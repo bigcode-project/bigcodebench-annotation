@@ -5,7 +5,7 @@ matplotlib==3.4.3
 seaborn==0.11.2
 numpy==1.21.2
 cryptography==3.4.8
-scipy==1.7.1
+scipy==1.7.2
 nltk==3.6.3
 pytz==2023.3.post1
 networkx==2.6.3
@@ -21,7 +21,7 @@ textblob==0.18.0
 python-docx==1.1.0
 openpyxl==3.1.2
 Levenshtein==0.25.0
-faker 
+faker
 tensorflow
 wordcloud
 pytesseract
