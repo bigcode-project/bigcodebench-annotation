@@ -17,7 +17,6 @@ selenium==4.15.
 Pillow==8.3.2
 beautifulsoup4==4.8.2
 datetime==5.5
-textblob==0.18.0
 python-docx==1.1.0
 openpyxl==3.1.2
 Levenshtein==0.25.0
