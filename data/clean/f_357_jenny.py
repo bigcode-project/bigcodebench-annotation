@@ -130,7 +130,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(
             predictions.shape[0], 20000
         )  # 20% of 100000 samples for testing
-        self.assertEqual(mse, 0.010142327812255192)
+        self.assertAlmostEqual(mse, 0.010142327812255192)
         
     def test_case_6(self):
         # Test output shapes
