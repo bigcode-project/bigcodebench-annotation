@@ -34,7 +34,8 @@ def f_928(data_file_path: str):
     # Convert strings with commas to float, if applicable
     for col in df.columns:
         df[col] = pd.to_numeric(df[col].replace(",", "", regex=True), errors="coerce")
-
+    # drop columns with NaN values
+    df = df.dropna(axis=1)
     means = df.mean()
     std_devs = df.std()
 
@@ -50,7 +51,7 @@ def f_928(data_file_path: str):
     # ANOVA Test if more than one numerical column
     anova_results = None
     if len(df.columns) > 1:
-        anova_results = pd.DataFrame(f_oneway(*[df[col] for col in df.columns if df[col].dtype != 'object']), 
+        anova_results = pd.DataFrame(f_oneway(*[df[col] for col in df.columns if df[col].dtype != 'object']),
                                      index=['F-value', 'P-value'], 
                                      columns=['ANOVA Results'])
 
@@ -100,8 +101,8 @@ class TestCases(unittest.TestCase):
         self.assertEqual(means["B"], 5)
         self.assertEqual(len(axes), 2)
         self.assertEqual(anova_results["ANOVA Results"]["F-value"], 13.5)
-        self.assertEqual(anova_results["ANOVA Results"]["P-value"], 0.021312)
-
+        self.assertAlmostEqual(anova_results["ANOVA Results"]["P-value"], 0.021312, places=5)
+        
     @patch("pandas.read_csv")
     def test_numerical_and_non_numerical_columns(self, mock_read_csv):
         """
