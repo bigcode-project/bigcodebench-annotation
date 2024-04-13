@@ -27,7 +27,7 @@ def f_850(url: str) -> pd.DataFrame:
     - requests
     - pandas
 
-    Example Usage:
+    Example:
     >>> f_850('https://example.com/data.json')
     DataFrame:
        A  B

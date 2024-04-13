@@ -1,5 +1,4 @@
 import csv
-import os
 import sys
 
 def f_533(filename):
@@ -14,7 +13,6 @@ def f_533(filename):
 
     Requirements:
     - csv
-    - os
     - sys
 
     Example:
@@ -38,6 +36,7 @@ def f_533(filename):
     return filename
 
 import unittest
+import os
 
 def run_tests():
     suite = unittest.TestSuite()

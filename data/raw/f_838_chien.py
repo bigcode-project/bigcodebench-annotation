@@ -13,7 +13,7 @@ def f_838(file_path: str, plot_path: str) -> (float, float, str):
     Labels the x-axis as "Index" and the y-axis as "Value".
     Saves the generated plot to the file path specified in 'plot_path'.
 
-    Args:
+    Parameters:
     - file_path (str): Path to the CSV input file.
     - plot_path (str): Path where the plot will be saved.
 

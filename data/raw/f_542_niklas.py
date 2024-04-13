@@ -1,6 +1,6 @@
 import pandas as pd
 import json
-import os
+
 
 def f_542(file_path, key):
     """
@@ -16,7 +16,6 @@ def f_542(file_path, key):
     Requirements:
     - pandas
     - json
-    - os
     
     Example:
     >>> df = f_542('data.json', 'ele')
@@ -33,6 +32,7 @@ def f_542(file_path, key):
     return df
 
 import unittest
+import os
 
 def run_tests():
     suite = unittest.TestSuite()

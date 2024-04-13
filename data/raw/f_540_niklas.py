@@ -22,10 +22,11 @@ def f_540(df):
     >>> f_540(df)
     {('a', 'b', 'c', 'd', 'e'): 2, ('b', 'c', 'd', 'e', 'f'): 1}
     """
-    df['combination'] = df.apply(lambda row: tuple(sorted(row)), axis=1)
-
+    df['combination'] = pd.Series(df.apply(lambda row: tuple(sorted(row)), axis=1))
+    
+    # Using Counter from collections to calculate the frequency of each combination
     combination_freq = Counter(df['combination'])
-
+    
     return dict(combination_freq)
 
 import unittest
@@ -71,6 +72,6 @@ class TestCases(unittest.TestCase):
         freq = f_540(df)
         self.assertEqual(freq[('a', 'b', 'c', 'd', 'e')], 3)
         
-run_tests()
+
 if __name__ == "__main__":
     run_tests()

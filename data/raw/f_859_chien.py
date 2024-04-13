@@ -18,13 +18,13 @@ def f_859(url: str) -> "matplotlib.axes._axes.Axes":
     - ValueError: If the URL is invalid or if there's an error downloading the image. Error message will specify the download issue.
     - IOError: If there's an error in opening or processing the downloaded image. Error message will specify the processing issue.
 
-    Dependencies:
+    Requirements:
     - requests
     - PIL
     - numpy
-    - matplotlib
+    - matplotlib.pyplot
 
-    Example Usage:
+    Example:
     >>> ax = f_859("https://www.example.com/myimage.jpg")
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>

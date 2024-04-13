@@ -20,7 +20,7 @@ def f_911(repo_url: str) -> dict:
     - requests.exceptions.RequestException: For other general issues encountered during the API request, such
             as network problems, invalid responses, or timeouts.
 
-    Notes:
+    Requirements:
     - requests
     - logging
 

@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
 
 
 def f_560(df):
@@ -20,27 +21,35 @@ def f_560(df):
 
     Example:
     >>> np.random.seed(42)
-    >>> df = pd.DataFrame(np.random.rand(500, 2) * 100, columns=['A', 'B'])
+    >>> df = pd.DataFrame(np.random.rand(500, 2) * 100, columns=['A', 'B']) 
     >>> labels = f_560(df)
     >>> print(labels)
-    [2 0 1 2 0 2 0 1 2 1 1 1 2 2 1 1 2 0 1 0 2 2 2 2 1 0 0 0 1 1 1 0 2 2 2 1 2
-     0 1 1 0 1 1 0 0 2 0 0 1 1 2 2 0 2 1 1 0 0 1 0 0 1 1 0 2 1 1 0 0 2 0 1 1 0
-     1 0 2 0 0 2 2 0 2 1 2 1 1 1 0 0 1 0 2 0 1 2 0 1 0 0 1 2 1 2 1 0 1 1 2 0 0
-     1 1 0 0 0 0 2 1 1 0 0 2 2 0 1 0 2 0 1 0 2 0 0 1 0 0 0 0 0 0 1 1 2 2 1 0 2
-     1 1 2 0 0 1 0 1 2 0 1 1 0 1 0 0 1 2 1 1 0 1 1 1 2 1 2 2 1 2 2 0 2 2 0 0 1
-     1 2 1 1 0 2 0 0 1 0 0 2 2 0 0 2 2 2 1 1 2 0 0 1 0 0 2 2 2 1 2 1 2 2 1 2 1
-     0 0 1 0 2 2 2 1 2 0 0 2 2 2 2 2 2 0 0 2 0 1 0 2 1 1 1 0 0 2 1 0 0 0 0 1 2
-     0 1 0 0 1 2 0 0 0 0 1 0 2 1 2 2 2 0 0 1 0 1 1 2 1 0 2 2 0 2 1 2 1 1 1 1 2
-     1 0 1 1 1 1 2 1 2 2 1 0 1 0 1 1 1 2 1 0 0 2 1 1 1 1 2 0 0 2 0 1 1 0 2 1 1
-     1 1 2 2 2 1 0 0 2 0 1 1 1 1 2 2 2 1 1 2 2 2 0 1 2 0 2 0 2 0 2 1 2 0 2 2 1
-     1 0 2 2 0 2 1 2 0 0 1 2 2 0 2 2 1 1 2 0 0 1 2 1 2 2 0 2 0 0 1 0 2 0 1 0 2
-     0 1 1 1 1 2 1 0 1 1 1 0 0 2 2 1 2 0 2 2 1 2 1 0 1 2 1 0 1 0 1 0 1 2 1 1 1
-     1 0 0 1 2 1 1 2 2 0 1 1 0 1 2 1 0 0 1 2 1 2 0 1 2 2 2 0 1 2 0 0 2 1 1 2 2
-     1 1 0 0 0 1 1 1 0 2 1 0 0 2 0 2 1 0 0]
+    [0 2 1 0 2 0 2 1 0 1 1 1 0 0 1 1 0 2 1 2 0 0 0 0 1 2 2 2 1 1 1 2 0 0 0 1 0
+     2 1 1 2 1 1 2 2 0 2 2 1 1 0 0 2 0 1 1 2 2 1 2 2 1 1 2 0 1 1 2 2 0 2 1 1 2
+     1 2 0 2 2 0 0 2 0 1 0 1 1 1 2 2 1 2 0 2 1 0 2 1 2 2 1 0 1 0 1 2 1 1 0 2 2
+     1 1 2 2 2 2 0 1 1 2 2 0 0 2 1 2 0 2 1 2 0 2 2 1 2 2 2 2 2 2 1 1 0 0 1 2 0
+     1 1 0 2 2 1 2 1 0 2 1 1 2 1 2 2 1 0 1 1 2 1 1 1 0 1 0 0 1 0 0 2 0 0 2 2 1
+     1 0 1 1 2 0 2 2 1 2 2 0 0 2 2 0 0 0 1 1 0 2 2 1 2 2 0 0 0 1 0 1 0 0 1 0 1
+     2 2 1 2 0 0 0 1 0 2 2 0 0 0 0 0 0 2 2 0 2 1 2 0 1 1 1 2 2 0 1 2 2 2 2 1 0
+     2 1 2 2 1 0 2 2 2 2 1 2 0 1 0 0 0 2 2 1 2 1 1 0 1 2 0 0 2 0 1 0 1 1 1 1 0
+     1 2 1 1 1 1 0 1 0 0 1 2 1 2 1 1 1 0 1 2 2 0 1 1 1 1 0 2 2 0 2 1 1 2 0 1 1
+     1 1 0 0 0 1 2 2 0 2 1 1 1 1 0 0 0 1 1 0 0 0 2 1 0 2 0 2 0 2 0 1 0 2 0 0 1
+     1 2 0 0 2 0 1 0 2 2 1 0 0 2 0 0 1 1 0 2 2 1 0 1 0 0 2 0 2 2 1 2 0 2 1 2 0
+     2 1 1 1 1 0 1 2 1 1 1 2 2 0 0 1 0 2 0 0 1 0 1 2 1 0 1 2 1 2 1 2 1 0 1 1 1
+     1 2 2 1 0 1 1 0 0 2 1 1 2 1 0 1 2 2 1 0 1 0 2 1 0 0 0 2 1 0 2 2 0 1 1 0 0
+     1 1 2 2 2 1 1 1 2 0 1 2 2 0 2 0 1 2 2]
     """
     # Perform clustering
-    kmeans = KMeans(n_clusters=3, random_state=0).fit(df)
-    labels = kmeans.labels_
+    scaler = StandardScaler()
+    df_std = scaler.fit_transform(df.values)
+    
+    # Convert standardized values back to a DataFrame using pd
+    df_std = pd.DataFrame(df_std, columns=df.columns)
+    
+    # Perform clustering with sklearn's KMeans
+    kmeans = KMeans(n_clusters=3, random_state=0).fit(df_std)
+    labels = kmeans.labels_  # The labels are directly a numpy array
+    
     return labels
 
 import unittest
@@ -83,6 +92,5 @@ class TestCases(unittest.TestCase):
         self.assertTrue(np.all(np.isin(labels, [0, 1, 2])))
         
 
-run_tests()
 if __name__ == "__main__":
     run_tests()

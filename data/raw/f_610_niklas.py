@@ -1,6 +1,4 @@
 import pandas as pd
-import numpy as np
-import os
 from sklearn.preprocessing import MinMaxScaler
 
 def f_610(data_path):
@@ -15,8 +13,6 @@ def f_610(data_path):
 
     Requirements:
     - pandas
-    - numpy
-    - os
     - sklearn
     
     Example:
@@ -33,6 +29,8 @@ def f_610(data_path):
     return df
 
 import unittest
+import os
+import numpy as np
 
 def run_tests():
     suite = unittest.TestSuite()

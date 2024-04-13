@@ -35,7 +35,7 @@ def f_865(csv_file_path, column_name, date_format="%Y-%m-%d"):
     - os
     - datetime
 
-    Example Usage:
+    Example:
     >>> f_865('path/to/csvfile.csv', 'DateColumn')
         Date       Value
     0   2023-12-10  100

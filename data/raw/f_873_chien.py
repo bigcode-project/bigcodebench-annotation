@@ -7,8 +7,11 @@ def f_873():
     """
     Generate all possible combinations (with replacement) of three letters from the alphabet and save them in a pandas DataFrame.
 
+    Parameters:
+    - None
+
     Returns:
-        DataFrame: A pandas DataFrame with each row representing a unique combination of three letters.
+    - DataFrame: A pandas DataFrame with each row representing a unique combination of three letters.
 
     Requirements:
     - itertools

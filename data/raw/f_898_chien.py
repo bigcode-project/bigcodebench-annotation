@@ -38,7 +38,7 @@ def f_898(file_path):
     - The function plots a histogram of the sample using matplotlib, with the number of bins
          determined automatically ('auto').
 
-    Example Usage:
+    Example:
     >>> mean, std_dev, ax = f_898('population_data.csv')
     >>> print(mean, std_dev)
     (50.5, 29.011491975882016)

@@ -27,12 +27,12 @@ def f_863(url=API_URL, from_encoding=None, to_encoding="utf8"):
     Raises:
     - ValueError: "Unable to detect encoding for non-empty content", if it fails to detect the encoding for non-empty response content.
 
-    Requires:
+    Requirements:
     - json
     - requests
     - chardet
 
-    Example Usage:
+    Example:
     >>> data = f_863('http://api.example.com/data')
     >>> print(data)
     {'key': 'value'}  # Example of expected output
@@ -69,7 +69,6 @@ import unittest
 import json
 import requests
 from unittest import mock
-import chardet
 
 
 class TestCases(unittest.TestCase):

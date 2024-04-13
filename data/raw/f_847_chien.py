@@ -23,7 +23,7 @@ def f_847(url):
     - The function does not remove common stopwords; all words are counted as is.
     - Requires internet access to download the file from the URL.
 
-    Example Usage:
+    Example:
     >>> word_freq, ax = f_847('http://www.example.com/data.txt')
     >>> print(word_freq.most_common(5))
     [('the', 102), ('of', 76), ('and', 64), ('to', 52), ('in', 41)]

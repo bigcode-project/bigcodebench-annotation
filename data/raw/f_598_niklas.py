@@ -1,7 +1,5 @@
 import json
-import pandas as pd
 import numpy as np
-import os
 
 def f_598(df):
     """
@@ -41,6 +39,9 @@ def f_598(df):
     return df
 
 import unittest
+import os
+import pandas as pd
+
 
 def run_tests():
     suite = unittest.TestSuite()

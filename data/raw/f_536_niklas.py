@@ -1,6 +1,5 @@
 import os
 import random
-import shutil
 
 def f_536(directory, n_files):
     """
@@ -16,7 +15,6 @@ def f_536(directory, n_files):
     Requirements:
     - os
     - random
-    - shutil
 
     Example:
     >>> f_536('/path/to/directory', 5)
@@ -35,6 +33,7 @@ def f_536(directory, n_files):
     return directory
 
 import unittest
+import shutil
 
 def run_tests():
     random.seed(42)

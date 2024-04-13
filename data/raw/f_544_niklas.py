@@ -1,5 +1,4 @@
 import math
-import os
 import yaml
 
 def f_544(yaml_path, key):
@@ -15,7 +14,6 @@ def f_544(yaml_path, key):
 
     Requirements:
     - math
-    - os
     - yaml
     
     Example:
@@ -33,6 +31,7 @@ def f_544(yaml_path, key):
     return data
 
 import unittest
+import os
 
 def run_tests():
     suite = unittest.TestSuite()

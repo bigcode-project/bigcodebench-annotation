@@ -22,7 +22,7 @@ def f_844(csv_file_path: str):
     - pandas
     - matplotlib
 
-    Example Usage:
+    Example:
     >>> ax = f_844('data.csv')
     >>> ax.get_title()
     'Plot Title :  Normalized Column 1'

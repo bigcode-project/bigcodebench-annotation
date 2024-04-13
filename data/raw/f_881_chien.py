@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 
@@ -24,7 +23,6 @@ def f_881(s1, s2, n_clusters=3):
 
     Requirements:
     - pandas
-    - numpy
     - scikit-learn
     - matplotlib
 

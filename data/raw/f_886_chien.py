@@ -16,6 +16,9 @@ def f_886(client_socket):
     Parameters:
     client_socket (socket.socket): The client socket from which the message is received.
 
+    Returns:
+    - None
+
     Note:
     - Requires a working internet connection and access to an SMTP server.
     - The function asks for the sender's email, recipient's email,

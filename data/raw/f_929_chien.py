@@ -1,5 +1,4 @@
 import re
-from string import punctuation
 from collections import Counter
 import matplotlib.pyplot as plt
 
@@ -18,7 +17,6 @@ def f_929(text):
 
     Requirements:
     - re
-    - string.punctuation
     - collections.Counter
     - matplotlib.pyplot
 
@@ -44,6 +42,7 @@ def f_929(text):
 
 
 import unittest
+from string import punctuation
 
 
 class TestCases(unittest.TestCase):

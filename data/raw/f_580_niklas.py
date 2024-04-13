@@ -4,13 +4,13 @@ from sklearn.linear_model import LinearRegression
 
 def f_580(df):
     """
-    Use a linear regression model to predict the "value" of "feature" in the given dataframe and return the coefficients and section.
+    Use a linear regression model to predict the "value" of "feature" in the given dataframe and return the coefficients and intercept.
 
     Parameters:
-    - df (DataFrame): pandas DataFrame that contains columns named 'feature' and 'value'.
+    - df (pd.DataFrame): pandas DataFrame that contains columns named 'feature' and 'value'.
 
     Returns:
-    - unittest (dict): A dictionary with the coefficients and the intercept of the fitted linear regression model.
+    - result (dict): A dictionary with the coefficients and the intercept of the fitted linear regression model.
 
     Requirements:
     - pandas
@@ -24,10 +24,9 @@ def f_580(df):
     >>> print(coefficients)
     {'coefficients': [[-0.03353164387961974]], 'intercept': [0.5135976564010359]}
     """
-    X = df['feature'].values.reshape(-1,1)
-    y = df['value'].values.reshape(-1,1)
+    X = np.array(df['feature']).reshape(-1,1)  # Explicitly converting to numpy array and reshaping
+    y = np.array(df['value']).reshape(-1,1)    # Explicitly converting to numpy array and reshaping
 
-    # Fit linear regression
     model = LinearRegression().fit(X, y)
 
     return {'coefficients': model.coef_.tolist(), 'intercept': model.intercept_.tolist()}
@@ -84,6 +83,6 @@ class TestCases(unittest.TestCase):
         self.assertAlmostEqual(coefficients['coefficients'][0][0], 0.0)
         self.assertAlmostEqual(coefficients['intercept'][0], 0.0)
 
-run_tests()
+
 if __name__ == "__main__":
     run_tests()

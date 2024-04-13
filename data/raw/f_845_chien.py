@@ -25,7 +25,7 @@ def f_845(data, column_name="target_column"):
     - pandas
     - matplotlib
 
-    Example Usage:
+    Example:
     >>> sample_data = [{'userId': 1, 'value': 10}, {'userId': 2, 'value': 15}]
     >>> df, ax = f_845(sample_data, 'userId')
     >>> print(df)

@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from scipy.stats import ttest_ind
 
@@ -22,7 +21,6 @@ def f_880(s1, s2):
       observing the data if the null hypothesis (no difference in means) is true.
 
     Requirements:
-    - pandas
     - matplotlib
     - scipy
 
@@ -33,15 +31,16 @@ def f_880(s1, s2):
     >>> plt.show() # Display the plot in a non-interactive environment
     """
 
-    ax = s1.plot(
-        kind="hist", bins=30, alpha=0.5, label=s1.name or "Series 1", legend=True
-    )
-    s2.plot(
-        kind="hist", bins=30, alpha=0.5, label=s2.name or "Series 2", ax=ax, legend=True
-    )
-    t_stat, p_value = ttest_ind(
-        s1, s2, equal_var=False
-    )  # Assuming unequal variances by default
+    # Plotting directly on Series objects
+    ax = s1.plot(kind="hist", bins=30, alpha=0.5, label=s1.name or "Series 1", legend=True)
+    s2.plot(kind="hist", bins=30, alpha=0.5, label=s2.name or "Series 2", ax=ax, legend=True)
+    
+    # Performing the two-sample t-test
+    t_stat, p_value = ttest_ind(s1, s2, equal_var=False)  # Assuming unequal variances by default
+    
+    # No change needed for plt.show(), already correctly used
+    plt.show()  # Shows the plot
+    
     return ax, t_stat, p_value
 
 
@@ -130,4 +129,6 @@ def run_tests():
 
 
 if __name__ == "__main__":
-    run_tests()
+    import doctest
+    doctest.testmod()
+    # run_tests()

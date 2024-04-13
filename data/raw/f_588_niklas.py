@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.cluster import DBSCAN
 
 def f_588(data, cols):
@@ -16,7 +15,6 @@ def f_588(data, cols):
 
     Requirements:
     - pandas
-    - numpy
     - sklearn
 
     Example:
@@ -35,6 +33,7 @@ def f_588(data, cols):
     return df
 
 import unittest
+import numpy as np
 
 def run_tests():
     suite = unittest.TestSuite()

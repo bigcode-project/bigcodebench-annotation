@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
@@ -18,7 +17,6 @@ def f_906(arr):
     matplotlib.axes._subplots.AxesSubplot: A plot representing the time series of row sums.
 
     Requirements:
-    - numpy
     - pandas
     - matplotlib
 

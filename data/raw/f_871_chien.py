@@ -1,7 +1,6 @@
 import subprocess
 import time
 import json
-import os
 import platform
 
 LOGFILE_PATH = "logfile.log"
@@ -25,7 +24,6 @@ def f_871(interval, duration):
     - subprocess
     - time
     - json
-    - os
     - platform
 
     Note: 

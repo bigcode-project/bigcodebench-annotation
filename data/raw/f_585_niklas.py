@@ -10,7 +10,7 @@ def f_585(data, cols):
     - cols (list): List of column names
     
     Returns:
-    - correlation_matrix (DataFrame): The correlation matrix.
+    - correlation_matrix (pd.DataFrame): The correlation matrix.
 
     Requirements:
     - pandas
@@ -25,8 +25,12 @@ def f_585(data, cols):
     z  0.866025  0.114708  1.000000
     """
     df = pd.DataFrame(data, columns=cols)
+    
+    df_np = np.array(df)
+    df = pd.DataFrame(df_np, columns=cols)
+    
     correlation_matrix = df.corr()
-    return correlation_matrix ### Turn into numpy ###
+    return correlation_matrix
 
 import unittest
 
@@ -62,6 +66,5 @@ class TestCases(unittest.TestCase):
         correlation_matrix = f_585([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0], [-7.0, -8.0, -9.0]], ['x', 'y', 'z'])
         self.assertTrue(np.allclose(correlation_matrix, df.corr()))
 
-run_tests()
 if __name__ == "__main__":
     run_tests()

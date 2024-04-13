@@ -3,40 +3,40 @@ import numpy as np
 
 def f_545(df, col):
     """
-    Process a Pandas DataFrame by removing a specific column and returning the updated DataFrame.
+    Process a Pandas DataFrame by removing a specific column and adding a 'IsEvenIndex' column.
+    The 'IsEvenIndex' column is a boolean flag indicating if the index of each row is even.
     
     Parameters:
-    - df (DataFrame): The pandas DataFrame to process.
+    - df (pd.DataFrame): The pandas DataFrame to process.
     - col (str): The column to remove.
 
     Returns:
-    - df (pandas.DataFrame): The processed pandas DataFrame.
+    - df (pd.DataFrame): The processed pandas DataFrame with the specified column removed and a new 'IsEvenIndex' column added.
 
     Requirements:
     - pandas
     - numpy
-    
+
     Example:
     >>> np.random.seed(42)
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(5, 4)), columns=list('ABCD'))
-    >>> print(df)
-        A   B   C   D
-    0  51  92  14  71
-    1  60  20  82  86
-    2  74  74  87  99
-    3  23   2  21  52
-    4   1  87  29  37
     >>> df = f_545(df, 'C')
     >>> print(df)
-        A   B   D
-    0  51  92  71
-    1  60  20  86
-    2  74  74  99
-    3  23   2  52
-    4   1  87  37
+        A   B   D  IsEvenIndex
+    0  51  92  71         True
+    1  60  20  86        False
+    2  74  74  99         True
+    3  23   2  52        False
+    4   1  87  37         True
     """
-    df.drop(col, axis=1, inplace=True)
-    return df
+    # Remove specified column using pandas
+    updated_df = pd.DataFrame(df).drop(col, axis=1)
+    
+    # Add a new column 'IsEvenIndex' using numpy to determine if index is even
+    # The np.arange(len(updated_df)) creates an array of indexes, % 2 == 0 checks if they are even
+    updated_df['IsEvenIndex'] = np.arange(len(updated_df)) % 2 == 0
+    
+    return updated_df
 
 import unittest
 
@@ -77,6 +77,5 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df.shape, (100, 3))
         self.assertFalse('A' in df.columns)
 
-run_tests()
 if __name__ == "__main__":
     run_tests()

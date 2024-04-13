@@ -25,7 +25,7 @@ def f_861(url=URL, from_encoding="cp1251", use_lxml=False):
     - bs4
     - requests
 
-    Example Usage:
+    Example:
     >>> html = f_861('http://example.com', 'cp1251', True)
     >>> print(html.prettify()) if html else print("Error fetching or parsing the webpage.")
 

@@ -33,6 +33,9 @@ def f_903():
     Each pair is formatted as 'Planet:Element'. The number of rows is determined by
     the number of planets, and each row will contain as many planet-element pairs as there are elements.
 
+    Parameters:
+    - None
+
     Returns:
     pandas.DataFrame: A DataFrame where each cell contains a string in the format 'Planet:Element'.
                       The DataFrame has a number of rows equal to the number of planets and

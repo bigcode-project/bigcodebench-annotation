@@ -36,7 +36,7 @@ def f_900(n_pairs=26):
       of the pairs and assigns random counts to them.
     - The random counts assigned to each pair range from 1 to 9.
 
-    Example Usage:
+    Example:
     >>> ax = f_900(5)
     >>> [bar.get_label() for bar in ax]
     ['d:4', 'b:2', 'c:3', 'e:5', 'a:1']

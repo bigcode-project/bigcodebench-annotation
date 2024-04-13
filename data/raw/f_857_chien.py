@@ -24,7 +24,7 @@ def f_857(api_url):
     Requirements:
     - requests
     - pandas
-    - matplotlib
+    - matplotlib.pyplot
 
     Example:
     >>> df, plot = f_857("https://api.example.com/data")

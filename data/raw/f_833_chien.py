@@ -28,7 +28,7 @@ def f_833(hex_string):
     - urllib
     - codecs
 
-    Example Usage:
+    Example:
     >>> f_833("4a4b4c")
     {'hex': '4a4b4c', 'base64': 'SktM', 'utf-8': 'JKL', 'utf-16': 'JKL', 'utf-32': 'JKL', 'ASCII': 'JKL', 'URL': 'JKL', 'ROT13': 'WXY'}
 

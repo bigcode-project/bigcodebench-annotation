@@ -1,7 +1,6 @@
 import itertools
 import string
 import pandas as pd
-import matplotlib.pyplot as plt
 
 
 def f_876():
@@ -13,6 +12,9 @@ def f_876():
     It then creates a DataFrame from these combinations and plots a histogram to show the frequency
     of each letter appearing as the first letter in these combinations.
 
+    Parameters:
+    - None
+
     Returns:
     tuple: A tuple containing:
         - DataFrame: A pandas DataFrame with all 3-letter combinations.
@@ -22,7 +24,6 @@ def f_876():
     - itertools
     - string
     - pandas
-    - matplotlib.pyplot
 
     Example:
     >>> df, ax = f_876()
@@ -50,6 +51,7 @@ def f_876():
 import unittest
 import itertools
 import string
+import matplotlib.pyplot as plt
 
 LETTERS = list(string.ascii_lowercase)
 
@@ -105,6 +107,4 @@ def run_tests():
 
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
     run_tests()

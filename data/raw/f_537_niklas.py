@@ -38,8 +38,10 @@ def f_537(df):
             return row['team2']
         else:
             return random.choice([row['team1'], row['team2']])
-
-    df['winner'] = df.apply(determine_winner, axis=1)
+    
+    # Using pd.Series to explicitly create a new Series for the 'winner' column
+    winner_series = pd.Series([determine_winner(row) for index, row in df.iterrows()], index=df.index)
+    df['winner'] = winner_series
     return df
 
 import unittest
@@ -98,6 +100,5 @@ class TestCases(unittest.TestCase):
         self.assertTrue(df['winner'].equals(pd.Series(['Team B', 'Team C', 'Team D', 'Team E', 'Team A'])))
 
 
-run_tests()
 if __name__ == "__main__":
     run_tests()

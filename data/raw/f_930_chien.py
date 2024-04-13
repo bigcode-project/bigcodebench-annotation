@@ -14,6 +14,9 @@ def f_930():
     The float field contains randomly generated numbers between 0 and 10000,
     formatted with two decimal places and a comma as the thousands separator.
 
+    Parameters:
+    - None
+
     Returns:
         DataFrame: A pandas DataFrame with NUM_SAMPLES rows. Each row contains a
         random string in the 'String Field' column and a formatted float in the

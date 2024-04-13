@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from scipy import stats
 
@@ -13,7 +12,6 @@ def f_558(df):
     - dict: A dictionary with p-values from the Shapiro-Wilk test for each column.
 
     Requirements:
-    - pandas
     - numpy
     - scipy
 
@@ -24,11 +22,20 @@ def f_558(df):
     >>> print(p_values)
     {0: 0.3595593273639679, 1: 0.23594242334365845, 2: 0.7625805139541626, 3: 0.4812640845775604, 4: 0.13771511614322662}
     """
-    # Test normality
-    p_values = {col: stats.shapiro(df[col])[1] for col in df.columns}
+
+    p_values = {}
+
+    for col in df.columns:
+        column_data = np.array(df[col])
+        
+        test_stat, p_value = stats.shapiro(column_data)
+        
+        p_values[col] = p_value
+
     return p_values
 
 import unittest
+import pandas as pd
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -89,6 +96,5 @@ class TestCases(unittest.TestCase):
                 self.assertTrue(p_values[col] > 0.05)
 
 
-run_tests()
 if __name__ == "__main__":
     run_tests()

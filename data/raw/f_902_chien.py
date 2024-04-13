@@ -51,7 +51,7 @@ def f_902(num_pairs=10):
     - seaborn
     - matplotlib
 
-    Example Usage:
+    Example:
     >>> ax = f_902(10)
     >>> [tick.get_text() for tick in ax.get_xticklabels()]
     ['Circle:Red', 'Circle:Blue', 'Circle:Green', 'Circle:Yellow', 'Circle:Black', 'Circle:White', 'Circle:Purple', 'Circle:Orange', 'Circle:Pink', 'Circle:Brown']

@@ -10,10 +10,10 @@ def f_559(df):
     Given a Pandas DataFrame with random numeric values and columns X & Y, use sklearn's linear regression to match the data to a linear model.
 
     Parameters:
-    df (DataFrame): The DataFrame to use.
+    - df (DataFrame): The DataFrame to use.
 
     Returns:
-    LinearRegression: The fitted linear model.
+    - model (LinearRegression): The fitted linear model.
 
     Requirements:
     - numpy
@@ -27,7 +27,12 @@ def f_559(df):
     >>> print(model)
     LinearRegression()
     """
-    model = LinearRegression().fit(df[['X']], df['Y'])
+    X = pd.DataFrame(df[['X']])  # Extracting column 'X' as a DataFrame
+    y = pd.Series(df['Y'])       # Extracting column 'Y' as a Series
+    
+    # Fitting the linear regression model
+    model = LinearRegression().fit(X, y)
+    
     return model
 
 import unittest
@@ -74,6 +79,5 @@ class TestCases(unittest.TestCase):
         self.assertTrue(model.score(df[['X']], df['Y']) is not None)
         self.assertTrue(model.score(df[['X']], df['Y']) >= 0)
 
-run_tests()
 if __name__ == "__main__":
     run_tests()

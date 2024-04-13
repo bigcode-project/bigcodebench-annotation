@@ -17,6 +17,9 @@ def f_882(client_socket):
     - datetime.datetime
     - json
 
+    Returns:
+    - None
+
     Example:
     >>> import socket
     >>> server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

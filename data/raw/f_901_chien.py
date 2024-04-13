@@ -1,6 +1,5 @@
 import pandas as pd
 import itertools
-import random
 import numpy as np
 
 
@@ -22,11 +21,10 @@ def f_901(animals=None, foods=None):
     - If both 'animals' and 'foods' lists are empty or not provided, the function returns an empty DataFrame.
     - If either 'animals' or 'foods' list is empty or not provided, the function uses its predefined list for the missing parameter.
 
-    Dependencies:
+    Requirements:
     - pandas
     - numpy
     - itertools
-    - random
 
     Example:
     >>> animal_food_pairs = f_901(['Dog', 'Cat'], ['Meat', 'Fish'])
@@ -62,7 +60,6 @@ def f_901(animals=None, foods=None):
         return pd.DataFrame()
 
     pairs = [f"{a}:{f}" for a, f in itertools.product(animals, foods)]
-    # random.shuffle(pairs)
 
     # Reshape the data and create a DataFrame
     data = np.array(pairs).reshape(-1, len(foods))

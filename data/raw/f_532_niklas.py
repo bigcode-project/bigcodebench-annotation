@@ -1,6 +1,5 @@
 import os
 import random
-import shutil
 import json
 
 def f_532(directory, n):
@@ -17,7 +16,6 @@ def f_532(directory, n):
     Requirements:
     - os
     - random
-    - shutil
     - json
 
     Example:
@@ -38,6 +36,7 @@ def f_532(directory, n):
     return directory
 
 import unittest
+import shutil
 
 def run_tests():
     random.seed(42)

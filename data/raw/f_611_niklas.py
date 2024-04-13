@@ -1,6 +1,5 @@
 import json
 import csv
-import os
 
 def f_611(json_file, csv_file):
     """
@@ -16,7 +15,6 @@ def f_611(json_file, csv_file):
     Requirements:
     - json
     - csv
-    - os
         
     Example:
     >>> f_611('path_to_json_file.json', 'path_to_csv_file.csv')
@@ -32,6 +30,7 @@ def f_611(json_file, csv_file):
     return csv_file
 
 import unittest
+import os
 
 def run_tests():
     suite = unittest.TestSuite()

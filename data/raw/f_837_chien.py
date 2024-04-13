@@ -20,9 +20,10 @@ def f_837(url: str, csv_file_path: str) -> list:
     prolonged waiting in case of unresponsive webpages. If the request encounters any exceptions such as connection errors, timeouts, or HTTP errors, a 'requests.RequestException' is raised. 
     The function raises a '' with a message that includes the details of the exception. For example,, depending on the specific issue encountered.
     Parameters:
-    
-    url (str): The URL of the webpage to be parsed.
-    csv_file_path (str): The path where the resulting CSV file will be saved.
+
+    Parameters:
+    - url (str): The URL of the webpage to be parsed.
+    - csv_file_path (str): The path where the resulting CSV file will be saved.
 
     Returns:
     list: A list of tuples containing the (title, date, author) extracted from the webpage. Default placeholders 
@@ -40,6 +41,7 @@ def f_837(url: str, csv_file_path: str) -> list:
     >>> len(data) > 0
     True
     """
+
 
     try:
         response = requests.get(url, timeout=5)

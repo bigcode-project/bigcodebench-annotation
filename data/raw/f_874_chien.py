@@ -1,7 +1,6 @@
 import random
 import string
 import pandas as pd
-import matplotlib.pyplot as plt
 
 
 def f_874(n_rows=1000):
@@ -25,8 +24,7 @@ def f_874(n_rows=1000):
     - random
     - string
     - pandas
-    - matplotlib.pyplot
-
+    
     Example:
     >>> ax = f_874(1000)
     >>> ax.get_title()
@@ -55,6 +53,7 @@ def f_874(n_rows=1000):
 import unittest
 import random
 from matplotlib.axes import Axes
+import matplotlib.pyplot as plt
 
 
 class TestCases(unittest.TestCase):

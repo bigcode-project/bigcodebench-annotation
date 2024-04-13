@@ -36,27 +36,34 @@ def f_866(dataframe):
 
     if dataframe.empty:
         raise ValueError("DataFrame is empty.")
-
+        
     if not all(dataframe.dtypes.apply(lambda x: np.issubdtype(x, np.number))):
         raise TypeError("All columns must be numeric for correlation calculation.")
 
     if dataframe.shape[1] < 2:
-        raise ValueError(
-            "DataFrame must have at least two columns for correlation calculation."
-        )
+        raise ValueError("DataFrame must have at least two columns for correlation calculation.")
 
-    corr = dataframe.corr()
-    abs_corr = corr.abs()
+    # Explicit use of pd.DataFrame.corr() to calculate the correlation matrix
+    corr_matrix = pd.DataFrame.corr(dataframe)
+    abs_corr_matrix = corr_matrix.abs()
 
-    # Extract indices of the maximum absolute correlation
-    max_corr = abs_corr.unstack().dropna().nlargest(2).iloc[-1]
-    pair = np.where(abs_corr == max_corr)
+    # Finding the pair of columns with the highest absolute correlation
+    highest_corr_value = abs_corr_matrix.unstack().dropna().nlargest(2).iloc[-1]
+    max_corr_pair = np.where(abs_corr_matrix == highest_corr_value)
 
-    ax = dataframe.plot(
-        kind="scatter", x=dataframe.columns[pair[0][0]], y=dataframe.columns[pair[1][0]]
-    )
+    # Extracting column names for the highest correlation
+    column_x = dataframe.columns[max_corr_pair[0][0]]
+    column_y = dataframe.columns[max_corr_pair[1][0]]
 
-    return ax
+    # Using plt to plot the scatter plot
+    plt.figure(figsize=(10, 6))  # Creating a figure
+    plt.scatter(dataframe[column_x], dataframe[column_y])  # Plotting the scatter plot
+    plt.title(f"Scatter plot between {column_x} and {column_y}")  # Setting the title
+    plt.xlabel(column_x)  # Setting the x-axis label
+    plt.ylabel(column_y)  # Setting the y-axis label
+    plt.show()  # Displaying the figure
+
+    return plt.gca()  # Returning the current Axes object for further use
 
 
 import unittest
