@@ -63,7 +63,8 @@ class TestCases(unittest.TestCase):
     def tearDownClass(cls):
         os.remove(cls.db1_path)
         os.remove(cls.db2_path)
-
+        os.remove('nonexistent.db')
+    
     def test_valid_input(self):
         df1 = f_768(self.db1_path, self.table_name1, self.column_name1)
         self.assertIn('<br>', df1[self.column_name1].iloc[0])
