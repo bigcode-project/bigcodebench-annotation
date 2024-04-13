@@ -44,6 +44,8 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
     def base(self, src_dir, dst_dir):
+        if os.path.exists(src_dir):
+            shutil.rmtree(src_dir)
         # Create source directory
         os.mkdir(src_dir)
         # Create destination directory
@@ -68,9 +70,11 @@ class TestCases(unittest.TestCase):
             else:
                 self.assertFalse(os.path.exists(os.path.join(d, 'a.pdf')))
                 self.assertFalse(os.path.exists(os.path.join(d, 'a.doc')))
-        # Remove files
-        shutil.rmtree(src_dir)
-        shutil.rmtree(dst_dir)
+    
+    def tearDown(self):
+        for d in ['./source', './destination', './src', './dst', './s', './d']:
+            if os.path.exists(d):
+                shutil.rmtree(d)
 
     def test_case_1(self):
         self.base('./source', './destination')
@@ -86,7 +90,3 @@ class TestCases(unittest.TestCase):
 
     def test_case_5(self):
         self.base('./source', './d')
-
-run_tests()
-if __name__ == "__main__":
-    run_tests()

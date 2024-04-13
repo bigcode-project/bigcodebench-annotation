@@ -16,7 +16,7 @@ def f_610(data_path):
     - sklearn
     
     Example:
-    >>> f_610('path_to_data_file.csv')
+    >>> df = f_610('path_to_data_file.csv')
     """
     df = pd.read_csv(data_path)
     data = df.to_numpy()

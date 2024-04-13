@@ -50,6 +50,10 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
+    def tearDown(self):
+        if os.path.exists('IntCol.json'):
+            os.remove('IntCol.json')
+    
     def test_case_1(self):
         df = pd.DataFrame({'IntCol': [10, 100, 1000, 10000, 100000]})
         df_transformed = f_598(df)

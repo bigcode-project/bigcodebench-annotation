@@ -44,7 +44,7 @@ def f_608(raw_string, filename, output_dir):
     return file_path
 
 import unittest
-
+import shutil
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
@@ -52,6 +52,10 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
+    def tearDown(self):
+        if os.path.exists('./output'):
+            shutil.rmtree('./output')
+    
     def test_case_1(self):
         raw_string = 'eyJrZXkiOiAiVmFsdWUifQ=='
         filename = 'data'

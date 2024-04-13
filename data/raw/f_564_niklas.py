@@ -17,8 +17,9 @@ def f_564(t, n):
     - random
     
     Example:
+    >>> random.seed(42)
     >>> f_564((1, 2, 3, 4), 2)
-    (1, 3)
+    (3, 4)
     """
     combinations = list(itertools.combinations(t, n))
     selected_combination = random.choice(combinations)

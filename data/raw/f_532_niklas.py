@@ -4,7 +4,7 @@ import json
 
 def f_532(directory, n):
     """
-    Create n random files in a directory with json content, and then reset the cursor to the beginning of each file.
+    Create n random files in a directory with json content with the key 'number' and a random integer value between 1 and 100, and then reset the cursor to the beginning of each file.
 
     Parameters:
     - directory (str): The directory in which to generate the files.
@@ -38,24 +38,32 @@ def f_532(directory, n):
 import unittest
 import shutil
 
-def run_tests():
-    random.seed(42)
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCases))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-
 class TestCases(unittest.TestCase):
+    def tearDown(self):
+        shutil.rmtree('./source', ignore_errors=True)
+        shutil.rmtree('./src', ignore_errors=True)
+        shutil.rmtree('./s', ignore_errors=True)
+
     def test_case_1(self):
+        random.seed(0)
         directory = f_532('./source', 10)
         self.assertTrue(os.path.exists(directory))
-        self.assertEqual(len(os.listdir(directory)), 10)
+        read_data = []
+        for file in os.listdir(directory):
+            with open(os.path.join(directory, file), 'r') as f:
+                read_data.append(json.load(f))
+        self.assertEqual(read_data, [{'number': 39}, {'number': 98}, {'number': 6}, {'number': 34}, {'number': 66}, {'number': 50}, {'number': 62}, {'number': 54}, {'number': 63}, {'number': 52}])
         shutil.rmtree(directory)
 
     def test_case_2(self):
+        random.seed(1)
         directory = f_532('./src', 1)
         self.assertTrue(os.path.exists(directory))
-        self.assertEqual(len(os.listdir(directory)), 1)
+        read_data = []
+        for file in os.listdir(directory):
+            with open(os.path.join(directory, file), 'r') as f:
+                read_data.append(json.load(f))
+        self.assertEqual(read_data, [{'number': 18}])
         shutil.rmtree(directory)
 
     def test_case_3(self):
@@ -71,13 +79,12 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(directory)
 
     def test_case_5(self):
+        random.seed(2)
         directory = f_532('./source', 1)
         self.assertTrue(os.path.exists(directory))
-        self.assertEqual(len(os.listdir(directory)), 1)
+        read_data = []
+        for file in os.listdir(directory):
+            with open(os.path.join(directory, file), 'r') as f:
+                read_data.append(json.load(f))
+        self.assertEqual(read_data, [{'number': 8}])
         shutil.rmtree(directory)
-
-run_tests()
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
-    # run_tests()

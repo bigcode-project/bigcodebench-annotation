@@ -21,6 +21,7 @@ def f_612(source_dir, dest_dir, extension):
         
     Example:
     >>> f_612('path_to_source_dir', 'path_to_dest_dir', '.txt')
+    10
     """
     files = glob.glob(os.path.join(source_dir, f'*.{extension}'))
     
@@ -40,6 +41,11 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
+    def tearDown(self):
+        for d in ['./source', './destination', './src', './dst', './s', './d']:
+            if os.path.exists(d):
+                shutil.rmtree(d)
+
     def test_case_1(self):
         # Create source directory
         if os.path.exists('./source'):

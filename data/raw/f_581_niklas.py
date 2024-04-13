@@ -47,49 +47,49 @@ class TestCases(unittest.TestCase):
         X_train, X_test, y_train, y_test = f_581(df)
         self.assertEqual(X_train.shape, (70, 5))
         self.assertEqual(X_test.shape, (30, 5))
-        self.assertEqual(y_train.shape, (70,))
-        self.assertEqual(y_test.shape, (30,))
+        self.assertEqual(y_train.shape, (70, 1))
+        self.assertEqual(y_test.shape, (30, 1))
 
     def test_case_2(self):
         df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'target': [0, 1, 0]})
         X_train, X_test, y_train, y_test = f_581(df)
         self.assertEqual(X_train.shape, (2, 2))
         self.assertEqual(X_test.shape, (1, 2))
-        self.assertEqual(y_train.shape, (2,))
-        self.assertEqual(y_test.shape, (1,))
+        self.assertEqual(y_train.shape, (2, 1))
+        self.assertEqual(y_test.shape, (1, 1))
 
     def test_case_3(self):
         df = pd.DataFrame({'A': [0, 0, 0], 'B': [0, 0, 0], 'target': [0, 0, 0]})
         X_train, X_test, y_train, y_test = f_581(df)
         self.assertEqual(X_train.shape, (2, 2))
         self.assertEqual(X_test.shape, (1, 2))
-        self.assertEqual(y_train.shape, (2,))
-        self.assertEqual(y_test.shape, (1,))
+        self.assertEqual(y_train.shape, (2, 1))
+        self.assertEqual(y_test.shape, (1, 1))
         self.assertEqual(X_train.iloc[0, 0], 0)
         self.assertEqual(X_train.iloc[0, 1], 0)
         self.assertEqual(X_train.iloc[1, 0], 0)
         self.assertEqual(X_train.iloc[1, 1], 0)
         self.assertEqual(X_test.iloc[0, 0], 0)
         self.assertEqual(X_test.iloc[0, 1], 0)
-        self.assertEqual(y_train.iloc[0], 0)
-        self.assertEqual(y_train.iloc[1], 0)
-        self.assertEqual(y_test.iloc[0], 0)
+        self.assertEqual(y_train.iloc[0].to_list(), [0])
+        self.assertEqual(y_train.iloc[1].to_list(), [0])
+        self.assertEqual(y_test.iloc[0].to_list(), [0])
 
     def test_case_4(self):
         df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'target': [1, 1, 1]})
         X_train, X_test, y_train, y_test = f_581(df)
         self.assertEqual(X_train.shape, (2, 2))
         self.assertEqual(X_test.shape, (1, 2))
-        self.assertEqual(y_train.shape, (2,))
-        self.assertEqual(y_test.shape, (1,))
+        self.assertEqual(y_train.shape, (2, 1))
+        self.assertEqual(y_test.shape, (1, 1))
     
     def test_case_5(self):
         df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'target': [0, 0, 0]})
         X_train, X_test, y_train, y_test = f_581(df)
         self.assertEqual(X_train.shape, (2, 2))
         self.assertEqual(X_test.shape, (1, 2))
-        self.assertEqual(y_train.shape, (2,))
-        self.assertEqual(y_test.shape, (1,))
+        self.assertEqual(y_train.shape, (2, 1))
+        self.assertEqual(y_test.shape, (1, 1))
 
 
 if __name__ == "__main__":

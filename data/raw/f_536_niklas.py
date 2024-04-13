@@ -35,54 +35,47 @@ def f_536(directory, n_files):
 import unittest
 import shutil
 
-def run_tests():
-    random.seed(42)
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCases))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        random.seed(42)
+        
+    def tearDown(self):
+        shutil.rmtree('./source', ignore_errors=True)
+        shutil.rmtree('./src', ignore_errors=True)
+        shutil.rmtree('./s', ignore_errors=True)
+    
     def test_case_1(self):
         directory = f_536('./source', 10)
         self.assertTrue(os.path.exists(directory))
         self.assertEqual(len(os.listdir(directory)), 10)
         for file in os.listdir(directory):
             self.assertEqual(file.split('.')[-1], 'txt')
-        shutil.rmtree(directory)
-
+        
     def test_case_2(self):
         directory = f_536('./src', 1)
         self.assertTrue(os.path.exists(directory))
         self.assertEqual(len(os.listdir(directory)), 1)
         for file in os.listdir(directory):
             self.assertEqual(file.split('.')[-1], 'txt')        
-        shutil.rmtree(directory)
-
+        
     def test_case_3(self):
         directory = f_536('./s', 100)
         self.assertTrue(os.path.exists(directory))
         self.assertEqual(len(os.listdir(directory)), 100)
         for file in os.listdir(directory):
             self.assertEqual(file.split('.')[-1], 'txt')        
-        shutil.rmtree(directory)
-
+        
     def test_case_4(self):
         directory = f_536('./s', 0)
         self.assertTrue(os.path.exists(directory))
         self.assertEqual(len(os.listdir(directory)), 0)
         for file in os.listdir(directory):
             self.assertEqual(file.split('.')[-1], 'txt')        
-        shutil.rmtree(directory)
-
+        
     def test_case_5(self):
         directory = f_536('./source', 1)
         self.assertTrue(os.path.exists(directory))
         self.assertEqual(len(os.listdir(directory)), 1)
         for file in os.listdir(directory):
             self.assertEqual(file.split('.')[-1], 'txt')
-        shutil.rmtree(directory)
-
-run_tests()
-if __name__ == "__main__":
-    run_tests()
+        

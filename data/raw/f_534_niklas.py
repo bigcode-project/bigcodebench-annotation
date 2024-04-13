@@ -17,6 +17,7 @@ def f_534(directory, n_files):
     - random
 
     Example:
+    >>> random.seed(2)
     >>> f_534('/path/to/directory', 5)
     5
     """
@@ -35,16 +36,9 @@ def f_534(directory, n_files):
 import unittest
 import shutil
 
-
-def run_tests():
-    random.seed(42)
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCases))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-
 class TestCases(unittest.TestCase):
-    def base(self, dir, n_files):
+    def base(self, dir, n_files, contents):
+        random.seed(42)
         # Create directory
         if not os.path.exists(dir):
             os.makedirs(dir)
@@ -52,29 +46,30 @@ class TestCases(unittest.TestCase):
         n = f_534(dir, n_files)
         # Check files
         self.assertEqual(n, n_files)
+        read_data = []
         for f in os.listdir(dir):
             self.assertTrue(f.endswith('.txt'))
             with open(os.path.join(dir, f), 'r') as file:
-                self.assertEqual(len(file.read()), 1)
+                read_data.append(file.read())
                 file.seek(0)
-        # Remove files
-        shutil.rmtree(dir)
+        self.assertEqual(read_data, contents)
+
+    def tearDown(self):
+        shutil.rmtree('./directory', ignore_errors=True)
+        shutil.rmtree('./dir', ignore_errors=True)
+        shutil.rmtree('./d', ignore_errors=True)
 
     def test_case_1(self):
-        self.base('./directory', 5)
+        self.base('./directory', 5, ['1', '4', '0', '3', '3'])
 
     def test_case_2(self):
-        self.base('./dir', 10)
+        self.base('./dir', 10, ['9', '1', '2', '1', '1', '8', '4', '0', '3', '3'])
 
     def test_case_3(self):
-        self.base('./d', 15)
+        self.base('./d', 15, ['9', '1', '3', '2', '1', '1', '8', '4', '0', '0', '3', '1', '3', '6', '0'])
 
     def test_case_4(self):
-        self.base('./d', 20)
+        self.base('./d', 20, ['9', '1', '3', '8', '2', '1', '1', '8', '8', '4', '0', '3', '0', '3', '1', '3', '0', '9', '6', '0'])
 
     def test_case_5(self):
-        self.base('./directory', 25)
-
-run_tests()
-if __name__ == "__main__":
-    run_tests()
+        self.base('./directory', 25, ['6', '9', '1', '3', '8', '8', '2', '7', '1', '3', '1', '8', '8', '3', '4', '0', '3', '0', '3', '1', '3', '0', '9', '6', '0'])

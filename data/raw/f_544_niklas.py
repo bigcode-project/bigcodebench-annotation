@@ -17,7 +17,7 @@ def f_544(yaml_path, key):
     - yaml
     
     Example:
-    >>> yaml_data = f_544()
+    >>> yaml_data = f_544('data.yaml', 'ele')
     """
     with open(yaml_path, 'r') as file:
         data = yaml.safe_load(file)

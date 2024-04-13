@@ -18,6 +18,7 @@ def f_611(json_file, csv_file):
         
     Example:
     >>> f_611('path_to_json_file.json', 'path_to_csv_file.csv')
+    'path_to_csv_file.csv'
     """
     with open(json_file, 'r') as f:
         data = json.load(f)

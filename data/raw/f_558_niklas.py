@@ -20,7 +20,7 @@ def f_558(df):
     >>> df = pd.DataFrame(np.random.normal(size=(100, 5)))
     >>> p_values = f_558(df)
     >>> print(p_values)
-    {0: 0.3595593273639679, 1: 0.23594242334365845, 2: 0.7625805139541626, 3: 0.4812640845775604, 4: 0.13771511614322662}
+    {0: 0.3595593273639679, 1: 0.23594242334365845, 2: 0.7625704407691956, 3: 0.481273353099823, 4: 0.13771861791610718}
     """
 
     p_values = {}
@@ -44,6 +44,9 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        np.random.seed(42)
+    
     def test_case_1(self):
         df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
         p_values = f_558(df)
