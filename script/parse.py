@@ -128,7 +128,7 @@ def extract_test(file_contents, function_name):
             content = "\n".join(filtered_lines).strip()
             
             # remove run_tests function
-            return [line for line in content.split("\n") if "run_tests" not in line]
+            return "\n".join([line for line in content.split("\n") if "run_tests" not in line])
 
         else:
             return "Function not found in the script."
