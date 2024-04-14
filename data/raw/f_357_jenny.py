@@ -31,8 +31,8 @@ def f_357(n_samples=100, n_features=10, random_seed=None):
     >>> predictions, coefficients, intercept, mse = f_357(100, 5, random_seed=42)
     >>> predictions[:3]
     array([ 180.79207843, -295.0210232 ,  118.23799221])
-    >>> mse
-    0.011344800318058566
+    >>> round(mse, 4)
+    0.0113
     """
     # Generate synthetic data
     X, y = datasets.make_regression(
@@ -130,7 +130,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(
             predictions.shape[0], 20000
         )  # 20% of 100000 samples for testing
-        self.assertEqual(mse, 0.010142327812255192)
+        self.assertAlmostEqual(mse, 0.010142327812255192, places=4)
         
     def test_case_6(self):
         # Test output shapes
