@@ -70,6 +70,24 @@ def extract_apis(code):
     ApiExtractor().visit(tree)
     return list(set(api_list))  # Remove duplicates
 
+def remove_trailing_comments(text):
+    """
+    Removes all trailing lines starting with '#' from the given text.
+
+    Parameters:
+    text (str): The text from which to remove trailing comment lines.
+
+    Returns:
+    str: The text with trailing comments removed.
+    """
+    lines = text.splitlines()  # Split the text into individual lines
+    # Find the last non-comment line from the end; i.e., the first line from the end that doesn't start with '#'
+    for i in range(len(lines) - 1, -1, -1):
+        if not lines[i].strip().startswith('#'):
+            break  # Found the last non-comment line
+    # Return the text up to and including the last non-comment line, joined back into a single string
+    return '\n'.join(lines[:i+1])
+
 def extract_test(file_contents, function_name):
     """
     Extracts the content after a specified function in a given Python script using the ast module,
@@ -125,10 +143,9 @@ def extract_test(file_contents, function_name):
                     end = node.end_lineno
                     for i in range(start, end):
                         filtered_lines[i] = ""  # Clearing out lines of 'run_tests'
-            content = "\n".join(filtered_lines).strip()
+            content = "\n".join([line for line in filtered_lines if line])
             
-            # remove run_tests function
-            return "\n".join([line for line in content.split("\n") if "run_tests" not in line])
+            return remove_trailing_comments("\n".join(line for line in content.split("\n") if "run_tests" not in line))
 
         else:
             return "Function not found in the script."
@@ -151,7 +168,7 @@ def extract_content(file_path):
                             data["task_id"] = function_name
                             break
     with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read().strip("\n")
+        content = f.read().strip("\n").replace("<AxesSubplot:>", "<Axes: >")
 
         # Extracting the docstring if present
         docstring_start = content.find('"""')
@@ -173,7 +190,7 @@ def extract_content(file_path):
             data["canonical_solution"] = "\n".join(lines[function_start_line:function_end_line])
         else:
             data["canonical_solution"] = ""
-    data["test"] = extract_test(content,function_name)
+    data["test"] = extract_test(content,function_name).strip()
     data["apis"] = extract_apis(data["prompt"] + "\n" + data["canonical_solution"])
     data["libs"] = list(set([api.split(".")[0] for api in data["apis"]]))
     
@@ -259,8 +276,32 @@ def parse_docstring(docstring):
 
     return sections
 
+def reconstruct_problem(data):
+    return data["prompt"] + "\n" + data["canonical_solution"] + "\n\n" + data["test"] + "\n"
+
+def check_test_wo_doc(data):
+    "Check if the problem is related to file system, network requests and database"
+    if "shutil" in data["libs"] or "requests" in data["libs"] or "django" in data["libs"] or "sqlite3" in data["libs"]:
+        return True
+    elif "os.path" in data["apis"]:
+        return True
+    # check any file suffixes are inside data["prompt"]
+    elif any([suffix in data["prompt"] for suffix in [".txt", ".csv", ".json", ".xml", ".html", ".log", ".zip", ".tar", ".gz", ".pdf", ".png"]]):
+        return True
+    # check path like patterns are inside data["prompt"]
+    elif any([re.search(r"[\w\-.]+\/[\w\-.]+", data["prompt"])]):
+        return True
+    else:
+        return False
+
 if __name__ == "__main__":
+    shutil.rmtree("data/processed", ignore_errors=True)
+    os.makedirs("data/processed")
     with open("data/open-eval.jsonl", "w") as f:
         for file in tqdm(glob("data/clean/*.py")):
             data = extract_content(file)
             f.write(json.dumps(data) + "\n")
+            file_name = file.split("/")[-1].split(".")[0]
+            file_name = file_name + "_wo_doc" if check_test_wo_doc(data) else file_name + "_w_doc"
+            with open(f"data/processed/{file_name}.py", "w") as f2:
+                f2.write(reconstruct_problem(data))
