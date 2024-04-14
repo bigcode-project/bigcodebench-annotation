@@ -12,10 +12,11 @@ def f_772(word):
     list: A list of random pairs of adjacent letters from the word. If the word has fewer than 2 letters, returns a list of empty strings based on POSSIBLE_LETTERS length.
     
     Examples:
-    >>> random.seed(0); f_772('abcdef')
-    ['ab', 'bc', 'cd']
-    >>> random.seed(0); f_772('xyz')
-    ['xy', 'xy', 'yz']
+    >>> random.seed(0)
+    >>> f_772('abcdef')
+    ['de', 'de', 'ab']
+    >>> f_772('xyz')
+    ['yz', 'yz', 'yz']
     """
     if not all(char in string.ascii_letters for char in word):
         raise ValueError("Input must only contain letters.")

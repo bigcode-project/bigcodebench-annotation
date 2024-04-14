@@ -16,7 +16,7 @@ def f_413(input_file):
     Returns:
         - result (dict): each key corresponds to those in the input dictionaries, and the corresponding
           value is another dict with keys 'mean' and 'median', representing the calculated statistics.
-        - plots  (list[matplotlib.axes._subplots.Axes]): A list of bar charts, one for
+        - plots  (list[matplotlib.axes._axes.Axes]): A list of bar charts, one for
           each key in the dictionaries, visualizing the mean and median values.
 
     Requirements:
@@ -28,7 +28,7 @@ def f_413(input_file):
     Example:
     >>> results, plots = f_413("sample_data.json")
     >>> type(plots[0])
-    <class 'matplotlib.axes._subplots.Axes'>
+    <class 'matplotlib.axes._axes.Axes'>
     >>> results
     {'a': {'mean': 3.0, 'median': 3.0}, 'b': {'mean': 6.0, 'median': 6.0}}
     """

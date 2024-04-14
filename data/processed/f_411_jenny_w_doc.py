@@ -10,7 +10,7 @@ def f_411(data):
     data (list): A list of dictionaries. The keys are labels and the values are data points.
 
     Returns:
-    matplotlib.axes._subplots.Axes or None: Axes object of the plot showing 'Data over Time',
+    matplotlib.axes._axes.Axes or None: Axes object of the plot showing 'Data over Time',
                                                    with 'Time' on the x-axis and 'Data Points' on the y-axis.
                                                    If data is empty, return None.
 

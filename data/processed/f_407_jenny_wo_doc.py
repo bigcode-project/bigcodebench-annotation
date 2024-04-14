@@ -14,7 +14,7 @@ def f_407(data):
                    are not the expected type, this function raises TypeError.
 
     Returns:
-    - matplotlib.axes._subplots.Axes: The generated plot's Axes object.
+    - matplotlib.axes._axes.Axes: The generated plot's Axes object.
 
     Requirements:
     - pandas

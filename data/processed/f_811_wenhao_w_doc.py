@@ -11,7 +11,7 @@ def f_811(df):
     - df (pandas.DataFrame): A DataFrame with numerical values.
 
     Returns:
-    - matplotlib.axes._subplots.Axes: The Axes object of the Seaborn heatmap.
+    - matplotlib.axes._axes.Axes: The Axes object of the Seaborn heatmap.
 
     Raises:
     - ValueError: If the DataFrame is empty or if no numeric columns are present.

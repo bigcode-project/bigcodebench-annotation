@@ -19,7 +19,7 @@ def f_923(data):
     Returns:
     - dict: Contains the calculated mean, median, and standard deviation (sample) of the prices. 
         The keys are 'mean', 'median', and 'std_dev'.
-    - matplotlib.axes._subplots.Axes: A subplot object that represents the histogram plot of the product prices. 
+    - matplotlib.axes._axes.Axes: A subplot object that represents the histogram plot of the product prices. 
         The histogram displays the frequency distribution of the prices.
 
     Note:

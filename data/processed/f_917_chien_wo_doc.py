@@ -13,7 +13,7 @@ def f_917(time_strings, time_format="%d/%m/%Y %H:%M:%S.%f"):
       The default format is '%d/%m/%Y %H:%M:%S.%f', representing day/month/year hours:minutes:seconds.microseconds.
 
     Returns:
-    - ax (matplotlib.axes._subplots.Axes or None): An Axes object with the histogram plotted if
+    - ax (matplotlib.axes._axes.Axes or None): An Axes object with the histogram plotted if
       parsing is successful. Returns None if a parsing error occurs.
 
     Requirements:

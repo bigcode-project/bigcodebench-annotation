@@ -14,7 +14,7 @@ def f_906(arr):
     arr (numpy.ndarray): A 2D numpy array.
 
     Returns:
-    matplotlib.axes._subplots.Axes: A plot representing the time series of row sums.
+    matplotlib.axes._axes.Axes: A plot representing the time series of row sums.
 
     Requirements:
     - pandas

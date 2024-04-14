@@ -15,7 +15,7 @@ def f_887(data_list):
     - data_list (list): A list containing category labels (strings).
 
     Returns:
-    - Axes object (matplotlib.axes._subplots.Axes): The histogram displaying the distribution of categories.
+    - Axes object (matplotlib.axes._axes.Axes): The histogram displaying the distribution of categories.
 
     Requirements:
     - pandas

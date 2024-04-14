@@ -31,7 +31,7 @@ def f_752(letters, repetitions, colors):
     Example:
     >>> ax = f_752(['A', 'B', 'C'], [3, 5, 2], ['red', 'green', 'blue'])
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.Axes'>
+    <class 'matplotlib.axes._axes.Axes'>
     """
     if len(letters) != len(repetitions) or len(letters) != len(colors) or len(letters) == 0:
         raise ValueError("All lists must be the same length and non-empty.")

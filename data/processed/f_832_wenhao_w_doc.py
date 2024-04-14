@@ -32,8 +32,8 @@ def f_832(length: int, predicates: list, seed: int = None):
     - random
 
     Example:
-    >>> f_832(10, ['has_uppercase', 'has_numbers'], seed=42)
-    ('8czu("@iNc', {'has_uppercase': True, 'has_numbers': True})
+    >>> f_832(10, ['has_uppercase', 'has_numbers'], seed=42)[0]
+    '8czu("@iNc'
     >>> f_832(5, ['has_lowercase'], seed=123)
     ('eiMk[', {'has_lowercase': True})
     """

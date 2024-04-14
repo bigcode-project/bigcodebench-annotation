@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(
             ax,
             Axes,
-            "The second return value should be an instance of matplotlib.axes._subplots.Axes.",
+            "The second return value should be an instance of matplotlib.axes._axes.Axes.",
         )
     def test_number_of_lines(self):
         """Check that the correct number of lines are plotted."""

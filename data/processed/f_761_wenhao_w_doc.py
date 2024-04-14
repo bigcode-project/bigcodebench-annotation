@@ -16,7 +16,7 @@ def f_761(df, column):
     - column (str): The name of the column in the DataFrame that contains the categories.
     
     Output:
-    - matplotlib.axes._subplots.Axes: The Axes object for the generated plot.
+    - matplotlib.axes._axes.Axes: The Axes object for the generated plot.
     
     Requirements:
     - pandas
@@ -25,9 +25,7 @@ def f_761(df, column):
     
     Example:
     >>> df = pd.DataFrame({'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']})
-    >>> ax = f_761(df, 'Category')
-    # This generates and displays a bar chart showing the distribution of each category within the 'Category' column.
-    
+    >>> ax = f_761(df, 'Category')    
     >>> df = pd.DataFrame({'Type': ['A', 'A', 'C', 'E', 'D', 'E', 'D']})
     >>> ax = f_761(df, 'Type')
     """

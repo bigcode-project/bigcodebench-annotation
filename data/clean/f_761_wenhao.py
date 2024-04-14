@@ -25,9 +25,7 @@ def f_761(df, column):
     
     Example:
     >>> df = pd.DataFrame({'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']})
-    >>> ax = f_761(df, 'Category')
-    # This generates and displays a bar chart showing the distribution of each category within the 'Category' column.
-    
+    >>> ax = f_761(df, 'Category')    
     >>> df = pd.DataFrame({'Type': ['A', 'A', 'C', 'E', 'D', 'E', 'D']})
     >>> ax = f_761(df, 'Type')
     """

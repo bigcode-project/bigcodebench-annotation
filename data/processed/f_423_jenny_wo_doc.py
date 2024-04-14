@@ -13,7 +13,7 @@ def f_423(db_name="test.db", table_name="People"):
     table_name (str, optional): The name of the table to plot from. Defaults to 'People'.
 
     Returns:
-    matplotlib.axes._subplots.Axes: Axes object representing the age distribution plot,
+    matplotlib.axes._axes.Axes: Axes object representing the age distribution plot,
                                            with x-axis showing age and a default of bins=30, kde=True.
 
     Requirements:

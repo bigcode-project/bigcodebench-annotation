@@ -22,7 +22,7 @@ def f_891(date_str):
     Example:
     >>> ax = f_891('2023-06-15')
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.Axes'>
+    <class 'matplotlib.axes._axes.Axes'>
     """
     date = datetime.strptime(date_str, "%Y-%m-%d")
     num_of_values = date.day

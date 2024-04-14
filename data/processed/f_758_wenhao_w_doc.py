@@ -21,7 +21,7 @@ def f_758(df: pd.DataFrame) -> tuple:
                     with stock closing prices.
 
     Returns:
-    tuple: A tuple containing two matplotlib.axes._subplots.Axes objects: the first for the boxplot
+    tuple: A tuple containing two matplotlib.axes._axes.Axes objects: the first for the boxplot
            and the second for the histogram.
 
     Example:

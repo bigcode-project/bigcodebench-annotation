@@ -15,7 +15,7 @@ def f_778(word):
                 Should contain only lowercase alphabetic characters.
                 
     Returns:
-    Axes: A matplotlib.axes._subplots.Axes object representing the generated plot.
+    Axes: A matplotlib.axes._axes.Axes object representing the generated plot.
     
     Requirements:
     - numpy
