@@ -30,7 +30,7 @@ def f_368(student_grades, possible_grades=["A", "B", "C", "D", "F"]):
     <class 'matplotlib.axes._axes.Axes'>
     >>> report_df
            Count
-    Grade
+    Grade       
     A          3
     B          3
     C          2

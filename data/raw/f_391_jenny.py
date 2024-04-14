@@ -34,13 +34,9 @@ def f_391(epoch_milliseconds, seed=0, timezones=["UTC"]):
 
     Example:
     >>> f_391(1236472051807, seed=42)
-    {
-        'Event1': [{'date': datetime.date(2009, 3, 8), 'time': datetime.time(12, 0), 'timezone': 'UTC+05:00'}]
-    }
+    {'Danielle': [{'date': datetime.date(2009, 3, 8), 'time': datetime.time(11, 27, 31, 807000), 'timezone': 'UTC'}]}
     >>> f_391(1609459200000, seed=24, timezones=['UTC', 'UTC+01:00'])
-    {
-        'Event2': [{'date': datetime.date(2021, 1, 1), 'time': datetime.time(0, 0), 'timezone': 'UTC'}]
-    }
+    {'Jennifer': [{'date': datetime.date(2021, 1, 1), 'time': datetime.time(11, 0), 'timezone': 'UTC'}]}
     """
     Faker.seed(seed)
 

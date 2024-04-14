@@ -24,7 +24,7 @@ def f_330(data, column="c"):
     >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]}
     >>> modified_df, ax = f_330(data)
     >>> ax
-    <AxesSubplot:>
+    <Axes: >
     >>> modified_df
        a  b
     0  1  4

@@ -35,11 +35,11 @@ def f_389(
     <class 'pandas.core.frame.DataFrame'>
     >>> sales_data.head()
         Product                    Date  Sales
-    0  Product1 2009-03-08 08:27:31.807     50
-    1  Product5 2009-03-08 08:27:31.807     17
-    2  Product2 2009-03-08 08:27:31.807     11
-    3  Product4 2009-03-08 08:27:31.807     27
-    4  Product3 2009-03-08 08:27:31.807     25
+    0  Product4 2009-03-08 11:27:31.807     50
+    1  Product5 2009-03-08 11:27:31.807     17
+    2  Product1 2009-03-08 11:27:31.807     11
+    3  Product3 2009-03-08 11:27:31.807     27
+    4  Product2 2009-03-08 11:27:31.807     25
     """
     random.seed(random_seed)
 

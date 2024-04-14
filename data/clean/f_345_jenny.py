@@ -33,9 +33,9 @@ def f_345(P, T):
     >>> type(result)
     <class 'pandas.core.frame.DataFrame'>
     >>> result.head(2)
-       feature_0  feature_1  feature_2  feature_3  feature_4  feature_5  feature_6  feature_7  ...  feature_17  feature_18  feature_19  feature_20  feature_21  feature_22  feature_23  feature_24
-    0   0.214791   0.220904   1.697850  -1.854951   -0.22492   0.393341  -0.315747   1.247656  ...    1.625916   -1.506052    0.005112    0.145957    0.210771    1.768847   -1.759510   -0.003527
-    1  -0.652336   1.064228  -0.707134   0.704199   -0.73771  -0.933308   0.861438  -0.945290  ...   -0.028665    0.965428   -0.961705   -0.520208    0.993407   -0.036116    1.002544   -0.813796
+       feature_0  feature_1  feature_2  ...  feature_22  feature_23  feature_24
+    0   0.214791   0.220904   1.697850  ...    1.768847   -1.759510   -0.003527
+    1  -0.652336   1.064228  -0.707134  ...   -0.036116    1.002544   -0.813796
     <BLANKLINE>
     [2 rows x 25 columns]
     """

@@ -27,7 +27,7 @@ def f_350(points, seed=0):
     >>> points = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     >>> vor, ax = f_350(points)
     >>> type(vor)
-    <class 'scipy.spatial._qhull.Voronoi'>
+    <class 'scipy.spatial.qhull.Voronoi'>
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """

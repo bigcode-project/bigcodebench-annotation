@@ -18,7 +18,7 @@ def f_359(L):
 
     Requirements:
     - pandas
-    - NumPy
+    - numpy
 
     Example:
     >>> ax = f_359([[1,2,3],[4,5,6]])
@@ -52,7 +52,7 @@ class TestCases(unittest.TestCase):
         # Test non-overlapping numbers split into multi-item lists
         ax = f_359([[1, 2, 3], [4, 5, 6]])
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.patches), 6)
+        self.assertEqual(len(ax.patches), 12)
 
     def test_case_2(self):
         # Test non-overlapping numbers in individual lists

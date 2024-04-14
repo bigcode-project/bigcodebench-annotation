@@ -32,9 +32,9 @@ def f_406(array):
     0  1  2  3  4   5
     1  6  7  8  9  10
     >>> print(distance_matrix)
-          0          1
-    0  0.0  11.180340
-    1  11.180340  0.0
+              0         1
+    0   0.00000  11.18034
+    1  11.18034   0.00000
     """
     if not isinstance(array, list):
         raise TypeError("Input must be a list.")

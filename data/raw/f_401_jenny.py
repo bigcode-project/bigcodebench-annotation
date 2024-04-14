@@ -32,8 +32,8 @@ def f_401(column, data):
 
     Example:
     >>> data = [[datetime(2022, 1, 1), 5000, 200, 3.5],
-                [datetime(2022, 1, 2), 5500, 220, 4.0],
-                [datetime(2022, 1, 3), 6000, 240, 4.5]]
+    ...         [datetime(2022, 1, 2), 5500, 220, 4.0],
+    ...         [datetime(2022, 1, 3), 6000, 240, 4.5]]
     >>> stats, ax = f_401('Steps', data)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>

@@ -25,10 +25,11 @@ def f_340(name: str, age: int, code: str, salary: float, bio: str) -> pd.DataFra
     - random.randint
 
     Example:
+    >>> random.seed(0)
     >>> df = f_340("John", 30, "A10B", 5000.0, "This is a bio with spaces")
     >>> print(df)
-       Name  Age  Code  Salary                        Bio Job Title
-    0  John   30  A10B  5000.0  This is a bio with spaces  Engineer
+       Name  Age  Code  Salary                        Bio  Job Title
+    0  John   30  A10B  5000.0  This is a bio with spaces  Developer
     """
     EMPLOYEES = ["John", "Alice", "Bob", "Charlie", "David"]
     JOBS = ["Engineer", "Manager", "Analyst", "Developer", "Tester"]

@@ -40,7 +40,7 @@ def f_387(epoch_milliseconds, seed=0):
     >>> log.iloc[0]
     User                             user4
     Activity                        search
-    Time        2021-03-08 09:47:31.807000
+    Time        2021-03-08 12:47:31.807000
     Name: 0, dtype: object
     """
     random.seed(seed)

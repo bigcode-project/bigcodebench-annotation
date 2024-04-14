@@ -28,7 +28,7 @@ def f_399(column, data):
     >>> data = [[25, 50000, 2], [30, 75000, 5], [35, 100000, 7], [40, 125000, 10], [45, 150000, 12]]
     >>> stats, ax = f_399('Salary', data)
     >>> stats
-    {'sum': 375000, 'mean': 75000.0, 'min': 50000, 'max': 150000}
+    {'sum': 500000, 'mean': 100000.0, 'min': 50000, 'max': 150000}
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """

@@ -29,9 +29,9 @@ def f_386(start_time, end_time, step, amplitude, period, seed=0):
     Example:
     >>> ax = f_386(0, 10000, 100, 1, 1000)
     >>> type(ax)
-    <matplotlib.axes._axes.Axes>
+    <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_xticklabels()
-    [Text(-20.0, 0, '1970-01-01 01:00:08.000000'), ... ]
+    [Text(-20.0, 0, '1970-01-01 10:00:08.000000'), Text(0.0, 0, '1970-01-01 10:00:00.000000'), Text(20.0, 0, '1970-01-01 10:00:02.000000'), Text(40.0, 0, '1970-01-01 10:00:04.000000'), Text(60.0, 0, '1970-01-01 10:00:06.000000'), Text(80.0, 0, '1970-01-01 10:00:08.000000'), Text(100.0, 0, ''), Text(120.0, 0, '')]
     """
     np.random.seed(seed)
 

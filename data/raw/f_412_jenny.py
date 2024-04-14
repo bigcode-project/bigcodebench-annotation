@@ -28,7 +28,7 @@ def f_412(data):
     >>> stats
     {'cat': {'mean': 2.0, 'std': 0.816496580927726}, 'dog': {'mean': 5.0, 'std': 1.632993161855452}}
     >>> axes
-    [<AxesSubplot:title={'center':'Statistics of cat'}, ylabel='Value'>, <AxesSubplot:title={'center':'Statistics of dog'}, ylabel='Value'>]
+    [<Axes: title={'center': 'Statistics of cat'}, ylabel='Value'>, <Axes: title={'center': 'Statistics of dog'}, ylabel='Value'>]
     """
     if not data:
         raise ValueError("Input data is empty.")

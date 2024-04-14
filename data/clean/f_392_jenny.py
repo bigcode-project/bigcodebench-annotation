@@ -34,8 +34,8 @@ def f_392(days, random_seed=0):
     >>> type(df)
     <class 'pandas.core.frame.DataFrame'>
     >>> df.head(2)
-                    Groceries  Entertainment  Rent  Utilities  Miscellaneous
-    date
+                Groceries  Entertainment  Rent  Utilities  Miscellaneous
+    date                                                                
     2023-01-01         51             20    87         52              1
     2023-01-02         92             82    99          1             63
     """
