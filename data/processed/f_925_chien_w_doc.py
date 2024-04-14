@@ -24,7 +24,7 @@ def f_925(data=None):
                            }
 
     Returns:
-    - ax (matplotlib.axes._subplots.AxesSubplot): A scatter plot with weight on the x-axis and height on the y-axis, titled "Weight vs Height".
+    - ax (matplotlib.axes._subplots.Axes): A scatter plot with weight on the x-axis and height on the y-axis, titled "Weight vs Height".
 
     Raises:
     - ValueError: If any of the values in the 'Weight_String' key are not formatted as strings. This validation ensures 

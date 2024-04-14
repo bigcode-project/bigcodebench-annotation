@@ -15,7 +15,7 @@ def f_836(text):
                 of characters and punctuation.
 
     Returns:
-    matplotlib.axes._subplots.AxesSubplot: An Axes object showing the histogram and optionally the KDE 
+    matplotlib.axes._subplots.Axes: An Axes object showing the histogram and optionally the KDE 
                                            plot of word lengths. This visual representation helps in 
                                            understanding the distribution of word lengths in the given text.
 

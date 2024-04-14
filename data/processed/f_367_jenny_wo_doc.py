@@ -29,7 +29,7 @@ def f_367(file_path="data.csv", columns=["A", "B", "C"]):
     0      1.0      2.0      3.0
     1      4.0      5.0      6.0
     >>> ax
-    <matplotlib.axes._subplots.AxesSubplot object at 0x7f24b00f4a90>
+    <matplotlib.axes._subplots.Axes object at 0x7f24b00f4a90>
     >>> croot
     0    1.0    
     """

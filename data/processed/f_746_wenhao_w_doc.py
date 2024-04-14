@@ -20,11 +20,11 @@ def f_746(d, keys=['x', 'y', 'z']):
     >>> data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
     >>> ax = f_746(data)
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._subplots.Axes'>
 
     >>> ax = f_746(data, keys=['x', 'y'])
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._subplots.Axes'>
     """
     # Convert the list of dictionaries to a DataFrame
     df = pd.DataFrame(d)

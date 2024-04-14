@@ -36,7 +36,7 @@ def f_820(array, features=None, seed=None):
     >>> array = np.random.rand(2, 5)
     >>> ax = f_820(array, features=['A', 'B', 'C', 'D', 'E'], seed=1)
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._subplots.Axes'>
     >>> ax.collections[0].get_array().data.flatten()
     array([0.60276338, 0.71518937, 0.4236548 , 0.5488135 , 0.54488318,
            0.891773  , 0.43758721, 0.38344152, 0.64589411, 0.96366276])

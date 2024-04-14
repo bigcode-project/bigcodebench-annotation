@@ -27,7 +27,7 @@ def f_810(func, x_range=(-2, 2), num_points=1000):
     Example:
     >>> ax = f_810(np.sin)
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._subplots.Axes'>
     >>> ax.get_legend_handles_labels()[-1]
     ['sin(x)', 'Integral of sin(x)']
     """

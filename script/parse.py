@@ -168,7 +168,7 @@ def extract_content(file_path):
                             data["task_id"] = function_name
                             break
     with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read().strip("\n").replace("<AxesSubplot:>", "<Axes: >")
+        content = f.read().strip("\n").replace("AxesSubplot", "Axes")
 
         # Extracting the docstring if present
         docstring_start = content.find('"""')

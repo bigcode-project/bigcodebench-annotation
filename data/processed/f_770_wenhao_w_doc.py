@@ -26,8 +26,8 @@ def f_770(word: str) -> dict:
     - The function uses the `string` library to get a string of lowercase alphabets.
 
     Example:
-    >>> f_770('abcdef')
-    {'ab': 1, 'ac': 0, 'ad': 0, ..., 'yx': 0, 'yz': 0, 'za': 0, ..., 'zx': 0, 'zy': 0}
+    >>> list(f_770('abcdef').items())[:5]
+    [('ab', 1), ('ac', 0), ('ad', 0), ('ae', 0), ('af', 0)]
     """
     ALPHABETS = string.ascii_lowercase
     # Generate all two-letter combinations of alphabets

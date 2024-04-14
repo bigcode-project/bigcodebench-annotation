@@ -38,7 +38,7 @@ def f_830(json_data: str, data_key: str):
     >>> json_str = '{"data": {"values": [5, 10, 15, 20, 25]}}'
     >>> original_data, normalized_data, ax = f_830(json_str, 'data.values')
     >>> type(original_data), type(normalized_data), type(ax)
-    (<class 'pandas.core.series.Series'>, <class 'pandas.core.series.Series'>, <class 'matplotlib.axes._subplots.AxesSubplot'>)
+    (<class 'pandas.core.series.Series'>, <class 'pandas.core.series.Series'>, <class 'matplotlib.axes._subplots.Axes'>)
     """
     data = json.loads(json_data)
     try:

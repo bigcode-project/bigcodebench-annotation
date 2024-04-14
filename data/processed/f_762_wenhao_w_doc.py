@@ -11,7 +11,7 @@ def f_762(df):
     df (pandas.DataFrame): The DataFrame containing numerical columns to be used for correlation.
 
     Returns:
-    matplotlib.axes._subplots.AxesSubplot: The matplotlib Axes object representing the heatmap.
+    matplotlib.axes._subplots.Axes: The matplotlib Axes object representing the heatmap.
 
     Requirements:
     - pandas
@@ -22,7 +22,7 @@ def f_762(df):
     >>> df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
     >>> ax = f_762(df)
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._subplots.Axes'>
 
     """
     correlation_matrix = df.corr()

@@ -14,7 +14,7 @@ def f_757(df, z_threshold=2):
     Returns:
     tuple: A tuple containing the following elements:
         - pandas.DataFrame: A DataFrame containing the outliers in the 'closing_price' column.
-        - matplotlib.axes._subplots.AxesSubplot: The plot object displaying the outliers.
+        - matplotlib.axes._subplots.Axes: The plot object displaying the outliers.
     
     Requirements:
     - pandas

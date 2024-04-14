@@ -28,7 +28,7 @@ def f_910(num_samples=NUM_SAMPLES, num_outliers=NUM_OUTLIERS):
       the artificially introduced outliers.
     - outliers_detected (numpy array): The outliers detected using the IQR method. This 
       detection is based solely on the normally distributed portion of the data.
-    - ax (matplotlib.axes._subplots.AxesSubplot): The AxesSubplot object for the histogram 
+    - ax (matplotlib.axes._subplots.Axes): The Axes object for the histogram 
       plot of the combined dataset.
 
     Requirements:

@@ -43,7 +43,7 @@ def f_902(num_pairs=10):
                        possible unique combinations (100), it is adjusted to the valid range (1 to 100).
 
     Returns:
-    - ax (matplotlib.axes._subplots.AxesSubplot): The Axes object of the countplot, which can be used for
+    - ax (matplotlib.axes._subplots.Axes): The Axes object of the countplot, which can be used for
                                                   further customizations or to retrieve information about the plot.
 
     Requirements:

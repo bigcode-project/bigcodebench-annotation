@@ -19,7 +19,7 @@ def f_867(data_dict):
 
     Returns:
     - DataFrame: A pandas DataFrame created from the input dictionary, excluding None values.
-    - AxesSubplot or None: A seaborn histogram plot object if the DataFrame contains variable data; 
+    - Axes or None: A seaborn histogram plot object if the DataFrame contains variable data; 
                                None if the DataFrame is empty or if all values are identical.
 
     Requirements:

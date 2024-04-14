@@ -14,7 +14,7 @@ def f_336(df1, df2):
     Returns:
     - tuple: A tuple containing:
         - list: A list of the selected features.
-        - AxesSubplot: A heatmap showing the correlation between the selected features.
+        - Axes: A heatmap showing the correlation between the selected features.
 
     Requirements:
     - pandas

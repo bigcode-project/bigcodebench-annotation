@@ -15,7 +15,7 @@ def f_857(api_url):
 
     Returns:
     - DataFrame: A pandas DataFrame with the parsed data from the API.
-    - AxesSubplot or None: A matplotlib AxesSubplot object representing the plot of the data, or None if the data is empty.
+    - Axes or None: A matplotlib Axes object representing the plot of the data, or None if the data is empty.
 
     Raises:
     - HTTPError: If the API request fails due to issues like network problems, invalid response, etc.

@@ -14,7 +14,7 @@ def f_906(arr):
     arr (numpy.ndarray): A 2D numpy array.
 
     Returns:
-    matplotlib.axes._subplots.AxesSubplot: A plot representing the time series of row sums.
+    matplotlib.axes._subplots.Axes: A plot representing the time series of row sums.
 
     Requirements:
     - pandas
@@ -58,7 +58,7 @@ class TestCases(unittest.TestCase):
         """Test the basic functionality of the function."""
         arr = np.array([[i + j for i in range(3)] for j in range(5)])
         ax = f_906(arr)
-        # Check if the function returns AxesSubplot object
+        # Check if the function returns Axes object
         self.assertIsInstance(ax, plt.Axes)
         # Check the title of the plot
         self.assertEqual(ax.get_title(), "Time Series of Row Sums")
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         """Test the function with an empty array."""
         arr = np.array([])
         ax = f_906(arr)
-        # Check if the function returns AxesSubplot object
+        # Check if the function returns Axes object
         self.assertIsInstance(ax, plt.Axes)
         # Check the title of the plot
         self.assertEqual(ax.get_title(), "Time Series of Row Sums")
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
         """Test the function with a single row array."""
         arr = np.array([[1, 2, 3]])
         ax = f_906(arr)
-        # Check if the function returns AxesSubplot object
+        # Check if the function returns Axes object
         self.assertIsInstance(ax, plt.Axes)
         # Check the title of the plot
         self.assertEqual(ax.get_title(), "Time Series of Row Sums")
@@ -93,7 +93,7 @@ class TestCases(unittest.TestCase):
         """Test the function with negative values."""
         arr = np.array([[-1, -2, -3], [-4, -5, -6]])
         ax = f_906(arr)
-        # Check if the function returns AxesSubplot object
+        # Check if the function returns Axes object
         self.assertIsInstance(ax, plt.Axes)
         # Check the title of the plot
         self.assertEqual(ax.get_title(), "Time Series of Row Sums")
@@ -105,7 +105,7 @@ class TestCases(unittest.TestCase):
         """Test the function with zero values."""
         arr = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
         ax = f_906(arr)
-        # Check if the function returns AxesSubplot object
+        # Check if the function returns Axes object
         self.assertIsInstance(ax, plt.Axes)
         # Check the title of the plot
         self.assertEqual(ax.get_title(), "Time Series of Row Sums")

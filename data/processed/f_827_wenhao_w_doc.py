@@ -13,7 +13,7 @@ def f_827(df, x_column, y_column):
     y_column (str): The column name for the y-axis. Data contained in column must be numeric.
 
     Returns:
-    matplotlib.axes._subplots.AxesSubplot: The Axes object containing the scatter plot and the linear regression line.
+    matplotlib.axes._subplots.Axes: The Axes object containing the scatter plot and the linear regression line.
 
     Requirements:
     - pandas
@@ -28,7 +28,7 @@ def f_827(df, x_column, y_column):
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [2, 3, 4]})
     >>> ax = f_827(df, 'A', 'B')
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._subplots.Axes'>
     """
     X = df[x_column].values.reshape(-1, 1)
     Y = df[y_column].values

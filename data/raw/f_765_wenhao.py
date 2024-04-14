@@ -24,10 +24,11 @@ def f_765(person_names, email_domains, num_records=5):
     - ValueError: If the number of names provided is less than the number of records requested or if no email domains are provided.
     
     Example:
+    >>> random.seed(0)  # Initialize random seed
     >>> f_765(['John Doe', 'Jane Smith'], ['gmail.com', 'yahoo.com'], 2)
              Name              Email
-    0    John Doe  john[at]yahoo.com
-    1  Jane Smith  jane[at]gmail.com
+    0  Jane Smith  jane[at]gmail.com
+    1    John Doe  john[at]yahoo.com
     >>> f_765(['Alice'], ['outlook.com'], 1)
         Name                 Email
     0  Alice  alice[at]outlook.com

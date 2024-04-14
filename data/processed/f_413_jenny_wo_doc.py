@@ -16,7 +16,7 @@ def f_413(input_file):
     Returns:
         - result (dict): each key corresponds to those in the input dictionaries, and the corresponding
           value is another dict with keys 'mean' and 'median', representing the calculated statistics.
-        - plots  (list[matplotlib.axes._subplots.AxesSubplot]): A list of bar charts, one for
+        - plots  (list[matplotlib.axes._subplots.Axes]): A list of bar charts, one for
           each key in the dictionaries, visualizing the mean and median values.
 
     Requirements:

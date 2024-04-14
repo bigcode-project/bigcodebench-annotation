@@ -16,12 +16,12 @@ def f_898(file_path):
                      a single numeric value representing an individual in the population.
 
     Returns:
-    - Tuple (float, float, matplotlib.axes._subplots.AxesSubplot): The function returns a tuple containing
+    - Tuple (float, float, matplotlib.axes._subplots.Axes): The function returns a tuple containing
     three elements:
         - Sample mean (float): The mean of the sample.
         - Sample standard deviation (float): The standard deviation of the sample, calculated with a
            degrees of freedom (ddof) of 1.
-        - Matplotlib subplot (matplotlib.axes._subplots.AxesSubplot): An object representing the
+        - Matplotlib subplot (matplotlib.axes._subplots.Axes): An object representing the
            generated histogram plot with the normal distribution curve.
 
     Requirements:

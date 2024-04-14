@@ -32,7 +32,7 @@ def f_798(mystrings, text):
     Examples:
     >>> ax = f_798(['Lorem ipsum', 'consectetur adipiscing'], 'Lorem ipsum dolor sit amet lorem Ipsum')
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._subplots.Axes'>
     """
 
     if not text:

@@ -30,7 +30,7 @@ def f_875(rows=1000, string_length=3):
       Default is 3. A value of 0 results in the generation of empty strings.
 
     Returns:
-    - matplotlib.axes._subplots.AxesSubplot or None: A seaborn heatmap plot object if 
+    - matplotlib.axes._subplots.Axes or None: A seaborn heatmap plot object if 
       data is generated; otherwise, None.
 
     Requirements:

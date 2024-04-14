@@ -13,7 +13,7 @@ def f_895(data_dict):
 
     Returns:
     - tuple: A tuple containing:
-        - matplotlib.axes._subplots.AxesSubplot: The axes object of the histogram.
+        - matplotlib.axes._subplots.Axes: The axes object of the histogram.
         - str: A message indicating whether the distribution is uniform ("The distribution is uniform.")
                or not ("The distribution is not uniform.").
 

@@ -11,7 +11,7 @@ def f_811(df):
     - df (pandas.DataFrame): A DataFrame with numerical values.
 
     Returns:
-    - matplotlib.axes._subplots.AxesSubplot: The AxesSubplot object of the Seaborn heatmap.
+    - matplotlib.axes._subplots.Axes: The Axes object of the Seaborn heatmap.
 
     Raises:
     - ValueError: If the DataFrame is empty or if no numeric columns are present.
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame({"A": [1, 2, 3], "B": ["one", "two", "three"]})
         ax = f_811(df)
         self.assertIsInstance(
-            ax, plt.Axes, "The result should be a matplotlib AxesSubplot object"
+            ax, plt.Axes, "The result should be a matplotlib Axes object"
         )
         self.assertEqual(
             len(ax.get_xticklabels()), 1, "Non-numeric columns should be ignored"
@@ -64,25 +64,25 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
         result = f_811(df)
         self.assertIsInstance(
-            result, plt.Axes, "The result should be a matplotlib AxesSubplot object"
+            result, plt.Axes, "The result should be a matplotlib Axes object"
         )
     def test_with_negative_numbers(self):
         df = pd.DataFrame({"A": [-1, -2, -3], "B": [-4, -5, -6]})
         result = f_811(df)
         self.assertIsInstance(
-            result, plt.Axes, "The result should be a matplotlib AxesSubplot object"
+            result, plt.Axes, "The result should be a matplotlib Axes object"
         )
     def test_with_mixed_numbers(self):
         df = pd.DataFrame({"A": [1, -2, 3], "B": [-4, 5, -6]})
         result = f_811(df)
         self.assertIsInstance(
-            result, plt.Axes, "The result should be a matplotlib AxesSubplot object"
+            result, plt.Axes, "The result should be a matplotlib Axes object"
         )
     def test_with_zeroes(self):
         df = pd.DataFrame({"A": [0, 0, 0], "B": [0, 0, 0]})
         result = f_811(df)
         self.assertIsInstance(
-            result, plt.Axes, "The result should be a matplotlib AxesSubplot object"
+            result, plt.Axes, "The result should be a matplotlib Axes object"
         )
     def test_with_empty_dataframe(self):
         df = pd.DataFrame({"A": [], "B": []})

@@ -14,7 +14,7 @@ def f_331(data, column="c"):
     - column (str): Name of column to remove. Defaults to "c".
 
     Returns:
-    - matplotlib.axes._subplots.AxesSubplot or None: The Axes object of the heatmap
+    - matplotlib.axes._subplots.Axes or None: The Axes object of the heatmap
       or None if the heatmap is not generated.
 
     Requirements:
@@ -23,7 +23,7 @@ def f_331(data, column="c"):
 
     Example:
     >>> f_331({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
-    <Axes: >
+    <Axes:>
     >>> f_331(pd.DataFrame({'a': ["foo", "bar"]}))
     """
     df = pd.DataFrame(data)
