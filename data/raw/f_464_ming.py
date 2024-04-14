@@ -5,10 +5,6 @@ from random import choice
 import os
 # Constants
 LETTERS = list('abcdefghijklmnopqrstuvwxyz')
-current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
-if not os.path.exists(current_directory_path):
-    os.makedirs(current_directory_path)
-
 
 def f_464(file_path):
     """
@@ -37,8 +33,7 @@ import unittest
 import pandas as pd
 
 
-class TestGenerateRandomMatrix(unittest.TestCase):
-    @classmethod
+class TestCases(unittest.TestCase):
     def tearDownClass(cls):
         """Clean up any files created during the tests."""
         # Check and remove the expected file if it exists
