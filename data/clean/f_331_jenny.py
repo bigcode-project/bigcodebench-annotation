@@ -23,7 +23,7 @@ def f_331(data, column="c"):
 
     Example:
     >>> f_331({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
-    <AxesSubplot:>
+    <AxesSubplot: >
     >>> f_331(pd.DataFrame({'a': ["foo", "bar"]}))
     """
     df = pd.DataFrame(data)
