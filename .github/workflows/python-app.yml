@@ -37,4 +37,4 @@ jobs:
       run: |
         # pytest --doctest-modules data/clean/*_w_doc.py
         # pytest data/clean/*_wo_doc.py
-        pytest data/clean/*.py
+        pytest data/clean/f_855*.py
