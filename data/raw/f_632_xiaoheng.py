@@ -1,7 +1,5 @@
 import pickle
 import os
-from datetime import datetime
-import pytz
 
 # Constants
 FILE_NAME = 'save.pkl'
@@ -19,8 +17,6 @@ def f_632(dt):
     Requirements:
     - pickle
     - os
-    - datetime
-    - pytz
 
     Example:
     >>> dt = datetime.now(pytz.UTC)

@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 def f_639(L):
     """
@@ -12,6 +13,7 @@ def f_639(L):
     
     Requirements:
     - numpy
+    - math
 
     Example:
     >>> f_639([[1,2,3],[4,5,6]])

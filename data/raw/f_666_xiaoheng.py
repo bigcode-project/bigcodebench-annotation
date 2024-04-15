@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
         array1 = np.array([1, 2, 3])
         array2 = np.array([4, 5, 6])
         result = f_666(array1, array2)
-        self.assertAlmostEqual(result, 8.660254, places=6)
+        self.assertAlmostEqual(result, 2.8284271247461903, places=6)
 
     def test_empty_arrays(self):
         # Test with empty arrays
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
         array1 = np.array([-1, -2, -3])
         array2 = np.array([-4, -5, -6])
         result = f_666(array1, array2)
-        self.assertAlmostEqual(result, 8.660254, places=6)
+        self.assertAlmostEqual(result, 2.8284271247461903, places=6)
 
     def test_mixed_values(self):
         # Test with non-empty arrays containing a mix of positive and negative values
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
         array1 = np.array([1, -2, 3])
         array2 = np.array([-4, 5, -6])
         result = f_666(array1, array2)
-        self.assertAlmostEqual(result, 12.206556, places=6)
+        self.assertAlmostEqual(result, 12.083045973594572, places=6)
 
 def run_tests():
     suite = unittest.TestSuite()

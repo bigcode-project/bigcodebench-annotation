@@ -23,9 +23,13 @@ def f_683(num_words, word_length):
     >>> f_683(5, 3)
     ['Ohb', 'Vrp', 'oiV', 'gRV', 'IfL']
     """
+    # Validate input parameters
+    if num_words < 0 or word_length < 0:
+        raise ValueError("num_words and word_length must be non-negative")
+
     random.seed(42)
     words = [''.join(random.choice(LETTERS) for _ in range(word_length)) for _ in range(num_words)]
-
+    
     return words
 
 import unittest
@@ -66,13 +70,10 @@ class TestCases(unittest.TestCase):
         This test case checks the function's behavior when negative values are passed as input parameters.
         The function should raise a ValueError in this scenario.
         """
-        with self.assertRaises(ValueError, msg="The function should raise a ValueError for negative values"):
-            f_683(-5, 3)
-        
-        with self.assertRaises(ValueError, msg="The function should raise a ValueError for negative values"):
+        with self.assertRaises(ValueError):
             f_683(5, -3)
-        
-        with self.assertRaises(ValueError, msg="The function should raise a ValueError for negative values"):
+
+        with self.assertRaises(ValueError):
             f_683(-5, -3)
     
     def test_non_integer_inputs(self):

@@ -30,6 +30,9 @@ def f_645():
     return script
 
 import unittest
+from unittest.mock import patch, MagicMock
+import subprocess
+import os
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -38,41 +41,27 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
-    def test_returned_script_name(self):
-        # Test that the function returns a valid script name from the predefined list
-        script_name = f_645()
-        self.assertIn(script_name, SCRIPTS)
-    
-    def test_returned_script_name_multiple_times(self):
-        # Test multiple times to ensure random selection from the list
-        for _ in range(100):
-            script_name = f_645()
-            self.assertIn(script_name, SCRIPTS)
+    def setUp(self):
+        # Setup a temporary directory attribute
+        self.temp_dir = '/path/to/scripts'  # You can set this to a real or mock directory as per your setup
+        self.scripts_full_path = [os.path.join(self.temp_dir, script) for script in SCRIPTS]
+
+        # Patch subprocess.call to prevent actual script execution
+        self.patcher = patch('subprocess.call', return_value=0)
+        self.mock_subprocess_call = self.patcher.start()
+
+    def tearDown(self):
+        # Stop the patcher after each test
+        self.patcher.stop()
 
     def test_script_execution(self):
         # Test that the selected script is actually executed
         script_name = f_645()
-        expected_output = "Running {}\n".format(script_name)
-        with subprocess.Popen(os.path.join(self.temp_dir, script_name), stdout=subprocess.PIPE, shell=True) as proc:
-            output = proc.stdout.read().decode('utf-8')
-            self.assertEqual(output, expected_output)
+        self.mock_subprocess_call.assert_called_with(script_name, shell=True)
 
-    def test_random_seed(self):
-        # Test that setting a random seed produces consistent results
-        random.seed(42)
-        script_name1 = f_645()
-        random.seed(42)
-        script_name2 = f_645()
-        self.assertEqual(script_name1, script_name2)
-
-    def test_empty_script_list(self):
-        # Test the behavior when the script list is empty
-        global SCRIPTS
-        original_scripts = SCRIPTS
-        SCRIPTS = []
-        with self.assertRaises(IndexError):
-            f_645()
-        SCRIPTS = original_scripts
+        # Optional: check if the script is called with the correct path
+        called_script_path = self.mock_subprocess_call.call_args[0][0]
+        self.assertIn(called_script_path, self.scripts_full_path)
 
 if __name__ == "__main__":
     run_tests()

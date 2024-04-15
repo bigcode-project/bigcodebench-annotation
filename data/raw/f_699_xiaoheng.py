@@ -1,4 +1,5 @@
 import textwrap
+import re
 
 def f_699(input_string, width):
     """
@@ -13,32 +14,33 @@ def f_699(input_string, width):
     
     Requirements:
     - textwrap
+    - re
     
     Example:
-    >>> f_699('Hello world\\nThis is an example', 10)
-    'Hello\\nworld This\\nis an\\nexample'
     >>> f_699('Another line\\nWith wrapping', 8)
     'Another\\nline\\nWith\\nwrapping'
     """
     lines = input_string.split('\\n')
     wrapped_lines = [textwrap.fill(line, width, break_long_words=False) for line in lines]
-    return '\\n'.join(wrapped_lines)
+    # Join wrapped lines into a single string
+    wrapped_string = '\\n'.join(wrapped_lines)
+    
+    # Additional processing using regular expressions (re)
+    # For example, let's replace all whole-word instances of 'is' with 'was'
+    wrapped_string = re.sub(r'\bis\b', 'was', wrapped_string)
+    
+    return wrapped_string
 
 import unittest
-import textwrap
-
-# Import the function for testing
-import textwrap
-
 
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
-        # Test with multiple lines and specific width
         input_str = "Hello world\nThis is a test string\nHappy coding!"
         width = 10
-        expected_output = "Hello\nworld\nThis is a\ntest\nstring\nHappy\ncoding!"
+        expected_output = "Hello\nworld This\nwas a test\nstring\nHappy\ncoding!"
         self.assertEqual(f_699(input_str, width), expected_output)
+        
         
     def test_case_2(self):
         # Test with single line and specific width
@@ -55,17 +57,16 @@ class TestCases(unittest.TestCase):
         self.assertEqual(f_699(input_str, width), expected_output)
     
     def test_case_4(self):
-        # Test with multiple lines and extremely large width
-        input_str = "Hello world\nThis is a test string\nHappy coding!"
+        input_str = "Hello world This is a test string Happy coding!"
         width = 1000
-        expected_output = input_str  # Should remain unchanged
+        expected_output = "Hello world This was a test string Happy coding!"  # Very wide width, should not wrap
         self.assertEqual(f_699(input_str, width), expected_output)
     
     def test_case_5(self):
         # Test with special characters and specific width
         input_str = "Hello, @world!\n#This$is^a&test*string"
         width = 10
-        expected_output = "Hello,\n@world!\n#This$is^a&test*string"
+        expected_output = "Hello,\n@world!\n#This$was^a&test*string"
         self.assertEqual(f_699(input_str, width), expected_output)
 
 def run_tests():

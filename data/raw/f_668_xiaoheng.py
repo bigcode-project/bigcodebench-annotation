@@ -25,6 +25,9 @@ def f_668(l):
     >>> f_668(ELEMENTS)
     Counter({'I': 3, 'F': 3, 'G': 3, 'J': 3, 'E': 3, 'A': 3, 'B': 3, 'H': 3, 'D': 3, 'C': 3})
     """
+    if not l:  # Check if the list is empty
+        return Counter()  # Return an empty counter if the list is empty
+
     random.shuffle(l)
     l_cycled = cycle(l)
     counter = Counter(next(l_cycled) for _ in range(30))
@@ -74,14 +77,12 @@ class TestCases(unittest.TestCase):
         self.assertEqual(sum(result.values()), 30, "The total count should be 30")
         self.assertEqual(len(result), 2, "The result should contain two unique elements for repeated input")
 
-    def test_case_4(self):
-        # Test Description: Testing with an empty list
-        # Input: []
-        # Expected Output: An empty Counter object
+    def test_empty_list(self):
         input_data = []
         result = f_668(input_data)
         self.assertIsInstance(result, Counter, "The result should be a Counter object even for an empty list")
         self.assertEqual(len(result), 0, "The result should be an empty Counter for an empty input list")
+
 
     def test_case_5(self):
         # Test Description: Testing with a list of mixed data types

@@ -1,5 +1,4 @@
 import os
-import sys
 import re
 
 def f_615(log_file_path: str, keywords: list):
@@ -17,7 +16,6 @@ def f_615(log_file_path: str, keywords: list):
     Requirements:
     - os
     - re
-    - sys
     
     Example:
     >>> f_615('/path/to/log_file.log', ['ERROR', 'WARNING'])

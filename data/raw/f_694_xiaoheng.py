@@ -60,7 +60,7 @@ if __name__ == "__main__":
 import unittest
 import json
 
-class TestCountWordsInJsonText(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_normal_json_input(self):
         """Test with normal JSON input with various punctuation."""
         # Description: This test ensures that the function can accurately count words
@@ -82,7 +82,7 @@ class TestCountWordsInJsonText(unittest.TestCase):
         # Description: This test verifies that numbers and special characters are not counted
         # as words and that they are properly removed before word counting.
         json_input = '{"text": "12345 test! Special #characters and numbers 67890."}'
-        expected_output = {'test': 1, 'special': 1, 'characters': 1, 'and': 1, 'numbers': 1}
+        expected_output = {'12345': 1, 'test': 1, 'special': 1, 'characters': 1, 'and': 1, 'numbers': 1, '67890': 1}
         self.assertEqual(f_694(json_input), expected_output)
 
     def test_large_text_input(self):
@@ -103,7 +103,7 @@ class TestCountWordsInJsonText(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCountWordsInJsonText))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

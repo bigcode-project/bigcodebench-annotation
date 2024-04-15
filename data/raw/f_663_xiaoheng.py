@@ -1,5 +1,4 @@
 import os
-import sys
 from datetime import datetime
 
 def f_663(filepath: str) -> dict:
@@ -15,7 +14,6 @@ def f_663(filepath: str) -> dict:
 
     Requirements:
     - os
-    - sys
     - datetime
 
     Example:

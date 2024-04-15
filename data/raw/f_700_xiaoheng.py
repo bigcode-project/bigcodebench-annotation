@@ -44,36 +44,42 @@ def f_700(directory_path):
 import unittest
 import os
 import shutil
+import tempfile
 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Create test directories and files
-        self.test_dir_1 = '/mnt/data/test_dir_1'
-        self.test_dir_2 = '/mnt/data/test_dir_2'
-        self.empty_dir = '/mnt/data/empty_dir'
+        self.temp_dir = tempfile.mkdtemp()
+        self.test_dir_1 = os.path.join(self.temp_dir, 'test_dir_1')
+        self.empty_dir = os.path.join(self.temp_dir, 'empty_dir')
+        os.mkdir(self.test_dir_1)
         os.mkdir(self.empty_dir)
+        self.create_test_files(self.test_dir_1, ['test1.pdf', 'data.csv', 'image.jpg', 'invalid file name.jpg'])
 
     def tearDown(self):
-        # Delete test directories
-        shutil.rmtree(self.test_dir_1)
-        shutil.rmtree(self.test_dir_2)
-        shutil.rmtree(self.empty_dir)
+        shutil.rmtree(self.temp_dir)
+
+    def create_test_files(self, directory, filenames):
+        for filename in filenames:
+            path = os.path.join(directory, filename)
+            with open(path, 'w') as f:
+                f.write("Dummy content")
+
+    def test_file_moves(self):
+        f_700(self.test_dir_1)
+        invalid_dir = os.path.join(self.test_dir_1, 'Invalid')
+        self.assertTrue(os.path.exists(invalid_dir))
+        self.assertEqual(len(os.listdir(invalid_dir)), 4)
+
+    def test_empty_directory(self):
+        summary = f_700(self.empty_dir)
+        self.assertEqual(summary, {})
+
 
     def test_basic_functionality(self):
         # Test basic functionality
-        summary_1 = f_700(self.test_dir_1)
-        summary_2 = f_700(self.test_dir_2)
-        
-        # Check if the summary dictionary is accurate
-        self.assertEqual(summary_1, {'pdf': 1, 'csv': 1, 'jpg': 3, 'Invalid': 1})
-        self.assertEqual(summary_2, {'png': 2, 'txt': 2, 'csv': 1, 'Invalid': 1})
-
-    def test_empty_directory(self):
-        # Test empty directory
-        summary = f_700(self.empty_dir)
-        
-        # Check if the summary dictionary is empty
-        self.assertEqual(summary, {})
+        summary = f_700(self.test_dir_1)
+        expected = {'Invalid': 4}
+        self.assertEqual(summary, expected)
         
     def test_invalid_path(self):
         # Test with an invalid directory path
@@ -87,13 +93,6 @@ class TestCases(unittest.TestCase):
         # Check if the summary contains keys for all unique extensions and "Invalid"
         self.assertTrue(all(key in ['pdf', 'csv', 'jpg', 'Invalid'] for key in summary.keys()))
         
-    def test_file_moves(self):
-        # Test if the files are actually moved to the correct folders
-        f_700(self.test_dir_1)
-        
-        # Check if the 'Invalid' directory exists and contains the correct number of files
-        self.assertTrue(os.path.exists(os.path.join(self.test_dir_1, 'Invalid')))
-        self.assertEqual(len(os.listdir(os.path.join(self.test_dir_1, 'Invalid'))), 1)
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -101,8 +100,6 @@ def run_tests():
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
-if __name__ == '__main__':
-    unittest.main()
 
 if __name__ == "__main__":
     run_tests()

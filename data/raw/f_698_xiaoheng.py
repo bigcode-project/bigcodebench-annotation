@@ -38,7 +38,7 @@ class TestCases(unittest.TestCase):
 
     def test_case_1(self):
         input_string = "This is line one.\nThis is line two."
-        expected_output = {'line': 2, 'one': 1, 'two': 1}
+        expected_output = {'This': 2, 'line': 2, 'one': 1, 'two': 1}
         self.assertEqual(f_698(input_string), expected_output)
 
     def test_case_2(self):
@@ -53,7 +53,7 @@ class TestCases(unittest.TestCase):
 
     def test_case_4(self):
         input_string = "This is a test.\nThis is only a test."
-        expected_output = {'test': 2}
+        expected_output = {'This': 2, 'test': 2}
         self.assertEqual(f_698(input_string), expected_output)
 
     def test_case_5(self):

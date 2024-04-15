@@ -1,0 +1,4 @@
+dog, cat, bird
+cat, cat, dog
+bird, dog, cat
+cat, bird, dog

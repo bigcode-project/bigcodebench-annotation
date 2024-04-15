@@ -5,7 +5,7 @@ def f_626(config_path: str) -> dict:
     """
     Load a JSON configuration file and return the configuration dictionary.
     
-    Args:
+    Parameters:
     - config_path (str): Path to the configuration file.
     
     Returns:
@@ -69,7 +69,7 @@ import unittest
 import json
 import tempfile
 
-class TestLoadConfig(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Create temporary configuration files for testing
         self.valid_config_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
@@ -129,7 +129,7 @@ class TestLoadConfig(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestLoadConfig))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
     

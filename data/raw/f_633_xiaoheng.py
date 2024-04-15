@@ -1,6 +1,5 @@
 import pickle
 import os
-import numpy as np
 from sklearn.datasets import make_classification
 
 # Constants
@@ -21,7 +20,6 @@ def f_633(data, target):
     Requirements:
     - pickle
     - os
-    - numpy
     - sklearn.datasets
 
     Example:

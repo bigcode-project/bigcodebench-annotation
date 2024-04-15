@@ -46,31 +46,49 @@ def f_671(logfile, duration=60):
     return error_count
 
 import unittest
+from unittest.mock import mock_open, patch
+import re
+import datetime
 
-class TestF33(unittest.TestCase):
+# Assuming your original f_671 function here
 
-    def test_zero_errors(self):
-        self.assertEqual(f_671('/path/to/f_671_data_xiaoheng/mock_log_0.log'), 0)
+class TestCases(unittest.TestCase):
+    @patch('builtins.open', new_callable=mock_open, read_data='error 500 occurred\nok\nerror 500 occurred')
+    def test_some_errors(self, mock_file):
+        # Test where there are some 500 errors in the log
+        result = f_671('mock_log.log')
+        self.assertEqual(result, 2)
 
-    def test_some_errors(self):
-        result = f_671('/path/to/f_671_data_xiaoheng/mock_log_1.log')
-        self.assertTrue(result > 0 and result < 100)
+    @patch('builtins.open', new_callable=mock_open, read_data='')
+    def test_empty_file(self, mock_file):
+        # Test with an empty log file
+        result = f_671('empty.log')
+        self.assertEqual(result, 0)
 
-    def test_all_errors(self):
-        result = f_671('/path/to/f_671_data_xiaoheng/mock_log_2.log')
-        self.assertTrue(result == 100)
+    @patch('builtins.open', new_callable=mock_open, read_data='error 500 occurred\n' * 100)
+    def test_all_errors(self, mock_file):
+        # Test where all lines are 500 errors
+        result = f_671('all_errors.log')
+        self.assertEqual(result, 100)
 
-    def test_empty_file(self):
-        self.assertEqual(f_671('/path/to/f_671_data_xiaoheng/empty.log'), 0)
-
-    def test_file_not_present(self):
+    @patch('os.path.exists')
+    def test_file_not_present(self, mock_exists):
+        # Simulate file not existing
+        mock_exists.return_value = False
         with self.assertRaises(FileNotFoundError):
-            f_671('/path/to/non_existent.log')
+            f_671('non_existent.log')
+
+    @patch('builtins.open', new_callable=mock_open, read_data='error 500 occurred')
+    def test_single_error(self, mock_file):
+        # Test with a single error
+        result = f_671('single_error.log')
+        self.assertEqual(result, 1)
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestF33))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 if __name__ == "__main__":
     run_tests()

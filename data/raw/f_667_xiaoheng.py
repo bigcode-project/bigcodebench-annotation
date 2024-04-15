@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-import pandas as pd
 
 # Constants
 ARRAY_LENGTH = 10
@@ -18,7 +17,6 @@ def f_667():
     Requirements:
     - numpy
     - sklearn
-    - pandas
 
     Example:
     >>> f_667()
@@ -33,49 +31,55 @@ def f_667():
            [0.71428571],
            [0.28571429]])
     """
-    np.random.seed(42)
+    np.random.seed(42)  # For reproducibility, as shown in your example
     array = np.random.randint(0, 10, ARRAY_LENGTH).reshape(-1, 1)
     scaler = MinMaxScaler()
     scaled_array = scaler.fit_transform(array)
-
     return scaled_array
 
 import unittest
 import numpy as np
 
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        """Testing with default range_max"""
-        result = f_667()
-        self.assertEqual(result.shape, (100, 1), "Array shape should be (100, 1)")
-        self.assertTrue((result >= 0).all() and (result <= 1).all(), "Array values should be in range [0, 1]")
-        
-    def test_case_2(self):
-        """Testing with a specific range_max"""
-        result = f_667(50)
-        self.assertEqual(result.shape, (100, 1), "Array shape should be (100, 1)")
-        self.assertTrue((result >= 0).all() and (result <= 1).all(), "Array values should be in range [0, 1]")
-        
-    def test_case_3(self):
-        """Testing with range_max as 1"""
-        result = f_667(1)
-        self.assertEqual(result.shape, (100, 1), "Array shape should be (100, 1)")
-        self.assertTrue((result == 0).all(), "Array values should all be 0")
-        
-    def test_case_4(self):
-        """Testing with a negative range_max"""
-        with self.assertRaises(ValueError, msg="Should raise ValueError for negative range_max"):
-            f_667(-10)
-        
-    def test_case_5(self):
-        """Testing with range_max as a float"""
-        with self.assertRaises(ValueError, msg="Should raise ValueError for float range_max"):
-            f_667(10.5)
+
+    def setUp(self):
+        self.result = f_667()  # Call the function once to use in multiple tests if needed
+
+    def test_normal_functionality(self):
+        """Testing the basic functionality and shape of the output array."""
+        self.assertEqual(self.result.shape, (10, 1), "Array shape should be (10, 1)")
+        self.assertTrue((self.result >= 0).all() and (self.result <= 1).all(), "Array values should be in the range [0, 1]")
+
+    def test_output_values(self):
+        """ Ensuring that the scaling works as expected. """
+        expected_min = 0
+        expected_max = 1
+        actual_min = np.min(self.result)
+        actual_max = np.max(self.result)
+        self.assertEqual(actual_min, expected_min, "The minimum of the scaled array should be 0")
+        self.assertAlmostEqual(actual_max, expected_max, places=15, msg="The maximum of the scaled array should be very close to 1")
+
+    def test_no_arguments(self):
+        """Ensure that no arguments are passed to the function."""
+        with self.assertRaises(TypeError):
+            f_667(10)  # This should fail since the function expects no arguments
+
+    def test_unchanging_output(self):
+        """Test if multiple calls to the function give the same result due to seed setting."""
+        second_result = f_667()
+        np.testing.assert_array_equal(self.result, second_result, "Results should be the same on every call due to fixed seed.")
+
+    def test_distribution_of_values(self):
+        """Test that the distribution of scaled values is neither constant nor degenerate (not all values the same)."""
+        unique_values = np.unique(self.result)
+        self.assertTrue(len(unique_values) > 1, "There should be more than one unique scaled value to confirm distribution.")
+
 
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 if __name__ == "__main__":
     run_tests()

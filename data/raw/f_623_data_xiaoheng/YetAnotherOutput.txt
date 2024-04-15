@@ -1,0 +1,4 @@
+sun, moon, star
+moon, moon, sun
+star, sun, moon
+moon, star, sun
