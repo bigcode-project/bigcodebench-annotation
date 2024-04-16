@@ -51,12 +51,12 @@ import unittest
 from unittest.mock import patch
 import pandas as pd
 import matplotlib.pyplot as plt
+import pytest
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Setup fake data for testing
-        cls.df = pd.DataFrame({
+        self.df = pd.DataFrame({
             'fruit': ['apple', 'banana', 'orange', 'apple', 'banana', 'banana'],
             'quantity': [10, 15, 5, 10, 15, 15]
         })
@@ -86,7 +86,7 @@ class TestCases(unittest.TestCase):
         # Test with numeric data
         ax = f_297(self.df, 'quantity')
         self.assertIsInstance(ax, plt.Axes)
-
+        
     def test_color_length(self):
         # Test if the number of colors matches the number of unique values
         ax = f_297(self.df, 'fruit')

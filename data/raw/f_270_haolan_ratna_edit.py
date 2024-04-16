@@ -30,6 +30,7 @@ def f_270(output_file, test_directory):
 
     Example:
     >>> f_270('word_counts.csv')
+    10
     """
     total_words = 0
     try:
@@ -89,7 +90,8 @@ class TestCases(unittest.TestCase):
         # Remove the test_output.json file after each test
         if os.path.exists('test_output.csv'):
             os.remove('test_output.csv')
-        os.rmdir(self.test_directory)
+        if os.path.exists(self.test_directory):
+            os.rmdir(self.test_directory)
 
     def test_no_files_in_directory(self):
         # Test case where there are no txt files in the directory

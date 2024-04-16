@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(ax, matplotlib.axes._axes.Axes, "The returned object should be a seaborn FacetGrid.")
         # Check if the data plotted is the same length as the original minus the NaNs
         non_na_length = df.dropna().shape[0]
-        self.assertEqual(len(ax.collections[0].get_offsets()), non_na_length)  # Check if there's only one data point in the collection
+        self.assertEqual(len(ax.collections[0].get_offsets().data), non_na_length)  # Check if there's only one data point in the collection
         plt.close()
 
     def test_large_dataset(self):
