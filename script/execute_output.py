@@ -14,7 +14,7 @@ if __name__ == '__main__':
             outputs.append(s)
     pass_count = 0
     count = 0
-    with open(f"results/{jsonl_file.replace('.jsonl', '.py')}","w") as fp:
+    with open(f"{jsonl_file.replace('.jsonl', '.py')}","w") as fp:
         for output in tqdm(outputs):
             if output["generation"][0]:
                 with open("test.py","w") as f:
