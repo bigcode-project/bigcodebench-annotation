@@ -38,19 +38,11 @@ def f_219(data, key, min_value, max_value):
     random_generated = np.random.randint(min_value, max_value + 1, size=len(data))
     data[key] = random_generated
     return data
-    
 
 import unittest
 import numpy as np
 import pandas as pd
-
 # Blackbox test cases
-def run_tests():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCases))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-
 class TestCases(unittest.TestCase):
     def test_empty_data(self):
         data = pd.DataFrame()
@@ -105,11 +97,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(key in updated_data.columns)
         self.assertEqual(len(updated_data), 1000)
         self.assertTrue(all(min_value <= val <= max_value for val in updated_data[key]))
-
     def test_non_dataframe_input(self):
         with self.assertRaises(ValueError):
             data = {'key1': ['value1', 'value2', 'value3'], 'key2': [1, 2, 3]}
             f_219(data, 'new_key', 0, 10)
-            
-if __name__ == "__main__":
-    run_tests()

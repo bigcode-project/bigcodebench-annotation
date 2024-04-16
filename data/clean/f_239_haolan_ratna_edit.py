@@ -21,7 +21,6 @@ def f_239(df, dict_mapping, plot_histogram=False):
 
     Returns:
     - DataFrame: The preprocessed DataFrame with standardized features and values replaced as per dict_mapping.
-    - AxesSubplot: The histogram of the target variable if plot_histogram is True, otherwise None.
 
     Requirements:
     - pandas
@@ -31,11 +30,9 @@ def f_239(df, dict_mapping, plot_histogram=False):
 
     Examples:
     >>> df = pd.DataFrame({'feature1': [1, 2, 3], 'feature2': [4, 5, 6], 'feature3': [7, 8, 9], 'feature4': [10, 11, 12], 'feature5': [13, 14, 15], 'target': [0, 1, 1]})
-    >>> dict_mapping = {1: 1, 2: 2, 3: 3}
-    >>> f_239(df, dict_mapping, plot_histogram=True)[0].head(2)
-       feature1  feature2  feature3  feature4  feature5  target
-    0 -1.224745 -1.224745 -1.224745 -1.224745 -1.224745       0
-    1  0.000000  0.000000  0.000000  0.000000  0.000000       1
+    >>> dict_mapping = {1: 'a', 2: 'b', 3: 'c'}
+    >>> f_239(df, dict_mapping, plot_histogram=True)
+    DataFrame with standardized features and replaced values.
     """
 
     # Check if all required columns are present in the DataFrame
@@ -56,7 +53,7 @@ def f_239(df, dict_mapping, plot_histogram=False):
         ax = df[TARGET].plot.hist(bins=50)
         return df, ax
     else:
-        return df, None
+        return df
 
 import unittest
 import pandas as pd
@@ -74,7 +71,7 @@ class TestCases(unittest.TestCase):
             'target': [0, 1, 1]
         })
         dict_mapping = {1: 11, 0: 22}
-        result_df, _ = f_239(df, dict_mapping)
+        result_df = f_239(df, dict_mapping)
         self.assertTrue(11 in result_df.values)
         self.assertTrue(22 in result_df.values)
 
@@ -87,7 +84,7 @@ class TestCases(unittest.TestCase):
             'feature5': [13, 14, 15],
             'target': [0, 1, 1]
         })
-        result_df, _ = f_239(df, {})
+        result_df = f_239(df, {})
         for feature in ['feature1', 'feature2', 'feature3', 'feature4', 'feature5']:
             self.assertAlmostEqual(result_df[feature].mean(), 0, places=1)
             self.assertAlmostEqual(int(result_df[feature].std()), 1, places=1)
@@ -101,7 +98,7 @@ class TestCases(unittest.TestCase):
             'feature5': [13, 14, 15],
             'target': [0, 1, 1]
         })
-        result, _ = f_239(df, {}, plot_histogram=False)
+        result = f_239(df, {}, plot_histogram=False)
         self.assertIsInstance(result, pd.DataFrame)
 
     def test_missing_features_handling(self):
