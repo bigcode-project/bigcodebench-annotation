@@ -1,6 +1,5 @@
 import xmltodict
 import json
-import os
 
 def f_3883(s, file_path):
     """
@@ -17,7 +16,6 @@ def f_3883(s, file_path):
     Requirements:
     - xmltodict
     - json
-    - os
 
     Examples:
     Convert a simple XML string to a dictionary.
