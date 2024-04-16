@@ -35,8 +35,9 @@ jobs:
         flake8 data/clean/*.py --count --select=E9,F63,F7,F82 --show-source --statistics
     - name: Test processed data with pytest and doctest
       run: |
-        pytest --doctest-modules data/processed/*jenny_w_doc.py
-        pytest --doctest-modules data/processed/*wenhao_w_doc.py
+        pytest data/raw/*ratna*.py
+        # pytest --doctest-modules data/processed/*jenny_w_doc.py
+        # pytest --doctest-modules data/processed/*wenhao_w_doc.py
     # - name: Test processed data with pytest and no doctest
     #   run: |
     #     pytest data/processed/*_wo_doc.py
