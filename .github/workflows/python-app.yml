@@ -33,10 +33,9 @@ jobs:
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 data/clean/*.py --count --select=E9,F63,F7,F82 --show-source --statistics
-    - name: Test processed data with pytest and doctest
+    - name: Test processed data with pytest
       run: |
-        pytest --doctest-modules data/processed/*jenny_w_doc.py
-        pytest --doctest-modules data/processed/*wenhao_w_doc.py
+        sh script/run.sh
     # - name: Test processed data with pytest and no doctest
     #   run: |
     #     pytest data/processed/*_wo_doc.py

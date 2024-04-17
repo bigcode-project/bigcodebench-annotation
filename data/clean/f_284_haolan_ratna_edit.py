@@ -1,0 +1,71 @@
+import pandas as pd
+from random import randint
+
+# Constants
+CATEGORIES = ['A', 'B', 'C', 'D', 'E']
+
+def f_284(value_range=(0, 100)):
+    """
+    Generate a category distribution within a specified range and return as a DataFrame.
+
+    Parameters:
+    value_range (tuple): A tuple specifying the range (min, max) for generating random values for categories.
+    
+    Returns:
+    DataFrame: A pandas DataFrame that has two columns: 'Category' (category names) and 'Count' (count of each category). 
+
+    Requirements:
+    - pandas
+    - random
+
+    Example:
+    >>> df = f_284()
+    >>> df['Count'][0] >= 0
+    True
+    """
+
+    distribution = {category: randint(*value_range) for category in CATEGORIES}
+    df = pd.DataFrame(list(distribution.items()), columns=['Category', 'Count'])
+
+    return df
+
+import unittest
+import pandas as pd
+
+class TestCases(unittest.TestCase):
+    def test_return_type(self):
+        """Test if the function returns a DataFrame."""
+        result = f_284()
+        self.assertIsInstance(result, pd.DataFrame)
+
+    def test_columns(self):
+        """Test if the DataFrame has the correct columns."""
+        result = f_284()
+        self.assertListEqual(list(result.columns), ['Category', 'Count'])
+
+    def test_value_range_default(self):
+        """Test if the 'Count' values are within the default range."""
+        result = f_284()
+        for count in result['Count']:
+            self.assertTrue(0 <= count <= 100)
+
+    def test_value_range_custom(self):
+        """Test if the 'Count' values are within a custom range."""
+        test_range = (10, 50)
+        result = f_284(value_range=test_range)
+        for count in result['Count']:
+            self.assertTrue(test_range[0] <= count <= test_range[1])
+
+    def test_number_of_rows(self):
+        """Test if the DataFrame contains the expected number of rows."""
+        result = f_284()
+        self.assertEqual(len(result), len(CATEGORIES))
+
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+if __name__ == '__main__':
+    run_tests()
