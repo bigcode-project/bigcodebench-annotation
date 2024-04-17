@@ -281,7 +281,7 @@ def reconstruct_problem(data):
 
 def check_test_wo_doc(data):
     "Check if the problem is related to file system, network requests and database"
-    if any([lib in data["libs"] for lib in ["shutil", "requests", "django", "sqlite3", "datetime"]]):
+    if any([lib in data["libs"] for lib in ["shutil", "requests", "django", "sqlite3", "datetime", "flask", "turtle"]]):
         return True
     elif "os.path" in data["apis"]:
         return True
