@@ -1,6 +1,6 @@
 import os
-import openai
-from openai import OpenAI
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
 import termcolor
 import jsonlines
 import sys
@@ -10,7 +10,7 @@ from camel_converter import to_snake
 # from datasets import load_dataset
 from typing import List
 from tqdm import tqdm
-client = OpenAI()
+device = "cuda" # the device to load the model onto
 
 _CITATION = """
 
@@ -58,7 +58,13 @@ class ContentParser:
 class ChatWrapper:
 
     def __init__(self, model: str):
-        self._model = model
+        
+        self.model = AutoModelForCausalLM.from_pretrained(
+                            model,
+                            torch_dtype="auto",
+                            device_map="auto"
+                        )
+        self.tokenizer = AutoTokenizer.from_pretrained(model)
 
     def __call__(self, prompt: str, n: int) -> str:
         messages = [
@@ -67,29 +73,33 @@ class ChatWrapper:
                 "content": prompt,
             }
         ]
-        # while True:
-        # try:
-        response = client.chat.completions.create(
-            model=self._model,
-            messages=messages,
+        text = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+        model_inputs = self.tokenizer([text], return_tensors="pt").to(device)
+
+        generated_ids = self.model.generate(
+            model_inputs.input_ids,
+            do_sample=True,
+            max_new_tokens=1024,
             temperature=0.2,
             top_p=0.95,
-            n=n
+            num_return_sequences=n,
         )
-        content_list = list()
-        for i in range(n):
-            message = response.choices[i].message
-            assert message.role == "assistant"
-            content_list.append(message.content)
+        generated_ids = [
+            output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+        ]
+
+        content_list = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
         return content_list
-        # except Exception as e:
-        #     print("API EXCEPTION:", e)
 
 
 if __name__ == '__main__':
     TIMES = 1
     VERBOSE = True
-    MODEL = "gpt-4"
+    MODEL = "Qwen/CodeQwen1.5-7B-Chat"
     input_file = sys.argv[1]
     # make test directory
     if not os.path.exists("results"):
