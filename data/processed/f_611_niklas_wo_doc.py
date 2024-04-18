@@ -33,6 +33,10 @@ def f_611(json_file, csv_file):
 import unittest
 import os
 class TestCases(unittest.TestCase):
+    def tearDown(self):
+        for file in ['./test.json', './test.csv', './testx.json', './testx.csv', './testy.json', './testy.csv', './testz.json', './testz.csv']:
+            if os.path.exists(file):
+                os.remove(file)
     def test_case_1(self):
         # Create json file
         json_file = './test.json'
@@ -46,9 +50,7 @@ class TestCases(unittest.TestCase):
             reader = csv.reader(f)
             csv_data = list(reader)
         self.assertEqual(csv_data, [['a', 'b', 'c'], ['1', '2', '3']])
-        # Remove file
-        os.remove(json_file)
-        os.remove(csv_file)
+        
     def test_case_2(self):
         # Create json file
         json_file = './test.json'
@@ -62,9 +64,7 @@ class TestCases(unittest.TestCase):
             reader = csv.reader(f)
             csv_data = list(reader)
         self.assertEqual(csv_data, [['z', 'y', 'x'], ['1', '2', '3']])
-        # Remove file
-        os.remove(json_file)
-        os.remove(csv_file)
+        
     def test_case_3(self):
         # Create json file
         json_file = './testx.json'
@@ -78,9 +78,7 @@ class TestCases(unittest.TestCase):
             reader = csv.reader(f)
             csv_data = list(reader)
         self.assertEqual(csv_data, [['xxx'], ['99']])
-        # Remove file
-        os.remove(json_file)
-        os.remove(csv_file)
+        
     def test_case_4(self):
         # Create json file
         json_file = './testy.json'
@@ -94,9 +92,7 @@ class TestCases(unittest.TestCase):
             reader = csv.reader(f)
             csv_data = list(reader)
         self.assertEqual(csv_data, [['yyy'], ['99']])
-        # Remove file
-        os.remove(json_file)
-        os.remove(csv_file)
+        
     def test_case_5(self):
         # Create json file
         json_file = './testz.json'
@@ -110,6 +106,3 @@ class TestCases(unittest.TestCase):
             reader = csv.reader(f)
             csv_data = list(reader)
         self.assertEqual(csv_data, [['zzz'], ['99']])
-        # Remove file
-        os.remove(json_file)
-        os.remove(csv_file)
