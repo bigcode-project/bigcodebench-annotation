@@ -1,14 +1,18 @@
 #!/bin/bash
 cp data/raw/hanhu_data/*.py data/clean
 python script/parse.py
-for file in data/processed/*hanhu*.py; do
+for file in data/processed/*hanhu*w_doc*; do
     echo "Running pytest on $file..."
-    if [[ "$file" == *"_w_doc.py"* ]]; then
-        pytest --doctest-modules "$file"
-    elif [[ "$file" == *"_wo_doc.py"* ]]; then
-        pytest "$file"
+    pytest --doctest-modules "$file"    
+    if [ $? -ne 0 ]; then
+        echo "Pytest failed on $file, stopping..."
+        # exit 1
     fi
+done
 
+for file in data/processed/*hanhu*wo_doc*; do
+    echo "Running pytest on $file..."
+    pytest "$file"    
     if [ $? -ne 0 ]; then
         echo "Pytest failed on $file, stopping..."
         # exit 1
