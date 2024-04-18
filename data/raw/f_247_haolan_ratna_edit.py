@@ -16,22 +16,26 @@ def f_247(df, test_size=0.2, random_state=42):
 
     Returns:
     float: The accuracy of the prediction as a float value.
-
+    
+    Note:
+    - The function will raise a ValueError is input df is not a DataFrame.
+    
     Requirements:
     - pandas
-    - sklearn.model_selection
-    - sklearn.ensemble
-    - sklearn.metrics
+    - sklearn.model_selection.train_test_split
+    - sklearn.ensemble.RandomForestClassifier
+    - sklearn.metrics.accuracy_score
 
     Example:
-    >>> data = pd.DataFrame([
-        {'Name': 'James', 'Age': 30, 'Score': 85, 'Category': 'Electronics'},
-        {'Name': 'Lily', 'Age': 28, 'Score': 92, 'Category': 'Home'}
-    ])
+    >>> data = pd.DataFrame([{'Name': 'James', 'Age': 30, 'Score': 85, 'Category': 'Electronics'}, {'Name': 'Lily', 'Age': 28, 'Score': 92, 'Category': 'Home'}])
     >>> accuracy = f_247(data)
-    >>> print(accuracy)
+    >>> accuracy <= 1.0
+    True
     """
 
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
+    
     df = df.drop_duplicates(subset='Name')
 
     X = df[['Age', 'Score']]
@@ -51,8 +55,6 @@ import unittest
 import pandas as pd
 from faker import Faker
 import random
-
-
 
 class TestCases(unittest.TestCase):
     # Helper function to generate test data

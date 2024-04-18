@@ -12,6 +12,7 @@ def f_275(df):
     Axes: The matplotlib Axes object of the bar chart.
 
     Note:
+    - The function will raise a ValueError is input df is not a DataFrame.
     - This function use "Value Distribution" for the plot title.
     - This function use "Value" and "Count" as the xlabel and ylabel respectively.
 
@@ -20,15 +21,16 @@ def f_275(df):
     - matplotlib.pyplot
 
     Example:
-    >>> df = pd.DataFrame({
-    ...     'id': [1, 1, 2, 2, 3, 3],
-    ...     'value': ['A', 'B', 'A', 'B', 'A', 'B']
-    ... })
+    >>> df = pd.DataFrame({'id': [1, 1, 2, 2, 3, 3],'value': ['A', 'B', 'A', 'B', 'A', 'B']})
     >>> ax = f_275(df)
     >>> len(ax.patches)
     2
+    >>> plt.close()
     """
 
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
+    
     value_counts = df['value'].value_counts()
     ax = plt.bar(value_counts.index, value_counts.values)
     plt.xlabel('Value')

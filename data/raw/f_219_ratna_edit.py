@@ -53,6 +53,7 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
     def test_empty_data(self):
+        np.random.seed(0)
         data = pd.DataFrame()
         key = 'new_column'
         min_value = 0
@@ -63,6 +64,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(updated_data), 0)
     
     def test_non_empty_data(self):
+        np.random.seed(0)
         data = pd.DataFrame({'A': [1, 2, 3], 'B': ['a', 'b', 'c']})
         key = 'random_values'
         min_value = 0
@@ -74,6 +76,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(all(min_value <= val <= max_value for val in updated_data[key]))
         
     def test_negative_values(self):
+        np.random.seed(0)
         data = pd.DataFrame({'X': ['x1', 'x2'], 'Y': ['y1', 'y2']})
         key = 'random'
         min_value = -10
@@ -85,6 +88,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(all(min_value <= val <= max_value for val in updated_data[key]))
         
     def test_single_row_data(self):
+        np.random.seed(0)
         data = pd.DataFrame({'A': [5], 'B': ['abc']})
         key = 'new_col'
         min_value = 0
@@ -96,6 +100,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(all(min_value <= val <= max_value for val in updated_data[key]))
         
     def test_large_data(self):
+        np.random.seed(0)
         data = pd.DataFrame({'X': ['x' + str(i) for i in range(1000)], 'Y': ['y' + str(i) for i in range(1000)]})
         key = 'random_numbers'
         min_value = 1
@@ -107,6 +112,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(all(min_value <= val <= max_value for val in updated_data[key]))
 
     def test_non_dataframe_input(self):
+        np.random.seed(0)
         with self.assertRaises(ValueError):
             data = {'key1': ['value1', 'value2', 'value3'], 'key2': [1, 2, 3]}
             f_219(data, 'new_key', 0, 10)

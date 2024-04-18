@@ -22,8 +22,8 @@ def f_324(app_name):
     - flask_mail
 
     Example:
-    >>> mail, configs = f_230("test")
-    >>> mail.__getattribute__("app").name
+    >>> mail, configs = f_324("test")
+    >>> print(mail.__getattribute__("app").name)
     test
     """
 

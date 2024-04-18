@@ -1,5 +1,5 @@
 import pandas as pd
-from random import uniform
+import random
 
 
 # Constants
@@ -26,19 +26,17 @@ def f_250(n_data_points=N_DATA_POINTS):
     - random
 
     Example:
-    >>> data = f_250()
-    >>> print(data.head())
-    Value
-    0  1.234
-    1  2.345
-    2  3.456
-    3  4.567
-    4  5.678
+    >>> random.seed(0)
+    >>> data = f_250(20)
+    >>> print(data.shape)
+    (20, 1)
+    >>> MIN_VALUE <= data.iloc[0]['Value'] <= MAX_VALUE
+    True
     '''
     if n_data_points == 0:
         return pd.DataFrame(columns=['Value'])
     
-    data = [round(uniform(MIN_VALUE, MAX_VALUE), 3) for _ in range(n_data_points)]
+    data = [round(random.uniform(MIN_VALUE, MAX_VALUE), 3) for _ in range(n_data_points)]
     data_df = pd.DataFrame(data, columns=['Value'])
 
     return data_df
@@ -46,27 +44,33 @@ def f_250(n_data_points=N_DATA_POINTS):
     
 
 import unittest
+import pandas as pd
 
 class TestCases(unittest.TestCase):
     def test_return_type(self):
+        random.seed(0)
         result = f_250()
         self.assertIsInstance(result, pd.DataFrame)
 
     def test_data_points_count(self):
+        random.seed(0)
         result = f_250()
         self.assertEqual(len(result), 10000)
 
     def test_value_range(self):
+        random.seed(0)
         result = f_250()
         within_range = result['Value'].apply(lambda x: 0.0 <= x <= 10.0)
         self.assertTrue(within_range.all())
 
     def test_value_truncation(self):
+        random.seed(0)
         result = f_250()
         correctly_truncated = result['Value'].apply(lambda x: len(str(x).split('.')[1]) <= 3 if '.' in str(x) else True)
         self.assertTrue(correctly_truncated.all())
 
     def test_empty_data_frame(self):
+        random.seed(0)
         result = f_250(n_data_points=0)
         self.assertTrue(result.empty)
 

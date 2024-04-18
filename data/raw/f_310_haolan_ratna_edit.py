@@ -19,7 +19,7 @@ def f_310(l):
 
     Requirements:
     - numpy
-    - sklearn.decomposition
+    - sklearn.decomposition.PCA
     - matplotlib.pyplot
 
     Example:
@@ -27,8 +27,9 @@ def f_310(l):
     >>> ax = f_310(l)
     >>> len(ax.collections[0].get_offsets())
     4
-    >>> ax.get_title()
+    >>> print(ax.get_title())
     PCA Result
+    >>> plt.close()
     """
     pca = PCA(n_components=2)
     principalComponents = pca.fit_transform(l)
@@ -65,6 +66,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_ylabel(), "Second Principal Component")
         # Check the number of points
         self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
 
     def test_case_2(self):
         # Input 2: another simple 2D array
@@ -76,6 +78,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_ylabel(), "Second Principal Component")
         # Check the number of points
         self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
 
     def test_case_3(self):
         # Input 3: larger array
@@ -87,6 +90,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_ylabel(), "Second Principal Component")
         # Check the number of points
         self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
 
     def test_case_4(self):
         # Input 4: array with similar values (less variance)
@@ -98,6 +102,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_ylabel(), "Second Principal Component")
         # Check the number of points
         self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
 
     def test_case_5(self):
         # Input 5: array with larger values
@@ -109,6 +114,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_ylabel(), "Second Principal Component")
         # Check the number of points
         self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
 
 if __name__ == "__main__":
     run_tests()

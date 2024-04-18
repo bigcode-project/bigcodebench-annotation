@@ -1,7 +1,6 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-import numpy as np
 
 # Constants
 FEATURES = ['feature '+str(i) for i in range(1, 11)]
@@ -19,20 +18,24 @@ def f_304(df):
     
     Requirements:
     - pandas
-    - sklearn.model_selection
-    - sklearn.linear_model
-    - numpy
-        
+    - sklearn.model_selection.train_test_split
+    - sklearn.linear_model.LinearRegression
+    
+    Note:
+    - The function will raise a ValueError is input df is not a DataFrame.
+
     Example:
-    >>> df = pd.DataFrame({
-            'feature ' + str(i): np.random.rand(100) for i in range(1, 11)
-        })
+    >>> import numpy as np
+    >>> df = pd.DataFrame({'feature ' + str(i): np.random.rand(100) for i in range(1, 11)})
     >>> df['target'] = df.apply(lambda row: sum(row), axis=1)
     >>> model = f_304(df)
     >>> print(len(model.coef_))
     10
     """
 
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
+    
     X = df[FEATURES]
     y = df[TARGET]
 
@@ -46,6 +49,7 @@ def f_304(df):
 import unittest
 import pandas as pd
 from io import StringIO
+import numpy as np
 
 class TestCases(unittest.TestCase):
 

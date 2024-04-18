@@ -1,7 +1,6 @@
 import pandas as pd
 import re
 import numpy as np
-import matplotlib.pyplot as plt
 
 # Constants
 PATTERN = r"([a-fA-F\d]{32})"
@@ -21,12 +20,9 @@ def f_299(df, column):
     - pandas
     - re
     - numpy
-    - matplotlib.pyplot
 
     Example:
-    >>> data = pd.DataFrame({"text": ["6f96cfdfe5ccc627cadf24b41725caa4 gorilla", 
-    ...                               "6f96cfdfe5ccc627cadf24b41725caa4 banana",
-    ...                               "1234567890abcdef1234567890abcdef apple"]})
+    >>> data = pd.DataFrame({"text": ["6f96cfdfe5ccc627cadf24b41725caa4 gorilla", "6f96cfdfe5ccc627cadf24b41725caa4 banana", "1234567890abcdef1234567890abcdef apple"]})
     >>> counts = f_299(data, "text")
     >>> print(counts.index[0])
     6f96cfdfe5ccc627cadf24b41725caa4

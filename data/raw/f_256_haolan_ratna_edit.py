@@ -25,7 +25,7 @@ def f_256(ax, func_index):
     >>> ax = fig.add_subplot(111, polar=True)
     >>> ax_up = f_256(ax, 1)
     >>> ax_up.lines[0].get_ydata()[0]
-    0.0
+    1.0
     """
 
     x = np.linspace(0, 2 * np.pi, 1000)
