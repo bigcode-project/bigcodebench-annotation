@@ -31,7 +31,7 @@ if __name__ == '__main__':
                     pass_count += 1
                 else:
                     fp.write(output["prompt"] + "\n" + output["generation"][0] + "\n\n" + output["test"])
-                    fp.write("\n\n\"\"\"\n\n"+error_message+"\n\n\"\"\"\n\n##################################################\n\n")
+                    fp.write("\n\n"+error_message+"\n\n##################################################\n\n")
             except:
                 fp.write(output["prompt"] + "\n" + output["generation"][0] + "\n\n" + output["test"])
                 fp.write("\n\n\"\"\"\n\n"+"TIMEOUT"+"\n\n\"\"\"\n\n##################################################\n\n")
