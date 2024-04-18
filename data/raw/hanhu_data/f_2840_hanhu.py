@@ -77,5 +77,16 @@ class TestF2842(unittest.TestCase):
         with self.assertRaises(ssl.SSLError):
             f_2842('badssl.com', 443, '/test/path')
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2842)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

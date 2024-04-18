@@ -75,5 +75,16 @@ class TestF4441(unittest.TestCase):
         self.assertIsNone(result['defaults'][0])
 
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4441)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

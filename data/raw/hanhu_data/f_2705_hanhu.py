@@ -19,7 +19,7 @@ def f_2707(url, form_id, data):
 
     Requirements:
         - mechanize
-        - bs4
+        - bs4.BeautifulSoup
 
     Examples:
         >>> data = {'username': 'admin', 'password': 'password'}
@@ -97,6 +97,16 @@ class TestF2707(unittest.TestCase):
         with self.assertRaises(mechanize.URLError):
             f_2707('invalid_url', 0, {'username': 'admin'})
             
-if __name__ == "__main__":
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2707)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

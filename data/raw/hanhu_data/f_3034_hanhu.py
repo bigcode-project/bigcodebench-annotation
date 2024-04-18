@@ -94,5 +94,16 @@ class TestF3036(unittest.TestCase):
         with self.assertRaises(ValueError):
             f_3036(np.array([0]), np.array([0, 1]))
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3036)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

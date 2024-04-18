@@ -94,5 +94,16 @@ class TestF2407(unittest.TestCase):
         f_2407(colors)
         mock_screen.return_value.mainloop.assert_called_once()
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2407)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

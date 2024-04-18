@@ -54,5 +54,16 @@ class TestF3980(unittest.TestCase):
         signature = f_3980('', 'Hello, world!')
         self.assertEqual(len(signature), 64)
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3980)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

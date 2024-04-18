@@ -22,10 +22,18 @@ def f_4435(filepath):
     - binascii
 
     Examples:
-    >>> isinstance(f_4435('libc.so.6'), str) # Example output will vary based on system and DLL file availability.
+    Examples:
+    >>> with open('libc.so.6', 'w') as f:
+    ...     _ = f.write("")
+    >>> result = f_4435('libc.so.6')
+    MD5 Hash: d41d8cd98f00b204e9800998ecf8427e
+    SHA256 Hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    >>> isinstance(result, str) 
     True
-    >>> 'libc.so.6' in f_4435('libc.so.6')
+    >>> 'libc.so.6' in result
     True
+    >>> import os
+    >>> os.remove('libc.so.6')  # Cleanup the fi
     """
     lib = ctypes.CDLL(filepath)
 
@@ -108,5 +116,16 @@ class TestF4435(unittest.TestCase):
         sys.stdout = self.original_stdout
 
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4435)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

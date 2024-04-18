@@ -23,8 +23,8 @@ def f_4529(file_path):
     Requirements:
     - rsa
     - os
-    - cryptography.fernet
-    - base64
+    - cryptography.fernet.Fernet
+    - base64.b64encode
 
     Examples:
     >>> pub_key, encrypted_file, encrypted_key_file = f_4529('my_file.txt')
@@ -98,5 +98,16 @@ class TestF4529(unittest.TestCase):
         if os.path.exists('fernet_key.encrypted'):
             os.remove('fernet_key.encrypted')
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4529)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

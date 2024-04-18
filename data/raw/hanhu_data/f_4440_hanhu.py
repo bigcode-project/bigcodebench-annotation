@@ -23,10 +23,13 @@ def f_4442(f_list):
     - pandas
 
     Examples:
+    >>> def f(x): x*x
     >>> def g(x, y=2): return x*y
-    >>> f_4442([f, g]) # This will display a bar chart
-    
-    Attempting to include a lambda function in the list will raise a ValueError:
+    >>> f_4442([f, g])
+                   Number of Arguments
+    Function Name                     
+    f                                1
+    g                                2
     >>> lambda_func = lambda x: x * 2
     >>> f_4442([f, lambda_func])
     Traceback (most recent call last):
@@ -86,6 +89,16 @@ class TestF4442(unittest.TestCase):
         f_4442([sample_function])
         mock_show.assert_called_once()
 
-if __name__ == '__main__':
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4442)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

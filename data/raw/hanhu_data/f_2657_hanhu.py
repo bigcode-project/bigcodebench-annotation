@@ -140,6 +140,16 @@ class TestF2658(unittest.TestCase):
         request_handler.do_POST()
         request_handler.send_error.assert_called_with(400, 'No data key in request')
 
-if __name__ == "__main__":
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2658)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

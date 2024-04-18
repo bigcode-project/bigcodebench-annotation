@@ -24,8 +24,8 @@ def f_1897(ip_range, port):
 
     Requirements:
     - socket
-    - ipaddress
-    - threading
+    - ipaddress.IPv4Network
+    - threading.Thread
     """
     open_ports = {}
 
@@ -102,5 +102,16 @@ class TestF1897(unittest.TestCase):
             self.assertIsInstance(status, bool, "All values should be booleans indicating port status.")
 
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1897)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

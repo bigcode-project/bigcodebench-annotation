@@ -71,7 +71,7 @@ class TestF1754(unittest.TestCase):
     def test_normal_distribution_properties(self):
         """ Test if the generated samples have the correct mean and standard deviation. """
         mu, sigma = 0, 1
-        result = f_1754(mu, sigma, 1000)
+        result = f_1754(mu, sigma, 1000000)
         self.assertAlmostEqual(np.mean(result), mu, places=1)
         self.assertAlmostEqual(np.std(result), sigma, places=1)
 
@@ -104,5 +104,16 @@ class TestF1754(unittest.TestCase):
         result2 = f_1754(mu, sigma, 1000)
         self.assertFalse(np.array_equal(result1, result2))
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1754)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

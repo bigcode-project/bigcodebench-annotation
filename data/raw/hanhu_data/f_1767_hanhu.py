@@ -72,6 +72,16 @@ class TestF1768(unittest.TestCase):
         f_1768("F3BE8080", 16)
         mock_urandom.assert_called_once_with(16)
 
-if __name__ == "__main__":
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1768)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -14,17 +14,15 @@ def f_1715(api_url, template_folder):
     - template_folder (str): The path to the folder containing Flask templates.
 
     Requirements:
-    - flask
-    - flask_restful
+    - flask.Flask
+    - flask_restful.Resource
+    - flask_restful.Api
     - requests
 
     Example:
-    # Example 1: Check if the app instance is created
     >>> app = f_1715('https://api.example.com/data', 'templates')
     >>> 'data' in [str(route) for route in app.url_map.iter_rules()]
-    True  # Corrected to reflect actual behavior when '/data' endpoint is added
-
-    # Example 2: Check the type of the API object
+    True
     >>> api = Api(app)
     >>> type(api).__name__
     'Api'
@@ -94,7 +92,16 @@ class TestF1715(unittest.TestCase):
         response = client.get('/data')
         self.assertEqual(response.status_code, 200)
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1715)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
 
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -101,5 +101,16 @@ class TestF2439(unittest.TestCase):
         # Ensure that the plotting functions are called, validating the function's complete execution path
         mock_specshow.assert_called()
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2439)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

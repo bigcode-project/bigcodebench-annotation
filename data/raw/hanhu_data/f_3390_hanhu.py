@@ -77,6 +77,16 @@ class TestF3392Additional(unittest.TestCase):
         self.assertFalse(f_3392('SGVsbG8gV29ybGQ=', 'c47c23299efca3c220f4c19a5f2e4ced14729322'.upper(), 'my_secret_key'))
 
 
-if __name__ == '__main__':
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3392Additional)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

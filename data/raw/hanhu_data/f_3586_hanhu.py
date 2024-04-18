@@ -18,7 +18,7 @@ def f_3588(n, pattern):
     Requirements:
     - re
     - string
-    - random
+    - random.choice
 
     Examples:
     >>> len(f_3588(5, '[a-z]*')) == 5
@@ -63,5 +63,16 @@ class TestF3588(unittest.TestCase):
         self.assertEqual(f_3588(0, '^$'), '')
 
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3588)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -107,6 +107,16 @@ class TestF1701(unittest.TestCase):
         with self.assertRaises(ConnectionError):
             f_1701('nonexistentdomain.com')
 
-if __name__ == '__main__':
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1701)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

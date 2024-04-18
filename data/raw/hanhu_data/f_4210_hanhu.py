@@ -91,5 +91,16 @@ class TestF4212(unittest.TestCase):
         with self.assertRaises(ValueError):
             f_4212('10', 10, 1, self.alphabet)
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4212)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

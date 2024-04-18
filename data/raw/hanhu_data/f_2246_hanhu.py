@@ -18,7 +18,7 @@ def f_2248(dic):
         ValueError: If the input dictionary is empty.
 
     Requirements:
-    - geopy.distance
+    - geopy.distance.geodesic
     - folium
 
     Examples:
@@ -100,5 +100,16 @@ class TestF2248(unittest.TestCase):
         self.assertTrue(distances[('Loc1', 'Loc2')] > 10000)  # Expecting a large distance
 
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2248)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

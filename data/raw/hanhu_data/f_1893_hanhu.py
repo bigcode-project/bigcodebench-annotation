@@ -101,5 +101,16 @@ class TestF1894(unittest.TestCase):
         self.assertEqual(len(result), expected_result_count)
         self.assertEqual(mock_get.call_count, expected_result_count, "Should make HTTP GET requests only to usable IPs.")
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1894)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

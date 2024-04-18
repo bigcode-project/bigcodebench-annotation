@@ -24,10 +24,14 @@ def f_4669(filepath):
     - logging
 
     Examples:
-    >>> f_4669('example.cpp') # Assuming example.cpp exists and is compilable
-    # INFO log indicating successful compilation
-    >>> f_4669('non_existent.cpp') # Assuming non_existent.cpp does not exist
-    # ERROR log indicating failure to compile
+    >>> with open('example.cpp', 'w') as f: \
+            _ = f.write("int main(){return 0;}")
+    >>> f_4669('example.cpp')
+    >>> os.path.exists('example')
+    True
+    >>> import os
+    >>> os.remove('example.cpp')
+    >>> os.remove('example')
     """
     # Configure logging
     logging.basicConfig(level=logging.INFO)
@@ -53,7 +57,7 @@ class TestF4669(unittest.TestCase):
         # Setup an empty test file
         self.empty_file = 'empty_file.cpp'
         with open(self.empty_file, 'w') as f:
-            pass
+            f.write("")
 
     @patch('subprocess.check_call')
     def test_successful_compilation(self, mock_check_call):
@@ -86,6 +90,16 @@ class TestF4669(unittest.TestCase):
         # Clean up created files
         os.remove(self.empty_file)
 
-if __name__ == '__main__':
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4669)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

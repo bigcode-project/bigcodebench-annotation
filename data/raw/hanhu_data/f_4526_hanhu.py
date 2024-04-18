@@ -23,7 +23,7 @@ def f_4528(directory):
     - rsa
     - os
     - zipfile
-    - base64
+    - base64.b64encode
 
     Examples:
     >>> pub_key, zipfile_name = f_4528('./')
@@ -104,5 +104,16 @@ class TestF4528(unittest.TestCase):
             self.assertNotEqual(b64encode(b"Sample content").decode('utf-8'), encrypted_content)
 
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4528)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

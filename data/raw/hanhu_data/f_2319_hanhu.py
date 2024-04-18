@@ -18,7 +18,7 @@ def f_2321(commands):
 
     Requirements:
     - subprocess
-    - multiprocessing
+    - multiprocessing.Pool
 
     Notes:
     - If `commands` is an empty list, the function returns an empty list without attempting to execute any commands.
@@ -88,5 +88,16 @@ class TestF2321(unittest.TestCase):
         self.assertEqual(result[0], b'')
 
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2321)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

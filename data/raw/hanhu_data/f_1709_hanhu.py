@@ -1,7 +1,7 @@
 import hashlib
 import base64
-from django.http import HttpResponseBadRequest, HttpResponse
 import binascii
+from django.http import HttpResponseBadRequest, HttpResponse
 from django.conf import settings
 settings.configure()
 
@@ -45,10 +45,10 @@ def f_1710(data):
 
     Requirements:
     - django.http
+    - django.conf
     - base64
     - hashlib
     - binascii
-    - django.conf
     """
     try:
         username = data['username']
@@ -109,7 +109,16 @@ class TestF1710(unittest.TestCase):
         self.assertIsInstance(response, HttpResponseBadRequest)
         self.assertIn('Bad Request', response.content.decode())
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1710)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
 
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

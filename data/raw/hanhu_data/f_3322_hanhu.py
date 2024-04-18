@@ -1,6 +1,4 @@
 from tensorflow import keras
-from tensorflow.keras.layers import Dense, Activation
-from tensorflow.keras.optimizers import SGD
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
@@ -27,12 +25,11 @@ def f_3324(X, Y):
     - The y label is 'True positive rate'
 
     Requirements:
-    - tensorflow
-    - tensorflow.keras.layers
-    - tensorflow.keras.optimizers
-    - sklearn.model_selection
-    - sklearn.metrics
-    - matplotlib.pyplot
+    - tensorflow.keras
+    - sklearn.metrics.roc_curve
+    - sklearn.metrics.auc
+    - sklearn.model_selection.train_test_split
+    - matplotlib
 
     Example:
     >>> X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
@@ -40,16 +37,15 @@ def f_3324(X, Y):
     >>> model, ax = f_3324(X, Y)
     >>> isinstance(model, keras.models.Sequential)
     True
-    The function will train a model and return it along with the matplotlib Axes object for further customization of the plot.
     """
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
 
-    model = keras.Sequential([Dense(input_dim=2, units=1, activation='sigmoid')])
-    model.compile(loss='binary_crossentropy', optimizer=SGD(learning_rate=0.1))
+    model = keras.Sequential([keras.layers.Dense(input_dim=2, units=1, activation='sigmoid')])
+    model.compile(loss='binary_crossentropy', optimizer=keras.optimizers.SGD(learning_rate=0.1))
 
     model.fit(X_train, Y_train, epochs=200, batch_size=1, verbose=0)
 
-    Y_pred = model.predict(X_test).ravel()
+    Y_pred = model.predict(X_test, verbose=0).ravel()
     fpr, tpr, thresholds = roc_curve(Y_test, Y_pred)
     auc_score = auc(fpr, tpr)
 
@@ -66,7 +62,7 @@ def f_3324(X, Y):
 
 import unittest
 import numpy as np
-from tensorflow.keras.models import Sequential
+from tensorflow import keras
 from matplotlib.axes import Axes
 
 class TestF3324(unittest.TestCase):
@@ -77,7 +73,7 @@ class TestF3324(unittest.TestCase):
     def test_return_types(self):
         model, ax = f_3324(self.X, self.Y)
         # Check if the function returns a model and Axes object
-        self.assertIsInstance(model, Sequential, "The function should return a Sequential model.")
+        self.assertIsInstance(model, keras.models.Sequential, "The function should return a Sequential model.")
         self.assertIsInstance(ax, Axes, "The function should return a matplotlib Axes object.")
 
     def test_model_type(self):
@@ -98,7 +94,7 @@ class TestF3324(unittest.TestCase):
     def test_model_optimizer(self):
         model, _ = f_3324(self.X, self.Y)
         # Check if the model's optimizer is an instance of SGD
-        self.assertIsInstance(model.optimizer, SGD, "The optimizer for the model should be SGD.")
+        self.assertIsInstance(model.optimizer, keras.optimizers.SGD, "The optimizer for the model should be SGD.")
 
     def test_plot_axes(self):
         _, ax = f_3324(self.X, self.Y)
@@ -109,5 +105,16 @@ class TestF3324(unittest.TestCase):
         self.assertEqual(ax.get_xlabel(), 'False positive rate', "The plot's x label should be 'False positive rate'.")
         self.assertEqual(ax.get_ylabel(), 'True positive rate', "The plot's y label should be 'True positive rate'.")
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3324)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

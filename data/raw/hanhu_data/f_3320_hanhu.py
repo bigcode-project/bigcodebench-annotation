@@ -28,10 +28,10 @@ def f_3322(X, Y):
     - The y-axis label is 'Loss'
 
     Requirements:
-    - keras.layers
-    - keras.optimizers
-    - keras.models
-    - sklearn.model_selection
+    - keras.layers.Dense
+    - keras.optimizers.SGD
+    - keras.models.Sequential
+    - sklearn.model_selection.train_test_split
     - matplotlib.pyplot
 
     Examples:
@@ -119,5 +119,16 @@ class TestF3322(unittest.TestCase):
         self.assertIsInstance(model.optimizer, SGD)
 
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3322)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

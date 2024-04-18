@@ -74,5 +74,16 @@ class TestF3049(unittest.TestCase):
         result = f_3049([number])
         self.assertEqual(result[number], math.factorial(number))
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3049)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

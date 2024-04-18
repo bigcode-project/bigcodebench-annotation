@@ -6,8 +6,7 @@ def f_4395(s, min_length, max_length, letters):
     """
     Generates a random string of length between `min_length` and `max_length`, inclusive,
     using characters from `letters`, and evaluates its similarity to the provided string `s`.
-    The similarity is determined using SequenceMatcher from the difflib library, with a
-    similarity score of 0.5 or higher considered 'similar'.
+    A similarity score of 0.5 or higher considered 'similar'.
 
     Parameters:
     s (str): The string to which the generated string's similarity is evaluated.
@@ -22,7 +21,7 @@ def f_4395(s, min_length, max_length, letters):
     Requirements:
     - numpy
     - random
-    - difflib
+    - difflib.SequenceMatcher
 
     Examples:
     >>> s = 'apple'
@@ -85,5 +84,16 @@ class TestF4395(unittest.TestCase):
         generated_s, _ = f_4395(self.s, self.min_length, self.max_length, letters)
         self.assertTrue(all(c in letters for c in generated_s))
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4395)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -29,13 +29,10 @@ def f_1724(data, column, outlier_z_score):
     This visual comparison helps illustrate the impact of outlier removal on the dataset.
     
     Examples:
-    # Example 1: Check the length of the returned tuple
     >>> data = np.array([[14, 25], [1, 22], [7, 8], [100, 200]])
     >>> column = 1
     >>> len(f_1724(data, column, 3.0))
     3
-
-    # Example 2: Check the type of elements in the returned tuple
     >>> isinstance(f_1724(data, column, 3.0)[0], np.ndarray)
     True
     >>> isinstance(f_1724(data, column, 3.0)[1], np.ndarray)
@@ -129,5 +126,16 @@ class TestF1724(unittest.TestCase):
         self.assertEqual(expected_titles, actual_titles, "Plot titles do not match expected titles.")
 
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1724)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

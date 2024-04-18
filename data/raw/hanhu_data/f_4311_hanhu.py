@@ -13,8 +13,8 @@ def f_4313(my_dict):
     PrettyTable: A PrettyTable object representing the sorted dictionary.
 
     Requirements:
-    - collections
-    - prettytable
+    - collections.OrderedDict
+    - prettytable.PrettyTable
 
     Examples:
     Display a simple dictionary in a sorted table format.
@@ -72,5 +72,16 @@ class TestF4313(unittest.TestCase):
         table = f_4313(my_dict)
         self.assertEqual(len(table._rows), 1000)
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4313)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -1,5 +1,4 @@
 import csv
-import ipaddress
 from ipaddress import IPv4Network
 
 def f_1895(ip_range, csv_path):
@@ -9,7 +8,7 @@ def f_1895(ip_range, csv_path):
 
     Requirements:
     - csv
-    - ipaddress
+    - ipaddress.IPv4Network
 
     Parameters:
         ip_range (str): The IP range in CIDR notation (e.g., "192.168.0.0/16").
@@ -92,5 +91,16 @@ class TestF1895(unittest.TestCase):
         # Assert that writerow was called twice (once for each mocked IP address).
         self.assertEqual(mock_writer_instance.writerow.call_count, 2)
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1895)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

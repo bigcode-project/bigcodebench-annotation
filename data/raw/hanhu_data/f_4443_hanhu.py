@@ -79,5 +79,16 @@ class TestF4445(unittest.TestCase):
         result = json.loads(f_4445(annotated_function))
         self.assertDictEqual(result['annotations'], {'x': 'int', 'y': 'str', 'return': 'None'})
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4445)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

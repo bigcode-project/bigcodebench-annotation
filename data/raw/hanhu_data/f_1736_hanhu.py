@@ -13,7 +13,7 @@ def f_1737():
     Requirements:
     - matplotlib.pyplot
     - seaborn
-    - sklearn.datasets
+    - sklearn.datasets.load_diabetes
     - pandas
 
     Returns:
@@ -83,6 +83,16 @@ class TestF1737(unittest.TestCase):
         self.assertTrue(all(col in self.diabetes_df.columns for col in diabetes_df.columns))
         
 
-if __name__ == "__main__":
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1737)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

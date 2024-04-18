@@ -7,7 +7,7 @@ logging.basicConfig(filename="out.log", level=logging.INFO)
 def f_1713(template_folder):
     """
     Creates a Flask application with a specified templates folder. It defines a route at the root ('/')
-    which handles POST requests, logs the information request data as a JSON in a file called "out.log", and renders an 'index.html' template using
+    which handles POST requests, logs the information request data as a JSON, and renders an 'index.html' template using
     the data provided in POST requests.
 
     Parameters:
@@ -18,17 +18,16 @@ def f_1713(template_folder):
     The route logs incoming request data as JSON and serves the 'index.html' template with the provided data.
 
     Requirements:
-    - Flask
+    - flask.Flask
+    - flask.render_template
+    - flask.request
     - json
     - logging
 
     Example:
-    # Example 1: Create an instance of the Flask app with custom parameters
     >>> app = f_1713('my_templates')
     >>> isinstance(app, Flask)
     True
-
-    # Example 2: Check the route configuration
     >>> 'POST' in app.url_map.bind('').match('/', method='POST')
     False
     """
@@ -56,8 +55,7 @@ class TestF1713(unittest.TestCase):
         self.index_html_path = os.path.join(self.template_folder, 'index.html')
         with open(self.index_html_path, 'w') as f:
             f.write('<html><body>{{ data }}</body></html>')
-        self.log_file = "out.log"
-        
+                    
     def tearDown(self):
         os.remove(self.index_html_path)
         os.rmdir(self.template_folder)
@@ -81,22 +79,17 @@ class TestF1713(unittest.TestCase):
         app.config['TESTING'] = True
         self.assertEqual(app.template_folder, self.template_folder, "The template folder should be set correctly.")
 
-    def test_log_file_creation_and_content(self):
-        """Test if the log file is created and contains the expected log after a loggable action occurs."""
-        app = f_1713(self.template_folder)
-        app.config['TESTING'] = True
-        client =app.test_client()
+    def test_logging_info_called_with_correct_arguments(self):
+            """Test if logging.info is called with the correct JSON data."""
+            template_folder = 'path_to_templates'
+            app = f_1713(self.template_folder)
+            app.config['TESTING'] = True
+            test_data = {"test": "data"}
 
-        # Trigger a loggable action
-        test_data = {"test": "data"}
-        with app.test_client() as client:
-            client.post('/', json=test_data)
-
-        # Check if the log file is created and contains the expected content
-        self.assertTrue(os.path.exists(self.log_file), "Log file should be created.")
-        with open(self.log_file, "r") as f:
-            logs = f.read()
-        self.assertIn(json.dumps(test_data), logs)
+            with app.test_client() as client:
+                with patch('logging.info') as mock_logging_info:
+                    client.post('/', json=test_data)
+                    mock_logging_info.assert_called_once_with(json.dumps(test_data))
 
     @patch('logging.info')
     def test_logging_request_data(self, mock_logging):
@@ -120,6 +113,16 @@ class TestF1713(unittest.TestCase):
 
 
 
-if __name__ == '__main__':
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1713)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

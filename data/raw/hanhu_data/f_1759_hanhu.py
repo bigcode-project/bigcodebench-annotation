@@ -78,5 +78,16 @@ class TestF1760(unittest.TestCase):
         np.testing.assert_array_equal(result, np.array([0.5] * 53))
 
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1760)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

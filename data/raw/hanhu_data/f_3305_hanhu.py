@@ -91,6 +91,16 @@ class TestF3307(unittest.TestCase):
             result = f_3307('dummy_file_unicode.json')
             self.assertEqual(result, expected_normalized_output)
 
-if __name__ == '__main__':
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3307)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

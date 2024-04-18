@@ -78,5 +78,16 @@ class TestF1768(unittest.TestCase):
         expected_salt = base64.b64encode(b'\x00' * self.salt_size).decode('utf-8')
         self.assertEqual(salt, expected_salt)
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1768)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

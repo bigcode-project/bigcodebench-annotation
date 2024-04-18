@@ -1,6 +1,5 @@
 import difflib
 import gzip
-import os
 
 def f_3995(file_path1, file_path2):
     """
@@ -79,5 +78,16 @@ class TestF3995(unittest.TestCase):
         """Test that the function raises FileNotFoundError if both files do not exist."""
         with self.assertRaises(FileNotFoundError):
             f_3995('nonexistent1.gz', 'nonexistent2.gz')
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3995)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

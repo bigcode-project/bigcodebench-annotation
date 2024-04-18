@@ -131,5 +131,16 @@ class TestF2658(unittest.TestCase):
         response = requests.get("http://testserver/")
         self.assertEqual(response.status_code, 405)
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2658)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -18,7 +18,7 @@ def f_1764(LETTERS, n):
         str: The name of the generated JSON file containing letter counts.
 
     Requirements:
-    - collections
+    - collections.defaultdict
     - itertools
     - json
     - random
@@ -89,5 +89,16 @@ class TestF1764(unittest.TestCase):
                 os.remove(file)
 
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1764)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

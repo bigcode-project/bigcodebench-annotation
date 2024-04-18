@@ -22,10 +22,12 @@ def f_4530(file_path):
     Requirements:
     - rsa
     - os
-    - cryptography.hazmat.backends
-    - cryptography.hazmat.primitives.ciphers
+    - cryptography.hazmat.backends.default_backend
+    - cryptography.hazmat.primitives.ciphers.Cipher
+    - cryptography.hazmat.primitives.ciphers.algorithms
+    - cryptography.hazmat.primitives.ciphers.modes
     - cryptography.hazmat.primitives
-    - base64
+    - base64.b64encode
 
     Examples:
     >>> pub_key, encrypted_file, encrypted_key_file = f_4530('my_file.txt')
@@ -108,6 +110,16 @@ class TestF4530(unittest.TestCase):
         if os.path.exists('aes_key.encrypted'):
             os.remove('aes_key.encrypted')
 
-if __name__ == '__main__':
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4530)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -1,7 +1,5 @@
 import numpy as np
 import base64
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
@@ -21,24 +19,24 @@ def f_4215(num, from_base, to_base, private_key, alphabet):
     Returns:
     - str: The base64-encoded signed number.
 
-    Example Usage:
-    Suppose you have a private RSA key `private_key` for signing, and you want to convert the hexadecimal number 'A1' to base 8, sign it, and encode it using a custom alphabet. You would use the function as follows:
-
-    >>> private_key = rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=2048,
-            backend=default_backend()
+    Example:
+    >>> from cryptography.hazmat.backends import default_backend
+    >>> from cryptography.hazmat.primitives.asymmetric import rsa
+    >>> private_key = rsa.generate_private_key( \
+            public_exponent=65537, \
+            key_size=2048, \
+            backend=default_backend() \
         )
     >>> alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/"
     >>> encoded = f_4215('A1', 16, 8, private_key, alphabet)
     >>> print(encoded)
-    The output will be the base64-encoded signed version of 'A1' converted to base 8, using the specified custom alphabet.
-
+        XMBRyV7pyHXbaojpPuA3iv42nL5AVNukWQjfG48OnojFHtklqZuEgYoOwUZiQAj/dUxXANzzHuKjGRoPcuN5An7J7Gs8pEfEnOmnJfJgGLeiBgAXUeBl5aUTDoMIzBt5exSJWnNC1h5KXp+dDCpB4Hz3qIqdHyqHGNBExXZcEDOW6bEvF+rQOoQpxUJ6Xh3M/46i0g+vSDVyxLxurZpfVNQjEkrV8IlQXXdHoy4ciUC4YrwM0FrdM1BIWdzrhL9k6NfJeI96rabT8xHLrnZDH57mJqWBhpywVFtB7BEnqND70T0fpauFKtuaiA3jc+IydFC+lvodTWe3LiqI2WBsQw==
+    >>> isinstance(encoded, str)
+    True
+    
     Requirements:
     - numpy
-    - cryptography.hazmat.backends
-    - cryptography.hazmat.primitives.asymmetric.rsa
-    - cryptography.hazmat.primitives
+    - cryptography.hazmat.primitives.hashes
     - cryptography.hazmat.primitives.asymmetric.padding
     - base64
 
@@ -122,6 +120,16 @@ class TestF4215(unittest.TestCase):
             return False
 
 
-if __name__ == "__main__":
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4215)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

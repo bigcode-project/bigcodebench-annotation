@@ -17,7 +17,7 @@ def f_3591(mean, std_dev, n):
 
     Requirements:
     - numpy
-    - scipy
+    - scipy.stats
     - matplotlib.pyplot
 
     Examples:
@@ -57,12 +57,12 @@ class TestF3591(unittest.TestCase):
 
     def test_sample_mean(self):
         # Test if the mean of the samples is approximately equal to the specified mean
-        samples = f_3591(0, 1, 1000)
+        samples = f_3591(0, 1, 100000)
         self.assertAlmostEqual(np.mean(samples), 0, places=1)
 
     def test_sample_std_dev(self):
         # Test if the standard deviation of the samples is approximately equal to the specified standard deviation
-        samples = f_3591(0, 1, 1000)
+        samples = f_3591(0, 1, 100000)
         self.assertAlmostEqual(np.std(samples), 1, places=1)
 
     def test_negative_std_dev(self):
@@ -97,5 +97,16 @@ class TestF3591(unittest.TestCase):
         samples = f_3591(0, 1, 1)
         self.assertEqual(len(samples), 1)
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3591)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

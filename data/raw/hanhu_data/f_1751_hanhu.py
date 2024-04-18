@@ -20,7 +20,7 @@ def f_1752(my_dict):
 
     Requirements:
     - numpy
-    - scipy.stats
+    - scipy.stats.mode
 
     Examples:
     >>> example_dict = {'array': np.array([1, 2, 2, 3, 3, 3])}
@@ -78,6 +78,16 @@ class TestF1752(unittest.TestCase):
         self.assertEqual(result['mode'], 42)
 
 
-if __name__ == "__main__":
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1752)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

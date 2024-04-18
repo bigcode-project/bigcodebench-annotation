@@ -102,5 +102,16 @@ class TestF1755(unittest.TestCase):
         result = f_1755(self.directory, self.backup_directory)
         self.assertIsInstance(result, list)
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1755)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

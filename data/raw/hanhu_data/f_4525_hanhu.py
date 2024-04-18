@@ -25,13 +25,15 @@ def f_4527(url):
     Requirements:
     - rsa
     - urllib.request
-    - hashlib
+    - hashlib.sha256
 
     Examples:
-    >>> pub_key, signed_hash = f_4527('https://www.example.com')
+    >>> pub_key, signed_hash, hash_value = f_4527('https://www.example.com')
     >>> isinstance(pub_key, rsa.PublicKey)
     True
     >>> isinstance(signed_hash, str)
+    True
+    >>> isinstance(hash_value, bytes)
     True
     """
     try:
@@ -108,5 +110,16 @@ class TestF4527(unittest.TestCase):
         with self.assertRaises(rsa.pkcs1.VerificationError) as context:
             pub_key, signed_hash, hash_value = f_4527("https://www.example.com")
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4527)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

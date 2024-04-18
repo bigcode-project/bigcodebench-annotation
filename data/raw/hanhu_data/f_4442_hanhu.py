@@ -98,5 +98,16 @@ class TestF4444(unittest.TestCase):
         result = f_4444(test_func)
         self.assertAlmostEqual(result['sqrt_args'], math.sqrt(4), msg="sqrt_args should accurately represent the square root of the number of arguments.")
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4444)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

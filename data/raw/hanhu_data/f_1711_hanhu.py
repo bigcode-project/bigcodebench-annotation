@@ -90,5 +90,16 @@ class TestF1712(unittest.TestCase):
         mock_zip.writestr.assert_any_call('file2.gz', 'This is the content of file2.gz.')
 
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1712)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -66,5 +66,16 @@ class TestF3037(unittest.TestCase):
         result = f_3037(np.linspace(-5, 5, 500))
         self.assertIsNone(result)
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3037)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

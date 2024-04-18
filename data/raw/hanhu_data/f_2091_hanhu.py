@@ -100,5 +100,16 @@ class TestF2092(unittest.TestCase):
             f_2092('http://example.com/data.json', file_path)
             mock_urlopen.return_value.read.assert_called_once()
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2092)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -1,18 +1,18 @@
 import pandas as pd
 import folium
-from geopy.geocoders import Nominatim
+from geopy.geocoders import Photon
 
 def f_2250(dic):
     """
     Generates a Folium map with markers for specified locations. It preprocesses the input to handle
     both direct geographical coordinates and address strings. For address strings, it dynamically resolves
-    their latitude and longitude using the Nominatim geolocation service. This flexible input handling
+    their latitude and longitude using the Photon geolocation service. This flexible input handling
     allows for easy mapping of various location types.
 
     Parameters:
         dic (dict): A dictionary with location names as keys. Each key can either map to a dictionary
                     {'Lat': latitude, 'Lon': longitude} for direct coordinates, or to a string indicating
-                    the location's address for geolocation lookup using Nominatim.
+                    the location's address for geolocation lookup using Photon.
 
     Returns:
         folium.Map: A Folium map object with markers for each specified location.
@@ -20,21 +20,22 @@ def f_2250(dic):
     Requirements:
     - pandas
     - folium
-    - geopy.geocoders
+    - geopy.geocoders.Photon
 
     Notes:
-    - The geolocator, instantiated as Nominatim(user_agent="geoapiExercises"), plays a crucial role in enabling
+    - The geolocator, instantiated as Photon(user_agent="geoapiExercises"), plays a crucial role in enabling
     the function to handle string addresses by converting them into latitude and longitude, thus broadening
     the scope of input data that can be mapped.
 
     Examples:
     >>> locations = {'Place1': {'Lat': 0, 'Lon': 0}, 'Place2': 'New York, USA'}
-    >>> isinstance(f_2250(locations), folium.Map)
+    >>> result = f_2250(locations)
+    >>> isinstance(result, folium.Map)
     True
-    >>> 'Place1' in str(f_2250(locations))
+    >>> [0.0, 0.0] == result.location
     True
     """
-    geolocator = Nominatim(user_agent="geoapiExercises")
+    geolocator = Photon(user_agent="geoapiExercises")
 
     # Preprocess to handle both coordinates and string addresses
     preprocessed_locations = []
@@ -65,8 +66,8 @@ from unittest.mock import patch, MagicMock
 
 class TestF2250(unittest.TestCase):
     def setUp(self):
-        # Mocking the geocode return to control output of Nominatim geocode calls
-        self.geocode_patch = patch('geopy.geocoders.Nominatim.geocode', return_value=MagicMock(latitude=0, longitude=0))
+        # Mocking the geocode return to control output of Photon geocode calls
+        self.geocode_patch = patch('geopy.geocoders.Photon.geocode', return_value=MagicMock(latitude=0, longitude=0))
         self.mock_geocode = self.geocode_patch.start()
         # Ensure to stop the patcher to avoid side-effects
         self.addCleanup(self.geocode_patch.stop)
@@ -85,7 +86,7 @@ class TestF2250(unittest.TestCase):
         f_2250(locations)
         self.assertEqual(mock_marker.call_count, len(locations))
 
-    @patch('geopy.geocoders.Nominatim.geocode')
+    @patch('geopy.geocoders.Photon.geocode')
     def test_different_locations(self, mock_geocode):
         mock_geocode.return_value = MagicMock(latitude=40.7128, longitude=-74.0060)
         locations = {'Loc1': {'Lat': 0, 'Lon': 0}, 'Loc2': 'New York, USA'}
@@ -108,5 +109,16 @@ class TestF2250(unittest.TestCase):
         mock_map.assert_called_with(location=[0, 0], zoom_start=4)
 
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2250)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

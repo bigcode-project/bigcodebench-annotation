@@ -26,10 +26,14 @@ def f_1730(csv_file, csv_delimiter):
                        sorted by count in descending order.
 
     Examples:
-    >>> type(f_1730('path/to/data.csv', ',')) == list
+    >>> with open(temp_data.csv, "w") as f:
+    >>>     f.write("word1,word2,word3")
+    >>> type(f_1730('temp_data.csv', ',')) == list
     True
-    >>> all(isinstance(pair, tuple) and len(pair) == 2 for pair in f_1730('path/to/data.csv', ','))
+    >>> all(isinstance(pair, tuple) and len(pair) == 2 for pair in f_1730('temp_data.csv', ','))
     True
+    >>> import os
+    >>> os.remove(temp_data.csv)
     """
     words = []
 
@@ -89,5 +93,16 @@ class TestF1730(unittest.TestCase):
         self.assertIn(('word2', 1), result)
 
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1730)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -23,7 +23,7 @@ def f_4278(package_name):
     - os
     - sys
     - importlib
-    - pkgutil
+    - pkgutil.iter_modules
 
     Examples:
     Assuming 'pandas' is a valid package with modules 'module1' and 'module2',
@@ -102,5 +102,16 @@ class TestF4278(unittest.TestCase):
             self.assertEqual(sum(module in path for path in sys.path), 1)
 
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4278)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

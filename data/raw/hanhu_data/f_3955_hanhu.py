@@ -92,5 +92,16 @@ class TestF3957(unittest.TestCase):
         result_path = f_3957(csv_content, filename)
         self.assertTrue(os.path.isfile(result_path))
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3957)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

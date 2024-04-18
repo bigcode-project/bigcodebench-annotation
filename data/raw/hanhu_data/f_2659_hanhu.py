@@ -23,7 +23,7 @@ def f_2661(smtp_server, smtp_port, smtp_username, smtp_password):
     - cgi
     - http.server
     - smtplib
-    - email.mime.text
+    - email.mime.text.MIMEText
     - json
 
     Raises:
@@ -170,8 +170,16 @@ class TestEmailRequestHandler(unittest.TestCase):
         self.handler.send_response.assert_called_with(535)
         self.handler.end_headers.assert_called_once()
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestEmailRequestHandler)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
 
 
-
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

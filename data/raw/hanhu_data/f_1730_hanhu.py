@@ -81,7 +81,16 @@ class TestF1731(unittest.TestCase):
             f_1731(numbers)  # math.log should raise a ValueError for negative input
 
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1731)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
-
-
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -25,7 +25,7 @@ def f_1750(my_dict, keys):
 
     Requirements:
     - json
-    - collections
+    - collections.Counter
     - random
 
     Examples:
@@ -122,5 +122,16 @@ class TestF1750(unittest.TestCase):
         for key in self.keys:
             self.assertEqual(result[key], 50)
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1750)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -20,7 +20,8 @@ def f_1711(request, header, csv_data):
     FileResponse: A Django FileResponse object containing the CSV data as an attachment.
 
     Requirements:
-    - django
+    - django.http
+    - django.conf
     - csv
     - io
 
@@ -98,7 +99,16 @@ class TestF1711(unittest.TestCase):
         mock_csv_writer.return_value.writerows.assert_called_with(self.csv_data)
 
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1711)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
 
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

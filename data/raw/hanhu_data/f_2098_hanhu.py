@@ -69,5 +69,16 @@ class TestF2099(unittest.TestCase):
         unique_elements = f_2099(np.array(range(100)))
         self.assertLess(len(repeated_elements), len(unique_elements))
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2099)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

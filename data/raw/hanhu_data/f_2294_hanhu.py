@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 def f_2296(n, value):
     """
     Generates 'n' random numbers between 0 and 1, finds those greater than their average,
-    and counts how many are greater than or equal to a specified value. Additionally, plots 
-    the sorted numbers using matplotlib.pyplot.
+    and counts how many are greater than or equal to a specified value, then plots 
+    the sorted numbers.
 
     Parameters:
         n (int): The number of random numbers to generate.
@@ -88,5 +88,16 @@ class TestF2296(unittest.TestCase):
         greater_avg, count = f_2296(0, 0.5)
         self.assertEqual((greater_avg, count), ([], 0))
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2296)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

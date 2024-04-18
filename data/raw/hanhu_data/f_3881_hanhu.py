@@ -18,13 +18,10 @@ def f_3883(s, file_path):
     - json
 
     Examples:
-    Convert a simple XML string to a dictionary.
-    >>> result = f_3883('<person><name>John</name><age>30</age></person>')
+    >>> result = f_3883('<person><name>John</name><age>30</age></person>', "temp.json")
     >>> result['person']['name'] + ', ' + result['person']['age']
     'John, 30'
-
-    Convert an XML string with nested elements.
-    >>> result = f_3883('<school><class><student>Emma</student></class></school>')
+    >>> result = f_3883('<school><class><student>Emma</student></class></school>', "temp.json")
     >>> result['school']['class']['student']
     'Emma'
     """
@@ -113,6 +110,16 @@ class TestF3883(unittest.TestCase):
             f_3883(xml_str, file_path)
         self.assertFalse(os.path.exists(file_path), "JSON file should not be created for invalid XML.")
 
-if __name__ == '__main__':
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3883)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

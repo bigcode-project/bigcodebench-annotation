@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 def f_2295(data, value):
     """
     Analyzes a list of numerical data, identifies values greater than the average,
-    and counts how many values are greater than a specified value.
+    and counts how many values are greater than a specified value. Additionally, plots the
+    histogram of the sorted numbers.
 
     Parameters:
         data (list): A list of numerical data.
@@ -104,5 +105,16 @@ class TestF2295(unittest.TestCase):
         self.assertTrue(all(val > statistics.mean(data) for val in greater_avg), "All returned values should be greater than the average with floats")
         self.assertEqual(count, 2, "The count of values greater than 3.5 should be 2, including boundary conditions")
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2295)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

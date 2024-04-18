@@ -15,8 +15,8 @@ def f_2703(url):
 
     Requirements:
         - mechanize
-        - urllib.request
-        - bs4
+        - urllib.parse.urljoin
+        - bs4.BeautifulSoup
 
     Examples:
         >>> isinstance(f_2703('https://www.example.com'), list)
@@ -129,7 +129,16 @@ class TestF2703(unittest.TestCase):
         result = f_2703('https://www.example.com')
         self.assertEqual(len(result), 10000)
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2703)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
-
-
+    import doctest
+    doctest.testmod()
+    run_tests()

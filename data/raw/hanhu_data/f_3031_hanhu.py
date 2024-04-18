@@ -23,7 +23,7 @@ def f_3033(amplitude, frequency, time):
     - numpy
     - math
     - matplotlib.pyplot
-    - scipy.signal
+    - scipy.signal.get_window
 
     Notes:
     - The plot title is "Complex Wave with Hann Window".
@@ -128,5 +128,16 @@ class TestF3033(unittest.TestCase):
 
 
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3033)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

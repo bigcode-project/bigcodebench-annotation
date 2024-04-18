@@ -31,9 +31,9 @@ def f_3670(my_obj):
 
     Requirements:
     - json
-    - datetime
+    - datetime.datetime
     - numpy
-    - decimal
+    - decimal.Decimal
 
     Examples:
     Serialize a dictionary containing datetime, numpy array, and Decimal.
@@ -94,5 +94,16 @@ class TestF3670(unittest.TestCase):
         with self.assertRaises(TypeError):
             f_3670(obj)
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3670)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

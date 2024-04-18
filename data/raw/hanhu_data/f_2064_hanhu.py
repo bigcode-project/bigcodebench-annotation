@@ -92,5 +92,16 @@ class TestF2065(unittest.TestCase):
         # Expecting an empty dictionary since mock_search is mocked to always return False, simulating no match
         self.assertEqual(result, {})
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2065)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

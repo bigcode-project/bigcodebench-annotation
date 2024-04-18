@@ -18,7 +18,7 @@ def f_4434(filepath):
     Requirements:
     - ctypes
     - os
-    - datetime
+    - datetime.datetime
     - pytz
 
     Examples:
@@ -111,5 +111,16 @@ class TestF4434(unittest.TestCase):
         os.remove(self.filepath)
 
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF4434)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

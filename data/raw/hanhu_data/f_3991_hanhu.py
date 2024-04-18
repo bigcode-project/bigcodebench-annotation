@@ -20,6 +20,7 @@ def f_3993(file_path1, file_path2):
     Requirements:
     - hashlib
     - io
+    - os
 
     Examples:
     Assuming 'file1.gz' and 'file2.gz' contain the same content,
@@ -83,5 +84,16 @@ class TestF3993(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             f_3993('nonexistent1.gz', 'nonexistent2.txt')
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3993)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

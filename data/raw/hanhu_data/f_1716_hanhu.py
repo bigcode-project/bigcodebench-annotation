@@ -15,19 +15,17 @@ def f_1717(smtp_server, smtp_port, smtp_user, smtp_password, template_folder):
         template_folder (str): The folder path for email templates.
 
     Requirements:
-    - flask
-    - flask_mail
+    - flask.Flask
+    - flask_mail.Mail
+    - flask_mail.Message
 
     Returns:
         Flask: A Flask application instance configured for sending emails.
 
     Examples:
-    # Example 1: Check Flask app instance creation
     >>> app = f_1717('smtp.example.com', 587, 'user@example.com', 'password', 'templates')
     >>> type(app).__name__
     'Flask'
-
-    # Example 2: Check mail configuration
     >>> app.config['MAIL_USERNAME'] == 'user@example.com'
     True
     """
@@ -111,5 +109,16 @@ class TestF1717(unittest.TestCase):
         self.assertEqual(self.app.config['MAIL_PASSWORD'], self.smtp_password)
         self.assertEqual(self.app.config['MAIL_USE_TLS'], True)
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1717)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

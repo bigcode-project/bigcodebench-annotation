@@ -84,6 +84,16 @@ class TestF3671(unittest.TestCase):
         self.assertIn('"favorite_color": "BLUE"', result)
         self.assertIn('"favorite_color": "RED"', result)
 
-if __name__ == '__main__':
-    unittest.main()
 
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3671)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

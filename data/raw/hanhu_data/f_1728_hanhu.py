@@ -16,7 +16,7 @@ def f_1729(mean, std_dev, num_samples):
 
     Requirements:
     - numpy
-    - scipy.stats
+    - scipy.stats.norm
     - matplotlib.pyplot
 
     Notes:
@@ -31,6 +31,7 @@ def f_1729(mean, std_dev, num_samples):
             - numpy.ndarray: An array of samples drawn from the normal distribution.
 
     Examples:
+    >>> import matplotlib
     >>> samples, fig = f_1729(0, 1, 1000)
     >>> len(samples)
     1000
@@ -108,5 +109,16 @@ class TestF1729(unittest.TestCase):
         expected_y = norm.pdf(x, mean, std_dev)
         np.testing.assert_array_almost_equal(y, expected_y, decimal=2)
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1729)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

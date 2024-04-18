@@ -92,5 +92,16 @@ class TestF1896(unittest.TestCase):
         self.assertEqual(mock_check_output.call_count, expected_call_count, f"Expected to attempt pinging {expected_call_count} IPs.")
 
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1896)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

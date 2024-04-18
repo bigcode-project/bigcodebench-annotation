@@ -1,8 +1,6 @@
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_curve
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.optimizers import SGD
+from tensorflow import keras
 import matplotlib.pyplot as plt
 
 def f_3325(X, Y):
@@ -29,11 +27,9 @@ def f_3325(X, Y):
     - The axes object allows for further customization of the plot outside the function.
 
     Requirements:
-    - tensorflow.keras.models
-    - tensorflow.keras.layers
-    - tensorflow.keras.optimizers
-    - sklearn.model_selection
-    - sklearn.metrics
+    - tensorflow.keras
+    - sklearn.model_selection.train_test_split
+    - sklearn.metrics.precision_recall_curve
     - matplotlib.pyplot
 
     Examples:
@@ -48,12 +44,12 @@ def f_3325(X, Y):
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
     input_dim = X.shape[1]  # Dynamically set input dimension
 
-    model = Sequential([Dense(units=1, input_dim=input_dim, activation='sigmoid')])
-    model.compile(loss='binary_crossentropy', optimizer=SGD(learning_rate=0.1))
+    model = keras.models.Sequential([keras.layers.Dense(units=1, input_dim=input_dim, activation='sigmoid')])
+    model.compile(loss='binary_crossentropy', optimizer=keras.optimizers.SGD(learning_rate=0.1))
 
     model.fit(X_train, Y_train, epochs=200, batch_size=1, verbose=0)
 
-    Y_pred = model.predict(X_test).ravel()
+    Y_pred = model.predict(X_test, verbose=0).ravel()
     precision, recall, thresholds = precision_recall_curve(Y_test, Y_pred)
 
     fig, ax = plt.subplots()  # Modify here to return Axes object
@@ -113,5 +109,16 @@ class TestF3325(unittest.TestCase):
         self.assertEqual(ax.get_xlabel(), 'Recall', "The plot's x-axis label should be 'Recall'.")
         self.assertEqual(ax.get_ylabel(), 'Precision', "The plot's y-axis label should be 'Precision'.")
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3325)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

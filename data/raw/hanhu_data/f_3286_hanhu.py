@@ -17,7 +17,7 @@ def f_3288(file_name, excel_file_path, csv_file_path) -> str:
         str: The name of the created CSV file.
 
     Requirements:
-    - openpyxl
+    - openpyxl.load_workbook
     - os
     - csv
 
@@ -125,7 +125,16 @@ class TestF3288(unittest.TestCase):
             self.assertEqual(actual_content, expected_content, "CSV file content does not match expected content.")
 
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3288)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
-
-
+    import doctest
+    doctest.testmod()
+    run_tests()

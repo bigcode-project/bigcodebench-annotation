@@ -112,5 +112,16 @@ class TestF2970(unittest.TestCase):
         self.assertEqual(result2, expected_signature)
         self.assertEqual(result1, result2)
         
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2970)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

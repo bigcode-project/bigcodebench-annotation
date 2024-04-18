@@ -22,9 +22,9 @@ def f_2846(dir, api_key, recipient_email):
 
     Requirements:
     - os
-    - sendgrid
-    - sendgrid.helpers.mail
-    - python_http_client.exceptions
+    - sendgrid.SendGridAPIClient
+    - sendgrid.helpers.mail.Mail
+    - python_http_client.exceptions.HTTPError
 
     Example:
     >>> isinstance(f_2846('./test_directory', 'YOUR_SENDGRID_API_KEY', 'YOUR_EMAIL'), bool)
@@ -116,5 +116,16 @@ class TestF2846(unittest.TestCase):
         with self.assertRaises(Exception):
             f_2846('./valid_directory', api_key, recipient_email)
         
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2846)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

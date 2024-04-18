@@ -29,7 +29,7 @@ def f_2726(X, y, n_splits, batch_size, epochs):
     Examples:
     >>> X = np.random.rand(100, 10)
     >>> y = np.random.randint(0, 2, 100)
-    >>> history = f_2726(X, y)
+    >>> history = f_2726(X, y, 5, 32, 1)
     >>> isinstance(history, list)
     True
     >>> len(history)
@@ -106,5 +106,16 @@ class TestF2726(unittest.TestCase):
             result = f_2726(self.X, self.y, self.n_splits, self.batch_size, epochs)
             self.assertEqual(len(result), self.n_splits)  # Validating function execution
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2726)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

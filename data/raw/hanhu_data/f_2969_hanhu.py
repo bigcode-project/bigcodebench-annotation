@@ -109,5 +109,16 @@ class TestF2971(unittest.TestCase):
         self.assertEqual(blake3_hex, expected_blake3_hex, "BLAKE3 hash does not match expected value.")
         self.assertEqual(md5_hex, expected_md5_of_blake3, "MD5 hash of BLAKE3 hash does not match expected value.")
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF2971)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

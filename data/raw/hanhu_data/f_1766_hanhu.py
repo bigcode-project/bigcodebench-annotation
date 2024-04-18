@@ -19,10 +19,11 @@ def f_1767(POINTS=100):
     Requirements:
         - numpy
         - matplotlib.pyplot
-        - random
+        - random.randint
         - math
 
     Examples:
+        >>> import matplotlib
         >>> fig = f_1767(200)  # Displays a plot of a random walk with 200 steps
         >>> isinstance(fig, matplotlib.figure.Figure)
         True
@@ -112,8 +113,16 @@ class TestF1767(unittest.TestCase):
 
 
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1767)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
-
-
-
+    import doctest
+    doctest.testmod()
+    run_tests()

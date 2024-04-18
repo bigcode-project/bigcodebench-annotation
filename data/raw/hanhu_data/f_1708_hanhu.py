@@ -119,10 +119,16 @@ class TestF1709(unittest.TestCase):
         self.assertTrue(any(char.isalpha() for char in response.cookies['session_key'].value))
         self.assertTrue(any(char.isdigit() for char in response.cookies['session_key'].value))
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1709)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
 
 
-
-
-
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

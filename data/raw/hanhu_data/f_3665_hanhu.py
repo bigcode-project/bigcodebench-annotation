@@ -26,8 +26,8 @@ def f_3667(my_obj):
         
     Requirements:
     - json
-    - datetime
-    - decimal
+    - datetime.datetime
+    - decimal.Decimal
     
     Examples:
     Serialize a dictionary containing datetime and Decimal:
@@ -95,5 +95,16 @@ class TestF3667(unittest.TestCase):
         with self.assertRaises(TypeError):
             f_3667(obj)
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF3667)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

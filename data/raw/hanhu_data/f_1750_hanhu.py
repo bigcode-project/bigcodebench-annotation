@@ -21,7 +21,7 @@ def f_1751(my_dict):
         
     Requirements:
     - numpy
-    - sklearn.preprocessing
+    - sklearn.preprocessing.MinMaxScaler
 
     Examples:
     >>> example_dict = {'array': np.array([1, 2, 3, 4, 5])}
@@ -102,5 +102,16 @@ class TestF1751(unittest.TestCase):
         f_1751({'array': input_array})
         mock_fit_transform.assert_called_once()
 
+
+def run_tests():
+    """Run all tests for this function."""
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestF1751)
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()
