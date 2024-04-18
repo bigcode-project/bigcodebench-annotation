@@ -20,7 +20,7 @@ def f_295(df, group_col, value_col):
     - matplotlib.pyplot
     - numpy
 
-    Examples:
+    Example:
     >>> import matplotlib.pyplot as plt
     >>> import pandas as pd
     >>> df = pd.DataFrame({'Group': ['A', 'B', 'A', 'B', 'A', 'B'], 'Value': [1, 2, 3, 4, 5, 6]})
@@ -29,7 +29,7 @@ def f_295(df, group_col, value_col):
     2
     >>> plt.close()
 
-    Notes:
+    Note:
     - The function uses a predefined set of colors for the bars. If there are more groups than colors,
       the colors will repeat from the beginning of the COLORS list.
     - This function use "Bar chart of {value_col} by {group_col}" for the plot title.

@@ -24,7 +24,7 @@ def f_225(text=TEXT, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address
     Returns:
     list: A list of extracted names.
     
-    Notes:
+    Note:
     - The message in the email is formatted in "Subject: Extracted Names\n\n" with the extracted name "\nJosie Smith\nMugsy Dog Smith".
 
     Requirements:

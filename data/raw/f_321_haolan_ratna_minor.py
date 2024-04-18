@@ -9,6 +9,9 @@ def f_321(API_URL):
     """
     Get the public IP address of the current host from an API.
     
+    Parameters:
+    API_URL (str): The API url that will return json format of the 'ip'.
+
     Returns:
     str: The public IP address.
     

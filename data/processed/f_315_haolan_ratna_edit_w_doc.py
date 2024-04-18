@@ -16,7 +16,7 @@ def f_315(length, min_value = 0, max_value = 100):
     Returns:
     DataFrame: A pandas DataFrame with the calculated cumulative distribution function (CDF).
 
-    Notes:
+    Note:
     - DataFrame columns are defined by the COLUMNS constant.
 
     Requirements:

@@ -24,7 +24,7 @@ def f_260(my_path: str, days_old: int) -> str:
     - shutil
     - time
 
-    Examples:
+    Example:
     >>> f_260('/usr/my_directory', 30)
     '/usr/my_directory/archive'
     """

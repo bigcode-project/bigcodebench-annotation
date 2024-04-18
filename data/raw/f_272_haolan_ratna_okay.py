@@ -12,7 +12,7 @@ def f_272(directory_path):
     """
     Count the number of unique non-stop words across all '.txt' files in a specified directory.
 
-    Args:
+    Parameters:
     directory_path (str): The path to the directory containing '.txt' files.
 
     Returns:

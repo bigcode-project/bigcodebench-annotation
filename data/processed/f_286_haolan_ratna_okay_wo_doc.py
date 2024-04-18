@@ -6,7 +6,7 @@ def f_286(directory, file_list):
     """
     Select a random file from a given list of files in a specified directory and run it as a subprocess.
     
-    Args:
+    Parameters:
     directory (str): The directory path where the files are located.
     file_list (list of str): A list of file names to choose from.
 

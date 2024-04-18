@@ -26,7 +26,7 @@ def f_239(df, dict_mapping, plot_histogram=False):
     - matplotlib.pyplot
     - sklearn.preprocessing.StandardScaler
 
-    Examples:
+    Example:
     >>> df = pd.DataFrame({'feature1': [1, 2, 3], 'feature2': [4, 5, 6], 'feature3': [7, 8, 9],'feature4': [10, 11, 12], 'feature5': [13, 14, 15], 'target': [0, 1, 1]})
     >>> dict_mapping = {1: 11, 0: 22}
     >>> isinstance(f_239(df, dict_mapping, plot_histogram=True)[1], plt.Axes)

@@ -6,7 +6,7 @@ def f_285(points_count=1000, radius=1):
     """
     Generate a specified (i.e., points_counts) number of random points within a circle of a given radius and plot them using a scatter plot.
 
-    Input:
+    Parameters:
     - points_count (int): The number of random points to generate. Default is 1000.
     - radius (float): The radius of the circle within which points are generated. Default is 1.
 
