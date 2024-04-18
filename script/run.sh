@@ -1,7 +1,7 @@
 #!/bin/bash
 cp data/raw/hanhu_data/*.py data/clean
-python parse.py
-for file in data/processed/*.py; do
+python script/parse.py
+for file in data/processed/*hanhu*.py; do
     echo "Running pytest on $file..."
     if [[ "$file" == *"_w_doc.py"* ]]; then
         pytest --doctest-modules "$file"
