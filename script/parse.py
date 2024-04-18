@@ -281,9 +281,12 @@ def reconstruct_problem(data):
 
 def check_test_wo_doc(data):
     "Check if the problem is related to file system, network requests and database"
+    
     if any([lib in data["libs"] for lib in ["shutil", "requests", "django", "sqlite3", "datetime", "flask", "turtle"]]):
         return True
-    elif "os.path" in data["apis"]:
+    elif any([kw in data["prompt"] for kw in ["url"]]):
+        return True
+    elif any([api in data["apis"] for api in ["os.path"]]):
         return True
     # check any file suffixes are inside data["prompt"]
     elif any([suffix in data["prompt"] for suffix in [".txt", ".csv", ".json", ".xml", ".html", ".log", ".zip", ".tar", ".gz", ".pdf", ".png"]]):
