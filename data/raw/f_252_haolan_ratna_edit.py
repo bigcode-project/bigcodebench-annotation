@@ -1,6 +1,6 @@
-import numpy as np
+
 import pandas as pd
-from random import uniform
+import random
 from sklearn.preprocessing import StandardScaler
 
 # Constants
@@ -24,12 +24,12 @@ def f_252(n_data_points=5000, min_value=0.0, max_value=10.0):
     - The function use "Normalized Value" for the column name in the DataFrame that being returned.
 
     Requirements:
-    - numpy
     - pandas
     - random
-    - sklearn.preprocessing
+    - sklearn.preprocessing.StandardScaler
 
     Example:
+    >>> random.seed(0)
     >>> normalized_data = f_252(5000, 5, 5)
     >>> print(normalized_data['Normalized Value'][0])
     0.0
@@ -37,7 +37,7 @@ def f_252(n_data_points=5000, min_value=0.0, max_value=10.0):
     if max_value < min_value:
         raise ValueError()
 
-    data = [round(uniform(min_value, max_value), 3) for _ in range(n_data_points)]
+    data = [round(random.uniform(min_value, max_value), 3) for _ in range(n_data_points)]
     data_df = pd.DataFrame(data, columns=['Value'])
 
     scaler = StandardScaler()
@@ -47,9 +47,11 @@ def f_252(n_data_points=5000, min_value=0.0, max_value=10.0):
 
 import unittest
 import pandas as pd
+import random
 
 class TestCases(unittest.TestCase):
     def test_default_parameters(self):
+        random.seed(0)
         df = f_252()
         self.assertIsInstance(df, pd.DataFrame, "Return type should be a DataFrame.")
         self.assertEqual(len(df), 5000, "Default number of data points should be 5000.")
@@ -57,20 +59,24 @@ class TestCases(unittest.TestCase):
         self.assertAlmostEqual(df['Normalized Value'].std(), 1, delta=0.1, msg="Standard deviation should be close to 1.")
 
     def test_custom_parameters(self):
+        random.seed(0)
         df = f_252(1000, 1.0, 5.0)
         self.assertEqual(len(df), 1000, "Number of data points should match the specified value.")
         self.assertTrue(df['Normalized Value'].min() >= -3, "Normalized values should be within a reasonable range.")
         self.assertTrue(df['Normalized Value'].max() <= 3, "Normalized values should be within a reasonable range.")
 
     def test_edge_case_empty(self):
+        random.seed(0)
         with self.assertRaises(ValueError):
             f_252(0)
 
     def test_negative_data_points(self):
+        random.seed(0)
         with self.assertRaises(ValueError):
             f_252(-100)
 
     def test_invalid_range(self):
+        random.seed(0)
         with self.assertRaises(ValueError):
             f_252(1000, 5.0, 1.0)
 

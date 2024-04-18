@@ -1,5 +1,5 @@
 import pandas as pd
-from random import randint
+import random
 
 # Constants
 CATEGORIES = ['A', 'B', 'C', 'D', 'E']
@@ -19,39 +19,46 @@ def f_284(value_range=(0, 100)):
     - random
 
     Example:
+    >>> random.seed(0)
     >>> df = f_284()
     >>> df['Count'][0] >= 0
     True
     """
 
-    distribution = {category: randint(*value_range) for category in CATEGORIES}
+    distribution = {category: random.randint(*value_range) for category in CATEGORIES}
     df = pd.DataFrame(list(distribution.items()), columns=['Category', 'Count'])
 
     return df
 
 import unittest
 import pandas as pd
+import random
 class TestCases(unittest.TestCase):
     def test_return_type(self):
         """Test if the function returns a DataFrame."""
+        random.seed(0)
         result = f_284()
         self.assertIsInstance(result, pd.DataFrame)
     def test_columns(self):
         """Test if the DataFrame has the correct columns."""
+        random.seed(0)
         result = f_284()
         self.assertListEqual(list(result.columns), ['Category', 'Count'])
     def test_value_range_default(self):
         """Test if the 'Count' values are within the default range."""
+        random.seed(0)
         result = f_284()
         for count in result['Count']:
             self.assertTrue(0 <= count <= 100)
     def test_value_range_custom(self):
         """Test if the 'Count' values are within a custom range."""
+        random.seed(0)
         test_range = (10, 50)
         result = f_284(value_range=test_range)
         for count in result['Count']:
             self.assertTrue(test_range[0] <= count <= test_range[1])
     def test_number_of_rows(self):
         """Test if the DataFrame contains the expected number of rows."""
+        random.seed(0)
         result = f_284()
         self.assertEqual(len(result), len(CATEGORIES))

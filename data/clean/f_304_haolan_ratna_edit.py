@@ -26,6 +26,7 @@ def f_304(df):
 
     Example:
     >>> import numpy as np
+    >>> np.random.seed(0)
     >>> df = pd.DataFrame({'feature ' + str(i): np.random.rand(100) for i in range(1, 11)})
     >>> df['target'] = df.apply(lambda row: sum(row), axis=1)
     >>> model = f_304(df)
@@ -93,6 +94,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_3(self):
         # Testing with random data
+        np.random.seed(0)
         df = pd.DataFrame({
             'feature ' + str(i): np.random.rand(100) for i in range(1, 11)
         })
@@ -113,6 +115,7 @@ class TestCases(unittest.TestCase):
 
     def test_case_5(self):
         # Testing with data where target is a linear combination of features
+        np.random.seed(0)
         df = pd.DataFrame({
             'feature ' + str(i): np.random.rand(100) for i in range(1, 11)
         })

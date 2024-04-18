@@ -1,6 +1,6 @@
 import os
 import csv
-from random import randint
+import random
 from statistics import mean
 
 # Constants
@@ -22,9 +22,10 @@ def f_282(filename):
     - os
     - csv
     - random
-    - statistics
+    - statistics.mean
 
     Example:
+    >>> random.seed(0)
     >>> filename = 'people_report.csv'
     >>> path = f_282(filename)
     >>> os.path.exists(path)
@@ -37,7 +38,7 @@ def f_282(filename):
         writer.writerow(COLUMNS)
 
         data = [
-            ['Person_' + str(i), randint(20, 50), randint(150, 200), randint(50, 100)] 
+            ['Person_' + str(i), random.randint(20, 50), random.randint(150, 200), random.randint(50, 100)] 
             for i in range(1, PEOPLE_COUNT+1)
         ]
         writer.writerows(data)
@@ -60,12 +61,14 @@ class TestCases(unittest.TestCase):
 
     def test_file_creation(self):
         """Test if the file is created successfully."""
+        random.seed(0)
         self.filename = 'test_file_creation.csv'
         path = f_282(self.filename)
         self.assertTrue(os.path.exists(path))
 
     def test_file_content_rows(self):
         """Test if the file contains the correct number of rows."""
+        random.seed(0)
         self.filename = 'test_file_content_rows.csv'
         path = f_282(self.filename)
         with open(path, 'r') as file:
@@ -75,6 +78,7 @@ class TestCases(unittest.TestCase):
 
     def test_averages_calculation(self):
         """Test if the averages are calculated correctly."""
+        random.seed(0)
         self.filename = 'test_averages_calculation.csv'
         path = f_282(self.filename)
         with open(path, 'r') as file:
@@ -87,6 +91,7 @@ class TestCases(unittest.TestCase):
 
     def test_header(self):
         """Test if the file contains the correct header."""
+        random.seed(0)
         self.filename = 'test_header.csv'
         path = f_282(self.filename)
         with open(path, 'r') as file:
@@ -96,6 +101,7 @@ class TestCases(unittest.TestCase):
 
     def test_average_row_label(self):
         """Test if the average row is labeled correctly."""
+        random.seed(0)
         self.filename = 'test_average_row_label.csv'
         path = f_282(self.filename)
         with open(path, 'r') as file:

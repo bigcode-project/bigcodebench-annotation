@@ -82,6 +82,7 @@ class TestCases(unittest.TestCase):
 
     def test_case_3(self):
         # Input 3: larger array
+        np.random.seed(0)
         l = np.random.rand(10, 2)
         ax = f_310(l)
         self.assertTrue(isinstance(ax, plt.Axes))

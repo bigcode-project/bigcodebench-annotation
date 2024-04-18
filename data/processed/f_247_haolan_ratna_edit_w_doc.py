@@ -58,6 +58,7 @@ import random
 class TestCases(unittest.TestCase):
     # Helper function to generate test data
     def generate_test_data(self, num_records):
+        random.seed(0)
         fake = Faker()
         data = []
         for _ in range(num_records):
