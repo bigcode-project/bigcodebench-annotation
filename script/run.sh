@@ -1,6 +1,6 @@
 #!/bin/bash
 NAME=$1
-cp data/raw/*ratna*.py data/clean
+cp data/raw/*hanhu*.py data/clean
 python script/parse.py
 for file in data/processed/*wo_doc.py; do
     pytest "$file"
