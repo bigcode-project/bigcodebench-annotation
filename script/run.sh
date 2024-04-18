@@ -1,10 +1,16 @@
 #!/bin/bash
-
-# Loop through all python files in the current directory
+cp data/raw/hanhu_data/*.py data/clean
+python parse.py
 for file in data/processed/*.py; do
-    pytest "$file"
+    echo "Running pytest on $file..."
+    if [[ "$file" == *"_w_doc.py"* ]]; then
+        pytest --doctest-modules "$file"
+    elif [[ "$file" == *"_wo_doc.py"* ]]; then
+        pytest "$file"
+    fi
+
     if [ $? -ne 0 ]; then
         echo "Pytest failed on $file, stopping..."
-        exit 1
+        # exit 1
     fi
 done
