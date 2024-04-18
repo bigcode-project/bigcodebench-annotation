@@ -27,9 +27,9 @@ def f_100(list_of_pairs):
     >>> list_of_pairs = [('Fruits', 5), ('Vegetables', 9)]
     >>> df, ax = f_100(list_of_pairs)
     >>> print(df)
-           Category  Value
-    0       Fruits      5
-    1   Vegetables      9
+         Category  Value
+    0      Fruits      5
+    1  Vegetables      9
     """
     df = pd.DataFrame(list_of_pairs, columns=["Category", "Value"])
     plt.figure(figsize=(10, 5))

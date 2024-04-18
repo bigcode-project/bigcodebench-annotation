@@ -5,8 +5,7 @@ import seaborn as sns
 
 def f_101(csv_file):
     """
-    Read a CSV file, convert the string representations of dictionaries in a specific column ('dict_column')
-    to Python dictionaries, and visualize the data with Seaborn's pairplot.
+    Read a CSV file, convert the string representations of dictionaries in a specific column ('dict_column') to Python dictionaries, and visualize the data with Seaborn's pairplot.
 
     Parameters:
     - csv_file (str): The path to the CSV file.

@@ -9,7 +9,7 @@ PUNCTUATION = set(punctuation)
 
 def f_102(text):
     """
-    Draw a bar chart of the frequency of words in a text beginning with the "$" character. Words that start with the '$' character but consist only of punctuation (e.g., '$$') are not included in the frequency count.
+    Draw a bar chart of the frequency of words in a text beginning with the "$" character. Words that start with the '$' character but consist only of punctuation (e.g., '$!$' and '$.$') are not included in the frequency count.
     - If there is no word respecting the above conditions, the plot should be None.
     - The barplot x words on the x-axis and frequencies on the y-axis.
 
@@ -27,6 +27,8 @@ def f_102(text):
     Example:
     >>> text = "$child than resource indicate star $community station onto best green $exactly onto then age charge $friend than ready child really $let product coach decision professional $camera life off management factor $alone beat idea bit call $campaign fill stand Congress stuff $performance follow your resource road $data performance himself school here"
     >>> ax = f_102(text)
+    >>> print(ax)
+    Axes(0.125,0.11;0.775x0.77)
     """
     words = text.split()
     dollar_words = [
@@ -109,6 +111,11 @@ class TestCases(unittest.TestCase):
         text = "$apple $apple $banana $!$ $@ fruit $cherry"
         plot = f_102(text)
         self.assertIsInstance(plot, plt.Axes, "Return type should be a plot (Axes).")
+        self.is_bar(
+            plot,
+            expected_categories=["$apple", "$banana", "$cherry"],
+            expected_values=[2.0, 1.0, 1.0],
+        )
 
 
 def run_tests():
