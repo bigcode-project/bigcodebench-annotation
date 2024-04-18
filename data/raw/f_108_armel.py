@@ -8,11 +8,9 @@ ALPHA = 0.05
 
 def f_108(data_matrix):
     """
-    Calculate the mean value of each row in a 2D data matrix, run a t-test from a sample against the population value,
-    and record the mean values that differ significantly.
-    - Create a lineplot a the mean of rows in red. Its label is 'Means'.
-    - Create a line plot with the significant_indices (those with a pvalue less than ALPHA) on the x-axis and the corresponding means on the y-axis.
-    this plot should be blue. Its label is 'Significant Means'.
+    Calculate the mean value of each row in a 2D data matrix, run a t-test from a sample against the population value, and record the mean values that differ significantly.
+    - Create a lineplot with the mean of rows in red. Its label is 'Means'.
+    - Create a line plot with the significant_indices (those with a pvalue less than ALPHA) on the x-axis and the corresponding means on the y-axis. This plot should be blue. Its label is 'Significant Means'.
     - Create an horizontal line which represent the mean computed on the whole 2D matrix. It should be in green. Its label is 'Population Mean'.
 
     Parameters:
@@ -32,11 +30,13 @@ def f_108(data_matrix):
     >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
     >>> indices, ax = f_108(data)
     >>> print(indices)
+    []
 
     Example 2:
     >>> data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     >>> indices, ax = f_108(data)
     >>> print(indices)
+    []
     """
     means = np.mean(data_matrix, axis=1)
     population_mean = np.mean(data_matrix)

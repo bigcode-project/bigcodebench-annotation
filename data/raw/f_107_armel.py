@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
@@ -23,15 +22,18 @@ def f_107(data_matrix):
         - matplotlib.axes.Axes: The histogram plot of the distribution of means.
 
     Requirements:
-    - numpy
     - pandas
     - sklearn.preprocessing.StandardScaler
     - matplotlib.pyplot
 
     Example:
+    >>> import numpy as np
     >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
     >>> df, ax = f_107(data)
     >>> print(df)
+       Feature 1  Feature 2  Feature 3  Feature 4  Feature 5  Mean
+    0        1.0        1.0       -1.0       -1.0        1.0   0.2
+    1       -1.0       -1.0        1.0        1.0       -1.0  -0.2
     """
     scaler = StandardScaler()
     standardized_data = scaler.fit_transform(data_matrix)
@@ -43,7 +45,7 @@ def f_107(data_matrix):
 
 
 import unittest
-
+import numpy as np
 
 class TestCases(unittest.TestCase):
     """Test cases for the f_107 function."""

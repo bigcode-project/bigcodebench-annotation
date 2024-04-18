@@ -1,4 +1,3 @@
-import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -19,16 +18,27 @@ def f_106(df, target_column):
     - sklearn.model.RandomForestClassifier : The random forest classifier trained on the input data.
     - matplotlib.axes.Axes: The Axes object of the plotted data.
 
+    Requirements:
+    - sklearn.ensemble
+    - seaborn
+    - matplotlib.pyplot
+
     Example:
+    >>> import pandas as pd
     >>> data = pd.DataFrame({"X" : [-1, 3, 5, -4, 7, 2], "label": [0, 1, 1, 0, 1, 1]})
-    >>> df, ax = f_106(data, "label")
-    >>> print(df)
+    >>> model, ax = f_106(data, "label")
+    >>> print(data.head(2))
+       X  label
+    0 -1      0
+    1  3      1
+    >>> print(model)
+    RandomForestClassifier(random_state=42)
     """
 
     X = df.drop(target_column, axis=1)
     y = df[target_column]
 
-    model = RandomForestClassifier().fit(X, y)
+    model = RandomForestClassifier(random_state=42).fit(X, y)
     feature_imp = pd.Series(model.feature_importances_, index=X.columns).sort_values(
         ascending=False
     )
@@ -41,7 +51,7 @@ def f_106(df, target_column):
 
 
 import unittest
-
+import pandas as pd
 
 class TestCases(unittest.TestCase):
     """Test cases for the f_106 function."""

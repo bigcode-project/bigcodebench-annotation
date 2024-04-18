@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import skew
@@ -16,15 +15,18 @@ def f_110(data_matrix):
     matplotlib.axes.Axes: The Axes object of the plotted distribution.
 
     Requirements:
-    - numpy
     - pandas
     - matplotlib.pyplot
     - scipy.stats.skew
 
     Example:
+    >>> import numpy as np
     >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
     >>> df, ax = f_110(data)
     >>> print(df)
+       Skewness
+    0  0.122440
+    1  0.403407
     """
     skewness = skew(data_matrix, axis=1)
     df = pd.DataFrame(skewness, columns=["Skewness"])
@@ -35,6 +37,7 @@ def f_110(data_matrix):
 
 import unittest
 import os
+import numpy as np
 
 
 class TestCases(unittest.TestCase):
