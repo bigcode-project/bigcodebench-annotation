@@ -109,7 +109,7 @@ class CodeWrapper:
 if __name__ == '__main__':
     TIMES = 1
     VERBOSE = True
-    MODEL = "bigcode/starcoder2-7b"
+    MODEL = "bigcode/starcoder2-3b"
     TEMPERATURE = 0
     
     input_file = sys.argv[1]
