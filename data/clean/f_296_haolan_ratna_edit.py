@@ -21,7 +21,7 @@ def f_296(df, col):
     - matplotlib.pyplot
 
     Note:
-    - The input df must be DataFrame, not be empty, and must contain the specified column.
+    - The input df must be DataFrame, not be empty, and must contain the specified column, if it is not, the function will raise ValueError.
    
 
     Examples:
@@ -29,15 +29,14 @@ def f_296(df, col):
     >>> fig = f_296(df, 'value')
     >>> type(fig)
     <class 'matplotlib.figure.Figure'>
-    >>> fig.axes # doctest: +ELLIPSIS
-    [<matplotlib.axes._subplots.AxesSubplot object at 0x...>, <matplotlib.axes._subplots.AxesSubplot object at 0x...>]
-
+    >>> plt.close()
     >>> df = pd.DataFrame({'category': ['A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B']})
     >>> fig = f_296(df, 'category')
     >>> type(fig)
     <class 'matplotlib.figure.Figure'>
     >>> len(fig.axes)
     2
+    >>> plt.close()
     """
 
     if not isinstance(df, pd.DataFrame) or df.empty or col not in df.columns:

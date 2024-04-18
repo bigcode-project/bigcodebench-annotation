@@ -17,16 +17,19 @@ def f_245(df):
     - collections
 
     Note:
+    - The function will raise a ValueError is input df is not a DataFrame.
     - The function would return the first category in alphabetical order for "Most Popular Category' in the case of tie
 
     Example:
-    >>> data = pd.DataFrame({'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
-            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300},)
+    >>> data = pd.DataFrame([{'Customer': 'John', 'Category': 'Electronics', 'Sales': 500}, {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}])
     >>> report = f_245(data)
     >>> print(report)
     {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
     """
-
+    
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
+    
     df = df.drop_duplicates(subset='Customer')
     total_sales = df['Sales'].sum()
     popular_category = collections.Counter(df['Category']).most_common(1)[0][0]

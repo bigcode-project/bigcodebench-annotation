@@ -23,11 +23,12 @@ def f_297(df, col, title=None):
     Example:
     >>> df = pd.DataFrame({'fruit': ['apple', 'banana', 'orange', 'apple', 'banana', 'banana']})
     >>> ax = f_297(df, 'fruit', title='Fruit Distribution')
-    >>> type(ax) # This should return <class 'matplotlib.axes._axes.Axes'>
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> print(ax.get_title())
+    Fruit Distribution
+    >>> plt.close()
 
     Note:
-    - The input df must be DataFrame, not be empty, and must contain the specified column.
+    - The input df must be DataFrame, not be empty, and must contain the specified column, if it is not, the function will raise ValueError.
     - Each unique value in the column is represented by a slice in the pie chart with a unique color from a predefined set. 
     - The pie chart can have a title if specified.
 
@@ -51,7 +52,6 @@ import unittest
 from unittest.mock import patch
 import pandas as pd
 import matplotlib.pyplot as plt
-import pytest
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Setup fake data for testing
@@ -63,25 +63,31 @@ class TestCases(unittest.TestCase):
         # Test with valid input and column
         ax = f_297(self.df, 'fruit')
         self.assertIsInstance(ax, plt.Axes)
+        plt.close()
     def test_nonexistent_column(self):
         # Test with a nonexistent column
         with self.assertRaises(Exception):
             f_297(self.df, 'color')
+        plt.close()
     def test_empty_dataframe(self):
         # Test with an empty DataFrame
         with self.assertRaises(Exception):
             f_297(pd.DataFrame(), 'fruit')
+        plt.close()
     def test_pie_chart_title(self):
         # Test with a title for the pie chart
         title = "Distribution of Fruits"
         ax = f_297(self.df, 'fruit', title=title)
         self.assertEqual(ax.get_title(), title)
+        plt.close()
     def test_numeric_data(self):
         # Test with numeric data
         ax = f_297(self.df, 'quantity')
         self.assertIsInstance(ax, plt.Axes)
+        plt.close()
         
     def test_color_length(self):
         # Test if the number of colors matches the number of unique values
         ax = f_297(self.df, 'fruit')
         self.assertEqual(len(ax.patches), self.df['fruit'].nunique())
+        plt.close()

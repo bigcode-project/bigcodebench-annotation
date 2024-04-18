@@ -9,7 +9,7 @@ SMTP_PORT = 587
 EMAIL_ADDRESS = "your.email@gmail.com"
 EMAIL_PASSWORD = "your.password"
 
-def f_225(text=TEXT, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address=EMAIL_ADDRESS, email_password=EMAIL_PASSWORD, recepient_address=RECEPIENT_ADDRESS):
+def f_225(text=TEXT, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address=EMAIL_ADDRESS, email_password=EMAIL_PASSWORD, recepient_address=RECEPIENT_ADDRESS, smtp=None):
     """
     Extract all names from a string that is not enclosed by square brackets and send the names in an email.
 
@@ -32,7 +32,10 @@ def f_225(text=TEXT, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address
     - smtplib
 
     Example:
-    >>> f_225()
+    >>> from unittest.mock import MagicMock
+    >>> mock_smtp_instance = MagicMock()
+    >>> mock_smtp = MagicMock(return_value=mock_smtp_instance)
+    >>> f_225(text="Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003]Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]", smtp=mock_smtp)
     ['Josie Smith', 'Mugsy Dog Smith']
     """
 
@@ -41,8 +44,11 @@ def f_225(text=TEXT, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address
     names = [name.strip() for name in names if name != ""]
     
     message = 'Subject: Extracted Names\n\n' + '\n'.join(names)
-
-    server = smtplib.SMTP(smtp_server, smtp_port)
+    if smtp:
+        server = smtp(smtp_server, smtp_port)
+    else:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        
     server.starttls()
     server.login(email_address, email_password)
     server.sendmail(email_address, recepient_address, message)

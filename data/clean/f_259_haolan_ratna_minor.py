@@ -25,7 +25,7 @@ def f_259(ax, radius):
     Example:
     >>> fig = plt.figure()
     >>> ax = fig.add_subplot(111, polar=True)
-    >>> ax = f_259(ax, 1.5)
+    >>> result_ax = f_259(ax, 1.5)
     >>> np.allclose(result_ax.get_lines()[0].get_ydata(), 1.5)
     True
     '''
@@ -42,6 +42,7 @@ def f_259(ax, radius):
     
 
 import unittest
+import matplotlib.pyplot as plt
 
 class TestCases(unittest.TestCase):
     def test_polar_plot(self):

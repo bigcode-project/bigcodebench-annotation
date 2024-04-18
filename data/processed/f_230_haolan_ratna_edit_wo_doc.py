@@ -7,7 +7,7 @@ SMTP_PORT = 587
 EMAIL_ADDRESS = "your.email@gmail.com"
 EMAIL_PASSWORD = "your.password"
 
-def f_225(input_data=None, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address=EMAIL_ADDRESS, email_password=EMAIL_PASSWORD):
+def f_225(input_data=None, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address=EMAIL_ADDRESS, email_password=EMAIL_PASSWORD, smtp=None):
     """
     Extract recepient email address and names from JSON-formatted string and send the names in an email.
 
@@ -26,7 +26,10 @@ def f_225(input_data=None, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_a
     - smtplib
 
     Example:
-    >>> f_225('{"recipient": "recipient@example.com", "names": ["Josie Smith", "Mugsy Dog Smith"]}')
+    >>> from unittest.mock import MagicMock
+    >>> mock_smtp_instance = MagicMock()
+    >>> mock_smtp = MagicMock(return_value=mock_smtp_instance)
+    >>> f_225('{"recipient": "recipient@example.com", "names": ["Josie Smith", "Mugsy Dog Smith"]}', smtp=mock_smtp)
     ['Josie Smith', 'Mugsy Dog Smith']
     """
      
@@ -45,8 +48,11 @@ def f_225(input_data=None, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_a
         return []
 
     message = 'Subject: Extracted Names\n\n' + '\n'.join(names)
-
-    server = smtplib.SMTP(smtp_server, smtp_port)
+    
+    if smtp:
+        server = smtp(smtp_server, smtp_port)
+    else:
+        server = smtplib.SMTP(smtp_server, smtp_port)
     server.starttls()
     server.login(email_address, email_password)
     server.sendmail(email_address, recipient_email, message)

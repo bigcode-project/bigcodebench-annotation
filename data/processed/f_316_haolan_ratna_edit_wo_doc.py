@@ -1,8 +1,6 @@
 import collections
 import pandas as pd
 
-# Constants
-
 def f_316(my_tuple, path_csv_files):
     """
     Count the occurrences of each value in the specified columns in multiple CSV files.
@@ -20,7 +18,14 @@ def f_316(my_tuple, path_csv_files):
     - pandas
 
     Example:
-    >>> f_316(('Country', 'Gender'))
+    >>> from unittest.mock import MagicMock
+    >>> import pandas as pd
+    >>> df1 = pd.DataFrame({'Country': ['USA', 'Canada', 'USA'], 'Gender': ['Male', 'Female', 'Male']})
+    >>> df2 = pd.DataFrame({'Country': ['UK', 'USA', 'Germany'], 'Gender': ['Male', 'Male', 'Female']})
+    >>> pd.read_csv = MagicMock(side_effect=[df1, df2])
+    >>> result = f_316(('Country', 'Gender'), ['file1.csv', 'file2.csv'])
+    >>> print(result['Country'])
+    Counter({'USA': 3, 'Canada': 1, 'UK': 1, 'Germany': 1})
     """
 
     counter = {column: collections.Counter() for column in my_tuple}

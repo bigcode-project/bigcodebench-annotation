@@ -23,12 +23,11 @@ def f_277(df):
     Requirements:
     - pandas
     - numpy
-    - scipy.stats
+    - scipy.stats.zscore
     - matplotlib.pyplot
 
     Example:
-    >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]],
-                          columns=['Date', 'Value'])
+    >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
     >>> zscore_df, fig = f_277(df)
     >>> print(zscore_df.shape)
     (2, 4)
