@@ -4,9 +4,10 @@ requests==2.31.0
 matplotlib==3.7.0
 seaborn==0.13.2
 numpy==1.21.2
+numba==0.53.0
 cryptography==3.4.8
 scipy==1.7.2
-nltk==3.6.3
+nltk==3.8
 pytz==2023.3.post1
 networkx==2.6.3
 statsmodels==0.14.0
@@ -28,3 +29,6 @@ wordcloud
 pytesseract
 chardet
 python-dateutil
+python-Levenshtein-wheels
+flask==3.0.3
+Flask-Mail==0.9.1
