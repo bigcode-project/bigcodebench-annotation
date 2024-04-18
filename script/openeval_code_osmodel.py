@@ -69,7 +69,7 @@ class ContentParser:
         raise ParseError(f"Prompt is not in content:\n{content}")
 
 
-class ChatWrapper:
+class CodeWrapper:
 
     def __init__(self, model: str):
         
@@ -81,18 +81,8 @@ class ChatWrapper:
         self.tokenizer = AutoTokenizer.from_pretrained(model)
 
     def __call__(self, prompt: str, max_new_tokens=1024, temperature=0, top_p=0.95, n=1) -> List[str]:
-        messages = [
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ]
-        text = self.tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True
-        )
-        model_inputs = self.tokenizer([text], return_tensors="pt").to(device)
+        
+        model_inputs = self.tokenizer([prompt], return_tensors="pt").to(device)
 
         if not temperature:
             generated_ids = self.model.generate(
@@ -119,7 +109,7 @@ class ChatWrapper:
 if __name__ == '__main__':
     TIMES = 1
     VERBOSE = True
-    MODEL = "Qwen/CodeQwen1.5-7B-Chat"
+    MODEL = "bigcode/starcoder2-7b"
     TEMPERATURE = 0
     
     input_file = sys.argv[1]
@@ -134,7 +124,7 @@ if __name__ == '__main__':
         for s in f:
             samples.append(s)
 
-    chat_wrapper = ChatWrapper(MODEL)
+    code_wrapper = CodeWrapper(MODEL)
     parse_errors = 0
     parser = ContentParser()
     for idx, sample in enumerate(tqdm(samples)):
@@ -142,7 +132,7 @@ if __name__ == '__main__':
         
         if VERBOSE:
             print(f"Processing {sample['task_id']} ({idx + 1}/{len(samples)}))...")
-        sample["raw_generation"] = chat_wrapper(prompt, temperature=TEMPERATURE, n=TIMES)
+        sample["raw_generation"] = code_wrapper(prompt, temperature=TEMPERATURE, n=TIMES)
         try:
             sample["generation"] = [parser(prompt, generation_item, sample["task_id"]) for generation_item in sample["raw_generation"]]
         except ParseError as e:
