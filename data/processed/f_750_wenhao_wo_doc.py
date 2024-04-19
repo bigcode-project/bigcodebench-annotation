@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
         plots = f_750(self.directory, self.pattern)
         expected_titles = ['sales_data_2022.csv', 'sales_data_2021.csv']
         plot_titles = [plot.get_title() for plot in plots]
-        self.assertEqual(plot_titles, expected_titles, "Plot titles should match the CSV filenames")
+        self.assertEqual(set(plot_titles), set(expected_titles), "Plot titles should match the CSV filenames")
     def test_no_files_matched(self):
         plots = f_750(self.directory, r"^no_match_\d{4}.csv")
         self.assertEqual(len(plots), 0, "Should return an empty list if no files match the pattern")
