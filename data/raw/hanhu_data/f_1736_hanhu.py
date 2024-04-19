@@ -43,7 +43,7 @@ import pandas as pd
 from unittest.mock import patch
 from sklearn.datasets import load_diabetes
 
-class TestF1737(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Load the dataset only once for use in multiple tests to improve performance
         self.diabetes_data = load_diabetes()
@@ -87,7 +87,7 @@ class TestF1737(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1737)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

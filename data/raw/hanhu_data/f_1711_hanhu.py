@@ -54,7 +54,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 from django.http import HttpRequest, FileResponse
 
-class TestF1712(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         self.request = HttpRequest()
@@ -94,7 +94,7 @@ class TestF1712(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1712)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

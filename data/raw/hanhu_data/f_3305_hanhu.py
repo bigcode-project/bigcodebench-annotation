@@ -45,7 +45,7 @@ import unittest
 from unittest.mock import mock_open, patch
 import json
 
-class TestF3307(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Initialize test data and expected results
         self.mock_data = '{"key1": "SGVsbG8gV29ybGQ=", "key2": "UHl0aG9uIENvZGUgUmVmaW5lcg=="}'
@@ -95,7 +95,7 @@ class TestF3307(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3307)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

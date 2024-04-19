@@ -67,7 +67,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import SGD
 from matplotlib.axes import Axes
 
-class TestF3325(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Initialize common test data used in multiple test cases.
         self.X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
@@ -113,7 +113,7 @@ class TestF3325(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3325)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

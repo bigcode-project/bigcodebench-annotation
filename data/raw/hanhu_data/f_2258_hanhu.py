@@ -42,7 +42,7 @@ def f_2260(animals, mean):
 import unittest
 from unittest.mock import patch
 
-class TestF2260(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         self.animals = ['Dog', 'Cat', 'Bird', 'Fish', 'Hamster']
 
@@ -131,7 +131,7 @@ class TestF2260(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2260)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

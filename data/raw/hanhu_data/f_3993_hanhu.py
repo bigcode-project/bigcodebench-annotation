@@ -39,7 +39,7 @@ def f_3995(file_path1, file_path2):
 import unittest
 import os
 
-class TestF3995(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -82,7 +82,7 @@ class TestF3995(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3995)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

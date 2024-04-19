@@ -49,7 +49,7 @@ import os
 import tempfile
 import hashlib
 
-class TestF4492(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Setup a temporary directory with files for testing
@@ -91,7 +91,7 @@ class TestF4492(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4492)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

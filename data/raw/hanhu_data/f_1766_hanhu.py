@@ -50,7 +50,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import numpy as np
 
-class TestF1767(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('matplotlib.pyplot.show')
     def test_no_error(self, mock_show):
         """Test that the function runs without error."""
@@ -117,7 +117,7 @@ class TestF1767(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1767)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

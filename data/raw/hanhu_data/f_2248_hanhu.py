@@ -64,7 +64,7 @@ def f_2250(dic):
 import unittest
 from unittest.mock import patch, MagicMock
 
-class TestF2250(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Mocking the geocode return to control output of Photon geocode calls
         self.geocode_patch = patch('geopy.geocoders.Photon.geocode', return_value=MagicMock(latitude=0, longitude=0))
@@ -113,7 +113,7 @@ class TestF2250(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2250)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

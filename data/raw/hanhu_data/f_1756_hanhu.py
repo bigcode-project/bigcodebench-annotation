@@ -35,7 +35,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from unittest.mock import patch
 
-class TestF1757(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_no_error(self):
         """Test that the function runs without error."""
         try:
@@ -81,7 +81,7 @@ class TestF1757(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1757)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

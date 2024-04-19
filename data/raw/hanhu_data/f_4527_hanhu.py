@@ -59,7 +59,7 @@ from cryptography.fernet import Fernet
 import os
 import rsa
 
-class TestF4529(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Setup a test file
@@ -102,7 +102,7 @@ class TestF4529(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4529)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -51,7 +51,7 @@ def f_3883(s, save_json, json_file_path):
 import unittest
 import os
 
-class TestF3883(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.json_file_path = 'test_output.json'
@@ -108,7 +108,7 @@ class TestF3883(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3883)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

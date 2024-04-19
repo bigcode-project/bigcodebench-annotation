@@ -35,7 +35,7 @@ def f_2703(url):
 import unittest
 from unittest.mock import patch
 
-class TestF2703(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('mechanize.Browser')
     def test_return_type(self, mock_browser):
         """Test that the function returns a list."""
@@ -133,7 +133,7 @@ class TestF2703(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2703)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

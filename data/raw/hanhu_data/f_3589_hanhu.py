@@ -49,7 +49,7 @@ def f_3591(mean, std_dev, n):
 
 import unittest
 
-class TestF3591(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_sample_length(self):
         # Test if the function returns the correct number of samples
         samples = f_3591(0, 1, 1000)
@@ -101,7 +101,7 @@ class TestF3591(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3591)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

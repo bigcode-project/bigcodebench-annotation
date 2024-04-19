@@ -37,7 +37,7 @@ def f_1752(my_dict):
 import unittest
 import numpy as np
 
-class TestF1752(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_type(self):
         """Test that the function returns a dictionary."""
         result = f_1752({'array': np.array([1, 2, 3])})
@@ -82,7 +82,7 @@ class TestF1752(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1752)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

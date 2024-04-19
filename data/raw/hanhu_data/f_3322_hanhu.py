@@ -65,7 +65,7 @@ import numpy as np
 from tensorflow import keras
 from matplotlib.axes import Axes
 
-class TestF3324(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         self.X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
         self.Y = np.array([0, 1, 1, 0])
@@ -109,7 +109,7 @@ class TestF3324(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3324)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

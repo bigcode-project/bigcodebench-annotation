@@ -46,7 +46,7 @@ def f_2970(req_data, secret_key):
 
 import unittest
 
-class TestF2970(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         """Set up common test data and secret key."""
         self.secret_key = 'test_secret_key'
@@ -116,7 +116,7 @@ class TestF2970(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2970)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

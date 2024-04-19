@@ -74,7 +74,7 @@ def f_2439(L, M, N, audio_file):
 import unittest
 from unittest.mock import patch, MagicMock
 
-class TestF2439(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('os.path.isfile', return_value=False)
     def test_nonexistent_audio_file(self, mock_isfile):
         """Test if the function raises FileNotFoundError for a non-existent audio file."""
@@ -105,7 +105,7 @@ class TestF2439(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2439)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

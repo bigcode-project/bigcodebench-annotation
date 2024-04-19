@@ -43,7 +43,7 @@ import unittest
 from unittest.mock import patch, mock_open
 import mimetypes
 
-class TestF2065(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_type(self):
         """Test that the function returns a dictionary."""
         with patch('os.chdir'), patch('glob.glob', return_value=[]), patch('re.search'):
@@ -96,7 +96,7 @@ class TestF2065(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2065)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

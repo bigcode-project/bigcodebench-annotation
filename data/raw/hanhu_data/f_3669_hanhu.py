@@ -41,7 +41,7 @@ def f_3671(my_obj):
 
 import unittest
 
-class TestF3671(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_enum_serialization(self):
         # Test serialization of a dictionary containing an Enum to check if the Enum is properly converted to its name.
         obj = {'color': Color.RED}
@@ -88,7 +88,7 @@ class TestF3671(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3671)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

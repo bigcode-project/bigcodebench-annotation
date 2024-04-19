@@ -44,7 +44,7 @@ import unittest
 import blake3
 import hashlib
 
-class TestF2971(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         """Set up common test data."""
         self.req_data = {'key': 'value'}
@@ -113,7 +113,7 @@ class TestF2971(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2971)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

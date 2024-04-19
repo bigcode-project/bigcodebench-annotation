@@ -59,7 +59,7 @@ import matplotlib.pyplot as plt
 import math
 from scipy.signal import get_window
 
-class TestF3033(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         """Set up common constants for the tests."""
         self.amplitude = 1
@@ -132,7 +132,7 @@ class TestF3033(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3033)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

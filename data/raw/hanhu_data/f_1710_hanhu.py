@@ -54,7 +54,7 @@ import unittest
 from unittest.mock import patch
 from django.http import HttpRequest, FileResponse
 
-class TestF1711(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Prepare test data
@@ -103,7 +103,7 @@ class TestF1711(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1711)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

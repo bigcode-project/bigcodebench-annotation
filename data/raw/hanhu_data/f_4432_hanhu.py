@@ -53,7 +53,7 @@ from datetime import datetime
 import pytz
 from io import StringIO
 
-class TestF4434(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Create a temporary DLL file
@@ -115,7 +115,7 @@ class TestF4434(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4434)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -49,7 +49,7 @@ import json
 
 LETTERS = ['a', 'b', 'c', 'd', 'e']
 
-class TestF1764(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('random.randint', return_value=42)  # Mock randint to control filename
     def test_return_type(self, mock_randint):
         """Test that the function returns a string."""
@@ -93,7 +93,7 @@ class TestF1764(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1764)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

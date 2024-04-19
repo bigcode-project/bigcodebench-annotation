@@ -37,7 +37,7 @@ import json
 import os
 import tempfile
 
-class TestF3883(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Create a temporary directory to use during tests
         self.test_dir = tempfile.mkdtemp()
@@ -114,7 +114,7 @@ class TestF3883(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3883)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

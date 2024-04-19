@@ -38,7 +38,7 @@ def f_2099(newArray):
 import unittest
 import numpy as np
 
-class TestF2099(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_type(self):
         """Test that the function returns bytes."""
         result = f_2099(np.array([1, 2, 3]))
@@ -73,7 +73,7 @@ class TestF2099(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2099)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

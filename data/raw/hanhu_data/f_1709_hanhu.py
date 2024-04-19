@@ -69,7 +69,7 @@ import unittest
 from unittest.mock import patch
 from django.http import HttpResponseBadRequest, HttpResponse
 
-class TestF1710(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     @patch('base64.b64decode')
     def test_successful_login(self, mock_b64decode):
@@ -113,7 +113,7 @@ class TestF1710(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1710)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -48,7 +48,7 @@ import logging
 import os
 import tempfile
 
-class TestF1713(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         self.template_folder = tempfile.mkdtemp()
@@ -117,7 +117,7 @@ class TestF1713(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1713)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -58,7 +58,7 @@ from unittest.mock import patch
 import rsa
 from hashlib import sha256
 
-class TestF4527(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     @patch('urllib.request.urlopen')
     def test_return_type(self, mock_urlopen):
@@ -114,7 +114,7 @@ class TestF4527(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4527)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

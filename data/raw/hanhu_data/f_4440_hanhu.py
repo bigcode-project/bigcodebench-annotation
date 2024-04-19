@@ -54,7 +54,7 @@ import pandas as pd
 import inspect
 from unittest.mock import patch
 
-class TestF4442(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_single_function(self):
         def sample_function(x): pass
@@ -93,7 +93,7 @@ class TestF4442(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4442)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

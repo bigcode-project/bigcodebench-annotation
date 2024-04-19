@@ -53,7 +53,7 @@ import sys
 from io import StringIO
 import binascii
 
-class TestF4435(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Create a temporary DLL file
@@ -117,7 +117,7 @@ class TestF4435(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4435)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

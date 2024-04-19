@@ -50,7 +50,7 @@ def f_1730(csv_file, csv_delimiter):
 import unittest
 from unittest.mock import patch, mock_open
 
-class TestF1730(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_type(self):
         """ Test that the function returns a list. """
         with patch('builtins.open', mock_open(read_data="word1,word2,word1")):
@@ -97,7 +97,7 @@ class TestF1730(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1730)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -43,7 +43,7 @@ def f_4590(n=10, total=100):
 import unittest
 from array import array
 
-class TestF4590(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_return_type(self):
         nums, pos = f_4590(5, 50)
@@ -72,7 +72,7 @@ class TestF4590(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4590)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

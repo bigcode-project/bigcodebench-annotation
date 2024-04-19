@@ -89,7 +89,7 @@ import os
 import shutil
 from flask_login import login_user
 
-class TestF1716(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         current_file_path = os.path.abspath(__file__)
@@ -185,7 +185,7 @@ class TestF1716(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1716)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

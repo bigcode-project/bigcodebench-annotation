@@ -51,7 +51,7 @@ import unittest
 import logging
 from unittest.mock import patch
 
-class TestF4669(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Setup an empty test file
@@ -94,7 +94,7 @@ class TestF4669(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4669)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

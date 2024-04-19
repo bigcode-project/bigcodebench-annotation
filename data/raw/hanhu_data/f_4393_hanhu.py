@@ -45,7 +45,7 @@ def f_4395(s, min_length, max_length, letters):
 
 import unittest
 
-class TestF4395(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Set up common parameters for all tests
@@ -88,7 +88,7 @@ class TestF4395(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4395)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

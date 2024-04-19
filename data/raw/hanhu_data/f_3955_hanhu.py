@@ -48,7 +48,7 @@ import unittest
 import os
 import tempfile
 
-class TestF3957(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         """Set up a temporary directory for test files."""
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -96,7 +96,7 @@ class TestF3957(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3957)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

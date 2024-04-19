@@ -37,7 +37,7 @@ def f_4313(my_dict):
 
 import unittest
 
-class TestF4313(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_sort_and_display_dict(self):
         my_dict = {3: 'apple', 1: 'banana', 2: 'cherry'}
         table = f_4313(my_dict)
@@ -76,7 +76,7 @@ class TestF4313(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4313)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -60,41 +60,41 @@ from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from base64 import b64decode
 
-class TestF4526(unittest.TestCase):
+class TestCases(unittest.TestCase):
     filenames = []
 
     def test_return_type(self):
         pub_key, filename, _, _ = f_4526()
         self.assertIsInstance(pub_key, rsa.PublicKey)
         self.assertIsInstance(filename, str)
-        TestF4526.filenames.append(filename)
+        TestCases.filenames.append(filename)
 
     def test_file_creation(self):
         _, filename, _, _ = f_4526()
         self.assertTrue(os.path.exists(filename))
-        TestF4526.filenames.append(filename)
+        TestCases.filenames.append(filename)
 
     def test_file_content(self):
         _, filename, _, _ = f_4526()
         with open(filename, 'r') as f:
             content = f.read()
             self.assertTrue(content)
-        TestF4526.filenames.append(filename)
+        TestCases.filenames.append(filename)
 
     def test_key_size(self):
         pub_key, filename, _, _ = f_4526()
         self.assertEqual(pub_key.n.bit_length(), 512)
-        TestF4526.filenames.append(filename)
+        TestCases.filenames.append(filename)
 
     def test_unique_file_per_call(self):
         _, filename1, _, _ = f_4526()
         _, filename2, _, _ = f_4526()
         self.assertNotEqual(filename1, filename2)
-        TestF4526.filenames.extend([filename1, filename2])
+        TestCases.filenames.extend([filename1, filename2])
 
     def test_encryption_decryption(self):
         pub_key, filename, password, nonce = f_4526()
-        TestF4526.filenames.append(filename)
+        TestCases.filenames.append(filename)
         with open(filename, 'r') as f:
             encrypted_key = b64decode(f.read())
         cipher = AES.new(password, AES.MODE_EAX, nonce=nonce)
@@ -112,7 +112,7 @@ class TestF4526(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4526)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

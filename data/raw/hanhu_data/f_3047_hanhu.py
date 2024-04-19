@@ -37,7 +37,7 @@ def f_3049(numbers: list) -> dict:
 import unittest
 import math
 
-class TestF3049(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_type(self):
         """Test that the function returns a dictionary."""
         result = f_3049([3, 4, 5])
@@ -78,7 +78,7 @@ class TestF3049(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3049)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

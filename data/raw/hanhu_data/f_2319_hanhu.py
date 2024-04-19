@@ -43,7 +43,7 @@ def f_2321(commands):
 import unittest
 from unittest.mock import patch
 
-class TestF2321(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('subprocess.Popen')
     def test_return_type(self, mock_popen):
         """Test that the function returns a list of byte strings."""
@@ -92,7 +92,7 @@ class TestF2321(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2321)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

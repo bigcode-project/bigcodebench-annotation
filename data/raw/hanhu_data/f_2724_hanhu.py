@@ -63,7 +63,7 @@ import unittest
 import numpy as np
 import tensorflow as tf
 
-class TestF2726(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Common setup for all tests
@@ -110,7 +110,7 @@ class TestF2726(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2726)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -45,7 +45,7 @@ def f_4445(f):
 import unittest
 import json
 
-class TestF4445(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_regular_function(self):
         def sample_function(x, y, z=3): pass
@@ -83,7 +83,7 @@ class TestF4445(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4445)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

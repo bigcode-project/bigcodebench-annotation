@@ -58,7 +58,7 @@ import tempfile
 from collections import OrderedDict
 # Assume f_3960 is imported or defined elsewhere
 
-class TestF3960(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Create a temporary directory to store test files
         self.test_dir = tempfile.TemporaryDirectory()
@@ -102,7 +102,7 @@ class TestF3960(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3960)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

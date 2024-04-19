@@ -50,7 +50,7 @@ def f_2296(n, value):
 import unittest
 from unittest.mock import MagicMock, patch
 
-class TestF2296(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Mock random.random to return a fixed sequence of numbers
@@ -92,7 +92,7 @@ class TestF2296(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2296)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

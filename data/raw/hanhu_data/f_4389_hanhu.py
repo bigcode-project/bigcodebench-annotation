@@ -55,7 +55,7 @@ MIN_WORDS = 3
 MAX_WORDS = 10
 WORDS_POOL = ['apple', 'banana', 'racecar', 'world', 'level', 'madam', 'radar', 'rotor']
 
-class TestF4391(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_is_palindrome(self):
         """Test that the sentence generated is a palindrome."""
         sentence = f_4391(MIN_WORDS, MAX_WORDS, WORDS_POOL)
@@ -97,7 +97,7 @@ class TestF4391(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4391)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

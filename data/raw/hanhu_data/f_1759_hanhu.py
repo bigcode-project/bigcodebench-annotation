@@ -40,7 +40,7 @@ import unittest
 from unittest.mock import patch
 import numpy as np
 
-class TestF1760(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_type(self):
         """ Test that the function returns a numpy array. """
         result = f_1760([1, 2, 3])
@@ -82,7 +82,7 @@ class TestF1760(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1760)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

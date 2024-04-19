@@ -53,7 +53,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import sys
 
-class TestF4278(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     @patch('importlib.import_module')
     @patch('pkgutil.iter_modules')
@@ -106,7 +106,7 @@ class TestF4278(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4278)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

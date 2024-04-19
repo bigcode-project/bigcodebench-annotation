@@ -58,7 +58,7 @@ import unittest
 from unittest.mock import patch
 import os
 
-class TestF1750(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         self.keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
 
@@ -126,7 +126,7 @@ class TestF1750(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1750)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -45,7 +45,7 @@ def f_3037(x):
 import unittest
 import numpy as np
 
-class TestF3037(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_type(self):
         """ Test that the function returns None. """
         result = f_3037(np.linspace(-10, 10, 1000))
@@ -70,7 +70,7 @@ class TestF3037(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3037)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

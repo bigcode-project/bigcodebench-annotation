@@ -40,7 +40,7 @@ def f_3115():
 import unittest
 import re  # Import the regular expressions library
 
-class TestF3115(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         self.result = f_3115()
 
@@ -86,7 +86,7 @@ class TestF3115(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3115)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

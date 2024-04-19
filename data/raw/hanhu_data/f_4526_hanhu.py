@@ -54,7 +54,7 @@ import unittest
 import tempfile
 import shutil
 
-class TestF4528(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Setup a temporary directory
         self.test_dir = tempfile.mkdtemp()
@@ -108,7 +108,7 @@ class TestF4528(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4528)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

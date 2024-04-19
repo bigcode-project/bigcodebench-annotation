@@ -64,7 +64,7 @@ def f_4212(num, from_base, to_base, alphabet):
 
 import unittest
 
-class TestF4212(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Define the alphabet in the setUp method to be reused in all tests
         self.alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/"
@@ -95,7 +95,7 @@ class TestF4212(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4212)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

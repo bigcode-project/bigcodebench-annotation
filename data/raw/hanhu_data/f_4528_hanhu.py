@@ -64,7 +64,7 @@ def f_4530(file_path):
 import unittest
 from base64 import b64decode
 
-class TestF4530(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Setup a test file
@@ -114,7 +114,7 @@ class TestF4530(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4530)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

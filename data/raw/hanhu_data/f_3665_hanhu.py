@@ -47,7 +47,7 @@ from datetime import datetime
 from decimal import Decimal
 import pytz  # Assuming pytz is used for timezone information in datetime objects
 
-class TestF3667(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_datetime_serialization(self):
         """Ensure datetime objects are serialized to an ISO 8601 string."""
         obj = {'time': datetime(2023, 1, 1, 12, 0, tzinfo=pytz.utc)}
@@ -99,7 +99,7 @@ class TestF3667(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3667)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

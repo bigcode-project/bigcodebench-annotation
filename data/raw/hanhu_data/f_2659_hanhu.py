@@ -86,7 +86,7 @@ import unittest
 from unittest.mock import MagicMock, patch, ANY
 import io
 
-class TestEmailRequestHandler(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Setup with mock SMTP details
         self.smtp_server = 'smtp.example.com'
@@ -174,7 +174,7 @@ class TestEmailRequestHandler(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestEmailRequestHandler)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

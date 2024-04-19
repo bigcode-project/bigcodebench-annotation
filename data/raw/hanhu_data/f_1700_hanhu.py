@@ -55,7 +55,7 @@ import unittest.mock as mock
 import socket
 import requests
 
-class TestF1701(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @mock.patch('socket.gethostbyname')
     @mock.patch('requests.get')
     def test_valid_host(self, mock_get, mock_gethostbyname):
@@ -111,7 +111,7 @@ class TestF1701(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1701)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

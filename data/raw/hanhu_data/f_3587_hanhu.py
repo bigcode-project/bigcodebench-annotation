@@ -59,7 +59,7 @@ import unittest
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-class TestF3589(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Create temporary directories for the source and destination folders.
         self.src_dir = TemporaryDirectory()
@@ -135,7 +135,7 @@ class TestF3589(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3589)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

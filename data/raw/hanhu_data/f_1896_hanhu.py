@@ -58,7 +58,7 @@ from unittest.mock import patch, MagicMock
 import socket
 from ipaddress import IPv4Network
 
-class TestF1897(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('socket.socket')
     def test_return_type(self, mock_socket):
         """Test that the function returns a dictionary."""
@@ -106,7 +106,7 @@ class TestF1897(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1897)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

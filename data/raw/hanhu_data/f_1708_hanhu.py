@@ -65,7 +65,7 @@ import unittest
 from unittest.mock import patch
 from django.http import HttpRequest
 
-class TestF1709(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     @patch('random.choices')
     def test_session_key_in_cookies(self, mock_random_choices):
@@ -123,7 +123,7 @@ class TestF1709(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1709)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

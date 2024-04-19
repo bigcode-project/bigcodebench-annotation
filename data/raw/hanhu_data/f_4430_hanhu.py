@@ -67,7 +67,7 @@ from unittest.mock import patch, MagicMock
 import io
 import sys
 
-class TestF4432(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     @patch('ctypes.CDLL', autospec=True)
     @patch('os.path.exists', return_value=True)
@@ -135,7 +135,7 @@ class TestF4432(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4432)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

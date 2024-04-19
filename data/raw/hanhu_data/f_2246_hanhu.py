@@ -48,7 +48,7 @@ import unittest
 from unittest.mock import patch
 import folium  # Assuming the function f_2248 and folium are imported or defined appropriately.
 
-class TestF2248(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_type(self):
         """Test that the function returns a tuple with a map and a dictionary."""
         result = f_2248({'Loc1': {'Lat': 0, 'Lon': 0}, 'Loc2': {'Lat': 1, 'Lon': 1}})
@@ -104,7 +104,7 @@ class TestF2248(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2248)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

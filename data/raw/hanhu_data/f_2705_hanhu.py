@@ -45,7 +45,7 @@ def f_2707(url, form_id, data):
 import unittest
 from unittest.mock import patch, MagicMock
 
-class TestF2707(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('mechanize.Browser')
     def test_return_type(self, mock_browser):
         """ Test that the function returns a string. """
@@ -101,7 +101,7 @@ class TestF2707(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2707)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

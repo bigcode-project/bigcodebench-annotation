@@ -53,7 +53,7 @@ from unittest.mock import patch, Mock
 import requests
 
 
-class TestF4495(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     @patch('requests.get')
     def test_return_type(self, mock_get):
@@ -90,7 +90,7 @@ class TestF4495(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4495)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

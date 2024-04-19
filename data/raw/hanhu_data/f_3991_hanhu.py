@@ -44,7 +44,7 @@ def f_3993(file_path1, file_path2):
 import unittest
 import os
 
-class TestF3993(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         """Set up test environment by creating test files."""
         # Create files with predefined content for testing
@@ -88,7 +88,7 @@ class TestF3993(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3993)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

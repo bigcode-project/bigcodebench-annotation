@@ -57,7 +57,7 @@ from unittest.mock import patch
 import numpy as np
 import statistics
 
-class TestF2295(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_types(self):
         """Ensure the function returns a numpy.ndarray and an integer."""
         data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -109,7 +109,7 @@ class TestF2295(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2295)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

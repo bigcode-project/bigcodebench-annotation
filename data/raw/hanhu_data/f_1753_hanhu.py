@@ -57,7 +57,7 @@ from unittest.mock import patch
 import numpy as np
 import matplotlib.pyplot as plt
 
-class TestF1754(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_type(self):
         """ Test that the function returns a numpy array. """
         result = f_1754(0, 1, 1000)
@@ -108,7 +108,7 @@ class TestF1754(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1754)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -41,7 +41,7 @@ def f_1768(hex_str, salt_size):
 import unittest
 from unittest.mock import patch
 
-class TestF1768(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         self.salt_size = 16  # Define salt_size here to use in all tests
 
@@ -82,7 +82,7 @@ class TestF1768(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1768)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

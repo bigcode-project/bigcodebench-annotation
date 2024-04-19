@@ -47,7 +47,7 @@ def f_4444(f):
 import unittest
 import math
 
-class TestF4444(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_regular_function(self):
         def sample_function(x, y, z=3): pass
@@ -102,7 +102,7 @@ class TestF4444(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4444)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

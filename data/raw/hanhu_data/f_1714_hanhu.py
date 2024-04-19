@@ -44,7 +44,7 @@ import unittest
 from unittest.mock import patch
 from flask import Flask
 
-class TestF1715(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         """Set up test variables."""
@@ -96,7 +96,7 @@ class TestF1715(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1715)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

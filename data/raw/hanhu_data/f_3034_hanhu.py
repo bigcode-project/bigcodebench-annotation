@@ -64,7 +64,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cmath
 
-class TestF3036(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_input_types(self):
         """Test the function with non-numpy array inputs."""
         with self.assertRaises(TypeError):
@@ -98,7 +98,7 @@ class TestF3036(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3036)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

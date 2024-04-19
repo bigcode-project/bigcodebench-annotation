@@ -35,7 +35,7 @@ def f_3588(n, pattern):
 import unittest
 import re
 
-class TestF3588(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_correct_length(self):
         # Ensure the generated string has the requested length
         self.assertEqual(len(f_3588(5, '^[a-z]*$')), 5)
@@ -67,7 +67,7 @@ class TestF3588(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3588)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

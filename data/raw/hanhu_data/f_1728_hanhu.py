@@ -58,7 +58,7 @@ def f_1729(mean, std_dev, num_samples):
 import unittest
 import numpy as np
 
-class TestF1729(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         """ Set up for each test, fixing the random seed for reproducibility. """
         np.random.seed(0)
@@ -113,7 +113,7 @@ class TestF1729(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1729)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

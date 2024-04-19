@@ -39,7 +39,7 @@ def f_3392(s, signature, secret_key):
 import unittest
 import binascii
 
-class TestF3392Additional(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_valid_signature(self):
         # Test that a correctly signed message returns True
         self.assertTrue(f_3392('SGVsbG8gV29ybGQ=', 'c47c23299efca3c220f4c19a5f2e4ced14729322', 'my_secret_key'))
@@ -81,7 +81,7 @@ class TestF3392Additional(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3392Additional)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -66,7 +66,7 @@ from keras.models import Sequential
 from keras.optimizers import SGD
 import matplotlib.pyplot as plt
 
-class TestF3322(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Set up input and output data for the tests
         self.X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
@@ -123,7 +123,7 @@ class TestF3322(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3322)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

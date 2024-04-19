@@ -40,7 +40,7 @@ from unittest.mock import patch, mock_open
 import os
 import ipaddress
 
-class TestF1895(unittest.TestCase):
+class TestCases(unittest.TestCase):
     IP_RANGE = '192.168.0.0/30'
     CSV_PATH = 'test.csv'
 
@@ -95,7 +95,7 @@ class TestF1895(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1895)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

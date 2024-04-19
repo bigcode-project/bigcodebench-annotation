@@ -63,7 +63,7 @@ from unittest.mock import patch, MagicMock, Mock
 import os
 from python_http_client.exceptions import HTTPError
 
-class TestF2846(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('sendgrid.SendGridAPIClient.send')
     @patch('os.listdir')
     def test_successful_email_send(self, mock_listdir, mock_send):
@@ -120,7 +120,7 @@ class TestF2846(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2846)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

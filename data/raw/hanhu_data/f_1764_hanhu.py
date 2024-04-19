@@ -54,7 +54,7 @@ import hashlib
 from pathlib import Path
 from unittest.mock import patch
 
-class TestF1765(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Create a temporary directory for ROOT_DIR and DEST_DIR
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -109,7 +109,7 @@ class TestF1765(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1765)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

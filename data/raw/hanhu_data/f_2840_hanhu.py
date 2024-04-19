@@ -40,7 +40,7 @@ import http.client
 import ssl
 import socket
 
-class TestF2842(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('http.client.HTTPSConnection')
     def test_return_type(self, mock_conn):
         """ Test that the function returns a string. """
@@ -81,7 +81,7 @@ class TestF2842(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2842)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

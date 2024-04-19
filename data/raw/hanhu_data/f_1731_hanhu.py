@@ -38,7 +38,7 @@ def f_1732(num_strings, string_length):
 import unittest
 import random
 
-class TestF1732(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # This method will be run before each test.
         random.seed(0)  # Set a seed for reproducibility in all tests
@@ -87,7 +87,7 @@ class TestF1732(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1732)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

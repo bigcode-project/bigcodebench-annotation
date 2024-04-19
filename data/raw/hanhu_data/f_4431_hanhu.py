@@ -46,7 +46,7 @@ import unittest
 import tempfile
 from unittest.mock import patch, MagicMock
 
-class TestF4433(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Create a temporary directory for DLL files
@@ -112,7 +112,7 @@ class TestF4433(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF4433)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

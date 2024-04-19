@@ -42,7 +42,7 @@ import unittest
 from unittest.mock import patch
 import subprocess
 
-class TestF1896(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('subprocess.check_output')
     def test_return_type(self, mock_check_output):
         """
@@ -96,7 +96,7 @@ class TestF1896(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1896)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

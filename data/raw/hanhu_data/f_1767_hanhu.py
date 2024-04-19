@@ -40,7 +40,7 @@ import unittest
 from unittest.mock import patch
 import os
 
-class TestF1768(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_type(self):
         """ Test that the function returns a tuple. """
         result = f_1768("F3BE8080", 16)
@@ -76,7 +76,7 @@ class TestF1768(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1768)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

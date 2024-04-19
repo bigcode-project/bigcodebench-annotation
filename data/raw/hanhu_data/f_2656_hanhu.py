@@ -92,7 +92,7 @@ ERROR_RESPONSE = {
     'message': 'Invalid data received.'
 }
 
-class TestF2658(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     @requests_mock.mock()
     def test_invalid_content_type_header(self, m):
@@ -135,7 +135,7 @@ class TestF2658(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2658)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

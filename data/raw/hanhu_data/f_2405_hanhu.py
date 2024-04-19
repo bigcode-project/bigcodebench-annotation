@@ -46,7 +46,7 @@ import unittest
 from unittest.mock import patch, call
 import turtle
 
-class TestF2407(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('turtle.Turtle')
     @patch('turtle.Screen')
     def test_turtle_setup(self, mock_screen, mock_turtle):
@@ -98,7 +98,7 @@ class TestF2407(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2407)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

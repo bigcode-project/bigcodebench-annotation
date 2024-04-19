@@ -47,7 +47,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import requests  # Ensure requests is imported for exception handling
 
-class TestF1894(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('requests.get')
     def test_return_type(self, mock_get):
         """Test that the function returns a list."""
@@ -105,7 +105,7 @@ class TestF1894(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1894)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

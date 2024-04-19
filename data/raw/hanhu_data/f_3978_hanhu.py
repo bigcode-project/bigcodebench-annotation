@@ -31,7 +31,7 @@ def f_3980(secret, message):
 
 import unittest
 
-class TestF3980(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_hmac_signature_length(self):
         signature = f_3980('secretkey', 'Hello, world!')
         self.assertEqual(len(signature), 64)
@@ -58,7 +58,7 @@ class TestF3980(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF3980)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -40,7 +40,7 @@ def f_1731(numbers):
 import unittest
 import math
 
-class TestF1731(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_type(self):
         """Test that the function returns a float with a non-empty list."""
         result = f_1731([2, 3, 5])
@@ -85,7 +85,7 @@ class TestF1731(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF1731)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

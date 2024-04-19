@@ -73,7 +73,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 
-class TestF2658(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         self.mock_server = MagicMock()
@@ -144,7 +144,7 @@ class TestF2658(unittest.TestCase):
 def run_tests():
     """Run all tests for this function."""
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF2658)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
