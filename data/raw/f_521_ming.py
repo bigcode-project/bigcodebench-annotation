@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 
 def f_521(x, y, labels):
@@ -50,7 +53,7 @@ import unittest
 import numpy.testing as npt
 
 
-class TestF521(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Sample data for testing
         self.x = [np.array([1,2,3]), np.array([4,5,6])]
@@ -93,5 +96,14 @@ class TestF521(unittest.TestCase):
             npt.assert_array_equal(orig, after)
 
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

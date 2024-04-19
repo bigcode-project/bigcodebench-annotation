@@ -3,7 +3,9 @@ from unittest.mock import patch
 import pandas as pd
 import numpy as np
 from random import choice
-
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 PENALTIES_COST = [100, 200, 300, 400, 500]
@@ -29,7 +31,6 @@ def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
     >>> goals = {'Team A': 3, 'Team B': 2}
     >>> penalties = {'Team A': 1, 'Team B': 0}
     >>> report = f_473(goals, penalties)
-    >>> print(report)
     """
     report_data = []
     for team in TEAMS:
@@ -49,7 +50,7 @@ def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
     return report_df
 
 
-class TestF473(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     @patch('f_473_ming.choice', return_value=400)
     def test_goals_greater_than_penalties(self, mock_choice):
@@ -144,5 +145,14 @@ class TestF473(unittest.TestCase):
         pd.testing.assert_frame_equal(result_df, expected_df)
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

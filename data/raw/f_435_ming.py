@@ -1,6 +1,7 @@
 from collections import Counter
-
 import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,7 +16,7 @@ def f_435(list_of_menuitems):
         list_of_menuitems (list): A nested list of menu items.
 
     Returns:
-        matplotlib.axes.Axes: An Axes object representing the visualization.
+        matplotlib.axes.Axes: An Axes object representing the visualization, or None if there are no items to plot.
 
     Requirements:
         - collections
@@ -28,13 +29,26 @@ def f_435(list_of_menuitems):
         >>> isinstance(ax, matplotlib.axes.Axes)
         True
     """
+    if not list_of_menuitems or not any(list_of_menuitems):
+        print("No items to plot.")
+        return None
+
     # Flatten the nested list into a single list of items
     flat_list = [item for sublist in list_of_menuitems for item in sublist]
+    if not flat_list:
+        print("No items to plot.")
+        return None
+
     # Count the occurrence of each item
     counter = Counter(flat_list)
 
     # Convert the counter to a DataFrame
     df = pd.DataFrame(counter.items(), columns=['Item', 'Count'])
+
+    # Ensure there is data to plot
+    if df.empty:
+        print("No items to plot.")
+        return None
 
     # Create a seaborn barplot
     sns.set(style="whitegrid")
@@ -46,7 +60,7 @@ def f_435(list_of_menuitems):
 
 import unittest
 
-class TestF435(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         # Set up any repeated data here
         self.menu_items = [['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']]
@@ -57,10 +71,9 @@ class TestF435(unittest.TestCase):
         self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
 
     def test_empty_list(self):
-        """Test the function with an empty list."""
+        """Test the function with an empty list, expecting None as there's nothing to plot."""
         ax = f_435([])
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
-        # Additional checks can be added for the properties of `ax` to ensure it's handling empty data gracefully
+        self.assertIsNone(ax)
 
     def test_single_item_list(self):
         """Test the function with a list containing a single menu item."""
@@ -80,7 +93,17 @@ class TestF435(unittest.TestCase):
         self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
         # Verifying that 'Soda' and 'Water' both appear and have the same count could be done here
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()
 
 

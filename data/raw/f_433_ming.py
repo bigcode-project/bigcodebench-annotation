@@ -35,7 +35,7 @@ def f_433(df):
 import unittest
 from io import StringIO
 
-class TestF433(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_encode_basic_dataframe(self):
         df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
         encoded_df = f_433(df)
@@ -66,6 +66,14 @@ class TestF433(unittest.TestCase):
         decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
         pd.testing.assert_frame_equal(df, decoded_csv)
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
 
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -32,7 +32,6 @@ def f_519(texts):
     Example:
     >>> texts = ["Hello, world!", "Machine learning is great.", "Python is my favorite programming language."]
     >>> dtm = f_519(texts)
-    >>> print(dtm)
     """
     cleaned_texts = [ALPHANUMERIC.sub(' ', text).lower() for text in texts]
     tokenized_texts = [' '.join(word for word in text.split() if word not in STOPWORDS) for text in cleaned_texts]
@@ -46,7 +45,7 @@ def f_519(texts):
 
 import unittest
 
-class TestF519(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.texts = [
@@ -84,5 +83,14 @@ class TestF519(unittest.TestCase):
         self.assertIn("upper", dtm.columns, "All text should be converted to lowercase.")
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 def f_512(dataframe, target_value):
     '''
@@ -22,11 +25,7 @@ def f_512(dataframe, target_value):
     - matplotlib.pyplot
 
     Example:
-    >>> df = pd.DataFrame({
-            'Column1': ['0', 'a', '332', '33'],
-            'Column2': ['1', 'bb', '33', '22'],
-            'Column3': ['2', 'ccc', '2', '332']
-        })
+    >>> df = pd.DataFrame({'Column1': ['0', 'a', '332', '33']})
     >>> series, ax = f_512(df, '332')
     '''
     # Convert dataframe to string type for uniform comparison
@@ -110,5 +109,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(counts['Column3'], 1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

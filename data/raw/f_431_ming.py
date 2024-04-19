@@ -3,7 +3,7 @@ import hashlib
 import os
 
 def f_431(password: str, salt_length: int = 8) -> str:
-    '''
+    """
     Encrypt a password using Salt and SHA-256, then encode the result in base64.
 
     Parameters:
@@ -19,8 +19,9 @@ def f_431(password: str, salt_length: int = 8) -> str:
     - os
 
     Example:
-    >>> f_431('my_password')
-    '''
+    >>> isinstance(f_431('my_password'), str)
+    True
+    """
     # Generate a random salt
     salt = os.urandom(salt_length)
     # Use the salt and the password to create a SHA-256 hash
@@ -73,5 +74,13 @@ class PasswordEncryptionTests(unittest.TestCase):
         encrypted = f_431("")
         self.assertTrue(isinstance(encrypted, str) and len(encrypted) > 0)
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

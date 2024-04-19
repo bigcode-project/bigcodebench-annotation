@@ -2,7 +2,9 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 from random import sample
-
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
@@ -106,5 +108,8 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(modified_df, df)
         self.assertEqual(len(plots), 2)
 
+
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

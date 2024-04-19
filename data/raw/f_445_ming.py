@@ -1,3 +1,8 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -85,5 +90,7 @@ class TestArrayStatistics(unittest.TestCase):
         self.assertIsInstance(ax, plt.Axes)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

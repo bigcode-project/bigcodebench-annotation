@@ -1,3 +1,8 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 import numpy as np
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
@@ -27,9 +32,15 @@ def f_453():
         A tuple containing the numpy array of data points and the fitted KMeans model.
 
     Example:
-        >>> data, kmeans_model = f_453()
-        This will display a scatter plot of clustered points and return the
-        data points and the KMeans model used for clustering.
+    >>> data, kmeans = f_453()
+    >>> isinstance(data, np.ndarray)  # Check if data is a numpy array
+    True
+    >>> data.shape == (1000, 2)  # Verify the shape of the data array
+    True
+    >>> isinstance(kmeans, KMeans)  # Confirm kmeans is an instance of KMeans
+    True
+    >>> len(kmeans.cluster_centers_) == 5  # Check the number of clusters
+    True
     """
     # Generate random 2D points
     data = np.array([(np.random.randint(0, RANGE), np.random.randint(0, RANGE)) for _ in range(SIZE)])
@@ -54,7 +65,7 @@ import unittest
 import numpy as np
 from sklearn.cluster import KMeans
 
-class TestF453(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_data_size(self):
         """Ensure the generated data has the correct size."""
         data, _ = f_453()
@@ -81,6 +92,14 @@ class TestF453(unittest.TestCase):
         _, kmeans = f_453()
         self.assertEqual(len(kmeans.labels_), SIZE)
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
 
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

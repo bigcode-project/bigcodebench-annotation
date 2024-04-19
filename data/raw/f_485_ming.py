@@ -1,7 +1,9 @@
 import numpy as np
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Constants
 N_COMPONENTS = 2
 
@@ -25,7 +27,7 @@ def f_485(L):
     >>> type(pca_result)
     <class 'numpy.ndarray'>
     >>> type(plot)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._axes.Axes'>
     """
     data = np.array(L)
 
@@ -85,4 +87,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

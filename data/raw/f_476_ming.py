@@ -2,6 +2,10 @@ import pandas as pd
 from random import randint, seed
 import unittest
 from pandas.testing import assert_frame_equal
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 # Method
 def f_476(goals, penalties, rng_seed=None):
@@ -25,9 +29,11 @@ def f_476(goals, penalties, rng_seed=None):
     >>> results = f_476(5, 3, 42)
     >>> print(results)
          Team      Match Result
-    0  Team A  (3 goals, $3000)
-    1  Team B  (1 goals, $2000)
-    ...
+    0  Team A     (5 goals, $0)
+    1  Team B  (0 goals, $2000)
+    2  Team C  (1 goals, $1000)
+    3  Team D     (1 goals, $0)
+    4  Team E     (5 goals, $0)
     """
     # Constants
     TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
@@ -49,7 +55,7 @@ def f_476(goals, penalties, rng_seed=None):
     return results_df
 
 # Test Suite
-class TestF476(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         self.teams = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
         self.penalty_cost = 1000  # Match the PENALTY_COST used in f_476
@@ -126,5 +132,14 @@ class TestF476(unittest.TestCase):
             self.assertTrue(0 <= penalty_cost <= max_penalty_cost, f"Penalty cost {penalty_cost} not within range 0 to {max_penalty_cost}")
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

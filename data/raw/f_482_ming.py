@@ -2,6 +2,9 @@ import numpy as np
 from itertools import chain
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 def f_482(L):
     '''
@@ -22,7 +25,7 @@ def f_482(L):
     Examples:
     >>> ax = f_482([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._axes.Axes'>
     '''
     data = list(chain(*L))
     data = np.array(data).reshape(-1, 1)
@@ -73,4 +76,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

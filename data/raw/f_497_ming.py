@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 from random import randint
 import matplotlib.pyplot as plt
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 # Constants
 COLUMNS = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
@@ -27,8 +30,8 @@ def f_497(rows):
 
     Example:
     >>> df, ax = f_497(10)
-    >>> print(df)
     >>> print(ax.title.get_text())  # Should return 'Non-Zero Value Counts'
+    Non-Zero Value Counts
     """
     plt.close('all')  # Clear previous plots
     
@@ -98,4 +101,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

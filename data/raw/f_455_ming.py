@@ -33,21 +33,21 @@ def f_455(hours):
     - str: The path of the generated CSV file.
 
     Requirements:
-    - datetime: To generate the current timestamp for each sensor data row.
-    - os: For handling file and directory paths.
-    - random: To generate random sensor data values.
-    - csv: For writing the sensor data to a CSV file.
+    - datetime
+    - os
+    - random
+    - csv
 
     Example:
-    >>> file_path = f_455(24)
-    >>> print(file_path)
-    The function will return the path to the created CSV file containing the sensor data.
-
-    Note:
-    This function also demonstrates the use of the 'os' module to check for the existence of
-    the directory where the CSV file will be saved, creating it if necessary, to ensure that
-    the file writing operation does not fail due to a missing directory.
+    >>> file_path = f_455(1)  # Generate data for 1 hour
+    >>> os.path.exists(file_path)  # Check if the file was actually created
+    True
+    >>> isinstance(file_path, str)  # Validate that the return type is a string
+    True
+    >>> 'sensor_data.csv' in file_path  # Ensure the filename is correct
+    True
     """
+
     ensure_directory_exists(FILE_PATH)  # Ensure the directory exists
 
     data = [['Time'] + SENSORS]
@@ -65,7 +65,7 @@ def f_455(hours):
 import unittest
 import os
 
-class TestF455(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def tearDown(self):
         """Clean up any files created during the tests."""
@@ -105,7 +105,15 @@ class TestF455(unittest.TestCase):
         with open(FILE_PATH, 'r') as f:
             self.assertEqual(len(f.readlines()), 1)  # Only header row expected
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
 
-if __name__ == '__main__':
-    unittest.main()
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()
 

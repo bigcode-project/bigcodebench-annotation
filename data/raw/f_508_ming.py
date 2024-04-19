@@ -19,8 +19,8 @@ def f_508(date_str, from_tz, to_tz):
     - pytz
     - dateutil.parser
     Example:
-    >>> f_508('2022-10-22 11:59:59', 'UTC', 'America/Chicago')
-    <some_integer_output>
+    >>> type(f_508('2022-10-22 11:59:59', 'UTC', 'America/Chicago'))
+    <class 'int'>
     """
     # Get timezone objects for the source and destination timezones
     from_tz_obj = pytz.timezone(from_tz)
@@ -95,4 +95,6 @@ def run_tests():
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

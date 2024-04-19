@@ -18,14 +18,14 @@ def f_503(directory: str, pattern: str = r"(?<!Distillr)\\AcroTray\.exe") -> dic
     - dict: A dictionary with file paths as keys and their SHA256 hashes as values.
 
     Requirements:
-    - re: For regex matching.
-    - os: For walking through the directory.
-    - hashlib: For computing SHA256 hashes.
-    - binascii: For converting hash bytes to hexadecimal string.
+    - re
+    - os
+    - hashlib
+    - binascii
 
     Example:
-    >>> f_503("/path/to/directory")
-    {'/path/to/directory/AcroTray.exe': 'abc123...'}
+    >>> f_503(DATA_DIR)
+    {}
     """
     hashes = {}
     for root, _, files in os.walk(directory):
@@ -44,7 +44,7 @@ import tempfile
 import shutil
 import os
 
-class TestF503(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.test_dir = DATA_DIR
@@ -118,5 +118,14 @@ class TestF503(unittest.TestCase):
         self.assertEqual(len(result), 0)
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

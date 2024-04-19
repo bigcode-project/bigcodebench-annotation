@@ -1,7 +1,9 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 import unittest
-
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 GOALS_RANGE = (-10, 10)
@@ -18,8 +20,23 @@ def f_474_and_plot(goals, penalties):
     Returns:
     - DataFrame: A pandas DataFrame with columns 'Team' and 'Score', representing each team's net score.
 
-    Additionally, this function plots the score distribution using matplotlib to provide a visual representation of the scores.
+    Requirements:
+    - pandas
+    - matplotlib
+
+    Example:
+    >>> goals = {'Team A': 5, 'Team B': 3, 'Team C': 1, 'Team D': 0, 'Team E': 4}
+    >>> penalties = {'Team A': 1, 'Team B': 1, 'Team C': 1, 'Team D': 0, 'Team E': 2}
+    >>> df = f_474_and_plot(goals, penalties)
+    >>> print(df)
+         Team  Score
+    0  Team A      4
+    1  Team B      2
+    2  Team C      0
+    3  Team D      0
+    4  Team E      2
     """
+
     scores_data = []
 
     for team in TEAMS:
@@ -45,7 +62,7 @@ def f_474_and_plot(goals, penalties):
 
 
 # Unit Tests
-class TestF474AndPlot(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_no_goals_no_penalties(self):
         goals, penalties = {}, {}
         expected = pd.DataFrame({'Team': TEAMS, 'Score': [0] * 5})
@@ -76,5 +93,14 @@ class TestF474AndPlot(unittest.TestCase):
         pd.testing.assert_frame_equal(f_474_and_plot(goals, penalties), expected)
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

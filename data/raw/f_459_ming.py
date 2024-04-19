@@ -20,6 +20,14 @@ def f_459(df, letter):
 
     Requirements:
     - pandas
+
+    Example:
+    >>> df = pd.DataFrame({'Name': ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Fiona']})
+    >>> filtered_names = f_459(df, 'a')
+    >>> filtered_names.index[0].startswith('A')
+    True
+    >>> len(filtered_names)
+    1
     """
     regex = f'^{letter}'
     filtered_df = df[df['Name'].str.contains(regex, case=False, regex=True)]
@@ -29,7 +37,7 @@ def f_459(df, letter):
 
 ### Unit Tests
 
-class TestF459(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         """Generate a DataFrame for testing."""
         self.df = pd.DataFrame({'Name': [choice(LETTERS) + 'name' + str(randint(1, 100)) for _ in range(100)]})
@@ -65,5 +73,14 @@ class TestF459(unittest.TestCase):
         self.assertEqual(sum(result), 2)
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -3,6 +3,9 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from random import randint, seed
 import unittest
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
@@ -32,9 +35,9 @@ def f_480(goals, penalties, rng_seed=None):
 
     Example:
     >>> df, model = f_480(5, 3, rng_seed=42)
-    >>> print(df.head())
     >>> predictions = model.predict([[2], [3]])
     >>> print(predictions)
+    [706.89655172 439.65517241]
     """
     if rng_seed is not None:
         seed(rng_seed)
@@ -59,7 +62,7 @@ def f_480(goals, penalties, rng_seed=None):
 
 
 # Unit Tests
-class TestF480(unittest.TestCase):
+class TestCases(unittest.TestCase):
     """A set of unit tests to ensure the functionality of f_480."""
 
     def test_dataframe_structure(self):
@@ -90,5 +93,14 @@ class TestF480(unittest.TestCase):
         self.assertIsNotNone(model.coef_[0])
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

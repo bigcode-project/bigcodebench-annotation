@@ -44,7 +44,6 @@ Example:
 
 import unittest
 from unittest.mock import patch
-from gensim.models import Word2Vec
 
 stopwords_mock = ["is", "my", "a", "with", "and", "it", "to", "the", "of", "in"]
 
@@ -88,4 +87,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

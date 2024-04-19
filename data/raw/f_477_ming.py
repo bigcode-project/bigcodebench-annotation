@@ -2,14 +2,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from random import randint, seed
 import unittest
-
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Constants (they can be overridden with default parameters)
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 PENALTY_COST = 1000  # in dollars
 
 
 def f_477(goals, penalties, teams=TEAMS, penalty_cost=PENALTY_COST, rng_seed=None):
-    '''
+    """
     Generate and record a Pandas DataFrame of the results of football matches for multiple teams
     with random goals and penalties, and create a bar plot of the results. Penalties are converted into fines according to the penalty costs.
 
@@ -30,10 +32,13 @@ def f_477(goals, penalties, teams=TEAMS, penalty_cost=PENALTY_COST, rng_seed=Non
     - random
 
     Example:
-    >>> df, ax = f_477(5, 3)
-    >>> print(df.head())
-    >>> plt.show()  # This will display the bar plot
-    '''
+    >>> seed(42)  # Setting seed for reproducibility
+    >>> df, ax = f_477(5, 3, rng_seed=42)
+    >>> isinstance(df, pd.DataFrame) and 'Team' in df.columns and 'Goals' in df.columns and 'Penalty Cost' in df.columns
+    True
+    >>> all(df['Goals'] <= 5) and all(df['Penalty Cost'] <= 3000)  # Goals and penalties are within expected range
+    True
+    """
     if rng_seed is not None:
         seed(rng_seed)
 
@@ -56,7 +61,7 @@ def f_477(goals, penalties, teams=TEAMS, penalty_cost=PENALTY_COST, rng_seed=Non
 
 
 # Unit Tests
-class TestF477(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_positive_outcomes(self):
         """Test the function with positive goals and penalties."""
         df, _ = f_477(5, 3, rng_seed=42)
@@ -93,5 +98,14 @@ class TestF477(unittest.TestCase):
         self.assertTrue((df['Penalty Cost'] % custom_cost == 0).all() or (df['Penalty Cost'] == 0).all())
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

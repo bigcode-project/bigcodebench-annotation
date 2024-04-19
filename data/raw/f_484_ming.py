@@ -2,6 +2,10 @@ import numpy as np
 from itertools import chain
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 def f_484(L):
     """
@@ -23,7 +27,7 @@ def f_484(L):
     Example:
     >>> ax = f_484([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._axes.Axes'>
     """
     # Constants
     N_CLUSTERS = 3
@@ -43,11 +47,11 @@ import matplotlib.pyplot as plt
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(FunctionTests))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
-class FunctionTests(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_case_1(self):
         ax = f_484([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
         self.assertIsInstance(ax, plt.Axes)
@@ -68,5 +72,8 @@ class FunctionTests(unittest.TestCase):
         ax = f_484([[-1, -2, -3], [-50, -60, -70], [-100, -110, -120]])
         self.assertIsInstance(ax, plt.Axes)
 
+
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

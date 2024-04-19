@@ -1,3 +1,8 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 import random
 import math
 import matplotlib.pyplot as plt
@@ -27,7 +32,12 @@ def f_450(size=SIZE, frequency=1):
     
     Example:
     >>> ax = f_450(size=1000, frequency=1)
-    This will return a plot of a sinusoidal wave with 1000 points and a frequency of 1.
+    >>> isinstance(ax, matplotlib.axes.Axes)
+    True
+    >>> len(ax.lines[0].get_ydata()) == 1000  # Verify the number of data points in the sinusoidal wave
+    True
+    >>> isinstance(ax.lines[0].get_ydata()[0], float)  # Check if y-values are floating-point numbers
+    True
     '''
     x_values = np.arange(0, size)
     y_values = [math.sin((2 * PI / RANGE) * (x + int(RANGE * random.random()) * frequency)) for x in range(size)]
@@ -79,5 +89,9 @@ class TestCases(unittest.TestCase):
         x_data, y_data = ax.lines[0].get_data()
         self.assertEqual(len(x_data), size_random)
         self.assertTrue(min(y_data) >= -1 and max(y_data) <= 1)
+
+
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

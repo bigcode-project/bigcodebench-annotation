@@ -2,6 +2,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import random
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
@@ -29,7 +33,7 @@ def f_437(a, b):
     Example:
     >>> ax = f_437([1, 2, 3], ['A', 'B', 'C', 'D', 'E'])
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._axes.Axes'>
     """
     if not a or not b:  # Check if either list is empty
         fig, ax = plt.subplots()  # Creates a blank plot
@@ -49,7 +53,7 @@ def f_437(a, b):
 import unittest
 import matplotlib
 
-class TestF437(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_non_empty_lists(self):
         """Test with valid non-empty lists."""
         ax = f_437([1, 2, 3], ['A', 'B', 'C'])
@@ -76,5 +80,14 @@ class TestF437(unittest.TestCase):
         self.assertIsInstance(ax, matplotlib.axes.Axes)
 
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

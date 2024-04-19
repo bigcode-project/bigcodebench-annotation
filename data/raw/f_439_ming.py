@@ -1,3 +1,7 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -25,13 +29,8 @@ def f_439(a, b, columns=['A', 'B']):
 
     Example:
         >>> df, ax = f_439([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
-        >>> print(df)
-               A         B
-        0 -1.414214 -1.414214
-        1 -0.707107 -0.707107
-        2  0.000000  0.000000
-        3  0.707107  0.707107
-        4  1.414214  1.414214
+        >>> isinstance(df, pd.DataFrame) and isinstance(ax, matplotlib.axes.Axes)
+        True
     """
     # Handle empty input lists by returning an empty DataFrame and Axes object
     if len(a) == 0 or len(b) == 0:
@@ -53,7 +52,7 @@ import pandas as pd
 import matplotlib
 
 
-class TestF439(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_standard_case(self):
         """Test the function with non-empty lists."""
         df, ax = f_439([1, 2, 3], [4, 5, 6])
@@ -86,5 +85,13 @@ class TestF439(unittest.TestCase):
         self.assertIsInstance(ax, matplotlib.axes.Axes)
 
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

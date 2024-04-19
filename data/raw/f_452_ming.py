@@ -1,3 +1,8 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -28,8 +33,14 @@ def f_452():
 
     Example:
         >>> df = f_452()
-        This will display a scatter plot of points corresponding to the 'X' and 'Y' columns in the DataFrame.
-        The DataFrame itself is returned and can be inspected or used for further analysis.
+        >>> isinstance(df, pd.DataFrame)
+        True
+        >>> 'X' in df.columns and 'Y' in df.columns
+        True
+        >>> len(df)
+        1000
+        >>> all(df['X'].between(0, RANGE - 1)) and all(df['Y'].between(0, RANGE - 1))
+        True
     """
     # Generate the DataFrame with random integers within the specified range [0, RANGE)
     df = pd.DataFrame({
@@ -46,7 +57,7 @@ def f_452():
 
 import unittest
 
-class TestF452(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_dataframe_shape(self):
         """Test that the DataFrame has the correct shape."""
         df = f_452()
@@ -75,6 +86,14 @@ class TestF452(unittest.TestCase):
         self.assertTrue(np.issubdtype(df['X'].dtype, np.integer))
         self.assertTrue(np.issubdtype(df['Y'].dtype, np.integer))
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
 
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

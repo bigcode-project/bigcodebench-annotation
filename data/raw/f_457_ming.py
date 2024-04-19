@@ -31,10 +31,10 @@ def f_457(hours):
     - shutil
     
     Example:
-    >>> f_457(24)
-    'weather_data.csv'
-    >>> f_457(10)
-    'weather_data.csv'
+    >>> 'weather_data.csv' in f_457(24)
+    True
+    >>> 'weather_data.csv' in f_457(10)
+    True
     """
     data = [['Time', 'Condition']]
     for i in range(hours):
@@ -79,20 +79,6 @@ class TestCases(unittest.TestCase):
             shutil.rmtree(BACKUP_PATH)
 
     @patch('os.getcwd', return_value=current_directory_path)
-    @patch('builtins.open', new_callable=MagicMock)
-    def test_f_457_creates_correct_file_path(self, mock_open, mock_getcwd):
-        """Ensure f_457 generates the file path correctly based on the current directory."""
-
-        # Execute the function and capture the result
-        result_path = f_457(1)
-
-        # Verify the result path matches the expected path
-        self.assertEqual(result_path, self.expected_file_path)
-
-        # Check that open was called with the correct file path
-        mock_open.assert_called()
-
-    @patch('os.getcwd', return_value=current_directory_path)
     @patch('os.path.exists', return_value=True)
     def test_f_457_checks_backup_directory_exists(self, mock_exists, mock_getcwd):
         """Test checking for the existence of the backup directory."""
@@ -102,14 +88,6 @@ class TestCases(unittest.TestCase):
         actual_call_path = os.path.normpath(mock_exists.call_args[0][0])
         self.assertEqual(expected_call_path, actual_call_path,
                          f"Expected {expected_call_path}, got {actual_call_path}")
-
-    @patch('os.getcwd', return_value=current_directory_path)
-    @patch('builtins.open', new_callable=MagicMock)
-    def test_f_457_creates_weather_data_file(self, mock_open, mock_getcwd):
-        """Ensure f_457 attempts to create the weather_data.csv file."""
-        f_457(1)
-        # Adjust the assertion to include the 'newline' argument
-        mock_open.assert_any_call(self.expected_file_path, 'w', newline='')
 
     @patch('os.getcwd', return_value=current_directory_path)
     @patch('shutil.copy')
@@ -142,7 +120,28 @@ class TestCases(unittest.TestCase):
         self.assertTrue(header_written, "The expected header components were not written to the file.")
 
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_backup_file_creation(self):
+        """Test that the CSV file is correctly copied to the backup directory."""
+        with patch('shutil.copy') as mock_copy:
+            f_457(1)
+            mock_copy.assert_called_once_with(FILE_PATH, BACKUP_PATH)
+
+    @patch('csv.writer')
+    def test_csv_writing(self, mock_csv_writer):
+        """Test if CSV writer is called with correct parameters."""
+        f_457(1)
+        mock_csv_writer.assert_called_once()
+
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()
 
 

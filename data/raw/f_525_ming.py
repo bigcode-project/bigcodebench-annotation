@@ -4,6 +4,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import statistics
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 
 def f_525(sales_data):
@@ -17,10 +20,10 @@ def f_525(sales_data):
     - ax (matplotlib.axes.Axes): Axes object with the sales trends plot.
 
     Requirements:
-    - pandas for data manipulation.
-    - matplotlib.pyplot for plotting.
-    - numpy for numerical operations.
-    - statistics for standard deviation calculation.
+    - pandas
+    - matplotlib.pyplot
+    - numpy
+    - statistics
 
     Example usage:
     >>> sales_data = pd.DataFrame({
@@ -56,7 +59,7 @@ def f_525(sales_data):
     return ax
 
 
-class TestF525(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Generating a sample sales DataFrame
@@ -86,7 +89,7 @@ class TestF525(unittest.TestCase):
         """Verify that all months are correctly plotted as x-ticks."""
         ax = f_525(self.sales_data)
         # Convert x-ticks to integers for comparison
-        x_ticks = [int(tick) for tick in ax.get_xticks() if tick.is_integer()]
+        x_ticks = [int(tick) for tick in ax.get_xticks() if isinstance(tick, (int, np.integer))]
         expected_ticks = self.sales_data['Month'].tolist()
         self.assertListEqual(x_ticks, expected_ticks, "Not all months are correctly plotted as x-ticks.")
 
@@ -104,5 +107,14 @@ class TestF525(unittest.TestCase):
                                 "Missing standard deviation shading for one or more products.")
 
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

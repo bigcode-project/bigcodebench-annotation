@@ -1,3 +1,4 @@
+import binascii
 import os
 import base64
 

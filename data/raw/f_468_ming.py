@@ -1,3 +1,8 @@
+from collections import Counter
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -29,9 +34,6 @@ def f_468(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=COLUMNS)
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
     >>> modified_df, plots = f_468(df, tuples, 3)
-    >>> print(modified_df.head())
-    >>> for ax in plots:
-    >>>     plt.show(ax.figure)
     '''
 
     # Ensure tuple elements match DataFrame columns for removal
@@ -54,7 +56,7 @@ from unittest.mock import patch
 import pandas as pd
 import numpy as np
 
-class TestF468(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=COLUMNS)
@@ -91,5 +93,14 @@ class TestF468(unittest.TestCase):
         self.assertIn(plot_columns[1], COLUMNS, "Y-axis should be from COLUMNS.")
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

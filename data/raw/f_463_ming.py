@@ -1,3 +1,8 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -28,8 +33,6 @@ def f_463(df, letter):
     Example:
     >>> words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
     >>> df = pd.DataFrame({'Word': words})
-    >>> ax = f_463(df, 'a')
-    # This will display a box plot for the word lengths of 'apple', 'apricot', and 'avocado'.
     """
     # Validate if 'Word' column exists in df
     if 'Word' not in df.columns:
@@ -51,34 +54,10 @@ def f_463(df, letter):
     ax.set_title(f"Word Lengths Distribution for Words Starting with '{letter}'")
     return ax
 
-
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 import unittest
 from unittest.mock import patch
 
-
-def f_463(df, letter):
-    """
-    Filters rows in a DataFrame based on the starting letter of the values in the 'Word' column.
-    Calculates the lengths of these words and returns a box plot representing the distribution
-    of these lengths.
-    """
-    if 'Word' not in df.columns:
-        raise ValueError("The DataFrame should contain a 'Word' column.")
-    if df.empty:
-        return None
-
-    regex = f'^{letter}'
-    filtered_df = df[df['Word'].str.match(regex)]
-    word_lengths = filtered_df['Word'].str.len()
-    ax = sns.boxplot(x=word_lengths)
-    ax.set_title(f"Word Lengths Distribution for Words Starting with '{letter}'")
-    return ax
-
-
-class TestF463(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         self.words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
         self.df = pd.DataFrame({'Word': self.words})
@@ -115,5 +94,14 @@ class TestF463(unittest.TestCase):
             f_463(df_without_word, 'a')
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

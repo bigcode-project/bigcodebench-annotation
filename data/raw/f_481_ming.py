@@ -21,13 +21,9 @@ def f_481(L):
     DataFrame: A pandas DataFrame with random integers.
     
     Example:
-    >>> f_481([[2, 3], [5, 6]])
-    Output (structure only, values will vary):
-    |   | 0 | 1 | 2 | ... |
-    |---|---|---|---|-----|
-    | 0 | x | x | x | ... |
-    | 1 | x | x | x | ... |
-    |...|...|...|...|...  |
+    >>> df = f_481([[2, 3], [5, 6]])
+    >>> type(df)
+    <class 'pandas.core.frame.DataFrame'>
     '''
     rows, columns = L[0][0] * L[0][1], L[1][0] * L[1][1]
     random_array = np.random.randint(RANGE[0], RANGE[1], size=(rows, columns))
@@ -77,5 +73,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue((result.values <= 100).all())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

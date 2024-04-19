@@ -1,6 +1,11 @@
 import numpy as np
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
+
 
 def f_446(array_length=100, noise_level=0.2):
     """
@@ -21,7 +26,7 @@ def f_446(array_length=100, noise_level=0.2):
     Example:
     >>> ax = f_446(100, 0.2)
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._axes.Axes'>
     """
     x = np.linspace(0, 4*np.pi, array_length)
     y = np.sin(x) + noise_level * np.random.rand(array_length)
@@ -91,4 +96,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

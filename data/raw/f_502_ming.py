@@ -24,14 +24,13 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
     - pd.DataFrame: DataFrame with a single column 'File Path' of matched paths.
 
     Requirements:
-    - re for regex matching.
-    - pandas for DataFrame operations.
-    - csv for CSV file writing.
-    - os for directory traversal and file operations.
+    - re
+    - pandas
+    - csv
+    - os
 
     Example usage:
     >>> df = f_502(".*\.txt$", "/path/to/search", "matched_files.csv")
-    DataFrame will contain file paths of all .txt files in the search path.
     """
     matched_paths = []
     for root, _, files in os.walk(directory):
@@ -46,7 +45,7 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
 
 import unittest
 
-class TestF502(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.test_dir = DATA_DIR
@@ -99,5 +98,14 @@ class TestF502(unittest.TestCase):
         self.assertIn("test1.txt", df['File Path'].values[0])
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

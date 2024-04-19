@@ -4,6 +4,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 # Hard-coded list of common English stopwords for demonstration purposes
 STOPWORDS = set(["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", 
@@ -32,8 +35,24 @@ def f_496(text, n=2):
         - pd.DataFrame: Square co-occurrence matrix of words.
         - matplotlib.axes.Axes: Plot object of the co-occurrence matrix.
 
-    Requires:
-    - Python libraries: re, pandas, matplotlib, numpy, sklearn
+    Requirements:
+        - re
+        - pandas
+        - matplotlib
+        - numpy
+        - sklearn
+
+    Example:
+    >>> text = "hello hello world world"
+    >>> df, ax = f_496(text, n=2)
+    >>> df.columns.tolist()
+    ['hello world']
+    >>> df.index.tolist()
+    ['hello world']
+    >>> df.iloc[0, 0]
+    0
+    >>> isinstance(ax, matplotlib.axes.Axes)
+    True
     """
     # Pre-processing the text
     # Remove duplicate consecutive words
@@ -69,7 +88,7 @@ def f_496(text, n=2):
 
 import unittest
 
-class TestF496(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_simple_text(self):
         """Test with a simple text."""
         text = "hello world"
@@ -104,5 +123,14 @@ class TestF496(unittest.TestCase):
         self.assertTrue(matrix.empty, "Matrix should be empty for an empty string.")
 
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

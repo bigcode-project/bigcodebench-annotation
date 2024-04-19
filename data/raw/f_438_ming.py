@@ -3,7 +3,10 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 import matplotlib.pyplot as plt
-
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 # Constants
 
 
@@ -23,16 +26,18 @@ def f_438(a, b):
 
     Example:
     >>> correlation, ax = f_438([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
-    (1.0, <matplotlib.axes._subplots.AxesSubplot object at 0x...>)
+    >>> isinstance(correlation, float) and isinstance(ax, matplotlib.axes.Axes)
+    True
+    >>> round(correlation, 1)
+    1.0
     """
     correlation, _ = stats.pearsonr(a, b)
-    return correlation, plt.gca()
-
     df = pd.DataFrame({'A': a, 'B': b})
 
     plt.scatter(df['A'], df['B'])
     plt.plot(np.unique(df['A']), np.poly1d(np.polyfit(df['A'], df['B'], 1))(np.unique(df['A'])), color='red')
     plt.show()
+    return correlation, plt.gca()
 
 import unittest
 import numpy as np
@@ -71,4 +76,6 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

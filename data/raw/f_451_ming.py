@@ -1,3 +1,8 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 import random
 import numpy as np
 from scipy import stats
@@ -21,6 +26,12 @@ def f_451(size=1000, bin_width=100):
     
     Example:
     >>> fig = f_451(size=500, bin_width=50)
+    >>> isinstance(fig, matplotlib.figure.Figure)  # Check if the output is a matplotlib figure object
+    True
+    >>> len(fig.axes[0].lines) == 1  # Ensure there is one line plot on the axes for the PDF
+    True
+    >>> len(fig.axes[0].patches) > 10  # Check if there are histogram bars (patches) present
+    True
     '''
     data = np.random.randn(size)
     mu, std = stats.norm.fit(data)
@@ -79,5 +90,9 @@ class TestCases(unittest.TestCase):
         ax = fig.axes[0]
         self.assertGreaterEqual(len(ax.patches), 5, "Expected at least 5 bars in the histogram")
         self.assertEqual(len(ax.lines), 1, "Expected 1 line for the PDF plot")
+
+
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

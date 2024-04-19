@@ -43,7 +43,7 @@ def f_461(df, letter):
     return ax
 
 
-class TestF461(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         """Initialize testing dataframe."""
         self.df = pd.DataFrame({'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'avocado']})
@@ -81,5 +81,14 @@ class TestF461(unittest.TestCase):
         self.assertIsNone(ax, "Expected None when no words start with the specified letter.")
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

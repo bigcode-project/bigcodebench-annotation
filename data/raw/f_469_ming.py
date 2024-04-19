@@ -3,6 +3,10 @@ import numpy as np
 import seaborn as sns
 from random import sample
 
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
@@ -94,5 +98,9 @@ class TestCases(unittest.TestCase):
         modified_df, plots = f_469(self.df, tuples, 4)
         self.assertTrue((10, 20, 30, 40, 50) not in modified_df.values)
         self.assertEqual(len(plots), 4)
+
+
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

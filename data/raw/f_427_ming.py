@@ -4,6 +4,7 @@ import hashlib
 
 KEYS = ['470FC614', '4A0FC614', '4B9FC614', '4C8FC614', '4D7FC614']
 
+
 def f_427(hex_keys=KEYS, seed=42):
     """
     Given a list of hexadecimal string keys, this function selects one at random,
@@ -21,15 +22,15 @@ def f_427(hex_keys=KEYS, seed=42):
     ValueError: If contains invalid hexadecimal strings.
 
     Requirements:
-    - struct: To unpack the hexadecimal string to a floating-point number.
-    - hashlib: To compute the MD5 hash of the floating-point number.
-    - random: To randomly select a hexadecimal string from the list.
+    - struct
+    - hashlib
+    - random
 
     Example:
     >>> f_427(['1a2b3c4d', '5e6f7g8h'])
     '426614caa490f2c185aebf58f1d4adac'
     """
-    
+
     random.seed(seed)
     hex_key = random.choice(hex_keys)
 
@@ -44,13 +45,15 @@ def f_427(hex_keys=KEYS, seed=42):
 
 import unittest
 
+
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestF427))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
-class TestF427(unittest.TestCase):
+
+class TestCases(unittest.TestCase):
     def test_case_1(self):
         result = f_427(['1a2b3c4d', '5e6f7g8h'])
         self.assertEqual(result, '426614caa490f2c185aebf58f1d4adac')
@@ -71,8 +74,9 @@ class TestF427(unittest.TestCase):
         # test error message
         with self.assertRaises(ValueError):
             f_427(['1a2b3c4d', '5e6f7g8h', 'invalid_hex'])
-            
+
+
 if __name__ == "__main__":
     import doctest
-    doctest.testmod()
+    doctest.testmod(verbose=True)
     run_tests()

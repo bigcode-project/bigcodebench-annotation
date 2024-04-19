@@ -1,6 +1,9 @@
 import os
 import pandas as pd
 import json
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 # Set DATA_DIR to the 'data' subdirectory in the parent directory of this script
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -25,8 +28,8 @@ def f_493(df: pd.DataFrame, filename: str) -> str:
 
     Example:
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    >>> f_493(df, 'data.jsonl')
-    '[Path to]/data/data.jsonl'
+    >>> 'data.jsonl' in f_493(df, 'data.jsonl')
+    True
     """
     # Ensure the data directory exists
     if not os.path.exists(DATA_DIR):
@@ -49,7 +52,7 @@ import os
 import json
 import shutil
 
-class TestF493(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create the data directory if it doesn't exist."""
@@ -91,5 +94,15 @@ class TestF493(unittest.TestCase):
         path = f_493(df, 'test_special_chars.jsonl')
         self.assertTrue(os.path.exists(path))
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

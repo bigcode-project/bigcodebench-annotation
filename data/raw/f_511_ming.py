@@ -19,8 +19,8 @@ def f_511(date_str, tz_str):
     - pytz
 
     Example:
-    >>> f_511('2022-10-22 11:59:59', 'America/Chicago')
-    5772239  # Example output, actual value will depend on the current time when called
+    >>> type(f_511('2022-10-22 11:59:59', 'America/Chicago'))
+    <class 'int'>
     """
     tz = pytz.timezone(tz_str)
     given_date = parse(date_str).astimezone(tz)  # Correctly handle timezone conversion
@@ -35,7 +35,7 @@ def f_511(date_str, tz_str):
 
 import unittest
 
-class TestF511(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_time_until_new_year(self):
         # Test with a specific date and timezone
         self.assertIsInstance(f_511('2023-12-31 23:59:59', 'UTC'), int)
@@ -57,5 +57,14 @@ class TestF511(unittest.TestCase):
         self.assertIsInstance(f_511('2023-06-15 12:00:00', 'UTC'), int)
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

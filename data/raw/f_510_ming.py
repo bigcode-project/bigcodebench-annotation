@@ -21,7 +21,10 @@ def f_510(dates_str_list):
               of each weekday in the provided list.
 
     Requirements:
-    - Libraries/modules to be used: datetime, dateutil.parser, numpy, and pandas.
+    - datetime,
+    - dateutil.parser
+    - numpy
+    - pandas.
 
     Example:
     >>> f_510(['2022-10-22', '2022-10-23', '2022-10-24', '2022-10-25'])
@@ -101,4 +104,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

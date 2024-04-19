@@ -1,3 +1,8 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 import pandas as pd
 from datetime import datetime
 from random import randint
@@ -34,10 +39,13 @@ def f_454(hours, file_path=FILE_PATH):
     The function uses a dictionary to manage the generated temperature data with keys: 'Time', 'Temperature', and 'Category'.
     
     Example:
-    >>> f_454(24)
-    ('temp_data.csv', <AxesSubplot:>)
-
+    >>> file_path, ax = f_454(24)
+    >>> isinstance(file_path, str)
+    True
+    >>> 'custom_data.csv' in file_path
+    True
     """
+
     data = {'Time': [], 'Temperature': [], 'Category': []}
     for i in range(hours):
         temp = randint(-10, 40)  # random temperature between -10 and 40
@@ -119,4 +127,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

@@ -1,7 +1,9 @@
 import numpy as np
 import scipy.stats as stats
 import matplotlib.pyplot as plt
-
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Constants
 TARGET_VALUE = '332'
 ARRAY = np.array([['0', '1', '2'], ['a', 'bb', 'ccc'], ['332', '33', '2'], ['33', '22', '332']])
@@ -22,7 +24,7 @@ def f_513():
 
     Example:
     >>> f_513()
-    (2.0, 0.0, 'N/A', 'N/A')  # Example output, actual output will depend on ARRAY
+    (2.0, 'N/A', 'N/A', 'N/A')
     """
     indices = np.where(ARRAY[:,0] == TARGET_VALUE)[0]
 
@@ -51,7 +53,7 @@ def f_513():
 
 import unittest
 
-class TestF513(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_statistics_and_plot(self):
         """Test the statistical analysis and plotting."""
         result = f_513()
@@ -99,5 +101,14 @@ class TestF513(unittest.TestCase):
         self.assertNotEqual(result[3], 'N/A', "Kurtosis calculation should not return 'N/A'.")
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()
