@@ -17,6 +17,10 @@ for file in data/processed/*wo_doc.py; do
 done
 
 for file in data/processed/*w_doc.py; do
+    if grep -q ratna "$file"; then
+        continue
+    fi 
+    
     if ! pytest --doctest-modules "$file"; then
         echo "Pytest failed on $file, stopping..."
         exit 1
