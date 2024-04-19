@@ -315,6 +315,10 @@ if __name__ == "__main__":
             data = extract_content(file)
             # assert validate_lib_num(data), f"Less than 2 libraries are used in {file.replace('clean/', 'raw/')}"
             # assert validate_doc_example(data), f"Example is missing in {file.replace('clean/', 'raw/')}"
+            if not validate_lib_num(data):
+                print(file.replace('clean/', 'raw/'), "Less than 2 libraries are used")
+            if not validate_doc_example(data):
+                print(file.replace('clean/', 'raw/'), "Example is missing")
             f.write(json.dumps(data) + "\n")
             file_name = file.split("/")[-1].split(".")[0]
             file_name = file_name + "_wo_doc" if check_test_wo_doc(data) else file_name + "_w_doc"
