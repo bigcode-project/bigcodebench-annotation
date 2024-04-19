@@ -1,9 +1,8 @@
 #!/bin/bash
-
 NAME=$1
-cp data/raw/*ratna*.py data/clean
+cp data/raw/hanhu_data/*hanhu*.py data/clean
 python script/parse.py
-for file in data/processed/*wo_doc.py; do
+for file in data/processed/*hanhu*wo_doc.py; do
     pytest "$file"
     if [ $? -ne 0 ]; then
         echo "Pytest failed on $file, stopping..."
@@ -11,7 +10,7 @@ for file in data/processed/*wo_doc.py; do
     fi
 done
 
-for file in data/processed/*w_doc.py; do
+for file in data/processed/*hanhu*w_doc.py; do
     pytest --doctest-modules "$file"
     if [ $? -ne 0 ]; then
         echo "Pytest failed on $file, stopping..."
