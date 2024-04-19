@@ -6,7 +6,7 @@ for name in "${NAMES[@]}"; do
 done
 python script/parse.py
 for file in data/processed/*wo_doc.py; do
-    if ! grep -q f_855 "$file"; then
+    if grep -q f_855 "$file"; then
         continue
     fi
     
