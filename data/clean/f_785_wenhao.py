@@ -17,13 +17,13 @@ def f_785(start_date=START_DATE, periods=PERIODS, freq=FREQ, categories=CATEGORI
     - Generates a DataFrame containing sales data for given categories over a time range.
     - Visualizes the sales data using a line plot.
     
-    Input:
+    Parameters:
     - start_date (str): The start date for the report in 'YYYY-MM-DD' format. Default is '2016-01-01'.
     - periods (int): The number of periods for the report. Default is 13.
     - freq (str): The frequency of dates to be generated. Default is 'WOM-2FRI' (WeekOfMonth-2nd Friday).
     - categories (list): List of categories to include in the report. Default is ['Electronics', 'Fashion', 'Home & Kitchen', 'Automotive', 'Sports'].
 
-    Output:
+    Returns:
     - Returns a DataFrame containing the sales data.
     - Returns the Matplotlib Axes object for the plot.
 

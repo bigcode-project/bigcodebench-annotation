@@ -16,7 +16,7 @@ STOPWORDS = set([
     "don", "should", "now"
 ])
 
-def f_764(df, column):
+def f_764(data, column):
     """
     Removes English stopwords from a text column in a DataFrame and returns the modified DataFrame.
     
@@ -35,12 +35,13 @@ def f_764(df, column):
     - STOPWORDS: A set containing common English stopwords.
     
     Example:
-    >>> df = pd.DataFrame({'text': ['This is a sample sentence.', 'Another example here.']})
-    >>> print(f_764(df, 'text'))
+    >>> data = {'text': ['This is a sample sentence.', 'Another example here.']}
+    >>> print(f_764(data, 'text'))
                   text
     0  sample sentence
     1  Another example
     """
+    df = pd.DataFrame(data)
     df[column] = df[column].apply(lambda x: ' '.join([word for word in re.findall(r'\b\w+\b', x) if word.lower() not in STOPWORDS]))
     return df
 
@@ -52,33 +53,33 @@ import pandas as pd
 class TestCases(unittest.TestCase):
 
     def test_case_1(self):
-        df = pd.DataFrame({'text': ['This is a sample sentence.', 'Another example here.']})
+        data = {'text': ['This is a sample sentence.', 'Another example here.']}
         expected_df = pd.DataFrame({'text': ['sample sentence', 'Another example']})
-        result_df = f_764(df, 'text')
+        result_df = f_764(data, 'text')
         pd.testing.assert_frame_equal(result_df, expected_df)
 
     def test_case_2(self):
-        df = pd.DataFrame({'content': ['Stopwords should be removed.', 'Testing this function.']})
+        data = {'content': ['Stopwords should be removed.', 'Testing this function.']}
         expected_df = pd.DataFrame({'content': ['Stopwords removed', 'Testing function']})
-        result_df = f_764(df, 'content')
+        result_df = f_764(data, 'content')
         pd.testing.assert_frame_equal(result_df, expected_df)
 
     def test_case_3(self):
-        df = pd.DataFrame({'sentence': ['Hello world!', 'Good morning.']})
+        data = {'sentence': ['Hello world!', 'Good morning.']}
         expected_df = pd.DataFrame({'sentence': ['Hello world', 'Good morning']})
-        result_df = f_764(df, 'sentence')
+        result_df = f_764(data, 'sentence')
         pd.testing.assert_frame_equal(result_df, expected_df)
 
     def test_case_4(self):
-        df = pd.DataFrame({'text': ['This is a single sentence.'] * 100})
+        data = {'text': ['This is a single sentence.'] * 100}
         expected_df = pd.DataFrame({'text': ['single sentence'] * 100})
-        result_df = f_764(df, 'text')
+        result_df = f_764(data, 'text')
         pd.testing.assert_frame_equal(result_df, expected_df)
 
     def test_case_5(self):
-        df = pd.DataFrame({'line': [''] * 50})
+        data = {'line': [''] * 50}
         expected_df = pd.DataFrame({'line': [''] * 50})
-        result_df = f_764(df, 'line')
+        result_df = f_764(data, 'line')
         pd.testing.assert_frame_equal(result_df, expected_df)
 
 def run_tests():

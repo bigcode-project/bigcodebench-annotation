@@ -19,7 +19,7 @@ def f_750(directory: str, pattern: str) -> list:
     Returns:
     - A list of matplotlib.axes._axes.Axes objects, each representing a plot of sales data from a matched CSV file.
 
-    Example usage:
+    Examples:
     >>> axes = f_750('/path/to/data/', r'^sales_data_\d{4}.csv')
     >>> len(axes)
     2
