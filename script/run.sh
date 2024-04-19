@@ -7,7 +7,7 @@ done
 python script/parse.py
 for file in data/processed/*wo_doc.py; do
     if [[ $file == *"f_855"* ]]; then
-        echo "Skipping $file"
+        continue
     fi
     
     if ! pytest "$file"; then
@@ -18,7 +18,7 @@ done
 
 for file in data/processed/*w_doc.py; do
     if [[ $file == *"ratna"* ]]; then
-        echo "Skipping $file"
+        continue
     fi 
     
     if ! pytest --doctest-modules "$file"; then
