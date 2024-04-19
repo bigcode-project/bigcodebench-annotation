@@ -31,8 +31,6 @@ def f_4435(filepath):
     True
     >>> 'libc.so.6' in result
     True
-    >>> import os
-    >>> os.remove('libc.so.6')  # Cleanup the fi
     """
     lib = ctypes.CDLL(filepath)
 
