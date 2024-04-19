@@ -296,12 +296,24 @@ def check_test_wo_doc(data):
     else:
         return False
 
+def validate_lib_num(data):
+    if len(data["libs"]) < 2:
+        return False
+    return True
+
+def validate_doc_example(data):
+    if not data["doc"]["example"]:
+        return False
+    return True
+
 if __name__ == "__main__":
     shutil.rmtree("data/processed", ignore_errors=True)
     os.makedirs("data/processed")
     with open("data/open-eval.jsonl", "w") as f:
         for file in tqdm(glob("data/clean/*.py")):
             data = extract_content(file)
+            # assert validate_lib_num(data), f"Less than 2 libraries are used in {file.replace('clean/', 'raw/')}"
+            # assert validate_doc_example(data), f"Example is missing in {file.replace('clean/', 'raw/')}"
             f.write(json.dumps(data) + "\n")
             file_name = file.split("/")[-1].split(".")[0]
             file_name = file_name + "_wo_doc" if check_test_wo_doc(data) else file_name + "_w_doc"
