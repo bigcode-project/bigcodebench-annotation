@@ -72,7 +72,7 @@ class ChatWrapper:
         response = client.chat.completions.create(
             model=self._model,
             messages=messages,
-            temperature=0.2,
+            temperature=0,
             top_p=0.95,
             n=n
         )
@@ -89,8 +89,8 @@ class ChatWrapper:
 if __name__ == '__main__':
     TIMES = 1
     VERBOSE = True
-    MODEL = "gpt-4-turbo"
-    input_file = sys.argv[1]
+    MODEL = sys.argv[1]
+    input_file = "data/open-eval.jsonl"
     # make test directory
     if not os.path.exists("results"):
         os.makedirs("results")
