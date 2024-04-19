@@ -35,8 +35,6 @@ def f_4526():
     True
     >>> isinstance(nonce, bytes)
     True
-    >>> import os
-    >>> os.remove(filename)
     """
     (pub_key, priv_key) = rsa.newkeys(512)
     password = get_random_bytes(16)

@@ -32,8 +32,6 @@ def f_1730(csv_file, csv_delimiter):
     True
     >>> all(isinstance(pair, tuple) and len(pair) == 2 for pair in f_1730('temp_data.csv', ','))
     True
-    >>> import os
-    >>> os.remove(temp_data.csv)
     """
     words = []
 

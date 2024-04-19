@@ -29,9 +29,6 @@ def f_4669(filepath):
     >>> f_4669('example.cpp')
     >>> os.path.exists('example')
     True
-    >>> import os
-    >>> os.remove('example.cpp')
-    >>> os.remove('example')
     """
     # Configure logging
     logging.basicConfig(level=logging.INFO)
