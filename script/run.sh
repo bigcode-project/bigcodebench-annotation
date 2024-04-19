@@ -6,8 +6,8 @@ for name in "${NAMES[@]}"; do
 done
 python script/parse.py
 for file in data/processed/*wo_doc.py; do
-    if grep -q f_855 "$file"; then
-        continue
+    if [[ $file == *"f_855"* ]]; then
+        echo "Skipping $file"
     fi
     
     if ! pytest "$file"; then
@@ -17,8 +17,8 @@ for file in data/processed/*wo_doc.py; do
 done
 
 for file in data/processed/*w_doc.py; do
-    if grep -q ratna "$file"; then
-        continue
+    if [[ $file == *"ratna"* ]]; then
+        echo "Skipping $file"
     fi 
     
     if ! pytest --doctest-modules "$file"; then
