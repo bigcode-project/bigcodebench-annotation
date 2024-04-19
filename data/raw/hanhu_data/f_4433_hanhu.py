@@ -22,7 +22,6 @@ def f_4435(filepath):
     - binascii
 
     Examples:
-    Examples:
     >>> with open('libc.so.6', 'w') as f:
     ...     _ = f.write("")
     >>> result = f_4435('libc.so.6')
