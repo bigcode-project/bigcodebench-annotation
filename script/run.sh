@@ -3,7 +3,7 @@ for name in "${NAMES[@]}"; do
     cp data/raw/*"$name"*py data/clean
 done
 python script/parse.py
-for file in data/processed/*ming*wo_doc.py; do
+for file in data/processed/*wo_doc.py; do
     if [[ $file == *"f_855"* ]]; then
         continue
     fi
@@ -14,12 +14,10 @@ for file in data/processed/*ming*wo_doc.py; do
     fi
 done
 
-for file in data/processed/*ming*w_doc.py; do
-    if [[ $file == *"ratna"* ]]; then
-        continue
-    fi
+for file in data/processed/*w_doc.py; do
 
-    if ! pytest --doctest-modules "$file"; then
+    # if ! pytest --doctest-modules "$file"; then
+    if ! pytest "$file"; then
         echo "Pytest failed on $file, stopping..."
         exit 1
     fi
