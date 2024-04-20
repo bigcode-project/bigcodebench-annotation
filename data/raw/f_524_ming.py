@@ -2,6 +2,9 @@ import unittest
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 
 def f_524(x, y, labels):
@@ -21,16 +24,14 @@ def f_524(x, y, labels):
     - matplotlib.figure.Figure: The figure object that contains the plotted curves.
 
     Requirements:
-    - numpy for handling numerical operations.
-    - matplotlib.pyplot for plotting.
-    - scipy.optimize for curve fitting.
+    - numpy
+    - matplotlib.pyplot
+    - scipy.optimize
 
     Example:
     >>> x_data = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
     >>> y_data = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
     >>> labels = ['H2O', 'O2', 'CO2']
-    >>> fig = f_524(x_data, y_data, labels)
-    >>> plt.show()
     """
 
     if not x or not y or not labels:
@@ -54,7 +55,7 @@ def f_524(x, y, labels):
     return fig
 
 
-class TestF524(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Example data for all tests
@@ -95,5 +96,14 @@ class TestF524(unittest.TestCase):
             f_524(x, y, labels)
 
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

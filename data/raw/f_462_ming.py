@@ -22,8 +22,12 @@ def f_462(df, letter):
     - numpy
 
     Example:
-    >>> df = pd.DataFrame({'Word': random.sample(words.words(), 1000)})
-    >>> f_462(df, 'a')
+    >>> df = pd.DataFrame({'Word': ['apple', 'banana', 'apricot', 'blueberry', 'cherry', 'avocado']})
+    >>> stats = f_462(df, 'a')
+    >>> stats['mean'] > 0
+    True
+    >>> stats['median'] > 0
+    True
     """
     regex = '^' + letter
     filtered_df = df[df['Word'].str.contains(regex, regex=True)]
@@ -86,5 +90,8 @@ class TestCases(unittest.TestCase):
         self.assertIn('median', result)
         self.assertIn('mode', result)
 
+
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

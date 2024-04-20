@@ -1,3 +1,8 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 import pandas as pd
 import random
 import statistics
@@ -26,19 +31,22 @@ def f_449():
                                           and previous 5 integers.
 
     Requirements:
-        This function requires the following libraries:
-        - pandas: Used for creating and manipulating the DataFrame.
-        - random: Used for generating random integers.
-        - statistics: Used for calculating the moving average.
-        - matplotlib.pyplot: Used for plotting the histogram.
-        - numpy: Used for defining the bins in the histogram.
+        - pandas
+        - random
+        - statistics
+        - matplotlib.pyplot
+        - numpy
 
     Example:
         >>> df = f_449()
-        >>> print(df)
-        This will display the DataFrame with 1000 rows of random numbers and their moving averages.
-        >>> df['Random Numbers'].plot(kind='hist', bins=np.arange(min(df['Random Numbers']), max(df['Random Numbers']) + BIN_WIDTH, BIN_WIDTH))
-        This will plot a histogram of the "Random Numbers" column, with the bins defined by the BIN_WIDTH constant.
+        >>> isinstance(df, pd.DataFrame)
+        True
+        >>> 'Random Numbers' in df.columns and 'Moving Average' in df.columns
+        True
+        >>> len(df)
+        1000
+        >>> all(df['Random Numbers'].between(0, RANGE))
+        True
     """
     numbers = [random.randint(0, RANGE) for _ in range(SIZE)]
     moving_avg = [statistics.mean(numbers[max(0, i - 5):i + 1]) for i in range(SIZE)]
@@ -60,7 +68,7 @@ def f_449():
 
 import unittest
 
-class TestF449(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_dataframe_shape(self):
         """Test that the DataFrame has the correct shape."""
         df = f_449()
@@ -72,10 +80,12 @@ class TestF449(unittest.TestCase):
         self.assertTrue(df['Random Numbers'].between(0, RANGE).all())
 
     def test_moving_average_calculation(self):
-        """Test the moving average calculation for accuracy."""
+        """Test that the moving average is correctly calculated."""
         df = f_449()
-        # Verifying the first moving average calculation manually might not be feasible,
-        # so this test is more about ensuring there's a logical check possible.
+        # Assuming moving average calculation correctness check for the first few entries
+        for i in range(6):  # Check the first 6 entries for a window of 6 elements
+            expected_avg = statistics.mean(df['Random Numbers'].iloc[max(0, i - 5):i + 1])
+            self.assertEqual(df['Moving Average'].iloc[i], expected_avg, "Moving average calculation mismatch.")
 
     def test_columns_existence(self):
         """Ensure both required columns exist in the DataFrame."""
@@ -89,5 +99,14 @@ class TestF449(unittest.TestCase):
         self.assertFalse(df.empty)
 
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

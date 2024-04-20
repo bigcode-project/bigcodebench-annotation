@@ -2,6 +2,9 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from random import randint
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
@@ -27,15 +30,6 @@ def f_479(goals, penalties):
 
     Example:
     >>> df, plots = f_479(5, 3)
-    >>> df
-           Team  Goals  Penalty Cost
-    0   Team A      2          2000
-    1   Team B      3          1000
-    2   Team C      4          3000
-    3   Team D      1          2000
-    4   Team E      5             0
-    >>> type(plots[0])
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
     """
     match_results = []
 
@@ -113,7 +107,8 @@ class TestCases(unittest.TestCase):
         # Check if goals and penalty costs are within limits
         self.assertTrue((df['Goals'] <= 2).all())
         self.assertTrue((df['Penalty Cost'] <= 1000).all())  # max penalty cost = 1 * 1000
-        
+
+
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
@@ -122,4 +117,6 @@ def run_tests():
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

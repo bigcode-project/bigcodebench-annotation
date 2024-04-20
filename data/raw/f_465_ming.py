@@ -18,15 +18,15 @@ def f_465(matrix1, matrix2):
     - str: The string representation of the DataFrame without the index and header.
 
     Requirements:
-    - pandas: For creating and manipulating the DataFrame.
-    - numpy: For array manipulation and concatenation.
+    - pandas
+    - numpy
 
     Example:
     >>> matrix1 = np.array([[1, 2, 3], [4, 5, 6]])
     >>> matrix2 = np.array([[7, 8, 9], [10, 11, 12]])
-    >>> print(f_465(matrix1, matrix2))
-     1  2  3  7  8  9
-     4  5  6 10 11 12
+    >>> result = f_465(matrix1, matrix2)
+    >>> all(x in result.replace(' ', '') for x in ['123789', '456101112'])
+    True
     """
     combined_matrix = np.concatenate((matrix1, matrix2), axis=1)
     df = pd.DataFrame(combined_matrix)
@@ -35,7 +35,7 @@ def f_465(matrix1, matrix2):
 
 import unittest
 
-class TestF465(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def normalize_whitespace(self, string):
         """Normalize the whitespace in the string to a single space."""
@@ -82,5 +82,14 @@ class TestF465(unittest.TestCase):
         self.assertEqual(self.normalize_whitespace(result), self.normalize_whitespace(expected_output))
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

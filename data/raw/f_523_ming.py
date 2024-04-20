@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 
 def f_523(x, y, labels):
@@ -25,7 +28,6 @@ def f_523(x, y, labels):
     >>> y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
     >>> labels = ['H₂O', 'O₂', 'CO₂']
     >>> fig = f_523(x, y, labels)
-    >>> plt.show(fig)
     """
     pca = PCA(n_components=2)
 
@@ -111,4 +113,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

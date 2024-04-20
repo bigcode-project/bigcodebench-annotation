@@ -18,12 +18,14 @@ def f_504(dataframe: pd.DataFrame) -> pd.DataFrame:
     - pd.DataFrame: A modified DataFrame with cells containing the extracted numeric values or NaN.
     
     Requirements:
-    - Libraries: re, pandas, numpy.
+    - re
+    - pandas
+    - numpy.
     
     Example:
     >>> df = pd.DataFrame({'A': ['>1.23<', '>4.56<'], 'B': ['>7.89<', '>0.12<']})
     >>> f_504(df)
-       A     B
+          A     B
     0  1.23  7.89
     1  4.56  0.12
     """
@@ -74,5 +76,8 @@ class TestCases(unittest.TestCase):
         expected = pd.DataFrame()
         pd.testing.assert_frame_equal(result, expected)
 
+
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

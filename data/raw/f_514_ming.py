@@ -1,6 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 def f_514(dataframe, target_value='332'):
     """
@@ -41,7 +45,7 @@ def f_514(dataframe, target_value='332'):
 import unittest
 import pandas as pd
 
-class TestF514(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         """Create a sample DataFrame for testing."""
         self.df = pd.DataFrame({
@@ -77,5 +81,14 @@ class TestF514(unittest.TestCase):
         self.assertEqual(mask.sum().sum(), 1, "There should be exactly 1 occurrence of the custom target value 'a'.")
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

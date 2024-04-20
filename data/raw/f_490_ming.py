@@ -3,6 +3,9 @@ import os
 import unittest
 import shutil
 import os
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 
 # Set the directory for data relative to the current file's location
@@ -42,7 +45,6 @@ def f_490(dataset, filename):
     >>> df1 = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
     >>> df2 = pd.DataFrame({"D": [5, 6], "E": [7, 8]})
     >>> f_490([df1, df2], 'sample.csv')
-    This will write df1 and df2 to 'sample.csv' in the './data' directory, separating them with a line of hyphens.
     """
     ensure_dir_exists(DATA_DIR)  # Ensure the data directory exists
     filepath = os.path.join(DATA_DIR, filename)
@@ -64,7 +66,7 @@ import os
 import shutil
 
 
-class TestF490(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Ensure the data directory exists before any tests are run."""
@@ -108,6 +110,15 @@ class TestF490(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(DATA_DIR, 'no_dataframes.csv')))
 
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()
 

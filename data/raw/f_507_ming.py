@@ -6,6 +6,9 @@ import pandas as pd
 from datetime import datetime
 from dateutil.parser import parse
 import matplotlib.pyplot as plt
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 # Correct CSV_PATH to reflect the current directory of this script plus 'data.csv'
 CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.csv')
@@ -31,10 +34,13 @@ def f_507(csv_path=CSV_PATH, date_column=DATE_COLUMN):
     - matplotlib.pyplot for plotting.
 
     Example:
-    Assuming 'data.csv' with a 'date' column containing date strings:
-    >>> histogram_plot = f_507()
-    >>> type(histogram_plot)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    >>> import os
+    >>> from unittest.mock import patch
+    >>> with patch('os.path.exists', return_value=False):
+    ...     f_507('nonexistent.csv')
+    Traceback (most recent call last):
+        ...
+    FileNotFoundError: nonexistent.csv does not exist
     """
     if not os.path.isfile(csv_path):
         raise FileNotFoundError(f"{csv_path} does not exist")
@@ -49,7 +55,7 @@ import shutil
 import os
 import pandas as pd
 
-class TestF507Function(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -105,5 +111,14 @@ class TestF507Function(unittest.TestCase):
             f_507(invalid_data_csv, 'date')
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

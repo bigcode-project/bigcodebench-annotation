@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 def f_500(num_samples=100, num_features=5):
     """
@@ -24,7 +27,6 @@ def f_500(num_samples=100, num_features=5):
     
     Example:
     >>> df, ax = f_500(10, 3)
-    >>> print(df)
     >>> ax.figure.show()
     """
     FEATURES = ['Feature' + str(i) for i in range(1, num_features + 1)]
@@ -77,4 +79,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

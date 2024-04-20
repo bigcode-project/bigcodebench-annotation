@@ -3,6 +3,9 @@ import pandas as pd
 import json
 import unittest
 import shutil
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 # Set DATA_DIR to the 'data' subdirectory in the current file's parent directory
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -29,8 +32,8 @@ def f_491(df, filename):
 
     Example:
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    >>> f_491(df, 'data.json')
-    './data/data.json'
+    >>> 'data.json' in f_491(df, 'data.json')
+    True
     
     The JSON file will be saved in the format:
     [
@@ -52,7 +55,7 @@ import os
 import json
 import shutil
 
-class TestF491(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up testing environment; ensure data directory exists."""
@@ -106,5 +109,14 @@ class TestF491(unittest.TestCase):
         self.assertEqual(data, [{"A": None, "B": None}, {"A": None, "B": None}])
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

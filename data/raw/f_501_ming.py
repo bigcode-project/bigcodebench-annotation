@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 PRODUCTS = ['Product' + str(i) for i in range(1, 6)]
 MONTHS = ['Month' + str(i) for i in range(1, 13)]
@@ -23,9 +26,21 @@ def f_501():
     - A heatmap visualizing sales figures across products and months.
 
     Requirements:
-    - pandas for data manipulation.
-    - numpy for random data generation.
-    - matplotlib.pyplot and seaborn for plotting.
+    - pandas
+    - numpy
+    - matplotlib.pyplot
+    - seaborn
+
+    Example:
+    >>> df = f_501()
+    >>> df.shape
+    (12, 5)
+    >>> all(df.columns == PRODUCTS)
+    True
+    >>> all(df.index == MONTHS)
+    True
+    >>> (df.values >= 100).all() and (df.values <= 1000).all()
+    True
     """
     sales = np.random.randint(100, 1001, size=(len(MONTHS), len(PRODUCTS)))
     df = pd.DataFrame(sales, index=MONTHS, columns=PRODUCTS)
@@ -47,7 +62,7 @@ def f_501():
 
 import unittest
 
-class TestF501(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_dataframe_shape(self):
         """Test if the DataFrame has the correct shape."""
         df = f_501()
@@ -76,6 +91,15 @@ class TestF501(unittest.TestCase):
         self.assertIsInstance(df, pd.DataFrame)
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()
 

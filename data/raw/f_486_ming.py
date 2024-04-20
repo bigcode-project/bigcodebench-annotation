@@ -2,6 +2,10 @@ import pandas as pd
 import numpy as np
 import math
 from random import randint
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 def f_486(cities_list):
     """
@@ -23,7 +27,8 @@ def f_486(cities_list):
     Example:
     >>> cities = ['New York', 'London', 'Beijing', 'Tokyo', 'Sydney']
     >>> pop_data = f_486(cities)
-    >>> print(pop_data)
+    >>> type(pop_data)
+    <class 'pandas.core.frame.DataFrame'>
     """
     population_data = []
 
@@ -82,4 +87,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

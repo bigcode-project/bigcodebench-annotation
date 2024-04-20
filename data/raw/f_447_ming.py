@@ -11,11 +11,23 @@ def f_447(l):
     Given a list `l`, this function shuffles the list, constructs a dataframe using the shuffled list,
     and then for each row in the dataframe, moves the first N_GROUPS elements to the end of the same row.
 
-    Input:
+    Parameters:
     - l (list): A list of elements.
 
-    Output:
+    Returns:
     - DataFrame: A modified DataFrame constructed from the shuffled list.
+
+    Requirements:
+    - pandas
+    - numpy
+    - random
+
+    Example:
+    >>> df = f_447(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'])
+    >>> df.shape == (5, 10)
+    True
+    >>> set(df.iloc[0]) == set(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'])
+    True
     """
     if not l:
         return pd.DataFrame()
@@ -31,7 +43,7 @@ def f_447(l):
 import unittest
 import pandas as pd
 
-class TestF447(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_with_predefined_elements(self):
         """Test function with the predefined ELEMENTS list."""
         df = f_447(ELEMENTS.copy())  # Use a copy to prevent modification of the original list
@@ -72,6 +84,15 @@ class TestF447(unittest.TestCase):
         self.assertTrue(diff, "Shuffled DataFrame rows should differ from initial order")
 
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()
 

@@ -1,3 +1,8 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 import unittest
 from unittest.mock import patch
 from datetime import datetime
@@ -50,7 +55,7 @@ def f_458(duration):
 
 ### Unit Tests
 
-class TestF458(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('matplotlib.pyplot.pause', return_value=None)
     def test_data_list_lengths_match(self, mock_pause):
         """
@@ -80,7 +85,7 @@ class TestF458(unittest.TestCase):
         self.assertTrue(all(0 <= y <= 100 for y in y_data))
 
     @patch('matplotlib.pyplot.pause', return_value=None)
-    @patch('f_458_ming.randint', return_value=50)
+    @patch(__name__ + '.randint', return_value=50)
     def test_random_values_consistency(self, mock_randint, mock_pause):
         """
         Test that generated values are consistent with the mocked random function.
@@ -98,5 +103,14 @@ class TestF458(unittest.TestCase):
             datetime.strptime(timestamp, '%H:%M:%S.%f')
 
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

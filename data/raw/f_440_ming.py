@@ -1,3 +1,8 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 import numpy as np
 import pandas as pd
 from scipy.spatial import distance
@@ -27,7 +32,7 @@ def f_440(a, b):
     Example:
     >>> euclidean_distance, df, ax = f_440([1, 2, 3], [2, 3, 4])
     >>> print(euclidean_distance)
-    1.732...
+    1.7320508075688772
     """
     # Calculate the Euclidean distance
     euclidean_distance = distance.euclidean(a, b)
@@ -105,4 +110,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

@@ -1,6 +1,9 @@
 import os
 import pandas as pd
 import csv
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 # Adjust DATA_DIR to point to the 'data' subdirectory in the parent directory of this script
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -28,8 +31,8 @@ def f_492(df, filename):
 
     Examples:
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    >>> f_492(df, 'data.csv')
-    '[Absolute path to]/data/data.csv'
+    >>> 'data.csv' in f_492(df, 'data.csv')
+    True
     """
     # Ensure the data directory exists
     if not os.path.exists(DATA_DIR):
@@ -45,7 +48,7 @@ import shutil
 import pandas as pd
 import os
 
-class TestF492(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create the data directory if it doesn't exist."""
@@ -91,5 +94,14 @@ class TestF492(unittest.TestCase):
         self.assertIn('path_format.csv', result_path)
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

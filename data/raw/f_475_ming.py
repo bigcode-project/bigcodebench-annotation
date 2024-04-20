@@ -3,7 +3,9 @@ import seaborn as sns
 import unittest
 from unittest.mock import patch
 import matplotlib.pyplot as plt
-
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 def f_475(goals, penalties):
     """
@@ -28,7 +30,12 @@ def f_475(goals, penalties):
     >>> penalties = {'Team A': 1, 'Team B': 0, 'Team C': 2, 'Team D': 3, 'Team E': 1}
     >>> df, plot = f_475(goals, penalties)
     >>> print(df)
-    >>> plot.show()
+         Team  Goals  Penalties
+    0  Team A      3          1
+    1  Team B      2          0
+    2  Team C      1          2
+    3  Team D      0          3
+    4  Team E      2          1
     """
     # Constants
     TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
@@ -47,7 +54,7 @@ def f_475(goals, penalties):
 
 
 # Unit tests for the function f_475
-class TestF475(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('matplotlib.pyplot.show')
     def test_visualization_output(self, mock_show):
         goals = {'Team A': 3, 'Team B': 2, 'Team C': 0}
@@ -97,5 +104,14 @@ class TestF475(unittest.TestCase):
         pd.testing.assert_frame_equal(df, expected_df, check_like=True)
 
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 if __name__ == "__main__":
-    unittest.main()
+    import doctest
+    doctest.testmod()
+    run_tests()

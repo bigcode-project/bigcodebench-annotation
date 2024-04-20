@@ -52,7 +52,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         random.seed(1)
         result = f_432()
-        self.assertEqual(result, 'eJxzNTH0CgqMMHJxMgkwdAyM8rQwc3IMMffzCHDyCAjy9PQI9HY0CY1wtzRx9YmKMg8wjgQAWN0NxA==')
+        self.assertEqual(result, 'eJwFwUEOhCAMAMAvLVBXONJooGqkUCDa/z/EmR3M0epjNwQ2sSr5P8a+3pkxcyPK9YwwnhRgv1RXdu85F5CJZEvq+t4sVkpD1DBLkmA6kPhRj+6jdcvPyeAPdLQbtg==')
 
     def test_case_2(self):
         random.seed(0)

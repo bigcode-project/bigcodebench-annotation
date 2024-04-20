@@ -1,7 +1,8 @@
 import re
 import string
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-
+import nltk
+nltk.download('vader_lexicon')
 # Constants
 ALPHANUMERIC = re.compile('[\W_]+')
 PUNCTUATIONS = string.punctuation
@@ -25,14 +26,15 @@ def f_517(text: str, sia: SentimentIntensityAnalyzer) -> dict:
           - 'pos': Positive sentiment score.
     
     Requirements:
-    - re module for regular expressions.
-    - string module for string operations.
-    - nltk.sentiment.vader for sentiment analysis.
+    - re
+    - string
+    - nltk.sentiment.vader
     
     Example:
+    >>> from nltk.sentiment import SentimentIntensityAnalyzer
     >>> sia = SentimentIntensityAnalyzer()
     >>> f_517("I love Python!", sia)
-    {'compound': 0.6369, 'neg': 0.0, 'neu': 0.192, 'pos': 0.808}
+    {'neg': 0.0, 'neu': 0.192, 'pos': 0.808, 'compound': 0.6369}
     """
     text = ALPHANUMERIC.sub(' ', text).lower()
     text = text.translate(str.maketrans('', '', PUNCTUATIONS))
@@ -82,4 +84,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

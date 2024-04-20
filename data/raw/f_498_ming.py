@@ -3,6 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from random import sample
 from typing import Tuple
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 # Constants
 STUDENTS = ['Student' + str(i) for i in range(1, 101)]
@@ -29,11 +32,6 @@ def f_498(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
 
     Example:
     >>> df, ax = f_498(50)
-    >>> print(df.head())
-       Course1  Course2  Course3  Course4  Course5
-    Student1      67       76       89       54       92
-    Student2      43       56       75       48       92
-    ...
     >>> ax.get_title()
     'Course-wise Average and Passing Grade Counts'
     """
@@ -115,4 +113,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

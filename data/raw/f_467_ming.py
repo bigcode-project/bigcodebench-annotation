@@ -19,7 +19,13 @@ def f_467(matrix):
 
     Example:
     >>> matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    >>> f_467(matrix)
+    >>> normalized_df = f_467(matrix)
+    >>> isinstance(normalized_df, pd.DataFrame)
+    True
+    >>> np.allclose(normalized_df.mean(), 0)
+    True
+    >>> np.allclose(normalized_df.std(ddof=0), 1)
+    True
     """
     df = pd.DataFrame(matrix)
     normalized_df = df.apply(stats.zscore)
@@ -85,5 +91,9 @@ class TestCases(unittest.TestCase):
             2: [-1.224745, 0.0, 1.224745]
         })
         pd.testing.assert_frame_equal(result, expected_result)
+
+
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

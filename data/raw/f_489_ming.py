@@ -1,6 +1,10 @@
 import math
 from random import randint
 import matplotlib.pyplot as plt
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 def f_489():
     """
@@ -78,4 +82,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

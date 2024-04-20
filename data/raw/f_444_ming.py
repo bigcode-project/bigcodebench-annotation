@@ -1,3 +1,8 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 import numpy as np
 import matplotlib.pyplot as plt
 from random import randint
@@ -20,8 +25,6 @@ def f_444(array_length=100):
 
     Example:
     >>> ax = f_444(100)
-    >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
     """
     array1 = np.array([randint(1, 100) for _ in range(array_length)])
     array2 = np.array([randint(1, 100) for _ in range(array_length)])
@@ -70,5 +73,8 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(ax, Axes)
         self.assertEqual(len(ax.lines[0].get_ydata()), 250)
 
+
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

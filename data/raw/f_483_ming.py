@@ -2,6 +2,10 @@ import numpy as np
 from itertools import chain
 from scipy.stats import norm
 import matplotlib.pyplot as plt
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 def f_483(L):
     '''
@@ -22,8 +26,6 @@ def f_483(L):
 
     Example:
     >>> ax = f_483([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
     '''
     data = list(chain(*L))
     mu, std = norm.fit(data)
@@ -86,4 +88,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

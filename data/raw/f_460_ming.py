@@ -21,7 +21,7 @@ def f_460(df, letter):
     Example:
     >>> df = pd.DataFrame({'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'kiwi']})
     >>> f_460(df, 'a')
-    {5: 2, 6: 1}
+    {5: 1}
     """
     regex = '^' + letter
     filtered_df = df[df['Word'].str.contains(regex, regex=True)]
@@ -72,4 +72,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

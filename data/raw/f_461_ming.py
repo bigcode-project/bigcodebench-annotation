@@ -2,6 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import unittest
 from unittest.mock import patch
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 
 def f_461(df, letter):
@@ -17,13 +20,12 @@ def f_461(df, letter):
     - AxesSubplot: A histogram plot of word lengths for words starting with the specified letter.
 
     Requirements:
-    - pandas: For DataFrame manipulation and filtering.
-    - matplotlib.pyplot: For generating the histogram plot.
+    - pandas
+    - matplotlib.pyplot
 
     Example:
     >>> df = pd.DataFrame({'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'avocado']})
     >>> ax = f_461(df, 'a')
-    # This will generate a histogram plot for word lengths of 'apple' and 'avocado' as they start with 'a'.
     """
     regex = f'^{letter}'
     filtered_df = df[df['Word'].str.match(regex)]
@@ -43,7 +45,7 @@ def f_461(df, letter):
     return ax
 
 
-class TestF461(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         """Initialize testing dataframe."""
         self.df = pd.DataFrame({'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'avocado']})
@@ -81,5 +83,14 @@ class TestF461(unittest.TestCase):
         self.assertIsNone(ax, "Expected None when no words start with the specified letter.")
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

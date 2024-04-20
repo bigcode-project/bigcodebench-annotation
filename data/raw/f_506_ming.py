@@ -12,22 +12,34 @@ def f_506(filename: str) -> pd.DataFrame:
     Returns:
     - DataFrame: The contents of the CSV file as a pandas DataFrame.
 
+    Raises:
+    - FileNotFoundError: If the CSV file does not exist.
+
     Requirements:
     - os
     - pandas
 
     Example:
-    >>> df = f_506('data.csv')
-    DataFrame with the contents of 'data.csv', which is now erased.
+    >>> import os
+    >>> from unittest.mock import patch
+    >>> with patch('os.path.exists', return_value=False):
+    ...     f_506('nonexistent.csv')
+    Traceback (most recent call last):
+        ...
+    FileNotFoundError: No such file: 'nonexistent.csv'
     """
+    if not os.path.exists(filename):
+        raise FileNotFoundError(f"No such file: '{filename}'")
+
     if os.stat(filename).st_size == 0:
         # File is empty, return an empty DataFrame with no columns.
         return pd.DataFrame()
 
     df = pd.read_csv(filename)
 
-    # Erase the original file's content
-    open(filename, 'w').close()
+    # Erase the original file's content using a context manager to handle the file properly
+    with open(filename, 'w') as file:
+        file.truncate()
 
     return df
 
@@ -35,7 +47,7 @@ import unittest
 import tempfile
 import shutil
 
-class TestF506(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -88,5 +100,14 @@ class TestF506(unittest.TestCase):
             _ = f_506(non_existent_file)
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

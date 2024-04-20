@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 from random import randint, seed
 import re
 import unittest
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
@@ -33,6 +36,12 @@ def f_478(goals, penalties, rng_seed=None, teams= TEAMS):
     Example:
     >>> analyzed_data = f_478(5, 3, rng_seed=42)
     >>> print(analyzed_data[['Team', 'Goals', 'Penalty Cost']])
+         Team  Goals  Penalty Cost
+    0  Team A      5             0
+    1  Team B      0          2000
+    2  Team C      1          1000
+    3  Team D      1             0
+    4  Team E      5             0
     """
     if rng_seed is not None:
         seed(rng_seed)
@@ -63,7 +72,7 @@ def f_478(goals, penalties, rng_seed=None, teams= TEAMS):
     return results_df
 
 # Unit Tests
-class TestF478(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         self.expected_columns = ['Team', 'Match Result', 'Goals', 'Penalty Cost']
 
@@ -96,5 +105,14 @@ class TestF478(unittest.TestCase):
         self.assertTrue(df.empty)
 
 
-if __name__ == '__main__':
-    unittest.main()
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

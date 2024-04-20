@@ -1,3 +1,8 @@
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 import pandas as pd
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -90,4 +95,6 @@ def run_tests():
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

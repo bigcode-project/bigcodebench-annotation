@@ -1,5 +1,9 @@
 from random import sample
 from itertools import combinations
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 def f_470(df, tuples, n_plots):
     """
@@ -76,5 +80,8 @@ class TestCases(unittest.TestCase):
         modified_df, _ = f_470(self.df, tuples, 3)
         self.assertEqual(len(modified_df), len(self.df))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

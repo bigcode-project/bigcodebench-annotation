@@ -20,11 +20,11 @@ def f_434(list_of_menuitems):
         - pandas
 
     Example:
-        >>> f_434([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
-                Count
-        Pizza     2
-        Burger    1
-        Coke      2
+        >>> result = f_434([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
+        >>> result.loc['Pizza', 'Count']
+        2
+        >>> result.loc['Coke', 'Count']
+        2
     """
     # Flattening the list using list comprehension
     flat_list = [item for sublist in list_of_menuitems for item in sublist]
@@ -76,4 +76,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

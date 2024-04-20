@@ -33,7 +33,7 @@ def f_442(date_str, from_tz, to_tz):
 
 import unittest
 
-class TestF442(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_utc_to_new_york(self):
         """Test conversion from UTC to America/New_York timezone."""
         result = f_442('2022-03-01 12:00:00', 'UTC', 'America/New_York')
@@ -60,5 +60,15 @@ class TestF442(unittest.TestCase):
         self.assertEqual(result, '2022-06-01 13:00:00')
 
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

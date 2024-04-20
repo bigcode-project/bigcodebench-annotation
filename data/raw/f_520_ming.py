@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as stats
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 def f_520(x, y, labels):
     """
@@ -25,7 +29,6 @@ def f_520(x, y, labels):
     >>> y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
     >>> labels = ['H₂O', 'O₂', 'CO₂']
     >>> fig = f_520(x, y, labels)
-    >>> plt.show(fig)
     """
     fig, ax = plt.subplots()
 
@@ -39,11 +42,9 @@ def f_520(x, y, labels):
     
     return fig
 
+
 import unittest
-import numpy as np
 import matplotlib
-import matplotlib.pyplot as plt
-import scipy.stats as stats
 
 
 def run_tests():
@@ -91,4 +92,6 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

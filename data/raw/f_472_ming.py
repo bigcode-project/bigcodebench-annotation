@@ -3,9 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from random import sample
 import unittest
-
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
+
 
 def f_472(df, tuples, n_plots):
     """
@@ -46,7 +49,7 @@ def f_472(df, tuples, n_plots):
     return df, plot_details
 
 # Unit test class
-class TestF472(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def setUp(self):
         self.df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
         self.tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
@@ -83,5 +86,15 @@ class TestF472(unittest.TestCase):
         all_columns = all(c[0] in COLUMNS and c[1] in COLUMNS for c in plot_details)
         self.assertTrue(all_columns)
 
-if __name__ == '__main__':
-    unittest.main()
+
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+    run_tests()

@@ -1,3 +1,8 @@
+from collections import Counter
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -79,5 +84,9 @@ class TestCases(unittest.TestCase):
         
         self.assertIsInstance(ax, matplotlib.axes.Axes)
         self.assertEqual(ax.images[0].get_cmap().name, 'hot')
+
+
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()
