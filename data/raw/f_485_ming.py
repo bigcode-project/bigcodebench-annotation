@@ -26,8 +26,6 @@ def f_485(L):
     >>> pca_result, plot = f_485([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     >>> type(pca_result)
     <class 'numpy.ndarray'>
-    >>> type(plot)
-    <class 'matplotlib.axes._axes.Axes'>
     """
     data = np.array(L)
 

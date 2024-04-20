@@ -2,6 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import unittest
 from unittest.mock import patch
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 
 def f_461(df, letter):
@@ -17,13 +20,12 @@ def f_461(df, letter):
     - AxesSubplot: A histogram plot of word lengths for words starting with the specified letter.
 
     Requirements:
-    - pandas: For DataFrame manipulation and filtering.
-    - matplotlib.pyplot: For generating the histogram plot.
+    - pandas
+    - matplotlib.pyplot
 
     Example:
     >>> df = pd.DataFrame({'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'avocado']})
     >>> ax = f_461(df, 'a')
-    # This will generate a histogram plot for word lengths of 'apple' and 'avocado' as they start with 'a'.
     """
     regex = f'^{letter}'
     filtered_df = df[df['Word'].str.match(regex)]

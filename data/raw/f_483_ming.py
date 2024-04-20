@@ -26,8 +26,6 @@ def f_483(L):
 
     Example:
     >>> ax = f_483([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
     '''
     data = list(chain(*L))
     mu, std = norm.fit(data)

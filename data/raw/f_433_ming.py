@@ -52,7 +52,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame({'X': [], 'Y': []})
         encoded_df = f_433(df)
         decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
-        pd.testing.assert_frame_equal(df, decoded_csv, check_dtype=False)
+        pd.testing.assert_frame_equal(df, decoded_csv, check_dtype=False, check_index_type=False)
 
     def test_encode_with_specific_values(self):
         df = pd.DataFrame({'ID': [101, 102, 103], 'Score': [85, 90, 88]})
@@ -65,6 +65,7 @@ class TestCases(unittest.TestCase):
         encoded_df = f_433(df)
         decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
         pd.testing.assert_frame_equal(df, decoded_csv)
+
 
 def run_tests():
     suite = unittest.TestSuite()

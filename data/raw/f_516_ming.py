@@ -60,7 +60,8 @@ def f_516(texts, num_topics):
     tfidf = vectorizer.fit_transform(tokenized_texts)
 
     nmf = NMF(n_components=num_topics, random_state=1).fit(tfidf)
-    feature_names = vectorizer.get_feature_names_out()
+    feature_names = vectorizer.get_feature_names_out() if hasattr(vectorizer,
+                                                                  'get_feature_names_out') else vectorizer.get_feature_names()
 
     topics = []
     for topic_idx, topic in enumerate(nmf.components_):

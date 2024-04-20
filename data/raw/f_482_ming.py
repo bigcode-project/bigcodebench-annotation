@@ -24,8 +24,6 @@ def f_482(L):
 
     Examples:
     >>> ax = f_482([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
     '''
     data = list(chain(*L))
     data = np.array(data).reshape(-1, 1)

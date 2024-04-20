@@ -30,7 +30,12 @@ def f_475(goals, penalties):
     >>> penalties = {'Team A': 1, 'Team B': 0, 'Team C': 2, 'Team D': 3, 'Team E': 1}
     >>> df, plot = f_475(goals, penalties)
     >>> print(df)
-    >>> plot.show()
+         Team  Goals  Penalties
+    0  Team A      3          1
+    1  Team B      2          0
+    2  Team C      1          2
+    3  Team D      0          3
+    4  Team E      2          1
     """
     # Constants
     TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']

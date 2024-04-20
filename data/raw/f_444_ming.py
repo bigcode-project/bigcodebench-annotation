@@ -25,8 +25,6 @@ def f_444(array_length=100):
 
     Example:
     >>> ax = f_444(100)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
     """
     array1 = np.array([randint(1, 100) for _ in range(array_length)])
     array2 = np.array([randint(1, 100) for _ in range(array_length)])

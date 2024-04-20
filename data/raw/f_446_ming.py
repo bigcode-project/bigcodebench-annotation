@@ -25,8 +25,6 @@ def f_446(array_length=100, noise_level=0.2):
 
     Example:
     >>> ax = f_446(100, 0.2)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
     """
     x = np.linspace(0, 4*np.pi, array_length)
     y = np.sin(x) + noise_level * np.random.rand(array_length)

@@ -72,8 +72,9 @@ def f_496(text, n=2):
     X = vectorizer.fit_transform([words_filtered])  # Ensure input is treated as a single document
     matrix = (X.T * X).todense()
     np.fill_diagonal(matrix, 0)
-    matrix_df = pd.DataFrame(matrix, index=vectorizer.get_feature_names_out(),
-                             columns=vectorizer.get_feature_names_out())
+    feature_names = vectorizer.get_feature_names_out() if hasattr(vectorizer,
+                                                                  'get_feature_names_out') else vectorizer.get_feature_names()
+    matrix_df = pd.DataFrame(matrix, index=feature_names, columns=feature_names)
 
     fig, ax = plt.subplots()
     cax = ax.matshow(matrix_df, cmap='hot')

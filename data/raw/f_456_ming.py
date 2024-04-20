@@ -3,7 +3,7 @@ import matplotlib
 # Check and set the backend
 print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
 matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
+import sys
 import pandas as pd
 from datetime import datetime
 from random import randint
@@ -16,6 +16,7 @@ import os
 current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
 FILE_PATH = os.path.join(current_directory_path, 'traffic_data.csv')
 VEHICLE_TYPES = ['Car', 'Bus', 'Truck', 'Bike']
+# sys.path.append(current_directory_path)
 
 
 def ensure_directory(current_directory_path):
@@ -77,7 +78,6 @@ def f_456(hours):
 import unittest
 from unittest.mock import patch, MagicMock, ANY, call
 
-
 class TestCases(unittest.TestCase):
 
     def setUp(self):
@@ -97,7 +97,7 @@ class TestCases(unittest.TestCase):
     @patch('matplotlib.pyplot.show')  # Mock plt.show to not render plots
     @patch('csv.writer')  # Mock csv.writer to not actually write files
     @patch('pandas.read_csv')  # Mock pd.read_csv to not read from disk
-    @patch('f_456_ming.randint', return_value=25)  # Mock randint to return a fixed value
+    @patch(__name__ + '.randint', return_value=25)  # Mock randint to return a fixed value
     def test_dataframe_content(self, mock_randint, mock_read_csv, mock_csv_writer, mock_plt_show):
         mock_read_csv.return_value = pd.DataFrame({
             'Time': ['2021-01-01 00:00:00.000000'],
@@ -111,7 +111,7 @@ class TestCases(unittest.TestCase):
         mock_read_csv.assert_called_with(FILE_PATH)
         mock_plt_show.assert_called()
 
-    @patch('f_456_ming.pd.read_csv', return_value=pd.DataFrame(columns=['Time'] + VEHICLE_TYPES))
+    @patch(__name__ + '.pd.read_csv', return_value=pd.DataFrame(columns=['Time'] + VEHICLE_TYPES))
     def test_empty_dataframe_on_zero_hours(self, mock_read_csv):
         """Check for empty DataFrame on zero hours input."""
         _, ax = f_456(0)
@@ -126,13 +126,13 @@ class TestCases(unittest.TestCase):
         f_456(1)
         mock_makedirs.assert_called_with(os.path.dirname(FILE_PATH))
 
-    @patch('f_456_ming.plt.show')
+    @patch(__name__ + '.plt.show')
     def test_plot_generation(self, mock_plt_show):
         """Verify that the plot is generated."""
         f_456(1)
         mock_plt_show.assert_called()
 
-    @patch('f_456_ming.plt.show')  # Mock to skip plot rendering
+    @patch(__name__ + '.plt.show')  # Mock to skip plot rendering
     def test_f_456_runs_without_error(self, mock_show):
         """Test f_456 function to ensure it runs with given hours without raising an error."""
         try:

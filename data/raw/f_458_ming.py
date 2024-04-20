@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(all(0 <= y <= 100 for y in y_data))
 
     @patch('matplotlib.pyplot.pause', return_value=None)
-    @patch('f_458_ming.randint', return_value=50)
+    @patch(__name__ + '.randint', return_value=50)
     def test_random_values_consistency(self, mock_randint, mock_pause):
         """
         Test that generated values are consistent with the mocked random function.

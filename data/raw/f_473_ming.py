@@ -52,7 +52,7 @@ def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
 
 class TestCases(unittest.TestCase):
 
-    @patch('f_473_ming.choice', return_value=400)
+    @patch(__name__ + '.choice', return_value=400)
     def test_goals_greater_than_penalties(self, mock_choice):
         goals = {'Team A': 4, 'Team B': 2, 'Team C': 0, 'Team D': 0, 'Team E': 0}
         penalties = {'Team A': 1, 'Team B': 1, 'Team C': 0, 'Team D': 0, 'Team E': 0}
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
         result_df = f_473(goals, penalties)
         pd.testing.assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
 
-    @patch('f_473_ming.choice', return_value=200)
+    @patch(__name__ + '.choice', return_value=200)
     def test_some_teams_missing(self, mock_choice):
         goals = {'Team A': 2, 'Team E': 5}
         penalties = {'Team A': 0, 'Team E': 3}
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
         result_df = f_473(goals, penalties)
         pd.testing.assert_frame_equal(result_df, expected_df)
 
-    @patch('f_473_ming.choice', return_value=500)
+    @patch(__name__ + '.choice', return_value=500)
     def test_penalties_greater_than_goals(self, mock_choice):
         goals = {'Team B': 1, 'Team D': 2}
         penalties = {'Team B': 3, 'Team D': 5}
@@ -97,7 +97,7 @@ class TestCases(unittest.TestCase):
         result_df = f_473(goals, penalties)
         pd.testing.assert_frame_equal(result_df, expected_df)
 
-    @patch('f_473_ming.choice', return_value=300)
+    @patch(__name__ + '.choice', return_value=300)
     def test_all_teams_penalty(self, mock_choice):
         goals = {'Team A': 0, 'Team B': 0, 'Team C': 0, 'Team D': 0, 'Team E': 0}
         penalties = {'Team A': 2, 'Team B': 1, 'Team C': 3, 'Team D': 1, 'Team E': 4}
@@ -113,7 +113,7 @@ class TestCases(unittest.TestCase):
         result_df = f_473(goals, penalties)
         pd.testing.assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
 
-    @patch('f_473_ming.choice', return_value=100)
+    @patch(__name__ + '.choice', return_value=100)
     def test_empty_goals_and_penalties(self, mock_choice):
         goals = {}
         penalties = {}
@@ -129,7 +129,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result_df, expected_df)
 
 
-    @patch('f_473_ming.choice', return_value=300)
+    @patch(__name__ + '.choice', return_value=300)
     def test_no_penalties(self, mock_choice):
         goals = {'Team A': 3, 'Team B': 2}
         penalties = {'Team A': 0, 'Team B': 0}

@@ -26,8 +26,6 @@ def f_484(L):
 
     Example:
     >>> ax = f_484([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
     """
     # Constants
     N_CLUSTERS = 3

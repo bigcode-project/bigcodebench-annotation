@@ -38,7 +38,8 @@ def f_519(texts):
 
     vectorizer = CountVectorizer()
     dtm = vectorizer.fit_transform(tokenized_texts)
-    dtm_df = pd.DataFrame(dtm.toarray(), columns=vectorizer.get_feature_names_out())
+    dtm_df = pd.DataFrame(dtm.toarray(), columns= vectorizer.get_feature_names_out() if hasattr(vectorizer,
+                                                                  'get_feature_names_out') else vectorizer.get_feature_names())
 
     return dtm_df
 

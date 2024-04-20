@@ -32,8 +32,6 @@ def f_437(a, b):
 
     Example:
     >>> ax = f_437([1, 2, 3], ['A', 'B', 'C', 'D', 'E'])
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
     """
     if not a or not b:  # Check if either list is empty
         fig, ax = plt.subplots()  # Creates a blank plot

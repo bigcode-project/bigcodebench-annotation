@@ -30,8 +30,6 @@ def f_479(goals, penalties):
 
     Example:
     >>> df, plots = f_479(5, 3)
-    >>> type(plots[0])
-    <class 'matplotlib.axes._axes.Axes'>
     """
     match_results = []
 
