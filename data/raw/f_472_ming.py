@@ -9,6 +9,7 @@ matplotlib.use('Agg')
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
+
 def f_472(df, tuples, n_plots):
     """
     Removes rows from a DataFrame based on values of multiple columns, 

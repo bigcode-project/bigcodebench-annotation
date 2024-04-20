@@ -42,11 +42,9 @@ def f_520(x, y, labels):
     
     return fig
 
+
 import unittest
-import numpy as np
 import matplotlib
-import matplotlib.pyplot as plt
-import scipy.stats as stats
 
 
 def run_tests():
