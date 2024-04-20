@@ -3,12 +3,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def f_811(df):
+def f_811(data):
     """
-    Creates and return a heatmap of the cumulative sum of each column in a pandas DataFrame.
+    Creates and return a heatmap of the cumulative sum of each column in a dictionary.
 
     Parameters:
-    - df (pandas.DataFrame): A DataFrame with numerical values.
+    - data (dict): A dictionary where the keys are the column names and the values are the column values.
 
     Returns:
     - matplotlib.axes._subplots.AxesSubplot: The AxesSubplot object of the Seaborn heatmap.
@@ -18,16 +18,16 @@ def f_811(df):
 
     Requirements:
     - pandas
-    - matplotlib
     - seaborn
 
     Notes:
     - Only numeric columns are considered for the heatmap. Non-numeric columns are ignored.
 
     Example:
-    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    >>> ax = f_811(df)
+    >>> data = {'A': [1, 2, 3], 'B': [4, 5, 6]}
+    >>> ax = f_811(data)
     """
+    df = pd.DataFrame(data)
     numeric_df = df.select_dtypes(include=["number"])
     if numeric_df.empty:
         raise ValueError("No numeric columns present")
@@ -48,8 +48,9 @@ class TestCases(unittest.TestCase):
         plt.close("all")
 
     def test_cumsum_correctness(self):
-        df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
-        ax = f_811(df)
+        data = {"A": [1, 2, 3], "B": [4, 5, 6]}
+        df = pd.DataFrame(data)
+        ax = f_811(data)
         result_cumsum = df.cumsum().values.flatten()
         heatmap_data = ax.collections[0].get_array().data.flatten()
         np.testing.assert_array_equal(
@@ -57,8 +58,8 @@ class TestCases(unittest.TestCase):
         )
 
     def test_non_numeric_columns_ignored(self):
-        df = pd.DataFrame({"A": [1, 2, 3], "B": ["one", "two", "three"]})
-        ax = f_811(df)
+        data = {"A": [1, 2, 3], "B": ["one", "two", "three"]}
+        ax = f_811(data)
         self.assertIsInstance(
             ax, plt.Axes, "The result should be a matplotlib AxesSubplot object"
         )
@@ -67,42 +68,42 @@ class TestCases(unittest.TestCase):
         )
 
     def test_with_positive_numbers(self):
-        df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
-        result = f_811(df)
+        data = {"A": [1, 2, 3], "B": [4, 5, 6]}
+        result = f_811(data)
         self.assertIsInstance(
             result, plt.Axes, "The result should be a matplotlib AxesSubplot object"
         )
 
     def test_with_negative_numbers(self):
-        df = pd.DataFrame({"A": [-1, -2, -3], "B": [-4, -5, -6]})
-        result = f_811(df)
+        data = {"A": [-1, -2, -3], "B": [-4, -5, -6]}
+        result = f_811(data)
         self.assertIsInstance(
             result, plt.Axes, "The result should be a matplotlib AxesSubplot object"
         )
 
     def test_with_mixed_numbers(self):
-        df = pd.DataFrame({"A": [1, -2, 3], "B": [-4, 5, -6]})
-        result = f_811(df)
+        data = {"A": [1, -2, 3], "B": [-4, 5, -6]}
+        result = f_811(data)
         self.assertIsInstance(
             result, plt.Axes, "The result should be a matplotlib AxesSubplot object"
         )
 
     def test_with_zeroes(self):
-        df = pd.DataFrame({"A": [0, 0, 0], "B": [0, 0, 0]})
-        result = f_811(df)
+        data = {"A": [0, 0, 0], "B": [0, 0, 0]}
+        result = f_811(data)
         self.assertIsInstance(
             result, plt.Axes, "The result should be a matplotlib AxesSubplot object"
         )
 
     def test_with_empty_dataframe(self):
-        df = pd.DataFrame({"A": [], "B": []})
+        data = {"A": [], "B": []}
         with self.assertRaises(ValueError):
-            f_811(df)
+            f_811(data)
 
     def test_no_numeric_columns(self):
-        df = pd.DataFrame({"A": ["one", "two", "three"], "B": ["four", "five", "six"]})
+        data = {"A": ["one", "two", "three"], "B": ["four", "five", "six"]}
         with self.assertRaises(ValueError):
-            f_811(df)
+            f_811(data)
 
 
 def run_tests():

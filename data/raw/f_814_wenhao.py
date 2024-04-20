@@ -8,7 +8,7 @@ def f_814(directory_path: str):
     Analyzes a given directory, listing each file it contains along with its size,
     creation time, and last modification time without recursing into subdirectories.
 
-    Args:
+    Parameters:
     - directory_path (str): The path to the directory to be analyzed.
                             If it is empty, this function returns an empty list.
 

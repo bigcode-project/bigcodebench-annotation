@@ -16,7 +16,7 @@ def f_743(d):
     - pandas
     - sklearn.preprocessing.MinMaxScaler
 
-    Example usage:
+    Examples:
     >>> data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
     >>> print(f_743(data))
          x         y    z

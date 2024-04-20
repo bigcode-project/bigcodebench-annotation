@@ -4,12 +4,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
-def f_593(df, target_column):
+def f_593(data, columns, target_column):
     """
     Perform a logistic regression on a DataFrame to predict a specific target column.
 
     Parameters:
-    - df (pd.DataFrame): The input DataFrame.
+    - data (np.array): The input data as a NumPy array.
+    - columns (list): The list of column names.
     - target_column (str): The target column name.
 
     Returns:
@@ -19,10 +20,10 @@ def f_593(df, target_column):
     >>> np.random.seed(42)
     >>> data = np.random.randint(0, 100, size=(100, 4))  # Using np to generate random data
     >>> columns = ['A', 'B', 'C', 'target']
-    >>> df = pd.DataFrame(data, columns=columns)  # Explicitly using pd to create DataFrame
-    >>> f_593(df, 'target')
+    >>> f_593(data, columns, 'target')
     0.0
     """
+    df = pd.DataFrame(data, columns=columns)
     if target_column not in df.columns:
         raise ValueError('Target column does not exist in DataFrame')
 
@@ -42,17 +43,22 @@ def f_593(df, target_column):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'C': [0, 1, 0]})
-        self.assertEqual(f_593(df, 'C'), 0.0)
+        data = np.array([[1, 4, 0], [2, 5, 1], [3, 6, 0]])
+        columns = ['A', 'B', 'C']
+        self.assertEqual(f_593(data, columns, 'C'), 0.0)
     def test_case_2(self):
-        df = pd.DataFrame({'A': [1, 2, 3, -10], 'B': [4, 5, 6, -10], 'C': [1, 1, 1, 0]})
-        self.assertEqual(f_593(df, 'C'), 1.0)
+        data = np.array([[1, 2, 3, -10], [4, 5, 6, -10], [1, 1, 1, 0]])
+        columns = ['A', 'B', 'C']
+        self.assertEqual(f_593(data, columns, 'C'), 1.0)
     def test_case_3(self):
-        df = pd.DataFrame({'A': [1, 2, 3, -10], 'B': [4, 5, 6, -10], 'C': [0, 0, 0, 1]})
-        self.assertEqual(f_593(df, 'C'), 1.0)
+        data = np.array([[1, 2, 3, -10], [4, 5, 6, -10], [0, 0, 0, 1]])
+        columns = ['A', 'B', 'C']
+        self.assertEqual(f_593(data, columns, 'C'), 1.0)
     def test_case_4(self):
-        df = pd.DataFrame({'A': [-10, 2, 3, -10], 'B': [-10, 5, 6, -10], 'C': [1, 0, 0, 1]})
-        self.assertEqual(f_593(df, 'C'), 1.0)
+        data = np.array([[-10, 2, 3, -10], [-10, 5, 6, -10], [1, 0, 0, 1]])
+        columns = ['A', 'B', 'C']
+        self.assertEqual(f_593(data, columns, 'C'), 1.0)
     def test_case_5(self):
-        df = pd.DataFrame({'A': [-10, 2, 3, -10], 'B': [-10, 5, 6, -10], 'C': [0, 1, 1, 0]})
-        self.assertEqual(f_593(df, 'C'), 1.0)
+        data = np.array([[-10, 2, 3, -10], [-10, 5, 6, -10], [0, 1, 1, 0]])
+        columns = ['A', 'B', 'C']
+        self.assertEqual(f_593(data, columns, 'C'), 1.0)
