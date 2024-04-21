@@ -154,7 +154,7 @@ def extract_test(file_contents, function_name):
 
 
 def extract_content(file_path):
-    data = {}
+    data = {"file": file_path.split("/")[-1]}
     with open(file_path, 'r') as file:
             for line in file:
                 line = line.strip()
@@ -312,8 +312,8 @@ if __name__ == "__main__":
     os.makedirs("data/processed")
     with open("data/open-eval.jsonl", "w") as f:
         for file in tqdm(glob("data/clean/*.py")):
-            if "ratna" in file:
-                continue
+            # if "ratna" in file:
+            #     continue
             data = extract_content(file)
             # assert validate_lib_num(data), f"Less than 2 libraries are used in {file.replace('clean/', 'raw/')}"
             # assert validate_doc_example(data), f"Example is missing in {file.replace('clean/', 'raw/')}"

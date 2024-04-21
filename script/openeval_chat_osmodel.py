@@ -65,10 +65,10 @@ class ContentParser:
             return stop_at_stop_token(content[j1:j2], EOS)
         # second parse content with assumption that model wrote code without description
         for entry_point in self._entry_point_variations(entry_point):
-            if entry_point in content:
+            if "def " + entry_point in content:                
                 content = content.split(entry_point)[1]
                 return stop_at_stop_token("".join(content.splitlines(keepends=True)[1:]), EOS)
-        raise ParseError(f"Prompt is not in content:\n{content}")
+        return stop_at_stop_token("".join(content.splitlines(keepends=True)[1:]), EOS)
 
 
 class ChatWrapper:
