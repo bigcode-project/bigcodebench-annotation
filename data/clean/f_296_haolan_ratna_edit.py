@@ -20,11 +20,11 @@ def f_296(df, col):
     - seaborn
     - matplotlib.pyplot
 
-    Note:
+    Raises:
     - The input df must be DataFrame, not be empty, and must contain the specified column, if it is not, the function will raise ValueError.
    
 
-    Examples:
+    Example:
     >>> df = pd.DataFrame({'value': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
     >>> fig = f_296(df, 'value')
     >>> type(fig)

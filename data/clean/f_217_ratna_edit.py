@@ -19,14 +19,6 @@ def f_217(csv_url, sort_by_column="title"):
     - io.StringIO
 
     Example:
-    >>> import pandas as pd
-    >>> from io import StringIO
-    >>> import requests
-    >>> from unittest.mock import MagicMock
-    >>> csv_data = "id,title,price\\n1,Apple,0.3\\n2,Banana,0.5\\n3,Cherry,0.2\\n"
-    >>> mock_response = MagicMock()
-    >>> mock_response.text = csv_data
-    >>> requests.get = MagicMock(return_value=mock_response)
     >>> f_217("http://example.com/data.csv", sort_by_column="title")
        id   title  price
     0   1   Apple    0.3

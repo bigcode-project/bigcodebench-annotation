@@ -21,6 +21,9 @@ def f_299(df, column):
     - re
     - numpy
 
+    Raises:
+    - The function will raise KeyError if the "column" does not exist in input "df"
+
     Example:
     >>> data = pd.DataFrame({"text": ["6f96cfdfe5ccc627cadf24b41725caa4 gorilla", "6f96cfdfe5ccc627cadf24b41725caa4 banana", "1234567890abcdef1234567890abcdef apple"]})
     >>> counts = f_299(data, "text")

@@ -27,8 +27,10 @@ def f_297(df, col, title=None):
     Fruit Distribution
     >>> plt.close()
 
-    Note:
+    Raises:
     - The input df must be DataFrame, not be empty, and must contain the specified column, if it is not, the function will raise ValueError.
+
+    Note:
     - Each unique value in the column is represented by a slice in the pie chart with a unique color from a predefined set. 
     - The pie chart can have a title if specified.
 

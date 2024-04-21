@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 
 
@@ -14,8 +14,12 @@ def f_258(ax, num_points):
     Returns:
     matplotlib.axes._subplots.AxesSubplot: The modified Axes object with plotted points.
 
+    Raises:
+    - This function will raise a ValueError if the input ax is not and Axes.
+    - This function will raise a ValueError if it is use the negative number as num_points.
+
     Requirements:
-    - matplotlib.pyplot
+    - matplotlib
     - numpy
 
     Example:
@@ -27,6 +31,9 @@ def f_258(ax, num_points):
     10.0
     >>> plt.close()
     """
+    
+    if not isinstance(ax, matplotlib.axes.AxesSubplots):
+        raise ValueError("The input is not an axes")
 
     r = np.random.rand(num_points)
     theta = 2 * np.pi * np.random.rand(num_points)
@@ -90,6 +97,10 @@ class TestCases(unittest.TestCase):
         with self.assertRaises(ValueError, msg="Should raise ValueError for negative number of points"):
             f_258(ax, -10)
         plt.close()
+
+    def test_case_6(self):
+        with self.assertRaises(ValueError):
+            f_258("non_ax", 1)
 
 def run_tests():
     suite = unittest.TestSuite()

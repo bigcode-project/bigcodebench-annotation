@@ -12,6 +12,9 @@ def f_254(data):
     Returns:
     matplotlib.figure.Figure: The Figure object containing the pie chart.
 
+    Raises:
+    - The function will raise ValueError if the input data is not a DataFrame.
+
     Requirements:
     - matplotlib.pyplot
     - pandas
@@ -25,7 +28,12 @@ def f_254(data):
     <class 'matplotlib.figure.Figure'>
     >>> len(fig.axes[0].patches) #check slices from pie chart
     3
+    >>> plt.close()
     """
+
+    
+    if not isinstance(data, pd.DataFrame):
+        raise ValueError("Input df is not a DataFrame.")
 
     job_count = data['Job'].value_counts()
     
@@ -48,6 +56,7 @@ class TestFunction(unittest.TestCase):
         data = pd.DataFrame(columns=['Name', 'Date', 'Job'])
         fig = f_254(data)
         self.assertIsInstance(fig, plt.Figure)
+        plt.close()
 
     def test_single_job(self):
         data = pd.DataFrame({'Name': ['John'], 'Date': ['01/03/2012'], 'Job': ['Engineer']})
@@ -56,6 +65,8 @@ class TestFunction(unittest.TestCase):
         # Check pie sizes
         sizes = fig.axes[0].patches
         self.assertEqual(len(sizes), 1)  # There should be only one slice
+        plt.close()
+
 
     def test_multiple_jobs(self):
         data = pd.DataFrame({'Name': ['John', 'Jane'], 'Date': ['01/03/2012', '02/05/2013'], 'Job': ['Engineer', 'Doctor']})
@@ -64,16 +75,22 @@ class TestFunction(unittest.TestCase):
         # Check pie sizes
         sizes = fig.axes[0].patches
         self.assertEqual(len(sizes), 2)  # There should be two slices
+        plt.close()
+
 
     def test_repeated_jobs(self):
         data = pd.DataFrame({'Name': ['John', 'Jane', 'Joe'], 'Date': ['01/03/2012', '02/05/2013', '03/08/2014'], 'Job': ['Engineer', 'Engineer', 'Lawyer']})
         fig = f_254(data)
         self.assertIsInstance(fig, plt.Figure)
+        plt.close()
+
 
     def test_large_dataset(self):
         data = pd.DataFrame({'Name': ['Person' + str(i) for i in range(100)], 'Date': ['01/01/2020' for _ in range(100)], 'Job': ['Job' + str(i % 3) for i in range(100)]})
         fig = f_254(data)
         self.assertIsInstance(fig, plt.Figure)
+        plt.close()
+
 
 def run_tests():
     suite = unittest.TestSuite()

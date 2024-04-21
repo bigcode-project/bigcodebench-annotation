@@ -25,6 +25,8 @@ def f_318(df, group_col, value_col, group_name):
     - The title of the plot will be 'Bar chart of [value_col] for [group_name]'.
     - The x-axis label will be the name of the grouping column [group_col].
     - The y-axis label will be the name of the value column [value_col].
+
+    Raises:
     - Raise ValueError if the group_name does not exist in df.
 
     Example:

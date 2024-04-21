@@ -15,7 +15,9 @@ def f_303(json_list, r):
 
     Note:
     - The datetime to be extracted is located in the 'number_list' key in the JSON data.
-    - Raise an Error if the json_list is an invalid JSON, empty, or does not have 'number_list' key.
+
+    Raises:
+    - Raise an Exception if the json_list is an invalid JSON, empty, or does not have 'number_list' key.
     
     Requirements:
     - itertools

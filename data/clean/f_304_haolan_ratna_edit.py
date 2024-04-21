@@ -21,7 +21,7 @@ def f_304(df):
     - sklearn.model_selection.train_test_split
     - sklearn.linear_model.LinearRegression
     
-    Note:
+    Raises:
     - The function will raise a ValueError is input df is not a DataFrame.
 
     Example:

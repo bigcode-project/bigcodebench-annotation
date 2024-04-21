@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
@@ -25,10 +24,12 @@ def f_276(df, plot=False):
     - This function use "Scaled Values Over Time" for the plot title.
     - This function use "Date" and "Scaled Value" as the xlabel and ylabel respectively.
 
+    Raises:
+    - This function will raise KeyError if the DataFrame does not have the 'Date' and 'Value' columns.
+
     Requirements:
     - pandas
-    - numpy
-    - sklearn.preprocessing
+    - sklearn.preprocessing.StandardScaler
     - matplotlib.pyplot
 
     Example:
