@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
 
     def test_case_6(self):
         with self.assertRaises(ValueError):
-            f_245("non_df", {})
+            f_245("non_df")
 
 def run_tests():
     suite = unittest.TestSuite()
