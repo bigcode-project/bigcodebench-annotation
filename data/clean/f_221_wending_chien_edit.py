@@ -1,4 +1,3 @@
-import pandas as pd
 import re
 import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -20,9 +19,11 @@ def f_221(df):
     Note:
     - If the DataFrame does not contain 'Title' and 'Content' columns, the function returns an empty plot.
     - If no articles have titles containing "how" or "what," the function also returns an empty plot.
+    - Set the name of the y-axis to 'TF-IDF Score'.
+    - Set xticks to display the feature names vertically.
 
     Requirements:
-    pandas, re, matplotlib.pyplot, sklearn.feature_extraction.text, numpy
+    re, matplotlib, sklearn, numpy
 
     Example:
     >>> data = {'Title': ['How to make pancakes', 'News update'], 'Content': ['Pancakes are easy to make.', 'Today’s news is about politics.']}
@@ -59,6 +60,9 @@ def f_221(df):
 
 import unittest
 import pandas as pd
+import matplotlib
+
+matplotlib.use('Agg')
 
 
 class TestCases(unittest.TestCase):

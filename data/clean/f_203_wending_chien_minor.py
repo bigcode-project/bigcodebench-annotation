@@ -1,6 +1,4 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 
 
@@ -18,7 +16,7 @@ def f_203(data_dict, data_keys):
     normalized data.
 
     Requirements:
-    pandas, numpy, matplotlib.pyplot, sklearn.preprocessing
+    pandas, sklearn
 
     Raises:
     ValueError: If no keys in `data_keys` are found in `data_dict`.
@@ -56,6 +54,7 @@ def f_203(data_dict, data_keys):
 
 
 import unittest
+import matplotlib.pyplot as plt
 
 
 def run_tests():

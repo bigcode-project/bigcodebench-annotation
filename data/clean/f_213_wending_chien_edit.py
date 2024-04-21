@@ -1,7 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
 
 
 def f_213(num_labels=5, data_range=(0, 1)):
@@ -17,7 +16,7 @@ def f_213(num_labels=5, data_range=(0, 1)):
     matplotlib.figure.Figure: A Figure object containing the stacked bar chart of the generated data.
 
     Requirements:
-    pandas, matplotlib.pyplot, numpy, seaborn
+    pandas, matplotlib, numpy
 
     Example:
     >>> fig = f_213()

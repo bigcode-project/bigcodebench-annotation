@@ -21,7 +21,7 @@ def f_216(num_groups=5, data_size=5, labels=None):
         - str: The filename where the plot is saved ('test_plot.png').
 
     Requirements:
-    pandas, matplotlib.pyplot, numpy
+    pandas, matplotlib, numpy
 
     Example:
     >>> np.random.seed(0)
@@ -57,6 +57,9 @@ import unittest
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import matplotlib
+
+matplotlib.use('Agg')
 
 
 def run_tests():

@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 
 # Constants
@@ -20,7 +19,7 @@ def f_206(data):
         - Axes: A matplotlib Axes object with the plot of row averages.
 
     Requirements:
-    pandas, numpy, matplotlib.pyplot
+    pandas, matplotlib
 
     Example:
     >>> data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])
@@ -43,6 +42,9 @@ def f_206(data):
 
 import unittest
 import numpy as np
+import matplotlib
+
+matplotlib.use('Agg')
 
 
 def run_tests():

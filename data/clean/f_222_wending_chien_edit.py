@@ -1,4 +1,3 @@
-import pandas as pd
 import re
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import CountVectorizer
@@ -19,7 +18,7 @@ def f_222(df):
     list: List of cluster labels for the filtered articles, indicating the cluster to which each article belongs.
 
     Requirements:
-    pandas, re, sklearn.cluster, sklearn.feature_extraction.text
+    re, sklearn
 
     Example:
     >>> df_sample = pd.DataFrame({

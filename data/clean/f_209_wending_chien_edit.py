@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import seaborn as sns
-import matplotlib.pyplot as plt
 from scipy import stats
 
 # Constants
@@ -26,7 +25,7 @@ def f_209(data):
         if the test could not be conducted.
 
     Requirements:
-    pandas, numpy, seaborn, scipy.stats, matplotlib.pyplot
+    pandas, numpy, seaborn, scipy
 
     Raises:
     ValueError: If the input data does not have exactly eight columns.

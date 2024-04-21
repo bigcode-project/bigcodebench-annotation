@@ -1,6 +1,5 @@
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 
 def f_208(data):
@@ -17,7 +16,7 @@ def f_208(data):
         - Axes: The matplotlib Axes object showing the heatmap of the correlations.
 
     Requirements:
-    pandas, numpy, seaborn, matplotlib.pyplot
+    pandas, numpy, seaborn
 
     Raises:
     ValueError: If the input data is not a 2D array or if it contains non-numeric data.
@@ -49,6 +48,10 @@ def f_208(data):
 import unittest
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.use('Agg')
 
 
 def run_tests():
@@ -86,8 +89,8 @@ class TestCases(unittest.TestCase):
         df, _ = f_208(self.data)
         expected_correlation = pd.DataFrame(self.data).corr()
         actual_correlation = \
-        sns.heatmap(pd.DataFrame(self.data).corr(), annot=True, cmap='coolwarm').get_figure().axes[0].collections[
-            0].get_array()
+            sns.heatmap(pd.DataFrame(self.data).corr(), annot=True, cmap='coolwarm').get_figure().axes[0].collections[
+                0].get_array()
         np.testing.assert_array_almost_equal(actual_correlation, expected_correlation.to_numpy().ravel())
 
     def test_input_validation(self):

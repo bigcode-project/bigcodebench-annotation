@@ -1,4 +1,3 @@
-import pandas as pd
 import re
 import nltk
 from string import punctuation
@@ -16,7 +15,7 @@ def f_220(df):
     dict: A dictionary with keys as words and values as their corresponding frequency, excluding any punctuation marks.
 
     Requirements:
-    pandas, re, nltk, string
+    re, nltk, string
 
     Raises:
     ValueError: If the DataFrame is empty or does not contain the necessary columns 'Title' and 'Content'.
@@ -51,6 +50,9 @@ def f_220(df):
 
 import unittest
 import pandas as pd
+import nltk
+
+nltk.download('punkt')  # Ensure the NLTK tokenizer is available
 
 
 def run_tests():
@@ -61,11 +63,6 @@ def run_tests():
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
-
-
-import nltk
-
-nltk.download('punkt')  # Ensure the NLTK tokenizer is available
 
 
 class TestCases(unittest.TestCase):
