@@ -24,12 +24,13 @@ def f_216(num_groups=5, data_size=5, labels=None):
     pandas, matplotlib.pyplot, numpy
 
     Example:
+    >>> np.random.seed(0)
     >>> fig, data, plot_filename = f_216(3, 3, ['A', 'B', 'C'])
     >>> print(data)
-                 A         B         C
-    0  0.228417  0.719754  0.420622
-    1  0.365601  0.951348  0.571545
-    2  0.268062  0.338793  0.346639
+              A         B         C
+    0  0.548814  0.715189  0.602763
+    1  0.544883  0.423655  0.645894
+    2  0.437587  0.891773  0.963663
     >>> print(plot_filename)
     test_plot.png
     """

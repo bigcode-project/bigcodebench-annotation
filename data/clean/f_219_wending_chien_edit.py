@@ -30,7 +30,7 @@ def f_219(df):
     >>> df = pd.DataFrame(data)
     >>> ax = f_219(df)
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._axes.Axes'>
     """
 
     if df.empty or 'Likes' not in df.columns or 'Views' not in df.columns or 'Title' not in df.columns:

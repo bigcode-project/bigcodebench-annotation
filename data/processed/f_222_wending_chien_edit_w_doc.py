@@ -23,10 +23,10 @@ def f_222(df):
 
     Example:
     >>> df_sample = pd.DataFrame({
-        'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
-        'Content': ['This is a tutorial about coding...', 'Python is a programming language...',
-                    'Programming is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
-    })
+    ...    'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
+    ...    'Content': ['This is a tutorial about coding...', 'Python is a programming language...',
+    ...                'Programming is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
+    ... })
     >>> f_222(df_sample)
     [0, 1, 0, 1]
     """

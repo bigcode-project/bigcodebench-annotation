@@ -28,8 +28,9 @@ def f_202(product_dict, product_keys):
     >>> product_keys = ['Apple', 'Banana']
     >>> report, ax = f_202(product_dict, product_keys)
     >>> print(report)
-    >>> if ax:
-    ...     plt.show()
+      Product  Quantity  Price  Profit
+    0   Apple       100    2.5   250.0
+    1  Banana       120    1.5   180.0
     """
     columns = ['Product', 'Quantity', 'Price', 'Profit']
     data = []

@@ -19,10 +19,11 @@ def f_218(country_dict):
     numpy, pandas
 
     Example:
+    >>> np.random.seed(0)
     >>> country_dict = {'John': 'USA', 'Alice': 'UK', 'Bob': 'China', 'Charlie': 'Japan', 'David': 'Australia'}
     >>> df = f_218(country_dict)
     >>> df.loc['USA']
-    GDP    45000000000
+    GDP    55085855791
     Name: USA, dtype: int64
     """
     COUNTRIES = ['USA', 'UK', 'China', 'Japan', 'Australia']

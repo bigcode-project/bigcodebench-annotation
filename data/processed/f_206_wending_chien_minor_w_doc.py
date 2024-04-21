@@ -26,9 +26,9 @@ def f_206(data):
     >>> data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])
     >>> df, ax = f_206(data)
     >>> print(df.to_string(index=False))
-       A  B  C  D  E  F  G  H  Average
-       1  2  3  4  4  3  7  1      3.125
-       6  2  3  4  3  4  4  1      3.375
+     A  B  C  D  E  F  G  H  Average
+     1  2  3  4  4  3  7  1    3.125
+     6  2  3  4  3  4  4  1    3.375
     """
     df = pd.DataFrame(data, columns=COLUMN_NAMES)
     df['Average'] = df.mean(axis=1)

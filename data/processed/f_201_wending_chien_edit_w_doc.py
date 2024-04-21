@@ -26,8 +26,8 @@ def f_201(elements, include_index=False):
     >>> result = f_201(['abc', 'def'], include_index=True)
     >>> print(result.to_string(index=False))
      Index Element  Count
-        0     abc      3
-        1     def      3
+         0     abc      3
+         1     def      3
     """
     elements_series = pd.Series(elements)
     count_series = elements_series.apply(lambda x: len(x))

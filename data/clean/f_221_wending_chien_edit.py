@@ -29,7 +29,7 @@ def f_221(df):
     >>> df = pd.DataFrame(data)
     >>> ax = f_221(df)
     >>> type(ax)
-    <class 'matplotlib.axes._subplots.AxesSubplot'>
+    <class 'matplotlib.axes._axes.Axes'>
     """
     pattern = re.compile(r'(how|what)', re.IGNORECASE)
 

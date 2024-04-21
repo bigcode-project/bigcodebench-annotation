@@ -23,6 +23,7 @@ def f_211(text, rwidth=0.8):
     bins will be created.
 
     Example:
+    >>> import matplotlib
     >>> ax = f_211('Hello world, this is a test sentence.')
     >>> isinstance(ax, matplotlib.axes.Axes)
     True

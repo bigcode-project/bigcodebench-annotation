@@ -34,10 +34,10 @@ def f_223(dataframe, text_column):
     >>> df = pd.DataFrame({'text': ['This is a test.', 'Python is cool!', 'nltk and sklearn are useful for text analysis.']})
     >>> result = f_223(df, 'text')
     >>> print(result.to_string(index=False))
-       analysis  cool  nltk  python  sklearn  test  text  useful
-    0        0     0     0       0        0     1     1       0
-    1        0     1     0       1        0     0     0       0
-    2        1     0     1       0        1     0     1       1
+     analysis  cool  nltk  python  sklearn  test  text  useful
+            0     0     0       0        0     1     0       0
+            0     1     0       1        0     0     0       0
+            1     0     1       0        1     0     1       1
     """
 
     def preprocess_text(text):

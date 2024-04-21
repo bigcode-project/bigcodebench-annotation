@@ -24,7 +24,8 @@ def f_215(num_types=5, integer_range=(0, 100)):
 
     Example:
     >>> fig, ax = f_215(3, (0, 50))
-    >>> plt.show()  # This will display the plot.
+    >>> isinstance(fig, plt.Figure)
+    True
     """
     LABELS = [f'Type{i + 1}' for i in range(num_types)]
     data = pd.DataFrame({label: [randint(*integer_range) for _ in range(num_types)] for label in LABELS})

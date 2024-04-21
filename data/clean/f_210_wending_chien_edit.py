@@ -24,7 +24,7 @@ def f_210(log_file):
     Example:
     >>> output_path = f_210('server.log')
     >>> print(output_path)
-    'log_data.csv'
+    log_data.csv
     """
     log_pattern = r'(ERROR|INFO): \[\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*\] - (.*)'
     parsed_data = []

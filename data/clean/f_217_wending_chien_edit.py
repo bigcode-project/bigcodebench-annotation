@@ -29,9 +29,9 @@ def f_217(vegetable_dict):
     >>> vegetable_dict = {'John': 'Carrot', 'Alice': 'Potato', 'Bob': 'Tomato'}
     >>> print(f_217(vegetable_dict))
             Count  Percentage
-    Carrot      3       25.00
-    Potato      3       25.00
-    Tomato      6       50.00
+    Carrot      7   46.666667
+    Potato      7   46.666667
+    Tomato      1    6.666667
     """
     random.seed(0)
     # Create a counter for vegetables based on reversed dictionary

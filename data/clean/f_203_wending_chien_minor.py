@@ -28,10 +28,10 @@ def f_203(data_dict, data_keys):
     >>> data_keys = ['A', 'B']
     >>> normalized_df, ax = f_203(data_dict, data_keys)
     >>> print(normalized_df.to_string(index=False))
-       A    B
-    0  0.0  0.0
-    1  0.5  0.5
-    2  1.0  1.0
+      A   B
+    0.0 0.0
+    0.5 0.5
+    1.0 1.0
     """
     # Extract and transform the data for the specified keys
     data_for_keys = {key: data_dict[key] for key in data_keys if key in data_dict}

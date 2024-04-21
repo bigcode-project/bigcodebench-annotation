@@ -21,7 +21,7 @@ def f_205(data):
     Example:
     >>> df = f_205(['A', 'B', 'C', 'A', 'D', 'E', 'B', 'C'])
     >>> print(df.to_string(index=False))
-     Category  Encoded
+    Category  Encoded
            A        0
            B        1
            C        2

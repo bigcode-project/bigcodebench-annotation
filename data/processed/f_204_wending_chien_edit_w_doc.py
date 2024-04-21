@@ -23,11 +23,18 @@ def f_204():
     The grades are randomly generated for each course using a uniform distribution between 0 and 100.
 
     Example:
+    >>> random.seed(0)
     >>> grades = f_204()
     >>> print(grades[['Name', 'Average Grade']].to_string(index=False))
      Name  Average Grade
-      Joe          50.0
-      Amy          45.0
+      Joe         51.875
+      Amy         53.250
+     Mark         53.750
+     Sara         47.125
+     John         55.250
+    Emily         48.625
+      Zoe         63.750
+     Matt         54.750
     """
     students_data = []
 

@@ -23,8 +23,10 @@ def f_212(rows=5, cols=5):
     ValueError: If the number of columns exceeds the number of available categories.
 
     Example:
+    >>> import matplotlib
     >>> ax = f_212(3, 3)  # Generates a 3x3 DataFrame and plots it
-    >>> plt.show()  # This line is to display the plot, necessary in interactive environments
+    >>> isinstance(ax, matplotlib.axes.Axes)
+    True
     """
     np.random.seed(0)
     categories = ['A', 'B', 'C', 'D', 'E']
