@@ -39,44 +39,25 @@ def f_201(elements, include_index=False):
         count_df = count_df[['Index', 'Element', 'Count']]  # Reordering columns to put 'Index' first
     return count_df
 
-
 import unittest
-
-
-def run_tests():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCases))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-
-
 class TestCases(unittest.TestCase):
-
     def test_case_1(self):
         result = f_201(['hello'])
         expected = pd.DataFrame({'Element': ['hello'], 'Count': [5]})
         pd.testing.assert_frame_equal(result, expected)
-
     def test_case_2(self):
         result = f_201(['a', 'bc', 'def'])
         expected = pd.DataFrame({'Element': ['a', 'bc', 'def'], 'Count': [1, 2, 3]})
         pd.testing.assert_frame_equal(result, expected)
-
     def test_case_3(self):
         result = f_201(['zzz', 'zzz'])
         expected = pd.DataFrame({'Element': ['zzz', 'zzz'], 'Count': [3, 3]})
         pd.testing.assert_frame_equal(result, expected)
-
     def test_case_4(self):
         result = f_201(['hello world', 'open ai'])
         expected = pd.DataFrame({'Element': ['hello world', 'open ai'], 'Count': [11, 7]})
         pd.testing.assert_frame_equal(result, expected)
-
     def test_case_5(self):
         result = f_201(['hello', 'world'], include_index=True)
         expected = pd.DataFrame({'Index': np.array([0, 1], dtype='int64'), 'Element': ['hello', 'world'], 'Count': [5, 5]})
         pd.testing.assert_frame_equal(result, expected)
-
-
-if __name__ == "__main__":
-    run_tests()
