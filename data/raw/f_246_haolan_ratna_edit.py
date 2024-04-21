@@ -13,8 +13,10 @@ def f_246(df):
     Returns:
     tuple: A tuple containing the matplotlib.pyplot object and the axes object.
 
-    Note:
+    Raises:
     - The function will raise a ValueError is input df is not a DataFrame.
+
+    Note:
     - The function use "Linear Regression" for the plot title.
     - The function use "Age" and "Score" as the xlabel and ylabel respectively.
 
@@ -103,6 +105,10 @@ class TestF1545(unittest.TestCase):
         ])
         with self.assertRaises(KeyError):
             f_246(data)
+    
+    def test_non_df(self):
+        with self.assertRaises(ValueError):
+            f_246("non_df")
 
 def run_tests():
     suite = unittest.TestSuite()

@@ -22,6 +22,8 @@ def f_243(df, dct):
     Note:
     - This function operates on DataFrames containing numeric or categorical data that can be replaced with numeric values, as correlation calculations require numeric data.
     - This function using pearson method to calculate the correlation matrix.
+    
+    Raises:
     - This function will raise a ValueError is input df is not a DataFrame.
         
     Example:
@@ -81,6 +83,10 @@ class TestCases(unittest.TestCase):
         dct = {i: i + 1 for i in range(30)}
         result = f_243(df, dct)
         self.assertTrue(result.shape == (3, 3))
+
+    def test_case_6(self):
+        with self.assertRaises(ValueError):
+            f_243("non_df", {})
 
 def run_tests():
     suite = unittest.TestSuite()

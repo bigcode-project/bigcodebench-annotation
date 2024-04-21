@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 
 # Constants
@@ -15,9 +15,12 @@ def f_256(ax, func_index):
 
     Returns:
     matplotlib.axes._subplots.AxesSubplot: The modified ax with the plotted function.
-
+    
+    Raises:
+    - This function will raise a ValueError if the input ax is not and Axes.
+    
     Requirements:
-    - matplotlib.pyplot
+    - matplotlib
     - numpy
 
     Example:
@@ -28,6 +31,8 @@ def f_256(ax, func_index):
     1.0
     """
 
+    if not isinstance(ax, matplotlib.axes.AxesSubplots):
+        raise ValueError("The input is not an axes")
     x = np.linspace(0, 2 * np.pi, 1000)
     y = FUNCTIONS[func_index](x)
 
@@ -67,6 +72,10 @@ class TestCases(unittest.TestCase):
     def test_rlabel_position(self):
         ax = f_256(self.ax, 1)
         self.assertEqual(ax.get_rlabel_position(), 45, "Rlabel position should be 45 for index 1")
+
+    def test_case_non_ax(self):
+        with self.assertRaises(ValueError):
+            f_256("non_ax", 1)
 
 def run_tests():
     suite = unittest.TestSuite()

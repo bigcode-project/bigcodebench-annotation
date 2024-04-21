@@ -15,7 +15,7 @@ def f_219(data, key, min_value, max_value):
     Returns:
     DataFrame: Updated DataFrame with the new column added.
 
-    Note:
+    Raises:
     - The function will raise an error if the input data is not pandas DataFrame
     
     Requirements:

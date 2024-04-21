@@ -12,7 +12,7 @@ def f_265(n):
     list of tuples: A list of tuple pairs representing all possible combinations 
                     of two numbers within the specified range.
     
-    Note:
+    Raises:
     - This function will raise Value Error if the input n is less than 0.
     
     Requirements:

@@ -18,7 +18,7 @@ def f_242(df, dct, columns=None, plot_histograms=False):
     - pandas
     - matplotlib.pyplot
     
-    Note:
+    Raises:
     - The function will raise a ValueError is input df is not a DataFrame.
     
     Example:
@@ -52,6 +52,7 @@ def f_242(df, dct, columns=None, plot_histograms=False):
 
 import pandas as pd
 import unittest
+import matplotlib.pyplot as plt
 
 class TestCases(unittest.TestCase):
     def test_basic_functionality(self):
@@ -60,6 +61,7 @@ class TestCases(unittest.TestCase):
         expected_df = pd.DataFrame({'col1': ['a', 'b'], 'col2': ['c', 'd']})
         result_df = f_242(df, dct)
         pd.testing.assert_frame_equal(result_df, expected_df)
+        plt.close()
 
     def test_complex_dataframe(self):
         df = pd.DataFrame({'col1': [1, 2, 3, 4], 'col2': [5, 6, 7, 8], 'col3': [9, 10, 11, 12]})
@@ -67,18 +69,21 @@ class TestCases(unittest.TestCase):
         expected_df = pd.DataFrame({'col1': ['a', 'b', 'c', 'd'], 'col2': ['e', 'f', 'g', 'h'], 'col3': ['i', 'j', 'k', 'l']})
         result_df = f_242(df, dct)
         pd.testing.assert_frame_equal(result_df, expected_df)
+        plt.close()
 
     def test_empty_dataframe(self):
         df = pd.DataFrame()
         dct = {1: 'a', 2: 'b'}
         result_df = f_242(df, dct)
         pd.testing.assert_frame_equal(result_df, df)
+        plt.close()
 
     def test_columns_not_in_dataframe(self):
         df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
         dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
         result_df = f_242(df, dct, columns=['col3', 'col4'], plot_histograms=True)
         pd.testing.assert_frame_equal(result_df, df.replace(dct))
+        plt.close()
 
     def test_histogram_plotting(self):
         df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
@@ -86,6 +91,12 @@ class TestCases(unittest.TestCase):
         result_df = f_242(df, dct, columns=['col3', 'col4'], plot_histograms=True)
         # Since actual plot inspection is not feasible, assume histograms are correctly plotted if no errors are raised
         pd.testing.assert_frame_equal(result_df, df.replace(dct))
+        plt.close()
+
+    def test_case_non_df(self):
+        with self.assertRaises(ValueError):
+            f_242("non_df", {})
+        plt.close()
 
 def run_tests():
     suite = unittest.TestSuite()

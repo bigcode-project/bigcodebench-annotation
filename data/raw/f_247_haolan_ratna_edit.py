@@ -17,7 +17,7 @@ def f_247(df, test_size=0.2, random_state=42):
     Returns:
     float: The accuracy of the prediction as a float value.
     
-    Note:
+    Raises:
     - The function will raise a ValueError is input df is not a DataFrame.
     
     Requirements:
@@ -101,6 +101,10 @@ class TestCases(unittest.TestCase):
         data = self.generate_test_data(20)
         accuracy = f_247(data)
         self.assertIsInstance(accuracy, float)
+    
+    def test_case_non_df(self):
+        with self.assertRaises(ValueError):
+            f_247("non_df")
 
 def run_tests():
     suite = unittest.TestSuite()

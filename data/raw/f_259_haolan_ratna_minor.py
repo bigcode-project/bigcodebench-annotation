@@ -23,11 +23,13 @@ def f_259(ax, radius):
     - numpy
 
     Example:
+    >>> import matplotlib.pyplot as plt
     >>> fig = plt.figure()
     >>> ax = fig.add_subplot(111, polar=True)
     >>> result_ax = f_259(ax, 1.5)
     >>> np.allclose(result_ax.get_lines()[0].get_ydata(), 1.5)
     True
+    >>> plt.close()
     '''
     if radius < 0:
         raise ValueError('Radius must be non-negative')
@@ -51,6 +53,7 @@ class TestCases(unittest.TestCase):
         ax = fig.add_subplot(111, polar=True)
         result_ax = f_259(ax, 1.0)
         self.assertIsInstance(result_ax, plt.PolarAxes)
+        plt.close()
 
     def test_circle_radius(self):
         '''Test if the circle is drawn with the correct radius.'''
@@ -60,6 +63,7 @@ class TestCases(unittest.TestCase):
         result_ax = f_259(ax, radius)
         for line in result_ax.get_lines():
             self.assertTrue(np.allclose(line.get_ydata(), radius))
+        plt.close()
 
     def test_negative_radius(self):
         '''Test handling of negative radius.'''
@@ -67,6 +71,7 @@ class TestCases(unittest.TestCase):
         ax = fig.add_subplot(111, polar=True)
         with self.assertRaises(ValueError):
             f_259(ax, -1.0)
+        plt.close()
 
     def test_non_polar_plot(self):
         '''Test handling of non-polar plot input.'''
@@ -74,6 +79,7 @@ class TestCases(unittest.TestCase):
         ax = fig.add_subplot(111)
         with self.assertRaises(TypeError):
             f_259(ax, 1.0)
+        plt.close()
 
     def test_zero_radius(self):
         '''Test handling of zero radius.'''
@@ -83,6 +89,7 @@ class TestCases(unittest.TestCase):
         result_ax = f_259(ax, radius)
         for line in result_ax.get_lines():
             self.assertTrue(np.allclose(line.get_ydata(), radius))
+        plt.close()
 
 def run_tests():
     suite = unittest.TestSuite()
