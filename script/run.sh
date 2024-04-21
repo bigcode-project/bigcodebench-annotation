@@ -15,7 +15,6 @@ for name in "${NAMES[@]}"; do
             echo "Pytest failed on $file, stopping..."
             exit 1
         fi
-        sleep 1
     done
 
     for file in data/processed/*"$name"*w_doc.py; do
@@ -24,5 +23,4 @@ for name in "${NAMES[@]}"; do
             exit 1
         fi
     done
-    sleep 1
 done

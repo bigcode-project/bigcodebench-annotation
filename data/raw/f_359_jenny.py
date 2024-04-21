@@ -49,10 +49,10 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test non-overlapping numbers split into multi-item lists
+        # Test non-overlapping numbers split into multi-item listss
         ax = f_359([[1, 2, 3], [4, 5, 6]])
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.patches), 6)
+        self.assertEqual(len(ax.patches), 6, ax.get_xticklabels())
 
     def test_case_2(self):
         # Test non-overlapping numbers in individual lists
