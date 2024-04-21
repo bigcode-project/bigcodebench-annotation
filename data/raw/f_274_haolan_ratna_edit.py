@@ -11,7 +11,7 @@ def f_274(df):
     Returns:
     DataFrame: The pandas DataFrame after standardizing 'age' and 'income' columns.
 
-    Note:
+    Raises:
     - This function will raise ValueError if the DataFrame does not have the 'id', 'age', and 'income' columns.
 
     Requirements:
@@ -76,6 +76,11 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame({'id': list(range(1000)), 'age': list(range(1000)), 'income': list(range(1000, 2000))})
         result = f_274(df)
         self.assertEqual(len(result), 1000)
+    
+    def test_invalid_df(self):
+        df = pd.Dataframe()
+        with self.assertRaises(ValueError):
+            f_274(df)
 
 def run_tests():
     suite = unittest.TestSuite()

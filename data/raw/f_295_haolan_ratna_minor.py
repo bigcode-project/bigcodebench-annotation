@@ -34,6 +34,9 @@ def f_295(df, group_col, value_col):
       the colors will repeat from the beginning of the COLORS list.
     - This function use "Bar chart of {value_col} by {group_col}" for the plot title.
     - This function use value of variables group_col and value_col as the xlabel and ylabel respectively.
+
+    Raises:
+    -This function will raise TypeError if the 'Value' has non-numeric values.
     """
 
     group_mean = df.groupby(group_col)[value_col].mean()

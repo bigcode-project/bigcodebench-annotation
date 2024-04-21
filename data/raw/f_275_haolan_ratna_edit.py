@@ -11,8 +11,10 @@ def f_275(df):
     Returns:
     Axes: The matplotlib Axes object of the bar chart.
 
-    Note:
+    Raises:
     - The function will raise a ValueError is input df is not a DataFrame.
+
+    Note:
     - This function use "Value Distribution" for the plot title.
     - This function use "Value" and "Count" as the xlabel and ylabel respectively.
 

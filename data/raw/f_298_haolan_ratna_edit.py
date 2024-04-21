@@ -19,7 +19,7 @@ def f_298(df, col1, col2):
     - matplotlib.pyplot
     - seaborn
 
-    Note:
+    Raises:
     - Raise ValueError if the input df is not a DataFrame, empty, or does not contain the specified columns.
     - Raise TypeError if df use non-numeric data
 
@@ -122,6 +122,18 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(ax.collections), 1)  # Check if there's only one collection of points in the plot
         self.assertEqual(len(ax.collections[0].get_offsets()), 1)  # Check if there's only one data point in the collection
         plt.close()
+    
+    def test_non_df(self):
+        with self.assertRaises(ValueError):
+            f_298("non_df", 'A', 'B')
+    
+    def test_empty_df(self):
+        with self.assertRaises(ValueError):
+            f_298(pd.DataFrame(), 'A', 'B')
+
+    def test_column_df(self):
+        with self.assertRaises(ValueError):
+            f_298(pd.DataFrame({'A': [1]}), 'A', 'B')
 
 
 def run_tests():

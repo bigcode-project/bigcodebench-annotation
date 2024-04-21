@@ -22,6 +22,8 @@ def f_278(df, plot=False):
 
     Note:
     - This function use "Correlation Heatmap" as the title of the heatmap plot
+
+    Raises:
     - If the DataFrame input is empty or have invalid 'Value', this function will raise ValueError.
 
     Requirements:
