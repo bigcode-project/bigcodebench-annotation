@@ -32,7 +32,7 @@ def f_258(ax, num_points):
     >>> plt.close()
     """
     
-    if not isinstance(ax, matplotlib.axes.Axess):
+    if not isinstance(ax, matplotlib.axes.Axes):
         raise ValueError("The input is not an axes")
 
     r = np.random.rand(num_points)
