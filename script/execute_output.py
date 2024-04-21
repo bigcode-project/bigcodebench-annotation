@@ -21,8 +21,6 @@ if __name__ == '__main__':
         with open(f"{jsonl_file.replace('.jsonl', '.py')}","w") as fp:
             os.chdir(temp_dir)
             for output in tqdm(outputs):
-                if not output["generation"][0]:
-                    continue
                 temp_script = os.path.join(temp_dir, "test_temp.py")
                 if output["generation"][0]:
                     with open(temp_script,"w") as f:
