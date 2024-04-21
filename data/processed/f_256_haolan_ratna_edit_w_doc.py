@@ -24,11 +24,13 @@ def f_256(ax, func_index):
     - numpy
 
     Example:
+    >>> import matplotlib.pyplot as plt
     >>> fig = plt.figure()
     >>> ax = fig.add_subplot(111, polar=True)
     >>> ax_up = f_256(ax, 1)
     >>> ax_up.lines[0].get_ydata()[0]
     1.0
+    >>> plt.close()
     """
 
     if not isinstance(ax, matplotlib.axes.Axess):
@@ -42,6 +44,7 @@ def f_256(ax, func_index):
 
 import unittest
 import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def setUp(self):
         self.fig = plt.figure()

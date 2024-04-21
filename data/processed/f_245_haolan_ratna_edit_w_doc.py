@@ -84,4 +84,4 @@ class TestCases(unittest.TestCase):
         self.assertEqual(f_245(data), expected_output)
     def test_case_6(self):
         with self.assertRaises(ValueError):
-            f_245("non_df", {})
+            f_245("non_df")
