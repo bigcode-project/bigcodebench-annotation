@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
 import csv
+from io import StringIO
 
 # Constants
 DATABASE_NAME = 'test.db'
