@@ -28,12 +28,13 @@ def f_256(ax, func_index):
     >>> fig = plt.figure()
     >>> ax = fig.add_subplot(111, polar=True)
     >>> ax_up = f_256(ax, 1)
+    <class 'matplotlib.projections.polar.PolarAxes'>
     >>> ax_up.lines[0].get_ydata()[0]
     1.0
     >>> plt.close()
     """
-
-    if not isinstance(ax, matplotlib.axes.Axess):
+    print(type(ax))
+    if not isinstance(ax, matplotlib.axes.Axes):
         raise ValueError("The input is not an axes")
     x = np.linspace(0, 2 * np.pi, 1000)
     y = FUNCTIONS[func_index](x)

@@ -39,7 +39,7 @@ def f_263(n_keys, n_values):
 import unittest
 import random
 LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
-class TestFunction(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_basic_functionality(self):
         random.seed(0)
         result = f_263(3, 5)

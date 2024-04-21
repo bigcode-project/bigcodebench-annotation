@@ -33,7 +33,7 @@ def f_265(n):
     return pairs
 
 import unittest
-class TestFunction(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_small_range(self):
         self.assertEqual(f_265(2), [(1, 2)])
     def test_medium_range(self):

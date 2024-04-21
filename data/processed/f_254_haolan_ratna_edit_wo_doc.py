@@ -50,7 +50,7 @@ def f_254(data):
 import unittest
 import matplotlib.pyplot as plt
 import pandas as pd
-class TestFunction(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_empty_data(self):
         data = pd.DataFrame(columns=['Name', 'Date', 'Job'])
         fig = f_254(data)

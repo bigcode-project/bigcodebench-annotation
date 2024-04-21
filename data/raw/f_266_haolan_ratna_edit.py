@@ -38,7 +38,7 @@ def f_266(n):
 import unittest
 import random
 
-class TestClosestPairOfPoints(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_typical_use_case(self):
         random.seed(0)
@@ -67,7 +67,7 @@ class TestClosestPairOfPoints(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestClosestPairOfPoints))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

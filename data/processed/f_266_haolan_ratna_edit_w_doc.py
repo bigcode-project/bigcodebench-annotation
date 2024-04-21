@@ -37,7 +37,7 @@ def f_266(n):
 
 import unittest
 import random
-class TestClosestPairOfPoints(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_typical_use_case(self):
         random.seed(0)
         result = f_266(5)

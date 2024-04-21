@@ -41,7 +41,7 @@ import random
 
 LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
 
-class TestFunction(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_basic_functionality(self):
         random.seed(0)
         result = f_263(3, 5)
@@ -77,7 +77,7 @@ class TestFunction(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestFunction))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

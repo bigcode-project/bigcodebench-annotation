@@ -35,7 +35,7 @@ def f_265(n):
 import unittest
 
 
-class TestFunction(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_small_range(self):
         self.assertEqual(f_265(2), [(1, 2)])
@@ -62,7 +62,7 @@ class TestFunction(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestFunction))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

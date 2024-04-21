@@ -45,7 +45,7 @@ def f_267(x=1):
 import unittest
 import random
 
-class TestDrawPokerHand(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_hand_size(self):
         """ Test if the hand contains exactly 5 cards. """
@@ -98,7 +98,7 @@ class TestDrawPokerHand(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestDrawPokerHand))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

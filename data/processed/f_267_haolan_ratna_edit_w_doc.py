@@ -44,7 +44,7 @@ def f_267(x=1):
 
 import unittest
 import random
-class TestDrawPokerHand(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_hand_size(self):
         """ Test if the hand contains exactly 5 cards. """
         random.seed(0)

@@ -51,7 +51,7 @@ import unittest
 import matplotlib.pyplot as plt
 import pandas as pd
 
-class TestFunction(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_empty_data(self):
         data = pd.DataFrame(columns=['Name', 'Date', 'Job'])
         fig = f_254(data)
@@ -94,7 +94,7 @@ class TestFunction(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestFunction))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

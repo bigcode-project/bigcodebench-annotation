@@ -44,7 +44,7 @@ def f_262(my_path):
 
 import unittest
 import tempfile
-class TestCalculateDirectoryFileSizes(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_non_empty_directory(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create sample files
