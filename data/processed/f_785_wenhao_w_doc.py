@@ -1,5 +1,4 @@
 import pandas as pd
-from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -29,7 +28,6 @@ def f_785(start_date=START_DATE, periods=PERIODS, freq=FREQ, categories=CATEGORI
 
     Requirements:
     - pandas
-    - datetime
     - matplotlib.pyplot
     - numpy
 

@@ -1,4 +1,3 @@
-import pandas as pd
 import seaborn as sns
 import numpy as np
 
@@ -8,11 +7,11 @@ def f_826(df):
     Generates a pair plot from a numeric DataFrame and calculates its covariance matrix.
 
     Parameters:
-    - df (pd.DataFrame): A pandas DataFrame with only numeric columns.
+    - df (pandas.DataFrame): A pandas DataFrame with only numeric columns.
 
     Returns:
     - tuple:
-        - covariance_df (pd.DataFrame): The covariance matrix of the input DataFrame.
+        - covariance_df (pandas.DataFrame): The covariance matrix of the input DataFrame.
         - pair_plot (sns.axisgrid.PairGrid): Pair plot of the input DataFrame.
 
     Raises:
@@ -20,11 +19,11 @@ def f_826(df):
     - TypeError: If the DataFrame contains non-numeric data types.
 
     Requirements:
-    - pandas
     - numpy
     - seaborn
 
     Examples:
+    >>> import pandas as pd
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'C': [7, 8, 9]})
     >>> covariance_df, ax = f_826(df)
     >>> type(ax)

@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 
 
@@ -43,7 +42,7 @@ def f_212(rows=5, cols=5):
 
 
 import unittest
-
+import matplotlib.pyplot as plt
 
 def run_tests():
     suite = unittest.TestSuite()

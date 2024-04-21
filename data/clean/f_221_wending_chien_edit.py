@@ -1,4 +1,3 @@
-import pandas as pd
 import re
 import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -25,6 +24,7 @@ def f_221(df):
     pandas, re, matplotlib.pyplot, sklearn.feature_extraction.text, numpy
 
     Example:
+    >>> import pandas as pd
     >>> data = {'Title': ['How to make pancakes', 'News update'], 'Content': ['Pancakes are easy to make.', 'Today’s news is about politics.']}
     >>> df = pd.DataFrame(data)
     >>> ax = f_221(df)

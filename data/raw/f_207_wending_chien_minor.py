@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
@@ -22,6 +21,7 @@ def f_207(data):
     pandas, numpy, sklearn.preprocessing, matplotlib.pyplot
 
     Example:
+    >>> import numpy as np
     >>> data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])
     >>> df, ax = f_207(data)
     >>> print(df.round(2))

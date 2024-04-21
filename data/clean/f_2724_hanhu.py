@@ -1,5 +1,4 @@
 import tensorflow as tf
-import numpy as np
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import MinMaxScaler
 
@@ -22,11 +21,11 @@ def f_2726(X, y, n_splits, batch_size, epochs):
 
     Requirements:
     - tensorflow
-    - numpy
     - sklearn.model_selection.KFold
     - sklearn.preprocessing.MinMaxScaler
 
     Examples:
+    >>> import numpy as np
     >>> X = np.random.rand(100, 10)
     >>> y = np.random.randint(0, 2, 100)
     >>> history = f_2726(X, y, 5, 32, 1)

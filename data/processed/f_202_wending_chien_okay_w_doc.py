@@ -1,6 +1,4 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 def f_202(product_dict, product_keys):
@@ -20,8 +18,6 @@ def f_202(product_dict, product_keys):
     
     Requirements:
     - pandas
-    - numpy
-    - matplotlib.pyplot
     
     Example:
     >>> product_dict = {'Apple': [100, 2.5], 'Orange': [80, 3.5], 'Banana': [120, 1.5]}

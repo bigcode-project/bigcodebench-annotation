@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 
 
@@ -42,6 +41,7 @@ def f_212(rows=5, cols=5):
     return ax
 
 import unittest
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def tearDown(self):
         # Cleanup any opened figures in matplotlib

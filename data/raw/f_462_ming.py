@@ -1,7 +1,5 @@
-import pandas as pd
-import re
-import numpy as np
 
+import numpy as np
 
 def f_462(df, letter):
     """
@@ -16,12 +14,12 @@ def f_462(df, letter):
     
     Requirements:
     - pandas
-    - re
     - random
     - nltk
     - numpy
 
     Example:
+    >>> import pandas as pd
     >>> df = pd.DataFrame({'Word': ['apple', 'banana', 'apricot', 'blueberry', 'cherry', 'avocado']})
     >>> stats = f_462(df, 'a')
     >>> stats['mean'] > 0

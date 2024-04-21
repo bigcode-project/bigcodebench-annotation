@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
@@ -16,10 +15,10 @@ def f_560(df):
 
     Requirements:
     - pandas
-    - numpy
     - sklearn
 
     Example:
+    >>> import numpy as np
     >>> np.random.seed(42)
     >>> df = pd.DataFrame(np.random.rand(500, 2) * 100, columns=['A', 'B']) 
     >>> labels = f_560(df)

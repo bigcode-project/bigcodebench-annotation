@@ -1,5 +1,4 @@
 import subprocess
-import os
 import logging
 
 def f_4669(filepath):
@@ -20,10 +19,10 @@ def f_4669(filepath):
 
     Requirements:
     - subprocess
-    - os
     - logging
 
     Examples:
+    >>> import os
     >>> with open('example.cpp', 'w') as f: \
             _ = f.write("int main(){return 0;}")
     >>> f_4669('example.cpp')
@@ -43,6 +42,7 @@ def f_4669(filepath):
     except FileNotFoundError as e:
         logging.error('Compiler not found or file does not exist: %s', e)
 
+import os
 import unittest
 import logging
 from unittest.mock import patch

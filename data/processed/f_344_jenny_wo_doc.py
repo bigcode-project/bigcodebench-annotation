@@ -1,6 +1,5 @@
 import numpy as np
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 
 def f_344(P, T):

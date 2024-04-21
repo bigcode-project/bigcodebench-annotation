@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
@@ -9,7 +8,7 @@ def f_593(data, columns, target_column):
     Perform a logistic regression on a DataFrame to predict a specific target column.
     
     Parameters:
-    - data (np.array): The input data as a NumPy array.
+    - data (numpy.array): The input data as a NumPy array.
     - columns (list): The list of column names.
     - target_column (str): The target column name.
 
@@ -18,10 +17,10 @@ def f_593(data, columns, target_column):
 
     Requirements:
     - pandas
-    - numpy
     - sklearn
     
     Example:
+    >>> import numpy as np
     >>> np.random.seed(42)
     >>> data = np.random.randint(0, 100, size=(100, 4))  # Using np to generate random data
     >>> columns = ['A', 'B', 'C', 'target']
@@ -46,7 +45,7 @@ def f_593(data, columns, target_column):
     return accuracy
 
 import unittest
-
+import numpy as np
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
