@@ -52,6 +52,7 @@ def f_560(df):
     return labels
 
 import unittest
+import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame(np.random.rand(500, 2) * 100, columns=['A', 'B'])

@@ -52,7 +52,7 @@ def f_560(df):
     return labels
 
 import unittest
-
+import numpy as np
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))

@@ -58,7 +58,7 @@ def f_219(df):
 
 import matplotlib
 import unittest
-
+import pandas as pd
 
 def run_tests():
     """

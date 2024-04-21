@@ -40,11 +40,11 @@ import binascii
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(PasswordEncryptionTests))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
-class PasswordEncryptionTests(unittest.TestCase):
+class TestCases(unittest.TestCase):
     
     def test_valid_encryption_format(self):
         encrypted = f_431("test_password")

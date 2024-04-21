@@ -56,6 +56,7 @@ def f_219(df):
 # Integrating the test_cases function into the TestCases class methods and running the tests
 import matplotlib
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         data_1 = pd.DataFrame({
