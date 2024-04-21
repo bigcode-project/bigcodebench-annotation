@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score
 def f_593(data, columns, target_column):
     """
     Perform a logistic regression on a DataFrame to predict a specific target column.
-
+    
     Parameters:
     - data (np.array): The input data as a NumPy array.
     - columns (list): The list of column names.
@@ -16,6 +16,11 @@ def f_593(data, columns, target_column):
     Returns:
     - accuracy (float): The accuracy of the logistic regression model.
 
+    Requirements:
+    - pandas
+    - numpy
+    - sklearn
+    
     Example:
     >>> np.random.seed(42)
     >>> data = np.random.randint(0, 100, size=(100, 4))  # Using np to generate random data
