@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(result), 1000)
     
     def test_invalid_df(self):
-        df = pd.Dataframe()
+        df = pd.DataFrame()
         with self.assertRaises(ValueError):
             f_274(df)
 
