@@ -21,6 +21,8 @@ if __name__ == '__main__':
         with open(f"{jsonl_file.replace('.jsonl', '.py')}","w") as fp:
             os.chdir(temp_dir)
             for output in tqdm(outputs):
+                if not output["generation"][0]:
+                    continue
                 temp_script = os.path.join(temp_dir, "test_temp.py")
                 if output["generation"][0]:
                     with open(temp_script,"w") as f:
@@ -30,10 +32,10 @@ if __name__ == '__main__':
                         f.write(output["raw_generation"][0] + "\n\n" + output["test"])
                 # Run the script and capture the output
                 try:
-                    result = subprocess.run(["pytest", temp_script], capture_output=True, text=True, timeout=50)
+                    result = subprocess.run(["pytest", temp_script], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=50)
                     # Output and error messages
                     error_message = result.stdout
-                    if "failed" not in error_message:
+                    if result.returncode == 0:
                         pass_count += 1
                         task_record[output["task_id"]] = True
                     else:
