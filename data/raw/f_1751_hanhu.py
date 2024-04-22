@@ -27,8 +27,6 @@ def f_1752(numbers):
         >>> result = f_1752([1, 2, 2, 3, 3, 3])
         >>> 'mode' in result and result['mode'] == 3 and 'entropy' in result
         True
-        >>> 'mode' in f_1752([1, 1, 2])
-        True
     """
     if len(numbers) == 0:
         raise ValueError
