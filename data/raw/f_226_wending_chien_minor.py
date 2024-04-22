@@ -19,7 +19,8 @@ def f_226(data_size):
         - str: The color used for the histogram bars.
 
     Requirements:
-    numpy, matplotlib.pyplot
+    - numpy
+    - matplotlib
 
     Example:
     >>> data, color = f_226(5)

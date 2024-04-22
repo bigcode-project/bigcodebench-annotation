@@ -19,7 +19,8 @@ def f_206(data):
         - Axes: A matplotlib Axes object with the plot of row averages.
 
     Requirements:
-    pandas, numpy, matplotlib.pyplot
+    - pandas
+    - matplotlib
 
     Example:
     >>> import numpy as np
@@ -43,6 +44,9 @@ def f_206(data):
 
 import unittest
 import numpy as np
+import matplotlib
+
+matplotlib.use('Agg')
 
 
 def run_tests():
