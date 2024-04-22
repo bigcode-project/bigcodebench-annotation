@@ -21,7 +21,7 @@ def f_309(l, x_data, plot=False):
     - matplotlib.pyplot
 
     Example:
-    >>>import numpy as np
+    >>> import numpy as np
     >>> l = np.array([1, 4, 9, 16, 25])
     >>> x_data = np.array([1, 2, 3, 4, 5])
     >>> params, fitted_values = f_309(l, x_data)
