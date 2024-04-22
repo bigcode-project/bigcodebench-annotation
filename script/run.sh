@@ -10,14 +10,14 @@ for name in "${NAMES[@]}"; do
             continue
         fi
 
-        if ! coverage run -m pytest "$file"; then
+        if ! coverage run -a -m pytest "$file"; then
             echo "Pytest failed on $file, stopping..."
             exit 1
         fi
     done
 
     for file in data/processed/*"$name"*w_doc.py; do
-        if ! coverage run -m pytest --doctest-modules "$file"; then
+        if ! coverage run -a -m pytest --doctest-modules "$file"; then
             echo "Pytest failed on $file, stopping..."
             exit 1
         fi
