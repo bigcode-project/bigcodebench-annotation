@@ -1,7 +1,5 @@
 import requests
 import os
-import tempfile
-import shutil
 import zipfile
 
 def f_235(url, destination_directory, headers=None):

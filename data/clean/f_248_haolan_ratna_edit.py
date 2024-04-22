@@ -1,5 +1,3 @@
-import pandas as pd
-import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
@@ -26,6 +24,7 @@ def f_248(df):
     - sklearn.preprocessing
 
     Example:
+    >>> import pandas as pd
     >>> data = pd.DataFrame([{'Name': 'James', 'Age': 30, 'Score': 85},{'Name': 'James', 'Age': 35, 'Score': 90},{'Name': 'Lily', 'Age': 28, 'Score': 92},{'Name': 'Sam', 'Age': 40, 'Score': 88},{'Name': 'Nick', 'Age': 50, 'Score': 80}])
     >>> modified_df, plot_axes = f_248(data)
     >>> modified_df.head()

@@ -1,4 +1,3 @@
-from flask import Flask
 import os
 from flask_mail import Mail
 
@@ -17,11 +16,11 @@ def f_330(app):
     - If the variables do not exist, use defaults.
     
     Requirements:
-    - flask
     - os
     - flask_mail
 
     Example:
+    >>> from flask import Flask
     >>> app = Flask("test")
     >>> mail, configs = f_330(app)
     >>> 'MAIL_SERVER' in configs

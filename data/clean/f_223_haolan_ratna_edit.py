@@ -1,4 +1,3 @@
-import json
 from django.http import HttpResponse
 from django.conf import settings
 import uuid
@@ -18,10 +17,10 @@ def f_223(data):
     
     Requirements:
     - django
-    - json
     - uuid
 
     Example:
+    >>> import json
     >>> response = f_223(json.dumps({"Sample-Key": "Sample-Value"}))
     >>> response.has_key('UUID')
     True

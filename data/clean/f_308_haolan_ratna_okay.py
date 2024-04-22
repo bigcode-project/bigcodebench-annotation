@@ -1,4 +1,3 @@
-import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 
@@ -21,6 +20,7 @@ def f_308(l):
     - The return DataFrame use 'Scaled Values' as the column name.
 
     Example:
+    >>> import numpy as np
     >>> l = np.array([10, 20, 30, 40, 50])
     >>> df = f_308(l)
     >>> print(int(df.iloc[0]['Scaled Values']))

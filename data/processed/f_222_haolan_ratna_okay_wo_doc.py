@@ -1,4 +1,3 @@
-import json
 from django.http import HttpResponse
 from django.conf import settings
 import random
@@ -21,11 +20,11 @@ def f_222(data, min_delay, max_delay):
     
     Requirements:
     - django
-    - json
     - random
     - time
 
     Example:
+    >>> import json
     >>> random.seed(0)
     >>> response = f_222(json.dumps({"Sample-Key": "Sample-Value"}), 1, 5)
     >>> response.status_code

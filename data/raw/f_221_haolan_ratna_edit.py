@@ -1,5 +1,4 @@
 import re
-import urllib
 from urllib import request
 import json
 

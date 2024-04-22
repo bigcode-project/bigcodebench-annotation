@@ -1,7 +1,5 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import random
-import unittest
 
 # Constants
 COLORS = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
@@ -18,11 +16,11 @@ def f_255(ax):
     str: The color code (as a string) of the plotted function.
 
     Requirements:
-    - matplotlib.pyplot
     - numpy
     - random
 
     Example:
+    >>> import matplotlib.pyplot as plt
     >>> random.seed(0)
     >>> fig = plt.figure()
     >>> ax = fig.add_subplot(111, polar=True)

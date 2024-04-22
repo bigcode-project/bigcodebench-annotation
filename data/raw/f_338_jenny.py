@@ -1,5 +1,4 @@
 import seaborn as sns
-import matplotlib.pyplot as plt
 from scipy.stats import chi2_contingency
 
 
@@ -17,7 +16,7 @@ def f_338(df1, df2, column1="feature1", column2="feature2"):
     Returns:
     tuple: A tuple containing:
         - p (float): The p-value of the Chi-Squared test.
-        - heatmap (plt.Axes): Seaborn heatmap of the contingency table.
+        - heatmap (matplotlib.pyplot.Axes): Seaborn heatmap of the contingency table.
 
     Requirements:
     - seaborn
@@ -42,7 +41,7 @@ def f_338(df1, df2, column1="feature1", column2="feature2"):
 
 import unittest
 import pandas as pd
-
+import matplotlib.pyplot as plt
 
 def run_tests():
     suite = unittest.TestSuite()

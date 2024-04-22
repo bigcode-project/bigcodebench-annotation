@@ -1,4 +1,3 @@
-import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
@@ -18,11 +17,11 @@ def f_309(l, x_data, plot=False):
         - ax (matplotlib.axes._subplots.AxesSubplot, optional): Axes object of the plot if plot=True.
 
     Requirements:
-    - numpy
     - scipy.optimize.curve_fit
     - matplotlib.pyplot
 
     Example:
+    >>>import numpy as np
     >>> l = np.array([1, 4, 9, 16, 25])
     >>> x_data = np.array([1, 2, 3, 4, 5])
     >>> params, fitted_values = f_309(l, x_data)

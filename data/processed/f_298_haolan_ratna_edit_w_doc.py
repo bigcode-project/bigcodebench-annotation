@@ -1,5 +1,4 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
 
 def f_298(df, col1, col2):
@@ -16,7 +15,6 @@ def f_298(df, col1, col2):
 
     Requirements:
     - pandas
-    - matplotlib.pyplot
     - seaborn
 
     Raises:
@@ -24,7 +22,6 @@ def f_298(df, col1, col2):
     - Raise TypeError if df use non-numeric data
 
     Example:
-    >>> import pandas as pd
     >>> import matplotlib.pyplot as plt
     >>> df = pd.DataFrame({'X': [1, 2, 3, 4, 5], 'Y': [2, 4, 6, 8, 10]})
     >>> plot = f_298(df, 'X', 'Y')

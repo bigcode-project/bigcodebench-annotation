@@ -2,7 +2,6 @@ import requests
 import json
 import pandas as pd
 import seaborn as sns
-import unittest
 
 # Constants
 HEADERS = {

@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
@@ -24,7 +23,6 @@ def f_279(df):
     
     Requirements:
     - pandas
-    - numpy
     - sklearn.decomposition
     - matplotlib.pyplot
 

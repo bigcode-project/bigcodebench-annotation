@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import math
 
@@ -16,11 +15,11 @@ def f_257(ax, num_turns):
     matplotlib.axes._subplots.AxesSubplot: The modified Axes object with the spiral plot.
 
     Requirements:
-    - matplotlib.pyplot
     - numpy
     - math
 
     Example:
+    >>> import matplotlib.pyplot as plt
     >>> fig, ax = plt.subplots(subplot_kw={'polar': True})
     >>> ax = f_257(ax, 3)
     >>> ax.get_rlabel_position()
