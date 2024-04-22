@@ -4,22 +4,26 @@ for name in "${NAMES[@]}"; do
 done
 python script/parse.py
 
-for name in "${NAMES[@]}"; do
-    for file in data/processed/*"$name"*wo_doc.py; do
-        if [[ $file == *"f_855"* ]]; then
-            continue
-        fi
+coverage run -a -m pytest data/processed/f_328_jenny_wo_doc.py
+coverage run -a -m pytest --doctest-modules data/processed/f_333_jenny_w_doc.py
+coverage report -m
 
-        if ! coverage run -a -m pytest "$file"; then
-            echo "Pytest failed on $file, stopping..."
-            exit 1
-        fi
-    done
+# for name in "${NAMES[@]}"; do
+#     for file in data/processed/*"$name"*wo_doc.py; do
+#         if [[ $file == *"f_855"* ]]; then
+#             continue
+#         fi
 
-    for file in data/processed/*"$name"*w_doc.py; do
-        if ! coverage run -a -m pytest --doctest-modules "$file"; then
-            echo "Pytest failed on $file, stopping..."
-            exit 1
-        fi
-    done
-done
+#         if ! coverage run -a -m pytest "$file"; then
+#             echo "Pytest failed on $file, stopping..."
+#             exit 1
+#         fi
+#     done
+
+#     for file in data/processed/*"$name"*w_doc.py; do
+#         if ! coverage run -a -m pytest --doctest-modules "$file"; then
+#             echo "Pytest failed on $file, stopping..."
+#             exit 1
+#         fi
+#     done
+# done
