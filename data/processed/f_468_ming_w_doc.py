@@ -50,22 +50,6 @@ def f_468(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
 
     return df, plots
 
-
-import unittest
-from unittest.mock import patch
-import pandas as pd
-import numpy as np
-
-class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=COLUMNS)
-        cls.tuples = [(cls.df.iloc[0].values), (cls.df.iloc[1].values)]
-
-    def test_no_plots_generated(self):
-        """Test case with zero plots requested."""
-
-
 import unittest
 from unittest.mock import patch
 import pandas as pd
