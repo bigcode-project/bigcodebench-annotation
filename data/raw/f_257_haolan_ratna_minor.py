@@ -36,7 +36,7 @@ def f_257(ax, num_turns):
 
 
 import unittest
-
+import matplotlib.pyplot as plt
 
 class TestCases(unittest.TestCase):
 

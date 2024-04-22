@@ -35,6 +35,7 @@ def f_257(ax, num_turns):
     return ax
 
 import unittest
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def setUp(self):
         self.fig, self.ax = plt.subplots(subplot_kw={'polar': True})
