@@ -36,6 +36,5 @@ jobs:
     - name: Test processed data with pytest
       run: |
         bash script/run.sh
-    - name: Get coverage
-      run: |
         coverage report -m
+        
