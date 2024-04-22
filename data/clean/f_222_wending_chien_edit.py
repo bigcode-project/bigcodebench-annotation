@@ -18,7 +18,8 @@ def f_222(df):
     list: List of cluster labels for the filtered articles, indicating the cluster to which each article belongs.
 
     Requirements:
-    pandas, re, sklearn.cluster, sklearn.feature_extraction.text
+    - re
+    - sklearn
 
     Example:
     >>> import pandas as pd

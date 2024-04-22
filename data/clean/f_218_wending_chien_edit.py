@@ -16,7 +16,8 @@ def f_218(country_dict):
     value as the column. GDP values range between 1,000,000,000 and 100,000,000,000.
 
     Requirements:
-    numpy, pandas
+    - numpy
+    - pandas
 
     Example:
     >>> np.random.seed(0)

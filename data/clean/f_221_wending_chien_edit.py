@@ -19,9 +19,14 @@ def f_221(df):
     Note:
     - If the DataFrame does not contain 'Title' and 'Content' columns, the function returns an empty plot.
     - If no articles have titles containing "how" or "what," the function also returns an empty plot.
+    - Set the name of the y-axis to 'TF-IDF Score'.
+    - Set xticks to display the feature names vertically.
 
     Requirements:
-    pandas, re, matplotlib.pyplot, sklearn.feature_extraction.text, numpy
+    - re
+    - matplotlib
+    - sklearn
+    - numpy
 
     Example:
     >>> import pandas as pd
@@ -59,6 +64,9 @@ def f_221(df):
 
 import unittest
 import pandas as pd
+import matplotlib
+
+matplotlib.use('Agg')
 
 
 class TestCases(unittest.TestCase):
