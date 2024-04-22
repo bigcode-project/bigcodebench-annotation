@@ -37,4 +37,6 @@ jobs:
       run: |
         bash script/run.sh
         coverage report -m
-        
+    # - name: Get coverage
+    #   run: |
+    #     coverage report -m
