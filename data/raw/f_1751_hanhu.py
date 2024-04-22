@@ -7,7 +7,7 @@ def f_1752(numbers):
     """
     Creates and returns a dictionary with the mode and entropy of a numpy array constructed from a given list.
     The function first converts the list into a numpy array, then calculates the mode and the entropy of this array,
-    and finally adds them to a new dictionary with the keys 'mode' and 'entropy'.
+    and finally adds them to the initial dictionary with the keys 'mode' and 'entropy'.
 
     Parameters:
         numbers (list): A non-empty list of numbers from which a numpy array is created to calculate mode and entropy.
