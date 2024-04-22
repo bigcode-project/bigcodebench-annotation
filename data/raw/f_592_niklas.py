@@ -20,6 +20,7 @@ def f_592(df, column, alpha):
     
     Example:
     >>> import pandas as pd
+    >>> np.random.seed(42)
     >>> df = pd.DataFrame({'Value': np.random.normal(0, 1, 1000)})
     >>> print(f_592(df, 'Value', 0.05))
     True
