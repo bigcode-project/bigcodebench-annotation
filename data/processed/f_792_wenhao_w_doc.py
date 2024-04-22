@@ -15,11 +15,14 @@ def f_792(rows, columns, seed=None):
     Returns:
     - DataFrame: A Pandas DataFrame containing the generated random values.
     
+    Requirements:
+    - numpy
+    - pandas
+    
     Examples:
     >>> df = f_792(3, 2, seed=42)
     >>> print(df.shape)
     (3, 2)
-    
     >>> df = f_792(1, 1, seed=24)
     >>> print(df.shape)
     (1, 1)

@@ -4,10 +4,7 @@ from sklearn.linear_model import LinearRegression
 
 def f_788(start_date='2016-01-01', periods=13, freq='WOM-2FRI', sales_data=None):
     """
-    Generate a sales series and forecast future sales using linear regression.
-    
-    Functionality:
-    - This function generates a time series of sales data starting from a specified date, then uses linear regression to forecast future sales based on the provided or generated sales data.
+    Generates a time series of sales data starting from a specified date, then use linear regression to forecast future sales based on the provided or generated sales data.
     
     Parameters:
     - start_date (str): The start date for the sales data in YYYY-MM-DD format. Default is '2016-01-01'.
@@ -17,6 +14,11 @@ def f_788(start_date='2016-01-01', periods=13, freq='WOM-2FRI', sales_data=None)
     
     Returns:
     - A numpy array containing the forecasted future sales for the same number of periods as the input data.
+    
+    Requirements:
+    - numpy
+    - pandas
+    - sklearn.linear_model.LinearRegression
     
     Examples:
     >>> np.random.seed(42)  # For consistent random data generation in examples

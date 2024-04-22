@@ -14,6 +14,12 @@ def f_1757():
     - numpy
     - matplotlib.pyplot
 
+    Parameters:
+    None
+    
+    Returns:
+    None
+    
     Examples:
     >>> f_1757() # This will display the plot of the parabola y = x^2
     >>> type(f_1757())

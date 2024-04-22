@@ -9,12 +9,12 @@ def f_749(pattern: str, replacement: str, directory: str) -> bool:
         - Searches for files in the specified directory whose names contain the given pattern.
         - Renames those files by replacing the pattern with the given replacement string.
     
-    Input:
+    Parameters:
         - pattern (str): The pattern to search for in the filenames.
         - replacement (str): The string to replace the pattern with.
         - directory (str): The directory in which to search for files.
         
-    Output:
+    Returns:
     - Returns a boolean value. True if the operation was successful, otherwise False.
     
     Requirements:

@@ -25,7 +25,7 @@ def f_525(sales_data):
     - numpy
     - statistics
 
-    Example usage:
+    Example:
     >>> sales_data = pd.DataFrame({
     ...     'Month': range(1, 13),
     ...     'Product A': np.random.randint(100, 200, size=12),

@@ -20,6 +20,13 @@ def f_829(json_data: str, key_path: list):
     KeyError: If a specified key is not found.
     ValueError: If no numeric data is found, or the data string is empty or corrupted.
 
+    Requirements:
+    - json
+    - numpy
+    - matplotlib
+    - seaborn
+    - pandas
+
     Examples:
     >>> json_data = '{"level1":{"level2":{"data":"1,2,3,4"}}}'
     >>> key_path = ['level1', 'level2', 'data']

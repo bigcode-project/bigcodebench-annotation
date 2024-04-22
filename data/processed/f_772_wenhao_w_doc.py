@@ -11,6 +11,10 @@ def f_772(word):
     Returns:
     list: A list of random pairs of adjacent letters from the word. If the word has fewer than 2 letters, returns a list of empty strings based on POSSIBLE_LETTERS length.
     
+    Requirements:
+    - random
+    - string
+    
     Examples:
     >>> random.seed(0)
     >>> f_772('abcdef')

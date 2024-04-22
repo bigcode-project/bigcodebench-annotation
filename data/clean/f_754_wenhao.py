@@ -5,11 +5,11 @@ def f_754(letters: list, repetitions: int) -> dict:
     """
     Count the frequency of each letter in a list after repeating it a given number of times.
 
-    Input:
+    Parameters:
     - letters (list): A list of single-character strings representing letters.
     - repetitions (int): The number of times to repeat the list.
 
-    Output:
+    Returns:
     Returns a dictionary where the keys are the letters and the values are their frequencies.
 
     Requirements:

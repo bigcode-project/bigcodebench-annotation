@@ -5,17 +5,15 @@ import csv
 def f_747(directory_path, file_extension='.csv'):
     """
     Reads all files with a specified extension in a given directory and returns their data in a dictionary.
-
-    Functionality:
     - Reads all files with the specified extension in the given directory.
     - Uses the filename without the extension as a key in the output dictionary.
     - The value for each key is a list of rows from the file, where each row is represented as a list of values.
 
-    Input:
+    Parameters:
     - directory_path (str): The path to the directory containing the files.
     - file_extension (str, optional): The file extension to look for. Default is '.csv'.
 
-    Output:
+    Returns:
     - Returns a dictionary where each key is the filename (without extension) and the value is a list of rows from the file.
 
     Requirements:

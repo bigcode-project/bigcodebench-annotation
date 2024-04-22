@@ -15,6 +15,11 @@ def f_787(start_date='2016-01-01', periods=13, freq='WOM-2FRI', seed=0):
     Returns:
     - A tuple containing a pandas DataFrame with columns ['Date', 'Price'] and a Matplotlib Axes object for the plot.
 
+    Requirements:
+    - pandas
+    - numpy
+    - matplotlib.pyplot
+    
     Examples:
     >>> df, ax = f_787('2020-01-01', 5, 'M', seed=42)
     >>> len(df)

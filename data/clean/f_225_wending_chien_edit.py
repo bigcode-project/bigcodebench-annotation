@@ -26,6 +26,9 @@ def f_225(rows, columns):
     - dict: Dictionaries with a random number (1 to 5) of key-value pairs, keys and values are integers from 0 to 9.
     - set: Sets of random size (1 to 5) containing unique integers from 0 to 9.
 
+    Returns:
+    pd.DataFrame: A DataFrame with the specified number of rows and columns containing randomly generated data.
+
     Requirements:
     - pandas
     - numpy

@@ -15,7 +15,7 @@ def f_761(data, column):
     - data (dict): A dictionary where the keys are the column names and the values are the column values.
     - column (str): The name of the column in the DataFrame that contains the categories.
     
-    Output:
+    Returns:
     - matplotlib.axes._axes.Axes: The Axes object for the generated plot.
     
     Requirements:

@@ -14,14 +14,14 @@ def f_752(letters, repetitions, colors):
     - The length of the list `colors` should match the number of repetitions of `letters`.
     - The lists 'letters' and 'colors' cannot be empty.
     
-    Input:
+    Parameters:
     - letters (list of str): A list of unique letters to be visualized.
     - repetitions (list of int): A list of the number of times each letter is repeated.
       Must be the same length as `letters`.
     - colors (list of str): A list of colors for the bars corresponding to each letter.
       Must be the same length as `letters`.
     
-    Output:
+    Returns:
     - Returns the Matplotlib Axes object representing the created bar chart.
     
     Requirements:

@@ -17,7 +17,7 @@ def f_207(data):
     mean of each row.
     Axes: A matplotlib Axes object showing a plot of the average values across the dataset.
 
-    Required Libraries:
+    Requirements:
     - pandas
     - sklearn
     - matplotlib

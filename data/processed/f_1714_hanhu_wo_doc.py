@@ -13,6 +13,9 @@ def f_1715(api_url, template_folder):
     - api_url (str): The URL of the external API from which data is fetched.
     - template_folder (str): The path to the folder containing Flask templates.
 
+    Returns:
+    - app (Flask): A Flask application instance with a configured RESTful API endpoint.
+    
     Requirements:
     - flask.Flask
     - flask_restful.Resource
