@@ -2,6 +2,7 @@ import os
 import sys
 import re
 import ast
+import astor
 import json
 import zipfile
 import base64
@@ -14,18 +15,20 @@ def extract_apis(code):
     tree = ast.parse(code)
     api_list = []
     imported_modules = {}
+    scope_stack = []
 
     class ApiExtractor(ast.NodeVisitor):
         def visit_Import(self, node):
             for alias in node.names:
                 module_name = alias.name
                 alias_name = alias.asname or alias.name
-                imported_modules[alias_name] = module_name
-                # Add submodule and top-level module
-                submodule_parts = module_name.split('.')
-                for i in range(1, len(submodule_parts) + 1):
-                    submodule = '.'.join(submodule_parts[:i])
-                    imported_modules[submodule] = submodule
+                if scope_stack:
+                    imported_modules[scope_stack[-1]][alias_name] = module_name
+                else:
+                    imported_modules[alias_name] = module_name
+                top_level_module = module_name.split('.')[0]
+                if top_level_module not in imported_modules:
+                    imported_modules[top_level_module] = module_name
             self.generic_visit(node)
 
         def visit_ImportFrom(self, node):
@@ -34,41 +37,118 @@ def extract_apis(code):
                 for alias in node.names:
                     full_name = f'{module}.{alias.name}'
                     alias_name = alias.asname or alias.name
-                    imported_modules[alias_name] = full_name
+                    if scope_stack:
+                        imported_modules[scope_stack[-1]][alias_name] = full_name
+                    else:
+                        imported_modules[alias_name] = full_name
+                top_level_module = module.split('.')[0]
+                if top_level_module not in imported_modules:
+                    imported_modules[top_level_module] = module
             self.generic_visit(node)
 
+        def visit_ClassDef(self, node):
+            scope_stack.append(node.name)
+            imported_modules[node.name] = {}
+            self.generic_visit(node)
+            scope_stack.pop()
+
         def visit_Attribute(self, node):
-            if isinstance(node.value, ast.Name) and node.value.id in imported_modules:
-                base_module = imported_modules[node.value.id]
-                api_call = f"{base_module}.{node.attr}"
-                if api_call not in api_list:
-                    api_list.append(api_call)
+            if isinstance(node.value, ast.Name):
+                id_lookup = node.value.id
+                current_scope = scope_stack[-1] if scope_stack else None
+                base_module = (imported_modules[current_scope].get(id_lookup)
+                               if current_scope and id_lookup in imported_modules[current_scope]
+                               else imported_modules.get(id_lookup))
+                if base_module:
+                    api_call = f"{base_module}.{node.attr}"
+                    if api_call not in api_list:
+                        api_list.append(api_call)
+            self.generic_visit(node)
+
+        def visit_Name(self, node):
+            id_lookup = node.id
+            current_scope = scope_stack[-1] if scope_stack else None
+            base_module = (imported_modules[current_scope].get(id_lookup)
+                           if current_scope and id_lookup in imported_modules[current_scope]
+                           else imported_modules.get(id_lookup))
+            if base_module and base_module not in api_list:
+                api_list.append(base_module)
             self.generic_visit(node)
 
         def visit_Call(self, node):
-            if isinstance(node.func, ast.Attribute):
-                attr_parts = []
+            function_name = None
+            if isinstance(node.func, ast.Name):
+                function_name = node.func.id
+            elif isinstance(node.func, ast.Attribute):
+                attrs = []
                 current = node.func
                 while isinstance(current, ast.Attribute):
-                    attr_parts.append(current.attr)
+                    attrs.append(current.attr)
                     current = current.value
+                if isinstance(current, ast.Name):
+                    attrs.append(current.id)
+                    attrs.reverse()
+                    function_name = '.'.join(attrs)
 
-                if isinstance(current, ast.Name) and current.id in imported_modules:
-                    base_module = imported_modules[current.id]
-                    attr_parts.append(base_module)
-                    attr_parts.reverse()
-                    api_call = '.'.join(attr_parts)
+            if function_name:
+                current_scope = scope_stack[-1] if scope_stack else None
+                base_module = (imported_modules[current_scope].get(function_name.split('.')[0])
+                               if current_scope and function_name.split('.')[0] in imported_modules[current_scope]
+                               else imported_modules.get(function_name.split('.')[0]))
+                if base_module:
+                    api_call = f"{base_module}{'.' + '.'.join(function_name.split('.')[1:]) if len(function_name.split('.')) > 1 else ''}"
                     if api_call not in api_list:
                         api_list.append(api_call)
-            elif isinstance(node.func, ast.Name) and node.func.id in imported_modules:
-                api_call = imported_modules[node.func.id]
-                if api_call not in api_list:
-                    api_list.append(api_call)
 
+            # Direct function usage as arguments
+            for arg in node.args:
+                if isinstance(arg, ast.Name) and arg.id in imported_modules:
+                    api_call = imported_modules[arg.id]
+                    if api_call not in api_list:
+                        api_list.append(api_call)
+                    
             self.generic_visit(node)
 
     ApiExtractor().visit(tree)
-    return list(set(api_list))  # Remove duplicates
+    return list(set([api for api in api_list if "." in api]))
+
+def filter_unused_imports(script, libs):
+    """
+    Removes import lines that are not used in the listed API function or module specifications and returns the unused lines.
+
+    Parameters:
+    - script (str): The full Python script as a string.
+    - apis (list): A list of fully qualified API module or function names as strings.
+
+    Returns:
+    - tuple: A tuple containing:
+        1. The modified script with unused import statements removed.
+        2. A list of strings, each a line of unused import statements.
+    """
+    lines = script.splitlines()
+    used_lines = []
+    unused_imports = []
+    import_re = re.compile(r"^\s*(from\s+[\w\.]+\s+import\s+[\w\*,\s]+|import\s+[\w\.,\s]+)")
+
+    # Build a regex pattern to check for any API usage
+    api_pattern = re.compile("|".join(re.escape(lib) for lib in libs), re.IGNORECASE)
+
+    break_line_num = None
+    # Analyze each line to determine if it's an import and if it's used
+    for i, line in enumerate(lines):
+        if "def " in line:
+            break_line_num = i
+            break
+        if import_re.match(line):
+            # Check if any API is mentioned in the line
+            if api_pattern.search(line):
+                used_lines.append(line)
+            else:
+                unused_imports.append(line)
+        else:
+            used_lines.append(line)
+            
+    return "\n".join(used_lines+lines[break_line_num:]), unused_imports
 
 def remove_trailing_comments(text):
     """
@@ -169,7 +249,6 @@ def extract_content(file_path):
                             break
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read().strip("\n").replace("AxesSubplot", "Axes").replace("matplotlib.axes._subplots", "matplotlib.axes._axes")
-
         # Extracting the docstring if present
         docstring_start = content.find('"""')
         docstring_end = content.find('"""', docstring_start + 3)
@@ -193,7 +272,10 @@ def extract_content(file_path):
     data["test"] = extract_test(content,function_name).strip()
     data["apis"] = extract_apis(data["prompt"] + "\n" + data["canonical_solution"])
     data["libs"] = list(set([api.split(".")[0] for api in data["apis"]]))
-    
+    _, unused_imports = filter_unused_imports(data["prompt"], data["libs"])
+    if unused_imports:
+        print(f"Unused imports in {file_path.replace('clean/','raw/')}: {unused_imports}")
+    # data["test"] = "\n".join(unused_imports) + "\n" + data["test"]
     docs = re.search(r'\"\"\"(.*?)\"\"\"', data["prompt"], re.DOTALL)
     if not docs:
         docs = re.search(r"'''(.*?)'''", data["prompt"], re.DOTALL)
@@ -312,9 +394,10 @@ if __name__ == "__main__":
     os.makedirs("data/processed")
     with open("data/open-eval.jsonl", "w") as f:
         for file in tqdm(glob("data/clean/*.py")):
-            # if "ratna" in file:
-            #     continue
+            if "ming" in file:
+                continue
             data = extract_content(file)
+            # print(data["apis"])
             # assert validate_lib_num(data), f"Less than 2 libraries are used in {file.replace('clean/', 'raw/')}"
             # assert validate_doc_example(data), f"Example is missing in {file.replace('clean/', 'raw/')}"
             if not validate_lib_num(data):
