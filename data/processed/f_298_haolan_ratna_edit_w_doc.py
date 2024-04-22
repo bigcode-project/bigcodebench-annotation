@@ -19,15 +19,18 @@ def f_298(df, col1, col2):
     - matplotlib.pyplot
     - seaborn
 
-    Note:
+    Raises:
     - Raise ValueError if the input df is not a DataFrame, empty, or does not contain the specified columns.
     - Raise TypeError if df use non-numeric data
 
     Example:
+    >>> import pandas as pd
+    >>> import matplotlib.pyplot as plt
     >>> df = pd.DataFrame({'X': [1, 2, 3, 4, 5], 'Y': [2, 4, 6, 8, 10]})
     >>> plot = f_298(df, 'X', 'Y')
-    >>> type(plot) # This should return <class 'matplotlib.axes._axes.Axes'>
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> len(plot.collections[0].get_offsets().data)
+    5
+    >>> plt.close()
     """
     # Ensure that the df is DataFrame, not empty and the specified column exists
     if not isinstance(df, pd.DataFrame) or df.empty or col1 not in df.columns or col2 not in df.columns:
@@ -42,7 +45,6 @@ import pandas as pd
 import seaborn as sns
 import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
     def test_numeric_data(self):
         # Create a DataFrame with numeric data
@@ -105,3 +107,14 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(ax.collections), 1)  # Check if there's only one collection of points in the plot
         self.assertEqual(len(ax.collections[0].get_offsets()), 1)  # Check if there's only one data point in the collection
         plt.close()
+    
+    def test_non_df(self):
+        with self.assertRaises(ValueError):
+            f_298("non_df", 'A', 'B')
+    
+    def test_empty_df(self):
+        with self.assertRaises(ValueError):
+            f_298(pd.DataFrame(), 'A', 'B')
+    def test_column_df(self):
+        with self.assertRaises(ValueError):
+            f_298(pd.DataFrame({'A': [1]}), 'A', 'B')

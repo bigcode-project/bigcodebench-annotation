@@ -15,14 +15,16 @@ def f_303(json_list, r):
 
     Note:
     - The datetime to be extracted is located in the 'number_list' key in the JSON data.
-    - Raise an Error if the json_list is an invalid JSON, empty, or does not have 'number_list' key.
+
+    Raises:
+    - Raise an Exception if the json_list is an invalid JSON, empty, or does not have 'number_list' key.
     
     Requirements:
     - itertools
     - json
     
     Example:
-    >>> combinations = f_303([1, 2, 3, 4, 5], 3)
+    >>> combinations = f_303('{"number_list": [1, 2, 3, 4, 5]}', 3)
     >>> print(combinations)
     [(1, 2, 3), (1, 2, 4), (1, 2, 5), (1, 3, 4), (1, 3, 5), (1, 4, 5), (2, 3, 4), (2, 3, 5), (2, 4, 5), (3, 4, 5)]
     """

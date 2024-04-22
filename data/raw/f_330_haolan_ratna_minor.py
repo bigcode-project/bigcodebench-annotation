@@ -24,6 +24,8 @@ def f_330(app):
     Example:
     >>> app = Flask("test")
     >>> mail, configs = f_330(app)
+    >>> 'MAIL_SERVER' in configs
+    True
     """
 
     app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'localhost')

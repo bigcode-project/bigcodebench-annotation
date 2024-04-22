@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from scipy import stats
 
@@ -18,7 +17,6 @@ def f_240(df, dct):
     dict: A dictionary containing statistics (mean, median, mode, variance) for each feature defined in the 'FEATURES' constant.
     
     Requirements:
-    - pandas
     - numpy
     - scipy.stats
 
@@ -26,12 +24,10 @@ def f_240(df, dct):
     - The function would return "Invalid input" string if the input is invalid (e.g., does not contain the required 'feature1' key).
     
     Example:
-    >>> df = pd.DataFrame({'feature1': ['a', 'b', 'c', 'd', 'e'], 'feature2': [1, 2, 3, 4, 5]})
-    >>> dct = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5}
+    >>> df = pd.DataFrame({'feature1': [1, 2, 3, 4, 5], 'feature2': [5, 4, 3, 2, 1], 'feature3': [2, 2, 2, 2, 2], 'feature4': [1, 1, 3, 3, 5], 'feature5': [0, 1, 1, 1, 1]})
+    >>> dct = {}
     >>> f_240(df, dct)
-    {'feature1': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0},
-     'feature2': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0},
-     ...}
+    {'feature1': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 'feature2': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 'feature3': {'mean': 2.0, 'median': 2.0, 'mode': 2, 'variance': 0.0}, 'feature4': {'mean': 2.6, 'median': 3.0, 'mode': 1, 'variance': 2.24}, 'feature5': {'mean': 0.8, 'median': 1.0, 'mode': 1, 'variance': 0.16000000000000006}}
     """
 
     # Replace values using dictionary mapping

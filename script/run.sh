@@ -1,4 +1,4 @@
-NAMES=(chien jenny wenhao niklas hanhu)
+NAMES=(chien jenny wenhao niklas hanhu ratna)
 for name in "${NAMES[@]}"; do
     cp data/raw/*"$name"*py data/clean
 done
@@ -7,14 +7,14 @@ python script/parse.py
 for name in "${NAMES[@]}"; do
     for file in data/processed/*"$name"*wo_doc.py; do
 
-        if ! coverage run -a -m pytest "$file"; then
+        if ! pytest "$file"; then
             echo "Pytest failed on $file, stopping..."
             exit 1
         fi
     done
 
     for file in data/processed/*"$name"*w_doc.py; do
-        if ! coverage run -a -m pytest --doctest-modules "$file"; then
+        if ! pytest --doctest-modules "$file"; then
             echo "Pytest failed on $file, stopping..."
             exit 1
         fi

@@ -23,11 +23,13 @@ def f_259(ax, radius):
     - numpy
 
     Example:
+    >>> import matplotlib.pyplot as plt
     >>> fig = plt.figure()
     >>> ax = fig.add_subplot(111, polar=True)
-    >>> ax = f_259(ax, 1.5)
+    >>> result_ax = f_259(ax, 1.5)
     >>> np.allclose(result_ax.get_lines()[0].get_ydata(), 1.5)
     True
+    >>> plt.close()
     '''
     if radius < 0:
         raise ValueError('Radius must be non-negative')
@@ -40,6 +42,7 @@ def f_259(ax, radius):
     return ax
 
 import unittest
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_polar_plot(self):
         '''Test if the function plots on a polar plot.'''
@@ -47,6 +50,7 @@ class TestCases(unittest.TestCase):
         ax = fig.add_subplot(111, polar=True)
         result_ax = f_259(ax, 1.0)
         self.assertIsInstance(result_ax, plt.PolarAxes)
+        plt.close()
     def test_circle_radius(self):
         '''Test if the circle is drawn with the correct radius.'''
         fig = plt.figure()
@@ -55,18 +59,21 @@ class TestCases(unittest.TestCase):
         result_ax = f_259(ax, radius)
         for line in result_ax.get_lines():
             self.assertTrue(np.allclose(line.get_ydata(), radius))
+        plt.close()
     def test_negative_radius(self):
         '''Test handling of negative radius.'''
         fig = plt.figure()
         ax = fig.add_subplot(111, polar=True)
         with self.assertRaises(ValueError):
             f_259(ax, -1.0)
+        plt.close()
     def test_non_polar_plot(self):
         '''Test handling of non-polar plot input.'''
         fig = plt.figure()
         ax = fig.add_subplot(111)
         with self.assertRaises(TypeError):
             f_259(ax, 1.0)
+        plt.close()
     def test_zero_radius(self):
         '''Test handling of zero radius.'''
         fig = plt.figure()
@@ -75,3 +82,4 @@ class TestCases(unittest.TestCase):
         result_ax = f_259(ax, radius)
         for line in result_ax.get_lines():
             self.assertTrue(np.allclose(line.get_ydata(), radius))
+        plt.close()

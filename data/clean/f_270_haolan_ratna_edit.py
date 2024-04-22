@@ -1,4 +1,3 @@
-import pandas as pd
 from collections import Counter
 import os
 import csv
@@ -23,7 +22,6 @@ def f_270(output_file, test_directory):
     - Return 0 if the input invalid or error raised
 
     Requirements:
-    - pandas
     - collections.Counter
     - os
     - csv

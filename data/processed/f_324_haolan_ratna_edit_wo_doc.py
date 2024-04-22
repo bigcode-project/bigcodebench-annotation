@@ -14,16 +14,21 @@ def f_324(app_name):
 
     Note:
     - The details of the email server are retrieved from environment variables. 
-    - If the variables do not exist, use defaults.
-
+    - If the variables do not exist, use defaults:
+      - 'MAIL_SERVER': 'localhost'
+      - 'MAIL_PORT': 25
+      - 'MAIL_USE_TLS': False
+      - 'MAIL_USERNAME': None
+      - 'MAIL_PASSWORD': None
+    
     Requirements:
     - flask
     - os
     - flask_mail
 
     Example:
-    >>> mail, configs = f_230("test")
-    >>> mail.__getattribute__("app").name
+    >>> mail, configs = f_324("test")
+    >>> print(mail.__getattribute__("app").name)
     test
     """
 

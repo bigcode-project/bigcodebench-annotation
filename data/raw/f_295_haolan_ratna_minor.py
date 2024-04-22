@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -18,20 +17,26 @@ def f_295(df, group_col, value_col):
     - AxesSubplot: A matplotlib axes object with the bar chart.
 
     Requirements:
-    - pandas
     - matplotlib.pyplot
     - numpy
 
-    Examples:
+    Example:
+    >>> import matplotlib.pyplot as plt
+    >>> import pandas as pd
     >>> df = pd.DataFrame({'Group': ['A', 'B', 'A', 'B', 'A', 'B'], 'Value': [1, 2, 3, 4, 5, 6]})
     >>> ax = f_295(df, 'Group', 'Value')
     >>> len(ax.patches)
     2
-    Notes:
+    >>> plt.close()
+
+    Note:
     - The function uses a predefined set of colors for the bars. If there are more groups than colors,
       the colors will repeat from the beginning of the COLORS list.
     - This function use "Bar chart of {value_col} by {group_col}" for the plot title.
     - This function use value of variables group_col and value_col as the xlabel and ylabel respectively.
+
+    Raises:
+    -This function will raise TypeError if the 'Value' has non-numeric values.
     """
 
     group_mean = df.groupby(group_col)[value_col].mean()
@@ -70,6 +75,7 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         self.df = pd.DataFrame({'Group': ['A', 'B', 'C'], 'Value': [10, 20, 30]})
         self.ax = f_295(self.df, 'Group', 'Value')
+        plt.close()
 
     def test_bar_chart(self):
         # Create a figure and render the plot
@@ -90,6 +96,7 @@ class TestCases(unittest.TestCase):
 
         # Check that bars are present in the plot
         self.assertTrue(np.any(rgb[:, :, 3] != 0), msg="No bars found in the plot")
+        plt.close()
 
     def test_single_group(self):
         # Test for a single group with a single value
@@ -99,6 +106,7 @@ class TestCases(unittest.TestCase):
         })
         ax = f_295(df_single_group, 'Group', 'Value')
         self.assertIsNotNone(ax, "The axes object should not be None")
+        plt.close()
 
     def test_multiple_groups(self):
         # Test for multiple groups
@@ -108,6 +116,7 @@ class TestCases(unittest.TestCase):
         })
         ax = f_295(df_multiple_groups, 'Group', 'Value')
         self.assertIsNotNone(ax, "The axes object should not be None")
+        plt.close()
 
     def test_with_nan(self):
         # Test handling of NaN values
@@ -117,6 +126,7 @@ class TestCases(unittest.TestCase):
         })
         ax = f_295(df_with_nan, 'Group', 'Value')
         self.assertIsNotNone(ax, "The axes object should not be None")
+        plt.close()
 
     def test_non_numeric_values(self):
         # Test with non-numeric values to ensure TypeError is raised
@@ -126,6 +136,7 @@ class TestCases(unittest.TestCase):
         })
         with self.assertRaises(TypeError):
             f_295(df_non_numeric, 'Group', 'Value')
+        plt.close()
 
     def test_large_numbers(self):
         # Test with a large range of numbers
@@ -135,6 +146,7 @@ class TestCases(unittest.TestCase):
         })
         ax = f_295(df_large_numbers, 'Group', 'Value')
         self.assertIsNotNone(ax, "The axes object should not be None")
+        plt.close()
 
 
     def test_complex_data(self):
@@ -142,6 +154,7 @@ class TestCases(unittest.TestCase):
         df_complex = generate_complex_test_data(num_rows=100)
         ax = f_295(df_complex, 'Group', 'Value')
         self.assertIsNotNone(ax, "The axes object should not be None for complex data")
+        plt.close()
 
 def generate_complex_test_data(num_rows=100):
     """Generate a DataFrame with a mix of numeric and text data, including some potential outliers."""

@@ -23,11 +23,14 @@ def f_224(data_url: str) -> list:
     - requests
 
     Example:
-    >>> f_224("https://api.example.com/data")
-    ['John', 'Doe', 'Alice']
-
+    >>> import json
+    >>> from unittest.mock import MagicMock
+    >>> from io import BytesIO
+    >>> mock_response = MagicMock()
+    >>> mock_response.json.return_value = {"names": ["John", "[Adam]", "Eve"]}
+    >>> requests.get = MagicMock(return_value=mock_response)
     >>> f_224("https://api.example.com/other_data")
-    ['Bob', 'Eve']
+    ['John', 'Eve']
     """
 
     try:

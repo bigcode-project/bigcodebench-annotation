@@ -19,7 +19,7 @@ def f_310(l):
 
     Requirements:
     - numpy
-    - sklearn.decomposition
+    - sklearn.decomposition.PCA
     - matplotlib.pyplot
 
     Example:
@@ -27,8 +27,9 @@ def f_310(l):
     >>> ax = f_310(l)
     >>> len(ax.collections[0].get_offsets())
     4
-    >>> ax.get_title()
+    >>> print(ax.get_title())
     PCA Result
+    >>> plt.close()
     """
     pca = PCA(n_components=2)
     principalComponents = pca.fit_transform(l)
@@ -56,6 +57,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_ylabel(), "Second Principal Component")
         # Check the number of points
         self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
     def test_case_2(self):
         # Input 2: another simple 2D array
         l = np.array([[2, 3], [4, 5], [6, 7], [8, 9]])
@@ -66,8 +68,10 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_ylabel(), "Second Principal Component")
         # Check the number of points
         self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
     def test_case_3(self):
         # Input 3: larger array
+        np.random.seed(0)
         l = np.random.rand(10, 2)
         ax = f_310(l)
         self.assertTrue(isinstance(ax, plt.Axes))
@@ -76,6 +80,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_ylabel(), "Second Principal Component")
         # Check the number of points
         self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
     def test_case_4(self):
         # Input 4: array with similar values (less variance)
         l = np.array([[1, 2], [1, 2.1], [1.1, 2], [1.1, 2.1]])
@@ -86,6 +91,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_ylabel(), "Second Principal Component")
         # Check the number of points
         self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
     def test_case_5(self):
         # Input 5: array with larger values
         l = np.array([[100, 200], [300, 400], [500, 600], [700, 800]])
@@ -96,3 +102,4 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_ylabel(), "Second Principal Component")
         # Check the number of points
         self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()

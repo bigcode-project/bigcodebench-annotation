@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
@@ -25,10 +24,12 @@ def f_276(df, plot=False):
     - This function use "Scaled Values Over Time" for the plot title.
     - This function use "Date" and "Scaled Value" as the xlabel and ylabel respectively.
 
+    Raises:
+    - This function will raise KeyError if the DataFrame does not have the 'Date' and 'Value' columns.
+
     Requirements:
     - pandas
-    - numpy
-    - sklearn.preprocessing
+    - sklearn.preprocessing.StandardScaler
     - matplotlib.pyplot
 
     Example:
@@ -36,6 +37,7 @@ def f_276(df, plot=False):
     >>> scaled_df, ax = f_276(df, plot=True)
     >>> print(scaled_df.shape)
     (2, 4)
+    >>> plt.close()
     '''
     df['Date'] = pd.to_datetime(df['Date'])
     df = pd.concat([df['Date'], df['Value'].apply(pd.Series)], axis=1)
@@ -62,30 +64,36 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
         result= f_276(df)
         self.assertEqual(result.shape, (2, 4))  # Checking if the DataFrame has the correct shape
+        plt.close()
     def test_varying_length_lists(self):
         # DataFrame where 'Value' contains lists of varying lengths
         df = pd.DataFrame([['2021-01-01', [8, 10]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
         result = f_276(df)
         self.assertEqual(result.shape, (2, 4))  # The function should handle varying lengths
+        plt.close()
     def test_varying_length_list_2(self):
         df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
         result = f_276(df)
         self.assertEqual(result.empty, False)  
+        plt.close()
     def test_missing_columns(self):
         # DataFrame missing 'Value' column
         df = pd.DataFrame([['2021-01-01'], ['2021-01-02']], columns=['Date'])
         with self.assertRaises(KeyError):
             f_276(df)  # Expecting a KeyError due to missing 'Value' column
+        plt.close()
     def test_empty(self):
         df = pd.DataFrame()
         with self.assertRaises(KeyError):
             f_276(df)  
+        plt.close()
     def test_plot_attributes(self):
         df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
         _, ax = f_276(df, True)
         self.assertEqual(ax.get_title(), 'Scaled Values Over Time')
         self.assertEqual(ax.get_xlabel(), 'Date')
         self.assertEqual(ax.get_ylabel(), 'Scaled Value')
+        plt.close()
     def test_plot_point(self):
         df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
         result, ax = f_276(df, True)
@@ -96,3 +104,4 @@ class TestCases(unittest.TestCase):
                 list_result.extend(columnSeriesObj.values)
         bar_heights = [rect.get_height() for rect in ax.patches]
         self.assertListEqual(bar_heights, list_result)
+        plt.close()

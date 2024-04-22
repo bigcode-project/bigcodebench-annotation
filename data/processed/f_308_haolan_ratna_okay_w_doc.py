@@ -17,16 +17,14 @@ def f_308(l):
     - sklearn.preprocessing
     - pandas
 
+    Note:
+    - The return DataFrame use 'Scaled Values' as the column name.
+
     Example:
     >>> l = np.array([10, 20, 30, 40, 50])
     >>> df = f_308(l)
-    >>> print(df)
-       Scaled Values
-    0            0.0
-    1            0.25
-    2            0.5
-    3            0.75
-    4            1.0
+    >>> print(int(df.iloc[0]['Scaled Values']))
+    0
     """
 
     scaler = MinMaxScaler()

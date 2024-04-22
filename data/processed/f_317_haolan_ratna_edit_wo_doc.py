@@ -13,8 +13,8 @@ def f_317(csv_url_dict, sort_by_column="title"):
     Returns:
     DataFrame: The pandas DataFrame sorted based on the specified column.
     
-    Note:
-    - This function will raise an error if the dictionary is empty or the key "URL" does not exist in the dictionary.
+    Raises:
+    - This function will raise a ValueError if the dictionary is empty or the key "URL" does not exist in the dictionary.
 
     Requirements:
     - pandas

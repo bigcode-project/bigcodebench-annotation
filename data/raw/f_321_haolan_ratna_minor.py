@@ -9,6 +9,9 @@ def f_321(API_URL):
     """
     Get the public IP address of the current host from an API.
     
+    Parameters:
+    API_URL (str): The API url that will return json format of the 'ip'.
+
     Returns:
     str: The public IP address.
     
@@ -18,7 +21,13 @@ def f_321(API_URL):
     - json
     
     Example:
-    >>> f_321(https://api.ipify.org?format=json)
+    >>> import json
+    >>> from unittest.mock import MagicMock
+    >>> mock_response = MagicMock()
+    >>> mock_response.read.return_value = json.dumps({'ip': '192.168.1.1'}).encode('utf-8')
+    >>> mock_urlopen = MagicMock(return_value=mock_response)
+    >>> with unittest.mock.patch('urllib.request.urlopen', mock_urlopen):
+    ...     f_321('https://api.ipify.org?format=json')
     '192.168.1.1'
     """
 

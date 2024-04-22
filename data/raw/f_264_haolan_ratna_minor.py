@@ -13,7 +13,7 @@ def f_264(sentence):
     dict: A dictionary where the keys are the words and the values are their counts.
 
     Requirements:
-    - random
+    - re
     - collections.Counter
     
     Example:

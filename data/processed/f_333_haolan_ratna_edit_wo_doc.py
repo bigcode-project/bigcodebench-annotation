@@ -29,6 +29,10 @@ def f_333(url, directory, metadata):
     - json
     - time
 
+    Raises:
+    - The function will raise FileNotFoundError if the directory does not exist.
+    - The function will raise TypeError if the url is invalid.
+
     Example:
     >>> f_333('https://www.example.com', './uploads', {'userId': 'abc'})
     """

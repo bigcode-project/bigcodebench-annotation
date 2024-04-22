@@ -66,7 +66,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-class TestFunction(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_return_types(self):
         df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
@@ -106,7 +106,7 @@ class TestFunction(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestFunction))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

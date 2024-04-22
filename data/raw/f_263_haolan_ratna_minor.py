@@ -19,12 +19,16 @@ def f_263(n_keys, n_values):
     - Keys are randomly selected from a predefined list of letters, and values are consecutive integers starting from 1.
     - Due to the randomness in key selection, the actual keys in the dictionary may vary in each execution.
 
+    Requirements:
+    - collections
+    - random
+
     Example:
     >>> random.seed(0)
     >>> f_263(3, 5)
     {'g': [1, 2, 3, 4, 5], 'a': [1, 2, 3, 4, 5]}
     >>> result = f_263(1, 5)
-    >>> list(result())[0] in LETTERS
+    >>> list(result)[0] in LETTERS
     True
     """ 
 
@@ -33,33 +37,39 @@ def f_263(n_keys, n_values):
     return dict(collections.OrderedDict((k, values) for k in keys))
 
 import unittest
+import random
 
-class TestFunction(unittest.TestCase):
-    LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
 
+class TestCases(unittest.TestCase):
     def test_basic_functionality(self):
+        random.seed(0)
         result = f_263(3, 5)
-        self.assertEqual(len(result), 3)
+        self.assertLessEqual(len(result), 3)
         for key in result:
             self.assertIn(key, LETTERS)
             self.assertEqual(result[key], [1, 2, 3, 4, 5])
 
     def test_no_keys(self):
+        random.seed(0)
         result = f_263(0, 5)
         self.assertEqual(result, {})
 
     def test_no_values(self):
+        random.seed(0)
         result = f_263(3, 0)
         for key in result:
             self.assertEqual(result[key], [])
 
     def test_large_input(self):
+        random.seed(0)
         result = f_263(10, 1000)
         for key in result:
             self.assertIn(key, LETTERS)
             self.assertEqual(len(result[key]), 1000)
 
     def test_max_keys(self):
+        random.seed(0)
         result = f_263(len(LETTERS), 5)
         for key in result:
             self.assertIn(key, LETTERS)
@@ -67,7 +77,7 @@ class TestFunction(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestFunction))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

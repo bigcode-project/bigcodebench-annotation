@@ -17,19 +17,20 @@ def f_312(length):
     
     Requirements:
     - numpy
-    - scipy.stats
+    - scipy.stats.norm
     - matplotlib.pyplot
     
-    Constants:
-    - MU (mean): 0
-    - SIGMA (standard deviation): 1
+    Note:
+    - This function use this constant MU (mean): 0, SIGMA (standard deviation): 1
     
     Example:
+    >>> np.random.seed(0)
     >>> distribution, ax = f_312(1000)
     >>> print(type(distribution))
     <class 'numpy.ndarray'>
-    >>> print(type(ax))
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> len(ax.get_lines())
+    1
+    >>> plt.close()
     """
 
     MU = 0
@@ -47,31 +48,51 @@ def f_312(length):
 import unittest
 import numpy as np
 import matplotlib.pyplot as plt
+
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
 class TestCases(unittest.TestCase):
     def test_case_1(self):
+        np.random.seed(0)
         distribution, ax = f_312(1000)
         self.assertIsInstance(distribution, np.ndarray, "Expected distribution to be a numpy array")
         self.assertIsInstance(ax, plt.Axes, "Expected ax to be a matplotlib Axes object")
-    
+        plt.close()
+
     def test_case_2(self):
+        np.random.seed(0)
         length = 500
         distribution, _ = f_312(length)
         self.assertEqual(len(distribution), length, f"Expected distribution length to be {length}")
+        plt.close()
     
     def test_case_3(self):
+        np.random.seed(0)
         distribution, _ = f_312(1000)
         mean = distribution.mean()
         std_dev = distribution.std()
         self.assertAlmostEqual(mean, 0, delta=0.1, msg=f"Expected mean to be close to 0, got {mean}")
         self.assertAlmostEqual(std_dev, 1, delta=0.1, msg=f"Expected std_dev to be close to 1, got {std_dev}")
+        plt.close()
     
     def test_case_4(self):
+        np.random.seed(0)
         distribution, ax = f_312(1000)
         lines = ax.get_lines()
         self.assertEqual(len(lines), 1, "Expected one line representing PDF in the plot")
         bars = [rect for rect in ax.get_children() if isinstance(rect, plt.Rectangle)]
         self.assertGreater(len(bars), 1, "Expected multiple bars representing histogram in the plot")
+        plt.close()
     
     def test_case_5(self):
+        np.random.seed(0)
         distribution, _ = f_312(2000)
         self.assertEqual(distribution.shape, (2000,), "Expected shape of distribution to match input length")
+        plt.close()
+
+if __name__ == "__main__":
+    run_tests()

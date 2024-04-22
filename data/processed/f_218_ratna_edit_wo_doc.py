@@ -14,7 +14,7 @@ def f_218(json_data):
     Note:
     - The datetime to be extracted is located in the 'utc_datetime' key in the JSON data.
 
-    Requirement:
+    Requirements:
     - json
     - datetime
 

@@ -20,21 +20,12 @@ def f_273(df):
     - numpy
 
     Example:
-    >>> df = pd.DataFrame({
-    ...     'id': [1, 1, 2, 2, 3, 3],
-    ...     'age': [25, 26, 35, 36, 28, 29],
-    ...     'income': [50000, 60000, 70000, 80000, 90000, 100000]
-    ... })
-    >>> df_scaled, income_hist = f_1578(df)
-    >>> print(df_scaled)
-            age  income
-        id
-        1  0  0.0     0.0
-           1  1.0     1.0
-        2  2  0.0     0.0
-           3  1.0     1.0
-        3  4  0.0     0.0
-           5  1.0     1.0
+    >>> df = pd.DataFrame({'id': [1, 1, 2, 2, 3, 3], 'age': [25, 26, 35, 36, 28, 29],'income': [50000, 60000, 70000, 80000, 90000, 100000]})
+    >>> df_scaled, income_hist = f_273(df)
+    >>> print(df_scaled.iloc[0]['age'])
+    0.0
+    >>> print(df_scaled.iloc[0]['income'])
+    0.0
     """
 
     scaler = MinMaxScaler(feature_range=(0, 1))

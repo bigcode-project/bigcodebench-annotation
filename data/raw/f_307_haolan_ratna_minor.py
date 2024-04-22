@@ -25,8 +25,9 @@ def f_307(l):
     Example:
     >>> l = np.array([5, 5, 5, 5, 5])
     >>> ax = f_307(l)
-    >>> ax.get_title()
+    >>> print(ax.get_title())
     Fit results: mu = 5.00,  std = 0.00
+    >>> plt.close()
     '''
     fig, ax = plt.subplots()
     ax.hist(l, bins='auto', density=True, alpha=0.6, color='g')
@@ -38,7 +39,6 @@ def f_307(l):
     ax.plot(x, p, 'k', linewidth=2)
     title = "Fit results: mu = %.2f,  std = %.2f" % (mu, std)
     ax.set_title(title)
-    plt.show()
     return ax
 
     

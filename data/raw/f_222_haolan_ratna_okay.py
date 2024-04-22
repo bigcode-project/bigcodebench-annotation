@@ -26,6 +26,7 @@ def f_222(data, min_delay, max_delay):
     - time
 
     Example:
+    >>> random.seed(0)
     >>> response = f_222(json.dumps({"Sample-Key": "Sample-Value"}), 1, 5)
     >>> response.status_code
     200
@@ -45,34 +46,40 @@ def f_222(data, min_delay, max_delay):
 
 import unittest
 import json
+import random
 
 
 class TestCases(unittest.TestCase):
     def test_case_1(self):
+        random.seed(0)
         data = json.dumps({"key": "value"})
         response = f_222(data, 1, 2)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), {"key": "value"})
 
     def test_case_2(self):
+        random.seed(0)
         data = json.dumps({"test": "data", "sample": "value"})
         response = f_222(data, 0, 1)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), {"test": "data", "sample": "value"})
 
     def test_case_3(self):
+        random.seed(0)
         data = json.dumps({"hello": "world"})
         response = f_222(data, 1, 3)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), {"hello": "world"})
 
     def test_case_4(self):
+        random.seed(0)
         data = json.dumps({})
         response = f_222(data, 0, 0)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), {})
 
     def test_case_5(self):
+        random.seed(0)
         data = json.dumps({"a": 1, "b": 2, "c": 3})
         response = f_222(data, 2, 4)
         self.assertEqual(response.status_code, 200)

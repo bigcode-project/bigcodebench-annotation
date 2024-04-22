@@ -1,6 +1,5 @@
-import numpy as np
 import pandas as pd
-from random import uniform
+import random
 from scipy import stats
 
 def f_251(n_data_points=5000, min_value=0.0, max_value=10.0):
@@ -17,18 +16,18 @@ def f_251(n_data_points=5000, min_value=0.0, max_value=10.0):
     dict: A dictionary with keys 'mean', 'median', 'mode' and their corresponding calculated values.
     
     Requirements:
-    - numpy
     - pandas
     - random
     - scipy.stats
 
     Example:
+    >>> random.seed(0)
     >>> stats = f_251(1000, 5.0, 5.0)
     >>> print(stats)
     {'mean': 5.0, 'median': 5.0, 'mode': 5.0}
     """
 
-    data = [round(uniform(min_value, max_value), 3) for _ in range(n_data_points)]
+    data = [round(random.uniform(min_value, max_value), 3) for _ in range(n_data_points)]
     data_df = pd.DataFrame(data, columns=['Value'])
 
     mean = data_df['Value'].mean()
@@ -38,15 +37,18 @@ def f_251(n_data_points=5000, min_value=0.0, max_value=10.0):
     return {'mean': mean, 'median': median, 'mode': mode}
 
 import unittest
+import random
 
 class TestCases(unittest.TestCase):
     def test_default_parameters(self):
+        random.seed(0)
         result = f_251()
         self.assertIn('mean', result)
         self.assertIn('median', result)
         self.assertIn('mode', result)
 
     def test_custom_range(self):
+        random.seed(0)
         result = f_251(1000, 1.0, 5.0)
         self.assertGreaterEqual(result['mean'], 1.0)
         self.assertLessEqual(result['mean'], 5.0)
@@ -56,18 +58,21 @@ class TestCases(unittest.TestCase):
         self.assertLessEqual(result['mode'], 5.0)
 
     def test_small_dataset(self):
+        random.seed(0)
         result = f_251(10, 2.0, 2.0)
         self.assertEqual(result['mean'], 2.0)
         self.assertEqual(result['median'], 2.0)
         self.assertEqual(result['mode'], 2.0)
 
     def test_large_dataset(self):
+        random.seed(0)
         result = f_251(10000, 0.0, 100.0)
         self.assertTrue(0.0 <= result['mean'] <= 100.0)
         self.assertTrue(0.0 <= result['median'] <= 100.0)
         self.assertTrue(0.0 <= result['mode'] <= 100.0)
 
     def test_single_value_range(self):
+        random.seed(0)
         result = f_251(100, 5.0, 5.0)
         self.assertEqual(result['mean'], 5.0)
         self.assertEqual(result['median'], 5.0)

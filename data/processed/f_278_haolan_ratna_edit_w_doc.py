@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -24,20 +23,24 @@ def f_278(df, plot=False):
     Note:
     - This function use "Correlation Heatmap" as the title of the heatmap plot
 
+    Raises:
+    - If the DataFrame input is empty or have invalid 'Value', this function will raise ValueError.
+
     Requirements:
     - pandas
-    - numpy
     - seaborn
     - matplotlib.pyplot
 
     Example:
-    >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]],
-                          columns=COLUMNS)
+    >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
     >>> corr_df = f_278(df)
     >>> print(corr_df[0][0])
-    1
+    1.0
     '''
 
+    if not isinstance(df, pd.DataFrame) or 'Value' not in df or 'Date' not in df or len(df.index) == 0:
+        raise ValueError()
+    
     df['Date'] = pd.to_datetime(df['Date'])
     df = pd.concat([df['Date'], df['Value'].apply(pd.Series)], axis=1)
     
@@ -65,19 +68,21 @@ class TestCases(unittest.TestCase):
     def test_empty_dataframe(self):
         # Testing with an empty DataFrame
         df = pd.DataFrame(columns=['Date', 'Value'])
-        result = f_278(df)
-        self.assertFalse(result.empty)
+        with self.assertRaises(ValueError):
+            result = f_278(df)
     def test_plot_generation(self):
         # Testing if the function correctly generates a plot
         df = pd.DataFrame([['2021-01-01', [1, 2]], ['2021-01-02', [3, 4]]], columns=['Date', 'Value'])
         _, ax = f_278(df, plot=True)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.get_title(), 'Correlation Heatmap')
+        plt.close()
     def test_invalid_data(self):
         # Testing with invalid data (non-numeric) in 'Value' column
         df = pd.DataFrame([['2021-01-01', ['a', 'b', 'c']]], columns=['Date', 'Value'])
         with self.assertRaises(ValueError):
-            f_278(df)
+            result = f_278(df)
+        
     
     def test_plot_data_correlation(self):
         # Testing if the values in the plot match the correlation coefficients in the DataFrame
@@ -89,3 +94,4 @@ class TestCases(unittest.TestCase):
         plot_data_float = plot_data.astype(float)
         # Asserting that the values in the plot match the correlation coefficients in the DataFrame
         np.testing.assert_array_almost_equal(corr_df.values, plot_data_float, decimal=2)
+        plt.close()

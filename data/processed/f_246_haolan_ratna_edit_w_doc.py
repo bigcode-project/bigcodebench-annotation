@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 
@@ -14,27 +13,27 @@ def f_246(df):
     Returns:
     tuple: A tuple containing the matplotlib.pyplot object and the axes object.
 
+    Raises:
+    - The function will raise a ValueError is input df is not a DataFrame.
+
     Note:
     - The function use "Linear Regression" for the plot title.
     - The function use "Age" and "Score" as the xlabel and ylabel respectively.
 
     Requirements:
     - pandas
-    - numpy
     - scipy.stats
     - matplotlib.pyplot
 
     Example:
-    >>> data = pd.DataFrame([
-                                {'Name': 'Alice', 'Age': 20, 'Score': 70},
-                                {'Name': 'Bob', 'Age': 25, 'Score': 75},
-                                {'Name': 'Eve', 'Age': 30, 'Score': 80}
-                            ])
+    >>> data = pd.DataFrame([{'Name': 'Alice', 'Age': 20, 'Score': 70}, {'Name': 'Bob', 'Age': 25, 'Score': 75}, {'Name': 'Eve', 'Age': 30, 'Score': 80}])
     >>> plt, ax = f_246(data)
-    >>> ax.lines[0].get_xdata()
+    >>> ax.lines[0].get_xdata()[0]
     20
     """
-
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
+    
     df = df.drop_duplicates(subset='Name')
 
     slope, intercept, r_value, _, _ = stats.linregress(df['Age'], df['Score'])
@@ -100,3 +99,7 @@ class TestF1545(unittest.TestCase):
         ])
         with self.assertRaises(KeyError):
             f_246(data)
+    
+    def test_non_df(self):
+        with self.assertRaises(ValueError):
+            f_246("non_df")

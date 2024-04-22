@@ -20,8 +20,6 @@ def f_227(url):
     Example:
     >>> f_227('https://www.google.com')
     0
-    >>> f_227('https://invalid_url')
-    1
     """
     if platform.system() == 'Darwin':
         cmd = 'open'

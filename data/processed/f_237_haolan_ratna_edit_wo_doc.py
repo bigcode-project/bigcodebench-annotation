@@ -2,7 +2,6 @@ import requests
 import json
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 import unittest
 
 # Constants
@@ -26,7 +25,7 @@ def f_237(url, parameters):
         - DataFrame: The pandas DataFrame containing the data.
         - Axes: The matplotlib Axes object of the heatmap.
 
-    Note:
+    Raises:
     - Thif function will raise an Expection if the url is invalid, empty data, invalid data, and url cannot be accessed.
 
     Requirements:
@@ -34,7 +33,6 @@ def f_237(url, parameters):
     - json
     - pandas
     - seaborn
-    - matplotlib.pyplot
 
     Example:
     >>> df, ax = f_237('https://api.example.com/data', {'param1': 'value1'})
@@ -54,7 +52,6 @@ def f_237(url, parameters):
         raise(e)
 
 # Importing the refined function from the refined_function.py file
-import matplotlib
 import unittest
 from unittest.mock import patch, Mock
 import json

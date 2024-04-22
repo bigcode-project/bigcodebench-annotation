@@ -1,7 +1,6 @@
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
-import unittest
 
 # Constants
 COLUMNS = ['Name', 'Age', 'Country', 'Score']
@@ -18,9 +17,9 @@ def f_244(df):
     matplotlib.figure.Figure: A matplotlib figure containing the histogram and boxplot.
 
     Requirements:
-    - pandas
     - matplotlib.pyplot
     - seaborn
+    - pandas
 
     Note:
     - The function would return "Invalid input" string if the input is invalid (e.g., does not contain the required 'Name' key).
@@ -28,17 +27,19 @@ def f_244(df):
     - The boxplot of scores has a title "Boxplot of Scores by Country".
 
     Example:
-    >>> data = pd.DataFrame([
-            {'Name': 'James', 'Age': 30, 'Country': 'USA', 'Score': 85},
-            {'Name': 'James', 'Age': 35, 'Country': 'USA', 'Score': 90},
-            {'Name': 'Lily', 'Age': 28, 'Country': 'Canada', 'Score': 92},
-            {'Name': 'Sam', 'Age': 40, 'Country': 'UK', 'Score': 88},
-            {'Name': 'Nick', 'Age': 50, 'Country': 'Australia', 'Score': 80}
-        ])
+    >>> data = pd.DataFrame([{'Name': 'James', 'Age': 30, 'Country': 'USA', 'Score': 85}, {'Name': 'Nick', 'Age': 50, 'Country': 'Australia', 'Score': 80}])
     >>> fig = f_244(data)
-    # return a histogram of scores and a boxplot of scores by country based on the input dataframe
-    """
+    >>> axes = fig.get_axes()
+    >>> print(axes[0].get_title())
+    Histogram of Scores
 
+    >>> print(f_244("not a dataframe"))
+    Invalid input
+    """
+    
+    if not isinstance(df, pd.DataFrame):
+        return "Invalid input"
+    
     try:
         df = df.drop_duplicates(subset='Name')
 
@@ -59,6 +60,9 @@ def f_244(df):
         return "Invalid input"
 
 
+
+import unittest
+import pandas as pd
 
 class TestCases(unittest.TestCase):
 

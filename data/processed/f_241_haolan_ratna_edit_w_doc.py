@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
 def f_241(df, dct, columns=None):
@@ -17,20 +16,28 @@ def f_241(df, dct, columns=None):
 
     Requirements:
     - pandas
-    - numpy
     - sklearn.preprocessing.LabelEncoder
 
     Example:
     >>> df = pd.DataFrame({'col1': ['a', 'b', 'c'], 'col2': [1, 2, 3]})
     >>> dct = {'a': 'x', 'b': 'y'}
-    >>> f_241(df, dct)
-    ... # returns DataFrame with 'col1' encoded and 'col2' standardized
+    >>> result = f_241(df, dct)
+    >>> result.shape == df.shape
+    True
+    >>> result['col1'].mean() == 0.0
+    True
 
     Note:
     - The function assumes that the DataFrame and the dictionary are well-formed and relevant to each other.
     - The encoding of categorical columns is done using LabelEncoder, which encodes labels with value between 0 and n_classes-1.
     - Numerical standardization is performed by subtracting the mean and dividing by the standard deviation of each column.
+
+    Raises:
+    - The function will raise a ValueError is input df is not a DataFrame.
     """
+
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
 
     # Replace values using the provided dictionary
     df = df.replace(dct)
@@ -97,3 +104,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(result.shape, df.shape)
         self.assertAlmostEqual(result['num'].std(), 1, places=5)
         self.assertIn(result['cat'].dtype, [np.float64])
+    
+    def test_case_6(self):
+        with self.assertRaises(ValueError):
+            f_241("non_df", {})

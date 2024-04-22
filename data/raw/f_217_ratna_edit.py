@@ -5,31 +5,31 @@ from io import StringIO
 def f_217(csv_url, sort_by_column="title"):
     """
     Fetches data from a given CSV URL and returns a pandas DataFrame sorted based on the specified column.
-    
-    Input:
-    - csv_url (str): The URL to fetch the CSV data from. Default is "http://example.com/data.csv".
+
+    Parameters:
+    - csv_url (str): The URL to fetch the CSV data from.
     - sort_by_column (str): The column name based on which the data needs to be sorted. Default is "title".
-    
+
     Returns:
     DataFrame: The pandas DataFrame that sorted based on the specified column.
-    
+
     Requirements:
     - pandas
     - requests
     - io.StringIO
-    
-    Example:
-    >>> f_217("http://example.com/data.csv", "title")
-    id  title   price
-    1   Apple    0.3
-    2   Banana   0.5
-    3   Cherry   0.2
 
-    >>> f_217("http://example.com/data.csv", "price")
-    id  title   price
-    3   Cherry   0.2
-    1   Apple    0.3
-    2   Banana   0.5
+    Example:
+    >>> f_217("http://example.com/data.csv", sort_by_column="title")
+       id   title  price
+    0   1   Apple    0.3
+    1   2  Banana    0.5
+    2   3  Cherry    0.2
+
+    >>> f_217("http://example.com/data.csv", sort_by_column="price")
+       id   title  price
+    2   3  Cherry    0.2
+    0   1   Apple    0.3
+    1   2  Banana    0.5
     
     """
     response = requests.get(csv_url)

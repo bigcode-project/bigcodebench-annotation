@@ -14,14 +14,18 @@ def f_266(n):
     tuple or None: A tuple of the form ((x1, y1), (x2, y2)), which are the coordinates of the closest pair,
                    or None if n is less than 2.
     
+    Note:
+    - This function will return None if the input n less than 2.
+    
     Requirements:
     - random
     - itertools.combinations
     - math
 
     Example:
-    >>> f_266(1)
-    None
+    >>> random.seed(0)
+    >>> print(f_266(2))
+    ((0.8444218515250481, 0.7579544029403025), (0.420571580830845, 0.25891675029296335))
     """
 
     if n < 2:
@@ -32,19 +36,25 @@ def f_266(n):
     return closest_pair
 
 import unittest
-class TestClosestPairOfPoints(unittest.TestCase):
+import random
+class TestCases(unittest.TestCase):
     def test_typical_use_case(self):
+        random.seed(0)
         result = f_266(5)
         self.assertIsInstance(result, tuple, "Should return a tuple for 5 points")
     def test_zero_points(self):
+        random.seed(0)
         result = f_266(0)
         self.assertIsNone(result, "Should return None for 0 points")
     def test_one_point(self):
+        random.seed(0)
         result = f_266(1)
         self.assertIsNone(result, "Should return None for 1 point")
     def test_large_number_of_points(self):
+        random.seed(0)
         result = f_266(1000)
         self.assertIsInstance(result, tuple, "Should return a tuple for 1000 points")
     def test_minimum_points(self):
+        random.seed(0)
         result = f_266(2)
         self.assertIsInstance(result, tuple, "Should return a tuple for 2 points")

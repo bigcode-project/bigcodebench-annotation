@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 # Constants
 COLUMNS = ['column1', 'column2', 'column3', 'column4', 'column5']
@@ -16,25 +17,33 @@ def f_243(df, dct):
     
     Requirements:
     - pandas
+    - numpy
     
     Note:
     - This function operates on DataFrames containing numeric or categorical data that can be replaced with numeric values, as correlation calculations require numeric data.
     - This function using pearson method to calculate the correlation matrix.
+    
+    Raises:
+    - This function will raise a ValueError is input df is not a DataFrame.
         
     Example:
-    >>> df = pd.DataFrame({'column1': [1, 2, 3, 4, 5], 'column2': [6, 7, 8, 9, 10]})
-    >>> dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'v', 7: 'w', 8: 'x', 9: 'y', 10: 'z'}
-    >>> f_243(df, dct)
-    DataFrame with correlation coefficients
+    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    >>> dct = {1: 10, 2: 20, 3: 30, 4: 40, 5: 50, 6: 60}
+    >>> correlation_matrix = f_243(df, dct)
+    >>> correlation_matrix.shape == (2, 2)
+    True
+    >>> np.allclose(correlation_matrix, np.array([[1.0, 1.0], [1.0, 1.0]]))
+    True
     """
-
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
     # Replace values using dictionary mapping
     df = df.replace(dct)
     
     # Calculate the correlation matrix
-    correlation_matrix = df.corr(method='pearson')
+    correlation_matrix = np.corrcoef(df.values, rowvar=False)
     
-    return correlation_matrix
+    return pd.DataFrame(correlation_matrix, columns=df.columns, index=df.columns)
 
 import unittest
 import pandas as pd
@@ -74,6 +83,10 @@ class TestCases(unittest.TestCase):
         dct = {i: i + 1 for i in range(30)}
         result = f_243(df, dct)
         self.assertTrue(result.shape == (3, 3))
+
+    def test_case_6(self):
+        with self.assertRaises(ValueError):
+            f_243("non_df", {})
 
 def run_tests():
     suite = unittest.TestSuite()

@@ -63,7 +63,7 @@ import unittest
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-class TestFunction(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_return_types(self):
         df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
         variance_ratio, plot = f_279(df)

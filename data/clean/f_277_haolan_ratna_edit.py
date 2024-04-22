@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from scipy.stats import zscore
 import matplotlib.pyplot as plt
 
@@ -20,18 +19,20 @@ def f_277(df):
     - This function use "Z-Scores Over Time" for the plot title.
     - This function use "Date" and "Z-Score" as the xlabel and ylabel respectively.
 
+    Raises:
+    - This function will raise KeyError if the DataFrame does not have the 'Date' and 'Value' columns.
+
     Requirements:
     - pandas
-    - numpy
-    - scipy.stats
+    - scipy.stats.zscore
     - matplotlib.pyplot
 
     Example:
-    >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]],
-                          columns=['Date', 'Value'])
+    >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
     >>> zscore_df, fig = f_277(df)
     >>> print(zscore_df.shape)
     (2, 4)
+    >>> plt.close()
     """
 
     df['Date'] = pd.to_datetime(df['Date'])
@@ -62,6 +63,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(columns=['Date', 'Value'])
         with self.assertRaises(Exception):
             f_277(df)
+        plt.close()
 
     def test_typical_data(self):
         df = pd.DataFrame([[self.fake.date(), [self.fake.random_number(digits=2) for _ in range(3)]] for _ in range(5)],
@@ -74,12 +76,14 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_title(), 'Z-Scores Over Time')
         self.assertEqual(ax.get_xlabel(), 'Date')
         self.assertEqual(ax.get_ylabel(), 'Z-Score')
+        plt.close()
 
     def test_nan_values(self):
         df = pd.DataFrame([['2021-01-01', [5, np.nan, 7]], ['2021-01-02', [np.nan, 9, 10]]], columns=['Date', 'Value'])
         zscore_df, fig = f_277(df)
         self.assertEqual(zscore_df.shape, (2, 4))
         self.assertIsInstance(fig, plt.Figure)
+        plt.close()
 
     def test_single_row_data(self):
         df = pd.DataFrame([[self.fake.date(), [self.fake.random_number(digits=2) for _ in range(3)]]],
@@ -87,12 +91,14 @@ class TestCases(unittest.TestCase):
         zscore_df, fig = f_277(df)
         self.assertEqual(zscore_df.shape, (1, 4))
         self.assertIsInstance(fig, plt.Figure)
+        plt.close()
 
     def test_non_numeric_values(self):
         df = pd.DataFrame([[self.fake.date(), [self.fake.word() for _ in range(3)]] for _ in range(5)],
                           columns=['Date', 'Value'])
         with self.assertRaises(Exception):
             f_277(df)
+        plt.close()
 
     def test_large_dataset(self):
         df = pd.DataFrame([[self.fake.date(), [self.fake.random_number(digits=2) for _ in range(10)]] for _ in range(100)],
@@ -100,6 +106,7 @@ class TestCases(unittest.TestCase):
         zscore_df, fig = f_277(df)
         self.assertEqual(zscore_df.shape, (100, 11))
         self.assertIsInstance(fig, plt.Figure)
+        plt.close()
     
 
 def run_tests():

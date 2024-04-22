@@ -6,7 +6,7 @@ def f_286(directory, file_list):
     """
     Select a random file from a given list of files in a specified directory and run it as a subprocess.
     
-    Args:
+    Parameters:
     directory (str): The directory path where the files are located.
     file_list (list of str): A list of file names to choose from.
 
@@ -19,6 +19,7 @@ def f_286(directory, file_list):
     - random
 
     Example:
+    >>> random.seed(0)
     >>> f_286("c:\Program Files\VMware\VMware Server", ["file1.bat", "file2.bat"]) #valid directory and file list
     0 
     """
@@ -38,9 +39,11 @@ def f_286(directory, file_list):
 import unittest
 import subprocess
 from unittest.mock import patch, MagicMock
+import random
 
 class TestCases(unittest.TestCase):
     def test_valid_input(self):
+        random.seed(0)
         # Testing with a valid directory and file list
         directory = "valid_dir"
         file_list = ["script1.bat", "script2.bat"]
@@ -54,6 +57,7 @@ class TestCases(unittest.TestCase):
 
     def test_empty_file_list(self):
         # Testing with an empty file list
+        random.seed(0)
         directory = "valid_dir"
         file_list = []
         result = f_286(directory, file_list)
@@ -61,6 +65,7 @@ class TestCases(unittest.TestCase):
 
     def test_invalid_directory(self):
         # Testing with an invalid directory
+        random.seed(0)
         directory = "invalid_dir"
         file_list = ["script1.bat"]
         with patch('subprocess.Popen', side_effect=Exception("Error")):
@@ -69,6 +74,7 @@ class TestCases(unittest.TestCase):
 
     def test_non_zero_exit_code(self):
         # Testing a subprocess that returns a non-zero exit code
+        random.seed(0)
         directory = "valid_dir"
         file_list = ["script3.bat"]
         with patch('subprocess.Popen') as mock_popen:
@@ -81,6 +87,7 @@ class TestCases(unittest.TestCase):
 
     def test_random_file_selection(self):
         # Testing that a file is randomly selected from the list
+        random.seed(0)
         directory = "valid_dir"
         file_list = ["script1.bat", "script2.bat", "script3.bat"]
         with patch('random.choice', side_effect=file_list):

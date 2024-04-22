@@ -13,8 +13,10 @@ def f_280(directory):
         - int: The number of files removed.
         - list: The names of the removed files.
 
-    Note:
+    Raises:
     - If the specified directory does not exist the code would raise FileNotFoundError.
+    
+    Note:
     - Removed files are logged in 'jquery_removal.log' file.
 
     Requirements:

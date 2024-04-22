@@ -1,6 +1,4 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
 
@@ -23,20 +21,24 @@ def f_239(df, dict_mapping, plot_histogram=False):
     - DataFrame: The preprocessed DataFrame with standardized features and values replaced as per dict_mapping.
     - AxesSubplot: The histogram of the target variable if plot_histogram is True, otherwise None.
 
+    Raises:
+    - The function will raise ValueError if the FEATURES and TARGET columns not in the input DataFrame.
+    - The function will raise ValueError if the input df is not a DataFrame.
+
     Requirements:
     - pandas
-    - numpy
-    - matplotlib.pyplot
     - sklearn.preprocessing.StandardScaler
 
-    Examples:
-    >>> df = pd.DataFrame({'feature1': [1, 2, 3], 'feature2': [4, 5, 6], 'feature3': [7, 8, 9], 'feature4': [10, 11, 12], 'feature5': [13, 14, 15], 'target': [0, 1, 1]})
-    >>> dict_mapping = {1: 1, 2: 2, 3: 3}
-    >>> f_239(df, dict_mapping, plot_histogram=True)[0].head(2)
-       feature1  feature2  feature3  feature4  feature5  target
-    0 -1.224745 -1.224745 -1.224745 -1.224745 -1.224745       0
-    1  0.000000  0.000000  0.000000  0.000000  0.000000       1
+    Example:
+    >>> df = pd.DataFrame({'feature1': [1, 2, 3], 'feature2': [4, 5, 6], 'feature3': [7, 8, 9],'feature4': [10, 11, 12], 'feature5': [13, 14, 15], 'target': [0, 1, 1]})
+    >>> dict_mapping = {1: 11, 0: 22}
+    >>> isinstance(f_239(df, dict_mapping, plot_histogram=True)[1], plt.Axes)
+    True
+    >>> plt.close()
     """
+
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("Input df is not a DataFrame.")
 
     # Check if all required columns are present in the DataFrame
     required_columns = FEATURES + [TARGET]
@@ -124,6 +126,11 @@ class TestCases(unittest.TestCase):
         result_df, ax = f_239(df, {}, plot_histogram=True)
         self.assertTrue(hasattr(ax, 'hist'))
         self.assertIsInstance(ax, plt.Axes)
+        plt.close()
+    
+    def test_non_df(self):
+        with self.assertRaises(ValueError):
+            f_239("non_df", {})
 
 
 def run_tests():
