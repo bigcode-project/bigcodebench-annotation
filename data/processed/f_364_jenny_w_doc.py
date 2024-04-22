@@ -1,6 +1,5 @@
 import pandas as pd
 import random
-import matplotlib.pyplot as plt
 
 
 def f_364(num_rows=100, categories=["a", "b", "c", "d", "e"], random_seed=42):
@@ -18,7 +17,7 @@ def f_364(num_rows=100, categories=["a", "b", "c", "d", "e"], random_seed=42):
 
     Returns:
     - pd.DataFrame: A pandas DataFrame with randomly generated category data.
-    - plt.Axes: A bar chart visualizing the category counts.
+    - matplotlib.pyplot.Axes: A bar chart visualizing the category counts.
 
     Requirements:
     - pandas

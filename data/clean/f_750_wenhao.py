@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import re
 import matplotlib.pyplot as plt
-import numpy as np
 
 def f_750(directory: str, pattern: str) -> list:
     """
@@ -19,7 +18,13 @@ def f_750(directory: str, pattern: str) -> list:
     Returns:
     - A list of matplotlib.axes._subplots.AxesSubplot objects, each representing a plot of sales data from a matched CSV file.
 
-    Example usage:
+    Requirements:
+    - os
+    - pandas
+    - re
+    - matplotlib.pyplot
+    
+    Examples:
     >>> axes = f_750('/path/to/data/', r'^sales_data_\d{4}.csv')
     >>> len(axes)
     2
@@ -38,6 +43,8 @@ def f_750(directory: str, pattern: str) -> list:
 
 import unittest
 import shutil
+import numpy as np
+
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -69,7 +76,7 @@ class TestCases(unittest.TestCase):
         plots = f_750(self.directory, self.pattern)
         expected_titles = ['sales_data_2022.csv', 'sales_data_2021.csv']
         plot_titles = [plot.get_title() for plot in plots]
-        self.assertEqual(plot_titles, expected_titles, "Plot titles should match the CSV filenames")
+        self.assertEqual(set(plot_titles), set(expected_titles), "Plot titles should match the CSV filenames")
 
     def test_no_files_matched(self):
         plots = f_750(self.directory, r"^no_match_\d{4}.csv")

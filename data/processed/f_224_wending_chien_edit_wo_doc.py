@@ -28,6 +28,7 @@ def f_224(csv_input):
     - io
 
     Example:
+    >>> from io import StringIO
     >>> test_csv_data = "id,name\\n1,Alice\\n2,Bob"
     >>> test_csv_file = StringIO(test_csv_data)  # This is the in-memory CSV data
     >>> # Testing the function with the in-memory CSV data

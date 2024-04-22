@@ -22,6 +22,7 @@ def f_222(df):
     - sklearn
 
     Example:
+    >>> import pandas as pd
     >>> df_sample = pd.DataFrame({
     ...    'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
     ...    'Content': ['This is a tutorial about coding...', 'Python is a programming language...',

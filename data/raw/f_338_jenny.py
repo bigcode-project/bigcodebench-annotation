@@ -1,4 +1,3 @@
-import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy.stats import chi2_contingency
@@ -21,11 +20,11 @@ def f_338(df1, df2, column1="feature1", column2="feature2"):
         - heatmap (plt.Axes): Seaborn heatmap of the contingency table.
 
     Requirements:
-    - pandas
     - seaborn
     - scipy.stats.chi2_contingency
 
     Example:
+    >>> import pandas as pd
     >>> df1 = pd.DataFrame({'id': [1, 2, 3], 'feature1': ['A', 'B', 'A']})
     >>> df2 = pd.DataFrame({'id': [1, 2, 3], 'feature2': ['X', 'Y', 'X']})
     >>> p_value, heatmap = f_338(df1, df2)

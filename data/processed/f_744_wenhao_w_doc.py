@@ -1,6 +1,5 @@
 import pandas as pd
 from collections import Counter
-import unittest
 
 def f_744(d):
     """
@@ -35,6 +34,7 @@ def f_744(d):
 
     return counts
 
+import unittest
 class TestCases(unittest.TestCase):
     def test_empty_list(self):
         self.assertEqual(f_744([]), {'x': Counter(), 'y': Counter(), 'z': Counter()})

@@ -4,19 +4,16 @@ from datetime import datetime
 
 def f_790(rows=3, columns=2, start_date=datetime(2021, 1, 1), end_date=datetime(2021, 12, 31), seed=0):
     """
-    Generate a matrix with unique dates between a given start and end date.
-    
-    Functionality:
-    This function generates a matrix of given dimensions (rows x columns) containing unique dates between 
+    Generates a matrix of given dimensions (rows x columns) containing unique dates between 
     a specified start date and end date.
     
-    Input:
+    Parameters:
     - rows (int): The number of rows for the output matrix. Default is 3.
     - columns (int): The number of columns for the output matrix. Default is 2.
     - start_date (datetime): The start date for the range of unique dates. Default is datetime(2021, 1, 1).
     - end_date (datetime): The end date for the range of unique dates. Default is datetime(2021, 12, 31).
     
-    Output to be returned:
+    Returns:
     - ndarray: A numpy ndarray with unique dates in the shape (rows, columns).
     
     Requirements:

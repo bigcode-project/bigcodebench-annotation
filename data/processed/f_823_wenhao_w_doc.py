@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -31,6 +30,7 @@ def f_823(df):
     - Only numeric columns are considered for the heatmap. Non-numeric columns are ignored.
 
     Examples:
+    >>> import pandas as pd
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
     >>> standardized_df, fig = f_823(df)
     >>> standardized_df

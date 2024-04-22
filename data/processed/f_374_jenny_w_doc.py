@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
@@ -8,8 +7,8 @@ def f_374(X, Y):
     Adjust a quadratic function to the given data (X, Y) and plot the data along with the fit.
 
     Parameters:
-    - X (list or np.array): The X data points.
-    - Y (list or np.array): The Y data points.
+    - X (list or numpy.array): The X data points.
+    - Y (list or numpy.array): The Y data points.
 
     Returns:
     tuple:
@@ -21,6 +20,7 @@ def f_374(X, Y):
     - scipy.optimize.curve_fit
 
     Example:
+    >>> import numpy as np
     >>> np.random.seed(42)
     >>> X = np.linspace(-10, 10, 100)
     >>> Y = 3*X**2 + 2*X + 1 + np.random.normal(0, 20, len(X))

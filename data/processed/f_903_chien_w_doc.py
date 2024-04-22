@@ -51,9 +51,11 @@ def f_903():
     >>> random.seed(0)
     >>> planet_elements_table = f_903()
     >>> planet_elements_table.head(2)
-              Hydrogen         Helium           Oxygen          Carbon          Nitrogen     Magnesium            Silicon          Iron         Nickel
-    0   Uranus:Silicon  Earth:Silicon  Neptune:Silicon  Neptune:Nickel   Uranus:Hydrogen  Jupiter:Iron   Neptune:Nitrogen  Earth:Nickel  Uranus:Helium
-    1  Venus:Magnesium  Saturn:Helium    Mars:Nitrogen  Mercury:Helium  Jupiter:Nitrogen  Venus:Oxygen  Neptune:Magnesium  Mercury:Iron   Venus:Helium
+              Hydrogen         Helium  ...          Iron         Nickel
+    0   Uranus:Silicon  Earth:Silicon  ...  Earth:Nickel  Uranus:Helium
+    1  Venus:Magnesium  Saturn:Helium  ...  Mercury:Iron   Venus:Helium
+    <BLANKLINE>
+    [2 rows x 9 columns]
     """
     # Generate all possible pairs
     pairs = [

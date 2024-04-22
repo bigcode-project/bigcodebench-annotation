@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from statsmodels.tsa.seasonal import seasonal_decompose
-import random 
 
 def f_786(start_date='2016-01-01', periods=24, freq='M', model='additive'):
     """
@@ -15,7 +14,12 @@ def f_786(start_date='2016-01-01', periods=24, freq='M', model='additive'):
 
     Returns:
     - A dictionary containing 'trend', 'seasonal', and 'residual' components as Pandas Series.
-
+    
+    Requirements:
+    - numpy
+    - pandas
+    - statsmodels
+    
     Examples:
     >>> result = f_786('2016-01-01', 24, 'M')
     >>> all(key in result for key in ['trend', 'seasonal', 'residual'])
@@ -42,30 +46,30 @@ def f_786(start_date='2016-01-01', periods=24, freq='M', model='additive'):
 import unittest
 class TestCases(unittest.TestCase):
     def test_default_parameters(self):
-        random.seed(42)  # For reproducibility
+        np.random.seed(42)  # For reproducibility
         result = f_786(periods=24)  # Adjust to meet the minimum requirement for decomposition
         self.assertTrue(all(key in result for key in ['trend', 'seasonal', 'residual']))
     def test_multiplicative_model(self):
-        random.seed(0)  # For reproducibility
+        np.random.seed(0)  # For reproducibility
         result = f_786('2020-01-01', 24, 'M', 'multiplicative')
         self.assertTrue(all(key in result for key in ['trend', 'seasonal', 'residual']))
     def test_custom_parameters(self):
-        random.seed(55)  # For reproducibility
+        np.random.seed(55)  # For reproducibility
         result = f_786('2017-01-01', 36, 'M')
         self.assertEqual(len(result['trend']), 36)
     def test_weekly_frequency(self):
-        random.seed(1)  # For reproducibility
+        np.random.seed(1)  # For reproducibility
         result = f_786('2022-01-01', 104, 'W', 'additive')
         self.assertTrue(all(key in result for key in ['trend', 'seasonal', 'residual']))
         self.assertEqual(len(result['seasonal']), 104)
         
     def test_insufficient_periods_error(self):
-        random.seed(66)  # For reproducibility
+        np.random.seed(66)  # For reproducibility
         result = f_786('2022-01-01', 12, 'M')
         self.assertIn('error', result)
         
     def test_additive_decomposition_properties(self):
-        random.seed(42)  # For reproducibility
+        np.random.seed(42)  # For reproducibility
         periods = 36
         result = f_786('2020-01-01', periods, 'M')
         reconstructed = result['trend'].fillna(0) + result['seasonal'].fillna(0) + result['residual'].fillna(0)

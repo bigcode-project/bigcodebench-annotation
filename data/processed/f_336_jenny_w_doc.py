@@ -1,7 +1,6 @@
 import pandas as pd
 from sklearn.feature_selection import SelectKBest, f_classif
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 
 def f_336(df1, df2):

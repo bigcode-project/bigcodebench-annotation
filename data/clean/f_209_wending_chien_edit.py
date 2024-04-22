@@ -36,6 +36,7 @@ def f_209(data):
     It requires at least 20 data points to perform the normality test.
 
     Example:
+    >>> import numpy as np
     >>> data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])
     >>> df, ax, p_value = f_209(data)
     >>> print(df)

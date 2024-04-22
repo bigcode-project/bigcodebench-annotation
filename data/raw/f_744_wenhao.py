@@ -1,6 +1,5 @@
 import pandas as pd
 from collections import Counter
-import unittest
 
 def f_744(d):
     """
@@ -34,6 +33,8 @@ def f_744(d):
             counts[key] = Counter()
 
     return counts
+
+import unittest
 
 class TestCases(unittest.TestCase):
     def test_empty_list(self):

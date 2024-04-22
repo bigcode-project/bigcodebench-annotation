@@ -24,8 +24,8 @@ def f_864(input_string, verify_hash=None):
 
     Example:
     >>> f_864("Hello, World!")
-    'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'
-    >>> f_864("Hello, World!", "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e")
+    'dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f'
+    >>> f_864("Hello, World!", "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f")
     True
     """
     if not isinstance(input_string, str):

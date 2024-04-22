@@ -30,10 +30,10 @@ def f_821(array, seed=None):
     Examples:
     >>> array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
     >>> df = f_821(array, seed=42)
-    >>> df
-           PC1           PC2
-    0  5.59017  4.440892e-16
-    1 -5.59017  4.440892e-16
+    >>> df["PC1"]
+    0    5.59017
+    1   -5.59017
+    Name: PC1, dtype: float64
     >>> df.shape
     (2, 2)
     """

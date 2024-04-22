@@ -23,6 +23,7 @@ def f_206(data):
     - matplotlib
 
     Example:
+    >>> import numpy as np
     >>> data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])
     >>> df, ax = f_206(data)
     >>> print(df.to_string(index=False))

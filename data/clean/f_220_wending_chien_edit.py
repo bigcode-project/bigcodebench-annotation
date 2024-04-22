@@ -23,6 +23,7 @@ def f_220(df):
     ValueError: If the DataFrame is empty or does not contain the necessary columns 'Title' and 'Content'.
 
     Example:
+    >>> import pandas as pd
     >>> data = {'Title': ['What is happening', 'Nothing special'], 'Content': ['Like what you see?', 'Just normal text.']}
     >>> df = pd.DataFrame(data)
     >>> f_220(df)

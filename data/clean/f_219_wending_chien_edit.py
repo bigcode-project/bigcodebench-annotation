@@ -26,6 +26,7 @@ def f_219(df):
     there are any entries matching the search criteria. If these conditions are not met, it returns an empty plot.
 
     Example:
+    >>> import pandas as pd
     >>> data = {'Title': ['How to code', 'What is Python', 'Tutorial'], 'Views': [1500, 1200, 1000], 'Likes': [150, 300, 100]}
     >>> df = pd.DataFrame(data)
     >>> ax = f_219(df)
@@ -61,6 +62,7 @@ import unittest
 import matplotlib
 
 matplotlib.use('Agg')
+
 
 def run_tests():
     """

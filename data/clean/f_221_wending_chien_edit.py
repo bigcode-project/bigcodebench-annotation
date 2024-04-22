@@ -29,6 +29,7 @@ def f_221(df):
     - numpy
 
     Example:
+    >>> import pandas as pd
     >>> data = {'Title': ['How to make pancakes', 'News update'], 'Content': ['Pancakes are easy to make.', 'Today’s news is about politics.']}
     >>> df = pd.DataFrame(data)
     >>> ax = f_221(df)

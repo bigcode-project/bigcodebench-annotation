@@ -1,4 +1,4 @@
-import pandas as pd
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import zscore
@@ -17,7 +17,6 @@ def f_757(df, z_threshold=2):
         - matplotlib.axes._subplots.AxesSubplot: The plot object displaying the outliers.
     
     Requirements:
-    - pandas
     - numpy
     - matplotlib.pyplot
     - scipy.stats.zscore
@@ -26,6 +25,7 @@ def f_757(df, z_threshold=2):
     - Z-Score threshold for identifying outliers is customizable via the 'z_threshold' parameter.
     
     Examples:
+    >>> import pandas as pd
     >>> df1 = pd.DataFrame({
     ...     'closing_price': [100, 101, 102, 103, 104, 150]
     ... })

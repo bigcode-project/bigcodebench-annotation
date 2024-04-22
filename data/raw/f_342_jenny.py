@@ -1,7 +1,5 @@
 import pickle
 import os
-import pandas as pd
-import numpy as np
 
 
 def f_342(df, file_name="save.pkl"):
@@ -21,6 +19,8 @@ def f_342(df, file_name="save.pkl"):
     - os
 
     Example:
+    >>> import pandas as pd
+    >>> import numpy as np
     >>> np.random.seed(0)
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
     >>> loaded_df = f_342(df, 'test_file.pkl')

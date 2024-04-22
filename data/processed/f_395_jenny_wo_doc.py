@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 import pandas as pd
 import random
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 
 def f_395(days_in_past=7, random_seed=0):
@@ -21,7 +20,7 @@ def f_395(days_in_past=7, random_seed=0):
 
     Returns:
     Tuple containing
-    - ax (plt.Axes): DataFrame used for plotting.
+    - ax (matplotlib.pyplot.Axes): DataFrame used for plotting.
     - df (pd.DataFrame): Seaborn lineplot with date on the x-axis, duration on the y-axis, and activity as hue.
 
     Requirements:
