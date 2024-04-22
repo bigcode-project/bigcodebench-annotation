@@ -1,7 +1,6 @@
 from datetime import datetime
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 def f_384(start_time, end_time, step, trend, seed=42):
@@ -20,7 +19,7 @@ def f_384(start_time, end_time, step, trend, seed=42):
     - seed (int, optional): Seed for reproducibility. Default is 42.
 
     Returns:
-    - ax (plt.Axes): The Axes object of the generated plot.
+    - ax (matplotlib.pyplot.Axes): The Axes object of the generated plot.
 
     Requirements:
     - datetime.datetime

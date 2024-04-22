@@ -154,7 +154,7 @@ def extract_test(file_contents, function_name):
 
 
 def extract_content(file_path):
-    data = {}
+    data = {"file": file_path.split("/")[-1]}
     with open(file_path, 'r') as file:
             for line in file:
                 line = line.strip()
@@ -282,7 +282,7 @@ def reconstruct_problem(data):
 def check_test_wo_doc(data):
     "Check if the problem is related to file system, network requests and database"
     
-    if any([lib in data["libs"] for lib in ["shutil", "requests", "django", "sqlite3", "datetime", "flask", "turtle", "smtplib"]]):
+    if any([lib in data["libs"] for lib in ["shutil", "requests", "django", "sqlite3", "datetime", "flask", "turtle", "smtplib", "yaml"]]):
         return True
     elif any([kw in data["prompt"] for kw in ["url"]]):
         return True
@@ -312,6 +312,8 @@ if __name__ == "__main__":
     os.makedirs("data/processed")
     with open("data/open-eval.jsonl", "w") as f:
         for file in tqdm(glob("data/clean/*.py")):
+            # if "ratna" in file:
+            #     continue
             data = extract_content(file)
             # assert validate_lib_num(data), f"Less than 2 libraries are used in {file.replace('clean/', 'raw/')}"
             # assert validate_doc_example(data), f"Example is missing in {file.replace('clean/', 'raw/')}"

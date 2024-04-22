@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from scipy import stats
 
@@ -15,7 +14,12 @@ def f_592(df, column, alpha):
     Returns:
     - bool: True if the column passes the normality test, False otherwise.
 
+    Requirements:
+    - numpy
+    - scipy.stats
+    
     Example:
+    >>> import pandas as pd
     >>> df = pd.DataFrame({'Value': np.random.normal(0, 1, 1000)})
     >>> print(f_592(df, 'Value', 0.05))
     True
@@ -34,6 +38,7 @@ def f_592(df, column, alpha):
 
 
 import unittest
+import pandas as pd
 
 def run_tests():
     suite = unittest.TestSuite()

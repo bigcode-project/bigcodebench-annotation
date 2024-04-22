@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
@@ -13,11 +12,11 @@ def f_580(df):
     - result (dict): A dictionary with the coefficients and the intercept of the fitted linear regression model.
 
     Requirements:
-    - pandas
     - numpy
     - sklearn
 
     Example:
+    >>> import pandas as pd
     >>> np.random.seed(42)
     >>> df = pd.DataFrame({'feature': np.random.rand(100), 'value': np.random.rand(100)})
     >>> coefficients = f_580(df)
@@ -32,6 +31,7 @@ def f_580(df):
     return {'coefficients': model.coef_.tolist(), 'intercept': model.intercept_.tolist()}
 
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame({'feature': np.random.rand(100), 'value': np.random.rand(100)})

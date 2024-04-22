@@ -1,6 +1,5 @@
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 def f_762(data):
     """
@@ -16,7 +15,6 @@ def f_762(data):
     Requirements:
     - pandas
     - seaborn
-    - matplotlib.pyplot
 
     Example:
     >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]}

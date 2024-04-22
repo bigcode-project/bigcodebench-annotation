@@ -1,5 +1,4 @@
 import rsa
-import os
 from cryptography.fernet import Fernet
 from base64 import b64encode
 
@@ -22,7 +21,6 @@ def f_4529(file_path):
 
     Requirements:
     - rsa
-    - os
     - cryptography.fernet.Fernet
     - base64.b64encode
 

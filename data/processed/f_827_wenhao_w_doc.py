@@ -1,4 +1,3 @@
-import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
@@ -16,8 +15,6 @@ def f_827(df, x_column, y_column):
     matplotlib.axes._axes.Axes: The Axes object containing the scatter plot and the linear regression line.
 
     Requirements:
-    - pandas
-    - numpy
     - matplotlib
     - sklearn
 
@@ -25,6 +22,7 @@ def f_827(df, x_column, y_column):
     - After plotting the scatterplot, this function overlays the predicted regression line on top in red on the same Axes.
 
     Example:
+    >>> import pandas as pd
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [2, 3, 4]})
     >>> ax = f_827(df, 'A', 'B')
     >>> type(ax)

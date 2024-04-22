@@ -3,22 +3,11 @@ from datetime import datetime
 import numpy as np
 from decimal import Decimal
 
-class ComplexEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime):
-            return obj.isoformat()
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
-        elif isinstance(obj, Decimal):
-            return str(obj)
-        return json.JSONEncoder.default(self, obj)
-
 def f_3670(my_obj):
     """
     Serializes an object to a JSON string, handling complex data types through a custom JSONEncoder.
     This function is capable of serializing data types such as datetime, numpy.ndarray, and Decimal
-    which are not natively supported by the default JSON serialization mechanisms. It leverages the
-    ComplexEncoder class to accomplish this task.
+    which are not natively supported by the default JSON serialization mechanisms.
 
     Parameters:
     my_obj (object):  The object to serialize. This could be any Python object, typically a dictionary or a list containing complex data types.
@@ -45,6 +34,16 @@ def f_3670(my_obj):
     >>> f_3670({'name': 'Alice', 'age': 30})
     '{"name": "Alice", "age": 30}'
     """
+    
+    class ComplexEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime):
+                return obj.isoformat()
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, Decimal):
+                return str(obj)
+            return json.JSONEncoder.default(self, obj)
     return json.dumps(my_obj, cls=ComplexEncoder)
 
 import unittest

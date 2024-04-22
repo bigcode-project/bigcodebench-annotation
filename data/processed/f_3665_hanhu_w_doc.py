@@ -2,20 +2,11 @@ import json
 from datetime import datetime
 from decimal import Decimal
 
-class DateTimeEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime):
-            return obj.isoformat()
-        if isinstance(obj, Decimal):
-            return str(obj)
-        return json.JSONEncoder.default(self, obj)
-
 def f_3667(my_obj):
     """
     Serializes an object to a JSON string, adding support for datetime and Decimal data types.
     
-    Utilizes the DateTimeEncoder class to handle complex data types not natively supported by 
-    the json module's default encoder. The `My_class` parameter is reserved for future use and does 
+    Handle complex data types not natively supported by the json module's default encoder. The `My_class` parameter is reserved for future use and does 
     not affect the current implementation.
     
     Parameters:
@@ -39,6 +30,13 @@ def f_3667(my_obj):
     >>> f_3667({'name': 'Alice', 'age': 30})
     '{"name": "Alice", "age": 30}'
     """
+    class DateTimeEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime):
+                return obj.isoformat()
+            if isinstance(obj, Decimal):
+                return str(obj)
+            return json.JSONEncoder.default(self, obj)
     return json.dumps(my_obj, cls=DateTimeEncoder)
 
 import unittest

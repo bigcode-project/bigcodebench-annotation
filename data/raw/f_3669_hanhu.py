@@ -6,11 +6,6 @@ class Color(Enum):
     GREEN = 2
     BLUE = 3
 
-class EnumEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Enum):
-            return obj.name  # or obj.value, depending on the requirement
-        return json.JSONEncoder.default(self, obj)
 
 def f_3671(my_obj):
     """
@@ -37,6 +32,11 @@ def f_3671(my_obj):
     >>> f_3671({'name': 'Alice', 'age': 30})
     '{"name": "Alice", "age": 30}'
     """
+    class EnumEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, Enum):
+                return obj.name  # or obj.value, depending on the requirement
+            return json.JSONEncoder.default(self, obj)
     return json.dumps(my_obj, cls=EnumEncoder)
 
 import unittest

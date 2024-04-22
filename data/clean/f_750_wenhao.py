@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import re
 import matplotlib.pyplot as plt
-import numpy as np
 
 def f_750(directory: str, pattern: str) -> list:
     """
@@ -19,6 +18,12 @@ def f_750(directory: str, pattern: str) -> list:
     Returns:
     - A list of matplotlib.axes._subplots.AxesSubplot objects, each representing a plot of sales data from a matched CSV file.
 
+    Requirements:
+    - os
+    - pandas
+    - re
+    - matplotlib.pyplot
+    
     Examples:
     >>> axes = f_750('/path/to/data/', r'^sales_data_\d{4}.csv')
     >>> len(axes)
@@ -38,6 +43,8 @@ def f_750(directory: str, pattern: str) -> list:
 
 import unittest
 import shutil
+import numpy as np
+
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -30,10 +30,10 @@ if __name__ == '__main__':
                         f.write(output["raw_generation"][0] + "\n\n" + output["test"])
                 # Run the script and capture the output
                 try:
-                    result = subprocess.run(["pytest", temp_script], capture_output=True, text=True, timeout=50)
+                    result = subprocess.run(["pytest", temp_script], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=50)
                     # Output and error messages
                     error_message = result.stdout
-                    if "failed" not in error_message:
+                    if result.returncode == 0:
                         pass_count += 1
                         task_record[output["task_id"]] = True
                     else:
