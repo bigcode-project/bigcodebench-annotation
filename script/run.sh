@@ -10,7 +10,7 @@ python script/parse.py
 
 for name in "${NAMES[@]}"; do
     for file in data/processed/*"$name"*wo_doc.py; do
-        if [[ $file == *"f_855"* ]]; then
+        if [[ $file != *"f_855"* ]]; then
             continue
         fi
 
