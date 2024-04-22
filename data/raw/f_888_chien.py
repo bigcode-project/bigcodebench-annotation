@@ -1,6 +1,5 @@
 import pandas as pd
 from datetime import datetime
-import matplotlib.pyplot as plt
 
 # Constants
 ROOMS = ["Room1", "Room2", "Room3", "Room4", "Room5"]
@@ -20,7 +19,7 @@ def f_888(date_str, booking_data):
 
     Returns:
     - DataFrame: A pandas DataFrame containing booking status for each room.
-    - plt.Axes: A matplotlib Axes object for the bar plot of booking statuses.
+    - matplotlib.pyplot.Axes: A matplotlib Axes object for the bar plot of booking statuses.
 
     Raises:
     - ValueError: Raised in two scenarios:
@@ -32,7 +31,6 @@ def f_888(date_str, booking_data):
     - datetime
 
     Example:
-    >>> from datetime import datetime
     >>> future_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
     >>> booking_info = {"Room1": "Booked", "Room2": "Available"}
     >>> report_df, ax = f_888(future_date, booking_info)

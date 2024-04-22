@@ -9,13 +9,13 @@ def f_788(start_date='2016-01-01', periods=13, freq='WOM-2FRI', sales_data=None)
     Functionality:
     - This function generates a time series of sales data starting from a specified date, then uses linear regression to forecast future sales based on the provided or generated sales data.
     
-    Input:
+    Parameters:
     - start_date (str): The start date for the sales data in YYYY-MM-DD format. Default is '2016-01-01'.
     - periods (int): The number of periods for which the sales data is available. Default is 13.
     - freq (str): The frequency of the sales data, e.g., 'WOM-2FRI' for the second Friday of each month. Default is 'WOM-2FRI'.
     - sales_data (array-like, optional): An array containing actual sales data. If not provided, random data will be generated.
     
-    Output:
+    Returns:
     - A numpy array containing the forecasted future sales for the same number of periods as the input data.
     
     Examples:

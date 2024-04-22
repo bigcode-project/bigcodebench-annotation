@@ -1,3 +1,3 @@
-# OpenEval: Benchmarking Programming Agents for Open-Domain Tasks
+# Benchmarking Programming Agents for Realistic Function Calling
 
 WIP. Coming soon...

@@ -54,6 +54,8 @@ class ContentParser:
         # NOTE: Model doesn't follow instructions directly:
         # adds description of change and sometimes fixes
         # typos, or other "bugs" in description.
+        if "### Response:\n" in content:
+            content = content.split("### Response:\n")[1]
         if "```" in content:
             content = content.split("```")[1]
         # first parse with assumption that content has description
@@ -63,11 +65,10 @@ class ContentParser:
             return stop_at_stop_token(content[j1:j2], EOS)
         # second parse content with assumption that model wrote code without description
         for entry_point in self._entry_point_variations(entry_point):
-            if entry_point in content:
+            if "def " + entry_point in content:                
                 content = content.split(entry_point)[1]
                 return stop_at_stop_token("".join(content.splitlines(keepends=True)[1:]), EOS)
-        raise ParseError(f"Prompt is not in content:\n{content}")
-
+        return stop_at_stop_token("".join(content.splitlines(keepends=True)[1:]), EOS)
 
 class CodeWrapper:
 
@@ -109,10 +110,9 @@ class CodeWrapper:
 if __name__ == '__main__':
     TIMES = 1
     VERBOSE = True
-    MODEL = "bigcode/starcoder2-3b"
     TEMPERATURE = 0
-    
-    input_file = sys.argv[1]
+    MODEL = sys.argv[1]
+    input_file = "data/open-eval.jsonl"
     # make test directory
     if not os.path.exists("results"):
         os.makedirs("results")

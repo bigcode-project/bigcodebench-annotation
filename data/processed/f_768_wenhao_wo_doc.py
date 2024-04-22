@@ -1,6 +1,5 @@
 import pandas as pd
 import sqlite3
-import os
 
 def f_768(db_path: str, table_name: str, column_name: str) -> pd.DataFrame:
     """
@@ -11,7 +10,6 @@ def f_768(db_path: str, table_name: str, column_name: str) -> pd.DataFrame:
     Requirements:
     - pandas
     - sqlite3
-    - os
     
     Parameters:
     - db_path (str): The path to the SQLite database file.
@@ -45,6 +43,7 @@ def create_mock_db(db_path: str, table_name: str, column_name: str):
     conn.commit()
     conn.close()
 import unittest
+import os
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

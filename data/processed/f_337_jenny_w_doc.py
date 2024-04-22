@@ -1,4 +1,3 @@
-import numpy as np
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 
@@ -18,7 +17,7 @@ def f_337(df1, df2, column1="feature1", column2="feature2"):
     - column2 (str): Name of column containing features to model in df2. Defaults to "feature2".
 
     Returns:
-    - labels (np.ndarray): Cluster labels for each data point (dtype=int32).
+    - labels (numpy.ndarray): Cluster labels for each data point (dtype=int32).
     - ax (matplotlib.axes._axes.Axes): The plotted figure's Axes object.
 
     Requirements:

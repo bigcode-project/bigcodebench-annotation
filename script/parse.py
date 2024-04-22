@@ -154,7 +154,7 @@ def extract_test(file_contents, function_name):
 
 
 def extract_content(file_path):
-    data = {}
+    data = {"file": file_path.split("/")[-1]}
     with open(file_path, 'r') as file:
             for line in file:
                 line = line.strip()
@@ -281,7 +281,8 @@ def reconstruct_problem(data):
 
 def check_test_wo_doc(data):
     "Check if the problem is related to file system, network requests and database"
-    if any([lib in data["libs"] for lib in ["shutil", "requests", "django", "sqlite3", "datetime", "smtplib"]]):
+    
+    if any([lib in data["libs"] for lib in ["shutil", "requests", "django", "sqlite3", "datetime", "flask", "turtle", "smtplib", "yaml"]]):
         return True
     elif any([kw in data["prompt"] for kw in ["url"]]):
         return True
@@ -296,12 +297,30 @@ def check_test_wo_doc(data):
     else:
         return False
 
+def validate_lib_num(data):
+    if len(data["libs"]) < 2:
+        return False
+    return True
+
+def validate_doc_example(data):
+    if not data["doc"]["example"]:
+        return False
+    return True
+
 if __name__ == "__main__":
     shutil.rmtree("data/processed", ignore_errors=True)
     os.makedirs("data/processed")
     with open("data/open-eval.jsonl", "w") as f:
         for file in tqdm(glob("data/clean/*.py")):
+            # if "ratna" in file:
+            #     continue
             data = extract_content(file)
+            # assert validate_lib_num(data), f"Less than 2 libraries are used in {file.replace('clean/', 'raw/')}"
+            # assert validate_doc_example(data), f"Example is missing in {file.replace('clean/', 'raw/')}"
+            if not validate_lib_num(data):
+                print(file.replace('clean/', 'raw/'), "Less than 2 libraries are used")
+            if not validate_doc_example(data):
+                print(file.replace('clean/', 'raw/'), "Example is missing")
             f.write(json.dumps(data) + "\n")
             file_name = file.split("/")[-1].split(".")[0]
             file_name = file_name + "_wo_doc" if check_test_wo_doc(data) else file_name + "_w_doc"

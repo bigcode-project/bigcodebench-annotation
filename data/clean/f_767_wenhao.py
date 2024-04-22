@@ -15,6 +15,11 @@ def f_767(data_size=1000, column_names=['A', 'B', 'C', 'D', 'E'], seed=0):
 
     Returns:
     - DataFrame: The modified Pandas DataFrame.
+    
+    Examples:
+    >>> df = f_767(data_size=100, column_names=['X', 'Y', 'Z'], seed=42)
+    >>> df.shape
+    (100, 3)
     """
     np.random.seed(seed)
     df = pd.DataFrame(np.random.randint(1, 101, size=(data_size, len(column_names))), columns=column_names)

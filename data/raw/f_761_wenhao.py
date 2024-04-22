@@ -1,9 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def f_761(df, column):
+def f_761(data, column):
     """
-    Draw and return a bar chart that shows the distribution of categories in a specific column of a DataFrame.
+    Draw and return a bar chart that shows the distribution of categories in a specific column of a dictionary.
     
     Note:
     The categories are defined by the constant CATEGORIES, 
@@ -12,7 +12,7 @@ def f_761(df, column):
     The x label of the plot is set to 'Category', the y label is set to 'Count', and the title is set to 'Distribution of {column}'.
     
     Parameters:
-    - df (pandas.DataFrame): The DataFrame to be processed.
+    - data (dict): A dictionary where the keys are the column names and the values are the column values.
     - column (str): The name of the column in the DataFrame that contains the categories.
     
     Output:
@@ -24,11 +24,12 @@ def f_761(df, column):
     - matplotlib.pyplot
     
     Example:
-    >>> df = pd.DataFrame({'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']})
-    >>> ax = f_761(df, 'Category')    
-    >>> df = pd.DataFrame({'Type': ['A', 'A', 'C', 'E', 'D', 'E', 'D']})
-    >>> ax = f_761(df, 'Type')
+    >>> data = {'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']}
+    >>> ax = f_761(data, 'Category')    
+    >>> data = {'Type': ['A', 'A', 'C', 'E', 'D', 'E', 'D']}
+    >>> ax = f_761(data, 'Type')
     """
+    df = pd.DataFrame(data)
     # Define the categories
     CATEGORIES = ['A', 'B', 'C', 'D', 'E']
     
@@ -58,8 +59,8 @@ class TestCases(unittest.TestCase):
     
     def test_with_all_categories(self):
         """Test with all categories present."""
-        df = pd.DataFrame({'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']})
-        ax = f_761(df, 'Category')
+        data = {'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']}
+        ax = f_761(data, 'Category')
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.get_xlabel(), 'Category')
         self.assertEqual(ax.get_ylabel(), 'Count')
@@ -68,15 +69,15 @@ class TestCases(unittest.TestCase):
 
     def test_with_missing_categories(self):
         """Test with some categories missing."""
-        df = pd.DataFrame({'Category': ['A', 'A', 'B', 'C']})
-        ax = f_761(df, 'Category')
+        data = {'Category': ['A', 'A', 'B', 'C']}
+        ax = f_761(data, 'Category')
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(len(ax.get_xticks()), 5)  # Ensure all categories are accounted for, including missing ones
 
     def test_with_unexpected_category(self):
         """Test with a category not in predefined list."""
-        df = pd.DataFrame({'Category': ['F', 'A', 'B']})  # 'F' is not a predefined category
-        ax = f_761(df, 'Category')
+        data = {'Category': ['F', 'A', 'B']}  # 'F' is not a predefined category
+        ax = f_761(data, 'Category')
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(len(ax.get_xticks()), 5)  # 'F' is ignored, only predefined categories are considered
 

@@ -1,20 +1,22 @@
-#!/bin/bash
-
-NAME=$1
-cp data/raw/*ratna*.py data/clean
-python script/parse.py
-for file in data/processed/*ratna*wo_doc.py; do
-    pytest "$file"
-    if [ $? -ne 0 ]; then
-        echo "Pytest failed on $file, stopping..."
-        exit 1
-    fi
+NAMES=(chien jenny wenhao niklas hanhu ratna)
+for name in "${NAMES[@]}"; do
+    cp data/raw/*"$name"*py data/clean
 done
+python script/parse.py
 
-for file in data/processed/*ratna*w_doc.py; do
-    pytest --doctest-modules "$file"
-    if [ $? -ne 0 ]; then
-        echo "Pytest failed on $file, stopping..."
-        exit 1
-    fi
+for name in "${NAMES[@]}"; do
+    for file in data/processed/*"$name"*wo_doc.py; do
+
+        if ! pytest "$file"; then
+            echo "Pytest failed on $file, stopping..."
+            exit 1
+        fi
+    done
+
+    for file in data/processed/*"$name"*w_doc.py; do
+        if ! pytest --doctest-modules "$file"; then
+            echo "Pytest failed on $file, stopping..."
+            exit 1
+        fi
+    done
 done

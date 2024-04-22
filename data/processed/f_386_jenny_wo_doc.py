@@ -1,7 +1,6 @@
 from datetime import datetime
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 def f_386(start_time, end_time, step, amplitude, period, seed=0):
@@ -18,7 +17,7 @@ def f_386(start_time, end_time, step, amplitude, period, seed=0):
     - seed (int): Random seed for reproducibility. Defaults to 0.
 
     Returns:
-    plt.Axes: A plot of the generated 'Time Series with Seasonality',
+    matplotlib.pyplot.Axes: A plot of the generated 'Time Series with Seasonality',
               with 'Timestamp' on x-axis and 'Value' on y-axis.
 
     Requirements:
