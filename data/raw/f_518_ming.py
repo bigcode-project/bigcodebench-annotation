@@ -1,23 +1,22 @@
 import re
 import subprocess
 import sys
-
-
-def install_and_import(package):
-    try:
-        __import__(package)
-    except ImportError:
-        print(f"Package {package} not found. Installing...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-    finally:
-        globals()[package] = __import__(package)
-
-# Install and import nltk and gensim
-install_and_import("nltk")
-install_and_import("gensim")
-
 import nltk
 from gensim.models import Word2Vec
+
+# def install_and_import(package):
+#     try:
+#         __import__(package)
+#     except ImportError:
+#         print(f"Package {package} not found. Installing...")
+#         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+#     finally:
+#         globals()[package] = __import__(package)
+#
+#
+# # Install and import nltk and gensim
+# install_and_import("nltk")
+# install_and_import("gensim")
 
 # Constants
 ALPHANUMERIC = re.compile('[\W_]+')
@@ -60,7 +59,6 @@ Example:
     return model
 
 import unittest
-from unittest.mock import patch
 
 stopwords_mock = ["is", "my", "a", "with", "and", "it", "to", "the", "of", "in"]
 

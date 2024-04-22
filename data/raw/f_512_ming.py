@@ -25,10 +25,11 @@ def f_512(dataframe, target_value):
     - matplotlib.pyplot
 
     Example:
-    >>> df = pd.DataFrame({'Column1': ['0', 'a', '332', '33']})
+    >>> df = {'Column1': ['0', 'a', '332', '33']}
     >>> series, ax = f_512(df, '332')
     '''
     # Convert dataframe to string type for uniform comparison
+    dataframe = pd.DataFrame(dataframe)
     dataframe = dataframe.astype(str)
     
     counts = dataframe.apply(lambda x: (x == target_value).sum())
@@ -43,9 +44,6 @@ def f_512(dataframe, target_value):
     
 
 import unittest
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -56,11 +54,11 @@ def run_tests():
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test case with default example data
-        df = pd.DataFrame({
+        df = {
             'Column1': ['0', 'a', '332', '33'],
             'Column2': ['1', 'bb', '33', '22'],
             'Column3': ['2', 'ccc', '2', '332']
-        })
+        }
         counts, ax = f_512(df, '332')
         self.assertEqual(counts['Column1'], 1)
         self.assertEqual(counts['Column2'], 0)
@@ -68,11 +66,11 @@ class TestCases(unittest.TestCase):
 
     def test_case_2(self):
         # Test case with no occurrences of the target value
-        df = pd.DataFrame({
+        df = {
             'Column1': ['0', 'a', '331', '33'],
             'Column2': ['1', 'bb', '33', '22'],
             'Column3': ['2', 'ccc', '2', '331']
-        })
+        }
         counts, ax = f_512(df, '332')
         self.assertEqual(counts['Column1'], 0)
         self.assertEqual(counts['Column2'], 0)
@@ -80,11 +78,11 @@ class TestCases(unittest.TestCase):
 
     def test_case_3(self):
         # Test case with multiple occurrences of the target value in a single column
-        df = pd.DataFrame({
+        df = {
             'Column1': ['332', 'a', '332', '33'],
             'Column2': ['1', '332', '332', '22'],
             'Column3': ['2', '332', '2', '332']
-        })
+        }
         counts, ax = f_512(df, '332')
         self.assertEqual(counts['Column1'], 2)
         self.assertEqual(counts['Column2'], 2)
@@ -98,11 +96,11 @@ class TestCases(unittest.TestCase):
 
     def test_case_5(self):
         # Test case with different data types in the DataFrame
-        df = pd.DataFrame({
+        df = {
             'Column1': [0, 'a', 332, '33'],
             'Column2': [1.0, 'bb', 33.0, 22.2],
             'Column3': [2, 'ccc', 2, 332]
-        })
+        }
         counts, ax = f_512(df, '332')
         self.assertEqual(counts['Column1'], 1)
         self.assertEqual(counts['Column2'], 0)

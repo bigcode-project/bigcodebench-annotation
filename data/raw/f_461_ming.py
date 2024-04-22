@@ -1,3 +1,5 @@
+import re
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import unittest
@@ -24,9 +26,10 @@ def f_461(df, letter):
     - matplotlib.pyplot
 
     Example:
-    >>> df = pd.DataFrame({'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'avocado']})
+    >>> df = {'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'avocado']}
     >>> ax = f_461(df, 'a')
     """
+    df = pd.DataFrame(df)
     regex = f'^{letter}'
     filtered_df = df[df['Word'].str.match(regex)]
     word_lengths = filtered_df['Word'].str.len()
@@ -48,14 +51,14 @@ def f_461(df, letter):
 class TestCases(unittest.TestCase):
     def setUp(self):
         """Initialize testing dataframe."""
-        self.df = pd.DataFrame({'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'avocado']})
+        self.df = {'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'avocado']}
 
     @patch('matplotlib.pyplot.hist')
     def test_filter_by_letter(self, mock_hist):
         """Test filtering functionality by a specific letter."""
         f_461(self.df, 'a')
         filtered_words = ['apple', 'avocado']
-        self.assertTrue(all(word in self.df['Word'].values for word in filtered_words))
+        self.assertTrue(all(word in self.df['Word'] for word in filtered_words))
 
     @patch('matplotlib.pyplot.hist')
     def test_return_type(self, mock_hist):
@@ -70,11 +73,14 @@ class TestCases(unittest.TestCase):
             mock_hist.assert_called_once()
 
     def test_word_length_calculation(self):
-        """Test if word lengths are calculated correctly."""
-        filtered_df = self.df[self.df['Word'].str.match('^a')]
-        expected_lengths = filtered_df['Word'].str.len().tolist()
-        actual_lengths = [5, 7]  # Lengths of 'apple' and 'avocado'
-        self.assertEqual(expected_lengths, actual_lengths)
+        """Test if word lengths are calculated correctly for words starting with 'a'."""
+        ax = f_461(self.df, 'a')
+        expected_lengths = [5, 7]  # Lengths of 'apple' and 'avocado'
+        filtered_words = [word for word in self.df['Word'] if word.startswith('a')]
+        actual_lengths = [len(word) for word in filtered_words]
+
+        # Test if actual lengths match expected lengths
+        self.assertEqual(expected_lengths, actual_lengths, "The word lengths do not match expected results.")
 
     @patch('matplotlib.pyplot.hist')
     def test_nonexistent_letter(self, mock_hist):

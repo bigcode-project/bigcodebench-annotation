@@ -27,7 +27,10 @@ def f_519(texts):
                     cell values indicate the frequency of a term in a document.
 
     Requirements:
-    - Python packages: re, nltk, pandas, scikit-learn
+    - re
+    - nltk
+    - pandas
+    - scikit-learn
 
     Example:
     >>> texts = ["Hello, world!", "Machine learning is great.", "Python is my favorite programming language."]

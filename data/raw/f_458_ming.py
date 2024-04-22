@@ -24,10 +24,10 @@ def f_458(duration):
         - The second list contains the generated random values.
 
     Requirements:
-    - datetime: Used for generating timestamp strings for each data point.
-    - time: Used to manage the duration for which data is generated.
-    - random: Required for generating random values within a specified range.
-    - matplotlib.pyplot: Necessary for plotting the generated data points.
+    - datetime
+    - time
+    - random
+    - matplotlib.pyplot
     """
     # Constants
     VALUES_RANGE = (0, 100)
