@@ -16,7 +16,9 @@ def f_208(data):
         - Axes: The matplotlib Axes object showing the heatmap of the correlations.
 
     Requirements:
-    pandas, numpy, seaborn
+    - pandas
+    - numpy
+    - seaborn
 
     Raises:
     ValueError: If the input data is not a 2D array or if it contains non-numeric data.

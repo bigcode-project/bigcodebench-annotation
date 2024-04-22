@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import seaborn as sns
 from scipy import stats
 
@@ -25,7 +24,9 @@ def f_209(data):
         if the test could not be conducted.
 
     Requirements:
-    pandas, numpy, seaborn, scipy
+    - pandas
+    - seaborn
+    - scipy
 
     Raises:
     ValueError: If the input data does not have exactly eight columns.

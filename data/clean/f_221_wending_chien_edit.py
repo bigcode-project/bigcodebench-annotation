@@ -23,7 +23,10 @@ def f_221(df):
     - Set xticks to display the feature names vertically.
 
     Requirements:
-    re, matplotlib, sklearn, numpy
+    - re
+    - matplotlib
+    - sklearn
+    - numpy
 
     Example:
     >>> data = {'Title': ['How to make pancakes', 'News update'], 'Content': ['Pancakes are easy to make.', 'Today’s news is about politics.']}

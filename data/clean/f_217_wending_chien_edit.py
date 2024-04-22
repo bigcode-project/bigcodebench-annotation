@@ -23,7 +23,9 @@ def f_217(vegetable_dict):
     and their percentage occurrence within the total counts.
 
     Requirements:
-    random, pandas, collections
+    - random
+    - pandas
+    - collections
 
     Example:
     >>> vegetable_dict = {'John': 'Carrot', 'Alice': 'Potato', 'Bob': 'Tomato'}

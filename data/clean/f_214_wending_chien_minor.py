@@ -16,7 +16,9 @@ def f_214(num_rows=5, rand_range=(0, 100)):
     matplotlib.figure.Figure: The matplotlib Figure object containing the plotted data.
 
     Requirements:
-    pandas, matplotlib, random
+    - pandas
+    - matplotlib
+    - random
 
     Example:
     >>> fig = f_214(num_rows=3, rand_range=(10, 50))

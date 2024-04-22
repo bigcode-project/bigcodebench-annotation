@@ -18,7 +18,8 @@ def f_219(df):
     or no video titles match the search criteria.
 
     Requirements:
-    re, matplotlib
+    - re
+    - matplotlib
 
     Note:
     The function checks for the presence of the necessary data columns ('Title', 'Views', 'Likes') and whether

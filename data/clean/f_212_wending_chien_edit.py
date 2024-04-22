@@ -16,7 +16,8 @@ def f_212(rows=5, cols=5):
     matplotlib.axes._subplots.AxesSubplot: The Axes object displaying the stacked bar chart.
 
     Requirements:
-    numpy, pandas
+    - numpy
+    - pandas
 
     Raises:
     ValueError: If the number of columns exceeds the number of available categories.

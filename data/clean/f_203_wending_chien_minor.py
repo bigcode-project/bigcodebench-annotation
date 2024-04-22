@@ -16,7 +16,8 @@ def f_203(data_dict, data_keys):
     normalized data.
 
     Requirements:
-    pandas, sklearn
+    - pandas
+    - sklearn
 
     Raises:
     ValueError: If no keys in `data_keys` are found in `data_dict`.

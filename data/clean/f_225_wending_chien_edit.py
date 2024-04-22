@@ -27,7 +27,9 @@ def f_225(rows, columns):
     - set: Sets of random size (1 to 5) containing unique integers from 0 to 9.
 
     Requirements:
-    pandas, numpy, random
+    - pandas
+    - numpy
+    - random
 
     Example:
     >>> df = f_225(2, 3)

@@ -15,7 +15,9 @@ def f_220(df):
     dict: A dictionary with keys as words and values as their corresponding frequency, excluding any punctuation marks.
 
     Requirements:
-    re, nltk, string
+    - re
+    - nltk
+    - string
 
     Raises:
     ValueError: If the DataFrame is empty or does not contain the necessary columns 'Title' and 'Content'.

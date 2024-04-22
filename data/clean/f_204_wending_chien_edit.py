@@ -17,7 +17,9 @@ def f_204():
                and their average grade across all courses.
 
     Requirements:
-    pandas, numpy, random
+    - pandas
+    - numpy
+    - random
 
     Note:
     The grades are randomly generated for each course using a uniform distribution between 0 and 100.

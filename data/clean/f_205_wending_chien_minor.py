@@ -16,7 +16,8 @@ def f_205(data):
     is the numerical representation.
 
     Requirements:
-    pandas, sklearn
+    - pandas
+    - sklearn
 
     Example:
     >>> df = f_205(['A', 'B', 'C', 'A', 'D', 'E', 'B', 'C'])

@@ -19,7 +19,8 @@ def f_206(data):
         - Axes: A matplotlib Axes object with the plot of row averages.
 
     Requirements:
-    pandas, matplotlib
+    - pandas
+    - matplotlib
 
     Example:
     >>> data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])

@@ -16,7 +16,9 @@ def f_211(text, rwidth=0.8):
     matplotlib.axes.Axes: An Axes object containing the histogram of word lengths.
 
     Requirements:
-    re, matplotlib, numpy
+    - re
+    - matplotlib
+    - numpy
 
     Note:
     If there are no words in the input text, or all words are filtered out, the histogram will be empty as no

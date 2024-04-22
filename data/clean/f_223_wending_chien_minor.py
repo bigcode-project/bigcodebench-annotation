@@ -27,7 +27,9 @@ def f_223(dataframe, text_column):
     DataFrame: Returns a DataFrame with each word (after preprocessing) as a column and their count as rows.
 
     Requirements:
-    pandas, re, sklearn
+    - pandas
+    - re
+    - sklearn
 
     Example:
     >>> df = pd.DataFrame({'text': ['This is a test.', 'Python is cool!', 'nltk and sklearn are useful for text analysis.']})
