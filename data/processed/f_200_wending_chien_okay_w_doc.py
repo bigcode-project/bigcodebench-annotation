@@ -15,7 +15,7 @@ def f_200(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
 
     Requirements:
     - pandas
-    - sklearn.preprocessing
+    - sklearn
 
     Example:
     >>> df = pd.DataFrame({'fruit': ['apple', 'banana', 'cherry', 'apple', 'banana']})

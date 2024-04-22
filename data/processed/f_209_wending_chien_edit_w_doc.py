@@ -24,7 +24,9 @@ def f_209(data):
         if the test could not be conducted.
 
     Requirements:
-    pandas, numpy, seaborn, scipy.stats, matplotlib.pyplot
+    - pandas
+    - seaborn
+    - scipy
 
     Raises:
     ValueError: If the input data does not have exactly eight columns.

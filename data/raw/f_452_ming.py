@@ -24,10 +24,10 @@ def f_452():
         pd.DataFrame: A DataFrame with 'X' and 'Y' columns containing the generated random integers.
 
     Requirements:
-        - numpy
-        - pandas
-        - seaborn
-        - matplotlib.pyplot
+        - numpy: Used for generating arrays of random integers.
+        - pandas: Utilized for creating and handling the DataFrame.
+        - seaborn: For plotting the scatter plot in a more aesthetically pleasing manner than Matplotlib's default.
+        - matplotlib.pyplot: Provides the underlying plotting functions used by Seaborn and controls for displaying the plot.
 
     No Parameters.
 

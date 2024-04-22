@@ -26,9 +26,9 @@ def f_463(df, letter):
                    returns None.
 
     Requirements:
-    - pandas
-    - seaborn
-    - matplotlib.pyplot
+    - pandas: For DataFrame manipulation and filtering.
+    - seaborn: For generating the box plot.
+    - matplotlib.pyplot: For plot customization and display.
 
     Example:
     >>> words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']

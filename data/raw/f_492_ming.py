@@ -25,9 +25,9 @@ def f_492(df, filename):
     str: The absolute path of the saved CSV file.
 
     Requirements:
-    - os
-    - pandas
-    - csv
+    - os: For path manipulation
+    - pandas: For DataFrame operations
+    - csv: For setting quoting options while saving the DataFrame
 
     Examples:
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})

@@ -38,31 +38,23 @@ def f_592(df, column, alpha):
     _, p = stats.shapiro(df[column])
     return p > alpha
 
-
 import unittest
 import pandas as pd
-
-
 class TestCases(unittest.TestCase):
     def setUp(self):
         np.random.seed(0)
-
     def test_case_1(self):
         df = pd.DataFrame({'Value': np.random.normal(0, 1, 1000)})
         self.assertTrue(f_592(df, 'Value', 0.05))
-
     def test_case_2(self):
         df = pd.DataFrame({'Value': np.random.uniform(0, 1, 1000)})
         self.assertFalse(f_592(df, 'Value', 0.05))
-
     def test_case_3(self):
         df = pd.DataFrame({'Value': np.random.exponential(1, 1000)})
         self.assertFalse(f_592(df, 'Value', 0.05))
-
     def test_case_4(self):
         df = pd.DataFrame({'Value': np.random.lognormal(0, 1, 1000)})
         self.assertFalse(f_592(df, 'Value', 0.05))
-
     def test_case_5(self):
         df = pd.DataFrame({'Value': np.random.chisquare(1, 1000)})
         self.assertFalse(f_592(df, 'Value', 0.05))

@@ -16,7 +16,9 @@ def f_215(num_types=5, integer_range=(0, 100)):
     tuple: A tuple containing a matplotlib Figure and Axes objects for the generated plot.
 
     Requirements:
-    pandas, matplotlib.pyplot, random
+    - pandas
+    - matplotlib
+    - random
 
     Note:
     The plot displays categories on the y-axis and their corresponding values on the x-axis, with
@@ -36,6 +38,8 @@ def f_215(num_types=5, integer_range=(0, 100)):
     return fig, ax
 
 import unittest
+import matplotlib
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         fig, ax = f_215()

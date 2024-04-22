@@ -23,9 +23,9 @@ def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
     - pd.DataFrame: DataFrame with Team, Goals, Penalties, Penalties Cost, Performance Score.
 
     Requirements:
-    - pandas
-    - numpy
-    - random.choice
+    - pandas: For DataFrame creation and manipulation.
+    - numpy: For numerical calculations.
+    - random.choice: For selecting penalties cost randomly.
 
     Example:
     >>> goals = {'Team A': 3, 'Team B': 2}

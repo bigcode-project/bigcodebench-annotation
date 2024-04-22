@@ -17,7 +17,8 @@ def f_201(elements, include_index=False):
     Includes an 'Index' column if requested.
 
     Requirements:
-    pandas, numpy
+    - pandas
+    - numpy
 
     Note:
     The order of columns in the returned DataFrame will be ['Index', 'Element', 'Count'] if the index is included.

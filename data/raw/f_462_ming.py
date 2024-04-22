@@ -22,14 +22,13 @@ def f_462(df, letter):
     - numpy
 
     Example:
-    >>> df = {'Word': ['apple', 'banana', 'apricot', 'blueberry', 'cherry', 'avocado']}
+    >>> df = pd.DataFrame({'Word': ['apple', 'banana', 'apricot', 'blueberry', 'cherry', 'avocado']})
     >>> stats = f_462(df, 'a')
     >>> stats['mean'] > 0
     True
     >>> stats['median'] > 0
     True
     """
-    df = pd.DataFrame(df)
     regex = '^' + letter
     filtered_df = df[df['Word'].str.contains(regex, regex=True)]
     word_lengths = filtered_df['Word'].str.len()
@@ -42,6 +41,15 @@ import pandas as pd
 import random
 from string import ascii_lowercase
 
+def generate_random_words(num=100):
+    """Generates a list of random words."""
+    word_list = []
+    for _ in range(num):
+        length = random.randint(3, 10)
+        word = ''.join(random.choice(ascii_lowercase) for _ in range(length))
+        word_list.append(word)
+    return word_list
+
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
@@ -50,14 +58,7 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        word_list = []
-        num = 1000
-        for _ in range(num):
-            length = random.randint(3, 10)
-            word = ''.join(random.choice(ascii_lowercase) for _ in range(length))
-            word_list.append(word)
-
-        self.df = {'Word': word_list}
+        self.df = pd.DataFrame({'Word': generate_random_words(1000)})
 
     def test_case_1(self):
         result = f_462(self.df, 'a')

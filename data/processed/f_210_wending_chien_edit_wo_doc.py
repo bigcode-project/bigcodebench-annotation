@@ -16,7 +16,9 @@ def f_210(log_file):
     str: The file path to the newly created CSV file which contains the structured log data.
 
     Requirements:
-    re, pandas, datetime
+    - re
+    - pandas
+    - datetime
 
     Raises:
     ValueError: If the timestamp in any log entry is invalid or if no valid log entries are found.

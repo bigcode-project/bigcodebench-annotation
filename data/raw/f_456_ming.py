@@ -16,6 +16,12 @@ import os
 current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
 FILE_PATH = os.path.join(current_directory_path, 'traffic_data.csv')
 VEHICLE_TYPES = ['Car', 'Bus', 'Truck', 'Bike']
+# sys.path.append(current_directory_path)
+
+
+def ensure_directory(current_directory_path):
+    if not os.path.exists(current_directory_path):
+        os.makedirs(current_directory_path)
 
 
 def f_456(hours):
@@ -44,9 +50,7 @@ def f_456(hours):
     >>> isinstance(ax, matplotlib.axes.Axes)
     True
     """
-
-    if not os.path.exists(current_directory_path):
-        os.makedirs(current_directory_path)
+    ensure_directory(current_directory_path)
 
     data = [['Time'] + VEHICLE_TYPES]
     for i in range(hours):

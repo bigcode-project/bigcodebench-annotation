@@ -18,7 +18,8 @@ def f_219(df):
     or no video titles match the search criteria.
 
     Requirements:
-    pandas, re, matplotlib.pyplot
+    - re
+    - matplotlib
 
     Note:
     The function checks for the presence of the necessary data columns ('Title', 'Views', 'Likes') and whether
@@ -54,9 +55,10 @@ def f_219(df):
     return ax
 
 # Integrating the test_cases function into the TestCases class methods and running the tests
-import matplotlib
-import unittest
 import pandas as pd
+import unittest
+import matplotlib
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         data_1 = pd.DataFrame({

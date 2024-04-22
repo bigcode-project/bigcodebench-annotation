@@ -18,7 +18,9 @@ def f_207(data):
     Axes: A matplotlib Axes object showing a plot of the average values across the dataset.
 
     Required Libraries:
-    pandas, numpy, sklearn.preprocessing, matplotlib.pyplot
+    - pandas
+    - sklearn
+    - matplotlib
 
     Example:
     >>> import numpy as np
@@ -43,6 +45,8 @@ def f_207(data):
 
 import unittest
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])

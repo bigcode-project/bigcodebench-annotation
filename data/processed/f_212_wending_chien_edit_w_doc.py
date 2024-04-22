@@ -16,7 +16,8 @@ def f_212(rows=5, cols=5):
     matplotlib.axes._axes.Axes: The Axes object displaying the stacked bar chart.
 
     Requirements:
-    numpy, pandas, matplotlib.pyplot
+    - numpy
+    - pandas
 
     Raises:
     ValueError: If the number of columns exceeds the number of available categories.
@@ -42,6 +43,8 @@ def f_212(rows=5, cols=5):
 
 import unittest
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def tearDown(self):
         # Cleanup any opened figures in matplotlib
