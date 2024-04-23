@@ -1,14 +1,9 @@
 import os
-import shutil
 
 import matplotlib
-import pandas as pd
-from datetime import datetime
-from dateutil.parser import parse
 import matplotlib.pyplot as plt
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import pandas as pd
+from dateutil.parser import parse
 
 # Correct CSV_PATH to reflect the current directory of this script plus 'data.csv'
 CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.csv')
@@ -50,10 +45,13 @@ def f_507(csv_path=CSV_PATH, date_column=DATE_COLUMN):
 
     return df[date_column].dt.year.hist()
 
+
 import unittest
 import shutil
 import os
-import pandas as pd
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 class TestCases(unittest.TestCase):
     @classmethod

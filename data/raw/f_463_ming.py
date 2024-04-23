@@ -1,13 +1,6 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import unittest
-from unittest.mock import patch
 
 
 def f_463(df, letter):
@@ -26,9 +19,9 @@ def f_463(df, letter):
                    returns None.
 
     Requirements:
-    - pandas: For DataFrame manipulation and filtering.
-    - seaborn: For generating the box plot.
-    - matplotlib.pyplot: For plot customization and display.
+    - pandas
+    - seaborn
+    - matplotlib.pyplot
 
     Example:
     >>> words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
@@ -54,8 +47,14 @@ def f_463(df, letter):
     ax.set_title(f"Word Lengths Distribution for Words Starting with '{letter}'")
     return ax
 
+
 import unittest
 from unittest.mock import patch
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 
 class TestCases(unittest.TestCase):
     def setUp(self):

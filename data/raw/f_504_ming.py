@@ -1,6 +1,6 @@
 import re
+
 import pandas as pd
-import numpy as np
 
 # Constants
 DATA_PATTERN = r'>\d+\.\d+<'

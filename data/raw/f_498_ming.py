@@ -1,11 +1,9 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from random import sample
 from typing import Tuple
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
 
 # Constants
 STUDENTS = ['Student' + str(i) for i in range(1, 101)]
@@ -51,7 +49,12 @@ def f_498(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
 
     return df, ax
 
+
 import unittest
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 def run_tests():
     suite = unittest.TestSuite()

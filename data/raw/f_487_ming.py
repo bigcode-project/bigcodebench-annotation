@@ -1,10 +1,8 @@
-import pytz
-from datetime import datetime
-from dateutil.parser import parse
 from random import choice
+
 import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import pytz
+from dateutil.parser import parse
 
 # Constants
 TIMEZONES = ['America/New_York', 'Europe/London', 'Asia/Shanghai', 'Asia/Tokyo', 'Australia/Sydney']
@@ -41,6 +39,9 @@ def f_487(date_str, from_tz):
 
 import unittest
 from datetime import datetime
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 def run_tests():
     suite = unittest.TestSuite()

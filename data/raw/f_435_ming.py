@@ -1,10 +1,8 @@
 from collections import Counter
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
-import seaborn as sns
-import pandas as pd
+
 import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
 
 
 def f_435(list_of_menuitems):
@@ -59,6 +57,9 @@ def f_435(list_of_menuitems):
 
 
 import unittest
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 class TestCases(unittest.TestCase):
     def setUp(self):

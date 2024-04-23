@@ -1,8 +1,3 @@
-import numpy as np
-import pandas as pd
-from datetime import datetime
-from dateutil.parser import parse
-
 DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 def f_510(dates_str_list):
@@ -45,18 +40,14 @@ def f_510(dates_str_list):
     return distribution
 
 import unittest
+
 import numpy as np
 import pandas as pd
-from datetime import datetime
 from dateutil.parser import parse
+
 DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 def run_tests():
-    import numpy as np
-    import pandas as pd
-    from datetime import datetime
-    from dateutil.parser import parse
-    
     # Constants for the test cases
     DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     

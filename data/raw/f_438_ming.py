@@ -1,13 +1,8 @@
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import stats
-import matplotlib.pyplot as plt
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-# Constants
 
 
 def f_438(a, b):
@@ -40,8 +35,12 @@ def f_438(a, b):
     return correlation, plt.gca()
 
 import unittest
-import numpy as np
 import math
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+# Constants
+
 
 class TestCases(unittest.TestCase):
 

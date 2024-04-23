@@ -1,7 +1,6 @@
-import pandas as pd
-import numpy as np
-from itertools import cycle, islice
 from random import shuffle, randint
+
+import pandas as pd
 
 # Constants
 ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']

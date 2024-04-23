@@ -1,15 +1,6 @@
-import os
 import pandas as pd
-import json
-import unittest
-import shutil
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import pandas as pd
 
-# Set DATA_DIR to the 'data' subdirectory in the current file's parent directory
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(CURRENT_DIR, 'data')
 
 def f_491(df, filename):
     """
@@ -54,6 +45,12 @@ import unittest
 import os
 import json
 import shutil
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
+# Set DATA_DIR to the 'data' subdirectory in the current file's parent directory
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(CURRENT_DIR, 'data')
 
 class TestCases(unittest.TestCase):
     @classmethod

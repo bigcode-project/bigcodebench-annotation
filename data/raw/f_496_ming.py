@@ -1,12 +1,11 @@
 # Importing the required libraries
 import re
-from sklearn.feature_extraction.text import CountVectorizer
-import pandas as pd
+
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
 
 # Hard-coded list of common English stopwords for demonstration purposes
 STOPWORDS = set(["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", 
@@ -88,6 +87,9 @@ def f_496(text, n=2):
 
 
 import unittest
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 class TestCases(unittest.TestCase):
     def test_simple_text(self):
