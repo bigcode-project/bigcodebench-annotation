@@ -10,6 +10,7 @@ from camel_converter import to_snake
 # from datasets import load_dataset
 from typing import List
 from tqdm import tqdm
+import argparse
 client = OpenAI()
 
 _CITATION = """
@@ -17,10 +18,27 @@ _CITATION = """
 }
 """
 
+EOS = ["\ndef", "\nclass ", "\nimport ", "\nfrom ", "\nassert ", "\n# "]
+
 def get_prompt_base(doc):
     return "Complete the following function:\n" + doc["prompt"]
 
+def get_prompt_instruct(doc):
+    return doc["instruction"]
 
+def stop_at_stop_token(decoded_string, stop_tokens):
+        """
+        Produces the prefix of decoded_string that ends at the first occurrence of
+        a stop_token.
+        WARNING: the decoded_string *must not* include the prompt, which may have stop tokens
+        itself.
+        """
+        min_stop_index = len(decoded_string)
+        for stop_token in stop_tokens:
+            stop_index = decoded_string.find(stop_token)
+            if stop_index != -1 and stop_index < min_stop_index:
+                min_stop_index = stop_index
+        return decoded_string[:min_stop_index]
 
 class ParseError(Exception):
     pass
@@ -42,6 +60,8 @@ class ContentParser:
         # typos, or other "bugs" in description.
         if "### Response:\n" in content:
             content = content.split("### Response:\n")[1]
+        elif "\nassistant\n" in content:
+            content = content.split("\nassistant\n")[1]    
         if "```" in content:
             content = content.split("```")[1]
         # first parse with assumption that content has description
@@ -89,15 +109,20 @@ class ChatWrapper:
 
 
 if __name__ == '__main__':
-    TIMES = 1
-    VERBOSE = True
-    MODEL = sys.argv[1]
     input_file = "data/open-eval.jsonl"
-    # make test directory
-    if not os.path.exists("results"):
-        os.makedirs("results")
+    args = argparse.ArgumentParser()
+    args.add_argument("--times", type=int, default=1)
+    args.add_argument("--verbose", type=bool, default=True)
+    args.add_argument("--temperature", type=int, default=0)
+    args.add_argument("--mode", type=str, default="base")
+    args.add_argument("--model", type=str, default="gpt-4-turbo-2024-04-09")
     
-    # Load descriptions
+    args = args.parse_args()
+    TIMES = args.times
+    VERBOSE = args.verbose
+    TEMPERATURE = args.temperature
+    MODE = args.mode
+    MODEL = args.model
 
     samples = []
     with jsonlines.open(input_file) as f:
@@ -108,7 +133,12 @@ if __name__ == '__main__':
     parse_errors = 0
     parser = ContentParser()
     for idx, sample in enumerate(tqdm(samples)):
-        prompt = get_prompt_base(sample)
+        if MODE == "base":
+            prompt = get_prompt_base(sample)
+        elif MODE == "instruct":
+            prompt = get_prompt_instruct(sample)
+        else:
+            raise ValueError("Invalid mode")
         
         if VERBOSE:
             print(f"Processing {sample['task_id']} ({idx + 1}/{len(samples)}))...")
@@ -128,6 +158,6 @@ if __name__ == '__main__':
     if VERBOSE:
         print("parse error rate:", parse_errors / len(samples))
 
-    results_filename = MODEL+f"_completions_"+input_file.split("/")[-1].split(".")[0]+".jsonl"
+    results_filename = MODEL+f"_{MODE}_completions_"+input_file.split("/")[-1].split(".")[0]+".jsonl"
     with jsonlines.open("results/"+results_filename, "w") as writer:
         writer.write_all(samples)

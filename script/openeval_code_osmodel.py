@@ -56,6 +56,8 @@ class ContentParser:
         # typos, or other "bugs" in description.
         if "### Response:\n" in content:
             content = content.split("### Response:\n")[1]
+        elif "\nassistant\n" in content:
+            content = content.split("\nassistant\n")[1]
         if "```" in content:
             content = content.split("```")[1]
         # first parse with assumption that content has description
