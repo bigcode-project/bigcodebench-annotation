@@ -1,7 +1,7 @@
 from random import randint, seed
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import re
 
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
