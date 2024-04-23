@@ -1,6 +1,8 @@
-from random import sample
 from itertools import combinations
+from random import sample
+
 import matplotlib
+
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

@@ -3,7 +3,6 @@ import matplotlib
 print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
 matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
-import random
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt

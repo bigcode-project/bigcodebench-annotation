@@ -1,8 +1,9 @@
-import pandas as pd
-from random import randint, seed
 import unittest
-from pandas.testing import assert_frame_equal
+from random import randint, seed
+
 import matplotlib
+import pandas as pd
+
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

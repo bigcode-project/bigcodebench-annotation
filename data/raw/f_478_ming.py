@@ -1,10 +1,11 @@
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from random import randint, seed
-import re
 import unittest
+from random import randint, seed
+
 import matplotlib
+import matplotlib.pyplot as plt
+import pandas as pd
+
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

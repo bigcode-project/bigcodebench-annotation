@@ -1,8 +1,8 @@
-import numpy as np
+import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib
+
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

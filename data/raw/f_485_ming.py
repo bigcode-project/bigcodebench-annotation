@@ -1,7 +1,6 @@
-import numpy as np
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
 import matplotlib
+from sklearn.decomposition import PCA
+
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 # Constants

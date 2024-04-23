@@ -1,6 +1,7 @@
+import base64
 import binascii
 import os
-import base64
+
 
 def f_428():
     """

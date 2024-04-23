@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib
 # Check and set the backend
 print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend

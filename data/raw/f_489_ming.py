@@ -1,7 +1,9 @@
 import math
 from random import randint
-import matplotlib.pyplot as plt
+
 import matplotlib
+import matplotlib.pyplot as plt
+
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

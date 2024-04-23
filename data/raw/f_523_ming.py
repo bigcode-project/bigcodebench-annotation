@@ -1,6 +1,3 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
 import matplotlib
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
@@ -42,9 +39,7 @@ def f_523(x, y, labels):
     
     return fig
 
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
+
 import unittest
 
 import numpy as np

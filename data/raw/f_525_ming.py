@@ -1,10 +1,11 @@
+import statistics
 import unittest
 
-import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import statistics
-import matplotlib
+import pandas as pd
+
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 
@@ -25,7 +26,7 @@ def f_525(sales_data):
     - numpy
     - statistics
 
-    Example:
+    Example usage:
     >>> sales_data = pd.DataFrame({
     ...     'Month': range(1, 13),
     ...     'Product A': np.random.randint(100, 200, size=12),

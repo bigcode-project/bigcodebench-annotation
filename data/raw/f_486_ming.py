@@ -1,8 +1,11 @@
-import pandas as pd
-import numpy as np
 import math
 from random import randint
 import matplotlib
+import math
+from random import randint
+
+import matplotlib
+
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

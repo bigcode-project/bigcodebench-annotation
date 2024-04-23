@@ -1,8 +1,9 @@
-import numpy as np
 from itertools import chain
-from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
+
 import matplotlib
+import numpy as np
+from sklearn.cluster import KMeans
+
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

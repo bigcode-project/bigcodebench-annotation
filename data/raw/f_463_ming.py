@@ -6,8 +6,6 @@ matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import unittest
-from unittest.mock import patch
 
 
 def f_463(df, letter):
@@ -26,9 +24,9 @@ def f_463(df, letter):
                    returns None.
 
     Requirements:
-    - pandas: For DataFrame manipulation and filtering.
-    - seaborn: For generating the box plot.
-    - matplotlib.pyplot: For plot customization and display.
+    - pandas
+    - seaborn
+    - matplotlib.pyplot
 
     Example:
     >>> words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']

@@ -1,7 +1,9 @@
+import unittest
+
+import matplotlib
 import pandas as pd
 from matplotlib import pyplot as plt
-import unittest
-import matplotlib
+
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 # Constants

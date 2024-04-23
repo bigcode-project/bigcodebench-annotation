@@ -1,7 +1,11 @@
-import pandas as pd
 from random import randint
 from statistics import mean
 import matplotlib
+from random import randint
+from statistics import mean
+
+import matplotlib
+
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

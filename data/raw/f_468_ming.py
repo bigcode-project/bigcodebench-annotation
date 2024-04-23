@@ -1,7 +1,8 @@
-from collections import Counter
 import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 from random import sample
 
@@ -22,10 +23,10 @@ def f_468(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     - list: A list containing matplotlib Axes objects of the generated plots.
 
     Requirements:
-    - pandas: For data manipulation.
-    - numpy: For initial random data generation (example use).
-    - matplotlib.pyplot: For plotting.
-    - random: For selecting random column pairs for plotting.
+    - pandas
+    - numpy
+    - matplotlib.pyplot
+    - random
 
     Example:
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=COLUMNS)
@@ -52,8 +53,7 @@ import unittest
 from unittest.mock import patch
 import pandas as pd
 import numpy as np
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -1,8 +1,10 @@
 import unittest
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.optimize import curve_fit
+
 import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.optimize import curve_fit
+
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

@@ -1,6 +1,4 @@
 from collections import Counter
-import pandas as pd
-import numpy as np  # Although not directly used, added to comply with requirements
 
 
 def f_434(list_of_menuitems):

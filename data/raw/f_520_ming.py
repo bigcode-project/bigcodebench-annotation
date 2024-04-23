@@ -1,9 +1,6 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import scipy.stats as stats
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 def f_520(x, y, labels):
@@ -45,6 +42,8 @@ def f_520(x, y, labels):
 
 import unittest
 import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 
 def run_tests():
