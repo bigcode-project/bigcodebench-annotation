@@ -1,8 +1,3 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
 import pandas as pd
 from scipy.spatial import distance
 import matplotlib.pyplot as plt
@@ -46,7 +41,13 @@ def f_440(a, b):
     
     return euclidean_distance, df, ax
 
+
 import unittest
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 
 def run_tests():
     suite = unittest.TestSuite()

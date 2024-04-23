@@ -1,11 +1,6 @@
 import math
 from random import randint
-
-import matplotlib
 import matplotlib.pyplot as plt
-
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 def f_489():
@@ -42,7 +37,12 @@ def f_489():
     
     return ax  # Return the axis object for testing
 
+
 import unittest
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 def run_tests():
     suite = unittest.TestSuite()

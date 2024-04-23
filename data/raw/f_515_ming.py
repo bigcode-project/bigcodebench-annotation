@@ -1,9 +1,6 @@
-import scipy.optimize as optimize
 import matplotlib.pyplot as plt
 import scipy.optimize as optimize
-
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import numpy as np
 
 
 def f_515(array, target_value):
@@ -58,7 +55,10 @@ def f_515(array, target_value):
 
 
 import unittest
-import numpy as np
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 class TestCases(unittest.TestCase):
     def setUp(self):

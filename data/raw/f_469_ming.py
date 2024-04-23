@@ -1,10 +1,7 @@
 import seaborn as sns
 from random import sample
-
-import seaborn as sns
-
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import pandas as pd
+import numpy as np
 
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
@@ -50,8 +47,10 @@ def f_469(df, tuples, n_plots):
     return df, plots
 
 import unittest
-import pandas as pd
-import numpy as np
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 def run_tests():
     suite = unittest.TestSuite()

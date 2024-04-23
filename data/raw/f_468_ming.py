@@ -1,7 +1,3 @@
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
-
 import pandas as pd
 import matplotlib.pyplot as plt
 from random import sample
@@ -51,8 +47,10 @@ def f_468(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
 
 import unittest
 from unittest.mock import patch
-import pandas as pd
 import numpy as np
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 class TestCases(unittest.TestCase):
     @classmethod

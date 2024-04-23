@@ -1,13 +1,6 @@
 import math
 from random import randint
-import matplotlib
-import math
-from random import randint
-
-import matplotlib
-
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import pandas as pd
 
 
 def f_486(cities_list):
@@ -44,7 +37,10 @@ def f_486(cities_list):
     return population_df
 
 import unittest
-import pandas as pd
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
 
 def run_tests():
     suite = unittest.TestSuite()

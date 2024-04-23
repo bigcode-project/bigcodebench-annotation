@@ -1,13 +1,8 @@
-import unittest
 from random import choice
-from unittest.mock import patch
-
-import matplotlib
 import numpy as np
 import pandas as pd
 
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 PENALTIES_COST = [100, 200, 300, 400, 500]
@@ -52,6 +47,11 @@ def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
     return report_df
 
 
+import unittest
+from unittest.mock import patch
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
 
     @patch(__name__ + '.choice', return_value=400)

@@ -1,13 +1,7 @@
-import pandas as pd
-import unittest
 from random import randint, seed
-
-import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
@@ -72,6 +66,11 @@ def f_478(goals, penalties, rng_seed=None, teams= TEAMS):
 
     return results_df
 
+
+import matplotlib
+import unittest
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Unit Tests
 class TestCases(unittest.TestCase):
     def setUp(self):

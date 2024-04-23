@@ -1,11 +1,5 @@
-import unittest
 from random import randint, seed
-
-import matplotlib
 import pandas as pd
-
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 # Method
@@ -55,6 +49,11 @@ def f_476(goals, penalties, rng_seed=None):
 
     return results_df
 
+
+import unittest
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Test Suite
 class TestCases(unittest.TestCase):
     def setUp(self):

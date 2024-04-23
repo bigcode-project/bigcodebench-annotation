@@ -1,11 +1,6 @@
-import unittest
-
-import matplotlib
 import pandas as pd
 from matplotlib import pyplot as plt
 
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 GOALS_RANGE = (-10, 10)
@@ -63,6 +58,10 @@ def f_474_and_plot(goals, penalties):
     return scores_df
 
 
+import unittest
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Unit Tests
 class TestCases(unittest.TestCase):
     def test_no_goals_no_penalties(self):

@@ -1,7 +1,6 @@
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
-
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
 
 def f_523(x, y, labels):
     """ 
@@ -41,16 +40,17 @@ def f_523(x, y, labels):
 
 
 import unittest
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
 
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 
 class TestCases(unittest.TestCase):
     def setUp(self):

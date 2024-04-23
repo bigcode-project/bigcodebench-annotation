@@ -1,11 +1,7 @@
 from itertools import combinations
 from random import sample
-
-import matplotlib
-
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
-
+import pandas as pd
+import numpy as np
 
 def f_470(df, tuples, n_plots):
     """
@@ -44,8 +40,10 @@ def f_470(df, tuples, n_plots):
     return df, plots
 
 import unittest
-import pandas as pd
-import numpy as np
+import matplotlib
+
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 def run_tests():
     suite = unittest.TestSuite()

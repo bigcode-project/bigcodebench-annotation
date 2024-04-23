@@ -1,10 +1,5 @@
-import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 # Constants
 LABELS = ['H\u2082O', 'O\u2082', 'CO\u2082', 'N\u2082', 'Ar']
@@ -48,6 +43,10 @@ df (DataFrame): The dataframe used to create the heatmap.
 
 import unittest
 import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 def run_tests():
     suite = unittest.TestSuite()

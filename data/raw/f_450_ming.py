@@ -1,12 +1,7 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-
+import random
 # Constants
 RANGE = 10000
 SIZE = 1000
@@ -48,7 +43,10 @@ def f_450(size=SIZE, frequency=1):
     
 
 import unittest
-import random
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
 def run_tests():
     suite = unittest.TestSuite()

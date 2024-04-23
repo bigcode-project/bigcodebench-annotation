@@ -1,13 +1,8 @@
-import unittest
 from random import randint, seed
-
-import matplotlib
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
@@ -62,6 +57,11 @@ def f_480(goals, penalties, rng_seed=None):
 
     return results_df, model
 
+
+import matplotlib
+import unittest
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 # Unit Tests
 class TestCases(unittest.TestCase):

@@ -1,11 +1,7 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
 from datetime import datetime
 from random import randint
 import matplotlib.pyplot as plt
+import pandas as pd
 import os
 
 TEMP_CATEGORIES = ['Cold', 'Normal', 'Hot']
@@ -66,8 +62,10 @@ def f_454(hours, file_path=FILE_PATH):
     return file_path, ax
 
 import unittest
-import pandas as pd
-import os
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
 
 def run_tests():
