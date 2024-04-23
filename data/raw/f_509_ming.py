@@ -1,6 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
+
 from dateutil.parser import parse
-import calendar
+
 
 def f_509(date_str):
     """

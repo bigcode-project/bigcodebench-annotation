@@ -1,8 +1,9 @@
-import shutil
-import pandas as pd
-import numpy as np
-from random import choice
 import os
+import shutil
+
+import numpy as np
+import pandas as pd
+
 # Constants
 LETTERS = list('abcdefghijklmnopqrstuvwxyz')
 current_directory_path = os.getcwd()

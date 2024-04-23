@@ -1,6 +1,6 @@
-import pandas as pd
-import numpy as np
 from random import shuffle
+
+import numpy as np
 
 # Constants
 ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']

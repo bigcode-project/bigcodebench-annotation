@@ -1,29 +1,6 @@
+import os
+
 import pandas as pd
-import os
-import unittest
-import shutil
-import os
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
-
-
-# Set the directory for data relative to the current file's location
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(CURRENT_DIR, 'data')
-
-def ensure_dir_exists(path):
-    """
-    Ensure the specified directory exists; if not, create it.
-
-    Parameters:
-    - path (str): The path of the directory to check and possibly create.
-
-    Returns:
-    None: Creates the directory if it does not exist, otherwise does nothing.
-    """
-    if not os.path.exists(path):
-        os.makedirs(path)
 
 
 def f_490(dataset, filename):
@@ -38,15 +15,17 @@ def f_490(dataset, filename):
     None: The function writes the DataFrames to a CSV file but does not return any value.
 
     Requirements:
-    - pandas: For handling DataFrames and writing to CSV files.
-    - os: For checking and creating directories.
+    - pandas
+    - os
 
     Example:
     >>> df1 = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
     >>> df2 = pd.DataFrame({"D": [5, 6], "E": [7, 8]})
     >>> f_490([df1, df2], 'sample.csv')
     """
-    ensure_dir_exists(DATA_DIR)  # Ensure the data directory exists
+
+    if not os.path.exists(DATA_DIR):
+        os.makedirs(DATA_DIR)
     filepath = os.path.join(DATA_DIR, filename)
     with open(filepath, 'w', newline='') as f:
         for i, df in enumerate(dataset):
@@ -60,11 +39,14 @@ def f_490(dataset, filename):
                 f.write('\n')
 
 
-
 import unittest
-import os
 import shutil
-
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+# Set the directory for data relative to the current file's location
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(CURRENT_DIR, 'data')
 
 class TestCases(unittest.TestCase):
     @classmethod

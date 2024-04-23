@@ -1,9 +1,8 @@
-from datetime import datetime
-import os
-from os.path import normpath
-from random import randint
 import csv
+import os
 import shutil
+from datetime import datetime
+from random import randint
 
 # Constants
 current_directory_path = os.getcwd()
@@ -53,7 +52,7 @@ def f_457(hours):
 
 
 import unittest
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import patch, mock_open
 
 
 class TestCases(unittest.TestCase):

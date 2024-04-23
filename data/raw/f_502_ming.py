@@ -1,11 +1,8 @@
+import os
 import re
 import shutil
 
 import pandas as pd
-import csv
-import os
-# Set DATA_DIR to the 'data' subdirectory in the current script's directory
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
 def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
@@ -44,6 +41,9 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
     return df
 
 import unittest
+# Set DATA_DIR to the 'data' subdirectory in the current script's directory
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
 
 class TestCases(unittest.TestCase):
     @classmethod

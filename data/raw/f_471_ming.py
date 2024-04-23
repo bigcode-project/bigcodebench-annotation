@@ -1,10 +1,10 @@
-import pandas as pd
-import numpy as np
-import seaborn as sns
 from random import sample
+
 import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
@@ -50,8 +50,8 @@ def f_471(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     
 
 import unittest
-import pandas as pd
-import numpy as np
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 def run_tests():
     suite = unittest.TestSuite()

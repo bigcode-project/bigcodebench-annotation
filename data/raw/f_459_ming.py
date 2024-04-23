@@ -1,7 +1,7 @@
-import pandas as pd
-from random import choice, randint
 import unittest
-from unittest.mock import patch
+from random import choice, randint
+
+import pandas as pd
 
 # Constants
 LETTERS = list('abcdefghijklmnopqrstuvwxyz')

@@ -1,10 +1,6 @@
-import numpy as np
 from itertools import chain
+import numpy as np
 from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 def f_484(L):
@@ -42,6 +38,9 @@ def f_484(L):
 
 import unittest
 import matplotlib.pyplot as plt
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 def run_tests():
     suite = unittest.TestSuite()

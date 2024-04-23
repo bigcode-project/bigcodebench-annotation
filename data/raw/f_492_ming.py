@@ -1,13 +1,7 @@
-import os
-import pandas as pd
 import csv
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
-# Adjust DATA_DIR to point to the 'data' subdirectory in the parent directory of this script
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(CURRENT_DIR, 'data')
+import matplotlib
+import pandas as pd
 
 
 def f_492(df, filename):
@@ -25,9 +19,9 @@ def f_492(df, filename):
     str: The absolute path of the saved CSV file.
 
     Requirements:
-    - os: For path manipulation
-    - pandas: For DataFrame operations
-    - csv: For setting quoting options while saving the DataFrame
+    - os
+    - pandas
+    - csv
 
     Examples:
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
@@ -45,8 +39,14 @@ def f_492(df, filename):
 
 import unittest
 import shutil
-import pandas as pd
 import os
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+
+# Adjust DATA_DIR to point to the 'data' subdirectory in the parent directory of this script
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(CURRENT_DIR, 'data')
+
 
 class TestCases(unittest.TestCase):
     @classmethod

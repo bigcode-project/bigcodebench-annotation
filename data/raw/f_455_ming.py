@@ -1,13 +1,14 @@
+import csv
+import os
 import shutil
 from datetime import datetime
-import os
 from random import randint
-import csv
 
 # Constants
 current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
 FILE_PATH = os.path.join(current_directory_path, 'sensor_data.csv')
 SENSORS = ['Temperature', 'Humidity', 'Pressure']
+
 
 def f_455(hours):
     """

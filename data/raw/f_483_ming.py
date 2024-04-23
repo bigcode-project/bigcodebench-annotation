@@ -1,10 +1,5 @@
-import numpy as np
-from itertools import chain
-from scipy.stats import norm
 import matplotlib.pyplot as plt
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import numpy as np
 
 
 def f_483(L):
@@ -44,10 +39,11 @@ def f_483(L):
     
 
 import unittest
-import numpy as np
 from itertools import chain
 from scipy.stats import norm
-import matplotlib.pyplot as plt
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 def run_tests():
     suite = unittest.TestSuite()
