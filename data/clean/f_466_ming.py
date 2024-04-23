@@ -1,11 +1,7 @@
-from collections import Counter
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
-
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def f_466(matrix):
     """
@@ -34,9 +30,9 @@ def f_466(matrix):
     return ax
 
 import unittest
-import numpy as np
 import matplotlib
-
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Importing the refined function
 
 
@@ -45,6 +41,7 @@ def run_tests():
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 
 class TestCases(unittest.TestCase):
     def test_case_1(self):

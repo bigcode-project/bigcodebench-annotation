@@ -1,11 +1,10 @@
-import pandas as pd
-import seaborn as sns
 import unittest
 from unittest.mock import patch
-import matplotlib.pyplot as plt
+
 import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import pandas as pd
+import seaborn as sns
+
 
 def f_475(goals, penalties):
     """
@@ -52,6 +51,8 @@ def f_475(goals, penalties):
 
     return df, plot
 
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Unit tests for the function f_475
 class TestCases(unittest.TestCase):
     @patch('matplotlib.pyplot.show')

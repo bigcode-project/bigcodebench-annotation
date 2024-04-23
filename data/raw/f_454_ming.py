@@ -5,9 +5,7 @@ import pandas as pd
 import os
 
 TEMP_CATEGORIES = ['Cold', 'Normal', 'Hot']
-current_directory_path = os.getcwd()
-# print(current_directory_path)
-FILE_PATH = os.path.join(current_directory_path, 'custom_data.csv')
+FILE_PATH = 'custom_data.csv'
 
 
 def f_454(hours, file_path=FILE_PATH):

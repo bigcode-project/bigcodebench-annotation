@@ -1,5 +1,7 @@
 import re
+
 from nltk.corpus import stopwords
+
 
 def f_494(text: str) -> dict:
     """

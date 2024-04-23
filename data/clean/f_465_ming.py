@@ -1,9 +1,8 @@
 import re
 
-import pandas as pd
 import numpy as np
-import unittest
-from unittest.mock import patch
+import pandas as pd
+
 
 def f_465(matrix1, matrix2):
     """

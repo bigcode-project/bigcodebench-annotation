@@ -1,10 +1,5 @@
-import numpy as np
-from itertools import chain
-from scipy.stats import norm
 import matplotlib.pyplot as plt
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import numpy as np
 
 
 def f_483(L):
@@ -43,10 +38,11 @@ def f_483(L):
     return ax
 
 import unittest
-import numpy as np
 from itertools import chain
 from scipy.stats import norm
-import matplotlib.pyplot as plt
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         L = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]

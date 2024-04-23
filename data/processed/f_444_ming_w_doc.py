@@ -1,11 +1,7 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
-import numpy as np
-import matplotlib.pyplot as plt
 from random import randint
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 def f_444(array_length=100):
     """
@@ -38,7 +34,10 @@ def f_444(array_length=100):
     return ax
 
 import unittest
+import matplotlib
 from matplotlib.axes import Axes
+# Check and set the backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):

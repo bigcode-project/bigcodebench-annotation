@@ -1,12 +1,6 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
+import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
-
 # Constants for configuration
 RANGE = 100
 SIZE = 1000
@@ -61,8 +55,10 @@ def f_453():
     return data, kmeans
 
 import unittest
-import numpy as np
-from sklearn.cluster import KMeans
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     def test_data_size(self):
         """Ensure the generated data has the correct size."""

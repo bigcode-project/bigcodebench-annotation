@@ -1,6 +1,6 @@
-import binascii
-import os
 import base64
+import os
+
 
 def f_428():
     """
@@ -28,6 +28,7 @@ def f_428():
 
 import string
 import unittest
+import binascii
 class TestCases(unittest.TestCase):
     def test_return_type(self):
         """Test that the return type is a string."""

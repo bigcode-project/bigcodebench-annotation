@@ -1,5 +1,5 @@
 from collections import Counter
-
+import pandas as pd
 
 def f_434(list_of_menuitems):
     """
@@ -14,7 +14,6 @@ def f_434(list_of_menuitems):
 
     Requirements:
         - collections
-        - numpy
         - pandas
 
     Example:
@@ -36,7 +35,7 @@ def f_434(list_of_menuitems):
 
 
 import unittest
-import pandas as pd
+
 
 def run_tests():
     suite = unittest.TestSuite()

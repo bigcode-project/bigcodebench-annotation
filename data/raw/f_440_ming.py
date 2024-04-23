@@ -18,7 +18,6 @@ def f_440(a, b):
     matplotlib.axes.Axes: The generated plot's Axes object.
 
     Requirements:
-    - numpy
     - pandas
     - scipy.spatial.distance
     - matplotlib

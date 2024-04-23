@@ -1,10 +1,6 @@
-import numpy as np
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def f_446(array_length=100, noise_level=0.2):
@@ -44,7 +40,8 @@ def f_446(array_length=100, noise_level=0.2):
     return ax
 
 import unittest
-import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
 def run_tests():
     suite = unittest.TestSuite()

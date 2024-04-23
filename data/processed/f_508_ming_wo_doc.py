@@ -1,5 +1,4 @@
 import pytz
-from datetime import datetime
 from dateutil.parser import parse
 
 def f_508(date_str, from_tz, to_tz):

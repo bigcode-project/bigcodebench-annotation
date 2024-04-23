@@ -1,5 +1,5 @@
 from random import shuffle
-
+import pandas as pd
 import numpy as np
 
 # Constants
@@ -41,7 +41,6 @@ def f_447(l):
 
 
 import unittest
-import pandas as pd
 
 class TestCases(unittest.TestCase):
     def test_with_predefined_elements(self):

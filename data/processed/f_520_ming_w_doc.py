@@ -1,9 +1,6 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import scipy.stats as stats
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 def f_520(x, y, labels):
@@ -44,6 +41,8 @@ def f_520(x, y, labels):
 
 import unittest
 import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]

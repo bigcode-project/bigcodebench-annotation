@@ -1,5 +1,4 @@
 from random import shuffle, randint
-
 import pandas as pd
 
 # Constants
@@ -22,8 +21,6 @@ def f_448(l):
 
     Requirements:
     - pandas
-    - numpy
-    - itertools.cycle
     - random.shuffle
     - random.randint
 

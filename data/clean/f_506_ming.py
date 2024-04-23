@@ -1,4 +1,5 @@
 import os
+
 import pandas as pd
 
 
@@ -44,7 +45,6 @@ def f_506(filename: str) -> pd.DataFrame:
     return df
 
 import unittest
-import tempfile
 import shutil
 
 class TestCases(unittest.TestCase):

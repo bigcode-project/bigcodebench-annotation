@@ -1,11 +1,7 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+
 
 def f_445(array_length=100):
     '''
@@ -42,9 +38,9 @@ def f_445(array_length=100):
     
 
 import unittest
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
 def run_tests():
     suite = unittest.TestSuite()

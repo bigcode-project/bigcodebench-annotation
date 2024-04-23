@@ -1,9 +1,5 @@
-import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 def f_514(dataframe, target_value='332'):
@@ -43,6 +39,9 @@ def f_514(dataframe, target_value='332'):
 
 import unittest
 import pandas as pd
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def setUp(self):
         """Create a sample DataFrame for testing."""

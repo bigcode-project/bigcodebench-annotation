@@ -1,5 +1,5 @@
 import numpy as np
-
+import pandas as pd
 
 def f_462(df, letter):
     """
@@ -36,7 +36,6 @@ def f_462(df, letter):
     return statistics
 
 import unittest
-import pandas as pd
 import random
 from string import ascii_lowercase
 

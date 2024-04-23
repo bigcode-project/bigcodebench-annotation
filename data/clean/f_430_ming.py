@@ -1,8 +1,7 @@
-import struct
 import codecs
 import random
+import struct
 
-# Constants
 KEYS = ['470FC614', '4A0FC614', '4B9FC614', '4C8FC614', '4D7FC614']
 
 def f_430(hex_keys=KEYS):
@@ -31,10 +30,9 @@ def f_430(hex_keys=KEYS):
 
     return encoded_float
 
+
 import unittest
-import struct
-import codecs
-import random
+
 
 def run_tests():
     suite = unittest.TestSuite()

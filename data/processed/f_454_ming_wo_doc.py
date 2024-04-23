@@ -1,18 +1,11 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
-import pandas as pd
 from datetime import datetime
 from random import randint
 import matplotlib.pyplot as plt
+import pandas as pd
 import os
 
 TEMP_CATEGORIES = ['Cold', 'Normal', 'Hot']
-current_directory_path = os.getcwd()
-# print(current_directory_path)
-FILE_PATH = os.path.join(current_directory_path, 'custom_data.csv')
+FILE_PATH = 'custom_data.csv'
 
 
 def f_454(hours, file_path=FILE_PATH):
@@ -67,8 +60,10 @@ def f_454(hours, file_path=FILE_PATH):
     return file_path, ax
 
 import unittest
-import pandas as pd
-import os
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     def tearDown(self):
         """Clean up any files created during the tests."""

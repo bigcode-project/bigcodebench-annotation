@@ -1,6 +1,6 @@
-import binascii
-import os
 import base64
+import os
+
 
 def f_428():
     """
@@ -28,6 +28,7 @@ def f_428():
 
 import string
 import unittest
+import binascii
 
 def run_tests():
     suite = unittest.TestSuite()

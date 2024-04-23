@@ -1,8 +1,8 @@
 import re
+
 import nltk
-from matplotlib import pyplot as plt
-from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import NMF
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Ensure nltk's stopwords are downloaded
 nltk.download('stopwords')

@@ -1,26 +1,24 @@
-import numpy as np
 from itertools import chain
+import numpy as np
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
 
 def f_482(L):
     '''
     Convert a list of lists 'L' into a single list of integers, standardize the integers, and plot the standardized values.
-    
-    Requirements:
-    - numpy: For reshaping the list into an array.
-    - itertools: For chaining sublists into a single list.
-    - sklearn.preprocessing: For standardizing the list of integers.
-    - matplotlib.pyplot: For plotting the standardized values.
 
     Parameters:
     L (list of lists): A list of lists where each sublist contains integers.
     
     Returns:
     matplotlib.axes._subplots.AxesSubplot: A plot displaying the standardized values.
+
+    Requirements:
+    - numpy
+    - itertools
+    - sklearn.preprocessing
+    - matplotlib.pyplot
 
     Examples:
     >>> ax = f_482([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
@@ -38,7 +36,9 @@ def f_482(L):
     
 
 import unittest
-import matplotlib.pyplot as plt
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 
 def run_tests():
     suite = unittest.TestSuite()

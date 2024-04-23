@@ -14,7 +14,6 @@ def f_442(date_str, from_tz, to_tz):
     str: The converted datetime string in "yyyy-mm-dd hh:mm:ss" format.
 
     Requirements:
-    - datetime
     - pytz
     - dateutil.parser
 

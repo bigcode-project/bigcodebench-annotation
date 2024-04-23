@@ -1,5 +1,4 @@
 import base64
-import binascii
 import os
 
 
@@ -29,6 +28,7 @@ def f_428():
 
 import string
 import unittest
+import binascii
 
 def run_tests():
     suite = unittest.TestSuite()

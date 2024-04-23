@@ -1,13 +1,5 @@
-import os
-import pandas as pd
-import json
 import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
-
-# Set DATA_DIR to the 'data' subdirectory in the parent directory of this script
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(CURRENT_DIR, 'data')
+import pandas as pd
 
 
 def f_493(df: pd.DataFrame, filename: str) -> str:
@@ -50,6 +42,11 @@ import pandas as pd
 import os
 import json
 import shutil
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
+# Set DATA_DIR to the 'data' subdirectory in the parent directory of this script
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(CURRENT_DIR, 'data')
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

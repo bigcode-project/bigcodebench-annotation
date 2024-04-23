@@ -1,11 +1,8 @@
-import unittest
-from unittest.mock import patch
-import pandas as pd
-import numpy as np
 from random import choice
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import numpy as np
+import pandas as pd
+
+
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 PENALTIES_COST = [100, 200, 300, 400, 500]
@@ -23,9 +20,9 @@ def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
     - pd.DataFrame: DataFrame with Team, Goals, Penalties, Penalties Cost, Performance Score.
 
     Requirements:
-    - pandas: For DataFrame creation and manipulation.
-    - numpy: For numerical calculations.
-    - random.choice: For selecting penalties cost randomly.
+    - pandas
+    - numpy
+    - random.choice
 
     Example:
     >>> goals = {'Team A': 3, 'Team B': 2}
@@ -49,6 +46,11 @@ def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
     report_df = pd.DataFrame(report_data)
     return report_df
 
+import unittest
+from unittest.mock import patch
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     @patch(__name__ + '.choice', return_value=400)
     def test_goals_greater_than_penalties(self, mock_choice):

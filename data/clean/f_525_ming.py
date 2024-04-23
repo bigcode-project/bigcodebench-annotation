@@ -1,12 +1,6 @@
-import unittest
-
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
 import statistics
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import numpy as np
+import pandas as pd
 
 
 def f_525(sales_data):
@@ -59,6 +53,11 @@ def f_525(sales_data):
     return ax
 
 
+import unittest
+import matplotlib
+import matplotlib.pyplot as plt
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

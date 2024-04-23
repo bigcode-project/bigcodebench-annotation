@@ -1,11 +1,7 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-import matplotlib.pyplot as plt
 
 
 def f_439(a, b, columns=['A', 'B']):
@@ -47,8 +43,10 @@ def f_439(a, b, columns=['A', 'B']):
     return df, ax
 
 import unittest
-import pandas as pd
 import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     def test_standard_case(self):
         """Test the function with non-empty lists."""

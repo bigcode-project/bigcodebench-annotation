@@ -1,8 +1,3 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -24,10 +19,10 @@ def f_452():
         pd.DataFrame: A DataFrame with 'X' and 'Y' columns containing the generated random integers.
 
     Requirements:
-        - numpy: Used for generating arrays of random integers.
-        - pandas: Utilized for creating and handling the DataFrame.
-        - seaborn: For plotting the scatter plot in a more aesthetically pleasing manner than Matplotlib's default.
-        - matplotlib.pyplot: Provides the underlying plotting functions used by Seaborn and controls for displaying the plot.
+        - numpy
+        - pandas
+        - seaborn
+        - matplotlib.pyplot
 
     No Parameters.
 
@@ -55,6 +50,10 @@ def f_452():
     return df
 
 import unittest
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     def test_dataframe_shape(self):
         """Test that the DataFrame has the correct shape."""

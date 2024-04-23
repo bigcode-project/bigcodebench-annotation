@@ -1,7 +1,5 @@
 from collections import Counter
 import pandas as pd
-import numpy as np  # Although not directly used, added to comply with requirements
-
 
 def f_434(list_of_menuitems):
     """
@@ -16,7 +14,6 @@ def f_434(list_of_menuitems):
 
     Requirements:
         - collections
-        - numpy
         - pandas
 
     Example:
@@ -37,7 +34,6 @@ def f_434(list_of_menuitems):
     return df
 
 import unittest
-import pandas as pd
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         result = f_434([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])

@@ -1,7 +1,9 @@
 import re
 import string
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
+
 import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+
 nltk.download('vader_lexicon')
 # Constants
 ALPHANUMERIC = re.compile('[\W_]+')
@@ -42,7 +44,6 @@ def f_517(text: str, sia: SentimentIntensityAnalyzer) -> dict:
     return sentiment_scores
 
 import unittest
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
 # Mock the SentimentIntensityAnalyzer for our tests
 class MockedSentimentIntensityAnalyzer:
     def polarity_scores(self, text):

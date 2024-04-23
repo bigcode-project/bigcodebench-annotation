@@ -1,9 +1,7 @@
-import re
-import os
-import hashlib
 import binascii
-# Set DATA_DIR to the 'data' subdirectory in the current script's directory
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+import hashlib
+import re
+
 
 def f_503(directory: str, pattern: str = r"(?<!Distillr)\\AcroTray\.exe") -> dict:
     """
@@ -42,6 +40,8 @@ import unittest
 import tempfile
 import shutil
 import os
+# Set DATA_DIR to the 'data' subdirectory in the current script's directory
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

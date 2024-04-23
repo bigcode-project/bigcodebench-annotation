@@ -21,7 +21,6 @@ def f_437(a, b):
     - numpy
     - pandas
     - matplotlib
-    - random
 
     Data Structure:
     - Uses pandas DataFrame to structure the data.

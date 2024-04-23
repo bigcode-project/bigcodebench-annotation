@@ -1,12 +1,7 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
-import random
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
+
 
 def f_451(size=1000, bin_width=100):
     '''
@@ -51,6 +46,10 @@ def f_451(size=1000, bin_width=100):
     return fig
 
 import unittest
+import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):

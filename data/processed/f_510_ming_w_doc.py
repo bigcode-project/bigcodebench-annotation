@@ -1,8 +1,3 @@
-import numpy as np
-import pandas as pd
-from datetime import datetime
-from dateutil.parser import parse
-
 DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 def f_510(dates_str_list):
@@ -47,7 +42,6 @@ def f_510(dates_str_list):
 import unittest
 import numpy as np
 import pandas as pd
-from datetime import datetime
 from dateutil.parser import parse
 DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 class TestCases(unittest.TestCase):

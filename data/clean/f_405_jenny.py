@@ -31,10 +31,8 @@ def f_405(array: list, random_seed: int = 42) -> (pd.DataFrame, np.ndarray):
     0   1   2   3   4   5
     1   6   7   8   9  10
     2  11  12  13  14  15
-    >>> print(transformed)
-    [[ 1.11803399e+01  8.88178420e-16]
-     [-0.00000000e+00 -0.00000000e+00]
-     [-1.11803399e+01  8.88178420e-16]]
+    >>> print(transformed[:, 0])
+    [ 11.18033989  -0.         -11.18033989]
     """
     df = pd.DataFrame(array)
 

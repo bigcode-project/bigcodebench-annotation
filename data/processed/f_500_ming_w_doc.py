@@ -1,10 +1,9 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
 
 def f_500(num_samples=100, num_features=5):
     """
@@ -41,8 +40,8 @@ def f_500(num_samples=100, num_features=5):
     return df, ax
 
 import unittest
-import pandas as pd
-import matplotlib.pyplot as plt
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):

@@ -1,12 +1,7 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
 import collections
 import itertools
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
 
 # Constants
 ITEMS = ['apple', 'banana', 'cherry', 'date', 'elderberry']
@@ -54,6 +49,9 @@ def f_436(a, b):
 
 import unittest
 import matplotlib
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         a = ['apple', 'banana', 'cherry']

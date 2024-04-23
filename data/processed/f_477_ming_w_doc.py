@@ -1,10 +1,8 @@
-import pandas as pd
-import matplotlib.pyplot as plt
 from random import randint, seed
-import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import pandas as pd
+
+
 # Constants (they can be overridden with default parameters)
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 PENALTY_COST = 1000  # in dollars
@@ -59,6 +57,10 @@ def f_477(goals, penalties, teams=TEAMS, penalty_cost=PENALTY_COST, rng_seed=Non
 
     return results_df, ax
 
+import unittest
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Unit Tests
 class TestCases(unittest.TestCase):
     def test_positive_outcomes(self):

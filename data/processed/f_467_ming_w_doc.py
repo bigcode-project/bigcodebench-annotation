@@ -1,7 +1,3 @@
-import pandas as pd
-import numpy as np
-from scipy import stats
-
 def f_467(matrix):
     """
     Normalizes a 2D numeric array (matrix) using the Z score.

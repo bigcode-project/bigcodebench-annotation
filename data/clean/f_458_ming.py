@@ -1,13 +1,10 @@
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
-import unittest
-from unittest.mock import patch
-from datetime import datetime
 import time
+import unittest
+from datetime import datetime
 from random import randint
+from unittest.mock import patch
+
+import matplotlib
 import matplotlib.pyplot as plt
 
 
@@ -24,10 +21,10 @@ def f_458(duration):
         - The second list contains the generated random values.
 
     Requirements:
-    - datetime: Used for generating timestamp strings for each data point.
-    - time: Used to manage the duration for which data is generated.
-    - random: Required for generating random values within a specified range.
-    - matplotlib.pyplot: Necessary for plotting the generated data points.
+    - datetime
+    - time
+    - random
+    - matplotlib.pyplot
     """
     # Constants
     VALUES_RANGE = (0, 100)
@@ -54,6 +51,10 @@ def f_458(duration):
 
 
 ### Unit Tests
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 
 class TestCases(unittest.TestCase):
     @patch('matplotlib.pyplot.pause', return_value=None)

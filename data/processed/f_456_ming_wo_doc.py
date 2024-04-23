@@ -1,27 +1,18 @@
+import csv
+import os
 import shutil
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-import sys
-import pandas as pd
 from datetime import datetime
 from random import randint
-import csv
+
+import matplotlib
 import matplotlib.pyplot as plt
-import os
+import pandas as pd
 
 # Constants
 
 current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
 FILE_PATH = os.path.join(current_directory_path, 'traffic_data.csv')
 VEHICLE_TYPES = ['Car', 'Bus', 'Truck', 'Bike']
-# sys.path.append(current_directory_path)
-
-
-def ensure_directory(current_directory_path):
-    if not os.path.exists(current_directory_path):
-        os.makedirs(current_directory_path)
 
 
 def f_456(hours):
@@ -50,7 +41,9 @@ def f_456(hours):
     >>> isinstance(ax, matplotlib.axes.Axes)
     True
     """
-    ensure_directory(current_directory_path)
+
+    if not os.path.exists(current_directory_path):
+        os.makedirs(current_directory_path)
 
     data = [['Time'] + VEHICLE_TYPES]
     for i in range(hours):
@@ -75,7 +68,10 @@ def f_456(hours):
     return FILE_PATH, ax
 
 import unittest
-from unittest.mock import patch, MagicMock, ANY, call
+from unittest.mock import patch
+# Check and set the backend
+print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
+matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     def setUp(self):
         """Set up the environment for testing."""

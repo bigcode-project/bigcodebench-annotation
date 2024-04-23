@@ -1,11 +1,9 @@
-import numpy as np
 from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 # Constants
 N_COMPONENTS = 2
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 def f_485(L):
     """
@@ -38,8 +36,9 @@ def f_485(L):
     return pca_result, ax
 
 import unittest
-import numpy as np
-import matplotlib.pyplot as plt
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         test_input = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]

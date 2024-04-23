@@ -1,12 +1,12 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
-import matplotlib.pyplot as plt
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
+
 # Constants
 TARGET_VALUE = '332'
 ARRAY = np.array([['0', '1', '2'], ['a', 'bb', 'ccc'], ['332', '33', '2'], ['33', '22', '332']])
+
 
 def f_513():
     """
@@ -51,6 +51,9 @@ def f_513():
     return mean, variance, skewness, kurtosis
 
 import unittest
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_statistics_and_plot(self):
         """Test the statistical analysis and plotting."""

@@ -1,9 +1,6 @@
 import math
 from random import randint
 import matplotlib.pyplot as plt
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 def f_489():
@@ -41,6 +38,9 @@ def f_489():
     return ax  # Return the axis object for testing
 
 import unittest
+import matplotlib
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         ax = f_489()

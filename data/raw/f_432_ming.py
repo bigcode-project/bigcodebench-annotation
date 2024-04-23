@@ -1,6 +1,7 @@
 import random
 import string
-
+import base64
+import zlib
 def f_432(string_length=100):
     """
     Create a random string of a specified length with uppercase letters and digits, compress it with zlib, 
@@ -36,8 +37,7 @@ def f_432(string_length=100):
     return encoded_compressed_string.decode('utf-8')
 
 import unittest
-import base64
-import zlib
+
 
 def run_tests():
     suite = unittest.TestSuite()

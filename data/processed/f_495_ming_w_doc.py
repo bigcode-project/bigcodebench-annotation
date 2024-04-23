@@ -1,7 +1,8 @@
-from typing import Any
-import numpy as np
 import itertools
+from typing import Any
+
 from scipy import stats
+
 
 def f_495(input_list: list, repetitions: int) -> Any:
     """

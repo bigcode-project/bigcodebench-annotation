@@ -1,5 +1,4 @@
 import numpy as np
-from itertools import product
 import pandas as pd
 
 # Constants

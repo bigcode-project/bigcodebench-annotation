@@ -1,6 +1,6 @@
+from random import shuffle
 import pandas as pd
 import numpy as np
-from random import shuffle
 
 # Constants
 ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
@@ -40,7 +40,6 @@ def f_447(l):
     return df
 
 import unittest
-import pandas as pd
 class TestCases(unittest.TestCase):
     def test_with_predefined_elements(self):
         """Test function with the predefined ELEMENTS list."""

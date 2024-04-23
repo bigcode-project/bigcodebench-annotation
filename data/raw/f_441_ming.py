@@ -1,6 +1,4 @@
 from datetime import datetime
-
-import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -19,7 +17,6 @@ def f_441(data):
     - pandas
     - datetime
     - matplotlib.pyplot
-    - numpy
 
     Example:
     >>> data = '2022-01-100,2022-02-200,2022-03-150,2022-04-300,2022-05-250,2022-06-350,2022-07-400,2022-08-450,2022-09-500,2022-10-550,2022-11-600,2022-12-650'
@@ -54,6 +51,8 @@ def f_441(data):
     return ax
 
 import unittest
+import matplotlib
+
 # Check and set the backend
 print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
 matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues

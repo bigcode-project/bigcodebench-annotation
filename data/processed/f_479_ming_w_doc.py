@@ -1,10 +1,8 @@
+from random import randint
+
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-from random import randint
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
@@ -49,8 +47,8 @@ def f_479(goals, penalties):
     return results_df, [plot1, plot2]
 
 import unittest
-import pandas as pd
-import matplotlib
+import matplotlib# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Importing the refined function
 class TestCases(unittest.TestCase):
     

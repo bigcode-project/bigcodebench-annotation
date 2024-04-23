@@ -1,4 +1,3 @@
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -36,6 +35,8 @@ def f_438(a, b):
 
 import unittest
 import math
+import matplotlib
+
 # Check and set the backend
 print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
 matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues

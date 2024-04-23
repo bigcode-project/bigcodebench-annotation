@@ -1,5 +1,6 @@
 import hashlib
 import os
+import base64
 
 def f_431(password: str, salt_length: int = 8) -> str:
     """
@@ -34,7 +35,6 @@ def f_431(password: str, salt_length: int = 8) -> str:
     
 
 import unittest
-import base64
 import binascii
 
 def run_tests():

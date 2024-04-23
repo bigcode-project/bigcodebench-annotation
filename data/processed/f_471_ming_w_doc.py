@@ -1,10 +1,10 @@
-import pandas as pd
-import numpy as np
-import seaborn as sns
 from random import sample
+
 import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
@@ -49,8 +49,8 @@ def f_471(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     return df, plots
 
 import unittest
-import pandas as pd
-import numpy as np
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=list('ABCDE'))

@@ -1,11 +1,8 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from random import sample
-import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
@@ -48,6 +45,10 @@ def f_472(df, tuples, n_plots):
 
     return df, plot_details
 
+import matplotlib
+import unittest
+# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
+matplotlib.use('Agg')
 # Unit test class
 class TestCases(unittest.TestCase):
     def setUp(self):
