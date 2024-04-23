@@ -29,11 +29,7 @@ jobs:
         pip install flake8 pytest coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         python -m nltk.downloader punkt stopwords
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 data/clean/*.py --count --select=E9,F63,F7,F82 --show-source --statistics
-    - name: Test processed data with pytest
+    - name: Test processed data with flake8 and pytest
       run: |
         bash script/run.sh
 
