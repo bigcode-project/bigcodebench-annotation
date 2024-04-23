@@ -1,6 +1,5 @@
 import pandas as pd
-import pandas as pd
-
+import os
 
 def f_491(df, filename):
     """
@@ -16,37 +15,26 @@ def f_491(df, filename):
     Requirements:
     - os
     - pandas
-    - json
 
-    Data Structure:
+    Note:
     - The function manipulates a Pandas DataFrame and saves it as a JSON file.
 
     Example:
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
     >>> 'data.json' in f_491(df, 'data.json')
     True
-    
-    The JSON file will be saved in the format:
-    [
-        {"A": 1, "B": 4},
-        {"A": 2, "B": 5},
-        {"A": 3, "B": 6}
-    ]
     """
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
     file_path = os.path.join(DATA_DIR, filename)
     df_clean = df.where(pd.notnull(df), None)
     with open(file_path, 'w') as f:
-        df_clean.to_json(f, orient='records', date_format='iso')
+        df_clean.to_json(f, orient='records')
     return file_path
 
 import unittest
-import os
 import json
 import shutil
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 # Set DATA_DIR to the 'data' subdirectory in the current file's parent directory
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
