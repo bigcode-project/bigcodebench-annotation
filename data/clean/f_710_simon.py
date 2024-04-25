@@ -25,8 +25,8 @@ def f_710(n_colors, colors=['Red', 'Green', 'Blue', 'Yellow', 'Purple'], rng_see
           across calls with the same seed.
 
     Requirements:
-    - itertools for cycling through the given list of colors.
-    - random for selecting random colors from the list.
+    - itertools
+    - random
 
     Examples:
     >>> color_pattern = f_710(4, rng_seed=123)
