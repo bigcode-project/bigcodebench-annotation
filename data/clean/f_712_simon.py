@@ -20,6 +20,11 @@ def f_712(data_list=[('a', 1, 2.1), ('b', 2, 3.2), ('c', 3, 4.3), ('d', 4, 5.4),
     Returns:
     DataFrame: A pandas DataFrame with the mean values of the numerical data at each position.
 
+    Requirements:
+    - pandas
+    - numpy
+    - itertools
+
     Example:
     >>> df = f_712()
     >>> print(df)
