@@ -30,8 +30,8 @@ def f_720(data, target, test_size=0.2, random_state=None):
 
     Requirements:
     - pandas
-    - sklearn: The function uses sklearn.model_selection.train_test_split,
-               sklearn.ensemble.RandomForestRegressor and
+    - sklearn: sklearn.model_selection.train_test_split,
+               sklearn.ensemble.RandomForestRegressor,
                sklearn.metrics.mean_squared_error
 
     Examples:
