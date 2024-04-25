@@ -18,8 +18,8 @@ def f_709(text1, text2):
     tuple: A tuple containing the cleaned texts (text1, text2) with punctuation removed.
 
     Requirements:
-    - re: The regular expression library used for pattern matching and manipulation.
-    - string: Provides a constant string of ASCII characters considered punctuation.
+    - re
+    - string
 
     Example:
     >>> cleaned_text1, cleaned_text2 = f_709("Hello, world!", "How's it going?")

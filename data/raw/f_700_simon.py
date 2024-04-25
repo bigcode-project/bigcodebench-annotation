@@ -18,8 +18,8 @@ def f_700(max_length, n_samples, seed=None):
     and their lengths will vary from 1 to `max_length`.
 
     Requirements:
-    - random: To generate random choices of lowercase letters.
-    - string: To get the set of lowercase letters.
+    - random
+    - string
 
     Raises:
     ValueError: If max_length is smaller than 1.

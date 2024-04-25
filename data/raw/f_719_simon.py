@@ -28,8 +28,8 @@ def f_719(data, n_components=2):
 
     Requirements:
     pandas
-    sklearn.preprocessing: StandardScaler is used for scaling the data.
-    sklearn.decomposition: for using PCA.
+    sklearn.preprocessing
+    sklearn.decomposition
 
     Example:
     >>> data = pd.DataFrame({

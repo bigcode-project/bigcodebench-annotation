@@ -24,6 +24,7 @@ def f_658(num_samples=500, noise_strength=1, random_seed=None, test_size=0.2):
 
     Returns:
     float: The R-squared score of the fitted model on the test set.
+    LinearRegression: The trained linear regression model.
 
     Raises:
     - ValueError: If test set size is smaller than 2.

@@ -7,6 +7,7 @@ def f_692(n_rows, scale_cols, columns=['A', 'B', 'C', 'D', 'E'], random_seed=Non
     """
     Generate a DataFrame with columns 'columns' and fill them with random
     values. Scale the columns at the provided indexes with sklearn StandardScaler.
+    If scale_cols is empty no column is scaled
         
     Parameters:
     n_rows (int): The number of rows in the DataFrame.

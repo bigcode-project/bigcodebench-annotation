@@ -15,6 +15,9 @@ def f_681(test_scores, student):
     Returns:
     float: The average score for the student.
     
+    Raises:
+    ValueError: student is not present in the test_scores dataframe
+                
     Requirements:
     - pandas
     - numpy

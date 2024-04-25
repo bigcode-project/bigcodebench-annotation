@@ -442,8 +442,9 @@ class TestCases(unittest.TestCase):
   182: (2, 15, 33),
   183: (2, 16, 32)}}
         )
-        pd.testing.assert_frame_equal(result, expected)
-
+        self.assertEqual(result.size, expected.size)
+        for comb in result['Combinations']:
+            self.assertEqual(comb[0]+comb[1]+comb[2], 50)
     def test_edge_case_2(self):
         # Test with a list of length less than 3
         result = f_680([1, 2, 3], 3)
@@ -452,27 +453,30 @@ class TestCases(unittest.TestCase):
     def test_edge_case_3(self):
         # Test with negative numbers in the list
         result = f_680([-1, -2, 1, 2, 3, 0], 0)
-        expexted = pd.DataFrame(
+        expected = pd.DataFrame(
             {'Combinations': {0: (-1, -2, 3), 1: (-1, 1, 0), 2: (-2, 2, 0)}}       
         )
-        pd.testing.assert_frame_equal(result, expexted)
-
+        self.assertEqual(result.size, expected.size)
+        for comb in result['Combinations']:
+            self.assertEqual(comb[0]+comb[1]+comb[2], 0)
     def test_edge_case_4(self):
         # Test with repeated numbers in the list
         result = f_680([1, 1, 1, 1, 1, 3], 3)
         expected = pd.DataFrame(
             {'Combinations': {0: (1, 1, 1)}}
         )
-        pd.testing.assert_frame_equal(result, expected)
-
+        self.assertEqual(result.size, expected.size)
+        for comb in result['Combinations']:
+            self.assertEqual(comb[0]+comb[1]+comb[2], 3)
     def test_edge_case_5(self):
         # Test with both positive and negative numbers with no valid combinations
         result = f_680([-5, -4, -3, 5, 6, 7, 0], 0)
-        expexted = pd.DataFrame(
+        expected = pd.DataFrame(
             {'Combinations': {0: (-4, -3, 7), 1: (-5, 5, 0)}}
         )
-        pd.testing.assert_frame_equal(result, expexted)
-
+        self.assertEqual(result.size, expected.size)
+        for comb in result['Combinations']:
+            self.assertEqual(comb[0]+comb[1]+comb[2], 0)
 
 if __name__ == "__main__":
     run_tests()

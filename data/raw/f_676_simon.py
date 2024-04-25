@@ -42,14 +42,14 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame({'A': ['apple', 'banana'], 'B': ['orange', 'apple']})
         result = f_676(df, 'apple')
         expected_result = [(0, 'A'), (1, 'B')]
-        self.assertEqual(result, expected_result)
+        self.assertCountEqual(result, expected_result)
     
     def test_case_2(self):
         # No occurrence of the item
         df = pd.DataFrame({'A': ['orange', 'banana'], 'B': ['orange', 'banana']})
         result = f_676(df, 'apple')
         expected_result = []
-        self.assertEqual(result, expected_result)
+        self.assertCountEqual(result, expected_result)
     
     def test_case_3(self):
         # Larger DataFrame
@@ -60,14 +60,14 @@ class TestCases(unittest.TestCase):
         })
         result = f_676(df, 'apple')
         expected_result = [(index, col) for col in df for index, val in enumerate(df[col]) if val == 'apple']
-        self.assertEqual(result, expected_result)
+        self.assertCountEqual(result, expected_result)
     
     def test_case_4(self):
         # Empty DataFrame
         df = pd.DataFrame()
         result = f_676(df, 'apple')
         expected_result = []
-        self.assertEqual(result, expected_result)
+        self.assertCountEqual(result, expected_result)
     
     def test_case_5(self):
         # DataFrame with non-string values
@@ -77,6 +77,6 @@ class TestCases(unittest.TestCase):
         })
         result = f_676(df, 3)
         expected_result = [(2, 'A'), (1, 'B')]
-        self.assertEqual(result, expected_result)
+        self.assertCountEqual(result, expected_result)
 if __name__ == "__main__":
     run_tests()

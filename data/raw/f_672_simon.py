@@ -17,9 +17,9 @@ def f_672(df: pd.DataFrame) -> int:
     TypeError: If input is not a DataFrame
 
     Requirements:
-    - re (for regular expression matching)
-    - numpy (for numerical operations)
-    - pandas (for DataFrame operations)
+    - re
+    - numpy
+    - pandas
 
     Note:
     The function uses a specific pattern '[(){}[\]]' to identify brackets.

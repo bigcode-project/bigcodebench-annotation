@@ -36,8 +36,8 @@ def f_726(df, columns=['A', 'B', 'C'], larger=50, equal=900):
     
 
     Requires:
-    - pandas (for DataFrame operations)
-    - scipy.stats (for the chi2_contingency function)
+    - pandas
+    - scipy.stats
 
     Example:
     >>> df = pd.DataFrame({

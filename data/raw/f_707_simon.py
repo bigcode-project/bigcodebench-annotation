@@ -19,10 +19,10 @@ def f_707(data):
                Each row corresponds to an entry from the input data.
     
     Requirements:
-    - pandas: Required to create a DataFrame for the normalized data.
-    - numpy: Used for numerical operations on the data.
-    - scipy.stats.zscore: Used for z-score normalization.
-    - sklearn.preprocessing.MinMaxScaler: Used for min-max scaling of the weights.
+    - pandas
+    - numpy
+    - scipy.stats.zscore
+    - sklearn.preprocessing.MinMaxScaler
 
     Example:
     >>> data = [('A', 100, 0.5), ('B', 200, 0.6), ('C', 150, 0.7)]

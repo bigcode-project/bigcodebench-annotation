@@ -11,12 +11,15 @@ def f_714(data_list):
     numeric values at each position using numpy, where non numeric values are
     ignores. If all values at a position are non numeric, the mean at this
     position is set to be np.nan.
+    If the provided tuples have different number of entries, missing values are 
+    treated as zeros.
 
     Parameters:
     - data_list (list of tuples): The data to process, structured as a list of tuples. Each tuple can contain alphanumeric values.
 
     Returns:
     - list: A list of mean values for each numeric position across the tuples. Non-numeric positions are ignored.
+            An empty list is returned if the input list (data_list) is empty.
 
     Requirements:
     - numpy

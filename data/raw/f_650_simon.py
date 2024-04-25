@@ -11,11 +11,13 @@ def f_650(result):
     and add the current date and time in the format YYYY-mm-dd HHL:MM:SS to the summary.
     The global constant DATE_FORMAT is used to transform the currnet date and time into this format.
 
+
     Parameters:
     result (list of dict): A list of dictionaries containing the key "from_user" whose numeric values are to be analyzed.
 
     Returns:
     Series: A pandas Series with the statistical summary, including 'mean', 'median', 'min', 'max', 'std', and 'current_time'.
+            If the input contains no "from_user" values all statistical values are set to np.nan
 
     Data Structures:
     - Uses numpy arrays for efficient statistical computations.

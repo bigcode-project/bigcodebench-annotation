@@ -5,7 +5,7 @@ import string
 
 def f_686(length, seed=None, alphabets=list(string.ascii_lowercase)):
     """
-    Generate a list of 10 random strings from all possible strings of a given
+    Generate a list of 10 randomly picked strings from all possible strings of a given
     length from the provided series of characters, using a specific seed for
     reproducibility.
 

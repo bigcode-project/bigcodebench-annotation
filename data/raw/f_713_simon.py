@@ -14,7 +14,7 @@ def f_713(data_list, file_name):
     It returns a list of the calculated mean values.
 
     Missing values and non numeric values at positions other than the first are filled / replaced with np.nan. 
-    If an empty list is handed to the function an empty list is returned.
+    If an empty list is handed to the function an empty list is returned and an empty file is created.
 
     The function utilizes the 'numpy' library for numerical operations and the 'itertools' library 
     to handle the iteration through the data structure.

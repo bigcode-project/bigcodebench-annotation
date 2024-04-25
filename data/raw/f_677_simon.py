@@ -23,8 +23,8 @@ def f_677(data: np.ndarray, threshold: float = 2.0) -> list:
     float: The variance of the fitted normal distribution.
 
     Requirements:
-    - numpy for getting the indices of the outliers
-    - scipy.stats.norm for fitting a normal distribution to the data
+    - numpy 
+    - scipy.stats.norm
 
     Example:
     >>> data = np.array([1, 2, 3, 4, 5, 6, 100])
@@ -41,14 +41,13 @@ def f_677(data: np.ndarray, threshold: float = 2.0) -> list:
     7.133644853010899 
     """
     # Calculate the z-scores
-    mean, var = norm.fit(data)
-    std_dev = np.sqrt(var)
+    mean, std_dev = norm.fit(data)
     if std_dev == 0:
-        return [], mean, var
+        return [], mean, std_dev**2
     z_scores = (data - mean) / std_dev
     outliers = np.where(np.abs(z_scores) > threshold)
 
-    return list(outliers[0]), mean, var
+    return list(outliers[0]), mean, std_dev**2
 
 
 import unittest
@@ -67,16 +66,16 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         data = np.array([1, 2, 3, 4, 5, 6, 100])
         result, mean, var = f_677(data)
-        self.assertEqual(result, [0, 1, 2, 3, 4, 6])
+        self.assertEqual(result, [6])
         self.assertAlmostEqual(mean, 17.2, delta=0.1)
-        self.assertAlmostEqual(var, 33.8, delta=0.1)
+        self.assertAlmostEqual(var, 1142.78, delta=0.1)
 
     def test_case_2(self):
         data = np.array([1, 2, 3, 4, 5, 6, 7])
         result, mean, var = f_677(data)
-        self.assertEqual(result, [0, 6])
+        self.assertEqual(result, [])
         self.assertAlmostEqual(mean, 4, delta=0.1)
-        self.assertAlmostEqual(var, 2, delta=0.1)
+        self.assertAlmostEqual(var, 4, delta=0.1)
 
     def test_case_3(self):
         data = np.array([5, 5, 5, 5, 5])
@@ -91,16 +90,16 @@ class TestCases(unittest.TestCase):
         fake.seed_instance(12)
         data = np.array([fake.random_int(min=0, max=100) for _ in range(10000)])
         result, mean, var = f_677(data)
-        self.assertEqual(len(result), 7871)
+        self.assertEqual(len(result), 0)
         self.assertAlmostEqual(mean, 50.28, delta=0.1)
-        self.assertAlmostEqual(var, 29.03, delta=0.1)
+        self.assertAlmostEqual(var, 842.86, delta=0.1)
 
     def test_case_5(self):
         data = np.array([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 50])
         result, mean, var = f_677(data, threshold=0.5)
-        self.assertEqual(result, [0, 1, 2, 3, 4, 5, 6, 7, 11])
+        self.assertEqual(result, [0, 1, 2, 11])
         self.assertAlmostEqual(mean, 4.17, delta=0.1)
-        self.assertAlmostEqual(var, 14.14, delta=0.1)
+        self.assertAlmostEqual(var, 200.14, delta=0.1)
 
 
 

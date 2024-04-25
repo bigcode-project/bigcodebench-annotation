@@ -28,9 +28,9 @@ def f_722(data, n_clusters=3, seed=None):
     - ValueError: If the DataFrame contains non numeric entries.
 
     Requirements:
-    - pandas (for DataFrame operations)
-    - numpy (for numerical operations and handling of return type)
-    - sklearn.cluster.KMeans (for clustering algorithm)
+    - pandas
+    - numpy
+    - sklearn.cluster.KMeans
 
     Example:
     >>> data = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))

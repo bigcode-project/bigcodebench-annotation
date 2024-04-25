@@ -22,6 +22,11 @@ def f_647(df, age, weight):
     
     Raises:
     KeyError: If the input DataFrame does not contain the required columns 'Age' and 'Weight'.
+  
+    Requirements:
+        - sklearn.preprocessing.StandardScaler
+        - pandas
+
     """
     selected_df = df[(df['Age'] < age) & (df['Weight'] > weight)]
     
