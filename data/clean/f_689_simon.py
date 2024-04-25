@@ -21,8 +21,8 @@ def f_689(range_start=1, range_end=100, pairs_count=10, random_seed=None):
                (num1, num2, square root of absolute difference).
 
     Requirements:
-    - random: Used to generate random integers.
-    - math: Used to compute the square root.
+    - random
+    - math
 
     Example:
     >>> pairs = f_689()
