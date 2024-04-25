@@ -1,7 +1,6 @@
 from itertools import combinations
 from random import sample
-import pandas as pd
-import numpy as np
+
 
 def f_470(df, tuples, n_plots):
     """
@@ -18,12 +17,11 @@ def f_470(df, tuples, n_plots):
     - list: A list of tuples, each containing a pair of column names used for the plot and the corresponding plot object.
 
     Requirements:
-    - pandas for DataFrame manipulation.
-    - numpy for numerical operations.
-    - itertools for generating combinations of column names.
-    - matplotlib.pyplot for creating scatter plots.
+    - random
+    - itertools
 
     Example:
+    >>> import numpy as np, pandas as pd
     >>> df = pd.DataFrame(np.random.rand(10, 5), columns=['A', 'B', 'C', 'D', 'E'])
     >>> tuples = [(0.1, 0.2, 0.3, 0.4, 0.5)]
     >>> modified_df, plots = f_470(df, tuples, 3)
@@ -39,9 +37,11 @@ def f_470(df, tuples, n_plots):
         plots.append((selected_columns, ax))
     return df, plots
 
+
 import unittest
 import matplotlib
-
+import pandas as pd
+import numpy as np
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

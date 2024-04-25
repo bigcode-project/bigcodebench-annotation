@@ -16,7 +16,6 @@ def f_460(df, letter):
     
     Requirements:
     - pandas
-    - re
 
     Example:
     >>> df = {'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'kiwi']}

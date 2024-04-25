@@ -1,8 +1,4 @@
-import unittest
-from random import choice, randint
-
 import pandas as pd
-
 # Constants
 LETTERS = list('abcdefghijklmnopqrstuvwxyz')
 
@@ -22,6 +18,7 @@ def f_459(df, letter):
     - pandas
 
     Example:
+    >>> import pandas as pd
     >>> df = pd.DataFrame({'Name': ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Fiona']})
     >>> filtered_names = f_459(df, 'a')
     >>> filtered_names.index[0].startswith('A')
@@ -36,6 +33,9 @@ def f_459(df, letter):
 
 
 ### Unit Tests
+from random import choice, randint
+import unittest
+
 
 class TestCases(unittest.TestCase):
     def setUp(self):

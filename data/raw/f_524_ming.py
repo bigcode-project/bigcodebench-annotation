@@ -1,4 +1,3 @@
-import unittest
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -21,7 +20,6 @@ def f_524(x, y, labels):
 
     Requirements:
     - numpy
-    - matplotlib.pyplot
     - scipy.optimize
 
     Example:
@@ -50,7 +48,7 @@ def f_524(x, y, labels):
 
     return fig
 
-
+import unittest
 import matplotlib
 import matplotlib.pyplot as plt
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities

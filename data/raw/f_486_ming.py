@@ -10,7 +10,6 @@ def f_486(cities_list):
     
     Requirements:
     - pandas
-    - numpy
     - math
     - random
 

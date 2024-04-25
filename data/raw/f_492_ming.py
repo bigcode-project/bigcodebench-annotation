@@ -1,7 +1,6 @@
 import csv
-
-import matplotlib
 import pandas as pd
+import os
 
 
 def f_492(df, filename):
@@ -19,9 +18,9 @@ def f_492(df, filename):
     str: The absolute path of the saved CSV file.
 
     Requirements:
-    - os
     - pandas
     - csv
+    - os
 
     Examples:
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
@@ -39,7 +38,7 @@ def f_492(df, filename):
 
 import unittest
 import shutil
-import os
+import matplotlib
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

@@ -1,5 +1,3 @@
-import matplotlib
-import matplotlib.pyplot as plt
 import pandas as pd
 
 
@@ -17,7 +15,6 @@ def f_461(df, letter):
 
     Requirements:
     - pandas
-    - matplotlib.pyplot
 
     Example:
     >>> df = {'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'avocado']}
@@ -41,10 +38,13 @@ def f_461(df, letter):
 
     return ax
 
+
 import unittest
 from unittest.mock import patch
+import matplotlib
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 
 class TestCases(unittest.TestCase):

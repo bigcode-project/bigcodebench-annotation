@@ -15,8 +15,8 @@ def f_438(a, b):
     Requirements:
     - numpy
     - pandas
-    - scipy.stats
-    - matplotlib
+    - scipy
+    - matplotlib.pyplot
 
     Example:
     >>> correlation, ax = f_438([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
@@ -32,6 +32,7 @@ def f_438(a, b):
     plt.plot(np.unique(df['A']), np.poly1d(np.polyfit(df['A'], df['B'], 1))(np.unique(df['A'])), color='red')
     plt.show()
     return correlation, plt.gca()
+
 
 import unittest
 import math

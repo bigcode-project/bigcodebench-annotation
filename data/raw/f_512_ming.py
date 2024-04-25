@@ -17,8 +17,6 @@ def f_512(dataframe, target_value):
 
     Requirements:
     - pandas
-    - numpy
-    - matplotlib.pyplot
 
     Example:
     >>> df = {'Column1': ['0', 'a', '332', '33']}

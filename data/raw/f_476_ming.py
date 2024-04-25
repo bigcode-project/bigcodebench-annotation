@@ -16,8 +16,8 @@ def f_476(goals, penalties, rng_seed=None):
     - pd.DataFrame: A pandas DataFrame with columns ['Team', 'Match Result'], detailing each team's goals and accumulated fines.
 
     Requirements:
-    - pandas>=1.1.5
-    - Python standard library: random
+    - pandas
+    - random
 
     Example:
     >>> seed(42)  # Setting seed for reproducibility in this example

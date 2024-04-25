@@ -1,3 +1,8 @@
+import pandas as pd
+from scipy import stats
+import numpy as np
+
+
 def f_467(matrix):
     """
     Normalizes a 2D numeric array (matrix) using the Z score.
@@ -29,11 +34,8 @@ def f_467(matrix):
     normalized_df = normalized_df.fillna(0.0)
     return normalized_df
 
-import unittest
 
-import numpy as np
-import pandas as pd
-from scipy import stats
+import unittest
 
 
 def run_tests():

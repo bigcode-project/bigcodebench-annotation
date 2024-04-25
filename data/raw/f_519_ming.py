@@ -1,5 +1,4 @@
 import re
-
 import nltk
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
@@ -31,7 +30,7 @@ def f_519(texts):
     - re
     - nltk
     - pandas
-    - scikit-learn
+    - sklearn.feature_extraction.text
 
     Example:
     >>> texts = ["Hello, world!", "Machine learning is great.", "Python is my favorite programming language."]

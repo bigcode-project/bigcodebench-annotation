@@ -1,15 +1,8 @@
-import os
-import shutil
-
 import numpy as np
 import pandas as pd
 
 # Constants
 LETTERS = list('abcdefghijklmnopqrstuvwxyz')
-current_directory_path = os.getcwd()
-output_dir = os.path.join(current_directory_path, 'output')
-if not os.path.exists(output_dir):
-    os.mkdir(output_dir)
 
 
 def f_464(file_path):
@@ -25,7 +18,6 @@ def f_464(file_path):
     Requirements:
     - pandas
     - numpy
-    - random
 
     Example:
     >>> f_464('random_matrix.csv')
@@ -35,7 +27,16 @@ def f_464(file_path):
 
     return None
 
+
 import unittest
+import shutil
+import os
+current_directory_path = os.getcwd()
+output_dir = os.path.join(current_directory_path, 'output')
+if not os.path.exists(output_dir):
+    os.mkdir(output_dir)
+
+
 class TestCases(unittest.TestCase):
 
     @classmethod

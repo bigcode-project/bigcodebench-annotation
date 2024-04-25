@@ -5,6 +5,7 @@ from random import sample
 # Constants for column names to use in plots
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
+
 def f_468(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     '''
     Remove rows from a dataframe based on column values and generate random scatter plots.
@@ -20,7 +21,6 @@ def f_468(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
 
     Requirements:
     - pandas
-    - numpy
     - matplotlib.pyplot
     - random
 
@@ -51,6 +51,7 @@ import numpy as np
 import matplotlib
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
+
 
 class TestCases(unittest.TestCase):
     @classmethod

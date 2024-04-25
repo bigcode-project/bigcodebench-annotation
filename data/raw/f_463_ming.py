@@ -1,6 +1,4 @@
-import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 
 def f_463(df, letter):
@@ -19,11 +17,11 @@ def f_463(df, letter):
                    returns None.
 
     Requirements:
-    - pandas
     - seaborn
-    - matplotlib.pyplot
+
 
     Example:
+    >>> import pandas as pd
     >>> words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
     >>> df = pd.DataFrame({'Word': words})
     """
@@ -51,6 +49,8 @@ def f_463(df, letter):
 import unittest
 from unittest.mock import patch
 import matplotlib
+import matplotlib.pyplot as plt
+import pandas as pd
 # Check and set the backend
 print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
 matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues

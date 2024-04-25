@@ -19,8 +19,8 @@ def f_440(a, b):
 
     Requirements:
     - pandas
-    - scipy.spatial.distance
-    - matplotlib
+    - scipy.spatial
+    - matplotlib.pyplot
 
     Example:
     >>> euclidean_distance, df, ax = f_440([1, 2, 3], [2, 3, 4])

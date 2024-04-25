@@ -1,10 +1,6 @@
 import time
-import unittest
 from datetime import datetime
 from random import randint
-from unittest.mock import patch
-
-import matplotlib
 import matplotlib.pyplot as plt
 
 
@@ -52,6 +48,9 @@ def f_458(duration):
 
 ### Unit Tests
 # Check and set the backend
+import unittest
+from unittest.mock import patch
+import matplotlib
 print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
 matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 

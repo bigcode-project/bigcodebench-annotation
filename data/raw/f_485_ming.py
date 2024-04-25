@@ -1,8 +1,9 @@
 from sklearn.decomposition import PCA
-# Constants
-N_COMPONENTS = 2
 import numpy as np
 import matplotlib.pyplot as plt
+
+# Constants
+N_COMPONENTS = 2
 
 
 def f_485(L):

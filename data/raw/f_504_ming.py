@@ -1,7 +1,6 @@
 import re
-
 import pandas as pd
-
+import numpy as np
 # Constants
 DATA_PATTERN = r'>\d+\.\d+<'
 
@@ -20,9 +19,10 @@ def f_504(dataframe: pd.DataFrame) -> pd.DataFrame:
     Requirements:
     - re
     - pandas
-    - numpy.
+    - numpy
     
     Example:
+    >>> import pandas as pd
     >>> df = pd.DataFrame({'A': ['>1.23<', '>4.56<'], 'B': ['>7.89<', '>0.12<']})
     >>> f_504(df)
           A     B
@@ -34,10 +34,8 @@ def f_504(dataframe: pd.DataFrame) -> pd.DataFrame:
                                               if pd.notnull(x) and re.search(DATA_PATTERN, x) else np.nan)
     return dataframe
 
-import unittest
-import pandas as pd
-import numpy as np
 
+import unittest
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))

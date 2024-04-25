@@ -1,16 +1,13 @@
 import csv
 import os
-import shutil
 from datetime import datetime
 from random import randint
 
 # Constants
-current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
-FILE_PATH = os.path.join(current_directory_path, 'sensor_data.csv')
 SENSORS = ['Temperature', 'Humidity', 'Pressure']
 
 
-def f_455(hours):
+def f_455(hours, current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])):
     """
     Create sensor data for the specified number of hours and save it in a CSV file.
 
@@ -35,7 +32,7 @@ def f_455(hours):
     >>> 'sensor_data.csv' in file_path  # Ensure the filename is correct
     True
     """
-
+    FILE_PATH = os.path.join(current_directory_path, 'sensor_data.csv')
     directory = os.path.dirname(FILE_PATH)
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -54,6 +51,10 @@ def f_455(hours):
 
 import unittest
 import os
+import shutil
+current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
+FILE_PATH = os.path.join(current_directory_path, 'sensor_data.csv')
+
 
 class TestCases(unittest.TestCase):
 

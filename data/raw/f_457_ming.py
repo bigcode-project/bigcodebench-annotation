@@ -5,14 +5,10 @@ from datetime import datetime
 from random import randint
 
 # Constants
-current_directory_path = os.getcwd()
-# print(current_directory_path)
-FILE_PATH = os.path.join(current_directory_path, 'weather_data.csv')
 WEATHER_CONDITIONS = ['Sunny', 'Cloudy', 'Rainy', 'Snowy', 'Stormy']
-BACKUP_PATH = os.path.join(current_directory_path, 'backup/')
 
 
-def f_457(hours):
+def f_457(hours, current_directory_path = os.getcwd()):
     """
     Generate weather data for the specified number of hours, save it in a CSV file and back up the file to a backup directory.
     
@@ -35,6 +31,8 @@ def f_457(hours):
     >>> 'weather_data.csv' in f_457(10)
     True
     """
+    FILE_PATH = os.path.join(current_directory_path, 'weather_data.csv')
+    BACKUP_PATH = os.path.join(current_directory_path, 'backup/')
     data = [['Time', 'Condition']]
     for i in range(hours):
         row = [datetime.now().strftime('%H:%M:%S.%f'), WEATHER_CONDITIONS[randint(0, len(WEATHER_CONDITIONS)-1)]]
@@ -53,6 +51,10 @@ def f_457(hours):
 
 import unittest
 from unittest.mock import patch, mock_open
+current_directory_path = os.getcwd()
+# print(current_directory_path)
+FILE_PATH = os.path.join(current_directory_path, 'weather_data.csv')
+BACKUP_PATH = os.path.join(current_directory_path, 'backup/')
 
 
 class TestCases(unittest.TestCase):

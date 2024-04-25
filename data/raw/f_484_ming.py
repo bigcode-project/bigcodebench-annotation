@@ -7,12 +7,11 @@ def f_484(L):
     """
     Convert a list of lists into a list of integers, apply the KMeans clustering, 
     and return a scatter plot with data points color-coded by their cluster.
-    
-    This function utilizes the following libraries/modules:
-    - numpy (for data reshaping)
-    - itertools.chain (for list conversion)
-    - sklearn.cluster.KMeans (for clustering)
-    - matplotlib.pyplot (for plotting)
+
+    Requirements:
+    - itertools.chain
+    - numpy
+    - sklearn.cluster
 
     Parameters:
     L (list of lists): A list of lists where each sublist contains integers.
@@ -35,6 +34,7 @@ def f_484(L):
     ax.scatter(data, [0]*len(data), c=kmeans.labels_.astype(float))
     
     return ax
+
 
 import unittest
 import matplotlib.pyplot as plt

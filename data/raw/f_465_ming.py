@@ -1,5 +1,3 @@
-import re
-
 import numpy as np
 import pandas as pd
 
@@ -33,6 +31,7 @@ def f_465(matrix1, matrix2):
 
 
 import unittest
+import re
 
 class TestCases(unittest.TestCase):
 

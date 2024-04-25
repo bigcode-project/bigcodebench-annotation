@@ -1,4 +1,3 @@
-import matplotlib
 import pandas as pd
 
 
@@ -14,9 +13,7 @@ def f_493(df: pd.DataFrame, filename: str) -> str:
     - str: The full path where the JSON Lines file was saved.
 
     Requirements:
-    - os
     - pandas
-    - json
 
     Example:
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
@@ -43,6 +40,7 @@ import pandas as pd
 import os
 import json
 import shutil
+import matplotlib
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

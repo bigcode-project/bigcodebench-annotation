@@ -1,16 +1,9 @@
 import os
-
-import matplotlib
-import matplotlib.pyplot as plt
 import pandas as pd
 from dateutil.parser import parse
 
-# Correct CSV_PATH to reflect the current directory of this script plus 'data.csv'
-CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.csv')
-DATE_COLUMN = 'date'  # Default column in the CSV file with the date strings
 
-
-def f_507(csv_path=CSV_PATH, date_column=DATE_COLUMN):
+def f_507(csv_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.csv'), date_column='date'):
     """
     Read a CSV file, convert a column of date strings into datetime objects,
     and draw a histogram of the year distribution of these dates.
@@ -23,10 +16,9 @@ def f_507(csv_path=CSV_PATH, date_column=DATE_COLUMN):
     - matplotlib.axes._subplots.AxesSubplot: A histogram plot object showing the distribution of years.
 
     Requirements:
-    - pandas for data manipulation and CSV file reading.
-    - datetime and dateutil.parser for date string parsing.
-    - os for file path operations.
-    - matplotlib.pyplot for plotting.
+    - pandas
+    - dateutil.parser
+    - os
 
     Example:
     >>> import os
@@ -37,6 +29,7 @@ def f_507(csv_path=CSV_PATH, date_column=DATE_COLUMN):
         ...
     FileNotFoundError: nonexistent.csv does not exist
     """
+
     if not os.path.isfile(csv_path):
         raise FileNotFoundError(f"{csv_path} does not exist")
 
@@ -49,6 +42,8 @@ def f_507(csv_path=CSV_PATH, date_column=DATE_COLUMN):
 import unittest
 import shutil
 import os
+import matplotlib.pyplot as plt
+import matplotlib
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

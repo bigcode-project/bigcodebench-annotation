@@ -1,9 +1,6 @@
 from random import sample
-
-import matplotlib
-import numpy as np
-import pandas as pd
 import seaborn as sns
+import pandas as pd
 
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
@@ -25,11 +22,11 @@ def f_471(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     
     Requirements:
     - pandas
-    - numpy
     - seaborn
     - random
     
     Example:
+    >>> import numpy as np
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
     >>> modified_df, plots = f_471(df, tuples, 3)
@@ -50,14 +47,18 @@ def f_471(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     
 
 import unittest
+import matplotlib
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
+import numpy as np
+
 
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 
 class TestCases(unittest.TestCase):
 

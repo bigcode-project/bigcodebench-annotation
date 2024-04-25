@@ -1,7 +1,5 @@
 import os
 import re
-import shutil
-
 import pandas as pd
 
 
@@ -23,7 +21,6 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
     Requirements:
     - re
     - pandas
-    - csv
     - os
 
     Example usage:
@@ -40,7 +37,9 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
 
     return df
 
+
 import unittest
+import shutil
 # Set DATA_DIR to the 'data' subdirectory in the current script's directory
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 

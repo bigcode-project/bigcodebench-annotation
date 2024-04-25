@@ -21,7 +21,7 @@ def f_439(a, b, columns=['A', 'B']):
         - numpy
         - pandas
         - sklearn.preprocessing
-        - matplotlib
+        - matplotlib.pyplot
 
     Example:
         >>> df, ax = f_439([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])

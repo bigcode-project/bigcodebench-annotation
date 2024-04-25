@@ -1,5 +1,6 @@
 import pandas as pd
 import seaborn as sns
+import numpy as np
 
 # Constants
 LABELS = ['H\u2082O', 'O\u2082', 'CO\u2082', 'N\u2082', 'Ar']
@@ -16,11 +17,10 @@ def f_522(x, y, labels):
 
     Returns:
     ax (AxesSubplot): A seaborn heatmap object.
-df (DataFrame): The dataframe used to create the heatmap.
+    df (DataFrame): The dataframe used to create the heatmap.
 
     Requirements:
     - numpy
-    - matplotlib.pyplot
     - pandas
     - seaborn
 
@@ -29,7 +29,6 @@ df (DataFrame): The dataframe used to create the heatmap.
     >>> y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
     >>> labels = ['H\u2082O', 'O\u2082', 'CO\u2082']
     >>> ax = f_522(x, y, labels)
-    >>> plt.show()
     """
     data = []
 
@@ -41,18 +40,19 @@ df (DataFrame): The dataframe used to create the heatmap.
     
     return ax, df
 
+
 import unittest
-import numpy as np
 import matplotlib
-import matplotlib.pyplot as plt
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
+
 
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 
 class TestCases(unittest.TestCase):
     # (test cases will be same as above)

@@ -1,7 +1,5 @@
 # Importing the required libraries
 import re
-
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -37,9 +35,9 @@ def f_496(text, n=2):
     Requirements:
         - re
         - pandas
-        - matplotlib
+        - matplotlib.pyplot
         - numpy
-        - sklearn
+        - sklearn.feature_extraction.text
 
     Example:
     >>> text = "hello hello world world"
@@ -87,6 +85,7 @@ def f_496(text, n=2):
 
 
 import unittest
+import matplotlib
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

@@ -1,5 +1,4 @@
 import re
-
 import nltk
 from sklearn.decomposition import NMF
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -29,9 +28,10 @@ def f_516(texts, num_topics):
     - list of list of str: A list where each element is a list of words representing a topic.
 
     Requirements:
-    - Regular expressions (re module) for text cleaning.
-    - NLTK (Natural Language Toolkit) for stopwords.
-    - Scikit-learn (sklearn) for TF-IDF vectorization and NMF.
+    - re
+    - nltk
+    - sklearn.decomposition
+    - sklearn.feature_extraction.text
 
     Example:
     >>> texts = [

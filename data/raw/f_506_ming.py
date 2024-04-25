@@ -1,5 +1,4 @@
 import os
-
 import pandas as pd
 
 
@@ -46,6 +45,7 @@ def f_506(filename: str) -> pd.DataFrame:
 
 import unittest
 import shutil
+
 
 class TestCases(unittest.TestCase):
     @classmethod

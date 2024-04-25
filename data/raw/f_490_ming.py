@@ -1,7 +1,5 @@
 import os
 
-import pandas as pd
-
 
 def f_490(dataset, filename):
     """
@@ -15,10 +13,10 @@ def f_490(dataset, filename):
     None: The function writes the DataFrames to a CSV file but does not return any value.
 
     Requirements:
-    - pandas
     - os
 
     Example:
+    >>> import pandas as pd
     >>> df1 = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
     >>> df2 = pd.DataFrame({"D": [5, 6], "E": [7, 8]})
     >>> f_490([df1, df2], 'sample.csv')
@@ -42,11 +40,13 @@ def f_490(dataset, filename):
 import unittest
 import shutil
 import matplotlib
+import pandas as pd
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 # Set the directory for data relative to the current file's location
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(CURRENT_DIR, 'data')
+
 
 class TestCases(unittest.TestCase):
     @classmethod

@@ -1,11 +1,10 @@
 from random import choice
-
-import matplotlib
 import pytz
 from dateutil.parser import parse
 
 # Constants
 TIMEZONES = ['America/New_York', 'Europe/London', 'Asia/Shanghai', 'Asia/Tokyo', 'Australia/Sydney']
+
 
 def f_487(date_str, from_tz):
     """
@@ -19,7 +18,6 @@ def f_487(date_str, from_tz):
     - tuple: A tuple containing the converted datetime string and the randomly chosen timezone.
     
     Requirements:
-    - datetime
     - pytz
     - dateutil.parser
     - random
@@ -39,6 +37,7 @@ def f_487(date_str, from_tz):
 
 import unittest
 from datetime import datetime
+import matplotlib
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

@@ -1,7 +1,6 @@
 import seaborn as sns
 from random import sample
-import pandas as pd
-import numpy as np
+
 
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
@@ -22,12 +21,11 @@ def f_469(df, tuples, n_plots):
         - list of Axes: A list containing the generated pairplots.
 
     Requirements:
-    - pandas
-    - numpy
     - seaborn
     - random
 
     Example:
+    >>> import numpy as np, pandas as pd
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
     >>> modified_df, plots = f_469(df, tuples, 3)
@@ -50,6 +48,7 @@ import unittest
 import matplotlib
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
+import pandas as pd
 
 
 def run_tests():

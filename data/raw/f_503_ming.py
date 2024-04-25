@@ -17,7 +17,6 @@ def f_503(directory: str, pattern: str = r"(?<!Distillr)\\AcroTray\.exe") -> dic
 
     Requirements:
     - re
-    - os
     - hashlib
     - binascii
 
@@ -43,6 +42,7 @@ import shutil
 import os
 # Set DATA_DIR to the 'data' subdirectory in the current script's directory
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
 
 class TestCases(unittest.TestCase):
     @classmethod

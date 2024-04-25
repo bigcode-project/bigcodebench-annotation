@@ -1,9 +1,6 @@
-import os
-import shutil
+import hashlib
+import base64
 
-current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
-if not os.path.exists(current_directory_path):
-    os.makedirs(current_directory_path)
 
 def f_505(filename, data, password):
     """
@@ -44,9 +41,13 @@ def f_505(filename, data, password):
     return encrypted
 
 import unittest
-import hashlib
-import base64
 import os
+import shutil
+
+current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
+if not os.path.exists(current_directory_path):
+    os.makedirs(current_directory_path)
+
 
 def run_tests():
     suite = unittest.TestSuite()

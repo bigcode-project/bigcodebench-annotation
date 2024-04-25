@@ -1,7 +1,3 @@
-import unittest
-from unittest.mock import patch
-
-import matplotlib
 import pandas as pd
 import seaborn as sns
 
@@ -21,7 +17,6 @@ def f_475(goals, penalties):
 
     Requirements:
     - pandas
-    - matplotlib.pyplot
     - seaborn
 
     Example:
@@ -51,6 +46,10 @@ def f_475(goals, penalties):
 
     return df, plot
 
+
+import unittest
+from unittest.mock import patch
+import matplotlib
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
 

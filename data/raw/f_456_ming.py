@@ -1,21 +1,15 @@
 import csv
 import os
-import shutil
 from datetime import datetime
 from random import randint
-
-import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
 # Constants
-
-current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
-FILE_PATH = os.path.join(current_directory_path, 'traffic_data.csv')
 VEHICLE_TYPES = ['Car', 'Bus', 'Truck', 'Bike']
 
 
-def f_456(hours):
+def f_456(hours, current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])):
     """
     Generates traffic data for different vehicle types over a specified number of hours,
     saves the data to a CSV file, and plots the data in a line chart.
@@ -31,6 +25,8 @@ def f_456(hours):
     - os
     - csv
     - matplotlib.pyplot
+    - random
+    - datetime
 
     Example:
     >>> file_path, ax = f_456(2)  # Generate data for 2 hours
@@ -44,7 +40,7 @@ def f_456(hours):
 
     if not os.path.exists(current_directory_path):
         os.makedirs(current_directory_path)
-
+    FILE_PATH = os.path.join(current_directory_path, 'traffic_data.csv')
     data = [['Time'] + VEHICLE_TYPES]
     for i in range(hours):
         row = [datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')] + [randint(0, 50) for _ in VEHICLE_TYPES]
@@ -70,11 +66,13 @@ def f_456(hours):
 
 import unittest
 from unittest.mock import patch
-
+import shutil
+import matplotlib
 # Check and set the backend
 print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
 matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
+current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
+FILE_PATH = os.path.join(current_directory_path, 'traffic_data.csv')
 
 class TestCases(unittest.TestCase):
 

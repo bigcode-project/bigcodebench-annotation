@@ -18,9 +18,9 @@ def f_453():
     highlighted.
 
     Requirements:
-        - numpy for array operations.
-        - sklearn.cluster for applying KMeans clustering.
-        - matplotlib.pyplot for plotting the clustered points and centroids.
+        - numpy
+        - sklearn.cluster
+        - matplotlib.pyplot
 
     Returns:
         A tuple containing the numpy array of data points and the fitted KMeans model.
