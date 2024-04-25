@@ -2,7 +2,6 @@ import os
 import sys
 import re
 import ast
-import astor
 import json
 import zipfile
 import base64
@@ -433,8 +432,6 @@ if __name__ == "__main__":
     os.makedirs("data/processed", exist_ok=True)
     with open("data/open-eval.jsonl", "w") as f:
         for i, file in enumerate(tqdm(glob("data/clean/*.py"))):
-            if "ming" in file:
-                continue
             data = extract_content(file, None)
             if not validate_lib_num(data):
                 print(file.replace('clean/', 'raw/'), "Less than 2 libraries are used")
