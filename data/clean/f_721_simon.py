@@ -26,9 +26,9 @@ def f_721(data, col1, col2):
     TypeError: If one or both of the columns contain non-categorical data.
 
     Requirements:
-    numpy: for input type checking
-    pandas: pandas.crosstab for constructing the contingency table
-    scipy.stats.chi2_contingency: for performing the chi2 test of independence
+    numpy
+    pandas
+    scipy.stats.chi2_contingency
 
     Examples:
     >>> data = pd.DataFrame({
