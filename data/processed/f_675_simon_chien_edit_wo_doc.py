@@ -30,17 +30,6 @@ def f_675(file_name: str) -> pd.DataFrame:
     2	Anthony George	0.996744	0.216552
     3	Brian Washington	0.126279	0.459948
     4	Elias Lawrence	0.337239	0.124185
-
-    >>> normalized_data = f_675("test.csv")
-    >>> print(normalized_data.head())
-
-    Fruit	Weight	Amount
-    0	Aplple	1	0.5
-    1	Mr. Leslie Casey	0.32140	0.998905
-    2	Anthony George	0.8998888	0.123784
-    3	Brian Washington	0.121222	0.445321
-    4	Elias Lawrence	0.345223	0
-
     """
     df = pd.read_csv(file_name)
     if df.select_dtypes(include='number').empty:

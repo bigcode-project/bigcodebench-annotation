@@ -34,15 +34,6 @@ def f_731(data_dir: str, csv_file: str) -> pd.DataFrame:
     1   Orange       NaN        2
     2  Avocado       Bad        1.667
     3  Coconut     Tasty        2
-
-    >>> df = f_731("/path/to/data/directory", "test.csv")
-    >>> print(df)
-         Name     Score     
-    0    Alex         25.2   
-    1   Tanja         31.5   
-    2   Maine         99  
-    3    Lisa        100
-    4  Simone         63.925
     """
     file_path = os.path.join(data_dir, csv_file)
     try:

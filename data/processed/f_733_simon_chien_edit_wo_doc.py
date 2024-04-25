@@ -26,16 +26,12 @@ def f_733(csv_file_path, attribute, test_size=0.2, random_state=42):
     - sklearn.linear_model
     - sklearn.model_selection
 
+    Note: The function assumes that the CSV file is correctly formatted and that the specified attribute exists.
+
     Example:
     >>> model, predictions = f_733("/path/to/data.csv", "target")
     >>> print(predictions)
     [123.45, ..., 126.78]
-
-    >>> model, predictions = f_733("/path/to/test.csv", "target")
-    >>> print(predictions)
-    [1.2423, 4.2313, 28.2219, 10.3092]
-
-    Note: The function assumes that the CSV file is correctly formatted and that the specified attribute exists.
     """
     df = pd.read_csv(csv_file_path)
     X = df.drop(columns=[attribute])

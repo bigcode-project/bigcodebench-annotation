@@ -30,9 +30,6 @@ def f_657(dir_path):
     Example:
     >>> f_657("/path/to/directory")
     {'file1.txt': 2, 'subdir/file2.txt': 1}
-
-    >>> f_657("/path/to/directory")
-    {'test.txt': 245, 'subdir/test2.txt': 0, 'subdir/sf/test3.txt': 1}
     """
 
     if not os.path.isdir(dir_path):

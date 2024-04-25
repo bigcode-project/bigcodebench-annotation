@@ -28,14 +28,6 @@ def f_730(data_dir: str, csv_files: list) -> pd.DataFrame:
     0    Elena   13  Female
     1      Tom   23    Male
     0   Franko   12    Male
-
-    >>> df = f_730('/path/to/data/directory', ['file1.csv', 'other_file.csv'])
-    >>> print(df.head())
-            Name  Age  Gender  Animal Size
-    0    Simon   5     Male      None  None
-    1    Bobby   32    Male      None  None
-    0    Elena   13  Female      None  None
-    2     None  None   None      Tiger  12
     """
     merged_df = pd.DataFrame()
 

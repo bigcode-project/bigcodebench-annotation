@@ -45,38 +45,6 @@ def f_728(data):
     3   Tom   20     88
     7   Tom   20     86
     9   Tom   20     85
-
-    >>> print(avg_scores)
-    Name
-    John    91.0
-    Nick    80.0
-    Tom     86.0
-    Name: Score, dtype: float64
-    >>> print(common_age)
-    19
-
-    >>> data = {
-    ...     'Name': ['Simon', 'Alex', 'Tanja', 'Amanda', 'Tanja'],
-    ...     'Age': [21, 42, 54, 20, 54],
-    ...     'Score': [1, 1, 2, 3, 5]
-    ... }
-    >>> df, avg_scores, common_age = f_728(data)
-    >>> print(df)
-         Name  Age  Score
-    1    Alex   42      1
-    3  Amanda   20      3
-    0   Simon   21      1
-    2   Tanja   54      2
-    4   Tanja   54      5
-    >>> print(avg_scores)
-    Name
-    Alex      1.0
-    Amanda    3.0
-    Simon     1.0
-    Tanja     3.5
-    Name: Score, dtype: float64
-    >>> print(common_age)
-    54
     """
 
     if not all(key in data for key in ['Name', 'Age', 'Score']):

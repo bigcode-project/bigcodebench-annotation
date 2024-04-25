@@ -38,14 +38,6 @@ def f_725(df: pd.DataFrame, column_a: str, column_b: str, column_c: str) -> bool
     ... })
     >>> f_725(df, 'A', 'B', 'C')
     False
-
-    >>> df = pd.DataFrame({
-    ...     'TempA': [],
-    ...     'TempB': [],
-    ...     'TempC': []
-    ... })
-    >>> f_725(df, 'TempA', 'TempB', 'TempC')
-    True
     """
     # Filter rows based on column_b and column_c
     filtered_df = df[(df[column_b] > 50) & (df[column_c] == 900)]

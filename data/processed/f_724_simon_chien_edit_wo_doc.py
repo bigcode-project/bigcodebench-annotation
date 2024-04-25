@@ -42,13 +42,6 @@ def f_724(db_file, table_name, column_name, pattern='\d+[xX]'):
     59  60                 3xanswer
     60  61                   5xgirl
     61  62                   5xkind
-
-    >>> result = f_724('f_724_data_simon/sample.db', 'test_table', 'test_column', pattern='kind')
-    >>> print(result)
-        id                                        test_column
-    20  21  To between successful ever ago PM toward today...
-    42  43  Entire manage wife management perform size def...
-    61  62                                             5xkind
     """
 
     if not os.path.isfile(db_file):

@@ -26,17 +26,6 @@ def f_694(file_path, num_rows, data_dimensions=5, random_seed=None):
     Example:
     >>> f_694('/tmp/data.csv', 100)
     '/tmp/data.csv'
-
-    >>> f_694('test.csv', 5, 2, random_seed=42)
-    'test.csv'
-    >>> pd.read_csv('test.csv')
-        Feature_1	Feature_2
-    0	0.154163	0.740050
-    1	0.918747	0.900715
-    2	0.283828	0.606083
-    3	0.521226	0.552038
-    4	0.764560	0.020810
-
     """
     np.random.seed(random_seed)
     df = pd.DataFrame(np.random.rand(num_rows, data_dimensions),

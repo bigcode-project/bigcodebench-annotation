@@ -33,22 +33,6 @@ def f_732(data_dir,
     >>> file_name, df = f_732('test_data')
     >>> print(file_name)
     'file2.csv'
-    >>> print(df)
-           Animal     Weight
-     0        Cat          1
-    21      Mouse         12
-    15   Elephant       1000
-     2      Tiger        500
-
-    >>> file_name, df = f_732('data', csv_files=['test1.csv', 'test2.csv'], seed=42)
-    >>> print(file_name)
-    'test1.csv'
-    >>> print(df)
-                Name       House    Salary
-     12        Simba     mansion     11111
-    231      Dolores     mansion      2222
-    135       Elaine        shed     93274
-     21       Sophia      garden       111
     """
 
     random.seed(seed)

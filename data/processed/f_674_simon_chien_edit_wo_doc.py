@@ -29,12 +29,6 @@ def f_674(file_name):
     'Fruit': 'Apple',
     'Genre': 'HipHop',
     'Height': 172}
-
-    >>> common_values = f_674('test.csv')
-    >>> print(common_values)
-    {'Object': 'Chair',
-    'Weight': '211kg',
-    'Dancing Style': 'Waltz',}
     """
     data = np.genfromtxt(file_name, delimiter=',', names=True,
                          dtype=None, encoding=None)

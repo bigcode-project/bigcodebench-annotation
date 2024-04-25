@@ -38,32 +38,6 @@ def f_663(articles, timezone):
     Health          1   3.0    3    3
     Sports          1  19.0   19   19
     Technology      1   8.0    8    8
-
-    >>> articles = [{'title': 'Apple News', 'title_url': 'Apple_News', 'id': 2, 'category': 'Technology', 'published_time': datetime(2023, 6, 15, 12, 0, 0, tzinfo=pytz.UTC)},
-    ...             {'title': 'New York Times', 'title_url': 'New_York_Times', 'id': 4, 'category': 'Sports', 'published_time': datetime(2023, 6, 16, 23, 0, 0, tzinfo=pytz.UTC)},
-    ...             {'title': 'USA Today', 'title_url': 'USA_Today', 'id': 6, 'category': 'Health', 'published_time': datetime(2023, 6, 17, 7, 0, 0, tzinfo=pytz.UTC)}]
-    >>> analysis_df = f_663(articles, 'America/New_York')
-    >>> print(analysis_df)
-                count  mean  min  max
-    category                         
-    Health          1   3.0    3    3
-    Sports          1  19.0   19   19
-    Technology      1   8.0    8    8
-
-    >>> articles = [
-    ...    {'title': 'Apple News', 'title_url': 'Apple_News', 'id': 2, 'category': 'Technology', 'published_time': '09:01:04.403278+00:00'},
-    ...    {'title': 'New York Times', 'title_url': 'New_York_Times', 'id': 4, 'category': 'Sports', 'published_time': '02:03:04.403278+00:00'},
-    ...    {'title': 'USA Today', 'title_url': 'USA_Today', 'id': 6, 'category': 'Health', 'published_time': '21:11:01.403278+00:00'},
-    ...    {'title': 'newsies', 'title_url': 'newsies.news', 'id': 21, 'category': 'Technology', 'published_time': '4:25:12.403278+00:00'},
-    ...    {'title': 'ORF', 'title_url': 'orf.at', 'id': 44, 'category': 'Health', 'published_time': '03:04:03.403278+00:00'},
-    ...    {'title': 'ARD', 'title_url': 'ard.com', 'id': 61, 'category': 'Health', 'published_time': '11:41:12.403278+00:00'}]
-    >>> analysis_df = f_663(articles, 'America/New_York')
-    >>> print(analysis_df)
-                count       mean  min  max
-    category                              
-    Health          3  15.666667    7   23
-    Sports          1  22.000000   22   22
-    Technology      2   2.500000    0    5
     """
 
     if not isinstance(articles, list):

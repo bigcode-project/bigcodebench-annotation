@@ -55,11 +55,21 @@ def f_732(data_dir,
 
     return file, selected_rows
 
+
 import unittest
 import pandas as pd
 import os
 import tempfile
 import shutil
+
+
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Create a temporary directory
@@ -79,14 +89,17 @@ class TestCases(unittest.TestCase):
         # Create CSV files in the directory
         for file_name, df in data.items():
             df.to_csv(os.path.join(self.test_dir, file_name), index=False)
+
     def tearDown(self):
         # Remove the directory after the test
         shutil.rmtree(self.test_dir)
+
     def test_random_selection(self):
         # Testing random selection and ensuring the file chosen and its data are correct
         file_name, df = f_732(self.test_dir, seed=42)
         self.assertTrue(file_name in self.test_files)
         self.assertFalse(df.empty)
+
     def test_specific_file_selection(self):
         # Test selecting a specific file and checking contents
         file_name, df = f_732(self.test_dir, ['file1.csv'], seed=42)
@@ -97,17 +110,24 @@ class TestCases(unittest.TestCase):
         df_reset = df.reset_index(drop=True)
         # Assert frame equality
         pd.testing.assert_frame_equal(df_reset, expected_sampled)
+
     def test_empty_file(self):
         # Ensure an empty file returns an empty DataFrame
         file_name, df = f_732(self.test_dir, ['empty.csv'], seed=42)
         self.assertEqual(file_name, 'empty.csv')
         self.assertTrue(df.empty)
+
     def test_multiple_files(self):
         # Testing selection from multiple files
         file_name, df = f_732(self.test_dir, ['file3.csv', 'file4.csv'], seed=24)
         self.assertIn(file_name, ['file3.csv', 'file4.csv'])
         self.assertFalse(df.empty)
+
     def test_no_file_matches(self):
         # Testing behavior when no files match the list
         with self.assertRaises(FileNotFoundError):
             f_732(self.test_dir, ['nonexistent.csv'], seed=42)
+
+
+if __name__ == "__main__":
+    run_tests()
