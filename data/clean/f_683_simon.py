@@ -26,8 +26,8 @@ def f_683(iterations=5, min_delay=1.0, max_delay=2.0, seed=None):
     - ValueError: If iterations is not a positive integer or if min_delay/max_delay is not a positive floating point value.
 
     Requirements:
-    - time: for simulating the delay
-    - random: for sampling the delay times
+    - time
+    - random
     
     Example:
     >>> messages, delay = f_683(2, 0.4)
