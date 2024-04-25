@@ -23,8 +23,8 @@ def f_677(data: np.ndarray, threshold: float = 2.0) -> list:
     float: The variance of the fitted normal distribution.
 
     Requirements:
-    - numpy for getting the indices of the outliers
-    - scipy.stats.norm for fitting a normal distribution to the data
+    - numpy 
+    - scipy.stats.norm
 
     Example:
     >>> data = np.array([1, 2, 3, 4, 5, 6, 100])
