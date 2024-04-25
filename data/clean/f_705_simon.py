@@ -109,9 +109,6 @@ class TestCases(unittest.TestCase):
         total_letters = sum(len(lst) for lst in result.values())
         self.assertEqual(total_letters, large_n)
 
-    def test_return_value(self):
-
-
 
 if __name__ == "__main__":
     run_tests()
