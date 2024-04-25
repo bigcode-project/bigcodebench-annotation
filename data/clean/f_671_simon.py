@@ -17,8 +17,8 @@ def f_671(directory):
     list[str]: A list of file paths that contain brackets in their names.
     
     Requirements:
-    - re module for regular expression matching.
-    - os module for directory walking and path operations.
+    - re
+    - os
     
     Example:
     >>> f_671('./some_directory/')
