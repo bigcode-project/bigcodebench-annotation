@@ -19,8 +19,8 @@ def f_697(obj_list, attr):
     collections.Counter: The frequency count of each value of the attribute.
 
     Requirements:
-    - collections: Using the collections.Counter for calculating the frequencies
-    - pandas: For creating the DataFrame
+    - collections
+    - pandas
     
     Example:
     >>> class ExampleObject:
