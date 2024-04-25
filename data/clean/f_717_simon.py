@@ -1,6 +1,4 @@
-import pandas as pd
 from itertools import zip_longest
-
 import pandas as pd
 import random
 
@@ -25,6 +23,11 @@ def f_717(data, columns=['Name', 'Age', 'Occupation'], fill_missing=False, num_r
     Returns:
     DataFrame: A pandas DataFrame with specified columns.
                Missing elements are represented as None or filled with random data.
+
+    Requirements:
+    - pandas
+    - random
+    - itertools
 
     Example:
     >>> data = [('John', 25, 'Engineer'), ('Alice', ), ('Bob', )]
