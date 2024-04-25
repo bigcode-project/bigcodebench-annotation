@@ -30,6 +30,13 @@ def f_653(start_year=1980, end_year=2000, email_domain='example.com',
     - DataFrame: A pandas DataFrame containing the generated user data. The DataFrame has columns: 
                'ID', 'Name', 'Date of Birth', and 'Email'.
 
+    Requirements:
+    - pandas
+    - numpy
+    - codecs
+    - re
+    - datetime
+
     Examples:
     >>> df = f_653()
     >>> print(df)   
