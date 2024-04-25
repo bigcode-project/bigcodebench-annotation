@@ -219,11 +219,11 @@ pip install -r requirements.txt
 If you notice any third-party libraries that are not included in the `requirements.txt` file but used in the `data/process.py` file, please add them with the compatible versions to the `requirements.txt` file.
 
 ### How to Validate Data?
-We build a GitHub action to validate the data. The action is based on the `script/bash.sh`. Specifically, any refined data will be copied to the `data/clean` folder and then parsed based on `script/parser.py`. The parsed data will be stored in the `data/processed` folder. The parsed data will be separate into two splits for `pytest`. The first split will be validated by running `pytest $FILE_NAME` and the second split will be validated by running `pytest --doctest-modules $FILE_NAME`. Please note that we validate each file separately, as `pytest` may fail unexpectedly when validating all files at once.
+We build a GitHub action to validate the data. The action is based on the `script/run.sh`. Specifically, any refined data will be copied to the `data/clean` folder and then parsed based on `script/parser.py`. The parsed data will be stored in the `data/processed` folder. The parsed data will be separate into two splits for `pytest`. The first split will be validated by running `pytest $FILE_NAME` and the second split will be validated by running `pytest --doctest-modules $FILE_NAME`. Please note that we validate each file separately, as `pytest` may fail unexpectedly when validating all files at once.
 
 If you want to validate the data locally, you can run the following command:
 ```bash
-sh script/bash.sh
+sh script/run.sh
 ```
 
 If you find any failed test cases, please fix the data in the `data/raw` folder based on the failed problem IDs. The refinement should be based on the [How to Refine Data?](#how-to-refine-data) section.
