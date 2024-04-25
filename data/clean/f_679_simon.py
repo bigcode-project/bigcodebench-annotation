@@ -19,7 +19,7 @@ def f_679(dataframe, item, sample_size=None, random_seed=None):
     Requirements:
     - pandas
     - random.seed
-    - random.randint for generating a list of indices, used for sampling the positions
+    - random.randint
 
     Example:
     >>> df = pd.DataFrame([['Apple', 'Banana', 'Orange', 'Apple', 'Banana'] for _ in range(5)])
