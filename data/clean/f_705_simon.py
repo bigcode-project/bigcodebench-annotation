@@ -28,9 +28,9 @@ def f_705(n, seed=None):
                  its associated letter, depending on the randomness and seed.
 
     Requirements:
-    - collections.defaultdict for storing the lists of letters.
-    - random for generating random letters.
-    - string for accessing a constant containing the lowercase letters.
+    - collections.defaultdict
+    - random
+    - string
 
     Example:
     >>> f_705(5, seed=123)
