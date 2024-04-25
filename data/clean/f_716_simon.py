@@ -23,8 +23,8 @@ def f_716(points):
                     consecutive points. Each distance is a float.
     
     Requirements:
-    - itertools, for the efficient looping through consecutive point pairs with 'zip_longest'.
-    - scipy.spatial, specifically the 'distance' class, for calculating Euclidean distance.
+    - itertools
+    - scipy.spatial
 
     Example:
     >>> f_716([(1, 2), (3, 4), (5, 6), (7, 8)])
