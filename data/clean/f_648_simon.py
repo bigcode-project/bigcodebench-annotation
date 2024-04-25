@@ -23,8 +23,8 @@ def f_648(df: pd.DataFrame, height: int, weight: int, columns: list) -> sm.regre
     - sm.regression.linear_model.RegressionResultsWrapper: The result of the OLS regression, or None if no rows meet the criteria or DataFrame is empty.
 
     Requirements:
-    - pandas for DataFrame manipulation.
-    - statsmodels for performing OLS regression.
+    - pandas
+    - statsmodels
 
     Example:
     >>> df = pd.DataFrame({'Age': [30, 40], 'Height': [60, 70], 'Weight': [100, 150]})
