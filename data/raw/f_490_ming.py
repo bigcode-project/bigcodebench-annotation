@@ -1,4 +1,5 @@
 import os
+import time
 
 
 def f_490(dataset, filename):
@@ -14,6 +15,7 @@ def f_490(dataset, filename):
 
     Requirements:
     - os
+    - time
 
     Example:
     >>> import pandas as pd
@@ -21,6 +23,7 @@ def f_490(dataset, filename):
     >>> df2 = pd.DataFrame({"D": [5, 6], "E": [7, 8]})
     >>> f_490([df1, df2], 'sample.csv')
     """
+    start_time = time.time()
 
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
@@ -35,6 +38,9 @@ def f_490(dataset, filename):
             if i < len(dataset) - 1:
                 # Add a newline after the DataFrame content, except after the last DataFrame
                 f.write('\n')
+
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
 
 
 import unittest

@@ -23,6 +23,9 @@ def f_495(input_list: list, repetitions: int) -> Any:
     - typing
     - itertools
     - scipy
+
+    Returns:
+    - scipy.stats.ModeResult: An object containing the mode(s) and count(s) of the most frequently occurring element(s) in the flattened list.
     
     Examples:
     >>> f_495(['A', 'B', 'C'], 10)

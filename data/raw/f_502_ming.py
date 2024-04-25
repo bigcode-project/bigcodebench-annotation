@@ -23,7 +23,7 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
     - pandas
     - os
 
-    Example usage:
+    Example:
     >>> df = f_502(".*\.txt$", "/path/to/search", "matched_files.csv")
     """
     matched_paths = []

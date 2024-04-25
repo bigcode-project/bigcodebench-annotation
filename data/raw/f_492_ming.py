@@ -1,5 +1,4 @@
 import csv
-import pandas as pd
 import os
 
 
@@ -23,6 +22,7 @@ def f_492(df, filename):
     - os
 
     Examples:
+    >>> import pandas as pd
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
     >>> 'data.csv' in f_492(df, 'data.csv')
     True
@@ -41,7 +41,7 @@ import shutil
 import matplotlib
 # Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
 matplotlib.use('Agg')
-
+import pandas as pd
 # Adjust DATA_DIR to point to the 'data' subdirectory in the parent directory of this script
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(CURRENT_DIR, 'data')

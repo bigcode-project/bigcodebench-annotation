@@ -21,6 +21,10 @@ def f_458(duration):
     - time
     - random
     - matplotlib.pyplot
+
+    Example:
+    >>> type(f_458(1))
+    <class 'tuple'>
     """
     # Constants
     VALUES_RANGE = (0, 100)

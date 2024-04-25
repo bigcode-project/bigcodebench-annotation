@@ -16,7 +16,7 @@ def f_525(sales_data):
     - matplotlib.pyplot
     - statistics
 
-    Example usage:
+    Example:
     >>> import pandas as pd, numpy as np
     >>> sales_data = pd.DataFrame({
     ...     'Month': range(1, 13),

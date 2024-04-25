@@ -1,6 +1,6 @@
 import pandas as pd
 from scipy import stats
-import numpy as np
+
 
 
 def f_467(matrix):
@@ -19,6 +19,7 @@ def f_467(matrix):
     - scipy
 
     Example:
+    >>> import numpy as np
     >>> matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     >>> normalized_df = f_467(matrix)
     >>> isinstance(normalized_df, pd.DataFrame)
@@ -36,6 +37,7 @@ def f_467(matrix):
 
 
 import unittest
+import numpy as np
 
 
 def run_tests():
@@ -43,6 +45,7 @@ def run_tests():
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 
 class TestCases(unittest.TestCase):
 

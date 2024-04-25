@@ -18,6 +18,12 @@ def f_438(a, b):
     - scipy
     - matplotlib.pyplot
 
+    Returns:
+    - tuple: Contains two elements:
+        - float: The Pearson correlation coefficient.
+        - matplotlib.axes.Axes: The Axes object of the plotted scatter plot with a regression line.
+
+
     Example:
     >>> correlation, ax = f_438([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
     >>> isinstance(correlation, float) and isinstance(ax, matplotlib.axes.Axes)

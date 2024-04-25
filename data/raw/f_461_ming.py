@@ -1,5 +1,5 @@
 import pandas as pd
-
+import time
 
 def f_461(df, letter):
     """
@@ -15,11 +15,13 @@ def f_461(df, letter):
 
     Requirements:
     - pandas
+    - time
 
     Example:
     >>> df = {'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'avocado']}
     >>> ax = f_461(df, 'a')
     """
+    start_time = time.time()
     df = pd.DataFrame(df)
     regex = f'^{letter}'
     filtered_df = df[df['Word'].str.match(regex)]
@@ -36,6 +38,8 @@ def f_461(df, letter):
     ax.set_xlabel("Word Length")
     ax.set_ylabel("Frequency")
 
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
     return ax
 
 

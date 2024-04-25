@@ -1,5 +1,5 @@
 import pandas as pd
-
+import time
 
 def f_493(df: pd.DataFrame, filename: str) -> str:
     """
@@ -14,12 +14,14 @@ def f_493(df: pd.DataFrame, filename: str) -> str:
 
     Requirements:
     - pandas
+    - time
 
     Example:
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
     >>> 'data.jsonl' in f_493(df, 'data.jsonl')
     True
     """
+    start_time = time.time()
     # Ensure the data directory exists
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
@@ -31,7 +33,8 @@ def f_493(df: pd.DataFrame, filename: str) -> str:
         for record in df.to_dict(orient='records'):
             json.dump(record, file)
             file.write('\n')
-
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
     return os.path.abspath(file_path)
 
 

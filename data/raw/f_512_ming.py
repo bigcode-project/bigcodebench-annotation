@@ -1,5 +1,5 @@
 import pandas as pd
-
+import time
 
 def f_512(dataframe, target_value):
     '''
@@ -17,11 +17,13 @@ def f_512(dataframe, target_value):
 
     Requirements:
     - pandas
+    - time
 
     Example:
     >>> df = {'Column1': ['0', 'a', '332', '33']}
     >>> series, ax = f_512(df, '332')
     '''
+    start_time = time.time()
     # Convert dataframe to string type for uniform comparison
     dataframe = pd.DataFrame(dataframe)
     dataframe = dataframe.astype(str)
@@ -33,7 +35,8 @@ def f_512(dataframe, target_value):
         ax = counts.plot(kind='bar')
     else:
         ax = None
-
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
     return counts, ax
     
 

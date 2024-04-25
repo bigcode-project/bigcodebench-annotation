@@ -1,4 +1,5 @@
 import pandas as pd
+import time
 # Constants
 LETTERS = list('abcdefghijklmnopqrstuvwxyz')
 
@@ -16,6 +17,7 @@ def f_459(df, letter):
 
     Requirements:
     - pandas
+    - time
 
     Example:
     >>> import pandas as pd
@@ -26,9 +28,12 @@ def f_459(df, letter):
     >>> len(filtered_names)
     1
     """
+    start_time = time.time()
     regex = f'^{letter}'
     filtered_df = df[df['Name'].str.contains(regex, case=False, regex=True)]
     # Note: The plotting line is removed to simplify testing and focus on data processing.
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
     return filtered_df['Name'].value_counts()
 
 
