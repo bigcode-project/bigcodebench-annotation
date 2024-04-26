@@ -27,7 +27,7 @@ def f_644(list_of_pairs):
     >>> list_of_pairs = [('Fruits', 5), ('Vegetables', 9), ('Dairy', -1), ('Bakery', -2), ('Meat', 4)]
     >>> df = f_644(list_of_pairs)
     >>> print(df)
-        Category     Value
+         Category     Value
     0      Fruits  0.636364
     1  Vegetables  1.000000
     2       Dairy  0.090909
@@ -36,7 +36,7 @@ def f_644(list_of_pairs):
     >>> list_of_pairs = [('car', 3.2), ('bike', 0), ('train', -1), ('plane', -6.2), ('ship', 1234)]
     >>> df = f_644(list_of_pairs)
     >>> print(df)
-        Category     Value
+      Category     Value
     0      car  0.007579
     1     bike  0.004999
     2    train  0.004193
