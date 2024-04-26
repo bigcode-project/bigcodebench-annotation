@@ -23,7 +23,7 @@ def f_725(df: pd.DataFrame, column_a: str, column_b: str, column_c: str) -> bool
         column_b (str): The name of the column used for filtering based on its value being greater than 50.
         column_c (str): The name of the column used for filtering based on its value being equal to 900.
     
-    Output:
+    Returns:
         bool: True if the data in column_a (after filtering based on column_b and column_c) is stationary, False otherwise.
     
     Requirements:
