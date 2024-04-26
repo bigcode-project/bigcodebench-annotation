@@ -1,11 +1,12 @@
 from collections import Counter
 import logging
 
-def f_682(letter_list, element):
+def f_682(letter_list, element, log_path):
     """
     Count the frequency of a particular letter in a given list of letters with logging.
 
     Logs are written to a file named 'f_682.log' with encoding 'utf-8' and logging level DEBUG.
+    The log file is created by the function or overwritten if already exists.
     For each function call the following is logged with the respective logging level:
         - info: f"Function called with list: {letter_list} and element: {element}"
         - error: if the element is not in the letter list
@@ -40,35 +41,45 @@ def f_682(letter_list, element):
     1
     >>> with open('f_682.log') as log:
     >>>     print(log.read())
-    INFO:root:Function called with list: ['x', 'y', 'z'] and element: y
-    INFO:root:Frequency of 'y' is 1
+    INFO:Function called with list: ['x', 'y', 'z'] and element: y
+    INFO:Frequency of 'y' is 1
 
     >>> try: f_682(['x', 'y', 'z'], 'a') 
     >>> except: 
     >>> with open('f_682.log') as log:
     >>>     print(log.read())
-    INFO:root:Function called with list: ['x', 'y', 'z'] and element: a
-    ERROR:root:The element is not in the letter list.
+    INFO:Function called with list: ['x', 'y', 'z'] and element: a
+    ERROR:The element is not in the letter list.
 
     """
-    logging.basicConfig(filename='f_682.log', encoding='utf-8', level=logging.DEBUG)
-    logging.info(f"Function called with list: {letter_list} and element: {element}")
+    formatter = logging.Formatter('%(levelname)s:%(message)s')
+    handler = logging.FileHandler(log_path+'/f_682.log', mode='w')
+    logger = logging.getLogger()
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+    logger.info(f"Function called with list: {letter_list} and element: {element}")
 
     if element not in letter_list:
-        logging.error("The element is not in the letter list.")
+        logger.error("The element is not in the letter list.")
         logging.shutdown()
+        logger.handlers[0].close
+        logger.removeHandler(logger.handlers[0])
         raise ValueError("The element is not in the letter list.")
         
     letter_frequencies = Counter(letter_list)
     element_frequency = letter_frequencies[element]
     
-    logging.info(f"Frequency of '{element}' is {element_frequency}")
+    logger.info(f"Frequency of '{element}' is {element_frequency}")
     logging.shutdown()
+    logger.handlers[0].close
+    logger.removeHandler(logger.handlers[0])
     return element_frequency
 
 
 import unittest
-import os
+import os, shutil
+import tempfile
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -80,47 +91,46 @@ def run_tests():
 class TestCases(unittest.TestCase):
 
     def setUp(self):
-        if os.path.exists('f_682.log'):
-            os.remove('f_682.log')
+        self.temp_folder = tempfile.mkdtemp()
 
     def tearDown(self) -> None:
-        if os.path.exists('f_682.log'):
-            os.remove('f_682.log')
+        shutil.rmtree(self.temp_folder)
+        self.temp_folder = None
 
     def test_case_1(self):
-        result = f_682(['a', 'b', 'a', 'c', 'a'], 'a')
+        result = f_682(['a', 'b', 'a', 'c', 'a'], 'a', self.temp_folder)
         self.assertEqual(result, 3)
-        with open('f_682.log') as log:
-            self.assertTrue("INFO:root:Function called with list: ['a', 'b', 'a', 'c', 'a'] and element: a" in log.readline())
-            self.assertTrue("INFO:root:Frequency of 'a' is 3" in log.readline())
+        with open(self.temp_folder+'/f_682.log') as log:
+            self.assertTrue("INFO:Function called with list: ['a', 'b', 'a', 'c', 'a'] and element: a" in log.readline())
+            self.assertTrue("INFO:Frequency of 'a' is 3" in log.readline())
 
     def test_case_2(self):
-        result = f_682(['x', 'y', 'z'], 'y')
+        result = f_682(['x', 'y', 'z'], 'y', self.temp_folder)
         self.assertEqual(result, 1)
-        with open('f_682.log') as log:
-            self.assertTrue("INFO:root:Function called with list: ['x', 'y', 'z'] and element: y" in log.readline())
-            self.assertTrue("INFO:root:Frequency of 'y' is 1" in log.readline())
+        with open(self.temp_folder+'/f_682.log') as log:
+            self.assertTrue("INFO:Function called with list: ['x', 'y', 'z'] and element: y" in log.readline())
+            self.assertTrue("INFO:Frequency of 'y' is 1" in log.readline())
 
     def test_case_3(self):
-        result = f_682(['m', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v'], 'r')
+        result = f_682(['m', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v'], 'r', self.temp_folder)
         self.assertEqual(result, 1)
-        with open('f_682.log') as log:
-            self.assertTrue("INFO:root:Function called with list: ['m', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v'] and element: r" in log.readline())
-            self.assertTrue("INFO:root:Frequency of 'r' is 1" in log.readline())
+        with open(self.temp_folder+'/f_682.log') as log:
+            self.assertTrue("INFO:Function called with list: ['m', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v'] and element: r" in log.readline())
+            self.assertTrue("INFO:Frequency of 'r' is 1" in log.readline())
 
     def test_case_4(self):
-        result = f_682(['z', 'z', 'z', 'z'], 'z')
+        result = f_682(['z', 'z', 'z', 'z'], 'z', self.temp_folder)
         self.assertEqual(result, 4)
-        with open('f_682.log') as log:
-            self.assertTrue("INFO:root:Function called with list: ['z', 'z', 'z', 'z'] and element: z" in log.readline())
-            self.assertTrue("INFO:root:Frequency of 'z' is 4" in log.readline())
+        with open(self.temp_folder+'/f_682.log') as log:
+            self.assertTrue("INFO:Function called with list: ['z', 'z', 'z', 'z'] and element: z" in log.readline())
+            self.assertTrue("INFO:Frequency of 'z' is 4" in log.readline())
 
     def test_case_5(self):
         with self.assertRaises(ValueError):
-            f_682(['a', 'b', 'c'], 'z')
-        with open('f_682.log') as log:
-            self.assertTrue("INFO:root:Function called with list: ['a', 'b', 'c'] and element: z" in log.readline())
-            self.assertTrue("ERROR:root:The element is not in the letter list." in log.readline())
+            f_682(['a', 'b', 'c'], 'z', self.temp_folder)
+        with open(self.temp_folder+'/f_682.log') as log:
+            self.assertTrue("INFO:Function called with list: ['a', 'b', 'c'] and element: z" in log.readline())
+            self.assertTrue("ERROR:The element is not in the letter list." in log.readline())
 
 
 
