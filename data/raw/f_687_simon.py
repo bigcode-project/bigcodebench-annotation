@@ -25,7 +25,7 @@ def f_687(input_list):
     [2, 5, 7, 89]
     
     >>> f_687([101, 102, 103, 104])
-    [103]
+    [101, 103]
     """
     primes = [i for i in input_list if isprime(i)]
     sorted_primes = sorted(primes, key=lambda x: (math.degrees(x), x))
