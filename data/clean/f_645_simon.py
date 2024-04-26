@@ -29,16 +29,16 @@ def f_645(text):
     Example:
     >>> text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
     >>> f_645(text)
-        Word  Frequency
-    0   $abc      3
-    1   $efg      1
-    2   $hij      3
+       Word  Frequency
+    0  $abc          3
+    1  $efg          1
+    2  $hij          3
 
     >>> text = "$hello this i$s a $test $test $test"
     >>> f_645(text)
-        Word	Frequency
-    0	$hello	1
-    1	$test	3
+         Word  Frequency
+    0  $hello          1
+    1   $test          3
     """
     if not isinstance(text, str):
         raise ValueError("The input should be a string.")
