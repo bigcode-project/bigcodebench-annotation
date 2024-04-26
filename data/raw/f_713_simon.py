@@ -35,17 +35,16 @@ def f_713(data_list, file_name):
     >>> f_713(data, 'mean_values.txt')
     [3.0, 4.0]
     >>> with open('mean_values.txt') as file:
-    >>>     txt_content = file.readlines()
+    ...    txt_content = file.readlines()
     >>> print(txt_content)
-    ['Position 1: 3.0\n', 'Position 2: 4.0\n']
-
+    ['Position 1: 3.0\\n', 'Position 2: 4.0\\n']
     >>> data_list=[('hi', 'test', -12, 4), ('hallo', 1.2, 'test'), ('hola', -3, 34, 12.1)]
     >>> f_713(data_list, 'test.txt')
     [-0.9, 11.0, 8.05]
     >>> with open('test.txt') as file:
-    >>>     txt_content = file.readlines()
+    ...     txt_content = file.readlines()
     >>> print(txt_content)
-    ['Position 1: -0.9\n', 'Position 2: 11.0\n', 'Position 3: 8.05\n']
+    ['Position 1: -0.9\\n', 'Position 2: 11.0\\n', 'Position 3: 8.05\\n']
     """
     # Unzipping the data to separate the elements of the tuples
     unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
