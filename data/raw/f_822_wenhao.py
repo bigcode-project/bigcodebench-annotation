@@ -62,7 +62,7 @@ class TestCases(unittest.TestCase):
         # Test basic case
         array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
         target = np.array([0, 1])
-        clf = f_822(array, target)
+        clf = f_822(array, target, seed=42)
         self.assertIsInstance(clf, RandomForestClassifier)
         self.assertTrue(len(clf.feature_importances_) > 0)
         self.assertEqual(set(np.unique(target)), set(clf.classes_))
