@@ -27,21 +27,21 @@ def f_644(list_of_pairs):
     >>> list_of_pairs = [('Fruits', 5), ('Vegetables', 9), ('Dairy', -1), ('Bakery', -2), ('Meat', 4)]
     >>> df = f_644(list_of_pairs)
     >>> print(df)
-             Category     Value
-        0      Fruits  0.636364
-        1  Vegetables  1.000000
-        2       Dairy  0.090909
-        3      Bakery  0.000000
-        4        Meat  0.545455
+        Category     Value
+    0      Fruits  0.636364
+    1  Vegetables  1.000000
+    2       Dairy  0.090909
+    3      Bakery  0.000000
+    4        Meat  0.545455
     >>> list_of_pairs = [('car', 3.2), ('bike', 0), ('train', -1), ('plane', -6.2), ('ship', 1234)]
     >>> df = f_644(list_of_pairs)
     >>> print(df)
-          Category     Value
-        0      car  0.007579
-        1     bike  0.004999
-        2    train  0.004193
-        3    plane  0.000000
-        4     ship  1.000000
+        Category     Value
+    0      car  0.007579
+    1     bike  0.004999
+    2    train  0.004193
+    3    plane  0.000000
+    4     ship  1.000000
             """
 
     if len(list_of_pairs) == 0:
