@@ -7,7 +7,7 @@ def f_809(df: pd.DataFrame) -> pd.DataFrame:
     Calculate the cumulative sum for each column in a given DataFrame and plot
     the results in a bar chart.
 
-    Args:
+    Parameters:
     df (pd.DataFrame): The input DataFrame with numerical values.
                        Must not be empty and must contain numeric data to plot.
     Returns:

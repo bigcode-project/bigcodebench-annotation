@@ -23,7 +23,6 @@ def f_675(file_name: str) -> pd.DataFrame:
     Example:
     >>> normalized_data = f_675("sample.csv")
     >>> print(normalized_data.head())
-
     Name	Age	Salary
     0	Alex Anderson	0.304651	0.122298
     1	Mr. Leslie Casey	0.28140	0.598905
