@@ -31,25 +31,25 @@ def f_666(
     - random
 
     Example:
-    >>> df = f_666(5)
+    >>> df = f_666(5, random_seed=1)
     >>> print(df)
-    Country    Product  Sales
-    0   India  Product B     50
-    1      UK  Product C     27
-    2      UK  Product A      1
-    3      UK  Product E     49
-    4      UK  Product E      6
+      Country    Product  Sales
+    0      UK  Product E     98
+    1     USA  Product C     16
+    2   India  Product D     61
+    3   India  Product B     13
+    4   India  Product A     50
 
-    >>> df = f_666(7, products=['tea', 'coffee'], countries=['Austria', 'Australia'])
+    >>> df = f_666(7, products=['tea', 'coffee'], countries=['Austria', 'Australia'], random_seed=12)
     >>> print(df)
-            Country Product  Sales
-    0    Austria  coffee     88
-    1    Austria  coffee     69
-    2    Austria  coffee     30
-    3  Australia  coffee     56
-    4  Australia     tea      1
-    5    Austria     tea     55
-    6    Austria     tea     61
+         Country Product  Sales
+    0  Australia  coffee     85
+    1  Australia     tea     49
+    2    Austria  coffee     62
+    3  Australia  coffee     89
+    4    Austria     tea     85
+    5    Austria  coffee     48
+    6    Austria  coffee     27
     """
     
     random.seed(random_seed)

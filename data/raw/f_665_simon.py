@@ -31,26 +31,26 @@ def f_665(n,
     - csv
     
     Example:
-    >>> df = f_665(5)
+    >>> df = f_665(5, random_seed=1)
     >>> print(df)
-            Site    Category           Response  Value
-    0   USA Today      Sports     Strongly Agree      5
-    1   USA Today      Sports  Strongly Disagree      1
-    2         CNN  Technology           Disagree      2
-    3  Apple News      Sports     Strongly Agree      5
-    4         CNN    Business              Agree      4
+                 Site       Category           Response  Value
+    0       USA Today  Entertainment  Strongly Disagree      1
+    1      Apple News         Sports              Agree      4
+    2             CNN       Politics              Agree      4
+    3       USA Today         Sports              Agree      4
+    4  New York Times       Politics              Agree      4
     
-    >>> df = f_665(8, ['test', 'fun'], likert_scale=['true', 'false'], news_sites=['cat', 'dog'])
+    >>> df = f_665(8, ['test', 'fun'], likert_scale=['true', 'false'], news_sites=['cat', 'dog'], random_seed=12)
     >>> print(df)
-        Site Category  Response  Value
-    0  dog     test      True      1
-    1  cat      fun     False      2
-    2  dog     test     False      2
-    3  dog     test     False      2
-    4  dog     test     False      2
-    5  cat     test     False      2
-    6  cat      fun     False      2
-    7  cat      fun     False      2
+      Site Category  Response  Value
+    0  dog      fun     False      2
+    1  cat      fun      True      1
+    2  dog      fun     False      2
+    3  dog     test      True      1
+    4  cat      fun     False      2
+    5  cat      fun      True      1
+    6  cat     test      True      1
+    7  dog      fun      True      1
     """
     survey_data = []
 

@@ -29,11 +29,7 @@ def f_662(news_articles):
     ...             {'title': 'USA Today', 'title_url': 'USA_Today', 'id': 6, 'category': 'Health'}]
     >>> sorted_articles = f_662(articles)
     >>> print(sorted_articles)
-    {
-        'Health': [{'title': 'USA Today', 'title_url': 'USA_Today', 'id': 6, 'category': 'Health'}],
-        'Sports': [{'title': 'New York Times', 'title_url': 'New_York_Times', 'id': 4, 'category': 'Sports'}],
-        'Technology': [{'title': 'Apple News', 'title_url': 'Apple_News', 'id': 2, 'category': 'Technology'}]
-    }
+    defaultdict(<class 'list'>, {'Health': [{'title': 'USA Today', 'title_url': 'USA_Today', 'id': 6, 'category': 'Health'}], 'Sports': [{'title': 'New York Times', 'title_url': 'New_York_Times', 'id': 4, 'category': 'Sports'}], 'Technology': [{'title': 'Apple News', 'title_url': 'Apple_News', 'id': 2, 'category': 'Technology'}]})
 
     >>> articles = [
     ...        {'title': 'Der Standard', 'title_url': 'standard', 'id': 2, 'category': 'climate'},
@@ -42,15 +38,8 @@ def f_662(news_articles):
     ...    ]
     >>> sorted_articles = f_662(articles)
     >>> print(sorted_articles)
-    defaultdict(<class 'list'>, 
-    {
-        'climate': [{'title': 'Der Standard', 'title_url': 'standard', 'id': 2, 'category': 'climate'},
-                    {'title': 'tecky', 'title_url': 'tecky', 'id': 4, 'category': 'climate'}],
-        'environment': [{'title': 'earth magazine', 'title_url': 'earth', 'id': 4, 'category': 'environment'}]
-    }
-    )
+    defaultdict(<class 'list'>, {'climate': [{'title': 'Der Standard', 'title_url': 'standard', 'id': 2, 'category': 'climate'}, {'title': 'tecky', 'title_url': 'tecky', 'id': 4, 'category': 'climate'}], 'environment': [{'title': 'earth magazine', 'title_url': 'earth', 'id': 4, 'category': 'environment'}]})
     """
-
     if any(not sorted(dic.keys()) == ['category', 'id', 'title', 'title_url']  for dic in news_articles):
         raise ValueError("input dictionaries must contain the following keys: 'category', 'id', 'title', 'title_url'")
 

@@ -40,7 +40,7 @@ def f_672(df: pd.DataFrame) -> int:
     # Constants
     BRACKETS_PATTERN = '[(){}[\]]'
 
-    return df.map(
+    return df.applymap(
         lambda x: len(re.findall(BRACKETS_PATTERN, str(x)))
         ).sum().sum()
 

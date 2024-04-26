@@ -26,22 +26,22 @@ def f_664(n,
     - numpy
 
     Example:
-    >>> df = f_664(5)
+    >>> df = f_664(5, random_seed=1)
     >>> print(df)
-        title                    title_url  id    category  views
-    0  Article 0  samplewebsite.com/Article_0   0     Science   1012
-    1  Article 1  samplewebsite.com/Article_1   1      Sports    976
-    2  Article 2  samplewebsite.com/Article_2   2  Technology    948
-    3  Article 3  samplewebsite.com/Article_3   3      Health    971
-    4  Article 4  samplewebsite.com/Article_4   4      Health   1001
+           title                    title_url  id    category  views
+    0  Article 0  samplewebsite.com/Article_0   0  Technology    992
+    1  Article 1  samplewebsite.com/Article_1   1    Business    962
+    2  Article 2  samplewebsite.com/Article_2   2      Sports    968
+    3  Article 3  samplewebsite.com/Article_3   3      Health    991
+    4  Article 4  samplewebsite.com/Article_4   4      Sports    993
 
-
-    >>> df = f_664(3, categories=['A', 'B'], domain='test.de')
+    >>> df = f_664(3, categories=['A', 'B'], domain='test.de', random_seed=12)
     >>> print(df)
-        title          title_url  id category  views
-    0  Article 0  test.de/Article_0   0        B    954
-    1  Article 1  test.de/Article_1   1        A   1007
-    2  Article 2  test.de/Article_2   2        B   1011
+           title          title_url  id category  views
+    0  Article 0  test.de/Article_0   0        B    963
+    1  Article 1  test.de/Article_1   1        B    977
+    2  Article 2  test.de/Article_2   2        B   1048
+
     """
     random.seed(random_seed)
     np.random.seed(random_seed)

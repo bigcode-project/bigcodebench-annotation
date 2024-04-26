@@ -35,7 +35,7 @@ def f_647(df, age, weight):
     ...     "shoe_size": [12, 6, 7, 8, 9, 6]
     ... })
     >>> print(f_647(data, 70, 63))
-        Age    Weight  shoe_size
+           Age    Weight  shoe_size
     0  1.40400 -0.701695  -1.224745
     1 -0.55507 -0.712504   0.000000
     2 -0.84893  1.414200   1.224745
@@ -45,8 +45,8 @@ def f_647(df, age, weight):
     ...     "Weight": [62, 63, 12, 24, 11, 111, 200, 70],
     ...     "banana_consumption": [1, 1, 7, 2, 100, 6, 26, 1]
     ... })
-    ... print(f_647(input, 32, 22))
-        Age    Weight  banana_consumption
+    >>> print(f_647(input, 32, 22))
+            Age    Weight  banana_consumption
     0 -1.083473 -1.192322           -0.666109
     1  0.120386  0.150487           -0.271378
     2  1.565016  1.524165            1.702277

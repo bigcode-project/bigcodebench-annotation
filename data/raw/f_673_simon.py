@@ -33,33 +33,27 @@ def f_673(L, num_dataframes=5, random_seed=None):
     1  14  22  46
     4   2   5   6
     >>> print(df_list)
-    [    
-        b   c   k
+    [    b   c   k
     0  14  65  76
     1  14  22  46
-    2  14  65  76,     
-        b   c   k
+    2  14  65  76,     b   c   k
     0   7  12  33
     1   2   5   6
-    2  14  22  46,     
-        b   c   k
+    2  14  22  46,     b   c   k
     0  14  65  76
     1   2   5   6
-    2   2   5   6
-    ]
+    2   2   5   6]
 
     >>> L = [[1, '65', 76], [2, '5', 6]]
-    >>> common_rows, df_list = f_673(L, num_dataframes=1)
+    >>> common_rows, df_list = f_673(L, num_dataframes=1, random_seed=1)
     >>> print(common_rows)
-        r  j  a
-    0  2  5  6
+       d   w   t
+    0  1  65  76
     >>> print(df_list)
-    [   
-        r   j   a
-    0  2   5   6
+    [   d   w   t
+    0  1  65  76
     1  1  65  76
-    2  2   5   6
-    ]
+    2  1  65  76]
     """
     if random_seed is not None:
         seed(random_seed)

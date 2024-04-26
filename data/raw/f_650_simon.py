@@ -32,30 +32,16 @@ def f_650(result):
 
     Example:
     >>> result = [{"hi": 7, "bye": 4, "from_user": 0}, {"from_user": 0}, {"from_user": 1}]
-    >>> f_650(result)
-    mean                  0.333333
-    median                0.0
-    min                   0.0
-    max                   1.0
-    std                   0.471405
-    current_time          2023-10-10 12:23:45  # Note: This time will vary based on when the function is run
-    dtype: object
-
+    >>> stats = f_650(result)
+    >>> print(stats['mean'], stats['median'], stats['min'], stats['max'], stats['std'])
+    0.3333333333333333 0.0 0 1 0.4714045207910317
     >>> result = [{"test": 7, "hallo": 4, "from_user": 1.3},
-    >>>           {"from_user": 2},
-    >>>           {"from_user": 4.6},
-    >>>           {"from_user": -2.3, "b": 1},
-    >>>           {"a": "test", "from_user": 12.12},
-    >>>          ]
+    ...           {"from_user": 2},
+    ...           {"from_user": 4.6},
+    ...           {"from_user": -2.3, "b": 1},
+    ...           {"a": "test", "from_user": 12.12},
+    ...          ]
     >>> summary = f_650(result)
-    >>> summary
-    mean                          3.544
-    median                          2.0
-    min                            -2.3
-    max                           12.12
-    std                        4.821508
-    current_time    2023-11-28 13:21:07
-    dtype: object
     """
     from_user_values = np.array([d['from_user'] for d in result if 'from_user' in d])
     # Handle edge case of empty array

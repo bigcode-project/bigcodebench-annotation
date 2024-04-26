@@ -29,13 +29,13 @@ def f_654(directory_name="latin_files",
     - zipfile
 
     Example:
-    >>> zipped_file = f_654("latin_files", ["file1.txt", "file2.txt", "file3.txt"], "latin-1")
+    >>> zipped_file = f_654("latin_files", "test", ["file1.txt", "file2.txt", "file3.txt"])
     >>> print(zipped_file)
-    "latin_files.zip"
+    latin_files.zip
 
-    >>> zipped_file = f_654("files", 'hi', ["test1.txt", "testing.txt"], "utf-8")
+    >>> zipped_file = f_654(directory_name="directorio", content='hi', file_names=["custom1.txt", "custom2.txt"], encoding='utf-8')
     >>> print(zipped_file)
-    "files.zip"
+    directorio.zip
     '''
 
     os.makedirs(directory_name, exist_ok=True)

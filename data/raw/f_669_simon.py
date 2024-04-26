@@ -35,8 +35,8 @@ def f_669(df, feature, target, n=10):
     ... })
     >>> indices, model = f_669(df, 'col1', 'col2', n=5)
     >>> print(indices)
-    >>> print(model)
     [0, 1, 9, 7, 8]
+    >>> print(model)
     LinearRegression()
 
     >>> df = pd.DataFrame({
@@ -45,8 +45,8 @@ def f_669(df, feature, target, n=10):
     ... })
     >>> indices, model = f_669(df, 'a', 'b', n=3)
     >>> print(indices)
-    >>> print(model)
     [0, 1, 2]
+    >>> print(model)
     LinearRegression()
     """
     # Ensure provided columns exist in the dataframe

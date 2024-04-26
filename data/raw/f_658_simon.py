@@ -37,9 +37,9 @@ def f_658(num_samples=500, noise_strength=1, random_seed=None, test_size=0.2):
 
     Example:
     >>> f_658(num_samples=10, noise_strength=23.5, random_seed=24, test_size=0.3)
-    -0.4892453918038726
+    (-0.4892453918038726, LinearRegression())
     >>> f_658(noise_strength=0.1)
-    0.9720280466398104
+    (0.9658328575162494, LinearRegression())
     """
 
     if num_samples * test_size < 2:

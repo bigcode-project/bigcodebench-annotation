@@ -35,15 +35,14 @@ def f_655(csv_file='names.csv',
     Example:
     >>> file_name = f_655()
     >>> print(file_name)
-    'names.csv'
+    names.csv
 
-    >>> file_name = f_655(csv_file='test.csv', names=['simon', 'alex'])
+    >>> file_name = f_655(csv_file='test.csv', names=['simon', 'alex'], rng_seed=1)
     >>> with open(file_name, 'r', newline='', encoding='latin-1') as csvfile:
-    >>>     reader = csv.reader(csvfile)
-    >>>     rows = list(reader)
-    >>>     print(rows)
-    [['Name', 'Age'], ['Sopetón', '48'], ['alex', '38'], ['Muñoz', '33'], ['simon', '34'], ['Muñoz', '38'], ['simon', '33'], ['Sopetón', '22'], ['simon', '38'], ['Sopetón', '37'], ['alex', '35'], ['Muñoz', '41'], ['alex', '39'], ['Sopetón', '33'], ['simon', '40'], ['Méndez', '27'], ['alex', '44'], ['Pérez', '26'], ['simon', '27'], ['Sopetón', '31'], ['alex', '45'], ['Sopetón', '42'], ['alex', '45'], ['Méndez', '29'], ['alex', '48'], ['Pérez', '36'], ['simon', '25'], ['Pérez', '46'], ['alex', '30'], ['Muñoz', '32'], ['simon', '41'], ['Méndez', '31'], ['alex', '35'], ['Pérez', '47'], ['alex', '45'], ['Méndez', '49'], ['simon', '35'], ['Sopetón', '36'], ['simon', '24'], ['Sopetón', '39'], ['simon', '45'], ['Gómez', '41'], ['alex', '48'], ['Muñoz', '43'], ['simon', '20'], ['Méndez', '35'], ['alex', '30'], ['Méndez', '40'], ['simon', '43'], ['Gómez', '49'], ['simon', '31'], ['Gómez', '33'], ['alex', '36'], ['Gómez', '39'], ['simon', '40'], ['Pérez', '28'], ['alex', '47'], ['Gómez', '28'], ['alex', '47'], ['Pérez', '50'], ['simon', '26'], ['Pérez', '24'], ['alex', '38'], ['Pérez', '32'], ['simon', '30'], ['Muñoz', '32'], ['alex', '28'], ['Gómez', '25'], ['simon', '24'], ['Méndez', '33'], ['alex', '37'], ['Gómez', '37'], ['simon', '41'], ['Sopetón', '49'], ['alex', '38'], ['Méndez', '24'], ['alex', '39'], ['Sopetón', '29'], ['simon', '47'], ['Sopetón', '29'], ['simon', '24'], ['Muñoz', '49'], ['alex', '44'], ['Sopetón', '40'], ['alex', '21'], ['Pérez', '32'], ['simon', '28'], ['Muñoz', '34'], ['alex', '39'], ['Gómez', '38'], ['alex', '32'], ['Sopetón', '26'], ['simon', '20'], ['Gómez', '30'], ['alex', '39'], ['Pérez', '42'], ['alex', '47'], ['Sopetón', '22'], ['simon', '37'], ['Pérez', '39'], ['simon', '47']]
-
+    ...     reader = csv.reader(csvfile)
+    ...     rows = list(reader)
+    ...     print(rows)
+    [['Name', 'Age'], ['Méndez', '38'], ['simon', '28'], ['Sopetón', '35'], ['alex', '35'], ['Pérez', '45'], ['simon', '23'], ['Pérez', '20'], ['alex', '33'], ['Muñoz', '44'], ['simon', '42'], ['Pérez', '28'], ['simon', '38'], ['Sopetón', '48'], ['alex', '20'], ['Sopetón', '20'], ['simon', '50'], ['Pérez', '41'], ['simon', '33'], ['Sopetón', '36'], ['simon', '44'], ['Pérez', '50'], ['alex', '37'], ['Méndez', '31'], ['simon', '41'], ['Méndez', '44'], ['alex', '50'], ['Gómez', '49'], ['simon', '33'], ['Muñoz', '49'], ['simon', '25'], ['Gómez', '23'], ['alex', '48'], ['Muñoz', '49'], ['alex', '36'], ['Méndez', '29'], ['alex', '38'], ['Pérez', '47'], ['alex', '38'], ['Sopetón', '35'], ['simon', '43'], ['Pérez', '33'], ['simon', '31'], ['Muñoz', '48'], ['alex', '22'], ['Pérez', '41'], ['simon', '44'], ['Méndez', '36'], ['alex', '31'], ['Pérez', '43'], ['simon', '35'], ['Sopetón', '29'], ['alex', '40'], ['Méndez', '25'], ['simon', '20'], ['Méndez', '37'], ['simon', '32'], ['Muñoz', '31'], ['alex', '34'], ['Gómez', '41'], ['simon', '32'], ['Muñoz', '45'], ['simon', '36'], ['Muñoz', '26'], ['alex', '50'], ['Sopetón', '35'], ['alex', '38'], ['Muñoz', '26'], ['alex', '35'], ['Gómez', '33'], ['alex', '20'], ['Muñoz', '37'], ['alex', '34'], ['Muñoz', '20'], ['simon', '40'], ['Méndez', '37'], ['simon', '47'], ['Sopetón', '45'], ['alex', '21'], ['Sopetón', '22'], ['simon', '34'], ['Sopetón', '44'], ['alex', '27'], ['Gómez', '23'], ['simon', '31'], ['Gómez', '22'], ['simon', '25'], ['Gómez', '36'], ['simon', '41'], ['Gómez', '40'], ['alex', '34'], ['Gómez', '35'], ['alex', '23'], ['Sopetón', '29'], ['alex', '30'], ['Pérez', '45'], ['simon', '28'], ['Sopetón', '28'], ['simon', '50'], ['Muñoz', '33'], ['simon', '27']]
     """
 
     if not isinstance(csv_file, str):

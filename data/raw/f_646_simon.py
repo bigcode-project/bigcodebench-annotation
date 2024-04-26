@@ -33,19 +33,17 @@ def f_646(df, target_column, target_values=None):
         >>> df = pd.DataFrame(rng.integers(0, 100, size=(1000, 2)), columns=['A', 'predict'])
         >>> model = f_646(df, 'predict')
         >>> print(model.coef_)
+        [-0.04934205]
         >>> print(model.intercept_)  
-
-            [-0.04934205]
-            53.67665840020308
+        53.67665840020308
 
         >>> rng = np.random.default_rng(seed=0)
         >>> df = pd.DataFrame(rng.integers(0, 100, size=(1000, 5)), columns=['A', 'B', 'C', 'D', 'predict'])
         >>> model = f_646(df, 'predict')
         >>> print(model.coef_)
+        [-0.00173703 -0.02190392 -0.03304266  0.00759771]
         >>> print(model.intercept_)
-        
-            [-0.00173703 -0.02190392 -0.03304266  0.00759771]
-            53.362739257681035
+        53.362739257681035
     """
 
     if not isinstance(df, pd.DataFrame):

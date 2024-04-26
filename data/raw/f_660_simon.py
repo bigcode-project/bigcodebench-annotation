@@ -20,6 +20,7 @@ def f_660(num_samples=100, n_estimators=100, random_seed=None, cv=5):
 
     Returns:
     float: The mean cross-validation score.
+    model: the trained model
 
     Raises:
     - ValueError: If num_samples / cv < 2
@@ -31,14 +32,15 @@ def f_660(num_samples=100, n_estimators=100, random_seed=None, cv=5):
     - sklearn.ensemble.RandomForestRegressor
 
     Example:
-    >>> cv_score = f_660(random_seed=21, cv=3, n_estimators=90, num_samples=28)
-    >>> print(cv_score)
-    -0.7631373607354236
+    >>> res = f_660(random_seed=21, cv=3, n_estimators=90, num_samples=28)
+    >>> print(res)
+    (-0.7631373607354236, RandomForestRegressor(n_estimators=90, random_state=21))
 
-    >>> cv_score = f_660()
-    >>> print(cv_score)
-    0.5932193408127572
+    >>> results = f_660(random_seed=1)
+    >>> print(results)
+    (0.47332912782858, RandomForestRegressor(random_state=1))
     '''
+    
     if num_samples / cv < 2:
         raise ValueError("num_samples / cv should be greater than or equal to 2.")
 

@@ -29,16 +29,10 @@ def f_648(df: pd.DataFrame, height: int, weight: int, columns: list) -> sm.regre
     Example:
     >>> df = pd.DataFrame({'Age': [30, 40], 'Height': [60, 70], 'Weight': [100, 150]})
     >>> model = f_648(df, 50, 120, ['Age', 'Height', 'Weight'])
-    >>> print(model)
-    <statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x000001D32E5EAAD0>
 
     >>> df = pd.DataFrame(np.random.randint(10,98,size=(100, 3)), columns=['Age', 'Height', 'Weight'])
     >>> model = f_648(df, 45, 72, columns=['Age', 'Height', 'Weight'])
-    >>> print(model.params)
-    const     36.613966
-    Height     0.133301
-    Weight     0.157604
-    dtype: float64
+
     """
     # Check for empty DataFrame
     if df.empty:
@@ -56,7 +50,6 @@ def f_648(df: pd.DataFrame, height: int, weight: int, columns: list) -> sm.regre
     X = sm.add_constant(X)
     model = sm.OLS(y, X)
     results = model.fit()
-
     return results
     
 

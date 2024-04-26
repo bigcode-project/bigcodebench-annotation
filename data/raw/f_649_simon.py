@@ -38,17 +38,17 @@ def f_649(data, target_column, test_size=0.2, random_state = 0) -> float:
     Example:
     >>> rng = np.random.default_rng(seed=42)
     >>> data = pd.DataFrame({
-    >>>     'x1': rng.random(100),
-    >>>     'x2': rng.random(100),
-    >>>     'y': rng.random(100)
-    >>> })
+    ...     'x1': rng.random(100),
+    ...     'x2': rng.random(100),
+    ...     'y': rng.random(100)
+    ... })
     >>> result = f_649(data, 'y', random_state=2, test_size=0.3)
     >>> result
     -0.25486317198996633
 
     >>> data = pd.DataFrame({
-    >>>     'x1': rng.random(500),
-    >>> })
+    ...     'x1': rng.random(500),
+    ... })
     >>> data['y'] = data['x1'] * 2 + 1
     >>> result = f_649(data, 'y', random_state=9, test_size=0.1)
     >>> result

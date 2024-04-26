@@ -26,12 +26,12 @@ def f_667(df, col1, col2, N=10):
     - heapq
 
     Example:
-    >>>    df = pd.DataFrame({
-    ...        'col1': [99, 86, 90, 70, 86, 95, 56, 98, 80, 81],
-    ...        'col2': [21, 11, 21, 1, 26, 40, 4, 50, 34, 37]
-    ...         })
-    >>>    p_value = f_667(df, 'col1', 'col2', N=5)
-    >>>    print(p_value)    
+    >>> df = pd.DataFrame({
+    ...     'col1': [99, 86, 90, 70, 86, 95, 56, 98, 80, 81],
+    ...     'col2': [21, 11, 21, 1, 26, 40, 4, 50, 34, 37]
+    ... })
+    >>> p_value = f_667(df, 'col1', 'col2', N=5)
+    >>> print(p_value)    
     4.676251508205865e-06
 
     >>> df = pd.DataFrame({

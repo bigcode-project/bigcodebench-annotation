@@ -26,10 +26,10 @@ def f_670(length, random_seed=None):
           definition of the bracket set.
 
     Example:
-    >>> string = f_670(10)
+    >>> string = f_670(10, random_seed=1)
     >>> print(string)
-    vszb)zqkhy
-
+    ieqh]{[yng
+    
     >>> string = f_670(34, random_seed=42)
     >>> print(string)
     hbrpoigf)cbfnobm(o{rak)vrjnvgfygww

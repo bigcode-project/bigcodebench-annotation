@@ -28,14 +28,14 @@ def f_652(num_samples, countries=['Russia', 'China', 'USA', 'India', 'Brazil'],
     - sklearn.preprocessing.LabelEncoder
 
     Example:
-    >>> demographics = f_652(5)
-    >>> print(demographics.head())
-       Country  Age  Gender
-    0    Russia   23      1
-    1    China   34      0
-    2    USA     45      1
-    3    India   28      0
-    4    Brazil  39      1
+    >>> demographics = f_652(5, rng_seed=31)
+    >>> print(demographics)
+      Country  Age  Gender
+    0     USA   46       0
+    1  Brazil   21       1
+    2     USA   37       1
+    3  Russia   32       1
+    4     USA   46       0
 
     >>> demographics = f_652(5, countries=['Austria', 'Germany'], rng_seed=3)
     >>> print(demographics)
