@@ -18,6 +18,7 @@ def f_682(letter_list, element, log_path):
     Parameters:
     letter_list (list of str): The list of letters.
     element (str): The specific letter for which the frequency needs to be counted.
+    log_path (str): the path to the folder in which to save the log file
 
     Returns:
     int: The frequency of the letter.
@@ -62,18 +63,20 @@ def f_682(letter_list, element, log_path):
 
     if element not in letter_list:
         logger.error("The element is not in the letter list.")
-        logging.shutdown()
         logger.handlers[0].close
         logger.removeHandler(logger.handlers[0])
+        logging.shutdown()
+
         raise ValueError("The element is not in the letter list.")
         
     letter_frequencies = Counter(letter_list)
     element_frequency = letter_frequencies[element]
     
     logger.info(f"Frequency of '{element}' is {element_frequency}")
-    logging.shutdown()
     logger.handlers[0].close
     logger.removeHandler(logger.handlers[0])
+    logging.shutdown()
+
     return element_frequency
 
 
@@ -90,17 +93,18 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
 
-    def setUp(self):
-        self.temp_folder = tempfile.mkdtemp()
+    @classmethod
+    def setUpClass(cls):
+        cls.temp_folder = tempfile.mkdtemp()
 
-    def tearDown(self) -> None:
-        shutil.rmtree(self.temp_folder)
-        self.temp_folder = None
+    @classmethod
+    def tearDownClass(cls):       
+        shutil.rmtree(cls.temp_folder)
 
     def test_case_1(self):
         result = f_682(['a', 'b', 'a', 'c', 'a'], 'a', self.temp_folder)
         self.assertEqual(result, 3)
-        with open(self.temp_folder+'/f_682.log') as log:
+        with open(TestCases.temp_folder+'/f_682.log') as log:
             self.assertTrue("INFO:Function called with list: ['a', 'b', 'a', 'c', 'a'] and element: a" in log.readline())
             self.assertTrue("INFO:Frequency of 'a' is 3" in log.readline())
 
