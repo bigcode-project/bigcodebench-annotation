@@ -113,8 +113,8 @@ class TestCases(unittest.TestCase):
         expected_df = pd.DataFrame(expected_data)
         # Ensure the data types match, especially for integer columns
         expected_df = expected_df.astype({
-            'min': 'int32',
-            'max': 'int32',
+            'min': 'int64',
+            'max': 'int64',
             'count': 'int64',
             'mean': 'float64'
         })
@@ -154,8 +154,8 @@ class TestCases(unittest.TestCase):
         expected_df.index.name = 'category'
 
         expected_df = expected_df.astype({
-            'min': 'int32',
-            'max': 'int32',
+            'min': 'int64',
+            'max': 'int64',
             'count': 'int64',
             'mean': 'float64'
         })

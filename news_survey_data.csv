@@ -1,0 +1,9 @@
+Site,Category,Response,Value
+dog,fun,false,2
+cat,fun,true,1
+dog,fun,false,2
+dog,test,true,1
+cat,fun,false,2
+cat,fun,true,1
+cat,test,true,1
+dog,fun,true,1
