@@ -27,6 +27,30 @@ def f_647(df, age, weight):
         - sklearn.preprocessing.StandardScaler
         - pandas
 
+    Examples:
+
+    >>> data = pd.DataFrame({
+    ...     "Age": [32, 51, 11, 5, 88, 434],
+    ...     "Weight": [62, 76, 72, 859, 69, 102],
+    ...     "shoe_size": [12, 6, 7, 8, 9, 6]
+    ... })
+    >>> print(f_647(data, 70, 63))
+        Age    Weight  shoe_size
+    0  1.40400 -0.701695  -1.224745
+    1 -0.55507 -0.712504   0.000000
+    2 -0.84893  1.414200   1.224745
+
+    >>> input = pd.DataFrame({
+    ...     "Age": [32, 51, 12, 1, 55, 11, 23, 5],
+    ...     "Weight": [62, 63, 12, 24, 11, 111, 200, 70],
+    ...     "banana_consumption": [1, 1, 7, 2, 100, 6, 26, 1]
+    ... })
+    ... print(f_647(input, 32, 22))
+        Age    Weight  banana_consumption
+    0 -1.083473 -1.192322           -0.666109
+    1  0.120386  0.150487           -0.271378
+    2  1.565016  1.524165            1.702277
+    3 -0.601929 -0.482331           -0.764791
     """
     selected_df = df[(df['Age'] < age) & (df['Weight'] > weight)]
     
