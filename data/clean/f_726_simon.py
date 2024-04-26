@@ -35,7 +35,7 @@ def f_726(df, columns=['A', 'B', 'C'], larger=50, equal=900):
     ValueError: If the specified columns are not contained in df.
     
 
-    Requires:
+    Requirements:
     - pandas
     - scipy.stats
 
