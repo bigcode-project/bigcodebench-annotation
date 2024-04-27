@@ -1,5 +1,7 @@
 import pandas as pd
 import time
+output_dir = './output'
+
 
 def f_493(df: pd.DataFrame, filename: str) -> str:
     """
@@ -23,10 +25,10 @@ def f_493(df: pd.DataFrame, filename: str) -> str:
     """
     start_time = time.time()
     # Ensure the data directory exists
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
-    file_path = os.path.join(DATA_DIR, filename)
+    file_path = os.path.join(output_dir, filename)
 
     # Save DataFrame as JSON Lines
     with open(file_path, 'w') as file:
@@ -45,22 +47,17 @@ import json
 import shutil
 
 
-# Set DATA_DIR to the 'data' subdirectory in the parent directory of this script
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(CURRENT_DIR, 'data')
-
-
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create the data directory if it doesn't exist."""
-        if not os.path.exists(DATA_DIR):
-            os.makedirs(DATA_DIR)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
     @classmethod
     def tearDownClass(cls):
         """Clean up by removing the data directory and its contents after tests."""
-        shutil.rmtree(DATA_DIR, ignore_errors=True)
+        shutil.rmtree(output_dir, ignore_errors=True)
 
     def test_basic_dataframe(self):
         """Ensure basic DataFrame is saved correctly."""

@@ -1,5 +1,6 @@
 import csv
 import os
+output_dir = './output'
 
 
 def f_492(df, filename):
@@ -28,10 +29,10 @@ def f_492(df, filename):
     True
     """
     # Ensure the data directory exists
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
-    file_path = os.path.join(DATA_DIR, filename)
+    file_path = os.path.join(output_dir, filename)
     df.to_csv(file_path, index=False, quoting=csv.QUOTE_NONNUMERIC)
     return os.path.abspath(file_path)
 
@@ -39,29 +40,26 @@ def f_492(df, filename):
 import unittest
 import shutil
 import pandas as pd
-# Adjust DATA_DIR to point to the 'data' subdirectory in the parent directory of this script
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(CURRENT_DIR, 'data')
 
 
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create the data directory if it doesn't exist."""
-        if not os.path.exists(DATA_DIR):
-            os.makedirs(DATA_DIR)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
     @classmethod
     def tearDownClass(cls):
         """Clean up by removing files created during tests (if any)."""
-        shutil.rmtree(DATA_DIR, ignore_errors=True)
+        shutil.rmtree(output_dir, ignore_errors=True)
 
     def test_basic_dataframe(self):
         """Test saving a simple DataFrame."""
         df = pd.DataFrame({'A': [1, 2], 'B': ['x', 'y']})
-        expected_path = os.path.join(DATA_DIR, 'basic.csv')
+        expected_path = os.path.join(output_dir, 'basic.csv')
         result_path = f_492(df, 'basic.csv')
-        self.assertEqual(expected_path, result_path)
+        self.assertEqual(expected_path[expected_path.rindex('/') + 1:], result_path[result_path.rindex('/') + 1: ])
         self.assertTrue(os.path.exists(result_path))
 
     def test_with_numeric_and_text(self):

@@ -44,9 +44,9 @@ import unittest
 import os
 import shutil
 
-current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
-if not os.path.exists(current_directory_path):
-    os.makedirs(current_directory_path)
+output_dir = './output'
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
 
 def run_tests():
@@ -64,12 +64,12 @@ class TestCases(unittest.TestCase):
         # Check and remove the expected file if it exists
         # if os.path.exists(FILE_PATH):
         #     os.remove(FILE_PATH)
-        if os.path.exists(current_directory_path):
-            shutil.rmtree(current_directory_path)
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
 
     def test_case_1(self):
         # Testing basic encryption and file write
-        file1 = os.path.join(current_directory_path, 'test1.txt')
+        file1 = os.path.join(output_dir, 'test1.txt')
         encrypted = f_505(file1, 'Hello, World!', 'password123')
         with open(file1, 'r') as f:
             file_content = f.read()
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_2(self):
         # Testing with different data and password
-        file2 = os.path.join(current_directory_path, 'test2.txt')
+        file2 = os.path.join(output_dir, 'test2.txt')
         encrypted = f_505(file2, 'OpenAI', 'secret')
         with open(file2, 'r') as f:
             file_content = f.read()
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_3(self):
         # Testing with special characters in data and password
-        file3 = os.path.join(current_directory_path, 'test3.txt')
+        file3 = os.path.join(output_dir, 'test3.txt')
         data = '!@#$%^&*()_+'
         password = 'special_chars'
         encrypted = f_505(file3, data, password)
@@ -95,7 +95,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_4(self):
         # Testing file creation if it doesn't exist
-        file4 = os.path.join(current_directory_path, 'nonexistent_file.txt')
+        file4 = os.path.join(output_dir, 'nonexistent_file.txt')
         if os.path.exists(file4):
             os.remove(file4)
         encrypted = f_505(file4, 'Test Data', 'pwd')
@@ -103,7 +103,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_5(self):
         # Testing decryption to ensure encryption is reversible
-        file5 = os.path.join(current_directory_path, 'test5.txt')
+        file5 = os.path.join(output_dir, 'test5.txt')
         data = 'Decryption Test'
         password = 'decrypt_pwd'
         encrypted = f_505(file5, data, password)

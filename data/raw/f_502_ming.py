@@ -40,14 +40,14 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
 
 import unittest
 import shutil
-# Set DATA_DIR to the 'data' subdirectory in the current script's directory
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
+output_dir = './output'
 
 
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.test_dir = DATA_DIR
+        cls.test_dir = output_dir
         if not os.path.exists(cls.test_dir):
             os.makedirs(cls.test_dir)
 

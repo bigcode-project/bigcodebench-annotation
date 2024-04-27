@@ -1,8 +1,10 @@
 import numpy as np
 import pandas as pd
+import os
 
 # Constants
 LETTERS = list('abcdefghijklmnopqrstuvwxyz')
+output_dir = './output'
 
 
 def f_464(file_path):
@@ -20,7 +22,9 @@ def f_464(file_path):
     - numpy
 
     Example:
-    >>> f_464('random_matrix.csv')
+    >>> if not os.path.exists(output_dir):
+    ...     os.mkdir(output_dir)
+    >>> f_464(os.path.join(output_dir, 'random_matrix.csv'))
     """
     matrix = pd.DataFrame(np.random.choice(LETTERS, (10, 10)))
     matrix.to_csv(file_path, sep='\t', header=False, index=False)
@@ -31,8 +35,6 @@ def f_464(file_path):
 import unittest
 import shutil
 import os
-current_directory_path = os.getcwd()
-output_dir = os.path.join(current_directory_path, 'output')
 if not os.path.exists(output_dir):
     os.mkdir(output_dir)
 
