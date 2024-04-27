@@ -9,7 +9,7 @@ def f_1729(mean, std_dev, num_samples):
     with the fit results, showing the mean and standard deviation used in the generation.
     The function returns both the plot and the samples generated.
 
-    Args:
+    Parameters:
         mean (float): The mean of the normal distribution.
         std_dev (float): The standard deviation of the normal distribution.
         num_samples (int): The number of samples to draw from the distribution.

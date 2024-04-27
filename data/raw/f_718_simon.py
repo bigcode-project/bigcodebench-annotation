@@ -13,7 +13,7 @@ def f_718(data_dict, source_directory, backup_directory):
     2. Sorts the dictionary by the frequency of its values in descending order.
     3. Backs up all files from the specified source directory to a backup directory.
 
-    Args:
+    Parameters:
         data_dict (dict): The dictionary to be modified and sorted.
         source_directory (str): The path to the source directory containing files to be backed up.
         backup_directory (str): The path to the backup directory where files will be copied.

@@ -8,7 +8,7 @@ def f_1897(ip_range, port):
     The function returns a dictionary with IP addresses as keys and a boolean indicating
     the port's status (True if open, False otherwise).
 
-    Args:
+    Parameters:
         ip_range (str): The IP address range to scan, in CIDR notation.
         port (int): The port number to check on each IP in the range.
 

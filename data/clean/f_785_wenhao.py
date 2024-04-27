@@ -12,10 +12,6 @@ def f_785(start_date=START_DATE, periods=PERIODS, freq=FREQ, categories=CATEGORI
     """
     Create and visualize a sales report for different categories over a period of time.
     
-    Functionality:
-    - Generates a DataFrame containing sales data for given categories over a time range.
-    - Visualizes the sales data using a line plot.
-    
     Parameters:
     - start_date (str): The start date for the report in 'YYYY-MM-DD' format. Default is '2016-01-01'.
     - periods (int): The number of periods for the report. Default is 13.

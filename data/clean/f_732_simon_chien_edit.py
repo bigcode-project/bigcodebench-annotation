@@ -33,6 +33,12 @@ def f_732(data_dir,
     >>> file_name, df = f_732('test_data')
     >>> print(file_name)
     'file2.csv'
+    >>> print(df)
+           Animal     Weight
+     0        Cat          1
+    21      Mouse         12
+    15   Elephant       1000
+     2      Tiger        500
     """
 
     random.seed(seed)

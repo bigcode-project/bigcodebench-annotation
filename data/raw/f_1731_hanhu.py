@@ -9,7 +9,7 @@ def f_1732(num_strings, string_length):
     and their frequencies sorted by frequency in descending order.
     The random strings are composed of ASCII lowercase characters.
 
-    Args:
+    Parameters:
         num_strings (int): The number of random strings to generate.
         string_length (int): The length of each random string.
 

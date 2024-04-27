@@ -5,7 +5,7 @@ def f_735(logs: list):
     """
     Analyze the given list of logs for the occurrence of errors and calculate the average time of occurrence of errors.
     
-    Args:
+    Parameters:
     - logs (list): A list of log strings.
     
     Returns:
