@@ -38,9 +38,6 @@ def f_492(df, filename):
 
 import unittest
 import shutil
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 import pandas as pd
 # Adjust DATA_DIR to point to the 'data' subdirectory in the parent directory of this script
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))

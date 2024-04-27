@@ -35,10 +35,8 @@ def f_486(cities_list):
 
     return population_df
 
+
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 def run_tests():

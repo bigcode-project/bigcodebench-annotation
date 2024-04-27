@@ -45,10 +45,8 @@ def f_490(dataset, filename):
 
 import unittest
 import shutil
-import matplotlib
 import pandas as pd
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
 # Set the directory for data relative to the current file's location
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(CURRENT_DIR, 'data')

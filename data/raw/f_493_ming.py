@@ -43,9 +43,7 @@ import pandas as pd
 import os
 import json
 import shutil
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
 
 # Set DATA_DIR to the 'data' subdirectory in the parent directory of this script
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))

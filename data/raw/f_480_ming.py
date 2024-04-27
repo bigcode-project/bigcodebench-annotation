@@ -56,11 +56,9 @@ def f_480(goals, penalties, rng_seed=None):
     return results_df, model
 
 
-import matplotlib
 import unittest
 import numpy as np
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
 
 # Unit Tests
 class TestCases(unittest.TestCase):

@@ -48,9 +48,6 @@ def f_468(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
 import unittest
 from unittest.mock import patch
 import numpy as np
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 class TestCases(unittest.TestCase):

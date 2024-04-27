@@ -49,9 +49,6 @@ def f_475(goals, penalties):
 
 import unittest
 from unittest.mock import patch
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 # Unit tests for the function f_475

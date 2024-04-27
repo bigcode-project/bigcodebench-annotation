@@ -49,10 +49,9 @@ def f_524(x, y, labels):
     return fig
 
 import unittest
-import matplotlib
 import matplotlib.pyplot as plt
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
+
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

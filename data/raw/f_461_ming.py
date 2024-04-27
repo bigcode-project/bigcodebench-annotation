@@ -45,9 +45,6 @@ def f_461(df, letter):
 
 import unittest
 from unittest.mock import patch
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 

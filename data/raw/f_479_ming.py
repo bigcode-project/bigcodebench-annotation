@@ -46,8 +46,7 @@ def f_479(goals, penalties):
     return results_df, [plot1, plot2]
 
 import unittest
-import matplotlib# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import matplotlib
 
 
 # Importing the refined function

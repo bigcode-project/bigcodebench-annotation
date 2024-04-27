@@ -35,11 +35,9 @@ def f_487(date_str, from_tz):
 
     return converted_date.strftime('%Y-%m-%d %H:%M:%S'), to_tz.zone
 
+
 import unittest
 from datetime import datetime
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 def run_tests():

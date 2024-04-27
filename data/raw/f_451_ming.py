@@ -3,6 +3,7 @@ from scipy import stats
 import matplotlib.pyplot as plt
 
 
+
 def f_451(size=1000, bin_width=100):
     '''
     Create a list of normally distributed random numbers and plot their histogram and probability density function (PDF).
@@ -20,6 +21,7 @@ def f_451(size=1000, bin_width=100):
     - matplotlib.figure.Figure: A figure object containing the histogram and PDF plot.
     
     Example:
+    >>> import matplotlib
     >>> fig = f_451(size=500, bin_width=50)
     >>> isinstance(fig, matplotlib.figure.Figure)  # Check if the output is a matplotlib figure object
     True
@@ -47,10 +49,6 @@ def f_451(size=1000, bin_width=100):
     
 
 import unittest
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
 
 def run_tests():

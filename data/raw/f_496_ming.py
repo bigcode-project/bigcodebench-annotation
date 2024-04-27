@@ -40,6 +40,7 @@ def f_496(text, n=2):
         - sklearn.feature_extraction.text
 
     Example:
+    >>> import matplotlib
     >>> text = "hello hello world world"
     >>> df, ax = f_496(text, n=2)
     >>> df.columns.tolist()
@@ -85,9 +86,6 @@ def f_496(text, n=2):
 
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 class TestCases(unittest.TestCase):

@@ -38,9 +38,6 @@ def f_485(L):
 
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 def run_tests():

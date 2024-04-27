@@ -52,9 +52,7 @@ def f_497(rows):
 
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
 
 # Test function
 def run_tests():

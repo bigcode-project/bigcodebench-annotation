@@ -52,11 +52,10 @@ def f_525(sales_data):
 
 
 import unittest
-import matplotlib
 import pandas as pd
 import numpy as np
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
+
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -36,10 +36,8 @@ def f_445(array_length=100):
     
 
 import unittest
-import matplotlib
 import matplotlib.pyplot as plt
 
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
 def run_tests():
     suite = unittest.TestSuite()

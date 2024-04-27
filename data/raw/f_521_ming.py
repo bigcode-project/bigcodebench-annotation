@@ -48,9 +48,6 @@ def f_521(x, y, labels):
 
 import unittest
 import numpy.testing as npt
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 class TestCases(unittest.TestCase):

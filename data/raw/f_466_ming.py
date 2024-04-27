@@ -31,9 +31,6 @@ def f_466(matrix):
 import unittest
 import numpy as np
 import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
-# Importing the refined function
 
 
 def run_tests():

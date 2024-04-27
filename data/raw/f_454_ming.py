@@ -61,11 +61,7 @@ def f_454(hours, file_path=FILE_PATH):
 
 
 import unittest
-import matplotlib
 import os
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
 
 def run_tests():

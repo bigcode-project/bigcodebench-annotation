@@ -44,10 +44,7 @@ def f_472(df, tuples, n_plots):
     return df, plot_details
 
 
-import matplotlib
 import unittest
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 import numpy as np
 import pandas as pd
 

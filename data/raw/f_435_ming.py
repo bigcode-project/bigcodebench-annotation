@@ -57,8 +57,7 @@ def f_435(list_of_menuitems):
 
 import unittest
 import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
 
 class TestCases(unittest.TestCase):
     def setUp(self):

@@ -39,9 +39,6 @@ def f_514(dataframe, target_value='332'):
 
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 import pandas as pd
 
 

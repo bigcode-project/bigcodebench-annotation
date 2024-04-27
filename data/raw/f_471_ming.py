@@ -47,9 +47,6 @@ def f_471(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 import numpy as np
 
 

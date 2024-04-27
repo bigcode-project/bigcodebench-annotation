@@ -67,12 +67,9 @@ def f_456(hours, current_directory_path = os.path.join(os.getcwd(), os.path.spli
 import unittest
 from unittest.mock import patch
 import shutil
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
 FILE_PATH = os.path.join(current_directory_path, 'traffic_data.csv')
+
 
 class TestCases(unittest.TestCase):
 

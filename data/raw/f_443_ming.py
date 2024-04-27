@@ -40,10 +40,7 @@ def f_443(data):
     return ax
 
 import unittest
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 
 def run_tests():
     suite = unittest.TestSuite()

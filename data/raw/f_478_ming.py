@@ -67,10 +67,9 @@ def f_478(goals, penalties, rng_seed=None, teams=TEAMS):
     return results_df
 
 
-import matplotlib
 import unittest
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
+
 # Unit Tests
 class TestCases(unittest.TestCase):
     def setUp(self):

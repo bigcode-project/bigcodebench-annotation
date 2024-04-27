@@ -39,17 +39,16 @@ def f_470(df, tuples, n_plots):
 
 
 import unittest
-import matplotlib
 import pandas as pd
 import numpy as np
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
 
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 
 class TestCases(unittest.TestCase):
     def setUp(self):

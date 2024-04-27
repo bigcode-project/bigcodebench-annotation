@@ -38,9 +38,6 @@ def f_500(num_samples=100, num_features=5):
 
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
