@@ -20,7 +20,7 @@ def f_518(texts, stopwords=None):
 
     Requirements:
     - re
-    - nltk (optional if stopwords are provided)
+    - nltk
     - gensim
 
     Example:

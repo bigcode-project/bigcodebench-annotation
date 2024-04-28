@@ -1,6 +1,7 @@
 import binascii
 import hashlib
 import re
+output_dir = './output'
 
 
 def f_503(directory: str, pattern: str = r"(?<!Distillr)\\AcroTray\.exe") -> dict:
@@ -17,12 +18,11 @@ def f_503(directory: str, pattern: str = r"(?<!Distillr)\\AcroTray\.exe") -> dic
 
     Requirements:
     - re
-    - os
     - hashlib
     - binascii
 
     Example:
-    >>> f_503(DATA_DIR)
+    >>> f_503(output_dir)
     {}
     """
     hashes = {}
@@ -41,13 +41,12 @@ import unittest
 import tempfile
 import shutil
 import os
-# Set DATA_DIR to the 'data' subdirectory in the current script's directory
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
 
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.test_dir = DATA_DIR
+        cls.test_dir = output_dir
         if not os.path.exists(cls.test_dir):
             os.makedirs(cls.test_dir)
 

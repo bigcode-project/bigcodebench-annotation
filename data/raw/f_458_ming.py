@@ -1,10 +1,6 @@
 import time
-import unittest
 from datetime import datetime
 from random import randint
-from unittest.mock import patch
-
-import matplotlib
 import matplotlib.pyplot as plt
 
 
@@ -25,6 +21,10 @@ def f_458(duration):
     - time
     - random
     - matplotlib.pyplot
+
+    Example:
+    >>> type(f_458(1))
+    <class 'tuple'>
     """
     # Constants
     VALUES_RANGE = (0, 100)
@@ -52,8 +52,8 @@ def f_458(duration):
 
 ### Unit Tests
 # Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+import unittest
+from unittest.mock import patch
 
 
 class TestCases(unittest.TestCase):

@@ -5,14 +5,11 @@ from datetime import datetime
 from random import randint
 
 # Constants
-current_directory_path = os.getcwd()
-# print(current_directory_path)
-FILE_PATH = os.path.join(current_directory_path, 'weather_data.csv')
 WEATHER_CONDITIONS = ['Sunny', 'Cloudy', 'Rainy', 'Snowy', 'Stormy']
-BACKUP_PATH = os.path.join(current_directory_path, 'backup/')
+output_dir = './output'
 
 
-def f_457(hours):
+def f_457(hours, output_dir = output_dir):
     """
     Generate weather data for the specified number of hours, save it in a CSV file and back up the file to a backup directory.
     
@@ -35,6 +32,8 @@ def f_457(hours):
     >>> 'weather_data.csv' in f_457(10)
     True
     """
+    FILE_PATH = os.path.join(output_dir, 'weather_data.csv')
+    BACKUP_PATH = os.path.join(output_dir, 'backup/')
     data = [['Time', 'Condition']]
     for i in range(hours):
         row = [datetime.now().strftime('%H:%M:%S.%f'), WEATHER_CONDITIONS[randint(0, len(WEATHER_CONDITIONS)-1)]]
@@ -53,6 +52,9 @@ def f_457(hours):
 
 import unittest
 from unittest.mock import patch, mock_open
+
+FILE_PATH = os.path.join(output_dir, 'weather_data.csv')
+BACKUP_PATH = os.path.join(output_dir, 'backup/')
 
 
 class TestCases(unittest.TestCase):
@@ -77,7 +79,7 @@ class TestCases(unittest.TestCase):
         if os.path.exists(BACKUP_PATH):
             shutil.rmtree(BACKUP_PATH)
 
-    @patch('os.getcwd', return_value=current_directory_path)
+    @patch('os.getcwd', return_value=output_dir)
     @patch('os.path.exists', return_value=True)
     def test_f_457_checks_backup_directory_exists(self, mock_exists, mock_getcwd):
         """Test checking for the existence of the backup directory."""
@@ -88,7 +90,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(expected_call_path, actual_call_path,
                          f"Expected {expected_call_path}, got {actual_call_path}")
 
-    @patch('os.getcwd', return_value=current_directory_path)
+    @patch('os.getcwd', return_value=output_dir)
     @patch('shutil.copy')
     def test_f_457_copies_to_backup_directory(self, mock_copy, mock_getcwd):
         """Test if f_457 copies the weather_data.csv file to the backup directory."""
@@ -99,7 +101,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(expected_backup_dir, actual_backup_dir,
                          "The backup directory path does not match the expected directory path.")
 
-    @patch('os.getcwd', return_value=current_directory_path)
+    @patch('os.getcwd', return_value=output_dir)
     @patch('os.makedirs')
     @patch('os.path.exists', side_effect=lambda path: path in [FILE_PATH, BACKUP_PATH])
     @patch('builtins.open', new_callable=mock_open, read_data="Time,Condition\n")
@@ -130,6 +132,7 @@ class TestCases(unittest.TestCase):
         """Test if CSV writer is called with correct parameters."""
         f_457(1)
         mock_csv_writer.assert_called_once()
+
 
 def run_tests():
     suite = unittest.TestSuite()

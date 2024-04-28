@@ -16,11 +16,11 @@ def f_514(dataframe, target_value='332'):
         - matplotlib.axes._subplots.AxesSubplot: The Axes object of the heatmap.
 
     Requirements:
-    - pandas
     - matplotlib.pyplot
     - seaborn
 
     Example:
+    >>> import pandas as pd
     >>> df = pd.DataFrame({
     ...     'Column1': ['0', 'a', '332', '33'],
     ...     'Column2': ['1', 'bb', '33', '22'],
@@ -40,9 +40,6 @@ def f_514(dataframe, target_value='332'):
 
 import unittest
 import pandas as pd
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 class TestCases(unittest.TestCase):

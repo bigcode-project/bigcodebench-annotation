@@ -49,11 +49,9 @@ def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
 
 import unittest
 from unittest.mock import patch
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
-class TestCases(unittest.TestCase):
 
+
+class TestCases(unittest.TestCase):
     @patch(__name__ + '.choice', return_value=400)
     def test_goals_greater_than_penalties(self, mock_choice):
         goals = {'Team A': 4, 'Team B': 2, 'Team C': 0, 'Team D': 0, 'Team E': 0}

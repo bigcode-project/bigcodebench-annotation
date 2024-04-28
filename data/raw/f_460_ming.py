@@ -1,4 +1,5 @@
 import pandas as pd
+import time
 
 
 def f_460(df, letter):
@@ -16,18 +17,21 @@ def f_460(df, letter):
     
     Requirements:
     - pandas
-    - re
+    - time
 
     Example:
     >>> df = {'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'kiwi']}
     >>> f_460(df, 'a')
     {5: 1}
     """
+    start_time = time.time()
     df = pd.DataFrame(df)
     regex = '^' + letter
     filtered_df = df[df['Word'].str.contains(regex, regex=True)]
     word_lengths = filtered_df['Word'].str.len()
     count_dict = word_lengths.value_counts().to_dict()
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
 
     return count_dict
 

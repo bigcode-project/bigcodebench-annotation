@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+output_dir = './output'
+
 
 def f_491(df, filename):
     """
@@ -24,33 +26,31 @@ def f_491(df, filename):
     >>> 'data.json' in f_491(df, 'data.json')
     True
     """
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
-    file_path = os.path.join(DATA_DIR, filename)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    file_path = os.path.join(output_dir, filename)
     df_clean = df.where(pd.notnull(df), None)
     with open(file_path, 'w') as f:
         df_clean.to_json(f, orient='records')
     return file_path
 
+
 import unittest
 import json
 import shutil
 
-# Set DATA_DIR to the 'data' subdirectory in the current file's parent directory
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(CURRENT_DIR, 'data')
 
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up testing environment; ensure data directory exists."""
-        if not os.path.exists(DATA_DIR):
-            os.makedirs(DATA_DIR)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
     @classmethod
     def tearDownClass(cls):
         """Clean up; remove the data directory and its contents after tests."""
-        shutil.rmtree(DATA_DIR, ignore_errors=True)
+        shutil.rmtree(output_dir, ignore_errors=True)
 
     def test_basic_dataframe(self):
         """Test saving a simple DataFrame."""

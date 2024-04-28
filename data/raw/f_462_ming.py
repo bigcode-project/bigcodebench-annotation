@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+
 def f_462(df, letter):
     """
     The function filters rows in a DataFrame in which the values of a particular column start with a particular letter and then calculates the length of the words in the filtered column and returns basic statistics (mean, median, mode) of the word lengths.
@@ -14,9 +15,6 @@ def f_462(df, letter):
     
     Requirements:
     - pandas
-    - re
-    - random
-    - nltk
     - numpy
 
     Example:
@@ -34,6 +32,7 @@ def f_462(df, letter):
     statistics = {'mean': np.mean(word_lengths), 'median': np.median(word_lengths), 'mode': word_lengths.mode().values[0]}
 
     return statistics
+
 
 import unittest
 import random

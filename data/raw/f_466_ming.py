@@ -1,7 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
-
 
 def f_466(matrix):
     """
@@ -15,10 +13,10 @@ def f_466(matrix):
     
     Requirements:
     - pandas
-    - numpy
     - matplotlib.pyplot
     
     Example:
+    >>> import numpy as np
     >>> matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     >>> ax = f_466(matrix)
     """
@@ -29,11 +27,10 @@ def f_466(matrix):
 
     return ax
 
+
 import unittest
+import numpy as np
 import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
-# Importing the refined function
 
 
 def run_tests():

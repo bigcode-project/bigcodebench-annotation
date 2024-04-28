@@ -59,9 +59,6 @@ def f_477(goals, penalties, teams=TEAMS, penalty_cost=PENALTY_COST, rng_seed=Non
 
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 # Unit Tests

@@ -10,6 +10,7 @@ from glob import glob
 from pprint import pprint
 from tqdm import tqdm
 
+
 def extract_apis(code):
     tree = ast.parse(code)
     api_list = []
@@ -167,6 +168,7 @@ def remove_trailing_comments(text):
     # Return the text up to and including the last non-comment line, joined back into a single string
     return '\n'.join(lines[:i+1])
 
+
 def extract_test(file_contents, function_name):
     """
     Extracts the content after a specified function in a given Python script using the ast module,
@@ -288,8 +290,8 @@ def extract_content(file_path, rename_id=None):
     data["apis"] = extract_apis(data["prompt"] + "\n" + data["canonical_solution"])
     data["libs"] = list(set([api.split(".")[0] for api in data["apis"]]))
     _, unused_imports = filter_unused_imports(data["prompt"], data["libs"])
-    # if unused_imports:
-    #     print(f"Unused imports in {file_path.replace('clean/','raw/')}: {unused_imports}")
+    if unused_imports:
+        print(f"Unused imports in {file_path.replace('clean/','raw/')}: {unused_imports}")
     docs = re.search(r'\"\"\"(.*?)\"\"\"', data["prompt"], re.DOTALL)
     if not docs:
         docs = re.search(r"'''(.*?)'''", data["prompt"], re.DOTALL)
@@ -432,6 +434,8 @@ if __name__ == "__main__":
     os.makedirs("data/processed", exist_ok=True)
     with open("data/open-eval.jsonl", "w") as f:
         for i, file in enumerate(tqdm(glob("data/clean/*.py"))):
+            # if "ming" in file:
+            #     continue
             data = extract_content(file, None)
             if not validate_lib_num(data):
                 print(file.replace('clean/', 'raw/'), "Less than 2 libraries are used")

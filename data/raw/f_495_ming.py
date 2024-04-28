@@ -1,6 +1,5 @@
 import itertools
 from typing import Any
-
 from scipy import stats
 
 
@@ -21,9 +20,12 @@ def f_495(input_list: list, repetitions: int) -> Any:
     - Returns a ModeResult object from scipy.stats containing the mode(s) and count(s).
     
     Requirements:
-    - numpy
+    - typing
     - itertools
-    - scipy.stats
+    - scipy
+
+    Returns:
+    - scipy.stats.ModeResult: An object containing the mode(s) and count(s) of the most frequently occurring element(s) in the flattened list.
     
     Examples:
     >>> f_495(['A', 'B', 'C'], 10)
@@ -39,6 +41,7 @@ def f_495(input_list: list, repetitions: int) -> Any:
     mode = stats.mode(flattened_list)
     
     return mode
+
 
 import unittest
 import numpy as np

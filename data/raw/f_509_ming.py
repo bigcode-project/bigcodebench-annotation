@@ -1,6 +1,5 @@
-from datetime import timedelta
-
 from dateutil.parser import parse
+from datetime import timedelta
 
 
 def f_509(date_str):
@@ -16,7 +15,6 @@ def f_509(date_str):
     Requirements:
     - datetime
     - dateutil.parser
-    - calendar
 
     Example:
     >>> f_509('2022-10-22')
@@ -36,8 +34,10 @@ def f_509(date_str):
 
     return next_day
 
+
 import unittest
 from datetime import datetime
+
 
 def run_tests():
     suite = unittest.TestSuite()

@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
+
 def f_523(x, y, labels):
     """ 
     Perform Principal Component Analysis (PCA) on "x" and "y" numpy arrays and record the results with labels.
@@ -40,9 +41,6 @@ def f_523(x, y, labels):
 
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 def run_tests():

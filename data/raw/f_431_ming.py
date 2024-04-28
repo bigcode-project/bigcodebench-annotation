@@ -2,6 +2,7 @@ import hashlib
 import os
 import base64
 
+
 def f_431(password: str, salt_length: int = 8) -> str:
     """
     Encrypt a password using Salt and SHA-256, then encode the result in base64.

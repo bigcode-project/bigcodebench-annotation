@@ -1,7 +1,5 @@
-import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-
+import time
 
 def f_463(df, letter):
     """
@@ -19,14 +17,15 @@ def f_463(df, letter):
                    returns None.
 
     Requirements:
-    - pandas
     - seaborn
-    - matplotlib.pyplot
+    - time
 
     Example:
+    >>> import pandas as pd
     >>> words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
     >>> df = pd.DataFrame({'Word': words})
     """
+    start_time = time.time()
     # Validate if 'Word' column exists in df
     if 'Word' not in df.columns:
         raise ValueError("The DataFrame should contain a 'Word' column.")
@@ -45,15 +44,16 @@ def f_463(df, letter):
     word_lengths = filtered_df['Word'].str.len()
     ax = sns.boxplot(x=word_lengths)
     ax.set_title(f"Word Lengths Distribution for Words Starting with '{letter}'")
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
     return ax
 
 
 import unittest
 from unittest.mock import patch
-import matplotlib
+import matplotlib.pyplot as plt
+import pandas as pd
 # Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
 
 class TestCases(unittest.TestCase):

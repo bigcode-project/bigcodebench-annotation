@@ -19,8 +19,8 @@ def f_440(a, b):
 
     Requirements:
     - pandas
-    - scipy.spatial.distance
-    - matplotlib
+    - scipy.spatial
+    - matplotlib.pyplot
 
     Example:
     >>> euclidean_distance, df, ax = f_440([1, 2, 3], [2, 3, 4])
@@ -42,10 +42,6 @@ def f_440(a, b):
 
 
 import unittest
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
 
 def run_tests():

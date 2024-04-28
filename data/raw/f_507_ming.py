@@ -1,16 +1,9 @@
 import os
-
-import matplotlib
-import matplotlib.pyplot as plt
 import pandas as pd
 from dateutil.parser import parse
+output_dir = './output'
 
-# Correct CSV_PATH to reflect the current directory of this script plus 'data.csv'
-CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.csv')
-DATE_COLUMN = 'date'  # Default column in the CSV file with the date strings
-
-
-def f_507(csv_path=CSV_PATH, date_column=DATE_COLUMN):
+def f_507(csv_path=os.path.join(output_dir, 'data.csv'), date_column='date'):
     """
     Read a CSV file, convert a column of date strings into datetime objects,
     and draw a histogram of the year distribution of these dates.
@@ -23,10 +16,9 @@ def f_507(csv_path=CSV_PATH, date_column=DATE_COLUMN):
     - matplotlib.axes._subplots.AxesSubplot: A histogram plot object showing the distribution of years.
 
     Requirements:
-    - pandas for data manipulation and CSV file reading.
-    - datetime and dateutil.parser for date string parsing.
-    - os for file path operations.
-    - matplotlib.pyplot for plotting.
+    - pandas
+    - dateutil.parser
+    - os
 
     Example:
     >>> import os
@@ -37,6 +29,7 @@ def f_507(csv_path=CSV_PATH, date_column=DATE_COLUMN):
         ...
     FileNotFoundError: nonexistent.csv does not exist
     """
+
     if not os.path.isfile(csv_path):
         raise FileNotFoundError(f"{csv_path} does not exist")
 
@@ -49,35 +42,33 @@ def f_507(csv_path=CSV_PATH, date_column=DATE_COLUMN):
 import unittest
 import shutil
 import os
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.current_dir = os.path.dirname(os.path.abspath(__file__))
-        cls.test_data_dir = os.path.join(cls.current_dir, 'test_data')
-        if not os.path.exists(cls.test_data_dir):
-            os.makedirs(cls.test_data_dir)
+        cls.output_dir = './output'
+        if not os.path.exists(cls.output_dir):
+            os.makedirs(cls.output_dir)
 
         # Prepare CSV files for testing
-        cls.valid_data_csv = os.path.join(cls.test_data_dir, 'valid_data.csv')
+        cls.valid_data_csv = os.path.join(cls.output_dir, 'valid_data.csv')
         with open(cls.valid_data_csv, 'w') as f:
             f.write("date\n2020-01-01\n2021-02-02")
 
-        cls.empty_data_csv = os.path.join(cls.test_data_dir, 'empty_data.csv')
+        cls.empty_data_csv = os.path.join(cls.output_dir, 'empty_data.csv')
         open(cls.empty_data_csv, 'w').close()  # Create an empty file
 
         # No need to create an invalid data CSV because parsing errors are tested dynamically
 
-        cls.different_column_data_csv = os.path.join(cls.test_data_dir, 'different_column_data.csv')
+        cls.different_column_data_csv = os.path.join(cls.output_dir, 'different_column_data.csv')
         with open(cls.different_column_data_csv, 'w') as f:
             f.write("different_date_column\n2020-01-01\n2021-02-02")
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(cls.test_data_dir, ignore_errors=True)
+        shutil.rmtree(cls.output_dir, ignore_errors=True)
 
     def test_valid_data(self):
         """Test with valid date data."""
@@ -91,7 +82,7 @@ class TestCases(unittest.TestCase):
 
     def test_nonexistent_file(self):
         """Test with a nonexistent CSV file path."""
-        nonexistent_csv = os.path.join(self.test_data_dir, 'nonexistent.csv')
+        nonexistent_csv = os.path.join(self.output_dir, 'nonexistent.csv')
         with self.assertRaises(FileNotFoundError):
             f_507(nonexistent_csv, 'date')
 
@@ -102,7 +93,7 @@ class TestCases(unittest.TestCase):
 
     def test_invalid_data(self):
         """Dynamically test with invalid date strings; expecting the function to handle errors gracefully."""
-        invalid_data_csv = os.path.join(self.test_data_dir, 'invalid_data.csv')
+        invalid_data_csv = os.path.join(self.output_dir, 'invalid_data.csv')
         with open(invalid_data_csv, 'w') as f:
             f.write("date\nnot-a-date\n2021-13-01")
         with self.assertRaises(ValueError):

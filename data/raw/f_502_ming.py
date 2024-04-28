@@ -1,7 +1,5 @@
 import os
 import re
-import shutil
-
 import pandas as pd
 
 
@@ -23,10 +21,9 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
     Requirements:
     - re
     - pandas
-    - csv
     - os
 
-    Example usage:
+    Example:
     >>> df = f_502(".*\.txt$", "/path/to/search", "matched_files.csv")
     """
     matched_paths = []
@@ -40,15 +37,17 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
 
     return df
 
+
 import unittest
-# Set DATA_DIR to the 'data' subdirectory in the current script's directory
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+import shutil
+
+output_dir = './output'
 
 
 class TestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.test_dir = DATA_DIR
+        cls.test_dir = output_dir
         if not os.path.exists(cls.test_dir):
             os.makedirs(cls.test_dir)
 

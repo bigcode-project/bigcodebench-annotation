@@ -1,21 +1,15 @@
 import csv
 import os
-import shutil
 from datetime import datetime
 from random import randint
-
-import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
 # Constants
-
-current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
-FILE_PATH = os.path.join(current_directory_path, 'traffic_data.csv')
 VEHICLE_TYPES = ['Car', 'Bus', 'Truck', 'Bike']
+output_dir = './output'
 
-
-def f_456(hours):
+def f_456(hours, output_dir = output_dir):
     """
     Generates traffic data for different vehicle types over a specified number of hours,
     saves the data to a CSV file, and plots the data in a line chart.
@@ -31,8 +25,11 @@ def f_456(hours):
     - os
     - csv
     - matplotlib.pyplot
+    - random
+    - datetime
 
     Example:
+    >>> import matplotlib
     >>> file_path, ax = f_456(2)  # Generate data for 2 hours
     >>> isinstance(file_path, str)
     True
@@ -42,9 +39,9 @@ def f_456(hours):
     True
     """
 
-    if not os.path.exists(current_directory_path):
-        os.makedirs(current_directory_path)
-
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    FILE_PATH = os.path.join(output_dir, 'traffic_data.csv')
     data = [['Time'] + VEHICLE_TYPES]
     for i in range(hours):
         row = [datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')] + [randint(0, 50) for _ in VEHICLE_TYPES]
@@ -70,18 +67,17 @@ def f_456(hours):
 
 import unittest
 from unittest.mock import patch
-
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+import shutil
+output_dir = './output'
+FILE_PATH = os.path.join(output_dir, 'traffic_data.csv')
 
 
 class TestCases(unittest.TestCase):
 
     def setUp(self):
         """Set up the environment for testing."""
-        if not os.path.exists(current_directory_path):
-            os.makedirs(current_directory_path)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
     @classmethod
     def tearDownClass(cls):
@@ -89,8 +85,8 @@ class TestCases(unittest.TestCase):
         # Check and remove the expected file if it exists
         # if os.path.exists(FILE_PATH):
         #     os.remove(FILE_PATH)
-        if os.path.exists(current_directory_path):
-            shutil.rmtree(current_directory_path)
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
 
     @patch('matplotlib.pyplot.show')  # Mock plt.show to not render plots
     @patch('csv.writer')  # Mock csv.writer to not actually write files
@@ -119,8 +115,8 @@ class TestCases(unittest.TestCase):
     @patch('os.path.exists', return_value=False)
     def test_directory_creation(self, mock_path_exists, mock_makedirs):
         """Ensure directory is created if it does not exist."""
-        if os.path.exists(current_directory_path):
-            shutil.rmtree(current_directory_path)
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
         f_456(1)
         mock_makedirs.assert_called_with(os.path.dirname(FILE_PATH))
 

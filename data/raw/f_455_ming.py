@@ -1,16 +1,13 @@
 import csv
 import os
-import shutil
 from datetime import datetime
 from random import randint
 
 # Constants
-current_directory_path = os.path.join(os.getcwd(), os.path.splitext(os.path.basename(__file__))[0])
-FILE_PATH = os.path.join(current_directory_path, 'sensor_data.csv')
 SENSORS = ['Temperature', 'Humidity', 'Pressure']
+output_dir = './output'
 
-
-def f_455(hours):
+def f_455(hours, output_dir = output_dir):
     """
     Create sensor data for the specified number of hours and save it in a CSV file.
 
@@ -35,10 +32,9 @@ def f_455(hours):
     >>> 'sensor_data.csv' in file_path  # Ensure the filename is correct
     True
     """
-
-    directory = os.path.dirname(FILE_PATH)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    FILE_PATH = os.path.join(output_dir, 'sensor_data.csv')
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
     data = [['Time'] + SENSORS]
     for i in range(hours):
@@ -54,6 +50,10 @@ def f_455(hours):
 
 import unittest
 import os
+import shutil
+
+FILE_PATH = os.path.join(output_dir, 'sensor_data.csv')
+
 
 class TestCases(unittest.TestCase):
 
@@ -62,8 +62,8 @@ class TestCases(unittest.TestCase):
         # Check and remove the expected file if it exists
         # if os.path.exists(FILE_PATH):
         #     os.remove(FILE_PATH)
-        if os.path.exists(current_directory_path):
-            shutil.rmtree(current_directory_path)
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
 
     def test_csv_file_creation(self):
         """Test if the CSV file is successfully created."""
@@ -94,6 +94,7 @@ class TestCases(unittest.TestCase):
         f_455(0)
         with open(FILE_PATH, 'r') as f:
             self.assertEqual(len(f.readlines()), 1)  # Only header row expected
+
 
 def run_tests():
     suite = unittest.TestSuite()
