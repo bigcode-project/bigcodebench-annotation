@@ -2,7 +2,6 @@ import os
 import sys
 import re
 import ast
-import astor
 import json
 import zipfile
 import base64
@@ -10,6 +9,7 @@ import shutil
 from glob import glob
 from pprint import pprint
 from tqdm import tqdm
+
 
 def extract_apis(code):
     tree = ast.parse(code)
@@ -167,6 +167,7 @@ def remove_trailing_comments(text):
             break  # Found the last non-comment line
     # Return the text up to and including the last non-comment line, joined back into a single string
     return '\n'.join(lines[:i+1])
+
 
 def extract_test(file_contents, function_name):
     """
@@ -433,8 +434,8 @@ if __name__ == "__main__":
     os.makedirs("data/processed", exist_ok=True)
     with open("data/open-eval.jsonl", "w") as f:
         for i, file in enumerate(tqdm(glob("data/clean/*.py"))):
-            if "ming" in file:
-                continue
+            # if "ming" in file:
+            #     continue
             data = extract_content(file, None)
             if not validate_lib_num(data):
                 print(file.replace('clean/', 'raw/'), "Less than 2 libraries are used")
