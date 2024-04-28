@@ -290,8 +290,8 @@ def extract_content(file_path, rename_id=None):
     data["apis"] = extract_apis(data["prompt"] + "\n" + data["canonical_solution"])
     data["libs"] = list(set([api.split(".")[0] for api in data["apis"]]))
     _, unused_imports = filter_unused_imports(data["prompt"], data["libs"])
-    # if unused_imports:
-    #     print(f"Unused imports in {file_path.replace('clean/','raw/')}: {unused_imports}")
+    if unused_imports:
+        print(f"Unused imports in {file_path.replace('clean/','raw/')}: {unused_imports}")
     docs = re.search(r'\"\"\"(.*?)\"\"\"', data["prompt"], re.DOTALL)
     if not docs:
         docs = re.search(r"'''(.*?)'''", data["prompt"], re.DOTALL)
