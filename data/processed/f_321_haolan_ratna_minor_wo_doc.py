@@ -5,7 +5,7 @@ import json
 # Constants
 IP_REGEX = r'[0-9]+(?:\.[0-9]+){3}'
 
-def f_321(API_URL):
+def f_568(API_URL):
     """
     Get the public IP address of the current host from an API.
     
@@ -27,7 +27,7 @@ def f_321(API_URL):
     >>> mock_response.read.return_value = json.dumps({'ip': '192.168.1.1'}).encode('utf-8')
     >>> mock_urlopen = MagicMock(return_value=mock_response)
     >>> with unittest.mock.patch('urllib.request.urlopen', mock_urlopen):
-    ...     f_321('https://api.ipify.org?format=json')
+    ...     f_568('https://api.ipify.org?format=json')
     '192.168.1.1'
     """
 
@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
         mock_response.read.return_value = json.dumps({'ip': '192.168.1.1'}).encode('utf-8')
         mock_urlopen.return_value = mock_response
         
-        result = f_321(self.API_URL)
+        result = f_568(self.API_URL)
         self.assertEqual(result, '192.168.1.1')
     @patch('urllib.request.urlopen')
     def test_invalid_ip(self, mock_urlopen):
@@ -63,14 +63,14 @@ class TestCases(unittest.TestCase):
         mock_response.read.return_value = json.dumps({'ip': '500.500.500.500'}).encode('utf-8')
         mock_urlopen.return_value = mock_response
         
-        result = f_321(self.API_URL)
+        result = f_568(self.API_URL)
         self.assertEqual(result, '500.500.500.500')
     @patch('urllib.request.urlopen')
     def test_api_failure(self, mock_urlopen):
         # Mocking an API failure
         mock_urlopen.side_effect = Exception("API failure")
         
-        result = f_321(self.API_URL)
+        result = f_568(self.API_URL)
         self.assertEqual(result, "API failure")
     @patch('urllib.request.urlopen')
     def test_missing_ip_key(self, mock_urlopen):
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
         mock_response.read.return_value = json.dumps({}).encode('utf-8')
         mock_urlopen.return_value = mock_response
         
-        result = f_321(self.API_URL)
+        result = f_568(self.API_URL)
         self.assertEqual(result, "'ip'")
     @patch('urllib.request.urlopen')
     def test_non_json_response(self, mock_urlopen):

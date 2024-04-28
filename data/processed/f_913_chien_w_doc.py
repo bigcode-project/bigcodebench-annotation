@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def f_913(data_dict):
+def f_211(data_dict):
     """
     Generates histograms for each column in the given DataFrame and checks if the value distributions
     are uniform. It prints a message for each non-uniform distribution.
@@ -19,7 +19,7 @@ def f_913(data_dict):
     Example:
     >>> data = {'Category1': ['A', 'A', 'B', 'B', 'B', 'C', 'C', 'C', 'C', 'D', 'E', 'E'],
     ...                    'Category2': ['X', 'Y', 'Y', 'Z', 'Z', 'Z', 'Z', 'W', 'W', 'W', 'W', 'W']}
-    >>> axes = f_913(data)
+    >>> axes = f_211(data)
     The distribution of values in column 'Category1' is not uniform.
     The distribution of values in column 'Category2' is not uniform.
     >>> [ax.get_title() for ax in axes]
@@ -46,14 +46,14 @@ def f_913(data_dict):
 import unittest
 import pandas as pd
 class TestCases(unittest.TestCase):
-    """Test cases for f_913 function."""
+    """Test cases for f_211 function."""
     def test_uniform_distribution(self):
         """Test for uniform distribution."""
         data = {
                 "Category1": ["A", "A", "B", "B", "C", "C"],
                 "Category2": ["X", "X", "Y", "Y", "Z", "Z"],
             }
-        axes = f_913(data)
+        axes = f_211(data)
         self.assertEqual([ax.get_title() for ax in axes], ["Category1", "Category2"])
     def test_non_uniform_distribution(self):
         """Test for non-uniform distribution."""
@@ -61,14 +61,14 @@ class TestCases(unittest.TestCase):
                 "Category1": ["A", "A", "B", "B", "C", "C", "C"],
                 "Category2": ["X", "X", "Y", "Y", "Z", "Z", "Z"],
             }
-        axes = f_913(data)
+        axes = f_211(data)
         self.assertEqual([ax.get_title() for ax in axes], ["Category1", "Category2"])
     def test_single_column(self):
         """Test for single column."""
         data = {
                 "Category1": ["A", "A", "B", "B", "C", "C"],
             }
-        axes = f_913(data)
+        axes = f_211(data)
         self.assertEqual([ax.get_title() for ax in axes], ["Category1"])
     def test_multiple_categories(self):
         """Test for multiple categories."""
@@ -76,10 +76,10 @@ class TestCases(unittest.TestCase):
                 "Category1": ["A", "A", "B", "B", "C", "C", "D", "D", "E", "E"],
                 "Category2": ["X", "X", "Y", "Y", "Z", "Z", "W", "W", "V", "V"],
             }
-        axes = f_913(data)
+        axes = f_211(data)
         self.assertEqual([ax.get_title() for ax in axes], ["Category1", "Category2"])
     def test_empty_dataframe(self):
         """Test for empty dataframe."""
         data = {}
-        axes = f_913(data)
+        axes = f_211(data)
         self.assertEqual(axes, [])

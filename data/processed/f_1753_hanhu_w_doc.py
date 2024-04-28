@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def f_1754(mu, sigma, sample_size):
+def f_221(mu, sigma, sample_size):
     """
     Generates a numpy array of random samples drawn from a normal distribution
     and plots the histogram of these samples. This function specifies the mean (mu), 
@@ -33,7 +33,7 @@ def f_1754(mu, sigma, sample_size):
     - matplotlib.pyplot
 
     Examples:
-    >>> data = f_1754(0, 1, 1000)
+    >>> data = f_221(0, 1, 1000)
     >>> len(data)
     1000
     >>> isinstance(data, np.ndarray)
@@ -58,23 +58,23 @@ import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_return_type(self):
         """ Test that the function returns a numpy array. """
-        result = f_1754(0, 1, 1000)
+        result = f_221(0, 1, 1000)
         self.assertIsInstance(result, np.ndarray)
     def test_sample_size(self):
         """ Test that the returned array has the correct size. """
-        result = f_1754(0, 1, 1000)
+        result = f_221(0, 1, 1000)
         self.assertEqual(len(result), 1000)
     def test_normal_distribution_properties(self):
         """ Test if the generated samples have the correct mean and standard deviation. """
         mu, sigma = 0, 1
-        result = f_1754(mu, sigma, 1000000)
+        result = f_221(mu, sigma, 1000000)
         self.assertAlmostEqual(np.mean(result), mu, places=1)
         self.assertAlmostEqual(np.std(result), sigma, places=1)
     @patch('matplotlib.pyplot.show')
     def test_plot_labels_and_title(self, mock_show):
         """ Test if the plot has correct labels and title. """
         with patch('matplotlib.pyplot.hist') as mock_hist:
-            f_1754(0, 1, 1000)
+            f_221(0, 1, 1000)
             args, kwargs = mock_hist.call_args
             self.assertIn('bins', kwargs)
             self.assertEqual(kwargs['bins'], 30)
@@ -87,12 +87,12 @@ class TestCases(unittest.TestCase):
         """ Test the function with a mock of np.random.normal. """
         with patch('numpy.random.normal', return_value=np.full(1000, 0.5)) as mock_random_normal:
             mu, sigma = 0, 1
-            result = f_1754(mu, sigma, 1000)
+            result = f_221(mu, sigma, 1000)
             mock_random_normal.assert_called_once_with(mu, sigma, 1000)
             self.assertTrue(all(x == 0.5 for x in result))
     def test_output_consistency(self):
         """ Test if repeated calls with the same parameters produce different results. """
         mu, sigma = 0, 1
-        result1 = f_1754(mu, sigma, 1000)
-        result2 = f_1754(mu, sigma, 1000)
+        result1 = f_221(mu, sigma, 1000)
+        result2 = f_221(mu, sigma, 1000)
         self.assertFalse(np.array_equal(result1, result2))

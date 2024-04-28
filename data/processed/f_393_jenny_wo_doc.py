@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import matplotlib.pyplot as plt
 
-def f_393(days_in_past=7, random_seed=0):
+def f_659(days_in_past=7, random_seed=0):
     """
     Draw a graph of temperature trends over the past week using randomly generated data.
 
@@ -26,7 +26,7 @@ def f_393(days_in_past=7, random_seed=0):
     - matplotlib.pyplot
 
     Example:
-    >>> ax = f_393(random_seed=42)
+    >>> ax = f_659(random_seed=42)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_xticklabels()
@@ -58,33 +58,33 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_title(), "Temperature Trend")
     def test_case_1(self):
         # Test default parameters
-        ax = f_393()
+        ax = f_659()
         self._test_plot(ax)
     def test_case_2(self):
         # Test days in the past
         for n_days in [1, 5, 50, 100]:
-            ax = f_393(n_days, random_seed=2)
+            ax = f_659(n_days, random_seed=2)
             self._test_plot(ax)
             self.assertEqual(len(ax.lines[0].get_ydata()), n_days)
     def test_case_3(self):
         # Test handling invalid days in the past
         with self.assertRaises(Exception):
-            f_393(0, random_seed=4)
+            f_659(0, random_seed=4)
     def test_case_4(self):
         # Test handling invalid days in the past
         with self.assertRaises(Exception):
-            f_393(-1, random_seed=4)
+            f_659(-1, random_seed=4)
     def test_case_5(self):
         # Test random seed reproducibility
-        ax1 = f_393(5, random_seed=42)
-        ax2 = f_393(5, random_seed=42)
+        ax1 = f_659(5, random_seed=42)
+        ax2 = f_659(5, random_seed=42)
         self.assertTrue(
             np.array_equal(ax1.lines[0].get_ydata(), ax2.lines[0].get_ydata())
         )
     def test_case_6(self):
         # Test random seed difference
-        ax1 = f_393(5, random_seed=0)
-        ax2 = f_393(5, random_seed=42)
+        ax1 = f_659(5, random_seed=0)
+        ax2 = f_659(5, random_seed=42)
         self.assertFalse(
             np.array_equal(ax1.lines[0].get_ydata(), ax2.lines[0].get_ydata())
         )

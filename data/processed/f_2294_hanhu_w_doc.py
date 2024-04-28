@@ -4,7 +4,7 @@ import statistics
 import matplotlib.pyplot as plt
 
 
-def f_2296(n, value):
+def f_336(n, value):
     """
     Generates 'n' random numbers between 0 and 1, finds those greater than their average,
     and counts how many are greater than or equal to a specified value, then plots 
@@ -25,7 +25,7 @@ def f_2296(n, value):
     - matplotlib.pyplot
 
     Examples:
-    >>> greater_avg, count = f_2296(10, 0.5)
+    >>> greater_avg, count = f_336(10, 0.5)
     >>> isinstance(greater_avg, list) and isinstance(count, int)
     True
     >>> len(greater_avg) <= 10
@@ -58,24 +58,24 @@ class TestCases(unittest.TestCase):
     def test_plotting_mocked(self, mock_show):
         """ Test that the function calls plt.show(). """
         with patch('random.random', self.random_mock):
-            _ = f_2296(5, 0.5)
+            _ = f_336(5, 0.5)
             mock_show.assert_called_once()
     def test_return_types(self):
         """ Test that the function returns a list and an int. """
-        greater_avg, count = f_2296(10, 0.5)
+        greater_avg, count = f_336(10, 0.5)
         self.assertIsInstance(greater_avg, list)
         self.assertIsInstance(count, int)
     def test_number_of_elements(self):
         """Check if the list contains only numbers greater than the average."""
         with patch('random.random', self.random_mock):
-            greater_avg, _ = f_2296(5, 0.5)
+            greater_avg, _ = f_336(5, 0.5)
             self.assertEqual(len(greater_avg), 2)
     def test_count_greater_than_or_equal_value(self):
         """Verify the count includes numbers greater than or equal to the value."""
         with patch('random.random', self.random_mock):
-            _, count = f_2296(5, 0.5)
+            _, count = f_336(5, 0.5)
             self.assertEqual(count, 2)
     def test_empty_case(self):
         """Test the function's behavior with n=0."""
-        greater_avg, count = f_2296(0, 0.5)
+        greater_avg, count = f_336(0, 0.5)
         self.assertEqual((greater_avg, count), ([], 0))

@@ -1,7 +1,7 @@
 import re
 from datetime import time
 
-def f_735(logs: list):
+def f_543(logs: list):
     """
     Analyze the given list of logs for the occurrence of errors and calculate the average time of occurrence of errors.
     
@@ -17,7 +17,7 @@ def f_735(logs: list):
     - datetime
     
     Example:
-    >>> f_735(['2021-06-15 09:45:00 ERROR: Failed to connect to database',\
+    >>> f_543(['2021-06-15 09:45:00 ERROR: Failed to connect to database',\
             '2021-06-15 10:15:00 WARNING: Low disk space',\
             '2021-06-15 10:35:00 INFO: Backup completed successfully'])
     ([datetime.time(9, 45)], datetime.time(9, 45))
@@ -50,33 +50,33 @@ class TestCases(unittest.TestCase):
         logs = ['2021-06-15 09:45:00 ERROR: Failed to connect to database',
                 '2021-06-15 10:15:00 WARNING: Low disk space',
                 '2021-06-15 10:35:00 INFO: Backup completed successfully']
-        result = f_735(logs)
+        result = f_543(logs)
         self.assertEqual(result, ([time(9, 45)], time(9, 45)))
     def test_case_2(self):
         logs = ['2021-06-15 08:45:00 ERROR: Failed to authenticate',
                 '2021-06-15 09:15:00 ERROR: Failed to connect to database',
                 '2021-06-15 10:35:00 INFO: Backup completed successfully']
-        result = f_735(logs)
+        result = f_543(logs)
         self.assertEqual(result, ([time(8, 45), time(9, 15)], time(9, 0)))
     def test_case_3(self):
         logs = ['2021-06-15 07:45:00 INFO: Backup started',
                 '2021-06-15 08:15:00 WARNING: Low memory',
                 '2021-06-15 09:35:00 INFO: Backup completed successfully']
-        result = f_735(logs)
+        result = f_543(logs)
         self.assertEqual(result, ([], time(0, 0)))
     def test_case_4(self):
         logs = []
-        result = f_735(logs)
+        result = f_543(logs)
         self.assertEqual(result, ([], time(0, 0)))
     def test_case_5(self):
         logs = ['2021-06-15 09:45:00 ERROR: Failed to connect to database',
                 '2021-06-15 10:15:00 WARNING: Low disk space',
                 '2021-06-15 11:45:00 ERROR: Failed to authenticate']
-        result = f_735(logs)
+        result = f_543(logs)
         self.assertEqual(result, ([time(9, 45), time(11, 45)], time(10, 45)))
     def test_case_invalid_format(self):
         logs = ['Invalid log format',
                 'Another invalid log format',
                 'Yet another invalid log format']
-        result = f_735(logs)
+        result = f_543(logs)
         self.assertEqual(result, ([], time(0, 0)))

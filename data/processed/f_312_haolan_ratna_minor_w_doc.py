@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 
-def f_312(length):
+def f_279(length):
     """
     Create a normal distribution with a given length, plot its histogram alongside the 
     probability density function, and return the distribution and the plot.
@@ -25,7 +25,7 @@ def f_312(length):
     
     Example:
     >>> np.random.seed(0)
-    >>> distribution, ax = f_312(1000)
+    >>> distribution, ax = f_279(1000)
     >>> print(type(distribution))
     <class 'numpy.ndarray'>
     >>> len(ax.get_lines())
@@ -51,20 +51,20 @@ import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         np.random.seed(0)
-        distribution, ax = f_312(1000)
+        distribution, ax = f_279(1000)
         self.assertIsInstance(distribution, np.ndarray, "Expected distribution to be a numpy array")
         self.assertIsInstance(ax, plt.Axes, "Expected ax to be a matplotlib Axes object")
         plt.close()
     def test_case_2(self):
         np.random.seed(0)
         length = 500
-        distribution, _ = f_312(length)
+        distribution, _ = f_279(length)
         self.assertEqual(len(distribution), length, f"Expected distribution length to be {length}")
         plt.close()
     
     def test_case_3(self):
         np.random.seed(0)
-        distribution, _ = f_312(1000)
+        distribution, _ = f_279(1000)
         mean = distribution.mean()
         std_dev = distribution.std()
         self.assertAlmostEqual(mean, 0, delta=0.1, msg=f"Expected mean to be close to 0, got {mean}")
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
     
     def test_case_4(self):
         np.random.seed(0)
-        distribution, ax = f_312(1000)
+        distribution, ax = f_279(1000)
         lines = ax.get_lines()
         self.assertEqual(len(lines), 1, "Expected one line representing PDF in the plot")
         bars = [rect for rect in ax.get_children() if isinstance(rect, plt.Rectangle)]
@@ -82,6 +82,6 @@ class TestCases(unittest.TestCase):
     
     def test_case_5(self):
         np.random.seed(0)
-        distribution, _ = f_312(2000)
+        distribution, _ = f_279(2000)
         self.assertEqual(distribution.shape, (2000,), "Expected shape of distribution to match input length")
         plt.close()

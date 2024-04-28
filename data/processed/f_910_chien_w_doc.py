@@ -6,7 +6,7 @@ NUM_SAMPLES = 100
 NUM_OUTLIERS = 5
 
 
-def f_910(num_samples=NUM_SAMPLES, num_outliers=NUM_OUTLIERS):
+def f_492(num_samples=NUM_SAMPLES, num_outliers=NUM_OUTLIERS):
     """
     Generate a dataset comprising both normal data and artificially introduced outliers,
     and plot a histogram of the combined data. The function detects outliers in the dataset
@@ -44,7 +44,7 @@ def f_910(num_samples=NUM_SAMPLES, num_outliers=NUM_OUTLIERS):
     Example:
     >>> import numpy as np
     >>> np.random.seed(0)
-    >>> data, outliers_detected, ax = f_910()
+    >>> data, outliers_detected, ax = f_492()
     >>> print(outliers_detected)
     [-9.61613603 -3.96850367  3.20347075]
     """
@@ -71,16 +71,16 @@ import unittest
 import numpy as np
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for the function f_910."""
+    """Test cases for the function f_492."""
     def test_default_values(self):
         """Test the function with default values."""
         np.random.seed(0)
-        data, _, _ = f_910()
+        data, _, _ = f_492()
         self.assertEqual(len(data), 105)
     def test_custom_values(self):
         """Test the function with custom values."""
         np.random.seed(1)
-        data, outliers_detected, _ = f_910(num_samples=50, num_outliers=10)
+        data, outliers_detected, _ = f_492(num_samples=50, num_outliers=10)
         self.assertEqual(len(data), 60)
         # Replicate the IQR calculation for testing
         normal_data = data[:50]  # Assuming the first 50 are normal data
@@ -95,14 +95,14 @@ class TestCases(unittest.TestCase):
     def test_no_outliers(self):
         """Test the function with no outliers."""
         np.random.seed(2)
-        data, outliers_detected, ax = f_910(num_samples=100, num_outliers=0)
+        data, outliers_detected, ax = f_492(num_samples=100, num_outliers=0)
         self.assertEqual(len(data), 100)
         # Adjust the expectation to consider possible false positives
         self.assertTrue(len(outliers_detected) <= 1)  # Allow for up to 1 false positive
     def test_only_outliers(self):
         """Test the function with only outliers."""
         np.random.seed(3)
-        data, outliers_detected, _ = f_910(num_samples=0, num_outliers=100)
+        data, outliers_detected, _ = f_492(num_samples=0, num_outliers=100)
         self.assertEqual(len(data), 100)
         # Since no normal data is generated, IQR is not applied, and no outliers are detected.
         self.assertEqual(len(outliers_detected), 0)
@@ -110,6 +110,6 @@ class TestCases(unittest.TestCase):
         """Test the function with negative values."""
         np.random.seed(4)
         with self.assertRaises(ValueError):
-            f_910(num_samples=-10, num_outliers=-5)
+            f_492(num_samples=-10, num_outliers=-5)
     def tearDown(self):
         plt.close()

@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import csv
 
 
-def f_856(
+def f_288(
     url: str,
     base_url: str = "https://www.example.com",
     csv_file: str = "scraped_data.csv",
@@ -27,9 +27,9 @@ def f_856(
     - csv
 
     Examples:
-    >>> f_856('/mywebpage')
+    >>> f_288('/mywebpage')
     5
-    >>> f_856('/anotherpage', base_url='https://www.different.com', csv_file='other_links.csv')
+    >>> f_288('/anotherpage', base_url='https://www.different.com', csv_file='other_links.csv')
     8
     """
     full_url = urljoin(base_url, url)
@@ -51,14 +51,14 @@ from unittest.mock import patch, MagicMock
 import requests
 import os
 class TestCases(unittest.TestCase):
-    """Test cases for f_856."""
+    """Test cases for f_288."""
     @patch("requests.get")
     def test_empty_page(self, mock_get):
         """
         Test the function with an empty webpage (no links).
         """
         mock_get.return_value = MagicMock(text="<html></html>")
-        result = f_856("/empty")
+        result = f_288("/empty")
         self.assertEqual(result, 0)
     @patch("requests.get")
     def test_single_link(self, mock_get):
@@ -68,7 +68,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = MagicMock(
             text='<html><a href="link1.html">Link1</a></html>'
         )
-        result = f_856("/single-link")
+        result = f_288("/single-link")
         self.assertEqual(result, 1)
     @patch("requests.get")
     def test_multiple_links(self, mock_get):
@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = MagicMock(
             text='<html><a href="link1.html">Link1</a><a href="link2.html">Link2</a></html>'
         )
-        result = f_856("/multiple-links")
+        result = f_288("/multiple-links")
         self.assertEqual(result, 2)
     @patch("requests.get")
     def test_duplicate_links(self, mock_get):
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = MagicMock(
             text='<html><a href="link.html">Link</a><a href="link.html">Link</a></html>'
         )
-        result = f_856("/duplicate-links")
+        result = f_288("/duplicate-links")
         self.assertEqual(result, 1)
     @patch("requests.get")
     def test_external_links(self, mock_get):
@@ -98,7 +98,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = MagicMock(
             text='<html><a href="http://external.com/link">External Link</a></html>'
         )
-        result = f_856("/external-link")
+        result = f_288("/external-link")
         self.assertEqual(result, 1)
     @classmethod
     def tearDownClass(cls):

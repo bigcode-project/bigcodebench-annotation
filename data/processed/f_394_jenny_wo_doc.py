@@ -3,7 +3,7 @@ import pytz
 import calendar
 
 
-def f_394(days_in_past=7):
+def f_103(days_in_past=7):
     """
     Get the weekday of the date 'days_in_past' days ago from today.
 
@@ -25,9 +25,9 @@ def f_394(days_in_past=7):
     - calendar
 
     Example:
-    >>> f_394()
+    >>> f_103()
     'Monday'
-    >>> f_394(3)
+    >>> f_103(3)
     'Friday'
     """
     if days_in_past < 0:
@@ -45,7 +45,7 @@ import calendar
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Input 1: Default input
-        result = f_394()
+        result = f_103()
         self.assertIsInstance(result, str)
         self.assertIn(result, list(calendar.day_name))
         # Ensure the result matches the expected output for 7 days ago
@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(result, expected_weekday)
     def test_case_2(self):
         # Input 2: Test with 3 days in the past
-        result = f_394(3)
+        result = f_103(3)
         self.assertIsInstance(result, str)
         self.assertIn(result, list(calendar.day_name))
         # Ensure the result matches the expected output for 3 days ago
@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(result, expected_weekday)
     def test_case_3(self):
         # Input 3: Test with 0 days in the past (today)
-        result = f_394(0)
+        result = f_103(0)
         self.assertIsInstance(result, str)
         self.assertIn(result, list(calendar.day_name))
         # Ensure the result matches the expected output for today
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(result, expected_weekday)
     def test_case_4(self):
         # Input 4: Test with 30 days in the past (approximately a month ago)
-        result = f_394(30)
+        result = f_103(30)
         self.assertIsInstance(result, str)
         self.assertIn(result, list(calendar.day_name))
         # Ensure the result matches the expected output for 30 days ago
@@ -83,4 +83,4 @@ class TestCases(unittest.TestCase):
         # Input 5: Test handling invalid days_in_the_past
         for invalid in [-1, "1"]:
             with self.assertRaises(Exception):
-                f_394(invalid)
+                f_103(invalid)

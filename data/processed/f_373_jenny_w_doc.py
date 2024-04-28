@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 
 
-def f_373(n_samples=1000, mu=0, sigma=1, random_seed=0):
+def f_307(n_samples=1000, mu=0, sigma=1, random_seed=0):
     """
     Generates a histogram and a probability density function (PDF) plot for a specified normal distribution.
 
@@ -27,7 +27,7 @@ def f_373(n_samples=1000, mu=0, sigma=1, random_seed=0):
     - scipy.stats.norm
 
     Example:
-    >>> ax, samples = f_373()
+    >>> ax, samples = f_307()
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_xticklabels()
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         sigma_test = 2
         n_samples_test = 10000
         random_seed_test = 42
-        _, samples = f_373(
+        _, samples = f_307(
             n_samples=n_samples_test,
             mu=mu_test,
             sigma=sigma_test,
@@ -97,12 +97,12 @@ class TestCases(unittest.TestCase):
         )
     def test_case_2(self):
         # Default parameters
-        ax, _ = f_373(random_seed=self.default_seed)
+        ax, _ = f_307(random_seed=self.default_seed)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(len(ax.patches), 30)
     def test_case_3(self):
         # Custom parameters: small number of samples, custom mean and standard deviation
-        ax, _ = f_373(
+        ax, _ = f_307(
             n_samples=self.small_n_samples,
             mu=self.custom_mu,
             sigma=self.custom_sigma,
@@ -112,44 +112,44 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(ax.patches), 30)
     def test_case_4(self):
         # Large number of samples
-        ax, _ = f_373(n_samples=self.large_n_samples, random_seed=self.default_seed)
+        ax, _ = f_307(n_samples=self.large_n_samples, random_seed=self.default_seed)
         self.assertIsInstance(ax, plt.Axes)
         self.assertTrue(len(ax.patches) >= 30)
     def test_case_5(self):
         # Small number of samples
-        ax, _ = f_373(n_samples=self.small_n_samples, random_seed=self.default_seed)
+        ax, _ = f_307(n_samples=self.small_n_samples, random_seed=self.default_seed)
         self.assertIsInstance(ax, plt.Axes)
         self.assertTrue(len(ax.patches) <= 30)
     def test_case_6(self):
         # Large standard deviation
-        ax, _ = f_373(sigma=self.large_sigma, random_seed=self.default_seed)
+        ax, _ = f_307(sigma=self.large_sigma, random_seed=self.default_seed)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(len(ax.patches), 30)
     def test_case_7(self):
         # Small standard deviation
-        ax, _ = f_373(sigma=self.small_sigma, random_seed=self.default_seed)
+        ax, _ = f_307(sigma=self.small_sigma, random_seed=self.default_seed)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(len(ax.patches), 30)
     def test_case_8(self):
         # Invalid negative standard deviation
         with self.assertRaises(ValueError):
-            f_373(sigma=self.negative_sigma)
+            f_307(sigma=self.negative_sigma)
     def test_case_9(self):
         # Invalid zero standard deviation
         with self.assertRaises(Exception):
-            f_373(sigma=self.zero_sigma)
+            f_307(sigma=self.zero_sigma)
     def test_case_10(self):
         # Invalid zero samples
         with self.assertRaises(Exception):
-            f_373(n_samples=self.zero_n_samples)
+            f_307(n_samples=self.zero_n_samples)
     def test_case_11(self):
         # Invalid negative samples
         with self.assertRaises(ValueError):
-            f_373(n_samples=self.negative_n_samples)
+            f_307(n_samples=self.negative_n_samples)
     def test_case_12(self):
         # Reproducibility with same seed
-        ax1, sample1 = f_373(random_seed=self.default_seed)
-        ax2, sample2 = f_373(random_seed=self.default_seed)
+        ax1, sample1 = f_307(random_seed=self.default_seed)
+        ax2, sample2 = f_307(random_seed=self.default_seed)
         self.assertEqual(ax1.patches[0].get_height(), ax2.patches[0].get_height())
         self.assertTrue((sample1 == sample2).all())
     def tearDown(self):

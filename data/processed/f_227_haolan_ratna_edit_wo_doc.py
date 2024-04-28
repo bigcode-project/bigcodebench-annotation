@@ -2,7 +2,7 @@ import subprocess
 import platform
 import time
 
-def f_227(url):
+def f_75(url):
     """
     Open a web page in the default web browser.
 
@@ -18,7 +18,7 @@ def f_227(url):
     - time
 
     Example:
-    >>> f_227('https://www.google.com')
+    >>> f_75('https://www.google.com')
     0
     """
     if platform.system() == 'Darwin':
@@ -49,7 +49,7 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [0]  # Simulate process ending after 10 checks
         process_mock.returncode = 0
         mock_popen.return_value = process_mock
-        result = f_227('https://www.google.com')
+        result = f_75('https://www.google.com')
         mock_popen.assert_called_with(['open', 'https://www.google.com'], shell=True)
         self.assertIsInstance(result, int)
         self.assertEqual(result, 0)
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [0]  # Simulate process ending after 10 checks
         process_mock.returncode = 0
         mock_popen.return_value = process_mock
-        result = f_227('https://www.openai.com')
+        result = f_75('https://www.openai.com')
         mock_popen.assert_called_with(['start', 'https://www.openai.com'], shell=True)
         self.assertIsInstance(result, int)
         self.assertEqual(result, 0)
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [1]  # Simulate failure
         process_mock.returncode = 1
         mock_popen.return_value = process_mock
-        result = f_227('')
+        result = f_75('')
         mock_popen.assert_called_with(['xdg-open', ''], shell=True)
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [1]  # Simulate failure
         process_mock.returncode = 1
         mock_popen.return_value = process_mock
-        result = f_227('/invalid_url')
+        result = f_75('/invalid_url')
         mock_popen.assert_called_with(['xdg-open', '/invalid_url'], shell=True)
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)
@@ -97,7 +97,7 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [1]  # Simulate failure
         process_mock.returncode = 1
         mock_popen.return_value = process_mock
-        result = f_227('/path/to/file.txt')
+        result = f_75('/path/to/file.txt')
         mock_popen.assert_called_with(['xdg-open', '/path/to/file.txt'], shell=True)
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)

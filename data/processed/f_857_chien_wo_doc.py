@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 
 
-def f_857(api_url):
+def f_405(api_url):
     """
     Fetches data from a specified API, processes the JSON response, converts it into a pandas DataFrame,
     and plots the data using matplotlib.
@@ -26,7 +26,7 @@ def f_857(api_url):
     - matplotlib.pyplot
 
     Example:
-    >>> df, plot = f_857("https://api.example.com/data")
+    >>> df, plot = f_405("https://api.example.com/data")
     >>> df.head()
     >>> if plot:
     >>>     plot.show()
@@ -58,14 +58,14 @@ class TestCases(unittest.TestCase):
     def test_successful_api_call_with_data(self, mock_get):
         """Test the function with a successful API call returning non-empty data."""
         mock_get.return_value = Mock(status_code=200, json=lambda: [{"a": 1, "b": 2}])
-        df, plot = f_857("http://example.com/api")
+        df, plot = f_405("http://example.com/api")
         self.assertIsInstance(df, pd.DataFrame)
         self.assertIsInstance(plot, plt.Axes)
     @patch("requests.get")
     def test_successful_api_call_with_empty_data(self, mock_get):
         """Test the function with a successful API call returning empty data."""
         mock_get.return_value = Mock(status_code=200, json=lambda: [])
-        df, plot = f_857("http://example.com/api")
+        df, plot = f_405("http://example.com/api")
         self.assertIsInstance(df, pd.DataFrame)
         self.assertTrue(df.empty)
         self.assertIsNone(plot)
@@ -76,16 +76,16 @@ class TestCases(unittest.TestCase):
             status_code=200, json=lambda: Exception("Invalid JSON")
         )
         with self.assertRaises(Exception):
-            f_857("http://example.com/api")
+            f_405("http://example.com/api")
     @patch("requests.get")
     def test_api_call_with_http_error(self, mock_get):
         """Test the function with an API call that raises an HTTP error."""
         mock_get.side_effect = requests.HTTPError()
         with self.assertRaises(requests.HTTPError):
-            f_857("http://example.com/api")
+            f_405("http://example.com/api")
     def test_incorrect_url_type(self):
         """Test the function with an incorrect type for the URL."""
         with self.assertRaises(TypeError):
-            f_857(123)
+            f_405(123)
     def tearDown(self):
         plt.close()

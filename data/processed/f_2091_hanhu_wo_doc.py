@@ -3,7 +3,7 @@ import urllib.request
 import urllib.parse
 import gzip
 
-def f_2092(url_str, file_path):
+def f_530(url_str, file_path):
     """
     Fetches JSON data from a given URL, decodes the data, and compresses it into a gzip file.
 
@@ -21,9 +21,9 @@ def f_2092(url_str, file_path):
     - gzip
 
     Examples:
-    >>> isinstance(f_2092('http://example.com/data.json', '/path/to/file.json.gz'), str)
+    >>> isinstance(f_530('http://example.com/data.json', '/path/to/file.json.gz'), str)
     True
-    >>> f_2092('http://example.com/data.json', '/path/to/file.json.gz').endswith('.gz')
+    >>> f_530('http://example.com/data.json', '/path/to/file.json.gz').endswith('.gz')
     True
     """
     response = urllib.request.urlopen(url_str)
@@ -49,7 +49,7 @@ class TestCases(unittest.TestCase):
         file_path = '/path/to/file.json.gz'
         
         with patch('json.dumps', return_value='{"key": "value"}') as mock_json_dumps:
-            f_2092('http://example.com/data.json', file_path)
+            f_530('http://example.com/data.json', file_path)
             mock_json_dumps.assert_called_once()
             self.assertTrue(gzip.open.called, "gzip.open should be called to write data.")
     @patch('urllib.request.urlopen')
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
         file_path = '/path/to/invalid-url.json.gz'
         
         with self.assertRaises(urllib.error.URLError):
-            f_2092('http://invalid-url.com', file_path)
+            f_530('http://invalid-url.com', file_path)
     @patch('gzip.open', mock_open())
     @patch('urllib.request.urlopen')
     def test_return_type_is_string(self, mock_urlopen):
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         mock_urlopen.return_value = mock_response
         file_path = '/path/to/file.json.gz'
         
-        result = f_2092('http://example.com/data.json', file_path)
+        result = f_530('http://example.com/data.json', file_path)
         self.assertTrue(isinstance(result, str), "The return type should be a string.")
     @patch('gzip.open', new_callable=mock_open)
     @patch('urllib.request.urlopen')
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
         mock_urlopen.return_value = mock_response
         file_path = '/path/to/file.json.gz'
         
-        f_2092('http://example.com/data.json', file_path)
+        f_530('http://example.com/data.json', file_path)
         mock_gzip_open.assert_called_once_with(file_path, 'wb')
     @patch('urllib.request.urlopen')
     def test_response_read_called(self, mock_urlopen):
@@ -91,5 +91,5 @@ class TestCases(unittest.TestCase):
         file_path = '/path/to/file.json.gz'
         
         with patch('gzip.open', mock_open()):
-            f_2092('http://example.com/data.json', file_path)
+            f_530('http://example.com/data.json', file_path)
             mock_urlopen.return_value.read.assert_called_once()

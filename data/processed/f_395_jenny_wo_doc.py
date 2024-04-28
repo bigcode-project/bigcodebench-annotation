@@ -4,7 +4,7 @@ import random
 import seaborn as sns
 
 
-def f_395(days_in_past=7, random_seed=0):
+def f_203(days_in_past=7, random_seed=0):
     """
     Generates a graph of daily activity durations for a specified number of days in the past
     using randomly generated data for activities.
@@ -31,7 +31,7 @@ def f_395(days_in_past=7, random_seed=0):
     - seaborn
 
     Example:
-    >>> ax, df = f_395(7, random_seed=42)
+    >>> ax, df = f_203(7, random_seed=42)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
 
@@ -81,31 +81,31 @@ class TestCases(unittest.TestCase):
             self.assertIn(activity, legend_labels)
     def test_case_1(self):
         # Test using default parameters
-        ax, df = f_395()
+        ax, df = f_203()
         self._check_df(df, self.default_days_in_past)
         self._check_plot(ax)
     def test_case_2(self):
         # Test using custom parameters
-        ax, df = f_395(10, random_seed=2)
+        ax, df = f_203(10, random_seed=2)
         self._check_df(df, 10)
         self._check_plot(ax)
     def test_case_3(self):
         # Test days_in_past
         for ndays in [1, 5, 10, 100, 500]:
-            _, df = f_395(ndays)
+            _, df = f_203(ndays)
             self.assertEqual(len(df["Date"].unique()), ndays)
     def test_case_4(self):
         # Test random seed
-        _, df1 = f_395(10, random_seed=4)
-        _, df2 = f_395(10, random_seed=4)
-        _, df3 = f_395(10, random_seed=0)
+        _, df1 = f_203(10, random_seed=4)
+        _, df2 = f_203(10, random_seed=4)
+        _, df3 = f_203(10, random_seed=0)
         pd.testing.assert_frame_equal(df1, df2)
         self.assertFalse(df2.equals(df3))
     def test_case_5(self):
         # Test handling invalid days in past
         with self.assertRaises(ValueError):
-            f_395(0, random_seed=5)
+            f_203(0, random_seed=5)
         with self.assertRaises(ValueError):
-            f_395(-1, random_seed=5)
+            f_203(-1, random_seed=5)
     def tearDown(self):
         plt.close("all")

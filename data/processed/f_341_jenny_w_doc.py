@@ -2,7 +2,7 @@ import string
 import matplotlib.pyplot as plt
 
 
-def f_341(s):
+def f_559(s):
     """
     Calculate the frequency of each letter in a string and return a bar chart of frequencies.
     Results are case-insensitive. If non-string input is provided, function will throw an error.
@@ -22,7 +22,7 @@ def f_341(s):
 
     Example:
     >>> s = 'This is a test string.'
-    >>> freqs, ax = f_341(s)
+    >>> freqs, ax = f_559(s)
     >>> freqs
     {'a': 1, 'b': 0, 'c': 0, 'd': 0, 'e': 1, 'f': 0, 'g': 1, 'h': 1, 'i': 3, 'j': 0, 'k': 0, 'l': 0, 'm': 0, 'n': 1, 'o': 0, 'p': 0, 'q': 0, 'r': 1, 's': 4, 't': 4, 'u': 0, 'v': 0, 'w': 0, 'x': 0, 'y': 0, 'z': 0}
     >>> type(ax)
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
         expected_output = {
             letter: s.lower().count(letter) for letter in string.ascii_lowercase
         }
-        result, ax = f_341(s)
+        result, ax = f_559(s)
         self.assertEqual(result, expected_output)
         self.assertEqual(ax.get_title(), "Letter Frequencies")
         self.assertEqual(ax.get_xlabel(), "Letters")
@@ -64,7 +64,7 @@ class TestCases(unittest.TestCase):
         # Test with a string having all alphabets
         s = "abcdefghijklmnopqrstuvwxyz"
         expected_output = {letter: 1 for letter in string.ascii_lowercase}
-        result, ax = f_341(s)
+        result, ax = f_559(s)
         self.assertEqual(result, expected_output)
         self.assertEqual(ax.get_title(), "Letter Frequencies")
         self.assertEqual(ax.get_xlabel(), "Letters")
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         # Test with a string having no alphabets
         s = "1234567890!@#$%^&*()"
         expected_output = {letter: 0 for letter in string.ascii_lowercase}
-        result, ax = f_341(s)
+        result, ax = f_559(s)
         self.assertEqual(result, expected_output)
         self.assertEqual(ax.get_title(), "Letter Frequencies")
         self.assertEqual(ax.get_xlabel(), "Letters")
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
         # Test with an empty string
         s = ""
         expected_output = {letter: 0 for letter in string.ascii_lowercase}
-        result, ax = f_341(s)
+        result, ax = f_559(s)
         self.assertEqual(result, expected_output)
         self.assertEqual(ax.get_title(), "Letter Frequencies")
         self.assertEqual(ax.get_xlabel(), "Letters")
@@ -91,6 +91,6 @@ class TestCases(unittest.TestCase):
         # Test error handling
         for invalid in [123, []]:
             with self.assertRaises(Exception):
-                f_341(invalid)
+                f_559(invalid)
     def tearDown(self):
         plt.close("all")

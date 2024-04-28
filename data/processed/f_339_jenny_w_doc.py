@@ -3,7 +3,7 @@ import re
 import random
 
 
-def f_339(s: str, seed: int = 0) -> pd.DataFrame:
+def f_442(s: str, seed: int = 0) -> pd.DataFrame:
     """
     Generate a Pandas DataFrame of products with their ID, quantity, code, price, product, and description
     based on a specified string of product data.
@@ -32,13 +32,13 @@ def f_339(s: str, seed: int = 0) -> pd.DataFrame:
 
     Examples:
     >>> s = '1 10 A10B 100 This is a description with spaces'
-    >>> df = f_339(s)
+    >>> df = f_442(s)
     >>> df
       ID  Quantity  Code  Price Product                        Description
     0  1        10  A10B    100    Pear  This is a description with spaces
 
     >>> s = '1 10 A10B 100 This is a description with spaces\\n2 20 B20C 200 Another description example'
-    >>> df = f_339(s)
+    >>> df = f_442(s)
     >>> df
       ID  Quantity  Code  Price Product                        Description
     0  1        10  A10B    100    Pear  This is a description with spaces
@@ -104,7 +104,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic structure and data correctness
         input_str = "1 10 A10B 100 This is a description with spaces"
-        result = f_339(input_str)
+        result = f_442(input_str)
         self.assertIsInstance(result, pd.DataFrame)
         self._test_most_columns(result, self.df1)
     def test_case_2(self):
@@ -115,7 +115,7 @@ class TestCases(unittest.TestCase):
                 "2 15 B20C 200 Another description with spaces",
             ]
         )
-        result = f_339(input_str)
+        result = f_442(input_str)
         self._test_most_columns(result, self.df_multiple)
     def test_case_3(self):
         # Test multiline with trailing whitespaces
@@ -125,7 +125,7 @@ class TestCases(unittest.TestCase):
                 "2 15 B20C 200 Another description with spaces     ",
             ]
         )
-        result = f_339(input_str)
+        result = f_442(input_str)
         self._test_most_columns(result, self.df_multiple)
     def test_case_4(self):
         # Test behavior with extra spaces in the input string
@@ -135,7 +135,7 @@ class TestCases(unittest.TestCase):
                 "2  15   B20C   200 Another description with spaces     ",
             ]
         )
-        result = f_339(input_str)
+        result = f_442(input_str)
         self._test_most_columns(result, self.df_multiple)
     def test_case_5(self):
         # Test code to product mapping when there are duplicates
@@ -145,16 +145,16 @@ class TestCases(unittest.TestCase):
                 "2 15 A10B 200 Another description with spaces",
             ]
         )
-        result = f_339(input_str)
+        result = f_442(input_str)
         product_names = result["Product"]
         self.assertEqual(product_names.iloc[0], product_names.iloc[1])
     def test_case_6(self):
         # Test behavior with empty input string
         input_str = ""
         with self.assertRaises(ValueError):
-            f_339(input_str)
+            f_442(input_str)
     def test_case_7(self):
         # Test behavior with incomplete input string
         input_str = "1 10"
         with self.assertRaises(ValueError):
-            f_339(input_str)
+            f_442(input_str)

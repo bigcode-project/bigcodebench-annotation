@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy import stats
 
 
-def f_931(mean=123456.908, std_dev=1.2, save_plots=False):
+def f_60(mean=123456.908, std_dev=1.2, save_plots=False):
     """
     Generate a random sample from a normal distribution, analyze its skewness and kurtosis,
     and create a histogram and a QQ plot to visualize the distribution.
@@ -25,7 +25,7 @@ def f_931(mean=123456.908, std_dev=1.2, save_plots=False):
 
     Example:
     >>> np.random.seed(0)
-    >>> skewness, kurtosis, plot_paths = f_931(123456.908, 1.2, True)
+    >>> skewness, kurtosis, plot_paths = f_60(123456.908, 1.2, True)
     >>> print(f'Skewness: {skewness}, Kurtosis: {kurtosis}, Plots: {plot_paths}')
     Skewness: 0.03385895323538189, Kurtosis: -0.04676632447765128, Plots: ['histogram_plot.png', 'qq_plot.png']
 
@@ -60,49 +60,49 @@ import unittest
 import os
 import numpy as np
 class TestCases(unittest.TestCase):
-    """Test cases for f_931."""
+    """Test cases for f_60."""
     def test_default_parameters(self):
         """
-        Test f_931 with default parameters.
+        Test f_60 with default parameters.
         """
         np.random.seed(0)
-        skewness, kurtosis, plot_paths = f_931()
+        skewness, kurtosis, plot_paths = f_60()
         self.assertAlmostEqual(skewness, 0, delta=0.5)
         self.assertAlmostEqual(kurtosis, 0, delta=0.5)
         self.assertEqual(len(plot_paths), 0)
     def test_save_plots_true(self):
         """
-        Test f_931 with save_plots set to True.
+        Test f_60 with save_plots set to True.
         """
         np.random.seed(1)
-        _, _, plot_paths = f_931(save_plots=True)
+        _, _, plot_paths = f_60(save_plots=True)
         self.assertEqual(len(plot_paths), 2)
         for path in plot_paths:
             self.assertTrue(os.path.exists(path))
             os.remove(path)  # Clean up: remove created files
     def test_custom_mean_std_dev(self):
         """
-        Test f_931 with custom mean and standard deviation.
+        Test f_60 with custom mean and standard deviation.
         """
         np.random.seed(2)
         mean = 100
         std_dev = 10
-        skewness, kurtosis, _ = f_931(mean, std_dev)
+        skewness, kurtosis, _ = f_60(mean, std_dev)
         self.assertAlmostEqual(skewness, 0, delta=1)
         self.assertAlmostEqual(kurtosis, 0, delta=1)
     def test_negative_std_dev(self):
         """
-        Test f_931 with a negative standard deviation.
+        Test f_60 with a negative standard deviation.
         """
         np.random.seed(3)
         with self.assertRaises(ValueError):
-            f_931(std_dev=-1)
+            f_60(std_dev=-1)
     def test_large_sample(self):
         """
-        Test f_931 with a larger sample size.
+        Test f_60 with a larger sample size.
         """
         np.random.seed(4)
-        _, _, plot_paths = f_931(mean=1000, std_dev=50, save_plots=True)
+        _, _, plot_paths = f_60(mean=1000, std_dev=50, save_plots=True)
         self.assertEqual(len(plot_paths), 2)
         for path in plot_paths:
             self.assertTrue(os.path.exists(path))

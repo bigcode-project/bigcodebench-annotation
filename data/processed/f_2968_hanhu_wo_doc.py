@@ -3,7 +3,7 @@ import urllib.parse
 import hmac
 import hashlib
 
-def f_2970(req_data, secret_key):
+def f_538(req_data, secret_key):
     """
     Signs the specified request data with a secret key using HMAC SHA256, then URL encodes the signature.
 
@@ -25,9 +25,9 @@ def f_2970(req_data, secret_key):
 
     Examples:
     >>> secret_key = 'my_secret_key'
-    >>> isinstance(f_2970({'test': 'just a test'}, secret_key), str)
+    >>> isinstance(f_538({'test': 'just a test'}, secret_key), str)
     True
-    >>> isinstance(f_2970({'another': 'data', 'key': 123}, secret_key), str)
+    >>> isinstance(f_538({'another': 'data', 'key': 123}, secret_key), str)
     True
     """
     if not isinstance(req_data, dict):
@@ -59,35 +59,35 @@ class TestCases(unittest.TestCase):
         return url_encoded_signature
     def test_return_type(self):
         """Ensure the function returns a string."""
-        result = f_2970({'key': 'value'}, self.secret_key)
+        result = f_538({'key': 'value'}, self.secret_key)
         self.assertIsInstance(result, str)
     def test_known_data_signature(self):
         """Validate the HMAC signature against a known output for specific data."""
         known_data = {'known': 'data'}
         expected_signature = self.compute_expected_signature(known_data)
-        result = f_2970(known_data, self.secret_key)
+        result = f_538(known_data, self.secret_key)
         self.assertEqual(result, expected_signature)
     def test_empty_data(self):
         """Verify the function behaves correctly with empty input data."""
-        result = f_2970({}, self.secret_key)
+        result = f_538({}, self.secret_key)
         expected_signature_for_empty_data = self.compute_expected_signature({})
         self.assertEqual(result, expected_signature_for_empty_data)
     def test_complex_data_structure(self):
         """Check the function's behavior with complex nested data structures."""
         complex_data = {'list': [1, 2, 3], 'nested': {'key': 'value'}}
-        result = f_2970(complex_data, self.secret_key)
+        result = f_538(complex_data, self.secret_key)
         expected_signature = self.compute_expected_signature(complex_data)
         self.assertEqual(result, expected_signature)
     def test_non_dict_input(self):
         """Ensure non-dictionary inputs raise the appropriate error."""
         with self.assertRaises(TypeError):
-            f_2970('not a dict', self.secret_key)
+            f_538('not a dict', self.secret_key)
     def test_different_data_different_signatures(self):
         """Test that different data results in different HMAC signatures."""
         data1 = {'data': 'test1'}
         data2 = {'data': 'test2'}
-        result1 = f_2970(data1, self.secret_key)
-        result2 = f_2970(data2, self.secret_key)
+        result1 = f_538(data1, self.secret_key)
+        result2 = f_538(data2, self.secret_key)
         expected_signature1 = self.compute_expected_signature(data1)
         expected_signature2 = self.compute_expected_signature(data2)
         self.assertEqual(result1, expected_signature1)
@@ -96,8 +96,8 @@ class TestCases(unittest.TestCase):
     def test_consistent_hash_with_same_input(self):
         """Test that hashing the same data multiple times results in the same hashes."""
         data = {'consistent': 'data'}
-        result1 = f_2970(data, self.secret_key)
-        result2 = f_2970(data, self.secret_key)
+        result1 = f_538(data, self.secret_key)
+        result2 = f_538(data, self.secret_key)
         expected_signature = self.compute_expected_signature(data)
         self.assertEqual(result1, expected_signature)
         self.assertEqual(result2, expected_signature)

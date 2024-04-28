@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from random import randint
 import math
 
-def f_1767(POINTS=100):
+def f_283(POINTS=100):
     """
     Simulates a random walk in a two-dimensional space and draws the path using matplotlib.
     The walk is determined by randomly choosing directions at each step. The function generates
@@ -24,7 +24,7 @@ def f_1767(POINTS=100):
 
     Examples:
         >>> import matplotlib
-        >>> fig = f_1767(200)  # Displays a plot of a random walk with 200 steps
+        >>> fig = f_283(200)  # Displays a plot of a random walk with 200 steps
         >>> isinstance(fig, matplotlib.figure.Figure)
         True
     """
@@ -53,9 +53,9 @@ class TestCases(unittest.TestCase):
     def test_no_error(self, mock_show):
         """Test that the function runs without error."""
         try:
-            f_1767(100)  # Adjust POINTS value if necessary for your specific test case
+            f_283(100)  # Adjust POINTS value if necessary for your specific test case
         except Exception as e:
-            self.fail(f"Function f_1767 raised an exception: {e}")
+            self.fail(f"Function f_283 raised an exception: {e}")
     @patch('matplotlib.pyplot.subplots')
     def test_walk_length(self, mock_subplots):
         """Test that the walk has the correct length."""
@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
         mock_fig = MagicMock()
         mock_subplots.return_value = (mock_fig, mock_ax)
         
-        f_1767(100)  # Using a specific POINTS value for testing
+        f_283(100)  # Using a specific POINTS value for testing
         mock_ax.plot.assert_called_once()
         args, kwargs = mock_ax.plot.call_args
         x, y = args[0], args[1]
@@ -75,7 +75,7 @@ class TestCases(unittest.TestCase):
         mock_ax = MagicMock()
         mock_fig = MagicMock()
         mock_subplots.return_value = (mock_fig, mock_ax)
-        f_1767(100)  # Using a specific POINTS value for testing
+        f_283(100)  # Using a specific POINTS value for testing
         
         args, _ = mock_ax.plot.call_args
         x, y = args[0], args[1]
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
         mock_ax = MagicMock()
         mock_fig = MagicMock()
         mock_subplots.return_value = (mock_fig, mock_ax)
-        f_1767(10)  # Using a smaller number for a more manageable test case
+        f_283(10)  # Using a smaller number for a more manageable test case
         args, _ = mock_ax.plot.call_args
         x, y = args[0], args[1]
         for i in range(1, len(x)):
@@ -98,5 +98,5 @@ class TestCases(unittest.TestCase):
     @patch('matplotlib.pyplot.show')
     def test_plot_shown(self, mock_show):
         """Test that plt.show() is called."""
-        f_1767(100)  # Adjust POINTS value if necessary for your specific test case
+        f_283(100)  # Adjust POINTS value if necessary for your specific test case
         mock_show.assert_called_once()

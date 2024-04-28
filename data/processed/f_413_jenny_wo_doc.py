@@ -4,7 +4,7 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 
 
-def f_413(input_file):
+def f_126(input_file):
     """
     Reads a JSON file containing a list of dictionaries. For each key across all dictionaries,
     calculates the mean and median of its values using numpy. Visualizes the mean and median
@@ -26,7 +26,7 @@ def f_413(input_file):
         - matplotlib.pyplot
 
     Example:
-    >>> results, plots = f_413("sample_data.json")
+    >>> results, plots = f_126("sample_data.json")
     >>> type(plots[0])
     <class 'matplotlib.axes._axes.Axes'>
     >>> results
@@ -75,14 +75,14 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Check plot generation
         expected_titles = ["a", "b"]
-        _, plots = f_413(os.path.join(self.temp_dir.name, "test_1.json"))
+        _, plots = f_126(os.path.join(self.temp_dir.name, "test_1.json"))
         self.assertEqual(len(plots), len(expected_titles))
         for plot, title in zip(plots, expected_titles):
             assert isinstance(plot, matplotlib.axes._axes.Axes)
             self.assertTrue(plot.get_title(), f"Statistics of {title}")
     def test_case_2(self):
         # Check result correctness
-        results, _ = f_413(os.path.join(self.temp_dir.name, "test_1.json"))
+        results, _ = f_126(os.path.join(self.temp_dir.name, "test_1.json"))
         self.assertIn("a", results)
         self.assertIn("b", results)
         self.assertEqual(results["a"]["mean"], 3.0)
@@ -92,15 +92,15 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test with invalid data structure (not a list of dicts)
         with self.assertRaises(AttributeError):
-            f_413(os.path.join(self.temp_dir.name, "invalid.json"))
+            f_126(os.path.join(self.temp_dir.name, "invalid.json"))
     def test_case_4(self):
         # Test with empty data
-        results, plots = f_413(os.path.join(self.temp_dir.name, "empty.json"))
+        results, plots = f_126(os.path.join(self.temp_dir.name, "empty.json"))
         self.assertEqual(results, {})
         self.assertEqual(len(plots), 0)
     def test_case_5(self):
         # Test handling nested dicts with one key each
-        results, _ = f_413(os.path.join(self.temp_dir.name, "test_2.json"))
+        results, _ = f_126(os.path.join(self.temp_dir.name, "test_2.json"))
         self.assertIn("x", results)
         self.assertIn("y", results)
         self.assertIn("z", results)
@@ -113,4 +113,4 @@ class TestCases(unittest.TestCase):
     def test_case_6(self):
         # Test with nonexistent filename
         with self.assertRaises(FileNotFoundError):
-            f_413(os.path.join(self.temp_dir.name, "NOTEXISTS.json"))
+            f_126(os.path.join(self.temp_dir.name, "NOTEXISTS.json"))

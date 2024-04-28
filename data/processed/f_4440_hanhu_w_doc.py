@@ -2,7 +2,7 @@ import inspect
 import matplotlib.pyplot as plt
 import pandas as pd
 
-def f_4442(f_list):
+def f_565(f_list):
     """
     Analyzes a list of functions and draws a bar chart showing the number of arguments for each function.
     The function names are listed along the x-axis, and the number of arguments are represented as bars.
@@ -25,13 +25,13 @@ def f_4442(f_list):
     Examples:
     >>> def f(x): x*x
     >>> def g(x, y=2): return x*y
-    >>> f_4442([f, g])
+    >>> f_565([f, g])
                    Number of Arguments
     Function Name                     
     f                                1
     g                                2
     >>> lambda_func = lambda x: x * 2
-    >>> f_4442([f, lambda_func])
+    >>> f_565([f, lambda_func])
     Traceback (most recent call last):
     ...
     ValueError: The function should not be a lambda function.
@@ -56,29 +56,29 @@ from unittest.mock import patch
 class TestCases(unittest.TestCase):
     def test_single_function(self):
         def sample_function(x): pass
-        df = f_4442([sample_function])
+        df = f_565([sample_function])
         self.assertEqual(df.loc['sample_function', 'Number of Arguments'], 1)
     def test_multiple_functions(self):
         def f(x): pass
         def g(x, y): pass
-        df = f_4442([f, g])
+        df = f_565([f, g])
         self.assertEqual(df.loc['f', 'Number of Arguments'], 1)
         self.assertEqual(df.loc['g', 'Number of Arguments'], 2)
     def test_no_arguments_function(self):
         def no_arg_func(): pass
-        df = f_4442([no_arg_func])
+        df = f_565([no_arg_func])
         self.assertEqual(df.loc['no_arg_func', 'Number of Arguments'], 0)
     def test_lambda_functions(self):
         lambda_func = lambda x, y: x + y
         with self.assertRaises(ValueError):
-            df = f_4442([lambda_func])
+            df = f_565([lambda_func])
     
     def test_function_with_defaults(self):
         def func_with_defaults(x, y=2): pass
-        df = f_4442([func_with_defaults])
+        df = f_565([func_with_defaults])
         self.assertEqual(df.loc['func_with_defaults', 'Number of Arguments'], 2)
     @patch('matplotlib.pyplot.show')
     def test_plot_called(self, mock_show):
         def sample_function(x): pass
-        f_4442([sample_function])
+        f_565([sample_function])
         mock_show.assert_called_once()

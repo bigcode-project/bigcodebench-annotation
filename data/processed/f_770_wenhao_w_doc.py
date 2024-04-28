@@ -3,7 +3,7 @@ import itertools
 import string
 
 
-def f_770(word: str) -> dict:
+def f_588(word: str) -> dict:
     """
     Create a dictionary containing all possible two-letter combinations of the lowercase English alphabets. 
     The dictionary values represent the frequency of these two-letter combinations in the given word.
@@ -26,7 +26,7 @@ def f_770(word: str) -> dict:
     - The function uses the `string` library to get a string of lowercase alphabets.
 
     Example:
-    >>> list(f_770('abcdef').items())[:5]
+    >>> list(f_588('abcdef').items())[:5]
     [('ab', 1), ('ac', 0), ('ad', 0), ('ae', 0), ('af', 0)]
     """
     ALPHABETS = string.ascii_lowercase
@@ -45,7 +45,7 @@ def f_770(word: str) -> dict:
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = f_770('abcdef')
+        result = f_588('abcdef')
         self.assertEqual(result['ab'], 1)
         self.assertEqual(result['ac'], 0)
         self.assertEqual(result['bc'], 1)
@@ -53,7 +53,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(result['zz'], 0)
         
     def test_case_2(self):
-        result = f_770('aabbcc')
+        result = f_588('aabbcc')
         self.assertEqual(result['aa'], 1)
         self.assertEqual(result['ab'], 1)
         self.assertEqual(result['ba'], 0)
@@ -61,20 +61,20 @@ class TestCases(unittest.TestCase):
         self.assertEqual(result['bc'], 1)
         
     def test_case_3(self):
-        result = f_770('fedcba')
+        result = f_588('fedcba')
         self.assertEqual(result['fe'], 1)
         self.assertEqual(result['ef'], 0)
         self.assertEqual(result['dc'], 1)
         self.assertEqual(result['ba'], 1)
         self.assertEqual(result['zz'], 0)
     def test_case_4(self):
-        result = f_770('cadbfe')
+        result = f_588('cadbfe')
         self.assertEqual(result['ca'], 1)
         self.assertEqual(result['ad'], 1)
         self.assertEqual(result['db'], 1)
         self.assertEqual(result['fe'], 1)
         self.assertEqual(result['zz'], 0)
     def test_case_5(self):
-        result = f_770('')
+        result = f_588('')
         self.assertEqual(result['ab'], 0)
         self.assertEqual(result['zz'], 0)

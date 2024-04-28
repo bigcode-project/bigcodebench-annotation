@@ -1,7 +1,7 @@
 import numpy as np
 import random
 
-def f_1760(my_list):
+def f_4(my_list):
     """
     Appends a randomly selected integer between 0 and 100 to the given list 'my_list' and 
     returns a numpy array of random floating-point numbers. The size of the returned array 
@@ -20,7 +20,7 @@ def f_1760(my_list):
     - random
                        
     Examples:
-        >>> result = f_1760([2, 3, 5])
+        >>> result = f_4([2, 3, 5])
         >>> 10 <= len(result) <= 110  # Expecting the length to be within the range after adding a random number between 0 and 100
         True
         >>> isinstance(result, np.ndarray)
@@ -40,25 +40,25 @@ import numpy as np
 class TestCases(unittest.TestCase):
     def test_return_type(self):
         """ Test that the function returns a numpy array. """
-        result = f_1760([1, 2, 3])
+        result = f_4([1, 2, 3])
         self.assertIsInstance(result, np.ndarray)
     @patch('random.randint', return_value=50)
     def test_array_size(self, mock_randint):
         """ Test that the returned array has the correct size. """
         input_list = [1, 2, 3]
         expected_size = sum(input_list) + 50  # The function adds a mocked random number to the list
-        result = f_1760(input_list)
+        result = f_4(input_list)
         self.assertEqual(len(result), expected_size)
     @patch('random.randint', return_value=50)
     def test_list_modification(self, mock_randint):
         """ Test that the input list is modified correctly with a mocked random value. """
         input_list = [1, 2, 3]
-        f_1760(input_list)
+        f_4(input_list)
         self.assertIn(50, input_list)  # Asserting the list contains the mocked random value
     @patch('random.randint', return_value=50)
     def test_empty_list(self, mock_randint):
         """ Test the function with an empty list and a mocked random addition. """
-        result = f_1760([])
+        result = f_4([])
         self.assertEqual(len(result), 50)  # Expecting the array size to be equal to the mocked random number
     @patch('numpy.random.rand')
     @patch('random.randint', return_value=50)
@@ -66,6 +66,6 @@ class TestCases(unittest.TestCase):
         """ Test the function with mocks of randint and np.random.rand to control the randomness. """
         mock_rand.return_value = np.array([0.5] * 53)  # Setting the mock array size to 53
         input_list = [1, 2]
-        result = f_1760(input_list)
+        result = f_4(input_list)
         mock_rand.assert_called_once_with(53)  # Assert that np.random.rand is called with the size after adding 50
         np.testing.assert_array_equal(result, np.array([0.5] * 53))

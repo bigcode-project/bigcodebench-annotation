@@ -1,7 +1,7 @@
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
-def f_310(l):
+def f_147(l):
     """
     Perform Principal Component Analysis (PCA) on the given array and record the first two main components.
 
@@ -23,7 +23,7 @@ def f_310(l):
     Example:
     >>> import numpy as np
     >>> l = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
-    >>> ax = f_310(l)
+    >>> ax = f_147(l)
     >>> len(ax.collections[0].get_offsets())
     4
     >>> print(ax.get_title())
@@ -49,7 +49,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Input 1: simple 2D array
         l = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
-        ax = f_310(l)
+        ax = f_147(l)
         self.assertTrue(isinstance(ax, plt.Axes))
         self.assertEqual(ax.get_title(), "PCA Result")
         self.assertEqual(ax.get_xlabel(), "First Principal Component")
@@ -60,7 +60,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Input 2: another simple 2D array
         l = np.array([[2, 3], [4, 5], [6, 7], [8, 9]])
-        ax = f_310(l)
+        ax = f_147(l)
         self.assertTrue(isinstance(ax, plt.Axes))
         self.assertEqual(ax.get_title(), "PCA Result")
         self.assertEqual(ax.get_xlabel(), "First Principal Component")
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
         # Input 3: larger array
         np.random.seed(0)
         l = np.random.rand(10, 2)
-        ax = f_310(l)
+        ax = f_147(l)
         self.assertTrue(isinstance(ax, plt.Axes))
         self.assertEqual(ax.get_title(), "PCA Result")
         self.assertEqual(ax.get_xlabel(), "First Principal Component")
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Input 4: array with similar values (less variance)
         l = np.array([[1, 2], [1, 2.1], [1.1, 2], [1.1, 2.1]])
-        ax = f_310(l)
+        ax = f_147(l)
         self.assertTrue(isinstance(ax, plt.Axes))
         self.assertEqual(ax.get_title(), "PCA Result")
         self.assertEqual(ax.get_xlabel(), "First Principal Component")
@@ -94,7 +94,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Input 5: array with larger values
         l = np.array([[100, 200], [300, 400], [500, 600], [700, 800]])
-        ax = f_310(l)
+        ax = f_147(l)
         self.assertTrue(isinstance(ax, plt.Axes))
         self.assertEqual(ax.get_title(), "PCA Result")
         self.assertEqual(ax.get_xlabel(), "First Principal Component")

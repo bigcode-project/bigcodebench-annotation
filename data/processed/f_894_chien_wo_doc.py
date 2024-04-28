@@ -5,7 +5,7 @@ import hashlib
 DIRECTORY = "./hashed_files"
 
 
-def f_894(input_string):
+def f_480(input_string):
     """
     Hash each non-empty line of a multi-line string using SHA256 and save the hashes to files.
     The filename is the first 10 characters of the hash, with a '.txt' extension.
@@ -25,7 +25,7 @@ def f_894(input_string):
     - Empty lines in the input string are ignored.
 
     Example:
-    >>> file_paths = f_894('line a\nfollows by line b\n\n...bye\n')
+    >>> file_paths = f_480('line a\nfollows by line b\n\n...bye\n')
     >>> print(file_paths)
     ['./hashed_files/489fe1fa6c.txt', './hashed_files/67009597fe.txt', './hashed_files/eab4758603.txt']
     """
@@ -50,7 +50,7 @@ import os
 import hashlib
 import shutil
 class TestCases(unittest.TestCase):
-    """Tests for the function f_894."""
+    """Tests for the function f_480."""
     @classmethod
     def setUpClass(cls):
         """Set up a temporary directory for test files."""
@@ -68,7 +68,7 @@ class TestCases(unittest.TestCase):
         """Test with a single line input."""
         input_string = "Hello world"
         expected = [os.path.join("./hashed_files", "64ec88ca00.txt")]
-        result = f_894(input_string)
+        result = f_480(input_string)
         self.assertEqual(result, expected)
     def test_multi_line(self):
         """Test with a multi-line input."""
@@ -78,13 +78,13 @@ class TestCases(unittest.TestCase):
             os.path.join("./hashed_files", "c8b588f708.txt"),
             os.path.join("./hashed_files", "3195807ae4.txt"),
         ]
-        result = f_894(input_string)
+        result = f_480(input_string)
         self.assertEqual(result, expected)
     def test_empty_input(self):
         """Test with an empty string."""
         input_string = ""
         expected = []
-        result = f_894(input_string)
+        result = f_480(input_string)
         self.assertEqual(result, expected)
     def test_input_with_empty_lines(self):
         """Test input string containing empty lines."""
@@ -93,13 +93,13 @@ class TestCases(unittest.TestCase):
             os.path.join("./hashed_files", "209f4c0be3.txt"),
             os.path.join("./hashed_files", "1ae5466eb8.txt"),
         ]
-        result = f_894(input_string)
+        result = f_480(input_string)
         self.assertEqual(result, expected)
     def test_no_newline_at_end(self):
         """Test input string without a newline at the end."""
         input_string = "Line with no newline at end"
         expected = [os.path.join("./hashed_files", "901dd863e9.txt")]
-        result = f_894(input_string)
+        result = f_480(input_string)
         self.assertEqual(result, expected)
     def test_directory_creation(self):
         """
@@ -108,7 +108,7 @@ class TestCases(unittest.TestCase):
         # Assert that the DIRECTORY does not exist before calling the function
         self.assertFalse(os.path.exists(DIRECTORY))
         # Call the function with any string
-        f_894("Test for directory creation")
+        f_480("Test for directory creation")
         # Check if the DIRECTORY has been created
         self.assertTrue(os.path.exists(DIRECTORY))
         # Optionally, clean up by removing the created directory after the test

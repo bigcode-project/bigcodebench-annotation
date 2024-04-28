@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def f_219(data, key, min_value, max_value):
+def f_106(data, key, min_value, max_value):
     '''
     Add a new column with random values to the "data" DataFrame.
 
@@ -25,7 +25,7 @@ def f_219(data, key, min_value, max_value):
     Example:
     >>> np.random.seed(0)
     >>> data = pd.DataFrame({'key1': ['value1', 'value2', 'value3'], 'key2': [1, 2, 3]})
-    >>> updated_data = f_219(data, 'new_key', 0, 10)
+    >>> updated_data = f_106(data, 'new_key', 0, 10)
     >>> print(updated_data)
          key1  key2  new_key
     0  value1     1        5
@@ -50,7 +50,7 @@ class TestCases(unittest.TestCase):
         key = 'new_column'
         min_value = 0
         max_value = 10
-        updated_data = f_219(data, key, min_value, max_value)
+        updated_data = f_106(data, key, min_value, max_value)
         self.assertIsInstance(updated_data, pd.DataFrame)
         self.assertTrue(key in updated_data.columns)
         self.assertEqual(len(updated_data), 0)
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         key = 'random_values'
         min_value = 0
         max_value = 10
-        updated_data = f_219(data, key, min_value, max_value)
+        updated_data = f_106(data, key, min_value, max_value)
         self.assertIsInstance(updated_data, pd.DataFrame)
         self.assertTrue(key in updated_data.columns)
         self.assertEqual(len(updated_data), 3)  # Assuming the length of the input data is 3
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         key = 'random'
         min_value = -10
         max_value = -5
-        updated_data = f_219(data, key, min_value, max_value)
+        updated_data = f_106(data, key, min_value, max_value)
         self.assertIsInstance(updated_data, pd.DataFrame)
         self.assertTrue(key in updated_data.columns)
         self.assertEqual(len(updated_data), 2)
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         key = 'new_col'
         min_value = 0
         max_value = 10
-        updated_data = f_219(data, key, min_value, max_value)
+        updated_data = f_106(data, key, min_value, max_value)
         self.assertIsInstance(updated_data, pd.DataFrame)
         self.assertTrue(key in updated_data.columns)
         self.assertEqual(len(updated_data), 1)
@@ -97,7 +97,7 @@ class TestCases(unittest.TestCase):
         key = 'random_numbers'
         min_value = 1
         max_value = 100
-        updated_data = f_219(data, key, min_value, max_value)
+        updated_data = f_106(data, key, min_value, max_value)
         self.assertIsInstance(updated_data, pd.DataFrame)
         self.assertTrue(key in updated_data.columns)
         self.assertEqual(len(updated_data), 1000)
@@ -106,4 +106,4 @@ class TestCases(unittest.TestCase):
         np.random.seed(0)
         with self.assertRaises(ValueError):
             data = {'key1': ['value1', 'value2', 'value3'], 'key2': [1, 2, 3]}
-            f_219(data, 'new_key', 0, 10)
+            f_106(data, 'new_key', 0, 10)

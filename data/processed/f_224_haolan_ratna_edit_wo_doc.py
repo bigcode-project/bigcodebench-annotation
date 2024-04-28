@@ -2,7 +2,7 @@ import re
 import json
 import requests
 
-def f_224(data_url: str) -> list:
+def f_507(data_url: str) -> list:
     """
     Fetch data from a specific URL and extract all names from the JSON-formatted data that are not enclosed by square brackets.
     
@@ -29,7 +29,7 @@ def f_224(data_url: str) -> list:
     >>> mock_response = MagicMock()
     >>> mock_response.json.return_value = {"names": ["John", "[Adam]", "Eve"]}
     >>> requests.get = MagicMock(return_value=mock_response)
-    >>> f_224("https://api.example.com/other_data")
+    >>> f_507("https://api.example.com/other_data")
     ['John', 'Eve']
     """
 
@@ -67,25 +67,25 @@ class TestCases(unittest.TestCase):
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_1(self, mock_get):
         context = "https://api.example.com/data"
-        result = f_224(context)
+        result = f_507(context)
         self.assertListEqual(result, ["John", "Doe", "Alice"])
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_2(self, mock_get):
         context = "https://api.example.com/other_data"
-        result = f_224(context)
+        result = f_507(context)
         self.assertListEqual(result, ['Bob', 'Eve'])
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_3(self, mock_get):
         context = ""
-        result = f_224(context)
+        result = f_507(context)
         self.assertEqual(result, "Invalid url input")
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_4(self, mock_get):
         context = "https://api.example.com/error_data"
-        result = f_224(context)
+        result = f_507(context)
         self.assertEqual(result, "Invalid url input")
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_5(self, mock_get):
         context = "https://api.example.com/data_1"
-        result = f_224(context)
+        result = f_507(context)
         self.assertListEqual(result, ['Billy'])

@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
-def f_279(df):
+def f_419(df):
     '''
     Processes a DataFrame containing dates and lists of numbers. It converts the lists into separate columns,
     performs Principal Component Analysis (PCA), and returns the explained variance ratio of the principal components
@@ -28,7 +28,7 @@ def f_279(df):
 
     Example:
     >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-    >>> explained_variance_ratio, ax = f_279(df)
+    >>> explained_variance_ratio, ax = f_419(df)
     >>> print(len(explained_variance_ratio))
     2
     '''
@@ -64,30 +64,30 @@ import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_return_types(self):
         df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        variance_ratio, plot = f_279(df)
+        variance_ratio, plot = f_419(df)
         self.assertIsInstance(variance_ratio, np.ndarray)
         self.assertIsInstance(plot, plt.Axes)
     def test_known_input_output(self):
         df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        variance_ratio, plot = f_279(df)
+        variance_ratio, plot = f_419(df)
         self.assertIsInstance(variance_ratio, np.ndarray)
         self.assertIsInstance(plot, plt.Axes)
     def test_empty_dataframe(self):
         empty_df = pd.DataFrame()
-        variance_ratio, _ = f_279(empty_df)
+        variance_ratio, _ = f_419(empty_df)
         self.assertEqual(variance_ratio, 0)
     def test_single_row_dataframe(self):
         single_row_df = pd.DataFrame([['2021-01-01', [8, 10, 12]]], columns=['Date', 'Value'])
-        variance_ratio, _ = f_279(single_row_df)
+        variance_ratio, _ = f_419(single_row_df)
         self.assertEqual(len(variance_ratio), 1)
     def test_plot_attributes(self):
         df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        _, ax = f_279(df)
+        _, ax = f_419(df)
         self.assertEqual(ax.get_title(), 'Explained Variance Ratio of Principal Components')
         self.assertEqual(ax.get_xlabel(), 'Principal Component')
         self.assertEqual(ax.get_ylabel(), 'Explained Variance Ratio')
     def test_plot_explained_variance_ratio(self):
         df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        variance_ratio, ax = f_279(df)
+        variance_ratio, ax = f_419(df)
         bar_heights = [rect.get_height() for rect in ax.patches]
         self.assertListEqual(bar_heights, list(variance_ratio))

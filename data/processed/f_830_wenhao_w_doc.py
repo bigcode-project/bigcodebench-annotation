@@ -4,7 +4,7 @@ from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
 
-def f_830(json_data: str, data_key: str):
+def f_95(json_data: str, data_key: str):
     """
     Processes a JSON string to extract numerical data, Min-Max normalize them,
     and generate a line plot.
@@ -36,7 +36,7 @@ def f_830(json_data: str, data_key: str):
 
     Example:
     >>> json_str = '{"data": {"values": [5, 10, 15, 20, 25]}}'
-    >>> original_data, normalized_data, ax = f_830(json_str, 'data.values')
+    >>> original_data, normalized_data, ax = f_95(json_str, 'data.values')
     >>> type(original_data), type(normalized_data), type(ax)
     (<class 'pandas.core.series.Series'>, <class 'pandas.core.series.Series'>, <class 'matplotlib.axes._axes.Axes'>)
     """
@@ -75,13 +75,13 @@ class TestCases(unittest.TestCase):
     def test_data_extraction(self):
         json_str = '{"data": {"values": [0.5, 10, 15, 20]}}'
         data_key = "data.values"
-        original_data, _, _ = f_830(json_str, data_key)
+        original_data, _, _ = f_95(json_str, data_key)
         expected_series = pd.Series([0.5, 10, 15, 20], dtype=pd.Float64Dtype)
         pd.testing.assert_series_equal(original_data, expected_series)
     def test_data_normalization(self):
         json_str = '{"data": {"values": [0, 10, 20, 30, 40]}}'
         data_key = "data.values"
-        _, normalized_data, _ = f_830(json_str, data_key)
+        _, normalized_data, _ = f_95(json_str, data_key)
         expected_normalized = pd.Series(
             [0.0, 0.25, 0.5, 0.75, 1.0], dtype=pd.Float64Dtype
         )
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
     def test_plot_properties(self):
         json_str = '{"data": {"values": [1, 2, 3, 4, 5]}}'
         data_key = "data.values"
-        _, _, ax = f_830(json_str, data_key)
+        _, _, ax = f_95(json_str, data_key)
         self.assertEqual(ax.get_title(), "Comparison of Original and Normalized Data")
         self.assertEqual(ax.get_xlabel(), "Index")
         self.assertEqual(ax.get_ylabel(), "Value")
@@ -99,14 +99,14 @@ class TestCases(unittest.TestCase):
     def test_empty_data(self):
         json_str = '{"data": {"values": []}}'
         data_key = "data.values"
-        original_data, normalized_data, ax = f_830(json_str, data_key)
+        original_data, normalized_data, ax = f_95(json_str, data_key)
         self.assertTrue(original_data.empty)
         self.assertIsNone(normalized_data)
         self.assertIsNone(ax)
     def test_non_uniform_data_spacing(self):
         json_str = '{"data": {"values": [1, 1, 2, 3, 5, 8]}}'
         data_key = "data.values"
-        _, normalized_data, _ = f_830(json_str, data_key)
+        _, normalized_data, _ = f_95(json_str, data_key)
         expected_normalized = pd.Series(
             [0.0, 0.0, 0.142857, 0.285714, 0.571429, 1.0], dtype=pd.Float64Dtype
         )
@@ -114,7 +114,7 @@ class TestCases(unittest.TestCase):
     def test_negative_values(self):
         json_str = '{"data": {"values": [-50, -20, 0, 20, 50]}}'
         data_key = "data.values"
-        _, normalized_data, _ = f_830(json_str, data_key)
+        _, normalized_data, _ = f_95(json_str, data_key)
         expected_normalized = pd.Series(
             [0.0, 0.3, 0.5, 0.7, 1.0], dtype=pd.Float64Dtype
         )
@@ -122,7 +122,7 @@ class TestCases(unittest.TestCase):
     def test_nested_json_structure(self):
         json_str = '{"data": {"deep": {"deeper": {"values": [2, 4, 6, 8, 10]}}}}'
         data_key = "data.deep.deeper.values"
-        original_data, _, _ = f_830(json_str, data_key)
+        original_data, _, _ = f_95(json_str, data_key)
         expected_series = pd.Series([2, 4, 6, 8, 10], dtype=pd.Float64Dtype)
         pd.testing.assert_series_equal(original_data, expected_series)
     def test_complex_json_structure(self):
@@ -148,7 +148,7 @@ class TestCases(unittest.TestCase):
             }
         }"""
         data_key = "readings.data.deep.deeper.values"
-        original_data, normalized_data, ax = f_830(json_str, data_key)
+        original_data, normalized_data, ax = f_95(json_str, data_key)
         expected_series = pd.Series([100, 200, 300, 400, 500], dtype=pd.Float64Dtype)
         pd.testing.assert_series_equal(original_data, expected_series)
         expected_normalized = pd.Series(

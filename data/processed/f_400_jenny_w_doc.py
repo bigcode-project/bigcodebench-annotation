@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def f_400(column, data):
+def f_256(column, data):
     """
     Analyze a list of sales data, calculate the sum, the mean, the minimum, the maximum of a given column,
     and return the bar chart plot for the given column without displaying it.
@@ -24,7 +24,7 @@ def f_400(column, data):
 
     Example:
     >>> data = [['Product A', 100, 10000], ['Product B', 150, 15000], ['Product C', 200, 20000]]
-    >>> stats, plot = f_400('Total Sales', data)
+    >>> stats, plot = f_256('Total Sales', data)
     >>> stats
     {'sum': 45000, 'mean': 15000.0, 'min': 10000, 'max': 20000}
     >>> plot
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         ]
         for data, expected in scenarios:
             with self.subTest(data=data):
-                stats, ax = f_400("Total Sales", data)
+                stats, ax = f_256("Total Sales", data)
                 self.assertDictEqual(stats, expected)
                 self.assertEqual(ax.get_title(), "Bar Chart of Total Sales")
                 plt.close("all")
@@ -105,24 +105,24 @@ class TestCases(unittest.TestCase):
         ]
         for data, expected in scenarios:
             with self.subTest(data=data):
-                stats, ax = f_400("Quantity Sold", data)
+                stats, ax = f_256("Quantity Sold", data)
                 self.assertDictEqual(stats, expected)
                 self.assertEqual(ax.get_title(), "Bar Chart of Quantity Sold")
                 plt.close("all")
     def test_case_3(self):
         # Test error handling - invalid column
         with self.assertRaises(KeyError):
-            f_400("Invalid Column", [["Product A", 100, 10000]])
+            f_256("Invalid Column", [["Product A", 100, 10000]])
     def test_case_4(self):
         # Test error handling - empty data and negative values
         with self.assertRaises(Exception):
-            f_400("Total Sales", [])
+            f_256("Total Sales", [])
         with self.assertRaises(Exception):
-            f_400("Total Sales", [["Product A", -100, -10000]])
+            f_256("Total Sales", [["Product A", -100, -10000]])
     def test_case_5(self):
         # Test plot data integrity
         data = [["Product A", 100, 5000], ["Product B", 200, 10000]]
-        _, ax = f_400("Quantity Sold", data)
+        _, ax = f_256("Quantity Sold", data)
         bars = [rect.get_height() for rect in ax.patches]
         expected_bars = [100, 200]
         self.assertEqual(bars, expected_bars)

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 TIME_FORMAT = "%d/%m/%y %H:%M:%S.%f"
 
 
-def f_919(time_strings):
+def f_489(time_strings):
     """
     Compute the differences in seconds between consecutive datetime strings and plot these differences as a bar chart.
 
@@ -28,7 +28,7 @@ def f_919(time_strings):
 
     Example:
     >>> time_strings = ['30/03/09 16:31:32.123', '30/03/09 16:32:33.123', '30/03/09 16:33:34.123']
-    >>> ax = f_919(time_strings)
+    >>> ax = f_489(time_strings)
     >>> plt.show()  # This will display the bar chart
     """
     # Calculate time differences
@@ -48,7 +48,7 @@ def f_919(time_strings):
 import unittest
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for f_919"""
+    """Test cases for f_489"""
     def test_regular_time_strings(self):
         """Test Regular Time Strings with 1-second difference"""
         time_strings = [
@@ -56,7 +56,7 @@ class TestCases(unittest.TestCase):
             "30/03/09 16:31:33.123",
             "30/03/09 16:31:34.123",
         ]
-        ax = f_919(time_strings)
+        ax = f_489(time_strings)
         bars = ax.patches
         bar_heights = [bar.get_height() for bar in bars]
         plt.close()
@@ -68,7 +68,7 @@ class TestCases(unittest.TestCase):
             "31/03/09 17:32:33.123",
             "01/04/09 18:33:34.123",
         ]
-        ax = f_919(time_strings)
+        ax = f_489(time_strings)
         bars = ax.patches
         bar_heights = [bar.get_height() for bar in bars]
         plt.close()
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
             "30/03/09 16:31:32.623",
             "30/03/09 16:31:33.123",
         ]
-        ax = f_919(time_strings)
+        ax = f_489(time_strings)
         bars = ax.patches
         bar_heights = [bar.get_height() for bar in bars]
         plt.close()
@@ -93,7 +93,7 @@ class TestCases(unittest.TestCase):
             "30/03/09 16:31:32.123",
             "30/03/09 16:31:32.123",
         ]
-        ax = f_919(time_strings)
+        ax = f_489(time_strings)
         bars = ax.patches
         bar_heights = [bar.get_height() for bar in bars]
         plt.close()
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
     def test_large_list(self):
         """Test Large List of Time Strings with Constant 1-second Difference"""
         time_strings = ["30/03/09 16:31:" + f"{i:02}.123" for i in range(30, 40)]
-        ax = f_919(time_strings)
+        ax = f_489(time_strings)
         bars = ax.patches
         bar_heights = [bar.get_height() for bar in bars]
         plt.close()

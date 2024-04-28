@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import itertools
 
-def f_426(list_of_menuitems, title="Menu Distribution", color="blue", width=1.0):
+def f_360(list_of_menuitems, title="Menu Distribution", color="blue", width=1.0):
     """
     Given a nested list of menu items, flatten the list using itertool chain, count the occurrences of each item, then
     plot a histogram with an alphabetically sorted x-axis labeled as "Menu Items" and y-axis as "Frequency".
@@ -24,9 +24,9 @@ def f_426(list_of_menuitems, title="Menu Distribution", color="blue", width=1.0)
     - itertools
 
     Example:
-    >>> f_426([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
+    >>> f_360([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
     <Axes: title={'center': 'Menu Distribution'}, xlabel='Menu Items', ylabel='Frequency'>
-    >>> f_426(['Burger'], title='A Title', color='red', width=5.0)
+    >>> f_360(['Burger'], title='A Title', color='red', width=5.0)
     <Axes: title={'center': 'A Title'}, xlabel='Menu Items', ylabel='Frequency'>
     """
     # Flatten the list
@@ -51,7 +51,7 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         input_data = [["Pizza", "Burger"], ["Pizza", "Coke"], ["Pasta", "Coke"]]
-        ax = f_426(input_data)
+        ax = f_360(input_data)
         # Test default plot properties
         self.assertEqual(ax.get_title(), "Menu Distribution")
         self.assertEqual(ax.get_xlabel(), "Menu Items")
@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
             self.assertEqual(p.get_width(), 1.0)
     def test_case_2(self):
         input_data = [["Pizza", "Burger"], ["Pizza", "Coke"], ["Pasta", "Coke"]]
-        ax = f_426(input_data, title="Custom Title", color="red", width=0.8)
+        ax = f_360(input_data, title="Custom Title", color="red", width=0.8)
         # Test custom plot properties
         self.assertEqual(ax.get_title(), "Custom Title")
         self.assertEqual(ax.get_xlabel(), "Menu Items")
@@ -75,13 +75,13 @@ class TestCases(unittest.TestCase):
             self.assertEqual(p.get_width(), 0.8)
     def test_case_3(self):
         input_data = [["Burger"], ["Pizza"], ["Pasta"]]
-        ax = f_426(input_data)
+        ax = f_360(input_data)
         # Test count
         bars = [p.get_height() for p in ax.patches]
         self.assertEqual(bars, [1, 1, 1])
     def test_case_4(self):
         input_data = [["Carrot", "Apple"], ["Apple", "Banana"], ["Banana"]]
-        ax = f_426(input_data)
+        ax = f_360(input_data)
         # Test x-axis order
         self.assertEqual(
             [_._text for _ in ax.get_xticklabels() if _._text],
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
         )
     def test_case_5(self):
         # Test input edge case: some empty elements
-        ax = f_426([[], ["Apple"]])
+        ax = f_360([[], ["Apple"]])
         self.assertEqual(len(ax.patches), 1)
         for p in ax.patches:
             # bar width
@@ -97,16 +97,16 @@ class TestCases(unittest.TestCase):
             self.assertEqual(p.get_height(), 1)
     def test_case_6(self):
         with self.assertRaises(ValueError):
-            f_426([])
+            f_360([])
         with self.assertRaises(ValueError):
-            f_426([[]])
+            f_360([[]])
         with self.assertRaises(ValueError):
-            f_426("")
+            f_360("")
         with self.assertRaises(TypeError):
-            f_426(None)
+            f_360(None)
         with self.assertRaises(TypeError):
-            f_426(1)
+            f_360(1)
         with self.assertRaises(TypeError):
-            f_426([1])
+            f_360([1])
     def tearDown(self):
         plt.close("all")

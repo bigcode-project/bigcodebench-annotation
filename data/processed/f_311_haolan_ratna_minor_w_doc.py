@@ -4,7 +4,7 @@ import numpy as np
 # Constants
 COLUMNS = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
 
-def f_311(length):
+def f_676(length):
     """
     Generate a Pandas DataFrame with specified length and random data and then record the data.
 
@@ -20,7 +20,7 @@ def f_311(length):
 
     Example:
     >>> np.random.seed(0)
-    >>> df = f_311(5)
+    >>> df = f_676(5)
     >>> df.shape
     (5, 5)
     """
@@ -38,7 +38,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Testing basic functionality
         np.random.seed(0)
-        df = f_311(5)
+        df = f_676(5)
         self.assertIsInstance(df, pd.DataFrame, "Output should be a DataFrame.")
         self.assertEqual(df.shape, (5, 5), "DataFrame shape mismatch.")
         
@@ -46,24 +46,24 @@ class TestCases(unittest.TestCase):
         # Testing custom columns
         np.random.seed(0)
         custom_columns = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
-        df = f_311(3)
+        df = f_676(3)
         self.assertListEqual(list(df.columns), custom_columns, "Column names mismatch.")
         
     def test_case_3(self):
         # Testing return plot
         np.random.seed(0)
-        df = f_311(4)
+        df = f_676(4)
         self.assertIsInstance(df, pd.DataFrame, "Output should be a DataFrame.")
         
     def test_case_4(self):
         # Testing data range
         np.random.seed(0)
-        df = f_311(10)
+        df = f_676(10)
         self.assertTrue((df.values >= 0).all() and (df.values < 100).all(), "Data values should be between 0 and 99.")
         
     def test_case_5(self):
         # Testing default columns
         np.random.seed(0)
-        df = f_311(7)
+        df = f_676(7)
         default_columns = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
         self.assertListEqual(list(df.columns), default_columns, "Default column names mismatch.")

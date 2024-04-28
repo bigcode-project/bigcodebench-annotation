@@ -3,7 +3,7 @@ import numpy as np
 from random import choice, seed
 
 
-def f_421(db_path, table_name, num_entries, random_seed=None):
+def f_356(db_path, table_name, num_entries, random_seed=None):
     """
     Insert random data into an SQLite3 table that contains random names, ages, and heights.
     If the table does not exist, it will be created.
@@ -28,7 +28,7 @@ def f_421(db_path, table_name, num_entries, random_seed=None):
     - random.seed
 
     Example:
-    >>> f_421('path_to_test.db', 'People', 100, random_seed=42)
+    >>> f_356('path_to_test.db', 'People', 100, random_seed=42)
     100
     """
     # Setting the random seed if provided
@@ -83,27 +83,27 @@ class TestCases(unittest.TestCase):
         self.temp_dir.cleanup()
     def test_case_1(self):
         # Test inserting 50 entries with a fixed seed
-        result = f_421(self.db_path, "SamplePeople", 50, random_seed=42)
+        result = f_356(self.db_path, "SamplePeople", 50, random_seed=42)
         self.assertEqual(result, 50)
     def test_case_2(self):
         # Test inserting 30 entries into a new table with a fixed seed
-        result = f_421(self.db_path, "NewPeople", 30, random_seed=42)
+        result = f_356(self.db_path, "NewPeople", 30, random_seed=42)
         self.assertEqual(result, 30)
     def test_case_3(self):
         # Test inserting 20 entries, verifying smaller batch works as expected
-        result = f_421(self.db_path, "SamplePeople", 20, random_seed=42)
+        result = f_356(self.db_path, "SamplePeople", 20, random_seed=42)
         self.assertEqual(result, 20)
     def test_case_4(self):
         # Test inserting a large number of entries (200) with a fixed seed
-        result = f_421(self.db_path, "SamplePeople", 200, random_seed=42)
+        result = f_356(self.db_path, "SamplePeople", 200, random_seed=42)
         self.assertEqual(result, 200)
     def test_case_5(self):
         # Test inserting 0 entries to check handling of empty input
-        result = f_421(self.db_path, "SamplePeople", 0, random_seed=42)
+        result = f_356(self.db_path, "SamplePeople", 0, random_seed=42)
         self.assertEqual(result, 0)
     def test_case_6(self):
         # Test the content of the rows for correctness against expected values
-        f_421(self.db_path, "ContentCheck", 10, random_seed=42)
+        f_356(self.db_path, "ContentCheck", 10, random_seed=42)
         conn = sqlite3.connect(self.db_path)
         cur = conn.cursor()
         cur.execute("SELECT * FROM ContentCheck")
@@ -115,21 +115,21 @@ class TestCases(unittest.TestCase):
     def test_case_7(self):
         # Test invalid db path
         with self.assertRaises(sqlite3.OperationalError):
-            f_421("/invalid/path.db", "TestTable", 10)
+            f_356("/invalid/path.db", "TestTable", 10)
     def test_case_8(self):
         # Test invalid table names (SQL keywords)
         with self.assertRaises(sqlite3.OperationalError):
-            f_421(self.db_path, "Select", 10)
+            f_356(self.db_path, "Select", 10)
     def test_case_9(self):
         # Test handling invalid num_entries
         with self.assertRaises(Exception):
-            f_421(self.db_path, "TestTable", -1)
+            f_356(self.db_path, "TestTable", -1)
         with self.assertRaises(TypeError):
-            f_421(self.db_path, "TestTable", "ten")
+            f_356(self.db_path, "TestTable", "ten")
     def test_case_10(self):
         # Test handling invalid random seed
         with self.assertRaises(Exception):
-            f_421(self.db_path, "TestTable", 10, random_seed="invalid")
+            f_356(self.db_path, "TestTable", 10, random_seed="invalid")
     def test_case_11(self):
         # Test different schema in existing table
         conn = sqlite3.connect(self.db_path)
@@ -137,10 +137,10 @@ class TestCases(unittest.TestCase):
         cur.execute("CREATE TABLE TestTable (id INTEGER)")
         conn.close()
         with self.assertRaises(sqlite3.OperationalError):
-            f_421(self.db_path, "TestTable", 10)
+            f_356(self.db_path, "TestTable", 10)
     def test_case_12(self):
         # Insert a known set of data and verify its integrity
-        f_421(self.db_path, "IntegrityCheck", 1, random_seed=42)
+        f_356(self.db_path, "IntegrityCheck", 1, random_seed=42)
         conn = sqlite3.connect(self.db_path)
         cur = conn.cursor()
         cur.execute("SELECT * FROM IntegrityCheck")
@@ -150,4 +150,4 @@ class TestCases(unittest.TestCase):
         # Test against SQL injection in table_name parameter
         malicious_name = "Test; DROP TABLE IntegrityCheck;"
         with self.assertRaises(sqlite3.OperationalError):
-            f_421(self.db_path, malicious_name, 1)
+            f_356(self.db_path, malicious_name, 1)

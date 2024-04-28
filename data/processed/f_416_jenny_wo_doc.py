@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def f_416(file_path):
+def f_154(file_path):
     """
     Identifies duplicate rows from a CSV file using the csv library, convert duplicated rows
     into a pandas DataFrame, then plot using matplotlib.
@@ -23,7 +23,7 @@ def f_416(file_path):
     - matplotlib.pyplot
 
     Example:
-    >>> duplicates, ax = f_416("sample_data.csv")
+    >>> duplicates, ax = f_154("sample_data.csv")
     >>> duplicates
     {('Alice', '25', 'New York'): 3, ('Bob', '30', 'London'): 2}
     >>> type(ax)
@@ -75,7 +75,7 @@ class TestCases(unittest.TestCase):
         # With duplicates - test results
         content = "Name,Age,City\nAlice,25,New York\nAlice,25,New York\nBob,30,London\nAlice,25,New York\nBob,30,London"
         file_path = self.create_temp_csv_file(content)
-        duplicates, _ = f_416(file_path)
+        duplicates, _ = f_154(file_path)
         self.assertEqual(
             duplicates,
             Counter({("Alice", "25", "New York"): 3, ("Bob", "30", "London"): 2}),
@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
         # With duplicates - test plot
         content = "Name,Age,City\nAlice,25,New York\nAlice,25,New York\nBob,30,London\nAlice,25,New York\nBob,30,London"
         file_path = self.create_temp_csv_file(content)
-        _, ax = f_416(file_path)
+        _, ax = f_154(file_path)
         # Test plot
         self.assertIsNotNone(ax)
         self.assertIsInstance(ax, matplotlib.axes._axes.Axes)
@@ -94,12 +94,12 @@ class TestCases(unittest.TestCase):
         # Without duplicates
         content = "Name,Age,City\nEve,28,Paris\nAdam,32,Berlin"
         file_path = self.create_temp_csv_file(content)
-        duplicates, ax = f_416(file_path)
+        duplicates, ax = f_154(file_path)
         self.assertEqual(duplicates, Counter())
         self.assertIsNone(ax)
     def test_case_4(self):
         with self.assertRaises(ValueError):
-            f_416("sample_data.txt")
+            f_154("sample_data.txt")
     def test_case_5(self):
         with self.assertRaises(FileNotFoundError):
-            f_416(os.path.join(self.temp_dir.name, "non_existent_file.csv"))
+            f_154(os.path.join(self.temp_dir.name, "non_existent_file.csv"))

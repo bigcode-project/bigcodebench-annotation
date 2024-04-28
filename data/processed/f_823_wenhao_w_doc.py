@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
 
-def f_823(df):
+def f_470(df):
     """
     Plots the correlation matrix from numeric columns in a DataFrame and returns a DataFrame
     where the numeric columns are standardized to have mean 0 and variance 1.
@@ -32,7 +32,7 @@ def f_823(df):
     Examples:
     >>> import pandas as pd
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    >>> standardized_df, fig = f_823(df)
+    >>> standardized_df, fig = f_470(df)
     >>> standardized_df
               A         B
     0 -1.224745 -1.224745
@@ -63,28 +63,28 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic case with integer values
         df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
-        standardized_df, fig = f_823(df)
+        standardized_df, fig = f_470(df)
         self.assertTrue(np.allclose(standardized_df.mean(), 0))
         self.assertTrue(np.allclose(standardized_df.std(ddof=0), 1))
         self.assertTrue(isinstance(fig, plt.Figure))
     def test_case_2(self):
         # Test case with float values
         df = pd.DataFrame({"X": [1.1, 2.2, 3.3], "Y": [4.4, 5.5, 6.6]})
-        standardized_df, fig = f_823(df)
+        standardized_df, fig = f_470(df)
         self.assertTrue(np.allclose(standardized_df.mean(), 0))
         self.assertTrue(np.allclose(standardized_df.std(ddof=0), 1))
         self.assertTrue(isinstance(fig, plt.Figure))
     def test_case_3(self):
         # Test case with negative values
         df = pd.DataFrame({"A": [-1, -2, -3], "B": [-4, -5, -6]})
-        standardized_df, fig = f_823(df)
+        standardized_df, fig = f_470(df)
         self.assertTrue(np.allclose(standardized_df.mean(), 0))
         self.assertTrue(np.allclose(standardized_df.std(ddof=0), 1))
         self.assertTrue(isinstance(fig, plt.Figure))
     def test_case_4(self):
         # Test case with single column
         df = pd.DataFrame({"A": [1, 2, 3]})
-        standardized_df, fig = f_823(df)
+        standardized_df, fig = f_470(df)
         self.assertTrue(np.allclose(standardized_df.mean(), 0))
         self.assertTrue(np.allclose(standardized_df.std(ddof=0), 1))
         self.assertTrue(isinstance(fig, plt.Figure))
@@ -92,16 +92,16 @@ class TestCases(unittest.TestCase):
         # Test proper exception handling - no numeric columns
         df = pd.DataFrame({"A": ["apple", "banana", "cherry"]})
         with self.assertRaises(ValueError):
-            f_823(df)
+            f_470(df)
     def test_case_6(self):
         # Test proper exception handling - empty dataframe
         df = pd.DataFrame()
         with self.assertRaises(ValueError):
-            f_823(df)
+            f_470(df)
     def test_case_7(self):
         # Test ignoring non-numeric columns
         df = pd.DataFrame({"A": [1, 2, 3], "B": ["x", "y", "z"], "C": [4.5, 5.5, 6.5]})
-        standardized_df, fig = f_823(df)
+        standardized_df, fig = f_470(df)
         self.assertTrue("B" in standardized_df.columns)
         self.assertTrue(np.allclose(standardized_df[["A", "C"]].mean(), 0))
         self.assertTrue(np.allclose(standardized_df[["A", "C"]].std(ddof=0), 1))

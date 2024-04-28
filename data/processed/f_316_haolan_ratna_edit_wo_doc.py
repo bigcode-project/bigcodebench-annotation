@@ -1,7 +1,7 @@
 import collections
 import pandas as pd
 
-def f_316(my_tuple, path_csv_files):
+def f_574(my_tuple, path_csv_files):
     """
     Count the occurrences of each value in the specified columns in multiple CSV files.
 
@@ -23,7 +23,7 @@ def f_316(my_tuple, path_csv_files):
     >>> df1 = pd.DataFrame({'Country': ['USA', 'Canada', 'USA'], 'Gender': ['Male', 'Female', 'Male']})
     >>> df2 = pd.DataFrame({'Country': ['UK', 'USA', 'Germany'], 'Gender': ['Male', 'Male', 'Female']})
     >>> pd.read_csv = MagicMock(side_effect=[df1, df2])
-    >>> result = f_316(('Country', 'Gender'), ['file1.csv', 'file2.csv'])
+    >>> result = f_574(('Country', 'Gender'), ['file1.csv', 'file2.csv'])
     >>> print(result['Country'])
     Counter({'USA': 3, 'Canada': 1, 'UK': 1, 'Germany': 1})
     """
@@ -48,7 +48,7 @@ class TestCases(unittest.TestCase):
         # Mocking pandas.read_csv to return a DataFrame
         mock_read_csv.side_effect = lambda x: pd.DataFrame({'Country': ['USA', 'Canada', 'USA'], 'Gender': ['Male', 'Female', 'Male']})
         # Call the function with mocked data
-        result = f_316(('Country', 'Gender'), ['file1.csv'])
+        result = f_574(('Country', 'Gender'), ['file1.csv'])
         # Assertions to verify the function behavior
         self.assertEqual(result['Country'], {'USA': 2, 'Canada': 1})
         self.assertEqual(result['Gender'], {'Male': 2, 'Female': 1})
@@ -58,7 +58,7 @@ class TestCases(unittest.TestCase):
         # Mocking pandas.read_csv to return an empty DataFrame
         mock_read_csv.side_effect = lambda x: pd.DataFrame(columns=['Country', 'Gender'])
         # Call the function with mocked data
-        result = f_316(('Country', 'Gender'), ['file1.csv'])
+        result = f_574(('Country', 'Gender'), ['file1.csv'])
         # Assertions to verify the function behavior
         self.assertEqual(result['Country'], {})
         self.assertEqual(result['Gender'], {})
@@ -67,14 +67,14 @@ class TestCases(unittest.TestCase):
         # Mocking pandas.read_csv to return a DataFrame with missing 'Gender' column
         mock_read_csv.side_effect = lambda x: pd.DataFrame({'Country': ['USA', 'Canada', 'USA']})
         # Call the function with mocked data
-        result = f_316(('Country', 'Gender'), ['file1.csv', 'file2.csv'])
+        result = f_574(('Country', 'Gender'), ['file1.csv', 'file2.csv'])
         # Assertions to verify the function behavior
         self.assertEqual(result['Country'], {'USA': 4, 'Canada': 2})
         self.assertEqual(result['Gender'], {})
     @patch('pandas.read_csv')
     def test_no_csv_files(self, mock_read_csv):
         # Call the function with mocked data
-        result = f_316(('Country', 'Gender'), [])
+        result = f_574(('Country', 'Gender'), [])
         # Assertions to verify the function behavior
         self.assertEqual(result['Country'], {})
         self.assertEqual(result['Gender'], {})
@@ -84,4 +84,4 @@ class TestCases(unittest.TestCase):
         mock_read_csv.side_effect = Exception
         # Call the function with mocked data
         with self.assertRaises(Exception):
-            result = f_316(('Country', 'Gender'), ['file3.csv'])
+            result = f_574(('Country', 'Gender'), ['file3.csv'])

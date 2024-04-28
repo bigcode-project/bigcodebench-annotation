@@ -1,7 +1,7 @@
 import math
 import yaml
 
-def f_544(yaml_path, key):
+def f_386(yaml_path, key):
     """
     Read a YAML file, apply the cosine to a specific key from the data, and then write the modified data back into the YAML file.
     
@@ -17,7 +17,7 @@ def f_544(yaml_path, key):
     - yaml
     
     Example:
-    >>> yaml_data = f_544('data.yaml', 'ele')
+    >>> yaml_data = f_386('data.yaml', 'ele')
     """
     with open(yaml_path, 'r') as file:
         data = yaml.safe_load(file)
@@ -38,7 +38,7 @@ class TestCases(unittest.TestCase):
         with open(yaml_path, 'w') as file:
             yaml.safe_dump(contents, file)
         # Run function
-        data = f_544(yaml_path, key)
+        data = f_386(yaml_path, key)
         # Check data
         self.assertEqual(data, expected)
         # Remove YAML file

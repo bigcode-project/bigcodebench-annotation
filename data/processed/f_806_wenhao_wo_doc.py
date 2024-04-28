@@ -4,7 +4,7 @@ from pathlib import Path
 import zipfile
 
 
-def f_806(source_directory, target_directory, zip_name):
+def f_24(source_directory, target_directory, zip_name):
     """
     Zip files with certain extensions from a source directory and save it as a zip file
     saved to a target directory.
@@ -32,7 +32,7 @@ def f_806(source_directory, target_directory, zip_name):
 
 
     Example:
-    >>> path = f_806('/path/to/source_directory', '/path/to/target_directory', 'zipped_files')
+    >>> path = f_24('/path/to/source_directory', '/path/to/target_directory', 'zipped_files')
     >>> type(path)
     <class 'str'>
     >>> path
@@ -100,7 +100,7 @@ class TestCases(unittest.TestCase):
             )
     def test_case_1(self):
         # Test empty directory
-        zip_path = f_806(
+        zip_path = f_24(
             os.path.join(self.test_source_dir, "empty_dir"),
             self.test_target_dir,
             "empty_test",
@@ -108,7 +108,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(self.zip_file_count(zip_path), 0)
     def test_case_2(self):
         # Test no matching files
-        zip_path = f_806(
+        zip_path = f_24(
             os.path.join(self.test_source_dir, "no_matching_files"),
             self.test_target_dir,
             "no_match_test",
@@ -116,7 +116,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(self.zip_file_count(zip_path), 0)
     def test_case_3(self):
         # Test some matching files
-        zip_path = f_806(
+        zip_path = f_24(
             os.path.join(self.test_source_dir, "some_matching_files"),
             self.test_target_dir,
             "some_match_test",
@@ -124,7 +124,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(self.zip_file_count(zip_path), 2)
     def test_case_4(self):
         # Test all matching files
-        zip_path = f_806(
+        zip_path = f_24(
             os.path.join(self.test_source_dir, "all_matching_files"),
             self.test_target_dir,
             "all_match_test",
@@ -132,7 +132,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(self.zip_file_count(zip_path), 4)
     def test_case_5(self):
         # Test nested directory
-        zip_path = f_806(
+        zip_path = f_24(
             os.path.join(self.test_source_dir, "nested_dir"),
             self.test_target_dir,
             "nested_test",
@@ -140,7 +140,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(self.zip_file_count(zip_path), 2)
     def test_case_6(self):
         # Test mixed extension
-        zip_path = f_806(
+        zip_path = f_24(
             os.path.join(self.test_source_dir, "mixed_extensions"),
             self.test_target_dir,
             "mixed_extensions_test",
@@ -148,7 +148,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(self.zip_file_count(zip_path), 3)
     def test_case_7(self):
         # Test subdirectories with files
-        zip_path = f_806(
+        zip_path = f_24(
             os.path.join(self.test_source_dir, "subdirs_with_files"),
             self.test_target_dir,
             "subdirs_with_files_test",

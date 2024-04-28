@@ -2,7 +2,7 @@ import random
 from itertools import combinations
 import math
 
-def f_266(n):
+def f_184(n):
     """
     Generate n random dots within a unit square (0 to 1 on both axes) in a 2D space 
     and find the pair that comes closest to each other.
@@ -24,7 +24,7 @@ def f_266(n):
 
     Example:
     >>> random.seed(0)
-    >>> print(f_266(2))
+    >>> print(f_184(2))
     ((0.8444218515250481, 0.7579544029403025), (0.420571580830845, 0.25891675029296335))
     """
 
@@ -40,21 +40,21 @@ import random
 class TestCases(unittest.TestCase):
     def test_typical_use_case(self):
         random.seed(0)
-        result = f_266(5)
+        result = f_184(5)
         self.assertIsInstance(result, tuple, "Should return a tuple for 5 points")
     def test_zero_points(self):
         random.seed(0)
-        result = f_266(0)
+        result = f_184(0)
         self.assertIsNone(result, "Should return None for 0 points")
     def test_one_point(self):
         random.seed(0)
-        result = f_266(1)
+        result = f_184(1)
         self.assertIsNone(result, "Should return None for 1 point")
     def test_large_number_of_points(self):
         random.seed(0)
-        result = f_266(1000)
+        result = f_184(1000)
         self.assertIsInstance(result, tuple, "Should return a tuple for 1000 points")
     def test_minimum_points(self):
         random.seed(0)
-        result = f_266(2)
+        result = f_184(2)
         self.assertIsInstance(result, tuple, "Should return a tuple for 2 points")

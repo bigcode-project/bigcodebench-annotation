@@ -2,7 +2,7 @@ import random
 from datetime import datetime
 import matplotlib.pyplot as plt
 
-def f_388(epoch_milliseconds, seed=None):
+def f_2(epoch_milliseconds, seed=None):
     """
     Generate and draw a sales trend for different categories from a particular epoch milliseconds
     to the current time.
@@ -26,7 +26,7 @@ def f_388(epoch_milliseconds, seed=None):
 
     Example:
     >>> random.seed(42)
-    >>> sales_data, ax = f_388(1236472051807, seed=42)
+    >>> sales_data, ax = f_2(1236472051807, seed=42)
     >>> type(sales_data)
     <class 'dict'>
     >>> list(sales_data['Electronics'])[:3]
@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
                 self.assertLessEqual(sale, 50)
     def test_case_1(self):
         # Basic test on manual example - Jan 1 2021
-        sales_data, ax = f_388(1609459200000, seed=1)
+        sales_data, ax = f_2(1609459200000, seed=1)
         self.assertIsInstance(sales_data, dict)
         self.assertIsInstance(ax, plt.Axes)
         self._check_sales_data(
@@ -96,27 +96,27 @@ class TestCases(unittest.TestCase):
         # Basic test on current date - should raise error
         current_epoch = int(datetime.now().timestamp() * 1000)
         with self.assertRaises(ValueError):
-            f_388(current_epoch, seed=2)
+            f_2(current_epoch, seed=2)
     def test_case_3(self):
         # Test random seed
         t = 1609459200000
-        sales_data1, _ = f_388(t, seed=42)
-        sales_data2, _ = f_388(t, seed=42)
-        sales_data3, _ = f_388(t, seed=3)
+        sales_data1, _ = f_2(t, seed=42)
+        sales_data2, _ = f_2(t, seed=42)
+        sales_data3, _ = f_2(t, seed=3)
         self.assertEqual(sales_data1, sales_data2)
         self.assertNotEqual(sales_data1, sales_data3)
     def test_case_4(self):
         # Test that future date raises ValueError
         future_epoch = int((datetime.now() + timedelta(days=1)).timestamp() * 1000)
         with self.assertRaises(ValueError):
-            f_388(future_epoch, seed=4)
+            f_2(future_epoch, seed=4)
     def test_case_5(self):
         # Test that negative epoch milliseconds raise an error
         with self.assertRaises(ValueError):
-            f_388(-1609459200000, seed=5)
+            f_2(-1609459200000, seed=5)
     def test_case_6(self):
         # Test that non-integer types for epoch milliseconds raise a TypeError
         with self.assertRaises(TypeError):
-            f_388("1609459200000", seed=6)
+            f_2("1609459200000", seed=6)
     def tearDown(self):
         plt.close("all")

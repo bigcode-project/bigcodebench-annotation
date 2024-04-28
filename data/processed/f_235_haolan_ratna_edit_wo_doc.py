@@ -2,7 +2,7 @@ import requests
 import os
 import zipfile
 
-def f_235(url, destination_directory, headers=None):
+def f_390(url, destination_directory, headers=None):
     """
     Download a zip file from a URL, extract its contents to the specified directory, and return the list of extracted files.
 
@@ -20,7 +20,7 @@ def f_235(url, destination_directory, headers=None):
     - zipfile
 
     Example:
-    >>> extracted_files = f_235("https://example.com/data.zip", "/path/to/destination")
+    >>> extracted_files = f_390("https://example.com/data.zip", "/path/to/destination")
     >>> print(extracted_files)
     ['file1.txt', 'file2.csv']
     """
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         mock_basename.return_value = "data.zip"
         mock_listdir.return_value = ['file1.txt', 'file2.csv']
         # Call the function
-        extracted_files = f_235(MOCK_URL, MOCK_DESTINATION_DIR)
+        extracted_files = f_390(MOCK_URL, MOCK_DESTINATION_DIR)
         # Assertions
         mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
         mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data.zip'), 'wb')
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
         mock_basename.return_value = "data.zip"
         mock_listdir.return_value = ['file1.txt', 'file2.csv', 'file3.td']
         # Call the function
-        extracted_files = f_235(MOCK_URL, MOCK_DESTINATION_DIR)
+        extracted_files = f_390(MOCK_URL, MOCK_DESTINATION_DIR)
         # Assertions
         mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
         mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data.zip'), 'wb')
@@ -112,7 +112,7 @@ class TestCases(unittest.TestCase):
         mock_basename.return_value = "data.zip"
         mock_listdir.return_value = ['file1.txt']
         # Call the function
-        extracted_files = f_235(MOCK_URL, MOCK_DESTINATION_DIR)
+        extracted_files = f_390(MOCK_URL, MOCK_DESTINATION_DIR)
         # Assertions
         mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
         mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data.zip'), 'wb')
@@ -133,7 +133,7 @@ class TestCases(unittest.TestCase):
         mock_basename.return_value = "data_download.zip"
         mock_listdir.return_value = ['file1.txt', 'file2.xlsx']
         # Call the function
-        extracted_files = f_235(MOCK_URL, MOCK_DESTINATION_DIR)
+        extracted_files = f_390(MOCK_URL, MOCK_DESTINATION_DIR)
         # Assertions
         mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
         mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data_download.zip'), 'wb')
@@ -154,7 +154,7 @@ class TestCases(unittest.TestCase):
         mock_basename.return_value = "data_download.zip"
         mock_listdir.return_value = []
         # Call the function
-        extracted_files = f_235(MOCK_URL, MOCK_DESTINATION_DIR)
+        extracted_files = f_390(MOCK_URL, MOCK_DESTINATION_DIR)
         # Assertions
         mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
         mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data_download.zip'), 'wb')

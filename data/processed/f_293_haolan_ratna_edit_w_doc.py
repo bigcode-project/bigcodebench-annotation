@@ -1,7 +1,7 @@
 import heapq
 import random
 
-def f_293(k, list_length = 5, min_value = 0, max_value = 100):
+def f_451(k, list_length = 5, min_value = 0, max_value = 100):
     """
     Find the k smallest numbers in a randomly generated list using heapq.
 
@@ -22,10 +22,10 @@ def f_293(k, list_length = 5, min_value = 0, max_value = 100):
 
     Example:
     >>> random.seed(0)
-    >>> rand_list, least_k = f_293(3)
+    >>> rand_list, least_k = f_451(3)
     >>> least_k[0] in rand_list
     True
-    >>> rand_list, least_k = f_293(3,5,100,100)
+    >>> rand_list, least_k = f_451(3,5,100,100)
     >>> print(least_k)
     [100, 100, 100]
     """
@@ -42,24 +42,24 @@ class TestCases(unittest.TestCase):
     
     def test_empty_list(self):
         random.seed(0)
-        rand_list, least_k = f_293(0, 0)
+        rand_list, least_k = f_451(0, 0)
         self.assertEqual(rand_list, [])
         self.assertEqual(least_k, [])
     def test_k_larger_than_list_length(self):
         random.seed(0)
-        rand_list, least_k = f_293(5, 10)
+        rand_list, least_k = f_451(5, 10)
         self.assertEqual(len(rand_list), 10)
         self.assertEqual(len(least_k), 5)
     def test_sorted_list(self):
         random.seed(0)
-        rand_list, least_k = f_293(100, 3)
+        rand_list, least_k = f_451(100, 3)
         self.assertEqual(least_k, sorted(rand_list)[:3])
     def test_least_k_sorted(self):
         random.seed(0)
-        rand_list, least_k = f_293(100, 5, 100, 100)
+        rand_list, least_k = f_451(100, 5, 100, 100)
         self.assertEqual(least_k, sorted(least_k)[:5])
     
     def test_least_k_sorted_first(self):
         random.seed(0)
-        rand_list, least_k = f_293(100, 5)
+        rand_list, least_k = f_451(100, 5)
         self.assertEqual(least_k[0], sorted(least_k)[0])

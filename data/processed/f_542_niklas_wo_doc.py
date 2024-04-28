@@ -2,7 +2,7 @@ import pandas as pd
 import json
 
 
-def f_542(file_path, key):
+def f_130(file_path, key):
     """
     Load a JSON file into a Pandas DataFrame, remove a specific key from each object and write the processed DataFrame back into a JSON file.
     
@@ -18,7 +18,7 @@ def f_542(file_path, key):
     - json
     
     Example:
-    >>> df = f_542('data.json', 'ele')
+    >>> df = f_130('data.json', 'ele')
     """
     with open(file_path, 'r') as file:
         data = json.load(file)
@@ -39,7 +39,7 @@ class TestCases(unittest.TestCase):
         with open(json_path, 'w') as file:
             json.dump(contents, file)
         # Run function
-        df = f_542(json_path, key)
+        df = f_130(json_path, key)
         # Check key is removed
         self.assertFalse(key in df.columns)
         # Check JSON file is updated

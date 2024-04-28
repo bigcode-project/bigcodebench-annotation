@@ -2,7 +2,7 @@ import pandas as pd
 import itertools
 from random import shuffle
 
-def f_751(letters=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'], categories=['Category 1', 'Category 2', 'Category 3']):
+def f_465(letters=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'], categories=['Category 1', 'Category 2', 'Category 3']):
     """
     Create a Pandas DataFrame by associating each element from a list of letters to a category from a list of categories.
     The categories are randomly shuffled.
@@ -22,7 +22,7 @@ def f_751(letters=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'], categories=['Ca
     Example:
     >>> import random
     >>> random.seed(0)
-    >>> df = f_751(['A', 'B'], ['Cat 1', 'Cat 2'])
+    >>> df = f_465(['A', 'B'], ['Cat 1', 'Cat 2'])
     >>> print(df)
       Letter Category
     0      A    Cat 2
@@ -30,7 +30,7 @@ def f_751(letters=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'], categories=['Ca
     2      A    Cat 1
     3      B    Cat 2
     >>> random.seed(1)
-    >>> df = f_751()
+    >>> df = f_465()
     >>> print(df.head())
       Letter    Category
     0      A  Category 3
@@ -52,31 +52,31 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Testing with default parameters
-        df = f_751()
+        df = f_465()
         self.assertTrue(isinstance(df, pd.DataFrame))
         self.assertEqual(set(df.columns), {'Letter', 'Category'})
         self.assertEqual(len(df), 27)  # 9 letters * 3 categories
     def test_case_2(self):
         # Testing with custom parameters
-        df = f_751(['X', 'Y'], ['Cat 1'])
+        df = f_465(['X', 'Y'], ['Cat 1'])
         self.assertTrue(isinstance(df, pd.DataFrame))
         self.assertEqual(set(df.columns), {'Letter', 'Category'})
         self.assertEqual(len(df), 2)  # 2 letters * 1 category
     def test_case_3(self):
         # Testing with empty categories list
-        df = f_751(['X', 'Y'], [])
+        df = f_465(['X', 'Y'], [])
         self.assertTrue(isinstance(df, pd.DataFrame))
         self.assertEqual(set(df.columns), {'Letter', 'Category'})
         self.assertEqual(len(df), 0)  # 2 letters * 0 categories
     def test_case_4(self):
         # Testing with empty letters list
-        df = f_751([], ['Cat 1', 'Cat 2'])
+        df = f_465([], ['Cat 1', 'Cat 2'])
         self.assertTrue(isinstance(df, pd.DataFrame))
         self.assertEqual(set(df.columns), {'Letter', 'Category'})
         self.assertEqual(len(df), 0)  # 0 letters * 2 categories
     def test_case_5(self):
         # Testing with both empty lists
-        df = f_751([], [])
+        df = f_465([], [])
         self.assertTrue(isinstance(df, pd.DataFrame))
         self.assertEqual(set(df.columns), {'Letter', 'Category'})
         self.assertEqual(len(df), 0)  # 0 letters * 0 categories

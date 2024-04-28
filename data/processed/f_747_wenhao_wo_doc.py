@@ -2,7 +2,7 @@ import os
 import glob
 import csv
 
-def f_747(directory_path, file_extension='.csv'):
+def f_415(directory_path, file_extension='.csv'):
     """
     Reads all files with a specified extension in a given directory and returns their data in a dictionary.
     - Reads all files with the specified extension in the given directory.
@@ -22,11 +22,11 @@ def f_747(directory_path, file_extension='.csv'):
     - csv
 
     Example:
-    >>> data = f_747('/home/user/data')
+    >>> data = f_415('/home/user/data')
     >>> print(data['file1'])
     [['header1', 'header2'], ['row1_col1', 'row1_col2'], ['row2_col1', 'row2_col2']]
     
-    >>> data = f_747('/home/user/data', '.txt')
+    >>> data = f_415('/home/user/data', '.txt')
     >>> print(data)
     {}
     """
@@ -64,30 +64,30 @@ class TestCases(unittest.TestCase):
         shutil.rmtree('test_5')
     
     def test_case_1(self):
-        # This test assumes the existence of a directory named 'f_747_data_wenhao' with a CSV file 'file1.csv'
-        data = f_747('test_1')
+        # This test assumes the existence of a directory named 'f_415_data_wenhao' with a CSV file 'file1.csv'
+        data = f_415('test_1')
         self.assertIsInstance(data, dict)
         self.assertIn('file1', data)
         self.assertEqual(data['file1'], [['header1', 'header2'], ['row1_col1', 'row1_col2'], ['row2_col1', 'row2_col2']])
     def test_case_2(self):
         # This test checks explicit file_extension input
-        data = f_747('test_2', '.csv')
+        data = f_415('test_2', '.csv')
         self.assertIsInstance(data, dict)
         self.assertIn('file2', data)
         self.assertEqual(data['file2'], [['name', 'age'], ['Alice', '30'], ['Bob', '40']])
     def test_case_3(self):
         # This test checks for a non-existent file extension, expecting an empty dictionary
-        data = f_747('test_3', '.txt')
+        data = f_415('test_3', '.txt')
         self.assertIsInstance(data, dict)
         self.assertEqual(len(data), 0)
     def test_case_4(self):
         # This test checks for a non-existent directory, expecting an empty dictionary
-        data = f_747('/nonexistent/directory')
+        data = f_415('/nonexistent/directory')
         self.assertIsInstance(data, dict)
         self.assertEqual(len(data), 0)
     def test_case_5(self):
         # This test checks another file's presence and content in the dictionary
-        data = f_747('test_5')
+        data = f_415('test_5')
         self.assertIsInstance(data, dict)
         self.assertIn('file3', data)
         self.assertEqual(data['file3'], [['subject', 'marks'], ['Math', '90'], ['Science', '85']])

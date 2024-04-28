@@ -4,7 +4,7 @@ import os
 import urllib.error
 
 
-def f_848(
+def f_450(
     url: str,
     save_path: str = "downloaded_file.zip",
     extract_path: str = "extracted_files",
@@ -33,7 +33,7 @@ def f_848(
     - urllib
 
     Example:
-    >>> extracted_path = f_848('http://www.example.com/data.zip')
+    >>> extracted_path = f_450('http://www.example.com/data.zip')
     >>> print(extracted_path)
     'extracted_files'
 
@@ -68,8 +68,8 @@ import urllib.error
 import shutil
 from pathlib import Path
 class TestCases(unittest.TestCase):
-    """Test cases for the f_848 function."""
-    base_path = "mnt/data/f_848_data_chien"
+    """Test cases for the f_450 function."""
+    base_path = "mnt/data/f_450_data_chien"
     def setUp(self):
         # Ensure the base path is absolute
         self.base_path = os.path.abspath(self.base_path)
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
         url = "https://getsamplefiles.com/download/zip/sample-1.zip"
         save_path = Path(self.base_path) / "sample_1_download.zip"
         extract_path = Path(self.base_path) / "sample_1_extract"
-        result_path = f_848(url, save_path, extract_path)
+        result_path = f_450(url, save_path, extract_path)
         self.assertEqual(result_path, extract_path)
         self.assertTrue(os.path.exists(extract_path))
         self.assertFalse(os.path.exists(save_path))
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
         url = "https://getsamplefiles.com/download/zip/sample-2.zip"
         save_path = Path(self.base_path) / "sample_2_download.zip"
         extract_path = Path(self.base_path) / "sample_2_extract"
-        result_path = f_848(url, save_path, extract_path)
+        result_path = f_450(url, save_path, extract_path)
         self.assertEqual(result_path, extract_path)
         self.assertTrue(os.path.exists(extract_path))
         self.assertFalse(os.path.exists(save_path))
@@ -99,7 +99,7 @@ class TestCases(unittest.TestCase):
         url = "https://invalidurl.com/nonexistent.zip"
         save_path = Path(self.base_path) / "invalid_url.zip"
         extract_path = Path(self.base_path) / "invalid_url_extract"
-        result = f_848(url, save_path, extract_path)
+        result = f_450(url, save_path, extract_path)
         self.assertTrue(result.startswith("URL Error:"))
     def test_file_already_exists_at_save_path(self):
         """Test Case 4: File Already Exists at Save Path"""
@@ -109,7 +109,7 @@ class TestCases(unittest.TestCase):
         # Create a dummy file at the save path
         with open(save_path, "w") as file:
             file.write("Dummy content")
-        result_path = f_848(url, save_path, extract_path)
+        result_path = f_450(url, save_path, extract_path)
         self.assertEqual(result_path, extract_path)
         self.assertFalse(os.path.exists(save_path))
     def test_extraction_path_already_exists(self):
@@ -120,7 +120,7 @@ class TestCases(unittest.TestCase):
         # Create the extraction path directory
         if not os.path.exists(extract_path):
             os.makedirs(extract_path)
-        result_path = f_848(url, save_path, extract_path)
+        result_path = f_450(url, save_path, extract_path)
         self.assertEqual(result_path, extract_path)
     @classmethod
     def tearDownClass(cls):

@@ -2,7 +2,7 @@ from random import choice
 import turtle
 import time
 
-def f_2407(colors):
+def f_376(colors):
     """
     Draws five squares of random colors using Turtle Graphics. Each square is drawn
     sequentially with a 1-second pause between squares.
@@ -22,7 +22,7 @@ def f_2407(colors):
     - time
 
     Examples:
-    >>> f_2407(['red', 'blue', 'green', 'yellow', 'purple'])  # This will open a Turtle Graphics window and draw squares
+    >>> f_376(['red', 'blue', 'green', 'yellow', 'purple'])  # This will open a Turtle Graphics window and draw squares
     >>> turtle.TurtleScreen._RUNNING
     True  # Check if the Turtle Graphics screen is running
     """
@@ -50,16 +50,16 @@ class TestCases(unittest.TestCase):
     def test_turtle_setup(self, mock_screen, mock_turtle):
         """ Test the setup of the Turtle Graphics environment. """
         colors = ['red', 'blue', 'green', 'yellow', 'purple']
-        f_2407(colors)
+        f_376(colors)
         mock_screen.assert_called_once()
         mock_turtle.assert_called_once()
     @patch('turtle.Turtle')
     @patch('turtle.Screen')
     def test_function_executes_without_error(self, mock_screen, mock_turtle):
-        """ Test that the f_2407 function executes without raising any errors. """
+        """ Test that the f_376 function executes without raising any errors. """
         colors = ['red', 'blue', 'green', 'yellow', 'purple']
         try:
-            f_2407(colors)
+            f_376(colors)
             execution_successful = True
         except Exception:
             execution_successful = False
@@ -68,7 +68,7 @@ class TestCases(unittest.TestCase):
     def test_square_drawing(self, mock_turtle):
         """ Test that the turtle moves correctly to draw squares. """
         colors = ['red', 'blue', 'green', 'yellow', 'purple']
-        f_2407(colors)
+        f_376(colors)
         move_calls = [call.forward(100), call.right(90)] * 4 * 5  # 4 sides per square, 5 squares
         mock_turtle.return_value.assert_has_calls(move_calls, any_order=True)
     @patch('time.sleep')
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
     def test_time_delay(self, mock_turtle, mock_sleep):
         """ Test that there is a time delay between each square. """
         colors = ['red', 'blue', 'green', 'yellow', 'purple']
-        f_2407(colors)
+        f_376(colors)
         self.assertEqual(mock_sleep.call_count, 5)
         mock_sleep.assert_called_with(1)
     @patch('turtle.Turtle')
@@ -84,5 +84,5 @@ class TestCases(unittest.TestCase):
     def test_mainloop_invocation(self, mock_screen, mock_turtle):
         """ Test that the Turtle window's mainloop is called. """
         colors = ['red', 'blue', 'green', 'yellow', 'purple']
-        f_2407(colors)
+        f_376(colors)
         mock_screen.return_value.mainloop.assert_called_once()

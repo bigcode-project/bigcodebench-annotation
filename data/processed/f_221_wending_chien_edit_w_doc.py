@@ -4,7 +4,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 
 
-def f_221(df):
+def f_623(df):
     """
     Analyzes a given DataFrame containing article titles and content to identify articles with titles that include
     the words "how" or "what". It calculates the TF-IDF scores for the words in the content of these articles and
@@ -32,7 +32,7 @@ def f_221(df):
     >>> import pandas as pd
     >>> data = {'Title': ['How to make pancakes', 'News update'], 'Content': ['Pancakes are easy to make.', 'Today’s news is about politics.']}
     >>> df = pd.DataFrame(data)
-    >>> ax = f_221(df)
+    >>> ax = f_623(df)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
         self.df_sample = pd.DataFrame(self.DATA)
     def test_case_1(self):
         # Test with original data
-        ax = f_221(self.df_sample)
+        ax = f_623(self.df_sample)
         self.assertEqual(len(ax.patches), 11)  # Adjusting based on actual data
         self.assertEqual(ax.get_ylabel(), "TF-IDF Score")
     def test_case_2(self):
@@ -84,22 +84,22 @@ class TestCases(unittest.TestCase):
         df_no_interesting = self.df_sample.copy()
         df_no_interesting['Title'] = ['Coding 101', 'Python tutorial', 'Programming basics', 'Cooking basics',
                                       'Life basics']
-        ax = f_221(df_no_interesting)
+        ax = f_623(df_no_interesting)
         self.assertEqual(len(ax.patches), 0)  # No bars in the plot as no interesting articles
     def test_case_3(self):
         # Test with only one interesting article
         df_one_interesting = self.df_sample.copy()
         df_one_interesting['Title'] = ['How to play guitar?', 'Python tutorial', 'Programming basics', 'Cooking basics',
                                        'Life basics']
-        ax = f_221(df_one_interesting)
+        ax = f_623(df_one_interesting)
         self.assertEqual(len(ax.patches), 5)  # 5 unique words in the interesting article
     def test_case_4(self):
         # Test with data not containing columns 'Title' and 'Content'
         df_empty = pd.DataFrame(columns=['Title', 'Description'])
-        ax = f_221(df_empty)
+        ax = f_623(df_empty)
         self.assertEqual(len(ax.patches), 0)  # No bars in the plot as dataframe is empty
     def test_case_5(self):
         # Test with empty dataframe
         df_empty = pd.DataFrame(columns=['Title', 'Content'])
-        ax = f_221(df_empty)
+        ax = f_623(df_empty)
         self.assertEqual(len(ax.patches), 0)  # No bars in the plot as dataframe is empty

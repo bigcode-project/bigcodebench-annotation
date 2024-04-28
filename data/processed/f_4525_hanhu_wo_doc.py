@@ -2,7 +2,7 @@ import rsa
 import urllib.request
 from hashlib import sha256
 
-def f_4527(url):
+def f_524(url):
     """
     Generates RSA public and private keys, retrieves the content from the specified URL, calculates
     its SHA256 hash, and signs the hash with the private key. Returns the public key and the signed hash
@@ -28,7 +28,7 @@ def f_4527(url):
     - hashlib.sha256
 
     Examples:
-    >>> pub_key, signed_hash, hash_value = f_4527('https://www.example.com')
+    >>> pub_key, signed_hash, hash_value = f_524('https://www.example.com')
     >>> isinstance(pub_key, rsa.PublicKey)
     True
     >>> isinstance(signed_hash, str)
@@ -61,14 +61,14 @@ class TestCases(unittest.TestCase):
     @patch('urllib.request.urlopen')
     def test_return_type(self, mock_urlopen):
         mock_urlopen.return_value.read.return_value = b"test content"
-        pub_key, signed_hash, hash_value = f_4527("https://www.example.com")
+        pub_key, signed_hash, hash_value = f_524("https://www.example.com")
         self.assertIsInstance(pub_key, rsa.PublicKey)
         self.assertIsInstance(signed_hash, str)
         self.assertIsInstance(hash_value, bytes)
     @patch('urllib.request.urlopen')
     def test_valid_signature(self, mock_urlopen):
         mock_urlopen.return_value.read.return_value = b"test content"
-        pub_key, signed_hash, hash_value = f_4527("https://www.example.com")
+        pub_key, signed_hash, hash_value = f_524("https://www.example.com")
         content_hash = sha256(b"test content").digest()
         try:
             rsa.verify(content_hash, bytes.fromhex(signed_hash), pub_key)
@@ -79,23 +79,23 @@ class TestCases(unittest.TestCase):
     @patch('urllib.request.urlopen')
     def test_hashing_of_content(self, mock_urlopen):
         mock_urlopen.return_value.read.return_value = b"test content"
-        pub_key, signed_hash, hash_value = f_4527("https://www.example.com")
+        pub_key, signed_hash, hash_value = f_524("https://www.example.com")
         # Assuming the function is modified to return the content hash for testing
         self.assertEqual(sha256(b"test content").digest(), hash_value)
     @patch('urllib.request.urlopen')
     def test_network_error_handling_1(self, mock_urlopen):
         mock_urlopen.side_effect = urllib.error.URLError("URL error")
         with self.assertRaises(urllib.error.URLError) as context:
-            pub_key, signed_hash, hash_value = f_4527("https://www.example.com")
+            pub_key, signed_hash, hash_value = f_524("https://www.example.com")
     @patch('urllib.request.urlopen')
     def test_http_error_handling_2(self, mock_urlopen):
         mock_urlopen.side_effect = urllib.error.HTTPError("https://www.example.com", 404, "Not Found", hdrs={}, fp=None)
         with self.assertRaises(ValueError) as context:
-            pub_key, signed_hash = f_4527("https://www.example.com")
+            pub_key, signed_hash = f_524("https://www.example.com")
     @patch('urllib.request.urlopen')
     @patch('rsa.sign')
     def test_verification_error_handling(self, mock_sign, mock_urlopen):
         mock_urlopen.return_value.read.return_value = b"test content"
         mock_sign.side_effect = rsa.pkcs1.VerificationError("Verification failed")
         with self.assertRaises(rsa.pkcs1.VerificationError) as context:
-            pub_key, signed_hash, hash_value = f_4527("https://www.example.com")
+            pub_key, signed_hash, hash_value = f_524("https://www.example.com")

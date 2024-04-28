@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 
 
-def f_901(animals=None, foods=None):
+def f_669(animals=None, foods=None):
     """
     Create a DataFrame with combinations of animals and foods in a 'animal:food' format.
 
@@ -27,7 +27,7 @@ def f_901(animals=None, foods=None):
     - itertools
 
     Example:
-    >>> animal_food_pairs = f_901(['Dog', 'Cat'], ['Meat', 'Fish'])
+    >>> animal_food_pairs = f_669(['Dog', 'Cat'], ['Meat', 'Fish'])
     >>> print(animal_food_pairs)
            Meat      Fish
     0  Dog:Meat  Dog:Fish
@@ -70,12 +70,12 @@ def f_901(animals=None, foods=None):
 import unittest
 import random
 class TestCases(unittest.TestCase):
-    """Tests for the function f_901."""
+    """Tests for the function f_669."""
     def test_default_input(self):
         """Test with default inputs for animals and foods."""
         random.seed(0)
         # Scenario: Testing with default inputs for animals and foods
-        result = f_901()
+        result = f_669()
         # Check the shape of the returned DataFrame
         self.assertEqual(
             result.shape,
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
         # Scenario: Testing with custom lists of animals and foods
         animals = ["Dog", "Cat", "Elephant"]
         foods = ["Meat", "Fish", "Grass", "Fruits"]
-        result = f_901(animals, foods)
+        result = f_669(animals, foods)
         # Check the shape of the returned DataFrame
         self.assertEqual(
             result.shape,
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
         # Scenario: Testing with empty lists for animals and foods
         animals = []
         foods = []
-        result = f_901(animals, foods)
+        result = f_669(animals, foods)
         # Check the shape of the returned DataFrame
         self.assertEqual(
             result.shape,
@@ -114,7 +114,7 @@ class TestCases(unittest.TestCase):
         # Scenario: Testing with a single animal and a single food
         animals = ["Dog"]
         foods = ["Meat"]
-        result = f_901(animals, foods)
+        result = f_669(animals, foods)
         # Check the shape of the returned DataFrame
         self.assertEqual(
             result.shape,
@@ -132,7 +132,7 @@ class TestCases(unittest.TestCase):
         random.seed(4)
         # Scenario: Testing with a custom list of animals and default list of foods
         animals = ["Dog", "Cat", "Elephant"]
-        result = f_901(animals)
+        result = f_669(animals)
         # Check the shape of the returned DataFrame
         self.assertEqual(
             result.shape,

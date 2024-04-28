@@ -5,7 +5,7 @@ from django.conf import settings
 if not settings.configured:
     settings.configure()
 
-def f_1712(request, file_paths):
+def f_218(request, file_paths):
     """
     Generates a ZIP file response for a Django HttpRequest, zipping the specified files. This function is useful 
     for scenarios where multiple file downloads are required in response to a web request. The actual HttpRequest 
@@ -30,11 +30,11 @@ def f_1712(request, file_paths):
     ...     settings.configure()  # Add minimal necessary settings
     >>> from django.http import HttpRequest
     >>> request = HttpRequest()
-    >>> response = f_1712(request)
+    >>> response = f_218(request)
     >>> response['Content-Type']
     'application/zip'
     >>> request = HttpRequest()
-    >>> response = f_1712(request)
+    >>> response = f_218(request)
     >>> response['Content-Disposition']
     'attachment; filename="files.zip"'
     """
@@ -59,25 +59,25 @@ class TestCases(unittest.TestCase):
         self.file_paths = ['file1.gz', 'file2.gz']  # Example file paths for testing
     def test_response_type(self):
         """Ensure the response is an instance of FileResponse."""
-        response = f_1712(self.request, self.file_paths)
+        response = f_218(self.request, self.file_paths)
         self.assertIsInstance(response, FileResponse)
     def test_response_status_code(self):
         """Response should have a status code of 200."""
-        response = f_1712(self.request, self.file_paths)
+        response = f_218(self.request, self.file_paths)
         self.assertEqual(response.status_code, 200)
     def test_content_type(self):
         """Content type of the response should be set to 'application/zip'."""
-        response = f_1712(self.request, self.file_paths)
+        response = f_218(self.request, self.file_paths)
         self.assertEqual(response['Content-Type'], 'application/zip')
     def test_attachment_filename(self):
         """The Content-Disposition should correctly specify the attachment filename."""
-        response = f_1712(self.request, self.file_paths)
+        response = f_218(self.request, self.file_paths)
         self.assertEqual(response['Content-Disposition'], 'attachment; filename="files.zip"')
     @patch('zipfile.ZipFile')
     def test_zip_file_content(self, mock_zip_file):
         """Zip file should contain the specified files with correct content."""
         mock_zip = MagicMock()
         mock_zip_file.return_value.__enter__.return_value = mock_zip
-        f_1712(self.request, self.file_paths)
+        f_218(self.request, self.file_paths)
         mock_zip.writestr.assert_any_call('file1.gz', 'This is the content of file1.gz.')
         mock_zip.writestr.assert_any_call('file2.gz', 'This is the content of file2.gz.')

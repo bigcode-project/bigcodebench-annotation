@@ -1,7 +1,7 @@
 import itertools
 import math
 
-def f_529(x):
+def f_312(x):
     """
     Find the sub-sequence of a dictionary, x, with the minimum total length, where the keys are letters and the values are their lengths.
 
@@ -16,9 +16,9 @@ def f_529(x):
     - math
 
     Example:
-    >>> f_529({'a': 1, 'b': 2, 'c': 3})
+    >>> f_312({'a': 1, 'b': 2, 'c': 3})
     ['a']
-    >>> f_529({'a': 1, 'b': -2, 'c': -5, 'd': 4})
+    >>> f_312({'a': 1, 'b': -2, 'c': -5, 'd': 4})
     ['b', 'c']
     """
     min_length = math.inf
@@ -36,12 +36,12 @@ def f_529(x):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        self.assertEqual(f_529({'a': 1, 'b': 2, 'c': 3}), ['a'])
+        self.assertEqual(f_312({'a': 1, 'b': 2, 'c': 3}), ['a'])
     def test_case_2(self):
-        self.assertEqual(sorted(f_529({'a': 1, 'b': -2, 'c': -5, 'd': 4})), sorted(['b', 'c']))
+        self.assertEqual(sorted(f_312({'a': 1, 'b': -2, 'c': -5, 'd': 4})), sorted(['b', 'c']))
     def test_case_3(self):
-        self.assertEqual(f_529({'a': 1, 'b': 2, 'c': 3, 'd': 4}), ['a'])
+        self.assertEqual(f_312({'a': 1, 'b': 2, 'c': 3, 'd': 4}), ['a'])
     def test_case_4(self):
-        self.assertEqual(sorted(f_529({'a': -1, 'b': 2, 'c': 3, 'd': 4, 'e': -5})), sorted(['a', 'e']))
+        self.assertEqual(sorted(f_312({'a': -1, 'b': 2, 'c': 3, 'd': 4, 'e': -5})), sorted(['a', 'e']))
     def test_case_5(self):
-        self.assertEqual(sorted(f_529({'a': -1, 'b': -2, 'c': -3, 'd': 4, 'e': 5})), sorted(['a', 'b', 'c']))
+        self.assertEqual(sorted(f_312({'a': -1, 'b': -2, 'c': -3, 'd': 4, 'e': 5})), sorted(['a', 'b', 'c']))

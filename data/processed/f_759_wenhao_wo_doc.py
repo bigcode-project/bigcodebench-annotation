@@ -4,7 +4,7 @@ from matplotlib.axes import Axes
 from statsmodels.tsa.arima.model import ARIMA
 from typing import List, Tuple
 
-def f_759(df: pd.DataFrame) -> Tuple[List[float], Axes]:
+def f_194(df: pd.DataFrame) -> Tuple[List[float], Axes]:
     """
     Forecasts the share closing prices for the next 7 days using the ARIMA model and plots the forecast.
 
@@ -28,7 +28,7 @@ def f_759(df: pd.DataFrame) -> Tuple[List[float], Axes]:
     ...     'date': pd.date_range(start='1/1/2021', end='1/7/2021'),
     ...     'closing_price': [100, 101, 102, 103, 104, 105, 106]
     ... })
-    >>> forecast, ax = f_759(df)
+    >>> forecast, ax = f_194(df)
     >>> print(forecast)
     [106.99999813460752, 107.99999998338443, 108.99999547091295, 109.99999867405204, 110.99999292499156, 111.99999573455818, 112.9999903188028]
     """
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         })
         
         # Running the function
-        forecast1, ax1 = f_759(df1)
+        forecast1, ax1 = f_194(df1)
         
         # Checking the type of the forecast and plot object
         self.assertIsInstance(forecast1, list)
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
         })
         
         # Running the function
-        forecast2, ax2 = f_759(df2)
+        forecast2, ax2 = f_194(df2)
         
         # Checking the type of the forecast and plot object
         self.assertIsInstance(forecast2, list)
@@ -102,7 +102,7 @@ class TestCases(unittest.TestCase):
         })
         
         # Running the function
-        forecast3, ax3 = f_759(df3)
+        forecast3, ax3 = f_194(df3)
         
         # Checking the type of the forecast and plot object
         self.assertIsInstance(forecast3, list)
@@ -123,7 +123,7 @@ class TestCases(unittest.TestCase):
         })
         
         # Running the function
-        forecast4, ax4 = f_759(df4)
+        forecast4, ax4 = f_194(df4)
         
         # Checking the type of the forecast and plot object
         self.assertIsInstance(forecast4, list)
@@ -143,7 +143,7 @@ class TestCases(unittest.TestCase):
         })
         
         # Running the function
-        forecast5, ax5 = f_759(df5)
+        forecast5, ax5 = f_194(df5)
         
         # Checking the type of the forecast and plot object
         self.assertIsInstance(forecast5, list)

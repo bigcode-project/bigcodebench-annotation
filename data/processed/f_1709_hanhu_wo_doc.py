@@ -5,7 +5,7 @@ from django.http import HttpResponseBadRequest, HttpResponse
 from django.conf import settings
 settings.configure()
 
-def f_1710(data):
+def f_265(data):
     """
     This method is designed to handle the authentication process in a web application context.
     It expects input in the form of a dictionary with 'username' and 'password' keys. The password
@@ -34,12 +34,12 @@ def f_1710(data):
     >>> if not settings.configured:
     ...     settings.configure()
     >>> data = {'username': 'admin', 'password': base64.b64encode(hashlib.sha256('password'.encode()).digest()).decode()}
-    >>> response = f_1710(data)
+    >>> response = f_265(data)
     >>> response.status_code == 200 and 'Login successful.' in response.content.decode()
     False
 
     >>> data = {'username': 'admin', 'password': base64.b64encode(hashlib.sha256('wrongpassword'.encode()).digest()).decode()}
-    >>> response = f_1710(data)
+    >>> response = f_265(data)
     >>> response.status_code == 401 and 'Login failed.' in response.content.decode()
     False
 
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         """Test successful login with correct credentials."""
         mock_b64decode.return_value = b'password'
         data = {'username': 'admin', 'password': 'valid_base64'}
-        response = f_1710(data)
+        response = f_265(data)
         self.assertEqual(response.status_code, 200)
         self.assertIn('Login successful.', response.content.decode())
     @patch('base64.b64decode')
@@ -81,23 +81,23 @@ class TestCases(unittest.TestCase):
         """Test failed login with incorrect password."""
         mock_b64decode.return_value = b'wrongpassword'
         data = {'username': 'admin', 'password': 'valid_base64'}
-        response = f_1710(data)
+        response = f_265(data)
         self.assertEqual(response.status_code, 401)
         self.assertIn('Login failed.', response.content.decode())
     def test_invalid_data_structure(self):
         """Test response with missing username or password."""
         data = {'username': 'admin'}
-        response = f_1710(data)
+        response = f_265(data)
         self.assertIsInstance(response, HttpResponseBadRequest)
     @patch('base64.b64decode', side_effect=ValueError)
     def test_malformed_data(self, mock_b64decode):
         """Test response with non-base64 encoded password."""
         data = {'username': 'admin', 'password': 'not_base64'}
-        response = f_1710(data)
+        response = f_265(data)
         self.assertIsInstance(response, HttpResponseBadRequest)
     def test_empty_data(self):
         """Test response when provided with an empty dictionary."""
         data = {}
-        response = f_1710(data)
+        response = f_265(data)
         self.assertIsInstance(response, HttpResponseBadRequest)
         self.assertIn('Bad Request', response.content.decode())

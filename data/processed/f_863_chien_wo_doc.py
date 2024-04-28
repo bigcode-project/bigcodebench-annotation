@@ -6,7 +6,7 @@ import chardet
 API_URL = "http://api.example.com/data"
 
 
-def f_863(url=API_URL, from_encoding=None, to_encoding="utf8"):
+def f_665(url=API_URL, from_encoding=None, to_encoding="utf8"):
     """
     Fetches data from a specified REST API URL and processes it for JSON parsing. The process involves decoding
     and re-encoding the data, handling different encoding scenarios.
@@ -33,7 +33,7 @@ def f_863(url=API_URL, from_encoding=None, to_encoding="utf8"):
     - chardet
 
     Example:
-    >>> data = f_863('http://api.example.com/data')
+    >>> data = f_665('http://api.example.com/data')
     >>> print(data)
     {'key': 'value'}  # Example of expected output
 
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         response_content = '{"key": "value"}'.encode("cp1251")
         mock_get.return_value.content = response_content
         mock_detect.return_value = {"encoding": "cp1251"}
-        result = f_863()
+        result = f_665()
         expected_output = {"key": "value"}
         self.assertEqual(result, expected_output)
     @mock.patch("requests.get")
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         """Test that the function can handle custom URL and specified encodings."""
         response_content = '{"message": "success"}'.encode("latin1")
         mock_get.return_value.content = response_content
-        result = f_863(
+        result = f_665(
             url="http://custom.url/api", from_encoding="latin1", to_encoding="utf8"
         )
         expected_output = {"message": "success"}
@@ -94,7 +94,7 @@ class TestCases(unittest.TestCase):
     def test_get_data_with_empty_response(self, mock_get):
         """Test that the function returns an empty dictionary when the response content is empty."""
         mock_get.return_value.content = b""
-        result = f_863()
+        result = f_665()
         expected_output = {}
         self.assertEqual(result, expected_output)
     @mock.patch("requests.get")
@@ -103,13 +103,13 @@ class TestCases(unittest.TestCase):
         response_content = b"{invalid json content}"
         mock_get.return_value.content = response_content
         with self.assertRaises(json.JSONDecodeError):
-            f_863()
+            f_665()
     @mock.patch("requests.get")
     def test_get_data_with_different_valid_encoding(self, mock_get):
         """Test that the function can handle different specified encodings."""
         response_content = '{"text": "こんにちは"}'.encode("utf8")
         mock_get.return_value.content = response_content
-        result = f_863(from_encoding="utf8", to_encoding="utf8")
+        result = f_665(from_encoding="utf8", to_encoding="utf8")
         expected_output = {"text": "こんにちは"}
         self.assertEqual(result, expected_output)
     @mock.patch("requests.get")
@@ -121,7 +121,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value.content = response_content
         mock_detect.return_value = {"encoding": None}
         with self.assertRaises(ValueError) as context:
-            f_863()
+            f_665()
         # Asserting that the correct ValueError is raised
         self.assertTrue(
             "Unable to detect encoding for non-empty content" in str(context.exception)

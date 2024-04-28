@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
-def f_549(list_of_lists):
+def f_387(list_of_lists):
     """
     Merges a predefined set of lists into a list and one-hot-encodes the elements of the list.
 
@@ -16,7 +16,7 @@ def f_549(list_of_lists):
     - scikit-learn
 
     Example:
-    >>> f_549([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    >>> f_387([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     array([[1., 0., 0., 0., 0., 0., 0., 0., 0.],
            [0., 1., 0., 0., 0., 0., 0., 0., 0.],
            [0., 0., 1., 0., 0., 0., 0., 0., 0.],
@@ -35,14 +35,14 @@ def f_549(list_of_lists):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        self.assertEqual(f_549([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).shape, (9, 9))
+        self.assertEqual(f_387([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).shape, (9, 9))
     def test_case_2(self):
-        arr = f_549([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        arr = f_387([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         self.assertTrue(np.all(arr.sum(axis=0) == 1))
         self.assertTrue(np.all(arr.sum(axis=1) == 1))
         self.assertTrue(np.all(arr >= 0))
     def test_case_3(self):
-        arr = f_549([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        arr = f_387([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         self.assertEqual(arr[0, 0], 1)
         self.assertEqual(arr[1, 1], 1)
         self.assertEqual(arr[2, 2], 1)
@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(arr[8, 8], 1)
         
     def test_case_4(self):
-        arr = f_549([[1, 1, 1], [2, 2, 2], [3, 3, 3]])
+        arr = f_387([[1, 1, 1], [2, 2, 2], [3, 3, 3]])
         self.assertEqual(arr[0, 0], 1)
         self.assertEqual(arr[1, 0], 1)
         self.assertEqual(arr[2, 0], 1)
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(arr[7, 2], 1)
         self.assertEqual(arr[8, 2], 1)
     def test_case_5(self):
-        arr = f_549([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        arr = f_387([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         self.assertEqual(arr[0, 0], 1)
         self.assertEqual(arr[1, 1], 1)
         self.assertEqual(arr[2, 2], 1)

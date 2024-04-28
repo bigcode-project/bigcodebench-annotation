@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from decimal import Decimal
 
-def f_3667(my_obj):
+def f_459(my_obj):
     """
     Serializes an object to a JSON string, adding support for datetime and Decimal data types.
     
@@ -22,12 +22,12 @@ def f_3667(my_obj):
     
     Examples:
     Serialize a dictionary containing datetime and Decimal:
-    >>> result = f_3667({'time': datetime(2023, 4, 1, 12, 0), 'amount': Decimal('10.99')})
+    >>> result = f_459({'time': datetime(2023, 4, 1, 12, 0), 'amount': Decimal('10.99')})
     >>> '2023-04-01T12:00:00' in result and '10.99' in result
     True
 
     Serialize a simple dictionary:
-    >>> f_3667({'name': 'Alice', 'age': 30})
+    >>> f_459({'name': 'Alice', 'age': 30})
     '{"name": "Alice", "age": 30}'
     """
     class DateTimeEncoder(json.JSONEncoder):
@@ -47,33 +47,33 @@ class TestCases(unittest.TestCase):
     def test_datetime_serialization(self):
         """Ensure datetime objects are serialized to an ISO 8601 string."""
         obj = {'time': datetime(2023, 1, 1, 12, 0, tzinfo=pytz.utc)}
-        result = f_3667(obj)
+        result = f_459(obj)
         self.assertIn('2023-01-01T12:00:00+00:00', result)
     def test_decimal_serialization(self):
         """Verify Decimal objects are serialized to their string representation."""
         obj = {'price': Decimal('99.99')}
-        result = f_3667(obj)
+        result = f_459(obj)
         self.assertIn('99.99', result)
     def test_combined_serialization(self):
         """Test serialization of a complex object containing both datetime and Decimal."""
         obj = {'time': datetime(2023, 1, 1, 12, 0, tzinfo=pytz.utc), 'price': Decimal('99.99')}
-        result = f_3667(obj)
+        result = f_459(obj)
         self.assertIn('2023-01-01T12:00:00+00:00', result)
         self.assertIn('99.99', result)
     def test_simple_object_serialization(self):
         """Check serialization of simple key-value pairs."""
         obj = {'name': 'Alice', 'age': 30}
-        result = f_3667(obj)
+        result = f_459(obj)
         self.assertEqual(result, '{"name": "Alice", "age": 30}')
     def test_null_serialization(self):
         """Ensure that `None` is correctly serialized as `null`."""
         obj = {'value': None}
-        result = f_3667(obj)
+        result = f_459(obj)
         self.assertEqual(result, '{"value": null}')
     def test_list_serialization(self):
         """Test serialization of a list containing mixed data types."""
         obj = {'list': [datetime(2023, 1, 1, 12, 0, tzinfo=pytz.utc), Decimal('99.99'), None]}
-        result = f_3667(obj)
+        result = f_459(obj)
         self.assertIn('"2023-01-01T12:00:00+00:00"', result)
         self.assertIn('99.99', result)
         self.assertIn('null', result)
@@ -83,4 +83,4 @@ class TestCases(unittest.TestCase):
             pass
         obj = {'custom': CustomObject()}
         with self.assertRaises(TypeError):
-            f_3667(obj)
+            f_459(obj)
