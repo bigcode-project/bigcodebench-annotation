@@ -233,7 +233,26 @@ def extract_test(file_contents, function_name):
     except Exception as e:
         return f"Error processing the script: {e}"
 
+def count_test_cases(code):
+    # Parse the code to AST
+    root = ast.parse(code)
 
+    # Define a class to count test cases
+    class TestCaseCounter(ast.NodeVisitor):
+        def __init__(self):
+            self.test_case_count = 0
+
+        def visit_FunctionDef(self, node):
+            if node.name.startswith("test"):
+                self.test_case_count += 1
+            self.generic_visit(node)
+
+    # Create a counter object and visit nodes
+    counter = TestCaseCounter()
+    counter.visit(root)
+
+    # Return the number of test cases found
+    return counter.test_case_count
 
 def extract_content(file_path, rename_id=None):
     data = {"file": file_path.split("/")[-1]}
@@ -287,6 +306,7 @@ def extract_content(file_path, rename_id=None):
         else:
             data["canonical_solution"] = ""
     data["test"] = extract_test(content,function_name).strip()
+    data["test_count"] = count_test_cases(data["test"])
     data["apis"] = extract_apis(data["prompt"] + "\n" + data["canonical_solution"])
     data["libs"] = list(set([api.split(".")[0] for api in data["apis"]]))
     _, unused_imports = filter_unused_imports(data["prompt"], data["libs"])
@@ -434,9 +454,7 @@ if __name__ == "__main__":
     os.makedirs("data/processed", exist_ok=True)
     with open("data/open-eval.jsonl", "w") as f:
         for i, file in enumerate(tqdm(glob("data/clean/*.py"))):
-            # if "ming" in file:
-            #     continue
-            data = extract_content(file, None)
+            data = extract_content(file, f"f_{i}")
             if not validate_lib_num(data):
                 print(file.replace('clean/', 'raw/'), "Less than 2 libraries are used")
             if not validate_doc_example(data):
