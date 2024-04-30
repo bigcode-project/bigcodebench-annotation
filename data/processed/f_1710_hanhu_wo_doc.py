@@ -2,7 +2,8 @@ import csv
 import io
 from django.http import HttpRequest, FileResponse
 from django.conf import settings
-settings.configure()
+if not settings.configured:
+    settings.configure()
 
 def f_357(request, header, csv_data):
     """

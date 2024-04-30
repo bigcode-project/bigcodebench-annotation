@@ -3,7 +3,8 @@ import base64
 import binascii
 from django.http import HttpResponseBadRequest, HttpResponse
 from django.conf import settings
-settings.configure()
+if not settings.configured:
+    settings.configure()
 
 def f_1710(data):
     """
