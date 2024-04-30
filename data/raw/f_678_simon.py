@@ -20,12 +20,17 @@ def f_678(data, n_clusters):
     Example:
     >>> data = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
     >>> cluster = f_678(data, 2)
-    >>> sorted_cluster = list(cluster.values())
-    >>> print(sorted_cluster)
+    >>> cluster_list = list(cluster.values())
+    >>> cluster_list.sort(key=lambda x: x[0])
+    >>> print(cluster_list)
+    [array([0, 1]), array([2, 3])]
 
     >>> data = np.array([[1, 1], [2, 2]])
-    >>> f_678(data, 2)
-    {0: array([0]), 1: array([1])}
+    >>> cluster = f_678(data, 2)
+    >>> cluster_list = list(cluster.values())
+    >>> cluster_list.sort(key=lambda x: x[0])
+    >>> print(cluster_list)
+    [array([0]), array([1])]
     """
     kmeans = KMeans(n_clusters=n_clusters).fit(data)
     labels = kmeans.labels_
