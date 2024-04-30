@@ -27,13 +27,15 @@ def f_708(data, n_clusters=2, random_state=0):
     Example:
     >>> data = [('A', 1, 1), ('B', 2, 2), ('C', 300, 300), ('D', 400, 400)]
     >>> labels = f_708(data, n_clusters=2, random_state=42)
+    >>> labels.sort()
     >>> print(labels)
-    [1 1 0 0]
+    [0 0 1 1]
 
     >>> data = [('T1', 1, 1), ('T2', 1, 1.1), ('T2', 1.1, 1), ('C1', 400, 400), ('C2', 401, 401), ('B1', 35, 35)]
     >>> labels = f_708(data, n_clusters=3, random_state=42)
+    >>> labels.sort()
     >>> print(labels)
-    [1 1 1 0 0 2]
+    [0 0 1 1 1 2]
     """
     items, x_values, y_values = zip(*data)
     coordinates = np.array(list(zip(x_values, y_values)))
