@@ -29,7 +29,7 @@ def f_708(data, n_clusters=2, random_state=0):
     >>> labels = f_708(data, n_clusters=2, random_state=42)
     >>> print(labels)
     [1 1 0 0]
-
+    
     >>> data = [('T1', 1, 1), ('T2', 1, 1.1), ('T2', 1.1, 1), ('C1', 400, 400), ('C2', 401, 401), ('B1', 35, 35)]
     >>> labels = f_708(data, n_clusters=3, random_state=42)
     >>> print(labels)
