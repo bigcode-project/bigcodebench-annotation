@@ -36,11 +36,11 @@ def f_722(data, n_clusters=3, seed=None):
     >>> data = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
     >>> labels, model = f_722(data, n_clusters=4, seed=12)
     >>> print(labels) 
+    [2 0 2 1 3 3 3 3 2 2 3 2 0 2 2 1 1 2 0 0 3 1 1 0 3 3 0 1 3 2 2 1 0 1 2 3 0
+     2 1 1 1 0 1 3 0 3 1 1 1 3 3 1 2 1 1 2 3 1 3 2 3 0 2 1 3 3 2 1 1 1 0 2 0 3
+     1 2 3 2 3 3 1 0 0 1 3 0 3 3 2 0 2 1 1 3 1 1 3 0 1 2]
     >>> print(model)
-    [2 3 2 0 2 2 3 1 3 1 1 1 2 2 1 2 3 2 2 1 0 1 3 0 2 3 1 3 1 1 0 2 3 3 1 2 0
-    2 3 0 1 2 1 1 3 2 2 3 0 0 2 2 0 1 3 3 1 2 0 3 0 0 2 1 0 0 0 0 1 1 3 0 2 2
-    1 3 3 1 2 3 0 0 0 2 3 2 1 3 3 0 0 0 3 3 0 3 1 0 2 1]
-    KMeans(n_clusters=4, n_init=10, random_state=12)
+    KMeans(n_clusters=4, random_state=12)
 
 
     >>> data = pd.DataFrame({
@@ -49,9 +49,9 @@ def f_722(data, n_clusters=3, seed=None):
     ... })
     >>> labels, model = f_722(data, seed=213)
     >>> print(labels)
-    >>> print(model)
     [2 0 2 0 1]
-    KMeans(n_clusters=3, n_init=10, random_state=213)
+    >>> print(model)
+    KMeans(n_clusters=3, random_state=213)
     """
     if not data.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()).all():
         raise ValueError("DataFrame should only contain numeric values.")
