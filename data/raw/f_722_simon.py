@@ -33,6 +33,7 @@ def f_722(data, n_clusters=3, seed=None):
     - sklearn.cluster.KMeans
 
     Example:
+    >>> np.random.seed(12)
     >>> data = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
     >>> labels, model = f_722(data, n_clusters=4, seed=12)
     >>> print(labels) 
