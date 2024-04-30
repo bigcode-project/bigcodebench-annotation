@@ -41,8 +41,7 @@ def f_722(data, n_clusters=3, seed=None):
      2 0 3 2 1 2 1 1 3 1 1 1 1 2 2 1 0 0 3 3 0 0 1 1 2 0 0 2 2 0 2 2 2 0 3 2 3
      3 1 2 1 1 3 1 1 1 2 1 0 0 1 2 1 3 0 0 2 3 3 3 2 3 2]
     >>> print(model)
-    KMeans(n_clusters=4, random_state=12)
-
+    KMeans(n_clusters=4, n_init=10, random_state=12)
 
     >>> data = pd.DataFrame({
     ...     'a': [1, 20, 2, 22, 100],
@@ -52,7 +51,7 @@ def f_722(data, n_clusters=3, seed=None):
     >>> print(labels)
     [2 0 2 0 1]
     >>> print(model)
-    KMeans(n_clusters=3, random_state=213)
+    KMeans(n_clusters=3, n_init=10, random_state=213)
     """
     if not data.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()).all():
         raise ValueError("DataFrame should only contain numeric values.")
