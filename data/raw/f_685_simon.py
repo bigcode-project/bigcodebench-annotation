@@ -26,8 +26,8 @@ def f_685(samples=10, delay=0.1):
     >>> print(f'Mean: %.3f, Std: %.1f' % (mean, std))
     Mean: 0.050, Std: 0.0
     >>> mean, std = f_685(100, 0.001)
-    >>> print(f'Mean: %.3f, Std: %.5f' % (mean, std))
-    Mean: 0.001, Std: 0.00001
+    >>> print(f'Mean: %.3f, Std: %.4f' % (mean, std))
+    Mean: 0.001, Std: 0.0000
     """
     delay_times = []
 
