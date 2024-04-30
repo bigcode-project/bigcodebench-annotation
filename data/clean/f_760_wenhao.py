@@ -37,7 +37,7 @@ def f_760(data, mapping):
 
 import unittest
 # Unit tests for the f_760 function
-class ReplaceAcronymsTests(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_acronyms_single_column(self):
         data = {'text': ['NASA rocks', 'Visit the USA']}
         mapping = {'NASA': 'National Aeronautics and Space Administration', 'USA': 'United States of America'}
@@ -75,7 +75,7 @@ class ReplaceAcronymsTests(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(ReplaceAcronymsTests))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

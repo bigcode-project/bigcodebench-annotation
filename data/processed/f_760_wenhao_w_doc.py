@@ -37,7 +37,7 @@ def f_301(data, mapping):
 
 import unittest
 # Unit tests for the f_301 function
-class ReplaceAcronymsTests(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_acronyms_single_column(self):
         data = {'text': ['NASA rocks', 'Visit the USA']}
         mapping = {'NASA': 'National Aeronautics and Space Administration', 'USA': 'United States of America'}
