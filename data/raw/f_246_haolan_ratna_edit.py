@@ -53,7 +53,7 @@ import unittest
 import pandas as pd
 import matplotlib.pyplot as plt
 
-class TestF1545(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_correct_data_handling(self):
         data = pd.DataFrame([
@@ -112,7 +112,7 @@ class TestF1545(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestF1545))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

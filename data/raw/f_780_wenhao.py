@@ -25,7 +25,7 @@ def f_780(input_str):
     return freq_dict
 
 import unittest
-class TestF780(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_only_letters(self):
         # Expected output adjusted for lowercase
@@ -52,7 +52,7 @@ class TestF780(unittest.TestCase):
         self.assertEqual(f_780("!!!@@@###$$$%%%^^^&&&"), {})
 
 def run_tests():
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestF780)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

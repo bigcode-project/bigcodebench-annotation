@@ -36,7 +36,7 @@ def f_104(array_length=100):
 
 import unittest
 import matplotlib.pyplot as plt
-class TestArrayStatistics(unittest.TestCase):
+class TestCases(unittest.TestCase):
     
     def test_default_length(self):
         df, ax = f_104()

@@ -37,7 +37,7 @@ def f_391(dir_path: str) -> list:
 import unittest
 from pathlib import Path
 import shutil
-class TestRenameFiles(unittest.TestCase):
+class TestCases(unittest.TestCase):
     
     def setUp(self):
         self.temp_dir = Path("temp_test_dir")

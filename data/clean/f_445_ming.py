@@ -41,11 +41,11 @@ import matplotlib.pyplot as plt
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestArrayStatistics))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
-class TestArrayStatistics(unittest.TestCase):
+class TestCases(unittest.TestCase):
     
     def test_default_length(self):
         df, ax = f_445()

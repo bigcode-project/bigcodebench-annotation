@@ -25,7 +25,7 @@ def f_345(input_str):
     return freq_dict
 
 import unittest
-class TestF780(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_only_letters(self):
         # Expected output adjusted for lowercase
         self.assertEqual(f_345("Hello, World!"), {'h': 1, 'e': 1, 'l': 3, 'o': 2, 'w': 1, 'r': 1, 'd': 1})

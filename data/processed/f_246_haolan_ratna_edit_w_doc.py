@@ -52,7 +52,7 @@ def f_114(df):
 import unittest
 import pandas as pd
 import matplotlib.pyplot as plt
-class TestF1545(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_correct_data_handling(self):
         data = pd.DataFrame([
             {'Name': 'Alice', 'Age': 25, 'Score': 80},
