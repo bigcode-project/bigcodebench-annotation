@@ -36,8 +36,8 @@ def f_720(data, target, test_size=0.2, random_state=None):
 
     Examples:
     >>> df = pd.DataFrame({'feature1': [1,2,3], 'feature2': [2,3,4], 'target': [5,6,7]})
-    >>> f_720(df, 'target')
-    (1.5625, RandomForestRegressor())
+    >>> f_720(df, 'target', random_state=1)
+    (1.6899999999999995, RandomForestRegressor(random_state=1))
 
     >>> df = pd.DataFrame({'feature1': [1, 2, 3, 53], 'feature2': [2, 3, 4, 1], 'feature3': [-12, -2, 4.2, -2], 'trgt': [5, 6, 7, 1]})
     >>> f_720(df, 'trgt', random_state=12, test_size=0.4)

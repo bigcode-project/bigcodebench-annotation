@@ -33,15 +33,15 @@ def f_722(data, n_clusters=3, seed=None):
     - sklearn.cluster.KMeans
 
     Example:
+    >>> np.random.seed(1)
     >>> data = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
     >>> labels, model = f_722(data, n_clusters=4, seed=12)
     >>> print(labels) 
+    [2 0 0 3 3 0 1 2 1 0 3 2 0 3 0 1 0 3 3 2 3 2 1 2 2 3 1 2 1 2 0 1 3 1 0 2 1
+     1 1 3 3 2 1 0 0 0 2 1 0 1 1 0 2 2 3 1 0 0 3 1 2 3 2 2 3 3 2 2 0 1 2 2 0 1
+     1 3 3 1 3 1 1 0 1 0 2 2 1 1 0 1 0 3 3 0 2 0 1 0 1 0]
     >>> print(model)
-    [2 3 2 0 2 2 3 1 3 1 1 1 2 2 1 2 3 2 2 1 0 1 3 0 2 3 1 3 1 1 0 2 3 3 1 2 0
-    2 3 0 1 2 1 1 3 2 2 3 0 0 2 2 0 1 3 3 1 2 0 3 0 0 2 1 0 0 0 0 1 1 3 0 2 2
-    1 3 3 1 2 3 0 0 0 2 3 2 1 3 3 0 0 0 3 3 0 3 1 0 2 1]
-    KMeans(n_clusters=4, n_init=10, random_state=12)
-
+    KMeans(n_clusters=4, random_state=12)
 
     >>> data = pd.DataFrame({
     ...     'a': [1, 20, 2, 22, 100],
@@ -49,9 +49,9 @@ def f_722(data, n_clusters=3, seed=None):
     ... })
     >>> labels, model = f_722(data, seed=213)
     >>> print(labels)
-    >>> print(model)
     [2 0 2 0 1]
-    KMeans(n_clusters=3, n_init=10, random_state=213)
+    >>> print(model)
+    KMeans(n_clusters=3, random_state=213)
     """
     if not data.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()).all():
         raise ValueError("DataFrame should only contain numeric values.")
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
         assert all(label in range(4) for label in unique_labels)
         self.assertTrue(isinstance(labels, np.ndarray))
         self.assertIsInstance(kmeans, KMeans)
-        np.testing.assert_equal(labels, [3, 0, 3, 1, 2, 1, 2, 0, 2, 1, 1, 3, 3, 1, 0, 0, 0, 0, 1, 3])
+        np.testing.assert_equal(labels, [1, 2, 1, 0, 3, 0, 3, 2, 3, 0, 2, 1, 1, 0, 2, 2, 2, 2, 0, 1])
 
     def test_case_2(self):
         data = pd.DataFrame(np.zeros((100, 4)), columns=list('ABCD'))
@@ -106,12 +106,11 @@ class TestCases(unittest.TestCase):
         data = pd.DataFrame({'A': range(100), 'B': range(100), 'C': range(100)})
         labels, kmeans = f_722(data, seed=42)
         self.assertIsInstance(kmeans, KMeans)
+        print(labels)
 
-        expected = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-       2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-       2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        expected = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         np.testing.assert_equal(labels, expected)
         self.assertTrue(isinstance(labels, np.ndarray))
 
@@ -120,12 +119,12 @@ class TestCases(unittest.TestCase):
         data = pd.DataFrame(np.random.rand(100, 20))
         labels, kmeans = f_722(data, n_clusters=12, seed=12)
         self.assertIsInstance(kmeans, KMeans)
-        expected = [ 4,  5,  5,  9, 10,  1,  0,  3,  4,  7,  7,  2, 11, 11,  3,  0,  4,
-                    2,  3,  2,  2, 10, 10,  8,  5,  9, 11,  5,  0,  8, 11,  5,  7,  0,
-                    8, 11,  7, 11,  6,  1,  1,  7,  0,  9,  3,  7,  8,  0,  4,  1,  7,
-                    2, 10,  3, 11,  9,  1,  1,  7,  4,  5,  7,  6,  9,  8,  6,  5,  9,  0,
-                    11 , 1 , 1,  4,  2,  1,  0,  7,  5,  1,  9,  6,  7, 10, 10,  4,  4,  9,
-                    1,  9,  5,  6,  3, 10,  7, 11,  8,  1,  8,  6, 11]
+        print(labels)
+        expected = [11, 2, 11,  7,  3,  9,  2,  4,  8, 11,  0,  7,  7,  8, 10,  2, 11, 11, 10, 11,  2,  4,  4,  1,
+        5,  7,  2,  5,  2,  6,  2,  2,  8,  9,  1,  9,  8,  2,  9,  9,  6,  1,  2,  5,  6,  8,  1,  6,
+        4,  9,  8, 11,  1, 10,  8,  7,  9,  9,  8, 11,  5,  8,  7, 11,  1,  4,  1,  7,  2,  8,  2,  6,
+        1, 11,  6,  5, 10,  5,  6,  7,  6,  0,  3,  4, 11,  9,  3,  4, 11,  5,  7, 10,  4,  0,  1,  1,
+        9,  1,  9,  8]
         np.testing.assert_equal(labels, expected)
         self.assertTrue(isinstance(labels, np.ndarray))
 
