@@ -4,16 +4,16 @@ import base64
 
 def f_1028(data: np.ndarray) -> str:
     """
-    Standardize a numeric array using sklearn's StandardScaler and encrypt the standardized data in "ascii."
+    Standardize a numeric array using sklearn's StandardScaler and encode the standardized data in base64 format as an ASCII string.
     
     Parameters:
     - data (numpy.ndarray): The numpy array to standardize and encode.
     
     Returns:
-    - str: The encoded string of the standardized data in base64 format.
+    - str: The base64-encoded ASCII string representation of the standardized data.
     
     Requirements:
-    - sklearn.preprocessing
+    - sklearn.preprocessing.StandardScaler
     - numpy
     - base64
     
@@ -21,6 +21,7 @@ def f_1028(data: np.ndarray) -> str:
     >>> data = np.array([[0, 0], [0, 0], [1, 1], [1, 1]])
     >>> encoded_data = f_1028(data)
     >>> print(encoded_data)
+    W1stMS4sIC0xLl0sCiBbLTEuLCAtMS5dLAogWyAxLiwgIDEuXSwKIFsgMS4sICAxLl1d
     """
     scaler = StandardScaler()
     standardized_data = scaler.fit_transform(data)
