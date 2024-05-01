@@ -7,26 +7,28 @@ DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 def f_1026(data: dict) -> str:
     """
-    This function takes a Python dictionary, adds a timestamp to it, encodes the dictionary 
-    into a JSON-formatted string, and then encodes the resulting string in ASCII using base64 encoding.
+    Takes a Python dictionary, adds a current timestamp to it, serializes the modified dictionary
+    to a JSON-formatted string, and then encodes this string using base64 encoding with ASCII character encoding.
     
     Parameters:
     data (dict): The Python dictionary to encode. The dictionary should not contain a key named 'timestamp',
-                 as this key is used to insert the current timestamp by the function.
+                 as this key is used to insert the current timestamp by the function. The input dictionary
+                 is modified in-place by adding the 'timestamp' key.
     
     Returns:
-    str: A base64 encoded string that represents the input dictionary with an added timestamp.
-         The timestamp is added with the key 'timestamp' in the 'YYYY-MM-DD HH:MM:SS' format.
+    str: A base64 encoded string that represents the input dictionary with an added timestamp,
+         encoded in ASCII. The timestamp is formatted as 'YYYY-MM-DD HH:MM:SS' and added with the key 'timestamp'.
     
     Requirements:
-    - The 'json' library is used to convert the Python dictionary to a JSON-formatted string.
-    - The 'base64' library is used to encode the JSON-formatted string in ASCII.
-    - The 'datetime' library is used to get the current timestamp in the specified format.
+    - json
+    - base64
+    - datetime.datetime
     
     Example:
     >>> data = {'name': 'John', 'age': 30, 'city': 'New York'}
     >>> encoded_data = f_1026(data)
-    >>> print(encoded_data)  # The output will be a base64 encoded string representing the dictionary with the added timestamp.
+    >>> isinstance(encoded_data, str)
+    True
     """
     # Adding current timestamp to the dictionary
     data['timestamp'] = datetime.now().strftime(DATE_FORMAT)
