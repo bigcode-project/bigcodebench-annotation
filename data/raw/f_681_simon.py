@@ -4,7 +4,7 @@ import numpy as np
 
 def f_681(test_scores, student):
     """
-    Calculate the average test score for a particular student from a given DataFrame of test results.
+    Calculate the average test score and the standard deviation for a particular student from a given DataFrame of test results.
     
     Parameters:
     test_scores (DataFrame): The DataFrame containing columns 'Student' and 'Score'.
@@ -13,7 +13,7 @@ def f_681(test_scores, student):
     student (int): The specific student ID for which the average score needs to be calculated.
     
     Returns:
-    float: The average score for the student.
+    np.array([float, float]): A numpy array containing the average score and the standard deviation for the student.
     
     Raises:
     ValueError: student is not present in the test_scores dataframe
@@ -28,19 +28,20 @@ def f_681(test_scores, student):
     >>> scores = pd.DataFrame({'Student': list(np.random.choice(STUDENTS, 50, replace=True)), 
     ...                        'Score': np.random.randint(50, 101, size=50)})
     >>> f_681(scores, 10)
-    70.0
-    
+    array([70.        ,  7.07106781])
+
     >>> scores = pd.DataFrame({'Student': [1, 2, 1, 1], 'Score': [10, 1, 1, 1]})
     >>> f_681(scores, 1)
-    4.0
+    array([4.        , 5.19615242])
     """
     if student not in test_scores['Student'].values:
         raise ValueError(f"The student with ID {student} is not present in the test scores DataFrame.")
         
     student_scores = test_scores[test_scores['Student'] == student]['Score']
     average_score = student_scores.mean()
+    std = student_scores.std()
     
-    return average_score
+    return np.array([average_score, std])
 
 import unittest
 from faker import Faker
@@ -69,8 +70,14 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         student_id = self.students_sample[0]
         expected_avg = self.scores[self.scores['Student'] == student_id]['Score'].mean()
-        result = f_681(self.scores, student_id)
-        self.assertAlmostEqual(expected_avg, result, places=2)
+        expected_std = self.scores[self.scores['Student'] == student_id]['Score'].std()
+
+        res = f_681(self.scores, student_id)
+        avg, std = res
+        self.assertIsInstance(res, np.ndarray)
+        self.assertAlmostEqual(expected_avg, avg, places=2)
+        self.assertAlmostEqual(expected_std, std, places=2)
+
 
     def test_case_2(self):
         student_id = max(self.student_ids) + 1
@@ -89,8 +96,11 @@ class TestCases(unittest.TestCase):
             'Score': [100] * len(self.student_ids)
         })
         student_id = self.student_ids[3]
-        result = f_681(scores, student_id)
-        self.assertEqual(result, 100.0)
+        res = f_681(scores, student_id)
+        avg, std = res
+        self.assertIsInstance(res, np.ndarray)
+        self.assertEqual(avg, 100.0)
+        self.assertTrue(np.isnan(std))
 
     def test_case_5(self):
         scores = pd.DataFrame({
@@ -99,8 +109,12 @@ class TestCases(unittest.TestCase):
         })
         student_id = self.student_ids[4]
         expected_avg = scores[scores['Student'] == student_id]['Score'].mean()
-        result = f_681(scores, student_id)
-        self.assertAlmostEqual(expected_avg, result, places=2)
+        expected_std = scores[scores['Student'] == student_id]['Score'].std()
+
+        avg, std = f_681(scores, student_id)
+        self.assertAlmostEqual(expected_avg, avg, places=2)
+        self.assertAlmostEqual(expected_std, std, places=2)
+
 
 
 if __name__ == "__main__":
