@@ -6,14 +6,15 @@ import re
 VALID_JSON_STRUCTURE = {
     "type": "object",
     "properties": {
-        "name": {"type": "string"},
-        "age": {"type": "number"},
-        "email": {"type": "string"}
+        "name": {"type": str},  
+        "age": {"type": int},   
+        "email": {"type": str}  
     },
     "required": ["name", "age", "email"]
 }
 
 EMAIL_REGEX = r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
+
 
 def f_1029(file_path, attribute):
     """
@@ -59,7 +60,6 @@ import unittest
 import json
 import os
 import re
-from typing import Union
 
 EMAIL_REGEX = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
@@ -70,30 +70,56 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        # Creating a dummy JSON file
+        self.filepath = '/tmp/test_data.json'
+        self.valid_data = {
+            "name": "John Doe",
+            "age": 30,
+            "email": "john.doe@example.com"
+        }
+        self.invalid_email_data = {
+            "name": "John Doe",
+            "age": 30,
+            "email": "johndoe@example"
+        }
+        with open(self.filepath, 'w') as file:
+            json.dump(self.valid_data, file)
+    
+    def tearDown(self):
+        # Remove the dummy JSON file after the test
+        os.remove(self.filepath)
+
     def test_case_valid_json(self):
         # Test with valid JSON data
-        result = f_1029('/mnt/data/valid.json', 'name')
+        result = f_1029(self.filepath, 'name')
         self.assertEqual(result, "John Doe")
     
-    def test_case_invalid_missing_attr(self):
-        # Test with JSON missing required attribute
-        with self.assertRaises(ValueError):
-            f_1029('/mnt/data/invalid_missing_attr.json', 'name')
-    
     def test_case_invalid_email_format(self):
-        # Test with JSON having incorrect email format
+        # Overwrite with invalid email format data and test
+        with open(self.filepath, 'w') as file:
+            json.dump(self.invalid_email_data, file)
         with self.assertRaises(ValueError):
-            f_1029('/mnt/data/invalid_email_format.json', 'email')
+            f_1029(self.filepath, 'email')
     
-    def test_case_non_existent_file(self):
-        # Test with non-existent file path
+    def test_case_missing_attribute(self):
+        # Test with JSON missing a required attribute by removing 'age'
+        modified_data = self.valid_data.copy()
+        del modified_data['age']
+        with open(self.filepath, 'w') as file:
+            json.dump(modified_data, file)
         with self.assertRaises(ValueError):
-            f_1029('/mnt/data/non_existent.json', 'name')
+            f_1029(self.filepath, 'age')
     
     def test_case_retrieve_age(self):
         # Test retrieving age from valid JSON
-        result = f_1029('/mnt/data/valid.json', 'age')
+        result = f_1029(self.filepath, 'age')
         self.assertEqual(result, 30)
+
+    def test_case_non_existent_file(self):
+        # Test with non-existent file path
+        with self.assertRaises(ValueError):
+            f_1029('/tmp/non_existent.json', 'name')
 
 if __name__ == "__main__":
     run_tests()
