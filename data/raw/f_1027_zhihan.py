@@ -34,6 +34,7 @@ def f_1027(data, url="http://your-api-url.com"):
 import unittest
 from unittest.mock import patch, Mock
 import requests
+import json
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -55,7 +56,7 @@ class TestCases(unittest.TestCase):
         response = f_1027(data, url="http://mock-api-url.com")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, "OK")
-
+    
     @patch('requests.post', side_effect=mock_post)
     def test_case_2(self, mock_post_method):
         data = {'task': 'Write code', 'status': 'completed'}
@@ -83,6 +84,16 @@ class TestCases(unittest.TestCase):
         response = f_1027(data, url="http://mock-api-url.com")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, "OK")
+
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_6(self, mock_post_method):
+        # Test to verify that the POST request is made with the correct parameters
+        data = {'name': 'John', 'age': 30, 'city': 'New York'}
+        json_data = json.dumps(data)
+        encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')
+        f_1027(data, url="http://mock-api-url.com")
+        mock_post_method.assert_called_once_with("http://mock-api-url.com", data={"payload": encoded_data})
+
 
 if __name__ == "__main__":
     run_tests()
