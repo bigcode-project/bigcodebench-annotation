@@ -4,14 +4,16 @@ import zlib
 
 def f_1024(data_dict):
     """
-    Compresses a dictionary into a JSON string using zlib, then encodes it with base64.
-    
+    Serializes a dictionary to a JSON string, compresses it using zlib, and then encodes the compressed
+    data with base64.
+
     Parameters:
-    data_dict (dict): The dictionary to be compressed and encoded.
-    
+    data_dict (dict): The dictionary to be compressed and encoded. The dictionary should only contain
+                      data that can be serialized to JSON.
+
     Returns:
-    str: The base64 encoded compressed dictionary.
-    
+    str: A base64 encoded string that represents the zlib-compressed JSON string of the dictionary.
+
     Requirements:
     - base64
     - zlib
@@ -21,6 +23,7 @@ def f_1024(data_dict):
     >>> data = {'key1': 'value1', 'key2': 'value2'}
     >>> encoded_data = f_1024(data)
     >>> print(encoded_data)
+    eJyrVspOrTRUslJQKkvMKU01VNJRAIkYwUWMlGoBw5sKmw==
     """
     json_str = json.dumps(data_dict)
     compressed = zlib.compress(json_str.encode())
