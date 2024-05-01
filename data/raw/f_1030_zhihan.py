@@ -1,20 +1,20 @@
 import requests
 from bs4 import BeautifulSoup
 
-def f_1030(url, attribute):
+def f_1030(url, tag):
     """
-    Scrape a web page for a specified HTML attribute and return its value.
+    Scrape a web page for the first occurrence of a specified HTML tag and return its text content.
 
     Parameters:
     url (str): The URL of the website to scrape.
-    attribute (str): The HTML attribute to scrape for.
+    tag (str): The HTML tag to find and retrieve text from.
 
     Returns:
-    str: The value of the specified HTML attribute if found, otherwise returns a message indicating the attribute was not found.
+    str: The text content of the specified HTML tag if found, otherwise returns None.
 
     Requirements:
     - requests
-    - bs4
+    - bs4.BeautifulSoup
 
     Example:
     >>> f_1030("https://www.google.com/", "title")
@@ -22,9 +22,9 @@ def f_1030(url, attribute):
     """
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
-    attribute_value = soup.find(attribute)
+    tag_content = soup.find(tag)
     
-    return attribute_value.string if attribute_value else f"The attribute '{attribute}' was not found on the provided website."
+    return tag_content.string if tag_content else None
 
 import unittest
 
