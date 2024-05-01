@@ -6,30 +6,31 @@ THRESHOLD = 0.5
 
 def f_1022(l1, l2):
     """
-    This function takes two lists, l1 and l2, as input, combines them by alternating their elements, 
-    calculates the absolute difference of each combined element to a predefined threshold, and 
-    returns the element that is closest to this threshold.
+    Alternates elements from two numeric lists, calculates the absolute difference of each 
+    element from a predefined threshold, and returns the element closest to this threshold.
     
     Parameters:
     l1 (list): The first input list containing numeric values.
     l2 (list): The second input list containing numeric values.
     
     Returns:
-    float: The element from the combined list that is closest to the threshold.
+    float: The element from the combined list that is closest to the threshold of 0.5.
     
     Requirements:
-    - This function requires the libraries: numpy and itertools.
+    - numpy
+    - itertools.zip_longest
+
+    Notes:
+    - If l1 and l2 are of different lengths, elements from the longer list without a corresponding 
+      pair in the shorter list will not be paired with 'None'. Only existing numeric elements are considered.
+    - The threshold is fixed at 0.5. Adjustments to the threshold require changes to the THRESHOLD constant.
     
     Example:
-    >>> l1 = [0, 1, 2, 3, 4]
-    >>> l2 = [10, 11, 12, 13, 14]
+    >>> l1 = [0.3, 1, 2, 3]
+    >>> l2 = [0.7, 11, 12, 13]
     >>> closest = f_1022(l1, l2)
-    >>> print(closest)  # Output: 0.5
-    
-    Notes:
-    - The THRESHOLD is predefined and set to 0.5.
-    - If the lengths of l1 and l2 are different, the function will still combine them by filling 
-      the shorter list with None, which will be filtered out in the combining process.
+    >>> print(closest)
+    0.7
     """
     combined = [val for pair in zip_longest(l1, l2) for val in pair if val is not None]
     differences = np.abs(np.array(combined) - THRESHOLD)
