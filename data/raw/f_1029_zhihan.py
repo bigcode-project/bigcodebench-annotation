@@ -1,6 +1,5 @@
 import json
 import os
-import argparse
 import re
 
 # Constants
@@ -18,29 +17,27 @@ EMAIL_REGEX = r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
 
 def f_1029(file_path, attribute):
     """
-    Validate the structure and contents of a JSON file and retrieve a specified attribute from the JSON object.
+    Validate the structure and contents of a JSON file against predefined schema rules and retrieve a specified attribute from the JSON object. Ensures that all required fields exist, match their defined types, and checks the validity of the email format using a regular expression.
     
     Parameters:
     file_path (str): The path to the JSON file.
     attribute (str): The attribute to retrieve from the JSON object.
 
     Returns:
-    Any: The value of the specified attribute.
+    Any: The value of the specified attribute, consistent with the type defined in the JSON schema.
 
     Requirements:
     - json
     - os
-        - re
+    - re
+
+    Errors:
+    - Raises ValueError if the file does not exist, required attributes are missing, types do not match, or the email format is invalid.
 
     Example:
     >>> f_1029('/path/to/file.json', 'email')
     'john.doe@example.com'
     """
-    parser = argparse.ArgumentParser(description='Validate JSON file and retrieve attribute.')
-    parser.add_argument('--file_path', type=str, help='Path to the JSON file.')
-    parser.add_argument('--attribute', type=str, help='Attribute to retrieve from the JSON object.')
-    args = parser.parse_args()
-
     if not os.path.isfile(file_path):
         raise ValueError(f'{file_path} does not exist.')
 
