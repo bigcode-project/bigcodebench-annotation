@@ -30,6 +30,8 @@ def f_1025(message, encryption_key):
     return base64.b64encode(encrypted_message).decode()
 
 import unittest
+import base64
+from cryptography.fernet import Fernet
 
 class TestCases(unittest.TestCase):
 
@@ -59,9 +61,15 @@ class TestCases(unittest.TestCase):
         self.assertNotEqual(result, long_message)
 
     def test_case_5(self):
-        # Test with a basic message and a shorter encryption key (to test if the function handles key length issues).
-        with self.assertRaises(Exception):
+        # Test with a basic message and an incorrectly formatted encryption key.
+        with self.assertRaises(ValueError):
             f_1025('Hello, World!', '0123456789')
+
+    def test_case_6(self):
+        # Test with a non-base64 but correct length key.
+        with self.assertRaises(Exception):
+            f_1025('Hello, World!', '01234567890123456789012345678901'*2)  # Not base64-encoded
+
 
 def run_tests():
     suite = unittest.TestSuite()
