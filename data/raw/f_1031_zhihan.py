@@ -3,23 +3,24 @@ from functools import reduce
 
 def f_1031(list_of_pairs):
     """ 
-    Calculate the product of the second values in each tuple in a list of tuples and return the product as a numeric array.
+    Calculate the product of the second values in each tuple in a list of tuples and return the product as a single-element numeric array.
     
     Parameters:
     list_of_pairs (list): A list of tuples, where the first element is the category 
                           and the second element is the numeric value.
     
     Returns:
-    numpy.ndarray: A numpy array with the product of the second values.
+    numpy.ndarray: A numpy array containing a single element that is the product of the second values in the list of tuples.
     
     Requirements:
     - numpy
-    - functools
+    - functools.reduce
     
     Example:
     >>> list_of_pairs = [('Fruits', 5), ('Vegetables', 9), ('Dairy', -1), ('Bakery', -2), ('Meat', 4)]
     >>> product_array = f_1031(list_of_pairs)
     >>> print(product_array)
+    360
     """
     second_values = [pair[1] for pair in list_of_pairs]
     product = reduce(np.multiply, second_values)
