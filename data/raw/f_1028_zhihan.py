@@ -2,7 +2,7 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 import base64
 
-def f_1028(data: np.ndarray) -> str:
+def f_1028(data):
     """
     Standardize a numeric array using sklearn's StandardScaler and encode the standardized data in base64 format as an ASCII string.
     
