@@ -8,23 +8,24 @@ SALT_LENGTH = 32
 
 def f_1023(password):
     """
-    Hash a password with the PBKDF2 algorithm and encode both the salt and the hashed password with base64.
+    Hashes a password using the PBKDF2 HMAC algorithm with SHA-256 as the hashing algorithm, 
+    combined with a randomly generated salt, and returns both the salt and the hashed password, 
+    each base64-encoded.
 
     Parameters:
     password (str): The password to be hashed.
 
     Returns:
-    tuple: A tuple containing the base64 encoded salt and hashed password.
+    tuple[bytes, bytes]: A tuple containing the base64-encoded salt and the base64-encoded hashed password as byte strings.
 
     Requirements:
     - base64
     - hashlib
     - os
-    - binascii
 
     Example:
     >>> salt, hashed_password = f_1023('my_password')
-    >>> print(salt, hashed_password)
+    >>> print(salt.decode(), hashed_password.decode())
     """
     salt = os.urandom(SALT_LENGTH)
     hashed_password = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100000)
@@ -35,7 +36,7 @@ import base64
 import hashlib
 
 # Load the refined function for testing
-exec(open('/mnt/data/refined_function.py').read())
+# exec(open('/mnt/data/refined_function.py').read())
 
 def run_tests():
     suite = unittest.TestSuite()
