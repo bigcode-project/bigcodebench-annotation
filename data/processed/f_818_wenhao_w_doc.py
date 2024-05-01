@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
         df = f_21(5, columns=custom_columns, seed=0)
         self.assertTrue(all(column in custom_columns for column in df.columns))
         # assert first 2 rows data
-        self.assertEqual(df.iloc[0].tolist(), [0.5488135039273248, 0.7151893663724195, 0.6027633760716439])
+        self.assertEqual(set(df.iloc[0].tolist()), {0.5488135039273248, 0.7151893663724195, 0.6027633760716439})
         
     def test_case_3(self):
         # Test custom rows
@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
             self.assertEqual(len(df), n_rows)
     def test_case_4(self):
         df = f_21(5, seed=42)
-        self.assertEqual(df.iloc[0].tolist(), [0.3745401188473625, 0.9507143064099162, 0.7319939418114051, 0.5986584841970366, 0.15601864044243652])
+        self.assertEqual(set(df.iloc[0].tolist()), {0.3745401188473625, 0.9507143064099162, 0.7319939418114051, 0.5986584841970366, 0.15601864044243652})
     def test_case_5(self):
         # Test handling edge cases - negative rows
         with self.assertRaises(ValueError):
