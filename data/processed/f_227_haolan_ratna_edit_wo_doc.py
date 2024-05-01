@@ -38,7 +38,6 @@ def f_75(url):
     return process.returncode
 
 import unittest
-import unittest
 from unittest.mock import patch, MagicMock
 class TestCases(unittest.TestCase):
     @patch('subprocess.Popen')
@@ -50,7 +49,7 @@ class TestCases(unittest.TestCase):
         process_mock.returncode = 0
         mock_popen.return_value = process_mock
         result = f_75('https://www.google.com')
-        mock_popen.assert_called_with(['open', 'https://www.google.com'], shell=True)
+        self.assertEqual(['open', 'https://www.google.com'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 0)
     @patch('subprocess.Popen')
@@ -62,7 +61,7 @@ class TestCases(unittest.TestCase):
         process_mock.returncode = 0
         mock_popen.return_value = process_mock
         result = f_75('https://www.openai.com')
-        mock_popen.assert_called_with(['start', 'https://www.openai.com'], shell=True)
+        self.assertEqual(['start', 'https://www.openai.com'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 0)
     @patch('subprocess.Popen')
@@ -74,7 +73,7 @@ class TestCases(unittest.TestCase):
         process_mock.returncode = 1
         mock_popen.return_value = process_mock
         result = f_75('')
-        mock_popen.assert_called_with(['xdg-open', ''], shell=True)
+        self.assertEqual(['xdg-open', ''], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)
     @patch('subprocess.Popen')
@@ -86,7 +85,7 @@ class TestCases(unittest.TestCase):
         process_mock.returncode = 1
         mock_popen.return_value = process_mock
         result = f_75('/invalid_url')
-        mock_popen.assert_called_with(['xdg-open', '/invalid_url'], shell=True)
+        self.assertEqual(['xdg-open', '/invalid_url'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)
     @patch('subprocess.Popen')
@@ -98,6 +97,6 @@ class TestCases(unittest.TestCase):
         process_mock.returncode = 1
         mock_popen.return_value = process_mock
         result = f_75('/path/to/file.txt')
-        mock_popen.assert_called_with(['xdg-open', '/path/to/file.txt'], shell=True)
+        self.assertEqual(['xdg-open', '/path/to/file.txt'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)
