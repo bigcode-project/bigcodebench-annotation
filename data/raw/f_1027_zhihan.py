@@ -4,15 +4,15 @@ import base64
 
 def f_1027(data, url="http://your-api-url.com"):
     """
-    Encode a Python dictionary into a JSON-formatted string and then the string into "ASCII."
-    Send the encoded string to an API endpoint as a POST request.
+    Convert a Python dictionary into a JSON-formatted string, encode this string in base64 format,
+    and send it as a payload in a POST request to an API endpoint.
     
     Parameters:
     data (dict): The Python dictionary to encode and send.
     url (str, optional): The API endpoint URL. Defaults to "http://your-api-url.com".
     
     Returns:
-    Response: The response from the API endpoint.
+    requests.Response: The response object received from the API endpoint after the POST request.
     
     Requirements:
     - requests
@@ -23,6 +23,7 @@ def f_1027(data, url="http://your-api-url.com"):
     >>> data = {'name': 'John', 'age': 30, 'city': 'New York'}
     >>> response = f_1027(data, url="http://example-api-url.com")
     >>> print(response.status_code)
+    200
     """
     json_data = json.dumps(data)
     encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')
@@ -34,18 +35,18 @@ import unittest
 from unittest.mock import patch, Mock
 import requests
 
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
 # Mocking the requests.post method
 def mock_post(*args, **kwargs):
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.text = "OK"
     return mock_response
-
-def run_tests():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCases))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
 
 class TestCases(unittest.TestCase):
     @patch('requests.post', side_effect=mock_post)
