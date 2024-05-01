@@ -27,6 +27,9 @@ def f_1030(url, tag):
     return tag_content.string if tag_content else None
 
 import unittest
+import os
+import requests
+from bs4 import BeautifulSoup
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -35,24 +38,38 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        result = f_1030("file:///mnt/data/test_page_1.html", "title")
-        self.assertEqual(result, "Test Page 1")
+    def setUp(self):
+        # Create a dummy HTML file
+        self.filename = "test_page.html"
+        self.filepath = os.path.join("/tmp", self.filename)
+        with open(self.filepath, "w") as file:
+            file.write("<html><head><title>Test Page</title></head>"
+                       "<body><h1>This is a test page</h1><p>Sample paragraph.</p></body></html>")
+        self.url = "file://" + self.filepath
 
-    def test_case_2(self):
-        result = f_1030("file:///mnt/data/test_page_1.html", "h2")
-        self.assertEqual(result, "The attribute 'h2' was not found on the provided website.")
+    def tearDown(self):
+        # Remove the dummy HTML file after the test is done
+        os.remove(self.filepath)
 
-    def test_case_3(self):
-        result = f_1030("file:///mnt/data/test_page_2.html", "title")
-        self.assertEqual(result, "Test Page 2")
+    def test_title_tag_found(self):
+        # Test retrieving the title tag
+        result = f_1030(self.url, "title")
+        self.assertEqual(result, "Test Page")
 
-    def test_case_4(self):
-        result = f_1030("file:///mnt/data/test_page_2.html", "h2")
-        self.assertEqual(result, "The attribute 'h2' was not found on the provided website.")
+    def test_h1_tag_found(self):
+        # Test retrieving the h1 tag
+        result = f_1030(self.url, "h1")
+        self.assertEqual(result, "This is a test page")
 
-    def test_case_5(self):
+    def test_nonexistent_tag(self):
+        # Test for a tag that doesn't exist
+        result = f_1030(self.url, "h2")
+        self.assertIsNone(result)
+
+    def test_invalid_url_handling(self):
+        # Test how the function handles an invalid URL
         with self.assertRaises(requests.exceptions.RequestException):
             f_1030("invalid_url", "title")
+
 if __name__ == "__main__":
     run_tests()
