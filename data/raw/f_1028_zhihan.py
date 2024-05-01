@@ -21,7 +21,7 @@ def f_1028(data: np.ndarray) -> str:
     >>> data = np.array([[0, 0], [0, 0], [1, 1], [1, 1]])
     >>> encoded_data = f_1028(data)
     >>> print(encoded_data)
-    W1stMS4sIC0xLl0sCiBbLTEuLCAtMS5dLAogWyAxLiwgIDEuXSwKIFsgMS4sICAxLl1d
+    W1stMS4gLTEuXQogWy0xLiAtMS5dCiBbIDEuICAxLl0KIFsgMS4gIDEuXV0=
     """
     scaler = StandardScaler()
     standardized_data = scaler.fit_transform(data)
