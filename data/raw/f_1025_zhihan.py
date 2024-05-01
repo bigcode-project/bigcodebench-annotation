@@ -3,14 +3,18 @@ from cryptography.fernet import Fernet
 
 def f_1025(message, encryption_key):
     """
-    Encrypt a message with a symmetric encryption key and then encode the encrypted message using base64.
+    Encrypts a message with a symmetric encryption key using Fernet encryption, and then encode the 
+    encrypted message using base64.
 
     Parameters:
     message (str): The message to be encrypted and encoded.
-    encryption_key (str): The key used for symmetric encryption. It should be a string of 32 bytes.
+    encryption_key (str): The key used for symmetric encryption. It should be a string, which will 
+                          be encoded to bytes, then URL-safe base64 encoded to conform to the requirements 
+                          for Fernet (32 bytes after encoding).
 
     Returns:
-    str: The base64 encoded encrypted message.
+    str: The base64 encoded encrypted message. The message is first encrypted using Fernet encryption, 
+         then the result is base64 encoded.
 
     Requirements:
     - base64
@@ -18,7 +22,8 @@ def f_1025(message, encryption_key):
 
     Example:
     >>> encrypted_message = f_1025('Hello, World!', '01234567890123456789012345678901')
-    >>> print(encrypted_message)
+    >>> isinstance(encrypted_message, str)
+    True
     """
     fernet = Fernet(base64.urlsafe_b64encode(encryption_key.encode()))
     encrypted_message = fernet.encrypt(message.encode())
