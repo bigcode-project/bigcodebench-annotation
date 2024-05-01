@@ -47,7 +47,7 @@ from datetime import datetime
 # Constants
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
-class TestEncodeDataFunction(unittest.TestCase):
+class TestCases(unittest.TestCase):
     
     def test_f_1026_basic(self):
         """Test the f_1026 function with a basic dictionary."""
@@ -128,7 +128,7 @@ class TestEncodeDataFunction(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestEncodeDataFunction))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 if __name__ == "__main__":
