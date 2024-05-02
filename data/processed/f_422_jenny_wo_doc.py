@@ -41,13 +41,12 @@ import shutil
 import sqlite3
 import pandas as pd
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.temp_dir_obj = tempfile.TemporaryDirectory()
-        cls.temp_dir = cls.temp_dir_obj.name
-        cls.db_path = os.path.join(cls.temp_dir, "test.db")
+    def setUp(self):
+        self.temp_dir_obj = tempfile.TemporaryDirectory()
+        self.temp_dir = self.temp_dir_obj.name
+        self.db_path = os.path.join(self.temp_dir, "test.db")
         # Setup the database and tables
-        conn = sqlite3.connect(cls.db_path)
+        conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         # Create tables and insert some data
         cursor.execute("CREATE TABLE People (Name TEXT, Age INTEGER)")
@@ -60,9 +59,8 @@ class TestCases(unittest.TestCase):
         )
         conn.commit()
         conn.close()
-    @classmethod
-    def tearDownClass(cls):
-        cls.temp_dir_obj.cleanup()
+    def tearDown(self):
+        self.temp_dir_obj.cleanup()
     def test_case_1(self):
         # Test exporting the People table
         csv_path = os.path.join(self.temp_dir, "data.csv")

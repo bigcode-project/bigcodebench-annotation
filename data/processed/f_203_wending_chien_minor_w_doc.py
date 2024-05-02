@@ -88,6 +88,6 @@ class TestCases(unittest.TestCase):
             f_539(self.data_dict, data_keys)
     def test_key_not_in_dict(self):
         # Test with a key that's not in the dictionary
-        data_keys = ['D']  # Assuming 'D' is not in `data_dict`
+        data_keys = ['D']  # Assu 'D' is not in `data_dict`
         with self.assertRaises(ValueError):
             f_539(self.data_dict, data_keys)

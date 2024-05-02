@@ -42,15 +42,14 @@ import os
 class TestCases(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Set up test environment by creating test gzip files with known content."""
         with gzip.open('file1.gz', 'wt') as f:
             f.write("This is a test file.\n")
         with gzip.open('file2.gz', 'wt') as f:
             f.write("This is a different test file.\n")
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up by removing the test gzip files."""
         os.remove('file1.gz')
         os.remove('file2.gz')

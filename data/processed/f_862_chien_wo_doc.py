@@ -31,7 +31,7 @@ def f_281(filename=IMAGE_PATH, from_encoding="cp1251", to_encoding="utf8"):
     - pytesseract
 
     Example:
-    # Assuming 'image.png' contains the text 'Привет мир' in Russian (encoded in cp1251),
+    # Assu 'image.png' contains the text 'Привет мир' in Russian (encoded in cp1251),
     # and this text is successfully extracted by the OCR.
     >>> text = f_281('image.png', 'cp1251', 'utf8')
     >>> print(text)

@@ -26,7 +26,7 @@ def f_619(package_name):
     - pkgutil.iter_modules
 
     Examples:
-    Assuming 'pandas' is a valid package with modules 'module1' and 'module2',
+    Assu 'pandas' is a valid package with modules 'module1' and 'module2',
 
     >>> len(f_619('pandas')) >= 2
     True
@@ -82,12 +82,12 @@ class TestCases(unittest.TestCase):
         except ImportError:
             self.assertTrue(True, "Package not found, which is expected in this test.")
     def test_module_path_in_sys_path(self):
-        # Assuming 'numpy' is installed
+        # Assu 'numpy' is installed
         modules_added = f_619('numpy')
         for module in modules_added:
             self.assertTrue(any(module in path for path in sys.path))
     def test_no_duplicates_in_sys_path(self):
-        # Assuming 'numpy' is installed
+        # Assu 'numpy' is installed
         modules_added = f_619('numpy')
         for module in modules_added:
             self.assertEqual(sum(module in path for path in sys.path), 1)

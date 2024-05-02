@@ -18,6 +18,9 @@ def f_537(csv_url, sort_by_column="title"):
     - requests
     - io.StringIO
 
+    Raises:
+    Exception: If the response status code is not 200.
+
     Example:
     >>> f_537("http://example.com/data.csv", sort_by_column="title")
        id   title  price

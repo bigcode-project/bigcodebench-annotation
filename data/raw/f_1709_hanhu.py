@@ -2,9 +2,6 @@ import hashlib
 import base64
 import binascii
 from django.http import HttpResponseBadRequest, HttpResponse
-from django.conf import settings
-if not settings.configured:
-    settings.configure()
 
 def f_1710(data):
     """
@@ -69,6 +66,9 @@ def f_1710(data):
 import unittest
 from unittest.mock import patch
 from django.http import HttpResponseBadRequest, HttpResponse
+from django.conf import settings
+if not settings.configured:
+    settings.configure()
 
 class TestCases(unittest.TestCase):
 

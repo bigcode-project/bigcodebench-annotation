@@ -64,7 +64,7 @@ class TestCases(unittest.TestCase):
         updated_data = f_106(data, key, min_value, max_value)
         self.assertIsInstance(updated_data, pd.DataFrame)
         self.assertTrue(key in updated_data.columns)
-        self.assertEqual(len(updated_data), 3)  # Assuming the length of the input data is 3
+        self.assertEqual(len(updated_data), 3)  # Assu the length of the input data is 3
         self.assertTrue(all(min_value <= val <= max_value for val in updated_data[key]))
         
     def test_negative_values(self):

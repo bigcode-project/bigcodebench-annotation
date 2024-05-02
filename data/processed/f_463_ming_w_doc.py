@@ -44,7 +44,7 @@ def f_46(df, letter):
     word_lengths = filtered_df['Word'].str.len()
     ax = sns.boxplot(x=word_lengths)
     ax.set_title(f"Word Lengths Distribution for Words Starting with '{letter}'")
-    end_time = time.time()  # End timing
+    end_time = time.time()  # End ti
     cost = f"Operation completed in {end_time - start_time} seconds."
     return ax
 

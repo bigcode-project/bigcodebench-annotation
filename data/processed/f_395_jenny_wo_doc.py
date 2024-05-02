@@ -10,7 +10,7 @@ def f_203(days_in_past=7, random_seed=0):
     using randomly generated data for activities.
 
     This function randomly generates acitivity durations from 0 to 120 for each activity
-    from ["Running", "Swimming", "Cycling", "Yoga", "Weight Training"].
+    from ["Running", "Swim", "Cycling", "Yoga", "Weight Training"].
 
     Parameters:
     days_in_past (int, optional): The number of days in the past for which to generate the graph.
@@ -45,7 +45,7 @@ def f_203(days_in_past=7, random_seed=0):
     if days_in_past < 1:
         raise ValueError("days_in_past must be in the past")
 
-    ACTIVITIES = ["Running", "Swimming", "Cycling", "Yoga", "Weight Training"]
+    ACTIVITIES = ["Running", "Swim", "Cycling", "Yoga", "Weight Training"]
 
     data = []
     for i in range(days_in_past):
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
         self.default_days_in_past = 7
         self.default_activities = [
             "Running",
-            "Swimming",
+            "Swim",
             "Cycling",
             "Yoga",
             "Weight Training",

@@ -41,12 +41,11 @@ import shutil
 import pandas as pd
 class TestCases(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Create the data directory if it doesn't exist."""
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up by removing files created during tests (if any)."""
         shutil.rmtree(output_dir, ignore_errors=True)
     def test_basic_dataframe(self):

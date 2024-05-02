@@ -157,7 +157,7 @@ class TestCases(unittest.TestCase):
         with self.client as client:
             # Simulate an authenticated session
             with client.session_transaction() as sess:
-                sess['user_id'] = 'testuser'  # Assuming the user loader can use this to load the user
+                sess['user_id'] = 'testuser'  # Assu the user loader can use this to load the user
             # Manually set current_user for the duration of the test
             with patch('flask_login.utils._get_user') as mock_current_user:
                 mock_user = MagicMock()

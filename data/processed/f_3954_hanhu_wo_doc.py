@@ -51,14 +51,12 @@ def f_367(s, save_json, json_file_path):
 import unittest
 import os
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.json_file_path = 'test_output.json'
+    def setUp(self):
+        self.json_file_path = 'test_output.json'
     
-    @classmethod
-    def tearDownClass(cls):
-        if os.path.exists(cls.json_file_path):
-            os.remove(cls.json_file_path)
+    def tearDown(self):
+        if os.path.exists(self.json_file_path):
+            os.remove(self.json_file_path)
     def test_simple_xml_to_dict(self):
         xml_str = '<person><name>John</name><age>30</age></person>'
         result = f_367(xml_str, False, '')

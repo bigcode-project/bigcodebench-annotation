@@ -47,23 +47,22 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.data1 = [
+    def setUp(self):
+        self.data1 = [
             {"A": 10, "B": 15, "C": 12},
             {"A": 12, "B": 20, "C": 14},
             {"A": 15, "B": 18, "C": 15},
             {"A": 11, "B": 17, "C": 13},
         ]
-        cls.data2 = [
+        self.data2 = [
             {"X": 5, "Y": 8},
             {"X": 6, "Y": 7},
             {"X": 7, "Y": 6},
             {"X": 8, "Y": 5},
         ]
-        cls.data3 = [{"P": 3, "Q": 2, "R": 4, "S": 1}, {"P": 4, "Q": 3, "R": 2, "S": 3}]
-        cls.data4 = [{"W": 7}, {"W": 8}, {"W": 9}, {"W": 6}]
-        cls.data5 = [{"M": 1, "N": 3}, {"M": 3, "N": 1}]
+        self.data3 = [{"P": 3, "Q": 2, "R": 4, "S": 1}, {"P": 4, "Q": 3, "R": 2, "S": 3}]
+        self.data4 = [{"W": 7}, {"W": 8}, {"W": 9}, {"W": 6}]
+        self.data5 = [{"M": 1, "N": 3}, {"M": 3, "N": 1}]
     def test_case_1(self):
         # Test for correct Axes instance and labels for a typical data set
         ax = f_318(self.data1)

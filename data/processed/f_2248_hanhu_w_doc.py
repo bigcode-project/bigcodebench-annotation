@@ -50,7 +50,7 @@ def f_494(dic):
 
     locations_df = pd.DataFrame(preprocessed_locations)
 
-    # Assuming the first row has valid coordinates
+    # Assu the first row has valid coordinates
     first_row = locations_df.iloc[0]
     folium_map = folium.Map(location=[first_row['Lat'], first_row['Lon']], zoom_start=4)
 
@@ -98,5 +98,5 @@ class TestCases(unittest.TestCase):
         """Test that the map is initialized with correct latitude and longitude."""
         locations = {'Loc1': {'Lat': 0, 'Lon': 0}, 'Loc2': {'Lat': 4, 'Lon': 4}}
         f_494(locations)
-        # Assuming that the map is initialized at the location of the first entry in the dictionary
+        # Assu that the map is initialized at the location of the first entry in the dictionary
         mock_map.assert_called_with(location=[0, 0], zoom_start=4)

@@ -74,8 +74,7 @@ class TestCases(unittest.TestCase):
         """Set up the environment for testing."""
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up any files created during the tests."""
         # Check and remove the expected file if it exists
         # if os.path.exists(FILE_PATH):

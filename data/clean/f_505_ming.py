@@ -58,8 +58,7 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up any files created during the tests."""
         # Check and remove the expected file if it exists
         # if os.path.exists(FILE_PATH):

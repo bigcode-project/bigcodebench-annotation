@@ -5,7 +5,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 def f_170(df):
     """
-    Analyzes articles by their titles for specific keywords ("how" or "what"), vectorizes the content using
+    Analyzes articles by their titles for specific case-insensitive keywords ("how" or "what"), vectorizes the content using
     CountVectorizer, and groups them into clusters using KMeans clustering. This function is intended for basic
     content analysis and clustering to understand common themes or topics among articles asking questions starting
     with "how" or "what".
@@ -24,9 +24,9 @@ def f_170(df):
     Example:
     >>> import pandas as pd
     >>> df_sample = pd.DataFrame({
-    ...    'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
-    ...    'Content': ['This is a tutorial about coding...', 'Python is a programming language...',
-    ...                'Programming is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
+    ...    'Title': ['How to code?', 'What is Python?', 'The art of program', 'How to cook?', 'What is life?'],
+    ...    'Content': ['This is a tutorial about coding...', 'Python is a program language...',
+    ...                'Program is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
     ... })
     >>> f_170(df_sample)
     [0, 1, 0, 1]
@@ -51,9 +51,9 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         """Prepare environment and variables for tests."""
         self.df_sample = pd.DataFrame({
-            'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
-            'Content': ['This is a tutorial about coding...', 'Python is a programming language...',
-                        'Programming is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
+            'Title': ['How to code?', 'What is Python?', 'The art of program', 'How to cook?', 'What is life?'],
+            'Content': ['This is a tutorial about coding...', 'Python is a program language...',
+                        'Program is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
         })
         os.environ['OMP_NUM_THREADS'] = '1'  # Setup environment variable for deterministic parallel processing
     def tearDown(self):

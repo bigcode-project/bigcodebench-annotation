@@ -41,22 +41,20 @@ import unittest
 import shutil
 output_dir = './output'
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.test_dir = output_dir
-        if not os.path.exists(cls.test_dir):
-            os.makedirs(cls.test_dir)
+    def setUp(self):
+        self.test_dir = output_dir
+        if not os.path.exists(self.test_dir):
+            os.makedirs(self.test_dir)
         # Create test files
-        cls.test_file1 = os.path.join(cls.test_dir, "test1.txt")
-        cls.test_file2 = os.path.join(cls.test_dir, "ignore.exe")
-        with open(cls.test_file1, 'w') as f:
+        self.test_file1 = os.path.join(self.test_dir, "test1.txt")
+        self.test_file2 = os.path.join(self.test_dir, "ignore.exe")
+        with open(self.test_file1, 'w') as f:
             f.write("This is a test file.")
-        with open(cls.test_file2, 'w') as f:
+        with open(self.test_file2, 'w') as f:
             f.write("This file should be ignored.")
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Remove the test directory and all its contents
-        shutil.rmtree(cls.test_dir, ignore_errors=True)
+        shutil.rmtree(self.test_dir, ignore_errors=True)
     def test_file_matching(self):
         """Ensure function matches correct files."""
         output_csv = os.path.join(self.test_dir, "matched_files.csv")

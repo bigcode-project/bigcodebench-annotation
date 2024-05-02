@@ -47,8 +47,8 @@ import unittest
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Setup test directories
-        self.source_dir = 'f_261_data_wenhao/'
-        self.target_dir = 'f_261_data_wenhao_target/'
+        self.source_dir = 'f_261_data_/'
+        self.target_dir = 'f_261_data__target/'
         
         # Remove any existing test directories to start fresh
         if os.path.exists(self.source_dir):

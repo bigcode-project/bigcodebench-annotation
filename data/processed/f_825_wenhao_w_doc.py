@@ -63,7 +63,7 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 class TestCases(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         np.random.seed(42)
     def test_data_correctness(self):
         """Tests if the normal distribution parameters accurately represent the data's distribution."""
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
         ax = f_302(df, "F")
         line = ax.lines[
             0
-        ]  # Assuming the normal distribution line is the first line object in the plot
+        ]  # Assu the normal distribution line is the first line object in the plot
         x_data = line.get_xdata()
         y_data = line.get_ydata()
         # The peak of the normal distribution curve should be at the mean

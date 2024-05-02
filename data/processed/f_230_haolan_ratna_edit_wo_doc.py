@@ -9,7 +9,7 @@ EMAIL_PASSWORD = "your.password"
 
 def f_87(input_data=None, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address=EMAIL_ADDRESS, email_password=EMAIL_PASSWORD, smtp=None):
     """
-    Extract recepient email address and names from JSON-formatted string and send the names in an email.
+    Extract recepient email address and names from JSON-formatted string and send the names in an email. The sent message should be in the format 'Subject: Extracted Names\n\nName1\nName2\n...'.
 
     Parameters:
     input_data (str): JSON-formatted string containing the recipient email address and the list of names.

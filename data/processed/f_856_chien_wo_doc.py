@@ -100,8 +100,7 @@ class TestCases(unittest.TestCase):
         )
         result = f_288("/external-link")
         self.assertEqual(result, 1)
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Remove the database file with retries."""
         if os.path.exists("scraped_data.csv"):
             os.remove("scraped_data.csv")

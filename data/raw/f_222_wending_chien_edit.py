@@ -5,7 +5,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 def f_222(df):
     """
-    Analyzes articles by their titles for specific keywords ("how" or "what"), vectorizes the content using
+    Analyzes articles by their titles for specific case-insensitive keywords ("how" or "what"), vectorizes the content using
     CountVectorizer, and groups them into clusters using KMeans clustering. This function is intended for basic
     content analysis and clustering to understand common themes or topics among articles asking questions starting
     with "how" or "what".

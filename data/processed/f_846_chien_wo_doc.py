@@ -13,7 +13,7 @@ def f_673(url):
     Returns:
     pandas.DataFrame
         A DataFrame constructed from the parsed XML data. Each row of the DataFrame corresponds to an 'item' element
-        in the XML file, with child elements of 'item' becoming columns in the DataFrame.
+        in the XML file, with child elements of 'item' beco columns in the DataFrame.
 
     Raises:
     ValueError

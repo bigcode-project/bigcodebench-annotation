@@ -7,7 +7,7 @@ import numpy as np
 def f_141(file_path: str, plot_path: str) -> (float, float, str):
     """
     Processes a CSV file at the given path by reading its contents, cleaning the data,
-    performing statistical analysis, and generating a plot, which is saved to the specified path.
+    perfor statistical analysis, and generating a plot, which is saved to the specified path.
 
     Sets the title of the plot to "Data Visualization".
     Labels the x-axis as "Index" and the y-axis as "Value".

@@ -61,12 +61,11 @@ from pathlib import Path
 import os
 class TestCases(unittest.TestCase):
     """Test cases for f_598."""
-    test_data_dir = "mnt/data/f_598_data_chien"
-    @classmethod
-    def setUpClass(cls):
+    test_data_dir = "mnt/data/f_598_data_"
+    def setUp(self):
         """Set up method to create a directory for test files."""
-        cls.test_dir = Path(cls.test_data_dir)
-        cls.test_dir.mkdir(parents=True, exist_ok=True)
+        self.test_dir = Path(self.test_data_dir)
+        self.test_dir.mkdir(parents=True, exist_ok=True)
     def check_csv_content(self, xml_content, csv_path):
         """Helper function to check if the CSV content matches the XML content."""
         root = ET.fromstring(xml_content)
@@ -124,8 +123,7 @@ class TestCases(unittest.TestCase):
         csv_output = self.test_dir / "non_existent_directory" / "output.csv"
         with self.assertRaises(IOError):
             f_598(xml_content, csv_output)
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Cleanup the test directories
         dirs_to_remove = ["mnt/data", "mnt"]
         for dir_path in dirs_to_remove:

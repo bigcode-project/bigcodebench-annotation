@@ -127,7 +127,7 @@ class TestCases(unittest.TestCase):
                 client.sendall("Test".encode())
                 responses.append(client.recv(1024).decode())
         for response in responses:
-            # Assuming the server response format includes the timestamp followed by the echoed message
+            # Assu the server response format includes the timestamp followed by the echoed message
             self.assertTrue("Test" in response)
     def test_no_data_received(self):
         """Test server behavior when no data is received from the client."""

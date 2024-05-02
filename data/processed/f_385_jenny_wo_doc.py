@@ -109,7 +109,7 @@ class TestCases(unittest.TestCase):
             "2023-01-03 Not a valid entry\n"
             "WARNING - This log entry is missing its timestamp\n"
             "2023-01-04 15:00:00.000000 - INFO - System update completed\n"
-            "Some random text not conforming to the log format\n"
+            "Some random text not confor to the log format\n"
             "2023-01-04 16:00:00.000000 - ERROR - Error in processing\n"
         )
         log_file_path = self._create_temp_log_file("log5.txt", content)

@@ -101,9 +101,8 @@ class TestCases(unittest.TestCase):
         priv_key = rsa.PrivateKey.load_pkcs1(decrypted_key)
         self.assertIsInstance(priv_key, rsa.PrivateKey)
 
-    @classmethod
-    def tearDownClass(cls):
-        for filename in cls.filenames:
+    def tearDown(self):
+        for filename in self.filenames:
             os.remove(filename)
 
 

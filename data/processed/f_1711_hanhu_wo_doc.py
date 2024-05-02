@@ -2,8 +2,6 @@ import zipfile
 import io
 from django.http import FileResponse, HttpRequest
 from django.conf import settings
-if not settings.configured:
-    settings.configure()
 
 def f_218(request, file_paths):
     """
@@ -12,7 +10,7 @@ def f_218(request, file_paths):
     is not utilized within the function but is required for compatibility with Django view structures.
 
     Parameters:
-    - request (HttpRequest): The incoming Django HttpRequest, not used within the function.
+    - request (HttpRequest): The inco Django HttpRequest, not used within the function.
     - file_paths (list of str): A list of file paths or file contents to be included in the zip.
 
     Returns:
@@ -53,6 +51,8 @@ def f_218(request, file_paths):
 import unittest
 from unittest.mock import MagicMock, patch
 from django.http import HttpRequest, FileResponse
+if not settings.configured:
+    settings.configure()
 class TestCases(unittest.TestCase):
     def setUp(self):
         self.request = HttpRequest()

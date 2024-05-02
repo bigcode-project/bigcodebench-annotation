@@ -133,10 +133,9 @@ class TestCases(unittest.TestCase):
         result_path = f_848(url, save_path, extract_path)
         self.assertEqual(result_path, extract_path)
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Clean up any files or directories created during the tests
-        shutil.rmtree(cls.base_path, ignore_errors=True)
+        shutil.rmtree(self.base_path, ignore_errors=True)
         # Cleanup the test directories
         dirs_to_remove = ["mnt/data", "mnt"]
         for dir_path in dirs_to_remove:

@@ -14,12 +14,12 @@ ERROR_RESPONSE = {
 
 def f_482():
     """
-    Creates an HTTP POST request handler for processing incoming data. The data is expected
+    Creates an HTTP POST request handler for processing inco data. The data is expected
     to be in JSON format with a key 'data'. The handler responds with a 200 success message
     if the data is valid, or an error message otherwise.
 
     Returns:
-        function: A class that handles HTTP POST requests and validates incoming data.
+        function: A class that handles HTTP POST requests and validates inco data.
 
     Requirements:
     - cgi

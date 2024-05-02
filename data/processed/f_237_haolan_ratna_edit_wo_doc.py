@@ -25,7 +25,7 @@ def f_292(url, parameters):
         - Axes: The matplotlib Axes object of the heatmap.
 
     Raises:
-    - Thif function will raise an Expection if the url is invalid, empty data, invalid data, and url cannot be accessed.
+    - Thif function will raise a general Expection if the url is invalid, empty data, invalid data, and url cannot be accessed.
 
     Requirements:
     - requests

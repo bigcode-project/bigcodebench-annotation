@@ -69,9 +69,9 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         # Sample data for testing
         self.DATA = {
-            'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
-            'Content': ['This is a tutorial about coding...', 'Python is a programming language...',
-                        'Programming is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
+            'Title': ['How to code?', 'What is Python?', 'The art of program', 'How to cook?', 'What is life?'],
+            'Content': ['This is a tutorial about coding...', 'Python is a program language...',
+                        'Program is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
         }
         self.df_sample = pd.DataFrame(self.DATA)
     def test_case_1(self):
@@ -82,14 +82,14 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test with no interesting articles
         df_no_interesting = self.df_sample.copy()
-        df_no_interesting['Title'] = ['Coding 101', 'Python tutorial', 'Programming basics', 'Cooking basics',
+        df_no_interesting['Title'] = ['Coding 101', 'Python tutorial', 'Program basics', 'Cooking basics',
                                       'Life basics']
         ax = f_623(df_no_interesting)
         self.assertEqual(len(ax.patches), 0)  # No bars in the plot as no interesting articles
     def test_case_3(self):
         # Test with only one interesting article
         df_one_interesting = self.df_sample.copy()
-        df_one_interesting['Title'] = ['How to play guitar?', 'Python tutorial', 'Programming basics', 'Cooking basics',
+        df_one_interesting['Title'] = ['How to play guitar?', 'Python tutorial', 'Program basics', 'Cooking basics',
                                        'Life basics']
         ax = f_623(df_one_interesting)
         self.assertEqual(len(ax.patches), 5)  # 5 unique words in the interesting article

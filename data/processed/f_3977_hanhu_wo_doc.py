@@ -20,11 +20,11 @@ def f_177(file_path):
     - base64
 
     Examples:
-    Assuming 'example.txt' contains some text and a valid 'private.pem' is present,
+    Assu 'example.txt' contains some text and a valid 'private.pem' is present,
     >>> len(f_177('example.txt')) > 0
     True
 
-    Assuming 'empty.txt' is an empty file and a valid 'private.pem' is present,
+    Assu 'empty.txt' is an empty file and a valid 'private.pem' is present,
     >>> len(f_177('empty.txt')) > 0
     True
     """
@@ -46,7 +46,7 @@ import base64
 from unittest.mock import patch
 class TestCases(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Set up test environment: create necessary files with mock content."""
         with open('example.txt', 'w') as f:
             f.write('This is a test file.')
@@ -60,8 +60,7 @@ class TestCases(unittest.TestCase):
         # Create an intentionally invalid private key file
         with open('invalid_private.pem', 'w') as f:
             f.write('Invalid key content')
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up by removing the files created for the test."""
         for filename in ['example.txt', 'empty.txt', 'private.pem', 'invalid_private.pem']:
             if os.path.exists(filename):
@@ -92,7 +91,7 @@ class TestCases(unittest.TestCase):
             os.rename('temp_private.pem', 'private.pem')
     def test_different_files_same_key(self):
         """Ensure different files produce different signatures using the same key."""
-        # Assuming another_example.txt exists and contains different content
+        # Assu another_example.txt exists and contains different content
         if os.path.exists('another_example.txt'):
             hash1 = f_177('example.txt')
             hash2 = f_177('another_example.txt')

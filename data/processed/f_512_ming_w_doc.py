@@ -35,7 +35,7 @@ def f_198(dataframe, target_value):
         ax = counts.plot(kind='bar')
     else:
         ax = None
-    end_time = time.time()  # End timing
+    end_time = time.time()  # End ti
     cost = f"Operation completed in {end_time - start_time} seconds."
     return counts, ax
 

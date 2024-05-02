@@ -9,7 +9,7 @@ def f_262(start_date='2016-01-01', periods=13, freq='WOM-2FRI', seed=0):
     Parameters:
     - start_date (str): The start date for the share price series in 'YYYY-MM-DD' format. Default is '2016-01-01'.
     - periods (int): The number of periods for which the share price needs to be generated. Default is 13.
-    - freq (str): The frequency string conforming to pandas date offset aliases. Default is 'WOM-2FRI'.
+    - freq (str): The frequency string confor to pandas date offset aliases. Default is 'WOM-2FRI'.
     - seed (int, optional): The seed for the random number generator to ensure reproducibility. Default is None.
 
     Returns:

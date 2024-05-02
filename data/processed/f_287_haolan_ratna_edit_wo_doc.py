@@ -22,7 +22,7 @@ def f_364(filename):
     - shutil
 
     Example:
-    >>> f_364('vmware-cmd.bat') # Assuming successful execution
+    >>> f_364('vmware-cmd.bat') # Assu successful execution
     0
     >>> f_364('nonexistent.bat') # If backup fails or file doesn't exist
     -1

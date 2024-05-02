@@ -1,13 +1,6 @@
 import random
 import string
-from django.conf import settings
 from django.http import HttpResponse
-# Configure Django settings if not already configured
-if not settings.configured:
-    settings.configure(
-        DEFAULT_CHARSET='utf-8',
-        SECRET_KEY='a-very-secret-key',
-    )
 
 
 def f_1709(request, session_expire_time):
@@ -64,6 +57,13 @@ def f_1709(request, session_expire_time):
 import unittest
 from unittest.mock import patch
 from django.http import HttpRequest
+from django.conf import settings
+# Configure Django settings if not already configured
+if not settings.configured:
+    settings.configure(
+        DEFAULT_CHARSET='utf-8',
+        SECRET_KEY='a-very-secret-key',
+    )
 
 class TestCases(unittest.TestCase):
 

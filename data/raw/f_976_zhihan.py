@@ -62,15 +62,14 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Create mock directories and files for testing
-        cls.source_dir_path = os.path.join(temp_dir, "source_dir")
-        cls.target_dir_path = os.path.join(temp_dir, "target_dir")
-        os.makedirs(cls.source_dir_path, exist_ok=True)
-        os.makedirs(cls.target_dir_path, exist_ok=True)
+        self.source_dir_path = os.path.join(temp_dir, "source_dir")
+        self.target_dir_path = os.path.join(temp_dir, "target_dir")
+        os.makedirs(self.source_dir_path, exist_ok=True)
+        os.makedirs(self.target_dir_path, exist_ok=True)
         for i in range(5):
-            with open(os.path.join(cls.source_dir_path, f"file_{i}.txt"), "w") as f:
+            with open(os.path.join(self.source_dir_path, f"file_{i}.txt"), "w") as f:
                 f.write(f"Content of file_{i}.txt")
 
     def test_case_1(self):

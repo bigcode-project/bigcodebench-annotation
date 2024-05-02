@@ -51,7 +51,7 @@ import unittest
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-# Assuming the function f_602 is defined in the same script, otherwise import it appropriately.
+# Assu the function f_602 is defined in the same script, otherwise import it appropriately.
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):

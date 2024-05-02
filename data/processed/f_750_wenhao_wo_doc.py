@@ -45,12 +45,11 @@ import unittest
 import shutil
 import numpy as np
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Prepare test data
-        cls.directory = "f_523_data_wenhao/"
-        cls.pattern = r"^sales_data_\d{4}.csv"
-        os.makedirs(cls.directory, exist_ok=True)
+        self.directory = "f_523_data_/"
+        self.pattern = r"^sales_data_\d{4}.csv"
+        os.makedirs(self.directory, exist_ok=True)
         data_2021 = pd.DataFrame({
             'Month': ['January', 'February', 'March'],
             'Sales': [100, 150, 200]
@@ -59,12 +58,11 @@ class TestCases(unittest.TestCase):
             'Month': ['January', 'February', 'March'],
             'Sales': [120, 130, 210]
         })
-        data_2021.to_csv(cls.directory + "sales_data_2021.csv", index=False)
-        data_2022.to_csv(cls.directory + "sales_data_2022.csv", index=False)
-    @classmethod
-    def tearDownClass(cls):
+        data_2021.to_csv(self.directory + "sales_data_2021.csv", index=False)
+        data_2022.to_csv(self.directory + "sales_data_2022.csv", index=False)
+    def tearDown(self):
         # Clean up test data
-        shutil.rmtree(cls.directory)
+        shutil.rmtree(self.directory)
     def test_plots_generated(self):
         plots = f_523(self.directory, self.pattern)
         self.assertEqual(len(plots), 2, "Should generate two plots for two CSV files")

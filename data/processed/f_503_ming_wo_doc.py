@@ -41,19 +41,17 @@ import tempfile
 import shutil
 import os
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.test_dir = output_dir
-        if not os.path.exists(cls.test_dir):
-            os.makedirs(cls.test_dir)
+    def setUp(self):
+        self.test_dir = output_dir
+        if not os.path.exists(self.test_dir):
+            os.makedirs(self.test_dir)
         # Create a test file within the test_dir
-        cls.test_file = os.path.join(cls.test_dir, "AcroTray.exe")
-        with open(cls.test_file, 'wb') as f:
+        self.test_file = os.path.join(self.test_dir, "AcroTray.exe")
+        with open(self.test_file, 'wb') as f:
             f.write(b"Dummy content for testing.")
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Clean up by removing the test directory and its contents
-        shutil.rmtree(cls.test_dir, ignore_errors=True)
+        shutil.rmtree(self.test_dir, ignore_errors=True)
     def test_matching_file(self):
         """Ensure the method correctly identifies and hashes a matching file."""
         # Use the directory, not the file path, and adjust the pattern if necessary.

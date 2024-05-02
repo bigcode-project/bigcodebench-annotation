@@ -52,21 +52,20 @@ import unittest
 import matplotlib.pyplot as plt
 import numpy as np
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.default_seed = 42
-        cls.large_n_samples = 100000
-        cls.small_n_samples = 100
-        cls.zero_n_samples = 0
-        cls.negative_n_samples = -100
-        cls.default_mu = 0
-        cls.default_sigma = 1
-        cls.large_sigma = 5
-        cls.small_sigma = 0.2
-        cls.zero_sigma = 0
-        cls.negative_sigma = -1
-        cls.custom_mu = 5
-        cls.custom_sigma = 2
+    def setUp(self):
+        self.default_seed = 42
+        self.large_n_samples = 100000
+        self.small_n_samples = 100
+        self.zero_n_samples = 0
+        self.negative_n_samples = -100
+        self.default_mu = 0
+        self.default_sigma = 1
+        self.large_sigma = 5
+        self.small_sigma = 0.2
+        self.zero_sigma = 0
+        self.negative_sigma = -1
+        self.custom_mu = 5
+        self.custom_sigma = 2
     def test_case_1(self):
         # Test data generation correctness
         mu_test = 3

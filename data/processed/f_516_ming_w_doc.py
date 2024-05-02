@@ -37,7 +37,7 @@ def f_150(texts, num_topics):
     >>> texts = [
     ...     "Data science involves the study of data.",
     ...     "Machine learning provides systems the ability to learn from data.",
-    ...     "Python is a programming language used in data science."
+    ...     "Python is a program language used in data science."
     ... ]
     >>> topics = f_150(texts, 2)
     >>> print(topics)
@@ -69,16 +69,15 @@ def f_150(texts, num_topics):
         topic_keywords = [feature_names[i] for i in topic.argsort()[:-num_topics - 1:-1]]
         topics.append(topic_keywords)  # Append a list of keywords
 
-    return topics  # Assuming plt.gca() or similar plotting calls are handled separately if needed
+    return topics  # Assu plt.gca() or similar plotting calls are handled separately if needed
 
 import unittest
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.texts = [
+    def setUp(self):
+        self.texts = [
             "Data science is an inter-disciplinary field that uses scientific methods, processes, algorithms and systems to extract knowledge and insights from structured and unstructured data.",
             "Machine learning is a subset of artificial intelligence (AI) that provides systems the ability to automatically learn and improve from experience without being explicitly programmed.",
-            "Python is an interpreted, high-level and general-purpose programming language."
+            "Python is an interpreted, high-level and general-purpose program language."
         ]
     def test_extract_topics(self):
         """Test extracting topics from texts."""

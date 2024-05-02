@@ -46,22 +46,20 @@ def f_314(filename: str) -> pd.DataFrame:
 import unittest
 import shutil
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.output_dir = './output'
-        if not os.path.exists(cls.output_dir):
-            os.makedirs(cls.output_dir)
-        cls.test_file = os.path.join(cls.output_dir, 'test.csv')
-        with open(cls.test_file, 'w') as f:
+    def setUp(self):
+        self.output_dir = './output'
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+        self.test_file = os.path.join(self.output_dir, 'test.csv')
+        with open(self.test_file, 'w') as f:
             f.write("col1,col2\n1,2\n3,4")
         # Debugging: Verify file content immediately after writing
-        with open(cls.test_file, 'r') as f:
+        with open(self.test_file, 'r') as f:
             content = f.read()
-        print(f"Debug: Content written to {cls.test_file}: {content}")
-    @classmethod
-    def tearDownClass(cls):
+        print(f"Debug: Content written to {self.test_file}: {content}")
+    def tearDown(self):
         # Clean up by removing the test file and the test_data directory
-        shutil.rmtree(cls.output_dir, ignore_errors=True)
+        shutil.rmtree(self.output_dir, ignore_errors=True)
     def test_file_not_found(self):
         """Test the function with a filename that does not exist."""
         with self.assertRaises(FileNotFoundError):

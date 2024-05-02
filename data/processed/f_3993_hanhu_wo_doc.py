@@ -19,12 +19,12 @@ def f_531(file_path1, file_path2):
     - gzip
 
     Examples:
-    Assuming 'file1.gz' and 'file2.gz' contain slightly different text,
+    Assu 'file1.gz' and 'file2.gz' contain slightly different text,
     >>> result = f_531('file1.gz', 'file2.gz')
     >>> len(result) > 0
     True
 
-    Assuming 'file1.gz' and 'file1.gz' are identical,
+    Assu 'file1.gz' and 'file1.gz' are identical,
     >>> f_531('file1.gz', 'file1.gz')
     ''
     """
@@ -40,14 +40,13 @@ import unittest
 import os
 class TestCases(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Set up test environment by creating test gzip files with known content."""
         with gzip.open('file1.gz', 'wt') as f:
             f.write("This is a test file.\n")
         with gzip.open('file2.gz', 'wt') as f:
             f.write("This is a different test file.\n")
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up by removing the test gzip files."""
         os.remove('file1.gz')
         os.remove('file2.gz')

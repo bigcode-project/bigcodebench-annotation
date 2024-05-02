@@ -51,12 +51,11 @@ def f_20(x, y, labels):
 import unittest
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Example data for all tests
-        cls.x = [np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([1, 3, 5])]
-        cls.y = [np.array([2, 3, 5]), np.array([5, 7, 10]), np.array([2.5, 3.5, 5.5])]
-        cls.labels = ["Test 1", "Test 2", "Test 3"]
+        self.x = [np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([1, 3, 5])]
+        self.y = [np.array([2, 3, 5]), np.array([5, 7, 10]), np.array([2.5, 3.5, 5.5])]
+        self.labels = ["Test 1", "Test 2", "Test 3"]
     def test_plot_labels(self):
         """Ensure the plot includes all specified labels."""
         fig = f_20(self.x, self.y, self.labels)

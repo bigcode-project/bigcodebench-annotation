@@ -12,7 +12,7 @@ def f_443(bins=30):
     - bins (int, optional): Number of bins for the histogram. Default is 30.
 
     Returns:
-    - tuple: A tuple containing the distribution list and the Axes object of the histogram plot.
+    - tuple: A tuple containing the distribution list and the Axes patch object of the histogram plot.
 
     Requirements:
     - random

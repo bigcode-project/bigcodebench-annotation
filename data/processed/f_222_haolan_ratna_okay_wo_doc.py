@@ -3,9 +3,6 @@ from django.conf import settings
 import random
 import time
 
-if not settings.configured:
-    settings.configure(DEBUG=True)
-
 def f_580(data, min_delay, max_delay):
     """
     After a random delay, generate a Django HttpResponse with JSON data to simulate the latency of the network.
@@ -46,6 +43,8 @@ def f_580(data, min_delay, max_delay):
 import unittest
 import json
 import random
+if not settings.configured:
+    settings.configure(DEBUG=True)
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         random.seed(0)

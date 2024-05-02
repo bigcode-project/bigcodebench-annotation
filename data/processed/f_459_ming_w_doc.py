@@ -31,7 +31,7 @@ def f_604(data, letter):
     start_time = time.time()
     regex = f'^{letter}'
     filtered_df = df[df['Name'].str.contains(regex, case=False, regex=True)]
-    end_time = time.time()  # End timing
+    end_time = time.time()  # End ti
     cost = f"Operation completed in {end_time - start_time} seconds."
     return filtered_df['Name'].value_counts()
 

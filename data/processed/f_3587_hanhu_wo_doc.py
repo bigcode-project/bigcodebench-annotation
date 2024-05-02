@@ -35,7 +35,7 @@ def f_396(src_dir, dest_dir, ext):
     >>> moved_files = f_396(test_src_dir, test_dest_dir, test_ext)
     >>> len(moved_files) > 0  # Check if any files were moved
     True
-    >>> 'test_file.txt' in [os.path.basename(path) for path in moved_files]  # Assuming test_file.txt exists in test_src_dir
+    >>> 'test_file.txt' in [os.path.basename(path) for path in moved_files]  # Assu test_file.txt exists in test_src_dir
     True
     >>> os.listdir(test_dest_dir)  # Verify that files were moved, and no duplicates exist in the destination
     ['test_file.txt']

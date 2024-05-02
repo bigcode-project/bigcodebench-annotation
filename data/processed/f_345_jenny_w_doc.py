@@ -139,7 +139,7 @@ class TestCases(unittest.TestCase):
         result = f_624(P, T)
         self.assertTrue(np.allclose(result, np.zeros((3, 15))))
     def test_case_9(self):
-        # Test DataFrame output for correct column names, ensuring they match expected feature naming convention
+        # Test DataFrame output for correct column names, ensuring they match expected feature na convention
         P = np.random.rand(3, 3)
         T = np.random.rand(3, 4, 4)
         result = f_624(P, T)

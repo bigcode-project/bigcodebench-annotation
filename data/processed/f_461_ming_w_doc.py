@@ -38,7 +38,7 @@ def f_14(df, letter):
     ax.set_xlabel("Word Length")
     ax.set_ylabel("Frequency")
 
-    end_time = time.time()  # End timing
+    end_time = time.time()  # End ti
     cost = f"Operation completed in {end_time - start_time} seconds."
     return ax
 

@@ -6,7 +6,7 @@ def f_419(df):
     '''
     Processes a DataFrame containing dates and lists of numbers. It converts the lists into separate columns,
     performs Principal Component Analysis (PCA), and returns the explained variance ratio of the principal components
-    along with a bar chart visualizing this ratio.
+    along with a bar chart visualizing this ratio. Returns 0,0 if the input DataFrame is empty.
 
     Parameters:
     df (DataFrame): A pandas DataFrame with columns 'Date' and 'Value'. 'Date' is a date column, and 'Value' contains 
@@ -41,7 +41,7 @@ def f_419(df):
     df['Date'] = pd.to_datetime(df['Date'])
     df = pd.concat([df['Date'], df['Value'].apply(pd.Series)], axis=1)
     
-    # Performing PCA
+    # Perfor PCA
     pca = PCA()
     pca.fit(df.iloc[:,1:])
     

@@ -60,17 +60,16 @@ class TestCases(unittest.TestCase):
 
     directory = "mnt/data/f_852_data_chien"
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Setup method to create a sample image inr test files."""
         # Create directory if it doesn't exist
-        cls.test_dir = Path(cls.directory)
-        cls.test_dir.mkdir(parents=True, exist_ok=True)
+        self.test_dir = Path(self.directory)
+        self.test_dir.mkdir(parents=True, exist_ok=True)
 
         # Create and save a sample image
-        cls.sample_image_path = Path(cls.test_dir) / "sample_image.png"
+        self.sample_image_path = Path(self.test_dir) / "sample_image.png"
         sample_image = Image.new("RGBA", (100, 100), color="blue")
-        sample_image.save(cls.sample_image_path)
+        sample_image.save(self.sample_image_path)
 
     @patch("requests.get")
     def test_valid_image_url(self, mock_get):
@@ -116,8 +115,7 @@ class TestCases(unittest.TestCase):
         img = f_853("https://www.google.com/images/srpr/logo11w.png")
         self.assertEqual(img.mode, "RGBA", "Image mode does not match expected")
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Cleanup the test directories
         dirs_to_remove = ["mnt/data", "mnt"]
         for dir_path in dirs_to_remove:

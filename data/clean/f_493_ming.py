@@ -49,13 +49,12 @@ import shutil
 
 class TestCases(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Create the data directory if it doesn't exist."""
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up by removing the data directory and its contents after tests."""
         shutil.rmtree(output_dir, ignore_errors=True)
 

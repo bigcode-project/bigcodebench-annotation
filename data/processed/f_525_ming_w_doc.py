@@ -54,10 +54,9 @@ import unittest
 import pandas as pd
 import numpy as np
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Generating a sample sales DataFrame
-        cls.sales_data = pd.DataFrame({
+        self.sales_data = pd.DataFrame({
             'Month': range(1, 13),
             'Product A': np.random.randint(100, 200, size=12),
             'Product B': np.random.randint(150, 250, size=12),

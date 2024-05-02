@@ -15,7 +15,7 @@ def f_335(data):
     Returns:
     DataFrame: A pandas DataFrame where data is normalized, with an additional column 'Average' representing the
     mean of each row.
-    Axes: A matplotlib Axes object showing a plot of the average values across the dataset.
+    Axes: A matplotlib Axes object showing a bar subplot of the average values across the dataset.
 
     Requirements:
     - pandas

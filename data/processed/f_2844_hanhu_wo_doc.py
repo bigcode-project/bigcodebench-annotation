@@ -49,7 +49,7 @@ def f_246(dir, api_key, recipient_email):
     try:
         sg = SendGridAPIClient(api_key)
         response = sg.send(message)
-        # Assuming success codes are in the 2xx range
+        # Assu success codes are in the 2xx range
         return 200 <= response.status_code < 300
     except HTTPError as e:
         print(f"HTTP error occurred: {e}")

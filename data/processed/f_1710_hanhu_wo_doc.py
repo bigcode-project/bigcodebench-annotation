@@ -1,9 +1,6 @@
 import csv
 import io
 from django.http import HttpRequest, FileResponse
-from django.conf import settings
-if not settings.configured:
-    settings.configure()
 
 def f_357(request, header, csv_data):
     """
@@ -13,7 +10,7 @@ def f_357(request, header, csv_data):
     CSV file in response to a user request on a Django web application.
 
     Parameters:
-    request (HttpRequest): The incoming Django HttpRequest.
+    request (HttpRequest): The inco Django HttpRequest.
     header (list of str): List of strings representing the header of the CSV file.
     csv_data (list of list of str): List of rows, with each row being a list of strings, to be written into the CSV file.
 
@@ -53,6 +50,9 @@ def f_357(request, header, csv_data):
 import unittest
 from unittest.mock import patch
 from django.http import HttpRequest, FileResponse
+from django.conf import settings
+if not settings.configured:
+    settings.configure()
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Prepare test data

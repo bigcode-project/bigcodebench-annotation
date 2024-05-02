@@ -2,9 +2,6 @@ import hashlib
 import base64
 import binascii
 from django.http import HttpResponseBadRequest, HttpResponse
-from django.conf import settings
-if not settings.configured:
-    settings.configure()
 
 def f_265(data):
     """
@@ -68,6 +65,9 @@ def f_265(data):
 import unittest
 from unittest.mock import patch
 from django.http import HttpResponseBadRequest, HttpResponse
+from django.conf import settings
+if not settings.configured:
+    settings.configure()
 class TestCases(unittest.TestCase):
     @patch('base64.b64decode')
     def test_successful_login(self, mock_b64decode):

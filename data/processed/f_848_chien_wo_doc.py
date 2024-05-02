@@ -69,7 +69,7 @@ import shutil
 from pathlib import Path
 class TestCases(unittest.TestCase):
     """Test cases for the f_450 function."""
-    base_path = "mnt/data/f_450_data_chien"
+    base_path = "mnt/data/f_450_data_"
     def setUp(self):
         # Ensure the base path is absolute
         self.base_path = os.path.abspath(self.base_path)
@@ -122,10 +122,9 @@ class TestCases(unittest.TestCase):
             os.makedirs(extract_path)
         result_path = f_450(url, save_path, extract_path)
         self.assertEqual(result_path, extract_path)
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Clean up any files or directories created during the tests
-        shutil.rmtree(cls.base_path, ignore_errors=True)
+        shutil.rmtree(self.base_path, ignore_errors=True)
         # Cleanup the test directories
         dirs_to_remove = ["mnt/data", "mnt"]
         for dir_path in dirs_to_remove:

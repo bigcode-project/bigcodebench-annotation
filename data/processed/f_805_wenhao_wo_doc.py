@@ -7,7 +7,7 @@ import shutil
 def f_40(source_directory: str, target_directory: str):
     """
     Moves files with specific extensions from a source directory to a target directory,
-    handling naming conflicts by renaming duplicates.
+    handling na conflicts by rena duplicates.
 
     Parameters:
     - source_directory (str): The absolute or relative path of the source directory.
@@ -29,7 +29,7 @@ def f_40(source_directory: str, target_directory: str):
     Notes:
     - This function scans the source directory recursively to find files.
     - Files are filtered by the extensions: ".txt", ".docx", ".xlsx", ".csv".
-    - Renaming of files due to naming conflicts follows the pattern '<original_name>-n.<extension>'.
+    - Rena of files due to na conflicts follows the pattern '<original_name>-n.<extension>'.
 
     Examples:
     >>> f_40('./source_folder', './target_folder')
@@ -143,14 +143,14 @@ class TestCases(unittest.TestCase):
             with self.assertRaises(FileNotFoundError):
                 f_40(source_dir, target_dir)
     def test_case_8(self):
-        # Test file renaming when handling duplicate files
+        # Test file rena when handling duplicate files
         with tempfile.TemporaryDirectory() as source_dir, tempfile.TemporaryDirectory() as target_dir:
             extensions = self.valid_extensions
             for i, ext in enumerate(extensions):
                 filename = f"file_{i}{ext}"
                 # Create duplicate files in the source directory
                 Path(os.path.join(source_dir, filename)).touch()
-                # Create expected duplicate files in the target directory to force renaming
+                # Create expected duplicate files in the target directory to force rena
                 Path(os.path.join(target_dir, filename)).touch()
             result = f_40(source_dir, target_dir)
             self.assertEqual(result, len(extensions), "Should have moved all files.")

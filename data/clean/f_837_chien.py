@@ -119,7 +119,7 @@ class TestCases(unittest.TestCase):
     """Tests for the f_837 function"""
 
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Set up any necessary resources before any tests are run."""
         os.makedirs("mnt/data", exist_ok=True)  # Create the directory for test files
 
@@ -186,8 +186,7 @@ class TestCases(unittest.TestCase):
 
         self.assertIn("Error fetching URL", str(context.exception))
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up shared resources after all tests in the class have completed."""
         # Cleanup the test directories
         dirs_to_remove = ["mnt/data", "mnt"]

@@ -6,7 +6,7 @@ import json
 
 def f_227(smtp_server, smtp_port, smtp_username, smtp_password):
     """
-    Creates an HTTP POST request handler that processes incoming email data and sends
+    Creates an HTTP POST request handler that processes inco email data and sends
     an email. The email data must be a JSON object with 'subject', 'message', and 'to' keys.
     
     Parameters:

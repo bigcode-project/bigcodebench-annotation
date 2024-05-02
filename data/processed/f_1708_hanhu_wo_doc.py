@@ -1,13 +1,6 @@
 import random
 import string
-from django.conf import settings
 from django.http import HttpResponse
-# Configure Django settings if not already configured
-if not settings.configured:
-    settings.configure(
-        DEFAULT_CHARSET='utf-8',
-        SECRET_KEY='a-very-secret-key',
-    )
 
 
 def f_305(request, session_expire_time):
@@ -16,7 +9,7 @@ def f_305(request, session_expire_time):
     then sets this key in a cookie on an HttpResponse object with the specified expiration time.
 
     Parameters:
-    request (django.http.HttpRequest): The incoming Django HttpRequest.
+    request (django.http.HttpRequest): The inco Django HttpRequest.
     session_expire_time (int): The expiration time for the session cookie in seconds.
 
     Returns:
@@ -64,6 +57,13 @@ def f_305(request, session_expire_time):
 import unittest
 from unittest.mock import patch
 from django.http import HttpRequest
+from django.conf import settings
+# Configure Django settings if not already configured
+if not settings.configured:
+    settings.configure(
+        DEFAULT_CHARSET='utf-8',
+        SECRET_KEY='a-very-secret-key',
+    )
 class TestCases(unittest.TestCase):
     @patch('random.choices')
     def test_session_key_in_cookies(self, mock_random_choices):

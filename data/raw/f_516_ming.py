@@ -75,9 +75,8 @@ def f_516(texts, num_topics):
 import unittest
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.texts = [
+    def setUp(self):
+        self.texts = [
             "Data science is an inter-disciplinary field that uses scientific methods, processes, algorithms and systems to extract knowledge and insights from structured and unstructured data.",
             "Machine learning is a subset of artificial intelligence (AI) that provides systems the ability to automatically learn and improve from experience without being explicitly programmed.",
             "Python is an interpreted, high-level and general-purpose programming language."

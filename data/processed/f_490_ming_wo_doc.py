@@ -40,7 +40,7 @@ def f_173(dataset, filename):
                 # Add a newline after the DataFrame content, except after the last DataFrame
                 f.write('\n')
 
-    end_time = time.time()  # End timing
+    end_time = time.time()  # End ti
     cost = f"Operation completed in {end_time - start_time} seconds."
 
 import unittest
@@ -48,12 +48,11 @@ import shutil
 import pandas as pd
 class TestCases(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Ensure the data directory exists before any tests are run."""
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up by removing the data directory and its contents after all tests."""
         shutil.rmtree(output_dir, ignore_errors=True)
     def test_single_dataframe(self):

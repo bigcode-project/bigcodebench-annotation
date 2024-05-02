@@ -67,18 +67,16 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Create sample files for testing
-        cls.files = ['f_665_data_xiaoheng/test1.txt', 'f_665_data_xiaoheng/test2.txt', 'f_665_data_xiaoheng/image1.jpg', 'f_665_data_xiaoheng/image2.jpg']
-        for file in cls.files:
+        self.files = ['f_665_data_xiaoheng/test1.txt', 'f_665_data_xiaoheng/test2.txt', 'f_665_data_xiaoheng/image1.jpg', 'f_665_data_xiaoheng/image2.jpg']
+        for file in self.files:
             with open(file, 'w') as f:
                 f.write(f"Content of {file}")
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Cleanup any generated files and archives
-        for file in cls.files:
+        for file in self.files:
             if os.path.exists(file):
                 os.remove(file)
         for archive in glob.glob('/tmp/archive/*.tar.gz'):

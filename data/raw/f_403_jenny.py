@@ -47,10 +47,9 @@ import random
 
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         random.seed(42)
-        cls.mock_data = [[random.randint(1, 100) for _ in range(5)] for _ in range(5)]
+        self.mock_data = [[random.randint(1, 100) for _ in range(5)] for _ in range(5)]
 
     def test_case_1(self):
         # Test dataframe creation with valid input

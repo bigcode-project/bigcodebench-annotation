@@ -32,7 +32,7 @@ def f_123(kwargs):
 
     Note:
     - The function sets the significance level (alpha) at 0.05.
-    - It removes NaN values before performing any calculations or plotting.
+    - It removes NaN values before perfor any calculations or plotting.
     - A t-test is performed with the 'nan_policy' set to 'omit' to ignore NaNs.
     - The function checks for sufficient non-NaN data points and adequate variance in each group before conducting the t-test.
     - The boxplot and histograms provide a visual comparison of the data distributions.

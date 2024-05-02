@@ -4,7 +4,7 @@ import zipfile
 
 def f_235(url, destination_directory, headers=None):
     """
-    Download a zip file from a URL, extract its contents to the specified directory, and return the list of extracted files.
+    Download and keep a zip file from a URL, extract its contents to the specified directory, and return the list of extracted files.
 
     Parameters:
     url (str): The URL of the zip file to download.
@@ -72,14 +72,17 @@ class TestCases(unittest.TestCase):
 
         # Mock other functions
         mock_basename.return_value = "data.zip"
-        mock_listdir.return_value = ['file1.txt', 'file2.csv']
+        mock_zip_instance = MagicMock()
+        zip_contents = ['file1.txt', 'file2.csv']  # Files in the zip
+        mock_zip_instance.namelist.return_value = zip_contents
+        mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
 
         # Call the function
         extracted_files = f_235(MOCK_URL, MOCK_DESTINATION_DIR)
         # Assertions
         mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
         mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data.zip'), 'wb')
-        self.assertEqual(extracted_files, ['file1.txt', 'file2.csv'])
+        self.assertEqual(zip_contents, mock_zip_instance.namelist())
 
     @patch('requests.get')
     @patch('zipfile.ZipFile.extract')
@@ -96,14 +99,17 @@ class TestCases(unittest.TestCase):
 
         # Mock other functions
         mock_basename.return_value = "data.zip"
-        mock_listdir.return_value = ['file1.txt', 'file2.csv', 'file3.td']
+        mock_zip_instance = MagicMock()
+        zip_contents = ['file1.txt', 'file2.csv', 'file3.td']
+        mock_zip_instance.namelist.return_value = zip_contents
+        mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
 
         # Call the function
         extracted_files = f_235(MOCK_URL, MOCK_DESTINATION_DIR)
         # Assertions
         mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
         mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data.zip'), 'wb')
-        self.assertEqual(extracted_files, ['file1.txt', 'file2.csv', 'file3.td'])
+        self.assertEqual(zip_contents, mock_zip_instance.namelist())
 
     @patch('requests.get')
     @patch('zipfile.ZipFile.extract')
@@ -120,14 +126,17 @@ class TestCases(unittest.TestCase):
 
         # Mock other functions
         mock_basename.return_value = "data.zip"
-        mock_listdir.return_value = ['file1.txt']
+        mock_zip_instance = MagicMock()
+        zip_contents = ['file1.txt']
+        mock_zip_instance.namelist.return_value = zip_contents
+        mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
 
         # Call the function
         extracted_files = f_235(MOCK_URL, MOCK_DESTINATION_DIR)
         # Assertions
         mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
         mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data.zip'), 'wb')
-        self.assertEqual(extracted_files, ['file1.txt'])
+        self.assertEqual(zip_contents, mock_zip_instance.namelist())
 
 
     @patch('requests.get')
@@ -145,14 +154,17 @@ class TestCases(unittest.TestCase):
 
         # Mock other functions
         mock_basename.return_value = "data_download.zip"
-        mock_listdir.return_value = ['file1.txt', 'file2.xlsx']
+        mock_zip_instance = MagicMock()
+        zip_contents = ['file1.txt', 'file2.xlsx']
+        mock_zip_instance.namelist.return_value = zip_contents
+        mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
 
         # Call the function
         extracted_files = f_235(MOCK_URL, MOCK_DESTINATION_DIR)
         # Assertions
         mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
         mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data_download.zip'), 'wb')
-        self.assertEqual(extracted_files, ['file1.txt', 'file2.xlsx'])
+        self.assertEqual(zip_contents, mock_zip_instance.namelist())
 
 
     @patch('requests.get')
@@ -170,14 +182,17 @@ class TestCases(unittest.TestCase):
 
         # Mock other functions
         mock_basename.return_value = "data_download.zip"
-        mock_listdir.return_value = []
+        mock_zip_instance = MagicMock()
+        zip_contents = []
+        mock_zip_instance.namelist.return_value = zip_contents
+        mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
 
         # Call the function
         extracted_files = f_235(MOCK_URL, MOCK_DESTINATION_DIR)
         # Assertions
         mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
         mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data_download.zip'), 'wb')
-        self.assertEqual(extracted_files, [])
+        self.assertEqual(zip_contents, mock_zip_instance.namelist())
 
 def run_tests():
     suite = unittest.TestSuite()

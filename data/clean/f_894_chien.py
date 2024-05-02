@@ -55,16 +55,14 @@ import shutil
 class TestCases(unittest.TestCase):
     """Tests for the function f_894."""
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Set up a temporary directory for test files."""
-        cls.temp_directory = "./temp_test_files"
-        os.makedirs(cls.temp_directory, exist_ok=True)
+        self.temp_directory = "./temp_test_files"
+        os.makedirs(self.temp_directory, exist_ok=True)
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up by removing the temporary directory after tests."""
-        shutil.rmtree(cls.temp_directory)
+        shutil.rmtree(self.temp_directory)
         dirs_to_remove = ["hashed_files"]
         for dir_path in dirs_to_remove:
             if os.path.exists(dir_path):

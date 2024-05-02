@@ -1,9 +1,5 @@
 from django.http import HttpResponse
-from django.conf import settings
 import uuid
-
-if not settings.configured:
-    settings.configure(DEBUG=True)
 
 def f_388(data):
     """
@@ -38,6 +34,9 @@ def f_388(data):
 
 import unittest
 import json
+from django.conf import settings
+if not settings.configured:
+    settings.configure(DEBUG=True)
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):

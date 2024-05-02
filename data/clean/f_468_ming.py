@@ -51,10 +51,9 @@ import numpy as np
 
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=COLUMNS)
-        cls.tuples = [(cls.df.iloc[0].values), (cls.df.iloc[1].values)]
+    def setUp(self):
+        self.df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=COLUMNS)
+        self.tuples = [(self.df.iloc[0].values), (self.df.iloc[1].values)]
 
     def test_no_plots_generated(self):
         """Test case with zero plots requested."""

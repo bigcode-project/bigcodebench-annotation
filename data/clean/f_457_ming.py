@@ -69,8 +69,7 @@ class TestCases(unittest.TestCase):
         with open(self.expected_file_path, 'w') as f:
             f.write("Time,Condition\n")  # Example: Write a header or initial content
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up any files created during the tests."""
         # Check and remove the expected file if it exists
         if os.path.exists(FILE_PATH):

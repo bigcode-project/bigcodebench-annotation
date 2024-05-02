@@ -74,15 +74,14 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 import base64
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Generate a test RSA private key
-        cls.private_key = rsa.generate_private_key(
+        self.private_key = rsa.generate_private_key(
             public_exponent=65537,
             key_size=2048,
             backend=default_backend()
         )
-        cls.alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/"
+        self.alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/"
 
     def test_base_conversion_and_signing(self):
         """Test base conversion and signing output is a base64 string"""

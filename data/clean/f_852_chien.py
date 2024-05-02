@@ -67,11 +67,10 @@ class TestCases(unittest.TestCase):
 
     test_data_dir = "mnt/data/f_852_data_chien"
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Set up method to create a directory for test files."""
-        cls.test_dir = Path(cls.test_data_dir)
-        cls.test_dir.mkdir(parents=True, exist_ok=True)
+        self.test_dir = Path(self.test_data_dir)
+        self.test_dir.mkdir(parents=True, exist_ok=True)
 
     def check_csv_content(self, xml_content, csv_path):
         """Helper function to check if the CSV content matches the XML content."""
@@ -142,8 +141,7 @@ class TestCases(unittest.TestCase):
         with self.assertRaises(IOError):
             f_852(xml_content, csv_output)
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Cleanup the test directories
         dirs_to_remove = ["mnt/data", "mnt"]
         for dir_path in dirs_to_remove:

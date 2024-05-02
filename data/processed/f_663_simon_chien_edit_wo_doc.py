@@ -106,7 +106,7 @@ class TestCases(unittest.TestCase):
         expected_df.index.name = 'category'
         pd.testing.assert_frame_equal(result_df, expected_df)
     def test_article_timezone_conversion(self):
-        # Assuming test data has UTC as the base timezone and checking against London timezone
+        # Assu test data has UTC as the base timezone and checking against London timezone
         result = f_658(self.articles, 'Europe/London')
         expected_hours = [8.0, 15.0, 12.0]
         actual_hours = result.reset_index()['mean'].tolist()

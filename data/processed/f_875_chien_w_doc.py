@@ -45,7 +45,7 @@ def f_47(rows=1000, string_length=3):
        DataFrame will be empty. In this case, the function prints a message "No data to generate heatmap." and returns None.
     - If the DataFrame is not empty, each string is split into its 
        constituent letters, converted into one-hot encoded format, and then the frequency 
-       of each letter is calculated by summing these encodings.
+       of each letter is calculated by sum these encodings.
        
     Example:
     >>> ax = f_47(1000, 3)

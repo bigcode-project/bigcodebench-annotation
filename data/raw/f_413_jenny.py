@@ -65,23 +65,21 @@ def run_tests():
 
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.temp_dir = tempfile.TemporaryDirectory()
-        cls.test_data = {
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.test_data = {
             "test_1.json": [{"a": 2, "b": 4}, {"a": 4, "b": 8}],
             "test_2.json": [{"x": 1}, {"y": 2}, {"z": 6}],
             "invalid.json": {"not": "valid"},
             "empty.json": [],
         }
         # Generate test files
-        for filename, content in cls.test_data.items():
-            with open(os.path.join(cls.temp_dir.name, filename), "w") as f:
+        for filename, content in self.test_data.items():
+            with open(os.path.join(self.temp_dir.name, filename), "w") as f:
                 json.dump(content, f)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.temp_dir.cleanup()
+    def tearDown(self):
+        self.temp_dir.cleanup()
         plt.close("all")
 
     def test_case_1(self):

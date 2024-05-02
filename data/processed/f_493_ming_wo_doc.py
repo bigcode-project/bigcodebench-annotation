@@ -35,7 +35,7 @@ def f_460(df: pd.DataFrame, filename: str) -> str:
         for record in df.to_dict(orient='records'):
             json.dump(record, file)
             file.write('\n')
-    end_time = time.time()  # End timing
+    end_time = time.time()  # End ti
     cost = f"Operation completed in {end_time - start_time} seconds."
     return os.path.abspath(file_path)
 
@@ -46,12 +46,11 @@ import json
 import shutil
 class TestCases(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Create the data directory if it doesn't exist."""
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up by removing the data directory and its contents after tests."""
         shutil.rmtree(output_dir, ignore_errors=True)
     def test_basic_dataframe(self):

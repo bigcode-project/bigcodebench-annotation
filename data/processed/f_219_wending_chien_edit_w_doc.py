@@ -8,7 +8,7 @@ def f_382(df):
     The like ratio for each video is calculated by dividing the number of likes by the number of views.
     This function generates a bar plot of the like ratios for these specific videos.
     If the DataFrame is empty, lacks the required columns, or contains no titles matching the criteria,
-    an empty plot is returned.
+    an empty subplot is returned.
 
     Parameters:
     df (DataFrame): A DataFrame containing video data with columns 'Title', 'Views', and 'Likes'.
@@ -62,7 +62,7 @@ matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         data_1 = pd.DataFrame({
-            'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
+            'Title': ['How to code?', 'What is Python?', 'The art of program', 'How to cook?', 'What is life?'],
             'Views': [1000, 500, 200, 300, 800],
             'Likes': [500, 250, 100, 150, 600]
         })
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(ax, matplotlib.axes.Axes, "The returned object should be of type Axes.")
     def test_case_4(self):
         data_4 = pd.DataFrame({
-            'Title': ['Learning to code', 'Python basics', 'Advanced programming', 'Cooking basics',
+            'Title': ['Learning to code', 'Python basics', 'Advanced program', 'Cooking basics',
                       'Life and philosophy'],
             'Views': [1100, 450, 220, 320, 850],
             'Likes': [550, 225, 110, 160, 425]

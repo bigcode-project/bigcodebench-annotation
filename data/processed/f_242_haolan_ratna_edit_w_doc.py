@@ -12,7 +12,7 @@ def f_663(df, dct, columns=None, plot_histograms=False):
     plot_histograms (bool): If True, plots histograms for specified columns.
 
     Returns:
-    DataFrame: The DataFrame with replaced values.
+    DataFrame: The DataFrame with replaced values. The columns are in the format of 'col1', 'col2', etc.
 
     Requirements:
     - pandas

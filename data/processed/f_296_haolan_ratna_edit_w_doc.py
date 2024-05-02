@@ -62,12 +62,11 @@ import unittest
 import pandas as pd
 import matplotlib
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Setup data for the tests
-        cls.numeric_df = pd.DataFrame({'numeric': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
-        cls.categorical_df = pd.DataFrame({'categorical': ['A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B']})
-        cls.mixed_df = pd.DataFrame({
+        self.numeric_df = pd.DataFrame({'numeric': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
+        self.categorical_df = pd.DataFrame({'categorical': ['A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B']})
+        self.mixed_df = pd.DataFrame({
             'numeric': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             'categorical': ['A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B']
         })

@@ -7,7 +7,7 @@ from keras.optimizers import SGD
 def f_191(X, Y):
     """
     Trains a simple neural network on given input data and target labels. The function:
-    - Splits the data into a training set (75%) and a test set (25%), assuming the input dimension is always 2.
+    - Splits the data into a training set (75%) and a test set (25%), assu the input dimension is always 2.
     - Constructs a Sequential model with one dense hidden layer and a sigmoid activation function.
     - Compiles the model using binary cross-entropy loss and SGD optimizer with a specified learning rate.
     - Fits the model to the training data (without verbose output), also evaluating it on the test set as validation data.

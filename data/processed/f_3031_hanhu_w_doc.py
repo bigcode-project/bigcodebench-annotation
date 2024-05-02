@@ -111,5 +111,5 @@ class TestCases(unittest.TestCase):
         """Test that the plot includes both real and imaginary parts of the complex wave."""
         _, _, ax = f_149(self.amplitude, self.frequency, self.time)
         lines = ax.get_lines()
-        # Assuming the first line is the real part and the second line is the imaginary part
+        # Assu the first line is the real part and the second line is the imaginary part
         self.assertEqual(len(lines), 2, "Plot does not contain two lines for real and imaginary parts")

@@ -6,7 +6,7 @@ import collections
 VEGETABLES = ['Carrot', 'Potato', 'Tomato', 'Cabbage', 'Spinach']
 
 
-def f_600(vegetable_dict):
+def f_600(vegetable_dict, seed=0):
     """
     Calculate statistics for the vegetables preferred by people listed in the input dictionary.
     The function reverses the dictionary to map vegetables to people and assigns random counts to these vegetables.
@@ -17,7 +17,8 @@ def f_600(vegetable_dict):
 
     Parameters:
     vegetable_dict (dict): A dictionary mapping people's names to their preferred vegetables.
-
+    seed (int): An integer value to seed the random number generator. Defaults to 0.
+    
     Returns:
     DataFrame: Returns a DataFrame with columns for vegetable names, their random counts,
     and their percentage occurrence within the total counts.
@@ -35,7 +36,7 @@ def f_600(vegetable_dict):
     Potato      7   46.666667
     Tomato      1    6.666667
     """
-    random.seed(0)
+    random.seed(seed)
     # Create a counter for vegetables based on reversed dictionary
     reversed_dict = {v: k for k, v in vegetable_dict.items()}
     vegetable_counter = collections.Counter({vegetable: random.randint(1, 10) for vegetable in reversed_dict.keys()})

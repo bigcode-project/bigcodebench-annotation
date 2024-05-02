@@ -13,7 +13,7 @@ def f_290(n):
                     of two numbers within the specified range.
     
     Raises:
-    - This function will raise Value Error if the input n is less than 0.
+    - This function will raise Value Error if the input n is less than 1.
     
     Requirements:
     - numpy

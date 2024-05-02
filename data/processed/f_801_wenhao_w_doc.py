@@ -25,7 +25,7 @@ def f_298(text, seed=None):
     Examples:
     >>> f_298('Hello, world!', 0)
     'Hello, wlrod!'
-    >>> f_298("Programming is fun, isn't it?", 42)
+    >>> f_298("Program is fun, isn't it?", 42)
     "Prmiangmrog is fun, isn't it?"
     """
     if seed is not None:
@@ -56,7 +56,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(input_text.split()), len(output_text.split()))
     def test_case_2(self):
         # Test with single word
-        input_text = "Programming"
+        input_text = "Program"
         output_text = f_298(input_text, seed=2)
         self.assertTrue(output_text.startswith("P"))
         self.assertTrue(output_text.endswith("g"))

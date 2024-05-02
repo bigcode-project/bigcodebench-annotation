@@ -59,25 +59,23 @@ import tempfile
 import matplotlib.pyplot as plt
 import json
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Setup a temporary directory and write sample JSON data to a temp file
-        cls.temp_dir = tempfile.TemporaryDirectory()
-        cls.sample_data_file = os.path.join(cls.temp_dir.name, "sample_data.json")
-        cls.sample_data = [
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.sample_data_file = os.path.join(self.temp_dir.name, "sample_data.json")
+        self.sample_data = [
             {"A": 10, "B": 20, "C": 30},
             {"A": 15, "B": 25, "C": 35},
             {"A": 20, "B": 30, "C": 40},
         ]
-        with open(cls.sample_data_file, "w") as f:
-            json.dump(cls.sample_data, f)
+        with open(self.sample_data_file, "w") as f:
+            json.dump(self.sample_data, f)
         # Create an invalid JSON file for testing
-        cls.invalid_json_file = os.path.join(cls.temp_dir.name, "invalid.json")
-        with open(cls.invalid_json_file, "w") as f:
+        self.invalid_json_file = os.path.join(self.temp_dir.name, "invalid.json")
+        with open(self.invalid_json_file, "w") as f:
             f.write("invalid content")
-    @classmethod
-    def tearDownClass(cls):
-        cls.temp_dir.cleanup()
+    def tearDown(self):
+        self.temp_dir.cleanup()
         plt.close("all")
     def test_case_1(self):
         # Test if the function can read the JSON data file and return a plot

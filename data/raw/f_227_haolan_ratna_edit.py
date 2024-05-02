@@ -4,7 +4,7 @@ import time
 
 def f_227(url):
     """
-    Open a web page in the default web browser.
+    Open a web page in the default web browser in a background process.
 
     Parameters:
     url (str): The URL of the webpage to be opened.

@@ -42,7 +42,7 @@ def f_459(my_obj):
 import unittest
 from datetime import datetime
 from decimal import Decimal
-import pytz  # Assuming pytz is used for timezone information in datetime objects
+import pytz  # Assu pytz is used for timezone information in datetime objects
 class TestCases(unittest.TestCase):
     def test_datetime_serialization(self):
         """Ensure datetime objects are serialized to an ISO 8601 string."""

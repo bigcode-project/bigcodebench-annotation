@@ -5,7 +5,7 @@ import json
 def f_422():
     """
     The f_422 method is a specialized handler for processing HTTP POST requests within a server setup,
-    primarily designed to handle JSON-formatted data. It meticulously checks incoming requests to ensure they contain the
+    primarily designed to handle JSON-formatted data. It meticulously checks inco requests to ensure they contain the
     expected 'data' key and have a Content-Type header set to application/json.
     If a request fails these checks, the method responds with an error status and a message indicating the specific validation failure.
     Conversely, when a request satisfies these criteria, it acknowledges with a success message,

@@ -153,8 +153,7 @@ class TestCases(unittest.TestCase):
         with self.assertRaises(sqlite3.DatabaseError):
             f_858("http://example.com", "faulty_database.db")
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Remove the database file with retries."""
         if os.path.exists("my_database.db"):
             os.remove("my_database.db")

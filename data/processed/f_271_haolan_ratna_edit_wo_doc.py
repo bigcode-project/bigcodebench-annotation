@@ -45,24 +45,17 @@ def f_408(filename, directory):
 
 import unittest
 from faker import Faker
+import shutil
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Set up a Faker instance and a test directory
-        cls.faker = Faker()
-        cls.test_dir = './testdir/'
-        os.makedirs(cls.test_dir, exist_ok=True)
-    @classmethod
-    def tearDownClass(cls):
-        # Clean up the test directory after all tests
-        for file in os.listdir(cls.test_dir):
-            os.remove(os.path.join(cls.test_dir, file))
-        os.rmdir(cls.test_dir)
-    
+        self.faker = Faker()
+        self.test_dir = './testdir/'
+        os.makedirs(self.test_dir, exist_ok=True)
     def tearDown(self):
-        # Remove the test_output.json file after each test
-        if os.path.exists('test_output.json'):
-            os.remove('test_output.json')
+        # Clean up the test directory
+        shutil.rmtree(self.test_dir)
+    
     def test_single_file_few_words(self):
         # Test with a single file with a few words
         file_name = 'single_file.txt'
@@ -113,7 +106,17 @@ class TestCases(unittest.TestCase):
         with open('test_output.json', 'r') as f:
             result = json.load(f)
         self.assertEqual(result, expected_result)
-    def test_non_existent_directory(self):
-        # Test with a non-existent directory
-        with self.assertRaises(FileNotFoundError):
-            f_408('test_output.json', './non_existent_dir/')
+    def test_nested_directories(self):
+        # Test with nested directories
+        nested_dir = os.path.join(self.test_dir, 'nested_dir')
+        os.makedirs(nested_dir, exist_ok=True)
+        file_name = 'nested_file.txt'
+        test_content = 'hello world hello'
+        expected_result = {'hello': 2, 'world': 1}
+        file_path = os.path.join(nested_dir, file_name)
+        with open(file_path, 'w') as f:
+            f.write(test_content)
+        f_408('test_output.json', nested_dir)
+        with open('test_output.json', 'r') as f:
+            result = json.load(f)
+        self.assertEqual(result, expected_result)

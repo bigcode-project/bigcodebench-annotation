@@ -7,7 +7,7 @@ FEATURES = ['feature1', 'feature2', 'feature3', 'feature4', 'feature5']
 def f_617(df, dct):
     """
     This function calculates and returns the mean, median, mode, and variance for specified features in a DataFrame. 
-    It replaces certain values in the DataFrame based on a provided dictionary mapping before performing the calculations.
+    It replaces certain values in the DataFrame based on a provided dictionary mapping before perfor the calculations.
     
     Parameters:
     df (DataFrame): The input DataFrame.
@@ -21,7 +21,7 @@ def f_617(df, dct):
     - scipy.stats
 
     Note:
-    - The function would return "Invalid input" string if the input is invalid (e.g., does not contain the required 'feature1' key).
+    - The function would return "Invalid input" string if the input is invalid (e.g., does not contain the required 'feature1' key) or if there is an error in the calculation.
     
     Example:
     >>> df = pd.DataFrame({'feature1': [1, 2, 3, 4, 5], 'feature2': [5, 4, 3, 2, 1], 'feature3': [2, 2, 2, 2, 2], 'feature4': [1, 1, 3, 3, 5], 'feature5': [0, 1, 1, 1, 1]})

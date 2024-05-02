@@ -104,7 +104,7 @@ class TestCases(unittest.TestCase):
     def test_ngram_range(self):
         """Test with a specific n-gram range."""
         text = "jump high and run fast"
-        # Assuming no preprocessing that removes words, we expect 3 unique tri-grams.
+        # Assu no preprocessing that removes words, we expect 3 unique tri-grams.
         matrix, _ = f_86(text, n=3)
         # Expecting a 3x3 matrix since there are 3 unique tri-grams with no overlap in this simple case.
         self.assertEqual(matrix.shape, (2, 2),

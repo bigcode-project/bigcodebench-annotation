@@ -5,7 +5,7 @@ from string import punctuation
 
 def f_220(df):
     """
-    Extracts articles whose titles contain specific keywords ("like" or "what") from a DataFrame and analyzes
+    Extracts articles whose titles contain specific case-insensitive keywords ("like" or "what") from a DataFrame and analyzes
     the frequency of each word in the content of these articles, excluding punctuation.
 
     Parameters:

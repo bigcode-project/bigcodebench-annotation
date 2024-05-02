@@ -43,31 +43,29 @@ import shutil
 import os
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.output_dir = './output'
-        if not os.path.exists(cls.output_dir):
-            os.makedirs(cls.output_dir)
+    def setUp(self):
+        self.output_dir = './output'
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
         # Prepare CSV files for testing
-        cls.valid_data_csv = os.path.join(cls.output_dir, 'valid_data.csv')
-        with open(cls.valid_data_csv, 'w') as f:
+        self.valid_data_csv = os.path.join(self.output_dir, 'valid_data.csv')
+        with open(self.valid_data_csv, 'w') as f:
             f.write("date\n2020-01-01\n2021-02-02")
-        cls.empty_data_csv = os.path.join(cls.output_dir, 'empty_data.csv')
-        open(cls.empty_data_csv, 'w').close()  # Create an empty file
+        self.empty_data_csv = os.path.join(self.output_dir, 'empty_data.csv')
+        open(self.empty_data_csv, 'w').close()  # Create an empty file
         # No need to create an invalid data CSV because parsing errors are tested dynamically
-        cls.different_column_data_csv = os.path.join(cls.output_dir, 'different_column_data.csv')
-        with open(cls.different_column_data_csv, 'w') as f:
+        self.different_column_data_csv = os.path.join(self.output_dir, 'different_column_data.csv')
+        with open(self.different_column_data_csv, 'w') as f:
             f.write("different_date_column\n2020-01-01\n2021-02-02")
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls.output_dir, ignore_errors=True)
+    def tearDown(self):
+        shutil.rmtree(self.output_dir, ignore_errors=True)
     def test_valid_data(self):
         """Test with valid date data."""
         histogram_plot = f_241(self.valid_data_csv, 'date')
         self.assertIsInstance(histogram_plot, plt.Axes)
     def test_empty_file(self):
         """Test with an empty CSV file."""
-        with self.assertRaises(ValueError):  # Assuming pandas raises a ValueError for an empty CSV
+        with self.assertRaises(ValueError):  # Assu pandas raises a ValueError for an empty CSV
             f_241(self.empty_data_csv, 'date')
     def test_nonexistent_file(self):
         """Test with a nonexistent CSV file path."""

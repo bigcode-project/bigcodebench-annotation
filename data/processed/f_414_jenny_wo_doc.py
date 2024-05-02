@@ -58,10 +58,9 @@ import numpy as np
 import tempfile
 import json
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.temp_dir = tempfile.TemporaryDirectory()
-        cls.test_data_paths = []
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.test_data_paths = []
         test_data = [
             [{"a": 2, "b": 3, "c": 4}],  # Test data for test_case_1
             [{"a": 1}],  # Test data for test_case_2
@@ -70,10 +69,10 @@ class TestCases(unittest.TestCase):
             [{"a": 1.5, "c": 4}, {"b": None}],  # Test data for test_case_5
         ]
         for idx, data in enumerate(test_data, start=1):
-            path = cls.temp_dir.name + f"/test_data_{idx}.json"
+            path = self.temp_dir.name + f"/test_data_{idx}.json"
             with open(path, "w") as f:
                 json.dump(data, f)
-            cls.test_data_paths.append(path)
+            self.test_data_paths.append(path)
     def test_case_1(self):
         # Basic test
         df = f_27(self.test_data_paths[0])
@@ -156,6 +155,5 @@ class TestCases(unittest.TestCase):
         self.assertAlmostEqual(df.loc["a", "mean"], 7.5)
         self.assertAlmostEqual(df.loc["b", "mean"], 22.5)
         self.assertAlmostEqual(df.loc["c", "mean"], 30.0)
-    @classmethod
-    def tearDownClass(cls):
-        cls.temp_dir.cleanup()
+    def tearDown(self):
+        self.temp_dir.cleanup()

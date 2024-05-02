@@ -48,10 +48,9 @@ import unittest
 from unittest.mock import patch
 import numpy as np
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=COLUMNS)
-        cls.tuples = [(cls.df.iloc[0].values), (cls.df.iloc[1].values)]
+    def setUp(self):
+        self.df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=COLUMNS)
+        self.tuples = [(self.df.iloc[0].values), (self.df.iloc[1].values)]
     def test_no_plots_generated(self):
         """Test case with zero plots requested."""
         _, plots = f_57(self.df, [], 0)  # Request 0 plots.
@@ -70,7 +69,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(modified_df), len(self.df), "No rows should be removed.")
     def test_random_plot_columns(self):
         _, plots = f_57(self.df, [], 1)
-        # Assuming f_57 generates at least one plot and adds it to the list,
+        # Assu f_57 generates at least one plot and adds it to the list,
         # access the first plot for testing.
         first_plot = plots[0]
         plot_columns = [first_plot.get_xlabel(), first_plot.get_ylabel()]

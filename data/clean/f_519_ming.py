@@ -50,9 +50,8 @@ def f_519(texts):
 import unittest
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.texts = [
+    def setUp(self):
+        self.texts = [
             "Hello, world!",
             "Data science is about the extraction of knowledge from data.",
             "Machine learning is a fascinating field.",
