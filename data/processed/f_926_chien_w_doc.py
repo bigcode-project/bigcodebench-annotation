@@ -26,8 +26,8 @@ def f_370(data):
     - scipy
 
     Example:
-    >>> f_370({'Score_String': ['80.5', '85.7', '90.2'], 'Grade': ['B', 'B+', 'A-']})
-    -0.46351538587606683
+    >>> round(f_370({'Score_String': ['80.5', '85.7', '90.2'], 'Grade': ['B', 'B+', 'A-']}),2)
+    -0.46
     """
     df = pd.DataFrame(data)
     if len(df) < 2:  # Check if the data frame has less than 2 rows

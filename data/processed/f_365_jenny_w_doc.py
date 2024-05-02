@@ -5,7 +5,7 @@ import pandas as pd
 def f_474(data_str, separator=",", bins=20):
     """
     Convert a string of numerical values separated by a specified separator into a pandas
-    integer series, and then draw a histogram of the data.
+    numerical series with int64, and then draw a histogram of the data.
 
     The function raises a ValueError if data is empty or it fails to convert the data.
     It plots the histogram with the following attributes:

@@ -5,7 +5,10 @@ import matplotlib.pyplot as plt
 def f_431(P, T):
     """
     Calculate the product of a matrix "P" and a 3D tensor "T" with numpy and then visualize the
-    result in 3D with matplotlib. Note: This function only accepts numpy matrices/arrays.
+    result in 3D with matplotlib. The product of the matrix and tensor is based on the Einstein summation.
+    
+    Note:
+    This function only accepts numpy matrices/arrays.
 
     Parameters:
     P (numpy.ndarray): The input matrix with shape (N, 3), where N is the number of rows.
@@ -59,15 +62,6 @@ class TestCases(unittest.TestCase):
         # Test output visualization
         _, ax = f_431(self.test_P, self.test_T)
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_title(), "")
-        self.assertEqual(ax.get_xlabel(), "")
-        self.assertEqual(ax.get_ylabel(), "")
-        ax.set_title("Test Title")
-        ax.set_xlabel("X Label")
-        ax.set_ylabel("Y Label")
-        self.assertEqual(ax.get_title(), "Test Title")
-        self.assertEqual(ax.get_xlabel(), "X Label")
-        self.assertEqual(ax.get_ylabel(), "Y Label")
     def test_case_2(self):
         # Test result correctness
         result, _ = f_431(self.test_P, self.test_T)

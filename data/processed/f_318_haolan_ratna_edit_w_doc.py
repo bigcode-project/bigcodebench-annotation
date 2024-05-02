@@ -6,7 +6,7 @@ COLORS = ['r', 'g', 'b']
 
 def f_423(df, group_col, value_col, group_name):
     """
-    Create a bar chart of a specific group from the input dataframe.
+    Create a bar subplot of a specific group from the input dataframe.
 
     Parameters:
     - df (DataFrame): The input DataFrame containing the data.

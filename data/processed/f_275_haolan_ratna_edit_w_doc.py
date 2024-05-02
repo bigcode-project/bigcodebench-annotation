@@ -5,7 +5,7 @@ def f_1(df):
     """
     Draw a bar chart of the counts of each unique value in the 'value' column of a pandas DataFrame and return the Axes object.
     Empty DataFrame will return an empty bar chart.
-
+    
     Parameters:
     df (DataFrame): The pandas DataFrame with columns ['id', 'value'].
 
@@ -32,14 +32,14 @@ def f_1(df):
     """
 
     if not isinstance(df, pd.DataFrame):
-        raise ValueError("Input df must be a pandas DataFrame.")
-
+        raise ValueError("The input df is not a DataFrame")
+    
     value_counts = df['value'].value_counts()
-    ax = value_counts.plot(kind='bar')
-    ax.set_title('Value Distribution')
-    ax.set_xlabel('Value')
-    ax.set_ylabel('Count')
-    return ax
+    ax = plt.bar(value_counts.index, value_counts.values)
+    plt.xlabel('Value')
+    plt.ylabel('Count')
+    plt.title('Value Distribution')
+    return plt.gca()
 
 import unittest
 import pandas as pd

@@ -5,7 +5,7 @@ import random
 COLORS = ['#00bfbf', '#000000', '#0000ff']
 def f_305(number_list, bins):
     """
-    Create a histogram plot of a list of numbers.
+    Create a histogram subplot of a list of numbers.
 
     Parameters:
     - number_list (list): A list of numeric values to be plotted.

@@ -17,8 +17,11 @@ def f_364(num_rows=100, categories=["a", "b", "c", "d", "e"], random_seed=42):
 
     Returns:
     - pd.DataFrame: A pandas DataFrame with randomly generated category data.
-    - matplotlib.pyplot.Axes: A bar chart visualizing the category counts.
+    - matplotlib.pyplot.Axes: A bar chart visualizing the category counts, with the title 'Category Counts'.
 
+    Raises:
+    - ValueError: If num_rows is less than 1.
+    
     Requirements:
     - pandas
     - random

@@ -6,7 +6,7 @@ COLUMNS = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
 
 def f_626(length, min_value = 0, max_value = 100):
     """
-    Generate a pandas DataFrame with specified length and calculate the cumulative distribution function (CDF).
+    Randomly generate a pandas DataFrame with specified ranges and length, and calculate the cumulative distribution function (CDF).
 
     Parameters:
     length (int): The length of the DataFrame to be generated.

@@ -59,7 +59,8 @@ class TestCases(unittest.TestCase):
     def tearDown(self):
         os.remove(self.db1_path)
         os.remove(self.db2_path)
-        os.remove('nonexistent.db')
+        if os.path.exists('nonexistent.db'):
+            os.remove('nonexistent.db')
     
     def test_valid_input(self):
         df1 = f_768(self.db1_path, self.table_name1, self.column_name1)

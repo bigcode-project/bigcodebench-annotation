@@ -23,7 +23,7 @@ def f_546(
 
     Returns:
     cluster_result (numpy.ndarray): The result of KMeans clustering.
-    ax (matplotlib.axes.Axes): The visualization of the KMeans clustering.
+    ax (matplotlib.axes.Axes): The visualization of the KMeans clustering, with the title 'KMeans Clustering Visualization'.
 
     Requirements:
     - numpy

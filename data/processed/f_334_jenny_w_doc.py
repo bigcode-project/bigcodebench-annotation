@@ -20,7 +20,7 @@ def f_139(df1, df2, features=["feature1", "feature2", "feature3"], target="targe
     dict: A dictionary containing:
         - 'coefficients': Regression coefficients (list).
         - 'intercept': Regression intercept (float).
-        - 'residuals_plot': A matplotlib Axes object representing the residuals plot.
+        - 'residuals_plot': A matplotlib Axes object representing the residuals plot, with the title 'Residuals Plot', x-axis label 'Predicted Values', and y-axis label 'Residuals'.
 
     Requirements:
     - pandas

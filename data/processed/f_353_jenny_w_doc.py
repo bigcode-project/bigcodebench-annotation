@@ -4,7 +4,7 @@ from scipy.stats import norm
 
 def f_83(mu=0, sigma=1):
     """
-    Draw and return a plot of a normal distribution with the given mean and standard deviation,
+    Draw and return a subplot of a normal distribution with the given mean and standard deviation,
     utilizing numpy's linspace to create an array of 100 linearly spaced numbers between
     `mu - 3*sigma` and `mu + 3*sigma`.
 
@@ -13,7 +13,7 @@ def f_83(mu=0, sigma=1):
     sigma (float): The standard deviation of the distribution. Default is 1.
 
     Returns:
-    matplotlib.axes.Axes: The plot representing the normal distribution.
+    matplotlib.axes.Axes: The subplot representing the normal distribution.
 
     Requirements:
     - numpy

@@ -11,7 +11,7 @@ def f_144(n, seed=0):
     - seed (int, optional): The seed for the random number generator. Defaults to None.
 
     Returns:
-    - plot (matplotlib.figure.Figure): The generated plot titled "Scatter plot of random points".
+    - plot (matplotlib.figure.Figure): The generated plot titled "Scatter plot of random points", with x-axis labeled "X" and y-axis labeled "Y".
     - points (list of tuples): List containing the (x, y) coordinates of the plotted points.
 
     Requirements:

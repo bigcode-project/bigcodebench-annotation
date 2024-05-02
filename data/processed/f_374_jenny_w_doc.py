@@ -13,7 +13,7 @@ def f_468(X, Y):
     Returns:
     tuple:
     - list: The optimized parameters of the quadratic function (a, b, c).
-    - matplotlib.axes.Axes: The plot showing the data points and the quadratic fit.
+    - matplotlib.axes.Axes: The plot showing the scatter data points and the quadratic fit.
 
     Requirements:
     - matplotlib.pyplot

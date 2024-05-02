@@ -126,5 +126,5 @@ class TestCases(unittest.TestCase):
         mock_response.headers['content-type'] = 'text/csv'
         mock_response._content = mock_csv_content.encode('utf-8')
         mock_get.return_value = mock_response
-        with self.assertRaises(Exception): 
-            result = f_615({"URL": "http://example.com/error.csv"})
+        with self.assertRaises(ValueError):
+            result = f_615({"link": "http://example.com/error.csv"})

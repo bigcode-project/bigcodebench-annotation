@@ -15,7 +15,7 @@ def f_596(pattern):
     pattern (str): The regex pattern to match.
 
     Returns:
-    str: The absolute path to the CSV file containing matched data.
+    str: The absolute path to the CSV file containing matched data. If no data is matched, the file will be empty.
 
     Note:
     - The CSV file generated name is "matched_data.csv"

@@ -17,6 +17,9 @@ def f_361(script_dir, scripts, delay):
     Returns:
     list: A list of timestamps indicating the start time of each script execution.
 
+    Raises:
+    - ValueError: If the delay is negative or no scripts are provided.
+    
     Requirements:
     - subprocess
     - os

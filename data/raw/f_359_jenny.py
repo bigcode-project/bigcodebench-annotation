@@ -16,6 +16,9 @@ def f_359(L):
     Returns:
     ax (matplotlib.axes._axes.Axes): The Axes object of the histogram plot.
 
+    Raises:
+    If the input is not a list of list of integers, a TypeError is raised.
+    
     Requirements:
     - pandas
     - numpy
