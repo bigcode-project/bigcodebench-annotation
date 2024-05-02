@@ -4,38 +4,36 @@ import zipfile
 
 def f_1019(directory):
     """
-    Zips all files located in the specified directory and returns the path to the created zip file.
+    Zips all files (not including subdirectories) located in the specified directory and returns the path to the created zip file.
     
     Parameters:
     directory (str): The directory path containing the files to be zipped.
     
     Returns:
-    str: The path to the generated zip file, or None if the directory is empty.
+    str: The path to the generated zip file. Returns None if the directory does not contain any files.
     
+    Raises:
+    FileNotFoundError: if the specified directory does not exist
+
     Requirements:
     - os
     - glob
     - zipfile
     
+    Notes:
+    - The zip name is always 'files.zip'
+
     Example:
-    >>> f_1019('/path/to/files')
-    '/path/to/files/files.zip'
+    >>> path = f_1019('/path/to/files')
+    >>> isinstance(path, str)
+    True
     """
-    # Check if directory exists
     if not os.path.exists(directory):
         raise FileNotFoundError(f"Directory '{directory}' not found.")
-    
-    # Get all files (excluding directories) in the specified directory
     files = [f for f in glob.glob(os.path.join(directory, '*')) if os.path.isfile(f)]
-
-    # If directory is empty or only contains sub-directories, return None
     if not files:
         return None
-
-    # Define the zip file path
     zip_file_path = os.path.join(directory, 'files.zip')
-
-    # Create a new zip file and add all files into it
     with zipfile.ZipFile(zip_file_path, 'w') as zipf:
         for file in files:
             zipf.write(file, os.path.basename(file))
