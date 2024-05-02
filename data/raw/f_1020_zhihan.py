@@ -5,23 +5,32 @@ def f_1020():
     """
     Obtain system details, including operating system, architecture, and memory usage.
     
-    This function uses the 'platform' and 'psutil' libraries to gather information about 
-    the system's operating system, architecture, and memory usage. It then returns these details
-    in a dictionary format.
+    This function gathers information about the system's operating system, architecture,
+    and memory usage. It calculates the percentage of used memory  by comparing the total
+    and currently used memory. The gathered details are then returned in a dictionary 
+    format with specific keys for each piece of information.
     
     Returns:
         dict: A dictionary containing:
             - 'OS': Operating System name (e.g., 'Windows', 'Linux').
-            - 'Architecture': System architecture (e.g., '64bit').
-            - 'Memory Usage': Percentage of memory currently being used.
-
+            - 'Architecture': System architecture (typically first item from platform.architecture(), e.g., '64bit').
+            - 'Memory Usage': Formatted string representing the percentage of memory currently in use, 
+                              calculated as (used memory / total memory) * 100.
+  
     Requirements:
         - platform
         - psutil
 
     Examples:
-        >>> f_1020()
-        {'OS': 'Linux', 'Architecture': '64bit', 'Memory Usage': '45.20%'}
+        >>> system_info = f_1020()
+        >>> isinstance(system_info, dict)
+        True
+        >>> 'OS' in system_info
+        True
+        >>> 'Architecture' in system_info
+        True
+        >>> 'Memory Usage' in system_info
+        True
     """
     system_info = {}
 
