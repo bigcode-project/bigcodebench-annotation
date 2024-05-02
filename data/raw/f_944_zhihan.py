@@ -1,17 +1,23 @@
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+
 def f_944(texts):
     """
-    Calculate the TF-IDF score for each word in a text collection after removing URLs.
+    Processes a collection of text documents to compute the TF-IDF (Term Frequency-Inverse Document Frequency) scores
+    for each word, excluding any URLs present in the texts. The TF-IDF scores help to identify the importance of a word
+    within a document relative to a collection of documents.
 
     Parameters:
-    texts (list of str): The texts to analyze.
+    texts (list of str): A list containing the text documents to be analyzed.
 
     Returns:
-    tuple: A tuple containing:
-        - list of tuples: A dense matrix of TF-IDF scores.
-        - list of str: The feature names (words) corresponding to the scores.
+    tuple of (list of tuples, list of str):
+        - The first element is a list of tuples, each tuple representing a document with its words' TF-IDF scores in a
+          dense matrix format. Each score in the tuple corresponds to a word's TF-IDF score in the document.
+        - The second element is a list of strings, representing the unique words (features) across all documents for
+          which TF-IDF scores have been calculated. The order of words in this list matches the order of scores in the
+          tuples of the first element.
 
     Requirements:
     - re
@@ -23,11 +29,16 @@ def f_944(texts):
       (0.        , 0.        , 0.6316672 , 0.6316672 , 0.44943642, 0.        ),
       (0.        , 0.        , 0.        , 0.        , 0.44943642, 0.6316672 )],
      ['for', 'info', 'great', 'is', 'python', 'love'])
+
+    Notes:
+    - URLs in the text documents are removed before calculating TF-IDF scores to ensure they do not affect the analysis.
+    - The TF-IDF scores are rounded to 8 decimal places for precision.
     """
+
     # Handle empty input
     if all(text.strip() == "" for text in texts):
         return [], []
-    
+
     # Remove URLs
     cleaned_texts = [re.sub('http[s]?://\S+', '', text) for text in texts]
 
@@ -38,7 +49,9 @@ def f_944(texts):
     dense_matrix = [tuple(round(val, 8) for val in row) for row in tfidf_matrix.toarray().tolist()]
     return dense_matrix, list(vectorizer.get_feature_names_out())
 
+
 import unittest
+
 
 def run_tests():
     """Execute the test cases for the function f_944."""
@@ -47,6 +60,7 @@ def run_tests():
     runner = unittest.TextTestRunner(verbosity=2)
     results = runner.run(suite)
     return results
+
 
 class TestCases(unittest.TestCase):
     def test_case_1(self):
@@ -68,7 +82,7 @@ class TestCases(unittest.TestCase):
             sorted(output[1])
         )
         self.assertEqual(output, expected_output)
-        
+
     def test_case_3(self):
         input_texts = ['I love coding.', 'You love coding too.', 'We all love coding.']
         output = f_944(input_texts)
@@ -78,7 +92,7 @@ class TestCases(unittest.TestCase):
             sorted(output[1])
         )
         self.assertEqual(output, expected_output)
-    
+
     def test_case_4(self):
         input_texts = ['Check out this amazing article at https://www.example.com/article']
         output = f_944(input_texts)
@@ -88,13 +102,12 @@ class TestCases(unittest.TestCase):
             sorted(output[1])
         )
         self.assertEqual(output, expected_output)
-        
+
     def test_case_5(self):
         input_texts = ['', '', '']
         expected_output = ([], [])
         self.assertEqual(f_944(input_texts), expected_output)
 
+
 if __name__ == '__main__':
-    run_tests()
-if __name__ == "__main__":
     run_tests()

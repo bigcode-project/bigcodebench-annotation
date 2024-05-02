@@ -2,6 +2,7 @@ import json
 import urllib.request
 from datetime import datetime
 
+
 def f_1008(api_url):
     """
     Fetch the latest data from a given JSON API and convert the timestamp to a datetime object.
@@ -32,12 +33,21 @@ def f_1008(api_url):
 
     return latest_data
 
+
 import unittest
 from unittest.mock import patch
 from datetime import datetime
 
-class TestFetchLatestData(unittest.TestCase):
-    
+
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
+
+class TestCases(unittest.TestCase):
+
     @patch('urllib.request.urlopen')
     def test_case_1(self, mock_urlopen):
         mock_urlopen.return_value.__enter__.return_value.read.return_value = b'[{"timestamp": 1631462400, "data": "some data"}]'
@@ -73,10 +83,6 @@ class TestFetchLatestData(unittest.TestCase):
         self.assertEqual(result['timestamp'], datetime.fromtimestamp(1631808000))
         self.assertEqual(result['data'], 'final data')
 
-def run_tests():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestFetchLatestData))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
+
 if __name__ == "__main__":
     run_tests()

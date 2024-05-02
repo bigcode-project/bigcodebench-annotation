@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 import numpy as np
 
+
 def f_999(data):
     ''' 
     Train a simple linear regression model based on the given data and evaluate the model by calculating the mean square error.
@@ -20,25 +21,29 @@ def f_999(data):
     - numpy
 
     Example:
-    >>> f_938(DATA)
-    6.182284986260905
+    >>> data = {
+    >>>         'Hours': [2.5, 5.1, 3.2, 8.5, 3.5],
+    >>>         'Scores': [21, 47, 27, 75, 30],
+    >>>         }
+    >>> f_999(data)
+    7.097196867421619
     '''
     df = pd.DataFrame(data)
-    
+
     X = df[['Hours']]
     y = df['Scores']
-    
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
+
     model = LinearRegression()
     model.fit(X_train, y_train)
-    
+
     predictions = model.predict(X_test)
-    
+
     mse = np.mean((y_test - predictions) ** 2)
-    
+
     return mse
-    
+
 
 import unittest
 import pandas as pd
@@ -53,8 +58,9 @@ def run_tests():
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
+
 class TestCases(unittest.TestCase):
-    
+
     def test_case_1(self):
         data = {
             'Hours': [2.5, 5.1, 3.2, 8.5, 3.5],
@@ -70,7 +76,7 @@ class TestCases(unittest.TestCase):
         }
         mse = f_999(data)
         self.assertIsInstance(mse, float)
-        
+
     def test_case_3(self):
         data = {
             'Hours': [2.5, 3.5, 1.5],
@@ -94,5 +100,7 @@ class TestCases(unittest.TestCase):
         }
         mse = f_999(data)
         self.assertAlmostEqual(mse, 6.182284986260905, places=5)
+
+
 if __name__ == "__main__":
     run_tests()

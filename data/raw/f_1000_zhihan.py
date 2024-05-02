@@ -1,6 +1,7 @@
 import itertools
 from random import shuffle
 
+
 def f_1000(numbers=list(range(1, 11))):
     """
     Mix a list of numbers, calculate the sum of the differences between each pair of consecutive numbers, 
@@ -18,27 +19,32 @@ def f_1000(numbers=list(range(1, 11))):
 
     Example:
     >>> f_1000([1, 2, 3])
-    Some float value  # This is a placeholder and will be updated after running the function.
+    2.6666666666666665
+    >>> f_1000([-3, -1])
+    2.0
     """
     shuffle(numbers)
     permutations = list(itertools.permutations(numbers))
 
     sum_diffs = 0
     for perm in permutations:
-        diffs = [abs(perm[i] - perm[i+1]) for i in range(len(perm)-1)]
+        diffs = [abs(perm[i] - perm[i + 1]) for i in range(len(perm) - 1)]
         sum_diffs += sum(diffs)
 
     avg_sum_diffs = sum_diffs / len(permutations)
-    
+
     return avg_sum_diffs
 
+
 import unittest
+
 
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 
 class TestCases(unittest.TestCase):
     def test_case_1(self):
@@ -70,5 +76,7 @@ class TestCases(unittest.TestCase):
         result = f_1000([])
         self.assertIsInstance(result, float)
         self.assertEqual(result, 0)
+
+
 if __name__ == "__main__":
     run_tests()

@@ -2,6 +2,7 @@ import collections
 import random
 import string
 
+
 def f_1001(length=100):
     """
     Generate a random string of the specified length, and then count the occurrence of each character.
@@ -19,21 +20,25 @@ def f_1001(length=100):
 
     Example:
     >>> f_1001(10)
-    # Returns a dictionary with counts of each character in the generated string. 
-    # Since the output is random, the exact dictionary will vary.
+    {'U': 1, 'M': 1, 'P': 1, 'd': 2, 'Q': 1, 'x': 1, 'f': 1, 'j': 1, 'F': 1}
+    >>> f_1001(5)
+     {'y': 1, 'L': 1, 'o': 1, 'g': 1, 'h': 1}
     """
     random_string = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase, k=length))
     char_counts = collections.Counter(random_string)
     return dict(char_counts)
 
+
 import unittest
 import string
+
 
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 
 class TestCases(unittest.TestCase):
     def setUp(self):
@@ -73,6 +78,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(sum(result.values()), 5)
         for char in result:
             self.assertTrue(char in self.valid_chars)
+
 
 if __name__ == "__main__":
     run_tests()

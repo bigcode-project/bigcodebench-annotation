@@ -23,6 +23,7 @@ def f_1027(data, url="http://your-api-url.com"):
     >>> data = {'name': 'John', 'age': 30, 'city': 'New York'}
     >>> response = f_1027(data, url="http://example-api-url.com")
     >>> print(response.status_code)
+    '200'
     """
     json_data = json.dumps(data)
     encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')

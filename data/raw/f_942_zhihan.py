@@ -1,6 +1,7 @@
 import re
 from collections import Counter
 
+
 def f_942(text, top_n):
     """
     Count the N most common words in a text after removing URLs.
@@ -22,7 +23,7 @@ def f_942(text, top_n):
     """
     # Remove URLs
     text = re.sub('http[s]?://\S+', '', text)
-    
+
     # Tokenize the text using regex (improved tokenization)
     words = re.findall(r'\b\w+\b', text)
 
@@ -31,7 +32,9 @@ def f_942(text, top_n):
 
     return word_freq.most_common(top_n)
 
+
 import unittest
+
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -39,8 +42,9 @@ def run_tests():
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
+
 class TestCases(unittest.TestCase):
-    
+
     def test_case_1(self):
         result = f_942('Python is great. I love Python.', 2)
         expected = [('Python', 2), ('is', 1)]
@@ -66,5 +70,7 @@ class TestCases(unittest.TestCase):
         result = f_942('Hello, world! How are you?', 2)
         expected = [('Hello', 1), ('world', 1)]
         self.assertEqual(result, expected)
+
+
 if __name__ == "__main__":
     run_tests()
