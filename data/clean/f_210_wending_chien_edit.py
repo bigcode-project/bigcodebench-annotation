@@ -105,11 +105,12 @@ class TestCases(unittest.TestCase):
 
     def test_partial_correct_log(self):
         partial_log_content = "ERROR: [2023-03-23 15:00:00] - Correct message\nThis is not a correct log format\n"
-        with patch('builtins.open', mock_open(read_data=partial_log_content)) as mock_file:
-            generated_csv_path = f_210('partial.log')
-            self.assertTrue(os.path.exists(generated_csv_path), "CSV file was not created for partial correct log.")
-            generated_df = pd.read_csv(generated_csv_path)
-            self.assertEqual(len(generated_df), 1, "Only one correct log entry should be parsed.")
+        with open(self.sample_log_file, 'w') as log_file:
+            log_file.write(partial_log_content)
+        generated_csv_path = f_210(self.sample_log_file)
+        self.assertTrue(os.path.exists(generated_csv_path), "CSV file was not created for partial correct log.")
+        generated_df = pd.read_csv(generated_csv_path)
+        self.assertEqual(len(generated_df), 1, "Only one correct log entry should be parsed.")
 
     def test_malformed_timestamp(self):
         malformed_content = "ERROR: [2023-00-23 15:00:00] - Malformed timestamp"
