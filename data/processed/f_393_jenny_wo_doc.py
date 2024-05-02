@@ -19,6 +19,9 @@ def f_659(days_in_past=7, random_seed=0):
                                      with 'Date' on the a-xis and 'Temperature (°C)' on the y-axis.
 
 
+    Raises:
+    ValueError: If days_in_past is less than 1.
+    
     Requirements:
     - datetime.datetime
     - datetime.timedelta

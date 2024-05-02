@@ -65,34 +65,34 @@ class TestCases(unittest.TestCase):
         pub_key, filename, _, _ = f_4526()
         self.assertIsInstance(pub_key, rsa.PublicKey)
         self.assertIsInstance(filename, str)
-        TestCases.filenames.append(filename)
+        self.filenames.append(filename)
 
     def test_file_creation(self):
         _, filename, _, _ = f_4526()
         self.assertTrue(os.path.exists(filename))
-        TestCases.filenames.append(filename)
+        self.filenames.append(filename)
 
     def test_file_content(self):
         _, filename, _, _ = f_4526()
         with open(filename, 'r') as f:
             content = f.read()
             self.assertTrue(content)
-        TestCases.filenames.append(filename)
+        self.filenames.append(filename)
 
     def test_key_size(self):
         pub_key, filename, _, _ = f_4526()
         self.assertEqual(pub_key.n.bit_length(), 512)
-        TestCases.filenames.append(filename)
+        self.filenames.append(filename)
 
     def test_unique_file_per_call(self):
         _, filename1, _, _ = f_4526()
         _, filename2, _, _ = f_4526()
         self.assertNotEqual(filename1, filename2)
-        TestCases.filenames.extend([filename1, filename2])
+        self.filenames.extend([filename1, filename2])
 
     def test_encryption_decryption(self):
         pub_key, filename, password, nonce = f_4526()
-        TestCases.filenames.append(filename)
+        self.filenames.append(filename)
         with open(filename, 'r') as f:
             encrypted_key = b64decode(f.read())
         cipher = AES.new(password, AES.MODE_EAX, nonce=nonce)
@@ -103,7 +103,8 @@ class TestCases(unittest.TestCase):
 
     def tearDown(self):
         for filename in self.filenames:
-            os.remove(filename)
+            if os.path.exists(filename):
+                os.remove(filename)
 
 
 def run_tests():

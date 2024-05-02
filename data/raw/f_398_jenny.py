@@ -13,7 +13,6 @@ def f_398(column, data):
     - data (list of lists): A list where each element is a list representing stock data for a single day.
                             Each inner list should contain values in the following order:
                             'Date', 'Open', 'High', 'Low', 'Close', 'Volume'.
-                            Function will raise ValueError if the structure is not as expected.
     Returns:
     - dict: A dictionary containing the calculated 'sum', 'mean', 'min' (minimum), and 'max' (maximum)
             for the specified column. If the input data is empty, 'sum' will be 0, and 'mean', 'min', and
@@ -23,6 +22,9 @@ def f_398(column, data):
     - pandas
     - numpy
 
+    Raises:
+    - ValueError: If the specified column name is not valid.
+    
     Example:
     >>> data = [[datetime(2022, 1, 1), 100, 105, 95, 102, 10000]]
     >>> results = f_398('Open', data)

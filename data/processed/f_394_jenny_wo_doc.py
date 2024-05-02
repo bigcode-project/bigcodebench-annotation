@@ -18,6 +18,9 @@ def f_103(days_in_past=7):
     Returns:
     weekday (str)     : The name of the weekday (e.g., 'Monday', 'Tuesday') for the computed date.
 
+    Raises:
+    ValueError: If 'days_in_past' is negative.
+    
     Requirements:
     - datetime.datetime
     - datetime.timedelta

@@ -27,6 +27,9 @@ def f_519(epoch_milliseconds, seed=0):
         - 'Time': The timestamp of when the activity occurred, incrementally
                   increasing from the starting epoch time to the current time.
 
+    Raises:
+    - ValueError: If the start time is after the current system time.
+    
     Requirements:
     - pandas
     - datetime.datetime.fromtimestamp

@@ -16,7 +16,7 @@ def f_399(column, data):
 
     Returns:
     tuple: A tuple containing:
-        - dict: A dictionary with the sum, mean, min, and max of the column.
+        - dict: A dictionary with the 'sum', 'mean', 'min', and 'max' of the column.
         - Axes object: The pie chart visualizing the column data.
 
     Requirements:

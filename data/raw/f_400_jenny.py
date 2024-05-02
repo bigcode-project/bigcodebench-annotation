@@ -22,6 +22,9 @@ def f_400(column, data):
     - pandas
     - numpy
 
+    Raises:
+    - ValueError: If the quantity sold or total sales is negative.
+    
     Example:
     >>> data = [['Product A', 100, 10000], ['Product B', 150, 15000], ['Product C', 200, 20000]]
     >>> stats, plot = f_400('Total Sales', data)

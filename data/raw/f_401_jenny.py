@@ -30,6 +30,10 @@ def f_401(column, data):
     - numpy
     - matplotlib.pyplot
 
+    Raises:
+    - KeyError: If the specified column is not valid.
+    - ValueError: If the data list is empty or if any of the numeric values for
+                    steps, calories burned, and distance walked are negative.
     Example:
     >>> data = [[datetime(2022, 1, 1), 5000, 200, 3.5],
     ...         [datetime(2022, 1, 2), 5500, 220, 4.0],

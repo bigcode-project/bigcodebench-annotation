@@ -19,6 +19,9 @@ def f_2(epoch_milliseconds, seed=None):
     - sales_data (dict): Sales data for different categories over days.
     - ax (plt.Axes): The plot depicting the sales trend.
 
+    Raises:
+    - ValueError: If the start time is negative or after the current time.
+    
     Requirements:
     - random
     - datetime.datetime
