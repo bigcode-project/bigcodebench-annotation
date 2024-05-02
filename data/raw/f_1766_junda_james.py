@@ -30,7 +30,7 @@ def f_1766(url='http://example.com'):
     - requests
     - bs4
 
-    Example usage:
+    Example:
     >>> df = f_1766('https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)')
     >>> print(df)
                                                        0
