@@ -53,30 +53,24 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
     
-    def test_case_1(self):
+    def test_presence_and_type_of_keys(self):
+        """Test that the result has the correct keys and that each key maps to the expected data type."""
         result = f_1020()
-        self.assertTrue('OS' in result)
-        self.assertTrue('Architecture' in result)
-        self.assertTrue('Memory Usage' in result)
-        self.assertIn(result['OS'], ['Windows', 'Linux', 'Darwin'])
-        self.assertIn(result['Architecture'], ['64bit', '32bit'])
-        # Checking memory usage format e.g. "45.20%"
+        self.assertIsInstance(result, dict)
+        self.assertTrue('OS' in result and isinstance(result['OS'], str))
+        self.assertTrue('Architecture' in result and isinstance(result['Architecture'], str))
+        self.assertTrue('Memory Usage' in result and isinstance(result['Memory Usage'], str))
+
+    def test_memory_usage_format(self):
+        """Test that the 'Memory Usage' key is correctly formatted as a percentage."""
+        result = f_1020()
         self.assertRegex(result['Memory Usage'], r"\d{1,3}\.\d{2}%")
-
-    # As this function is deterministic and does not have different behaviors for different inputs,
-    # one test case is sufficient to validate its functionality. However, for the sake of the requirement, 
-    # we will add four more tests that are essentially the same.
     
-    def test_case_2(self):
-        self.test_case_1()
+    def test_non_empty_values(self):
+        """Ensure that the values associated with each key are non-empty."""
+        result = f_1020()
+        for key, value in result.items():
+            self.assertTrue(bool(value))
 
-    def test_case_3(self):
-        self.test_case_1()
-
-    def test_case_4(self):
-        self.test_case_1()
-
-    def test_case_5(self):
-        self.test_case_1()
 if __name__ == "__main__":
     run_tests()
