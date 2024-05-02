@@ -107,7 +107,7 @@ class TestCases(unittest.TestCase):
         expected_result = [(2, 'A'), (1, 'B')]
         self.assertCountEqual(result, expected_result)
         self.assertEqual(count, 3)
-        pd.testing.assert_frame_equal(pd.DataFrame(dictionary, df))
+        pd.testing.assert_frame_equal(pd.DataFrame(dictionary), df)
 
 if __name__ == "__main__":
     run_tests()
