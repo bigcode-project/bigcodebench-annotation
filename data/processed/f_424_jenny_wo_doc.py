@@ -4,7 +4,7 @@ import pandas as pd
 
 def f_348(db_name, table_name):
     """
-    Plot the relationship between the first and second numerical columns of an SQLite3 table.
+    Plot the relationship between the first and second numerical columns of an SQLite3 table, after excluding 'id' column.
 
     Parameters:
     - db_name (str): The absolute path to the SQLite3 database.
@@ -13,6 +13,9 @@ def f_348(db_name, table_name):
     Returns:
     - matplotlib.axes._axes.Axes: Scatterplot with column name labeled on their respective axes.
 
+    Raises:
+    - ValueError: If the table has less than two numerical columns.
+    
     Requirements:
     - sqlite3
     - pandas

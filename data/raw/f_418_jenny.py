@@ -32,6 +32,9 @@ def f_418(df: pd.DataFrame) -> (Counter, plt.Axes):
     - seaborn
     - matplotlib.pyplot
 
+    Raises:
+    - ValueError: If the DataFrame is empty or if age is negative.
+    
     Example:
     >>> df = pd.DataFrame({'name': ['Alice', 'Bob', 'Alice'], 'age': [25, 26, 25]})
     >>> duplicates_counter, ax = f_418(df)

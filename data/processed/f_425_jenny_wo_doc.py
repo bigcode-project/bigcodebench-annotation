@@ -22,6 +22,9 @@ def f_48(db_name, table_name, num_entries, random_seed=None):
     Returns:
     str: The absolute path of the SQLite3 database file.
 
+    Raises:
+    ValueError: If num_entries is negative.
+    
     Requirements:
     - sqlite3
     - random.choice

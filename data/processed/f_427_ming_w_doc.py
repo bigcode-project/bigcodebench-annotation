@@ -16,7 +16,7 @@ def f_329(hex_keys=KEYS, seed=42):
     seed (int, optional): A seed for the random number generator to ensure deterministic behavior.
 
     Returns:
-    str: The MD5 hash of the randomly selected hexadecimal string converted to a float.
+    str: The MD5 hash of the floating-point number derived from the randomly selected hexadecimal string.
 
     Raises:
     ValueError: If contains invalid hexadecimal strings.

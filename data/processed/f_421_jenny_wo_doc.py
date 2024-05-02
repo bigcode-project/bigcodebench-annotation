@@ -21,6 +21,9 @@ def f_356(db_path, table_name, num_entries, random_seed=None):
     Returns:
     int: The number of rows inserted.
 
+    Raises:
+    ValueError: If num_entries is negative.
+    
     Requirements:
     - sqlite3
     - numpy
