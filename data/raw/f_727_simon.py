@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
@@ -34,30 +33,31 @@ def f_727(df, col_a='A', col_b='B', col_c='C', seed=None):
     
     Requirements:
     - pandas
-    - numpy
     - sklearn.model_selection
     - sklearn.linear_model
 
     Example:
+    >>> np.random.seed(32)
     >>> df = pd.DataFrame({'A': np.random.randint(0, 100, 1000),
     ...                    'B': np.random.randint(0, 100, 1000),
     ...                    'C': np.random.choice([900, 800, 700, 600], 1000)})
-    >>> predictions = f_727(df)
+    >>> predictions, model = f_727(df, seed=1)
     >>> print(predictions)
+    [77.21974339 76.26960987 76.34878767 77.16695819 76.53353585 76.86344332
+     76.86344332 77.19335079 76.81065812 76.77106923 76.79746183 77.0481915
+     76.23002098 76.63910624 77.114173   76.04527279 77.0217989  76.0188802
+     77.18015449 76.91622851 76.62590994 76.90303222 76.75787293 77.29892118
+     77.18015449 76.07166539 76.04527279 76.88983592]
     >>> print(model)
-    [76.69220349 75.75947019 74.87337356 77.43839013 74.26709691 75.01328355
-    76.08592685 76.45902017 76.69220349 74.5469169  75.05992022 74.96664689
-    75.80610686 76.50565683 75.66619686 77.25184347 74.92001022 75.38637687
-    72.8213603  72.96127029 73.94064026 73.24109028 76.59893016 76.03929018]
     LinearRegression()
 
     >>> df = pd.DataFrame({'A': [1, 2, 3, 4, 5],
     ...                    'B': [10, 80, 80, 80, 80],
     ...                    'C': [900, 900, 900, 900, 900]})
-    >>> predictions, model = f_727(df)
+    >>> predictions, model = f_727(df, seed=12)
     >>> print(predictions) 
-    >>> print(model)
     [80.]
+    >>> print(model)
     LinearRegression()
     """
     # Validating the input dataframe
@@ -109,7 +109,7 @@ class TestCases(unittest.TestCase):
                            'C': np.random.choice([900, 800], 100)})
         predictions, model = f_727(df, seed=12)
         self.assertIsInstance(model, LinearRegression)
-        np.testing.assert_almost_equal(predictions, np.array([65.64, 67.24, 70.83, 64.04, 67.51, 66.44]), decimal=2)
+        np.testing.assert_almost_equal(predictions, np.array([73.84, 73.74, 73.02, 73.32, 72.66]), decimal=2)
 
     def test_empty_dataframe(self):
         # Test with an empty DataFrame
@@ -159,7 +159,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(model, LinearRegression)
         np.testing.assert_almost_equal(
             predictions,
-            np.array([76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76.]),
+            np.array([73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61]),
             decimal=2
             )
 

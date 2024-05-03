@@ -1,7 +1,4 @@
 import pandas as pd
-from itertools import zip_longest
-
-import pandas as pd
 import random
 
 def f_717(data, columns=['Name', 'Age', 'Occupation'], fill_missing=False, num_range=(0, 100), seed=None):
@@ -26,19 +23,23 @@ def f_717(data, columns=['Name', 'Age', 'Occupation'], fill_missing=False, num_r
     DataFrame: A pandas DataFrame with specified columns.
                Missing elements are represented as None or filled with random data.
 
+    Requirements:
+    - pandas
+    - random
+
     Example:
     >>> data = [('John', 25, 'Engineer'), ('Alice', ), ('Bob', )]
     >>> df = f_717(data, fill_missing=True, num_range=(0, 10), seed=42)
     >>> print(df)
-       Name   Age  Occupation
-    0  John  25.0    Engineer
-    1 Alice  10.0       None
-    2   Bob   1.0       None
+        Name   Age Occupation
+    0   John  25.0   Engineer
+    1  Alice  10.0       None
+    2    Bob   1.0       None
 
     >>> data = [('Mango', 20), ('Apple', ), ('Banana', )]
     >>> df = f_717(data, columns=['Fruit', 'Quantity'], fill_missing=False, seed=42)
     >>> print(df)
-          Fruit  Quantity
+        Fruit  Quantity
     0   Mango      20.0
     1   Apple       NaN
     2  Banana       NaN

@@ -27,28 +27,10 @@ def f_704(n, pattern, seed=None):
 
     Example:
     >>> f_704(100, r'[A-Za-z]{5}', seed=12345)
-    ['DlPzA', 'kKAsZ', 'CqKjI', 'zXVrB', 'pHdSa'] 
-    
-    >>> f_704(1000, r'[1-9]{2}')
-    ['76',
-    '88',
-    '41',
-    '88',
-    '19',
-    '54',
-    '43',
-    '52',
-    '47',
-    '29',
-    '64',
-    '31',
-    '96',
-    '21',
-    '24',
-    '22',
-    '37',
-    '81',
-    '68']
+    ['mrKBk', 'BqJOl', 'NJlwV', 'UfHVA', 'LGkjn', 'vubDv', 'GSVAa', 'kXLls', 'RKlVy', 'vZcoh', 'FnVZW', 'JQlqL']
+
+    >>> f_704(1000, r'[1-9]{2}', seed=1)
+    ['51', '84', '16', '79', '16', '28', '63', '82', '94', '18', '68', '42', '95', '33', '64', '38', '69', '56', '32', '16', '18', '19', '27']
      """
     if seed is not None:
         random.seed(seed)
@@ -63,7 +45,7 @@ def run_tests():
     suite = unittest.TestSuite()
 
     # Add tests to the test suite
-    suite.addTest(unittest.makeSuite(FinalTestCases))
+    suite.addTest(unittest.makeSuite(TestCases))
 
     # Test runner
     runner = unittest.TextTestRunner()
@@ -71,7 +53,7 @@ def run_tests():
     # Run the tests
     runner.run(suite)
 
-class FinalTestCases(unittest.TestCase):
+class TestCases(unittest.TestCase):
     
     def test_valid_pattern_matching(self):
         test_length = 100

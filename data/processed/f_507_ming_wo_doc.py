@@ -29,7 +29,6 @@ def f_241(csv_path=os.path.join(output_dir, 'data.csv'), date_column='date'):
         ...
     FileNotFoundError: nonexistent.csv does not exist
     """
-
     if not os.path.isfile(csv_path):
         raise FileNotFoundError(f"{csv_path} does not exist")
 

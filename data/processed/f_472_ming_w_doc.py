@@ -1,7 +1,6 @@
 from random import sample
 import matplotlib.pyplot as plt
 
-
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 

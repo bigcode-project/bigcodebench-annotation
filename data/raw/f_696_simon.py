@@ -1,4 +1,3 @@
-import os
 import csv
 import random
 from faker import Faker
@@ -29,10 +28,9 @@ def f_696(file_path, num_rows, random_seed=None):
     ValueError: If num_rows is not an integer >= 0.
 
     Requirements:
-    - os: For handling file-related operations.
-    - csv: For writing data to a CSV file.
-    - random: For generating random age values.
-    - faker: For generating fake personal data.
+    - csv
+    - random
+    - faker
 
     Example:
     >>> f_696('/tmp/people.csv', 100)

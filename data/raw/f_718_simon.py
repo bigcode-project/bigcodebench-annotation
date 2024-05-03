@@ -24,10 +24,30 @@ def f_718(data_dict, source_directory, backup_directory):
             - list: A list of tuples representing the sorted items of the dictionary by their frequency.
             - bool: A boolean indicating whether the backup was successful (True) or not (False).
 
-    Note:
-        - The function uses `os.path.isdir` to check if the source directory exists.
-        - If the source directory exists, `shutil.copytree` is used to copy its contents to the backup directory.
-        - If directories already exist at the backup location, `dirs_exist_ok=True` allows the function to overwrite them.
+    Requirements:
+     - collections
+     - operator
+     - os
+     - shutil
+
+    Examples:
+    >>> data_dict = {'b': 'val1', 'c': 'val2'}
+    >>> updated_dict, value_frequencies, backup_status = f_718(data_dict, 'folder1', 'backup_folder')
+    >>> print(updated_dict)
+    {'a': 1, 'key1': 'value1', 'key2': 'value2'}
+    >>> print(value_frequencies)
+    [('val1', 1), ('val2', 1), (1, 1)]
+    >>> print(backup_status)
+    True
+
+    >>> data_dict = {'avc': '1', 'hello': 'world', 'test': 'world', 'cat': 'meow'}
+    >>> updated_dict, value_frequencies, backup_status = f_718(data_dict, 'to_backup', 'backup')
+    >>> print(updated_dict)
+    {'a': 1, 'avc': '1', 'hello': 'world', 'test': 'world', 'cat': 'meow'}
+    >>> print(value_frequencies)
+    [('avc', 1), ('world', 2), ('meow', 1), (1, 2)]
+    >>> print(backup_status)
+    True
     """
     # Add the key 'a' with value 1
     data_dict.update({'a': 1})
