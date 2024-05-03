@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 CATEGORIES = ["A", "B", "C", "D", "E"]
 
 
-def f_609(data_list):
+def f_678(data_list):
     """
     Processes a list of category labels to create a histogram that visualizes their distribution.
     This histogram compares the distribution of a predefined set of categories (A, B, C, D, E)
@@ -23,6 +23,7 @@ def f_609(data_list):
 
     Notes:
     - The function evaluates the distribution of predefined categories ('A', 'B', 'C', 'D', 'E') and checks for uniformity.
+      If the distribution is not uniform, a warning message of "The distribution of predefined categories is not uniform." is printed.
     - Categories in the data_list that are not among the predefined categories are identified and included in the histogram.
     - The ax.bar call in the function creates a bar plot on the axes object. It uses the following parameters:
         * all_categories: The categories to be displayed on the x-axis, including both predefined and extra categories.
@@ -38,7 +39,7 @@ def f_609(data_list):
 
     Example:
     >>> data = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-    >>> ax = f_609(data)
+    >>> ax = f_678(data)
     >>> ax.get_xticks()
     array([0., 1., 2., 3., 4., 5., 6.])
     """
@@ -81,7 +82,7 @@ class TestCases(unittest.TestCase):
         Test the function with an empty list. Expects ValueError.
         """
         with self.assertRaises(ValueError):
-            f_609([])
+            f_678([])
     def test_uniform_distribution(self):
         """
         Test the function with a uniform distribution of predefined categories.
@@ -89,7 +90,7 @@ class TestCases(unittest.TestCase):
         """
         data = ["A", "B", "C", "D", "E"] * 2
         with patch("sys.stdout", new=io.StringIO()) as fake_output:
-            f_609(data)
+            f_678(data)
         self.assertNotIn(
             "The distribution of predefined categories is not uniform.",
             fake_output.getvalue(),
@@ -101,7 +102,7 @@ class TestCases(unittest.TestCase):
         """
         data = ["A", "A", "B", "C", "D", "E"]
         with patch("sys.stdout", new=io.StringIO()) as fake_output:
-            f_609(data)
+            f_678(data)
         self.assertIn(
             "The distribution of predefined categories is not uniform.",
             fake_output.getvalue(),
@@ -112,7 +113,7 @@ class TestCases(unittest.TestCase):
         Expects extra categories to be included in the histogram.
         """
         data = ["A", "B", "C", "D", "E", "F", "G"]
-        ax = f_609(data)
+        ax = f_678(data)
         self.assertIn("F", [tick.get_text() for tick in ax.get_xticklabels()])
         self.assertIn("G", [tick.get_text() for tick in ax.get_xticklabels()])
     def test_no_extra_categories(self):
@@ -121,7 +122,7 @@ class TestCases(unittest.TestCase):
         Expects only predefined categories to be included in the histogram.
         """
         data = ["A", "B", "C", "D", "E"]
-        ax = f_609(data)
+        ax = f_678(data)
         for extra_cat in ["F", "G"]:
             self.assertNotIn(
                 extra_cat, [tick.get_text() for tick in ax.get_xticklabels()]

@@ -4,7 +4,7 @@ import smtplib
 from email.mime.text import MIMEText
 import json
 
-def f_227(smtp_server, smtp_port, smtp_username, smtp_password):
+def f_245(smtp_server, smtp_port, smtp_username, smtp_password):
     """
     Creates an HTTP POST request handler that processes inco email data and sends
     an email. The email data must be a JSON object with 'subject', 'message', and 'to' keys.
@@ -34,7 +34,7 @@ def f_227(smtp_server, smtp_port, smtp_username, smtp_password):
                                          This is communicated to the client with a 535 Authentication Failed response.
 
     Examples:
-    >>> handler = f_227('smtp.example.com', 587, 'user@example.com', 'password')
+    >>> handler = f_245('smtp.example.com', 587, 'user@example.com', 'password')
     >>> isinstance(handler, type)
     True
     >>> issubclass(handler, http.server.BaseHTTPRequestHandler)
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
         self.smtp_port = 587
         self.smtp_username = 'user@example.com'
         self.smtp_password = 'password'
-        self.handler_class = f_227(self.smtp_server, self.smtp_port, self.smtp_username, self.smtp_password)
+        self.handler_class = f_245(self.smtp_server, self.smtp_port, self.smtp_username, self.smtp_password)
         mock_request = MagicMock()
         mock_request.makefile = MagicMock(side_effect=lambda *args, **kwargs: io.BytesIO())
         self.handler = self.handler_class(mock_request, ('127.0.0.1', 8080), None)

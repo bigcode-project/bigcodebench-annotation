@@ -3,7 +3,7 @@ from collections import Counter
 from statistics import mode
 
 
-def f_690(list_length=1000, range_start=1, range_end=10, random_seed=None):
+def f_580(list_length=1000, range_start=1, range_end=10, random_seed=None):
     """
     Generate a random list of integers within a specified range. Convert this
     list to a generator object that yields tuples. Each tuple contains a number
@@ -27,13 +27,13 @@ def f_690(list_length=1000, range_start=1, range_end=10, random_seed=None):
     - statistics
 
     Example:
-    >>> mode, numbers = f_690(100, 1, 5, random_seed=1)
+    >>> mode, numbers = f_580(100, 1, 5, random_seed=1)
     >>> print(mode)  # prints the mode e.g. 3
     4
     >>> print(next(numbers))  # prints a tuple like (1, 25)
     (2, 18)
 
-    >>> mode, numbers = f_690(20, -12, 334, random_seed=23)
+    >>> mode, numbers = f_580(20, -12, 334, random_seed=23)
     >>> print(mode)
     136
     >>> print([_ for _ in numbers])
@@ -49,24 +49,24 @@ import unittest
  
 class TestCases(unittest.TestCase):
     def test_rng(self):
-        mode1, numbers1 = f_690(random_seed=2)
-        mode2, numbers2 = f_690(random_seed=2)
+        mode1, numbers1 = f_580(random_seed=2)
+        mode2, numbers2 = f_580(random_seed=2)
         self.assertEqual(mode1, mode2)
         self.assertCountEqual([_ for _ in numbers1], [_ for _ in numbers2])
     def test_case_1(self):
-        mode, numbers = f_690(100, 1, 5, random_seed=1)
+        mode, numbers = f_580(100, 1, 5, random_seed=1)
         self.assertEqual(mode, 4)
         expected = [(2, 18), (5, 22), (1, 20), (3, 14), (4, 26)]
         self.assertCountEqual([_ for _ in numbers], expected)
         
     def test_case_2(self):
-        mode, numbers = f_690(50, 3, 7, random_seed=12)
+        mode, numbers = f_580(50, 3, 7, random_seed=12)
         self.assertEqual(mode, 7)
         expected = [(6, 9), (5, 8), (7, 12), (4, 10), (3, 11)]
         self.assertCountEqual([_ for _ in numbers], expected)
         
     def test_case_3(self):
-        mode, numbers = f_690(200, 10, 20, random_seed=222)
+        mode, numbers = f_580(200, 10, 20, random_seed=222)
         self.assertEqual(mode, 18)
         expected = [
             (11, 20),
@@ -84,16 +84,16 @@ class TestCases(unittest.TestCase):
         self.assertCountEqual([_ for _ in numbers], expected)
         
     def test_case_4(self):
-        mode, numbers = f_690(1000, 0, 1, random_seed=42)
+        mode, numbers = f_580(1000, 0, 1, random_seed=42)
         self.assertEqual(mode, 1)
         expected = [(0, 486), (1, 514)]
         self.assertCountEqual([_ for _ in numbers], expected)
     def test_case_5(self):
-        mode, numbers = f_690(10, 5, 5, random_seed=1)
+        mode, numbers = f_580(10, 5, 5, random_seed=1)
         self.assertEqual(mode, 5)
         expected = [(5, 10)]
         self.assertCountEqual([_ for _ in numbers], expected)
     
     def test_case_6(self):
-        _, numbers = f_690()
+        _, numbers = f_580()
         self.assertIsInstance(numbers, type((x for x in range(1))))  # Checking if it's a generator

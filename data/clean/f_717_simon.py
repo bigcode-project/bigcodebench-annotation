@@ -1,4 +1,3 @@
-from itertools import zip_longest
 import pandas as pd
 import random
 
@@ -27,7 +26,6 @@ def f_717(data, columns=['Name', 'Age', 'Occupation'], fill_missing=False, num_r
     Requirements:
     - pandas
     - random
-    - itertools
 
     Example:
     >>> data = [('John', 25, 'Engineer'), ('Alice', ), ('Bob', )]

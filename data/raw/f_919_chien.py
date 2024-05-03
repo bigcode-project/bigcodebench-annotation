@@ -8,7 +8,7 @@ TIME_FORMAT = "%d/%m/%y %H:%M:%S.%f"
 
 def f_919(time_strings):
     """
-    Compute the differences in seconds between consecutive datetime strings and plot these differences as a bar chart.
+    Compute the differences in seconds with integer values between consecutive datetime strings and plot these differences as a bar chart.
 
     Parameters:
     - time_strings (list of str): A list of datetime strings in the format 'dd/mm/yy HH:MM:SS.fff'.

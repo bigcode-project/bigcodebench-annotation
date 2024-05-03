@@ -3,7 +3,7 @@ from typing import Any
 from scipy import stats
 
 
-def f_245(input_list: list, repetitions: int) -> Any:
+def f_265(input_list: list, repetitions: int) -> Any:
     """
     Calculate the mode of a list of elements with multiple repetitions of the original list.
     
@@ -28,10 +28,10 @@ def f_245(input_list: list, repetitions: int) -> Any:
     - scipy.stats.ModeResult: An object containing the mode(s) and count(s) of the most frequently occurring element(s) in the flattened list.
     
     Examples:
-    >>> f_245(['A', 'B', 'C'], 10)
+    >>> f_265(['A', 'B', 'C'], 10)
     ModeResult(mode=array(['A'], dtype='<U1'), count=array([10]))
     
-    >>> f_245([1, 2, 3], 5)
+    >>> f_265([1, 2, 3], 5)
     ModeResult(mode=array([1]), count=array([5]))
     """
     # Flattening the list with multiple repetitions
@@ -48,30 +48,30 @@ class TestCases(unittest.TestCase):
     
     def test_case_1(self):
         # Test with list of integers
-        result = f_245([1, 2, 3], 5)
+        result = f_265([1, 2, 3], 5)
         self.assertEqual(result.mode.tolist(), [1])
         self.assertEqual(result.count.tolist(), [5])
         
     def test_case_2(self):
         # Test with list of strings
-        result = f_245(['A', 'B', 'C'], 10)
+        result = f_265(['A', 'B', 'C'], 10)
         self.assertEqual(result.mode.tolist(), ['A'])
         self.assertEqual(result.count.tolist(), [10])
         
     def test_case_3(self):
         # Test with list of floating-point numbers
-        result = f_245([1.5, 2.5, 3.5], 4)
+        result = f_265([1.5, 2.5, 3.5], 4)
         self.assertEqual(result.mode.tolist(), [1.5])
         self.assertEqual(result.count.tolist(), [4])
         
     def test_case_4(self):
         # Test with empty list
-        result = f_245([], 10)
+        result = f_265([], 10)
         self.assertEqual(result.mode.shape, (0,))
         self.assertEqual(result.count.shape, (0,))
         
     def test_case_5(self):
         # Test with mixed type list
-        result = f_245([1, 'A', 1.5], 3)
+        result = f_265([1, 'A', 1.5], 3)
         self.assertEqual(result.mode.tolist(), ['1'])
         self.assertEqual(result.count.tolist(), [3])

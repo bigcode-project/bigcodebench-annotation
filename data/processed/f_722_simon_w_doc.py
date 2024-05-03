@@ -1,9 +1,8 @@
 import pandas as pd
-import numpy as np
 from sklearn.cluster import KMeans
 
 
-def f_722(data, n_clusters=3, seed=None):
+def f_383(data, n_clusters=3, seed=None):
     """
     Perform K-Means clustering on the given DataFrame using the sklearn KMeans algorithm. 
 
@@ -29,28 +28,27 @@ def f_722(data, n_clusters=3, seed=None):
 
     Requirements:
     - pandas
-    - numpy
     - sklearn.cluster.KMeans
 
     Example:
+    >>> np.random.seed(12)
     >>> data = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-    >>> labels, model = f_722(data, n_clusters=4, seed=12)
+    >>> labels, model = f_383(data, n_clusters=4, seed=12)
     >>> print(labels) 
+    [1 0 1 0 1 2 1 3 3 1 0 3 0 0 2 2 2 3 3 3 1 0 1 0 3 1 1 1 1 3 1 3 0 3 1 0 0
+     2 0 3 2 1 2 1 1 3 1 1 1 1 2 2 1 0 0 3 3 0 0 1 1 2 0 0 2 2 0 2 2 2 0 3 2 3
+     3 1 2 1 1 3 1 1 1 2 1 0 0 1 2 1 3 0 0 2 3 3 3 2 3 2]
     >>> print(model)
-    [2 3 2 0 2 2 3 1 3 1 1 1 2 2 1 2 3 2 2 1 0 1 3 0 2 3 1 3 1 1 0 2 3 3 1 2 0
-    2 3 0 1 2 1 1 3 2 2 3 0 0 2 2 0 1 3 3 1 2 0 3 0 0 2 1 0 0 0 0 1 1 3 0 2 2
-    1 3 3 1 2 3 0 0 0 2 3 2 1 3 3 0 0 0 3 3 0 3 1 0 2 1]
     KMeans(n_clusters=4, n_init=10, random_state=12)
-
 
     >>> data = pd.DataFrame({
     ...     'a': [1, 20, 2, 22, 100],
     ...     'b': [1, 20, 2, 22, 100]
     ... })
-    >>> labels, model = f_722(data, seed=213)
+    >>> labels, model = f_383(data, seed=213)
     >>> print(labels)
-    >>> print(model)
     [2 0 2 0 1]
+    >>> print(model)
     KMeans(n_clusters=3, n_init=10, random_state=213)
     """
     if not data.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()).all():
@@ -70,11 +68,11 @@ class TestCases(unittest.TestCase):
             'a': [1, 2, 3],
             'b': ['a', 2, 4]
         })
-        self.assertRaises(Exception, f_722, data)
+        self.assertRaises(Exception, f_383, data)
     def test_case_1(self):
         np.random.seed(12)
         data = pd.DataFrame(np.random.randint(0, 20, size=(20, 4)), columns=list('ABCD'))
-        labels, kmeans = f_722(data, n_clusters=4, seed=1)
+        labels, kmeans = f_383(data, n_clusters=4, seed=1)
         unique_labels = np.unique(labels)
         assert all(label in range(4) for label in unique_labels)
         self.assertTrue(isinstance(labels, np.ndarray))
@@ -82,14 +80,14 @@ class TestCases(unittest.TestCase):
         np.testing.assert_equal(labels, [3, 0, 3, 1, 2, 1, 2, 0, 2, 1, 1, 3, 3, 1, 0, 0, 0, 0, 1, 3])
     def test_case_2(self):
         data = pd.DataFrame(np.zeros((100, 4)), columns=list('ABCD'))
-        labels, kmeans = f_722(data, n_clusters=3, seed=12)
+        labels, kmeans = f_383(data, n_clusters=3, seed=12)
         self.assertIsInstance(kmeans, KMeans)
         assert len(np.unique(labels)) == 1
         self.assertTrue(isinstance(labels, np.ndarray))
         self.assertCountEqual(labels, np.zeros(100))
     def test_case_3(self):
         data = pd.DataFrame({'A': range(100), 'B': range(100), 'C': range(100)})
-        labels, kmeans = f_722(data, seed=42)
+        labels, kmeans = f_383(data, seed=42)
         self.assertIsInstance(kmeans, KMeans)
         expected = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -101,7 +99,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         np.random.seed(5)
         data = pd.DataFrame(np.random.rand(100, 20))
-        labels, kmeans = f_722(data, n_clusters=12, seed=12)
+        labels, kmeans = f_383(data, n_clusters=12, seed=12)
         self.assertIsInstance(kmeans, KMeans)
         expected = [ 4,  5,  5,  9, 10,  1,  0,  3,  4,  7,  7,  2, 11, 11,  3,  0,  4,
                     2,  3,  2,  2, 10, 10,  8,  5,  9, 11,  5,  0,  8, 11,  5,  7,  0,
@@ -113,4 +111,4 @@ class TestCases(unittest.TestCase):
         self.assertTrue(isinstance(labels, np.ndarray))
     def test_case_5(self):
         data = pd.DataFrame([])
-        self.assertRaises(Exception, f_722, data)
+        self.assertRaises(Exception, f_383, data)

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import itertools
 
-def f_157(n_walks, n_steps, seed=None):
+def f_168(n_walks, n_steps, seed=None):
     """
     Create and plot `n_walks` number of random walks, each with `n_steps` steps.
 
@@ -24,7 +24,7 @@ def f_157(n_walks, n_steps, seed=None):
     - itertools
 
     Example:
-    >>> ax = f_157(5, 100, seed=42)
+    >>> ax = f_168(5, 100, seed=42)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_xticklabels()
@@ -48,25 +48,25 @@ import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic setup
-        ax = f_157(5, 100, seed=42)
+        ax = f_168(5, 100, seed=42)
         self.assertIsInstance(ax, plt.Axes)
     def test_case_2(self):
         # Test number of walks
         for n_walk in [0, 1, 2, 10, 50]:
-            ax = f_157(n_walk, 10, seed=42)
+            ax = f_168(n_walk, 10, seed=42)
             lines = ax.get_lines()
             self.assertEqual(len(lines), n_walk)
     def test_case_3(self):
         # Test number of steps
         for n_steps in [0, 1, 10, 100, 500]:
-            ax = f_157(2, n_steps, seed=42)
+            ax = f_168(2, n_steps, seed=42)
             lines = ax.get_lines()
             self.assertEqual(len(lines[0].get_ydata()), n_steps)
     def test_case_4(self):
         # Test random seed
-        ax1 = f_157(5, 100, seed=42)
-        ax2 = f_157(5, 100, seed=42)
-        ax3 = f_157(5, 100, seed=0)
+        ax1 = f_168(5, 100, seed=42)
+        ax2 = f_168(5, 100, seed=42)
+        ax3 = f_168(5, 100, seed=0)
         lines1 = ax1.get_lines()
         lines2 = ax2.get_lines()
         lines3 = ax3.get_lines()
@@ -86,10 +86,10 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test invalid n_walks
         with self.assertRaises(ValueError):
-            f_157(-1, 100, seed=42)
+            f_168(-1, 100, seed=42)
     def test_case_6(self):
         # Test negative n_steps
         with self.assertRaises(ValueError):
-            f_157(1, -100, seed=42)
+            f_168(1, -100, seed=42)
     def tearDown(self):
         plt.close("all")

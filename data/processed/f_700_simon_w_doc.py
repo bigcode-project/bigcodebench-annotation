@@ -1,7 +1,7 @@
 import random
 import string
 
-def f_700(max_length, n_samples, seed=None):
+def f_699(max_length, n_samples, seed=None):
     """Generate a list containing random strings of lowercase letters. Each string's length varies from 1 to `max_length`.
     An optional seed can be set for the random number generator for reproducible results.
 
@@ -25,9 +25,9 @@ def f_700(max_length, n_samples, seed=None):
     ValueError: If max_length is smaller than 1.
 
     Example:
-    >>> f_700(3, 12, seed=12)
+    >>> f_699(3, 12, seed=12)
     ['gn', 'da', 'mq', 'rp', 'aqz', 'ex', 'o', 'b', 'vru', 'a', 'v', 'ncz']
-    >>> f_700(5, n_samples=8, seed=1)
+    >>> f_699(5, n_samples=8, seed=1)
     ['ou', 'g', 'tmjf', 'avlt', 's', 'sfy', 'aao', 'rzsn']
 
     """
@@ -54,17 +54,17 @@ def f_700(max_length, n_samples, seed=None):
     return all_combinations
 
 """
-This script contains tests for the function f_700.
+This script contains tests for the function f_699.
 Each test checks a specific aspect of the function's behavior.
 """
 import unittest
 import random
-class TestF1240Function(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_length_and_content(self):
         """Test the length of the output and whether it contains valid strings."""
         seed = 1  # for reproducibility
         max_length = 5
-        result = f_700(max_length, n_samples=10, seed=seed)
+        result = f_699(max_length, n_samples=10, seed=seed)
         
         # All outputs should be strings
         self.assertTrue(all(isinstance(item, str) for item in result))
@@ -75,19 +75,19 @@ class TestF1240Function(unittest.TestCase):
     def test_randomness(self):
         """Test that setting a seed produces reproducible results."""
         seed = 2
-        result1 = f_700(3, seed=seed, n_samples=100)
-        result2 = f_700(3, seed=seed, n_samples=100)
+        result1 = f_699(3, seed=seed, n_samples=100)
+        result2 = f_699(3, seed=seed, n_samples=100)
         self.assertEqual(result1, result2)  # results should be same with same seed
     def test_varying_length(self):
         """Test with varying n to check the function's robustness with different input sizes."""
         seed = 3
         for n in range(1, 15):  # testing multiple sizes
-            result = f_700(n, seed=seed, n_samples=10)
+            result = f_699(n, seed=seed, n_samples=10)
             self.assertTrue(all(1 <= len(item) <= n for item in result))
     def test_negative_input(self):
         """Test how the function handles negative input. It should handle it gracefully."""
         with self.assertRaises(ValueError):
-            f_700(-1, n_samples=22)  # negative numbers shouldn't be allowed
+            f_699(-1, n_samples=22)  # negative numbers shouldn't be allowed
     def test_zero_length(self):
         """Test how the function handles zero input. It should handle it gracefully or according to its specification."""
-        self.assertRaises(ValueError, f_700, 0, n_samples=5)
+        self.assertRaises(ValueError, f_699, 0, n_samples=5)

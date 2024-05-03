@@ -14,7 +14,9 @@ def f_849(url, download_path="mnt/data/downloads/"):
 
     Returns:
     - str: Path to the directory containing the extracted contents. If an error occurs, a descriptive
-               message detailing the type of error is returned.
+               message is returned. The message starts with "Error: ". 
+               If the specific descrption is either "The URL does not point to a ZIP file.", 
+               or "The downloaded file is not a valid ZIP file.", or "Unable to download the file from the provided URL.".
 
     Raises:
     - Network Issues or Invalid URL: Returns "Error: Unable to download the file from the provided URL."

@@ -3,13 +3,12 @@ import pandas as pd
 import os
 
 
-def f_383(db_file, table_name, column_name, pattern='\d+[xX]'):
+def f_427(db_file, table_name, column_name, pattern='\d+[xX]'):
     """
     Find all matches with a regex pattern in a list of strings in an SQL database.
     
     The function loads an sql database and selects all entries from the specified
-    table. All entries of the specified column are matched against a regex pattern.
-    Matches are returned in a DataFrame.
+    table. Matches are returned in a DataFrame.
 
     Parameters:
     db_file (str): The SQLite database file.
@@ -29,7 +28,7 @@ def f_383(db_file, table_name, column_name, pattern='\d+[xX]'):
     - os
         
     Example:
-    >>> result = f_383('f_383_data_simon/sample.db', 'test_table', 'test_column')
+    >>> result = f_427('f_427_data_simon/sample.db', 'test_table', 'test_column')
     >>> print(result.head(10))
         id              test_column
     0    1                  4x4 car
@@ -86,7 +85,7 @@ class TestCases(unittest.TestCase):
         os.rmdir(self.test_dir)
     def test_regular_expression_match(self):
         # Test case with known data and expected matches
-        result = f_383(self.db_path, 'test_table', 'test_column')
+        result = f_427(self.db_path, 'test_table', 'test_column')
         expected = pd.DataFrame({
             'id': [1, 2, 3, 4, 5],
             'test_column': ['4x4 car', 'New 3x3 puzzle', 'Product with 5X feature', '1xsafe', '3xmother']
@@ -94,21 +93,21 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result, expected)
     def test_no_matches(self):
         # Test case where no entries match the pattern
-        result = f_383(self.db_path, 'test_table', 'test_column', pattern='abc')
+        result = f_427(self.db_path, 'test_table', 'test_column', pattern='abc')
         self.assertTrue(result.empty)
     def test_non_existent_table(self):
         # Catch the OperationalError from sqlite directly
         with self.assertRaises(Exception):
-            f_724(self.db_path, 'fake_table', 'test_column')
+            f_427(self.db_path, 'fake_table', 'test_column')
     def test_non_existent_column(self):
         # Catch the correct exception for non-existent column
         with self.assertRaises(KeyError):
-            f_383(self.db_path, 'test_table', 'fake_column')
+            f_427(self.db_path, 'test_table', 'fake_column')
     def test_different_pattern(self):
         # Test case with a different pattern
         self.conn.execute("INSERT INTO test_table (id, test_column) VALUES (?, ?)", (6, "something 1ab2x"))
         self.conn.commit()
-        result = f_383(self.db_path, 'test_table', 'test_column', pattern='1ab2x')
+        result = f_427(self.db_path, 'test_table', 'test_column', pattern='1ab2x')
         result.reset_index(drop=True, inplace=True)  # Resetting index before comparison
         expected = pd.DataFrame({
             'id': [6],

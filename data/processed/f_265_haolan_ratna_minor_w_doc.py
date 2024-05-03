@@ -1,7 +1,7 @@
 import numpy as np
 from itertools import combinations
 
-def f_290(n):
+def f_317(n):
     """
     Generate a list of all possible integer pairs within the range of 1 to n.
 
@@ -20,9 +20,9 @@ def f_290(n):
     - itertools.combinations
 
     Example:
-    >>> f_290(3)
+    >>> f_317(3)
     [(1, 2), (1, 3), (2, 3)]
-    >>> f_290(4)
+    >>> f_317(4)
     [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
     """
 
@@ -35,19 +35,19 @@ def f_290(n):
 import unittest
 class TestCases(unittest.TestCase):
     def test_small_range(self):
-        self.assertEqual(f_290(2), [(1, 2)])
+        self.assertEqual(f_317(2), [(1, 2)])
     def test_medium_range(self):
         expected_output = [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
-        self.assertEqual(f_290(4), expected_output)
+        self.assertEqual(f_317(4), expected_output)
     def test_large_range(self):
-        result = f_290(10)
+        result = f_317(10)
         self.assertEqual(len(result), 45)  # 10 choose 2 combinations
         self.assertIn((1, 10), result)
     def test_edge_case_empty(self):
-        self.assertEqual(f_290(1), [])
+        self.assertEqual(f_317(1), [])
     def test_invalid_input_negative(self):
         with self.assertRaises(ValueError):
-            f_290(-1)
+            f_317(-1)
     def test_invalid_input_zero(self):
         with self.assertRaises(ValueError):
-            f_290(0)
+            f_317(0)

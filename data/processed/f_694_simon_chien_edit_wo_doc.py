@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def f_514(file_path, num_rows, data_dimensions=5, random_seed=None):
+def f_576(file_path, num_rows, data_dimensions=5, random_seed=None):
     """
     Creates a CSV file on a given file path with random numeric data. 
     The number of rows in the CSV file is determined by the 'num_rows' parameter, 
@@ -24,7 +24,7 @@ def f_514(file_path, num_rows, data_dimensions=5, random_seed=None):
     - numpy
 
     Example:
-    >>> f_514('/tmp/data.csv', 100)
+    >>> f_576('/tmp/data.csv', 100)
     '/tmp/data.csv'
     """
     np.random.seed(random_seed)
@@ -49,34 +49,34 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(self.test_dir)
     def test_basic_functionality(self):
         # Test with default parameters
-        file_path = f_514(os.path.join(self.test_dir, 'data.csv'), 100)
+        file_path = f_576(os.path.join(self.test_dir, 'data.csv'), 100)
         self.assertTrue(os.path.exists(file_path))
         df = pd.read_csv(file_path)
         self.assertEqual(len(df), 100)
         self.assertEqual(len(df.columns), 5)
     def test_custom_dimensions(self):
         # Test with custom dimensions
-        file_path = f_514(os.path.join(self.test_dir, 'data_custom.csv'), 50, 7)
+        file_path = f_576(os.path.join(self.test_dir, 'data_custom.csv'), 50, 7)
         self.assertTrue(os.path.exists(file_path))
         df = pd.read_csv(file_path)
         self.assertEqual(len(df), 50)
         self.assertEqual(len(df.columns), 7)
     def test_empty_file(self):
         # Test generating an empty file
-        file_path = f_514(os.path.join(self.test_dir, 'empty.csv'), 0, 5)
+        file_path = f_576(os.path.join(self.test_dir, 'empty.csv'), 0, 5)
         self.assertTrue(os.path.exists(file_path))
         df = pd.read_csv(file_path)
         self.assertEqual(len(df), 0)
     def test_random_seed(self):
         # Test reproducibility with a random seed
-        file_path1 = f_514(os.path.join(self.test_dir, 'data_seed.csv'), 20, 5, 42)
-        file_path2 = f_514(os.path.join(self.test_dir, 'data_seed.csv'), 20, 5, 42)
+        file_path1 = f_576(os.path.join(self.test_dir, 'data_seed.csv'), 20, 5, 42)
+        file_path2 = f_576(os.path.join(self.test_dir, 'data_seed.csv'), 20, 5, 42)
         df1 = pd.read_csv(file_path1)
         df2 = pd.read_csv(file_path2)
         pd.testing.assert_frame_equal(df1, df2)
     def test_no_columns(self):
         # Test with zero columns
-        file_path = f_514(os.path.join(self.test_dir, 'no_columns.csv'), 10, 0)
+        file_path = f_576(os.path.join(self.test_dir, 'no_columns.csv'), 10, 0)
         self.assertTrue(os.path.exists(file_path))
         with open(file_path, 'r') as file:
             data = file.read()

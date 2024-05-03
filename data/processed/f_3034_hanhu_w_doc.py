@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cmath
 
-def f_399(x, y):
+def f_446(x, y):
     """
     Draw the phase of a complex function over a range of x and y and return the matplotlib axes object
     along with the 2D array of calculated phase values.
@@ -26,10 +26,10 @@ def f_399(x, y):
     - cmath
 
     Examples:
-    >>> ax, Z = f_399(np.array([1, 2, 3]), np.array([1, 2, 3]))
+    >>> ax, Z = f_446(np.array([1, 2, 3]), np.array([1, 2, 3]))
     >>> isinstance(ax, plt.Axes), isinstance(Z, np.ndarray)
     (True, True)
-    >>> ax, Z = f_399(np.array([0]), np.array([0]))  # Test with single point
+    >>> ax, Z = f_446(np.array([0]), np.array([0]))  # Test with single point
     >>> isinstance(ax, plt.Axes), isinstance(Z, np.ndarray)
     (True, True)
     """
@@ -67,24 +67,24 @@ class TestCases(unittest.TestCase):
     def test_input_types(self):
         """Test the function with non-numpy array inputs."""
         with self.assertRaises(TypeError):
-            f_399([1, 2, 3], np.array([1, 2, 3]))
+            f_446([1, 2, 3], np.array([1, 2, 3]))
     def test_empty_arrays(self):
         """Test function with empty numpy arrays."""
-        _, Z = f_399(np.array([]), np.array([]))
+        _, Z = f_446(np.array([]), np.array([]))
         self.assertEqual(Z.size, 0)
     def test_single_point(self):
         """Test the function with single-point arrays."""
-        ax, Z = f_399(np.array([0]), np.array([0]))
+        ax, Z = f_446(np.array([0]), np.array([0]))
         self.assertIsInstance(ax, plt.Axes)
         self.assertIsInstance(Z, np.ndarray)
     def test_phase_calculation(self):
         """Test phase calculation for known values."""
         x = np.array([1, -1])
         y = np.array([0, 0])
-        _, Z = f_399(x, y)
+        _, Z = f_446(x, y)
         expected_phases = np.array([cmath.phase((1 + 0j)**2 - 1), cmath.phase((-1 + 0j)**2 - 1)])
         np.testing.assert_array_almost_equal(Z[0], expected_phases)
     def test_mismatched_array_sizes(self):
         """Test function with arrays of different lengths."""
         with self.assertRaises(ValueError):
-            f_399(np.array([0]), np.array([0, 1]))
+            f_446(np.array([0]), np.array([0, 1]))

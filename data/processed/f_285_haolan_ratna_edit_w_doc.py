@@ -2,7 +2,7 @@ import random
 import math
 import matplotlib.pyplot as plt
 
-def f_315(points_count=1000, radius=1):
+def f_346(points_count=1000, radius=1):
     """
     Generate a specified (i.e., points_counts) number of random points within a circle of a given radius and plot them using a scatter plot.
 
@@ -25,7 +25,7 @@ def f_315(points_count=1000, radius=1):
     Example:
     >>> import matplotlib.pyplot as plt
     >>> random.seed(0)
-    >>> ax = f_315(500, 0.5)
+    >>> ax = f_346(500, 0.5)
     >>> len(ax.collections[0].get_offsets())
     500
     >>> plt.close()
@@ -46,33 +46,33 @@ import random
 class TestCases(unittest.TestCase):
     def test_default_parameters(self):
         random.seed(0)
-        ax = f_315()
+        ax = f_346()
         self.assertEqual(len(ax.collections[0].get_offsets()), 1000, "Default parameter points count mismatch")
         self.assertEqual(ax.get_aspect(), 1.0, "Aspect ratio mismatch in default parameters test")
         plt.close()
     def test_custom_parameters(self):
         random.seed(0)
-        ax = f_315(500, 0.5)
+        ax = f_346(500, 0.5)
         self.assertEqual(len(ax.collections[0].get_offsets()), 500, "Custom parameter points count mismatch")
         self.assertEqual(ax.get_aspect(), 1.0, "Aspect ratio mismatch in custom parameters test")
         plt.close()
     def test_radius_accuracy(self):
         random.seed(0)
         radius = 2
-        ax = f_315(100, radius)
+        ax = f_346(100, radius)
         points = ax.collections[0].get_offsets()
         for point in points[:1]:
             self.assertTrue(math.sqrt(point[0]**2 + point[1]**2) <= radius, "Point outside specified radius")
         plt.close()
     def test_plot_title(self):
         random.seed(0)
-        ax = f_315()
+        ax = f_346()
         ax.set_title("Test Plot")
         self.assertEqual(ax.get_title(), "Test Plot", "Plot title mismatch")
         plt.close()
     def test_axes_labels(self):
         random.seed(0)
-        ax = f_315()
+        ax = f_346()
         ax.set_xlabel("X Axis")
         ax.set_ylabel("Y Axis")
         self.assertEqual(ax.get_xlabel(), "X Axis", "X-axis label mismatch")

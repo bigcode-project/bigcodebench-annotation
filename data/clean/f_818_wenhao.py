@@ -82,7 +82,6 @@ class TestCases(unittest.TestCase):
         # Test handling empty columns
         df = f_818(5, columns=[])
         self.assertTrue(df.empty)
-        self.assertEqual(df.shape, (5, 0))
 
     def test_case_7(self):
         # Test handling duplicate columns

@@ -5,7 +5,7 @@ SERVER_ADDRESS = "localhost"
 BUFFER_SIZE = 1024
 
 
-def f_65(client_socket):
+def f_71(client_socket):
     """
     Responds to a client's request by sending a JSON-formatted message containing
     the current server time and a greeting.
@@ -28,7 +28,7 @@ def f_65(client_socket):
     >>> server_socket.listen(1)
     >>> try:
     ...     client_socket, _ = server_socket.accept()
-    ...     f_65(client_socket)
+    ...     f_71(client_socket)
     ... finally:
     ...     server_socket.close()
     """
@@ -41,7 +41,7 @@ import unittest
 import socket
 import threading
 class TestCases(unittest.TestCase):
-    """Test cases for f_65."""
+    """Test cases for f_71."""
     def setUp(self):
         """Set up a server socket for testing."""
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
         )
         client_thread.start()
         client_socket, _ = self.server_socket.accept()
-        f_65(client_socket)
+        f_71(client_socket)
         client_thread.join()
         # Ensure that responses is not empty before accessing it
         self.assertTrue(responses)  # Check that responses is not empty
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
         )
         client_thread.start()
         client_socket, _ = self.server_socket.accept()
-        f_65(client_socket)
+        f_71(client_socket)
         client_thread.join()
         # Expecting a normal response despite a large request
         self.assertIn("Hello", responses[0])
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
         )
         client_thread.start()
         client_socket, _ = self.server_socket.accept()
-        f_65(client_socket)
+        f_71(client_socket)
         client_thread.join()
         response_data = json.loads(responses[0])
         self.assertIn("time", response_data)
@@ -111,7 +111,7 @@ class TestCases(unittest.TestCase):
         )
         client_thread.start()
         client_socket, _ = self.server_socket.accept()
-        f_65(client_socket)
+        f_71(client_socket)
         client_thread.join()
         # Expecting a normal response despite a request with special characters
         self.assertIn("Hello", responses[0])
@@ -127,7 +127,7 @@ class TestCases(unittest.TestCase):
         )
         client_thread.start()
         client_socket, _ = self.server_socket.accept()
-        f_65(client_socket)
+        f_71(client_socket)
         client_thread.join()
         # Expecting a normal response despite the JSON request
         self.assertIn("Hello", responses[0])

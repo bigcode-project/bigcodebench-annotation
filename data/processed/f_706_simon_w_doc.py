@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
-from collections import Counter
 
-
-def f_706(fruit_data):
+def f_331(fruit_data):
     """
     Calculate and return the total and average counts for each type of fruit.
 
@@ -23,11 +21,10 @@ def f_706(fruit_data):
     Requirements:
     - pandas
     - numpy
-    - collections.Counter
 
     Example:
     >>> fruit_list = [('apple', 5), ('banana', 3), ('apple', 6), ('banana', 4), ('cherry', 5), ('banana', 2), ('apple', 4), ('cherry', 5)]
-    >>> report = f_706(fruit_list)
+    >>> report = f_331(fruit_list)
     >>> report.sort_index(inplace=True)
     >>> print(report)
             Total Count  Average Count
@@ -36,7 +33,7 @@ def f_706(fruit_data):
     cherry           10            5.0
 
     >>> fruit = [('apple', 1), ('orange', 25), ('apple', 111)]
-    >>> df = f_706(fruit)
+    >>> df = f_331(fruit)
     >>> df.sort_index(inplace=True)
     >>> print(df)
             Total Count  Average Count
@@ -67,7 +64,6 @@ def f_706(fruit_data):
 import unittest
 import pandas as pd
 import numpy as np
-from collections import Counter
 class TestCases(unittest.TestCase):
     test_data_sets = [
         [('vote', 19), ('those', 15), ('recent', 4), ('manage', 12), ('again', 13), ('box', 16), ('box', 16), ('box', 16)],
@@ -76,11 +72,11 @@ class TestCases(unittest.TestCase):
         [('involve', 2), ('money', 11), ('use', 15), ('fish', 19), ('boy', 3), ('both', 10)], [('take', 16), ('activity', 12), ('tend', 10), ('take', 2)]
     ]
     def test_empty(self):
-        report = f_706([])
+        report = f_331([])
         self.assertTrue(report.empty)
     def test_case_1(self):
         # Using the first set of test data
-        report = f_706(self.test_data_sets[0])
+        report = f_331(self.test_data_sets[0])
         expected = pd.DataFrame(
             {
             'Total Count': {'vote': 19,
@@ -105,7 +101,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(report, expected, check_dtype=False)
     def test_case_2(self):
         # Using the second set of test data
-        report = f_706(self.test_data_sets[1])
+        report = f_331(self.test_data_sets[1])
         expected = pd.DataFrame(
             {'Total Count': {'experience': 14.0,
                 'interesting': 8.0,
@@ -130,7 +126,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(report, expected, check_dtype=False)
     def test_case_3(self):
         # Using the third set of test data
-        report = f_706(self.test_data_sets[2])
+        report = f_331(self.test_data_sets[2])
         expected = pd.DataFrame(
             {'Total Count': {'our': 11.0,
             'then': 2.0,
@@ -160,7 +156,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(report, expected, check_dtype=False)
     def test_case_4(self):
         # Using the fourth set of test data
-        report = f_706(self.test_data_sets[3])
+        report = f_331(self.test_data_sets[3])
         expected = pd.DataFrame(
             {'Total Count': {'involve': 2.0,
             'money': 11.0,
@@ -182,7 +178,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(report, expected, check_dtype=False)
     def test_case_5(self):
         # Using the fifth set of test data
-        report = f_706(self.test_data_sets[4])
+        report = f_331(self.test_data_sets[4])
         expected = pd.DataFrame(
             {'Total Count': {'take': 18.0, 'activity': 12.0, 'tend': 10.0},
             'Average Count': {'take': 9.0, 'activity': 12.0, 'tend': 10.0}}

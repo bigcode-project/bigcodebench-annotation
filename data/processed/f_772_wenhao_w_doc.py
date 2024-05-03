@@ -1,7 +1,8 @@
 import random
 import string
 
-def f_486(word):
+POSSIBLE_LETTERS = ['a', 'b', 'c']
+def f_546(word):
     """
     Generates a list of random pairs of adjacent letters from the given word. The number of such pairs will be equal to the length of the constant POSSIBLE_LETTERS.
     
@@ -17,51 +18,51 @@ def f_486(word):
     
     Examples:
     >>> random.seed(0)
-    >>> f_486('abcdef')
+    >>> f_546('abcdef')
     ['de', 'de', 'ab']
-    >>> f_486('xyz')
+    >>> f_546('xyz')
     ['yz', 'yz', 'yz']
     """
     if not all(char in string.ascii_letters for char in word):
         raise ValueError("Input must only contain letters.")
     
     if len(word) < 2:
-        return ['' for _ in range(len(['a', 'b', 'c']))]
+        return ['' for _ in range(len(POSSIBLE_LETTERS))]
     
     pairs = [''.join(x) for x in zip(word, word[1:])]
-    random_pairs = [random.choice(pairs) for _ in range(len(['a', 'b', 'c']))]
+    random_pairs = [random.choice(pairs) for _ in range(len(POSSIBLE_LETTERS))]
 
     return random_pairs
 
 import unittest
 import random
 # Assu the function is correctly imported from its script
-# from f_486 import f_486  
+# from f_546 import f_546  
 class TestCases(unittest.TestCase):
     def test_with_valid_input(self):
         random.seed(0)
-        result = f_486('abcdef')
+        result = f_546('abcdef')
         self.assertEqual(len(result), 3, "Output list should have length 3")
         valid_pairs = ['ab', 'bc', 'cd', 'de', 'ef']
         for pair in result:
             self.assertIn(pair, valid_pairs, f"Pair '{pair}' is not a valid adjacent pair in 'abcdef'")
     def test_single_character(self):
         random.seed(42)
-        result = f_486('a')
+        result = f_546('a')
         expected = ['', '', '']
         self.assertEqual(result, expected, "Should return list of empty strings for a single character")
     def test_empty_string(self):
         random.seed(55)
-        result = f_486('')
+        result = f_546('')
         expected = ['', '', '']
         self.assertEqual(result, expected, "Should return list of empty strings for an empty string")
     def test_non_letter_input(self):
         random.seed(0)
         with self.assertRaises(ValueError):
-            f_486('123')
+            f_546('123')
     def test_long_input(self):
         random.seed(5)
-        result = f_486('abcdefghijklmnopqrstuvwxyz')
+        result = f_546('abcdefghijklmnopqrstuvwxyz')
         all_pairs = [''.join(x) for x in zip('abcdefghijklmnopqrstuvwxyz', 'abcdefghijklmnopqrstuvwxyz'[1:])]
         for pair in result:
             self.assertIn(pair, all_pairs, f"Pair '{pair}' is not a valid adjacent pair in the alphabet")

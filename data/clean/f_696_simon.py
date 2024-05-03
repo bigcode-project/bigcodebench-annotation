@@ -1,4 +1,3 @@
-import os
 import csv
 import random
 from faker import Faker
@@ -29,7 +28,6 @@ def f_696(file_path, num_rows, random_seed=None):
     ValueError: If num_rows is not an integer >= 0.
 
     Requirements:
-    - os
     - csv
     - random
     - faker

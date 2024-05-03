@@ -2,7 +2,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 
-def f_237(arr):
+def f_256(arr):
     """
     Calculate the sum of each row in a 2D numpy array and plot these sums as a time series.
 
@@ -34,7 +34,7 @@ def f_237(arr):
     
     Example:
     >>> arr = np.array([[i + j for i in range(3)] for j in range(5)])
-    >>> ax = f_237(arr)
+    >>> ax = f_256(arr)
     >>> ax.get_title()
     'Time Series of Row Sums'
     """
@@ -53,11 +53,11 @@ import unittest
 import numpy as np
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for the function f_237."""
+    """Test cases for the function f_256."""
     def test_basic_functionality(self):
         """Test the basic functionality of the function."""
         arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        ax = f_237(arr)
+        ax = f_256(arr)
         # Check if the function returns Axes object
         self.assertIsInstance(ax, plt.Axes)
         # Check the title of the plot
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
     def test_empty_array(self):
         """Test the function with an empty array."""
         arr = np.array([])
-        ax = f_237(arr)
+        ax = f_256(arr)
         # Check if the function returns Axes object
         self.assertIsInstance(ax, plt.Axes)
         # Check the title of the plot
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
     def test_single_row_array(self):
         """Test the function with a single row array."""
         arr = np.array([[1, 2, 3]])
-        ax = f_237(arr)
+        ax = f_256(arr)
         # Check if the function returns Axes object
         self.assertIsInstance(ax, plt.Axes)
         # Check the title of the plot
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
     def test_negative_values(self):
         """Test the function with negative values."""
         arr = np.array([[-1, -2, -3], [-4, -5, -6]])
-        ax = f_237(arr)
+        ax = f_256(arr)
         # Check if the function returns Axes object
         self.assertIsInstance(ax, plt.Axes)
         # Check the title of the plot
@@ -104,7 +104,7 @@ class TestCases(unittest.TestCase):
     def test_zero_values(self):
         """Test the function with zero values."""
         arr = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
-        ax = f_237(arr)
+        ax = f_256(arr)
         # Check if the function returns Axes object
         self.assertIsInstance(ax, plt.Axes)
         # Check the title of the plot

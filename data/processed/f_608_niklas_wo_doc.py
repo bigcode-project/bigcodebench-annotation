@@ -3,7 +3,7 @@ import csv
 import os
 import base64
 
-def f_116(raw_string, filename, output_dir):
+def f_125(raw_string, filename, output_dir):
     """
     Processes a base64-encoded JSON string, stores the data in a CSV file, and returns the path of the file.
 
@@ -22,7 +22,7 @@ def f_116(raw_string, filename, output_dir):
     - base64
 
     Example:
-    >>> f_116('eyJrZXkiOiAiVmFsdWUifQ==', 'data', './output')
+    >>> f_125('eyJrZXkiOiAiVmFsdWUifQ==', 'data', './output')
     './output/data.csv'
     """
     # Decode the string and load the data
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
         filename = 'data'
         output_dir = './output'
         expected = './output/data.csv'
-        self.assertEqual(f_116(raw_string, filename, output_dir), expected)
+        self.assertEqual(f_125(raw_string, filename, output_dir), expected)
         with open(expected, 'r') as f:
             self.assertEqual(f.read(), 'key,Value\n')
         os.remove(expected)
@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
         filename = 'data'
         output_dir = './output'
         expected = './output/data.csv'
-        self.assertEqual(f_116(raw_string, filename, output_dir), expected)
+        self.assertEqual(f_125(raw_string, filename, output_dir), expected)
         with open(expected, 'r') as f:
             self.assertEqual(f.read(), 'key,hello\n')
         os.remove(expected)
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
         filename = 'data'
         output_dir = './output'
         expected = './output/data.csv'
-        self.assertEqual(f_116(raw_string, filename, output_dir), expected)
+        self.assertEqual(f_125(raw_string, filename, output_dir), expected)
         with open(expected, 'r') as f:
             self.assertEqual(f.read(), 'key,hello\nkey2,world\n')
         os.remove(expected)
@@ -86,7 +86,7 @@ class TestCases(unittest.TestCase):
         filename = 'data'
         output_dir = './output'
         expected = './output/data.csv'
-        self.assertEqual(f_116(raw_string, filename, output_dir), expected)
+        self.assertEqual(f_125(raw_string, filename, output_dir), expected)
         with open(expected, 'r') as f:
             self.assertEqual(f.read(), 'key,hello\nkey2,world\nkey3,!\n')
         os.remove(expected)
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
         filename = 'data'
         output_dir = './output'
         expected = './output/data.csv'
-        self.assertEqual(f_116(raw_string, filename, output_dir), expected)
+        self.assertEqual(f_125(raw_string, filename, output_dir), expected)
         with open(expected, 'r') as f:
             self.assertEqual(f.read(), 'key,hello\nkey2,world\nkey3,!\nkey4,test\n')
         os.remove(expected)

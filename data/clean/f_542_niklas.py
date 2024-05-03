@@ -4,7 +4,7 @@ import json
 
 def f_542(file_path, key):
     """
-    Load a JSON file into a Pandas DataFrame, remove a specific key from each object and write the processed DataFrame back into a JSON file.
+    Load a JSON file into a Pandas DataFrame, remove a specific key from each object and write the processed DataFrame back into a JSON file oriented by records.
     
     Parameters:
     - file_path (str): The path to the JSON file.

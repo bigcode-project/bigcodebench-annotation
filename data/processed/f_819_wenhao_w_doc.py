@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 
-def f_464(records: np.ndarray, random_seed: int = 0) -> pd.DataFrame:
+def f_520(records: np.ndarray, random_seed: int = 0) -> pd.DataFrame:
     """
     Randomly shuffle the given array's features, normalize its values, then convert to a DataFrame
     with shuffled feature names.
@@ -30,13 +30,13 @@ def f_464(records: np.ndarray, random_seed: int = 0) -> pd.DataFrame:
 
     Examples:
     >>> data = np.array([[1, 2, 3], [4, 5, 6]])
-    >>> df = f_464(data, random_seed=42)
+    >>> df = f_520(data, random_seed=42)
     >>> df.shape
     (2, 3)
     >>> df.columns
     Index(['f2', 'f3', 'f1'], dtype='object')
     >>> data = np.array([[-1, -2, -3, -4, -5], [0, 0, 0, 0, 0], [1, 2, 3, 4, 5]])
-    >>> df = f_464(data, random_seed=24)
+    >>> df = f_520(data, random_seed=24)
     >>> df
              f3        f1        f4        f5        f2
     0 -1.224745 -1.224745 -1.224745 -1.224745 -1.224745
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         self.expected_shape = (2, 5)
     def test_case_1(self):
         # Test basic shape and columns
-        df = f_464(self.data, random_seed=1)
+        df = f_520(self.data, random_seed=1)
         self.assertEqual(df.shape, self.expected_shape)
         self.assertTrue(set(df.columns) == set(["f1", "f2", "f3", "f4", "f5"]))
         # assert last row values
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_2(self):
         # Test normalization
-        df = f_464(self.data, random_seed=2)
+        df = f_520(self.data, random_seed=2)
         np.testing.assert_array_almost_equal(
             df.mean(axis=0), np.zeros(self.expected_shape[1]), decimal=5
         )
@@ -89,18 +89,18 @@ class TestCases(unittest.TestCase):
         
     def test_case_3(self):
         # Test random seed effect
-        df1 = f_464(self.data, random_seed=3)
-        df2 = f_464(self.data, random_seed=3)
+        df1 = f_520(self.data, random_seed=3)
+        df2 = f_520(self.data, random_seed=3)
         pd.testing.assert_frame_equal(df1, df2)
     def test_case_4(self):
         # Test handling invalid inputs
         with self.assertRaises(ValueError):
-            f_464(np.array([1, 2, 3]), random_seed=4)
+            f_520(np.array([1, 2, 3]), random_seed=4)
         with self.assertRaises(ValueError):
-            f_464(np.array([[1, 2, 3], [4, 5]], dtype=object), random_seed=4)
+            f_520(np.array([[1, 2, 3], [4, 5]], dtype=object), random_seed=4)
     def test_case_5(self):
         # Test handling zero variance
         data = np.array([[1, 1, 1, 1, 1], [1, 1, 1, 1, 1]])
-        df = f_464(data, random_seed=42)
+        df = f_520(data, random_seed=42)
         # In cases of zero variance, StandardScaler will set values to 0
         np.testing.assert_array_equal(df.values, np.zeros(data.shape))

@@ -1,7 +1,7 @@
 from itertools import combinations
 import math
 
-def f_379(x, w):
+def f_423(x, w):
     """
     Find the continuous substring of x, which has the maximum total weight, given a dictionary where the keys are characters and the values are their weights.
 
@@ -17,9 +17,9 @@ def f_379(x, w):
     - math
 
     Example:
-    >>> f_379('c', {'a': 1, 'b': 2, 'c': 3})
+    >>> f_423('c', {'a': 1, 'b': 2, 'c': 3})
     'c'
-    >>> f_379('abc', {'a': 10, 'b': -5, 'c': 3})
+    >>> f_423('abc', {'a': 10, 'b': -5, 'c': 3})
     'a'
     """
     max_weight = -math.inf
@@ -37,14 +37,14 @@ def f_379(x, w):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        self.assertEqual(f_379('c', {'a': 1, 'b': 2, 'c': 3}), 'c')
+        self.assertEqual(f_423('c', {'a': 1, 'b': 2, 'c': 3}), 'c')
     
     def test_case_2(self):
-        self.assertEqual(f_379('aabc', {'a': 10, 'b': -5, 'c': 3}), 'aa')
+        self.assertEqual(f_423('aabc', {'a': 10, 'b': -5, 'c': 3}), 'aa')
     def test_case_3(self):
-        self.assertEqual(f_379('aabc', {'a': 10, 'b': -2, 'c': 3}), 'aabc')
+        self.assertEqual(f_423('aabc', {'a': 10, 'b': -2, 'c': 3}), 'aabc')
     def test_case_4(self):
-        self.assertEqual(f_379('aabc', {'a': 2, 'b': -5, 'c': 3}), 'aa')
+        self.assertEqual(f_423('aabc', {'a': 2, 'b': -5, 'c': 3}), 'aa')
     
     def test_case_5(self):
-        self.assertEqual(f_379('aabc', {'a': 0, 'b': -1, 'c': 1}), 'c')
+        self.assertEqual(f_423('aabc', {'a': 0, 'b': -1, 'c': 1}), 'c')

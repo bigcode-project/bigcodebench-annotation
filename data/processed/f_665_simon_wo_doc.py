@@ -2,7 +2,7 @@ import pandas as pd
 import random
 import csv
 
-def f_665(n, 
+def f_68(n, 
            categories=['Sports', 'Technology', 'Business', 'Politics', 'Entertainment'],
            news_sites=['New York Times', 'USA Today', 'Apple News', 'CNN', 'BBC'],
            likert_scale=['Strongly Disagree', 'Disagree', 'Neither Agree nor Disagree', 'Agree', 'Strongly Agree'],
@@ -31,7 +31,7 @@ def f_665(n,
     - csv
     
     Example:
-    >>> df = f_665(5, random_seed=1)
+    >>> df = f_68(5, random_seed=1)
     >>> print(df)
                  Site       Category           Response  Value
     0       USA Today  Entertainment  Strongly Disagree      1
@@ -40,7 +40,7 @@ def f_665(n,
     3       USA Today         Sports              Agree      4
     4  New York Times       Politics              Agree      4
     
-    >>> df = f_665(8, ['test', 'fun'], likert_scale=['true', 'false'], news_sites=['cat', 'dog'], random_seed=12)
+    >>> df = f_68(8, ['test', 'fun'], likert_scale=['true', 'false'], news_sites=['cat', 'dog'], random_seed=12)
     >>> print(df)
       Site Category  Response  Value
     0  dog      fun     False      2
@@ -83,9 +83,9 @@ class TestCases(unittest.TestCase):
         
     def test_rng(self):
         'test rng reproducability'
-        df1 = f_665(300, file_path=os.path.join(self.temp_dir, "test1.csv"), random_seed=42)
+        df1 = f_68(300, file_path=os.path.join(self.temp_dir, "test1.csv"), random_seed=42)
         df1_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test1.csv"))
-        df2 = f_665(300, file_path=os.path.join(self.temp_dir, "test2.csv"), random_seed=42)
+        df2 = f_68(300, file_path=os.path.join(self.temp_dir, "test2.csv"), random_seed=42)
         df2_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test2.csv"))
         self.assertTrue(pd.testing.assert_frame_equal(df1, df2) is None)
         self.assertTrue(pd.testing.assert_frame_equal(df1_from_csv, df1) is None)
@@ -93,7 +93,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test with default values for categories, news_sites, and likert_scale
         n = 100
-        df = f_665(n, file_path=os.path.join(self.temp_dir, "test1.csv"), random_seed=1)
+        df = f_68(n, file_path=os.path.join(self.temp_dir, "test1.csv"), random_seed=1)
         df_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test1.csv"))
         self.assertTrue(pd.testing.assert_frame_equal(df_from_csv, df) is None)
         self.assertEqual(len(df), n)
@@ -105,7 +105,7 @@ class TestCases(unittest.TestCase):
         # Test with custom values for categories and default values for others
         n = 500
         categories = ['Science', 'Math']
-        df = f_665(n, categories=categories, file_path=os.path.join(self.temp_dir, "test2.csv"), random_seed=12)
+        df = f_68(n, categories=categories, file_path=os.path.join(self.temp_dir, "test2.csv"), random_seed=12)
         df_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test2.csv"))
         self.assertTrue(pd.testing.assert_frame_equal(df_from_csv, df) is None)
         self.assertEqual(len(df), n)
@@ -114,7 +114,7 @@ class TestCases(unittest.TestCase):
         # Test with custom values for news_sites and default values for others
         n = 775
         news_sites = ['ABC', 'NBC']
-        df = f_665(n, news_sites=news_sites, file_path=os.path.join(self.temp_dir, "test3.csv"), random_seed=11)
+        df = f_68(n, news_sites=news_sites, file_path=os.path.join(self.temp_dir, "test3.csv"), random_seed=11)
         df_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test3.csv"))
         self.assertTrue(pd.testing.assert_frame_equal(df_from_csv, df) is None)
         self.assertEqual(len(df), n)
@@ -123,7 +123,7 @@ class TestCases(unittest.TestCase):
         # Test with custom values for likert_scale and default values for others
         n = 20
         likert_scale = ['Yes', 'No']
-        df = f_665(n, likert_scale=likert_scale, file_path=os.path.join(self.temp_dir, "test4.csv"), random_seed=18)
+        df = f_68(n, likert_scale=likert_scale, file_path=os.path.join(self.temp_dir, "test4.csv"), random_seed=18)
         df_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test4.csv"))
         self.assertTrue(pd.testing.assert_frame_equal(df_from_csv, df) is None)
         self.assertEqual(len(df), n)
@@ -132,7 +132,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test for empty df
         n = 0
-        df = f_665(n, file_path=os.path.join(self.temp_dir, "test5.csv"))
+        df = f_68(n, file_path=os.path.join(self.temp_dir, "test5.csv"))
         self.assertEqual(len(df), n)
     def tearDown(self):
         # Cleanup temporary directory after tests

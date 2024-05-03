@@ -3,7 +3,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from python_http_client.exceptions import HTTPError
 
-def f_246(dir, api_key, recipient_email):
+def f_267(dir, api_key, recipient_email):
     """
     Get a list of files in a directory and send that list by e-mail to a specific recipient using a provided SendGrid API key.
 
@@ -27,9 +27,9 @@ def f_246(dir, api_key, recipient_email):
     - python_http_client.exceptions.HTTPError
 
     Example:
-    >>> isinstance(f_246('./test_directory', 'YOUR_SENDGRID_API_KEY', 'YOUR_EMAIL'), bool)
+    >>> isinstance(f_267('./test_directory', 'YOUR_SENDGRID_API_KEY', 'YOUR_EMAIL'), bool)
     True
-    >>> f_246('/nonexistent_directory', 'YOUR_SENDGRID_API_KEY', 'YOUR_EMAIL')  # This will return False, as the directory does not exist.
+    >>> f_267('/nonexistent_directory', 'YOUR_SENDGRID_API_KEY', 'YOUR_EMAIL')  # This will return False, as the directory does not exist.
     False
     """
     try:
@@ -71,13 +71,13 @@ class TestCases(unittest.TestCase):
         mock_send.return_value = MagicMock(status_code=202)
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
-        result = f_246('./valid_directory', api_key, recipient_email)
+        result = f_267('./valid_directory', api_key, recipient_email)
         self.assertTrue(result)
     def test_invalid_directory(self):
         """Test the handling of an invalid directory."""
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
-        result = f_246('/nonexistent_directory', api_key, recipient_email)
+        result = f_267('/nonexistent_directory', api_key, recipient_email)
         self.assertFalse(result)
     @patch('os.listdir')
     @patch('sendgrid.SendGridAPIClient.send')
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
         with self.assertRaises(HTTPError):
-            f_246('./valid_directory', api_key, recipient_email)
+            f_267('./valid_directory', api_key, recipient_email)
     @patch('sendgrid.SendGridAPIClient.send')
     @patch('os.listdir')
     def test_empty_directory(self, mock_listdir, mock_send):
@@ -98,7 +98,7 @@ class TestCases(unittest.TestCase):
         mock_send.return_value = MagicMock(status_code=202)
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
-        result = f_246('./empty_directory', api_key, recipient_email)
+        result = f_267('./empty_directory', api_key, recipient_email)
         self.assertTrue(result)
     @patch('sendgrid.SendGridAPIClient.send')
     @patch('os.listdir')
@@ -109,4 +109,4 @@ class TestCases(unittest.TestCase):
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
         with self.assertRaises(Exception):
-            f_246('./valid_directory', api_key, recipient_email)
+            f_267('./valid_directory', api_key, recipient_email)

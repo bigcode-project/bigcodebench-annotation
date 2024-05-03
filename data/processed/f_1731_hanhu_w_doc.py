@@ -2,7 +2,7 @@ import random
 import string
 from collections import Counter
 
-def f_371(num_strings, string_length):
+def f_415(num_strings, string_length):
     """
     Creates a list of random strings, each of a specified length, and counts the frequency
     of each character across all strings. The function then returns the characters
@@ -23,9 +23,9 @@ def f_371(num_strings, string_length):
                        sorted by count in descending order.
 
     Examples:
-    >>> type(f_371(1000, 5)) == list
+    >>> type(f_415(1000, 5)) == list
     True
-    >>> all(isinstance(pair, tuple) and len(pair) == 2 for pair in f_371(1000, 5))
+    >>> all(isinstance(pair, tuple) and len(pair) == 2 for pair in f_415(1000, 5))
     True
     """
     strings = [''.join(random.choices(string.ascii_lowercase, k=string_length)) for _ in range(num_strings)]
@@ -43,34 +43,34 @@ class TestCases(unittest.TestCase):
         random.seed(0)  # Set a seed for reproducibility in all tests
     def test_return_type(self):
         """ Test that the function returns a list. """
-        result = f_371(100, 5)
+        result = f_415(100, 5)
         self.assertIsInstance(result, list)
     def test_list_length(self):
         """ Test that the length of the list is not greater than the number of unique characters. """
-        result = f_371(100, 5)
+        result = f_415(100, 5)
         self.assertLessEqual(len(result), 26)  # 26 letters in the ASCII lowercase alphabet
     def test_tuple_structure(self):
         """ Test that each element in the list is a tuple with two elements. """
-        result = f_371(100, 5)
+        result = f_415(100, 5)
         for item in result:
             self.assertIsInstance(item, tuple)
             self.assertEqual(len(item), 2)
     def test_deterministic_output(self):
         """ Test the function with a predefined seed for reproducibility. """
-        result = f_371(100, 5)
+        result = f_415(100, 5)
         self.assertTrue(all(isinstance(pair, tuple) and len(pair) == 2 for pair in result))
         self.assertGreater(len(result), 0)  # Ensure the result is not empty
     def test_specific_character_count(self):
         """ Test if a specific character count is as expected based on the seed. """
-        result = f_371(100, 5)
+        result = f_415(100, 5)
         specific_char = 'a'  # Example character to check
         specific_count = next((count for char, count in result if char == specific_char), 0)
         self.assertGreater(specific_count, 0)  # Check if the count for the specific character is greater than 0
     def test_zero_strings(self):
         """ Test the function returns an empty list when no strings are generated. """
-        result = f_371(0, 5)
+        result = f_415(0, 5)
         self.assertEqual(result, [])
     def test_zero_length(self):
         """ Test the function with string_length of zero returns empty strings but counts them. """
-        result = f_371(100, 0)
+        result = f_415(100, 0)
         self.assertEqual(result, [])

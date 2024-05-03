@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import random
 
 
-def f_519(epoch_milliseconds, seed=0):
+def f_582(epoch_milliseconds, seed=0):
     """
     Generate user activity logs from a given epoch time to the current time.
 
@@ -37,7 +37,7 @@ def f_519(epoch_milliseconds, seed=0):
     - random
 
     Example:
-    >>> log = f_519(1615168051807)
+    >>> log = f_582(1615168051807)
     >>> type(log)
     <class 'pandas.core.frame.DataFrame'>
     >>> log.iloc[0]
@@ -75,7 +75,7 @@ class TestCases(unittest.TestCase):
         epoch_milliseconds = int(
             (datetime.now() - timedelta(days=1)).timestamp() * 1000
         )
-        log = f_519(epoch_milliseconds)
+        log = f_582(epoch_milliseconds)
         self.assertTrue(isinstance(log, pd.DataFrame))
         self.assertTrue("User" in log.columns)
         self.assertTrue("Activity" in log.columns)
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
         epoch_milliseconds = int(
             (datetime.now() - timedelta(minutes=1)).timestamp() * 1000
         )
-        log = f_519(epoch_milliseconds)
+        log = f_582(epoch_milliseconds)
         self.assertTrue(len(log) > 0)  # Should have at least one entry
         self.assertTrue(
             log["Time"].min() >= datetime.fromtimestamp(epoch_milliseconds / 1000.0)
@@ -98,7 +98,7 @@ class TestCases(unittest.TestCase):
             (datetime.now() - timedelta(days=1)).timestamp() * 1000
         )
         seed = 42
-        log = f_519(epoch_milliseconds, seed=seed)
+        log = f_582(epoch_milliseconds, seed=seed)
         first_row = log.iloc[0]
         expected_user = "user1"
         expected_activity = "login"
@@ -109,7 +109,7 @@ class TestCases(unittest.TestCase):
         epoch_milliseconds = int(
             (datetime.now() - timedelta(days=30)).timestamp() * 1000
         )
-        log = f_519(epoch_milliseconds)
+        log = f_582(epoch_milliseconds)
         # Ensure that log timestamps are properly incrementing
         time_diffs = log["Time"].diff().dropna()
         self.assertTrue(all(time_diffs > timedelta(seconds=0)))
@@ -134,4 +134,4 @@ class TestCases(unittest.TestCase):
             (datetime.now() + timedelta(days=1)).timestamp() * 1000
         )
         with self.assertRaises(Exception):
-            f_519(epoch_milliseconds)
+            f_582(epoch_milliseconds)

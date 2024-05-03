@@ -25,7 +25,7 @@ def f_844(csv_file_path: str):
     Example:
     >>> ax = f_844('data.csv')
     >>> ax.get_title()
-    'Plot Title :  Normalized Column 1'
+    "          Plot Title :  Normalized Column 1"
     """
     df = pd.read_csv(csv_file_path)
     mean = df["column1"].mean()

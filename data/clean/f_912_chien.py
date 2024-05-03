@@ -6,7 +6,7 @@ import pandas as pd
 def f_912(db_path, query, warn_large_dataset=True):
     """
     Fetches data from an SQLite database using the provided database path and SQL query.
-    This function can optionally issue a warning when the dataset fetched contains more than 10,000 rows.
+    This function will issue a warning of "The data contains more than 10000 rows." when this condition is met.
 
     Parameters:
     - db_path (str): The file path to the SQLite database from which data needs to be fetched.
@@ -24,7 +24,7 @@ def f_912(db_path, query, warn_large_dataset=True):
 
     Raises:
     - Exception: If any error occurs during database connection, SQL query execution, or data 
-      fetching. The error message provides details about the issue.
+      fetching. The error message provides details about the issue, starting with "Error fetching data from the database: ".
 
     Example:
     >>> data = f_912('/path/to/sqlite.db', 'SELECT * FROM table_name')

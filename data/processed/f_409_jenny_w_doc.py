@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def f_404(data_list):
+def f_451(data_list):
     """
     Visualizes the scores of students over multiple tests using a line plot.
 
@@ -24,7 +24,7 @@ def f_404(data_list):
 
     Example:
     >>> data = [{'John': 5, 'Jane': 10}, {'John': 6, 'Jane': 8}, {'John': 5, 'Jane': 9}]
-    >>> ax = f_404(data)
+    >>> ax = f_451(data)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_xticklabels()
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
         data = [{"John": 5, "Jane": 10}, {"Jane": 8, "Joe": 7}, {"John": 6}]
         self.validate_plot(data)
     def validate_plot(self, data):
-        ax = f_404(data)
+        ax = f_451(data)
         self.assertIsInstance(ax, plt.Axes)
         df = pd.DataFrame(data)
         for idx, column in enumerate(df):

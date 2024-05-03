@@ -5,7 +5,7 @@ from gensim.models import Word2Vec
 ALPHANUMERIC = re.compile('[\W_]+')
 
 
-def f_661(texts, stopwords=None):
+def f_736(texts, stopwords=None):
     """
     Generate word vectors from a list of texts using the gensim Word2Vec model.
     The texts are first cleaned by removing all non-alphanumeric characters except space,
@@ -25,7 +25,7 @@ def f_661(texts, stopwords=None):
 
     Example:
     >>> texts = ["Hello, World!", "Machine Learning is great", "Python is my favorite program language"]
-    >>> model = f_661(texts)
+    >>> model = f_736(texts)
     >>> vector = model.wv['python']
     """
     if stopwords is None:
@@ -48,30 +48,30 @@ class TestCases(unittest.TestCase):
     
     def test_case_1(self):
         texts = ["Hello, World!", "Machine Learning is great", "Python is my favorite program language"]
-        model = f_661(texts, stopwords=stopwords_mock)
+        model = f_736(texts, stopwords=stopwords_mock)
         self.assertIsInstance(model, Word2Vec)
         self.assertIn('python', model.wv.key_to_index)
         
     def test_case_2(self):
         texts = ["Hello!!!", "@Machine Learning", "Python###"]
-        model = f_661(texts, stopwords=stopwords_mock)
+        model = f_736(texts, stopwords=stopwords_mock)
         self.assertIsInstance(model, Word2Vec)
         self.assertIn('python', model.wv.key_to_index)
         
     def test_case_3(self):
         texts = []
-        model = f_661(texts, stopwords=stopwords_mock)
+        model = f_736(texts, stopwords=stopwords_mock)
         self.assertIsInstance(model, Word2Vec)
         
     def test_case_4(self):
         texts = ["This is a long sentence with many words, and it should still work!", 
                  "Another long sentence to check the function's capability."]
-        model = f_661(texts, stopwords=stopwords_mock)
+        model = f_736(texts, stopwords=stopwords_mock)
         self.assertIsInstance(model, Word2Vec)
         self.assertIn('long', model.wv.key_to_index)
         
     def test_case_5(self):
         texts = ["Bonjour", "Hola", "Ciao"]
-        model = f_661(texts, stopwords=stopwords_mock)
+        model = f_736(texts, stopwords=stopwords_mock)
         self.assertIsInstance(model, Word2Vec)
         self.assertIn('bonjour', model.wv.key_to_index)

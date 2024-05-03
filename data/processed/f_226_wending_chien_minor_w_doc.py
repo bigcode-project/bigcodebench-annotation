@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 BAR_COLOR = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
 
 
-def f_168(data_size):
+def f_181(data_size):
     """
     Generates random numeric data and creates a histogram of the data.
     The color of the histogram bars is randomly selected from a predefined list.
@@ -23,7 +23,7 @@ def f_168(data_size):
     - matplotlib
 
     Example:
-    >>> data, color = f_168(5)
+    >>> data, color = f_181(5)
     >>> print(data.shape)
     (5,)
     >>> print(color in ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black'])
@@ -39,22 +39,22 @@ import unittest
 import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        data, color = f_168(100)
+        data, color = f_181(100)
         self.assertEqual(len(data), 100)
         self.assertTrue(color in ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black'])
     def test_case_2(self):
-        data, color = f_168(50)
+        data, color = f_181(50)
         self.assertEqual(len(data), 50)
         self.assertTrue(color in ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black'])
     def test_case_3(self):
-        data, color = f_168(150)
+        data, color = f_181(150)
         self.assertEqual(len(data), 150)
         self.assertTrue(color in ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black'])
     def test_case_4(self):
-        data, color = f_168(200)
+        data, color = f_181(200)
         self.assertEqual(len(data), 200)
         self.assertTrue(color in ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black'])
     def test_case_5(self):
-        data, color = f_168(250)
+        data, color = f_181(250)
         self.assertEqual(len(data), 250)
         self.assertTrue(color in ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black'])

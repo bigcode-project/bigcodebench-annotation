@@ -4,7 +4,7 @@ from random import randint
 import matplotlib.pyplot as plt
 
 
-def f_527(duration):
+def f_590(duration):
     """
     Generate and draw random data in real time for the specified duration.
 
@@ -23,7 +23,7 @@ def f_527(duration):
     - matplotlib.pyplot
 
     Example:
-    >>> type(f_527(1))
+    >>> type(f_590(1))
     <class 'tuple'>
     """
     # Constants
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
         """
         Test that the lengths of timestamp and data lists match.
         """
-        x_data, y_data = f_527(1)
+        x_data, y_data = f_590(1)
         self.assertEqual(len(x_data), len(y_data))
     @patch('matplotlib.pyplot.pause', return_value=None)
     def test_function_runs_without_error(self, mock_pause):
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
         Test that the function runs without error.
         """
         try:
-            f_527(1)
+            f_590(1)
             function_ran_successfully = True
         except Exception as e:
             function_ran_successfully = False
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         """
         Test that the random values are within the specified range.
         """
-        _, y_data = f_527(1)
+        _, y_data = f_590(1)
         self.assertTrue(all(0 <= y <= 100 for y in y_data))
     @patch('matplotlib.pyplot.pause', return_value=None)
     @patch(__name__ + '.randint', return_value=50)
@@ -85,13 +85,13 @@ class TestCases(unittest.TestCase):
         """
         Test that generated values are consistent with the mocked random function.
         """
-        _, y_data = f_527(1)
+        _, y_data = f_590(1)
         self.assertTrue(all(y == 50 for y in y_data))
     @patch('matplotlib.pyplot.pause', return_value=None)
     def test_timestamps_format(self, mock_pause):
         """
         Test that timestamps are in the expected format.
         """
-        x_data, _ = f_527(1)
+        x_data, _ = f_590(1)
         for timestamp in x_data:
             datetime.strptime(timestamp, '%H:%M:%S.%f')

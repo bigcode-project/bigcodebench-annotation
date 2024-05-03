@@ -45,7 +45,7 @@ def run_tests():
     suite = unittest.TestSuite()
 
     # Add tests to the test suite
-    suite.addTest(unittest.makeSuite(FinalTestCases))
+    suite.addTest(unittest.makeSuite(TestCases))
 
     # Test runner
     runner = unittest.TextTestRunner()
@@ -53,7 +53,7 @@ def run_tests():
     # Run the tests
     runner.run(suite)
 
-class FinalTestCases(unittest.TestCase):
+class TestCases(unittest.TestCase):
     
     def test_valid_pattern_matching(self):
         test_length = 100

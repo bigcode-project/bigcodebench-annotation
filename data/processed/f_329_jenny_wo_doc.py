@@ -2,7 +2,7 @@ import pandas as pd
 import json
 
 
-def f_264(data: dict, output_path: str = "./default_data_output.json") -> str:
+def f_287(data: dict, output_path: str = "./default_data_output.json") -> str:
     """Converts the given DataFrame to a dictionary, dropping the column named 'c'
     if it exists, and then saves it as a JSON file.
 
@@ -18,9 +18,9 @@ def f_264(data: dict, output_path: str = "./default_data_output.json") -> str:
     - json
 
     Example:
-    >>> f_264({'a': [1,2], 'b': [3,4], 'c': [5,6]})
+    >>> f_287({'a': [1,2], 'b': [3,4], 'c': [5,6]})
     './default_data_output.json'
-    >>> f_264({'a': [1,2], 'b': [3,4], 'c': [5,6]}, 'custom/path/results.json')
+    >>> f_287({'a': [1,2], 'b': [3,4], 'c': [5,6]}, 'custom/path/results.json')
     'custom/path/results.json'
     """
     df = pd.DataFrame(data)
@@ -64,7 +64,7 @@ class TestCases(unittest.TestCase):
         # Test basic DataFrame with column "c"
         data = {"a": [1, 2], "b": [3, 4], "c": [5, 6]}
         df = pd.DataFrame(data)
-        output_path = f_264(data)
+        output_path = f_287(data)
         self.assertTrue(os.path.exists(output_path))
         expected_data = self.convert_keys_to_str(
             df.drop(columns="c").to_dict(orient="dict")
@@ -75,7 +75,7 @@ class TestCases(unittest.TestCase):
         data = {"name": ["Alice", "Bob"], "country": ["USA", "Canada"], "c": ["x", "y"]}
         df = pd.DataFrame(data)
         custom_path = "./custom_data_output_2.json"
-        output_path = f_264(data, custom_path)
+        output_path = f_287(data, custom_path)
         self.assertTrue(os.path.exists(output_path))
         expected_data = self.convert_keys_to_str(
             df.drop(columns="c").to_dict(orient="dict")
@@ -86,7 +86,7 @@ class TestCases(unittest.TestCase):
         data = {"age": [25, 30], "height": [170, 175]}
         df = pd.DataFrame(data)
         custom_path = "./custom_data_output_3.json"
-        output_path = f_264(data, custom_path)
+        output_path = f_287(data, custom_path)
         self.assertTrue(os.path.exists(output_path))
         expected_data = self.convert_keys_to_str(df.to_dict(orient="dict"))
         self.assertEqual(self.read_json_file(output_path), expected_data)
@@ -99,7 +99,7 @@ class TestCases(unittest.TestCase):
                 "c": [0.5, 0.8],
             }
         df = pd.DataFrame(data)
-        output_path = f_264(data)
+        output_path = f_287(data)
         self.assertTrue(os.path.exists(output_path))
         expected_data = self.convert_keys_to_str(
             df.drop(columns="c").to_dict(orient="dict")
@@ -110,7 +110,7 @@ class TestCases(unittest.TestCase):
         data = {}
         df = pd.DataFrame(data)
         custom_path = "./custom_data_output_5.json"
-        output_path = f_264(data, custom_path)
+        output_path = f_287(data, custom_path)
         self.assertTrue(os.path.exists(output_path))
         expected_data = self.convert_keys_to_str(df.to_dict(orient="dict"))
         self.assertEqual(self.read_json_file(output_path), expected_data)

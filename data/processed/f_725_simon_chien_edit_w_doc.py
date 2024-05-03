@@ -2,7 +2,7 @@ import pandas as pd
 from statsmodels.tsa.stattools import adfuller
 
 
-def f_610(df: pd.DataFrame, column_a: str, column_b: str, column_c: str) -> bool:
+def f_679(df: pd.DataFrame, column_a: str, column_b: str, column_c: str) -> bool:
     """
     Determines if a specific subset of data is stationary by filtering rows where column_b bigger than 50 and column_c equal to 900. 
     Data is considered to be stationary if the p_value returned by the Augmented Dickey-Fuller test is smaller than 0.05.
@@ -29,7 +29,7 @@ def f_610(df: pd.DataFrame, column_a: str, column_b: str, column_c: str) -> bool
     ...      'B': [60, 70, 80, 90, 100, 110],
     ...      'C': [900, 900, 900, 900, 900, 900]
     ... })
-    >>> f_610(df, 'A', 'B', 'C')
+    >>> f_679(df, 'A', 'B', 'C')
     False
     """
     # Filter rows based on column_b and column_c
@@ -61,20 +61,20 @@ class TestCases(unittest.TestCase):
     def test_constant_value(self):
         # All values in column A are constant after filtering
         self.data['A'] = 5
-        result = f_610(self.data, 'A', 'B', 'C')
+        result = f_679(self.data, 'A', 'B', 'C')
         self.assertTrue(result, "Should be True as data is constant.")
     def test_empty_after_filter(self):
         # After filtering, no rows remain
-        result = f_610(self.data[self.data['B'] > 1000], 'A', 'B', 'C')
+        result = f_679(self.data[self.data['B'] > 1000], 'A', 'B', 'C')
         self.assertTrue(result, "Should be True as no data remains after filter.")
     def test_non_stationary_data(self):
         # Test a clearly non-stationary dataset
-        result = f_610(self.data, 'A', 'B', 'C')
+        result = f_679(self.data, 'A', 'B', 'C')
         self.assertFalse(result, "Should be False as data is non-stationary.")
     def test_stationary_data(self):
         # Test a stationary dataset
         self.data['A'] = 5
-        result = f_610(self.data, 'A', 'B', 'C')
+        result = f_679(self.data, 'A', 'B', 'C')
         self.assertTrue(result, "Should be True as data is stationary.")
     def test_edge_case_small_dataset(self):
         # Test a very small dataset
@@ -83,5 +83,5 @@ class TestCases(unittest.TestCase):
             'B': [60, 70],
             'C': [900, 900]
         })
-        result = f_610(small_data, 'A', 'B', 'C')
+        result = f_679(small_data, 'A', 'B', 'C')
         self.assertTrue(result, "Should be True due to small dataset size or no variation.")

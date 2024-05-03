@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def f_602(df: pd.DataFrame) -> tuple:
+def f_671(df: pd.DataFrame) -> tuple:
     """
     Visualize the distribution of stock closing prices using both a box plot and a histogram
     within a single figure. This function is designed to help understand the spread, central tendency,
@@ -28,7 +28,7 @@ def f_602(df: pd.DataFrame) -> tuple:
     >>> df = pd.DataFrame({
     ...     'closing_price': [100, 101, 102, 103, 104, 150]
     ... })
-    >>> boxplot_ax, histplot_ax = f_602(df)
+    >>> boxplot_ax, histplot_ax = f_671(df)
     >>> print(boxplot_ax.get_title())
     Box Plot of Closing Prices
     >>> print(histplot_ax.get_title())
@@ -51,14 +51,14 @@ import unittest
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-# Assu the function f_602 is defined in the same script, otherwise import it appropriately.
+# Assu the function f_671 is defined in the same script, otherwise import it appropriately.
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
         df = pd.DataFrame({
             'closing_price': [100, 101, 102, 103, 104, 150]
         })
-        boxplot_ax, histplot_ax = f_602(df)
+        boxplot_ax, histplot_ax = f_671(df)
         
         self.assertIsInstance(boxplot_ax, plt.Axes)
         self.assertIsInstance(histplot_ax, plt.Axes)
@@ -71,7 +71,7 @@ class TestCases(unittest.TestCase):
             
     def test_empty_df(self):
         df = pd.DataFrame({'closing_price': []})
-        boxplot_ax, histplot_ax = f_602(df)
+        boxplot_ax, histplot_ax = f_671(df)
         
         self.assertIsInstance(boxplot_ax, plt.Axes)
         self.assertIsInstance(histplot_ax, plt.Axes)
@@ -81,10 +81,10 @@ class TestCases(unittest.TestCase):
     def test_invalid_column(self):
         df = pd.DataFrame({'price': [100, 101, 102]})
         with self.assertRaises(KeyError):
-            f_602(df)
+            f_671(df)
     def test_single_value_df(self):
         df = pd.DataFrame({'closing_price': [100]})
-        boxplot_ax, histplot_ax = f_602(df)
+        boxplot_ax, histplot_ax = f_671(df)
         
         self.assertIsInstance(boxplot_ax, plt.Axes)
         self.assertIsInstance(histplot_ax, plt.Axes)
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(histplot_ax.has_data(), "Histogram should handle a single value dataframe.")
     def test_large_values_df(self):
         df = pd.DataFrame({'closing_price': [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]})
-        boxplot_ax, histplot_ax = f_602(df)
+        boxplot_ax, histplot_ax = f_671(df)
         
         self.assertIsInstance(boxplot_ax, plt.Axes)
         self.assertIsInstance(histplot_ax, plt.Axes)

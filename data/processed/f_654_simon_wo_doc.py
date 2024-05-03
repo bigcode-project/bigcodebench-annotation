@@ -3,7 +3,7 @@ import os
 import zipfile
 
 
-def f_654(directory_name="latin_files",
+def f_437(directory_name="latin_files",
           content='Sopetón',
           file_names=['file1.txt', 'file2.txt', 'file3.txt'],
           encoding="latin-1"):
@@ -29,11 +29,11 @@ def f_654(directory_name="latin_files",
     - zipfile
 
     Example:
-    >>> zipped_file = f_654("latin_files", "test", ["file1.txt", "file2.txt", "file3.txt"])
+    >>> zipped_file = f_437("latin_files", "test", ["file1.txt", "file2.txt", "file3.txt"])
     >>> print(zipped_file)
     latin_files.zip
 
-    >>> zipped_file = f_654(directory_name="directorio", content='hi', file_names=["custom1.txt", "custom2.txt"], encoding='utf-8')
+    >>> zipped_file = f_437(directory_name="directorio", content='hi', file_names=["custom1.txt", "custom2.txt"], encoding='utf-8')
     >>> print(zipped_file)
     directorio.zip
     '''
@@ -59,7 +59,7 @@ from zipfile import ZipFile
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test default parameters
-        zipped_file = f_654()
+        zipped_file = f_437()
         self.assertEqual(zipped_file, "latin_files.zip")
         self.assertTrue(os.path.exists(zipped_file))
         
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         shutil.rmtree("latin_files")
     def test_case_2(self):
         # Test with custom directory and file names
-        zipped_file = f_654(directory_name="custom_directory", content='test', file_names=["custom1.txt", "custom2.txt"], encoding='utf-8')
+        zipped_file = f_437(directory_name="custom_directory", content='test', file_names=["custom1.txt", "custom2.txt"], encoding='utf-8')
         self.assertEqual(zipped_file, "custom_directory.zip")
         self.assertTrue(os.path.exists(zipped_file))
         
@@ -95,7 +95,7 @@ class TestCases(unittest.TestCase):
         shutil.rmtree("custom_directory")
     def test_case_3(self):
         # Test with custom encoding
-        zipped_file = f_654(encoding="utf-8")
+        zipped_file = f_437(encoding="utf-8")
         self.assertEqual(zipped_file, "latin_files.zip")
         self.assertTrue(os.path.exists(zipped_file))
         
@@ -110,7 +110,7 @@ class TestCases(unittest.TestCase):
         shutil.rmtree("latin_files")
     def test_case_4(self):
         # Test with all custom parameters
-        zipped_file = f_654(directory_name="all_custom", file_names=["all1.txt", "all2.txt"], encoding="utf-8")
+        zipped_file = f_437(directory_name="all_custom", file_names=["all1.txt", "all2.txt"], encoding="utf-8")
         self.assertEqual(zipped_file, "all_custom.zip")
         self.assertTrue(os.path.exists(zipped_file))
         
@@ -125,7 +125,7 @@ class TestCases(unittest.TestCase):
         shutil.rmtree("all_custom")
     def test_case_5(self):
         # Test with a single file and default encoding
-        zipped_file = f_654(directory_name="single_file_dir", file_names=["single.txt"])
+        zipped_file = f_437(directory_name="single_file_dir", file_names=["single.txt"])
         self.assertEqual(zipped_file, "single_file_dir.zip")
         self.assertTrue(os.path.exists(zipped_file))
         

@@ -1,5 +1,4 @@
 import heapq
-import pandas as pd
 from scipy import stats
 
 def f_667(df, col1, col2, N=10):
@@ -21,7 +20,6 @@ def f_667(df, col1, col2, N=10):
     ValueError: If N is <= 1.
 
     Requirements:
-    - pandas
     - scipy.stats
     - heapq
 

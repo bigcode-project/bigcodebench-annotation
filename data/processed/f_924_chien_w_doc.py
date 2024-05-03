@@ -7,7 +7,7 @@ DATA = {
 }
 
 
-def f_179(area_string, data=DATA):
+def f_193(area_string, data=DATA):
     """
     Predicts the price based on a given area after training a linear regression model.
 
@@ -25,7 +25,7 @@ def f_179(area_string, data=DATA):
     - sklearn.linear_model
 
     Example:
-    >>> f_179('6,000')
+    >>> f_193('6,000')
     600.0
     """
     # Convert area strings to float and prepare data for the model
@@ -47,25 +47,25 @@ def f_179(area_string, data=DATA):
 
 import unittest
 class TestCases(unittest.TestCase):
-    """Test cases for f_179"""
+    """Test cases for f_193"""
     def test_correctness(self):
         """Test correctness."""
-        self.assertAlmostEqual(f_179("6,000"), 600, delta=10)
-        self.assertAlmostEqual(f_179("7,000"), 700, delta=10)
+        self.assertAlmostEqual(f_193("6,000"), 600, delta=10)
+        self.assertAlmostEqual(f_193("7,000"), 700, delta=10)
     def test_input_formats(self):
         """Test input formats."""
-        self.assertAlmostEqual(f_179("6,500"), 650, delta=10)
-        self.assertAlmostEqual(f_179("6500"), 650, delta=10)
+        self.assertAlmostEqual(f_193("6,500"), 650, delta=10)
+        self.assertAlmostEqual(f_193("6500"), 650, delta=10)
     def test_custom_data(self):
         """Test custom data."""
         custom_data = {
             "Area_String": ["10", "20", "30", "40", "50"],
             "Price": [1, 2, 3, 4, 5],
         }
-        self.assertAlmostEqual(f_179("60", data=custom_data), 6, delta=0.1)
+        self.assertAlmostEqual(f_193("60", data=custom_data), 6, delta=0.1)
     def test_existing_area(self):
         """Test existing area."""
-        self.assertAlmostEqual(f_179("5,000"), 500, delta=5)
+        self.assertAlmostEqual(f_193("5,000"), 500, delta=5)
     def test_large_area(self):
         """Test large area."""
-        self.assertAlmostEqual(f_179("100,000"), 10000, delta=100)
+        self.assertAlmostEqual(f_193("100,000"), 10000, delta=100)

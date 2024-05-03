@@ -1,8 +1,7 @@
 import heapq
-import pandas as pd
 from scipy import stats
 
-def f_667(df, col1, col2, N=10):
+def f_4(df, col1, col2, N=10):
     """
     Find the N largest absolute differences between the corresponding elements
     of two specified columns in a DataFrame, perform a t-Test on the elements
@@ -21,7 +20,6 @@ def f_667(df, col1, col2, N=10):
     ValueError: If N is <= 1.
 
     Requirements:
-    - pandas
     - scipy.stats
     - heapq
 
@@ -30,7 +28,7 @@ def f_667(df, col1, col2, N=10):
     ...     'col1': [99, 86, 90, 70, 86, 95, 56, 98, 80, 81],
     ...     'col2': [21, 11, 21, 1, 26, 40, 4, 50, 34, 37]
     ... })
-    >>> p_value = f_667(df, 'col1', 'col2', N=5)
+    >>> p_value = f_4(df, 'col1', 'col2', N=5)
     >>> print(p_value)    
     4.676251508205865e-06
 
@@ -38,7 +36,7 @@ def f_667(df, col1, col2, N=10):
     ...    'col1': [1, 3, 4, 70],
     ...    'col2': [2, 3, 5, 1]
     ...     })
-    >>> p_value = f_667(df, 'col1', 'col2', N=5)
+    >>> p_value = f_4(df, 'col1', 'col2', N=5)
     >>> print(p_value)
     0.3590111759771484
 
@@ -73,9 +71,9 @@ class TestCases(unittest.TestCase):
             'col2': [10, 20, 3000, 40, 50]  # Only one large difference
         }
         df = pd.DataFrame(data)
-        p_value = f_667(df, 'col1', 'col2', N=4)
+        p_value = f_4(df, 'col1', 'col2', N=4)
         self.assertGreater(p_value, 0.1)  # Expecting a high p-value as only one value differs significantly
-        self.assertRaises(Exception, f_667, df, 'col1', 'col2', N=1)
+        self.assertRaises(Exception, f_4, df, 'col1', 'col2', N=1)
     def test_wrong_columns(self):
         # test with wrong columns
         data = {
@@ -83,9 +81,9 @@ class TestCases(unittest.TestCase):
             'col2': [2, 3, 4, 5, 6]
         }
         df = pd.DataFrame(data)
-        self.assertRaises(Exception, f_667, df, 'a', 'col2')
-        self.assertRaises(Exception, f_667, df, 'col1', 'a')
-        self.assertRaises(Exception, f_667, df, 'a', 'b')
+        self.assertRaises(Exception, f_4, df, 'a', 'col2')
+        self.assertRaises(Exception, f_4, df, 'col1', 'a')
+        self.assertRaises(Exception, f_4, df, 'a', 'b')
         
             
     def test_case_1(self):
@@ -95,7 +93,7 @@ class TestCases(unittest.TestCase):
             'col2': [2, 3, 4, 5, 6]
         }
         df = pd.DataFrame(data)
-        p_value = f_667(df, 'col1', 'col2')
+        p_value = f_4(df, 'col1', 'col2')
         self.assertGreater(p_value, 0.05)  # Expecting a high p-value due to small differences
     def test_case_2(self):
         # Test case with larger numerical differences in columns
@@ -104,7 +102,7 @@ class TestCases(unittest.TestCase):
             'col2': [10, 20, 30, 40, 50]
         }
         df = pd.DataFrame(data)
-        p_value = f_667(df, 'col1', 'col2')
+        p_value = f_4(df, 'col1', 'col2')
         self.assertLess(p_value, 0.05)  # Expecting a low p-value due to large differences
     def test_case_3(self):
         # Test case with random data from Faker
@@ -114,7 +112,7 @@ class TestCases(unittest.TestCase):
             'col2': [fake.random_int(min=0, max=1000) for _ in range(10)]
         }
         df = pd.DataFrame(data)
-        p_value = f_667(df, 'col1', 'col2')
+        p_value = f_4(df, 'col1', 'col2')
         # No specific assertion for random data, just checking if function executes without errors
     def test_case_4(self):
         # Test case with identical columns (expecting a high p-value)
@@ -123,7 +121,7 @@ class TestCases(unittest.TestCase):
             'col2': [10, 20, 30, 40, 50]
         }
         df = pd.DataFrame(data)
-        p_value = f_667(df, 'col1', 'col2')
+        p_value = f_4(df, 'col1', 'col2')
         self.assertAlmostEqual(p_value, 1., places=2)  # Expecting a high p-value as columns are identical
     def test_case_5(self):
         # Test case with only one differing value in columns
@@ -132,5 +130,5 @@ class TestCases(unittest.TestCase):
             'col2': [10, 20, 3000, 40, 50]  # Only one large difference
         }
         df = pd.DataFrame(data)
-        p_value = f_667(df, 'col1', 'col2')
+        p_value = f_4(df, 'col1', 'col2')
         self.assertGreater(p_value, 0.1)  # Expecting a high p-value as only one value differs significantly

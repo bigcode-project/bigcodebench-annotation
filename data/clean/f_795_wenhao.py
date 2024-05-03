@@ -15,7 +15,7 @@ def f_795(
 
     Parameters:
     - task_list (list of str): List of tasks to be assigned.
-    - n_tasks (int): Number of tasks to be assigned. This number should not be negative.
+    - n_tasks (int): Number of tasks to be assigned. This number should not be negative, but can be larger than the number of tasks in the task_list.
     - employees (list of str, optional): List of employee names to whom tasks can be assigned.
                                          If not provided, defaults to: ['John Doe', 'Jane Smith',
                                          'James Brown', 'Mary Johnson', 'Robert Davis'].

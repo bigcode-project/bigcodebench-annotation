@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import csv
 
 
-def f_598(xml_content, output_csv_path):
+def f_667(xml_content, output_csv_path):
     """
     Parses XML content from a string and converts it into a CSV format.
 
@@ -31,7 +31,7 @@ def f_598(xml_content, output_csv_path):
     - csv
 
     Example:
-    >>> f_598('<root><element>data</element></root>', 'path/to/output.csv')
+    >>> f_667('<root><element>data</element></root>', 'path/to/output.csv')
     >>> with open('path/to/output.csv', 'r') as f:
     ...     print(f.read())
     element,data
@@ -60,8 +60,8 @@ import shutil
 from pathlib import Path
 import os
 class TestCases(unittest.TestCase):
-    """Test cases for f_598."""
-    test_data_dir = "mnt/data/f_598_data_"
+    """Test cases for f_667."""
+    test_data_dir = "mnt/data/f_667_data_"
     def setUp(self):
         """Set up method to create a directory for test files."""
         self.test_dir = Path(self.test_data_dir)
@@ -81,25 +81,25 @@ class TestCases(unittest.TestCase):
         """Test with simple XML content."""
         xml_content = "<root><element>data</element></root>"
         csv_output = self.test_dir / "output_scenario_0.csv"
-        f_598(xml_content, csv_output)
+        f_667(xml_content, csv_output)
         self.check_csv_content(xml_content, csv_output)
     def test_nested_xml(self):
         """Test with nested XML content."""
         xml_content = "<root><parent><child>data</child></parent></root>"
         csv_output = self.test_dir / "output_scenario_1.csv"
-        f_598(xml_content, csv_output)
+        f_667(xml_content, csv_output)
         self.check_csv_content(xml_content, csv_output)
     def test_empty_xml(self):
         """Test with an empty XML."""
         xml_content = "<root></root>"
         csv_output = self.test_dir / "output_scenario_2.csv"
-        f_598(xml_content, csv_output)
+        f_667(xml_content, csv_output)
         self.check_csv_content(xml_content, csv_output)
     def test_xml_with_attributes(self):
         """Test with an XML that contains elements with attributes."""
         xml_content = '<root><element attr="value">data</element></root>'
         csv_output = self.test_dir / "output_scenario_3.csv"
-        f_598(xml_content, csv_output)
+        f_667(xml_content, csv_output)
         self.check_csv_content(xml_content, csv_output)
     def test_large_xml(self):
         """Test with a larger XML file."""
@@ -109,20 +109,20 @@ class TestCases(unittest.TestCase):
             + "</root>"
         )
         csv_output = self.test_dir / "output_scenario_4.csv"
-        f_598(xml_content, csv_output)
+        f_667(xml_content, csv_output)
         self.check_csv_content(xml_content, csv_output)
     def test_invalid_xml_content(self):
         """Test with invalid XML content to trigger ET.ParseError."""
         xml_content = "<root><element>data</element"  # Malformed XML
         csv_output = self.test_dir / "output_invalid_xml.csv"
         with self.assertRaises(ET.ParseError):
-            f_598(xml_content, csv_output)
+            f_667(xml_content, csv_output)
     def test_unwritable_csv_path(self):
         """Test with an unwritable CSV path to trigger IOError."""
         xml_content = "<root><element>data</element></root>"
         csv_output = self.test_dir / "non_existent_directory" / "output.csv"
         with self.assertRaises(IOError):
-            f_598(xml_content, csv_output)
+            f_667(xml_content, csv_output)
     def tearDown(self):
         # Cleanup the test directories
         dirs_to_remove = ["mnt/data", "mnt"]

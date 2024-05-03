@@ -1,8 +1,7 @@
 import re
-import numpy as np
 import pandas as pd
 
-def f_672(df: pd.DataFrame) -> int:
+def f_739(df: pd.DataFrame) -> int:
     """
     Count the total number of brackets (i.e., '(', ')', '{', '}', '[', ']') in
     a pandas DataFrame.
@@ -18,7 +17,6 @@ def f_672(df: pd.DataFrame) -> int:
 
     Requirements:
     - re
-    - numpy
     - pandas
 
     Note:
@@ -26,11 +24,11 @@ def f_672(df: pd.DataFrame) -> int:
 
     Example:
     >>> df = pd.DataFrame({'A': ['(a)', 'b', 'c'], 'B': ['d', 'e', '(f)']})
-    >>> f_672(df)
+    >>> f_739(df)
     4
 
     >>> df = pd.DataFrame({'Test': ['(a)', 'b', '[[[[))c']})
-    >>> f_672(df)
+    >>> f_739(df)
     8
     """
 
@@ -51,17 +49,17 @@ fake = Faker()
 class TestCases(unittest.TestCase):
     def test_wrong_input(self):
         # test with non dataframe input
-        self.assertRaises(Exception, f_672, 1)
-        self.assertRaises(Exception, f_672, ['a'])
-        self.assertRaises(Exception, f_672, {'a': 1})
-        self.assertRaises(Exception, f_672, 'asdf')
+        self.assertRaises(Exception, f_739, 1)
+        self.assertRaises(Exception, f_739, ['a'])
+        self.assertRaises(Exception, f_739, {'a': 1})
+        self.assertRaises(Exception, f_739, 'asdf')
     def test_case_1(self):
         # Test with DataFrame containing no brackets
         df = pd.DataFrame({
             'A': [fake.word() for _ in range(5)],
             'B': [fake.word() for _ in range(5)]
         })
-        result = f_672(df)
+        result = f_739(df)
         self.assertEqual(result, 0)
     def test_case_2(self):
         # Test with DataFrame containing a few brackets
@@ -69,7 +67,7 @@ class TestCases(unittest.TestCase):
             'A': ['(a)', 'b', 'c', '{d}', 'e'],
             'B': ['f', '[g]', 'h', 'i', 'j']
         })
-        result = f_672(df)
+        result = f_739(df)
         self.assertEqual(result, 6)
     def test_case_3(self):
         # Test with DataFrame where every entry contains a bracket
@@ -77,7 +75,7 @@ class TestCases(unittest.TestCase):
             'A': ['(a)', '{b}', '[c]', '(d)', '[e]'],
             'B': ['{f}', '(g)', '[h]', '{i}', '(j)']
         })
-        result = f_672(df)
+        result = f_739(df)
         self.assertEqual(result, 20)
     def test_case_4(self):
         # Test with DataFrame containing mixed characters and brackets
@@ -85,7 +83,7 @@ class TestCases(unittest.TestCase):
             'A': ['(a1)', '{b2}', 'c3', 'd4', '[e5]'],
             'B': ['f6', 'g7', '[h8]', 'i9', 'j0']
         })
-        result = f_672(df)
+        result = f_739(df)
         self.assertEqual(result, 8)
     def test_case_5(self):
         # Test with DataFrame containing numbers, letters, and brackets
@@ -93,12 +91,12 @@ class TestCases(unittest.TestCase):
             'A': ['(123]', '{{456}', '789', '0ab', '[cde]'],
             'B': ['fgh', 'ijk', '[)lmn]', 'opq', 'rst']
         })
-        result = f_672(df)
+        result = f_739(df)
         self.assertEqual(result, 10)
     def test_empty(self):
         # test with empty df
         df = pd.DataFrame()
-        result = f_672(df)
+        result = f_739(df)
         self.assertEqual(result, 0)
     def test_only(self):
         # test df with only parenthesis as entries
@@ -106,5 +104,5 @@ class TestCases(unittest.TestCase):
             'test': ['[[()]', '{}{{{{{{))))}}', '[]'],
             'asdf': ['{]', '()))', '))}}]]']
         })
-        result = f_672(df)
+        result = f_739(df)
         self.assertEqual(result, 33)

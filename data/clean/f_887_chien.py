@@ -23,6 +23,7 @@ def f_887(data_list):
 
     Notes:
     - The function evaluates the distribution of predefined categories ('A', 'B', 'C', 'D', 'E') and checks for uniformity.
+      If the distribution is not uniform, a warning message of "The distribution of predefined categories is not uniform." is printed.
     - Categories in the data_list that are not among the predefined categories are identified and included in the histogram.
     - The ax.bar call in the function creates a bar plot on the axes object. It uses the following parameters:
         * all_categories: The categories to be displayed on the x-axis, including both predefined and extra categories.

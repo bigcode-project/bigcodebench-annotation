@@ -12,7 +12,9 @@ def f_904(df: pd.DataFrame, column_name: str) -> (str, plt.Axes):
     - column_name (str): The name of the column to be evaluated.
 
     Returns:
-    - str: A message indicating whether the distribution in the column is uniform or not.
+    - str: A message indicating whether the distribution in the column is uniform or not. The message is one of the following:
+        - "The distribution of values is uniform."
+        - "The distribution of values is not uniform."
     - plt.Axes: An Axes object displaying the histogram of the value distribution in the specified column.
 
     The function handles the following cases:

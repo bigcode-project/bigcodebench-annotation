@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def f_663(df, dct, columns=None, plot_histograms=False):
+def f_738(df, dct, columns=None, plot_histograms=False):
     '''
     Replace values in a DataFrame with a dictionary mapping and optionally record histograms for specified columns.
     
@@ -24,7 +24,7 @@ def f_663(df, dct, columns=None, plot_histograms=False):
     Example:
     >>> df = pd.DataFrame({'col1': [1, 2, 3, 4], 'col2': [5, 6, 7, 8], 'col3': [9, 10, 11, 12]})
     >>> dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j', 11: 'k', 12: 'l'}
-    >>> modified_df = f_663(df, dct)
+    >>> modified_df = f_738(df, dct)
     >>> modified_df
       col1 col2 col3
     0    a    e    i
@@ -56,36 +56,36 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
         dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
         expected_df = pd.DataFrame({'col1': ['a', 'b'], 'col2': ['c', 'd']})
-        result_df = f_663(df, dct)
+        result_df = f_738(df, dct)
         pd.testing.assert_frame_equal(result_df, expected_df)
         plt.close()
     def test_complex_dataframe(self):
         df = pd.DataFrame({'col1': [1, 2, 3, 4], 'col2': [5, 6, 7, 8], 'col3': [9, 10, 11, 12]})
         dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j', 11: 'k', 12: 'l'}
         expected_df = pd.DataFrame({'col1': ['a', 'b', 'c', 'd'], 'col2': ['e', 'f', 'g', 'h'], 'col3': ['i', 'j', 'k', 'l']})
-        result_df = f_663(df, dct)
+        result_df = f_738(df, dct)
         pd.testing.assert_frame_equal(result_df, expected_df)
         plt.close()
     def test_empty_dataframe(self):
         df = pd.DataFrame()
         dct = {1: 'a', 2: 'b'}
-        result_df = f_663(df, dct)
+        result_df = f_738(df, dct)
         pd.testing.assert_frame_equal(result_df, df)
         plt.close()
     def test_columns_not_in_dataframe(self):
         df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
         dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
-        result_df = f_663(df, dct, columns=['col3', 'col4'], plot_histograms=True)
+        result_df = f_738(df, dct, columns=['col3', 'col4'], plot_histograms=True)
         pd.testing.assert_frame_equal(result_df, df.replace(dct))
         plt.close()
     def test_histogram_plotting(self):
         df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
         dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
-        result_df = f_663(df, dct, columns=['col3', 'col4'], plot_histograms=True)
+        result_df = f_738(df, dct, columns=['col3', 'col4'], plot_histograms=True)
         # Since actual plot inspection is not feasible, assume histograms are correctly plotted if no errors are raised
         pd.testing.assert_frame_equal(result_df, df.replace(dct))
         plt.close()
     def test_case_non_df(self):
         with self.assertRaises(ValueError):
-            f_663("non_df", {})
+            f_738("non_df", {})
         plt.close()

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 
 
-def f_302(df, column, bins=30, density=True, alpha=0.6, color="g", seed=None):
+def f_332(df, column, bins=30, density=True, alpha=0.6, color="g", seed=None):
     """
     Plots a histogram for a specified column of a pandas DataFrame and overlays
     it with a fitted normal distribution curve.
@@ -31,7 +31,7 @@ def f_302(df, column, bins=30, density=True, alpha=0.6, color="g", seed=None):
     Example:
     >>> np.random.seed(0)
     >>> df = pd.DataFrame({'A': np.random.normal(0, 1, 1000)})
-    >>> ax = f_302(df, 'A')
+    >>> ax = f_332(df, 'A')
     >>> ax.get_title()
     "Normal Fit for 'A'"
     """
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         """Tests if the normal distribution parameters accurately represent the data's distribution."""
         mean, std_dev = 0, 1
         df = pd.DataFrame({"F": np.random.normal(mean, std_dev, 5000)})
-        ax = f_302(df, "F")
+        ax = f_332(df, "F")
         line = ax.lines[
             0
         ]  # Assu the normal distribution line is the first line object in the plot
@@ -86,8 +86,8 @@ class TestCases(unittest.TestCase):
     def test_bins_parameter(self):
         """Verifies that changing the number of bins affects the plot."""
         df = pd.DataFrame({"B": np.random.normal(0, 1, 100)})
-        ax_default_bins = f_302(df, "B")
-        ax_more_bins = f_302(df, "B", bins=50)
+        ax_default_bins = f_332(df, "B")
+        ax_more_bins = f_332(df, "B", bins=50)
         self.assertNotEqual(
             ax_default_bins.patches,
             ax_more_bins.patches,
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
     def test_alpha_parameter(self):
         """Checks if the alpha parameter correctly sets the transparency."""
         df = pd.DataFrame({"C": np.random.normal(0, 1, 100)})
-        ax = f_302(df, "C", alpha=0.1)
+        ax = f_332(df, "C", alpha=0.1)
         self.assertLess(
             ax.patches[0].get_alpha(),
             0.5,
@@ -105,7 +105,7 @@ class TestCases(unittest.TestCase):
     def test_density_parameter(self):
         """Ensures the density parameter properly normalizes the histogram."""
         df = pd.DataFrame({"D": np.random.normal(0, 1, 100)})
-        ax = f_302(df, "D", density=False)
+        ax = f_332(df, "D", density=False)
         total_bar_area = sum((p.get_width() * p.get_height() for p in ax.patches))
         self.assertNotEqual(
             total_bar_area,
@@ -115,7 +115,7 @@ class TestCases(unittest.TestCase):
     def test_color_parameter(self):
         """Validates that the histogram bars use the specified color."""
         df = pd.DataFrame({"E": np.random.normal(0, 1, 100)})
-        ax = f_302(
+        ax = f_332(
             df, "E", color="blue", alpha=0.6
         )  # Match alpha value with the function's default or specified value
         for patch in ax.patches:

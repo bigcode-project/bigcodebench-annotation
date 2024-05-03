@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def f_19(start_time, end_time):
+def f_21(start_time, end_time):
     """
     Plots the hourly difference between UTC and specified global time zones across a date range.
 
@@ -29,7 +29,7 @@ def f_19(start_time, end_time):
     - matplotlib.pyplot
 
     Example:
-    >>> ax = f_19('2021-01-01', '2021-01-10')
+    >>> ax = f_21('2021-01-01', '2021-01-10')
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_xticklabels()
@@ -70,29 +70,29 @@ import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic functionality
-        ax = f_19("2021-01-01", "2021-01-10")
+        ax = f_21("2021-01-01", "2021-01-10")
         self._common_assertions(ax)
     def test_case_2(self):
         # Test single day range
-        ax = f_19("2021-01-01", "2021-01-01")
+        ax = f_21("2021-01-01", "2021-01-01")
         self._common_assertions(ax)
     def test_case_3(self):
         # Test leap year
-        ax = f_19("2020-02-28", "2020-03-01")
+        ax = f_21("2020-02-28", "2020-03-01")
         self._common_assertions(ax)
     def test_case_4(self):
         # Test DST transition
-        ax = f_19("2021-03-27", "2021-03-29")
+        ax = f_21("2021-03-27", "2021-03-29")
         self._common_assertions(ax)
     def test_case_5(self):
         # Test plotting consistency
-        ax = f_19("2021-01-01", "2021-01-10")
+        ax = f_21("2021-01-01", "2021-01-10")
         colors = [line.get_color() for line in ax.get_lines()]
         self.assertEqual(len(set(colors)), len(colors))  # Check if colors are unique
     def test_case_6(self):
         # Testing input validation via invalid date format
         with self.assertRaises(ValueError):
-            f_19("01-01-2021", "10-01-2021")
+            f_21("01-01-2021", "10-01-2021")
     def _common_assertions(self, ax):
         """Common assertions for all test cases"""
         self.assertIsInstance(ax, plt.Axes)

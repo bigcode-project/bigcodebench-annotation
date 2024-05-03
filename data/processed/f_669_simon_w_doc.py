@@ -1,9 +1,7 @@
 import heapq
-import numpy as np
-import pandas as pd
 from sklearn.linear_model import LinearRegression
 
-def f_669(df, feature, target, n=10):
+def f_90(df, feature, target, n=10):
     """
     Fit a simple linear regression model to two columns of a DataFrame 
     specified by feature and target. 
@@ -24,8 +22,7 @@ def f_669(df, feature, target, n=10):
     ValueError: If specified columns are not in the provided DataFrame.
 
     Requirements:
-    - numpy
-    - pandas
+    - heapq
     - sklearn.linear_model
     
     Example:
@@ -33,7 +30,7 @@ def f_669(df, feature, target, n=10):
     ...     'col1': [99, 86, 90, 70, 86, 95, 56, 98, 80, 81],
     ...     'col2': [21, 11, 21, 1, 26, 40, 4, 50, 34, 37]
     ... })
-    >>> indices, model = f_669(df, 'col1', 'col2', n=5)
+    >>> indices, model = f_90(df, 'col1', 'col2', n=5)
     >>> print(indices)
     [0, 1, 9, 7, 8]
     >>> print(model)
@@ -43,7 +40,7 @@ def f_669(df, feature, target, n=10):
     ...     'a': [1, 2, 3, 4, 5],
     ...     'b': [1, 2, 3, 4, 5]
     ... })
-    >>> indices, model = f_669(df, 'a', 'b', n=3)
+    >>> indices, model = f_90(df, 'a', 'b', n=3)
     >>> print(indices)
     [0, 1, 2]
     >>> print(model)
@@ -80,16 +77,16 @@ class TestCases(unittest.TestCase):
             'col2': [2, 3, 4, 5, 6]
         }
         df = pd.DataFrame(data)
-        self.assertRaises(Exception, f_669, df, 'a', 'col2')
-        self.assertRaises(Exception, f_669, df, 'col1', 'a')
-        self.assertRaises(Exception, f_669, df, 'a', 'b')
+        self.assertRaises(Exception, f_90, df, 'a', 'col2')
+        self.assertRaises(Exception, f_90, df, 'col1', 'a')
+        self.assertRaises(Exception, f_90, df, 'a', 'b')
     # tests with random data
     def test_case_1(self):
-        indices, model = f_669(pd.DataFrame(self.sample_data), 'col1', 'col2')
+        indices, model = f_90(pd.DataFrame(self.sample_data), 'col1', 'col2')
         self.assertTrue(isinstance(model, LinearRegression))
         self.assertEqual(len(indices), 10)
     def test_case_2(self):
-        indices, model = f_669(pd.DataFrame(self.sample_data), 'col1', 'col2', n=5)
+        indices, model = f_90(pd.DataFrame(self.sample_data), 'col1', 'col2', n=5)
         self.assertTrue(isinstance(model, LinearRegression))
         self.assertEqual(len(indices), 5)
     def test_case_3(self):
@@ -98,7 +95,7 @@ class TestCases(unittest.TestCase):
             'col1': [fake.random_int(min=1, max=100) for _ in range(random_length)],
             'col2': [fake.random_int(min=1, max=100) for _ in range(random_length)]
         })
-        indices, model = f_669(df, 'col1', 'col2', n=3)
+        indices, model = f_90(df, 'col1', 'col2', n=3)
         self.assertTrue(isinstance(model, LinearRegression))
         self.assertEqual(len(indices), 3)
     def test_case_4(self):
@@ -106,7 +103,7 @@ class TestCases(unittest.TestCase):
             'col1': [fake.random_int(min=1, max=100) for _ in range(10)],
             'col2': [50 for _ in range(10)]
         })
-        indices, model = f_669(df, 'col1', 'col2')
+        indices, model = f_90(df, 'col1', 'col2')
         self.assertTrue(isinstance(model, LinearRegression))
         self.assertEqual(len(indices), 10)
     def test_case_5(self):
@@ -114,7 +111,7 @@ class TestCases(unittest.TestCase):
             'col1': list(range(10)),
             'col2': list(range(10))
         })
-        indices, model = f_669(df, 'col1', 'col2')
+        indices, model = f_90(df, 'col1', 'col2')
         self.assertTrue(isinstance(model, LinearRegression))
         self.assertEqual(len(indices), 10)
     # deterministic tests
@@ -123,7 +120,7 @@ class TestCases(unittest.TestCase):
             'col1': [10, 20, 30, 40, 50],
             'col2': [1, 2, 3, 4, 5]
         })
-        indices, model = f_669(df, 'col1', 'col2')
+        indices, model = f_90(df, 'col1', 'col2')
         self.assertTrue(isinstance(model, LinearRegression))
         # Given the linear relationship, the residuals should be close to zero.
         # Hence, any index could be in the top N residuals.
@@ -138,7 +135,7 @@ class TestCases(unittest.TestCase):
             'col1': [10, 20, 30, 40, 50],
             'col2': [10, 40, 90, 160, 250]
         })
-        indices, model = f_669(df, 'col1', 'col2')
+        indices, model = f_90(df, 'col1', 'col2')
         self.assertTrue(isinstance(model, LinearRegression))
         # Given the data, the residuals will vary. 
         # We're predicting the largest residuals based on known data.
@@ -155,7 +152,7 @@ class TestCases(unittest.TestCase):
             'col1': [1, 2, 3, 4, 5],
             'col2': [5, 4, 3, 2, 1]
         })
-        indices, model = f_669(df, 'col1', 'col2')
+        indices, model = f_90(df, 'col1', 'col2')
         self.assertTrue(isinstance(model, LinearRegression))
         # Given the inverse linear relationship, the residuals should be close to zero.
         # Hence, any index could be in the top N residuals.

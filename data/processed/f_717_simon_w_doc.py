@@ -1,8 +1,7 @@
-from itertools import zip_longest
 import pandas as pd
 import random
 
-def f_717(data, columns=['Name', 'Age', 'Occupation'], fill_missing=False, num_range=(0, 100), seed=None):
+def f_364(data, columns=['Name', 'Age', 'Occupation'], fill_missing=False, num_range=(0, 100), seed=None):
     """
     Create a Pandas DataFrame from a list of tuples, each representing a row.
     Tuples of unequal lengths are allowed, and missing elements are filled with None.
@@ -27,11 +26,10 @@ def f_717(data, columns=['Name', 'Age', 'Occupation'], fill_missing=False, num_r
     Requirements:
     - pandas
     - random
-    - itertools
 
     Example:
     >>> data = [('John', 25, 'Engineer'), ('Alice', ), ('Bob', )]
-    >>> df = f_717(data, fill_missing=True, num_range=(0, 10), seed=42)
+    >>> df = f_364(data, fill_missing=True, num_range=(0, 10), seed=42)
     >>> print(df)
         Name   Age Occupation
     0   John  25.0   Engineer
@@ -39,7 +37,7 @@ def f_717(data, columns=['Name', 'Age', 'Occupation'], fill_missing=False, num_r
     2    Bob   1.0       None
 
     >>> data = [('Mango', 20), ('Apple', ), ('Banana', )]
-    >>> df = f_717(data, columns=['Fruit', 'Quantity'], fill_missing=False, seed=42)
+    >>> df = f_364(data, columns=['Fruit', 'Quantity'], fill_missing=False, seed=42)
     >>> print(df)
         Fruit  Quantity
     0   Mango      20.0
@@ -64,37 +62,37 @@ class TestCases(unittest.TestCase):
     def test_basic_functionality(self):
         # Testing basic functionality with complete data for each column
         data = [('John', 25, 'Engineer'), ('Alice', 30, 'Doctor')]
-        df = f_717(data)
+        df = f_364(data)
         expected_df = pd.DataFrame(data, columns=['Name', 'Age', 'Occupation'])
         pd.testing.assert_frame_equal(df, expected_df)
     def test_uneven_tuples(self):
         # Handling tuples of uneven length, missing elements should be filled with None
         data = [('John', 25, 'Engineer'), ('Alice', 30, 'Doctor'), ('Bob', )]
-        df = f_717(data)
+        df = f_364(data)
         expected_df = pd.DataFrame([['John', 25, 'Engineer'], ['Alice', 30, 'Doctor'], ['Bob', None, None]], columns=['Name', 'Age', 'Occupation'])
         pd.testing.assert_frame_equal(df, expected_df)
     def test_custom_columns(self):
         # Specifying custom column names
         data = [('Mango', 20), ('Apple', 30)]
-        df = f_717(data, columns=['Fruit', 'Quantity'])
+        df = f_364(data, columns=['Fruit', 'Quantity'])
         expected_df = pd.DataFrame(data, columns=['Fruit', 'Quantity'])
         pd.testing.assert_frame_equal(df, expected_df)
     def test_empty_list(self):
         # Providing an empty list, resulting in an empty DataFrame with only the specified columns
         data = []
-        df = f_717(data)
+        df = f_364(data)
         expected_df = pd.DataFrame(columns=['Name', 'Age', 'Occupation'])
         pd.testing.assert_frame_equal(df, expected_df)
     def test_all_none(self):
         # All elements missing for a particular record
         data = [('John', 25, 'Engineer'), (None, None, None)]
-        df = f_717(data)
+        df = f_364(data)
         expected_df = pd.DataFrame([['John', 25, 'Engineer'], [None, None, None]], columns=['Name', 'Age', 'Occupation'])
         pd.testing.assert_frame_equal(df, expected_df)
     def test_random_fill(self):
         # Testing random data filling functionality
         data = [('John', 25, None), (None, None, None)]
-        df = f_717(data, fill_missing=True, num_range=(1, 100), seed=42)
+        df = f_364(data, fill_missing=True, num_range=(1, 100), seed=42)
         # Check if missing values are filled and if the filled values are within the specified range
         self.assertTrue(df.loc[0, 'Occupation'] is None)
         self.assertTrue(df.loc[1, 'Name'] is None)
@@ -102,6 +100,6 @@ class TestCases(unittest.TestCase):
     def test_seed_reproducibility(self):
         # Testing if the seed parameter provides reproducible results
         data = [('John', None, None)]
-        df1 = f_717(data, fill_missing=True, num_range=(1, 100), seed=42)
-        df2 = f_717(data, fill_missing=True, num_range=(1, 100), seed=42)
+        df1 = f_364(data, fill_missing=True, num_range=(1, 100), seed=42)
+        df2 = f_364(data, fill_missing=True, num_range=(1, 100), seed=42)
         pd.testing.assert_frame_equal(df1, df2)

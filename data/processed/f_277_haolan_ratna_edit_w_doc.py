@@ -2,7 +2,7 @@ import pandas as pd
 from scipy.stats import zscore
 import matplotlib.pyplot as plt
 
-def f_553(df):
+def f_619(df):
     """
     Processes a pandas DataFrame with 'Date' and 'Value' columns. The 'Value' column contains lists of numbers. 
     Converts 'Date' to datetime, splits 'Value' lists into separate columns, calculates Z-scores, 
@@ -29,7 +29,7 @@ def f_553(df):
 
     Example:
     >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-    >>> zscore_df, fig = f_553(df)
+    >>> zscore_df, fig = f_619(df)
     >>> print(zscore_df.shape)
     (2, 4)
     >>> plt.close()
@@ -61,12 +61,12 @@ class TestCases(unittest.TestCase):
     def test_empty_dataframe(self):
         df = pd.DataFrame(columns=['Date', 'Value'])
         with self.assertRaises(Exception):
-            f_553(df)
+            f_619(df)
         plt.close()
     def test_typical_data(self):
         df = pd.DataFrame([[self.fake.date(), [self.fake.random_number(digits=2) for _ in range(3)]] for _ in range(5)],
                           columns=['Date', 'Value'])
-        zscore_df, fig = f_553(df)
+        zscore_df, fig = f_619(df)
         self.assertEqual(zscore_df.shape, (5, 4))
         self.assertIsInstance(fig, plt.Figure)
         self.assertEqual(len(fig.axes), 1)
@@ -77,14 +77,14 @@ class TestCases(unittest.TestCase):
         plt.close()
     def test_nan_values(self):
         df = pd.DataFrame([['2021-01-01', [5, np.nan, 7]], ['2021-01-02', [np.nan, 9, 10]]], columns=['Date', 'Value'])
-        zscore_df, fig = f_553(df)
+        zscore_df, fig = f_619(df)
         self.assertEqual(zscore_df.shape, (2, 4))
         self.assertIsInstance(fig, plt.Figure)
         plt.close()
     def test_single_row_data(self):
         df = pd.DataFrame([[self.fake.date(), [self.fake.random_number(digits=2) for _ in range(3)]]],
                           columns=['Date', 'Value'])
-        zscore_df, fig = f_553(df)
+        zscore_df, fig = f_619(df)
         self.assertEqual(zscore_df.shape, (1, 4))
         self.assertIsInstance(fig, plt.Figure)
         plt.close()
@@ -92,12 +92,12 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame([[self.fake.date(), [self.fake.word() for _ in range(3)]] for _ in range(5)],
                           columns=['Date', 'Value'])
         with self.assertRaises(Exception):
-            f_553(df)
+            f_619(df)
         plt.close()
     def test_large_dataset(self):
         df = pd.DataFrame([[self.fake.date(), [self.fake.random_number(digits=2) for _ in range(10)]] for _ in range(100)],
                           columns=['Date', 'Value'])
-        zscore_df, fig = f_553(df)
+        zscore_df, fig = f_619(df)
         self.assertEqual(zscore_df.shape, (100, 11))
         self.assertIsInstance(fig, plt.Figure)
         plt.close()

@@ -5,7 +5,7 @@ from dateutil.parser import parse
 TIME_FORMAT = "%d/%m/%y %H:%M:%S.%f"
 
 
-def f_90(time_string, from_tz, to_tz):
+def f_98(time_string, from_tz, to_tz):
     """
     Converts a time string from one timezone to another, considering various cases such as daylight saving time.
 
@@ -22,7 +22,7 @@ def f_90(time_string, from_tz, to_tz):
     - dateutil
 
     Example:
-    >>> f_90('30/03/09 16:31:32.123', 'UTC', 'America/New_York')
+    >>> f_98('30/03/09 16:31:32.123', 'UTC', 'America/New_York')
     '30/03/09 12:31:32.123000'
 
     Note: The example assumes no daylight saving time shift between the given timezones at the specified date and time.
@@ -37,39 +37,39 @@ def f_90(time_string, from_tz, to_tz):
 
 import unittest
 class TestCases(unittest.TestCase):
-    """Test cases for f_90"""
+    """Test cases for f_98"""
     def test_utc_to_est(self):
         """
         Test conversion from UTC to Eastern Standard Time.
         """
-        result = f_90("30/03/09 16:31:32.123", "UTC", "America/New_York")
+        result = f_98("30/03/09 16:31:32.123", "UTC", "America/New_York")
         expected = "30/03/09 12:31:32.123000"  # Adjusted for daylight saving time if applicable
         self.assertEqual(result, expected)
     def test_est_to_utc(self):
         """
         Test conversion from Eastern Standard Time to UTC.
         """
-        result = f_90("30/03/09 12:31:32.123", "America/New_York", "UTC")
+        result = f_98("30/03/09 12:31:32.123", "America/New_York", "UTC")
         expected = "30/03/09 16:31:32.123000"  # Adjusted for daylight saving time if applicable
         self.assertEqual(result, expected)
     def test_utc_to_ist(self):
         """
         Test conversion from UTC to Indian Standard Time.
         """
-        result = f_90("01/04/09 00:00:00.000", "UTC", "Asia/Kolkata")
+        result = f_98("01/04/09 00:00:00.000", "UTC", "Asia/Kolkata")
         expected = "01/04/09 05:30:00.000000"  # IST is UTC+5:30
         self.assertEqual(result, expected)
     def test_ist_to_utc(self):
         """
         Test conversion from Indian Standard Time to UTC.
         """
-        result = f_90("01/04/09 05:30:00.000", "Asia/Kolkata", "UTC")
+        result = f_98("01/04/09 05:30:00.000", "Asia/Kolkata", "UTC")
         expected = "01/04/09 00:00:00.000000"  # IST is UTC+5:30
         self.assertEqual(result, expected)
     def test_utc_to_gmt(self):
         """
         Test conversion from UTC to GMT (should be the same).
         """
-        result = f_90("15/04/09 10:30:00.000", "UTC", "GMT")
+        result = f_98("15/04/09 10:30:00.000", "UTC", "GMT")
         expected = "15/04/09 10:30:00.000000"  # GMT and UTC are the same
         self.assertEqual(result, expected)

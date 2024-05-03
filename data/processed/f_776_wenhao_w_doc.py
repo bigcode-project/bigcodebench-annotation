@@ -1,9 +1,9 @@
 from collections import Counter
 import hashlib
 
-def f_272(word: str) -> dict:
+def f_296(word: str) -> dict:
     """
-    Count the occurrence of each adjacent pair of letters in a wordm and encode the result as an MD5 hash.
+    Count the occurrence of each adjacent pair of letters from left to right in a word and encode the result as an MD5 hash.
 
     Parameters:
     - word (str): The word in which to count the adjacent letter pairs.
@@ -15,9 +15,9 @@ def f_272(word: str) -> dict:
     - collections.Counter
 
     Examples:
-    >>> f_272('abracadabra')
+    >>> f_296('abracadabra')
     'bc9af285d87b312e61ab3661e66b741b'
-    >>> f_272('hello')
+    >>> f_296('hello')
     'dd5dec1a853625e2dc48f3d42665c337'
     """
     pairs = list(map(''.join, zip(word[:-1], word[1:])))
@@ -29,26 +29,26 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test with the word 'abracadabra'
-        result = f_272('abracadabra')
+        result = f_296('abracadabra')
         expected = 'bc9af285d87b312e61ab3661e66b741b'
         self.assertEqual(result, expected)
     def test_case_2(self):
         # Test with the word 'hello'
-        result = f_272('hello')
+        result = f_296('hello')
         expected = 'dd5dec1a853625e2dc48f3d42665c337'
         self.assertEqual(result, expected)
     def test_case_3(self):
         # Test with the word 'python'
-        result = f_272('python')
+        result = f_296('python')
         expected = '2ef1af06ae4aa496eaa8e963bde5514e'
         self.assertEqual(result, expected)
     def test_case_4(self):
         # Test with an empty string
-        result = f_272('')
+        result = f_296('')
         expected = '99914b932bd37a50b983c5e7c90ae93b'
         self.assertEqual(result, expected)
     def test_case_5(self):
         # Test with a single character string
-        result = f_272('a')
+        result = f_296('a')
         expected = '99914b932bd37a50b983c5e7c90ae93b'
         self.assertEqual(result, expected)

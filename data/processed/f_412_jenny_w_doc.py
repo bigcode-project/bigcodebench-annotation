@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def f_457(data):
+def f_511(data):
     """
     Calculate statistical measurements (mean and standard deviation) of the values associated with
     each key in a list of dictionaries, and visualize mean and standard deviation with bar charts.
@@ -26,7 +26,7 @@ def f_457(data):
     - TypeError: If the input is not a list of dictionaries or if any value in the dictionaries is not numeric.
     
     Example:
-    >>> stats, axes = f_457([{'cat': 1, 'dog': 3}, {'cat' : 2, 'dog': 5}, {'cat' : 3, 'dog': 7}])
+    >>> stats, axes = f_511([{'cat': 1, 'dog': 3}, {'cat' : 2, 'dog': 5}, {'cat' : 3, 'dog': 7}])
     >>> stats
     {'cat': {'mean': 2.0, 'std': 0.816496580927726}, 'dog': {'mean': 5.0, 'std': 1.632993161855452}}
     >>> axes
@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic case
         data = [{"cat": 1, "dog": 3}, {"cat": 2, "dog": 5}, {"cat": 3, "dog": 7}]
-        stats, axes = f_457(data)
+        stats, axes = f_511(data)
         self.assertAlmostEqual(stats["cat"]["mean"], 2.0)
         self.assertAlmostEqual(stats["cat"]["std"], 0.816496580927726)
         self.assertAlmostEqual(stats["dog"]["mean"], 5.0)
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test other keys (animals)
         data = [{"bird": 5, "fish": 10}, {"bird": 6, "fish": 8}, {"bird": 7, "fish": 9}]
-        stats, axes = f_457(data)
+        stats, axes = f_511(data)
         self.assertAlmostEqual(stats["bird"]["mean"], 6.0)
         self.assertAlmostEqual(stats["bird"]["std"], 0.816496580927726)
         self.assertAlmostEqual(stats["fish"]["mean"], 9.0)
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test handling negatives
         data = [{"cat": -1, "dog": -3}, {"cat": -2, "dog": -5}, {"cat": -3, "dog": -7}]
-        stats, axes = f_457(data)
+        stats, axes = f_511(data)
         self.assertAlmostEqual(stats["cat"]["mean"], -2.0)
         self.assertAlmostEqual(stats["cat"]["std"], 0.816496580927726)
         self.assertAlmostEqual(stats["dog"]["mean"], -5.0)
@@ -104,7 +104,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Test single input
         data = [{"cat": 1}]
-        stats, axes = f_457(data)
+        stats, axes = f_511(data)
         self.assertEqual(stats, {"cat": {"mean": 1.0, "std": 0.0}})
         self.assertEqual(axes[0].get_title(), "Statistics of cat")
         for ax, key in zip(axes, stats):
@@ -113,7 +113,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test handling zero
         data = [{"cat": 0, "dog": 0}, {"cat": 0, "dog": 0}, {"cat": 0, "dog": 0}]
-        stats, axes = f_457(data)
+        stats, axes = f_511(data)
         self.assertEqual(
             stats, {"cat": {"mean": 0.0, "std": 0.0}, "dog": {"mean": 0.0, "std": 0.0}}
         )
@@ -125,15 +125,15 @@ class TestCases(unittest.TestCase):
     def test_case_6(self):
         # Test correct handling of empty input
         with self.assertRaises(ValueError):
-            f_457([])
+            f_511([])
     def test_case_7(self):
         # Test correct handling of incorrect input types
         with self.assertRaises(TypeError):
-            f_457("not a list")
+            f_511("not a list")
         with self.assertRaises(TypeError):
-            f_457([123])
+            f_511([123])
         with self.assertRaises(TypeError):
-            f_457([{"cat": "not numeric"}])
+            f_511([{"cat": "not numeric"}])
     def test_case_8(self):
         # Test with a mix of positive and negative integers
         data = [
@@ -141,7 +141,7 @@ class TestCases(unittest.TestCase):
             {"apple": -4, "banana": 6},
             {"apple": -6, "banana": 8},
         ]
-        stats, _ = f_457(data)
+        stats, _ = f_511(data)
         self.assertAlmostEqual(stats["apple"]["mean"], -4.0)
         self.assertAlmostEqual(stats["apple"]["std"], 1.632993161855452)
         self.assertAlmostEqual(stats["banana"]["mean"], 6.0)
@@ -149,7 +149,7 @@ class TestCases(unittest.TestCase):
     def test_case_9(self):
         # Test with floating point numbers
         data = [{"x": 0.5, "y": 1.5}, {"x": 2.5, "y": 3.5}, {"x": 4.5, "y": 5.5}]
-        stats, _ = f_457(data)
+        stats, _ = f_511(data)
         self.assertAlmostEqual(stats["x"]["mean"], 2.5)
         self.assertAlmostEqual(stats["x"]["std"], 1.632993161855452)
         self.assertAlmostEqual(stats["y"]["mean"], 3.5)

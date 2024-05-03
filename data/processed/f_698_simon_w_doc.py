@@ -1,7 +1,7 @@
 import heapq
 import random
 
-def f_698(obj_list, attr, top_n=5, seed=None):
+def f_289(obj_list, attr, top_n=5, seed=None):
     """
 Find the top N values of the specified attribute in a list of objects.
 Return the top N values as well a a randomly sampled value of all attributes.
@@ -28,7 +28,7 @@ Example:
     ...
     >>> random.seed(1)
     >>> obj_list = [Object(random.randint(1, 100)) for _ in range(33)]
-    >>> top_values, random_value = f_698(obj_list, 'value', 5, seed=1)
+    >>> top_values, random_value = f_289(obj_list, 'value', 5, seed=1)
     >>> print(top_values)
     [99, 98, 98, 98, 93]
     >>> print(random_value)
@@ -40,7 +40,7 @@ Example:
     ...
     >>> random.seed(2)
     >>> obj_list = [Object(random.randint(1, 12)) for _ in range(13)]
-    >>> top_values, random_value = f_698(obj_list, 'test', 2, 12)
+    >>> top_values, random_value = f_289(obj_list, 'test', 2, 12)
     >>> print(top_values)
     [12, 11]
     >>> print(random_value)
@@ -72,37 +72,37 @@ class TestCases(unittest.TestCase):
     
     def test_case_1(self):
         obj_list = self.generate_objects(10)
-        result, rand = f_698(obj_list, 'value', 5, seed=12)
+        result, rand = f_289(obj_list, 'value', 5, seed=12)
         self.assertEqual(result, [95, 95, 82, 36, 32])
         self.assertEqual(rand, 18)
     def test_case_2(self):
         obj_list = self.generate_objects(50)
-        result, rand = f_698(obj_list, 'value', 7, seed=1)
+        result, rand = f_289(obj_list, 'value', 7, seed=1)
         self.assertEqual(result, [98, 98, 95, 94, 92, 90, 90])
         self.assertEqual(rand, 12)
         
     def test_case_3(self):
         obj_list = []
-        result, rand = f_698(obj_list, 'value', 5, seed=2)
+        result, rand = f_289(obj_list, 'value', 5, seed=2)
         self.assertEqual(result, [])
         self.assertEqual(rand, None)
         
     def test_case_4(self):
         obj_list = self.generate_objects(5)
-        result, rand = f_698(obj_list, 'value', 10, seed=3)
+        result, rand = f_289(obj_list, 'value', 10, seed=3)
         self.assertEqual(result, [81, 80, 71, 38, 11])
         self.assertEqual(rand, 71)
         
     def test_case_5(self):
         obj_list = self.generate_objects(100)
-        result, rand = f_698(obj_list, 'value', 3, seed=4)
+        result, rand = f_289(obj_list, 'value', 3, seed=4)
         self.assertEqual(result, [100, 99, 99])
         self.assertEqual(rand, 22)
     def test_case_rng(self):
         obj_list = self.generate_objects(100)
-        result, rand = f_698(obj_list, 'value', 3, seed=123)
-        result2, rand2 = f_698(obj_list, 'value', 3, seed=43)
+        result, rand = f_289(obj_list, 'value', 3, seed=123)
+        result2, rand2 = f_289(obj_list, 'value', 3, seed=43)
         self.assertEqual(result, result2)
         self.assertNotEqual(rand, rand2)
-        result, rand3 = f_698(obj_list, 'value', 3, seed=123)
+        result, rand3 = f_289(obj_list, 'value', 3, seed=123)
         self.assertEqual(rand, rand3)

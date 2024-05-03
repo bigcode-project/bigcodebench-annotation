@@ -4,7 +4,8 @@ import random
 def f_534(directory, n_files):
     """
     Create n random txt files in a specific directory, write only a single digit random integer into each file, and then reset the cursor to the beginning of each file.
-
+    The file names start from 'file_1.txt' and increment by 1 for each file.
+    
     Parameters:
     - directory (str): The directory in which to generate the files.
     - n_files (int): The number of files to generate.

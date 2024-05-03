@@ -3,7 +3,7 @@ import os
 output_dir = './output'
 
 
-def f_76(df, filename):
+def f_82(df, filename):
     """
     Save a Pandas DataFrame to a CSV file in a specified directory.
 
@@ -25,7 +25,7 @@ def f_76(df, filename):
     Examples:
     >>> import pandas as pd
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    >>> 'data.csv' in f_76(df, 'data.csv')
+    >>> 'data.csv' in f_82(df, 'data.csv')
     True
     """
     # Ensure the data directory exists
@@ -52,27 +52,27 @@ class TestCases(unittest.TestCase):
         """Test saving a simple DataFrame."""
         df = pd.DataFrame({'A': [1, 2], 'B': ['x', 'y']})
         expected_path = os.path.join(output_dir, 'basic.csv')
-        result_path = f_76(df, 'basic.csv')
+        result_path = f_82(df, 'basic.csv')
         self.assertEqual(expected_path[expected_path.rindex('/') + 1:], result_path[result_path.rindex('/') + 1: ])
         self.assertTrue(os.path.exists(result_path))
     def test_with_numeric_and_text(self):
         """Test a DataFrame with both numeric and text columns."""
         df = pd.DataFrame({'Numeric': [10, 20], 'Text': ['Hello', 'World']})
-        result_path = f_76(df, 'numeric_text.csv')
+        result_path = f_82(df, 'numeric_text.csv')
         self.assertTrue(os.path.exists(result_path))
     def test_with_special_characters(self):
         """Test a DataFrame containing special characters."""
         df = pd.DataFrame({'Data': ['"Quoted"', ',Comma']})
-        result_path = f_76(df, 'special_chars.csv')
+        result_path = f_82(df, 'special_chars.csv')
         self.assertTrue(os.path.exists(result_path))
     def test_empty_dataframe(self):
         """Test saving an empty DataFrame."""
         df = pd.DataFrame()
-        result_path = f_76(df, 'empty.csv')
+        result_path = f_82(df, 'empty.csv')
         self.assertTrue(os.path.exists(result_path))
     def test_returned_path_format(self):
         """Test the format of the returned file path."""
         df = pd.DataFrame({'Column': [1]})
-        result_path = f_76(df, 'path_format.csv')
+        result_path = f_82(df, 'path_format.csv')
         self.assertTrue(os.path.isabs(result_path))
         self.assertIn('path_format.csv', result_path)

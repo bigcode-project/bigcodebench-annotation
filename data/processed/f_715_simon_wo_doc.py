@@ -1,7 +1,7 @@
 import csv
 import os
 
-def f_715(data, file_path, headers):
+def f_395(data, file_path, headers):
     """
     Writes a list of tuples to a CSV file.
 
@@ -26,7 +26,7 @@ def f_715(data, file_path, headers):
 
     
     Examples:
-    >>> full_path = f_715([(1, 'a', 2), ('a', 3, 5), ('c', 1, -2)], 'test.csv', ['a', 'b', 'c'])
+    >>> full_path = f_395([(1, 'a', 2), ('a', 3, 5), ('c', 1, -2)], 'test.csv', ['a', 'b', 'c'])
     >>> print(full_path)
     '/user/data/test.csv' #full path depends on os and individual folder structure
     >>> with open('test.csv', 'r', newline='') as csvfile:
@@ -38,7 +38,7 @@ def f_715(data, file_path, headers):
     ['a', '3', '5']
     ['c', '1', '-2']
 
-    >>> f_715([('test', 123, 2), (3, -3, -15), ('hallo', 1, -2)], 'data.csv', ['test1', 'test2', 'test3'])
+    >>> f_395([('test', 123, 2), (3, -3, -15), ('hallo', 1, -2)], 'data.csv', ['test1', 'test2', 'test3'])
     '/user/data/data.csv' #full path depends on os and individual folder structure
     >>> with open('data.csv', 'r', newline='') as csvfile:
     >>>     reader = csv.reader(csvfile)
@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
         data = [(fake.name(), str(fake.random_int(min=20, max=90)), fake.job()) for _ in range(10)]
         headers = ['Name', 'Age', 'Occupation']
         file_path = os.path.join(self.test_dir, 'test_valid.csv')
-        result_path = f_715(data, file_path, headers)
+        result_path = f_395(data, file_path, headers)
         self.assertTrue(os.path.exists(result_path))
         with open(result_path, newline='') as csvfile:
             reader = csv.reader(csvfile)
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
         data = []
         headers = ['Name', 'Age', 'Occupation']
         file_path = os.path.join(self.test_dir, 'test_empty.csv')
-        result_path = f_715(data, file_path, headers)
+        result_path = f_395(data, file_path, headers)
         self.assertTrue(os.path.exists(result_path))
         with open(result_path, newline='') as csvfile:
             reader = csv.reader(csvfile)
@@ -104,7 +104,7 @@ class TestCases(unittest.TestCase):
         data = [(fake.name(), ), (fake.name(), str(fake.random_int(min=20, max=90)))]
         headers = ['Name', 'Age', 'Occupation']
         file_path = os.path.join(self.test_dir, 'test_incomplete.csv')
-        result_path = f_715(data, file_path, headers)
+        result_path = f_395(data, file_path, headers)
         self.assertTrue(os.path.exists(result_path))
         with open(result_path, newline='') as csvfile:
             reader = csv.reader(csvfile)
@@ -117,9 +117,9 @@ class TestCases(unittest.TestCase):
         data_initial = [(fake.name(), str(fake.random_int(min=20, max=90)), fake.job())]
         headers = ['Name', 'Age', 'Occupation']
         file_path = os.path.join(self.test_dir, 'test_overwrite.csv')
-        f_715(data_initial, file_path, headers)
+        f_395(data_initial, file_path, headers)
         data_new = [(fake.name(), str(fake.random_int(min=20, max=90)), fake.job()) for _ in range(5)]
-        result_path = f_715(data_new, file_path, headers)
+        result_path = f_395(data_new, file_path, headers)
         self.assertTrue(os.path.exists(result_path))
         with open(result_path, newline='') as csvfile:
             reader = csv.reader(csvfile)
@@ -134,4 +134,4 @@ class TestCases(unittest.TestCase):
         headers = ['Name', 'Age', 'Occupation']
         file_path = None
         with self.assertRaises(Exception):
-            f_715(data, file_path, headers)
+            f_395(data, file_path, headers)

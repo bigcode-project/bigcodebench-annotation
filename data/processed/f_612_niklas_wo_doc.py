@@ -2,7 +2,7 @@ import os
 import shutil
 import glob
 
-def f_88(source_dir, dest_dir, extension):
+def f_96(source_dir, dest_dir, extension):
     """
     Move all files with a particular extension from one directory to another.
     
@@ -20,7 +20,7 @@ def f_88(source_dir, dest_dir, extension):
     - glob
         
     Example:
-    >>> f_88('path_to_source_dir', 'path_to_dest_dir', '.txt')
+    >>> f_96('path_to_source_dir', 'path_to_dest_dir', '.txt')
     10
     """
     files = glob.glob(os.path.join(source_dir, f'*.{extension}'))
@@ -52,7 +52,7 @@ class TestCases(unittest.TestCase):
             with open(os.path.join('./source', filename), 'w') as f:
                 f.write('test')
         # Run function
-        f_88('./source', './destination', 'txt')
+        f_96('./source', './destination', 'txt')
         # Check files
         for d in ['./destination', './source']:
             if d == './source':
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
             with open(os.path.join('./src', filename), 'w') as f:
                 f.write('test')
         # Run function
-        f_88('./src', './dst', 'txt')
+        f_96('./src', './dst', 'txt')
         # Check files
         for d in ['./dst', './src']:
             if d == './src':
@@ -112,7 +112,7 @@ class TestCases(unittest.TestCase):
             with open(os.path.join('./s', filename), 'w') as f:
                 f.write('test')
         # Run function
-        f_88('./s', './d', 'txt')
+        f_96('./s', './d', 'txt')
         # Check files
         for d in ['./d', './s']:
             if d == './s':
@@ -142,7 +142,7 @@ class TestCases(unittest.TestCase):
             with open(os.path.join('./s', filename), 'w') as f:
                 f.write('test')
         # Run function
-        f_88('./s', './destination', 'txt')
+        f_96('./s', './destination', 'txt')
         # Check files
         for d in ['./destination', './s']:
             if d == './s':
@@ -172,7 +172,7 @@ class TestCases(unittest.TestCase):
             with open(os.path.join('./source', filename), 'w') as f:
                 f.write('xxx')
         # Run function
-        f_88('./source', './d', 'docx')
+        f_96('./source', './d', 'docx')
         # Check files
         for d in ['./d', './source']:
             if d == './source':

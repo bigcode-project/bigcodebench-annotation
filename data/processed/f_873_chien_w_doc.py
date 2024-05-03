@@ -3,7 +3,7 @@ import string
 import pandas as pd
 
 
-def f_639():
+def f_711():
     """
     Generate all possible combinations (with replacement) of three letters from the alphabet and save them in a pandas DataFrame.
 
@@ -19,7 +19,7 @@ def f_639():
     - pandas
 
     Example:
-    >>> df = f_639()
+    >>> df = f_711()
     >>> print(df.head())
       Letter 1 Letter 2 Letter 3
     0        a        a        a
@@ -40,13 +40,13 @@ import pandas as pd
 from itertools import product
 import string
 class TestCases(unittest.TestCase):
-    """Tests for the function f_639."""
+    """Tests for the function f_711."""
     def test_combinations(self):
         """
         Test if the function generates the correct combinations with replacement.
         """
         correct_combinations = list(product(string.ascii_lowercase, repeat=3))
-        result_df = f_639()
+        result_df = f_711()
         result_combinations = [tuple(row) for row in result_df.values]
         self.assertEqual(
             result_combinations,
@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
         """
         Test if the DataFrame has the correct column names.
         """
-        result_df = f_639()
+        result_df = f_711()
         self.assertEqual(
             list(result_df.columns),
             ["Letter 1", "Letter 2", "Letter 3"],
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
         """
         Test if the shape of the DataFrame is correct.
         """
-        result_df = f_639()
+        result_df = f_711()
         self.assertEqual(
             result_df.shape,
             (26**3, 3),
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         """
         Test if all DataFrame columns contain strings.
         """
-        result_df = f_639()
+        result_df = f_711()
         for col in result_df.columns:
             self.assertTrue(
                 result_df[col].apply(lambda x: isinstance(x, str)).all(),
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
         """
         Test if there are no duplicate combinations in the DataFrame.
         """
-        result_df = f_639()
+        result_df = f_711()
         result_combinations = [tuple(row) for row in result_df.values]
         self.assertEqual(
             len(result_combinations),

@@ -1,6 +1,7 @@
 import random
 import string
 
+POSSIBLE_LETTERS = ['a', 'b', 'c']
 def f_772(word):
     """
     Generates a list of random pairs of adjacent letters from the given word. The number of such pairs will be equal to the length of the constant POSSIBLE_LETTERS.
@@ -26,10 +27,10 @@ def f_772(word):
         raise ValueError("Input must only contain letters.")
     
     if len(word) < 2:
-        return ['' for _ in range(len(['a', 'b', 'c']))]
+        return ['' for _ in range(len(POSSIBLE_LETTERS))]
     
     pairs = [''.join(x) for x in zip(word, word[1:])]
-    random_pairs = [random.choice(pairs) for _ in range(len(['a', 'b', 'c']))]
+    random_pairs = [random.choice(pairs) for _ in range(len(POSSIBLE_LETTERS))]
 
     return random_pairs
 

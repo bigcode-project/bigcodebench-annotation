@@ -1,6 +1,4 @@
 import heapq
-import numpy as np
-import pandas as pd
 from sklearn.linear_model import LinearRegression
 
 def f_669(df, feature, target, n=10):
@@ -24,8 +22,7 @@ def f_669(df, feature, target, n=10):
     ValueError: If specified columns are not in the provided DataFrame.
 
     Requirements:
-    - numpy
-    - pandas
+    - heapq
     - sklearn.linear_model
     
     Example:

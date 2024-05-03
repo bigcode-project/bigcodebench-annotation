@@ -19,7 +19,7 @@ def f_785(start_date=START_DATE, periods=PERIODS, freq=FREQ, categories=CATEGORI
     - categories (list): List of categories to include in the report. Default is ['Electronics', 'Fashion', 'Home & Kitchen', 'Automotive', 'Sports'].
 
     Returns:
-    - Returns a DataFrame containing the sales data.
+    - Returns a DataFrame containing the sales data with the following columns: 'Date', 'Category', 'Sales'.
     - Returns the Matplotlib Axes object for the plot.
 
     Requirements:

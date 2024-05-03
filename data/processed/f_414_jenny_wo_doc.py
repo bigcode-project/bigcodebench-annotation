@@ -4,7 +4,7 @@ import numpy as np
 from collections import defaultdict
 
 
-def f_27(input_file="data.json"):
+def f_30(input_file="data.json"):
     """
     Read a list of dictionaries from a JSON file, calculate the mean and median for each key
     (ignoring non-numeric or missing values), and convert the results into a Pandas DataFrame.
@@ -28,7 +28,7 @@ def f_27(input_file="data.json"):
     - pandas
 
     Example:
-    >>> df = f_27('data_1.json')
+    >>> df = f_30('data_1.json')
     a        mean  median
     b        mean  median
     c        mean  median
@@ -75,19 +75,19 @@ class TestCases(unittest.TestCase):
             self.test_data_paths.append(path)
     def test_case_1(self):
         # Basic test
-        df = f_27(self.test_data_paths[0])
+        df = f_30(self.test_data_paths[0])
         self.assertListEqual(df.index.tolist(), ["a", "b", "c"])
         self.assertAlmostEqual(df.loc["a", "mean"], 2.0)
         self.assertAlmostEqual(df.loc["a", "median"], 2.0)
     def test_case_2(self):
         # Test with a single key
-        df = f_27(self.test_data_paths[1])
+        df = f_30(self.test_data_paths[1])
         self.assertListEqual(df.index.tolist(), ["a"])
         self.assertAlmostEqual(df.loc["a", "mean"], 1.0)
         self.assertAlmostEqual(df.loc["a", "median"], 1.0)
     def test_case_3(self):
         # Test with missing values to ensure handling of NaN
-        df = f_27(self.test_data_paths[2])
+        df = f_30(self.test_data_paths[2])
         self.assertListEqual(df.index.tolist(), ["a", "b"])
         self.assertAlmostEqual(df.loc["a", "mean"], 1.5)
         self.assertAlmostEqual(df.loc["a", "median"], 1.5)
@@ -95,11 +95,11 @@ class TestCases(unittest.TestCase):
         self.assertTrue(np.isnan(df.loc["b", "median"]))
     def test_case_4(self):
         # Test empty dataframe creation from an empty input file
-        df = f_27(self.test_data_paths[3])
+        df = f_30(self.test_data_paths[3])
         self.assertEqual(df.shape[0], 0)
     def test_case_5(self):
         # Test handling of mixed data, including valid values and NaN
-        df = f_27(self.test_data_paths[4])
+        df = f_30(self.test_data_paths[4])
         self.assertListEqual(df.index.tolist(), ["a", "b", "c"])
         self.assertAlmostEqual(df.loc["a", "mean"], 1.5)
         self.assertAlmostEqual(df.loc["a", "median"], 1.5)
@@ -113,7 +113,7 @@ class TestCases(unittest.TestCase):
         path = self.temp_dir.name + "/test_data_6.json"
         with open(path, "w") as f:
             json.dump(data, f)
-        df = f_27(path)
+        df = f_30(path)
         self.assertListEqual(df.index.tolist(), ["a", "b", "c"])
         self.assertAlmostEqual(df.loc["a", "mean"], 5.0)
         self.assertAlmostEqual(df.loc["c", "mean"], 7.0)
@@ -124,7 +124,7 @@ class TestCases(unittest.TestCase):
         path = self.temp_dir.name + "/test_data_7.json"
         with open(path, "w") as f:
             json.dump(data, f)
-        df = f_27(path)
+        df = f_30(path)
         self.assertAlmostEqual(df.loc["a", "mean"], 50.5)
         self.assertAlmostEqual(
             df.loc["b", "mean"], np.mean([2 * i for i in range(2, 101, 2)])
@@ -138,7 +138,7 @@ class TestCases(unittest.TestCase):
         path = self.temp_dir.name + "/test_data_8.json"
         with open(path, "w") as f:
             json.dump(data, f)
-        df = f_27(path)
+        df = f_30(path)
         self.assertTrue(np.isnan(df.loc["a", "mean"]))
         self.assertTrue(np.isnan(df.loc["b", "mean"]))
     def test_case_9(self):
@@ -151,7 +151,7 @@ class TestCases(unittest.TestCase):
         path = self.temp_dir.name + "/test_data_9.json"
         with open(path, "w") as f:
             json.dump(data, f)
-        df = f_27(path)
+        df = f_30(path)
         self.assertAlmostEqual(df.loc["a", "mean"], 7.5)
         self.assertAlmostEqual(df.loc["b", "mean"], 22.5)
         self.assertAlmostEqual(df.loc["c", "mean"], 30.0)

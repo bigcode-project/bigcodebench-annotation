@@ -2,7 +2,7 @@ import re
 import random
 import string
 
-def f_704(n, pattern, seed=None):
+def f_266(n, pattern, seed=None):
     """
     Generate a random string of length 'n' and find all non-overlapping matches
     of the regex 'pattern'.
@@ -26,10 +26,10 @@ def f_704(n, pattern, seed=None):
     - string
 
     Example:
-    >>> f_704(100, r'[A-Za-z]{5}', seed=12345)
+    >>> f_266(100, r'[A-Za-z]{5}', seed=12345)
     ['mrKBk', 'BqJOl', 'NJlwV', 'UfHVA', 'LGkjn', 'vubDv', 'GSVAa', 'kXLls', 'RKlVy', 'vZcoh', 'FnVZW', 'JQlqL']
 
-    >>> f_704(1000, r'[1-9]{2}', seed=1)
+    >>> f_266(1000, r'[1-9]{2}', seed=1)
     ['51', '84', '16', '79', '16', '28', '63', '82', '94', '18', '68', '42', '95', '33', '64', '38', '69', '56', '32', '16', '18', '19', '27']
      """
     if seed is not None:
@@ -39,7 +39,7 @@ def f_704(n, pattern, seed=None):
     return matches
 
 import unittest
-class FinalTestCases(unittest.TestCase):
+class TestCases(unittest.TestCase):
     
     def test_valid_pattern_matching(self):
         test_length = 100
@@ -59,30 +59,30 @@ class FinalTestCases(unittest.TestCase):
             'FnVZW',
             'JQlqL'
         ]
-        actual_matches = f_704(test_length, test_pattern, seed=test_seed)
+        actual_matches = f_266(test_length, test_pattern, seed=test_seed)
         self.assertEqual(actual_matches, expected_matches)
     def test_no_matches_found(self):
         test_length = 100
         test_pattern = r'XYZ'
         test_seed = 12345
         expected_matches = []
-        actual_matches = f_704(test_length, test_pattern, seed=test_seed)
+        actual_matches = f_266(test_length, test_pattern, seed=test_seed)
         self.assertEqual(actual_matches, expected_matches)
     def test_zero_length_string(self):
         test_length = 0
         test_pattern = r'[A-Za-z0-9]{5}'
         expected_matches = []
-        actual_matches = f_704(test_length, test_pattern, seed=None)
+        actual_matches = f_266(test_length, test_pattern, seed=None)
         self.assertEqual(actual_matches, expected_matches)
     def test_unusual_pattern(self):
         test_length = 100
         test_pattern = r'[^A-Za-z0-9]+'
         test_seed = 67890
         expected_matches = []
-        actual_matches = f_704(test_length, test_pattern, seed=test_seed)
+        actual_matches = f_266(test_length, test_pattern, seed=test_seed)
         self.assertEqual(actual_matches, expected_matches)
     def test_extreme_input_values(self):
         test_length = 10000  # Reduced size for the environment's stability
         test_pattern = r'[A-Za-z]{5}'
-        actual_matches = f_704(test_length, test_pattern, seed=None)
+        actual_matches = f_266(test_length, test_pattern, seed=None)
         self.assertIsInstance(actual_matches, list)
