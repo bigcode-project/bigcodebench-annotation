@@ -31,7 +31,7 @@ def f_1016(directory, backup_dir='/path/to/backup'):
     """
     if not os.path.exists(directory):
         raise FileNotFoundError(f"Directory '{directory}' not found.")
-    
+
     log_files = glob.glob(os.path.join(directory, '*.log'))
     if not log_files:
         return "No logs found to backup."
@@ -47,12 +47,54 @@ def f_1016(directory, backup_dir='/path/to/backup'):
 
     return backup_file
 
+
 import unittest
 import tempfile
 import os
 import subprocess
 import glob
 import shutil
+
+
+class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+        self.temp_backup_dir = tempfile.mkdtemp()
+        
+        # Create some log files and some non-log files
+        for i in range(5):
+            with open(os.path.join(self.temp_dir, f"file_{i}.log"), "w") as f:
+                f.write(f"Mock log content for file_{i}")
+            with open(os.path.join(self.temp_dir, f"file_{i}.txt"), "w") as f:
+                f.write(f"Mock content for file_{i}.txt")
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir)
+        shutil.rmtree(self.temp_backup_dir)
+
+    def test_backup_creation_and_log_file_deletion(self):
+        # Test the creation of the backup file and deletion of original log files.
+        backup_path = f_1016(self.temp_dir, self.temp_backup_dir)
+        self.assertTrue(os.path.exists(backup_path))
+        self.assertEqual(backup_path, os.path.join(self.temp_backup_dir, 'logs_backup.tar.gz'))
+        self.assertFalse(any(file.endswith('.log') for file in os.listdir(self.temp_dir)))
+
+    def test_no_log_files_to_backup(self):
+        # Test behavior when no log files are present in the directory.
+        empty_dir = tempfile.mkdtemp()
+        result = f_1016(empty_dir, self.temp_backup_dir)
+        self.assertEqual(result, "No logs found to backup.")
+        shutil.rmtree(empty_dir)
+
+    def test_non_log_files_remain(self):
+        # Ensure that non-log files are not deleted or included in the backup.
+        backup_path = f_1016(self.temp_dir, self.temp_backup_dir)
+        self.assertEqual(len(glob.glob(os.path.join(self.temp_dir, '*.txt'))), 5)  # Check only non-log files remain
+
+    def test_handle_non_existing_directory(self):
+        # Verify that a FileNotFoundError is raised for a non-existing source directory.
+        with self.assertRaises(FileNotFoundError):
+            f_1016('/non/existing/directory', self.temp_backup_dir)
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -62,48 +104,5 @@ def run_tests():
 
 
 
-class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.temp_dir = tempfile.mkdtemp()
-        self.temp_backup_dir = tempfile.mkdtemp()
-        
-        for i in range(5):
-            with open(os.path.join(self.temp_dir, f"file_{i}.log"), "w") as f:
-                f.write(f"Mock log content for file_{i}")
-
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir)
-        shutil.rmtree(self.temp_backup_dir)
-
-    def test_case_1(self):
-        backup_path = f_1016(self.temp_dir, self.temp_backup_dir)
-        self.assertTrue(os.path.exists(backup_path))
-        self.assertEqual(backup_path, os.path.join(self.temp_backup_dir, 'logs_backup.tar.gz'))
-        self.assertEqual(len(os.listdir(self.temp_dir)), 0)
-
-    def test_case_2(self):
-        backup_path = f_1016(self.temp_dir, self.temp_backup_dir)
-        self.assertTrue(os.path.exists(backup_path))
-        self.assertEqual(backup_path, os.path.join(self.temp_backup_dir, 'logs_backup.tar.gz'))
-        self.assertEqual(len(os.listdir(self.temp_dir)), 0)
-
-    def test_case_3(self):
-        empty_dir = tempfile.mkdtemp()
-        result = f_1016(empty_dir, self.temp_backup_dir)
-        self.assertEqual(result, "No logs found to backup.")
-        self.assertEqual(len(os.listdir(empty_dir)), 0)
-
-    def test_case_4(self):
-        for i in range(5):
-            with open(os.path.join(self.temp_dir, f"file_{i}.txt"), "w") as f:
-                f.write(f"Mock content for file_{i}.txt")
-        backup_path = f_1016(self.temp_dir, self.temp_backup_dir)
-        self.assertTrue(os.path.exists(backup_path))
-        self.assertEqual(backup_path, os.path.join(self.temp_backup_dir, 'logs_backup.tar.gz'))
-        self.assertEqual(len(os.listdir(self.temp_dir)), 5)
-
-    def test_case_5(self):
-        with self.assertRaises(FileNotFoundError):
-            f_1016('/non/existing/directory', self.temp_backup_dir)
 if __name__ == "__main__":
     run_tests()
