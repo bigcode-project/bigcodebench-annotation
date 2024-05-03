@@ -42,15 +42,6 @@ def f_1017(process_name: str) -> str:
         subprocess.Popen(process_name)
         return f"Process not found. Starting {process_name}."
     
-
-import unittest
-
-def run_tests():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCases))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-
 import unittest
 from unittest.mock import patch, MagicMock
 
@@ -91,6 +82,12 @@ class TestCases(unittest.TestCase):
         process1.terminate.assert_called_once()
         process2.terminate.assert_called_once()
         mock_popen.assert_called_once_with('multi_instance')
-        
+
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
 if __name__ == "__main__":
     run_tests()
