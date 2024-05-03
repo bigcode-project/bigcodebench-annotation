@@ -29,12 +29,20 @@ def f_156():
     >>> type(fig).__name__
     'Figure'
     """
-    font = {'family': 'Arial'}
-    plt.rc('font', **font)  # Set the global font to Arial.
-    DIABETES = load_diabetes()
-    diabetes_df = pd.DataFrame(data=DIABETES.data, columns=DIABETES.feature_names)
-    pair_plot = sns.pairplot(diabetes_df)
-    return pair_plot.fig, diabetes_df
+    # Set the font to Arial
+    plt.rcParams['font.family'] = 'Arial'
+
+    # Load the diabetes dataset
+    diabetes = load_diabetes()
+    df = pd.DataFrame(data=diabetes.data, columns=diabetes.feature_names)
+
+    # Create a pairplot
+    pairplot = sns.pairplot(df)
+
+    # Show the plot
+    plt.show()
+
+    return pairplot.fig, df
 
 import unittest
 import matplotlib.pyplot as plt

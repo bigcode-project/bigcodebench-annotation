@@ -12,6 +12,7 @@ def f_4432(filepath):
     This function demonstrates the use of various system-related libraries in Python.
 
     The format of the printed message is:
+    System: <system-name-here>
     Node Name: <node-name-here>
     Release: <release-here>
     Version: <version-here>

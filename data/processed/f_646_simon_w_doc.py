@@ -18,10 +18,7 @@ def f_515(df, target_column, target_values=None):
         LinearRegression: The trained Linear Regression model.
 
     Raises:
-        ValueError: If df is not a DataFrame
-        ValueError: If df is empty
-        ValueError: If target_column ist not a column of df
-        ValueError: If df contains values that are not numeric
+        ValueError: If df is not a DataFrame or if target_column is not a string or if target_values is not an array-like object
 
     Requirements:
         - numpy

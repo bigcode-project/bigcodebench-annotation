@@ -14,6 +14,9 @@ def f_608(SERVER_NAME, SERVER_PORT, path):
     Returns:
         str: The response body from the server as a string.
 
+    Raises:
+        ssl.SSLError: If there is an SSL handshake error.
+
     Requirements:
     - socket
     - ssl

@@ -3,9 +3,10 @@ import logging
 
 def f_4669(filepath):
     """
-    Attempts to compile a C++ file specified by 'filepath'. The output of the compilation process
+    Attempts to compile a existing C++ file specified by 'filepath'. The output of the compilation process
     is logged, indicating whether the compilation was successful or not. This function is useful
     for automating the compilation of C++ code and tracking compilation results.
+    The log should indicate whether the compilation was successful or if an error occurred.
 
     Parameters:
     filepath (str): The path of the C++ file to be compiled.
@@ -51,7 +52,7 @@ class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Setup an empty test file
-        self.empty_file = 'empty_file.cpp'
+        self.empty_file = './empty_file.cpp'
         with open(self.empty_file, 'w') as f:
             f.write("")
 

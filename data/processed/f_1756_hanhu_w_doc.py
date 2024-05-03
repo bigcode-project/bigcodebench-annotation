@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 def f_405():
     """
     Creates and displays a diagram of a parabola represented by the equation y = x^2.
-    The function plots the parabola using matplotlib, sets the title, labels the axes,
+    The function plots the parabola using matplotlib, sets the title as 'y = x^2', labels the axes as 'x' and 'y',
     and enables the grid. It uses a fixed range for x values from -10 to 10 with 400 points.
     This function is used for demonstrating basic plotting capabilities and visualizing
     quadratic functions. The function does not take any parameters and does not return any value.

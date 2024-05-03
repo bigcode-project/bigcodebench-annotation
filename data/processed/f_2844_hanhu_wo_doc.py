@@ -34,9 +34,8 @@ def f_267(dir, api_key, recipient_email):
     """
     try:
         file_list = os.listdir(dir)
-    except FileNotFoundError:
-        print("Directory not found.")
-        return False
+    except:
+        raise FileNotFoundError(f"Directory '{dir}' does not exist.")
 
     file_list_str = ', '.join(file_list)
 
@@ -63,12 +62,15 @@ from unittest.mock import patch, MagicMock, Mock
 import os
 from python_http_client.exceptions import HTTPError
 class TestCases(unittest.TestCase):
+    @patch('os.path.exists')
     @patch('sendgrid.SendGridAPIClient.send')
     @patch('os.listdir')
-    def test_successful_email_send(self, mock_listdir, mock_send):
+    def test_successful_email_send(self, mock_listdir, mock_send, mock_exists):
         """Test successful email sending with a valid directory."""
         mock_listdir.return_value = ['file1.gz', 'file2.gz']
+        mock_exists.return_value = True
         mock_send.return_value = MagicMock(status_code=202)
+        
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
         result = f_267('./valid_directory', api_key, recipient_email)
@@ -77,35 +79,42 @@ class TestCases(unittest.TestCase):
         """Test the handling of an invalid directory."""
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
-        result = f_267('/nonexistent_directory', api_key, recipient_email)
-        self.assertFalse(result)
+        with self.assertRaises(FileNotFoundError):
+            f_267('/nonexistent_directory', api_key, recipient_email)
+        
+    @patch('os.path.exists')
     @patch('os.listdir')
     @patch('sendgrid.SendGridAPIClient.send')
-    def test_failed_email_send(self, mock_send, mock_listdir):
+    def test_failed_email_send(self, mock_send, mock_listdir, mock_exists):
         """Test handling of a failed email send by ensuring HTTPError is raised."""
         mock_listdir.return_value = ['file1.gz', 'file2.gz']
         mock_response = Mock(status_code=400, body='Bad Request')
+        mock_exists.return_value = True
         mock_send.side_effect = HTTPError(mock_response, 'Failed to send')
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
         with self.assertRaises(HTTPError):
             f_267('./valid_directory', api_key, recipient_email)
+    @patch('os.path.exists')
     @patch('sendgrid.SendGridAPIClient.send')
     @patch('os.listdir')
-    def test_empty_directory(self, mock_listdir, mock_send):
+    def test_empty_directory(self, mock_listdir, mock_send, mock_exists):
         """Test sending an email with an empty directory."""
         mock_listdir.return_value = []
         mock_send.return_value = MagicMock(status_code=202)
+        mock_exists.return_value = True
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
         result = f_267('./empty_directory', api_key, recipient_email)
         self.assertTrue(result)
+    @patch('os.path.exists')
     @patch('sendgrid.SendGridAPIClient.send')
     @patch('os.listdir')
-    def test_generic_exception_handling(self, mock_listdir, mock_send):
+    def test_generic_exception_handling(self, mock_listdir, mock_send, mock_exists):
         """Test handling of generic exceptions during email sending."""
         mock_listdir.return_value = ['file1.gz', 'file2.gz']
         mock_send.side_effect = Exception('Generic error')
+        mock_exists.return_value = True
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
         with self.assertRaises(Exception):

@@ -4,7 +4,7 @@ from prettytable import PrettyTable
 
 def f_4313(my_dict):
     """
-    Sorts a given dictionary by its keys in ascending order and returns a PrettyTable object displaying the sorted items.
+    Sorts a given dictionary by its keys in ascending order and returns a PrettyTable object displaying the sorted items with the names 'Key' and 'Value'.
 
     Parameters:
     my_dict (dict): The dictionary to be sorted and displayed.

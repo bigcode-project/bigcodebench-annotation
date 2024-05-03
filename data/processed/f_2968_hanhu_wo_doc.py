@@ -5,7 +5,7 @@ import hashlib
 
 def f_604(req_data, secret_key):
     """
-    Signs the specified request data with a secret key using HMAC SHA256, then URL encodes the signature.
+    Signs the specified request data with a secret key using HMAC SHA256, then URL encodes the signature and replace spaces with '+'.
 
     Parameters:
         req_data (dict): The request data to be signed. It should be a dictionary.

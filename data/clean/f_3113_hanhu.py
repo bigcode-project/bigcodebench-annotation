@@ -7,7 +7,8 @@ def f_3115():
     Generates a table displaying the system's CPU usage, memory usage, and disk usage.
 
     Returns:
-        A string representation of a table with the following system information:
+        A string representation of a table with the columns of 'Item' and 'Value',
+        and the following system information:
         - CPU Usage (%)
         - Memory Usage (%)
         - Disk Usage (%)
@@ -54,15 +55,15 @@ class TestCases(unittest.TestCase):
             with self.subTest(header=header):
                 self.assertIn(header, self.result)
 
-    # def test_non_empty_values(self):
-    #     """Test that the table's values are not empty or zero."""
-    #     # Extract numeric values using a regular expression
-    #     values = re.findall(r'\|\s*[\d.]+\s*\|', self.result)
-    #     # Convert extracted strings to float and test they are greater than 0
-    #     for value_str in values:
-    #         value = float(value_str.strip('| ').strip())
-    #         with self.subTest(value=value):
-    #             self.assertTrue(value > 0)
+    def test_non_empty_values(self):
+        """Test that the table's values are not empty or zero."""
+        # Extract numeric values using a regular expression
+        values = re.findall(r'\|\s*[\d.]+\s*\|', self.result)
+        # Convert extracted strings to float and test they are greater than 0
+        for value_str in values:
+            value = float(value_str.strip('| ').strip())
+            with self.subTest(value=value):
+                self.assertTrue(value > 0)
 
     def test_value_ranges(self):
         """Test that CPU and memory usage percentages are within 0-100%."""

@@ -90,7 +90,7 @@ import shutil
 from flask_login import login_user
 class TestCases(unittest.TestCase):
     def setUp(self):
-        current_file_path = os.path.abspath(__file__)
+        current_file_path = os.path.abspath("__file__")
         current_directory = os.path.dirname(current_file_path)
         self.secret_key = 'mysecretkey'
         self.template_folder = f'{current_directory}/templates'

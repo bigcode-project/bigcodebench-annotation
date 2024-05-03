@@ -12,8 +12,11 @@ def f_476(x):
         x (numpy.ndarray): The range of x values over which to plot the distribution.
 
     Returns:
-        None. Displays a matplotlib plot of the complex distribution.
+        numpy.ndarray: The complex distribution created from the two Gaussian distributions.
 
+    Raises:
+        TypeError: If `x` is not a numpy.ndarray.
+    
     Requirements:
     - numpy
     - scipy.stats.norm
@@ -41,6 +44,7 @@ def f_476(x):
     plt.legend()
     plt.grid()
     plt.show()
+    return complex_dist
 
 import unittest
 import numpy as np
@@ -48,7 +52,8 @@ class TestCases(unittest.TestCase):
     def test_return_type(self):
         """ Test that the function returns None. """
         result = f_476(np.linspace(-10, 10, 1000))
-        self.assertIsNone(result)
+        self.assertAlmostEquals(result[0], 7.69459863e-23+3.03794142e-09j)
+        self.assertAlmostEquals(result[1], 9.398202102189114e-23+3.2258293600449145e-09j)
     def test_input_type(self):
         """ Test the function with non-numpy array inputs. """
         with self.assertRaises(TypeError):
@@ -56,8 +61,15 @@ class TestCases(unittest.TestCase):
     def test_empty_array(self):
         """ Test function with empty numpy array. """
         result = f_476(np.array([]))
-        self.assertIsNone(result)
+        self.assertEqual(result.size, 0)
     def test_array_length(self):
         """ Test function with arrays of different lengths. """
         result = f_476(np.linspace(-5, 5, 500))
-        self.assertIsNone(result)
+        self.assertAlmostEquals(result[0], 1.4867195147342979e-06+0.0004363413475228801j)
+        self.assertAlmostEquals(result[-1], 1.4867195147342979e-06+0.06475879783294587j)
+    def test_special_values(self):
+        """ Test function with special values. """
+        result = f_476(np.linspace(-np.inf, np.inf, 1000))
+        # nan+nanj, should not use assertEqual
+        self.assertTrue(np.isnan(result[0].real))
+        self.assertTrue(np.isnan(result[0].imag))
