@@ -1,5 +1,4 @@
 import heapq
-import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 def f_668(df, col1, col2, N=10):
@@ -20,7 +19,6 @@ def f_668(df, col1, col2, N=10):
 
     Requirements:
     - heapq
-    - pandas
     - sklearn.preprocessing
     
     Example:

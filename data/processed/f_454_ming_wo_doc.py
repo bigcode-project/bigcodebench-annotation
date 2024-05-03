@@ -3,7 +3,6 @@ from random import randint
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
 TEMP_CATEGORIES = ['Cold', 'Normal', 'Hot']
 FILE_PATH = 'custom_data.csv'
 

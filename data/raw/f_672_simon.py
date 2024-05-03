@@ -1,5 +1,4 @@
 import re
-import numpy as np
 import pandas as pd
 
 def f_672(df: pd.DataFrame) -> int:
@@ -17,9 +16,8 @@ def f_672(df: pd.DataFrame) -> int:
     TypeError: If input is not a DataFrame
 
     Requirements:
-    - re (for regular expression matching)
-    - numpy (for numerical operations)
-    - pandas (for DataFrame operations)
+    - re
+    - pandas
 
     Note:
     The function uses a specific pattern '[(){}[\]]' to identify brackets.
@@ -40,7 +38,7 @@ def f_672(df: pd.DataFrame) -> int:
     # Constants
     BRACKETS_PATTERN = '[(){}[\]]'
 
-    return df.map(
+    return df.applymap(
         lambda x: len(re.findall(BRACKETS_PATTERN, str(x)))
         ).sum().sum()
 

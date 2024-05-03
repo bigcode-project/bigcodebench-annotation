@@ -1,7 +1,6 @@
 import seaborn as sns
 from random import sample
 
-
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 

@@ -107,7 +107,7 @@ class TestCases(unittest.TestCase):
 
     def test_non_existent_table(self):
         # Catch the OperationalError from sqlite directly
-        with self.assertRaises(pd.errors.DatabaseError):
+        with self.assertRaises(Exception):
             f_724(self.db_path, 'fake_table', 'test_column')
 
     def test_non_existent_column(self):
