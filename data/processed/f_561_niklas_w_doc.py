@@ -1,7 +1,7 @@
 import math
 import pandas as pd
 
-def f_347(tuples_list):
+def f_387(tuples_list):
     """
     Given a list of tuples turn them into a Pandas DataFrame with math.sin applied to each number.
 
@@ -16,7 +16,7 @@ def f_347(tuples_list):
     - pandas
 
     Example:
-    >>> df = f_347([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)])
+    >>> df = f_387([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)])
     >>> print(df)
               0         1         2         3
     0  0.841471  0.909297  0.141120 -0.756802
@@ -29,7 +29,7 @@ def f_347(tuples_list):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = f_347([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)])
+        df = f_387([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)])
         self.assertEqual(df.shape, (3, 4))
         self.assertEqual(df.iloc[0, 0], math.sin(1))
         self.assertEqual(df.iloc[0, 1], math.sin(2))
@@ -44,14 +44,14 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df.iloc[2, 2], math.sin(11))
         self.assertEqual(df.iloc[2, 3], math.sin(12))
     def test_case_2(self):
-        df = f_347([(1, 2, 3, 4)])
+        df = f_387([(1, 2, 3, 4)])
         self.assertEqual(df.shape, (1, 4))
         self.assertEqual(df.iloc[0, 0], math.sin(1))
         self.assertEqual(df.iloc[0, 1], math.sin(2))
         self.assertEqual(df.iloc[0, 2], math.sin(3))
         self.assertEqual(df.iloc[0, 3], math.sin(4))
     def test_case_3(self):
-        df = f_347([(1, 2, 3, 4), (5, 6, 7, 8)])
+        df = f_387([(1, 2, 3, 4), (5, 6, 7, 8)])
         self.assertEqual(df.shape, (2, 4))
         self.assertEqual(df.iloc[0, 0], math.sin(1))
         self.assertEqual(df.iloc[0, 1], math.sin(2))
@@ -62,7 +62,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df.iloc[1, 2], math.sin(7))
         self.assertEqual(df.iloc[1, 3], math.sin(8))
     def test_case_4(self):
-        df = f_347([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12), (13, 14, 15, 16)])
+        df = f_387([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12), (13, 14, 15, 16)])
         self.assertEqual(df.shape, (4, 4))
         self.assertEqual(df.iloc[0, 0], math.sin(1))
         self.assertEqual(df.iloc[0, 1], math.sin(2))
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df.iloc[3, 2], math.sin(15))
         self.assertEqual(df.iloc[3, 3], math.sin(16))
     def test_case_5(self):
-        df = f_347([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12), (13, 14, 15, 16), (17, 18, 19, 20)])
+        df = f_387([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12), (13, 14, 15, 16), (17, 18, 19, 20)])
         self.assertEqual(df.shape, (5, 4))
         self.assertEqual(df.iloc[0, 0], math.sin(1))
         self.assertEqual(df.iloc[0, 1], math.sin(2))

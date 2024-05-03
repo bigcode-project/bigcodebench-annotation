@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 def f_787(start_date='2016-01-01', periods=13, freq='WOM-2FRI', seed=0):
     """
     Generate a share price series for a specific period of time, plot the share prices, and return the DataFrame and the plot on the share prices over the given date range.
-
+    The share prices are randomly generated between 100 and 500 from a uniform distribution.
+    
     Parameters:
     - start_date (str): The start date for the share price series in 'YYYY-MM-DD' format. Default is '2016-01-01'.
     - periods (int): The number of periods for which the share price needs to be generated. Default is 13.

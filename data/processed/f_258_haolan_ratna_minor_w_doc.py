@@ -2,7 +2,7 @@ import matplotlib
 import numpy as np
 
 
-def f_662(ax, num_points):
+def f_737(ax, num_points):
     """
     Plots "num_points" random points on the polar diagram represented by "ax."
     The radial ticks on the plot are positioned based on the number of points divided by 10 degrees.
@@ -26,7 +26,7 @@ def f_662(ax, num_points):
     >>> np.random.seed(0)
     >>> fig = plt.figure()
     >>> ax = fig.add_subplot(111, polar=True)
-    >>> ax = f_662(ax, 100)
+    >>> ax = f_737(ax, 100)
     >>> ax.get_rlabel_position()
     10.0
     >>> plt.close()
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
         np.random.seed(0)
         fig = plt.figure()
         ax = fig.add_subplot(111, polar=True)
-        modified_ax = f_662(ax, 10)
+        modified_ax = f_737(ax, 10)
         self.assertIsInstance(modified_ax, plt.Axes, "Should return a matplotlib Axes object")
         self.assertEqual(modified_ax.get_rlabel_position(), 10 / 10, "Radial label position should be set to 1")
         plt.close()
@@ -60,7 +60,7 @@ class TestCases(unittest.TestCase):
         np.random.seed(0)
         fig = plt.figure()
         ax = fig.add_subplot(111, polar=True)
-        modified_ax = f_662(ax, 100)
+        modified_ax = f_737(ax, 100)
         self.assertIsInstance(modified_ax, plt.Axes, "Should return a matplotlib Axes object")
         self.assertEqual(modified_ax.get_rlabel_position(), 100 / 10, "Radial label position should be set to 10")
         plt.close()
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         np.random.seed(0)
         fig = plt.figure()
         ax = fig.add_subplot(111, polar=True)
-        modified_ax = f_662(ax, 50)
+        modified_ax = f_737(ax, 50)
         self.assertIsInstance(modified_ax, plt.Axes, "Should return a matplotlib Axes object")
         self.assertEqual(modified_ax.get_rlabel_position(), 50 / 10, "Radial label position should be set to 5")
         plt.close()
@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
         np.random.seed(0)
         fig = plt.figure()
         ax = fig.add_subplot(111, polar=True)
-        modified_ax = f_662(ax, 0)
+        modified_ax = f_737(ax, 0)
         self.assertIsInstance(modified_ax, plt.Axes, "Should return a matplotlib Axes object")
         self.assertEqual(modified_ax.get_rlabel_position(), 0 / 10, "Radial label position should be set to 0")
         plt.close()
@@ -88,8 +88,8 @@ class TestCases(unittest.TestCase):
         fig = plt.figure()
         ax = fig.add_subplot(111, polar=True)
         with self.assertRaises(ValueError, msg="Should raise ValueError for negative number of points"):
-            f_662(ax, -10)
+            f_737(ax, -10)
         plt.close()
     def test_case_6(self):
         with self.assertRaises(ValueError):
-            f_662("non_ax", 1)
+            f_737("non_ax", 1)

@@ -3,7 +3,7 @@ import requests
 
 URL = 'https://api.github.com/users/'
 
-def f_316(username):
+def f_347(username):
     """
     Retrieves user information from the GitHub API for a given username, normalizes all string data to ASCII,
     and returns a dictionary of the normalized data. This function demonstrates data retrieval from a web API
@@ -23,7 +23,7 @@ def f_316(username):
     - requests
 
     Examples:
-    >>> result = f_316('torvalds')
+    >>> result = f_347('torvalds')
     >>> isinstance(result, dict)
     True
     >>> 'login' in result
@@ -55,25 +55,25 @@ class TestCases(unittest.TestCase):
     @patch('requests.get')
     def test_return_type(self, mock_get):
         mock_get.return_value.json.return_value = {'login': 'user', 'name': 'Test User'}
-        result = f_316('user')
+        result = f_347('user')
         self.assertIsInstance(result, dict)
     @patch('requests.get')
     def test_normalized_string(self, mock_get):
         mock_get.return_value.json.return_value = {'login': 'user', 'name': 'Tést Üser'}
-        result = f_316('user')
+        result = f_347('user')
         self.assertEqual(result['name'], 'Test User')
     @patch('requests.get')
     def test_non_string_values(self, mock_get):
         mock_get.return_value.json.return_value = {'login': 'user', 'id': 12345}
-        result = f_316('user')
+        result = f_347('user')
         self.assertEqual(result['id'], 12345)
     @patch('requests.get')
     def test_empty_username(self, mock_get):
         mock_get.return_value.json.return_value = {}
-        result = f_316('')
+        result = f_347('')
         self.assertEqual(result, {})
     @patch('requests.get')
     def test_error_response(self, mock_get):
         mock_get.return_value.raise_for_status = Mock(side_effect=requests.exceptions.HTTPError("404 Not Found"))
         with self.assertRaises(Exception) as context:
-            f_316('nonexistentuser')
+            f_347('nonexistentuser')

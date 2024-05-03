@@ -15,10 +15,16 @@ def f_661(file_path, output_path=None, sort_key='title', linear_regression=False
     x_column (str): The name of the column to use as the predictor variable for linear regression.
     y_column (str): The name of the column to use as the response variable for linear regression.
 
-    Returns: DataFrame, str, or LinearRegression model: The sorted pandas DataFrame if 'output_path' is None and
+    Returns: 
+    DataFrame, str, or LinearRegression model: The sorted pandas DataFrame if 'output_path' is None and
     'linear_regression' is False, otherwise the path to the saved output file. If 'linear_regression' is True,
     returns the fitted model.
 
+    Raises:
+    Exception: If there is an error in reading, sorting the data, or fitting the model.
+    If the specified columns for linear regression do not exist in the dataframe, a ValueError with "Specified columns for linear regression do not exist in the dataframe" message is also raised.
+
+    
     Requirements:
     - pandas
     - scikit-learn
@@ -27,8 +33,7 @@ def f_661(file_path, output_path=None, sort_key='title', linear_regression=False
     >>> model = f_661('data.csv', sort_key='title', linear_regression=True, x_column='age', y_column='salary')
     >>> # Returns a fitted LinearRegression model based on 'age' and 'salary' columns.
 
-    Raises:
-    Exception: If there is an error in reading, sorting the data, or fitting the model.
+    
     """
     try:
         df = pd.read_csv(file_path)

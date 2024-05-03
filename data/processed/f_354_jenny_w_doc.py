@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
 
-def f_180(data: pd.DataFrame) -> (pd.DataFrame, list):
+def f_194(data: pd.DataFrame) -> (pd.DataFrame, list):
     """
     This function takes a pandas DataFrame and standardizes its features using sklearn's StandardScaler,
     which standardizes features by removing the mean and scaling to unit variance.
@@ -32,7 +32,7 @@ def f_180(data: pd.DataFrame) -> (pd.DataFrame, list):
     ...     'Feature4': [0.5, 0.4, 0.3, 0.2, 0.1],
     ...     'Feature5': [0.1, 0.3, 0.5, 0.7, 0.9]
     ... })
-    >>> standardized_data, axes_list = f_180(data)
+    >>> standardized_data, axes_list = f_194(data)
     >>> type(standardized_data)
     <class 'pandas.core.frame.DataFrame'>
     >>> axes_list
@@ -93,7 +93,7 @@ class TestCases(unittest.TestCase):
             np.random.chisquare(df=1, size=(100, 5)),
             columns=self.columns,
         )
-        standardized_data, _ = f_180(data)
+        standardized_data, _ = f_194(data)
         self.assertTrue(np.isclose(standardized_data.std().values, 1, atol=1e-1).all())
     def test_case_5(self):
         # Test function with a dataframe that has only one row
@@ -106,7 +106,7 @@ class TestCases(unittest.TestCase):
                 "Feature5": [0.5],
             }
         )
-        _, axes_list = f_180(data)
+        _, axes_list = f_194(data)
         self.assertEqual(len(axes_list), 5)
     def test_case_6(self):
         # Test with columns having identical values across all rows.
@@ -119,7 +119,7 @@ class TestCases(unittest.TestCase):
                 "Feature5": [0.5] * 100,
             }
         )
-        standardized_data, _ = f_180(data)
+        standardized_data, _ = f_194(data)
         # Identical values become NaN after standardization because variance is 0
         expected_zeros = pd.DataFrame(
             0,
@@ -137,7 +137,7 @@ class TestCases(unittest.TestCase):
                 "Extra2",
             ],
         )
-        _, axes_list = f_180(data)
+        _, axes_list = f_194(data)
         self.assertEqual(len(axes_list), 5)
     def test_case_8(self):
         # Test with missing columns from the expected FEATURES set
@@ -145,12 +145,12 @@ class TestCases(unittest.TestCase):
             np.random.rand(100, 3), columns=["Feature1", "Feature2", "Feature3"]
         )
         with self.assertRaises(KeyError):
-            f_180(data)
+            f_194(data)
     def test_case_9(self):
         # Test should fail when there is invalid input - empty dataframe
         data = pd.DataFrame()
         with self.assertRaises(KeyError):
-            f_180(data)
+            f_194(data)
     def test_case_10(self):
         # Test should fail when there is invalid input - NaN
         data = pd.DataFrame(
@@ -162,7 +162,7 @@ class TestCases(unittest.TestCase):
                 "Feature5": [0.5, 0.6, np.nan],
             }
         )
-        standardized_data, _ = f_180(data)
+        standardized_data, _ = f_194(data)
         self.assertTrue(standardized_data.isnull().any().any())
     def test_case_11(self):
         # Test should fail when there is invalid input - inf
@@ -176,7 +176,7 @@ class TestCases(unittest.TestCase):
             }
         )
         with self.assertRaises(ValueError):
-            f_180(data)
+            f_194(data)
     def test_case_12(self):
         # Test the function with non-numeric columns.
         data = pd.DataFrame(
@@ -189,15 +189,15 @@ class TestCases(unittest.TestCase):
             }
         )
         with self.assertRaises(ValueError):
-            f_180(data)
+            f_194(data)
     def test_case_13(self):
         # Function should fail if more than expected number of features (5)
         data = pd.DataFrame(np.random.rand(100, 50))
         with self.assertRaises(KeyError):
-            f_180(data)
+            f_194(data)
     def standardized_data_test(self, data):
         np.random.seed(0)
-        standardized_data, axes_list = f_180(data)
+        standardized_data, axes_list = f_194(data)
         # Check if the data is standardized (mean ~ 0 and standard deviation ~ 1)
         self.assertTrue(np.isclose(standardized_data.mean().values, 0, atol=1e-2).all())
         self.assertTrue(np.isclose(standardized_data.std().values, 1, atol=1e-1).all())

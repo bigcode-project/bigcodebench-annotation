@@ -3,7 +3,7 @@ from scipy import stats
 
 
 
-def f_201(matrix):
+def f_217(matrix):
     """
     Normalizes a 2D numeric array (matrix) using the Z score.
     
@@ -21,7 +21,7 @@ def f_201(matrix):
     Example:
     >>> import numpy as np
     >>> matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    >>> normalized_df = f_201(matrix)
+    >>> normalized_df = f_217(matrix)
     >>> isinstance(normalized_df, pd.DataFrame)
     True
     >>> np.allclose(normalized_df.mean(), 0)
@@ -40,7 +40,7 @@ import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-        result = f_201(matrix)
+        result = f_217(matrix)
         expected_result = pd.DataFrame({
             0: [-1.224745, 0.0, 1.224745],
             1: [-1.224745, 0.0, 1.224745],
@@ -49,7 +49,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result, expected_result)
     def test_case_2(self):
         matrix = np.array([[2, 5], [5, 2]])
-        result = f_201(matrix)
+        result = f_217(matrix)
         expected_result = pd.DataFrame({
             0: [-1.0, 1.0],
             1: [1.0, -1.0]
@@ -57,14 +57,14 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result, expected_result)
     def test_case_3(self):
         matrix = np.array([[5]])
-        result = f_201(matrix)
+        result = f_217(matrix)
         expected_result = pd.DataFrame({
             0: [0.0]
         })
         pd.testing.assert_frame_equal(result, expected_result)
     def test_case_4(self):
         matrix = np.array([[1, 3], [2, 4], [3, 5]])
-        result = f_201(matrix)
+        result = f_217(matrix)
         expected_result = pd.DataFrame({
             0: [-1.224745, 0.0, 1.224745],
             1: [-1.224745, 0.0, 1.224745]
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result, expected_result)
     def test_case_5(self):
         matrix = np.array([[10, 20, 30], [40, 50, 60], [70, 80, 90]])
-        result = f_201(matrix)
+        result = f_217(matrix)
         expected_result = pd.DataFrame({
             0: [-1.224745, 0.0, 1.224745],
             1: [-1.224745, 0.0, 1.224745],

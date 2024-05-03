@@ -21,6 +21,8 @@ def f_900(n_pairs=26):
     Returns:
     - matplotlib.container.BarContainer: This object represents the bar chart created by the function.
       Each bar in the chart is labeled with its corresponding letter-number pair (e.g., 'a:1', 'b:2').
+      The title of the chart is "Random Letter:Number Pairs Chart", the x-axis label is "Letter:Number Pairs",
+      and the y-axis label is "Counts".
 
     Raises:
     - ValueError: If 'n_pairs' is outside the range of 1 to 26, inclusive. This ensures that the function

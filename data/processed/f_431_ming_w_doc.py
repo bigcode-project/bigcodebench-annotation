@@ -3,7 +3,7 @@ import os
 import base64
 
 
-def f_526(password: str, salt_length: int = 8) -> str:
+def f_589(password: str, salt_length: int = 8) -> str:
     """
     Encrypt a password using Salt and SHA-256, then encode the result in base64.
 
@@ -20,7 +20,7 @@ def f_526(password: str, salt_length: int = 8) -> str:
     - os
 
     Example:
-    >>> isinstance(f_526('my_password'), str)
+    >>> isinstance(f_589('my_password'), str)
     True
     """
     # Generate a random salt
@@ -39,7 +39,7 @@ import binascii
 class TestCases(unittest.TestCase):
     
     def test_valid_encryption_format(self):
-        encrypted = f_526("test_password")
+        encrypted = f_589("test_password")
         try:
             base64.b64decode(encrypted)
             valid = True
@@ -49,18 +49,18 @@ class TestCases(unittest.TestCase):
     def test_varying_password_lengths(self):
         for length in [1, 5, 10, 50, 100]:
             password = "a" * length
-            encrypted = f_526(password)
+            encrypted = f_589(password)
             self.assertTrue(isinstance(encrypted, str) and len(encrypted) > 0)
     
     def test_salt_length_effect(self):
         for salt_length in [1, 4, 8, 16]:
-            encrypted = f_526("test_password", salt_length=salt_length)
+            encrypted = f_589("test_password", salt_length=salt_length)
             self.assertTrue(isinstance(encrypted, str) and len(encrypted) > 0)
     
     def test_special_characters_in_password(self):
-        encrypted = f_526("!@#$%^&*()")
+        encrypted = f_589("!@#$%^&*()")
         self.assertTrue(isinstance(encrypted, str) and len(encrypted) > 0)
     
     def test_empty_password(self):
-        encrypted = f_526("")
+        encrypted = f_589("")
         self.assertTrue(isinstance(encrypted, str) and len(encrypted) > 0)

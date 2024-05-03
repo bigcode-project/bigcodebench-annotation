@@ -13,7 +13,7 @@ def f_896(file_path, save_path=None):
     scenarios, such as empty data or data containing only stopwords.
 
     Parameters:
-    - file_path (str): Path to the CSV file containing the text data. The CSV should have a single text column.
+    - file_path (str): Path to the CSV file containing the text data. The CSV should have a single text column named "Text".
     - save_path (str, optional): Path where the histogram plot will be saved. If not provided, the plot is displayed.
 
     Returns:

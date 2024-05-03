@@ -4,7 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 
 
-def f_199(csv_file_path, target_column="target", test_size=0.2, n_estimators=100):
+def f_215(csv_file_path, target_column="target", test_size=0.2, n_estimators=100):
     """
     Processes a CSV file to train a Random Forest classifier and generates a formatted classification report.
 
@@ -26,7 +26,7 @@ def f_199(csv_file_path, target_column="target", test_size=0.2, n_estimators=100
         - sklearn
 
     Example:
-    >>> report = f_199('/path/to/data.csv')
+    >>> report = f_215('/path/to/data.csv')
     >>> print(report)
     class 0        0.88       0.90       0.89          50
     class 1        0.89       0.87       0.88          48
@@ -74,11 +74,11 @@ import unittest
 from unittest.mock import patch
 import pandas as pd
 class TestCases(unittest.TestCase):
-    """Test cases for f_199."""
+    """Test cases for f_215."""
     @patch("pandas.read_csv")
     def test_default_parameters(self, mock_read_csv):
         """
-        Test f_199 with default parameters using an adequately sized mock dataset.
+        Test f_215 with default parameters using an adequately sized mock dataset.
         """
         mock_data = {
             "feature1": range(100),
@@ -86,12 +86,12 @@ class TestCases(unittest.TestCase):
             "target": [0, 1] * 50,  # Alternating 0s and 1s
         }
         mock_read_csv.return_value = pd.DataFrame(mock_data)
-        result = f_199("dummy_path.csv")
+        result = f_215("dummy_path.csv")
         self.assertIn("precision", result)
     @patch("pandas.read_csv")
     def test_non_default_target_column(self, mock_read_csv):
         """
-        Test f_199 with a non-default target column using a larger mock dataset.
+        Test f_215 with a non-default target column using a larger mock dataset.
         """
         mock_data = {
             "feature1": range(100),
@@ -99,12 +99,12 @@ class TestCases(unittest.TestCase):
             "label": [1, 0] * 50,  # Alternating 1s and 0s
         }
         mock_read_csv.return_value = pd.DataFrame(mock_data)
-        result = f_199("dummy_path.csv", target_column="label")
+        result = f_215("dummy_path.csv", target_column="label")
         self.assertIn("precision", result)
     @patch("pandas.read_csv")
     def test_different_test_size(self, mock_read_csv):
         """
-        Test f_199 with a different test size and a larger dataset.
+        Test f_215 with a different test size and a larger dataset.
         """
         mock_data = {
             "feature1": range(100),
@@ -112,12 +112,12 @@ class TestCases(unittest.TestCase):
             "target": [0, 1, 1, 0] * 25,  # Repeated pattern
         }
         mock_read_csv.return_value = pd.DataFrame(mock_data)
-        result = f_199("dummy_path.csv", test_size=0.5)
+        result = f_215("dummy_path.csv", test_size=0.5)
         self.assertIn("precision", result)
     @patch("pandas.read_csv")
     def test_different_n_estimators(self, mock_read_csv):
         """
-        Test f_199 with a different number of estimators and an expanded dataset.
+        Test f_215 with a different number of estimators and an expanded dataset.
         """
         mock_data = {
             "feature1": range(100),
@@ -125,15 +125,15 @@ class TestCases(unittest.TestCase):
             "target": [1, 0] * 50,  # Alternating 1s and 0s
         }
         mock_read_csv.return_value = pd.DataFrame(mock_data)
-        result = f_199("dummy_path.csv", n_estimators=50)
+        result = f_215("dummy_path.csv", n_estimators=50)
         self.assertIn("precision", result)
     @patch("pandas.read_csv")
     def test_missing_target_column(self, mock_read_csv):
         """
-        Test f_199 with a missing target column.
+        Test f_215 with a missing target column.
         """
         mock_read_csv.return_value = pd.DataFrame(
             {"feature1": [1, 2], "feature2": [3, 4]}
         )
         with self.assertRaises(ValueError):
-            f_199("dummy_path.csv", target_column="not_exist")
+            f_215("dummy_path.csv", target_column="not_exist")

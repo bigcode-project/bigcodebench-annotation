@@ -2,7 +2,7 @@ import numpy as np
 import seaborn as sns
 
 
-def f_224(P, T):
+def f_242(P, T):
     """
     Calculate the product of a matrix 'P' and a 3D tensor 'T' using numpy and visualize the results as a heatmap.
     Note: This function only accepts numpy matrices/arrays.
@@ -23,7 +23,7 @@ def f_224(P, T):
     >>> np.random.seed(0)
     >>> P = np.array([[6, 2, 7], [1, 1, 8]])
     >>> T = np.random.rand(3, 3, 3)
-    >>> product, heatmap = f_224(P, T)
+    >>> product, heatmap = f_242(P, T)
     >>> product
     array([[[ 9.50686132, 11.96467131, 11.52469849],
             [ 9.99949817,  7.62347761,  9.48114103],
@@ -61,32 +61,32 @@ class TestCases(unittest.TestCase):
         )
     def test_case_1(self):
         # Test return types
-        product, heatmap = f_224(self.test_P, self.test_T)
+        product, heatmap = f_242(self.test_P, self.test_T)
         self.assertIsInstance(product, np.ndarray)
         self.assertIsInstance(heatmap, plt.Axes)
     def test_case_2(self):
         # Test output correctness
-        product, _ = f_224(self.test_P, self.test_T)
+        product, _ = f_242(self.test_P, self.test_T)
         expected_product = np.tensordot(self.test_P, self.test_T, axes=[1, 0])
         self.assertTrue(np.allclose(product, expected_product))
     def test_case_3(self):
         # Test output correctness with zeros
-        product, _ = f_224(self.test_P_zeros, self.test_T)
+        product, _ = f_242(self.test_P_zeros, self.test_T)
         self.assertTrue(np.all(product == 0))
     def test_case_4(self):
         # Test return shape
-        product, _ = f_224(self.test_P, self.test_T)
+        product, _ = f_242(self.test_P, self.test_T)
         expected_shape = (2, 3, 3)
         self.assertEqual(product.shape, expected_shape, "Output shape is incorrect")
     def test_case_5(self):
         # Test handling invalid input types
         with self.assertRaises(TypeError):
-            f_224([1, 2], [2, 1])
+            f_242([1, 2], [2, 1])
     def test_case_6(self):
         # Test handling invalid shape
         P = np.array([[1, 2], [3, 4]])
         T = np.random.rand(3, 3, 3)
         with self.assertRaises(ValueError):
-            f_224(P, T)
+            f_242(P, T)
     def tearDown(self):
         plt.close("all")

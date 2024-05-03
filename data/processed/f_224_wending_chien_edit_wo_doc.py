@@ -8,7 +8,7 @@ DATABASE_NAME = 'test.db'
 TABLE_NAME = 'test_table'
 
 
-def f_204(csv_input):
+def f_220(csv_input):
     """
     Imports data from a specified CSV input into an SQLite database and retrieves it as a pandas DataFrame. The function
     reads the CSV input (file path or `StringIO`), creates a new database table or replaces an existing one, inserts
@@ -32,7 +32,7 @@ def f_204(csv_input):
     >>> test_csv_data = "id,name\\n1,Alice\\n2,Bob"
     >>> test_csv_file = StringIO(test_csv_data)  # This is the in-memory CSV data
     >>> # Testing the function with the in-memory CSV data
-    >>> df = f_204(test_csv_file)
+    >>> df = f_220(test_csv_file)
     >>> print(df)
       id   name
     0  1  Alice
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
             "Gender": ["Female", "Male", "Male"]
         }
         expected_df = pd.DataFrame(expected_data)
-        result_df = f_204('dummy_path.csv')
+        result_df = f_220('dummy_path.csv')
         result_df["Age"] = result_df["Age"].astype('int64')  # Ensure types are matched
         assert_frame_equal(expected_df, result_df)
     @patch('builtins.open', new_callable=mock_open,
@@ -102,7 +102,7 @@ class TestCases(unittest.TestCase):
             "Stock": [10, 50, 30]
         }
         expected_df = pd.DataFrame(expected_data)
-        result_df = f_204('dummy_path.csv')
+        result_df = f_220('dummy_path.csv')
         result_df["Price"] = result_df["Price"].astype('int64')  # Ensure types are matched
         result_df["Stock"] = result_df["Stock"].astype('int64')  # Ensure types are matched
         assert_frame_equal(expected_df, result_df)
@@ -110,18 +110,18 @@ class TestCases(unittest.TestCase):
     @patch('sqlite3.connect')
     def test_case_3(self, mock_connect, mock_open):
         mock_connect.return_value = self.conn
-        result_df = f_204('dummy_path.csv')
+        result_df = f_220('dummy_path.csv')
         self.assertEqual(result_df.shape, (2, 2))
     def test_case_4(self):
         # Non-existent file handling: Expecting a FileNotFoundError
         non_existent_csv = 'non_existent.csv'
         with self.assertRaises(FileNotFoundError):
-            f_204(non_existent_csv)
+            f_220(non_existent_csv)
     @patch('builtins.open', new_callable=mock_open, read_data='Name,Age\n"Alice""; DROP TABLE test_table; --",30')
     @patch('sqlite3.connect')
     def test_case_5(self, mock_connect, mock_open):
         mock_connect.return_value = self.conn
-        result_df = f_204('dangerous_path.csv')
+        result_df = f_220('dangerous_path.csv')
         self.assertEqual(result_df.shape, (1, 2))
     def test_case_6(self):
         # Test with in-memory CSV data
@@ -132,5 +132,5 @@ class TestCases(unittest.TestCase):
             "name": ["Alice", "Bob"]
         }
         expected_df = pd.DataFrame(expected_data)
-        result_df = f_204(test_csv_file)
+        result_df = f_220(test_csv_file)
         assert_frame_equal(expected_df, result_df)

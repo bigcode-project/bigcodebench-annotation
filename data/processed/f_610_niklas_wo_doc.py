@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
-def f_258(data_path):
+def f_281(data_path):
     """
     Normalizes a dataset from a .csv file.
     
@@ -16,7 +16,7 @@ def f_258(data_path):
     - sklearn
     
     Example:
-    >>> df = f_258('path_to_data_file.csv')
+    >>> df = f_281('path_to_data_file.csv')
     """
     df = pd.read_csv(data_path)
     data = df.to_numpy()
@@ -38,7 +38,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(data, columns=['a', 'b', 'c'])
         df.to_csv('data.csv', index=False)
         # Run function
-        df = f_258('data.csv')
+        df = f_281('data.csv')
         # Check result
         self.assertEqual(df.shape, (3, 3))
         self.assertAlmostEqual(df['a'].min(), 0)
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(data, columns=['a', 'b', 'c'])
         df.to_csv('data.csv', index=False)
         # Run function
-        df = f_258('data.csv')
+        df = f_281('data.csv')
         # Check result
         self.assertEqual(df.shape, (3, 3))
         self.assertAlmostEqual(df['a'].min(), 0)
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(data, columns=['a', 'b', 'c'])
         df.to_csv('data.csv', index=False)
         # Run function
-        df = f_258('data.csv')
+        df = f_281('data.csv')
         # Check result
         self.assertEqual(df.shape, (3, 3))
         self.assertAlmostEqual(df['a'].min(), 0)
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(data, columns=['a', 'b', 'c'])
         df.to_csv('data.csv', index=False)
         # Run function
-        df = f_258('data.csv')
+        df = f_281('data.csv')
         # Check result
         self.assertEqual(df.shape, (3, 3))
         self.assertAlmostEqual(df['a'].min(), 0)
@@ -106,7 +106,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(data, columns=['a', 'b', 'c'])
         df.to_csv('data.csv', index=False)
         # Run function
-        df = f_258('data.csv')
+        df = f_281('data.csv')
         # Check result
         self.assertEqual(df.shape, (2, 3))
         self.assertAlmostEqual(df['a'].min(), 0)

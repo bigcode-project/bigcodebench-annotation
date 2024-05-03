@@ -3,7 +3,7 @@ import hashlib
 
 def f_776(word: str) -> dict:
     """
-    Count the occurrence of each adjacent pair of letters in a wordm and encode the result as an MD5 hash.
+    Count the occurrence of each adjacent pair of letters from left to right in a word and encode the result as an MD5 hash.
 
     Parameters:
     - word (str): The word in which to count the adjacent letter pairs.

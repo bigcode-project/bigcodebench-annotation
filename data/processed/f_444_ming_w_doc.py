@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def f_434(array_length=100):
+def f_484(array_length=100):
     """
     Generate two arrays of random integers and draw a line diagram with the 
     maximum values of the respective elements of the two arrays.
@@ -20,7 +20,7 @@ def f_434(array_length=100):
     - random
 
     Example:
-    >>> ax = f_434(100)
+    >>> ax = f_484(100)
     """
     array1 = np.array([randint(1, 100) for _ in range(array_length)])
     array2 = np.array([randint(1, 100) for _ in range(array_length)])
@@ -38,26 +38,26 @@ from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
-        ax = f_434(50)
+        ax = f_484(50)
         self.assertIsInstance(ax, Axes)
         self.assertEqual(len(ax.lines[0].get_ydata()), 50)
         
     def test_case_2(self):
-        ax = f_434(100)
+        ax = f_484(100)
         self.assertIsInstance(ax, Axes)
         self.assertEqual(len(ax.lines[0].get_ydata()), 100)
         
     def test_case_3(self):
-        ax = f_434(150)
+        ax = f_484(150)
         self.assertIsInstance(ax, Axes)
         self.assertEqual(len(ax.lines[0].get_ydata()), 150)
         
     def test_case_4(self):
-        ax = f_434(200)
+        ax = f_484(200)
         self.assertIsInstance(ax, Axes)
         self.assertEqual(len(ax.lines[0].get_ydata()), 200)
         
     def test_case_5(self):
-        ax = f_434(250)
+        ax = f_484(250)
         self.assertIsInstance(ax, Axes)
         self.assertEqual(len(ax.lines[0].get_ydata()), 250)

@@ -3,7 +3,7 @@ import ctypes
 from datetime import datetime
 import pytz
 
-def f_67(filepath):
+def f_73(filepath):
     """
     Loads a DLL file from the specified filepath and prints its metadata, including creation time,
     modification time, and file size. The times are displayed in UTC format. This function
@@ -22,9 +22,9 @@ def f_67(filepath):
     - pytz
 
     Examples:
-    >>> isinstance(f_67('libc.so.6'), str) # Doctest will vary based on the system and DLL file availability.
+    >>> isinstance(f_73('libc.so.6'), str) # Doctest will vary based on the system and DLL file availability.
     True
-    >>> 'libc.so.6' in f_67('libc.so.6')
+    >>> 'libc.so.6' in f_73('libc.so.6')
     True
     """
     lib = ctypes.CDLL(filepath)
@@ -60,19 +60,19 @@ class TestCases(unittest.TestCase):
         self.assertTrue(os.path.exists(self.filepath))
     def test_invalid_file_path(self):
         with self.assertRaises(OSError):
-            f_67('invalid_path.dll')
+            f_73('invalid_path.dll')
     @patch('ctypes.CDLL')
     @patch('os.stat')
     def test_return_value(self, mock_stat, mock_cdll):
         """Verify that the function returns the name of the DLL file."""
         mock_cdll.return_value._name = 'test.dll'
-        result = f_67('path/to/test.dll')
+        result = f_73('path/to/test.dll')
         self.assertEqual(result, 'test.dll')
     @patch('ctypes.CDLL', side_effect=OSError("File not found"))
     def test_nonexistent_file(self, mock_cdll):
         """Ensure function handles nonexistent files appropriately."""
         with self.assertRaises(OSError) as context:
-            f_67('path/to/nonexistent.dll')
+            f_73('path/to/nonexistent.dll')
         self.assertEqual(str(context.exception), "File not found")
     @patch('os.stat')
     @patch('ctypes.CDLL')
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         # Capture the output of print statements
         captured_output = StringIO()
         sys.stdout = captured_output
-        f_67('path/to/file.dll')
+        f_73('path/to/file.dll')
         # Restore stdout
         sys.stdout = sys.__stdout__
         # Verify that the expected metadata is printed

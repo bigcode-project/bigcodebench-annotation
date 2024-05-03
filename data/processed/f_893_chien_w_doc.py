@@ -2,7 +2,7 @@ import re
 import pandas as pd
 
 
-def f_571(input_string: str) -> pd.DataFrame:
+def f_638(input_string: str) -> pd.DataFrame:
     """
     Process a multi-line string by replacing tabs with spaces and converting it into a pandas DataFrame.
     Each non-empty line of the input string is transformed into a separate row in the DataFrame.
@@ -25,7 +25,7 @@ def f_571(input_string: str) -> pd.DataFrame:
       will be replaced by ' ' in the output DataFrame.
 
     Example:
-    >>> df = f_571('line a\\nfollowed by line b with a\\ttab\\n\\n...bye\\n')
+    >>> df = f_638('line a\\nfollowed by line b with a\\ttab\\n\\n...bye\\n')
     >>> print(df.head())
                                 Text
     0                         line a
@@ -43,39 +43,39 @@ def f_571(input_string: str) -> pd.DataFrame:
 import pandas as pd
 import unittest
 class TestCases(unittest.TestCase):
-    """Tests for f_571."""
+    """Tests for f_638."""
     def test_basic_string(self):
         """
         Test with a basic multi-line string.
         """
         input_str = "line1\nline2 with a\ttab\nline3"
         expected_output = pd.DataFrame({"Text": ["line1", "line2 with a tab", "line3"]})
-        pd.testing.assert_frame_equal(f_571(input_str), expected_output)
+        pd.testing.assert_frame_equal(f_638(input_str), expected_output)
     def test_empty_string(self):
         """
         Test with an empty string.
         """
         input_str = ""
         expected_output = pd.DataFrame(columns=["Text"])
-        pd.testing.assert_frame_equal(f_571(input_str), expected_output)
+        pd.testing.assert_frame_equal(f_638(input_str), expected_output)
     def test_string_with_empty_lines(self):
         """
         Test with a string that contains empty lines.
         """
         input_str = "line1\n\nline3"
         expected_output = pd.DataFrame({"Text": ["line1", "line3"]})
-        pd.testing.assert_frame_equal(f_571(input_str), expected_output)
+        pd.testing.assert_frame_equal(f_638(input_str), expected_output)
     def test_string_with_only_tabs(self):
         """
         Test with a string that contains only tabs.
         """
         input_str = "\t\t\t"
         expected_output = pd.DataFrame(columns=["Text"])
-        pd.testing.assert_frame_equal(f_571(input_str), expected_output)
+        pd.testing.assert_frame_equal(f_638(input_str), expected_output)
     def test_string_with_mixed_whitespace(self):
         """
         Test with a string that contains a mix of tabs and spaces.
         """
         input_str = "line1\n \t \nline3"
         expected_output = pd.DataFrame({"Text": ["line1", "line3"]})
-        pd.testing.assert_frame_equal(f_571(input_str), expected_output)
+        pd.testing.assert_frame_equal(f_638(input_str), expected_output)

@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.stats import linregress
 
 
-def f_278(df):
+def f_304(df):
     """
     Analyze the relationship between two variables in a DataFrame.
     The function performs a linear regression on the two variables and adds a 'predicted' column to the DataFrame.
@@ -22,7 +22,7 @@ def f_278(df):
     Example:
     >>> df = pd.DataFrame({'var1': np.random.randn(10),
     ...                    'var2': np.random.randn(10)})
-    >>> df = f_278(df)
+    >>> df = f_304(df)
     >>> assert 'predicted' in df.columns
     >>> assert len(df) == 10
     >>> assert len(df.columns) == 3
@@ -43,14 +43,14 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame({'var1': np.random.randn(10),
                            'var2': np.random.randn(10)})
-        df = f_278(df)
+        df = f_304(df)
         self.assertTrue('predicted' in df.columns)
         self.assertEqual(len(df), 10)
         self.assertEqual(len(df.columns), 3)
     def test_case_2(self):
         df = pd.DataFrame({'var1': [1, 2, 3, 4, 5],
                             'var2': [1, 2, 3, 4, 5]})
-        df = f_278(df)
+        df = f_304(df)
         self.assertTrue('predicted' in df.columns)
         self.assertEqual(len(df), 5)
         self.assertEqual(len(df.columns), 3)
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         df = pd.DataFrame({'var1': [1, 2, 3, 4, 5],
                             'var2': [5, 4, 3, 2, 1]})
-        df = f_278(df)
+        df = f_304(df)
         self.assertTrue('predicted' in df.columns)
         self.assertEqual(len(df), 5)
         self.assertEqual(len(df.columns), 3)
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         df = pd.DataFrame({'var1': [1, 2, 3, 4, 5],
                             'var2': [1, 1, 1, 1, 1]})
-        df = f_278(df)
+        df = f_304(df)
         self.assertTrue('predicted' in df.columns)
         self.assertEqual(len(df), 5)
         self.assertEqual(len(df.columns), 3)
@@ -75,7 +75,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         df = pd.DataFrame({'var1': [0, 1, 2, 3, 4, 5],
                             'var2': [1, 1, 1, 1, 1, 1]})
-        df = f_278(df)
+        df = f_304(df)
         self.assertTrue('predicted' in df.columns)
         self.assertEqual(len(df), 6)
         self.assertEqual(len(df.columns), 3)

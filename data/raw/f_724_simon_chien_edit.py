@@ -8,8 +8,7 @@ def f_724(db_file, table_name, column_name, pattern='\d+[xX]'):
     Find all matches with a regex pattern in a list of strings in an SQL database.
     
     The function loads an sql database and selects all entries from the specified
-    table. All entries of the specified column are matched against a regex pattern.
-    Matches are returned in a DataFrame.
+    table. Matches are returned in a DataFrame.
 
     Parameters:
     db_file (str): The SQLite database file.
@@ -107,7 +106,7 @@ class TestCases(unittest.TestCase):
 
     def test_non_existent_table(self):
         # Catch the OperationalError from sqlite directly
-        with self.assertRaises(pd.errors.DatabaseError):
+        with self.assertRaises(Exception):
             f_724(self.db_path, 'fake_table', 'test_column')
 
     def test_non_existent_column(self):

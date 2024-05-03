@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def f_660(feature: pd.Series, target: pd.Series) -> (np.ndarray, plt.Axes):
+def f_735(feature: pd.Series, target: pd.Series) -> (np.ndarray, plt.Axes):
     """
     Train a logistic regression model on one feature and evaluate its performance using a confusion matrix plot.
     The function takes a feature and a target series, splits them into training and testing sets, trains the logistic
@@ -30,7 +30,7 @@ def f_660(feature: pd.Series, target: pd.Series) -> (np.ndarray, plt.Axes):
     Example:
     >>> feature = pd.Series(np.random.rand(1000)) # Feature data
     >>> target = pd.Series(np.random.randint(0, 2, size=1000)) # Target data (binary)
-    >>> cm, ax = f_660(feature, target)
+    >>> cm, ax = f_735(feature, target)
     >>> ax.get_title()
     'Confusion Matrix'
     """
@@ -75,7 +75,7 @@ import pandas as pd
 import numpy as np
 from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
-    """Test cases for the function f_660."""
+    """Test cases for the function f_735."""
     def test_with_random_data(self):
         """
         Test the function with random data to ensure normal functionality.
@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
         feature = pd.Series(np.random.rand(100))
         np.random.seed(42)
         target = pd.Series(np.random.randint(0, 2, size=100))
-        cm, ax = f_660(feature, target)
+        cm, ax = f_735(feature, target)
         self.assertIsInstance(cm, np.ndarray)
         self.assertIsInstance(ax, Axes)
     def test_with_all_zeroes(self):
@@ -94,7 +94,7 @@ class TestCases(unittest.TestCase):
         feature = pd.Series(np.zeros(100))
         np.random.seed(123)
         target = pd.Series(np.random.randint(0, 2, size=100))
-        cm, ax = f_660(feature, target)
+        cm, ax = f_735(feature, target)
         self.assertIsInstance(cm, np.ndarray)
         self.assertIsInstance(ax, Axes)
     def test_with_all_ones(self):
@@ -104,7 +104,7 @@ class TestCases(unittest.TestCase):
         feature = pd.Series(np.ones(100))
         np.random.seed(42)
         target = pd.Series(np.random.randint(0, 2, size=100))
-        cm, ax = f_660(feature, target)
+        cm, ax = f_735(feature, target)
         self.assertIsInstance(cm, np.ndarray)
         self.assertIsInstance(ax, Axes)
     def test_with_perfect_correlation(self):
@@ -114,7 +114,7 @@ class TestCases(unittest.TestCase):
         np.random.seed(123)
         feature = pd.Series(np.random.rand(100))
         target = feature.round()
-        cm, ax = f_660(feature, target)
+        cm, ax = f_735(feature, target)
         self.assertIsInstance(cm, np.ndarray)
         self.assertIsInstance(ax, Axes)
     def test_with_no_correlation(self):
@@ -125,7 +125,7 @@ class TestCases(unittest.TestCase):
         feature = pd.Series(np.random.rand(100))
         np.random.seed(42)
         target = pd.Series(np.random.choice([0, 1], size=100))
-        cm, ax = f_660(feature, target)
+        cm, ax = f_735(feature, target)
         self.assertIsInstance(cm, np.ndarray)
         self.assertIsInstance(ax, Axes)
     def tearDown(self):

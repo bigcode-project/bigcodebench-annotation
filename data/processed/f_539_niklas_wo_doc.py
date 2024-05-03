@@ -3,9 +3,9 @@ import json
 import os
 import shutil
 
-def f_176(path):
+def f_190(path):
     """
-    Processes JSON files in a directory. The function reads each JSON file alphabetically into a DataFrame and inserts a "Source" column that specifies the filename. The processed files are then moved to a "processed" subdirectory.
+    Processes JSON files in a directory. The function reads each JSON file alphabetically into a DataFrame and inserts a "Source" column that specifies the filename. The processed files are then moved to a "processed" subdirectory. The path may not exist initially.
     
     Parameters:
     - path (str): The path of the directory containing the JSON files.
@@ -20,10 +20,6 @@ def f_176(path):
     - shutil
     
     Example:
-    >>> import os
-    >>> import shutil
-    >>> if os.path.exists('data'):
-    ...     shutil.rmtree('data')
     >>> os.mkdir('data')
     >>> with open('data/a.json', 'w') as f:
     ...     f.write('[{"a": 1, "b": 2}, {"a": 3, "b": 4}]')
@@ -33,7 +29,7 @@ def f_176(path):
     ...     f.write('[{"a": 5, "b": 6}, {"a": 7, "b": 8}]')
     ...
     36
-    >>> df = f_176('data')
+    >>> df = f_190('data')
     >>> print(df)
        a  b  source
     0  5  6  b.json
@@ -84,7 +80,7 @@ class TestCases(unittest.TestCase):
         dir = './test_data_1'
         self.create_json_files(dir, ['a.json', 'b.json'], 
                               [[{"a": 1, "b": 2}, {"a": 3, "b": 4}], [{"a": 5, "b": 6}, {"a": 7, "b": 8}]])
-        df = f_176(dir)
+        df = f_190(dir)
         self.assertEqual(len(df), 4)
         shutil.rmtree(dir)
     
@@ -94,7 +90,7 @@ class TestCases(unittest.TestCase):
         """
         dir = './test_data_2'
         os.makedirs(dir)
-        df = f_176(dir)
+        df = f_190(dir)
         self.assertTrue(df.empty)
         shutil.rmtree(dir)
     
@@ -105,7 +101,7 @@ class TestCases(unittest.TestCase):
         dir = './test_data_3'
         self.create_json_files(dir, ['a.json', 'b.txt'], 
                               [[{"a": 1, "b": 2}], []])
-        df = f_176(dir)
+        df = f_190(dir)
         self.assertEqual(len(df), 1)
         shutil.rmtree(dir)
     
@@ -116,7 +112,7 @@ class TestCases(unittest.TestCase):
         dir = './test_data_4'
         self.create_json_files(dir, ['a.json'], 
                               [[{"a": 1, "b": 2}]])
-        df = f_176(dir)
+        df = f_190(dir)
         self.assertEqual(len(df), 1)
         shutil.rmtree(dir)
     
@@ -127,6 +123,6 @@ class TestCases(unittest.TestCase):
         dir = './test_data_5'
         self.create_json_files(dir, ['a.json'], 
                               [[]])
-        df = f_176(dir)
+        df = f_190(dir)
         self.assertTrue(df.empty)
         shutil.rmtree(dir)

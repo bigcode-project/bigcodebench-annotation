@@ -2,7 +2,7 @@ import collections
 import matplotlib.pyplot as plt
 
 
-def f_528(data):
+def f_591(data):
     """
     Combine a list of dictionaries with possibly differing keys (student names) into a single dictionary,
     calculate the average score for each student, and return a bar chart of average student scores with
@@ -29,7 +29,7 @@ def f_528(data):
                 {'John': 6, 'Jane': 8, 'Joe': 10},\
                 {'John': 5, 'Jane': 9, 'Joe': 8},\
                 {'John': 7, 'Jane': 10, 'Joe': 9}]
-    >>> ax = f_528(data)
+    >>> ax = f_591(data)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_xticklabels()
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
             {"John": 5, "Jane": 9, "Joe": 8},
             {"John": 7, "Jane": 10, "Joe": 9},
         ]
-        ax = f_528(data)
+        ax = f_591(data)
         self._check_plot_structure(ax)
         # Check bar heights (average scores)
         for bar, label in zip(ax.containers[0], ["Jane", "Joe", "John"]):
@@ -93,7 +93,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test same user multiple data points
         data = [{"John": 5}, {"John": 6}, {"John": 7}, {"John": 8}]
-        ax = f_528(data)
+        ax = f_591(data)
         self._check_plot_structure(ax)
         # Check bar heights (average scores)
         for bar, _ in zip(ax.containers[0], ["John"]):
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test with multiple students and one data point each
         data = [{"John": 10}, {"Jane": 15}, {"Joe": 20}]
-        ax = f_528(data)
+        ax = f_591(data)
         self._check_plot_structure(ax)
         # Check bar heights match the single data point for each student
         expected_scores = {"Jane": 15, "Joe": 20, "John": 10}
@@ -110,7 +110,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Test multiple users multiple data points different lengths
         data = [{"Jane": 10, "Joe": 7}, {"Joe": 10}, {"Jane": 9, "John": 8}]
-        ax = f_528(data)
+        ax = f_591(data)
         self._check_plot_structure(ax)
         # Check bar heights (average scores)
         for bar, label in zip(ax.containers[0], ["Jane", "Joe"]):
@@ -126,7 +126,7 @@ class TestCases(unittest.TestCase):
             {"Jane": 9, "John": 8},
             {"Joe": None},
         ]
-        ax = f_528(data)
+        ax = f_591(data)
         self._check_plot_structure(ax)  # Results should be same as test_case_4
         for bar, label in zip(ax.containers[0], ["Jane", "Joe"]):
             if label == "Jane":
@@ -136,7 +136,7 @@ class TestCases(unittest.TestCase):
     def test_case_6(self):
         # Test only one data point with multiple students
         data = [{"John": 5, "Jane": 10}]
-        ax = f_528(data)
+        ax = f_591(data)
         self._check_plot_structure(ax)
         # Check bar heights (average scores)
         for bar, label in zip(ax.containers[0], ["Jane", "John"]):
@@ -147,17 +147,17 @@ class TestCases(unittest.TestCase):
     def test_case_7(self):
         # Test empty input
         data = []
-        ax = f_528(data)
+        ax = f_591(data)
         self.assertIsNone(ax)
     def test_case_8(self):
         # Test with data containing negative scores
         data = [{"John": -2, "Jane": 3}, {"John": -4, "Jane": 5}]
         with self.assertRaises(ValueError):
-            f_528(data)
+            f_591(data)
     def test_case_9(self):
         # Test with a larger dataset
         data = [{"John": i} for i in range(1000)]
-        ax = f_528(data)
+        ax = f_591(data)
         self._check_plot_structure(ax)
         # Check bar height for the large dataset (average should be close to 499.5)
         self.assertAlmostEqual(
@@ -167,11 +167,11 @@ class TestCases(unittest.TestCase):
         # Test with some negative scores mixed with positive ones
         data = [{"John": 5, "Jane": -1}, {"John": -2, "Jane": 2}]
         with self.assertRaises(ValueError):
-            f_528(data)
+            f_591(data)
     def test_case_11(self):
         # Test with all scores as 0
         data = [{"John": 0, "Jane": 0}, {"John": 0, "Jane": 0}]
-        ax = f_528(data)
+        ax = f_591(data)
         self._check_plot_structure(ax)
         # Check bar heights are 0 for all students
         for bar, label in zip(ax.containers[0], ["Jane", "John"]):
@@ -179,7 +179,7 @@ class TestCases(unittest.TestCase):
     def test_case_12(self):
         # Test with some dictionaries being empty
         data = [{"John": 5}, {}, {"Jane": 10}]
-        ax = f_528(data)
+        ax = f_591(data)
         self._check_plot_structure(ax)
         # Check that the empty dictionary does not affect the output
         expected_scores = {"Jane": 10, "John": 5}

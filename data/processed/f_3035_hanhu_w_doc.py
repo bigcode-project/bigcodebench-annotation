@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 
-def f_427(x):
+def f_476(x):
     """
     Draws a plot visualizing a complex distribution created from two Gaussian distributions.
     The real part of the complex distribution is a Gaussian centered at 0 with a standard deviation of 1,
@@ -21,10 +21,10 @@ def f_427(x):
 
     Examples:
     >>> X = np.linspace(-10, 10, 1000)
-    >>> result = f_427(X)
+    >>> result = f_476(X)
     >>> result is None
     True
-    >>> f_427(np.linspace(-5, 5, 500)) is None  # Test with a different range
+    >>> f_476(np.linspace(-5, 5, 500)) is None  # Test with a different range
     True
     """
 
@@ -47,17 +47,17 @@ import numpy as np
 class TestCases(unittest.TestCase):
     def test_return_type(self):
         """ Test that the function returns None. """
-        result = f_427(np.linspace(-10, 10, 1000))
+        result = f_476(np.linspace(-10, 10, 1000))
         self.assertIsNone(result)
     def test_input_type(self):
         """ Test the function with non-numpy array inputs. """
         with self.assertRaises(TypeError):
-            f_427([1, 2, 3])
+            f_476([1, 2, 3])
     def test_empty_array(self):
         """ Test function with empty numpy array. """
-        result = f_427(np.array([]))
+        result = f_476(np.array([]))
         self.assertIsNone(result)
     def test_array_length(self):
         """ Test function with arrays of different lengths. """
-        result = f_427(np.linspace(-5, 5, 500))
+        result = f_476(np.linspace(-5, 5, 500))
         self.assertIsNone(result)

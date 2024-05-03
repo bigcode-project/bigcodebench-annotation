@@ -5,7 +5,7 @@ import shutil
 
 def f_539(path):
     """
-    Processes JSON files in a directory. The function reads each JSON file alphabetically into a DataFrame and inserts a "Source" column that specifies the filename. The processed files are then moved to a "processed" subdirectory.
+    Processes JSON files in a directory. The function reads each JSON file alphabetically into a DataFrame and inserts a "Source" column that specifies the filename. The processed files are then moved to a "processed" subdirectory. The path may not exist initially.
     
     Parameters:
     - path (str): The path of the directory containing the JSON files.
@@ -20,10 +20,6 @@ def f_539(path):
     - shutil
     
     Example:
-    >>> import os
-    >>> import shutil
-    >>> if os.path.exists('data'):
-    ...     shutil.rmtree('data')
     >>> os.mkdir('data')
     >>> with open('data/a.json', 'w') as f:
     ...     f.write('[{"a": 1, "b": 2}, {"a": 3, "b": 4}]')

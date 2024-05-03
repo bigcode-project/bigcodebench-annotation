@@ -3,7 +3,7 @@ from scipy import integrate
 import matplotlib.pyplot as plt
 
 
-def f_628(func, x_range=(-2, 2), num_points=1000):
+def f_698(func, x_range=(-2, 2), num_points=1000):
     """
     Calculates and plots both a given function and its cumulative integral over a specified range,
     using a linearly spaced range of x-values.
@@ -25,7 +25,7 @@ def f_628(func, x_range=(-2, 2), num_points=1000):
     - The plot includes a legend and labels for the x and y axes that include the function's name.
 
     Example:
-    >>> ax = f_628(np.sin)
+    >>> ax = f_698(np.sin)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_legend_handles_labels()[-1]
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
         plt.close("all")
     def helper_assert_plot_attributes(self, func):
         # Test plot attributes are as expected
-        ax = f_628(func)
+        ax = f_698(func)
         function_name = func.__name__
         legend_labels = ax.get_legend_handles_labels()[-1]
         self.assertIsInstance(ax, Axes)
@@ -59,21 +59,21 @@ class TestCases(unittest.TestCase):
         self.assertIn(function_name, legend_labels[1])
     def test_case_1(self):
         # Test basic case in docstring
-        ax = f_628(np.sin)
+        ax = f_698(np.sin)
         self.helper_assert_plot_attributes(np.sin)
     def test_case_2(self):
         # Test other functions - numpy
         for func in [np.cos, np.exp]:
-            ax = f_628(func)
+            ax = f_698(func)
             self.helper_assert_plot_attributes(func)
     def test_case_3(self):
         # Test other functions - lambda
         func = lambda x: x ** 2
-        ax = f_628(func)
+        ax = f_698(func)
         self.helper_assert_plot_attributes(func)
     def test_case_4(self):
         # Test custom range and points
-        ax = f_628(np.cos, x_range=(0, np.pi), num_points=500)
+        ax = f_698(np.cos, x_range=(0, np.pi), num_points=500)
         self.assertEqual(len(ax.lines[0].get_xdata()), 500)
         self.assertEqual(ax.lines[0].get_xdata()[0], 0)
         self.assertEqual(ax.lines[0].get_xdata()[-1], np.pi)
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
         func = lambda x: x ** 2
         X = np.linspace(0, 1, 1000)
         expected_integral = 1 / 3 * X ** 3  # Analytical integral of x^2
-        ax = f_628(func, x_range=(0, 1), num_points=1000)
+        ax = f_698(func, x_range=(0, 1), num_points=1000)
         computed_integral = ax.lines[1].get_ydata()[
             -1
         ]  # Last value of the computed integral

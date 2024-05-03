@@ -2,7 +2,7 @@ from typing import List, Union
 import numpy as np
 import scipy.fft
 
-def f_160(data: List[Union[int, str]], repetitions: int = 1):
+def f_171(data: List[Union[int, str]], repetitions: int = 1):
     """
     Calculates the mode(s), their count(s), and the fast fourier transform of the data after repeating it a specified number of times.
     in a list of elements that can be repeated a specified number of times.
@@ -24,7 +24,7 @@ def f_160(data: List[Union[int, str]], repetitions: int = 1):
         'count': a numpy array of the count(s) of the mode(s).
         
     Examples:
-    >>> f_160([1, '2', '2'], repetitions=1)
+    >>> f_171([1, '2', '2'], repetitions=1)
     {'mode': array(['2'], dtype='<U1'), 'count': [2], 'fft': array([ 5.-0.j, -1.+0.j, -1.-0.j])}
     """
     
@@ -56,27 +56,27 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_empty_list(self):
         expected = {'mode': np.array([], dtype='object').tolist(), 'count': np.array([], dtype=int).tolist(), 'fft': np.array([]).tolist()}
-        result = f_160([], repetitions=1)
+        result = f_171([], repetitions=1)
         self.assertEqual({'mode': result['mode'].tolist(), 'count': result['count'].tolist(), 'fft': result['fft'].tolist()}, expected)
     def test_single_mode(self):
-        result = f_160([1, 2, 2, 3], repetitions=1)
+        result = f_171([1, 2, 2, 3], repetitions=1)
         np.testing.assert_array_equal(result['mode'], np.array([2]))
         np.testing.assert_array_equal(result['count'], np.array([2]))
         np.testing.assert_array_equal(result['fft'], np.array([ 8.-0.j, -1.+1.j, -2.-0.j, -1.-1.j]))
     def test_multiple_modes_repeated(self):
-        result = f_160(['00', '01'], repetitions=3)
+        result = f_171(['00', '01'], repetitions=3)
         np.testing.assert_array_equal(result['mode'], np.array(['00', '01']))
         np.testing.assert_array_equal(result['count'], np.array([3, 3]))
         np.testing.assert_array_equal(result['fft'], np.array([ 1.-0.j, -1.-0.j]))
     def test_mixed_types(self):
         # Assu '1' (string) appears twice, and 1 (int) appears once.
         # The test expects the string '1' to be the mode with a count of 2.
-        result = f_160([1, '1', '1', 2], repetitions=1)
+        result = f_171([1, '1', '1', 2], repetitions=1)
         np.testing.assert_array_equal(result['mode'], np.array(['1']))
         np.testing.assert_array_equal(result['count'], np.array([2]))  # Expected count is 2 for '1'
         np.testing.assert_array_equal(result['fft'], np.array([ 5.-0.j,  0.+1.j, -1.-0.j,  0.-1.j]))
         
     def test_no_repetitions(self):
         expected = {'mode': np.array([], dtype='object').tolist(), 'count': np.array([], dtype=int).tolist(), 'fft': np.array([]).tolist()}
-        result = f_160(['111', '222', '333'], repetitions=0)
+        result = f_171(['111', '222', '333'], repetitions=0)
         self.assertEqual({'mode': result['mode'].tolist(), 'count': result['count'].tolist(), 'fft': result['fft'].tolist()}, expected)

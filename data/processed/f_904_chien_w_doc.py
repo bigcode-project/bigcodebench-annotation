@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def f_342(df: pd.DataFrame, column_name: str) -> (str, plt.Axes):
+def f_380(df: pd.DataFrame, column_name: str) -> (str, plt.Axes):
     """
     This function assesses whether the distribution of values in a specified column of a DataFrame is
     uniform and visualizes this distribution using a histogram.
@@ -12,7 +12,9 @@ def f_342(df: pd.DataFrame, column_name: str) -> (str, plt.Axes):
     - column_name (str): The name of the column to be evaluated.
 
     Returns:
-    - str: A message indicating whether the distribution in the column is uniform or not.
+    - str: A message indicating whether the distribution in the column is uniform or not. The message is one of the following:
+        - "The distribution of values is uniform."
+        - "The distribution of values is not uniform."
     - plt.Axes: An Axes object displaying the histogram of the value distribution in the specified column.
 
     The function handles the following cases:
@@ -34,7 +36,7 @@ def f_342(df: pd.DataFrame, column_name: str) -> (str, plt.Axes):
 
     Example:
     >>> df = pd.DataFrame({'Category': ['A', 'A', 'B', 'B', 'B', 'C', 'C', 'C', 'C', 'D', 'E', 'E']})
-    >>> message, ax = f_342(df, 'Category')
+    >>> message, ax = f_380(df, 'Category')
     >>> print(message)
     The distribution of values is not uniform.
     """
@@ -69,21 +71,21 @@ import unittest
 import pandas as pd
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Tests for `f_342`."""
+    """Tests for `f_380`."""
     def test_uniform_distribution(self):
         """Test the distribution of values in a column with a uniform distribution."""
         df = pd.DataFrame({"Category": ["A", "A", "B", "B", "C", "C"]})
-        message, _ = f_342(df, "Category")
+        message, _ = f_380(df, "Category")
         self.assertEqual(message, "The distribution of values is uniform.")
     def test_non_uniform_distribution(self):
         """Test the distribution of values in a column with a non-uniform distribution."""
         df = pd.DataFrame({"Category": ["A", "A", "B", "B", "B", "C", "C", "C", "C"]})
-        message, _ = f_342(df, "Category")
+        message, _ = f_380(df, "Category")
         self.assertEqual(message, "The distribution of values is not uniform.")
     def test_single_value(self):
         """Test the distribution of values in a column with a single value."""
         df = pd.DataFrame({"Category": ["A", "A", "A", "A", "A", "A"]})
-        message, _ = f_342(df, "Category")
+        message, _ = f_380(df, "Category")
         self.assertEqual(message, "The distribution of values is uniform.")
     def test_multi_column(self):
         """Test the distribution of values in a column with a multi-column DataFrame."""
@@ -93,12 +95,12 @@ class TestCases(unittest.TestCase):
                 "Type": ["X", "X", "Y", "Y", "Z", "Z"],
             }
         )
-        message, _ = f_342(df, "Type")
+        message, _ = f_380(df, "Type")
         self.assertEqual(message, "The distribution of values is uniform.")
     def test_empty_dataframe(self):
         """Test the distribution of values in a column with an empty DataFrame."""
         df = pd.DataFrame({"Category": []})
-        message, _ = f_342(df, "Category")
+        message, _ = f_380(df, "Category")
         self.assertEqual(
             message, "The DataFrame is empty or the specified column has no data."
         )

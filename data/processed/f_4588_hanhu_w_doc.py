@@ -3,7 +3,7 @@ import bisect
 from array import array
 
 
-def f_401(n=10, total=100):
+def f_448(n=10, total=100):
     """
     Generates 'n' random integer numbers such that their sum equals 'total', sorts these numbers,
     and determines the position where a new random number can be inserted to maintain the sorted order.
@@ -22,7 +22,7 @@ def f_401(n=10, total=100):
     - array.array
 
     Examples:
-    >>> sorted_nums, pos = f_401(5, 50)
+    >>> sorted_nums, pos = f_448(5, 50)
     >>> len(sorted_nums) == 5
     True
     >>> sum(sorted_nums) == 50
@@ -44,20 +44,20 @@ import unittest
 from array import array
 class TestCases(unittest.TestCase):
     def test_return_type(self):
-        nums, pos = f_401(5, 50)
+        nums, pos = f_448(5, 50)
         self.assertIsInstance(nums, array)
         self.assertIsInstance(pos, int)
     def test_correct_length(self):
-        nums, _ = f_401(5, 50)
+        nums, _ = f_448(5, 50)
         self.assertEqual(len(nums), 5)
     def test_sum_of_numbers(self):
-        nums, _ = f_401(5, 50)
+        nums, _ = f_448(5, 50)
         self.assertEqual(sum(nums), 50)
     def test_sorted_order(self):
-        nums, _ = f_401(5, 50)
+        nums, _ = f_448(5, 50)
         self.assertEqual(list(nums), sorted(nums))
     def test_insertion_position(self):
-        nums, pos = f_401(5, 50)
+        nums, pos = f_448(5, 50)
         new_num = random.randint(0, 50)
         nums.insert(pos, new_num)
         self.assertEqual(nums[pos], new_num)

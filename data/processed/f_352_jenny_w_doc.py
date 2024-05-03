@@ -3,7 +3,7 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
 
-def f_483(data, n_components=2, random_state=None):
+def f_543(data, n_components=2, random_state=None):
     """
     Performs Principal Component Analysis (PCA) on the provided dataset to reduce its dimensionality,
     and visualizes the results using a scatter plot.
@@ -30,7 +30,7 @@ def f_483(data, n_components=2, random_state=None):
 
     Example:
     >>> data = np.random.random((100, 5))
-    >>> results = f_483(data, random_state=42)
+    >>> results = f_543(data, random_state=42)
     >>> results['transformed_data'].shape
     (100, 2)
     >>> type(results['ax'])
@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
                 self.assertAlmostEqual(dot_product, 0, delta=1e-2)
     def test_case_1(self):
         # Test with default settings
-        results = f_483(self.data, random_state=self.seed)
+        results = f_543(self.data, random_state=self.seed)
         self.assertEqual(results["transformed_data"].shape, (self.n, self.n_components))
         x_data = results["ax"].collections[0].get_offsets()[:, 0]
         y_data = results["ax"].collections[0].get_offsets()[:, 1]
@@ -94,37 +94,37 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test n_components
         for n_components in [1, 2, min(self.data.shape)]:
-            results = f_483(self.data, n_components=n_components, random_state=42)
+            results = f_543(self.data, n_components=n_components, random_state=42)
             self.assertEqual(results["transformed_data"].shape[1], n_components)
             self.assert_pca_correctness(self.data, results, n_components, self.seed)
     def test_case_3(self):
         # Test when one of the features has zero variance
         data = self.data.copy()
         data[:, 1] = 0  # Second feature has zero variance
-        results = f_483(data, n_components=2, random_state=self.seed)
+        results = f_543(data, n_components=2, random_state=self.seed)
         self.assertEqual(results["transformed_data"].shape, (100, 2))
         self.assert_pca_correctness(data, results, 2, self.seed)
     def test_case_4(self):
         # Test with n_components greater than min(n_samples, n_features)
         data = np.random.RandomState(self.seed).randn(10, 2)
         with self.assertRaises(ValueError):
-            f_483(data, n_components=3, random_state=self.seed)
+            f_543(data, n_components=3, random_state=self.seed)
     def test_case_5(self):
         # Test with a single sample
         data = np.random.RandomState(self.seed).randn(1, self.n_dims)
         with self.assertRaises(ValueError):
-            f_483(data)
+            f_543(data)
     def test_case_6(self):
         # Edge case - test when dataset contains NaN
         data = self.data.copy()
         data[0, 0] = np.nan  # Introduce a NaN value
         with self.assertRaises(ValueError):
-            f_483(data, n_components=2, random_state=self.seed)
+            f_543(data, n_components=2, random_state=self.seed)
     def test_case_7(self):
         # Edge case - test when dataset contains infinite values
         data = self.data.copy()
         data[0, 0] = np.inf  # Introduce an infinite value
         with self.assertRaises(ValueError):
-            f_483(data, n_components=2, random_state=self.seed)
+            f_543(data, n_components=2, random_state=self.seed)
     def tearDown(self):
         plt.close("all")

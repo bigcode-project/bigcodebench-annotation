@@ -9,7 +9,8 @@ PLOT_TITLE = "Value Distribution"
 def f_867(data_dict):
     """
     Processes a dictionary of numerical data to create a pandas DataFrame, removes None values, and generates a histogram 
-    of the data values using seaborn. The histogram's bins are dynamically calculated based on the range of the data. 
+    of the data values using seaborn. The histogram's bins are dynamically calculated based on the range of the data. Specifically,
+    the number of bins is set to the minimum of 11 and half the number of data points, with a minimum of 2 bins.
     If the DataFrame is empty or the data lacks variability (all values are the same after removing None values), 
     the function does not generate a plot.
 

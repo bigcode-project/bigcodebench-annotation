@@ -7,7 +7,7 @@ import pandas as pd
 TARGET_JSON_FILE = "downloaded_file.json"
 
 
-def f_595(url):
+def f_664(url):
     """
     This function retrieves a JSON file from the given URL using urllib.request.urlretrieve,
     temporarily saving it as 'downloaded_file.json'. It then opens and reads this file,
@@ -26,7 +26,7 @@ def f_595(url):
     - pandas
 
     Example:
-    >>> f_595('http://example.com/employees.json')
+    >>> f_664('http://example.com/employees.json')
         name  age           city
     0  Alice   25       New York
     1    Bob   30  San Francisco
@@ -44,7 +44,7 @@ import unittest
 import pandas as pd
 from unittest.mock import patch, mock_open
 class TestCases(unittest.TestCase):
-    """Test cases for the f_595 function."""
+    """Test cases for the f_664 function."""
     @patch("urllib.request.urlretrieve")
     @patch("os.remove")
     def test_sample_1(self, mock_remove, mock_urlretrieve):
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
                     {"name": "Bob", "age": 30, "city": "San Francisco"},
                 ]
             )
-            result_df = f_595(url)
+            result_df = f_664(url)
             pd.testing.assert_frame_equal(result_df, expected_df)
         mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
         mock_remove.assert_called_once_with("downloaded_file.json")
@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
                     {"product": "Keyboard", "price": 50},
                 ]
             )
-            result_df = f_595(url)
+            result_df = f_664(url)
             pd.testing.assert_frame_equal(result_df, expected_df)
         mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
         mock_remove.assert_called_once_with("downloaded_file.json")
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
         mock_urlretrieve.return_value = None
         with patch("builtins.open", mock_open(read_data=sample_data)):
             expected_df = pd.DataFrame()
-            result_df = f_595(url)
+            result_df = f_664(url)
             pd.testing.assert_frame_equal(result_df, expected_df)
         mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
     @patch("urllib.request.urlretrieve")
@@ -100,7 +100,7 @@ class TestCases(unittest.TestCase):
         url = "http://example.com/non_existent.json"
         mock_urlretrieve.side_effect = Exception("URL retrieval failed")
         with self.assertRaises(Exception):
-            f_595(url)
+            f_664(url)
         mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
     @patch("urllib.request.urlretrieve")
     @patch("os.remove")
@@ -112,5 +112,5 @@ class TestCases(unittest.TestCase):
         with patch(
             "builtins.open", mock_open(read_data=sample_data)
         ), self.assertRaises(Exception):
-            f_595(url)
+            f_664(url)
         mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")

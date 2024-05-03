@@ -3,7 +3,7 @@ import seaborn as sns
 import pandas as pd
 from sklearn.datasets import load_diabetes
 
-def f_145():
+def f_156():
     """
     Draws a seaborn pairplot for the diabetes dataset obtained from sklearn.datasets. 
     This function sets the font to Arial. It then loads the diabetes dataset into a
@@ -21,7 +21,7 @@ def f_145():
         pd.DataFrame: a DataFrame representation of the diabetes dataset
 
     Examples:
-    >>> fig, df = f_145()
+    >>> fig, df = f_156()
     >>> isinstance(fig, plt.Figure)
     True
     >>> isinstance(df, pd.DataFrame)
@@ -49,29 +49,29 @@ class TestCases(unittest.TestCase):
         self.diabetes_df = pd.DataFrame(data=self.diabetes_data.data, columns=self.diabetes_data.feature_names)
     def test_return_type(self):
         """Test that the function returns a matplotlib Figure instance."""
-        fig, diabetes_df = f_145()
+        fig, diabetes_df = f_156()
         self.assertIsInstance(fig, plt.Figure)
         self.assertIsInstance(diabetes_df, pd.DataFrame)
     def test_dataframe_values_equal(self):
-        fig, diabetes_df = f_145()
+        fig, diabetes_df = f_156()
         # Check if all values in each column are equal
         for col in self.diabetes_df.columns:
             self.assertTrue(all(self.diabetes_df[col] == diabetes_df[col]))
     def test_font_setting(self):
         """Test if the font setting is correctly applied to the figure."""
-        f_145()
+        f_156()
         # Checking matplotlib's default font settings
         current_font = plt.rcParams['font.family']
         self.assertIn('Arial', current_font)
     @patch('seaborn.pairplot')
     def test_seaborn_pairplot_called(self, mock_pairplot):
-        """Test if seaborn's pairplot function is called in f_145."""
+        """Test if seaborn's pairplot function is called in f_156."""
         mock_pairplot.return_value = sns.pairplot(self.diabetes_df)  # Mocking pairplot to return a valid pairplot
-        f_145()
+        f_156()
         mock_pairplot.assert_called()
     def test_dataframe_col_equal(self):
         """Test specific configurations of the seaborn pairplot."""
-        fig, diabetes_df = f_145()
+        fig, diabetes_df = f_156()
         # Check if all columns in self.diabetes_df are the same as in diabetes_df
         self.assertTrue(all(col in diabetes_df.columns for col in self.diabetes_df.columns))
         self.assertTrue(all(col in self.diabetes_df.columns for col in diabetes_df.columns))

@@ -7,7 +7,7 @@ PRODUCTS = ['Product' + str(i) for i in range(1, 6)]
 MONTHS = ['Month' + str(i) for i in range(1, 13)]
 
 
-def f_18():
+def f_20():
     """
     Generate a DataFrame representing monthly sales of products and visualize the total sales.
 
@@ -29,7 +29,7 @@ def f_18():
     - seaborn
 
     Example:
-    >>> df = f_18()
+    >>> df = f_20()
     >>> df.shape
     (12, 5)
     >>> all(df.columns == PRODUCTS)
@@ -60,23 +60,23 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_dataframe_shape(self):
         """Test if the DataFrame has the correct shape."""
-        df = f_18()
+        df = f_20()
         self.assertEqual(df.shape, (12, 5))  # 12 months and 5 products
     def test_dataframe_columns(self):
         """Test if the DataFrame has the correct column names."""
-        df = f_18()
+        df = f_20()
         expected_columns = PRODUCTS
         self.assertListEqual(list(df.columns), expected_columns)
     def test_dataframe_index(self):
         """Test if the DataFrame has the correct index."""
-        df = f_18()
+        df = f_20()
         expected_index = MONTHS
         self.assertListEqual(list(df.index), expected_index)
     def test_sales_range(self):
         """Test if sales figures are within the expected range."""
-        df = f_18()
+        df = f_20()
         self.assertTrue((df >= 100).all().all() and (df <= 1000).all().all())
     def test_returns_dataframe(self):
         """Test if the function returns a pandas DataFrame."""
-        df = f_18()
+        df = f_20()
         self.assertIsInstance(df, pd.DataFrame)

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def f_254(list_of_lists):
+def f_276(list_of_lists):
     """
     Generate a list of pandas Series objects, where each Series is indexed by the elements of a sub-list from `list_of_lists`.
     Each Series contains unique integers starting from 1 and going up to the length of the respective sub-list. These integers
@@ -25,7 +25,7 @@ def f_254(list_of_lists):
     - Here's an example demonstrating how to use this function:
       >>> import numpy as np
       >>> np.random.seed(0)  # Setting a seed for reproducibility of the example
-      >>> series = f_254([['x', 'y', 'z'], ['a', 'b', 'c']])
+      >>> series = f_276([['x', 'y', 'z'], ['a', 'b', 'c']])
       >>> for s in series: print(s)
       x    3
       y    2
@@ -53,12 +53,12 @@ import unittest
 import pandas as pd
 import numpy as np
 class TestCases(unittest.TestCase):
-    """Test cases for the function f_254."""
+    """Test cases for the function f_276."""
     def test_basic_functionality(self):
         """Test basic functionality of the function."""
         np.random.seed(0)
         input_data = [["x", "y", "z"], ["a", "b", "c"]]
-        result = f_254(input_data)
+        result = f_276(input_data)
         self.assertEqual(len(result), 2)
         expected_indexes = [["x", "y", "z"], ["a", "b", "c"]]
         for i, s in enumerate(result):
@@ -68,7 +68,7 @@ class TestCases(unittest.TestCase):
         """Test with sub-lists of different lengths."""
         np.random.seed(1)
         input_data = [["m", "n"], ["p", "q", "r", "s"]]
-        result = f_254(input_data)
+        result = f_276(input_data)
         self.assertEqual(len(result), 2)
         expected_indexes = [["m", "n"], ["p", "q", "r", "s"]]
         for i, s in enumerate(result):
@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
         """Test with a single-element sub-list."""
         np.random.seed(2)
         input_data = [["a"]]
-        result = f_254(input_data)
+        result = f_276(input_data)
         self.assertEqual(len(result), 1)
         expected_indexes = [["a"]]
         for i, s in enumerate(result):
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
         """Test with sub-lists of different lengths."""
         np.random.seed(3)
         input_data = [["x", "y", "z"], ["a", "b"]]
-        result = f_254(input_data)
+        result = f_276(input_data)
         self.assertEqual(len(result), 2)
         expected_indexes = [["x", "y", "z"], ["a", "b"]]
         for i, s in enumerate(result):
@@ -98,7 +98,7 @@ class TestCases(unittest.TestCase):
         """Test with multiple sub-lists."""
         np.random.seed(4)
         input_data = [["x", "y"], ["a", "b"], ["m", "n", "o"]]
-        result = f_254(input_data)
+        result = f_276(input_data)
         self.assertEqual(len(result), 3)
         expected_indexes = [["x", "y"], ["a", "b"], ["m", "n", "o"]]
         for i, s in enumerate(result):

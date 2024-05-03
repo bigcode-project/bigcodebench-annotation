@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_mail import Mail, Message
 
-def f_488(smtp_server, smtp_port, smtp_user, smtp_password, template_folder):
+def f_548(smtp_server, smtp_port, smtp_user, smtp_password, template_folder):
     """
     Creates a Flask application configured to send emails using Flask-Mail.
     It sets up the necessary SMTP configuration dynamically based on provided parameters
@@ -23,7 +23,7 @@ def f_488(smtp_server, smtp_port, smtp_user, smtp_password, template_folder):
         Flask: A Flask application instance configured for sending emails.
 
     Examples:
-    >>> app = f_488('smtp.example.com', 587, 'user@example.com', 'password', 'templates')
+    >>> app = f_548('smtp.example.com', 587, 'user@example.com', 'password', 'templates')
     >>> type(app).__name__
     'Flask'
     >>> app.config['MAIL_USERNAME'] == 'user@example.com'
@@ -62,7 +62,7 @@ class TestCases(unittest.TestCase):
         self.smtp_password = 'password'
         self.template_folder = 'templates'
         # Create the app with test configurations
-        self.app = f_488(self.smtp_server, self.smtp_port, self.smtp_user, self.smtp_password, self.template_folder)
+        self.app = f_548(self.smtp_server, self.smtp_port, self.smtp_user, self.smtp_password, self.template_folder)
         self.app.config['TESTING'] = True
         self.client = self.app.test_client()
     def test_app_instance(self):

@@ -15,7 +15,7 @@ def f_759(df: pd.DataFrame) -> Tuple[List[float], Axes]:
     Returns:
     Tuple[List[float], Axes]: A tuple containing:
                               - A list with forecasted prices for the next 7 days.
-                              - A matplotlib Axes object containing the plot.
+                              - A matplotlib Axes object containing the subplot.
 
     Requirements:
     - pandas

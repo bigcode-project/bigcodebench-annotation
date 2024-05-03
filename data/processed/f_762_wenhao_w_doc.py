@@ -1,7 +1,7 @@
 import pandas as pd
 import seaborn as sns
 
-def f_635(data):
+def f_706(data):
     """
     Draw and return a correlation matrix heatmap for a DataFrame containing numerical columns.
     The title of the heatmap is set to 'Correlation Matrix'.
@@ -18,7 +18,7 @@ def f_635(data):
 
     Example:
     >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]}
-    >>> ax = f_635(data)
+    >>> ax = f_706(data)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
 
@@ -36,30 +36,30 @@ class TestCases(unittest.TestCase):
     
     def test_case_1(self):
         data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]}
-        ax = f_635(data)
+        ax = f_706(data)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
         
     def test_case_2(self):
         data = {'a': [1, 2, 3], 'b': [-4, -5, -6], 'c': [-7, -8, -9]}
-        ax = f_635(data)
+        ax = f_706(data)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
         
     def test_case_3(self):
         data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [-7, -8, -9]}
-        ax = f_635(data)
+        ax = f_706(data)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
         
     def test_case_4(self):
         data = {'a': [1, 1, 1], 'b': [2, 2, 2], 'c': [3, 3, 3]}
-        ax = f_635(data)
+        ax = f_706(data)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
         
     def test_case_5(self):
         data = {'a': [1, 2, None], 'b': [4, None, 6], 'c': [None, 8, 9]}
-        ax = f_635(data)
+        ax = f_706(data)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.title.get_text(), 'Correlation Matrix')

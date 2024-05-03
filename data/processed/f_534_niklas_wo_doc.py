@@ -1,10 +1,11 @@
 import os
 import random
 
-def f_134(directory, n_files):
+def f_144(directory, n_files):
     """
     Create n random txt files in a specific directory, write only a single digit random integer into each file, and then reset the cursor to the beginning of each file.
-
+    The file names start from 'file_1.txt' and increment by 1 for each file.
+    
     Parameters:
     - directory (str): The directory in which to generate the files.
     - n_files (int): The number of files to generate.
@@ -18,7 +19,7 @@ def f_134(directory, n_files):
 
     Example:
     >>> random.seed(2)
-    >>> f_134('/path/to/directory', 5)
+    >>> f_144('/path/to/directory', 5)
     5
     """
     if not os.path.exists(directory):
@@ -42,7 +43,7 @@ class TestCases(unittest.TestCase):
         if not os.path.exists(dir):
             os.makedirs(dir)
         # Run function
-        n = f_134(dir, n_files)
+        n = f_144(dir, n_files)
         # Check files
         self.assertEqual(n, n_files)
         read_data = []

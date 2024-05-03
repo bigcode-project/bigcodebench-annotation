@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 
-def f_643(start_time, end_time, step, amplitude, period, seed=0):
+def f_715(start_time, end_time, step, amplitude, period, seed=0):
     """
     Generate a time series with a given seasonality from the start time to the end time
     with a given step, and plot the time series with the seasonality.
@@ -26,7 +26,7 @@ def f_643(start_time, end_time, step, amplitude, period, seed=0):
     - numpy
 
     Example:
-    >>> ax = f_643(0, 10000, 100, 1, 1000)
+    >>> ax = f_715(0, 10000, 100, 1, 1000)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_xticklabels()
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
                 amplitude=amplitude,
                 period=period,
             ):
-                ax = f_643(start_time, end_time, step, amplitude, period)
+                ax = f_715(start_time, end_time, step, amplitude, period)
                 self.assertIsInstance(ax, plt.Axes)
                 self.assertEqual(ax.get_title(), "Time Series with Seasonality")
                 self.assertEqual(ax.get_xlabel(), "Timestamp")
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test large step
         # Plot should still behave as expected even when step > (end_time - start_time)
-        ax = f_643(0, 10000, 200000, 1, 1000)
+        ax = f_715(0, 10000, 200000, 1, 1000)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.get_title(), "Time Series with Seasonality")
         self.assertEqual(ax.get_xlabel(), "Timestamp")
@@ -95,28 +95,28 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test handling invalid input types - period
         with self.assertRaises(ValueError):
-            f_643(0, 10000, 100, 1, 0)
+            f_715(0, 10000, 100, 1, 0)
         with self.assertRaises(ValueError):
-            f_643(0, 10000, 100, 1, -1)
+            f_715(0, 10000, 100, 1, -1)
     def test_case_4(self):
         # Test handling invalid input types - step
         with self.assertRaises(ValueError):
-            f_643(0, 10000, -100, 1, 1000)
+            f_715(0, 10000, -100, 1, 1000)
         with self.assertRaises(ValueError):
-            f_643(0, 10000, 0, 1, 1000)
+            f_715(0, 10000, 0, 1, 1000)
     def test_case_5(self):
         # Test plot data integrity
-        ax = f_643(0, 10000, 100, 1, 1000)
+        ax = f_715(0, 10000, 100, 1, 1000)
         xy_data = ax.get_lines()[0].get_xydata()
         expected_length = (10000 - 0) // 100
         self.assertEqual(len(xy_data), expected_length)
     def test_case_6(self):
         # Test random seed
-        ax1 = f_643(0, 10000, 100, 1, 1000, seed=42)
+        ax1 = f_715(0, 10000, 100, 1, 1000, seed=42)
         xy_data1 = ax1.get_lines()[0].get_xydata()
-        ax2 = f_643(0, 10000, 100, 1, 1000, seed=42)
+        ax2 = f_715(0, 10000, 100, 1, 1000, seed=42)
         xy_data2 = ax2.get_lines()[0].get_xydata()
-        ax3 = f_643(0, 10000, 100, 1, 1000, seed=43)
+        ax3 = f_715(0, 10000, 100, 1, 1000, seed=43)
         xy_data3 = ax3.get_lines()[0].get_xydata()
         self.assertTrue(
             np.array_equal(xy_data1, xy_data2),

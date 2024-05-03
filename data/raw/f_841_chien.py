@@ -70,8 +70,10 @@ class TestCases(unittest.TestCase):
         self.valid_url = "http://example.com/valid.tar.gz"
         self.invalid_checksum_url = "http://example.com/invalid_checksum.tar.gz"
         # Create a minimal tar.gz file to simulate download
+        with open("test_file.txt", "w") as f:
+            f.write("test data")
         with tarfile.open(TARGET_TAR_FILE, "w:gz") as tar:
-            tar.add(__file__, arcname=os.path.basename(__file__))
+            tar.add("test_file.txt")
 
     def test_valid_file(self):
         """Test that a valid file is downloaded, its checksum is validated, and it is extracted."""
@@ -115,6 +117,8 @@ class TestCases(unittest.TestCase):
         # Clean up any created files
         if os.path.exists(TARGET_TAR_FILE):
             os.remove(TARGET_TAR_FILE)
+        if os.path.exists("test_file.txt"):
+            os.remove("test_file.txt")
 
 
 def run_tests():

@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.decomposition import PCA
 
-def f_36(df):
+def f_39(df):
     """
     Perform Principal Component Analysis (PCA) on the DataFrame and record the first two main components.
     
@@ -17,7 +17,7 @@ def f_36(df):
     
     Example:
     >>> df = pd.DataFrame([[5.1, 3.5, 1.4], [4.9, 3.0, 1.4], [4.7, 3.2, 1.3]], columns = ['x', 'y', 'z'])
-    >>> df_pca = f_36(df)
+    >>> df_pca = f_39(df)
     >>> print(df_pca)
             PC1       PC2
     0  0.334781 -0.011992
@@ -35,7 +35,7 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame([[0, 0], [0, 0]], columns = ['x', 'y'])
-        df_pca = f_36(df)
+        df_pca = f_39(df)
         self.assertTrue('PC1' in df_pca.columns)
         self.assertTrue('PC2' in df_pca.columns)
         self.assertEqual(df_pca.shape, (2, 2))
@@ -45,7 +45,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df_pca['PC2'].iloc[1], 0)
     def test_case_2(self):
         df = pd.DataFrame([[1, 1], [1, 1]], columns = ['x', 'y'])
-        df_pca = f_36(df)
+        df_pca = f_39(df)
         self.assertTrue('PC1' in df_pca.columns)
         self.assertTrue('PC2' in df_pca.columns)
         self.assertEqual(df_pca.shape, (2, 2))
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df_pca['PC2'].iloc[1], 0)
     def test_case_3(self):
         df = pd.DataFrame([[1, 0], [0, 1]], columns = ['x', 'y'])
-        df_pca = f_36(df)
+        df_pca = f_39(df)
         self.assertTrue('PC1' in df_pca.columns)
         self.assertTrue('PC2' in df_pca.columns)
         self.assertEqual(df_pca.shape, (2, 2))
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df_pca['PC2'].iloc[1], df_pca_new[1, 1])
     def test_case_4(self):
         df = pd.DataFrame([[4, 3, 2, 1], [1, 2, 3, 4]], columns = ['x', 'y', 'z', 'w'])
-        df_pca = f_36(df)
+        df_pca = f_39(df)
         self.assertTrue('PC1' in df_pca.columns)
         self.assertTrue('PC2' in df_pca.columns)
         self.assertEqual(df_pca.shape, (2, 2))
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df_pca['PC1'].iloc[0], df_pca_new[0, 0])
     def test_case_5(self):
         df = pd.DataFrame([[1, 2, 3, 4], [4, 3, 2, 1]], columns = ['x', 'y', 'z', 'w'])
-        df_pca = f_36(df)
+        df_pca = f_39(df)
         self.assertTrue('PC1' in df_pca.columns)
         self.assertTrue('PC2' in df_pca.columns)
         self.assertEqual(df_pca.shape, (2, 2))

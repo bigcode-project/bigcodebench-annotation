@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
 
-def f_34(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
+def f_37(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
     """
     Encrypt the categorical data in a specific column of a DataFrame using LabelEncoder.
 
@@ -19,7 +19,7 @@ def f_34(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
 
     Example:
     >>> df = pd.DataFrame({'fruit': ['apple', 'banana', 'cherry', 'apple', 'banana']})
-    >>> encoded_df = f_34(df, 'fruit')
+    >>> encoded_df = f_37(df, 'fruit')
     >>> encoded_df['fruit'].tolist()
     [0, 1, 2, 0, 1]
     """
@@ -32,21 +32,21 @@ import pandas as pd
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame({'fruit': ['apple', 'banana', 'cherry', 'apple', 'banana']})
-        encoded_df = f_34(df, 'fruit')
+        encoded_df = f_37(df, 'fruit')
         self.assertEqual(encoded_df['fruit'].tolist(), [0, 1, 2, 0, 1])
     def test_case_2(self):
         df = pd.DataFrame({'animal': ['cat', 'dog', 'bird', 'cat', 'bird']})
-        encoded_df = f_34(df, 'animal')
+        encoded_df = f_37(df, 'animal')
         self.assertEqual(encoded_df['animal'].tolist(), [1, 2, 0, 1, 0])
     def test_case_3(self):
         df = pd.DataFrame({'color': ['red', 'blue', 'green', 'red', 'green']})
-        encoded_df = f_34(df, 'color')
+        encoded_df = f_37(df, 'color')
         self.assertEqual(encoded_df['color'].tolist(), [2, 0, 1, 2, 1])
     def test_case_4(self):
         df = pd.DataFrame({'vehicle': ['car', 'bus', 'train', 'car', 'train']})
-        encoded_df = f_34(df, 'vehicle')
+        encoded_df = f_37(df, 'vehicle')
         self.assertEqual(encoded_df['vehicle'].tolist(), [1, 0, 2, 1, 2])
     def test_case_5(self):
         df = pd.DataFrame({'city': ['NYC', 'LA', 'SF', 'NYC', 'SF']})
-        encoded_df = f_34(df, 'city')
+        encoded_df = f_37(df, 'city')
         self.assertEqual(encoded_df['city'].tolist(), [1, 0, 2, 1, 2])

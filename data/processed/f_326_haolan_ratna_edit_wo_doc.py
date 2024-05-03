@@ -7,7 +7,7 @@ import os
 # Constants
 API_URL = 'https://api.example.com/data'
 
-def f_596(pattern):
+def f_665(pattern):
     """
     Make a GET request to an API, extract data that matches a RegEx pattern, and write it to a CSV file.
 
@@ -29,9 +29,9 @@ def f_596(pattern):
     - os
 
     Example:
-    >>> f_596(r'\\\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,}\\\\b')
+    >>> f_665(r'\\\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,}\\\\b')
     '/absolute/path/to/matched_data.csv'
-    >>> f_596(r'\\\\d{3}-\\\\d{2}-\\\\d{4}')  # For matching SSN format
+    >>> f_665(r'\\\\d{3}-\\\\d{2}-\\\\d{4}')  # For matching SSN format
     '/absolute/path/to/matched_data.csv'
     """
 
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
             os.remove("matched_data.csv")
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_1(self, mock_get):
-        result = f_596(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b')
+        result = f_665(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b')
         self.assertTrue(os.path.exists(result))
         with open("matched_data.csv", "r") as file:
             content = file.read()
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
             self.assertIn("jane.smith@domain.org", content)
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_2(self, mock_get):
-        result = f_596('\d{3}-\d{2}-\d{4}')
+        result = f_665('\d{3}-\d{2}-\d{4}')
         self.assertTrue(os.path.exists(result))
         with open("matched_data.csv", "r") as file:
             content = file.read()
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
             self.assertIn("987-65-4321", content)
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_3(self, mock_get):
-        result = f_596(r'apple')
+        result = f_665(r'apple')
         self.assertTrue(os.path.exists(result))
         with open("matched_data.csv", "r") as file:
             content = file.read()
@@ -97,14 +97,14 @@ class TestCases(unittest.TestCase):
             self.assertNotIn("banana", content)
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_4(self, mock_get):
-        result = f_596(r'no_match')
+        result = f_665(r'no_match')
         self.assertTrue(os.path.exists(result))
         with open("matched_data.csv", "r") as file:
             content = file.read()
             self.assertEqual(content, "")
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_5(self, mock_get):
-        result = f_596(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b')
+        result = f_665(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b')
         self.assertTrue(os.path.exists(result))
         with open("matched_data.csv", "r") as file:
             content = file.read()

@@ -3,7 +3,7 @@ import time
 output_dir = './output'
 
 
-def f_460(df: pd.DataFrame, filename: str) -> str:
+def f_516(df: pd.DataFrame, filename: str) -> str:
     """
     Write a Pandas DataFrame into a JSON Lines file and save it in a specified directory.
 
@@ -20,7 +20,7 @@ def f_460(df: pd.DataFrame, filename: str) -> str:
 
     Example:
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    >>> 'data.jsonl' in f_460(df, 'data.jsonl')
+    >>> 'data.jsonl' in f_516(df, 'data.jsonl')
     True
     """
     start_time = time.time()
@@ -56,25 +56,25 @@ class TestCases(unittest.TestCase):
     def test_basic_dataframe(self):
         """Ensure basic DataFrame is saved correctly."""
         df = pd.DataFrame({'A': [1, 2], 'B': ['x', 'y']})
-        path = f_460(df, 'test_basic.jsonl')
+        path = f_516(df, 'test_basic.jsonl')
         self.assertTrue(os.path.exists(path))
     def test_empty_dataframe(self):
         """Ensure method handles empty DataFrame correctly."""
         df = pd.DataFrame()
-        path = f_460(df, 'test_empty.jsonl')
+        path = f_516(df, 'test_empty.jsonl')
         self.assertTrue(os.path.exists(path))
     def test_with_nan_values(self):
         """Ensure NaN values are handled correctly."""
         df = pd.DataFrame({'A': [1, None], 'B': [None, 2]})
-        path = f_460(df, 'test_nan.jsonl')
+        path = f_516(df, 'test_nan.jsonl')
         self.assertTrue(os.path.exists(path))
     def test_large_dataframe(self):
         """Test with a large DataFrame."""
         df = pd.DataFrame({'A': range(1000)})
-        path = f_460(df, 'test_large.jsonl')
+        path = f_516(df, 'test_large.jsonl')
         self.assertTrue(os.path.exists(path))
     def test_special_characters(self):
         """Test DataFrame containing special characters."""
         df = pd.DataFrame({'A': ['Hello, "World"', "It's alright"]})
-        path = f_460(df, 'test_special_chars.jsonl')
+        path = f_516(df, 'test_special_chars.jsonl')
         self.assertTrue(os.path.exists(path))

@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 
 
-def f_650(goals, penalties):
+def f_723(goals, penalties):
     """
     Visualize the distribution of goals and penalties for a number of teams and return the data as a DataFrame.
 
@@ -22,7 +22,7 @@ def f_650(goals, penalties):
     Example:
     >>> goals = {'Team A': 3, 'Team B': 2, 'Team C': 1, 'Team D': 0, 'Team E': 2}
     >>> penalties = {'Team A': 1, 'Team B': 0, 'Team C': 2, 'Team D': 3, 'Team E': 1}
-    >>> df, plot = f_650(goals, penalties)
+    >>> df, plot = f_723(goals, penalties)
     >>> print(df)
          Team  Goals  Penalties
     0  Team A      3          1
@@ -48,20 +48,20 @@ def f_650(goals, penalties):
 
 import unittest
 from unittest.mock import patch
-# Unit tests for the function f_650
+# Unit tests for the function f_723
 class TestCases(unittest.TestCase):
     @patch('matplotlib.pyplot.show')
     def test_visualization_output(self, mock_show):
         goals = {'Team A': 3, 'Team B': 2, 'Team C': 0}
         penalties = {'Team A': 1, 'Team B': 0, 'Team C': 2}
-        df, _ = f_650(goals, penalties)
+        df, _ = f_723(goals, penalties)
         self.assertEqual(list(df.columns), ['Team', 'Goals', 'Penalties'])
         self.assertEqual(df['Goals'].sum(), 5)
         self.assertEqual(df['Penalties'].sum(), 3)
     def test_empty_input(self):
         goals = {}
         penalties = {}
-        df, _ = f_650(goals, penalties)
+        df, _ = f_723(goals, penalties)
         # The dataframe should have the teams but with 0 goals and penalties.
         expected_data = {
             'Team': ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
@@ -73,18 +73,18 @@ class TestCases(unittest.TestCase):
     def test_plot_type(self):
         goals = {'Team A': 1}
         penalties = {'Team A': 1}
-        _, plot = f_650(goals, penalties)
+        _, plot = f_723(goals, penalties)
         self.assertIsInstance(plot, sns.axisgrid.PairGrid)
     def test_invalid_keys(self):
         goals = {'Team Z': 1}
         penalties = {'Team Z': 1}
-        df, _ = f_650(goals, penalties)
+        df, _ = f_723(goals, penalties)
         self.assertFalse('Team Z' in df['Team'].values)
     @patch('matplotlib.pyplot.show')
     def test_data_integrity(self, mock_show):
         goals = {'Team A': 3, 'Team B': 2, 'Team C': 1}
         penalties = {'Team A': 1, 'Team B': 2, 'Team C': 3}
-        df, _ = f_650(goals, penalties)
+        df, _ = f_723(goals, penalties)
         expected_data = {
             'Team': ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
             'Goals': [3, 2, 1, 0, 0],

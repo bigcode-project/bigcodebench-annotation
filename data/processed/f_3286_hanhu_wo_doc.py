@@ -2,7 +2,7 @@ import os
 import csv
 from openpyxl import load_workbook
 
-def f_293(file_name, excel_file_path, csv_file_path) -> str:
+def f_321(file_name, excel_file_path, csv_file_path) -> str:
     """
     Converts an Excel file (.xls or .xlsx) to a CSV file by reading the contents of the Excel file
     and writing them to a new CSV file with the same name but a different extension. Allows specifying
@@ -22,9 +22,9 @@ def f_293(file_name, excel_file_path, csv_file_path) -> str:
     - csv
 
     Example:
-    >>> f_293('test.xlsx', '/path/to/excel/files', '/path/to/csv/files')
+    >>> f_321('test.xlsx', '/path/to/excel/files', '/path/to/csv/files')
     'test.csv'
-    >>> f_293('nonexistent.xlsx', '/path/to/excel/files', '/path/to/csv/files')
+    >>> f_321('nonexistent.xlsx', '/path/to/excel/files', '/path/to/csv/files')
     Traceback (most recent call last):
        ...
     FileNotFoundError: [Errno 2] No such file or directory: '/path/to/excel/files/nonexistent.xlsx'
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
         """Test that an Excel file is successfully converted to a CSV file."""
         excel_file_name = 'test.xlsx'
         self.create_temp_excel_file(excel_file_name)
-        result = f_293(excel_file_name, str(self.mock_excel_path), str(self.mock_csv_path))
+        result = f_321(excel_file_name, str(self.mock_excel_path), str(self.mock_csv_path))
         self.assertEqual(result, 'test.csv')
     @patch('openpyxl.load_workbook')
     def test_return_type(self, mock_load_workbook):
@@ -88,18 +88,18 @@ class TestCases(unittest.TestCase):
         excel_file_name = 'test.xlsx'
         temp_file_path = self.create_temp_excel_file(excel_file_name)
         mock_load_workbook.return_value.active.iter_rows.return_value = iter([])
-        result = f_293(excel_file_name, str(self.mock_excel_path), str(self.mock_csv_path))
+        result = f_321(excel_file_name, str(self.mock_excel_path), str(self.mock_csv_path))
         self.assertIsInstance(result, str)
     def test_file_not_found(self):
         """Check that FileNotFoundError is raised when the Excel file does not exist."""
         with self.assertRaises(FileNotFoundError):
-            f_293('nonexistent.xlsx', str(self.mock_excel_path), str(self.mock_csv_path))
+            f_321('nonexistent.xlsx', str(self.mock_excel_path), str(self.mock_csv_path))
     def test_csv_file_creation(self):
         """Test that a CSV file is created with the expected content from the Excel file."""
         excel_file_name = 'test.xlsx'
         self.create_temp_excel_file(excel_file_name)
         # Call the function under test
-        csv_file_name = f_293(excel_file_name, str(self.mock_excel_path), str(self.mock_csv_path))
+        csv_file_name = f_321(excel_file_name, str(self.mock_excel_path), str(self.mock_csv_path))
         csv_file_path = self.mock_csv_path / csv_file_name
         # Check if the CSV file was actually created
         self.assertTrue(os.path.exists(csv_file_path), f"CSV file was not created: {csv_file_path}")

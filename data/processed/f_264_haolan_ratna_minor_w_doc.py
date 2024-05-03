@@ -1,7 +1,7 @@
 import re
 from collections import Counter
 
-def f_108(sentence):
+def f_116(sentence):
     """
     Count the occurrence of each word in a sentence and return the result as a dictionary.
     This function uses a regular expression to find words and a Counter to count their occurrences.
@@ -17,7 +17,7 @@ def f_108(sentence):
     - collections.Counter
     
     Example:
-    >>> f_108("apple banana apple orange orange orange")
+    >>> f_116("apple banana apple orange orange orange")
     {'apple': 2, 'banana': 1, 'orange': 3}
     """
 
@@ -30,22 +30,22 @@ from faker import Faker
 fake = Faker()
 class TestCases(unittest.TestCase):
     def test_empty_string(self):
-        self.assertEqual(f_108(""), {})
+        self.assertEqual(f_116(""), {})
     def test_single_word(self):
         word = fake.word()
-        self.assertEqual(f_108(word)[word], 1)
+        self.assertEqual(f_116(word)[word], 1)
     def test_multiple_words(self):
         sentence = fake.sentence()
         expected_result = {}
         for word in sentence.split():
             expected_result[word] = expected_result.get(word, 0) + 1
-        self.assertEqual(len(f_108(sentence)), len(expected_result))
+        self.assertEqual(len(f_116(sentence)), len(expected_result))
     def test_case_sensitivity(self):
         sentence = 'Apple apple'
-        self.assertEqual(f_108(sentence), {"Apple": 1, "apple": 1})
+        self.assertEqual(f_116(sentence), {"Apple": 1, "apple": 1})
     def test_punctuation_inclusion(self):
         sentence = 'apple, apple; banana!'
-        self.assertEqual(f_108(sentence), {"apple": 2, "banana": 1})
+        self.assertEqual(f_116(sentence), {"apple": 2, "banana": 1})
     def test_numeric_and_special_characters(self):
         sentence = '123 $%^& 123'
-        self.assertEqual(f_108(sentence), {'123': 2})
+        self.assertEqual(f_116(sentence), {'123': 2})

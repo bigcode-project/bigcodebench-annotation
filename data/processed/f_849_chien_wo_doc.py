@@ -3,7 +3,7 @@ import requests
 from zipfile import ZipFile, BadZipFile
 
 
-def f_495(url, download_path="mnt/data/downloads/"):
+def f_556(url, download_path="mnt/data/downloads/"):
     """
     Downloads and extracts a ZIP file from a specified URL to a given directory.
 
@@ -14,7 +14,9 @@ def f_495(url, download_path="mnt/data/downloads/"):
 
     Returns:
     - str: Path to the directory containing the extracted contents. If an error occurs, a descriptive
-               message detailing the type of error is returned.
+               message is returned. The message starts with "Error: ". 
+               If the specific descrption is either "The URL does not point to a ZIP file.", 
+               or "The downloaded file is not a valid ZIP file.", or "Unable to download the file from the provided URL.".
 
     Raises:
     - Network Issues or Invalid URL: Returns "Error: Unable to download the file from the provided URL."
@@ -33,7 +35,7 @@ def f_495(url, download_path="mnt/data/downloads/"):
     - zipfile
 
     Example:
-    >>> f_495('https://example.com/file.zip')
+    >>> f_556('https://example.com/file.zip')
        'mnt/data/downloads/file'
     """
     if not os.path.exists(download_path):
@@ -73,11 +75,11 @@ import unittest
 from unittest.mock import patch
 import shutil
 class TestCases(unittest.TestCase):
-    """Test cases for f_495."""
+    """Test cases for f_556."""
     def test_valid_zip_url(self):
         """Test a valid ZIP URL."""
         url = "https://getsamplefiles.com/download/zip/sample-1.zip"
-        result = f_495(url)
+        result = f_556(url)
         self.assertTrue(result.startswith("mnt/data/downloads/"))
         self.assertTrue(result.endswith("sample-1"))
         shutil.rmtree("mnt/data/downloads")
@@ -86,7 +88,7 @@ class TestCases(unittest.TestCase):
         """Test an invalid URL."""
         mock_get.side_effect = requests.RequestException()
         url = "https://invalid-url.com/sample.zip"
-        result = f_495(url)
+        result = f_556(url)
         self.assertEqual(
             result,
             "Error: Unable to download the file from the provided URL.",
@@ -98,7 +100,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value.headers = {"Content-Type": "text/plain"}
         mock_get.return_value.content = b"Not a ZIP file"
         url = "https://valid-url.com/not-a-zip.txt"
-        result = f_495(url)
+        result = f_556(url)
         self.assertEqual(result, "Error: The URL does not point to a ZIP file.")
     @patch("requests.get")
     def test_download_invald_zip_file(self, mock_get):
@@ -108,14 +110,14 @@ class TestCases(unittest.TestCase):
         mock_get.return_value.content = b"Some ZIP content"
         url = "https://valid-zip-url.com/sample.zip"
         custom_path = "mnt/data/custom_path/"
-        result = f_495(url, custom_path)
+        result = f_556(url, custom_path)
         self.assertEqual(result, "Error: The downloaded file is not a valid ZIP file.")
     @patch("requests.get")
     def test_general_error(self, mock_get):
         """Test a general error."""
         mock_get.side_effect = RuntimeError("Unexpected error")
         url = "https://error-url.com/error.zip"
-        result = f_495(url)
+        result = f_556(url)
         self.assertTrue(result.startswith("Error: Unexpected error"))
     def tearDown(self):
         # Cleanup the test directories

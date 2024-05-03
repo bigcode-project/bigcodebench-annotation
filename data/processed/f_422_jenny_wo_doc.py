@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 
-def f_135(db_name, table_name, csv_path="data.csv"):
+def f_145(db_name, table_name, csv_path="data.csv"):
     """
     Read SQLite3 table via pandas and export to a CSV file.
 
@@ -21,9 +21,9 @@ def f_135(db_name, table_name, csv_path="data.csv"):
     str: The absolute path of the exported CSV file.
 
     Example:
-    >>> f_135('test.db', 'People')
+    >>> f_145('test.db', 'People')
     'data.csv'
-    >>> f_135('/absolute/path/to/test.db', 'Orders', 'orders.csv')
+    >>> f_145('/absolute/path/to/test.db', 'Orders', 'orders.csv')
     '/absolute/path/to/orders.csv'
     """
     try:
@@ -64,7 +64,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test exporting the People table
         csv_path = os.path.join(self.temp_dir, "data.csv")
-        output_path = f_135(self.db_path, "People", csv_path)
+        output_path = f_145(self.db_path, "People", csv_path)
         self.assertTrue(os.path.exists(output_path), "CSV file not created.")
         df = pd.read_csv(output_path)
         self.assertEqual(len(df), 3, "CSV contains incorrect number of rows.")
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test exporting the Orders table
         csv_path = os.path.join(self.temp_dir, "orders.csv")
-        output_path = f_135(self.db_path, "Orders", csv_path)
+        output_path = f_145(self.db_path, "Orders", csv_path)
         self.assertTrue(os.path.exists(output_path), "CSV file not created.")
         df = pd.read_csv(output_path)
         self.assertEqual(len(df), 3, "CSV contains incorrect number of rows.")
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test exporting with a custom CSV path
         custom_path = os.path.join(self.temp_dir, "custom_data.csv")
-        output_path = f_135(self.db_path, "People", custom_path)
+        output_path = f_145(self.db_path, "People", custom_path)
         self.assertTrue(
             os.path.exists(output_path), "CSV file not created at custom path."
         )
@@ -92,17 +92,17 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Test with a non-existent database
         with self.assertRaises(Exception):
-            f_135(os.path.join(self.temp_dir, "nonexistent.db"), "People")
+            f_145(os.path.join(self.temp_dir, "nonexistent.db"), "People")
     def test_case_5(self):
         # Test with a non-existent table
         with self.assertRaises(pd.io.sql.DatabaseError):
-            f_135(self.db_path, "NonexistentTable")
+            f_145(self.db_path, "NonexistentTable")
     def test_case_6(self):
         # Test if the function overwrites an existing CSV file
         csv_path = os.path.join(self.temp_dir, "data.csv")
         with open(csv_path, "w") as file:
             file.write("Old Content")
-        output_path = f_135(self.db_path, "People", csv_path)
+        output_path = f_145(self.db_path, "People", csv_path)
         self.assertTrue(os.path.exists(output_path), "CSV file not created.")
         with open(output_path, "r") as file:
             content = file.read()
@@ -112,4 +112,4 @@ class TestCases(unittest.TestCase):
     def test_case_7(self):
         # Test error handling with invalid CSV path
         with self.assertRaises(OSError):
-            f_135(self.db_path, "People", "/nonexistent_path/data.csv")
+            f_145(self.db_path, "People", "/nonexistent_path/data.csv")

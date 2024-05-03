@@ -1,7 +1,7 @@
 import pandas as pd
 import seaborn as sns
 
-def f_50(df, col1, col2):
+def f_54(df, col1, col2):
     """
     Draw a scatter plot with a regression line for two columns from a DataFrame.
 
@@ -24,7 +24,7 @@ def f_50(df, col1, col2):
     Example:
     >>> import matplotlib.pyplot as plt
     >>> df = pd.DataFrame({'X': [1, 2, 3, 4, 5], 'Y': [2, 4, 6, 8, 10]})
-    >>> plot = f_50(df, 'X', 'Y')
+    >>> plot = f_54(df, 'X', 'Y')
     >>> len(plot.collections[0].get_offsets().data)
     5
     >>> plt.close()
@@ -50,7 +50,7 @@ class TestCases(unittest.TestCase):
             'B': [5, 4, 3, 2, 1]
         })
         # Call the function with the DataFrame
-        ax = f_50(df, 'A', 'B')
+        ax = f_54(df, 'A', 'B')
         
         # Assertions to validate the output
         self.assertIsInstance(ax, matplotlib.axes._axes.Axes, "The returned object should be a seaborn FacetGrid.")
@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
         })
         # We expect a TypeError because non-numeric data can't be used to plot a regression line
         with self.assertRaises(TypeError, msg="The function should raise a TypeError for non-numeric data."):
-            f_50(df, 'A', 'B')
+            f_54(df, 'A', 'B')
         plt.close()
     def test_missing_data(self):
         # Create a DataFrame with missing data
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
             'B': [5, None, 3, 2, 1]
         })
         # Call the function with the DataFrame
-        ax = f_50(df, 'A', 'B')
+        ax = f_54(df, 'A', 'B')
         # Assertions to validate the output
         # We expect the function to handle missing data according to seaborn's default behavior
         self.assertIsInstance(ax, matplotlib.axes._axes.Axes, "The returned object should be a seaborn FacetGrid.")
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
             'B': range(10000, 20000)
         })
         # Call the function with the DataFrame
-        ax = f_50(df, 'A', 'B')
+        ax = f_54(df, 'A', 'B')
         # Assertions to validate the output
         self.assertIsInstance(ax, matplotlib.axes._axes.Axes, "The returned object should be a seaborn FacetGrid.")
         plt.close()
@@ -98,7 +98,7 @@ class TestCases(unittest.TestCase):
             'B': [1]
         })
         # Call the function with the DataFrame
-        ax = f_50(df, 'A', 'B')
+        ax = f_54(df, 'A', 'B')
         # Assertions to validate the output
         self.assertIsInstance(ax, matplotlib.axes._axes.Axes, "The returned object should be a seaborn FacetGrid.")
         self.assertEqual(len(ax.collections), 1)  # Check if there's only one collection of points in the plot
@@ -107,11 +107,11 @@ class TestCases(unittest.TestCase):
     
     def test_non_df(self):
         with self.assertRaises(ValueError):
-            f_50("non_df", 'A', 'B')
+            f_54("non_df", 'A', 'B')
     
     def test_empty_df(self):
         with self.assertRaises(ValueError):
-            f_50(pd.DataFrame(), 'A', 'B')
+            f_54(pd.DataFrame(), 'A', 'B')
     def test_column_df(self):
         with self.assertRaises(ValueError):
-            f_50(pd.DataFrame({'A': [1]}), 'A', 'B')
+            f_54(pd.DataFrame({'A': [1]}), 'A', 'B')

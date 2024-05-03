@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def f_441(url: str) -> "matplotlib.axes._axes.Axes":
+def f_493(url: str) -> "matplotlib.axes._axes.Axes":
     """
     Downloads an image from the specified URL, converts it to grayscale, and generates a histogram of its grayscale values.
 
@@ -25,7 +25,7 @@ def f_441(url: str) -> "matplotlib.axes._axes.Axes":
     - matplotlib.pyplot
 
     Example:
-    >>> ax = f_441("https://www.example.com/myimage.jpg")
+    >>> ax = f_493("https://www.example.com/myimage.jpg")
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
@@ -63,7 +63,7 @@ import matplotlib
 from PIL import Image
 import io
 class TestCases(unittest.TestCase):
-    """Test cases for f_441."""
+    """Test cases for f_493."""
     def create_mock_image(self):
         """
         Creates a mock grayscale image in memory.
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
         mock_img = self.create_mock_image()
         mock_get.return_value = Mock(ok=True)
         mock_get.return_value.raw = mock_img
-        ax = f_441("https://www.google.com/images/srpr/logo11w.png")
+        ax = f_493("https://www.google.com/images/srpr/logo11w.png")
         self.assertIsInstance(
             ax,
             matplotlib.axes._axes.Axes,
@@ -99,7 +99,7 @@ class TestCases(unittest.TestCase):
         """
         mock_get.side_effect = requests.exceptions.RequestException
         with self.assertRaises(ValueError):
-            f_441("invalid_url")
+            f_493("invalid_url")
     @patch("requests.get")
     def test_histogram_bins(self, mock_get):
         """
@@ -108,7 +108,7 @@ class TestCases(unittest.TestCase):
         mock_img = self.create_mock_image()
         mock_get.return_value = Mock(ok=True)
         mock_get.return_value.raw = mock_img
-        ax = f_441("https://www.google.com/images/srpr/logo11w.png")
+        ax = f_493("https://www.google.com/images/srpr/logo11w.png")
         n, bins, _ = ax.hist([], bins=256)
         self.assertEqual(len(bins), 257, "There should be 257 bin edges for 256 bins")
     @patch("requests.get")
@@ -119,7 +119,7 @@ class TestCases(unittest.TestCase):
         mock_img = self.create_mock_image()
         mock_get.return_value = Mock(ok=True)
         mock_get.return_value.raw = mock_img
-        ax = f_441("https://www.google.com/images/srpr/logo11w.png")
+        ax = f_493("https://www.google.com/images/srpr/logo11w.png")
         n, bins, _ = ax.hist([], bins=256)
         self.assertTrue(
             bins[0] >= 0 and bins[-1] <= 255, "Data range should be between 0 and 255"
@@ -131,7 +131,7 @@ class TestCases(unittest.TestCase):
         """
         mock_get.side_effect = requests.exceptions.RequestException
         with self.assertRaises(ValueError):
-            f_441("")
+            f_493("")
     @patch("requests.get")
     @patch("PIL.Image.open")
     def test_ioerror_image_processing(self, mock_image_open, mock_get):
@@ -144,7 +144,7 @@ class TestCases(unittest.TestCase):
         # Mock PIL.Image.open to raise IOError
         mock_image_open.side_effect = IOError("Mocked IOError")
         with self.assertRaises(IOError) as context:
-            f_441("https://www.example.com/image.jpg")
+            f_493("https://www.example.com/image.jpg")
         self.assertEqual(
             str(context.exception), "Error processing the image: Mocked IOError"
         )
