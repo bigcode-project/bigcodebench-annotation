@@ -1,3 +1,7 @@
+import os
+import glob
+import subprocess
+
 def f_1016(directory, backup_dir='/path/to/backup'):
     """
     Backup all log files in a specific directory and delete the original files.
@@ -14,7 +18,6 @@ def f_1016(directory, backup_dir='/path/to/backup'):
     Requirements:
     - subprocess
     - glob
-    - shutil
     - os
     
     Example:
