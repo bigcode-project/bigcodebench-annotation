@@ -25,10 +25,8 @@ def f_476(x):
     Examples:
     >>> X = np.linspace(-10, 10, 1000)
     >>> result = f_476(X)
-    >>> result is None
-    True
-    >>> f_476(np.linspace(-5, 5, 500)) is None  # Test with a different range
-    True
+    >>> result[0]
+    (7.69459862670642e-23+3.037941424911643e-09j)
     """
 
     # Type check for x and y
