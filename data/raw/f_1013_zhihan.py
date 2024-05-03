@@ -14,11 +14,14 @@ def f_1013(ftp_server='ftp.dlptest.com', ftp_user='dlpuser', ftp_password='rNrKY
     - ftp_dir (str): The directory path on the FTP server from which files need to be downloaded. Default is '/ftp/test'.
     
     Returns:
-    - List[str]: A list of filenames downloaded from the FTP server.
+    - List[str]: A list of filenames that were attempted to be downloaded from the FTP server.
+
+    Raises:
+    - Exception: If there is a failure in connecting to the FTP server, logging in, or changing to the specified directory.
     
     Requirements:
     - subprocess
-    - ftplib
+    - ftplib.FTP
     - os
     - sys
 
@@ -53,13 +56,6 @@ import os
 import subprocess
 from ftplib import FTP
 import sys
-
-
-def run_tests():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCases))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
 
 class TestCases(unittest.TestCase):
     def setUp(self):
@@ -96,5 +92,12 @@ class TestCases(unittest.TestCase):
         # Invalid FTP directory
         with self.assertRaises(SystemExit):
             f_1013(ftp_dir="/invalid_directory")
+
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
 if __name__ == "__main__":
     run_tests()
