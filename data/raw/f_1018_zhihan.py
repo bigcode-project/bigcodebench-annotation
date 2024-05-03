@@ -15,14 +15,15 @@ def f_1018(file):
     file (str): The path to the CSV file.
 
     Returns:
-    list: The paths to the split files.
+    list: The paths to the split files. If the file does not exist, does not have csv extension or some an exception occurs, 
+    then returns empty list.
 
     Requirements:
-    - subprocess: For running shell commands
-    - csv: For reading and writing CSV files
-    - glob: For finding split files
-    - random: For shuffling rows in a CSV file
-    - os: For checking file existence
+    - subprocess
+    - csv
+    - glob
+    - random
+    - os
 
     Example:
     >>> f_1018('/path/to/file.csv')
@@ -105,5 +106,6 @@ class TestCases(unittest.TestCase):
             f.write("This is a test text file.")
         split_files = f_1018(os.path.join(test_data_dir, "test.txt"))
         self.assertEqual(split_files, [], "Expected an empty list for a non-CSV file.")
+
 if __name__ == "__main__":
     run_tests()
