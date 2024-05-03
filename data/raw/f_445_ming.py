@@ -7,7 +7,7 @@ def f_445(array_length=100):
     Generate two arrays of random numbers of a given length, calculate their mean, median, and standard deviation, 
     and draw a bar chart to compare these statistics.
 
-    Args:
+    Parameters:
     - array_length (int, optional): The length of the arrays to be generated. Default is 100.
 
     Returns:

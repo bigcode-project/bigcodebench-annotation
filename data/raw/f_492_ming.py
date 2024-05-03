@@ -1,6 +1,6 @@
 import csv
 import os
-output_dir = './output'
+OUTPUT_DIR = './output'
 
 
 def f_492(df, filename):
@@ -29,10 +29,10 @@ def f_492(df, filename):
     True
     """
     # Ensure the data directory exists
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
 
-    file_path = os.path.join(output_dir, filename)
+    file_path = os.path.join(OUTPUT_DIR, filename)
     df.to_csv(file_path, index=False, quoting=csv.QUOTE_NONNUMERIC)
     return os.path.abspath(file_path)
 
@@ -46,17 +46,17 @@ class TestCases(unittest.TestCase):
     @classmethod
     def setUp(self):
         """Create the data directory if it doesn't exist."""
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        if not os.path.exists(OUTPUT_DIR):
+            os.makedirs(OUTPUT_DIR)
 
     def tearDown(self):
         """Clean up by removing files created during tests (if any)."""
-        shutil.rmtree(output_dir, ignore_errors=True)
+        shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
 
     def test_basic_dataframe(self):
         """Test saving a simple DataFrame."""
         df = pd.DataFrame({'A': [1, 2], 'B': ['x', 'y']})
-        expected_path = os.path.join(output_dir, 'basic.csv')
+        expected_path = os.path.join(OUTPUT_DIR, 'basic.csv')
         result_path = f_492(df, 'basic.csv')
         self.assertEqual(expected_path[expected_path.rindex('/') + 1:], result_path[result_path.rindex('/') + 1: ])
         self.assertTrue(os.path.exists(result_path))

@@ -4,10 +4,12 @@ import pandas as pd
 
 def f_462(df, letter):
     """
-    The function filters rows in a DataFrame in which the values of a particular column start with a particular letter and then calculates the length of the words in the filtered column and returns basic statistics (mean, median, mode) of the word lengths.
+    The function filters rows in a dictionary of list in which the values of a particular column start with
+    a particular letter and then calculates the length of the words in the filtered column and returns basic
+    statistics (mean, median, mode) of the word lengths.
 
     Parameters:
-    df (DataFrame): The input DataFrame. It should have a 'Word' column.
+    df (dict of list): A dictionary where the key 'Word' maps to a list of strings.
     letter (str): The letter to filter the 'Word' column.
 
     Returns:
@@ -38,11 +40,13 @@ import unittest
 import random
 from string import ascii_lowercase
 
+
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 
 class TestCases(unittest.TestCase):
     def setUp(self):

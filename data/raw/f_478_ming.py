@@ -18,6 +18,7 @@ def f_478(goals, penalties, rng_seed=None, teams=TEAMS):
     - goals (int): The maximum number of goals a team can score in a match.
     - penalties (int): The maximum number of penalties a team can receive in a match.
     - rng_seed (int, optional): Seed for the random number generator to ensure reproducibility. Defaults to None.
+    - teams (list of str, optional): List of team names to assign players
 
     Returns:
     - DataFrame: A pandas DataFrame containing teams, their goals, and penalty costs, along with the original match results.

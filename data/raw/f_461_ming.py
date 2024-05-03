@@ -3,11 +3,11 @@ import time
 
 def f_461(df, letter):
     """
-    Filters rows in a DataFrame where values in the 'Word' column begin with the specified letter,
+    Filters rows in a dictionary where values in the 'Word' column begin with the specified letter,
     then calculates the length of the words in the filtered column and returns a histogram plot of the word lengths.
 
     Parameters:
-    - df (pd.DataFrame): The input DataFrame. Must have a 'Word' column with string values.
+    - df (dict of list): A dictionary where the key 'Word' maps to a list of strings.
     - letter (str): The letter to filter the 'Word' column by. It should be a lowercase letter.
 
     Returns:

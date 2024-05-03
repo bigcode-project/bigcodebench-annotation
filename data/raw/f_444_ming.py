@@ -8,7 +8,7 @@ def f_444(array_length=100):
     Generate two arrays of random integers and draw a line diagram with the 
     maximum values of the respective elements of the two arrays.
 
-    Args:
+    Parameters:
     - array_length (int): Length of the random arrays to be generated. Default is 100.
 
     Returns:

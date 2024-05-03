@@ -41,12 +41,12 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
 import unittest
 import shutil
 
-output_dir = './output'
+OUTPUT_DIR = './output'
 
 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.test_dir = output_dir
+        self.test_dir = OUTPUT_DIR
         if not os.path.exists(self.test_dir):
             os.makedirs(self.test_dir)
 

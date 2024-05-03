@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-output_dir = './output'
+OUTPUT_DIR = './output'
 
 
 def f_491(df, filename):
@@ -26,9 +26,9 @@ def f_491(df, filename):
     >>> 'data.json' in f_491(df, 'data.json')
     True
     """
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    file_path = os.path.join(output_dir, filename)
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+    file_path = os.path.join(OUTPUT_DIR, filename)
     df_clean = df.where(pd.notnull(df), None)
     with open(file_path, 'w') as f:
         df_clean.to_json(f, orient='records')
@@ -44,12 +44,12 @@ class TestCases(unittest.TestCase):
     @classmethod
     def setUp(self):
         """Set up testing environment; ensure data directory exists."""
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        if not os.path.exists(OUTPUT_DIR):
+            os.makedirs(OUTPUT_DIR)
 
     def tearDown(self):
         """Clean up; remove the data directory and its contents after tests."""
-        shutil.rmtree(output_dir, ignore_errors=True)
+        shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
 
     def test_basic_dataframe(self):
         """Test saving a simple DataFrame."""

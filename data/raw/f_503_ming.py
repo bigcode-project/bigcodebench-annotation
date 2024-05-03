@@ -1,7 +1,7 @@
 import binascii
 import hashlib
 import re
-output_dir = './output'
+OUTPUT_DIR = './output'
 
 
 def f_503(directory: str, pattern: str = r"(?<!Distillr)\\AcroTray\.exe") -> dict:
@@ -45,7 +45,7 @@ import os
 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.test_dir = output_dir
+        self.test_dir = OUTPUT_DIR
         if not os.path.exists(self.test_dir):
             os.makedirs(self.test_dir)
 

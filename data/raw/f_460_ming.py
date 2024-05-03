@@ -4,12 +4,12 @@ import time
 
 def f_460(df, letter):
     """
-    The function filters rows in a DataFrame in which the values of the 'Word' column begin with a specified letter. 
+    The function filters rows in a dict of list in which the values of the 'Word' column begin with a specified letter.
     It then calculates the length of the words in the filtered column and returns a dictionary of word lengths 
     and their respective counts.
 
     Parameters:
-    df (DataFrame): The input DataFrame. It should have a 'Word' column.
+    df (dict of list): A dictionary where the key 'Word' maps to a list of strings.
     letter (str): The letter to filter the 'Word' column by. 
 
     Returns:
