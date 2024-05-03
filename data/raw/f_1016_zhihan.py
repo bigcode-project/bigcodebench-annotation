@@ -4,21 +4,24 @@ import subprocess
 
 def f_1016(directory, backup_dir='/path/to/backup'):
     """
-    Backup all log files in a specific directory and delete the original files.
-    The backup is created as a tar.gz file.
+    Backup all '.log' files in a specified directory to a tar.gz file and delete the original files after backup.
+    The backup file is named 'logs_backup.tar.gz' and placed in the specified backup directory.
     
     Parameters:
-    directory (str): The directory that contains the log files.
-    backup_dir (str, optional): The directory where the backup file will be saved.
-                                Default is '/path/to/backup'.
+    - directory (str): The directory that contains the log files to be backed up.
+    - backup_dir (str, optional): The directory where the backup file will be saved.
+                                  Default is '/path/to/backup'.
     
     Returns:
-    str: The path to the backup file if logs are found, otherwise returns a message stating no logs were found.
+    - str: The path to the backup file if logs are found, otherwise returns a message stating no logs were found.
+    
+    Raises:
+    - FileNotFoundError: If the specified directory does not exist.
     
     Requirements:
-    - subprocess
-    - glob
-    - os
+    - subprocess: Used for creating the tar.gz archive.
+    - glob: Used to find all log files in the specified directory.
+    - os: Used to check directory existence, create directories, and remove files.
     
     Example:
     >>> f_1016('/path/to/logs')
