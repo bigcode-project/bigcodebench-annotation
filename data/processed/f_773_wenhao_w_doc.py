@@ -1,7 +1,7 @@
 from collections import defaultdict
 import re
 
-def f_773(word: str) -> dict:
+def f_35(word: str) -> dict:
     """
     Find the occurrences of each two-letter combination in the sanitized word,
     where only alphabetic characters are considered.
@@ -17,11 +17,11 @@ def f_773(word: str) -> dict:
     collections.defaultdict: A dictionary with keys as two-letter combinations and values as their counts in the sanitized word.
 
     Example:
-    >>> f_773('abcdef')
+    >>> f_35('abcdef')
     defaultdict(<class 'int'>, {'ab': 1, 'bc': 1, 'cd': 1, 'de': 1, 'ef': 1})
-    >>> f_773('aabbcc')
+    >>> f_35('aabbcc')
     defaultdict(<class 'int'>, {'aa': 1, 'ab': 1, 'bb': 1, 'bc': 1, 'cc': 1})
-    >>> f_773('a1!b@c#d$')
+    >>> f_35('a1!b@c#d$')
     defaultdict(<class 'int'>, {'ab': 1, 'bc': 1, 'cd': 1})
     """
     # Sanitize the word to include only alphabetic characters
@@ -37,32 +37,32 @@ def f_773(word: str) -> dict:
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = f_773('abcdef')
+        result = f_35('abcdef')
         expected = {'ab': 1, 'bc': 1, 'cd': 1, 'de': 1, 'ef': 1}
         self.assertEqual(result, expected)
     def test_case_2(self):
-        result = f_773('aabbcc')
+        result = f_35('aabbcc')
         expected = {'aa': 1, 'ab': 1, 'bb': 1, 'bc': 1, 'cc': 1}
         self.assertEqual(result, expected)
     def test_case_3(self):
-        result = f_773('a')
+        result = f_35('a')
         expected = {}
         self.assertEqual(result, expected)
     def test_case_4(self):
-        result = f_773('')
+        result = f_35('')
         expected = {}
         self.assertEqual(result, expected)
     def test_case_5(self):
-        result = f_773('AbCd')
+        result = f_35('AbCd')
         expected = {'Ab': 1, 'bC': 1, 'Cd': 1}
         self.assertEqual(result, expected)
     def test_case_6(self):
         # Test with non-alphabetic characters in the word
-        result = f_773('a1!b@c#d$')
+        result = f_35('a1!b@c#d$')
         expected = {'ab': 1, 'bc': 1, 'cd': 1}
         self.assertEqual(result, expected)
     def test_case_7(self):
         # Test with mixed case and non-alphabetic characters
-        result = f_773('AaBb!!Cc123')
+        result = f_35('AaBb!!Cc123')
         expected = {'Aa': 1, 'aB': 1, 'Bb': 1, 'bC': 1, 'Cc': 1}
         self.assertEqual(result, expected)

@@ -27,7 +27,7 @@ def f_225(rows, columns):
     - set: Sets of random size (1 to 5) containing unique integers from 0 to 9.
 
     Returns:
-    pd.DataFrame: A DataFrame with the specified number of rows and columns containing randomly generated data.
+    pd.DataFrame: A DataFrame with the specified number of rows and columns named 'col0', 'col1', etc., containing randomly generated data.
 
     Requirements:
     - pandas

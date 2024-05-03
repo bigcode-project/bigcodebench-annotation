@@ -58,9 +58,6 @@ def f_501():
 
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 class TestCases(unittest.TestCase):

@@ -2,8 +2,6 @@ import zipfile
 import io
 from django.http import FileResponse, HttpRequest
 from django.conf import settings
-if not settings.configured:
-    settings.configure()
 
 def f_1712(request, file_paths):
     """
@@ -53,6 +51,8 @@ def f_1712(request, file_paths):
 import unittest
 from unittest.mock import MagicMock, patch
 from django.http import HttpRequest, FileResponse
+if not settings.configured:
+    settings.configure()
 
 class TestCases(unittest.TestCase):
 

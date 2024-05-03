@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 # Constants
 COLORS = ['r', 'g', 'b']
 
-def f_318(df, group_col, value_col, group_name):
+def f_423(df, group_col, value_col, group_name):
     """
-    Create a bar chart of a specific group from the input dataframe.
+    Create a bar subplot of a specific group from the input dataframe.
 
     Parameters:
     - df (DataFrame): The input DataFrame containing the data.
@@ -32,7 +32,7 @@ def f_318(df, group_col, value_col, group_name):
     Example:
     >>> import pandas as pd
     >>> df = pd.DataFrame({'Group': ['A', 'B', 'C'], 'Value': [10, 20, 30]})
-    >>> ax = f_318(df, 'Group', 'Value', 'B')
+    >>> ax = f_423(df, 'Group', 'Value', 'B')
     >>> num_bars = len(ax.containers[0])  # Number of bars in the plot
     >>> num_bars == 1  # There should be 1 bar in the plot for group 'B'
     True
@@ -84,21 +84,21 @@ class TestCases(unittest.TestCase):
         self.df = pd.DataFrame({'Group': ['A', 'B', 'C'], 'Value': [10, 20, 30]})
         
     def test_single_group_bar_chart(self):
-        ax = f_318(self.df, 'Group', 'Value', 'B')
+        ax = f_423(self.df, 'Group', 'Value', 'B')
         num_bars = len(ax.containers[0])  # Number of bars in the plot
         self.assertEqual(num_bars, 1)  # There should be 1 bar in the plot for group 'B'
         plt.close()
     def test_missing_group(self):
         with self.assertRaises(ValueError):
-            ax = f_318(self.df, 'Group', 'Value', 'D')  # Group 'D' does not exist in the DataFrame
+            ax = f_423(self.df, 'Group', 'Value', 'D')  # Group 'D' does not exist in the DataFrame
         plt.close()
     def test_correct_labels(self):
-        ax = f_318(self.df, 'Group', 'Value', 'B')
+        ax = f_423(self.df, 'Group', 'Value', 'B')
         self.assertEqual(ax.get_xlabel(), 'Group')  # x-axis label should be 'Group'
         self.assertEqual(ax.get_ylabel(), 'Value')  # y-axis label should be 'Value'
         plt.close()
     def test_inline_points(self):
-        ax = f_318(self.df, 'Group', 'Value', 'B')
+        ax = f_423(self.df, 'Group', 'Value', 'B')
         bars = ax.containers[0]
         for bar in bars:
             self.assertAlmostEqual(bar.get_height(), 20, delta=0.01)  # Check if points are inline
@@ -106,7 +106,7 @@ class TestCases(unittest.TestCase):
     
     
     def test_inline_points(self):
-        ax = f_318(self.df, 'Group', 'Value', 'C')
+        ax = f_423(self.df, 'Group', 'Value', 'C')
         bars = ax.containers[0]
         for bar in bars:
             self.assertAlmostEqual(bar.get_height(), 30, delta=0.01)  # Check if points are inline

@@ -2,7 +2,7 @@ import os
 import shutil
 
 
-def f_816(path, delimiter="/"):
+def f_576(path, delimiter="/"):
     """
     Splits a given file path by a specific delimiter and computes disk usage for each directory component.
 
@@ -23,10 +23,10 @@ def f_816(path, delimiter="/"):
     - shutil
 
     Examples:
-    >>> f_816('Docs/src', '/')
+    >>> f_576('Docs/src', '/')
     [('Docs', {'total': 100, 'used': 50, 'free': 50}), ('src', {'total': 200, 'used': 100, 'free': 100})]
 
-    >>> f_816('a/b', '/')
+    >>> f_576('a/b', '/')
     [('a', {'total': 300, 'used': 150, 'free': 150}), ('b', {'total': 400, 'used': 200, 'free': 200})]
     """
     if not path or not isinstance(path, str):
@@ -79,20 +79,20 @@ class TestCases(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdirname:
             non_exist_path = os.path.join(tmpdirname, "nonexist")
             with self.assertRaises(FileNotFoundError):
-                f_816(non_exist_path)
+                f_576(non_exist_path)
     def test_invalid_path(self):
         # Test function should raise error if path is not valid
         with self.assertRaises(ValueError):
-            f_816("")
+            f_576("")
         with self.assertRaises(ValueError):
-            f_816(123)
+            f_576(123)
     @patch("os.path.exists")
     @patch("shutil.disk_usage")
     def test_varied_path(self, mock_disk_usage, mock_exists):
         # Test functionality
         mock_exists.return_value = True
         mock_disk_usage.side_effect = self.disk_usage_side_effect
-        result = f_816("Docs/src")
+        result = f_576("Docs/src")
         expected = [
             (
                 "Docs",
@@ -119,7 +119,7 @@ class TestCases(unittest.TestCase):
         mock_exists.return_value = True
         mock_disk_usage.return_value = self.mock_usage_src
         deep_path = "Docs/src/Projects/Python/Example"
-        result = f_816(deep_path)
+        result = f_576(deep_path)
         expected = [
             ("Docs", self.mock_usage_src._asdict()),
             ("src", self.mock_usage_src._asdict()),
@@ -134,7 +134,7 @@ class TestCases(unittest.TestCase):
         # Test function works on single directory
         mock_exists.return_value = True
         mock_disk_usage.return_value = self.mock_usage_home
-        result = f_816("home")
+        result = f_576("home")
         expected = [("home", self.mock_usage_home._asdict())]
         self.assertEqual(result, expected)
     @patch("os.path.exists")
@@ -147,7 +147,7 @@ class TestCases(unittest.TestCase):
             "/Docs/src": self.mock_usage_src,
         }.get(path, self.mock_usage_root)
         with self.assertRaises(ValueError):
-            result = f_816("Docs//src")
+            result = f_576("Docs//src")
             expected = [
                 ("Docs", self.mock_usage_docs._asdict()),
                 ("", {"total": 0, "used": 0, "free": 0}),
@@ -163,7 +163,7 @@ class TestCases(unittest.TestCase):
             "/Docs": self.mock_usage_docs,
             "/Docs/src": self.mock_usage_src,
         }.get(path, self.mock_usage_root)
-        result = f_816("Docs/src/")
+        result = f_576("Docs/src/")
         expected = [
             ("Docs", self.mock_usage_docs._asdict()),
             ("src", self.mock_usage_src._asdict()),

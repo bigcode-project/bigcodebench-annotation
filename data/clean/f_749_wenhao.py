@@ -5,10 +5,6 @@ def f_749(pattern: str, replacement: str, directory: str) -> bool:
     """
     Renames all files in a directory that match a particular pattern with a given replacement string.
     
-    Functionality:
-        - Searches for files in the specified directory whose names contain the given pattern.
-        - Renames those files by replacing the pattern with the given replacement string.
-    
     Parameters:
         - pattern (str): The pattern to search for in the filenames.
         - replacement (str): The string to replace the pattern with.

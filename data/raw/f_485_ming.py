@@ -1,8 +1,9 @@
 from sklearn.decomposition import PCA
-# Constants
-N_COMPONENTS = 2
 import numpy as np
 import matplotlib.pyplot as plt
+
+# Constants
+N_COMPONENTS = 2
 
 
 def f_485(L):
@@ -37,9 +38,6 @@ def f_485(L):
 
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 def run_tests():

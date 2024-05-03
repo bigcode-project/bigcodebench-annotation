@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 COLUMN_NAMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
 
-def f_206(data):
+def f_497(data):
     """
     Computes the average of each row in a provided 2D array and appends these averages as a new column.
     Additionally, it plots the averages against their respective row indices.
@@ -25,7 +25,7 @@ def f_206(data):
     Example:
     >>> import numpy as np
     >>> data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])
-    >>> df, ax = f_206(data)
+    >>> df, ax = f_497(data)
     >>> print(df.to_string(index=False))
      A  B  C  D  E  F  G  H  Average
      1  2  3  4  4  3  7  1    3.125
@@ -48,7 +48,7 @@ matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])
-        df, ax = f_206(data)
+        df, ax = f_497(data)
         # Testing the DataFrame
         self.assertEqual(df.shape, (2, 9))
         self.assertIn('Average', df.columns)
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(ax.lines), 1)
     def test_case_2(self):
         data = np.array([[1, 1, 1, 1, 1, 1, 1, 1]])
-        df, ax = f_206(data)
+        df, ax = f_497(data)
         # Testing the DataFrame
         self.assertEqual(df.shape, (1, 9))
         self.assertIn('Average', df.columns)
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(ax.lines), 1)
     def test_case_3(self):
         data = np.array([[1, 2, 3, 4, 5, 6, 7, 8], [8, 7, 6, 5, 4, 3, 2, 1]])
-        df, ax = f_206(data)
+        df, ax = f_497(data)
         # Testing the DataFrame
         self.assertEqual(df.shape, (2, 9))
         self.assertIn('Average', df.columns)
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(ax.lines), 1)
     def test_case_4(self):
         data = np.array([[0, 0, 0, 0, 0, 0, 0, 0], [10, 10, 10, 10, 10, 10, 10, 10]])
-        df, ax = f_206(data)
+        df, ax = f_497(data)
         # Testing the DataFrame
         self.assertEqual(df.shape, (2, 9))
         self.assertIn('Average', df.columns)
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(ax.lines), 1)
     def test_case_5(self):
         data = np.array([[5, 5, 5, 5, 5, 5, 5, 5]])
-        df, ax = f_206(data)
+        df, ax = f_497(data)
         # Testing the DataFrame
         self.assertEqual(df.shape, (1, 9))
         self.assertIn('Average', df.columns)

@@ -2,7 +2,7 @@ import pathlib
 import os
 
 
-def f_815(path: str, delimiter: str = os.path.sep) -> list:
+def f_645(path: str, delimiter: str = os.path.sep) -> list:
     """
     Validates that a given file path does not contain invalid characters for file paths
     then splits it into path components using a specified delimiter.
@@ -28,9 +28,9 @@ def f_815(path: str, delimiter: str = os.path.sep) -> list:
     - This function treats '<', '>', ':', '"', '|', '?', '*' as invalid characters in paths.
 
     Examples:
-    >>> f_815('Docs/src/Scripts/temp', '/')
+    >>> f_645('Docs/src/Scripts/temp', '/')
     ['Docs', 'src', 'Scripts', 'temp']
-    >>> f_815(r'Docs\\src\\Scripts\\temp', '\\\\')
+    >>> f_645(r'Docs\\src\\Scripts\\temp', '\\\\')
     ['Docs', 'src', 'Scripts', 'temp']
     """
 
@@ -58,32 +58,32 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Testing a standard UNIX-like path with '/' delimiter
         self.assertEqual(
-            f_815("Docs/src/Scripts/temp", "/"),
+            f_645("Docs/src/Scripts/temp", "/"),
             ["Docs", "src", "Scripts", "temp"],
         )
     def test_case_2(self):
         # Testing a standard Windows-like path with '\' delimiter
         self.assertEqual(
-            f_815("Docs\\src\\Scripts\\temp", "\\"),
+            f_645("Docs\\src\\Scripts\\temp", "\\"),
             ["Docs", "src", "Scripts", "temp"],
         )
     def test_case_3(self):
         # Testing an empty path string
-        self.assertEqual(f_815("", "/"), [])
+        self.assertEqual(f_645("", "/"), [])
     def test_case_4(self):
         # Testing a path with invalid characters
-        self.assertEqual(f_815("Docs/src/Scripts|temp", "/"), [])
+        self.assertEqual(f_645("Docs/src/Scripts|temp", "/"), [])
     def test_case_5(self):
         # Testing a path with a different delimiter
-        self.assertEqual(f_815("Docs|src|Scripts|temp", "|"), [])
+        self.assertEqual(f_645("Docs|src|Scripts|temp", "|"), [])
     def test_case_6(self):
         # Handle leading and trailing delimiters
-        self.assertEqual(f_815("/Docs/src/Scripts/", "/"), ["Docs", "src", "Scripts"])
+        self.assertEqual(f_645("/Docs/src/Scripts/", "/"), ["Docs", "src", "Scripts"])
     def test_case_7(self):
         # Test mixed delimiters given expected conversion
         self.assertEqual(
-            f_815("Docs/src\\Scripts/temp", "\\"), ["Docs", "src", "Scripts", "temp"]
+            f_645("Docs/src\\Scripts/temp", "\\"), ["Docs", "src", "Scripts", "temp"]
         )
         self.assertEqual(
-            f_815("Docs/src\\Scripts/temp", "/"), ["Docs", "src", "Scripts", "temp"]
+            f_645("Docs/src\\Scripts/temp", "/"), ["Docs", "src", "Scripts", "temp"]
         )

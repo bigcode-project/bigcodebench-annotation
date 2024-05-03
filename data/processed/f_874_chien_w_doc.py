@@ -3,7 +3,7 @@ import string
 import pandas as pd
 
 
-def f_874(n_rows=1000):
+def f_78(n_rows=1000):
     """
     Generate a histogram of the frequency of the top 30 unique random 3-letter strings.
     The function creates random strings, each consisting of 3 letters from the lowercase English alphabet.
@@ -26,7 +26,7 @@ def f_874(n_rows=1000):
     - pandas
     
     Example:
-    >>> ax = f_874(1000)
+    >>> ax = f_78(1000)
     >>> ax.get_title()
     'Top 30 Frequencies of Random 3-Letter Strings'
     """
@@ -54,28 +54,28 @@ import random
 from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Tests for the function f_874."""
+    """Tests for the function f_78."""
     def test_return_type(self):
         """Test if the function returns a Matplotlib Axes object."""
         random.seed(0)
-        result = f_874(100)
+        result = f_78(100)
         self.assertIsInstance(result, Axes)
     def test_default_parameter(self):
         """Test the function with the default parameter."""
-        result = f_874()
+        result = f_78()
         self.assertIsInstance(result, Axes)
     def test_zero_rows(self):
         """Test the function with zero rows."""
         with self.assertRaises(ValueError):
-            f_874(0)
+            f_78(0)
     def test_negative_rows(self):
         """Test the function with a negative number of rows."""
         with self.assertRaises(ValueError):
-            f_874(-1)
+            f_78(-1)
     def test_large_number_of_rows(self):
         """Test the function with a large number of rows."""
         random.seed(2)
-        result = f_874(10000)
+        result = f_78(10000)
         self.assertIsInstance(result, Axes)
     def tearDown(self):
         plt.close()

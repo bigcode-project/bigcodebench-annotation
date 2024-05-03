@@ -8,7 +8,7 @@ FILE_EXTENSIONS = ['.txt', '.csv', '.xlsx', '.docx', '.pdf']
 
 def f_260(my_path: str, days_old: int) -> str:
     """
-    Archive files older than a specified number of days in a given directory. This function searches for files with specific extensions (.txt, .csv, .xlsx, .docx, .pdf) in the given directory.
+    Archive files that were changed older than a specified number of days in a given directory. This function searches for files with specific extensions (.txt, .csv, .xlsx, .docx, .pdf) in the given directory.
     Files older than 'days_old' are moved to an 'archive' subdirectory within the specified directory.
 
     Parameters:

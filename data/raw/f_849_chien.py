@@ -130,8 +130,7 @@ class TestCases(unittest.TestCase):
         result = f_849(url)
         self.assertTrue(result.startswith("Error: Unexpected error"))
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Cleanup the test directories
         dirs_to_remove = ["mnt/data", "mnt"]
         for dir_path in dirs_to_remove:

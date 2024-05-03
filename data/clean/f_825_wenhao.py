@@ -66,7 +66,7 @@ from matplotlib import colors
 
 class TestCases(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         np.random.seed(42)
 
     def test_data_correctness(self):

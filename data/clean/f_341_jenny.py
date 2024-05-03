@@ -13,7 +13,7 @@ def f_341(s):
     Returns:
     tuple: A tuple containing:
         - dict: A dictionary with the frequency of each letter.
-        - Axes: The plot of 'Letter Frequencies' with 'Letters' on the x-axis and 'Frequency'
+        - Axes: The bar subplot of 'Letter Frequencies' with 'Letters' on the x-axis and 'Frequency'
                 on the y-axis.
 
     Requirements:

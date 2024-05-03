@@ -2,7 +2,7 @@ import pandas as pd
 import re
 
 # Function to replace acronyms in DataFrame
-def f_760(data, mapping):
+def f_301(data, mapping):
     """
     Replace all acronyms in a DataFrame with their full words according to a provided dictionary.
     
@@ -20,7 +20,7 @@ def f_760(data, mapping):
     Examples:
     >>> data = {'text': ['NASA is great', 'I live in the USA']}
     >>> mapping = {'NASA': 'National Aeronautics and Space Administration', 'USA': 'United States of America'}
-    >>> print(f_760(data, mapping))
+    >>> print(f_301(data, mapping))
                                                     text
     0  National Aeronautics and Space Administration ...
     1             I live in the United States of America
@@ -36,39 +36,39 @@ def f_760(data, mapping):
     return df
 
 import unittest
-# Unit tests for the f_760 function
-class ReplaceAcronymsTests(unittest.TestCase):
+# Unit tests for the f_301 function
+class TestCases(unittest.TestCase):
     def test_acronyms_single_column(self):
         data = {'text': ['NASA rocks', 'Visit the USA']}
         mapping = {'NASA': 'National Aeronautics and Space Administration', 'USA': 'United States of America'}
         expected = pd.DataFrame({'text': ['National Aeronautics and Space Administration rocks', 'Visit the United States of America']})
-        result = f_760(data, mapping)
+        result = f_301(data, mapping)
         pd.testing.assert_frame_equal(result, expected)
     
     def test_acronyms_multiple_columns(self):
         data = {'col1': ['NASA exploration'], 'col2': ['Made in USA']}
         mapping = {'NASA': 'National Aeronautics and Space Administration', 'USA': 'United States of America'}
         expected = pd.DataFrame({'col1': ['National Aeronautics and Space Administration exploration'], 'col2': ['Made in United States of America']})
-        result = f_760(data, mapping)
+        result = f_301(data, mapping)
         pd.testing.assert_frame_equal(result, expected)
     
     def test_no_acronyms(self):
         data = {'text': ['A sunny day', 'A rainy night']}
         mapping = {'NASA': 'National Aeronautics and Space Administration'}
         expected = pd.DataFrame({'text': ['A sunny day', 'A rainy night']})
-        result = f_760(data, mapping)
+        result = f_301(data, mapping)
         pd.testing.assert_frame_equal(result, expected)
     
     def test_non_string_types(self):
         data = {'text': ['NASA mission', 2020, None]}
         mapping = {'NASA': 'National Aeronautics and Space Administration'}
         expected = pd.DataFrame({'text': ['National Aeronautics and Space Administration mission', 2020, None]})
-        result = f_760(data, mapping)
+        result = f_301(data, mapping)
         pd.testing.assert_frame_equal(result, expected)
     
     def test_empty_dataframe(self):
         data = {'text': []}
         mapping = {'NASA': 'National Aeronautics and Space Administration'}
         expected = pd.DataFrame({'text': []})
-        result = f_760(data, mapping)
+        result = f_301(data, mapping)
         pd.testing.assert_frame_equal(result, expected)

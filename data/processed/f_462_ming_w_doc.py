@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 
-def f_462(df, letter):
+
+def f_10(df, letter):
     """
     The function filters rows in a DataFrame in which the values of a particular column start with a particular letter and then calculates the length of the words in the filtered column and returns basic statistics (mean, median, mode) of the word lengths.
 
@@ -14,14 +15,11 @@ def f_462(df, letter):
     
     Requirements:
     - pandas
-    - re
-    - random
-    - nltk
     - numpy
 
     Example:
     >>> df = {'Word': ['apple', 'banana', 'apricot', 'blueberry', 'cherry', 'avocado']}
-    >>> stats = f_462(df, 'a')
+    >>> stats = f_10(df, 'a')
     >>> stats['mean'] > 0
     True
     >>> stats['median'] > 0
@@ -48,27 +46,27 @@ class TestCases(unittest.TestCase):
             word_list.append(word)
         self.df = {'Word': word_list}
     def test_case_1(self):
-        result = f_462(self.df, 'a')
+        result = f_10(self.df, 'a')
         self.assertIn('mean', result)
         self.assertIn('median', result)
         self.assertIn('mode', result)
     def test_case_2(self):
-        result = f_462(self.df, 'z')
+        result = f_10(self.df, 'z')
         self.assertIn('mean', result)
         self.assertIn('median', result)
         self.assertIn('mode', result)
     def test_case_3(self):
-        result = f_462(self.df, 'm')
+        result = f_10(self.df, 'm')
         self.assertIn('mean', result)
         self.assertIn('median', result)
         self.assertIn('mode', result)
     def test_case_4(self):
-        result = f_462(self.df, 'f')
+        result = f_10(self.df, 'f')
         self.assertIn('mean', result)
         self.assertIn('median', result)
         self.assertIn('mode', result)
     def test_case_5(self):
-        result = f_462(self.df, 't')
+        result = f_10(self.df, 't')
         self.assertIn('mean', result)
         self.assertIn('median', result)
         self.assertIn('mode', result)

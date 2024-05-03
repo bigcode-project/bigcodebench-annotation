@@ -4,7 +4,7 @@ import os
 # Constants
 FIELDS = ['ID', 'Name', 'Age']
 
-def f_3960(values, filename):
+def f_299(values, filename):
     """
     Writes a list of OrderedDicts to an Excel file. Each OrderedDict in the list represents a row in the Excel sheet,
     and each key in the OrderedDict corresponds to a column defined in the FIELDS constant comprising column names 
@@ -25,13 +25,13 @@ def f_3960(values, filename):
     Create an Excel file with data from a list of OrderedDicts.
     >>> data = [OrderedDict([('ID', 1), ('Name', 'John Doe'), ('Age', 30)]),
     ...         OrderedDict([('ID', 2), ('Name', 'Jane Doe'), ('Age', 28)])]
-    >>> path = f_3960(data, 'test_data.xls')
+    >>> path = f_299(data, 'test_data.xls')
     >>> os.path.exists(path) and 'test_data.xls' in path
     True
 
     Create an Excel file with no data.
     >>> empty_data = []
-    >>> path = f_3960(empty_data, 'empty_data.xls')
+    >>> path = f_299(empty_data, 'empty_data.xls')
     >>> os.path.exists(path) and 'empty_data.xls' in path
     True
     """
@@ -56,7 +56,7 @@ import unittest
 import os
 import tempfile
 from collections import OrderedDict
-# Assume f_3960 is imported or defined elsewhere
+# Assume f_299 is imported or defined elsewhere
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Create a temporary directory to store test files
@@ -68,25 +68,25 @@ class TestCases(unittest.TestCase):
         values = [OrderedDict([('ID', 1), ('Name', 'John Doe'), ('Age', 30)]),
                   OrderedDict([('ID', 2), ('Name', 'Jane Doe'), ('Age', 28)])]
         filename = os.path.join(self.test_dir.name, 'test_data.xls')
-        result_path = f_3960(values, filename)
+        result_path = f_299(values, filename)
         self.assertTrue(os.path.isfile(result_path))
     def test_empty_data_to_excel(self):
         values = []
         filename = os.path.join(self.test_dir.name, 'empty_data.xls')
-        result_path = f_3960(values, filename)
+        result_path = f_299(values, filename)
         self.assertTrue(os.path.isfile(result_path))
     def test_incomplete_data_to_excel(self):
         values = [OrderedDict([('ID', 1), ('Name', 'John Doe')])]
         filename = os.path.join(self.test_dir.name, 'incomplete_data.xls')
-        result_path = f_3960(values, filename)
+        result_path = f_299(values, filename)
         self.assertTrue(os.path.isfile(result_path))
     def test_mismatched_fields(self):
         values = [OrderedDict([('ID', 1), ('Name', 'John Doe'), ('Gender', 'Male')])]
         filename = os.path.join(self.test_dir.name, 'mismatched_fields.xls')
-        result_path = f_3960(values, filename)
+        result_path = f_299(values, filename)
         self.assertTrue(os.path.isfile(result_path))
     def test_multiple_rows(self):
         values = [OrderedDict([('ID', i), ('Name', f'Name {i}'), ('Age', 20+i)]) for i in range(5)]
         filename = os.path.join(self.test_dir.name, 'multiple_rows.xls')
-        result_path = f_3960(values, filename)
+        result_path = f_299(values, filename)
         self.assertTrue(os.path.isfile(result_path))

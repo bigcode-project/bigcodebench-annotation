@@ -1,8 +1,6 @@
 import csv
 import io
 from django.http import HttpRequest, FileResponse
-from django.conf import settings
-settings.configure()
 
 def f_1711(request, header, csv_data):
     """
@@ -53,6 +51,9 @@ def f_1711(request, header, csv_data):
 import unittest
 from unittest.mock import patch
 from django.http import HttpRequest, FileResponse
+from django.conf import settings
+if not settings.configured:
+    settings.configure()
 
 class TestCases(unittest.TestCase):
 

@@ -33,11 +33,9 @@ def f_444(array_length=100):
     
     return ax
 
+
 import unittest
-import matplotlib
 from matplotlib.axes import Axes
-# Check and set the backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
 
 def run_tests():

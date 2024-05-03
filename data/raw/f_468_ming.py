@@ -5,6 +5,7 @@ from random import sample
 # Constants for column names to use in plots
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
+
 def f_468(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     '''
     Remove rows from a dataframe based on column values and generate random scatter plots.
@@ -20,7 +21,6 @@ def f_468(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
 
     Requirements:
     - pandas
-    - numpy
     - matplotlib.pyplot
     - random
 
@@ -48,15 +48,12 @@ def f_468(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
 import unittest
 from unittest.mock import patch
 import numpy as np
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=COLUMNS)
-        cls.tuples = [(cls.df.iloc[0].values), (cls.df.iloc[1].values)]
+    def setUp(self):
+        self.df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=COLUMNS)
+        self.tuples = [(self.df.iloc[0].values), (self.df.iloc[1].values)]
 
     def test_no_plots_generated(self):
         """Test case with zero plots requested."""

@@ -48,7 +48,7 @@ from unittest.mock import patch
 class TestCases(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Set up test environment: create necessary files with mock content."""
         with open('example.txt', 'w') as f:
             f.write('This is a test file.')
@@ -64,8 +64,7 @@ class TestCases(unittest.TestCase):
         with open('invalid_private.pem', 'w') as f:
             f.write('Invalid key content')
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up by removing the files created for the test."""
         for filename in ['example.txt', 'empty.txt', 'private.pem', 'invalid_private.pem']:
             if os.path.exists(filename):

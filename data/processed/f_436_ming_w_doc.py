@@ -1,13 +1,12 @@
 import collections
 import itertools
-
 import matplotlib.pyplot as plt
 
 # Constants
 ITEMS = ['apple', 'banana', 'cherry', 'date', 'elderberry']
 
 
-def f_436(a, b):
+def f_319(a, b):
     """
     Combine two lists and record the frequency of predefined items in the combined list.
 
@@ -22,10 +21,10 @@ def f_436(a, b):
     Requirements:
     - collections
     - itertools
-    - matplotlib
+    - matplotlib.pyplot
 
     Example:
-    >>> ax = f_436(['apple', 'banana', 'cherry'], ['date', 'elderberry', 'apple', 'banana', 'cherry'])
+    >>> ax = f_319(['apple', 'banana', 'cherry'], ['date', 'elderberry', 'apple', 'banana', 'cherry'])
     >>> isinstance(ax, matplotlib.axes.Axes)
     True
     """
@@ -49,14 +48,11 @@ def f_436(a, b):
 
 import unittest
 import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         a = ['apple', 'banana', 'cherry']
         b = ['date', 'elderberry', 'apple', 'banana', 'cherry']
-        result = f_436(a, b)
+        result = f_319(a, b)
         self.assertIsInstance(result, matplotlib.axes.Axes)
         heights = [rect.get_height() for rect in result.patches]
         expected_heights = [2, 2, 2, 1, 1]
@@ -64,7 +60,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         a = []
         b = ['apple', 'apple', 'apple']
-        result = f_436(a, b)
+        result = f_319(a, b)
         heights = [rect.get_height() for rect in result.patches]
         expected_heights = [3, 0, 0, 0, 0]
         self.assertEqual(heights, expected_heights)
@@ -72,7 +68,7 @@ class TestCases(unittest.TestCase):
         """Test the function with a list where some items have the same count."""
         a = ['banana', 'cherry', 'date']
         b = ['banana', 'cherry', 'date']
-        ax = f_436(a, b)
+        ax = f_319(a, b)
         rects = ax.containers[0]
         heights = [rect.get_height() for rect in rects]
         expected_heights = [0, 2, 2, 2, 0]
@@ -81,7 +77,7 @@ class TestCases(unittest.TestCase):
         """Test the function with a list where one item appears multiple times."""
         a = ['elderberry', 'elderberry']
         b = ['elderberry']
-        ax = f_436(a, b)
+        ax = f_319(a, b)
         rects = ax.containers[0]
         heights = [rect.get_height() for rect in rects]
         expected_heights = [0, 0, 0, 0, 3]  # Elderberry appears 3 times, others appear 0 times
@@ -90,7 +86,7 @@ class TestCases(unittest.TestCase):
         """Test the function with a single non-empty list and an empty list."""
         a = ['apple', 'banana', 'cherry', 'date', 'elderberry']
         b = []
-        ax = f_436(a, b)
+        ax = f_319(a, b)
         rects = ax.containers[0]
         heights = [rect.get_height() for rect in rects]
         expected_heights = [1, 1, 1, 1, 1]  # Each item appears once

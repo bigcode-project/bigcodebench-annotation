@@ -1,12 +1,10 @@
 import seaborn as sns
 from random import sample
-import pandas as pd
-import numpy as np
 
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
-def f_469(df, tuples, n_plots):
+def f_521(df, tuples, n_plots):
     """
     Remove rows from a dataframe based on values of multiple columns, and then create n random pairs of two columns 
     against each other to generate pairplots.
@@ -22,15 +20,14 @@ def f_469(df, tuples, n_plots):
         - list of Axes: A list containing the generated pairplots.
 
     Requirements:
-    - pandas
-    - numpy
     - seaborn
     - random
 
     Example:
+    >>> import numpy as np, pandas as pd
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-    >>> modified_df, plots = f_469(df, tuples, 3)
+    >>> modified_df, plots = f_521(df, tuples, 3)
     """
     if not df.empty:
         df = df[~df.apply(tuple, axis=1).isin(tuples)]
@@ -47,9 +44,7 @@ def f_469(df, tuples, n_plots):
     return df, plots
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import pandas as pd
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Common setup for generating DataFrame for testing
@@ -62,29 +57,29 @@ class TestCases(unittest.TestCase):
         })
     def test_case_1(self):
         tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-        modified_df, plots = f_469(self.df, tuples, 3)
+        modified_df, plots = f_521(self.df, tuples, 3)
         self.assertTrue(all(tuple(row) not in tuples for row in modified_df.to_numpy()))
         # Check the number of plots does not exceed min(n_plots, len(df.columns) // 2)
         expected_plot_count = min(3, len(self.df.columns) // 2)
         self.assertEqual(len(plots), expected_plot_count)
     def test_case_2(self):
         tuples = [(200, 200, 200, 200, 200), (300, 300, 300, 300, 300)]
-        modified_df, plots = f_469(self.df, tuples, 2)
+        modified_df, plots = f_521(self.df, tuples, 2)
         self.assertEqual(len(modified_df), len(self.df))
         self.assertEqual(len(plots), 2)
     def test_case_3(self):
         tuples = []
-        modified_df, plots = f_469(self.df, tuples, 1)
+        modified_df, plots = f_521(self.df, tuples, 1)
         self.assertEqual(len(modified_df), len(self.df))
         self.assertEqual(len(plots), 1)
     def test_case_4(self):
         tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-        modified_df, plots = f_469(self.df, tuples, 0)
+        modified_df, plots = f_521(self.df, tuples, 0)
         self.assertTrue(all(row not in modified_df.values for row in tuples))
         self.assertEqual(len(plots), 0)
     def test_case_5(self):
         tuples = [(10, 20, 30, 40, 50), (200, 200, 200, 200, 200)]
-        modified_df, plots = f_469(self.df, tuples, 4)
+        modified_df, plots = f_521(self.df, tuples, 4)
         # Ensure the specific tuple is not in the DataFrame
         self.assertTrue((10, 20, 30, 40, 50) not in modified_df.values)
         # Check the number of plots does not exceed min(n_plots, len(df.columns) // 2)

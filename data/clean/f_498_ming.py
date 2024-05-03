@@ -27,6 +27,7 @@ def f_498(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
     - numpy
     - matplotlib.pyplot
     - random
+    - typing
 
     Example:
     >>> df, ax = f_498(50)
@@ -51,9 +52,6 @@ def f_498(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
 
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 def run_tests():

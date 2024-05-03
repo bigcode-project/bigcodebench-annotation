@@ -3,7 +3,7 @@ import random
 import matplotlib.pyplot as plt
 
 
-def f_417(num_rolls, num_dice, plot_path=None, random_seed=0):
+def f_99(num_rolls, num_dice, plot_path=None, random_seed=0):
     """Simulate rolling a certain number of a standard six-sided dice several times, then
     identify and display the distribution of the sums of the dice rolls in a bar plot.
 
@@ -25,7 +25,7 @@ def f_417(num_rolls, num_dice, plot_path=None, random_seed=0):
     - matplotlib.pyplot
 
     Example:
-    >>> result, ax = f_417(10000, 2, 'output.png')
+    >>> result, ax = f_99(10000, 2, 'output.png')
     >>> type(result)
     <class 'collections.Counter'>
     >>> type(ax)
@@ -70,38 +70,38 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(self.test_dir)
     def test_case_1(self):
         # Test basic functionality with 100 rolls and 2 dice
-        result, ax = f_417(100, 2, random_seed=42)
+        result, ax = f_99(100, 2, random_seed=42)
         self.assertIsInstance(result, Counter)
         self.assertTrue(isinstance(ax, plt.Axes))
     def test_case_2(self):
         # Test plot saving functionality
         plot_path = os.path.join(self.test_dir, "test_plot.png")
-        result, ax = f_417(1000, 1, plot_path, random_seed=42)
+        result, ax = f_99(1000, 1, plot_path, random_seed=42)
         self.assertIsInstance(result, Counter)
         self.assertTrue(os.path.exists(plot_path))
         self.assertTrue(isinstance(ax, plt.Axes))
     def test_case_3(self):
         # Test with a larger number of dice
-        result, ax = f_417(500, 5, random_seed=42)
+        result, ax = f_99(500, 5, random_seed=42)
         self.assertIsInstance(result, Counter)
         self.assertTrue(isinstance(ax, plt.Axes))
     def test_case_4(self):
         # Test with the minimum possible inputs
-        result, ax = f_417(1, 1, random_seed=42)
+        result, ax = f_99(1, 1, random_seed=42)
         self.assertIsInstance(result, Counter)
         self.assertTrue(isinstance(ax, plt.Axes))
         self.assertEqual(len(result), 1)  # Only one possible sum with 1 roll of 1 die
     def test_case_5(self):
         # Test the effect of different random seeds on the result consistency
-        result1, _ = f_417(100, 2, random_seed=42)
-        result2, _ = f_417(100, 2, random_seed=43)
+        result1, _ = f_99(100, 2, random_seed=42)
+        result2, _ = f_99(100, 2, random_seed=43)
         self.assertNotEqual(
             result1, result2, "Results should differ with different seeds"
         )
     def test_case_6(self):
         # Test plot detail correctness (labels, title)
         plot_path = os.path.join(self.test_dir, "test_plot_detail.png")
-        _, ax = f_417(10, 2, plot_path, random_seed=42)
+        _, ax = f_99(10, 2, plot_path, random_seed=42)
         self.assertTrue(
             "sum of dice roll" in ax.get_xlabel().lower(), "X-axis label is incorrect"
         )
@@ -112,7 +112,7 @@ class TestCases(unittest.TestCase):
         )
     def test_case_7(self):
         # Test data correctness with a manually calculated example
-        result, _ = f_417(2, 1, random_seed=42)
+        result, _ = f_99(2, 1, random_seed=42)
         expected = Counter({6: 1, 1: 1})
         self.assertEqual(
             result, expected, "Data distribution does not match expected outcome"

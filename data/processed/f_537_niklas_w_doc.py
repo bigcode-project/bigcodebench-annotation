@@ -1,7 +1,7 @@
 import pandas as pd
 import random
 
-def f_537(df):
+def f_338(df):
     """
     Generate a DataFrame that contains savegames for a number of games between different teams.
     Each row of the input DataFrame represents a match, and contains two teams and their respective scores.
@@ -25,7 +25,7 @@ def f_537(df):
     ...                    'team2': np.random.choice(['Team A', 'Team B', 'Team C', 'Team D', 'Team E'], 20),
     ...                    'score1': np.random.randint(0, 10, 20),
     ...                    'score2': np.random.randint(0, 10, 20)})
-    >>> df = f_537(df)
+    >>> df = f_338(df)
     >>> assert 'winner' in df.columns
     >>> assert df['winner'].dtype == object
     >>> assert all(winner in ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'] for winner in df['winner'])
@@ -53,7 +53,7 @@ class TestCases(unittest.TestCase):
                            'team2': ['Team B', 'Team C', 'Team D', 'Team E', 'Team A'],
                             'score1': [1, 2, 3, 4, 5],
                             'score2': [2, 3, 4, 5, 6]})
-        df = f_537(df)
+        df = f_338(df)
         self.assertTrue('winner' in df.columns)
         self.assertTrue(df['winner'].equals(pd.Series(['Team B', 'Team C', 'Team D', 'Team E', 'Team A'])))
     def test_case_2(self):
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
                            'team2': ['Team D', 'Team E', 'Team A', 'Team B', 'Team C'],
                            'score1': [99, 99, 99, 99, 99],
                            'score2': [99, 99, 99, 99, 99]})
-        df = f_537(df)
+        df = f_338(df)
         self.assertTrue('winner' in df.columns)
         self.assertTrue(df['winner'].equals(pd.Series(['Team C', 'Team D', 'Team A', 'Team A', 'Team B'])))
     def test_case_3(self):
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
                             'team2': ['Team B', 'Team C', 'Team D', 'Team E', 'Team A'],
                              'score1': [0, 0, 0, 0, 0],
                              'score2': [0, 0, 0, 0, 0]})
-        df = f_537(df)
+        df = f_338(df)
         self.assertTrue('winner' in df.columns)
         self.assertTrue(df['winner'].equals(pd.Series(['Team A', 'Team B', 'Team D', 'Team D', 'Team E'])))
     
@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
                             'team2': ['Team B', 'Team C', 'Team D', 'Team E', 'Team A'],
                              'score1': [10, 9, 8, 7, 6],
                              'score2': [9, 8, 7, 6, 5]})
-        df = f_537(df)
+        df = f_338(df)
         self.assertTrue('winner' in df.columns)
         self.assertTrue(df['winner'].equals(pd.Series(['Team A', 'Team B', 'Team C', 'Team D', 'Team E'])))
     
@@ -87,6 +87,6 @@ class TestCases(unittest.TestCase):
                             'team2': ['Team B', 'Team C', 'Team D', 'Team E', 'Team A'],
                              'score1': [10, 9, 8, 7, 6],
                              'score2': [11, 12, 13, 14, 15]})
-        df = f_537(df)
+        df = f_338(df)
         self.assertTrue('winner' in df.columns)
         self.assertTrue(df['winner'].equals(pd.Series(['Team B', 'Team C', 'Team D', 'Team E', 'Team A'])))

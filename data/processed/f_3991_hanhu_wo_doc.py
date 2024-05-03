@@ -2,7 +2,7 @@ import hashlib
 import io
 import os
 
-def f_3993(file_path1, file_path2):
+def f_73(file_path1, file_path2):
     """
     Compares two files to determine if they are identical by computing and comparing their MD5 hash values.
     This method is effective for checking if two files have exactly the same content.
@@ -23,12 +23,12 @@ def f_3993(file_path1, file_path2):
     - os
 
     Examples:
-    Assuming 'file1.gz' and 'file2.gz' contain the same content,
-    >>> f_3993('file1.gz', 'file2.gz')
+    Assu 'file1.gz' and 'file2.gz' contain the same content,
+    >>> f_73('file1.gz', 'file2.gz')
     True
 
-    Assuming 'file1.gz' and 'file3.txt' contain different content,
-    >>> f_3993('file1.gz', 'file3.txt')
+    Assu 'file1.gz' and 'file3.txt' contain different content,
+    >>> f_73('file1.gz', 'file3.txt')
     False
     """
     if not os.path.exists(file_path1) or not os.path.exists(file_path2):
@@ -59,19 +59,19 @@ class TestCases(unittest.TestCase):
         os.remove('file3.txt')
     def test_identical_files(self):
         """Test that identical files are recognized as such."""
-        self.assertTrue(f_3993('file1.gz', 'file2.gz'))
+        self.assertTrue(f_73('file1.gz', 'file2.gz'))
     def test_different_files(self):
         """Test that files with different contents are recognized as such."""
-        self.assertFalse(f_3993('file1.gz', 'file3.txt'))
+        self.assertFalse(f_73('file1.gz', 'file3.txt'))
     def test_first_file_not_exist(self):
         """Test the behavior when the first file does not exist."""
         with self.assertRaises(FileNotFoundError):
-            f_3993('nonexistent1.gz', 'file2.gz')
+            f_73('nonexistent1.gz', 'file2.gz')
     def test_second_file_not_exist(self):
         """Test the behavior when the second file does not exist."""
         with self.assertRaises(FileNotFoundError):
-            f_3993('file1.gz', 'nonexistent2.txt')
+            f_73('file1.gz', 'nonexistent2.txt')
     def test_both_files_not_exist(self):
         """Test the behavior when both files do not exist."""
         with self.assertRaises(FileNotFoundError):
-            f_3993('nonexistent1.gz', 'nonexistent2.txt')
+            f_73('nonexistent1.gz', 'nonexistent2.txt')

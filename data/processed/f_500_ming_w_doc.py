@@ -1,11 +1,9 @@
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 
 
-def f_500(num_samples=100, num_features=5):
+def f_271(num_samples=100, num_features=5):
     """
     Generate a Pandas DataFrame with random values, representing a dataset with multiple features. 
     Calculate the correlation between the features and visualize this information using a heatmap.
@@ -21,11 +19,10 @@ def f_500(num_samples=100, num_features=5):
     Requirements:
     - pandas
     - numpy
-    - matplotlib.pyplot
     - seaborn
     
     Example:
-    >>> df, ax = f_500(10, 3)
+    >>> df, ax = f_271(10, 3)
     >>> ax.figure.show()
     """
     FEATURES = ['Feature' + str(i) for i in range(1, num_features + 1)]
@@ -40,30 +37,29 @@ def f_500(num_samples=100, num_features=5):
     return df, ax
 
 import unittest
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
-        df, ax = f_500()
+        df, ax = f_271()
         self.assertEqual(df.shape, (100, 5))
         self.assertIsInstance(ax, plt.Axes)
         
     def test_case_2(self):
-        df, ax = f_500(10, 3)
+        df, ax = f_271(10, 3)
         self.assertEqual(df.shape, (10, 3))
         self.assertIsInstance(ax, plt.Axes)
     def test_case_3(self):
-        df, ax = f_500(50, 2)
+        df, ax = f_271(50, 2)
         self.assertEqual(df.shape, (50, 2))
         self.assertIsInstance(ax, plt.Axes)
         
     def test_case_4(self):
-        df, ax = f_500(150, 6)
+        df, ax = f_271(150, 6)
         self.assertEqual(df.shape, (150, 6))
         self.assertIsInstance(ax, plt.Axes)
         
     def test_case_5(self):
-        df, ax = f_500(5, 10)
+        df, ax = f_271(5, 10)
         self.assertEqual(df.shape, (5, 10))
         self.assertIsInstance(ax, plt.Axes)

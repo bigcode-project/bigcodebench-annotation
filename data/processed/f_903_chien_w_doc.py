@@ -27,7 +27,7 @@ ELEMENTS = [
 ]
 
 
-def f_903():
+def f_98():
     """
     Generate a DataFrame where each row contains random planet-element pairs.
     Each pair is formatted as 'Planet:Element'. The number of rows is determined by
@@ -49,7 +49,7 @@ def f_903():
 
     Example:
     >>> random.seed(0)
-    >>> planet_elements_table = f_903()
+    >>> planet_elements_table = f_98()
     >>> planet_elements_table.head(2)
               Hydrogen         Helium  ...          Iron         Nickel
     0   Uranus:Silicon  Earth:Silicon  ...  Earth:Nickel  Uranus:Helium
@@ -77,18 +77,18 @@ import itertools
 import pandas as pd
 import random
 class TestCases(unittest.TestCase):
-    """Tests for `f_903`."""
+    """Tests for `f_98`."""
     def test_basic_structure(self):
         """Test the basic structure of the table."""
         random.seed(0)
-        table = f_903()
+        table = f_98()
         # Verify the structure of the table
         self.assertEqual(len(table), len(PLANETS))
         self.assertEqual(list(table.columns), ELEMENTS)
     def test_pair_existence(self):
         """Test the existence of planet-element pairs."""
         random.seed(1)
-        table = f_903()
+        table = f_98()
         # Verify all planet-element pairs are present
         all_pairs = set(f"{p}:{e}" for p, e in itertools.product(PLANETS, ELEMENTS))
         generated_pairs = set(table.values.flatten())
@@ -98,14 +98,14 @@ class TestCases(unittest.TestCase):
     def test_data_type(self):
         """Test the data type of the table and its elements."""
         random.seed(2)
-        table = f_903()
+        table = f_98()
         # Check the data type of the table and its elements
         self.assertIsInstance(table, pd.DataFrame)
         self.assertTrue(all(isinstance(cell, str) for cell in table.values.flatten()))
     def test_data_format(self):
         """Test the format of the elements in the table."""
         random.seed(3)
-        table = f_903()
+        table = f_98()
         # Check the format of the elements in the table
         self.assertTrue(
             all(
@@ -116,7 +116,7 @@ class TestCases(unittest.TestCase):
     def test_uniqueness(self):
         """Test the uniqueness of the pairs."""
         random.seed(4)
-        table = f_903()
+        table = f_98()
         # Check uniqueness of the pairs
         generated_pairs = table.values.flatten()
         self.assertEqual(len(generated_pairs), len(set(generated_pairs)))

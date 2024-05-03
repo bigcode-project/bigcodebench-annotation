@@ -1,9 +1,8 @@
-import unittest
 import numpy as np
 from scipy.optimize import curve_fit
 
 
-def f_524(x, y, labels):
+def f_20(x, y, labels):
     """
     Fit an exponential curve to given data points and plot the curves with labels.
 
@@ -21,7 +20,6 @@ def f_524(x, y, labels):
 
     Requirements:
     - numpy
-    - matplotlib.pyplot
     - scipy.optimize
 
     Example:
@@ -50,20 +48,17 @@ def f_524(x, y, labels):
 
     return fig
 
-import matplotlib
+import unittest
 import matplotlib.pyplot as plt
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Example data for all tests
-        cls.x = [np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([1, 3, 5])]
-        cls.y = [np.array([2, 3, 5]), np.array([5, 7, 10]), np.array([2.5, 3.5, 5.5])]
-        cls.labels = ["Test 1", "Test 2", "Test 3"]
+        self.x = [np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([1, 3, 5])]
+        self.y = [np.array([2, 3, 5]), np.array([5, 7, 10]), np.array([2.5, 3.5, 5.5])]
+        self.labels = ["Test 1", "Test 2", "Test 3"]
     def test_plot_labels(self):
         """Ensure the plot includes all specified labels."""
-        fig = f_524(self.x, self.y, self.labels)
+        fig = f_20(self.x, self.y, self.labels)
         ax = fig.gca()
         legend_labels = [text.get_text() for text in ax.get_legend().get_texts()]
         self.assertListEqual(legend_labels, self.labels, "Legend labels do not match input labels.")
@@ -75,16 +70,16 @@ class TestCases(unittest.TestCase):
                 self.assertTrue(len(popt) == 3, "Optimal parameters not found for the exponential fit.")
     def test_output_type(self):
         """Check the output type to be a matplotlib figure."""
-        fig = f_524(self.x, self.y, self.labels)
+        fig = f_20(self.x, self.y, self.labels)
         self.assertIsInstance(fig, plt.Figure, "Output is not a matplotlib figure.")
     def test_no_data(self):
         """Test the function with no data provided."""
         with self.assertRaises(ValueError, msg="Empty data lists should raise a ValueError."):
-            f_524([], [], [])
+            f_20([], [], [])
     def test_non_numeric_data(self):
         """Ensure non-numeric data raises a ValueError during fitting."""
         x = [np.array(["a", "b", "c"])]
         y = [np.array(["d", "e", "f"])]
         labels = ["Invalid Data"]
         with self.assertRaises(ValueError, msg="Non-numeric data should raise a ValueError."):
-            f_524(x, y, labels)
+            f_20(x, y, labels)

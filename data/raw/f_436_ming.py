@@ -1,6 +1,5 @@
 import collections
 import itertools
-
 import matplotlib.pyplot as plt
 
 # Constants
@@ -22,7 +21,7 @@ def f_436(a, b):
     Requirements:
     - collections
     - itertools
-    - matplotlib
+    - matplotlib.pyplot
 
     Example:
     >>> ax = f_436(['apple', 'banana', 'cherry'], ['date', 'elderberry', 'apple', 'banana', 'cherry'])
@@ -50,10 +49,6 @@ def f_436(a, b):
 
 import unittest
 import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-
 
 class TestCases(unittest.TestCase):
 

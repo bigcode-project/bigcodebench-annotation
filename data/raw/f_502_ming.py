@@ -1,7 +1,5 @@
 import os
 import re
-import shutil
-
 import pandas as pd
 
 
@@ -23,10 +21,9 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
     Requirements:
     - re
     - pandas
-    - csv
     - os
 
-    Example usage:
+    Example:
     >>> df = f_502(".*\.txt$", "/path/to/search", "matched_files.csv")
     """
     matched_paths = []
@@ -40,30 +37,30 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
 
     return df
 
+
 import unittest
-# Set DATA_DIR to the 'data' subdirectory in the current script's directory
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+import shutil
+
+output_dir = './output'
 
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.test_dir = DATA_DIR
-        if not os.path.exists(cls.test_dir):
-            os.makedirs(cls.test_dir)
+    def setUp(self):
+        self.test_dir = output_dir
+        if not os.path.exists(self.test_dir):
+            os.makedirs(self.test_dir)
 
         # Create test files
-        cls.test_file1 = os.path.join(cls.test_dir, "test1.txt")
-        cls.test_file2 = os.path.join(cls.test_dir, "ignore.exe")
-        with open(cls.test_file1, 'w') as f:
+        self.test_file1 = os.path.join(self.test_dir, "test1.txt")
+        self.test_file2 = os.path.join(self.test_dir, "ignore.exe")
+        with open(self.test_file1, 'w') as f:
             f.write("This is a test file.")
-        with open(cls.test_file2, 'w') as f:
+        with open(self.test_file2, 'w') as f:
             f.write("This file should be ignored.")
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Remove the test directory and all its contents
-        shutil.rmtree(cls.test_dir, ignore_errors=True)
+        shutil.rmtree(self.test_dir, ignore_errors=True)
 
     def test_file_matching(self):
         """Ensure function matches correct files."""

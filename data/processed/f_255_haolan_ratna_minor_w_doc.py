@@ -4,7 +4,7 @@ import random
 # Constants
 COLORS = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
 
-def f_255(ax):
+def f_560(ax):
     """
     Generate a random sine wave function and draw it on a provided matplotlib polar subplot 'ax'. 
     The function randomly selects a color from a predefined list and sets a random position for radial labels.
@@ -24,7 +24,7 @@ def f_255(ax):
     >>> random.seed(0)
     >>> fig = plt.figure()
     >>> ax = fig.add_subplot(111, polar=True)
-    >>> color = f_255(ax)
+    >>> color = f_560(ax)
     >>> color in COLORS
     True
     >>> plt.close()
@@ -47,28 +47,28 @@ class TestCases(unittest.TestCase):
         random.seed(0)
         fig = plt.figure()
         ax = fig.add_subplot(111, polar=True)
-        color = f_255(ax)
+        color = f_560(ax)
         self.assertIn(color, ['b', 'g', 'r', 'c', 'm', 'y', 'k'])
         plt.close()
     def test_random_color(self):
         random.seed(0)
         fig = plt.figure()
         ax = fig.add_subplot(111, polar=True)
-        colors = set(f_255(ax) for _ in range(10))
+        colors = set(f_560(ax) for _ in range(10))
         self.assertTrue(len(colors) > 1)
         plt.close()
     def test_plot_exists(self):
         random.seed(0)
         fig = plt.figure()
         ax = fig.add_subplot(111, polar=True)
-        f_255(ax)
+        f_560(ax)
         self.assertTrue(len(ax.lines) > 0)
         plt.close()
     def test_plot_properties(self):
         random.seed(0)
         fig = plt.figure()
         ax = fig.add_subplot(111, polar=True)
-        color = f_255(ax)
+        color = f_560(ax)
         line = ax.lines[0]
         self.assertEqual(line.get_color(), color)
         plt.close()
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
         random.seed(0)
         fig = plt.figure()
         ax = fig.add_subplot(111, polar=True)
-        f_255(ax)
+        f_560(ax)
         position = ax.get_rlabel_position()
         self.assertTrue(position>1.0)
         plt.close()

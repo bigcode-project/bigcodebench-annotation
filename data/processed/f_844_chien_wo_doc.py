@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def f_844(csv_file_path: str):
+def f_545(csv_file_path: str):
     """
     This function reads data from a CSV file, normalizes a specific column named 'column1', and then plots the normalized data.
 
@@ -23,7 +23,7 @@ def f_844(csv_file_path: str):
     - matplotlib
 
     Example:
-    >>> ax = f_844('data.csv')
+    >>> ax = f_545('data.csv')
     >>> ax.get_title()
     'Plot Title :  Normalized Column 1'
     """
@@ -51,14 +51,14 @@ from unittest.mock import patch
 import pandas as pd
 import numpy as np
 class TestCases(unittest.TestCase):
-    """Test cases for the f_844 function."""
+    """Test cases for the f_545 function."""
     @patch("pandas.read_csv")
     def test_title_format(self, mock_read_csv):
         """Test that the function returns the correct title."""
         # Mocking the DataFrame
         mock_data = pd.DataFrame({"column1": np.random.rand(10)})
         mock_read_csv.return_value = mock_data
-        ax = f_844("dummy_path")
+        ax = f_545("dummy_path")
         expected_title = "          Plot Title :  Normalized Column 1"
         self.assertEqual(ax.get_title(), expected_title)
     @patch("pandas.read_csv")
@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
         """Test that the function returns the correct xlabel."""
         mock_data = pd.DataFrame({"column1": np.random.rand(10)})
         mock_read_csv.return_value = mock_data
-        ax = f_844("dummy_path")
+        ax = f_545("dummy_path")
         expected_xlabel = "               Index :     Normalized Value"
         self.assertEqual(ax.get_xlabel(), expected_xlabel)
     @patch("pandas.read_csv")
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
         """Test that the function returns the correct ylabel."""
         mock_data = pd.DataFrame({"column1": np.random.rand(10)})
         mock_read_csv.return_value = mock_data
-        ax = f_844("dummy_path")
+        ax = f_545("dummy_path")
         expected_ylabel = "           Frequency :     Normalized Value"
         self.assertEqual(ax.get_ylabel(), expected_ylabel)
     @patch("pandas.read_csv")
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
         """Test that the function returns the correct number of data points."""
         mock_data = pd.DataFrame({"column1": np.random.rand(10)})
         mock_read_csv.return_value = mock_data
-        ax = f_844("dummy_path")
+        ax = f_545("dummy_path")
         line = ax.get_lines()[0]
         self.assertEqual(len(line.get_data()[1]), 10)
     @patch("pandas.read_csv")
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
         """Test that the function returns the correct data points."""
         mock_data = pd.DataFrame({"column1": np.random.rand(10)})
         mock_read_csv.return_value = mock_data
-        ax = f_844("dummy_path")
+        ax = f_545("dummy_path")
         line = ax.get_lines()[0]
         data_points = line.get_data()[1]
         self.assertTrue(all(-3 <= point <= 3 for point in data_points))

@@ -3,7 +3,7 @@ import os
 import hashlib
 
 
-def f_883(client_socket, cert_file, key_file, buffer_size=1024):
+def f_567(client_socket, cert_file, key_file, buffer_size=1024):
     """
     This function secures a client socket using SSL/TLS and sends back the SHA256 hash of a file requested by the client. 
 
@@ -36,8 +36,8 @@ def f_883(client_socket, cert_file, key_file, buffer_size=1024):
         >>> key_file = "path/to/private.key"
         >>> # Accept client connection
         >>> client_socket, addr = server_socket.accept()
-        >>> # Use f_883 function to handle the client request
-        >>> file_hash = f_883(client_socket, cert_file, key_file)
+        >>> # Use f_567 function to handle the client request
+        >>> file_hash = f_567(client_socket, cert_file, key_file)
         >>> print("Sent file hash:", file_hash)
         >>> server_socket.close()
     """
@@ -72,7 +72,7 @@ import ssl
 import os
 import hashlib
 class TestCases(unittest.TestCase):
-    """Unit tests for f_883."""
+    """Unit tests for f_567."""
     @patch("ssl.SSLContext")
     @patch("socket.socket")
     def test_file_found(self, mock_socket, mock_ssl_context):
@@ -95,7 +95,7 @@ class TestCases(unittest.TestCase):
                 "builtins.open", unittest.mock.mock_open(read_data=b"file content")
             ) as mock_file:
                 # Call the function
-                result = f_883(mock_socket, cert_file, key_file)
+                result = f_567(mock_socket, cert_file, key_file)
                 # Check if file was opened
                 mock_file.assert_called_with(mock_request, "rb")
                 # Create expected hash
@@ -126,7 +126,7 @@ class TestCases(unittest.TestCase):
         with patch("os.path.exists") as mock_exists:
             mock_exists.return_value = False
             # Call the function
-            result = f_883(mock_socket, cert_file, key_file)
+            result = f_567(mock_socket, cert_file, key_file)
             # Assertions
             self.assertEqual(result, "File not found")
             mock_context.wrap_socket.assert_called_with(mock_socket, server_side=True)
@@ -149,14 +149,14 @@ class TestCases(unittest.TestCase):
         # Configuring the secure_socket to raise an exception when recv is called
         mock_secure_socket.recv.side_effect = Exception("Test exception")
         # Call the function and verify that it handles the exception
-        result = f_883(mock_socket, cert_file, key_file)
+        result = f_567(mock_socket, cert_file, key_file)
         # Assertions
         self.assertTrue("Error: Test exception" in result)
         mock_context.wrap_socket.assert_called_with(mock_socket, server_side=True)
         mock_secure_socket.close.assert_called()
     @patch("ssl.SSLContext")
     @patch("socket.socket")
-    def test_f_883_empty_file(self, mock_socket, mock_ssl_context):
+    def test_f_567_empty_file(self, mock_socket, mock_ssl_context):
         """Test that the function returns the correct SHA256 hash for an empty file."""
         # Setup for empty file scenario
         cert_file = "path/to/certificate.crt"
@@ -174,7 +174,7 @@ class TestCases(unittest.TestCase):
         ) as mock_file:  # Note the b'' for empty bytes
             mock_exists.return_value = True
             # Call the function
-            result = f_883(mock_socket, cert_file, key_file)
+            result = f_567(mock_socket, cert_file, key_file)
             # Expected hash for an empty file
             expected_hash = hashlib.sha256(b"").hexdigest()  # Hash of empty bytes
             # Assertions
@@ -182,7 +182,7 @@ class TestCases(unittest.TestCase):
             mock_file.assert_called_with(mock_request, "rb")
     @patch("ssl.SSLContext")
     @patch("socket.socket")
-    def test_f_883_large_file(self, mock_socket, mock_ssl_context):
+    def test_f_567_large_file(self, mock_socket, mock_ssl_context):
         """Test that the function returns the correct SHA256 hash for a large file."""
         # Setup for large file scenario
         cert_file = "path/to/certificate.crt"
@@ -201,7 +201,7 @@ class TestCases(unittest.TestCase):
         ) as mock_file:
             mock_exists.return_value = True
             # Call the function
-            result = f_883(mock_socket, cert_file, key_file)
+            result = f_567(mock_socket, cert_file, key_file)
             # Expected hash for the large file
             expected_hash = hashlib.sha256(large_file_content).hexdigest()
             # Assertions

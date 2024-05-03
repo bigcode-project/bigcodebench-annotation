@@ -31,7 +31,7 @@ def f_771(word: str) -> np.ndarray:
     return difference, entropy
 
 import unittest
-class TestF_771(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_case_1(self):
         result = f_771('abcdef')
         expected_diff = np.array([1, 1, 1, 1, 1])
@@ -76,7 +76,7 @@ class TestF_771(unittest.TestCase):
 
 def run_tests():
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestF_771)
+    suite = loader.loadTestsFromTestCase(TestCases)
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

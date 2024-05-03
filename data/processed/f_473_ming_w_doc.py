@@ -8,7 +8,7 @@ TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 PENALTIES_COST = [100, 200, 300, 400, 500]
 
 
-def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
+def f_243(goals: dict, penalties: dict) -> pd.DataFrame:
     """
     Create a match report for teams with goals scored and penalties conceded.
 
@@ -27,7 +27,7 @@ def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
     Example:
     >>> goals = {'Team A': 3, 'Team B': 2}
     >>> penalties = {'Team A': 1, 'Team B': 0}
-    >>> report = f_473(goals, penalties)
+    >>> report = f_243(goals, penalties)
     """
     report_data = []
     for team in TEAMS:
@@ -48,9 +48,6 @@ def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
 
 import unittest
 from unittest.mock import patch
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     @patch(__name__ + '.choice', return_value=400)
     def test_goals_greater_than_penalties(self, mock_choice):
@@ -61,10 +58,10 @@ class TestCases(unittest.TestCase):
             'Goals': [4, 2, 0, 0, 0],
             'Penalties': [1, 1, 0, 0, 0],
             'Penalties Cost': [400, 400, 0, 0, 0],  # Mocked value is reflected here
-            'Performance Score': [3, 1, 0, 0, 0]  # Assuming Performance Score is Goals - Penalties
+            'Performance Score': [3, 1, 0, 0, 0]  # Assu Performance Score is Goals - Penalties
         }
         expected_df = pd.DataFrame(expected_data)
-        result_df = f_473(goals, penalties)
+        result_df = f_243(goals, penalties)
         pd.testing.assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
     @patch(__name__ + '.choice', return_value=200)
     def test_some_teams_missing(self, mock_choice):
@@ -78,7 +75,7 @@ class TestCases(unittest.TestCase):
             'Performance Score': [2, 0, 0, 0, 2]
         }
         expected_df = pd.DataFrame(expected_data)
-        result_df = f_473(goals, penalties)
+        result_df = f_243(goals, penalties)
         pd.testing.assert_frame_equal(result_df, expected_df)
     @patch(__name__ + '.choice', return_value=500)
     def test_penalties_greater_than_goals(self, mock_choice):
@@ -92,7 +89,7 @@ class TestCases(unittest.TestCase):
             'Performance Score': [0, 0, 0, 0, 0]
         }
         expected_df = pd.DataFrame(expected_data)
-        result_df = f_473(goals, penalties)
+        result_df = f_243(goals, penalties)
         pd.testing.assert_frame_equal(result_df, expected_df)
     @patch(__name__ + '.choice', return_value=300)
     def test_all_teams_penalty(self, mock_choice):
@@ -107,7 +104,7 @@ class TestCases(unittest.TestCase):
             'Performance Score': [0] * len(TEAMS)  # A list of zeros for performance score
         }
         expected_df = pd.DataFrame(expected_data)
-        result_df = f_473(goals, penalties)
+        result_df = f_243(goals, penalties)
         pd.testing.assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
     @patch(__name__ + '.choice', return_value=100)
     def test_empty_goals_and_penalties(self, mock_choice):
@@ -121,7 +118,7 @@ class TestCases(unittest.TestCase):
             'Performance Score': [0, 0, 0, 0, 0]
         }
         expected_df = pd.DataFrame(expected_data)
-        result_df = f_473(goals, penalties)
+        result_df = f_243(goals, penalties)
         pd.testing.assert_frame_equal(result_df, expected_df)
     @patch(__name__ + '.choice', return_value=300)
     def test_no_penalties(self, mock_choice):
@@ -135,5 +132,5 @@ class TestCases(unittest.TestCase):
             'Performance Score': [3, 2] + [0, 0, 0]
         }
         expected_df = pd.DataFrame(expected_data)
-        result_df = f_473(goals, penalties)
+        result_df = f_243(goals, penalties)
         pd.testing.assert_frame_equal(result_df, expected_df)

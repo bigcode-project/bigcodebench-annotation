@@ -1,14 +1,11 @@
 from random import sample
-
-import matplotlib
-import numpy as np
-import pandas as pd
 import seaborn as sns
+import pandas as pd
 
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
-def f_471(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
+def f_171(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     '''
     Remove rows from a dataframe based on values of multiple columns, 
     and then create n random joint plots of two columns against each other if the DataFrame is not empty.
@@ -25,14 +22,14 @@ def f_471(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     
     Requirements:
     - pandas
-    - numpy
     - seaborn
     - random
     
     Example:
+    >>> import numpy as np
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-    >>> modified_df, plots = f_471(df, tuples, 3)
+    >>> modified_df, plots = f_171(df, tuples, 3)
     '''
     
     # Drop rows based on tuples
@@ -49,13 +46,12 @@ def f_471(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     return df, plots
 
 import unittest
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=list('ABCDE'))
         tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-        modified_df, plots = f_471(df, tuples, 3)
+        modified_df, plots = f_171(df, tuples, 3)
         # Convert tuples to DataFrame for compatibility
         tuples_df = pd.DataFrame([t for t in tuples], columns=list('ABCDE'))
         # Check each tuple to ensure it's not in modified_df
@@ -66,7 +62,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
         tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-        modified_df, plots = f_471(df, tuples, 2)
+        modified_df, plots = f_171(df, tuples, 2)
         
         for plot in plots:
             self.assertTrue(plot.x.name in df.columns)
@@ -75,7 +71,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         df = pd.DataFrame(columns=list('ABCDE'))
         tuples = [(10, 20, 30, 40, 50)]
-        modified_df, plots = f_471(df, tuples, 2)
+        modified_df, plots = f_171(df, tuples, 2)
         
         self.assertTrue(modified_df.empty)
         self.assertEqual(len(plots), 0)
@@ -83,7 +79,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         df = pd.DataFrame([(10, 20, 30, 40, 50), (10, 20, 30, 40, 50)], columns=list('ABCDE'))
         tuples = [(10, 20, 30, 40, 50)]
-        modified_df, plots = f_471(df, tuples, 2)
+        modified_df, plots = f_171(df, tuples, 2)
         
         self.assertTrue(modified_df.empty)
         self.assertEqual(len(plots), 0)
@@ -91,7 +87,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
         tuples = []
-        modified_df, plots = f_471(df, tuples, 2)
+        modified_df, plots = f_171(df, tuples, 2)
         
         pd.testing.assert_frame_equal(modified_df, df)
         self.assertEqual(len(plots), 2)

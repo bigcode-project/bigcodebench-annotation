@@ -1,10 +1,11 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def f_275(df):
+def f_1(df):
     """
     Draw a bar chart of the counts of each unique value in the 'value' column of a pandas DataFrame and return the Axes object.
-
+    Empty DataFrame will return an empty bar chart.
+    
     Parameters:
     df (DataFrame): The pandas DataFrame with columns ['id', 'value'].
 
@@ -24,7 +25,7 @@ def f_275(df):
 
     Example:
     >>> df = pd.DataFrame({'id': [1, 1, 2, 2, 3, 3],'value': ['A', 'B', 'A', 'B', 'A', 'B']})
-    >>> ax = f_275(df)
+    >>> ax = f_1(df)
     >>> len(ax.patches)
     2
     >>> plt.close()
@@ -49,14 +50,14 @@ class TestCases(unittest.TestCase):
             'id': [1, 1, 2, 2, 3, 3],
             'value': ['A', 'B', 'A', 'B', 'A', 'B']
         })
-        ax = f_275(df)
+        ax = f_1(df)
         self.assertIsInstance(ax, plt.Axes, "Should return an Axes object")
         self.assertEqual(len(ax.patches), 2, "Should have 2 bars for values 'A' and 'B'")
         self.assertEqual(ax.get_title(), "Value Distribution", "Incorrect title")
         plt.close()
     def test_empty_dataframe(self):
         df = pd.DataFrame(columns=['id', 'value'])
-        ax = f_275(df)
+        ax = f_1(df)
         self.assertIsInstance(ax, plt.Axes, "Should handle empty DataFrame")
         self.assertEqual(len(ax.patches), 0, "Should have no bars for an empty DataFrame")
         plt.close()
@@ -65,7 +66,7 @@ class TestCases(unittest.TestCase):
             'id': [1, 2, 3],
             'value': [100, 200, 300]
         })
-        ax = f_275(df)
+        ax = f_1(df)
         self.assertIsInstance(ax, plt.Axes, "Should handle numeric values in 'value' column")
         plt.close()
     
@@ -74,7 +75,7 @@ class TestCases(unittest.TestCase):
             'id': [1, 2, 3],
             'value': [100, 200, 300]
         })
-        ax = f_275(df)
+        ax = f_1(df)
         self.assertEqual(ax.get_title(), 'Value Distribution')
         self.assertEqual(ax.get_xlabel(), 'Value')
         self.assertEqual(ax.get_ylabel(), 'Count')
@@ -85,7 +86,7 @@ class TestCases(unittest.TestCase):
             'id': [1, 1, 2, 2],
             'value': ['A', 'B', 'A', 'B']
         })
-        ax = f_275(df)
+        ax = f_1(df)
         # Get the actual value counts from the DataFrame
         actual_value_counts = df['value'].value_counts()
         # Get the patches from the bar plot

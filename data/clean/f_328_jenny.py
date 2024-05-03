@@ -43,23 +43,21 @@ import os
 
 
 class TestCases(unittest.TestCase):
-    fake = Faker()
-    specific_names = [
-        "John Doe",
-        "Jane Smith",
-        "Alice Brown",
-        "Bob White",
-        "Charlie Green",
-    ]
-    specific_ages = [25, 30, 35, 40, 45]
-
-    @classmethod
-    def setUpClass(cls):
+    
+    def setUp(self):
         """Set up test data before running tests."""
-        cls.db_file = cls.generate_test_data_with_file()
+        self.fake = Faker()
+        self.specific_names = [
+            "John Doe",
+            "Jane Smith",
+            "Alice Brown",
+            "Bob White",
+            "Charlie Green",
+        ]
+        self.specific_ages = [25, 30, 35, 40, 45]
+        self.db_file = self.generate_test_data_with_file()
 
-    @staticmethod
-    def generate_test_data_with_file() -> str:
+    def generate_test_data_with_file(self) -> str:
         """Generate test data and save it to a temporary SQLite database file."""
         db_file = "./temp_test_db.sqlite3"
         if os.path.exists(db_file):
@@ -74,10 +72,10 @@ class TestCases(unittest.TestCase):
         """
         conn.execute(create_table_query)
         for _ in range(100):
-            name = TestCases.fake.name()
-            age = TestCases.fake.random_int(min=20, max=70)
+            name = self.fake.name()
+            age = self.fake.random_int(min=20, max=70)
             conn.execute("INSERT INTO users (name, age) VALUES (?, ?)", (name, age))
-        for name, age in zip(TestCases.specific_names, TestCases.specific_ages):
+        for name, age in zip(self.specific_names, self.specific_ages):
             conn.execute("INSERT INTO users (name, age) VALUES (?, ?)", (name, age))
         conn.commit()
         conn.close()
@@ -126,10 +124,9 @@ class TestCases(unittest.TestCase):
             all(df["age"].iloc[i] >= df["age"].iloc[i + 1] for i in range(len(df) - 1))
         )
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up test data after running tests."""
-        os.remove(cls.db_file)
+        os.remove(self.db_file)
 
 
 def run_tests():

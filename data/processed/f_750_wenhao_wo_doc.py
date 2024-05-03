@@ -3,7 +3,7 @@ import pandas as pd
 import re
 import matplotlib.pyplot as plt
 
-def f_750(directory: str, pattern: str) -> list:
+def f_523(directory: str, pattern: str) -> list:
     """
     Searches a directory for CSV files matching a given regular expression pattern,
     reads sales data from these files, and plots the sales data with month on the x-axis and sales on the y-axis.
@@ -25,7 +25,7 @@ def f_750(directory: str, pattern: str) -> list:
     - matplotlib.pyplot
     
     Examples:
-    >>> axes = f_750('/path/to/data/', r'^sales_data_\d{4}.csv')
+    >>> axes = f_523('/path/to/data/', r'^sales_data_\d{4}.csv')
     >>> len(axes)
     2
     >>> axes[0].get_title()
@@ -45,12 +45,11 @@ import unittest
 import shutil
 import numpy as np
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Prepare test data
-        cls.directory = "f_750_data_wenhao/"
-        cls.pattern = r"^sales_data_\d{4}.csv"
-        os.makedirs(cls.directory, exist_ok=True)
+        self.directory = "f_523_data_/"
+        self.pattern = r"^sales_data_\d{4}.csv"
+        os.makedirs(self.directory, exist_ok=True)
         data_2021 = pd.DataFrame({
             'Month': ['January', 'February', 'March'],
             'Sales': [100, 150, 200]
@@ -59,28 +58,27 @@ class TestCases(unittest.TestCase):
             'Month': ['January', 'February', 'March'],
             'Sales': [120, 130, 210]
         })
-        data_2021.to_csv(cls.directory + "sales_data_2021.csv", index=False)
-        data_2022.to_csv(cls.directory + "sales_data_2022.csv", index=False)
-    @classmethod
-    def tearDownClass(cls):
+        data_2021.to_csv(self.directory + "sales_data_2021.csv", index=False)
+        data_2022.to_csv(self.directory + "sales_data_2022.csv", index=False)
+    def tearDown(self):
         # Clean up test data
-        shutil.rmtree(cls.directory)
+        shutil.rmtree(self.directory)
     def test_plots_generated(self):
-        plots = f_750(self.directory, self.pattern)
+        plots = f_523(self.directory, self.pattern)
         self.assertEqual(len(plots), 2, "Should generate two plots for two CSV files")
     def test_plot_titles(self):
-        plots = f_750(self.directory, self.pattern)
+        plots = f_523(self.directory, self.pattern)
         expected_titles = ['sales_data_2022.csv', 'sales_data_2021.csv']
         plot_titles = [plot.get_title() for plot in plots]
         self.assertEqual(set(plot_titles), set(expected_titles), "Plot titles should match the CSV filenames")
     def test_no_files_matched(self):
-        plots = f_750(self.directory, r"^no_match_\d{4}.csv")
+        plots = f_523(self.directory, r"^no_match_\d{4}.csv")
         self.assertEqual(len(plots), 0, "Should return an empty list if no files match the pattern")
     def test_invalid_directory(self):
         with self.assertRaises(FileNotFoundError):
-            f_750("/invalid/directory/", self.pattern)
+            f_523("/invalid/directory/", self.pattern)
     def test_plot_data_integrity(self):
-        plots = f_750(self.directory, self.pattern)
+        plots = f_523(self.directory, self.pattern)
         # Read the CSV files again to get expected data
         expected_data = []
         for file in os.listdir(self.directory):

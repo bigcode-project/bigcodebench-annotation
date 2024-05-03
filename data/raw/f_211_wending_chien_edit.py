@@ -5,7 +5,7 @@ import numpy as np
 
 def f_211(text, rwidth=0.8):
     """
-    Analyzes and visualizes the distribution of word lengths in a text. The function generates a histogram,
+    Analyzes and visualizes the distribution of word lengths in a text. The function generates a histogram subplot,
     which facilitates the understanding of how word lengths vary within the provided text.
 
     Parameters:

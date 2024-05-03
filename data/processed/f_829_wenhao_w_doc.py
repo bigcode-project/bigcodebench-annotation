@@ -5,7 +5,7 @@ import seaborn as sns
 import pandas as pd
 
 
-def f_829(json_data: str, key_path: list):
+def f_561(json_data: str, key_path: list):
     """
     Extracts and visualizes numerical data from a JSON structure based on a specified path of keys.
 
@@ -30,7 +30,7 @@ def f_829(json_data: str, key_path: list):
     Examples:
     >>> json_data = '{"level1":{"level2":{"data":"1,2,3,4"}}}'
     >>> key_path = ['level1', 'level2', 'data']
-    >>> fig = f_829(json_data, key_path)
+    >>> fig = f_561(json_data, key_path)
     >>> isinstance(fig, plt.Figure)
     True
     """
@@ -63,26 +63,26 @@ class TestCases(unittest.TestCase):
         """Tests correct extraction and visualization from valid JSON data."""
         json_data = '{"level1":{"level2":{"data":"1,2,3,4"}}}'
         key_path = ["level1", "level2", "data"]
-        fig = f_829(json_data, key_path)
+        fig = f_561(json_data, key_path)
         self.assertIsInstance(fig, plt.Figure)
     def test_missing_key_error(self):
         """Tests response to missing key in JSON data."""
         json_data = '{"level1":{}}'
         key_path = ["level1", "level2", "data"]
         with self.assertRaises(KeyError):
-            f_829(json_data, key_path)
+            f_561(json_data, key_path)
     def test_corrupted_json(self):
         """Tests response to malformed data."""
         key_path = ["level1", "level2", "data"]
         for x in ["{'level1':{}}", '{"level1":{"level' "invalid", ""]:
             with self.assertRaises(ValueError):
-                f_829(x, key_path)
+                f_561(x, key_path)
     def test_empty_data_value_error(self):
         """Tests response to empty numeric data."""
         json_data = '{"level1":{"level2":{"data":""}}}'
         key_path = ["level1", "level2", "data"]
         with self.assertRaises(ValueError):
-            f_829(json_data, key_path)
+            f_561(json_data, key_path)
     def test_non_numeric_data_value_error(self):
         """Tests response to non-numeric data."""
         json_data = '{"level1":{"level2":{"data":"a,b,c"}}}'
@@ -90,4 +90,4 @@ class TestCases(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             with self.assertRaises(ValueError):
-                f_829(json_data, key_path)
+                f_561(json_data, key_path)

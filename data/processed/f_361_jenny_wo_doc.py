@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 
 
-def f_361(script_dir, scripts, delay):
+def f_651(script_dir, scripts, delay):
     """
     Execute a list of bash scripts with a specified delay between each script.
 
@@ -17,6 +17,9 @@ def f_361(script_dir, scripts, delay):
     Returns:
     list: A list of timestamps indicating the start time of each script execution.
 
+    Raises:
+    - ValueError: If the delay is negative or no scripts are provided.
+    
     Requirements:
     - subprocess
     - os
@@ -24,7 +27,7 @@ def f_361(script_dir, scripts, delay):
     - datetime.datetime
 
     Example:
-    >>> f_361('/path/to/scripts/', ['script1.sh', 'script2.sh'], 5)
+    >>> f_651('/path/to/scripts/', ['script1.sh', 'script2.sh'], 5)
     ['2023-09-09 10:10:10', '2023-09-09 10:10:15']
     """
     if delay < 0:
@@ -69,7 +72,7 @@ class TestCases(unittest.TestCase):
         script_name = self.create_temp_script("echo 'Test'")
         scripts = [script_name]
         delay = 1
-        start_times = f_361(self.script_dir, scripts, delay)
+        start_times = f_651(self.script_dir, scripts, delay)
         self.assertEqual(len(start_times), 1)
         self.assertTrue(
             isinstance(datetime.strptime(start_times[0], "%Y-%m-%d %H:%M:%S"), datetime)
@@ -81,7 +84,7 @@ class TestCases(unittest.TestCase):
             self.create_temp_script("echo 'Test 2'"),
         ]
         delay = 2
-        start_times = f_361(self.script_dir, script_names, delay)
+        start_times = f_651(self.script_dir, script_names, delay)
         self.assertEqual(len(start_times), 2)
         time_diff = datetime.strptime(
             start_times[1], "%Y-%m-%d %H:%M:%S"
@@ -90,11 +93,11 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Testing with an invalid script path
         with self.assertRaises(FileNotFoundError):
-            f_361(self.script_dir, ["this-doesn't-exist"], 1)
+            f_651(self.script_dir, ["this-doesn't-exist"], 1)
     def test_case_4(self):
         # Testing with no scripts (empty list)
         with self.assertRaises(Exception):
-            f_361(self.script_dir, [], 1)
+            f_651(self.script_dir, [], 1)
     def test_case_5(self):
         # Testing with zero delay
         script_names = [
@@ -102,7 +105,7 @@ class TestCases(unittest.TestCase):
             self.create_temp_script("echo 'Test 2'"),
         ]
         delay = 0
-        start_times = f_361(self.script_dir, script_names, delay)
+        start_times = f_651(self.script_dir, script_names, delay)
         self.assertEqual(len(start_times), 2)
     def test_case_6(self):
         # Test handling invalid delay
@@ -111,4 +114,4 @@ class TestCases(unittest.TestCase):
             self.create_temp_script("echo 'Test 2'"),
         ]
         with self.assertRaises(Exception):
-            f_361(self.script_dir, script_names, -1)
+            f_651(self.script_dir, script_names, -1)

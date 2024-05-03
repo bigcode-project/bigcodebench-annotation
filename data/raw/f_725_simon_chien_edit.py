@@ -4,15 +4,8 @@ from statsmodels.tsa.stattools import adfuller
 
 def f_725(df: pd.DataFrame, column_a: str, column_b: str, column_c: str) -> bool:
     """
-    Determines if a specific subset of data is stationary.
-    
-    Functionality:
-        1. Filters rows where column_b > 50 and column_c == 900.
-        2. Checks if the resulting subset of data in column_a is stationary using the Augmented Dickey-Fuller test.
-        3. Returns True if the data is stationary, False otherwise.
-
-    Data is considered to be stationary if the p_value returned by the 
-    Augmented Dickey-Fuller test is smaller than 0.05.
+    Determines if a specific subset of data is stationary by filtering rows where column_b bigger than 50 and column_c equal to 900. 
+    Data is considered to be stationary if the p_value returned by the Augmented Dickey-Fuller test is smaller than 0.05.
 
     If column_a is empty after filtering or if its values are constant, True
     is returned.

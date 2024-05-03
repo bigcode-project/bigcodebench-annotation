@@ -7,7 +7,7 @@ SIZE = 1000
 CLUSTERS = 5
 
 
-def f_453():
+def f_557():
     """
     Generates a set of 2D random points within a specified range and size,
     applies KMeans clustering to these points, and plots the results with
@@ -18,15 +18,15 @@ def f_453():
     highlighted.
 
     Requirements:
-        - numpy for array operations.
-        - sklearn.cluster for applying KMeans clustering.
-        - matplotlib.pyplot for plotting the clustered points and centroids.
+        - numpy
+        - sklearn.cluster
+        - matplotlib.pyplot
 
     Returns:
         A tuple containing the numpy array of data points and the fitted KMeans model.
 
     Example:
-    >>> data, kmeans = f_453()
+    >>> data, kmeans = f_557()
     >>> isinstance(data, np.ndarray)  # Check if data is a numpy array
     True
     >>> data.shape == (1000, 2)  # Verify the shape of the data array
@@ -55,29 +55,25 @@ def f_453():
     return data, kmeans
 
 import unittest
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     def test_data_size(self):
         """Ensure the generated data has the correct size."""
-        data, _ = f_453()
+        data, _ = f_557()
         self.assertEqual(data.shape, (SIZE, 2))
     def test_cluster_centers_shape(self):
         """Check the shape of the cluster centers array."""
-        _, kmeans = f_453()
+        _, kmeans = f_557()
         self.assertEqual(kmeans.cluster_centers_.shape, (CLUSTERS, 2))
     def test_fitted_model(self):
         """Verify the model is a KMeans instance and is fitted."""
-        _, kmeans = f_453()
+        _, kmeans = f_557()
         self.assertIsInstance(kmeans, KMeans)
         self.assertTrue(hasattr(kmeans, 'labels_'))
     def test_data_range(self):
         """Ensure that generated data points fall within the specified range."""
-        data, _ = f_453()
+        data, _ = f_557()
         self.assertTrue((data >= 0).all() and (data <= RANGE).all())
     def test_cluster_labels(self):
         """Verify that cluster labels are assigned to each data point."""
-        _, kmeans = f_453()
+        _, kmeans = f_557()
         self.assertEqual(len(kmeans.labels_), SIZE)

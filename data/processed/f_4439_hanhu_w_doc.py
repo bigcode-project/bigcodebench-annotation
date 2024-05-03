@@ -1,7 +1,7 @@
 import inspect
 import types
 
-def f_4441(f):
+def f_566(f):
     """
     Inspects a given function 'f' and returns its specifications, including the function's name,
     whether it is a lambda function, its arguments, defaults, and annotations. This method
@@ -20,11 +20,11 @@ def f_4441(f):
 
     Examples:
     >>> def sample_function(x, y=5): return x + y
-    >>> result = f_4441(sample_function)
+    >>> result = f_566(sample_function)
     >>> 'sample_function' == result['function_name'] and len(result['args']) == 2
     True
     >>> lambda_func = lambda x: x * 2
-    >>> f_4441(lambda_func)['is_lambda']
+    >>> f_566(lambda_func)['is_lambda']
     True
     """
     spec = inspect.getfullargspec(f)
@@ -41,24 +41,24 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_regular_function(self):
         def test_func(a, b=1): pass
-        result = f_4441(test_func)
+        result = f_566(test_func)
         self.assertEqual(result['function_name'], 'test_func')
         self.assertListEqual(result['args'], ['a', 'b'])
         self.assertTupleEqual(result['defaults'], (1,))
     def test_lambda_function(self):
         lambda_func = lambda x, y=2: x + y
-        result = f_4441(lambda_func)
+        result = f_566(lambda_func)
         self.assertTrue(result['is_lambda'])
     def test_no_arguments(self):
         def test_func(): pass
-        result = f_4441(test_func)
+        result = f_566(test_func)
         self.assertEqual(len(result['args']), 0)
     def test_annotations(self):
         def test_func(a: int, b: str = 'hello') -> int: pass
-        result = f_4441(test_func)
+        result = f_566(test_func)
         self.assertIn('a', result['annotations'])
         self.assertIn('return', result['annotations'])
     def test_defaults_none(self):
         def test_func(a, b=None): pass
-        result = f_4441(test_func)
+        result = f_566(test_func)
         self.assertIsNone(result['defaults'][0])

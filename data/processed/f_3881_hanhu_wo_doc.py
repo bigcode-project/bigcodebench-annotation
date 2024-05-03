@@ -1,7 +1,7 @@
 import xmltodict
 import json
 
-def f_3883(s, file_path):
+def f_16(s, file_path):
     """
     Converts an XML string into a dictionary representation and saves it as a JSON file.
     This is useful for easily accessing and persisting data stored in XML format.
@@ -18,10 +18,10 @@ def f_3883(s, file_path):
     - json
 
     Examples:
-    >>> result = f_3883('<person><name>John</name><age>30</age></person>', "temp.json")
+    >>> result = f_16('<person><name>John</name><age>30</age></person>', "temp.json")
     >>> result['person']['name'] + ', ' + result['person']['age']
     'John, 30'
-    >>> result = f_3883('<school><class><student>Emma</student></class></school>', "temp.json")
+    >>> result = f_16('<school><class><student>Emma</student></class></school>', "temp.json")
     >>> result['school']['class']['student']
     'Emma'
     """
@@ -53,29 +53,29 @@ class TestCases(unittest.TestCase):
     def test_simple_xml(self):
         xml_str = '<person><name>John</name><age>30</age></person>'
         file_path = os.path.join(self.test_dir, 'test_simple.json')
-        result = f_3883(xml_str, file_path)
+        result = f_16(xml_str, file_path)
         self.assertEqual(result['person']['name'], 'John')
         self.assertEqual(result['person']['age'], '30')
     def test_nested_xml(self):
         xml_str = '<school><class><student>Emma</student></class></school>'
         file_path = os.path.join(self.test_dir, 'test_nested.json')
-        result = f_3883(xml_str, file_path)
+        result = f_16(xml_str, file_path)
         self.assertEqual(result['school']['class']['student'], 'Emma')
     def test_empty_xml(self):
         xml_str = '<empty></empty>'
         file_path = os.path.join(self.test_dir, 'test_empty.json')
-        result = f_3883(xml_str, file_path)
+        result = f_16(xml_str, file_path)
         self.assertEqual(result.get('empty', None), None)
     def test_attribute_xml(self):
         xml_str = '<book id="123">Python Guide</book>'
         file_path = os.path.join(self.test_dir, 'test_attribute.json')
-        result = f_3883(xml_str, file_path)
+        result = f_16(xml_str, file_path)
         self.assertEqual(result['book']['@id'], '123')
         self.assertEqual(result['book']['#text'], 'Python Guide')
     def test_complex_xml(self):
         xml_str = '<family><person name="John"><age>30</age></person><person name="Jane"><age>28</age></person></family>'
         file_path = os.path.join(self.test_dir, 'test_complex.json')
-        result = f_3883(xml_str, file_path)
+        result = f_16(xml_str, file_path)
         self.assertEqual(result['family']['person'][0]['@name'], 'John')
         self.assertEqual(result['family']['person'][0]['age'], '30')
         self.assertEqual(result['family']['person'][1]['@name'], 'Jane')
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         file_path = os.path.join(self.test_dir, 'test_output.json')
         expected_dict = {'person': {'name': 'John', 'age': '30'}}
         
-        result = f_3883(xml_str, file_path)
+        result = f_16(xml_str, file_path)
         
         self.assertTrue(os.path.exists(file_path), "JSON file was not created.")
         
@@ -98,5 +98,5 @@ class TestCases(unittest.TestCase):
         xml_str = '<unclosed<tag>'
         file_path = os.path.join(self.test_dir, 'test_invalid.json')
         with self.assertRaises(Exception):
-            f_3883(xml_str, file_path)
+            f_16(xml_str, file_path)
         self.assertFalse(os.path.exists(file_path), "JSON file should not be created for invalid XML.")

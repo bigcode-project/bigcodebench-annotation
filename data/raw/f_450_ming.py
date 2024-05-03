@@ -7,6 +7,7 @@ RANGE = 10000
 SIZE = 1000
 PI = np.pi
 
+
 def f_450(size=SIZE, frequency=1):
     '''
     Create a list of random sinusoidal values and plot them in a graph.
@@ -25,6 +26,7 @@ def f_450(size=SIZE, frequency=1):
     - numpy
     
     Example:
+    >>> import matplotlib
     >>> ax = f_450(size=1000, frequency=1)
     >>> isinstance(ax, matplotlib.axes.Axes)
     True
@@ -43,16 +45,14 @@ def f_450(size=SIZE, frequency=1):
     
 
 import unittest
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 
 class TestCases(unittest.TestCase):
     def test_case_1(self):

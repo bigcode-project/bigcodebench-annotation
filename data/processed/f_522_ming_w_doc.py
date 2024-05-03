@@ -1,11 +1,12 @@
 import pandas as pd
 import seaborn as sns
+import numpy as np
 
 # Constants
 LABELS = ['H\u2082O', 'O\u2082', 'CO\u2082', 'N\u2082', 'Ar']
 
 
-def f_522(x, y, labels):
+def f_274(x, y, labels):
     """
     Create a heatmap using the seaborn library for "x" and "y" numpy arrays with labels.
 
@@ -16,11 +17,10 @@ def f_522(x, y, labels):
 
     Returns:
     ax (Axes): A seaborn heatmap object.
-df (DataFrame): The dataframe used to create the heatmap.
+    df (DataFrame): The dataframe used to create the heatmap.
 
     Requirements:
     - numpy
-    - matplotlib.pyplot
     - pandas
     - seaborn
 
@@ -28,8 +28,7 @@ df (DataFrame): The dataframe used to create the heatmap.
     >>> x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
     >>> y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
     >>> labels = ['H\u2082O', 'O\u2082', 'CO\u2082']
-    >>> ax = f_522(x, y, labels)
-    >>> plt.show()
+    >>> ax = f_274(x, y, labels)
     """
     data = []
 
@@ -42,18 +41,13 @@ df (DataFrame): The dataframe used to create the heatmap.
     return ax, df
 
 import unittest
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     # (test cases will be same as above)
     def test_case_1(self):
         x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
         y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
         labels = ['H₂O', 'O₂', 'CO₂']
-        ax, df = f_522(x, y, labels)
+        ax, df = f_274(x, y, labels)
         
         # Assert the shape of the dataframe
         self.assertEqual(df.shape, (3, 6))
@@ -65,7 +59,7 @@ class TestCases(unittest.TestCase):
         x = [np.array([1,1]), np.array([2,2])]
         y = [np.array([3,3]), np.array([4,4])]
         labels = ['H₂O', 'O₂']
-        ax, df = f_522(x, y, labels)
+        ax, df = f_274(x, y, labels)
         
         # Assert the shape of the dataframe
         self.assertEqual(df.shape, (2, 4))
@@ -77,7 +71,7 @@ class TestCases(unittest.TestCase):
         x = [np.array([10])]
         y = [np.array([20])]
         labels = ['H₂O']
-        ax, df = f_522(x, y, labels)
+        ax, df = f_274(x, y, labels)
         
         # Assert the shape of the dataframe
         self.assertEqual(df.shape, (1, 2))
@@ -89,7 +83,7 @@ class TestCases(unittest.TestCase):
         x = [np.array([5,6,7]), np.array([8,9,10]), np.array([11,12,13])]
         y = [np.array([15,16,17]), np.array([18,19,20]), np.array([21,22,23])]
         labels = ['A', 'B', 'C']
-        ax, df = f_522(x, y, labels)
+        ax, df = f_274(x, y, labels)
         
         # Assert the shape of the dataframe
         self.assertEqual(df.shape, (3, 6))
@@ -101,7 +95,7 @@ class TestCases(unittest.TestCase):
         x = [np.array([2,3]), np.array([5,6])]
         y = [np.array([8,9]), np.array([11,12])]
         labels = ['X', 'Y']
-        ax, df = f_522(x, y, labels)
+        ax, df = f_274(x, y, labels)
         
         # Assert the shape of the dataframe
         self.assertEqual(df.shape, (2, 4))

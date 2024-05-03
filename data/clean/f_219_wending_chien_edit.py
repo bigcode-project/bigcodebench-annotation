@@ -8,7 +8,7 @@ def f_219(df):
     The like ratio for each video is calculated by dividing the number of likes by the number of views.
     This function generates a bar plot of the like ratios for these specific videos.
     If the DataFrame is empty, lacks the required columns, or contains no titles matching the criteria,
-    an empty plot is returned.
+    an empty subplot is returned.
 
     Parameters:
     df (DataFrame): A DataFrame containing video data with columns 'Title', 'Views', and 'Likes'.

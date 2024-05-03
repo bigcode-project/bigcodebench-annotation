@@ -4,7 +4,7 @@ import numpy as np
 # Constants
 FUNCTIONS = [np.sin, np.cos, np.tan]
 
-def f_256(ax, func_index):
+def f_226(ax, func_index):
     """
     Draw a mathematical function (sine, cosine, or tangent) on a polar diagram 'ax'.
     The radial ticks are placed at a position corresponding to the index of the function multiplied by 45 degrees.
@@ -27,7 +27,7 @@ def f_256(ax, func_index):
     >>> import matplotlib.pyplot as plt
     >>> fig = plt.figure()
     >>> ax = fig.add_subplot(111, polar=True)
-    >>> ax_up = f_256(ax, 1)
+    >>> ax_up = f_226(ax, 1)
     <class 'matplotlib.projections.polar.PolarAxes'>
     >>> ax_up.lines[0].get_ydata()[0]
     1.0
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, polar=True)
     def test_sine_function(self):
-        ax = f_256(self.ax, 0)
+        ax = f_226(self.ax, 0)
         self.assertIsNotNone(ax, "Ax should not be None")
         # Verify if the plotted function matches the sine function
         x = np.linspace(0, 2 * np.pi, 1000)
@@ -59,17 +59,17 @@ class TestCases(unittest.TestCase):
         y_actual = ax.lines[0].get_ydata()
         np.testing.assert_allclose(y_actual, y_expected, atol=1e-5)
     def test_cosine_function(self):
-        ax = f_256(self.ax, 1)
+        ax = f_226(self.ax, 1)
         self.assertIsNotNone(ax, "Ax should not be None")
     def test_tangent_function(self):
-        ax = f_256(self.ax, 2)
+        ax = f_226(self.ax, 2)
         self.assertIsNotNone(ax, "Ax should not be None")
     def test_invalid_index(self):
         with self.assertRaises(IndexError):
-            f_256(self.ax, 3)
+            f_226(self.ax, 3)
     def test_rlabel_position(self):
-        ax = f_256(self.ax, 1)
+        ax = f_226(self.ax, 1)
         self.assertEqual(ax.get_rlabel_position(), 45, "Rlabel position should be 45 for index 1")
     def test_case_non_ax(self):
         with self.assertRaises(ValueError):
-            f_256("non_ax", 1)
+            f_226("non_ax", 1)

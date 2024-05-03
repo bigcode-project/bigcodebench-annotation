@@ -3,7 +3,8 @@ from scipy import stats
 import matplotlib.pyplot as plt
 
 
-def f_451(size=1000, bin_width=100):
+
+def f_217(size=1000, bin_width=100):
     '''
     Create a list of normally distributed random numbers and plot their histogram and probability density function (PDF).
     
@@ -20,7 +21,8 @@ def f_451(size=1000, bin_width=100):
     - matplotlib.figure.Figure: A figure object containing the histogram and PDF plot.
     
     Example:
-    >>> fig = f_451(size=500, bin_width=50)
+    >>> import matplotlib
+    >>> fig = f_217(size=500, bin_width=50)
     >>> isinstance(fig, matplotlib.figure.Figure)  # Check if the output is a matplotlib figure object
     True
     >>> len(fig.axes[0].lines) == 1  # Ensure there is one line plot on the axes for the PDF
@@ -46,38 +48,34 @@ def f_451(size=1000, bin_width=100):
     return fig
 
 import unittest
-import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
-        fig = f_451()
+        fig = f_217()
         ax = fig.axes[0]
         self.assertGreaterEqual(len(ax.patches), 5, "Expected at least 5 bars in the histogram")
         self.assertEqual(len(ax.lines), 1, "Expected 1 line for the PDF plot")
         
     def test_case_2(self):
-        fig = f_451(size=500, bin_width=50)
+        fig = f_217(size=500, bin_width=50)
         ax = fig.axes[0]
         self.assertGreaterEqual(len(ax.patches), 5, "Expected at least 5 bars in the histogram")
         self.assertEqual(len(ax.lines), 1, "Expected 1 line for the PDF plot")
         
     def test_case_3(self):
-        fig = f_451(size=1500, bin_width=150)
+        fig = f_217(size=1500, bin_width=150)
         ax = fig.axes[0]
         self.assertGreaterEqual(len(ax.patches), 5, "Expected at least 5 bars in the histogram")
         self.assertEqual(len(ax.lines), 1, "Expected 1 line for the PDF plot")
         
     def test_case_4(self):
-        fig = f_451(size=2000, bin_width=200)
+        fig = f_217(size=2000, bin_width=200)
         ax = fig.axes[0]
         self.assertGreaterEqual(len(ax.patches), 5, "Expected at least 5 bars in the histogram")
         self.assertEqual(len(ax.lines), 1, "Expected 1 line for the PDF plot")
         
     def test_case_5(self):
-        fig = f_451(size=2500, bin_width=250)
+        fig = f_217(size=2500, bin_width=250)
         ax = fig.axes[0]
         self.assertGreaterEqual(len(ax.patches), 5, "Expected at least 5 bars in the histogram")
         self.assertEqual(len(ax.lines), 1, "Expected 1 line for the PDF plot")

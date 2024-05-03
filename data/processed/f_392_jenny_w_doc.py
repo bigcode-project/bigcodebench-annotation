@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def f_392(days, random_seed=0):
+def f_158(days, random_seed=0):
     """
     Generates a spending report DataFrame for the given number of days.
 
@@ -30,7 +30,7 @@ def f_392(days, random_seed=0):
     - numpy
 
     Example:
-    >>> df = f_392(5, random_seed=42)
+    >>> df = f_158(5, random_seed=42)
     >>> type(df)
     <class 'pandas.core.frame.DataFrame'>
     >>> df.head(2)
@@ -77,39 +77,39 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic case with default parameters
         days = 7
-        report = f_392(days)
+        report = f_158(days)
         self._test_report(report, days)
     def test_case_2(self):
         # Test handling 0 days
         days = 0
-        report = f_392(days)
+        report = f_158(days)
         self._test_report(report, days)
     def test_case_3(self):
         # Test handling larger number of days
         days = 1000
-        report = f_392(days)
+        report = f_158(days)
         self._test_report(report, days)
     def test_case_4(self):
         # Test handling invalid inputs
         with self.assertRaises(ValueError):
-            f_392(-1)
+            f_158(-1)
         with self.assertRaises(ValueError):
-            f_392(None)
+            f_158(None)
         with self.assertRaises(TypeError):
-            f_392("-1")
+            f_158("-1")
     def test_case_5(self):
         # Test random seed reproducibility
         days = 100
-        report1 = f_392(days, random_seed=42)
-        report2 = f_392(days, random_seed=42)
+        report1 = f_158(days, random_seed=42)
+        report2 = f_158(days, random_seed=42)
         self.assertTrue(report1.equals(report2))
         self._test_report(report1, days)
         self._test_report(report2, days)
     def test_case_6(self):
         # Test random seed variation
         days = 100
-        report1 = f_392(days, random_seed=24)
-        report2 = f_392(days, random_seed=42)
+        report1 = f_158(days, random_seed=24)
+        report2 = f_158(days, random_seed=42)
         self.assertFalse(report1.equals(report2))
         self._test_report(report1, days)
         self._test_report(report2, days)

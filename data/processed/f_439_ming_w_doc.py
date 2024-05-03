@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 
-def f_439(a, b, columns=['A', 'B']):
+def f_62(a, b, columns=['A', 'B']):
     """
     Standardize two lists of numbers using the StandardScaler from sklearn and visualize the standardized values using a bar plot.
 
@@ -21,10 +21,10 @@ def f_439(a, b, columns=['A', 'B']):
         - numpy
         - pandas
         - sklearn.preprocessing
-        - matplotlib
+        - matplotlib.pyplot
 
     Example:
-        >>> df, ax = f_439([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
+        >>> df, ax = f_62([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
         >>> isinstance(df, pd.DataFrame) and isinstance(ax, matplotlib.axes.Axes)
         True
     """
@@ -44,33 +44,30 @@ def f_439(a, b, columns=['A', 'B']):
 
 import unittest
 import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     def test_standard_case(self):
         """Test the function with non-empty lists."""
-        df, ax = f_439([1, 2, 3], [4, 5, 6])
+        df, ax = f_62([1, 2, 3], [4, 5, 6])
         self.assertIsInstance(df, pd.DataFrame)
         self.assertEqual(df.shape, (3, 2))
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_empty_lists(self):
         """Test the function with empty lists."""
-        df, ax = f_439([], [])
+        df, ax = f_62([], [])
         self.assertIsInstance(df, pd.DataFrame)
         self.assertEqual(df.empty, True)
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_unequal_length_lists(self):
         """Test the function with lists of unequal length. Expecting an exception."""
         with self.assertRaises(ValueError):
-            f_439([1, 2, 3], [4, 5])
+            f_62([1, 2, 3], [4, 5])
     def test_single_value_lists(self):
         """Test the function with single-value lists."""
-        df, ax = f_439([1], [1])
+        df, ax = f_62([1], [1])
         self.assertEqual(df.shape, (1, 2))
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_large_lists(self):
         """Test the function with large lists."""
-        df, ax = f_439(list(range(100)), list(range(100, 200)))
+        df, ax = f_62(list(range(100)), list(range(100, 200)))
         self.assertEqual(df.shape, (100, 2))
         self.assertIsInstance(ax, matplotlib.axes.Axes)

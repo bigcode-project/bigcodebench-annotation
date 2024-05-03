@@ -13,7 +13,7 @@ STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
              'further', 'then', 'once']
 
 
-def f_223(dataframe, text_column):
+def f_578(dataframe, text_column):
     """
     Prepares and transforms text data from a specified column in a DataFrame by removing stopwords, numbers,
     and punctuation, and subsequently applying a vectorization process to convert text into a numeric format suitable
@@ -33,7 +33,7 @@ def f_223(dataframe, text_column):
 
     Example:
     >>> df = pd.DataFrame({'text': ['This is a test.', 'Python is cool!', 'nltk and sklearn are useful for text analysis.']})
-    >>> result = f_223(df, 'text')
+    >>> result = f_578(df, 'text')
     >>> print(result.to_string(index=False))
      analysis  cool  nltk  python  sklearn  test  text  useful
             0     0     0       0        0     1     0       0
@@ -60,7 +60,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame(
             {'text': ['This is a test.', 'Python is cool!', 'nltk and sklearn are useful for text analysis.']})
-        result = f_223(df, 'text')
+        result = f_578(df, 'text')
         expected = pd.DataFrame({
             'analysis': [0, 0, 1],
             'cool': [0, 1, 0],
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result, expected)
     def test_case_2(self):
         df = pd.DataFrame({'text': ['Hello World!', 'GPT-4 is amazing.', 'Chat with ChatGPT.']})
-        result = f_223(df, 'text')
+        result = f_578(df, 'text')
         expected = pd.DataFrame({
             'amazing': [0, 1, 0],
             'chat': [0, 0, 1],
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         df = pd.DataFrame(
             {'text': ['OpenAI develops cool models.', 'Deep learning is the future.', 'Stay updated with the latest.']})
-        result = f_223(df, 'text')
+        result = f_578(df, 'text')
         expected = pd.DataFrame({
             'cool': [1, 0, 0],
             'deep': [0, 1, 0],
@@ -103,7 +103,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result, expected)
     def test_case_4(self):
         df = pd.DataFrame({'text': ['The quick brown fox.', 'Jumps over the lazy dog.', 'Lorem ipsum dolor sit.']})
-        result = f_223(df, 'text')
+        result = f_578(df, 'text')
         expected = pd.DataFrame({
             'brown': [1, 0, 0],
             'dog': [0, 1, 0],
@@ -119,7 +119,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result, expected)
     def test_case_5(self):
         df = pd.DataFrame({'text': ['Hello there!', 'General Kenobi.', 'You are a bold one.']})
-        result = f_223(df, 'text')
+        result = f_578(df, 'text')
         expected = pd.DataFrame({
             'bold': [0, 0, 1],
             'general': [0, 1, 0],

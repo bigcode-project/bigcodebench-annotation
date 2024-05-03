@@ -2,9 +2,9 @@ import subprocess
 import platform
 import time
 
-def f_227(url):
+def f_75(url):
     """
-    Open a web page in the default web browser.
+    Open a web page in the default web browser in a background process.
 
     Parameters:
     url (str): The URL of the webpage to be opened.
@@ -18,7 +18,7 @@ def f_227(url):
     - time
 
     Example:
-    >>> f_227('https://www.google.com')
+    >>> f_75('https://www.google.com')
     0
     """
     if platform.system() == 'Darwin':
@@ -38,7 +38,6 @@ def f_227(url):
     return process.returncode
 
 import unittest
-import unittest
 from unittest.mock import patch, MagicMock
 class TestCases(unittest.TestCase):
     @patch('subprocess.Popen')
@@ -49,8 +48,8 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [0]  # Simulate process ending after 10 checks
         process_mock.returncode = 0
         mock_popen.return_value = process_mock
-        result = f_227('https://www.google.com')
-        mock_popen.assert_called_with(['open', 'https://www.google.com'], shell=True)
+        result = f_75('https://www.google.com')
+        self.assertEqual(['open', 'https://www.google.com'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 0)
     @patch('subprocess.Popen')
@@ -61,8 +60,8 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [0]  # Simulate process ending after 10 checks
         process_mock.returncode = 0
         mock_popen.return_value = process_mock
-        result = f_227('https://www.openai.com')
-        mock_popen.assert_called_with(['start', 'https://www.openai.com'], shell=True)
+        result = f_75('https://www.openai.com')
+        self.assertEqual(['start', 'https://www.openai.com'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 0)
     @patch('subprocess.Popen')
@@ -73,8 +72,8 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [1]  # Simulate failure
         process_mock.returncode = 1
         mock_popen.return_value = process_mock
-        result = f_227('')
-        mock_popen.assert_called_with(['xdg-open', ''], shell=True)
+        result = f_75('')
+        self.assertEqual(['xdg-open', ''], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)
     @patch('subprocess.Popen')
@@ -85,8 +84,8 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [1]  # Simulate failure
         process_mock.returncode = 1
         mock_popen.return_value = process_mock
-        result = f_227('/invalid_url')
-        mock_popen.assert_called_with(['xdg-open', '/invalid_url'], shell=True)
+        result = f_75('/invalid_url')
+        self.assertEqual(['xdg-open', '/invalid_url'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)
     @patch('subprocess.Popen')
@@ -97,7 +96,7 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [1]  # Simulate failure
         process_mock.returncode = 1
         mock_popen.return_value = process_mock
-        result = f_227('/path/to/file.txt')
-        mock_popen.assert_called_with(['xdg-open', '/path/to/file.txt'], shell=True)
+        result = f_75('/path/to/file.txt')
+        self.assertEqual(['xdg-open', '/path/to/file.txt'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)

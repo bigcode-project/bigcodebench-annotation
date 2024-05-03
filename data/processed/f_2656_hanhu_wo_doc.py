@@ -2,10 +2,10 @@ import cgi
 import http.server
 import json
 
-def f_2658():
+def f_422():
     """
-    The f_2658 method is a specialized handler for processing HTTP POST requests within a server setup,
-    primarily designed to handle JSON-formatted data. It meticulously checks incoming requests to ensure they contain the
+    The f_422 method is a specialized handler for processing HTTP POST requests within a server setup,
+    primarily designed to handle JSON-formatted data. It meticulously checks inco requests to ensure they contain the
     expected 'data' key and have a Content-Type header set to application/json.
     If a request fails these checks, the method responds with an error status and a message indicating the specific validation failure.
     Conversely, when a request satisfies these criteria, it acknowledges with a success message,
@@ -31,7 +31,7 @@ def f_2658():
     - json
 
     Example:
-    >>> handler = f_2658()
+    >>> handler = f_422()
     >>> server = http.server.HTTPServer(('127.0.0.1', 8080), handler)
     >>> server.serve_forever()
     """

@@ -1,13 +1,12 @@
 from random import choice
-
-import matplotlib
 import pytz
 from dateutil.parser import parse
 
 # Constants
 TIMEZONES = ['America/New_York', 'Europe/London', 'Asia/Shanghai', 'Asia/Tokyo', 'Australia/Sydney']
 
-def f_487(date_str, from_tz):
+
+def f_410(date_str, from_tz):
     """
     Converts a datetime string from a given timezone to a datetime string in a randomly chosen timezone.
 
@@ -19,14 +18,13 @@ def f_487(date_str, from_tz):
     - tuple: A tuple containing the converted datetime string and the randomly chosen timezone.
     
     Requirements:
-    - datetime
     - pytz
     - dateutil.parser
     - random
 
     Example:
     >>> date_str, from_tz = '2023-06-15 12:00:00', 'UTC'
-    >>> converted_date, to_tz = f_487(date_str, from_tz)
+    >>> converted_date, to_tz = f_410(date_str, from_tz)
     >>> to_tz in TIMEZONES
     True
     """
@@ -39,11 +37,9 @@ def f_487(date_str, from_tz):
 
 import unittest
 from datetime import datetime
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = f_487('2023-06-15 12:00:00', 'UTC')
+        result = f_410('2023-06-15 12:00:00', 'UTC')
         self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 2)
         datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
@@ -51,7 +47,7 @@ class TestCases(unittest.TestCase):
         self.assertIn(result[1], TIMEZONES)
     
     def test_case_2(self):
-        result = f_487('2022-01-01 00:00:00', 'America/New_York')
+        result = f_410('2022-01-01 00:00:00', 'America/New_York')
         self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 2)
         datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
@@ -59,7 +55,7 @@ class TestCases(unittest.TestCase):
         self.assertIn(result[1], TIMEZONES)
         
     def test_case_3(self):
-        result = f_487('2020-12-31 23:59:59', 'Asia/Shanghai')
+        result = f_410('2020-12-31 23:59:59', 'Asia/Shanghai')
         self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 2)
         datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
@@ -67,7 +63,7 @@ class TestCases(unittest.TestCase):
         self.assertIn(result[1], TIMEZONES)
         
     def test_case_4(self):
-        result = f_487('2019-07-04 04:04:04', 'Europe/London')
+        result = f_410('2019-07-04 04:04:04', 'Europe/London')
         self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 2)
         datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
@@ -75,7 +71,7 @@ class TestCases(unittest.TestCase):
         self.assertIn(result[1], TIMEZONES)
     
     def test_case_5(self):
-        result = f_487('2018-02-28 14:28:58', 'Australia/Sydney')
+        result = f_410('2018-02-28 14:28:58', 'Australia/Sydney')
         self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 2)
         datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')

@@ -1,6 +1,5 @@
 import re
 import string
-
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
@@ -8,6 +7,7 @@ nltk.download('vader_lexicon')
 # Constants
 ALPHANUMERIC = re.compile('[\W_]+')
 PUNCTUATIONS = string.punctuation
+
 
 def f_517(text: str, sia: SentimentIntensityAnalyzer) -> dict:
     """Analyze the sentiment of a text using the provided SentimentIntensityAnalyzer.
@@ -30,6 +30,7 @@ def f_517(text: str, sia: SentimentIntensityAnalyzer) -> dict:
     Requirements:
     - re
     - string
+    - nltk
     - nltk.sentiment.vader
     
     Example:

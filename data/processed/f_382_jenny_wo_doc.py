@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 
 
-def f_382(
+def f_633(
     start_time,
     end_time,
     step,
@@ -31,7 +31,7 @@ def f_382(
                   equal-sized portions, the last timestamp may be excluded.
     - columns (list of str, optional): Names of the DataFrame columns to be included in the output.
                                        Defaults to: ['Timestamp', 'Sensor1', 'Sensor2', 'Sensor3', 'SensorStatus'].
-                                       Regardless of naming, the function will populate the first column with
+                                       Regardless of na, the function will populate the first column with
                                        timestamp, the middle columns with sensor data, and the final with status.
     - sensor_statuses (list of str, optional): Possible statuses for the sensors to randomly assign in the dataset.
                                                Defaults to: ['OK', 'MAINTENANCE_REQUIRED', 'ERROR'].
@@ -48,7 +48,7 @@ def f_382(
     - pandas
 
     Example:
-    >>> df = f_382(0, 5000, 1000)
+    >>> df = f_633(0, 5000, 1000)
     >>> type(df)
     <class 'pandas.core.frame.DataFrame'>
     >>> df.head(1)
@@ -82,7 +82,7 @@ import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic case
-        df = f_382(0, 10000, 100, random_seed=42)
+        df = f_633(0, 10000, 100, random_seed=42)
         self.assertIsInstance(df, pd.DataFrame)
         self.assertEqual(
             list(df.columns),
@@ -95,7 +95,7 @@ class TestCases(unittest.TestCase):
         # Test custom columns
         columns = ["Time", "Sensor_A", "Sensor_B", "Sensor_C", "Status"]
         statuses = ["WORKING", "NEEDS_CHECK", "FAILED"]
-        df = f_382(
+        df = f_633(
             1500, 3000, 50, columns=columns, sensor_statuses=statuses, random_seed=42
         )
         self.assertIsInstance(df, pd.DataFrame)
@@ -108,43 +108,43 @@ class TestCases(unittest.TestCase):
         expected_sensor1 = math.sin(ts / 1000) + np.random.normal(0, 0.1, 1)[0]
         expected_sensor2 = math.cos(ts / 1000) + np.random.normal(0, 0.1, 1)[0]
         expected_sensor3 = math.tan(ts / 1000) + np.random.normal(0, 0.1, 1)[0]
-        df = f_382(0, 100, 100, random_seed=42)
+        df = f_633(0, 100, 100, random_seed=42)
         self.assertAlmostEqual(df.iloc[0]["Sensor1"], expected_sensor1, places=5)
         self.assertAlmostEqual(df.iloc[0]["Sensor2"], expected_sensor2, places=5)
         self.assertAlmostEqual(df.iloc[0]["Sensor3"], expected_sensor3, places=5)
     def test_case_4(self):
         # Test handling invalid start times
         with self.assertRaises(ValueError):
-            f_382(10000, 0, 100)
+            f_633(10000, 0, 100)
     def test_case_5(self):
         # Test handling incorrect end times
         with self.assertRaises(ValueError):
-            f_382(1000, 900, 100)
+            f_633(1000, 900, 100)
     def test_case_6(self):
         # Test column handling
         columns = ["Time", "Value1", "Value2", "Value3", "MachineStatus"]
-        df = f_382(0, 500, 100, columns=columns)
+        df = f_633(0, 500, 100, columns=columns)
         self.assertEqual(list(df.columns), columns)
         # Too few/too many columns
         with self.assertRaises(ValueError):
-            f_382(0, 500, 100, columns[:-1])
+            f_633(0, 500, 100, columns[:-1])
         with self.assertRaises(ValueError):
-            f_382(0, 500, 100, columns + ["foo", "bar"])
+            f_633(0, 500, 100, columns + ["foo", "bar"])
     def test_case_7(self):
         # Test sensor status handling
         with self.assertRaises(ValueError):
-            f_382(0, 500, 100, [])
+            f_633(0, 500, 100, [])
         statuses = ["RUNNING", "SHUTDOWN", "ERROR"]
-        df = f_382(0, 500, 100, sensor_statuses=statuses)
+        df = f_633(0, 500, 100, sensor_statuses=statuses)
         self.assertTrue((df["SensorStatus"].isin(statuses)).all())
     def test_case_8(self):
         # Test random seed
-        df1 = f_382(0, 500, 100, random_seed=42)
-        df2 = f_382(0, 500, 100, random_seed=42)
+        df1 = f_633(0, 500, 100, random_seed=42)
+        df2 = f_633(0, 500, 100, random_seed=42)
         pd.testing.assert_frame_equal(df1, df2)
     def test_case_9(self):
         # Test invalid steps handling
         with self.assertRaises(ValueError):
-            f_382(0, 1000, -100)  # Step is negative
+            f_633(0, 1000, -100)  # Step is negative
         with self.assertRaises(ValueError):
-            f_382(0, 1000, 0)  # Step is zero
+            f_633(0, 1000, 0)  # Step is zero

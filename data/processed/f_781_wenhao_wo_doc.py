@@ -1,7 +1,7 @@
 import re
 import pandas as pd
 
-def f_781(input_df):
+def f_17(input_df):
     """
     Cleans the text in a pandas DataFrame column named 'text' by removing all special characters, punctuation marks, and spaces, then calculates the length of the cleaned text.
 
@@ -17,11 +17,11 @@ def f_781(input_df):
 
     Examples:
     >>> df = pd.DataFrame({'text': ['Special $#! characters   spaces 888323']})
-    >>> print(f_781(df))
+    >>> print(f_17(df))
                           clean_text  text_length
     0  Specialcharactersspaces888323           29
     >>> df = pd.DataFrame({'text': ['Hello, World!']})
-    >>> print(f_781(df))
+    >>> print(f_17(df))
        clean_text  text_length
     0  HelloWorld           10
     """
@@ -38,35 +38,35 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         self.df = pd.DataFrame({'text': ['hello', 'world', 'Special $#! characters   spaces 888323', 'Hello, World!', '', None]})
     def test_clean_text_and_calculate_length(self):
-        result = f_781(self.df)
+        result = f_17(self.df)
         expected_clean_text = ['hello', 'world', 'Specialcharactersspaces888323', 'HelloWorld', '', '']
         expected_text_length = [5, 5, 29, 10, 0, 0]
         pd.testing.assert_series_equal(result['clean_text'], pd.Series(expected_clean_text, name='clean_text'), check_names=False)
         pd.testing.assert_series_equal(result['text_length'], pd.Series(expected_text_length, name='text_length'), check_names=False)
     def test_with_special_characters(self):
         df = pd.DataFrame({'text': ['@@@hello***', '%%%world$$$']})
-        result = f_781(df)
+        result = f_17(df)
         self.assertEqual(result['clean_text'].iloc[0], 'hello')
         self.assertEqual(result['clean_text'].iloc[1], 'world')
         self.assertEqual(result['text_length'].iloc[0], 5)
         self.assertEqual(result['text_length'].iloc[1], 5)
     def test_with_numeric_strings(self):
         df = pd.DataFrame({'text': ['123', '4567']})
-        result = f_781(df)
+        result = f_17(df)
         self.assertEqual(result['clean_text'].iloc[0], '123')
         self.assertEqual(result['clean_text'].iloc[1], '4567')
         self.assertEqual(result['text_length'].iloc[0], 3)
         self.assertEqual(result['text_length'].iloc[1], 4)
     def test_empty_and_none(self):
         df = pd.DataFrame({'text': ['', None]})
-        result = f_781(df)
+        result = f_17(df)
         self.assertEqual(result['clean_text'].iloc[0], '')
         self.assertEqual(result['clean_text'].iloc[1], '')
         self.assertEqual(result['text_length'].iloc[0], 0)
         self.assertEqual(result['text_length'].iloc[1], 0)
     def test_mixed_cases(self):
         df = pd.DataFrame({'text': ['HelloWorld', 'HELLOworld123']})
-        result = f_781(df)
+        result = f_17(df)
         self.assertEqual(result['clean_text'].iloc[0], 'HelloWorld')
         self.assertEqual(result['clean_text'].iloc[1], 'HELLOworld123')
         self.assertEqual(result['text_length'].iloc[0], 10)

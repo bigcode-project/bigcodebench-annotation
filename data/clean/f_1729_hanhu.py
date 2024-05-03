@@ -12,7 +12,7 @@ def f_1730(csv_file, csv_delimiter):
 
     Note: The function assumes that each cell in the CSV contains a single word.
 
-    Args:
+    Parameters:
         csv_file (str): The path to the CSV file to be read.
         csv_delimiter (str): The delimiter used in the CSV file.
 

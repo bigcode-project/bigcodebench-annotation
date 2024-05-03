@@ -7,7 +7,8 @@ import re
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 PENALTY_COST = 1000  # in dollars
 
-def f_478(goals, penalties, rng_seed=None, teams= TEAMS):
+
+def f_478(goals, penalties, rng_seed=None, teams=TEAMS):
     """
     Generate and analyze a Pandas DataFrame of football match results for multiple teams,
     incorporating random goals and penalties, then visualize the analyzed data. Penalties are
@@ -23,7 +24,6 @@ def f_478(goals, penalties, rng_seed=None, teams= TEAMS):
 
     Requirements:
     - pandas
-    - numpy
     - matplotlib.pyplot
     - random
     - re
@@ -67,10 +67,9 @@ def f_478(goals, penalties, rng_seed=None, teams= TEAMS):
     return results_df
 
 
-import matplotlib
 import unittest
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
+
 # Unit Tests
 class TestCases(unittest.TestCase):
     def setUp(self):

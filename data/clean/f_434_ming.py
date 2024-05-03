@@ -1,6 +1,7 @@
 from collections import Counter
 import pandas as pd
 
+
 def f_434(list_of_menuitems):
     """
     Given a nested list of menu items, this function flattens the list and returns a Pandas DataFrame

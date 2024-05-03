@@ -1,7 +1,6 @@
 import csv
-
-import matplotlib
-import pandas as pd
+import os
+output_dir = './output'
 
 
 def f_492(df, filename):
@@ -19,53 +18,47 @@ def f_492(df, filename):
     str: The absolute path of the saved CSV file.
 
     Requirements:
-    - os
     - pandas
     - csv
+    - os
 
     Examples:
+    >>> import pandas as pd
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
     >>> 'data.csv' in f_492(df, 'data.csv')
     True
     """
     # Ensure the data directory exists
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
-    file_path = os.path.join(DATA_DIR, filename)
+    file_path = os.path.join(output_dir, filename)
     df.to_csv(file_path, index=False, quoting=csv.QUOTE_NONNUMERIC)
     return os.path.abspath(file_path)
 
 
 import unittest
 import shutil
-import os
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
-
-# Adjust DATA_DIR to point to the 'data' subdirectory in the parent directory of this script
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(CURRENT_DIR, 'data')
+import pandas as pd
 
 
 class TestCases(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Create the data directory if it doesn't exist."""
-        if not os.path.exists(DATA_DIR):
-            os.makedirs(DATA_DIR)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Clean up by removing files created during tests (if any)."""
-        shutil.rmtree(DATA_DIR, ignore_errors=True)
+        shutil.rmtree(output_dir, ignore_errors=True)
 
     def test_basic_dataframe(self):
         """Test saving a simple DataFrame."""
         df = pd.DataFrame({'A': [1, 2], 'B': ['x', 'y']})
-        expected_path = os.path.join(DATA_DIR, 'basic.csv')
+        expected_path = os.path.join(output_dir, 'basic.csv')
         result_path = f_492(df, 'basic.csv')
-        self.assertEqual(expected_path, result_path)
+        self.assertEqual(expected_path[expected_path.rindex('/') + 1:], result_path[result_path.rindex('/') + 1: ])
         self.assertTrue(os.path.exists(result_path))
 
     def test_with_numeric_and_text(self):

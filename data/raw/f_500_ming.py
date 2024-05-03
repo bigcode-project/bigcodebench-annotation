@@ -1,5 +1,3 @@
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -21,7 +19,6 @@ def f_500(num_samples=100, num_features=5):
     Requirements:
     - pandas
     - numpy
-    - matplotlib.pyplot
     - seaborn
     
     Example:
@@ -39,9 +36,9 @@ def f_500(num_samples=100, num_features=5):
     
     return df, ax
 
+
 import unittest
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 
 def run_tests():

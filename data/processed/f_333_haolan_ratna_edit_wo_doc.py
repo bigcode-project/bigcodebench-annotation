@@ -10,7 +10,7 @@ HEADERS = {
     'Content-Type': 'application/json'
 }
 
-def f_333(url, directory, metadata):
+def f_102(url, directory, metadata):
     """
     Upload all files from a specific directory to the specified server URL, along with the associated metadata. 
     In addition, the speed limit function pauses for one second after each upload.
@@ -34,7 +34,7 @@ def f_333(url, directory, metadata):
     - The function will raise TypeError if the url is invalid.
 
     Example:
-    >>> f_333('https://www.example.com', './uploads', {'userId': 'abc'})
+    >>> f_102('https://www.example.com', './uploads', {'userId': 'abc'})
     """
 
     files = os.listdir(directory)
@@ -54,8 +54,8 @@ import unittest
 from unittest.mock import patch, Mock
 import os
 TEST_URL = "https://www.example.com"
-TEST_DIRECTORY = "./test_uploads_f_333"
-TEST_DIRECTORY_EMPTY = "./test_uploads_f_333_empty"
+TEST_DIRECTORY = "./test_uploads_f_102"
+TEST_DIRECTORY_EMPTY = "./test_uploads_f_102_empty"
 TEST_METADATA = {'userId': 'abc'}
 # Mocking the requests.post method
 def mock_requests_post(*args, **kwargs):
@@ -92,23 +92,23 @@ class TestCases(unittest.TestCase):
     @patch('requests.post', side_effect=mock_requests_post)
     def test_upload_success(self, mock_post):
         # Test successful upload with mock response
-        status_codes = f_333(TEST_URL, TEST_DIRECTORY, TEST_METADATA)
+        status_codes = f_102(TEST_URL, TEST_DIRECTORY, TEST_METADATA)
         self.assertEqual(status_codes, [200, 200, 200, 200, 200])
     @patch('requests.post', side_effect=mock_requests_post)
     def test_directory_not_found(self, mock_post):
         # Test if directory does not exist
         with self.assertRaises(FileNotFoundError):
-            f_333(TEST_URL, "non_existing_directory", TEST_METADATA)
+            f_102(TEST_URL, "non_existing_directory", TEST_METADATA)
     @patch('requests.post', side_effect=mock_requests_post)
     def test_empty_directory(self, mock_post):
         # Test if directory is empty
-        status_codes = f_333(TEST_URL, TEST_DIRECTORY_EMPTY, TEST_METADATA)
+        status_codes = f_102(TEST_URL, TEST_DIRECTORY_EMPTY, TEST_METADATA)
         self.assertEqual(status_codes, [])
     def test_invalid_url(self):
         # Test with invalid URL
         with self.assertRaises(Exception):
-            f_333("invalid_url", TEST_DIRECTORY, TEST_METADATA)
+            f_102("invalid_url", TEST_DIRECTORY, TEST_METADATA)
     @patch('requests.post', side_effect=mock_requests_post_fail)
     def test_urls(self, mock_post):
-        status_codes = f_333(TEST_URL, TEST_DIRECTORY, TEST_METADATA)
+        status_codes = f_102(TEST_URL, TEST_DIRECTORY, TEST_METADATA)
         self.assertEqual(status_codes, [400, 400, 400, 400, 400])

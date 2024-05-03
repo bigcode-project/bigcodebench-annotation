@@ -1,9 +1,7 @@
-import matplotlib
-import matplotlib.pyplot as plt
 import pandas as pd
+import time
 
-
-def f_461(df, letter):
+def f_14(df, letter):
     """
     Filters rows in a DataFrame where values in the 'Word' column begin with the specified letter,
     then calculates the length of the words in the filtered column and returns a histogram plot of the word lengths.
@@ -17,12 +15,13 @@ def f_461(df, letter):
 
     Requirements:
     - pandas
-    - matplotlib.pyplot
+    - time
 
     Example:
     >>> df = {'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'avocado']}
-    >>> ax = f_461(df, 'a')
+    >>> ax = f_14(df, 'a')
     """
+    start_time = time.time()
     df = pd.DataFrame(df)
     regex = f'^{letter}'
     filtered_df = df[df['Word'].str.match(regex)]
@@ -39,12 +38,13 @@ def f_461(df, letter):
     ax.set_xlabel("Word Length")
     ax.set_ylabel("Frequency")
 
+    end_time = time.time()  # End ti
+    cost = f"Operation completed in {end_time - start_time} seconds."
     return ax
 
 import unittest
 from unittest.mock import patch
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def setUp(self):
         """Initialize testing dataframe."""
@@ -52,22 +52,22 @@ class TestCases(unittest.TestCase):
     @patch('matplotlib.pyplot.hist')
     def test_filter_by_letter(self, mock_hist):
         """Test filtering functionality by a specific letter."""
-        f_461(self.df, 'a')
+        f_14(self.df, 'a')
         filtered_words = ['apple', 'avocado']
         self.assertTrue(all(word in self.df['Word'] for word in filtered_words))
     @patch('matplotlib.pyplot.hist')
     def test_return_type(self, mock_hist):
         """Test the return type is a matplotlib Axes."""
-        ax = f_461(self.df, 'a')
+        ax = f_14(self.df, 'a')
         self.assertTrue(isinstance(ax, plt.Axes))
     def test_histogram_plot_calls(self):
         """Test if histogram plot is generated with correct parameters."""
         with patch('pandas.Series.hist') as mock_hist:
-            f_461(self.df, 'd')
+            f_14(self.df, 'd')
             mock_hist.assert_called_once()
     def test_word_length_calculation(self):
         """Test if word lengths are calculated correctly for words starting with 'a'."""
-        ax = f_461(self.df, 'a')
+        ax = f_14(self.df, 'a')
         expected_lengths = [5, 7]  # Lengths of 'apple' and 'avocado'
         filtered_words = [word for word in self.df['Word'] if word.startswith('a')]
         actual_lengths = [len(word) for word in filtered_words]
@@ -76,5 +76,5 @@ class TestCases(unittest.TestCase):
     @patch('matplotlib.pyplot.hist')
     def test_nonexistent_letter(self, mock_hist):
         """Test filtering by a letter not present returns None."""
-        ax = f_461(self.df, 'z')
+        ax = f_14(self.df, 'z')
         self.assertIsNone(ax, "Expected None when no words start with the specified letter.")

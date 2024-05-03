@@ -7,7 +7,7 @@ import numpy as np
 NUM_SAMPLES = 1000  # Number of samples
 
 
-def f_930():
+def f_601():
     """
     Generates a DataFrame with two columns: a string field and a float field.
     The string field contains randomly generated strings of 10 ASCII letters.
@@ -31,7 +31,7 @@ def f_930():
     Example:
     >>> random.seed(0)
     >>> np.random.seed(0)
-    >>> dataset = f_930()
+    >>> dataset = f_601()
     >>> print(dataset.head(1))
       String Field Float Field
     0   RNvnAvOpyE    5,488.14
@@ -54,34 +54,34 @@ import unittest
 import pandas as pd
 import random
 class TestCases(unittest.TestCase):
-    """Test cases for f_930."""
+    """Test cases for f_601."""
     def test_dataframe_creation(self):
         """
         Test if the function returns a pandas DataFrame.
         """
         random.seed(1)
-        result = f_930()
+        result = f_601()
         self.assertIsInstance(result, pd.DataFrame)
     def test_row_count(self):
         """
         Test if the DataFrame contains the correct number of rows.
         """
         random.seed(2)
-        result = f_930()
+        result = f_601()
         self.assertEqual(len(result), NUM_SAMPLES)
     def test_column_count(self):
         """
         Test if the DataFrame contains exactly two columns.
         """
         random.seed(3)
-        result = f_930()
+        result = f_601()
         self.assertEqual(len(result.columns), 2)
     def test_string_field_format(self):
         """
         Test if the 'String Field' contains strings of 10 ASCII letters.
         """
         random.seed(4)
-        result = f_930()
+        result = f_601()
         all_strings = all(result["String Field"].str.match("^[A-Za-z]{10}$"))
         self.assertTrue(all_strings)
     def test_float_field_format(self):
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
         Test if the 'Float Field' contains formatted float strings.
         """
         random.seed(5)
-        result = f_930()
+        result = f_601()
         all_floats = all(
             isinstance(float(val.replace(",", "")), float)
             for val in result["Float Field"]

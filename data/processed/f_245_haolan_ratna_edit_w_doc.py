@@ -1,7 +1,7 @@
 import pandas as pd
 import collections
 
-def f_245(df):
+def f_38(df):
     """
     Generate a sales report from a DataFrame, excluding duplicate customer names. 
     The report includes total sales and the most popular sales category.
@@ -24,7 +24,7 @@ def f_245(df):
 
     Example:
     >>> data = pd.DataFrame([{'Customer': 'John', 'Category': 'Electronics', 'Sales': 500}, {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}])
-    >>> report = f_245(data)
+    >>> report = f_38(data)
     >>> print(report)
     {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
     """
@@ -48,7 +48,7 @@ class TestCases(unittest.TestCase):
             {'Customer': 'Nick', 'Category': 'Sports', 'Sales': 600}
         ])
         expected_output = {'Total Sales': 1800, 'Most Popular Category': 'Electronics'}
-        self.assertEqual(f_245(data), expected_output)
+        self.assertEqual(f_38(data), expected_output)
     def test_case_with_duplicates(self):
         data = pd.DataFrame([
             {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
@@ -57,21 +57,21 @@ class TestCases(unittest.TestCase):
             {'Customer': 'Peter', 'Category': 'Beauty', 'Sales': 400}
         ])
         expected_output = {'Total Sales': 1200, 'Most Popular Category': 'Electronics'}
-        self.assertEqual(f_245(data), expected_output)
+        self.assertEqual(f_38(data), expected_output)
     def test_case_empty(self):
         data = pd.DataFrame([
             {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
             {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}
         ])
         expected_output = {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
-        self.assertEqual(f_245(data), expected_output)
+        self.assertEqual(f_38(data), expected_output)
     def test_case_unique_customers(self):
         data = pd.DataFrame([
             {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
             {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}
         ])
         expected_output = {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
-        self.assertEqual(f_245(data), expected_output)
+        self.assertEqual(f_38(data), expected_output)
     def test_case_tie_categories(self):
         data = pd.DataFrame([
             {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
         ])
         # In case of a tie, the first category in alphabetical order will be chosen
         expected_output = {'Total Sales': 1300, 'Most Popular Category': 'Electronics'}
-        self.assertEqual(f_245(data), expected_output)
+        self.assertEqual(f_38(data), expected_output)
     def test_case_6(self):
         with self.assertRaises(ValueError):
-            f_245("non_df")
+            f_38("non_df")

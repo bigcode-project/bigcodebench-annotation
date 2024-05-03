@@ -6,7 +6,7 @@ import seaborn as sns
 PLOT_TITLE = "Value Distribution"
 
 
-def f_867(data_dict):
+def f_346(data_dict):
     """
     Processes a dictionary of numerical data to create a pandas DataFrame, removes None values, and generates a histogram 
     of the data values using seaborn. The histogram's bins are dynamically calculated based on the range of the data. 
@@ -38,7 +38,7 @@ def f_867(data_dict):
 
     Example:
     >>> data = {'a': [1, 2, 3, None], 'b': [5, 6, None, 8]}
-    >>> df, plot = f_867(data)
+    >>> df, plot = f_346(data)
     >>> df
          a    b
     0  1.0  5.0
@@ -63,13 +63,13 @@ def f_867(data_dict):
 import unittest
 import pandas as pd
 class TestCases(unittest.TestCase):
-    """Test cases for function f_867."""
+    """Test cases for function f_346."""
     def test_dataframe_creation(self):
         """
         Test if the function correctly creates a DataFrame from the input dictionary.
         """
         data = {"a": [1, 2, 3, 4], "b": [5, 6, 7, 8]}
-        df, _ = f_867(data)
+        df, _ = f_346(data)
         self.assertIsInstance(df, pd.DataFrame)
         self.assertEqual(df.shape, (4, 2))
     def test_distribution_plot(self):
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         Test if the function correctly creates a distribution plot with the correct title and non-empty bars.
         """
         data = {"a": [1, 2, 3, 4], "b": [5, 6, 7, 8]}
-        _, plot = f_867(data)
+        _, plot = f_346(data)
         self.assertEqual(plot.get_title(), "Value Distribution")
         self.assertTrue(len(plot.patches) > 0)
     def test_empty_dictionary(self):
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         Test if the function correctly handles an empty dictionary, returning an empty DataFrame and no plot.
         """
         data = {}
-        df, plot = f_867(data)
+        df, plot = f_346(data)
         self.assertEqual(df.shape, (0, 0))
         self.assertIsNone(plot)
     def test_number_of_bins(self):
@@ -93,13 +93,13 @@ class TestCases(unittest.TestCase):
         Test if the function dynamically calculates the number of bins for the plot based on the data.
         """
         data = {"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-        _, plot = f_867(data)
+        _, plot = f_346(data)
         self.assertTrue(len(plot.patches) <= 11)
     def test_dataframe_without_none(self):
         """
         Test if the function correctly removes rows with None values from the DataFrame.
         """
         data = {"a": [1, 2, None, 4], "b": [5, None, 7, 8]}
-        df, _ = f_867(data)
+        df, _ = f_346(data)
         self.assertEqual(df.shape, (2, 2))
         self.assertNotIn(None, df.values.flatten())

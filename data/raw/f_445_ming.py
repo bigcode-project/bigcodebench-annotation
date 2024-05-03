@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -18,7 +17,6 @@ def f_445(array_length=100):
     Requirements:
     - numpy
     - pandas
-    - matplotlib.pyplot
 
     Example:
     >>> df, ax = f_445(50)
@@ -38,17 +36,16 @@ def f_445(array_length=100):
     
 
 import unittest
-import matplotlib
+import matplotlib.pyplot as plt
 
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestArrayStatistics))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
-class TestArrayStatistics(unittest.TestCase):
+class TestCases(unittest.TestCase):
     
     def test_default_length(self):
         df, ax = f_445()

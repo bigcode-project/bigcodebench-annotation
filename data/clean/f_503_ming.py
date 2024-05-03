@@ -1,6 +1,7 @@
 import binascii
 import hashlib
 import re
+output_dir = './output'
 
 
 def f_503(directory: str, pattern: str = r"(?<!Distillr)\\AcroTray\.exe") -> dict:
@@ -17,12 +18,11 @@ def f_503(directory: str, pattern: str = r"(?<!Distillr)\\AcroTray\.exe") -> dic
 
     Requirements:
     - re
-    - os
     - hashlib
     - binascii
 
     Example:
-    >>> f_503(DATA_DIR)
+    >>> f_503(output_dir)
     {}
     """
     hashes = {}
@@ -41,25 +41,22 @@ import unittest
 import tempfile
 import shutil
 import os
-# Set DATA_DIR to the 'data' subdirectory in the current script's directory
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.test_dir = DATA_DIR
-        if not os.path.exists(cls.test_dir):
-            os.makedirs(cls.test_dir)
+    def setUp(self):
+        self.test_dir = output_dir
+        if not os.path.exists(self.test_dir):
+            os.makedirs(self.test_dir)
 
         # Create a test file within the test_dir
-        cls.test_file = os.path.join(cls.test_dir, "AcroTray.exe")
-        with open(cls.test_file, 'wb') as f:
+        self.test_file = os.path.join(self.test_dir, "AcroTray.exe")
+        with open(self.test_file, 'wb') as f:
             f.write(b"Dummy content for testing.")
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Clean up by removing the test directory and its contents
-        shutil.rmtree(cls.test_dir, ignore_errors=True)
+        shutil.rmtree(self.test_dir, ignore_errors=True)
 
     def test_matching_file(self):
         """Ensure the method correctly identifies and hashes a matching file."""

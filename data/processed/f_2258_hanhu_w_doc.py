@@ -1,7 +1,7 @@
 import random
 from scipy import stats
 
-def f_2260(animals, mean):
+def f_41(animals, mean):
     """
     Simulates sales in a pet shop based on a randomly determined number of customers.
     Each customer randomly buys one type of animal from the specified list of animals.
@@ -20,7 +20,7 @@ def f_2260(animals, mean):
 
     Examples:
     >>> ANIMALS = ['Dog', 'Cat', 'Bird', 'Fish', 'Hamster']
-    >>> sales = f_2260(ANIMALS, 120)
+    >>> sales = f_41(ANIMALS, 120)
     >>> isinstance(sales, dict)
     True
     >>> all(animal in ANIMALS for animal in sales.keys())
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
         mock_poisson.return_value.rvs.return_value = 100
         mock_choice.side_effect = lambda x: x[0]  # always choose the first animal
         expected = {'Dog': 100, 'Cat': 0, 'Bird': 0, 'Fish': 0, 'Hamster': 0}
-        result = f_2260(self.animals, 100)
+        result = f_41(self.animals, 100)
         self.assertEqual(result, expected)
     @patch('random.choice')
     @patch('scipy.stats.poisson')
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
         """Test the scenario where zero customers arrive."""
         mock_poisson.return_value.rvs.return_value = 0
         expected = {'Dog': 0, 'Cat': 0, 'Bird': 0, 'Fish': 0, 'Hamster': 0}
-        result = f_2260(self.animals, 0)
+        result = f_41(self.animals, 0)
         self.assertEqual(result, expected)
     @patch('random.choice')
     @patch('scipy.stats.poisson')
@@ -68,7 +68,7 @@ class TestCases(unittest.TestCase):
         mock_poisson.return_value.rvs.return_value = 1000
         mock_choice.side_effect = lambda x: 'Dog'  # simulate all choosing 'Dog'
         expected = {'Dog': 1000, 'Cat': 0, 'Bird': 0, 'Fish': 0, 'Hamster': 0}
-        result = f_2260(self.animals, 500)
+        result = f_41(self.animals, 500)
         self.assertEqual(result, expected)
     @patch('random.choice')
     @patch('scipy.stats.poisson')
@@ -76,12 +76,12 @@ class TestCases(unittest.TestCase):
         """Test random selection of animals."""
         mock_poisson.return_value.rvs.return_value = 5
         mock_choice.side_effect = ['Dog', 'Cat', 'Bird', 'Fish', 'Hamster']
-        result = f_2260(self.animals, 5)
+        result = f_41(self.animals, 5)
         expected = {'Dog': 1, 'Cat': 1, 'Bird': 1, 'Fish': 1, 'Hamster': 1}
         self.assertEqual(result, expected)
     def test_empty_animal_list(self):
         """Test with an empty list of animals."""
-        result = f_2260([], 10)
+        result = f_41([], 10)
         self.assertEqual(result, {})
     @patch('random.choice')
     @patch('scipy.stats.poisson')
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
         """Test that the function returns a dictionary."""
         mock_poisson.return_value.rvs.return_value = 5
         mock_random.side_effect = ['Dog', 'Cat', 'Bird', 'Fish', 'Hamster']
-        result = f_2260(self.animals, 120)
+        result = f_41(self.animals, 120)
         self.assertIsInstance(result, dict)
     @patch('random.choice')
     @patch('scipy.stats.poisson')
@@ -97,13 +97,13 @@ class TestCases(unittest.TestCase):
         """Test the content of the sales dictionary matches the expected distribution of one each."""
         mock_poisson.return_value.rvs.return_value = 5
         mock_random.side_effect = ['Dog', 'Cat', 'Bird', 'Fish', 'Hamster']
-        result = f_2260(self.animals, 120)
+        result = f_41(self.animals, 120)
         self.assertEqual(result, {'Dog': 1, 'Cat': 1, 'Bird': 1, 'Fish': 1, 'Hamster': 1})
     @patch('scipy.stats.poisson')
     def test_no_customer(self, mock_poisson):
         """Test the function with zero customers."""
         mock_poisson.return_value.rvs.return_value = 0
-        result = f_2260(self.animals, 120)
+        result = f_41(self.animals, 120)
         self.assertEqual(result, {animal: 0 for animal in self.animals})
     @patch('random.choice')
     @patch('scipy.stats.poisson')
@@ -111,5 +111,5 @@ class TestCases(unittest.TestCase):
         """Test that all animal types are considered in sales."""
         mock_poisson.return_value.rvs.return_value = 5
         mock_random.side_effect = ['Dog', 'Cat', 'Bird', 'Fish', 'Hamster']
-        result = f_2260(self.animals, 120)
+        result = f_41(self.animals, 120)
         self.assertTrue(all(animal in result for animal in self.animals))

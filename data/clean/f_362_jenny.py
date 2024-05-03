@@ -18,6 +18,9 @@ def f_362(script_path, output_file_path):
     - df (pd.DataFrame): DataFrame containing the data from the CSV.
     - ax (matplotlib.axes._axes.Axes): Axes object of the plotted bar graph.
 
+    Raises:
+    - ValueError: If the script fails to execute, the CSV is invalid, or the CSV does not contain exactly 2 columns.
+    
     Requirements:
     - pandas
     - subprocess

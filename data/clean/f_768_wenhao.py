@@ -46,22 +46,21 @@ def create_mock_db(db_path: str, table_name: str, column_name: str):
 import unittest
 import os
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.db1_path = 'test_db1.db'
-        cls.db2_path = 'test_db2.db'
-        cls.table_name1 = 'TestData1'
-        cls.table_name2 = 'TestData2'
-        cls.column_name1 = 'TextColumn1'
-        cls.column_name2 = 'TextColumn2'
-        create_mock_db(cls.db1_path, cls.table_name1, cls.column_name1)
-        create_mock_db(cls.db2_path, cls.table_name2, cls.column_name2)
+    def setUp(self):
+        self.db1_path = 'test_db1.db'
+        self.db2_path = 'test_db2.db'
+        self.table_name1 = 'TestData1'
+        self.table_name2 = 'TestData2'
+        self.column_name1 = 'TextColumn1'
+        self.column_name2 = 'TextColumn2'
+        create_mock_db(self.db1_path, self.table_name1, self.column_name1)
+        create_mock_db(self.db2_path, self.table_name2, self.column_name2)
 
-    @classmethod
-    def tearDownClass(cls):
-        os.remove(cls.db1_path)
-        os.remove(cls.db2_path)
-        os.remove('nonexistent.db')
+    def tearDown(self):
+        os.remove(self.db1_path)
+        os.remove(self.db2_path)
+        if os.path.exists('nonexistent.db'):
+            os.remove('nonexistent.db')
     
     def test_valid_input(self):
         df1 = f_768(self.db1_path, self.table_name1, self.column_name1)

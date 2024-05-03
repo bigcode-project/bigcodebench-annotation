@@ -2,7 +2,7 @@ import pandas as pd
 from scipy.stats import pearsonr
 
 
-def f_926(data):
+def f_370(data):
     """
     Calculates the Pearson correlation coefficient between numerical scores and categorical grades.
 
@@ -26,8 +26,8 @@ def f_926(data):
     - scipy
 
     Example:
-    >>> f_926({'Score_String': ['80.5', '85.7', '90.2'], 'Grade': ['B', 'B+', 'A-']})
-    -0.46351538587606683
+    >>> round(f_370({'Score_String': ['80.5', '85.7', '90.2'], 'Grade': ['B', 'B+', 'A-']}),2)
+    -0.46
     """
     df = pd.DataFrame(data)
     if len(df) < 2:  # Check if the data frame has less than 2 rows
@@ -41,20 +41,20 @@ def f_926(data):
 import unittest
 import pandas as pd
 class TestCases(unittest.TestCase):
-    """Test cases for f_926"""
+    """Test cases for f_370"""
     def test_normal_operation(self):
         """
         Test normal operation with valid input.
         """
         data = {"Score_String": ["80.5", "85.7", "90.2"], "Grade": ["B", "B+", "A-"]}
-        result = f_926(data)
+        result = f_370(data)
         self.assertIsInstance(result, float)
     def test_empty_input(self):
         """
         Test the function with empty input.
         """
         data = {"Score_String": [], "Grade": []}
-        result = f_926(data)
+        result = f_370(data)
         self.assertTrue(pd.isna(result))
     def test_invalid_score_format(self):
         """
@@ -62,14 +62,14 @@ class TestCases(unittest.TestCase):
         """
         data = {"Score_String": ["eighty", "85.7", "90.2"], "Grade": ["B", "B+", "A-"]}
         with self.assertRaises(ValueError):
-            f_926(data)
+            f_370(data)
     def test_mismatched_lengths(self):
         """
         Test the function with mismatched lengths of scores and grades.
         """
         data = {"Score_String": ["80.5", "85.7"], "Grade": ["B", "B+", "A-"]}
         with self.assertRaises(ValueError):
-            f_926(data)
+            f_370(data)
     def test_non_ordinal_grades(self):
         """
         Test the function with non-ordinal grade inputs.
@@ -78,5 +78,5 @@ class TestCases(unittest.TestCase):
             "Score_String": ["80.5", "85.7", "90.2"],
             "Grade": ["Pass", "Fail", "Pass"],
         }
-        result = f_926(data)
+        result = f_370(data)
         self.assertIsInstance(result, float)

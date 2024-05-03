@@ -19,7 +19,7 @@ def f_384(start_time, end_time, step, trend, seed=42):
     - seed (int, optional): Seed for reproducibility. Default is 42.
 
     Returns:
-    - ax (matplotlib.pyplot.Axes): The Axes object of the generated plot.
+    - ax (matplotlib.pyplot.Axes): The Axes object of the generated plot, with the x-axis labeled 'Time' and y-axis labeled 'Value'.
 
     Requirements:
     - datetime.datetime

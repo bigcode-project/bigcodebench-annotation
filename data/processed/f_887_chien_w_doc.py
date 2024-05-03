@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 CATEGORIES = ["A", "B", "C", "D", "E"]
 
 
-def f_887(data_list):
+def f_609(data_list):
     """
     Processes a list of category labels to create a histogram that visualizes their distribution.
     This histogram compares the distribution of a predefined set of categories (A, B, C, D, E)
@@ -38,7 +38,7 @@ def f_887(data_list):
 
     Example:
     >>> data = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-    >>> ax = f_887(data)
+    >>> ax = f_609(data)
     >>> ax.get_xticks()
     array([0., 1., 2., 3., 4., 5., 6.])
     """
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
         Test the function with an empty list. Expects ValueError.
         """
         with self.assertRaises(ValueError):
-            f_887([])
+            f_609([])
     def test_uniform_distribution(self):
         """
         Test the function with a uniform distribution of predefined categories.
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
         """
         data = ["A", "B", "C", "D", "E"] * 2
         with patch("sys.stdout", new=io.StringIO()) as fake_output:
-            f_887(data)
+            f_609(data)
         self.assertNotIn(
             "The distribution of predefined categories is not uniform.",
             fake_output.getvalue(),
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
         """
         data = ["A", "A", "B", "C", "D", "E"]
         with patch("sys.stdout", new=io.StringIO()) as fake_output:
-            f_887(data)
+            f_609(data)
         self.assertIn(
             "The distribution of predefined categories is not uniform.",
             fake_output.getvalue(),
@@ -112,7 +112,7 @@ class TestCases(unittest.TestCase):
         Expects extra categories to be included in the histogram.
         """
         data = ["A", "B", "C", "D", "E", "F", "G"]
-        ax = f_887(data)
+        ax = f_609(data)
         self.assertIn("F", [tick.get_text() for tick in ax.get_xticklabels()])
         self.assertIn("G", [tick.get_text() for tick in ax.get_xticklabels()])
     def test_no_extra_categories(self):
@@ -121,7 +121,7 @@ class TestCases(unittest.TestCase):
         Expects only predefined categories to be included in the histogram.
         """
         data = ["A", "B", "C", "D", "E"]
-        ax = f_887(data)
+        ax = f_609(data)
         for extra_cat in ["F", "G"]:
             self.assertNotIn(
                 extra_cat, [tick.get_text() for tick in ax.get_xticklabels()]

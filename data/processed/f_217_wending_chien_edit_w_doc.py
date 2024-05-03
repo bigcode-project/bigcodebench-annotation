@@ -6,7 +6,7 @@ import collections
 VEGETABLES = ['Carrot', 'Potato', 'Tomato', 'Cabbage', 'Spinach']
 
 
-def f_217(vegetable_dict):
+def f_600(vegetable_dict, seed=0):
     """
     Calculate statistics for the vegetables preferred by people listed in the input dictionary.
     The function reverses the dictionary to map vegetables to people and assigns random counts to these vegetables.
@@ -17,7 +17,8 @@ def f_217(vegetable_dict):
 
     Parameters:
     vegetable_dict (dict): A dictionary mapping people's names to their preferred vegetables.
-
+    seed (int): An integer value to seed the random number generator. Defaults to 0.
+    
     Returns:
     DataFrame: Returns a DataFrame with columns for vegetable names, their random counts,
     and their percentage occurrence within the total counts.
@@ -29,13 +30,13 @@ def f_217(vegetable_dict):
 
     Example:
     >>> vegetable_dict = {'John': 'Carrot', 'Alice': 'Potato', 'Bob': 'Tomato'}
-    >>> print(f_217(vegetable_dict))
+    >>> print(f_600(vegetable_dict))
             Count  Percentage
     Carrot      7   46.666667
     Potato      7   46.666667
     Tomato      1    6.666667
     """
-    random.seed(0)
+    random.seed(seed)
     # Create a counter for vegetables based on reversed dictionary
     reversed_dict = {v: k for k, v in vegetable_dict.items()}
     vegetable_counter = collections.Counter({vegetable: random.randint(1, 10) for vegetable in reversed_dict.keys()})
@@ -49,7 +50,7 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         vegetable_dict = {'John': 'Carrot', 'Alice': 'Potato', 'Bob': 'Tomato'}
-        result = f_217(vegetable_dict)
+        result = f_600(vegetable_dict)
         self.assertIn('Carrot', result.index)
         self.assertIn('Potato', result.index)
         self.assertIn('Tomato', result.index)
@@ -57,26 +58,26 @@ class TestCases(unittest.TestCase):
         self.assertTrue(all(result['Percentage'] >= 0))
     def test_case_2(self):
         vegetable_dict = {'Charlie': 'Cabbage', 'David': 'Spinach'}
-        result = f_217(vegetable_dict)
+        result = f_600(vegetable_dict)
         self.assertIn('Cabbage', result.index)
         self.assertIn('Spinach', result.index)
         self.assertTrue(all(result['Percentage'] <= 100))
         self.assertTrue(all(result['Percentage'] >= 0))
     def test_case_3(self):
         vegetable_dict = {}
-        result = f_217(vegetable_dict)
+        result = f_600(vegetable_dict)
         self.assertTrue(all(result['Percentage'] <= 100))
         self.assertTrue(all(result['Percentage'] >= 0))
     def test_case_4(self):
         vegetable_dict = {'Eva': 'Carrot', 'Frank': 'Carrot', 'Grace': 'Tomato'}
-        result = f_217(vegetable_dict)
+        result = f_600(vegetable_dict)
         self.assertIn('Carrot', result.index)
         self.assertIn('Tomato', result.index)
         self.assertTrue(all(result['Percentage'] <= 100))
         self.assertTrue(all(result['Percentage'] >= 0))
     def test_case_5(self):
         vegetable_dict = {'Hannah': 'Spinach', 'Ian': 'Potato', 'Jack': 'Cabbage', 'Katie': 'Tomato'}
-        result = f_217(vegetable_dict)
+        result = f_600(vegetable_dict)
         self.assertIn('Spinach', result.index)
         self.assertIn('Potato', result.index)
         self.assertIn('Cabbage', result.index)

@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.feature_selection import f_oneway
 
-def f_928(data_file_path: str):
+def f_105(data_file_path: str):
     """
     Analyzes numerical data from a CSV file. The function reads the CSV file, converts string representations of
     numbers with commas into floating point numbers, calculates the mean and standard deviation for each numerical column,
@@ -26,7 +26,7 @@ def f_928(data_file_path: str):
     - The ANOVA test is only performed if there are two or more numerical columns. Compute two columns "F-value" and "P-value" for each pair of numerical columns.
 
     Example:
-    >>> means, std_devs, axes, anova_results = f_928('data.csv')
+    >>> means, std_devs, axes, anova_results = f_105('data.csv')
     >>> print(f'Means: {means}, Standard Deviations: {std_devs}')
     >>> print(anova_results)
     """
@@ -62,14 +62,14 @@ from unittest.mock import patch
 import pandas as pd
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for f_928"""
+    """Test cases for f_105"""
     @patch("pandas.read_csv")
     def test_empty_file(self, mock_read_csv):
         """
         Test the function with an empty CSV file.
         """
         mock_read_csv.return_value = pd.DataFrame()
-        means, std_devs, axes, anova_results = f_928("empty.csv")
+        means, std_devs, axes, anova_results = f_105("empty.csv")
         self.assertTrue(means.empty)
         self.assertTrue(std_devs.empty)
         self.assertEqual(len(axes), 0)
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
         Test the function with a CSV file having a single numerical column.
         """
         mock_read_csv.return_value = pd.DataFrame({"A": [1, 2, 3, 4, 5]})
-        means, std_devs, axes, anova_results = f_928("single_column.csv")
+        means, std_devs, axes, anova_results = f_105("single_column.csv")
         self.assertEqual(means["A"], 3)
         self.assertAlmostEqual(std_devs["A"], 1.5811, places=4)
         self.assertEqual(len(axes), 1)
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
         Test the function with a CSV file having multiple numerical columns.
         """
         mock_read_csv.return_value = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
-        means, _, axes, anova_results = f_928("multiple_columns.csv")
+        means, _, axes, anova_results = f_105("multiple_columns.csv")
         self.assertEqual(means["A"], 2)
         self.assertEqual(means["B"], 5)
         self.assertEqual(len(axes), 2)
@@ -104,7 +104,7 @@ class TestCases(unittest.TestCase):
         Test the function with a mix of numerical and non-numerical columns.
         """
         mock_read_csv.return_value = pd.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"]})
-        means, std_devs, axes, anova_results = f_928("mixed_columns.csv")
+        means, std_devs, axes, anova_results = f_105("mixed_columns.csv")
         self.assertEqual(len(means), 1)  # Only one numerical column
         self.assertEqual(len(std_devs), 1)
         self.assertEqual(len(axes), 1)
@@ -115,7 +115,7 @@ class TestCases(unittest.TestCase):
         Test the function with a CSV file containing numbers with special characters (e.g., commas).
         """
         mock_read_csv.return_value = pd.DataFrame({"A": ["1,000", "2,000", "3,000"]})
-        means, std_devs, axes, anova_results = f_928("special_characters.csv")
+        means, std_devs, axes, anova_results = f_105("special_characters.csv")
         self.assertAlmostEqual(means["A"], 2000, places=0)
         self.assertAlmostEqual(std_devs["A"], pd.Series([1000, 2000, 3000]).std(), places=0)
         self.assertEqual(len(axes), 1)

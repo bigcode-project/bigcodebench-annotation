@@ -2,12 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def f_809(df: pd.DataFrame) -> pd.DataFrame:
+def f_593(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate the cumulative sum for each column in a given DataFrame and plot
     the results in a bar chart.
 
-    Args:
+    Parameters:
     df (pd.DataFrame): The input DataFrame with numerical values.
                        Must not be empty and must contain numeric data to plot.
     Returns:
@@ -31,7 +31,7 @@ def f_809(df: pd.DataFrame) -> pd.DataFrame:
 
     Example:
     >>> input_df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    >>> output_df, fig = f_809(input_df)
+    >>> output_df, fig = f_593(input_df)
     >>> output_df
        A   B
     0  1   4
@@ -62,17 +62,17 @@ class TestCases(unittest.TestCase):
         self.expected_df = pd.DataFrame({"A": [1, 3, 6], "B": [4, 9, 15]})
     def test_case_1(self):
         # Test basic case
-        output_df, _ = f_809(self.input_df)
+        output_df, _ = f_593(self.input_df)
         pd.testing.assert_frame_equal(output_df, self.expected_df)
     def test_case_2(self):
         # Test cumulative sum correctness for a case with negative values
         input_df_neg = pd.DataFrame({"A": [1, -2, 3], "B": [-4, 5, -6]})
         expected_df_neg = pd.DataFrame({"A": [1, -1, 2], "B": [-4, 1, -5]})
-        output_df_neg, _ = f_809(input_df_neg)
+        output_df_neg, _ = f_593(input_df_neg)
         pd.testing.assert_frame_equal(output_df_neg, expected_df_neg)
     def test_case_3(self):
         # Test bar chart properties
-        _, fig = f_809(self.input_df)
+        _, fig = f_593(self.input_df)
         self.assertIsInstance(fig, plt.Figure)
         ax = fig.axes[0]  # Get the Axes object from the figure
         # Verify the title, x-label, and y-label
@@ -87,22 +87,22 @@ class TestCases(unittest.TestCase):
         # Test with an empty DataFrame
         empty_df = pd.DataFrame()
         with self.assertRaises(Exception):
-            f_809(empty_df)
+            f_593(empty_df)
     def test_case_5(self):
         # Test with DataFrame containing NaN values
         nan_df = pd.DataFrame({"A": [1, np.nan, 3], "B": [4, 5, np.nan]})
         nan_df_cumsum = nan_df.cumsum()
-        output_nan_df, _ = f_809(nan_df)
+        output_nan_df, _ = f_593(nan_df)
         pd.testing.assert_frame_equal(output_nan_df, nan_df_cumsum)
     def test_case_6(self):
         # Test with DataFrame containing all zeros
         zeros_df = pd.DataFrame({"A": [0, 0, 0], "B": [0, 0, 0]})
         expected_zeros_df = pd.DataFrame({"A": [0, 0, 0], "B": [0, 0, 0]})
-        output_zeros_df, _ = f_809(zeros_df)
+        output_zeros_df, _ = f_593(zeros_df)
         pd.testing.assert_frame_equal(output_zeros_df, expected_zeros_df)
     def test_case_7(self):
         # Test with a DataFrame containing only one row
         one_row_df = pd.DataFrame({"A": [1], "B": [2]})
         expected_one_row_df = pd.DataFrame({"A": [1], "B": [2]})
-        output_one_row_df, _ = f_809(one_row_df)
+        output_one_row_df, _ = f_593(one_row_df)
         pd.testing.assert_frame_equal(output_one_row_df, expected_one_row_df)

@@ -6,6 +6,7 @@ import numpy as np
 ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 N_GROUPS = 5
 
+
 def f_447(l):
     """
     Given a list `l`, this function shuffles the list, constructs a dataframe using the shuffled list,

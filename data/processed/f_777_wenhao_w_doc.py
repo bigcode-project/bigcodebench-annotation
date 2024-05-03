@@ -1,7 +1,7 @@
 import pandas as pd
 import string
 
-def f_777(word):
+def f_91(word):
     """
     Creates a Pandas DataFrame from a single word, where each row contains a letter from the word 
     and its 1-based position in the alphabet.
@@ -18,13 +18,13 @@ def f_777(word):
       where 'Position' is the letter's position in the English alphabet.
     
     Examples:
-    >>> f_777('abc')
+    >>> f_91('abc')
       Letter  Position
     0      a         1
     1      b         2
     2      c         3
 
-    >>> f_777('zoo')
+    >>> f_91('zoo')
       Letter  Position
     0      z        26
     1      o        15
@@ -49,24 +49,24 @@ import pandas as pd
 class TestCases(unittest.TestCase):
     def test_abc(self):
         """Test with the word 'abc'."""
-        result = f_777('abc')
+        result = f_91('abc')
         expected = pd.DataFrame({'Letter': ['a', 'b', 'c'], 'Position': [1, 2, 3]})
         pd.testing.assert_frame_equal(result, expected)
     def test_xyz(self):
         """Test with the word 'xyz'."""
-        result = f_777('xyz')
+        result = f_91('xyz')
         expected = pd.DataFrame({'Letter': ['x', 'y', 'z'], 'Position': [24, 25, 26]})
         pd.testing.assert_frame_equal(result, expected)
     def test_mixed_case_error(self):
         """Test with a mixed case word, expecting a ValueError."""
         with self.assertRaises(ValueError):
-            f_777('AbC')
+            f_91('AbC')
     def test_non_alpha_error(self):
         """Test with a non-alphabetic word, expecting a ValueError."""
         with self.assertRaises(ValueError):
-            f_777('123')
+            f_91('123')
     def test_empty_string(self):
         """Test with an empty string, expecting an empty DataFrame."""
-        result = f_777('')
+        result = f_91('')
         expected = pd.DataFrame({'Letter': [], 'Position': []})
         pd.testing.assert_frame_equal(result, expected)

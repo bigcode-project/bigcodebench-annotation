@@ -7,9 +7,9 @@ SMTP_PORT = 587
 EMAIL_ADDRESS = "your.email@gmail.com"
 EMAIL_PASSWORD = "your.password"
 
-def f_225(input_data=None, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address=EMAIL_ADDRESS, email_password=EMAIL_PASSWORD, smtp=None):
+def f_87(input_data=None, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address=EMAIL_ADDRESS, email_password=EMAIL_PASSWORD, smtp=None):
     """
-    Extract recepient email address and names from JSON-formatted string and send the names in an email.
+    Extract recepient email address and names from JSON-formatted string and send the names in an email. The sent message should be in the format 'Subject: Extracted Names\n\nName1\nName2\n...'.
 
     Parameters:
     input_data (str): JSON-formatted string containing the recipient email address and the list of names.
@@ -29,7 +29,7 @@ def f_225(input_data=None, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_a
     >>> from unittest.mock import MagicMock
     >>> mock_smtp_instance = MagicMock()
     >>> mock_smtp = MagicMock(return_value=mock_smtp_instance)
-    >>> f_225('{"recipient": "recipient@example.com", "names": ["Josie Smith", "Mugsy Dog Smith"]}', smtp=mock_smtp)
+    >>> f_87('{"recipient": "recipient@example.com", "names": ["Josie Smith", "Mugsy Dog Smith"]}', smtp=mock_smtp)
     ['Josie Smith', 'Mugsy Dog Smith']
     """
      
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         mock_smtp.return_value = mock_smtp_instance
         
         # Call the function
-        result = f_225('{"recipient": "recipient@example.com", "names": ["Josie Smith", "Mugsy Dog Smith"]}')
+        result = f_87('{"recipient": "recipient@example.com", "names": ["Josie Smith", "Mugsy Dog Smith"]}')
         
         # Assert that SMTP was called with the right parameters
         mock_smtp.assert_called_once_with('smtp.gmail.com', 587)
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
         mock_smtp.return_value = mock_smtp_instance
         
         # Call the function
-        result = f_225('{"recipient": "names@gmail.com", "names": ["Josie Smith", "Mugsy Dog Smith"]}')
+        result = f_87('{"recipient": "names@gmail.com", "names": ["Josie Smith", "Mugsy Dog Smith"]}')
         
         # Assert that SMTP was called with the right parameters
         mock_smtp.assert_called_once_with('smtp.gmail.com', 587)
@@ -102,7 +102,7 @@ class TestCases(unittest.TestCase):
         custom_text = '{"recipient": "names@gmail.com", "names": []}'
         
         # Call the function with custom input
-        result = f_225(input_data=custom_text)
+        result = f_87(input_data=custom_text)
         # Assert the return value
         self.assertEqual(result, [])
     @patch('smtplib.SMTP')
@@ -114,7 +114,7 @@ class TestCases(unittest.TestCase):
         custom_text = '{"recipient": "change@gmail.com", "names": []}'
         
         # Call the function with custom input
-        result = f_225(input_data=custom_text)
+        result = f_87(input_data=custom_text)
         
         # Assert the return value
         self.assertEqual(result, [])
@@ -127,7 +127,7 @@ class TestCases(unittest.TestCase):
         custom_text = '{"recipient": "change@gmail.com", "names": ["Name 1", "Name 2"]}'
         
         # Call the function with custom input
-        result = f_225(input_data=custom_text, email_address="your.email.change@gmail.com", email_password="your.password.change")
+        result = f_87(input_data=custom_text, email_address="your.email.change@gmail.com", email_password="your.password.change")
         
         # Assert that SMTP was called with the right parameters
         mock_smtp.assert_called_once_with('smtp.gmail.com', 587)

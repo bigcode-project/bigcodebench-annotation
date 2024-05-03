@@ -10,6 +10,7 @@ from glob import glob
 from pprint import pprint
 from tqdm import tqdm
 
+
 def extract_apis(code):
     tree = ast.parse(code)
     api_list = []
@@ -167,6 +168,11 @@ def remove_trailing_comments(text):
     # Return the text up to and including the last non-comment line, joined back into a single string
     return '\n'.join(lines[:i+1])
 
+def evaluate_test_class(code):
+    exec_globals = {}
+    exec(code, exec_globals)
+    return 'TestCases' in exec_globals
+    
 def extract_test(file_contents, function_name):
     """
     Extracts the content after a specified function in a given Python script using the ast module,
@@ -231,10 +237,29 @@ def extract_test(file_contents, function_name):
     except Exception as e:
         return f"Error processing the script: {e}"
 
+def get_test_case_names(code):
+    # Parse the code to AST
+    root = ast.parse(code)
 
+    # Define a class to collect test case names
+    class TestCaseNameCollector(ast.NodeVisitor):
+        def __init__(self):
+            self.test_case_names = []
+
+        def visit_FunctionDef(self, node):
+            if node.name.startswith("test"):
+                self.test_case_names.append(node.name)
+            self.generic_visit(node)
+
+    # Create a collector object and visit nodes
+    collector = TestCaseNameCollector()
+    collector.visit(root)
+
+    # Return the list of test case names found
+    return collector.test_case_names
 
 def extract_content(file_path, rename_id=None):
-    data = {"file": file_path.split("/")[-1]}
+    data = {"task_id": file_path.split("/")[-1]}
     with open(file_path, 'r') as file:
             for line in file:
                 line = line.strip()
@@ -245,12 +270,12 @@ def extract_content(file_path, rename_id=None):
                     if end != -1:
                         function_name = line[start:end].strip()
                         if function_name.startswith("f_"):
-                            data["task_id"] = function_name
+                            data["entry_point"] = function_name
                             break
     with open(file_path, "r", encoding="utf-8") as f:
         if not rename_id:
-            rename_id = data["task_id"]
-        data["task_id"] = rename_id
+            rename_id = data["entry_point"]
+        data["entry_point"] = rename_id
         content = f.read().strip("\n").replace("AxesSubplot", "Axes").replace("matplotlib.axes._subplots", "matplotlib.axes._axes")
         content = content.replace(function_name, rename_id)
         
@@ -285,11 +310,12 @@ def extract_content(file_path, rename_id=None):
         else:
             data["canonical_solution"] = ""
     data["test"] = extract_test(content,function_name).strip()
+    data["test_case"] = get_test_case_names(data["test"])
     data["apis"] = extract_apis(data["prompt"] + "\n" + data["canonical_solution"])
     data["libs"] = list(set([api.split(".")[0] for api in data["apis"]]))
     _, unused_imports = filter_unused_imports(data["prompt"], data["libs"])
-    # if unused_imports:
-    #     print(f"Unused imports in {file_path.replace('clean/','raw/')}: {unused_imports}")
+    if unused_imports:
+        print(f"Unused imports in {file_path.replace('clean/','raw/')}: {unused_imports}")
     docs = re.search(r'\"\"\"(.*?)\"\"\"', data["prompt"], re.DOTALL)
     if not docs:
         docs = re.search(r"'''(.*?)'''", data["prompt"], re.DOTALL)
@@ -432,7 +458,7 @@ if __name__ == "__main__":
     os.makedirs("data/processed", exist_ok=True)
     with open("data/open-eval.jsonl", "w") as f:
         for i, file in enumerate(tqdm(glob("data/clean/*.py"))):
-            data = extract_content(file, None)
+            data = extract_content(file, f"f_{i}")
             if not validate_lib_num(data):
                 print(file.replace('clean/', 'raw/'), "Less than 2 libraries are used")
             if not validate_doc_example(data):
@@ -441,6 +467,8 @@ if __name__ == "__main__":
                 print(file.replace('clean/', 'raw/'), "Returns is missing")
             if not validate_doc_reqs(data):
                 print(file.replace('clean/', 'raw/'), "Requirements is missing")
+            if not evaluate_test_class(data["prompt"] + "\n\n" + data["test"]):
+                print(file.replace('clean/', 'raw/'), "TestCases class is missing")
             f.write(json.dumps(data) + "\n")
             file_name = file.split("/")[-1].split(".")[0]
             file_name = file_name + "_wo_doc" if check_test_wo_doc(data) else file_name + "_w_doc"

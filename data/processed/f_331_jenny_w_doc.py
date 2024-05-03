@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 
 
-def f_331(data, column="c"):
+def f_291(data, column="c"):
     """
     Removes a column from a given data dictionary and creates a heatmap
     of the correlation matrix of the remaining data. Non-numeric columns are
@@ -22,9 +22,9 @@ def f_331(data, column="c"):
     - seaborn
 
     Example:
-    >>> f_331({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
+    >>> f_291({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
     <Axes: >
-    >>> f_331(pd.DataFrame({'a': ["foo", "bar"]}))
+    >>> f_291(pd.DataFrame({'a': ["foo", "bar"]}))
     """
     df = pd.DataFrame(data)
     if column in df.columns:
@@ -58,7 +58,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             data
         )
-        ax = f_331(data)
+        ax = f_291(data)
         # Assert that column "c" is not in the heatmap
         self.assertNotIn("c", [col.get_text() for col in ax.get_xticklabels()])
         # Check plotted value correctness
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
         # Input: DataFrame without column "c".
         data = {"a": list(range(10)), "b": list(range(10))}
         df = pd.DataFrame(data)
-        ax = f_331(data)
+        ax = f_291(data)
         # Assert that columns "a" and "b" are in the heatmap
         self.assertIn("a", [col.get_text() for col in ax.get_xticklabels()])
         self.assertIn("b", [col.get_text() for col in ax.get_xticklabels()])
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             data
         )
-        ax = f_331(data, column="b")
+        ax = f_291(data, column="b")
         # Assert that column "b" is not in the heatmap
         self.assertNotIn("b", [col.get_text() for col in ax.get_xticklabels()])
         # Assert that other columns are in the heatmap
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             data
         )
-        ax = f_331(data)
+        ax = f_291(data)
         # Assert that only numeric column "a" is in the heatmap
         self.assertIn("a", [col.get_text() for col in ax.get_xticklabels()])
         self.assertNotIn("b", [col.get_text() for col in ax.get_xticklabels()])
@@ -117,7 +117,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             data
         )
-        ax = f_331(data)
+        ax = f_291(data)
         # Assert that columns "a" and "b" are in the heatmap and column "c" is not
         self.assertIn("a", [col.get_text() for col in ax.get_xticklabels()])
         self.assertIn("b", [col.get_text() for col in ax.get_xticklabels()])
@@ -126,7 +126,7 @@ class TestCases(unittest.TestCase):
         # Input: Empty DataFrame.
         data = {}
         df = pd.DataFrame(data)
-        ax = f_331(data)
+        ax = f_291(data)
         # Assert that the function returns None for an empty DataFrame
         self.assertIsNone(ax)
     def tearDown(self):

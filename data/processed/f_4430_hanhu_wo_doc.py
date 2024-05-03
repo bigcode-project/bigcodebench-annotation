@@ -4,7 +4,7 @@ import sys
 import subprocess
 
 
-def f_4432(filepath):
+def f_487(filepath):
     """
     Loads a DLL file specified by the given filepath, then retrieves and prints system information
     including system name, node name, release, version, machine, Python version, and PIP version.
@@ -35,9 +35,9 @@ def f_4432(filepath):
     - subprocess
 
     Examples:
-    >>> f_4432('libc.so.6') # Doctest will vary based on the system and DLL file.
+    >>> f_487('libc.so.6') # Doctest will vary based on the system and DLL file.
     'libc.so.6'
-    >>> isinstance(f_4432('libc.so.6'), str)
+    >>> isinstance(f_487('libc.so.6'), str)
     True
     """
     if not isinstance(filepath, str):
@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
         # Capture the output of print statements
         captured_output = io.StringIO()
         sys.stdout = captured_output
-        f_4432('libc.so.6')
+        f_487('libc.so.6')
         # Restore stdout
         sys.stdout = sys.__stdout__
         # Verify that the expected information is printed
@@ -97,21 +97,21 @@ class TestCases(unittest.TestCase):
         mock_cdll_instance = MagicMock()
         mock_cdll.return_value = mock_cdll_instance
         mock_cdll_instance._name = 'libc.so.6'  # Setting up the expected return value
-        # Invoke f_4432 with a filepath
+        # Invoke f_487 with a filepath
         filepath = 'libc.so.6'
-        result = f_4432(filepath)
+        result = f_487(filepath)
         # Check that the function returns a string and that the string is the name of the DLL
         self.assertIsInstance(result, str)  # Ensure the return type is string
         self.assertEqual(result, 'libc.so.6')  # Check if the name matches what's expected
     def test_invalid_file_path(self):
         with self.assertRaises(OSError):
-            f_4432('invalid_path.dll')
+            f_487('invalid_path.dll')
     def test_empty_file_path(self):
         with self.assertRaises(OSError):
-            f_4432('')
+            f_487('')
     def test_non_string_input(self):
         with self.assertRaises(TypeError):
-            f_4432(123)
+            f_487(123)
     def test_os_uname_output(self):
         filepath = 'libc.so.6'
         self.assertFalse('sysname' in os.uname())

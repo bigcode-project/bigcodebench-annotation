@@ -1,4 +1,8 @@
+import numpy as np
+import pandas as pd
+from dateutil.parser import parse
 DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
 
 def f_510(dates_str_list):
     """
@@ -16,10 +20,10 @@ def f_510(dates_str_list):
               of each weekday in the provided list.
 
     Requirements:
-    - datetime,
+    - datetime
     - dateutil.parser
     - numpy
-    - pandas.
+    - pandas
 
     Example:
     >>> f_510(['2022-10-22', '2022-10-23', '2022-10-24', '2022-10-25'])
@@ -39,18 +43,9 @@ def f_510(dates_str_list):
 
     return distribution
 
+
 import unittest
-
-import numpy as np
-import pandas as pd
-from dateutil.parser import parse
-
-DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-
 def run_tests():
-    # Constants for the test cases
-    DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()

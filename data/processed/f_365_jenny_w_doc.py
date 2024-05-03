@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd
 
 
-def f_365(data_str, separator=",", bins=20):
+def f_474(data_str, separator=",", bins=20):
     """
     Convert a string of numerical values separated by a specified separator into a pandas
-    integer series, and then draw a histogram of the data.
+    numerical series with int64, and then draw a histogram of the data.
 
     The function raises a ValueError if data is empty or it fails to convert the data.
     It plots the histogram with the following attributes:
@@ -28,7 +28,7 @@ def f_365(data_str, separator=",", bins=20):
     - pandas
 
     Example:
-    >>> series, ax = f_365('1,2,3,4,5,5,5,4,3,2,1')
+    >>> series, ax = f_474('1,2,3,4,5,5,5,4,3,2,1')
     >>> print(type(series), series.tolist())
     <class 'pandas.core.series.Series'> [1, 2, 3, 4, 5, 5, 5, 4, 3, 2, 1]
     >>> print(type(ax))
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
                 self.assertTrue(patch.get_height() >= 0)
     def test_case_1(self):
         # Test default case
-        series, ax = f_365(self.default_str)
+        series, ax = f_474(self.default_str)
         self.assertIsInstance(series, pd.Series)
         self.assertHistogramAttributes(series, ax)
         pd.testing.assert_series_equal(series, self.default_expected)
@@ -73,34 +73,34 @@ class TestCases(unittest.TestCase):
         # Test function works on different bin sizes
         for bins in [5, 10, 15, 30, 100]:
             with self.subTest(bins=bins):
-                series, ax = f_365(self.default_str, bins=bins)
+                series, ax = f_474(self.default_str, bins=bins)
                 self.assertIsInstance(series, pd.Series)
                 self.assertHistogramAttributes(series, ax)
                 pd.testing.assert_series_equal(series, self.default_expected)
     def test_case_3(self):
         # Test custom separators
         data_str = "1|2|3|4|5"
-        series, ax = f_365(data_str, separator="|")
+        series, ax = f_474(data_str, separator="|")
         self.assertIsInstance(series, pd.Series)
         self.assertHistogramAttributes(series, ax)
         pd.testing.assert_series_equal(series, pd.Series([1, 2, 3, 4, 5]))
     def test_case_4(self):
         # Test negative and zero
         data_str = "-5,-4,-3,-2,-1,0"
-        series, ax = f_365(data_str)
+        series, ax = f_474(data_str)
         self.assertIsInstance(series, pd.Series)
         self.assertHistogramAttributes(series, ax)
         pd.testing.assert_series_equal(series, pd.Series([-5, -4, -3, -2, -1, 0]))
     def test_case_5(self):
         # Test single item
         data_str = "1"
-        series, ax = f_365(data_str)
+        series, ax = f_474(data_str)
         self.assertIsInstance(series, pd.Series)
         self.assertHistogramAttributes(series, ax)
         pd.testing.assert_series_equal(series, pd.Series([1]))
     def test_case_6(self):
         # Test with float
-        series, ax = f_365("1.0,2.0,3.0,4.0,5.0,5.0,5.0,4.0,3.0,2.0,1.0")
+        series, ax = f_474("1.0,2.0,3.0,4.0,5.0,5.0,5.0,4.0,3.0,2.0,1.0")
         self.assertIsInstance(series, pd.Series)
         self.assertHistogramAttributes(series, ax)
         pd.testing.assert_series_equal(series, self.default_expected)
@@ -108,11 +108,11 @@ class TestCases(unittest.TestCase):
         # Test with empty string
         data_str = ""
         with self.assertRaises(ValueError):
-            f_365(data_str)
+            f_474(data_str)
     def test_case_8(self):
         # Test with invalid data (contains string)
         data_str = "a,b,c, 1"
         with self.assertRaises(ValueError):
-            f_365(data_str)
+            f_474(data_str)
     def tearDown(self):
         plt.close("all")

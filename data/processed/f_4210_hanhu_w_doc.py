@@ -3,7 +3,7 @@ import secrets
 import hashlib
 import base64
 
-def f_4212(num, from_base, to_base, alphabet):
+def f_469(num, from_base, to_base, alphabet):
     """
     Converts a number from one base to another, adds a random salt, hashes the result using SHA-256,
     and then encodes the hash in base64 using a custom alphabet. The function also returns the used salt.
@@ -34,13 +34,13 @@ def f_4212(num, from_base, to_base, alphabet):
     Examples:
     Convert a hexadecimal number to octal, hash it using SHA-256, and return the base64-encoded hash and salt using a custom alphabet.
     >>> alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/"
-    >>> encoded, salt = f_4212('A1', 16, 8, alphabet)
+    >>> encoded, salt = f_469('A1', 16, 8, alphabet)
     >>> isinstance(encoded, str) and isinstance(salt, str)
     True
 
     Verify that different invocations produce different results due to the random salt.
-    >>> result1, salt1 = f_4212('FF', 16, 8, alphabet)
-    >>> result2, salt2 = f_4212('FF', 16, 8, alphabet)
+    >>> result1, salt1 = f_469('FF', 16, 8, alphabet)
+    >>> result2, salt2 = f_469('FF', 16, 8, alphabet)
     >>> result1 != result2
     True
     """
@@ -69,19 +69,19 @@ class TestCases(unittest.TestCase):
         self.alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/"
     
     def test_base_conversion_and_hashing(self):
-        encoded, salt = f_4212('A1', 16, 8, self.alphabet)
+        encoded, salt = f_469('A1', 16, 8, self.alphabet)
         self.assertTrue(isinstance(encoded, str))
         self.assertTrue(isinstance(salt, str))
     def test_different_salts_different_hashes(self):
-        result1, salt1 = f_4212('FF', 16, 8, self.alphabet)
-        result2, salt2 = f_4212('FF', 16, 8, self.alphabet)
+        result1, salt1 = f_469('FF', 16, 8, self.alphabet)
+        result2, salt2 = f_469('FF', 16, 8, self.alphabet)
         self.assertNotEqual(result1, result2)
     def test_invalid_number_format(self):
         with self.assertRaises(ValueError):
-            f_4212('G', 16, 8, self.alphabet)
+            f_469('G', 16, 8, self.alphabet)
     def test_invalid_from_base(self):
         with self.assertRaises(ValueError):
-            f_4212('10', 1, 8, self.alphabet)
+            f_469('10', 1, 8, self.alphabet)
     def test_invalid_to_base(self):
         with self.assertRaises(ValueError):
-            f_4212('10', 10, 1, self.alphabet)
+            f_469('10', 10, 1, self.alphabet)

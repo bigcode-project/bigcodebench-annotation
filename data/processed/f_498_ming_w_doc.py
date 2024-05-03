@@ -10,7 +10,7 @@ STUDENTS = ['Student' + str(i) for i in range(1, 101)]
 COURSES = ['Course' + str(i) for i in range(1, 6)]
 
 
-def f_498(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
+def f_541(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
     """
     Generate a Pandas DataFrame that displays the grades of a randomly selected group of students in multiple courses.
     Calculate the average grade in each course, the number of students with a passing grade (>= 60), 
@@ -27,9 +27,10 @@ def f_498(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
     - numpy
     - matplotlib.pyplot
     - random
+    - typing
 
     Example:
-    >>> df, ax = f_498(50)
+    >>> df, ax = f_541(50)
     >>> ax.get_title()
     'Course-wise Average and Passing Grade Counts'
     """
@@ -50,14 +51,11 @@ def f_498(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
     return df, ax
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
         # Test with 10 students
-        df, ax = f_498(10)
+        df, ax = f_541(10)
         
         # Check DataFrame dimensions
         self.assertEqual(df.shape, (10, 5))
@@ -67,7 +65,7 @@ class TestCases(unittest.TestCase):
     
     def test_case_2(self):
         # Test with 50 students
-        df, ax = f_498(50)
+        df, ax = f_541(50)
         
         # Check DataFrame dimensions
         self.assertEqual(df.shape, (50, 5))
@@ -77,7 +75,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_3(self):
         # Test with 100 students
-        df, ax = f_498(100)
+        df, ax = f_541(100)
         
         # Check DataFrame dimensions
         self.assertEqual(df.shape, (100, 5))
@@ -87,7 +85,7 @@ class TestCases(unittest.TestCase):
     
     def test_case_4(self):
         # Test with 1 student
-        df, ax = f_498(1)
+        df, ax = f_541(1)
         
         # Check DataFrame dimensions
         self.assertEqual(df.shape, (1, 5))
@@ -97,7 +95,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_5(self):
         # Test with 5 students
-        df, ax = f_498(5)
+        df, ax = f_541(5)
         
         # Check DataFrame dimensions
         self.assertEqual(df.shape, (5, 5))

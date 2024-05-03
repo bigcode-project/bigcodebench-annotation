@@ -15,8 +15,14 @@ def f_438(a, b):
     Requirements:
     - numpy
     - pandas
-    - scipy.stats
-    - matplotlib
+    - scipy
+    - matplotlib.pyplot
+
+    Returns:
+    - tuple: Contains two elements:
+        - float: The Pearson correlation coefficient.
+        - matplotlib.axes.Axes: The Axes object of the plotted scatter plot with a regression line.
+
 
     Example:
     >>> correlation, ax = f_438([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
@@ -33,14 +39,10 @@ def f_438(a, b):
     plt.show()
     return correlation, plt.gca()
 
+
 import unittest
 import math
 import matplotlib
-
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-# Constants
 
 
 class TestCases(unittest.TestCase):

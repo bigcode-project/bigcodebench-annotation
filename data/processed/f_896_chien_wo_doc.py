@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 STOP_WORDS = ["a", "an", "the", "in", "on", "at", "and", "or"]
 
 
-def f_896(file_path, save_path=None):
+def f_606(file_path, save_path=None):
     """
     This function processes a text dataset from a CSV file, performs text vectorization while excluding specific
     stopwords, and creates a histogram of the ten most common words. The function is robust to different input
@@ -29,9 +29,9 @@ def f_896(file_path, save_path=None):
     - matplotlib
 
     Examples:
-    >>> ax = f_896('text_data.csv')
+    >>> ax = f_606('text_data.csv')
     # ax is the matplotlib Axes object for the plot
-    >>> result = f_896('text_data.csv', 'output_plot.png')
+    >>> result = f_606('text_data.csv', 'output_plot.png')
     # result is None, and the plot is saved to 'output_plot.png'
     """
     df = pd.read_csv(file_path, header=None, names=["Text"])
@@ -68,14 +68,14 @@ import unittest
 from unittest.mock import patch
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for f_896"""
+    """Test cases for f_606"""
     @patch("pandas.read_csv")
     def test_empty_csv(self, mock_read_csv):
         """
         Test with an empty CSV file. Checks if the function handles empty data gracefully.
         """
         mock_read_csv.return_value = pd.DataFrame(columns=["Text"])
-        result = f_896("dummy_path.csv")
+        result = f_606("dummy_path.csv")
         self.assertIsNone(result, "The function should return None for empty data")
     @patch("pandas.read_csv")
     def test_single_line_csv(self, mock_read_csv):
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
         Test with a CSV file containing a single line of text. Verifies correct handling of minimal data.
         """
         mock_read_csv.return_value = pd.DataFrame({"Text": ["test"]})
-        ax = f_896("dummy_path.csv")
+        ax = f_606("dummy_path.csv")
         self.assertEqual(
             len(ax.patches),
             1,
@@ -95,7 +95,7 @@ class TestCases(unittest.TestCase):
         Test to ensure that stop words are correctly removed from the text.
         """
         mock_read_csv.return_value = pd.DataFrame({"Text": ["a test"]})
-        ax = f_896("dummy_path.csv")
+        ax = f_606("dummy_path.csv")
         x_labels = [label.get_text() for label in ax.get_xticklabels()]
         self.assertNotIn("a", x_labels, "Stop words should not appear in the histogram")
     @patch("pandas.read_csv")
@@ -105,7 +105,7 @@ class TestCases(unittest.TestCase):
         Test the functionality of saving the plot to a file.
         """
         mock_read_csv.return_value = pd.DataFrame({"Text": ["save test"]})
-        f_896("dummy_path.csv", "output.png")
+        f_606("dummy_path.csv", "output.png")
         mock_savefig.assert_called_with("output.png")
     @patch("pandas.read_csv")
     def test_multiple_lines_csv(self, mock_read_csv):
@@ -113,7 +113,7 @@ class TestCases(unittest.TestCase):
         Test with a CSV file containing multiple lines of text. Checks for correct handling of multiline data.
         """
         mock_read_csv.return_value = pd.DataFrame({"Text": ["test1", "test2"]})
-        ax = f_896("dummy_path.csv")
+        ax = f_606("dummy_path.csv")
         self.assertEqual(
             len(ax.patches),
             2,

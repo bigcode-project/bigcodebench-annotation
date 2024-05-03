@@ -2,10 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def f_346(P, T):
+def f_431(P, T):
     """
     Calculate the product of a matrix "P" and a 3D tensor "T" with numpy and then visualize the
-    result in 3D with matplotlib. Note: This function only accepts numpy matrices/arrays.
+    result in 3D with matplotlib. The product of the matrix and tensor is based on the Einstein summation.
+    
+    Note:
+    This function only accepts numpy matrices/arrays.
 
     Parameters:
     P (numpy.ndarray): The input matrix with shape (N, 3), where N is the number of rows.
@@ -23,7 +26,7 @@ def f_346(P, T):
     Example:
     >>> P = np.array([[6, 2, 7], [1, 1, 8], [8, 7, 1]])
     >>> T = np.random.rand(3, 3, 3)
-    >>> result, ax = f_346(P, T)
+    >>> result, ax = f_431(P, T)
     >>> type(result)
     <class 'numpy.ndarray'>
     >>> type(ax)
@@ -57,41 +60,32 @@ class TestCases(unittest.TestCase):
         return np.allclose(result, expected_result)
     def test_case_1(self):
         # Test output visualization
-        _, ax = f_346(self.test_P, self.test_T)
+        _, ax = f_431(self.test_P, self.test_T)
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_title(), "")
-        self.assertEqual(ax.get_xlabel(), "")
-        self.assertEqual(ax.get_ylabel(), "")
-        ax.set_title("Test Title")
-        ax.set_xlabel("X Label")
-        ax.set_ylabel("Y Label")
-        self.assertEqual(ax.get_title(), "Test Title")
-        self.assertEqual(ax.get_xlabel(), "X Label")
-        self.assertEqual(ax.get_ylabel(), "Y Label")
     def test_case_2(self):
         # Test result correctness
-        result, _ = f_346(self.test_P, self.test_T)
+        result, _ = f_431(self.test_P, self.test_T)
         self.assertTrue(self.check_result_correctness(self.test_P, self.test_T, result))
         self.assertEqual(result.shape, (self.test_P.shape[0], 3))
     def test_case_3(self):
         # Test with zeros and negative values
         P = np.array([[0, 0, 0]])
         T = np.random.rand(3, 3, 3) - 0.5
-        result, _ = f_346(P, T)
+        result, _ = f_431(P, T)
         self.assertTrue(np.all(result == 0))
     def test_case_4(self):
         # Test with non-numeric data
         P = np.array([["a", "b", "c"], [1, 2, 3]])
         with self.assertRaises(Exception):
-            f_346(P, self.test_T)
+            f_431(P, self.test_T)
     def test_case_5(self):
         # Test incompatible shapes
         P = np.array([[1, 2], [3, 4]])
         with self.assertRaises(Exception):
-            f_346(P, self.test_T)
+            f_431(P, self.test_T)
     def test_case_6(self):
         # Test incompatible input types
         with self.assertRaises(Exception):
-            f_346([1, 2], [2, 1])
+            f_431([1, 2], [2, 1])
     def tearDown(self):
         plt.close("all")

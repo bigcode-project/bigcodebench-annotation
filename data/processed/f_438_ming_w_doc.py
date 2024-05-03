@@ -4,7 +4,7 @@ import pandas as pd
 from scipy import stats
 
 
-def f_438(a, b):
+def f_516(a, b):
     """
     Calculate the Pearson correlation coefficient of two lists, generate a Pandas DataFrame from these lists, and then draw a scatter plot with a regression line.
 
@@ -15,11 +15,17 @@ def f_438(a, b):
     Requirements:
     - numpy
     - pandas
-    - scipy.stats
-    - matplotlib
+    - scipy
+    - matplotlib.pyplot
+
+    Returns:
+    - tuple: Contains two elements:
+        - float: The Pearson correlation coefficient.
+        - matplotlib.axes.Axes: The Axes object of the plotted scatter plot with a regression line.
+
 
     Example:
-    >>> correlation, ax = f_438([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
+    >>> correlation, ax = f_516([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
     >>> isinstance(correlation, float) and isinstance(ax, matplotlib.axes.Axes)
     True
     >>> round(correlation, 1)
@@ -36,27 +42,23 @@ def f_438(a, b):
 import unittest
 import math
 import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
-# Constants
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        correlation, ax = f_438([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
+        correlation, ax = f_516([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
         self.assertAlmostEqual(correlation, 1.0)
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_case_2(self):
-        correlation, ax = f_438([1, 1, 1, 1, 1], [1, 1, 1, 1, 1])
+        correlation, ax = f_516([1, 1, 1, 1, 1], [1, 1, 1, 1, 1])
         self.assertTrue(math.isnan(correlation))
     def test_case_3(self):
-        correlation, ax = f_438([1, 2, 3, 4, 5], [5, 4, 3, 2, 1])
+        correlation, ax = f_516([1, 2, 3, 4, 5], [5, 4, 3, 2, 1])
         self.assertAlmostEqual(correlation, -1.0)
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_case_4(self):
-        correlation, ax = f_438([2, 4, 6, 8, 10], [1, 2, 3, 4, 5])
+        correlation, ax = f_516([2, 4, 6, 8, 10], [1, 2, 3, 4, 5])
         self.assertAlmostEqual(correlation, 1.0)
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_case_5(self):
-        correlation, ax = f_438([1, 3, 5, 7, 9], [9, 7, 5, 3, 1])
+        correlation, ax = f_516([1, 3, 5, 7, 9], [9, 7, 5, 3, 1])
         self.assertAlmostEqual(correlation, -1.0)
         self.assertIsInstance(ax, matplotlib.axes.Axes)

@@ -1,6 +1,4 @@
-
 import re
-
 from nltk.corpus import stopwords
 
 
@@ -17,6 +15,7 @@ def f_494(text: str) -> dict:
 
     Requirements:
     - re
+    - nltk.corpus
 
     Note:
     - A manually defined set of common English stopwords is used for filtering.

@@ -3,7 +3,7 @@ from statistics import mean
 import pandas as pd
 
 
-def f_488(products_list):
+def f_155(products_list):
     """
     Generate a DataFrame of sales data for a list of products.
     
@@ -24,7 +24,7 @@ def f_488(products_list):
     
     Example:
     >>> products = ['Apples', 'Bananas', 'Grapes', 'Oranges', 'Pineapples']
-    >>> sales_data = f_488(products)
+    >>> sales_data = f_155(products)
     >>> type(sales_data)
     <class 'pandas.core.frame.DataFrame'>
     """
@@ -41,14 +41,11 @@ def f_488(products_list):
     return sales_df
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test with a single product
         products = ["Apples"]
-        sales_data = f_488(products)
+        sales_data = f_155(products)
         
         # Checking if returned DataFrame has the correct structure
         expected_columns = ['Product'] + [f'Month {i+1}' for i in range(12)] + ['Average Sales']
@@ -63,20 +60,20 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test with multiple products
         products = ["Apples", "Bananas", "Grapes"]
-        sales_data = f_488(products)
+        sales_data = f_155(products)
         self.assertEqual(len(sales_data), 3)
     def test_case_3(self):
         # Test with no products
         products = []
-        sales_data = f_488(products)
+        sales_data = f_155(products)
         self.assertEqual(len(sales_data), 0)
     def test_case_4(self):
         # Test with a long product name
         products = ["A" * 100]
-        sales_data = f_488(products)
+        sales_data = f_155(products)
         self.assertEqual(sales_data['Product'].iloc[0], "A" * 100)
     def test_case_5(self):
         # Test with products having special characters
         products = ["@pples", "!Bananas", "#Grapes"]
-        sales_data = f_488(products)
+        sales_data = f_155(products)
         self.assertTrue(all(item in sales_data['Product'].tolist() for item in products))

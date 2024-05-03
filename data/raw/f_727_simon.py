@@ -101,7 +101,7 @@ from sklearn.linear_model import LinearRegression
 class TestCases(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         np.random.seed(0)  # Set a seed for reproducibility
 
     def test_normal_case(self):

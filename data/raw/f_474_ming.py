@@ -59,9 +59,8 @@ def f_474_and_plot(goals, penalties):
 
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
+
 # Unit Tests
 class TestCases(unittest.TestCase):
     def test_no_goals_no_penalties(self):

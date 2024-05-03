@@ -20,6 +20,9 @@ def f_252(n_data_points=5000, min_value=0.0, max_value=10.0):
     Returns:
     DataFrame: A pandas DataFrame with the normalized data.
     
+    Raises:
+    If max_value is less than min_value, a ValueError is raised.
+    
     Note:
     - The function use "Normalized Value" for the column name in the DataFrame that being returned.
 

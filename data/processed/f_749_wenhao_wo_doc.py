@@ -1,13 +1,9 @@
 import os
 import re
 
-def f_749(pattern: str, replacement: str, directory: str) -> bool:
+def f_362(pattern: str, replacement: str, directory: str) -> bool:
     """
     Renames all files in a directory that match a particular pattern with a given replacement string.
-    
-    Functionality:
-        - Searches for files in the specified directory whose names contain the given pattern.
-        - Renames those files by replacing the pattern with the given replacement string.
     
     Parameters:
         - pattern (str): The pattern to search for in the filenames.
@@ -22,9 +18,9 @@ def f_749(pattern: str, replacement: str, directory: str) -> bool:
     - os
 
     Examples:
-    >>> f_749('draft', 'final', '/home/user/documents')
+    >>> f_362('draft', 'final', '/home/user/documents')
     True
-    >>> f_749('tmp', 'temp', '/home/user/downloads')
+    >>> f_362('tmp', 'temp', '/home/user/downloads')
     False
     """
     try:
@@ -52,9 +48,9 @@ class TestCases(unittest.TestCase):
         for filename in filenames:
             Path(f"{self.test_dir}/{filename}").touch()
     
-    def test_renaming_files(self):
+    def test_rena_files(self):
         self.create_test_files(["draft1.txt", "draft2.txt", "draft3.txt"])
-        result = f_749("draft", "final", self.test_dir)
+        result = f_362("draft", "final", self.test_dir)
         self.assertTrue(result)
         expected_files = sorted(["final1.txt", "final2.txt", "final3.txt"])
         actual_files = sorted(os.listdir(self.test_dir))
@@ -62,24 +58,24 @@ class TestCases(unittest.TestCase):
         
     def test_no_matching_files(self):
         self.create_test_files(["file1.txt", "file2.txt", "file3.txt"])
-        result = f_749("draft", "final", self.test_dir)
+        result = f_362("draft", "final", self.test_dir)
         self.assertTrue(result)
         expected_files = sorted(["file1.txt", "file2.txt", "file3.txt"])
         actual_files = sorted(os.listdir(self.test_dir))
         self.assertEqual(expected_files, actual_files)
         
     def test_nonexistent_directory(self):
-        result = f_749("draft", "final", "/nonexistent/directory")
+        result = f_362("draft", "final", "/nonexistent/directory")
         self.assertFalse(result)
         
     def test_empty_directory(self):
-        result = f_749("draft", "final", self.test_dir)
+        result = f_362("draft", "final", self.test_dir)
         self.assertTrue(result)
         self.assertEqual([], os.listdir(self.test_dir))
         
-    def test_complex_pattern_renaming(self):
+    def test_complex_pattern_rena(self):
         self.create_test_files(["draft_file1.txt", "file_draft2.txt", "draft3file.txt"])
-        result = f_749("draft", "final", self.test_dir)
+        result = f_362("draft", "final", self.test_dir)
         self.assertTrue(result)
         expected_files = sorted(["final_file1.txt", "file_final2.txt", "final3file.txt"])
         actual_files = sorted(os.listdir(self.test_dir))

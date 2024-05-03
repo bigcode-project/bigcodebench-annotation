@@ -8,7 +8,7 @@ HEADERS = {
     'accept': 'application/json'
 }
 
-def f_237(url, parameters):
+def f_292(url, parameters):
     """
     Retrieve data from a specific API endpoint with the provided parameters, 
     convert the data into a pandas dataframe, and draw a heatmap to show 
@@ -25,7 +25,7 @@ def f_237(url, parameters):
         - Axes: The matplotlib Axes object of the heatmap.
 
     Raises:
-    - Thif function will raise an Expection if the url is invalid, empty data, invalid data, and url cannot be accessed.
+    - Thif function will raise a general Expection if the url is invalid, empty data, invalid data, and url cannot be accessed.
 
     Requirements:
     - requests
@@ -34,7 +34,7 @@ def f_237(url, parameters):
     - seaborn
 
     Example:
-    >>> df, ax = f_237('https://api.example.com/data', {'param1': 'value1'})
+    >>> df, ax = f_292('https://api.example.com/data', {'param1': 'value1'})
     >>> df.iloc[0]['data']
     1
     """
@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = mock_response
         url = 'https://api.example.com/data'
         params = {'param1': 'value1'}
-        df, ax = f_237(url, params)
+        df, ax = f_292(url, params)
         self.assertIsNotNone(df)
         self.assertIsNotNone(ax)
         # Check the content of the DataFrame
@@ -82,14 +82,14 @@ class TestCases(unittest.TestCase):
         url = 'https://api.example.com/empty_data'
         params = {'param1': 'value1'}
         with self.assertRaises(Exception):
-            f_237(url, params)
+            f_292(url, params)
     @patch('requests.get')
     def test_invalid_url(self, mock_get):
         mock_get.side_effect = requests.exceptions.RequestException
         url = 'https://api.invalid.com/data'
         params = {'param1': 'value1'}
         with self.assertRaises(Exception):
-            f_237(url, params)
+            f_292(url, params)
     @patch('requests.get')
     def test_invalid_json_response(self, mock_get):
         mock_response = Mock()
@@ -98,14 +98,14 @@ class TestCases(unittest.TestCase):
         url = 'https://api.example.com/invalid_json'
         params = {'param1': 'value1'}
         with self.assertRaises(Exception):
-            f_237(url, params)
+            f_292(url, params)
     @patch('requests.get')
     def test_valid_request_with_no_params(self, mock_get):
         mock_response = Mock()
         mock_response.text = '{"data": [1, 2, 3, 4, 5]}'
         mock_get.return_value = mock_response
         url = 'https://api.example.com/data'
-        df, ax = f_237(url, {})
+        df, ax = f_292(url, {})
         self.assertIsNotNone(df)
         self.assertIsNotNone(ax)
     @patch('requests.get')
@@ -116,7 +116,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = mock_response
         url = 'https://api.example.com/data'
         params = {'param1': 'value1'}
-        df, ax = f_237(url, params)
+        df, ax = f_292(url, params)
         self.assertTrue(hasattr(ax, 'get_xlabel'))
         self.assertTrue(hasattr(ax, 'get_ylabel'))
         self.assertTrue(hasattr(ax, 'get_title'))

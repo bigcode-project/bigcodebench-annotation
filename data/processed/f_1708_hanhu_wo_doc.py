@@ -1,22 +1,15 @@
 import random
 import string
-from django.conf import settings
 from django.http import HttpResponse
-# Configure Django settings if not already configured
-if not settings.configured:
-    settings.configure(
-        DEFAULT_CHARSET='utf-8',
-        SECRET_KEY='a-very-secret-key',
-    )
 
 
-def f_1709(request, session_expire_time):
+def f_305(request, session_expire_time):
     """
     This function creates a random session key comprising letters and digits with a specific length of 20,
     then sets this key in a cookie on an HttpResponse object with the specified expiration time.
 
     Parameters:
-    request (django.http.HttpRequest): The incoming Django HttpRequest.
+    request (django.http.HttpRequest): The inco Django HttpRequest.
     session_expire_time (int): The expiration time for the session cookie in seconds.
 
     Returns:
@@ -36,7 +29,7 @@ def f_1709(request, session_expire_time):
     >>> if not settings.configured:
     ...     settings.configure()
     >>> request = HttpRequest()
-    >>> response = f_1709(request, 60)
+    >>> response = f_305(request, 60)
     >>> 'session_key' in response.cookies
     True
     >>> len(response.cookies['session_key'].value) == 20
@@ -64,13 +57,20 @@ def f_1709(request, session_expire_time):
 import unittest
 from unittest.mock import patch
 from django.http import HttpRequest
+from django.conf import settings
+# Configure Django settings if not already configured
+if not settings.configured:
+    settings.configure(
+        DEFAULT_CHARSET='utf-8',
+        SECRET_KEY='a-very-secret-key',
+    )
 class TestCases(unittest.TestCase):
     @patch('random.choices')
     def test_session_key_in_cookies(self, mock_random_choices):
         """Test if 'session_key' is set in the response cookies with the correct expiration."""
         mock_random_choices.return_value = ['1a'] * 10  # Mock session key as 'aaaaaaaaaaaaaaaaaaaa'
         request = HttpRequest()
-        response = f_1709(request, 60)  # pass the session_expire_time
+        response = f_305(request, 60)  # pass the session_expire_time
         self.assertIn('session_key', response.cookies)
         self.assertEqual(response.cookies['session_key']['max-age'], 60)
     @patch('random.choices')
@@ -78,21 +78,21 @@ class TestCases(unittest.TestCase):
         """Test if the length of 'session_key' is 20."""
         mock_random_choices.return_value = ['1a'] * 10
         request = HttpRequest()
-        response = f_1709(request, 60)  # pass the session_expire_time
+        response = f_305(request, 60)  # pass the session_expire_time
         self.assertEqual(len(response.cookies['session_key'].value), 20)
     @patch('random.choices')
     def test_response_content(self, mock_random_choices):
         """Test if the response content includes the expected message."""
         mock_random_choices.return_value = ['1a'] * 10
         request = HttpRequest()
-        response = f_1709(request, 60)  # pass the session_expire_time
+        response = f_305(request, 60)  # pass the session_expire_time
         self.assertIn('Session key generated successfully.', response.content.decode())
     @patch('random.choices')
     def test_response_type(self, mock_random_choices):
         """Test if the response object is of type HttpResponse."""
         mock_random_choices.return_value = ['1a'] * 10
         request = HttpRequest()
-        response = f_1709(request, 60)  # pass the session_expire_time
+        response = f_305(request, 60)  # pass the session_expire_time
         self.assertIsInstance(response, HttpResponse)
     @patch('random.choices')
     def test_raise_error(self, mock_random_choices):
@@ -100,14 +100,14 @@ class TestCases(unittest.TestCase):
         mock_random_choices.return_value = ['a'] * 20  # Only letters, no digits
         request = HttpRequest()
         with self.assertRaises(ValueError):
-            f_1709(request, 60)  # pass the session_expire_time
+            f_305(request, 60)  # pass the session_expire_time
     @patch('random.choices')
     def test_valid_session_key(self, mock_random_choices):
         """Test if the function completes without error when session key is valid."""
         # Ensure the mock session key always contains both letters and digits
         mock_random_choices.return_value = list('A1' * 10)  # This creates a string 'A1A1A1A1A1A1A1A1A1A1'
         request = HttpRequest()
-        response = f_1709(request, 60)  # pass the session_expire_time
+        response = f_305(request, 60)  # pass the session_expire_time
         self.assertEqual(len(response.cookies['session_key'].value), 20)
         self.assertTrue(any(char.isalpha() for char in response.cookies['session_key'].value))
         self.assertTrue(any(char.isdigit() for char in response.cookies['session_key'].value))

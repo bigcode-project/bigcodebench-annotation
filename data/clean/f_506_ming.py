@@ -1,5 +1,4 @@
 import os
-
 import pandas as pd
 
 
@@ -47,27 +46,25 @@ def f_506(filename: str) -> pd.DataFrame:
 import unittest
 import shutil
 
-class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.current_dir = os.path.dirname(os.path.abspath(__file__))
-        cls.test_data_dir = os.path.join(cls.current_dir, 'test_data')
-        if not os.path.exists(cls.test_data_dir):
-            os.makedirs(cls.test_data_dir)
 
-        cls.test_file = os.path.join(cls.test_data_dir, 'test.csv')
-        with open(cls.test_file, 'w') as f:
+class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.output_dir = './output'
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
+        self.test_file = os.path.join(self.output_dir, 'test.csv')
+        with open(self.test_file, 'w') as f:
             f.write("col1,col2\n1,2\n3,4")
 
         # Debugging: Verify file content immediately after writing
-        with open(cls.test_file, 'r') as f:
+        with open(self.test_file, 'r') as f:
             content = f.read()
-        print(f"Debug: Content written to {cls.test_file}: {content}")
+        print(f"Debug: Content written to {self.test_file}: {content}")
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Clean up by removing the test file and the test_data directory
-        shutil.rmtree(cls.test_data_dir, ignore_errors=True)
+        shutil.rmtree(self.output_dir, ignore_errors=True)
 
     def test_file_not_found(self):
         """Test the function with a filename that does not exist."""
@@ -95,7 +92,7 @@ class TestCases(unittest.TestCase):
 
     def test_handling_non_existent_file(self):
         """Test the function's response to being given a non-existent file path."""
-        non_existent_file = os.path.join(self.test_data_dir, 'non_existent.csv')
+        non_existent_file = os.path.join(self.output_dir, 'non_existent.csv')
         with self.assertRaises(FileNotFoundError, msg="Expected FileNotFoundError for non-existent file."):
             _ = f_506(non_existent_file)
 

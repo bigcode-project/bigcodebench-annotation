@@ -4,7 +4,7 @@ import urllib.parse
 import codecs
 
 
-def f_833(hex_string):
+def f_654(hex_string):
     """
     Convert a hexadecimal string to various encodings.
 
@@ -29,10 +29,10 @@ def f_833(hex_string):
     - codecs
 
     Example:
-    >>> f_833("4a4b4c")
+    >>> f_654("4a4b4c")
     {'hex': '4a4b4c', 'base64': 'SktM', 'utf-8': 'JKL', 'utf-16': 'JKL', 'utf-32': 'JKL', 'ASCII': 'JKL', 'URL': 'JKL', 'ROT13': 'WXY'}
 
-    >>> f_833("68656c6c6f")
+    >>> f_654("68656c6c6f")
     {'hex': '68656c6c6f', 'base64': 'aGVsbG8=', 'utf-8': 'hello', 'utf-16': 'hello', 'utf-32': 'hello', 'ASCII': 'hello', 'URL': 'hello', 'ROT13': 'uryyb'}
     """
     encodings = {}
@@ -71,11 +71,11 @@ def f_833(hex_string):
 
 import unittest
 class TestCases(unittest.TestCase):
-    """Test cases for f_833"""
+    """Test cases for f_654"""
     def test_hex_string_sample(self):
         """Test the sample input from the problem description."""
         hex_str = "4a4b4c"
-        result = f_833(hex_str)
+        result = f_654(hex_str)
         self.assertEqual(result["hex"], hex_str)
         self.assertEqual(result["base64"], "SktM")
         self.assertEqual(result["utf-8"], "JKL")
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
     def test_hex_string_1(self):
         """Test a hex string with a mix of letters and numbers."""
         hex_str = "68656c6c6f"
-        result = f_833(hex_str)
+        result = f_654(hex_str)
         self.assertEqual(result["hex"], hex_str)
         self.assertEqual(result["base64"], "aGVsbG8=")
         self.assertEqual(result["utf-8"], "hello")
@@ -99,7 +99,7 @@ class TestCases(unittest.TestCase):
     def test_hex_string_2(self):
         """Test a hex string with a mix of letters and numbers."""
         hex_str = "776f726c64"
-        result = f_833(hex_str)
+        result = f_654(hex_str)
         self.assertEqual(result["hex"], hex_str)
         self.assertEqual(result["base64"], "d29ybGQ=")
         self.assertEqual(result["utf-8"], "world")
@@ -111,7 +111,7 @@ class TestCases(unittest.TestCase):
     def test_hex_string_3(self):
         """Test a hex string with a mix of letters and numbers."""
         hex_str = "616263"
-        result = f_833(hex_str)
+        result = f_654(hex_str)
         self.assertEqual(result["hex"], hex_str)
         self.assertEqual(result["base64"], "YWJj")
         self.assertEqual(result["utf-8"], "abc")
@@ -123,7 +123,7 @@ class TestCases(unittest.TestCase):
     def test_hex_string_4(self):
         """Test a hex string with a mix of letters and numbers."""
         hex_str = "313233"
-        result = f_833(hex_str)
+        result = f_654(hex_str)
         self.assertEqual(result["hex"], hex_str)
         self.assertEqual(result["base64"], "MTIz")
         self.assertEqual(result["utf-8"], "123")
@@ -135,7 +135,7 @@ class TestCases(unittest.TestCase):
     def test_hex_string_non_ascii(self):
         """Test a hex string with non-ASCII characters."""
         hex_str = "c3a9"
-        result = f_833(hex_str)
+        result = f_654(hex_str)
         self.assertEqual(result["hex"], hex_str)
         self.assertEqual(result["base64"], "w6k=")
         self.assertEqual(result["utf-8"], "é")

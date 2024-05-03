@@ -7,7 +7,7 @@ STUDENTS = ['Joe', 'Amy', 'Mark', 'Sara', 'John', 'Emily', 'Zoe', 'Matt']
 COURSES = ['Math', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Geography', 'Computer Science']
 
 
-def f_204():
+def f_398():
     """
     Generates a DataFrame containing random grades for a predefined list of students across a set of courses.
     Each student will have one grade per course and an average grade calculated across all courses.
@@ -26,7 +26,7 @@ def f_204():
 
     Example:
     >>> random.seed(0)
-    >>> grades = f_204()
+    >>> grades = f_398()
     >>> print(grades[['Name', 'Average Grade']].to_string(index=False))
      Name  Average Grade
       Joe         51.875
@@ -57,9 +57,9 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         random.seed(0)
         # Correctly set up the mock within the test execution context
-        self.patcher = patch('random.randint', side_effect=[i % 100 for i in range(800)])  # Assuming 8 students and 100 course entries
+        self.patcher = patch('random.randint', side_effect=[i % 100 for i in range(800)])  # Assu 8 students and 100 course entries
         self.mock_randint = self.patcher.start()
-        self.grades_df = f_204()
+        self.grades_df = f_398()
         self.patcher.stop()
     def test_dataframe_columns(self):
         # Ensure the DataFrame contains the correct columns

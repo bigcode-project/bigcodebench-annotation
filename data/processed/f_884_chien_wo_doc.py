@@ -4,7 +4,7 @@ import queue
 from datetime import datetime, timedelta
 
 
-def f_884(
+def f_653(
     server_address="localhost", server_port=12345, buffer_size=1024, run_duration=5
 ):
     """
@@ -26,7 +26,7 @@ def f_884(
     - datetime
 
     Example:
-    >>> print(f_884())
+    >>> print(f_653())
     'Server started on localhost:12345. Ran for 5 seconds.'
     """
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -81,11 +81,11 @@ import socket
 import time
 import threading
 class TestCases(unittest.TestCase):
-    """Test cases for the f_884 function."""
+    """Test cases for the f_653 function."""
     def setUp(self):
         # Start the server in a separate thread
         self.server_thread = threading.Thread(
-            target=f_884, args=("localhost", 12345, 1024, 10)
+            target=f_653, args=("localhost", 12345, 1024, 10)
         )
         self.server_thread.start()
         time.sleep(1)
@@ -127,7 +127,7 @@ class TestCases(unittest.TestCase):
                 client.sendall("Test".encode())
                 responses.append(client.recv(1024).decode())
         for response in responses:
-            # Assuming the server response format includes the timestamp followed by the echoed message
+            # Assu the server response format includes the timestamp followed by the echoed message
             self.assertTrue("Test" in response)
     def test_no_data_received(self):
         """Test server behavior when no data is received from the client."""

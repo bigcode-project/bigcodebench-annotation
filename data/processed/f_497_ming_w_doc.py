@@ -5,7 +5,8 @@ import pandas as pd
 # Constants
 COLUMNS = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
 
-def f_497(rows):
+
+def f_425(rows):
     """
     Create a Pandas DataFrame with random integer values between 0 and 9 for a given number of rows.
     Count the non-zero values in each column and visualize this information using a bar plot.
@@ -21,11 +22,10 @@ def f_497(rows):
     Requirements:
     - numpy
     - pandas
-    - random
     - matplotlib.pyplot
 
     Example:
-    >>> df, ax = f_497(10)
+    >>> df, ax = f_425(10)
     >>> print(ax.title.get_text())  # Should return 'Non-Zero Value Counts'
     Non-Zero Value Counts
     """
@@ -51,38 +51,35 @@ def f_497(rows):
     return df, ax
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 # Test function
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test when rows is 0
-        df, ax = f_497(0)
+        df, ax = f_425(0)
         self.assertTrue(df.empty)
         self.assertEqual(len(ax.patches), 0)
         self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
     def test_case_2(self):
         # Test when rows is 1
-        df, ax = f_497(1)
+        df, ax = f_425(1)
         self.assertEqual(len(df), 1)
         self.assertEqual(len(ax.patches), 5)
         self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
     def test_case_3(self):
         # Test when rows is 10
-        df, ax = f_497(10)
+        df, ax = f_425(10)
         self.assertEqual(len(df), 10)
         self.assertEqual(len(ax.patches), 5)
         self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
     def test_case_4(self):
         # Test when rows is negative
-        df, ax = f_497(-5)
+        df, ax = f_425(-5)
         self.assertTrue(df.empty)
         self.assertEqual(len(ax.patches), 0)
         self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
     def test_case_5(self):
         # Test when rows is large (e.g., 1000)
-        df, ax = f_497(1000)
+        df, ax = f_425(1000)
         self.assertEqual(len(df), 1000)
         self.assertEqual(len(ax.patches), 5)
         self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')

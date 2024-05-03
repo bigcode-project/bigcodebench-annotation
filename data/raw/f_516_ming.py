@@ -1,5 +1,4 @@
 import re
-
 import nltk
 from sklearn.decomposition import NMF
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -29,9 +28,10 @@ def f_516(texts, num_topics):
     - list of list of str: A list where each element is a list of words representing a topic.
 
     Requirements:
-    - Regular expressions (re module) for text cleaning.
-    - NLTK (Natural Language Toolkit) for stopwords.
-    - Scikit-learn (sklearn) for TF-IDF vectorization and NMF.
+    - re
+    - nltk
+    - sklearn.decomposition
+    - sklearn.feature_extraction.text
 
     Example:
     >>> texts = [
@@ -75,9 +75,8 @@ def f_516(texts, num_topics):
 import unittest
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.texts = [
+    def setUp(self):
+        self.texts = [
             "Data science is an inter-disciplinary field that uses scientific methods, processes, algorithms and systems to extract knowledge and insights from structured and unstructured data.",
             "Machine learning is a subset of artificial intelligence (AI) that provides systems the ability to automatically learn and improve from experience without being explicitly programmed.",
             "Python is an interpreted, high-level and general-purpose programming language."

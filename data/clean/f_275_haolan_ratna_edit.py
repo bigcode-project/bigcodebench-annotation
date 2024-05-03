@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 def f_275(df):
     """
     Draw a bar chart of the counts of each unique value in the 'value' column of a pandas DataFrame and return the Axes object.
-
+    Empty DataFrame will return an empty bar chart.
+    
     Parameters:
     df (DataFrame): The pandas DataFrame with columns ['id', 'value'].
 

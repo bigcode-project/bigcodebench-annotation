@@ -7,7 +7,7 @@ def f_1896(ip_range):
     The function returns a dictionary with IP addresses as keys and a boolean value indicating
     their active status (True if the ping is successful, False otherwise).
 
-    Args:
+    Parameters:
         ip_range (str): The IP range to scan, in CIDR notation (e.g., '192.168.0.0/24').
 
     Requirements:

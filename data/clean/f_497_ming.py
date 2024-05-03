@@ -5,6 +5,7 @@ import pandas as pd
 # Constants
 COLUMNS = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
 
+
 def f_497(rows):
     """
     Create a Pandas DataFrame with random integer values between 0 and 9 for a given number of rows.
@@ -21,7 +22,6 @@ def f_497(rows):
     Requirements:
     - numpy
     - pandas
-    - random
     - matplotlib.pyplot
 
     Example:
@@ -52,9 +52,7 @@ def f_497(rows):
 
 
 import unittest
-import matplotlib
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+
 
 # Test function
 def run_tests():

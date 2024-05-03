@@ -2,7 +2,7 @@ import re
 import os
 import glob
 
-def f_782(dir_path: str) -> list:
+def f_391(dir_path: str) -> list:
     """
     Rename all files in the specified directory by removing all special characters,
     punctuation marks, and spaces, using regular expressions. The function keeps
@@ -17,12 +17,12 @@ def f_782(dir_path: str) -> list:
     dir_path (str): The path to the directory containing the files to be renamed.
 
     Returns:
-    list[str]: A list containing the new names of all files after renaming.
+    list[str]: A list containing the new names of all files after rena.
 
     Example:
-    >>> f_782('path/to/directory')
+    >>> f_391('path/to/directory')
     ['file1', 'file2', 'file3']
-    >>> f_782('another/directory/path')
+    >>> f_391('another/directory/path')
     ['anotherFile1', 'anotherFile2']
     """
     new_names = []
@@ -37,7 +37,7 @@ def f_782(dir_path: str) -> list:
 import unittest
 from pathlib import Path
 import shutil
-class TestRenameFiles(unittest.TestCase):
+class TestCases(unittest.TestCase):
     
     def setUp(self):
         self.temp_dir = Path("temp_test_dir")
@@ -52,7 +52,7 @@ class TestRenameFiles(unittest.TestCase):
             (self.temp_dir / file_name).touch()
         
         expected_names = ["file1txt", "file2txt", "file3txt"]
-        new_file_names = f_782(str(self.temp_dir))
+        new_file_names = f_391(str(self.temp_dir))
         
         self.assertListEqual(sorted(new_file_names), sorted(expected_names))
     
@@ -62,13 +62,13 @@ class TestRenameFiles(unittest.TestCase):
             (self.temp_dir / file_name).touch()
         
         expected_names = ["file1txt", "file2txt", "file3txt"]
-        new_file_names = f_782(str(self.temp_dir))
+        new_file_names = f_391(str(self.temp_dir))
         
         self.assertListEqual(sorted(new_file_names), sorted(expected_names))
     
     def test_empty_directory(self):
         expected_names = []
-        new_file_names = f_782(str(self.temp_dir))
+        new_file_names = f_391(str(self.temp_dir))
         
         self.assertListEqual(new_file_names, expected_names)
     
@@ -78,7 +78,7 @@ class TestRenameFiles(unittest.TestCase):
             (self.temp_dir / file_name).touch()
         
         expected_names = ["txt", "txt", "txt"]
-        new_file_names = f_782(str(self.temp_dir))
+        new_file_names = f_391(str(self.temp_dir))
         
         self.assertListEqual(sorted(new_file_names), sorted(expected_names))
     
@@ -88,6 +88,6 @@ class TestRenameFiles(unittest.TestCase):
             (self.temp_dir / file_name).touch()
         
         expected_names = ["file1txt", "file2txt", "file3txt"]
-        new_file_names = f_782(str(self.temp_dir))
+        new_file_names = f_391(str(self.temp_dir))
         
         self.assertListEqual(sorted(new_file_names), sorted(expected_names))

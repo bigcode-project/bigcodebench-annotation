@@ -1,13 +1,11 @@
 from random import sample
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
 
-def f_472(df, tuples, n_plots):
+def f_363(df, tuples, n_plots):
     """
     Removes rows from a DataFrame based on values of multiple columns, 
     and then create n random line plots of two columns against each other.
@@ -22,15 +20,14 @@ def f_472(df, tuples, n_plots):
       Each entry in the plot details list is a tuple containing the two columns plotted against each other.
 
     Requirements:
-    - pandas for DataFrame manipulation.
-    - numpy for array operations.
-    - matplotlib.pyplot for plotting.
-    - random for selecting random elements.
+    - matplotlib.pyplot
+    - random
 
     Example:
+    >>> import numpy as np, pandas as pd
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-    >>> modified_df, plot_details = f_472(df, tuples, 3)
+    >>> modified_df, plot_details = f_363(df, tuples, 3)
     """
     mask = df.apply(tuple, axis=1).isin(tuples)
     df = df[~mask]
@@ -45,17 +42,16 @@ def f_472(df, tuples, n_plots):
 
     return df, plot_details
 
-import matplotlib
 import unittest
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import numpy as np
+import pandas as pd
 # Unit test class
 class TestCases(unittest.TestCase):
     def setUp(self):
         self.df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
         self.tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
     def test_basic_functionality(self):
-        modified_df, plot_details = f_472(self.df, self.tuples, 3)
+        modified_df, plot_details = f_363(self.df, self.tuples, 3)
         # Convert DataFrame rows to tuples for comparison
         df_tuples = set([tuple(x) for x in modified_df.to_numpy()])
         # Convert list of tuples to a set for efficient searching
@@ -65,16 +61,16 @@ class TestCases(unittest.TestCase):
         self.assertTrue(len(intersection) == 0, f"Removed tuples found in the modified DataFrame: {intersection}")
     def test_empty_dataframe(self):
         empty_df = pd.DataFrame(columns=list('ABCDE'))
-        modified_df, plot_details = f_472(empty_df, [], 1)
+        modified_df, plot_details = f_363(empty_df, [], 1)
         self.assertTrue(modified_df.empty)
     def test_zero_plots(self):
-        modified_df, plot_details = f_472(self.df, [], 0)
+        modified_df, plot_details = f_363(self.df, [], 0)
         self.assertEqual(len(plot_details), 0)
     def test_more_plots_than_data(self):
-        modified_df, plot_details = f_472(self.df.iloc[:5], [], 10)
+        modified_df, plot_details = f_363(self.df.iloc[:5], [], 10)
         self.assertTrue(len(plot_details) <= 5)
     def test_plot_details(self):
-        _, plot_details = f_472(self.df, [], 3)
+        _, plot_details = f_363(self.df, [], 3)
         self.assertEqual(len(plot_details), 3)
         all_columns = all(c[0] in COLUMNS and c[1] in COLUMNS for c in plot_details)
         self.assertTrue(all_columns)

@@ -6,7 +6,7 @@ from random import choice
 DATA_TYPES = [str, int, float, list, tuple, dict, set]
 
 
-def f_225(rows, columns):
+def f_143(rows, columns):
     """
     Generates a DataFrame with a specified number of rows and columns, populated with randomly generated data.
     Each column's data type is randomly selected from a set of Python data types,
@@ -27,7 +27,7 @@ def f_225(rows, columns):
     - set: Sets of random size (1 to 5) containing unique integers from 0 to 9.
 
     Returns:
-    pd.DataFrame: A DataFrame with the specified number of rows and columns containing randomly generated data.
+    pd.DataFrame: A DataFrame with the specified number of rows and columns named 'col0', 'col1', etc., containing randomly generated data.
 
     Requirements:
     - pandas
@@ -35,7 +35,7 @@ def f_225(rows, columns):
     - random
 
     Example:
-    >>> df = f_225(2, 3)
+    >>> df = f_143(2, 3)
     >>> print(df.shape)
     (2, 3)
     >>> isinstance(df, pd.DataFrame)
@@ -74,11 +74,11 @@ class TestCases(unittest.TestCase):
     def test_dataframe_dimensions(self):
         """Test the generated DataFrame has the correct dimensions."""
         rows, columns = 5, 3
-        df = f_225(rows, columns)
+        df = f_143(rows, columns)
         self.assertEqual(df.shape, (rows, columns), "DataFrame should have the specified dimensions.")
     def test_dataframe_data_types(self):
         """Test that each column in the DataFrame has data of the correct type and validates mixed data types."""
-        df = f_225(5, 5)
+        df = f_143(5, 5)
         for col in df.columns:
             values = df[col]
             unique_types = set(type(v) for v in values)
@@ -86,17 +86,17 @@ class TestCases(unittest.TestCase):
     def test_dataframe_size(self):
         """Test that the DataFrame has the correct dimensions."""
         rows, columns = 5, 4
-        df = f_225(rows, columns)
+        df = f_143(rows, columns)
         self.assertEqual(df.shape, (rows, columns), "DataFrame should have the specified dimensions.")
     def test_column_names(self):
         """Test that the column names are correctly formatted."""
         columns = 3
-        df = f_225(5, columns)
+        df = f_143(5, columns)
         expected_columns = ['col' + str(i) for i in range(columns)]
         self.assertListEqual(list(df.columns), expected_columns, "Column names are not formatted correctly.")
     def test_collection_sizes(self):
         """Test the size constraints of collections like lists, tuples, dicts, and sets."""
-        df = f_225(10, 10)
+        df = f_143(10, 10)
         for col in df.columns:
             if isinstance(df[col][0], (list, tuple, set, dict)):
                 if isinstance(df[col][0], dict):

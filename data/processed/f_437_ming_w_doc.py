@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
 
-def f_437(a, b):
+def f_435(a, b):
     """
     Generate a pandas DataFrame with random values based on two lists and plot the DataFrame as a bar chart.
 
@@ -26,7 +26,7 @@ def f_437(a, b):
     - Uses pandas DataFrame to structure the data.
 
     Example:
-    >>> ax = f_437([1, 2, 3], ['A', 'B', 'C', 'D', 'E'])
+    >>> ax = f_435([1, 2, 3], ['A', 'B', 'C', 'D', 'E'])
     """
     if not a or not b:  # Check if either list is empty
         fig, ax = plt.subplots()  # Creates a blank plot
@@ -44,27 +44,24 @@ def f_437(a, b):
 
 import unittest
 import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     def test_non_empty_lists(self):
         """Test with valid non-empty lists."""
-        ax = f_437([1, 2, 3], ['A', 'B', 'C'])
+        ax = f_435([1, 2, 3], ['A', 'B', 'C'])
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_empty_a_list(self):
         """Test with an empty 'a' list."""
-        ax = f_437([], ['A', 'B', 'C'])
+        ax = f_435([], ['A', 'B', 'C'])
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_empty_b_list(self):
         """Test with an empty 'b' list."""
-        ax = f_437([1, 2, 3], [])
+        ax = f_435([1, 2, 3], [])
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_both_lists_empty(self):
         """Test with both 'a' and 'b' lists empty."""
-        ax = f_437([], [])
+        ax = f_435([], [])
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_a_list_longer_than_columns(self):
         """Test with 'a' list having more elements than predefined columns."""
-        ax = f_437([1, 2, 3, 4, 5, 6], ['A', 'B'])
+        ax = f_435([1, 2, 3, 4, 5, 6], ['A', 'B'])
         self.assertIsInstance(ax, matplotlib.axes.Axes)

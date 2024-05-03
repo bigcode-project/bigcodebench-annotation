@@ -26,9 +26,11 @@ def f_428():
 
     return encoded_str.decode()
 
+
 import string
 import unittest
 import binascii
+
 
 def run_tests():
     suite = unittest.TestSuite()

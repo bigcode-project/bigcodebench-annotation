@@ -4,7 +4,7 @@ import time
 
 def f_227(url):
     """
-    Open a web page in the default web browser.
+    Open a web page in the default web browser in a background process.
 
     Parameters:
     url (str): The URL of the webpage to be opened.
@@ -38,7 +38,6 @@ def f_227(url):
     return process.returncode
 
 import unittest
-import unittest
 from unittest.mock import patch, MagicMock
 def run_tests():
     suite = unittest.TestSuite()
@@ -58,7 +57,7 @@ class TestCases(unittest.TestCase):
         mock_popen.return_value = process_mock
 
         result = f_227('https://www.google.com')
-        mock_popen.assert_called_with(['open', 'https://www.google.com'], shell=True)
+        self.assertEqual(['open', 'https://www.google.com'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 0)
 
@@ -72,7 +71,7 @@ class TestCases(unittest.TestCase):
         mock_popen.return_value = process_mock
 
         result = f_227('https://www.openai.com')
-        mock_popen.assert_called_with(['start', 'https://www.openai.com'], shell=True)
+        self.assertEqual(['start', 'https://www.openai.com'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 0)
 
@@ -86,7 +85,7 @@ class TestCases(unittest.TestCase):
         mock_popen.return_value = process_mock
 
         result = f_227('')
-        mock_popen.assert_called_with(['xdg-open', ''], shell=True)
+        self.assertEqual(['xdg-open', ''], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)
 
@@ -100,7 +99,7 @@ class TestCases(unittest.TestCase):
         mock_popen.return_value = process_mock
 
         result = f_227('/invalid_url')
-        mock_popen.assert_called_with(['xdg-open', '/invalid_url'], shell=True)
+        self.assertEqual(['xdg-open', '/invalid_url'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)
 
@@ -114,7 +113,7 @@ class TestCases(unittest.TestCase):
         mock_popen.return_value = process_mock
 
         result = f_227('/path/to/file.txt')
-        mock_popen.assert_called_with(['xdg-open', '/path/to/file.txt'], shell=True)
+        self.assertEqual(['xdg-open', '/path/to/file.txt'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)
 

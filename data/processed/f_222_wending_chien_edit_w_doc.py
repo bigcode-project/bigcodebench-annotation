@@ -3,9 +3,9 @@ from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import CountVectorizer
 
 
-def f_222(df):
+def f_170(df):
     """
-    Analyzes articles by their titles for specific keywords ("how" or "what"), vectorizes the content using
+    Analyzes articles by their titles for specific case-insensitive keywords ("how" or "what"), vectorizes the content using
     CountVectorizer, and groups them into clusters using KMeans clustering. This function is intended for basic
     content analysis and clustering to understand common themes or topics among articles asking questions starting
     with "how" or "what".
@@ -24,11 +24,11 @@ def f_222(df):
     Example:
     >>> import pandas as pd
     >>> df_sample = pd.DataFrame({
-    ...    'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
-    ...    'Content': ['This is a tutorial about coding...', 'Python is a programming language...',
-    ...                'Programming is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
+    ...    'Title': ['How to code?', 'What is Python?', 'The art of program', 'How to cook?', 'What is life?'],
+    ...    'Content': ['This is a tutorial about coding...', 'Python is a program language...',
+    ...                'Program is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
     ... })
-    >>> f_222(df_sample)
+    >>> f_170(df_sample)
     [0, 1, 0, 1]
     """
     pattern = re.compile(r'(how|what)', re.IGNORECASE)
@@ -51,9 +51,9 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         """Prepare environment and variables for tests."""
         self.df_sample = pd.DataFrame({
-            'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
-            'Content': ['This is a tutorial about coding...', 'Python is a programming language...',
-                        'Programming is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
+            'Title': ['How to code?', 'What is Python?', 'The art of program', 'How to cook?', 'What is life?'],
+            'Content': ['This is a tutorial about coding...', 'Python is a program language...',
+                        'Program is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
         })
         os.environ['OMP_NUM_THREADS'] = '1'  # Setup environment variable for deterministic parallel processing
     def tearDown(self):
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         os.environ.pop('OMP_NUM_THREADS', None)
     def test_vectorizer_and_clustering(self):
         """Test if the vectorization and clustering are setting up as expected, without mocking."""
-        cluster_labels = f_222(self.df_sample)
+        cluster_labels = f_170(self.df_sample)
         self.assertIn(set(cluster_labels), [{0, 1}])  # We expect two clusters
         self.assertEqual(len(cluster_labels), 4, "Expected 4 cluster labels.")
     def test_no_matching_articles(self):
@@ -70,12 +70,12 @@ class TestCases(unittest.TestCase):
             'Title': ['Understanding AI', 'Introduction to Machine Learning'],
             'Content': ['AI is a broad field.', 'Machine learning is a subset of AI.']
         })
-        cluster_labels = f_222(df_no_matches)
+        cluster_labels = f_170(df_no_matches)
         self.assertEqual(len(cluster_labels), 0, "Expected no cluster labels for DataFrame without matching titles.")
     def test_empty_dataframe(self):
         """Test the function with an empty DataFrame."""
         df_empty = pd.DataFrame(columns=['Title', 'Content'])
-        cluster_labels = f_222(df_empty)
+        cluster_labels = f_170(df_empty)
         self.assertEqual(len(cluster_labels), 0, "Expected no cluster labels for an empty DataFrame.")
     def test_invalid_dataframe_structure(self):
         """Test the function with a DataFrame missing required columns."""
@@ -84,8 +84,8 @@ class TestCases(unittest.TestCase):
             'Body': ['Content about Python.']  # Wrong column name
         })
         with self.assertRaises(KeyError):
-            f_222(df_invalid)
+            f_170(df_invalid)
     def test_function_exception_handling(self):
         """Test to ensure that function handles incorrect input types gracefully."""
         with self.assertRaises(TypeError):
-            f_222(None)  # Passing None to simulate bad input
+            f_170(None)  # Passing None to simulate bad input

@@ -1,4 +1,3 @@
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -18,9 +17,9 @@ def f_521(x, y, labels):
     - matplotlib.figure.Figure: The figure object containing the plot.
 
     Requirements:
-    - numpy for numerical operations.
-    - matplotlib.pyplot for plotting.
-    - sklearn.preprocessing for data scaling.
+    - numpy
+    - matplotlib.pyplot
+    - sklearn.preprocessing
 
     Example:
     >>> x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
@@ -49,8 +48,6 @@ def f_521(x, y, labels):
 
 import unittest
 import numpy.testing as npt
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
 
 
 class TestCases(unittest.TestCase):

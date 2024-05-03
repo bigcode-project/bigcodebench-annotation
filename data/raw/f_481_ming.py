@@ -10,7 +10,6 @@ def f_481(L):
     
     Requirements:
     - numpy
-    - itertools
     - pandas
 
     Parameters:

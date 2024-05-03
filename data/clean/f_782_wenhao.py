@@ -37,7 +37,7 @@ def f_782(dir_path: str) -> list:
 import unittest
 from pathlib import Path
 import shutil
-class TestRenameFiles(unittest.TestCase):
+class TestCases(unittest.TestCase):
     
     def setUp(self):
         self.temp_dir = Path("temp_test_dir")
@@ -94,7 +94,7 @@ class TestRenameFiles(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestRenameFiles))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

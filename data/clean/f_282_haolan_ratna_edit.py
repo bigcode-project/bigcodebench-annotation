@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
         with open(path, 'r') as file:
             reader = csv.reader(file)
             rows = list(reader)
-            ages, heights, weights = zip(*[(int(row[1]), int(row[2]), int(row[3])) for row in rows[1:-1]])
+            ages, heights, weights = zip(*[(float(row[1]), float(row[2]), float(row[3])) for row in rows[1:-1]])
             expected_averages = [mean(ages), mean(heights), mean(weights)]
             actual_averages = [float(rows[-1][1]), float(rows[-1][2]), float(rows[-1][3])]
             self.assertEqual(actual_averages, expected_averages)

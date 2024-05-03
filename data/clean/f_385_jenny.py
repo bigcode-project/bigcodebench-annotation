@@ -25,7 +25,10 @@ def f_385(file_path: str) -> pd.DataFrame:
     - re
     - os
     - pandas
-
+    
+    Raises:
+    - FileNotFoundError: If the specified log file does not exist.
+    
     Example:
     Given a log file with content:
     ```

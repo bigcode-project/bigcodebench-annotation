@@ -1,18 +1,15 @@
-import unittest
-from random import choice, randint
-
 import pandas as pd
-
+import time
 # Constants
 LETTERS = list('abcdefghijklmnopqrstuvwxyz')
 
 
-def f_459(df, letter):
+def f_459(data, letter):
     """
     Filters rows in a DataFrame where the 'Name' column values start with a specified letter.
 
     Parameters:
-    - df (pd.DataFrame): The input DataFrame. It should have a 'Name' column.
+    - df (dic): The input dict. It should have a 'Name' key.
     - letter (str): The letter to filter the 'Name' column by.
 
     Returns:
@@ -20,27 +17,34 @@ def f_459(df, letter):
 
     Requirements:
     - pandas
+    - time
 
     Example:
-    >>> df = pd.DataFrame({'Name': ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Fiona']})
-    >>> filtered_names = f_459(df, 'a')
+    >>> data = {'Name': ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Fiona']}
+    >>> filtered_names = f_459(data, 'a')
     >>> filtered_names.index[0].startswith('A')
     True
     >>> len(filtered_names)
     1
     """
+    df = pd.DataFrame(data)
+    start_time = time.time()
     regex = f'^{letter}'
     filtered_df = df[df['Name'].str.contains(regex, case=False, regex=True)]
-    # Note: The plotting line is removed to simplify testing and focus on data processing.
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
     return filtered_df['Name'].value_counts()
 
 
 ### Unit Tests
+from random import choice, randint
+import unittest
+
 
 class TestCases(unittest.TestCase):
     def setUp(self):
         """Generate a DataFrame for testing."""
-        self.df = pd.DataFrame({'Name': [choice(LETTERS) + 'name' + str(randint(1, 100)) for _ in range(100)]})
+        self.df = {'Name': [choice(LETTERS) + 'name' + str(randint(1, 100)) for _ in range(100)]}
 
     def test_filter_letter_a(self):
         """Test filtering by letter 'a'."""

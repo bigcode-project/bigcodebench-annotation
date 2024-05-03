@@ -1,9 +1,7 @@
-import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
+import time
 
-
-def f_463(df, letter):
+def f_46(df, letter):
     """
     Filters rows in a DataFrame based on the starting letter of the values in the 'Word' column.
     It then calculates the lengths of these words and returns a box plot representing the distribution
@@ -19,14 +17,15 @@ def f_463(df, letter):
                    returns None.
 
     Requirements:
-    - pandas
     - seaborn
-    - matplotlib.pyplot
+    - time
 
     Example:
+    >>> import pandas as pd
     >>> words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
     >>> df = pd.DataFrame({'Word': words})
     """
+    start_time = time.time()
     # Validate if 'Word' column exists in df
     if 'Word' not in df.columns:
         raise ValueError("The DataFrame should contain a 'Word' column.")
@@ -45,14 +44,15 @@ def f_463(df, letter):
     word_lengths = filtered_df['Word'].str.len()
     ax = sns.boxplot(x=word_lengths)
     ax.set_title(f"Word Lengths Distribution for Words Starting with '{letter}'")
+    end_time = time.time()  # End ti
+    cost = f"Operation completed in {end_time - start_time} seconds."
     return ax
 
 import unittest
 from unittest.mock import patch
-import matplotlib
+import matplotlib.pyplot as plt
+import pandas as pd
 # Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
 class TestCases(unittest.TestCase):
     def setUp(self):
         self.words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
@@ -60,26 +60,26 @@ class TestCases(unittest.TestCase):
     @patch('seaborn.boxplot')
     def test_word_filtering(self, mock_boxplot):
         """Test if the function correctly filters words starting with a given letter."""
-        f_463(self.df, 'a')
+        f_46(self.df, 'a')
         filtered_words = ['apple', 'apricot', 'avocado']
         self.assertTrue(all(word.startswith('a') for word in filtered_words), "Word filtering by letter 'a' failed.")
     @patch('seaborn.boxplot')
     def test_boxplot_called(self, mock_boxplot):
         """Test if seaborn's boxplot is called when valid data is provided."""
-        f_463(self.df, 'a')
+        f_46(self.df, 'a')
         mock_boxplot.assert_called_once()
     @patch('matplotlib.pyplot.show')
     def test_return_type(self, mock_show):
         """Test the return type is an Axes."""
-        ax = f_463(self.df, 'a')
+        ax = f_46(self.df, 'a')
         self.assertIsInstance(ax, plt.Axes)
     def test_empty_dataframe(self):
         """Test handling of empty DataFrame."""
         empty_df = pd.DataFrame({'Word': []})
-        result = f_463(empty_df, 'a')
+        result = f_46(empty_df, 'a')
         self.assertIsNone(result, "Empty DataFrame should return None.")
     def test_no_word_column(self):
         """Test handling of DataFrame without 'Word' column."""
         df_without_word = pd.DataFrame({'NoWord': self.words})
         with self.assertRaises(ValueError):
-            f_463(df_without_word, 'a')
+            f_46(df_without_word, 'a')

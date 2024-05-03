@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
 
-def f_822(
+def f_63(
     feature_array,
     target_array,
     feature_names=["f1", "f2", "f3", "f4", "f5"],
@@ -32,7 +32,7 @@ def f_822(
     Examples:
     >>> feature_array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
     >>> target_array = np.array([0, 1])
-    >>> clf = f_822(feature_array, target_array)
+    >>> clf = f_63(feature_array, target_array)
     >>> type(clf)
     <class 'sklearn.ensemble._forest.RandomForestClassifier'>
     """
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
         # Test basic case
         array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
         target = np.array([0, 1])
-        clf = f_822(array, target)
+        clf = f_63(array, target, seed=42)
         self.assertIsInstance(clf, RandomForestClassifier)
         self.assertTrue(len(clf.feature_importances_) > 0)
         self.assertEqual(set(np.unique(target)), set(clf.classes_))
@@ -76,21 +76,21 @@ class TestCases(unittest.TestCase):
         # Test identical features
         array = np.ones((10, 5))
         target = np.zeros(10)
-        clf = f_822(array, target)
+        clf = f_63(array, target)
         self.assertTrue(len(clf.feature_importances_) > 0)
     def test_case_3(self):
         # Test all unique targets
         array = np.array([[i] * 5 for i in range(10)])
         target = np.arange(10)
-        clf = f_822(array, target)
+        clf = f_63(array, target)
         self.assertEqual(len(np.unique(target)), len(clf.classes_))
     def test_case_4(self):
         # Test random seed reproducibility
         np.random.seed(0)
         array = np.random.rand(10, 5)
         target = np.random.randint(0, 2, 10)
-        clf1 = f_822(array, target, seed=42)
-        clf2 = f_822(array, target, seed=42)
+        clf1 = f_63(array, target, seed=42)
+        clf2 = f_63(array, target, seed=42)
         self.assertEqual(
             clf1.feature_importances_.tolist(), clf2.feature_importances_.tolist()
         )
@@ -98,40 +98,40 @@ class TestCases(unittest.TestCase):
         # Test negative features
         array = np.array([[-1, -2, -3, -4, -5], [-6, -7, -8, -9, -10]])
         target = np.array([0, 1])
-        clf = f_822(array, target)
+        clf = f_63(array, target)
         self.assertTrue(len(clf.feature_importances_) > 0)
     def test_case_6(self):
         # Test single feature array
         array = np.arange(10).reshape(-1, 1)
         target = np.array([0, 1] * 5)
         feature_names = ["f1"]
-        clf = f_822(array, target, feature_names)
+        clf = f_63(array, target, feature_names)
         self.assertTrue(len(clf.feature_importances_) > 0)
     def test_case_7(self):
         # Test exception handling for incompatible shapes among arrays
         array = np.array([[1, 2, 3], [4, 5, 6]])
         target = np.array([0, 1, 2])
         with self.assertRaises(ValueError):
-            f_822(array, target)
+            f_63(array, target)
     def test_case_8(self):
         # Test exception handling for incompatible feature_names vs array shape
         array = np.array([[1, 2, 3], [4, 5, 6]])  # 2x3 array
         target = np.array([0, 1])
         incorrect_feature_names = ["f1", "f2"]  # Only 2 names for a 3-column array
         with self.assertRaises(ValueError):
-            f_822(array, target, feature_names=incorrect_feature_names)
+            f_63(array, target, feature_names=incorrect_feature_names)
     def test_case_9(self):
         # Test custom feature names
         array = np.array([[7, 8], [9, 10]])
         target = np.array([0, 1])
         custom_feature_names = ["custom1", "custom2"]
-        clf = f_822(array, target, feature_names=custom_feature_names)
+        clf = f_63(array, target, feature_names=custom_feature_names)
         self.assertEqual(clf.feature_importances_.size, len(custom_feature_names))
     def test_case_10(self):
         # Test custom target name
         array = np.array([[11, 12, 13, 14, 15], [16, 17, 18, 19, 20]])
         target = np.array([1, 0])
         custom_target_name = "custom_target"
-        clf = f_822(array, target, target_name=custom_target_name)
+        clf = f_63(array, target, target_name=custom_target_name)
         # Check if the model was trained successfully
         self.assertTrue(len(clf.feature_importances_) > 0)

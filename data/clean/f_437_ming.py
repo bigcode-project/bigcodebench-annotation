@@ -45,9 +45,7 @@ def f_437(a, b):
 
 import unittest
 import matplotlib
-# Check and set the backend
-print("Current backend:", matplotlib.get_backend())  # Optional: Check the current backend
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 
 class TestCases(unittest.TestCase):
     def test_non_empty_lists(self):

@@ -40,8 +40,7 @@ def f_446(array_length=100, noise_level=0.2):
     return ax
 
 import unittest
-import matplotlib
-matplotlib.use('Agg')  # Set to 'Agg' to avoid GUI-related issues
+
 
 def run_tests():
     suite = unittest.TestSuite()

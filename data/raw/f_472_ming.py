@@ -1,7 +1,6 @@
 from random import sample
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
+
 
 # Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
@@ -22,12 +21,11 @@ def f_472(df, tuples, n_plots):
       Each entry in the plot details list is a tuple containing the two columns plotted against each other.
 
     Requirements:
-    - pandas for DataFrame manipulation.
-    - numpy for array operations.
-    - matplotlib.pyplot for plotting.
-    - random for selecting random elements.
+    - matplotlib.pyplot
+    - random
 
     Example:
+    >>> import numpy as np, pandas as pd
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
     >>> modified_df, plot_details = f_472(df, tuples, 3)
@@ -46,10 +44,11 @@ def f_472(df, tuples, n_plots):
     return df, plot_details
 
 
-import matplotlib
 import unittest
-# Force matplotlib to use a non-GUI backend to prevent issues in environments without display capabilities
-matplotlib.use('Agg')
+import numpy as np
+import pandas as pd
+
+
 # Unit test class
 class TestCases(unittest.TestCase):
     def setUp(self):

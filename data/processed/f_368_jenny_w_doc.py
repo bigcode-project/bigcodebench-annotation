@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from collections import Counter
 
-def f_368(student_grades, possible_grades=["A", "B", "C", "D", "F"]):
+def f_462(student_grades, possible_grades=["A", "B", "C", "D", "F"]):
     """
     Create a report on students' grades in a class, including a count of each grade out of all possible grades
     and a bar chart. Note: Grades are case-insensitive but whitespace-sensitive. Those not in possible grades
@@ -25,7 +25,7 @@ def f_368(student_grades, possible_grades=["A", "B", "C", "D", "F"]):
 
     Example:
     >>> student_grades = ['A', 'B', 'B', 'C', 'A', 'D', 'F', 'B', 'A', 'C']
-    >>> report_df, ax = f_368(student_grades)
+    >>> report_df, ax = f_462(student_grades)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> report_df
@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
             {"Count": expected_counts}, index=["A", "B", "C", "D", "F"]
         )
         expected_df.index.name = "Grade"
-        report_df, ax = f_368(grades)
+        report_df, ax = f_462(grades)
         pd.testing.assert_frame_equal(report_df, expected_df)
         self._validate_plot(ax)
     def test_case_1(self):
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test with an empty list of grades
         with self.assertRaises(Exception):
-            f_368([], [0, 0, 0, 0, 0])
+            f_462([], [0, 0, 0, 0, 0])
     def test_case_4(self):
         # Test correctly ignoring invalid grades
         self._test_helper(["A", "X", "Y", "Z"], [1, 0, 0, 0, 0])
@@ -94,7 +94,7 @@ class TestCases(unittest.TestCase):
             index=[*dict.fromkeys(g.upper() for g in possible_grades)],
         )
         expected_df.index.name = "Grade"
-        report_df, ax = f_368(grades, possible_grades=possible_grades)
+        report_df, ax = f_462(grades, possible_grades=possible_grades)
         pd.testing.assert_frame_equal(report_df, expected_df)
         self._validate_plot(ax)
     def test_case_6(self):
