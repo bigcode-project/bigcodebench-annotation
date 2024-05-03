@@ -19,9 +19,9 @@ def f_1016(directory, backup_dir='/path/to/backup'):
     - FileNotFoundError: If the specified directory does not exist.
     
     Requirements:
-    - subprocess: Used for creating the tar.gz archive.
-    - glob: Used to find all log files in the specified directory.
-    - os: Used to check directory existence, create directories, and remove files.
+    - subprocess
+    - glob
+    - os
     
     Example:
     >>> f_1016('/path/to/logs')
