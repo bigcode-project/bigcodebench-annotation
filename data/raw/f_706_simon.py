@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-from collections import Counter
-
 
 def f_706(fruit_data):
     """
@@ -23,7 +21,6 @@ def f_706(fruit_data):
     Requirements:
     - pandas
     - numpy
-    - collections.Counter
 
     Example:
     >>> fruit_list = [('apple', 5), ('banana', 3), ('apple', 6), ('banana', 4), ('cherry', 5), ('banana', 2), ('apple', 4), ('cherry', 5)]
@@ -68,7 +65,6 @@ import unittest
 
 import pandas as pd
 import numpy as np
-from collections import Counter
 
 
 class TestCases(unittest.TestCase):

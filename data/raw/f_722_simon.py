@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.cluster import KMeans
 
 
@@ -29,7 +28,6 @@ def f_722(data, n_clusters=3, seed=None):
 
     Requirements:
     - pandas
-    - numpy
     - sklearn.cluster.KMeans
 
     Example:

@@ -1,5 +1,4 @@
 import re
-import numpy as np
 import pandas as pd
 
 def f_672(df: pd.DataFrame) -> int:
@@ -18,7 +17,6 @@ def f_672(df: pd.DataFrame) -> int:
 
     Requirements:
     - re
-    - numpy
     - pandas
 
     Note:

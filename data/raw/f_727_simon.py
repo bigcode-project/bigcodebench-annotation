@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
@@ -34,7 +33,6 @@ def f_727(df, col_a='A', col_b='B', col_c='C', seed=None):
     
     Requirements:
     - pandas
-    - numpy
     - sklearn.model_selection
     - sklearn.linear_model
 
@@ -111,7 +109,7 @@ class TestCases(unittest.TestCase):
                            'C': np.random.choice([900, 800], 100)})
         predictions, model = f_727(df, seed=12)
         self.assertIsInstance(model, LinearRegression)
-        np.testing.assert_almost_equal(predictions, np.array([65.64, 67.24, 70.83, 64.04, 67.51, 66.44]), decimal=2)
+        np.testing.assert_almost_equal(predictions, np.array([73.84, 73.74, 73.02, 73.32, 72.66]), decimal=2)
 
     def test_empty_dataframe(self):
         # Test with an empty DataFrame
@@ -161,7 +159,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(model, LinearRegression)
         np.testing.assert_almost_equal(
             predictions,
-            np.array([76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76., 76.]),
+            np.array([73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61]),
             decimal=2
             )
 

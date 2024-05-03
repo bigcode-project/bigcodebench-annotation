@@ -59,7 +59,7 @@ Each test checks a specific aspect of the function's behavior.
 import unittest
 import random
 
-class TestF1240Function(unittest.TestCase):
+class TestCases(unittest.TestCase):
     def test_length_and_content(self):
         """Test the length of the output and whether it contains valid strings."""
         seed = 1  # for reproducibility
@@ -99,8 +99,10 @@ class TestF1240Function(unittest.TestCase):
         self.assertRaises(ValueError, f_700, 0, n_samples=5)
 
 def run_tests():
-    """Execute the tests"""
-    unittest.main()
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
 
 # This condition checks if the script is running directly or imported somewhere else
 if __name__ == "__main__":

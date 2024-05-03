@@ -1,4 +1,4 @@
-NAMES=(chien jenny wenhao niklas hanhu ratna ming simon)
+NAMES=(simon)
 for name in "${NAMES[@]}"; do
     cp data/raw/*"$name"*py data/clean
 done

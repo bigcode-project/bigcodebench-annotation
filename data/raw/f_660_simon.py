@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import RandomForestRegressor
 
@@ -27,7 +26,6 @@ def f_660(num_samples=100, n_estimators=100, random_seed=None, cv=5):
 
     Requirements:
     - numpy
-    - pandas
     - sklearn.model_selection.cross_val_score
     - sklearn.ensemble.RandomForestRegressor
 
@@ -62,12 +60,12 @@ import unittest
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(RoundedDeterministicTestCases))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
 
-class RoundedDeterministicTestCases(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_case_rng(self):
         'rng reproducability'
