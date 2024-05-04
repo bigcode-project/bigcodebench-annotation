@@ -258,7 +258,8 @@ def extract_test(file_contents, function_name):
 
 def replace_pii(content):
     for name in ["chien", "jenny", "wenhao", "niklas", "hanhu", "ratna", "ming", "junda", "haolan", "xiaohenng"]:   
-        content = content.replace(name, "")
+        content = content.replace("_"+name, "")
+        content = content.replace(name+"_", "")
     return content
 
 def extract_content(file_path, rename_id=None):
