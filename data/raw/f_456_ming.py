@@ -13,7 +13,8 @@ OUTPUT_DIR = './output'
 def f_456(hours, output_dir=OUTPUT_DIR):
     """
     Generates traffic data for different vehicle types over a specified number of hours,
-    saves the data to a CSV file, and plots the data in a line chart.
+    saves the data to a CSV file with coloumns 'Time', 'Car', 'Bus', 'Truck', and 'Bike',
+    and plots the data in a line chart with 'Time' on x-axis and 'Vehicle Count' on y-axis.
 
     Parameters:
     - hours (int): Number of hours to generate data for.
@@ -147,6 +148,5 @@ def run_tests():
 
 if __name__ == "__main__":
     import doctest
-
     doctest.testmod()
     run_tests()

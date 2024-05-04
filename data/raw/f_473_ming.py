@@ -5,16 +5,21 @@ import pandas as pd
 
 # Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
-PENALTIES_COST = [100, 200, 300, 400, 500]
+PENALTIES_COSTS = [100, 200, 300, 400, 500]
 
 
-def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
+def f_473(goals, penalties, teams=TEAMS, penalties_costs=PENALTIES_COSTS):
     """
-    Create a match report for teams with goals scored and penalties conceded.
+    Generates a performance report DataFrame for teams, detailing goals and penalties. For each team, the function fetches
+    goal and penalty counts, calculates 'Penalties Cost' using a random multiplier from a predefined list, and computes
+    a 'Performance Score' as the non-negative difference between goals and penalties. Return a Dataframe with colomns 'Team',
+    'Goals', 'Penalties', 'Penalties Cost' and 'Performance Score'.
 
     Parameters:
     - goals (dict): Team names as keys, numbers of goals scored as values.
     - penalties (dict): Team names as keys, numbers of penalties incurred as values.
+    - teams (list, optioanl): input teams. Default value is ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
+    - penalties_costs (list, optional): input penalties_costs. Default value is [100, 200, 300, 400, 500].
 
     Returns:
     - pd.DataFrame: DataFrame with Team, Goals, Penalties, Penalties Cost, Performance Score.
@@ -30,10 +35,10 @@ def f_473(goals: dict, penalties: dict) -> pd.DataFrame:
     >>> report = f_473(goals, penalties)
     """
     report_data = []
-    for team in TEAMS:
+    for team in teams:
         team_goals = goals.get(team, 0)
         team_penalties = penalties.get(team, 0)
-        penalties_cost = team_penalties * choice(PENALTIES_COST)
+        penalties_cost = team_penalties * choice(penalties_costs)
         performance_score = np.max([0, team_goals - team_penalties])
         report_data.append({
             'Team': team,

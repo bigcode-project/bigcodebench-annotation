@@ -5,8 +5,8 @@ import time
 def f_460(df, letter):
     """
     The function filters rows in a dict of list in which the values of the 'Word' column begin with a specified letter.
-    It then calculates the length of the words in the filtered column and returns a dictionary of word lengths 
-    and their respective counts.
+    It first convert the dict to Datafrome, then calculates the length of the words in the filtered column and returns
+    a dictionary of word lengths and their respective counts.
 
     Parameters:
     df (dict of list): A dictionary where the key 'Word' maps to a list of strings.
@@ -34,6 +34,7 @@ def f_460(df, letter):
     cost = f"Operation completed in {end_time - start_time} seconds."
 
     return count_dict
+
 
 import unittest
 

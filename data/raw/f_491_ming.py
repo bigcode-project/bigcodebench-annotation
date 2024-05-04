@@ -3,13 +3,14 @@ import os
 OUTPUT_DIR = './output'
 
 
-def f_491(df, filename):
+def f_491(df, filename, output_dir=OUTPUT_DIR):
     """
     Save a Pandas DataFrame to a JSON file in a specified directory.
     
     Parameters:
-    df (DataFrame): A Pandas DataFrame to be saved.
-    filename (str): The filename of the JSON file where the DataFrame will be saved.
+    - df (DataFrame): A Pandas DataFrame to be saved.
+    - filename (str): The filename of the JSON file where the DataFrame will be saved.
+    - output_dir (str, optional): the ouput directory.
     
     Returns:
     str: The full file path where the DataFrame is saved.
@@ -26,9 +27,9 @@ def f_491(df, filename):
     >>> 'data.json' in f_491(df, 'data.json')
     True
     """
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
-    file_path = os.path.join(OUTPUT_DIR, filename)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    file_path = os.path.join(output_dir, filename)
     df_clean = df.where(pd.notnull(df), None)
     with open(file_path, 'w') as f:
         df_clean.to_json(f, orient='records')

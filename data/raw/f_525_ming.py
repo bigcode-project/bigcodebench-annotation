@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 
 def f_525(sales_data):
     """
-    Plot sales trends for five products over a year, highlighting variability with standard deviation shading.
+    Plot sales trends for five products over a year, highlighting variability with standard deviation shading
+    with 'Month' on x-axis and 'Sales' on y-axis.
 
     Parameters:
     - sales_data (pd.DataFrame): DataFrame with sales data, expected columns: 'Month', 'Product A' to 'Product E'.

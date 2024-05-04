@@ -3,7 +3,7 @@ import os
 OUTPUT_DIR = './output'
 
 
-def f_492(df, filename):
+def f_492(df, filename, output_dir=OUTPUT_DIR):
     """
     Save a Pandas DataFrame to a CSV file in a specified directory.
 
@@ -11,8 +11,9 @@ def f_492(df, filename):
     The CSV file will be saved in the 'data' directory relative to the parent directory of this script.
 
     Parameters:
-    df (pandas.DataFrame): A Pandas DataFrame to be saved.
-    filename (str): The filename of the CSV file where the DataFrame will be saved.
+    - df (pandas.DataFrame): A Pandas DataFrame to be saved.
+    - filename (str): The filename of the CSV file where the DataFrame will be saved.
+    - output_dir (str, optional): the ouput directory.
 
     Returns:
     str: The absolute path of the saved CSV file.
@@ -29,10 +30,10 @@ def f_492(df, filename):
     True
     """
     # Ensure the data directory exists
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
-    file_path = os.path.join(OUTPUT_DIR, filename)
+    file_path = os.path.join(output_dir, filename)
     df.to_csv(file_path, index=False, quoting=csv.QUOTE_NONNUMERIC)
     return os.path.abspath(file_path)
 

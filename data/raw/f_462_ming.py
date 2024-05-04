@@ -4,9 +4,9 @@ import pandas as pd
 
 def f_462(df, letter):
     """
-    The function filters rows in a dictionary of list in which the values of a particular column start with
-    a particular letter and then calculates the length of the words in the filtered column and returns basic
-    statistics (mean, median, mode) of the word lengths.
+    This function converts an input dictionary into a DataFrame, filters rows where 'Word' column values start with a
+    specified letter, calculates the lengths of these words, and returns basic statistics (mean, median, mode) of the
+    word lengths.
 
     Parameters:
     df (dict of list): A dictionary where the key 'Word' maps to a list of strings.

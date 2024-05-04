@@ -3,13 +3,14 @@ import time
 OUTPUT_DIR = './output'
 
 
-def f_490(dataset, filename):
+def f_490(dataset, filename, output_dir=OUTPUT_DIR):
     """
     Writes multiple Pandas DataFrames to a single CSV file, separating each DataFrame by a line of hyphens ("------").
 
     Parameters:
     - dataset (list of pd.DataFrame): A list containing the DataFrames to be written to the file.
     - filename (str): The name of the file (excluding the path) where the DataFrames will be written.
+    - output_dir (str, optional): the ouput directory.
 
     Returns:
     None: The function writes the DataFrames to a CSV file but does not return any value.
@@ -26,9 +27,9 @@ def f_490(dataset, filename):
     """
     start_time = time.time()
 
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
-    filepath = os.path.join(OUTPUT_DIR, filename)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    filepath = os.path.join(output_dir, filename)
     with open(filepath, 'w', newline='') as f:
         for i, df in enumerate(dataset):
             if i > 0:

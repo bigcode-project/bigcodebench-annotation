@@ -6,12 +6,13 @@ LETTERS = list('abcdefghijklmnopqrstuvwxyz')
 OUTPUT_DIR = './output'
 
 
-def f_464(file_path):
+def f_464(file_path, output_dir=OUTPUT_DIR):
     """
-    Create a CSV file with a 2D matrix filled with random lowercase letters.
+    Create a CSV file containing a 2D matrix populated exclusively with random lowercase letters.
     
     Parameters:
     - file_path (str): The path of the CSV file to be created.
+    - output_dir (str, optional): The dir of the CSV file to be created.
     
     Returns:
     None: Writes a CSV file to the specified path.
@@ -23,8 +24,8 @@ def f_464(file_path):
     Example:
     >>> f_464(os.path.join(OUTPUT_DIR, 'random_matrix.csv'))
     """
-    if not os.path.exists(OUTPUT_DIR):
-        os.mkdir(OUTPUT_DIR)
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
     matrix = pd.DataFrame(np.random.choice(LETTERS, (10, 10)))
     matrix.to_csv(file_path, sep='\t', header=False, index=False)
 

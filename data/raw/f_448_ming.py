@@ -1,19 +1,16 @@
 from random import shuffle, randint
 import pandas as pd
 
-# Constants
-ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-N_GROUPS = 5
-
-def f_448(l):
+def f_448(l, n_groups = 5):
     """
     Generate a Series from a list "l". The function shuffles the list, 
     then creates a longer series by cycling through the shuffled list. 
-    For each element in the series, it randomly selects "n" characters 
+    For each element in the series, it randomly selects n_groups characters
     from the start of the string and moves them to the end. 
     
     Parameters:
     - l (list): A list of strings.
+    - n_groups (int): number of groups. Default value is 5.
 
     Returns:
     - pd.Series: A Series where each element is modified by moving "n" 
@@ -41,7 +38,7 @@ def f_448(l):
 
     # Create the full list by applying the precomputed shifts
     modified_elements = []
-    for _ in range(N_GROUPS):
+    for _ in range(n_groups):
         for element, (start, end) in zip(l, random_shifts):
             new_element = element[start:] + element[:end] if len(element) > 1 else element
             modified_elements.append(new_element)
@@ -49,7 +46,10 @@ def f_448(l):
     # Convert the list to a Series
     return pd.Series(modified_elements)
 
+
 import unittest
+# Constants
+N_GROUPS = 5
 
 class TestCases(unittest.TestCase):
     def setUp(self):

@@ -55,37 +55,35 @@ def run_tests():
 
 
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        ax = f_450()
-        x_data, y_data = ax.lines[0].get_data()
-        self.assertEqual(len(x_data), SIZE)
-        self.assertTrue(min(y_data) >= -1 and max(y_data) <= 1)
-    
-    def test_case_2(self):
-        ax = f_450(size=500)
-        x_data, y_data = ax.lines[0].get_data()
-        self.assertEqual(len(x_data), 500)
-        self.assertTrue(min(y_data) >= -1 and max(y_data) <= 1)
-    
-    def test_case_3(self):
-        ax = f_450(frequency=2)
-        x_data, y_data = ax.lines[0].get_data()
-        self.assertEqual(len(x_data), SIZE)
-        self.assertTrue(min(y_data) >= -1 and max(y_data) <= 1)
         
     def test_case_4(self):
         ax = f_450(size=1500, frequency=0.5)
         x_data, y_data = ax.lines[0].get_data()
         self.assertEqual(len(x_data), 1500)
         self.assertTrue(min(y_data) >= -1 and max(y_data) <= 1)
-    
-    def test_case_5(self):
-        size_random = random.randint(500, 1500)
-        frequency_random = random.uniform(0.1, 3)
-        ax = f_450(size=size_random, frequency=frequency_random)
-        x_data, y_data = ax.lines[0].get_data()
-        self.assertEqual(len(x_data), size_random)
-        self.assertTrue(min(y_data) >= -1 and max(y_data) <= 1)
+
+    def test_standard_functionality(self):
+        """Test the function with default parameters."""
+        ax = f_450()
+        self.assertIsInstance(ax, plt.Axes)
+
+    def test_varying_sizes(self):
+        """Test the function with different array sizes."""
+        for size in [0, 10, 500, 1500]:
+            ax = f_450(size=size)
+            self.assertIsInstance(ax, plt.Axes)
+            self.assertEqual(len(ax.lines[0].get_xdata()), size)
+
+    def test_different_frequencies(self):
+        """Test the function with different frequencies."""
+        for frequency in [0.5, 1, 2]:
+            ax = f_450(frequency=frequency)
+            self.assertIsInstance(ax, plt.Axes)
+
+    def test_plot_output(self):
+        """Verify the plot is generated and is of correct type."""
+        ax = f_450()
+        self.assertTrue(hasattr(ax, 'figure'), "Plot does not have associated figure attribute")
 
 
 if __name__ == "__main__":

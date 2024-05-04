@@ -8,7 +8,10 @@ GOALS_RANGE = (-10, 10)
 
 def f_474_and_plot(goals, penalties):
     """
-    Calculates the net score for each team, returns a scores distribution DataFrame, and plots the distribution.
+    Calculates net scores for teams ('Team A' to 'Team E') by subtracting penalties from goals and clips scores to stay
+    within -10 to 10. Visualizes results with a bar chart showing each team's adjusted scores 'Team' on the x-axis and
+    score values 'Score' on the y-axis.
+
 
     Parameters:
     - goals (dict): A dictionary where keys are team names and values are the number of goals scored.

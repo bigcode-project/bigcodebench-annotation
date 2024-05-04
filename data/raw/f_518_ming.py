@@ -7,7 +7,7 @@ ALPHANUMERIC = re.compile('[\W_]+')
 
 def f_518(texts, stopwords=None):
     """
-    Generate word vectors from a list of texts using the gensim Word2Vec model.
+    Generate word vectors from a list of texts using the gensim Word2Vec model and nltk.corpus.stopwords.
     The texts are first cleaned by removing all non-alphanumeric characters except space,
     lowercased, and stop words are removed.
 

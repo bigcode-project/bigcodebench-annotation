@@ -22,7 +22,7 @@ def f_503(directory: str, pattern: str = r"(?<!Distillr)\\AcroTray\.exe") -> dic
     - binascii
 
     Example:
-    >>> f_503(output_dir)
+    >>> f_503(OUTPUT_DIR)
     {}
     """
     hashes = {}

@@ -7,9 +7,10 @@ from random import randint
 SENSORS = ['Temperature', 'Humidity', 'Pressure']
 OUTPUT_DIR = './output'
 
-def f_455(hours, output_dir = OUTPUT_DIR):
+def f_455(hours, output_dir=OUTPUT_DIR):
     """
-    Create sensor data for the specified number of hours and save it in a CSV file.
+    Create sensor data for the specified number of hours and save it in a CSV file
+    with coloumns 'Time', 'Temperature', 'Humidity' and 'Pressure'.
 
     Parameters:
     - hours (int): The number of hours for which sensor data is to be generated.
