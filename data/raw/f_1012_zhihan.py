@@ -4,18 +4,16 @@ import json
 from datetime import datetime
 
 SCRIPT_NAME = 'backup.sh'
-BACKUP_DIR = '/home/user/backup'
 LOG_FILE = '/home/user/backup_log.json'
 
-def f_1012(script_name=SCRIPT_NAME, backup_dir=BACKUP_DIR, log_file=LOG_FILE):
+def f_1012(script_name=SCRIPT_NAME, log_file=LOG_FILE):
     """
     Runs the provided backup shell script and logs the start time, end time, and exit status 
-    in a specified JSON log file. If the script does not exist or fails to execute, an exception is raised.
+    in a specified JSON log file.
     
     Parameters:
     - script_name (str): The name of the shell script to run. Default is 'backup.sh'.
-    - backup_dir (str): The directory where the backup is stored. Default is '/home/user/backup'.
-    - log_file (str): The path to the JSON log file. Default is '/home/user/backup_log.json'.
+    - log_file (str): The path to the JSON log file where the execution details will be recorded. Default is '/home/user/backup_log.json'.
     
     Returns:
     dict: A dictionary containing:
@@ -23,6 +21,10 @@ def f_1012(script_name=SCRIPT_NAME, backup_dir=BACKUP_DIR, log_file=LOG_FILE):
         - 'end_time': The end time of the script execution in the format '%Y-%m-%d %H:%M:%S'.
         - 'exit_status': The exit status of the script execution (0 for success, other values indicate an error).
     
+    Raises:
+    - FileNotFoundError: If the script file does not exist.
+    - RuntimeError: If there is an error executing the script.
+        
     Requirements:
     - subprocess
     - os
