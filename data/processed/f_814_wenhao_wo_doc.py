@@ -109,7 +109,7 @@ class TestCases(unittest.TestCase):
         file_names = sorted([file[0] for file in result])
         expected_file_names = sorted(
             list(self.files.keys())
-        )  # Assu 'utc_test.txt' is expected.
+        )  # Assuming 'utc_test.txt' is expected.
         self.assertListEqual(file_names, expected_file_names)
     def test_case_6(self):
         # Test if modification times are correctly identified.

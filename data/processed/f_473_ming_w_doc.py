@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
             'Goals': [4, 2, 0, 0, 0],
             'Penalties': [1, 1, 0, 0, 0],
             'Penalties Cost': [400, 400, 0, 0, 0],  # Mocked value is reflected here
-            'Performance Score': [3, 1, 0, 0, 0]  # Assu Performance Score is Goals - Penalties
+            'Performance Score': [3, 1, 0, 0, 0]  # Assuming Performance Score is Goals - Penalties
         }
         expected_df = pd.DataFrame(expected_data)
         result_df = f_263(goals, penalties)

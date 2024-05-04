@@ -26,7 +26,7 @@ def f_668(ROOT_DIR, DEST_DIR, SPECIFIC_HASH):
     - hashlib
 
     Examples:
-    >>> # Assu the correct paths are given for ROOT_DIR, DEST_DIR,
+    >>> # Assuming the correct paths are given for ROOT_DIR, DEST_DIR,
     >>> # and at least one file in ROOT_DIR matches SPECIFIC_HASH:
     >>> type(f_668('/path/to/root', '/path/to/dest', 'd41d8cd98f00b204e9800998ecf8427e')) is int
     True

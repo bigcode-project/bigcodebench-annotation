@@ -22,7 +22,7 @@ def f_408(filename):
     - shutil
 
     Example:
-    >>> f_408('vmware-cmd.bat') # Assu successful execution
+    >>> f_408('vmware-cmd.bat') # Assuming successful execution
     0
     >>> f_408('nonexistent.bat') # If backup fails or file doesn't exist
     -1

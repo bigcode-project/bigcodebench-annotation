@@ -93,7 +93,7 @@ class TestCases(unittest.TestCase):
         mean, std_dev, num_samples = 0, 1, 1000
         _, fig = f_334(mean, std_dev, num_samples)
         ax = fig.axes[0]
-        line = ax.get_lines()[0]  # Assu the first line is the PDF
+        line = ax.get_lines()[0]  # Assuming the first line is the PDF
         x, y = line.get_data()
         expected_y = norm.pdf(x, mean, std_dev)
         np.testing.assert_array_almost_equal(y, expected_y, decimal=2)

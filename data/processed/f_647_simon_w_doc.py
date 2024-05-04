@@ -91,5 +91,5 @@ class TestCases(unittest.TestCase):
             f_592(incomplete_df, 30, 70)
     def test_non_numeric_values(self):
         self.df['Age'] = self.df['Age'].astype(str)  # Converting Age to string
-        with self.assertRaises(Exception):  # Assu ValueError is raised for non-numeric inputs
+        with self.assertRaises(Exception):  # Assuming ValueError is raised for non-numeric inputs
             f_592(self.df, 30, 70)

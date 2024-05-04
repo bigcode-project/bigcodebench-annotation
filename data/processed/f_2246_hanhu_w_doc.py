@@ -42,7 +42,7 @@ def f_565(dic):
 
 import unittest
 from unittest.mock import patch
-import folium  # Assu the function f_565 and folium are imported or defined appropriately.
+import folium  # Assuming the function f_565 and folium are imported or defined appropriately.
 class TestCases(unittest.TestCase):
     def test_return_type(self):
         """Test that the function returns a tuple with a map and a dictionary."""

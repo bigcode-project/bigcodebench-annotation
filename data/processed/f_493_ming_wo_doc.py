@@ -31,7 +31,7 @@ def f_516(df: pd.DataFrame, filename: str) -> str:
         for record in df.to_dict(orient='records'):
             json.dump(record, file)
             file.write('\n')
-    end_time = time.time()  # End ti
+    end_time = time.time()  # End timing
     cost = f"Operation completed in {end_time - start_time} seconds."
     return os.path.abspath(file_path)
 

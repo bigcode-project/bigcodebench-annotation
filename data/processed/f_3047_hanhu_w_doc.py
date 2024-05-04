@@ -58,7 +58,7 @@ class TestCases(unittest.TestCase):
     def test_negative_numbers(self):
         """Test function with a negative number."""
         with self.assertRaises(ValueError):
-            f_325([-1])  # Assu we want to enforce non-negative integers only
+            f_325([-1])  # Assuming we want to enforce non-negative integers only
     def test_very_large_number(self):
         """Test function with a very large number to check for performance or overflow issues."""
         number = 20  # A reasonable choice to avoid excessive computation time in tests

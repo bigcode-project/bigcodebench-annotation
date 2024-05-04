@@ -24,9 +24,9 @@ def f_183(df):
     Example:
     >>> import pandas as pd
     >>> df_sample = pd.DataFrame({
-    ...    'Title': ['How to code?', 'What is Python?', 'The art of program', 'How to cook?', 'What is life?'],
-    ...    'Content': ['This is a tutorial about coding...', 'Python is a program language...',
-    ...                'Program is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
+    ...    'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
+    ...    'Content': ['This is a tutorial about coding...', 'Python is a programming language...',
+    ...                'Programming is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
     ... })
     >>> f_183(df_sample)
     [0, 1, 0, 1]
@@ -48,9 +48,9 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         """Prepare environment and variables for tests."""
         self.df_sample = pd.DataFrame({
-            'Title': ['How to code?', 'What is Python?', 'The art of program', 'How to cook?', 'What is life?'],
-            'Content': ['This is a tutorial about coding...', 'Python is a program language...',
-                        'Program is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
+            'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
+            'Content': ['This is a tutorial about coding...', 'Python is a programming language...',
+                        'Programming is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
         })
         os.environ['OMP_NUM_THREADS'] = '1'  # Setup environment variable for deterministic parallel processing
     def tearDown(self):

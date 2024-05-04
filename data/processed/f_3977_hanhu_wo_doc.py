@@ -20,11 +20,11 @@ def f_191(file_path):
     - base64
 
     Examples:
-    Assu 'example.txt' contains some text and a valid 'private.pem' is present,
+    Assuming 'example.txt' contains some text and a valid 'private.pem' is present,
     >>> len(f_191('example.txt')) > 0
     True
 
-    Assu 'empty.txt' is an empty file and a valid 'private.pem' is present,
+    Assuming 'empty.txt' is an empty file and a valid 'private.pem' is present,
     >>> len(f_191('empty.txt')) > 0
     True
     """
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
             os.rename('temp_private.pem', 'private.pem')
     def test_different_files_same_key(self):
         """Ensure different files produce different signatures using the same key."""
-        # Assu another_example.txt exists and contains different content
+        # Assuming another_example.txt exists and contains different content
         if os.path.exists('another_example.txt'):
             hash1 = f_191('example.txt')
             hash2 = f_191('another_example.txt')

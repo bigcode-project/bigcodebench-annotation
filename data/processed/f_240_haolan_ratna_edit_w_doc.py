@@ -7,7 +7,7 @@ FEATURES = ['feature1', 'feature2', 'feature3', 'feature4', 'feature5']
 def f_687(df, dct):
     """
     This function calculates and returns the mean, median, mode, and variance for specified features in a DataFrame. 
-    It replaces certain values in the DataFrame based on a provided dictionary mapping before perfor the calculations.
+    It replaces certain values in the DataFrame based on a provided dictionary mapping before performing the calculations.
     
     Parameters:
     df (DataFrame): The input DataFrame.

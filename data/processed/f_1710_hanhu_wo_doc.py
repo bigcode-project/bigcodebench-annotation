@@ -10,7 +10,7 @@ def f_400(request, header, csv_data):
     CSV file in response to a user request on a Django web application.
 
     Parameters:
-    request (HttpRequest): The inco Django HttpRequest.
+    request (HttpRequest): The incoming Django HttpRequest.
     header (list of str): List of strings representing the header of the CSV file.
     csv_data (list of list of str): List of rows, with each row being a list of strings, to be written into the CSV file.
 

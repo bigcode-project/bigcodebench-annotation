@@ -62,7 +62,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(histogram_plot, plt.Axes)
     def test_empty_file(self):
         """Test with an empty CSV file."""
-        with self.assertRaises(ValueError):  # Assu pandas raises a ValueError for an empty CSV
+        with self.assertRaises(ValueError):  # Assuming pandas raises a ValueError for an empty CSV
             f_260(self.empty_data_csv, 'date')
     def test_nonexistent_file(self):
         """Test with a nonexistent CSV file path."""

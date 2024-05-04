@@ -102,7 +102,7 @@ class TestCases(unittest.TestCase):
             'Score': [88, 92, 85]
         }
         df, avg_scores, common_age = f_271(data)
-        self.assertEqual(common_age, 24)  # Assu the first element is taken if all are equally common
+        self.assertEqual(common_age, 24)  # Assuming the first element is taken if all are equally common
     def test_duplicate_names_different_ages(self):
         # Testing with duplicate names but different ages
         data = {

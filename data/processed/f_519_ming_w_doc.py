@@ -33,7 +33,7 @@ def f_311(texts):
     - sklearn.feature_extraction.text
 
     Example:
-    >>> texts = ["Hello, world!", "Machine learning is great.", "Python is my favorite program language."]
+    >>> texts = ["Hello, world!", "Machine learning is great.", "Python is my favorite programming language."]
     >>> dtm = f_311(texts)
     """
     cleaned_texts = [ALPHANUMERIC.sub(' ', text).lower() for text in texts]
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
             "Hello, world!",
             "Data science is about the extraction of knowledge from data.",
             "Machine learning is a fascinating field.",
-            "Python is a versatile program language.",
+            "Python is a versatile programming language.",
             "Stop words are filtered out in text preprocessing."
         ]
     def test_dtm_shape(self):

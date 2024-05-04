@@ -48,7 +48,7 @@ class TestCases(unittest.TestCase):
         for filename in filenames:
             Path(f"{self.test_dir}/{filename}").touch()
     
-    def test_rena_files(self):
+    def test_renafiles(self):
         self.create_test_files(["draft1.txt", "draft2.txt", "draft3.txt"])
         result = f_406("draft", "final", self.test_dir)
         self.assertTrue(result)
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(result)
         self.assertEqual([], os.listdir(self.test_dir))
         
-    def test_complex_pattern_rena(self):
+    def test_complex_pattern_renaming(self):
         self.create_test_files(["draft_file1.txt", "file_draft2.txt", "draft3file.txt"])
         result = f_406("draft", "final", self.test_dir)
         self.assertTrue(result)

@@ -17,7 +17,7 @@ def f_438(dir_path: str) -> list:
     dir_path (str): The path to the directory containing the files to be renamed.
 
     Returns:
-    list[str]: A list containing the new names of all files after rena.
+    list[str]: A list containing the new names of all files after renaming.
 
     Example:
     >>> f_438('path/to/directory')

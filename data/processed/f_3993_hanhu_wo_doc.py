@@ -19,12 +19,12 @@ def f_596(file_path1, file_path2):
     - gzip
 
     Examples:
-    Assu 'file1.gz' and 'file2.gz' contain slightly different text,
+    Assuming 'file1.gz' and 'file2.gz' contain slightly different text,
     >>> result = f_596('file1.gz', 'file2.gz')
     >>> len(result) > 0
     True
 
-    Assu 'file1.gz' and 'file1.gz' are identical,
+    Assuming 'file1.gz' and 'file1.gz' are identical,
     >>> f_596('file1.gz', 'file1.gz')
     ''
     """

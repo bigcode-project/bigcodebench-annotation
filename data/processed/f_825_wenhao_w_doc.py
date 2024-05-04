@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
         ax = f_332(df, "F")
         line = ax.lines[
             0
-        ]  # Assu the normal distribution line is the first line object in the plot
+        ]  # Assuming the normal distribution line is the first line object in the plot
         x_data = line.get_xdata()
         y_data = line.get_ydata()
         # The peak of the normal distribution curve should be at the mean

@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         random.seed(0)
         # Correctly set up the mock within the test execution context
-        self.patcher = patch('random.randint', side_effect=[i % 100 for i in range(800)])  # Assu 8 students and 100 course entries
+        self.patcher = patch('random.randint', side_effect=[i % 100 for i in range(800)])  # Assuming 8 students and 100 course entries
         self.mock_randint = self.patcher.start()
         self.grades_df = f_445()
         self.patcher.stop()

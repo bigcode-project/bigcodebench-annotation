@@ -31,7 +31,7 @@ def f_704(
                   equal-sized portions, the last timestamp may be excluded.
     - columns (list of str, optional): Names of the DataFrame columns to be included in the output.
                                        Defaults to: ['Timestamp', 'Sensor1', 'Sensor2', 'Sensor3', 'SensorStatus'].
-                                       Regardless of na, the function will populate the first column with
+                                       Regardless of naming, the function will populate the first column with
                                        timestamp, the middle columns with sensor data, and the final with status.
     - sensor_statuses (list of str, optional): Possible statuses for the sensors to randomly assign in the dataset.
                                                Defaults to: ['OK', 'MAINTENANCE_REQUIRED', 'ERROR'].

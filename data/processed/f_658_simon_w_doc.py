@@ -17,7 +17,7 @@ def f_374(num_samples=500, noise_strength=1, random_seed=None, test_size=0.2):
                    Defaults to 500
     - noise_strength (float): The strength (magnitude) of the noise that is
                               added to the dataset. Defaults to 1
-    - random_seed (int): The seed used in generating the dataset, in perfor
+    - random_seed (int): The seed used in generating the dataset, in performing
                    the train test split and in generating the random noise.
                    Defaults to None
     - test_size (float): The fraction of the test split. Defaults to 0.2

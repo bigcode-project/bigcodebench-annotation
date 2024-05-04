@@ -56,7 +56,7 @@ class TestCases(unittest.TestCase):
     @patch('requests.get')
     def test_handle_exceptions(self, mock_get):
         """Test that the function handles exceptions properly by not including IPs with failed requests."""
-        mock_get.side_effect = [requests.exceptions.ConnectionError] * 4  # Assu a /30 subnet, resulting in 4 attempts.
+        mock_get.side_effect = [requests.exceptions.ConnectionError] * 4  # Assuming a /30 subnet, resulting in 4 attempts.
         result = f_341('192.168.0.0/30', 5)
         # The expected result is adjusted since the function no longer returns False for failed requests but instead skips them.
         expected_result = []  # Expecting an empty list due to ConnectionError.

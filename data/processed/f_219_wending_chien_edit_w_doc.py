@@ -56,7 +56,7 @@ matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         data_1 = pd.DataFrame({
-            'Title': ['How to code?', 'What is Python?', 'The art of program', 'How to cook?', 'What is life?'],
+            'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
             'Views': [1000, 500, 200, 300, 800],
             'Likes': [500, 250, 100, 150, 600]
         })
@@ -86,7 +86,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(ax, matplotlib.axes.Axes, "The returned object should be of type Axes.")
     def test_case_4(self):
         data_4 = pd.DataFrame({
-            'Title': ['Learning to code', 'Python basics', 'Advanced program', 'Cooking basics',
+            'Title': ['Learning to code', 'Python basics', 'Advanced programming', 'Cooking basics',
                       'Life and philosophy'],
             'Views': [1100, 450, 220, 320, 850],
             'Likes': [550, 225, 110, 160, 425]

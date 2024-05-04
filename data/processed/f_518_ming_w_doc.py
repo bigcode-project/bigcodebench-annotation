@@ -24,7 +24,7 @@ def f_736(texts, stopwords=None):
     - gensim
 
     Example:
-    >>> texts = ["Hello, World!", "Machine Learning is great", "Python is my favorite program language"]
+    >>> texts = ["Hello, World!", "Machine Learning is great", "Python is my favorite programming language"]
     >>> model = f_736(texts)
     >>> vector = model.wv['python']
     """
@@ -42,7 +42,7 @@ stopwords_mock = ["is", "my", "a", "with", "and", "it", "to", "the", "of", "in"]
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
-        texts = ["Hello, World!", "Machine Learning is great", "Python is my favorite program language"]
+        texts = ["Hello, World!", "Machine Learning is great", "Python is my favorite programming language"]
         model = f_736(texts, stopwords=stopwords_mock)
         self.assertIsInstance(model, Word2Vec)
         self.assertIn('python', model.wv.key_to_index)

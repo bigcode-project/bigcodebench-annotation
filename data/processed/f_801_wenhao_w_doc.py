@@ -2,14 +2,14 @@ import random
 import re
 
 
-def f_327(text, seed=0):
+def f_327(text, seed=None):
     """
     Scramble the letters in each word of a given text, keeping the first and last letters of each word intact.
 
     Parameters:
     text (str): The text to be scrambled.
     seed (int, optional): A seed for the random number generator to ensure reproducible results.
-                          Defaults to 0.
+                          Defaults to None (not set).
 
     Returns:
     str: The scrambled text.
@@ -25,10 +25,11 @@ def f_327(text, seed=0):
     Examples:
     >>> f_327('Hello, world!', 0)
     'Hello, wlrod!'
-    >>> f_327("Program is fun, isn't it?", 42)
+    >>> f_327("Programming is fun, isn't it?", 42)
     "Prmiangmrog is fun, isn't it?"
     """
-    random.seed(seed)
+    if seed is not None:
+        random.seed(seed)
     def scramble_word(match):
         word = match.group(0)
         if len(word) > 3:
@@ -52,7 +53,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(input_text.split()), len(output_text.split()))
     def test_case_2(self):
         # Test with single word
-        input_text = "Program"
+        input_text = "Programming"
         output_text = f_327(input_text, seed=2)
         self.assertTrue(output_text.startswith("P"))
         self.assertTrue(output_text.endswith("g"))

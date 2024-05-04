@@ -28,7 +28,7 @@ def f_0(request):
     "HTTP/1.1 404 NOT FOUND\r\n\r\nFile Not Found"
     >>> f_0("INVALID REQUEST")
     "HTTP/1.1 400 BAD REQUEST\r\n\r\nBad Request"
-    >>> f_0("GET /restricted.txt HTTP/1.1") # Assu an I/O error occurs
+    >>> f_0("GET /restricted.txt HTTP/1.1") # Assuming an I/O error occurs
     "HTTP/1.1 500 INTERNAL SERVER ERROR\r\n\r\nInternal Server Error"
     """
     match = re.match(r"^GET /([\w\.\-]+) HTTP/1\.1$", request)

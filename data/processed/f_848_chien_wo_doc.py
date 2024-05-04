@@ -59,7 +59,7 @@ import shutil
 from pathlib import Path
 class TestCases(unittest.TestCase):
     """Test cases for the f_504 function."""
-    base_path = "mnt/data/f_504_data_"
+    base_path = "mnt/data/f_504_data"
     def setUp(self):
         # Ensure the base path is absolute
         self.base_path = os.path.abspath(self.base_path)

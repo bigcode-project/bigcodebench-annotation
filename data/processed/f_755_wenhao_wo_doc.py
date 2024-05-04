@@ -58,7 +58,7 @@ class TestCases(unittest.TestCase):
         np.testing.assert_array_equal(result['count'], np.array([3, 3]))
         np.testing.assert_array_equal(result['fft'], np.array([ 1.-0.j, -1.-0.j]))
     def test_mixed_types(self):
-        # Assu '1' (string) appears twice, and 1 (int) appears once.
+        # Assuming '1' (string) appears twice, and 1 (int) appears once.
         # The test expects the string '1' to be the mode with a count of 2.
         result = f_171([1, '1', '1', 2], repetitions=1)
         np.testing.assert_array_equal(result['mode'], np.array(['1']))

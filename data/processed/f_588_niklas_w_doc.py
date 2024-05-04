@@ -3,7 +3,7 @@ from sklearn.cluster import DBSCAN
 
 def f_537(data, cols):
     """
-    Perform DBSCAN clustering on the data by transfor it into a DataFrame and recording the clusters in a new column named 'Cluster'.
+    Perform DBSCAN clustering on the data by transforming it into a DataFrame and recording the clusters in a new column named 'Cluster'.
     Please choose the parameters eps=3 and min_samples=2.
     
     Parameters:

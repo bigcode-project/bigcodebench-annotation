@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
         data, outliers_detected, _ = f_552(num_samples=50, num_outliers=10)
         self.assertEqual(len(data), 60)
         # Replicate the IQR calculation for testing
-        normal_data = data[:50]  # Assu the first 50 are normal data
+        normal_data = data[:50]  # Assuming the first 50 are normal data
         q75, q25 = np.percentile(normal_data, [75, 25])
         iqr = q75 - q25
         lower_bound = q25 - (iqr * 1.5)

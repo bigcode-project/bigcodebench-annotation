@@ -9,7 +9,7 @@ def f_335(request, session_expire_time):
     then sets this key in a cookie on an HttpResponse object with the specified expiration time.
 
     Parameters:
-    request (django.http.HttpRequest): The inco Django HttpRequest.
+    request (django.http.HttpRequest): The incoming Django HttpRequest.
     session_expire_time (int): The expiration time for the session cookie in seconds.
 
     Returns:

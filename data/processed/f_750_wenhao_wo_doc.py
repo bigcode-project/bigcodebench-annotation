@@ -46,7 +46,7 @@ import numpy as np
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Prepare test data
-        self.directory = "f_586_data_/"
+        self.directory = "f_586_data/"
         self.pattern = r"^sales_data_\d{4}.csv"
         os.makedirs(self.directory, exist_ok=True)
         data_2021 = pd.DataFrame({

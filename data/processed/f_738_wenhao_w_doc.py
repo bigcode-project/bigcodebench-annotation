@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(sum(result.values()), 0, "With count 0, there should be no letters.")
         
     def test_specific_distribution(self):
-        # Assu the seed value of 4 leads to a specific, known distribution
+        # Assuming the seed value of 4 leads to a specific, known distribution
         result = f_571(5, 2, seed=4)
         # Correct the expected distribution based on actual output
         correct_expected_distribution = Counter({'b': 3, 'a': 3, 'e': 2, 'c': 1, 'd': 1})

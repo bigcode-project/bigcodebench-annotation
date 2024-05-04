@@ -60,7 +60,7 @@ from pathlib import Path
 import os
 class TestCases(unittest.TestCase):
     """Test cases for f_667."""
-    test_data_dir = "mnt/data/f_667_data_"
+    test_data_dir = "mnt/data/f_667_data"
     def setUp(self):
         """Set up method to create a directory for test files."""
         self.test_dir = Path(self.test_data_dir)

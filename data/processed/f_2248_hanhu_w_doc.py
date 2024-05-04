@@ -90,5 +90,5 @@ class TestCases(unittest.TestCase):
         """Test that the map is initialized with correct latitude and longitude."""
         locations = {'Loc1': {'Lat': 0, 'Lon': 0}, 'Loc2': {'Lat': 4, 'Lon': 4}}
         f_555(locations)
-        # Assu that the map is initialized at the location of the first entry in the dictionary
+        # Assuming that the map is initialized at the location of the first entry in the dictionary
         mock_map.assert_called_with(location=[0, 0], zoom_start=4)

@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
     def test_hashing_of_content(self, mock_urlopen):
         mock_urlopen.return_value.read.return_value = b"test content"
         pub_key, signed_hash, hash_value = f_587("https://www.example.com")
-        # Assu the function is modified to return the content hash for testing
+        # Assuming the function is modified to return the content hash for testing
         self.assertEqual(sha256(b"test content").digest(), hash_value)
     @patch('urllib.request.urlopen')
     def test_network_error_handling_1(self, mock_urlopen):

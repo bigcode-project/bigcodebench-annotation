@@ -21,10 +21,10 @@ def f_466(db_path: str, table_name: str, column_name: str) -> pd.DataFrame:
 
     Examples:
     >>> df = f_466('./data.db', 'messages', 'content')
-    >>> df.loc[0, 'content']  # Assu the first row originally contained "Hello\nWorld"
+    >>> df.loc[0, 'content']  # Assuming the first row originally contained "Hello\nWorld"
     'Hello<br>World'
     >>> df = f_466('./another_data.db', 'comments', 'text')
-    >>> df.loc[1, 'text']  # Assu the second row originally contained "Good\nMorning"
+    >>> df.loc[1, 'text']  # Assuming the second row originally contained "Good\nMorning"
     'Good<br>Morning'
     """
     try:

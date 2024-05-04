@@ -10,7 +10,7 @@ def f_582(epoch_milliseconds, seed=0):
     This function iterates from the starting epoch time to the current system
     time, incrementally increasing the time by a random number of seconds (an
     integer in [1, 10]) between each log entry. Each log entry records a user
-    perfor an activity at a specific time.
+    performing an activity at a specific time.
 
     Parameters:
     - epoch_milliseconds (int): Starting epoch time in milliseconds. Must be in
@@ -114,11 +114,11 @@ class TestCases(unittest.TestCase):
             30 * 24 * 60 * 60
         )  # Approximate number of seconds in a month
         max_possible_entries = (
-            seconds_in_a_month  # Assu a minimum of 1-second increments
+            seconds_in_a_month  # Assuming a minimum of 1-second increments
         )
         min_possible_entries = (
             seconds_in_a_month // 10
-        )  # Assu a maximum of 10-second increments
+        )  # Assuming a maximum of 10-second increments
         # Verify that the log has a reasonable number of entries given the time frame
         self.assertTrue(min_possible_entries <= len(log) <= max_possible_entries)
         self.assertTrue(

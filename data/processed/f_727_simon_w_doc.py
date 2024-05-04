@@ -148,5 +148,5 @@ class TestCases(unittest.TestCase):
                            'C': [900, 900, 900, 900, 900]})
         predictions, model = f_392(df, seed=100)
         # Since the data is linear and simple, the model should predict close to the actual values
-        expected_predictions = np.array([70])  # Assu a perfect model
+        expected_predictions = np.array([70])  # Assuming a perfect model
         np.testing.assert_almost_equal(predictions, expected_predictions)

@@ -33,7 +33,7 @@ def f_16(df, letter):
     ax.set_title(f"Histogram of Word Lengths starting with '{letter}'")
     ax.set_xlabel("Word Length")
     ax.set_ylabel("Frequency")
-    end_time = time.time()  # End ti
+    end_time = time.time()  # End timing
     cost = f"Operation completed in {end_time - start_time} seconds."
     return ax
 

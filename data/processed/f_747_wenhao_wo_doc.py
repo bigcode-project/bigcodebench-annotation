@@ -62,7 +62,7 @@ class TestCases(unittest.TestCase):
         shutil.rmtree('test_5')
     
     def test_case_1(self):
-        # This test assumes the existence of a directory named 'f_464_data_' with a CSV file 'file1.csv'
+        # This test assumes the existence of a directory named 'f_464_data' with a CSV file 'file1.csv'
         data = f_464('test_1')
         self.assertIsInstance(data, dict)
         self.assertIn('file1', data)

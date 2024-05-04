@@ -26,7 +26,7 @@ def f_540(directory):
 
     Example:
     >>> f_540("/path/to/directory")
-    (3, ['jquery-1.js', 'jquery-2.js', 'jquery-ui.js'])  # Assu 3 jQuery files were removed
+    (3, ['jquery-1.js', 'jquery-2.js', 'jquery-ui.js'])  # Assuming 3 jQuery files were removed
     """
     logging.basicConfig(filename='jquery_removal.log', level=logging.INFO,
                         format='%(asctime)s - %(levelname)s - %(message)s')

@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
     def test_moving_average_calculation(self):
         """Test that the moving average is correctly calculated."""
         df = f_226()
-        # Assu moving average calculation correctness check for the first few entries
+        # Assuming moving average calculation correctness check for the first few entries
         for i in range(6):  # Check the first 6 entries for a window of 6 elements
             expected_avg = statistics.mean(df['Random Numbers'].iloc[max(0, i - 5):i + 1])
             self.assertEqual(df['Moving Average'].iloc[i], expected_avg, "Moving average calculation mismatch.")

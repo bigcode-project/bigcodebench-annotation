@@ -30,7 +30,7 @@ def f_253(df, letter):
     filtered_df = df[df['Word'].str.contains(regex, regex=True)]
     word_lengths = filtered_df['Word'].str.len()
     count_dict = word_lengths.value_counts().to_dict()
-    end_time = time.time()  # End ti
+    end_time = time.time()  # End timing
     cost = f"Operation completed in {end_time - start_time} seconds."
     return count_dict
 

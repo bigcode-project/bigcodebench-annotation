@@ -54,7 +54,7 @@ import shutil
 import os
 class TestCases(unittest.TestCase):
     """Test cases for f_569 function."""
-    directory = "mnt/data/f_852_data_"
+    directory = "mnt/data/f_852_data"
     def setUp(self):
         """Setup method to create a sample image inr test files."""
         # Create directory if it doesn't exist

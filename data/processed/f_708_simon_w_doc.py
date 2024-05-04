@@ -49,7 +49,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Testing with a basic dataset and default parameters
         data = [('A', 1, 1), ('B', 2, 2), ('C', 300, 300), ('D', 400, 400)]
-        expected_labels = np.array([0, 0, 1, 1])  # Assu 2 clusters and certain random_state
+        expected_labels = np.array([0, 0, 1, 1])  # Assuming 2 clusters and certain random_state
         labels = f_432(data, random_state=1)
         np.testing.assert_array_equal(labels, expected_labels)
     def test_case_2(self):

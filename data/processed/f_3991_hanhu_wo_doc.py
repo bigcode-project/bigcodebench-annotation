@@ -23,11 +23,11 @@ def f_79(file_path1, file_path2):
     - os
 
     Examples:
-    Assu 'file1.gz' and 'file2.gz' contain the same content,
+    Assuming 'file1.gz' and 'file2.gz' contain the same content,
     >>> f_79('file1.gz', 'file2.gz')
     True
 
-    Assu 'file1.gz' and 'file3.txt' contain different content,
+    Assuming 'file1.gz' and 'file3.txt' contain different content,
     >>> f_79('file1.gz', 'file3.txt')
     False
     """

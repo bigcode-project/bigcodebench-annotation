@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(modified_df), len(self.df), "No rows should be removed.")
     def test_random_plot_columns(self):
         _, plots = f_61(self.df, [], 1)
-        # Assu f_61 generates at least one plot and adds it to the list,
+        # Assuming f_61 generates at least one plot and adds it to the list,
         # access the first plot for testing.
         first_plot = plots[0]
         plot_columns = [first_plot.get_xlabel(), first_plot.get_ylabel()]

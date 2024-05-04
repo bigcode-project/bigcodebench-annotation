@@ -15,7 +15,7 @@ def f_475(template_folder):
 
     Returns:
     flask.app.Flask: A Flask application instance configured with a root route that handles POST requests.
-    The route logs inco request data as JSON and serves the 'index.html' template with the provided data.
+    The route logs incoming request data as JSON and serves the 'index.html' template with the provided data.
 
     Requirements:
     - flask.Flask

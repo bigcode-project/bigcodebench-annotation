@@ -33,7 +33,7 @@ def f_546(word):
 
 import unittest
 import random
-# Assu the function is correctly imported from its script
+# Assuming the function is correctly imported from its script
 # from f_546 import f_546  
 class TestCases(unittest.TestCase):
     def test_with_valid_input(self):
