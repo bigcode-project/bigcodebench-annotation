@@ -2,30 +2,28 @@ import collections
 import json
 import requests
 
-# Constants
-API_URL = 'https://api.github.com/users/'
-
-def f_995(user):
+def f_995(user, API_URL = 'https://api.github.com/users/'):
     """
-    Retrieve the names of the repositories of a GitHub user sorted by their creation date.
-    
-    This function sends a request to the GitHub API to fetch the repository details of a given user. It then sorts these repositories by their creation date and returns a list of the sorted repository names.
+    Retrieves the names of the repositories of a specified GitHub user, sorted in ascending order by their creation date.
+
+    The function queries the GitHub API for all repositories of a given user, parses the response to extract the names and creation dates, and returns the repository names sorted by the date they were created.
 
     Parameters:
-    user (str): The GitHub username.
+    - user (str): The GitHub username whose repositories are to be retrieved.
+    - API_URL (str): The base URL of the GitHub API. Default is 'https://api.github.com/users/'.
 
     Returns:
-    list: A list of repository names sorted by their creation date.
+    - list of str: A list of repository names, sorted by their creation dates from oldest to newest.
+
 
     Requirements:
     - collections
     - json
     - requests
-    - The function uses the API URL 'https://api.github.com/users/' to make requests.
 
     Example:
     >>> f_995('octocat')
-    ['Repo1', 'Repo2', ...]  # Example output
+    ['Spoon-Knife', 'Hello-World', 'octocat.github.io']  # Example output, actual results may vary.
     """
     response = requests.get(API_URL + user + '/repos')
     data = json.loads(response.text)
@@ -34,8 +32,8 @@ def f_995(user):
     return list(sorted_repos.keys())
 
 import unittest
-import sys
-sys.path.append('/mnt/data/')  # Add the path to include the refined function.py
+from unittest.mock import patch, Mock
+import json
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -44,29 +42,50 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
+    def setUp(self):
+        self.mock_response_with_multiple_repos = json.dumps([
+        {"name": "Repo1", "created_at": "2021-01-01T00:00:00Z"},
+        {"name": "Repo2", "created_at": "2021-01-02T00:00:00Z"}
+    ])
+        self.mock_response_with_single_repo = json.dumps([
+        {"name": "SingleRepo", "created_at": "2021-01-01T00:00:00Z"}
+    ])
+        self.mock_response_with_no_repos = json.dumps([])
+
+    @patch('requests.get')
+    def test_case_1(self, mock_get):
         # Test if the function returns a list
+        mock_get.return_value = Mock(status_code=200, text=self.mock_response_with_multiple_repos)
         result = f_995('octocat')
         self.assertIsInstance(result, list, "The returned value should be a list.")
 
-    def test_case_2(self):
+    @patch('requests.get')
+    def test_case_2(self, mock_get):
         # Test for a user with multiple repositories
+        mock_get.return_value = Mock(status_code=200, text=self.mock_response_with_multiple_repos)
         result = f_995('octocat')
         self.assertTrue(len(result) > 1, "The user 'octocat' should have more than one repository.")
 
-    def test_case_3(self):
+    @patch('requests.get')
+    def test_case_3(self, mock_get):
         # Test for a user with no repositories
-        result = f_995('dummyuserwithnorepos')  # This is a dummy user that shouldn't have any repositories
+        mock_get.return_value = Mock(status_code=200, text=self.mock_response_with_no_repos)
+        result = f_995('dummyuserwithnorepos')
         self.assertEqual(len(result), 0, "The user 'dummyuserwithnorepos' should have zero repositories.")
 
-    def test_case_4(self):
+    @patch('requests.get')
+    def test_case_4(self, mock_get):
         # Test for a non-existent user
+        mock_get.return_value = Mock(status_code=404, text=self.mock_response_with_no_repos)
         result = f_995('nonexistentuserxyz')
         self.assertEqual(len(result), 0, "A non-existent user should have zero repositories.")
 
-    def test_case_5(self):
+    @patch('requests.get')
+    def test_case_5(self, mock_get):
         # Test for a user with a single repository
-        result = f_995('userwithonerepo')  # This is a dummy user for the purpose of this test
+        mock_get.return_value = Mock(status_code=200, text=self.mock_response_with_single_repo)
+        result = f_995('userwithonerepo')
         self.assertEqual(len(result), 1, "The user 'userwithonerepo' should have one repository.")
+
 if __name__ == "__main__":
     run_tests()
