@@ -1,26 +1,37 @@
 import random
+import statistics
 
 # Constants
-LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+# LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
-def f_1002():
+def f_1002(LETTERS):
     """
     Create a dictionary in which keys are random letters and values are lists of random integers.
-    The dictionary is then sorted by the sum of the values in descending order.
+    The dictionary is then sorted by the mean of the values in descending order, demonstrating the use of the statistics library.
+    
+    Parameters:
+        LETTERS (list of str): A list of characters used as keys for the dictionary.
     
     Returns:
-    dict: The sorted dictionary with letters as keys and lists of integers as values.
+    dict: The sorted dictionary with letters as keys and lists of integers as values, sorted by their mean values.
     
     Requirements:
     - random
+    - statistics
     
     Example:
-    >>> sorted_dict = f_1002()
-    >>> print(sorted_dict.keys())  # ['a', 'b', 'c', ...] (random order)
-    >>> print(type(sorted_dict['a']))  # <class 'list'>
+    >>> import random
+    >>> random.seed(42)
+    >>> sorted_dict = f_1002(['a', 'b', 'c'])
+    >>> list(sorted_dict.keys())
+    ['a', 'b', 'c']
+    >>> isinstance(sorted_dict['a'], list)
+    True
+    >>> type(sorted_dict['a'])  # Check type of values
+    <class 'list'>
     """
     random_dict = {k: [random.randint(0, 100) for _ in range(random.randint(1, 10))] for k in LETTERS}
-    sorted_dict = dict(sorted(random_dict.items(), key=lambda item: sum(item[1]), reverse=True))
+    sorted_dict = dict(sorted(random_dict.items(), key=lambda item: statistics.mean(item[1]), reverse=True))
     return sorted_dict
 
 import unittest
