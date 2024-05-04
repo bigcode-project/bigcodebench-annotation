@@ -2,26 +2,30 @@ import os
 import glob
 import hashlib
 
-def f_994(source_dir=SOURCE_DIR, target_dir=TARGET_DIR, prefix=PREFIX):
+def f_994(source_dir, target_dir, prefix='#Hash: '):
     """
-    Compute the MD5 hash of each file's content in the provided `source_dir`, prepend the computed hash to the original content,
-    and write the modified content to a new file in the provided `target_dir`. Existing files with the same name in the `target_dir` will be overwritten.
-    
+    Computes the MD5 hash of each file's content in the specified `source_dir`, prepends the hash along with a prefix 
+    to the original content, and writes the modified content to new files in the `target_dir`. 
+    Existing files with the same name in `target_dir` are overwritten.
+
     Parameters:
-    - source_dir (str): The source directory containing the files to be hashed. Default is 'source'.
-    - target_dir (str): The target directory where the hashed files will be written. Default is 'target'.
-    - prefix (str): The line to prepend before the hash in the new files. Default is '#Hash: '.
-    
+    - source_dir (str): The directory containing the files to be processed. Must exist.
+    - target_dir (str): The directory where the processed files will be written. Created if it does not exist.
+    - prefix (str): The prefix to prepend before the hash in each new file. Default is '#Hash: '.
+
     Returns:
-    - list: A list of paths to the newly created files in the `target_dir`.
-    
+    - list: A list of paths to the newly created files in the `target_dir`, each with the hash prepended.
+
     Requirements:
     - os
     - glob
     - hashlib
-    
+
+    Raises:
+    FileNotFoundError if the source directory does not exist.
+
     Example:
-    >>> f_868(source_dir='samples', target_dir='hashed_samples')
+    >>> f_994(source_dir='samples', target_dir='hashed_samples', prefix='#MD5: ')
     ['hashed_samples/file1.txt', 'hashed_samples/file2.txt']
     """
     if not os.path.exists(source_dir):
@@ -29,24 +33,21 @@ def f_994(source_dir=SOURCE_DIR, target_dir=TARGET_DIR, prefix=PREFIX):
     
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
+    
     new_files = []
-    for file in glob.glob(source_dir + '/*'):
-        with open(file, 'r') as infile:
+    for file_path in glob.glob(os.path.join(source_dir, '*')):
+        with open(file_path, 'r') as infile:
             content = infile.read()
+        
         hash_object = hashlib.md5(content.encode())
-        new_file_path = os.path.join(target_dir, os.path.basename(file))
+        new_file_path = os.path.join(target_dir, os.path.basename(file_path))
+        
         with open(new_file_path, 'w') as outfile:
-            outfile.write(prefix + hash_object.hexdigest() + '\n' + content)
+            outfile.write(f"{prefix}{hash_object.hexdigest()}\n{content}")
+        
         new_files.append(new_file_path)
+    
     return new_files
-
-import unittest
-import os
-import hashlib
-
-SOURCE_DIR = 'source'
-TARGET_DIR = 'target'
-PREFIX = '#Hash: '
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -54,48 +55,75 @@ def run_tests():
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
+import unittest
+import os
+import shutil
+import tempfile
+from unittest.mock import patch
+
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
-        # Using default directories and prefix
-        result = f_868(source_dir='samples', target_dir='hashed_samples')
-        expected_files = [os.path.join('hashed_samples', file_name) for file_name in ['file1.txt', 'file2.txt', 'file3.txt', 'file4.txt', 'file5.txt']]
-        self.assertListEqual(result, expected_files)
+    def setUp(self):
+        # Create temporary directories for source and target
+        self.source_dir = tempfile.mkdtemp()
+        self.target_dir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        # Clean up the directories after tests
+        shutil.rmtree(self.source_dir)
+        shutil.rmtree(self.target_dir)
+
+    def test_default_directories_and_prefix(self):
+        # Create some sample files in source_dir
+        sample_files = ['file1.txt', 'file2.txt', 'file3.txt']
+        for file_name in sample_files:
+            with open(os.path.join(self.source_dir, file_name), 'w') as f:
+                f.write("Sample content for " + file_name)
+        
+        result = f_994(source_dir=self.source_dir, target_dir=self.target_dir)
+        expected_files = [os.path.join(self.target_dir, file_name) for file_name in sample_files]
+        self.assertListEqual(sorted(result), sorted(expected_files))
+
         for file in expected_files:
             with open(file, 'r') as f:
                 lines = f.readlines()
-                self.assertTrue(lines[0].startswith(PREFIX))
-                self.assertEqual(''.join(lines[1:]), file_contents[os.path.basename(file)])
-    
-    def test_case_2(self):
-        # Using custom prefix
+                self.assertTrue(lines[0].startswith('#Hash: '))
+                self.assertIn("Sample content for", ''.join(lines[1:]))
+
+    def test_custom_prefix(self):
+        # Testing with a custom prefix
         custom_prefix = "MD5Hash: "
-        result = f_868(source_dir='samples', target_dir='hashed_samples', prefix=custom_prefix)
+        with open(os.path.join(self.source_dir, "file.txt"), 'w') as f:
+            f.write("Sample content")
+        
+        result = f_994(source_dir=self.source_dir, target_dir=self.target_dir, prefix=custom_prefix)
         for file in result:
             with open(file, 'r') as f:
                 lines = f.readlines()
                 self.assertTrue(lines[0].startswith(custom_prefix))
-    
-    def test_case_3(self):
-        # Using empty directory
-        empty_dir = "/mnt/data/empty_samples"
-        os.makedirs(empty_dir, exist_ok=True)
-        result = f_868(source_dir=empty_dir, target_dir='hashed_samples')
+
+    def test_empty_directory(self):
+        # Testing with an empty source directory
+        result = f_994(source_dir=self.source_dir, target_dir=self.target_dir)
         self.assertEqual(result, [])
-    
-    def test_case_4(self):
-        # Using non-existing source directory
-        non_existing_dir = "/mnt/data/non_existing"
+
+    def test_non_existing_source_directory(self):
+        # Using a non-existing source directory should raise FileNotFoundError
+        non_existing_dir = "/path/to/nonexistent/dir"
         with self.assertRaises(FileNotFoundError):
-            f_868(source_dir=non_existing_dir, target_dir='hashed_samples')
-    
-    def test_case_5(self):
-        # Overwriting existing files in target directory
-        initial_content = "Initial content."
-        with open(os.path.join('hashed_samples', "file1.txt"), 'w') as f:
-            f.write(initial_content)
-        result = f_868(source_dir='samples', target_dir='hashed_samples')
-        with open(os.path.join('hashed_samples', "file1.txt"), 'r') as f:
-            self.assertNotEqual(f.read(), initial_content)
+            f_994(source_dir=non_existing_dir, target_dir=self.target_dir)
+
+    def test_overwriting_existing_files(self):
+        # Overwriting existing files in the target directory
+        file_path = os.path.join(self.target_dir, "file1.txt")
+        with open(file_path, 'w') as f:
+            f.write("Initial content.")
+        
+        with open(os.path.join(self.source_dir, "file1.txt"), 'w') as f:
+            f.write("New content.")
+        
+        f_994(source_dir=self.source_dir, target_dir=self.target_dir)
+        with open(file_path, 'r') as f:
+            self.assertNotEqual(f.read(), "Initial content.")
+
 if __name__ == "__main__":
     run_tests()
