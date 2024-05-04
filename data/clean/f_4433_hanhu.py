@@ -14,7 +14,7 @@ def f_4435(filepath):
     filepath (str): The path of the DLL file.
 
     Returns:
-    str: The name of the loaded DLL file.
+    str: The actual name of the loaded DLL file.
 
     Requirements:
     - ctypes

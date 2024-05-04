@@ -5,7 +5,7 @@ import gzip
 
 def f_2092(url_str, file_path):
     """
-    Fetches JSON data from a given URL, decodes the data, and compresses it into a gzip file.
+    Fetches JSON data from a given URL, decodes the json-formatted data, and compresses it into a gzip file.
 
     Parameters:
         url_str (str): The URL string pointing to the JSON data.

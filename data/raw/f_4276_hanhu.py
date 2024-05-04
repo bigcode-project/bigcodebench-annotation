@@ -73,7 +73,6 @@ class TestCases(unittest.TestCase):
 
         # Call the function under test
         modules_added = f_4278('numpy')
-        print(modules_added)
         # Perform your assertions here
         # For example, assert that modules were "added" (imported)
         self.assertFalse(len(modules_added) > 0)

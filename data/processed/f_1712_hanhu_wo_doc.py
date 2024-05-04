@@ -35,10 +35,11 @@ def f_475(template_folder):
     app = Flask(__name__, template_folder=template_folder)
 
     @app.route('/', methods=['POST'])
-    def home():
-        data = request.json
+    def handle_post():
+        data = request.get_json()
         logging.info(json.dumps(data))
         return render_template('index.html', data=data)
+
     return app
 
 import unittest

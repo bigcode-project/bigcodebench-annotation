@@ -24,6 +24,7 @@ def f_143(text):
     - string
     - pandas
 
+    Note:
     The function ignores words that are entirely made up of punctuation, even if they start with a '$'.
 
     Example:

@@ -42,7 +42,7 @@ def f_184(list_of_pairs):
     2    train  0.004193
     3    plane  0.000000
     4     ship  1.000000
-            """
+    """
 
     if len(list_of_pairs) == 0:
         raise Exception('The input array should not be empty.')

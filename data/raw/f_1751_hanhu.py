@@ -6,7 +6,7 @@ from scipy.stats import entropy
 def f_1752(numbers):
     """
     Creates and returns a dictionary with the mode and entropy of a numpy array constructed from a given list.
-    The function first converts the list into a numpy array, then calculates the mode and the entropy of this array,
+    The function first converts the list into a numpy array, then calculates the mode and the entropy (base 2) of this array,
     and finally adds them to the initial dictionary with the keys 'mode' and 'entropy'.
 
     Parameters:

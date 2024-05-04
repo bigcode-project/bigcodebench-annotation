@@ -8,6 +8,7 @@ def f_2661(smtp_server, smtp_port, smtp_username, smtp_password):
     """
     Creates an HTTP POST request handler that processes incoming email data and sends
     an email. The email data must be a JSON object with 'subject', 'message', and 'to' keys.
+    The type of the response can be retrieved as 'content-type' and the length of the response as 'content-length'.
     
     Parameters:
         smtp_server (str): SMTP server address.
