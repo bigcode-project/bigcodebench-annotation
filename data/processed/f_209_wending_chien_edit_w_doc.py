@@ -50,15 +50,11 @@ def f_273(data):
         raise ValueError("Data must contain exactly eight columns.")
     df = pd.DataFrame(data, columns=COLUMN_NAMES)
     df['Average'] = df.mean(axis=1)
-
     ax = sns.kdeplot(df['Average'], linewidth=3)
-
-    # Check if there are enough samples for normaltest
     if len(df['Average']) >= 20:
         k2, p = stats.normaltest(df['Average'])
     else:
         p = None
-
     return df, ax, p
 
 import numpy as np

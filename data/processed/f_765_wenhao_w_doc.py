@@ -35,16 +35,11 @@ def f_277(person_names, email_domains, num_records=5):
     """
     if len(person_names) < num_records or len(email_domains) == 0:
         raise ValueError("Insufficient number of names or domains provided.")
-    
     data = []
-    
-    # Randomly select 'num_records' names from the provided list
     selected_names = random.sample(person_names, num_records)
-
     for name in selected_names:
         email = re.sub('@', '[at]', '{}@{}'.format(name.split()[0].lower(), random.choice(email_domains)))
         data.append([name, email])
-
     df = pd.DataFrame(data, columns=['Name', 'Email'])
     return df
 

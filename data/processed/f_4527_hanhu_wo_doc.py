@@ -36,20 +36,16 @@ def f_292(file_path):
     (pub_key, priv_key) = rsa.newkeys(512)
     fernet_key = Fernet.generate_key()
     fernet = Fernet(fernet_key)
-
     with open(file_path, 'rb') as f:
         data = f.read()
         encrypted_data = fernet.encrypt(data)
-
     encrypted_file = file_path + '.encrypted'
     with open(encrypted_file, 'wb') as f:
         f.write(encrypted_data)
-
     encrypted_fernet_key = rsa.encrypt(fernet_key, pub_key)
     encrypted_key_file = 'fernet_key.encrypted'
     with open(encrypted_key_file, 'wb') as f:
         f.write(b64encode(encrypted_fernet_key))
-
     return pub_key, encrypted_file, encrypted_key_file
 
 import unittest

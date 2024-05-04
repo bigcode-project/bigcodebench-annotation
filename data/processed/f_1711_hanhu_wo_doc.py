@@ -37,15 +37,12 @@ def f_236(request, file_paths):
     'attachment; filename="files.zip"'
     """
     zip_io = io.BytesIO()
-
     with zipfile.ZipFile(zip_io, 'w') as zip_file:
         for file_path in file_paths:
             zip_file.writestr(file_path, 'This is the content of {}.'.format(file_path))
-
     zip_io.seek(0)  # Reset the file pointer to the start of the stream
     response = FileResponse(zip_io, as_attachment=True, filename='files.zip')
     response['Content-Type'] = 'application/zip'
-
     return response
 
 import unittest

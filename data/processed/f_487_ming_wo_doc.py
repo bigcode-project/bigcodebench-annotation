@@ -32,7 +32,6 @@ def f_458(date_str, from_tz):
     to_tz = pytz.timezone(choice(TIMEZONES))
     given_date = parse(date_str).replace(tzinfo=from_tz)
     converted_date = given_date.astimezone(to_tz)
-
     return converted_date.strftime('%Y-%m-%d %H:%M:%S'), to_tz.zone
 
 import unittest

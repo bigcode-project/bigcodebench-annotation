@@ -38,13 +38,8 @@ def f_718():
     LETTERS = list(string.ascii_lowercase)
     combinations = list(itertools.product(LETTERS, repeat=3))
     df = pd.DataFrame(combinations, columns=["a", "b", "c"])
-
-    # Getting value counts and ensuring the correct order of letters
     value_counts = df["a"].value_counts().reindex(LETTERS, fill_value=0)
-
-    # Plotting the histogram with the correct order
     ax = value_counts.plot(kind="bar")
-
     return df, ax
 
 import unittest

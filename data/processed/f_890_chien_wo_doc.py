@@ -32,10 +32,7 @@ def f_33(date_str):
     """
     start_date = datetime.strptime(date_str, "%Y-%m-%d")
     dates = pd.date_range(start_date, periods=10).tolist()
-
-    # Creating a DataFrame from the product of EMPLOYEES and dates
     df = pd.DataFrame(list(product(EMPLOYEES, dates)), columns=["Employee", "Date"])
-
     return df
 
 import unittest

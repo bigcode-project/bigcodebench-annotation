@@ -30,7 +30,6 @@ def f_11(df, letter):
     filtered_df = df[df['Word'].str.contains(regex, regex=True)]
     word_lengths = filtered_df['Word'].str.len()
     statistics = {'mean': np.mean(word_lengths), 'median': np.median(word_lengths), 'mode': word_lengths.mode().values[0]}
-
     return statistics
 
 import unittest

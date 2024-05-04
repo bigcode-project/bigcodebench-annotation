@@ -36,17 +36,13 @@ def f_60(data):
     3  1.707546 -1.457267    date
     """
     dataframe = pd.DataFrame(data)
-    # Initialize the scaler
     scaler = StandardScaler()
-
-    # Iterate over columns and scale if they are numeric
     for column in dataframe.columns:
         if dataframe[column].dtype in ["float64", "int64"]:
             dataframe[column] = scaler.fit_transform(
                 dataframe[column].values.reshape(-1, 1)
             )
         else:
-            # Attempt to convert the entire column to float and then scale
             converted_column = dataframe[column].apply(pd.to_numeric, errors="coerce")
             if (
                 not converted_column.isna().all()

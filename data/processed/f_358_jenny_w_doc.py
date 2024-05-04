@@ -34,16 +34,12 @@ def f_470(data: pd.DataFrame) -> (pd.DataFrame, plt.Axes):
     >>> normalized_df['Feature1'].iloc[0]  # Returns a normalized value between 0 and 1
     0.0
     """
-    # Normalizing the data
     scaler = MinMaxScaler()
     normalized_data = pd.DataFrame(scaler.fit_transform(data), columns=data.columns)
-
-    # Plotting heatmap
     plt.figure(figsize=(10, 8))
     ax = sns.heatmap(
         normalized_data, cmap="YlGnBu", cbar_kws={"label": "Normalized Value"}
     )
-
     return normalized_data, ax
 
 import unittest

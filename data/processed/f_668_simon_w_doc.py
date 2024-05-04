@@ -38,19 +38,13 @@ def f_358(df, col1, col2, N=10):
     >>> print(indices)   
     [2, 3, 0, 1]
     """
-    # Ensure provided columns exist in the dataframe
     if col1 not in df.columns or col2 not in df.columns:
         raise ValueError(f"Columns {col1} or {col2} not found in the DataFrame.")
-
-
     scaler = StandardScaler()
     df[[col1, col2]] = scaler.fit_transform(df[[col1, col2]])
-
     l1 = df[col1].values
     l2 = df[col2].values
-
     largest_diff_indices = heapq.nlargest(N, range(len(l1)), key=lambda i: abs(l1[i] - l2[i]))
-
     return largest_diff_indices
 
 import unittest

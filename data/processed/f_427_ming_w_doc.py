@@ -30,15 +30,12 @@ def f_365(hex_keys=KEYS, seed=42):
     >>> f_365(['1a2b3c4d', '5e6f7g8h'])
     '426614caa490f2c185aebf58f1d4adac'
     """
-
     random.seed(seed)
     hex_key = random.choice(hex_keys)
-
     try:
         float_num = struct.unpack('!f', bytes.fromhex(hex_key))[0]
     except ValueError as e:
         raise ValueError("Invalid hexadecimal string in hex_keys.") from e
-
     hashed_float = hashlib.md5(str(float_num).encode()).hexdigest()
     return hashed_float
 

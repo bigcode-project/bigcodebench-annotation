@@ -36,9 +36,7 @@ def f_126(directory, extensions=[".txt", ".docx", ".xlsx", ".csv"], keep_zero=Tr
     """
     if not os.path.exists(directory):
         raise OSError("directory must exist.")
-
     counter = Counter()
-
     for suffix in extensions:
         count = len(
             glob.glob(os.path.join(directory, "**", "*" + suffix), recursive=True)

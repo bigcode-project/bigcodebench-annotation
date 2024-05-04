@@ -29,7 +29,6 @@ def f_559(f):
     """
     spec = inspect.getfullargspec(f)
     annotations = {k: v.__name__ if isinstance(v, type) else str(v) for k, v in spec.annotations.items()}
-
     info = {
         'function_name': f.__name__,
         'args': spec.args,
@@ -37,7 +36,6 @@ def f_559(f):
         'annotations': annotations,
         'is_lambda': isinstance(f, types.LambdaType)
     }
-
     return json.dumps(info)
 
 import unittest

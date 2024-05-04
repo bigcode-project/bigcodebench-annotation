@@ -34,10 +34,8 @@ def f_9(data: np.ndarray) -> plt.Axes:
     """
     if np.any(data < 0) or np.isnan(data).any():
         raise ValueError("Input array contains negative numbers or NaNs.")
-
     if not np.issubdtype(data.dtype, np.number):
         raise TypeError("Input array contains non-numeric values.")
-
     data_sorted = np.sort(data)
     cumulative_prob = (
         np.cumsum(data_sorted) / np.sum(data_sorted)
@@ -49,7 +47,6 @@ def f_9(data: np.ndarray) -> plt.Axes:
     ax.set_xlabel("Index")
     ax.set_ylabel("Cumulative Probability")
     ax.set_title("Cumulative Probability Plot")
-
     return ax
 
 import unittest

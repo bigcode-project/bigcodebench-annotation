@@ -23,10 +23,8 @@ def f_519(directory, file_list):
     >>> f_519("c:\Program Files\VMware\VMware Server", ["file1.bat", "file2.bat"]) #valid directory and file list
     0 
     """
-
     if not file_list:
         return None
-
     file = random.choice(file_list)
     file_path = os.path.join(directory, file)
     try:

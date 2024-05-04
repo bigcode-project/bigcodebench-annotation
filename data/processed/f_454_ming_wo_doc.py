@@ -38,7 +38,6 @@ def f_534(hours, file_path=FILE_PATH):
     >>> 'custom_data.csv' in file_path
     True
     """
-
     data = {'Time': [], 'Temperature': [], 'Category': []}
     for i in range(hours):
         temp = randint(-10, 40)  # random temperature between -10 and 40
@@ -50,13 +49,10 @@ def f_534(hours, file_path=FILE_PATH):
             data['Category'].append(TEMP_CATEGORIES[2])
         else:
             data['Category'].append(TEMP_CATEGORIES[1])
-
     df = pd.DataFrame(data)
     df.to_csv(file_path, index=False)
-    
     ax = df.plot(x = 'Time', y = 'Temperature', kind = 'line', title="Temperature Data Over Time")
     plt.show()
-
     return file_path, ax
 
 import unittest

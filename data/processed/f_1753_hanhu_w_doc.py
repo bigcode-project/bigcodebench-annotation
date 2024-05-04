@@ -40,15 +40,12 @@ def f_239(mu, sigma, sample_size):
     True
     """
     samples = np.random.normal(mu, sigma, sample_size)
-    
-    # Plotting the histogram of the samples
     plt.hist(samples, bins=30, alpha=0.75, color='blue')
     plt.title('Histogram of Generated Samples')
     plt.xlabel('Sample values')
     plt.ylabel('Frequency')
     plt.grid(True)
     plt.show()
-    
     return samples
 
 import unittest

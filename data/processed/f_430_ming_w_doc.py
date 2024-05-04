@@ -27,7 +27,6 @@ def f_416(hex_keys=KEYS):
     hex_key = random.choice(hex_keys)
     float_num = struct.unpack('!f', bytes.fromhex(hex_key))[0]
     encoded_float = codecs.encode(str(float_num), 'utf-8')
-
     return encoded_float
 
 import unittest

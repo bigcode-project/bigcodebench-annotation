@@ -35,7 +35,6 @@ def f_393(data):
     le = LabelEncoder()
     encoded = le.fit_transform(data)
     df = pd.DataFrame({'Category': data, 'Encoded': encoded})
-
     return df
 
 import unittest

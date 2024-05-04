@@ -36,10 +36,8 @@ def f_110(url, directory, metadata):
     Example:
     >>> f_110('https://www.example.com', './uploads', {'userId': 'abc'})
     """
-
     files = os.listdir(directory)
     status_codes = []
-
     for file in files:
         if os.path.isfile(os.path.join(directory, file)):
             with open(os.path.join(directory, file), 'rb') as f:
@@ -47,7 +45,6 @@ def f_110(url, directory, metadata):
                 response = requests.post(url, files=files, headers=HEADERS, data=json.dumps(metadata))
                 status_codes.append(response.status_code)
                 time.sleep(1)
-
     return status_codes
 
 import unittest

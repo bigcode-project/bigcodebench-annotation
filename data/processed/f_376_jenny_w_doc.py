@@ -30,9 +30,7 @@ def f_650(data_list, seed=None):
     """
     if seed is not None:
         random.seed(seed)
-
     df = pd.DataFrame([s.strip() for s in data_list], columns=["Original String"])
-
     modified_strings = []
     for s in data_list:
         substrings = re.split(", ", s)
@@ -43,9 +41,7 @@ def f_650(data_list, seed=None):
             else s.replace(random_substring + ", ", "")
         )
         modified_strings.append(modified_s)
-
     df["Modified String"] = modified_strings
-
     return df
 
 import unittest

@@ -28,15 +28,11 @@ def f_476(x):
     >>> result[0]
     (7.69459862670642e-23+3.037941424911643e-09j)
     """
-
-    # Type check for x and y
     if not isinstance(x, np.ndarray):
         raise TypeError("x must be numpy.ndarray")
-
     real_part = norm.pdf(x, 0, 1)
     imag_part = norm.pdf(x, 2, 2)
     complex_dist = real_part + 1j * imag_part
-
     plt.plot(x, complex_dist.real, label='Real part')
     plt.plot(x, complex_dist.imag, label='Imaginary part')
     plt.legend()

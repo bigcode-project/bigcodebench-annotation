@@ -33,14 +33,11 @@ def f_238(data=None):
     """
     if data is None:
         data = np.random.rand(100, 5)
-
     df = pd.DataFrame(data)
     df[df < 0.5] = 0
-
     scaler = StandardScaler()
     scaled_data = scaler.fit_transform(df)
     standardized_df = pd.DataFrame(scaled_data, columns=df.columns)
-
     return standardized_df
 
 import numpy as np

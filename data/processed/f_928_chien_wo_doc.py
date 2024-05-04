@@ -31,30 +31,22 @@ def f_113(data_file_path: str):
     >>> print(anova_results)
     """
     df = pd.read_csv(data_file_path)
-    # Convert strings with commas to float, if applicable
     for col in df.columns:
         df[col] = pd.to_numeric(df[col].replace(",", "", regex=True), errors="coerce")
-    # drop columns with NaN values
     df = df.dropna(axis=1)
     means = df.mean()
     std_devs = df.std()
-
-    # Creating a histogram for each numerical column
     axes = []
     for col in df.columns:
         ax = df[col].hist(bins=50)
         ax.set_title(col)
         axes.append(ax)
-
     plt.show()
-
-    # ANOVA Test if more than one numerical column
     anova_results = None
     if len(df.columns) > 1:
         anova_results = pd.DataFrame(f_oneway(*[df[col] for col in df.columns if df[col].dtype != 'object']),
                                      index=['F-value', 'P-value'], 
                                      columns=['ANOVA Results'])
-
     return means, std_devs, axes, anova_results
 
 import unittest

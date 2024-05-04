@@ -22,10 +22,8 @@ def f_609(logs: list):
             '2021-06-15 10:35:00 INFO: Backup completed successfully'])
     ([datetime.time(9, 45)], datetime.time(9, 45))
     """
-    
     error_times = []
     total_time = 0
-
     for log in logs:
         if "ERROR" in log:
             time_match = re.search(r'(\d{2}):(\d{2}):\d{2}', log)
@@ -33,14 +31,12 @@ def f_609(logs: list):
                 hour, minute = map(int, time_match.groups())
                 error_times.append(time(hour, minute))
                 total_time += hour * 60 + minute
-
     if error_times:
         avg_hour = (total_time // len(error_times)) // 60
         avg_minute = (total_time // len(error_times)) % 60
         avg_time = time(avg_hour, avg_minute)
     else:
         avg_time = time(0, 0)
-
     return error_times, avg_time
 
 import unittest

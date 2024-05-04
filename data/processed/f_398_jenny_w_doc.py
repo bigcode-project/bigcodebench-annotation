@@ -45,17 +45,14 @@ def f_648(column, data):
         raise ValueError(
             "Data must be a list of lists, with each inner list matching the length of the column names."
         )
-
     df = pd.DataFrame(data, columns=valid_columns)
     column_data = df[column]
-
     result = {
         "sum": np.sum(column_data) if not column_data.empty else 0,
         "mean": np.mean(column_data) if not column_data.empty else float("nan"),
         "min": np.min(column_data) if not column_data.empty else float("nan"),
         "max": np.max(column_data) if not column_data.empty else float("nan"),
     }
-
     return result
 
 import unittest

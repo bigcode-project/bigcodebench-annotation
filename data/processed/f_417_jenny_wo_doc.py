@@ -32,18 +32,13 @@ def f_107(num_rolls, num_dice, plot_path=None, random_seed=0):
     <class 'matplotlib.axes._axes.Axes'>
     """
     POSSIBLE_VALUES = list(range(1, 7))
-
     random.seed(random_seed)
-
     sums = []
     for _ in range(num_rolls):
         roll = [random.choice(POSSIBLE_VALUES) for _ in range(num_dice)]
         sums.append(sum(roll))
-
     sums_counter = Counter(sums)
-
     labels, values = zip(*sums_counter.items())
-
     plt.bar(labels, values)
     plt.xlabel("Sum of Dice Roll")
     plt.ylabel("Count")
@@ -51,7 +46,6 @@ def f_107(num_rolls, num_dice, plot_path=None, random_seed=0):
     ax = plt.gca()
     if plot_path:
         plt.savefig(plot_path)
-
     return sums_counter, ax
 
 import unittest

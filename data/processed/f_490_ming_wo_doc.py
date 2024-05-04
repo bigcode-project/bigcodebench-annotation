@@ -25,21 +25,16 @@ def f_187(dataset, filename):
     >>> f_187([df1, df2], 'sample.csv')
     """
     start_time = time.time()
-
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     filepath = os.path.join(output_dir, filename)
     with open(filepath, 'w', newline='') as f:
         for i, df in enumerate(dataset):
             if i > 0:
-                # Write the separator with a newline at the end only
                 f.write('------\n')
-            # Avoid writing the index and ensure no extra newline is added at the end of the DataFrame
             df.to_csv(f, index=False, header=True, mode='a')
             if i < len(dataset) - 1:
-                # Add a newline after the DataFrame content, except after the last DataFrame
                 f.write('\n')
-
     end_time = time.time()  # End ti
     cost = f"Operation completed in {end_time - start_time} seconds."
 

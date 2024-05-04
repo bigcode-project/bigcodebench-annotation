@@ -36,24 +36,15 @@ def f_192(df, dict_mapping, plot_histogram=False):
     True
     >>> plt.close()
     """
-
     if not isinstance(df, pd.DataFrame):
         raise ValueError("Input df is not a DataFrame.")
-
-    # Check if all required columns are present in the DataFrame
     required_columns = FEATURES + [TARGET]
     missing_columns = [col for col in required_columns if col not in df.columns]
     if missing_columns:
         raise ValueError(f"Missing columns in DataFrame: {missing_columns}")
-
-    # Replace values using dictionary mapping
     df = df.replace(dict_mapping)
-    
-    # Standardize the features
     scaler = StandardScaler()
     df[FEATURES] = scaler.fit_transform(df[FEATURES])
-    
-    # Plot histogram of the target variable if requested
     if plot_histogram:
         ax = df[TARGET].plot.hist(bins=50)
         return df, ax

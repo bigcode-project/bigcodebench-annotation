@@ -46,7 +46,6 @@ def f_212(n_rows, remove_cols, columns=['A', 'B', 'C', 'D', 'E'], random_seed=No
     np.random.seed(random_seed)
     df = pd.DataFrame(np.random.randint(0, 100, size=(n_rows, len(columns))), columns=columns)
     df = df.drop(df.columns[remove_cols], axis=1)
-
     return df
 
 import unittest

@@ -32,15 +32,12 @@ def f_407(df, tuples, n_plots):
     """
     mask = df.apply(tuple, axis=1).isin(tuples)
     df = df[~mask]
-
     plot_details = []
     for _ in range(min(n_plots, len(df))):
         selected_columns = sample(COLUMNS, 2)
         df.plot(x=selected_columns[0], y=selected_columns[1], kind='line')
         plot_details.append((selected_columns[0], selected_columns[1]))
-
     plt.show()
-
     return df, plot_details
 
 import unittest

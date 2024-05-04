@@ -35,19 +35,12 @@ def f_517(df, col, title=None):
     - The pie chart can have a title if specified.
 
     """
-
-    # Ensure that the DataFrame is not empty and the specified column exists
     if not isinstance(df, pd.DataFrame) or df.empty or col not in df.columns:
         raise ValueError("The DataFrame is empty or the specified column does not exist.")
-
-    # Compute the value counts for the specified column
     value_counts = df[col].value_counts()
-
-    # Plot the pie chart with an optional title
     ax = value_counts.plot(kind='pie', colors=COLORS[:len(value_counts)], autopct='%1.1f%%')
     if title:
         plt.title(title)
-
     return ax
 
 import unittest

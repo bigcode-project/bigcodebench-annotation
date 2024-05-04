@@ -33,9 +33,7 @@ def f_77(data_list, seed=0):
     1  table, chair, bag, lamp  table, chair, bag, kuhm
     """
     random.seed(seed)
-
     df = pd.DataFrame(data_list, columns=["Original String"])
-
     modified_strings = []
     for s in data_list:
         s = s.strip()
@@ -50,9 +48,7 @@ def f_77(data_list, seed=0):
         substrings[replace_idx] = random_string
         modified_string = ", ".join(substrings)
         modified_strings.append(modified_string)
-
     df["Modified String"] = modified_strings
-
     return df
 
 import unittest

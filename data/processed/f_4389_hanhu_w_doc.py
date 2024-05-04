@@ -34,8 +34,6 @@ def f_450(MIN_WORDS, MAX_WORDS, WORDS_POOL):
     """
     sentence_length = np.random.randint(MIN_WORDS, MAX_WORDS + 1)
     first_half = [random.choice(WORDS_POOL) for _ in range(sentence_length // 2)]
-
-    # For odd-length sentences, add a middle word
     if sentence_length % 2 == 1:
         middle_word = [random.choice(WORDS_POOL)]
         second_half = first_half[::-1]
@@ -43,7 +41,6 @@ def f_450(MIN_WORDS, MAX_WORDS, WORDS_POOL):
     else:
         second_half = first_half[::-1]
         sentence = first_half + second_half
-
     return ' '.join(sentence)
 
 import unittest

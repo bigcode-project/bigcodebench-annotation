@@ -46,20 +46,12 @@ def f_271(data):
     7   Tom   20     86
     9   Tom   20     85
     """
-
     if not all(key in data for key in ['Name', 'Age', 'Score']):
         raise ValueError("The dictionary must have the keys 'Name', 'Age', 'Score'")
-
-    # Creating a dataframe and sorting it
     df = pd.DataFrame(data).sort_values(['Name', 'Age'])
-
-    # Calculating average scores
     avg_scores = df.groupby('Name')['Score'].mean()
-
-    # Getting the most common age
     age_counts = Counter(df['Age'])
     most_common_age = age_counts.most_common(1)[0][0] if age_counts else None
-
     return df, avg_scores, most_common_age
 
 import unittest

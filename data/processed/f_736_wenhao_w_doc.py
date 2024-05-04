@@ -31,7 +31,6 @@ def f_87():
     array = np.random.randint(1, 100, size=ARRAY_SIZE)
     mean = np.mean(array)
     std = np.std(array)
-
     fig, ax = plt.subplots()
     ax.hist(array, bins='auto')
     ax.set_title('Histogram of Random Integers')
@@ -42,7 +41,6 @@ def f_87():
     ax.axvline(mean - std, color='purple', linestyle='dashed', linewidth=1)
     ax.legend(["Mean", "Standard Deviation"])
     plt.show()
-    
     return array, mean, std, ax
 
 import unittest

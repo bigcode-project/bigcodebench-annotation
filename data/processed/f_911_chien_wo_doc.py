@@ -39,12 +39,9 @@ def f_570(repo_url: str) -> dict:
             and repo_info.get("message") == "API rate limit exceeded"
         ):
             raise requests.exceptions.HTTPError("API rate limit exceeded")
-
         if repo_info.get("open_issues_count", 0) > 10000:
             logging.warning("The repository has more than 10000 open issues.")
-
         return repo_info
-
     except requests.exceptions.RequestException as e:
         raise requests.exceptions.RequestException(
             f"Error fetching repo info: {e}"

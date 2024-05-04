@@ -30,20 +30,12 @@ def f_561(data):
     4.5
     4.5
     """
-
     if not isinstance(data, np.ndarray) or data.ndim != 2:
         raise ValueError("Input data must be a 2D numpy array.")
-
     df = pd.DataFrame(data)
-
-    # Calculate correlation matrix
     correlation = df.corr()
-    # Plot the heatmap
     ax = sns.heatmap(correlation, annot=True, cmap='coolwarm')
-
-    # Compute the average for each row and add it as a new column
     df['Average'] = df.mean(axis=1)
-
     return df, ax
 
 import unittest

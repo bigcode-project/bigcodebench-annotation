@@ -30,21 +30,15 @@ def f_708(data):
     3
     >>> plt.close()
     """
-
-    
     if not isinstance(data, pd.DataFrame):
         raise ValueError("Input df is not a DataFrame.")
-
     job_count = data['Job'].value_counts()
-    
     labels = job_count.index.tolist()
     sizes = job_count.values.tolist()
     colors = [plt.cm.Spectral(i/float(len(labels))) for i in range(len(labels))]
-        
     fig, ax = plt.subplots()
     ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
     ax.axis('equal')
-
     return fig
 
 import unittest

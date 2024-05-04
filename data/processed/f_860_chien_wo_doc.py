@@ -42,7 +42,6 @@ def f_215(csv_file_path, target_column="target", test_size=0.2, n_estimators=100
     df = pd.read_csv(csv_file_path)
     if target_column not in df.columns:
         raise ValueError(f"'{target_column}' column not found in the CSV file.")
-
     X = df.drop(target_column, axis=1)
     y = df[target_column]
     X_train, X_test, y_train, y_test = train_test_split(
@@ -52,12 +51,9 @@ def f_215(csv_file_path, target_column="target", test_size=0.2, n_estimators=100
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
     report = classification_report(y_test, y_pred)
-
-    # New formatting approach
     lines = report.split("\n")
     formatted_lines = []
     for line in lines:
-        # Split the line into words and rejoin with specific spacing
         parts = line.split()
         if len(parts) == 5:  # Class-specific metrics
             formatted_line = f"{parts[0]:<15}{parts[1]:>10}{parts[2]:>10}{parts[3]:>10}{parts[4]:>10}"
@@ -66,7 +62,6 @@ def f_215(csv_file_path, target_column="target", test_size=0.2, n_estimators=100
         else:
             formatted_line = line  # Header or empty lines
         formatted_lines.append(formatted_line)
-
     formatted_report = "\n".join(formatted_lines)
     return formatted_report
 

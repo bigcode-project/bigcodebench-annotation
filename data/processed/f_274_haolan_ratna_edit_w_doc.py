@@ -26,9 +26,7 @@ def f_84(df):
     """
     try:
         scaler = StandardScaler()
-
         df_grouped = df.groupby('id').apply(lambda x: pd.DataFrame(scaler.fit_transform(x[['age', 'income']]), columns=['age', 'income'], index=x.index))
-
         return df_grouped
     except:
         raise ValueError()

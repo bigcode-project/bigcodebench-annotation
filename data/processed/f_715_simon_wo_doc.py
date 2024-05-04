@@ -52,7 +52,6 @@ def f_395(data, file_path, headers):
     """
     if file_path is None:
         raise ValueError("The file path is invalid.")
-
     with open(file_path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(headers)

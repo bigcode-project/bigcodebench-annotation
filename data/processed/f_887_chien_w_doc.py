@@ -43,24 +43,15 @@ def f_678(data_list):
     >>> ax.get_xticks()
     array([0., 1., 2., 3., 4., 5., 6.])
     """
-
     if not data_list:
         raise ValueError("The data list is empty.")
-
     data_series = pd.Series(data_list)
     category_counts = data_series.value_counts()
-
-    # Prepare data for predefined categories
     predefined_counts = category_counts.reindex(CATEGORIES, fill_value=0)
-
-    # Check for uniformity in predefined categories
     if not all(x == predefined_counts.iloc[0] for x in predefined_counts):
         print("The distribution of predefined categories is not uniform.")
-
-    # Handling extra categories not in predefined list
     extra_categories = category_counts.drop(CATEGORIES, errors="ignore").index.tolist()
     all_categories = CATEGORIES + extra_categories
-
     _, ax = plt.subplots()
     ax.bar(
         all_categories,
@@ -69,7 +60,6 @@ def f_678(data_list):
         align="center",
     )
     ax.set_xticks(all_categories)
-
     return ax
 
 import unittest

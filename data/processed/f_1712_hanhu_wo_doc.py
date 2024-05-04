@@ -31,15 +31,12 @@ def f_475(template_folder):
     >>> 'POST' in app.url_map.bind('').match('/', method='POST')
     False
     """
-
     app = Flask(__name__, template_folder=template_folder)
-
     @app.route('/', methods=['POST'])
     def handle_post():
         data = request.get_json()
         logging.info(json.dumps(data))
         return render_template('index.html', data=data)
-
     return app
 
 import unittest

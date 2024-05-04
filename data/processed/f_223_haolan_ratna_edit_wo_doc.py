@@ -21,15 +21,9 @@ def f_434(data):
     >>> response.has_key('UUID')
     True
     """
-
     response = HttpResponse(data, content_type='application/json')
-
-    # Generate a UUID
     request_uuid = uuid.uuid4()
-
-    # Add the UUID to the response headers
     response['UUID'] = str(request_uuid)
-
     return response
 
 import unittest

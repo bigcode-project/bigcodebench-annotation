@@ -33,14 +33,12 @@ def f_422(path_to_append=PATH_TO_APPEND, database=DATABASE):
     'path/to/whatever'
     """
     sys.path.append(path_to_append)
-
     conn = sqlite3.connect(database)
     cur = conn.cursor()
     cur.execute("CREATE TABLE IF NOT EXISTS paths (path TEXT UNIQUE)")
     cur.execute("INSERT OR IGNORE INTO paths (path) VALUES (?)", (path_to_append,))
     conn.commit()
     conn.close()
-
     return path_to_append
 
 import unittest

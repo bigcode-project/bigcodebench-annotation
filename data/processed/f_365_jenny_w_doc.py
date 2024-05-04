@@ -34,11 +34,9 @@ def f_531(data_str, separator=",", bins=20):
     >>> print(type(ax))
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     data = np.fromstring(data_str, sep=separator)
     if data.size == 0:
         raise ValueError("Failed to find valid data")
-
     data = pd.Series(data, dtype='int64')
     ax = data.plot.hist(grid=True, bins=bins, rwidth=0.9, color="#607c8e")
     return data, ax

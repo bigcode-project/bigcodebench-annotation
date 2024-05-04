@@ -45,14 +45,12 @@ def f_334(mean, std_dev, num_samples):
     samples = np.random.normal(mean, std_dev, num_samples)
     fig, ax = plt.subplots()
     ax.hist(samples, bins=30, density=True, alpha=0.6, color='g')
-
     xmin, xmax = ax.get_xlim()
     x = np.linspace(xmin, xmax, 100)
     p = norm.pdf(x, mean, std_dev)
     ax.plot(x, p, 'k', linewidth=2)
     title = "Fit results: mean = %.2f,  std = %.2f" % (mean, std_dev)
     ax.set_title(title)
-
     return samples, fig
 
 import unittest

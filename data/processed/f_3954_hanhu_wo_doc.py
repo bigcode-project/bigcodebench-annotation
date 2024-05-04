@@ -39,13 +39,10 @@ def f_411(s, save_json, json_file_path):
     """
     if not s.strip():  # Check for empty or whitespace-only string
         raise ValueError("The input XML string is empty or contains only whitespace.")
-    
     my_dict = xmltodict.parse(s)
-
     if save_json and json_file_path:
         with open(json_file_path, 'w') as json_file:
             json.dump(my_dict, json_file, indent=4)
-
     return my_dict
 
 import unittest

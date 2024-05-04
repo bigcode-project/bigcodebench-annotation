@@ -57,26 +57,18 @@ def f_495(L, num_dataframes=5, random_seed=None):
     """
     if random_seed is not None:
         seed(random_seed)
-
     if len(L) == 0:
         return pd.DataFrame(), []
-
     LETTERS = list('abcdefghijklmnopqrstuvwxyz')
     max_cols = min(len(LETTERS), len(L[0]))
     col_names = choices(LETTERS, k=max_cols)
     dataframes = []
-
     for _ in range(num_dataframes):
-        # Randomly sample rows from L for each DataFrame
         sampled_rows = choices(L, k=3)
         dataframe = pd.DataFrame(sampled_rows, columns=col_names)
         dataframes.append(dataframe)
-
-    # Finding common rows across all DataFrames
-    # Concatenate all DataFrames and find common rows
     combined_df = pd.concat(dataframes, ignore_index=True)
     common_rows = combined_df[combined_df.duplicated(keep=False)]
-
     return common_rows.drop_duplicates(), dataframes
 
 # Generating fake data for the test cases

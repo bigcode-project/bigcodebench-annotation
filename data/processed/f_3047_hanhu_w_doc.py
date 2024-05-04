@@ -26,7 +26,6 @@ def f_325(numbers: list) -> dict:
     >>> factorials[5] == 120 and factorials[9] == 362880
     True
     """
-    # Check input types
     if not all(isinstance(n, int) and n >= 0 for n in numbers):
         raise ValueError("All elements in the list must be integers")
     with Pool() as pool:

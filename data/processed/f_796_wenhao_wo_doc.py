@@ -46,13 +46,10 @@ def f_172(mystrings, folder_path, seed=None):
     """
     if seed is not None:
         np.random.seed(seed)
-
     saved_plots = []
     processed_names = set()
-
     if not os.path.exists(folder_path):
         os.makedirs(folder_path, exist_ok=True)
-
     for name in mystrings:
         if name in processed_names:
             continue
@@ -63,7 +60,6 @@ def f_172(mystrings, folder_path, seed=None):
         plt.savefig(os.path.join(folder_path, file_name))
         saved_plots.append(file_name)
         processed_names.add(name)
-
     return saved_plots
 
 import unittest

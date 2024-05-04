@@ -37,13 +37,10 @@ def f_669(vegetable_dict, seed=0):
     Tomato      1    6.666667
     """
     random.seed(seed)
-    # Create a counter for vegetables based on reversed dictionary
     reversed_dict = {v: k for k, v in vegetable_dict.items()}
     vegetable_counter = collections.Counter({vegetable: random.randint(1, 10) for vegetable in reversed_dict.keys()})
-
     statistics_df = pd.DataFrame.from_dict(vegetable_counter, orient='index', columns=['Count'])
     statistics_df['Percentage'] = statistics_df['Count'] / statistics_df['Count'].sum() * 100
-
     return statistics_df
 
 import unittest

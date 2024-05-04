@@ -26,10 +26,8 @@ def f_18(s, file_path):
     'Emma'
     """
     my_dict = xmltodict.parse(s)
-    # Save the dictionary to a JSON file
     with open(file_path, 'w') as json_file:
         json.dump(my_dict, json_file, indent=4)
-
     return my_dict
 
 import unittest

@@ -29,29 +29,21 @@ def f_229(number_teams=5):
     >>> print(ranking)
     OrderedDict([('Team 4', 50), ('Team 5', 40), ('Team 1', 30), ('Team 2', 20), ('Team 3', 10)])
     """
-
-    # Constants
-    
     TEAMS = []
     POINTS = []
-
     for i in range(1, number_teams+1):
         TEAMS.append("Team "+str(i))
         POINTS.append(10*i)
-    
     shuffled_points = POINTS.copy()
     random.shuffle(shuffled_points)
     ranking = dict(zip(TEAMS, shuffled_points))
-
     sorted_ranking = PriorityQueue()
     for team, points in ranking.items():
         sorted_ranking.put((-points, team))
-
     sorted_ranking_dict = collections.OrderedDict()
     while not sorted_ranking.empty():
         points, team = sorted_ranking.get()
         sorted_ranking_dict[team] = -points
-
     return sorted_ranking_dict
 
 import unittest

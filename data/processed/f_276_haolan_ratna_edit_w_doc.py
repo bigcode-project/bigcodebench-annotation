@@ -41,10 +41,8 @@ def f_188(df, plot=False):
     '''
     df['Date'] = pd.to_datetime(df['Date'])
     df = pd.concat([df['Date'], df['Value'].apply(pd.Series)], axis=1)
-    
     scaler = StandardScaler()
     df.iloc[:,1:] = scaler.fit_transform(df.iloc[:,1:])
-    
     if plot:
         plt.figure()
         ax = df.set_index('Date').plot(kind='bar', stacked=True)
@@ -52,8 +50,6 @@ def f_188(df, plot=False):
         plt.xlabel('Date')
         plt.ylabel('Scaled Value')
         return df, ax
-
-    
     return df
 
 import unittest

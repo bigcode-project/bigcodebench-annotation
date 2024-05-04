@@ -32,15 +32,12 @@ def f_227(data_dict):
         uniform = (
             len(set(counts)) == 1
         )  # Check if all counts are the same (uniform distribution)
-
         if not uniform:
             print(f"The distribution of values in column '{column}' is not uniform.")
-
         ax = counts.plot(kind="bar")
         ax.set_title(column)
         axes_list.append(ax)
         plt.close()
-
     return axes_list
 
 import unittest

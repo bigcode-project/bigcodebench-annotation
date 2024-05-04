@@ -38,11 +38,9 @@ def f_507(df: pd.DataFrame) -> pd.DataFrame:
         raise TypeError("Input DataFrame contains non-numeric data types.")
     if df.empty or df.isnull().values.any():
         raise ValueError("Input DataFrame is empty or contains NaN values.")
-
     df_cumsum = df.cumsum()
     scaler = MinMaxScaler()
     df_norm_cumsum = pd.DataFrame(scaler.fit_transform(df_cumsum), columns=df.columns)
-
     return df_norm_cumsum
 
 import unittest

@@ -23,7 +23,6 @@ def f_324(t, n):
     """
     combinations = list(itertools.combinations(t, n))
     selected_combination = random.choice(combinations)
-
     return selected_combination
 
 import unittest

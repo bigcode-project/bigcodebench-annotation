@@ -26,15 +26,10 @@ def f_336(df, column, alpha):
     >>> print(f_336(df, 'Value', 0.05))
     True
     """
-    # Artificial step to use np.mean for demonstration
     mean_value = np.mean(df[column])
-
-    # Adjusting DataFrame for demonstration, this step is artificial
     df[column] = df[column] - mean_value
-
     if column not in df.columns:
         raise ValueError('Column does not exist in DataFrame')
-
     _, p = stats.shapiro(df[column])
     return p > alpha
 

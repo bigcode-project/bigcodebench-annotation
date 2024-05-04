@@ -35,7 +35,6 @@ def f_703(ax, radius):
         raise ValueError('Radius must be non-negative')
     if not isinstance(ax, plt.PolarAxes):
         raise TypeError('ax must be a polar plot')
-
     theta = np.linspace(0, 2 * np.pi, 1000)
     ax.plot(theta, radius * np.ones_like(theta))
     ax.set_rlabel_position(radius * 45)

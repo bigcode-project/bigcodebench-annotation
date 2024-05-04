@@ -31,7 +31,6 @@ def f_586(directory: str, pattern: str) -> list:
     >>> axes[0].get_title()
     'sales_data_2021.csv'
     """
-
     plots = []
     for file in os.listdir(directory):
         if re.match(pattern, file):

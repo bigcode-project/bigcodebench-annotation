@@ -27,9 +27,7 @@ def f_207(df):
     >>> print(df_scaled.iloc[0]['income'])
     0.0
     """
-
     scaler = MinMaxScaler(feature_range=(0, 1))
-    #Scaling the 'age' and 'income' columns
     df_grouped = df.groupby('id').apply(
         lambda x: pd.DataFrame(
             scaler.fit_transform(x[['age', 'income']]), 
@@ -37,10 +35,7 @@ def f_207(df):
             index=x.index
         )
     )
-
-    # Creating a histogram of the 'income' column
     hist, bins = np.histogram(df_grouped['income'], bins=10)
-
     return df_grouped, (hist, bins)
 
 import unittest

@@ -27,7 +27,6 @@ def f_500(text, seed=None):
     >>> f_500(text, 0)
     'Mynbi, qpmzj!'
     """
-
     def replace_with_random_char(c):
         if c.isalpha():
             if c.islower():
@@ -35,7 +34,6 @@ def f_500(text, seed=None):
             else:
                 return random.choice(string.ascii_uppercase)
         return c
-
     if seed is not None:
         random.seed(seed)
     return "".join(replace_with_random_char(c) for c in text)

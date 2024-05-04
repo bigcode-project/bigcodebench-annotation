@@ -42,18 +42,14 @@ def f_427(db_file, table_name, column_name, pattern='\d+[xX]'):
     60  61                   5xgirl
     61  62                   5xkind
     """
-
     if not os.path.isfile(db_file):
         raise ValueError('db_file does not exist.')
-
     conn = sqlite3.connect(db_file)
     df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
-
     if df[column_name].dtype == 'object':  # Check if the column data type is a string
         matches = df[df[column_name].str.contains(pattern)]
     else:
         matches = pd.DataFrame(columns=df.columns)  # Return an empty DataFrame
-
     return matches
 
 import unittest

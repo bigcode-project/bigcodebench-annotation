@@ -33,20 +33,15 @@ def f_717(path: str, delimiter: str = os.path.sep) -> list:
     >>> f_717(r'Docs\\src\\Scripts\\temp', '\\\\')
     ['Docs', 'src', 'Scripts', 'temp']
     """
-
     if not path:
         return []
-
     path = path.replace("\\", "/")
-
     path_obj = pathlib.Path(path)
-
     invalid_chars = set('<>:"|?*')
     if any(
         set(str(component)).intersection(invalid_chars) for component in path_obj.parts
     ):
         return []
-
     return [
         component
         for component in path_obj.parts

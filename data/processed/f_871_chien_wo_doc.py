@@ -40,16 +40,12 @@ def f_204(interval, duration):
     """
     if interval <= 0 or duration <= 0:
         raise ValueError("Interval and duration must be greater than zero.")
-
     start_time = time.time()
     try:
         with open(LOGFILE_PATH, "w", encoding="utf-8") as logfile:
             while time.time() - start_time <= duration:
                 operation_start_time = time.time()
-
-                # Check the operating system
                 if platform.system() == "Windows":
-                    # Windows command for CPU usage
                     command = [
                         "typeperf",
                         "\\Processor(_Total)\\% Processor Time",
@@ -57,9 +53,7 @@ def f_204(interval, duration):
                         "1",
                     ]
                 else:
-                    # Unix/Linux command for CPU usage
                     command = ["top", "-b", "-n1"]
-
                 output = subprocess.check_output(command)
                 cpu_usage_line = (
                     output.decode("utf-8").split("\n")[2]
@@ -71,18 +65,14 @@ def f_204(interval, duration):
                     if platform.system() == "Windows"
                     else cpu_usage_line.split(":")[1].split(",")[0].strip()
                 )
-
                 log_data = {"timestamp": time.time(), "cpu_usage": cpu_usage}
                 json.dump(log_data, logfile)
                 logfile.write("\n")
-
-                # Adjust sleep time
                 sleep_time = max(0, interval - (time.time() - operation_start_time))
                 time.sleep(sleep_time)
     except IOError as e:
         print(f"Error writing to file {LOGFILE_PATH}: {e}")
         return None
-
     return LOGFILE_PATH
 
 import unittest

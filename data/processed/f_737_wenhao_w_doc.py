@@ -31,7 +31,6 @@ def f_672():
     array = np.random.randint(1, 500, size=ARRAY_SIZE)
     mean = np.mean(array)
     std = np.std(array)
-
     fig, ax = plt.subplots()
     ax.hist(array, bins='auto')
     ax.set_title('Histogram of Random Values')

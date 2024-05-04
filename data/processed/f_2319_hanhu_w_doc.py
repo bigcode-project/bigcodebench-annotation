@@ -30,13 +30,10 @@ def f_119(commands):
     >>> all(isinstance(output, bytes) for output in result)
     True
     """
-
     if not commands:  # Handle case where commands list is empty
         return []
-
     with Pool(processes=len(commands)) as pool:
         outputs = pool.map(execute_command, commands)
-
     return outputs
 
 import unittest

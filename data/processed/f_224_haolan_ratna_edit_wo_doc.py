@@ -33,7 +33,6 @@ def f_568(data_url: str) -> list:
     >>> f_568("https://api.example.com/other_data")
     ['John', 'Eve']
     """
-
     try:
         response = requests.get(data_url)
         data = response.json()

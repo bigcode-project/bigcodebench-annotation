@@ -25,7 +25,6 @@ def f_317(n):
     >>> f_317(4)
     [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
     """
-
     if n < 1:
         raise ValueError("Input must be a positive integer")
     numbers = np.arange(1, n + 1)

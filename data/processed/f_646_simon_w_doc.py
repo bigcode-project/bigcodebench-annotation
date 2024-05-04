@@ -42,27 +42,19 @@ def f_515(df, target_column, target_values=None):
         >>> print(model.intercept_)
         53.362739257681035
     """
-
     if not isinstance(df, pd.DataFrame):
         raise ValueError("df should be a DataFrame.")
-    
     if df.empty:
         raise ValueError("df should contain at least one row")
-    
     if target_column not in df.columns:
         raise ValueError("target_column should be in DataFrame")
-    
     if not all(np.issubdtype(dtype, np.number) for dtype in df.dtypes):
         raise ValueError("df values should be numeric only")
-
     if target_values != None:
         df = df.applymap(lambda x: x if x in target_values else 0)
-
     X = df.drop(target_column, axis=1)
     y = df[target_column]
-
     model = LinearRegression().fit(X, y)
-
     return model
 
 import unittest

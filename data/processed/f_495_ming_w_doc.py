@@ -34,12 +34,8 @@ def f_265(input_list: list, repetitions: int) -> Any:
     >>> f_265([1, 2, 3], 5)
     ModeResult(mode=array([1]), count=array([5]))
     """
-    # Flattening the list with multiple repetitions
     flattened_list = np.array(list(itertools.chain(*[input_list for _ in range(repetitions)])))
-    
-    # Calculating the mode
     mode = stats.mode(flattened_list)
-    
     return mode
 
 import unittest

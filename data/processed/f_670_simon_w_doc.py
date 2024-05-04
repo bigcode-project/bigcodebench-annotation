@@ -39,7 +39,6 @@ def f_600(length, random_seed=None):
     ieqh]{[yng]by)a{rogubbb
     """
     random.seed(random_seed)
-    # Constants
     BRACKETS = "(){}[]"
     return ''.join(random.choice(string.ascii_lowercase + BRACKETS) for _ in range(length))
 

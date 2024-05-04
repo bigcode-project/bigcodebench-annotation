@@ -29,13 +29,10 @@ def f_260(csv_path=os.path.join(output_dir, 'data.csv'), date_column='date'):
         ...
     FileNotFoundError: nonexistent.csv does not exist
     """
-
     if not os.path.isfile(csv_path):
         raise FileNotFoundError(f"{csv_path} does not exist")
-
     df = pd.read_csv(csv_path)
     df[date_column] = df[date_column].apply(lambda x: parse(x))
-
     return df[date_column].dt.year.hist()
 
 import unittest

@@ -31,22 +31,16 @@ def f_10(text):
     """
     words = re.split(r"\W+", text)
     word_counts = [len(word) for word in words if word]
-
     _, ax = plt.subplots()
-
     if word_counts:  # Check if word_counts is not empty
         ax.hist(word_counts, bins=30, edgecolor='black', alpha=0.7)
-
-        # Add KDE plot if applicable
         if len(word_counts) > 1 and np.var(word_counts) != 0:
             try:
                 kde = gaussian_kde(word_counts)
                 x_range = np.linspace(min(word_counts), max(word_counts), 100)
                 ax.plot(x_range, kde(x_range), color='red')  # KDE line in red
             except linalg.LinAlgError:
-                # Handle the singular matrix error
                 pass
-
     return ax
 
 import unittest

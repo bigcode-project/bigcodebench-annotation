@@ -35,17 +35,12 @@ def f_151(letters, repetitions, colors):
     """
     if len(letters) != len(repetitions) or len(letters) != len(colors) or len(letters) == 0:
         raise ValueError("All lists must be the same length and non-empty.")
-        
-    # Count the frequency of each letter based on repetitions
     counts = np.array(repetitions)
-    
-    # Create the bar chart
     fig, ax = plt.subplots()
     ax.bar(letters, counts, color=colors)
     ax.set_xlabel('Letters')
     ax.set_ylabel('Frequency')
     ax.set_title('Frequency of Letters')
-    
     return ax
 
 import unittest

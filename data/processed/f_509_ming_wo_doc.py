@@ -24,14 +24,10 @@ def f_31(date_str):
     """
     given_date = parse(date_str)
     next_day = given_date
-
     while True:
         next_day = next_day + timedelta(days=1)
-
-        # Monday to Friday are business days
         if 0 <= next_day.weekday() < 5:
             break
-
     return next_day
 
 import unittest

@@ -53,15 +53,10 @@ def f_592(df, age, weight):
     3 -0.601929 -0.482331           -0.764791
     """
     selected_df = df[(df['Age'] < age) & (df['Weight'] > weight)]
-    
-    # Check if the selected DataFrame is empty
     if selected_df.empty:
         return selected_df
-
-    # Standardizing the selected data
     scaler = StandardScaler()
     selected_df = pd.DataFrame(scaler.fit_transform(selected_df), columns=selected_df.columns)
-
     return selected_df
 
 import unittest

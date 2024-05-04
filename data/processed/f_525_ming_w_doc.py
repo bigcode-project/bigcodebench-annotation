@@ -33,21 +33,16 @@ def f_157(sales_data):
     for label in sales_data.columns[1:]:  # Skipping 'Month' column
         monthly_sales = sales_data[label]
         std_dev = statistics.stdev(monthly_sales)
-
         ax.plot(sales_data['Month'], monthly_sales, label=label)
         ax.fill_between(sales_data['Month'],
                         monthly_sales - std_dev,
                         monthly_sales + std_dev,
                         alpha=0.2)
-
     ax.set_xlabel('Month')
     ax.set_ylabel('Sales')
     ax.set_title('Monthly Sales Trends with Standard Deviation')
     ax.legend()
-
-    # Set x-ticks to be explicit months from the DataFrame
     ax.set_xticks(sales_data['Month'])
-
     return ax
 
 import unittest

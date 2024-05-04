@@ -41,14 +41,11 @@ def f_130(url: str, csv_file_path: str) -> list:
     >>> len(data) > 0
     True
     """
-
-
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()
     except requests.RequestException as e:
         raise RuntimeError(f"Error fetching URL: {e}")
-
     soup = BeautifulSoup(response.text, "html.parser")
     data = []
     for div in soup.find_all("div", class_="container"):
@@ -64,10 +61,8 @@ def f_130(url: str, csv_file_path: str) -> list:
             else "No Author"
         )
         data.append((title, date, author))
-
     df = pd.DataFrame(data, columns=["Title", "Date", "Author"])
     df.to_csv(csv_file_path, index=False)
-
     return data
 
 import unittest

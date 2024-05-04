@@ -35,13 +35,10 @@ def f_183(df):
     interesting_articles = df[df['Title'].apply(lambda x: bool(pattern.search(x)))]
     if interesting_articles.empty:
         return []
-
     vectorizer = CountVectorizer()
     X = vectorizer.fit_transform(interesting_articles['Content'])
-
     kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
     kmeans.fit(X)
-
     return list(kmeans.labels_)
 
 import unittest

@@ -31,10 +31,8 @@ def f_255(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
         for file in files:
             if re.match(pattern, file):
                 matched_paths.append(os.path.join(root, file))
-
     df = pd.DataFrame(matched_paths, columns=['File Path'])
     df.to_csv(output_csv, index=False)
-
     return df
 
 import unittest

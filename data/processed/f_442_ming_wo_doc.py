@@ -25,7 +25,6 @@ def f_622(date_str, from_tz, to_tz):
     to_tz = pytz.timezone(to_tz)
     date = parser.parse(date_str).replace(tzinfo=from_tz)
     date = date.astimezone(to_tz)
-
     return date.strftime('%Y-%m-%d %H:%M:%S')
 
 import unittest

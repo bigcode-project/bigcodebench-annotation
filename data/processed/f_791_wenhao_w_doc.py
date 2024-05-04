@@ -30,7 +30,6 @@ def f_109(rows=3, columns=2, seed=42):
     matrix = np.random.rand(rows, columns)
     scaler = MinMaxScaler()
     scaled_matrix = scaler.fit_transform(matrix)
-
     return scaled_matrix
 
 import unittest

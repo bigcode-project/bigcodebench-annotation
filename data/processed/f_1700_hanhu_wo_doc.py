@@ -33,16 +33,11 @@ def f_428(host):
     """
     if not host:
         raise ValueError("Host must be a non-empty string.")
-
     try:
-        # Fetch IP address
         ip_address = socket.gethostbyname(host)
-
-        # Fetch geolocation
         response = requests.get(f"https://ipinfo.io/{ip_address}")
         response.raise_for_status()
         geolocation = response.json()
-
         return {
             'ip_address': ip_address,
             'geolocation': geolocation

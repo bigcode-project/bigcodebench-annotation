@@ -22,16 +22,11 @@ def f_742(df):
     >>> print(p_values)
     {0: 0.3595593273639679, 1: 0.23594242334365845, 2: 0.7625704407691956, 3: 0.481273353099823, 4: 0.13771861791610718}
     """
-
     p_values = {}
-
     for col in df.columns:
         column_data = np.array(df[col])
-        
         test_stat, p_value = stats.shapiro(column_data)
-        
         p_values[col] = p_value
-
     return p_values
 
 import unittest

@@ -30,14 +30,9 @@ def f_696(length, min_value = 0, max_value = 100):
     >>> print(len(cdf))
     1
     """
-
-    # Generate random data and create a DataFrame
     data = np.random.randint(min_value, max_value, size=(length, len(COLUMNS)))
     df = pd.DataFrame(data, columns=COLUMNS)
-
-    # Calculate the cumulative distribution function (CDF) for each column
     df = df.apply(lambda x: x.value_counts().sort_index().cumsum())
-
     return df
 
 import unittest

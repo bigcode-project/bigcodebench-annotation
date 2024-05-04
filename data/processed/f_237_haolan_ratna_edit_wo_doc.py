@@ -41,10 +41,8 @@ def f_320(url, parameters):
     try:
         response = requests.get(url, params=parameters, headers=HEADERS)
         data = json.loads(response.text)
-
         df = pd.DataFrame(data)
         corr = df.corr()
-
         ax = sns.heatmap(corr, annot=True, cmap='coolwarm')
         return df, ax
     except Exception as e:

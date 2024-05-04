@@ -30,10 +30,8 @@ def f_44(animals, mean):
     """
     if not animals:
         return {}
-
     sales = {animal: 0 for animal in animals}
     num_customers = stats.poisson(mu=mean).rvs()
-
     for _ in range(num_customers):
         animal = random.choice(animals)
         sales[animal] += 1

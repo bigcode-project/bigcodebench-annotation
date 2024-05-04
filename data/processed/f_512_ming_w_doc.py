@@ -24,13 +24,9 @@ def f_214(dataframe, target_value):
     >>> series, ax = f_214(df, '332')
     '''
     start_time = time.time()
-    # Convert dataframe to string type for uniform comparison
     dataframe = pd.DataFrame(dataframe)
     dataframe = dataframe.astype(str)
-    
     counts = dataframe.apply(lambda x: (x == target_value).sum())
-
-    # Check if DataFrame is empty
     if not dataframe.empty:
         ax = counts.plot(kind='bar')
     else:

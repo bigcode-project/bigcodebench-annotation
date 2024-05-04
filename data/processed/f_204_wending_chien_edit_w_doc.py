@@ -39,15 +39,12 @@ def f_445():
      Matt         54.750
     """
     students_data = []
-
     for student in STUDENTS:
         grades = [randint(0, 100) for _ in COURSES]
         average_grade = np.mean(grades)
         students_data.append([student] + grades + [average_grade])
-
     columns = ['Name'] + COURSES + ['Average Grade']
     grades_df = pd.DataFrame(students_data, columns=columns)
-
     return grades_df
 
 import unittest

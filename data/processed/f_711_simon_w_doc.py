@@ -50,22 +50,16 @@ def f_316(
     3    David      6
     4      Eve      3
     """
-
     if len(students) == 0:
         raise ValueError("The students list should contain at least one student.")
-
     seed(rng_seed)
-
     student_cycle = cycle(students)
     grade_data = []
-
     for _ in range(n_grades):
         student = next(student_cycle)
         grade = randint(min(grade_range), max(grade_range))
         grade_data.append([student, grade])
-
     grade_df = pd.DataFrame(grade_data, columns=['Student', 'Grade'])
-
     return grade_df
 
 import unittest

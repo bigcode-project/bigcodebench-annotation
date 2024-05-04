@@ -27,17 +27,12 @@ def f_32(text: str) -> dict:
     >>> f_32("hello hello world")
     {'hello': 1, 'world': 1}
     """
-    # Remove duplicate words
     stop_words = set(stopwords.words('english'))
     text = ' '.join(sorted(set(text.split()), key=text.index))
-    # Tokenize and remove stopwords
     words = [word for word in re.findall(r'\b\w+\b', text.lower()) if word not in stop_words]
-    
-    # Create frequency distribution
     freq_dist = {}
     for word in words:
         freq_dist[word] = freq_dist.get(word, 0) + 1
-    
     return freq_dist
 
 import unittest

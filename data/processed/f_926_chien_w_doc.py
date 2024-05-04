@@ -32,7 +32,6 @@ def f_414(data):
     df = pd.DataFrame(data)
     if len(df) < 2:  # Check if the data frame has less than 2 rows
         return float("nan")  # or return None
-
     df["Score_Float"] = df["Score_String"].astype(float)
     df["Grade_Encoded"] = df["Grade"].astype("category").cat.codes
     correlation = pearsonr(df["Score_Float"], df["Grade_Encoded"])[0]

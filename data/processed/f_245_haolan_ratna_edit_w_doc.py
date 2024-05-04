@@ -28,10 +28,8 @@ def f_41(df):
     >>> print(report)
     {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
     """
-    
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df is not a DataFrame")
-    
     df = df.drop_duplicates(subset='Customer')
     total_sales = df['Sales'].sum()
     popular_category = collections.Counter(df['Category']).most_common(1)[0][0]

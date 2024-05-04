@@ -36,35 +36,21 @@ def f_152(file_path: str, plot_path: str) -> (float, float, str):
     >>> f_152("sample_data.csv", "output_plot.png")
     (25.5, 23.0, "output_plot.png")
     """
-    # Check if file exists
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"File {file_path} does not exist.")
-
-    # Load data and handle empty file
     try:
         data = pd.read_csv(file_path)
     except pd.errors.EmptyDataError:
         return np.nan, np.nan, plot_path
-
-    # Convert data to numeric, coerce errors to NaN
     data = pd.to_numeric(data.squeeze(), errors="coerce")
-
-    # Ensure data is a Pandas Series
     if not isinstance(data, pd.Series):
         data = pd.Series(data)
-
-    # Clean data
     data = data.dropna()
-
-    # Perform analysis
     if data.empty:
         mean = median = np.nan
     else:
-        # Calculate mean and median
         mean = float(np.mean(data))
         median = float(np.median(data))
-
-    # Create plot and save it
     plt.figure(figsize=(10, 6))
     plt.plot(data)
     plt.title("Data Visualization")
@@ -72,7 +58,6 @@ def f_152(file_path: str, plot_path: str) -> (float, float, str):
     plt.ylabel("Value")
     plt.savefig(plot_path)
     plt.close()
-
     return mean, median, plot_path
 
 import unittest

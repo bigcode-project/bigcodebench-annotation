@@ -42,28 +42,22 @@ def f_353(start_date, end_date, num_series, seed=None):
     """
     if seed is not None:
         random.seed(seed)
-
     start_date_dt = datetime.strptime(start_date, "%Y-%m-%d")
     end_date_dt = datetime.strptime(end_date, "%Y-%m-%d")
     if start_date_dt > end_date_dt:
         raise ValueError("start_date must be earlier than or equal to end_date.")
     if num_series < 1:
         raise ValueError("num_series must be at least 1.")
-
     date_range = pd.date_range(start_date_dt, end_date_dt)
-
     data = {}
     for i in range(num_series):
         series_name = f"series_{i+1}"
         data[series_name] = [random.randint(0, 100) for _ in range(len(date_range))]
-
     df = pd.DataFrame(data, index=date_range)
-
     ax = df.plot()
     ax.set_title("Random Time Series")
     ax.set_xlabel("Date")
     ax.set_ylabel("Value")
-
     return df, ax
 
 import unittest

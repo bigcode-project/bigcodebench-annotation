@@ -28,7 +28,6 @@ def f_49(directory):
     ['./another_directory/file{3}.png']
     """
     BRACKET_PATTERN = '[(){}\\[\\]]'  # Corrected pattern to match any type of bracket
-    
     file_list = []
     for root, dirs, files in os.walk(directory):
         for file in files:

@@ -60,33 +60,22 @@ def f_392(df, col_a='A', col_b='B', col_c='C', seed=None):
     >>> print(model)
     LinearRegression()
     """
-    # Validating the input dataframe
     if df.empty or not all(col in df for col in [col_a, col_b, col_c]):
         return None  # Invalid input scenario
-    
     try:
-        # Ensuring the columns contain numeric data
         df[[col_a, col_b, col_c]] = df[[col_a, col_b, col_c]].apply(pd.to_numeric, errors='raise')
     except ValueError:
         return None  # Non-numeric data encountered
-
-    # Filtering the data based on the conditions
     selected = df[(df[col_b] > 50) & (df[col_c] == 900)][[col_a, col_b]]
-
     if selected.empty:
         return None
-    
-    # Preparing the data for linear regression
     X_train, X_test, y_train, _ = train_test_split(selected[col_a].values.reshape(-1, 1),
                                                    selected[col_b].values,
                                                    test_size=0.2,
                                                    random_state=seed)
-
-    # Applying linear regression
     model = LinearRegression()
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
-
     return predictions, model
 
 import unittest

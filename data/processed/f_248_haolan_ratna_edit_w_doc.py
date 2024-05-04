@@ -34,20 +34,15 @@ def f_240(df):
     3    Sam  0.341882  0.399511
     4   Nick  1.481487 -1.426825
     """
-
     df = df.drop_duplicates(subset='Name')
-
     scaler = StandardScaler()
-
     df[['Age', 'Score']] = scaler.fit_transform(df[['Age', 'Score']])
-
     plt.figure(figsize=(8, 6))
     plt.scatter(df['Age'], df['Score'])
     plt.xlabel('Age (standardized)')
     plt.ylabel('Score (standardized)')
     plt.title('Scatter Plot of Standardized Age and Score')
     ax = plt.gca()  # Get current axes
-    
     return df, ax
 
 import unittest

@@ -27,14 +27,9 @@ def f_81(url):
         cmd = 'start'
     else:
         cmd = 'xdg-open'
-
-    # Open webpage in a background process
     process = subprocess.Popen([cmd, url], shell=True)
-
-    # Wait for the process to complete
     while process.poll() is None:
         time.sleep(1)
-
     return process.returncode
 
 import unittest

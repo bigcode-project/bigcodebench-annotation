@@ -28,7 +28,6 @@ def f_425():
     cpu_usage = psutil.cpu_percent(interval=1)
     memory_info = psutil.virtual_memory()
     disk_usage = psutil.disk_usage(os.sep)
-
     table = Texttable()
     table.add_rows([
         ['Item', 'Value'],

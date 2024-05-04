@@ -46,9 +46,7 @@ def f_307(filename=IMAGE_PATH, from_encoding="cp1251", to_encoding="utf8"):
                 except (UnicodeDecodeError, LookupError) as exc:
                     raise ValueError("Incorrect encoding provided.") from exc
         except Exception:
-            # If OCR fails, fall back to processing the image comment
             pass
-
         comment = image.info.get("comment", "")
         if isinstance(comment, bytes):
             try:
@@ -59,7 +57,6 @@ def f_307(filename=IMAGE_PATH, from_encoding="cp1251", to_encoding="utf8"):
                 )
             except (UnicodeDecodeError, LookupError) as exc:
                 raise ValueError("Incorrect encoding provided.") from exc
-
         return comment
 
 import unittest

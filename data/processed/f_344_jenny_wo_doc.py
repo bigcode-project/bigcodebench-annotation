@@ -37,9 +37,7 @@ def f_242(P, T):
     """
     if not (isinstance(P, np.ndarray) and isinstance(T, np.ndarray)):
         raise TypeError("Expected inputs to be numpy arrays")
-
     result = np.tensordot(P, T, axes=[1, 0])
-    # Sum along the last dimension to get a 2D matrix
     result_2D = np.sum(result, axis=-1)
     heatmap = sns.heatmap(result_2D)
     return result, heatmap

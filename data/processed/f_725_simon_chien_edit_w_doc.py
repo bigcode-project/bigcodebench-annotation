@@ -32,17 +32,11 @@ def f_679(df: pd.DataFrame, column_a: str, column_b: str, column_c: str) -> bool
     >>> f_679(df, 'A', 'B', 'C')
     False
     """
-    # Filter rows based on column_b and column_c
     filtered_df = df[(df[column_b] > 50) & (df[column_c] == 900)]
-
     if filtered_df[column_a].nunique() <= 1:
         return True
-
-    # If dataframe is empty after filtering, return False
     if filtered_df.empty:
         return True
-
-    # Perform Augmented Dickey-Fuller test
     adf_result = adfuller(filtered_df[column_a])
     p_value = adf_result[1]
     return p_value <= 0.05

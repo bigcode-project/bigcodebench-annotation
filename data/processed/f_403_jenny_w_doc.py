@@ -30,10 +30,8 @@ def f_74(array):
     <Axes: >
     """
     COLUMNS = ["A", "B", "C", "D", "E"]
-
     if not array or any(len(sublist) != 5 for sublist in array):
         raise ValueError("array must be non-empty and all sublists must have a length of 5.")
-
     df = pd.DataFrame(array, columns=COLUMNS)
     heatmap = sns.heatmap(df.corr(), annot=True)
     return df, heatmap

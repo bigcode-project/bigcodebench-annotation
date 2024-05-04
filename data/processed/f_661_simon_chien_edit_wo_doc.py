@@ -38,16 +38,13 @@ def f_117(file_path, output_path=None, sort_key='title', linear_regression=False
     try:
         df = pd.read_csv(file_path)
         df.sort_values(by=[sort_key], inplace=True)
-
         if linear_regression:
             if x_column not in df.columns or y_column not in df.columns:
                 raise ValueError("Specified columns for linear regression do not exist in the dataframe")
-
             X = df[[x_column]]
             y = df[y_column]
             model = LinearRegression().fit(X, y)
             return model
-
         if output_path:
             df.to_csv(output_path, index=False)
             return output_path

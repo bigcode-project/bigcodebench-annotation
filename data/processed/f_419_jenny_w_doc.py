@@ -42,26 +42,17 @@ def f_231(df, n_clusters=3, random_state=None, n_init=10):
     >>> duplicates
     Counter({(2, 1): 3})
     """
-    # Identify duplicates
     duplicates = df[df.duplicated(subset=["x", "y"], keep=False)]
     duplicates_counter = Counter(map(tuple, duplicates[["x", "y"]].values))
-
-    # Remove duplicates and perform KMeans clustering on unique points
     unique_df = df.drop_duplicates(subset=["x", "y"]).copy()
-
-    # Adjust n_clusters if unique data points are fewer than desired clusters
     n_clusters = min(n_clusters, len(unique_df))
-
     kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=n_init)
     unique_df["cluster"] = kmeans.fit_predict(unique_df[["x", "y"]])
-
-    # Plot clustered data
     fig, ax = plt.subplots()
     scatter = ax.scatter(unique_df["x"], unique_df["y"], c=unique_df["cluster"])
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_title("KMeans Clusters")
-
     return duplicates_counter, unique_df, ax
 
 import unittest

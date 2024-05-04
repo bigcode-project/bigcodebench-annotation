@@ -45,10 +45,8 @@ def f_248(file_path: str) -> pd.DataFrame:
     Name: 0, dtype: object
     """
     LOG_REGEX = r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}) - (\w+) - (.+)$"
-
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"The file {file_path} does not exist.")
-
     logs = []
     with open(file_path, "r") as f:
         for line in f:
@@ -56,12 +54,9 @@ def f_248(file_path: str) -> pd.DataFrame:
             if match:
                 timestamp, level, message = match.groups()
                 logs.append([timestamp, level, message])
-
     df = pd.DataFrame(logs, columns=["Timestamp", "Level", "Message"])
-
     if df.empty:
         df = pd.DataFrame(columns=["Timestamp", "Level", "Message"])
-
     return df
 
 import unittest

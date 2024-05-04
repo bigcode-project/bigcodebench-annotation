@@ -38,15 +38,12 @@ def f_557(hours, output_dir = output_dir):
     for i in range(hours):
         row = [datetime.now().strftime('%H:%M:%S.%f'), WEATHER_CONDITIONS[randint(0, len(WEATHER_CONDITIONS)-1)]]
         data.append(row)
-
     with open(FILE_PATH, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(data)
-    
     if not os.path.exists(BACKUP_PATH):
         os.makedirs(BACKUP_PATH)
     shutil.copy(FILE_PATH, BACKUP_PATH)
-
     return FILE_PATH
 
 import unittest

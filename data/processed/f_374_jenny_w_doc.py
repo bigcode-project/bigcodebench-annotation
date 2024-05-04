@@ -30,16 +30,12 @@ def f_524(X, Y):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     def func(x, a, b, c):
         return a * x ** 2 + b * x + c
-
     popt, pcov = curve_fit(func, X, Y)
-
     fig, ax = plt.subplots()
     ax.scatter(X, Y)
     ax.plot(X, func(X, *popt), "r-")
-
     return list(popt), ax
 
 import unittest

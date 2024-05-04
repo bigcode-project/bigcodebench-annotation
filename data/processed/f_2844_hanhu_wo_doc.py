@@ -36,19 +36,15 @@ def f_267(dir, api_key, recipient_email):
         file_list = os.listdir(dir)
     except:
         raise FileNotFoundError(f"Directory '{dir}' does not exist.")
-
     file_list_str = ', '.join(file_list)
-
     message = Mail(
         from_email='from_email@example.com',
         to_emails=recipient_email,
         subject=f'Directory Listing for {dir}',
         plain_text_content=file_list_str)
-
     try:
         sg = SendGridAPIClient(api_key)
         response = sg.send(message)
-        # Assu success codes are in the 2xx range
         return 200 <= response.status_code < 300
     except HTTPError as e:
         print(f"HTTP error occurred: {e}")

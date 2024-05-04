@@ -20,8 +20,6 @@ def f_116(sentence):
     >>> f_116("apple banana apple orange orange orange")
     {'apple': 2, 'banana': 1, 'orange': 3}
     """
-
-
     words = re.findall(r'\b\w+\b', sentence)
     return dict(Counter(words))
 

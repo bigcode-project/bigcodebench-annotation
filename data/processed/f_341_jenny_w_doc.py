@@ -28,22 +28,16 @@ def f_625(s):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     if not isinstance(s, str):
         raise TypeError("Expected string input")
-
     LETTERS = string.ascii_lowercase
-
     s = s.lower()
-
     letter_counts = {letter: s.count(letter) for letter in LETTERS}
-
     fig, ax = plt.subplots()
     ax.bar(letter_counts.keys(), letter_counts.values())
     ax.set_xlabel("Letters")
     ax.set_ylabel("Frequency")
     ax.set_title("Letter Frequencies")
-
     return letter_counts, ax
 
 import unittest

@@ -37,23 +37,17 @@ def f_646(P, T, tensor_shape=(3, 3, 3)):
     """
     if not (isinstance(P, np.ndarray) and isinstance(T, np.ndarray)):
         raise TypeError("Expected inputs to be numpy arrays")
-
     if not T.shape == tensor_shape:
         raise ValueError("Provided tensor does not match the specified tensor_shape.")
-
     result = np.tensordot(P, T, axes=[1, 1]).swapaxes(0, 1)
-
-    # Reshape the result for PCA
     result = result.reshape(result.shape[0], -1)
     pca = PCA(n_components=2)
     pca_result = pca.fit_transform(result)
-
     fig, ax = plt.subplots()
     ax.scatter(pca_result[:, 0], pca_result[:, 1])
     ax.set_title("PCA Result Visualization")
     ax.set_xlabel("Principal Component 1")
     ax.set_ylabel("Principal Component 2")
-
     return pca_result, ax
 
 import unittest

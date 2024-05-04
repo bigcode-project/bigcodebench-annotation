@@ -34,12 +34,10 @@ def f_545(x=1):
     """
     result = []
     card_counts = Counter()
-
     for i in range(x):
         drawn = random.sample(CARDS, 5)
         result.append(drawn)
         card_counts.update(drawn)
-
     return result, card_counts
 
 import unittest

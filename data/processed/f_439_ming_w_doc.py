@@ -28,16 +28,13 @@ def f_67(a, b, columns=['A', 'B']):
         >>> isinstance(df, pd.DataFrame) and isinstance(ax, matplotlib.axes.Axes)
         True
     """
-    # Handle empty input lists by returning an empty DataFrame and Axes object
     if len(a) == 0 or len(b) == 0:
         fig, ax = plt.subplots()
         plt.close(fig)  # Prevent empty plot from displaying
         return pd.DataFrame(), ax
-
     scaler = StandardScaler()
     standardized_values = scaler.fit_transform(np.array([a, b]).T)
     df = pd.DataFrame(standardized_values, columns=columns)
-
     ax = df.plot(kind='bar')
     plt.show()
     return df, ax

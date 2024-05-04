@@ -32,15 +32,10 @@ def f_604(req_data, secret_key):
     """
     if not isinstance(req_data, dict):
         raise TypeError("req_data must be a dictionary")
-    # Convert request data to json string
     json_req_data = json.dumps(req_data)
-    # Create a new hmac object with the secret key and the json string as the message
     hmac_obj = hmac.new(secret_key.encode(), json_req_data.encode(), hashlib.sha256)
-    # Get the hmac signature
     hmac_signature = hmac_obj.hexdigest()  # Use hexdigest for a hexadecimal representation
-    # URL encode the hmac signature
     url_encoded_signature = urllib.parse.quote_plus(hmac_signature)
-
     return url_encoded_signature
 
 import unittest

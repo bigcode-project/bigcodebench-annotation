@@ -33,18 +33,14 @@ def f_373(n, value):
     """
     if n < 1:  # Handle case where n is 0 or less
         return [], 0
-
     numbers = [random.random() for _ in range(n)]
     avg = statistics.mean(numbers)
     greater_avg = [x for x in numbers if x > avg]
-
     numbers.sort()
     bpoint = bisect.bisect_right(numbers, value)
     num_greater_value = len(numbers) - bpoint
-
     plt.plot(numbers)
     plt.show()
-
     return greater_avg, num_greater_value
 
 import unittest

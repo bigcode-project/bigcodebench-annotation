@@ -38,9 +38,7 @@ def f_163(dates_str_list):
     """
     weekdays = [parse(date_str).weekday() for date_str in dates_str_list]
     weekday_counts = np.bincount(weekdays, minlength=7)
-    
     distribution = pd.Series(weekday_counts, index=DAYS_OF_WEEK)
-
     return distribution
 
 import unittest

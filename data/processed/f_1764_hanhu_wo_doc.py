@@ -34,7 +34,6 @@ def f_668(ROOT_DIR, DEST_DIR, SPECIFIC_HASH):
     True
     """
     files_moved = 0
-
     os.makedirs(DEST_DIR, exist_ok=True)
     for filename in glob.glob(os.path.join(ROOT_DIR, '*')):
         if not os.path.exists(filename) or os.path.isdir(filename):

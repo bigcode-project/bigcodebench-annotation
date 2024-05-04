@@ -39,15 +39,12 @@ def f_627(json_data: str, key_path: list):
         for key in key_path:
             data = data[key]
         values = np.fromstring(data, sep=",")
-
         if values.size == 0:
             raise ValueError("No numeric data found or empty data string.")
         df = pd.DataFrame(values, columns=["Values"])
-
         fig, ax = plt.subplots()
         sns.boxplot(data=df, ax=ax)
         return fig
-
     except json.decoder.JSONDecodeError as e:
         raise ValueError(f"Input malformed: {e}")
     except KeyError as e:

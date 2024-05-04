@@ -29,20 +29,14 @@ def f_687(df, dct):
     >>> f_687(df, dct)
     {'feature1': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 'feature2': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 'feature3': {'mean': 2.0, 'median': 2.0, 'mode': 2, 'variance': 0.0}, 'feature4': {'mean': 2.6, 'median': 3.0, 'mode': 1, 'variance': 2.24}, 'feature5': {'mean': 0.8, 'median': 1.0, 'mode': 1, 'variance': 0.16000000000000006}}
     """
-
-    # Replace values using dictionary mapping
     df = df.replace(dct)
-    
     statistics = {}
     try:
         for feature in FEATURES:
-            # Calculate statistics
             mean = np.mean(df[feature])
             median = np.median(df[feature])
             mode = stats.mode(df[feature])[0][0]
             variance = np.var(df[feature])
-            
-            # Store statistics in dictionary
             statistics[feature] = {'mean': mean, 'median': median, 'mode': mode, 'variance': variance}
     except Exception as e:
         return "Invalid input"        

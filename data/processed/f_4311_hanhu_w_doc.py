@@ -28,10 +28,8 @@ def f_502(my_dict):
     """
     ordered_dict = OrderedDict(sorted(my_dict.items(), key=lambda t: t[0]))
     table = PrettyTable(['Key', 'Value'])
-
     for key, value in ordered_dict.items():
         table.add_row([key, value])
-
     return table
 
 import unittest

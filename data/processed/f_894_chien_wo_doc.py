@@ -31,7 +31,6 @@ def f_539(input_string):
     """
     if not os.path.exists(DIRECTORY):
         os.makedirs(DIRECTORY)
-
     file_paths = []
     lines = input_string.split("\n")
     for line in lines:
@@ -42,7 +41,6 @@ def f_539(input_string):
             with open(filepath, "w", encoding="utf-8") as file:
                 file.write(line_hash)
             file_paths.append(filepath)
-
     return file_paths
 
 import unittest

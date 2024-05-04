@@ -36,22 +36,15 @@ def f_623():
     >>> len(kmeans.cluster_centers_) == 5  # Check the number of clusters
     True
     """
-    # Generate random 2D points
     data = np.array([(np.random.randint(0, RANGE), np.random.randint(0, RANGE)) for _ in range(SIZE)])
-
-    # Apply KMeans clustering
     kmeans = KMeans(n_clusters=CLUSTERS)
     kmeans.fit(data)
-
-    # Plot the clustered data points
     plt.scatter(data[:, 0], data[:, 1], c=kmeans.labels_, cmap='viridis', marker='.')
-    # Plot the cluster centroids
     plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=300, c='red', marker='x')
     plt.title("KMeans Clustering of Random 2D Points")
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.show()
-
     return data, kmeans
 
 import unittest

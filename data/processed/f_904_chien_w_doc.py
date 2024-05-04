@@ -45,26 +45,22 @@ def f_380(df: pd.DataFrame, column_name: str) -> (str, plt.Axes):
         _, ax = plt.subplots()
         ax.set_title(f"Distribution of values in {column_name} (No Data)")
         return message, ax
-
     unique_values_count = df[column_name].nunique()
     total_values = len(df[column_name])
     is_uniform = total_values % unique_values_count == 0 and all(
         df[column_name].value_counts() == total_values / unique_values_count
     )
-
     message = (
         "The distribution of values is uniform."
         if is_uniform
         else "The distribution of values is not uniform."
     )
-
     _, ax = plt.subplots()
     ax.hist(df[column_name], bins=unique_values_count, edgecolor="black", alpha=0.7)
     ax.set_xticks(range(unique_values_count))
     ax.set_xlabel("Values")
     ax.set_ylabel("Frequency")
     ax.set_title(f"Distribution of values in {column_name}")
-
     return message, ax
 
 import unittest

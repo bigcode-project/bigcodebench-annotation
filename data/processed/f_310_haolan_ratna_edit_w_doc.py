@@ -32,14 +32,12 @@ def f_158(l):
     """
     pca = PCA(n_components=2)
     principalComponents = pca.fit_transform(l)
-    
     fig = plt.figure(figsize=(6, 4))
     ax = fig.add_subplot(111)
     plt.scatter(principalComponents[:, 0], principalComponents[:, 1])
     plt.xlabel('First Principal Component')
     plt.ylabel('Second Principal Component')
     plt.title('PCA Result')
-
     return ax
 
 import unittest

@@ -53,10 +53,7 @@ def f_288(data):
         password = base64.b64decode(data['password']).decode()
     except (KeyError, UnicodeDecodeError, binascii.Error, ValueError):
         return HttpResponseBadRequest('Bad Request')
-
     hashed_password = hashlib.sha256(password.encode()).digest()
-
-    # Dummy authentication logic
     if username == 'admin' and hashed_password == hashlib.sha256('password'.encode()).digest():
         return HttpResponse('Login successful.')
     else:

@@ -27,7 +27,6 @@ def f_405():
     """
     X = np.linspace(-10, 10, 400)
     Y = X**2
-
     plt.figure()
     plt.plot(X, Y)
     plt.title('y = x^2')

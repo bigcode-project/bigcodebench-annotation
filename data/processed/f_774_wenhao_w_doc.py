@@ -30,17 +30,12 @@ def f_489(word: str) -> list:
     >>> f_489("a1b2c3")
     [('ab', 1)]
     """
-    # Clean the word: lowercase and keep alphabetic characters only
     clean_word = re.sub('[^a-z]', '', word.lower())
-    
     if len(clean_word) < 2:
         return []
-    
     pairs = [clean_word[i:i+2] for i in range(len(clean_word) - 1)]
     pair_counter = Counter(pairs)
     most_common = pair_counter.most_common(1)
-    
-    # This check ensures we return the result directly from most_common without additional filtering
     return most_common
 
 import unittest

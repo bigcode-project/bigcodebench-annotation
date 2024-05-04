@@ -42,14 +42,12 @@ def f_413(time_strings, target_tz):
     2  20/12/11 12:34:56.000  20/12/11 07:34:56.000000
     """
     data = []
-
     for time_string in time_strings:
         utc_time = datetime.strptime(time_string, TIME_FORMAT)
         converted_time = utc_time.replace(tzinfo=ZoneInfo("UTC")).astimezone(
             ZoneInfo(target_tz)
         )
         data.append([time_string, converted_time.strftime(TIME_FORMAT)])
-
     df = pd.DataFrame(data, columns=["Original Time", "Converted Time"])
     return df
 

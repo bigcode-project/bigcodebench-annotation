@@ -56,14 +56,11 @@ def f_704(
     0  1970-01-01 00:00:00.000000  0.049671  0.986174  0.064769        ERROR
     """
     np.random.seed(random_seed)
-
     if start_time > end_time:
         raise ValueError("start_time cannot be after end_time")
     if step < 0:
         raise ValueError("step must be positive")
-
     timestamps = list(range(start_time, end_time, step))
-
     data = []
     for ts in timestamps:
         dt = datetime.utcfromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M:%S.%f")
@@ -73,7 +70,6 @@ def f_704(
         status = np.random.choice(sensor_statuses)
         row = [dt, sensor1, sensor2, sensor3, status]
         data.append(row)
-
     return pd.DataFrame(data, columns=columns)
 
 import unittest

@@ -96,7 +96,6 @@ def f_208(test_scores, student):
     student_scores = test_scores[test_scores['Student'] == student]['Score']
     average_score = student_scores.mean()
     std = student_scores.std()
-    
     return np.array([average_score, std]), test_scores
 
 import unittest

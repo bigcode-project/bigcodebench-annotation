@@ -28,14 +28,9 @@ def f_350(a, b):
     >>> isinstance(ax, matplotlib.axes.Axes)
     True
     """
-    # Combine lists
     combined = list(itertools.chain(a, b))
-    # Count occurrences of each item
     counter = collections.Counter(combined)
-    # Get counts for predefined items
     item_counts = [counter.get(item, 0) for item in ITEMS]
-
-    # Create a bar plot
     fig, ax = plt.subplots()
     ax.bar(ITEMS, item_counts, color='skyblue')
     ax.set_xlabel('Items')
@@ -43,7 +38,6 @@ def f_350(a, b):
     ax.set_title('Item Frequency in Combined List')
     plt.xticks(rotation=45)
     plt.tight_layout()  # Adjust layout to make room for item labels
-
     return ax
 
 import unittest

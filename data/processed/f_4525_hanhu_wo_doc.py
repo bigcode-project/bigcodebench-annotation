@@ -38,13 +38,10 @@ def f_587(url):
     """
     try:
         (pub_key, priv_key) = rsa.newkeys(512)
-
         response = urllib.request.urlopen(url)
         content = response.read()
         hash_value = sha256(content).digest()
-        
         signed_hash = rsa.sign(hash_value, priv_key, 'SHA-256').hex()
-
         return pub_key, signed_hash, hash_value
     except urllib.error.HTTPError as e:
         raise ValueError(f"Server returned an HTTP error: {e.code} {e.reason}") from e

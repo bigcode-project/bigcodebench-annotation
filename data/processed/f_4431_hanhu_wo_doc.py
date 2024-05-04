@@ -32,13 +32,10 @@ def f_572(filepath, destination_dir):
     True
     """
     lib = ctypes.CDLL(filepath)
-
     dll_dir = os.path.dirname(filepath)
     dll_files = glob.glob(os.path.join(dll_dir, '*.dll'))
-
     for dll_file in dll_files:
         shutil.move(dll_file, destination_dir)
-
     return lib._name
 
 import unittest

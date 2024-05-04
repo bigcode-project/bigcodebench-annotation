@@ -45,9 +45,7 @@ def f_670():
         ],
         "Float Field": [f"{x:,.2f}" for x in np.random.uniform(0, 10000, NUM_SAMPLES)],
     }
-
     df = pd.DataFrame(data)
-
     return df
 
 import unittest

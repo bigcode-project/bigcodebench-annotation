@@ -46,24 +46,19 @@ def f_460(num_samples, countries=['Russia', 'China', 'USA', 'India', 'Brazil'],
     3  Austria   19       1
     4  Austria   21       1
     """
-
     if not isinstance(num_samples, int):
         raise ValueError("num_samples should be an integer.")
-
     rng = np.random.default_rng(seed=rng_seed)
     countries = rng.choice(countries, num_samples)
     ages = rng.choice(ages, num_samples)
     genders = rng.choice(genders, num_samples)
-
     le = LabelEncoder()
     encoded_genders = le.fit_transform(genders)
-
     demographics = pd.DataFrame({
         'Country': countries,
         'Age': ages,
         'Gender': encoded_genders
     })
-
     return demographics
 
 import unittest

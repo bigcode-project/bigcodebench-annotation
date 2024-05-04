@@ -42,7 +42,6 @@ def f_631(f_list):
             raise ValueError("The function should not be a lambda function.")
         spec = inspect.getfullargspec(f)
         func_info.append([f.__name__, len(spec.args)])
-
     df = pd.DataFrame(func_info, columns=['Function Name', 'Number of Arguments'])
     df.set_index('Function Name', inplace=True)
     df.plot(kind='bar')  # Uncomment to visualize the bar chart

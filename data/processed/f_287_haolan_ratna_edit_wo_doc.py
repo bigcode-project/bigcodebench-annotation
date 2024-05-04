@@ -27,18 +27,14 @@ def f_408(filename):
     >>> f_408('nonexistent.bat') # If backup fails or file doesn't exist
     -1
     """
-
     file_path = os.path.join(DIRECTORY, filename)
     backup_path = os.path.join(BACKUP_DIRECTORY, filename)
-
-    # Backup the file
     try:
         shutil.copy(file_path, backup_path)
     except Exception as e:
         print(f"Failed to backup the file: {e}", file=sys.stderr)
         return -1
     try:
-        # Execute the file as a subprocess
         process = subprocess.Popen(file_path)
         return process.poll()  # return the exit code
     except Exception as e:

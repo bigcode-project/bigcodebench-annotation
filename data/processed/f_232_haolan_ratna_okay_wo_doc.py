@@ -20,11 +20,8 @@ def f_401(input):
     >>> f_401('Fetch data from https://api.example.com/data')
     {'key': 'value'}
     """
-
     endpoint = re.search(r'https?:\/\/[^ ]+', input).group()
-
     response = requests.get(endpoint)
-
     return response.json()
 
 import unittest

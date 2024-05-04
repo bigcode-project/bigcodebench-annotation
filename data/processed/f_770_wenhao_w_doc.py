@@ -30,16 +30,10 @@ def f_656(word: str) -> dict:
     [('ab', 1), ('ac', 0), ('ad', 0), ('ae', 0), ('af', 0)]
     """
     ALPHABETS = string.ascii_lowercase
-    # Generate all two-letter combinations of alphabets
     permutations = [''.join(x) for x in itertools.permutations(ALPHABETS, 2)]
     combinations = permutations + [x*2 for x in ALPHABETS]
-    
-    # Generate all two-letter combinations in the word
     word_combinations = [''.join(x) for x in zip(word, word[1:])]
-    # Count the occurrences of each two-letter combination in the word
     word_counter = Counter(word_combinations)
-
-    # Create the dictionary with the counts
     return {key: word_counter.get(key, 0) for key in combinations}
 
 import unittest

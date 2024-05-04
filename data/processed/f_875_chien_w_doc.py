@@ -52,24 +52,13 @@ def f_51(rows=1000, string_length=3):
     >>> ax.get_xlim()
     (0.0, 26.0)
     """
-
-    # Generate random strings
     data = ["".join(random.choices(LETTERS, k=string_length)) for _ in range(rows)]
-
-    # Create a DataFrame and compute letter frequency
     df = pd.DataFrame({"String": data})
-
-    # Check if the DataFrame is empty
     if df.empty:
         print("No data to generate heatmap.")
         return None
-
     df = pd.get_dummies(df["String"].apply(list).explode()).groupby(level=0).sum()
-
-    # Calculate the correlation matrix
     corr = df.corr()
-
-    # Create and return the heatmap
     ax = sns.heatmap(corr, annot=True, fmt=".2f")
     plt.close()  # Close the plot to prevent it from showing during function call
     return ax

@@ -30,18 +30,9 @@ def f_147(df, features):
     """
     if not features:
         return df
-
-    # Initialize the StandardScaler
     scaler = StandardScaler()
-    
-    # Apply StandardScaler to the specified features
-    # Using pd.DataFrame to explicitly reference DataFrame operations
     df.loc[:, features] = pd.DataFrame(scaler.fit_transform(df.loc[:, features]), columns=features, index=df.index)
-
-    # Example of explicit np usage, even though not necessary for this function
-    # Just for demonstration: add a dummy operation using np
     df['dummy'] = np.zeros(len(df))
-
     return df.drop('dummy', axis=1)  
 
 import unittest

@@ -39,16 +39,13 @@ def f_512(df: pd.DataFrame) -> dict:
     >>> {key: next(value) for key, value in gen_dict.items()}
     {'Donald': ('Donald', 9.0), 'Girl': ('Girl', -1.0), 'Micky': ('Micky', 25.2)}
     """
-
     if 'Name' not in df.columns or 'Score' not in df.columns:
         raise ValueError('The DataFram should have the columns "Name" and "Score".')
-
     grouped = df.groupby('Name')
     result_dict = {}
     for name, group in grouped:
         avg_score = mean(group['Score'])
         result_dict[name] = iter([(name, avg_score)])
-
     return result_dict
 
 import unittest

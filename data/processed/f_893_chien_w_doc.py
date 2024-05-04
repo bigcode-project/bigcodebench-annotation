@@ -33,11 +33,8 @@ def f_638(input_string: str) -> pd.DataFrame:
     2                         ...bye
     """
     input_string = input_string.replace('\\n', '\n').replace('\\t', ' ')
-    # Split the input string into lines and filter out empty lines
     lines = [line for line in input_string.split("\n") if line.strip()]
-    # Replace tabs with spaces in each line
     lines = [re.sub("\t", " ", line) for line in lines]
-    # Create a DataFrame from the processed lines
     return pd.DataFrame(lines, columns=["Text"])
 
 import pandas as pd

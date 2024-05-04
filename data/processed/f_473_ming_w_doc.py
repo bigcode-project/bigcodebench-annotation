@@ -42,7 +42,6 @@ def f_263(goals: dict, penalties: dict) -> pd.DataFrame:
             'Penalties Cost': penalties_cost,
             'Performance Score': performance_score
         })
-
     report_df = pd.DataFrame(report_data)
     return report_df
 

@@ -45,19 +45,16 @@ def f_226():
     """
     numbers = [random.randint(0, RANGE) for _ in range(SIZE)]
     moving_avg = [statistics.mean(numbers[max(0, i - 5):i + 1]) for i in range(SIZE)]
-
     df = pd.DataFrame({
         'Random Numbers': numbers,
         'Moving Average': moving_avg
     })
-
     plt.hist(df['Random Numbers'],
              bins=np.arange(min(df['Random Numbers']), max(df['Random Numbers']) + BIN_WIDTH, BIN_WIDTH))
     plt.title('Histogram of Random Numbers')
     plt.xlabel('Random Numbers')
     plt.ylabel('Frequency')
     plt.show()
-
     return df
 
 import unittest

@@ -26,7 +26,6 @@ def f_148(x):
     pairs = list(itertools.combinations(x.keys(), 2))
     max_pair = max(pairs, key=lambda pair: math.cos(x[pair[0]]) + math.cos(x[pair[1]]))
     print(max_pair)
-
     return max_pair
 
 import unittest

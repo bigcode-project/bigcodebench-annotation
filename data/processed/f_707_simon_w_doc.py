@@ -42,21 +42,15 @@ def f_538(data):
     3  Christopher         -1.760916           0.000000
     4      Timothy         -0.238270           0.120482
     """
-    # Extracting items, counts, and weights from the input data
     items, counts, weights = zip(*data)
-    
-    # Normalizing the counts and weights
     counts_normalized = zscore(counts)
     scaler = MinMaxScaler()
     weights_normalized = scaler.fit_transform(np.array(weights).reshape(-1, 1)).flatten()
-
-    # Creating a DataFrame with the normalized data
     report_df = pd.DataFrame({
         'Item': items,
         'Normalized Count': counts_normalized,
         'Normalized Weight': weights_normalized
     })
-
     return report_df
 
 import unittest

@@ -30,15 +30,11 @@ def f_714(file_path: str, column_name: str) -> pd.DataFrame:
     if not os.path.exists(file_path):
         print(f'File does not exist: {file_path}')
         sys.exit(1)
-
     df = pd.read_csv(file_path)
-    
-    # Check if the column exists
     if column_name in df.columns:
         df[column_name] = df[column_name].replace({'\n': '<br>'}, regex=True)
     else:
         print(f"Column '{column_name}' does not exist in the DataFrame. No changes were made.")
-
     return df
 
 import unittest

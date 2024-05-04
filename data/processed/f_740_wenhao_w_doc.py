@@ -25,10 +25,8 @@ def f_131(count, seed=0):
     Counter()
     """
     random.seed(seed)
-
     pairs = [tuple(random.choices(LETTERS, k=2)) for _ in range(count)]
     pair_frequency = Counter(pairs)
-
     return pair_frequency
 
 import unittest

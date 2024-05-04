@@ -31,18 +31,13 @@ def f_630(text: str, seed=None) -> str:
     >>> f_630('attention is all you need', 42)
     'ATtENTIOn_IS_ALL_You_Need'
     """
-
     if seed is not None:
         random.seed(seed)
-
     text = re.sub("[%s]" % re.escape(string.punctuation), "", text)
-
     REPLACEMENTS = {" ": "_", "\t": "__", "\n": "___"}
     for k, v in REPLACEMENTS.items():
         text = text.replace(k, v)
-
     text = "".join(random.choice([k.upper(), k]) for k in text)
-
     return text
 
 import unittest

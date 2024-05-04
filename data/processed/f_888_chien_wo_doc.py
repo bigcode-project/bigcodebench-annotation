@@ -42,24 +42,19 @@ def f_357(date_str, booking_data):
     3  Room4     Not Listed
     4  Room5     Not Listed
     """
-    # Validate the date string
     try:
         date = datetime.strptime(date_str, "%Y-%m-%d")
         if date < datetime.now():
             raise ValueError("Date is in the past. Please provide a future date.")
     except ValueError as e:
         raise ValueError(f"Invalid date: {e}") from e
-
     report_data = [[room, booking_data.get(room, "Not Listed")] for room in ROOMS]
     report_df = pd.DataFrame(report_data, columns=["Room", "Booking Status"])
-
-    # Create a bar plot of the booking statuses
     ax = (
         report_df["Booking Status"]
         .value_counts()
         .plot(kind="bar", title="Booking Statuses for " + date_str)
     )
-
     return report_df, ax
 
 import unittest

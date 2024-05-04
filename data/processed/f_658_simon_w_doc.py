@@ -41,27 +41,20 @@ def f_374(num_samples=500, noise_strength=1, random_seed=None, test_size=0.2):
     >>> f_374(noise_strength=0.1)
     (0.9658328575162494, LinearRegression())
     """
-
     if num_samples * test_size < 2:
         raise ValueError("Test set should contain at least 2 samples. num_samples * testsize >=2")
-
     if random_seed is not None:
         np.random.seed(random_seed)
-
     X = np.random.rand(num_samples, 1)
     y = 2*X.squeeze() + 1 + np.random.randn(num_samples) * noise_strength
-
     X_train, X_test, y_train, y_test = train_test_split(
                                             X, y,
                                             test_size=test_size,
                                             random_state=random_seed
                                             )
-
     model = LinearRegression()
     model.fit(X_train, y_train)
-
     r_squared = model.score(X_test, y_test)
-
     return r_squared, model
 
 import unittest

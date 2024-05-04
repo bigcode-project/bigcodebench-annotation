@@ -33,27 +33,17 @@ def f_213(df):
     >>> print(pred_prices)
     [107.0, 108.0, 109.0, 110.0, 111.0, 112.0, 113.0]
     """
-    # Convert date to timestamp
     df['date'] = pd.to_datetime(df['date'])
     df['date'] = df['date'].map(pd.Timestamp.timestamp)
-    
-    # Prepare data
     X = df['date'].values.reshape(-1, 1)
     y = df['closing_price'].values
-    
-    # Fit model
     model = LinearRegression()
     model.fit(X, y)
-    
-    # Predict future prices
     future_dates = np.array([df['date'].max() + i*24*60*60 for i in range(1, 8)]).reshape(-1, 1)
     pred_prices = model.predict(future_dates)
-    
-    # Plot
     fig, ax = plt.subplots()
     ax.scatter(df['date'], df['closing_price'], color='black')
     ax.plot(future_dates, pred_prices, color='blue', linewidth=3)
-    
     return pred_prices.tolist(), ax
 
 import unittest

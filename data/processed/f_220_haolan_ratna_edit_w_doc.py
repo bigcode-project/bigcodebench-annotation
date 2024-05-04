@@ -21,8 +21,6 @@ def f_487(ip_addresses: list) -> dict:
     >>> f_487(['8.8.8.8', '8.8.4.4'])
     {'8.8.8.8': 'dns.google', '8.8.4.4': 'dns.google'}
     """
-
-    
     IP_REGEX = r'[0-9]+(?:\.[0-9]+){3}'
     hostnames = {}
     for ip in ip_addresses:

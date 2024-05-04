@@ -45,21 +45,15 @@ def f_520(records: np.ndarray, random_seed: int = 0) -> pd.DataFrame:
     """
     if random_seed is not None:
         np.random.seed(random_seed)
-
     if not (records.ndim == 2):
         raise ValueError("Input must be a 2D numpy array.")
-
     records_copy = records.copy()
     np.random.shuffle(records_copy.T)
-
     scaler = StandardScaler()
     normalized_records = scaler.fit_transform(records_copy)
-
     features = [f"f{i+1}" for i in range(records[0].shape[0])]
     np.random.shuffle(features)
-
     df = pd.DataFrame(normalized_records, columns=features)
-
     return df
 
 import unittest

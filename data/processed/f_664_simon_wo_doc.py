@@ -45,7 +45,6 @@ def f_279(n,
     """
     random.seed(random_seed)
     np.random.seed(random_seed)
-
     data = []
     for _ in range(n):
         title = f"Article {_}"
@@ -54,7 +53,6 @@ def f_279(n,
         category = random.choice(categories)
         views = np.random.poisson(1000)
         data.append({'title': title, 'title_url': title_url, 'id': id, 'category': category, 'views': views})
-
     df = pd.DataFrame(data)
     return df
 

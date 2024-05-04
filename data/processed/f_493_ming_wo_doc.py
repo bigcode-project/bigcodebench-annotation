@@ -24,13 +24,9 @@ def f_516(df: pd.DataFrame, filename: str) -> str:
     True
     """
     start_time = time.time()
-    # Ensure the data directory exists
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-
     file_path = os.path.join(output_dir, filename)
-
-    # Save DataFrame as JSON Lines
     with open(file_path, 'w') as file:
         for record in df.to_dict(orient='records'):
             json.dump(record, file)

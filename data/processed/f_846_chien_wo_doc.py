@@ -44,20 +44,16 @@ def f_749(url):
             xml_data = response.read()
     except Exception as e:
         raise ValueError(f"Error fetching the XML file: {e}")
-
     try:
         xml_tree = etree.XML(xml_data)
     except etree.XMLSyntaxError:
         raise ValueError("Invalid XML syntax")
-
     data = []
     for item in xml_tree.findall(".//item"):
         data_item = {child.tag: child.text for child in item}
         data.append(data_item)
-
     if not data:
         raise ValueError("XML structure does not match expected format.")
-
     return pd.DataFrame(data)
 
 import unittest

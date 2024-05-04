@@ -21,23 +21,13 @@ def f_402(date_str, from_tz, to_tz):
     >>> type(f_402('2022-10-22 11:59:59', 'UTC', 'America/Chicago'))
     <class 'int'>
     """
-    # Get timezone objects for the source and destination timezones
     from_tz_obj = pytz.timezone(from_tz)
     to_tz_obj = pytz.timezone(to_tz)
-
-    # Parse the given date string and localize it to the source timezone
     given_date_naive = parse(date_str)
     given_date = from_tz_obj.localize(given_date_naive)
-
-    # Convert the given date to the destination timezone
     given_date_in_to_tz = given_date.astimezone(to_tz_obj)
-
-    # Get the current time in the destination timezone
     current_date_in_to_tz = datetime.now(pytz.utc).astimezone(to_tz_obj)
-
-    # Calculate the time difference in seconds
     time_difference = current_date_in_to_tz - given_date_in_to_tz
-
     return int(time_difference.total_seconds())
 
 import unittest

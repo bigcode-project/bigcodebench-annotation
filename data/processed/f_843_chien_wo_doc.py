@@ -32,12 +32,9 @@ def f_664(url):
     1    Bob   30  San Francisco
     """
     urllib.request.urlretrieve(url, TARGET_JSON_FILE)
-
     with open(TARGET_JSON_FILE, "r") as f:
         data = json.load(f)
-
     os.remove(TARGET_JSON_FILE)
-
     return pd.DataFrame(data)
 
 import unittest

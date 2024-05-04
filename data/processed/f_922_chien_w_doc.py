@@ -36,12 +36,10 @@ def f_410(arr):
     """
     unique, counts = np.unique(arr, return_counts=True)
     uniform_distribution = len(set(counts)) == 1
-
     _, ax = plt.subplots()
     ax.hist(arr, bins=np.arange(len(unique) + 1) - 0.5, rwidth=0.8, align="mid")
     ax.set_xticks(range(len(unique)))
     ax.set_xticklabels(unique)
-
     return uniform_distribution, ax
 
 import numpy as np

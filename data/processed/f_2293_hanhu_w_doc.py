@@ -37,18 +37,14 @@ def f_424(data, value):
     """
     if not data:  # Handle empty data list
         return np.array([]), 0
-
     data = np.array(data)
     avg = statistics.mean(data)
     greater_avg = data[data > avg]
-
     data.sort()
     bpoint = bisect.bisect_right(data, value)
     num_greater_value = len(data) - bpoint
-
     plt.hist(data, bins=10)
     plt.show()
-
     return greater_avg, num_greater_value
 
 import unittest

@@ -46,11 +46,8 @@ def f_90(df, feature, target, n=10):
     >>> print(model)
     LinearRegression()
     """
-    # Ensure provided columns exist in the dataframe
     if feature not in df.columns or target not in df.columns:
         raise ValueError(f"Columns {feature} or {target} not found in the DataFrame.")
-
-
     X = df[feature].values.reshape(-1, 1)
     y = df[target].values
     model = LinearRegression()

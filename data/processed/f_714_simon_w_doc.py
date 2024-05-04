@@ -31,12 +31,8 @@ def f_228(data_list):
     >>> f_228([(1, 'a', 2), ('a', 3, 5), ('c', 1, -2)])
     [1.0, 2.0, 1.6666666666666667]
     """
-    # Unzip the data while handling uneven tuple lengths by filling missing values with NaN
     unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
-
-    # Calculate the mean of numeric values, ignoring non-numeric ones
     mean_values = [np.nanmean([val for val in column if isinstance(val, (int, float))]) for column in unzipped_data]
-
     return mean_values
 
 import unittest

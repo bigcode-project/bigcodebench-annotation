@@ -30,15 +30,10 @@ def f_85(n_rows=1000):
     >>> ax.get_title()
     'Top 30 Frequencies of Random 3-Letter Strings'
     """
-    # Check if n_rows is positive
     if n_rows <= 0:
         raise ValueError("Number of rows must be greater than 0")
-
-    # Generate random strings
     data = ["".join(random.choices(string.ascii_lowercase, k=3)) for _ in range(n_rows)]
     df = pd.DataFrame(data, columns=["String"])
-
-    # Aggregate and plot the data
     frequency = df["String"].value_counts()
     ax = frequency.head(30).plot(
         kind="bar"
@@ -46,7 +41,6 @@ def f_85(n_rows=1000):
     ax.set_title("Top 30 Frequencies of Random 3-Letter Strings")
     ax.set_xlabel("String")
     ax.set_ylabel("Frequency")
-
     return ax
 
 import unittest

@@ -30,9 +30,7 @@ def f_421(country_dict):
     COUNTRIES = ['USA', 'UK', 'China', 'Japan', 'Australia']
     country_gdp = {country: np.random.randint(1000000000, 100000000000, dtype=np.int64) for country in COUNTRIES if
                    country in country_dict.values()}
-
     gdp_df = pd.DataFrame.from_dict(country_gdp, orient='index', columns=['GDP'])
-
     return gdp_df
 
 import unittest

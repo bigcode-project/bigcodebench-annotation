@@ -31,13 +31,9 @@ def f_739(df: pd.DataFrame) -> int:
     >>> f_739(df)
     8
     """
-
     if not isinstance(df, pd.DataFrame):
         raise TypeError("df should be a DataFrame.")
-
-    # Constants
     BRACKETS_PATTERN = '[(){}[\]]'
-
     return df.applymap(
         lambda x: len(re.findall(BRACKETS_PATTERN, str(x)))
         ).sum().sum()

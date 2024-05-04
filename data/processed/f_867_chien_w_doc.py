@@ -48,17 +48,13 @@ def f_386(data_dict):
     'Value Distribution'
     """
     df = pd.DataFrame(data_dict).dropna()
-
     if df.empty or df.nunique().min() < 2:
         return df, None
-
     min_val, max_val = df.values.min(), df.values.max()
     num_bins = max(min(11, len(df) // 2), 2)
     bin_edges = np.linspace(min_val, max_val, num_bins)
-
     plot = sns.histplot(df.values.flatten(), bins=bin_edges, kde=False)
     plot.set_title(PLOT_TITLE)
-
     return df, plot
 
 import unittest

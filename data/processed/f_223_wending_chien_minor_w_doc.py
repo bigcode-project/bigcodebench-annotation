@@ -40,18 +40,15 @@ def f_645(dataframe, text_column):
             0     1     0       1        0     0     0       0
             1     0     1       0        1     0     1       1
     """
-
     def preprocess_text(text):
         text = text.lower()
         text = re.sub(r'\d+', '', text)
         text = re.sub(r'\W+', ' ', text)
         text = ' '.join(word for word in text.split() if word not in STOPWORDS)
         return text
-
     dataframe[text_column] = dataframe[text_column].apply(preprocess_text)
     vectorizer = CountVectorizer()
     vectorized_data = vectorizer.fit_transform(dataframe[text_column])
-
     return pd.DataFrame(vectorized_data.toarray(), columns=vectorizer.get_feature_names_out())
 
 import pandas as pd

@@ -38,25 +38,17 @@ def f_269(df, group_col, value_col):
     Raises:
     -This function will raise TypeError if the 'Value' has non-numeric values.
     """
-
     group_mean = df.groupby(group_col)[value_col].mean()
     group_std = df.groupby(group_col)[value_col].std()
-
-    # Get the number of groups and generate x locations for the bars
     num_groups = len(group_mean)
     index = np.arange(num_groups)
-
-    # Create the bar chart with error bars
     for i, (mean, std) in enumerate(zip(group_mean, group_std)):
         plt.bar(index[i], mean, yerr=std, color=COLORS[i % len(COLORS)], capsize=4, label=f'Group {i+1}')
-
-    # Set labels and title
     plt.xlabel(group_col)
     plt.ylabel(value_col)
     plt.title(f'Bar chart of {value_col} by {group_col}')
     plt.xticks(index, group_mean.index)  # Set x-axis labels to group names
     plt.legend()
-    # Return the axes object
     return plt.gca()
 
 import unittest

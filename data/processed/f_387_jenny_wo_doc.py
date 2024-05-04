@@ -47,15 +47,12 @@ def f_582(epoch_milliseconds, seed=0):
     Name: 0, dtype: object
     """
     random.seed(seed)
-
     USERS = ["user1", "user2", "user3", "user4", "user5"]
     ACTIVITIES = ["login", "logout", "browse", "search", "purchase"]
-
     start_time = datetime.fromtimestamp(epoch_milliseconds / 1000.0)
     end_time = datetime.now()
     if start_time >= end_time:
         raise ValueError("Start time must be before current system time")
-
     logs = []
     current_time = start_time
     while current_time <= end_time:

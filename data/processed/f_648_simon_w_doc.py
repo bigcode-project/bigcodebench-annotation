@@ -33,17 +33,11 @@ def f_452(df: pd.DataFrame, height: int, weight: int, columns: list) -> sm.regre
     >>> model = f_452(df, 45, 72, columns=['Age', 'Height', 'Weight'])
 
     """
-    # Check for empty DataFrame
     if df.empty:
         return None
-
-    # Filter the DataFrame based on provided column names
     selected_df = df[(df[columns[1]] > height) & (df[columns[2]] < weight)]
-    
-    # If no rows match the condition, return None
     if selected_df.empty:
         return None
-    
     X = selected_df[columns[1:]]
     y = selected_df[columns[0]]
     X = sm.add_constant(X)

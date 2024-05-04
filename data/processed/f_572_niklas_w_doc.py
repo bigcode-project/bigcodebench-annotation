@@ -26,14 +26,12 @@ def f_588(radius, num_points):
     [(-0.10124546928297637, -0.12149119380571095), (-0.07399370924760951, 0.46662154808860146), (-0.06984148700093858, -0.8196472742078809)]
     """
     out = []
-    
     for _ in range(num_points):
         theta = uniform(0, 2*np.pi)
         r = radius * math.sqrt(uniform(0, 1))
         x = r * math.cos(theta)
         y = r * math.sin(theta)
         out.append((x, y))
-        
     return out
 
 import unittest

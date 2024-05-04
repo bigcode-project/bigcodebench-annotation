@@ -48,16 +48,13 @@ def f_103(json_data: str, data_key: str):
         values = pd.Series(data, dtype=pd.Float64Dtype)
     except KeyError:
         raise KeyError(f"Key path '{data_key}' not found in the provided JSON data.")
-
     if values.empty:
         return values, None, None
-
     scaler = MinMaxScaler()
     normalized_values = pd.Series(
         scaler.fit_transform(values.values.reshape(-1, 1)).flatten(),
         dtype=pd.Float64Dtype,
     )
-
     fig, ax = plt.subplots()
     ax.plot(values, label="Original Data")
     ax.plot(normalized_values, label="Normalized Data")
@@ -65,7 +62,6 @@ def f_103(json_data: str, data_key: str):
     ax.set_xlabel("Index")
     ax.set_ylabel("Value")
     ax.legend()
-
     return values, normalized_values, ax
 
 import unittest

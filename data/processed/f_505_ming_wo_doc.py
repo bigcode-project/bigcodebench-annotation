@@ -23,21 +23,15 @@ def f_34(filename, data, password):
     >>> f_34('test.txt', 'Hello, World!', 'password')
     'Fu0k9LUEJCY+ookLrA=='
     """
-    # Ensure the file exists
     try:
         open(filename, 'x').close()
     except FileExistsError:
         pass
-
-    # Encrypt the data using simple XOR operation with password hash as key
     key = hashlib.sha256(password.encode()).digest()
     encrypted_bytes = [byte ^ key[i % len(key)] for i, byte in enumerate(data.encode())]
     encrypted = base64.b64encode(bytes(encrypted_bytes)).decode()
-
-    # Write to the file
     with open(filename, 'w') as f:
         f.write(encrypted)
-
     return encrypted
 
 import unittest

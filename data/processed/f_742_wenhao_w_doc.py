@@ -29,13 +29,10 @@ def f_508(d):
     """
     if not isinstance(d, list) or any(not isinstance(item, dict) for item in d):
         raise ValueError("Input must be a list of dictionaries.")
-    
     if not d:
         return {key: None for key in ['x', 'y', 'z']}
-
     df = pd.DataFrame(d).fillna(0)  # Replace missing values with 0 to allow computations
     stats = {}
-
     for key in ['x', 'y', 'z']:
         if key in df.columns:
             stats[key] = {
@@ -47,7 +44,6 @@ def f_508(d):
             }
         else:
             stats[key] = None
-
     return stats
 
 # Test suite

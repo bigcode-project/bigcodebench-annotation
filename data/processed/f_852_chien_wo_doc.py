@@ -44,7 +44,6 @@ def f_667(xml_content, output_csv_path):
     try:
         root = ET.fromstring(xml_content)
         data = [[elem.tag, elem.text] for elem in root.iter()]
-
         with open(output_csv_path, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerows(data)

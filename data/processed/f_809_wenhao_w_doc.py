@@ -41,14 +41,12 @@ def f_662(df: pd.DataFrame) -> pd.DataFrame:
     <Figure size 640x480 with 1 Axes>
     """
     cumsum_df = df.cumsum()
-
     fig, ax = plt.subplots()
     cumsum_df.plot(kind="bar", ax=ax)
     ax.set_title("Cumulative Sum per Column")
     ax.set_xlabel("Index")
     ax.set_ylabel("Cumulative Sum")
     ax.legend()
-
     return cumsum_df, fig
 
 import numpy as np

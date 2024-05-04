@@ -29,15 +29,12 @@ def f_166(products_list):
     <class 'pandas.core.frame.DataFrame'>
     """
     sales_data = []
-
     for product in products_list:
         sales = [randint(100, 500) for _ in range(12)]
         avg_sales = mean(sales)
         sales.append(avg_sales)
         sales_data.append([product] + sales)
-
     sales_df = pd.DataFrame(sales_data, columns=['Product'] + [f'Month {i+1}' for i in range(12)] + ['Average Sales'])
-
     return sales_df
 
 import unittest

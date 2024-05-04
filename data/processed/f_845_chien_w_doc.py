@@ -34,13 +34,10 @@ def f_389(data, column_name="target_column"):
     1       2     15
     """
     df = pd.DataFrame(data)
-
     if column_name not in df.columns:
         raise ValueError(f"Column '{column_name}' not found in the DataFrame.")
-
     if not pd.api.types.is_numeric_dtype(df[column_name]):
         df[column_name] = df[column_name].astype("category").cat.codes
-
     _, ax = plt.subplots()
     df[column_name].hist(ax=ax)
     ax.set_title(f"Histogram of {column_name}")

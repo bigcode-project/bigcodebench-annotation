@@ -27,27 +27,19 @@ def f_492():
     (2.0, 'N/A', 'N/A', 'N/A')
     """
     indices = np.where(ARRAY[:,0] == TARGET_VALUE)[0]
-
-    # Check if statistical analysis is possible
     if len(indices) < 2:
-        # Not enough data for meaningful statistical analysis
         plt.hist(indices, bins='auto')  # Plotting can still occur
         plt.show()
         return (np.mean(indices), 'N/A', 'N/A', 'N/A') if indices.size else ('N/A', 'N/A', 'N/A', 'N/A')
-
-    # Perform statistical analysis
     mean = np.mean(indices)
     variance = np.var(indices)
     skewness = stats.skew(indices)
     kurtosis = stats.kurtosis(indices)
-
-    # Plot the distribution
     plt.hist(indices, bins='auto')
     plt.title('Distribution of Indices')
     plt.xlabel('Indices')
     plt.ylabel('Frequency')
     plt.show()
-
     return mean, variance, skewness, kurtosis
 
 import unittest

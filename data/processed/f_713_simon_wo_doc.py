@@ -46,23 +46,17 @@ def f_594(data_list, file_name):
     >>> print(txt_content)
     ['Position 1: -0.9\\n', 'Position 2: 11.0\\n', 'Position 3: 8.05\\n']
     """
-    # Unzipping the data to separate the elements of the tuples
     unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
     mean_values = []
-    # Calculating the mean values excluding the first position (non-numerical)
     for column in unzipped_data[1:]:
         numeric_values = [val for val in column if isinstance(val, (int, float))]
         if numeric_values:
             mean_values.append(np.nanmean(numeric_values))
         else:
             mean_values.append(np.nan)
-
-    # Writing the mean values to the specified file
     with open(file_name, 'w') as f:
         for i, mean_value in enumerate(mean_values, start=1):
             f.write('Position {}: {}\n'.format(i, mean_value))
-    
-    # Returning the list of mean values for testing purposes
     return mean_values
 
 import unittest

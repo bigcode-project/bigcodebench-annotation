@@ -31,10 +31,7 @@ def f_611(csv_file_path: str):
     mean = df["column1"].mean()
     std = df["column1"].std()
     df["column1_normalized"] = (df["column1"] - mean) / std
-
-    # Creating a figure and axes
     _, ax = plt.subplots()
-    # Plotting on the created axes
     ax.plot(df["column1_normalized"])
     title = "%*s : %*s" % (20, "Plot Title", 20, "Normalized Column 1")
     xlabel = "%*s : %*s" % (20, "Index", 20, "Normalized Value")
@@ -42,8 +39,6 @@ def f_611(csv_file_path: str):
     ax.set_title(title)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-
-    # Return the axes object for further manipulation
     return ax
 
 import unittest

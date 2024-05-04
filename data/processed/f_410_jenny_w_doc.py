@@ -37,7 +37,6 @@ def f_591(data):
     """
     if not data:
         return None
-
     combined_dict = {}
     for d in data:
         for k, v in d.items():
@@ -49,17 +48,14 @@ def f_591(data):
                 combined_dict[k].append(v)
             else:
                 combined_dict[k] = [v]
-
     avg_scores = {k: sum(v) / len(v) for k, v in combined_dict.items()}
     avg_scores = collections.OrderedDict(sorted(avg_scores.items()))
     labels, values = zip(*avg_scores.items())
-
     fig, ax = plt.subplots()
     ax.bar(labels, values, color=["red", "yellow", "green", "blue", "purple"])
     ax.set_title("Average Student Scores")
     ax.set_xlabel("Student")
     ax.set_ylabel("Average Score")
-
     return ax
 
 import unittest

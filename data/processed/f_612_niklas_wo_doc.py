@@ -24,12 +24,9 @@ def f_96(source_dir, dest_dir, extension):
     10
     """
     files = glob.glob(os.path.join(source_dir, f'*.{extension}'))
-    
     for file in files:
         shutil.move(file, dest_dir)
-        
     result = len(files)
-
     return result
 
 import unittest

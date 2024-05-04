@@ -28,7 +28,6 @@ def f_608(SERVER_NAME, SERVER_PORT, path):
     True
     """
     context = ssl.create_default_context()
-
     with socket.create_connection((SERVER_NAME, SERVER_PORT)) as sock:
         with context.wrap_socket(sock, server_hostname=SERVER_NAME) as ssock:
             conn = http.client.HTTPSConnection(SERVER_NAME, SERVER_PORT, context=context)

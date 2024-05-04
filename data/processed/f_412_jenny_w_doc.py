@@ -39,15 +39,11 @@ def f_511(data):
     for d in data:
         if not all(isinstance(value, (int, float)) for value in d.values()):
             raise TypeError("All values in the dictionaries must be numeric.")
-
     stats = defaultdict(list)
     for d in data:
         for key, value in d.items():
             stats[key].append(value)
-
     result = {k: {"mean": np.mean(v), "std": np.std(v)} for k, v in stats.items()}
-
-    # Visualization
     axes = []
     for key in result:
         fig, ax = plt.subplots()
@@ -55,7 +51,6 @@ def f_511(data):
         ax.set_title(f"Statistics of {key}")
         ax.set_ylabel("Value")
         axes.append(ax)
-
     return result, axes
 
 import unittest

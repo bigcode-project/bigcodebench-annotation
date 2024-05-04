@@ -24,16 +24,9 @@ def f_585(json_data):
     False
     """
     try:
-        # Convert JSON string to Python dictionary
         data = json.loads(json_data)
-
-        # Extract datetime string from dictionary
         datetime_str = data['utc_datetime']
-
-        # Convert datetime string to datetime object
         utc_datetime = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S')
-
-        # Check if the day of the week is Saturday (5) or Sunday (6)
         return utc_datetime.weekday() >= 5
     except Exception as e:
         raise e

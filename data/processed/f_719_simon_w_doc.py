@@ -63,13 +63,10 @@ def f_553(data, n_components=2):
     """
     if not isinstance(data, pd.DataFrame):
         raise ValueError("data should be a DataFrame.")
-
     if not data.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()).all():
         raise ValueError("DataFrame should only contain numeric values.")
-    
     if n_components > len(data.columns):
         raise ValueError("n_components should not be greater than the number of columns in data.")
-    
     scaler = StandardScaler()
     data_scaled = scaler.fit_transform(data)
     pca = PCA(n_components=n_components)

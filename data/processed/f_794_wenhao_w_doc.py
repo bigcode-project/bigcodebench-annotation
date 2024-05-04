@@ -46,9 +46,7 @@ def f_120(mystrings, n_products, seed=0):
         category = CATEGORIES[randint(0, len(CATEGORIES) - 1)]
         price = round(np.random.normal(50, 10), 2)
         catalogue_data.append([product_name, category, price])
-
     catalogue_df = pd.DataFrame(catalogue_data, columns=['Product Name', 'Category', 'Price'])
-
     return catalogue_df
 
 import unittest

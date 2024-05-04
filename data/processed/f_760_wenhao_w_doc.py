@@ -27,12 +27,9 @@ def f_330(data, mapping):
     """
     df = pd.DataFrame(data)
     pattern = re.compile(r'\b[A-Z]+\b')
-    
     def replace_match(match):
         return mapping.get(match.group(0), match.group(0))
-
     df = df.applymap(lambda x: pattern.sub(replace_match, x) if isinstance(x, str) else x)
-
     return df
 
 import unittest

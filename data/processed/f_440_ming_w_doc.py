@@ -27,17 +27,11 @@ def f_338(a, b):
     >>> print(euclidean_distance)
     1.7320508075688772
     """
-    # Calculate the Euclidean distance
     euclidean_distance = distance.euclidean(a, b)
-
-    # Create a DataFrame
     df = pd.DataFrame({'A': a, 'B': b})
-
-    # Plot the values
     fig, ax = plt.subplots()
     ax.plot(df['A'], df['B'])
     ax.plot([df['A'].iloc[0], df['B'].iloc[0]], [df['A'].iloc[-1], df['B'].iloc[-1]], 'ro-')
-    
     return euclidean_distance, df, ax
 
 import unittest

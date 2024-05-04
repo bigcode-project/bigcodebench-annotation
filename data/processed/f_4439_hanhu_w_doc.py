@@ -28,7 +28,6 @@ def f_632(f):
     True
     """
     spec = inspect.getfullargspec(f)
-
     return {
         'function_name': f.__name__,
         'is_lambda': isinstance(f, types.LambdaType),

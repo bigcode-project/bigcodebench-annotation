@@ -24,14 +24,11 @@ def f_38(word: str) -> dict:
     >>> f_38('a1!b@c#d$')
     defaultdict(<class 'int'>, {'ab': 1, 'bc': 1, 'cd': 1})
     """
-    # Sanitize the word to include only alphabetic characters
     sanitized_word = re.sub('[^A-Za-z]', '', word)
     occurrences = defaultdict(int)
     pairs = [''.join(x) for x in zip(sanitized_word, sanitized_word[1:])]
-
     for pair in pairs:
         occurrences[pair] += 1
-
     return occurrences
 
 import unittest

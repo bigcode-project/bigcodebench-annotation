@@ -29,12 +29,9 @@ def f_54(df, col1, col2):
     5
     >>> plt.close()
     """
-    # Ensure that the df is DataFrame, not empty and the specified column exists
     if not isinstance(df, pd.DataFrame) or df.empty or col1 not in df.columns or col2 not in df.columns:
         raise ValueError("The DataFrame is empty or the specified column does not exist.")
-    
     ax = sns.regplot(x=col1, y=col2, data=df)
-
     return ax
 
 import unittest

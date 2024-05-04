@@ -31,18 +31,13 @@ def f_185(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
     >>> modified_df, plots = f_185(df, tuples, 3)
     '''
-    
-    # Drop rows based on tuples
     df = df.set_index(list('ABCDE')).drop(tuples, errors='ignore').reset_index()
-    
     plots = []
-    # Generate plots only if DataFrame is not empty
     if not df.empty:
         for _ in range(n_plots):
             selected_columns = sample(COLUMNS, 2)
             plot = sns.jointplot(data=df, x=selected_columns[0], y=selected_columns[1])
             plots.append(plot)
-    
     return df, plots
 
 import unittest

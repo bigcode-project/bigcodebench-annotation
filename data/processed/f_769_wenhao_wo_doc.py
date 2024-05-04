@@ -21,16 +21,10 @@ def f_381(file_path: str, column_name: str) -> pd.DataFrame:
     >>> df = f_381('data.csv', 'Category')
     >>> print(df.head())
     """
-    # Load the CSV file into a DataFrame
     df = pd.read_csv(file_path)
-    
-    # Replace occurrences of '\n' with '<br>'
     df[column_name] = df[column_name].replace({'\n': '<br>'}, regex=True)
-    
-    # Initialize LabelEncoder and fit_transform the specified column
     le = LabelEncoder()
     df[column_name] = le.fit_transform(df[column_name])
-    
     return df
 
 import os

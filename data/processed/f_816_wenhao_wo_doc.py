@@ -33,11 +33,9 @@ def f_643(path, delimiter="/"):
         raise ValueError("Path must be a non-empty string")
     if not os.path.exists(path):
         raise FileNotFoundError(f"Path '{path}' does not exist")
-
     path_components = path.strip(delimiter).split(delimiter)
     if not all(path_components):
         raise ValueError("Path contains invalid components")
-
     results = []
     for index, component in enumerate(path_components):
         sub_path = delimiter.join(path_components[: index + 1])
@@ -47,7 +45,6 @@ def f_643(path, delimiter="/"):
         results.append(
             (component, {"total": usage.total, "used": usage.used, "free": usage.free})
         )
-
     return results
 
 import unittest

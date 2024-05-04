@@ -43,7 +43,6 @@ def f_143(text):
     """
     if not isinstance(text, str):
         raise ValueError("The input should be a string.")
-
     tk = nltk.WhitespaceTokenizer()
     words = tk.tokenize(text)    
     dollar_words = [word for word in words if word.startswith('$') and not all(c in set(punctuation) for c in word)]

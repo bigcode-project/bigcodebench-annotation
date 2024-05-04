@@ -29,7 +29,6 @@ def f_571(length, count, seed=0):
     random.seed(seed)
     strings = [''.join(random.choices(['a', 'b', 'c', 'd', 'e'], k=length)) for _ in range(count)]
     letter_frequency = Counter(itertools.chain(*strings))
-    
     return letter_frequency
 
 import unittest

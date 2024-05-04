@@ -39,13 +39,9 @@ def f_340(epoch_milliseconds, seed=0, timezones=["UTC"]):
     {'Jennifer': [{'date': datetime.date(2021, 1, 1), 'time': datetime.time(11, 0), 'timezone': 'UTC'}]}
     """
     Faker.seed(seed)
-
     faker_instance = Faker()
-
     event_datetime = datetime.fromtimestamp(epoch_milliseconds / 1000.0)
-
     event_name = faker_instance.unique.first_name()
-
     validated_timezones = []
     utc_offset_regex = r"^UTC([+-])(0[0-9]|1[0-4]):([0-5][0-9])$"
     for tz in timezones:
@@ -57,9 +53,7 @@ def f_340(epoch_milliseconds, seed=0, timezones=["UTC"]):
             validated_timezones.append(tz)
     if not validated_timezones:
         validated_timezones = ["UTC"]
-
     timezone = faker_instance.random_element(elements=(validated_timezones))
-
     event_schedule = {
         event_name: [
             {
@@ -69,7 +63,6 @@ def f_340(epoch_milliseconds, seed=0, timezones=["UTC"]):
             }
         ]
     }
-
     return event_schedule
 
 import unittest

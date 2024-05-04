@@ -39,23 +39,17 @@ def f_732(array, seed=None):
     """
     if seed is not None:
         np.random.seed(seed)
-
     if not isinstance(array, np.ndarray) or len(array.shape) != 2:
         raise ValueError("Input must be a 2D numpy array.")
-
     if array.size == 0 or array.shape[1] == 0:
         return pd.DataFrame(columns=["PC1", "PC2"])
-
     shuffled_array = np.copy(array)
     np.random.shuffle(np.transpose(shuffled_array))
-
     n_components = min(2, shuffled_array.shape[1])
     pca = PCA(n_components=n_components)
     principal_components = pca.fit_transform(shuffled_array)
-
     column_labels = ["PC1", "PC2"][:n_components]
     df = pd.DataFrame(data=principal_components, columns=column_labels)
-
     return df
 
 import unittest

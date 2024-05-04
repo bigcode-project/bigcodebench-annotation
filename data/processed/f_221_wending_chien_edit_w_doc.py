@@ -37,28 +37,19 @@ def f_693(df):
     <class 'matplotlib.axes._axes.Axes'>
     """
     pattern = re.compile(r'(how|what)', re.IGNORECASE)
-
-    # Check if the DataFrame has the required columns
     if not set(['Title', 'Content']).issubset(df.columns):
         fig, ax = plt.subplots()
         return ax
-
     interesting_articles = df[df['Title'].apply(lambda x: bool(pattern.search(x)))]
-
     fig, ax = plt.subplots()
-
-    # If there are no interesting articles, return an empty plot
     if interesting_articles.empty:
         return ax
-
     vectorizer = TfidfVectorizer()
     X = vectorizer.fit_transform(interesting_articles['Content'])
     tfidf_scores = np.array(X.sum(axis=0))[0]
-
     ax.bar(vectorizer.get_feature_names_out(), tfidf_scores)
     ax.set_ylabel('TF-IDF Score')
     plt.xticks(rotation='vertical')
-
     return ax
 
 import unittest

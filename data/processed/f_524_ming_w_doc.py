@@ -27,25 +27,16 @@ def f_22(x, y, labels):
     >>> y_data = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
     >>> labels = ['H2O', 'O2', 'CO2']
     """
-
     if not x or not y or not labels:
         raise ValueError("Empty data lists provided.")
-
     def exponential_func(x, a, b, c):
         """Exponential function model for curve fitting."""
         return a * np.exp(-b * x) + c
-
     fig, ax = plt.subplots()
-
     for i in range(len(x)):
-        # Fit the exponential model to the data
         popt, _ = curve_fit(exponential_func, x[i], y[i])
-
-        # Plot the fitted curve
         ax.plot(x[i], exponential_func(x[i], *popt), label=labels[i])
-
     ax.legend()
-
     return fig
 
 import unittest

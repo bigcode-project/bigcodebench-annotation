@@ -32,20 +32,14 @@ def f_738(df, dct, columns=None, plot_histograms=False):
     2    c    g    k
     3    d    h    l
     '''
-    
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df is not a DataFrame")
-    
-    # Replace values using dictionary mapping
     df_replaced = df.replace(dct)
-    
-    # Plot a histogram for each specified column
     if plot_histograms and columns:
         for column in columns:
             if column in df_replaced:
                 df_replaced[column].plot.hist(bins=50)
                 plt.title(column)
-
     return df_replaced
 
 import pandas as pd

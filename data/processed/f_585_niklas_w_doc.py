@@ -25,10 +25,8 @@ def f_624(data, cols):
     z  0.866025  0.114708  1.000000
     """
     df = pd.DataFrame(data, columns=cols)
-    
     df_np = np.array(df)
     df = pd.DataFrame(df_np, columns=cols)
-    
     correlation_matrix = df.corr()
     return correlation_matrix
 

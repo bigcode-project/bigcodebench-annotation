@@ -45,16 +45,12 @@ def f_694(P, T):
         raise ValueError(
             f"Matrix P shape {P.shape[1]} and Tensor T shape {T.shape[0]} are incompatible for tensor multiplication."
         )
-
     result = np.tensordot(P, T, axes=[1, 0]).swapaxes(0, 1)
     result = result.reshape(result.shape[0], -1)
-
     scaler = StandardScaler()
     result = scaler.fit_transform(result)
-
     adjusted_feature_names = [f"feature_{i}" for i in range(result.shape[1])]
     result = pd.DataFrame(result, columns=adjusted_feature_names)
-
     return result
 
 import unittest

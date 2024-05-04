@@ -43,22 +43,17 @@ def f_369(X, Y):
     """
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
     input_dim = X.shape[1]  # Dynamically set input dimension
-
     model = keras.models.Sequential([keras.layers.Dense(units=1, input_dim=input_dim, activation='sigmoid')])
     model.compile(loss='binary_crossentropy', optimizer=keras.optimizers.SGD(learning_rate=0.1))
-
     model.fit(X_train, Y_train, epochs=200, batch_size=1, verbose=0)
-
     Y_pred = model.predict(X_test, verbose=0).ravel()
     precision, recall, thresholds = precision_recall_curve(Y_test, Y_pred)
-
     fig, ax = plt.subplots()  # Modify here to return Axes object
     ax.plot(recall, precision, label='Precision-Recall curve')
     ax.set_xlabel('Recall')
     ax.set_ylabel('Precision')
     ax.set_title('Precision-Recall Curve')
     ax.legend(loc='best')
-
     return model, ax  # Return both the model and the axes object
 
 import unittest

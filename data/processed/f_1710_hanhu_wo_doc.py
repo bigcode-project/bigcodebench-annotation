@@ -41,10 +41,8 @@ def f_400(request, header, csv_data):
     writer.writerow(header)
     writer.writerows(csv_data)
     csv_io.seek(0)
-
     response = FileResponse(csv_io, as_attachment=True, filename='data.csv')
     response['Content-Type'] = 'text/csv'
-
     return response
 
 import unittest

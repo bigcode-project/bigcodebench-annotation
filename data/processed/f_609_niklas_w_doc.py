@@ -24,19 +24,10 @@ def f_7(raw_string, line_length):
     >>> f_7('SGVsbG8sICBXb3JsZCEgICAg', 5)
     'Hello\\n, Wor\\nld!'
     """
-
-    # Decode the string from base64
     decoded_string = base64.b64decode(raw_string).decode('utf-8')
-
-    # Unescape HTML entities
     unescaped_string = unescape(decoded_string)
-
-    # Replace multiple spaces with a single space and strip leading and trailing spaces
     cleaned_string = re.sub(' +', ' ', unescaped_string).strip()
-
-    # Wrap the text
     wrapped_text = textwrap.fill(cleaned_string, line_length)
-
     return wrapped_text
 
 import unittest

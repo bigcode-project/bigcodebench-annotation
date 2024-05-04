@@ -26,16 +26,13 @@ def f_218(directory_path):
     >>> f_218('./yourdictfiles/')
     1500
     """
-
     word_counts = Counter()
-
     for file_name in os.listdir(directory_path):
         if not file_name.endswith('.txt'):
             continue
         with open(os.path.join(directory_path, file_name), 'r') as file:
             words = [word for word in file.read().split() if word.lower() not in STOPWORDS]
             word_counts.update(words)
-
     return len(word_counts)
 
 import unittest

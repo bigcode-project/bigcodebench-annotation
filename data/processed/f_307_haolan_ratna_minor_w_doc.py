@@ -31,7 +31,6 @@ def f_362(l):
     '''
     fig, ax = plt.subplots()
     ax.hist(l, bins='auto', density=True, alpha=0.6, color='g')
-
     mu, std = stats.norm.fit(l)
     xmin, xmax = plt.xlim()
     x = np.linspace(xmin, xmax, 100)

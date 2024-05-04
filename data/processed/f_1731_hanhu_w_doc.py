@@ -32,7 +32,6 @@ def f_415(num_strings, string_length):
     characters = ''.join(strings)
     character_counter = Counter(characters)
     most_common_characters = character_counter.most_common()
-
     return most_common_characters
 
 import unittest

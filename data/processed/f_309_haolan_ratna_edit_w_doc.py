@@ -28,20 +28,16 @@ def f_564(l, x_data, plot=False):
     >>> print(fitted_values)
     [ 1.  4.  9. 16. 25.]
     """
-
     def func(x, a, b):
         return a * x**2 + b
-
     params, _ = curve_fit(func, x_data, l)
     fitted_values = func(x_data, *params)
-    
     if plot:
         fig, ax = plt.subplots(figsize=(6, 4))
         ax.scatter(x_data, l, label='Data')
         ax.plot(x_data, fitted_values, label='Fitted function')
         ax.legend(loc='best')
         return params, fitted_values, ax
-
     return params, fitted_values
 
 import unittest

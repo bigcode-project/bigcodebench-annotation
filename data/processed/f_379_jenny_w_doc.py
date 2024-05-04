@@ -29,18 +29,14 @@ def f_351(data_list, seed=42):
     'mirror, lamp, bag'
     """
     random.seed(seed)
-
     df = pd.DataFrame(data_list, columns=["Original String"])
-
     randomized_strings = []
     for s in data_list:
         substrings = re.split("\s*,\s*", s)
         random_positions = random.sample(range(len(substrings)), len(substrings))
         randomized_s = ", ".join([substrings[i] for i in random_positions])
         randomized_strings.append(randomized_s)
-
     df["Randomized String"] = randomized_strings
-
     return df
 
 import unittest

@@ -38,22 +38,17 @@ def f_355(array):
     """
     if not isinstance(array, list):
         raise TypeError("Input must be a list.")
-
     if not all(isinstance(sublist, list) for sublist in array):
         raise TypeError("Input must be a list of lists.")
-
     for sublist in array:
         if not all(isinstance(item, (int, float)) for item in sublist):
             raise TypeError("All elements in the sublists must be int or float.")
-
     columns = [chr(65 + i) for i in range(len(array[0]))]
     df = pd.DataFrame(array, columns=columns)
-
     distances = pdist(df.values, metric="euclidean")
     distance_matrix = pd.DataFrame(
         squareform(distances), index=df.index, columns=df.index
     )
-
     return df, distance_matrix
 
 import unittest

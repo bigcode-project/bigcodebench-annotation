@@ -54,17 +54,11 @@ def f_683(data, target, test_size=0.2, random_state=None):
     data = pd.DataFrame(data)
     if data.empty or target not in data.columns:
         raise ValueError("Data must not be empty and target column must exist in the DataFrame.")
-
-    # Splitting the data into training and test sets
     X_train, X_test, y_train, y_test = train_test_split(
         data.drop(columns=[target]), data[target], test_size=test_size, random_state=random_state
     )
-
-    # Training the model
     model = RandomForestRegressor(random_state=random_state)
     model.fit(X_train, y_train)
-
-    # Making predictions and returning the MSE
     predictions = model.predict(X_test)
     mse = mean_squared_error(y_test, predictions)
     return mse, model, data

@@ -43,18 +43,13 @@ def f_184(list_of_pairs):
     3    plane  0.000000
     4     ship  1.000000
     """
-
     if len(list_of_pairs) == 0:
         raise Exception('The input array should not be empty.')
-
     df = pd.DataFrame(list_of_pairs, columns=['Category', 'Value'])
-
     if pd.api.types.is_numeric_dtype(df.Value) is not True:
         raise ValueError('The values have to be numeric.')
-
     scaler = MinMaxScaler()
     df['Value'] = scaler.fit_transform(df[['Value']])
-
     return df
 
 import unittest

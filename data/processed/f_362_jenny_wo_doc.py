@@ -38,15 +38,11 @@ def f_368(script_path, output_file_path):
         raise ValueError(
             "Error occurred while executing the script or script not found"
         )
-
     df = pd.read_csv(output_file_path)
-
     if len(df.columns) != 2:
         raise ValueError("CSV file must contain exactly 2 columns")
-
     ax = df.plot(kind="bar", x=df.columns[0], legend=False)
     ax.set_xlabel(df.columns[0])
-
     return df, ax
 
 import unittest

@@ -38,9 +38,7 @@ def f_674(num_rows=100, categories=["a", "b", "c", "d", "e"], random_seed=42):
     """
     if num_rows <= 0:
         raise ValueError("num_rows must not be negative")
-
     random.seed(random_seed)
-
     df = pd.DataFrame(
         {
             "Category": [
@@ -50,13 +48,11 @@ def f_674(num_rows=100, categories=["a", "b", "c", "d", "e"], random_seed=42):
             "Value": [random.randint(1, 100) for _ in range(num_rows)],
         }
     )
-
     ax = (
         df["Category"]
         .value_counts()
         .plot(kind="bar", title="Category Counts", figsize=(10, 6))
     )
-
     return df, ax
 
 import unittest

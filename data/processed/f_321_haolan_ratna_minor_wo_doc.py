@@ -33,7 +33,6 @@ def f_634(API_URL):
     ...     f_634('https://api.ipify.org?format=json')
     '192.168.1.1'
     """
-
     try:
         response = urllib.request.urlopen(API_URL)
         data = json.loads(response.read())

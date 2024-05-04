@@ -44,15 +44,12 @@ def f_526(df):
     numeric_df = df.select_dtypes(include=[np.number])
     if numeric_df.empty:
         raise ValueError("No numeric columns present")
-
     correlation = numeric_df.corr()
     fig, ax = plt.subplots()
     sns.heatmap(correlation, ax=ax)
-
     numeric_cols = numeric_df.columns
     scaler = StandardScaler()
     df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
-
     return df, fig
 
 import unittest

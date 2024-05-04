@@ -40,30 +40,22 @@ def f_510(goals, penalties, rng_seed=None, teams=TEAMS):
     """
     if rng_seed is not None:
         seed(rng_seed)
-
     match_results = []
-
     for team in teams:
         team_goals = randint(0, goals)
         team_penalties = randint(0, penalties)
         penalty_cost = PENALTY_COST * team_penalties
         result_string = f"({team_goals} goals, ${penalty_cost})"
         match_results.append([team, result_string])
-
     results_df = pd.DataFrame(match_results, columns=['Team', 'Match Result'])
-
     if not results_df.empty:
-    # Extract goals and penalty cost from the result string
         results_df['Goals'] = results_df['Match Result'].apply(lambda x: int(re.search(r'\((\d+) goals', x).group(1)))
         results_df['Penalty Cost'] = results_df['Match Result'].apply(lambda x: int(re.search(r'\$(\d+)', x).group(1)))
-
-        # Visualization - this part will not be tested directly in unit tests
         ax = results_df.set_index('Team')[['Goals', 'Penalty Cost']].plot(kind='bar', stacked=True)
         plt.ylabel('Counts')
         plt.title('Football Match Results Analysis')
         plt.tight_layout()
         plt.show()
-
     return results_df
 
 import unittest

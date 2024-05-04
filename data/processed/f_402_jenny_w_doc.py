@@ -28,15 +28,11 @@ def f_35(array):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-    # Internal Constants
     COLUMNS = ["A", "B", "C", "D", "E"]
-
     df = pd.DataFrame(array, columns=COLUMNS)
     sums = df.sum()
-
     fig, ax = plt.subplots()
     sums.plot(kind="bar", ax=ax)
-
     return df, ax
 
 import unittest

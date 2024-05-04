@@ -31,14 +31,11 @@ def f_549(time_strings):
     >>> ax = f_549(time_strings)
     >>> plt.show()  # This will display the bar chart
     """
-    # Calculate time differences
     differences = (
         np.diff([datetime.datetime.strptime(t, TIME_FORMAT) for t in time_strings])
         .astype("timedelta64[s]")
         .astype(int)
     )
-
-    # Plotting the bar chart
     _ = plt.bar(range(len(differences)), differences)
     plt.xlabel("Index")
     plt.ylabel("Time Difference (seconds)")

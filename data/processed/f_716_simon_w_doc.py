@@ -37,7 +37,6 @@ def f_655(points):
     for point1, point2 in zip_longest(points, points[1:]):
         if point2 is not None:
             distances.append(distance.euclidean(point1, point2))
-            
     return distances
 
 import unittest

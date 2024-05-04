@@ -50,10 +50,8 @@ def f_301(file_path, num_rows, random_seed=None):
         ['John Benjamin', '29', '8523 Rhonda Avenue, Rosemouth, HI 32166', 'masonjohn@example.org']
     ]
     """
-
     if num_rows < 0 or not isinstance(num_rows, int):
         raise ValueError('num_rows should be an integer >=0.')
-
     fake = Faker()
     fake.seed_instance(random_seed)
     random.seed(random_seed)

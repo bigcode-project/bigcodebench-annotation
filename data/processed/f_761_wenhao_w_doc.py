@@ -30,24 +30,17 @@ def f_78(data, column):
     >>> ax = f_78(data, 'Type')
     """
     df = pd.DataFrame(data)
-    # Define the categories
     CATEGORIES = ['A', 'B', 'C', 'D', 'E']
-    
-    # Count occurrences of each category
     counts = df[column].value_counts()
     missing_categories = list(set(CATEGORIES) - set(counts.index))
     for category in missing_categories:
         counts[category] = 0
-
     counts = counts.reindex(CATEGORIES)
-    
-    # Plotting
     ax = counts.plot(kind='bar')
     ax.set_xlabel('Category')
     ax.set_ylabel('Count')
     ax.set_title(f'Distribution of {column}')
     plt.show()
-    
     return ax
 
 import unittest

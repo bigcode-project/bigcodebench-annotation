@@ -38,16 +38,12 @@ def f_69(
     """
     if seed is not None:
         np.random.seed(seed)
-
     shuffled_array = feature_array.copy()
     np.random.shuffle(shuffled_array.T)
-
     df = pd.DataFrame(shuffled_array, columns=feature_names)
     df[target_name] = target_array
-
     clf = RandomForestClassifier()
     clf.fit(df[feature_names], df[target_name])
-
     return clf
 
 import unittest

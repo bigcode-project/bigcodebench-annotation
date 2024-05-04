@@ -26,14 +26,11 @@ def f_644(n_data_points=5000, min_value=0.0, max_value=10.0):
     >>> print(stats)
     {'mean': 5.0, 'median': 5.0, 'mode': 5.0}
     """
-
     data = [round(random.uniform(min_value, max_value), 3) for _ in range(n_data_points)]
     data_df = pd.DataFrame(data, columns=['Value'])
-
     mean = data_df['Value'].mean()
     median = data_df['Value'].median()
     mode = stats.mode(data_df['Value'].values)[0][0]
-
     return {'mean': mean, 'median': median, 'mode': mode}
 
 import unittest

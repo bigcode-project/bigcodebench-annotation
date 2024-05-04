@@ -28,14 +28,12 @@ def f_223(ip_range):
     True
     """
     active_ips = {}
-
     for ip in IPv4Network(ip_range):
         try:
             subprocess.check_output(f'ping -c 1 {ip}', shell=True)
             active_ips[str(ip)] = True
         except subprocess.CalledProcessError:
             active_ips[str(ip)] = False
-
     return active_ips
 
 import unittest

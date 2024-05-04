@@ -37,10 +37,8 @@ def f_45(size=SIZE, frequency=1):
     '''
     x_values = np.arange(0, size)
     y_values = [math.sin((2 * PI / RANGE) * (x + int(RANGE * random.random()) * frequency)) for x in range(size)]
-    
     fig, ax = plt.subplots()
     ax.plot(x_values, y_values)
-    
     return ax
 
 import unittest

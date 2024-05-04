@@ -29,23 +29,15 @@ def f_83(string, patterns=['nnn', 'aaa', 'sss', 'ddd', 'fff']):
     >>> f_83('123kajhdlkfah12345k,jk123', patterns=['123', '1234'])
     {'123': 3, '1234': 1}
     """
-
     if not isinstance(string, str):
         raise TypeError("Input string should be of type string.")
-
     if not isinstance(patterns, list):
         raise TypeError("patterns should be a list of strings.")
-    
     if not all(isinstance(s, str) for s in patterns):
         raise TypeError("patterns should be a list of strings.")
-
-    
-
     pattern_counts = collections.defaultdict(int)
-
     for pattern in patterns:
         pattern_counts[pattern] = len(re.findall(pattern, string))
-
     return dict(pattern_counts)
 
 import unittest

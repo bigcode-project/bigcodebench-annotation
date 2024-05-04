@@ -31,7 +31,6 @@ def f_217(matrix):
     """
     df = pd.DataFrame(matrix)
     normalized_df = df.apply(stats.zscore)
-    # Handle NaN values by replacing them with 0.0
     normalized_df = normalized_df.fillna(0.0)
     return normalized_df
 

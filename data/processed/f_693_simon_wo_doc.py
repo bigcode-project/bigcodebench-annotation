@@ -42,11 +42,9 @@ def f_498(file_path,
     """
     FIELDS = ['Name', 'Age', 'Gender', 'Country']
     random.seed(seed)
-
     with open(file_path, 'w', newline='') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=FIELDS)
         writer.writeheader()
-
         for _ in range(num_rows):
             writer.writerow({
                 'Name': ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ', k=5)),
@@ -54,7 +52,6 @@ def f_498(file_path,
                 'Gender': random.choice(gender),
                 'Country': random.choice(countries)
             })
-
     return file_path
 
 import unittest

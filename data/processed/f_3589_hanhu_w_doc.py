@@ -30,21 +30,17 @@ def f_566(mean, std_dev, n):
     500
     """
     samples = np.random.normal(mean, std_dev, n)
-
     plt.figure(figsize=(10, 6))
     plt.hist(samples, bins=30, density=True, alpha=0.6, color='g')
-
     xmin, xmax = plt.xlim()
     x = np.linspace(xmin, xmax, 100)
     p = stats.norm.pdf(x, mean, std_dev)
     plt.plot(x, p, 'k', linewidth=2)
-
     title = f'Normal Distribution: Mean = {mean}, Std Dev = {std_dev}'
     plt.title(title)
     plt.xlabel('Value')
     plt.ylabel('Density')
     plt.show()
-
     return samples
 
 import unittest

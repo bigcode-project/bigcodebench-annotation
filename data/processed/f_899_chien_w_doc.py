@@ -44,7 +44,6 @@ def f_164(colors, states):
     random.seed(42)
     random.shuffle(combinations)
     num_columns = min(len(colors), len(states))
-
     data = {
         f"Color:State {i+1}": [
             f"{comb[0]}:{comb[1]}" for comb in combinations[i::num_columns]
@@ -52,7 +51,6 @@ def f_164(colors, states):
         for i in range(num_columns)
     }
     df = pd.DataFrame(data)
-
     return df
 
 import unittest

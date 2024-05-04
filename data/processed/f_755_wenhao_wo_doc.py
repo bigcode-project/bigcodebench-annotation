@@ -27,29 +27,18 @@ def f_171(data: List[Union[int, str]], repetitions: int = 1):
     >>> f_171([1, '2', '2'], repetitions=1)
     {'mode': array(['2'], dtype='<U1'), 'count': [2], 'fft': array([ 5.-0.j, -1.+0.j, -1.-0.j])}
     """
-    
     def calculate_mode(data):
-        # Use a dictionary to count occurrences, considering both value and type
         counts = {}
         for item in data:
             key = (item, type(item))  # Distinguish between types
             counts[key] = counts.get(key, 0) + 1
-
-        # Find the maximum count and corresponding values
         max_count = max(counts.values())
         mode_items = [value for (value, value_type), count in counts.items() if count == max_count]
-
         return mode_items, [max_count] * len(mode_items)
-    
     if not data or repetitions <= 0:  # Handle empty data or no repetitions
         return {'mode': np.array([], dtype='object'), 'count': np.array([], dtype=int), 'fft': np.array([])}
-
-    # Repeat the data
     repeated_data = data * repetitions
-
-    # Calculate mode
     mode, count = calculate_mode(repeated_data)
-    # using scipy.stats to calculate fft
     return {'mode': np.sort(mode), 'count': count, 'fft': scipy.fft.fft(data)}
 
 import unittest

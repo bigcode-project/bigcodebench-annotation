@@ -53,7 +53,6 @@ def f_360(obj_list, attr):
     count = collections.Counter(attr_values)
     if len(count.keys()) == 0:
         return pd.DataFrame()
-
     df = pd.DataFrame.from_dict(count, orient='index').reset_index()
     df = df.rename(columns={'index':'attribute', 0:'count'})
     return df

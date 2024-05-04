@@ -44,15 +44,11 @@ def f_494(s: str, seed: int = 0) -> pd.DataFrame:
     0  1        10  A10B    100    Pear  This is a description with spaces
     1  2        20  B20C    200    Pear        Another description example
     """
-
     if not s:
         raise ValueError("Incomplete data provided.")
-
     random.seed(seed)
-
     products = ["Apple", "Banana", "Orange", "Pear", "Grape"]
     code_to_product = dict()
-
     data_list = []
     segments = [segment.strip() for segment in s.split("\n")]
     for segment in segments:

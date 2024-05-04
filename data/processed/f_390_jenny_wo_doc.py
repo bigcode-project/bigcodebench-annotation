@@ -36,34 +36,25 @@ def f_206(
     >>> type(ax)
     <class 'matplotlib.figure.Figure'>
     """
-
     random.seed(random_seed)
-
     if (not isinstance(teams, list)) or (not all(isinstance(t, str) for t in teams)):
         raise TypeError("Expected teams to be list of str")
-
     start_time = datetime.fromtimestamp(epoch_milliseconds / 1000.0)
     current_time = datetime.now()
     days_diff = (current_time - start_time).days
-
     if days_diff < 0:
         raise ValueError("Input epoch timestamp is in the future!")
-
     performance_data = {team: [0] * days_diff for team in teams}
-
     for i in range(days_diff):
         for team in teams:
             performance = random.uniform(0.1, 1)
             performance_data[team][i] += performance
-
     fig, ax = plt.subplots()
     for team, performance in performance_data.items():
         ax.plot(range(days_diff), performance, label=team)
-
     ax.set_xlabel("Days since " + start_time.strftime("%Y-%m-%d %H:%M:%S"))
     ax.set_ylabel("Performance")
     ax.legend()
-
     return performance_data, fig
 
 import unittest

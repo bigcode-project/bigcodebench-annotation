@@ -30,7 +30,6 @@ def f_19(input_df):
             return pd.Series(['', 0], index=['clean_text', 'text_length'])
         cleaned_text = re.sub('[^A-Za-z0-9]+', '', str(row['text']))
         return pd.Series([cleaned_text, len(cleaned_text)], index=['clean_text', 'text_length'])
-    
     return input_df.apply(clean_text_and_calculate_length, axis=1)
 
 import unittest

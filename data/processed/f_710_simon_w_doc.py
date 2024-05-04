@@ -38,18 +38,13 @@ def f_27(n_colors, colors=['Red', 'Green', 'Blue', 'Yellow', 'Purple'], rng_seed
     >>> print(color_pattern)
     ['Brown', 'Black', 'Green', 'Brown', 'Black', 'Brown', 'Brown', 'Black', 'Green', 'Green', 'Black', 'Brown']
     """
-
-    # Setting the seed for the random number generator
     if rng_seed is not None:
         seed(rng_seed)
-
     color_cycle = cycle(colors)
     color_pattern = []
-
     for _ in range(n_colors):
         color = next(color_cycle) if _ % 2 == 0 else choice(colors)
         color_pattern.append(color)
-
     return color_pattern
 
 import unittest

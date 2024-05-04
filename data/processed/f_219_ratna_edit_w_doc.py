@@ -34,7 +34,6 @@ def f_114(data, key, min_value, max_value):
     '''
     if not isinstance(data, pd.DataFrame):
         raise ValueError("Input 'data' must be a pandas DataFrame.")
-    
     random_generated = np.random.randint(min_value, max_value + 1, size=len(data))
     data[key] = random_generated
     return data

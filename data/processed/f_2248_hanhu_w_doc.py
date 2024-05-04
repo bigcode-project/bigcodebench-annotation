@@ -36,8 +36,6 @@ def f_555(dic):
     True
     """
     geolocator = Photon(user_agent="geoapiExercises")
-
-    # Preprocess to handle both coordinates and string addresses
     preprocessed_locations = []
     for location, value in dic.items():
         if isinstance(value, dict) and 'Lat' in value and 'Lon' in value:
@@ -47,17 +45,11 @@ def f_555(dic):
             preprocessed_locations.append({'Location': location, 'Lat': geocoded_location.latitude, 'Lon': geocoded_location.longitude})
         else:
             raise ValueError("Location value must be either a dict with 'Lat' and 'Lon' keys or a string.")
-
     locations_df = pd.DataFrame(preprocessed_locations)
-
-    # Assu the first row has valid coordinates
     first_row = locations_df.iloc[0]
     folium_map = folium.Map(location=[first_row['Lat'], first_row['Lon']], zoom_start=4)
-
-    # Add markers for all locations
     for _, row in locations_df.iterrows():
         folium.Marker([row['Lat'], row['Lon']], popup=row['Location']).add_to(folium_map)
-
     return folium_map
 
 import unittest

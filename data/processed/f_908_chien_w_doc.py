@@ -34,7 +34,6 @@ def f_684(arr):
         arr, annot=True, vmax=vmax, vmin=vmin
     )  # Include both vmin and vmax in the heatmap call
     ax.set_title("Heatmap of the 2D Array")
-
     return ax
 
 import unittest

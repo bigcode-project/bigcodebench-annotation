@@ -26,27 +26,21 @@ def f_590(duration):
     >>> type(f_590(1))
     <class 'tuple'>
     """
-    # Constants
     VALUES_RANGE = (0, 100)
     PLOT_INTERVAL = 0.1
-
     plt.ion()
     x_data = []
     y_data = []
-
     end_time = time.time() + duration
     while time.time() < end_time:
         x_data.append(datetime.now().strftime('%H:%M:%S.%f'))
         y_data.append(randint(*VALUES_RANGE))
-
         plt.clf()
         plt.plot(x_data, y_data)
         plt.draw()
         plt.pause(PLOT_INTERVAL)
-
     plt.ioff()
     plt.show()
-
     return x_data, y_data
 
 ### Unit Tests

@@ -39,26 +39,19 @@ def f_121(df1, df2):
     <class 'seaborn.axisgrid.PairGrid'>
     """
     merged_df = pd.merge(df1, df2, on="id", how="outer")
-
-    # Select only numeric columns from df1 (excluding 'id')
     numeric_features_df1 = df1.select_dtypes(
         include=["float64", "int64"]
     ).columns.tolist()
     if "id" in numeric_features_df1:
         numeric_features_df1.remove("id")
-
-    # Scale only the numeric features of df1
     if not merged_df.empty and numeric_features_df1:
         scaler = StandardScaler()
         merged_df[numeric_features_df1] = scaler.fit_transform(
             merged_df[numeric_features_df1]
         )
-
-    # Pair plot only for the numeric features of df1
     pair_plot = None
     if numeric_features_df1:
         pair_plot = sns.pairplot(merged_df[numeric_features_df1])
-
     return merged_df, pair_plot
 
 import unittest

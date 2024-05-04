@@ -42,7 +42,6 @@ def f_702(df):
         )
     covariance_df = df.cov()
     pair_plot = sns.pairplot(df)
-
     return covariance_df, pair_plot
 
 import unittest

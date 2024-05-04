@@ -42,13 +42,11 @@ def f_541(data: np.ndarray, threshold: float = 2.0) -> list:
 
       
     """
-    # Calculate the z-scores
     mean, std_dev = norm.fit(data)
     if std_dev == 0:
         return [], mean, std_dev**2
     z_scores = (data - mean) / std_dev
     outliers = np.where(np.abs(z_scores) > threshold)
-
     return list(outliers[0]), mean, std_dev**2
 
 import unittest

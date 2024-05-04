@@ -33,7 +33,6 @@ def f_578(a, b):
     """
     correlation, _ = stats.pearsonr(a, b)
     df = pd.DataFrame({'A': a, 'B': b})
-
     plt.scatter(df['A'], df['B'])
     plt.plot(np.unique(df['A']), np.poly1d(np.polyfit(df['A'], df['B'], 1))(np.unique(df['A'])), color='red')
     plt.show()

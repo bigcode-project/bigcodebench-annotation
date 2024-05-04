@@ -36,16 +36,12 @@ def f_709(db_path, query, warn_large_dataset=True):
     """
     if warn_large_dataset:
         warnings.simplefilter("always")
-
     try:
         with sqlite3.connect(db_path) as conn:
             data = pd.read_sql_query(query, conn)
-
         if warn_large_dataset and data.shape[0] > 10000:
             warnings.warn("The data contains more than 10000 rows.")
-
         return data
-
     except Exception as e:
         raise Exception(f"Error fetching data from the database: {str(e)}") from e
 

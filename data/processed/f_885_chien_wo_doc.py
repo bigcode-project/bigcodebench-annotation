@@ -47,7 +47,6 @@ def f_0(request):
             response = "HTTP/1.1 404 NOT FOUND\r\n\r\nFile Not Found"
     else:
         response = "HTTP/1.1 400 BAD REQUEST\r\n\r\nBad Request"
-
     return response
 
 import unittest

@@ -40,19 +40,14 @@ def f_138(data_dir,
     15   Elephant       1000
      2      Tiger        500
     """
-
     random.seed(seed)
-
     file = csv_files[random.randint(0, len(csv_files) - 1)]
     file_path = os.path.join(data_dir, file)
-
     try:
         df = pd.read_csv(file_path)
     except pd.errors.EmptyDataError:
         return file, pd.DataFrame()
-
     selected_rows = df.sample(n=random.randint(1, len(df)), random_state=seed)
-
     return file, selected_rows
 
 import unittest

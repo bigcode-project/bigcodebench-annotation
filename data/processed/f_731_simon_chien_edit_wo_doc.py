@@ -40,11 +40,9 @@ def f_613(data_dir: str, csv_file: str) -> pd.DataFrame:
         df = pd.read_csv(file_path)
     except pd.errors.EmptyDataError:
         return pd.DataFrame()
-
     for column in df.columns:
         if np.issubdtype(df[column].dtype, np.number):  # checking for numeric columns
             df[column].fillna(df[column].mean(), inplace=True)
-
     return df
 
 import unittest

@@ -25,16 +25,13 @@ def f_56():
     frequency = randint(1, 5)
     amplitude = randint(1, 5)
     phase_shift = randint(0, 360)
-
     y = [amplitude * math.sin(2 * math.pi * frequency * (xi + phase_shift)) for xi in x]
-
     fig, ax = plt.subplots()
     ax.plot(x, y)
     ax.set_title('Random Sine Wave')
     ax.set_xlabel('Time')
     ax.set_ylabel('Amplitude')
     ax.grid(True)
-    
     return ax  # Return the axis object for testing
 
 import unittest

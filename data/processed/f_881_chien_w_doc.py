@@ -44,25 +44,17 @@ def f_746(s1, s2, n_clusters=3):
     """
     if not isinstance(s1, pd.Series) or not isinstance(s2, pd.Series):
         raise ValueError("s1 and s2 must be pandas Series")
-
     if len(s1) != len(s2):
         raise ValueError("s1 and s2 must have the same length")
-
-    # Create a DataFrame from the series
     df = pd.concat([s1, s2], axis=1)
-
-    # Perform K-Means clustering
     kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
     labels = kmeans.fit_predict(df)
-
-    # Visualize the clusters
     _, ax = plt.subplots()
     scatter = ax.scatter(df[s1.name], df[s2.name], c=labels)
     ax.set_xlabel(s1.name)
     ax.set_ylabel(s2.name)
     ax.set_title("K-Means Clustering")
     plt.legend(*scatter.legend_elements(), title="Clusters")
-
     return labels, ax
 
 import pandas as pd

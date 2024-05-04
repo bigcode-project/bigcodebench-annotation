@@ -46,7 +46,6 @@ def f_169(days, random_seed=0):
     categories = ["Groceries", "Entertainment", "Rent", "Utilities", "Miscellaneous"]
     for category in categories:
         df[category] = np.random.randint(0, 100, size=(days))
-
     return df
 
 import unittest

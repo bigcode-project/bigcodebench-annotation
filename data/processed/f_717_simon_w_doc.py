@@ -46,14 +46,11 @@ def f_364(data, columns=['Name', 'Age', 'Occupation'], fill_missing=False, num_r
     """
     if seed is not None:
         random.seed(seed)
-
     df = pd.DataFrame(data, columns=columns)
-
     if fill_missing:
         for col in df.columns:
             if df[col].dtype in ['float64', 'int64']:
                 df[col] = df[col].apply(lambda x: random.randint(*num_range) if pd.isnull(x) else x)
-
     return df
 
 import unittest

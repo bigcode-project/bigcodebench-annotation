@@ -34,12 +34,9 @@ def f_302(df, file_name="save.pkl"):
     """
     with open(file_name, "wb") as file:
         pickle.dump(df, file)
-
     with open(file_name, "rb") as file:
         loaded_df = pickle.load(file)
-
     os.remove(file_name)
-
     return loaded_df
 
 import unittest

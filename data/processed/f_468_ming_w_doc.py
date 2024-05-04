@@ -29,19 +29,13 @@ def f_61(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
     >>> modified_df, plots = f_61(df, tuples, 3)
     '''
-
-    # Ensure tuple elements match DataFrame columns for removal
     df = df[~df.apply(tuple, axis=1).isin(tuples)]
-
-    # Generate random plots
     plots = []
     for _ in range(n_plots):
         selected_columns = sample(COLUMNS, 2)
         ax = df.plot(x=selected_columns[0], y=selected_columns[1], kind='scatter')
         plots.append(ax)
-
     plt.show()
-
     return df, plots
 
 import unittest

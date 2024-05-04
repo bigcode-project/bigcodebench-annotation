@@ -35,10 +35,8 @@ def f_111(days_in_past=7):
     """
     if days_in_past < 0:
         raise ValueError("Days in the past cannot be negative")
-
     date = datetime.now(pytz.UTC) - timedelta(days=days_in_past)
     weekday = calendar.day_name[date.weekday()]
-
     return weekday
 
 import unittest

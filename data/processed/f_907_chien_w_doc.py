@@ -34,15 +34,11 @@ def f_716(arr):
     row_sums = arr.sum(axis=1)
     pca = PCA(n_components=1)
     pca.fit(row_sums.reshape(-1, 1))
-
-    # Plotting (requires matplotlib and sklearn)
-
     _, ax = plt.subplots()
     ax.bar([0], pca.explained_variance_ratio_)
     ax.set_title("Explained Variance Ratio of Principal Components")
     ax.set_xticks([0])
     ax.set_xticklabels(["PC1"])
-
     return ax
 
 import unittest

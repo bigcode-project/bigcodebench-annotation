@@ -31,11 +31,9 @@ def f_654(data, cols, percentage):
     corr_matrix = df.corr().abs()
     columns = corr_matrix.columns
     corr_combinations = []
-
     for col1, col2 in combinations(columns, 2):
         if corr_matrix.loc[col1, col2] > percentage:
             corr_combinations.append((col1, col2))
-
     return corr_combinations
 
 import unittest

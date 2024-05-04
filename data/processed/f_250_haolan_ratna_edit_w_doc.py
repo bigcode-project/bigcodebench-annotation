@@ -35,10 +35,8 @@ def f_744(n_data_points=N_DATA_POINTS):
     '''
     if n_data_points == 0:
         return pd.DataFrame(columns=['Value'])
-    
     data = [round(random.uniform(MIN_VALUE, MAX_VALUE), 3) for _ in range(n_data_points)]
     data_df = pd.DataFrame(data, columns=['Value'])
-
     return data_df
 
 import unittest

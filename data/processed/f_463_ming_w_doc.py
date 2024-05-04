@@ -26,21 +26,16 @@ def f_50(df, letter):
     >>> df = pd.DataFrame({'Word': words})
     """
     start_time = time.time()
-    # Validate if 'Word' column exists in df
     if 'Word' not in df.columns:
         raise ValueError("The DataFrame should contain a 'Word' column.")
-
-    # Handle empty DataFrame
     if df.empty:
         print("The DataFrame is empty.")
         return None
-
     regex = f'^{letter}'
     filtered_df = df[df['Word'].str.match(regex)]
     if filtered_df.empty:
         print(f"No words start with the letter '{letter}'.")
         return None
-
     word_lengths = filtered_df['Word'].str.len()
     ax = sns.boxplot(x=word_lengths)
     ax.set_title(f"Word Lengths Distribution for Words Starting with '{letter}'")

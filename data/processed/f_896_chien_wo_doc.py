@@ -36,27 +36,20 @@ def f_675(file_path, save_path=None):
     """
     df = pd.read_csv(file_path, header=None, names=["Text"])
     df["Text"] = df["Text"].str.split("\\n").str.join(" ")
-
     vectorizer = CountVectorizer(stop_words=STOP_WORDS)
     try:
         word_count = vectorizer.fit_transform(df["Text"])
     except ValueError:
-        # Handle the case where the DataFrame is empty or contains only stop words
         print("No valid words to plot. Returning None.")
         return None
-
     sum_words = word_count.sum(axis=0)
     words_freq = [
         (word, sum_words[0, idx]) for word, idx in vectorizer.vocabulary_.items()
     ]
     words_freq = sorted(words_freq, key=lambda x: x[1], reverse=True)
-
     top_words = words_freq[:10]
     df = pd.DataFrame(top_words, columns=["Word", "Count"])
-
     ax = df.plot.bar(x="Word", y="Count", rot=0)
-
-    # Saving or displaying the plot
     if save_path:
         plt.savefig(save_path)
         plt.close()

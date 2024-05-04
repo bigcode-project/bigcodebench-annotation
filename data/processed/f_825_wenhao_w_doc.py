@@ -37,23 +37,18 @@ def f_332(df, column, bins=30, density=True, alpha=0.6, color="g", seed=None):
     """
     if seed is not None:
         np.random.seed(seed)
-
     data = df[column]
     mu, std = norm.fit(data)
-
     fig, ax = plt.subplots()
     ax.hist(data, bins=bins, density=density, alpha=alpha, color=color)
-
     xmin, xmax = plt.xlim()
     x = np.linspace(xmin, xmax, 100)
     p = norm.pdf(x, mu, std)
     ax.plot(x, p, "k", linewidth=2)
-
     title = f"Normal Fit for '{column}'"
     ax.set_title(title)
     ax.set_ylabel("Density")
     ax.set_xlabel(column)
-
     return ax
 
 import unittest

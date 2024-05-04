@@ -29,10 +29,8 @@ def f_439(newArray):
     True
     """
     buffer = io.BytesIO()
-
     with gzip.GzipFile(fileobj=buffer, mode='w') as f:
         f.write(struct.pack('d'*newArray.size, *newArray))
-
     return buffer.getvalue()
 
 import unittest

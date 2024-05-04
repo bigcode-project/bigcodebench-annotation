@@ -27,7 +27,6 @@ def f_523(word: str) -> np.ndarray:
     word_ascii_values = np.array([ord(x) for x in word])
     difference = np.diff(word_ascii_values)
     entropy = stats.entropy(difference)
-    
     return difference, entropy
 
 import unittest

@@ -29,7 +29,6 @@ def f_70(ip_address):
     >>> f_70(ip_address)
     '192.168.1.1'
     """
-
     try:
         response = ip_address
         data = json.loads(response)

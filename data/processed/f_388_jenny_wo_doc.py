@@ -38,34 +38,26 @@ def f_2(epoch_milliseconds, seed=None):
     <class 'matplotlib.axes._axes.Axes'>
     """
     CATEGORIES = ["Electronics", "Clothing", "Home", "Books", "Sports"]
-
     if seed is not None:
         random.seed(seed)
-
     if epoch_milliseconds < 0:
         raise ValueError("Start time cannot be negative.")
-
     start_time = datetime.fromtimestamp(epoch_milliseconds / 1000.0)
     current_time = datetime.now()
     days_diff = (current_time - start_time).days
     if days_diff <= 0:
         raise ValueError("Start date must be before current time.")
-
     sales_data = {category: [0] * days_diff for category in CATEGORIES}
-
     for i in range(days_diff):
         for category in CATEGORIES:
             sales = random.randint(10, 50)
             sales_data[category][i] += sales
-
     fig, ax = plt.subplots()
     for category, sales in sales_data.items():
         ax.plot(range(days_diff), sales, label=category)
-
     ax.set_xlabel("Days since " + start_time.strftime("%Y-%m-%d %H:%M:%S"))
     ax.set_ylabel("Sales")
     ax.legend()
-
     return sales_data, ax
 
 import unittest

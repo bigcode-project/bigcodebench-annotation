@@ -29,12 +29,9 @@ def f_318(data, column="c"):
     df = pd.DataFrame(data)
     if column in df.columns:
         df = df.drop(columns=column)
-
     df = df.select_dtypes(include=["number"])
-
     if df.empty:
         return None
-
     return sns.heatmap(df.corr())
 
 import unittest

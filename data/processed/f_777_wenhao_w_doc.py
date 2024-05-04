@@ -37,11 +37,9 @@ def f_99(word):
         return pd.DataFrame({'Letter': [], 'Position': []})
     elif not word.isalpha() or not word.islower():
         raise ValueError("Input word must be in lowercase alphabetic characters only.")
-
     alphabet = string.ascii_lowercase
     positions = [alphabet.index(char) + 1 for char in word]
     df = pd.DataFrame({'Letter': list(word), 'Position': positions})
-
     return df
 
 import unittest

@@ -37,16 +37,12 @@ def f_398():
         >>> all(df['X'].between(0, RANGE - 1)) and all(df['Y'].between(0, RANGE - 1))
         True
     """
-    # Generate the DataFrame with random integers within the specified range [0, RANGE)
     df = pd.DataFrame({
         'X': np.random.randint(0, RANGE, SIZE),
         'Y': np.random.randint(0, RANGE, SIZE)
     })
-
-    # Draw a scatter plot using Seaborn for a more refined visual output
     sns.scatterplot(data=df, x='X', y='Y')
     plt.show()
-
     return df
 
 import unittest

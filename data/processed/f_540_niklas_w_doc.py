@@ -23,10 +23,7 @@ def f_690(df):
     {('a', 'b', 'c', 'd', 'e'): 2, ('b', 'c', 'd', 'e', 'f'): 1}
     """
     df['combination'] = pd.Series(df.apply(lambda row: tuple(sorted(row)), axis=1))
-    
-    # Using Counter from collections to calculate the frequency of each combination
     combination_freq = Counter(df['combination'])
-    
     return dict(combination_freq)
 
 import unittest

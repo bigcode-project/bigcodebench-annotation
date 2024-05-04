@@ -55,11 +55,9 @@ def f_303(file_path):
         raise IOError(
             "Error reading the file. Please check the file path and permissions."
         ) from exc
-
     sample = np.random.choice(population, 30, replace=False)
     mean = np.mean(sample)
     std_dev = np.std(sample, ddof=1)
-
     plt.hist(sample, bins="auto", density=True, alpha=0.7, rwidth=0.85)
     xmin, xmax = plt.xlim()
     x = np.linspace(xmin, xmax, 100)
@@ -69,7 +67,6 @@ def f_303(file_path):
     plt.ylabel("Frequency")
     plt.title("Sample Histogram with Normal Distribution Overlay")
     ax = plt.gca()
-
     return mean, std_dev, ax
 
 import unittest

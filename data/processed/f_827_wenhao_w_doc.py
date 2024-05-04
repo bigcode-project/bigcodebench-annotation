@@ -32,11 +32,9 @@ def f_254(df, x_column, y_column):
     Y = df[y_column].values
     reg = LinearRegression().fit(X, Y)
     Y_pred = reg.predict(X)
-
     fig, ax = plt.subplots()
     ax.scatter(X, Y)
     ax.plot(X, Y_pred, color="red")
-
     return ax
 
 import unittest

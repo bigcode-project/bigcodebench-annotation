@@ -29,28 +29,17 @@ def f_628(list_of_menuitems):
     if not list_of_menuitems or not any(list_of_menuitems):
         print("No items to plot.")
         return None
-
-    # Flatten the nested list into a single list of items
     flat_list = [item for sublist in list_of_menuitems for item in sublist]
     if not flat_list:
         print("No items to plot.")
         return None
-
-    # Count the occurrence of each item
     counter = Counter(flat_list)
-
-    # Convert the counter to a DataFrame
     df = pd.DataFrame(counter.items(), columns=['Item', 'Count'])
-
-    # Ensure there is data to plot
     if df.empty:
         print("No items to plot.")
         return None
-
-    # Create a seaborn barplot
     sns.set(style="whitegrid")
     ax = sns.barplot(x="Count", y="Item", data=df, palette="viridis")
-
     plt.tight_layout()  # Adjust the layout to make room for the item labels
     return ax
 

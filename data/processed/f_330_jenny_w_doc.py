@@ -34,11 +34,8 @@ def f_237(data, column="c"):
     df = pd.DataFrame(data)
     if column in df.columns:
         df = df.drop(columns=column)
-
-    # If there's no numeric data, return None for the plot.
     if df.empty or not np.any(df.dtypes.apply(pd.api.types.is_numeric_dtype)):
         return df, None
-
     ax = df.plot()
     return df, ax
 

@@ -35,18 +35,14 @@ def f_548(smtp_server, smtp_port, smtp_user, smtp_password, template_folder):
     app.config['MAIL_USERNAME'] = smtp_user
     app.config['MAIL_PASSWORD'] = smtp_password
     app.config['MAIL_USE_TLS'] = True
-    
     mail = Mail()
     mail.init_app(app)
-
     @app.route('/send_mail')
     def send_mail():
         msg = Message('Hello', sender='from@example.com', recipients=['to@example.com'])
         msg.body = 'Hello Flask message sent from Flask-Mail'
         mail.send(msg)
-
         return 'Mail sent!'
-
     return app
 
 import unittest

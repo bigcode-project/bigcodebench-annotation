@@ -37,7 +37,6 @@ def f_451(data_list):
     ax.set_title("Student Scores over Tests")
     ax.set_xlabel("Test Number")
     ax.set_ylabel("Score")
-
     return ax
 
 import unittest

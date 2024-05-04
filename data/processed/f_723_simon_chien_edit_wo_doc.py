@@ -43,13 +43,11 @@ def f_705(csv_file, column_name='data', pattern='\d+[xX]', sample_size=None, see
     """
     df = pd.read_csv(csv_file)
     matches = df[df[column_name].str.contains(pattern, na=False)]
-
     if sample_size is not None:
         random.seed(seed)  # Set the seed for reproducibility
         sample_size = min(sample_size, len(matches))  # Ensure sample size is not greater than the number of matches
         sampled_indices = random.sample(range(len(matches)), sample_size)  # Randomly select indices
         matches = matches.iloc[sampled_indices]  # Select rows corresponding to sampled indices
-
     return matches
 
 import unittest

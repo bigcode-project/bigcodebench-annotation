@@ -31,16 +31,13 @@ def f_490(product_list, categories, min_value = 10, max_value = 100):
     >>> report.iloc[0]['Quantity Sold']
     100
     """
-
     report_data = []
-
     for product in product_list:
         category = categories[random.randint(0, len(categories)-1)]
         quantity_sold = random.randint(min_value, max_value)
         revenue = random.randint(min_value, max_value)
         total_revenue = quantity_sold * revenue
         report_data.append([product, category, quantity_sold, revenue, total_revenue])
-
     report_df = pd.DataFrame(report_data, columns=['Product', 'Category', 'Quantity Sold', 'Revenue', 'Total Revenue'])
     return report_df
 

@@ -50,10 +50,8 @@ Example:
     attr_values = [getattr(obj, attr) for obj in obj_list]
     if len(attr_values) == 0:
         return [], None
-
     top_values = heapq.nlargest(top_n, attr_values)
     random_value = random.choice(attr_values)
-
     return top_values, random_value
 
 import unittest

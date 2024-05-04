@@ -23,10 +23,7 @@ def f_326(word):
     ([('h', 8), ('o', 15), ('w', 23), ('i', 9), ('s', 19), ('t', 20), ('h', 8), ('e', 5), ('w', 23), ('e', 5), ('a', 1), ('t', 20), ('h', 8), ('e', 5), ('r', 18), ('t', 20), ('o', 15), ('d', 4), ('a', 1), ('y', 25)], ['how', 'is', 'the', 'weather', 'today'])
     """
     ALPHABET = list(string.ascii_lowercase)
-    # Map each letter in the word to its corresponding alphabetical number
     word_numbers = [ALPHABET.index(letter) + 1 for letter in word]
-    
-    # Combine each letter with its alphabetical number in a tuple
     return [(word[i], word_numbers[i]) for i in range(len(word))],  wordninja.split(word)
 
 import unittest

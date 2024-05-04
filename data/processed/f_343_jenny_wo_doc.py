@@ -26,23 +26,17 @@ def f_283(numbers, file_path="save.pkl"):
     >>> type(loaded_fig)
     <class 'matplotlib.figure.Figure'>
     """
-
     if not isinstance(numbers, list) or not all(
         isinstance(item, (int, float)) for item in numbers
     ):
         raise TypeError("Expect list of numbers.")
-
     fig = plt.figure()
     plt.plot(numbers)
-
     with open(file_path, "wb") as file:
         pickle.dump(fig, file)
-
     with open(file_path, "rb") as file:
         loaded_fig = pickle.load(file)
-
     os.remove(file_path)
-
     return loaded_fig
 
 import unittest

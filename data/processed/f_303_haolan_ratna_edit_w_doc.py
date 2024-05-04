@@ -29,10 +29,7 @@ def f_59(json_list, r):
     [(1, 2, 3), (1, 2, 4), (1, 2, 5), (1, 3, 4), (1, 3, 5), (1, 4, 5), (2, 3, 4), (2, 3, 5), (2, 4, 5), (3, 4, 5)]
     """
     try:
-        # Convert JSON string to Python dictionary
         data = json.loads(json_list)
-
-        # Extract number_list from dictionary
         number_list = data['number_list']
         return list(itertools.combinations(number_list, r))
     except Exception as e:

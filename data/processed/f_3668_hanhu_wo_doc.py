@@ -34,7 +34,6 @@ def f_210(my_obj):
     >>> f_210({'name': 'Alice', 'age': 30})
     '{"name": "Alice", "age": 30}'
     """
-    
     class ComplexEncoder(json.JSONEncoder):
         def default(self, obj):
             if isinstance(obj, datetime):

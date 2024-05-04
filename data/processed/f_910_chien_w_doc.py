@@ -51,8 +51,6 @@ def f_552(num_samples=NUM_SAMPLES, num_outliers=NUM_OUTLIERS):
     normal_data = np.random.normal(size=num_samples)
     outliers = np.random.uniform(low=-10, high=10, size=num_outliers)
     data = np.concatenate([normal_data, outliers]) if num_samples > 0 else outliers
-
-    # Identify outliers using IQR (only if there is normal data)
     outliers_detected = np.array([])
     if num_samples > 0:
         q75, q25 = np.percentile(normal_data, [75, 25])
@@ -60,11 +58,8 @@ def f_552(num_samples=NUM_SAMPLES, num_outliers=NUM_OUTLIERS):
         lower_bound = q25 - (iqr * 1.5)
         upper_bound = q75 + (iqr * 1.5)
         outliers_detected = data[(data < lower_bound) | (data > upper_bound)]
-
-    # Plot histogram
     _, ax = plt.subplots()
     ax.hist(data, bins=30)
-
     return data, outliers_detected, ax
 
 import unittest

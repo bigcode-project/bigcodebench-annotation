@@ -28,10 +28,7 @@ def f_663(df):
     """
     X = pd.DataFrame(df[['X']])  # Extracting column 'X' as a DataFrame
     y = pd.Series(df['Y'])       # Extracting column 'Y' as a Series
-    
-    # Fitting the linear regression model
     model = LinearRegression().fit(X, y)
-    
     return model
 
 import unittest

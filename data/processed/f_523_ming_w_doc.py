@@ -27,16 +27,12 @@ def f_361(x, y, labels):
     >>> fig = f_361(x, y, labels)
     """
     pca = PCA(n_components=2)
-
     fig, ax = plt.subplots()
-
     for i in range(len(x)):
         xy = np.vstack((x[i], y[i])).T
         xy_transformed = pca.fit_transform(xy)
         ax.plot(xy_transformed[:, 0], xy_transformed[:, 1], label=labels[i])
-    
     ax.legend()
-    
     return fig
 
 import unittest

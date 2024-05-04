@@ -24,14 +24,10 @@ def f_287(data: dict, output_path: str = "./default_data_output.json") -> str:
     'custom/path/results.json'
     """
     df = pd.DataFrame(data)
-    # Drop column named 'c' if it exists
     df = df.drop(columns="c", errors="ignore")
-    # Convert the DataFrame to dictionary
     data_dict = df.to_dict(orient="dict")
-    # Save the dictionary as a JSON file
     with open(output_path, "w") as file:
         json.dump(data_dict, file)
-
     return output_path
 
 import unittest

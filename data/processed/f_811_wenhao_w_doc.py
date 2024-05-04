@@ -29,7 +29,6 @@ def f_47(data):
     numeric_df = df.select_dtypes(include=["number"])
     if numeric_df.empty:
         raise ValueError("No numeric columns present")
-
     df_cumsum = numeric_df.cumsum()
     ax = sns.heatmap(df_cumsum)
     return ax

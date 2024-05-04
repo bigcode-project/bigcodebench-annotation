@@ -32,7 +32,6 @@ def f_253(df, letter):
     count_dict = word_lengths.value_counts().to_dict()
     end_time = time.time()  # End ti
     cost = f"Operation completed in {end_time - start_time} seconds."
-
     return count_dict
 
 import unittest

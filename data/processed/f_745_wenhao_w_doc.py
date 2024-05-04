@@ -29,12 +29,9 @@ def f_246(d, target='z'):
     """
     df = pd.DataFrame(d)
     predictors = [k for k in df.columns if k != target]
-
     X = df[predictors]
     y = df[target]
-
     model = LinearRegression().fit(X, y)
-
     return model
 
 import unittest

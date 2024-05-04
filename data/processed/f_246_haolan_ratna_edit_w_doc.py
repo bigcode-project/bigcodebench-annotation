@@ -33,11 +33,8 @@ def f_123(df):
     """
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df is not a DataFrame")
-    
     df = df.drop_duplicates(subset='Name')
-
     slope, intercept, r_value, _, _ = stats.linregress(df['Age'], df['Score'])
-
     df['Age_up'] = intercept + slope * df['Age']
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(111)

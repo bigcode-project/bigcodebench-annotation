@@ -45,22 +45,16 @@ def f_234(n_pairs=26):
     """
     if n_pairs > 26 or n_pairs < 1:
         raise ValueError("n_pairs should be between 1 and 26")
-
     pairs = [f"{letter}:{number}" for letter, number in zip(LETTERS, NUMBERS)][:n_pairs]
     random.seed(42)
     random.shuffle(pairs)
     counts = np.random.randint(1, 10, size=n_pairs)
-
     bars = plt.bar(pairs, counts)
-
-    # Set label for each bar
     for bar, pair in zip(bars, pairs):
         bar.set_label(pair)
-
     plt.xlabel("Letter:Number Pairs")
     plt.ylabel("Counts")
     plt.title("Random Letter:Number Pairs Chart")
-
     return bars
 
 import unittest

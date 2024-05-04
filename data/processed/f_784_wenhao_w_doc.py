@@ -44,14 +44,12 @@ def f_315(start_date: str, periods: int, freq: str, random_seed: int = 0) -> (pd
     date_range = pd.date_range(start_date, periods=periods, freq=freq)
     sales_forecast = np.random.randint(100, 500, size=periods)
     forecast_df = pd.DataFrame({'Date': date_range, 'Sales': sales_forecast}).set_index('Date')
-
     fig, ax = plt.subplots()
     forecast_df['Sales'].plot(ax=ax, marker='o')
     ax.set_title('Sales Forecast')
     ax.set_xlabel('Date')
     ax.set_ylabel('Sales')
     ax.grid(True)
-    
     return forecast_df, ax
 
 import unittest

@@ -33,19 +33,14 @@ def f_63(goals, penalties):
     3  Team D      0
     4  Team E      2
     """
-
     scores_data = []
-
     for team in TEAMS:
         team_goals = goals.get(team, 0)
         team_penalties = penalties.get(team, 0)
         score = team_goals - team_penalties
         scores_data.append([team, score])
-
     scores_df = pd.DataFrame(scores_data, columns=['Team', 'Score'])
     scores_df['Score'] = scores_df['Score'].clip(*GOALS_RANGE)
-
-    #Plotting (commented out for testing)
     plt.figure(figsize=(10, 6))
     plt.bar(scores_df['Team'], scores_df['Score'], color='skyblue')
     plt.xlabel('Team')
@@ -54,7 +49,6 @@ def f_63(goals, penalties):
     plt.ylim(GOALS_RANGE[0] - 1, GOALS_RANGE[1] + 1)
     plt.grid(axis='y', linestyle='--')
     plt.show()
-
     return scores_df
 
 import unittest

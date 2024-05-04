@@ -35,10 +35,8 @@ def f_174(n_samples=100, centers=3, n_features=2, random_seed=42):
         n_features=n_features,
         random_state=random_seed,
     )
-
     fig, ax = plt.subplots()
     ax.scatter(X[:, 0], X[:, 1], c=y)
-
     return X, y, ax
 
 import unittest

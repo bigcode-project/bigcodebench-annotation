@@ -32,7 +32,6 @@ def f_98(time_string, from_tz, to_tz):
     dt = parse(time_string, dayfirst=True)
     dt = from_zone.localize(dt)
     dt = dt.astimezone(to_zone)
-
     return dt.strftime(TIME_FORMAT)
 
 import unittest

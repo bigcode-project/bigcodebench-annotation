@@ -32,16 +32,12 @@ def f_565(dic):
         raise ValueError("Input dictionary is empty.")
     locations = [(k, v['Lat'], v['Lon']) for k, v in dic.items()]
     distances = {}
-
     folium_map = folium.Map(location=[locations[0][1], locations[0][2]], zoom_start=4)
-
     for i in range(len(locations)):
         folium.Marker([locations[i][1], locations[i][2]], popup=locations[i][0]).add_to(folium_map)
-
         for j in range(i + 1, len(locations)):
             distance = geodesic((locations[i][1], locations[i][2]), (locations[j][1], locations[j][2])).kilometers
             distances[(locations[i][0], locations[j][0])] = distance
-
     return folium_map, distances
 
 import unittest

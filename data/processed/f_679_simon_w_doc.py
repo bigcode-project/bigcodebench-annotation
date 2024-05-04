@@ -46,10 +46,8 @@ def f_637(dictionary, item, sample_size=None, random_seed=None):
     """
     dataframe = pd.DataFrame(dictionary)
     positions = [(i, col) for i in dataframe.index for col in dataframe.columns if dataframe.at[i, col] == item]
-
     if random_seed is not None:
         seed(random_seed)
-
     if sample_size is not None and sample_size < len(positions):
         sampled_positions = []
         for _ in range(sample_size):

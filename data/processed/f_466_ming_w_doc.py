@@ -21,10 +21,8 @@ def f_167(matrix):
     >>> ax = f_167(matrix)
     """
     df = pd.DataFrame(matrix)
-
     fig, ax = plt.subplots()
     ax.imshow(df, cmap='hot', interpolation='nearest')
-
     return ax
 
 import unittest

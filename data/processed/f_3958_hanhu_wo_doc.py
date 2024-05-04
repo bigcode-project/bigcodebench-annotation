@@ -37,19 +37,13 @@ def f_328(values, filename):
     """
     book = xlwt.Workbook()
     sheet1 = book.add_sheet("persons")
-
-    # Write header
     for col_index, col in enumerate(FIELDS):
         sheet1.write(0, col_index, col)
-
-    # Write data rows
     for row_index, row_values in enumerate(values, 1):
         for col_index, col in enumerate(FIELDS):
             value = row_values.get(col, "")
             sheet1.write(row_index, col_index, value)
-
     book.save(filename)
-
     return os.path.abspath(filename)
 
 import unittest

@@ -44,25 +44,17 @@ def f_692(arr: np.ndarray) -> (plt.Axes, np.ndarray):
     >>> print(normalized_data)
     [-1.22474487  0.          1.22474487]
     """
-    # Calculating row sums
     row_sums = arr.sum(axis=1)
-
-    # Normalizing the data
     mean = np.mean(row_sums)
     std_dev = np.std(row_sums)
     normalized_data = (
         (row_sums - mean) / std_dev if std_dev != 0 else np.zeros_like(row_sums)
     )
-
-    # Plotting the histogram
     _, ax = plt.subplots()
     ax.hist(normalized_data, bins=30, density=True, alpha=0.6, color="g")
-
-    # Plotting the PDF of a standard normal distribution
     x = np.linspace(norm.ppf(0.01), norm.ppf(0.99), 100)
     ax.plot(x, norm.pdf(x), "r-", lw=2)
     ax.set_title("Histogram of Normalized Data with Standard Normal PDF")
-
     return ax, normalized_data
 
 import unittest

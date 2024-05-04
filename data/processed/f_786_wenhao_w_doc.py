@@ -36,7 +36,6 @@ def f_567(start_date='2016-01-01', periods=24, freq='M', model='additive'):
         decomposition = seasonal_decompose(sales_series, model=model, period=12 if freq == 'M' else 4)
     except ValueError as e:
         return {'error': str(e)}
-    
     return {
         'trend': decomposition.trend,
         'seasonal': decomposition.seasonal,

@@ -22,12 +22,8 @@ def f_726(letters: list, repetitions: int) -> dict:
     >>> f_726(['A', 'B'], 3)
     {'A': 3, 'B': 3}
     """
-    # Create a flattened list by repeating the original list
     flattened_list = list(itertools.chain(*[letters for _ in range(repetitions)]))
-    
-    # Count the occurrences of each letter in the flattened list
     counts = dict(Counter(flattened_list))
-    
     return counts
 
 import unittest

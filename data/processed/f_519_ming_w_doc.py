@@ -38,12 +38,10 @@ def f_311(texts):
     """
     cleaned_texts = [ALPHANUMERIC.sub(' ', text).lower() for text in texts]
     tokenized_texts = [' '.join(word for word in text.split() if word not in STOPWORDS) for text in cleaned_texts]
-
     vectorizer = CountVectorizer()
     dtm = vectorizer.fit_transform(tokenized_texts)
     dtm_df = pd.DataFrame(dtm.toarray(), columns= vectorizer.get_feature_names_out() if hasattr(vectorizer,
                                                                   'get_feature_names_out') else vectorizer.get_feature_names())
-
     return dtm_df
 
 import unittest

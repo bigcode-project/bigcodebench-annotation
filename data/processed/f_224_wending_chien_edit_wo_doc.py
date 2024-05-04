@@ -38,28 +38,21 @@ def f_220(csv_input):
     0  1  Alice
     1  2    Bob
     """
-    # Check if the input is a StringIO object or a file path
     if isinstance(csv_input, StringIO):
         dr = csv.DictReader(csv_input)  # Read from StringIO
     else:
         with open(csv_input, 'r') as f:
             dr = csv.DictReader(f)  # Read from a file
-
     conn = sqlite3.connect(DATABASE_NAME)
     cursor = conn.cursor()
-
-    # Create table and insert data
     cols = dr.fieldnames
     cursor.execute(f'DROP TABLE IF EXISTS {TABLE_NAME}')
     cursor.execute(f'CREATE TABLE {TABLE_NAME} ({", ".join([f"{col} TEXT" for col in cols])})')
     for row in dr:
         cursor.execute(f'INSERT INTO {TABLE_NAME} VALUES ({", ".join(["?" for _ in cols])})', list(row.values()))
-
     conn.commit()
     dataframe = pd.read_sql_query(f'SELECT * from {TABLE_NAME}', conn)
-
     conn.close()
-
     return dataframe
 
 import unittest

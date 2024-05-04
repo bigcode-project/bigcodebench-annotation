@@ -58,26 +58,15 @@ def f_179(df, columns=['A', 'B', 'C'], larger=50, equal=900):
     """
     if len(columns) != 3:
         raise ValueError("Exactly three columns should be specified.")
-    
     for column in columns:
         if column not in df.columns:
             raise ValueError('The specified columns should exist in the DataFrame.')
-    
     col_categorical, col_numerical, col_filter = columns
-
-    # Filtering the data based on the specified conditions
     selected = df[(df[col_numerical] > larger) & (df[col_filter] == equal)][[col_categorical, col_numerical]]
-
-    # Creating a contingency table for the chi-square test
     contingency_table = pd.crosstab(selected[col_categorical], selected[col_numerical])
-    
-    # Check if the contingency table is empty (no data meeting the criteria)
     if contingency_table.size == 0:
         raise ValueError("Insufficient data - no matching data for the applied conditions.")
-    
-    # Perfor the chi-square test
     _, p_value, _, _ = chi2_contingency(contingency_table)
-    
     return p_value
 
 import unittest

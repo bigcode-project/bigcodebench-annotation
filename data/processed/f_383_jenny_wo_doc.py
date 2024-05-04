@@ -35,7 +35,6 @@ def f_21(start_time, end_time):
     >>> ax.get_xticklabels()
     [Text(18628.0, 0, '2021-01-01'), Text(18629.0, 0, '2021-01-02'), Text(18630.0, 0, '2021-01-03'), Text(18631.0, 0, '2021-01-04'), Text(18632.0, 0, '2021-01-05'), Text(18633.0, 0, '2021-01-06'), Text(18634.0, 0, '2021-01-07'), Text(18635.0, 0, '2021-01-08'), Text(18636.0, 0, '2021-01-09')]
     """
-    # Constants
     TIMEZONES = [
         "UTC",
         "America/Los_Angeles",
@@ -44,7 +43,6 @@ def f_21(start_time, end_time):
         "Australia/Sydney",
     ]
     COLORS = ["b", "g", "r", "c", "m", "y", "k"]
-
     start_date = datetime.strptime(start_time, "%Y-%m-%d")
     end_date = datetime.strptime(end_time, "%Y-%m-%d")
     current_tz = pytz.timezone("UTC")

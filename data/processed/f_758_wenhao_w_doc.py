@@ -35,16 +35,12 @@ def f_671(df: pd.DataFrame) -> tuple:
     Histogram of Closing Prices
     """
     fig, axes = plt.subplots(1, 2, figsize=(12, 6))
-    
     boxplot_ax = sns.boxplot(x=df['closing_price'], ax=axes[0])
     boxplot_ax.set_title('Box Plot of Closing Prices')
-    
     histplot_ax = sns.histplot(df['closing_price'], kde=True, ax=axes[1])
     histplot_ax.set_title('Histogram of Closing Prices')
-    
     plt.tight_layout()
     plt.close(fig)  # Prevent automatic figure display within Jupyter notebooks or interactive environments.
-    
     return boxplot_ax, histplot_ax
 
 import unittest

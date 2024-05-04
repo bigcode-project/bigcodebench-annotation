@@ -38,24 +38,18 @@ def f_46(X, y, n_splits, batch_size, epochs):
     """
     scaler = MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
-
     kf = KFold(n_splits=n_splits)
     history = []
-
     for train_index, test_index in kf.split(X_scaled):
         X_train, X_test = X_scaled[train_index], X_scaled[test_index]
         y_train, y_test = y[train_index], y[test_index]
-
         model = tf.keras.models.Sequential([
             tf.keras.layers.Dense(50, activation='relu'),
             tf.keras.layers.Dense(1, activation='sigmoid')
         ])
-
         model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-
         hist = model.fit(X_train, y_train, validation_data=(X_test, y_test), batch_size=batch_size, epochs=epochs, verbose=0)
         history.append(hist)
-
     return history
 
 import unittest

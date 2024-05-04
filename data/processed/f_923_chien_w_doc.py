@@ -42,20 +42,14 @@ def f_259(data):
     - The histogram plot's appearance (like color, alpha, and rwidth) is pre-set but can be customized further if needed.
     """
     df = pd.DataFrame(data)
-    # Correctly convert string prices to float, accounting for commas
     df["Price_Float"] = df["Price_String"].apply(lambda x: float(x.replace(",", "")))
-
     mean_price = np.mean(df["Price_Float"])
     median_price = np.median(df["Price_Float"])
-    # Use ddof=1 for sample standard deviation
     std_dev_price = np.std(df["Price_Float"], ddof=1)
-
-    # Histogram plot settings can be refined for better visualization
     ax = plt.hist(df["Price_Float"], bins="auto", color="blue", alpha=0.7, rwidth=0.85)
     plt.title("Histogram of Product Prices")
     plt.xlabel("Price")
     plt.ylabel("Frequency")
-
     return {"mean": mean_price, "median": median_price, "std_dev": std_dev_price}, ax
 
 import unittest

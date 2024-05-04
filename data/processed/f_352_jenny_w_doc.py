@@ -38,13 +38,11 @@ def f_543(data, n_components=2, random_state=None):
     """
     pca = PCA(n_components=n_components, random_state=random_state)
     transformed_data = pca.fit_transform(data)
-
     fig, ax = plt.subplots()
     if transformed_data.shape[1] == 1:
         ax.scatter(transformed_data[:, 0], np.zeros_like(transformed_data[:, 0]))
     else:
         ax.scatter(transformed_data[:, 0], transformed_data[:, 1])
-
     return {"transformed_data": transformed_data, "ax": ax}
 
 import unittest

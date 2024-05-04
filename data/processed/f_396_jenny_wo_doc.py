@@ -34,16 +34,13 @@ def f_186(
     2024-03-30  37.454012  95.071431  73.199394  59.865848  15.601864
     """
     np.random.seed(random_seed)
-
     if not isinstance(days_in_past, int) or days_in_past <= 0:
         raise ValueError("days_in_past must be a positive integer.")
     if not stock_names or not all(isinstance(name, str) for name in stock_names):
         raise ValueError("stock_names must be a list of strings and cannot be empty.")
-
     dates = pd.date_range(end=datetime.now().date(), periods=days_in_past)
     prices = np.random.rand(days_in_past, len(stock_names)) * 100
     df = pd.DataFrame(prices, columns=stock_names, index=dates)
-
     return df
 
 import unittest

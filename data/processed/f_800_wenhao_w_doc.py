@@ -31,7 +31,6 @@ def f_618(text: str) -> tuple:
     """
     words = text.split()
     chars = re.sub("\s", "", re.sub(f"[{string.punctuation}]", "", text))
-
     return len(words), len(chars), len(set(chars))
 
 import unittest

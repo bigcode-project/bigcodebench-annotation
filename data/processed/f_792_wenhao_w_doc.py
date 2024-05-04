@@ -31,7 +31,6 @@ def f_688(rows, columns, seed=None):
         np.random.seed(seed)
     matrix = np.random.rand(rows, columns)
     df = pd.DataFrame(matrix)
-    
     return df
 
 import unittest

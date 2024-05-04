@@ -33,28 +33,21 @@ def f_715(start_time, end_time, step, amplitude, period, seed=0):
     [Text(-20.0, 0, '1970-01-01 10:00:08.000000'), Text(0.0, 0, '1970-01-01 10:00:00.000000'), Text(20.0, 0, '1970-01-01 10:00:02.000000'), Text(40.0, 0, '1970-01-01 10:00:04.000000'), Text(60.0, 0, '1970-01-01 10:00:06.000000'), Text(80.0, 0, '1970-01-01 10:00:08.000000'), Text(100.0, 0, ''), Text(120.0, 0, '')]
     """
     np.random.seed(seed)
-
     if period <= 0 or step < 1:
         raise ValueError("Invalid input values")
-
     COLUMNS = ["Timestamp", "Value"]
-
     timestamps = np.arange(start_time, end_time, step)
     df = pd.DataFrame(columns=COLUMNS)
-
     if amplitude == 0:
         values = [0] * len(timestamps)
     else:
         values = np.random.normal(size=len(timestamps))
-
     data = []
     for i, ts in enumerate(timestamps):
         dt = datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M:%S.%f")
         value = values[i] + amplitude * np.sin(2 * np.pi * ts / period)
         data.append([dt, value])
-
     df = pd.DataFrame(data, columns=COLUMNS)
-
     ax = df.plot(x="Timestamp", y="Value", title="Time Series with Seasonality")
     ax.set_ylabel("Value")
     return ax

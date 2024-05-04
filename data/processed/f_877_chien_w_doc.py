@@ -34,22 +34,13 @@ def f_753(s1, s2):
     >>> edit_distance
     387.5590277622236
     """
-
-    # Determine categories where both stores exceed the sales threshold
     high_sales_categories = s1.index[(s1 > 200) & (s2 > 200)]
-
     if high_sales_categories.empty:
         return None, 0.0
-
-    # Prepare the data for plotting
     df = pd.DataFrame(
         {"Store 1": s1[high_sales_categories], "Store 2": s2[high_sales_categories]}
     )
-
-    # compute the edit distance between the two series
     edit_distance = np.linalg.norm(df["Store 1"] - df["Store 2"])
-    
-    # Generate the bar plot
     ax = df.plot(kind="bar", title="Sales Comparison Above Threshold in Categories")
     return ax, edit_distance
 

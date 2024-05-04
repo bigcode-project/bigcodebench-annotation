@@ -32,12 +32,9 @@ def f_308(l):
     """
     if not l:
         return pd.DataFrame()
-
     shuffle(l)
     df = pd.DataFrame([l for _ in range(N_GROUPS)])
-    # Ensure rolling does not aggregate rows into lists
     df = df.apply(lambda row: np.roll(row, -N_GROUPS), axis=1, result_type='expand')
-
     return df
 
 import unittest

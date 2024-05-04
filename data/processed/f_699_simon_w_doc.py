@@ -33,16 +33,12 @@ def f_485(students, subjects, seed=None):
     """
     if seed is not None:
         random.seed(seed)
-
     report_data = []
-
     for student in students:
         grades = [random.randint(0, 100) for _ in subjects]
         avg_grade = statistics.mean(grades)
         report_data.append((student,) + tuple(grades) + (avg_grade,))
-
     report_df = pd.DataFrame(report_data, columns=['Student'] + subjects + ['Average Grade'])
-
     return report_df
 
 import unittest

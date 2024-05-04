@@ -27,7 +27,6 @@ def f_290(data):
     data = data.split('-')
     data = [int(d) for d in data]
     df = pd.DataFrame(data, columns=['Values'])
-    
     plt.figure(figsize=(10, 6))
     ax = plt.gca()  # Get current Axes
     ax.hist(df['Values'], bins=np.arange(df['Values'].min(), df['Values'].max()+2) - 0.5, edgecolor='black')
@@ -36,7 +35,6 @@ def f_290(data):
     ax.set_title('Histogram of Values')
     ax.set_xticks(sorted(list(set(data))))  # Set x-ticks based on unique data values
     plt.show()
-    
     return ax
 
 import unittest

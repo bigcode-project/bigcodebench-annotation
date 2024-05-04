@@ -42,7 +42,6 @@ def f_661(data_dict):
     """
     if not data_dict:
         return None, "The distribution is uniform."
-
     data_counter = collections.Counter(data_dict)
     counts = list(data_counter.values())
     avg_count = sum(counts) / len(counts)
@@ -52,7 +51,6 @@ def f_661(data_dict):
         if uniform
         else "The distribution is not uniform."
     )
-
     _, ax = plt.subplots()
     ax.hist(
         counts,

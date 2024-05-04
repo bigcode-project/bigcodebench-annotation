@@ -28,21 +28,15 @@ def f_193(area_string, data=DATA):
     >>> f_193('6,000')
     600.0
     """
-    # Convert area strings to float and prepare data for the model
     df = pd.DataFrame(data)
     df["Area_Float"] = df["Area_String"].str.replace(",", "").astype(float)
-
-    # Train the linear regression model
     X = df[["Area_Float"]]
     Y = df["Price"]
     model = LinearRegression()
     model.fit(X, Y)
-
-    # Predict the price for the given area string
     area_float = float(area_string.replace(",", ""))
     prediction_data = pd.DataFrame([area_float], columns=["Area_Float"])
     price_predicted = model.predict(prediction_data)
-
     return price_predicted[0]
 
 import unittest

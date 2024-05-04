@@ -32,18 +32,14 @@ def f_75(data_list, seed=None):
     """
     if seed is not None:
         random.seed(seed)
-
     df = pd.DataFrame(data_list, columns=["Original String"])
-
     shuffled_strings = []
     for s in data_list:
         substrings = re.split("\s*,\s*", s)
         random.shuffle(substrings)
         shuffled_s = ", ".join(substrings)
         shuffled_strings.append(shuffled_s)
-
     df["Shuffled String"] = shuffled_strings
-
     return df
 
 import unittest

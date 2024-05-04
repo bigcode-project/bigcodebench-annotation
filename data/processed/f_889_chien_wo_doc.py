@@ -60,14 +60,9 @@ def f_102(date_str):
     """
     given_date = parse(date_str)
     current_date = datetime.now()
-
     total_seconds = (current_date - given_date).total_seconds()
-
-    # Count leap seconds that occurred between the two dates
     leap_seconds = np.sum(LEAP_SECONDS >= given_date.year)
-
     total_seconds += leap_seconds
-
     return int(total_seconds)
 
 import unittest

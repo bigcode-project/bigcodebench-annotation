@@ -39,7 +39,6 @@ def f_418(target_words, n_sentences, vocabulary):
         raise ValueError("n_sentences cannot be negative.")
     if not vocabulary:
         raise ValueError("Vocabulary cannot be empty.")
-
     sentences = []
     for _ in range(n_sentences):
         sentence = " ".join(random.choices(vocabulary, k=10))

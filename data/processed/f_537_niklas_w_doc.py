@@ -30,7 +30,6 @@ def f_376(df):
     >>> assert df['winner'].dtype == object
     >>> assert all(winner in ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'] for winner in df['winner'])
     """
-
     def determine_winner(row):
         if row['score1'] > row['score2']:
             return row['team1']
@@ -38,8 +37,6 @@ def f_376(df):
             return row['team2']
         else:
             return random.choice([row['team1'], row['team2']])
-    
-    # Using pd.Series to explicitly create a new Series for the 'winner' column
     winner_series = pd.Series([determine_winner(row) for index, row in df.iterrows()], index=df.index)
     df['winner'] = winner_series
     return df

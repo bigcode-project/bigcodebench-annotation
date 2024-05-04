@@ -31,13 +31,10 @@ def f_299(x, y, labels):
     >>> ax = f_299(x, y, labels)
     """
     data = []
-
     for i in range(len(x)):
         data.append(np.concatenate((x[i], y[i])))
-
     df = pd.DataFrame(data, index=labels)
     ax = sns.heatmap(df, cmap='coolwarm')
-    
     return ax, df
 
 import unittest

@@ -25,13 +25,10 @@ def f_532(src_dir, dst_dir):
     >>> './destination'
     """
     FILE_PATTERNS = ['*.txt', '*.docx']
-    # Find all matching files
     matching_files = list(itertools.chain.from_iterable(
         fnmatch.filter(os.listdir(src_dir), pattern) for pattern in FILE_PATTERNS))
-
     for filename in matching_files:
         shutil.copy2(os.path.join(src_dir, filename), dst_dir)
-
     return dst_dir
 
 import unittest

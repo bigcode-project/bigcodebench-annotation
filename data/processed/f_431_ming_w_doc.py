@@ -23,15 +23,10 @@ def f_589(password: str, salt_length: int = 8) -> str:
     >>> isinstance(f_589('my_password'), str)
     True
     """
-    # Generate a random salt
     salt = os.urandom(salt_length)
-    # Use the salt and the password to create a SHA-256 hash
     hash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
-    # Combine the salt and the hash
     salted_hash = salt + hash
-    # Encode the salted hash in base64
     encrypted_password = base64.b64encode(salted_hash)
-
     return encrypted_password.decode('utf-8')
 
 import unittest

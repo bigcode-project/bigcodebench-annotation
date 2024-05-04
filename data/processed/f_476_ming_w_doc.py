@@ -30,13 +30,10 @@ def f_473(goals, penalties, rng_seed=None):
     3  Team D     (1 goals, $0)
     4  Team E     (5 goals, $0)
     """
-    # Constants
     TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
     PENALTY_COST = 1000  # in dollars
-
     if rng_seed is not None:
         seed(rng_seed)  # Set seed for reproducibility
-
     match_results = []
     for team in TEAMS:
         team_goals = randint(0, abs(goals))
@@ -44,9 +41,7 @@ def f_473(goals, penalties, rng_seed=None):
         penalty_cost = PENALTY_COST * team_penalties
         result_string = f"({team_goals} goals, ${penalty_cost})"
         match_results.append([team, result_string])
-
     results_df = pd.DataFrame(match_results, columns=['Team', 'Match Result'])
-
     return results_df
 
 import unittest

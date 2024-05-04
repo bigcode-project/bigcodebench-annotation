@@ -35,26 +35,16 @@ def f_282(df, dct, columns=None):
     Raises:
     - The function will raise a ValueError is input df is not a DataFrame.
     """
-
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df is not a DataFrame")
-
-    # Replace values using the provided dictionary
     df = df.replace(dct)
-    
-    # Determine columns to encode
     if columns is None:
         columns = df.select_dtypes(include=['object']).columns.tolist()
-
-    # Encode categorical features
     for column in columns:
         if df[column].dtype == 'object':
             le = LabelEncoder()
             df[column] = le.fit_transform(df[column])
-            
-    # Standardize numerical features
     df = (df - df.mean()) / df.std()
-    
     return df
 
 import unittest

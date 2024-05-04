@@ -29,13 +29,8 @@ def f_247(df, col):
     3  23   2  52        False
     4   1  87  37         True
     """
-    # Remove specified column using pandas
     updated_df = pd.DataFrame(df).drop(col, axis=1)
-    
-    # Add a new column 'IsEvenIndex' using numpy to determine if index is even
-    # The np.arange(len(updated_df)) creates an array of indexes, % 2 == 0 checks if they are even
     updated_df['IsEvenIndex'] = np.arange(len(updated_df)) % 2 == 0
-    
     return updated_df
 
 import unittest

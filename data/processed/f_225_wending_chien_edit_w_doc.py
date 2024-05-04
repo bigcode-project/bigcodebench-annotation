@@ -62,7 +62,6 @@ def f_154(rows, columns):
         elif data_type == set:
             data['col' + str(col)] = [set(np.random.choice(range(10), size=np.random.randint(1, 6))) for _ in
                                       range(rows)]
-
     df = pd.DataFrame(data)
     return df
 

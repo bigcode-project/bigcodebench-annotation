@@ -33,7 +33,6 @@ def f_341(ip_range, timeout):
         network = ipaddress.IPv4Network(ip_range, strict=False)  # Note the `strict=False`
     except ValueError as e:
         raise ValueError(f"Invalid IP range: {e}")
-
     for ip in network:
         try:
             response = requests.get(f"http://{ip}", timeout=timeout)

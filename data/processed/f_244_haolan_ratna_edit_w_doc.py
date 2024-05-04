@@ -36,25 +36,18 @@ def f_55(df):
     >>> print(f_55("not a dataframe"))
     Invalid input
     """
-    
     if not isinstance(df, pd.DataFrame):
         return "Invalid input"
-    
     try:
         df = df.drop_duplicates(subset='Name')
-
         fig = plt.figure(figsize=(10, 5))
-
         plt.subplot(1, 2, 1)
         sns.histplot(df['Score'], bins=10)
         plt.title('Histogram of Scores')
-
         plt.subplot(1, 2, 2)
         sns.boxplot(x='Country', y='Score', data=df)
         plt.title('Boxplot of Scores by Country')
-
         plt.tight_layout()
-
         return fig
     except Exception as e:
         return "Invalid input"

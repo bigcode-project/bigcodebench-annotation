@@ -28,19 +28,11 @@ def f_540(directory):
     >>> f_540("/path/to/directory")
     (3, ['jquery-1.js', 'jquery-2.js', 'jquery-ui.js'])  # Assu 3 jQuery files were removed
     """
-
-    # Configure logging
     logging.basicConfig(filename='jquery_removal.log', level=logging.INFO,
                         format='%(asctime)s - %(levelname)s - %(message)s')
-    
-    # Check if directory exists
     if not os.path.exists(directory):
         raise FileNotFoundError(f"Directory '{directory}' does not exist.")
-
-    # Get all files in the directory
     files = os.listdir(directory)
-
-    # Remove jQuery files
     removed_files = 0
     removed_file_names = []
     for file in files:
@@ -52,7 +44,6 @@ def f_540(directory):
                 logging.info(f"Removed jQuery file: {file}")
             except Exception as e:
                 logging.error(f"Error while removing file {file}: {e}")
-
     return removed_files, removed_file_names
 
 import unittest

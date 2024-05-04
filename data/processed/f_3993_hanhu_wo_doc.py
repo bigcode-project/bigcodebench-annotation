@@ -33,7 +33,6 @@ def f_596(file_path1, file_path2):
         file2_content = file2.readlines()
         diff = difflib.ndiff(file1_content, file2_content)
         diff = [line for line in diff if line.startswith('+ ') or line.startswith('- ')]
-
     return ''.join(diff)
 
 import unittest

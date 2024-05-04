@@ -41,16 +41,12 @@ def f_551(n_samples=200, centers=4, plot_path=None, random_seed=None):
         centers=centers,
         random_state=random_seed,
     )
-
     fig, ax = plt.subplots()
-
     ax.scatter(X[:, 0], X[:, 1], c=y)
-
     if plot_path:
         plt.savefig(plot_path)
         plt.close(fig)
         return cdist(X, X), None
-
     return cdist(X, X), ax
 
 import unittest

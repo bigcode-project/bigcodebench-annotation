@@ -26,24 +26,15 @@ def f_243(d, keys=['x', 'y', 'z']):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-    # Convert the list of dictionaries to a DataFrame
     df = pd.DataFrame(d)
-
-    # Initialize a plot
     fig, ax = plt.subplots()
-    
-    # Plot the values for the specified keys
     plotted_keys = []
     for key in keys:
         if key in df.columns:
             ax.plot(df[key], label=key)
             plotted_keys.append(key)
-    
-    # Add a legend if there are any lines plotted
     if plotted_keys:
         ax.legend()
-    
-    # Return the Axes object
     return ax
 
 import unittest

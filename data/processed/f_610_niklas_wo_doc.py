@@ -20,12 +20,9 @@ def f_281(data_path):
     """
     df = pd.read_csv(data_path)
     data = df.to_numpy()
-    
     scaler = MinMaxScaler()
     data = scaler.fit_transform(data)
-
     df = pd.DataFrame(data, columns=df.columns)
-
     return df
 
 import unittest

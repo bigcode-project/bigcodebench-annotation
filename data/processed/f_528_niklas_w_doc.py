@@ -22,7 +22,6 @@ def f_134(x, n):
     """
     counter = collections.Counter(x)
     most_frequent = heapq.nlargest(n, counter.keys(), key=counter.get)
-
     return most_frequent
 
 import unittest

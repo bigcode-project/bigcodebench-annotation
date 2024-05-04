@@ -32,10 +32,7 @@ def f_486(a, b):
         fig, ax = plt.subplots()  # Creates a blank plot
         plt.close(fig)  # Close the plot window to prevent it from showing empty plots
         return ax
-
-    # Use np.random.seed for reproducibility if needed
     np.random.seed(0)
-    # Ensure column names from b are used only up to the length of b
     selected_columns = COLUMNS[:len(b)]
     df = pd.DataFrame(np.random.randn(len(a), len(b)), index=a, columns=selected_columns)
     ax = df.plot(kind='bar')

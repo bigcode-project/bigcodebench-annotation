@@ -41,19 +41,16 @@ def f_194(data: pd.DataFrame) -> (pd.DataFrame, list):
     <class 'matplotlib.axes._axes.Axes'>
     """
     FEATURES = ["Feature1", "Feature2", "Feature3", "Feature4", "Feature5"]
-
     scaler = StandardScaler()
     data_standardized = pd.DataFrame(
         scaler.fit_transform(data[FEATURES]), columns=FEATURES
     )
-
     axes_list = []
     for feature in FEATURES:
         fig, ax = plt.subplots()
         ax.hist(data_standardized[feature], bins=20, alpha=0.5)
         ax.set_title("Histogram of {}".format(feature))
         axes_list.append(ax)
-
     return data_standardized, axes_list
 
 import unittest

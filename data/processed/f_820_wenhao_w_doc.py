@@ -41,25 +41,19 @@ def f_8(array, features=None, seed=None):
     array([0.60276338, 0.71518937, 0.4236548 , 0.5488135 , 0.54488318,
            0.891773  , 0.43758721, 0.38344152, 0.64589411, 0.96366276])
     """
-
     if seed is not None:
         np.random.seed(seed)
-
     if array.size == 0 or len(array.shape) != 2:
         raise ValueError("Input array must be 2-dimensional and non-empty.")
-
     if features is not None and len(features) != array.shape[1]:
         raise ValueError("Features list must match the number of columns in the array.")
-
     shuffled_array = np.random.permutation(array.T).T
-
     fig, ax = plt.subplots()
     sns.heatmap(
         shuffled_array,
         xticklabels=features if features is not None else np.arange(array.shape[1]) + 1,
         ax=ax,
     )
-
     return ax
 
 import unittest

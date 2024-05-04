@@ -46,7 +46,6 @@ def f_276(list_of_lists):
         np.random.shuffle(values)
         s = pd.Series(values, index=sublist)
         series_list.append(s)
-
     return series_list
 
 import unittest

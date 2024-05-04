@@ -34,14 +34,11 @@ def f_104(csv_content, filename):
     """
     book = xlwt.Workbook()
     sheet1 = book.add_sheet("sheet1")
-
     reader = csv.reader(io.StringIO(csv_content))
     for row_index, row in enumerate(reader):
         for col_index, col in enumerate(row):
             sheet1.write(row_index, col_index, col)
-
     book.save(filename)
-
     return os.path.abspath(filename)
 
 import unittest

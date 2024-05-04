@@ -30,13 +30,10 @@ def f_191(file_path):
     """
     with open(file_path, 'rb') as f:
         content = f.read()
-
     hash_output = hashlib.sha256(content).digest()
-
     with open('private.pem', 'rb') as key_file:
         private_key = rsa.PrivateKey.load_pkcs1(key_file.read())
     signature = rsa.sign(hash_output, private_key, 'SHA-256')
-
     return base64.b64encode(signature).decode('utf-8')
 
 import unittest

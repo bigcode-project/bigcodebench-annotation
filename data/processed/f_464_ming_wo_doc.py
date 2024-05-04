@@ -27,7 +27,6 @@ def f_202(file_path):
     """
     matrix = pd.DataFrame(np.random.choice(LETTERS, (10, 10)))
     matrix.to_csv(file_path, sep='\t', header=False, index=False)
-
     return None
 
 import unittest

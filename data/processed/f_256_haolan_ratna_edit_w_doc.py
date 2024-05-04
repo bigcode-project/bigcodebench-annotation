@@ -38,7 +38,6 @@ def f_244(ax, func_index):
         raise ValueError("The input is not an axes")
     x = np.linspace(0, 2 * np.pi, 1000)
     y = FUNCTIONS[func_index](x)
-
     ax.plot(x, y)
     ax.set_rlabel_position(func_index * 45)
     return ax

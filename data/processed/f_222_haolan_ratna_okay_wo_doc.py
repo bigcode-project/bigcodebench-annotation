@@ -29,15 +29,9 @@ def f_647(data, min_delay, max_delay):
     >>> json.loads(response.content)
     {"Sample-Key": "Sample-Value"}
     """
-
-    # Generate a random delay
     delay = random.uniform(min_delay, max_delay)
-
-    # Wait for the delay
     time.sleep(delay)
-
     response = HttpResponse(data, content_type='application/json')
-
     return response
 
 import unittest

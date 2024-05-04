@@ -30,25 +30,16 @@ def f_444(df1, df2):
     >>> selected_features
     ['feature2', 'feature3']
     """
-    # Merge dataframes based on 'id'
     df = pd.merge(df1, df2, on="id")
-
-    # Separate features and target
     features = df1.columns.drop("id")
     X = df[features]
     y = df["target"]
-
-    # Select top 2 features
     selector = SelectKBest(f_classif, k=2)
     X_new = selector.fit_transform(X, y)
-
     selected_features = [x for x, y in zip(features, selector.get_support()) if y]
-
-    # Draw heatmap
     heatmap = sns.heatmap(
         pd.DataFrame(X_new, columns=selected_features).corr(), annot=True
     )
-
     return selected_features, heatmap
 
 import unittest

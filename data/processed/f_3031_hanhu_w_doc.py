@@ -41,8 +41,6 @@ def f_160(amplitude, frequency, time):
     wave = amplitude * np.exp(1j * 2 * math.pi * frequency * time)
     window = get_window('hann', time.size)  # Apply a Hann window
     wave *= window  # Apply the window to the wave
-
-    # Plot the wave
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(time, np.real(wave), label="Real Part")
     ax.plot(time, np.imag(wave), label="Imaginary Part")
@@ -50,7 +48,6 @@ def f_160(amplitude, frequency, time):
     ax.set_xlabel("Time")
     ax.set_ylabel("Amplitude")
     ax.legend()
-
     return wave, fig, ax
 
 import unittest

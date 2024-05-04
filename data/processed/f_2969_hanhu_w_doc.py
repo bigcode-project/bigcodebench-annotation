@@ -31,13 +31,9 @@ def f_522(req_data):
     >>> f_522({'empty': ''})[0] != f_522({'another': 'data'})[0]
     True
     """
-    # Convert request data to json string
     json_req_data = json.dumps(req_data)
-    # Hash the request data using BLAKE3 and get hexadecimal representation directly
     blake3_hex = blake3.blake3(json_req_data.encode('utf-8')).hexdigest()
-    # Use hashlib for generating an MD5 hash of the BLAKE3 hex representation (for demonstration)
     md5_hash = hashlib.md5(blake3_hex.encode('utf-8')).hexdigest()
-
     return blake3_hex, md5_hash
 
 import unittest

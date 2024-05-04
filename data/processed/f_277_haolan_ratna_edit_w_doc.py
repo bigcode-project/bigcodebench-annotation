@@ -34,19 +34,15 @@ def f_619(df):
     (2, 4)
     >>> plt.close()
     """
-
     df['Date'] = pd.to_datetime(df['Date'])
     df = pd.concat([df['Date'], df['Value'].apply(pd.Series)], axis=1)
-    
     df.iloc[:,1:] = df.iloc[:,1:].apply(zscore)
-    
     fig = plt.figure()
     ax = fig.add_subplot(111)
     df.set_index('Date').boxplot(ax=ax)
     ax.set_title('Z-Scores Over Time')
     ax.set_xlabel('Date')
     ax.set_ylabel('Z-Score')
-    
     return df, fig
 
 import unittest

@@ -29,15 +29,12 @@ def f_463(product_list, categories):
     >>> report.iloc[0]['Category'] in ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
     True
     """
-
     report_data = []
-
     for product in product_list:
         category = categories[random.randint(0, len(categories)-1)]
         quantity_sold = random.randint(1, 100)
         revenue = quantity_sold * random.randint(10, 100)
         report_data.append([product, category, quantity_sold, revenue])
-
     report_df = pd.DataFrame(report_data, columns=['Product', 'Category', 'Quantity Sold', 'Revenue'])
     return report_df
 

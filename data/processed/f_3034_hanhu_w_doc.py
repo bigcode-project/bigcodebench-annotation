@@ -33,30 +33,22 @@ def f_446(x, y):
     >>> isinstance(ax, plt.Axes), isinstance(Z, np.ndarray)
     (True, True)
     """
-    # Type check for x and y
     if not isinstance(x, np.ndarray) or not isinstance(y, np.ndarray):
         raise TypeError("x and y must be numpy.ndarray")
-
-    # Handle empty arrays
     if x.size == 0 or y.size == 0:
         print("Empty x or y array provided.")
         return None, np.array([])  # Adjusted to return a tuple
-
-    # Check for mismatched array sizes
     if len(x) != len(y):
         raise ValueError("Mismatched array sizes: x and y must have the same length")
-
     Z = np.zeros((len(y), len(x)), dtype=float)
     for i in range(len(y)):
         for j in range(len(x)):
             z = complex(x[j], y[i])
             Z[i, j] = cmath.phase(z**2 - 1)
-
     fig, ax = plt.subplots()
     c = ax.imshow(Z, extent=(np.amin(x), np.amax(x), np.amin(y), np.amax(y)), origin='lower', cmap='hsv')
     fig.colorbar(c, ax=ax, label="Phase (radians)")
     ax.grid()
-
     return ax, Z
 
 import unittest

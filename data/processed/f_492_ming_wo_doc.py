@@ -28,10 +28,8 @@ def f_82(df, filename):
     >>> 'data.csv' in f_82(df, 'data.csv')
     True
     """
-    # Ensure the data directory exists
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-
     file_path = os.path.join(output_dir, filename)
     df.to_csv(file_path, index=False, quoting=csv.QUOTE_NONNUMERIC)
     return os.path.abspath(file_path)

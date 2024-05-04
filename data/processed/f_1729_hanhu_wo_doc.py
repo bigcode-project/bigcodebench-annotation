@@ -34,15 +34,12 @@ def f_57(csv_file, csv_delimiter):
     True
     """
     words = []
-
     with open(csv_file, 'r') as f:
         reader = csv.reader(f, delimiter=csv_delimiter)
         for row in reader:
             words.extend(row)
-
     word_counter = Counter(words)
     most_common_words = sorted(word_counter.items(), key=operator.itemgetter(1), reverse=True)
-
     return most_common_words
 
 import unittest

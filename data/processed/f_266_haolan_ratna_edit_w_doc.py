@@ -27,10 +27,8 @@ def f_198(n):
     >>> print(f_198(2))
     ((0.8444218515250481, 0.7579544029403025), (0.420571580830845, 0.25891675029296335))
     """
-
     if n < 2:
         return None
-
     points = [(random.random(), random.random()) for i in range(n)]
     closest_pair = min(combinations(points, 2), key=lambda pair: math.hypot(pair[0][0] - pair[1][0], pair[0][1] - pair[1][1]))
     return closest_pair

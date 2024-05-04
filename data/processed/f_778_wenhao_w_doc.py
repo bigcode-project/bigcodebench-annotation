@@ -32,26 +32,15 @@ def f_200(word):
     The function uses the index of each letter in the English alphabet to represent its position.
     For example, 'a' will be represented by 1, 'b' by 2, and so on.
     """
-    # Validate the input word to contain only alphabetic characters
     if not all(char in ALPHABET for char in word):
         raise ValueError("The word should contain only lowercase alphabetic characters.")
-        
-    # Calculate the positions of each letter in the word within the alphabet
     letter_positions = np.array(list(map(lambda x: ALPHABET.index(x) + 1, word)))
-    
-    # Create a figure and axis object
     fig, ax = plt.subplots()
-    
-    # Draw the bar chart on the axis
     ax.bar(np.arange(len(letter_positions)), letter_positions)
-    
-    # Configure plot settings
     ax.set_xlabel('Letter Index')
     ax.set_ylabel('Alphabetical Position')
     ax.set_title('Alphabetical Position of Letters in Word')
-    
     plt.show()
-    
     return ax
 
 import unittest

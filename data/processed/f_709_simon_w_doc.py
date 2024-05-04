@@ -30,16 +30,11 @@ def f_366(text1, text2):
     >>> print(cleaned_text1, cleaned_text2)
     test with parenthesis  And other stuff 
     """
-    # Constants
     PUNCTUATION = string.punctuation
-
     cleaned_texts = []
-
-    # Remove punctuation from each text string
     for text in [text1, text2]:
         cleaned_text = re.sub('['+re.escape(PUNCTUATION)+']', '', text)
         cleaned_texts.append(cleaned_text)
-
     return tuple(cleaned_texts)
 
 import unittest

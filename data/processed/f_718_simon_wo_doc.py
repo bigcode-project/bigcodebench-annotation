@@ -49,21 +49,13 @@ def f_477(data_dict, source_directory, backup_directory):
     >>> print(backup_status)
     True
     """
-    # Add the key 'a' with value 1
     data_dict.update({'a': 1})
-
-    # Count the frequency of the values
     counter = collections.Counter(data_dict.values())
-
-    # Sort the dictionary by the frequency
     sorted_dict = sorted(counter.items(), key=operator.itemgetter(1), reverse=True)
-
-    # Backup files
     backup_status = False
     if os.path.isdir(source_directory):
         shutil.copytree(source_directory, backup_directory, dirs_exist_ok=True)
         backup_status = True
-
     return data_dict, sorted_dict, backup_status
 
 import unittest

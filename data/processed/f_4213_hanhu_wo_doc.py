@@ -47,12 +47,10 @@ def f_300(num, from_base, to_base, private_key, alphabet):
     """
     base64_table = np.array(list(alphabet))
     n = int(num, from_base)
-    
     new_num = ''
     while n > 0:
         n, m = divmod(n, to_base)
         new_num += base64_table[m]
-
     num = new_num[::-1]
     data = bytes(num, 'utf-8')
     signed_num = private_key.sign(
@@ -64,7 +62,6 @@ def f_300(num, from_base, to_base, private_key, alphabet):
         hashes.SHA256()
     )
     base64_encoded = base64.b64encode(signed_num)
-
     return base64_encoded.decode()
 
 import unittest
