@@ -6,11 +6,15 @@ def f_1007(csv_file_path):
     """
     Find the best-selling product from a given CSV file with sales data.
 
+    This function assumes that the CSV file contains a header and two columns: 
+    'product' and 'quantity', where 'product' is a string representing the product 
+    name and 'quantity' is an integer representing the quantity sold.
+
     Args:
-    csv_file_path (str): Path to the CSV file with sales data. The CSV should have two columns: 'product' and 'quantity'.
+        csv_file_path (str): Path to the CSV file containing sales data.
 
     Returns:
-    str: The name of the top selling product.
+        str: The name of the top-selling product based on the total quantity sold.
 
     Requirements:
     - csv
@@ -23,7 +27,7 @@ def f_1007(csv_file_path):
     """
     with open(csv_file_path, 'r') as f:
         reader = csv.reader(f)
-        next(reader)  # skip header
+        next(reader)
         sales_data = collections.defaultdict(int)
         for row in reader:
             product, quantity = row[0], int(row[1])
