@@ -44,27 +44,33 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
     
+    def setUp(self):
+        # Setting up a common letters array and sorted dictionary for use in all tests
+        self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+        self.sorted_dict = f_1002(self.letters)
+
     def test_case_1(self):
-        sorted_dict = f_1002()
-        self.assertIsInstance(sorted_dict, dict, "The function should return a dictionary.")
+        # Check if the function returns a dictionary
+        self.assertIsInstance(self.sorted_dict, dict, "The function should return a dictionary.")
 
     def test_case_2(self):
-        sorted_dict = f_1002()
-        all_letters = all([key in LETTERS for key in sorted_dict.keys()])
+        # Ensure all keys in the sorted dictionary are within the provided letters
+        all_letters = all([key in self.letters for key in self.sorted_dict.keys()])
         self.assertTrue(all_letters, "All keys of the dictionary should be letters.")
         
     def test_case_3(self):
-        sorted_dict = f_1002()
-        all_lists = all([isinstance(val, list) and all(isinstance(i, int) for i in val) for val in sorted_dict.values()])
+        # Ensure all values are lists of integers
+        all_lists = all([isinstance(val, list) and all(isinstance(i, int) for i in val) for val in self.sorted_dict.values()])
         self.assertTrue(all_lists, "All values of the dictionary should be lists of integers.")
         
     def test_case_4(self):
-        sorted_dict = f_1002()
-        sums = [sum(val) for val in sorted_dict.values()]
-        self.assertTrue(all(sums[i] >= sums[i + 1] for i in range(len(sums) - 1)), "The dictionary should be sorted in descending order based on the sum of its values.")
+        # Check if the dictionary is sorted by the mean values in descending order
+        means = [statistics.mean(val) for val in self.sorted_dict.values()]
+        self.assertTrue(all(means[i] >= means[i + 1] for i in range(len(means) - 1)), "The dictionary should be sorted in descending order based on the mean of its values.")
     
     def test_case_5(self):
-        sorted_dict = f_1002()
-        self.assertEqual(set(sorted_dict.keys()), set(LETTERS), "The dictionary should have all letters as keys.")
+        # Check if the dictionary includes all provided letters as keys
+        self.assertEqual(set(self.sorted_dict.keys()), set(self.letters), "The dictionary should have all provided letters as keys.")
+        
 if __name__ == "__main__":
     run_tests()
