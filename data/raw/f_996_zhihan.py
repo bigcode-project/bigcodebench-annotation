@@ -4,36 +4,32 @@ import re
 import csv
 
 def f_996(url="http://example.com", csv_path="emails.csv", 
-                   regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b", 
-                   headers={'User-Agent': 'Mozilla/5.0'}):
+          regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b", 
+          headers={'User-Agent': 'Mozilla/5.0'}):
     """
-Scrapes a web page to extract all email addresses and writes them to a specified CSV file.
+    Scrapes a web page to extract all email addresses using a specified regular expression pattern and writes them to a CSV file. The csv file is
+    always created eventhough no email is found in the url. The header of the csv should be "Emails".
+
+    Parameters:
+    - url (str): The URL of the web page to scrape. Default is "http://example.com".
+    - csv_path (str): The filesystem path where the CSV file should be saved. Default is "emails.csv".
+    - regex (str): The regular expression pattern used to identify email addresses. Default is a pattern that matches common email formats.
+    - headers (dict): The HTTP headers to use for the request. Default includes a User-Agent header.
+
+    Returns:
+    - str: The path to the CSV file where the extracted email addresses have been saved.
+
+    Requirements:
+    - bs4
+    - requests
+    - re
+    - csv
     
-Functionality:
-- Extracts email addresses from the specified URL.
-- Writes the extracted emails to a CSV file at the given path.
-    
-Input:
-- url (str): The URL of the web page to scrape. Default is "http://example.com".
-- csv_path (str): The path where the CSV file should be saved. Default is "emails.csv".
-- regex (str): The regular expression pattern to extract emails. Default is a common email pattern.
-- headers (dict): The headers to use for the request. Default is {'User-Agent': 'Mozilla/5.0'}.
-    
-Output:
-- Returns the path of the CSV file where the emails are saved.
-    
-Requirements:
-- bs4
-- requests
-- re
-- csv
-    
-Example:
->>> f_996()
-"emails.csv"
-    
->>> f_996(url="http://another-example.com", csv_path="another_emails.csv")
-"another_emails.csv"
+    Examples:
+    >>> f_996()
+    'emails.csv'
+    >>> f_996(url="http://another-example.com", csv_path="another_emails.csv")
+    'another_emails.csv'
     """
     response = requests.get(url, headers=headers)
     soup = bs4.BeautifulSoup(response.text, 'html.parser')
@@ -41,7 +37,7 @@ Example:
 
     emails = re.findall(regex, text)
 
-    with open(csv_path, 'w') as f:
+    with open(csv_path, 'w', newline='') as f:
         write = csv.writer(f)
         write.writerow(['Emails'])
         for email in emails:
@@ -53,13 +49,7 @@ import unittest
 from unittest.mock import patch
 import os
 import csv
-
-# Adding the modified function content to the test environment
-
-import bs4
-import requests
-import re
-import csv
+import tempfile
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -68,67 +58,59 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
-    # Mocked HTML content for testing
-    mocked_html_content = """<html>
-        <head><title>Test Page</title></head>
-        <body>
-            <p>Emails: test1@example.com, test2@domain.com, not-an-email</p>
-        </body>
-    </html>"""
+    def setUp(self):
+        # Create a temporary directory to hold any output files
+        self.test_dir = tempfile.mkdtemp()
+        self.addCleanup(lambda: os.rmdir(self.test_dir))
+
+    def tearDown(self):
+        # Clean up all files created during the tests
+        for filename in os.listdir(self.test_dir):
+            os.remove(os.path.join(self.test_dir, filename))
 
     @patch('requests.get')
-    def test_case_1(self, mock_get):
-        # Mocking the response of requests.get
-        mock_get.return_value.text = self.mocked_html_content
-        # Testing with default values
-        result = f_996()
-        self.assertEqual(result, "emails.csv")
-        # Asserting that emails.csv contains the correct emails
-        with open(result, 'r') as f:
-            reader = csv.reader(f)
-            emails = list(reader)
-        self.assertEqual(emails, [['Emails'], ['test1@example.com'], ['test2@domain.com']])
+    def test_extraction_and_saving_default(self, mock_get):
+        """Test extracting emails using default parameters and saving to default path."""
+        mocked_html_content = """<html><body>Emails: test1@example.com, test2@domain.com</body></html>"""
+        mock_get.return_value.text = mocked_html_content
         
-    @patch('requests.get')
-    def test_case_2(self, mock_get):
-        # Mocking the response of requests.get
-        mock_get.return_value.text = self.mocked_html_content
-        # Testing with custom URL and default CSV path
-        result = f_996(url="http://mocked-url.com")
-        self.assertEqual(result, "emails.csv")
+        csv_path = os.path.join(self.test_dir, "emails.csv")
+        with patch('builtins.open', unittest.mock.mock_open()) as mocked_file:
+            f_996(csv_path=csv_path)
+            mocked_file.assert_called_once_with(csv_path, 'w', newline='')
 
     @patch('requests.get')
-    def test_case_3(self, mock_get):
-        # Mocking the response of requests.get
-        mock_get.return_value.text = self.mocked_html_content
-        # Testing with custom URL and custom CSV path
-        result = f_996(url="http://mocked-url.com", csv_path="custom_emails.csv")
-        self.assertEqual(result, "custom_emails.csv")
-
-    @patch('requests.get')
-    def test_case_4(self, mock_get):
-        # Mocking the response of requests.get
-        mock_get.return_value.text = self.mocked_html_content
-        # Testing with custom regex pattern
-        result = f_996(regex=r"\b[A-Za-z0-9._%+-]+@example.com\b")
-        # Since we used a specific regex pattern, only test1@example.com should be extracted
-        with open(result, 'r') as f:
+    def test_extraction_custom_url(self, mock_get):
+        """Test the email extraction from a custom URL and ensure file creation even if no emails are found."""
+        mock_get.return_value.text = "<html><body>No email here</body></html>"
+        csv_path = os.path.join(self.test_dir, "output.csv")
+        result = f_996(url="http://mocked-url.com", csv_path=csv_path)
+        self.assertEqual(result, csv_path)
+        self.assertTrue(os.path.exists(csv_path))  # Ensuring file is created
+        with open(csv_path, 'r') as f:
             reader = csv.reader(f)
-            emails = list(reader)
-        self.assertEqual(emails, [['Emails'], ['test1@example.com']])
-        
-    @patch('requests.get')
-    def test_case_5(self, mock_get):
-        # Mocking the response of requests.get
-        mock_get.return_value.text = self.mocked_html_content
-        # Testing with custom headers
-        result = f_996(headers={'User-Agent': 'Custom-Agent'})
-        self.assertEqual(result, "emails.csv")
+            data = list(reader)
+        self.assertEqual(data, [['Emails']])
 
-# Cleaning up created CSV files after tests
-if os.path.exists("emails.csv"):
-    os.remove("emails.csv")
-if os.path.exists("custom_emails.csv"):
-    os.remove("custom_emails.csv")
+    @patch('requests.get')
+    def test_extraction_custom_regex(self, mock_get):
+        """Test extraction with a custom regex pattern."""
+        mocked_html_content = "<html><body>Email: unique@example.com, other@sample.com</body></html>"
+        mock_get.return_value.text = mocked_html_content
+        csv_path = os.path.join(self.test_dir, "custom_regex.csv")
+        f_996(csv_path=csv_path, regex=r"\b[A-Za-z0-9._%+-]+@example.com\b")
+        with open(csv_path, 'r') as file:
+            reader = csv.reader(file)
+            emails = [row for row in reader]
+        self.assertEqual(emails, [['Emails'], ['unique@example.com']])  # Only matching specific domain
+
+    @patch('requests.get')
+    def test_with_headers_customization(self, mock_get):
+        """Test extraction with customized headers."""
+        mock_get.return_value.text = "<html><body>Email: info@test.com</body></html>"
+        csv_path = os.path.join(self.test_dir, "headers.csv")
+        f_996(csv_path=csv_path, headers={'User-Agent': 'Custom-Agent'})
+        self.assertTrue(os.path.exists(csv_path))
+
 if __name__ == "__main__":
     run_tests()
