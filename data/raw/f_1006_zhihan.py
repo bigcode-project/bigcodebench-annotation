@@ -1,23 +1,24 @@
 import os
 import re
 
-# Constants
-log_dir = '/var/log/'
-
 def f_1006(pattern, log_dir='/var/log/'):
     """
-    Find the latest log file in a directory that matches a given regex pattern.
+    Find the latest log file in a specified directory that matches a given regex pattern.
+
+    This function searches through all files in the specified directory, filters them based on the provided regex pattern, 
+    and returns the path to the most recent log file based on modification time. If no files match the pattern or the directory 
+    is empty, the function returns None.
 
     Parameters:
-    pattern (str): The regex pattern to match the log files.
+        pattern (str): The regex pattern to match the names of the log files.
+        log_dir (str, optional): The directory to search for log files. Defaults to '/var/log/'.
 
     Returns:
-    str: The path of the most recent log file.
+        str or None: The path to the most recent log file that matches the pattern, or None if no matching files are found.
 
     Requirements:
     - os
     - re
-    - datetime
 
     Example:
     >>> f_1006(r'^access.log.[0-9]+$', '/var/log/')
@@ -29,7 +30,7 @@ def f_1006(pattern, log_dir='/var/log/'):
     return os.path.join(log_dir, log_files[0]) if log_files else None
 
 import unittest
-from unittest.mock import patch, mock_open
+from unittest.mock import patch
 import os
 import re
 
