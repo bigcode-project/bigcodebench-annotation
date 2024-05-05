@@ -1,5 +1,4 @@
 import warnings
-import unittest
 import sklearn.model_selection as model_selection
 import sklearn.svm as svm
 import sklearn.datasets as datasets
@@ -44,6 +43,8 @@ def f_703():
         warnings.warn(warning_msg)
 
     return accuracy, warning_msg
+
+import unittest
 
 class TestCases(unittest.TestCase):
     def test_high_accuracy(self):
