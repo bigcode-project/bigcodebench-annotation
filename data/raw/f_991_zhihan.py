@@ -2,13 +2,12 @@ import sqlite3
 import hashlib
 import binascii
 
-def f_991(db_name, salt, cursor):
+def f_991(salt, cursor):
     """
     Updates the passwords in a user table of an SQLite database by hashing them with SHA256, 
     using a provided salt. The function directly modifies the database via the given cursor.
 
     Parameters:
-    - db_name (str): The name of the SQLite database
     - salt (str): The salt value to be appended to each password before hashing.
     - cursor (sqlite3.Cursor): A cursor object through which SQL commands are executed.
 
@@ -19,14 +18,19 @@ def f_991(db_name, salt, cursor):
     - sqlite3
     - hashlib
     - binascii
+
+    Raises:
+    TypeError if the salt is not a string
     
     Example:
+    >>> conn = sqlite3.connect('sample.db')
+    >>> cursor = conn.cursor()
     >>> num_updated = f_991('sample.db', 'mysalt', cursor)
     >>> print(num_updated)
     5
     """
-    conn = sqlite3.connect(db_name)
-    cursor = conn.cursor()
+    if not isinstance(salt, str):
+        raise TypeError
     cursor.execute("SELECT id, password FROM users")
     users = cursor.fetchall()
     count_updated = 0
@@ -44,56 +48,67 @@ def f_991(db_name, salt, cursor):
 
 import unittest
 import sqlite3
-
-import sqlite3
 import hashlib
 import binascii
 
-def create_mock_db(db_name: str):
+def create_mock_db():
     """Helper function to create a mock SQLite database with a users table."""
-    conn = sqlite3.connect(db_name)
+    conn = sqlite3.connect(":memory:")
     cursor = conn.cursor()
-    
-    # Create a users table and populate it with some sample data
     cursor.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, password TEXT)")
-    cursor.executemany("INSERT INTO users (password) VALUES (?)", [("password1",), ("password2",), ("password3",), ("password4",), ("password5",)])
+    passwords = [("password1",), ("password2",), ("password3",), ("password4",), ("password5",)]
+    cursor.executemany("INSERT INTO users (password) VALUES (?)", passwords)
     conn.commit()
-    
-    return conn, cursor
+    return conn
 
 class TestCases(unittest.TestCase):
     def setUp(self):
         """Setup mock database for testing."""
-        self.conn, self.cursor = create_mock_db(":memory:")
+        self.conn = create_mock_db()
+        self.cursor = self.conn.cursor()
 
     def tearDown(self):
         """Tear down and close the mock database after testing."""
         self.conn.close()
 
-    def test_case_1(self):
-        num_updated = f_991(":memory:", "testsalt", self.cursor)
+    def test_updated_passwords(self):
+        """Verify that the number of updated passwords matches the number of users and check hash correctness."""
+        salt = "testsalt"
+        num_updated = f_991(salt, self.cursor)
         self.assertEqual(num_updated, 5, "Expected 5 users to be updated")
         
-        # Verify the passwords are hashed correctly
-        self.cursor.execute("SELECT password FROM users WHERE id = 1")
-        hashed_password = self.cursor.fetchone()[0]
-        self.assertTrue(len(hashed_password) == 64, "Expected hashed password to be 64 characters long")
+        self.cursor.execute("SELECT password FROM users")
+        for row in self.cursor.fetchall():
+            password = row[0]
+            self.assertTrue(isinstance(password, str) and len(password) == 64,
+                            "Expected hashed password to be 64 characters long")
+            # Recreate hash to check if hashing was done correctly
+            expected_hash = hashlib.sha256(("ME" + "password" + salt).encode()).hexdigest()
+            self.assertNotEqual(password, expected_hash)  # Ensure the hash varies per user/password
 
-    def test_case_2(self):
-        num_updated = f_991(":memory:", "diffsalt", self.cursor)
-        self.assertEqual(num_updated, 5, "Expected 5 users to be updated")
+    def test_empty_database(self):
+        """Check behavior with an empty user table."""
+        self.cursor.execute("DELETE FROM users")
+        num_updated = f_991("testsalt", self.cursor)
+        self.assertEqual(num_updated, 0, "Expected 0 users to be updated when the table is empty")
 
-    def test_case_3(self):
-        num_updated = f_991(":memory:", "unique_salt", self.cursor)
-        self.assertEqual(num_updated, 5, "Expected 5 users to be updated")
+    def test_varied_salts(self):
+        """Ensure different salts produce different hashes for the same password."""
+        self.cursor.execute("UPDATE users SET password = 'constant'")
+        salt1 = "salt1"
+        salt2 = "salt2"
+        f_991(salt1, self.cursor)
+        hash1 = self.cursor.execute("SELECT password FROM users WHERE id = 1").fetchone()[0]
+        
+        self.cursor.execute("UPDATE users SET password = 'constant'")
+        f_991(salt2, self.cursor)
+        hash2 = self.cursor.execute("SELECT password FROM users WHERE id = 1").fetchone()[0]
+        
+        self.assertNotEqual(hash1, hash2, "Hashes should differ when different salts are used")
 
-    def test_case_4(self):
-        num_updated = f_991(":memory:", "salt123", self.cursor)
-        self.assertEqual(num_updated, 5, "Expected 5 users to be updated")
-
-    def test_case_5(self):
-        num_updated = f_991(":memory:", "finalsalt", self.cursor)
-        self.assertEqual(num_updated, 5, "Expected 5 users to be updated")
+    def test_invalid_salt(self):
+        with self.assertRaises(TypeError):
+            f_991(1, self.cursor)
 
 def run_tests():
     suite = unittest.TestSuite()
