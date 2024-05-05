@@ -9,7 +9,8 @@ PENALTY_COST = 1000  # in dollars
 
 def f_479(goals, penalties):
     """
-    Generate and visualize a Pandas DataFrame of the results of football matches for multiple teams with random goals and penalties. Penalties are converted into fines according to penalty costs.
+    Generate and visualize a Pandas DataFrame of the results of football matches for multiple teams 'Team' with
+    random goals 'Goals' and penalties 'Penalty Cost'. Penalties are converted into fines according to penalty costs.
 
     Parameters:
     goals (int): The maximum number of goals a team can score in a match.

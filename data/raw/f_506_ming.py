@@ -45,11 +45,11 @@ def f_506(filename: str) -> pd.DataFrame:
 
 import unittest
 import shutil
-
+OUTPUT_DIR = r'./output'
 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.output_dir = './output'
+        self.output_dir = OUTPUT_DIR
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 

@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans
 def f_484(L):
     """
     Convert a list of lists into a list of integers, apply the KMeans clustering, 
-    and return a scatter plot with data points color-coded by their cluster.
+    and return a scatter plot 'matplotlib.axes.Axes' with data points color-coded by their cluster.
 
     Requirements:
     - itertools.chain

@@ -6,9 +6,9 @@ import pandas as pd
 def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
     """
     Searches for files in the specified directory that match a given regex pattern.
-
     This function walks through the directory, matches filenames against the pattern,
-    and saves the matched file paths to a CSV file. It returns a DataFrame of these paths.
+    and saves the matched file paths to a CSV file. It returns a DataFrame of these paths
+    with colomn 'File Path'.
 
     Parameters:
     - pattern (str): Regex pattern to match filenames.
@@ -41,12 +41,12 @@ def f_502(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
 import unittest
 import shutil
 
-output_dir = './output'
+OUTPUT_DIR = './output'
 
 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.test_dir = output_dir
+        self.test_dir = OUTPUT_DIR
         if not os.path.exists(self.test_dir):
             os.makedirs(self.test_dir)
 

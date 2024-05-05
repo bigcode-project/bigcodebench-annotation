@@ -5,11 +5,9 @@ import pandas as pd
 
 def f_488(products_list):
     """
-    Generate a DataFrame of sales data for a list of products.
-    
-    Functionality:
-    This function takes in a list of product names and generates random sales data for each product over a period of 12 months.
-    It then calculates the average sales for each product and returns the results as a pandas DataFrame.
+    This function takes in a list of product names and generates random sales data for each product over a period of
+    12 months. It then calculates the average sales for each product and returns the results as a pandas DataFrame with
+    columns: 'Product', 'Month 1', 'Month 2', ..., 'Month 12', 'Average Sales'..
     
     Parameters:
     products_list (list): A list of product names.

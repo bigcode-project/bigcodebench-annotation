@@ -4,7 +4,7 @@ from nltk.corpus import stopwords
 
 def f_494(text: str) -> dict:
     """
-    Analyzes a given text string by removing duplicate words and stopwords, 
+    Analyzes a given text string by removing duplicate words and stopwords defined by nltk.corpus ,
     and then returns a frequency distribution of the remaining words.
 
     Parameters:

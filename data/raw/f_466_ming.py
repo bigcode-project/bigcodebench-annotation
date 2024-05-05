@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 
 def f_466(matrix):
     """
-    Visualize a 2D numeric array (matrix) as a heatmap using matplotlib.
+    Visualize a 2D numeric array (matrix) as a heatmap using matplotlib, specifying a cmap for the color mapping
+    and interpolation to control the pixel rendering.
     
     Parameters:
     matrix (array): The 2D numpy array.

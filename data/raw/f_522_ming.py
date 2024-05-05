@@ -8,7 +8,7 @@ LABELS = ['H\u2082O', 'O\u2082', 'CO\u2082', 'N\u2082', 'Ar']
 
 def f_522(x, y, labels):
     """
-    Create a heatmap using the seaborn library for "x" and "y" numpy arrays with labels.
+    Create a heatmap using the seaborn library for "x" as x-values and "y" as y-values with labels.
 
     Parameters:
     x (list): List of numpy arrays representing the x-values of the data points.
@@ -52,7 +52,6 @@ def run_tests():
 
 
 class TestCases(unittest.TestCase):
-    # (test cases will be same as above)
 
     def test_case_1(self):
         x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]

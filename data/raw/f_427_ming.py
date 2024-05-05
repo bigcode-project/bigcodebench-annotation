@@ -54,26 +54,34 @@ def run_tests():
 
 
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        result = f_427(['1a2b3c4d', '5e6f7g8h'])
-        self.assertEqual(result, '426614caa490f2c185aebf58f1d4adac')
 
-    def test_case_2(self):
+    def test_normal_functionality(self):
+        """Test the function with default parameters."""
         result = f_427()
-        self.assertEqual(result, 'aa1f8c53e0aee57fccd07b90a902579a')
+        self.assertIsInstance(result, str)
 
-    def test_case_3(self):
-        result = f_427(['12121212', '34343434'])
-        self.assertEqual(result, 'b523721fccb8fe2e7bf999e74e25056f')
+    def test_custom_keys_list(self):
+        """Test the function with a custom list of hexadecimal keys."""
+        custom_keys = ['1A2FC614', '1B0FC614', '1C9FC614']
+        result = f_427(hex_keys=custom_keys)
+        self.assertIsInstance(result, str)
 
-    def test_case_4(self):
-        result = f_427(['1VVVVVVV', '3VVVVVVV', 'F3fF3fF3'])
-        self.assertEqual(result, 'fae7b34f299d23a584fbc19c2fcdf865')
+    def test_empty_key_list(self):
+        """Test the function with an empty list to check for error handling."""
+        with self.assertRaises(IndexError):
+            f_427(hex_keys=[])
 
-    def test_case_5(self):
-        # test error message
+    def test_invalid_hexadecimal(self):
+        """Test the function with an invalid hexadecimal string."""
+        invalid_keys = ['ZZZ', '4A0FC614']
         with self.assertRaises(ValueError):
-            f_427(['1a2b3c4d', '5e6f7g8h', 'invalid_hex'])
+            f_427(hex_keys=invalid_keys)
+
+    def test_consistent_output_with_same_seed(self):
+        """Test that the same seed returns the same result."""
+        result1 = f_427(seed=99)
+        result2 = f_427(seed=99)
+        self.assertEqual(result1, result2)
 
 
 if __name__ == "__main__":

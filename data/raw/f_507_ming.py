@@ -1,9 +1,9 @@
 import os
 import pandas as pd
 from dateutil.parser import parse
-output_dir = './output'
+OUTPUT_DIR = './output'
 
-def f_507(csv_path=os.path.join(output_dir, 'data.csv'), date_column='date'):
+def f_507(csv_path=os.path.join(OUTPUT_DIR, 'data.csv'), date_column='date'):
     """
     Read a CSV file, convert a column of date strings into datetime objects,
     and draw a histogram of the year distribution of these dates.
@@ -47,7 +47,7 @@ import matplotlib.pyplot as plt
 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.output_dir = './output'
+        self.output_dir = OUTPUT_DIR
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 

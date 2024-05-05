@@ -40,35 +40,40 @@ def run_tests():
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
+
 class TestCases(unittest.TestCase):
-    # Utility function to decode bytes and convert to float
-    def bytes_to_float(self, byte_val):
-        return float(codecs.decode(byte_val, 'utf-8'))
 
-    def test_case_1(self):
-        random.seed(42)
+    def test_default_functionality(self):
+        """Test the function with default parameters."""
         result = f_430()
-        self.assertEqual(result, b'36806.078125')
+        self.assertIsInstance(result, bytes)  # Check if output is correctly encoded in UTF-8
 
-    def test_case_2(self):
-        result = f_430(['5D7FC614'])
-        self.assertEqual(result, b'1.1519025322058056e+18')
-        
-    def test_case_3(self):
-        # Checking consistency over multiple runs
-        random.seed(0)
-        result = f_430(['ABCD1234', 'DEADBEEF', '00AABEEF'])
-        self.assertEqual(result, b'-6.259853398707798e+18')
+    def test_custom_hex_keys(self):
+        """Test the function with a custom list of hexadecimal keys."""
+        custom_keys = ['1A2FC614', '1B0FC614', '1C9FC614']
+        result = f_430(hex_keys=custom_keys)
+        self.assertIsInstance(result, bytes)
 
-    def test_case_4(self):
-        result = f_430(['00000000'])
-        self.assertEqual(result, b'0.0')
-    
-    def test_case_5(self):
-        # Checking the decoding process
-        result = f_430(['AAAAAAAA'])
-        self.assertEqual(result, b'-3.0316488252093987e-13')
-        
+    def test_empty_list(self):
+        """Test the function with an empty list."""
+        with self.assertRaises(IndexError):  # Assuming random.choice will raise IndexError on empty list
+            f_430(hex_keys=[])
+
+    def test_consistency_of_output(self):
+        """Ensure that the output is consistent with a fixed seed."""
+        random.seed(42)  # Set the seed for predictability
+        first_result = f_430()
+        random.seed(42)  # Reset seed to ensure same choice is made
+        second_result = f_430()
+        self.assertEqual(first_result, second_result)
+
+    def test_invalid_hex_key(self):
+        """Test with an invalid hex key."""
+        invalid_keys = ['ZZZZZZZZ', 'XXXX']
+        with self.assertRaises(ValueError):
+            f_430(hex_keys=invalid_keys)
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

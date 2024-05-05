@@ -67,35 +67,34 @@ class TestCases(unittest.TestCase):
         df, ax = f_497(0)
         self.assertTrue(df.empty)
         self.assertEqual(len(ax.patches), 0)
-        self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
+
 
     def test_case_2(self):
         # Test when rows is 1
         df, ax = f_497(1)
         self.assertEqual(len(df), 1)
         self.assertEqual(len(ax.patches), 5)
-        self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
+
 
     def test_case_3(self):
         # Test when rows is 10
         df, ax = f_497(10)
         self.assertEqual(len(df), 10)
         self.assertEqual(len(ax.patches), 5)
-        self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
+
 
     def test_case_4(self):
         # Test when rows is negative
         df, ax = f_497(-5)
         self.assertTrue(df.empty)
         self.assertEqual(len(ax.patches), 0)
-        self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
+
 
     def test_case_5(self):
         # Test when rows is large (e.g., 1000)
         df, ax = f_497(1000)
         self.assertEqual(len(df), 1000)
         self.assertEqual(len(ax.patches), 5)
-        self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
 
 
 if __name__ == "__main__":

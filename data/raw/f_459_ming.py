@@ -6,10 +6,11 @@ LETTERS = list('abcdefghijklmnopqrstuvwxyz')
 
 def f_459(data, letter):
     """
-    Filters rows in a DataFrame where the 'Name' column values start with a specified letter.
+    Filters rows in a dictionary where the 'Name' column values start with a specified letter.
+    First, convert the dict to a DataFrame and then filter rows in this DataFrame.
 
     Parameters:
-    - df (dic): The input dict. It should have a 'Name' key.
+    - df (dic of list): The input dict. It should have a 'Name' key.
     - letter (str): The letter to filter the 'Name' column by.
 
     Returns:

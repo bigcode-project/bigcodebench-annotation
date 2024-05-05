@@ -4,11 +4,11 @@ import pandas as pd
 
 def f_433(df):
     """
-    Encodes a Pandas DataFrame as a Base64 string. The DataFrame is first converted to CSV format,
-    then encoded to bytes, and finally encoded to a Base64 string.
+    Encodes a dict of list as a Base64 string. The dict is first converted to a Pandas DataFrame.
+    Then convert the data franme to CSV format and encoded to bytes, finally encoded it to a Base64 string.
 
     Parameters:
-        df (DataFrame): The pandas DataFrame to be encoded.
+        df (dict of list): A dictionary where the key 'Word' maps to a list of strings.
 
     Returns:
         str: The Base64 encoded string of the DataFrame's CSV representation.
@@ -36,6 +36,7 @@ def f_433(df):
 
 import unittest
 from io import StringIO
+
 
 class TestCases(unittest.TestCase):
     def test_encode_basic_dataframe(self):

@@ -1,6 +1,6 @@
 import pandas as pd
 import time
-output_dir = './output'
+OUTPUT_DIR = './output'
 
 
 def f_493(df: pd.DataFrame, filename: str) -> str:
@@ -25,10 +25,10 @@ def f_493(df: pd.DataFrame, filename: str) -> str:
     """
     start_time = time.time()
     # Ensure the data directory exists
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
 
-    file_path = os.path.join(output_dir, filename)
+    file_path = os.path.join(OUTPUT_DIR, filename)
 
     # Save DataFrame as JSON Lines
     with open(file_path, 'w') as file:
@@ -51,12 +51,12 @@ class TestCases(unittest.TestCase):
     @classmethod
     def setUp(self):
         """Create the data directory if it doesn't exist."""
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        if not os.path.exists(OUTPUT_DIR):
+            os.makedirs(OUTPUT_DIR)
 
     def tearDown(self):
         """Clean up by removing the data directory and its contents after tests."""
-        shutil.rmtree(output_dir, ignore_errors=True)
+        shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
 
     def test_basic_dataframe(self):
         """Ensure basic DataFrame is saved correctly."""

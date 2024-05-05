@@ -24,6 +24,7 @@ def f_463(df, letter):
     >>> import pandas as pd
     >>> words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
     >>> df = pd.DataFrame({'Word': words})
+    >>> _ = f_463(df, 'apple')
     """
     start_time = time.time()
     # Validate if 'Word' column exists in df
