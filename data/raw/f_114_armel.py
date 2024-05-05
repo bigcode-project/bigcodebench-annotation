@@ -1,5 +1,3 @@
-import pandas as pd
-import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
@@ -13,6 +11,7 @@ def f_114(df):
 
     Returns:
     DataFrame: A pandas DataFrame after normalization.
+    Axes: A matplotlib Axes displaying a box plot for each column.
 
     Requirements:
     - pandas
@@ -21,8 +20,15 @@ def f_114(df):
     - matplotlib.pyplot
 
     Example:
+    >>> import pandas as pd
+    >>> import numpy as np
     >>> df = pd.DataFrame([[1,2,3],[4,5,6],[7.0,np.nan,9.0]], columns=["c1","c2","c3"])
-    >>> f_114(df)
+    >>> df, ax = f_114(df)
+    >>> print(df)
+        c1   c2   c3
+    0  0.0  0.0  0.0
+    1  0.5  1.0  0.5
+    2  1.0  0.5  1.0
     """
     df = df.fillna(df.mean(axis=0))
     scaler = MinMaxScaler()
@@ -33,7 +39,8 @@ def f_114(df):
 
 
 import unittest
-
+import pandas as pd
+import numpy as np
 
 class TestCases(unittest.TestCase):
     """Test cases for the f_114 function."""

@@ -40,12 +40,12 @@ def f_120(timestamp):
     Example:
     >>> df, ax = f_120(1347517370)
     >>> print(df)
-                Timezone             Datetime
-    0   America/New_York 2012-09-13 04:49:30
-    1      Europe/London 2012-09-13 09:49:30
-    2      Asia/Shanghai 2012-09-13 16:49:30
-    3         Asia/Tokyo 2012-09-13 17:49:30
-    4   Australia/Sydney 2012-09-13 19:49:30
+               Timezone            Datetime
+    0  America/New_York 2012-09-13 02:22:50
+    1     Europe/London 2012-09-13 07:22:50
+    2     Asia/Shanghai 2012-09-13 14:22:50
+    3        Asia/Tokyo 2012-09-13 15:22:50
+    4  Australia/Sydney 2012-09-13 16:22:50
     """
     datetimes = [
         datetime.fromtimestamp(timestamp, pytz.timezone(tz)).strftime(DATE_FORMAT)

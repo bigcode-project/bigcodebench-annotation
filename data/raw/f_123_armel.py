@@ -1,9 +1,8 @@
-import pandas as pd
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 
 
-def f_123(df: pd.DataFrame, age: int, height: int) -> pd.DataFrame:
+def f_123(df, age: int, height: int):
     """
     Filters the input DataFrame based on specified 'Age' and 'Height' conditions and applies KMeans clustering.
     - If the filtered dataframe has less than 3  columns, add to it a column 'Cluster' with 0 for each row.
@@ -22,14 +21,20 @@ def f_123(df: pd.DataFrame, age: int, height: int) -> pd.DataFrame:
     matplotlib.axes.Axes: The Axes object of the plotted data. If no KMeans was done, returns None.
 
     Requirements:
-    - pandas
     - sklearn
     - matplotlib
 
     Example:
-    >>> text = "This is a sample text. This text contains sample words."
-    >>> word_counts = f_124(text)
-    >>> print(word_counts)
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({
+    ...     'Age': [30, 45, 60, 75],
+    ...     'Height': [160, 170, 165, 190],
+    ...     'Weight': [55, 65, 75, 85]
+    ... })
+    >>> selected_df, ax = f_123(df, 50, 180)
+    >>> print(selected_df)
+       Age  Height  Weight  Cluster
+    2   60     165      75        0
     """
     # Filter the DataFrame based on given conditions
     selected_df = df[(df["Age"] > age) & (df["Height"] < height)].copy()
@@ -53,6 +58,7 @@ def f_123(df: pd.DataFrame, age: int, height: int) -> pd.DataFrame:
 
 
 import unittest
+import pandas as pd
 
 
 class TestCases(unittest.TestCase):

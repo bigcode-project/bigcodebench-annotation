@@ -2,13 +2,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def f_121(df, age, height):
+def f_121(array, age, height):
     """
-    Select rows in Pandas DataFrame df, where the value in the "Age" column is greater than age and the value in the "Height" column is smaller than height.
+    Given a 2D input array containing where the first three rows correspond to 'Age', 'Height', 'Weight' and each column denotes an individual. Convert this array into a pandas dataframes with column names 'Age', 'Height', 'Weight' and name the remaining rows as 'Feature 1', 'Feature 2', ... 'Feature k'. Then select rows in Pandas DataFrame df, where the value in the "Age" column is greater than age and the value in the "Height" column is smaller than height.
     It then plots the selected data as a scatter plot with 'Age' on the x-axis and 'Height' on the y-axis.
 
     Parameters:
-    df (pd.DataFrame): The input DataFrame.
+    array (np.array): The input array.
     age (int): The minimum age for selection.
     height (int): The maximum height for selection.
 
@@ -21,34 +21,41 @@ def f_121(df, age, height):
     - matplotlib.pyplot
 
     Example:
-    >>> df = pd.DataFrame({
-    ...     'Age': [30, 45, 60, 75],
-    ...     'Height': [160, 170, 180, 190],
-    ...     'Weight': [55, 65, 75, 85]
-    ... })
-    >>> selected_df, ax = f_121(df, 50, 185)
+    >>> import numpy as np
+    >>> array = np.array([
+    ...    [30, 45, 60, 75],
+    ...    [160, 170, 180, 190],
+    ...    [55, 65, 75, 85]
+    ... ])
+    >>> selected_df, ax = f_121(array, 50, 185)
+    >>> print(selected_df)
+       Age  Height  Weight
+    2   60     180      75
     """
+    columns = ["Age", "Height", "Weight"] + [
+        f"Feature {i+1}" for i in range(array.shape[0] - 3)
+    ]
+    df = pd.DataFrame(array.T, columns=columns)
     selected_df = df[(df["Age"] > age) & (df["Height"] < height)]
     ax = selected_df.plot(kind="scatter", x="Age", y="Height", title=None)
     return selected_df, ax
 
 
 import unittest
-import pandas as pd
 from faker import Faker
 
 
 def generate_dataframe(num_records=100):
     fake = Faker()
     Faker.seed(0)
-    data = {
-        "Name": [fake.name() for _ in range(num_records)],
-        "Age": [fake.random_int(min=0, max=100) for _ in range(num_records)],
-        "Height": [fake.random_int(min=150, max=200) for _ in range(num_records)],
-        "Weight": [fake.random_int(min=50, max=100) for _ in range(num_records)],
-        "Address": [fake.address() for _ in range(num_records)],
-        "Email": [fake.email() for _ in range(num_records)],
-    }
+    data = [
+        [fake.random_int(min=0, max=100) for _ in range(num_records)],
+        [fake.random_int(min=150, max=200) for _ in range(num_records)],
+        [fake.random_int(min=50, max=100) for _ in range(num_records)],
+        [fake.name() for _ in range(num_records)],
+        [fake.address() for _ in range(num_records)],
+        [fake.email() for _ in range(num_records)],
+    ]
     return pd.DataFrame(data)
 
 

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 def f_115(df: pd.DataFrame):
     """
-    Perform PCA on a DataFrame (excluding non-numeric columns) and draw a scatter plot of the first two main components.
+    Perform PCA on a DataFrame (excluding non-numeric columns) and draw a scatter plot of the first two main components. The principal columns should be name 'Component 1' and 'Component 2'.
     Missing values are replaced by column's average.
 
     Parameters:
@@ -26,6 +26,11 @@ def f_115(df: pd.DataFrame):
     Example:
     >>> df = pd.DataFrame([[1,2,3],[4,5,6],[7.0,np.nan,9.0]], columns=["c1","c2","c3"])
     >>> principalDf, ax = f_115(df)
+    >>> print(principalDf)
+       Component 1  Component 2
+    0     4.450915    -0.662840
+    1    -0.286236     1.472436
+    2    -4.164679    -0.809596
     """
     # Select only numeric columns
     df_numeric = df.select_dtypes(include=[np.number])
@@ -36,13 +41,11 @@ def f_115(df: pd.DataFrame):
     principalComponents = pca.fit_transform(df_numeric)
     principalDf = pd.DataFrame(
         data=principalComponents,
-        columns=["principal component 1", "principal component 2"],
+        columns=["Component 1", "Component 2"],
     )
 
     # Plot scatter plot
-    ax = sns.scatterplot(
-        data=principalDf, x="principal component 1", y="principal component 2"
-    )
+    ax = sns.scatterplot(data=principalDf, x="Component 1", y="Component 2")
     plt.show()
     return principalDf, ax
 
@@ -57,11 +60,11 @@ class TestCases(unittest.TestCase):
             [[1, 2, 3], [4, 5, 6], [7.0, np.nan, 9.0]], columns=["c1", "c2", "c3"]
         )
         principalDf, ax = f_115(df)
-        self.assertTrue("principal component 1" in principalDf.columns)
-        self.assertTrue("principal component 2" in principalDf.columns)
+        self.assertTrue("Component 1" in principalDf.columns)
+        self.assertTrue("Component 2" in principalDf.columns)
         self.assertEqual(principalDf.shape, (3, 2))
-        self.assertEqual(ax.get_xlabel(), "principal component 1")
-        self.assertEqual(ax.get_ylabel(), "principal component 2")
+        self.assertEqual(ax.get_xlabel(), "Component 1")
+        self.assertEqual(ax.get_ylabel(), "Component 2")
 
     def test_case_2(self):
         df = pd.DataFrame(
@@ -74,11 +77,11 @@ class TestCases(unittest.TestCase):
             }
         )
         principalDf, ax = f_115(df)
-        self.assertTrue("principal component 1" in principalDf.columns)
-        self.assertTrue("principal component 2" in principalDf.columns)
+        self.assertTrue("Component 1" in principalDf.columns)
+        self.assertTrue("Component 2" in principalDf.columns)
         self.assertEqual(principalDf.shape, (5, 2))
-        self.assertEqual(ax.get_xlabel(), "principal component 1")
-        self.assertEqual(ax.get_ylabel(), "principal component 2")
+        self.assertEqual(ax.get_xlabel(), "Component 1")
+        self.assertEqual(ax.get_ylabel(), "Component 2")
 
     def test_case_3(self):
         df = pd.DataFrame(
@@ -89,11 +92,11 @@ class TestCases(unittest.TestCase):
             }
         )
         principalDf, ax = f_115(df)
-        self.assertTrue("principal component 1" in principalDf.columns)
-        self.assertTrue("principal component 2" in principalDf.columns)
+        self.assertTrue("Component 1" in principalDf.columns)
+        self.assertTrue("Component 2" in principalDf.columns)
         self.assertEqual(principalDf.shape, (4, 2))
-        self.assertEqual(ax.get_xlabel(), "principal component 1")
-        self.assertEqual(ax.get_ylabel(), "principal component 2")
+        self.assertEqual(ax.get_xlabel(), "Component 1")
+        self.assertEqual(ax.get_ylabel(), "Component 2")
 
     def test_case_4(self):
         df = pd.DataFrame(
@@ -104,20 +107,20 @@ class TestCases(unittest.TestCase):
             }
         )
         principalDf, ax = f_115(df)
-        self.assertTrue("principal component 1" in principalDf.columns)
-        self.assertTrue("principal component 2" in principalDf.columns)
+        self.assertTrue("Component 1" in principalDf.columns)
+        self.assertTrue("Component 2" in principalDf.columns)
         self.assertEqual(principalDf.shape, (10, 2))
-        self.assertEqual(ax.get_xlabel(), "principal component 1")
-        self.assertEqual(ax.get_ylabel(), "principal component 2")
+        self.assertEqual(ax.get_xlabel(), "Component 1")
+        self.assertEqual(ax.get_ylabel(), "Component 2")
 
     def test_case_5(self):
         df = pd.DataFrame({"c1": [1] * 10, "c2": [2] * 10, "c3": [3] * 10})
         principalDf, ax = f_115(df)
-        self.assertTrue("principal component 1" in principalDf.columns)
-        self.assertTrue("principal component 2" in principalDf.columns)
+        self.assertTrue("Component 1" in principalDf.columns)
+        self.assertTrue("Component 2" in principalDf.columns)
         self.assertEqual(principalDf.shape, (10, 2))
-        self.assertEqual(ax.get_xlabel(), "principal component 1")
-        self.assertEqual(ax.get_ylabel(), "principal component 2")
+        self.assertEqual(ax.get_xlabel(), "Component 1")
+        self.assertEqual(ax.get_ylabel(), "Component 2")
 
 
 def run_tests():

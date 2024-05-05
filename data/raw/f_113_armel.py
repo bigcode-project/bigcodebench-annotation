@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -18,14 +17,25 @@ def f_113(df):
                     Each plot visualizes the distribution of data in the respective column with 10 bins.
 
     Requirements:
-    - pandas
     - numpy
     - seaborn
     - matplotlib.pyplot
 
     Example:
+    >>> import pandas as pd
+    >>> import numpy as np
     >>> df = pd.DataFrame([[1,2,3],[4,5,6],[7.0,np.nan,9.0]], columns=["c1","c2","c3"])
     >>> description, plots = f_113(df)
+    >>> print(description)
+            c1    c2   c3
+    count  3.0  3.00  3.0
+    mean   4.0  3.50  6.0
+    std    3.0  1.50  3.0
+    min    1.0  2.00  3.0
+    25%    2.5  2.75  4.5
+    50%    4.0  3.50  6.0
+    75%    5.5  4.25  7.5
+    max    7.0  5.00  9.0
     """
     df = df.fillna(df.mean(axis=0))
     description = df.describe()
@@ -37,6 +47,7 @@ def f_113(df):
 
 
 import unittest
+import pandas as pd
 
 
 class TestCases(unittest.TestCase):

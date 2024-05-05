@@ -1,13 +1,12 @@
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
 
-def f_111(data_matrix, n_components):
+def f_111(data_matrix, n_components=2):
     """
     Apply PCA with n_components components to a 2D data matrix, calculate the mean value of each component, and then return the cumulative explained variance of the components in a plot.
-    - The function returns a dataframe with columns 'Component 1', 'Component 2' etc.
+    - The function returns a dataframe with columns 'Component 1', 'Component 2', ... etc.
     - Each row of the dataframe correspond to a row of the original matrix mapped in the PCA space.
     - The dataframe should also include a column 'Mean' which is the average value of each component value per row
     - Create a plot of the cumulative explained variance.
@@ -22,15 +21,18 @@ def f_111(data_matrix, n_components):
         - matplotlib.axes._subplots.AxesSubplot: A plot showing the cumulative explained variance of the components.
 
     Requirements:
-    - numpy
     - pandas
     - matplotlib.pyplot
-    - sklearn.decomposition.PCA
+    - sklearn.decomposition
 
     Example:
+    >>> import numpy as np
     >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
     >>> df, ax = f_111(data)
     >>> print(df)
+       Component 1   Component 2      Mean
+    0     5.700877  2.163271e-16  2.850439
+    1    -5.700877  2.163271e-16 -2.850439
     """
     pca = PCA(n_components=n_components)
     transformed_data = pca.fit_transform(data_matrix)
@@ -49,7 +51,7 @@ def f_111(data_matrix, n_components):
 
 
 import unittest
-
+import numpy as np
 
 class TestCases(unittest.TestCase):
     """Test cases for the f_111 function."""
@@ -95,6 +97,8 @@ class TestCases(unittest.TestCase):
         expected_columns = min(data.shape) + 1
         self.assertEqual(df.shape[1], expected_columns)
         self.assertTrue("Mean" in df.columns)
+        self.assertTrue("Component 1" in df.columns)
+        self.assertTrue("Component 2" in df.columns)
         self.assertEqual(ax.get_xlabel(), "Number of Components")
         self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
 

@@ -29,10 +29,12 @@ def f_125(text):
     - matplotlib.pyplot
 
     Example:
-    >>> text = "Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA\nName: Jane Doe, Email: jane.doe@example.com, Age: 25, Country: UK"
+    >>> text = 'Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA\nName: Jane Doe, Email: jane.doe@example.com, Age: 25, Country: UK'
     >>> df = f_125(text)
     >>> print(df)
-    >>> sns.histplot(data=df, x='Age')
+           Name                 Email  Age Country
+    0  John Doe  john.doe@example.com   30     USA
+    1  Jane Doe  jane.doe@example.com   25      UK
     """
     pattern = r"Name: (.*?), Email: (.*?), Age: (.*?), Country: (.*?)($|\n)"
     matches = re.findall(pattern, text)

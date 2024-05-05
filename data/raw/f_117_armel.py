@@ -1,5 +1,3 @@
-import pandas as pd
-import numpy as np
 from sklearn.preprocessing import StandardScaler
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -17,17 +15,20 @@ def f_117(df):
     - AxesSubplot: A heatmap of the correlation matrix.
 
     Requirements:
-    - pandas
-    - numpy
     - sklearn.preprocessing.StandardScaler
     - seaborn
     - matplotlib.pyplot
 
     Example:
+    >>> import pandas as pd
+    >>> import numpy as np
     >>> df = pd.DataFrame([[1,2,3],[4,5,6],[7.0,np.nan,9.0]], columns=["c1","c2","c3"])
     >>> standardized_df, heatmap = f_117(df)
     >>> print(standardized_df)
-    # Output DataFrame here
+             c1        c2        c3
+    0 -1.224745 -1.224745 -1.224745
+    1  0.000000  1.224745  0.000000
+    2  1.224745  0.000000  1.224745
     """
     df = df.fillna(df.mean(axis=0))
     scaler = StandardScaler()
@@ -38,6 +39,7 @@ def f_117(df):
 
 
 import unittest
+import pandas as pd
 
 
 class TestCases(unittest.TestCase):

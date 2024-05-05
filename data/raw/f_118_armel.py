@@ -9,7 +9,7 @@ DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 def f_118(n, output_path=None):
     """
-    Generate n random Unix timestamps and convert them strings formatted as DATE_FORMAT.
+    Generate n random Unix timestamps and convert them to strings formatted as DATE_FORMAT.
     Plot a histogram of the distribution of the generated timestamps. If an output path is provided,
     save the histogram to the specified path. Otherwise, display the plot.
 
@@ -25,6 +25,12 @@ def f_118(n, output_path=None):
     - datetime
     - random
     - matplotlib.pyplot
+
+    Example:
+    >>> random.seed(42)
+    >>> timestamps = f_118(n=3, output_path=None)
+    >>> print(timestamps)
+    ['2013-07-06 20:56:46', '1977-07-29 23:34:23', '1971-09-14 11:29:44']
     """
     timestamps = []
     for _ in range(n):
@@ -42,7 +48,6 @@ def f_118(n, output_path=None):
 
 
 import unittest
-from datetime import datetime
 import os
 
 class TestCases(unittest.TestCase):

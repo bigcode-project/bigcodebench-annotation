@@ -1,5 +1,3 @@
-import pandas as pd
-import numpy as np
 from scipy.stats import zscore
 import matplotlib.pyplot as plt
 
@@ -19,12 +17,14 @@ def f_116(df):
         2. list: A list of Axes objects representing the histograms of the numeric columns.
 
     Requirements:
-    - pandas for data manipulation.
-    - numpy for numerical operations.
-    - scipy.stats.zscore for Z-score computation.
-    - matplotlib.pyplot for plotting histograms.
+    - pandas.
+    - numpy.
+    - scipy.stats.zscore.
+    - matplotlib.pyplot.
 
     Example:
+    >>> import pandas as pd
+    >>> import numpy as np
     >>> df_input = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7.0, np.nan, 9.0]], columns=["col1", "col2", "col3"])
     >>> zscore_output, plots = f_116(df_input)
     """
@@ -39,6 +39,8 @@ def f_116(df):
 
 
 import unittest
+import pandas as pd
+import numpy as np
 
 
 class TestCases(unittest.TestCase):

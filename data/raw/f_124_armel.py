@@ -23,16 +23,16 @@ def f_124(text):
     >>> text = "This is a sample text. This text contains sample words."
     >>> word_counts = f_124(text)
     >>> print(word_counts)
-    This      2
-    sample    2
-    text.     1
-    contains  1
-    words.    1
+    this        2
+    sample      2
+    text        2
+    contains    1
+    words       1
     dtype: int64
     """
-    words = re.split(r"\s+", text.lower())
+    words = re.findall(r"\b\w+\b", text.lower())
     words = [word for word in words if word not in STOPWORDS]
-    word_counts = pd.Series(words).value_counts()
+    word_counts = pd.Series(words).value_counts().rename(None)
     return word_counts
 
 

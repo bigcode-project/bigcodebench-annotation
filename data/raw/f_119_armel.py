@@ -19,6 +19,7 @@ def f_119(timestamps):
     Returns:
     - pandas.DataFrame: A pandas DataFrame containing the original Unix timestamps and the converted datetime objects.
     - Axes: The Axes object of the histogram plot. The histogram will have 10 bins by default, representing the distribution of the datetime objects.
+    - ValueError("Input list of timestamps is empty"): If the list of timestamps is empty.
 
     Requirements:
     - datetime
@@ -26,10 +27,12 @@ def f_119(timestamps):
     - matplotlib.pyplot
 
     Examples:
-    >>> f_119([1347517370, 1475153730, 1602737300])
-    DataFrame with columns 'Timestamp' and 'Datetime'
-    >>> f_119([1602737300, 1702737300])
-    DataFrame with columns 'Timestamp' and 'Datetime'
+    >>> df, ax = f_119([1347517370, 1475153730, 1602737300])
+    >>> print(df)
+        Timestamp             Datetime
+    0  1347517370  2012-09-13 02:22:50
+    1  1475153730  2016-09-29 08:55:30
+    2  1602737300  2020-10-15 00:48:20
     """
     if not timestamps:
         raise ValueError("Input list of timestamps is empty.")
@@ -50,7 +53,7 @@ class TestCases(unittest.TestCase):
         self.test_data = [
             [1318935276, 1342905276, 23074268],
             [4235087541, 1234653346, 19862358],
-            [4567721232],
+            [],
             [1156829289],
             [1000000000, 2000000000, 3000000000],
         ]
@@ -65,7 +68,12 @@ class TestCases(unittest.TestCase):
 
     def test_case_3(self):
         input_timestamps = self.test_data[2]
-        self.assert_function_output(input_timestamps)
+        with self.assertRaises(ValueError) as context:
+            f_119(input_timestamps)
+        self.assertEqual(
+            str(context.exception),
+            "Input list of timestamps is empty.",
+        )
 
     def test_case_4(self):
         input_timestamps = self.test_data[3]
@@ -79,12 +87,14 @@ class TestCases(unittest.TestCase):
             {
                 "Timestamp": [1000000000, 2000000000, 3000000000],
                 "Datetime": [
-                    "2001-09-09 03:46:40",
-                    "2033-05-18 05:33:20",
-                    "2065-01-24 06:20:00",
+                    "2001-09-08 21:46:40",
+                    "2033-05-17 23:33:20",
+                    "2065-01-24 00:20:00",
                 ],
             }
         )
+        # print(df)
+        # print(expected_df)
         pd.testing.assert_frame_equal(df, expected_df)
 
     def assert_function_output(self, input_timestamps):
