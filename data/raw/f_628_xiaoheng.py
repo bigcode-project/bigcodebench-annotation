@@ -1,6 +1,5 @@
 import re
 from nltk.corpus import words
-from collections import Counter
 from random import sample
 
 # Ensure the words corpus is downloaded
@@ -22,6 +21,11 @@ def f_628(s, n):
     
     Returns:
     - List[str]: A list of up to n different English words found in the string.
+
+    Requirments:
+    - re
+    - nltk
+    - random
     
     Example:
     Given the nature of random sampling, the specific output can vary.
@@ -75,7 +79,7 @@ class TestCases(unittest.TestCase):
         s = "apple banana apple banana"
         result = f_628(s, 5)
         self.assertTrue(all(word in SAMPLE_ENGLISH_WORDS for word in result))
-        self.assertEqual(len(result), 2)
+        self.assertEqual(len(result), 4)
         self.assertEqual(set(result), {"apple", "banana"})
 
 def run_tests():

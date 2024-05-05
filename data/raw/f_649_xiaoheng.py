@@ -16,8 +16,9 @@ def f_649(n):
     - float: The average distance from the center of the circle.
 
     Requirements:
-    - Requires the use of the math, random, and statistics libraries.
-    - The function uses a constant RADIUS to determine the radius of the circle. The default value of RADIUS is 5.
+    - math
+    - random
+    - statistics
 
     Example:
     >>> random.seed(42)

@@ -14,7 +14,8 @@ def f_689(filename, data):
     - bool: True if the operation is successful, False otherwise.
 
     Requirements:
-    - pickle, os
+    - pickle
+    - os
 
     Example:
     >>> result = f_689('data.pkl', {'key': 'value'})

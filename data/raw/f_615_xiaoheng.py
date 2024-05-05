@@ -1,5 +1,4 @@
 import os
-import sys
 import re
 
 def f_615(log_file_path: str, keywords: list):
@@ -17,7 +16,6 @@ def f_615(log_file_path: str, keywords: list):
     Requirements:
     - os
     - re
-    - sys
     
     Example:
     >>> f_615('/path/to/log_file.log', ['ERROR', 'WARNING'])
@@ -45,17 +43,18 @@ import unittest
 import os
 
 class TestCases(unittest.TestCase):
-
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         # Setup code to create a test log file
-        self.test_file_path = "test_log_file.log"
-        with open(self.test_file_path, 'w') as f:
+        cls.test_file_path = "test_log_file.log"
+        with open(cls.test_file_path, 'w') as f:
             f.write("ERROR 11:30:10 This is an error message\n")
             f.write("WARNING 11:35:10 This is a warning message\n")
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         # Cleanup the test log file
-        os.remove(self.test_file_path)
+        os.remove(cls.test_file_path)
 
     def test_nonexistent_file(self):
         with self.assertRaises(FileNotFoundError):

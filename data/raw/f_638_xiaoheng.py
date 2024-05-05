@@ -9,7 +9,7 @@ def f_638(L):
     L (list): The nested list.
     
     Returns:
-    int: The mode.
+    - mode (int): The mode.
     
     Requirements:
     - numpy
@@ -19,7 +19,7 @@ def f_638(L):
     >>> f_638([[1,2,3],[4,5,6]])
     1
     '''
-    flattened = [item for sublist in L for item in sublist]
+    flattened = np.hstack(L)  
     mode = stats.mode(flattened)[0][0]
     return mode
     

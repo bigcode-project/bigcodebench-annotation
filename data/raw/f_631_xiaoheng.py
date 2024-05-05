@@ -19,6 +19,8 @@ def f_631(strings, filename=None):
     Requirements:
     - pickle
     - os
+    - random
+    - string
 
     Example:
     >>> strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)) for _ in range(10)]

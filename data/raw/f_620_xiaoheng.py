@@ -4,14 +4,14 @@ from scipy.stats import ttest_rel
 
 def f_620(text1, text2):
     """
-    Perform a paired t-test for the number of words in two strings.
+    Perform a paired t-test for the number of words in two strings, only if the strings produce the same number of words.
     
     Parameters:
     - text1 (str), text2 (str): The two text strings.
     
     Returns:
-    - t_statistic (float): The t-statistic.
-    - p_value (float): The p-value.
+    - t_statistic (float): The t-statistic, or NaN if tests cannot be performed due to unequal lengths.
+    - p_value (float): The p-value, or NaN if tests cannot be performed due to unequal lengths.
     
     Requirements:
     - re
@@ -24,8 +24,13 @@ def f_620(text1, text2):
     """
     word_counts1 = np.array([len(word) for word in re.split(r'\W+', text1) if word])
     word_counts2 = np.array([len(word) for word in re.split(r'\W+', text2) if word])
+
+    if len(word_counts1) != len(word_counts2):
+        return (np.nan, np.nan)
+
     t_statistic, p_value = ttest_rel(word_counts1, word_counts2)
     return t_statistic, p_value
+
 
 import unittest
 import re
@@ -62,6 +67,11 @@ class TestCases(unittest.TestCase):
     def test_5(self):
         t_stat, p_val = f_620("Testing with similar lengths.", "Testing with similar lengths.")
         self.assertTrue(np.isnan(t_stat))  # Since the lengths are the same, t-statistic should be NaN
+        self.assertTrue(np.isnan(p_val))
+
+    def test_unequal_lengths(self):
+        t_stat, p_val = f_620("Short text.", "This is a slightly longer text.")
+        self.assertTrue(np.isnan(t_stat))
         self.assertTrue(np.isnan(p_val))
 
 if __name__ == "__main__":

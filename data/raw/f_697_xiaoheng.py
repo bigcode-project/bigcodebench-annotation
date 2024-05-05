@@ -42,7 +42,7 @@ import string
 
 # Importing the refined function
 
-class TestF55(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Set up the directory where test files will be saved
@@ -100,7 +100,7 @@ class TestF55(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestF55))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

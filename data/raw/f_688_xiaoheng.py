@@ -24,7 +24,9 @@ def f_688(filename, data):
     Example:
     >>> result, written_data = f_688('data.json', {'key': 'value'})
     >>> print(result)  # This should print: True
+    True
     >>> print(written_data)  # This should print: {'key': 'value'}
+    {'key': 'value'}
     """
     try:
         # Write the dictionary to the file as JSON
@@ -53,6 +55,20 @@ from faker import Faker
 fake = Faker()
 
 class TestCases(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        """Create the test file with initial data."""
+        cls.filename = 'data.json'
+        cls.data = {'key': 'value'}
+        with open(cls.filename, 'w') as file:
+            json.dump(cls.data, file)
+
+    @classmethod
+    def tearDownClass(cls):
+        """Remove the test file after all tests."""
+        os.remove(cls.filename)
+
     def test_empty_dict(self):
         """Test with an empty dictionary to ensure it writes and verifies correctly."""
         filename = 'empty_test.json'
@@ -114,4 +130,6 @@ def run_tests():
 
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()

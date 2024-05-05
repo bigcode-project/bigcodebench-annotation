@@ -60,13 +60,15 @@ import tempfile
 import shutil
 
 class TestCases(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         # Create a temporary directory for the tests
-        self.test_dir = tempfile.mkdtemp()
+        cls.test_dir = tempfile.mkdtemp()
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         # Remove the temporary directory after the tests
-        shutil.rmtree(self.test_dir)
+        shutil.rmtree(cls.test_dir)
 
     def setUp(self):
         # Create a test file in the temporary directory

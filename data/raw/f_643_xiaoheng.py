@@ -22,10 +22,11 @@ def f_643(my_dict):
     >>> my_dict = {'apple': 1, 'banana': 2, 'avocado': 3, 'blueberry': 4, 'blackberry': 5}
     >>> aggregated_dict = f_643(my_dict)
     >>> print(aggregated_dict)
-    {'apple': 1, 'avocado': 3, 'banana': 2, 'blackberry': 5, 'blueberry': 4}
+    {'a': 4, 'b': 11}
     """
-    sorted_items = sorted(my_dict.items(), key=KEY_FUNC)
-    aggregated_dict = {key: sum(item[1] for item in group) for key, group in groupby(sorted_items, KEY_FUNC)}
+    sorted_items = sorted(my_dict.items(), key=lambda item: item[0][0])
+    # Group items by the first character of the key and sum their values
+    aggregated_dict = {k: sum(item[1] for item in g) for k, g in groupby(sorted_items, key=lambda item: item[0][0])}
 
     return aggregated_dict
 

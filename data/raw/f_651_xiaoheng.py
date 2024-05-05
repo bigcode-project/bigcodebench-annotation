@@ -1,5 +1,5 @@
 import numpy as np
-import re
+import datetime
 
 def f_651(arr):
     """
@@ -13,7 +13,7 @@ def f_651(arr):
 
     Requirements:
     - numpy
-    - re
+    - datetime
 
     Example:
     >>> arr = np.array(['apple.orange', 'red.green.yellow'])
@@ -22,10 +22,14 @@ def f_651(arr):
     ['orange.apple' 'yellow.green.red']
     """
     vectorized_reverse = np.vectorize(lambda s: '.'.join(s.split('.')[::-1]))
+    
+    now = datetime.datetime.now()
+    
     return vectorized_reverse(arr)
 
 import numpy as np
 import unittest
+import re
 
 def run_tests():
     """
@@ -80,5 +84,6 @@ class TestCases(unittest.TestCase):
         result = f_651(arr)
         expected = np.array(['GPT.OpenAI', 'amazing.is.GPT-4'])
         np.testing.assert_array_equal(result, expected)
+
 if __name__ == "__main__":
     run_tests()

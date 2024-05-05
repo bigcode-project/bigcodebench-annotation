@@ -1,38 +1,42 @@
 import re
 import os
 import configparser
+import shutil
 
-# Constants
-PATTERN = r"(?<!Distillr)\\\\AcroTray\.exe"
-DIRECTORY = r"C:\\SomeDir\\"
-
-def f_680():
+def f_680(source_dir, target_dir, file_pattern=r'\b[A-Za-z0-9]+\.(txt|doc|docx)\b'):
     """
     Look for files that match the pattern of the regular expression '(? <! Distillr)\\\\ AcroTray\\.exe' in the directory 'C:\\ SomeDir\\'. If found, write these file paths to a configuration file.
 
     Parameters:
-    - None
-    
+    - source_dir (str): The path to the source directory.
+    - target_dir (str): The path to the target directory.
+    - file_pattern (str, optional): The regular expression pattern that filenames must match in order
+                                   to be moved. Default is r'\b[A-Za-z0-9]+\.(txt|doc|docx)\b',
+                                   which matches filenames that consist of alphanumeric characters
+                                   and have extensions txt, doc, or docx.
+
     Returns:
     - str: Path to the created configuration file.
 
-    Requirements:
+    Requirements;
     - re
     - os
     - configparser
-
-    Example:
-    >>> f_680()
+    - shtuil
     """
-    config = configparser.ConfigParser()
-    for root, dirs, files in os.walk(DIRECTORY):
-        for file in files:
-            if re.search(PATTERN, file):
-                path = os.path.join(root, file)
-                config[path] = {'file': path}
-    with open('config.ini', 'w') as configfile:
-        config.write(configfile)
-    return os.path.abspath('config.ini')
+    if not os.path.exists(source_dir):
+        raise FileNotFoundError("The source directory does not exist.")
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+
+    moved_files_count = 0
+
+    for filename in os.listdir(source_dir):
+        if re.match(file_pattern, filename):
+            shutil.move(os.path.join(source_dir, filename), os.path.join(target_dir, filename))
+            moved_files_count += 1
+
+    return moved_files_count
 
 import unittest
 import os
@@ -41,80 +45,59 @@ import configparser
 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Creating a temporary directory and files for testing
-        self.directory = tempfile.mkdtemp()
-        self.pattern = r"test_file_\d+\.txt"
-        self.files = [
-            "test_file_1.txt",
-            "test_file_2.txt",
-            "not_matching.txt"
-        ]
-        for file in self.files:
-            with open(os.path.join(self.directory, file), 'w') as f:
-                f.write("This is a test file.")
+        # Create a temporary directory for source and target
+        self.source_dir = tempfile.mkdtemp()
+        self.target_dir = tempfile.mkdtemp()
 
-    # Normal Case:
-    # Description: Tests the function with a valid directory and pattern where matching files are present.
-    # Expected Outcome: The configuration file is created and contains the paths of the matching files.
-    def test_normal_case(self):
-        output_file = "config.ini"
-        result = f_680(self.directory, self.pattern, output_file)
-        self.assertTrue(os.path.exists(result))
-        config = configparser.ConfigParser()
-        config.read(result)
-        for file in self.files[:2]:
-            path = os.path.join(self.directory, file)
-            self.assertIn(path, config)
-            self.assertEqual(config[path]['file'], path)
+        # Files that should match the pattern and be moved
+        self.valid_files = ['test1.txt', 'document1.doc', 'file1.docx', 'test2.txt', 'notes1.docx']
+        for file in self.valid_files:
+            with open(os.path.join(self.source_dir, file), 'w') as f:
+                f.write("Dummy content")
 
-    # No Matches:
-    # Description: Tests the function with a valid directory and pattern where no files match.
-    # Expected Outcome: The configuration file is created but is empty.
-    def test_no_matches(self):
-        output_file = "config.ini"
-        result = f_680(self.directory, "non_matching_pattern", output_file)
-        self.assertTrue(os.path.exists(result))
-        config = configparser.ConfigParser()
-        config.read(result)
-        self.assertEqual(len(config.sections()), 0)
+        # Files that should not match the pattern and remain
+        self.invalid_files = ['image1.png', 'script.js', 'data.csv', 'test.tmp', 'archive.zip']
+        for file in self.invalid_files:
+            with open(os.path.join(self.source_dir, file), 'w') as f:
+                f.write("Dummy content")
 
-    # Empty Directory:
-    # Description: Tests the function with an empty directory.
-    # Expected Outcome: The configuration file is created but is empty.
-    def test_empty_directory(self):
-        output_file = "config.ini"
-        with tempfile.TemporaryDirectory() as empty_directory:
-            result = f_680(empty_directory, self.pattern, output_file)
-            self.assertTrue(os.path.exists(result))
-            config = configparser.ConfigParser()
-            config.read(result)
-            self.assertEqual(len(config.sections()), 0)
+    def tearDown(self):
+        # Clean up by removing directories
+        shutil.rmtree(self.source_dir)
+        shutil.rmtree(self.target_dir)
 
-    # Empty Pattern:
-    # Description: Tests the function with an empty pattern.
-    # Expected Outcome: The configuration file is created but is empty.
-    def test_empty_pattern(self):
-        output_file = "config.ini"
-        result = f_680(self.directory, "", output_file)
-        self.assertTrue(os.path.exists(result))
-        config = configparser.ConfigParser()
-        config.read(result)
-        self.assertEqual(len(config.sections()), 0)
+    def test_valid_files_moved(self):
+        # Test that all valid files are moved
+        moved_files_count = f_680(self.source_dir, self.target_dir)
+        self.assertEqual(moved_files_count, len(self.valid_files), "Not all valid files were moved.")
 
-    # Special Characters in Pattern:
-    # Description: Tests the function with a pattern that includes special characters.
-    # Expected Outcome: The configuration file is created and contains the paths of the matching files.
-    def test_special_characters_in_pattern(self):
-        output_file = "config.ini"
-        special_pattern = r"test_file_[\d]+\.txt"
-        result = f_680(self.directory, special_pattern, output_file)
-        self.assertTrue(os.path.exists(result))
-        config = configparser.ConfigParser()
-        config.read(result)
-        for file in self.files[:2]:
-            path = os.path.join(self.directory, file)
-            self.assertIn(path, config)
-            self.assertEqual(config[path]['file'], path)
+    def test_invalid_files_not_moved(self):
+        # Test that invalid files are not moved
+        f_680(self.source_dir, self.target_dir)
+        remaining_files = os.listdir(self.source_dir)
+        self.assertListEqual(sorted(remaining_files), sorted(self.invalid_files), "Invalid files were moved.")
+
+    def test_no_files_to_move(self):
+        # Test with no files matching the pattern
+        # Clean source directory from valid files
+        for file in self.valid_files:
+            os.remove(os.path.join(self.source_dir, file))
+        moved_files_count = f_680(self.source_dir, self.target_dir)
+        self.assertEqual(moved_files_count, 0, "Files were moved when none should have.")
+
+    def test_pattern_specificity(self):
+        # Test with a more specific pattern that should only match .docx files
+        moved_files_count = f_680(self.source_dir, self.target_dir, r'\b[A-Za-z0-9]+\.(docx)\b')
+        expected_count = sum(1 for f in self.valid_files if f.endswith('.docx'))
+        self.assertEqual(moved_files_count, expected_count, "Pattern did not correctly filter files.")
+
+    def test_target_directory_creation(self):
+        # Test that the target directory is created if it does not exist
+        shutil.rmtree(self.target_dir)  # Ensure target directory is deleted
+        moved_files_count = f_680(self.source_dir, self.target_dir)
+        self.assertTrue(os.path.exists(self.target_dir), "Target directory was not created.")
+        self.assertEqual(moved_files_count, len(self.valid_files), "Files were not moved correctly when target directory was initially absent.")
+
 
 def run_tests():
     suite = unittest.TestSuite()
