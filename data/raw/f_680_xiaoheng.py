@@ -1,6 +1,5 @@
 import re
 import os
-import configparser
 import shutil
 
 def f_680(source_dir, target_dir, file_pattern=r'\b[A-Za-z0-9]+\.(txt|doc|docx)\b'):
@@ -21,7 +20,6 @@ def f_680(source_dir, target_dir, file_pattern=r'\b[A-Za-z0-9]+\.(txt|doc|docx)\
     Requirements;
     - re
     - os
-    - configparser
     - shtuil
     """
     if not os.path.exists(source_dir):

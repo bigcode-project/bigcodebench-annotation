@@ -1,5 +1,4 @@
 import csv
-import codecs
 import io
 
 def f_630(filename, from_encoding='cp1251', to_encoding='utf8', delimiter=','):
@@ -19,7 +18,6 @@ def f_630(filename, from_encoding='cp1251', to_encoding='utf8', delimiter=','):
     
     Requirements:
     - csv
-    - codecs
     - io
     
     Example:

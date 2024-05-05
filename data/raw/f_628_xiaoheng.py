@@ -22,7 +22,7 @@ def f_628(s, n):
     Returns:
     - List[str]: A list of up to n different English words found in the string.
 
-    Requirments:
+    Requirements:
     - re
     - nltk
     - random

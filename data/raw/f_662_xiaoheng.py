@@ -1,7 +1,6 @@
 import os
 import shutil
 import time
-from datetime import datetime
 
 # Constants
 BACKUP_DIR = '/tmp/backup'

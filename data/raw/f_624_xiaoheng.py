@@ -1,6 +1,5 @@
 import urllib.request
 import os
-import mmap
 import re
 
 # Constants
@@ -20,7 +19,6 @@ def f_624(url):
     Requirements:
     - urllib
     - os
-    - mmap
     - re
 
     Example:

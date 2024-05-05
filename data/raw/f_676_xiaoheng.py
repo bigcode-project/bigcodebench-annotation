@@ -5,7 +5,6 @@ nltk.download('stopwords')
 from nltk.corpus import stopwords
 
 from collections import Counter
-import random
 
 # Constants
 STOPWORDS = set(stopwords.words('english'))
