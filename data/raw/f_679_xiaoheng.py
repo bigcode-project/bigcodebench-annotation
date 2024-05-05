@@ -23,7 +23,7 @@ def f_679(directory=DIRECTORY, file_pattern=PATTERN):
     - tarfile
 
     Example:
-    >>> f_679()
+    >>> f_680('/path/to/source', '/path/to/target')
     """
     tar_path = Path(directory) / 'archive.tar'
     with tarfile.open(tar_path, 'w') as tar:
