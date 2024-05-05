@@ -17,10 +17,14 @@ def f_680(source_dir, target_dir, file_pattern=r'\b[A-Za-z0-9]+\.(txt|doc|docx)\
     Returns:
     - str: Path to the created configuration file.
 
-    Requirements;
+    Requirements:
     - re
     - os
     - shtuil
+
+    Example:
+    >>> f_680('/path/to/source', '/path/to/target')
+    3
     """
     if not os.path.exists(source_dir):
         raise FileNotFoundError("The source directory does not exist.")
@@ -104,4 +108,6 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
+    # import doctest
+    # doctest.testmod()
     run_tests()
