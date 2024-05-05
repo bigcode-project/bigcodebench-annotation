@@ -6,7 +6,7 @@ def f_130(mu, sigma, num_samples):
     """
     Display a plot showing a normal distribution with a given mean and standard deviation and overlay a histogram of randomly generated samples from this distribution.
     The plot title should be 'Normal Distribution'.
-    
+
     Parameters:
     mu (float): The mean of the distribution.
     sigma (float): The standard deviation of the distribution.
@@ -21,7 +21,7 @@ def f_130(mu, sigma, num_samples):
     - matplotlib.pyplot
 
     Example:
-    >>> f_130(0, 1, 1000)
+    >>> plt = f_130(0, 1, 1000)
     """
     samples = np.random.normal(mu, sigma, num_samples)
     fig, ax = plt.subplots()
@@ -31,7 +31,7 @@ def f_130(mu, sigma, num_samples):
     x = np.linspace(xmin, xmax, 100)
     p = stats.norm.pdf(x, mu, sigma)
     ax.plot(x, p, 'k', linewidth=2)
-    
+
     ax.set_title('Normal Distribution')
     plt.show()
     return fig
@@ -50,7 +50,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_title(), "Normal Distribution")
         self.assertTrue(len(ax.patches) > 0)
         self.assertTrue(len(ax.lines) > 0)
-        
+
     def test_case_2(self):
         np.random.seed(42)
         mu = 5
@@ -102,4 +102,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()

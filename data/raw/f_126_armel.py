@@ -12,7 +12,7 @@ def f_126(text):
     text (str): The text to analyze.
 
     Returns:
-    DataFrame: A pandas DataFrame with the document-term matrix. It column names should be adapted from the vectorizer feature names.
+    DataFrame: A pandas DataFrame with the document-term matrix. Its column names should be adapted from the vectorizer feature names.
 
     Requirements:
     - pandas
@@ -23,6 +23,9 @@ def f_126(text):
     >>> text = "This is a sample sentence. This sentence contains sample words."
     >>> dtm = f_126(text)
     >>> print(dtm)
+       contains  is  sample  sentence  this  words
+    0         0   1       1         1     1      0
+    1         1   0       1         1     1      1
     """
     sentences = re.split(r"\.\s*", text)
     sentences = [sentence for sentence in sentences if len(sentence.strip()) != 0]

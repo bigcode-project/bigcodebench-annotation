@@ -27,6 +27,7 @@ def f_127(text):
     >>> print(df)
     Sentence 1    5
     Sentence 2    5
+    dtype: int64
     """
     sentences = re.split(r"\.\s*", text)
     sentence_counts = {}
