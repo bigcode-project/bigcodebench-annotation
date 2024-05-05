@@ -1,5 +1,5 @@
-# NAMES=(chien jenny wenhao niklas hanhu ratna simon ming)
-NAMES=(ming)
+NAMES=(xiaoheng)
+# NAMES=(ming)
 for name in "${NAMES[@]}"; do
     cp data/raw/*"$name"*py data/clean
 done
