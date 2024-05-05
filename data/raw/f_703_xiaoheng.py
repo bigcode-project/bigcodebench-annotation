@@ -23,8 +23,6 @@ def f_703():
 
     Example:
     >>> f_703()
-    (0.98, None)
-    >>> f_703()
     (0.96, None)
     """
     warnings.simplefilter('always')
