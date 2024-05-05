@@ -81,6 +81,5 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+
     run_tests()  

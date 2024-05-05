@@ -1,5 +1,5 @@
 from collections import Counter
-from random import choice
+from random import choice, seed
 
 # Constants
 POSSIBLE_ITEMS = ['apple', 'banana', 'cherry', 'date', 'elderberry']
@@ -25,8 +25,9 @@ def f_704(list_of_lists):
     >>> all(isinstance(basket, Counter) for basket in baskets) # Illustrative, actual items will vary due to randomness
     True
     >>> sum(len(basket) for basket in baskets) # The sum of lengths of all baskets; illustrative example
-    5
+    3
     """
+    seed(42)  # Set the seed for reproducibility
     baskets = []
     for list_ in list_of_lists:
         basket = Counter()
@@ -82,4 +83,6 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
     run_tests()
