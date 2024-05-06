@@ -23,7 +23,7 @@ def f_989(json_data, unknown_key, save_dir=None):
     - json
     - requests
     - os
-    - datetime
+    - datetime.datetime
 
     Example:
     >>> json_str = '{"unknown": "https://example.com/file.txt"}'
