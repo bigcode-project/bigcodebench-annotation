@@ -41,7 +41,6 @@ class TestCases(unittest.TestCase):
         # Test Case 1: Default Input
         # Description: This test case checks the function's behavior with its default settings.
         # The random seed is set to ensure reproducibility.
-        np.random.seed(42)
         result = f_669()
         expected_output = np.array(['I', 'F', 'G', 'J', 'E', 'A', 'B', 'H', 'D', 'C'])
         np.testing.assert_array_equal(result, expected_output)
