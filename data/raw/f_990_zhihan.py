@@ -14,6 +14,12 @@ def f_990(directory: str) -> str:
     Returns:
     str: The absolute path of the JSON file ('hashes.json') containing the hashes.
     
+    Requirements:
+    - os
+    - hashlib
+    - json
+    - pathlib.Path
+
     Example:
     >>> json_file = f_990("/path/to/directory")
     >>> print(f"Hashes saved at: {json_file}")
