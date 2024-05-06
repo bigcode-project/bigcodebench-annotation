@@ -1,6 +1,6 @@
 import numpy as np
 import itertools
-from random import randint
+import random
 import statistics
 
 def f_1010(T1, RANGE=100):
@@ -21,8 +21,11 @@ def f_1010(T1, RANGE=100):
     Requirements:
     - numpy
     - itertools
-    - random.randint
+    - random
     - statistics
+
+    Raises:
+    statistics.StatisticsError if T1 is empty
     
     Example:
     >>> import random
@@ -35,10 +38,12 @@ def f_1010(T1, RANGE=100):
     >>> print(stats)
     (23.773333333333333, 25.0, 15)
     """
+    if len(T1) <= 0:
+        raise statistics.StatisticsError
     int_list = [list(map(int, x)) for x in T1]
     flattened_list = list(itertools.chain(*int_list))
     total_nums = sum(flattened_list)
-    random_nums = [randint(0, RANGE) for _ in range(total_nums)]
+    random_nums = [random.randint(0, RANGE) for _ in range(total_nums)]
     mean = np.mean(random_nums)
     median = np.median(random_nums)
     mode = statistics.mode(random_nums)
@@ -47,6 +52,7 @@ def f_1010(T1, RANGE=100):
 import unittest
 import numpy as np
 import statistics
+from unittest.mock import patch
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -55,51 +61,57 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
+    @patch('random.randint', return_value=50)
+    def test_case_1(self, mock_randint):
         """Tests with small numbers and default range."""
         T1 = (('1', '2'), ('2', '3'), ('3', '4'))
         mean, median, mode = f_1010(T1)
         total_elements = sum(map(int, sum(T1, ())))
-        self.assertTrue(isinstance(mean, float) and 0 <= mean <= 100)
-        self.assertTrue(isinstance(median, float) and 0 <= median <= 100)
-        self.assertTrue(isinstance(mode, int) and 0 <= mode <= 100)
+        self.assertEqual(total_elements, 15)  # Check if the total_elements calculation is correct
+        self.assertTrue(isinstance(mean, float))
+        self.assertTrue(isinstance(median, float))
+        self.assertTrue(isinstance(mode, int))
 
-    def test_case_2(self):
+    @patch('random.randint', return_value=50)
+    def test_case_2(self, mock_randint):
         """Tests with mid-range numbers and default range."""
         T1 = (('1', '2', '3'), ('4', '5'), ('6', '7', '8', '9'))
         mean, median, mode = f_1010(T1)
-        self.assertTrue(isinstance(mean, float) and 0 <= mean <= 100)
-        self.assertTrue(isinstance(median, float) and 0 <= median <= 100)
-        self.assertTrue(isinstance(mode, int) and 0 <= mode <= 100)
+        self.assertEqual(mean, 50.0)
+        self.assertEqual(median, 50.0)
+        self.assertEqual(mode, 50)
 
-    def test_case_3(self):
+    @patch('random.randint', return_value=25)
+    def test_case_3(self, mock_randint):
         """Tests with adjusted range to 50, checks new bounds."""
         T1 = (('1', '2', '3'), ('4', '5'), ('6', '7', '8', '9'))
         mean, median, mode = f_1010(T1, RANGE=50)
-        self.assertTrue(isinstance(mean, float) and 0 <= mean <= 50)
-        self.assertTrue(isinstance(median, float) and 0 <= median <= 50)
-        self.assertTrue(isinstance(mode, int) and 0 <= mode <= 50)
+        self.assertEqual(mean, 25.0)
+        self.assertEqual(median, 25.0)
+        self.assertEqual(mode, 25)
 
-    def test_case_4(self):
+    @patch('random.randint', return_value=75)
+    def test_case_4(self, mock_randint):
         """Tests with minimal input of single-digit numbers."""
         T1 = (('1',), ('2',), ('3',))
         mean, median, mode = f_1010(T1)
-        self.assertTrue(isinstance(mean, float) and 0 <= mean <= 100)
-        self.assertTrue(isinstance(median, float) and 0 <= median <= 100)
-        self.assertTrue(isinstance(mode, int) and 0 <= mode <= 100)
+        self.assertEqual(mean, 75.0)
+        self.assertEqual(median, 75.0)
+        self.assertEqual(mode, 75)
 
-    def test_case_5(self):
+    @patch('random.randint', return_value=10)
+    def test_case_5(self, mock_randint):
         """Tests with larger numbers, focusing on correct type checking."""
         T1 = (('10', '20', '30'), ('40', '50'), ('60', '70', '80', '90'))
         mean, median, mode = f_1010(T1)
-        self.assertTrue(isinstance(mean, float) and 0 <= mean <= 100)
-        self.assertTrue(isinstance(median, float) and 0 <= median <= 100)
-        self.assertTrue(isinstance(mode, int) and 0 <= mode <= 100)
+        self.assertEqual(mean, 10.0)
+        self.assertEqual(median, 10.0)
+        self.assertEqual(mode, 10)
 
     def test_empty_input(self):
         """Tests behavior with an empty tuple input."""
         T1 = ()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(statistics.StatisticsError):
             mean, median, mode = f_1010(T1)
 
 if __name__ == "__main__":
