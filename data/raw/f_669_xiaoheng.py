@@ -4,7 +4,7 @@ import random
 # Constants
 ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
-def f_669(l=ELEMENTS):
+def f_669(l=None):
     """
     Create a numeric array from a list "l" and move the first 3 elements to the end of the array.
 
@@ -23,6 +23,8 @@ def f_669(l=ELEMENTS):
     >>> f_669(ELEMENTS)
     array(['I', 'F', 'G', 'J', 'E', 'A', 'B', 'H', 'D', 'C'], dtype='<U1')
     """
+    if l is None:
+        l = ELEMENTS.copy()  # Use a copy to avoid modifying the original list
     random.shuffle(l)
     arr = np.array(l)
     arr = np.concatenate((arr[3:], arr[:3]))
@@ -40,8 +42,8 @@ class TestCases(unittest.TestCase):
         # Description: This test case checks the function's behavior with its default settings.
         # The random seed is set to ensure reproducibility.
         result = f_669()
-        expected_output = np.array(['I', 'F', 'G', 'J', 'E', 'A', 'B', 'H', 'D', 'C'])
-        np.testing.assert_array_equal(result, expected_output)
+        expected_output = ['I', 'F', 'G', 'J', 'E', 'A', 'B', 'H', 'D', 'C']
+        self.assertEqual(result.tolist(), expected_output)
 
     def test_custom_list_input(self):
         # Test Case 2: Custom List Input
@@ -49,8 +51,8 @@ class TestCases(unittest.TestCase):
         # The random seed is set to ensure reproducibility.
         input_list = ['X', 'Y', 'Z', 'W', 'V', 'U']
         result = f_669(input_list)
-        expected_output = np.array(['V', 'X', 'U', 'W', 'Y', 'Z'])  # Corrected based on actual shuffle and cycle
-        np.testing.assert_array_equal(result, expected_output)
+        expected_output = ['V', 'X', 'U', 'W', 'Y', 'Z']  # Corrected based on actual shuffle and cycle
+        self.assertEqual(result.tolist(), expected_output)
 
     def test_empty_list(self):
         # Test Case 3: Empty List
@@ -64,16 +66,16 @@ class TestCases(unittest.TestCase):
         # Description: This test case checks the function's behavior with a single element list.
         # The random seed is set to ensure reproducibility.
         result = f_669(['X'])
-        expected_output = np.array(['X'])
-        np.testing.assert_array_equal(result, expected_output)
+        expected_output = ['X']
+        self.assertEqual(result.tolist(), expected_output)
 
     def test_three_elements_list(self):
         # Test Case 5: Three Elements List
         # Description: This test case checks the function's behavior with a three element list.
         # The random seed is set to ensure reproducibility.
         result = f_669(['Y', 'X', 'Z'])
-        expected_output = np.array(['X', 'Y', 'Z'])  # Corrected based on actual shuffle and cycle
-        np.testing.assert_array_equal(result, expected_output)
+        expected_output = ['X', 'Y', 'Z']  # Corrected based on actual shuffle and cycle
+        self.assertEqual(result.tolist(), expected_output)
 
 def run_tests():
     suite = unittest.TestSuite()
