@@ -25,7 +25,7 @@ def f_991(salt, cursor):
     Example:
     >>> conn = sqlite3.connect('sample.db')
     >>> cursor = conn.cursor()
-    >>> num_updated = f_991('sample.db', 'mysalt', cursor)
+    >>> num_updated = f_991('mysalt', cursor)
     >>> print(num_updated)
     5
     """
