@@ -18,6 +18,9 @@ def f_645():
     Requirements:
     - subprocess
     - random
+
+    Example:
+    >>> f_645()
     """
     script_name = random.choice(SCRIPTS)
     script_path = os.path.join(SCRIPTS_DIR, script_name)  # Generate the full path

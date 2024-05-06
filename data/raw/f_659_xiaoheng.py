@@ -14,7 +14,7 @@ def f_659():
     Parameters:
     - None
 
-    Returns;
+    Returns:
     - None
 
     Requirements:
@@ -24,6 +24,7 @@ def f_659():
 
     Example:
     >>> f_659()
+
     """
     SOURCE_DIR = '/source/dir'
     TARGET_DIR = '/target/dir'
