@@ -1,4 +1,5 @@
 import re
+import random
 from nltk.corpus import words
 from random import sample
 
@@ -46,11 +47,10 @@ def f_628(s, n):
 
 import unittest
 
-
-# Assuming ENGLISH_WORDS is defined for simplicity
-SAMPLE_ENGLISH_WORDS = set(words.words())
-
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        random.seed(0)
+    
     def test_extract_english_words(self):
         s = "This is a test string with some random words: apple, banana, test, hello, world"
         result = f_628(s, 5)
