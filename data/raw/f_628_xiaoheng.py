@@ -47,11 +47,10 @@ def f_628(s, n):
 
 import unittest
 
-class TestCases(unittest.TestCase):
-    def setUp(self):
-        random.seed(0)
+class TestCases(unittest.TestCase):        
     
     def test_extract_english_words(self):
+        random.seed(0)
         s = "This is a test string with some random words: apple, banana, test, hello, world"
         result = f_628(s, 5)
         self.assertTrue(all(word in SAMPLE_ENGLISH_WORDS for word in result))
@@ -59,23 +58,27 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(set(result)), len(result), "All words should be unique")
 
     def test_fewer_than_n_words(self):
+        random.seed(0)
         s = "hello world"
         result = f_628(s, 5)
         self.assertTrue(len(result) <= 5)
         self.assertTrue(all(word in SAMPLE_ENGLISH_WORDS for word in result))
 
     def test_no_english_words(self):
+        random.seed(0)
         s = "xyz abcdef"
         result = f_628(s, 5)
         self.assertEqual(len(result), 0)
 
     def test_case_insensitivity(self):
+        random.seed(0)
         s = "Apple BANANA Test"
         result = f_628(s, 3)
         self.assertTrue(all(word.lower() in SAMPLE_ENGLISH_WORDS for word in result))
         self.assertEqual(len(result), 3)
 
     def test_duplicate_words(self):
+        random.seed(0)
         s = "apple banana apple banana"
         result = f_628(s, 5)
         self.assertTrue(all(word in SAMPLE_ENGLISH_WORDS for word in result))
