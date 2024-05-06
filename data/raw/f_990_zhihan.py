@@ -38,7 +38,6 @@ def f_990(directory: str) -> str:
     json_file = Path(directory) / 'hashes.json'
     with open(json_file, 'w') as f:
         json.dump(hash_dict, f)
-    print(str(json_file))
     return str(json_file)
 
 import unittest
