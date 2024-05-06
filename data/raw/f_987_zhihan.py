@@ -2,14 +2,13 @@ import os
 import re
 import hashlib
 
-def f_987(path=FILE_PATH, delimiter=SPLIT_PATTERN):
+def f_987(path, delimiter):
     """
-    Divide a file path by a specific delimiter, leaving the delimiter in the result.
-    The function also computes the hash of the file if the path is a file.
+    Splits a file path by a specified delimiter, retaining the delimiter in the output, and computes the hash of each component if it is a file.
     
     Parameters:
-    path (str): The file path to split. Default is 'Docs/src/Scripts/temp'.
-    delimiter (str): The delimiter to use for splitting the path. Default is '/'.
+    path (str): The file path to split.
+    delimiter (str): The delimiter to use for splitting the path.
 
     Returns:
     list[tuple]: A list of tuples, where each tuple contains a path component and its hash (if it's a file).
@@ -46,31 +45,67 @@ def run_tests():
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
+import unittest
+import os
+import tempfile
+
 class TestCases(unittest.TestCase):
 
-    def test_case_1(self):
+    def setUp(self):
+        # Setup a temporary directory and files for testing
+        self.test_dir = tempfile.mkdtemp()
+        self.test_file1 = os.path.join(self.test_dir, 'file1.txt')
+        self.test_file2 = os.path.join(self.test_dir, 'file2.txt')
+        with open(self.test_file1, 'w') as f:
+            f.write('Hello World')
+        with open(self.test_file2, 'w') as f:
+            f.write('Goodbye World')
+
+    def tearDown(self):
+        # Remove temporary files and directory after testing
+        os.remove(self.test_file1)
+        os.remove(self.test_file2)
+        os.rmdir(self.test_dir)
+
+    def test_simple_path_without_files(self):
+        # Test splitting a path without any files
         result = f_987("Docs/src/", "/")
         expected = [('Docs', None), ('/', None), ('src', None), ('/', None)]
         self.assertEqual(result, expected)
 
-    def test_case_2(self):
+    def test_path_with_file_but_no_hashing(self):
+        # Test splitting a path with a file, assuming file does not exist for hashing
         result = f_987("Docs/src/file.txt", "/")
         expected = [('Docs', None), ('/', None), ('src', None), ('/', None), ('file.txt', None)]
         self.assertEqual(result, expected)
 
-    def test_case_3(self):
+    def test_complex_path_with_no_files(self):
+        # Test a more complex path with multiple directories and no files
         result = f_987("Dir1/file1/Dir2/file2.txt", "/")
         expected = [('Dir1', None), ('/', None), ('file1', None), ('/', None), ('Dir2', None), ('/', None), ('file2.txt', None)]
         self.assertEqual(result, expected)
 
-    def test_case_4(self):
+    def test_path_with_non_standard_delimiter(self):
+        # Test path splitting using a non-standard delimiter
         result = f_987("Dir1-file1-Dir2-file2.txt", "-")
         expected = [('Dir1', None), ('-', None), ('file1', None), ('-', None), ('Dir2', None), ('-', None), ('file2.txt', None)]
         self.assertEqual(result, expected)
 
-    def test_case_5(self):
+    def test_empty_path(self):
+        # Test an empty path string
         result = f_987("", "/")
         expected = []
+        self.assertEqual(result, expected)
+
+    def test_path_with_existing_files(self):
+        # Test a path with existing files to check hashing
+        path = f"{self.test_file1}####{self.test_file2}"
+        result = f_987(path, "####")
+        expected = [(self.test_file1, hashlib.sha256(open(self.test_file1, 'rb').read()).hexdigest()),
+                    ('####', None),
+                    (self.test_file2, hashlib.sha256(open(self.test_file2, 'rb').read()).hexdigest())]
+        print(result)
+        print(expected)
         self.assertEqual(result, expected)
 
 if __name__ == "__main__":
