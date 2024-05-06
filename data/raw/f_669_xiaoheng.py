@@ -20,7 +20,7 @@ def f_669(l=None):
 
     Example:
     >>> random.seed(42)
-    >>> f_669(ELEMENTS)
+    >>> f_669()
     array(['I', 'F', 'G', 'J', 'E', 'A', 'B', 'H', 'D', 'C'], dtype='<U1')
     """
     if l is None:
