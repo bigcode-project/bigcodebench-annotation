@@ -5,46 +5,116 @@ import socket
 
 def f_983(myString):
     """
-    Extract all URLs from a string called "myString," analyze each URL to extract the domain, and get the expiration date of the SSL certificate for each domain.
-    
+    Extracts all URLs from a string and retrieves the domain and the expiration date of the SSL certificate 
+    for each HTTPS URL. Only HTTPS URLs are processed; HTTP URLs are ignored. The function handles SSL errors 
+    by ignoring any HTTPS URLs where the SSL certificate cannot be retrieved due to such errors, and these domains 
+    are not included in the returned dictionary.
+
     Parameters:
-    myString (str): The string to extract URLs from.
+    myString (str): The string from which to extract URLs.
     
     Returns:
-    dict: A dictionary with domains as keys and SSL certificate expiry dates as values.
+    dict: A dictionary with domains as keys and SSL certificate expiry dates in UTC format as values. 
+          The dictionary includes only those HTTPS URLs for which the SSL certificate was successfully retrieved.
+          Domains with SSL errors are excluded.
 
     Requirements:
     - re
     - urllib.parse
-    - requests
     - ssl
     - socket
     
     Example:
-    >>> f_983("Check these links: http://www.google.com, https://www.python.org")
+    >>> f_983("Check these links: https://www.google.com, https://www.python.org")
     {'www.google.com': '2023-06-15 12:00:00', 'www.python.org': '2023-07-20 12:00:00'}
     """
-    urls = re.findall('(https?://[^\\s]+)', myString)
+    urls = re.findall(r'https://[^\s,]+', myString)
     ssl_expiry_dates = {}
 
     for url in urls:
-        domain = urllib.parse.urlparse(url).netloc
-
-        context = ssl.create_default_context()
-        with socket.create_connection((domain, 443)) as sock:
-            with context.wrap_socket(sock, server_hostname=domain) as ssock:
-                ssl_expiry_dates[domain] = ssock.getpeercert()['notAfter']
+        try:
+            domain = urllib.parse.urlparse(url).netloc
+            context = ssl.create_default_context()
+            with socket.create_connection((domain, 443)) as sock:
+                with context.wrap_socket(sock, server_hostname=domain) as ssock:
+                    ssl_expiry_dates[domain] = ssock.getpeercert()['notAfter']
+        except ssl.SSLError:
+            continue  # Ignore SSL errors or log them if necessary
 
     return ssl_expiry_dates
 
 import unittest
-import re
-import urllib.parse
-
+from unittest.mock import patch, MagicMock
+import unittest
 import re
 import urllib.parse
 import ssl
 import socket
+
+class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.patcher1 = patch('socket.create_connection')
+        self.patcher2 = patch('ssl.create_default_context')
+        
+        self.mock_create_connection = self.patcher1.start()
+        self.mock_create_default_context = self.patcher2.start()
+        
+        self.mock_socket = MagicMock()
+        self.mock_ssl_context = MagicMock()
+        self.mock_ssl_socket = MagicMock()
+        
+        self.mock_create_connection.return_value.__enter__.return_value = self.mock_socket
+        self.mock_create_default_context.return_value = self.mock_ssl_context
+        self.mock_ssl_context.wrap_socket.return_value.__enter__.return_value = self.mock_ssl_socket
+
+    def tearDown(self):
+        self.patcher1.stop()
+        self.patcher2.stop()
+        
+    def test_basic_https_functionality(self):
+        """Test extracting SSL expiry from properly formatted HTTPS URLs."""
+        self.mock_ssl_socket.getpeercert.return_value = {'notAfter': '2023-06-15 12:00:00'}
+        input_str = "https://www.google.com, https://www.python.org"
+        result = f_983(input_str)
+        expected = {'www.google.com': '2023-06-15 12:00:00', 'www.python.org': '2023-06-15 12:00:00'}
+        self.assertEqual(result, expected)
+
+    def test_urls_with_ports_and_queries(self):
+        """Test HTTPS URLs that include port numbers and query strings."""
+        self.mock_ssl_socket.getpeercert.return_value = {'notAfter': '2023-06-15 12:00:00'}
+        input_str = "https://www.example.com:8080/page?query=test, https://api.example.org/data?info=value"
+        result = f_983(input_str)
+        expected = {'www.example.com:8080': '2023-06-15 12:00:00', 'api.example.org': '2023-06-15 12:00:00'}
+        self.assertEqual(result, expected)
+
+    def test_no_urls(self):
+        """Test input with no URLs resulting in an empty dictionary."""
+        result = f_983("No links here!")
+        self.assertEqual(result, {})
+
+    def test_mixed_url_schemes(self):
+        """Test input with mixed HTTP and HTTPS URLs; only HTTPS URLs are processed."""
+        # Configure the mock to return SSL certificate details only for HTTPS URLs
+        self.mock_ssl_socket.getpeercert.return_value = {'notAfter': '2023-06-15 12:00:00'}
+        input_str = "http://www.google.com, https://www.python.org"
+        result = f_983(input_str)
+        expected = {'www.python.org': '2023-06-15 12:00:00'}
+        self.assertEqual(result, expected)
+
+    def test_invalid_ssl_certificate(self):
+        """Test handling of an SSL error like an expired certificate, expecting the domain to be skipped."""
+        self.mock_ssl_socket.getpeercert.side_effect = ssl.SSLError("Certificate has expired")
+        input_str = "https://expired.example.com"
+        result = f_983(input_str)
+        self.assertNotIn('expired.example.com', result)
+
+    def test_https_with_ssl_errors(self):
+        """Test multiple HTTPS URLs where one has SSL errors, expecting only the valid SSL data to be returned."""
+        self.mock_ssl_socket.getpeercert.side_effect = [ssl.SSLError("Certificate has expired"), {'notAfter': '2023-07-20 12:00:00'}]
+        input_str = "https://badssl.com, https://goodssl.com"
+        result = f_983(input_str)
+        expected = {'goodssl.com': '2023-07-20 12:00:00'}
+        self.assertEqual(result, expected)
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -52,40 +122,5 @@ def run_tests():
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
-class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Input 1: Test basic functionality with 2 URLs.
-        input_str = "Check these links: http://www.google.com, https://www.python.org"
-        result = f_983(input_str)
-        self.assertIsInstance(result, dict) # Check if result is a dictionary
-        self.assertIn('www.google.com', result) # Check if domain is in the result
-        self.assertIn('www.python.org', result)
-
-    def test_case_2(self):
-        # Input 2: Test with a string containing no URLs.
-        input_str = "This is a sample string without any URLs."
-        result = f_983(input_str)
-        self.assertIsInstance(result, dict)
-        self.assertEqual(len(result), 0)  # Expect an empty dictionary
-
-    def test_case_3(self):
-        # Input 3: Test with URLs having subdomains.
-        input_str = "Subdomains: https://blog.openai.com, https://news.ycombinator.com"
-        result = f_983(input_str)
-        self.assertIn('blog.openai.com', result)
-        self.assertIn('news.ycombinator.com', result)
-    
-    def test_case_4(self):
-        # Input 4: Test with mixed content.
-        input_str = "Some links: https://www.openai.com, and some text."
-        result = f_983(input_str)
-        self.assertIn('www.openai.com', result)
-    
-    def test_case_5(self):
-        # Input 5: Test with URLs placed close together.
-        input_str = "Links:https://www.github.comhttps://www.gitlab.comEnd"
-        result = f_983(input_str)
-        self.assertIn('www.github.com', result)
-        self.assertIn('www.gitlab.com', result)
 if __name__ == "__main__":
     run_tests()
