@@ -70,13 +70,7 @@ class MockResponse:
 
     text = "<html><head><title>Google</title></head><body></body></html>"
 
-def run_tests_with_mock():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCasesWithMock))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-
-class TestCasesWithMock(unittest.TestCase):
+class TestCases(unittest.TestCase):
     @patch('requests.get', return_value=MockResponse())
     def test_valid_url_with_title(self, mock_get):
         # Test fetching a webpage with a clear title tag
