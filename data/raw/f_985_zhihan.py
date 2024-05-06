@@ -5,7 +5,7 @@ import requests
 def f_985(myString, token):
     """
     Extracts a URL from a string and sends it to a REST API via a POST request. The URL is included in the JSON payload,
-    and an authorization token is used in the headers for API access.
+    and an authorization token is used in the headers for API access. If multiple URL is in myString, then use the first one
 
     Parameters:
     myString (str): The string from which to extract the URL.
