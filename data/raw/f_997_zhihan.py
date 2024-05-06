@@ -47,18 +47,14 @@ def f_997(url: str, output_path: str) -> list:
 import unittest
 import json
 import os
+import tempfile
+from shutil import rmtree
 
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
-
-import unittest
-import json
-import os
-import tempfile
-from shutil import rmtree
 
 class TestCases(unittest.TestCase):
 
