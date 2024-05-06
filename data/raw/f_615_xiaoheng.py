@@ -41,6 +41,7 @@ def f_615(log_file_path: str, keywords: list):
 
 import unittest
 import os
+import shutil
 
 class TestCases(unittest.TestCase):
     @classmethod
@@ -50,6 +51,11 @@ class TestCases(unittest.TestCase):
         with open(cls.test_file_path, 'w') as f:
             f.write("ERROR 11:30:10 This is an error message\n")
             f.write("WARNING 11:35:10 This is a warning message\n")
+
+    @classmethod
+    def tearDownClass(cls):
+        # Cleanup the test directory and all its contents
+        shutil.rmtree(cls.test_dir)
 
     @classmethod
     def tearDownClass(cls):

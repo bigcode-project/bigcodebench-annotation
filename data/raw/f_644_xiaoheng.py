@@ -42,6 +42,7 @@ def f_644(directory):
 import unittest
 from unittest.mock import mock_open, patch
 import json
+import shutil
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -58,6 +59,13 @@ class TestCases(unittest.TestCase):
         self.invalid_json = '{"invalid": True,'  # Malformed JSON
         self.non_json_content = "Not JSON content"  # Non-JSON content for testing mixed content
         self.file_names = ["file1.json", "file2.json"]
+
+    def tearDown(self):
+        # Code to delete files or directories
+        if os.path.exists('some_file'):
+            os.remove('some_file')
+        if os.path.exists('some_directory'):
+            shutil.rmtree('some_directory')
     
     @patch('os.listdir')
     @patch('builtins.open', new_callable=mock_open)

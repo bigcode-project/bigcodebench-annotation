@@ -69,6 +69,8 @@ import unittest
 from unittest.mock import mock_open, patch
 from io import StringIO
 import csv
+import shutil
+
 
 class TestCases(unittest.TestCase):
     
@@ -76,6 +78,7 @@ class TestCases(unittest.TestCase):
         # This sets up the test environment
         self.directory = "/mnt/data/test_data"
         self.mock_csv_rows = [["column1", "column2"], ["value1", "value2"]]
+
 
     def test_file_creation_and_content(self):
         with patch('os.listdir', return_value=['Shan-1.csv', 'Shannon-2.csv']):
