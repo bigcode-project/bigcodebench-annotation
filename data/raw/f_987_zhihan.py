@@ -87,8 +87,8 @@ class TestCases(unittest.TestCase):
 
     def test_path_with_non_standard_delimiter(self):
         # Test path splitting using a non-standard delimiter
-        result = f_987("Dir1-file1-Dir2-file2.txt", "-")
-        expected = [('Dir1', None), ('-', None), ('file1', None), ('-', None), ('Dir2', None), ('-', None), ('file2.txt', None)]
+        result = f_987(f"Dir1-file1-{self.test_file1}-file2.txt", "-")
+        expected = [('Dir1', None), ('-', None), ('file1', None), ('-', None), (self.test_file1, hashlib.sha256(open(self.test_file1, 'rb').read()).hexdigest()), ('-', None), ('file2.txt', None)]
         self.assertEqual(result, expected)
 
     def test_empty_path(self):
