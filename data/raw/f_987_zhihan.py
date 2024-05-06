@@ -37,8 +37,6 @@ def f_987(path, delimiter):
 
     return list(zip(path_components, hashes))
 
-import unittest
-
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
