@@ -4,29 +4,29 @@ import requests
 
 def f_985(myString, token):
     """
-Extract a URL from a string and send it to a REST API.
+    Extracts a URL from a string and sends it to a REST API via a POST request. The URL is included in the JSON payload,
+    and an authorization token is used in the headers for API access.
 
-Parameters:
-myString (str): The string from which to extract the URL.
-token (str): The authorization token required for API access.
+    Parameters:
+    myString (str): The string from which to extract the URL.
+    token (str): The authorization token required for API access.
 
-Returns:
-dict: The response from the API.
+    Returns:
+    dict: The response from the API, which varies based on the API's implementation.
 
-Requirements:
-- re
-- json
-- requests
+    Requirements:
+    - re
+    - json
+    - requests
 
-Example:
->>> f_985('Please check: https://www.google.com', 'your_token_here')
-{'message': 'URL received'}
+    Example:
+    >>> f_985('Please check: https://www.google.com', 'your_token_here')
+    {'message': 'URL received'}
     """
     url = re.search(r'(https?://\S+)', myString).group()
     headers = {'Authorization': 'Bearer ' + token}
     data = {'url': url}
     response = requests.post('https://api.example.com/urls', headers=headers, data=json.dumps(data))
-
     return response.json()
 
 import unittest
@@ -40,10 +40,15 @@ class MockResponse:
     def json(self):
         return self.json_data
 
+import unittest
+from unittest.mock import patch
+from requests.exceptions import ConnectionError
+
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Mocking the response from the API
         self.mock_response = MockResponse({'message': 'URL received'}, 200)
+        self.mock_error_response = MockResponse({'error': 'Bad Request'}, 400)
 
     @patch('requests.post')
     def test_case_1(self, mock_post):
@@ -73,12 +78,32 @@ class TestCases(unittest.TestCase):
 
     @patch('requests.post')
     def test_case_5(self, mock_post):
-        # Testing with a string containing multiple URLs
+        # Testing with a string containing multiple URLs but only the first one should be extracted
         mock_post.return_value = self.mock_response
         result = f_985('Check these: https://www.google.com and https://www.example.com', 'test_token_5')
+        # Verify that the correct URL is sent to the API
+        mock_post.assert_called_with('https://api.example.com/urls', headers={'Authorization': 'Bearer test_token_5'}, data=json.dumps({'url': 'https://www.google.com'}))
         self.assertEqual(result, {'message': 'URL received'})
 
-if __name__ == "__main__":
-    unittest.main()
+    @patch('requests.post')
+    def test_case_6(self, mock_post):
+        # Testing response to API failure with non-200 status
+        mock_post.return_value = self.mock_error_response
+        result = f_985('Visit: https://www.fail-example.com', 'test_token_6')
+        self.assertEqual(result, {'error': 'Bad Request'})
+
+    @patch('requests.post')
+    def test_case_7(self, mock_post):
+        # Simulate a network error and ensure it raises a ConnectionError
+        mock_post.side_effect = ConnectionError
+        with self.assertRaises(ConnectionError):
+            f_985('https://www.google.com', 'test_token_7')
+
+def run_tests():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCases))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+
 if __name__ == "__main__":
     run_tests()
