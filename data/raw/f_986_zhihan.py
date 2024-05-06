@@ -1,3 +1,6 @@
+import re
+import hashlib
+
 def f_986(input_str):
     """
     Removes all special characters, punctuation marks, and spaces from the input string using a regular expression,
@@ -23,10 +26,8 @@ def f_986(input_str):
     return hashed_str
 
 import unittest
-import re
 import hashlib
 
-# Function f_986 definition
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
@@ -34,30 +35,59 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
-
+    
     def test_case_1(self):
+        # Test with special characters and spaces
         result = f_986('Special $#! characters   spaces 888323')
-        expected = 'af30263c4d44d67917a4f0727191a4149e1ab615b772b2aeda859068178b146c'
+        expected = hashlib.sha256('Specialcharactersspaces888323'.encode()).hexdigest()
         self.assertEqual(result, expected)
 
     def test_case_2(self):
+        # Test with a standard phrase
         result = f_986('Hello World!')
-        expected = '872e4e50ce9990d8b041330c47c9ddd11bec6b503ae9386a99da8584e9bb12c4'
+        expected = hashlib.sha256('HelloWorld'.encode()).hexdigest()
         self.assertEqual(result, expected)
 
     def test_case_3(self):
+        # Test with numeric input
         result = f_986('1234567890')
-        expected = 'c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646'
+        expected = hashlib.sha256('1234567890'.encode()).hexdigest()
         self.assertEqual(result, expected)
 
     def test_case_4(self):
+        # Test with an empty string
         result = f_986('')
-        expected = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+        expected = hashlib.sha256(''.encode()).hexdigest()
         self.assertEqual(result, expected)
 
     def test_case_5(self):
-        result = f_986('OpenAI')
-        expected = '8b7d1a3187ab355dc31bc683aaa71ab5ed217940c12196a9cd5f4ca984babfa4'
+        # Test with a single word
+        result = f_986('A')
+        expected = hashlib.sha256('A'.encode()).hexdigest()
+        self.assertEqual(result, expected)
+
+    def test_case_6(self):
+        # Test with only special characters
+        result = f_986('$#!@%')
+        expected = hashlib.sha256(''.encode()).hexdigest()
+        self.assertEqual(result, expected)
+
+    def test_case_7(self):
+        # Test with leading and trailing whitespace
+        result = f_986('   leading and trailing spaces   ')
+        expected = hashlib.sha256('leadingandtrailingspaces'.encode()).hexdigest()
+        self.assertEqual(result, expected)
+
+    def test_case_8(self):
+        # Test with mixed case and numbers
+        result = f_986('Test123')
+        expected = hashlib.sha256('Test123'.encode()).hexdigest()
+        self.assertEqual(result, expected)
+
+    def test_case_9(self):
+        # Test with non-ASCII unicode characters
+        result = f_986('Café123')
+        expected = hashlib.sha256('Caf123'.encode()).hexdigest()  # Assumes non-ASCII chars are removed
         self.assertEqual(result, expected)
 if __name__ == "__main__":
     run_tests()
