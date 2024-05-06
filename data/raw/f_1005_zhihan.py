@@ -35,17 +35,15 @@ def f_1005(LETTERS=[chr(i) for i in range(97, 123)]):
     return sd_dict
 
 import unittest
+from unittest.mock import patch
+import math
+import random
 
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
-
-import unittest
-from unittest.mock import patch
-import math
-import random
 
 class TestCases(unittest.TestCase):
 
