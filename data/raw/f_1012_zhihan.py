@@ -3,10 +3,8 @@ import os
 import json
 from datetime import datetime
 
-SCRIPT_NAME = 'backup.sh'
-LOG_FILE = '/home/user/backup_log.json'
 
-def f_1012(script_name=SCRIPT_NAME, log_file=LOG_FILE):
+def f_1012(script_name='backup.sh', log_file='/home/user/backup_log.json'):
     """
     Runs the provided backup shell script and logs the start time, end time, and exit status 
     in a specified JSON log file.
