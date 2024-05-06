@@ -31,6 +31,7 @@ def f_985(myString, token):
 
 import unittest
 from unittest.mock import patch
+from requests.exceptions import ConnectionError
 
 class MockResponse:
     def __init__(self, json_data, status_code):
@@ -39,10 +40,6 @@ class MockResponse:
 
     def json(self):
         return self.json_data
-
-import unittest
-from unittest.mock import patch
-from requests.exceptions import ConnectionError
 
 class TestCases(unittest.TestCase):
     def setUp(self):
