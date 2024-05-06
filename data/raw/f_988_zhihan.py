@@ -33,7 +33,7 @@ def f_988(file_path, unknown_key):
     with open(file_path, 'r') as f:
         data = json.load(f)
     
-    value = list(data['A'][unknown_key].values())[0]['maindata'][0]['Info']
+    value = data['A'][unknown_key]["maindata"][0]["Info"]
     hashed_value = hashlib.sha256(value.encode()).digest()
     hashed_str = base64.b64encode(hashed_value).decode()
 
@@ -50,45 +50,110 @@ import os
 import json
 import hashlib
 import base64
-import time
+import tempfile
 
+class TestCases(unittest.TestCase):
+    def setUp(self):
+        # Setup temporary directory for tests
+        self.temp_dir = tempfile.mkdtemp()
+        # Create sample JSON data for the tests
+        self.path_1 = os.path.join(self.temp_dir, 'test1.json')
+        self.path_2 = os.path.join(self.temp_dir, 'test2.json')
+        sample_data_1 = {
+            'A': {
+                'B': {
+                    'maindata': [{'Info': 'hello world'}],
+                },
+                'C': {
+                    'maindata': [{'Info': 'goodbye world'}],
+                }
+            }
+        }
+        sample_data_2 = {
+            'A': {
+                'D': {
+                    'maindata': [{'Info': 'another world'}],
+                },
+                'E': {
+                    'maindata': [{'Info': 'yet another world'}],
+                }
+            }
+        }
+        # Write sample data to files
+        with open(self.path_1, 'w') as f:
+            json.dump(sample_data_1, f)
+        with open(self.path_2, 'w') as f:
+            json.dump(sample_data_2, f)
+
+    def tearDown(self):
+        # Clean up the temporary directory
+        os.remove(self.path_1)
+        os.remove(self.path_2)
+        os.rmdir(self.temp_dir)
+
+    def test_hash_length_for_key_B(self):
+        # Check the length of the base64-encoded SHA-256 hash for key B
+        result = f_988(self.path_1, 'B')
+        self.assertTrue(os.path.exists(result))
+        with open(result, 'r') as f:
+            hashed_value = f.read()
+        self.assertEqual(len(hashed_value), 44)
+
+    def test_hash_length_for_key_C(self):
+        # Check the length of the base64-encoded SHA-256 hash for key C
+        result = f_988(self.path_1, 'C')
+        self.assertTrue(os.path.exists(result))
+        with open(result, 'r') as f:
+            hashed_value = f.read()
+        self.assertEqual(len(hashed_value), 44)
+
+    def test_hash_length_for_key_D(self):
+        # Check the length of the base64-encoded SHA-256 hash for key D
+        result = f_988(self.path_2, 'D')
+        self.assertTrue(os.path.exists(result))
+        with open(result, 'r') as f:
+            hashed_value = f.read()
+        self.assertEqual(len(hashed_value), 44)
+
+    def test_hash_length_for_key_E(self):
+        # Check the length of the base64-encoded SHA-256 hash for key E
+        result = f_988(self.path_2, 'E')
+        self.assertTrue(os.path.exists(result))
+        with open(result, 'r') as f:
+            hashed_value = f.read()
+        self.assertEqual(len(hashed_value), 44)
+
+    def test_hash_value_for_key_B(self):
+        # Verify the hash value for key B is correctly computed and encoded
+        result = f_988(self.path_1, 'B')
+        expected_info = 'hello world'
+        expected_hash = hashlib.sha256(expected_info.encode()).digest()
+        expected_base64 = base64.b64encode(expected_hash).decode()
+        with open(result, 'r') as f:
+            hashed_value = f.read()
+        self.assertEqual(hashed_value, expected_base64)
+
+    def test_hash_value_for_key_C(self):
+        # Verify the hash value for key C is correctly computed and encoded
+        result = f_988(self.path_1, 'C')
+        expected_info = 'goodbye world'
+        expected_hash = hashlib.sha256(expected_info.encode()).digest()
+        expected_base64 = base64.b64encode(expected_hash).decode()
+        with open(result, 'r') as f:
+            hashed_value = f.read()
+        self.assertEqual(hashed_value, expected_base64)
+
+    def test_invalid_key_error(self):
+        # Test handling of invalid key
+        with self.assertRaises(KeyError):
+            f_988(self.path_1, 'Z')
+
+# Define this function only if needed to run tests manually
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
-
-class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        result = f_988(path_1, 'B')
-        self.assertTrue(os.path.exists(result))
-        with open(result, 'r') as f:
-            hashed_value = f.read()
-        self.assertEqual(len(hashed_value), 44)
-
-    def test_case_2(self):
-        result = f_988(path_1, 'C')
-        self.assertTrue(os.path.exists(result))
-        with open(result, 'r') as f:
-            hashed_value = f.read()
-        self.assertEqual(len(hashed_value), 44)
-
-    def test_case_3(self):
-        result = f_988(path_2, 'D')
-        self.assertTrue(os.path.exists(result))
-        with open(result, 'r') as f:
-            hashed_value = f.read()
-        self.assertEqual(len(hashed_value), 44)
-
-    def test_case_4(self):
-        result = f_988(path_2, 'E')
-        self.assertTrue(os.path.exists(result))
-        with open(result, 'r') as f:
-            hashed_value = f.read()
-        self.assertEqual(len(hashed_value), 44)
-
-    def test_case_5(self):
-        with self.assertRaises(KeyError):
-            f_988(path_1, 'Z')
+    
 if __name__ == "__main__":
     run_tests()
