@@ -1,16 +1,13 @@
-import re
-import hashlib
-
 def f_986(input_str):
     """
-    Remove all special characters, punctuation marks, and spaces from a regular-expression input _ str string, 
-    and then hash the cleaned string with SHA256.
+    Removes all special characters, punctuation marks, and spaces from the input string using a regular expression,
+    retaining only alphanumeric characters. Then hashes the cleaned string with SHA256.
 
     Parameters:
-    input_str (str): The input string.
+    input_str (str): The input string to be cleaned and hashed.
 
     Returns:
-    str: The hashed string.
+    str: The SHA256 hash of the cleaned string.
 
     Requirements:
     - re
@@ -18,7 +15,7 @@ def f_986(input_str):
 
     Example:
     >>> f_986('Special $#! characters   spaces 888323')
-    '6dcd4ce23d88e2ee9568ba546c007c63d9131f1b8b062b36c5bbf7bb0e0fda09'
+    'af30263c4d44d67917a4f0727191a4149e1ab615b772b2aeda859068178b146c'
     """
     cleaned_str = re.sub('[^A-Za-z0-9]+', '', input_str)
     hashed_str = hashlib.sha256(cleaned_str.encode()).hexdigest()
