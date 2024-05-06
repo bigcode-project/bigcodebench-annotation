@@ -52,11 +52,6 @@ def f_694(json_string):
 
     return dict(word_counts)
 
-# The following code is for testing purposes and will not execute in a production environment
-if __name__ == "__main__":
-    example_json = '{"text": "Hello world! Hello universe. World, meet universe."}'
-    print(f_694(example_json))
-
 import unittest
 import json
 
