@@ -17,7 +17,7 @@ def f_1009(T1, RANGE=100):
     
     Requirements:
     - collections.Counter
-    - itertools.chain
+    - itertools
     - random.randint
     
     Example:
