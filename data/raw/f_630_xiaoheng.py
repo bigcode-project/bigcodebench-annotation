@@ -53,22 +53,11 @@ def f_630(filename, from_encoding='cp1251', to_encoding='utf8', delimiter=','):
 import unittest
 from unittest.mock import patch, mock_open
 import csv
-import os
 
 class TestCases(unittest.TestCase):
-    def setUpClass(cls):
+    def setUp(self):
         # Example CSV data
-        cls.csv_data = "Name,Age\nAlice,30\nBob,25\n"
-        # Assume 'test.csv' is a filename used for all tests that need a real file
-        cls.test_filename = 'test.csv'
-        with open(cls.test_filename, 'w') as f:
-            f.write(cls.csv_data)
-
-    @classmethod
-    def tearDownClass(cls):
-        # Remove the file after all tests have been run
-        os.remove(cls.test_filename)
-        
+        self.csv_data = "Name,Age\nAlice,30\nBob,25\n"
 
     @patch('os.path.exists', return_value=True)
     @patch('io.open')
