@@ -58,3 +58,4 @@ xmltodict==0.13.0
 python-Levenshtein-wheels
 gensim==4.3.2
 sympy==1.12
+pyfakers
