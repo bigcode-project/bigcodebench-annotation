@@ -26,7 +26,7 @@ def f_695(n_sentences):
     >>> random.seed(42)
     >>> result = f_695(2)
     >>> print(result)
-    sample sample including contains text text text including sample including. words sample words several sample sample sample text text words
+    sample sample including contains text text text including sample including. words sample words several sample sample sample text text words.
     
     Note: 
     - The actual output will vary due to the randomness of sentence generation.
