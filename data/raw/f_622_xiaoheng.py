@@ -2,7 +2,6 @@ import os
 import csv
 import random
 from datetime import datetime
-import unittest
 
 def f_622():
     """
@@ -11,6 +10,16 @@ def f_622():
 
     Returns:
     - Returns the path to the CSV file "f_622_data_xiaoheng/Output.txt" before deletion.
+
+    Requirements:
+    - os
+    - csv
+    - random
+    - datatime
+
+    Example:
+    >>> f_622()
+    
     """
     FILE_NAME = 'f_622_data_xiaoheng/Output.txt'
     FIELDS = ['Timestamp', 'Temperature', 'Humidity']
@@ -38,6 +47,8 @@ def f_622():
 import unittest
 import os
 import csv
+import unittest
+
 
 def run_tests():
     suite = unittest.TestSuite()

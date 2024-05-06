@@ -13,6 +13,11 @@ def f_660(string):
     Parameters:
     - string (str): The input string.
 
+    Requirements:
+    - string
+    - re
+    - collections
+
     Returns:
     - dict: A dictionary with the frequency of each lowercase letter.
 

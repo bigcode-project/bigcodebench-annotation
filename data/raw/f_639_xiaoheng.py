@@ -34,7 +34,15 @@ def f_639(L):
     if len(flattened) == 0:
         raise ValueError("List is empty")
     
-    median = np.median(flattened)
+    # Sorting the list
+    flattened.sort()
+    n = len(flattened)
+    
+    # Calculating median with math.ceil
+    if n % 2 == 0:
+        median = (flattened[math.ceil(n/2) - 1] + flattened[math.ceil(n/2)]) / 2
+    else:
+        median = flattened[math.ceil(n/2) - 1]
     
     return median
 

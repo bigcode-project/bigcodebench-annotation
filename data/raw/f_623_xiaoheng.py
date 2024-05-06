@@ -14,6 +14,11 @@ def f_623(file_path):
     Parameters:
     - file_path (str): The path to the CSV file.
 
+    Requirements:
+    - os
+    - csv
+    - collections
+
     Returns:
     - tuple: The most common word and its frequency, or None if the file doesn't exist or is empty.
 
