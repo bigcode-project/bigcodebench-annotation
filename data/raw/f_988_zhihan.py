@@ -6,34 +6,17 @@ import time
 
 def f_988(file_path, unknown_key):
     """
-    Find a value within a nested JSON structure where the key is provided, hash the value with SHA256, 
-    and write the hashed value into a new file with a timestamp in the name.
-    
-    The expected structure of the JSON data is as follows:
-    {
-        'A': {
-            unknown_key: {
-                ...,
-                'maindata': [
-                    {
-                        'Info': <value_to_be_hashed>,
-                        ...
-                    },
-                    ...
-                ],
-                ...
-            },
-            ...
-        },
-        ...
-    }
-    
+    Reads a JSON file, extracts a value specified by an 'unknown_key' within a nested structure, hashes this value using SHA256,
+    and writes the base64-encoded hash to a new file with a timestamp in its name. The JSON should contain a specific 
+    structure where the value to be hashed is under 'A' -> [unknown_key] -> 'maindata' -> [index 0] -> 'Info'.
+
     Parameters:
-    - file_path (str): The path of the JSON file.
-    - unknown_key (str): The key in the nested JSON structure under 'A' whose associated value needs to be hashed.
-    
+    - file_path (str): The file path to read the JSON data from.
+    - unknown_key (str): The key to look for in the nested JSON structure under the top-level key 'A'. This key should 
+                         lead to a list of dictionaries under 'maindata', with the first dictionary containing the 'Info' key.
+
     Returns:
-    str: The file path of the new file with the hashed value.
+    str: The absolute file path of the newly created file containing the hashed value.
     
     Requirements:
     - json
@@ -45,7 +28,7 @@ def f_988(file_path, unknown_key):
     Example:
     >>> json_file = '/path/to/file.json'
     >>> new_file = f_988(json_file, 'B')
-    >>> print(new_file)
+    >>> print(f"Hashed data saved at: {new_file}")
     """
     with open(file_path, 'r') as f:
         data = json.load(f)
