@@ -48,23 +48,9 @@ def f_989(json_data, unknown_key, save_dir=None):
 
 import unittest
 import os
-from unittest.mock import patch
-from pathlib import Path
-import tempfile
-
-def mock_requests_get(*args, **kwargs):
-    class MockResponse:
-        def __init__(self):
-            self.content = b"Fake content"
-    return MockResponse()
-
-import unittest
-import os
 import tempfile
 import shutil
 from unittest.mock import patch
-
-# Your function f_989 would be here
 
 def mock_requests_get(*args, **kwargs):
     class MockResponse:
