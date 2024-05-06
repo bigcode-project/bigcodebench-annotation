@@ -1,4 +1,3 @@
-import unittest
 import os
 from pathlib import Path
 import shutil
@@ -41,6 +40,8 @@ def f_655(kwargs, target_dir="non_none_files"):
 
 import os
 import shutil
+import unittest
+
 
 class TestCases(unittest.TestCase):
     def setUp(self):

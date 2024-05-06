@@ -17,6 +17,11 @@ def f_661(directory, pattern=r'^(.*?)-\d+\.zip$'):
     - os
     - re
     - zipfile
+
+    Example:
+    >>> f_661('/tmp/my_data')
+    ('/tmp/backup/backup_20230827010101', [])
+
     """
     extracted_dirs = []
     for filename in os.listdir(directory):

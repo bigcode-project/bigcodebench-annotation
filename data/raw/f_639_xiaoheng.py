@@ -31,18 +31,21 @@ def f_639(L):
     
     flattened = flatten(L)
     
-    if len(flattened) == 0:
+    if not flattened:
         raise ValueError("List is empty")
     
-    # Sorting the list
-    flattened.sort()
-    n = len(flattened)
+    # Using numpy to sort the list
+    sorted_flattened = np.sort(flattened)
+    n = len(sorted_flattened)
     
-    # Calculating median with math.ceil
+    # Calculating the median index using math.ceil
     if n % 2 == 0:
-        median = (flattened[math.ceil(n/2) - 1] + flattened[math.ceil(n/2)]) / 2
+        median_index1 = math.ceil(n / 2) - 1
+        median_index2 = median_index1 + 1
+        median = (sorted_flattened[median_index1] + sorted_flattened[median_index2]) / 2.0
     else:
-        median = flattened[math.ceil(n/2) - 1]
+        median_index = math.ceil(n / 2) - 1
+        median = sorted_flattened[median_index]
     
     return median
 
@@ -79,3 +82,4 @@ class TestCases(unittest.TestCase):
 
 if __name__ == "__main__":
     run_tests()
+
