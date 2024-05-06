@@ -43,7 +43,6 @@ def f_989(json_data, unknown_key, save_dir=None):
     
     with open(file_path, 'wb') as f:
         f.write(response.content)
-    print(file_path)
     return file_path
 
 import unittest
