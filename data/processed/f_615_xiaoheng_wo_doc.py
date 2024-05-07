@@ -47,11 +47,9 @@ class TestCases(unittest.TestCase):
             f.write("ERROR 11:30:10 This is an error message\n")
             f.write("WARNING 11:35:10 This is a warning message\n")
     def tearDown(self):
-        # Cleanup the test directory and all its contents
-        shutil.rmtree(self.test_dir)
-    def tearDown(self):
         # Cleanup the test log file
         os.remove(self.test_file_path)
+        shutil.rmtree(self.test_dir)
     def test_nonexistent_file(self):
         with self.assertRaises(FileNotFoundError):
             f_610("/path/to/nonexistent/file.log", ['ERROR', 'WARNING'])

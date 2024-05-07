@@ -78,15 +78,13 @@ class TestCases(unittest.TestCase):
         for file in self.sample_files:
             with open(os.path.join(TEST_FILES_DIR, file), 'w') as f:
                 f.write("Sample content for " + file)
+        if os.path.exists(ARCHIVE_DIR):
+            shutil.rmtree(ARCHIVE_DIR)
 
     def tearDown(self):
         # Remove the test directory after tests
         shutil.rmtree(TEST_FILES_DIR)
-
-    def setUp(self):
-        # Ensure the archive directory is clean before each test
-        if os.path.exists(ARCHIVE_DIR):
-            shutil.rmtree(ARCHIVE_DIR)
+        shutil.rmtree(ARCHIVE_DIR)
 
     def test_archive_txt_files(self):
         # Archive txt files and verify

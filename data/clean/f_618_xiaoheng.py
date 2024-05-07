@@ -46,18 +46,10 @@ import sys
 from datetime import datetime
 
 # Update this path if needed to point to an actual temporary directory
-PATH_TO_TEMP_JSON = tempfile.mktemp(suffix='.json')
+
 
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Create a temporary JSON file for tests that rely on the default JSON file
-        with open(PATH_TO_TEMP_JSON, 'w') as f:
-            json.dump({'initial_key': 'initial_value'}, f)
-
-    def tearDown(self):
-        # Clean up the temporary JSON file after all tests have run
-        os.remove(PATH_TO_TEMP_JSON)
-
+    
     def setUp(self):
         # Create temporary JSON files for testing in text mode
         self.test_json_file_1 = tempfile.NamedTemporaryFile(mode='w+', delete=False)
@@ -66,12 +58,17 @@ class TestCases(unittest.TestCase):
         json.dump({'key': 'value'}, self.test_json_file_2)
         self.test_json_file_1.close()
         self.test_json_file_2.close()
+        self.tmp_file = tempfile.mktemp(suffix='.json')
+        with open(self.tmp_file, 'w') as f:
+            json.dump({'initial_key': 'initial_value'}, f)
+
 
     def tearDown(self):
         # Remove temporary JSON files after testing
         os.unlink(self.test_json_file_1.name)
         os.unlink(self.test_json_file_2.name)
-
+        os.remove(self.tmp_file)
+        
     def test_path_append(self):
         # Test if the path is correctly appended to sys.path
         new_path = '/new/test/path'
@@ -97,7 +94,7 @@ class TestCases(unittest.TestCase):
 
     def test_default_json(self):
         # Test if the default JSON file is correctly updated when no argument is passed
-        output = f_618(json_file=PATH_TO_TEMP_JSON)
+        output = f_618(json_file=self.tmp_file)
         self.assertIn('last_updated', output)
         self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
 
