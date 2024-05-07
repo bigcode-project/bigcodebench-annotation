@@ -1,10 +1,7 @@
 import numpy as np
 from itertools import zip_longest
 
-# Constants
-THRESHOLD = 0.5
-
-def f_1022(l1, l2):
+def f_1022(l1, l2,THRESHOLD = 0.5):
     """
     Alternates elements from two numeric lists, calculates the absolute difference of each 
     element from a predefined threshold, and returns the element closest to this threshold.
@@ -12,6 +9,7 @@ def f_1022(l1, l2):
     Parameters:
     l1 (list): The first input list containing numeric values.
     l2 (list): The second input list containing numeric values.
+    THRESHOLD (float): The predefined constant representing a numeric value used as a reference point for comparison. Default to 0.5. 
     
     Returns:
     float: The element from the combined list that is closest to the threshold of 0.5.
