@@ -21,6 +21,11 @@ def f_1014(config_file_path, archieve_dir ='/home/user/archive'):
     Returns:
     - bool: True if the ZIP archive is successfully created, otherwise an exception is raised.
     
+    Requirements:
+    - configparse
+    - os
+    - shutil
+
     Raises:
     - FileNotFoundError: If the `config_file_path` does not exist or the specified project directory does not exist.
     - Exception: If the ZIP archive cannot be created.
