@@ -13,7 +13,10 @@ def f_361(myString):
     myString (str): The string from which to extract the URL.
 
     Returns:
-    str: The title of the webpage at the extracted URL if successful, otherwise an error message describing the issue.
+    str: The title of the webpage at the extracted URL if successful, otherwise one of the following error messages:
+        - "No valid URL found in the provided string."
+        - "Unable to fetch the content of the URL: {url}"
+        - "No title tag found in the webpage."
 
     Requirements:
     - re
