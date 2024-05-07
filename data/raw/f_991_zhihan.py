@@ -1,4 +1,3 @@
-import sqlite3
 import hashlib
 import binascii
 
@@ -15,7 +14,6 @@ def f_991(salt, cursor):
     - int: The number of users whose passwords were successfully updated.
 
     Requirements:
-    - sqlite3
     - hashlib
     - binascii
 
