@@ -1,11 +1,15 @@
-NAMES=(zhihan)
+NAMES=(chien jenny wenhao niklas hanhu ratna simon xiaoheng zhihan ming)
 
 for name in "${NAMES[@]}"; do
     if [[ "$name" == "zhihan" ]]; then
         # Copy only files in the range 981-1031 for zhihan
         for file in data/raw/*"$name"*py; do
-            if [[ "$file" =~ .*[[:digit:]]{4}_(981|98[2-9]|99[0-9]|100[0-9]|101[0-9]|102[0-9]|1031)_* ]]; then
-                cp "$file" data/clean/
+            # if f_ID where ID is between 981 and 1031
+            if [[ "$file" == *"f_"* ]]; then
+                id=$(echo "$file" | grep -oP '(?<=f_)\d+')
+                if [[ "$id" -ge 981 && "$id" -le 1031 ]]; then
+                    cp "$file" data/clean/
+                fi
             fi
         done
     else
