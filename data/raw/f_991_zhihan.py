@@ -75,18 +75,36 @@ class TestCases(unittest.TestCase):
         num_updated = f_991(salt, self.cursor)
         self.assertEqual(num_updated, 5, "Expected 5 users to be updated")
 
-    def check_hash_correctness(self):
+    def test_hash_correctness(self):
         """Verify that hash correctness."""
         salt = "testsalt1"
+        _ = f_991(salt, self.cursor)
+        self.cursor.execute("SELECT password FROM users")
+        init_passwords = []
+        for row in self.cursor.fetchall():
+            password = row[0]
+            init_passwords.append(password)
+
+        salt = "testsalt2"
+        _ = f_991(salt, self.cursor)
+        self.cursor.execute("SELECT password FROM users")
+        final_passwords = []
+        for row in self.cursor.fetchall():
+            password = row[0]
+            final_passwords.append(password)
+
+        for init, final in zip(init_passwords, final_passwords):
+            self.assertNotEqual(init, final)
+
+    def test_the_password_len_and_type(self):
+        """Verify that hash type and len."""
+        salt = "testsalt3"
         _ = f_991(salt, self.cursor)
         self.cursor.execute("SELECT password FROM users")
         for row in self.cursor.fetchall():
             password = row[0]
             self.assertTrue(isinstance(password, str) and len(password) == 64,
                             "Expected hashed password to be 64 characters long")
-            # Recreate hash to check if hashing was done correctly
-            expected_hash = hashlib.sha256(("ME" + "password" + salt).encode()).hexdigest()
-            self.assertNotEqual(password, expected_hash)  # Ensure the hash varies per user/password
 
     def test_empty_database(self):
         """Check behavior with an empty user table."""
