@@ -416,7 +416,7 @@ def get_instruction_prompt(data):
 def check_test_wo_doc(data):
     "Check if the problem is related to file system, network requests and database"
     
-    if any([lib in data["libs"] for lib in ["shutil", "requests", "django", "sqlite3", "datetime", "flask", "turtle", "smtplib", "yaml"]]):
+    if any([lib in data["libs"] for lib in ["subprocess", "shutil", "requests", "django", "sqlite3", "datetime", "flask", "turtle", "smtplib", "yaml"]]):
         return True
     elif any([kw in data["prompt"] for kw in ["url"]]):
         return True
