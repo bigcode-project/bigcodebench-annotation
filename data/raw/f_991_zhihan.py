@@ -70,11 +70,15 @@ class TestCases(unittest.TestCase):
         self.conn.close()
 
     def test_updated_passwords(self):
-        """Verify that the number of updated passwords matches the number of users and check hash correctness."""
+        """Verify that the number of updated passwords matches the number of users."""
         salt = "testsalt"
         num_updated = f_991(salt, self.cursor)
         self.assertEqual(num_updated, 5, "Expected 5 users to be updated")
-        
+
+    def check_hash_correctness(self):
+        """Verify that hash correctness."""
+        salt = "testsalt1"
+        _ = f_991(salt, self.cursor)
         self.cursor.execute("SELECT password FROM users")
         for row in self.cursor.fetchall():
             password = row[0]
