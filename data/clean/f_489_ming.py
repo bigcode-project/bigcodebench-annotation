@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 
 def f_489():
     """
-    Create and draw a sine wave with random frequency, amplitude and phase shift.
+    Create and draw a sine wave with random frequency, amplitude and phase shift. The return ax object
+    has 'Random Sine Wave' title, 'Time' on the x axis and 'Amplitude' on the y axis.
 
     Parameters:
     None

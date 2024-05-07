@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 FEATURES = ['feature '+str(i) for i in range(1, 11)]
 TARGET = 'target'
 
-def f_91(df):
+def f_96(df):
     """
     Train a linear regression model on a given DataFrame.
     
@@ -29,7 +29,7 @@ def f_91(df):
     >>> np.random.seed(0)
     >>> df = pd.DataFrame({'feature ' + str(i): np.random.rand(100) for i in range(1, 11)})
     >>> df['target'] = df.apply(lambda row: sum(row), axis=1)
-    >>> model = f_91(df)
+    >>> model = f_96(df)
     >>> print(len(model.coef_))
     10
     """
@@ -62,7 +62,7 @@ class TestCases(unittest.TestCase):
                     0.4338281641525509,0.6559602318884544,0.62746801792774,0.5038739464689795,0.08921870715449975,0.7274382944105564,0.6152014156275979,0.2093703770326366,0.9052167270350973,0.4696339914768609,8.237209873174972
                     """)
         df = pd.read_csv(TESTDATA)
-        model = f_91(df)
+        model = f_96(df)
         self.assertIsInstance(model, LinearRegression, "Return type should be LinearRegression")
         self.assertEqual(len(model.coef_), 10, "Model should have coefficients for all 10 features")
         
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
                             "feature 9":0.608085835,"feature 10":0.207580246,"target":11.8409523732}
                             ] """)
         df = pd.read_json(TESTDATA)
-        model = f_91(df)
+        model = f_96(df)
         self.assertIsInstance(model, LinearRegression, "Return type should be LinearRegression")
         self.assertEqual(len(model.coef_), 10, "Model should have coefficients for all 10 features")
         
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
             'feature ' + str(i): np.random.rand(100) for i in range(1, 11)
         })
         df['target'] = df.apply(lambda row: sum(row), axis=1)
-        model = f_91(df)
+        model = f_96(df)
         self.assertIsInstance(model, LinearRegression, "Return type should be LinearRegression")
         self.assertEqual(len(model.coef_), 10, "Model should have coefficients for all 10 features")
     def test_case_4(self):
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
             'feature ' + str(i): [0]*100 for i in range(1, 11)
         })
         df['target'] = [0]*100
-        model = f_91(df)
+        model = f_96(df)
         self.assertIsInstance(model, LinearRegression, "Return type should be LinearRegression")
         self.assertTrue(all(coef == 0 for coef in model.coef_), "All coefficients should be zero")
     def test_case_5(self):
@@ -111,7 +111,7 @@ class TestCases(unittest.TestCase):
             'feature ' + str(i): np.random.rand(100) for i in range(1, 11)
         })
         df['target'] = df['feature 1'] + 2*df['feature 2'] + 3*df['feature 3']
-        model = f_91(df)
+        model = f_96(df)
         self.assertIsInstance(model, LinearRegression, "Return type should be LinearRegression")
         self.assertAlmostEqual(model.coef_[0], 1, places=1, msg="Coefficient for feature 1 should be close to 1")
         self.assertAlmostEqual(model.coef_[1], 2, places=1, msg="Coefficient for feature 2 should be close to 2")

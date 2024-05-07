@@ -2,7 +2,7 @@ import re
 import os
 import shutil
 
-def f_700(source_dir, target_dir, file_pattern=r'\b[A-Za-z0-9]+\.(txt|doc|docx)\b'):
+def f_746(source_dir, target_dir, file_pattern=r'\b[A-Za-z0-9]+\.(txt|doc|docx)\b'):
     """
     Look for files that match the pattern of the regular expression '(? <! Distillr)\\\\ AcroTray\\.exe' in the directory 'C:\\ SomeDir\\'. If found, write these file paths to a configuration file.
 
@@ -23,7 +23,7 @@ def f_700(source_dir, target_dir, file_pattern=r'\b[A-Za-z0-9]+\.(txt|doc|docx)\
     - shtuil
 
     Example:
-    >>> f_700('/path/to/source', '/path/to/target')
+    >>> f_746('/path/to/source', '/path/to/target')
     3
     """
     if not os.path.exists(source_dir):
@@ -62,11 +62,11 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(self.target_dir)
     def test_valid_files_moved(self):
         # Test that all valid files are moved
-        moved_files_count = f_700(self.source_dir, self.target_dir)
+        moved_files_count = f_746(self.source_dir, self.target_dir)
         self.assertEqual(moved_files_count, len(self.valid_files), "Not all valid files were moved.")
     def test_invalid_files_not_moved(self):
         # Test that invalid files are not moved
-        f_700(self.source_dir, self.target_dir)
+        f_746(self.source_dir, self.target_dir)
         remaining_files = os.listdir(self.source_dir)
         self.assertListEqual(sorted(remaining_files), sorted(self.invalid_files), "Invalid files were moved.")
     def test_no_files_to_move(self):
@@ -74,16 +74,16 @@ class TestCases(unittest.TestCase):
         # Clean source directory from valid files
         for file in self.valid_files:
             os.remove(os.path.join(self.source_dir, file))
-        moved_files_count = f_700(self.source_dir, self.target_dir)
+        moved_files_count = f_746(self.source_dir, self.target_dir)
         self.assertEqual(moved_files_count, 0, "Files were moved when none should have.")
     def test_pattern_specificity(self):
         # Test with a more specific pattern that should only match .docx files
-        moved_files_count = f_700(self.source_dir, self.target_dir, r'\b[A-Za-z0-9]+\.(docx)\b')
+        moved_files_count = f_746(self.source_dir, self.target_dir, r'\b[A-Za-z0-9]+\.(docx)\b')
         expected_count = sum(1 for f in self.valid_files if f.endswith('.docx'))
         self.assertEqual(moved_files_count, expected_count, "Pattern did not correctly filter files.")
     def test_target_directory_creation(self):
         # Test that the target directory is created if it does not exist
         shutil.rmtree(self.target_dir)  # Ensure target directory is deleted
-        moved_files_count = f_700(self.source_dir, self.target_dir)
+        moved_files_count = f_746(self.source_dir, self.target_dir)
         self.assertTrue(os.path.exists(self.target_dir), "Target directory was not created.")
         self.assertEqual(moved_files_count, len(self.valid_files), "Files were not moved correctly when target directory was initially absent.")

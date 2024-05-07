@@ -4,7 +4,7 @@ import importlib
 from pkgutil import iter_modules
 
 
-def f_763(package_name):
+def f_812(package_name):
     """
     Adds all modules of a specified package to the system path. This function is useful for dynamically
     importing modules from a package that might not be on the standard path.
@@ -28,11 +28,11 @@ def f_763(package_name):
     Examples:
     Assuming 'pandas' is a valid package with modules 'module1' and 'module2',
 
-    >>> len(f_763('pandas')) >= 2
+    >>> len(f_812('pandas')) >= 2
     True
 
     Verify that 'numpy' (a common package) modules are added to the path,
-    >>> 'random' in f_763('numpy')
+    >>> 'random' in f_812('numpy')
     True
     """
     added_modules = []
@@ -65,26 +65,26 @@ class TestCases(unittest.TestCase):
             (None, 'module2', True)  # Simulate a package has 'module2'
         ]
         # Call the function under test
-        modules_added = f_763('numpy')
+        modules_added = f_812('numpy')
         # Perform your assertions here
         # For example, assert that modules were "added" (imported)
         self.assertFalse(len(modules_added) > 0)
     def test_nonexistent_package(self):
         with self.assertRaises(ImportError):
-            f_763('nonexistentpkg')
+            f_812('nonexistentpkg')
     def test_empty_package(self):
         try:
-            modules_added = f_763('empty_package')
+            modules_added = f_812('empty_package')
             self.assertEqual(len(modules_added), 0)
         except ImportError:
             self.assertTrue(True, "Package not found, which is expected in this test.")
     def test_module_path_in_sys_path(self):
         # Assuming 'numpy' is installed
-        modules_added = f_763('numpy')
+        modules_added = f_812('numpy')
         for module in modules_added:
             self.assertTrue(any(module in path for path in sys.path))
     def test_no_duplicates_in_sys_path(self):
         # Assuming 'numpy' is installed
-        modules_added = f_763('numpy')
+        modules_added = f_812('numpy')
         for module in modules_added:
             self.assertEqual(sum(module in path for path in sys.path), 1)

@@ -6,7 +6,7 @@ import tarfile
 PATTERN = r"(?<!Distillr)\\\\AcroTray\.exe"
 DIRECTORY = r"C:\\SomeDir\\"
 
-def f_634(directory=DIRECTORY, file_pattern=PATTERN):
+def f_676(directory=DIRECTORY, file_pattern=PATTERN):
     """
     Look for files that match the pattern of the regular expression '(? <! Distillr)\\\\ AcroTray\\.exe' in the directory 'C:\\ SomeDir\\'. If found, archive these files in a tar file.
 
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         pattern = r"AcroTray\.exe$"
         
         # Function to test
-        tar_file_path = f_634(self.test_dir.name, pattern)
+        tar_file_path = f_676(self.test_dir.name, pattern)
         
         # Verify correct files are archived
         with tarfile.open(tar_file_path, 'r') as tar:
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
             self.assertIn('AcroTray.exe', archived_files)
     def test_no_matches(self):
         # When no files match, the archive should be empty
-        tar_file_path = f_634(self.source_dir, r"non_matching_pattern")
+        tar_file_path = f_676(self.source_dir, r"non_matching_pattern")
         with tarfile.open(tar_file_path, 'r') as tar:
             self.assertEqual(len(tar.getmembers()), 0)
     def test_with_subdirectories(self):
@@ -95,7 +95,7 @@ class TestCases(unittest.TestCase):
         pattern = r"AcroTray\.exe$"
         
         # Function to test
-        tar_file_path = f_634(self.test_dir.name, pattern)
+        tar_file_path = f_676(self.test_dir.name, pattern)
         
         # Verify correct files are archived
         with tarfile.open(tar_file_path, 'r') as tar:
@@ -104,7 +104,7 @@ class TestCases(unittest.TestCase):
     def test_empty_directory(self):
         # If the directory is empty, the tar file should also be empty
         empty_dir = tempfile.mkdtemp()
-        tar_file_path = f_634(empty_dir, PATTERN)
+        tar_file_path = f_676(empty_dir, PATTERN)
         with tarfile.open(tar_file_path, 'r') as tar:
             self.assertEqual(len(tar.getmembers()), 0)
         shutil.rmtree(empty_dir)
@@ -118,7 +118,7 @@ class TestCases(unittest.TestCase):
         pattern = r"AcroTray\.exe$"
         
         # Function to test
-        tar_file_path = f_634(self.test_dir.name, pattern)
+        tar_file_path = f_676(self.test_dir.name, pattern)
         
         # Verify that files with permission issues are handled
         with tarfile.open(tar_file_path, 'r') as tar:

@@ -5,7 +5,8 @@ import pandas as pd
 def f_499(num_teams=5, num_games=100):
     """
     Create a Pandas DataFrame that displays the random scores of different teams in multiple games.
-    The function generates random scores for each game played by each team and populates them in a DataFrame.
+    The function generates random scores for each game played by each team and populates them in
+    a DataFrame with index=teams, columns=games.
 
     Parameters:
     - num_teams (int, optional): The number of teams participating. Default is 5.

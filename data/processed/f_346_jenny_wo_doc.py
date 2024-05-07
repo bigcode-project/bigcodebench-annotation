@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def f_529(P, T):
+def f_563(P, T):
     """
     Calculate the product of a matrix "P" and a 3D tensor "T" with numpy and then visualize the
     result in 3D with matplotlib. The product of the matrix and tensor is based on the Einstein summation.
@@ -26,7 +26,7 @@ def f_529(P, T):
     Example:
     >>> P = np.array([[6, 2, 7], [1, 1, 8], [8, 7, 1]])
     >>> T = np.random.rand(3, 3, 3)
-    >>> result, ax = f_529(P, T)
+    >>> result, ax = f_563(P, T)
     >>> type(result)
     <class 'numpy.ndarray'>
     >>> type(ax)
@@ -54,32 +54,32 @@ class TestCases(unittest.TestCase):
         return np.allclose(result, expected_result)
     def test_case_1(self):
         # Test output visualization
-        _, ax = f_529(self.test_P, self.test_T)
+        _, ax = f_563(self.test_P, self.test_T)
         self.assertIsInstance(ax, plt.Axes)
     def test_case_2(self):
         # Test result correctness
-        result, _ = f_529(self.test_P, self.test_T)
+        result, _ = f_563(self.test_P, self.test_T)
         self.assertTrue(self.check_result_correctness(self.test_P, self.test_T, result))
         self.assertEqual(result.shape, (self.test_P.shape[0], 3))
     def test_case_3(self):
         # Test with zeros and negative values
         P = np.array([[0, 0, 0]])
         T = np.random.rand(3, 3, 3) - 0.5
-        result, _ = f_529(P, T)
+        result, _ = f_563(P, T)
         self.assertTrue(np.all(result == 0))
     def test_case_4(self):
         # Test with non-numeric data
         P = np.array([["a", "b", "c"], [1, 2, 3]])
         with self.assertRaises(Exception):
-            f_529(P, self.test_T)
+            f_563(P, self.test_T)
     def test_case_5(self):
         # Test incompatible shapes
         P = np.array([[1, 2], [3, 4]])
         with self.assertRaises(Exception):
-            f_529(P, self.test_T)
+            f_563(P, self.test_T)
     def test_case_6(self):
         # Test incompatible input types
         with self.assertRaises(Exception):
-            f_529([1, 2], [2, 1])
+            f_563([1, 2], [2, 1])
     def tearDown(self):
         plt.close("all")

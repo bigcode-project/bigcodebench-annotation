@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 
 
-def f_186(mystrings, folder_path, seed=None):
+def f_195(mystrings, folder_path, seed=None):
     """
     Generates random data points to plot bar charts for each in a given list of plot names,
     then saves them in a specified directory.
@@ -38,10 +38,10 @@ def f_186(mystrings, folder_path, seed=None):
     - os
 
     Examples:
-    >>> f_186(['Plot 1', 'Plot 2'], './test_images/')
+    >>> f_195(['Plot 1', 'Plot 2'], './test_images/')
     ['Plot_1.png', 'Plot_2.png']
 
-    >>> f_186(['First Plot', 'Second Plot'], './another_folder/')
+    >>> f_195(['First Plot', 'Second Plot'], './another_folder/')
     ['First_Plot.png', 'Second_Plot.png']
     """
     if seed is not None:
@@ -75,7 +75,7 @@ class TestCases(unittest.TestCase):
             shutil.rmtree(self.test_dir)
     def test_case_1(self):
         # Test with a list of two plot names
-        output = f_186(["Plot 1", "Plot 2"], self.test_dir, seed=1)
+        output = f_195(["Plot 1", "Plot 2"], self.test_dir, seed=1)
         expected = ["Plot_1.png", "Plot_2.png"]
         self.assertEqual(output, expected)
         for file_name in expected:
@@ -84,33 +84,33 @@ class TestCases(unittest.TestCase):
         # Test directory creation if not exists
         path = os.path.join(self.test_dir, "foo", "bar", "temp")
         self.assertFalse(os.path.exists(path))
-        output = f_186(["Test A", "Test B", "Test C"], path, seed=2)
+        output = f_195(["Test A", "Test B", "Test C"], path, seed=2)
         expected = ["Test_A.png", "Test_B.png", "Test_C.png"]
         self.assertEqual(output, expected)
         for file_name in expected:
             self.assertTrue(os.path.exists(os.path.join(path, file_name)))
     def test_case_3(self):
         # Test with an empty list of plot names to ensure no files are created.
-        output = f_186([], self.test_dir, seed=3)
+        output = f_195([], self.test_dir, seed=3)
         self.assertEqual(output, [])
         self.assertEqual(len(os.listdir(self.test_dir)), 0)
     def test_case_4(self):
         # Test with a list of plot names containing special characters.
-        output = f_186(["Test@A", "Test#B", "Test&C"], self.test_dir, seed=4)
+        output = f_195(["Test@A", "Test#B", "Test&C"], self.test_dir, seed=4)
         expected = ["Test@A.png", "Test#B.png", "Test&C.png"]
         self.assertEqual(output, expected)
         for file_name in expected:
             self.assertTrue(os.path.exists(os.path.join(self.test_dir, file_name)))
     def test_case_5(self):
         # Test with a single-element list of plot names, ensuring the function can handle minimal input.
-        output = f_186(["Single Plot"], self.test_dir, seed=5)
+        output = f_195(["Single Plot"], self.test_dir, seed=5)
         expected = ["Single_Plot.png"]
         self.assertEqual(output, expected)
         for file_name in expected:
             self.assertTrue(os.path.exists(os.path.join(self.test_dir, file_name)))
     def test_case_6(self):
         # Test with name deduplication
-        output = f_186(["Single Plot"] * 5, self.test_dir, seed=6)
+        output = f_195(["Single Plot"] * 5, self.test_dir, seed=6)
         expected = ["Single_Plot.png"]
         self.assertEqual(output, expected)
         for file_name in expected:

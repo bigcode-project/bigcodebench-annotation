@@ -3,7 +3,7 @@ import random
 
 # Constants
 COLORS = ['#00bfbf', '#000000', '#0000ff']
-def f_677(number_list, bins):
+def f_723(number_list, bins):
     """
     Create a histogram subplot of a list of numbers.
 
@@ -31,7 +31,7 @@ def f_677(number_list, bins):
     >>> random.seed(0)
     >>> number_list = [1, 2, 2, 3, 3, 3, 4, 4, 5]
     >>> bins = 5
-    >>> ax = f_677(number_list, bins)
+    >>> ax = f_723(number_list, bins)
     >>> ax.patches[0].get_height()
     1.0
     >>> ax.patches[2].get_height() > ax.patches[0].get_height()
@@ -56,7 +56,7 @@ COLORS = ['#00bfbf', '#000000', '#0000ff']
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         random.seed(0)
-        ax = f_677(test_data["small_dataset"], 5)
+        ax = f_723(test_data["small_dataset"], 5)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.get_title(), "Histogram")
         self.assertEqual(ax.get_xlabel(), "Number")
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         plt.close()
     def test_case_2(self):
         random.seed(0)
-        ax = f_677(test_data["large_dataset"], 10)
+        ax = f_723(test_data["large_dataset"], 10)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.get_title(), "Histogram")
         self.assertEqual(ax.get_xlabel(), "Number")
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         plt.close()
     def test_case_3(self):
         random.seed(0)
-        ax = f_677(test_data["uniform_dataset"], 3)
+        ax = f_723(test_data["uniform_dataset"], 3)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.get_title(), "Histogram")
         self.assertEqual(ax.get_xlabel(), "Number")
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
         plt.close()
     def test_case_4(self):
         random.seed(0)
-        ax = f_677(test_data["empty_dataset"], 5)
+        ax = f_723(test_data["empty_dataset"], 5)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.get_title(), "Histogram")
         self.assertEqual(ax.get_xlabel(), "Number")
@@ -99,7 +99,7 @@ class TestCases(unittest.TestCase):
         plt.close()
     def test_case_5(self):
         random.seed(0)
-        ax = f_677(test_data["mixed_dataset"], 6)
+        ax = f_723(test_data["mixed_dataset"], 6)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.get_title(), "Histogram")
         self.assertEqual(ax.get_xlabel(), "Number")

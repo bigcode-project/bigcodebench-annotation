@@ -3,17 +3,17 @@ import pandas as pd
 import numpy as np
 
 # Constants
-ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-N_GROUPS = 5
 
 
-def f_447(l):
+
+def f_447(l, n_groups = 5):
     """
     Given a list `l`, this function shuffles the list, constructs a dataframe using the shuffled list,
-    and then for each row in the dataframe, moves the first N_GROUPS elements to the end of the same row.
+    and then for each row in the dataframe, moves the first n_groups elements to the end of the same row.
 
     Parameters:
     - l (list): A list of elements.
+    - n_groups (int): number of groups. Default value is 5.
 
     Returns:
     - DataFrame: A modified DataFrame constructed from the shuffled list.
@@ -34,14 +34,17 @@ def f_447(l):
         return pd.DataFrame()
 
     shuffle(l)
-    df = pd.DataFrame([l for _ in range(N_GROUPS)])
+    df = pd.DataFrame([l for _ in range(n_groups)])
     # Ensure rolling does not aggregate rows into lists
-    df = df.apply(lambda row: np.roll(row, -N_GROUPS), axis=1, result_type='expand')
+    df = df.apply(lambda row: np.roll(row, -n_groups), axis=1, result_type='expand')
 
     return df
 
 
 import unittest
+ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+N_GROUPS = 5
+
 
 class TestCases(unittest.TestCase):
     def test_with_predefined_elements(self):

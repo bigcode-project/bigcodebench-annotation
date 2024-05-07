@@ -2,7 +2,7 @@ from collections import defaultdict
 from operator import itemgetter
 from itertools import groupby
 
-def f_583(news_articles):
+def f_621(news_articles):
     """
     Sort a list of news articles by "category" and "title." The news articles are then grouped by "category."
 
@@ -27,7 +27,7 @@ def f_583(news_articles):
     >>> articles = [{'title': 'Apple News', 'title_url': 'Apple_News', 'id': 2, 'category': 'Technology'},
     ...             {'title': 'New York Times', 'title_url': 'New_York_Times', 'id': 4, 'category': 'Sports'},
     ...             {'title': 'USA Today', 'title_url': 'USA_Today', 'id': 6, 'category': 'Health'}]
-    >>> sorted_articles = f_583(articles)
+    >>> sorted_articles = f_621(articles)
     >>> print(sorted_articles)
     defaultdict(<class 'list'>, {'Health': [{'title': 'USA Today', 'title_url': 'USA_Today', 'id': 6, 'category': 'Health'}], 'Sports': [{'title': 'New York Times', 'title_url': 'New_York_Times', 'id': 4, 'category': 'Sports'}], 'Technology': [{'title': 'Apple News', 'title_url': 'Apple_News', 'id': 2, 'category': 'Technology'}]})
 
@@ -36,7 +36,7 @@ def f_583(news_articles):
     ...        {'title': 'tecky', 'title_url': 'tecky', 'id': 4, 'category': 'climate'},
     ...        {'title': 'earth magazine', 'title_url': 'earth', 'id': 4, 'category': 'environment'}
     ...    ]
-    >>> sorted_articles = f_583(articles)
+    >>> sorted_articles = f_621(articles)
     >>> print(sorted_articles)
     defaultdict(<class 'list'>, {'climate': [{'title': 'Der Standard', 'title_url': 'standard', 'id': 2, 'category': 'climate'}, {'title': 'tecky', 'title_url': 'tecky', 'id': 4, 'category': 'climate'}], 'environment': [{'title': 'earth magazine', 'title_url': 'earth', 'id': 4, 'category': 'environment'}]})
     """
@@ -70,10 +70,10 @@ class TestCases(unittest.TestCase):
         input2 = {'title': 'Apple News', 'title_url': 'Apple_News', 'id': 2, 'category': 'Technology'}
         input3 = [{'title': 'Apple News', 'title_url': 'Apple_News', 'id': 2, 'category': 'Technology', 'test': 2}]
         input4 = [{'title': 'Apple News', 'title_url': 'Apple_News', 'id': 2, 'test': 'Technology'}]
-        self.assertRaises(Exception, f_583, input1)
-        self.assertRaises(Exception, f_583, input2)
-        self.assertRaises(Exception, f_583, input3)
-        self.assertRaises(Exception, f_583, input4)
+        self.assertRaises(Exception, f_621, input1)
+        self.assertRaises(Exception, f_621, input2)
+        self.assertRaises(Exception, f_621, input3)
+        self.assertRaises(Exception, f_621, input4)
     def test_case_1(self):
         'two categories'
         articles = [
@@ -99,7 +99,7 @@ class TestCases(unittest.TestCase):
                  'category': 'science'}
                 ]
         }
-        sorted_articles = f_583(articles)
+        sorted_articles = f_621(articles)
         self.assertIn('Technology', sorted_articles)
         self.assertIn('science', sorted_articles)
         self.assertCountEqual(sorted_articles['science'], expected['science'])
@@ -127,16 +127,16 @@ class TestCases(unittest.TestCase):
                  'category': 'Technology'}
                 ]
         }
-        sorted_articles = f_583(articles)
+        sorted_articles = f_621(articles)
         self.assertCountEqual(sorted_articles['Technology'], expected['Technology'])
     def test_case_4(self):
         'empty list'
         articles = []
-        sorted_articles = f_583(articles)
+        sorted_articles = f_621(articles)
         self.assertEqual(len(sorted_articles), 0)
     def test_case_5(self):
         'test return structure with large input set'
         articles = generate_mock_articles(300)
-        sorted_articles = f_583(articles)
+        sorted_articles = f_621(articles)
         for article in articles:
             self.assertIn(article['category'], sorted_articles)

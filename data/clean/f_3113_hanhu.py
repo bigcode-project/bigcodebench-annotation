@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
         for value_str in values:
             value = float(value_str.strip('| ').strip())
             with self.subTest(value=value):
-                self.assertTrue(value > 0)
+                self.assertTrue(0 <= value <= 100)
 
     def test_value_ranges(self):
         """Test that CPU and memory usage percentages are within 0-100%."""

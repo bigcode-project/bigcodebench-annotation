@@ -5,16 +5,12 @@ import numpy as np
 import pandas as pd
 
 
-# Constants
-STUDENTS = ['Student' + str(i) for i in range(1, 101)]
-COURSES = ['Course' + str(i) for i in range(1, 6)]
 
-
-def f_498(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
+def f_498(num_students):
     """
     Generate a Pandas DataFrame that displays the grades of a randomly selected group of students in multiple courses.
     Calculate the average grade in each course, the number of students with a passing grade (>= 60), 
-    and visualize this information using a bar plot.
+    and visualize this information using a bar plot with title 'Course-wise Average and Passing Grade Counts'.
 
     Parameters:
     num_students (int): The number of students in the sample.
@@ -35,6 +31,11 @@ def f_498(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
     'Course-wise Average and Passing Grade Counts'
     """
     # Generate sample students and grades
+
+    # Constants
+    STUDENTS = ['Student' + str(i) for i in range(1, 101)]
+    COURSES = ['Course' + str(i) for i in range(1, 6)]
+
     students_sample = sample(STUDENTS, num_students)
     grades = np.random.randint(40, 101, size=(num_students, len(COURSES)))
 

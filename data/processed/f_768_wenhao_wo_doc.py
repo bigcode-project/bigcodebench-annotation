@@ -1,7 +1,7 @@
 import pandas as pd
 import sqlite3
 
-def f_513(db_path: str, table_name: str, column_name: str) -> pd.DataFrame:
+def f_547(db_path: str, table_name: str, column_name: str) -> pd.DataFrame:
     """
     Loads data from an SQLite database into a Pandas DataFrame and performs a string replacement operation
     on a specified column. Specifically, replaces all occurrences of the newline character '\n' with the HTML line
@@ -20,10 +20,10 @@ def f_513(db_path: str, table_name: str, column_name: str) -> pd.DataFrame:
     pd.DataFrame: The modified DataFrame with replaced strings in the specified column.
 
     Examples:
-    >>> df = f_513('./data.db', 'messages', 'content')
+    >>> df = f_547('./data.db', 'messages', 'content')
     >>> df.loc[0, 'content']  # Assuming the first row originally contained "Hello\nWorld"
     'Hello<br>World'
-    >>> df = f_513('./another_data.db', 'comments', 'text')
+    >>> df = f_547('./another_data.db', 'comments', 'text')
     >>> df.loc[1, 'text']  # Assuming the second row originally contained "Good\nMorning"
     'Good<br>Morning'
     """
@@ -61,22 +61,22 @@ class TestCases(unittest.TestCase):
             os.remove('nonexistent.db')
     
     def test_valid_input(self):
-        df1 = f_513(self.db1_path, self.table_name1, self.column_name1)
+        df1 = f_547(self.db1_path, self.table_name1, self.column_name1)
         self.assertIn('<br>', df1[self.column_name1].iloc[0])
     def test_different_table_and_column(self):
-        df2 = f_513(self.db2_path, self.table_name2, self.column_name2)
+        df2 = f_547(self.db2_path, self.table_name2, self.column_name2)
         self.assertIn('<br>', df2[self.column_name2].iloc[1])
     def test_invalid_db_path(self):
         # Adjusting for the fact that a non-existent database doesn't cause sqlite3.OperationalError when using pandas
         try:
-            f_513('nonexistent.db', self.table_name1, self.column_name1)
+            f_547('nonexistent.db', self.table_name1, self.column_name1)
             self.fail("Expected an exception due to nonexistent database path")
         except Exception as e:
             self.assertIsInstance(e, (sqlite3.OperationalError, pd.errors.DatabaseError))
     def test_invalid_table_name(self):
         with self.assertRaises(pd.errors.DatabaseError):
-            f_513(self.db1_path, 'NonexistentTable', self.column_name1)
+            f_547(self.db1_path, 'NonexistentTable', self.column_name1)
     def test_invalid_column_name(self):
         # This checks for a KeyError since pandas will raise this if the column does not exist
         with self.assertRaises(KeyError):
-            f_513(self.db1_path, self.table_name1, 'NonexistentColumn')
+            f_547(self.db1_path, self.table_name1, 'NonexistentColumn')

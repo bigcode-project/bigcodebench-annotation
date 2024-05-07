@@ -2,7 +2,7 @@ import base64
 import os
 
 
-def f_609():
+def f_650():
     """
     Generates a random float number, converts it to a hexadecimal string,
     and then encodes this hexadecimal representation in base64.
@@ -15,7 +15,7 @@ def f_609():
         - base64
 
     Example:
-    >>> example_output = f_609()
+    >>> example_output = f_650()
     >>> isinstance(example_output, str)
     True
     >>> len(example_output) > 0
@@ -31,13 +31,13 @@ import binascii
 class TestCases(unittest.TestCase):
     def test_return_type(self):
         """Test that the return type is a string."""
-        self.assertIsInstance(f_609(), str)
+        self.assertIsInstance(f_650(), str)
     def test_non_empty_output(self):
         """Test that the output is not an empty string."""
-        self.assertTrue(len(f_609()) > 0)
+        self.assertTrue(len(f_650()) > 0)
     def test_base64_encoding(self):
         """Test that the output is correctly base64 encoded."""
-        output = f_609()
+        output = f_650()
         try:
             decoded_bytes = base64.b64decode(output)
             # If decoding succeeds, output was correctly base64 encoded.
@@ -48,8 +48,8 @@ class TestCases(unittest.TestCase):
         self.assertTrue(is_base64, "Output should be a valid base64 encoded string.")
     def test_output_variability(self):
         """Test that two consecutive calls to the function produce different outputs."""
-        self.assertNotEqual(f_609(), f_609())
+        self.assertNotEqual(f_650(), f_650())
     def test_string_representation(self):
         """Test that the output can be represented as ASCII string."""
-        output = f_609()
+        output = f_650()
         self.assertTrue(all(c in string.ascii_letters + string.digits + '+/=' for c in output))

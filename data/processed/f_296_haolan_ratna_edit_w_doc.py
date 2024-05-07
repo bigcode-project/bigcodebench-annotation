@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def f_515(df, col):
+def f_549(df, col):
     """
     This function takes a pandas DataFrame and a column name as input and generates two subplots in one matplotlib figure:
     the first subplot is a histogram (with a kernel density estimate for numerical data), and the second is a box plot,
@@ -26,12 +26,12 @@ def f_515(df, col):
 
     Example:
     >>> df = pd.DataFrame({'value': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
-    >>> fig = f_515(df, 'value')
+    >>> fig = f_549(df, 'value')
     >>> type(fig)
     <class 'matplotlib.figure.Figure'>
     >>> plt.close()
     >>> df = pd.DataFrame({'category': ['A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B']})
-    >>> fig = f_515(df, 'category')
+    >>> fig = f_549(df, 'category')
     >>> type(fig)
     <class 'matplotlib.figure.Figure'>
     >>> len(fig.axes)
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
         })
     def test_numeric_data(self):
         "Test with numeric data for histogram and box plot"
-        fig = f_515(self.numeric_df, 'numeric')
+        fig = f_549(self.numeric_df, 'numeric')
         self.assertIsInstance(fig, matplotlib.figure.Figure)
         self.assertEqual(len(fig.axes), 2)
         self.assertTrue(len(fig.axes[0].patches) > 0)
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         plt.close()
     def test_categorical_data(self):
         "Test with categorical data for count plot and strip plot"
-        fig = f_515(self.categorical_df, 'categorical')
+        fig = f_549(self.categorical_df, 'categorical')
         self.assertIsInstance(fig, matplotlib.figure.Figure)
         self.assertEqual(len(fig.axes), 2)
         self.assertTrue(len(fig.axes[0].patches) > 0)
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
         plt.close()
     def test_mixed_data(self):
         "Test with DataFrame containing both numeric and categorical columns"
-        fig = f_515(self.mixed_df, 'numeric')
+        fig = f_549(self.mixed_df, 'numeric')
         self.assertIsInstance(fig, matplotlib.figure.Figure)
         self.assertEqual(len(fig.axes), 2)
         self.assertTrue(len(fig.axes[0].patches) > 0)
@@ -89,11 +89,11 @@ class TestCases(unittest.TestCase):
     def test_invalid_column(self):
         "Test with a non-existent column"
         with self.assertRaises(Exception):
-            f_515(self.numeric_df, 'nonexistent')
+            f_549(self.numeric_df, 'nonexistent')
         plt.close()
     def test_empty_dataframe(self):
         "Test with an empty DataFrame"
         empty_df = pd.DataFrame({'empty': []})
         with self.assertRaises(ValueError):
-            f_515(empty_df, 'empty')
+            f_549(empty_df, 'empty')
         plt.close()

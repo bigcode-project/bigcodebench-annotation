@@ -6,9 +6,11 @@ import matplotlib.pyplot as plt
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
 
-def f_535(a, b):
+def f_569(a, b):
     """
-    Generate a pandas DataFrame with random values based on two lists and plot the DataFrame as a bar chart.
+    Generate a pandas DataFrame with random values based on lists 'a' and 'b', and plot it as a bar chart.
+    List 'a' sets the DataFrame's row indices, while the length of list 'b' determines the number of columns
+    using predefined names from the 'COLUMNS = ['A', 'B', 'C', 'D', 'E']' list.
 
     Parameters:
     - a (list): A list used to define the number of rows in the DataFrame.
@@ -26,7 +28,7 @@ def f_535(a, b):
     - Uses pandas DataFrame to structure the data.
 
     Example:
-    >>> ax = f_535([1, 2, 3], ['A', 'B', 'C', 'D', 'E'])
+    >>> ax = f_569([1, 2, 3], ['A', 'B', 'C', 'D', 'E'])
     """
     if not a or not b:  # Check if either list is empty
         fig, ax = plt.subplots()  # Creates a blank plot
@@ -44,21 +46,21 @@ import matplotlib
 class TestCases(unittest.TestCase):
     def test_non_empty_lists(self):
         """Test with valid non-empty lists."""
-        ax = f_535([1, 2, 3], ['A', 'B', 'C'])
+        ax = f_569([1, 2, 3], ['A', 'B', 'C'])
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_empty_a_list(self):
         """Test with an empty 'a' list."""
-        ax = f_535([], ['A', 'B', 'C'])
+        ax = f_569([], ['A', 'B', 'C'])
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_empty_b_list(self):
         """Test with an empty 'b' list."""
-        ax = f_535([1, 2, 3], [])
+        ax = f_569([1, 2, 3], [])
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_both_lists_empty(self):
         """Test with both 'a' and 'b' lists empty."""
-        ax = f_535([], [])
+        ax = f_569([], [])
         self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_a_list_longer_than_columns(self):
         """Test with 'a' list having more elements than predefined columns."""
-        ax = f_535([1, 2, 3, 4, 5, 6], ['A', 'B'])
+        ax = f_569([1, 2, 3, 4, 5, 6], ['A', 'B'])
         self.assertIsInstance(ax, matplotlib.axes.Axes)

@@ -4,7 +4,7 @@ from datetime import datetime
 # Constants
 LOG_DIR = './logs'
 
-def f_820(metrics, filename, log_dir=LOG_DIR):
+def f_870(metrics, filename, log_dir=LOG_DIR):
     """
     This function writes a dictionary of metrics to a specified log file, appending a timestamp to each entry.
     
@@ -22,12 +22,12 @@ def f_820(metrics, filename, log_dir=LOG_DIR):
     
     Examples:
     >>> metrics = {'accuracy': 0.98, 'loss': 0.05}
-    >>> f_820(metrics, 'metrics.log')
+    >>> f_870(metrics, 'metrics.log')
     An error occurred: [Errno 2] No such file or directory: './logs/metrics.log'
     False
     
     >>> metrics = {'precision': 0.75, 'recall': 0.80}
-    >>> f_820(metrics, 'evaluation.log')
+    >>> f_870(metrics, 'evaluation.log')
     An error occurred: [Errno 2] No such file or directory: './logs/evaluation.log'
     False
     """
@@ -55,29 +55,29 @@ class TestCases(unittest.TestCase):
         self.log_dir = './temp_logs'
     def test_non_string_filename(self):
         with self.assertRaises(ValueError):
-            f_820(self.metrics, 12345, log_dir=self.log_dir)
+            f_870(self.metrics, 12345, log_dir=self.log_dir)
     def test_non_dictionary_metrics(self):
         with self.assertRaises(ValueError):
-            f_820('accuracy: 0.95', self.filename, log_dir=self.log_dir)
+            f_870('accuracy: 0.95', self.filename, log_dir=self.log_dir)
     @patch('os.makedirs')
     @patch('builtins.open', new_callable=mock_open)
     @patch('os.path.exists', return_value=True)
     def test_normal_metrics_logging(self, mock_exists, mock_file, mock_makedirs):
-        result = f_820(self.metrics, self.filename, log_dir=self.log_dir)
+        result = f_870(self.metrics, self.filename, log_dir=self.log_dir)
         self.assertTrue(result)
         mock_file.assert_called_once_with(os.path.join(self.log_dir, self.filename), 'a')
     @patch('os.makedirs')
     @patch('builtins.open', new_callable=mock_open)
     @patch('os.path.exists', return_value=True)
     def test_normal_metrics_logging(self, mock_exists, mock_file, mock_makedirs):
-        result = f_820(self.metrics, self.filename, log_dir=self.log_dir)
+        result = f_870(self.metrics, self.filename, log_dir=self.log_dir)
         self.assertTrue(result)
         mock_file.assert_called_once_with(os.path.join(self.log_dir, self.filename), 'a')
     @patch('os.makedirs')
     @patch('builtins.open', new_callable=mock_open)
     @patch('os.path.exists', return_value=False)
     def test_non_existent_log_directory(self, mock_exists, mock_file, mock_makedirs):
-        result = f_820(self.metrics, self.filename, log_dir='./nonexistent_dir')
+        result = f_870(self.metrics, self.filename, log_dir='./nonexistent_dir')
         self.assertTrue(result)
     @patch('os.makedirs')
     @patch('builtins.open', new_callable=MagicMock)
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
         metrics = {}
         filename = 'empty_metrics.log'
         log_dir = './temp_logs'
-        result = f_820(metrics, filename, log_dir=log_dir)
+        result = f_870(metrics, filename, log_dir=log_dir)
         # Assert that the function returned True for successful logging
         self.assertTrue(result)
         # Check that 'write' was called exactly twice: once for the timestamp, once for the newline
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(args_list[1][0][0], '\n')  # Check if second write is just a newline
     def test_non_string_filename(self):
         with self.assertRaises(ValueError):
-            f_820(self.metrics, 12345, log_dir=self.log_dir)
+            f_870(self.metrics, 12345, log_dir=self.log_dir)
     def test_non_dictionary_metrics(self):
         with self.assertRaises(ValueError):
-            f_820('accuracy: 0.95', self.filename, log_dir=self.log_dir)
+            f_870('accuracy: 0.95', self.filename, log_dir=self.log_dir)

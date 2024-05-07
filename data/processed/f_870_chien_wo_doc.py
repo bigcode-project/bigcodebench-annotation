@@ -2,7 +2,7 @@ import binascii
 import urllib.parse
 
 
-def f_277(url):
+def f_294(url):
     """
     Decode a hexadecimal string from the 'q' query parameter of a URL.
 
@@ -21,7 +21,7 @@ def f_277(url):
     - urllib.parse
     
     Example:
-    >>> f_277('https://www.example.com?q=4a4b4c')
+    >>> f_294('https://www.example.com?q=4a4b4c')
     'JKL'
     """
     try:
@@ -35,28 +35,28 @@ import unittest
 import binascii
 import urllib.parse
 class TestCases(unittest.TestCase):
-    """Test cases for f_277."""
+    """Test cases for f_294."""
     def test_valid_hex_string(self):
         """Test with a valid hex string in query parameter."""
         url = "https://www.example.com?q=4a4b4c"
-        self.assertEqual(f_277(url), "JKL")
+        self.assertEqual(f_294(url), "JKL")
     def test_no_query_parameter(self):
         """Test with no query parameter."""
         url = "https://www.example.com"
-        self.assertIsNone(f_277(url))
+        self.assertIsNone(f_294(url))
     def test_invalid_hex_string(self):
         """Test with an invalid hex string in query parameter."""
         url = "https://www.example.com?q=4a4b4c4d4"
         self.assertIsNone(
-            f_277(url)
+            f_294(url)
         )  # Updated to assertIsNone as the function now handles the exception
     def test_valid_hex_non_utf8(self):
         """Test with a valid hex string that is not valid UTF-8."""
         url = "https://www.example.com?q=80"
         self.assertIsNone(
-            f_277(url)
+            f_294(url)
         )  # Updated to assertIsNone due to the handling of UnicodeDecodeError
     def test_multiple_query_parameters(self):
         """Test with multiple query parameters."""
         url = "https://www.example.com?a=123&q=4a4b4c&b=456"
-        self.assertEqual(f_277(url), "JKL")
+        self.assertEqual(f_294(url), "JKL")

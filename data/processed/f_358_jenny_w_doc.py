@@ -4,7 +4,7 @@ import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
 
 
-def f_518(data: pd.DataFrame) -> (pd.DataFrame, plt.Axes):
+def f_552(data: pd.DataFrame) -> (pd.DataFrame, plt.Axes):
     """
     Normalize the data and visualize it using a heatmap.
 
@@ -28,7 +28,7 @@ def f_518(data: pd.DataFrame) -> (pd.DataFrame, plt.Axes):
     
     Example:
     >>> df = pd.DataFrame([[1,1,1], [2,2,2], [3,3,3]], columns=['Feature1', 'Feature2', 'Feature3'])
-    >>> normalized_df, _ = f_518(df)
+    >>> normalized_df, _ = f_552(df)
     >>> type(normalized_df)
     <class 'pandas.core.frame.DataFrame'>
     >>> normalized_df['Feature1'].iloc[0]  # Returns a normalized value between 0 and 1
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
             np.random.rand(100, 5),
             columns=self.expected_columns,
         )
-        normalized_data, ax = f_518(data)
+        normalized_data, ax = f_552(data)
         self._check_data_structure(normalized_data, self.expected_columns)
         self._check_data_value(normalized_data)
         self._check_heatmap(ax)
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
             np.zeros((100, 5)),
             columns=self.expected_columns,
         )
-        normalized_data, ax = f_518(data)
+        normalized_data, ax = f_552(data)
         self._check_data_structure(normalized_data, self.expected_columns)
         self._check_heatmap(ax)
         # Check if all values in normalized data are zero
@@ -100,7 +100,7 @@ class TestCases(unittest.TestCase):
             np.arange(500).reshape(100, 5),
             columns=self.expected_columns,
         )
-        normalized_data, ax = f_518(data)
+        normalized_data, ax = f_552(data)
         self._check_data_structure(normalized_data, self.expected_columns)
         self._check_data_value(normalized_data)
         self._check_heatmap(ax)
@@ -110,14 +110,14 @@ class TestCases(unittest.TestCase):
             np.arange(500, 0, -1).reshape(100, 5),
             columns=self.expected_columns,
         )
-        normalized_data, ax = f_518(data)
+        normalized_data, ax = f_552(data)
         self._check_data_structure(normalized_data, self.expected_columns)
         self._check_data_value(normalized_data)
         self._check_heatmap(ax)
     def test_case_5(self):
         # Test single valid column
         data = pd.DataFrame(np.random.rand(100, 1), columns=["Feature1"])
-        normalized_data, ax = f_518(data)
+        normalized_data, ax = f_552(data)
         self._check_data_structure(normalized_data, ["Feature1"])
         self._check_data_value(normalized_data)
         self._check_heatmap(ax)
@@ -127,11 +127,11 @@ class TestCases(unittest.TestCase):
             {"Feature1": np.random.rand(100), "Feature2": ["string"] * 100}
         )
         with self.assertRaises(ValueError):
-            f_518(data)
+            f_552(data)
     def test_case_7(self):
         # Test should fail when inputs are invalid - empty dataframe
         data = pd.DataFrame()
         with self.assertRaises(ValueError):
-            f_518(data)
+            f_552(data)
     def tearDown(self):
         plt.close("all")

@@ -2,7 +2,7 @@ import random
 import pandas as pd
 import numpy as np
 
-def f_307(n,
+def f_324(n,
           domain="samplewebsite.com",
           categories=['Sports', 'Technology', 'Health', 'Science', 'Business'],
           random_seed=None):
@@ -26,7 +26,7 @@ def f_307(n,
     - numpy
 
     Example:
-    >>> df = f_307(5, random_seed=1)
+    >>> df = f_324(5, random_seed=1)
     >>> print(df)
            title                    title_url  id    category  views
     0  Article 0  samplewebsite.com/Article_0   0  Technology    992
@@ -35,7 +35,7 @@ def f_307(n,
     3  Article 3  samplewebsite.com/Article_3   3      Health    991
     4  Article 4  samplewebsite.com/Article_4   4      Sports    993
 
-    >>> df = f_307(3, categories=['A', 'B'], domain='test.de', random_seed=12)
+    >>> df = f_324(3, categories=['A', 'B'], domain='test.de', random_seed=12)
     >>> print(df)
            title          title_url  id category  views
     0  Article 0  test.de/Article_0   0        B    963
@@ -60,13 +60,13 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_rng(self):
         'test rng reproducability'
-        df1 = f_307(300, random_seed=42)
-        df2 = f_307(300, random_seed=42)
+        df1 = f_324(300, random_seed=42)
+        df2 = f_324(300, random_seed=42)
         self.assertTrue(pd.testing.assert_frame_equal(df1, df2) is None)
     
     def test_case_1(self):
         'default params'
-        df = f_307(400, random_seed=10)
+        df = f_324(400, random_seed=10)
         self.assertEqual(len(df), 400)
         self.assertTrue(df['title_url'].str.startswith("samplewebsite.com/Article_").all())
         self.assertEqual(len(df['id'].unique()), 400)
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(df['views'].dtype, int)
     def test_case_2(self):
         'custom params'
-        df = f_307(330, domain="testdomain.com", categories=['A', 'B', 'C'])
+        df = f_324(330, domain="testdomain.com", categories=['A', 'B', 'C'])
         self.assertEqual(len(df), 330)
         self.assertTrue(df['title_url'].str.startswith("testdomain.com/Article_").all())
         self.assertEqual(len(df['id'].unique()), 330)
@@ -82,15 +82,15 @@ class TestCases(unittest.TestCase):
         self.assertTrue(df['views'].dtype, int)
     def test_case_3(self):
         '0 articles'
-        df = f_307(0)
+        df = f_324(0)
         self.assertEqual(len(df), 0)
     def test_case_4(self):
-        df = f_307(1000, random_seed=1)
+        df = f_324(1000, random_seed=1)
         self.assertEqual(len(df), 1000)
         self.assertEqual(len(df['id'].unique()), 1000)
         self.assertTrue(df['views'].dtype, int)
     def test_case_5(self):
-        df = f_307(7, domain="anotherdomain.com", random_seed=3)
+        df = f_324(7, domain="anotherdomain.com", random_seed=3)
         self.assertEqual(len(df), 7)
         self.assertTrue(df['title_url'].str.startswith("anotherdomain.com/Article_").all())
         self.assertEqual(len(df['id'].unique()), 7)

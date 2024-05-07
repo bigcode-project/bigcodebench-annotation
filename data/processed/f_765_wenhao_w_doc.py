@@ -2,7 +2,7 @@ import pandas as pd
 import random
 import re
 
-def f_305(person_names, email_domains, num_records=5):
+def f_322(person_names, email_domains, num_records=5):
     """
     Generate a DataFrame with a specified number of records containing personal names and emails. 
     The emails are cleaned by replacing all occurrences of "@" with "[at]".
@@ -25,11 +25,11 @@ def f_305(person_names, email_domains, num_records=5):
     
     Example:
     >>> random.seed(0)  # Initialize random seed
-    >>> f_305(['John Doe', 'Jane Smith'], ['gmail.com', 'yahoo.com'], 2)
+    >>> f_322(['John Doe', 'Jane Smith'], ['gmail.com', 'yahoo.com'], 2)
              Name              Email
     0  Jane Smith  jane[at]gmail.com
     1    John Doe  john[at]yahoo.com
-    >>> f_305(['Alice'], ['outlook.com'], 1)
+    >>> f_322(['Alice'], ['outlook.com'], 1)
         Name                 Email
     0  Alice  alice[at]outlook.com
     """
@@ -49,7 +49,7 @@ class TestCases(unittest.TestCase):
     
     def test_case_1(self):
         random.seed(0)  # Initialize random seed
-        result_df = f_305(['John Doe', 'Jane Smith'], ['gmail.com', 'yahoo.com'], 2)
+        result_df = f_322(['John Doe', 'Jane Smith'], ['gmail.com', 'yahoo.com'], 2)
         self.assertTrue(isinstance(result_df, pd.DataFrame))
         self.assertEqual(len(result_df), 2)
         self.assertTrue(set(result_df.columns) == {'Name', 'Email'})
@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_2(self):
         random.seed(0)  # Initialize random seed
-        result_df = f_305(['Alice'], ['outlook.com'], 1)
+        result_df = f_322(['Alice'], ['outlook.com'], 1)
         self.assertTrue(isinstance(result_df, pd.DataFrame))
         self.assertEqual(len(result_df), 1)
         self.assertTrue(set(result_df.columns) == {'Name', 'Email'})
@@ -66,16 +66,16 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         random.seed(0)  # Initialize random seed
         with self.assertRaises(ValueError):
-            f_305(['John Doe'], ['gmail.com'], 2)
+            f_322(['John Doe'], ['gmail.com'], 2)
             
     def test_case_4(self):
         random.seed(0)  # Initialize random seed
         with self.assertRaises(ValueError):
-            f_305(['John Doe', 'Jane Smith'], [], 2)
+            f_322(['John Doe', 'Jane Smith'], [], 2)
             
     def test_case_5(self):
         random.seed(0)  # Initialize random seed
-        result_df = f_305(['John Doe', 'Jane Smith', 'Bob'], ['gmail.com', 'yahoo.com'], 3)
+        result_df = f_322(['John Doe', 'Jane Smith', 'Bob'], ['gmail.com', 'yahoo.com'], 3)
         self.assertTrue(isinstance(result_df, pd.DataFrame))
         self.assertEqual(len(result_df), 3)
         self.assertTrue(set(result_df.columns) == {'Name', 'Email'})

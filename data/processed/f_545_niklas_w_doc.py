@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def f_268(df, col):
+def f_285(df, col):
     """
     Process a Pandas DataFrame by removing a specific column and adding a 'IsEvenIndex' column.
     The 'IsEvenIndex' column is a boolean flag indicating if the index of each row is even.
@@ -20,7 +20,7 @@ def f_268(df, col):
     Example:
     >>> np.random.seed(42)
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(5, 4)), columns=list('ABCD'))
-    >>> df = f_268(df, 'C')
+    >>> df = f_285(df, 'C')
     >>> print(df)
         A   B   D  IsEvenIndex
     0  51  92  71         True
@@ -37,26 +37,26 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-        df = f_268(df, 'A')
+        df = f_285(df, 'A')
         self.assertEqual(df.shape, (100, 4))
         self.assertFalse('A' in df.columns)
     def test_case_2(self):
         df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-        df = f_268(df, 'B')
+        df = f_285(df, 'B')
         self.assertEqual(df.shape, (100, 4))
         self.assertFalse('B' in df.columns)
     def test_case_3(self):
         df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-        df = f_268(df, 'C')
+        df = f_285(df, 'C')
         self.assertEqual(df.shape, (100, 4))
         self.assertFalse('C' in df.columns)
     def test_case_4(self):
         df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-        df = f_268(df, 'D')
+        df = f_285(df, 'D')
         self.assertEqual(df.shape, (100, 4))
         self.assertFalse('D' in df.columns)
     def test_case_5(self):
         df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-        df = f_268(df, 'A')
+        df = f_285(df, 'A')
         self.assertEqual(df.shape, (100, 4))
         self.assertFalse('A' in df.columns)

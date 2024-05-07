@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-def f_705(n_components=2, N_SAMPLES=500, N_FEATURES=50, random_seed=None):
+def f_751(n_components=2, N_SAMPLES=500, N_FEATURES=50, random_seed=None):
     """
     Generate a high-dimensional dataset, run PCA to reduce its dimensionality, and then draw a heatmap of
     the covariance matrix of the transformed data.
@@ -27,7 +27,7 @@ def f_705(n_components=2, N_SAMPLES=500, N_FEATURES=50, random_seed=None):
     - seaborn
 
     Example:
-    >>> transformed, ax = f_705(n_components=2, random_seed=42)
+    >>> transformed, ax = f_751(n_components=2, random_seed=42)
     >>> transformed.shape
     (500, 2)
     """
@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
         self.N_FEATURES = 50
     def test_case_1(self):
         # Test basic functionality - results
-        transformed_data, _ = f_705()
+        transformed_data, _ = f_751()
         self.assertEqual(transformed_data.shape, (self.N_SAMPLES, self.n_components))
         np.random.seed(self.seed)
         X = np.random.rand(self.N_SAMPLES, self.N_FEATURES)
@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(np.sum(pca.explained_variance_ratio_) <= 1)
     def test_case_2(self):
         # Test basic functionality - visualization
-        _, heatmap_axes = f_705()
+        _, heatmap_axes = f_751()
         self.assertIsNotNone(heatmap_axes)
         self.assertIsInstance(heatmap_axes, plt.Axes)
         self.assertEqual(len(heatmap_axes.get_xticklabels()), 2)
@@ -71,37 +71,37 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test n_components
         for n_components in [1, 10, self.N_FEATURES]:
-            transformed_data, _ = f_705(
+            transformed_data, _ = f_751(
                 n_components=n_components, N_FEATURES=self.N_FEATURES
             )
             self.assertEqual(transformed_data.shape, (self.N_SAMPLES, n_components))
     def test_case_4(self):
         # Test N_SAMPLES
         for n_samples in [self.n_components, 10, 50, 100]:
-            transformed_data, _ = f_705(N_SAMPLES=n_samples)
+            transformed_data, _ = f_751(N_SAMPLES=n_samples)
             self.assertEqual(transformed_data.shape, (n_samples, self.n_components))
     def test_case_5(self):
         # Test N_FEATURES
         for n_features in [self.n_components, 10, 50, 100]:
-            transformed_data, _ = f_705(N_FEATURES=n_features)
+            transformed_data, _ = f_751(N_FEATURES=n_features)
             self.assertEqual(
                 transformed_data.shape, (self.N_SAMPLES, self.n_components)
             )
     def test_case_6(self):
         # Test random_seed
-        transformed_data1, _ = f_705(random_seed=self.seed)
-        transformed_data2, _ = f_705(random_seed=self.seed)
+        transformed_data1, _ = f_751(random_seed=self.seed)
+        transformed_data2, _ = f_751(random_seed=self.seed)
         np.testing.assert_array_equal(transformed_data1, transformed_data2)
-        transformed_data2, _ = f_705(random_seed=0)
+        transformed_data2, _ = f_751(random_seed=0)
         with self.assertRaises(AssertionError):
             np.testing.assert_array_equal(transformed_data1, transformed_data2)
     def test_case_7(self):
         # Function should fail at invalid values
         with self.assertRaises(ValueError):
             # negative n_components
-            f_705(n_components=-1)
+            f_751(n_components=-1)
         with self.assertRaises(ValueError):
             # more components than features
-            f_705(n_components=self.N_FEATURES + 10, N_FEATURES=self.N_FEATURES)
+            f_751(n_components=self.N_FEATURES + 10, N_FEATURES=self.N_FEATURES)
     def tearDown(self):
         plt.close("all")

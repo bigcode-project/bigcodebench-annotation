@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 
-def f_54(data_dir: str, csv_files: list) -> pd.DataFrame:
+def f_56(data_dir: str, csv_files: list) -> pd.DataFrame:
     """
     Merge / Concatenate multiple CSV files from a specified directory into a single Pandas DataFrame.
 
@@ -20,7 +20,7 @@ def f_54(data_dir: str, csv_files: list) -> pd.DataFrame:
     - os
     
     Example:
-    >>> df = f_54('/path/to/data/directory', ['file1.csv', 'file2.csv', 'file3.csv'])
+    >>> df = f_56('/path/to/data/directory', ['file1.csv', 'file2.csv', 'file3.csv'])
     >>> print(df.head())
             Name  Age  Gender
     0    Simon   5     Male
@@ -72,26 +72,26 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(self.test_dir)
     def test_with_multiple_files(self):
         # Test merging multiple files
-        result = f_54(self.test_dir, ['file1.csv', 'file2.csv'])
+        result = f_56(self.test_dir, ['file1.csv', 'file2.csv'])
         expected_df = pd.concat([self.files['file1.csv'], self.files['file2.csv']],
                                 ignore_index=True)
         pd.testing.assert_frame_equal(result, expected_df)
     def test_with_different_columns(self):
         # Test files with different columns
-        result = f_54(self.test_dir, ['file1.csv', 'file3.csv', 'file4.csv'])
+        result = f_56(self.test_dir, ['file1.csv', 'file3.csv', 'file4.csv'])
         expected_df = pd.concat([self.files['file1.csv'], self.files['file3.csv'], self.files['file4.csv']],
                                 ignore_index=True)
         pd.testing.assert_frame_equal(result, expected_df)
     def test_with_empty_list(self):
         # Test with an empty list of files
-        result = f_54(self.test_dir, [])
+        result = f_56(self.test_dir, [])
         self.assertTrue(result.empty)
     def test_with_nonexistent_file(self):
         # Test referencing a non-existent file
         with self.assertRaises(FileNotFoundError):
-            f_54(self.test_dir, ['nonexistent.csv'])
+            f_56(self.test_dir, ['nonexistent.csv'])
     def test_single_file(self):
         # Test with a single file
-        result = f_54(self.test_dir, ['file2.csv'])
+        result = f_56(self.test_dir, ['file2.csv'])
         expected_df = self.files['file2.csv']
         pd.testing.assert_frame_equal(result, expected_df)

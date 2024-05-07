@@ -5,7 +5,7 @@ from collections import Counter
 
 STEMMER = PorterStemmer()
 
-def f_169(content):
+def f_175(content):
     """
     Stem every word in a sentence, except the last, and count the frequency of each stem.
 
@@ -22,7 +22,7 @@ def f_169(content):
     - collections.Counter
 
     Example:
-    >>> f_169('running runner run')
+    >>> f_175('running runner run')
     {'run': 1, 'runner': 1}
     """
     content = content.split(' ')[:-1]
@@ -34,21 +34,21 @@ def f_169(content):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = f_169('running runner run')
+        result = f_175('running runner run')
         self.assertEqual(result, {'run': 1, 'runner': 1})
     
     def test_case_2(self):
-        result = f_169('dancing dancer danced')
+        result = f_175('dancing dancer danced')
         self.assertEqual(result, {'danc': 1, 'dancer': 1})
         
     def test_case_3(self):
-        result = f_169('loving lover love')
+        result = f_175('loving lover love')
         self.assertEqual(result, {'love': 1, 'lover': 1})
         
     def test_case_4(self):
-        result = f_169('computing computer compute')
+        result = f_175('computing computer compute')
         self.assertEqual(result, {'comput': 2})
         
     def test_case_5(self):
-        result = f_169('swimming swimmer swim')
+        result = f_175('swimming swimmer swim')
         self.assertEqual(result, {'swim': 1, 'swimmer': 1})

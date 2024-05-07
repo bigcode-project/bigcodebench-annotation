@@ -3,7 +3,7 @@ import random
 import pandas as pd
 
 
-def f_146(data_dir,
+def f_152(data_dir,
           csv_files=['file1.csv', 'file2.csv', 'file3.csv'],
           seed=None):
     """
@@ -30,7 +30,7 @@ def f_146(data_dir,
     - pandas
 
     Example:
-    >>> file_name, df = f_146('test_data')
+    >>> file_name, df = f_152('test_data')
     >>> print(file_name)
     'file2.csv'
     >>> print(df)
@@ -79,12 +79,12 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(self.test_dir)
     def test_random_selection(self):
         # Testing random selection and ensuring the file chosen and its data are correct
-        file_name, df = f_146(self.test_dir, seed=42)
+        file_name, df = f_152(self.test_dir, seed=42)
         self.assertTrue(file_name in self.test_files)
         self.assertFalse(df.empty)
     def test_specific_file_selection(self):
         # Test selecting a specific file and checking contents
-        file_name, df = f_146(self.test_dir, ['file1.csv'], seed=42)
+        file_name, df = f_152(self.test_dir, ['file1.csv'], seed=42)
         expected = pd.read_csv(os.path.join(self.test_dir, 'file1.csv'))
         # Sample from expected and reset index
         expected_sampled = expected.sample(len(df), random_state=42).reset_index(drop=True)
@@ -94,15 +94,15 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(df_reset, expected_sampled)
     def test_empty_file(self):
         # Ensure an empty file returns an empty DataFrame
-        file_name, df = f_146(self.test_dir, ['empty.csv'], seed=42)
+        file_name, df = f_152(self.test_dir, ['empty.csv'], seed=42)
         self.assertEqual(file_name, 'empty.csv')
         self.assertTrue(df.empty)
     def test_multiple_files(self):
         # Testing selection from multiple files
-        file_name, df = f_146(self.test_dir, ['file3.csv', 'file4.csv'], seed=24)
+        file_name, df = f_152(self.test_dir, ['file3.csv', 'file4.csv'], seed=24)
         self.assertIn(file_name, ['file3.csv', 'file4.csv'])
         self.assertFalse(df.empty)
     def test_no_file_matches(self):
         # Testing behavior when no files match the list
         with self.assertRaises(FileNotFoundError):
-            f_146(self.test_dir, ['nonexistent.csv'], seed=42)
+            f_152(self.test_dir, ['nonexistent.csv'], seed=42)

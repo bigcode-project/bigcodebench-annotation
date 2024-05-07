@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
 
-def f_325(myList, n_clusters):
+def f_342(myList, n_clusters):
     """
     Cluster a list of 2D points using KMeans and visualize the clusters.
 
@@ -23,7 +23,7 @@ def f_325(myList, n_clusters):
 
     Example:
     >>> myList = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]
-    >>> ax = f_325(myList, 2)
+    >>> ax = f_342(myList, 2)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_xticklabels()
@@ -47,18 +47,18 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test single cluster
         myList = [[1, 1], [1, 1], [1, 1], [1, 1]]
-        ax = f_325(myList, 1)
+        ax = f_342(myList, 1)
         self.assertEqual(len(set(ax.collections[0].get_array())), 1)
     def test_case_2(self):
         # Test arbitrary number of clusters
         myList = self.test_list
         for n in range(1, 6):
-            ax = f_325(myList, n)
+            ax = f_342(myList, n)
             self.assertEqual(len(set(ax.collections[0].get_array())), n)
     def test_case_3(self):
         # Test visualization
         myList = self.test_list
-        ax = f_325(myList, 2)
+        ax = f_342(myList, 2)
         red_collection = next(
             coll
             for coll in ax.collections
@@ -73,16 +73,16 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Test handling invalid inputs
         with self.assertRaises(ValueError):
-            f_325([], 1)
+            f_342([], 1)
         with self.assertRaises(ValueError):
-            f_325([[1, 1], [2, 2]], 0)
+            f_342([[1, 1], [2, 2]], 0)
         with self.assertRaises(ValueError):
-            f_325(self.test_list, len(self.test_list) + 1)
+            f_342(self.test_list, len(self.test_list) + 1)
     def test_case_5(self):
         # Test consistency across runs with built-in random seed
         myList = self.test_list
-        ax1 = f_325(myList, 2)
-        ax2 = f_325(myList, 2)
+        ax1 = f_342(myList, 2)
+        ax2 = f_342(myList, 2)
         colors1 = ax1.collections[0].get_array()
         colors2 = ax2.collections[0].get_array()
         self.assertTrue(all(c1 == c2 for c1, c2 in zip(colors1, colors2)))

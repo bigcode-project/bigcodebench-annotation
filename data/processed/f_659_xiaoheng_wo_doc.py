@@ -7,7 +7,7 @@ SOURCE_DIR = '/source/dir'
 TARGET_DIR = '/target/dir'
 FILE_PATTERN = re.compile(r'^(.*?)-\d+\.json$')
 
-def f_537():
+def f_571():
     """
     Move all json files in a source directory to a target directory and rename them by splitting the filename the last time "-" occurs and keeping the prefix part of the filename.
     
@@ -23,7 +23,7 @@ def f_537():
     - shutil
 
     Example:
-    >>> f_537()
+    >>> f_571()
 
     """
     SOURCE_DIR = '/source/dir'
@@ -48,7 +48,7 @@ class TestCases(unittest.TestCase):
     @patch('os.path.join', side_effect=lambda *args: '/'.join(args))
     def test_move_json_files(self, mock_join, mock_move, mock_listdir):
         mock_listdir.return_value = ['data-1.json', 'info-2.json', 'report-3.json']
-        f_537()
+        f_571()
         expected_calls = [
             call('/source/dir/data-1.json', '/target/dir/data.json'),
             call('/source/dir/info-2.json', '/target/dir/info.json'),
@@ -58,18 +58,18 @@ class TestCases(unittest.TestCase):
     @patch('os.listdir', MagicMock(return_value=[]))
     @patch('shutil.move')
     def test_no_files_to_move(self, mock_move):
-        f_537()
+        f_571()
         mock_move.assert_not_called()
     @patch('os.listdir', return_value=['wrongfile.txt', 'not-a-json-1.txt', 'badname.json'])
     @patch('shutil.move')
     def test_incorrect_file_patterns(self, mock_move, mock_listdir):
-        f_537()
+        f_571()
         mock_move.assert_not_called()
     @patch('os.listdir', return_value=['complex-pattern-123-1.json', 'simple-2.json'])
     @patch('shutil.move')
     @patch('os.path.join', side_effect=lambda *args: '/'.join(args))
     def test_renaaccuracy(self, mock_join, mock_move, mock_listdir):
-        f_537()
+        f_571()
         expected_calls = [
             call('/source/dir/complex-pattern-123-1.json', '/target/dir/complex-pattern-123.json'),
             call('/source/dir/simple-2.json', '/target/dir/simple.json')
@@ -78,5 +78,5 @@ class TestCases(unittest.TestCase):
     @patch('os.listdir', return_value=['misleading-name-not-json-file-1', 'another-fake-2.json.data'])
     @patch('shutil.move')
     def test_special_cases_handling(self, mock_move, mock_listdir):
-        f_537()
+        f_571()
         mock_move.assert_not_called()

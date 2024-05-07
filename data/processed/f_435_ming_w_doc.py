@@ -4,7 +4,7 @@ import pandas as pd
 import seaborn as sns
 
 
-def f_696(list_of_menuitems):
+def f_742(list_of_menuitems):
     """
     Given a nested list of menu items, this function flattens the list and visualizes the frequency
     of each menu item using a seaborn barplot.
@@ -22,7 +22,7 @@ def f_696(list_of_menuitems):
         - matplotlib
 
     Example:
-        >>> ax = f_696([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
+        >>> ax = f_742([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
         >>> isinstance(ax, matplotlib.axes.Axes)
         True
     """
@@ -51,23 +51,23 @@ class TestCases(unittest.TestCase):
         self.menu_items = [['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']]
     def test_return_type(self):
         """Test that the function returns a matplotlib Axes object."""
-        ax = f_696(self.menu_items)
+        ax = f_742(self.menu_items)
         self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
     def test_empty_list(self):
         """Test the function with an empty list, expecting None as there's nothing to plot."""
-        ax = f_696([])
+        ax = f_742([])
         self.assertIsNone(ax)
     def test_single_item_list(self):
         """Test the function with a list containing a single menu item."""
-        ax = f_696([['Pizza']])
+        ax = f_742([['Pizza']])
         self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
         # Checks for correct item count can be added if needed
     def test_identical_items_list(self):
         """Test the function with a list where all items are identical."""
-        ax = f_696([['Burger'], ['Burger'], ['Burger']])
+        ax = f_742([['Burger'], ['Burger'], ['Burger']])
         self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
         # Could verify that 'Burger' is the only item and its count is correct
     def test_multiple_items_same_count(self):
         """Test the function with a list where multiple items have the same count."""
-        ax = f_696([['Soda', 'Water'], ['Soda', 'Water']])
+        ax = f_742([['Soda', 'Water'], ['Soda', 'Water']])
         self.assertTrue(isinstance(ax, matplotlib.axes.Axes))

@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
-def f_420(file_path: str, column_name: str) -> pd.DataFrame:
+def f_445(file_path: str, column_name: str) -> pd.DataFrame:
     """
     Load a CSV file into a Pandas DataFrame, replace all occurrences of the string '\n' with the string '<br>'
     in the specified column, and encode the specified column as a categorical variable using LabelEncoder from sklearn.
@@ -18,7 +18,7 @@ def f_420(file_path: str, column_name: str) -> pd.DataFrame:
     - sklearn.preprocessing.LabelEncoder
     
     Example:
-    >>> df = f_420('data.csv', 'Category')
+    >>> df = f_445('data.csv', 'Category')
     >>> print(df.head())
     """
     df = pd.read_csv(file_path)
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Input 1: A simple CSV file with a 'Category' column containing '\n' characters
         # Expected: The '\n' should be replaced with '<br>' and the column should be encoded
-        df = f_420('test_data/test_case_1.csv', 'Category')
+        df = f_445('test_data/test_case_1.csv', 'Category')
         self.assertIsInstance(df, pd.DataFrame)
         self.assertIn('Category', df.columns)
         self.assertNotIn('\n', df['Category'].astype(str))
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Input 2: A CSV file with different columns
         # Expected: Only the specified column should be affected
-        df = f_420('test_data/test_case_2.csv', 'Name')
+        df = f_445('test_data/test_case_2.csv', 'Name')
         self.assertIsInstance(df, pd.DataFrame)
         self.assertIn('Name', df.columns)
         self.assertNotIn('\n', df['Name'].astype(str))
@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Input 3: A CSV file with a column that doesn't contain '\n'
         # Expected: The column should still be encoded
-        df = f_420('test_data/test_case_3.csv', 'Item')
+        df = f_445('test_data/test_case_3.csv', 'Item')
         self.assertIsInstance(df, pd.DataFrame)
         self.assertIn('Item', df.columns)
         self.assertTrue(df['Item'].dtype.name == 'int64')
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Input 4: A CSV file with multiple columns, affecting only one
         # Expected: Only the specified column should be encoded
-        df = f_420('test_data/test_case_4.csv', 'Language')
+        df = f_445('test_data/test_case_4.csv', 'Language')
         self.assertIsInstance(df, pd.DataFrame)
         self.assertIn('Language', df.columns)
         self.assertNotIn('\n', df['Language'].astype(str))
@@ -103,4 +103,4 @@ class TestCases(unittest.TestCase):
         # Input 5: A CSV file with no columns matching the specified column
         # Expected: An exception should be raised
         with self.assertRaises(Exception):
-            df = f_420('test_data/test_case_5.csv', 'NonExistentColumn')
+            df = f_445('test_data/test_case_5.csv', 'NonExistentColumn')

@@ -1,7 +1,7 @@
 import os
 import re
 
-def f_610(log_file_path: str, keywords: list):
+def f_651(log_file_path: str, keywords: list):
     '''
     Check a log file and format the lines that contain certain keywords. This code reads the log file specified by log_file_path; searches for lines containing any of the keywords provided in the list;
     and formats each line to display the keyword, the timestamp, and the message separated by 20 spaces.
@@ -18,7 +18,7 @@ def f_610(log_file_path: str, keywords: list):
     - re
     
     Example:
-    >>> f_610('/path/to/log_file.log', ['ERROR', 'WARNING'])
+    >>> f_651('/path/to/log_file.log', ['ERROR', 'WARNING'])
     ['    ERROR :    11:30:10 : This is an error message', '    WARNING :    11:35:10 : This is a warning message']
     '''
     if not os.path.exists(log_file_path):
@@ -51,15 +51,15 @@ class TestCases(unittest.TestCase):
         os.remove(self.test_file_path)
     def test_nonexistent_file(self):
         with self.assertRaises(FileNotFoundError):
-            f_610("/path/to/nonexistent/file.log", ['ERROR', 'WARNING'])
+            f_651("/path/to/nonexistent/file.log", ['ERROR', 'WARNING'])
     def test_empty_keywords(self):
-        self.assertEqual(f_610(self.test_file_path, []), [])
+        self.assertEqual(f_651(self.test_file_path, []), [])
     def test_single_keyword(self):
-        result = f_610(self.test_file_path, ['ERROR'])
+        result = f_651(self.test_file_path, ['ERROR'])
         self.assertTrue(all('ERROR' in line for line in result))
     def test_multiple_keywords(self):
-        result = f_610(self.test_file_path, ['ERROR', 'WARNING'])
+        result = f_651(self.test_file_path, ['ERROR', 'WARNING'])
         self.assertTrue(all(any(kw in line for kw in ['ERROR', 'WARNING']) for line in result))
     def test_all_keywords(self):
-        result = f_610(self.test_file_path, ['ERROR', 'WARNING', 'INFO'])
+        result = f_651(self.test_file_path, ['ERROR', 'WARNING', 'INFO'])
         self.assertTrue(len(result) >= 2)

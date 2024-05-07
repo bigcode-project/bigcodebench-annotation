@@ -1,7 +1,7 @@
 import csv
 import sys
 
-def f_755(filename):
+def f_803(filename):
     """
     Read a CSV file, inverse the order of the lines and write the inverted lines back into the file. Then reset the cursor to the beginning of the file.
 
@@ -16,7 +16,7 @@ def f_755(filename):
     - sys
 
     Example:
-    >>> f_755('file.csv')
+    >>> f_803('file.csv')
     'file.csv'
     """
     try:
@@ -40,7 +40,7 @@ class TestCases(unittest.TestCase):
         with open(filename, 'w') as file:
             file.write(contents)
         # Run function
-        f_755(filename)
+        f_803(filename)
         # Check file
         with open(filename, 'r') as file:
             txt = file.read()

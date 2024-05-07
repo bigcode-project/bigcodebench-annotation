@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
-def f_114(rows=3, columns=2, seed=42):
+def f_119(rows=3, columns=2, seed=42):
     """
     Generate a matrix of random values with specified dimensions and scale it between 0 and 1.
     
@@ -17,12 +17,12 @@ def f_114(rows=3, columns=2, seed=42):
     - sklearn.preprocessing.MinMaxScaler
     
     Example:
-    >>> f_114(3, 2)
+    >>> f_119(3, 2)
     array([[0.37939383, 1.        ],
            [1.        , 0.55700635],
            [0.        , 0.        ]])
     
-    >>> f_114(2, 2)
+    >>> f_119(2, 2)
     array([[0., 1.],
            [1., 0.]])
     """
@@ -37,26 +37,26 @@ import numpy as np
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
-        result = f_114()
+        result = f_119()
         self.assertEqual(result.shape, (3, 2))
         self.assertTrue(np.all(result >= 0))
     
     def test_case_2(self):
-        result = f_114(2, 2)
+        result = f_119(2, 2)
         self.assertEqual(result.shape, (2, 2))
         self.assertTrue(np.all(result >= 0) and np.all(result <= 1))
         
     def test_case_3(self):
-        result = f_114(4, 3)
+        result = f_119(4, 3)
         self.assertEqual(result.shape, (4, 3))
         self.assertTrue(np.all(result >= 0) and np.all(result <= 1))
     
     def test_case_4(self):
-        result = f_114(5, 1)
+        result = f_119(5, 1)
         self.assertEqual(result.shape, (5, 1))
         self.assertTrue(np.all(result >= 0))
         
     def test_case_5(self):
-        result = f_114(1, 5)
+        result = f_119(1, 5)
         self.assertEqual(result.shape, (1, 5))
         self.assertTrue(np.all(result >= 0) and np.all(result <= 1))

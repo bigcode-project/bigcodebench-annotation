@@ -7,7 +7,7 @@ from statistics import mean
 COLUMNS = ['Name', 'Age', 'Height', 'Weight']
 PEOPLE_COUNT = 100
 
-def f_275(filename):
+def f_292(filename):
     """
     Generates a CSV file containing simulated data for 100 people, including name, age, height, and weight. 
     It also calculates and appends the average age, height, and weight at the end of the file.
@@ -27,7 +27,7 @@ def f_275(filename):
     Example:
     >>> random.seed(0)
     >>> filename = 'people_report.csv'
-    >>> path = f_275(filename)
+    >>> path = f_292(filename)
     >>> os.path.exists(path)
     True
     """
@@ -57,13 +57,13 @@ class TestCases(unittest.TestCase):
         """Test if the file is created successfully."""
         random.seed(0)
         self.filename = 'test_file_creation.csv'
-        path = f_275(self.filename)
+        path = f_292(self.filename)
         self.assertTrue(os.path.exists(path))
     def test_file_content_rows(self):
         """Test if the file contains the correct number of rows."""
         random.seed(0)
         self.filename = 'test_file_content_rows.csv'
-        path = f_275(self.filename)
+        path = f_292(self.filename)
         with open(path, 'r') as file:
             reader = csv.reader(file)
             rows = list(reader)
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
         """Test if the averages are calculated correctly."""
         random.seed(0)
         self.filename = 'test_averages_calculation.csv'
-        path = f_275(self.filename)
+        path = f_292(self.filename)
         with open(path, 'r') as file:
             reader = csv.reader(file)
             rows = list(reader)
@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
         """Test if the file contains the correct header."""
         random.seed(0)
         self.filename = 'test_header.csv'
-        path = f_275(self.filename)
+        path = f_292(self.filename)
         with open(path, 'r') as file:
             reader = csv.reader(file)
             header = next(reader)
@@ -93,7 +93,7 @@ class TestCases(unittest.TestCase):
         """Test if the average row is labeled correctly."""
         random.seed(0)
         self.filename = 'test_average_row_label.csv'
-        path = f_275(self.filename)
+        path = f_292(self.filename)
         with open(path, 'r') as file:
             reader = csv.reader(file)
             rows = list(reader)

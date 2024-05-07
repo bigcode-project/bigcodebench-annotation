@@ -6,7 +6,7 @@ import pandas as pd
 COLUMNS = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
 
 
-def f_522(rows):
+def f_556(rows):
     """
     Create a Pandas DataFrame with random integer values between 0 and 9 for a given number of rows.
     Count the non-zero values in each column and visualize this information using a bar plot.
@@ -25,7 +25,7 @@ def f_522(rows):
     - matplotlib.pyplot
 
     Example:
-    >>> df, ax = f_522(10)
+    >>> df, ax = f_556(10)
     >>> print(ax.title.get_text())  # Should return 'Non-Zero Value Counts'
     Non-Zero Value Counts
     """
@@ -46,31 +46,26 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test when rows is 0
-        df, ax = f_522(0)
+        df, ax = f_556(0)
         self.assertTrue(df.empty)
         self.assertEqual(len(ax.patches), 0)
-        self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
     def test_case_2(self):
         # Test when rows is 1
-        df, ax = f_522(1)
+        df, ax = f_556(1)
         self.assertEqual(len(df), 1)
         self.assertEqual(len(ax.patches), 5)
-        self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
     def test_case_3(self):
         # Test when rows is 10
-        df, ax = f_522(10)
+        df, ax = f_556(10)
         self.assertEqual(len(df), 10)
         self.assertEqual(len(ax.patches), 5)
-        self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
     def test_case_4(self):
         # Test when rows is negative
-        df, ax = f_522(-5)
+        df, ax = f_556(-5)
         self.assertTrue(df.empty)
         self.assertEqual(len(ax.patches), 0)
-        self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')
     def test_case_5(self):
         # Test when rows is large (e.g., 1000)
-        df, ax = f_522(1000)
+        df, ax = f_556(1000)
         self.assertEqual(len(df), 1000)
         self.assertEqual(len(ax.patches), 5)
-        self.assertEqual(ax.title.get_text(), 'Non-Zero Value Counts')

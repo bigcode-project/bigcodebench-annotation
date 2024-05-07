@@ -6,7 +6,7 @@ from sklearn.preprocessing import MinMaxScaler
 PLOT_TITLE = "Scaled Values"
 
 
-def f_730(data_dict):
+def f_777(data_dict):
     """
     Scales the values in a given dictionary using MinMaxScaler and plots the scaled data.
 
@@ -25,7 +25,7 @@ def f_730(data_dict):
 
     Example:
     >>> data = {'a': [1, 2, None, 4], 'b': [5, None, 7, 8]}
-    >>> scaled_df, plot_ax = f_730(data)
+    >>> scaled_df, plot_ax = f_777(data)
     >>> scaled_df
          a    b
     0  0.0  0.0
@@ -53,7 +53,7 @@ class TestCases(unittest.TestCase):
         """
         Test with an empty dictionary. Should return an empty DataFrame and a plot object.
         """
-        result_df, result_ax = f_730({})
+        result_df, result_ax = f_777({})
         self.assertTrue(result_df.empty)
         self.assertIsNotNone(result_ax)
     def test_all_none_data(self):
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         Test with a dictionary where all values are None. Should return an empty DataFrame and a plot object.
         """
         data = {"a": [None, None], "b": [None, None]}
-        result_df, result_ax = f_730(data)
+        result_df, result_ax = f_777(data)
         self.assertTrue(result_df.empty)
         self.assertIsNotNone(result_ax)
     def test_normal_data(self):
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         Test with a normal data dictionary. Should return a non-empty DataFrame and a plot object.
         """
         data = {"a": [1, 2, 3], "b": [4, 5, 6]}
-        result_df, result_ax = f_730(data)
+        result_df, result_ax = f_777(data)
         self.assertEqual(result_ax.get_title(), "Scaled Values")
         self.assertFalse(result_df.empty)
         self.assertEqual(result_df.shape, (3, 2))
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
         Test data with some missing values. Missing values should be dropped, and scaled data should be returned.
         """
         data = {"a": [1, None, 3], "b": [4, 5, None]}
-        result_df, result_ax = f_730(data)
+        result_df, result_ax = f_777(data)
         self.assertEqual(result_df.shape, (1, 2))  # Only one row without missing values
         self.assertIsNotNone(result_ax)
     def test_with_negative_values(self):
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
         Test data with negative values. Should handle negative values correctly and return scaled data.
         """
         data = {"a": [-1, -2, -3], "b": [1, 2, 3]}
-        result_df, result_ax = f_730(data)
+        result_df, result_ax = f_777(data)
         self.assertFalse(result_df.empty)
         self.assertEqual(result_df.shape, (3, 2))
         self.assertIsNotNone(result_ax)

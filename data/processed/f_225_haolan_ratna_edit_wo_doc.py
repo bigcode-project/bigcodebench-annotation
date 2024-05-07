@@ -9,7 +9,7 @@ SMTP_PORT = 587
 EMAIL_ADDRESS = "your.email@gmail.com"
 EMAIL_PASSWORD = "your.password"
 
-def f_136(text=TEXT, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address=EMAIL_ADDRESS, email_password=EMAIL_PASSWORD, recepient_address=RECEPIENT_ADDRESS, smtp=None):
+def f_142(text=TEXT, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address=EMAIL_ADDRESS, email_password=EMAIL_PASSWORD, recepient_address=RECEPIENT_ADDRESS, smtp=None):
     """
     Extract all names from a string that is not enclosed by square brackets and send the names in an email.
 
@@ -35,7 +35,7 @@ def f_136(text=TEXT, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address
     >>> from unittest.mock import MagicMock
     >>> mock_smtp_instance = MagicMock()
     >>> mock_smtp = MagicMock(return_value=mock_smtp_instance)
-    >>> f_136(text="Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003]Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]", smtp=mock_smtp)
+    >>> f_142(text="Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003]Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]", smtp=mock_smtp)
     ['Josie Smith', 'Mugsy Dog Smith']
     """
     names = re.findall('(.*?)(?:\\[.*?\\]|$)', text)
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         mock_smtp.return_value = mock_smtp_instance
         
         # Call the function
-        result = f_136()
+        result = f_142()
         
         # Assert that SMTP was called with the right parameters
         mock_smtp.assert_called_once_with('smtp.gmail.com', 587)
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
         mock_smtp.return_value = mock_smtp_instance
         
         # Call the function
-        result = f_136()
+        result = f_142()
         
         # Assert that SMTP was called with the right parameters
         mock_smtp.assert_called_once_with('smtp.gmail.com', 587)
@@ -94,7 +94,7 @@ class TestCases(unittest.TestCase):
         custom_text = "[No names enclosed by square brackets]"
         
         # Call the function with custom input
-        result = f_136(text=custom_text)
+        result = f_142(text=custom_text)
         
         # Assert that SMTP was called with the right parameters
         mock_smtp.assert_called_once_with('smtp.gmail.com', 587)
@@ -112,7 +112,7 @@ class TestCases(unittest.TestCase):
         custom_text = "[No names enclosed by square brackets]"
         
         # Call the function with custom input
-        result = f_136(text=custom_text, recepient_address='change@gmail.com')
+        result = f_142(text=custom_text, recepient_address='change@gmail.com')
         
         # Assert that SMTP was called with the right parameters
         mock_smtp.assert_called_once_with('smtp.gmail.com', 587)
@@ -130,7 +130,7 @@ class TestCases(unittest.TestCase):
         custom_text = "[No names enclosed by square brackets]"
         
         # Call the function with custom input
-        result = f_136(text=custom_text, email_address="your.email.change@gmail.com", email_password="your.password.change")
+        result = f_142(text=custom_text, email_address="your.email.change@gmail.com", email_password="your.password.change")
         
         # Assert that SMTP was called with the right parameters
         mock_smtp.assert_called_once_with('smtp.gmail.com', 587)

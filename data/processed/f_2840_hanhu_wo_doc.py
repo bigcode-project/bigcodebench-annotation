@@ -2,7 +2,7 @@ import socket
 import ssl
 import http.client
 
-def f_675(SERVER_NAME, SERVER_PORT, path):
+def f_721(SERVER_NAME, SERVER_PORT, path):
     """
     Makes an HTTPS GET request to a specified server and path, and retrieves the response.
 
@@ -23,7 +23,7 @@ def f_675(SERVER_NAME, SERVER_PORT, path):
     - http.client
 
     Examples:
-    >>> response = f_675('www.example.com', 443, '/path/to/request')
+    >>> response = f_721('www.example.com', 443, '/path/to/request')
     >>> isinstance(response, str)
     True
     """
@@ -45,25 +45,25 @@ class TestCases(unittest.TestCase):
     def test_return_type(self, mock_conn):
         """ Test that the function returns a string. """
         mock_conn.return_value.getresponse.return_value.read.return_value = b'Server Response'
-        result = f_675('www.example.com', 443, '/test/path')
+        result = f_721('www.example.com', 443, '/test/path')
         self.assertIsInstance(result, str)
     @patch('http.client.HTTPSConnection')
     def test_different_paths(self, mock_conn):
         """ Test the function with different request paths. """
         mock_conn.return_value.getresponse.return_value.read.return_value = b'Server Response'
-        result = f_675('www.example.com', 443, '/another/path')
+        result = f_721('www.example.com', 443, '/another/path')
         self.assertIsInstance(result, str)
     @patch('http.client.HTTPSConnection')
     def test_connection_error_handling(self, mock_conn):
         """ Test handling of connection errors. """
         mock_conn.side_effect = http.client.HTTPException('Connection error')
         with self.assertRaises(http.client.HTTPException):
-            f_675('www.example.com', 443, '/error/path')
+            f_721('www.example.com', 443, '/error/path')
     @patch('http.client.HTTPSConnection')
     def test_response_content(self, mock_conn):
         """ Test the content of the response. """
         mock_conn.return_value.getresponse.return_value.read.return_value = b'Expected Content'
-        result = f_675('www.example.com', 443, '/content/path')
+        result = f_721('www.example.com', 443, '/content/path')
         self.assertEqual(result, 'Expected Content')
     @patch('socket.create_connection')
     @patch('http.client.HTTPSConnection')
@@ -71,4 +71,4 @@ class TestCases(unittest.TestCase):
         """ Test handling of SSL handshake errors. """
         mock_socket.side_effect = ssl.SSLError('SSL handshake failed')
         with self.assertRaises(ssl.SSLError):
-            f_675('badssl.com', 443, '/test/path')
+            f_721('badssl.com', 443, '/test/path')

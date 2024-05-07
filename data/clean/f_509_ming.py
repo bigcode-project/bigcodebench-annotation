@@ -4,7 +4,7 @@ from datetime import timedelta
 
 def f_509(date_str):
     """
-    Get the next business day (Mon-Fri) after a certain date string.
+    Get the next business day (Mon-Fri) after a certain date string. Implemented by dateutil.parser and datetime.
 
     Parameters:
     date_str (str): The date string in "yyyy-mm-dd" format.

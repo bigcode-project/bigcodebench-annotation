@@ -3,7 +3,7 @@ from random import choice, seed
 import os
 
 
-def f_53(db_name, table_name, num_entries, random_seed=None):
+def f_55(db_name, table_name, num_entries, random_seed=None):
     """
     Create an SQLite3 table and fill it with random data using the provided database and table names.
 
@@ -32,7 +32,7 @@ def f_53(db_name, table_name, num_entries, random_seed=None):
     - os
 
     Example:
-    >>> db_path = f_53('test.db', 'People', 100, random_seed=42)
+    >>> db_path = f_55('test.db', 'People', 100, random_seed=42)
     >>> print(db_path)
     '/absolute/path/to/test.db'
     """
@@ -71,7 +71,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic case
         num_entries = 5
-        db_path = f_53(
+        db_path = f_55(
             self.db_path, self.table_name, num_entries, random_seed=self.random_seed
         )
         self.assertTrue(os.path.exists(db_path))
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test handling 0 entries
         num_entries = 0
-        db_path = f_53(
+        db_path = f_55(
             self.db_path, self.table_name, num_entries, random_seed=self.random_seed
         )
         self.assertTrue(os.path.exists(db_path))
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test handling 1 entry
         num_entries = 1
-        db_path = f_53(
+        db_path = f_55(
             self.db_path, self.table_name, num_entries, random_seed=self.random_seed
         )
         self.assertTrue(os.path.exists(db_path))
@@ -95,18 +95,18 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Test handling invalid num_entries
         with self.assertRaises(Exception):
-            f_53(self.db_path, self.table_name, -1, random_seed=self.random_seed)
+            f_55(self.db_path, self.table_name, -1, random_seed=self.random_seed)
         with self.assertRaises(Exception):
-            f_53(self.db_path, self.table_name, "1", random_seed=self.random_seed)
+            f_55(self.db_path, self.table_name, "1", random_seed=self.random_seed)
     def test_case_5(self):
         # Test invalid table names (SQL keywords)
         with self.assertRaises(sqlite3.OperationalError):
-            f_53(self.db_path, "Select", 10)
+            f_55(self.db_path, "Select", 10)
     def test_case_6(self):
         # Test against SQL injection in table_name parameter
         malicious_name = "Test; DROP TABLE IntegrityCheck;"
         with self.assertRaises(sqlite3.OperationalError):
-            f_53(self.db_path, malicious_name, 1)
+            f_55(self.db_path, malicious_name, 1)
     def verify_db_content(self, num_entries):
         # Connect to the database and check if the table has correct number of entries
         conn = sqlite3.connect(self.db_path)

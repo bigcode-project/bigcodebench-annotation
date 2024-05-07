@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 
 def f_443(data):
     """
-    Draw a histogram of the data.
+     This function draws a histogram to visualize the frequency distribution of numeric values provided in a string format,
+     with 'Value' on the x-axis, 'Frequency' on the y-axis and 'Histogram of Values' as the title.
+
 
     Parameters:
     data (str): The data string in the format 'value-value-value-...'.
@@ -38,6 +40,7 @@ def f_443(data):
     plt.show()
     
     return ax
+
 
 import unittest
 

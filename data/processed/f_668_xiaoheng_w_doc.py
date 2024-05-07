@@ -5,7 +5,7 @@ from itertools import cycle
 # Constants
 ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
-def f_181(l):
+def f_189(l):
     """
     Create a counter from a list "l" and move the first 3 elements to the end of the list.
 
@@ -22,7 +22,7 @@ def f_181(l):
 
     Example:
     >>> random.seed(42)
-    >>> f_181(ELEMENTS)
+    >>> f_189(ELEMENTS)
     Counter({'I': 3, 'F': 3, 'G': 3, 'J': 3, 'E': 3, 'A': 3, 'B': 3, 'H': 3, 'D': 3, 'C': 3})
     """
     if not l:  # Check if the list is empty
@@ -42,7 +42,7 @@ class TestCases(unittest.TestCase):
         # Input: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         # Expected Output: A Counter object with 30 elements, all unique elements of the input should be present
         input_data = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-        result = f_181(input_data)
+        result = f_189(input_data)
         self.assertIsInstance(result, Counter, "The result should be a Counter object")
         self.assertEqual(sum(result.values()), 30, "The total count should be 30")
         self.assertEqual(len(result), len(set(input_data)), "All unique elements should be present in the result")
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
         # Input: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         # Expected Output: A Counter object with 30 elements, all unique elements of the input should be present
         input_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        result = f_181(input_data)
+        result = f_189(input_data)
         self.assertIsInstance(result, Counter, "The result should be a Counter object")
         self.assertEqual(sum(result.values()), 30, "The total count should be 30")
         self.assertEqual(len(result), len(set(input_data)), "All unique elements should be present in the result")
@@ -60,13 +60,13 @@ class TestCases(unittest.TestCase):
         # Input: ['A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B']
         # Expected Output: A Counter object with 30 elements, two unique elements should be present ('A' and 'B')
         input_data = ['A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B']
-        result = f_181(input_data)
+        result = f_189(input_data)
         self.assertIsInstance(result, Counter, "The result should be a Counter object")
         self.assertEqual(sum(result.values()), 30, "The total count should be 30")
         self.assertEqual(len(result), 2, "The result should contain two unique elements for repeated input")
     def test_empty_list(self):
         input_data = []
-        result = f_181(input_data)
+        result = f_189(input_data)
         self.assertIsInstance(result, Counter, "The result should be a Counter object even for an empty list")
         self.assertEqual(len(result), 0, "The result should be an empty Counter for an empty input list")
     def test_case_5(self):
@@ -74,5 +74,5 @@ class TestCases(unittest.TestCase):
         # Input: ['A', 2, 'C', 4, 'E', 6, 'G', 8, 'I', 10]
         # Expected Output: A Counter object with 30 elements
         input_data = ['A', 2, 'C', 4, 'E', 6, 'G', 8, 'I', 10]
-        result = f_181(input_data)
+        result = f_189(input_data)
         self.assertIsInstance(result, Counter, "The result should be a Counter object when input has mixed types")

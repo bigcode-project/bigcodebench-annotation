@@ -3,7 +3,7 @@ import glob
 from collections import Counter
 
 
-def f_132(directory, extensions=[".txt", ".docx", ".xlsx", ".csv"], keep_zero=True):
+def f_138(directory, extensions=[".txt", ".docx", ".xlsx", ".csv"], keep_zero=True):
     """
     Traverses a given directory recursively to count files by specified extensions.
 
@@ -27,11 +27,11 @@ def f_132(directory, extensions=[".txt", ".docx", ".xlsx", ".csv"], keep_zero=Tr
     - This function counts files in a case-sensitive manner.
 
     Examples:
-    >>> f_132('/path/to/documents')
+    >>> f_138('/path/to/documents')
     Counter({'.txt': 5, '.docx': 2, '.xlsx': 1, '.csv': 0})
-    >>> f_132('/path/to/documents', keep_zero=False)
+    >>> f_138('/path/to/documents', keep_zero=False)
     Counter({'.txt': 5, '.docx': 2, '.xlsx': 1})
-    >>> f_132('/path/to/documents', extensions=['.txt'], keep_zero=False)
+    >>> f_138('/path/to/documents', extensions=['.txt'], keep_zero=False)
     Counter({'.txt': 5})
     """
     if not os.path.exists(directory):
@@ -65,23 +65,23 @@ class TestCases(unittest.TestCase):
         # Test basic case with default extensions
         file_names = ["file1.txt", "file2.docx", "file3.xlsx", "file4.csv", "file5.txt"]
         self.create_test_files(self.temp_dir.name, file_names)
-        result = f_132(self.temp_dir.name)
+        result = f_138(self.temp_dir.name)
         expected = Counter({".txt": 2, ".docx": 1, ".xlsx": 1, ".csv": 1})
         self.assertEqual(result, expected)
     def test_case_2(self):
         # Test empty directory
-        result = f_132(self.temp_dir.name)
+        result = f_138(self.temp_dir.name)
         expected = Counter({".txt": 0, ".docx": 0, ".xlsx": 0, ".csv": 0})
         self.assertEqual(result, expected)
     def test_case_3(self):
         # Test error handling - non-existent directory
         with self.assertRaises(OSError):
-            f_132("/path/to/nonexistent/directory")
+            f_138("/path/to/nonexistent/directory")
     def test_case_4(self):
         # Test ignoring unspecified extensions
         file_names = ["file1.pdf", "file2.png", "file3.txt"]
         self.create_test_files(self.temp_dir.name, file_names)
-        result = f_132(self.temp_dir.name)
+        result = f_138(self.temp_dir.name)
         expected = Counter({".txt": 1, ".docx": 0, ".xlsx": 0, ".csv": 0})
         self.assertEqual(result, expected)
     def test_case_5(self):
@@ -90,14 +90,14 @@ class TestCases(unittest.TestCase):
         os.makedirs(nested_dir_path)
         file_names = ["nested_file1.txt", "nested_file2.xlsx"]
         self.create_test_files(nested_dir_path, file_names)
-        result = f_132(self.temp_dir.name)
+        result = f_138(self.temp_dir.name)
         expected = Counter({".txt": 1, ".xlsx": 1, ".docx": 0, ".csv": 0})
         self.assertEqual(result, expected)
     def test_case_6(self):
         # Test custom extensions
         file_names = ["image.jpeg", "video.mp4", "document.pdf"]
         self.create_test_files(self.temp_dir.name, file_names)
-        result = f_132(
+        result = f_138(
             self.temp_dir.name, extensions=[".jpeg", ".mp4"], keep_zero=False
         )
         expected = Counter({".jpeg": 1, ".mp4": 1})
@@ -106,7 +106,7 @@ class TestCases(unittest.TestCase):
         # Test custom extensions
         file_names = ["file1.txt", "file2.docx"]
         self.create_test_files(self.temp_dir.name, file_names)
-        result = f_132(self.temp_dir.name, keep_zero=False)
+        result = f_138(self.temp_dir.name, keep_zero=False)
         expected = Counter(
             {".txt": 1, ".docx": 1}
         )  # .xlsx and .csv are omitted because their count is 0 and keep_zero is False
@@ -115,6 +115,6 @@ class TestCases(unittest.TestCase):
         # Test case sensitivity
         file_names = ["file1.txt", "file1.tXt", "fiLE.txt", "fiLE.TXt"]
         self.create_test_files(self.temp_dir.name, file_names)
-        result = f_132(self.temp_dir.name, extensions=[".txt"])
+        result = f_138(self.temp_dir.name, extensions=[".txt"])
         expected = Counter({".txt": 2})
         self.assertEqual(result, expected)

@@ -2,7 +2,7 @@ import ctypes
 import hashlib
 import binascii
 
-def f_709(filepath):
+def f_755(filepath):
     """
     Loads a DLL file from a given filepath, calculates its MD5 and SHA256 hashes,
     and prints these hashes in hexadecimal format. This function is a demonstration
@@ -24,7 +24,7 @@ def f_709(filepath):
     Examples:
     >>> with open('libc.so.6', 'w') as f:
     ...     _ = f.write("")
-    >>> result = f_709('libc.so.6')
+    >>> result = f_755('libc.so.6')
     MD5 Hash: d41d8cd98f00b204e9800998ecf8427e
     SHA256 Hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     >>> isinstance(result, str) 
@@ -60,7 +60,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(os.path.exists(self.filepath))
     def test_invalid_file_path(self):
         with self.assertRaises(OSError):
-            f_709('invalid_path.dll')
+            f_755('invalid_path.dll')
     @patch('ctypes.CDLL')
     @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data=b'test data')
     @patch('hashlib.md5')
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         mock_md5.return_value.digest.return_value = b'\x93\x15\x98\x3f\xcd\xb4\xcc\xcb\x28\x7b\xcc\xdb\xdd\x4e\x8a\x45'  # Mock MD5 digest
         mock_sha256.return_value.digest.return_value = b'\xd7\xa8\xfb\x48\xd2\x8d\x1d\x73\xa0\x34\x6b\xbf\x40\x41\xdf\x98\xc2\x50\x1d\x4a\xe4\x88\x9b\x93\x4f\xaa\x63\xf7\xaf\x67\xe9\xb1'  # Mock SHA256 digest
         mock_cdll.return_value._name = 'test.dll'
-        dll_name = f_709(self.filepath)  # Replace 'f_709_module.f_709' with the actual path to your f_709 function
+        dll_name = f_755(self.filepath)  # Replace 'f_755_module.f_755' with the actual path to your f_755 function
         self.assertEqual(dll_name, 'test.dll')
     @patch('ctypes.CDLL')
     @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data=b'test data')
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
         expected_hash = b'\x93\x15\x98\x3f\xcd\xb4\xcc\xcb\x28\x7b\xcc\xdb\xdd\x4e\x8a\x45'
         mock_md5.return_value.digest.return_value = expected_hash
         with patch('builtins.print') as mock_print:
-            f_709('path/to/test.dll')
+            f_755('path/to/test.dll')
             expected_md5_output = f'MD5 Hash: {binascii.hexlify(expected_hash).decode()}'
             mock_print.assert_any_call(expected_md5_output)
     @patch('ctypes.CDLL')
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
         expected_hash = b'\xd7\xa8\xfb\x48\xd2\x8d\x1d\x73\xa0\x34\x6b\xbf\x40\x41\xdf\x98\xc2\x50\x1d\x4a\xe4\x88\x9b\x93\x4f\xaa\x63\xf7\xaf\x67\xe9\xb1'
         mock_sha256.return_value.digest.return_value = expected_hash
         with patch('builtins.print') as mock_print:
-            f_709('path/to/test.dll')
+            f_755('path/to/test.dll')
             expected_sha256_output = f'SHA256 Hash: {binascii.hexlify(expected_hash).decode()}'
             mock_print.assert_any_call(expected_sha256_output)
     def tearDown(self):

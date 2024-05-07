@@ -5,7 +5,7 @@ import random
 HAND_RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 SUITS = ['H', 'D', 'C', 'S']
 
-def f_149():
+def f_155():
     """
     Generate a random poker hand consisting of five cards, and count the frequency of each card rank.
 
@@ -25,7 +25,7 @@ def f_149():
     - random
 
     Example:
-        >>> hand, rank_counts = f_149()
+        >>> hand, rank_counts = f_155()
         >>> print(hand)  
         ['QH', '2C', '5D', '4H', 'QH']
         >>> print(rank_counts)  
@@ -48,12 +48,12 @@ SUITS = ['H', 'D', 'C', 'S']
 class TestCases(unittest.TestCase):
     def test_poker_hand_length(self):
         """Test if the poker hand has 5 cards."""
-        hand, rank_counts = f_149()
+        hand, rank_counts = f_155()
         self.assertEqual(len(hand), 5, "The poker hand should contain 5 cards.")
     
     def test_card_format(self):
         """Test if each card in the hand is formatted correctly."""
-        hand, rank_counts = f_149()
+        hand, rank_counts = f_155()
         for card in hand:
             self.assertIn(len(card), [2, 3], "Each card should be a string of length 2 or 3.")
             self.assertIn(card[:-1], HAND_RANKS, "The rank of each card should be valid.")
@@ -61,17 +61,17 @@ class TestCases(unittest.TestCase):
     
     def test_rank_counts_type(self):
         """Test if rank_counts is of type Counter."""
-        hand, rank_counts = f_149()
+        hand, rank_counts = f_155()
         self.assertIsInstance(rank_counts, Counter, "rank_counts should be a Counter dictionary.")
     
     def test_rank_counts_keys(self):
         """Test if the keys of rank_counts are valid ranks."""
-        hand, rank_counts = f_149()
+        hand, rank_counts = f_155()
         for rank in rank_counts.keys():
             self.assertIn(rank, HAND_RANKS, "The ranks in rank_counts should be valid.")
     
     def test_rank_counts_values(self):
         """Test if the values of rank_counts are integers."""
-        hand, rank_counts = f_149()
+        hand, rank_counts = f_155()
         for count in rank_counts.values():
             self.assertIsInstance(count, int, "The counts in rank_counts should be integers.")

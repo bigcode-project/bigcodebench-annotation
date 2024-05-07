@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 
 
-def f_570(df, target_column, target_values=None):
+def f_608(df, target_column, target_values=None):
     """
     Replace all elements in DataFrame columns that are not present in the target_values array with zeros, and then perform a linear regression using the target column.
 
@@ -28,7 +28,7 @@ def f_570(df, target_column, target_values=None):
     Example:
         >>> rng = np.random.default_rng(seed=0)
         >>> df = pd.DataFrame(rng.integers(0, 100, size=(1000, 2)), columns=['A', 'predict'])
-        >>> model = f_570(df, 'predict')
+        >>> model = f_608(df, 'predict')
         >>> print(model.coef_)
         [-0.04934205]
         >>> print(model.intercept_)  
@@ -36,7 +36,7 @@ def f_570(df, target_column, target_values=None):
 
         >>> rng = np.random.default_rng(seed=0)
         >>> df = pd.DataFrame(rng.integers(0, 100, size=(1000, 5)), columns=['A', 'B', 'C', 'D', 'predict'])
-        >>> model = f_570(df, 'predict')
+        >>> model = f_608(df, 'predict')
         >>> print(model.coef_)
         [-0.00173703 -0.02190392 -0.03304266  0.00759771]
         >>> print(model.intercept_)
@@ -77,18 +77,18 @@ class TestCases(unittest.TestCase):
         '''non DataFrame input'''
         df = 3
         target_column = 'test'
-        self.assertRaises(Exception, f_570, df, target_column)
+        self.assertRaises(Exception, f_608, df, target_column)
     def test_case_target_column(self):
         '''target column not in DataFrame'''
         rng = np.random.default_rng(seed=0)
         df = pd.DataFrame(rng.integers(0, 10, size=(5, 2)), columns=['test', 'python'])
         target_column = 'not'
-        self.assertRaises(Exception, f_570, df, target_column)
+        self.assertRaises(Exception, f_608, df, target_column)
     def test_case_empty_df(self):
         '''empty df as input'''
         df = pd.DataFrame(columns=['A', 'B'])
         target_column = 'A'
-        self.assertRaises(Exception, f_570, df, target_column)
+        self.assertRaises(Exception, f_608, df, target_column)
     
     def test_case_non_numeric_values(self):
         '''df not numeric'''
@@ -98,13 +98,13 @@ class TestCases(unittest.TestCase):
         }
         df = pd.DataFrame(data)
         target_column = 'A'
-        self.assertRaises(Exception, f_570, df, target_column)
+        self.assertRaises(Exception, f_608, df, target_column)
     def test_case_1(self):
         '''prediction for one column'''
         rng = np.random.default_rng(seed=0)
         df = pd.DataFrame(rng.integers(0, 100, size=(1000, 1)), columns=list('A'))
         df['predict'] = df.apply(self.lin_relation_1d, args=(2, 4))
-        model = f_570(df, 'predict')
+        model = f_608(df, 'predict')
         self.assertIsInstance(model, LinearRegression, "Returned value is not a LinearRegression model.")
         # make sure predictions work as expected
         pred = model.predict(df.drop('predict', axis=1))
@@ -118,7 +118,7 @@ class TestCases(unittest.TestCase):
         rng = np.random.default_rng(seed=0)
         df = pd.DataFrame(rng.integers(0, 100, size=(1000, 5)), columns=list('ABCDE'))
         df['predict'] = df.apply(self.lin_relation_nd, axis=1, args=(4, [2.5, 5.8, 6, 4, -1]))
-        model = f_570(df, 'predict')
+        model = f_608(df, 'predict')
         self.assertIsInstance(model, LinearRegression, "Returned value is not a LinearRegression model.")
         # make sure predictions work as expected
         pred = model.predict(df.drop('predict', axis=1))
@@ -131,7 +131,7 @@ class TestCases(unittest.TestCase):
         rng = np.random.default_rng(seed=0)
         df = pd.DataFrame(rng.integers(0, 10, size=(1000, 1)), columns=list('A'))
         df['predict'] = df.apply(self.lin_relation_1d, args=(0, 2))
-        model = f_570(df, 'predict', target_values=[1, 2, 4, 8])
+        model = f_608(df, 'predict', target_values=[1, 2, 4, 8])
         self.assertIsInstance(model, LinearRegression, "Returned value is not a LinearRegression model.")
         
         # make sure predictions work as expected
@@ -146,7 +146,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         '''df with constant values'''
         df = pd.DataFrame(np.full((10, 10), 3), columns=list('ABCDEFGHIJ'))
-        model = f_570(df, 'J')
+        model = f_608(df, 'J')
         self.assertTrue(all(coef == 0 for coef in model.coef_), "Model coefficients are not correct.")
         self.assertAlmostEqual(model.intercept_, 3, places=4)
     def test_case_5(self):
@@ -154,7 +154,7 @@ class TestCases(unittest.TestCase):
         rng = np.random.default_rng(seed=0)
         df = pd.DataFrame(rng.random(size=(1000, 5)) * 10, columns=list('ABCDE'))
         df['predict'] = df.apply(self.lin_relation_nd, axis=1, args=(-1, [15, -4.8, 12, 40.2, -2]))
-        model = f_570(df, 'predict')
+        model = f_608(df, 'predict')
         self.assertIsInstance(model, LinearRegression, "Returned value is not a LinearRegression model.")
         # make sure predictions work as expected
         pred = model.predict(df.drop('predict', axis=1))

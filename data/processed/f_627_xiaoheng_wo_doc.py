@@ -5,7 +5,7 @@ import glob
 # Constants
 DIRECTORY_PATH = './files/'
 
-def f_653(directory=DIRECTORY_PATH, from_encoding='cp1251', to_encoding='utf8'):
+def f_698(directory=DIRECTORY_PATH, from_encoding='cp1251', to_encoding='utf8'):
     """
     Convert the encoding of all text files in a specified directory from one encoding to another. 
     The function modifies the files in-place.
@@ -24,8 +24,8 @@ def f_653(directory=DIRECTORY_PATH, from_encoding='cp1251', to_encoding='utf8'):
     - glob
     
     Example:
-    >>> f_653('./files/', 'cp1251', 'utf8')  # Converts all .txt files in './files/' from 'cp1251' to 'utf8'
-    >>> f_653('./other_files/', 'utf8', 'ascii')  # Converts all .txt files in './other_files/' from 'utf8' to 'ascii'
+    >>> f_698('./files/', 'cp1251', 'utf8')  # Converts all .txt files in './files/' from 'cp1251' to 'utf8'
+    >>> f_698('./other_files/', 'utf8', 'ascii')  # Converts all .txt files in './other_files/' from 'utf8' to 'ascii'
     """
     for filename in glob.glob(os.path.join(directory, '*.txt')):
         with codecs.open(filename, 'r', from_encoding) as file:
@@ -62,7 +62,7 @@ class TestCases(unittest.TestCase):
         mock_glob.return_value = ['./test_files/file1.txt', './test_files/file2.txt']
         create_text_file('./test_files/file1.txt', 'Hello', 'utf8')
         create_text_file('./test_files/file2.txt', 'World', 'utf8')
-        f_653(directory='./test_files/', from_encoding='utf8', to_encoding='ascii')
+        f_698(directory='./test_files/', from_encoding='utf8', to_encoding='ascii')
         with codecs.open('./test_files/file1.txt', 'r', 'ascii') as file:
             self.assertEqual(file.read(), 'Hello')
         with codecs.open('./test_files/file2.txt', 'r', 'ascii') as file:
@@ -71,13 +71,13 @@ class TestCases(unittest.TestCase):
     @patch('glob.glob')
     def test_empty_directory(self, mock_glob):
         mock_glob.return_value = []
-        f_653(directory='./empty/', from_encoding='utf8', to_encoding='ascii')
+        f_698(directory='./empty/', from_encoding='utf8', to_encoding='ascii')
         
     @patch('glob.glob')
     def test_same_encoding(self, mock_glob):
         mock_glob.return_value = ['./test_files/file3.txt']
         create_text_file('./test_files/file3.txt', 'Same Encoding', 'utf8')
-        f_653(directory='./test_files/', from_encoding='utf8', to_encoding='utf8')
+        f_698(directory='./test_files/', from_encoding='utf8', to_encoding='utf8')
         with codecs.open('./test_files/file3.txt', 'r', 'utf8') as file:
             self.assertEqual(file.read(), 'Same Encoding')
             
@@ -86,9 +86,9 @@ class TestCases(unittest.TestCase):
         mock_glob.return_value = ['./test_files/file4.txt']
         create_text_file('./test_files/file4.txt', 'Invalid', 'utf8')
         with self.assertRaises(LookupError):
-            f_653(directory='./test_files/', from_encoding='utf8', to_encoding='invalid_encoding')
+            f_698(directory='./test_files/', from_encoding='utf8', to_encoding='invalid_encoding')
             
     @patch('glob.glob')
     def test_nonexistent_directory(self, mock_glob):
         mock_glob.return_value = []
-        f_653(directory='./nonexistent/', from_encoding='utf8', to_encoding='ascii')
+        f_698(directory='./nonexistent/', from_encoding='utf8', to_encoding='ascii')

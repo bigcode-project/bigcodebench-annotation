@@ -3,7 +3,7 @@ import scipy.optimize as optimize
 import numpy as np
 
 
-def f_829(array, target_value):
+def f_879(array, target_value):
     """
     Fit an exponential decay function to the indices in the array where the first column matches the target value.
 
@@ -23,7 +23,7 @@ def f_829(array, target_value):
     >>> import numpy as np
     >>> array = np.array([[1, 2], [1, 3], [1, 4], [2, 5], [2, 6]])
     >>> target = 1
-    >>> params, ax = f_829(array, target)
+    >>> params, ax = f_879(array, target)
     >>> len(params)
     3
     """
@@ -57,23 +57,23 @@ class TestCases(unittest.TestCase):
         ])
     def test_return_types(self):
         """Test the return types of the function."""
-        coeffs, ax = f_829(self.array, '332')
+        coeffs, ax = f_879(self.array, '332')
         self.assertIsInstance(coeffs, np.ndarray, "Coefficients should be a numpy array.")
         self.assertTrue(hasattr(ax, 'plot'), "The second return value should be an Axes object.")
     def test_target_value_found(self):
         """Test when the target value is found."""
-        coeffs, _ = f_829(self.array, '332')
+        coeffs, _ = f_879(self.array, '332')
         self.assertGreater(coeffs.size, 0, "Should return coefficients when target value is found.")
     def test_target_value_not_found(self):
         """Test when the target value is not found."""
         with self.assertRaises(ValueError):
-            f_829(self.array, '999')
+            f_879(self.array, '999')
     def test_not_enough_points(self):
         """Test with not enough points for fitting."""
         small_array = np.array([['332'], ['a'], ['b']])
         with self.assertRaises(ValueError):
-            f_829(small_array, '332')
+            f_879(small_array, '332')
     def test_functionality(self):
         """Test the overall functionality."""
-        coeffs, _ = f_829(self.array, '332')
+        coeffs, _ = f_879(self.array, '332')
         self.assertEqual(coeffs.shape, (3,), "Should return three coefficients.")

@@ -4,7 +4,7 @@ from operator import itemgetter
 # Constants
 KEY_FUNC = itemgetter(0)
 
-def f_177(my_dict):
+def f_184(my_dict):
     """
     Group the dictionary entries after the first character of the key and add the values for each group.
 
@@ -20,7 +20,7 @@ def f_177(my_dict):
     
     Example:
     >>> my_dict = {'apple': 1, 'banana': 2, 'avocado': 3, 'blueberry': 4, 'blackberry': 5}
-    >>> aggregated_dict = f_177(my_dict)
+    >>> aggregated_dict = f_184(my_dict)
     >>> print(aggregated_dict)
     {'a': 4, 'b': 11}
     """
@@ -34,27 +34,27 @@ class TestCases(unittest.TestCase):
     
     def test_1(self):
         my_dict = {'apple': 1, 'banana': 2, 'avocado': 3, 'blueberry': 4, 'blackberry': 5}
-        result = f_177(my_dict)
+        result = f_184(my_dict)
         expected = {'a': 4, 'b': 11}
         self.assertEqual(result, expected)
         
     def test_2(self):
         my_dict = {'apple': 10, 'apricot': 10, 'banana': 10, 'blueberry': 10}
-        result = f_177(my_dict)
+        result = f_184(my_dict)
         expected = {'a': 20, 'b': 20}
         self.assertEqual(result, expected)
     def test_3(self):
         my_dict = {}
-        result = f_177(my_dict)
+        result = f_184(my_dict)
         expected = {}
         self.assertEqual(result, expected)
     def test_4(self):
         my_dict = {'apple': 1, 'orange': 2, 'cherry': 3, 'blueberry': 4}
-        result = f_177(my_dict)
+        result = f_184(my_dict)
         expected = {'a': 1, 'o': 2, 'c': 3, 'b': 4}
         self.assertEqual(result, expected)
     def test_5(self):
         my_dict = {'apple': 1, 'apricot': 2, 'banana': 3, 'blueberry': 4, 'cherry': 5, 'date': 6}
-        result = f_177(my_dict)
+        result = f_184(my_dict)
         expected = {'a': 3, 'b': 7, 'c': 5, 'd': 6}
         self.assertEqual(result, expected)

@@ -2,7 +2,7 @@ import re
 import datetime
 import time
 
-def f_629(logfile, duration=60):
+def f_671(logfile, duration=60):
     """
     Monitor the access log file of an HTTP server and count the number of 500 errors in a given duration.
     
@@ -19,7 +19,7 @@ def f_629(logfile, duration=60):
     - time
     
     Example:
-    >>> f_629('/path/to/access.log', 5)
+    >>> f_671('/path/to/access.log', 5)
     3
 
     Note: 
@@ -44,31 +44,31 @@ import unittest
 from unittest.mock import mock_open, patch
 import re
 import datetime
-# Assuming your original f_629 function here
+# Assuming your original f_671 function here
 class TestCases(unittest.TestCase):
     @patch('builtins.open', new_callable=mock_open, read_data='error 500 occurred\nok\nerror 500 occurred')
     def test_some_errors(self, mock_file):
         # Test where there are some 500 errors in the log
-        result = f_629('mock_log.log')
+        result = f_671('mock_log.log')
         self.assertEqual(result, 2)
     @patch('builtins.open', new_callable=mock_open, read_data='')
     def test_empty_file(self, mock_file):
         # Test with an empty log file
-        result = f_629('empty.log')
+        result = f_671('empty.log')
         self.assertEqual(result, 0)
     @patch('builtins.open', new_callable=mock_open, read_data='error 500 occurred\n' * 100)
     def test_all_errors(self, mock_file):
         # Test where all lines are 500 errors
-        result = f_629('all_errors.log')
+        result = f_671('all_errors.log')
         self.assertEqual(result, 100)
     @patch('os.path.exists')
     def test_file_not_present(self, mock_exists):
         # Simulate file not existing
         mock_exists.return_value = False
         with self.assertRaises(FileNotFoundError):
-            f_629('non_existent.log')
+            f_671('non_existent.log')
     @patch('builtins.open', new_callable=mock_open, read_data='error 500 occurred')
     def test_single_error(self, mock_file):
         # Test with a single error
-        result = f_629('single_error.log')
+        result = f_671('single_error.log')
         self.assertEqual(result, 1)

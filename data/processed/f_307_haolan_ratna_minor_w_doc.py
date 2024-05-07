@@ -2,7 +2,7 @@ import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 
-def f_399(l):
+def f_423(l):
     '''
     Draw a histogram of the given array with a Gaussian fit.
 
@@ -24,7 +24,7 @@ def f_399(l):
 
     Example:
     >>> l = np.array([5, 5, 5, 5, 5])
-    >>> ax = f_399(l)
+    >>> ax = f_423(l)
     >>> print(ax.get_title())
     Fit results: mu = 5.00,  std = 0.00
     >>> plt.close()
@@ -47,7 +47,7 @@ import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         l1 = np.array([1, 2, 2, 3, 3, 3, 4, 4, 4, 4])
-        ax1 = f_399(l1)
+        ax1 = f_423(l1)
         mu, std = stats.norm.fit(l1)
         expected_title_1 = f"Fit results: mu = {mu:.2f},  std = {std:.2f}"
         self.assertIsInstance(ax1, plt.Axes, "Return type should be a matplotlib Axes object.")
@@ -55,12 +55,12 @@ class TestCases(unittest.TestCase):
     
     def test_case_2(self):
         l2 = np.array([5, 5, 5, 5, 5])
-        ax2 = f_399(l2)
+        ax2 = f_423(l2)
         self.assertIsInstance(ax2, plt.Axes, "Return type should be a matplotlib Axes object.")
         self.assertEqual(ax2.get_title(), "Fit results: mu = 5.00,  std = 0.00", "Incorrect title for test case 2.")
     def test_case_3(self):
         l3 = np.array([1, 2, 3, 4, 5, 6, 6, 7, 8, 8, 9])
-        ax3 = f_399(l3)
+        ax3 = f_423(l3)
         mu, std = stats.norm.fit(l3)
         expected_title_3 = f"Fit results: mu = {mu:.2f},  std = {std:.2f}"
         self.assertIsInstance(ax3, plt.Axes, "Return type should be a matplotlib Axes object.")
@@ -68,13 +68,13 @@ class TestCases(unittest.TestCase):
     
     def test_case_4(self):
         l4 = np.array([10, 10, 10, 10, 10])
-        ax4 = f_399(l4)
+        ax4 = f_423(l4)
         self.assertIsInstance(ax4, plt.Axes, "Return type should be a matplotlib Axes object.")
         self.assertEqual(ax4.get_title(), "Fit results: mu = 10.00,  std = 0.00", "Incorrect title for test case 4.")
         
     def test_case_5(self):
         l5 = np.array([1, 1, 2, 2, 3, 3, 4, 4, 5, 5])
-        ax5 = f_399(l5)
+        ax5 = f_423(l5)
         mu, std = stats.norm.fit(l5)
         expected_title_5 = f"Fit results: mu = {mu:.2f},  std = {std:.2f}"
         self.assertIsInstance(ax5, plt.Axes, "Return type should be a matplotlib Axes object.")

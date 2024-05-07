@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def f_79(data, column):
+def f_83(data, column):
     """
     Draw and return a bar chart that shows the distribution of categories in a specific column of a dictionary.
     
@@ -25,9 +25,9 @@ def f_79(data, column):
     
     Example:
     >>> data = {'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']}
-    >>> ax = f_79(data, 'Category')    
+    >>> ax = f_83(data, 'Category')    
     >>> data = {'Type': ['A', 'A', 'C', 'E', 'D', 'E', 'D']}
-    >>> ax = f_79(data, 'Type')
+    >>> ax = f_83(data, 'Type')
     """
     df = pd.DataFrame(data)
     CATEGORIES = ['A', 'B', 'C', 'D', 'E']
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
     def test_with_all_categories(self):
         """Test with all categories present."""
         data = {'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']}
-        ax = f_79(data, 'Category')
+        ax = f_83(data, 'Category')
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.get_xlabel(), 'Category')
         self.assertEqual(ax.get_ylabel(), 'Count')
@@ -60,12 +60,12 @@ class TestCases(unittest.TestCase):
     def test_with_missing_categories(self):
         """Test with some categories missing."""
         data = {'Category': ['A', 'A', 'B', 'C']}
-        ax = f_79(data, 'Category')
+        ax = f_83(data, 'Category')
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(len(ax.get_xticks()), 5)  # Ensure all categories are accounted for, including missing ones
     def test_with_unexpected_category(self):
         """Test with a category not in predefined list."""
         data = {'Category': ['F', 'A', 'B']}  # 'F' is not a predefined category
-        ax = f_79(data, 'Category')
+        ax = f_83(data, 'Category')
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(len(ax.get_xticks()), 5)  # 'F' is ignored, only predefined categories are considered

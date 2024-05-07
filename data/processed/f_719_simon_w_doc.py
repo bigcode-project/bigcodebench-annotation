@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
-def f_608(data, n_components=2):
+def f_649(data, n_components=2):
     """
     Perform PCA (Principal Component Analysis) on the provided DataFrame.
 
@@ -38,7 +38,7 @@ def f_608(data, n_components=2):
     ...     'C': [11, 12, 13, 14, 15],
     ...     'D': [16, 17, 18, 19, 20]
     ... })
-    >>> result = f_608(data, n_components=2)
+    >>> result = f_649(data, n_components=2)
     >>> print(result)
               0             1
     0  2.828427  3.648565e-16
@@ -52,7 +52,7 @@ def f_608(data, n_components=2):
     ...         'B': [-1, 0, 0, 9.76, 12.34],
     ...         'C': [1, 42, -13.2, 31, 1.23],
     ... })
-    >>> res = f_608(data, n_components=1)
+    >>> res = f_649(data, n_components=1)
     >>> print(res)        
               0
     0 -0.793152
@@ -87,24 +87,24 @@ class TestCases(unittest.TestCase):
         })
         self.data_large = pd.DataFrame(np.random.randint(0, 100, size=(1000, 50)))
     def test_basic_functionality(self):
-        result = f_608(self.data_small)
+        result = f_649(self.data_small)
         self.assertEqual(result.shape, (5, 2))
     def test_varying_components(self):
         for components in [1, 3, 4]:
-            result = f_608(self.data_small, n_components=components)
+            result = f_649(self.data_small, n_components=components)
             self.assertEqual(result.shape, (5, components))
     def test_large_dataset(self):
-        result = f_608(self.data_large, n_components=10)
+        result = f_649(self.data_large, n_components=10)
         self.assertEqual(result.shape, (1000, 10))
     def test_invalid_input(self):
         data_invalid = self.data_small.copy()
         data_invalid['E'] = ['non-numeric'] * 5
         with self.assertRaises(ValueError):
-            f_608(data_invalid)
+            f_649(data_invalid)
     def test_empty_dataframe(self):
         data_empty = pd.DataFrame()
         with self.assertRaises(ValueError):
-            f_608(data_empty)
+            f_649(data_empty)
     def test_known_input(self):
         expected_output = np.array([
             [ 2.82842712e+00,  3.64856517e-16],
@@ -113,5 +113,5 @@ class TestCases(unittest.TestCase):
             [-1.41421356e+00,  1.21618839e-16],
             [-2.82842712e+00,  2.43237678e-16]
        ])
-        actual_output = f_608(self.data_small, n_components=2).values
+        actual_output = f_649(self.data_small, n_components=2).values
         np.testing.assert_almost_equal(actual_output, expected_output, decimal=5)

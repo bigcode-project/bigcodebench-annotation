@@ -2,7 +2,7 @@ import pandas as pd
 import pytz
 
 
-def f_822(articles, timezone):
+def f_872(articles, timezone):
     """
     Analyze the publication times of a list of articles: 
     1) Convert 'published_time' to a specified timezone
@@ -31,7 +31,7 @@ def f_822(articles, timezone):
     >>> articles = [{'title': 'Apple News', 'title_url': 'Apple_News', 'id': 2, 'category': 'Technology', 'published_time': datetime(2023, 6, 15, 12, 0, 0, tzinfo=pytz.UTC)},
     ...             {'title': 'New York Times', 'title_url': 'New_York_Times', 'id': 4, 'category': 'Sports', 'published_time': datetime(2023, 6, 16, 23, 0, 0, tzinfo=pytz.UTC)},
     ...             {'title': 'USA Today', 'title_url': 'USA_Today', 'id': 6, 'category': 'Health', 'published_time': datetime(2023, 6, 17, 7, 0, 0, tzinfo=pytz.UTC)}]
-    >>> analysis_df = f_822(articles, 'America/New_York')
+    >>> analysis_df = f_872(articles, 'America/New_York')
     >>> print(analysis_df)
                 count  mean  min  max
     category                         
@@ -73,14 +73,14 @@ class TestCases(unittest.TestCase):
     def test_empty_articles_list(self):
         # Test handling of empty list
         with self.assertRaises(ValueError):
-            f_822([], 'America/New_York')
+            f_872([], 'America/New_York')
     def test_invalid_article_format(self):
         # Test handling of improperly formatted articles list
         with self.assertRaises(ValueError):
-            f_822([{'wrong_key': 'wrong_value'}], 'America/New_York')
+            f_872([{'wrong_key': 'wrong_value'}], 'America/New_York')
     def test_conversion_and_grouping(self):
         timezone = 'America/New_York'
-        result_df = f_822(self.articles, timezone)
+        result_df = f_872(self.articles, timezone)
         expected_data = {
             'count': {'Health': 1, 'Sports': 1, 'Technology': 1},
             'mean': {'Health': 3.0, 'Sports': 10.0, 'Technology': 7.0},
@@ -99,7 +99,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result_df, expected_df)
     def test_article_timezone_conversion(self):
         # Assuming test data has UTC as the base timezone and checking against London timezone
-        result = f_822(self.articles, 'Europe/London')
+        result = f_872(self.articles, 'Europe/London')
         expected_hours = [8.0, 15.0, 12.0]
         actual_hours = result.reset_index()['mean'].tolist()
         self.assertEqual(expected_hours, actual_hours)
@@ -115,7 +115,7 @@ class TestCases(unittest.TestCase):
             # -8 hours from UTC
         ]
         timezone = 'America/New_York'  # UTC-5
-        result_df = f_822(articles, timezone)
+        result_df = f_872(articles, timezone)
         expected_data = {
             'count': {'Health': 1, 'Sports': 1, 'Technology': 1},
             'mean': {'Health': 14.0, 'Sports': 21.0, 'Technology': 7.0},

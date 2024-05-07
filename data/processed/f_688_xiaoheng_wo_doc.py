@@ -1,7 +1,7 @@
 import json
 import os
 
-def f_785(filename, data):
+def f_834(filename, data):
     """
     Write a dictionary to a file as a JSON object and return the written content for verification.
     
@@ -22,7 +22,7 @@ def f_785(filename, data):
     - os
 
     Example:
-    >>> result, written_data = f_785('data.json', {'key': 'value'})
+    >>> result, written_data = f_834('data.json', {'key': 'value'})
     >>> print(result)  # This should print: True
     True
     >>> print(written_data)  # This should print: {'key': 'value'}
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         """Test with an empty dictionary to ensure it writes and verifies correctly."""
         filename = 'empty_test.json'
         data = {}
-        success, content = f_785(filename, data)
+        success, content = f_834(filename, data)
         self.assertTrue(success)
         self.assertEqual(content, data)
         os.remove(filename)
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         """Test with a simple dictionary to check for basic write and verify functionality."""
         filename = 'simple_test.json'
         data = {'key': 'value'}
-        success, content = f_785(filename, data)
+        success, content = f_834(filename, data)
         self.assertTrue(success)
         self.assertEqual(content, data)
         os.remove(filename)
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         """Test with a nested dictionary to ensure nested structures are handled correctly."""
         filename = 'nested_test.json'
         data = {'key': {'nested_key': 'nested_value'}}
-        success, content = f_785(filename, data)
+        success, content = f_834(filename, data)
         self.assertTrue(success)
         self.assertEqual(content, data)
         os.remove(filename)
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         """Test with a large dictionary to ensure the function can handle more substantial amounts of data."""
         filename = 'large_test.json'
         data = {fake.word(): fake.sentence() for _ in range(100)}
-        success, content = f_785(filename, data)
+        success, content = f_834(filename, data)
         self.assertTrue(success)
         self.assertEqual(content, data)
         os.remove(filename)
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
             'list': [1, 2, 3],
             'dict': {'nested': 'dict'}
         }
-        success, content = f_785(filename, data)
+        success, content = f_834(filename, data)
         self.assertTrue(success)
         self.assertEqual(content, data)
         os.remove(filename)

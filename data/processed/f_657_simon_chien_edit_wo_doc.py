@@ -3,7 +3,7 @@ import os
 import glob
 
 
-def f_841(dir_path):
+def f_893(dir_path):
     """
     Search for occurrences of the word "error" in all text files within a 
     specified directory and its subdirectories.
@@ -28,7 +28,7 @@ def f_841(dir_path):
     This function is NOT case sensitive, e.g. also "ERROr" will be counted.
     
     Example:
-    >>> f_841("/path/to/directory")
+    >>> f_893("/path/to/directory")
     {'file1.txt': 2, 'subdir/file2.txt': 1}
     """
     if not os.path.isdir(dir_path):
@@ -64,10 +64,10 @@ class TestCases(unittest.TestCase):
     def test_non_existent(self):
         # Expect ValueError for non-existent directory
         with self.assertRaises(ValueError):
-            f_841(os.path.join(self.test_dir, "non_existent"))
+            f_893(os.path.join(self.test_dir, "non_existent"))
     def test_empty_folder(self):
         # Test empty directory
-        result = f_841(self.test_dir)
+        result = f_893(self.test_dir)
         self.assertEqual(result, {})
     def test_files_with_errors(self):
         # Files with varying counts of 'error'
@@ -83,13 +83,13 @@ class TestCases(unittest.TestCase):
         }
         for path, content in files.items():
             self.create_file(path, content)
-        result = f_841(self.test_dir)
+        result = f_893(self.test_dir)
         self.assertEqual(result, expected)
     def test_case_sensitive_and_realistic_text(self):
         # More complex scenarios, including nested directories
         file_path = self.create_file('nested/folder1/folder2/error_log.txt', 'Error\nerror\nERROR')
         expected = {file_path: 3}
-        result = f_841(self.test_dir)
+        result = f_893(self.test_dir)
         self.assertEqual(result, expected)
     def test_exact_word_matching(self):
         # Ensure only the exact word 'error' is counted and ignore similar words like 'errors'
@@ -109,5 +109,5 @@ class TestCases(unittest.TestCase):
         }
         for path, content in files.items():
             self.create_file(path, content)
-        result = f_841(self.test_dir)
+        result = f_893(self.test_dir)
         self.assertEqual(result, expected)

@@ -1,7 +1,7 @@
 import numpy as np
 import itertools
 
-def f_643(dimension):
+def f_685(dimension):
     """
     Create a 2D numeric array (matrix) of a given dimension with random integers between 1 and 100, 
     and a flat list of all elements in the matrix.
@@ -19,7 +19,7 @@ def f_643(dimension):
     - itertools
 
     Example:
-    >>> matrix, flat_list = f_643(3)
+    >>> matrix, flat_list = f_685(3)
     Combinations of pairs of elements: [(52, 93), (52, 15), (52, 72), (52, 61), (52, 21), (52, 83), (52, 87), (52, 75), (93, 15), (93, 72), (93, 61), (93, 21), (93, 83), (93, 87), (93, 75), (15, 72), (15, 61), (15, 21), (15, 83), (15, 87), (15, 75), (72, 61), (72, 21), (72, 83), (72, 87), (72, 75), (61, 21), (61, 83), (61, 87), (61, 75), (21, 83), (21, 87), (21, 75), (83, 87), (83, 75), (87, 75)]
     >>> print(matrix)
     [[52 93 15]
@@ -47,7 +47,7 @@ class TestCases(unittest.TestCase):
         Expected Output: A 3x3 matrix and a flat list of 9 elements, with all elements between 1 and 100.
         """
         dimension = 3
-        matrix, flat_list = f_643(dimension)
+        matrix, flat_list = f_685(dimension)
         self.assertEqual(matrix.shape, (dimension, dimension))
         self.assertEqual(len(flat_list), dimension ** 2)
         self.assertTrue(all(1 <= x <= 100 for x in flat_list))
@@ -58,7 +58,7 @@ class TestCases(unittest.TestCase):
         Expected Output: A 1x1 matrix and a flat list of 1 element, with the element between 1 and 100.
         """
         dimension = 1
-        matrix, flat_list = f_643(dimension)
+        matrix, flat_list = f_685(dimension)
         self.assertEqual(matrix.shape, (dimension, dimension))
         self.assertEqual(len(flat_list), dimension ** 2)
         self.assertTrue(all(1 <= x <= 100 for x in flat_list))
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         Expected Output: A 100x100 matrix and a flat list of 10000 elements, with all elements between 1 and 100.
         """
         dimension = 100
-        matrix, flat_list = f_643(dimension)
+        matrix, flat_list = f_685(dimension)
         self.assertEqual(matrix.shape, (dimension, dimension))
         self.assertEqual(len(flat_list), dimension ** 2)
         self.assertTrue(all(1 <= x <= 100 for x in flat_list))
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
         """
         dimension = 0
         with self.assertRaises(ValueError):
-            f_643(dimension)
+            f_685(dimension)
     def test_negative_dimension(self):
         """
         Test Case 5: Test with a negative dimension (invalid input)
@@ -90,4 +90,4 @@ class TestCases(unittest.TestCase):
         """
         dimension = -3
         with self.assertRaises(ValueError):
-            f_643(dimension)
+            f_685(dimension)

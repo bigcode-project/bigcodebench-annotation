@@ -4,7 +4,8 @@ import numpy as np
 # Constants
 DATA_PATTERN = r'>\d+\.\d+<'
 
-def f_504(dataframe: pd.DataFrame) -> pd.DataFrame:
+
+def f_504(dataframe, data_pattern=DATA_PATTERN):
     """
     Extract numeric data from a Pandas DataFrame based on a specific pattern. The function searches 
     each cell for occurrences of the regex pattern '>number<number>' (e.g., '>1.23<') and replaces 
@@ -12,6 +13,7 @@ def f_504(dataframe: pd.DataFrame) -> pd.DataFrame:
     
     Parameters:
     - dataframe (pd.DataFrame): A pandas DataFrame containing data to be processed.
+    - data_pattern (str, optional): data search pattern. Default value is '>\d+\.\d+<'.
     
     Returns:
     - pd.DataFrame: A modified DataFrame with cells containing the extracted numeric values or NaN.
@@ -30,8 +32,8 @@ def f_504(dataframe: pd.DataFrame) -> pd.DataFrame:
     1  4.56  0.12
     """
     for col in dataframe.columns:
-        dataframe[col] = dataframe[col].apply(lambda x: float(re.search(DATA_PATTERN, x).group(0)[1:-1]) 
-                                              if pd.notnull(x) and re.search(DATA_PATTERN, x) else np.nan)
+        dataframe[col] = dataframe[col].apply(lambda x: float(re.search(data_pattern, x).group(0)[1:-1])
+                                              if pd.notnull(x) and re.search(data_pattern, x) else np.nan)
     return dataframe
 
 

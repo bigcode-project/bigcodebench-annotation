@@ -1,7 +1,7 @@
 import pickle
 import os
 
-def f_86(filename, data):
+def f_90(filename, data):
     """
     Serialize an object using pickle and overwrite the specified file with this serialized data.
     Before writing, checks if the directory exists, creating it if necessary.
@@ -18,7 +18,7 @@ def f_86(filename, data):
     - os
 
     Example:
-    >>> result = f_86('data.pkl', {'key': 'value'})
+    >>> result = f_90('data.pkl', {'key': 'value'})
     >>> print(result)
     True
     """
@@ -44,17 +44,17 @@ class TestCases(unittest.TestCase):
             os.remove(self.filename)
     def test_serialization_success(self):
         # Test successful serialization
-        self.assertTrue(f_86(self.filename, self.test_data))
+        self.assertTrue(f_90(self.filename, self.test_data))
         # Verify the file exists
         self.assertTrue(os.path.exists(self.filename))
     def test_serialization_readback(self):
         # Test if the serialized then deserialized data matches the original data
-        f_86(self.filename, self.test_data)
+        f_90(self.filename, self.test_data)
         with open(self.filename, 'rb') as f:
             data_readback = pickle.load(f)
         self.assertEqual(self.test_data, data_readback)
     def test_serialization_failure(self):
         # Test failure due to an invalid filename (e.g., directory does not exist)
-        result = f_86('/non/existent/path/' + self.filename, self.test_data)
+        result = f_90('/non/existent/path/' + self.filename, self.test_data)
         self.assertFalse(result)
 import unittest

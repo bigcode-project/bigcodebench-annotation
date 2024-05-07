@@ -10,8 +10,9 @@ PENALTY_COST = 1000  # in dollars
 
 def f_477(goals, penalties, teams=TEAMS, penalty_cost=PENALTY_COST, rng_seed=None):
     """
-    Generate and record a Pandas DataFrame of the results of football matches for multiple teams
-    with random goals and penalties, and create a bar plot of the results. Penalties are converted into fines according to the penalty costs.
+    Generate a Dataframe to show the football match results of teams 'Team' with random goals 'Goals' and
+    penalties 'Penalty Cost', and create a bar plot of the results. Penalties are converted into fines according to the
+    penalty costs.
 
     Parameters:
     - goals (int): The maximum number of goals a team can score in a match.

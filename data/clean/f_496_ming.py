@@ -4,23 +4,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
-
-# Hard-coded list of common English stopwords for demonstration purposes
-STOPWORDS = set(["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", 
-                 "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", 
-                 "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", 
-                 "theirs", "themselves", "what", "which", "who", "whom", "this", "that", 
-                 "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", 
-                 "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", 
-                 "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", 
-                 "at", "by", "for", "with", "about", "against", "between", "into", "through", 
-                 "during", "before", "after", "above", "below", "to", "from", "up", "down", 
-                 "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "simple", "test"])
+from nltk.corpus import stopwords
 
 
 def f_496(text, n=2):
     """
-    Analyzes a text string, removing duplicate consecutive words and stopwords,
+    Analyzes a text string, removing duplicate consecutive words and stopwords defined by nltk.corpus,
     generates a square co-occurrence matrix of words, and plots this matrix.
 
     Parameters:
@@ -38,6 +27,7 @@ def f_496(text, n=2):
         - matplotlib.pyplot
         - numpy
         - sklearn.feature_extraction.text
+        - nltk.corpus
 
     Example:
     >>> import matplotlib
@@ -55,9 +45,9 @@ def f_496(text, n=2):
     # Pre-processing the text
     # Remove duplicate consecutive words
     text = re.sub(r'\b(\w+)( \1\b)+', r'\1', text)
-
+    stop_words = set(stopwords.words('english'))
     # Remove stopwords
-    words_filtered = ' '.join([word for word in text.lower().split() if word not in STOPWORDS])
+    words_filtered = ' '.join([word for word in text.lower().split() if word not in stop_words])
 
     # If words_filtered is empty after removing stopwords, return an empty DataFrame
     if not words_filtered.strip():
@@ -97,7 +87,7 @@ class TestCases(unittest.TestCase):
 
     def test_text_with_stopwords(self):
         """Test text with stopwords removed."""
-        text = "this is a simple test"
+        text = "this is a"
         matrix, _ = f_496(text)
         self.assertTrue(matrix.empty, "Matrix should be empty after removing stopwords.")
 

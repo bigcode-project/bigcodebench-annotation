@@ -4,7 +4,8 @@ from dateutil.parser import parse
 
 def f_508(date_str, from_tz, to_tz):
     """
-    Convert a date string from one time zone to another and return the time difference in seconds to the current time in the destination time zone.
+    Convert a date string from one time zone to another and return the time difference in seconds to the current time
+    in the destination time zone.
 
     Parameters:
     date_str (str): The date string in "yyyy-mm-dd hh:mm:ss" format.

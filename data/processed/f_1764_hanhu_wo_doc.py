@@ -3,7 +3,7 @@ import shutil
 import glob
 import hashlib
 
-def f_740(ROOT_DIR, DEST_DIR, SPECIFIC_HASH):
+def f_787(ROOT_DIR, DEST_DIR, SPECIFIC_HASH):
     """
     Moves all files from a specified root directory (ROOT_DIR) to a target directory (DEST_DIR) if they match a specific hash value (SPECIFIC_HASH).
     The function calculates the MD5 hash of each file in ROOT_DIR and moves it if the hash matches SPECIFIC_HASH.
@@ -28,9 +28,9 @@ def f_740(ROOT_DIR, DEST_DIR, SPECIFIC_HASH):
     Examples:
     >>> # Assuming the correct paths are given for ROOT_DIR, DEST_DIR,
     >>> # and at least one file in ROOT_DIR matches SPECIFIC_HASH:
-    >>> type(f_740('/path/to/root', '/path/to/dest', 'd41d8cd98f00b204e9800998ecf8427e')) is int
+    >>> type(f_787('/path/to/root', '/path/to/dest', 'd41d8cd98f00b204e9800998ecf8427e')) is int
     True
-    >>> f_740('/path/to/root', '/path/to/dest', 'd41d8cd98f00b204e9800998ecf8427e') >= 0
+    >>> f_787('/path/to/root', '/path/to/dest', 'd41d8cd98f00b204e9800998ecf8427e') >= 0
     True
     """
     files_moved = 0
@@ -74,13 +74,13 @@ class TestCases(unittest.TestCase):
     @patch('shutil.move')
     def test_file_moved_with_matching_hash(self, mock_move):
         """Test that a file is moved when its hash matches the specified hash."""
-        result = f_740(str(self.root_dir), str(self.dest_dir), self.dummy_file_hash)
+        result = f_787(str(self.root_dir), str(self.dest_dir), self.dummy_file_hash)
         
         self.assertEqual(result, 1)
         mock_move.assert_called_once()
     def test_no_file_moved_with_non_matching_hash(self):
         """Test no files are moved if hash doesn't match."""
-        result = f_740(str(self.root_dir), str(self.dest_dir), 'non_matching_hash')
+        result = f_787(str(self.root_dir), str(self.dest_dir), 'non_matching_hash')
         
         self.assertEqual(result, 0)
         # Since we're not mocking shutil.move, we verify by checking the files in DEST_DIR
@@ -88,11 +88,11 @@ class TestCases(unittest.TestCase):
     def test_dest_dir_created(self):
         """Test that destination directory is created if it doesn't exist."""
         shutil.rmtree(self.dest_dir)  # Remove the dest_dir to test its recreation
-        f_740(str(self.root_dir), str(self.dest_dir), 'any_hash')
+        f_787(str(self.root_dir), str(self.dest_dir), 'any_hash')
         
         self.assertTrue(self.dest_dir.exists())
     def test_no_files_to_move(self):
         """Test the function when there are no files to move."""
         os.remove(self.dummy_file_path)  # Remove the dummy file to simulate no files to move
-        result = f_740(str(self.root_dir), str(self.dest_dir), 'any_hash')
+        result = f_787(str(self.root_dir), str(self.dest_dir), 'any_hash')
         self.assertEqual(result, 0)

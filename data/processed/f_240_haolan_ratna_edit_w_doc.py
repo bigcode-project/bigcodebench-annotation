@@ -4,7 +4,7 @@ from scipy import stats
 # Constants
 FEATURES = ['feature1', 'feature2', 'feature3', 'feature4', 'feature5']
 
-def f_761(df, dct):
+def f_809(df, dct):
     """
     This function calculates and returns the mean, median, mode, and variance for specified features in a DataFrame. 
     It replaces certain values in the DataFrame based on a provided dictionary mapping before performing the calculations.
@@ -26,7 +26,7 @@ def f_761(df, dct):
     Example:
     >>> df = pd.DataFrame({'feature1': [1, 2, 3, 4, 5], 'feature2': [5, 4, 3, 2, 1], 'feature3': [2, 2, 2, 2, 2], 'feature4': [1, 1, 3, 3, 5], 'feature5': [0, 1, 1, 1, 1]})
     >>> dct = {}
-    >>> f_761(df, dct)
+    >>> f_809(df, dct)
     {'feature1': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 'feature2': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 'feature3': {'mean': 2.0, 'median': 2.0, 'mode': 2, 'variance': 0.0}, 'feature4': {'mean': 2.6, 'median': 3.0, 'mode': 1, 'variance': 2.24}, 'feature5': {'mean': 0.8, 'median': 1.0, 'mode': 1, 'variance': 0.16000000000000006}}
     """
     df = df.replace(dct)
@@ -64,7 +64,7 @@ class TestCases(unittest.TestCase):
             'feature4': {'mean': 2.6, 'median': 3.0, 'mode': 1, 'variance': 2.24}, 
             'feature5': {'mean': 0.8, 'median': 1.0, 'mode': 1, 'variance': 0.16000000000000006},
         }
-        result = f_761(df, dct)
+        result = f_809(df, dct)
         self.assertEqual(result, expected_result)
     def test_case_2(self):
         # Test with string replacements
@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
             'feature4': {'mean': 15.0, 'median': 15.0, 'mode': 13, 'variance': 2.0}, 
             'feature5': {'mean': 20.0, 'median': 20.0, 'mode': 18, 'variance': 2.0}
         }
-        result = f_761(df, dct)
+        result = f_809(df, dct)
         self.assertEqual(result, expected_result)
     def test_case_3(self):
         # Test with missing features in DataFrame
@@ -103,7 +103,7 @@ class TestCases(unittest.TestCase):
             'feature4': {'mean': 6.0, 'median': 6.0, 'mode': 5, 'variance': 0.6666666666666666}, 
             'feature5': {'mean': 8.0, 'median': 8.0, 'mode': 7, 'variance': 0.6666666666666666}
         }
-        result = f_761(df, dct)
+        result = f_809(df, dct)
         self.assertEqual(result, expected_result)
     def test_case_4(self):
         # Test with string replacements
@@ -123,11 +123,11 @@ class TestCases(unittest.TestCase):
             'feature4': {'mean': 14.0, 'median': 14.0, 'mode': 13, 'variance': 0.6666666666666666}, 
             'feature5': {'mean': 19.0, 'median': 19.0, 'mode': 18, 'variance': 0.6666666666666666}
         }
-        result = f_761(df, dct)
+        result = f_809(df, dct)
         self.assertEqual(result, expected_result)
     
     def test_case_5(self):
         # Test with invalid input
         df = pd.DataFrame({})
-        result = f_761(df, {})
+        result = f_809(df, {})
         self.assertEqual(result, "Invalid input")

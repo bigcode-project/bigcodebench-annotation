@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns
 
 
-def f_797(db_name="test.db", table_name="People"):
+def f_846(db_name="test.db", table_name="People"):
     """
     Draw the age distribution of the persons in an SQLite3 table and returns the Axes object of the plot.
     Raises a ValueError if the loaded data contains negative age values.
@@ -22,10 +22,10 @@ def f_797(db_name="test.db", table_name="People"):
     - seaborn
 
     Examples:
-    >>> ax = f_797('path/to/test.db', 'People')
+    >>> ax = f_846('path/to/test.db', 'People')
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
-    >>> ax = f_797()
+    >>> ax = f_846()
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
@@ -105,25 +105,25 @@ class TestCases(unittest.TestCase):
         if contains_data:
             self.assertTrue(len(ax.lines) > 0, "The plot should contain a KDE line.")
     def test_case_1(self):
-        ax = f_797(db_name=self.default_db_path, table_name="Employees")
+        ax = f_846(db_name=self.default_db_path, table_name="Employees")
         self._check_plot(ax)
     def test_case_2(self):
-        ax = f_797(db_name=self.alt_db_path)
+        ax = f_846(db_name=self.alt_db_path)
         self._check_plot(ax)
     def test_case_3(self):
-        ax = f_797(db_name=self.default_db_path, table_name="Employees")
+        ax = f_846(db_name=self.default_db_path, table_name="Employees")
         self._check_plot(ax)
     def test_case_4(self):
-        ax = f_797(db_name=self.multiple_db_path, table_name="MultipleAge")
+        ax = f_846(db_name=self.multiple_db_path, table_name="MultipleAge")
         self._check_plot(ax)
     def test_case_5(self):
-        ax = f_797(db_name=self.empty_db_path, table_name="EmptyAge")
+        ax = f_846(db_name=self.empty_db_path, table_name="EmptyAge")
         self._check_plot(ax, False)
     def test_case_6(self):
         # Test for non-existent table
         with self.assertRaises(Exception):
-            f_797(db_name=self.default_db_path, table_name="Nonexistent")
+            f_846(db_name=self.default_db_path, table_name="Nonexistent")
     def test_case_7(self):
         # Test for negative age values
         with self.assertRaises(ValueError):
-            f_797(db_name=self.negative_age_db_path, table_name="NegativeAge")
+            f_846(db_name=self.negative_age_db_path, table_name="NegativeAge")

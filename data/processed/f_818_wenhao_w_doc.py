@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-def f_24(rows, columns=["A", "B", "C", "D", "E"], seed=0) -> pd.DataFrame:
+def f_25(rows, columns=["A", "B", "C", "D", "E"], seed=0) -> pd.DataFrame:
     """
     Create a Pandas DataFrame with a specified number of rows filled with random
     values in [0, 1) and shuffled columns.
@@ -26,7 +26,7 @@ def f_24(rows, columns=["A", "B", "C", "D", "E"], seed=0) -> pd.DataFrame:
     - pandas
 
     Example:
-    >>> df = f_24(10)
+    >>> df = f_25(10)
     >>> df.head(2)
               D         E         A         C         B
     0  0.548814  0.715189  0.602763  0.544883  0.423655
@@ -45,7 +45,7 @@ import pandas as pd
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic case - data and format correctness
-        df = f_24(10, seed=0)
+        df = f_25(10, seed=0)
         default_columns = ["A", "B", "C", "D", "E"]
         self.assertEqual(df.shape, (10, 5))
         for column in default_columns:
@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test custom columns
         custom_columns = ["X", "Y", "Z"]
-        df = f_24(5, columns=custom_columns, seed=0)
+        df = f_25(5, columns=custom_columns, seed=0)
         self.assertTrue(all(column in custom_columns for column in df.columns))
         # assert first 2 rows data
         self.assertEqual(set(df.iloc[0].tolist()), {0.5488135039273248, 0.7151893663724195, 0.6027633760716439})
@@ -62,20 +62,20 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test custom rows
         for n_rows in [1, 10, 50]:
-            df = f_24(n_rows)
+            df = f_25(n_rows)
             self.assertEqual(len(df), n_rows)
     def test_case_4(self):
-        df = f_24(5, seed=42)
+        df = f_25(5, seed=42)
         self.assertEqual(set(df.iloc[0].tolist()), {0.3745401188473625, 0.9507143064099162, 0.7319939418114051, 0.5986584841970366, 0.15601864044243652})
     def test_case_5(self):
         # Test handling edge cases - negative rows
         with self.assertRaises(ValueError):
-            f_24(-1)
+            f_25(-1)
     def test_case_6(self):
         # Test handling empty columns
-        df = f_24(5, columns=[])
+        df = f_25(5, columns=[])
         self.assertTrue(df.empty)
     def test_case_7(self):
         # Test handling duplicate columns
-        df = f_24(5, columns=["A", "A", "B", "B", "C"], seed=0)
+        df = f_25(5, columns=["A", "A", "B", "B", "C"], seed=0)
         self.assertEqual(len(df.columns), 3)

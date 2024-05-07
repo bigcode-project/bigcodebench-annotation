@@ -6,7 +6,8 @@ RANGE = (1, 100)
 
 def f_481(L):
     '''
-    Convert a list of lists 'L' into a Pandas DataFrame filled with random integers, with the number of rows and columns corresponding to the integers in the nested lists.
+    Generates a DataFrame filled with random integers. The dimensions of the DataFrame (number of rows and columns)
+    are determined by multiplying pairs of integers from nested lists within the input list of lists 'L'.
     
     Requirements:
     - numpy

@@ -5,7 +5,7 @@ from configparser import ConfigParser
 PATH_TO_APPEND = '/path/to/whatever'
 CONFIG_FILE = '/path/to/config.ini'
 
-def f_343(path_to_append=PATH_TO_APPEND, config_file=CONFIG_FILE):
+def f_360(path_to_append=PATH_TO_APPEND, config_file=CONFIG_FILE):
     """
     Add a specific path to sys.path and update a configuration file with this path.
 
@@ -22,7 +22,7 @@ def f_343(path_to_append=PATH_TO_APPEND, config_file=CONFIG_FILE):
     - configparser.ConfigParser
 
     Example:
-    >>> config = f_343('/path/to/new_directory', '/path/to/new_config.ini')
+    >>> config = f_360('/path/to/new_directory', '/path/to/new_config.ini')
     >>> 'path_to_append' in config['DEFAULT']
     True
     """
@@ -58,12 +58,12 @@ class TestCases(unittest.TestCase):
         os.remove(self.temp_config_file.name)
     def test_append_path_and_update_config(self):
         new_path = '/path/to/test/directory'
-        updated_config, config_file_path = f_343(new_path, self.temp_config_file.name)
+        updated_config, config_file_path = f_360(new_path, self.temp_config_file.name)
         self.assertIn(new_path, sys.path)
         self.assertEqual(updated_config['DEFAULT']['path_to_append'], new_path)
         self.assertEqual(config_file_path, self.temp_config_file.name)
     def test_default_path_and_config(self):
-        updated_config, config_file_path = f_343(PATH_TO_APPEND, self.temp_config_file.name)
+        updated_config, config_file_path = f_360(PATH_TO_APPEND, self.temp_config_file.name)
         self.assertIn(PATH_TO_APPEND, sys.path)
         self.assertEqual(updated_config['DEFAULT']['path_to_append'], PATH_TO_APPEND)
         self.assertEqual(config_file_path, self.temp_config_file.name)
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
         if os.path.exists(invalid_config_file):
             os.remove(invalid_config_file)  # Ensure the file does not exist before the test
         try:
-            updated_config, config_file_path = f_343(config_file=invalid_config_file)
+            updated_config, config_file_path = f_360(config_file=invalid_config_file)
             self.assertTrue(os.path.exists(invalid_config_file), "The config file should be created.")
         finally:
             if os.path.exists(invalid_config_file):
@@ -81,13 +81,13 @@ class TestCases(unittest.TestCase):
         new_config_file = 'new_config.ini'
         if os.path.exists(new_config_file):
             os.remove(new_config_file)  # Ensure the file does not exist before the test
-        updated_config, config_file_path = f_343(config_file=new_config_file)
+        updated_config, config_file_path = f_360(config_file=new_config_file)
         self.assertTrue(os.path.exists(new_config_file))
         os.remove(new_config_file)
     def test_multiple_paths(self):
         path1 = '/path/to/test/directory1'
         path2 = '/path/to/test/directory2'
-        updated_config, config_file_path = f_343(path_to_append=[path1, path2], config_file=self.temp_config_file.name)
+        updated_config, config_file_path = f_360(path_to_append=[path1, path2], config_file=self.temp_config_file.name)
         self.assertIn(path1, sys.path)
         self.assertIn(path2, sys.path)
         self.assertEqual(updated_config['DEFAULT']['path_to_append'], f"{path1},{path2}")

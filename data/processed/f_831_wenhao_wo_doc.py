@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 
 
-def f_239(dir_path: str, predicates: list) -> dict:
+def f_251(dir_path: str, predicates: list) -> dict:
     """
     Evaluates each item (files and directories) in a given directory against specified conditions.
 
@@ -35,9 +35,9 @@ def f_239(dir_path: str, predicates: list) -> dict:
     - pathlib
 
     Examples:
-    >>> f_239('/path/to/dir', ['is_file', 'has_numbers'])
+    >>> f_251('/path/to/dir', ['is_file', 'has_numbers'])
     {'file.txt': {'is_file': True, 'has_numbers': False}, 'file2.txt': {'is_file': True, 'has_numbers': True}}
-    >>> f_239('/path/to/dir', ['is_dir', 'has_special_chars'])
+    >>> f_251('/path/to/dir', ['is_dir', 'has_special_chars'])
     {'my_folder': {'is_dir': True, 'has_special_chars': False}, 'a_@Folder': {'is_dir': True, 'has_special_chars': True}}
     """
     predicate_functions = {
@@ -103,7 +103,7 @@ class TestCases(unittest.TestCase):
         field = "is_file"
         for fn in self.is_file_fns:
             self.helper_make_data(fn, is_dir=False)
-        result = f_239(str(self.test_dir), [field])
+        result = f_251(str(self.test_dir), [field])
         for fn in self.is_file_fns:
             self.assertTrue(result[fn][field])
         self.helper_assert_predicate(result, [field])
@@ -111,7 +111,7 @@ class TestCases(unittest.TestCase):
         field = "is_dir"
         for fn in self.is_file_fns:
             self.helper_make_data(fn, is_dir=False)
-        result = f_239(str(self.test_dir), [field])
+        result = f_251(str(self.test_dir), [field])
         for fn in self.is_file_fns:
             self.assertFalse(result[fn][field])
         self.helper_assert_predicate(result, [field])
@@ -119,7 +119,7 @@ class TestCases(unittest.TestCase):
         field = "is_dir"
         for fn in self.is_dir_fns:
             self.helper_make_data(fn, is_dir=True)
-        result = f_239(str(self.test_dir), [field])
+        result = f_251(str(self.test_dir), [field])
         for fn in self.is_dir_fns:
             self.assertTrue(result[fn][field])
         self.helper_assert_predicate(result, [field])
@@ -127,7 +127,7 @@ class TestCases(unittest.TestCase):
         field = "is_file"
         for fn in self.is_dir_fns:
             self.helper_make_data(fn, is_dir=True)
-        result = f_239(str(self.test_dir), [field])
+        result = f_251(str(self.test_dir), [field])
         for fn in self.is_dir_fns:
             self.assertFalse(result[fn][field])
         self.helper_assert_predicate(result, [field])
@@ -136,7 +136,7 @@ class TestCases(unittest.TestCase):
         fns = ["fi!e", "fi@", "f.ile.txt"]
         for fn in fns:
             self.helper_make_data(fn, is_dir=False)
-        result = f_239(str(self.test_dir), [field])
+        result = f_251(str(self.test_dir), [field])
         for fn in fns:
             self.assertTrue(result[fn][field], result)
         self.helper_assert_predicate(result, [field])
@@ -145,7 +145,7 @@ class TestCases(unittest.TestCase):
         fns = ["file_", "_file", "file.txt", "some_file.txt"]
         for fn in fns:
             self.helper_make_data(fn, is_dir=False)
-        result = f_239(str(self.test_dir), [field])
+        result = f_251(str(self.test_dir), [field])
         for fn in fns:
             self.assertFalse(result[fn][field])
         self.helper_assert_predicate(result, [field])
@@ -154,14 +154,14 @@ class TestCases(unittest.TestCase):
         fns = ["123", "123.txt", "text123", "t1e2x3t4"]
         for fn in fns:
             self.helper_make_data(fn, is_dir=False)
-        result = f_239(str(self.test_dir), [field])
+        result = f_251(str(self.test_dir), [field])
         for fn in fns:
             self.assertTrue(result[fn][field])
         self.helper_assert_predicate(result, [field])
     def test_multiple_predicates(self):
         fn = "test1!.txt"
         self.helper_make_data(fn, is_dir=False)
-        result = f_239(str(self.test_dir), self.fields)
+        result = f_251(str(self.test_dir), self.fields)
         self.helper_assert_predicate(result, self.fields)
         self.assertTrue(result[fn]["is_file"])
         self.assertFalse(result[fn]["is_dir"])
@@ -170,15 +170,15 @@ class TestCases(unittest.TestCase):
     def test_deduplicate_predicates(self):
         fn = "test_file"
         self.helper_make_data(fn, is_dir=False)
-        result = f_239(str(self.test_dir), ["is_file", "is_file"])
+        result = f_251(str(self.test_dir), ["is_file", "is_file"])
         self.assertTrue(len(result) == 1)
         self.helper_assert_predicate(result, ["is_file"])
     def test_empty_predicates(self):
         with self.assertRaises(ValueError):
-            f_239(str(self.test_dir), [])
+            f_251(str(self.test_dir), [])
     def test_invalid_predicates(self):
         with self.assertRaises(ValueError):
-            f_239(str(self.test_dir), ["foo", "bar"])
+            f_251(str(self.test_dir), ["foo", "bar"])
     def test_nonexistent_directory_error(self):
         with self.assertRaises(FileNotFoundError):
-            f_239("nonexistent_dir", ["is_file"])
+            f_251("nonexistent_dir", ["is_file"])

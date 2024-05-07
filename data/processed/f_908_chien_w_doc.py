@@ -2,7 +2,7 @@ import numpy as np
 import seaborn as sns
 
 
-def f_758(arr):
+def f_806(arr):
     """
     Plots a heatmap of a given 2D numerical array and prints the sum of each row.
     The heatmap's color range is set based on the minimum and maximum values in the array.
@@ -23,7 +23,7 @@ def f_758(arr):
 
     Example:
     >>> arr = np.array([[i + j for i in range(3)] for j in range(5)])
-    >>> ax = f_758(arr)
+    >>> ax = f_806(arr)
     >>> ax.get_title()
     'Heatmap of the 2D Array'
     """
@@ -40,35 +40,35 @@ import unittest
 import numpy as np
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for the function f_758."""
+    """Test cases for the function f_806."""
     def tearDown(self):
         plt.clf()
     def test_scenario_1(self):
         """Scenario 1: Testing with a 2D array created by adding row and column indices."""
         arr = np.array([[i + j for i in range(3)] for j in range(5)])
         expected_vmax = np.max(arr)  # Calculate the expected vmax
-        ax = f_758(arr)
+        ax = f_806(arr)
         self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
         self.assertEqual(ax.collections[0].colorbar.vmax, expected_vmax)
     def test_scenario_2(self):
         """Scenario 2: Testing with a 2D array where each column has identical values based on the column index."""
         arr = np.array([[i for i in range(3)] for j in range(5)])
         expected_vmax = np.max(arr)  # Calculate the expected vmax
-        ax = f_758(arr)
+        ax = f_806(arr)
         self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
         self.assertEqual(ax.collections[0].colorbar.vmax, expected_vmax)
     def test_scenario_3(self):
         """Scenario 3: Testing with a 2D array where each row has identical values based on the row index."""
         arr = np.array([[j for i in range(3)] for j in range(5)])
         expected_vmax = np.max(arr)  # Calculate the expected vmax
-        ax = f_758(arr)
+        ax = f_806(arr)
         self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
         self.assertEqual(ax.collections[0].colorbar.vmax, expected_vmax)
     def test_scenario_4(self):
         """Scenario 4: Testing with a 2D array of zeros."""
         arr = np.zeros((5, 3))
         expected_vmax = np.max(arr)  # Calculate the expected vmax
-        ax = f_758(arr)
+        ax = f_806(arr)
         self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
         self.assertAlmostEqual(
             ax.collections[0].colorbar.vmax, expected_vmax, delta=0.2
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         """Scenario 5: Testing with a 2D array of ones."""
         arr = np.ones((5, 3))
         expected_vmax = np.max(arr)  # Calculate the expected vmax
-        ax = f_758(arr)
+        ax = f_806(arr)
         self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
         self.assertAlmostEqual(
             ax.collections[0].colorbar.vmax, expected_vmax, delta=0.2

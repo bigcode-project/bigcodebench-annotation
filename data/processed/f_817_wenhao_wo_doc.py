@@ -2,7 +2,7 @@ import shutil
 import pathlib
 
 
-def f_409(source_path, destination_path):
+def f_434(source_path, destination_path):
     """
     Lists files in the specified source directory without descending into subdirectories and copies them to a
     destination directory.
@@ -24,7 +24,7 @@ def f_409(source_path, destination_path):
     - pathlib
 
     Example:
-    >>> x = f_409('/Docs/src/Scripts')
+    >>> x = f_434('/Docs/src/Scripts')
     >>> type(x)
     <class 'tuple'>
     >>> x
@@ -62,14 +62,14 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test empty directory
         target_dir_before = list(self.test_target_dir.iterdir())
-        result = f_409(str(self.test_source_dir), str(self.test_target_dir))
+        result = f_434(str(self.test_source_dir), str(self.test_target_dir))
         target_dir_after = list(self.test_target_dir.iterdir())
         self.assertEqual(result, ("testf817-source", []))
         self.assertEqual(target_dir_before, target_dir_after)
     def test_case_2(self):
         # Test directory with one file
         self.create_files(["file1.txt"])
-        result = f_409(str(self.test_source_dir), str(self.test_target_dir))
+        result = f_434(str(self.test_source_dir), str(self.test_target_dir))
         self.assertEqual(result, ("testf817-source", ["file1.txt"]))
         # Check if files are copied correctly
         self.assertEqual(
@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test directory with multiple files
         self.create_files(["file1.txt", "file2.txt", "file3.txt"])
-        result = f_409(str(self.test_source_dir), str(self.test_target_dir))
+        result = f_434(str(self.test_source_dir), str(self.test_target_dir))
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0], "testf817-source")
         self.assertEqual(
@@ -99,7 +99,7 @@ class TestCases(unittest.TestCase):
         self.test_source_dir.joinpath("subdir1").mkdir()
         self.create_files(["file1.txt", "file2.txt"])
         self.create_files(["subdir1/file3.txt"])  # File inside subdirectory
-        result = f_409(str(self.test_source_dir), str(self.test_target_dir))
+        result = f_434(str(self.test_source_dir), str(self.test_target_dir))
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0], "testf817-source")
         self.assertEqual(sorted(result[1]), sorted(["file1.txt", "file2.txt"]))
@@ -113,22 +113,22 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test non-existent source directory
         with self.assertRaises(ValueError):
-            f_409(str(self.test_source_dir / "nonexistent"), str(self.test_target_dir))
+            f_434(str(self.test_source_dir / "nonexistent"), str(self.test_target_dir))
     def test_case_6(self):
         # Test non-existent destination directory
         shutil.rmtree(self.test_target_dir)
-        result = f_409(str(self.test_source_dir), str(self.test_target_dir))
+        result = f_434(str(self.test_source_dir), str(self.test_target_dir))
         self.assertEqual(result, ("testf817-source", []))
         # Check if destination directory is created
         self.assertTrue(self.test_target_dir.exists())
     def test_case_7(self):
         # Test copying files to existing destination directory
         self.create_files(["file1.txt", "file2.txt"])
-        result = f_409(str(self.test_source_dir), str(self.test_target_dir))
+        result = f_434(str(self.test_source_dir), str(self.test_target_dir))
         self.assertEqual(sorted(result[1]), sorted(["file1.txt", "file2.txt"]))
         # Call the function again
         self.create_files(["file3.txt", "file4.txt"])
-        result = f_409(str(self.test_source_dir), str(self.test_target_dir))
+        result = f_434(str(self.test_source_dir), str(self.test_target_dir))
         # There should now be 4 files in the directory
         self.assertEqual(
             sorted(self.test_source_dir.iterdir()),

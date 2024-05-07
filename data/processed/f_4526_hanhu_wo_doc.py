@@ -3,7 +3,7 @@ import os
 import zipfile
 from base64 import b64encode
 
-def f_453(directory):
+def f_483(directory):
     """
     Generates RSA public and private keys, encrypts all files in the specified directory using the public key,
     and saves the encrypted files into a zip file. It returns the public key and the name of the zip file.
@@ -26,7 +26,7 @@ def f_453(directory):
     - base64.b64encode
 
     Examples:
-    >>> pub_key, zipfile_name = f_453('./')
+    >>> pub_key, zipfile_name = f_483('./')
     >>> isinstance(pub_key, rsa.PublicKey)
     'True'
     >>> isinstance(zipfile_name, str)
@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
         for i in range(2):
             with open(os.path.join(self.test_dir, f"file{i}.txt"), 'w') as f:
                 f.write("Sample content")
-        pub_key, zipfile_name = f_453(self.test_dir)
+        pub_key, zipfile_name = f_483(self.test_dir)
         self.assertIsInstance(pub_key, rsa.PublicKey)
         self.assertIsInstance(zipfile_name, str)
     def test_zipfile_creation(self):
@@ -74,13 +74,13 @@ class TestCases(unittest.TestCase):
         for i in range(2):
             with open(os.path.join(self.test_dir, f"file{i}.txt"), 'w') as f:
                 f.write("Sample content")
-        _, zipfile_name = f_453(self.test_dir)
+        _, zipfile_name = f_483(self.test_dir)
         self.assertTrue(os.path.exists(zipfile_name))
         with zipfile.ZipFile(zipfile_name, 'r') as zipf:
             self.assertEqual(len(zipf.namelist()), 2)
     def test_empty_directory(self):
         # No files created in the setup for this test
-        _, zipfile_name = f_453(self.test_dir)
+        _, zipfile_name = f_483(self.test_dir)
         with zipfile.ZipFile(zipfile_name, 'r') as zipf:
             self.assertEqual(len(zipf.namelist()), 0)
     def test_file_encryption_contents(self):
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
         test_file_path = os.path.join(self.test_dir, "test_file.txt")
         with open(test_file_path, 'w') as f:
             f.write("Sample content")
-        pub_key, zipfile_name = f_453(self.test_dir)
+        pub_key, zipfile_name = f_483(self.test_dir)
         with zipfile.ZipFile(zipfile_name, 'r') as zipf:
             encrypted_content = zipf.read(os.path.basename(test_file_path))
             # Read the content to ensure it is encrypted and not plain text

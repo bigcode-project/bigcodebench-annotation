@@ -1,7 +1,7 @@
 import os
 import shutil
 
-def f_486(directory, backup_directory):
+def f_518(directory, backup_directory):
     """
     Scans a specified directory for JSON files and copies them to a backup directory.
     If the backup directory does not exist, it is created.
@@ -23,9 +23,9 @@ def f_486(directory, backup_directory):
     Examples:
     >>> directory = 'path/to/source'
     >>> backup_directory = 'path/to/backup'
-    >>> type(f_486(directory, backup_directory)) is list
+    >>> type(f_518(directory, backup_directory)) is list
     True
-    >>> all(file.endswith('.json') for file in f_486(directory, backup_directory))
+    >>> all(file.endswith('.json') for file in f_518(directory, backup_directory))
     True
     """
     copied_files = []
@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
     def test_backup_directory_creation(self):
         """ Test that the backup directory is created if it does not exist. """
         shutil.rmtree(self.backup_directory)  # Ensure the backup directory does not exist
-        f_486(self.directory, self.backup_directory)
+        f_518(self.directory, self.backup_directory)
         self.assertTrue(os.path.exists(self.backup_directory))
     def test_file_copying(self):
         """ Test that files are correctly copied to the backup directory. """
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
         test_file = os.path.join(self.directory, 'test1.json')
         with open(test_file, 'w') as f:
             f.write('{"test": "data"}')
-        f_486(self.directory, self.backup_directory)
+        f_518(self.directory, self.backup_directory)
         copied_file = os.path.join(self.backup_directory, 'test1.json')
         self.assertTrue(os.path.exists(copied_file))
     def test_json_file_selection(self):
@@ -77,15 +77,15 @@ class TestCases(unittest.TestCase):
             f.write('{"test": "data"}')
         with open(txt_file, 'w') as f:
             f.write("some text")
-        result = f_486(self.directory, self.backup_directory)
+        result = f_518(self.directory, self.backup_directory)
         self.assertEqual(len(result), 1)  # Only one JSON file should be copied
         self.assertTrue('test1.json' in result[0])
     def test_handling_nonexistent_directory(self):
         """ Test the function's behavior with a non-existent source directory. """
         shutil.rmtree(self.directory)  # Remove the source directory to simulate non-existence
         with self.assertRaises(FileNotFoundError):
-            f_486(self.directory, self.backup_directory)  # This should raise FileNotFoundError
+            f_518(self.directory, self.backup_directory)  # This should raise FileNotFoundError
     def test_return_type(self):
         """ Test that the function returns a list. """
-        result = f_486(self.directory, self.backup_directory)
+        result = f_518(self.directory, self.backup_directory)
         self.assertIsInstance(result, list)

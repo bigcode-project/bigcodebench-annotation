@@ -1,15 +1,16 @@
 import pandas as pd
 import os
-output_dir = './output'
+OUTPUT_DIR = './output'
 
 
-def f_491(df, filename):
+def f_491(df, filename, output_dir=OUTPUT_DIR):
     """
     Save a Pandas DataFrame to a JSON file in a specified directory.
     
     Parameters:
-    df (DataFrame): A Pandas DataFrame to be saved.
-    filename (str): The filename of the JSON file where the DataFrame will be saved.
+    - df (DataFrame): A Pandas DataFrame to be saved.
+    - filename (str): The filename of the JSON file where the DataFrame will be saved.
+    - output_dir (str, optional): the ouput directory.
     
     Returns:
     str: The full file path where the DataFrame is saved.
@@ -41,15 +42,14 @@ import shutil
 
 
 class TestCases(unittest.TestCase):
-    @classmethod
     def setUp(self):
         """Set up testing environment; ensure data directory exists."""
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        if not os.path.exists(OUTPUT_DIR):
+            os.makedirs(OUTPUT_DIR)
 
     def tearDown(self):
         """Clean up; remove the data directory and its contents after tests."""
-        shutil.rmtree(output_dir, ignore_errors=True)
+        shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
 
     def test_basic_dataframe(self):
         """Test saving a simple DataFrame."""

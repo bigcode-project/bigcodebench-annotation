@@ -12,13 +12,10 @@ def f_495(input_list: list, repetitions: int) -> Any:
     - Flattens the list with multiple repetitions.
     - Calculates the mode of the flattened list.
     
-    Input:
+    Parameters:
     - input_list (list): A list containing elements (can be of any hashable type).
     - repetitions (int): The number of times the original list should be repeated.
-    
-    Output:
-    - Returns a ModeResult object from scipy.stats containing the mode(s) and count(s).
-    
+
     Requirements:
     - typing
     - itertools

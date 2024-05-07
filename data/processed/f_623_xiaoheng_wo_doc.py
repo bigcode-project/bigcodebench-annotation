@@ -3,10 +3,10 @@ import csv
 from collections import Counter
 
 # Constants
-BASE_PATH = 'f_639_data_xiaoheng'
+BASE_PATH = 'f_681_data_xiaoheng'
 FILE_NAME = os.path.join(BASE_PATH, 'Output.txt')
 
-def f_639(file_path):
+def f_681(file_path):
     """
     This function reads the specified CSV file, counts the frequency of each word, and returns the most common word 
     along with its frequency.
@@ -24,7 +24,7 @@ def f_639(file_path):
 
     Example:
     >>> # Assuming 'example.txt' contains multiple repetitions of the word 'example'
-    >>> f_639('example.txt')  # doctest: +SKIP
+    >>> f_681('example.txt')  # doctest: +SKIP
     ('example', <some_positive_integer>)
 
     Note:
@@ -64,21 +64,21 @@ class TestCases(unittest.TestCase):
         return full_path
     def test_1(self):
         file_path = self.create_and_fill_file('Output.txt', ['banana']*5)
-        result = f_639(file_path)
+        result = f_681(file_path)
         self.assertEqual(result, ('banana', 5))
     def test_2(self):
         file_path = self.create_and_fill_file('AnotherOutput.txt', ['cat']*5)
-        result = f_639(file_path)
+        result = f_681(file_path)
         self.assertEqual(result, ('cat', 5))
     def test_3(self):
         file_path = self.create_and_fill_file('YetAnotherOutput.txt', ['moon']*5)
-        result = f_639(file_path)
+        result = f_681(file_path)
         self.assertEqual(result, ('moon', 5))
     def test_4(self):
         file_path = self.create_and_fill_file('Nonexistent.txt', [])
-        result = f_639(file_path)
+        result = f_681(file_path)
         self.assertIsNone(result)
     def test_5(self):
         file_path = self.create_and_fill_file('EmptyFile.txt', [])
-        result = f_639(file_path)
+        result = f_681(file_path)
         self.assertIsNone(result)

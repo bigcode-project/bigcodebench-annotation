@@ -3,7 +3,7 @@ import os
 import re
 import shutil
 
-def f_314(source_dir: str, target_dir: str, archive_name: str = 'archive.zip') -> str:
+def f_331(source_dir: str, target_dir: str, archive_name: str = 'archive.zip') -> str:
     """
     Archives all processed files from a source directory to a target directory.
     The function identifies processed files by the '_processed' suffix in the filename.
@@ -23,9 +23,9 @@ def f_314(source_dir: str, target_dir: str, archive_name: str = 'archive.zip') -
     - zipfile
 
     Example:
-    >>> f_314('./data/', './data_processed/')
+    >>> f_331('./data/', './data_processed/')
     './data_processed/archive.zip'
-    >>> f_314('./data/', './data_processed/', 'my_archive.zip')
+    >>> f_331('./data/', './data_processed/', 'my_archive.zip')
     './data_processed/my_archive.zip'
     """
     os.makedirs(source_dir, exist_ok=True)
@@ -42,8 +42,8 @@ import unittest
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Setup test directories
-        self.source_dir = 'f_314_data/'
-        self.target_dir = 'f_314_data_target/'
+        self.source_dir = 'f_331_data/'
+        self.target_dir = 'f_331_data_target/'
         
         # Remove any existing test directories to start fresh
         if os.path.exists(self.source_dir):
@@ -68,7 +68,7 @@ class TestCases(unittest.TestCase):
                 f.write(f"This is {file}")
         
         # Archive processed files
-        archive_path = f_314(self.source_dir, self.target_dir)
+        archive_path = f_331(self.source_dir, self.target_dir)
         
         # Check if the archive contains the correct file
         with zipfile.ZipFile(archive_path, 'r') as archive:
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
                 f.write(f"This is {file}")
         
         # Archive processed files
-        archive_path = f_314(self.source_dir, self.target_dir)
+        archive_path = f_331(self.source_dir, self.target_dir)
         
         # Check if the archive is empty
         with zipfile.ZipFile(archive_path, 'r') as archive:
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
             
     def test_case_3(self):
         # Source directory is empty
-        archive_path = f_314(self.source_dir, self.target_dir)
+        archive_path = f_331(self.source_dir, self.target_dir)
         
         # Check if the archive is empty
         with zipfile.ZipFile(archive_path, 'r') as archive:
@@ -104,13 +104,13 @@ class TestCases(unittest.TestCase):
                 
         # Archive processed files with a custom archive name
         custom_archive_name = 'custom_archive.zip'
-        archive_path = f_314(self.source_dir, self.target_dir, custom_archive_name)
+        archive_path = f_331(self.source_dir, self.target_dir, custom_archive_name)
         
         # Check if the custom archive name is used
         self.assertTrue(custom_archive_name in archive_path)
         
     def test_case_5(self):
         # Check the return value for correct archive path
-        archive_path = f_314(self.source_dir, self.target_dir)
+        archive_path = f_331(self.source_dir, self.target_dir)
         expected_path = os.path.join(self.target_dir, 'archive.zip')
         self.assertEqual(archive_path, expected_path)

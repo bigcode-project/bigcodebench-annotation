@@ -1,7 +1,7 @@
 import re
 import socket
 
-def f_536(ip_addresses: list) -> dict:
+def f_570(ip_addresses: list) -> dict:
     """
     Given a list of IP addresses, this function returns a dictionary mapping each valid IP address to its 
     respective hostname. If the hostname cannot be determined, the value will be None.
@@ -18,7 +18,7 @@ def f_536(ip_addresses: list) -> dict:
     - socket
     
     Example:
-    >>> f_536(['8.8.8.8', '8.8.4.4'])
+    >>> f_570(['8.8.8.8', '8.8.4.4'])
     {'8.8.8.8': 'dns.google', '8.8.4.4': 'dns.google'}
     """
     IP_REGEX = r'[0-9]+(?:\.[0-9]+){3}'
@@ -35,22 +35,22 @@ def f_536(ip_addresses: list) -> dict:
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = f_536(['8.8.8.8', '8.8.4.4'])
+        result = f_570(['8.8.8.8', '8.8.4.4'])
         expected = {'8.8.8.8': 'dns.google', '8.8.4.4': 'dns.google'}
         self.assertDictEqual(result, expected)
     def test_case_2(self):
-        result = f_536(['8.8.4.4'])
+        result = f_570(['8.8.4.4'])
         expected = {'8.8.4.4': 'dns.google'}
         self.assertDictEqual(result, expected)
     def test_case_3(self):
-        result = f_536(['256.256.256.256'])
+        result = f_570(['256.256.256.256'])
         expected = {'256.256.256.256': None}
         self.assertDictEqual(result, expected)
     def test_case_4(self):
-        result = f_536([])
+        result = f_570([])
         expected = {}
         self.assertDictEqual(result, expected)
     def test_case_5(self):
-        result = f_536(['1.1.1.1', '2.2.2.2'])
+        result = f_570(['1.1.1.1', '2.2.2.2'])
         expected_keys = ['1.1.1.1', '2.2.2.2']
         self.assertListEqual(list(result.keys()), expected_keys)

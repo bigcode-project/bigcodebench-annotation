@@ -3,7 +3,7 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 
 
-def f_250(df, n_clusters=3, random_state=None, n_init=10):
+def f_265(df, n_clusters=3, random_state=None, n_init=10):
     """
     Identify duplicate points in a DataFrame, perform KMeans clustering on the unique points,
     and record the clusters.
@@ -32,7 +32,7 @@ def f_250(df, n_clusters=3, random_state=None, n_init=10):
             'x': [1, 2, 2, 2, 3, 4],\
             'y': [1, 1, 1, 1, 3, 3]\
         })
-    >>> duplicates, df_clustered, ax = f_250(df, random_state=42)
+    >>> duplicates, df_clustered, ax = f_265(df, random_state=42)
     >>> df_clustered
        x  y  cluster
     0  1  1        2
@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic functionality with duplicates
         df = pd.DataFrame({"x": [1, 2, 2, 2, 3, 4], "y": [1, 1, 1, 1, 3, 3]})
-        duplicates, df_clustered, ax = f_250(df, random_state=42)
+        duplicates, df_clustered, ax = f_265(df, random_state=42)
         self.assertEqual(duplicates, Counter({(2, 1): 3}))
         self.assertIn("cluster", df_clustered.columns)
         self.assertEqual(ax.get_title(), "KMeans Clusters")
@@ -71,21 +71,21 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test functionality without duplicates
         df = pd.DataFrame({"x": [1, 2, 3, 4, 5, 6], "y": [1, 2, 3, 4, 5, 6]})
-        duplicates, df_clustered, ax = f_250(df, random_state=42)
+        duplicates, df_clustered, ax = f_265(df, random_state=42)
         self.assertEqual(duplicates, Counter())
         self.assertIn("cluster", df_clustered.columns)
         self.assertEqual(ax.get_title(), "KMeans Clusters")
     def test_case_3(self):
         # Test functionality with all points being duplicates
         df = pd.DataFrame({"x": [1, 1, 1, 1, 1, 1], "y": [1, 1, 1, 1, 1, 1]})
-        duplicates, df_clustered, ax = f_250(df, random_state=42)
+        duplicates, df_clustered, ax = f_265(df, random_state=42)
         self.assertEqual(duplicates, Counter({(1, 1): 6}))
         self.assertIn("cluster", df_clustered.columns)
         self.assertEqual(ax.get_title(), "KMeans Clusters")
     def test_case_4(self):
         # Test with specified number of clusters
         df = pd.DataFrame({"x": [1, 2, 3, 40, 50, 60], "y": [1, 2, 3, 40, 50, 60]})
-        duplicates, df_clustered, ax = f_250(df, n_clusters=2, random_state=42)
+        duplicates, df_clustered, ax = f_265(df, n_clusters=2, random_state=42)
         self.assertEqual(duplicates, Counter())
         self.assertIn("cluster", df_clustered.columns)
         self.assertEqual(ax.get_title(), "KMeans Clusters")
@@ -94,7 +94,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             {"x": [1, 2, 3, 4, 5, 5, 5, 5], "y": [1, 2, 3, 4, 5, 5, 5, 5]}
         )
-        duplicates, df_clustered, ax = f_250(df, random_state=42)
+        duplicates, df_clustered, ax = f_265(df, random_state=42)
         self.assertEqual(duplicates, Counter({(5, 5): 4}))
         self.assertIn("cluster", df_clustered.columns)
         self.assertEqual(ax.get_title(), "KMeans Clusters")
@@ -104,7 +104,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             {"x": [1, 2, 3, 3, 3, 4, 5, 6], "y": [1, 2, 3, 3, 3, 4, 5, 6]}
         )
-        duplicates, df_clustered, ax = f_250(df, random_state=42)
+        duplicates, df_clustered, ax = f_265(df, random_state=42)
         self.assertEqual(duplicates, Counter({(3, 3): 3}))
         self.assertIn("cluster", df_clustered.columns)
         self.assertEqual(ax.get_title(), "KMeans Clusters")
@@ -118,7 +118,7 @@ class TestCases(unittest.TestCase):
             }
         )
         # We expect 3 clusters because of the natural separation in data
-        duplicates, df_clustered, _ = f_250(df, n_clusters=3, random_state=42)
+        duplicates, df_clustered, _ = f_265(df, n_clusters=3, random_state=42)
         self.assertEqual(duplicates, Counter())
         # Check that all points in a specific region belong to the same cluster
         cluster_1 = df_clustered[df_clustered["x"] <= 3]["cluster"].nunique()
@@ -140,8 +140,8 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             {"x": [10, 20, 20, 40, 50, 60], "y": [10, 20, 20, 40, 50, 60]}
         )
-        _, df_clustered_1, _ = f_250(df, n_clusters=2, random_state=42)
-        _, df_clustered_2, _ = f_250(df, n_clusters=2, random_state=42)
+        _, df_clustered_1, _ = f_265(df, n_clusters=2, random_state=42)
+        _, df_clustered_2, _ = f_265(df, n_clusters=2, random_state=42)
         # Clusters should be the same for the same random state
         self.assertTrue((df_clustered_1["cluster"] == df_clustered_2["cluster"]).all())
     def tearDown(self):

@@ -1,9 +1,9 @@
 import csv
 import os
-output_dir = './output'
+OUTPUT_DIR = './output'
 
 
-def f_492(df, filename):
+def f_492(df, filename, output_dir=OUTPUT_DIR):
     """
     Save a Pandas DataFrame to a CSV file in a specified directory.
 
@@ -11,8 +11,9 @@ def f_492(df, filename):
     The CSV file will be saved in the 'data' directory relative to the parent directory of this script.
 
     Parameters:
-    df (pandas.DataFrame): A Pandas DataFrame to be saved.
-    filename (str): The filename of the CSV file where the DataFrame will be saved.
+    - df (pandas.DataFrame): A Pandas DataFrame to be saved.
+    - filename (str): The filename of the CSV file where the DataFrame will be saved.
+    - output_dir (str, optional): the ouput directory.
 
     Returns:
     str: The absolute path of the saved CSV file.
@@ -43,20 +44,19 @@ import pandas as pd
 
 
 class TestCases(unittest.TestCase):
-    @classmethod
     def setUp(self):
         """Create the data directory if it doesn't exist."""
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        if not os.path.exists(OUTPUT_DIR):
+            os.makedirs(OUTPUT_DIR)
 
     def tearDown(self):
         """Clean up by removing files created during tests (if any)."""
-        shutil.rmtree(output_dir, ignore_errors=True)
+        shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
 
     def test_basic_dataframe(self):
         """Test saving a simple DataFrame."""
         df = pd.DataFrame({'A': [1, 2], 'B': ['x', 'y']})
-        expected_path = os.path.join(output_dir, 'basic.csv')
+        expected_path = os.path.join(OUTPUT_DIR, 'basic.csv')
         result_path = f_492(df, 'basic.csv')
         self.assertEqual(expected_path[expected_path.rindex('/') + 1:], result_path[result_path.rindex('/') + 1: ])
         self.assertTrue(os.path.exists(result_path))

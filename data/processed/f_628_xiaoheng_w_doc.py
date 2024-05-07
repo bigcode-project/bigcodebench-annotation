@@ -10,7 +10,7 @@ nltk.download('words')
 # Constants
 SAMPLE_ENGLISH_WORDS = set(words.words())  # Correct initialization
 
-def f_642(s, n):
+def f_684(s, n):
     """
     Extract up to n different English words from a string, ignoring case. 
     The string is split into words and only the English words are retained.
@@ -31,9 +31,9 @@ def f_642(s, n):
     Example:
     Given the nature of random sampling, the specific output can vary.
     >>> s = 'This is an example string with some random words: Apple, banana, Test, hello, world'
-    >>> len(f_642(s, 5)) <= 5
+    >>> len(f_684(s, 5)) <= 5
     True
-    >>> set(f_642("apple Apple APPle", 3)) == {"apple"}
+    >>> set(f_684("apple Apple APPle", 3)) == {"apple"}
     True
     """
     word_list = re.findall(r'\b\w+\b', s.lower())  # Convert to lowercase for comparison
@@ -50,27 +50,27 @@ class TestCases(unittest.TestCase):
     
     def test_extract_english_words(self):
         s = "This is a test string with some random words: apple, banana, test, hello, world"
-        result = f_642(s, 5)
+        result = f_684(s, 5)
         self.assertTrue(all(word in SAMPLE_ENGLISH_WORDS for word in result))
         self.assertEqual(len(result), 5)
         self.assertEqual(len(set(result)), len(result), "All words should be unique")
     def test_fewer_than_n_words(self):
         s = "hello world"
-        result = f_642(s, 5)
+        result = f_684(s, 5)
         self.assertTrue(len(result) <= 5)
         self.assertTrue(all(word in SAMPLE_ENGLISH_WORDS for word in result))
     def test_no_english_words(self):
         s = "xyz abcdef"
-        result = f_642(s, 5)
+        result = f_684(s, 5)
         self.assertEqual(len(result), 0)
     def test_case_insensitivity(self):
         s = "Apple BANANA Test"
-        result = f_642(s, 3)
+        result = f_684(s, 3)
         self.assertTrue(all(word.lower() in SAMPLE_ENGLISH_WORDS for word in result))
         self.assertEqual(len(result), 3)
     def test_duplicate_words(self):
         s = "apple banana apple banana"
-        result = f_642(s, 5)
+        result = f_684(s, 5)
         self.assertTrue(all(word in SAMPLE_ENGLISH_WORDS for word in result))
         self.assertEqual(len(result), 4)
         self.assertEqual(set(result), {"apple", "banana"})

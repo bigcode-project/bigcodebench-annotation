@@ -5,8 +5,7 @@ from scipy.optimize import curve_fit
 def f_524(x, y, labels):
     """
     Fit an exponential curve to given data points and plot the curves with labels.
-
-    This function fits an exponential curve of the form: f(x) = a * exp(-b * x) + c
+    It fits an exponential curve of the form: f(x) = a * exp(-b * x) + c
     to the provided x and y data points for each set of data and plots the fitted curves
     with the corresponding labels on a single matplotlib figure.
 

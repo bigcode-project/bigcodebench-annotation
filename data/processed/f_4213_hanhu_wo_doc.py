@@ -4,7 +4,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
 
-def f_332(num, from_base, to_base, private_key, alphabet):
+def f_349(num, from_base, to_base, private_key, alphabet):
     """
     Converts a number from one base to another, signs it with a private RSA key,
     and encodes the signed number in base64 using a custom alphabet.
@@ -28,7 +28,7 @@ def f_332(num, from_base, to_base, private_key, alphabet):
             backend=default_backend() \
         )
     >>> alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/"
-    >>> encoded = f_332('A1', 16, 8, private_key, alphabet)
+    >>> encoded = f_349('A1', 16, 8, private_key, alphabet)
     >>> print(encoded)
         XMBRyV7pyHXbaojpPuA3iv42nL5AVNukWQjfG48OnojFHtklqZuEgYoOwUZiQAj/dUxXANzzHuKjGRoPcuN5An7J7Gs8pEfEnOmnJfJgGLeiBgAXUeBl5aUTDoMIzBt5exSJWnNC1h5KXp+dDCpB4Hz3qIqdHyqHGNBExXZcEDOW6bEvF+rQOoQpxUJ6Xh3M/46i0g+vSDVyxLxurZpfVNQjEkrV8IlQXXdHoy4ciUC4YrwM0FrdM1BIWdzrhL9k6NfJeI96rabT8xHLrnZDH57mJqWBhpywVFtB7BEnqND70T0fpauFKtuaiA3jc+IydFC+lvodTWe3LiqI2WBsQw==
     >>> isinstance(encoded, str)
@@ -79,24 +79,24 @@ class TestCases(unittest.TestCase):
         self.alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/"
     def test_base_conversion_and_signing(self):
         """Test base conversion and signing output is a base64 string"""
-        encoded = f_332('A1', 16, 8, self.private_key, self.alphabet)
+        encoded = f_349('A1', 16, 8, self.private_key, self.alphabet)
         self.assertIsInstance(encoded, str)
     def test_different_numbers_produce_different_output(self):
         """Test that different numbers produce different signed output"""
-        encoded1 = f_332('A1', 16, 8, self.private_key, self.alphabet)
-        encoded2 = f_332('FF', 16, 8, self.private_key, self.alphabet)
+        encoded1 = f_349('A1', 16, 8, self.private_key, self.alphabet)
+        encoded2 = f_349('FF', 16, 8, self.private_key, self.alphabet)
         self.assertNotEqual(encoded1, encoded2)
-    def test_f_332_return_type(self):
-        """Ensure f_332 returns a string."""
-        result = f_332('A1', 16, 8, self.private_key, self.alphabet)
-        self.assertIsInstance(result, str, "f_332 should return a string")
+    def test_f_349_return_type(self):
+        """Ensure f_349 returns a string."""
+        result = f_349('A1', 16, 8, self.private_key, self.alphabet)
+        self.assertIsInstance(result, str, "f_349 should return a string")
     def test_invalid_base_conversion_raises_value_error(self):
         """Test that invalid base conversion raises a ValueError"""
         with self.assertRaises(ValueError):
-            f_332('G', 16, 8, self.private_key, self.alphabet)
+            f_349('G', 16, 8, self.private_key, self.alphabet)
     def test_output_is_base64_encoded(self):
         """Test that the output is properly base64 encoded"""
-        encoded = f_332('1', 10, 2, self.private_key, self.alphabet)
+        encoded = f_349('1', 10, 2, self.private_key, self.alphabet)
         self.assertTrue(self.is_base64(encoded), "Output should be valid base64.")
     @staticmethod
     def is_base64(s):

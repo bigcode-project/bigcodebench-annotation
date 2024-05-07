@@ -7,7 +7,7 @@ SIZE = 1000
 CLUSTERS = 5
 
 
-def f_691():
+def f_737():
     """
     Generates a set of 2D random points within a specified range and size,
     applies KMeans clustering to these points, and plots the results with
@@ -26,7 +26,7 @@ def f_691():
         A tuple containing the numpy array of data points and the fitted KMeans model.
 
     Example:
-    >>> data, kmeans = f_691()
+    >>> data, kmeans = f_737()
     >>> isinstance(data, np.ndarray)  # Check if data is a numpy array
     True
     >>> data.shape == (1000, 2)  # Verify the shape of the data array
@@ -51,22 +51,22 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_data_size(self):
         """Ensure the generated data has the correct size."""
-        data, _ = f_691()
+        data, _ = f_737()
         self.assertEqual(data.shape, (SIZE, 2))
     def test_cluster_centers_shape(self):
         """Check the shape of the cluster centers array."""
-        _, kmeans = f_691()
+        _, kmeans = f_737()
         self.assertEqual(kmeans.cluster_centers_.shape, (CLUSTERS, 2))
     def test_fitted_model(self):
         """Verify the model is a KMeans instance and is fitted."""
-        _, kmeans = f_691()
+        _, kmeans = f_737()
         self.assertIsInstance(kmeans, KMeans)
         self.assertTrue(hasattr(kmeans, 'labels_'))
     def test_data_range(self):
         """Ensure that generated data points fall within the specified range."""
-        data, _ = f_691()
+        data, _ = f_737()
         self.assertTrue((data >= 0).all() and (data <= RANGE).all())
     def test_cluster_labels(self):
         """Verify that cluster labels are assigned to each data point."""
-        _, kmeans = f_691()
+        _, kmeans = f_737()
         self.assertEqual(len(kmeans.labels_), SIZE)

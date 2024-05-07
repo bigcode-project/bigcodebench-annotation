@@ -1,7 +1,7 @@
 import re
 from nltk.stem import PorterStemmer
 
-def f_766(text_series):
+def f_815(text_series):
     """
     Process a pandas Series of text data by lowercasing all letters, removing non-alphanumeric 
     characters (except spaces), removing punctuation, and stemming each word to its root form.
@@ -21,7 +21,7 @@ def f_766(text_series):
     
     Examples:
     >>> input_series = pd.Series(["This is a sample text.", "Another example!"])
-    >>> output_series = f_766(input_series)
+    >>> output_series = f_815(input_series)
     >>> print(output_series.iloc[0])
     thi is a sampl text
     >>> print(output_series.iloc[1])
@@ -45,7 +45,7 @@ class TestCases(unittest.TestCase):
         """
         input_series = pd.Series(["THIS IS A TEST.", "Test, case number 2!"])
         expected_output = pd.Series(["thi is a test", "test case number 2"])
-        processed_series = f_766(input_series)
+        processed_series = f_815(input_series)
         pd.testing.assert_series_equal(processed_series, expected_output)
     def test_numerics_and_special_characters(self):
         """
@@ -53,7 +53,7 @@ class TestCases(unittest.TestCase):
         """
         input_series = pd.Series(["Another Test 123.", "456 Anoth3r one!"])
         expected_output = pd.Series(["anoth test 123", "456 anoth3r one"])
-        processed_series = f_766(input_series)
+        processed_series = f_815(input_series)
         pd.testing.assert_series_equal(processed_series, expected_output)
     def test_empty_strings(self):
         """
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         """
         input_series = pd.Series(["", " "])
         expected_output = pd.Series(["", ""])
-        processed_series = f_766(input_series)
+        processed_series = f_815(input_series)
         pd.testing.assert_series_equal(processed_series, expected_output)
     def test_punctuation(self):
         """
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         """
         input_series = pd.Series(["Punctuation! Should, be: removed; right?"])
         expected_output = pd.Series(["punctuat should be remov right"])
-        processed_series = f_766(input_series)
+        processed_series = f_815(input_series)
         pd.testing.assert_series_equal(processed_series, expected_output)
     def test_stemconsistency(self):
         """
@@ -77,5 +77,5 @@ class TestCases(unittest.TestCase):
         """
         input_series = pd.Series(["Stemming should work on words like running", "stemmed works on stemmed"])
         expected_output = pd.Series(["stem should work on word like run", "stem work on stem"])
-        processed_series = f_766(input_series)
+        processed_series = f_815(input_series)
         pd.testing.assert_series_equal(processed_series, expected_output)

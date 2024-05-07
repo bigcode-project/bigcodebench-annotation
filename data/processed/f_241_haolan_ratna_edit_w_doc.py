@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
-def f_311(df, dct, columns=None):
+def f_328(df, dct, columns=None):
     """
     This function preprocesses a pandas DataFrame by replacing specified values, encoding categorical attributes, 
     and standardizing numerical attributes. It's designed to be flexible for data preprocessing in machine learning tasks.
@@ -21,7 +21,7 @@ def f_311(df, dct, columns=None):
     Example:
     >>> df = pd.DataFrame({'col1': ['a', 'b', 'c'], 'col2': [1, 2, 3]})
     >>> dct = {'a': 'x', 'b': 'y'}
-    >>> result = f_311(df, dct)
+    >>> result = f_328(df, dct)
     >>> result.shape == df.shape
     True
     >>> result['col1'].mean() == 0.0
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
         # Testing with a mix of categorical and numerical columns
         df = pd.DataFrame({'cat': ['a', 'b', 'c'], 'num': [1, 2, 3]})
         dct = {'a': 'x', 'b': 'y', 'c': 'z'}
-        result = f_311(df, dct)
+        result = f_328(df, dct)
         # Assertions
         self.assertEqual(result.shape, df.shape)
         self.assertTrue('cat' in result.columns)
@@ -64,7 +64,7 @@ class TestCases(unittest.TestCase):
         # Testing with only numerical columns
         df = pd.DataFrame({'num1': [10, 20, 30], 'num2': [40, 50, 60]})
         dct = {}
-        result = f_311(df, dct)
+        result = f_328(df, dct)
         # Assertions
         self.assertEqual(result.shape, df.shape)
         self.assertAlmostEqual(result['num1'].mean(), 0, places=5)
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         # Testing with only categorical columns
         df = pd.DataFrame({'cat1': ['u', 'v', 'w'], 'cat2': ['x', 'y', 'z']})
         dct = {'u': 'a', 'v': 'b', 'w': 'c', 'x': 'd', 'y': 'e', 'z': 'f'}
-        result = f_311(df, dct)
+        result = f_328(df, dct)
         # Assertions
         self.assertEqual(result.shape, df.shape)
         self.assertIn(result['cat1'].dtype, [np.float64])
@@ -82,14 +82,14 @@ class TestCases(unittest.TestCase):
         # Testing with an empty DataFrame
         df = pd.DataFrame({})
         dct = {}
-        result = f_311(df, dct)
+        result = f_328(df, dct)
         # Assertions
         self.assertEqual(result.empty, True)
     def test_case_5(self):
         # Testing with complex DataFrame and no changes through dictionary
         df = pd.DataFrame({'num': [100, 200, 300], 'cat': ['alpha', 'beta', 'gamma']})
         dct = {'delta': 400}
-        result = f_311(df, dct)
+        result = f_328(df, dct)
         # Assertions
         self.assertEqual(result.shape, df.shape)
         self.assertAlmostEqual(result['num'].std(), 1, places=5)
@@ -97,4 +97,4 @@ class TestCases(unittest.TestCase):
     
     def test_case_6(self):
         with self.assertRaises(ValueError):
-            f_311("non_df", {})
+            f_328("non_df", {})

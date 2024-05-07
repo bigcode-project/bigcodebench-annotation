@@ -14,7 +14,6 @@ STOPWORDS = nltk.corpus.stopwords.words('english')
 def f_516(texts, num_topics):
     """
     Performs topic extraction from a collection of text documents using Non-Negative Matrix Factorization (NMF).
-
     This function first preprocesses the input texts by removing non-alphanumeric characters (excluding spaces),
     converting all characters to lowercase, and removing stopwords. It then vectorizes the processed texts
     using TF-IDF and applies NMF to extract the specified number of topics. Each topic is represented as a list

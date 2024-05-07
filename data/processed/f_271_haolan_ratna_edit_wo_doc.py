@@ -2,7 +2,7 @@ from collections import Counter
 import os
 import json
 
-def f_503(filename, directory):
+def f_537(filename, directory):
     """
     Count the number of words in .txt files within a specified directory, 
     export the counts to a JSON file, and then return the total number of words.
@@ -22,7 +22,7 @@ def f_503(filename, directory):
     Example:
     >>> with open("./testdir/single_file.txt","r") as f: print f.read()
     hello world hello
-    >>> count = f_503('single_file.txt', './testdir/')
+    >>> count = f_537('single_file.txt', './testdir/')
     >>> print(count)
     3
     """
@@ -60,7 +60,7 @@ class TestCases(unittest.TestCase):
         expected_result = {'hello': 2, 'world': 1}
         with open(os.path.join(self.test_dir, file_name), 'w') as f:
             f.write(test_content)
-        counts = f_503('test_output.json', self.test_dir)
+        counts = f_537('test_output.json', self.test_dir)
         with open('test_output.json', 'r') as f:
             result = json.load(f)
         self.assertEqual(result, expected_result)
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
         for file_name, content in files_contents.items():
             with open(os.path.join(self.test_dir, file_name), 'w') as f:
                 f.write(content)
-        counts = f_503('test_output.json', self.test_dir)
+        counts = f_537('test_output.json', self.test_dir)
         for file_name, content in files_contents.items():
             if os.path.exists(os.path.join(self.test_dir, file_name)):
                 os.remove(os.path.join(self.test_dir, file_name))
@@ -86,7 +86,7 @@ class TestCases(unittest.TestCase):
         expected_result = {}
         with open(os.path.join(self.test_dir, file_name), 'w') as f:
             pass  # create an empty file
-        f_503('test_output.json', self.test_dir)
+        f_537('test_output.json', self.test_dir)
         with open('test_output.json', 'r') as f:
             result = json.load(f)
         self.assertEqual(result, expected_result)
@@ -97,7 +97,7 @@ class TestCases(unittest.TestCase):
         expected_result = {'hello-world': 1, 'hello_python': 1}
         with open(os.path.join(self.test_dir, file_name), 'w') as f:
             f.write(test_content)
-        f_503('test_output.json', self.test_dir)
+        f_537('test_output.json', self.test_dir)
         if os.path.exists(os.path.join(self.test_dir, file_name)):
             os.remove(os.path.join(self.test_dir, file_name))
         with open('test_output.json', 'r') as f:
@@ -113,7 +113,7 @@ class TestCases(unittest.TestCase):
         file_path = os.path.join(nested_dir, file_name)
         with open(file_path, 'w') as f:
             f.write(test_content)
-        f_503('test_output.json', nested_dir)
+        f_537('test_output.json', nested_dir)
         with open('test_output.json', 'r') as f:
             result = json.load(f)
         self.assertEqual(result, expected_result)

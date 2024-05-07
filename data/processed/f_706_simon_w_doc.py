@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def f_365(fruit_data):
+def f_386(fruit_data):
     """
     Calculate and return the total and average counts for each type of fruit.
 
@@ -24,7 +24,7 @@ def f_365(fruit_data):
 
     Example:
     >>> fruit_list = [('apple', 5), ('banana', 3), ('apple', 6), ('banana', 4), ('cherry', 5), ('banana', 2), ('apple', 4), ('cherry', 5)]
-    >>> report = f_365(fruit_list)
+    >>> report = f_386(fruit_list)
     >>> report.sort_index(inplace=True)
     >>> print(report)
             Total Count  Average Count
@@ -33,7 +33,7 @@ def f_365(fruit_data):
     cherry           10            5.0
 
     >>> fruit = [('apple', 1), ('orange', 25), ('apple', 111)]
-    >>> df = f_365(fruit)
+    >>> df = f_386(fruit)
     >>> df.sort_index(inplace=True)
     >>> print(df)
             Total Count  Average Count
@@ -64,11 +64,11 @@ class TestCases(unittest.TestCase):
         [('involve', 2), ('money', 11), ('use', 15), ('fish', 19), ('boy', 3), ('both', 10)], [('take', 16), ('activity', 12), ('tend', 10), ('take', 2)]
     ]
     def test_empty(self):
-        report = f_365([])
+        report = f_386([])
         self.assertTrue(report.empty)
     def test_case_1(self):
         # Using the first set of test data
-        report = f_365(self.test_data_sets[0])
+        report = f_386(self.test_data_sets[0])
         expected = pd.DataFrame(
             {
             'Total Count': {'vote': 19,
@@ -93,7 +93,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(report, expected, check_dtype=False)
     def test_case_2(self):
         # Using the second set of test data
-        report = f_365(self.test_data_sets[1])
+        report = f_386(self.test_data_sets[1])
         expected = pd.DataFrame(
             {'Total Count': {'experience': 14.0,
                 'interesting': 8.0,
@@ -118,7 +118,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(report, expected, check_dtype=False)
     def test_case_3(self):
         # Using the third set of test data
-        report = f_365(self.test_data_sets[2])
+        report = f_386(self.test_data_sets[2])
         expected = pd.DataFrame(
             {'Total Count': {'our': 11.0,
             'then': 2.0,
@@ -148,7 +148,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(report, expected, check_dtype=False)
     def test_case_4(self):
         # Using the fourth set of test data
-        report = f_365(self.test_data_sets[3])
+        report = f_386(self.test_data_sets[3])
         expected = pd.DataFrame(
             {'Total Count': {'involve': 2.0,
             'money': 11.0,
@@ -170,7 +170,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(report, expected, check_dtype=False)
     def test_case_5(self):
         # Using the fifth set of test data
-        report = f_365(self.test_data_sets[4])
+        report = f_386(self.test_data_sets[4])
         expected = pd.DataFrame(
             {'Total Count': {'take': 18.0, 'activity': 12.0, 'tend': 10.0},
             'Average Count': {'take': 9.0, 'activity': 12.0, 'tend': 10.0}}

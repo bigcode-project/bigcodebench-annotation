@@ -4,7 +4,7 @@ import pandas as pd
 from io import StringIO
 
 
-def f_95(url, table_id):
+def f_100(url, table_id):
     """
     Extracts and converts data from a specified HTML table based on the given 'table_id' on a webpage into a Pandas DataFrame.
     If the table is present but contains no data rows (i.e., no <tr> tags),
@@ -39,18 +39,18 @@ def f_95(url, table_id):
       This is useful for handling tables that are structurally present in the HTML but are devoid of data.
 
     Example:
-    >>> f_95('https://example.com/data.html', 'table1')
+    >>> f_100('https://example.com/data.html', 'table1')
     DataFrame:
        Name  Age
     0  Alice  25
     1  Bob    30
 
     Example of ValueError:
-    >>> f_95('https://example.com/data.html', 'nonexistent_table')
+    >>> f_100('https://example.com/data.html', 'nonexistent_table')
     ValueError: Table with the specified ID not found.
 
     Example of empty table:
-    >>> f_95('https://example.com/emptytable.html', 'empty_table')
+    >>> f_100('https://example.com/emptytable.html', 'empty_table')
     DataFrame:
     Empty DataFrame
     Columns: []
@@ -74,7 +74,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import pandas as pd
 class TestCases(unittest.TestCase):
-    """Test cases for f_95."""
+    """Test cases for f_100."""
     @patch("requests.get")
     def test_successful_scrape(self, mock_get):
         """Test a successful scrape."""
@@ -94,7 +94,7 @@ class TestCases(unittest.TestCase):
         mock_response.text = mock_html_content
         mock_get.return_value = mock_response
         # Test
-        df = f_95("http://example.com", "table0")
+        df = f_100("http://example.com", "table0")
         self.assertIsInstance(df, pd.DataFrame)
         self.assertGreater(len(df), 0)
         self.assertIn("Name", df.columns)
@@ -108,13 +108,13 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = mock_response
         # Test
         with self.assertRaises(ValueError):
-            f_95("http://example.com", "non_existent_table")
+            f_100("http://example.com", "non_existent_table")
     @patch("requests.get")
     def test_network_error(self, mock_get):
         """Test network error."""
         mock_get.side_effect = requests.exceptions.ConnectionError
         with self.assertRaises(requests.exceptions.ConnectionError):
-            f_95("http://example.com", "table0")
+            f_100("http://example.com", "table0")
     @patch("requests.get")
     def test_http_error(self, mock_get):
         """Test HTTP error."""
@@ -123,7 +123,7 @@ class TestCases(unittest.TestCase):
         )
         # Test
         with self.assertRaises(requests.exceptions.HTTPError):
-            f_95("http://example.com", "table0")
+            f_100("http://example.com", "table0")
     @patch("requests.get")
     def test_empty_table(self, mock_get):
         # Mock HTML content with an empty table
@@ -139,6 +139,6 @@ class TestCases(unittest.TestCase):
         mock_response.text = mock_html_content
         mock_get.return_value = mock_response
         # Test
-        df = f_95("http://example.com", "table0")
+        df = f_100("http://example.com", "table0")
         self.assertIsInstance(df, pd.DataFrame)
         self.assertEqual(len(df), 0)

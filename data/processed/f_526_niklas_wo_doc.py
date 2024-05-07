@@ -3,7 +3,7 @@ import os
 import fnmatch
 import itertools
 
-def f_587(src_dir, dst_dir):
+def f_626(src_dir, dst_dir):
     """
     Copy all files from 'src_dir' to 'dst_dir' that match any pattern in ['*.txt', '*.docx'].
 
@@ -21,7 +21,7 @@ def f_587(src_dir, dst_dir):
     - itertools
 
     Example:
-    >>> f_587('./source', './destination')
+    >>> f_626('./source', './destination')
     >>> './destination'
     """
     FILE_PATTERNS = ['*.txt', '*.docx']
@@ -45,7 +45,7 @@ class TestCases(unittest.TestCase):
             with open(os.path.join(src_dir, filename), 'w') as f:
                 f.write('test')
         # Run function
-        f_587(src_dir, dst_dir)
+        f_626(src_dir, dst_dir)
         # Check files
         for d in [src_dir, dst_dir]:
             self.assertTrue(os.path.exists(os.path.join(d, 'a.txt')))

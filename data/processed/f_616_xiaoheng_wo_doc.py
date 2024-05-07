@@ -4,7 +4,7 @@ from pathlib import Path
 # Constants
 PATH_TO_APPEND = '/path/to/whatever'
 
-def f_774(path_to_append=PATH_TO_APPEND):
+def f_823(path_to_append=PATH_TO_APPEND):
     """
     Add a specific path to sys.path and create a directory in that path if it does not exist.
 
@@ -22,10 +22,10 @@ def f_774(path_to_append=PATH_TO_APPEND):
     - pathlib
  
     Examples:
-    >>> f_774("/new/path/to/append")
+    >>> f_823("/new/path/to/append")
     "/new/path/to/append"
 
-    >>> f_774()
+    >>> f_823()
     "/path/to/whatever"
 
     """
@@ -49,25 +49,25 @@ class TestCases(unittest.TestCase):
         self.temp_dir.cleanup()
     def test_1(self):
         # Testing with the default path
-        result = f_774(self.temp_dir.name + '/path/to/whatever')
+        result = f_823(self.temp_dir.name + '/path/to/whatever')
         self.assertEqual(result, self.temp_dir.name + '/path/to/whatever')
         self.assertTrue(self.temp_dir.name + '/path/to/whatever' in sys.path)
         self.assertTrue(Path(self.temp_dir.name + '/path/to/whatever').exists())
     def test_2(self):
         # Testing with a custom path
-        result = f_774(self.temp_dir.name + '/test/path')
+        result = f_823(self.temp_dir.name + '/test/path')
         self.assertEqual(result, self.temp_dir.name + '/test/path')
         self.assertTrue(self.temp_dir.name + '/test/path' in sys.path)
         self.assertTrue(Path(self.temp_dir.name + '/test/path').exists())
     def test_3(self):
         # Testing if the directory is actually created
-        f_774(self.temp_dir.name + '/another/test/path')
+        f_823(self.temp_dir.name + '/another/test/path')
         self.assertTrue(Path(self.temp_dir.name + '/another/test/path').exists())
     def test_4(self):
         # Testing if the path is appended to sys.path
-        f_774(self.temp_dir.name + '/test/path')
+        f_823(self.temp_dir.name + '/test/path')
         self.assertTrue(self.temp_dir.name + '/test/path' in sys.path)
     def test_5(self):
         # Testing if the function returns the correct path
-        result = f_774(self.temp_dir.name + '/test/path')
+        result = f_823(self.temp_dir.name + '/test/path')
         self.assertEqual(result, self.temp_dir.name + '/test/path')

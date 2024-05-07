@@ -9,7 +9,7 @@ from collections import Counter
 # Constants
 STOPWORDS = set(stopwords.words('english'))
 
-def f_269(text, n=2):
+def f_286(text, n=2):
     """
     Remove duplicate and stopwords from a string "text."
     Then, generate a count of n-grams (default is bigrams) in the text.
@@ -28,7 +28,7 @@ def f_269(text, n=2):
 
     Example:
     >>> text = "The quick brown fox jumps over the lazy dog and the dog was not that quick to respond."
-    >>> ngrams = f_269(text)
+    >>> ngrams = f_286(text)
     >>> print(ngrams)
     Counter({('quick', 'brown'): 1, ('brown', 'fox'): 1, ('fox', 'jumps'): 1, ('jumps', 'lazy'): 1, ('lazy', 'dog'): 1, ('dog', 'dog'): 1, ('dog', 'quick'): 1, ('quick', 'respond'): 1})
     """
@@ -49,7 +49,7 @@ class TestCases(unittest.TestCase):
         - Expected Output: A Counter object with the count of each bigram
         """
         text = "The quick brown fox jumps over the lazy dog."
-        result = f_269(text)
+        result = f_286(text)
         expected = Counter({('quick', 'brown'): 1, ('brown', 'fox'): 1, ('fox', 'jumps'): 1, ('jumps', 'lazy'): 1, ('lazy', 'dog'): 1})
         self.assertEqual(result, expected)
     def test_case_2(self):
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
         - Expected Output: A Counter object with the count of each bigram, excluding duplicated words
         """
         text = "This is is a simple simple test test."
-        result = f_269(text)
+        result = f_286(text)
         expected = Counter({('simple', 'simple'): 1, ('simple', 'test'): 1, ('test', 'test'): 1})
         self.assertEqual(result, expected)
     def test_case_3(self):
@@ -69,13 +69,13 @@ class TestCases(unittest.TestCase):
         - Expected Output: A Counter object with the count of each bigram, excluding stopwords
         """
         text = "This is a test of the function."
-        result = f_269(text)
+        result = f_286(text)
         expected = Counter({('test', 'function'): 1})
         self.assertEqual(result, expected)
     def test_case_4(self):
         # This test involves punctuation; ensure punctuation handling is consistent with function logic
         text = "Hello, world!"
-        result = f_269(text)
+        result = f_286(text)
         expected = Counter({
             ('hello', 'world'): 1
         })
@@ -87,6 +87,6 @@ class TestCases(unittest.TestCase):
         - Expected Output: An empty Counter object
         """
         text = ""
-        result = f_269(text)
+        result = f_286(text)
         expected = Counter()
         self.assertEqual(result, expected)

@@ -3,7 +3,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
 
-def f_605(csv_file_path, attribute, test_size=0.2, random_state=42):
+def f_646(csv_file_path, attribute, test_size=0.2, random_state=42):
     """
     Train a linear regression model on a dataset and predict the value of a particular attribute.
     This function reads a CSV file to create a pandas DataFrame, separates the data into 
@@ -29,7 +29,7 @@ def f_605(csv_file_path, attribute, test_size=0.2, random_state=42):
     Note: The function assumes that the CSV file is correctly formatted and that the specified attribute exists.
 
     Example:
-    >>> model, predictions = f_605("/path/to/data.csv", "target")
+    >>> model, predictions = f_646("/path/to/data.csv", "target")
     >>> print(predictions)
     [123.45, ..., 126.78]
     """
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
         # Valid CSV and attribute
         data = {'feature1': [1, 2, 3], 'feature2': [4, 5, 6], 'target': [7, 8, 9]}
         self.create_csv(data)
-        model, predictions = f_605(self.csv_file_path, "target")
+        model, predictions = f_646(self.csv_file_path, "target")
         self.assertIsInstance(model, LinearRegression)
         self.assertIsInstance(predictions, np.ndarray)
         self.assertEqual(len(predictions), 1)  # 20% of 3 is 0.6, rounds to 1
@@ -75,23 +75,23 @@ class TestCases(unittest.TestCase):
         # Changing the test size
         data = {'feature1': range(10), 'feature2': range(10, 20), 'target': range(20, 30)}
         self.create_csv(data)
-        model, predictions = f_605(self.csv_file_path, "target", test_size=0.3)
+        model, predictions = f_646(self.csv_file_path, "target", test_size=0.3)
         self.assertEqual(len(predictions), 3)  # 30% of 10 is 3
     def test_invalid_attribute(self):
         # Attribute not present in the CSV
         data = {'feature1': [1, 2], 'feature2': [3, 4]}
         self.create_csv(data)
         with self.assertRaises(KeyError):
-            f_605(self.csv_file_path, "nonexistent_target")
+            f_646(self.csv_file_path, "nonexistent_target")
     def test_csv_with_missing_values(self):
         # CSV containing missing values in features
         data = {'feature1': [1, np.nan, 3], 'feature2': [4, 5, 6], 'target': [7, 8, 9]}
         self.create_csv(data)
         with self.assertRaises(ValueError):
-            f_605(self.csv_file_path, "target")
+            f_646(self.csv_file_path, "target")
     def test_predicting_non_numerical_data(self):
         # Non-numerical data in target
         data = {'feature1': [1, 2, 3], 'feature2': [4, 5, 6], 'target': ['a', 'b', 'c']}
         self.create_csv(data)
         with self.assertRaises(ValueError):
-            f_605(self.csv_file_path, "target")
+            f_646(self.csv_file_path, "target")

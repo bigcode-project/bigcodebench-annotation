@@ -2,7 +2,7 @@ import re
 import numpy as np
 from scipy.stats import ttest_rel
 
-def f_832(text1, text2):
+def f_883(text1, text2):
     """
     Perform a paired t-test for the number of words in two strings, only if the strings produce the same number of words.
     
@@ -19,7 +19,7 @@ def f_832(text1, text2):
     - scipy
     
     Example:
-    >>> f_832('Words, words, words.', 'And more words!')
+    >>> f_883('Words, words, words.', 'And more words!')
     (1.7320508075688774, 0.22540333075851657)
     """
     word_counts1 = np.array([len(word) for word in re.split(r'\W+', text1) if word])
@@ -35,27 +35,27 @@ import numpy as np
 from scipy.stats import ttest_rel
 class TestCases(unittest.TestCase):
     def test_1(self):
-        t_stat, p_val = f_832("Hello, world!", "Hi, universe!")
+        t_stat, p_val = f_883("Hello, world!", "Hi, universe!")
         self.assertTrue(isinstance(t_stat, float))
         self.assertTrue(isinstance(p_val, float))
     def test_2(self):
-        t_stat, p_val = f_832("Short text.", "This is a slightly longer text.")
+        t_stat, p_val = f_883("Short text.", "This is a slightly longer text.")
         self.assertTrue(isinstance(t_stat, float))
         self.assertTrue(isinstance(p_val, float))
     def test_3(self):
-        t_stat, p_val = f_832("A, B, C, D, E.", "F, G, H, I, J.")
+        t_stat, p_val = f_883("A, B, C, D, E.", "F, G, H, I, J.")
         self.assertTrue(isinstance(t_stat, float))
         self.assertTrue(isinstance(p_val, float))
         
     def test_4(self):
-        t_stat, p_val = f_832("", "")
+        t_stat, p_val = f_883("", "")
         self.assertTrue(np.isnan(t_stat))
         self.assertTrue(np.isnan(p_val))
     def test_5(self):
-        t_stat, p_val = f_832("Testing with similar lengths.", "Testing with similar lengths.")
+        t_stat, p_val = f_883("Testing with similar lengths.", "Testing with similar lengths.")
         self.assertTrue(np.isnan(t_stat))  # Since the lengths are the same, t-statistic should be NaN
         self.assertTrue(np.isnan(p_val))
     def test_unequal_lengths(self):
-        t_stat, p_val = f_832("Short text.", "This is a slightly longer text.")
+        t_stat, p_val = f_883("Short text.", "This is a slightly longer text.")
         self.assertTrue(np.isnan(t_stat))
         self.assertTrue(np.isnan(p_val))

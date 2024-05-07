@@ -2,7 +2,7 @@ import pandas as pd
 from scipy.stats import pearsonr
 
 
-def f_455(data):
+def f_485(data):
     """
     Calculates the Pearson correlation coefficient between numerical scores and categorical grades.
 
@@ -26,7 +26,7 @@ def f_455(data):
     - scipy
 
     Example:
-    >>> round(f_455({'Score_String': ['80.5', '85.7', '90.2'], 'Grade': ['B', 'B+', 'A-']}),2)
+    >>> round(f_485({'Score_String': ['80.5', '85.7', '90.2'], 'Grade': ['B', 'B+', 'A-']}),2)
     -0.46
     """
     df = pd.DataFrame(data)
@@ -40,20 +40,20 @@ def f_455(data):
 import unittest
 import pandas as pd
 class TestCases(unittest.TestCase):
-    """Test cases for f_455"""
+    """Test cases for f_485"""
     def test_normal_operation(self):
         """
         Test normal operation with valid input.
         """
         data = {"Score_String": ["80.5", "85.7", "90.2"], "Grade": ["B", "B+", "A-"]}
-        result = f_455(data)
+        result = f_485(data)
         self.assertIsInstance(result, float)
     def test_empty_input(self):
         """
         Test the function with empty input.
         """
         data = {"Score_String": [], "Grade": []}
-        result = f_455(data)
+        result = f_485(data)
         self.assertTrue(pd.isna(result))
     def test_invalid_score_format(self):
         """
@@ -61,14 +61,14 @@ class TestCases(unittest.TestCase):
         """
         data = {"Score_String": ["eighty", "85.7", "90.2"], "Grade": ["B", "B+", "A-"]}
         with self.assertRaises(ValueError):
-            f_455(data)
+            f_485(data)
     def test_mismatched_lengths(self):
         """
         Test the function with mismatched lengths of scores and grades.
         """
         data = {"Score_String": ["80.5", "85.7"], "Grade": ["B", "B+", "A-"]}
         with self.assertRaises(ValueError):
-            f_455(data)
+            f_485(data)
     def test_non_ordinal_grades(self):
         """
         Test the function with non-ordinal grade inputs.
@@ -77,5 +77,5 @@ class TestCases(unittest.TestCase):
             "Score_String": ["80.5", "85.7", "90.2"],
             "Grade": ["Pass", "Fail", "Pass"],
         }
-        result = f_455(data)
+        result = f_485(data)
         self.assertIsInstance(result, float)

@@ -2,7 +2,7 @@ from itertools import combinations
 import pandas as pd
 
 
-def f_378(number_list, element):
+def f_400(number_list, element):
     """
     Find all unique combinations of 3 numbers from a list that add up to a certain element.
 
@@ -23,19 +23,19 @@ def f_378(number_list, element):
     - pandas:
 
     Example:
-    >>> result = f_378([1, 2, 3, 4, 5], 6)
+    >>> result = f_400([1, 2, 3, 4, 5], 6)
     >>> print(result)    
       Combinations
     0    (1, 2, 3)
 
-    >>> result = f_378([-1, 1, 0, -2, 2, 3], 0)
+    >>> result = f_400([-1, 1, 0, -2, 2, 3], 0)
     >>> print(result) 
       Combinations
     0  (-1, -2, 3)
     1   (-1, 1, 0)
     2   (0, -2, 2)
 
-    >>> result = f_378([], 0)
+    >>> result = f_400([], 0)
     >>> print(result)
     Empty DataFrame
     Columns: [Combinations]
@@ -48,13 +48,13 @@ def f_378(number_list, element):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = f_378([1, 2, 3, 4, 5, 6], 6)
+        result = f_400([1, 2, 3, 4, 5, 6], 6)
         expected = pd.DataFrame(
             {'Combinations': {0: (1, 2, 3)}}
         )
         pd.testing.assert_frame_equal(result, expected)
     def test_case_2(self):
-        result = f_378(list(range(1, 51)) + [50], 50)
+        result = f_400(list(range(1, 51)) + [50], 50)
         expected = pd.DataFrame(
                 {'Combinations': {0: (1, 12, 37),
                 1: (1, 13, 36),
@@ -244,7 +244,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result, expected)
     def test_case_4(self):
         random_list = [i for i in range(1, 51)] + [50]
-        result = f_378(random_list, 50)
+        result = f_400(random_list, 50)
         expected = pd.DataFrame(
 {'Combinations': {0: (1, 12, 37),
   1: (1, 13, 36),
@@ -436,11 +436,11 @@ class TestCases(unittest.TestCase):
             self.assertEqual(comb[0]+comb[1]+comb[2], 50)
     def test_edge_case_2(self):
         # Test with a list of length less than 3
-        result = f_378([1, 2, 3], 3)
+        result = f_400([1, 2, 3], 3)
         self.assertTrue(result.empty)
     def test_edge_case_3(self):
         # Test with negative numbers in the list
-        result = f_378([-1, -2, 1, 2, 3, 0], 0)
+        result = f_400([-1, -2, 1, 2, 3, 0], 0)
         expected = pd.DataFrame(
             {'Combinations': {0: (-1, -2, 3), 1: (-1, 1, 0), 2: (-2, 2, 0)}}       
         )
@@ -449,7 +449,7 @@ class TestCases(unittest.TestCase):
             self.assertEqual(comb[0]+comb[1]+comb[2], 0)
     def test_edge_case_4(self):
         # Test with repeated numbers in the list
-        result = f_378([1, 1, 1, 1, 1, 3], 3)
+        result = f_400([1, 1, 1, 1, 1, 3], 3)
         expected = pd.DataFrame(
             {'Combinations': {0: (1, 1, 1)}}
         )
@@ -458,7 +458,7 @@ class TestCases(unittest.TestCase):
             self.assertEqual(comb[0]+comb[1]+comb[2], 3)
     def test_edge_case_5(self):
         # Test with both positive and negative numbers with no valid combinations
-        result = f_378([-5, -4, -3, 5, 6, 7, 0], 0)
+        result = f_400([-5, -4, -3, 5, 6, 7, 0], 0)
         expected = pd.DataFrame(
             {'Combinations': {0: (-4, -3, 7), 1: (-5, 5, 0)}}
         )

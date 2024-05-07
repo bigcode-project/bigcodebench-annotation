@@ -3,7 +3,7 @@ from itertools import cycle
 from random import randint, seed
 
 
-def f_350(
+def f_369(
     n_grades,
     students=['Alice', 'Bob', 'Charlie', 'David', 'Eve'],
     grade_range=range(1, 11),
@@ -34,14 +34,14 @@ def f_350(
     - random
 
     Example:
-    >>> grade_report = f_350(3, ['Alice', 'Bob'], range(1, 3), rng_seed=1)
+    >>> grade_report = f_369(3, ['Alice', 'Bob'], range(1, 3), rng_seed=1)
     >>> print(grade_report)
       Student  Grade
     0   Alice      1
     1     Bob      1
     2   Alice      2
 
-    >>> grade_report = f_350(5, rng_seed=12)
+    >>> grade_report = f_369(5, rng_seed=12)
     >>> print(grade_report)
        Student  Grade
     0    Alice      8
@@ -75,33 +75,33 @@ class TestCases(unittest.TestCase):
             return df1.shape == df2.shape and (df1.columns == df2.columns).all() and (df1.values == df2.values).all()
     def test_case_1(self):
         # Simple case with minimum input
-        result = f_350(1, ['Alice'], range(1, 2), rng_seed=32)
+        result = f_369(1, ['Alice'], range(1, 2), rng_seed=32)
         expected = pd.DataFrame({'Student': ['Alice'], 'Grade': [1]})
         self.assertTrue(self.are_dataframes_equal(result, expected))
     def test_case_2(self):
         # Testing with multiple grades and checking the cycling feature of students
-        result = f_350(5, ['Alice', 'Bob'], range(1, 3), rng_seed=1233)
+        result = f_369(5, ['Alice', 'Bob'], range(1, 3), rng_seed=1233)
         # Since grades are random, we check for correct students and valid grades only
         expected_students = ['Alice', 'Bob', 'Alice', 'Bob', 'Alice']
         self.assertEqual(list(result['Student']), expected_students)
         self.assertTrue(all(grade in [1, 2] for grade in result['Grade']))
     def test_case_3(self):
         # Testing with different grade range
-        result = f_350(200, ['Alice'], range(100, 102), rng_seed=12)
+        result = f_369(200, ['Alice'], range(100, 102), rng_seed=12)
         # Check if the grades are within the specified range
         self.assertTrue(all(100 <= grade <= 101 for grade in result['Grade']))
     def test_case_4(self):
         # Testing with a larger number of grades
         number_of_grades = 1000
-        result = f_350(number_of_grades, ['Alice', 'Bob'], range(1, 5), rng_seed=42)
+        result = f_369(number_of_grades, ['Alice', 'Bob'], range(1, 5), rng_seed=42)
         self.assertEqual(len(result), number_of_grades)
         self.assertTrue(all(1 <= grade <= 4 for grade in result['Grade']))
     def test_case_5(self):
         # Testing with an empty list of students, which should handle the error gracefully
         with self.assertRaises(Exception):
-            f_350(3, [], range(1, 3))
+            f_369(3, [], range(1, 3))
     def test_default(self):
-        result = f_350(10, rng_seed=12)
+        result = f_369(10, rng_seed=12)
         expected = pd.DataFrame({
             'Student': {0: 'Alice',
             1: 'Bob',

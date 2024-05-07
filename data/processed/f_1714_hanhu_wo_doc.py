@@ -2,7 +2,7 @@ from flask import Flask
 from flask_restful import Resource, Api
 import requests
 
-def f_43(api_url, template_folder):
+def f_45(api_url, template_folder):
     """
     Creates a Flask application with a RESTful API endpoint. The endpoint, when accessed,
     fetches data from an external API and returns the response as JSON. It is configured
@@ -23,7 +23,7 @@ def f_43(api_url, template_folder):
     - requests
 
     Example:
-    >>> app = f_43('https://api.example.com/data', 'templates')
+    >>> app = f_45('https://api.example.com/data', 'templates')
     >>> 'data' in [str(route) for route in app.url_map.iter_rules()]
     True
     >>> api = Api(app)
@@ -50,18 +50,18 @@ class TestCases(unittest.TestCase):
         self.template_folder = 'templates'
     def test_app_instance(self):
         """Test if the function returns a Flask app instance."""
-        app = f_43(self.api_url, self.template_folder)
+        app = f_45(self.api_url, self.template_folder)
         self.assertIsInstance(app, Flask)
     def test_api_endpoint_configuration(self):
         """Test if the API endpoint '/data' is configured correctly."""
-        app = f_43(self.api_url, self.template_folder)
+        app = f_45(self.api_url, self.template_folder)
         with app.test_request_context('/data'):
             self.assertTrue('/data' in [str(route) for route in app.url_map.iter_rules()])
     @patch('requests.get')
     def test_data_endpoint_response(self, mock_get):
         """Test if the data endpoint returns expected JSON data."""
         mock_get.return_value.json.return_value = {'test': 'value'}
-        app = f_43(self.api_url, self.template_folder)
+        app = f_45(self.api_url, self.template_folder)
         client = app.test_client()
         response = client.get('/data')
         self.assertEqual(response.json, {'test': 'value'})
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         """Test if the external API is called with the correct URL."""
         mock_get.return_value.status_code = 200  # Assume that the API call is successful
         mock_get.return_value.json.return_value = {'test': 'value'}  # Ensure this returns a serializable dictionary
-        app = f_43(self.api_url, self.template_folder)
+        app = f_45(self.api_url, self.template_folder)
         client = app.test_client()
         client.get('/data')
         mock_get.assert_called_once_with(self.api_url)
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value.status_code = 200  # Mock the status code as 200
         mock_get.return_value.json.return_value = {'data': 'example'}
         
-        app = f_43(self.api_url, self.template_folder)
+        app = f_45(self.api_url, self.template_folder)
         client = app.test_client()
         response = client.get('/data')
         self.assertEqual(response.status_code, 200)
