@@ -21,8 +21,17 @@ def f_1029(
     Parameters:
     file_path (str): The path to the JSON file.
     attribute (str): The attribute to retrieve from the JSON object.
-    INPUT_JSON (dict): The input json to validate.
-    EMAIL_REGEX (str): The regex used to check the email validity.
+    INPUT_JSON (dict): The input json to validate. The default value is:
+    '{
+        "type": "object",
+        "properties": {
+            "name": {"type": str},  
+            "age": {"type": int},   
+            "email": {"type": str}  
+        },
+        "required": ["name", "age", "email"]
+    }'.
+    EMAIL_REGEX (str): The regex used to check the email validity. Default to 'r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$")'
 
     Returns:
     Any: The value of the specified attribute, consistent with the type defined in the JSON schema.
