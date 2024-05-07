@@ -2,7 +2,7 @@ import subprocess
 import os
 import glob
 import time
-import rpy2.robjects as robjects
+# import rpy2.robjects as robjects
 
 
 def f_945(test_dir):
@@ -30,8 +30,8 @@ def f_945(test_dir):
 
     for r_script in r_scripts:
         start_time = time.time()
-        # subprocess.call(['/usr/bin/Rscript', '--vanilla', r_script])
-        robjects.r.source(r_script, encoding="utf-8")
+        subprocess.call(['/usr/bin/Rscript', '--vanilla', r_script])
+        # robjects.r.source(r_script, encoding="utf-8")
         end_time = time.time()
         execution_times[os.path.basename(r_script)] = end_time - start_time
 
