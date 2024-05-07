@@ -49,7 +49,6 @@ class TestCases(unittest.TestCase):
     def tearDown(self):
         # Cleanup the test log file
         os.remove(self.test_file_path)
-        shutil.rmtree(self.test_dir)
     def test_nonexistent_file(self):
         with self.assertRaises(FileNotFoundError):
             f_610("/path/to/nonexistent/file.log", ['ERROR', 'WARNING'])
