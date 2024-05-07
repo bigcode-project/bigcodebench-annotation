@@ -1,7 +1,7 @@
 import pandas as pd
 from scipy.stats import chi2_contingency
 
-def f_179(df, columns=['A', 'B', 'C'], larger=50, equal=900):
+def f_195(df, columns=['A', 'B', 'C'], larger=50, equal=900):
     """
     Filters a pandas DataFrame based on the values of specific rows, and performs
     a chi-square independence test on the first two columns.
@@ -45,7 +45,7 @@ def f_179(df, columns=['A', 'B', 'C'], larger=50, equal=900):
     ...     'B': [55, 70, 40, 85],
     ...     'C': [900, 900, 800, 900]
     ... })
-    >>> f_179(df)
+    >>> f_195(df)
     0.22313016014842973
 
     >>> df = pd.DataFrame({
@@ -53,7 +53,7 @@ def f_179(df, columns=['A', 'B', 'C'], larger=50, equal=900):
     ...     'hi': [45, 2, 2, 3, 4, 4],
     ...     'column3': [50, 50, 50, 50, 50, 50, ]
     ... })
-    >>> f_179(df, ['test', 'hi', 'column3'], larger=2, equal=50)
+    >>> f_195(df, ['test', 'hi', 'column3'], larger=2, equal=50)
     0.23810330555354436
     """
     if len(columns) != 3:
@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
                 'D': [900 for i in range(rows)] 
             }
         )
-        self.assertRaises(Exception, f_179, data)
+        self.assertRaises(Exception, f_195, data)
     def test_column_number(self):
         fake = faker.Faker()
         fake.seed_instance(42)
@@ -96,8 +96,8 @@ class TestCases(unittest.TestCase):
                 'C': [900 for i in range(rows)] 
             }
         )
-        self.assertRaises(Exception, f_179, data, ['A'])
-        self.assertRaises(Exception, f_179, data, ['A', 'B', 'C', 'D'])
+        self.assertRaises(Exception, f_195, data, ['A'])
+        self.assertRaises(Exception, f_195, data, ['A', 'B', 'C', 'D'])
     def test_no_data_after_filer(self):
         fake = faker.Faker()
         fake.seed_instance(42)
@@ -109,7 +109,7 @@ class TestCases(unittest.TestCase):
                 'C': [901 for i in range(rows)] 
             }
         )
-        self.assertRaises(Exception, f_179, data)
+        self.assertRaises(Exception, f_195, data)
     def test_medium_dataframe(self):
         # Test with a medium-sized dataframe (50 rows)
         fake = faker.Faker()
@@ -122,7 +122,7 @@ class TestCases(unittest.TestCase):
                 'C': [fake.random_int(899, 901) for i in range(rows)] 
             }
         )        
-        p_value = f_179(data)
+        p_value = f_195(data)
         self.assertAlmostEqual(p_value, 0.23, places=1)
     def test_large_dataframe(self):
         # Test with a large dataframe (1000 rows)
@@ -136,7 +136,7 @@ class TestCases(unittest.TestCase):
                 'C': [fake.random_int(800, 950) for i in range(rows)] 
             }
         )        
-        p_value = f_179(data)
+        p_value = f_195(data)
         self.assertAlmostEqual(p_value, 0.22, places=1)
     def test_very_large_dataframe(self):
         data = pd.DataFrame(
@@ -146,7 +146,7 @@ class TestCases(unittest.TestCase):
                 'C': [900, 900, 900, 900, 900] 
             }
         )
-        p_value = f_179(data)
+        p_value = f_195(data)
         self.assertAlmostEqual(p_value, 1.0, places=1)
     def test_huge_dataframe(self):
         # different column names
@@ -160,7 +160,7 @@ class TestCases(unittest.TestCase):
                 '1': [fake.random_int(821, 950) for i in range(rows)] 
             }
         )        
-        p_value = f_179(data, columns=['test', 'five', '1'])
+        p_value = f_195(data, columns=['test', 'five', '1'])
         self.assertAlmostEqual(p_value, 0.22, places=1)
     def test_diff_filter(self):
         # different filter values
@@ -174,5 +174,5 @@ class TestCases(unittest.TestCase):
                 '1': [fake.random_int(19, 21) for i in range(rows)] 
             }
         )        
-        p_value = f_179(data, columns=['test', 'five', '1'], larger=100, equal=20)
+        p_value = f_195(data, columns=['test', 'five', '1'], larger=100, equal=20)
         self.assertAlmostEqual(p_value, 0.35, places=1)

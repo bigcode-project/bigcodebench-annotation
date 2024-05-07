@@ -6,7 +6,7 @@ from random import shuffle
 COLORS = ["b", "g", "r", "c", "m", "y", "k"]
 
 
-def f_697(list_of_lists):
+def f_775(list_of_lists):
     """
     Plots a series of lines for each list in `list_of_lists`. Each line is plotted with shuffled y-values
     and sequential x-values starting from 1. The function shuffles the y-values of each inner list before plotting.
@@ -30,7 +30,7 @@ def f_697(list_of_lists):
     Example:
     >>> import random
     >>> random.seed(0)
-    >>> fig, ax = f_697([[1, 2, 3], [4, 5, 6]])
+    >>> fig, ax = f_775([[1, 2, 3], [4, 5, 6]])
     >>> ax.lines[0].get_color()
     (0.0, 0.0, 1.0, 1)
 
@@ -55,11 +55,11 @@ from matplotlib.axes import Axes
 import matplotlib.colors as mcolors
 import random
 class TestCases(unittest.TestCase):
-    """Tests for the function f_697."""
+    """Tests for the function f_775."""
     def test_return_types(self):
         """Check that the function returns the correct types."""
         random.seed(0)
-        fig, ax = f_697([["x", "y", "z"], ["a", "b", "c"]])
+        fig, ax = f_775([["x", "y", "z"], ["a", "b", "c"]])
         self.assertIsInstance(
             fig,
             Figure,
@@ -73,16 +73,16 @@ class TestCases(unittest.TestCase):
     def test_number_of_lines(self):
         """Check that the correct number of lines are plotted."""
         random.seed(1)
-        _, ax = f_697([["x", "y", "z"], ["a", "b", "c"]])
+        _, ax = f_775([["x", "y", "z"], ["a", "b", "c"]])
         self.assertEqual(
             len(ax.lines), 2, "There should be 2 lines plotted for 2 lists."
         )
-        _, ax = f_697([["x", "y", "z"]])
+        _, ax = f_775([["x", "y", "z"]])
         self.assertEqual(len(ax.lines), 1, "There should be 1 line plotted for 1 list.")
     def test_color_cycle(self):
         """Check that the colors of the plotted lines follow the specified cycle."""
         random.seed(2)
-        _, ax = f_697([["x"], ["y"], ["z"], ["a"], ["b"], ["c"], ["d"], ["e"]])
+        _, ax = f_775([["x"], ["y"], ["z"], ["a"], ["b"], ["c"], ["d"], ["e"]])
         expected_colors = ["b", "g", "r", "c", "m", "y", "k", "b"]
         # Convert color codes to RGBA format
         expected_colors_rgba = [mcolors.to_rgba(c) for c in expected_colors]
@@ -95,7 +95,7 @@ class TestCases(unittest.TestCase):
     def test_y_values(self):
         """Check that the y-values are shuffled."""
         random.seed(3)
-        _, ax = f_697([["x", "y", "z"]])
+        _, ax = f_775([["x", "y", "z"]])
         y_data = ax.lines[0].get_ydata()
         self.assertTrue(
             set(y_data) == {1, 2, 3},
@@ -104,7 +104,7 @@ class TestCases(unittest.TestCase):
     def test_empty_input(self):
         """Check that no lines are plotted for an empty input list."""
         random.seed(4)
-        _, ax = f_697([])
+        _, ax = f_775([])
         self.assertEqual(
             len(ax.lines),
             0,

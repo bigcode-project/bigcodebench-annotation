@@ -4,7 +4,7 @@ import glob
 import shutil
 
 
-def f_43(source_directory: str, target_directory: str):
+def f_44(source_directory: str, target_directory: str):
     """
     Moves files with specific extensions from a source directory to a target directory,
     handling naming conflicts by renaming duplicates.
@@ -32,9 +32,9 @@ def f_43(source_directory: str, target_directory: str):
     - Renaming of files due to naming conflicts follows the pattern '<original_name>-n.<extension>'.
 
     Examples:
-    >>> f_43('./source_folder', './target_folder')
+    >>> f_44('./source_folder', './target_folder')
     3
-    >>> f_43('./empty_folder', './target_folder')
+    >>> f_44('./empty_folder', './target_folder')
     0
     """
     moved_files = 0
@@ -68,7 +68,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test with an empty source directory
         with tempfile.TemporaryDirectory() as source_dir, tempfile.TemporaryDirectory() as target_dir:
-            result = f_43(source_dir, target_dir)
+            result = f_44(source_dir, target_dir)
             self.assertEqual(
                 result, 0, "Should return 0 for an empty source directory."
             )
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         with tempfile.TemporaryDirectory() as source_dir, tempfile.TemporaryDirectory() as target_dir:
             for i in range(3):
                 Path(f"{source_dir}/file_{i}").touch()
-            result = f_43(source_dir, target_dir)
+            result = f_44(source_dir, target_dir)
             self.assertEqual(
                 result, 0, "Should return 0 for files with non-matching extensions."
             )
@@ -87,14 +87,14 @@ class TestCases(unittest.TestCase):
             extensions = self.valid_extensions + [".pdf", ".jpg"]
             for i, ext in enumerate(extensions):
                 Path(f"{source_dir}/file_{i}{ext}").touch()
-            result = f_43(source_dir, target_dir)
+            result = f_44(source_dir, target_dir)
             self.assertTrue(result == len(self.valid_extensions))
     def test_case_4(self):
         # Test with a source directory containing files with all matching extensions
         with tempfile.TemporaryDirectory() as source_dir, tempfile.TemporaryDirectory() as target_dir:
             for i, ext in enumerate(self.valid_extensions):
                 Path(f"{source_dir}/file_{i}{ext}").touch()
-            result = f_43(source_dir, target_dir)
+            result = f_44(source_dir, target_dir)
             self.assertEqual(
                 result, 4, "Should return 4 for all files with matching extensions."
             )
@@ -108,7 +108,7 @@ class TestCases(unittest.TestCase):
                 Path(f"{source_dir}/file_{i}{ext}").touch()
                 Path(f"{source_dir}/subdir1/file_{i}{ext}").touch()
                 Path(f"{source_dir}/subdir1/subdir2/file_{i}{ext}").touch()
-            result = f_43(source_dir, target_dir)
+            result = f_44(source_dir, target_dir)
             self.assertEqual(
                 result,
                 12,
@@ -124,7 +124,7 @@ class TestCases(unittest.TestCase):
             for ext in extensions:
                 (Path(f"{source_dir}/subdir1") / f"file{ext}").touch()
                 (Path(f"{source_dir}/subdir2") / f"file{ext}").touch()
-            result = f_43(source_dir, target_dir)
+            result = f_44(source_dir, target_dir)
             self.assertEqual(
                 result,
                 8,
@@ -135,7 +135,7 @@ class TestCases(unittest.TestCase):
         source_dir = "/path/does/not/exist"
         with tempfile.TemporaryDirectory() as target_dir:
             with self.assertRaises(FileNotFoundError):
-                f_43(source_dir, target_dir)
+                f_44(source_dir, target_dir)
     def test_case_8(self):
         # Test file renaming when handling duplicate files
         with tempfile.TemporaryDirectory() as source_dir, tempfile.TemporaryDirectory() as target_dir:
@@ -146,7 +146,7 @@ class TestCases(unittest.TestCase):
                 Path(os.path.join(source_dir, filename)).touch()
                 # Create expected duplicate files in the target directory to force renaming
                 Path(os.path.join(target_dir, filename)).touch()
-            result = f_43(source_dir, target_dir)
+            result = f_44(source_dir, target_dir)
             self.assertEqual(result, len(extensions), "Should have moved all files.")
             # Check if files were renamed correctly to avoid overwriting
             expected_files = [f"file_{i}-1{ext}" for i, ext in enumerate(extensions)]

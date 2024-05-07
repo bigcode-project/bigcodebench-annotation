@@ -6,7 +6,7 @@ def execute_command(command):
     output, _ = process.communicate()
     return output
 
-def f_119(commands):
+def f_124(commands):
     """
     Executes a list of shell commands in parallel using multiprocessing, and collects their outputs.
     
@@ -24,7 +24,7 @@ def f_119(commands):
     - If `commands` is an empty list, the function returns an empty list without attempting to execute any commands.
     
     Examples:
-    >>> result = f_119(['ls', 'pwd', 'date'])
+    >>> result = f_124(['ls', 'pwd', 'date'])
     >>> isinstance(result, list)
     True
     >>> all(isinstance(output, bytes) for output in result)
@@ -44,14 +44,14 @@ class TestCases(unittest.TestCase):
         """Test that the function returns a list of byte strings."""
         mock_popen.return_value.communicate.return_value = (b'output', b'')
         commands = ['ls']
-        result = f_119(commands)
+        result = f_124(commands)
         self.assertIsInstance(result, list)
         self.assertTrue(all(isinstance(output, bytes) for output in result))
     @patch('subprocess.Popen')
     def test_empty_command_list(self, mock_popen):
         """Test the function with an empty command list."""
         mock_popen.return_value.communicate.return_value = (b'', b'')
-        result = f_119([])
+        result = f_124([])
         self.assertEqual(result, [])
         mock_popen.assert_not_called()
     @patch('subprocess.Popen')
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
         """Test that the function returns a list with mocked commands."""
         mock_popen.return_value.communicate.return_value = (b'Hello', b''), (b'World', b'')
         commands = ['echo "Hello"', 'echo "World"']
-        result = f_119(commands)
+        result = f_124(commands)
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 2)
     @patch('subprocess.Popen')
@@ -67,13 +67,13 @@ class TestCases(unittest.TestCase):
         """Test the function with a specific number of commands."""
         mock_popen.return_value.communicate.side_effect = [(b'output1', b''), (b'output2', b'')]
         commands = ['ls', 'pwd']
-        result = f_119(commands)
+        result = f_124(commands)
         self.assertEqual(len(result), 2)
     @patch('subprocess.Popen')
     def test_handling_empty_string_command(self, mock_popen):
         """Test the function with an empty string as a command."""
         mock_popen.return_value.communicate.return_value = (b'', b'')
         commands = ['']
-        result = f_119(commands)
+        result = f_124(commands)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0], b'')

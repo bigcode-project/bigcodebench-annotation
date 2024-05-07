@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
-def f_460(num_samples, countries=['Russia', 'China', 'USA', 'India', 'Brazil'], 
+def f_507(num_samples, countries=['Russia', 'China', 'USA', 'India', 'Brazil'], 
            ages=np.arange(18, 60), genders=['Male', 'Female'], rng_seed=None):
     """
     Generate a demographic dataset with information about people from different countries, their age, and gender. 
@@ -28,7 +28,7 @@ def f_460(num_samples, countries=['Russia', 'China', 'USA', 'India', 'Brazil'],
     - sklearn.preprocessing.LabelEncoder
 
     Example:
-    >>> demographics = f_460(5, rng_seed=31)
+    >>> demographics = f_507(5, rng_seed=31)
     >>> print(demographics)
       Country  Age  Gender
     0     USA   46       0
@@ -37,7 +37,7 @@ def f_460(num_samples, countries=['Russia', 'China', 'USA', 'India', 'Brazil'],
     3  Russia   32       1
     4     USA   46       0
 
-    >>> demographics = f_460(5, countries=['Austria', 'Germany'], rng_seed=3)
+    >>> demographics = f_507(5, countries=['Austria', 'Germany'], rng_seed=3)
     >>> print(demographics)
        Country  Age  Gender
     0  Germany   51       1
@@ -66,43 +66,43 @@ import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_num_samples(self):
         'num_samples not an integer'
-        self.assertRaises(Exception, f_460, 'test')
+        self.assertRaises(Exception, f_507, 'test')
     
     # Test Case 1: Basic test with default parameters
     def test_case_1(self):
-        demographics = f_460(10, rng_seed=1)
+        demographics = f_507(10, rng_seed=1)
         self.assertEqual(len(demographics), 10)
         self.assertTrue(set(demographics['Country'].unique()).issubset(['Russia', 'China', 'USA', 'India', 'Brazil']))
         self.assertTrue(all(18 <= age <= 59 for age in demographics['Age']))
         self.assertTrue(set(demographics['Gender'].unique()).issubset([0, 1]))
     # Test Case 2: Test with custom countries list
     def test_case_2(self):
-        demographics = f_460(5, countries=['Canada', 'Australia'], rng_seed=1)
+        demographics = f_507(5, countries=['Canada', 'Australia'], rng_seed=1)
         self.assertEqual(len(demographics), 5)
         self.assertTrue(set(demographics['Country'].unique()).issubset(['Canada', 'Australia']))
         self.assertTrue(all(18 <= age <= 59 for age in demographics['Age']))
         self.assertTrue(set(demographics['Gender'].unique()).issubset([0, 1]))
     # Test Case 3: Test with custom age range
     def test_case_3(self):
-        demographics = f_460(5, ages=np.arange(25, 40), rng_seed=1)
+        demographics = f_507(5, ages=np.arange(25, 40), rng_seed=1)
         self.assertEqual(len(demographics), 5)
         self.assertTrue(all(25 <= age <= 40 for age in demographics['Age']))
         self.assertTrue(set(demographics['Gender'].unique()).issubset([0, 1]))
     # Test Case 4: Test with custom gender list
     def test_case_4(self):
-        demographics = f_460(5, genders=['Non-Binary'], rng_seed=1)
+        demographics = f_507(5, genders=['Non-Binary'], rng_seed=1)
         self.assertEqual(len(demographics), 5)
         self.assertTrue(set(demographics['Gender'].unique()).issubset([0]))
     # Test Case 5: Test with larger sample size
     def test_case_5(self):
-        demographics = f_460(100, rng_seed=1)
+        demographics = f_507(100, rng_seed=1)
         self.assertEqual(len(demographics), 100)
         self.assertTrue(set(demographics['Country'].unique()).issubset(['Russia', 'China', 'USA', 'India', 'Brazil']))
         self.assertTrue(all(18 <= age <= 59 for age in demographics['Age']))
         self.assertTrue(set(demographics['Gender'].unique()).issubset([0, 1]))
     def test_case_6(self):
         'check for specific return value'
-        demographics = f_460(5, rng_seed=3)
+        demographics = f_507(5, rng_seed=3)
         expected_df = pd.DataFrame({
             'Country': ['Brazil', 'Russia', 'Russia', 'China', 'Russia'],
             'Age': [51, 54, 42, 19, 21],

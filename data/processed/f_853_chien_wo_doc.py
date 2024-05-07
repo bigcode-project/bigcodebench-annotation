@@ -3,7 +3,7 @@ from PIL import Image
 import io
 
 
-def f_569(url):
+def f_628(url):
     """
     Fetches an image from a given URL and returns it as a PIL Image object.
 
@@ -28,7 +28,7 @@ def f_569(url):
     - io
 
     Example:
-    >>> img = f_569('https://example.com/image.jpg')
+    >>> img = f_628('https://example.com/image.jpg')
     >>> isinstance(img, Image.Image)
     True
 
@@ -53,7 +53,7 @@ from pathlib import Path
 import shutil
 import os
 class TestCases(unittest.TestCase):
-    """Test cases for f_569 function."""
+    """Test cases for f_628 function."""
     directory = "mnt/data/f_852_data"
     def setUp(self):
         """Setup method to create a sample image inr test files."""
@@ -66,37 +66,37 @@ class TestCases(unittest.TestCase):
         sample_image.save(self.sample_image_path)
     @patch("requests.get")
     def test_valid_image_url(self, mock_get):
-        """Test f_569 function with a valid image URL."""
+        """Test f_628 function with a valid image URL."""
         with open(self.sample_image_path, "rb") as image_file:
             mock_get.return_value.content = image_file.read()
-        img = f_569("https://www.google.com/images/srpr/logo11w.png")
+        img = f_628("https://www.google.com/images/srpr/logo11w.png")
         self.assertIsInstance(img, Image.Image, "Returned object is not a PIL Image")
     @patch("requests.get")
     def test_invalid_url(self, mock_get):
-        """Test f_569 function with an invalid URL (not an image)."""
+        """Test f_628 function with an invalid URL (not an image)."""
         mock_get.side_effect = ValueError("Invalid URL")
         with self.assertRaises(ValueError):
-            f_569("https://www.google.com")
+            f_628("https://www.google.com")
     @patch("requests.get")
     def test_nonexistent_url(self, mock_get):
-        """Test f_569 function with a nonexistent URL."""
+        """Test f_628 function with a nonexistent URL."""
         mock_get.side_effect = ValueError("Nonexistent URL")
         with self.assertRaises(ValueError):
-            f_569("https://example.com/nonexistent_image.jpg")
+            f_628("https://example.com/nonexistent_image.jpg")
     @patch("requests.get")
     def test_image_properties(self, mock_get):
-        """Test f_569 function with a known image and check its properties."""
+        """Test f_628 function with a known image and check its properties."""
         with open(self.sample_image_path, "rb") as image_file:
             mock_get.return_value.content = image_file.read()
-        img = f_569("https://www.google.com/images/srpr/logo11w.png")
+        img = f_628("https://www.google.com/images/srpr/logo11w.png")
         self.assertEqual(img.format, "PNG", "Image format does not match expected")
         self.assertEqual(img.size, (100, 100), "Image size does not match expected")
     @patch("requests.get")
     def test_image_mode(self, mock_get):
-        """Test f_569 function with a known image and check its mode."""
+        """Test f_628 function with a known image and check its mode."""
         with open(self.sample_image_path, "rb") as image_file:
             mock_get.return_value.content = image_file.read()
-        img = f_569("https://www.google.com/images/srpr/logo11w.png")
+        img = f_628("https://www.google.com/images/srpr/logo11w.png")
         self.assertEqual(img.mode, "RGBA", "Image mode does not match expected")
     def tearDown(self):
         # Cleanup the test directories

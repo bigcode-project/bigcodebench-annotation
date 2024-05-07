@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.decomposition import PCA
 
 
-def f_732(array, seed=None):
+def f_821(array, seed=None):
     """
     Shuffles the columns of a numpy array randomly, performs Principal Component Analysis (PCA)
     to reduce the dimensionality to 2 principal components, and returns these components as a pandas DataFrame.
@@ -29,7 +29,7 @@ def f_732(array, seed=None):
 
     Examples:
     >>> array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-    >>> df = f_732(array, seed=42)
+    >>> df = f_821(array, seed=42)
     >>> df["PC1"]
     0    5.59017
     1   -5.59017
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
     def test_with_empty_array(self):
         """Test handling of an empty array."""
         array = np.empty((0, 0))
-        df = f_732(array, seed=42)
+        df = f_821(array, seed=42)
         self.assertTrue(df.empty, "The returned DataFrame should be empty.")
         self.assertTrue(
             (df.columns == ["PC1", "PC2"]).all(),
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         )
     def test_with_2x5_array(self):
         """Test PCA on a 2x5 array with shuffled columns."""
-        df = f_732(self.array2x5, seed=42)
+        df = f_821(self.array2x5, seed=42)
         self.assertEqual(df.shape, (2, 2), "DataFrame shape should be (2, 2).")
         self.assertTrue(
             (df.columns == ["PC1", "PC2"]).all(),
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         )
     def test_with_5x1_array(self):
         """Test PCA on a 5x1 array."""
-        df = f_732(self.array5x1, seed=0)
+        df = f_821(self.array5x1, seed=0)
         self.assertEqual(
             df.shape, (5, 1), "DataFrame shape should be (5, 1) for a single component."
         )
@@ -88,11 +88,11 @@ class TestCases(unittest.TestCase):
     def test_invalid_input(self):
         """Test handling of invalid input."""
         with self.assertRaises(ValueError):
-            f_732(np.array([1, 2, 3]), seed=42)
+            f_821(np.array([1, 2, 3]), seed=42)
     def test_reproducibility(self):
         """Test if the function is reproducible with the same seed."""
-        df1 = f_732(self.array2x5, seed=42)
-        df2 = f_732(self.array2x5, seed=42)
+        df1 = f_821(self.array2x5, seed=42)
+        df2 = f_821(self.array2x5, seed=42)
         pd.testing.assert_frame_equal(
             df1, df2, "Results should be identical when using the same seed."
         )
@@ -113,7 +113,7 @@ class TestCases(unittest.TestCase):
                 [10, 10, 10, 10, 10],
             ]
         )  # Increased variance in the last row
-        df = f_732(array, seed=0)
+        df = f_821(array, seed=0)
         # The PCA should be able to capture the variance in the first principal component
         # significantly more than in the second, if applicable.
         # Asserting that the first PC values are not all the same,

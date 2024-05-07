@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def f_573(csv_file_path, col1_name="column1", col2_name="column2"):
+def f_633(csv_file_path, col1_name="column1", col2_name="column2"):
     """
     Reads data from a CSV file and generates a bar plot based on grouped mean values.
 
@@ -34,7 +34,7 @@ def f_573(csv_file_path, col1_name="column1", col2_name="column2"):
     - matplotlib
 
     Example:
-    >>> ax = f_573("data.csv", "group_column", "value_column")
+    >>> ax = f_633("data.csv", "group_column", "value_column")
     >>> ax.get_title()
     'Mean of value_column Grouped by group_column'
 
@@ -84,38 +84,38 @@ class TestCases(unittest.TestCase):
     def test_bar_plot(self, mock_read_csv):
         """Test standard bar plot generation with sample data."""
         mock_read_csv.return_value = self.data["sample_data"]
-        ax = f_573("any_path.csv", "column1", "column2")
+        ax = f_633("any_path.csv", "column1", "column2")
         self.check_plot(ax, "sample_data", "column1", "column2")
     @patch("pandas.read_csv")
     def test_different_data(self, mock_read_csv):
         """Test bar plot with different data set."""
         mock_read_csv.return_value = self.data["different_data"]
-        ax = f_573("any_path.csv", "column1", "column2")
+        ax = f_633("any_path.csv", "column1", "column2")
         self.check_plot(ax, "different_data", "column1", "column2")
     @patch("pandas.read_csv")
     def test_missing_values(self, mock_read_csv):
         """Test bar plot with missing values in data."""
         mock_read_csv.return_value = self.data["missing_values"]
-        ax = f_573("any_path.csv", "column1", "column2")
+        ax = f_633("any_path.csv", "column1", "column2")
         self.check_plot(ax, "missing_values", "column1", "column2")
     @patch("pandas.read_csv")
     def test_different_column_names(self, mock_read_csv):
         """Test bar plot with different column names."""
         mock_read_csv.return_value = self.data["different_columns"]
-        ax = f_573("any_path.csv", "col1", "col2")
+        ax = f_633("any_path.csv", "col1", "col2")
         self.check_plot(ax, "different_columns", "col1", "col2")
     @patch("pandas.read_csv")
     def test_single_group_data(self, mock_read_csv):
         """Test bar plot with data containing only a single group."""
         mock_read_csv.return_value = self.data["single_group_data"]
-        ax = f_573("any_path.csv", "column1", "column2")
+        ax = f_633("any_path.csv", "column1", "column2")
         self.check_plot(ax, "single_group_data", "column1", "column2")
     @patch("pandas.read_csv")
     def test_non_numeric_aggregation_column(self, mock_read_csv):
         """Test bar plot with non-numeric data in the aggregation column."""
         mock_read_csv.return_value = self.data["non_numeric_data"]
         with self.assertRaises(TypeError):
-            f_573("any_path.csv", "column1", "column2")
+            f_633("any_path.csv", "column1", "column2")
     def check_plot(self, ax, data_key, col1, col2):
         """Check the generated bar plot."""
         # Use the correct DataFrame for expected calculations

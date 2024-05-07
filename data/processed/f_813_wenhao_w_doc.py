@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def f_9(data: np.ndarray) -> plt.Axes:
+def f_10(data: np.ndarray) -> plt.Axes:
     """
     Plots the cumulative probability distribution of a given NumPy array of numbers,
     representing how the cumulative probability increases with the sorted data indexes.
@@ -28,7 +28,7 @@ def f_9(data: np.ndarray) -> plt.Axes:
       "Cumulative Probability" on the y-axis.
 
     Example:
-    >>> ax = f_9(np.array([1, 2, 3, 4, 5]))
+    >>> ax = f_10(np.array([1, 2, 3, 4, 5]))
     >>> ax.get_title()
     'Cumulative Probability Plot'
     """
@@ -80,18 +80,18 @@ class TestCases(unittest.TestCase):
     def test_negative_numbers(self):
         data = np.array([-1, 0, 1, 2, 3])
         with self.assertRaises(ValueError):
-            f_9(data)
+            f_10(data)
     def test_nan_values(self):
         data = np.array([1, 2, 3, np.nan, 5])
         with self.assertRaises(ValueError):
-            f_9(data)
+            f_10(data)
     def test_non_numeric_values(self):
         data = np.array([1, 2, 3, "hello", 5])
         with self.assertRaises(TypeError):
-            f_9(data)
+            f_10(data)
     def test_increasing_array(self):
         data = np.array([1, 2, 3])
-        ax = f_9(data)
+        ax = f_10(data)
         expected_cumulative_prob = np.array([1 / 6, 1 / 2, 1])
         self.helper_assert_plot_attributes(ax=ax)
         self.helper_assert_cumulative_probability_correctness(
@@ -99,7 +99,7 @@ class TestCases(unittest.TestCase):
         )
     def test_constant_array(self):
         data = np.array([1, 1, 1, 1, 1])
-        ax = f_9(data)
+        ax = f_10(data)
         self.helper_assert_plot_attributes(ax)
         expected_cumulative_prob = np.array([0.2, 0.4, 0.6, 0.8, 1.0])
         self.helper_assert_cumulative_probability_correctness(
@@ -107,7 +107,7 @@ class TestCases(unittest.TestCase):
         )
     def test_zeros_array(self):
         data = np.array([0, 0, 0, 0, 0])
-        ax = f_9(data)
+        ax = f_10(data)
         self.helper_assert_plot_attributes(ax)
         expected_cumulative_prob = np.array([0, 0, 0, 0, 0])
         self.helper_assert_cumulative_probability_correctness(
@@ -115,7 +115,7 @@ class TestCases(unittest.TestCase):
         )
     def test_single_element_array(self):
         data = np.array([7])
-        ax = f_9(data)
+        ax = f_10(data)
         self.helper_assert_plot_attributes(ax)
         expected_cumulative_prob = np.array([1])
         self.helper_assert_cumulative_probability_correctness(

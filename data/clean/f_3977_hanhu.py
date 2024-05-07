@@ -47,7 +47,6 @@ from unittest.mock import patch
 
 class TestCases(unittest.TestCase):
 
-    @classmethod
     def setUp(self):
         """Set up test environment: create necessary files with mock content."""
         with open('example.txt', 'w') as f:

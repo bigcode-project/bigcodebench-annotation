@@ -3,7 +3,7 @@ from itertools import product
 import string
 
 
-def f_729(length, seed=None, alphabets=list(string.ascii_lowercase)):
+def f_817(length, seed=None, alphabets=list(string.ascii_lowercase)):
     """
     Generate a list of 10 randomly picked strings from all possible strings of a given
     length from the provided series of characters, using a specific seed for
@@ -24,10 +24,10 @@ def f_729(length, seed=None, alphabets=list(string.ascii_lowercase)):
     - string
 
     Example:
-    >>> f_729(2, 123)
+    >>> f_817(2, 123)
     ['tq', 'ob', 'os', 'mk', 'du', 'ar', 'wx', 'ec', 'et', 'vx']
 
-    >>> f_729(2, 123, alphabets=['x', 'y', 'z'])
+    >>> f_817(2, 123, alphabets=['x', 'y', 'z'])
     ['xz', 'xz', 'zx', 'xy', 'yx', 'zx', 'xy', 'xx', 'xy', 'xx']
     """
     np.random.seed(seed)
@@ -37,12 +37,12 @@ def f_729(length, seed=None, alphabets=list(string.ascii_lowercase)):
 import unittest
 class TestCases(unittest.TestCase):
     def test_rng(self):
-        output1 = f_729(2, 123)
-        output2 = f_729(2, 123)
+        output1 = f_817(2, 123)
+        output2 = f_817(2, 123)
         self.assertCountEqual(output1, output2)
     
     def test_case_1(self):
-        output = f_729(2, 123)
+        output = f_817(2, 123)
         self.assertEqual(len(output), 10)
         self.assertTrue(all(len(word) == 2 for word in output))
         self.assertTrue(all(word.islower() for word in output))
@@ -50,7 +50,7 @@ class TestCases(unittest.TestCase):
         self.assertCountEqual(output, expected)
         
     def test_case_2(self):
-        output = f_729(3, 456)
+        output = f_817(3, 456)
         self.assertEqual(len(output), 10)
         self.assertTrue(all(len(word) == 3 for word in output))
         self.assertTrue(all(word.islower() for word in output))
@@ -58,14 +58,14 @@ class TestCases(unittest.TestCase):
         self.assertCountEqual(output, expected)
         
     def test_case_3(self):
-        output = f_729(2, 789, alphabets=['x', 'y', 'z'])
+        output = f_817(2, 789, alphabets=['x', 'y', 'z'])
         self.assertEqual(len(output), 10)
         self.assertTrue(all(len(word) == 2 for word in output))
         self.assertTrue(all(letter in ['x', 'y', 'z'] for word in output for letter in word))
         expected = ['yx', 'xz', 'xy', 'yx', 'yy', 'zz', 'yy', 'xy', 'zz', 'xx']
         self.assertCountEqual(output, expected)
     def test_case_4(self):
-        output = f_729(1, 100)
+        output = f_817(1, 100)
         self.assertEqual(len(output), 10)
         self.assertTrue(all(len(word) == 1 for word in output))
         self.assertTrue(all(word.islower() for word in output))
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         self.assertCountEqual(output, expected)
         
     def test_case_5(self):
-        output = f_729(4, 200, alphabets=['a', 'b'])
+        output = f_817(4, 200, alphabets=['a', 'b'])
         self.assertEqual(len(output), 10)
         self.assertTrue(all(len(word) == 4 for word in output))
         self.assertTrue(all(letter in ['a', 'b'] for word in output for letter in word))

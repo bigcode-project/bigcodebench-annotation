@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 
 
-def f_561(data):
+def f_619(data):
     """
     Analyze a dataset by calculating the average of values across each row and visualizing the correlation matrix as a
     heatmap.
@@ -25,7 +25,7 @@ def f_561(data):
 
     Example:
     >>> data = np.array([[1, 2, 3, 4, 5, 6, 7, 8], [8, 7, 6, 5, 4, 3, 2, 1]])
-    >>> df, ax = f_561(data)
+    >>> df, ax = f_619(data)
     >>> print(df['Average'].to_string(index=False))
     4.5
     4.5
@@ -52,19 +52,19 @@ class TestCases(unittest.TestCase):
         # Remove any files or handle other cleanup actions
         plt.close('all')
     def test_dataframe_structure(self):
-        df, _ = f_561(self.data)
+        df, _ = f_619(self.data)
         self.assertIn('Average', df.columns, "DataFrame should contain an 'Average' column")
     def test_average_calculation(self):
-        df, _ = f_561(self.data)
+        df, _ = f_619(self.data)
         expected_averages = [3.125, 3.375]  # The average of rows
         pd.testing.assert_series_equal(df['Average'], pd.Series(expected_averages, name='Average'), check_dtype=True)
     def test_heatmap_plot_returned(self):
-        _, ax = f_561(self.data)
+        _, ax = f_619(self.data)
         self.assertIsInstance(ax, plt.Axes,
                               "The returned object should be a plt.Axes instance indicating a plot was created")
     def test_correlation_calculation(self):
         # Test to ensure that the correlation matrix is calculated correctly
-        df, _ = f_561(self.data)
+        df, _ = f_619(self.data)
         expected_correlation = pd.DataFrame(self.data).corr()
         actual_correlation = \
             sns.heatmap(pd.DataFrame(self.data).corr(), annot=True, cmap='coolwarm').get_figure().axes[0].collections[
@@ -73,4 +73,4 @@ class TestCases(unittest.TestCase):
     def test_input_validation(self):
         # Test to ensure that non-2D arrays are handled properly
         with self.assertRaises(ValueError):
-            f_561(np.array([1, 2, 3]))  # Not a 2D array
+            f_619(np.array([1, 2, 3]))  # Not a 2D array

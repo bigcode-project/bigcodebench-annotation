@@ -5,7 +5,7 @@ import glob
 
 
 
-def f_572(filepath, destination_dir):
+def f_632(filepath, destination_dir):
     """
     Loads a DLL file specified by the given filepath and moves all DLL files in the same directory
     to another specified directory. This function demonstrates file operations including DLL loading,
@@ -26,9 +26,9 @@ def f_572(filepath, destination_dir):
 
     Examples:
     >>> destination = 'destination_dir'
-    >>> f_572('libc.so.6', destination) # Doctest will vary based on system and file availability.
+    >>> f_632('libc.so.6', destination) # Doctest will vary based on system and file availability.
     'libc.so.6'
-    >>> isinstance(f_572('libc.so.6', destination), str)
+    >>> isinstance(f_632('libc.so.6', destination), str)
     True
     """
     lib = ctypes.CDLL(filepath)
@@ -52,22 +52,22 @@ class TestCases(unittest.TestCase):
             file.write('')
     @patch('ctypes.CDLL', autospec=True)
     def test_return_type(self, mock_cdll):
-        self.assertIsInstance(f_572(self.sample_dll, self.destination_dir), str)
+        self.assertIsInstance(f_632(self.sample_dll, self.destination_dir), str)
         
     @patch('ctypes.CDLL', autospec=True)
     def test_dll_file_movement(self, mock_cdll):
         """Test if DLL files are correctly moved to the destination directory."""
-        f_572(self.sample_dll, self.destination_dir)
+        f_632(self.sample_dll, self.destination_dir)
         
         # Check that the DLL file has been moved to the destination directory
         self.assertFalse(os.path.exists(self.sample_dll), "The DLL file should not exist in the source directory after moving.")
         self.assertTrue(os.path.exists(os.path.join(self.destination_dir, 'sample.dll')), "The DLL file should exist in the destination directory after moving.")
     def test_invalid_file_path(self):
         with self.assertRaises(OSError):
-            f_572('invalid_path.dll', self.destination_dir)
+            f_632('invalid_path.dll', self.destination_dir)
     def test_invalid_destination_dir(self):
         with self.assertRaises(OSError):
-            f_572(self.sample_dll, 'invalid_destination')
+            f_632(self.sample_dll, 'invalid_destination')
     @patch('ctypes.CDLL')
     def test_file_movement_with_mock_cdll(self, mock_cdll):
         # Setup the mock CDLL instance
@@ -77,14 +77,14 @@ class TestCases(unittest.TestCase):
         example_function_mock = MagicMock(return_value=42)  # Assume it returns an integer
         mock_cdll_instance.example_function = example_function_mock
         # Call the function under test
-        f_572(self.sample_dll, self.destination_dir)
+        f_632(self.sample_dll, self.destination_dir)
         # Verify the DLL was "loaded"
         mock_cdll.assert_called_once_with(self.sample_dll)
     @patch('ctypes.CDLL', autospec=True)
     def test_no_dll_in_source(self, cdll):
         # Remove the DLL file and run the function
         os.remove(self.sample_dll)
-        f_572(self.sample_dll, self.destination_dir)
+        f_632(self.sample_dll, self.destination_dir)
         # Check that no new files are in the destination directory
         self.assertEqual(len(os.listdir(self.destination_dir)), 0)
     def tearDown(self):

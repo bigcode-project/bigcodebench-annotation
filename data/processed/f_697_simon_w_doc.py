@@ -1,7 +1,7 @@
 import collections
 import pandas as pd
 
-def f_360(obj_list, attr):
+def f_397(obj_list, attr):
     """
     Count the frequency of each value of the given attribute from a list of objects.
     
@@ -29,7 +29,7 @@ def f_360(obj_list, attr):
     ...         self.shape = shape
     ...
     >>> obj_list = [ExampleObject('Red', 'Square'), ExampleObject('Green', 'Circle'), ExampleObject('Red', 'Rectangle')]
-    >>> count = f_360(obj_list, 'color')
+    >>> count = f_397(obj_list, 'color')
     >>> print(count)
       attribute  count
     0       Red      2
@@ -42,7 +42,7 @@ def f_360(obj_list, attr):
     ...         self.shape = shape
     ...
     >>> obj_list = [ExampleObject('tiger', 'Square'), ExampleObject('leopard', 'Circle'), ExampleObject('cat', 'Rectangle'), ExampleObject('elephant', 'Rectangle')]
-    >>> count = f_360(obj_list, 'shape')
+    >>> count = f_397(obj_list, 'shape')
     >>> print(count)
        attribute  count
     0     Square      1
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
             self.ExampleObject('Green', 'Circle'),
             self.ExampleObject('Red', 'Rectangle')
         ]
-        result = f_360(obj_list, 'color')
+        result = f_397(obj_list, 'color')
         expected = pd.DataFrame({
             'attribute': ['Red', 'Green'],
             'count': [2, 1]
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
             self.ExampleObject('Green', 'Circle'),
             self.ExampleObject('Red', 'Square')
         ]
-        result = f_360(obj_list, 'shape')
+        result = f_397(obj_list, 'shape')
         expected = pd.DataFrame({
             'attribute': ['Square', 'Circle'],
             'count': [2, 1]
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result.sort_index(), expected)
     def test_case_3(self):
         obj_list = []
-        result = f_360(obj_list, 'color')
+        result = f_397(obj_list, 'color')
         self.assertTrue(result.empty)
     def test_case_4(self):
         obj_list = [
@@ -98,7 +98,7 @@ class TestCases(unittest.TestCase):
             self.ExampleObject('Red', 'Square'),
             self.ExampleObject('Red', 'Square')
         ]
-        result = f_360(obj_list, 'color')
+        result = f_397(obj_list, 'color')
         expected = pd.DataFrame({
             'attribute': ['Red'],
             'count': [3]
@@ -110,7 +110,7 @@ class TestCases(unittest.TestCase):
             self.ExampleObject('Green', 'Circle'),
             self.ExampleObject('Blue', 'Triangle')
         ]
-        result = f_360(obj_list, 'shape')
+        result = f_397(obj_list, 'shape')
         expected = pd.DataFrame({
             'attribute': ['Square', 'Circle', 'Triangle'],
             'count': [1, 1, 1]

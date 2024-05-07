@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 
-def f_615(x, y, labels):
+def f_682(x, y, labels):
     """
     Scale the "x" and "y" arrays using the standard scaler of sklearn and plot them with given labels.
     Each pair of x and y arrays are scaled independently and plotted as a separate series with a label.
@@ -25,7 +25,7 @@ def f_615(x, y, labels):
     >>> x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
     >>> y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
     >>> labels = ['A', 'B', 'C']
-    >>> fig = f_615(x, y, labels)
+    >>> fig = f_682(x, y, labels)
     >>> plt.show()
     """
     scaler = StandardScaler()
@@ -47,16 +47,16 @@ class TestCases(unittest.TestCase):
         self.labels = ['Group 1', 'Group 2']
     def test_figure_type(self):
         """Test that the function returns a matplotlib figure."""
-        fig = f_615(self.x, self.y, self.labels)
+        fig = f_682(self.x, self.y, self.labels)
         self.assertTrue(str(type(fig)).endswith("matplotlib.figure.Figure'>"))
     def test_plot_labels(self):
         """Test that the correct number of labels are in the legend."""
-        fig = f_615(self.x, self.y, self.labels)
+        fig = f_682(self.x, self.y, self.labels)
         ax = fig.axes[0]
         self.assertEqual(len(ax.get_legend_handles_labels()[1]), len(self.labels))
     def test_non_empty_plot(self):
         """Test that the plot is not empty."""
-        fig = f_615(self.x, self.y, self.labels)
+        fig = f_682(self.x, self.y, self.labels)
         ax = fig.axes[0]
         self.assertTrue(len(ax.lines) > 0)
     def test_scaled_values_range(self):
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         """Test that the original input arrays are unchanged after scaling."""
         x_original = [arr.copy() for arr in self.x]
         y_original = [arr.copy() for arr in self.y]
-        f_615(self.x, self.y, self.labels)
+        f_682(self.x, self.y, self.labels)
         for orig, after in zip(x_original, self.x):
             npt.assert_array_equal(orig, after)
         for orig, after in zip(y_original, self.y):

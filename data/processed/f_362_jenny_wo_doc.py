@@ -1,7 +1,7 @@
 import subprocess
 import pandas as pd
 
-def f_368(script_path, output_file_path):
+def f_407(script_path, output_file_path):
     """
     Executes a script to produce a CSV, reads the CSV, and plots a bar graph from the data.
 
@@ -26,7 +26,7 @@ def f_368(script_path, output_file_path):
     - subprocess
 
     Examples:
-    >>> df, ax = f_368("generate_data.sh", "data.csv")
+    >>> df, ax = f_407("generate_data.sh", "data.csv")
     >>> type(df)
     <class 'pandas.core.frame.DataFrame'>
     >>> type(ax)
@@ -93,7 +93,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test plot generation
         self._create_script(self.valid_csv_content)
-        df, ax = f_368(self.script_path, self.output_path)
+        df, ax = f_407(self.script_path, self.output_path)
         expected_labels = df.iloc[:, 0].tolist()
         x_tick_labels = [tick.get_text() for tick in ax.get_xticklabels()]
         # Expected return object type
@@ -108,7 +108,7 @@ class TestCases(unittest.TestCase):
         expected_columns = ["Name", "Value"]
         expected_data = {"Name": ["A", "B", "C"], "Value": [1, 2, 3]}
         self._create_script(self.valid_csv_content)
-        df, ax = f_368(self.script_path, self.output_path)
+        df, ax = f_407(self.script_path, self.output_path)
         self.assertIsInstance(df, pd.DataFrame)
         self.assertEqual(df.shape, (3, 2))
         self._validate_y_tick_labels(ax, df)
@@ -119,7 +119,7 @@ class TestCases(unittest.TestCase):
         # Test handling of script execution failure
         self._create_script(["exit 1\n"])
         with self.assertRaises(ValueError):
-            f_368(self.script_path, self.output_path)
+            f_407(self.script_path, self.output_path)
     def test_case_4(self):
         # Test handling of files with too many columns
         content = [
@@ -129,7 +129,7 @@ class TestCases(unittest.TestCase):
         ]
         self._create_script(content)
         with self.assertRaises(ValueError):
-            f_368(self.script_path, self.output_path)
+            f_407(self.script_path, self.output_path)
     def test_case_5(self):
         # Test handling of files with too few columns
         content = [
@@ -139,13 +139,13 @@ class TestCases(unittest.TestCase):
         ]
         self._create_script(content)
         with self.assertRaises(ValueError):
-            f_368(self.script_path, self.output_path)
+            f_407(self.script_path, self.output_path)
     def test_case_6(self):
         # Test handling of empty file
         content = [f"> {self.output_path}\n"]
         self._create_script(content)
         with self.assertRaises(ValueError):
-            f_368(self.script_path, self.output_path)
+            f_407(self.script_path, self.output_path)
     def test_case_7(self):
         # Test handling non-numeric values
         content = [
@@ -155,7 +155,7 @@ class TestCases(unittest.TestCase):
         ]
         self._create_script(content)
         with self.assertRaises(TypeError):
-            f_368(self.script_path, self.output_path)
+            f_407(self.script_path, self.output_path)
     def test_case_8(self):
         # Test handling missing values
         content = [
@@ -164,13 +164,13 @@ class TestCases(unittest.TestCase):
             f'echo "B,2" >> {self.output_path}\n',
         ]
         self._create_script(content)
-        df, _ = f_368(self.script_path, self.output_path)
+        df, _ = f_407(self.script_path, self.output_path)
         self.assertTrue(df.isnull().values.any())
         self.assertEqual(df.shape, (2, 2))
     def test_case_9(self):
         # Handle handling of non-exitent script
         with self.assertRaises(ValueError):
-            f_368(
+            f_407(
                 os.path.join(self.temp_dir.name, "invalid_script_nonexist.sh"),
                 self.output_path,
             )

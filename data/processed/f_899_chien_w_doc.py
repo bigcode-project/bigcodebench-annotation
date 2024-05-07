@@ -3,7 +3,7 @@ import itertools
 import random
 
 
-def f_164(colors, states):
+def f_176(colors, states):
     """
     Generates a pandas DataFrame containing shuffled combinations of provided colors and states.
     The DataFrame is formatted so that each column represents a series of unique combinations,
@@ -33,7 +33,7 @@ def f_164(colors, states):
     Example:
     >>> colors = ['Red', 'Blue', 'Green']
     >>> states = ['Solid', 'Liquid']
-    >>> color_state_table = f_164(colors, states)
+    >>> color_state_table = f_176(colors, states)
     >>> print(color_state_table)
       Color:State 1 Color:State 2
     0   Blue:Liquid    Red:Liquid
@@ -57,27 +57,27 @@ import unittest
 import pandas as pd
 import random
 class TestCases(unittest.TestCase):
-    """Test cases for f_164."""
+    """Test cases for f_176."""
     def test_empty_lists(self):
         """Test with empty color and state lists."""
-        self.assertEqual(f_164([], []).empty, True)
+        self.assertEqual(f_176([], []).empty, True)
     def test_single_color_and_state(self):
         """Test with one color and one state."""
         random.seed(0)
-        result = f_164(["Red"], ["Solid"])
+        result = f_176(["Red"], ["Solid"])
         expected = pd.DataFrame({"Color:State 1": ["Red:Solid"]})
         pd.testing.assert_frame_equal(result, expected)
     def test_multiple_colors_single_state(self):
         """Test with multiple colors and a single state."""
         random.seed(1)
-        result = f_164(["Red", "Blue", "Green"], ["Solid"])
+        result = f_176(["Red", "Blue", "Green"], ["Solid"])
         expected_combinations = set(["Red:Solid", "Blue:Solid", "Green:Solid"])
         result_combinations = set(result["Color:State 1"])
         self.assertEqual(result_combinations, expected_combinations)
     def test_single_color_multiple_states(self):
         """Test with a single color and multiple states."""
         random.seed(2)
-        result = f_164(["Red"], ["Solid", "Liquid", "Gas"])
+        result = f_176(["Red"], ["Solid", "Liquid", "Gas"])
         expected_combinations = set(["Red:Solid", "Red:Liquid", "Red:Gas"])
         result_combinations = set(result["Color:State 1"])
         self.assertEqual(result_combinations, expected_combinations)
@@ -86,7 +86,7 @@ class TestCases(unittest.TestCase):
         random.seed(3)
         colors = ["Red", "Blue"]
         states = ["Solid", "Liquid"]
-        result = f_164(colors, states)
+        result = f_176(colors, states)
         expected_combinations = set(
             [f"{color}:{state}" for color in colors for state in states]
         )

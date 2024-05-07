@@ -18,7 +18,7 @@ STOPWORDS = set(["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "y
                  "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "simple", "test"])
 
 
-def f_94(text, n=2):
+def f_97(text, n=2):
     """
     Analyzes a text string, removing duplicate consecutive words and stopwords,
     generates a square co-occurrence matrix of words, and plots this matrix.
@@ -42,7 +42,7 @@ def f_94(text, n=2):
     Example:
     >>> import matplotlib
     >>> text = "hello hello world world"
-    >>> df, ax = f_94(text, n=2)
+    >>> df, ax = f_97(text, n=2)
     >>> df.columns.tolist()
     ['hello world']
     >>> df.index.tolist()
@@ -79,28 +79,28 @@ class TestCases(unittest.TestCase):
     def test_simple_text(self):
         """Test with a simple text."""
         text = "hello world"
-        matrix, _ = f_94(text)
+        matrix, _ = f_97(text)
         self.assertEqual(matrix.shape, (1, 1), "Matrix shape should be (1, 1) for unique words 'hello' and 'world'.")
     def test_text_with_stopwords(self):
         """Test text with stopwords removed."""
         text = "this is a simple test"
-        matrix, _ = f_94(text)
+        matrix, _ = f_97(text)
         self.assertTrue(matrix.empty, "Matrix should be empty after removing stopwords.")
     def test_duplicate_words(self):
         """Test text with duplicate consecutive words."""
         text = "happy happy joy joy"
-        matrix, _ = f_94(text)
+        matrix, _ = f_97(text)
         self.assertIn('happy joy', matrix.columns, "Matrix should contain 'happy joy' after duplicates are removed.")
     def test_ngram_range(self):
         """Test with a specific n-gram range."""
         text = "jump high and run fast"
         # Assuming no preprocessing that removes words, we expect 3 unique tri-grams.
-        matrix, _ = f_94(text, n=3)
+        matrix, _ = f_97(text, n=3)
         # Expecting a 3x3 matrix since there are 3 unique tri-grams with no overlap in this simple case.
         self.assertEqual(matrix.shape, (2, 2),
                          "Matrix shape should be (3, 3) for a tri-gram analysis without word removal.")
     def test_empty_text(self):
         """Test with an empty string."""
         text = ""
-        matrix, _ = f_94(text)
+        matrix, _ = f_97(text)
         self.assertTrue(matrix.empty, "Matrix should be empty for an empty string.")

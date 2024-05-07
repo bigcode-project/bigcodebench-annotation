@@ -3,7 +3,7 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
 
-def f_646(P, T, tensor_shape=(3, 3, 3)):
+def f_715(P, T, tensor_shape=(3, 3, 3)):
     """
     Calculate the product of a matrix "P" and a 3D tensor "T" with numpy and then apply PCA to reduce the
     dimensionality of the result. The resulting 2D data is then visualized.
@@ -29,7 +29,7 @@ def f_646(P, T, tensor_shape=(3, 3, 3)):
     Example:
     >>> P = np.array([[6, 2, 7], [1, 1, 8], [8, 7, 1], [9, 6, 4], [2, 1, 1]])
     >>> T = np.array([[[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
-    >>> pca_result, ax = f_646(P, T)
+    >>> pca_result, ax = f_715(P, T)
     >>> pca_result.shape
     (3, 2)
     >>> type(ax)
@@ -63,38 +63,38 @@ class TestCases(unittest.TestCase):
         self.T_ones = np.ones(self.TENSOR_SHAPE)
     def test_case_1(self):
         # Test results and plot correctness
-        pca_result, ax = f_646(self.P, self.T)
+        pca_result, ax = f_715(self.P, self.T)
         self._common_assertions(pca_result, ax)
     def test_case_2(self):
         # Function should fail when input types are invalid
         with self.assertRaises(Exception):
-            f_646("not a numpy array", self.T, self.TENSOR_SHAPE)
+            f_715("not a numpy array", self.T, self.TENSOR_SHAPE)
         with self.assertRaises(Exception):
-            f_646(self.P, "not a numpy array", self.TENSOR_SHAPE)
+            f_715(self.P, "not a numpy array", self.TENSOR_SHAPE)
         with self.assertRaises(Exception):
-            f_646([], [], self.TENSOR_SHAPE)
+            f_715([], [], self.TENSOR_SHAPE)
     def test_case_3(self):
         # Function should fail when input shapes are invalid
         T_incorrect_shape = np.random.rand(2, 2, 2)
         with self.assertRaises(Exception):
-            f_646(self.P, T_incorrect_shape, self.TENSOR_SHAPE)
+            f_715(self.P, T_incorrect_shape, self.TENSOR_SHAPE)
         with self.assertRaises(Exception):
-            f_646(np.array([]), np.array([]), self.TENSOR_SHAPE)
+            f_715(np.array([]), np.array([]), self.TENSOR_SHAPE)
     def test_case_4(self):
         # Test custom shapes
         P = np.random.rand(5, 4)
         T = np.random.rand(5, 4, 4)
-        pca_result, ax = f_646(P, T, tensor_shape=T.shape)
+        pca_result, ax = f_715(P, T, tensor_shape=T.shape)
         self._common_assertions(pca_result, ax)
     def test_case_5(self):
         # Test with zeros
-        pca_result, ax = f_646(self.P, self.T_zeros)
+        pca_result, ax = f_715(self.P, self.T_zeros)
         self._common_assertions(pca_result, ax)
     def test_case_6(self):
         # Adjusting the matrix and tensor to have a slight variation
         P = np.array([[1.01, 0.01, 0.01], [0.01, 1.01, 0.01], [0.01, 0.01, 1.01]])
         T = np.ones(self.TENSOR_SHAPE) + 0.01 * np.random.rand(*self.TENSOR_SHAPE)
-        pca_result, ax = f_646(P, T)
+        pca_result, ax = f_715(P, T)
         # Assert that the PCA results don't produce NaN values and that there's a reduction in dimensionality
         self.assertFalse(np.isnan(pca_result).any())
         self.assertEqual(pca_result.shape[1], 2)

@@ -3,7 +3,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 
-def f_419(directory_path: str):
+def f_460(directory_path: str):
     """
     Analyzes a given directory, listing each file it contains along with its size,
     creation time, and last modification time without recursing into subdirectories.
@@ -33,11 +33,11 @@ def f_419(directory_path: str):
       metadata change time.
 
     Examples:
-    >>> result = f_419('/path/to/directory')
+    >>> result = f_460('/path/to/directory')
     >>> print(result)
     [('example.txt', 1024, '2023-04-01T14:30:00Z', '2023-04-02T15:00:00Z'), ...]
 
-    >>> result = f_419('/path/to/empty_directory')
+    >>> result = f_460('/path/to/empty_directory')
     >>> print(result)
     []
     """
@@ -86,26 +86,26 @@ class TestCases(unittest.TestCase):
         self.test_dir.cleanup()
     def test_case_1(self):
         # Test the function on an existing directory.
-        result = f_419(self.test_dir.name)
+        result = f_460(self.test_dir.name)
         self.assertEqual(len(result), len(self.files))
     def test_case_2(self):
         # Test the function with a non-existing directory.
         with self.assertRaises(ValueError):
-            f_419("/path/to/non/existing/directory")
+            f_460("/path/to/non/existing/directory")
     def test_case_3(self):
         # Test the function with an empty directory.
         with tempfile.TemporaryDirectory() as empty_dir:
-            result = f_419(empty_dir)
+            result = f_460(empty_dir)
             self.assertEqual(len(result), 0)
     def test_case_4(self):
         # Test if the function correctly identifies file sizes.
-        result = f_419(self.test_dir.name)
+        result = f_460(self.test_dir.name)
         sizes = {file[0]: file[1] for file in result}
         for file_name, size in self.files.items():
             self.assertEqual(sizes[file_name], size)
     def test_case_5(self):
         # Test if the function lists all expected files, regardless of order.
-        result = f_419(self.test_dir.name)
+        result = f_460(self.test_dir.name)
         file_names = sorted([file[0] for file in result])
         expected_file_names = sorted(
             list(self.files.keys())
@@ -113,7 +113,7 @@ class TestCases(unittest.TestCase):
         self.assertListEqual(file_names, expected_file_names)
     def test_case_6(self):
         # Test if modification times are correctly identified.
-        result = f_419(self.test_dir.name)
+        result = f_460(self.test_dir.name)
         # Check if modification times are reasonable (not testing specific times because of system differences)
         for _, _, creation_time, modification_time in result:
             creation_datetime = datetime.fromisoformat(creation_time)
@@ -126,13 +126,13 @@ class TestCases(unittest.TestCase):
         # Add a file inside the sub-directory to ensure it's not empty
         with open(os.path.join(sub_dir_path, "file.txt"), "w") as sub_file:
             sub_file.write("This is a test.")
-        result = f_419(self.test_dir.name)
+        result = f_460(self.test_dir.name)
         self.assertEqual(
             len(result), len(self.files)
         )  # Should not count the subdir or its contents
     def test_case_8(self):
         # Test if file names are correctly identified.
-        result = f_419(self.test_dir.name)
+        result = f_460(self.test_dir.name)
         names = [file[0] for file in result]
         for name in self.files.keys():
             self.assertIn(name, names)
@@ -140,11 +140,11 @@ class TestCases(unittest.TestCase):
         # Test that a non-directory path raises a ValueError.
         with tempfile.NamedTemporaryFile() as tmpfile:
             with self.assertRaises(ValueError):
-                f_419(tmpfile.name)
+                f_460(tmpfile.name)
     def test_case_10(self):
         # Test timestamps are in UTC and within a reasonable accuracy window.
         self.after_creation = datetime.now(timezone.utc)
-        result = f_419(self.test_dir.name)
+        result = f_460(self.test_dir.name)
         for _, _, creation_time, modification_time in result:
             creation_dt = datetime.fromisoformat(creation_time)
             modification_dt = datetime.fromisoformat(modification_time)

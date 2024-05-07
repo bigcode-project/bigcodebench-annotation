@@ -3,7 +3,7 @@ import time
 output_dir = './output'
 
 
-def f_187(dataset, filename):
+def f_203(dataset, filename):
     """
     Writes multiple Pandas DataFrames to a single CSV file, separating each DataFrame by a line of hyphens ("------").
 
@@ -22,7 +22,7 @@ def f_187(dataset, filename):
     >>> import pandas as pd
     >>> df1 = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
     >>> df2 = pd.DataFrame({"D": [5, 6], "E": [7, 8]})
-    >>> f_187([df1, df2], 'sample.csv')
+    >>> f_203([df1, df2], 'sample.csv')
     """
     start_time = time.time()
     if not os.path.exists(output_dir):
@@ -53,26 +53,26 @@ class TestCases(unittest.TestCase):
     def test_single_dataframe(self):
         """Test with a single DataFrame."""
         df = pd.DataFrame({"Column1": [1, 2], "Column2": [3, 4]})
-        f_187([df], 'single_dataframe.csv')
+        f_203([df], 'single_dataframe.csv')
         self.assertTrue(os.path.exists(os.path.join(output_dir, 'single_dataframe.csv')))
     def test_multiple_dataframes(self):
         """Test with multiple DataFrames."""
         df1 = pd.DataFrame({"A": [5, 6], "B": [7, 8]})
         df2 = pd.DataFrame({"C": [9, 10], "D": [11, 12]})
-        f_187([df1, df2], 'multiple_dataframes.csv')
+        f_203([df1, df2], 'multiple_dataframes.csv')
         self.assertTrue(os.path.exists(os.path.join(output_dir, 'multiple_dataframes.csv')))
     def test_empty_dataframe(self):
         """Test with an empty DataFrame."""
         df = pd.DataFrame()
-        f_187([df], 'empty_dataframe.csv')
+        f_203([df], 'empty_dataframe.csv')
         self.assertTrue(os.path.exists(os.path.join(output_dir, 'empty_dataframe.csv')))
     def test_varying_row_counts(self):
         """Test with DataFrames having varying numbers of rows."""
         df1 = pd.DataFrame({"E": [13], "F": [14]})
         df2 = pd.DataFrame({"G": [15, 16, 17], "H": [18, 19, 20]})
-        f_187([df1, df2], 'varying_row_counts.csv')
+        f_203([df1, df2], 'varying_row_counts.csv')
         self.assertTrue(os.path.exists(os.path.join(output_dir, 'varying_row_counts.csv')))
     def test_no_dataframes(self):
         """Test with no DataFrames provided."""
-        f_187([], 'no_dataframes.csv')
+        f_203([], 'no_dataframes.csv')
         self.assertTrue(os.path.exists(os.path.join(output_dir, 'no_dataframes.csv')))

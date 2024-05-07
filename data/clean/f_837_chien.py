@@ -118,7 +118,6 @@ class MockResponse:
 class TestCases(unittest.TestCase):
     """Tests for the f_837 function"""
 
-    @classmethod
     def setUp(self):
         """Set up any necessary resources before any tests are run."""
         os.makedirs("mnt/data", exist_ok=True)  # Create the directory for test files

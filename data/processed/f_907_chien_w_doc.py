@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 from sklearn.decomposition import PCA
 
 
-def f_716(arr):
+def f_801(arr):
     """
     Performs Principal Component Analysis (PCA) on the sum of rows of a 2D numpy array and plots the explained variance ratio.
 
@@ -27,7 +27,7 @@ def f_716(arr):
     Example:
     >>> import numpy as np
     >>> arr = np.array([[i+j for i in range(3)] for j in range(5)])
-    >>> axes = f_716(arr)
+    >>> axes = f_801(arr)
     >>> axes.get_title()
     'Explained Variance Ratio of Principal Components'
     """
@@ -46,23 +46,23 @@ import numpy as np
 from sklearn.decomposition import PCA
 from matplotlib import pyplot as plt
 class TestCases(unittest.TestCase):
-    """Tests for function f_716."""
+    """Tests for function f_801."""
     def test_basic_functionality(self):
-        """Test basic functionality of f_716."""
+        """Test basic functionality of f_801."""
         arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        result = f_716(arr)
+        result = f_801(arr)
         self.assertIsInstance(result, plt.Axes)
     def test_plot_title_verification(self):
         """Test that the plot title is correct."""
         arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        result = f_716(arr)
+        result = f_801(arr)
         self.assertEqual(
             result.get_title(), "Explained Variance Ratio of Principal Components"
         )
     def test_bar_count_verification(self):
         """Test that the number of bars is correct."""
         arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        result = f_716(arr)
+        result = f_801(arr)
         n_components = min(2, arr.sum(axis=1).reshape(-1, 1).shape[1])
         self.assertEqual(len(result.patches), n_components)
     def test_variance_ratios_verification(self):
@@ -72,11 +72,11 @@ class TestCases(unittest.TestCase):
         n_components = min(2, row_sums.reshape(-1, 1).shape[1])
         pca = PCA(n_components=n_components)
         pca.fit(row_sums.reshape(-1, 1))
-        result = f_716(arr)
+        result = f_801(arr)
         for bar, variance_ratio in zip(result.patches, pca.explained_variance_ratio_):
             self.assertAlmostEqual(bar.get_height(), variance_ratio)
     def test_empty_input(self):
         """Test that an empty input raises a ValueError."""
         arr = np.array([])
         with self.assertRaises(ValueError):
-            f_716(arr)
+            f_801(arr)

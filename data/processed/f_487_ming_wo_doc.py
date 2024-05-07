@@ -6,7 +6,7 @@ from dateutil.parser import parse
 TIMEZONES = ['America/New_York', 'Europe/London', 'Asia/Shanghai', 'Asia/Tokyo', 'Australia/Sydney']
 
 
-def f_458(date_str, from_tz):
+def f_505(date_str, from_tz):
     """
     Converts a datetime string from a given timezone to a datetime string in a randomly chosen timezone.
 
@@ -24,7 +24,7 @@ def f_458(date_str, from_tz):
 
     Example:
     >>> date_str, from_tz = '2023-06-15 12:00:00', 'UTC'
-    >>> converted_date, to_tz = f_458(date_str, from_tz)
+    >>> converted_date, to_tz = f_505(date_str, from_tz)
     >>> to_tz in TIMEZONES
     True
     """
@@ -38,7 +38,7 @@ import unittest
 from datetime import datetime
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = f_458('2023-06-15 12:00:00', 'UTC')
+        result = f_505('2023-06-15 12:00:00', 'UTC')
         self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 2)
         datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
@@ -46,7 +46,7 @@ class TestCases(unittest.TestCase):
         self.assertIn(result[1], TIMEZONES)
     
     def test_case_2(self):
-        result = f_458('2022-01-01 00:00:00', 'America/New_York')
+        result = f_505('2022-01-01 00:00:00', 'America/New_York')
         self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 2)
         datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
         self.assertIn(result[1], TIMEZONES)
         
     def test_case_3(self):
-        result = f_458('2020-12-31 23:59:59', 'Asia/Shanghai')
+        result = f_505('2020-12-31 23:59:59', 'Asia/Shanghai')
         self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 2)
         datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
@@ -62,7 +62,7 @@ class TestCases(unittest.TestCase):
         self.assertIn(result[1], TIMEZONES)
         
     def test_case_4(self):
-        result = f_458('2019-07-04 04:04:04', 'Europe/London')
+        result = f_505('2019-07-04 04:04:04', 'Europe/London')
         self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 2)
         datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         self.assertIn(result[1], TIMEZONES)
     
     def test_case_5(self):
-        result = f_458('2018-02-28 14:28:58', 'Australia/Sydney')
+        result = f_505('2018-02-28 14:28:58', 'Australia/Sydney')
         self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 2)
         datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import random
 
-def f_680(rows=3, cols=2, min_val=0, max_val=100, seed=0):
+def f_754(rows=3, cols=2, min_val=0, max_val=100, seed=0):
     """
     Creates a matrix of specified dimensions with random integers within a given range,
     and then converts it into a pandas DataFrame.
@@ -22,7 +22,7 @@ def f_680(rows=3, cols=2, min_val=0, max_val=100, seed=0):
     - random
 
     Example:
-    >>> df = f_680(3, 2, 0, 100)
+    >>> df = f_754(3, 2, 0, 100)
     >>> print(type(df))
     <class 'pandas.core.frame.DataFrame'>
     >>> print(df.shape)
@@ -40,26 +40,26 @@ import unittest
 import pandas as pd
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = f_680()
+        df = f_754()
         self.assertIsInstance(df, pd.DataFrame)
         self.assertEqual(df.iloc[:, 0].tolist(), [49, 53, 33])
         self.assertEqual(df.iloc[:, 1].tolist(), [97, 5, 65])
         
     def test_case_2(self):
-        df = f_680(rows=5, cols=4)
+        df = f_754(rows=5, cols=4)
         self.assertIsInstance(df, pd.DataFrame)
         self.assertEqual(df.iloc[:, 0].tolist(), [49, 33, 38, 27, 17])
         self.assertEqual(df.iloc[:, 1].tolist(), [97, 65, 61, 64, 96])
         self.assertEqual(df.iloc[:, 2].tolist(), [53, 62, 45, 17, 12])
     def test_case_3(self):
-        df = f_680(min_val=10, max_val=20)
+        df = f_754(min_val=10, max_val=20)
         self.assertEqual(df.iloc[:, 0].tolist(), [16, 10, 18])
         self.assertEqual(df.iloc[:, 1].tolist(), [16, 14, 17])
         
     def test_case_4(self):
-        df = f_680(min_val=50, max_val=50)
+        df = f_754(min_val=50, max_val=50)
         self.assertEqual(df.iloc[:, 0].tolist(), [50, 50, 50])
         self.assertEqual(df.iloc[:, 1].tolist(), [50, 50, 50])
     def test_case_5(self):
-        df = f_680(rows=0, cols=2)
+        df = f_754(rows=0, cols=2)
         self.assertTrue(df.empty)

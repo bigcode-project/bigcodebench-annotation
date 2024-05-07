@@ -3,7 +3,7 @@ from sklearn.feature_selection import SelectKBest, f_classif
 import seaborn as sns
 
 
-def f_444(df1, df2):
+def f_490(df1, df2):
     """Perform the feature selection with SelectKBest (k=2) and return a heatmap of the feature correlations.
 
     Parameters:
@@ -24,7 +24,7 @@ def f_444(df1, df2):
     Example:
     >>> df1 = pd.DataFrame({'id': [1, 2, 3], 'feature1': [1.2, 3.4, 5.6], 'feature2': [2.3, 4.5, 6.7], 'feature3': [3.4, 5.6, 7.8]})
     >>> df2 = pd.DataFrame({'id': [1, 2, 3], 'target': [4.5, 6.7, 8.9]})
-    >>> selected_features, heatmap = f_444(df1, df2)
+    >>> selected_features, heatmap = f_490(df1, df2)
     >>> heatmap
     <Axes: >
     >>> selected_features
@@ -60,7 +60,7 @@ class TestCases(unittest.TestCase):
         )
         df2 = pd.DataFrame({"id": [1, 2, 3, 4, 5], "target": [1, 0, 1, 0, 1]})
         # Calling the function and asserting results
-        selected_features, ax = f_444(df1, df2)
+        selected_features, ax = f_490(df1, df2)
         self.assertListEqual(selected_features, ["feature1", "feature3"])
         self.assertIsInstance(ax, plt.Axes)
         self.assertTrue(ax.has_data())
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
         )
         df2 = pd.DataFrame({"id": [1, 2, 3], "target": [4.5, 6.7, 8.9]})
         # Calling the function and asserting results
-        selected_features, ax = f_444(df1, df2)
+        selected_features, ax = f_490(df1, df2)
         self.assertListEqual(selected_features, ["feature2", "feature3"])
         self.assertIsInstance(ax, plt.Axes)
         self.assertTrue(ax.has_data())
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
         )
         df2 = pd.DataFrame({"id": [1, 2, 3, 4], "target": [0, 1, 0, 1]})
         # Calling the function and asserting results
-        selected_features, ax = f_444(df1, df2)
+        selected_features, ax = f_490(df1, df2)
         self.assertListEqual(selected_features, ["feature2", "feature3"])
         self.assertIsInstance(ax, plt.Axes)
         self.assertTrue(ax.has_data())
@@ -108,7 +108,7 @@ class TestCases(unittest.TestCase):
         )
         df2 = pd.DataFrame({"id": [1, 2], "target": [1, 0]})
         # Calling the function and asserting results
-        selected_features, ax = f_444(df1, df2)
+        selected_features, ax = f_490(df1, df2)
         self.assertListEqual(selected_features, ["feature2", "feature3"])
         self.assertIsInstance(ax, plt.Axes)
         self.assertTrue(ax.has_data())
@@ -124,7 +124,7 @@ class TestCases(unittest.TestCase):
         )
         df2 = pd.DataFrame({"id": [1, 2, 3], "target": [1, 0, 1]})
         # Calling the function and asserting results
-        selected_features, ax = f_444(df1, df2)
+        selected_features, ax = f_490(df1, df2)
         self.assertListEqual(selected_features, ["feature2", "feature3"])
         self.assertIsInstance(ax, plt.Axes)
         self.assertTrue(ax.has_data())
@@ -137,7 +137,7 @@ class TestCases(unittest.TestCase):
         )
         df2 = pd.DataFrame({"id": [1, 2, 3], "target": [1, 0, 1]})
         with self.assertRaises(KeyError):
-            f_444(df1, df2)
+            f_490(df1, df2)
     def test_case_7(self):
         # Test handling errors - wrong types
         df1 = pd.DataFrame(
@@ -148,4 +148,4 @@ class TestCases(unittest.TestCase):
         )
         df2 = pd.DataFrame({"id": [1, 2, 3], "target": [1, 0, 1]})
         with self.assertRaises(ValueError):
-            f_444(df1, df2)
+            f_490(df1, df2)

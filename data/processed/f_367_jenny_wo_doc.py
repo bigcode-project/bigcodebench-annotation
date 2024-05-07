@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def f_598(file_path="data.csv", columns=["A", "B", "C"]):
+def f_665(file_path="data.csv", columns=["A", "B", "C"]):
     """
     Read a CSV file into a Pandas DataFrame, convert numeric values into floats,and draw a line chart of data in the specified columns.
     In addition, compute the cube-root of the data.
@@ -23,7 +23,7 @@ def f_598(file_path="data.csv", columns=["A", "B", "C"]):
     - numpy
 
     Example:
-    >>> df, ax, croot = f_598('path_to_csv.csv', ['Column1', 'Column2', 'Column3'])
+    >>> df, ax, croot = f_665('path_to_csv.csv', ['Column1', 'Column2', 'Column3'])
     >>> df
        Column1  Column2  Column3
     0      1.0      2.0      3.0
@@ -75,7 +75,7 @@ class TestCases(unittest.TestCase):
         plt.close("all")
     def test_case_1(self):
         file_path = self.temp_files["int"]
-        df, ax, croot = f_598(file_path=file_path, columns=["A", "B", "C"])
+        df, ax, croot = f_665(file_path=file_path, columns=["A", "B", "C"])
         self.assertIsInstance(df, pd.DataFrame)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(df.columns.tolist(), ["A", "B", "C"])
@@ -87,10 +87,10 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         file_path = self.temp_files["int"]
         with self.assertRaises(KeyError):
-            f_598(file_path=file_path, columns=["A", "B", "Nonexistent"])
+            f_665(file_path=file_path, columns=["A", "B", "Nonexistent"])
     def test_case_3(self):
         file_path = self.temp_files["varied"]
-        df, ax, croot = f_598(
+        df, ax, croot = f_665(
             file_path=file_path, columns=["IntColumn", "FloatColumn", "StringColumn"]
         )
         self.assertIsInstance(df, pd.DataFrame)
@@ -103,7 +103,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         file_path = self.temp_files["varied_invalid"]
         with self.assertRaises(Exception):
-            f_598(file_path=file_path, columns=["StringColumn"])
+            f_665(file_path=file_path, columns=["StringColumn"])
     def test_case_5(self):
         with self.assertRaises(FileNotFoundError):
-            f_598(file_path="nonexistent_file.csv")
+            f_665(file_path="nonexistent_file.csv")

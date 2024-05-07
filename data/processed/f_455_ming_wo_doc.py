@@ -7,7 +7,7 @@ from random import randint
 SENSORS = ['Temperature', 'Humidity', 'Pressure']
 output_dir = './output'
 
-def f_141(hours, output_dir = output_dir):
+def f_150(hours, output_dir = output_dir):
     """
     Create sensor data for the specified number of hours and save it in a CSV file.
 
@@ -24,7 +24,7 @@ def f_141(hours, output_dir = output_dir):
     - csv
 
     Example:
-    >>> file_path = f_141(1)  # Generate data for 1 hour
+    >>> file_path = f_150(1)  # Generate data for 1 hour
     >>> os.path.exists(file_path)  # Check if the file was actually created
     True
     >>> isinstance(file_path, str)  # Validate that the return type is a string
@@ -58,26 +58,26 @@ class TestCases(unittest.TestCase):
             shutil.rmtree(output_dir)
     def test_csv_file_creation(self):
         """Test if the CSV file is successfully created."""
-        f_141(1)
+        f_150(1)
         self.assertTrue(os.path.exists(FILE_PATH))
     def test_csv_file_rows(self):
         """Test if the CSV file contains the correct number of rows for 24 hours."""
-        f_141(24)
+        f_150(24)
         with open(FILE_PATH, 'r') as f:
             self.assertEqual(len(f.readlines()), 25)  # Including header
     def test_csv_file_header(self):
         """Test if the CSV file header matches the expected sensors."""
-        f_141(0)
+        f_150(0)
         with open(FILE_PATH, 'r') as f:
             reader = csv.reader(f)
             header = next(reader)
             self.assertEqual(header, ['Time', 'Temperature', 'Humidity', 'Pressure'])
     def test_file_path_return(self):
         """Test if the correct file path is returned."""
-        file_path = f_141(1)
+        file_path = f_150(1)
         self.assertEqual(file_path, FILE_PATH)
     def test_no_hours_data(self):
         """Test sensor data generation with 0 hours."""
-        f_141(0)
+        f_150(0)
         with open(FILE_PATH, 'r') as f:
             self.assertEqual(len(f.readlines()), 1)  # Only header row expected

@@ -1,7 +1,7 @@
 import os
 import re
 
-def f_406(pattern: str, replacement: str, directory: str) -> bool:
+def f_447(pattern: str, replacement: str, directory: str) -> bool:
     """
     Renames all files in a directory that match a particular pattern with a given replacement string.
     
@@ -18,9 +18,9 @@ def f_406(pattern: str, replacement: str, directory: str) -> bool:
     - os
 
     Examples:
-    >>> f_406('draft', 'final', '/home/user/documents')
+    >>> f_447('draft', 'final', '/home/user/documents')
     True
-    >>> f_406('tmp', 'temp', '/home/user/downloads')
+    >>> f_447('tmp', 'temp', '/home/user/downloads')
     False
     """
     try:
@@ -50,7 +50,7 @@ class TestCases(unittest.TestCase):
     
     def test_renafiles(self):
         self.create_test_files(["draft1.txt", "draft2.txt", "draft3.txt"])
-        result = f_406("draft", "final", self.test_dir)
+        result = f_447("draft", "final", self.test_dir)
         self.assertTrue(result)
         expected_files = sorted(["final1.txt", "final2.txt", "final3.txt"])
         actual_files = sorted(os.listdir(self.test_dir))
@@ -58,24 +58,24 @@ class TestCases(unittest.TestCase):
         
     def test_no_matching_files(self):
         self.create_test_files(["file1.txt", "file2.txt", "file3.txt"])
-        result = f_406("draft", "final", self.test_dir)
+        result = f_447("draft", "final", self.test_dir)
         self.assertTrue(result)
         expected_files = sorted(["file1.txt", "file2.txt", "file3.txt"])
         actual_files = sorted(os.listdir(self.test_dir))
         self.assertEqual(expected_files, actual_files)
         
     def test_nonexistent_directory(self):
-        result = f_406("draft", "final", "/nonexistent/directory")
+        result = f_447("draft", "final", "/nonexistent/directory")
         self.assertFalse(result)
         
     def test_empty_directory(self):
-        result = f_406("draft", "final", self.test_dir)
+        result = f_447("draft", "final", self.test_dir)
         self.assertTrue(result)
         self.assertEqual([], os.listdir(self.test_dir))
         
     def test_complex_pattern_renaming(self):
         self.create_test_files(["draft_file1.txt", "file_draft2.txt", "draft3file.txt"])
-        result = f_406("draft", "final", self.test_dir)
+        result = f_447("draft", "final", self.test_dir)
         self.assertTrue(result)
         expected_files = sorted(["final_file1.txt", "file_final2.txt", "final3file.txt"])
         actual_files = sorted(os.listdir(self.test_dir))

@@ -58,7 +58,6 @@ import pandas as pd
 
 class TestCases(unittest.TestCase):
 
-    @classmethod
     def setUp(self):
         np.random.seed(42)  # Set a seed for reproducibility
 

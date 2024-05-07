@@ -2,7 +2,7 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 
 
-def f_100(df1, df2, column1="feature1", column2="feature2"):
+def f_104(df1, df2, column1="feature1", column2="feature2"):
     """Merge datasets, perform KMeans clustering, then return cluster labels and scatterplot.
 
     Each dataset is assumed to contain at least one id column and one feature column. The column to process
@@ -27,7 +27,7 @@ def f_100(df1, df2, column1="feature1", column2="feature2"):
     Example:
     >>> df1 = pd.DataFrame({'id': [1, 2, 3], 'feature1': [1.2, 3.4, 5.6]})
     >>> df2 = pd.DataFrame({'id': [1, 2, 3], 'feature2': [2.3, 4.5, 6.7]})
-    >>> labels, ax = f_100(df1, df2)
+    >>> labels, ax = f_104(df1, df2)
     >>> type(labels)
     <class 'numpy.ndarray'>
     >>> type(ax)
@@ -61,26 +61,26 @@ class TestCases(unittest.TestCase):
         plt.close("all")
     def test_case_1(self):
         # Test scatterplot
-        _, ax = f_100(self.df1_base, self.df2_base)
+        _, ax = f_104(self.df1_base, self.df2_base)
         self.assertIsInstance(ax, matplotlib.axes._axes.Axes)
         self.assertEqual(ax.get_xlabel(), "feature1")
         self.assertEqual(ax.get_ylabel(), "feature2")
     def test_case_2(self):
         # Expect 2 clusters
-        labels, _ = f_100(self.df1_base, self.df2_base)
+        labels, _ = f_104(self.df1_base, self.df2_base)
         self.assertEqual(len(labels), 5)
         self.assertEqual(len(np.unique(labels)), 2)
     def test_case_3(self):
         # Mixed valid data types
         df1 = pd.DataFrame({"id": [1, 2, 3], "feature1": [1, 2, 3]})
         df2 = pd.DataFrame({"id": [1, 2, 3], "feature2": [1.1, 2.2, 3.3]})
-        labels, _ = f_100(df1, df2)
+        labels, _ = f_104(df1, df2)
         self.assertEqual(len(labels), 3)
     def test_case_4(self):
         # Partial matches
         df1 = pd.DataFrame({"id": [1, 2, 3], "feature1": [1.2, 3.4, 5.6]})
         df2 = pd.DataFrame({"id": [1, 2, 6], "feature2": [1.2, 3.1, 6.7]})
-        labels, _ = f_100(df1, df2)
+        labels, _ = f_104(df1, df2)
         self.assertEqual(len(labels), 2)
         self.assertEqual(len(np.unique(labels)), 2)
     def test_case_5(self):
@@ -88,13 +88,13 @@ class TestCases(unittest.TestCase):
         df1 = pd.DataFrame({"id": [1, 2, 3], "feature1": [1.2, 3.4, 5.6]})
         df2 = pd.DataFrame({"id": [4, 5, 6], "feature2": [2.3, 4.5, 6.7]})
         with self.assertRaises(ValueError):
-            f_100(df1, df2)
+            f_104(df1, df2)
     def test_case_6(self):
         # Should fail on non-numeric columns
         df1 = pd.DataFrame({"id": [1, 2, 3], "feature1": ["a", "b", "c"]})
         df2 = pd.DataFrame({"id": [1, 2, 3], "feature2": [1.1, 2.2, 3.3]})
         with self.assertRaises(Exception):
-            f_100(df1, df2)
+            f_104(df1, df2)
     def test_case_7(self):
         # Should fail on missing value
         df1 = pd.DataFrame(
@@ -104,4 +104,4 @@ class TestCases(unittest.TestCase):
             {"id": [1, 2, 3, 4, 5], "feature2": [2.3, 4.5, np.nan, 8.9, 10.1]}
         )
         with self.assertRaises(ValueError):
-            f_100(df1, df2)
+            f_104(df1, df2)

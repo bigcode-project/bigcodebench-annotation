@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-def f_592(df, age, weight):
+def f_658(df, age, weight):
     """
     Filters and standardizes a given DataFrame based on specified age and weight criteria.
 
@@ -34,7 +34,7 @@ def f_592(df, age, weight):
     ...     "Weight": [62, 76, 72, 859, 69, 102],
     ...     "shoe_size": [12, 6, 7, 8, 9, 6]
     ... })
-    >>> print(f_592(data, 70, 63))
+    >>> print(f_658(data, 70, 63))
            Age    Weight  shoe_size
     0  1.40400 -0.701695  -1.224745
     1 -0.55507 -0.712504   0.000000
@@ -45,7 +45,7 @@ def f_592(df, age, weight):
     ...     "Weight": [62, 63, 12, 24, 11, 111, 200, 70],
     ...     "banana_consumption": [1, 1, 7, 2, 100, 6, 26, 1]
     ... })
-    >>> print(f_592(input, 32, 22))
+    >>> print(f_658(input, 32, 22))
             Age    Weight  banana_consumption
     0 -1.083473 -1.192322           -0.666109
     1  0.120386  0.150487           -0.271378
@@ -71,7 +71,7 @@ class TestCases(unittest.TestCase):
         }
         self.df = pd.DataFrame(self.data)
     def test_standard_usage(self):
-        result_df = f_592(self.df, 70, 1)
+        result_df = f_658(self.df, 70, 1)
         self.assertFalse(result_df.empty)
         self.assertEqual(result_df.shape[1], self.df.shape[1])
         self.assertTrue((result_df.columns == self.df.columns).all())
@@ -81,15 +81,15 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result_df, expected, atol=1e-2)
     def test_empty_dataframe(self):
         empty_df = pd.DataFrame()
-        self.assertRaises(Exception, f_592, empty_df, 30, 70)
+        self.assertRaises(Exception, f_658, empty_df, 30, 70)
     def test_no_rows_meet_criteria(self):
-        result_df = f_592(self.df, 15, 95)
+        result_df = f_658(self.df, 15, 95)
         self.assertTrue(result_df.empty)
     def test_missing_columns(self):
         with self.assertRaises(KeyError):
             incomplete_df = self.df.drop(columns=["Age"])
-            f_592(incomplete_df, 30, 70)
+            f_658(incomplete_df, 30, 70)
     def test_non_numeric_values(self):
         self.df['Age'] = self.df['Age'].astype(str)  # Converting Age to string
         with self.assertRaises(Exception):  # Assuming ValueError is raised for non-numeric inputs
-            f_592(self.df, 30, 70)
+            f_658(self.df, 30, 70)

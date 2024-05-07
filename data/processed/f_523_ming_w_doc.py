@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
 
-def f_361(x, y, labels):
+def f_398(x, y, labels):
     """ 
     Perform Principal Component Analysis (PCA) on "x" and "y" numpy arrays and record the results with labels.
 
@@ -24,7 +24,7 @@ def f_361(x, y, labels):
     >>> x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
     >>> y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
     >>> labels = ['H₂O', 'O₂', 'CO₂']
-    >>> fig = f_361(x, y, labels)
+    >>> fig = f_398(x, y, labels)
     """
     pca = PCA(n_components=2)
     fig, ax = plt.subplots()
@@ -57,32 +57,32 @@ class TestCases(unittest.TestCase):
         
         self.labels = ['H₂O', 'O₂', 'CO₂', 'N₂', 'Ar']
     def test_case_1(self):
-        fig = f_361(self.x_data, self.y_data, self.labels)
+        fig = f_398(self.x_data, self.y_data, self.labels)
         # Check if returned object is a matplotlib figure
         self.assertIsInstance(fig, plt.Figure)
     def test_case_2(self):
         # Testing with different data lengths
         x_data = [np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([7, 8, 9])]
         y_data = [np.array([10, 11, 12]), np.array([13, 14, 15]), np.array([16, 17, 18])]
-        fig = f_361(x_data, y_data, self.labels[:3])
+        fig = f_398(x_data, y_data, self.labels[:3])
         self.assertIsInstance(fig, plt.Figure)
     def test_case_3(self):
         # Testing with data of length 2 (to avoid PCA error)
         x_data = [np.array([1, 2]), np.array([4, 5]), np.array([7, 8])]
         y_data = [np.array([10, 11]), np.array([13, 14]), np.array([16, 17])]
-        fig = f_361(x_data, y_data, self.labels[:3])
+        fig = f_398(x_data, y_data, self.labels[:3])
         self.assertIsInstance(fig, plt.Figure)
         
     def test_case_4(self):
         # Testing with longer data
         x_data = [np.array(range(10)), np.array(range(10, 20)), np.array(range(20, 30))]
         y_data = [np.array(range(30, 40)), np.array(range(40, 50)), np.array(range(50, 60))]
-        fig = f_361(x_data, y_data, self.labels[:3])
+        fig = f_398(x_data, y_data, self.labels[:3])
         self.assertIsInstance(fig, plt.Figure)
         
     def test_case_5(self):
         # Testing with random data
         x_data = [np.random.randn(10) for _ in range(3)]
         y_data = [np.random.randn(10) for _ in range(3)]
-        fig = f_361(x_data, y_data, self.labels[:3])
+        fig = f_398(x_data, y_data, self.labels[:3])
         self.assertIsInstance(fig, plt.Figure)

@@ -2,7 +2,7 @@ import rsa
 from cryptography.fernet import Fernet
 from base64 import b64encode
 
-def f_292(file_path):
+def f_324(file_path):
     """
     Generates RSA public and private keys and uses Fernet symmetric encryption to encrypt the contents
     of a specified file. The Fernet key is then encrypted with the public RSA key. The encrypted file
@@ -25,7 +25,7 @@ def f_292(file_path):
     - base64.b64encode
 
     Examples:
-    >>> pub_key, encrypted_file, encrypted_key_file = f_292('my_file.txt')
+    >>> pub_key, encrypted_file, encrypted_key_file = f_324('my_file.txt')
     >>> len(pub_key.save_pkcs1()) > 100
     True
     >>> encrypted_file.endswith('.encrypted')
@@ -59,22 +59,22 @@ class TestCases(unittest.TestCase):
         with open(self.test_file, 'w') as f:
             f.write("This is a test file.")
     def test_file_encryption(self):
-        pub_key, encrypted_file, _ = f_292(self.test_file)
+        pub_key, encrypted_file, _ = f_324(self.test_file)
         self.assertTrue(os.path.exists(encrypted_file))
     def test_encrypted_key_file_creation(self):
-        pub_key, _, encrypted_key_file = f_292(self.test_file)
+        pub_key, _, encrypted_key_file = f_324(self.test_file)
         self.assertTrue(os.path.exists(encrypted_key_file))
     def test_public_key_type(self):
-        pub_key, _, _ = f_292(self.test_file)
+        pub_key, _, _ = f_324(self.test_file)
         self.assertIsInstance(pub_key, rsa.PublicKey)
     def test_encrypted_file_size(self):
-        _, encrypted_file, _ = f_292(self.test_file)
+        _, encrypted_file, _ = f_324(self.test_file)
         original_size = os.path.getsize(self.test_file)
         encrypted_size = os.path.getsize(encrypted_file)
         self.assertTrue(encrypted_size > original_size)
     def test_non_existent_file(self):
         with self.assertRaises(FileNotFoundError):
-            f_292("non_existent_file.txt")
+            f_324("non_existent_file.txt")
     def tearDown(self):
         # Clean up created files
         os.remove(self.test_file)

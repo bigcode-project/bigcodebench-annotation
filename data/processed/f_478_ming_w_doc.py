@@ -8,7 +8,7 @@ TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 PENALTY_COST = 1000  # in dollars
 
 
-def f_510(goals, penalties, rng_seed=None, teams=TEAMS):
+def f_564(goals, penalties, rng_seed=None, teams=TEAMS):
     """
     Generate and analyze a Pandas DataFrame of football match results for multiple teams,
     incorporating random goals and penalties, then visualize the analyzed data. Penalties are
@@ -29,7 +29,7 @@ def f_510(goals, penalties, rng_seed=None, teams=TEAMS):
     - re
 
     Example:
-    >>> analyzed_data = f_510(5, 3, rng_seed=42)
+    >>> analyzed_data = f_564(5, 3, rng_seed=42)
     >>> print(analyzed_data[['Team', 'Goals', 'Penalty Cost']])
          Team  Goals  Penalty Cost
     0  Team A      5             0
@@ -65,24 +65,24 @@ class TestCases(unittest.TestCase):
         self.expected_columns = ['Team', 'Match Result', 'Goals', 'Penalty Cost']
     def test_dataframe_structure(self):
         """Test if the DataFrame contains the expected structure."""
-        df = f_510(4, 2, rng_seed=1)
+        df = f_564(4, 2, rng_seed=1)
         self.assertListEqual(list(df.columns), self.expected_columns)
     def test_randomness_control(self):
         """Test if the rng_seed parameter controls randomness."""
-        df1 = f_510(4, 2, rng_seed=42)
-        df2 = f_510(4, 2, rng_seed=42)
+        df1 = f_564(4, 2, rng_seed=42)
+        df2 = f_564(4, 2, rng_seed=42)
         pd.testing.assert_frame_equal(df1, df2)
     def test_positive_goals_penalties(self):
         """Test for positive goals and penalties input."""
-        df = f_510(5, 3, rng_seed=2)
+        df = f_564(5, 3, rng_seed=2)
         self.assertTrue((df['Goals'] >= 0).all() and (df['Goals'] <= 5).all())
         self.assertTrue((df['Penalty Cost'] % PENALTY_COST == 0).all())
     def test_zero_goals_penalties(self):
         """Test for zero goals and penalties."""
-        df = f_510(0, 0, rng_seed=3)
+        df = f_564(0, 0, rng_seed=3)
         self.assertTrue((df['Goals'] == 0).all())
         self.assertTrue((df['Penalty Cost'] == 0).all())
     def test_no_teams(self):
         """Test function with no teams."""
-        df = f_510(5, 3, rng_seed=4, teams=[])
+        df = f_564(5, 3, rng_seed=4, teams=[])
         self.assertTrue(df.empty)

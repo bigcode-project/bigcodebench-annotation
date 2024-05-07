@@ -2,7 +2,7 @@ from texttable import Texttable
 import os
 import psutil
 
-def f_425():
+def f_468():
     """
     Generates a table displaying the system's CPU usage, memory usage, and disk usage.
 
@@ -19,7 +19,7 @@ def f_425():
     - psutil
 
     Examples:
-    >>> table_str = f_425()
+    >>> table_str = f_468()
     >>> isinstance(table_str, str)
     True
     >>> 'CPU Usage (%)' in table_str and 'Memory Usage (%)' in table_str
@@ -41,7 +41,7 @@ import unittest
 import re  # Import the regular expressions library
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.result = f_425()
+        self.result = f_468()
     def test_return_type(self):
         """Test that the function returns a string."""
         self.assertIsInstance(self.result, str)

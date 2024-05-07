@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def f_315(start_date: str, periods: int, freq: str, random_seed: int = 0) -> (pd.DataFrame, plt.Axes):
+def f_349(start_date: str, periods: int, freq: str, random_seed: int = 0) -> (pd.DataFrame, plt.Axes):
     """
     Generates and plots a sales forecast starting from a given date, for a specified number of periods and frequency.
 
@@ -23,7 +23,7 @@ def f_315(start_date: str, periods: int, freq: str, random_seed: int = 0) -> (pd
         2. A matplotlib Axes object for the sales forecast plot.
 
     Examples:
-    >>> df, ax = f_315('2021-01-01', 5, 'WOM-2FRI')
+    >>> df, ax = f_349('2021-01-01', 5, 'WOM-2FRI')
     >>> print(df)
                 Sales
     Date             
@@ -32,7 +32,7 @@ def f_315(start_date: str, periods: int, freq: str, random_seed: int = 0) -> (pd
     2021-03-12    217
     2021-04-09    292
     2021-05-14    423
-    >>> df, ax = f_315('2022-02-01', 3, 'M', random_seed=42)
+    >>> df, ax = f_349('2022-02-01', 3, 'M', random_seed=42)
     >>> print(df)
                 Sales
     Date             
@@ -58,21 +58,21 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         self.random_seed = 42
     def test_basic_forecast(self):
-        df, ax = f_315('2021-01-01', 5, 'WOM-2FRI', self.random_seed)
+        df, ax = f_349('2021-01-01', 5, 'WOM-2FRI', self.random_seed)
         self.assertEqual(len(df), 5)
         self.assertTrue(all(df.columns == ['Sales']))
         self.assertEqual(ax.get_title(), 'Sales Forecast')
     def test_monthly_forecast(self):
-        df, ax = f_315('2022-01-01', 3, 'M', self.random_seed)
+        df, ax = f_349('2022-01-01', 3, 'M', self.random_seed)
         self.assertEqual(len(df), 3)
         self.assertTrue(all(df.columns == ['Sales']))
     def test_quarterly_forecast(self):
-        df, ax = f_315('2020-01-01', 4, 'Q', self.random_seed)
+        df, ax = f_349('2020-01-01', 4, 'Q', self.random_seed)
         self.assertEqual(len(df), 4)
         self.assertTrue(all(df.columns == ['Sales']))
     def test_invalid_input(self):
         with self.assertRaises(ValueError):
-            f_315('2021-13-01', 5, 'M', self.random_seed)
+            f_349('2021-13-01', 5, 'M', self.random_seed)
     def test_negative_periods(self):
         with self.assertRaises(ValueError):
-            f_315('2021-01-01', -5, 'M', self.random_seed)
+            f_349('2021-01-01', -5, 'M', self.random_seed)

@@ -1,7 +1,7 @@
 import os
 import re
 
-def f_49(directory):
+def f_50(directory):
     """
     Finds all files in the specified directory whose names contain any type of 
     bracket (round, curly, or square).
@@ -21,10 +21,10 @@ def f_49(directory):
     - os
     
     Example:
-    >>> f_49('./some_directory/')
+    >>> f_50('./some_directory/')
     ['./some_directory/file(1).txt', './some_directory/folder/file[2].jpg']
     
-    >>> f_49('./another_directory/')
+    >>> f_50('./another_directory/')
     ['./another_directory/file{3}.png']
     """
     BRACKET_PATTERN = '[(){}\\[\\]]'  # Corrected pattern to match any type of bracket
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
     
     def test_case_1(self):
         # Test with the root directory
-        result = f_49(self.temp_dir)
+        result = f_50(self.temp_dir)
         self.assertIn(os.path.join(self.temp_dir, 'file(2).txt'), result)
         self.assertIn(os.path.join(self.temp_dir, 'file[3].png'), result)
         self.assertIn(os.path.join(self.temp_dir, 'file{4}.jpg'), result)
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_2(self):
         # Test with a sub-directory
-        result = f_49(os.path.join(self.temp_dir, 'folder1'))
+        result = f_50(os.path.join(self.temp_dir, 'folder1'))
         self.assertIn(os.path.join(self.temp_dir, 'folder1', 'file(5).jpg'), result)
         self.assertIn(os.path.join(self.temp_dir, 'folder1', 'folder2', 'file[7].csv'), result)
         self.assertIn(os.path.join(self.temp_dir, 'folder1', 'folder2', 'file{8}.png'), result)
@@ -93,7 +93,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_3(self):
         # Test with a deeper sub-directory
-        result = f_49(os.path.join(self.temp_dir, 'folder1', 'folder2'))
+        result = f_50(os.path.join(self.temp_dir, 'folder1', 'folder2'))
         self.assertIn(os.path.join(self.temp_dir, 'folder1', 'folder2', 'file[7].csv'), result)
         self.assertIn(os.path.join(self.temp_dir, 'folder1', 'folder2', 'file{8}.png'), result)
         self.assertEqual(len(result), 2)
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
         # Test with an empty directory
         empty_dir = os.path.join(self.temp_dir, 'empty_folder')
         os.mkdir(empty_dir)
-        result = f_49(empty_dir)
+        result = f_50(empty_dir)
         self.assertEqual(result, [])
     def test_case_5(self):
         # Test with directory containing files without brackets
@@ -109,7 +109,7 @@ class TestCases(unittest.TestCase):
         os.mkdir(no_bracket_dir)
         open(os.path.join(no_bracket_dir, 'file9.txt'), 'w').close()
         open(os.path.join(no_bracket_dir, 'file10.jpg'), 'w').close()
-        result = f_49(no_bracket_dir)
+        result = f_50(no_bracket_dir)
         self.assertEqual(result, [])
     def tearDown(self):
         shutil.rmtree('temp_test_dir')

@@ -2,7 +2,7 @@ from collections import Counter
 import pandas as pd
 
 
-def f_536(list_of_menuitems):
+def f_591(list_of_menuitems):
     """
     Given a nested list of menu items, this function flattens the list and returns a Pandas DataFrame
     detailing the count of each individual menu item.
@@ -18,7 +18,7 @@ def f_536(list_of_menuitems):
         - pandas
 
     Example:
-        >>> result = f_536([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
+        >>> result = f_591([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
         >>> result.loc['Pizza', 'Count']
         2
         >>> result.loc['Coke', 'Count']
@@ -33,24 +33,24 @@ def f_536(list_of_menuitems):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = f_536([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
+        result = f_591([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
         expected_result = pd.DataFrame({'Count': [2, 1, 2, 1]},
                                        index=pd.Index(['Pizza', 'Burger', 'Coke', 'Pasta'], name='MenuItem'))
         pd.testing.assert_frame_equal(result, expected_result)
     def test_case_2(self):
-        result = f_536([['Bread', 'Butter'], ['Bread', 'Jam'], ['Bread', 'Jam'], ['Butter', 'Jam']])
+        result = f_591([['Bread', 'Butter'], ['Bread', 'Jam'], ['Bread', 'Jam'], ['Butter', 'Jam']])
         expected_result = pd.DataFrame({'Count': [3, 2, 3]},
                                        index=pd.Index(['Bread', 'Butter', 'Jam'], name='MenuItem'))
         pd.testing.assert_frame_equal(result, expected_result)
     def test_case_3(self):
-        result = f_536([['Tea', 'Coffee'], ['Tea', 'Milk'], ['Coffee', 'Milk']])
+        result = f_591([['Tea', 'Coffee'], ['Tea', 'Milk'], ['Coffee', 'Milk']])
         expected_result = pd.DataFrame({'Count': [2, 2, 2]}, index=pd.Index(['Tea', 'Coffee', 'Milk'], name='MenuItem'))
         pd.testing.assert_frame_equal(result, expected_result)
     def test_case_4(self):
-        result = f_536([['Sandwich'], ['Sandwich', 'Juice'], ['Coffee']])
+        result = f_591([['Sandwich'], ['Sandwich', 'Juice'], ['Coffee']])
         expected_result = pd.DataFrame({'Count': [2, 1, 1]},
                                        index=pd.Index(['Sandwich', 'Juice', 'Coffee'], name='MenuItem'))
         pd.testing.assert_frame_equal(result, expected_result)
     def test_case_5(self):
-        result = f_536([[], [], []])
+        result = f_591([[], [], []])
         self.assertTrue(result.empty)

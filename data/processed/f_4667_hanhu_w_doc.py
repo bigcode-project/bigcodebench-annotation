@@ -1,7 +1,7 @@
 import subprocess
 import logging
 
-def f_659(filepath):
+def f_729(filepath):
     """
     Attempts to compile a existing C++ file specified by 'filepath'. The output of the compilation process
     is logged, indicating whether the compilation was successful or not. This function is useful
@@ -26,7 +26,7 @@ def f_659(filepath):
     >>> import os
     >>> with open('example.cpp', 'w') as f: \
             _ = f.write("int main(){return 0;}")
-    >>> f_659('example.cpp')
+    >>> f_729('example.cpp')
     >>> os.path.exists('example')
     True
     """
@@ -51,26 +51,26 @@ class TestCases(unittest.TestCase):
             f.write("")
     @patch('subprocess.check_call')
     def test_successful_compilation(self, mock_check_call):
-        f_659('example.cpp')
+        f_729('example.cpp')
         mock_check_call.assert_called_with(['g++', 'example.cpp', '-o', 'example'])
     @patch('subprocess.check_call', side_effect=subprocess.CalledProcessError(1, ['g++']))
     def test_compilation_failure(self, mock_check_call):
-        f_659('example.cpp')
+        f_729('example.cpp')
         mock_check_call.assert_called_with(['g++', 'example.cpp', '-o', 'example'])
     
     @patch('logging.error')
     @patch('subprocess.check_call', side_effect=FileNotFoundError)
     def test_compiler_not_found(self, mock_check_call, mock_logging_error):
-        f_659('example.cpp')
+        f_729('example.cpp')
         mock_logging_error.assert_called()
     @patch('logging.error')
     def test_empty_file(self, mock_logging_error):
-        f_659(self.empty_file)
+        f_729(self.empty_file)
         mock_logging_error.assert_called()
     @patch('logging.error')
     @patch('subprocess.check_call', side_effect=FileNotFoundError())
     def test_logging_output(self, mock_check_call, mock_logging):
-        f_659('example.cpp')
+        f_729('example.cpp')
         mock_logging.assert_called()
     def tearDown(self):
         # Clean up created files
