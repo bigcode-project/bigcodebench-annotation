@@ -423,7 +423,7 @@ def check_test_wo_doc(data):
     elif any([api in data["apis"] for api in ["os.path"]]):
         return True
     # check any file suffixes are inside data["prompt"]
-    elif any([suffix in data["prompt"] for suffix in [".txt", ".csv", ".json", ".xml", ".html", ".log", ".zip", ".tar", ".gz", ".pdf", ".png"]]):
+    elif any([suffix in data["prompt"] for suffix in [".txt", ".csv", ".json", ".xml", ".html", ".log", ".zip", ".tar", ".gz", ".pdf", ".png", ".db"]]):
         return True
     # check path like patterns are inside data["prompt"]
     elif any([re.search(r"[\w\-.]+\/[\w\-.]+", data["prompt"])]):
