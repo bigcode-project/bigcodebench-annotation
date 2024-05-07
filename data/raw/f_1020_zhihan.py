@@ -11,26 +11,26 @@ def f_1020():
     format with specific keys for each piece of information.
     
     Returns:
-        dict: A dictionary containing:
-            - 'OS': Operating System name (e.g., 'Windows', 'Linux').
-            - 'Architecture': System architecture (typically first item from platform.architecture(), e.g., '64bit').
-            - 'Memory Usage': Formatted string representing the percentage of memory currently in use, 
-                              calculated as (used memory / total memory) * 100.
+    dict: A dictionary containing:
+        - 'OS': Operating System name (e.g., 'Windows', 'Linux').
+        - 'Architecture': System architecture (typically first item from platform.architecture(), e.g., '64bit').
+        - 'Memory Usage': Formatted string representing the percentage of memory currently in use, 
+                            calculated as (used memory / total memory) * 100.
   
     Requirements:
-        - platform
-        - psutil
+    - platform
+    - psutil
 
     Examples:
-        >>> system_info = f_1020()
-        >>> isinstance(system_info, dict)
-        True
-        >>> 'OS' in system_info
-        True
-        >>> 'Architecture' in system_info
-        True
-        >>> 'Memory Usage' in system_info
-        True
+    >>> system_info = f_1020()
+    >>> isinstance(system_info, dict)
+    True
+    >>> 'OS' in system_info
+    True
+    >>> 'Architecture' in system_info
+    True
+    >>> 'Memory Usage' in system_info
+    True
     """
     system_info = {}
 
