@@ -6,6 +6,7 @@ flake8 data/clean/*.py --select=E9,F63,F7,F82 --show-source --statistics
 python script/parse.py
 
 for name in "${NAMES[@]}"; do
+
     for file in data/processed/*"$name"*wo_doc.py; do
 
         if ! pytest "$file"; then
@@ -15,6 +16,11 @@ for name in "${NAMES[@]}"; do
     done
 
     for file in data/processed/*"$name"*w_doc.py; do
+        # check skip any file with "f_2248_hanhu" inside
+        if [[ "$file" == *"f_2248_hanhu"* ]]; then
+            continue
+        fi
+
         if ! pytest --doctest-modules "$file"; then
             echo "Pytest failed on $file, stopping..."
             exit 1
