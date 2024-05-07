@@ -55,18 +55,12 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         # Create a temporary directory for the tests
         self.test_dir = tempfile.mkdtemp()
-    def tearDown(self):
-        # Remove the temporary directory after the tests
-        shutil.rmtree(self.test_dir)
-    def setUp(self):
-        # Create a test file in the temporary directory
         self.test_file = os.path.join(self.test_dir, 'test.txt')
         with open(self.test_file, 'w') as f:
             f.write('This is a test file.')
     def tearDown(self):
         # Clean up any files created by the test
-        if os.path.exists(self.test_file):
-            os.remove(self.test_file)
+        shutil.rmtree(self.test_dir)
     def test_copy_and_erase(self):
         # Test case description:
         # This test verifies that the function copies the file to the specified

@@ -59,8 +59,6 @@ class TestCases(unittest.TestCase):
         for file in self.sample_files:
             with open(os.path.join(TEST_FILES_DIR, file), 'w') as f:
                 f.write("Sample content for " + file)
-        if os.path.exists(ARCHIVE_DIR):
-            shutil.rmtree(ARCHIVE_DIR)
     def tearDown(self):
         # Remove the test directory after tests
         shutil.rmtree(TEST_FILES_DIR)
@@ -93,5 +91,5 @@ class TestCases(unittest.TestCase):
         # Test archiving when the archive directory does not initially exist
         if os.path.exists(ARCHIVE_DIR):
             shutil.rmtree(ARCHIVE_DIR)
-        archive_path = f_131(os.path.join(TEST_FILES_DIR, '*.txt'))
+        archive_path = f_131(os.path.join(ARCHIVE_DIR, '*.txt'))
         self.assertFalse(os.path.isfile(archive_path))
