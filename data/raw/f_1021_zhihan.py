@@ -12,7 +12,7 @@ def f_1021(l1, l2, K=10):
     Parameters:
     l1 (list): The first list containing any hashable types.
     l2 (list): The second list containing any hashable types.
-    K: the size of the random sample from the combined list. Default is 10.
+    K (int): the size of the random sample from the combined list. Default to 10.
 
     Returns:
     collections.Counter: An object that counts the frequency of each element in the sample.
