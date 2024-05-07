@@ -2,11 +2,7 @@ import base64
 import hashlib
 import os
 
-
-# Constants
-SALT_LENGTH = 32
-
-def f_1023(password):
+def f_1023(password, SALT_LENGTH = 32):
     """
     Hashes a password using the PBKDF2 HMAC algorithm with SHA-256 as the hashing algorithm, 
     combined with a randomly generated salt, and returns both the salt and the hashed password, 
@@ -14,6 +10,7 @@ def f_1023(password):
 
     Parameters:
     password (str): The password to be hashed.
+    SALT_LENGTH (int): the length of the randomly generated salt.
 
     Returns:
     tuple[bytes, bytes]: A tuple containing the base64-encoded salt and the base64-encoded hashed password as byte strings.
