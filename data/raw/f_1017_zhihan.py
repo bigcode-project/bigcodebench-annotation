@@ -16,9 +16,9 @@ def f_1017(process_name: str) -> str:
         - "Process found. Restarting <process_name>."
 
     Requirements:
-    - subprocess: Used to start processes.
-    - psutil: Used to iterate over and manage running processes.
-    - time: Used to pause execution between termination and restarting of a process.
+    - subprocess
+    - psutil
+    - time
 
     Example:
     >>> f_1017('notepad')
