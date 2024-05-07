@@ -2,7 +2,7 @@ import subprocess
 import os
 import threading
 
-def f_948(script_path: str, timeout: int = 60) -> str:
+def f_769(script_path: str, timeout: int = 60) -> str:
     """
     Execute a specified python code with a given timeout. If the script execution exceeds the timeout, it is terminated.
 
@@ -19,10 +19,10 @@ def f_948(script_path: str, timeout: int = 60) -> str:
     - threading
 
     Examples:
-    >>> f_948('/pathto/MyrScript.py')
+    >>> f_769('/pathto/MyrScript.py')
     'Script executed successfully.'
     
-    >>> f_948('/pathto/LongRunningScript.py', 30)
+    >>> f_769('/pathto/LongRunningScript.py', 30)
     'Terminating process due to timeout.'
 
     Note:
@@ -33,12 +33,9 @@ def f_948(script_path: str, timeout: int = 60) -> str:
     """
     def target():
         subprocess.call(['python', script_path])
-
     thread = threading.Thread(target=target)
     thread.start()
-
     thread.join(timeout)
-
     if thread.is_alive():
         os.system(f'pkill -f "{script_path}"')
         thread.join()
@@ -50,16 +47,9 @@ import unittest
 from unittest.mock import patch
 import time
 import shutil
-
-def run_tests():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCases))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.test_dir = 'testdir_f_948'
+        self.test_dir = 'testdir_f_769'
         os.makedirs(self.test_dir, exist_ok=True)
         f = open(self.test_dir+"/script4.py","w")
         f.write("print('Hello from script4')")
@@ -76,7 +66,6 @@ class TestCases(unittest.TestCase):
         self.temp_dir = 'testdir_f_947/temp_dir'
         os.makedirs(self.temp_dir, exist_ok=True)
         
-
     def tearDown(self):
         # Clean up the test directory
         shutil.rmtree(self.test_dir)
@@ -84,32 +73,23 @@ class TestCases(unittest.TestCase):
     @patch('subprocess.call', return_value=None)
     def test_case_1(self, mock_subprocess):
         # Test with a short-running script
-        result = f_948('/path/to/short_script.py', 10)
+        result = f_769('/path/to/short_script.py', 10)
         self.assertEqual(result, 'Script executed successfully.')
-
     
     def test_case_2(self):
         # Test with a long-running script and short timeout
-        result = f_948(self.test_dir+"/script1.py", 3)
+        result = f_769(self.test_dir+"/script1.py", 3)
         self.assertEqual(result, 'Terminating process due to timeout.')
-
     @patch('subprocess.call', return_value=None)
     def test_case_3(self, mock_subprocess):
         # Test default timeout behavior
-        result = f_948('/path/to/short_script.py')
+        result = f_769('/path/to/short_script.py')
         self.assertEqual(result, 'Script executed successfully.')
-
     def test_case_4(self):
         # Test with a long-running script and long timeout
-        result = f_948(self.test_dir+"/script1.py", 20)
+        result = f_769(self.test_dir+"/script1.py", 20)
         self.assertEqual(result, 'Script executed successfully.')
-
     def test_case_5(self):
         # Test with a long-running script and default timeout
-        result = f_948(self.test_dir+"/script3.py")
+        result = f_769(self.test_dir+"/script3.py")
         self.assertEqual(result, 'Terminating process due to timeout.')
-
-
-
-if __name__ == "__main__":
-    run_tests()
