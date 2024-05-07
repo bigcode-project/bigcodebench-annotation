@@ -25,7 +25,10 @@ def f_1023(password, SALT_LENGTH = 32):
 
     Example:
     >>> salt, hashed_password = f_1023('my_password')
-    >>> print(salt.decode(), hashed_password.decode())
+    >>> isinstance(salt, bytes)
+    True
+    >>> isinstance(hashed_password, bytes)
+    True
     """
     if not password:
         raise ValueError
