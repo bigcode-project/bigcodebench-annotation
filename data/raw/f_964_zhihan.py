@@ -22,6 +22,7 @@ def f_964(animal_dict):
     >>> animal_dict = {'cat': 'c', 'dog': 'd', 'elephant': 'e', 'fox': 'f', 'giraffe': 'g', 'hippo': 'h', 'iguana': 'i', 'jaguar': 'j'}
     >>> counts = f_964(animal_dict)
     >>> print(counts)
+    {'a': 7, 'g': 4, 'o': 3, 'e': 3, 'p': 3, 'f': 3, 'i': 3, 't': 2, 'h': 2, 'n': 2, 'r': 2, 'u': 2, 'c': 1, 'd': 1, 'l': 1, 'x': 1, 'j': 1}
     """
     letters = list(itertools.chain.from_iterable(animal_dict.keys()))
     count_dict = dict(Counter(letters))

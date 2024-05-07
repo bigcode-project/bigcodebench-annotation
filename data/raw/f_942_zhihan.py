@@ -18,8 +18,11 @@ def f_942(text, top_n):
     - collections.Counter
 
     Example:
-    >>> f_1015('Visit https://www.python.org for more info. Python is great. I love Python.', 2)
+    >>> f_942('Visit https://www.python.org for more info. Python is great. I love Python.', 2)
     [('Python', 2), ('Visit', 1)]
+
+    Note:
+    - Valid url is start with http or https
     """
     # Remove URLs
     text = re.sub('http[s]?://\S+', '', text)

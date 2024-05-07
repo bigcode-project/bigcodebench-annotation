@@ -1,5 +1,4 @@
 from nltk.tokenize import RegexpTokenizer
-from string import punctuation
 from collections import Counter
 
 
@@ -24,11 +23,6 @@ def f_938(text):
     >>> text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
     >>> f_938(text)
     [('abc', 3), ('hij', 3), ('efg', 1)]
-
-    Note:
-    The tokenizer is configured to identify tokens that start with one or more "$" symbols followed by any number of
-    alphanumeric characters. Tokens that are solely "$" symbols or those that start with multiple "$" symbols but
-    contain no alphanumeric characters after the initial "$" are retained as-is but not counted.
     """
 
     tokenizer = RegexpTokenizer(r'\$\$+\w*|\$\w+')
@@ -39,7 +33,6 @@ def f_938(text):
 
 
 import unittest
-from collections import Counter
 
 
 def run_tests():

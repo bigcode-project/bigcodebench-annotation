@@ -20,7 +20,7 @@ def f_965(file_name=FILE_NAME):
     Returns:
     str: The path to the created file.
 
-    Data Ranges:
+    Note:
     - Temperature: From -50 to 50
     - Humidity: From 0 to 100
     - Pressure: From 980 to 1040
@@ -32,7 +32,7 @@ def f_965(file_name=FILE_NAME):
     - random
 
     Example:
-    >>> f_965()
+    >>> f_965("data.csv)
     'path/to/data.csv'
     """
     with open(file_name, 'w', newline='') as file:
@@ -51,6 +51,7 @@ def f_965(file_name=FILE_NAME):
 import unittest
 import os
 import csv
+import random
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -61,7 +62,7 @@ def run_tests():
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Setup for the test cases, creating a mock file name
-        self.mock_file_name = "test_data.csv"
+        self.mock_file_name = "test_f_965_data.csv"
         
     def tearDown(self):
         # Cleanup after each test, removing the generated file if it exists
@@ -70,16 +71,19 @@ class TestCases(unittest.TestCase):
 
     def test_case_1(self):
         # Testing default file name
-        returned_file = f_965()
+        random.seed(0)
+        returned_file = f_965(self.mock_file_name)
         self.assertTrue(os.path.exists(returned_file))
         
     def test_case_2(self):
         # Testing custom file name
+        random.seed(0)
         returned_file = f_965(self.mock_file_name)
         self.assertTrue(os.path.exists(returned_file))
         
     def test_case_3(self):
         # Testing content structure of the CSV file
+        random.seed(0)
         f_965(self.mock_file_name)
         with open(self.mock_file_name, 'r') as file:
             reader = csv.reader(file)
@@ -88,6 +92,7 @@ class TestCases(unittest.TestCase):
             
     def test_case_4(self):
         # Testing content data ranges of the CSV file
+        random.seed(0)
         f_965(self.mock_file_name)
         with open(self.mock_file_name, 'r') as file:
             reader = csv.reader(file)
@@ -100,6 +105,7 @@ class TestCases(unittest.TestCase):
                 
     def test_case_5(self):
         # Testing number of rows (24 hours + header)
+        random.seed(0)
         f_965(self.mock_file_name)
         with open(self.mock_file_name, 'r') as file:
             reader = csv.reader(file)

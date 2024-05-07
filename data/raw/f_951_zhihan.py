@@ -60,7 +60,7 @@ import shutil
 import time
 from unittest.mock import patch
 
-class TestRunRScript(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Create a temporary directory to store the mock R script and the output files
@@ -125,8 +125,9 @@ class TestRunRScript(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestRunRScript))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 if __name__ == "__main__":
     run_tests()

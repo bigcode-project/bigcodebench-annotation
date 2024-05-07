@@ -8,10 +8,7 @@ def f_934(file_pointer):
     Reads from a given file pointer to a JSON file, evaluates strings that represent dictionaries to actual dictionaries,
     and counts the frequency of each key across all dictionary entries in the JSON data.
 
-    This function assumes the input JSON data is a list of dictionaries or strings that can be evaluated as dictionaries.
-    It converts any string representations of dictionaries into actual Python dictionaries using `ast.literal_eval`,
-    then counts how frequently each key appears across all dictionaries.
-
+    
     Parameters:
     file_pointer (file object): An open file object pointing to the JSON file containing the data. This file should
                                 already be opened in the correct mode (e.g., 'r' for reading).
@@ -20,11 +17,14 @@ def f_934(file_pointer):
     collections.Counter: A Counter object representing the frequency of each key found in the dictionaries.
 
     Requirements:
-    - ast: For safely evaluating strings as Python expressions.
-    - json: For loading JSON data from the file pointer.
-    - collections.Counter: For counting key occurrences.
-
-    Example usage:
+    - ast
+    - json
+    - collections.Counter
+    
+    Note:
+    This function assumes the input JSON data is a list of dictionaries or strings that can be evaluated as dictionaries.
+    
+    Example:
     >>> with open("data.json", "r") as file:
     >>>    key_frequency = f_934(file)
     >>>    print(key_frequency)

@@ -22,7 +22,7 @@ def f_963(word_dict):
     >>> word_dict = {'apple': 'a', 'banana': 'b', 'cherry': 'c', 'date': 'd', 'elderberry': 'e', 'fig': 'f', 'grape': 'g', 'honeydew': 'h'}
     >>> counts = f_963(word_dict)
     >>> print(counts)
-    {'e': 10, 'a': 8, 'r': 4, 'p': 3, 'b': 2, 'n': 2, 'c': 2, 'd': 2, 'y': 2, 'f': 1, 'g': 1, 'h': 1, 'i': 1, 'l': 1, 'o': 1, 't': 1, 'u': 1, 'w': 1}
+    {'e': 9, 'a': 6, 'r': 6, 'p': 3, 'n': 3, 'y': 3, 'd': 3, 'l': 2, 'b': 2, 'h': 2, 'g': 2, 'c': 1, 't': 1, 'f': 1, 'i': 1, 'o': 1, 'w': 1}
     """
     letters = list(itertools.chain.from_iterable(word_dict.keys()))
     count_dict = dict(Counter(letters))

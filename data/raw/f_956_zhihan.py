@@ -1,3 +1,9 @@
+from collections import Counter
+import os
+import nltk
+from nltk.corpus import stopwords
+import string
+
 def f_956(directory):
     """
     Analyze a directory of text files and return the most common word and its number, excluding stopwords and punctuation.
@@ -18,11 +24,6 @@ def f_956(directory):
     >>> f_956('./text_files')
     ('example', 10) # This is just a mock output; real output will depend on text files' content.
     """
-    from collections import Counter
-    import os
-    import nltk
-    from nltk.corpus import stopwords
-    import string
 
     # Constants
     STOPWORDS = set(stopwords.words('english'))

@@ -25,10 +25,7 @@ def f_944(texts):
 
     Example:
     >>> f_944(['Visit https://www.python.org for more info.', 'Python is great.', 'I love Python.'])
-    ([(0.70710678, 0.70710678, 0.        , 0.        , 0.        , 0.        ),
-      (0.        , 0.        , 0.6316672 , 0.6316672 , 0.44943642, 0.        ),
-      (0.        , 0.        , 0.        , 0.        , 0.44943642, 0.6316672 )],
-     ['for', 'info', 'great', 'is', 'python', 'love'])
+    ([(0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.0, 0.5), (0.0, 0.62276601, 0.0, 0.62276601, 0.0, 0.0, 0.4736296, 0.0), (0.0, 0.0, 0.0, 0.0, 0.79596054, 0.0, 0.60534851, 0.0)], ['for', 'great', 'info', 'is', 'love', 'more', 'python', 'visit'])
 
     Notes:
     - URLs in the text documents are removed before calculating TF-IDF scores to ensure they do not affect the analysis.
