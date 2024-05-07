@@ -2,7 +2,7 @@ import subprocess
 import platform
 import time
 
-def f_81(url):
+def f_82(url):
     """
     Open a web page in the default web browser in a background process.
 
@@ -18,7 +18,7 @@ def f_81(url):
     - time
 
     Example:
-    >>> f_81('https://www.google.com')
+    >>> f_82('https://www.google.com')
     0
     """
     if platform.system() == 'Darwin':
@@ -43,7 +43,7 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [0]  # Simulate process ending after 10 checks
         process_mock.returncode = 0
         mock_popen.return_value = process_mock
-        result = f_81('https://www.google.com')
+        result = f_82('https://www.google.com')
         self.assertEqual(['open', 'https://www.google.com'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 0)
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [0]  # Simulate process ending after 10 checks
         process_mock.returncode = 0
         mock_popen.return_value = process_mock
-        result = f_81('https://www.openai.com')
+        result = f_82('https://www.openai.com')
         self.assertEqual(['start', 'https://www.openai.com'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 0)
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [1]  # Simulate failure
         process_mock.returncode = 1
         mock_popen.return_value = process_mock
-        result = f_81('')
+        result = f_82('')
         self.assertEqual(['xdg-open', ''], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [1]  # Simulate failure
         process_mock.returncode = 1
         mock_popen.return_value = process_mock
-        result = f_81('/invalid_url')
+        result = f_82('/invalid_url')
         self.assertEqual(['xdg-open', '/invalid_url'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
         process_mock.poll.side_effect = [None] * 9 + [1]  # Simulate failure
         process_mock.returncode = 1
         mock_popen.return_value = process_mock
-        result = f_81('/path/to/file.txt')
+        result = f_82('/path/to/file.txt')
         self.assertEqual(['xdg-open', '/path/to/file.txt'], mock_popen.call_args_list[0][0][0])
         self.assertIsInstance(result, int)
         self.assertEqual(result, 1)

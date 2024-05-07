@@ -3,7 +3,7 @@ from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import CountVectorizer
 
 
-def f_183(df):
+def f_199(df):
     """
     Analyzes articles by their titles for specific case-insensitive keywords ("how" or "what"), vectorizes the content using
     CountVectorizer, and groups them into clusters using KMeans clustering. This function is intended for basic
@@ -28,7 +28,7 @@ def f_183(df):
     ...    'Content': ['This is a tutorial about coding...', 'Python is a programming language...',
     ...                'Programming is an art...', 'This is a cooking tutorial...', 'Life is complicated...']
     ... })
-    >>> f_183(df_sample)
+    >>> f_199(df_sample)
     [0, 1, 0, 1]
     """
     pattern = re.compile(r'(how|what)', re.IGNORECASE)
@@ -58,7 +58,7 @@ class TestCases(unittest.TestCase):
         os.environ.pop('OMP_NUM_THREADS', None)
     def test_vectorizer_and_clustering(self):
         """Test if the vectorization and clustering are setting up as expected, without mocking."""
-        cluster_labels = f_183(self.df_sample)
+        cluster_labels = f_199(self.df_sample)
         self.assertIn(set(cluster_labels), [{0, 1}])  # We expect two clusters
         self.assertEqual(len(cluster_labels), 4, "Expected 4 cluster labels.")
     def test_no_matching_articles(self):
@@ -67,12 +67,12 @@ class TestCases(unittest.TestCase):
             'Title': ['Understanding AI', 'Introduction to Machine Learning'],
             'Content': ['AI is a broad field.', 'Machine learning is a subset of AI.']
         })
-        cluster_labels = f_183(df_no_matches)
+        cluster_labels = f_199(df_no_matches)
         self.assertEqual(len(cluster_labels), 0, "Expected no cluster labels for DataFrame without matching titles.")
     def test_empty_dataframe(self):
         """Test the function with an empty DataFrame."""
         df_empty = pd.DataFrame(columns=['Title', 'Content'])
-        cluster_labels = f_183(df_empty)
+        cluster_labels = f_199(df_empty)
         self.assertEqual(len(cluster_labels), 0, "Expected no cluster labels for an empty DataFrame.")
     def test_invalid_dataframe_structure(self):
         """Test the function with a DataFrame missing required columns."""
@@ -81,8 +81,8 @@ class TestCases(unittest.TestCase):
             'Body': ['Content about Python.']  # Wrong column name
         })
         with self.assertRaises(KeyError):
-            f_183(df_invalid)
+            f_199(df_invalid)
     def test_function_exception_handling(self):
         """Test to ensure that function handles incorrect input types gracefully."""
         with self.assertRaises(TypeError):
-            f_183(None)  # Passing None to simulate bad input
+            f_199(None)  # Passing None to simulate bad input

@@ -2,7 +2,7 @@ import time
 import matplotlib.pyplot as plt
 
 
-def f_136(time_strings, time_format="%d/%m/%Y %H:%M:%S.%f"):
+def f_144(time_strings, time_format="%d/%m/%Y %H:%M:%S.%f"):
     """
     Parses a list of time strings and plots a histogram of the seconds component.
 
@@ -25,7 +25,7 @@ def f_136(time_strings, time_format="%d/%m/%Y %H:%M:%S.%f"):
 
     Example:
     >>> time_strings = ['30/03/2009 16:31:32.123', '15/04/2010 14:25:46.789', '20/12/2011 12:34:56.000']
-    >>> ax = f_136(time_strings)
+    >>> ax = f_144(time_strings)
     >>> plt.show()  # Display the plot
     """
     try:
@@ -40,7 +40,7 @@ def f_136(time_strings, time_format="%d/%m/%Y %H:%M:%S.%f"):
 import unittest
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for the function f_136."""
+    """Test cases for the function f_144."""
     def test_histogram_counts(self):
         """Test the counts in the histogram."""
         time_strings = [
@@ -48,7 +48,7 @@ class TestCases(unittest.TestCase):
             "15/04/2010 14:25:46.789",
             "20/12/2011 12:34:56.000",
         ]
-        ax = f_136(time_strings)
+        ax = f_144(time_strings)
         # Extract histogram data
         n_values = [patch.get_height() for patch in ax.patches]
         # Check the count of values in each bin
@@ -56,22 +56,22 @@ class TestCases(unittest.TestCase):
     def test_histogram_title(self):
         """Test the title of the histogram."""
         time_strings = ["30/03/2009 16:31:32.123"]
-        ax = f_136(time_strings)
+        ax = f_144(time_strings)
         self.assertEqual(ax.get_title(), "")
     def test_histogram_xaxis(self):
         """Test the x-axis label of the histogram."""
         time_strings = ["30/03/2009 16:31:32.123"]
-        ax = f_136(time_strings)
+        ax = f_144(time_strings)
         self.assertEqual(ax.get_xlabel(), "")
     def test_histogram_yaxis(self):
         """Test the y-axis label of the histogram."""
         time_strings = ["30/03/2009 16:31:32.123"]
-        ax = f_136(time_strings)
+        ax = f_144(time_strings)
         self.assertEqual(ax.get_ylabel(), "")
     def test_large_input(self):
         """Test with a large input."""
         time_strings = ["30/03/2009 16:31:32.123"] * 50
-        ax = f_136(time_strings)
+        ax = f_144(time_strings)
         # Extract histogram data
         n_values = [patch.get_height() for patch in ax.patches]
         # Check the count of values in the specific bin corresponding to the seconds value "32"
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
     def test_invalid_time_format(self):
         """Test with an invalid time format."""
         time_strings = ["30/03/2009 16:31:32.123"]
-        ax = f_136(time_strings, time_format="%d/%m/%Y %H:%M:%S")
+        ax = f_144(time_strings, time_format="%d/%m/%Y %H:%M:%S")
         self.assertIsNone(ax)
     def tearDown(self):
         plt.close()

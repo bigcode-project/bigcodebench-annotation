@@ -2,7 +2,7 @@ import pandas as pd
 from random import randint
 
 
-def f_344(name: str, age: int, code: str, salary: float, bio: str) -> pd.DataFrame:
+def f_379(name: str, age: int, code: str, salary: float, bio: str) -> pd.DataFrame:
     """
     Generate a Pandas DataFrame of employees with their details based on the input provided.
 
@@ -26,7 +26,7 @@ def f_344(name: str, age: int, code: str, salary: float, bio: str) -> pd.DataFra
 
     Example:
     >>> random.seed(0)
-    >>> df = f_344("John", 30, "A10B", 5000.0, "This is a bio with spaces")
+    >>> df = f_379("John", 30, "A10B", 5000.0, "This is a bio with spaces")
     >>> print(df)
        Name  Age  Code  Salary                        Bio  Job Title
     0  John   30  A10B  5000.0  This is a bio with spaces  Developer
@@ -48,7 +48,7 @@ import random
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test the DataFrame structure for a known input
-        df = f_344("John", 30, "A10B", 5000.0, "Sample bio")
+        df = f_379("John", 30, "A10B", 5000.0, "Sample bio")
         expected_columns = ["Name", "Age", "Code", "Salary", "Bio", "Job Title"]
         self.assertListEqual(
             list(df.columns), expected_columns, "DataFrame columns mismatch"
@@ -62,34 +62,34 @@ class TestCases(unittest.TestCase):
             )
     def test_case_2(self):
         # Test minimum and maximum valid ages and salary, including edge cases
-        df_min_age = f_344("Alice", 18, "X10Y", 0.0, "Minimum age and salary")
+        df_min_age = f_379("Alice", 18, "X10Y", 0.0, "Minimum age and salary")
         self.assertEqual(df_min_age["Age"][0], 18)
         self.assertEqual(df_min_age["Salary"][0], 0.0)
-        df_max_age = f_344("Bob", 65, "Z99W", 1000000.0, "Maximum age and high salary")
+        df_max_age = f_379("Bob", 65, "Z99W", 1000000.0, "Maximum age and high salary")
         self.assertEqual(df_max_age["Age"][0], 65)
         self.assertEqual(df_max_age["Salary"][0], 1000000.0)
     def test_case_3(self):
         # Test bio with special characters, very long string, and empty string
-        df_special_bio = f_344("Charlie", 30, "C30D", 5300.0, "!@#$%^&*()_+|")
+        df_special_bio = f_379("Charlie", 30, "C30D", 5300.0, "!@#$%^&*()_+|")
         self.assertEqual(df_special_bio["Bio"][0], "!@#$%^&*()_+|")
-        df_long_bio = f_344("David", 30, "D40E", 5400.5, "a" * 1000)
+        df_long_bio = f_379("David", 30, "D40E", 5400.5, "a" * 1000)
         self.assertEqual(len(df_long_bio["Bio"][0]), 1000)
-        df_empty_bio = f_344("John", 30, "E50F", 5500.0, "")
+        df_empty_bio = f_379("John", 30, "E50F", 5500.0, "")
         self.assertEqual(df_empty_bio["Bio"][0], "")
     def test_case_4(self):
         # Test code with different formats
-        df_code_special_chars = f_344(
+        df_code_special_chars = f_379(
             "Alice", 25, "!@#$", 5500.5, "Bio with special char code"
         )
         self.assertEqual(df_code_special_chars["Code"][0], "!@#$")
     def test_case_5(self):
         # Test for case sensitivity
         with self.assertRaises(ValueError):
-            f_344("john", 30, "J01K", 5000.0, "Case sensitive name test")
+            f_379("john", 30, "J01K", 5000.0, "Case sensitive name test")
     def test_case_6(self):
         # Test each predefined name
         for name in ["John", "Alice", "Bob", "Charlie", "David"]:
-            df = f_344(name, 30, "A10B", 5000.0, f"{name}'s bio")
+            df = f_379(name, 30, "A10B", 5000.0, f"{name}'s bio")
             self.assertEqual(
                 df["Name"][0], name, f"Valid name {name} failed to create a DataFrame"
             )
@@ -108,19 +108,19 @@ class TestCases(unittest.TestCase):
         )
         random.seed(42)  # Set the seed for the first run
         for _ in range(n_iter):
-            df = f_344(name, age, code, salary, bio)
+            df = f_379(name, age, code, salary, bio)
             job_titles_first_run.append(df["Job Title"][0])
         random.seed(42)  # Reset the seed to ensure reproducibility for the second run
         for _ in range(n_iter):
-            df = f_344(name, age, code, salary, bio)
+            df = f_379(name, age, code, salary, bio)
             job_titles_second_run.append(df["Job Title"][0])
         random.seed(0)  # Repeat for third run with different seed
         for _ in range(n_iter):
-            df = f_344(name, age, code, salary, bio)
+            df = f_379(name, age, code, salary, bio)
             job_titles_third_run.append(df["Job Title"][0])
         self.assertEqual(job_titles_first_run, job_titles_second_run)
         self.assertNotEqual(job_titles_first_run, job_titles_third_run)
     def test_case_8(self):
         # Test invalid name
         with self.assertRaises(ValueError):
-            f_344("InvalidName", 28, "C30D", 5300.0, "Bio of InvalidName")
+            f_379("InvalidName", 28, "C30D", 5300.0, "Bio of InvalidName")

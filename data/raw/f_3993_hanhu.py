@@ -41,7 +41,6 @@ import os
 
 class TestCases(unittest.TestCase):
 
-    @classmethod
     def setUp(self):
         """Set up test environment by creating test gzip files with known content."""
         with gzip.open('file1.gz', 'wt') as f:

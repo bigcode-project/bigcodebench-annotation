@@ -3,7 +3,7 @@ import random
 
 
 
-def f_600(length, random_seed=None):
+def f_667(length, random_seed=None):
     """
     Generate a random string of a given length, with each character being either
     a parenthesis (from the set "(){}[]") 
@@ -26,15 +26,15 @@ def f_600(length, random_seed=None):
           definition of the bracket set.
 
     Example:
-    >>> string = f_600(10, random_seed=1)
+    >>> string = f_667(10, random_seed=1)
     >>> print(string)
     ieqh]{[yng
     
-    >>> string = f_600(34, random_seed=42)
+    >>> string = f_667(34, random_seed=42)
     >>> print(string)
     hbrpoigf)cbfnobm(o{rak)vrjnvgfygww
 
-    >>> string = f_600(23, random_seed=1)
+    >>> string = f_667(23, random_seed=1)
     >>> print(string)
     ieqh]{[yng]by)a{rogubbb
     """
@@ -50,33 +50,33 @@ class TestCases(unittest.TestCase):
         return 
     def test_rng(self):
         # rng reproducability
-        res1 = f_600(100, random_seed=42)
-        res2 = f_600(100, random_seed=42)
+        res1 = f_667(100, random_seed=42)
+        res2 = f_667(100, random_seed=42)
         self.assertEqual(res1, res2)
     def test_case_1(self):
         # Testing with length = 5
-        result = f_600(5, random_seed=1)
+        result = f_667(5, random_seed=1)
         self.assertEqual(len(result), 5)
         for char in result:
             self.assertIn(char, string.ascii_lowercase + self.BRACKETS)
     def test_case_2(self):
         # Testing with length = 0 (edge case)
-        result = f_600(0, random_seed=2)
+        result = f_667(0, random_seed=2)
         self.assertEqual(len(result), 0)
     def test_case_3(self):
         # Testing with length = 10
-        result = f_600(10, random_seed=3)
+        result = f_667(10, random_seed=3)
         self.assertEqual(len(result), 10)
         for char in result:
             self.assertIn(char, string.ascii_lowercase + self.BRACKETS)
     def test_case_4(self):
         # Testing with length = 1 (edge case)
-        result = f_600(1, random_seed=34)
+        result = f_667(1, random_seed=34)
         self.assertEqual(len(result), 1)
         self.assertIn(result, string.ascii_lowercase + self.BRACKETS)
     def test_case_5(self):
         # Testing with length = 50
-        result = f_600(50, random_seed=777)
+        result = f_667(50, random_seed=777)
         self.assertEqual(len(result), 50)
         for char in result:
             self.assertIn(char, string.ascii_lowercase + self.BRACKETS)

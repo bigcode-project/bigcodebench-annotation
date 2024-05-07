@@ -4,7 +4,7 @@ import struct
 
 KEYS = ['470FC614', '4A0FC614', '4B9FC614', '4C8FC614', '4D7FC614']
 
-def f_416(hex_keys=KEYS):
+def f_457(hex_keys=KEYS):
     """
     Generate a random float number from a list of hex strings and then encode the float number in utf-8.
 
@@ -21,7 +21,7 @@ def f_416(hex_keys=KEYS):
 
     Example:
     >>> random.seed(42)
-    >>> f_416()
+    >>> f_457()
     b'36806.078125'
     """
     hex_key = random.choice(hex_keys)
@@ -36,22 +36,22 @@ class TestCases(unittest.TestCase):
         return float(codecs.decode(byte_val, 'utf-8'))
     def test_case_1(self):
         random.seed(42)
-        result = f_416()
+        result = f_457()
         self.assertEqual(result, b'36806.078125')
     def test_case_2(self):
-        result = f_416(['5D7FC614'])
+        result = f_457(['5D7FC614'])
         self.assertEqual(result, b'1.1519025322058056e+18')
         
     def test_case_3(self):
         # Checking consistency over multiple runs
         random.seed(0)
-        result = f_416(['ABCD1234', 'DEADBEEF', '00AABEEF'])
+        result = f_457(['ABCD1234', 'DEADBEEF', '00AABEEF'])
         self.assertEqual(result, b'-6.259853398707798e+18')
     def test_case_4(self):
-        result = f_416(['00000000'])
+        result = f_457(['00000000'])
         self.assertEqual(result, b'0.0')
     
     def test_case_5(self):
         # Checking the decoding process
-        result = f_416(['AAAAAAAA'])
+        result = f_457(['AAAAAAAA'])
         self.assertEqual(result, b'-3.0316488252093987e-13')

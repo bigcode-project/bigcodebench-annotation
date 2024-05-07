@@ -1,7 +1,7 @@
 import heapq
 from sklearn.preprocessing import StandardScaler
 
-def f_358(df, col1, col2, N=10):
+def f_395(df, col1, col2, N=10):
     """
     Standardize two columns ('col1' and 'col2') in the DataFrame, find the biggest differences between the individual 
     elements of the standardized columns, and return the indices of the N largest differences.
@@ -26,7 +26,7 @@ def f_358(df, col1, col2, N=10):
     ...     'col1': [99, 86, 90, 70, 86, 95, 56, 98, 80, 81, 1, 2],
     ...     'col2': [21, 11, 21, 1, 26, 40, 4, 50, 34, 37, 3, 4]
     ... })
-    >>> indices = f_358(df, 'col1', 'col2', N=6)
+    >>> indices = f_395(df, 'col1', 'col2', N=6)
     >>> print(indices)     
     [3, 1, 11, 10, 7, 0]
 
@@ -34,7 +34,7 @@ def f_358(df, col1, col2, N=10):
     ...     'a': [1, 2, 3, 4],
     ...     'b': [1, 2, 3, 5]
     ... })
-    >>> indices = f_358(df, 'a', 'b')
+    >>> indices = f_395(df, 'a', 'b')
     >>> print(indices)   
     [2, 3, 0, 1]
     """
@@ -82,32 +82,32 @@ class TestCases(unittest.TestCase):
             'col2': [2, 3, 4, 5, 6]
         }
         df = pd.DataFrame(data)
-        self.assertRaises(Exception, f_358, df, 'a', 'col2')
-        self.assertRaises(Exception, f_358, df, 'col1', 'a')
-        self.assertRaises(Exception, f_358, df, 'a', 'b')
+        self.assertRaises(Exception, f_395, df, 'a', 'col2')
+        self.assertRaises(Exception, f_395, df, 'col1', 'a')
+        self.assertRaises(Exception, f_395, df, 'a', 'b')
     # Original test cases
     def test_case_1(self):
-        result = f_358(self.df1, 'col1', 'col2')
+        result = f_395(self.df1, 'col1', 'col2')
         self.assertTrue(isinstance(result, list))
         self.assertEqual(len(result), 10)
         
     def test_case_2(self):
-        result = f_358(self.df2, 'col1', 'col2', 5)
+        result = f_395(self.df2, 'col1', 'col2', 5)
         self.assertTrue(isinstance(result, list))
         self.assertEqual(len(result), 5)
         
     def test_case_3(self):
-        result = f_358(self.df3, 'col1', 'col2', 7)
+        result = f_395(self.df3, 'col1', 'col2', 7)
         self.assertTrue(isinstance(result, list))
         self.assertEqual(len(result), 7)
         
     def test_case_4(self):
-        result = f_358(self.df4, 'col1', 'col2', 8)
+        result = f_395(self.df4, 'col1', 'col2', 8)
         self.assertTrue(isinstance(result, list))
         self.assertEqual(len(result), 8)
         
     def test_case_5(self):
-        result = f_358(self.df5, 'col1', 'col2', 6)
+        result = f_395(self.df5, 'col1', 'col2', 6)
         self.assertTrue(isinstance(result, list))
         self.assertEqual(len(result), 6)
 class CorrectedDeterministicTestCases(unittest.TestCase):
@@ -118,7 +118,7 @@ class CorrectedDeterministicTestCases(unittest.TestCase):
             'col2': [5, 4, 3, 2, 1]
         })
         expected_result = [0, 4, 1, 3, 2]
-        result = f_358(df, 'col1', 'col2')
+        result = f_395(df, 'col1', 'col2')
         self.assertListEqual(sorted(result), sorted(expected_result))
         
     def test_deterministic_case_2(self):
@@ -127,7 +127,7 @@ class CorrectedDeterministicTestCases(unittest.TestCase):
             'col2': [10, 20, 30, 40, 50]
         })
         expected_result = [0, 1, 2, 3, 4]
-        result = f_358(df, 'col1', 'col2')
+        result = f_395(df, 'col1', 'col2')
         self.assertListEqual(sorted(result), sorted(expected_result))
         
     def test_deterministic_case_3(self):
@@ -136,5 +136,5 @@ class CorrectedDeterministicTestCases(unittest.TestCase):
             'col2': [2, 2, 2, 2, 2]
         })
         expected_result = [0, 1, 2, 3, 4]
-        result = f_358(df, 'col1', 'col2')
+        result = f_395(df, 'col1', 'col2')
         self.assertListEqual(sorted(result), sorted(expected_result))

@@ -2,7 +2,7 @@ import re
 from nltk.corpus import stopwords
 
 
-def f_32(text: str) -> dict:
+def f_33(text: str) -> dict:
     """
     Analyzes a given text string by removing duplicate words and stopwords, 
     and then returns a frequency distribution of the remaining words.
@@ -21,10 +21,10 @@ def f_32(text: str) -> dict:
     - A manually defined set of common English stopwords is used for filtering.
 
     Examples:
-    >>> f_32("The quick brown fox jumps over the lazy dog and the dog was not that quick to respond.")
+    >>> f_33("The quick brown fox jumps over the lazy dog and the dog was not that quick to respond.")
     {'quick': 1, 'brown': 1, 'fox': 1, 'jumps': 1, 'lazy': 1, 'dog': 1, 'respond': 1}
 
-    >>> f_32("hello hello world")
+    >>> f_33("hello hello world")
     {'hello': 1, 'world': 1}
     """
     stop_words = set(stopwords.words('english'))
@@ -39,26 +39,26 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         input_text = "The quick brown fox jumps over the lazy dog and the dog was not that quick to respond."
-        output = f_32(input_text)
+        output = f_33(input_text)
         expected_output = {'quick': 1, 'brown': 1, 'fox': 1, 'jumps': 1, 'lazy': 1, 'dog': 1, 'respond': 1}
         self.assertEqual(output, expected_output)
     def test_case_2(self):
         input_text = "hello hello world"
-        output = f_32(input_text)
+        output = f_33(input_text)
         expected_output = {'hello': 1, 'world': 1}
         self.assertEqual(output, expected_output)
     def test_case_3(self):
         input_text = "the and is"
-        output = f_32(input_text)
+        output = f_33(input_text)
         expected_output = {}
         self.assertEqual(output, expected_output)
     def test_case_4(self):
         input_text = ""
-        output = f_32(input_text)
+        output = f_33(input_text)
         expected_output = {}
         self.assertEqual(output, expected_output)
     def test_case_5(self):
         input_text = "hello1 hello2 hello1"
-        output = f_32(input_text)
+        output = f_33(input_text)
         expected_output = {'hello1': 1, 'hello2': 1}
         self.assertEqual(output, expected_output)

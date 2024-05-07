@@ -3,7 +3,7 @@ import random
 import re
 
 
-def f_351(data_list, seed=42):
+def f_388(data_list, seed=42):
     """
     Randomizes the order of comma-separated substrings within each string in a list,
     normalizing spaces to ensure a single space follows each comma using regex, then
@@ -22,7 +22,7 @@ def f_351(data_list, seed=42):
     - re
 
     Example:
-    >>> df = f_351(['lamp, bag, mirror', 'table, chair, bag'], seed=42)
+    >>> df = f_388(['lamp, bag, mirror', 'table, chair, bag'], seed=42)
     >>> df['Original String'][0]
     'lamp, bag, mirror'
     >>> df['Randomized String'][0]
@@ -46,7 +46,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic functionality with a reproducible seed
         input_data = ["a, b", "c, d, e"]
-        df = f_351(input_data, seed=42)
+        df = f_388(input_data, seed=42)
         self.assertEqual(len(df), 2)
         self.assertListEqual(df["Original String"].tolist(), input_data)
         self.assertNotEqual(
@@ -59,12 +59,12 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test function's behavior with an empty input list
         input_data = []
-        df = f_351(input_data)
+        df = f_388(input_data)
         self.assertEqual(len(df), 0)
     def test_case_3(self):
         # Test with single items (no commas) to verify output matches input exactly
         input_data = ["a", "b", "c"]
-        df = f_351(input_data)
+        df = f_388(input_data)
         self.assertListEqual(
             df["Original String"].tolist(), df["Randomized String"].tolist()
         )
@@ -72,14 +72,14 @@ class TestCases(unittest.TestCase):
         # Test with strings containing only commas
         input_data = [",,,", ",,"]
         expected_output = [", , , ", ", , "]
-        df = f_351(input_data)
+        df = f_388(input_data)
         self.assertTrue(
             all(df["Randomized String"].apply(lambda x: x in expected_output))
         )
     def test_case_5(self):
         # Test strings with inconsistent use of spaces and delimiters
         input_data = ["a,b,  c", "d ,e, f"]  # Inputs with inconsistent spacing
-        df = f_351(input_data, seed=24)
+        df = f_388(input_data, seed=24)
         for i in range(len(input_data)):
             original_substrings = set(re.split("\s*,\s*", input_data[i]))
             randomized_substrings = set(df["Randomized String"].iloc[i].split(", "))
@@ -90,29 +90,29 @@ class TestCases(unittest.TestCase):
     def test_case_6(self):
         # Test with strings that include special characters
         input_data = ["!@#, $%^", "&*(), )(_+"]
-        df = f_351(input_data, seed=99)
+        df = f_388(input_data, seed=99)
         self.assertEqual(len(df), 2)
         for orig, rand in zip(df["Original String"], df["Randomized String"]):
             self.assertSetEqual(set(orig.split(", ")), set(rand.split(", ")))
     def test_case_7(self):
         # Test random seed
         input_data = ["lamp, bag, mirror", "table, chair, vase"]
-        df1 = f_351(input_data, seed=42)
-        df2 = f_351(input_data, seed=42)
+        df1 = f_388(input_data, seed=42)
+        df2 = f_388(input_data, seed=42)
         self.assertListEqual(
             df1["Randomized String"].tolist(), df2["Randomized String"].tolist()
         )
     def test_case_8(self):
         # Test the handling of non-standard separators
         input_data = ["a;b;c", "d:e:f"]
-        df = f_351(input_data)
+        df = f_388(input_data)
         self.assertListEqual(
             df["Original String"].tolist(), df["Randomized String"].tolist()
         )
     def test_case_9(self):
         ## Test handling of strings with commas not followed by spaces
         input_data = ["a,b,c", "d,e,f"]
-        df = f_351(input_data, seed=42)
+        df = f_388(input_data, seed=42)
         for idx in range(len(input_data)):
             original_substrings = set(re.split(",\s*", input_data[idx].strip()))
             randomized_substrings = set(df["Randomized String"].iloc[idx].split(", "))
@@ -124,7 +124,7 @@ class TestCases(unittest.TestCase):
     def test_case_10(self):
         # Test handling of strings with leading or trailing spaces
         input_data = [" a, b, c ", " d, e, f "]
-        df = f_351(input_data, seed=42)
+        df = f_388(input_data, seed=42)
         for idx in range(len(input_data)):
             original_substrings = set(
                 x.strip() for x in re.split(",\s*", input_data[idx].strip())
@@ -140,7 +140,7 @@ class TestCases(unittest.TestCase):
     def test_case_11(self):
         # Test handling of strings with multiple spaces after a comma
         input_data = ["a,  b,   c", "d,    e, f"]
-        df = f_351(input_data, seed=42)
+        df = f_388(input_data, seed=42)
         for rand_str in df["Randomized String"].tolist():
             self.assertTrue(
                 ",  " not in rand_str

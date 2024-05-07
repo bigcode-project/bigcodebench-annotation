@@ -2,7 +2,7 @@ import string
 import random
 
 
-def f_101(text, seed=None):
+def f_105(text, seed=None):
     """
     Generates a password that mirrors the structure of the given text by replacing alphabetic
     characters with random ascii lowercase letters, digits with random single-digit numbers,
@@ -27,9 +27,9 @@ def f_101(text, seed=None):
     - This function does not handle high Unicode characters and focuses only on ASCII values.
 
     Examples:
-    >>> f_101("hello world! 123", 0)
+    >>> f_105("hello world! 123", 0)
     'mbqmp3jytre!v553'
-    >>> f_101("apple321#", seed=42)
+    >>> f_105("apple321#", seed=42)
     'uahev901#'
     """
     if seed is not None:
@@ -57,7 +57,7 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic case
-        result = f_101("Hello123", seed=1)
+        result = f_105("Hello123", seed=1)
         self.assertEqual(len(result), 8)
         for i, char in enumerate("Hello123"):
             if char.isalpha():
@@ -66,18 +66,18 @@ class TestCases(unittest.TestCase):
                 self.assertTrue(result[i].isdigit())
     def test_case_2(self):
         # Test basic case with alphabet only
-        result = f_101("ABC", seed=2)
+        result = f_105("ABC", seed=2)
         self.assertEqual(len(result), 3)
         self.assertTrue(all(char.isalpha() for char in result))
     def test_case_3(self):
         # Test basic case with digit only
-        result = f_101("123", seed=3)
+        result = f_105("123", seed=3)
         self.assertEqual(len(result), 3)
         self.assertTrue(all(char.isdigit() for char in result))
     def test_case_4(self):
         # Test basic case with whitespace, alphabet, number, special char
         text = "Hello, world!"
-        result = f_101(text, seed=4)
+        result = f_105(text, seed=4)
         self.assertEqual(len(result), 13)
         for i, char in enumerate(text):
             result_char = result[i]
@@ -92,4 +92,4 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test handling empty string
         with self.assertRaises(Exception):
-            f_101("", seed=5)
+            f_105("", seed=5)

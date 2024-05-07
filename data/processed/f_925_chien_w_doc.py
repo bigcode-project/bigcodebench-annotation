@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 
 
-def f_488(data=None):
+def f_538(data=None):
     """
     Converts string-formatted weights to floats and plots a scatter plot of weight against height.
 
@@ -35,7 +35,7 @@ def f_488(data=None):
     - seaborn
 
     Example:
-    >>> ax = f_488()
+    >>> ax = f_538()
     >>> print(ax.get_title())
     Weight vs Height
     """
@@ -56,21 +56,21 @@ import unittest
 import pandas as pd
 from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
-    """Test cases for f_488"""
+    """Test cases for f_538"""
     def test_default_data(self):
-        """Test f_488 with its default data."""
-        result = f_488()
+        """Test f_538 with its default data."""
+        result = f_538()
         self.assertIsInstance(result, Axes)
     def test_custom_data(self):
-        """Test f_488 with custom data."""
+        """Test f_538 with custom data."""
         custom_data = {
             "Weight_String": ["50.5", "55.7", "60.2"],
             "Height": [150, 155, 160],
         }
-        result = f_488(custom_data)
+        result = f_538(custom_data)
         self.assertIsInstance(result, Axes)
     def test_incorrect_data_type(self):
-        """Test f_488 with incorrect data types in Weight_String."""
+        """Test f_538 with incorrect data types in Weight_String."""
         incorrect_data = {
             "Weight_String": [
                 60.5,
@@ -80,17 +80,17 @@ class TestCases(unittest.TestCase):
             "Height": [160, 165, 170],
         }
         with self.assertRaises(ValueError):
-            f_488(incorrect_data)
+            f_538(incorrect_data)
     def test_empty_data(self):
-        """Test f_488 with empty data."""
+        """Test f_538 with empty data."""
         empty_data = {"Weight_String": [], "Height": []}
-        result = f_488(empty_data)
+        result = f_538(empty_data)
         self.assertIsInstance(result, Axes)
     def test_mismatched_data_length(self):
-        """Test f_488 with mismatched lengths of Weight_String and Height."""
+        """Test f_538 with mismatched lengths of Weight_String and Height."""
         mismatched_data = {
             "Weight_String": ["60.5", "65.7"],  # Less weights than heights
             "Height": [160, 165, 170],
         }
         with self.assertRaises(ValueError):
-            f_488(mismatched_data)
+            f_538(mismatched_data)

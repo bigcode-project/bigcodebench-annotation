@@ -9,7 +9,7 @@ ALPHANUMERIC = re.compile('[\W_]+')
 PUNCTUATIONS = string.punctuation
 
 
-def f_461(text: str, sia: SentimentIntensityAnalyzer) -> dict:
+def f_508(text: str, sia: SentimentIntensityAnalyzer) -> dict:
     """Analyze the sentiment of a text using the provided SentimentIntensityAnalyzer.
     The text is first cleaned by:
     - Removing all non-alphanumeric characters except spaces.
@@ -36,7 +36,7 @@ def f_461(text: str, sia: SentimentIntensityAnalyzer) -> dict:
     Example:
     >>> from nltk.sentiment import SentimentIntensityAnalyzer
     >>> sia = SentimentIntensityAnalyzer()
-    >>> f_461("I love Python!", sia)
+    >>> f_508("I love Python!", sia)
     {'neg': 0.0, 'neu': 0.192, 'pos': 0.808, 'compound': 0.6369}
     """
     text = ALPHANUMERIC.sub(' ', text).lower()
@@ -52,26 +52,26 @@ class MockedSentimentIntensityAnalyzer:
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         sia = MockedSentimentIntensityAnalyzer()
-        result = f_461("I love Python!", sia)
+        result = f_508("I love Python!", sia)
         expected = {'compound': 0.5, 'neg': 0.25, 'neu': 0.25, 'pos': 0.5}
         self.assertEqual(result, expected)
     
     def test_case_2(self):
         sia = MockedSentimentIntensityAnalyzer()
-        result = f_461("I hate rainy days.", sia)
+        result = f_508("I hate rainy days.", sia)
         self.assertEqual(result['neg'], 0.25)
     
     def test_case_3(self):
         sia = MockedSentimentIntensityAnalyzer()
-        result = f_461("The weather is neutral today.", sia)
+        result = f_508("The weather is neutral today.", sia)
         self.assertEqual(result['neu'], 0.25)
     
     def test_case_4(self):
         sia = MockedSentimentIntensityAnalyzer()
-        result = f_461("Absolutely fantastic!", sia)
+        result = f_508("Absolutely fantastic!", sia)
         self.assertEqual(result['pos'], 0.5)
     
     def test_case_5(self):
         sia = MockedSentimentIntensityAnalyzer()
-        result = f_461("This is a bad idea!", sia)
+        result = f_508("This is a bad idea!", sia)
         self.assertEqual(result['neg'], 0.25)

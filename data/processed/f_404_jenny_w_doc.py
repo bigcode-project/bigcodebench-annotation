@@ -3,7 +3,7 @@ import numpy as np
 import statsmodels.api as sm
 
 
-def f_700(
+def f_778(
     array: list, random_seed: int = 0
 ) -> (pd.DataFrame, sm.regression.linear_model.RegressionResultsWrapper):
     """
@@ -30,7 +30,7 @@ def f_700(
     - statsmodels.api.sm
 
     Example:
-    >>> df, results = f_700([[1,2,3,4,5], [6,7,8,9,10]])
+    >>> df, results = f_778([[1,2,3,4,5], [6,7,8,9,10]])
     >>> print(df)
        A  B  C  D  Response
     0  1  2  3  4         5
@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
         ]
         for array, random_seed, expected_r2 in test_data:
             with self.subTest(array=array):
-                df, results = f_700(array, random_seed=random_seed)
+                df, results = f_778(array, random_seed=random_seed)
                 expected_df = pd.DataFrame(
                     array, columns=["A", "B", "C", "D", "Response"]
                 )
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
             [11, 12, 13, 14, 15],
             [16, 17, 18, 19, 20],
         ]
-        df, results = f_700(array, random_seed=random_seed)
+        df, results = f_778(array, random_seed=random_seed)
         expected_df = pd.DataFrame(array, columns=["A", "B", "C", "D", "Response"])
         self.assertTrue(df.equals(expected_df))
         self.assertAlmostEqual(results.rsquared, 1.0, places=2)
@@ -93,23 +93,23 @@ class TestCases(unittest.TestCase):
         # Testing input validation for incorrect number of columns in a row
         array = [[1, 2, 3, 4], [5, 6, 7, 8]]  # Missing dependent variable
         with self.assertRaises(ValueError):
-            f_700(array)
+            f_778(array)
     def test_case_4(self):
         # Testing handling of non-numeric values to ensure type safety
         array = [["a", "b", "c", "d", "e"]]  # All elements as strings
         with self.assertRaises(ValueError):
-            df, results = f_700(array)
+            df, results = f_778(array)
             # This assumes the function is modified to catch and raise ValueError for non-numeric inputs
     def test_case_5(self):
         # Testing reproducibility by using the same random_seed
         array = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
         random_seed = 123
-        df1, results1 = f_700(array, random_seed=random_seed)
-        df2, results2 = f_700(array, random_seed=random_seed)
+        df1, results1 = f_778(array, random_seed=random_seed)
+        df2, results2 = f_778(array, random_seed=random_seed)
         self.assertTrue(df1.equals(df2))
         self.assertEqual(results1.params.tolist(), results2.params.tolist())
     def test_case_6(self):
         # Testing with an empty array to check function's handling of no input data
         array = []
         with self.assertRaises(ValueError):
-            f_700(array)
+            f_778(array)

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def f_15(column, data):
+def f_16(column, data):
     """
     Analyze and visualize statistical properties of a specified weather data column.
 
@@ -34,7 +34,7 @@ def f_15(column, data):
 
     Example:
     >>> data = [[datetime(2022, 1, 1), -5, 80, 10, 0], [datetime(2022, 1, 3), -2, 83, 15, 0]]
-    >>> result = f_15('Temperature', data)
+    >>> result = f_16('Temperature', data)
     >>> result['sum']
     -7
     >>> type(result['plot'])
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         ]
     def test_case_1(self):
         # Testing the 'Temperature' column
-        result = f_15("Temperature", self.data)
+        result = f_16("Temperature", self.data)
         self.assertEqual(result["sum"], -11)
         self.assertEqual(result["mean"], -2.2)
         self.assertEqual(result["min"], -5)
@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
     def test_case_2(self):
         # Testing the 'Humidity' column
-        result = f_15("Humidity", self.data)
+        result = f_16("Humidity", self.data)
         self.assertEqual(result["sum"], 410)
         self.assertEqual(result["mean"], 82)
         self.assertEqual(result["min"], 80)
@@ -86,7 +86,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
     def test_case_3(self):
         # Testing the 'Wind Speed' column
-        result = f_15("Wind Speed", self.data)
+        result = f_16("Wind Speed", self.data)
         self.assertEqual(result["sum"], 61)
         self.assertEqual(result["mean"], 12.2)
         self.assertEqual(result["min"], 10)
@@ -94,7 +94,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
     def test_case_4(self):
         # Testing the 'Precipitation' column
-        result = f_15("Precipitation", self.data)
+        result = f_16("Precipitation", self.data)
         self.assertAlmostEqual(result["sum"], 0.8, places=6)
         self.assertAlmostEqual(result["mean"], 0.16, places=6)
         self.assertAlmostEqual(result["min"], 0, places=6)
@@ -102,7 +102,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
     def test_case_5(self):
         # Testing with empty data
-        result = f_15("Temperature", [])
+        result = f_16("Temperature", [])
         self.assertTrue(np.isnan(result["mean"]))
         self.assertEqual(result["sum"], 0)
         self.assertTrue(

@@ -3,7 +3,7 @@ from string import punctuation
 import pandas as pd
 
 
-def f_143(text):
+def f_152(text):
     """
     Finds all words in a text, that are seperated by whitespace, 
     beginning with the "$" character and computes their number of occurences.
@@ -29,14 +29,14 @@ def f_143(text):
 
     Example:
     >>> text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
-    >>> f_143(text)
+    >>> f_152(text)
        Word  Frequency
     0  $abc          3
     1  $efg          1
     2  $hij          3
 
     >>> text = "$hello this i$s a $test $test $test"
-    >>> f_143(text)
+    >>> f_152(text)
          Word  Frequency
     0  $hello          1
     1   $test          3
@@ -54,32 +54,32 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
-        result = f_143(text)
+        result = f_152(text)
         expected_words = ["$abc", "$efg", "$hij"]
         expected_freqs = [3, 1, 3]
         self.assertListEqual(result["Word"].tolist(), expected_words)
         self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
     def test_case_2(self):
         text = "This is a test without dollar words."
-        result = f_143(text)
+        result = f_152(text)
         self.assertEqual(len(result), 0)
     def test_case_3(self):
         text = "$test1 $test2 $test1 $test3"
-        result = f_143(text)
+        result = f_152(text)
         expected_words = ["$test1", "$test2", "$test3"]
         expected_freqs = [2, 1, 1]
         self.assertListEqual(result["Word"].tolist(), expected_words)
         self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
     def test_case_4(self):
         text = "$! $$ $a $a $a"
-        result = f_143(text)
+        result = f_152(text)
         expected_words = ["$a"]
         expected_freqs = [3]
         self.assertListEqual(result["Word"].tolist(), expected_words)
         self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
     def test_case_5(self):
         text = "$word1 word2 $word2 $word1 $word3 $word1"
-        result = f_143(text)
+        result = f_152(text)
         expected_words = ["$word1", "$word2", "$word3"]
         expected_freqs = [3, 1, 1]
         self.assertListEqual(result["Word"].tolist(), expected_words)
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
     def test_case_6(self):
         '''empty input string'''
         text = ""
-        result = f_143(text)
+        result = f_152(text)
         expected_words = []
         expected_freqs = []
         self.assertListEqual(result["Word"].tolist(), expected_words)
@@ -96,14 +96,14 @@ class TestCases(unittest.TestCase):
     def test_case_7(self):
         '''check for correct return type'''
         text = "$test 123 abcd.aef"
-        result = f_143(text)
+        result = f_152(text)
         self.assertTrue(isinstance(result, pd.DataFrame))
         self.assertTrue('Word' in result.columns)
         self.assertTrue('Frequency' in result.columns)
     def test_case_8(self):
         '''word with $ in the middle'''
         text = "asdfj;alskdfj;$kjhkjhdf"
-        result = f_143(text)
+        result = f_152(text)
         expected_words = []
         expected_freqs = []
         self.assertListEqual(result["Word"].tolist(), expected_words)
@@ -111,4 +111,4 @@ class TestCases(unittest.TestCase):
     def test_case_9(self):
         '''non string input'''
         input = 24
-        self.assertRaises(Exception, f_143, input)
+        self.assertRaises(Exception, f_152, input)

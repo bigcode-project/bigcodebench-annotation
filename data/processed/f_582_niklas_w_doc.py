@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.cluster import KMeans
 
-def f_509(x_list, y_list):
+def f_563(x_list, y_list):
     """
     Perform K-Means clustering on the given data by first turning it into a DataFrame with two columns "x" and "y" and then return the labels and centroids.
 
@@ -20,7 +20,7 @@ def f_509(x_list, y_list):
 
     Example:
     >>> df = pd.DataFrame({'x': [1, 2, 3, 4, 5, 6], 'y': [2, 3, 4, 5, 6, 7]})
-    >>> labels, centroids = f_509([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
+    >>> labels, centroids = f_563([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
     """
     df = pd.DataFrame({'x': x_list, 'y': y_list})
     kmeans = KMeans(n_clusters=2, random_state=0).fit(df)
@@ -29,7 +29,7 @@ def f_509(x_list, y_list):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        labels, centroids = f_509([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
+        labels, centroids = f_563([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
         self.assertEqual(labels[0], 0)
         self.assertEqual(labels[1], 0)
         self.assertEqual(labels[2], 0)
@@ -41,7 +41,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(centroids[1][0], 5.)
         self.assertEqual(centroids[1][1], 6.)
     def test_case_2(self):
-        labels, centroids = f_509([1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2])
+        labels, centroids = f_563([1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2])
         self.assertEqual(labels[0], 0)
         self.assertEqual(labels[1], 0)
         self.assertEqual(labels[2], 0)
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(centroids[0][0], 1.)
         self.assertEqual(centroids[0][1], 2.)
     def test_case_3(self):
-        labels, centroids = f_509([1, 2, 3, 4, 5, 6], [2, 2, 2, 2, 2, 2])
+        labels, centroids = f_563([1, 2, 3, 4, 5, 6], [2, 2, 2, 2, 2, 2])
         self.assertEqual(labels[0], 0)
         self.assertEqual(labels[1], 0)
         self.assertEqual(labels[2], 0)
@@ -63,11 +63,11 @@ class TestCases(unittest.TestCase):
         self.assertEqual(centroids[1][0], 5.)
         self.assertEqual(centroids[1][1], 2.)
     def test_case_4(self):
-        labels, centroids = f_509([0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0])
+        labels, centroids = f_563([0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0])
         self.assertEqual(labels[0], 0)
         self.assertEqual(labels[1], 0)
     def test_case_5(self):
-        labels, centroids = f_509([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6])
+        labels, centroids = f_563([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6])
         self.assertEqual(labels[0], 0)
         self.assertEqual(labels[1], 0)
         self.assertEqual(labels[2], 0)

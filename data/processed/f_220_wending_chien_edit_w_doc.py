@@ -3,7 +3,7 @@ import nltk
 from string import punctuation
 
 
-def f_280(df):
+def f_308(df):
     """
     Extracts articles whose titles contain specific case-insensitive keywords ("like" or "what") from a DataFrame and analyzes
     the frequency of each word in the content of these articles, excluding punctuation.
@@ -26,7 +26,7 @@ def f_280(df):
     >>> import pandas as pd
     >>> data = {'Title': ['What is happening', 'Nothing special'], 'Content': ['Like what you see?', 'Just normal text.']}
     >>> df = pd.DataFrame(data)
-    >>> f_280(df)
+    >>> f_308(df)
     {'Like': 1, 'what': 1, 'you': 1, 'see': 1}
     """
     if "Title" not in df.columns or "Content" not in df.columns:
@@ -75,7 +75,7 @@ class TestCases(unittest.TestCase):
             'Like': 1, 'what': 1, 'you': 2, 'see': 1, 'Python': 1, 'popular': 1,
             'among': 1, 'developers': 1, 'What': 1, 'do': 1, 'think': 1
         }
-        result = f_280(self.df)
+        result = f_308(self.df)
         self.assertEqual(result, expected_freq, "The word frequencies do not match the expected output.")
     def test_no_matching_articles(self):
         """Test the function with a DataFrame that has no titles containing 'like' or 'what'."""
@@ -90,12 +90,12 @@ class TestCases(unittest.TestCase):
             ]
         }
         df_no_matches = pd.DataFrame(data)
-        result = f_280(df_no_matches)
+        result = f_308(df_no_matches)
         self.assertEqual(result, {}, "Expected no word frequencies for DataFrame without matching titles.")
     def test_empty_dataframe(self):
         """Test the function with an empty DataFrame."""
         df_empty = pd.DataFrame(columns=['Title', 'Content'])
-        result = f_280(df_empty)
+        result = f_308(df_empty)
         self.assertEqual(result, {}, "Expected no word frequencies for an empty DataFrame.")
     def test_case_sensitive_handling(self):
         """Test the function's handling of case sensitivity in finding keywords."""
@@ -110,7 +110,7 @@ class TestCases(unittest.TestCase):
             ]
         }
         df_case = pd.DataFrame(data)
-        result = f_280(df_case)
+        result = f_308(df_case)
         expected_freq = {'Technological': 1, 'growth': 1, 'is': 1, 'exponential': 1,
                          'These': 1, 'advancements': 1, 'are': 1, 'like': 1, 'no': 1, 'other': 1}
         self.assertEqual(result, expected_freq, "Case sensitivity handling is faulty.")
@@ -118,4 +118,4 @@ class TestCases(unittest.TestCase):
         """Test the function with a DataFrame lacking required columns."""
         df_invalid = pd.DataFrame({'Headline': ['What is happening'], 'Body': ['Something interesting']})
         with self.assertRaises(ValueError):
-            f_280(df_invalid)
+            f_308(df_invalid)

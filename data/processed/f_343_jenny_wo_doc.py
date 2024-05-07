@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 
 
-def f_283(numbers, file_path="save.pkl"):
+def f_312(numbers, file_path="save.pkl"):
     """
     Save a Matplotlib image generated from the provided "numbers" list in a pickle file.
     The function then reads the image back from the file for validation and deletes the pickle file afterward.
@@ -22,7 +22,7 @@ def f_283(numbers, file_path="save.pkl"):
 
     Example:
     >>> numbers = [random.random() for _ in range(100)]
-    >>> loaded_fig = f_283(numbers)
+    >>> loaded_fig = f_312(numbers)
     >>> type(loaded_fig)
     <class 'matplotlib.figure.Figure'>
     """
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test default case - correct file was generated & correct removal
         numbers = list(range(10))
-        loaded_fig = f_283(numbers)
+        loaded_fig = f_312(numbers)
         self.assertIsInstance(
             loaded_fig,
             type(plt.figure()),
@@ -62,7 +62,7 @@ class TestCases(unittest.TestCase):
         # Test when saving intermediate file to specified location
         numbers = list(range(10))
         path = os.path.join(self.temp_dir.name, "default.pkl")
-        loaded_fig = f_283(numbers, path)
+        loaded_fig = f_312(numbers, path)
         self.assertIsInstance(
             loaded_fig,
             type(plt.figure()),
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test with floats
         numbers = [random.random() for _ in range(10)]
-        loaded_fig = f_283(numbers)
+        loaded_fig = f_312(numbers)
         self.assertIsInstance(
             loaded_fig,
             type(plt.figure()),
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Test with a mix of positive, negative, integer, and floating numbers
         numbers = [1, -1, 2.5, -2.5, 3, -3, 4.5, -4.5]
-        loaded_fig = f_283(numbers)
+        loaded_fig = f_312(numbers)
         self.assertIsInstance(
             loaded_fig,
             type(plt.figure()),
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test with an empty list
         numbers = []
-        loaded_fig = f_283(numbers)
+        loaded_fig = f_312(numbers)
         self.assertIsInstance(
             loaded_fig,
             type(plt.figure()),
@@ -102,11 +102,11 @@ class TestCases(unittest.TestCase):
     def test_case_6(self):
         # Function should fail when there's invalid input
         with self.assertRaises(TypeError):
-            f_283("123")
+            f_312("123")
         with self.assertRaises(TypeError):
-            f_283(["1", "2", "3"])
+            f_312(["1", "2", "3"])
         with self.assertRaises(TypeError):
-            f_283([None, None, None])
+            f_312([None, None, None])
     def tearDown(self):
         plt.close("all")
         self.temp_dir.cleanup()

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
 
-def f_254(df, x_column, y_column):
+def f_279(df, x_column, y_column):
     """
     Draws a scatter plot for the specified columns from a pandas DataFrame and fits a linear regression model to the data.
 
@@ -24,7 +24,7 @@ def f_254(df, x_column, y_column):
     Example:
     >>> import pandas as pd
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [2, 3, 4]})
-    >>> ax = f_254(df, 'A', 'B')
+    >>> ax = f_279(df, 'A', 'B')
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
@@ -67,31 +67,31 @@ class TestCases(unittest.TestCase):
     def test_plot_attributes(self):
         # Basic case to test plot is correct
         df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": [1, 2, 3, 4]})
-        ax = f_254(df, "X", "Y")
+        ax = f_279(df, "X", "Y")
         self.assertIsInstance(ax, Axes)
         self.assertEqual(len(ax.lines), 1)
         self.assertEqual(len(ax.collections), 1)
     def test_linear_positive_slope(self):
         # Testing with a dataset that should produce a positive slope
         df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": [2, 4, 6, 8]})
-        ax = f_254(df, "X", "Y")
+        ax = f_279(df, "X", "Y")
         self.helper_assert_line_correctness(ax, expected_slope=2, expected_intercept=0)
     def test_linear_negative_slope(self):
         # Testing with a dataset that should produce a negative slope
         df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": [8, 6, 4, 2]})
-        ax = f_254(df, "X", "Y")
+        ax = f_279(df, "X", "Y")
         self.helper_assert_line_correctness(
             ax, expected_slope=-2, expected_intercept=10
         )
     def test_linear_zero_slope(self):
         # Testing with a dataset that should produce a zero slope
         df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": [5, 5, 5, 5]})
-        ax = f_254(df, "X", "Y")
+        ax = f_279(df, "X", "Y")
         self.helper_assert_line_correctness(ax, expected_slope=0, expected_intercept=5)
     def test_single_data_point(self):
         # Testing with a DataFrame having a single data point
         df = pd.DataFrame({"X": [1], "Y": [1]})
-        ax = f_254(df, "X", "Y")
+        ax = f_279(df, "X", "Y")
         self.assertIsInstance(ax, Axes)
         self.assertEqual(len(ax.lines), 1)
         self.assertEqual(len(ax.collections), 1)
@@ -99,14 +99,14 @@ class TestCases(unittest.TestCase):
         # Testing with missing values in the DataFrame
         df = pd.DataFrame({"X": [1, 2, np.nan, 4], "Y": [1, np.nan, 3, 4]})
         with self.assertRaises(ValueError):
-            f_254(df, "X", "Y")
+            f_279(df, "X", "Y")
     def test_with_categorical_data(self):
         # Testing with categorical data to ensure it fails
         df = pd.DataFrame({"X": ["a", "b", "c"], "Y": ["d", "e", "f"]})
         with self.assertRaises(ValueError):
-            f_254(df, "X", "Y")
+            f_279(df, "X", "Y")
     def test_incorrect_column_names(self):
         # Testing with incorrect column names
         df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
         with self.assertRaises(KeyError):
-            f_254(df, "X", "Y")
+            f_279(df, "X", "Y")

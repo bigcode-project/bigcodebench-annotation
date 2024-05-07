@@ -10,7 +10,7 @@ STUDENTS = ['Student' + str(i) for i in range(1, 101)]
 COURSES = ['Course' + str(i) for i in range(1, 6)]
 
 
-def f_607(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
+def f_674(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
     """
     Generate a Pandas DataFrame that displays the grades of a randomly selected group of students in multiple courses.
     Calculate the average grade in each course, the number of students with a passing grade (>= 60), 
@@ -30,7 +30,7 @@ def f_607(num_students: int) -> Tuple[pd.DataFrame, plt.Axes]:
     - typing
 
     Example:
-    >>> df, ax = f_607(50)
+    >>> df, ax = f_674(50)
     >>> ax.get_title()
     'Course-wise Average and Passing Grade Counts'
     """
@@ -49,7 +49,7 @@ class TestCases(unittest.TestCase):
     
     def test_case_1(self):
         # Test with 10 students
-        df, ax = f_607(10)
+        df, ax = f_674(10)
         
         # Check DataFrame dimensions
         self.assertEqual(df.shape, (10, 5))
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
     
     def test_case_2(self):
         # Test with 50 students
-        df, ax = f_607(50)
+        df, ax = f_674(50)
         
         # Check DataFrame dimensions
         self.assertEqual(df.shape, (50, 5))
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_3(self):
         # Test with 100 students
-        df, ax = f_607(100)
+        df, ax = f_674(100)
         
         # Check DataFrame dimensions
         self.assertEqual(df.shape, (100, 5))
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
     
     def test_case_4(self):
         # Test with 1 student
-        df, ax = f_607(1)
+        df, ax = f_674(1)
         
         # Check DataFrame dimensions
         self.assertEqual(df.shape, (1, 5))
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_5(self):
         # Test with 5 students
-        df, ax = f_607(5)
+        df, ax = f_674(5)
         
         # Check DataFrame dimensions
         self.assertEqual(df.shape, (5, 5))

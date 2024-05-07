@@ -3,7 +3,7 @@ import json
 from bs4 import BeautifulSoup
 
 
-def f_649(url: str, file_name: str = "Output.txt") -> str:
+def f_719(url: str, file_name: str = "Output.txt") -> str:
     """
     Scrape the title from a specified web page, save it in JSON format to a given file, 
     and append to the file if it exists.
@@ -26,9 +26,9 @@ def f_649(url: str, file_name: str = "Output.txt") -> str:
     - Data is appended to the specified file in JSON format, with each title on a new line.
 
     Example:
-    >>> f_649("http://example.com")
+    >>> f_719("http://example.com")
     'Output.txt'
-    >>> f_649("http://another-example.com", "AnotherOutput.txt")
+    >>> f_719("http://another-example.com", "AnotherOutput.txt")
     'AnotherOutput.txt'
     """
     response = requests.get(url, timeout=5)
@@ -45,7 +45,7 @@ from unittest.mock import patch, mock_open
 import requests
 import json
 class TestCases(unittest.TestCase):
-    """Test cases for f_649"""
+    """Test cases for f_719"""
     @patch("builtins.open", new_callable=mock_open, read_data="")
     def test_scrape_title_page_1(self, mock_file):
         """Test that the title is scraped from a web page and saved to a file"""
@@ -53,7 +53,7 @@ class TestCases(unittest.TestCase):
         mock_response.status_code = 200
         mock_response._content = b"<title>Test Page 1</title>"
         with patch("requests.get", return_value=mock_response):
-            file_path = f_649("http://example.com")
+            file_path = f_719("http://example.com")
             self.assertEqual(file_path, "Output.txt")
             mock_file().write.assert_called_once_with(
                 json.dumps({"title": "Test Page 1"}) + "\n"
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
         mock_response.status_code = 200
         mock_response._content = b"<title>Test Page 2</title>"
         with patch("requests.get", return_value=mock_response):
-            file_path = f_649("http://example.com", "AnotherOutput.txt")
+            file_path = f_719("http://example.com", "AnotherOutput.txt")
             self.assertEqual(file_path, "AnotherOutput.txt")
             mock_file().write.assert_called_once_with(
                 json.dumps({"title": "Test Page 2"}) + "\n"
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
     def test_invalid_url(self, mock_file):
         """Test that an exception is raised when the URL is invalid"""
         with self.assertRaises(requests.RequestException):
-            f_649("http://invalid-url")
+            f_719("http://invalid-url")
     @patch("builtins.open", new_callable=mock_open, read_data="")
     def test_page_without_title(self, mock_file):
         """Test that 'None' is saved as the title when the web page does not have a title"""
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
         mock_response.status_code = 200
         mock_response._content = b"<html><head></head><body></body></html>"
         with patch("requests.get", return_value=mock_response):
-            file_path = f_649("http://example.com")
+            file_path = f_719("http://example.com")
             self.assertEqual(file_path, "Output.txt")
             mock_file().write.assert_called_once_with(
                 json.dumps({"title": None}) + "\n"
@@ -95,7 +95,7 @@ class TestCases(unittest.TestCase):
         mock_response.status_code = 200
         mock_response._content = f"<title>{long_title}</title>".encode()
         with patch("requests.get", return_value=mock_response):
-            file_path = f_649("http://example.com")
+            file_path = f_719("http://example.com")
             self.assertEqual(file_path, "Output.txt")
             mock_file().write.assert_called_once_with(
                 json.dumps({"title": long_title}) + "\n"
@@ -111,7 +111,7 @@ class TestCases(unittest.TestCase):
         mock_response.status_code = 200
         mock_response._content = b"<title>New Title</title>"
         with patch("requests.get", return_value=mock_response):
-            file_path = f_649("http://example.com")
+            file_path = f_719("http://example.com")
             self.assertEqual(file_path, "Output.txt")
             mock_file().write.assert_called_with(
                 json.dumps({"title": "New Title"}) + "\n"

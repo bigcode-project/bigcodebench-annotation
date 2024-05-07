@@ -5,7 +5,7 @@ import struct
 KEYS = ['470FC614', '4A0FC614', '4B9FC614', '4C8FC614', '4D7FC614']
 
 
-def f_365(hex_keys=KEYS, seed=42):
+def f_404(hex_keys=KEYS, seed=42):
     """
     Given a list of hexadecimal string keys, this function selects one at random,
     converts it into a floating-point number, and then computes its MD5 hash. An optional
@@ -27,7 +27,7 @@ def f_365(hex_keys=KEYS, seed=42):
     - random
 
     Example:
-    >>> f_365(['1a2b3c4d', '5e6f7g8h'])
+    >>> f_404(['1a2b3c4d', '5e6f7g8h'])
     '426614caa490f2c185aebf58f1d4adac'
     """
     random.seed(seed)
@@ -42,18 +42,18 @@ def f_365(hex_keys=KEYS, seed=42):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = f_365(['1a2b3c4d', '5e6f7g8h'])
+        result = f_404(['1a2b3c4d', '5e6f7g8h'])
         self.assertEqual(result, '426614caa490f2c185aebf58f1d4adac')
     def test_case_2(self):
-        result = f_365()
+        result = f_404()
         self.assertEqual(result, 'aa1f8c53e0aee57fccd07b90a902579a')
     def test_case_3(self):
-        result = f_365(['12121212', '34343434'])
+        result = f_404(['12121212', '34343434'])
         self.assertEqual(result, 'b523721fccb8fe2e7bf999e74e25056f')
     def test_case_4(self):
-        result = f_365(['1VVVVVVV', '3VVVVVVV', 'F3fF3fF3'])
+        result = f_404(['1VVVVVVV', '3VVVVVVV', 'F3fF3fF3'])
         self.assertEqual(result, 'fae7b34f299d23a584fbc19c2fcdf865')
     def test_case_5(self):
         # test error message
         with self.assertRaises(ValueError):
-            f_365(['1a2b3c4d', '5e6f7g8h', 'invalid_hex'])
+            f_404(['1a2b3c4d', '5e6f7g8h', 'invalid_hex'])

@@ -2,7 +2,7 @@ import random
 import math
 
 
-def f_533(range_start=1, range_end=100, pairs_count=10, random_seed=None):
+def f_588(range_start=1, range_end=100, pairs_count=10, random_seed=None):
     """
     Create a generator object that generates a sequence of tuples.
     Each tuple contains two random numbers and the square root of their
@@ -25,11 +25,11 @@ def f_533(range_start=1, range_end=100, pairs_count=10, random_seed=None):
     - math
 
     Example:
-    >>> pairs = f_533(random_seed=1)
+    >>> pairs = f_588(random_seed=1)
     >>> print(next(pairs))
     (18, 73, 7.416198487095663)
     
-    >>> pairs = f_533(1, 3, pairs_count=25, random_seed=14)
+    >>> pairs = f_588(1, 3, pairs_count=25, random_seed=14)
     >>> print(next(pairs))
     (1, 3, 1.4142135623730951)
     """
@@ -43,12 +43,12 @@ import math
 class TestCases(unittest.TestCase):
     faker = Faker()
     def test_rng(self):
-        pairs1 = f_533(random_seed=42)
-        pairs2 = f_533(random_seed=42)
+        pairs1 = f_588(random_seed=42)
+        pairs2 = f_588(random_seed=42)
         for _ in range(10):
             self.assertEqual(next(pairs1), next(pairs2))
     def test_case_1(self):
-        pairs = f_533(random_seed=1)
+        pairs = f_588(random_seed=1)
         self.assertIsInstance(pairs, type((x for x in range(1))))
         expected = [
             (18, 73, 7.416198487095663),
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
             self.assertEqual(diff, math.sqrt(abs(x - y)))
             self.assertEqual((x, y, diff), expected[_])
     def test_case_2(self):
-        pairs = f_533(50, 150, random_seed=12)
+        pairs = f_588(50, 150, random_seed=12)
         self.assertIsInstance(pairs, type((x for x in range(1))))
         expected = [
             (110, 84, 5.0990195135927845),
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
             self.assertEqual((x, y, diff), expected[_])
     def test_case_3(self):
         pairs_count = 25
-        pairs = f_533(pairs_count=pairs_count, random_seed=14)
+        pairs = f_588(pairs_count=pairs_count, random_seed=14)
         self.assertIsInstance(pairs, type((x for x in range(1))))
         expected = [
             (14, 79, 8.06225774829855),
@@ -123,6 +123,6 @@ class TestCases(unittest.TestCase):
             self.assertEqual(diff, math.sqrt(abs(x - y)))
             self.assertEqual((x, y, diff), expected[_])
     def test_case_4(self):
-        pairs = f_533(pairs_count=0)
+        pairs = f_588(pairs_count=0)
         self.assertIsInstance(pairs, type((x for x in range(1))))
         self.assertEqual(sum(1 for _ in pairs), 0)

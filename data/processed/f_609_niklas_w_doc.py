@@ -3,7 +3,7 @@ import re
 from html import unescape
 import textwrap
 
-def f_7(raw_string, line_length):
+def f_8(raw_string, line_length):
     """
     Decode a raw string from base64, decouple HTML entities, replace multiple spaces with a single space, strip leading and subsequent spaces, and wrap text to a certain line length.
 
@@ -21,7 +21,7 @@ def f_7(raw_string, line_length):
     - textwrap
 
     Example:
-    >>> f_7('SGVsbG8sICBXb3JsZCEgICAg', 5)
+    >>> f_8('SGVsbG8sICBXb3JsZCEgICAg', 5)
     'Hello\\n, Wor\\nld!'
     """
     decoded_string = base64.b64decode(raw_string).decode('utf-8')
@@ -33,12 +33,12 @@ def f_7(raw_string, line_length):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        self.assertEqual(f_7('SGVsbG8sICBXb3JsZCEgICAg', 5), 'Hello\n, Wor\nld!')
+        self.assertEqual(f_8('SGVsbG8sICBXb3JsZCEgICAg', 5), 'Hello\n, Wor\nld!')
     def test_case_2(self):
-        self.assertEqual(f_7('SGVsbG8sICBXb3JsZCEgICAg', 10), 'Hello,\nWorld!')
+        self.assertEqual(f_8('SGVsbG8sICBXb3JsZCEgICAg', 10), 'Hello,\nWorld!')
     def test_case_3(self):
-        self.assertEqual(f_7('SGVsbG8sICBXb3JsZCEgICAg', 20), 'Hello, World!')
+        self.assertEqual(f_8('SGVsbG8sICBXb3JsZCEgICAg', 20), 'Hello, World!')
     def test_case_4(self):
-        self.assertEqual(f_7('SGVsbG8sICBXb3JsZCEgICAg', 1), 'H\ne\nl\nl\no\n,\nW\no\nr\nl\nd\n!')
+        self.assertEqual(f_8('SGVsbG8sICBXb3JsZCEgICAg', 1), 'H\ne\nl\nl\no\n,\nW\no\nr\nl\nd\n!')
     def test_case_5(self):
-        self.assertEqual(f_7('SGVsbG8sICBXb3JsZCEgICAg', 2), 'He\nll\no,\nWo\nrl\nd!')
+        self.assertEqual(f_8('SGVsbG8sICBXb3JsZCEgICAg', 2), 'He\nll\no,\nWo\nrl\nd!')

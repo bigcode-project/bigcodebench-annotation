@@ -2,7 +2,7 @@ import numpy as np
 import random
 from difflib import SequenceMatcher
 
-def f_159(s, min_length, max_length, letters):
+def f_170(s, min_length, max_length, letters):
     """
     Generates a random string of length between `min_length` and `max_length`, inclusive,
     using characters from `letters`, and evaluates its similarity to the provided string `s`.
@@ -28,7 +28,7 @@ def f_159(s, min_length, max_length, letters):
     >>> min_length = 5
     >>> max_length = 10
     >>> letters = 'abcdefghijklmnopqrstuvwxyz'
-    >>> generated_s, is_similar = f_159(s, min_length, max_length, letters)
+    >>> generated_s, is_similar = f_170(s, min_length, max_length, letters)
     >>> len(generated_s) >= min_length and len(generated_s) <= max_length
     True
     >>> isinstance(is_similar, bool)
@@ -49,26 +49,26 @@ class TestCases(unittest.TestCase):
         self.max_length = 10
         self.letters = 'abcdefghijklmnopqrstuvwxyz'
     def test_length_of_generated_string(self):
-        generated_s, _ = f_159(self.s, self.min_length, self.max_length, self.letters)
+        generated_s, _ = f_170(self.s, self.min_length, self.max_length, self.letters)
         self.assertTrue(self.min_length <= len(generated_s) <= self.max_length)
     def test_similarity_boolean(self):
-        _, is_similar = f_159(self.s, self.min_length, self.max_length, self.letters)
+        _, is_similar = f_170(self.s, self.min_length, self.max_length, self.letters)
         self.assertIsInstance(is_similar, bool)
     def test_empty_string(self):
         s = ''
-        generated_s, is_similar = f_159(s, self.min_length, self.max_length, self.letters)
+        generated_s, is_similar = f_170(s, self.min_length, self.max_length, self.letters)
         self.assertTrue(isinstance(generated_s, str))
         self.assertTrue(isinstance(is_similar, bool))
     def test_non_string_input(self):
         with self.assertRaises(TypeError):
-            f_159(123, self.min_length, self.max_length, self.letters)
+            f_170(123, self.min_length, self.max_length, self.letters)
     def test_large_string_input(self):
         s = 'a' * 100
-        generated_s, is_similar = f_159(s, self.min_length, self.max_length, self.letters)
+        generated_s, is_similar = f_170(s, self.min_length, self.max_length, self.letters)
         self.assertTrue(isinstance(generated_s, str))
         self.assertTrue(isinstance(is_similar, bool))
     def test_specific_letters(self):
         # Test using a different set of letters to ensure functionality is consistent with varied inputs
         letters = 'abc'
-        generated_s, _ = f_159(self.s, self.min_length, self.max_length, letters)
+        generated_s, _ = f_170(self.s, self.min_length, self.max_length, letters)
         self.assertTrue(all(c in letters for c in generated_s))

@@ -3,7 +3,7 @@ import re
 import random
 
 
-def f_650(data_list, seed=None):
+def f_720(data_list, seed=None):
     """
     Removes a random comma-separated value (treated as a "substring") from each string
     in a list and returns a pandas DataFrame containing the original and modified strings.
@@ -23,7 +23,7 @@ def f_650(data_list, seed=None):
     - random
 
     Example:
-    >>> f_650(['lamp, bag, mirror', 'table, chair, bag, lamp'], seed=42)
+    >>> f_720(['lamp, bag, mirror', 'table, chair, bag, lamp'], seed=42)
                Original String   Modified String
     0        lamp, bag, mirror         lamp, bag
     1  table, chair, bag, lamp  chair, bag, lamp
@@ -52,27 +52,27 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic case
         input_data = ["apple, orange, banana", "car, bike, plane"]
-        result = f_650(input_data, seed=42)
+        result = f_720(input_data, seed=42)
         self._test_dataframe(result, input_data)
     def test_case_2(self):
         # Test single character
         input_data = ["a, b, c, d, e", "f, g, h, i, j"]
-        result = f_650(input_data, seed=42)
+        result = f_720(input_data, seed=42)
         self._test_dataframe(result, input_data)
     def test_case_3(self):
         # Test single numeric characters
         input_data = ["1, 2, 3", "4, 5, 6, 7"]
-        result = f_650(input_data, seed=42)
+        result = f_720(input_data, seed=42)
         self._test_dataframe(result, input_data)
     def test_case_4(self):
         # Test with an empty list
         input_data = []
-        result = f_650(input_data, seed=42)
+        result = f_720(input_data, seed=42)
         self.assertTrue(result.empty)
     def test_case_5(self):
         # Test with strings without commas
         input_data = ["apple", "car"]
-        result = f_650(input_data, seed=42)
+        result = f_720(input_data, seed=42)
         # Ensure dataframe has correct columns
         self.assertListEqual(list(result.columns), self.columns)
         # Ensure 'Modified String' is the same as 'Original String' for single values
@@ -82,12 +82,12 @@ class TestCases(unittest.TestCase):
         # Test strings with leading and trailing spaces
         input_data = [" apple, orange, banana ", " car, bike, plane"]
         expected_data = ["apple, orange, banana", "car, bike, plane"]
-        result = f_650(input_data, seed=42)
+        result = f_720(input_data, seed=42)
         self._test_dataframe(result, expected_data)
     def test_case_7(self):
         # Test strings where the same value appears multiple times
         input_data = ["apple, apple, banana", "car, car, bike, plane"]
-        result = f_650(input_data, seed=42)
+        result = f_720(input_data, seed=42)
         # Special case where substrings might be duplicated
         for orig, mod in zip(result["Original String"], result["Modified String"]):
             diff = len(orig.split(", ")) - len(mod.split(", "))
@@ -95,14 +95,14 @@ class TestCases(unittest.TestCase):
     def test_case_8(self):
         # Test reproducibility with the same seed
         input_data = ["apple, orange, banana", "car, bike, plane"]
-        result1 = f_650(input_data, seed=42)
-        result2 = f_650(input_data, seed=42)
+        result1 = f_720(input_data, seed=42)
+        result2 = f_720(input_data, seed=42)
         pd.testing.assert_frame_equal(result1, result2)
     def test_case_9(self):
         # Test difference with different seeds
         input_data = ["apple, orange, banana", "car, bike, plane"]
-        result1 = f_650(input_data, seed=42)
-        result2 = f_650(input_data, seed=43)
+        result1 = f_720(input_data, seed=42)
+        result2 = f_720(input_data, seed=43)
         self.assertFalse(result1.equals(result2))
     def _test_dataframe(self, df, input_data):
         # Ensure dataframe has correct columns

@@ -48,7 +48,6 @@ import shutil
 
 
 class TestCases(unittest.TestCase):
-    @classmethod
     def setUp(self):
         """Create the data directory if it doesn't exist."""
         if not os.path.exists(OUTPUT_DIR):

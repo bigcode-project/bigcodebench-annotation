@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def f_285(start_date='2016-01-01', periods=13, freq='WOM-2FRI', seed=0):
+def f_316(start_date='2016-01-01', periods=13, freq='WOM-2FRI', seed=0):
     """
     Generate a share price series for a specific period of time, plot the share prices, and return the DataFrame and the plot on the share prices over the given date range.
     The share prices are randomly generated between 100 and 500 from a uniform distribution.
@@ -22,7 +22,7 @@ def f_285(start_date='2016-01-01', periods=13, freq='WOM-2FRI', seed=0):
     - matplotlib.pyplot
     
     Examples:
-    >>> df, ax = f_285('2020-01-01', 5, 'M', seed=42)
+    >>> df, ax = f_316('2020-01-01', 5, 'M', seed=42)
     >>> len(df)
     5
     >>> df.iloc[0]['Price']
@@ -53,7 +53,7 @@ import numpy as np
 class TestCases(unittest.TestCase):
     
     def test_default_parameters(self):
-        df, ax = f_285(seed=42)
+        df, ax = f_316(seed=42)
         self.assertIsInstance(df, pd.DataFrame, "The output should be a pandas DataFrame")
         self.assertIsInstance(ax, axes.Axes, "The output should be a Matplotlib Axes object")
         self.assertEqual(len(df), 13, "DataFrame should contain 13 rows by default")
@@ -61,18 +61,18 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.title.get_text(), 'Stock Prices', "Plot title should be 'Stock Prices'")
     
     def test_specified_parameters(self):
-        df, ax = f_285('2021-01-01', 5, 'M', seed=42)
+        df, ax = f_316('2021-01-01', 5, 'M', seed=42)
         self.assertEqual(len(df), 5, "DataFrame should contain 5 rows")
         self.assertTrue((100 <= df['Price']).all() and (df['Price'] <= 500).all(), "Stock prices should be between 100 and 500")
     
     def test_business_day_frequency(self):
-        df, ax = f_285('2021-01-01', 5, 'B', seed=42)
+        df, ax = f_316('2021-01-01', 5, 'B', seed=42)
         self.assertEqual(len(df), 5, "DataFrame should contain 5 rows")
     
     def test_weekly_frequency_more_periods(self):
-        df, ax = f_285('2021-01-01', 20, 'W', seed=42)
+        df, ax = f_316('2021-01-01', 20, 'W', seed=42)
         self.assertEqual(len(df), 20, "DataFrame should contain 20 rows")
     
     def test_different_year(self):
-        df, ax = f_285('2019-01-01', 10, 'W', seed=42)
+        df, ax = f_316('2019-01-01', 10, 'W', seed=42)
         self.assertEqual

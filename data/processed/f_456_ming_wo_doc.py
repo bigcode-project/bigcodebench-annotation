@@ -9,7 +9,7 @@ import pandas as pd
 VEHICLE_TYPES = ['Car', 'Bus', 'Truck', 'Bike']
 output_dir = './output'
 
-def f_371(hours, output_dir = output_dir):
+def f_410(hours, output_dir = output_dir):
     """
     Generates traffic data for different vehicle types over a specified number of hours,
     saves the data to a CSV file, and plots the data in a line chart.
@@ -30,7 +30,7 @@ def f_371(hours, output_dir = output_dir):
 
     Example:
     >>> import matplotlib
-    >>> file_path, ax = f_371(2)  # Generate data for 2 hours
+    >>> file_path, ax = f_410(2)  # Generate data for 2 hours
     >>> isinstance(file_path, str)
     True
     >>> 'traffic_data.csv' in file_path
@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
             'Time': ['2021-01-01 00:00:00.000000'],
             'Car': [25], 'Bus': [25], 'Truck': [25], 'Bike': [25]
         })
-        file_path, ax = f_371(1)
+        file_path, ax = f_410(1)
         self.assertEqual(file_path, FILE_PATH)
         mock_randint.assert_called()  # Ensures randint was called, but not specifics about calls
         mock_read_csv.assert_called_with(FILE_PATH)
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
     @patch(__name__ + '.pd.read_csv', return_value=pd.DataFrame(columns=['Time'] + VEHICLE_TYPES))
     def test_empty_dataframe_on_zero_hours(self, mock_read_csv):
         """Check for empty DataFrame on zero hours input."""
-        _, ax = f_371(0)
+        _, ax = f_410(0)
         self.assertIsNone(ax)
     @patch('os.makedirs')
     @patch('os.path.exists', return_value=False)
@@ -100,19 +100,19 @@ class TestCases(unittest.TestCase):
         """Ensure directory is created if it does not exist."""
         if os.path.exists(output_dir):
             shutil.rmtree(output_dir)
-        f_371(1)
+        f_410(1)
         mock_makedirs.assert_called_with(os.path.dirname(FILE_PATH))
     @patch(__name__ + '.plt.show')
     def test_plot_generation(self, mock_plt_show):
         """Verify that the plot is generated."""
-        f_371(1)
+        f_410(1)
         mock_plt_show.assert_called()
     @patch(__name__ + '.plt.show')  # Mock to skip plot rendering
-    def test_f_371_runs_without_error(self, mock_show):
-        """Test f_371 function to ensure it runs with given hours without raising an error."""
+    def test_f_410_runs_without_error(self, mock_show):
+        """Test f_410 function to ensure it runs with given hours without raising an error."""
         try:
-            f_371(1)  # Attempt to run the function with a simple input
+            f_410(1)  # Attempt to run the function with a simple input
             operation_successful = True
         except Exception:
             operation_successful = False
-        self.assertTrue(operation_successful, "f_371 should run without errors for given input")
+        self.assertTrue(operation_successful, "f_410 should run without errors for given input")

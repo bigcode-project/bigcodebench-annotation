@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
-def f_642(df, test_size=0.2, random_state=42):
+def f_711(df, test_size=0.2, random_state=42):
     """
     Predicts categories based on 'Age' and 'Score' in a given DataFrame using a Random Forest Classifier. 
     Rows with duplicate 'Name' entries are dropped before the prediction. The function uses a Random Forest Classifier 
@@ -28,7 +28,7 @@ def f_642(df, test_size=0.2, random_state=42):
 
     Example:
     >>> data = pd.DataFrame([{'Name': 'James', 'Age': 30, 'Score': 85, 'Category': 'Electronics'}, {'Name': 'Lily', 'Age': 28, 'Score': 92, 'Category': 'Home'}])
-    >>> accuracy = f_642(data)
+    >>> accuracy = f_711(data)
     >>> accuracy <= 1.0
     True
     """
@@ -66,30 +66,30 @@ class TestCases(unittest.TestCase):
     
     def test_basic_data(self):
         data = self.generate_test_data(10)
-        accuracy = f_642(data)
+        accuracy = f_711(data)
         self.assertIsInstance(accuracy, float)
         self.assertGreaterEqual(accuracy, 0)
         self.assertLessEqual(accuracy, 1)
     def test_more_data(self):
         data = self.generate_test_data(20)
-        accuracy = f_642(data)
+        accuracy = f_711(data)
         self.assertEqual(accuracy, 0)
     def test_large_data(self):
         data = self.generate_test_data(100)
-        accuracy = f_642(data)
+        accuracy = f_711(data)
         self.assertIsInstance(accuracy, float)
     def test_single_record(self):
         data = pd.DataFrame([{'Name': 'James', 'Age': 30, 'Score': 85, 'Category': 'Electronics'},
             {'Name': 'Bob', 'Age': 20, 'Score': 75, 'Category': 'Home'},
             {'Name': 'Nick', 'Age': 40, 'Score': 90, 'Category': 'Electronics'},
             {'Name': 'Amy', 'Age': 60, 'Score': 95, 'Category': 'Home'}])
-        accuracy = f_642(data)
+        accuracy = f_711(data)
         self.assertEqual(accuracy, 0)
     def test_moderate_size_data(self):
         data = self.generate_test_data(20)
-        accuracy = f_642(data)
+        accuracy = f_711(data)
         self.assertIsInstance(accuracy, float)
     
     def test_case_non_df(self):
         with self.assertRaises(ValueError):
-            f_642("non_df")
+            f_711("non_df")

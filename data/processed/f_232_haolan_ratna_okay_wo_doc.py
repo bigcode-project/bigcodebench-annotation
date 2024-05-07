@@ -1,7 +1,7 @@
 import re
 import requests
 
-def f_401(input):
+def f_442(input):
     """
     Extract an API endpoint from the input string, send a GET request to the endpoint, and return the response data in JSON format.
 
@@ -17,7 +17,7 @@ def f_401(input):
     - requests
 
     Example:
-    >>> f_401('Fetch data from https://api.example.com/data')
+    >>> f_442('Fetch data from https://api.example.com/data')
     {'key': 'value'}
     """
     endpoint = re.search(r'https?:\/\/[^ ]+', input).group()
@@ -35,7 +35,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = mock_response
         
         # Test
-        result = f_401('Fetch data from https://api.example.com/data')
+        result = f_442('Fetch data from https://api.example.com/data')
         self.assertEqual(result, {"key": "value"})
     @patch('requests.get')
     def test_case_2(self, mock_get):
@@ -45,7 +45,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = mock_response
         
         # Test
-        result = f_401('Get numbers from https://api.example.com/numbers')
+        result = f_442('Get numbers from https://api.example.com/numbers')
         self.assertEqual(result, {"data": [1, 2, 3]})
     @patch('requests.get')
     def test_case_3(self, mock_get):
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = mock_response
         
         # Test
-        result = f_401('Fetch empty data from https://api.example.com/empty')
+        result = f_442('Fetch empty data from https://api.example.com/empty')
         self.assertEqual(result, {})
     @patch('requests.get')
     def test_case_4(self, mock_get):
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = mock_response
         
         # Test
-        result = f_401('Check status from https://api.example.com/status')
+        result = f_442('Check status from https://api.example.com/status')
         self.assertEqual(result, {"status": "OK"})
     @patch('requests.get')
     def test_case_5(self, mock_get):
@@ -75,5 +75,5 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = mock_response
         
         # Test
-        result = f_401('List users from https://api.example.com/users')
+        result = f_442('List users from https://api.example.com/users')
         self.assertEqual(result, {"users": ["Alice", "Bob", "Charlie"]})

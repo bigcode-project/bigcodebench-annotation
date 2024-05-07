@@ -9,7 +9,7 @@ SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 
 
-def f_86(client_socket):
+def f_88(client_socket):
     """
     Receive a message from a client socket and send it as an email via an SMTP server.
 
@@ -35,7 +35,7 @@ def f_86(client_socket):
     >>> server_socket.bind((SERVER_ADDRESS, SERVER_PORT))
     >>> server_socket.listen(5)
     >>> client_socket, addr = server_socket.accept()
-    >>> f_86(client_socket)
+    >>> f_88(client_socket)
     """
     request = client_socket.recv(BUFFER_SIZE).decode("utf-8")
     print(f"Received: {request}")
@@ -58,7 +58,7 @@ import smtplib
 from email.message import EmailMessage
 import getpass
 class TestCases(unittest.TestCase):
-    """Test cases for f_86"""
+    """Test cases for f_88"""
     @patch("socket.socket")
     @patch("smtplib.SMTP")
     @patch("getpass.getpass")
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
             "password",
         ]
         # Call the function
-        f_86(mock_socket())
+        f_88(mock_socket())
         # Assertions
         mock_smtp.assert_called_with("smtp.gmail.com", 587)
     @patch("socket.socket")
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
         client_socket = MagicMock()
         # Simulate the recv and decode behavior by setting the return value of the decode method
         client_socket.recv.return_value.decode.return_value = ""
-        f_86(client_socket)
+        f_88(client_socket)
         mock_smtp_instance.send_message.assert_not_called()
     @patch("socket.socket")
     @patch("smtplib.SMTP")
@@ -118,7 +118,7 @@ class TestCases(unittest.TestCase):
         )
         # Expecting an SMTPConnectError
         with self.assertRaises(smtplib.SMTPConnectError):
-            f_86(client_socket)
+            f_88(client_socket)
     @patch("socket.socket")
     @patch("smtplib.SMTP")
     @patch("getpass.getpass")
@@ -134,7 +134,7 @@ class TestCases(unittest.TestCase):
             "recipient@example.com",
             "password",
         ]
-        f_86(client_socket)
+        f_88(client_socket)
         # Assert that the socket's close method was called
         client_socket.close.assert_called_once()
     @patch("socket.socket")
@@ -153,7 +153,7 @@ class TestCases(unittest.TestCase):
         ]
         mock_smtp_instance = MagicMock()
         mock_smtp.return_value = mock_smtp_instance
-        f_86(client_socket)
+        f_88(client_socket)
         # Assert that the SMTP instance was created
         mock_smtp.assert_called_with("smtp.gmail.com", 587)
         success_response = "Message sent."

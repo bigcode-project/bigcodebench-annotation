@@ -3,7 +3,7 @@ import random
 from collections import Counter
 
 
-def f_249(n, seed=None):
+def f_271(n, seed=None):
     """
     Generate a number of random lowercase letters and count their occurrences.
 
@@ -28,10 +28,10 @@ def f_249(n, seed=None):
     - random
 
     Example:
-    >>> letter_counts = f_249(1000, seed=123)
+    >>> letter_counts = f_271(1000, seed=123)
     >>> print(letter_counts)
     Counter({'v': 48, 'b': 47, 'n': 46, 'r': 46, 'k': 46, 'z': 46, 'c': 44, 'e': 43, 'q': 43, 'l': 43, 'y': 42, 'm': 42, 'a': 42, 'u': 42, 'd': 36, 'o': 34, 'j': 34, 'g': 34, 'f': 33, 'h': 33, 'p': 32, 'w': 30, 'x': 30, 'i': 29, 't': 28, 's': 27})
-    >>> f_249(10, seed=12)
+    >>> f_271(10, seed=12)
     Counter({'v': 2, 'l': 2, 'p': 1, 'i': 1, 'q': 1, 'e': 1, 'm': 1, 'a': 1})
 
     Note: 
@@ -51,29 +51,29 @@ from collections import Counter
 class TestCases(unittest.TestCase):
     def test_randomness_with_seed(self):
         # Using a seed should give consistent results
-        result1 = f_249(100, seed=1)
-        result2 = f_249(100, seed=1)
+        result1 = f_271(100, seed=1)
+        result2 = f_271(100, seed=1)
         self.assertEqual(result1, result2)
     def test_randomness_without_seed(self):
         # Without a seed, the results should be potentially different
-        result1 = f_249(100)
-        result2 = f_249(100)
+        result1 = f_271(100)
+        result2 = f_271(100)
         self.assertNotEqual(result1, result2)
     def test_validity_of_counts(self):
         # The total counts should equal the number of letters generated
         num_letters = 200
-        result = f_249(num_letters, seed=2)
+        result = f_271(num_letters, seed=2)
         self.assertEqual(sum(result.values()), num_letters)
     def test_non_negative_counts(self):
         # All counts should be non-negative
-        result = f_249(100, seed=3)
+        result = f_271(100, seed=3)
         self.assertTrue(all(count >= 0 for count in result.values()))
     def test_type_of_return_value(self):
         # The return type should be a Counter object
-        result = f_249(100, seed=4)
+        result = f_271(100, seed=4)
         self.assertIsInstance(result, Counter)
     def test_return_value(self):
         # test specific values
-        result = f_249(10, seed=42)
+        result = f_271(10, seed=42)
         exp = Counter({'d': 2, 'x': 2, 'h': 2, 'u': 1, 'a': 1, 'i': 1, 'e': 1})
         self.assertEqual(result, exp)

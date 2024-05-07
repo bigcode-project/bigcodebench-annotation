@@ -1,7 +1,7 @@
 import os
 import logging
 
-def f_540(directory):
+def f_595(directory):
     """
     Removes all jQuery files (JavaScript files containing 'jquery' in their name) from a specified directory.
 
@@ -25,7 +25,7 @@ def f_540(directory):
 
 
     Example:
-    >>> f_540("/path/to/directory")
+    >>> f_595("/path/to/directory")
     (3, ['jquery-1.js', 'jquery-2.js', 'jquery-ui.js'])  # Assuming 3 jQuery files were removed
     """
     logging.basicConfig(filename='jquery_removal.log', level=logging.INFO,
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
     def test_remove_jquery_files(self, mock_remove, mock_listdir, mock_exists):
         mock_exists.return_value = True
         mock_listdir.return_value = ['jquery-1.js', 'jquery-2.js', 'jquery-ui.js', 'otherfile.txt', 'example.js']
-        removed_count, removed_files = f_540('/fake/directory')
+        removed_count, removed_files = f_595('/fake/directory')
         self.assertEqual(removed_count, 3)
         self.assertListEqual(removed_files, ['jquery-1.js', 'jquery-2.js', 'jquery-ui.js'])
     @patch('os.path.exists')
@@ -63,33 +63,33 @@ class TestCases(unittest.TestCase):
     def test_empty_directory(self, mock_listdir, mock_exists):
         mock_exists.return_value = True
         mock_listdir.return_value = []
-        removed_count, removed_files = f_540('/fake/empty/directory')
+        removed_count, removed_files = f_595('/fake/empty/directory')
         self.assertEqual(removed_count, 0)
         self.assertListEqual(removed_files, [])
     @patch('os.path.exists')
     def test_nonexistent_directory(self, mock_exists):
         mock_exists.return_value = False
         with self.assertRaises(FileNotFoundError):
-            f_540('/fake/nonexistent/directory')
+            f_595('/fake/nonexistent/directory')
     @patch('os.path.exists', return_value=True)
     @patch('os.listdir', return_value=['jquery-1.js', 'jquery-2.min.js', 'jquery-ui.css'])
     @patch('os.remove')
     def test_remove_jquery_files_not_js(self, mock_remove, mock_listdir, mock_exists):
-        removed_count, removed_files = f_540('/fake/directory')
+        removed_count, removed_files = f_595('/fake/directory')
         self.assertEqual(removed_count, 2)
         self.assertListEqual(removed_files, ['jquery-1.js', 'jquery-2.min.js'])
     @patch('os.path.exists', return_value=True)
     @patch('os.listdir', return_value=['subdir', 'jquery-1.js'])
     @patch('os.remove')
     def test_remove_jquery_files_subdirectory(self, mock_remove, mock_listdir, mock_exists):
-        removed_count, removed_files = f_540('/fake/directory')
+        removed_count, removed_files = f_595('/fake/directory')
         self.assertEqual(removed_count, 1)
         self.assertListEqual(removed_files, ['jquery-1.js'])
     @patch('os.path.exists', return_value=True)
     @patch('os.listdir', return_value=['jquery-1.js', 'jquery-2.js', 'jquery-ui.js'])
     @patch('os.remove', side_effect=OSError("Permission denied"))
     def test_remove_jquery_files_error(self, mock_remove, mock_listdir, mock_exists):
-        removed_count, removed_files = f_540('/fake/directory')
+        removed_count, removed_files = f_595('/fake/directory')
         self.assertEqual(removed_count, 0)
         self.assertListEqual(removed_files, [])
     @patch('os.path.exists', return_value=True)
@@ -99,7 +99,7 @@ class TestCases(unittest.TestCase):
         """Test if logging works as expected."""
         with patch('logging.info') as mock_info, \
              patch('logging.error') as mock_error:
-            f_540('/fake/directory')
+            f_595('/fake/directory')
             mock_info.assert_called()
             mock_error.assert_not_called()  # Ensure that no error message is logged
     def tearDown(self):

@@ -51,7 +51,6 @@ import pandas as pd
 
 
 class TestCases(unittest.TestCase):
-    @classmethod
     def setUp(self):
         """Ensure the data directory exists before any tests are run."""
         if not os.path.exists(OUTPUT_DIR):

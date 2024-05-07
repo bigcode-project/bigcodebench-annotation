@@ -2,7 +2,7 @@ import pandas as pd
 from scipy.spatial.distance import pdist, squareform
 
 
-def f_355(array):
+def f_392(array):
     """
     Generate a Pandas DataFrame from a 2D list and calculate a distance matrix.
 
@@ -26,7 +26,7 @@ def f_355(array):
     - scipy.spatial.distance.squareform
 
     Example:
-    >>> df, distance_matrix = f_355([[1,2,3,4,5], [6,7,8,9,10]])
+    >>> df, distance_matrix = f_392([[1,2,3,4,5], [6,7,8,9,10]])
     >>> print(df)
        A  B  C  D   E
     0  1  2  3  4   5
@@ -56,7 +56,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Teset basic case
         input_data = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
-        df, distance_matrix = f_355(input_data)
+        df, distance_matrix = f_392(input_data)
         self.assertEqual(df.shape, (2, 5))
         self.assertTrue((df.columns == ["A", "B", "C", "D", "E"]).all())
         self.assertEqual(distance_matrix.shape, (2, 2))
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test negatives and zero
         input_data = [[-5, -4, -3, -2, -1], [0, 0, 0, 0, 0], [1, 2, 3, 4, 5]]
-        df, distance_matrix = f_355(input_data)
+        df, distance_matrix = f_392(input_data)
         self.assertEqual(df.shape, (3, 5))
         self.assertEqual(distance_matrix.shape, (3, 3))
         self.assertAlmostEqual(distance_matrix.iloc[0, 1], 7.41620, places=5)
@@ -73,14 +73,14 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test small lists
         input_data = [[1, 2], [3, 4]]
-        df, distance_matrix = f_355(input_data)
+        df, distance_matrix = f_392(input_data)
         self.assertEqual(df.shape, (2, 2))
         self.assertEqual(distance_matrix.shape, (2, 2))
         self.assertAlmostEqual(distance_matrix.iloc[0, 1], 2.82843, places=5)
     def test_case_4(self):
         # Test repeated single element
         input_data = [[5, 5, 5], [5, 5, 5], [5, 5, 5]]
-        df, distance_matrix = f_355(input_data)
+        df, distance_matrix = f_392(input_data)
         self.assertEqual(df.shape, (3, 3))
         self.assertEqual(distance_matrix.shape, (3, 3))
         self.assertEqual(distance_matrix.iloc[0, 1], 0)
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test single list
         input_data = [[1, 2, 3, 4, 5]]
-        df, distance_matrix = f_355(input_data)
+        df, distance_matrix = f_392(input_data)
         self.assertEqual(df.shape, (1, 5))
         self.assertEqual(distance_matrix.shape, (1, 1))
         self.assertEqual(distance_matrix.iloc[0, 0], 0)
@@ -96,18 +96,18 @@ class TestCases(unittest.TestCase):
         # Test empty list
         input_data = []
         with self.assertRaises(IndexError):
-            f_355(input_data)
+            f_392(input_data)
     def test_case_7(self):
         # Test larger dataset
         input_data = [list(range(100)) for _ in range(50)]
-        df, distance_matrix = f_355(input_data)
+        df, distance_matrix = f_392(input_data)
         self.assertEqual(df.shape, (50, 100))
         self.assertEqual(distance_matrix.shape, (50, 50))
         # No specific values check due to complexity
     def test_case_8(self):
         # Test single element list
         input_data = [[1]]
-        df, distance_matrix = f_355(input_data)
+        df, distance_matrix = f_392(input_data)
         self.assertEqual(df.shape, (1, 1))
         self.assertEqual(distance_matrix.shape, (1, 1))
         self.assertEqual(distance_matrix.iloc[0, 0], 0)
@@ -115,11 +115,11 @@ class TestCases(unittest.TestCase):
         # Test with different types in list
         input_data = [[1, 2, 3], ["a", "b", "c"]]
         with self.assertRaises(TypeError):
-            f_355(input_data)
+            f_392(input_data)
     def test_case_10(self):
         # Test with a more complex numerical list (including floats and negatives)
         input_data = [[-1.5, 2.3, 4.5], [0, 0, 0], [5.5, -2.3, 3.1]]
-        df, distance_matrix = f_355(input_data)
+        df, distance_matrix = f_392(input_data)
         self.assertEqual(df.shape, (3, 3))
         self.assertEqual(distance_matrix.shape, (3, 3))
         # Define expected distances based on manual or precise calculation

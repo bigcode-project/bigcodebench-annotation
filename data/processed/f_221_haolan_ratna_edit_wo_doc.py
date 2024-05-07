@@ -5,7 +5,7 @@ import json
 # Constants
 IP_REGEX = r'[0-9]+(?:\.[0-9]+){3}'
 
-def f_70(ip_address):
+def f_71(ip_address):
     """
     Get the public IP address from a JSON response containing the IP address.
     
@@ -26,7 +26,7 @@ def f_70(ip_address):
     
     Example:
     >>> ip_address = '{"ip": "192.168.1.1"}'
-    >>> f_70(ip_address)
+    >>> f_71(ip_address)
     '192.168.1.1'
     """
     try:
@@ -46,25 +46,25 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         ip_address = json.dumps({'ip': '192.168.1.1'}).encode('utf-8')
         
-        result = f_70(ip_address)
+        result = f_71(ip_address)
         self.assertEqual(result, '192.168.1.1')
     def test_case_2(self):
         ip_address = json.dumps({'ip': '500.500.500.500'}).encode('utf-8')
         
-        result = f_70(ip_address)
+        result = f_71(ip_address)
         self.assertEqual(result, '500.500.500.500')
     def test_case_3(self):
         ip_address = json.dumps({'ip': '192.168.0.3'}).encode('utf-8')
         
-        result = f_70(ip_address)
+        result = f_71(ip_address)
         self.assertEqual(result, '192.168.0.3')
     def test_case_4(self):
         ip_address = json.dumps({'ip': ''}).encode('utf-8')
         
-        result = f_70(ip_address)
+        result = f_71(ip_address)
         self.assertEqual(result, 'Invalid IP address received')
     def test_case_5(self):
         ip_address = json.dumps({'ip': 'Non-JSON response'}).encode('utf-8')
         
-        result = f_70(ip_address)
+        result = f_71(ip_address)
         self.assertEqual(result, 'Invalid IP address received')

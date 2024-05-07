@@ -1,7 +1,7 @@
 import os
 import random
 
-def f_122(directory, n_files):
+def f_127(directory, n_files):
     """
     Create n random text files in a specific directory, write a random string to each file, and then reset the cursor to the beginning of each file.
 
@@ -17,7 +17,7 @@ def f_122(directory, n_files):
     - random
 
     Example:
-    >>> f_122('/path/to/directory', 5)
+    >>> f_127('/path/to/directory', 5)
     '/path/to/directory'
     """
     if not os.path.exists(directory):
@@ -41,35 +41,35 @@ class TestCases(unittest.TestCase):
         shutil.rmtree('./s', ignore_errors=True)
     
     def test_case_1(self):
-        directory = f_122('./source', 10)
+        directory = f_127('./source', 10)
         self.assertTrue(os.path.exists(directory))
         self.assertEqual(len(os.listdir(directory)), 10)
         for file in os.listdir(directory):
             self.assertEqual(file.split('.')[-1], 'txt')
         
     def test_case_2(self):
-        directory = f_122('./src', 1)
+        directory = f_127('./src', 1)
         self.assertTrue(os.path.exists(directory))
         self.assertEqual(len(os.listdir(directory)), 1)
         for file in os.listdir(directory):
             self.assertEqual(file.split('.')[-1], 'txt')        
         
     def test_case_3(self):
-        directory = f_122('./s', 100)
+        directory = f_127('./s', 100)
         self.assertTrue(os.path.exists(directory))
         self.assertEqual(len(os.listdir(directory)), 100)
         for file in os.listdir(directory):
             self.assertEqual(file.split('.')[-1], 'txt')        
         
     def test_case_4(self):
-        directory = f_122('./s', 0)
+        directory = f_127('./s', 0)
         self.assertTrue(os.path.exists(directory))
         self.assertEqual(len(os.listdir(directory)), 0)
         for file in os.listdir(directory):
             self.assertEqual(file.split('.')[-1], 'txt')        
         
     def test_case_5(self):
-        directory = f_122('./source', 1)
+        directory = f_127('./source', 1)
         self.assertTrue(os.path.exists(directory))
         self.assertEqual(len(os.listdir(directory)), 1)
         for file in os.listdir(directory):

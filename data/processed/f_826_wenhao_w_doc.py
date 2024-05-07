@@ -2,7 +2,7 @@ import seaborn as sns
 import numpy as np
 
 
-def f_702(df):
+def f_780(df):
     """
     Generates a pair plot from a numeric DataFrame and calculates its covariance matrix.
 
@@ -25,7 +25,7 @@ def f_702(df):
     Examples:
     >>> import pandas as pd
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'C': [7, 8, 9]})
-    >>> covariance_df, ax = f_702(df)
+    >>> covariance_df, ax = f_780(df)
     >>> type(ax)
     <class 'seaborn.axisgrid.PairGrid'>
     >>> covariance_df
@@ -50,32 +50,32 @@ class TestCases(unittest.TestCase):
     def test_covariance_one(self):
         """Test basic case with expected covariance of 1.0"""
         df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6], "C": [7, 8, 9]})
-        covariance_df, _ = f_702(df)
+        covariance_df, _ = f_780(df)
         self.assertTrue((covariance_df == 1).all().all())
     def test_identical_values_dataframe(self):
         """Test DataFrame where all rows have identical values."""
         df = pd.DataFrame({"A": [1, 1, 1], "B": [2, 2, 2]})
-        covariance_df, _ = f_702(df)
+        covariance_df, _ = f_780(df)
         self.assertTrue((covariance_df == 0).all().all())
     def test_with_empty_dataframe(self):
         """Test handling empty input (should raise error)."""
         df = pd.DataFrame()
         with self.assertRaises(ValueError):
-            f_702(df)
+            f_780(df)
     def test_with_non_numeric_dataframe(self):
         """Test handling unsupported data types."""
         df = pd.DataFrame({"A": ["a", "b", "c"], "B": ["d", "e", "f"]})
         with self.assertRaises(TypeError):
-            f_702(df)
+            f_780(df)
     def test_plot_attributes(self):
         """Test plot attributes."""
         df = pd.DataFrame({"X": [10, 20, 30], "Y": [15, 25, 35]})
-        _, pair_plot = f_702(df)
+        _, pair_plot = f_780(df)
         self.assertIsInstance(pair_plot, sns.axisgrid.PairGrid)
         self.assertEqual(len(pair_plot.axes), 2)  # Should have 2x2 grid for pair plot
     def test_single_column_dataframe(self):
         """Test handling of DataFrame with a single numeric column."""
         df = pd.DataFrame({"A": [1, 2, 3]})
-        covariance_df, _ = f_702(df)
+        covariance_df, _ = f_780(df)
         self.assertEqual(covariance_df.loc["A"].item(), 1.0)
         self.assertEqual(covariance_df.shape, (1, 1))
