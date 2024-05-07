@@ -50,7 +50,7 @@ class TestCases(unittest.TestCase):
         for header in ['CPU Usage (%)', 'Memory Usage (%)', 'Disk Usage (%)']:
             with self.subTest(header=header):
                 self.assertIn(header, self.result)
-    def test_non_empty_values(self):
+    def test_proper_values(self):
         """Test that the table's values are not empty or zero."""
         # Extract numeric values using a regular expression
         values = re.findall(r'\|\s*[\d.]+\s*\|', self.result)
