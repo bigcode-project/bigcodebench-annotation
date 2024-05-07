@@ -25,8 +25,8 @@ def f_992(password, PREFIX="ME", SALT_LENGTH=16):
 
     Example:
     >>> hashed_password = f_992('password123', 'ME', 16)
-    >>> print(hashed_password)
-    'c3VwZXJzZWNyZXQ='
+    >>> isinstance(hashed_password, str)
+    True
     """
     if SALT_LENGTH < 0:
         raise ValueError
