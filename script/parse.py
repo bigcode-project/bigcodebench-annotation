@@ -426,14 +426,14 @@ def get_instruction_prompt(data):
 def check_test_wo_doc(data):
     "Check if the problem is related to file system, network requests and database"
     
-    if any([lib in data["libs"] for lib in ["shutil", "requests", "django", "sqlite3", "datetime", "flask", "turtle", "smtplib", "yaml"]]):
+    if any([lib in data["libs"] for lib in ["subprocess", "shutil", "requests", "django", "sqlite3", "datetime", "flask", "turtle", "smtplib", "yaml"]]):
         return True
     elif any([kw in data["prompt"] for kw in ["url"]]):
         return True
     elif any([api in data["apis"] for api in ["os.path"]]):
         return True
     # check any file suffixes are inside data["prompt"]
-    elif any([suffix in data["prompt"] for suffix in [".txt", ".csv", ".json", ".xml", ".html", ".log", ".zip", ".tar", ".gz", ".pdf", ".png"]]):
+    elif any([suffix in data["prompt"] for suffix in [".txt", ".csv", ".json", ".xml", ".html", ".log", ".zip", ".tar", ".gz", ".pdf", ".png", ".db"]]):
         return True
     # check path like patterns are inside data["prompt"]
     elif any([re.search(r"[\w\-.]+\/[\w\-.]+", data["prompt"])]):
