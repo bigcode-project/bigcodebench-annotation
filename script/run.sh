@@ -2,9 +2,9 @@ NAMES=(
     zhihan
 )
 for name in "${NAMES[@]}"; do
-    cp data/raw/*"$name"*refined*py data/clean
+    cp data/raw/*"$name"*py data/clean
 done
-flake8 data/clean/*.py --select=E9,F63,F7,F82 --show-source --statistics
+flake8 data/clean/*refined*.py --select=E9,F63,F7,F82 --show-source --statistics
 python script/parse.py
 
 for name in "${NAMES[@]}"; do
