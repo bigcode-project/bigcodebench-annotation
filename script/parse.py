@@ -467,7 +467,7 @@ if __name__ == "__main__":
     shutil.rmtree("data/processed", ignore_errors=True)
     os.makedirs("data/processed", exist_ok=True)
     with open("data/open-eval.jsonl", "w") as f:
-        for i, file in enumerate(tqdm(glob("data/clean/*.py"))):
+        for i, file in enumerate(tqdm(glob("data/clean/*zhihan*refined.py"))):
             data = extract_content(file, f"f_{i}")
             if not validate_lib_num(data):
                 print(file.replace('clean/', 'raw/'), "Less than 2 libraries are used")
