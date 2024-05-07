@@ -56,7 +56,7 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.test_dir = 'testdir_f_935/'
+        self.test_dir = 'testdir_f_935'
         os.makedirs(self.test_dir, exist_ok=True)
         self.sample_directory = 'testdir_f_935/sample_directory'
         os.makedirs(self.sample_directory, exist_ok=True)

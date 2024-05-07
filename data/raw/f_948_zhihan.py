@@ -1,6 +1,5 @@
 import subprocess
 import os
-import time
 import threading
 
 def f_948(script_path: str, timeout: int = 60) -> str:
@@ -17,7 +16,6 @@ def f_948(script_path: str, timeout: int = 60) -> str:
     Requirements:
     - subprocess
     - os
-    - time
     - threading
 
     Examples:
@@ -101,7 +99,6 @@ class TestCases(unittest.TestCase):
         result = f_948('/path/to/short_script.py')
         self.assertEqual(result, 'Script executed successfully.')
 
-    
     def test_case_4(self):
         # Test with a long-running script and long timeout
         result = f_948(self.test_dir+"/script1.py", 20)

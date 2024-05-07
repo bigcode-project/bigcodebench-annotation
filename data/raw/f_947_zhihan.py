@@ -1,5 +1,4 @@
 import subprocess
-import tempfile
 import shutil
 import os
 
@@ -7,16 +6,15 @@ def f_947(script_path: str, temp_dir: str) -> str:
     """
     Execute a given Python code in a temporary directory.
     
-    Input:
+    Parameters:
     - script_path (str): The path to the Python code that needs to be executed.
     - temp_dir (str): The path for the code to copy the Python code
     
-    Output:
+    Returns:
     - str: String indicating the success or failure of the script execution.
     
     Requirements:
     - subprocess
-    - tempfile
     - shutil
     - os
     

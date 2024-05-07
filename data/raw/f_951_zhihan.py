@@ -7,25 +7,21 @@ def f_951(r_script_path: str, output_path: str, duration: int) -> (bool, str):
     """
     This function executes an R script and verifies if the output file is generated within a given duration.
     
-    Functionality:
-    The function runs the provided R script and continuously checks the specified output path to see 
-    if any CSV files are generated within the allotted duration. 
-    
-    Input:
+    Parameters:
     - r_script_path (str): The absolute path to the R script to be executed.
     - output_path (str): The absolute path where the output CSV file is expected to be generated.
     - duration (int): The time, in seconds, within which the output file should be generated.
     
-    Output:
-    Returns a tuple containing:
-    - bool: True if the output file is generated within the specified duration, False otherwise.
-    - str: A message indicating whether the file was generated successfully or not.
+    Returns:
+    - tuple containing:
+      - bool: True if the output file is generated within the specified duration, False otherwise.
+      - str: A message indicating whether the file was generated successfully or not.
     
     Requirements:
-    - subprocess: To run the R script command.
-    - os: Not explicitly used but may be necessary for file path manipulations.
-    - time: To implement the waiting mechanism.
-    - glob: To search for the generated CSV file in the specified directory.
+    - subprocess
+    - os
+    - time
+    - glob
     
     Example:
     >>> f_951('/path_to_script/MyrScript.r', '/path_to_output/', 10)

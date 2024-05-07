@@ -23,7 +23,7 @@ def f_936(url):
     - requests
     - bs4.BeautifulSoup
 
-    Example usage:
+    Example:
     >>> f_936('https://example.com')
     [{'key': 'value'}, ...]
     """
