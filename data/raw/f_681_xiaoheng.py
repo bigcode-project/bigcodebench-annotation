@@ -12,6 +12,9 @@ def f_681():
     The function creates a list of five cards where each card is a string made up of a rank and a suit (e.g., "10H" for Ten of Hearts).
     It then counts the frequency of each card rank in the hand using a Counter dictionary.
 
+    Parameters:
+    - None
+
     Returns:
     tuple: A tuple containing two elements:
         - hand (list): A list of five cards.

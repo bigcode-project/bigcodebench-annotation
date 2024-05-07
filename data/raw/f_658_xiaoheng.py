@@ -21,6 +21,30 @@ def f_658(directory: str, pattern: str = r'^(.*?)-\d+\.csv$') -> list:
     - pathlib
     - csv
 
+    Example:
+    ```python
+    import re
+    import os
+    from pathlib import Path
+    import csv
+
+    def f_658(directory: str, pattern: str = r'^(.*?)-\d+\.csv$') -> list:
+        # Define the function body here...
+
+    # Create a test directory and some CSV files for testing
+    test_dir = 'test_dir'
+    os.makedirs(test_dir, exist_ok=True)
+    with open(os.path.join(test_dir, 'file1-123.csv'), 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['A', 'B', 'C'])
+    with open(os.path.join(test_dir, 'file2-456.csv'), 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['X', 'Y', 'Z'])
+
+    # Call the function for testing
+    new_files = f_658(test_dir)
+    print("New files created:", new_files)
+    ```
     """
 
     file_dir = Path(directory)
@@ -45,6 +69,8 @@ import unittest
 from unittest.mock import mock_open, patch
 from io import StringIO
 import csv
+import shutil
+
 
 class TestCases(unittest.TestCase):
     
@@ -52,6 +78,7 @@ class TestCases(unittest.TestCase):
         # This sets up the test environment
         self.directory = "/mnt/data/test_data"
         self.mock_csv_rows = [["column1", "column2"], ["value1", "value2"]]
+
 
     def test_file_creation_and_content(self):
         with patch('os.listdir', return_value=['Shan-1.csv', 'Shannon-2.csv']):

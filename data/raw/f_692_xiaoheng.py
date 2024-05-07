@@ -1,4 +1,3 @@
-import pandas as pd
 import re
 from nltk.stem import PorterStemmer
 
@@ -13,7 +12,6 @@ def f_692(text_series):
     - text_series (pandas.Series): A Series object containing string entries representing text data.
 
     Requirements:
-    - pandas
     - re
     - nltk
 
@@ -46,7 +44,7 @@ def f_692(text_series):
 import unittest
 import pandas as pd
 
-class TestTextProcessing(unittest.TestCase):
+class TestCases(unittest.TestCase):
     
     def test_lowercase_and_stemming(self):
         """
@@ -95,7 +93,7 @@ class TestTextProcessing(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestTextProcessing))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     result = runner.run(suite)
     return result

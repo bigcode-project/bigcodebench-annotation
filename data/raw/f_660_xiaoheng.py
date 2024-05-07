@@ -13,22 +13,34 @@ def f_660(string):
     Parameters:
     - string (str): The input string.
 
-    Returns:
-    - dict: A dictionary with the frequency of each lowercase letter.
-
     Requirements:
     - string
     - re
     - collections
 
+    Returns:
+    - dict: A dictionary with the frequency of each lowercase letter.
+
     Example:
     >>> f_660('abc-def-ghij')
+    {'a': 1, 'b': 1, 'c': 1, 'd': 1, 'e': 1, 'f': 1, 'g': 0, 'h': 0, 'i': 0, 'j': 0, 'k': 0, 'l': 0, 'm': 0, 'n': 0, 'o': 0, 'p': 0, 'q': 0, 'r': 0, 's': 0, 't': 0, 'u': 0, 'v': 0, 'w': 0, 'x': 0, 'y': 0, 'z': 0}
     """
-    match = LETTERS_PATTERN.match(string)
-    if match is not None:
+    # Match and extract the portion before the last hyphen
+    match = re.search(r'^(.*)-', string)
+    if match:
         prefix = match.group(1)
-        letter_counts = Counter(prefix)
-        return {letter: letter_counts.get(letter, 0) for letter in LETTERS}
+    else:
+        # If there's no hyphen, the whole string is considered if it is letters only
+        prefix = string if string.isalpha() else ""
+
+    # Count each letter in the prefix
+    letter_counts = Counter(prefix)
+    # Initialize a dictionary with all letters set to zero count
+    result = {letter: 0 for letter in ascii_lowercase}
+    # Update this dictionary with the actual counts from the prefix
+    result.update({letter: letter_counts.get(letter, 0) for letter in letter_counts if letter in result})
+
+    return result
 
 import unittest
 
@@ -40,48 +52,28 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test with a string containing multiple hyphens
-        result = count_letters_before_last_hyphen('abc-def-ghij')
-        expected = {
-            'a': 1, 'b': 1, 'c': 1, 'd': 1, 'e': 1, 'f': 1,
-            'g': 0, 'h': 0, 'i': 0, 'j': 0, 'k': 0, 'l': 0, 'm': 0,
-            'n': 0, 'o': 0, 'p': 0, 'q': 0, 'r': 0, 's': 0, 't': 0,
-            'u': 0, 'v': 0, 'w': 0, 'x': 0, 'y': 0, 'z': 0
-        }
+        result = f_660('abc-def-ghij')
+        expected = {letter: 1 if letter in 'abcdef' else 0 for letter in ascii_lowercase}
         self.assertEqual(result, expected)
 
     def test_case_2(self):
-        # Test with a string with no hyphen
         result = f_660('abcdefghij')
-        expected = {letter: 0 for letter in 'abcdefghijklmnopqrstuvwxyz'}
+        expected = {letter: 1 if letter in 'abcdefghij' else 0 for letter in ascii_lowercase}
         self.assertEqual(result, expected)
 
     def test_case_3(self):
-        # Test with a string with single hyphen and repeated letters
         result = f_660('aabbcc-def')
-        expected = {
-            'a': 2, 'b': 2, 'c': 2, 'd': 0, 'e': 0, 'f': 0,
-            'g': 0, 'h': 0, 'i': 0, 'j': 0, 'k': 0, 'l': 0, 'm': 0,
-            'n': 0, 'o': 0, 'p': 0, 'q': 0, 'r': 0, 's': 0, 't': 0,
-            'u': 0, 'v': 0, 'w': 0, 'x': 0, 'y': 0, 'z': 0
-        }
+        expected = {letter: 2 if letter in 'aabbcc' else 0 for letter in ascii_lowercase}
         self.assertEqual(result, expected)
 
     def test_case_4(self):
-        # Test with an empty string
         result = f_660('')
-        expected = {letter: 0 for letter in 'abcdefghijklmnopqrstuvwxyz'}
+        expected = {letter: 0 for letter in ascii_lowercase}
         self.assertEqual(result, expected)
 
     def test_case_5(self):
-        # Test with a string containing letters from the end of the alphabet
         result = f_660('xyz-abc')
-        expected = {
-            'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0, 'f': 0, 'g': 0, 'h': 0,
-            'i': 0, 'j': 0, 'k': 0, 'l': 0, 'm': 0, 'n': 0, 'o': 0, 'p': 0,
-            'q': 0, 'r': 0, 's': 0, 't': 0, 'u': 0, 'v': 0, 'w': 0, 'x': 1,
-            'y': 1, 'z': 1
-        }
+        expected = {letter: 1 if letter in 'xyz' else 0 for letter in ascii_lowercase}
         self.assertEqual(result, expected)
 
 if __name__ == "__main__":

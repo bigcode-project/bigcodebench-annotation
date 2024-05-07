@@ -1,5 +1,4 @@
 import numpy as np
-import random
 import itertools
 
 def f_674(dimension):
@@ -17,9 +16,11 @@ def f_674(dimension):
 
     Requirements:
     - numpy
+    - itertools
 
     Example:
     >>> matrix, flat_list = f_674(3)
+    Combinations of pairs of elements: [(52, 93), (52, 15), (52, 72), (52, 61), (52, 21), (52, 83), (52, 87), (52, 75), (93, 15), (93, 72), (93, 61), (93, 21), (93, 83), (93, 87), (93, 75), (15, 72), (15, 61), (15, 21), (15, 83), (15, 87), (15, 75), (72, 61), (72, 21), (72, 83), (72, 87), (72, 75), (61, 21), (61, 83), (61, 87), (61, 75), (21, 83), (21, 87), (21, 75), (83, 87), (83, 75), (87, 75)]
     >>> print(matrix)
     [[52 93 15]
      [72 61 21]
@@ -33,6 +34,10 @@ def f_674(dimension):
     np.random.seed(42)  # Ensure reproducible results
     matrix = np.random.randint(1, 101, size=(dimension, dimension))
     flat_list = matrix.flatten().tolist()
+    
+    combinations = list(itertools.combinations(flat_list, 2))
+    print("Combinations of pairs of elements:", combinations)
+    
     return matrix, flat_list
 
 import unittest

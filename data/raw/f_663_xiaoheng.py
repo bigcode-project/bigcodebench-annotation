@@ -1,5 +1,4 @@
 import os
-import sys
 from datetime import datetime
 
 def f_663(filepath: str) -> dict:
@@ -15,7 +14,6 @@ def f_663(filepath: str) -> dict:
 
     Requirements:
     - os
-    - sys
     - datetime
 
     Example:
@@ -29,17 +27,67 @@ def f_663(filepath: str) -> dict:
     except OSError as e:
         raise Exception(f"Error: {e}")
 
-    file_info = {
-        'size': f"{size} bytes",
-        'last_modified': mtime
-    }
-
-    return file_info
+    return {'size': f"{size} bytes", 'last_modified': mtime}
 
 import unittest
 import os
 from datetime import datetime
+from unittest.mock import patch
+import errno
 
+
+def create_test_files(base_path):
+    os.makedirs(base_path, exist_ok=True)
+    with open(os.path.join(base_path, "empty_file.txt"), 'w') as f:
+        pass
+    with open(os.path.join(base_path, "large_file.txt"), 'w') as f:
+        f.write("A" * 10**6)  # 1MB file
+
+class TestCases(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.base_path = "f_663_data_xiaoheng"
+        create_test_files(cls.base_path)
+
+    @classmethod
+    def tearDownClass(cls):
+        for item in os.listdir(cls.base_path):
+            os.remove(os.path.join(cls.base_path, item))
+        os.rmdir(cls.base_path)
+
+    def test_file_properties(self):
+        file_path = os.path.join(self.base_path, "large_file.txt")
+        result = f_663(file_path)
+        expected_size = os.path.getsize(file_path)
+        expected_mtime = datetime.fromtimestamp(os.path.getmtime(file_path)).strftime('%Y-%m-%d %H:%M:%S')
+        self.assertEqual(result['size'], f"{expected_size} bytes")
+        self.assertEqual(result['last_modified'], expected_mtime)
+
+    def test_empty_file(self):
+        file_path = os.path.join(self.base_path, "empty_file.txt")
+        result = f_663(file_path)
+        self.assertEqual(result['size'], "0 bytes")
+
+    def test_file_not_found(self):
+        file_path = os.path.join(self.base_path, "nonexistent.txt")
+        with self.assertRaises(Exception) as context:
+            f_663(file_path)
+        self.assertIn("No such file or directory", str(context.exception))
+
+    @patch('os.path.getsize')
+    @patch('os.path.getmtime')
+    def test_permission_error(self, mock_getmtime, mock_getsize):
+        mock_getsize.side_effect = OSError(errno.EACCES, "Permission denied")
+        mock_getmtime.side_effect = OSError(errno.EACCES, "Permission denied")
+        
+        with self.assertRaises(Exception) as context:
+            f_663("fakepath/file.txt")
+        self.assertIn("Permission denied", str(context.exception))
+
+    def test_large_file(self):
+        file_path = os.path.join(self.base_path, "large_file.txt")
+        result = f_663(file_path)
+        self.assertTrue(int(result['size'].replace(' bytes', '')) > 0)
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -47,45 +95,5 @@ def run_tests():
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
-class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test with a file containing "This is a test file with some content."
-        result = f_663("f_663_data_xiaoheng/test_file1.txt")
-        expected_size = os.path.getsize("f_663_data_xiaoheng/test_file1.txt")
-        expected_mtime = datetime.fromtimestamp(os.path.getmtime("f_663_data_xiaoheng/test_file1.txt")).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(result['size'], f"{expected_size} bytes")
-        self.assertEqual(result['last_modified'], expected_mtime)
-
-    def test_case_2(self):
-        # Test with a file containing a longer content than the previous one.
-        result = f_663("f_663_data_xiaoheng/test_file2.txt")
-        expected_size = os.path.getsize("f_663_data_xiaoheng/test_file2.txt")
-        expected_mtime = datetime.fromtimestamp(os.path.getmtime("f_663_data_xiaoheng/test_file2.txt")).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(result['size'], f"{expected_size} bytes")
-        self.assertEqual(result['last_modified'], expected_mtime)
-
-    def test_case_3(self):
-        # Test with a file containing short content.
-        result = f_663("f_663_data_xiaoheng/test_file3.txt")
-        expected_size = os.path.getsize("f_663_data_xiaoheng/test_file3.txt")
-        expected_mtime = datetime.fromtimestamp(os.path.getmtime("f_663_data_xiaoheng/test_file3.txt")).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(result['size'], f"{expected_size} bytes")
-        self.assertEqual(result['last_modified'], expected_mtime)
-
-    def test_case_4(self):
-        # Test with another file containing different content length.
-        result = f_663("f_663_data_xiaoheng/test_file4.txt")
-        expected_size = os.path.getsize("f_663_data_xiaoheng/test_file4.txt")
-        expected_mtime = datetime.fromtimestamp(os.path.getmtime("f_663_data_xiaoheng/test_file4.txt")).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(result['size'], f"{expected_size} bytes")
-        self.assertEqual(result['last_modified'], expected_mtime)
-
-    def test_case_5(self):
-        # Test with the final test file content.
-        result = f_663("f_663_data_xiaoheng/test_file5.txt")
-        expected_size = os.path.getsize("f_663_data_xiaoheng/test_file5.txt")
-        expected_mtime = datetime.fromtimestamp(os.path.getmtime("f_663_data_xiaoheng/test_file5.txt")).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(result['size'], f"{expected_size} bytes")
-        self.assertEqual(result['last_modified'], expected_mtime)
 if __name__ == "__main__":
     run_tests()

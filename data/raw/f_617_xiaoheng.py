@@ -1,5 +1,4 @@
 import sys
-import os
 import subprocess
 
 # Constants
@@ -21,7 +20,6 @@ def f_617(python_version=PYTHON_VERSION, path_to_append=PATH_TO_APPEND):
 
     Requirements:
     - sys
-    - os
     - subprocess
 
     Example:
@@ -33,55 +31,57 @@ def f_617(python_version=PYTHON_VERSION, path_to_append=PATH_TO_APPEND):
 
     return python_version
 
+import sys
 import unittest
 from unittest.mock import patch
 
 class TestCases(unittest.TestCase):
 
     @patch('subprocess.run')
-    @patch('sys.path.append')
-    def test_switch_to_default_python_version(self, mock_append, mock_run):
-        result = f_617()
+    def test_switch_to_default_python_version(self, mock_run):
+        original_path_length = len(sys.path)
+        f_617()
         mock_run.assert_called_with(['pyenv', 'global', '3.8'], check=True)
-        mock_append.assert_called_with('/path/to/whatever')
-        self.assertEqual(result, '3.8')
+        self.assertEqual(sys.path[-1], '/path/to/whatever')
+        sys.path = sys.path[:original_path_length]  # Reset sys.path to original state
 
     @patch('subprocess.run')
-    @patch('sys.path.append')
-    def test_switch_to_python_3_7(self, mock_append, mock_run):
-        result = f_617('3.7', '/another/path')
+    def test_switch_to_python_3_7(self, mock_run):
+        original_path_length = len(sys.path)
+        f_617('3.7', '/another/path')
         mock_run.assert_called_with(['pyenv', 'global', '3.7'], check=True)
-        mock_append.assert_called_with('/another/path')
-        self.assertEqual(result, '3.7')
+        self.assertEqual(sys.path[-1], '/another/path')
+        sys.path = sys.path[:original_path_length]
 
     @patch('subprocess.run')
-    @patch('sys.path.append')
-    def test_switch_to_python_3_9(self, mock_append, mock_run):
-        result = f_617('3.9')
+    def test_switch_to_python_3_9(self, mock_run):
+        original_path_length = len(sys.path)
+        f_617('3.9')
         mock_run.assert_called_with(['pyenv', 'global', '3.9'], check=True)
-        mock_append.assert_called_with('/path/to/whatever')
-        self.assertEqual(result, '3.9')
+        self.assertEqual(sys.path[-1], '/path/to/whatever')
+        sys.path = sys.path[:original_path_length]
 
     @patch('subprocess.run')
-    @patch('sys.path.append')
-    def test_switch_to_python_2_7(self, mock_append, mock_run):
-        result = f_617('2.7')
+    def test_switch_to_python_2_7(self, mock_run):
+        original_path_length = len(sys.path)
+        f_617('2.7')
         mock_run.assert_called_with(['pyenv', 'global', '2.7'], check=True)
-        mock_append.assert_called_with('/path/to/whatever')
-        self.assertEqual(result, '2.7')
+        self.assertEqual(sys.path[-1], '/path/to/whatever')
+        sys.path = sys.path[:original_path_length]
 
     @patch('subprocess.run')
-    @patch('sys.path.append')
-    def test_switch_to_python_3_6(self, mock_append, mock_run):
-        result = f_617('3.6', '/different/path')
+    def test_switch_to_python_3_6(self, mock_run):
+        original_path_length = len(sys.path)
+        f_617('3.6', '/different/path')
         mock_run.assert_called_with(['pyenv', 'global', '3.6'], check=True)
-        mock_append.assert_called_with('/different/path')
-        self.assertEqual(result, '3.6')
+        self.assertEqual(sys.path[-1], '/different/path')
+        sys.path = sys.path[:original_path_length]
 
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 if __name__ == "__main__":
     run_tests()

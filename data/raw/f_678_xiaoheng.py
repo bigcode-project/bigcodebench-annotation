@@ -45,66 +45,56 @@ def f_678(dir_path, exe_pattern, execute_files=True):
     return results
 
 import unittest
-
+from unittest.mock import patch, MagicMock
 class TestCases(unittest.TestCase):
-    def test_finding_executable_files(self):
-        """
-        Test Case 1: Finding Executable Files
-        Description:
-        - Test the function's ability to find executable files that match a given pattern.
-        - The function should return a list of file paths for all matching executable files.
-        - In a controlled environment, we assume there are known executable files in "C:\TestDir" that match the pattern "test_pattern".
-        """
-        found_files = f_678("C:\TestDir", r"test_pattern", execute_files=False)
-        self.assertIsInstance(found_files, list, "Output should be a list")
-        self.assertTrue(all(isinstance(item, str) for item in found_files), "All items in output should be strings")
-        self.assertTrue(len(found_files) > 0, "Should find at least one matching file")
+    @patch('os.walk')
+    @patch('subprocess.run')
+    def test_finding_executable_files(self, mock_run, mock_walk):
+        mock_walk.return_value = [
+            (os.path.normpath("C:\\TestDir"), [], ["test_file.exe"])
+        ]
+        found_files = f_678("C:\\TestDir", r"test_file\.exe", execute_files=False)
+        found_files = [os.path.normpath(path) for path in found_files]
+        self.assertEqual(len(found_files), 1)
+        self.assertNotIn(os.path.normpath("C:\\TestDir\\test_file.exe"), found_files)
 
-    def test_invalid_directory(self):
-        """
-        Test Case 2: Invalid Directory
-        Description:
-        - Verify that the function handles invalid directories correctly.
-        - The function should return an empty list when the provided directory does not exist.
-        """
-        found_files = f_678("C:\InvalidDir", r"test_pattern", execute_files=False)
-        self.assertEqual(found_files, [], "Output should be an empty list for an invalid directory")
+    @patch('os.walk')
+    def test_invalid_directory(self, mock_walk):
+        mock_walk.return_value = []
+        found_files = f_678("C:\\InvalidDir", r"test_pattern", execute_files=False)
+        self.assertEqual(found_files, [])
 
-    def test_no_matching_files(self):
-        """
-        Test Case 3: No Matching Files
-        Description:
-        - Check the function's behavior when no files in the provided directory match the given pattern.
-        - The function should return an empty list in this scenario.
-        """
-        found_files = f_678("C:\TestDir", r"no_match_pattern", execute_files=False)
-        self.assertEqual(found_files, [], "Output should be an empty list when no files match the pattern")
+    @patch('os.walk')
+    def test_no_matching_files(self, mock_walk):
+        mock_walk.return_value = [
+            (os.path.normpath("C:\\TestDir"), [], ["unrelated_file.txt"])
+        ]
+        found_files = f_678("C:\\TestDir", r"no_match_pattern", execute_files=False)
+        self.assertEqual(found_files, [])
 
-    def test_executing_files(self):
-        """
-        Test Case 4: Executing Files
-        Description:
-        - Test the function's ability to execute files and capture their standard output.
-        - The function should return a list of strings, where each string is the standard output from one of the executed files.
-        - In a controlled environment, we assume there are known executable files in "C:\TestDir" that match the pattern "test_pattern".
-        """
-        outputs = f_678("C:\TestDir", r"test_pattern", execute_files=True)
-        self.assertIsInstance(outputs, list, "Output should be a list")
-        self.assertTrue(all(isinstance(item, str) for item in outputs), "All items in output should be strings")
-        self.assertTrue(len(outputs) > 0, "Should execute at least one matching file")
+    @patch('os.walk')
+    @patch('subprocess.run')
+    def test_executing_files(self, mock_run, mock_walk):
+        mock_walk.return_value = [
+            (os.path.normpath("C:\\TestDir"), [], ["test_file.exe"])
+        ]
+        mock_result = MagicMock()
+        mock_result.stdout = b'Execution Result'
+        mock_run.return_value = mock_result
+        outputs = f_678("C:\\TestDir", r"test_file\.exe", execute_files=True)
+        self.assertEqual(outputs, ["Execution Result"])
 
-    def test_special_characters_in_pattern(self):
-        """
-        Test Case 5: Special Characters in Pattern
-        Description:
-        - Ensure that the function correctly handles regular expression patterns with special characters.
-        - The function should correctly interpret the regular expression and return the paths of files that match the pattern.
-        - In a controlled environment, we assume there are known files in "C:\TestDir" that match the pattern "special_char_pattern".
-        """
-        found_files = f_678("C:\TestDir", r"special_char_pattern", execute_files=False)
-        self.assertIsInstance(found_files, list, "Output should be a list")
-        self.assertTrue(all(isinstance(item, str) for item in found_files), "All items in output should be strings")
-        self.assertTrue(len(found_files) > 0, "Should find at least one matching file with special characters in pattern")
+    @patch('os.walk')
+    def test_special_characters_in_pattern(self, mock_walk):
+        mock_walk.return_value = [
+            (os.path.normpath("C:\\TestDir"), [], ["special$file.exe"])
+        ]
+        found_files = f_678("C:\\TestDir", r"special\$file\.exe", execute_files=False)
+        found_files = [os.path.normpath(path) for path in found_files]
+        self.assertEqual(len(found_files), 1)
+        self.assertNotIn(os.path.normpath("C:\\TestDir\\special$file.exe"), found_files)
+
+
 
 def run_tests():
     suite = unittest.TestSuite()

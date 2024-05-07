@@ -13,21 +13,21 @@ def f_646(s):
     - sqrt_sum (float): The sum of the square roots of the integers and floats.
     
     Requirements:
-    - re, math
+    - re
+    - math
     
     Example:
     >>> count, sqrt_sum = f_646('1,2,3.5,abc,4,5.6')
     >>> print(count)  # Ensure this matches exactly with expected output
     5
     >>> print("{:.2f}".format(sqrt_sum))  # Ensure this matches exactly with expected output
-    1.48
+    8.65
     '''
-    numbers = re.findall(r'\b\d+(\.\d+)?\b', s)
+    numbers = re.findall(r'\b\d+(?:\.\d+)?\b', s)  # Use non-capturing group for decimals
     count = len(numbers)
-    # Ensure conversion to float is only attempted on valid number strings
-    sqrt_sum = sum(math.sqrt(float(num)) for num in numbers if num)
-
+    sqrt_sum = sum(math.sqrt(float(num)) for num in numbers if num)  # Ensure conversion to float
     return count, sqrt_sum
+
 import unittest
 
 class TestCases(unittest.TestCase):
@@ -45,12 +45,12 @@ class TestCases(unittest.TestCase):
         count, sqrt_sum = f_646('1.1,2.2,3.3')
         self.assertEqual(count, 3)
         self.assertAlmostEqual(sqrt_sum, sum(math.sqrt(x) for x in [1.1, 2.2, 3.3]))
-        
+
     def test_4(self):
         count, sqrt_sum = f_646('')
         self.assertEqual(count, 0)
-        self.assertEqual(sqrt_sum, 0)
-        
+        self.assertEqual(sqrt_sum, 0.0)
+
     def test_5(self):
         count, sqrt_sum = f_646('apple,banana,3.14,15,grape,1001')
         self.assertEqual(count, 3)

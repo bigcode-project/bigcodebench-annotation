@@ -7,7 +7,7 @@ def f_691(target_value='332', csv_dir='./csv_files/', processed_dir='./processed
     Scans a directory for CSV files, finds for each file the index of the row with the first cell equal to the target value,
     and optionally moves the processed files to another directory.
     
-    Args:
+    Parameters:
     - target_value (str): The value to search for in the first cell of each row. Defaults to '332'.
     - csv_dir (str): The directory to scan for CSV files. Defaults to './csv_files/'.
     - processed_dir (str): The directory to move processed files to. Defaults to './processed_files/'.
@@ -48,56 +48,72 @@ def f_691(target_value='332', csv_dir='./csv_files/', processed_dir='./processed
 
 import unittest
 from unittest.mock import patch
+import tempfile
+import shutil
+import os
+from unittest.mock import mock_open, patch, MagicMock
+import csv
 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Common setup for all tests could be placed here
+        # Common setup for all tests
         self.target_value = '332'
-        self.csv_dir = '/mnt/data/csv_files/'
-        self.processed_dir = '/mnt/data/processed_files/'
+        self.csv_dir = '/fake/csv_files/'
+        self.processed_dir = '/fake/processed_files/'
         self.simulate = True
 
-    def test_file_with_target(self):
-        """ Test case for files with the target value """
-        # This test checks if the function can correctly find and return the row index
-        # of the target value in a CSV file when the target value is present.
+    @patch('os.listdir', return_value=['file_with_target.csv'])
+    @patch('builtins.open', new_callable=mock_open, read_data="332,Data\n333,More Data\n")
+    @patch('shutil.move')
+    def test_file_with_target(self, mock_move, mock_open, mock_listdir):
+        """ Test case for files with the target value. """
         result = f_691(target_value=self.target_value, csv_dir=self.csv_dir,
                        processed_dir=self.processed_dir, simulate=self.simulate)
-        self.assertIn('f_691_data_xiaoheng/file_with_target.csv', result)
-        self.assertEqual(result['f_691_data_xiaoheng/file_with_target.csv'], 0)
+        self.assertIn('file_with_target.csv', result)
+        self.assertEqual(result['file_with_target.csv'], 0)
+        mock_move.assert_not_called()
 
-    def test_file_without_target(self):
-        """ Test case for files without the target value """
-        # This test ensures that the function returns no result for a file that does not
-        # contain the target value.
+    @patch('os.listdir', return_value=['file_without_target.csv'])
+    @patch('builtins.open', new_callable=mock_open, read_data="334,Data\n335,More Data\n")
+    @patch('shutil.move')
+    def test_file_without_target(self, mock_move, mock_open, mock_listdir):
+        """ Test case for files without the target value. """
         result = f_691(target_value=self.target_value, csv_dir=self.csv_dir,
                        processed_dir=self.processed_dir, simulate=self.simulate)
-        self.assertNotIn('f_691_data_xiaoheng/file_without_target.csv', result)
+        self.assertNotIn('file_without_target.csv', result)
+        mock_move.assert_not_called()
 
-    def test_file_multiple_targets(self):
-        """ Test case for files with multiple target values """
-        # This test checks if the function correctly identifies the first occurrence of
-        # the target value in a file with multiple occurrences.
+    @patch('os.listdir', return_value=['empty_file.csv'])
+    @patch('builtins.open', new_callable=mock_open, read_data="")
+    @patch('shutil.move')
+    def test_empty_file(self, mock_move, mock_open, mock_listdir):
+        """ Test case for an empty CSV file. """
         result = f_691(target_value=self.target_value, csv_dir=self.csv_dir,
                        processed_dir=self.processed_dir, simulate=self.simulate)
-        self.assertIn('f_691_data_xiaoheng/file_multiple_targets.csv', result)
-        self.assertEqual(result['f_691_data_xiaoheng/file_multiple_targets.csv'], 0)
+        self.assertNotIn('empty_file.csv', result)
+        mock_move.assert_not_called()
 
-    def test_file_target_not_first(self):
-        """ Test case for files with the target value not in the first cell """
-        # This test verifies that the function does not falsely identify a target value
-        # that is not located in the first cell of a row.
+    @patch('os.listdir', return_value=['file_with_multiple_targets.csv'])
+    @patch('builtins.open', new_callable=mock_open, read_data="332,Data\n332,More Data\n333,Other Data\n")
+    @patch('shutil.move')
+    def test_file_with_multiple_targets(self, mock_move, mock_open, mock_listdir):
+        """ Test case for files with multiple occurrences of the target value. """
         result = f_691(target_value=self.target_value, csv_dir=self.csv_dir,
                        processed_dir=self.processed_dir, simulate=self.simulate)
-        self.assertNotIn('f_691_data_xiaoheng/file_target_not_first.csv', result)
+        self.assertIn('file_with_multiple_targets.csv', result)
+        self.assertEqual(result['file_with_multiple_targets.csv'], 0)
+        mock_move.assert_not_called()
 
-    def test_empty_file(self):
-        """ Test case for empty files """
-        # This test ensures that the function handles empty files gracefully without
-        # errors and does not include them in the result.
-        result = f_691(target_value=self.target_value, csv_dir=self.csv_dir,
-                       processed_dir=self.processed_dir, simulate=self.simulate)
-        self.assertNotIn('f_691_data_xiaoheng/empty_file.csv', result)
+    @patch('os.listdir', return_value=['file_with_target_not_first.csv'])
+    @patch('builtins.open', new_callable=mock_open, read_data="333,Data\n334,332\n335,Data\n")
+    @patch('shutil.move')
+    def test_file_with_target_not_first(self, mock_move, mock_open, mock_listdir):
+        """ Test case for a file where the target value is not in the first cell. """
+        result = f_691(target_value='332', csv_dir=self.csv_dir,
+                    processed_dir=self.processed_dir, simulate=self.simulate)
+        # This file should not be in the results because '332' is not in the first cell
+        self.assertNotIn('file_with_target_not_first.csv', result)
+        mock_move.assert_not_called()
 
 def run_tests():
     suite = unittest.TestSuite()

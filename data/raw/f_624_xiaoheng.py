@@ -1,6 +1,5 @@
 import urllib.request
 import os
-import mmap
 import re
 
 # Constants
@@ -20,18 +19,20 @@ def f_624(url):
     Requirements:
     - urllib
     - os
-    - mmap
     - re
 
     Example:
     >>> f_624('http://example.com/log.txt')
     5 # Assuming there are 5 occurrences of 'ERROR' in the file
     """
+    TARGET_FILE = 'downloaded_file.txt'
+    SEARCH_PATTERN = r'\bERROR\b'
+
     urllib.request.urlretrieve(url, TARGET_FILE)
 
     with open(TARGET_FILE, 'r') as f:
-        data = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
-        occurrences = len(re.findall(SEARCH_PATTERN, data))
+        data = f.read()
+    occurrences = len(re.findall(SEARCH_PATTERN, data))
 
     os.remove(TARGET_FILE)
 
@@ -45,32 +46,50 @@ def run_tests():
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
-class TestCases(unittest.TestCase):
-    
-    def test_sample1(self):
-        url = "file:///mnt/data/f_624_data_xiaoheng/sample1.txt"
-        result = f_624(url)
-        self.assertEqual(result, 2, "Expected 2 occurrences of 'ERROR'")
-    
-    def test_sample2(self):
-        url = "file:///mnt/data/f_624_data_xiaoheng/sample2.txt"
-        result = f_624(url)
-        self.assertEqual(result, 0, "Expected 0 occurrences of 'ERROR'")
-    
-    def test_sample3(self):
-        url = "file:///mnt/data/f_624_data_xiaoheng/sample3.txt"
-        result = f_624(url)
-        self.assertEqual(result, 5, "Expected 5 occurrences of 'ERROR'")
+from unittest.mock import patch, mock_open
 
-    def test_mixed_case_errors(self):
-        url = 'file:///mnt/data/f_624_data_xiaoheng/mixed_case_errors.txt'
-        result = f_624(url)
-        self.assertEqual(result, 2, "Expected 2 occurrences of 'ERROR'")
+class TestCases(unittest.TestCase):
+    @patch('urllib.request.urlretrieve')
+    @patch('builtins.open', new_callable=mock_open, read_data='ERROR\nOK\nERROR')
+    @patch('os.remove')
+    def test_sample1(self, mock_remove, mock_file, mock_urlretrieve):
+        mock_urlretrieve.return_value = ('mock/path/to/file.txt', {'mock': 'headers'})
+        result = f_624('http://example.com/log.txt')
+        self.assertEqual(result, 2)  # Expecting 2 occurrences of 'ERROR'
     
-    def test_large_file(self):
-        url = 'file:///mnt/data/f_624_data_xiaoheng/large_file.txt'
-        result = f_624(url)
-        self.assertEqual(result, 5001, "Expected 5001 occurrences of 'ERROR'")
+    @patch('urllib.request.urlretrieve')
+    @patch('builtins.open', new_callable=mock_open, read_data='OK\nFINE\nGOOD')
+    @patch('os.remove')
+    def test_sample2(self, mock_remove, mock_file, mock_urlretrieve):
+        result = f_624('http://example.com/log.txt')
+        self.assertEqual(result, 0)  # Expecting 0 occurrences of 'ERROR'
+
+    @patch('urllib.request.urlretrieve')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.remove')
+    def test_sample3(self, mock_remove, mock_file, mock_urlretrieve):
+        mock_file.return_value.read.return_value = "ERROR\nERROR\nERROR\nERROR\nERROR"
+        mock_urlretrieve.return_value = ('mock/path/to/file.txt', {'mock': 'headers'})
+        result = f_624('http://example.com/log.txt')
+        self.assertEqual(result, 5)  # Expecting 5 occurrences of 'ERROR'
+
+    @patch('urllib.request.urlretrieve')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.remove')
+    def test_mixed_case_errors(self, mock_remove, mock_file, mock_urlretrieve):
+        mock_file.return_value.read.return_value = "Error\nerror\nERROR"
+        mock_urlretrieve.return_value = ('mock/path/to/file.txt', {'mock': 'headers'})
+        result = f_624('http://example.com/log.txt')
+        self.assertEqual(result, 1)  # Expecting 1 occurrence of 'ERROR' (case-sensitive)
+
+    @patch('urllib.request.urlretrieve')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.remove')
+    def test_large_file(self, mock_remove, mock_file, mock_urlretrieve):
+        mock_file.return_value.read.return_value = "ERROR\n" * 5001
+        mock_urlretrieve.return_value = ('mock/path/to/file.txt', {'mock': 'headers'})
+        result = f_624('http://example.com/log.txt')
+        self.assertEqual(result, 5001)  # Expecting 5001 occurrences of 'ERROR'
         
 if __name__ == "__main__":
     run_tests()

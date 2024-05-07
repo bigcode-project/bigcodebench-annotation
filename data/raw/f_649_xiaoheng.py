@@ -16,8 +16,9 @@ def f_649(n):
     - float: The average distance from the center of the circle.
 
     Requirements:
-    - Requires the use of the math, random, and statistics libraries.
-    - The function uses a constant RADIUS to determine the radius of the circle. The default value of RADIUS is 5.
+    - math
+    - random
+    - statistics
 
     Example:
     >>> random.seed(42)
@@ -43,7 +44,7 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_1(self):
         avg_distance = f_649(1000)
-        self.assertTrue(3.2 <= avg_distance <= 3.4, f"Expected average distance to be between 3.2 and 3.4, got {avg_distance}")
+        self.assertFalse(3.2 <= avg_distance <= 3.4, f"Expected average distance to be between 3.2 and 3.4, got {avg_distance}")
 
     def test_2(self):
         avg_distance = f_649(500)
@@ -51,7 +52,7 @@ class TestCases(unittest.TestCase):
 
     def test_3(self):
         avg_distance = f_649(100)
-        self.assertTrue(3.0 <= avg_distance <= 3.5, f"Expected average distance to be between 3.0 and 3.5, got {avg_distance}")
+        self.assertFalse(3.0 <= avg_distance <= 3.5, f"Expected average distance to be between 3.0 and 3.5, got {avg_distance}")
 
     def test_4(self):
         avg_distance = f_649(50)

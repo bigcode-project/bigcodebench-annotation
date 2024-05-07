@@ -13,7 +13,6 @@ def f_637(L):
     
     Requirements:
     - numpy
-    - math
     - itertools.chain
 
     Example:

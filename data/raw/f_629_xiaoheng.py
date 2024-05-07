@@ -34,7 +34,7 @@ def f_629(s: str) -> np.ndarray:
 import unittest
 import numpy as np
 
-class TestVectorizeString(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_basic_string(self):
         s = "This is a test string."
@@ -68,7 +68,7 @@ class TestVectorizeString(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestVectorizeString))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

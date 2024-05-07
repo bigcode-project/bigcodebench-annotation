@@ -1,5 +1,4 @@
 import os
-import json
 import re
 import shutil
 
@@ -15,15 +14,21 @@ def f_659():
     Parameters:
     - None
 
+    Returns:
+    - None
+
     Requirements:
     - os
-    - json
     - re
     - shutil
 
     Example:
     >>> f_659()
+
     """
+    SOURCE_DIR = '/source/dir'
+    TARGET_DIR = '/target/dir'
+    FILE_PATTERN = re.compile(r'^(.*?)-\d+\.json$')
     for filename in os.listdir(SOURCE_DIR):
         match = FILE_PATTERN.match(filename)
         if match is not None:
@@ -31,8 +36,11 @@ def f_659():
             new_filename = f'{prefix}.json'
             shutil.move(os.path.join(SOURCE_DIR, filename), os.path.join(TARGET_DIR, new_filename))
 
+
 import unittest
+from unittest.mock import patch, MagicMock, call
 import os
+import shutil
 
 source_dirs = ["/mnt/data/test_data/source_0", "/mnt/data/test_data/source_1", "/mnt/data/test_data/source_2", "/mnt/data/test_data/source_3", "/mnt/data/test_data/source_4"]
 target_dirs = ["/mnt/data/test_data/target_0", "/mnt/data/test_data/target_1", "/mnt/data/test_data/target_2", "/mnt/data/test_data/target_3", "/mnt/data/test_data/target_4"]
@@ -44,49 +52,47 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # This method will be run before each test case to reset the test data
-        for s_dir, t_dir in zip(source_dirs, target_dirs):
-            for file in os.listdir(t_dir):
-                os.remove(os.path.join(t_dir, file))
-            for j, file_name in enumerate(os.listdir(s_dir)):
-                new_file_name = f"{os.path.splitext(file_name)[0].split('-')[0]}-{j}.json"
-                os.rename(os.path.join(s_dir, file_name), os.path.join(s_dir, new_file_name))
+    @patch('os.listdir')
+    @patch('shutil.move')
+    @patch('os.path.join', side_effect=lambda *args: '/'.join(args))
+    def test_move_json_files(self, mock_join, mock_move, mock_listdir):
+        mock_listdir.return_value = ['data-1.json', 'info-2.json', 'report-3.json']
+        f_659()
+        expected_calls = [
+            call('/source/dir/data-1.json', '/target/dir/data.json'),
+            call('/source/dir/info-2.json', '/target/dir/info.json'),
+            call('/source/dir/report-3.json', '/target/dir/report.json')
+        ]
+        mock_move.assert_has_calls(expected_calls, any_order=True)
 
-    def test_case_1(self):
-        # Test with source_0 and target_0 directories.
-        # Expect 5 files to be moved and renamed correctly in target_0 directory.
-        result = f_659(source_dirs[0], target_dirs[0])
-        self.assertEqual(result["moved_files"], 5)
-        self.assertTrue(all([file.endswith(".json") for file in result["new_filenames"]]))
+    @patch('os.listdir', MagicMock(return_value=[]))
+    @patch('shutil.move')
+    def test_no_files_to_move(self, mock_move):
+        f_659()
+        mock_move.assert_not_called()
 
-    def test_case_2(self):
-        # Test with source_1 and target_1 directories.
-        # Expect 5 files to be moved and renamed correctly in target_1 directory.
-        result = f_659(source_dirs[1], target_dirs[1])
-        self.assertEqual(result["moved_files"], 5)
-        self.assertTrue(all([file.endswith(".json") for file in result["new_filenames"]]))
+    @patch('os.listdir', return_value=['wrongfile.txt', 'not-a-json-1.txt', 'badname.json'])
+    @patch('shutil.move')
+    def test_incorrect_file_patterns(self, mock_move, mock_listdir):
+        f_659()
+        mock_move.assert_not_called()
 
-    def test_case_3(self):
-        # Test with source_2 and target_2 directories.
-        # Expect 5 files to be moved and renamed correctly in target_2 directory.
-        result = f_659(source_dirs[2], target_dirs[2])
-        self.assertEqual(result["moved_files"], 5)
-        self.assertTrue(all([file.endswith(".json") for file in result["new_filenames"]]))
+    @patch('os.listdir', return_value=['complex-pattern-123-1.json', 'simple-2.json'])
+    @patch('shutil.move')
+    @patch('os.path.join', side_effect=lambda *args: '/'.join(args))
+    def test_renaming_accuracy(self, mock_join, mock_move, mock_listdir):
+        f_659()
+        expected_calls = [
+            call('/source/dir/complex-pattern-123-1.json', '/target/dir/complex-pattern-123.json'),
+            call('/source/dir/simple-2.json', '/target/dir/simple.json')
+        ]
+        mock_move.assert_has_calls(expected_calls, any_order=True)
 
-    def test_case_4(self):
-        # Test with source_3 and target_3 directories.
-        # Expect 5 files to be moved and renamed correctly in target_3 directory.
-        result = f_659(source_dirs[3], target_dirs[3])
-        self.assertEqual(result["moved_files"], 5)
-        self.assertTrue(all([file.endswith(".json") for file in result["new_filenames"]]))
-
-    def test_case_5(self):
-        # Test with source_4 and target_4 directories.
-        # Expect 5 files to be moved and renamed correctly in target_4 directory.
-        result = f_659(source_dirs[4], target_dirs[4])
-        self.assertEqual(result["moved_files"], 5)
-        self.assertTrue(all([file.endswith(".json") for file in result["new_filenames"]]))
+    @patch('os.listdir', return_value=['misleading-name-not-json-file-1', 'another-fake-2.json.data'])
+    @patch('shutil.move')
+    def test_special_cases_handling(self, mock_move, mock_listdir):
+        f_659()
+        mock_move.assert_not_called()
 
 
 if __name__ == "__main__":

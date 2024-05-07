@@ -23,19 +23,18 @@ def f_703():
 
     Example:
     >>> f_703()
-    (0.98, None)
-    >>> f_703()
-    (0.96, None)
+    (1.0, None)
     """
     warnings.simplefilter('always')
-
     iris = datasets.load_iris()
-    X_train, X_test, y_train, y_test = model_selection.train_test_split(iris.data, iris.target, test_size=0.33)
-
-    clf = svm.SVC()
+    # Set random_state to any fixed number to ensure consistency in data splitting
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(
+        iris.data, iris.target, test_size=0.33, random_state=42)
+    
+    # Initialize the classifier with a fixed random_state
+    clf = svm.SVC(random_state=42)
     clf.fit(X_train, y_train)
     predictions = clf.predict(X_test)
-
     accuracy = metrics.accuracy_score(y_test, predictions)
 
     warning_msg = None
@@ -45,9 +44,7 @@ def f_703():
 
     return accuracy, warning_msg
 
-import warnings
 import unittest
-
 
 class TestCases(unittest.TestCase):
     def test_high_accuracy(self):
@@ -78,11 +75,12 @@ class TestCases(unittest.TestCase):
             if w:
                 self.assertEqual(str(w[-1].message), "The accuracy of the SVM classification is below 0.9.")
 
-def run_tests():  
+def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests()
+
+    run_tests()  

@@ -1,6 +1,5 @@
 from collections import Counter
 import heapq
-import random
 
 # Constants
 LETTERS = list('abcdefghijklmnopqrstuvwxyz')
@@ -19,7 +18,6 @@ def f_642(my_dict):
     Requirements:
     - collections
     - heapq
-    - random
 
     Example:
     >>> random.seed(43)

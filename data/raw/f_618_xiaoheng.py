@@ -1,4 +1,3 @@
-import os
 import sys
 import json
 from datetime import datetime
@@ -20,7 +19,6 @@ def f_618(path_to_append=PATH_TO_APPEND, json_file=JSON_FILE):
     - json_data (dict): The updated JSON data. The dictionary will contain a 'last_updated' key with the current datetime as its value.
 
     Requirements:
-    - os
     - sys
     - json
     - datetime.datetime
@@ -43,14 +41,29 @@ def f_618(path_to_append=PATH_TO_APPEND, json_file=JSON_FILE):
 import unittest
 import json
 import os
-from datetime import datetime
 import tempfile
+import sys
+from datetime import datetime
+
+# Update this path if needed to point to an actual temporary directory
+PATH_TO_TEMP_JSON = tempfile.mktemp(suffix='.json')
 
 class TestCases(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Create a temporary JSON file for tests that rely on the default JSON file
+        with open(PATH_TO_TEMP_JSON, 'w') as f:
+            json.dump({'initial_key': 'initial_value'}, f)
+
+    @classmethod
+    def tearDownClass(cls):
+        # Clean up the temporary JSON file after all tests have run
+        os.remove(PATH_TO_TEMP_JSON)
+
     def setUp(self):
-        # Create temporary JSON files for testing
-        self.test_json_file_1 = tempfile.NamedTemporaryFile(delete=False)
-        self.test_json_file_2 = tempfile.NamedTemporaryFile(delete=False)
+        # Create temporary JSON files for testing in text mode
+        self.test_json_file_1 = tempfile.NamedTemporaryFile(mode='w+', delete=False)
+        self.test_json_file_2 = tempfile.NamedTemporaryFile(mode='w+', delete=False)
         json.dump({'key': 'value'}, self.test_json_file_1)
         json.dump({'key': 'value'}, self.test_json_file_2)
         self.test_json_file_1.close()
@@ -64,7 +77,7 @@ class TestCases(unittest.TestCase):
     def test_path_append(self):
         # Test if the path is correctly appended to sys.path
         new_path = '/new/test/path'
-        f_618(path_to_append=new_path)
+        f_618(path_to_append=new_path, json_file=self.test_json_file_1.name)
         self.assertIn(new_path, sys.path)
 
     def test_json_update_1(self):
@@ -81,14 +94,12 @@ class TestCases(unittest.TestCase):
 
     def test_default_path(self):
         # Test if the default path is correctly appended when no argument is passed
-        f_618()
-        self.assertIn(PATH_TO_APPEND, sys.path)
+        f_618(json_file=self.test_json_file_1.name)
+        self.assertIn('/path/to/whatever', sys.path)
 
     def test_default_json(self):
         # Test if the default JSON file is correctly updated when no argument is passed
-        with open(JSON_FILE, 'w') as file:
-            json.dump({'default_key': 'default_value'}, file, indent=4)
-        output = f_618()
+        output = f_618(json_file=PATH_TO_TEMP_JSON)
         self.assertIn('last_updated', output)
         self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
 

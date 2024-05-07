@@ -65,5 +65,6 @@ class TestCases(unittest.TestCase):
         input_data = [0, 0, 0, 0, 0]
         expected_output = np.array([0., 0., 0., 0., 0.])
         np.testing.assert_array_almost_equal(f_647(input_data), expected_output, decimal=2)
+        
 if __name__ == "__main__":
     run_tests()

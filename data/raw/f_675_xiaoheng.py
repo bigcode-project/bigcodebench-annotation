@@ -31,6 +31,12 @@ def f_675(metrics, filename, log_dir=LOG_DIR):
     An error occurred: [Errno 2] No such file or directory: './logs/evaluation.log'
     False
     """
+
+    if not isinstance(metrics, dict):
+        raise ValueError("Metrics must be a dictionary")
+    if not isinstance(filename, str):
+        raise ValueError("Filename must be a string")
+    
     try:
         with open(os.path.join(log_dir, filename), 'a') as f:
             f.write(f'{datetime.now()}\n')
@@ -43,84 +49,77 @@ def f_675(metrics, filename, log_dir=LOG_DIR):
         return False
 
 import unittest
-import os
-import shutil
+from unittest.mock import patch, mock_open, MagicMock
 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Setting up a temporary log directory for testing
+        self.metrics = {'accuracy': 0.98, 'loss': 0.05}
+        self.filename = 'metrics.log'
         self.log_dir = './temp_logs'
-        if not os.path.exists(self.log_dir):
-            os.makedirs(self.log_dir)
-
-    def tearDown(self):
-        # Cleaning up the temporary log directory after testing
-        if os.path.exists(self.log_dir):
-            shutil.rmtree(self.log_dir)
-
-    def test_normal_metrics_logging(self):
-        """
-        Test Case 1: Test writing normal metrics to a log file
-        - Input: A dictionary of metrics and a filename
-        - Expected Output: The function should return True, indicating successful logging. The log file should contain the metrics.
-        """
-        metrics = {'accuracy': 0.98, 'loss': 0.05}
-        filename = 'metrics.log'
-        result = f_675(metrics, filename, log_dir=self.log_dir)
-        self.assertTrue(result)
-        with open(os.path.join(self.log_dir, filename), 'r') as f:
-            lines = f.readlines()
-        self.assertTrue(any('accuracy: 0.98' in line for line in lines))
-        self.assertTrue(any('loss: 0.05' in line for line in lines))
-
-    def test_empty_metrics(self):
-        """
-        Test Case 2: Test writing an empty metrics dictionary to a log file
-        - Input: An empty dictionary of metrics and a filename
-        - Expected Output: The function should return True, indicating successful logging. The log file should not contain any metrics.
-        """
-        metrics = {}
-        filename = 'empty_metrics.log'
-        result = f_675(metrics, filename, log_dir=self.log_dir)
-        self.assertTrue(result)
-        with open(os.path.join(self.log_dir, filename), 'r') as f:
-            lines = f.readlines()
-        self.assertTrue(any('accuracy' not in line for line in lines))
-        self.assertTrue(any('loss' not in line for line in lines))
 
     def test_non_string_filename(self):
-        """
-        Test Case 3: Test passing a non-string value as the filename
-        - Input: A dictionary of metrics and a non-string filename
-        - Expected Output: The function should raise an exception.
-        """
-        metrics = {'accuracy': 0.95}
-        filename = 12345
-        with self.assertRaises(Exception):
-            f_675(metrics, filename, log_dir=self.log_dir)
+        with self.assertRaises(ValueError):
+            f_675(self.metrics, 12345, log_dir=self.log_dir)
 
     def test_non_dictionary_metrics(self):
-        """
-        Test Case 4: Test passing a non-dictionary value as metrics
-        - Input: A non-dictionary value as metrics and a filename
-        - Expected Output: The function should raise an exception.
-        """
-        metrics = 'accuracy: 0.95'
-        filename = 'non_dict_metrics.log'
-        with self.assertRaises(Exception):
-            f_675(metrics, filename, log_dir=self.log_dir)
+        with self.assertRaises(ValueError):
+            f_675('accuracy: 0.95', self.filename, log_dir=self.log_dir)
 
-    def test_non_existent_log_directory(self):
-        """
-        Test Case 5: Test writing metrics to a non-existent log directory
-        - Input: A dictionary of metrics, a filename, and a non-existent log directory
-        - Expected Output: The function should return False, indicating failure to write to the log file.
-        """
-        metrics = {'precision': 0.75, 'recall': 0.80}
-        filename = 'evaluation.log'
-        non_existent_dir = './non_existent_logs'
-        result = f_675(metrics, filename, log_dir=non_existent_dir)
-        self.assertFalse(result)
+    @patch('os.makedirs')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.path.exists', return_value=True)
+    def test_normal_metrics_logging(self, mock_exists, mock_file, mock_makedirs):
+        result = f_675(self.metrics, self.filename, log_dir=self.log_dir)
+        self.assertTrue(result)
+        mock_file.assert_called_once_with(os.path.join(self.log_dir, self.filename), 'a')
+
+    @patch('os.makedirs')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.path.exists', return_value=True)
+    def test_normal_metrics_logging(self, mock_exists, mock_file, mock_makedirs):
+        result = f_675(self.metrics, self.filename, log_dir=self.log_dir)
+        self.assertTrue(result)
+        mock_file.assert_called_once_with(os.path.join(self.log_dir, self.filename), 'a')
+
+    @patch('os.makedirs')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.path.exists', return_value=False)
+    def test_non_existent_log_directory(self, mock_exists, mock_file, mock_makedirs):
+        result = f_675(self.metrics, self.filename, log_dir='./nonexistent_dir')
+        self.assertTrue(result)
+
+    @patch('os.makedirs')
+    @patch('builtins.open', new_callable=MagicMock)
+    @patch('os.path.exists', return_value=True)
+    def test_empty_metrics(self, mock_exists, mock_open, mock_makedirs):
+        # Setup the mock file handle that open returns
+        mock_file_handle = mock_open.return_value.__enter__.return_value
+        
+        # Call the function
+        metrics = {}
+        filename = 'empty_metrics.log'
+        log_dir = './temp_logs'
+        result = f_675(metrics, filename, log_dir=log_dir)
+
+        # Assert that the function returned True for successful logging
+        self.assertTrue(result)
+
+        # Check that 'write' was called exactly twice: once for the timestamp, once for the newline
+        self.assertEqual(mock_file_handle.write.call_count, 2)
+
+        # Check that the calls were for writing the timestamp and an empty line
+        args_list = mock_file_handle.write.call_args_list
+        self.assertTrue(args_list[0][0][0].endswith('\n'))  # Check if first write is a timestamp ending with newline
+        self.assertEqual(args_list[1][0][0], '\n')  # Check if second write is just a newline
+
+
+    def test_non_string_filename(self):
+        with self.assertRaises(ValueError):
+            f_675(self.metrics, 12345, log_dir=self.log_dir)
+
+    def test_non_dictionary_metrics(self):
+        with self.assertRaises(ValueError):
+            f_675('accuracy: 0.95', self.filename, log_dir=self.log_dir)
 
 def run_tests():
     suite = unittest.TestSuite()

@@ -1,8 +1,5 @@
-import unittest
-import os
 import sys
 from pathlib import Path
-import shutil
 
 # Constants
 PATH_TO_APPEND = '/path/to/whatever'
@@ -21,12 +18,9 @@ def f_616(path_to_append=PATH_TO_APPEND):
     - path_to_append (str): The path that was appended and where the directory was created.
 
     Requirements:
-    - unittest
-    - os
     - sys
     - pathlib
-    - shutil
-
+ 
     Examples:
     >>> f_616("/new/path/to/append")
     "/new/path/to/append"
@@ -44,6 +38,7 @@ def f_616(path_to_append=PATH_TO_APPEND):
     return path_to_append
 
 import tempfile
+import unittest
 
 def run_tests():
     suite = unittest.TestSuite()

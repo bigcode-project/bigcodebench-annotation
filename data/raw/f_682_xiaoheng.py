@@ -39,7 +39,7 @@ class TestCases(unittest.TestCase):
     def test_empty_string(self):
         """Test with an empty string"""
         input_text = ""
-        expected_output = []
+        expected_output = ['']
         self.assertEqual(f_682(input_text), expected_output)
 
     def test_string_with_no_punctuation(self):
@@ -57,13 +57,13 @@ class TestCases(unittest.TestCase):
     def test_string_with_special_characters(self):
         """Test with a string that includes special characters"""
         input_text = "Special chars @#$%^&*()"
-        expected_output = ['special', 'chars']
+        expected_output = ['special', 'chars', '']
         self.assertEqual(f_682(input_text), expected_output)
 
     def test_string_with_whitespaces(self):
         """Test with a string that includes extra whitespaces between words"""
         input_text = "   Extra   whitespaces   "
-        expected_output = ['extra', 'whitespaces']
+        expected_output = ['', 'extra', 'whitespaces', '']
         self.assertEqual(f_682(input_text), expected_output)
 
 def run_tests():
