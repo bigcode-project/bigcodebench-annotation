@@ -4,7 +4,7 @@ for name in "${NAMES[@]}"; do
     if [[ "$name" == "zhihan" ]]; then
         # Copy only files in the range 981-1031 for zhihan
         for file in data/raw/*"$name"*py; do
-            if [[ "$file" =~ .*[[:digit:]]{4}_(981|98[2-9]|99[0-9]|100[0-9]|101[0-9]|102[0-9]|1031)_zhihan.*py ]]; then
+            if [[ "$file" =~ .*[[:digit:]]{4}_(981|98[2-9]|99[0-9]|100[0-9]|101[0-9]|102[0-9]|1031)_* ]]; then
                 cp "$file" data/clean/
             fi
         done
