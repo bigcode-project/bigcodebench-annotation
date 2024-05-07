@@ -98,6 +98,7 @@ class TestCases(unittest.TestCase):
         with open(result, 'r') as f:
             hashed_value = f.read()
         self.assertEqual(len(hashed_value), 44)
+        os.remove(result)
 
     def test_hash_length_for_key_C(self):
         # Check the length of the base64-encoded SHA-256 hash for key C
@@ -106,6 +107,7 @@ class TestCases(unittest.TestCase):
         with open(result, 'r') as f:
             hashed_value = f.read()
         self.assertEqual(len(hashed_value), 44)
+        os.remove(result)
 
     def test_hash_length_for_key_D(self):
         # Check the length of the base64-encoded SHA-256 hash for key D
@@ -114,6 +116,7 @@ class TestCases(unittest.TestCase):
         with open(result, 'r') as f:
             hashed_value = f.read()
         self.assertEqual(len(hashed_value), 44)
+        os.remove(result)
 
     def test_hash_length_for_key_E(self):
         # Check the length of the base64-encoded SHA-256 hash for key E
@@ -122,6 +125,7 @@ class TestCases(unittest.TestCase):
         with open(result, 'r') as f:
             hashed_value = f.read()
         self.assertEqual(len(hashed_value), 44)
+        os.remove(result)
 
     def test_hash_value_for_key_B(self):
         # Verify the hash value for key B is correctly computed and encoded
@@ -132,6 +136,7 @@ class TestCases(unittest.TestCase):
         with open(result, 'r') as f:
             hashed_value = f.read()
         self.assertEqual(hashed_value, expected_base64)
+        os.remove(result)
 
     def test_hash_value_for_key_C(self):
         # Verify the hash value for key C is correctly computed and encoded
@@ -142,6 +147,7 @@ class TestCases(unittest.TestCase):
         with open(result, 'r') as f:
             hashed_value = f.read()
         self.assertEqual(hashed_value, expected_base64)
+        os.remove(result)
 
     def test_invalid_key_error(self):
         # Test handling of invalid key

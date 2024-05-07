@@ -104,18 +104,24 @@ class TestCases(unittest.TestCase):
         split_files = f_1018(self.small_csv_path)
         self.assertTrue(len(split_files) > 0, "No files were split.")
         self.assertNotEqual(self._read_csv(self.small_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
+        for filename in split_files:
+            os.remove(filename)
 
     def test_medium_csv(self):
         """Test splitting and shuffling a medium CSV file."""
         split_files = f_1018(self.medium_csv_path)
         self.assertTrue(len(split_files) > 0, "No files were split.")
         self.assertNotEqual(self._read_csv(self.medium_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
+        for filename in split_files:
+            os.remove(filename)
 
     def test_large_csv(self):
         """Test splitting and shuffling a large CSV file."""
         split_files = f_1018(self.large_csv_path)
         self.assertTrue(len(split_files) > 0, "No files were split.")
         self.assertNotEqual(self._read_csv(self.large_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
+        for filename in split_files:
+            os.remove(filename)
 
     def test_invalid_file(self):
         """Test behavior with a non-existent file path."""
