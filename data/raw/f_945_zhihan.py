@@ -2,15 +2,14 @@ import subprocess
 import os
 import glob
 import time
-# import rpy2.robjects as robjects
 
 
 def f_945(test_dir):
     """
-    Run all R scripts in a specific directory and return their execution times.
+    Run all Python codes in a specific directory and return their execution times.
 
     Parameters:
-    - script_path (str): Path to the directory for R script(s) to be executed.
+    - script_path (str): Path to the directory for Python code(s) to be executed.
     
     Returns:
     dict: A dictionary with the script names as keys and their execution times as values.
@@ -23,17 +22,16 @@ def f_945(test_dir):
 
     Example:
     >>> f_945("/mnt/data/mix_files/")
-    {"script1.r": 100, "script2.r": 5}
+    {'script1.py': 0.04103803634643555, "script2.py": 5}
     """
     execution_times = {}
-    r_scripts = glob.glob(os.path.join(test_dir, '*.r'))
+    py_scripts = glob.glob(os.path.join(test_dir, '*.py'))
 
-    for r_script in r_scripts:
+    for py_script in py_scripts:
         start_time = time.time()
-        subprocess.call(['/usr/bin/Rscript', '--vanilla', r_script])
-        # robjects.r.source(r_script, encoding="utf-8")
+        subprocess.call(['python', py_script])
         end_time = time.time()
-        execution_times[os.path.basename(r_script)] = end_time - start_time
+        execution_times[os.path.basename(py_script)] = end_time - start_time
 
     return execution_times
     
@@ -56,13 +54,13 @@ class TestCases(unittest.TestCase):
         os.makedirs(self.test_dir, exist_ok=True)
         self.sample_directory = 'testdir_f_945/sample_directory'
         os.makedirs(self.sample_directory, exist_ok=True)
-        f = open(self.sample_directory+"/script1.r","w")
+        f = open(self.sample_directory+"/script1.py","w")
         f.write("a <- 42/nA <- a * 2/nprint(a)")
         f.close()
-        f = open(self.sample_directory+"/script2.r","w")
+        f = open(self.sample_directory+"/script2.py","w")
         f.write("a <- 42/nA <- a * 2/nprint(a)/nprint(A)")
         f.close()
-        f = open(self.sample_directory+"/script3.r","w")
+        f = open(self.sample_directory+"/script3.py","w")
         f.write("a <- 42/nA <- a * 2/nprint(A)")
         f.close()
         self.empty_directory = "testdir_f_945/empty_directory"
@@ -72,12 +70,12 @@ class TestCases(unittest.TestCase):
         f = open(self.mixed_directory+"/1.txt","w")
         f.write("invalid")
         f.close()
-        f = open(self.mixed_directory+"/script4.r","w")
+        f = open(self.mixed_directory+"/script4.py","w")
         f.write("print('Hello from script4')")
         f.close()
         self.invalid_directory = "testdir_f_945/invalid_directory"
         os.makedirs(self.invalid_directory, exist_ok=True)
-        f = open(self.invalid_directory+"/1.r","w")
+        f = open(self.invalid_directory+"/1.txt","w")
         f.write("invalid")
         f.close()
         
@@ -90,9 +88,9 @@ class TestCases(unittest.TestCase):
         # Testing with the created R scripts directory
         result = f_945(self.sample_directory)
         self.assertEqual(len(result), 3)  # There are 3 R scripts
-        self.assertTrue("script1.r" in result)
-        self.assertTrue("script2.r" in result)
-        self.assertTrue("script3.r" in result)
+        self.assertTrue("script1.py" in result)
+        self.assertTrue("script2.py" in result)
+        self.assertTrue("script3.py" in result)
         for time_taken in result.values():
             self.assertTrue(time_taken >= 0)  # Execution time should be non-negative
 
@@ -102,7 +100,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(result, {})
 
     def test_case_3(self):
-        # Testing with a directory that has no R scripts (should return an empty dictionary)
+        # Testing with a directory that has no Python scripts (should return an empty dictionary)
         empty_dir = self.empty_directory
         os.makedirs(empty_dir, exist_ok=True)
         result = f_945(empty_dir)
@@ -115,11 +113,11 @@ class TestCases(unittest.TestCase):
         self.assertEqual(result, {})
 
     def test_case_5(self):
-        # Testing with a directory containing a mix of R scripts and other files
+        # Testing with a directory containing a mix of Python scripts and other files
         mix_files_dir = self.mixed_directory
         result = f_945(mix_files_dir)
-        self.assertEqual(len(result), 1)  # Only 1 R script
-        self.assertTrue("script4.r" in result)
+        self.assertEqual(len(result), 1)  # Only 1 Python script
+        self.assertTrue("script4.py" in result)
         for time_taken in result.values():
             self.assertTrue(time_taken >= 0)  # Execution time should be non-negative
 if __name__ == "__main__":

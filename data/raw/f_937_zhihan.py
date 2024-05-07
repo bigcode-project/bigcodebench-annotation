@@ -41,7 +41,7 @@ import shutil
 class TestCases(unittest.TestCase):
 
     def setUp(self):
-        self.test_dir = 'testdir_f_936'
+        self.test_dir = 'testdir_f_937'
         os.makedirs(self.test_dir, exist_ok=True)
         
         f = open(self.test_dir+"/sample.txt","w")
@@ -67,6 +67,7 @@ class TestCases(unittest.TestCase):
     def tearDown(self):
         # Clean up the test directory
         shutil.rmtree(self.test_dir)
+
     def test_case_1(self):
         result = f_937(self.test_dir+"/sample.txt")
         self.assertEqual(len(result), 2)
@@ -97,5 +98,6 @@ def run_tests():
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+    
 if __name__ == "__main__":
     run_tests()

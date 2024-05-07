@@ -107,5 +107,6 @@ class TestCases(unittest.TestCase):
         with open(output_file, 'r') as file:
             data = json.load(file)
         self.assertEqual(len(data), 2)
+        
 if __name__ == "__main__":
     run_tests()

@@ -66,21 +66,22 @@ class MockResponse:
     def json(self):
         return json.loads(self.text)
 
-@patch('requests.get', return_value=MockResponse())
-def run_tests(mock_get):
 
+def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
+    @patch('requests.get', return_value=MockResponse())
+    def test_case_1(self, mock_get):
         result = f_981("http://www.google.com", "TEST_API_KEY")
         self.assertIn('www.google.com', result)
         self.assertEqual(result['www.google.com']['city'], 'Mountain View')
 
-    def test_case_2(self):
+    @patch('requests.get', return_value=MockResponse())
+    def test_case_2(self, mock_get):
         result = f_981("http://www.google.com, https://www.python.org", "TEST_API_KEY")
         self.assertIn('www.google.com', result)
         self.assertIn('www.python.org', result)
@@ -93,7 +94,8 @@ class TestCases(unittest.TestCase):
         result = f_981("This is not a link: abc://test.link", "TEST_API_KEY")
         self.assertEqual(result, {})
 
-    def test_case_5(self):
+    @patch('requests.get', return_value=MockResponse())
+    def test_case_5(self, mock_get):
         result = f_981("http://www.google.com, http://www.google.com/about", "TEST_API_KEY")
         self.assertIn('www.google.com', result)
         self.assertNotIn('www.google.com/about', result)

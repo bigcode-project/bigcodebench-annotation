@@ -3,9 +3,12 @@
 # for name in "${NAMES[@]}"; do
 #     cp data/raw/*"$name"*py data/clean
 # done
-for i in {932..950}
+for i in {933..981}
 do
-    cp data/raw/f_"$i"_zhihan.py data/clean
+    if [ -e data/raw/f_"$i"_zhihan.py  ]
+    then
+        cp data/raw/f_"$i"_zhihan.py data/clean
+    fi
 done
 flake8 data/clean/*.py --select=E9,F63,F7,F82 --show-source --statistics
 python script/parse.py

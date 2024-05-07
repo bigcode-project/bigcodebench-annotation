@@ -71,7 +71,5 @@ class TestCases(unittest.TestCase):
         result = f_963(input_dict)
         self.assertDictEqual(result, expected_output)
 
-# Running the tests to ensure they pass
-run_tests()
 if __name__ == "__main__":
     run_tests()

@@ -1,4 +1,7 @@
-def f_961(file_path=FILE_PATH):
+import os
+from nltk import word_tokenize
+
+def f_961(file_path='File.txt'):
     """
     Tokenizes a text file using the NLTK library. This function reads each line from the file, 
     breaks it into words or punctuation, and stores the tokens in a list.

@@ -2,7 +2,6 @@ import csv
 import random
 
 # Constants
-FILE_NAME = 'data.csv'
 DATA = ['Temperature', 'Humidity', 'Pressure']
 RANGE = {
     'Temperature': (-50, 50),
@@ -10,7 +9,7 @@ RANGE = {
     'Pressure': (980, 1040)
 }
 
-def f_965(file_name=FILE_NAME):
+def f_965(file_name="data.csv"):
     """
     Generate a CSV file with weather data for each hour of the current day.
 
@@ -21,9 +20,10 @@ def f_965(file_name=FILE_NAME):
     str: The path to the created file.
 
     Note:
-    - Temperature: From -50 to 50
-    - Humidity: From 0 to 100
-    - Pressure: From 980 to 1040
+    - The row names for the csv are 'Temperature', 'Humidity', and 'Pressure' 
+    - Temperature ranged rom -50 to 50
+    - Humidity ranged rom 0 to 100
+    - Pressure ranged rom 980 to 1040
 
     Requirements:
     - os
@@ -32,7 +32,7 @@ def f_965(file_name=FILE_NAME):
     - random
 
     Example:
-    >>> f_965("data.csv)
+    >>> f_965("data.csv")
     'path/to/data.csv'
     """
     with open(file_name, 'w', newline='') as file:
@@ -111,5 +111,6 @@ class TestCases(unittest.TestCase):
             reader = csv.reader(file)
             rows = list(reader)
             self.assertEqual(len(rows), 25)
+
 if __name__ == "__main__":
     run_tests()
