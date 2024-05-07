@@ -44,23 +44,20 @@ import os
 import shutil
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Setup code to create a test log file
-        cls.test_file_path = "test_log_file.log"
-        with open(cls.test_file_path, 'w') as f:
+        self.test_file_path = "test_log_file.log"
+        with open(self.test_file_path, 'w') as f:
             f.write("ERROR 11:30:10 This is an error message\n")
             f.write("WARNING 11:35:10 This is a warning message\n")
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Cleanup the test directory and all its contents
-        shutil.rmtree(cls.test_dir)
+        shutil.rmtree(self.test_dir)
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Cleanup the test log file
-        os.remove(cls.test_file_path)
+        os.remove(self.test_file_path)
 
     def test_nonexistent_file(self):
         with self.assertRaises(FileNotFoundError):

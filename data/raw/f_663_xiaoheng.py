@@ -44,16 +44,14 @@ def create_test_files(base_path):
         f.write("A" * 10**6)  # 1MB file
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.base_path = "f_663_data_xiaoheng"
-        create_test_files(cls.base_path)
+    def setUp(self):
+        self.base_path = "f_663_data_xiaoheng"
+        create_test_files(self.base_path)
 
-    @classmethod
-    def tearDownClass(cls):
-        for item in os.listdir(cls.base_path):
-            os.remove(os.path.join(cls.base_path, item))
-        os.rmdir(cls.base_path)
+    def tearDown(self):
+        for item in os.listdir(self.base_path):
+            os.remove(os.path.join(self.base_path, item))
+        os.rmdir(self.base_path)
 
     def test_file_properties(self):
         file_path = os.path.join(self.base_path, "large_file.txt")

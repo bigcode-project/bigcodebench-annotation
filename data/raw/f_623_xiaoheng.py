@@ -57,13 +57,11 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Create the directory for test files."""
         os.makedirs(BASE_PATH, exist_ok=True)
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Remove all created test files and the directory after all tests."""
         for filename in os.listdir(BASE_PATH):
             os.remove(os.path.join(BASE_PATH, filename))

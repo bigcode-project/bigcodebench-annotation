@@ -97,13 +97,11 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        cls.temp_folder = tempfile.mkdtemp()
+    def setUp(self):
+        self.temp_folder = tempfile.mkdtemp()
 
-    @classmethod
-    def tearDownClass(cls):       
-        shutil.rmtree(cls.temp_folder)
+    def tearDown(self):       
+        shutil.rmtree(self.temp_folder)
 
     def test_case_1(self):
         result = f_682(['a', 'b', 'a', 'c', 'a'], 'a', self.temp_folder)

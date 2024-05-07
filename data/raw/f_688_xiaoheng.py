@@ -56,18 +56,16 @@ fake = Faker()
 
 class TestCases(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         """Create the test file with initial data."""
-        cls.filename = 'data.json'
-        cls.data = {'key': 'value'}
-        with open(cls.filename, 'w') as file:
-            json.dump(cls.data, file)
+        self.filename = 'data.json'
+        self.data = {'key': 'value'}
+        with open(self.filename, 'w') as file:
+            json.dump(self.data, file)
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Remove the test file after all tests."""
-        os.remove(cls.filename)
+        os.remove(self.filename)
 
     def test_empty_dict(self):
         """Test with an empty dictionary to ensure it writes and verifies correctly."""

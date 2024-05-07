@@ -70,18 +70,16 @@ def run_tests():
 TEST_FILES_DIR = './test_files'
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Create a directory for test files if it doesn't exist
         os.makedirs(TEST_FILES_DIR, exist_ok=True)
         # Create some sample files
-        cls.sample_files = ['test1.txt', 'test2.txt', 'image1.jpg', 'image2.jpg']
-        for file in cls.sample_files:
+        self.sample_files = ['test1.txt', 'test2.txt', 'image1.jpg', 'image2.jpg']
+        for file in self.sample_files:
             with open(os.path.join(TEST_FILES_DIR, file), 'w') as f:
                 f.write("Sample content for " + file)
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Remove the test directory after tests
         shutil.rmtree(TEST_FILES_DIR)
 

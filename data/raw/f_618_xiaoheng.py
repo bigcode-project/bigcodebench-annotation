@@ -49,14 +49,12 @@ from datetime import datetime
 PATH_TO_TEMP_JSON = tempfile.mktemp(suffix='.json')
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Create a temporary JSON file for tests that rely on the default JSON file
         with open(PATH_TO_TEMP_JSON, 'w') as f:
             json.dump({'initial_key': 'initial_value'}, f)
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Clean up the temporary JSON file after all tests have run
         os.remove(PATH_TO_TEMP_JSON)
 
