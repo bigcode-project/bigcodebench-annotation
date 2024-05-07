@@ -61,7 +61,6 @@ class TestCases(unittest.TestCase):
     def tearDown(self):
         # Close matplotlib plots and remove temporary directory
         plt.close("all")
-        shutil.rmtree(self.test_dir)
     def test_case_1(self):
         # Test basic functionality with 100 rolls and 2 dice
         result, ax = f_112(100, 2, random_seed=42)
