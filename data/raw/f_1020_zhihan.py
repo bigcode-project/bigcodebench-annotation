@@ -53,13 +53,25 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
     
-    def test_presence_and_type_of_keys(self):
+    def test_presence_OS(self):
+        """Test that the result has the correct keys and that each key maps to the expected data type."""
+        result = f_1020()
+        self.assertTrue('OS' in result and isinstance(result['OS'], str))
+
+    def test_presence_architecture(self):
+        """Test that the result has the correct keys and that each key maps to the expected data type."""
+        result = f_1020()
+        self.assertTrue('Architecture' in result and isinstance(result['Architecture'], str))
+
+    def test_presence_memory_usage(self):
+        """Test that the result has the correct keys and that each key maps to the expected data type."""
+        result = f_1020()
+        self.assertTrue('Memory Usage' in result and isinstance(result['Memory Usage'], str))
+
+    def test_return_type(self):
         """Test that the result has the correct keys and that each key maps to the expected data type."""
         result = f_1020()
         self.assertIsInstance(result, dict)
-        self.assertTrue('OS' in result and isinstance(result['OS'], str))
-        self.assertTrue('Architecture' in result and isinstance(result['Architecture'], str))
-        self.assertTrue('Memory Usage' in result and isinstance(result['Memory Usage'], str))
 
     def test_memory_usage_format(self):
         """Test that the 'Memory Usage' key is correctly formatted as a percentage."""
