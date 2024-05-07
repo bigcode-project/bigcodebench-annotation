@@ -45,10 +45,17 @@ import hashlib
 import os
 
 class TestCases(unittest.TestCase):
-    @patch('os.urandom')
-    def test_consistent_hashing(self, mock_urandom):
-        """ Test that hashing is consistent with the same salt and prefix """
-        mock_urandom.return_value = b'\x00' * 16  # Fixed salt for consistency
+    def setUp(self):
+        # Setup a predictable random generator for consistent testing
+        self.expected_salt = bytes([i%256 for i in range(16)])  # a repeatable "random" byte sequence
+        self.patcher = patch('os.urandom', return_value=self.expected_salt)
+        self.mock_urandom = self.patcher.start()
+
+    def tearDown(self):
+        # Stop patching 'os.urandom'
+        self.patcher.stop()
+
+    def test_consistent_hashing(self):
         password = "consistent"
         hashed_password1 = f_992(password, "ME", 16)
         hashed_password2 = f_992(password, "ME", 16)
@@ -63,10 +70,8 @@ class TestCases(unittest.TestCase):
         hashed_password2 = f_992(password, prefix2, 32)
         self.assertNotEqual(hashed_password1, hashed_password2)
 
-    @patch('os.urandom')
-    def test_hash_length(self, mock_urandom):
+    def test_hash_length(self):
         """ Ensure the hashed password is always 44 characters """
-        mock_urandom.return_value = b'\x00' * 16  # Consistent salt
         password = "variableLength"
         hashed_password = f_992(password)
         self.assertEqual(len(hashed_password), 44)
@@ -80,16 +85,6 @@ class TestCases(unittest.TestCase):
             f_992("password", PREFIX=123)  # Non-string prefix
         with self.assertRaises(ValueError):
             f_992("password", SALT_LENGTH=-1)  # Invalid salt length
-
-    def setUp(self):
-        # Setup a predictable random generator for consistent testing
-        self.expected_salt = bytes([i%256 for i in range(16)])  # a repeatable "random" byte sequence
-        self.patcher = patch('os.urandom', return_value=self.expected_salt)
-        self.mock_urandom = self.patcher.start()
-
-    def tearDown(self):
-        # Stop patching 'os.urandom'
-        self.patcher.stop()
 
     def test_empty_password(self):
         """ Test hashing an empty string """
