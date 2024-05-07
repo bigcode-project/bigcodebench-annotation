@@ -53,7 +53,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(data['age'], decoded_data['age'])
         self.assertEqual(data['city'], decoded_data['city'])
         self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp']), datetime)
+        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], "%Y-%m-%d %H:%M:%S"), datetime)
         
     def test_f_1026_empty(self):
         """Test the f_1026 function with an empty dictionary."""
@@ -62,7 +62,7 @@ class TestCases(unittest.TestCase):
         decoded_data = json.loads(base64.b64decode(encoded_data).decode('ascii'))
         self.assertEqual(len(decoded_data), 1)
         self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp']), datetime)
+        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], "%Y-%m-%d %H:%M:%S"), datetime)
         
     def test_f_1026_nested(self):
         """Test the f_1026 function with a nested dictionary."""
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(data['user'], decoded_data['user'])
         self.assertEqual(data['location'], decoded_data['location'])
         self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp']), datetime)
+        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], "%Y-%m-%d %H:%M:%S"), datetime)
         
     def test_f_1026_numeric(self):
         """Test the f_1026 function with a dictionary containing numeric keys."""
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
         for k, v in data_str_keys.items():
             self.assertEqual(v, decoded_data[k])
         self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp']), datetime)
+        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], "%Y-%m-%d %H:%M:%S"), datetime)
         
     def test_f_1026_mixed(self):
         """Test the f_1026 function with a dictionary containing mixed types of keys and values."""
@@ -94,7 +94,7 @@ class TestCases(unittest.TestCase):
         for k, v in data_str_keys.items():
             self.assertEqual(v, decoded_data[k])
         self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp']), datetime)
+        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], "%Y-%m-%d %H:%M:%S"), datetime)
 
 def run_tests():
     suite = unittest.TestSuite()
