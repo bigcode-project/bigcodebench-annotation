@@ -2,10 +2,7 @@ import json
 import base64
 from datetime import datetime
 
-# Constants
-DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
-
-def f_1026(data: dict) -> str:
+def f_1026(data: dict, DATE_FORMAT = "%Y-%m-%d %H:%M:%S") -> str:
     """
     Takes a Python dictionary, adds a current timestamp to it, serializes the modified dictionary
     to a JSON-formatted string, and then encodes this string using base64 encoding with ASCII character encoding.
@@ -17,8 +14,9 @@ def f_1026(data: dict) -> str:
     
     Returns:
     str: A base64 encoded string that represents the input dictionary with an added timestamp,
-         encoded in ASCII. The timestamp is formatted as 'YYYY-MM-DD HH:MM:SS' and added with the key 'timestamp'.
-    
+         encoded in ASCII. The timestamp is added with the key 'timestamp'.
+    DATE_FORMAT: The timestamp format. Default to 'YYYY-MM-DD HH:MM:SS'.
+         
     Requirements:
     - json
     - base64
@@ -55,7 +53,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(data['age'], decoded_data['age'])
         self.assertEqual(data['city'], decoded_data['city'])
         self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], DATE_FORMAT), datetime)
+        self.assertIsInstance(datetime.strptime(decoded_data['timestamp']), datetime)
         
     def test_f_1026_empty(self):
         """Test the f_1026 function with an empty dictionary."""
@@ -64,7 +62,7 @@ class TestCases(unittest.TestCase):
         decoded_data = json.loads(base64.b64decode(encoded_data).decode('ascii'))
         self.assertEqual(len(decoded_data), 1)
         self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], DATE_FORMAT), datetime)
+        self.assertIsInstance(datetime.strptime(decoded_data['timestamp']), datetime)
         
     def test_f_1026_nested(self):
         """Test the f_1026 function with a nested dictionary."""
@@ -74,7 +72,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(data['user'], decoded_data['user'])
         self.assertEqual(data['location'], decoded_data['location'])
         self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], DATE_FORMAT), datetime)
+        self.assertIsInstance(datetime.strptime(decoded_data['timestamp']), datetime)
         
     def test_f_1026_numeric(self):
         """Test the f_1026 function with a dictionary containing numeric keys."""
@@ -85,7 +83,7 @@ class TestCases(unittest.TestCase):
         for k, v in data_str_keys.items():
             self.assertEqual(v, decoded_data[k])
         self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], DATE_FORMAT), datetime)
+        self.assertIsInstance(datetime.strptime(decoded_data['timestamp']), datetime)
         
     def test_f_1026_mixed(self):
         """Test the f_1026 function with a dictionary containing mixed types of keys and values."""
@@ -96,7 +94,7 @@ class TestCases(unittest.TestCase):
         for k, v in data_str_keys.items():
             self.assertEqual(v, decoded_data[k])
         self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], DATE_FORMAT), datetime)
+        self.assertIsInstance(datetime.strptime(decoded_data['timestamp']), datetime)
 
 def run_tests():
     suite = unittest.TestSuite()
