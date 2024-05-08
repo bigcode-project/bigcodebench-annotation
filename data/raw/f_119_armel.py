@@ -19,6 +19,8 @@ def f_119(timestamps):
     Returns:
     - pandas.DataFrame: A pandas DataFrame containing the original Unix timestamps and the converted datetime objects.
     - Axes: The Axes object of the histogram plot. The histogram will have 10 bins by default, representing the distribution of the datetime objects.
+
+    Raises:
     - ValueError("Input list of timestamps is empty"): If the list of timestamps is empty.
 
     Requirements:
