@@ -1,12 +1,4 @@
-# NAMES=(chien jenny wenhao niklas hanhu ratna simon ming)
-NAMES=(zhihan)
-# for i in {933..981}
-# do
-#     if [ -e data/raw/f_"$i"_zhihan.py  ]
-#     then
-#         cp data/raw/f_"$i"_zhihan.py data/clean
-#     fi
-# done
+NAMES=(chien jenny wenhao niklas hanhu ratna simon ming zhihan)
 
 for name in "${NAMES[@]}"; do
     # Copy all files for other names
