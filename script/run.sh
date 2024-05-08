@@ -1,4 +1,4 @@
-NAMES=(chien jenny wenhao niklas hanhu ratna simon xiaoheng zhihan ming)
+NAMES=(james)
 
 for name in "${NAMES[@]}"; do
     if [[ "$name" == "zhihan" ]]; then
