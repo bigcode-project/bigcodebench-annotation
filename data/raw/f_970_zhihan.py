@@ -37,6 +37,7 @@ def f_970(csv_file, emp_prefix='EMP$$'):
     return dict(counter)
 
 import unittest
+import os
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -66,12 +67,21 @@ EMP$$006,Bruce Wayne,Entrepreneur
 """
 
         # Writing the content to temporary CSV files for testing
-        self.test_csv_path1 = "/mnt/data/test_csv1.csv"
-        self.test_csv_path2 = "/mnt/data/test_csv2.csv"
+        self.test_csv_path1 = "f_970_test_csv1.csv"
+        self.test_csv_path2 = "f_970_test_csv2.csv"
         with open(self.test_csv_path1, "w") as file:
             file.write(self.test_csv_content1)
         with open(self.test_csv_path2, "w") as file:
             file.write(self.test_csv_content2)
+        
+        self.empty_csv_path = "f_970_empty_csv.csv"
+        with open(self.empty_csv_path, "w") as file:
+            file.write("")
+
+    def tearDown(self):
+        os.remove(self.test_csv_path1)
+        os.remove(self.test_csv_path2)
+        os.remove(self.empty_csv_path)
 
     def test_case_1(self):
         # Testing with the first CSV content
@@ -99,11 +109,9 @@ EMP$$006,Bruce Wayne,Entrepreneur
         
     def test_case_5(self):
         # Testing with an empty CSV content
-        empty_csv_path = "/mnt/data/empty_csv.csv"
-        with open(empty_csv_path, "w") as file:
-            file.write("")
-        result = f_970(empty_csv_path)
+        result = f_970(self.empty_csv_path)
         expected = {}
         self.assertEqual(result, expected)
+
 if __name__ == "__main__":
     run_tests()

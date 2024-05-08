@@ -17,7 +17,7 @@ def f_955(unix_timestamp, target_timezone):
     str: A string representing the date and time in the target timezone, formatted as '%Y-%m-%d %H:%M:%S'.
 
     Requirements:
-    - datetime
+    - datetime.datetime
     - pytz
 
     Example:

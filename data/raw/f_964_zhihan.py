@@ -2,11 +2,16 @@ from collections import Counter
 from operator import itemgetter
 import itertools
 
+#CONSTANT
+ANIMAL = ['cat', 'camel', 'cow', 'dog', 'elephant', 'fox', 'giraffe', 'hippo', 'iguana', 'jaguar']
 
 def f_964(animal_dict):
     """
     Given a dictionary of animals as keys and letters as values, count the frequency of each letter in the animals.
     
+    Note:
+    - Remove key in the dictionary if it is not an animal from ANIMAL constant
+
     Parameters:
     animal_dict (dict): The dictionary with animals as keys and their letters as values.
     
@@ -22,8 +27,13 @@ def f_964(animal_dict):
     >>> animal_dict = {'cat': 'c', 'dog': 'd', 'elephant': 'e', 'fox': 'f', 'giraffe': 'g', 'hippo': 'h', 'iguana': 'i', 'jaguar': 'j'}
     >>> counts = f_964(animal_dict)
     >>> print(counts)
+    {'a': 7, 'g': 4, 'o': 3, 'e': 3, 'p': 3, 'f': 3, 'i': 3, 't': 2, 'h': 2, 'n': 2, 'r': 2, 'u': 2, 'c': 1, 'd': 1, 'l': 1, 'x': 1, 'j': 1}
     """
-    letters = list(itertools.chain.from_iterable(animal_dict.keys()))
+    animal_dict_copy = {}
+    for i in animal_dict:
+        if i in ANIMAL:
+            animal_dict_copy[i] = animal_dict[i]
+    letters = list(itertools.chain.from_iterable(animal_dict_copy.keys()))
     count_dict = dict(Counter(letters))
     
     sorted_dict = dict(sorted(count_dict.items(), key=itemgetter(1), reverse=True))
@@ -61,7 +71,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Input: A dictionary with non-animal words and their initial letters.
         animal_dict = {'hello': 'h', 'world': 'w'}
-        expected_output = dict(Counter('helloworld'))
+        expected_output = {}
         self.assertDictEqual(f_964(animal_dict), expected_output)
 
 def run_tests():
@@ -69,5 +79,6 @@ def run_tests():
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 if __name__ == "__main__":
     run_tests()

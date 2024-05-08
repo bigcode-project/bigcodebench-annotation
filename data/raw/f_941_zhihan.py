@@ -25,8 +25,8 @@ def f_941(text):
     str: The cleaned text with URLs, predefined stopwords, and punctuation removed.
 
     Requirements:
-    - re: For regex-based operations, such as URL removal and punctuation removal.
-    - Predefined list of common stopwords.
+    - re
+    - string.punctuation
 
     Example:
     >>> f_941('Visit https://www.python.org for more info. I love to eat apples.')
@@ -88,5 +88,6 @@ class TestCases(unittest.TestCase):
         expected_output = ''
         result = f_941(input_text)
         self.assertEqual(result, expected_output)
+        
 if __name__ == "__main__":
     run_tests()

@@ -16,6 +16,10 @@ def f_933(list_of_tuples):
     - tuple: A 2-element tuple where the first element is the sum of the numeric values, and the
              second element is a dictionary with categories as keys and their counts as values.
 
+    Requirements:
+    - numpy
+    - collections.Counter
+
     Example:
     >>> list_of_tuples = [(5, 'Fruits'), (9, 'Vegetables'), (-1, 'Dairy'), (-2, 'Bakery'), (4, 'Meat')]
     >>> sum_of_values, category_counts = f_933(list_of_tuples)

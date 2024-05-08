@@ -54,10 +54,21 @@ def run_tests():
 
 
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.filenames = []
+        for i in range(1,7):
+            self.filenames.append("f_939_test_output_"+str(i)+".txt")
+
+    def tearDown(self):
+        # Clean up the test file
+        for filename in self.filenames:
+            if os.path.exists(filename):
+                os.remove(filename)
+        
     def test_case_1(self):
         # Input 1
         text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
-        filename = 'test_1.txt'
+        filename = self.filenames[0]
         expected_words = ["$abc", "$efg", "$hij", "$abc", "$abc", "$hij", "$hij"]
         output_path = f_939(text, filename)
         with open(output_path, 'r') as file:
@@ -68,7 +79,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Input 2
         text = "There are no dollar words here."
-        filename = 'test_2.txt'
+        filename = self.filenames[1]
         expected_words = []
         output_path = f_939(text, filename)
         with open(output_path, 'r') as file:
@@ -79,7 +90,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Input 3
         text = "$$$$ $$ $$$$ $abc$ $def"
-        filename = 'test_3.txt'
+        filename = self.filenames[2]
         expected_words = ["$abc", "$def"]
         output_path = f_939(text, filename)
         with open(output_path, 'r') as file:
@@ -90,7 +101,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Input 4
         text = "$hello $world! This is a $test."
-        filename = 'test_4.txt'
+        filename = self.filenames[3]
         expected_words = ["$hello", "$world", "$test"]
         output_path = f_939(text, filename)
         with open(output_path, 'r') as file:
@@ -101,7 +112,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Input 5
         text = "$"
-        filename = 'test_5.txt'
+        filename = self.filenames[4]
         expected_words = []
         output_path = f_939(text, filename)
         with open(output_path, 'r') as file:
@@ -113,27 +124,25 @@ class TestCases(unittest.TestCase):
         # Example input text containing various cases
         input_text = "$example $valid word $!invalid $$ $1234"
         # Temporary output file name for testing
-        output_filename = "test_dollar_words.txt"
+        filename = self.filenames[5]
 
         # Expected result: Only valid $ prefixed words should be saved
         expected_words = ["$example", "$valid", "$1234"]
         expected_output = "\n".join(expected_words) + "\n"
 
         # Call the function with the test data
-        output_path = f_939(input_text, output_filename)
+        output_path = f_939(input_text, filename)
 
         # Verify the file was created
         self.assertTrue(os.path.exists(output_path))
 
         # Open the file and read its contents
-        with open(output_filename, 'r') as file:
+        with open(filename, 'r') as file:
             content = file.read()
 
         # Check the content against the expected output
         self.assertEqual(content, expected_output)
 
-        # Clean up: Remove the test file
-        os.remove(output_filename)
 
 
 if __name__ == "__main__":
