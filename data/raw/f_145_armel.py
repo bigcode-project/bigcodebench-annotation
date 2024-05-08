@@ -1,24 +1,22 @@
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 def f_145(data='/path/to/data.csv', emp_prefix='EMP'):
     """
     Load a CSV file into a DataFrame, filter the lines in which the employee ID begins with a prefix, and draw a histogram of its age.
-    
+
     Parameters:
     - data (str): The path to the data file. Default is '/path/to/data.csv'.
     - emp_prefix (str): The prefix of the employee IDs. Default is 'EMP$$'.
-    
+
     Returns:
     - DataFrame: A pandas DataFrame with the filtered data.
     - AxesSubplot: A histogram plot of the 'Age' column of the filtered data.
-    
+
     Requirements:
     - pandas
     - seaborn
-    - matplotlib.pyplot
-    
+
     Example:
     >>> df, ax = f_145()
     >>> print(df)
@@ -26,14 +24,13 @@ def f_145(data='/path/to/data.csv', emp_prefix='EMP'):
     # Load data and filter
     df = pd.read_csv(data)
     df = df[df['Employee ID'].str.startswith(emp_prefix)]
-    
+
     # Plot histogram
     ax = sns.histplot(data=df, x='Age', kde=True)
-    
+
     return df, ax
 
 import unittest
-import pandas as pd
 import shutil
 import os
 
@@ -87,7 +84,7 @@ class TestCases(unittest.TestCase):
             }
         )
         df.to_csv(self.f_5, index = False)
-    
+
     def tearDown(self):
         if os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir)
@@ -128,7 +125,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(df.shape[0] == 0)
         self.assertTrue(all([col in df.columns for col in ["Employee ID", "Age"]]))
         self.assertIsNotNone(ax)
-        
+
     def test_case_4(self):
         # Test the function with custom input data and prefix
         df, ax = f_145(self.f_4, 'DR')
@@ -142,7 +139,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(df, pd.DataFrame)
         pd.testing.assert_frame_equal(df.reset_index(drop=True), expected_df.reset_index(drop=True))
         self.assertIsNotNone(ax)
-    
+
     def test_case_5(self):
         # Test the function with custom input data and prefix
         df, ax = f_145(self.f_5, 'RS')
@@ -156,7 +153,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(df, pd.DataFrame)
         pd.testing.assert_frame_equal(df.reset_index(drop=True), expected_df.reset_index(drop=True))
         self.assertIsNotNone(ax)
-    
+
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
@@ -164,4 +161,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()

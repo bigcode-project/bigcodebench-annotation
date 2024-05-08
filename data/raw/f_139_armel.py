@@ -26,9 +26,12 @@ def f_139(data):
 
     Example:
     >>> data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
-    >>> 
-    >>> analyzed_df, ax = f_139(df)
+    >>> analyzed_df, ax = f_139(data)
     >>> print(analyzed_df)
+    col2  1  2
+    col1
+    1     2  1
+    2     3  1
     """
     df = pd.DataFrame(data, columns=COLUMNS)
     analyzed_df = df.groupby(COLUMNS[:-1])[COLUMNS[-1]].nunique().reset_index()
@@ -38,7 +41,6 @@ def f_139(data):
     return analyzed_df, ax
 
 import unittest
-import pandas as pd
 
 class TestCases(unittest.TestCase):
     """Test cases for the f_139 function."""
@@ -46,7 +48,7 @@ class TestCases(unittest.TestCase):
         data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
         df = pd.DataFrame(data, columns=COLUMNS)
         analyzed_df, ax = f_139(df)
-        
+
         expected_data = [[1, 1, 2], [1, 2, 1], [2, 1, 3], [2, 2, 1]]
         expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
         expected_df = expected_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
@@ -54,7 +56,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
         pd.testing.assert_frame_equal(analyzed_df, expected_df)
         self.assertTrue(isinstance(ax, plt.Axes))
-    
+
     def test_case_2(self):
         data = [
             [1, 1, 2],
@@ -146,4 +148,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()

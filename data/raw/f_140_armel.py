@@ -25,16 +25,21 @@ def f_140(data):
     >>> data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
     >>> analyzed_df, ax = f_140(data)
     >>> print(analyzed_df)
+       col1  col2  col3
+    0     1     1     2
+    1     1     2     1
+    2     2     1     3
+    3     2     2     1
     """
     df = pd.DataFrame(data, columns=COLUMNS)
     analyzed_df = df.groupby(COLUMNS[:-1])[COLUMNS[-1]].nunique().reset_index()
-    
+
     # Adjusting the plotting logic
     fig, ax = plt.subplots()
     ax.plot(analyzed_df[COLUMNS[:-1]].astype(str).agg('-'.join, axis=1), analyzed_df[COLUMNS[-1]])
     ax.set_xlabel('-'.join(COLUMNS[:-1]))
     ax.set_ylabel(COLUMNS[-1])
-    
+
     return analyzed_df, ax
 
 import unittest
@@ -45,12 +50,12 @@ class TestCases(unittest.TestCase):
         # Using the provided example as the first test case
         data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
         analyzed_df, ax = f_140(data)
-        
+
         # Assertions for the returned DataFrame
         expected_data = [[1, 1, 2], [1, 2, 1], [2, 1, 3], [2, 2, 1]]
         expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
         pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        
+
         # Assertions for the returned plot
         self.assertEqual(ax.get_xlabel(), 'col1-col2')
         self.assertEqual(ax.get_ylabel(), 'col3')
@@ -142,4 +147,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()

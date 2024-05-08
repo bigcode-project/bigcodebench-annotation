@@ -5,19 +5,19 @@ import os
 def f_143(dir_path: str, pattern: str = '^EMP'):
     """
     Look for all files in a directory that start with a given pattern, and return the number of files against their size. You should return a pandas DataFrame with 2 columns 'File' and 'Size' with correspond to the file name and the size respectively.
-    
+
     Parameters:
     - dir_path (str): The path to the directory.
     - pattern (str): The pattern to match. Default is '^EMP' (files starting with 'EMP').
-    
+
     Returns:
     - pandas.DataFrame: A pandas DataFrame with file names and their sizes.
-    
+
     Requirements:
     - pandas
     - re
     - os
-    
+
     Example:
     >>> report = f_143('/path/to/directory')
     >>> print(report)
@@ -42,17 +42,17 @@ class TestCases(unittest.TestCase):
         self.f_3 = os.path.join(self.test_dir, "EMP003.doc")
         self.f_4 = os.path.join(self.test_dir, "NOTEMP1.txt")
         self.f_5 = os.path.join(self.test_dir, "NOTEMP2.txt")
-        
+
         self.f_6 = os.path.join(self.test_dir, "A1.txt")
         self.f_7 = os.path.join(self.test_dir, "A2.txt")
         self.f_8 = os.path.join(self.test_dir, "A3.txt")
         self.f_9 = os.path.join(self.test_dir, "B1.py")
         self.f_10 = os.path.join(self.test_dir, "B2.py")
-        
+
         for i, element in enumerate([self.f_1, self.f_2, self.f_3, self.f_4, self.f_5, self.f_6, self.f_7, self.f_8, self.f_9, self.f_10]) :
             with open(element, "w") as f :
                 f.write(f"Test content {i+1}")
-    
+
     def tearDown(self):
         for filename in [
             self.f_1, self.f_2, self.f_3, self.f_4, self.f_5,
@@ -66,13 +66,13 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(report), 3)
         for i, row in report.iterrows():
             self.assertEqual(row['Size'], os.path.getsize(os.path.join(self.test_dir, f"EMP00{i+1}.doc")))
-            
+
     def test_case_2(self):
         report = f_143(self.test_dir, pattern="^NOTEMP")
         self.assertEqual(len(report), 2)
         for i, row in report.iterrows():
             self.assertEqual(row['Size'], os.path.getsize(os.path.join(self.test_dir, f"NOTEMP{i+1}.txt")))
-    
+
     def test_case_3(self):
         report = f_143(self.test_dir, pattern="NOTFOUND")
         expected_df = pd.DataFrame(
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(report), 3)
         for i, row in report.iterrows():
             self.assertEqual(row['Size'], os.path.getsize(os.path.join(self.test_dir, f"A{i+1}.txt")))
-    
+
     def test_case_5(self):
         report = f_143(self.test_dir, pattern="^B")
         self.assertEqual(len(report), 2)
@@ -105,4 +105,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()

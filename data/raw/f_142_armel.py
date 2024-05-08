@@ -1,6 +1,5 @@
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 # Constants
 COLUMNS = ['col1', 'col2', 'col3']
@@ -8,7 +7,7 @@ COLUMNS = ['col1', 'col2', 'col3']
 def f_142(data):
     """
     You are given a list of elements. Each element of the list is a list of 3 values. Use this list of elements to build a dataframe with 3 columns 'col1', 'col2' and 'col3' and create a distribution of chart of the different values of "col3" grouped by "col1" and "col2" using seaborn.
-    
+
     The function's logic is as follows:
     1. Build a pandas DataFrame by using list of elements. Make sure to name the columns as 'col1', 'col2' and 'col3', the constant COLUMNS is provided for this purpose.
     2. Create a new dataframe by grouping the values in the column 'col3' by ['col1', 'col2'].
@@ -27,31 +26,31 @@ def f_142(data):
     Requirements:
     - pandas
     - seaborn
-    - matplotlib
 
     Example:
     >>> data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
-    >>> 
     >>> analyzed_df, plot = f_142(data)
     >>> print(analyzed_df)
+       col1  col2  col3
+    0     1     1     2
+    1     1     2     1
+    2     2     1     3
+    3     2     2     1
     """
     df = pd.DataFrame(data, columns=COLUMNS)
     analyzed_df = df.groupby(COLUMNS[:-1])[COLUMNS[-1]].nunique().reset_index()
     ax = sns.distplot(analyzed_df[COLUMNS[-1]])
-    
+
     return analyzed_df, ax
 
 import unittest
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 class TestCases(unittest.TestCase):
-    """Test cases for the f_142 function."""    
+    """Test cases for the f_142 function."""
     def test_case_1(self):
         data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
         analyzed_df, plot = f_142(data)
-        
+
         # Asserting the analyzed DataFrame
         expected_df = pd.DataFrame({
             'col1': [1, 1, 2, 2],
@@ -59,15 +58,15 @@ class TestCases(unittest.TestCase):
             'col3': [2, 1, 3, 1]
         })
         pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        
+
         # Asserting plot attributes (e.g., title, x-axis, y-axis)
         self.assertEqual(plot.get_xlabel(), 'col3')
-        
+
     def test_case_2(self):
         # Testing with a different dataset
         data = [[1, 1, 1], [1, 1, 2], [1, 1, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]]
         analyzed_df, plot = f_142(data)
-        
+
         # Asserting the analyzed DataFrame
         expected_df = pd.DataFrame({
             'col1': [1, 1],
@@ -75,14 +74,14 @@ class TestCases(unittest.TestCase):
             'col3': [3, 1]
         })
         pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        
+
         # Asserting plot attributes
         self.assertEqual(plot.get_xlabel(), 'col3')
-    
+
     def test_case_3(self):
         data = [[1, 2, 3], [1, 2, 4], [1, 2, 5], [6, 7, 8]]
         analyzed_df, plot = f_142(data)
-        
+
         # Asserting the analyzed DataFrame
         expected_df = pd.DataFrame({
             'col1': [1, 6],
@@ -90,10 +89,10 @@ class TestCases(unittest.TestCase):
             'col3': [3, 1]
         })
         pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        
+
         # Asserting plot attributes
         self.assertEqual(plot.get_xlabel(), 'col3')
-    
+
     def test_case_4(self):
         data = [
             [0, 0, 1],
@@ -150,4 +149,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()
