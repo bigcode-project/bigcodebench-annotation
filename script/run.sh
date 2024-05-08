@@ -1,4 +1,4 @@
-NAMES=(chien jenny wenhao niklas hanhu ratna simon ming zhihan james)
+NAMES=(chien jenny wenhao niklas hanhu ratna simon ming zhihan james xiaoheng)
 
 for name in "${NAMES[@]}"; do
     # Copy all files for other names
@@ -7,6 +7,12 @@ done
 
 flake8 data/clean/*.py --select=E9,F63,F7,F82 --show-source --statistics
 python script/parse.py
+
+gzip -c data/open-eval.jsonl > data/open-eval.jsonl.gz
+
+# # used for WildCode evaluation
+# pip install -U wild-code
+# python script/eval.py --samples data/open-eval.jsonl
 
 for name in "${NAMES[@]}"; do
 
