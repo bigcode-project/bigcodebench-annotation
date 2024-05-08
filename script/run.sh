@@ -1,4 +1,4 @@
-NAMES=(chien jenny wenhao niklas hanhu ratna simon ming zhihan)
+NAMES=(james)
 
 for name in "${NAMES[@]}"; do
     # Copy all files for other names
