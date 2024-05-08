@@ -1,14 +1,13 @@
-import nltk
+from nltk.tokenize import RegexpTokenizer
 from string import punctuation
 import csv
 import os
 
-# Constants
 PUNCTUATION = set(punctuation)
 
 def f_940(text, filename):
     """
-    Save all words in a text beginning with the "$" character in a CSV file.
+    Save all words in a text beginning with the "$" character in a CSV file, excluding any words that are solely composed of punctuation characters.
 
     Parameters:
     text (str): The input text.
@@ -17,18 +16,28 @@ def f_940(text, filename):
     Returns:
     str: The absolute path of the saved CSV file.
 
+    Note:
+    - The header of the csv row is "Word"
+
     Requirements:
-    - nltk
-    - string
+    - nltk.tokenize.RegexpTokenizer
+    - string.punctuation
     - csv
     - os
 
     Example:
     >>> text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
     >>> f_940(text, 'dollar_words.csv')
+    '/absolute/path/to/dollar_words.csv'
     """
-    words = nltk.word_tokenize(text)
-    dollar_words = [word for word in words if word.startswith('$') and not all(c in PUNCTUATION for c in word)]
+    
+
+    punctuation_set = set(punctuation)
+    tokenizer = RegexpTokenizer(r'\$\w+')
+    dollar_prefixed_words = tokenizer.tokenize(text)
+    dollar_words = [word for word in dollar_prefixed_words if
+                          not all(char in punctuation_set for char in word[1:])]
+
     with open(filename, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(["Word"])
@@ -47,10 +56,20 @@ def read_csv_content(file_path):
         return list(reader)
 
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.filenames = []
+        for i in range(1,7):
+            self.filenames.append("f_940_test_output_"+str(i)+".csv")
+
+    def tearDown(self):
+        # Clean up the test file
+        for filename in self.filenames:
+            if os.path.exists(filename):
+                os.remove(filename)
 
     def test_case_1(self):
         text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
-        filename = "test_dollar_words_1.csv"
+        filename = self.filenames[0]
         result_path = f_940(text, filename)
         
         # Check if the returned path is correct
@@ -63,7 +82,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_2(self):
         text = "$hello world $this is a $test"
-        filename = "test_dollar_words_2.csv"
+        filename = self.filenames[1]
         result_path = f_940(text, filename)
         
         # Check if the returned path is correct
@@ -76,7 +95,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_3(self):
         text = "There are no dollar words here"
-        filename = "test_dollar_words_3.csv"
+        filename = self.filenames[2]
         result_path = f_940(text, filename)
         
         # Check if the returned path is correct
@@ -89,7 +108,7 @@ class TestCases(unittest.TestCase):
     
     def test_case_4(self):
         text = "$word1 $word2 $word3 $word4 $word5"
-        filename = "test_dollar_words_4.csv"
+        filename = self.filenames[3]
         result_path = f_940(text, filename)
         
         # Check if the returned path is correct
@@ -102,7 +121,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_5(self):
         text = "No dollar words but containing special characters @ # % & *"
-        filename = "test_dollar_words_5.csv"
+        filename = self.filenames[4]
         result_path = f_940(text, filename)
         
         # Check if the returned path is correct

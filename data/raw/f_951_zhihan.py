@@ -7,25 +7,21 @@ def f_951(r_script_path: str, output_path: str, duration: int) -> (bool, str):
     """
     This function executes an R script and verifies if the output file is generated within a given duration.
     
-    Functionality:
-    The function runs the provided R script and continuously checks the specified output path to see 
-    if any CSV files are generated within the allotted duration. 
-    
-    Input:
+    Parameters:
     - r_script_path (str): The absolute path to the R script to be executed.
     - output_path (str): The absolute path where the output CSV file is expected to be generated.
     - duration (int): The time, in seconds, within which the output file should be generated.
     
-    Output:
-    Returns a tuple containing:
-    - bool: True if the output file is generated within the specified duration, False otherwise.
-    - str: A message indicating whether the file was generated successfully or not.
+    Returns:
+    - tuple containing:
+      - bool: True if the output file is generated within the specified duration, False otherwise.
+      - str: A message indicating whether the file was generated successfully or not.
     
     Requirements:
-    - subprocess: To run the R script command.
-    - os: Not explicitly used but may be necessary for file path manipulations.
-    - time: To implement the waiting mechanism.
-    - glob: To search for the generated CSV file in the specified directory.
+    - subprocess
+    - os
+    - time
+    - glob
     
     Example:
     >>> f_951('/path_to_script/MyrScript.r', '/path_to_output/', 10)
@@ -60,11 +56,11 @@ import shutil
 import time
 from unittest.mock import patch
 
-class TestRunRScript(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Create a temporary directory to store the mock R script and the output files
-        self.temp_dir = '/mnt/data/temp_dir'
+        self.temp_dir = 'f_951_test_dir'
         os.makedirs(self.temp_dir, exist_ok=True)
         
         # Create a mock R script file
@@ -99,7 +95,7 @@ class TestRunRScript(unittest.TestCase):
     @patch('subprocess.call', return_value=None)
     def test_case_3(self, mock_subprocess_call):
         # Case where an invalid R script path is provided
-        invalid_path = '/invalid/path/mock_script.r'
+        invalid_path = 'invalid/path/mock_script.r'
         result, message = f_951(invalid_path, self.output_path, 5)
         self.assertFalse(result)
         self.assertEqual(message, 'File not generated within the specified duration.')
@@ -118,15 +114,16 @@ class TestRunRScript(unittest.TestCase):
     @patch('subprocess.call', return_value=None)
     def test_case_5(self, mock_subprocess_call):
         # Case where the output path is invalid
-        invalid_output_path = '/invalid/path/'
+        invalid_output_path = 'invalid/path/'
         result, message = f_951(self.r_script_path, invalid_output_path, 5)
         self.assertFalse(result)
         self.assertEqual(message, 'File not generated within the specified duration.')
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestRunRScript))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+
 if __name__ == "__main__":
     run_tests()

@@ -8,23 +8,22 @@ def f_936(url):
     Fetches the content of a webpage specified by its URL, parses it to find <script> tags,
     and attempts to evaluate any string within these tags as a Python dictionary.
 
-    The function looks specifically for <script> tag contents that are valid string representations
-    of dictionaries, using `ast.literal_eval` for safe evaluation.
-
     Parameters:
     - url (str): The URL of the webpage to scrape.
 
     Returns:
     - list of dict: A list containing dictionaries that were successfully evaluated from string representations
-      found within <script> tags on the webpage. If an error occurs during the request or if no dictionaries
-      are found/evaluable, an empty list is returned.
+      found within <script> tags on the webpage. 
+    
+    Note:
+    - If an error occurs during the request or if no dictionaries are found/evaluable, an empty list is returned.
 
     Requirements:
     - ast
     - requests
-    - bs4 (BeautifulSoup)
+    - bs4.BeautifulSoup
 
-    Example usage:
+    Example:
     >>> f_936('https://example.com')
     [{'key': 'value'}, ...]
     """

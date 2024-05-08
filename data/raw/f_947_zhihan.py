@@ -1,50 +1,44 @@
 import subprocess
-import tempfile
 import shutil
 import os
 
-def f_947(script_path: str) -> str:
+def f_947(script_path: str, temp_dir: str) -> str:
     """
-    Execute a given R script in a temporary directory and clean up after execution.
+    Execute a given Python code in a temporary directory.
     
-    Functionality:
-    This function creates a temporary directory, copies the specified R script to this directory, 
-    executes the R script, and then cleans up the temporary directory.
+    Parameters:
+    - script_path (str): The path to the Python code that needs to be executed.
+    - temp_dir (str): The path for the code to copy the Python code
     
-    Input:
-    - script_path (str): The path to the R script that needs to be executed.
-    
-    Output:
-    - Returns a string indicating the success or failure of the script execution.
+    Returns:
+    - str: String indicating the success or failure of the script execution.
     
     Requirements:
     - subprocess
-    - tempfile
     - shutil
     - os
     
     Example:
-    >>> f_947('/path/to/example_script.r')
+    >>> f_947('/path/to/example_script.py')
     'Script executed successfully!'
     
-    Note: Make sure the provided R script path is valid and accessible.
+    Note: 
+    - If the Python code can be run successfully return "Script executed successfully!", otherwise "Script execution failed!"
     """
     try:
-        with tempfile.TemporaryDirectory() as temp_dir:
-            shutil.copy(script_path, temp_dir)
-            temp_script_path = os.path.join(temp_dir, os.path.basename(script_path))
-            result = subprocess.call(['/usr/bin/Rscript', '--vanilla', temp_script_path])
-            
-            if result == 0:
-                return "Script executed successfully!"
-            else:
-                return "Script execution failed!"
+        shutil.copy(script_path, temp_dir)
+        temp_script_path = os.path.join(temp_dir, os.path.basename(script_path))
+        result = subprocess.call(["python", temp_script_path])
+        print(result)
+        if result == 0:
+            return "Script executed successfully!"
+        else:
+            return "Script execution failed!"
     except Exception as e:
-        return f"Error: {e}"
+        return "Script execution failed!"
 
 import unittest
 
-# Assuming the refined function has been imported as f_947
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -53,38 +47,61 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.test_dir = 'testdir_f_947'
+        os.makedirs(self.test_dir, exist_ok=True)
+        f = open(self.test_dir+"/script4.py","w")
+        f.write("print('Hello from script4')")
+        f.close()
+        f = open(self.test_dir+"/script1.py","w")
+        f.write("import time\ntime.sleep(20)\nprint('waiting')")
+        f.close()
+        f = open(self.test_dir+"/script2.py","w")
+        f.close()
+        f = open(self.test_dir+"/script3.py","w")
+        f.write("invalid python code")
+        f.close()
+        
+        self.temp_dir = 'testdir_f_947/temp_dir'
+        os.makedirs(self.temp_dir, exist_ok=True)
+        
+
+    def tearDown(self):
+        # Clean up the test directory
+        shutil.rmtree(self.test_dir)
     
     def test_case_1(self):
         # Testing with a non-existent script path
-        result = f_947('/path/to/non_existent_script.r')
-        self.assertEqual(result, "Error: [Errno 2] No such file or directory: '/path/to/non_existent_script.r'")
+        result = f_947('/path/to/non_existent_script.py', self.temp_dir)
+        self.assertEqual(result, "Script execution failed!")
+        self.assertEqual(os.path.exists(self.temp_dir+"/non_existent_script.py"), False)
     
     def test_case_2(self):
         # Testing with a valid script path but the script contains errors
         # Assuming we have a script named "error_script.r" which contains intentional errors
-        result = f_947('/path/to/error_script.r')
+        result = f_947(self.test_dir+"/script3.py", self.temp_dir)
         self.assertEqual(result, "Script execution failed!")
+        self.assertEqual(os.path.exists(self.temp_dir+"/script3.py"), True)
         
     def test_case_3(self):
         # Testing with a valid script path and the script executes successfully
-        # Assuming we have a script named "success_script.r" which runs without errors
-        result = f_947('/path/to/success_script.r')
+        # Assuming we have a script named "sscript4.r" which runs without errors
+        result = f_947(self.test_dir+"/script4.py", self.temp_dir)
         self.assertEqual(result, "Script executed successfully!")
+        self.assertEqual(os.path.exists(self.temp_dir+"/script4.py"), True)
     
     def test_case_4(self):
         # Testing with a script that takes a long time to execute
-        # Assuming we have a script named "long_running_script.r" that intentionally runs for a long time
-        result = f_947('/path/to/long_running_script.r')
-        # The exact output will depend on how the script is written, but for this test, 
-        # we assume it eventually completes successfully.
+        # Assuming we have a script named "script1.r" that intentionally runs for a long time
+        result = f_947(self.test_dir+"/script1.py", self.temp_dir)
         self.assertEqual(result, "Script executed successfully!")
+        self.assertEqual(os.path.exists(self.temp_dir+"/script1.py"), True)
     
     def test_case_5(self):
-        # Testing with a script that requires certain packages or libraries
-        # Assuming we have a script named "package_script.r" that requires specific R packages
-        result = f_947('/path/to/package_script.r')
-        # The exact output will depend on the presence or absence of the required packages.
-        # For this test, we'll assume that the required packages are present and the script runs successfully.
+         # Testing with a script that empty
+        result = f_947(self.test_dir+"/script2.py", self.temp_dir)
         self.assertEqual(result, "Script executed successfully!")
+        self.assertEqual(os.path.exists(self.temp_dir+"/script2.py"), True)
+
 if __name__ == "__main__":
     run_tests()

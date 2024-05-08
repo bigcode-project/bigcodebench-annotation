@@ -22,8 +22,10 @@ def f_978(password_length=10, salt="salty"):
     - hashlib
     
     Example:
+    >>> random.seed(0)
     >>> hashed_password = f_978(12, "my_salt")
     >>> print(hashed_password)
+    a706478dc5969e90dcfc2fbaffff0b9f8e7f2b006002edac13cb17f5bf9ba941
     """
     password_chars = string.ascii_letters + string.digits + string.punctuation
     password = ''.join(random.choice(password_chars) for i in range(password_length))
@@ -48,27 +50,33 @@ def run_tests():
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Testing with default parameters
+        random.seed(0)
         hashed_password = f_978()
         self.assertEqual(len(hashed_password), 64)  # SHA256 produces a 64-character long hash
 
     def test_case_2(self):
         # Testing with custom password length but default salt
+        random.seed(0)
         hashed_password = f_978(15)
         self.assertEqual(len(hashed_password), 64)
 
     def test_case_3(self):
         # Testing with default password length but custom salt
+        random.seed(0)
         hashed_password = f_978(salt="custom_salt")
         self.assertEqual(len(hashed_password), 64)
 
     def test_case_4(self):
         # Testing with both custom password length and salt
+        random.seed(0)
         hashed_password = f_978(20, "another_salt")
         self.assertEqual(len(hashed_password), 64)
 
     def test_case_5(self):
         # Testing with edge value for password length (e.g., very small value)
+        random.seed(0)
         hashed_password = f_978(1)
         self.assertEqual(len(hashed_password), 64)
+
 if __name__ == "__main__":
     run_tests()

@@ -21,10 +21,11 @@ def f_973(dict1):
     - statistics
 
     Example:
+    >>> random.seed(0)
     >>> d = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
     >>> stats = f_973(d)
     >>> print(stats)
-    (Mean of ages, Median of ages, [List of modes])
+    (44.7, 46.5, [46, 48, 24, 38, 54, 53, 47, 41, 52, 44])
     """
     emp_ages = []
     
@@ -57,6 +58,7 @@ def run_tests():
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
+        random.seed(0)
         # Input: 10 employees in "EMP$$" department
         d = {'EMP$$': 10}
         mean_age, median_age, mode_age = f_973(d)
@@ -67,6 +69,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(all(22 <= age <= 60 for age in mode_age))
     
     def test_case_2(self):
+        random.seed(0)
         # Input: Different number of employees in multiple departments
         d = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
         mean_age, median_age, mode_age = f_973(d)
@@ -77,6 +80,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(all(22 <= age <= 60 for age in mode_age))
     
     def test_case_3(self):
+        random.seed(0)
         # Input: No employees in "EMP$$" department
         d = {'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
         mean_age, median_age, mode_age = f_973(d)
@@ -87,6 +91,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(mode_age, [])
     
     def test_case_4(self):
+        random.seed(0)
         # Input: Large number of employees in "EMP$$" department to increase likelihood of multiple modes
         d = {'EMP$$': 1000}
         mean_age, median_age, mode_age = f_973(d)
@@ -97,6 +102,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(all(22 <= age <= 60 for age in mode_age))
     
     def test_case_5(self):
+        random.seed(0)
         # Input: Only one employee in "EMP$$" department
         d = {'EMP$$': 1}
         mean_age, median_age, mode_age = f_973(d)
