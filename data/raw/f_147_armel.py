@@ -1,26 +1,25 @@
 import pandas as pd
 import json
 import numpy as np
-import matplotlib.pyplot as plt
 
 # Constants
 COLUMNS = ['email', 'list']
 
 def f_147(json_file):
     """
-    Load e-mail data from a JSON file, convert it into a Pandas DataFrame, calculate the sum and mean 
-    of the list associated with each e-mail, and then record those values. Additionally, it plots the sum 
-    and mean values for each email. 
+    Load e-mail data from a JSON file, convert it into a Pandas DataFrame, calculate the sum and mean
+    of the list associated with each e-mail, and then record those values. Additionally, it plots the sum
+    and mean values for each email.
 
     If there is no e-mail data, return an empty dataframe with the right columns (['email', 'list', 'sum', 'mean']), and None as the plot.
-    
+
     Parameters:
     json_file (str): The path to the JSON file. The JSON file should have the structure:
                      [
                          {"email": "email1@example.com", "list": [value1, value2, ...]},
                          ...
                      ]
-    
+
     Returns:
     tuple: A tuple containing:
         - DataFrame: A pandas DataFrame with columns ['email', 'list', 'sum', 'mean'].
@@ -30,7 +29,6 @@ def f_147(json_file):
     - pandas
     - json
     - numpy
-    - matplotlib.pyplot
 
     Example:
     >>> df, ax = f_147('data/f_147/json_1.json')
@@ -40,13 +38,13 @@ def f_147(json_file):
         email_data = json.load(file)
     if not email_data :
         return pd.DataFrame([], columns = COLUMNS + ["sum", "mean"]), None
-    
+
     df = pd.DataFrame(email_data, columns=COLUMNS)
     df['sum'] = df['list'].apply(np.sum)
     df['mean'] = df['list'].apply(np.mean)
 
     ax = df[['sum', 'mean']].plot(kind='bar')
-    
+
     return df, ax
 
 import os
@@ -138,13 +136,13 @@ class TestCases(unittest.TestCase):
                 ],
                 fout
             )
-        
+
         with open(self.f_5, "w") as fout :
             json.dump(
                 [],
                 fout
             )
-    
+
     def tearDown(self):
         if os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir)
@@ -157,12 +155,12 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df["email"].tolist(), ["first@example.com", "second@example.com", "third@example.com"])
         self.assertEqual(df["sum"].tolist(), [113, 130, 201])
         self.assertEqual(df["mean"].tolist(), [113/6.0, 130/7.0, 201/5.0])
-        
+
         # Assert plot attributes
         self.assertEqual(ax.get_title(), '')
         self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], ['0', '1', '2'])
         self.assertListEqual([label.get_text() for label in ax.get_legend().get_texts()], ['sum', 'mean'])
-    
+
     def test_case_2(self):
         # Test with sample JSON data
         df, ax = f_147(self.f_2)
@@ -171,12 +169,12 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df["email"].tolist(), ["fourth@example.com", "fifth@example.com", "sixth@example.com", "seventh@example.com"])
         self.assertEqual(df["sum"].tolist(), [71, 47, 192, 138])
         self.assertEqual(df["mean"].tolist(), [71/5.0, 47/4.0, 192/5.0, 138/3.0])
-        
+
         # Assert plot attributes
         self.assertEqual(ax.get_title(), '')
         self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], ['0', '1', '2', '3'])
         self.assertListEqual([label.get_text() for label in ax.get_legend().get_texts()], ['sum', 'mean'])
-    
+
     def test_case_3(self):
         # Test with sample JSON data
         df, ax = f_147(self.f_3)
@@ -185,7 +183,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df["email"].tolist(), ["eight@example.com", "ninth@example.com"])
         self.assertEqual(df["sum"].tolist(), [15.0, 40.0])
         self.assertEqual(df["mean"].tolist(), [3.0, 8.0])
-        
+
         # Assert plot attributes
         self.assertEqual(ax.get_title(), '')
         self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], ['0', '1'])
@@ -199,7 +197,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df["email"].tolist(), ["tenth@example.com"])
         self.assertEqual(df["sum"].tolist(), [65.0])
         self.assertEqual(df["mean"].tolist(), [13.0])
-        
+
         # Assert plot attributes
         self.assertEqual(ax.get_title(), '')
         self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], ['0'])
@@ -212,4 +210,4 @@ class TestCases(unittest.TestCase):
         self.assertTrue(df.empty)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()

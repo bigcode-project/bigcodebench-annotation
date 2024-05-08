@@ -18,7 +18,7 @@ def f_149(directory):
     Returns:
     - pandas.DataFrame : DataFrame containing the data from the CSV file with the longest filename augmented with the columns 'sum', 'mean' and 'median'.
     - matplotlib.axes._axes.Axes : Histogram of the median. None if there is no data to plot.
-    
+
     Requirements:
     - pandas
     - os
@@ -38,7 +38,7 @@ def f_149(directory):
                 name = filename if len(filename) > len(name) else name
     if name is None :
         return pd.DataFrame({}, columns = ['email', 'list'] + ['sum', 'mean', 'median']), None
-    
+
     df = pd.read_csv(os.path.join(directory, name))
     df["list"] = df["list"].map(ast.literal_eval)
     df['sum'] = df['list'].apply(sum)
@@ -93,14 +93,28 @@ class TestCases(unittest.TestCase):
             }
         )
         df.to_csv(os.path.join(self.dir_3, "long_csv.csv"), index=False)
-    
+
         self.dir_4 = os.path.join(self.test_dir, "dir_4")
         os.makedirs(self.dir_4, exist_ok=True)
-    
+
+        self.dir_5 = os.path.join(self.test_dir, "dir_5")
+        os.makedirs(self.dir_5, exist_ok=True)
+        df = pd.DataFrame(
+            {
+                "email": [
+                    "first@example.com",
+                ],
+                "list": [
+                    [12],
+                ],
+            }
+        )
+        df.to_csv(os.path.join(self.dir_5, "csv.csv"), index=False)
+
     def tearDown(self):
         if os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir)
-    
+
     def test_case_1(self):
         # Test if the function correctly processes the CSV files and returns the appropriate DataFrame and histogram
         df, ax = f_149(self.dir_1)
@@ -118,7 +132,7 @@ class TestCases(unittest.TestCase):
                 ]
             )
         )
-        
+
         # Check specific values in the DataFrame
         self.assertEqual(df.loc[0, 'email'], 'first@example.com')
         self.assertEqual(df.loc[1, 'email'], 'second@example.com')
@@ -126,10 +140,10 @@ class TestCases(unittest.TestCase):
         self.assertEqual(df.loc[1, 'sum'], 130)
         self.assertEqual(df.loc[1, 'mean'], 130.0/7.0)
         self.assertEqual(df.loc[1, 'median'], 12.0)
-        
+
         # Check attributes of the histogram
         self.assertTrue(hasattr(ax, 'figure'))
-    
+
     def test_case_2(self):
         # Test if the function correctly processes the CSV files and returns the appropriate DataFrame and histogram
         df, ax = f_149(self.dir_2)
@@ -147,13 +161,13 @@ class TestCases(unittest.TestCase):
                 ]
             )
         )
-        
+
         # Check specific values in the DataFrame
         self.assertEqual(df.loc[1, 'email'], 'fifth@example.com')
         self.assertEqual(df.loc[1, 'sum'], 47)
         self.assertEqual(df.loc[1, 'mean'], 11.75)
         self.assertEqual(df.loc[2, 'median'], 23.0)
-        
+
         # Check attributes of the histogram
         self.assertTrue(hasattr(ax, 'figure'))
 
@@ -164,7 +178,7 @@ class TestCases(unittest.TestCase):
             fig = ax.get_figure()
             plt.close(fig)
         except:
-            pass   
+            pass
         # Check DataFrame structure and content
         self.assertTrue(
             all(
@@ -174,21 +188,21 @@ class TestCases(unittest.TestCase):
                 ]
             )
         )
-        
+
         # Check specific values in the DataFrame
         self.assertEqual(df.loc[1, 'email'], 'eleventh@example.com')
         self.assertEqual(df.loc[0, 'sum'], 65)
         self.assertEqual(df.loc[1, 'sum'], 90)
-        
+
         self.assertEqual(df.loc[0, 'mean'], 13.0)
         self.assertEqual(df.loc[1, 'mean'], 18.0)
 
         self.assertEqual(df.loc[0, 'median'], 13.0)
         self.assertEqual(df.loc[1, 'median'], 18.0)
-        
+
         # Check attributes of the histogram
         self.assertTrue(hasattr(ax, 'figure'))
-    
+
     def test_case_4(self):
         # Test with a directory without csv files
         df, ax = f_149(self.dir_4)
@@ -196,7 +210,7 @@ class TestCases(unittest.TestCase):
             fig = ax.get_figure()
             plt.close(fig)
         except:
-            pass           
+            pass
         # Check DataFrame structure and content
         self.assertTrue(
             all(
@@ -207,7 +221,35 @@ class TestCases(unittest.TestCase):
             )
         )
         self.assertIsNone(ax)
-    
+
+    def test_case_5(self):
+        # Test if the function correctly processes the CSV files and returns the appropriate DataFrame and histogram
+        df, ax = f_149(self.dir_5)
+        try:
+            fig = ax.get_figure()
+            plt.close(fig)
+        except:
+            pass
+        # Check DataFrame structure and content
+        self.assertTrue(
+            all(
+                [
+                    col in df.columns
+                    for col in ["email", "list", "sum", "mean", "median"]
+                ]
+            )
+        )
+
+        # Check specific values in the DataFrame
+        self.assertEqual(df.loc[0, "email"], "first@example.com")
+        self.assertEqual(df.loc[1, "sum"], 12)
+        self.assertEqual(df.loc[1, "mean"], 12.0)
+        self.assertEqual(df.loc[1, "median"], 12.0)
+
+        # Check attributes of the histogram
+        self.assertTrue(hasattr(ax, "figure"))
+
+
 def run_tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCases))
@@ -215,4 +257,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()

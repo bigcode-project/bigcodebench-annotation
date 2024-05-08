@@ -1,28 +1,27 @@
 import pandas as pd
 import seaborn as sns
 import numpy as np
-import matplotlib.pyplot as plt
 import ast
 
 def f_148(csv_file):
     """
-    Load e-mail data from a CSV file, convert it into a Pandas DataFrame, and calculate the sum, mean, and standard deviation of the list associated with each e-mail. Additionally, this function will 
+    Load e-mail data from a CSV file, convert it into a Pandas DataFrame, and calculate the sum, mean, and standard deviation of the list associated with each e-mail. Additionally, this function will
     draw a histogram of the mean values and return both the DataFrame and the histogram plot.
-    
+
     Parameters:
     - csv_file (str): The path to the CSV file containing email data.
-    
+
     Returns:
     - tuple: A tuple containing two elements:
         - DataFrame: A pandas DataFrame with columns 'email', 'list', 'sum', 'mean', and 'std'.
         - AxesSubplot: A histogram plot of the mean values.
-    
+
     Requirements:
     - pandas
     - seaborn
     - numpy
-    - matplotlib
-    
+    - ast
+
     Example:
     >>> df, plot = f_148('data/f_148/csv_1.csv')
     >>> print(df.head())
@@ -38,9 +37,6 @@ def f_148(csv_file):
 
 import os
 import unittest
-import pandas as pd
-import seaborn as sns
-import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -114,7 +110,7 @@ class TestCases(unittest.TestCase):
             shutil.rmtree(self.test_dir)
         except OSError as e:
             print(e)
-    
+
     def test_case_1(self):
         df, plot = f_148(self.f_1)
         try:
@@ -141,7 +137,7 @@ class TestCases(unittest.TestCase):
             self.assertEqual(row['sum'], sum(row['list']))
             self.assertAlmostEqual(row['mean'], np.mean(row['list']))
             self.assertAlmostEqual(row['std'], np.std(row['list']))
-    
+
     def test_case_3(self):
         df, ax = f_148(self.f_3)
         try:
@@ -185,4 +181,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()
