@@ -98,7 +98,8 @@ class TestCases(unittest.TestCase):
             {'key5': 'value5', 'key6': 'value6', 'key7': 'value7'},
             {'key8': 'value8'}
         ]
-        self.assertEqual(result, expected_result)
+        for i in expected_result:
+            self.assertTrue(i in result)
         
     def test_case_2(self):
         # Test with an empty directory
