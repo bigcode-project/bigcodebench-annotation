@@ -47,7 +47,7 @@ from unittest.mock import patch
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Create a temporary directory to store the mock R script and the output files
-        self.temp_dir = '/mnt/data/temp_dir'
+        self.temp_dir = 'f_770_test_dir'
         os.makedirs(self.temp_dir, exist_ok=True)
         
         # Create a mock R script file
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
     @patch('subprocess.call', return_value=None)
     def test_case_3(self, mock_subprocess_call):
         # Case where an invalid R script path is provided
-        invalid_path = '/invalid/path/mock_script.r'
+        invalid_path = 'invalid/path/mock_script.r'
         result, message = f_770(invalid_path, self.output_path, 5)
         self.assertFalse(result)
         self.assertEqual(message, 'File not generated within the specified duration.')
@@ -100,7 +100,7 @@ class TestCases(unittest.TestCase):
     @patch('subprocess.call', return_value=None)
     def test_case_5(self, mock_subprocess_call):
         # Case where the output path is invalid
-        invalid_output_path = '/invalid/path/'
+        invalid_output_path = 'invalid/path/'
         result, message = f_770(self.r_script_path, invalid_output_path, 5)
         self.assertFalse(result)
         self.assertEqual(message, 'File not generated within the specified duration.')
