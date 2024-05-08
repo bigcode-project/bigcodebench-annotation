@@ -55,18 +55,16 @@ import os
 import numpy as np
 
 class TestCases(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         # Create a dummy image for testing
-        cls.dummy_img_path = "test_image.jpg"
+        self.dummy_img_path = "test_image.jpg"
         np.random.seed(42)
         dummy_img = np.random.randint(0, 255, (20, 20, 3), dtype=np.uint8)
-        cv2.imwrite(cls.dummy_img_path, dummy_img)
+        cv2.imwrite(self.dummy_img_path, dummy_img)
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Cleanup the dummy image
-        os.remove(cls.dummy_img_path)
+        os.remove(self.dummy_img_path)
 
     def test_valid_input(self):
         blurred_image, ax_original, ax_blurred = f_2505(self.dummy_img_path, 3)

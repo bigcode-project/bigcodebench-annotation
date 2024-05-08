@@ -3,11 +3,11 @@ from datetime import datetime
 
 def f_3747(data, date_format, country, country_codes=None):
     """ 
-    Draw a histogram of the data from a DataFrame column of the pandas after converting the data into a specific format and locale,
+    Draw a histogram of the data from a DataFrame column of the pandas after converting the data into a specific format,
     and return the matplotlib Axes object.
 
     Parameters:
-    data (DataFrame): The pandas DataFrame containing date strings.
+    data (DataFrame): The pandas DataFrame containing date strings. The DataFrame has a column named 'dates' with the format '%d/%m/%Y'
     date_format (str): The date format string.
     country (str): The country name.
     country_codes (dict, optional): A dictionary mapping country names. Defaults to a predefined dictionary, where default is:

@@ -14,7 +14,7 @@ def f_3043(file_location, sheet_name):
 
     Returns:
     - dict: A dictionary with mean and standard deviation of each column.
-    - matplotlib.figure.Figure: The figure object containing the bar chart.
+    - matplotlib.figure.Figure: The figure object containing the bar chart. The figure is titled 'Mean and Standard Deviation', the X-axis is labeled 'Columns', and the Y-axis is labeled 'Values'.
 
     Raises:
     - FileNotFoundError: If the Excel file does not exist at the specified path.

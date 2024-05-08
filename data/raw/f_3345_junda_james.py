@@ -6,6 +6,8 @@ def f_3345(image_path='image.jpg', histogram_path='histogram.png'):
     """
     Read an image, create a histogram of the image pixel intensities, save the histogram as a PNG file, 
     and return the histogram plot object. The function also displays the original image and its histogram.
+    The limit to the size of the image depends on the hardware capabilities of the system you are working on. 
+    A possible size of an image is 20x20. 
 
     Parameters:
     - image_path (str): Path to the image file. Defaults to 'image.jpg'.
