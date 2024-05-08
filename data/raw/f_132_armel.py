@@ -1,25 +1,26 @@
 import json
 import pandas as pd
 
-def f_132(result, csv_file_path, json_file_path):
+
+def f_132(result, csv_file_path="test.csv", json_file_path="test.json"):
     """
     Save the list of dictionaries provided in the 'result' parameter to a CSV file (without index) and a JSON file.
-    
+
     Parameters:
     - result (list): A list of dictionaries.
     - csv_file_path (str): A path to a CSV file.
     - json_file_path (str): A path to a JSON file.
-    
+
     Returns:
     None
 
     Requirements:
     - pandas
     - json
-    
+
     Example:
     >>> result = [{"hi": 7, "bye": 4, "from_user": 0}, {1: 2, 3: 4, 5: 6}]
-    >>> f_132(result)
+    >>> f_132(result, 'test.csv', 'test.json')
     """
     # Save to CSV
     df = pd.DataFrame(result)
@@ -30,6 +31,7 @@ def f_132(result, csv_file_path, json_file_path):
         json.dump(result, f, indent=4)
 
     return None
+
 
 import unittest
 import os
@@ -51,12 +53,12 @@ class TestCases(unittest.TestCase):
         self.j_3 = os.path.join(self.test_dir, "json_3.json")
         self.j_4 = os.path.join(self.test_dir, "json_4.json")
         self.j_5 = os.path.join(self.test_dir, "json_5.json")
-    
+
     def tearDown(self):
         import shutil
         if os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir)
-    
+
     def test_case_1(self):
         # Test with a list of dictionaries with string keys and integer values
         result = [
@@ -70,7 +72,7 @@ class TestCases(unittest.TestCase):
         # Adjusting the expected result for JSON's string keys
         expected_result = [{"hi": 7, "bye": 4, "from_user": 0}]
         self.assertEqual(loaded_json, expected_result)
-        
+
     def test_case_2(self):
         # Test with a list of dictionaries with integer keys and values
         result = [{1: 2, 3: 4, 5: 6}]
@@ -82,7 +84,7 @@ class TestCases(unittest.TestCase):
         # Adjusting the expected result for JSON's string keys
         expected_result = [{"1": 2, "3": 4, "5": 6}]
         self.assertEqual(loaded_json, expected_result)
-        
+
     def test_case_3(self):
         # Test with an empty list
         result = []
@@ -125,7 +127,7 @@ class TestCases(unittest.TestCase):
             loaded_json = json.load(f)
         # Adjusting the expected result for JSON's string keys
         expected_result = [{"hi": 7, "bye": 4, "from_user": 11}]
-        self.assertEqual(loaded_json, expected_result) 
+        self.assertEqual(loaded_json, expected_result)
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -134,4 +136,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()

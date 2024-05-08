@@ -9,25 +9,42 @@ def f_135(car_dict):
 
     Parameters:
     car_dict (dict): The dictionary with car brands as keys and their colors as values.
-    
+
     Returns:
     tuple: A tuple containing:
         - DataFrame: A pandas DataFrame with car brands and their colors.
         - Axes: The Axes object of the bar chart visualizing the distribution of vehicle colors.
-    
+
     Requirements:
     - pandas
     - matplotlib
-    
+
     Example:
     >>> car_dict = {'Ford': 'Red', 'Toyota': 'Blue', 'Mercedes': 'Black', 'Tesla': 'White', 'BMW': 'Silver'}
     >>> df, ax = f_135(car_dict)
     >>> print(df)
+            Car   Color
+    0      Ford     Red
+    1    Toyota    Blue
+    2  Mercedes   Black
+    3     Tesla   White
+    4       BMW  Silver
     """
     car_data = list(car_dict.items())
     df = pd.DataFrame(car_data, columns=['Car', 'Color'])
     # Create the bar chart visualization
-    ax = df['Color'].value_counts().plot(kind='bar', title='Distribution of Vehicle Colors')
+    color_counts = df["Color"].value_counts()
+
+    figure = plt.figure()
+    # creating the bar plot
+    plt.bar(color_counts.keys(), color_counts.values, color="maroon", width=0.4)
+
+    plt.xlabel("Color")
+    plt.ylabel("Frequency")
+    plt.title("Distribution of Vehicle Colors")
+    plt.show()
+    ax = plt.gca()
+
     return df, ax
 
 import unittest
@@ -44,14 +61,14 @@ class TestCases(unittest.TestCase):
 
         for actual_category, expected_category in zip(extracted_categories, expected_categories):
             assert actual_category == expected_category, f"Expected category '{expected_category}', but got '{actual_category}'"
-    
+
     def test_case_1(self):
         car_dict = {
-            'Ford': 'Red', 
-            'Toyota': 'Blue', 
-            'Mercedes': 'Black', 
-            'Tesla': 'White', 
-            'BMW': 'Silver'
+            "Ford": "Red",
+            "Toyota": "Blue",
+            "Mercedes": "Black",
+            "Tesla": "White",
+            "BMW": "Silver",
         }
         df, ax = f_135(car_dict)
         self.is_barplot(
@@ -64,14 +81,16 @@ class TestCases(unittest.TestCase):
         self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
         self.assertSetEqual(set(df['Color']), set(car_dict.values()))
         self.assertEqual(ax.get_title(), 'Distribution of Vehicle Colors')
+        self.assertEqual(ax.get_xlabel(), "Color")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
 
     def test_case_2(self):
         car_dict = {
-            'Ford': 'Blue', 
-            'Toyota': 'Red', 
-            'Fiat': 'Silver', 
-            'Tesla': 'Silver', 
-            'BMW': 'White'
+            "Ford": "Blue",
+            "Toyota": "Red",
+            "Fiat": "Silver",
+            "Tesla": "Silver",
+            "BMW": "White",
         }
         df, ax = f_135(car_dict)
         # Assertions
@@ -82,16 +101,16 @@ class TestCases(unittest.TestCase):
 
     def test_case_3(self):
         car_dict = {
-            'Ford': 'Red', 
-            'Toyota': 'Blue', 
-            'Mercedes': 'Black', 
-            'Tesla': 'White', 
-            'BMW': 'Silver',
-            'Lamborghini': 'Black',
-            'Peugeot': 'Black'
+            "Ford": "Red",
+            "Toyota": "Blue",
+            "Mercedes": "Black",
+            "Tesla": "White",
+            "BMW": "Silver",
+            "Lamborghini": "Black",
+            "Peugeot": "Black",
         }
         df, ax = f_135(car_dict)
-        
+
         # Assertions
         self.assertListEqual(list(df.columns), ['Car', 'Color'])
         self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
@@ -100,14 +119,14 @@ class TestCases(unittest.TestCase):
 
     def test_case_4(self):
         car_dict = {
-            'Ford': 'Red', 
-            'Toyota': 'Blue', 
-            'Mercedes': 'Black', 
-            'Tesla': 'White', 
-            'BMW': 'Silver'
+            "Ford": "Red",
+            "Toyota": "Blue",
+            "Mercedes": "Black",
+            "Tesla": "White",
+            "BMW": "Silver",
         }
         df, ax = f_135(car_dict)
-        
+
         # Assertions
         self.assertListEqual(list(df.columns), ['Car', 'Color'])
         self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
@@ -116,14 +135,14 @@ class TestCases(unittest.TestCase):
 
     def test_case_5(self):
         car_dict = {
-            'Ford': 'Red', 
-            'Toyota': 'Red', 
-            'Mercedes': 'Red', 
-            'Tesla': 'White', 
-            'BMW': 'Silver'
+            "Ford": "Red",
+            "Toyota": "Red",
+            "Mercedes": "Red",
+            "Tesla": "White",
+            "BMW": "Silver",
         }
         df, ax = f_135(car_dict)
-        
+
         # Assertions
         self.assertListEqual(list(df.columns), ['Car', 'Color'])
         self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
@@ -137,4 +156,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()

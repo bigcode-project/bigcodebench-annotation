@@ -25,6 +25,11 @@ def f_138(df):
     >>> df = pd.DataFrame(data, columns=COLUMNS)
     >>> analyzed_df = f_138(df)
     >>> print(analyzed_df)
+    (   col1  col2  col3
+    0     1     1     2
+    1     1     2     1
+    2     2     1     3
+    3     2     2     1, <Axes: xlabel='col1'>)
     """
     analyzed_df = df.groupby(COLUMNS[:-1])[COLUMNS[-1]].nunique().reset_index()
     ax = analyzed_df.plot(kind='bar', x='col1', y='col3', secondary_y='col2')
@@ -46,13 +51,13 @@ class TestCases(unittest.TestCase):
 
         for actual_category, expected_category in zip(extracted_categories, expected_categories):
             assert actual_category == expected_category, f"Expected category '{expected_category}', but got '{actual_category}'"
-    
+
     def test_case_1(self):
         # Input 1
         data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
         df = pd.DataFrame(data, columns=COLUMNS)
         analyzed_df, ax = f_138(df)
-        
+
         # Assertions
         self.assertIsInstance(analyzed_df, pd.DataFrame)
         self.assertIsInstance(ax, matplotlib.axes.Axes)
@@ -65,7 +70,7 @@ class TestCases(unittest.TestCase):
         data = [[1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 4], [2, 1, 1], [2, 1, 2]]
         df = pd.DataFrame(data, columns=COLUMNS)
         analyzed_df, ax = f_138(df)
-        
+
         # Assertions
         self.assertIsInstance(analyzed_df, pd.DataFrame)
         self.assertIsInstance(ax, matplotlib.axes.Axes)
@@ -76,7 +81,7 @@ class TestCases(unittest.TestCase):
             expected_values=[2, 2, 2],
             expected_categories=['1', '1', '2']
         )
-        
+
     def test_case_3(self):
         # Input 3
         data = [[1, 1, 1], [1, 1, 1]]
@@ -98,7 +103,7 @@ class TestCases(unittest.TestCase):
         data = [[1, 1, 2], [1, 1, 2]]
         df = pd.DataFrame(data, columns=COLUMNS)
         analyzed_df, ax = f_138(df)
-        
+
         # Assertions
         self.assertIsInstance(analyzed_df, pd.DataFrame)
         self.assertIsInstance(ax, matplotlib.axes.Axes)
@@ -110,7 +115,7 @@ class TestCases(unittest.TestCase):
         data = [[1, 2, 1], [1, 1, 3]]
         df = pd.DataFrame(data, columns=COLUMNS)
         analyzed_df, ax = f_138(df)
-        
+
         # Assertions
         self.assertIsInstance(analyzed_df, pd.DataFrame)
         self.assertIsInstance(ax, matplotlib.axes.Axes)
@@ -125,4 +130,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()

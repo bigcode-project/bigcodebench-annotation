@@ -18,7 +18,7 @@ def f_131(page_title):
     - matplotlib.pyplot
 
     Example:
-    >>> f_131('Python (programming language)')
+    >>> ax = f_131('Python (programming language)')
     """
     try:
         text = wikipedia.page(page_title).content
@@ -48,7 +48,7 @@ class TestCases(unittest.TestCase):
         mock_function.return_value = A("I want to sleep")
         # Running the function
         _ = f_131('Python (programming language)')
-        
+
     @patch('wikipedia.page')
     def test_case_2(self, mock_function):
         # Mocking the function to prevent actual execution
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
         mock_function.return_value = A("I want to help you to get your business to work.")
         # Running the function
         _ = f_131('Python (programming language)')
-    
+
     def test_case_6(self):
         ax = f_131("Invalid Page Title")
         self.assertIsNone(ax)
@@ -88,4 +88,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()

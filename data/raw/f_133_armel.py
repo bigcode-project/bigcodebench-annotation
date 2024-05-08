@@ -33,7 +33,9 @@ def f_133(result):
 
     Example:
     >>> result = [{"hi": 7, "bye": 4, "from_user": 16}, {"some_key": 2, "another_key": 4, "from_user": 9}]
-    >>> f_133(result)
+    >>> square_roots, ax = f_133(result)
+    >>> print(square_roots)
+    [4. 3.]
     """
     # Extract the 'from_user' values
     from_user_values = [d['from_user'] for d in result if 'from_user' in d]
@@ -56,22 +58,15 @@ def f_133(result):
     return square_roots, ax
 
 import unittest
+import matplotlib
 
 class TestCases(unittest.TestCase):
     """Test cases for the f_133 function."""
     def test_case_1(self):
         # Input 1: Normal case with 2 dictionaries with 'from_user' keys.
         data = [
-            {
-                "key_1": 7,
-                "key_2": 4,
-                "from_user": 16
-            },
-            {
-                "key_1": 2, 
-                "key_2": 4, 
-                "from_user": 9
-            },
+            {"key_1": 7, "key_2": 4, "from_user": 16},
+            {"key_1": 2, "key_2": 4, "from_user": 9},
         ]
         square_roots, ax = f_133(data)
         self.assertEqual(ax.get_title(), PLOT_TITLE)
@@ -85,7 +80,7 @@ class TestCases(unittest.TestCase):
             datetime.strptime(annotations[0].get_text(), TIME_FORMAT)
         except:
             raise ValueError(f"The datetime in annotation ({annotations[0]}) does not have the right format ({TIME_FORMAT}).")
-    
+
     def test_case_2(self):
         # Input 2: List with 1 dictionary without the 'from_user' key.
         data = [
@@ -122,8 +117,8 @@ class TestCases(unittest.TestCase):
             },
             {
                 "from_user": 49,
-            }
-        ]    
+            },
+        ]
         square_roots, ax = f_133(data)
         np.testing.assert_array_equal(square_roots, np.array([11.0, 13.0, 15.0, 3.0, 7.0]))
 
@@ -140,4 +135,4 @@ def run_tests():
     runner.run(suite)
 
 if __name__ == "__main__":
-    run_tests() 
+    run_tests()
