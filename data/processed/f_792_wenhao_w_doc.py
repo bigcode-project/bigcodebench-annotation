@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-def f_688(rows, columns, seed=None):
+def f_810(rows, columns, seed=None):
     """
     Generate a DataFrame with random values within a specified range.
     
@@ -20,10 +20,10 @@ def f_688(rows, columns, seed=None):
     - pandas
     
     Examples:
-    >>> df = f_688(3, 2, seed=42)
+    >>> df = f_810(3, 2, seed=42)
     >>> print(df.shape)
     (3, 2)
-    >>> df = f_688(1, 1, seed=24)
+    >>> df = f_810(1, 1, seed=24)
     >>> print(df.shape)
     (1, 1)
     """
@@ -39,31 +39,31 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         self.seed = 42
     def test_case_1(self):
-        df = f_688(3, 2, seed=self.seed)
+        df = f_810(3, 2, seed=self.seed)
         self.assertEqual(df.shape, (3, 2))
         self.assertTrue((df >= 0).all().all())
         self.assertTrue((df <= 1).all().all())
         
     def test_case_2(self):
-        df = f_688(5, 5, seed=self.seed)
+        df = f_810(5, 5, seed=self.seed)
         self.assertEqual(df.shape, (5, 5))
         self.assertTrue((df >= 0).all().all())
         self.assertTrue((df <= 1).all().all())
         
     def test_case_3(self):
-        df = f_688(1, 1, seed=self.seed)
+        df = f_810(1, 1, seed=self.seed)
         self.assertEqual(df.shape, (1, 1))
         self.assertTrue((df >= 0).all().all())
         self.assertTrue((df <= 1).all().all())
         
     def test_case_4(self):
-        df = f_688(4, 3, seed=self.seed)
+        df = f_810(4, 3, seed=self.seed)
         self.assertEqual(df.shape, (4, 3))
         self.assertTrue((df >= 0).all().all())
         self.assertTrue((df <= 1).all().all())
         
     def test_case_5(self):
-        df = f_688(2, 2, seed=self.seed)
+        df = f_810(2, 2, seed=self.seed)
         self.assertEqual(df.shape, (2, 2))
         self.assertTrue((df >= 0).all().all())
         self.assertTrue((df <= 1).all().all())

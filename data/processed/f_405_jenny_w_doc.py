@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.decomposition import PCA
 
 
-def f_72(array: list, random_seed: int = 42) -> (pd.DataFrame, np.ndarray):
+def f_77(array: list, random_seed: int = 42) -> (pd.DataFrame, np.ndarray):
     """
     Converts a 2D list into a pandas DataFrame and applies PCA for dimensionality reduction.
 
@@ -25,7 +25,7 @@ def f_72(array: list, random_seed: int = 42) -> (pd.DataFrame, np.ndarray):
 
     Examples:
     >>> data = [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
-    >>> df, transformed = f_72(data)
+    >>> df, transformed = f_77(data)
     >>> print(df)
         0   1   2   3   4
     0   1   2   3   4   5
@@ -46,21 +46,21 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic 2-row dataset
         data = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
-        df, transformed_data = f_72(data)
+        df, transformed_data = f_77(data)
         expected_df = pd.DataFrame(data)
         self.assertTrue(df.equals(expected_df))
         self.assertEqual(transformed_data.shape, (2, 2))
     def test_case_2(self):
         # Test basic 3-row dataset
         data = [[10, 20, 30, 40, 50], [60, 70, 80, 90, 100], [110, 120, 130, 140, 150]]
-        df, transformed_data = f_72(data)
+        df, transformed_data = f_77(data)
         expected_df = pd.DataFrame(data)
         self.assertTrue(df.equals(expected_df))
         self.assertEqual(transformed_data.shape, (3, 2))
     def test_case_3(self):
         # Test mix of positive, negative, zero values
         data = [[-1, -2, -3, -4, -5], [5, 6, 7, 8, 9], [0, 0, 0, 0, 0]]
-        df, transformed_data = f_72(data)
+        df, transformed_data = f_77(data)
         expected_df = pd.DataFrame(data)
         self.assertTrue(df.equals(expected_df))
         self.assertEqual(transformed_data.shape, (3, 2))
@@ -72,14 +72,14 @@ class TestCases(unittest.TestCase):
             [105, 115, 125, 135, 145],
             [155, 165, 175, 185, 195],
         ]
-        df, transformed_data = f_72(data)
+        df, transformed_data = f_77(data)
         expected_df = pd.DataFrame(data)
         self.assertTrue(df.equals(expected_df))
         self.assertEqual(transformed_data.shape, (4, 2))
     def test_case_5(self):
         # Test uniform rows
         data = [[10, 10, 10, 10, 10], [20, 20, 20, 20, 20], [30, 30, 30, 30, 30]]
-        df, transformed_data = f_72(data)
+        df, transformed_data = f_77(data)
         expected_df = pd.DataFrame(data)
         self.assertTrue(df.equals(expected_df))
         self.assertEqual(transformed_data.shape, (3, 2))
@@ -87,18 +87,18 @@ class TestCases(unittest.TestCase):
         # Test single row (should fail since it's < n_components)
         with self.assertRaises(ValueError):
             data = [[1, 2, 3, 4, 5]]
-            f_72(data)
+            f_77(data)
     def test_case_7(self):
         # Test large numbers
         data = [[1000000000, 2000000000], [-1000000000, -2000000000]]
-        df, transformed_data = f_72(data)
+        df, transformed_data = f_77(data)
         expected_df = pd.DataFrame(data)
         self.assertTrue(df.equals(expected_df))
         self.assertEqual(transformed_data.shape, (2, 2))
     def test_case_8(self):
         # Test correctness of PCA
         data = [[2, 3], [3, 4], [5, 6]]
-        _, transformed_data = f_72(data)
+        _, transformed_data = f_77(data)
         # Using the sklearn PCA output as the expected transformation
         expected_transformation = np.array(
             [
@@ -113,7 +113,7 @@ class TestCases(unittest.TestCase):
     def test_case_9(self):
         # Test floats
         data = [[1.5, 2.5], [3.5, 4.5], [5.5, 6.5]]
-        df, transformed_data = f_72(data)
+        df, transformed_data = f_77(data)
         expected_df = pd.DataFrame(data)
         self.assertTrue(df.equals(expected_df))
         self.assertEqual(transformed_data.shape, (3, 2))

@@ -3,12 +3,12 @@ import re
 import pandas as pd
 
 
-def f_255(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
+def f_297(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
     """
     Searches for files in the specified directory that match a given regex pattern.
-
     This function walks through the directory, matches filenames against the pattern,
-    and saves the matched file paths to a CSV file. It returns a DataFrame of these paths.
+    and saves the matched file paths to a CSV file. It returns a DataFrame of these paths
+    with colomn 'File Path'.
 
     Parameters:
     - pattern (str): Regex pattern to match filenames.
@@ -24,7 +24,7 @@ def f_255(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
     - os
 
     Example:
-    >>> df = f_255(".*\.txt$", "/path/to/search", "matched_files.csv")
+    >>> df = f_297(".*\.txt$", "/path/to/search", "matched_files.csv")
     """
     matched_paths = []
     for root, _, files in os.walk(directory):
@@ -37,10 +37,10 @@ def f_255(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
 
 import unittest
 import shutil
-output_dir = './output'
+OUTPUT_DIR = './output'
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.test_dir = output_dir
+        self.test_dir = OUTPUT_DIR
         if not os.path.exists(self.test_dir):
             os.makedirs(self.test_dir)
         # Create test files
@@ -56,27 +56,27 @@ class TestCases(unittest.TestCase):
     def test_file_matching(self):
         """Ensure function matches correct files."""
         output_csv = os.path.join(self.test_dir, "matched_files.csv")
-        df = f_255(r".*\.txt$", self.test_dir, output_csv)
+        df = f_297(r".*\.txt$", self.test_dir, output_csv)
         self.assertTrue(os.path.exists(output_csv))
         self.assertIn(self.test_file1, df['File Path'].values)
     def test_no_files_matched(self):
         """Test when no files match the pattern."""
         output_csv = os.path.join(self.test_dir, "no_match.csv")
-        df = f_255(r".*\.md$", self.test_dir, output_csv)
+        df = f_297(r".*\.md$", self.test_dir, output_csv)
         self.assertTrue(df.empty)
     def test_output_file_creation(self):
         """Ensure the output file is created."""
         output_csv = os.path.join(self.test_dir, "output_creation.csv")
-        _ = f_255(r".*\.txt$", self.test_dir, output_csv)
+        _ = f_297(r".*\.txt$", self.test_dir, output_csv)
         self.assertTrue(os.path.exists(output_csv))
     def test_correct_number_of_matches(self):
         """Test the number of files matched is correct."""
         output_csv = os.path.join(self.test_dir, "correct_number.csv")
-        df = f_255(r".*\.txt$", self.test_dir, output_csv)
+        df = f_297(r".*\.txt$", self.test_dir, output_csv)
         self.assertEqual(len(df), 1)
     def test_pattern_specificity(self):
         """Ensure the regex pattern correctly distinguishes file types."""
         output_csv = os.path.join(self.test_dir, "pattern_specificity.csv")
-        df = f_255(r"test1\.txt$", self.test_dir, output_csv)
+        df = f_297(r"test1\.txt$", self.test_dir, output_csv)
         self.assertEqual(len(df), 1)
         self.assertIn("test1.txt", df['File Path'].values[0])

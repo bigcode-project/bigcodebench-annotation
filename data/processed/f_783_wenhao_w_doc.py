@@ -2,7 +2,7 @@ import re
 from nltk import word_tokenize
 from collections import Counter
 
-def f_597(input_str):
+def f_709(input_str):
     """
     Remove all special characters, punctuation marks and spaces from a string called "input _ str" using regex and then count the frequency of each word.
 
@@ -18,7 +18,7 @@ def f_597(input_str):
     - collections.Counter
 
     Example:
-    >>> f_597('Special $#! characters   spaces 888323')
+    >>> f_709('Special $#! characters   spaces 888323')
     Counter({'Special': 1, 'characters': 1, 'spaces': 1, '888323': 1})
     """
     cleaned_str = re.sub('[^A-Za-z0-9 ]+', '', input_str)
@@ -29,22 +29,22 @@ def f_597(input_str):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = f_597('Special $#! characters   spaces 888323')
+        result = f_709('Special $#! characters   spaces 888323')
         expected = {'Special': 1, 'characters': 1, 'spaces': 1, '888323': 1}
         self.assertEqual(result, expected)
     def test_case_2(self):
-        result = f_597('Hello hello world')
+        result = f_709('Hello hello world')
         expected = {'Hello': 1, 'hello': 1, 'world': 1}
         self.assertEqual(result, expected)
     def test_case_3(self):
-        result = f_597('')
+        result = f_709('')
         expected = {}
         self.assertEqual(result, expected)
     def test_case_4(self):
-        result = f_597('123 123 456')
+        result = f_709('123 123 456')
         expected = {'123': 2, '456': 1}
         self.assertEqual(result, expected)
     def test_case_5(self):
-        result = f_597('Hello123 #$! 123')
+        result = f_709('Hello123 #$! 123')
         expected = {'Hello123': 1, '123': 1}
         self.assertEqual(result, expected)

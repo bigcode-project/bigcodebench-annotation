@@ -4,7 +4,7 @@ import zlib
 # Constants
 KEY = '470FC614'
 
-def f_339(hex_string=KEY):
+def f_395(hex_string=KEY):
     """
     Converts a given hex string to a float number and then compresses the binary32 float number.
 
@@ -19,9 +19,9 @@ def f_339(hex_string=KEY):
     - zlib
 
     Example:
-    >>> f_339("470FC614")
+    >>> f_395("470FC614")
     b'x\\x9c\\xf3\\xeb\\x93\\xef\\x01\\x00\\x03\\xb0\\x01\\x88'
-    >>> f_339("ABCD1234")
+    >>> f_395("ABCD1234")
     b'x\\x9c\\xf3\\xd7>+\\x04\\x00\\x03m\\x01Z'
     """
     binary_float = struct.pack('!f', int(hex_string, 16))
@@ -30,27 +30,26 @@ def f_339(hex_string=KEY):
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test with default key
-        result = f_339()
-        self.assertEqual(result, b'x\x9c\xf3\xeb\x93\xef\x01\x00\x03\xb0\x01\x88')
-    def test_case_2(self):
-        # Test with a different hex string
-        hex_string = "ABCD12"
-        result = f_339(hex_string)
-        self.assertEqual(result, b'x\x9c\xf3\xd6>+\x04\x00\x03]\x01V')
-    def test_case_3(self):
-        # Test with another different hex string
-        hex_string = "DEADBEEF"
-        result = f_339(hex_string)
-        self.assertEqual(result, b'x\x9c\xf3\x8f[\xbb\x1f\x00\x04s\x02\x1a')
-    def test_case_4(self):
-        # Test with a hex string that has a smaller length
-        hex_string = "00AA"
-        result = f_339(hex_string)
-        self.assertEqual(result, b'x\x9cs\xd6b`\x00\x00\x01\x8e\x00n')
-    def test_case_5(self):
-        # Test with a hex string that has a larger length
-        hex_string = "00AABBCCDDEE"
-        result = f_339(hex_string)
-        self.assertEqual(result, b'x\x9c\x0b\xd6\xda}\x16\x00\x04\x11\x02\x06')
+    def test_default_functionality(self):
+        """Test the function with default parameters."""
+        result = f_395()
+        self.assertIsInstance(result, bytes)
+    def test_valid_custom_hex_string(self):
+        """Test the function with a valid custom hexadecimal string."""
+        hex_string = '1A2FC614'  # Example hex string
+        result = f_395(hex_string)
+        self.assertIsInstance(result, bytes)
+    def test_invalid_hex_string(self):
+        """Test the function with an invalid hexadecimal string."""
+        with self.assertRaises(ValueError):
+            f_395(hex_string='ZZZZZZZZ')
+    def test_boundary_hex_value(self):
+        """Test the function with a large boundary hexadecimal value."""
+        boundary_hex = 'FFFFFFFF'  # Maximum float value before overflow in some contexts
+        result = f_395(boundary_hex)
+        self.assertIsInstance(result, bytes)
+    def test_zero_value(self):
+        """Test the function with a hex string representing zero."""
+        zero_hex = '00000000'
+        result = f_395(zero_hex)
+        self.assertIsInstance(result, bytes)

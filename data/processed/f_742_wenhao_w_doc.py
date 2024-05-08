@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def f_508(d):
+def f_598(d):
     """
     Calculate mean, sum, max, min and standard deviation for the keys "x," "y" and "z" from a list of dictionaries "d."
     
@@ -20,11 +20,11 @@ def f_508(d):
 
     Examples:
     >>> data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
-    >>> f_508(data)
+    >>> f_598(data)
     {'x': {'mean': 2.0, 'sum': 6, 'max': 3, 'min': 1, 'std': 0.816496580927726}, 'y': {'mean': 8.666666666666666, 'sum': 26, 'max': 15, 'min': 1, 'std': 5.792715732327589}, 'z': {'mean': 6.0, 'sum': 18, 'max': 7, 'min': 5, 'std': 0.816496580927726}}
-    >>> f_508([])
+    >>> f_598([])
     {'x': None, 'y': None, 'z': None}
-    >>> f_508([{'a': 1}])
+    >>> f_598([{'a': 1}])
     {'x': None, 'y': None, 'z': None}
     """
     if not isinstance(d, list) or any(not isinstance(item, dict) for item in d):
@@ -50,22 +50,22 @@ def f_508(d):
 import unittest
 class TestCases(unittest.TestCase):
     def test_empty_list(self):
-        self.assertEqual(f_508([]), {'x': None, 'y': None, 'z': None})
+        self.assertEqual(f_598([]), {'x': None, 'y': None, 'z': None})
     def test_valid_input(self):
         data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
-        result = f_508(data)
+        result = f_598(data)
         self.assertAlmostEqual(result['x']['mean'], 2.0)
         self.assertAlmostEqual(result['y']['mean'], 8.666666666666666)
         self.assertAlmostEqual(result['z']['mean'], 6.0)
     def test_invalid_input_type(self):
         with self.assertRaises(ValueError):
-            f_508("not a list")
+            f_598("not a list")
     def test_partial_keys(self):
         data = [{'x': 1, 'y': 2}, {'y': 3, 'z': 4}]
-        result = f_508(data)
+        result = f_598(data)
         self.assertIsNotNone(result['x'])
         self.assertIsNotNone(result['y'])
         self.assertIsNotNone(result['z'])
     def test_all_keys_missing(self):
         data = [{'a': 1}, {'b': 2}]
-        self.assertEqual(f_508(data), {'x': None, 'y': None, 'z': None})
+        self.assertEqual(f_598(data), {'x': None, 'y': None, 'z': None})

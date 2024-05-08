@@ -2,7 +2,7 @@ import csv
 import io
 from django.http import HttpRequest, FileResponse
 
-def f_400(request, header, csv_data):
+def f_469(request, header, csv_data):
     """
     This function generates a CSV file response from a Django HttpRequest. It constructs a CSV
     file using the provided header and CSV data, and sends it back as a Django FileResponse.
@@ -30,7 +30,7 @@ def f_400(request, header, csv_data):
     >>> request = HttpRequest()
     >>> header = ['id', 'name', 'email']
     >>> csv_data = [['1', 'John Doe', 'john@example.com'], ['2', 'Jane Doe', 'jane@example.com']]
-    >>> response = f_400(request, header, csv_data)
+    >>> response = f_469(request, header, csv_data)
     >>> response['Content-Type']
     'text/csv'
     >>> response['Content-Disposition']
@@ -61,30 +61,30 @@ class TestCases(unittest.TestCase):
     @patch('io.StringIO')
     def test_response_type(self, mock_string_io, mock_csv_writer):
         # Test if the response is of type FileResponse
-        response = f_400(self.request, self.header, self.csv_data)
+        response = f_469(self.request, self.header, self.csv_data)
         self.assertIsInstance(response, FileResponse)
     @patch('csv.writer')
     @patch('io.StringIO')
     def test_response_status_code(self, mock_string_io, mock_csv_writer):
         # Test if the response has status code 200
-        response = f_400(self.request, self.header, self.csv_data)
+        response = f_469(self.request, self.header, self.csv_data)
         self.assertEqual(response.status_code, 200)
     @patch('csv.writer')
     @patch('io.StringIO')
     def test_content_type(self, mock_string_io, mock_csv_writer):
         # Test if the Content-Type header is set to 'text/csv'
-        response = f_400(self.request, self.header, self.csv_data)
+        response = f_469(self.request, self.header, self.csv_data)
         self.assertEqual(response['Content-Type'], 'text/csv')
     @patch('csv.writer')
     @patch('io.StringIO')
     def test_attachment_filename(self, mock_string_io, mock_csv_writer):
         # Test if the Content-Disposition is set correctly for file download
-        response = f_400(self.request, self.header, self.csv_data)
+        response = f_469(self.request, self.header, self.csv_data)
         self.assertIn('attachment; filename="data.csv"', response['Content-Disposition'])
     @patch('csv.writer')
     @patch('io.StringIO')
     def test_csv_file_content(self, mock_string_io, mock_csv_writer):
         # Test if csv.writer methods are called to write the header and rows correctly
-        response = f_400(self.request, self.header, self.csv_data)
+        response = f_469(self.request, self.header, self.csv_data)
         mock_csv_writer.return_value.writerow.assert_called_with(self.header)
         mock_csv_writer.return_value.writerows.assert_called_with(self.csv_data)

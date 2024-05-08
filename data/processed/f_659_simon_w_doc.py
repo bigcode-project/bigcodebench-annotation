@@ -3,7 +3,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 
 
-def f_722(num_samples=1000, k=5, d=2,  random_seed=None):
+def f_856(num_samples=1000, k=5, d=2,  random_seed=None):
     """
     Generate a dataset consisting of random numbers sampled from a gaussian
     normal distribution that are transformed by applying a linear
@@ -30,15 +30,15 @@ def f_722(num_samples=1000, k=5, d=2,  random_seed=None):
     - sklearn.metrics.mean_squared_error
 
     Example:
-    >>> mse = f_722(num_samples=123, k=-6.4, d=12.1, random_seed=2)
+    >>> mse = f_856(num_samples=123, k=-6.4, d=12.1, random_seed=2)
     >>> print(mse)
     193.04172078372736
 
-    >>> mse = f_722()
+    >>> mse = f_856()
     >>> print(mse)
     19.03543917135251
 
-    >>> mse = f_722(k=1, d=0)
+    >>> mse = f_856(k=1, d=0)
     >>> print(mse)
     0.001113785307245742
     """
@@ -54,25 +54,25 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_rng(self):
         'test rng reproducability'
-        result1 = f_722(random_seed=23)
-        result2 = f_722(random_seed=23)
+        result1 = f_856(random_seed=23)
+        result2 = f_856(random_seed=23)
         self.assertEqual(result1, result2)
     def test_case_1(self):
         'low mse + mse decreasing with num_samples'
-        result1 = f_722(num_samples=1000000, k=1, d=0, random_seed=1)
+        result1 = f_856(num_samples=1000000, k=1, d=0, random_seed=1)
         self.assertAlmostEqual(result1, 0, places=5)
-        result2 = f_722(num_samples=1000, k=1, d=0, random_seed=1)
-        result3 = f_722(num_samples=10000, k=1, d=0, random_seed=1)
+        result2 = f_856(num_samples=1000, k=1, d=0, random_seed=1)
+        result3 = f_856(num_samples=10000, k=1, d=0, random_seed=1)
         self.assertTrue(result2 > result3)
     def test_case_2(self):
         'deterministic mse'
-        result = f_722(num_samples=100, k=0, d=10, random_seed=42)
+        result = f_856(num_samples=100, k=0, d=10, random_seed=42)
         self.assertAlmostEqual(result, 100, places=5)
     def test_case_3(self):
         'random input'
-        result = f_722(num_samples=10000, k=10, d=0, random_seed=42)
+        result = f_856(num_samples=10000, k=10, d=0, random_seed=42)
         self.assertAlmostEqual(result, 81.61581766096013, places=5)
     def test_case_5(self):
         'floats'
-        result = f_722(num_samples=340, k=-3.4, d=123.4, random_seed=42)
+        result = f_856(num_samples=340, k=-3.4, d=123.4, random_seed=42)
         self.assertAlmostEqual(result, 15220.804873417765, places=5)

@@ -3,7 +3,7 @@ import string
 import pandas as pd
 
 
-def f_77(data_list, seed=0):
+def f_82(data_list, seed=0):
     """
     Replace a random substring (a sequence of characters between two commas or at the beginning/end of the string)
     in a list of strings with a random string (comprising ascii lowercase characters) with the same length as
@@ -27,7 +27,7 @@ def f_77(data_list, seed=0):
     - string
 
     Example:
-    >>> f_77(['lamp, bag, mirror', 'table, chair, bag, lamp'])
+    >>> f_82(['lamp, bag, mirror', 'table, chair, bag, lamp'])
                Original String          Modified String
     0        lamp, bag, mirror        lamp, tkg, mirror
     1  table, chair, bag, lamp  table, chair, bag, kuhm
@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test with a typical input list
         input_data = ["lamp, bag, mirror", "table, chair, bag, lamp"]
-        result = f_77(input_data, seed=0)
+        result = f_82(input_data, seed=0)
         self.assertTrue(all(item in input_data for item in result["Original String"]))
         self.assertNotEqual(
             result["Original String"].tolist(), result["Modified String"].tolist()
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test with a single-item list
         input_data = ["lamp, bag, mirror"]
-        result = f_77(input_data, seed=0)
+        result = f_82(input_data, seed=0)
         self.assertTrue(all(item in input_data for item in result["Original String"]))
         self.assertNotEqual(
             result["Original String"].tolist(), result["Modified String"].tolist()
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test with a list of varied length strings
         input_data = ["lamp, chair", "table, mirror, bag", "desk, bed"]
-        result = f_77(input_data, seed=0)
+        result = f_82(input_data, seed=0)
         self.assertTrue(all(item in input_data for item in result["Original String"]))
         self.assertNotEqual(
             result["Original String"].tolist(), result["Modified String"].tolist()
@@ -81,25 +81,25 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Test with an empty list
         input_data = []
-        result = f_77(input_data, seed=0)
+        result = f_82(input_data, seed=0)
         self.assertEqual(len(result), 0)
     def test_case_5(self):
         # Test with a list of empty strings
         input_data = ["", "", ""]
-        result = f_77(input_data, seed=0)
+        result = f_82(input_data, seed=0)
         self.assertEqual(result["Original String"].tolist(), ["", "", ""])
         self.assertEqual(result["Modified String"].tolist(), ["", "", ""])
     def test_case_6(self):
         # Test with strings that have no commas
         input_data = ["lamps", "table"]
-        result = f_77(input_data, seed=1)
+        result = f_82(input_data, seed=1)
         self.assertTrue(
             all(len(modified) == 5 for modified in result["Modified String"])
         )
     def test_case_7(self):
         # Test with strings that contain multiple identical substrings
         input_data = ["lamp, lamp, lamp"]
-        result = f_77(input_data, seed=2)
+        result = f_82(input_data, seed=2)
         self.assertNotEqual(result["Original String"][0], result["Modified String"][0])
         self.assertTrue(
             any(sub != "lamp" for sub in result["Modified String"][0].split(", "))
@@ -107,7 +107,7 @@ class TestCases(unittest.TestCase):
     def test_case_8(self):
         # Test with mixed case input strings
         input_data = ["Lamp, Bag, Mirror"]
-        result = f_77(input_data, seed=4)
+        result = f_82(input_data, seed=4)
         self.assertNotEqual(
             result["Original String"].tolist(), result["Modified String"].tolist()
         )
@@ -117,9 +117,9 @@ class TestCases(unittest.TestCase):
     def test_case_9(self):
         # Test effect of different seeds on output
         input_data = ["lamp, bag, mirror"]
-        result_seed_0a = f_77(input_data, seed=0)
-        result_seed_0b = f_77(input_data, seed=0)
-        result_seed_5 = f_77(input_data, seed=5)
+        result_seed_0a = f_82(input_data, seed=0)
+        result_seed_0b = f_82(input_data, seed=0)
+        result_seed_5 = f_82(input_data, seed=5)
         self.assertEqual(
             result_seed_0a["Modified String"][0], result_seed_0b["Modified String"][0]
         )
@@ -129,7 +129,7 @@ class TestCases(unittest.TestCase):
     def test_case_10(self):
         # Test case sensitivity
         input_data = ["Lamp, Bag, Mirror"]
-        result = f_77(input_data, seed=3)
+        result = f_82(input_data, seed=3)
         original_items = [
             item.lower() for item in result["Original String"][0].split(", ")
         ]
@@ -141,7 +141,7 @@ class TestCases(unittest.TestCase):
     def test_case_11(self):
         # Test whitespaces (i.e. make sure leading/trailing whitespaces are removed in processing substrings)
         input_data = ["  lamp, bag   ,mirror  "]
-        result = f_77(input_data, seed=3)
+        result = f_82(input_data, seed=3)
         modified = result["Modified String"][0].split(", ")
         self.assertTrue(
             all(item.strip() == item for item in modified),

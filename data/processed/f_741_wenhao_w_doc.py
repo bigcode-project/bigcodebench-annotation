@@ -1,7 +1,7 @@
 import numpy as np
 import random
 
-def f_264(length=10000, seed=0):
+def f_309(length=10000, seed=0):
     """
     Generates a random walk of a specified length. A random walk is a path that consists of a series of random steps
     on some mathematical space. In this case, the steps are either +1 or -1, chosen with equal probability.
@@ -22,7 +22,7 @@ def f_264(length=10000, seed=0):
     
     Example:
     >>> random.seed(0)     # For reproducibility in doctest
-    >>> walk = f_264(5)
+    >>> walk = f_309(5)
     >>> walk.tolist()
     [0, 1, 2, 1, 0, 1]
     """
@@ -38,17 +38,17 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         random.seed(42)  # Setting seed for reproducibility
     def test_default_length(self):
-        walk = f_264(seed=42)
+        walk = f_309(seed=42)
         self.assertEqual(len(walk), 10001)  # Includes starting point
     def test_custom_length(self):
-        walk = f_264(5000, seed=42)
+        walk = f_309(5000, seed=42)
         self.assertEqual(len(walk), 5001)  # Includes starting point
     def test_first_step_zero(self):
-        walk = f_264(1, seed=42)
+        walk = f_309(1, seed=42)
         self.assertEqual(walk[0], 0)  # First position should be 0
     def test_negative_length(self):
         with self.assertRaises(ValueError):
-            f_264(-1)
+            f_309(-1)
     def test_output_type(self):
-        walk = f_264(5, seed=42)
+        walk = f_309(5, seed=42)
         self.assertEqual(walk.tolist(), [0, 1, 0, -1, -2, -1])

@@ -2,9 +2,10 @@ import pytz
 from dateutil.parser import parse
 
 
-def f_402(date_str, from_tz, to_tz):
+def f_471(date_str, from_tz, to_tz):
     """
-    Convert a date string from one time zone to another and return the time difference in seconds to the current time in the destination time zone.
+    Convert a date string from one time zone to another and return the time difference in seconds to the current time
+    in the destination time zone.
 
     Parameters:
     date_str (str): The date string in "yyyy-mm-dd hh:mm:ss" format.
@@ -18,7 +19,7 @@ def f_402(date_str, from_tz, to_tz):
     - pytz
     - dateutil.parser
     Example:
-    >>> type(f_402('2022-10-22 11:59:59', 'UTC', 'America/Chicago'))
+    >>> type(f_471('2022-10-22 11:59:59', 'UTC', 'America/Chicago'))
     <class 'int'>
     """
     from_tz_obj = pytz.timezone(from_tz)
@@ -35,12 +36,12 @@ from datetime import datetime, timedelta
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test conversion from UTC to America/Chicago with a date in the past
-        result = f_402('2022-01-01 11:59:59', 'UTC', 'America/Chicago')
+        result = f_471('2022-01-01 11:59:59', 'UTC', 'America/Chicago')
         self.assertIsInstance(result, int)
         self.assertGreater(result, 0)
     def test_case_2(self):
         # Test conversion from America/New_York to Asia/Kolkata with a date in the past
-        result = f_402('2022-01-01 11:59:59', 'America/New_York', 'Asia/Kolkata')
+        result = f_471('2022-01-01 11:59:59', 'America/New_York', 'Asia/Kolkata')
         self.assertIsInstance(result, int)
         self.assertGreater(result, 0)
     def test_known_time_zone_offset_difference(self):
@@ -49,18 +50,18 @@ class TestCases(unittest.TestCase):
         utc_zone = 'UTC'
         target_zone = 'Etc/GMT+2'
         try:
-            result = f_402(known_date_utc, utc_zone, target_zone)
+            result = f_471(known_date_utc, utc_zone, target_zone)
             self.assertTrue(isinstance(result, int), "Result should be an integer representing seconds.")
         except Exception as e:
-            self.fail(f"f_402 raised an exception with known static offset time zones: {e}")
+            self.fail(f"f_471 raised an exception with known static offset time zones: {e}")
     def test_case_4(self):
         # Test conversion with a future date from UTC to America/Chicago
         future_date = (datetime.utcnow() + timedelta(days=10)).strftime('%Y-%m-%d %H:%M:%S')
-        result = f_402(future_date, 'UTC', 'America/Chicago')
+        result = f_471(future_date, 'UTC', 'America/Chicago')
         self.assertIsInstance(result, int)
         self.assertLess(result, 0)
     def test_case_5(self):
         # Test conversion from Asia/Kolkata to America/Los_Angeles with a date in the past
-        result = f_402('2022-01-01 11:59:59', 'Asia/Kolkata', 'America/Los_Angeles')
+        result = f_471('2022-01-01 11:59:59', 'Asia/Kolkata', 'America/Los_Angeles')
         self.assertIsInstance(result, int)
         self.assertGreater(result, 0)

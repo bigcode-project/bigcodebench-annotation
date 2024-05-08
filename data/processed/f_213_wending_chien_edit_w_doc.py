@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def f_379(num_labels=5, data_range=(0, 1)):
+def f_443(num_labels=5, data_range=(0, 1)):
     """
     Generate random numeric data across a specified range for a given number of categories and visualize it with
      a stacked bar chart.
@@ -21,10 +21,10 @@ def f_379(num_labels=5, data_range=(0, 1)):
     - numpy
 
     Example:
-    >>> fig = f_379()
+    >>> fig = f_443()
     >>> fig.show()  # This will display the figure with default parameters
 
-    >>> fig = f_379(num_labels=3, data_range=(1, 10))
+    >>> fig = f_443(num_labels=3, data_range=(1, 10))
     >>> fig.show()  # This will display the figure with three labels and data range from 1 to 10
     """
     np.random.seed(0)
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
         mock_ax = MagicMock()
         mock_subplots.return_value = (mock_fig, mock_ax)
         # Call the function
-        fig = f_379()
+        fig = f_443()
         # Assertions to ensure plot was called correctly
         mock_plot.assert_called_once()
         mock_plot.assert_called_with(kind='bar', stacked=True, ax=mock_ax)
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
         # Call the function with custom parameters
         num_labels = 4
         data_range = (1, 10)
-        fig = f_379(num_labels=num_labels, data_range=data_range)
+        fig = f_443(num_labels=num_labels, data_range=data_range)
         # Assertions to ensure plot was called correctly
         mock_plot.assert_called_once()
         mock_plot.assert_called_with(kind='bar', stacked=True, ax=mock_ax)
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
         mock_ax = MagicMock()
         mock_subplots.return_value = (mock_fig, mock_ax)
         # Call the function with a custom data range
-        fig = f_379(data_range=data_range)
+        fig = f_443(data_range=data_range)
         # Assertions to ensure plot was called correctly
         mock_plot.assert_called_once()
         mock_plot.assert_called_with(kind='bar', stacked=True, ax=mock_ax)
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
         mock_ax = MagicMock()
         mock_subplots.return_value = (mock_fig, mock_ax)
         # Call the function with custom number of labels and data range
-        fig = f_379(num_labels=num_labels, data_range=data_range)
+        fig = f_443(num_labels=num_labels, data_range=data_range)
         # Assertions to ensure plot was called correctly
         mock_plot.assert_called_once()
         mock_plot.assert_called_with(kind='bar', stacked=True, ax=mock_ax)

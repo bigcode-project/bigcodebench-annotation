@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import sys
 
-def f_714(file_path: str, column_name: str) -> pd.DataFrame:
+def f_847(file_path: str, column_name: str) -> pd.DataFrame:
     """
     Load a CSV file into a Pandas DataFrame, replace all occurrences of the string '\n' with the string '<br>'
     in the specified column, and return the cleaned DataFrame.
@@ -20,10 +20,10 @@ def f_714(file_path: str, column_name: str) -> pd.DataFrame:
     - sys
     
     Examples:
-    >>> df = f_714('data.csv', 'Value')
+    >>> df = f_847('data.csv', 'Value')
     >>> print(df['Value'].iloc[0])
     "some<br>text"
-    >>> df = f_714('another_data.csv', 'Comments')
+    >>> df = f_847('another_data.csv', 'Comments')
     >>> print(df['Comments'].iloc[1])
     "hello<br>world"
     """
@@ -67,29 +67,29 @@ class TestCases(unittest.TestCase):
         os.remove('test/test_data_3.csv')
         os.rmdir('test')
     def test_case_1(self):
-        df = f_714('test/test_data_1.csv', 'Value')
+        df = f_847('test/test_data_1.csv', 'Value')
         self.assertEqual(df['Value'].iloc[0], "Hello<br>World")
         self.assertEqual(df['Value'].iloc[1], "Python<br>is<br>awesome")
         self.assertEqual(df['Value'].iloc[2], "No newlines here")
         
     def test_case_2(self):
-        df = f_714('test/test_data_2.csv', 'Comments')
+        df = f_847('test/test_data_2.csv', 'Comments')
         self.assertEqual(df['Comments'].iloc[0], "Good<br>Morning")
         self.assertEqual(df['Comments'].iloc[1], "Happy<br>Coding")
         
     def test_case_3(self):
-        df = f_714('test/test_data_3.csv', 'Text')
+        df = f_847('test/test_data_3.csv', 'Text')
         self.assertEqual(df['Text'].iloc[0], "Line 1")
         self.assertEqual(df['Text'].iloc[1], "Line 2<br>Line 3")
         
     def test_case_4(self):
-        df1 = f_714('test/test_data_1.csv', 'Value')
-        df2 = f_714('test/test_data_1.csv', '')
+        df1 = f_847('test/test_data_1.csv', 'Value')
+        df2 = f_847('test/test_data_1.csv', '')
         self.assertEqual(df1['Value'].iloc[0], "Hello<br>World")
         self.assertEqual(df2['Value'].iloc[0], "Hello\nWorld")
         
     def test_case_5(self):
-        df1 = f_714('test/test_data_1.csv', 'Value')
-        df2 = f_714('test/test_data_1.csv', 'NonExistentColumn')
+        df1 = f_847('test/test_data_1.csv', 'Value')
+        df2 = f_847('test/test_data_1.csv', 'NonExistentColumn')
         self.assertEqual(df1['Value'].iloc[0], "Hello<br>World")
         self.assertEqual(df2['Value'].iloc[0], "Hello\nWorld")

@@ -3,7 +3,7 @@ import pandas as pd
 import re
 
 
-def f_248(file_path: str) -> pd.DataFrame:
+def f_287(file_path: str) -> pd.DataFrame:
     """
     Parse a log file to extract log entries into a DataFrame.
 
@@ -35,7 +35,7 @@ def f_248(file_path: str) -> pd.DataFrame:
     2023-01-01 12:00:00.000000 - INFO - Application started
     2023-01-01 12:01:00.000000 - ERROR - Failed to connect to database
     ```
-    >>> df = f_248("path_to_log_file.txt")
+    >>> df = f_287("path_to_log_file.txt")
     >>> type(df)
     <class 'pandas.core.frame.DataFrame'>
     >>> df.iloc[0]
@@ -80,26 +80,26 @@ class TestCases(unittest.TestCase):
             "2023-01-01 12:01:00.000000 - ERROR - Failed to connect to database\n"
         )
         log_file_path = self._create_temp_log_file("log1.txt", content)
-        df = f_248(log_file_path)
+        df = f_287(log_file_path)
         self.assertEqual(len(df), 2)
         self.assertEqual(df.iloc[0]["Level"], "INFO")
         self.assertEqual(df.iloc[1]["Level"], "ERROR")
     def test_case_2(self):
         # Test case for an empty log file
         log_file_path = self._create_temp_log_file("log2.txt", "")
-        df = f_248(log_file_path)
+        df = f_287(log_file_path)
         self.assertTrue(df.empty)
     def test_case_3(self):
         # Log file with lines that do not match the expected format
         content = "This is not a valid log entry\n2023-01-02 13:00:00.000000 - WARNING - Low disk space\n"
         log_file_path = self._create_temp_log_file("log3.txt", content)
-        df = f_248(log_file_path)
+        df = f_287(log_file_path)
         self.assertEqual(len(df), 1)
         self.assertEqual(df.iloc[0]["Level"], "WARNING")
     def test_caes_4(self):
         # Test case to ensure FileNotFoundError is raised when log file does not exist
         with self.assertRaises(FileNotFoundError):
-            f_248("/path/to/nonexistent/file.txt")
+            f_287("/path/to/nonexistent/file.txt")
     def test_case_5(self):
         # Log file with some entries having minor formatting issues
         content = (
@@ -111,7 +111,7 @@ class TestCases(unittest.TestCase):
             "2023-01-04 16:00:00.000000 - ERROR - Error in processing\n"
         )
         log_file_path = self._create_temp_log_file("log5.txt", content)
-        df = f_248(log_file_path)
+        df = f_287(log_file_path)
         self.assertEqual(len(df), 3)
         self.assertEqual(df.iloc[0]["Level"], "DEBUG")
         self.assertEqual(df.iloc[1]["Level"], "INFO")
@@ -127,7 +127,7 @@ class TestCases(unittest.TestCase):
             "2023-02-01 10:10:00.000000 - INFO - Recovery attempt initiated\n"
         )
         log_file_path = self._create_temp_log_file("log6.txt", content)
-        df = f_248(log_file_path)
+        df = f_287(log_file_path)
         self.assertEqual(len(df), 3)
         self.assertEqual(df.iloc[0]["Level"], "INFO")
         self.assertEqual(df.iloc[1]["Level"], "ERROR")

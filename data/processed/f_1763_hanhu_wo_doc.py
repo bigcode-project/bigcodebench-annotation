@@ -3,7 +3,7 @@ import itertools
 import json
 import random
 
-def f_199(LETTERS, n):
+def f_229(LETTERS, n):
     """
     Generates all possible combinations of a given set of letters of length 'n'.
     Counts the occurrences of each letter in these combinations and saves the results
@@ -24,9 +24,9 @@ def f_199(LETTERS, n):
     - random
 
     Examples:
-    >>> isinstance(f_199(['a', 'b', 'c', 'd', 'e'], 3), str)
+    >>> isinstance(f_229(['a', 'b', 'c', 'd', 'e'], 3), str)
     True
-    >>> 'letter_combinations_' in f_199(['a', 'b', 'c', 'd', 'e'], 2)
+    >>> 'letter_combinations_' in f_229(['a', 'b', 'c', 'd', 'e'], 2)
     True
     """
     combinations = list(itertools.combinations(LETTERS, n))
@@ -48,26 +48,26 @@ class TestCases(unittest.TestCase):
     @patch('random.randint', return_value=42)  # Mock randint to control filename
     def test_return_type(self, mock_randint):
         """Test that the function returns a string."""
-        result = f_199(LETTERS, 2)
+        result = f_229(LETTERS, 2)
         self.assertIsInstance(result, str)
         expected_filename = 'letter_combinations_42.json'
         self.assertEqual(result, expected_filename)
     @patch('random.randint', return_value=42)
     def test_file_creation(self, mock_randint):
         """Test that a file with the expected pattern name is created."""
-        filename = f_199(LETTERS, 2)
+        filename = f_229(LETTERS, 2)
         self.assertTrue(os.path.exists(filename))
     @patch('random.randint', return_value=42)
     def test_file_content(self, mock_randint):
         """Test the correctness of the file content."""
-        filename = f_199(LETTERS, 2)
+        filename = f_229(LETTERS, 2)
         with open(filename, 'r') as f:
             data = json.load(f)
         self.assertIsInstance(data, dict)
     @patch('random.randint', return_value=42)
     def test_combination_length(self, mock_randint):
         """Test with different lengths of combinations."""
-        filename = f_199(LETTERS, 1)
+        filename = f_229(LETTERS, 1)
         with open(filename, 'r') as f:
             data = json.load(f)
         expected_count = 1 * len(LETTERS)  # Each letter should appear once for n=1

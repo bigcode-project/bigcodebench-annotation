@@ -2,7 +2,7 @@ import random
 import string
 
 
-def f_216(length: int, predicates: list, seed: int = None):
+def f_246(length: int, predicates: list, seed: int = None):
     """
     Generates a random string of specified length and evaluates it for specific characteristics.
 
@@ -32,9 +32,9 @@ def f_216(length: int, predicates: list, seed: int = None):
     - random
 
     Example:
-    >>> f_216(10, ['has_uppercase', 'has_numbers'], seed=42)[0]
+    >>> f_246(10, ['has_uppercase', 'has_numbers'], seed=42)[0]
     '8czu("@iNc'
-    >>> f_216(5, ['has_lowercase'], seed=123)
+    >>> f_246(5, ['has_lowercase'], seed=123)
     ('eiMk[', {'has_lowercase': True})
     """
     if seed is not None:
@@ -62,7 +62,7 @@ import unittest
 import string
 class TestCases(unittest.TestCase):
     def test_valid_length_and_predicates(self):
-        result_str, result_dict = f_216(
+        result_str, result_dict = f_246(
             10,
             ["has_uppercase", "has_lowercase", "has_numbers", "has_special_chars"],
             seed=1,
@@ -75,7 +75,7 @@ class TestCases(unittest.TestCase):
     def test_result_correctness(self):
         n_repetitions = 1000
         for _ in range(n_repetitions):
-            result_str, result_dict = f_216(
+            result_str, result_dict = f_246(
                 10,
                 ["has_uppercase", "has_lowercase", "has_numbers", "has_special_chars"],
                 seed=1,
@@ -89,25 +89,25 @@ class TestCases(unittest.TestCase):
             if any(c.isdigit() for c in result_str):
                 self.assertTrue(result_dict["has_numbers"])
     def test_empty_string(self):
-        result_str, result_dict = f_216(0, ["has_uppercase", "has_numbers"], seed=3)
+        result_str, result_dict = f_246(0, ["has_uppercase", "has_numbers"], seed=3)
         self.assertEqual(result_str, "")
         self.assertFalse(result_dict["has_uppercase"])
         self.assertFalse(result_dict["has_numbers"])
     def test_negative_length(self):
         with self.assertRaises(ValueError):
-            f_216(-1, ["has_uppercase"])
+            f_246(-1, ["has_uppercase"])
     def test_no_predicates(self):
-        result_str, result_dict = f_216(10, [], seed=5)
+        result_str, result_dict = f_246(10, [], seed=5)
         self.assertEqual(len(result_str), 10)
         self.assertEqual(result_dict, {})
     def test_key_error(self):
         with self.assertRaises(KeyError):
-            f_216(10, ["has_uppercase", "invalid"])
+            f_246(10, ["has_uppercase", "invalid"])
     def test_deduplicate_predicates(self):
-        _, result_dict = f_216(15, ["has_uppercase", "has_uppercase"], seed=7)
+        _, result_dict = f_246(15, ["has_uppercase", "has_uppercase"], seed=7)
         self.assertEqual(len(result_dict), 1)
     def test_random_seed_reproducibility(self):
-        result_str1, result_dict1 = f_216(10, ["has_uppercase", "has_numbers"], seed=8)
-        result_str2, result_dict2 = f_216(10, ["has_uppercase", "has_numbers"], seed=8)
+        result_str1, result_dict1 = f_246(10, ["has_uppercase", "has_numbers"], seed=8)
+        result_str2, result_dict2 = f_246(10, ["has_uppercase", "has_numbers"], seed=8)
         self.assertEqual(result_str1, result_str2)
         self.assertEqual(result_dict1, result_dict2)

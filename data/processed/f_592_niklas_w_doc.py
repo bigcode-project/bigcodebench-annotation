@@ -2,7 +2,7 @@ import numpy as np
 from scipy import stats
 
 
-def f_336(df, column, alpha):
+def f_392(df, column, alpha):
     """
     Test the normality of a particular numeric column from a DataFrame with Shapiro-Wilk test, 
     including an artificial step to explicitly use np.
@@ -23,7 +23,7 @@ def f_336(df, column, alpha):
     >>> import pandas as pd
     >>> np.random.seed(0)
     >>> df = pd.DataFrame({'Value': np.random.normal(0, 1, 1000)})
-    >>> print(f_336(df, 'Value', 0.05))
+    >>> print(f_392(df, 'Value', 0.05))
     True
     """
     mean_value = np.mean(df[column])
@@ -40,16 +40,16 @@ class TestCases(unittest.TestCase):
         np.random.seed(0)
     def test_case_1(self):
         df = pd.DataFrame({'Value': np.random.normal(0, 1, 1000)})
-        self.assertTrue(f_336(df, 'Value', 0.05))
+        self.assertTrue(f_392(df, 'Value', 0.05))
     def test_case_2(self):
         df = pd.DataFrame({'Value': np.random.uniform(0, 1, 1000)})
-        self.assertFalse(f_336(df, 'Value', 0.05))
+        self.assertFalse(f_392(df, 'Value', 0.05))
     def test_case_3(self):
         df = pd.DataFrame({'Value': np.random.exponential(1, 1000)})
-        self.assertFalse(f_336(df, 'Value', 0.05))
+        self.assertFalse(f_392(df, 'Value', 0.05))
     def test_case_4(self):
         df = pd.DataFrame({'Value': np.random.lognormal(0, 1, 1000)})
-        self.assertFalse(f_336(df, 'Value', 0.05))
+        self.assertFalse(f_392(df, 'Value', 0.05))
     def test_case_5(self):
         df = pd.DataFrame({'Value': np.random.chisquare(1, 1000)})
-        self.assertFalse(f_336(df, 'Value', 0.05))
+        self.assertFalse(f_392(df, 'Value', 0.05))

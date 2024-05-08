@@ -3,7 +3,7 @@ from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
 
-def f_150(df1, df2, features=["feature1", "feature2", "feature3"], target="target"):
+def f_165(df1, df2, features=["feature1", "feature2", "feature3"], target="target"):
     """
     Perform linear regression analysis with specified characteristics and targets.
     The function should merge two dataframes based on the 'id' column, perform
@@ -30,7 +30,7 @@ def f_150(df1, df2, features=["feature1", "feature2", "feature3"], target="targe
     Example:
     >>> df1 = pd.DataFrame({'id': [1, 2, 3], 'feature1': [1.2, 3.4, 5.6], 'feature2': [2.3, 4.5, 6.7], 'feature3': [3.4, 5.6, 7.8]})
     >>> df2 = pd.DataFrame({'id': [1, 2, 3], 'target': [4.5, 6.7, 8.9]})
-    >>> result = f_150(df1, df2)
+    >>> result = f_165(df1, df2)
     >>> result['coefficients']
     [0.3333333333333334, 0.33333333333333354, 0.3333333333333335]
     >>> type(result['residuals_plot'])
@@ -75,13 +75,13 @@ class TestCases(unittest.TestCase):
         plt.close("all")
     # Test if the function returns the correct coefficients and intercept
     def test_case_1(self):
-        result = f_150(self.df1_sample, self.df2_sample)
+        result = f_165(self.df1_sample, self.df2_sample)
         for coef_actual, coef_expected in zip(result["coefficients"], [3.0, 3.0, 3.0]):
             self.assertAlmostEqual(coef_actual, coef_expected, places=7)
         self.assertAlmostEqual(result["intercept"], -3.0, places=7)
     # Test if the function returns the residuals plot
     def test_case_2(self):
-        result = f_150(self.df1_sample, self.df2_sample)
+        result = f_165(self.df1_sample, self.df2_sample)
         self.assertTrue(isinstance(result["residuals_plot"], plt.Axes))
     # Test if the residuals plot contains the right number of data points
     def test_case_3(self):
@@ -94,7 +94,7 @@ class TestCases(unittest.TestCase):
             }
         )
         df2 = pd.DataFrame({"id": [1, 2, 3], "target": [12, 30, 48]})
-        result = f_150(df1, df2)
+        result = f_165(df1, df2)
         self.assertEqual(len(result["residuals_plot"].collections), 1)
     # Test if the intercept of the model is correct
     def test_case_4(self):
@@ -107,11 +107,11 @@ class TestCases(unittest.TestCase):
             }
         )
         df2 = pd.DataFrame({"id": [1, 2, 3], "target": [10, 11, 12]})
-        result = f_150(df1, df2)
+        result = f_165(df1, df2)
         self.assertAlmostEqual(result["intercept"], 6.0, places=7)
     # Test the coefficients and intercept for a different set of data
     def test_case_5(self):
-        result = f_150(self.df1_sample, self.df2_sample)
+        result = f_165(self.df1_sample, self.df2_sample)
         for coef_actual, coef_expected in zip(result["coefficients"], [3.0, 3.0, 3.0]):
             self.assertAlmostEqual(coef_actual, coef_expected, places=7)
         self.assertAlmostEqual(result["intercept"], -3.0, places=7)
@@ -128,7 +128,7 @@ class TestCases(unittest.TestCase):
         df2 = pd.DataFrame(
             {"id": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "target": list(range(30, 40))}
         )
-        result = f_150(df1, df2)
+        result = f_165(df1, df2)
         model = LinearRegression().fit(
             df1[["feature1", "feature2", "feature3"]], df2["target"]
         )
@@ -147,7 +147,7 @@ class TestCases(unittest.TestCase):
             }
         )
         df2 = pd.DataFrame({"id": [1, 2, 3], "target": [10, 11, 12]})
-        result = f_150(df1, df2)
+        result = f_165(df1, df2)
         self.assertEqual(result["residuals_plot"].get_title(), "Residuals Plot")
         self.assertTrue(result["residuals_plot"].grid)
         self.assertEqual(len(result["residuals_plot"].lines), 1)

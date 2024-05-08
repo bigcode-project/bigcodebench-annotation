@@ -2,7 +2,7 @@ import pandas as pd
 import random
 
 
-def f_232(dictionary, item, seed):
+def f_266(dictionary, item, seed):
     """
     Converts a dictionary to a pandas DataFrame and find the locations of a particular item in the resulting DataFrame.
     Counts the number of occurences and adds a random integer x, where 0 <=x < 10, to it.
@@ -23,13 +23,13 @@ def f_232(dictionary, item, seed):
 
     Example:
     >>> dict = {'A': ['apple', 'banana'], 'B': ['orange', 'apple']}
-    >>> f_232(dict, 'apple', seed=12)
+    >>> f_266(dict, 'apple', seed=12)
     ([(0, 'A'), (1, 'B')], 9,         A       B
     0   apple  orange
     1  banana   apple)
     
     >>> dict = {'A': ['a', 'b', 'e'], 'B': ['c', 'd', 'd'], '2': ['asdf', 'ddd', 'aaaa'], '12': ['e', 'e', 'd']}
-    >>> f_232(dict, 'e', seed=2)
+    >>> f_266(dict, 'e', seed=2)
     ([(2, 'A'), (0, '12'), (1, '12')], 3,    A  B     2 12
     0  a  c  asdf  e
     1  b  d   ddd  e
@@ -50,7 +50,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Simple dict
         dictionary = {'A': ['apple', 'banana'], 'B': ['orange', 'apple']}
-        result, count, df = f_232(dictionary, 'apple', 2222)
+        result, count, df = f_266(dictionary, 'apple', 2222)
         expected_result = [(0, 'A'), (1, 'B')]
         self.assertCountEqual(result, expected_result)
         self.assertEqual(count, 5)
@@ -58,7 +58,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # No occurrence of the item
         dictionary = {'A': ['orange', 'banana'], 'B': ['orange', 'banana']}
-        result, count, df = f_232(dictionary, 'apple', seed=12)
+        result, count, df = f_266(dictionary, 'apple', seed=12)
         expected_result = []
         self.assertCountEqual(result, expected_result)
         self.assertEqual(count, 7)
@@ -71,7 +71,7 @@ class TestCases(unittest.TestCase):
             'B': [fake.random_element(elements=('apple', 'banana', 'orange')) for _ in range(10)],
             'C': [fake.random_element(elements=('apple', 'banana', 'orange')) for _ in range(10)]
         }
-        result, count, df = f_232(dictionary, 'apple', seed=22)
+        result, count, df = f_266(dictionary, 'apple', seed=22)
         expected_result = [(index, col) for col in df for index, val in enumerate(df[col]) if val == 'apple']
         self.assertCountEqual(result, expected_result)
         self.assertEqual(count, 10)
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Empty dict
         dictionary = {}
-        result, count, df = f_232(dictionary, 'apple', seed=112)
+        result, count, df = f_266(dictionary, 'apple', seed=112)
         expected_result = []
         self.assertCountEqual(result, expected_result)
         self.assertEqual(count, 7)
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
             'A': [1, 2, 3, 4, 5],
             'B': [2, 3, 4, 5, 6]
         }
-        result, count, df = f_232(dictionary, 3, seed=32)
+        result, count, df = f_266(dictionary, 3, seed=32)
         expected_result = [(2, 'A'), (1, 'B')]
         self.assertCountEqual(result, expected_result)
         self.assertEqual(count, 3)

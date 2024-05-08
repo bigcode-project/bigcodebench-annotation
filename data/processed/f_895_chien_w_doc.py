@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def f_661(data_dict):
+def f_778(data_dict):
     """
     Analyze the uniformity of a distribution represented by a dictionary of categories and their counts,
     and create a description to introduce this distribution.
@@ -36,7 +36,7 @@ def f_661(data_dict):
 
     Example:
     >>> data = {'A': 2, 'B': 3, 'C': 4, 'D': 1, 'E': 2}
-    >>> ax, message = f_661(data)
+    >>> ax, message = f_778(data)
     >>> print(message)
     The distribution is not uniform.
     """
@@ -65,29 +65,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 import unittest
 class TestCases(unittest.TestCase):
-    """Tests for f_661."""
+    """Tests for f_778."""
     def test_uniform_distribution(self):
         """Test whether the function correctly identifies a uniform distribution."""
         data = {"A": 5, "B": 5, "C": 5}
-        _, message = f_661(data)
+        _, message = f_778(data)
         self.assertEqual(message, "The distribution is uniform.")
     def test_non_uniform_distribution(self):
         """Test whether the function correctly identifies a non-uniform distribution."""
         data = {"A": 3, "B": 2, "C": 4}
-        _, message = f_661(data)
+        _, message = f_778(data)
         self.assertEqual(message, "The distribution is not uniform.")
     def test_empty_dictionary(self):
         """Test the function with an empty dictionary."""
         data = {}
-        _, message = f_661(data)
+        _, message = f_778(data)
         self.assertEqual(message, "The distribution is uniform.")
     def test_single_category(self):
         """Test the function with a single category."""
         data = {"A": 1}
-        _, message = f_661(data)
+        _, message = f_778(data)
         self.assertEqual(message, "The distribution is uniform.")
     def test_large_distribution(self):
         """Test the function with a large number of categories."""
         data = {chr(i): i for i in range(65, 91)}  # A to Z with ascending counts
-        _, message = f_661(data)
+        _, message = f_778(data)
         self.assertEqual(message, "The distribution is not uniform.")

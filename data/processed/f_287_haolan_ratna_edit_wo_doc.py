@@ -7,7 +7,7 @@ import sys
 DIRECTORY = 'c:\Program Files\VMware\VMware Server'
 BACKUP_DIRECTORY = 'c:\Program Files\VMware\VMware Server\Backup'
 
-def f_408(filename):
+def f_478(filename):
     """
     Backs up a specified file from a predefined directory to a backup directory and executes it as a subprocess.
     
@@ -22,9 +22,9 @@ def f_408(filename):
     - shutil
 
     Example:
-    >>> f_408('vmware-cmd.bat') # Assuming successful execution
+    >>> f_478('vmware-cmd.bat') # Assuming successful execution
     0
-    >>> f_408('nonexistent.bat') # If backup fails or file doesn't exist
+    >>> f_478('nonexistent.bat') # If backup fails or file doesn't exist
     -1
     """
     file_path = os.path.join(DIRECTORY, filename)
@@ -53,13 +53,13 @@ class TestCases(unittest.TestCase):
                 with patch('shutil.copy', return_value=None):  # Mock shutil.copy to avoid actual file operations
                     with patch('subprocess.Popen') as mock_popen:
                         mock_popen.return_value.poll.return_value = 0
-                        result = f_408(test_filename)
+                        result = f_478(test_filename)
         self.assertEqual(result, 0)
     def test_failed_backup_nonexistent_file(self):
         # Test with a non-existent file to simulate backup failure
         test_filename = 'nonexistent_file.bat'
         with patch('os.path.exists', return_value=False):
-            result = f_408(test_filename)
+            result = f_478(test_filename)
         self.assertEqual(result, -1)
     def test_failed_backup_non_executable_file(self):
         # Test with an existing but non-executable file
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
                 with patch('shutil.copy', return_value=None):  # Mock shutil.copy to avoid actual file operations
                     with patch('subprocess.Popen') as mock_popen:
                         mock_popen.side_effect = FileNotFoundError("File not executable")
-                        result = f_408(test_filename)
+                        result = f_478(test_filename)
         self.assertNotEqual(result, 0)
     def test_backup_of_large_file(self):
         # Test backing up a large file (size testing)
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
                 with patch('shutil.copy', return_value=None):  # Mock shutil.copy to avoid actual file operations
                     with patch('subprocess.Popen') as mock_popen:
                         mock_popen.return_value.poll.return_value = 0
-                        result = f_408(test_filename)
+                        result = f_478(test_filename)
         self.assertEqual(result, 0)
     def test_backup_with_special_characters(self):
         # Test with a file name containing special characters
@@ -88,5 +88,5 @@ class TestCases(unittest.TestCase):
             with patch('os.access', return_value=True):
                  with patch('shutil.copy', side_effect=Exception("Special character failed")):  # Mock shutil.copy to simulate backup failure
                     with patch('subprocess.Popen') as mock_popen:
-                        result = f_408(test_filename)
+                        result = f_478(test_filename)
         self.assertEqual(result, -1)

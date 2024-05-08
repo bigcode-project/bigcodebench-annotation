@@ -3,7 +3,7 @@ import random
 from faker import Faker
 
 
-def f_301(file_path, num_rows, random_seed=None):
+def f_350(file_path, num_rows, random_seed=None):
     """
     Generate a CSV file on a specific file path with fake personal data.
     The personal data consists of the following columns:
@@ -33,10 +33,10 @@ def f_301(file_path, num_rows, random_seed=None):
     - faker
 
     Example:
-    >>> f_301('/tmp/people.csv', 100)
+    >>> f_350('/tmp/people.csv', 100)
     '/tmp/people.csv'
 
-    >>> path = f_301('test.csv', 5, random_seed=12)
+    >>> path = f_350('test.csv', 5, random_seed=12)
     >>> with open(path, 'r') as file:
     >>>     reader = csv.reader(file)
     >>>     rows = list(reader)
@@ -78,8 +78,8 @@ class TestCases(unittest.TestCase):
         self.folder_path = tempfile.mkdtemp()
         self.file_path = os.path.join(self.folder_path, 'test.csv')
     def test_rng(self):
-        res_path1 = f_301(os.path.join(self.folder_path, 'test1.csv'), 45, random_seed=42)
-        res_path2 = f_301(os.path.join(self.folder_path, 'test2.csv'), 45, random_seed=42)
+        res_path1 = f_350(os.path.join(self.folder_path, 'test1.csv'), 45, random_seed=42)
+        res_path2 = f_350(os.path.join(self.folder_path, 'test2.csv'), 45, random_seed=42)
         with open(res_path1, 'r') as file:
             reader = csv.reader(file)
             rows1 = list(reader)
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(rows1, rows2)
     def test_case_1(self):
         num_rows = 10
-        result_path = f_301(self.file_path, num_rows, random_seed=12)
+        result_path = f_350(self.file_path, num_rows, random_seed=12)
         self.assertTrue(os.path.exists(result_path))
         with open(result_path, 'r') as file:
             reader = csv.reader(file)
@@ -140,7 +140,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # 0 rows
         num_rows = 0
-        result_path = f_301(self.file_path, num_rows)
+        result_path = f_350(self.file_path, num_rows)
         self.assertTrue(os.path.exists(result_path))
         with open(result_path, 'r') as file:
             reader = csv.reader(file)
@@ -150,7 +150,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # large amount of rows
         num_rows = 1000
-        result_path = f_301(self.file_path, num_rows)
+        result_path = f_350(self.file_path, num_rows)
         self.assertTrue(os.path.exists(result_path))
         df = pd.read_csv(result_path)
         self.assertTrue(df['Age'].between(20, 60, inclusive='both').all())
@@ -158,5 +158,5 @@ class TestCases(unittest.TestCase):
         os.remove(result_path)
     def test_case_4(self):
         #negative rows
-        self.assertRaises(Exception, f_301, self.file_path, -2)
-        self.assertRaises(Exception, f_301, self.file_path, 1.2)
+        self.assertRaises(Exception, f_350, self.file_path, -2)
+        self.assertRaises(Exception, f_350, self.file_path, 1.2)

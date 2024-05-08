@@ -4,7 +4,7 @@ import queue
 from datetime import datetime, timedelta
 
 
-def f_727(
+def f_864(
     server_address="localhost", server_port=12345, buffer_size=1024, run_duration=5
 ):
     """
@@ -26,7 +26,7 @@ def f_727(
     - datetime
 
     Example:
-    >>> print(f_727())
+    >>> print(f_864())
     'Server started on localhost:12345. Ran for 5 seconds.'
     """
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -76,11 +76,11 @@ import socket
 import time
 import threading
 class TestCases(unittest.TestCase):
-    """Test cases for the f_727 function."""
+    """Test cases for the f_864 function."""
     def setUp(self):
         # Start the server in a separate thread
         self.server_thread = threading.Thread(
-            target=f_727, args=("localhost", 12345, 1024, 10)
+            target=f_864, args=("localhost", 12345, 1024, 10)
         )
         self.server_thread.start()
         time.sleep(1)

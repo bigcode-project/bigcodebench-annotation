@@ -3,7 +3,7 @@ import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 
 
-def f_121(df1, df2):
+def f_132(df1, df2):
     """
     Merge two dataframes on the 'id' column and then scale the numeric features.
 
@@ -27,7 +27,7 @@ def f_121(df1, df2):
     Example:
     >>> df1 = pd.DataFrame({'id': [1, 2, 3], 'feature1': [1.2, 3.4, 5.6], 'feature2': [2.3, 4.5, 6.7]})
     >>> df2 = pd.DataFrame({'id': [1, 2, 3], 'feature4': [4.5, 6.7, 8.9], 'feature5': [5.6, 7.8, 9.0]})
-    >>> scaled_df, plot = f_121(df1, df2)
+    >>> scaled_df, plot = f_132(df1, df2)
     >>> scaled_df
        id  feature1  feature2  feature4  feature5
     0   1 -1.224745 -1.224745       4.5       5.6
@@ -71,7 +71,7 @@ class TestCases(unittest.TestCase):
         df2 = pd.DataFrame(
             {"id": [1, 2, 3], "feature4": [4.5, 6.7, 8.9], "feature5": [5.6, 7.8, 9.0]}
         )
-        scaled_df, _ = f_121(df1, df2)
+        scaled_df, _ = f_132(df1, df2)
         self.assertEqual(
             list(scaled_df.columns),
             ["id", "feature1", "feature2", "feature3", "feature4", "feature5"],
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
         df2 = pd.DataFrame(
             {"id": [1, 5, 3], "feature4": [7, 17, 27], "feature5": [8, 18, 28]}
         )
-        scaled_df, _ = f_121(df1, df2)
+        scaled_df, _ = f_132(df1, df2)
         self.assertAlmostEqual(scaled_df["feature2"].std(), 1.224745, places=5)
     def test_case_3(self):
         # Negative values and merging on 'id' and checking scaled values
@@ -105,7 +105,7 @@ class TestCases(unittest.TestCase):
         df2 = pd.DataFrame(
             {"id": [1, 2, 3], "feature4": [-11, -12, -13], "feature5": [-14, -15, -16]}
         )
-        scaled_df, _ = f_121(df1, df2)
+        scaled_df, _ = f_132(df1, df2)
         self.assertAlmostEqual(scaled_df["feature3"].max(), 1.224745, places=5)
     def test_case_4(self):
         # Zero values and checking if scaled values remain zero
@@ -120,7 +120,7 @@ class TestCases(unittest.TestCase):
         df2 = pd.DataFrame(
             {"id": [1, 2, 3, 4], "feature4": [0, 0, 0, 0], "feature5": [0, 0, 0, 0]}
         )
-        scaled_df, _ = f_121(df1, df2)
+        scaled_df, _ = f_132(df1, df2)
         self.assertAlmostEqual(scaled_df["feature1"].min(), 0, places=5)
     def test_case_5(self):
         # Large values and checking scaled min values
@@ -133,7 +133,7 @@ class TestCases(unittest.TestCase):
             }
         )
         df2 = pd.DataFrame({"id": [1, 2], "feature4": [10, 20], "feature5": [1, 2]})
-        scaled_df, _ = f_121(df1, df2)
+        scaled_df, _ = f_132(df1, df2)
         self.assertAlmostEqual(scaled_df["feature2"].min(), -1, places=5)
     def test_case_6(self):
         # Testing the plot's attributes
@@ -148,7 +148,7 @@ class TestCases(unittest.TestCase):
         df2 = pd.DataFrame(
             {"id": [1, 2, 3], "feature4": [10, 11, 12], "feature5": [13, 14, 15]}
         )
-        _, pair_plot = f_121(df1, df2)
+        _, pair_plot = f_132(df1, df2)
         # Checking if the pair plot has the expected attributes
         self.assertEqual(
             len(pair_plot.axes), 3
@@ -160,7 +160,7 @@ class TestCases(unittest.TestCase):
         # Testing with empty dataframes
         df1 = pd.DataFrame(columns=["id", "feature1", "feature2", "feature3"])
         df2 = pd.DataFrame(columns=["id", "feature4", "feature5"])
-        scaled_df, _ = f_121(df1, df2)
+        scaled_df, _ = f_132(df1, df2)
         self.assertTrue(scaled_df.empty)
     def test_case_8(self):
         # Testing with NaN values in the dataframes
@@ -175,7 +175,7 @@ class TestCases(unittest.TestCase):
         df2 = pd.DataFrame(
             {"id": [1, 2, 3], "feature4": [10, 11, 12], "feature5": [13, 14, 15]}
         )
-        scaled_df, _ = f_121(df1, df2)
+        scaled_df, _ = f_132(df1, df2)
         self.assertTrue(scaled_df.isnull().any().any())  # Checking if NaN values exist
     def tearDown(self):
         plt.close("all")

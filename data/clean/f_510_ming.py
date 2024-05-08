@@ -1,12 +1,12 @@
 import numpy as np
 import pandas as pd
 from dateutil.parser import parse
-DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
 
 
 def f_510(dates_str_list):
     """
-    Analyze the weekday distribution in a list of date strings.
+    Analyze the weekday distribution in a list of date strings. Implemented by dateutil.parser.
 
     This function takes a list of date strings in "yyyy-mm-dd" format, calculates 
     the weekday for each date, and returns a distribution of the weekdays.
@@ -36,6 +36,7 @@ def f_510(dates_str_list):
     Sunday       1
     dtype: int64
     """
+    DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     weekdays = [parse(date_str).weekday() for date_str in dates_str_list]
     weekday_counts = np.bincount(weekdays, minlength=7)
     
@@ -50,6 +51,7 @@ def run_tests():
     suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
+DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 
 class TestCases(unittest.TestCase):

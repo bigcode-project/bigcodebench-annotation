@@ -12,7 +12,7 @@ class LoginForm(FlaskForm):
 
 login_manager = LoginManager()
 
-def f_306(secret_key, template_folder):
+def f_355(secret_key, template_folder):
     """
     Creates a Flask application with configured user authentication using Flask-Login.
     It defines routes for login, logout, and a protected page. The user authentication
@@ -35,7 +35,7 @@ def f_306(secret_key, template_folder):
         Flask: A Flask application instance configured for user authentication.
 
     Examples:
-    >>> app = f_306('mysecretkey', 'templates')
+    >>> app = f_355('mysecretkey', 'templates')
     >>> 'login' in [rule.endpoint for rule in app.url_map.iter_rules()]
     True
     >>> app.config['SECRET_KEY'] == 'mysecretkey'
@@ -108,7 +108,7 @@ class TestCases(unittest.TestCase):
 </html>
     """)
         # Create the app with testing configurations
-        self.app = f_306(self.secret_key, self.template_folder)
+        self.app = f_355(self.secret_key, self.template_folder)
         self.app.config['TESTING'] = True
         self.app.config['DEBUG'] = True
         self.client = self.app.test_client()
@@ -118,21 +118,21 @@ class TestCases(unittest.TestCase):
             shutil.rmtree(self.template_folder)
     def test_app(self):
         """Test if the function returns a Flask app instance."""
-        app = f_306(self.secret_key, self.template_folder)
+        app = f_355(self.secret_key, self.template_folder)
         self.assertIsInstance(app, Flask, "The function should return a Flask app instance.")
     def test_protected_route_access(self):
         """Test if the protected route redirects to login when not authenticated."""
-        app = f_306(self.secret_key, self.template_folder)
+        app = f_355(self.secret_key, self.template_folder)
         with app.test_client() as client:
             response = client.get('/protected', follow_redirects=True)
             self.assertNotIn('Logged in as:', response.data.decode())
     def test_secret_key(self):
         """Test if the secret key is set correctly."""
-        app = f_306(self.secret_key, self.template_folder)
+        app = f_355(self.secret_key, self.template_folder)
         self.assertEqual(app.config['SECRET_KEY'], self.secret_key, "The secret key should be set correctly.")
     def test_login_page_accessibility(self):
         """Test if the login page is accessible."""
-        app = f_306(self.secret_key, self.template_folder)
+        app = f_355(self.secret_key, self.template_folder)
         with app.test_client() as client:
             response = client.get('/login')
             self.assertEqual(response.status_code, 200, "The login page should be accessible.")
@@ -140,7 +140,7 @@ class TestCases(unittest.TestCase):
     @patch('flask_login.LoginManager.init_app')
     def test_login_manager_initialization(self, mock_init_app):
         """Test if LoginManager is initialized within the function."""
-        app = f_306(self.secret_key, self.template_folder)
+        app = f_355(self.secret_key, self.template_folder)
         mock_init_app.assert_called_once_with(app)
     def test_logout_route_redirects_to_login(self):
         with self.client as client:

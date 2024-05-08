@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 def f_440(a, b):
     """
-    Calculate the Euclidean distance between two lists, create a Pandas DataFrame from these lists, 
-    and then draw the values with a line displaying the Euclidean distance.
+    Calculate the Euclidean distance between two lists, create a Pandas DataFrame from these lists
+    with indices 'A' and 'B', and then draw the values with a line displaying the Euclidean distance.
 
     Parameters:
     a (list): A list of numbers.

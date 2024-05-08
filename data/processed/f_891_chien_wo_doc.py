@@ -3,7 +3,7 @@ import random
 import matplotlib.pyplot as plt
 
 
-def f_177(date_str):
+def f_202(date_str):
     """
     Generates a list of random integers, where the count of integers equals the day of the month in the
     provided date, then generates a line plot of these integers and returns the Axes object of the plot.
@@ -20,7 +20,7 @@ def f_177(date_str):
     - matplotlib.pyplot
 
     Example:
-    >>> ax = f_177('2023-06-15')
+    >>> ax = f_202('2023-06-15')
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
@@ -35,13 +35,13 @@ import unittest
 import matplotlib.axes
 from datetime import datetime
 class TestCases(unittest.TestCase):
-    """Test cases for f_177."""
+    """Test cases for f_202."""
     def test_mid_month(self):
         """
         Test the function with a mid-month date.
         Checks if the generated plot has 15 data points for a date like '2023-06-15'.
         """
-        ax = f_177("2023-06-15")
+        ax = f_202("2023-06-15")
         self.assertIsInstance(ax, matplotlib.axes.Axes)
         self.assertEqual(len(ax.lines[0].get_ydata()), 15)
     def test_beginning_of_month(self):
@@ -49,7 +49,7 @@ class TestCases(unittest.TestCase):
         Test the function with a date at the beginning of the month.
         Checks if the plot has 1 data point for a date like '2023-06-01'.
         """
-        ax = f_177("2023-06-01")
+        ax = f_202("2023-06-01")
         self.assertIsInstance(ax, matplotlib.axes.Axes)
         self.assertEqual(len(ax.lines[0].get_ydata()), 1)
     def test_end_of_month(self):
@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
         Test the function with a date at the end of the month.
         Checks if the plot has 31 data points for a date like '2023-07-31'.
         """
-        ax = f_177("2023-07-31")
+        ax = f_202("2023-07-31")
         self.assertIsInstance(ax, matplotlib.axes.Axes)
         self.assertEqual(len(ax.lines[0].get_ydata()), 31)
     def test_leap_year(self):
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
         Test the function with a leap year date.
         Checks if the plot has 29 data points for a leap year date like '2024-02-29'.
         """
-        ax = f_177("2024-02-29")
+        ax = f_202("2024-02-29")
         self.assertIsInstance(ax, matplotlib.axes.Axes)
         self.assertEqual(len(ax.lines[0].get_ydata()), 29)
     def test_invalid_date(self):
@@ -74,6 +74,6 @@ class TestCases(unittest.TestCase):
         Expects a ValueError to be raised for an incorrectly formatted date.
         """
         with self.assertRaises(ValueError):
-            f_177("2023/06/15")
+            f_202("2023/06/15")
     def tearDown(self):
         plt.clf()

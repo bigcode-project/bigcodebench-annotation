@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 N_COMPONENTS = 2
 
 
-def f_602(L):
+def f_714(L):
     """
     Convert a list of lists 'L' into a 2D numeric array, apply PCA to it and return the PCA result and scatter plot.
     
@@ -22,7 +22,7 @@ def f_602(L):
     tuple: A tuple containing the PCA result (numpy array) and the scatter plot (matplotlib Axes object).
 
     Example:
-    >>> pca_result, plot = f_602([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    >>> pca_result, plot = f_714([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     >>> type(pca_result)
     <class 'numpy.ndarray'>
     """
@@ -37,31 +37,31 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         test_input = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-        pca_result, plot = f_602(test_input)
+        pca_result, plot = f_714(test_input)
         self.assertIsInstance(pca_result, np.ndarray)
         self.assertIsInstance(plot, plt.Axes)
         self.assertEqual(pca_result.shape, (3, 2))
     def test_case_2(self):
         test_input = [[1, 1], [1, 1], [1, 1]]
-        pca_result, plot = f_602(test_input)
+        pca_result, plot = f_714(test_input)
         self.assertIsInstance(pca_result, np.ndarray)
         self.assertIsInstance(plot, plt.Axes)
         self.assertEqual(pca_result.shape, (3, 2))
     def test_case_3(self):
         test_input = [[1, 2], [3, 4], [5, 6], [7, 8]]
-        pca_result, plot = f_602(test_input)
+        pca_result, plot = f_714(test_input)
         self.assertIsInstance(pca_result, np.ndarray)
         self.assertIsInstance(plot, plt.Axes)
         self.assertEqual(pca_result.shape, (4, 2))
     def test_case_4(self):
         test_input = [[-1, -2], [-3, -4], [-5, -6]]
-        pca_result, plot = f_602(test_input)
+        pca_result, plot = f_714(test_input)
         self.assertIsInstance(pca_result, np.ndarray)
         self.assertIsInstance(plot, plt.Axes)
         self.assertEqual(pca_result.shape, (3, 2))
     def test_case_5(self):
         test_input = [[-1, 2], [3, -4], [5, -6]]
-        pca_result, plot = f_602(test_input)
+        pca_result, plot = f_714(test_input)
         self.assertIsInstance(pca_result, np.ndarray)
         self.assertIsInstance(plot, plt.Axes)
         self.assertEqual(pca_result.shape, (3, 2))

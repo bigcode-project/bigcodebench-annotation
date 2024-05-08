@@ -5,7 +5,7 @@ from sklearn.decomposition import PCA
 
 def f_523(x, y, labels):
     """ 
-    Perform Principal Component Analysis (PCA) on "x" and "y" numpy arrays and record the results with labels.
+    Perform Principal Component Analysis (PCA) on "x" as x-values and "y" as y-values and record the results with labels.
 
     Parameters:
     x (list): List of numpy arrays representing the x-values of the data points.

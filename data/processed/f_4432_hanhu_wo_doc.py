@@ -3,7 +3,7 @@ import ctypes
 from datetime import datetime
 import pytz
 
-def f_73(filepath):
+def f_78(filepath):
     """
     Loads a DLL file from the specified filepath and returns its metadata, including creation time,
     modification time, and file size. The times are displayed in UTC format. This function
@@ -24,9 +24,9 @@ def f_73(filepath):
     - pytz
 
     Examples:
-    >>> isinstance(f_73('libc.so.6'), str) # Doctest will vary based on the system and DLL file availability.
+    >>> isinstance(f_78('libc.so.6'), str) # Doctest will vary based on the system and DLL file availability.
     True
-    >>> 'libc.so.6' in f_73('libc.so.6')
+    >>> 'libc.so.6' in f_78('libc.so.6')
     True
     """
     metadata = dict()
@@ -58,20 +58,20 @@ class TestCases(unittest.TestCase):
         self.assertTrue(os.path.exists(self.filepath))
     def test_invalid_file_path(self):
         with self.assertRaises(OSError):
-            f_73('invalid_path.dll')
+            f_78('invalid_path.dll')
     @patch('ctypes.CDLL')
     @patch('os.stat')
     def test_return_value(self, mock_stat, mock_cdll):
         """Verify that the function returns the name of the DLL file."""
         mock_cdll.return_value._name = 'test.dll'
-        result, metadata = f_73('path/to/test.dll')
+        result, metadata = f_78('path/to/test.dll')
         self.assertEqual(result, 'test.dll')
         self.assertIsInstance(metadata, dict)
     @patch('ctypes.CDLL', side_effect=OSError("File not found"))
     def test_nonexistent_file(self, mock_cdll):
         """Ensure function handles nonexistent files appropriately."""
         with self.assertRaises(OSError) as context:
-            f_73('path/to/nonexistent.dll')
+            f_78('path/to/nonexistent.dll')
         self.assertEqual(str(context.exception), "File not found")
     @patch('os.stat')
     @patch('ctypes.CDLL')
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
             'Size': 123456
         }
         # Call the function
-        result, metadata = f_73('path/to/test.dll')
+        result, metadata = f_78('path/to/test.dll')
         # Check if the output matches the expected dictionary
         self.assertEqual(result, 'test.dll', expected_output)
         self.assertEqual(metadata, expected_output)

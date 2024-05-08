@@ -6,9 +6,12 @@ TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 GOALS_RANGE = (-10, 10)
 
 
-def f_63(goals, penalties):
+def f_67(goals, penalties):
     """
-    Calculates the net score for each team, returns a scores distribution DataFrame, and plots the distribution.
+    Calculates net scores for teams ('Team A' to 'Team E') by subtracting penalties from goals and clips scores to stay
+    within -10 to 10. Visualizes results with a bar chart showing each team's adjusted scores 'Team' on the x-axis and
+    score values 'Score' on the y-axis.
+
 
     Parameters:
     - goals (dict): A dictionary where keys are team names and values are the number of goals scored.
@@ -24,7 +27,7 @@ def f_63(goals, penalties):
     Example:
     >>> goals = {'Team A': 5, 'Team B': 3, 'Team C': 1, 'Team D': 0, 'Team E': 4}
     >>> penalties = {'Team A': 1, 'Team B': 1, 'Team C': 1, 'Team D': 0, 'Team E': 2}
-    >>> df = f_63(goals, penalties)
+    >>> df = f_67(goals, penalties)
     >>> print(df)
          Team  Score
     0  Team A      4
@@ -57,24 +60,24 @@ class TestCases(unittest.TestCase):
     def test_no_goals_no_penalties(self):
         goals, penalties = {}, {}
         expected = pd.DataFrame({'Team': TEAMS, 'Score': [0] * 5})
-        pd.testing.assert_frame_equal(f_63(goals, penalties), expected)
+        pd.testing.assert_frame_equal(f_67(goals, penalties), expected)
     def test_goals_no_penalties(self):
         goals = {team: index for index, team in enumerate(TEAMS, start=1)}
         penalties = {}
         expected = pd.DataFrame({'Team': TEAMS, 'Score': [1, 2, 3, 4, 5]})
-        pd.testing.assert_frame_equal(f_63(goals, penalties), expected)
+        pd.testing.assert_frame_equal(f_67(goals, penalties), expected)
     def test_goals_with_penalties(self):
         goals = {team: 5 for team in TEAMS}
         penalties = {team: 2 for team in TEAMS}
         expected = pd.DataFrame({'Team': TEAMS, 'Score': [3] * 5})
-        pd.testing.assert_frame_equal(f_63(goals, penalties), expected)
+        pd.testing.assert_frame_equal(f_67(goals, penalties), expected)
     def test_clipping_negative_scores(self):
         goals = {team: -15 for team in TEAMS}
         penalties = {team: 0 for team in TEAMS}
         expected = pd.DataFrame({'Team': TEAMS, 'Score': [-10] * 5})
-        pd.testing.assert_frame_equal(f_63(goals, penalties), expected)
+        pd.testing.assert_frame_equal(f_67(goals, penalties), expected)
     def test_clipping_positive_scores(self):
         goals = {team: 20 for team in TEAMS}
         penalties = {team: 0 for team in TEAMS}
         expected = pd.DataFrame({'Team': TEAMS, 'Score': [10] * 5})
-        pd.testing.assert_frame_equal(f_63(goals, penalties), expected)
+        pd.testing.assert_frame_equal(f_67(goals, penalties), expected)

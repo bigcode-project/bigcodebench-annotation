@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def f_152(file_path: str, plot_path: str) -> (float, float, str):
+def f_168(file_path: str, plot_path: str) -> (float, float, str):
     """
     Processes a CSV file at the given path by reading its contents, cleaning the data,
     performing statistical analysis, and generating a plot, which is saved to the specified path.
@@ -33,7 +33,7 @@ def f_152(file_path: str, plot_path: str) -> (float, float, str):
     - numpy
 
     Example:
-    >>> f_152("sample_data.csv", "output_plot.png")
+    >>> f_168("sample_data.csv", "output_plot.png")
     (25.5, 23.0, "output_plot.png")
     """
     if not os.path.isfile(file_path):
@@ -66,10 +66,10 @@ import numpy as np
 import pandas as pd
 import shutil
 class TestCases(unittest.TestCase):
-    """Test cases for the f_152 function."""
+    """Test cases for the f_168 function."""
     def setUp(self):
         # Create a directory for test files if it doesn't exist
-        self.test_dir = "mnt/data/f_152_data_test"
+        self.test_dir = "mnt/data/f_168_data_test"
         os.makedirs(self.test_dir, exist_ok=True)
         # Create a valid data file
         self.valid_data_path = os.path.join(self.test_dir, "valid_data.csv")
@@ -106,7 +106,7 @@ class TestCases(unittest.TestCase):
     def test_valid_input(self):
         """Test that the function runs without errors and returns the correct output."""
         plot_path = os.path.join(self.test_dir, "valid_plot.png")
-        mean, median, plot_path = f_152(self.valid_data_path, plot_path)
+        mean, median, plot_path = f_168(self.valid_data_path, plot_path)
         self.assertIsInstance(mean, float)
         self.assertIsInstance(median, float)
         self.assertTrue(os.path.exists(plot_path))
@@ -114,11 +114,11 @@ class TestCases(unittest.TestCase):
         """Test that the function raises a FileNotFoundError when the specified file does not exist."""
         plot_path = os.path.join(self.test_dir, "not_found_plot.png")
         with self.assertRaises(FileNotFoundError):
-            f_152(os.path.join(self.test_dir, "non_existent_file.csv"), plot_path)
+            f_168(os.path.join(self.test_dir, "non_existent_file.csv"), plot_path)
     def test_empty_file(self):
         """Test that the function returns NaN for mean and median when the file is empty."""
         plot_path = os.path.join(self.test_dir, "empty_plot.png")
-        mean, median, returned_plot_path = f_152(self.empty_data_path, plot_path)
+        mean, median, returned_plot_path = f_168(self.empty_data_path, plot_path)
         self.assertTrue(np.isnan(mean))
         self.assertTrue(np.isnan(median))
         self.assertFalse(
@@ -127,35 +127,35 @@ class TestCases(unittest.TestCase):
     def test_non_numeric_data(self):
         """Test that the function returns NaN for mean and median when the file contains non-numeric data."""
         plot_path = os.path.join(self.test_dir, "non_numeric_plot.png")
-        mean, median, returned_plot_path = f_152(self.non_numeric_data_path, plot_path)
+        mean, median, returned_plot_path = f_168(self.non_numeric_data_path, plot_path)
         self.assertTrue(np.isnan(mean))
         self.assertTrue(np.isnan(median))
         self.assertTrue(os.path.exists(returned_plot_path))
     def test_large_data(self):
         """Test that the function runs without errors and returns the correct output for a large data file."""
         plot_path = os.path.join(self.test_dir, "large_data_plot.png")
-        mean, median, returned_plot_path = f_152(self.large_data_path, plot_path)
+        mean, median, returned_plot_path = f_168(self.large_data_path, plot_path)
         self.assertIsInstance(mean, float)
         self.assertIsInstance(median, float)
         self.assertTrue(os.path.exists(returned_plot_path))
     def test_data_with_nan_values(self):
         """Test that the function returns the correct output for a data file with NaN values."""
         plot_path = os.path.join(self.test_dir, "nan_data_plot.png")
-        mean, median, returned_plot_path = f_152(self.nan_data_path, plot_path)
+        mean, median, returned_plot_path = f_168(self.nan_data_path, plot_path)
         self.assertNotEqual(mean, np.nan)
         self.assertNotEqual(median, np.nan)
         self.assertTrue(os.path.exists(returned_plot_path))
     def test_single_value_data(self):
         """Test that the function returns the correct output for a data file with a single value."""
         plot_path = os.path.join(self.test_dir, "single_value_plot.png")
-        mean, median, returned_plot_path = f_152(self.single_value_path, plot_path)
+        mean, median, returned_plot_path = f_168(self.single_value_path, plot_path)
         self.assertEqual(mean, 42)
         self.assertEqual(median, 42)
         self.assertTrue(os.path.exists(returned_plot_path))
     def test_all_nan_data(self):
         """Test that the function returns NaN for mean and median when the file contains all NaN values."""
         plot_path = os.path.join(self.test_dir, "all_nan_plot.png")
-        mean, median, returned_plot_path = f_152(self.all_nan_path, plot_path)
+        mean, median, returned_plot_path = f_168(self.all_nan_path, plot_path)
         self.assertTrue(np.isnan(mean))
         self.assertTrue(np.isnan(median))
         self.assertTrue(os.path.exists(returned_plot_path))

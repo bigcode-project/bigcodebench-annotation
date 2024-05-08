@@ -6,9 +6,9 @@ import numpy as np
 def f_444(array_length=100):
     """
     Generate two arrays of random integers and draw a line diagram with the 
-    maximum values of the respective elements of the two arrays.
+    maximum values of the respective elements of the two arrays. Set 'Maximum Values' on its y-axis.
 
-    Args:
+    Parameters:
     - array_length (int): Length of the random arrays to be generated. Default is 100.
 
     Returns:
@@ -50,26 +50,30 @@ class TestCases(unittest.TestCase):
         ax = f_444(50)
         self.assertIsInstance(ax, Axes)
         self.assertEqual(len(ax.lines[0].get_ydata()), 50)
-        
-    def test_case_2(self):
-        ax = f_444(100)
-        self.assertIsInstance(ax, Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 100)
-        
-    def test_case_3(self):
-        ax = f_444(150)
-        self.assertIsInstance(ax, Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 150)
-        
-    def test_case_4(self):
-        ax = f_444(200)
-        self.assertIsInstance(ax, Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 200)
-        
-    def test_case_5(self):
-        ax = f_444(250)
-        self.assertIsInstance(ax, Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 250)
+
+    def test_standard_functionality(self):
+        """Test the function with default array length."""
+        ax = f_444()
+        self.assertIsInstance(ax, plt.Axes)
+
+    def test_zero_length_array(self):
+        """Test the function with zero array length."""
+        ax = f_444(0)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines[0].get_ydata()), 0)  # Expect no data points in the plot
+
+    def test_non_default_length_array(self):
+        """Test the function with non-default array lengths."""
+        lengths = [50, 200]
+        for length in lengths:
+            ax = f_444(length)
+            self.assertIsInstance(ax, plt.Axes)
+            self.assertEqual(len(ax.lines[0].get_ydata()), length)
+
+    def test_plot_output(self):
+        """Verify the plot is generated and is of correct type."""
+        ax = f_444()
+        self.assertTrue(hasattr(ax, 'figure'), "Plot does not have associated figure attribute")
 
 
 if __name__ == "__main__":

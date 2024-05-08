@@ -2,7 +2,7 @@ import pandas as pd
 from collections import Counter
 
 
-def f_271(data):
+def f_316(data):
     """
     Analyze a dictionary of student data to return a dataframe sorted by name and age in ascending order, 
     the average score per student as a pandas Series, and the most common age as an integer.
@@ -32,7 +32,7 @@ def f_271(data):
     ...     'Age': [20, 21, 19, 20, 19, 19, 21, 20, 19, 20],
     ...     'Score': [85, 79, 92, 88, 90, 92, 81, 86, 90, 85]
     ... }
-    >>> df, avg_scores, common_age = f_271(data)
+    >>> df, avg_scores, common_age = f_316(data)
     >>> print(df)
        Name  Age  Score
     2  John   19     92
@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
             'Scores': [85, 79]
         }
         with self.assertRaises(ValueError):
-            f_271(data)
+            f_316(data)
     def test_correct_processing(self):
         # Testing with correctly formatted data
         data = {
@@ -74,14 +74,14 @@ class TestCases(unittest.TestCase):
             'Age': [20, 21, 20, 19],
             'Score': [85, 79, 88, 92]
         }
-        df, avg_scores, common_age = f_271(data)
+        df, avg_scores, common_age = f_316(data)
         self.assertEqual(df.iloc[0]['Name'], 'John')
         self.assertAlmostEqual(avg_scores['Tom'], 86.5)
         self.assertEqual(common_age, 20)
     def test_empty_data(self):
         # Testing with empty lists
         data = {'Name': [], 'Age': [], 'Score': []}
-        df, avg_scores, common_age = f_271(data)
+        df, avg_scores, common_age = f_316(data)
         self.assertTrue(df.empty)
         self.assertTrue(avg_scores.empty)
         self.assertIsNone(common_age)
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
             'Age': [25, 25, 25],
             'Score': [88, 92, 85]
         }
-        df, avg_scores, common_age = f_271(data)
+        df, avg_scores, common_age = f_316(data)
         self.assertEqual(common_age, 25)
     def test_no_common_age(self):
         # Testing with no common age, each student has a unique age
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
             'Age': [24, 25, 26],
             'Score': [88, 92, 85]
         }
-        df, avg_scores, common_age = f_271(data)
+        df, avg_scores, common_age = f_316(data)
         self.assertEqual(common_age, 24)  # Assuming the first element is taken if all are equally common
     def test_duplicate_names_different_ages(self):
         # Testing with duplicate names but different ages
@@ -110,7 +110,7 @@ class TestCases(unittest.TestCase):
             'Age': [20, 21, 21],
             'Score': [85, 88, 79]
         }
-        df, avg_scores, common_age = f_271(data)
+        df, avg_scores, common_age = f_316(data)
         self.assertEqual(len(df[df['Name'] == 'Tom']), 2)
         self.assertNotEqual(df.iloc[0]['Age'], df.iloc[1]['Age'])
         self.assertTrue(df[df['Name'] == 'Tom'].Age.isin([20, 21]).all())

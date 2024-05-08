@@ -97,18 +97,13 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        cls.temp_folder = tempfile.mkdtemp()
-
-    @classmethod
-    def tearDownClass(cls):       
-        shutil.rmtree(cls.temp_folder)
+    def setUp(self):
+        self.temp_folder = tempfile.mkdtemp()
 
     def test_case_1(self):
         result = f_682(['a', 'b', 'a', 'c', 'a'], 'a', self.temp_folder)
         self.assertEqual(result, 3)
-        with open(TestCases.temp_folder+'/f_682.log') as log:
+        with open(self.temp_folder+'/f_682.log') as log:
             self.assertTrue("INFO:Function called with list: ['a', 'b', 'a', 'c', 'a'] and element: a" in log.readline())
             self.assertTrue("INFO:Frequency of 'a' is 3" in log.readline())
 

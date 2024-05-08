@@ -7,7 +7,7 @@ import collections
 # Constants
 FILE_NAME = 'file_sizes.csv'
 
-def f_730(my_path):
+def f_868(my_path):
     """
     Create a report on the file size in a directory and write it to a CSV file.
 
@@ -24,7 +24,7 @@ def f_730(my_path):
     - collections
 
     Example:
-    >>> f_730('/usr/my_directory')
+    >>> f_868('/usr/my_directory')
     """
     file_sizes = collections.defaultdict(int)
     for dirpath, dirnames, filenames in os.walk(my_path):
@@ -49,7 +49,7 @@ class TestCases(unittest.TestCase):
             with open(os.path.join(temp_dir, 'file2.txt'), 'w') as f:
                 f.write('World')
             # Run the function
-            csv_path = f_730(temp_dir)
+            csv_path = f_868(temp_dir)
             # Verify CSV file creation and contents
             self.assertTrue(os.path.exists(csv_path), 'CSV file not created')
             with open(csv_path, 'r') as csvfile:
@@ -60,7 +60,7 @@ class TestCases(unittest.TestCase):
                 self.assertEqual(rows[2][1], '5', 'Incorrect file size for file2.txt')
     def test_empty_directory(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            csv_path = f_730(temp_dir)
+            csv_path = f_868(temp_dir)
             self.assertTrue(os.path.exists(csv_path), 'CSV file not created in empty directory')
             with open(csv_path, 'r') as csvfile:
                 reader = csv.reader(csvfile)
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
             with open(os.path.join(temp_dir, 'subdir2', 'file2.txt'), 'w') as f:
                 f.write('World')
             # Run the function
-            csv_path = f_730(temp_dir)
+            csv_path = f_868(temp_dir)
             # Verify CSV file creation and contents
             self.assertTrue(os.path.exists(csv_path), 'CSV file not created for nested directories')
             with open(csv_path, 'r') as csvfile:
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
             # Create sample files
             with open(os.path.join(temp_dir, 'file1.txt'), 'w') as f:
                 f.write('Hellooooooooooo')
-            csv_path = f_730(temp_dir)
+            csv_path = f_868(temp_dir)
             self.assertTrue(os.path.exists(csv_path), 'CSV file not created')
     def test_large_number_of_files(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -100,7 +100,7 @@ class TestCases(unittest.TestCase):
                 with open(os.path.join(temp_dir, f'file{i}.txt'), 'w') as f:
                     f.write(str(i))
             
-            csv_path = f_730(temp_dir)
+            csv_path = f_868(temp_dir)
             self.assertTrue(os.path.exists(csv_path), 'CSV file not created for large number of files')
             with open(csv_path, 'r') as csvfile:
                 reader = csv.reader(csvfile)

@@ -3,7 +3,7 @@ from scipy.stats import ttest_ind
 import matplotlib.pyplot as plt
 
 
-def f_132(kwargs):
+def f_146(kwargs):
     """
     Performs a two-sample t-test on numerical data from two groups to determine if there is a significant
     difference in their means. The function handles NaN values, computes descriptive statistics for each group,
@@ -39,7 +39,7 @@ def f_132(kwargs):
     
     Example:
     >>> data = {'group1': [1, 2, 3, 4], 'group2': [5, 6, 7, 8]}
-    >>> results = f_132(data)
+    >>> results = f_146(data)
     >>> results['significant']
     True
     """
@@ -83,35 +83,35 @@ class TestCases(unittest.TestCase):
     def test_different_means(self):
         """Test with groups having significantly different means."""
         data = {"group1": [1, 2, 3], "group2": [4, 5, 6]}
-        result = f_132(data)
+        result = f_146(data)
         self.assertTrue(result["significant"])
     def test_similar_means(self):
         """Test with groups having similar means."""
         data = {"group1": [1, 2, 3], "group2": [1, 2, 3]}
-        result = f_132(data)
+        result = f_146(data)
         self.assertFalse(result["significant"])
     def test_with_nan_values(self):
         """Test with groups containing NaN values but with at least two non-NaN values in each group."""
         data = {"group1": [np.nan, 2, 3], "group2": [1, np.nan, 3]}
-        result = f_132(data)
+        result = f_146(data)
         self.assertIsNotNone(result)
     def test_empty_group(self):
         """Test with one of the groups being empty."""
         data = {"group1": [], "group2": [1, 2, 3]}
         with self.assertRaises(ValueError):
-            f_132(data)
+            f_146(data)
     def test_all_nan_values(self):
         """Test with groups containing only NaN values."""
         data = {"group1": [np.nan, np.nan], "group2": [np.nan, np.nan]}
         with self.assertRaises(ValueError):
-            f_132(data)
+            f_146(data)
     def test_insufficient_group_size(self):
         """Test with one of the groups having less than two non-NaN values."""
         data = {"group1": [1, np.nan], "group2": [2, 3, 4]}
         with self.assertRaises(ValueError):
-            f_132(data)
+            f_146(data)
     def test_low_variance(self):
         """Test with one of the groups having extremely low variance."""
         data = {"group1": [1.00000001, 1.00000002], "group2": [2, 3, 4]}
         with self.assertRaises(ValueError):
-            f_132(data)
+            f_146(data)

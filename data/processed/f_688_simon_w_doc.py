@@ -2,7 +2,7 @@ import pandas as pd
 from statistics import mean
 
 
-def f_512(df: pd.DataFrame) -> dict:
+def f_603(df: pd.DataFrame) -> dict:
     """
     Convert a Pandas DataFrame into a dictionary of generator objects in which 
     each generator generates a sequence of tuples that contain a unique name 
@@ -27,7 +27,7 @@ def f_512(df: pd.DataFrame) -> dict:
     ...     'Name': ['Tom', 'Nick', 'John', 'Tom', 'John'],
     ...     'Score': [85, 79, 90, 88, 82]
     ... })
-    >>> gen_dict = f_512(df_sample)
+    >>> gen_dict = f_603(df_sample)
     >>> {key: next(value) for key, value in gen_dict.items()}
     {'John': ('John', 86), 'Nick': ('Nick', 79), 'Tom': ('Tom', 86.5)}
 
@@ -35,7 +35,7 @@ def f_512(df: pd.DataFrame) -> dict:
     ...     'Name': ['Micky', 'Donald', 'Girl'],
     ...     'Score': [25.2, 9, -1]
     ... })
-    >>> gen_dict = f_512(df_sample)
+    >>> gen_dict = f_603(df_sample)
     >>> {key: next(value) for key, value in gen_dict.items()}
     {'Donald': ('Donald', 9.0), 'Girl': ('Girl', -1.0), 'Micky': ('Micky', 25.2)}
     """
@@ -59,14 +59,14 @@ class TestCases(unittest.TestCase):
             'A': ['Tom', 'Nick', 'John', 'Tom', 'John'],
             'Score': [85, 79, 90, 88, 82]
         })
-        self.assertRaises(Exception, f_512, df_sample1)
+        self.assertRaises(Exception, f_603, df_sample1)
     
     def test_case_1(self):
         df_test = pd.DataFrame({
             'Name': ['Tom', 'Nick', 'John'],
             'Score': [85, 79, 90]
         })
-        gen_dict = f_512(df_test)
+        gen_dict = f_603(df_test)
         expected_result = {
             'John': ('John', 90),
             'Nick': ('Nick', 79),
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
             'Name': ['Tom', 'Nick', 'John', 'Tom', 'John'],
             'Score': [85, 79, 90, 88, 82]
         })
-        gen_dict = f_512(df_test)
+        gen_dict = f_603(df_test)
         expected_result = {
             'John': ('John', 86),
             'Nick': ('Nick', 79),
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
             'Name': ['Tom', 'Nick', 'John', 'Anna', 'Elsa'],
             'Score': [85, 79, 90, 88, 82]
         })
-        gen_dict = f_512(df_test)
+        gen_dict = f_603(df_test)
         expected_result = {
             'Anna': ('Anna', 88),
             'Elsa': ('Elsa', 82),
@@ -109,7 +109,7 @@ class TestCases(unittest.TestCase):
             'Name': names,
             'Score': scores
         })
-        gen_dict = f_512(df_test)
+        gen_dict = f_603(df_test)
         grouped = df_test.groupby('Name')
         expected_result = {name: (name, mean(group['Score'])) for name, group in grouped}
         self.assertDictEqual({key: next(value) for key, value in gen_dict.items()}, expected_result)
@@ -119,5 +119,5 @@ class TestCases(unittest.TestCase):
             'Name': [],
             'Score': []
         })
-        gen_dict = f_512(df_test)
+        gen_dict = f_603(df_test)
         self.assertDictEqual(gen_dict, {})

@@ -2,7 +2,7 @@ import re
 import matplotlib.pyplot as plt
 
 
-def f_426(df):
+def f_500(df):
     """
     Analyzes a DataFrame to find videos with titles containing "how" or "what" and visualizes their like ratios.
     The like ratio for each video is calculated by dividing the number of likes by the number of views.
@@ -29,7 +29,7 @@ def f_426(df):
     >>> import pandas as pd
     >>> data = {'Title': ['How to code', 'What is Python', 'Tutorial'], 'Views': [1500, 1200, 1000], 'Likes': [150, 300, 100]}
     >>> df = pd.DataFrame(data)
-    >>> ax = f_426(df)
+    >>> ax = f_500(df)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
@@ -60,7 +60,7 @@ class TestCases(unittest.TestCase):
             'Views': [1000, 500, 200, 300, 800],
             'Likes': [500, 250, 100, 150, 600]
         })
-        ax = f_426(data_1)
+        ax = f_500(data_1)
         self.assertIsInstance(ax, matplotlib.axes.Axes, "The returned object should be of type Axes.")
         y_data = [rect.get_height() for rect in ax.patches]
         expected_y_data = [0.5, 0.5, 0.5, 0.75]
@@ -71,7 +71,7 @@ class TestCases(unittest.TestCase):
             'Views': [1200, 400, 250, 350, 900],
             'Likes': [600, 200, 125, 175, 450]
         })
-        ax = f_426(data_2)
+        ax = f_500(data_2)
         self.assertIsInstance(ax, matplotlib.axes.Axes, "The returned object should be of type Axes.")
         y_data = [rect.get_height() for rect in ax.patches]
         expected_y_data = [0.5, 0.5, 0.5, 0.5]
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
             'Views': [],
             'Likes': []
         })
-        ax = f_426(data_3)
+        ax = f_500(data_3)
         self.assertIsInstance(ax, matplotlib.axes.Axes, "The returned object should be of type Axes.")
     def test_case_4(self):
         data_4 = pd.DataFrame({
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
             'Views': [1100, 450, 220, 320, 850],
             'Likes': [550, 225, 110, 160, 425]
         })
-        ax = f_426(data_4)
+        ax = f_500(data_4)
         self.assertIsInstance(ax, matplotlib.axes.Axes, "The returned object should be of type Axes.")
     def test_case_5(self):
         data_5 = pd.DataFrame({
@@ -100,7 +100,7 @@ class TestCases(unittest.TestCase):
             'Views': [1300, 420, 270, 370, 950],
             'Likes': [650, 210, 135, 185, 475]
         })
-        ax = f_426(data_5)
+        ax = f_500(data_5)
         self.assertIsInstance(ax, matplotlib.axes.Axes, "The returned object should be of type Axes.")
         y_data = [rect.get_height() for rect in ax.patches]
         expected_y_data = [0.5, 0.5, 0.5, 0.5]

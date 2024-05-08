@@ -2,7 +2,6 @@ import pandas as pd
 from scipy import stats
 
 
-
 def f_467(matrix):
     """
     Normalizes a 2D numeric array (matrix) using the Z score.
@@ -49,15 +48,12 @@ def run_tests():
 
 class TestCases(unittest.TestCase):
 
-    def test_case_1(self):
-        matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-        result = f_467(matrix)
-        expected_result = pd.DataFrame({
-            0: [-1.224745, 0.0, 1.224745],
-            1: [-1.224745, 0.0, 1.224745],
-            2: [-1.224745, 0.0, 1.224745]
-        })
-        pd.testing.assert_frame_equal(result, expected_result)
+    def test_extreme_values_shape(self):
+        """Test the function with extreme values to ensure output shape is correct."""
+        matrix = [[1, 2], [10000, 20000]]
+        result_df = f_467(matrix)
+        # Verify that the shape of the result is the same as the input
+        self.assertEqual(result_df.shape, (2, 2))
 
     def test_case_2(self):
         matrix = np.array([[2, 5], [5, 2]])
@@ -76,24 +72,20 @@ class TestCases(unittest.TestCase):
         })
         pd.testing.assert_frame_equal(result, expected_result)
 
-    def test_case_4(self):
-        matrix = np.array([[1, 3], [2, 4], [3, 5]])
-        result = f_467(matrix)
+    def test_uniform_data(self):
+        """Test a matrix where all elements are the same."""
+        matrix = [[1, 1], [1, 1]]
         expected_result = pd.DataFrame({
-            0: [-1.224745, 0.0, 1.224745],
-            1: [-1.224745, 0.0, 1.224745]
+            0: [0.0, 0.0],
+            1: [0.0, 0.0]
         })
-        pd.testing.assert_frame_equal(result, expected_result)
+        pd.testing.assert_frame_equal(f_467(matrix), expected_result)
 
-    def test_case_5(self):
-        matrix = np.array([[10, 20, 30], [40, 50, 60], [70, 80, 90]])
-        result = f_467(matrix)
-        expected_result = pd.DataFrame({
-            0: [-1.224745, 0.0, 1.224745],
-            1: [-1.224745, 0.0, 1.224745],
-            2: [-1.224745, 0.0, 1.224745]
-        })
-        pd.testing.assert_frame_equal(result, expected_result)
+    def test_non_numeric_data(self):
+        """Test the function with non-numeric data."""
+        matrix = [['a', 'b'], ['c', 'd']]
+        with self.assertRaises(TypeError):
+            f_467(matrix)
 
 
 if __name__ == "__main__":

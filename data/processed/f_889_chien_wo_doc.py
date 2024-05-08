@@ -33,7 +33,7 @@ LEAP_SECONDS = np.array(
 )
 
 
-def f_102(date_str):
+def f_111(date_str):
     """
     Calculate the total number of seconds elapsed from a given date until the current time,
     including any leap seconds that occurred in this period.
@@ -54,7 +54,7 @@ def f_102(date_str):
     The LEAP_SECONDS array should contain years when leap seconds were added.
 
     Example:
-    >>> total_seconds = f_102('1970-01-01 00:00:00')
+    >>> total_seconds = f_111('1970-01-01 00:00:00')
     >>> print(total_seconds)
     1702597276
     """
@@ -69,7 +69,7 @@ import unittest
 from datetime import datetime, timedelta
 import numpy as np
 class TestCases(unittest.TestCase):
-    """Test cases for the function f_102."""
+    """Test cases for the function f_111."""
     def test_recent_date(self):
         """
         Test the function with a recent date.
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         test_date = "2022-01-01 00:00:00"
         expected_result = (datetime.now() - datetime(2022, 1, 1)).total_seconds()
         expected_result += np.sum(LEAP_SECONDS >= 2022)
-        self.assertEqual(f_102(test_date), int(expected_result))
+        self.assertEqual(f_111(test_date), int(expected_result))
     def test_date_before_leap_seconds(self):
         """
         Test the function with a date before the introduction of leap seconds.
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         test_date = "1960-01-01 00:00:00"
         expected_result = (datetime.now() - datetime(1960, 1, 1)).total_seconds()
         expected_result += np.sum(LEAP_SECONDS >= 1960)
-        self.assertEqual(f_102(test_date), int(expected_result))
+        self.assertEqual(f_111(test_date), int(expected_result))
     def test_date_with_leap_second(self):
         """
         Test the function with a date in a year when a leap second was added.
@@ -93,14 +93,14 @@ class TestCases(unittest.TestCase):
         test_date = "2016-01-01 00:00:00"
         expected_result = (datetime.now() - datetime(2016, 1, 1)).total_seconds()
         expected_result += np.sum(LEAP_SECONDS >= 2016)
-        self.assertAlmostEqual(f_102(test_date), int(expected_result), delta=1)
+        self.assertAlmostEqual(f_111(test_date), int(expected_result), delta=1)
     def test_future_date(self):
         """
         Test the function with a future date.
         """
         future_date = datetime.now() + timedelta(days=30)
         future_date_str = future_date.strftime("%Y-%m-%d %H:%M:%S")
-        result = f_102(future_date_str)
+        result = f_111(future_date_str)
         expected_result = -30 * 24 * 3600  # Negative seconds for future dates
         # Allowing a margin of error of 1 second
         self.assertTrue(abs(result - expected_result) <= 1)
@@ -109,4 +109,4 @@ class TestCases(unittest.TestCase):
         Test the function with the current date and time.
         """
         current_date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.assertEqual(f_102(current_date_str), 0)
+        self.assertEqual(f_111(current_date_str), 0)

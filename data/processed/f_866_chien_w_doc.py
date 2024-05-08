@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def f_89(dataframe):
+def f_97(dataframe):
     """
     Calculate the correlation matrix of a DataFrame and plot a scatter plot for the pair of columns with the highest absolute correlation.
 
@@ -29,7 +29,7 @@ def f_89(dataframe):
     ...     'B': np.random.rand(100),
     ...     'C': np.random.rand(100)
     ... })
-    >>> ax = f_89(df)
+    >>> ax = f_97(df)
     >>> print(ax)
     Axes(0.125,0.11;0.775x0.77)
     """
@@ -58,7 +58,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for the function f_89."""
+    """Test cases for the function f_97."""
     def test_high_correlation(self):
         """
         Test if the function correctly identifies and plots the pair of columns with the highest positive correlation.
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             {"A": np.arange(100), "B": np.arange(100) * 2, "C": np.random.rand(100)}
         )
-        ax = f_89(df)
+        ax = f_97(df)
         corr = df.corr()
         abs_corr = corr.abs()
         max_corr = abs_corr.unstack().dropna().nlargest(3).iloc[-1]
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
                 "C": np.random.rand(100),
             }
         )
-        ax = f_89(df)
+        ax = f_97(df)
         self.assertIsInstance(ax, plt.Axes)
     def test_negative_correlation(self):
         """
@@ -100,7 +100,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             {"A": np.arange(100), "B": np.random.rand(100), "C": -np.arange(100) + 50}
         )
-        ax = f_89(df)
+        ax = f_97(df)
         corr = df.corr()
         # Get the pair with the highest absolute correlation excluding self-correlations
         abs_corr = corr.abs()
@@ -118,7 +118,7 @@ class TestCases(unittest.TestCase):
         np.random.seed(3)
         df = pd.DataFrame({"A": np.random.rand(100)})
         with self.assertRaises(ValueError):
-            f_89(df)
+            f_97(df)
     def test_non_numeric_columns(self):
         """
         Test if the function raises a TypeError when provided with a DataFrame containing non-numeric columns.
@@ -128,11 +128,11 @@ class TestCases(unittest.TestCase):
             {"A": np.random.rand(100), "B": ["text"] * 100, "C": np.random.rand(100)}
         )
         with self.assertRaises(TypeError):
-            f_89(df)
+            f_97(df)
     def test_empty_dataframe(self):
         """
         Test if the function raises a ValueError when provided with an empty DataFrame.
         """
         df = pd.DataFrame()  # Create an empty DataFrame
         with self.assertRaises(ValueError):
-            f_89(df)
+            f_97(df)

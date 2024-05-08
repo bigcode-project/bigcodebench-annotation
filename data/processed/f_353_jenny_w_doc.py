@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 
-def f_91(mu=0, sigma=1):
+def f_99(mu=0, sigma=1):
     """
     Draw and return a subplot of a normal distribution with the given mean and standard deviation,
     utilizing numpy's linspace to create an array of 100 linearly spaced numbers between
@@ -21,7 +21,7 @@ def f_91(mu=0, sigma=1):
     - scipy.stats.norm
 
     Example:
-    >>> ax = f_91(mu=5, sigma=2)
+    >>> ax = f_99(mu=5, sigma=2)
     >>> ax
     <Axes: >
     >>> type(ax)
@@ -39,14 +39,14 @@ import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test default parameters
-        ax = f_91()
+        ax = f_99()
         lines = ax.get_lines()
         x, y = lines[0].get_data()
         self.assertAlmostEqual(x[np.argmax(y)], 0, delta=0.1)
         self.assertTrue(min(x) >= -3 and max(x) <= 3)
     def test_case_2(self):
         # Test positive mu and sigma with manual calculation
-        ax = f_91(mu=5, sigma=2)
+        ax = f_99(mu=5, sigma=2)
         lines = ax.get_lines()
         x, y = lines[0].get_data()
         expected_min, expected_max = 5 - 3 * 2, 5 + 3 * 2
@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
         self.assertAlmostEqual(max(x), expected_max, delta=0.1)
     def test_case_3(self):
         # Test negative mu and small sigma
-        ax = f_91(mu=-3, sigma=0.5)
+        ax = f_99(mu=-3, sigma=0.5)
         lines = ax.get_lines()
         x, y = lines[0].get_data()
         self.assertAlmostEqual(x[np.argmax(y)], -3, delta=0.1)
@@ -62,7 +62,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Test large mu and sigma
         mu, sigma = 1e6, 1e5
-        ax = f_91(mu=mu, sigma=sigma)
+        ax = f_99(mu=mu, sigma=sigma)
         lines = ax.get_lines()
         x, y = lines[0].get_data()
         self.assertTrue(
@@ -71,14 +71,14 @@ class TestCases(unittest.TestCase):
         )
     def test_case_5(self):
         # Test negative mu
-        ax = f_91(mu=-5, sigma=4)
+        ax = f_99(mu=-5, sigma=4)
         lines = ax.get_lines()
         x, y = lines[0].get_data()
         self.assertAlmostEqual(x[np.argmax(y)], -5, delta=0.15)
         self.assertTrue(min(x) >= -5 - 12 and max(x) <= -5 + 12)
     def test_case_6(self):
         # Test the function with a sigma of 0, which might represent a degenerate distribution
-        ax = f_91(mu=0, sigma=0)
+        ax = f_99(mu=0, sigma=0)
         lines = ax.get_lines()
         self.assertEqual(
             len(lines),
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
         )
     def test_case_7(self):
         # Test the function with extremely large values of mu and sigma to ensure it doesn't break
-        ax = f_91(mu=1e6, sigma=1e5)
+        ax = f_99(mu=1e6, sigma=1e5)
         lines = ax.get_lines()
         x, y = lines[0].get_data()
         self.assertTrue(
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
         )
     def test_case_8(self):
         # Test the function with a very small positive sigma to check narrow distributions
-        ax = f_91(mu=0, sigma=1e-5)
+        ax = f_99(mu=0, sigma=1e-5)
         lines = ax.get_lines()
         x, y = lines[0].get_data()
         # Checking that the plot peak is at mu and sigma affects the curve's spread.

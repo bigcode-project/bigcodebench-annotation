@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 from io import StringIO
 
-def f_685(csv_url_dict, sort_by_column="title"):
+def f_807(csv_url_dict, sort_by_column="title"):
     """
     Fetches data from a given dictionary that includes a CSV URL and returns a pandas DataFrame sorted based on two specified columns.
     
@@ -22,13 +22,13 @@ def f_685(csv_url_dict, sort_by_column="title"):
     - io.StringIO
     
     Example:
-    >>> f_685({"URL": "http://example.com/data.csv"}, "title")
+    >>> f_807({"URL": "http://example.com/data.csv"}, "title")
        id   title  price
     0   1   Apple    0.3
     1   2  Banana    0.5
     2   3  Cherry    0.2
 
-    >>> f_685({"URL": "http://example.com/test.csv"}, "price")
+    >>> f_807({"URL": "http://example.com/test.csv"}, "price")
        id   title  price
     2   3  Cherry    0.2
     0   1   Apple    0.3
@@ -58,7 +58,7 @@ class TestCases(unittest.TestCase):
         mock_response._content = mock_csv_content.encode('utf-8')
         mock_get.return_value = mock_response
         
-        result = f_685({"URL": "http://example.com/data.csv"}, 'title')
+        result = f_807({"URL": "http://example.com/data.csv"}, 'title')
         expected_titles = ["Apple", "Banana", "Cherry"]
         actual_titles = result['title'].tolist()
         self.assertEqual(actual_titles, expected_titles)
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
         mock_response._content = mock_csv_content.encode('utf-8')
         mock_get.return_value = mock_response
         
-        result = f_685({"URL": "http://example.com/tst.csv"}, 'price')
+        result = f_807({"URL": "http://example.com/tst.csv"}, 'price')
         self.assertEqual(result.iloc[0]['price'], 0.2)
         self.assertEqual(result.iloc[1]['price'], 0.3)
         self.assertEqual(result.iloc[2]['price'], 0.5)
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
         mock_response._content = mock_csv_content.encode('utf-8')
         mock_get.return_value = mock_response
         
-        result = f_685({"URL": "http://example.com/tst.csv"})
+        result = f_807({"URL": "http://example.com/tst.csv"})
         self.assertEqual(result.iloc[0]['title'], "Apple")
         self.assertEqual(result.iloc[1]['title'], "Banana")
         self.assertEqual(result.iloc[2]['title'], "Cherry")
@@ -100,7 +100,7 @@ class TestCases(unittest.TestCase):
         mock_response._content = mock_csv_content.encode('utf-8')
         mock_get.return_value = mock_response
         
-        result = f_685({"URL": "http://example.com/empty.csv"})
+        result = f_807({"URL": "http://example.com/empty.csv"})
         self.assertTrue(result.empty)
     @patch('requests.get')
     def test_case_5(self, mock_get):
@@ -111,7 +111,7 @@ class TestCases(unittest.TestCase):
         mock_response._content = mock_csv_content.encode('utf-8')
         mock_get.return_value = mock_response
         
-        result = f_685({"URL": "http://example.com/test_2.csv"}, "age")
+        result = f_807({"URL": "http://example.com/test_2.csv"}, "age")
         self.assertEqual(result.iloc[0]['name'], "Bob")
         self.assertEqual(result.iloc[1]['name'], "John")
         self.assertEqual(result.iloc[2]['name'], "Alice")
@@ -125,4 +125,4 @@ class TestCases(unittest.TestCase):
         mock_response._content = mock_csv_content.encode('utf-8')
         mock_get.return_value = mock_response
         with self.assertRaises(ValueError):
-            result = f_685({"link": "http://example.com/error.csv"})
+            result = f_807({"link": "http://example.com/error.csv"})

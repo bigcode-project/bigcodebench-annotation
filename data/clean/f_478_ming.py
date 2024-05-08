@@ -11,13 +11,14 @@ PENALTY_COST = 1000  # in dollars
 def f_478(goals, penalties, rng_seed=None, teams=TEAMS):
     """
     Generate and analyze a Pandas DataFrame of football match results for multiple teams,
-    incorporating random goals and penalties, then visualize the analyzed data. Penalties are
-    converted into fines based on a predetermined penalty cost.
+    incorporating random goals and penalties, then visualize the analyzed data with colomns 'Team', 'Goals',
+    and 'Penalty Cost'. Penalties are converted into fines based on a predetermined penalty cost.
 
     Parameters:
     - goals (int): The maximum number of goals a team can score in a match.
     - penalties (int): The maximum number of penalties a team can receive in a match.
     - rng_seed (int, optional): Seed for the random number generator to ensure reproducibility. Defaults to None.
+    - teams (list of str, optional): List of team names to assign players
 
     Returns:
     - DataFrame: A pandas DataFrame containing teams, their goals, and penalty costs, along with the original match results.

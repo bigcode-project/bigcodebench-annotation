@@ -3,9 +3,10 @@ import pandas as pd
 
 
 # Method
-def f_473(goals, penalties, rng_seed=None):
+def f_555(goals, penalties, rng_seed=None):
     """
-    Generate a Pandas DataFrame of the results of football matches for multiple teams, incorporating random goals and penalties. Penalties are converted into fines using a predefined cost.
+    Generate a Pandas DataFrame with colomns 'Team' and 'Match Result' of the results of football matches for multiple
+    teams, incorporating random goals and penalties. Penalties are converted into fines using a predefined cost.
 
     Parameters:
     - goals (int): The maximum number of goals a team can score in a match. Must be non-negative.
@@ -21,7 +22,7 @@ def f_473(goals, penalties, rng_seed=None):
 
     Example:
     >>> seed(42)  # Setting seed for reproducibility in this example
-    >>> results = f_473(5, 3, 42)
+    >>> results = f_555(5, 3, 42)
     >>> print(results)
          Team      Match Result
     0  Team A     (5 goals, $0)
@@ -49,12 +50,12 @@ import unittest
 class TestCases(unittest.TestCase):
     def setUp(self):
         self.teams = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
-        self.penalty_cost = 1000  # Match the PENALTY_COST used in f_473
+        self.penalty_cost = 1000  # Match the PENALTY_COST used in f_555
     def test_goals_and_penalties_within_range(self):
         """Test that goals and penalties fall within specified ranges."""
         max_goals = 5
         max_penalties = 3
-        df = f_473(max_goals, max_penalties)
+        df = f_555(max_goals, max_penalties)
         for _, row in df.iterrows():
             # Correctly extract goals and penalty cost from the 'Match Result' string
             match_result = row['Match Result']
@@ -70,7 +71,7 @@ class TestCases(unittest.TestCase):
         """Test that negative inputs are handled correctly."""
         max_goals = -5
         max_penalties = -3
-        df = f_473(max_goals, max_penalties)
+        df = f_555(max_goals, max_penalties)
         for _, row in df.iterrows():
             # Correctly extract and check values as before, ensuring no negative values are produced
             match_result = row['Match Result']
@@ -80,7 +81,7 @@ class TestCases(unittest.TestCase):
             self.assertTrue(0 <= penalty_cost, "Penalty cost is negative which is not expected")
     def test_zero_goals_and_penalties(self):
         """Test that the function handles 0 goals and 0 penalties correctly."""
-        df = f_473(0, 0)
+        df = f_555(0, 0)
         for _, row in df.iterrows():
             match_result = row['Match Result']
             goals = int(match_result.split(' ')[0][1:])
@@ -91,7 +92,7 @@ class TestCases(unittest.TestCase):
         """Test the function with extremely high values for goals and penalties."""
         max_goals = 1000
         max_penalties = 500
-        df = f_473(max_goals, max_penalties)
+        df = f_555(max_goals, max_penalties)
         for _, row in df.iterrows():
             match_result = row['Match Result']
             goals = int(match_result.split(' ')[0][1:])
@@ -103,7 +104,7 @@ class TestCases(unittest.TestCase):
         """Test the function with a mix of low and high values for goals and penalties."""
         max_goals = 10
         max_penalties = 1
-        df = f_473(max_goals, max_penalties)
+        df = f_555(max_goals, max_penalties)
         for _, row in df.iterrows():
             match_result = row['Match Result']
             goals = int(match_result.split(' ')[0][1:])

@@ -2,7 +2,7 @@ import re
 import collections
 
 
-def f_83(string, patterns=['nnn', 'aaa', 'sss', 'ddd', 'fff']):
+def f_88(string, patterns=['nnn', 'aaa', 'sss', 'ddd', 'fff']):
     """
     Counts the occurrence of specific patterns in a string.
     
@@ -22,11 +22,11 @@ def f_83(string, patterns=['nnn', 'aaa', 'sss', 'ddd', 'fff']):
     - collections
     
     Example:
-    >>> f_83("nnnaaaasssdddeeefffggg")
+    >>> f_88("nnnaaaasssdddeeefffggg")
     {'nnn': 1, 'aaa': 1, 'sss': 1, 'ddd': 1, 'fff': 1}
-    >>> f_83('asdfasdfasdfasdaaaaf', patterns=['a', 'asdf'])
+    >>> f_88('asdfasdfasdfasdaaaaf', patterns=['a', 'asdf'])
     {'a': 8, 'asdf': 3}
-    >>> f_83('123kajhdlkfah12345k,jk123', patterns=['123', '1234'])
+    >>> f_88('123kajhdlkfah12345k,jk123', patterns=['123', '1234'])
     {'123': 3, '1234': 1}
     """
     if not isinstance(string, str):
@@ -44,38 +44,38 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_empty_pattern(self):
         'empty pattern'
-        result = f_83('asdf', patterns=[])
+        result = f_88('asdf', patterns=[])
         expected_result = {}
         self.assertEqual(result, expected_result)
     
     def test_wrong_type(self):
         'wrong input types'
-        self.assertRaises(Exception, f_83, {'string': 123})
-        self.assertRaises(Exception, f_83, {'string': ['asdf']})
-        self.assertRaises(Exception, f_83, {'string': {'a': 3}})
-        self.assertRaises(Exception, f_83, {'string': ['test'], 'patterns': 3})
-        self.assertRaises(Exception, f_83, {'string': ['test'], 'patterns': ['3', 1]})
+        self.assertRaises(Exception, f_88, {'string': 123})
+        self.assertRaises(Exception, f_88, {'string': ['asdf']})
+        self.assertRaises(Exception, f_88, {'string': {'a': 3}})
+        self.assertRaises(Exception, f_88, {'string': ['test'], 'patterns': 3})
+        self.assertRaises(Exception, f_88, {'string': ['test'], 'patterns': ['3', 1]})
     def test_case_1(self):
-        result = f_83("nnnaaaasssdddeeefffggg")
+        result = f_88("nnnaaaasssdddeeefffggg")
         expected_result = {'nnn': 1, 'aaa': 1, 'sss': 1, 'ddd': 1, 'fff': 1}
         self.assertEqual(result, expected_result)
     
     def test_case_2(self):
-        result = f_83("")
+        result = f_88("")
         expected_result = {'nnn': 0, 'aaa': 0, 'sss': 0, 'ddd': 0, 'fff': 0}
         self.assertEqual(result, expected_result)
     
     def test_case_3(self):
-        result = f_83("xyz")
+        result = f_88("xyz")
         expected_result = {'nnn': 0, 'aaa': 0, 'sss': 0, 'ddd': 0, 'fff': 0}
         self.assertEqual(result, expected_result)
     
     def test_case_4(self):
-        result = f_83("nnnaaannnsssdddfffnnn")
+        result = f_88("nnnaaannnsssdddfffnnn")
         expected_result = {'nnn': 3, 'aaa': 1, 'sss': 1, 'ddd': 1, 'fff': 1}
         self.assertEqual(result, expected_result)
     
     def test_case_5(self):
-        result = f_83("xxxyyyzzz", patterns=['xxx', 'yyy', 'zzz', 'aaa'])
+        result = f_88("xxxyyyzzz", patterns=['xxx', 'yyy', 'zzz', 'aaa'])
         expected_result = {'xxx': 1, 'yyy': 1, 'zzz': 1, 'aaa': 0}
         self.assertEqual(result, expected_result)

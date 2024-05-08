@@ -2,7 +2,7 @@ import csv
 import random
 
 
-def f_322(csv_file='names.csv', 
+def f_377(csv_file='names.csv', 
           latin_names=['Sopetón', 'Méndez', 'Gómez', 'Pérez', 'Muñoz'],
           names=['Smith', 'Johnson', 'Williams', 'Brown', 'Jones'],
           encoding='latin-1', rng_seed=None):
@@ -33,11 +33,11 @@ def f_322(csv_file='names.csv',
     - random
 
     Example:
-    >>> file_name = f_322()
+    >>> file_name = f_377()
     >>> print(file_name)
     names.csv
 
-    >>> file_name = f_322(csv_file='test.csv', names=['simon', 'alex'], rng_seed=1)
+    >>> file_name = f_377(csv_file='test.csv', names=['simon', 'alex'], rng_seed=1)
     >>> with open(file_name, 'r', newline='', encoding='latin-1') as csvfile:
     ...     reader = csv.reader(csvfile)
     ...     rows = list(reader)
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         'default params'
         latin_names = ['Sopetón', 'Méndez', 'Gómez', 'Pérez', 'Muñoz']
         names = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones']
-        file_name = f_322(rng_seed=1)
+        file_name = f_377(rng_seed=1)
         self.assertEqual(file_name, 'names.csv')
         self.assertTrue(os.path.isfile(file_name))
         with open(file_name, 'r', newline='', encoding='latin-1') as csvfile:
@@ -91,8 +91,8 @@ class TestCases(unittest.TestCase):
         Path(file_name).unlink()
     def test_rng(self):
         'test rng reproducability'
-        file_name1 = f_322(csv_file='test1.csv', rng_seed=12)
-        file_name2 = f_322(csv_file='test2.csv', rng_seed=12)
+        file_name1 = f_377(csv_file='test1.csv', rng_seed=12)
+        file_name2 = f_377(csv_file='test2.csv', rng_seed=12)
         self.assertEqual(file_name1, 'test1.csv')
         self.assertEqual(file_name2, 'test2.csv')
         self.assertTrue(os.path.isfile(file_name1))
@@ -112,7 +112,7 @@ class TestCases(unittest.TestCase):
         custom_file = 'custom_names.csv'
         latin_names = ['Méndez']
         names = ['Simon']
-        file_name = f_322(csv_file=custom_file, names=names, encoding='utf-8',
+        file_name = f_377(csv_file=custom_file, names=names, encoding='utf-8',
                           latin_names=latin_names, rng_seed=1)
         self.assertEqual(file_name, custom_file)
         self.assertTrue(os.path.isfile(custom_file))
@@ -132,7 +132,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         latin_names = [Faker().first_name() for _ in range(5)]
         names = [Faker().first_name() for _ in range(5)]
-        file_name = f_322(latin_names=latin_names, names=names, rng_seed=1)
+        file_name = f_377(latin_names=latin_names, names=names, rng_seed=1)
         self.assertEqual(file_name, file_name)
         self.assertTrue(os.path.isfile(file_name))
         with open(file_name, 'r', newline='', encoding='latin-1') as csvfile:
@@ -150,7 +150,7 @@ class TestCases(unittest.TestCase):
         Path(file_name).unlink()
     def test_case_4(self):
         'emtpy name lists'
-        file_name = f_322(latin_names=[], names=[], rng_seed=1)
+        file_name = f_377(latin_names=[], names=[], rng_seed=1)
         self.assertEqual(file_name, file_name)
         self.assertTrue(os.path.isfile(file_name))
         with open(file_name, 'r', newline='', encoding='latin-1') as csvfile:
@@ -162,9 +162,9 @@ class TestCases(unittest.TestCase):
         Path(file_name).unlink()
     def test_case_5(self):
         'edge cases'
-        self.assertRaises(Exception, f_322, {'csv_file': 1, 'rng_seed': 12})
-        self.assertRaises(Exception, f_322, {'latin_names': 'test', 'rng_seed': 12})
-        self.assertRaises(Exception, f_322, {'names': 24, 'rng_seed': 12})
+        self.assertRaises(Exception, f_377, {'csv_file': 1, 'rng_seed': 12})
+        self.assertRaises(Exception, f_377, {'latin_names': 'test', 'rng_seed': 12})
+        self.assertRaises(Exception, f_377, {'names': 24, 'rng_seed': 12})
         # remove file if generated
         if os.path.isfile('names.csv'):
             Path('names.csv').unlink()

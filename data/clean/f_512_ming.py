@@ -1,13 +1,14 @@
 import pandas as pd
 import time
 
-def f_512(dataframe, target_value):
+
+def f_512(df, target_value):
     '''
-    Searches a given DataFrame for rows with cells equal to the provided target value.
-    It then plots the count of such rows per column.
+    Convert the input dic of list to DataFrame and searcher in this DataFrame for rows with cells equal to the
+    provided target_value. It then plots the count of such rows per column.
 
     Parameters:
-    - dataframe (pd.DataFrame): The DataFrame to be searched.
+    - df (dic of list): The input dict. It should have a 'Name' key.
     - target_value (str): The target value to be searched in the DataFrame.
 
     Returns:
@@ -25,7 +26,7 @@ def f_512(dataframe, target_value):
     '''
     start_time = time.time()
     # Convert dataframe to string type for uniform comparison
-    dataframe = pd.DataFrame(dataframe)
+    dataframe = pd.DataFrame(df)
     dataframe = dataframe.astype(str)
     
     counts = dataframe.apply(lambda x: (x == target_value).sum())

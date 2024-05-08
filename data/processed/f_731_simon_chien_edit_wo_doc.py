@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 
-def f_613(data_dir: str, csv_file: str) -> pd.DataFrame:
+def f_726(data_dir: str, csv_file: str) -> pd.DataFrame:
     """
     Load a CSV file into a pandas DataFrame and replace the NaN values in
     numeric columns with the mean of the corresponding column.
@@ -27,7 +27,7 @@ def f_613(data_dir: str, csv_file: str) -> pd.DataFrame:
     - numpy
     
     Example:
-    >>> df = f_613("/path/to/data/directory", "file.csv")
+    >>> df = f_726("/path/to/data/directory", "file.csv")
     >>> print(df)
          Fruit     Taste     Cost
     0    Apple      Good        1
@@ -53,7 +53,7 @@ import tempfile
 import shutil
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.folder_path = 'f_613_data_simon'
+        self.folder_path = 'f_726_data_simon'
     def setUp(self):
         # Create a temporary directory for test data
         self.test_dir = tempfile.mkdtemp()
@@ -68,7 +68,7 @@ class TestCases(unittest.TestCase):
     def test_empty_csv(self):
         # Test with an empty CSV file
         filename = self.create_csv('empty.csv', pd.DataFrame())
-        result = f_613(self.test_dir, filename)
+        result = f_726(self.test_dir, filename)
         self.assertTrue(result.empty)
     def test_numeric_columns_nan_replacement(self):
         data = pd.DataFrame({
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
             'Age': [25.0, 27.5, 30.0],  # Ensure all ages are floats
             'Salary': [50000.0, 60000.0, 55000.0]  # Ensure all salaries are floats
         })
-        result = f_613(self.test_dir, filename)
+        result = f_726(self.test_dir, filename)
         pd.testing.assert_frame_equal(result, expected)
     def test_mixed_columns(self):
         data = pd.DataFrame({
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
             'Name': ['Alice', 'Bob', 'Charlie'],
             'Score': [90.0, 88.0, 92.0]  # Ensure all scores are floats
         })
-        result = f_613(self.test_dir, filename)
+        result = f_726(self.test_dir, filename)
         pd.testing.assert_frame_equal(result, expected)
     def test_all_nan_column(self):
         # Test with a column that is entirely NaN
@@ -100,7 +100,7 @@ class TestCases(unittest.TestCase):
             'Empty': [np.nan, np.nan, np.nan]
         })
         filename = self.create_csv('all_nan.csv', data)
-        result = f_613(self.test_dir, filename)
+        result = f_726(self.test_dir, filename)
         self.assertTrue(result['Empty'].isnull().all())
     def test_no_numeric_data(self):
         # Test a CSV file with no numeric data
@@ -108,9 +108,9 @@ class TestCases(unittest.TestCase):
             'City': ['New York', 'Los Angeles', 'Chicago']
         })
         filename = self.create_csv('cities.csv', data)
-        result = f_613(self.test_dir, filename)
+        result = f_726(self.test_dir, filename)
         pd.testing.assert_frame_equal(result, data)
     def test_file_not_found(self):
         # Test the FileNotFoundError
         with self.assertRaises(FileNotFoundError):
-            f_613(self.test_dir, "non_existent.csv")
+            f_726(self.test_dir, "non_existent.csv")

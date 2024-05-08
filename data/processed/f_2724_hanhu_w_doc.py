@@ -2,7 +2,7 @@ import tensorflow as tf
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import MinMaxScaler
 
-def f_46(X, y, n_splits, batch_size, epochs):
+def f_49(X, y, n_splits, batch_size, epochs):
     """
     Trains a simple neural network on provided data using k-fold cross-validation.
     The network has one hidden layer with 50 neurons and ReLU activation, and
@@ -28,7 +28,7 @@ def f_46(X, y, n_splits, batch_size, epochs):
     >>> import numpy as np
     >>> X = np.random.rand(100, 10)
     >>> y = np.random.randint(0, 2, 100)
-    >>> history = f_46(X, y, 5, 32, 1)
+    >>> history = f_49(X, y, 5, 32, 1)
     >>> isinstance(history, list)
     True
     >>> len(history)
@@ -65,28 +65,28 @@ class TestCases(unittest.TestCase):
         self.epochs = 10
     def test_return_type(self):
         """Test that the function returns a list."""
-        result = f_46(self.X, self.y, self.n_splits, self.batch_size, self.epochs)
+        result = f_49(self.X, self.y, self.n_splits, self.batch_size, self.epochs)
         self.assertIsInstance(result, list)
     def test_history_length_with_default_splits(self):
         """Test the length of the history list matches the number of splits."""
-        result = f_46(self.X, self.y, self.n_splits, self.batch_size, self.epochs)
+        result = f_49(self.X, self.y, self.n_splits, self.batch_size, self.epochs)
         self.assertEqual(len(result), self.n_splits)
     def test_training_metrics_inclusion(self):
         """Test that key metrics are included in the training history."""
-        result = f_46(self.X, self.y, self.n_splits, self.batch_size, self.epochs)
+        result = f_49(self.X, self.y, self.n_splits, self.batch_size, self.epochs)
         self.assertTrue(all('accuracy' in hist.history for hist in result))
     def test_effect_of_different_n_splits(self):
         """Test function behavior with different values of n_splits."""
         for n_splits in [3, 7]:
-            result = f_46(self.X, self.y, n_splits, self.batch_size, self.epochs)
+            result = f_49(self.X, self.y, n_splits, self.batch_size, self.epochs)
             self.assertEqual(len(result), n_splits)
     def test_effect_of_different_batch_sizes(self):
         """Test function behavior with different batch sizes."""
         for batch_size in [16, 64]:
-            result = f_46(self.X, self.y, self.n_splits, batch_size, self.epochs)
+            result = f_49(self.X, self.y, self.n_splits, batch_size, self.epochs)
             self.assertEqual(len(result), self.n_splits)  # Validating function execution
     def test_effect_of_different_epochs(self):
         """Test function behavior with different epochs."""
         for epochs in [5, 20]:
-            result = f_46(self.X, self.y, self.n_splits, self.batch_size, epochs)
+            result = f_49(self.X, self.y, self.n_splits, self.batch_size, epochs)
             self.assertEqual(len(result), self.n_splits)  # Validating function execution

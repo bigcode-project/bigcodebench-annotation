@@ -3,7 +3,7 @@ from django.conf import settings
 import random
 import time
 
-def f_647(data, min_delay, max_delay):
+def f_762(data, min_delay, max_delay):
     """
     After a random delay, generate a Django HttpResponse with JSON data to simulate the latency of the network.
     
@@ -23,7 +23,7 @@ def f_647(data, min_delay, max_delay):
     Example:
     >>> import json
     >>> random.seed(0)
-    >>> response = f_647(json.dumps({"Sample-Key": "Sample-Value"}), 1, 5)
+    >>> response = f_762(json.dumps({"Sample-Key": "Sample-Value"}), 1, 5)
     >>> response.status_code
     200
     >>> json.loads(response.content)
@@ -43,30 +43,30 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         random.seed(0)
         data = json.dumps({"key": "value"})
-        response = f_647(data, 1, 2)
+        response = f_762(data, 1, 2)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), {"key": "value"})
     def test_case_2(self):
         random.seed(0)
         data = json.dumps({"test": "data", "sample": "value"})
-        response = f_647(data, 0, 1)
+        response = f_762(data, 0, 1)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), {"test": "data", "sample": "value"})
     def test_case_3(self):
         random.seed(0)
         data = json.dumps({"hello": "world"})
-        response = f_647(data, 1, 3)
+        response = f_762(data, 1, 3)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), {"hello": "world"})
     def test_case_4(self):
         random.seed(0)
         data = json.dumps({})
-        response = f_647(data, 0, 0)
+        response = f_762(data, 0, 0)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), {})
     def test_case_5(self):
         random.seed(0)
         data = json.dumps({"a": 1, "b": 2, "c": 3})
-        response = f_647(data, 2, 4)
+        response = f_762(data, 2, 4)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), {"a": 1, "b": 2, "c": 3})

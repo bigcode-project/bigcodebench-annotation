@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import mode
 
-def f_310(list_of_lists):
+def f_359(list_of_lists):
     """
     Merges a predefined set of lists into a list and finds the mode of the elements in the list.
 
@@ -18,7 +18,7 @@ def f_310(list_of_lists):
     - scipy
     
     Example:
-    >>> f_310([[1, 1, 3], [4, 5, 6], [7, 8, 9]])
+    >>> f_359([[1, 1, 3], [4, 5, 6], [7, 8, 9]])
     (array([1]), array([2]))
     """
     merged_list = np.array([item for sublist in list_of_lists for item in sublist])
@@ -28,12 +28,12 @@ def f_310(list_of_lists):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        self.assertEqual(f_310([[1, 1, 3], [4, 5, 6], [7, 8, 9]]), (1, 2))
+        self.assertEqual(f_359([[1, 1, 3], [4, 5, 6], [7, 8, 9]]), (1, 2))
     def test_case_2(self):
-        self.assertEqual(f_310([[1, 1, 3], [4, 5, 6], [7, 8, 9], [1, 1, 1]]), (1, 5))
+        self.assertEqual(f_359([[1, 1, 3], [4, 5, 6], [7, 8, 9], [1, 1, 1]]), (1, 5))
     def test_case_3(self):
-        self.assertEqual(f_310([[1, 1, 3], [4, 5, 6], [7, 8, 9], [1, 1, 1], [2, 2, 2]]), (1, 5))
+        self.assertEqual(f_359([[1, 1, 3], [4, 5, 6], [7, 8, 9], [1, 1, 1], [2, 2, 2]]), (1, 5))
     def test_case_4(self):
-        self.assertEqual(f_310([[1, 1, 3], [4, 5, 6], [7, 8, 9], [1, 1, 1], [2, 2, 2], [3, 3, 3]]), (1, 5))
+        self.assertEqual(f_359([[1, 1, 3], [4, 5, 6], [7, 8, 9], [1, 1, 1], [2, 2, 2], [3, 3, 3]]), (1, 5))
     def test_case_5(self):
-        self.assertEqual(f_310([[1, 1, 3], [4, 5, 6], [7, 8, 9], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4]]), (1, 5))
+        self.assertEqual(f_359([[1, 1, 3], [4, 5, 6], [7, 8, 9], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4]]), (1, 5))

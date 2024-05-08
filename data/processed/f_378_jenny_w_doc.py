@@ -3,7 +3,7 @@ import random
 import pandas as pd
 
 
-def f_75(data_list, seed=None):
+def f_80(data_list, seed=None):
     """
     Shuffle the substrings within each string in a given list.
 
@@ -25,7 +25,7 @@ def f_75(data_list, seed=None):
     - re
 
     Example:
-    >>> f_75(['lamp, bag, mirror', 'table, chair'], seed=42)
+    >>> f_80(['lamp, bag, mirror', 'table, chair'], seed=42)
          Original String    Shuffled String
     0  lamp, bag, mirror  bag, lamp, mirror
     1       table, chair       chair, table
@@ -47,7 +47,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic case
         input_data = ["lamp, bag, mirror", "table, chair"]
-        output_df = f_75(input_data)
+        output_df = f_80(input_data)
         self.assertEqual(output_df["Original String"].iloc[0], "lamp, bag, mirror")
         self.assertEqual(output_df["Original String"].iloc[1], "table, chair")
         self.assertEqual(len(output_df["Shuffled String"].iloc[0].split(", ")), 3)
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test single character substrings
         input_data = ["A, B, C, D", "E, F, G"]
-        output_df = f_75(input_data)
+        output_df = f_80(input_data)
         self.assertEqual(output_df["Original String"].iloc[0], "A, B, C, D")
         self.assertEqual(output_df["Original String"].iloc[1], "E, F, G")
         self.assertEqual(len(output_df["Shuffled String"].iloc[0].split(", ")), 4)
@@ -63,26 +63,26 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test single-item list
         input_data = ["word1, word2"]
-        output_df = f_75(input_data)
+        output_df = f_80(input_data)
         self.assertEqual(output_df["Original String"].iloc[0], "word1, word2")
         self.assertEqual(len(output_df["Shuffled String"].iloc[0].split(", ")), 2)
     def test_case_4(self):
         # Tests shuffling with an empty string
         input_data = [""]
-        output_df = f_75(input_data)
+        output_df = f_80(input_data)
         self.assertEqual(output_df["Original String"].iloc[0], "")
         self.assertEqual(output_df["Shuffled String"].iloc[0], "")
     def test_case_5(self):
         # Test shuffling single substring (no shuffling)
         input_data = ["single"]
-        output_df = f_75(input_data)
+        output_df = f_80(input_data)
         self.assertEqual(output_df["Original String"].iloc[0], "single")
         self.assertEqual(output_df["Shuffled String"].iloc[0], "single")
     def test_case_6(self):
         # Testing the effect of a specific random seed to ensure reproducibility
         input_data = ["a, b, c, d"]
-        output_df1 = f_75(input_data, seed=42)
-        output_df2 = f_75(input_data, seed=42)
+        output_df1 = f_80(input_data, seed=42)
+        output_df2 = f_80(input_data, seed=42)
         self.assertEqual(
             output_df1["Shuffled String"].iloc[0], output_df2["Shuffled String"].iloc[0]
         )
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
         # Tests shuffling with varying spaces around commas
         input_data = ["one,two, three"]
         corrected_expected_shuffled = "two, one, three"
-        output_df = f_75(input_data, seed=42)
+        output_df = f_80(input_data, seed=42)
         self.assertEqual(output_df["Original String"].iloc[0], "one,two, three")
         self.assertEqual(
             output_df["Shuffled String"].iloc[0], corrected_expected_shuffled

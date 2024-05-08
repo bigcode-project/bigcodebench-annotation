@@ -3,7 +3,7 @@ import string
 import pandas as pd
 
 
-def f_718():
+def f_852():
     """
     Generate all possible 3-letter combinations of the alphabet, save them in a pandas DataFrame,
     and draw a histogram of the frequency of the first letters in these combinations.
@@ -26,7 +26,7 @@ def f_718():
     - pandas
 
     Example:
-    >>> df, ax = f_718()
+    >>> df, ax = f_852()
     >>> print(df.head())
        a  b  c
     0  a  a  a
@@ -48,36 +48,36 @@ import string
 import matplotlib.pyplot as plt
 LETTERS = list(string.ascii_lowercase)
 class TestCases(unittest.TestCase):
-    """Tests for the function f_718"""
+    """Tests for the function f_852"""
     def test_dataframe_shape(self):
         """
         Test if the DataFrame has the correct shape (17576 rows, 3 columns)
         """
-        df, _ = f_718()
+        df, _ = f_852()
         self.assertEqual(df.shape, (17576, 3))
     def test_dataframe_columns(self):
         """
         Test if the DataFrame has the correct column names (a, b, c)
         """
-        df, _ = f_718()
+        df, _ = f_852()
         self.assertListEqual(list(df.columns), ["a", "b", "c"])
     def test_histogram_plot(self):
         """
         Test if the histogram plot is an instance of matplotlib Axes
         """
-        _, ax = f_718()
+        _, ax = f_852()
         self.assertTrue(isinstance(ax, plt.Axes))
     def test_first_column_values(self):
         """
         Test if the first column of the DataFrame contains only lowercase letters
         """
-        df, _ = f_718()
+        df, _ = f_852()
         self.assertTrue(all(letter in string.ascii_lowercase for letter in df["a"]))
     def test_no_empty_values(self):
         """
         Test if there are no empty values in the DataFrame
         """
-        df, _ = f_718()
+        df, _ = f_852()
         self.assertFalse(df.isnull().values.any())
     def tearDown(self):
         plt.close()

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # Constants
 ARRAY_SIZE = 10000
 
-def f_87():
+def f_95():
     """
     Create a numeric array of random integers, calculate the mean and standard deviation, and draw a histogram of the distribution.
 
@@ -23,7 +23,7 @@ def f_87():
     Example:
     >>> import numpy as np
     >>> np.random.seed(0)
-    >>> array, mean, std, ax = f_87()
+    >>> array, mean, std, ax = f_95()
     >>> print(mean, std)
     49.6135 28.5323416100046
     >>> plt.show()
@@ -48,27 +48,27 @@ import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         np.random.seed(0)
-        array, mean, std, ax = f_87()
+        array, mean, std, ax = f_95()
         self.assertEqual(array.size, ARRAY_SIZE)
         self.assertEqual(mean, 49.6135)
         self.assertEqual(std, 28.5323416100046)
         self.assertEqual(ax.get_title(), 'Histogram of Random Integers')
     def test_case_2(self):
-        array, mean, std, ax = f_87()
+        array, mean, std, ax = f_95()
         self.assertEqual(ax.get_xlabel(), 'Value')
         self.assertEqual(ax.get_ylabel(), 'Frequency')
     def test_case_3(self):
         np.random.seed(1)
-        array, mean, std, ax = f_87()
+        array, mean, std, ax = f_95()
         self.assertEqual(mean, 50.0717)
         self.assertEqual(std, 28.559862729186918)
     def test_case_4(self):
         np.random.seed(100)
-        array, mean, std, ax = f_87()
+        array, mean, std, ax = f_95()
         self.assertEqual(mean, 50.2223)
         self.assertEqual(std, 28.494467580742757)
     def test_case_5(self):
         np.random.seed(500)
-        array, mean, std, ax = f_87()
+        array, mean, std, ax = f_95()
         self.assertEqual(mean, 49.8636)
         self.assertEqual(std, 28.516030492338864)

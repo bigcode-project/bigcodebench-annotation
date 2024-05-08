@@ -4,7 +4,8 @@ import seaborn as sns
 
 def f_475(goals, penalties):
     """
-    Visualize the distribution of goals and penalties for a number of teams and return the data as a DataFrame.
+    Visualize the distribution of goals and penalties for a number of teams and return the data as a
+    DataFrame with colomns 'Team', 'Goals' and 'Penalties'.
 
     Parameters:
     - goals (dict): A dictionary where keys are team names and values are numbers of goals scored.

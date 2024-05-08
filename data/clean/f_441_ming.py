@@ -5,7 +5,8 @@ import pandas as pd
 
 def f_441(data):
     """
-    Draw a bar chart with monthly data for a given year.
+    This function plots a bar chart of monthly data values for a single year, with 'month' on the x-axis and 'value'
+    on the y-axis.
 
     Parameters:
     data (str): The data string in the format 'yyyy-mm-value'.

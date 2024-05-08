@@ -4,7 +4,7 @@ import csv
 import collections
 
 
-def f_12(url, column_name, csv_file_path):
+def f_14(url, column_name, csv_file_path):
     """
     Download a CSV file from a given URL, save it to a specified path, and count
     the occurrences of each value in a particular column. The function handles various
@@ -33,7 +33,7 @@ def f_12(url, column_name, csv_file_path):
     - collections
 
     Example:
-    >>> f_12('http://example.com/data.csv', 'category', 'downloaded_data.csv')
+    >>> f_14('http://example.com/data.csv', 'category', 'downloaded_data.csv')
     {'cat1': 5, 'cat2': 3, 'cat3': 8}
     # This is a hypothetical output; the actual output will depend on the CSV data.
 
@@ -57,7 +57,7 @@ import unittest
 from unittest.mock import patch, mock_open
 import os
 class TestCases(unittest.TestCase):
-    """Test cases for the f_12 function."""
+    """Test cases for the f_14 function."""
     @patch("os.remove")
     @patch("urllib.request.urlretrieve")
     @patch(
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
     )
     def test_count_categories_data1(self, mock_file, mock_urlretrieve, mock_remove):
         """Test that the function counts the occurrences of each category in the CSV file."""
-        result = f_12("mock_url", "category", "/mock/path/data1.csv")
+        result = f_14("mock_url", "category", "/mock/path/data1.csv")
         self.assertEqual(result, {"cat1": 2, "cat2": 2, "cat3": 1})
     @patch("os.remove")
     @patch("urllib.request.urlretrieve")
@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
     )
     def test_count_names_data2(self, mock_file, mock_urlretrieve, mock_remove):
         """Test that the function counts the occurrences of each name in the CSV file."""
-        result = f_12("mock_url", "name", "/mock/path/data2.csv")
+        result = f_14("mock_url", "name", "/mock/path/data2.csv")
         self.assertEqual(result, {"Alice": 2, "Bob": 1, "Charlie": 1})
     @patch("os.remove")
     @patch("urllib.request.urlretrieve")
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
     )
     def test_count_categories_data3(self, mock_file, mock_urlretrieve, mock_remove):
         """Test that the function counts the occurrences of each category in the CSV file."""
-        result = f_12("mock_url", "category", "/mock/path/data3.csv")
+        result = f_14("mock_url", "category", "/mock/path/data3.csv")
         self.assertEqual(result, {"cat1": 2, "cat2": 1, "cat3": 2})
     @patch("os.remove")
     @patch("urllib.request.urlretrieve")
@@ -100,7 +100,7 @@ class TestCases(unittest.TestCase):
     )
     def test_count_names_data3(self, mock_file, mock_urlretrieve, mock_remove):
         """Test that the function counts the occurrences of each name in the CSV file."""
-        result = f_12("mock_url", "name", "/mock/path/data3.csv")
+        result = f_14("mock_url", "name", "/mock/path/data3.csv")
         self.assertEqual(result, {"Alice": 3, "Bob": 1, "Charlie": 1})
     @patch("os.remove")
     @patch("urllib.request.urlretrieve")
@@ -112,4 +112,4 @@ class TestCases(unittest.TestCase):
     def test_non_existent_column(self, mock_file, mock_urlretrieve, mock_remove):
         """Test that the function raises an exception when the specified column does not exist."""
         with self.assertRaises(ValueError):
-            f_12("mock_url", "non_existent_column", "/mock/path/data3.csv")
+            f_14("mock_url", "non_existent_column", "/mock/path/data3.csv")

@@ -6,7 +6,7 @@ import platform
 LOGFILE_PATH = "logfile.log"
 
 
-def f_204(interval, duration):
+def f_234(interval, duration):
     """
     Monitors and logs CPU usage at specified intervals over a given duration.
 
@@ -35,7 +35,7 @@ def f_204(interval, duration):
     The function supports different commands for CPU usage monitoring on Windows and Unix/Linux platforms.
     
     Example:
-    >>> f_204(5, 60)
+    >>> f_234(5, 60)
     'logfile.log'
     """
     if interval <= 0 or duration <= 0:
@@ -80,7 +80,7 @@ import os
 import json
 from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    """Test cases for f_204."""
+    """Test cases for f_234."""
     def setUp(self):
         """
         Setup before each test case.
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
         # Create an iterator that starts at 0 and increments by 5 every time it's called
         time_iter = iter(range(0, 100, 5))
         mock_time.side_effect = lambda: next(time_iter)
-        result = f_204(5, 25)
+        result = f_234(5, 25)
         self.assertEqual(result, self.logfile_path)
         self.assertTrue(os.path.exists(self.logfile_path))
     def test_invalid_interval(self):
@@ -110,14 +110,14 @@ class TestCases(unittest.TestCase):
         It should raise a ValueError.
         """
         with self.assertRaises(ValueError):
-            f_204(-1, 10)
+            f_234(-1, 10)
     def test_invalid_duration(self):
         """
         Test the function with an invalid duration value (less than or equal to zero).
         It should raise a ValueError.
         """
         with self.assertRaises(ValueError):
-            f_204(5, -10)
+            f_234(5, -10)
     @patch("subprocess.check_output")
     @patch("time.time")
     @patch("platform.system")
@@ -132,7 +132,7 @@ class TestCases(unittest.TestCase):
         mock_time.side_effect = iter(range(0, 100, 5))
         mock_output = b'"\\Processor(_Total)\\% Processor Time","5.0"\n\n"2023-04-01 12:34:56.789","5.0"\n'
         mock_subprocess.return_value = mock_output
-        result = f_204(5, 10)
+        result = f_234(5, 10)
         self.assertEqual(result, self.logfile_path)
     @patch("subprocess.check_output")
     @patch("time.time")
@@ -148,7 +148,7 @@ class TestCases(unittest.TestCase):
         mock_time.side_effect = iter(range(0, 100, 5))
         mock_output = b"Linux 4.15.0-54-generic (ubuntu) \nTasks: 195 total...\n%Cpu(s):  5.0 us,  2.0 sy,  0.0 ni, 92.0 id,  0.0 wa,  0.0 hi,  1.0 si,  0.0 st\n"
         mock_subprocess.return_value = mock_output
-        result = f_204(5, 10)
+        result = f_234(5, 10)
         self.assertEqual(result, self.logfile_path)
     @patch("builtins.open", side_effect=IOError("Mocked error"))
     def test_io_error_handling(self, mock_open):
@@ -156,5 +156,5 @@ class TestCases(unittest.TestCase):
         Test the function's behavior when an IOError occurs during file operations.
         It should handle the error and return None.
         """
-        result = f_204(5, 10)
+        result = f_234(5, 10)
         self.assertIsNone(result)

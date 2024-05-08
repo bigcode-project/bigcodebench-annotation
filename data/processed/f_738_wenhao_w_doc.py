@@ -2,7 +2,7 @@ from collections import Counter
 import random
 import itertools
 
-def f_571(length, count, seed=0):
+def f_673(length, count, seed=0):
     """
     Generate a number of random strings with a specified length from a fixed set of letters ('a', 'b', 'c', 'd', 'e'),
     and analyze the frequency of each letter in the generated strings.
@@ -21,9 +21,9 @@ def f_571(length, count, seed=0):
     - Counter: A collections.Counter object containing the frequency of each letter in the generated strings.
     
     Example:
-    >>> f_571(5, 2, seed=1)
+    >>> f_673(5, 2, seed=1)
     Counter({'a': 3, 'd': 3, 'c': 2, 'e': 1, 'b': 1})
-    >>> f_571(0, 100, seed=2)
+    >>> f_673(0, 100, seed=2)
     Counter()
     """
     random.seed(seed)
@@ -35,28 +35,28 @@ import unittest
 from collections import Counter
 class TestCases(unittest.TestCase):
     def test_length_one_count_ten(self):
-        result = f_571(1, 10, seed=0)
+        result = f_673(1, 10, seed=0)
         self.assertIsInstance(result, Counter)
         self.assertEqual(sum(result.values()), 10, "The total count of letters should be 10.")
         
     def test_length_five_count_hundred(self):
-        result = f_571(5, 100, seed=1)
+        result = f_673(5, 100, seed=1)
         self.assertIsInstance(result, Counter)
         self.assertEqual(sum(result.values()), 500, "The total count of letters should be 500.")
         
     def test_zero_length(self):
-        result = f_571(0, 100, seed=2)
+        result = f_673(0, 100, seed=2)
         self.assertIsInstance(result, Counter)
         self.assertEqual(sum(result.values()), 0, "With length 0, there should be no letters.")
         
     def test_zero_count(self):
-        result = f_571(5, 0, seed=3)
+        result = f_673(5, 0, seed=3)
         self.assertIsInstance(result, Counter)
         self.assertEqual(sum(result.values()), 0, "With count 0, there should be no letters.")
         
     def test_specific_distribution(self):
         # Assuming the seed value of 4 leads to a specific, known distribution
-        result = f_571(5, 2, seed=4)
+        result = f_673(5, 2, seed=4)
         # Correct the expected distribution based on actual output
         correct_expected_distribution = Counter({'b': 3, 'a': 3, 'e': 2, 'c': 1, 'd': 1})
         self.assertEqual(result, correct_expected_distribution, "The letter distribution should match the expected distribution.")

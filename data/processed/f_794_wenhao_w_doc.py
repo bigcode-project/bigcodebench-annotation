@@ -6,7 +6,7 @@ from random import randint, seed
 # Constants
 CATEGORIES = ['Electronics', 'Clothing', 'Home & Kitchen', 'Books', 'Toys & Games']
 
-def f_120(mystrings, n_products, seed=0):
+def f_131(mystrings, n_products, seed=0):
     """
     Create a product catalog DataFrame where each row represents a product with the following columns:
     - 'Product Name': The name of the product with spaces replaced by underscores.
@@ -30,11 +30,11 @@ def f_120(mystrings, n_products, seed=0):
     - CATEGORIES: A list of categories used to randomly assign a category to each product.
 
     Examples:
-    >>> f_120(['Mobile Phone', 'T Shirt', 'Coffee Maker', 'Python Book', 'Toy Car'], 2)
+    >>> f_131(['Mobile Phone', 'T Shirt', 'Coffee Maker', 'Python Book', 'Toy Car'], 2)
        Product Name        Category  Price
     0   Python_Book           Books  67.64
     1  Mobile_Phone  Home & Kitchen  54.00
-    >>> f_120(['Laptop', 'Sweater'], 1)
+    >>> f_131(['Laptop', 'Sweater'], 1)
       Product Name Category  Price
     0      Sweater    Books  67.64
     """
@@ -55,29 +55,29 @@ class TestCases(unittest.TestCase):
     
     def test_case_1(self):
         
-        result = f_120(['Mobile Phone', 'T Shirt', 'Coffee Maker', 'Python Book', 'Toy Car'], 2, 42)
+        result = f_131(['Mobile Phone', 'T Shirt', 'Coffee Maker', 'Python Book', 'Toy Car'], 2, 42)
         # assert the value of the DataFrame
         self.assertEqual(result['Product Name'].tolist(), ['Mobile_Phone', 'Coffee_Maker'])
         self.assertEqual(result['Category'].tolist(), ['Electronics', 'Clothing'])
         self.assertEqual(result['Price'].tolist(), [54.97, 48.62])
         
     def test_case_2(self):
-        result = f_120(['Laptop', 'Sweater'], 1)
+        result = f_131(['Laptop', 'Sweater'], 1)
         self.assertEqual(result['Product Name'].tolist(), ['Sweater'])
         self.assertEqual(result['Category'].tolist(), ['Books'])
         self.assertEqual(result['Price'].tolist(), [67.64])
         
     def test_case_3(self):
-        result = f_120(['Book', 'Pen', 'Bag'], 3)
+        result = f_131(['Book', 'Pen', 'Bag'], 3)
         self.assertEqual(result['Product Name'].tolist(), ['Pen', 'Book', 'Bag'])
         self.assertEqual(result['Category'].tolist(), ['Books', 'Home & Kitchen', 'Books'])
         self.assertEqual(result['Price'].tolist(), [67.64, 54.00, 59.79])
         
     def test_case_4(self):
-        result = f_120(['Watch'], 2)
+        result = f_131(['Watch'], 2)
         self.assertEqual(result['Product Name'].tolist(), ['Watch', 'Watch'])
         self.assertEqual(result['Category'].tolist(), ['Books', 'Home & Kitchen'])
         self.assertEqual(result['Price'].tolist(), [67.64, 54.00])
     def test_case_5(self):
-        result = f_120(['TV', 'Fridge', 'Sofa', 'Table'], 0)
+        result = f_131(['TV', 'Fridge', 'Sofa', 'Table'], 0)
         self.assertEqual(result.empty, True)

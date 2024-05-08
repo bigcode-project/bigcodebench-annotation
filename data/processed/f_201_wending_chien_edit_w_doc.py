@@ -4,7 +4,7 @@ import numpy as np
 DEFAULT_COLUMNS = ['Element', 'Count']
 
 
-def f_530(elements, include_index=False):
+def f_623(elements, include_index=False):
     """
     Constructs a DataFrame that enumerates the character counts of each string in a provided list of elements. This
     function can optionally include an index column for each row in the DataFrame.
@@ -24,7 +24,7 @@ def f_530(elements, include_index=False):
     The order of columns in the returned DataFrame will be ['Index', 'Element', 'Count'] if the index is included.
 
     Example:
-    >>> result = f_530(['abc', 'def'], include_index=True)
+    >>> result = f_623(['abc', 'def'], include_index=True)
     >>> print(result.to_string(index=False))
      Index Element  Count
          0     abc      3
@@ -43,22 +43,22 @@ def f_530(elements, include_index=False):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = f_530(['hello'])
+        result = f_623(['hello'])
         expected = pd.DataFrame({'Element': ['hello'], 'Count': [5]})
         pd.testing.assert_frame_equal(result, expected)
     def test_case_2(self):
-        result = f_530(['a', 'bc', 'def'])
+        result = f_623(['a', 'bc', 'def'])
         expected = pd.DataFrame({'Element': ['a', 'bc', 'def'], 'Count': [1, 2, 3]})
         pd.testing.assert_frame_equal(result, expected)
     def test_case_3(self):
-        result = f_530(['zzz', 'zzz'])
+        result = f_623(['zzz', 'zzz'])
         expected = pd.DataFrame({'Element': ['zzz', 'zzz'], 'Count': [3, 3]})
         pd.testing.assert_frame_equal(result, expected)
     def test_case_4(self):
-        result = f_530(['hello world', 'open ai'])
+        result = f_623(['hello world', 'open ai'])
         expected = pd.DataFrame({'Element': ['hello world', 'open ai'], 'Count': [11, 7]})
         pd.testing.assert_frame_equal(result, expected)
     def test_case_5(self):
-        result = f_530(['hello', 'world'], include_index=True)
+        result = f_623(['hello', 'world'], include_index=True)
         expected = pd.DataFrame({'Index': np.array([0, 1], dtype='int64'), 'Element': ['hello', 'world'], 'Count': [5, 5]})
         pd.testing.assert_frame_equal(result, expected)

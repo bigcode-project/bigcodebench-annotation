@@ -1,7 +1,7 @@
 import pandas as pd
 from random import seed, choices
 
-def f_495(L, num_dataframes=5, random_seed=None):
+def f_581(L, num_dataframes=5, random_seed=None):
     """
     Generate a specified number of Pandas DataFrames from a list of lists "L".
     Each DataFrame has the same column names randomly chosen from lowercase English
@@ -26,7 +26,7 @@ def f_495(L, num_dataframes=5, random_seed=None):
 
     Example:
     >>> L = [['14', '65', 76], ['2', '5', 6], ['7', '12', 33], ['14', '22', 46]]
-    >>> common_rows, df_list = f_495(L, num_dataframes=3, random_seed=123)
+    >>> common_rows, df_list = f_581(L, num_dataframes=3, random_seed=123)
     >>> print(common_rows)
         b   c   k
     0  14  65  76
@@ -45,7 +45,7 @@ def f_495(L, num_dataframes=5, random_seed=None):
     2   2   5   6]
 
     >>> L = [[1, '65', 76], [2, '5', 6]]
-    >>> common_rows, df_list = f_495(L, num_dataframes=1, random_seed=1)
+    >>> common_rows, df_list = f_581(L, num_dataframes=1, random_seed=1)
     >>> print(common_rows)
        d   w   t
     0  1  65  76
@@ -75,7 +75,7 @@ def f_495(L, num_dataframes=5, random_seed=None):
 import unittest
 from faker import Faker
 import pandas as pd
-# [Your modified f_495_modified function goes here]
+# [Your modified f_581_modified function goes here]
 fake = Faker()
 def generate_fake_data(num_rows=5, num_columns=5):
     """Generate fake data for test cases"""
@@ -89,9 +89,9 @@ def generate_fake_data(num_rows=5, num_columns=5):
 class TestCases(unittest.TestCase):
     def test_rng(self):
         data = generate_fake_data(5, 3)
-        result1, _ = f_495(data, random_seed=12)
-        result2, _ = f_495(data, random_seed=12)
-        result3, _ = f_495(data, random_seed=1)
+        result1, _ = f_581(data, random_seed=12)
+        result2, _ = f_581(data, random_seed=12)
+        result3, _ = f_581(data, random_seed=1)
         pd.testing.assert_frame_equal(result1, result2)
         try:
             pd.testing.assert_frame_equal(result1, result3)
@@ -103,7 +103,7 @@ class TestCases(unittest.TestCase):
             raise AssertionError
     def test_case_1(self):
         data = generate_fake_data(5, 3)
-        result, df_list = f_495(data, random_seed=123)
+        result, df_list = f_581(data, random_seed=123)
         expected = pd.DataFrame(
             {'b': {0: 7775, 1: 3729, 3: 177, 4: 5730}, 'c': {0: 4407, 1: 9145, 3: 6139, 4: 2336}, 'k': {0: 8669, 1: 27, 3: 7905, 4: 6252}}        )
         pd.testing.assert_frame_equal(result, expected)
@@ -111,7 +111,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(df_list[0]), 3)
     def test_case_2(self):
         data = generate_fake_data(10, 5)
-        result, df_list = f_495(data, random_seed=42)
+        result, df_list = f_581(data, random_seed=42)
         expected = pd.DataFrame(
             {'q': {0: 995, 1: 5120, 2: 7775, 5: 7540, 6: 8413}, 'a': {0: 8338, 1: 9144, 2: 4407, 5: 9854, 6: 5521}, 'h': {0: 3657, 1: 2679, 2: 8669, 5: 3729, 6: 6629}, 'f': {0: 1490, 1: 841, 2: 5730, 5: 9145, 6: 1431}, 't': {0: 6943, 1: 9095, 2: 2336, 5: 27, 6: 304}}
         )
@@ -120,7 +120,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(df_list[0]), 3)
     def test_case_3(self):
         data = generate_fake_data(8, 4)
-        result, df_list = f_495(data, random_seed=121, num_dataframes=10)
+        result, df_list = f_581(data, random_seed=121, num_dataframes=10)
         expected = pd.DataFrame(
 {'c': {0: 7209, 2: 1431, 3: 7905, 4: 1222, 5: 3729, 6: 3444, 11: 7775, 16: 2336}, 'p': {0: 6023, 2: 304, 3: 4490, 4: 8413, 5: 9145, 6: 963, 11: 4407, 16: 6252}, 'k': {0: 2658, 2: 995, 3: 7540, 4: 5521, 5: 27, 6: 9440, 11: 8669, 16: 177}, 'x': {0: 5565, 2: 8338, 3: 9854, 4: 6629, 5: 2380, 6: 3270, 11: 5730, 16: 6139}}  
         )
@@ -129,7 +129,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(df_list[0]), 3)
     def test_case_4(self):
         data = generate_fake_data(3, 2)
-        result, df_list = f_495(data, random_seed=1233)
+        result, df_list = f_581(data, random_seed=1233)
         expected = pd.DataFrame(
             {'i': {0: 7775, 2: 2336, 7: 8669}, 'n': {0: 4407, 2: 6252, 7: 5730}}
         )
@@ -138,40 +138,40 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(df_list[0]), 3)
     def test_empty_input(self):
         data = []
-        result, df_list = f_495(data, random_seed=123)
+        result, df_list = f_581(data, random_seed=123)
         self.assertTrue(result.empty)
         self.assertEqual(len(df_list), 0)
     def test_single_row_input(self):
         data = [[1, 2, 3]]
-        result, df_list = f_495(data, random_seed=123)
+        result, df_list = f_581(data, random_seed=123)
         self.assertEqual(len(result), 1)
         self.assertEqual(len(df_list), 5)
         self.assertEqual(len(df_list[0]), 3)
     def test_single_column_input(self):
         data = [[1], [2], [3]]
-        result, df_list = f_495(data, random_seed=123)
+        result, df_list = f_581(data, random_seed=123)
         self.assertEqual(result.shape[1], 1)
         self.assertEqual(len(df_list), 5)
         self.assertEqual(len(df_list[0]), 3)
     def test_large_number_of_rows(self):
         data = generate_fake_data(1000, 5)
-        result, df_list = f_495(data, random_seed=123)
+        result, df_list = f_581(data, random_seed=123)
         self.assertTrue(isinstance(result, pd.DataFrame))
         self.assertEqual(len(df_list), 5)
         self.assertEqual(len(df_list[0]), 3)
     def test_non_uniform_row_lengths(self):
         data = [[1, 2], [3, 4, 5], [6]]
         with self.assertRaises(ValueError):
-            f_495(data, random_seed=123)
+            f_581(data, random_seed=123)
     def test_all_identical_rows(self):
         data = [[1, 2, 3]] * 5
-        result, df_list = f_495(data, random_seed=123)
+        result, df_list = f_581(data, random_seed=123)
         self.assertEqual(len(result), 1)
         self.assertEqual(len(df_list), 5)
         self.assertEqual(len(df_list[0]), 3)
     def test_no_common_rows(self):
         data = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-        result, df_list = f_495(data, random_seed=123)
+        result, df_list = f_581(data, random_seed=123)
         expected = pd.DataFrame(
             {'b': {0: 1, 1: 7, 3: 4}, 'c': {0: 2, 1: 8, 3: 5}, 'k': {0: 3, 1: 9, 3: 6}}
         )

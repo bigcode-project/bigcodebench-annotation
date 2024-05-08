@@ -2,7 +2,7 @@ import pandas as pd
 import csv
 import random
 
-def f_574(
+def f_677(
     n, 
     countries=['USA', 'UK', 'China', 'India', 'Germany'], 
     products=['Product A', 'Product B', 'Product C', 'Product D', 'Product E'], 
@@ -31,7 +31,7 @@ def f_574(
     - random
 
     Example:
-    >>> df = f_574(5, random_seed=1)
+    >>> df = f_677(5, random_seed=1)
     >>> print(df)
       Country    Product  Sales
     0      UK  Product E     98
@@ -40,7 +40,7 @@ def f_574(
     3   India  Product B     13
     4   India  Product A     50
 
-    >>> df = f_574(7, products=['tea', 'coffee'], countries=['Austria', 'Australia'], random_seed=12)
+    >>> df = f_677(7, products=['tea', 'coffee'], countries=['Austria', 'Australia'], random_seed=12)
     >>> print(df)
          Country Product  Sales
     0  Australia  coffee     85
@@ -78,12 +78,12 @@ class TestCases(unittest.TestCase):
         os.makedirs(self.temp_dir, exist_ok=True)
     def test_rng(self):
         'rng reproducability'
-        df1 = f_574(100, random_seed=1)
-        df2 = f_574(100, random_seed=1)
+        df1 = f_677(100, random_seed=1)
+        df2 = f_677(100, random_seed=1)
         self.assertTrue(pd.testing.assert_frame_equal(df1, df2) is None)
     def test_case_1(self):
         'default values'
-        df = f_574(100, random_seed=12)
+        df = f_677(100, random_seed=12)
         self.assertEqual(len(df), 100)
         self.assertTrue(set(df["Country"].unique()).issubset(set(['USA', 'UK', 'China', 'India', 'Germany'])))
         self.assertTrue(set(df["Product"].unique()).issubset(set(['Product A', 'Product B', 'Product C', 'Product D', 'Product E'])))
@@ -93,24 +93,24 @@ class TestCases(unittest.TestCase):
         'test with random countries and products'
         countries = [fake.country() for _ in range(5)]
         products = [fake.unique.first_name() for _ in range(5)]
-        df = f_574(200, countries=countries, products=products, random_seed=1)
+        df = f_677(200, countries=countries, products=products, random_seed=1)
         self.assertEqual(len(df), 200)
         self.assertTrue(set(df["Country"].unique()).issubset(set(countries)))
         self.assertTrue(set(df["Product"].unique()).issubset(set(products)))
     def test_case_3(self):
         'empty'
-        df = f_574(0)
+        df = f_677(0)
         self.assertEqual(len(df), 0)
     def test_case_4(self):
         'only one countrie and product'
-        df = f_574(50, countries=['USA'], products=['Product A'])
+        df = f_677(50, countries=['USA'], products=['Product A'])
         self.assertEqual(len(df), 50)
         self.assertTrue(set(df["Country"].unique()) == set(['USA']))
         self.assertTrue(set(df["Product"].unique()) == set(['Product A']))
     def test_case_5(self):
         'saving to csv'
         output_path = self.temp_dir
-        df = f_574(100, output_path=os.path.join(output_path, 'test.csv'))
+        df = f_677(100, output_path=os.path.join(output_path, 'test.csv'))
         self.assertEqual(len(df), 100)
         # Verify the file was saved correctly
         saved_df = pd.read_csv(os.path.join(output_path, 'test.csv'))

@@ -2,7 +2,7 @@ import subprocess
 import os
 import random
 
-def f_519(directory, file_list):
+def f_612(directory, file_list):
     """
     Select a random file from a given list of files in a specified directory and run it as a subprocess.
     
@@ -20,7 +20,7 @@ def f_519(directory, file_list):
 
     Example:
     >>> random.seed(0)
-    >>> f_519("c:\Program Files\VMware\VMware Server", ["file1.bat", "file2.bat"]) #valid directory and file list
+    >>> f_612("c:\Program Files\VMware\VMware Server", ["file1.bat", "file2.bat"]) #valid directory and file list
     0 
     """
     if not file_list:
@@ -49,14 +49,14 @@ class TestCases(unittest.TestCase):
             mock_process.wait.return_value = None
             mock_process.returncode = 0
             mock_popen.return_value = mock_process
-            result = f_519(directory, file_list)
+            result = f_612(directory, file_list)
             self.assertEqual(result, 0)
     def test_empty_file_list(self):
         # Testing with an empty file list
         random.seed(0)
         directory = "valid_dir"
         file_list = []
-        result = f_519(directory, file_list)
+        result = f_612(directory, file_list)
         self.assertIsNone(result)
     def test_invalid_directory(self):
         # Testing with an invalid directory
@@ -64,7 +64,7 @@ class TestCases(unittest.TestCase):
         directory = "invalid_dir"
         file_list = ["script1.bat"]
         with patch('subprocess.Popen', side_effect=Exception("Error")):
-            result = f_519(directory, file_list)
+            result = f_612(directory, file_list)
             self.assertIsNone(result)
     def test_non_zero_exit_code(self):
         # Testing a subprocess that returns a non-zero exit code
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
             mock_process.wait.return_value = None
             mock_process.returncode = 1
             mock_popen.return_value = mock_process
-            result = f_519(directory, file_list)
+            result = f_612(directory, file_list)
             self.assertEqual(result, 1)
     def test_random_file_selection(self):
         # Testing that a file is randomly selected from the list
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
                 mock_process.returncode = 0
                 mock_popen.return_value = mock_process
                 for expected_file in file_list:
-                    result = f_519(directory, file_list)
+                    result = f_612(directory, file_list)
                     # Manually check that the expected command was part of any call
                     expected_call = os.path.join(directory, expected_file)
                     found = False

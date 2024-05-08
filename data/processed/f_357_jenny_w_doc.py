@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
 
-def f_465(n_samples=100, n_features=10, random_seed=None):
+def f_546(n_samples=100, n_features=10, random_seed=None):
     """
     Generate synthetic data using a simple regression model, fit a linear regression model to the data,
     and return the predicted values along with the coefficients and intercept of the model.
@@ -28,7 +28,7 @@ def f_465(n_samples=100, n_features=10, random_seed=None):
     - sklearn.linear_model.LinearRegression
     
     Example:
-    >>> predictions, coefficients, intercept, mse = f_465(100, 5, random_seed=42)
+    >>> predictions, coefficients, intercept, mse = f_546(100, 5, random_seed=42)
     >>> predictions[:3]
     array([ 180.79207843, -295.0210232 ,  118.23799221])
     >>> round(mse, 4)
@@ -77,14 +77,14 @@ class TestCases(unittest.TestCase):
             [5000, 15],
             [10000, 20],
         ]:
-            predictions, _, _, mse = f_465(n_samples, n_features, random_seed=random_seed)
+            predictions, _, _, mse = f_546(n_samples, n_features, random_seed=random_seed)
             _, _, _, y = self.generate_data(
                 n_samples, n_features, random_seed=random_seed
             )
             self.assertEqual(mse, mean_squared_error(y, predictions))
     def test_case_2(self):
         # Test default parameters
-        predictions, coefficients, intercept, mse = f_465(random_seed=42)
+        predictions, coefficients, intercept, mse = f_546(random_seed=42)
         self.assertEqual(
             predictions.shape[0], 20
         )  # Default split leaves 20% of 100 samples for testing
@@ -96,8 +96,8 @@ class TestCases(unittest.TestCase):
         self.assertEqual(mse, mean_squared_error(y, predictions))
     def test_case_3(self):
         # Test different random seeds for reproducibility
-        _, coefficients_1, intercept_1, mse_1 = f_465(random_seed=1)
-        _, coefficients_2, intercept_2, mse_2 = f_465(random_seed=2)
+        _, coefficients_1, intercept_1, mse_1 = f_546(random_seed=1)
+        _, coefficients_2, intercept_2, mse_2 = f_546(random_seed=2)
         with self.assertRaises(AssertionError):
             assert_array_equal(coefficients_1, coefficients_2)
             self.assertEqual(intercept_1, intercept_2)
@@ -105,16 +105,16 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Test zero and negative samples and features
         with self.assertRaises(ValueError):
-            f_465(n_samples=0, n_features=10)
+            f_546(n_samples=0, n_features=10)
         with self.assertRaises(ValueError):
-            f_465(n_samples=100, n_features=0)
+            f_546(n_samples=100, n_features=0)
         with self.assertRaises(ValueError):
-            f_465(n_samples=-100, n_features=10)
+            f_546(n_samples=-100, n_features=10)
         with self.assertRaises(ValueError):
-            f_465(n_samples=100, n_features=-10)
+            f_546(n_samples=100, n_features=-10)
     def test_case_5(self):
         # Test extreme values for parameters
-        predictions, _, _, mse = f_465(n_samples=100000, n_features=100, random_seed=42)
+        predictions, _, _, mse = f_546(n_samples=100000, n_features=100, random_seed=42)
         self.assertEqual(
             predictions.shape[0], 20000
         )  # 20% of 100000 samples for testing
@@ -122,14 +122,14 @@ class TestCases(unittest.TestCase):
         
     def test_case_6(self):
         # Test output shapes
-        predictions, coefficients, _, mse = f_465(
+        predictions, coefficients, _, mse = f_546(
             n_samples=100, n_features=5, random_seed=42
         )
         self.assertEqual(predictions.shape[0], 20)
         self.assertEqual(coefficients.shape[0], 5)
     def test_case_7(self):
         # Test output types
-        predictions, coefficients, intercept, mse = f_465()
+        predictions, coefficients, intercept, mse = f_546()
         self.assertIsInstance(predictions, np.ndarray)
         self.assertIsInstance(coefficients, np.ndarray)
         self.assertIsInstance(intercept, float)
@@ -137,14 +137,14 @@ class TestCases(unittest.TestCase):
         
     def test_case_8(self):
         # Test determinism with the same random seed
-        predictions_1, _, _, mse_1 = f_465(random_seed=42)
-        predictions_2, _, _, mse_2 = f_465(random_seed=42)
+        predictions_1, _, _, mse_1 = f_546(random_seed=42)
+        predictions_2, _, _, mse_2 = f_546(random_seed=42)
         assert_array_equal(predictions_1, predictions_2)
         self.assertEqual(mse_1, mse_2)
         
     def test_case_9(self):
         # Test without random seed (non-deterministic outcomes)
-        predictions_1, _, _, _ = f_465()
-        predictions_2, _, _, _ = f_465()
+        predictions_1, _, _, _ = f_546()
+        predictions_2, _, _, _ = f_546()
         with self.assertRaises(AssertionError):
             assert_array_equal(predictions_1, predictions_2)

@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
 
-def f_374(num_samples=500, noise_strength=1, random_seed=None, test_size=0.2):
+def f_438(num_samples=500, noise_strength=1, random_seed=None, test_size=0.2):
     """
     Generate a dataset with a single feature and a target variable. The target
     is computed from the feature using a linear relation.
@@ -36,9 +36,9 @@ def f_374(num_samples=500, noise_strength=1, random_seed=None, test_size=0.2):
     - sklearn.linear_model.LinearRegression
 
     Example:
-    >>> f_374(num_samples=10, noise_strength=23.5, random_seed=24, test_size=0.3)
+    >>> f_438(num_samples=10, noise_strength=23.5, random_seed=24, test_size=0.3)
     (-0.4892453918038726, LinearRegression())
-    >>> f_374(noise_strength=0.1)
+    >>> f_438(noise_strength=0.1)
     (0.9658328575162494, LinearRegression())
     """
     if num_samples * test_size < 2:
@@ -61,24 +61,24 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         'rng reproducability'
-        r_squared1, _ = f_374(random_seed=42)
-        r_squared2, _ = f_374(random_seed=42)
+        r_squared1, _ = f_438(random_seed=42)
+        r_squared2, _ = f_438(random_seed=42)
         self.assertEqual(r_squared1, r_squared2)
     def test_case_2(self):
         'default params'
-        r_squared, model = f_374(num_samples=1000)
+        r_squared, model = f_438(num_samples=1000)
         self.assertTrue(0 <= r_squared <= 1)
         self.assertTrue(isinstance(model, LinearRegression))
         
     def test_case_3(self):
         'noise strength'
-        r_squared, model = f_374(noise_strength=0, random_seed=24)
+        r_squared, model = f_438(noise_strength=0, random_seed=24)
         self.assertAlmostEqual(r_squared, 1)
         self.assertTrue(isinstance(model, LinearRegression))
     def test_case_4(self):
         'test set too small'
-        self.assertRaises(Exception, f_374, {'num_samples': 10, 'test_size': 0.1})
+        self.assertRaises(Exception, f_438, {'num_samples': 10, 'test_size': 0.1})
     def test_case_5(self):
-        r_squared, model = f_374(num_samples=1000, noise_strength=1000, random_seed=24, test_size=0.3)
+        r_squared, model = f_438(num_samples=1000, noise_strength=1000, random_seed=24, test_size=0.3)
         self.assertTrue(r_squared < 0.2)
         self.assertTrue(isinstance(model, LinearRegression))

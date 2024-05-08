@@ -3,7 +3,7 @@ from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 
 
-def f_507(df: pd.DataFrame) -> pd.DataFrame:
+def f_597(df: pd.DataFrame) -> pd.DataFrame:
     """
     Computes the MinMax-normalized cumulative sum for each numeric column in the given DataFrame.
 
@@ -25,7 +25,7 @@ def f_507(df: pd.DataFrame) -> pd.DataFrame:
 
     Example:
     >>> input_df = pd.DataFrame({'A': [1, 2, 3], 'B': [3, 2, 1]})
-    >>> output_df = f_507(input_df)
+    >>> output_df = f_597(input_df)
     >>> type(output_df)
     <class 'pandas.core.frame.DataFrame'>
     >>> output_df
@@ -48,7 +48,7 @@ import pandas as pd
 import numpy as np
 class TestCases(unittest.TestCase):
     def check_cumsum_and_scaling(self, input_df, expected_output):
-        output = f_507(input_df)
+        output = f_597(input_df)
         pd.testing.assert_frame_equal(
             output, expected_output, check_dtype=False, atol=1e-5
         )
@@ -74,10 +74,10 @@ class TestCases(unittest.TestCase):
         self.assertEqual(set(before.columns), set(after.columns))
     def test_non_numeric_data_raises(self):
         with self.assertRaises(TypeError):
-            f_507(pd.DataFrame({"A": ["one", "two", "three"], "B": [1, 2, 3]}))
+            f_597(pd.DataFrame({"A": ["one", "two", "three"], "B": [1, 2, 3]}))
     def test_nan_values_raise(self):
         with self.assertRaises(ValueError):
-            f_507(pd.DataFrame({"A": [1, np.nan, 3], "B": [3, 2, 1]}))
+            f_597(pd.DataFrame({"A": [1, np.nan, 3], "B": [3, 2, 1]}))
     def test_empty_dataframe(self):
         with self.assertRaises(ValueError):
-            f_507(pd.DataFrame())
+            f_597(pd.DataFrame())

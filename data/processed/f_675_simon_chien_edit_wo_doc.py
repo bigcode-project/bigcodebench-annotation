@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
 
-def f_499(file_name: str) -> pd.DataFrame:
+def f_585(file_name: str) -> pd.DataFrame:
     """Normalize data in a csv file using MinMaxScaler from sklearn.
     Only numeric columns are normalized. Columns with other dtypes are left as
     they are.
@@ -21,7 +21,7 @@ def f_499(file_name: str) -> pd.DataFrame:
     - sklearn.preprocessing.MinMaxScaler
     
     Example:
-    >>> normalized_data = f_499("sample.csv")
+    >>> normalized_data = f_585("sample.csv")
     >>> print(normalized_data.head())
     Name	Age	Salary
     0	Alex Anderson	0.304651	0.122298
@@ -64,8 +64,8 @@ class TestCases(unittest.TestCase):
         empty_df = pd.DataFrame()
         non_numeric_path = self.create_csv("non_numeric.csv", non_numeric_df)
         empty_path = self.create_csv("empty.csv", empty_df)
-        self.assertRaises(ValueError, f_499, non_numeric_path)
-        self.assertRaises(ValueError, f_499, empty_path)
+        self.assertRaises(ValueError, f_585, non_numeric_path)
+        self.assertRaises(ValueError, f_585, empty_path)
     def test_single_row(self):
         # Test with a single row of numeric data
         single_row_df = pd.DataFrame({
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
             "Salary": [58000]
         })
         csv_path = self.create_csv("single_row.csv", single_row_df)
-        df = f_499(csv_path)
+        df = f_585(csv_path)
         self.assertIsInstance(df, pd.DataFrame)
         self.assertTrue((df['Age'] == 0).all() and (df['Salary'] == 0).all())
     def test_multiple_rows(self):
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
             "Salary": [50000, 60000, 70000]
         })
         csv_path = self.create_csv("multiple_rows.csv", data_df)
-        df = f_499(csv_path)
+        df = f_585(csv_path)
         self.assertIsInstance(df, pd.DataFrame)
         self.assertTrue((df['Age'] >= 0).all() and (df['Age'] <= 1).all())
         self.assertTrue((df['Salary'] >= 0).all() and (df['Salary'] <= 1).all())
@@ -98,7 +98,7 @@ class TestCases(unittest.TestCase):
             "City": ["New York", "Chicago", "San Francisco"]
         })
         csv_path = self.create_csv("mixed_columns.csv", mixed_df)
-        df = f_499(csv_path)
+        df = f_585(csv_path)
         self.assertIsInstance(df, pd.DataFrame)
         self.assertTrue((df['Age'] >= 0).all() and (df['Age'] <= 1).all())
         self.assertTrue((df['Salary'] >= 0).all() and (df['Salary'] <= 1).all())
@@ -110,7 +110,7 @@ class TestCases(unittest.TestCase):
             "Salary": range(10000, 20000)  # Large range of salaries
         })
         csv_path = self.create_csv("large_dataset.csv", large_df)
-        df = f_499(csv_path)
+        df = f_585(csv_path)
         self.assertIsInstance(df, pd.DataFrame)
         self.assertTrue((df['Age'] >= 0).all() and (df['Age'] <= 1).all())
         self.assertTrue((df['Salary'] >= 0).all() and (df['Salary'] <= 1).all())

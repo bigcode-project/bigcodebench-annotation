@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def f_76(n_points=100, random_seed=None):
+def f_81(n_points=100, random_seed=None):
     """
     Generate an array of random 3D dots in the range [0, 1) for each dimension
     and draw them in a 3D scatter plot.
@@ -21,7 +21,7 @@ def f_76(n_points=100, random_seed=None):
     - matplotlib.pyplot
 
     Example:
-    >>> points, plot = f_76(200, random_seed=42)
+    >>> points, plot = f_81(200, random_seed=42)
     >>> type(points)
     <class 'numpy.ndarray'>
     >>> type(plot)
@@ -41,7 +41,7 @@ from mpl_toolkits.mplot3d import Axes3D
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test default parameters - values
-        points, _ = f_76()
+        points, _ = f_81()
         self.assertEqual(points.shape, (100, 3))
         self.assertTrue(
             (points >= 0).all() and (points < 1).all(),
@@ -49,20 +49,20 @@ class TestCases(unittest.TestCase):
         )
     def test_case_2(self):
         # Test default parameters - plot
-        _, plot = f_76()
+        _, plot = f_81()
         self.assertTrue(isinstance(plot, Axes3D))
     def test_case_3(self):
         # Test controlling number of points
-        points1, _ = f_76(n_points=1)
-        points10, _ = f_76(n_points=10)
-        points100, _ = f_76(n_points=100)
+        points1, _ = f_81(n_points=1)
+        points10, _ = f_81(n_points=10)
+        points100, _ = f_81(n_points=100)
         self.assertEqual(points1.shape, (1, 3))
         self.assertEqual(points10.shape, (10, 3))
         self.assertEqual(points100.shape, (100, 3))
     def test_case_4(self):
         # Test random seed
-        points1, _ = f_76(random_seed=42)
-        points2, _ = f_76(random_seed=42)
+        points1, _ = f_81(random_seed=42)
+        points2, _ = f_81(random_seed=42)
         self.assertTrue(
             np.array_equal(points1, points2),
             "The points should be identical for the same seed",
@@ -70,9 +70,9 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test handling invalid inputs
         with self.assertRaises(ValueError):
-            f_76(-1)
+            f_81(-1)
         for invalid in [0.5, "invalid", None, []]:
             with self.assertRaises(TypeError):
-                f_76(invalid)
+                f_81(invalid)
     def tearDown(self):
         plt.close("all")

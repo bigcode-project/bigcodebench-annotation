@@ -2,11 +2,10 @@ import numpy as np
 from scipy.optimize import curve_fit
 
 
-def f_22(x, y, labels):
+def f_24(x, y, labels):
     """
     Fit an exponential curve to given data points and plot the curves with labels.
-
-    This function fits an exponential curve of the form: f(x) = a * exp(-b * x) + c
+    It fits an exponential curve of the form: f(x) = a * exp(-b * x) + c
     to the provided x and y data points for each set of data and plots the fitted curves
     with the corresponding labels on a single matplotlib figure.
 
@@ -49,7 +48,7 @@ class TestCases(unittest.TestCase):
         self.labels = ["Test 1", "Test 2", "Test 3"]
     def test_plot_labels(self):
         """Ensure the plot includes all specified labels."""
-        fig = f_22(self.x, self.y, self.labels)
+        fig = f_24(self.x, self.y, self.labels)
         ax = fig.gca()
         legend_labels = [text.get_text() for text in ax.get_legend().get_texts()]
         self.assertListEqual(legend_labels, self.labels, "Legend labels do not match input labels.")
@@ -61,16 +60,16 @@ class TestCases(unittest.TestCase):
                 self.assertTrue(len(popt) == 3, "Optimal parameters not found for the exponential fit.")
     def test_output_type(self):
         """Check the output type to be a matplotlib figure."""
-        fig = f_22(self.x, self.y, self.labels)
+        fig = f_24(self.x, self.y, self.labels)
         self.assertIsInstance(fig, plt.Figure, "Output is not a matplotlib figure.")
     def test_no_data(self):
         """Test the function with no data provided."""
         with self.assertRaises(ValueError, msg="Empty data lists should raise a ValueError."):
-            f_22([], [], [])
+            f_24([], [], [])
     def test_non_numeric_data(self):
         """Ensure non-numeric data raises a ValueError during fitting."""
         x = [np.array(["a", "b", "c"])]
         y = [np.array(["d", "e", "f"])]
         labels = ["Invalid Data"]
         with self.assertRaises(ValueError, msg="Non-numeric data should raise a ValueError."):
-            f_22(x, y, labels)
+            f_24(x, y, labels)

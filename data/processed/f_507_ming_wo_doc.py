@@ -1,9 +1,9 @@
 import os
 import pandas as pd
 from dateutil.parser import parse
-output_dir = './output'
+OUTPUT_DIR = './output'
 
-def f_260(csv_path=os.path.join(output_dir, 'data.csv'), date_column='date'):
+def f_305(csv_path=os.path.join(OUTPUT_DIR, 'data.csv'), date_column='date'):
     """
     Read a CSV file, convert a column of date strings into datetime objects,
     and draw a histogram of the year distribution of these dates.
@@ -24,7 +24,7 @@ def f_260(csv_path=os.path.join(output_dir, 'data.csv'), date_column='date'):
     >>> import os
     >>> from unittest.mock import patch
     >>> with patch('os.path.exists', return_value=False):
-    ...     f_260('nonexistent.csv')
+    ...     f_305('nonexistent.csv')
     Traceback (most recent call last):
         ...
     FileNotFoundError: nonexistent.csv does not exist
@@ -41,7 +41,7 @@ import os
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.output_dir = './output'
+        self.output_dir = OUTPUT_DIR
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
         # Prepare CSV files for testing
@@ -58,20 +58,20 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(self.output_dir, ignore_errors=True)
     def test_valid_data(self):
         """Test with valid date data."""
-        histogram_plot = f_260(self.valid_data_csv, 'date')
+        histogram_plot = f_305(self.valid_data_csv, 'date')
         self.assertIsInstance(histogram_plot, plt.Axes)
     def test_empty_file(self):
         """Test with an empty CSV file."""
         with self.assertRaises(ValueError):  # Assuming pandas raises a ValueError for an empty CSV
-            f_260(self.empty_data_csv, 'date')
+            f_305(self.empty_data_csv, 'date')
     def test_nonexistent_file(self):
         """Test with a nonexistent CSV file path."""
         nonexistent_csv = os.path.join(self.output_dir, 'nonexistent.csv')
         with self.assertRaises(FileNotFoundError):
-            f_260(nonexistent_csv, 'date')
+            f_305(nonexistent_csv, 'date')
     def test_different_date_column(self):
         """Test using a different date column name."""
-        histogram_plot = f_260(self.different_column_data_csv, 'different_date_column')
+        histogram_plot = f_305(self.different_column_data_csv, 'different_date_column')
         self.assertIsInstance(histogram_plot, plt.Axes)
     def test_invalid_data(self):
         """Dynamically test with invalid date strings; expecting the function to handle errors gracefully."""
@@ -79,4 +79,4 @@ class TestCases(unittest.TestCase):
         with open(invalid_data_csv, 'w') as f:
             f.write("date\nnot-a-date\n2021-13-01")
         with self.assertRaises(ValueError):
-            f_260(invalid_data_csv, 'date')
+            f_305(invalid_data_csv, 'date')

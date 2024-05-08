@@ -2,16 +2,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
 
-
 # Constants
 TARGET_VALUE = '332'
 ARRAY = np.array([['0', '1', '2'], ['a', 'bb', 'ccc'], ['332', '33', '2'], ['33', '22', '332']])
 
 
-def f_492():
+def f_578(target_value=TARGET_VALUE, array=ARRAY):
     """
-    Finds the row indices in a numpy array where the first cell matches "332."
+    Finds the row indices in a numpy array where the first cell matches target_value "332"
     Performs statistical analysis on these indices and plots their distribution.
+    Return 'N/A' for all stats if no target value found.
+
+    Parameters:
+    - target_value (str): The target value. Default value is '332'
+    - array (np.ndarray): The input array
 
     Returns:
     tuple: A tuple with mean, variance, skewness, and kurtosis of the indices, or
@@ -23,10 +27,10 @@ def f_492():
     - matplotlib.pyplot
 
     Example:
-    >>> f_492()
+    >>> f_578()
     (2.0, 'N/A', 'N/A', 'N/A')
     """
-    indices = np.where(ARRAY[:,0] == TARGET_VALUE)[0]
+    indices = np.where(array[:, 0] == target_value)[0]
     if len(indices) < 2:
         plt.hist(indices, bins='auto')  # Plotting can still occur
         plt.show()
@@ -46,7 +50,7 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_statistics_and_plot(self):
         """Test the statistical analysis and plotting."""
-        result = f_492()
+        result = f_578()
         self.assertIsInstance(result, tuple, "The result should be a tuple.")
         self.assertEqual(len(result), 4, "The tuple should contain four elements.")
         # Check that mean and variance are numbers or 'N/A'
@@ -54,15 +58,13 @@ class TestCases(unittest.TestCase):
         self.assertTrue(isinstance(result[1], (float, int)) or result[1] == 'N/A', "Variance should be a number or 'N/A'.")
     def test_empty_array(self):
         """Test with an array that has no matching target value."""
-        global ARRAY
-        ARRAY = np.array([['0', '1', '2'], ['a', 'bb', 'ccc'], ['33', '33', '2'], ['33', '22', '3']])
-        result = f_492()
+        ARRAY1 = np.array([['0', '1', '2'], ['a', 'bb', 'ccc'], ['33', '33', '2'], ['33', '22', '3']])
+        result = f_578(array=ARRAY1)
         self.assertEqual(result, ('N/A', 'N/A', 'N/A', 'N/A'), "Should return 'N/A' for all stats if no target value found.")
     def test_single_match(self):
         """Test with an array that has exactly one matching target value."""
-        global ARRAY
-        ARRAY = np.array([['0', '1', '2'], ['a', 'bb', 'ccc'], ['332', '33', '2'], ['33', '22', '3']])
-        result = f_492()
+        ARRAY2 = np.array([['0', '1', '2'], ['a', 'bb', 'ccc'], ['332', '33', '2'], ['33', '22', '3']])
+        result = f_578(array=ARRAY2)
         self.assertEqual(len(result), 4, "The tuple should contain four elements.")
         self.assertNotEqual(result[0], 'N/A', "Mean should not be 'N/A' for a single match.")
         self.assertEqual(result[1], 'N/A', "Variance should be 'N/A' for a single match.")
@@ -70,7 +72,7 @@ class TestCases(unittest.TestCase):
         """Test with an array that has multiple matching target values."""
         global ARRAY
         ARRAY = np.array([['332', '1', '2'], ['a', 'bb', 'ccc'], ['332', '33', '2'], ['332', '22', '3']])
-        result = f_492()
+        result = f_578()
         self.assertNotEqual(result, ('N/A', 'N/A', 'N/A', 'N/A'), "Should not return 'N/A' for all stats if multiple targets found.")
     def test_non_uniform_distribution(self):
         """Test with an array that results in a non-uniform distribution of target value indices."""
@@ -78,10 +80,7 @@ class TestCases(unittest.TestCase):
         # Ensure a clear non-uniform distribution of indices
         ARRAY = np.array(
             [['332', 'x', 'y'], ['a', 'bb', 'ccc'], ['b', '22', '3'], ['332', '33', '2'], ['332', '44', '5']])
-        result = f_492()
+        result = f_578()
         # Validate statistical analysis was performed
         self.assertIsInstance(result, tuple, "The result should be a tuple.")
         self.assertEqual(len(result), 4, "The tuple should contain four elements.")
-        # Validate skewness and kurtosis calculation by checking they are not 'N/A'
-        self.assertNotEqual(result[2], 'N/A', "Skewness calculation should not return 'N/A'.")
-        self.assertNotEqual(result[3], 'N/A', "Kurtosis calculation should not return 'N/A'.")

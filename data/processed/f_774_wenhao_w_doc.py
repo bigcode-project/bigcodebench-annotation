@@ -1,7 +1,7 @@
 from collections import Counter
 import re
 
-def f_489(word: str) -> list:
+def f_575(word: str) -> list:
     """
     Finds the most common two-letter combination in a given, cleaned word (lowercased and alphabetic characters only) 
     and returns its frequency. The search is case-insensitive and ignores non-alphabetic characters.
@@ -19,15 +19,15 @@ def f_489(word: str) -> list:
       the word has fewer than 2 alphabetic characters.
     
     Examples:
-    >>> f_489("aaBBcc")
+    >>> f_575("aaBBcc")
     [('aa', 1)]
-    >>> f_489("abc!abc")
+    >>> f_575("abc!abc")
     [('ab', 2)]
-    >>> f_489("a")
+    >>> f_575("a")
     []
-    >>> f_489("abcd")
+    >>> f_575("abcd")
     [('ab', 1)]
-    >>> f_489("a1b2c3")
+    >>> f_575("a1b2c3")
     [('ab', 1)]
     """
     clean_word = re.sub('[^a-z]', '', word.lower())
@@ -41,21 +41,21 @@ def f_489(word: str) -> list:
 import unittest
 class TestCases(unittest.TestCase):
     def test_repeating_pairs(self):
-        self.assertEqual(f_489("aabbcc"), [('aa', 1)], "Should identify single repeating pair")
+        self.assertEqual(f_575("aabbcc"), [('aa', 1)], "Should identify single repeating pair")
         
     def test_mixed_repeating_pairs(self):
-        self.assertEqual(f_489("abcabc"), [('ab', 2)], "Should identify most frequent pair in mixed sequence")
+        self.assertEqual(f_575("abcabc"), [('ab', 2)], "Should identify most frequent pair in mixed sequence")
         
     def test_single_character(self):
-        self.assertEqual(f_489("a"), [], "Should return empty list for single character")
+        self.assertEqual(f_575("a"), [], "Should return empty list for single character")
         
     def test_unique_pairs(self):
-        self.assertEqual(f_489("abcdef"), [('ab', 1)], "Should handle all unique pairs")
+        self.assertEqual(f_575("abcdef"), [('ab', 1)], "Should handle all unique pairs")
         
     def test_empty_string(self):
-        self.assertEqual(f_489(""), [], "Should return empty list for empty string")
+        self.assertEqual(f_575(""), [], "Should return empty list for empty string")
     def test_case_insensitive(self):
         # Corrected the expected count to match the correct behavior of the function
-        self.assertEqual(f_489("aAaAbbBB"), [('aa', 3)], "Should be case-insensitive")
+        self.assertEqual(f_575("aAaAbbBB"), [('aa', 3)], "Should be case-insensitive")
     def test_ignore_non_alphabetic(self):
-        self.assertEqual(f_489("abc123abc!"), [('ab', 2)], "Should ignore non-alphabetic characters")
+        self.assertEqual(f_575("abc123abc!"), [('ab', 2)], "Should ignore non-alphabetic characters")

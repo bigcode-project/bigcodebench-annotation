@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # Constants for pie chart colors
 COLORS = ['r', 'g', 'b', 'y', 'm']
 
-def f_517(df, col, title=None):
+def f_610(df, col, title=None):
     """
     Draw a pie chart of the number of unique values in a given DataFrame column with an optional title.
 
@@ -22,7 +22,7 @@ def f_517(df, col, title=None):
 
     Example:
     >>> df = pd.DataFrame({'fruit': ['apple', 'banana', 'orange', 'apple', 'banana', 'banana']})
-    >>> ax = f_517(df, 'fruit', title='Fruit Distribution')
+    >>> ax = f_610(df, 'fruit', title='Fruit Distribution')
     >>> print(ax.get_title())
     Fruit Distribution
     >>> plt.close()
@@ -56,33 +56,33 @@ class TestCases(unittest.TestCase):
         })
     def test_valid_input(self):
         # Test with valid input and column
-        ax = f_517(self.df, 'fruit')
+        ax = f_610(self.df, 'fruit')
         self.assertIsInstance(ax, plt.Axes)
         plt.close()
     def test_nonexistent_column(self):
         # Test with a nonexistent column
         with self.assertRaises(Exception):
-            f_517(self.df, 'color')
+            f_610(self.df, 'color')
         plt.close()
     def test_empty_dataframe(self):
         # Test with an empty DataFrame
         with self.assertRaises(Exception):
-            f_517(pd.DataFrame(), 'fruit')
+            f_610(pd.DataFrame(), 'fruit')
         plt.close()
     def test_pie_chart_title(self):
         # Test with a title for the pie chart
         title = "Distribution of Fruits"
-        ax = f_517(self.df, 'fruit', title=title)
+        ax = f_610(self.df, 'fruit', title=title)
         self.assertEqual(ax.get_title(), title)
         plt.close()
     def test_numeric_data(self):
         # Test with numeric data
-        ax = f_517(self.df, 'quantity')
+        ax = f_610(self.df, 'quantity')
         self.assertIsInstance(ax, plt.Axes)
         plt.close()
         
     def test_color_length(self):
         # Test if the number of colors matches the number of unique values
-        ax = f_517(self.df, 'fruit')
+        ax = f_610(self.df, 'fruit')
         self.assertEqual(len(ax.patches), self.df['fruit'].nunique())
         plt.close()

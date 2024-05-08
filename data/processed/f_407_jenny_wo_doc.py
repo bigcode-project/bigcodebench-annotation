@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def f_173(data):
+def f_198(data):
     """
     Combine a list of dictionaries with the same keys (fruit names) into a single pandas dataframe
     where NA/NaN values are filled with 0, then generate a line chart of sales.
@@ -21,9 +21,9 @@ def f_173(data):
     - matplotlib.pyplot
 
     Example:
-    >>> f_173([{'apple': 10, 'banana': 15, 'cherry': 12, 'durian': 0}])
+    >>> f_198([{'apple': 10, 'banana': 15, 'cherry': 12, 'durian': 0}])
     <Axes: title={'center': 'Fruit Sales over Time'}, xlabel='Time', ylabel='Sales Quantity'>
-    >>> f_173([{'apple': 10, 'banana': 15, 'cherry': 12}, {'apple': 12, 'banana': 20, 'cherry': 14}])
+    >>> f_198([{'apple': 10, 'banana': 15, 'cherry': 12}, {'apple': 12, 'banana': 20, 'cherry': 14}])
     <Axes: title={'center': 'Fruit Sales over Time'}, xlabel='Time', ylabel='Sales Quantity'>
     """
     df = pd.DataFrame(data)
@@ -42,7 +42,7 @@ import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         data = [{"apple": 10}, {"banana": 15, "cherry": 12}]
-        ax = f_173(data)
+        ax = f_198(data)
         # Test default plot values
         self.assertTrue(isinstance(ax, plt.Axes))
         self.assertTrue(isinstance(ax.lines[0], matplotlib.lines.Line2D))
@@ -52,7 +52,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test flat input
         data = [{"apple": 11, "banana": 15, "cherry": 12, "durian": 10}]
-        ax = f_173(data)
+        ax = f_198(data)
         self.assertTrue(isinstance(ax, plt.Axes))
         self.assertEqual(len(ax.lines), len(data[0]))
         for i, (fruit_name, fruit_quantity) in enumerate(data[0].items()):
@@ -64,7 +64,7 @@ class TestCases(unittest.TestCase):
             {"apple": 15},
             {"apple": 2, "banana": 11, "cherry": 8},
         ]
-        ax = f_173(data)
+        ax = f_198(data)
         # Test data correctness
         self.assertTrue(isinstance(ax, plt.Axes))
         self.assertEqual(len(ax.lines), 3)
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Test one fruit only
         data = [{"apple": 10}, {"apple": 12}, {"apple": 15}]
-        ax = f_173(data)
+        ax = f_198(data)
         self.assertTrue(isinstance(ax, plt.Axes))
         self.assertEqual(len(ax.lines), 1)
         self.assertEqual(ax.lines[0]._label, "apple")
@@ -85,13 +85,13 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test that function fails with unexpected data values
         with self.assertRaises(ValueError):
-            f_173("")
+            f_198("")
         with self.assertRaises(ValueError):
-            f_173(1)
+            f_198(1)
         # Test that function fails with unexpected data types
         with self.assertRaises(TypeError):
-            f_173(["apple", 10, "banana", 10])
+            f_198(["apple", 10, "banana", 10])
         with self.assertRaises(TypeError):
-            f_173([{"apple": "10"}, {"cherry": 10}])
+            f_198([{"apple": "10"}, {"cherry": 10}])
     def tearDown(self):
         plt.close("all")

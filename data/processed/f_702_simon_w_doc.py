@@ -3,7 +3,7 @@ from itertools import combinations
 import numpy as np
 
 
-def f_429(shape=(3, 3), low=1, high=10, seed=None):
+def f_503(shape=(3, 3), low=1, high=10, seed=None):
     """
     Generate a matrix of specified shape and random numbers within a specified 
     range. Generate a list of all possible number pairs (all possible combinations of
@@ -30,11 +30,11 @@ def f_429(shape=(3, 3), low=1, high=10, seed=None):
     - numpy
 
     Example:
-    >>> f_429((2, 2), 1, 5, seed=42)
+    >>> f_503((2, 2), 1, 5, seed=42)
     (43, array([[3, 4],
            [1, 3]]))
 
-    >>> f_429((5, 4), seed=1)
+    >>> f_503((5, 4), seed=1)
     (4401, array([[6, 9, 6, 1],
            [1, 2, 8, 7],
            [3, 5, 6, 3],
@@ -60,28 +60,28 @@ class TestCases(unittest.TestCase):
         return sum_of_products
     def test_case_1(self):
         # Testing with default parameters
-        result, matrix = f_429(seed=1)
+        result, matrix = f_503(seed=1)
         self.assertAlmostEqual(result, self._calculate_sum_of_product_pairs(matrix))
     def test_case_2(self):
         # Testing with a specific seed for reproducibility
         seed = 42
-        result1, matrix1 = f_429(seed=seed)
-        result2, matrix2 = f_429(seed=seed)
+        result1, matrix1 = f_503(seed=seed)
+        result2, matrix2 = f_503(seed=seed)
         self.assertEqual(result1, result2)
         self.assertEqual(list(matrix1.flatten()), list(matrix2.flatten()))
     def test_case_3(self):
         # Testing with a different matrix shape
         shape = (4, 4)
-        result, matrix = f_429(shape=shape, seed=1)
+        result, matrix = f_503(shape=shape, seed=1)
         self.assertAlmostEqual(result, self._calculate_sum_of_product_pairs(matrix))
     def test_case_4(self):
         # Testing with different number ranges
         low, high = 10, 20
-        result, matrix = f_429(low=low, high=high, seed=12)
+        result, matrix = f_503(low=low, high=high, seed=12)
         val = matrix.flatten()
         self.assertTrue(((val >= low) & (val < high)).all())
         self.assertAlmostEqual(result, self._calculate_sum_of_product_pairs(matrix))
     def test_case_5(self):
         # Testing the scenario where the random number range is invalid (high <= low)
         with self.assertRaises(ValueError):
-            f_429(low=5, high=5)
+            f_503(low=5, high=5)

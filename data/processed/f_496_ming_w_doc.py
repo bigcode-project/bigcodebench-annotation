@@ -4,23 +4,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
-
-# Hard-coded list of common English stopwords for demonstration purposes
-STOPWORDS = set(["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", 
-                 "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", 
-                 "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", 
-                 "theirs", "themselves", "what", "which", "who", "whom", "this", "that", 
-                 "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", 
-                 "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", 
-                 "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", 
-                 "at", "by", "for", "with", "about", "against", "between", "into", "through", 
-                 "during", "before", "after", "above", "below", "to", "from", "up", "down", 
-                 "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "simple", "test"])
+from nltk.corpus import stopwords
 
 
-def f_94(text, n=2):
+def f_102(text, n=2):
     """
-    Analyzes a text string, removing duplicate consecutive words and stopwords,
+    Analyzes a text string, removing duplicate consecutive words and stopwords defined by nltk.corpus,
     generates a square co-occurrence matrix of words, and plots this matrix.
 
     Parameters:
@@ -38,11 +27,12 @@ def f_94(text, n=2):
         - matplotlib.pyplot
         - numpy
         - sklearn.feature_extraction.text
+        - nltk.corpus
 
     Example:
     >>> import matplotlib
     >>> text = "hello hello world world"
-    >>> df, ax = f_94(text, n=2)
+    >>> df, ax = f_102(text, n=2)
     >>> df.columns.tolist()
     ['hello world']
     >>> df.index.tolist()
@@ -53,7 +43,8 @@ def f_94(text, n=2):
     True
     """
     text = re.sub(r'\b(\w+)( \1\b)+', r'\1', text)
-    words_filtered = ' '.join([word for word in text.lower().split() if word not in STOPWORDS])
+    stop_words = set(stopwords.words('english'))
+    words_filtered = ' '.join([word for word in text.lower().split() if word not in stop_words])
     if not words_filtered.strip():
         empty_df = pd.DataFrame()
         fig, ax = plt.subplots()
@@ -79,28 +70,28 @@ class TestCases(unittest.TestCase):
     def test_simple_text(self):
         """Test with a simple text."""
         text = "hello world"
-        matrix, _ = f_94(text)
+        matrix, _ = f_102(text)
         self.assertEqual(matrix.shape, (1, 1), "Matrix shape should be (1, 1) for unique words 'hello' and 'world'.")
     def test_text_with_stopwords(self):
         """Test text with stopwords removed."""
-        text = "this is a simple test"
-        matrix, _ = f_94(text)
+        text = "this is a"
+        matrix, _ = f_102(text)
         self.assertTrue(matrix.empty, "Matrix should be empty after removing stopwords.")
     def test_duplicate_words(self):
         """Test text with duplicate consecutive words."""
         text = "happy happy joy joy"
-        matrix, _ = f_94(text)
+        matrix, _ = f_102(text)
         self.assertIn('happy joy', matrix.columns, "Matrix should contain 'happy joy' after duplicates are removed.")
     def test_ngram_range(self):
         """Test with a specific n-gram range."""
         text = "jump high and run fast"
         # Assuming no preprocessing that removes words, we expect 3 unique tri-grams.
-        matrix, _ = f_94(text, n=3)
+        matrix, _ = f_102(text, n=3)
         # Expecting a 3x3 matrix since there are 3 unique tri-grams with no overlap in this simple case.
         self.assertEqual(matrix.shape, (2, 2),
                          "Matrix shape should be (3, 3) for a tri-gram analysis without word removal.")
     def test_empty_text(self):
         """Test with an empty string."""
         text = ""
-        matrix, _ = f_94(text)
+        matrix, _ = f_102(text)
         self.assertTrue(matrix.empty, "Matrix should be empty for an empty string.")

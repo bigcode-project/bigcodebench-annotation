@@ -5,7 +5,7 @@ import string
 # Constants
 ALPHABET = list(string.ascii_lowercase)
 
-def f_200(word):
+def f_230(word):
     """
     Draws a bar chart representing the positions of each letter in the given word 
     within the English alphabet using numpy and matplotlib.pyplot.
@@ -25,8 +25,8 @@ def f_200(word):
     - ALPHABET: A list containing all lowercase letters of the English alphabet.
     
     Examples:
-    >>> ax = f_200('abc')
-    >>> ax = f_200('hello')
+    >>> ax = f_230('abc')
+    >>> ax = f_230('hello')
     
     Note: 
     The function uses the index of each letter in the English alphabet to represent its position.
@@ -48,32 +48,32 @@ from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
-        ax = f_200('abc')
+        ax = f_230('abc')
         self.assertIsInstance(ax, Axes, "The returned object is not an instance of Axes.")
         self.assertEqual(ax.patches[0].get_height(), 1, "The height of the first bar should be 1.")
         self.assertEqual(ax.patches[1].get_height(), 2, "The height of the second bar should be 2.")
         self.assertEqual(ax.patches[2].get_height(), 3, "The height of the third bar should be 3.")
     
     def test_case_2(self):
-        ax = f_200('xyz')
+        ax = f_230('xyz')
         self.assertIsInstance(ax, Axes, "The returned object is not an instance of Axes.")
         self.assertEqual(ax.patches[0].get_height(), 24, "The height of the first bar should be 24.")
         self.assertEqual(ax.patches[1].get_height(), 25, "The height of the second bar should be 25.")
         self.assertEqual(ax.patches[2].get_height(), 26, "The height of the third bar should be 26.")
         
     def test_case_3(self):
-        ax = f_200('ace')
+        ax = f_230('ace')
         self.assertIsInstance(ax, Axes, "The returned object is not an instance of Axes.")
         self.assertEqual(ax.patches[0].get_height(), 1, "The height of the first bar should be 1.")
         self.assertEqual(ax.patches[1].get_height(), 3, "The height of the second bar should be 3.")
         self.assertEqual(ax.patches[2].get_height(), 5, "The height of the third bar should be 5.")
         
     def test_case_4(self):
-        ax = f_200('bd')
+        ax = f_230('bd')
         self.assertIsInstance(ax, Axes, "The returned object is not an instance of Axes.")
         self.assertEqual(ax.patches[0].get_height(), 2, "The height of the first bar should be 2.")
         self.assertEqual(ax.patches[1].get_height(), 4, "The height of the second bar should be 4.")
         
     def test_case_5(self):
         with self.assertRaises(ValueError):
-            f_200('a1b')
+            f_230('a1b')

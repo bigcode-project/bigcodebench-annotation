@@ -6,7 +6,7 @@ from random import sample
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
 
-def f_61(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
+def f_65(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     '''
     Remove rows from a dataframe based on column values and generate random scatter plots.
 
@@ -27,7 +27,7 @@ def f_61(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
     Example:
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=COLUMNS)
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-    >>> modified_df, plots = f_61(df, tuples, 3)
+    >>> modified_df, plots = f_65(df, tuples, 3)
     '''
     df = df[~df.apply(tuple, axis=1).isin(tuples)]
     plots = []
@@ -47,23 +47,23 @@ class TestCases(unittest.TestCase):
         self.tuples = [(self.df.iloc[0].values), (self.df.iloc[1].values)]
     def test_no_plots_generated(self):
         """Test case with zero plots requested."""
-        _, plots = f_61(self.df, [], 0)  # Request 0 plots.
+        _, plots = f_65(self.df, [], 0)  # Request 0 plots.
         self.assertEqual(len(plots), 0, "No plots should be generated when n_plots is 0.")
     def test_plot_generation(self):
-        _, plots = f_61(self.df, [], 3)
+        _, plots = f_65(self.df, [], 3)
         self.assertEqual(len(plots), 3, "Should generate exactly 3 plots.")
     @patch('matplotlib.pyplot.show')
     def test_empty_dataframe(self, mock_show):
         empty_df = pd.DataFrame(columns=COLUMNS)
-        modified_df, plots = f_61(empty_df, [], 2)
+        modified_df, plots = f_65(empty_df, [], 2)
         self.assertTrue(modified_df.empty, "DataFrame should be empty.")
         self.assertEqual(len(plots), 2, "Should attempt to generate 2 plots even for an empty DataFrame.")
     def test_no_row_removal(self):
-        modified_df, _ = f_61(self.df, [(999, 999, 999, 999, 999)], 0)
+        modified_df, _ = f_65(self.df, [(999, 999, 999, 999, 999)], 0)
         self.assertEqual(len(modified_df), len(self.df), "No rows should be removed.")
     def test_random_plot_columns(self):
-        _, plots = f_61(self.df, [], 1)
-        # Assuming f_61 generates at least one plot and adds it to the list,
+        _, plots = f_65(self.df, [], 1)
+        # Assuming f_65 generates at least one plot and adds it to the list,
         # access the first plot for testing.
         first_plot = plots[0]
         plot_columns = [first_plot.get_xlabel(), first_plot.get_ylabel()]

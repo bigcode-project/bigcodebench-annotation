@@ -1,7 +1,7 @@
 import seaborn as sns
 import time
 
-def f_50(df, letter):
+def f_53(df, letter):
     """
     Filters rows in a DataFrame based on the starting letter of the values in the 'Word' column.
     It then calculates the lengths of these words and returns a box plot representing the distribution
@@ -24,6 +24,7 @@ def f_50(df, letter):
     >>> import pandas as pd
     >>> words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
     >>> df = pd.DataFrame({'Word': words})
+    >>> _ = f_53(df, 'apple')
     """
     start_time = time.time()
     if 'Word' not in df.columns:
@@ -55,26 +56,26 @@ class TestCases(unittest.TestCase):
     @patch('seaborn.boxplot')
     def test_word_filtering(self, mock_boxplot):
         """Test if the function correctly filters words starting with a given letter."""
-        f_50(self.df, 'a')
+        f_53(self.df, 'a')
         filtered_words = ['apple', 'apricot', 'avocado']
         self.assertTrue(all(word.startswith('a') for word in filtered_words), "Word filtering by letter 'a' failed.")
     @patch('seaborn.boxplot')
     def test_boxplot_called(self, mock_boxplot):
         """Test if seaborn's boxplot is called when valid data is provided."""
-        f_50(self.df, 'a')
+        f_53(self.df, 'a')
         mock_boxplot.assert_called_once()
     @patch('matplotlib.pyplot.show')
     def test_return_type(self, mock_show):
         """Test the return type is an Axes."""
-        ax = f_50(self.df, 'a')
+        ax = f_53(self.df, 'a')
         self.assertIsInstance(ax, plt.Axes)
     def test_empty_dataframe(self):
         """Test handling of empty DataFrame."""
         empty_df = pd.DataFrame({'Word': []})
-        result = f_50(empty_df, 'a')
+        result = f_53(empty_df, 'a')
         self.assertIsNone(result, "Empty DataFrame should return None.")
     def test_no_word_column(self):
         """Test handling of DataFrame without 'Word' column."""
         df_without_word = pd.DataFrame({'NoWord': self.words})
         with self.assertRaises(ValueError):
-            f_50(df_without_word, 'a')
+            f_53(df_without_word, 'a')

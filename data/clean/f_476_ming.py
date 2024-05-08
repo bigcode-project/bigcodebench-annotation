@@ -5,7 +5,8 @@ import pandas as pd
 # Method
 def f_476(goals, penalties, rng_seed=None):
     """
-    Generate a Pandas DataFrame of the results of football matches for multiple teams, incorporating random goals and penalties. Penalties are converted into fines using a predefined cost.
+    Generate a Pandas DataFrame with colomns 'Team' and 'Match Result' of the results of football matches for multiple
+    teams, incorporating random goals and penalties. Penalties are converted into fines using a predefined cost.
 
     Parameters:
     - goals (int): The maximum number of goals a team can score in a match. Must be non-negative.

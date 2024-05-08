@@ -2,7 +2,7 @@ import pandas as pd
 import random
 from scipy import stats
 
-def f_644(n_data_points=5000, min_value=0.0, max_value=10.0):
+def f_759(n_data_points=5000, min_value=0.0, max_value=10.0):
     """
     Generate a random dataset of floating-point numbers within a specified range, 
     truncate each value to 3 decimal places, and calculate statistical measures (mean, median, mode) of the data.
@@ -22,7 +22,7 @@ def f_644(n_data_points=5000, min_value=0.0, max_value=10.0):
 
     Example:
     >>> random.seed(0)
-    >>> stats = f_644(1000, 5.0, 5.0)
+    >>> stats = f_759(1000, 5.0, 5.0)
     >>> print(stats)
     {'mean': 5.0, 'median': 5.0, 'mode': 5.0}
     """
@@ -38,13 +38,13 @@ import random
 class TestCases(unittest.TestCase):
     def test_default_parameters(self):
         random.seed(0)
-        result = f_644()
+        result = f_759()
         self.assertIn('mean', result)
         self.assertIn('median', result)
         self.assertIn('mode', result)
     def test_custom_range(self):
         random.seed(0)
-        result = f_644(1000, 1.0, 5.0)
+        result = f_759(1000, 1.0, 5.0)
         self.assertGreaterEqual(result['mean'], 1.0)
         self.assertLessEqual(result['mean'], 5.0)
         self.assertGreaterEqual(result['median'], 1.0)
@@ -53,19 +53,19 @@ class TestCases(unittest.TestCase):
         self.assertLessEqual(result['mode'], 5.0)
     def test_small_dataset(self):
         random.seed(0)
-        result = f_644(10, 2.0, 2.0)
+        result = f_759(10, 2.0, 2.0)
         self.assertEqual(result['mean'], 2.0)
         self.assertEqual(result['median'], 2.0)
         self.assertEqual(result['mode'], 2.0)
     def test_large_dataset(self):
         random.seed(0)
-        result = f_644(10000, 0.0, 100.0)
+        result = f_759(10000, 0.0, 100.0)
         self.assertTrue(0.0 <= result['mean'] <= 100.0)
         self.assertTrue(0.0 <= result['median'] <= 100.0)
         self.assertTrue(0.0 <= result['mode'] <= 100.0)
     def test_single_value_range(self):
         random.seed(0)
-        result = f_644(100, 5.0, 5.0)
+        result = f_759(100, 5.0, 5.0)
         self.assertEqual(result['mean'], 5.0)
         self.assertEqual(result['median'], 5.0)
         self.assertEqual(result['mode'], 5.0)

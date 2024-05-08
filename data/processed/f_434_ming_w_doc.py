@@ -2,10 +2,10 @@ from collections import Counter
 import pandas as pd
 
 
-def f_536(list_of_menuitems):
+def f_630(list_of_menuitems):
     """
     Given a nested list of menu items, this function flattens the list and returns a Pandas DataFrame
-    detailing the count of each individual menu item.
+    detailing the count of each individual menu item with index name 'MenuItem'.
 
     Parameters:
         list_of_menuitems (list): A nested list of menu items.
@@ -18,7 +18,7 @@ def f_536(list_of_menuitems):
         - pandas
 
     Example:
-        >>> result = f_536([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
+        >>> result = f_630([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
         >>> result.loc['Pizza', 'Count']
         2
         >>> result.loc['Coke', 'Count']
@@ -32,25 +32,32 @@ def f_536(list_of_menuitems):
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        result = f_536([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
-        expected_result = pd.DataFrame({'Count': [2, 1, 2, 1]},
-                                       index=pd.Index(['Pizza', 'Burger', 'Coke', 'Pasta'], name='MenuItem'))
-        pd.testing.assert_frame_equal(result, expected_result)
-    def test_case_2(self):
-        result = f_536([['Bread', 'Butter'], ['Bread', 'Jam'], ['Bread', 'Jam'], ['Butter', 'Jam']])
-        expected_result = pd.DataFrame({'Count': [3, 2, 3]},
-                                       index=pd.Index(['Bread', 'Butter', 'Jam'], name='MenuItem'))
-        pd.testing.assert_frame_equal(result, expected_result)
-    def test_case_3(self):
-        result = f_536([['Tea', 'Coffee'], ['Tea', 'Milk'], ['Coffee', 'Milk']])
-        expected_result = pd.DataFrame({'Count': [2, 2, 2]}, index=pd.Index(['Tea', 'Coffee', 'Milk'], name='MenuItem'))
-        pd.testing.assert_frame_equal(result, expected_result)
-    def test_case_4(self):
-        result = f_536([['Sandwich'], ['Sandwich', 'Juice'], ['Coffee']])
-        expected_result = pd.DataFrame({'Count': [2, 1, 1]},
-                                       index=pd.Index(['Sandwich', 'Juice', 'Coffee'], name='MenuItem'))
-        pd.testing.assert_frame_equal(result, expected_result)
-    def test_case_5(self):
-        result = f_536([[], [], []])
-        self.assertTrue(result.empty)
+    def test_normal_functionality(self):
+        """Test the function with typical nested lists."""
+        input_list = [['apple', 'banana'], ['apple'], ['banana', 'orange']]
+        expected_df = pd.DataFrame({'Count': [2, 2, 1]}, index=['apple', 'banana', 'orange'])
+        expected_df.index.name = 'MenuItem'
+        pd.testing.assert_frame_equal(f_630(input_list), expected_df)
+    def test_empty_list(self):
+        """Test the function with an empty list."""
+        expected_df = pd.DataFrame(columns=['Count'])
+        expected_df.index.name = 'MenuItem'
+        pd.testing.assert_frame_equal(f_630([]), expected_df)
+    def test_single_level_list(self):
+        """Test with a non-nested, single-level list."""
+        input_list = [['apple', 'banana', 'apple']]
+        expected_df = pd.DataFrame({'Count': [2, 1]}, index=['apple', 'banana'])
+        expected_df.index.name = 'MenuItem'
+        pd.testing.assert_frame_equal(f_630(input_list), expected_df)
+    def test_uniform_list(self):
+        """Test with a list where all sublists contain the same item."""
+        input_list = [['apple'], ['apple'], ['apple']]
+        expected_df = pd.DataFrame({'Count': [3]}, index=['apple'])
+        expected_df.index.name = 'MenuItem'
+        pd.testing.assert_frame_equal(f_630(input_list), expected_df)
+    def test_duplicate_items_across_sublists(self):
+        """Ensure items appearing in multiple sublists are counted correctly."""
+        input_list = [['apple', 'banana'], ['banana', 'banana', 'apple']]
+        expected_df = pd.DataFrame({'Count': [2, 3]}, index=['apple', 'banana'])
+        expected_df.index.name = 'MenuItem'
+        pd.testing.assert_frame_equal(f_630(input_list), expected_df)

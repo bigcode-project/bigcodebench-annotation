@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 
 
-def f_174(n_samples=100, centers=3, n_features=2, random_seed=42):
+def f_199(n_samples=100, centers=3, n_features=2, random_seed=42):
     """
     Create isotropic Gaussian blobs to form clusters and visualize them.
 
@@ -23,7 +23,7 @@ def f_174(n_samples=100, centers=3, n_features=2, random_seed=42):
     - sklearn
 
     Example:
-    >>> X, y, ax = f_174(n_samples=500, centers=5, random_seed=0)
+    >>> X, y, ax = f_199(n_samples=500, centers=5, random_seed=0)
     >>> type(X), type(y), type(ax)
     (<class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'matplotlib.axes._axes.Axes'>)
     >>> ax
@@ -46,7 +46,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test default case
         n_samples, n_features, centers = 100, 2, 3
-        X, y, ax = f_174()
+        X, y, ax = f_199()
         self.assertEqual(X.shape, (n_samples, n_features))
         self.assertEqual(y.shape, (n_samples,))
         self.assertIsInstance(ax, matplotlib.axes.Axes)
@@ -54,29 +54,29 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test n_samples
         for n_samples in [1, 50, 100]:
-            X, y, _ = f_174(n_samples=n_samples)
+            X, y, _ = f_199(n_samples=n_samples)
             self.assertEqual(X.shape[0], n_samples)
             self.assertEqual(y.shape[0], n_samples)
     def test_case_3(self):
         # Test centers
         for centers in [1, 50, 100]:
-            _, y, _ = f_174(centers=centers)
+            _, y, _ = f_199(centers=centers)
         self.assertEqual(len(set(y)), centers)
     def test_case_4(self):
         # Test n_features
         for n_features in [2, 50, 100]:
-            X, y, _ = f_174(n_features=n_features)
+            X, y, _ = f_199(n_features=n_features)
             self.assertEqual(X.shape[1], n_features)
     def test_case_5(self):
         # Test random seed
-        X1, y1, _ = f_174(n_samples=100, centers=3, n_features=2, random_seed=42)
-        X2, y2, _ = f_174(n_samples=100, centers=3, n_features=2, random_seed=42)
+        X1, y1, _ = f_199(n_samples=100, centers=3, n_features=2, random_seed=42)
+        X2, y2, _ = f_199(n_samples=100, centers=3, n_features=2, random_seed=42)
         self.assertTrue((X1 == X2).all())
         self.assertTrue((y1 == y2).all())
     def test_case_6(self):
         # Test with the minimum possible values that are still valid
         n_samples, n_features, centers = 1, 2, 1
-        X, y, ax = f_174(
+        X, y, ax = f_199(
             n_samples=1, centers=centers, n_features=n_features, random_seed=0
         )
         self.assertEqual(X.shape, (n_samples, n_features))
@@ -86,12 +86,12 @@ class TestCases(unittest.TestCase):
     def test_case_7(self):
         # Example of handling an expected failure due to invalid input
         with self.assertRaises(ValueError):
-            f_174(n_samples=-100)
+            f_199(n_samples=-100)
         with self.assertRaises(ValueError):
-            f_174(centers=-10)
+            f_199(centers=-10)
         with self.assertRaises(Exception):
-            f_174(n_features=0)
+            f_199(n_features=0)
         with self.assertRaises(ValueError):
-            f_174(random_seed="invalid")
+            f_199(random_seed="invalid")
     def tearDown(self):
         plt.close("all")

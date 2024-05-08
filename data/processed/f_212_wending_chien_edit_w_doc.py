@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def f_233(rows=5, cols=5):
+def f_267(rows=5, cols=5):
     """
     Generates a DataFrame with random numerical data and visualizes this data in a stacked bar chart for
     specified categories.
@@ -24,7 +24,7 @@ def f_233(rows=5, cols=5):
 
     Example:
     >>> import matplotlib
-    >>> ax = f_233(3, 3)  # Generates a 3x3 DataFrame and plots it
+    >>> ax = f_267(3, 3)  # Generates a 3x3 DataFrame and plots it
     >>> isinstance(ax, matplotlib.axes.Axes)
     True
     """
@@ -47,17 +47,17 @@ class TestCases(unittest.TestCase):
         # Cleanup any opened figures in matplotlib
         plt.close('all')
     def test_case_1(self):
-        ax = f_233(5, 5)
+        ax = f_267(5, 5)
         self.assertEqual(len(ax.patches), 25)  # 5 bars with 5 segments each, each segment represents a stacked part
     def test_case_2(self):
-        ax = f_233(7, 3)
+        ax = f_267(7, 3)
         self.assertEqual(len(ax.patches), 21)  # 7 bars with 3 segments each
     def test_case_3(self):
-        ax = f_233(10, 2)
+        ax = f_267(10, 2)
         self.assertEqual(len(ax.patches), 20)  # 10 bars with 2 segments each
     def test_case_4(self):
         with self.assertRaises(ValueError):  # Testing for more columns than categories
-            ax = f_233(5, 6)
+            ax = f_267(5, 6)
     def test_case_5(self):
-        ax = f_233(3, 1)
+        ax = f_267(3, 1)
         self.assertEqual(len(ax.patches), 3)  # 3 bars with 1 segment each

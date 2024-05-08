@@ -2,7 +2,7 @@ import pandas as pd
 import statistics
 import random
 
-def f_485(students, subjects, seed=None):
+def f_568(students, subjects, seed=None):
     """
     Create a grade report for a list of students across various subjects. Each student's grades are randomly generated, 
     and the report includes the average grade for each student. The randomness is seeded for reproducibility if a seed is provided.
@@ -24,7 +24,7 @@ def f_485(students, subjects, seed=None):
     Example:
     >>> students = ['Alice', 'Bob', 'Charlie']
     >>> subjects = ['Math', 'Physics', 'English']
-    >>> report = f_485(students, subjects, seed=123)
+    >>> report = f_568(students, subjects, seed=123)
     >>> print(report)
        Student  Math  Physics  English  Average Grade
     0    Alice     6       34       11      17.000000
@@ -47,7 +47,7 @@ class TestCases(unittest.TestCase):
     def test_dataframe_structure(self):
         students = ['Alice', 'Bob']
         subjects = ['Math', 'Physics']
-        report = f_485(students, subjects, seed=42)
+        report = f_568(students, subjects, seed=42)
         
         # Check if the output is a DataFrame
         self.assertIsInstance(report, pd.DataFrame)
@@ -58,7 +58,7 @@ class TestCases(unittest.TestCase):
     def test_average_grade_calculation(self):
         students = ['Alice']
         subjects = ['Math', 'Physics']
-        report = f_485(students, subjects, seed=42)
+        report = f_568(students, subjects, seed=42)
         # Since we know the seed, we know the grades. Let's check the average.
         alice_grades = report.iloc[0, 1:-1]
         self.assertEqual(report.at[0, 'Average Grade'], alice_grades.mean())
@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
         # Testing with different numbers of students and subjects
         students = ['Alice', 'Bob', 'Charlie']
         subjects = ['Math', 'Physics', 'Biology', 'English']
-        report = f_485(students, subjects, seed=42)
+        report = f_568(students, subjects, seed=42)
         # Check if the number of rows matches the number of students
         self.assertEqual(len(report), len(students))
     def test_random_seed_reproducibility(self):
@@ -74,15 +74,15 @@ class TestCases(unittest.TestCase):
         subjects = ['Math', 'Physics']
         
         # If we run the function with the same seed, we should get the same results.
-        report1 = f_485(students, subjects, seed=42)
-        report2 = f_485(students, subjects, seed=42)
+        report1 = f_568(students, subjects, seed=42)
+        report2 = f_568(students, subjects, seed=42)
         pd.testing.assert_frame_equal(report1, report2)
     def test_without_seed(self):
         students = ['Alice', 'Bob']
         subjects = ['Math', 'Physics']
         
         # When run without a seed, there should be variability in results.
-        report1 = f_485(students, subjects)  # No seed here
-        report2 = f_485(students, subjects)  # No seed here
+        report1 = f_568(students, subjects)  # No seed here
+        report2 = f_568(students, subjects)  # No seed here
         with self.assertRaises(AssertionError):
             pd.testing.assert_frame_equal(report1, report2)

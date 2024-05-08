@@ -2,7 +2,7 @@ import pandas as pd
 import random
 
 
-def f_463(product_list, categories):
+def f_544(product_list, categories):
     """
     Create a sales report for a list of products in different categories.
     The report includes the quantity sold and revenue generated for each product.
@@ -25,7 +25,7 @@ def f_463(product_list, categories):
     
     Example:
     >>> random.seed(0)
-    >>> report = f_463(['Product 1'], ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports'])
+    >>> report = f_544(['Product 1'], ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports'])
     >>> report.iloc[0]['Category'] in ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
     True
     """
@@ -48,35 +48,35 @@ class TestCases(unittest.TestCase):
     
     def test_case_1(self):
         random.seed(0)
-        report = f_463(self.products[:5], self.categories)
+        report = f_544(self.products[:5], self.categories)
         self.assertTrue(isinstance(report, pd.DataFrame))
         self.assertEqual(len(report), 5)
         self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
         
     def test_case_2(self):
         random.seed(0)
-        report = f_463(self.products[5:10], self.categories)
+        report = f_544(self.products[5:10], self.categories)
         self.assertTrue(isinstance(report, pd.DataFrame))
         self.assertEqual(len(report), 5)
         self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
         
     def test_case_3(self):
         random.seed(0)
-        report = f_463([self.products[10]], self.categories)
+        report = f_544([self.products[10]], self.categories)
         self.assertTrue(isinstance(report, pd.DataFrame))
         self.assertEqual(len(report), 1)
         self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
         
     def test_case_4(self):
         random.seed(0)
-        report = f_463(self.products[10:20], self.categories)
+        report = f_544(self.products[10:20], self.categories)
         self.assertTrue(isinstance(report, pd.DataFrame))
         self.assertEqual(len(report), 10)
         self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
         
     def test_case_5(self):
         random.seed(0)
-        report = f_463(self.products[20:40], self.categories)
+        report = f_544(self.products[20:40], self.categories)
         self.assertTrue(isinstance(report, pd.DataFrame))
         self.assertEqual(len(report), 20)
         self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)

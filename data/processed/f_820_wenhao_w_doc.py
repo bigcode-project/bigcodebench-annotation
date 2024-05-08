@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-def f_8(array, features=None, seed=None):
+def f_10(array, features=None, seed=None):
     """
     Shuffles the columns of a given 2D numpy array and visualizes it as a heatmap.
 
@@ -34,7 +34,7 @@ def f_8(array, features=None, seed=None):
     Example:
     >>> np.random.seed(0)
     >>> array = np.random.rand(2, 5)
-    >>> ax = f_8(array, features=['A', 'B', 'C', 'D', 'E'], seed=1)
+    >>> ax = f_10(array, features=['A', 'B', 'C', 'D', 'E'], seed=1)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.collections[0].get_array().data.flatten()
@@ -66,32 +66,32 @@ class TestCases(unittest.TestCase):
         self.expected_labels = ["1", "2", "3", "4", "5"]
     def test_default_features(self):
         """Test heatmap with default features."""
-        ax = f_8(self.array)
+        ax = f_10(self.array)
         xticklabels = [tick.get_text() for tick in ax.get_xticklabels()]
         self.assertEqual(xticklabels, self.expected_labels)
         self.assertTrue(len(ax.collections), 1)
     def test_custom_features(self):
         """Test heatmap with custom features."""
         custom_labels = ["A", "B", "C", "D", "E"]
-        ax = f_8(self.array, features=custom_labels)
+        ax = f_10(self.array, features=custom_labels)
         xticklabels = [tick.get_text() for tick in ax.get_xticklabels()]
         self.assertEqual(xticklabels, custom_labels)
         self.assertTrue(len(ax.collections), 1)
     def test_features_mismatch(self):
         """Test for error when features list does not match array dimensions."""
         with self.assertRaises(ValueError):
-            f_8(self.array, features=["A", "B"])
+            f_10(self.array, features=["A", "B"])
     def test_seed_reproducibility(self):
         """Test if seeding makes shuffling reproducible."""
-        ax1 = f_8(self.array, seed=42)
-        ax2 = f_8(self.array, seed=42)
+        ax1 = f_10(self.array, seed=42)
+        ax2 = f_10(self.array, seed=42)
         heatmap_data1 = ax1.collections[0].get_array().data
         heatmap_data2 = ax2.collections[0].get_array().data
         np.testing.assert_array_equal(heatmap_data1, heatmap_data2)
     def test_empty_array(self):
         """Test for handling an empty array."""
         with self.assertRaises(ValueError):
-            f_8(np.array([]))
+            f_10(np.array([]))
     def tearDown(self):
         """Cleanup plot figures after each test."""
         plt.close("all")

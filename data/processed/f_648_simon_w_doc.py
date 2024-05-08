@@ -2,7 +2,7 @@ import pandas as pd
 import statsmodels.api as sm
 
 
-def f_452(df: pd.DataFrame, height: int, weight: int, columns: list) -> sm.regression.linear_model.RegressionResultsWrapper:
+def f_533(df: pd.DataFrame, height: int, weight: int, columns: list) -> sm.regression.linear_model.RegressionResultsWrapper:
     """
     Performs an OLS linear regression on a subset of the provided DataFrame. The subset is created by filtering rows 
     where the value in the second column of 'columns' is greater than 'height' and the value in the third column is 
@@ -27,10 +27,10 @@ def f_452(df: pd.DataFrame, height: int, weight: int, columns: list) -> sm.regre
 
     Example:
     >>> df = pd.DataFrame({'Age': [30, 40], 'Height': [60, 70], 'Weight': [100, 150]})
-    >>> model = f_452(df, 50, 120, ['Age', 'Height', 'Weight'])
+    >>> model = f_533(df, 50, 120, ['Age', 'Height', 'Weight'])
 
     >>> df = pd.DataFrame(np.random.randint(10,98,size=(100, 3)), columns=['Age', 'Height', 'Weight'])
-    >>> model = f_452(df, 45, 72, columns=['Age', 'Height', 'Weight'])
+    >>> model = f_533(df, 45, 72, columns=['Age', 'Height', 'Weight'])
 
     """
     if df.empty:
@@ -49,34 +49,33 @@ import unittest
 import numpy as np
 import pandas as pd
 class TestCases(unittest.TestCase):
-    @classmethod
     def setUp(self):
         np.random.seed(42)  # Set a seed for reproducibility
     def test_case_1(self):
         # Test with a DataFrame of random values
         df = pd.DataFrame(np.random.randint(0,100,size=(100, 3)), columns=['Age', 'Height', 'Weight'])
-        results = f_452(df, 50, 70, columns=['Age', 'Height', 'Weight'])
+        results = f_533(df, 50, 70, columns=['Age', 'Height', 'Weight'])
         self.assertIsInstance(results, sm.regression.linear_model.RegressionResultsWrapper) 
         self.assertEqual(results.params.index.to_list(), ['const', 'Height', 'Weight']) # There should be 3 parameters: const, Height, Weight
     def test_case_2(self):
         # Test with a DataFrame where no rows match the condition
         df = pd.DataFrame(np.random.randint(30,40,size=(100, 3)), columns=['Age', 'Height', 'Weight'])
-        results = f_452(df, 50, 70, columns=['Age', 'Height', 'Weight'])
+        results = f_533(df, 50, 70, columns=['Age', 'Height', 'Weight'])
         self.assertIsNone(results) # There should be no regression result since no rows match the condition
     def test_case_3(self):
         # Test with a DataFrame where all rows match the condition
         df = pd.DataFrame(np.random.randint(60,80,size=(100, 3)), columns=['Age', 'Height', 'Weight'])
-        results = f_452(df, 50, 70, columns=['Age', 'Height', 'Weight'])
+        results = f_533(df, 50, 70, columns=['Age', 'Height', 'Weight'])
         self.assertIsInstance(results, sm.regression.linear_model.RegressionResultsWrapper) 
         self.assertEqual(results.params.index.to_list(), ['const', 'Height', 'Weight']) # There should be 3 parameters: const, Height, Weight
     def test_case_4(self):
         # Test with a DataFrame with different column names
         df = pd.DataFrame(np.random.randint(0,100,size=(100, 3)), columns=['Years', 'Size', 'Mass'])
-        results = f_452(df, 50, 70, columns=['Years', 'Size', 'Mass'])
+        results = f_533(df, 50, 70, columns=['Years', 'Size', 'Mass'])
         self.assertIsInstance(results, sm.regression.linear_model.RegressionResultsWrapper) 
         self.assertEqual(results.params.index.to_list(), ['const', 'Size', 'Mass']) # There should be 3 parameters: const, Height, Weight
     def test_case_5(self):
         # Test with an empty DataFrame
         df = pd.DataFrame(columns=['Age', 'Height', 'Weight'])
-        results = f_452(df, 50, 70, columns=['Age', 'Height', 'Weight'])
+        results = f_533(df, 50, 70, columns=['Age', 'Height', 'Weight'])
         self.assertIsNone(results) # There should be no regression result since DataFrame is empty

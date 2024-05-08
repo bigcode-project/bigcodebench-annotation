@@ -3,10 +3,10 @@ import numpy as np
 from sklearn.cluster import KMeans
 
 
-def f_440(L):
+def f_517(L):
     """
     Convert a list of lists into a list of integers, apply the KMeans clustering, 
-    and return a scatter plot with data points color-coded by their cluster.
+    and return a scatter plot 'matplotlib.axes.Axes' with data points color-coded by their cluster.
 
     Requirements:
     - itertools.chain
@@ -20,7 +20,7 @@ def f_440(L):
     matplotlib.axes.Axes: An Axes object representing the scatter plot.
 
     Example:
-    >>> ax = f_440([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
+    >>> ax = f_517([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
     """
     N_CLUSTERS = 3
     data = list(chain(*L))
@@ -34,17 +34,17 @@ import unittest
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        ax = f_440([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
+        ax = f_517([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
         self.assertIsInstance(ax, plt.Axes)
     def test_case_2(self):
-        ax = f_440([[1, 5], [2, 6], [3, 7]])
+        ax = f_517([[1, 5], [2, 6], [3, 7]])
         self.assertIsInstance(ax, plt.Axes)
     def test_case_3(self):
-        ax = f_440([[10, 20, 30, 40], [15, 25, 35, 45]])
+        ax = f_517([[10, 20, 30, 40], [15, 25, 35, 45]])
         self.assertIsInstance(ax, plt.Axes)
     def test_case_4(self):
-        ax = f_440([[1000, 2000], [3000, 4000], [5000, 6000]])
+        ax = f_517([[1000, 2000], [3000, 4000], [5000, 6000]])
         self.assertIsInstance(ax, plt.Axes)
     def test_case_5(self):
-        ax = f_440([[-1, -2, -3], [-50, -60, -70], [-100, -110, -120]])
+        ax = f_517([[-1, -2, -3], [-50, -60, -70], [-100, -110, -120]])
         self.assertIsInstance(ax, plt.Axes)

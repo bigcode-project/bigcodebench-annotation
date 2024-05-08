@@ -8,7 +8,9 @@ COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
 def f_437(a, b):
     """
-    Generate a pandas DataFrame with random values based on two lists and plot the DataFrame as a bar chart.
+    Generate a pandas DataFrame with random values based on lists 'a' and 'b', and plot it as a bar chart.
+    List 'a' sets the DataFrame's row indices, while the length of list 'b' determines the number of columns
+    using predefined names from the 'COLUMNS = ['A', 'B', 'C', 'D', 'E']' list.
 
     Parameters:
     - a (list): A list used to define the number of rows in the DataFrame.

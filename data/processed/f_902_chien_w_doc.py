@@ -29,7 +29,7 @@ COLORS = [
 ]
 
 
-def f_748(num_pairs=10):
+def f_889(num_pairs=10):
     """
     Generate and display a countplot of predefined shape-color pairs.
 
@@ -51,19 +51,19 @@ def f_748(num_pairs=10):
     - matplotlib
 
     Example:
-    >>> ax = f_748(10)
+    >>> ax = f_889(10)
     >>> [tick.get_text() for tick in ax.get_xticklabels()]
     ['Circle:Red', 'Circle:Blue', 'Circle:Green', 'Circle:Yellow', 'Circle:Black', 'Circle:White', 'Circle:Purple', 'Circle:Orange', 'Circle:Pink', 'Circle:Brown']
-    >>> ax = f_748(9)
+    >>> ax = f_889(9)
     >>> [tick.get_text() for tick in ax.get_xticklabels()]
     ['Circle:Red', 'Circle:Blue', 'Circle:Green', 'Circle:Yellow', 'Circle:Black', 'Circle:White', 'Circle:Purple', 'Circle:Orange', 'Circle:Pink', 'Circle:Brown']
-    >>> ax = f_748(8)
+    >>> ax = f_889(8)
     >>> [tick.get_text() for tick in ax.get_xticklabels()]
     ['Circle:Red', 'Circle:Blue', 'Circle:Green', 'Circle:Yellow', 'Circle:Black', 'Circle:White', 'Circle:Purple', 'Circle:Orange', 'Circle:Pink', 'Circle:Brown']
-    >>> ax = f_748(7)
+    >>> ax = f_889(7)
     >>> [tick.get_text() for tick in ax.get_xticklabels()]
     ['Circle:Red', 'Circle:Blue', 'Circle:Green', 'Circle:Yellow', 'Circle:Black', 'Circle:White', 'Circle:Purple', 'Circle:Orange', 'Circle:Pink', 'Circle:Brown']
-    >>> ax = f_748(6)
+    >>> ax = f_889(6)
     >>> [tick.get_text() for tick in ax.get_xticklabels()]
     ['Circle:Red', 'Circle:Blue', 'Circle:Green', 'Circle:Yellow', 'Circle:Black', 'Circle:White', 'Circle:Purple', 'Circle:Orange', 'Circle:Pink', 'Circle:Brown']
     """
@@ -78,25 +78,25 @@ import unittest
 import matplotlib.pyplot as plt
 import random
 class TestCases(unittest.TestCase):
-    """Tests for f_748."""
+    """Tests for f_889."""
     def tearDown(self):
         plt.clf()
     def test_basic_functionality(self):
         """Test basic functionality with default parameters."""
         random.seed(0)
-        ax = f_748()
+        ax = f_889()
         self.assertIsInstance(ax, plt.Axes)
     def test_pair_count(self):
         """Test if the number of displayed shape-color pairs matches the input."""
         random.seed(1)
         num_pairs = 7
-        ax = f_748(num_pairs)
+        ax = f_889(num_pairs)
         displayed_pairs = len(set(tick.get_text() for tick in ax.get_xticklabels()))
         self.assertEqual(displayed_pairs, num_pairs)
     def test_valid_pairs(self):
         """Ensure displayed shape-color pairs are valid combinations."""
         random.seed(2)
-        ax = f_748(10)
+        ax = f_889(10)
         displayed_pairs = [tick.get_text() for tick in ax.get_xticklabels()]
         for pair in displayed_pairs:
             shape, color = pair.split(":")
@@ -106,12 +106,12 @@ class TestCases(unittest.TestCase):
         """Test with the maximum number of pairs possible."""
         random.seed(3)
         max_pairs = len(SHAPES) * len(COLORS)
-        ax = f_748(max_pairs)
+        ax = f_889(max_pairs)
         displayed_pairs = len(set(tick.get_text() for tick in ax.get_xticklabels()))
         self.assertEqual(displayed_pairs, max_pairs)
     def test_min_pairs(self):
         """Test with the minimum number of pairs, which is 1."""
         random.seed(4)
-        ax = f_748(1)
+        ax = f_889(1)
         displayed_pairs = len(set(tick.get_text() for tick in ax.get_xticklabels()))
         self.assertEqual(displayed_pairs, 1)

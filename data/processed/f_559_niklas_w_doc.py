@@ -4,7 +4,7 @@ from sklearn.linear_model import LinearRegression
 ROWS = 100
 COLUMNS = ['X', 'Y']
 
-def f_663(df):
+def f_780(df):
     """
     Given a Pandas DataFrame with random numeric values and columns X & Y, use sklearn's linear regression to match the data to a linear model.
 
@@ -22,7 +22,7 @@ def f_663(df):
     >>> import numpy as np
     >>> np.random.seed(42)
     >>> df = pd.DataFrame(np.random.normal(size=(100, 2)), columns=['X', 'Y'])
-    >>> model = f_663(df)
+    >>> model = f_780(df)
     >>> print(model)
     LinearRegression()
     """
@@ -36,30 +36,30 @@ import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
-        model = f_663(df)
+        model = f_780(df)
         self.assertTrue(model is not None)
     
     def test_case_2(self):
         df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
-        model = f_663(df)
+        model = f_780(df)
         self.assertTrue(model is not None)
         self.assertTrue(model.coef_ is not None)
     def test_case_3(self):
         df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
-        model = f_663(df)
+        model = f_780(df)
         self.assertTrue(model is not None)
         self.assertTrue(model.coef_ is not None)
         self.assertTrue(model.intercept_ is not None)
     def test_case_4(self):
         df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
-        model = f_663(df)
+        model = f_780(df)
         self.assertTrue(model is not None)
         self.assertTrue(model.coef_ is not None)
         self.assertTrue(model.intercept_ is not None)
         self.assertTrue(model.score(df[['X']], df['Y']) is not None)
     def test_case_5(self):
         df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
-        model = f_663(df)
+        model = f_780(df)
         self.assertTrue(model is not None)
         self.assertTrue(model.coef_ is not None)
         self.assertTrue(model.intercept_ is not None)
