@@ -3,7 +3,7 @@ import os
 import time
 import glob
 
-def f_770(r_script_path: str, output_path: str, duration: int) -> (bool, str):
+def f_969(r_script_path: str, output_path: str, duration: int) -> (bool, str):
     """
     This function executes an R script and verifies if the output file is generated within a given duration.
     
@@ -24,9 +24,9 @@ def f_770(r_script_path: str, output_path: str, duration: int) -> (bool, str):
     - glob
     
     Example:
-    >>> f_770('/path_to_script/MyrScript.r', '/path_to_output/', 10)
+    >>> f_969('/path_to_script/MyrScript.r', '/path_to_output/', 10)
     (True, 'File generated successfully within the specified duration.')
-    >>> f_770('/path_to_script/InvalidScript.r', '/path_to_output/', 5)
+    >>> f_969('/path_to_script/InvalidScript.r', '/path_to_output/', 5)
     (False, 'File not generated within the specified duration.')
     """
     command = f'/usr/bin/Rscript --vanilla {r_script_path}'
@@ -47,7 +47,7 @@ from unittest.mock import patch
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Create a temporary directory to store the mock R script and the output files
-        self.temp_dir = 'f_770_test_dir'
+        self.temp_dir = 'f_969_test_dir'
         os.makedirs(self.temp_dir, exist_ok=True)
         
         # Create a mock R script file
@@ -67,14 +67,14 @@ class TestCases(unittest.TestCase):
         with open(os.path.join(self.output_path, 'output.csv'), 'w') as file:
             file.write('x,y\n1,11\n2,12\n3,13\n4,14\n5,15\n6,16\n7,17\n8,18\n9,19\n10,20')
         # Case where the output file is expected to be generated within the specified duration
-        result, message = f_770(self.r_script_path, self.output_path, 5)
+        result, message = f_969(self.r_script_path, self.output_path, 5)
         self.assertTrue(result)
         self.assertEqual(message, 'File generated successfully within the specified duration.')
         
     @patch('subprocess.call', return_value=None)
     def test_case_2(self, mock_subprocess_call):
         # Case where the output file is not expected to be generated within the specified duration
-        result, message = f_770(self.r_script_path, self.output_path, 0)
+        result, message = f_969(self.r_script_path, self.output_path, 0)
         self.assertFalse(result)
         self.assertEqual(message, 'File not generated within the specified duration.')
     
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self, mock_subprocess_call):
         # Case where an invalid R script path is provided
         invalid_path = 'invalid/path/mock_script.r'
-        result, message = f_770(invalid_path, self.output_path, 5)
+        result, message = f_969(invalid_path, self.output_path, 5)
         self.assertFalse(result)
         self.assertEqual(message, 'File not generated within the specified duration.')
     
@@ -93,7 +93,7 @@ class TestCases(unittest.TestCase):
             file.write('x,y\n1,11\n2,12\n3,13\n4,14\n5,15\n6,16\n7,17\n8,18\n9,19\n10,20')
         # Case where a longer duration is provided
         time.sleep(2)  # Wait for 2 seconds before running the test to simulate different start times
-        result, message = f_770(self.r_script_path, self.output_path, 10)
+        result, message = f_969(self.r_script_path, self.output_path, 10)
         self.assertTrue(result)
         self.assertEqual(message, 'File generated successfully within the specified duration.')
     
@@ -101,6 +101,6 @@ class TestCases(unittest.TestCase):
     def test_case_5(self, mock_subprocess_call):
         # Case where the output path is invalid
         invalid_output_path = 'invalid/path/'
-        result, message = f_770(self.r_script_path, invalid_output_path, 5)
+        result, message = f_969(self.r_script_path, invalid_output_path, 5)
         self.assertFalse(result)
         self.assertEqual(message, 'File not generated within the specified duration.')

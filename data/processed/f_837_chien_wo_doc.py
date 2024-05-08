@@ -3,7 +3,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 
-def f_144(url: str, csv_file_path: str) -> list:
+def f_858(url: str, csv_file_path: str) -> list:
     """
     Extracts title, date, and author information from a webpage and writes the data to a CSV file.
 
@@ -35,7 +35,7 @@ def f_144(url: str, csv_file_path: str) -> list:
     - pandas
 
     Example:
-    >>> data = f_144('https://example.com/articles', '/path/to/save/csv/file.csv')
+    >>> data = f_858('https://example.com/articles', '/path/to/save/csv/file.csv')
     >>> type(data)
     <class 'list'>
     >>> len(data) > 0
@@ -102,7 +102,7 @@ class MockResponse:
         if self.status_code != 200:
             raise Exception("HTTP Error")
 class TestCases(unittest.TestCase):
-    """Tests for the f_144 function"""
+    """Tests for the f_858 function"""
     def setUp(self):
         """Set up any necessary resources before any tests are run."""
         os.makedirs("mnt/data", exist_ok=True)  # Create the directory for test files
@@ -116,7 +116,7 @@ class TestCases(unittest.TestCase):
             ("Title1", "Date1", "Author1"),
             ("Title2", "Date2", "Author2"),
         ]
-        self.assertEqual(f_144(url, csv_file_path), expected_output)
+        self.assertEqual(f_858(url, csv_file_path), expected_output)
     @patch("requests.get")
     def test_html_parsing_single_entry(self, mock_get):
         """Test parsing of HTML with a single data entry."""
@@ -124,7 +124,7 @@ class TestCases(unittest.TestCase):
         url = "https://example.com/test_data_2.html"
         csv_file_path = "mnt/data/output_2.csv"
         expected_output = [("TitleA", "DateA", "AuthorA")]
-        self.assertEqual(f_144(url, csv_file_path), expected_output)
+        self.assertEqual(f_858(url, csv_file_path), expected_output)
     @patch("requests.get")
     def test_html_parsing_with_same_data_as_first(self, mock_get):
         """Test parsing of HTML similar to first test case."""
@@ -135,7 +135,7 @@ class TestCases(unittest.TestCase):
             ("Title1", "Date1", "Author1"),
             ("Title2", "Date2", "Author2"),
         ]
-        self.assertEqual(f_144(url, csv_file_path), expected_output)
+        self.assertEqual(f_858(url, csv_file_path), expected_output)
     @patch("requests.get")
     def test_html_parsing_with_same_data_as_second(self, mock_get):
         """Test parsing of HTML similar to second test case."""
@@ -143,7 +143,7 @@ class TestCases(unittest.TestCase):
         url = "https://example.com/test_data_2.html"
         csv_file_path = "mnt/data/output_4.csv"
         expected_output = [("TitleA", "DateA", "AuthorA")]
-        self.assertEqual(f_144(url, csv_file_path), expected_output)
+        self.assertEqual(f_858(url, csv_file_path), expected_output)
     @patch("requests.get")
     def test_html_parsing_with_nonexistent_url(self, mock_get):
         """Test handling of HTTP error when URL does not exist."""
@@ -151,15 +151,15 @@ class TestCases(unittest.TestCase):
         url = "https://example.com/non_existent.html"  # Non-existent URL
         csv_file_path = "mnt/data/output_5.csv"
         with self.assertRaises(Exception):
-            f_144(url, csv_file_path)  # Should raise HTTP Error
+            f_858(url, csv_file_path)  # Should raise HTTP Error
     @patch("requests.get")
-    def test_f_144_request_exception(self, mock_get):
-        """Test f_144 raises an exception when there is a request error."""
+    def test_f_858_request_exception(self, mock_get):
+        """Test f_858 raises an exception when there is a request error."""
         mock_get.side_effect = requests.RequestException("Error fetching URL")
         url = "https://example.com/non_existent.html"
         csv_file_path = "mnt/data/output_error.csv"
         with self.assertRaises(Exception) as context:
-            f_144(url, csv_file_path)
+            f_858(url, csv_file_path)
         self.assertIn("Error fetching URL", str(context.exception))
     def tearDown(self):
         """Clean up shared resources after all tests in the class have completed."""

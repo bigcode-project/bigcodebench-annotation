@@ -1,7 +1,7 @@
 from itertools import combinations
 import math
 
-def f_561(seq, letter_weight_dict):
+def f_529(seq, letter_weight_dict):
     """
     Find the subsequence in a string that has the maximum total weight based on the weights given for each character. 
     The weights are assigned randomly and a subsequence is a sequence that can be derived from another sequence by deleting some elements without changing the order of the remaining elements.
@@ -18,9 +18,9 @@ def f_561(seq, letter_weight_dict):
     - math
 
     Example:
-    >>> f_561('abc', {'a': 1, 'b': 2, 'c': 3})
+    >>> f_529('abc', {'a': 1, 'b': 2, 'c': 3})
     'abc'
-    >>> f_561('aabc', {'a': 10, 'b': -5, 'c': 3})
+    >>> f_529('aabc', {'a': 10, 'b': -5, 'c': 3})
     'aac'
     """
     max_weight = -math.inf
@@ -37,7 +37,7 @@ import unittest
 class TestCases(unittest.TestCase):
     def base(self, seq, letter_weight_dict, correct_seq):
         # Run function
-        result = f_561(seq, letter_weight_dict)
+        result = f_529(seq, letter_weight_dict)
         # Check result
         self.assertTrue(isinstance(result, str))
         self.assertEqual(result, correct_seq)

@@ -3,7 +3,7 @@ import rsa
 import base64
 
 
-def f_219(file_path):
+def f_367(file_path):
     """
     Generates a signed hash of a file's contents using RSA encryption. The file's contents are hashed using SHA-256,
     and then the hash is signed with a private RSA key stored in 'private.pem'. The signed hash is encoded in base64.
@@ -21,11 +21,11 @@ def f_219(file_path):
 
     Examples:
     Assuming 'example.txt' contains some text and a valid 'private.pem' is present,
-    >>> len(f_219('example.txt')) > 0
+    >>> len(f_367('example.txt')) > 0
     True
 
     Assuming 'empty.txt' is an empty file and a valid 'private.pem' is present,
-    >>> len(f_219('empty.txt')) > 0
+    >>> len(f_367('empty.txt')) > 0
     True
     """
     with open(file_path, 'rb') as f:
@@ -63,16 +63,16 @@ class TestCases(unittest.TestCase):
                 os.remove(filename)
     def test_signed_hash_of_file(self):
         """Ensure a non-empty signature is produced for a file with content."""
-        result = f_219('example.txt')
+        result = f_367('example.txt')
         self.assertTrue(len(result) > 0)
     def test_signed_hash_of_empty_file(self):
         """Ensure a non-empty signature is produced for an empty file."""
-        result = f_219('empty.txt')
+        result = f_367('empty.txt')
         self.assertTrue(len(result) > 0)
     def test_file_not_exist(self):
         """Verify FileNotFoundError is raised for non-existent file paths."""
         with self.assertRaises(FileNotFoundError):
-            f_219('nonexistent.txt')
+            f_367('nonexistent.txt')
     def test_invalid_private_key_format(self):
         """Test that an invalid private key format raises ValueError."""
         # Temporarily replace the valid key with an invalid one for this test
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
         os.rename('invalid_private.pem', 'private.pem')
         try:
             with self.assertRaises(ValueError):
-                f_219('example.txt')
+                f_367('example.txt')
         finally:
             # Ensure cleanup happens correctly
             os.rename('private.pem', 'invalid_private.pem')
@@ -89,11 +89,11 @@ class TestCases(unittest.TestCase):
         """Ensure different files produce different signatures using the same key."""
         # Assuming another_example.txt exists and contains different content
         if os.path.exists('another_example.txt'):
-            hash1 = f_219('example.txt')
-            hash2 = f_219('another_example.txt')
+            hash1 = f_367('example.txt')
+            hash2 = f_367('another_example.txt')
             self.assertNotEqual(hash1, hash2)
     @patch('rsa.sign', side_effect=rsa.pkcs1.VerificationError("Mocked verification error"))
     def test_rsa_verification_error_handling(self, mock_sign):
         """Test that rsa.pkcs1.VerificationError is correctly handled within the signing process."""
         with self.assertRaises(rsa.pkcs1.VerificationError):
-            f_219('example.txt')
+            f_367('example.txt')

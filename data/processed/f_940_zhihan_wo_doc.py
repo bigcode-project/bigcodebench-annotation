@@ -5,7 +5,7 @@ import os
 
 PUNCTUATION = set(punctuation)
 
-def f_761(text, filename):
+def f_960(text, filename):
     """
     Save all words in a text beginning with the "$" character in a CSV file, excluding any words that are solely composed of punctuation characters.
 
@@ -27,7 +27,7 @@ def f_761(text, filename):
 
     Example:
     >>> text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
-    >>> f_761(text, 'dollar_words.csv')
+    >>> f_960(text, 'dollar_words.csv')
     '/absolute/path/to/dollar_words.csv'
     """
     punctuation_set = set(punctuation)
@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         self.filenames = []
         for i in range(1,7):
-            self.filenames.append("f_761_test_output_"+str(i)+".csv")
+            self.filenames.append("f_960_test_output_"+str(i)+".csv")
     def tearDown(self):
         # Clean up the test file
         for filename in self.filenames:
@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
         filename = self.filenames[0]
-        result_path = f_761(text, filename)
+        result_path = f_960(text, filename)
         
         # Check if the returned path is correct
         self.assertTrue(os.path.exists(result_path))
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         text = "$hello world $this is a $test"
         filename = self.filenames[1]
-        result_path = f_761(text, filename)
+        result_path = f_960(text, filename)
         
         # Check if the returned path is correct
         self.assertTrue(os.path.exists(result_path))
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         text = "There are no dollar words here"
         filename = self.filenames[2]
-        result_path = f_761(text, filename)
+        result_path = f_960(text, filename)
         
         # Check if the returned path is correct
         self.assertTrue(os.path.exists(result_path))
@@ -102,7 +102,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         text = "$word1 $word2 $word3 $word4 $word5"
         filename = self.filenames[3]
-        result_path = f_761(text, filename)
+        result_path = f_960(text, filename)
         
         # Check if the returned path is correct
         self.assertTrue(os.path.exists(result_path))
@@ -115,7 +115,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         text = "No dollar words but containing special characters @ # % & *"
         filename = self.filenames[4]
-        result_path = f_761(text, filename)
+        result_path = f_960(text, filename)
         
         # Check if the returned path is correct
         self.assertTrue(os.path.exists(result_path))

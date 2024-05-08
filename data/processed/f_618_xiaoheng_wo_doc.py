@@ -6,7 +6,7 @@ from datetime import datetime
 PATH_TO_APPEND = '/path/to/whatever'
 JSON_FILE = '/path/to/json_file.json'
 
-def f_733(path_to_append=PATH_TO_APPEND, json_file=JSON_FILE):
+def f_579(path_to_append=PATH_TO_APPEND, json_file=JSON_FILE):
     """
     Add a specific path to sys.path and update a JSON file with the current date and time.
     This function appends a given path to Python's sys.path and updates a JSON file with the current date and time under the key 'last_updated'.
@@ -24,7 +24,7 @@ def f_733(path_to_append=PATH_TO_APPEND, json_file=JSON_FILE):
     - datetime.datetime
 
     Example:
-    >>> f_733('/path/to/new_directory', '/path/to/new_json_file.json')
+    >>> f_579('/path/to/new_directory', '/path/to/new_json_file.json')
     {'last_updated': '2023-08-28 12:34:56'}
     """
     sys.path.append(path_to_append)
@@ -65,24 +65,24 @@ class TestCases(unittest.TestCase):
     def test_path_append(self):
         # Test if the path is correctly appended to sys.path
         new_path = '/new/test/path'
-        f_733(path_to_append=new_path, json_file=self.test_json_file_1.name)
+        f_579(path_to_append=new_path, json_file=self.test_json_file_1.name)
         self.assertIn(new_path, sys.path)
     def test_json_update_1(self):
         # Test if the JSON file is correctly updated (test_json_file_1)
-        output = f_733(json_file=self.test_json_file_1.name)
+        output = f_579(json_file=self.test_json_file_1.name)
         self.assertIn('last_updated', output)
         self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
     def test_json_update_2(self):
         # Test if the JSON file is correctly updated (test_json_file_2)
-        output = f_733(json_file=self.test_json_file_2.name)
+        output = f_579(json_file=self.test_json_file_2.name)
         self.assertIn('last_updated', output)
         self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
     def test_default_path(self):
         # Test if the default path is correctly appended when no argument is passed
-        f_733(json_file=self.test_json_file_1.name)
+        f_579(json_file=self.test_json_file_1.name)
         self.assertIn('/path/to/whatever', sys.path)
     def test_default_json(self):
         # Test if the default JSON file is correctly updated when no argument is passed
-        output = f_733(json_file=self.tmp_file)
+        output = f_579(json_file=self.tmp_file)
         self.assertIn('last_updated', output)
         self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)

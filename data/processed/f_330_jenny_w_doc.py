@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def f_273(data, column="c"):
+def f_277(data, column="c"):
     """
     Remove a column from a data dictionary if it exists, and then plot the remaining data
     if it contains numeric data.
@@ -22,7 +22,7 @@ def f_273(data, column="c"):
 
     Example:
     >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]}
-    >>> modified_df, ax = f_273(data)
+    >>> modified_df, ax = f_277(data)
     >>> ax
     <Axes: >
     >>> modified_df
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             data
         )
-        modified_df, ax = f_273(data)  # Remove default column 'c'.
+        modified_df, ax = f_277(data)  # Remove default column 'c'.
         # Assert column 'c' removal and plot data verification.
         self.assertNotIn("c", modified_df.columns)
         plotted_data = [line.get_ydata() for line in ax.get_lines()]
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
         np.random.seed(0)
         data = {"a": np.random.randn(10), "b": np.random.randn(10)}
         df = pd.DataFrame(data)
-        modified_df, ax = f_273(data)
+        modified_df, ax = f_277(data)
         # Assert that the modified DataFrame remains unchanged and plot is generated.
         self.assertEqual(list(df.columns), list(modified_df.columns))
         self.assertIsNotNone(ax)
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
         # Scenario: Empty DataFrame
         data = {}
         df = pd.DataFrame(data)
-        modified_df, ax = f_273(data)
+        modified_df, ax = f_277(data)
         # Assert empty DataFrame and no plot.
         self.assertTrue(modified_df.empty)
         self.assertIsNone(ax)
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
         # Scenario: DataFrame with single non-numeric column 'c'.
         data = {"c": ["apple", "banana", "cherry"]}
         df = pd.DataFrame(data)
-        modified_df, ax = f_273(data)
+        modified_df, ax = f_277(data)
         # Assert empty DataFrame after 'c' removal and no plot.
         self.assertTrue(modified_df.empty)
         self.assertIsNone(ax)
@@ -115,7 +115,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             data
         )
-        modified_df, ax = f_273(data)
+        modified_df, ax = f_277(data)
         # Assert column 'c' removal and plot data verification excluding non-numeric column 'd'.
         self.assertNotIn("c", modified_df.columns)
         plotted_data = [line.get_ydata() for line in ax.get_lines()]
@@ -138,7 +138,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             data
         )
-        modified_df, ax = f_273(df, column="a")
+        modified_df, ax = f_277(df, column="a")
         self.assertNotIn("a", modified_df.columns)
         plotted_data = [line.get_ydata() for line in ax.get_lines()]
         self.assertTrue(
@@ -159,7 +159,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             data
         )
-        modified_df, ax = f_273(data)
+        modified_df, ax = f_277(data)
         self.assertNotIn("c", modified_df.columns)
         pd.testing.assert_frame_equal(df[["a", "b"]], modified_df)
         self.assertEqual(ax, None)

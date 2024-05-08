@@ -5,7 +5,7 @@ import csv
 # Constants
 FILE_DIR = './yourdictfiles/'
 
-def f_678(output_file, test_directory):
+def f_201(output_file, test_directory):
     """
     Count the number of words in multiple dictionary files (.txt) in a specific directory,
     export the counts to a CSV file, and then return the total number of words.
@@ -27,7 +27,7 @@ def f_678(output_file, test_directory):
     - csv
 
     Example:
-    >>> f_678('word_counts.csv')
+    >>> f_201('word_counts.csv')
     10
     """
     total_words = 0
@@ -85,29 +85,29 @@ class TestCases(unittest.TestCase):
     def test_no_files_in_directory(self):
         # Test case where there are no txt files in the directory
         self.create_fake_dict_files(self.test_directory, 0, 0)
-        result = f_678(self.output_file, self.test_directory)
+        result = f_201(self.output_file, self.test_directory)
         self.assertEqual(result, 0)
         self.remove_files()
     def test_single_file_multiple_words(self):
         # Test case with a single file containing multiple words
         self.create_fake_dict_files(self.test_directory, 1, 50)
-        result = f_678(self.output_file, self.test_directory)
+        result = f_201(self.output_file, self.test_directory)
         self.assertEqual(50,result)
         self.remove_files()
     def test_multiple_files_multiple_words(self):
         # Test case with multiple files each containing multiple words
         self.create_fake_dict_files(self.test_directory, 5, 20)
-        result = f_678(self.output_file, self.test_directory)
+        result = f_201(self.output_file, self.test_directory)
         self.remove_files()
         self.assertEqual(100,result)
         # self.assertFalse(result)
     def test_directory_does_not_exist(self):
         # Test case where the specified directory does not exist
-        result = f_678(self.output_file, self.test_directory)
+        result = f_201(self.output_file, self.test_directory)
         self.assertEqual(0,result)
     def test_empty_files_in_directory(self):
         # Test case with empty txt files in the directory
         self.create_fake_dict_files(self.test_directory, 3, 0)
-        result = f_678(self.output_file, self.test_directory)
+        result = f_201(self.output_file, self.test_directory)
         self.remove_files()
         self.assertEqual(0,result)

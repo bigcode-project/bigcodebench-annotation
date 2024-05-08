@@ -4,7 +4,7 @@ import os
 # Constants
 PREFIXES = ["is_", "has_", "can_", "should_"]
 
-def f_795(directory):
+def f_606(directory):
     """
     Read all JSON files from the specified directory, count the occurrence of keys starting with certain prefixes 
     (defined in the PREFIXES constant), and return a dictionary of statistics.
@@ -20,9 +20,9 @@ def f_795(directory):
     - os
 
     Example:
-    >>> f_795('/path/to/json/files')
+    >>> f_606('/path/to/json/files')
     {'is_': 10, 'has_': 5, 'can_': 3, 'should_': 2}
-    >>> f_795('/another/path/to/json/files')
+    >>> f_606('/another/path/to/json/files')
     {'is_': 8, 'has_': 6, 'can_': 1, 'should_': 4}
     """
     stats = {prefix: 0 for prefix in PREFIXES}
@@ -64,13 +64,13 @@ class TestCases(unittest.TestCase):
         mock_file_open().read.side_effect = [self.json_data_1, self.json_data_2]
         
         expected_result = {'is_': 1, 'has_': 1, 'can_': 1, 'should_': 1}
-        result = f_795('/fake/directory')
+        result = f_606('/fake/directory')
         self.assertEqual(result, expected_result)
     @patch('os.listdir')
     @patch('builtins.open', new_callable=mock_open)
     def test_no_json_files(self, mock_file_open, mock_listdir):
         mock_listdir.return_value = ['file1.txt', 'data.bin']
-        result = f_795('/fake/directory')
+        result = f_606('/fake/directory')
         expected = {prefix: 0 for prefix in PREFIXES}
         self.assertEqual(result, expected)
     @patch('os.listdir')
@@ -81,14 +81,14 @@ class TestCases(unittest.TestCase):
         mock_file_open().read.side_effect = [self.json_data_no_prefix]
         
         expected_result = {'is_': 0, 'has_': 0, 'can_': 0, 'should_': 0}
-        result = f_795('/fake/directory')
+        result = f_606('/fake/directory')
         self.assertEqual(result, expected_result)
     @patch('os.listdir')
     @patch('builtins.open', new_callable=mock_open)
     def test_multiple_json_files_with_repeated_prefixes(self, mock_file_open, mock_listdir):
         mock_file_open().read.side_effect = [self.json_data_1, self.json_data_1]
         mock_listdir.return_value = ['file1.json', 'file2.json']
-        result = f_795('/fake/directory')
+        result = f_606('/fake/directory')
         expected = {'is_': 2, 'has_': 2, 'can_': 0, 'should_': 0}
         self.assertEqual(result, expected)
     @patch('os.listdir')
@@ -104,7 +104,7 @@ class TestCases(unittest.TestCase):
         ]
         
         # Modify the function to skip files that do not contain valid JSON
-        def custom_f_795(directory):
+        def custom_f_606(directory):
             stats = {prefix: 0 for prefix in PREFIXES}
             for filename in os.listdir(directory):
                 if filename.endswith('.json'):
@@ -119,7 +119,7 @@ class TestCases(unittest.TestCase):
                         print(f"Skipping non-JSON content in {filename}")
             return stats
         # Call the modified function
-        result = custom_f_795('/fake/directory')
+        result = custom_f_606('/fake/directory')
         expected_result = {'can_': 0, 'has_': 1, 'is_': 1, 'should_': 0}
         self.assertEqual(result, expected_result)
         # Ensure that non-JSON content does not cause a failure

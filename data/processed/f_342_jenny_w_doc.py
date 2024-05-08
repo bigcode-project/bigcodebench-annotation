@@ -2,7 +2,7 @@ import pickle
 import os
 
 
-def f_351(df, file_name="save.pkl"):
+def f_300(df, file_name="save.pkl"):
     """
     Save the provided Pandas DataFrame "df" in a pickle file with the given name, read it
     back for validation, and delete the intermediate file.
@@ -23,7 +23,7 @@ def f_351(df, file_name="save.pkl"):
     >>> import numpy as np
     >>> np.random.seed(0)
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-    >>> loaded_df = f_351(df, 'test_file.pkl')
+    >>> loaded_df = f_300(df, 'test_file.pkl')
     >>> assert df.equals(loaded_df)
     >>> type(df), type(loaded_df)
     (<class 'pandas.core.frame.DataFrame'>, <class 'pandas.core.frame.DataFrame'>)
@@ -56,28 +56,28 @@ class TestCases(unittest.TestCase):
             np.random.randint(0, 100, size=(100, 4)), columns=list("ABCD")
         )
         file_path = os.path.join(self.temp_dir.name, "test.pkl")
-        loaded_df = f_351(df, file_path)
+        loaded_df = f_300(df, file_path)
         self.assertTrue(df.equals(loaded_df))
         self.assertFalse(os.path.exists(file_path))
     def test_case_2(self):
         # Test with floats
         df = pd.DataFrame(np.random.rand(50, 3), columns=list("XYZ"))
         file_path = os.path.join(self.temp_dir.name, "floats.pkl")
-        loaded_df = f_351(df, file_path)
+        loaded_df = f_300(df, file_path)
         self.assertTrue(df.equals(loaded_df))
         self.assertFalse(os.path.exists(file_path))
     def test_case_3(self):
         # Test with strings
         df = pd.DataFrame({"A": ["foo", "bar", "baz"], "B": ["qux", "quux", "corge"]})
         file_path = os.path.join(self.temp_dir.name, "strings.pkl")
-        loaded_df = f_351(df, file_path)
+        loaded_df = f_300(df, file_path)
         self.assertTrue(df.equals(loaded_df))
         self.assertFalse(os.path.exists(file_path))
     def test_case_4(self):
         # Test with empty dataframe
         df = pd.DataFrame()
         file_path = os.path.join(self.temp_dir.name, "empty.pkl")
-        loaded_df = f_351(df, file_path)
+        loaded_df = f_300(df, file_path)
         self.assertTrue(df.equals(loaded_df))
         self.assertFalse(os.path.exists(file_path))
     def test_case_5(self):
@@ -86,7 +86,7 @@ class TestCases(unittest.TestCase):
             {"Date": [datetime(2020, 1, 1), datetime(2020, 1, 2)], "Value": [10, 20]}
         )
         file_path = os.path.join(self.temp_dir.name, "datetime.pkl")
-        loaded_df = f_351(df, file_path)
+        loaded_df = f_300(df, file_path)
         self.assertTrue(df.equals(loaded_df))
         self.assertFalse(os.path.exists(file_path))
     def test_case_6(self):
@@ -96,14 +96,14 @@ class TestCases(unittest.TestCase):
             columns=[f"Col{i}" for i in range(10)],
         )
         file_path = os.path.join(self.temp_dir.name, "large.pkl")
-        loaded_df = f_351(df, file_path)
+        loaded_df = f_300(df, file_path)
         self.assertTrue(df.equals(loaded_df))
         self.assertFalse(os.path.exists(file_path))
     def test_case_7(self):
         # Test single entry dataframe
         df = pd.DataFrame({"Single": [42]})
         file_path = os.path.join(self.temp_dir.name, "test_file_small.pkl")
-        loaded_df = f_351(df, file_path)
+        loaded_df = f_300(df, file_path)
         self.assertTrue(
             df.equals(loaded_df), "Loaded DataFrame does not match the original."
         )

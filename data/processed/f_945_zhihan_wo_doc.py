@@ -4,7 +4,7 @@ import glob
 import time
 
 
-def f_766(test_dir):
+def f_965(test_dir):
     """
     Run all Python codes in a specific directory and return their execution times.
 
@@ -21,7 +21,7 @@ def f_766(test_dir):
     - time
 
     Example:
-    >>> f_766("/mnt/data/mix_files/")
+    >>> f_965("/mnt/data/mix_files/")
     {'script1.py': 0.04103803634643555, "script2.py": 5}
     """
     execution_times = {}
@@ -40,9 +40,9 @@ import time
 import shutil
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.test_dir = 'testdir_f_766/'
+        self.test_dir = 'testdir_f_965/'
         os.makedirs(self.test_dir, exist_ok=True)
-        self.sample_directory = 'testdir_f_766/sample_directory'
+        self.sample_directory = 'testdir_f_965/sample_directory'
         os.makedirs(self.sample_directory, exist_ok=True)
         f = open(self.sample_directory+"/script1.py","w")
         f.write("a <- 42/nA <- a * 2/nprint(a)")
@@ -53,9 +53,9 @@ class TestCases(unittest.TestCase):
         f = open(self.sample_directory+"/script3.py","w")
         f.write("a <- 42/nA <- a * 2/nprint(A)")
         f.close()
-        self.empty_directory = "testdir_f_766/empty_directory"
+        self.empty_directory = "testdir_f_965/empty_directory"
         os.makedirs(self.empty_directory, exist_ok=True)
-        self.mixed_directory = "testdir_f_766/mixed_directory"
+        self.mixed_directory = "testdir_f_965/mixed_directory"
         os.makedirs(self.mixed_directory, exist_ok=True)
         f = open(self.mixed_directory+"/1.txt","w")
         f.write("invalid")
@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
         f = open(self.mixed_directory+"/script4.py","w")
         f.write("print('Hello from script4')")
         f.close()
-        self.invalid_directory = "testdir_f_766/invalid_directory"
+        self.invalid_directory = "testdir_f_965/invalid_directory"
         os.makedirs(self.invalid_directory, exist_ok=True)
         f = open(self.invalid_directory+"/1.txt","w")
         f.write("invalid")
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(self.test_dir)
     def test_case_1(self):
         # Testing with the created R scripts directory
-        result = f_766(self.sample_directory)
+        result = f_965(self.sample_directory)
         self.assertEqual(len(result), 3)  # There are 3 R scripts
         self.assertTrue("script1.py" in result)
         self.assertTrue("script2.py" in result)
@@ -83,23 +83,23 @@ class TestCases(unittest.TestCase):
             self.assertTrue(time_taken >= 0)  # Execution time should be non-negative
     def test_case_2(self):
         # Testing with a non-existent directory (should return an empty dictionary)
-        result = f_766("/non/existent/path/")
+        result = f_965("/non/existent/path/")
         self.assertEqual(result, {})
     def test_case_3(self):
         # Testing with a directory that has no Python scripts (should return an empty dictionary)
         empty_dir = self.empty_directory
         os.makedirs(empty_dir, exist_ok=True)
-        result = f_766(empty_dir)
+        result = f_965(empty_dir)
         self.assertEqual(result, {})
     def test_case_4(self):
         # Testing with a directory containing other types of files (should return an empty dictionary)
         other_files_dir = self.invalid_directory
-        result = f_766(other_files_dir)
+        result = f_965(other_files_dir)
         self.assertEqual(result, {})
     def test_case_5(self):
         # Testing with a directory containing a mix of Python scripts and other files
         mix_files_dir = self.mixed_directory
-        result = f_766(mix_files_dir)
+        result = f_965(mix_files_dir)
         self.assertEqual(len(result), 1)  # Only 1 Python script
         self.assertTrue("script4.py" in result)
         for time_taken in result.values():

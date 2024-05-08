@@ -4,7 +4,7 @@ import random
 # Constants
 LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
 
-def f_814(n_keys, n_values):
+def f_190(n_keys, n_values):
     """
     Create a Python dictionary with a specified number of keys and values. 
 
@@ -25,9 +25,9 @@ def f_814(n_keys, n_values):
 
     Example:
     >>> random.seed(0)
-    >>> f_814(3, 5)
+    >>> f_190(3, 5)
     {'g': [1, 2, 3, 4, 5], 'a': [1, 2, 3, 4, 5]}
-    >>> result = f_814(1, 5)
+    >>> result = f_190(1, 5)
     >>> list(result)[0] in LETTERS
     True
     """
@@ -41,29 +41,29 @@ LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
 class TestCases(unittest.TestCase):
     def test_basic_functionality(self):
         random.seed(0)
-        result = f_814(3, 5)
+        result = f_190(3, 5)
         self.assertLessEqual(len(result), 3)
         for key in result:
             self.assertIn(key, LETTERS)
             self.assertEqual(result[key], [1, 2, 3, 4, 5])
     def test_no_keys(self):
         random.seed(0)
-        result = f_814(0, 5)
+        result = f_190(0, 5)
         self.assertEqual(result, {})
     def test_no_values(self):
         random.seed(0)
-        result = f_814(3, 0)
+        result = f_190(3, 0)
         for key in result:
             self.assertEqual(result[key], [])
     def test_large_input(self):
         random.seed(0)
-        result = f_814(10, 1000)
+        result = f_190(10, 1000)
         for key in result:
             self.assertIn(key, LETTERS)
             self.assertEqual(len(result[key]), 1000)
     def test_max_keys(self):
         random.seed(0)
-        result = f_814(len(LETTERS), 5)
+        result = f_190(len(LETTERS), 5)
         for key in result:
             self.assertIn(key, LETTERS)
             self.assertEqual(result[key], [1, 2, 3, 4, 5])

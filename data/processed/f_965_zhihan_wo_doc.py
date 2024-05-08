@@ -9,7 +9,7 @@ RANGE = {
     'Pressure': (980, 1040)
 }
 
-def f_778(file_name="data.csv"):
+def f_976(file_name="data.csv"):
     """
     Generate a CSV file with weather data for each hour of the current day.
 
@@ -32,7 +32,7 @@ def f_778(file_name="data.csv"):
     - random
 
     Example:
-    >>> f_778("data.csv")
+    >>> f_976("data.csv")
     'path/to/data.csv'
     """
     with open(file_name, 'w', newline='') as file:
@@ -53,7 +53,7 @@ import random
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Setup for the test cases, creating a mock file name
-        self.mock_file_name = "test_f_778_data.csv"
+        self.mock_file_name = "test_f_976_data.csv"
         
     def tearDown(self):
         # Cleanup after each test, removing the generated file if it exists
@@ -62,19 +62,19 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Testing default file name
         random.seed(0)
-        returned_file = f_778(self.mock_file_name)
+        returned_file = f_976(self.mock_file_name)
         self.assertTrue(os.path.exists(returned_file))
         
     def test_case_2(self):
         # Testing custom file name
         random.seed(0)
-        returned_file = f_778(self.mock_file_name)
+        returned_file = f_976(self.mock_file_name)
         self.assertTrue(os.path.exists(returned_file))
         
     def test_case_3(self):
         # Testing content structure of the CSV file
         random.seed(0)
-        f_778(self.mock_file_name)
+        f_976(self.mock_file_name)
         with open(self.mock_file_name, 'r') as file:
             reader = csv.reader(file)
             header = next(reader)
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Testing content data ranges of the CSV file
         random.seed(0)
-        f_778(self.mock_file_name)
+        f_976(self.mock_file_name)
         with open(self.mock_file_name, 'r') as file:
             reader = csv.reader(file)
             next(reader)  # Skip header
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Testing number of rows (24 hours + header)
         random.seed(0)
-        f_778(self.mock_file_name)
+        f_976(self.mock_file_name)
         with open(self.mock_file_name, 'r') as file:
             reader = csv.reader(file)
             rows = list(reader)

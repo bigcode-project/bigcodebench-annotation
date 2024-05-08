@@ -5,7 +5,7 @@ import statistics
 # Constants
 RADIUS = 5
 
-def f_704(n):
+def f_616(n):
     """
     Generate n random points within a circle of radius RADIUS (default value is 5) and return their average distance from the center.
 
@@ -22,9 +22,9 @@ def f_704(n):
 
     Example:
     >>> random.seed(42)
-    >>> f_704(100)
+    >>> f_616(100)
     3.2406
-    >>> f_704(50)
+    >>> f_616(50)
     3.4443
     """
     distances = []
@@ -40,19 +40,19 @@ def f_704(n):
 import unittest
 class TestCases(unittest.TestCase):
     def test_1(self):
-        avg_distance = f_704(1000)
-        self.assertFalse(3.2 <= avg_distance <= 3.4, f"Expected average distance to be between 3.2 and 3.4, got {avg_distance}")
+        avg_distance = f_616(1000)
+        self.assertTrue(3.2 <= avg_distance <= 3.4, f"Expected average distance to be between 3.2 and 3.4, got {avg_distance}")
     def test_2(self):
-        avg_distance = f_704(500)
+        avg_distance = f_616(500)
         self.assertTrue(3.2 <= avg_distance <= 3.5, f"Expected average distance to be between 3.2 and 3.5, got {avg_distance}")
     def test_3(self):
-        avg_distance = f_704(100)
-        self.assertFalse(3.0 <= avg_distance <= 3.5, f"Expected average distance to be between 3.0 and 3.5, got {avg_distance}")
+        avg_distance = f_616(100)
+        self.assertTrue(3.0 <= avg_distance <= 3.5, f"Expected average distance to be between 3.0 and 3.5, got {avg_distance}")
     def test_4(self):
-        avg_distance = f_704(50)
+        avg_distance = f_616(50)
         # Allowing a wider range due to higher variance with fewer points
         self.assertTrue(2.5 <= avg_distance <= 4.0, f"Expected average distance to be between 2.5 and 4.0, got {avg_distance}")
     def test_5(self):
-        avg_distance = f_704(10)
+        avg_distance = f_616(10)
         # Even wider range for very few points
         self.assertTrue(1.5 <= avg_distance <= 4.5, f"Expected average distance to be between 1.5 and 4.5, got {avg_distance}")

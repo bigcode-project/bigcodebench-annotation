@@ -3,7 +3,7 @@ from lxml import etree
 import pandas as pd
 
 
-def f_891(url):
+def f_867(url):
     """
     Fetches and parses an XML file from a specified URL, then converts it into a Pandas DataFrame.
 
@@ -29,14 +29,14 @@ def f_891(url):
 
     Examples:
     # Example with a valid XML structure
-    >>> df = f_891('http://example.com/sample_data.xml')
+    >>> df = f_867('http://example.com/sample_data.xml')
     >>> print(df)
        name age
     0  John  25
     1  Jane  30
 
     # Example with an invalid XML structure
-    >>> df = f_891('http://example.com/invalid_structure.xml')
+    >>> df = f_867('http://example.com/invalid_structure.xml')
     ValueError: XML structure does not match expected format.
     """
     try:
@@ -60,7 +60,7 @@ import unittest
 import pandas as pd
 from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    """Test cases for the f_891 function."""
+    """Test cases for the f_867 function."""
     @patch("urllib.request.urlopen")
     def test_valid_xml(self, mock_urlopen):
         """Test that the function returns the correct DataFrame for a given XML file."""
@@ -71,7 +71,7 @@ class TestCases(unittest.TestCase):
         )
         url = "http://example.com/sample_data.xml"
         expected_df = pd.DataFrame({"name": ["John", "Jane"], "age": ["25", "30"]})
-        result_df = f_891(url)
+        result_df = f_867(url)
         pd.testing.assert_frame_equal(result_df, expected_df)
     @patch("urllib.request.urlopen")
     def test_empty_xml(self, mock_urlopen):
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
         )
         url = "http://example.com/empty_data.xml"
         with self.assertRaises(ValueError):
-            f_891(url)
+            f_867(url)
     @patch("urllib.request.urlopen")
     def test_different_structure_xml(self, mock_urlopen):
         """Test that the function raises an error for an XML file with a different structure."""
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
         )
         url = "http://example.com/different_structure_data.xml"
         with self.assertRaises(ValueError):
-            f_891(url)
+            f_867(url)
     @patch("urllib.request.urlopen")
     def test_invalid_url(self, mock_urlopen):
         """Test that the function raises an error for an invalid URL."""
@@ -104,7 +104,7 @@ class TestCases(unittest.TestCase):
         mock_urlopen.side_effect = Exception("URL fetch error")
         url = "http://example.com/nonexistent/file.xml"
         with self.assertRaises(ValueError):
-            f_891(url)
+            f_867(url)
     @patch("urllib.request.urlopen")
     def test_non_xml_data(self, mock_urlopen):
         """Test that the function raises an error for non-XML data."""
@@ -115,4 +115,4 @@ class TestCases(unittest.TestCase):
         )
         url = "http://example.com/non_xml_data.txt"
         with self.assertRaises(ValueError):
-            f_891(url)
+            f_867(url)

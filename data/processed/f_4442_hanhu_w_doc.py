@@ -2,7 +2,7 @@ import inspect
 import types
 import math
 
-def f_536(f):
+def f_432(f):
     """
     Analyzes a given function 'f' and returns a dictionary containing its name, the square root of
     the number of arguments, and the count of lambda functions present in its default values.
@@ -23,11 +23,11 @@ def f_536(f):
 
     Examples:
     >>> def sample_function(x, y=2): return x + y
-    >>> result = f_536(sample_function)
+    >>> result = f_432(sample_function)
     >>> 'sample_function' == result['function_name'] and result['sqrt_args'] == math.sqrt(2)
     True
     >>> lambda_func = lambda x: x * 2
-    >>> f_536(lambda_func)['lambda_in_defaults'] == 0
+    >>> f_432(lambda_func)['lambda_in_defaults'] == 0
     True
     """
     spec = inspect.getfullargspec(f)
@@ -46,42 +46,42 @@ import math
 class TestCases(unittest.TestCase):
     def test_regular_function(self):
         def sample_function(x, y, z=3): pass
-        result = f_536(sample_function)
+        result = f_432(sample_function)
         self.assertEqual(result['function_name'], 'sample_function')
         self.assertEqual(result['sqrt_args'], math.sqrt(3))
     def test_lambda_in_defaults(self):
         def func_with_lambda(x, y=lambda a: a+2): pass
-        result = f_536(func_with_lambda)
+        result = f_432(func_with_lambda)
         self.assertEqual(result['lambda_in_defaults'], 1)
     def test_no_arguments(self):
         def no_arg_func(): pass
-        result = f_536(no_arg_func)
+        result = f_432(no_arg_func)
         self.assertEqual(result['sqrt_args'], 0)
     def test_function_with_no_lambda_defaults(self):
         def func_without_lambda(x, y=2): pass
-        result = f_536(func_without_lambda)
+        result = f_432(func_without_lambda)
         self.assertEqual(result['lambda_in_defaults'], 0)
     def test_function_with_multiple_defaults(self):
         def sample_function(x, y=2, z=lambda a: a+2, w=lambda b: b*2): pass
-        result = f_536(sample_function)
+        result = f_432(sample_function)
         self.assertEqual(result['lambda_in_defaults'], 2)
     def test_lambda_function(self):
         lambda_func = lambda x, y=lambda a: a * 2: x + y(2)
-        result = f_536(lambda_func)
+        result = f_432(lambda_func)
         self.assertEqual(result['function_name'], '<lambda>')
         self.assertEqual(result['sqrt_args'], math.sqrt(2), "Sqrt of args should be sqrt(2) for lambda_func with 2 args")
         self.assertEqual(result['lambda_in_defaults'], 1, "There should be 1 lambda in defaults")
     
     def test_sqrt_args_correctness(self):
         def test_func(a, b, c=3, d=lambda x: x + 1): pass
-        result = f_536(test_func)
+        result = f_432(test_func)
         self.assertEqual(result['sqrt_args'], math.sqrt(4), "Sqrt of args count should match expected value")
     # Test for edge case or error handling
     def test_non_function_input(self):
         with self.assertRaises(TypeError):
-            f_536("This is not a function")
+            f_432("This is not a function")
     # Directly verifying the math operation
     def test_math_operation_direct_check(self):
         def test_func(a, b, c=3, d=lambda x: x + 1): pass
-        result = f_536(test_func)
+        result = f_432(test_func)
         self.assertAlmostEqual(result['sqrt_args'], math.sqrt(4), msg="sqrt_args should accurately represent the square root of the number of arguments.")

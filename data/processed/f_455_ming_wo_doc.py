@@ -7,7 +7,7 @@ from random import randint
 SENSORS = ['Temperature', 'Humidity', 'Pressure']
 OUTPUT_DIR = './output'
 
-def f_156(hours, output_dir=OUTPUT_DIR):
+def f_455(hours, output_dir=OUTPUT_DIR):
     """
     Create sensor data for the specified number of hours and save it in a CSV file
     with coloumns 'Time', 'Temperature', 'Humidity' and 'Pressure'.
@@ -27,7 +27,7 @@ def f_156(hours, output_dir=OUTPUT_DIR):
     - csv
 
     Example:
-    >>> file_path = f_156(1)  # Generate data for 1 hour
+    >>> file_path = f_455(1)  # Generate data for 1 hour
     >>> os.path.exists(file_path)  # Check if the file was actually created
     True
     >>> isinstance(file_path, str)  # Validate that the return type is a string
@@ -61,26 +61,26 @@ class TestCases(unittest.TestCase):
             shutil.rmtree(OUTPUT_DIR)
     def test_csv_file_creation(self):
         """Test if the CSV file is successfully created."""
-        f_156(1)
+        f_455(1)
         self.assertTrue(os.path.exists(FILE_PATH))
     def test_csv_file_rows(self):
         """Test if the CSV file contains the correct number of rows for 24 hours."""
-        f_156(24)
+        f_455(24)
         with open(FILE_PATH, 'r') as f:
             self.assertEqual(len(f.readlines()), 25)  # Including header
     def test_csv_file_header(self):
         """Test if the CSV file header matches the expected sensors."""
-        f_156(0)
+        f_455(0)
         with open(FILE_PATH, 'r') as f:
             reader = csv.reader(f)
             header = next(reader)
             self.assertEqual(header, ['Time', 'Temperature', 'Humidity', 'Pressure'])
     def test_file_path_return(self):
         """Test if the correct file path is returned."""
-        file_path = f_156(1)
+        file_path = f_455(1)
         self.assertEqual(file_path, FILE_PATH)
     def test_no_hours_data(self):
         """Test sensor data generation with 0 hours."""
-        f_156(0)
+        f_455(0)
         with open(FILE_PATH, 'r') as f:
             self.assertEqual(len(f.readlines()), 1)  # Only header row expected

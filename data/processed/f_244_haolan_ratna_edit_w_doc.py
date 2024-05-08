@@ -5,7 +5,7 @@ import seaborn as sns
 # Constants
 COLUMNS = ['Name', 'Age', 'Country', 'Score']
 
-def f_59(df):
+def f_171(df):
     """
     Generates a histogram of scores and a boxplot of scores by country from a pandas DataFrame. 
     It considers only unique names for both plots.
@@ -28,12 +28,12 @@ def f_59(df):
 
     Example:
     >>> data = pd.DataFrame([{'Name': 'James', 'Age': 30, 'Country': 'USA', 'Score': 85}, {'Name': 'Nick', 'Age': 50, 'Country': 'Australia', 'Score': 80}])
-    >>> fig = f_59(data)
+    >>> fig = f_171(data)
     >>> axes = fig.get_axes()
     >>> print(axes[0].get_title())
     Histogram of Scores
 
-    >>> print(f_59("not a dataframe"))
+    >>> print(f_171("not a dataframe"))
     Invalid input
     """
     if not isinstance(df, pd.DataFrame):
@@ -64,7 +64,7 @@ class TestCases(unittest.TestCase):
             {'Name': 'Sam', 'Age': 40, 'Country': 'UK', 'Score': 88},
             {'Name': 'Nick', 'Age': 50, 'Country': 'Australia', 'Score': 80}
         ])
-        fig = f_59(data)
+        fig = f_171(data)
         # Retrieve axes from the figure
         axes = fig.get_axes()
         # Assert titles
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
     def test_empty_dataframe(self):
         # Test with an empty DataFrame
         data = pd.DataFrame([])
-        result = f_59(data)
+        result = f_171(data)
         self.assertEqual(result, "Invalid input")
     def test_missing_columns(self):
         # Test with a DataFrame missing required columns
@@ -89,12 +89,12 @@ class TestCases(unittest.TestCase):
             {'Name': 'James', 'Age': 30, 'Score': 85},
             {'Name': 'Lily', 'Age': 28, 'Score': 92}
         ])
-        result = f_59(data)
+        result = f_171(data)
         self.assertEqual(result, "Invalid input")
     def test_non_dataframe_input(self):
         # Test with a non-DataFrame input
         data = "not a dataframe"
-        result = f_59(data)
+        result = f_171(data)
         self.assertEqual(result, "Invalid input")
     def test_plot_attributes(self):
         # Test if the plot contains the correct title, x-axis, y-axis, and data points
@@ -102,7 +102,7 @@ class TestCases(unittest.TestCase):
             {'Name': 'James', 'Age': 30, 'Country': 'USA', 'Score': 85},
             {'Name': 'Nick', 'Age': 50, 'Country': 'Australia', 'Score': 80}
         ])
-        fig = f_59(data)
+        fig = f_171(data)
         # Retrieve axes from the figure
         axes = fig.get_axes()
         # Assert titles

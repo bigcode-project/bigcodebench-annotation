@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def f_242(n_rows, remove_cols, columns=['A', 'B', 'C', 'D', 'E'], random_seed=None):
+def f_699(n_rows, remove_cols, columns=['A', 'B', 'C', 'D', 'E'], random_seed=None):
     """
     Generate a DataFrame with columns 'columns' and fill them with random 
     integer values between 0 and 100. Remove some columns based on the provided indexes.
@@ -21,7 +21,7 @@ def f_242(n_rows, remove_cols, columns=['A', 'B', 'C', 'D', 'E'], random_seed=No
     - pandas
     
     Example:
-    >>> df = f_242(10, [1, 3], random_seed=1)
+    >>> df = f_699(10, [1, 3], random_seed=1)
     >>> print(df)
         A   C   E
     0  37  72  75
@@ -35,7 +35,7 @@ def f_242(n_rows, remove_cols, columns=['A', 'B', 'C', 'D', 'E'], random_seed=No
     8   8  13  72
     9  30   3  21
 
-    >>> df = f_242(3, [1, 3], columns=['test', 'rem1', 'apple', 'remove'], random_seed=12)
+    >>> df = f_699(3, [1, 3], columns=['test', 'rem1', 'apple', 'remove'], random_seed=12)
     >>> print(df)
        test  apple
     0    75      6
@@ -53,7 +53,7 @@ import numpy as np
 import pandas as pd
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = f_242(5, [1, 3], random_seed=1)
+        df = f_699(5, [1, 3], random_seed=1)
         expected = pd.DataFrame({
             'A': {0: 37, 1: 5, 2: 76, 3: 20, 4: 29},
             'C': {0: 72, 1: 64, 2: 6, 3: 84, 4: 50},
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         })
         pd.testing.assert_frame_equal(df, expected, check_dtype=False)
     def test_case_2(self):
-        df = f_242(10, [], columns=['X', 'Y', 'Z'], random_seed=12)
+        df = f_699(10, [], columns=['X', 'Y', 'Z'], random_seed=12)
         expected = pd.DataFrame({
             'X': {0: 75, 1: 2, 2: 76, 3: 49, 4: 13, 5: 75, 6: 76, 7: 89, 8: 35, 9: 63},
             'Y': {0: 27, 1: 3, 2: 48, 3: 52, 4: 89, 5: 74, 6: 13, 7: 35, 8: 33, 9: 96},
@@ -69,15 +69,15 @@ class TestCases(unittest.TestCase):
         })
         pd.testing.assert_frame_equal(df, expected, check_dtype=False)
     def test_case_3(self):
-        df = f_242(0, remove_cols=[], random_seed=42)
+        df = f_699(0, remove_cols=[], random_seed=42)
         expected = pd.DataFrame(
             {'A': {}, 'B': {}, 'C': {}, 'D': {}, 'E': {}}
         )
         pd.testing.assert_frame_equal(df, expected, check_dtype=False, check_index_type=False)
     def test_case_4(self):
-        df1 = f_242(10, [], random_seed=12)
-        df2 = f_242(10, [], random_seed=12)
+        df1 = f_699(10, [], random_seed=12)
+        df2 = f_699(10, [], random_seed=12)
         pd.testing.assert_frame_equal(df1, df2, check_dtype=False, check_index_type=False)
     def test_case_5(self):
-        df = f_242(6, [0, 1, 2, 3, 4], random_seed=1)
+        df = f_699(6, [0, 1, 2, 3, 4], random_seed=1)
         self.assertEqual(list(df.columns), [])

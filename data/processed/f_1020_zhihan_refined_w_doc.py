@@ -1,7 +1,7 @@
 import psutil
 import platform
 
-def f_693():
+def f_20():
     """
     Obtain system details, including operating system, architecture, and memory usage.
     
@@ -22,7 +22,7 @@ def f_693():
     - psutil
 
     Examples:
-    >>> system_info = f_693()
+    >>> system_info = f_20()
     >>> isinstance(system_info, dict)
     True
     >>> 'OS' in system_info
@@ -45,27 +45,27 @@ class TestCases(unittest.TestCase):
     
     def test_presence_OS(self):
         """Test that the result has the correct keys and that each key maps to the expected data type."""
-        result = f_693()
+        result = f_20()
         self.assertTrue('OS' in result and isinstance(result['OS'], str))
     def test_presence_architecture(self):
         """Test that the result has the correct keys and that each key maps to the expected data type."""
-        result = f_693()
+        result = f_20()
         self.assertTrue('Architecture' in result and isinstance(result['Architecture'], str))
     def test_presence_memory_usage(self):
         """Test that the result has the correct keys and that each key maps to the expected data type."""
-        result = f_693()
+        result = f_20()
         self.assertTrue('Memory Usage' in result and isinstance(result['Memory Usage'], str))
     def test_return_type(self):
         """Test that the result has the correct keys and that each key maps to the expected data type."""
-        result = f_693()
+        result = f_20()
         self.assertIsInstance(result, dict)
     def test_memory_usage_format(self):
         """Test that the 'Memory Usage' key is correctly formatted as a percentage."""
-        result = f_693()
+        result = f_20()
         self.assertRegex(result['Memory Usage'], r"\d{1,3}\.\d{2}%")
     
     def test_non_empty_values(self):
         """Ensure that the values associated with each key are non-empty."""
-        result = f_693()
+        result = f_20()
         for key, value in result.items():
             self.assertTrue(bool(value))

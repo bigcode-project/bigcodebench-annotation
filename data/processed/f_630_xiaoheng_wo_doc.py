@@ -1,7 +1,7 @@
 import csv
 import io
 
-def f_327(filename, from_encoding='cp1251', to_encoding='utf8', delimiter=','):
+def f_591(filename, from_encoding='cp1251', to_encoding='utf8', delimiter=','):
     """
     Convert the encoding of a CSV file from one encoding to another and return a list of dictionaries along with the converted CSV data as a string.
     
@@ -21,7 +21,7 @@ def f_327(filename, from_encoding='cp1251', to_encoding='utf8', delimiter=','):
     - io
     
     Example:
-    >>> data, converted_csv = f_327('sample.csv', 'cp1251', 'utf8')
+    >>> data, converted_csv = f_591('sample.csv', 'cp1251', 'utf8')
     >>> print(data)
     [{'Name': 'Alice', 'Age': '30'}, {'Name': 'Bob', 'Age': '25'}]
     >>> print(converted_csv)
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
         mock_file_handle = mock_open.return_value.__enter__.return_value
         mock_file_handle.read.return_value = "Name,Age\nAlice,30\nBob,25\n"
         # Run the function
-        data, converted_csv = f_327('sample_1.csv', 'utf8', 'utf8', ',')
+        data, converted_csv = f_591('sample_1.csv', 'utf8', 'utf8', ',')
         # Check the output data
         expected_data = [{'Name': 'Alice', 'Age': '30'}, {'Name': 'Bob', 'Age': '25'}]
         self.assertEqual(data, expected_data)
@@ -76,14 +76,14 @@ class TestCases(unittest.TestCase):
         # Simulate reading file with different encoding
         mock_open.return_value.__enter__.return_value.read.return_value = self.csv_data.encode('utf-8').decode('cp1251')
         # Run the function with the encoding details
-        data, converted_csv = f_327('sample_1.csv', 'cp1251', 'utf8', ',')
+        data, converted_csv = f_591('sample_1.csv', 'cp1251', 'utf8', ',')
         # Check that the conversion was handled properly
         self.assertIn("Alice", converted_csv)
         self.assertIn("Bob", converted_csv)
     @patch('io.open', new_callable=mock_open, read_data="Name,Age\nAlice,30\nBob,25\n")
     def test_empty_file(self, mock_open):
         mock_open.return_value.__enter__.return_value.read.return_value = ""
-        data, converted_csv = f_327('empty.csv', 'utf8', 'utf8', ',')
+        data, converted_csv = f_591('empty.csv', 'utf8', 'utf8', ',')
         self.assertEqual(data, [])
         self.assertEqual(converted_csv.strip(), "Column")  # Default column name in header
     @patch('os.path.exists', return_value=True)
@@ -92,11 +92,11 @@ class TestCases(unittest.TestCase):
         # Simulate invalid CSV data
         mock_open.return_value.__enter__.return_value.read.return_value = "Name Age\nAlice 30\nBob 25"
         # Run the function
-        data, converted_csv = f_327('invalid.csv', 'utf8', 'utf8', ' ')
+        data, converted_csv = f_591('invalid.csv', 'utf8', 'utf8', ' ')
         # Validate that data was parsed considering space as a delimiter
         self.assertTrue(all('Name' in entry and 'Age' in entry for entry in data))
     @patch('io.open', new_callable=mock_open, read_data="Name,Age\n")
     def test_csv_with_only_headers(self, mock_open):
-        data, converted_csv = f_327('headers_only.csv', 'utf8', 'utf8', ',')
+        data, converted_csv = f_591('headers_only.csv', 'utf8', 'utf8', ',')
         self.assertEqual(data, [])
         self.assertIn("Name,Age\n", converted_csv)  # Test with normalized newline

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def f_680(matrix1, matrix2):
+def f_466(matrix1, matrix2):
     """
     Connects two 2D numeric arrays (matrices) along the second axis (columns),
     converts them into a Pandas DataFrame, and returns a string representation of the DataFrame.
@@ -21,7 +21,7 @@ def f_680(matrix1, matrix2):
     Example:
     >>> matrix1 = np.array([[1, 2, 3], [4, 5, 6]])
     >>> matrix2 = np.array([[7, 8, 9], [10, 11, 12]])
-    >>> result = f_680(matrix1, matrix2)
+    >>> result = f_466(matrix1, matrix2)
     >>> all(x in result.replace(' ', '') for x in ['123789', '456101112'])
     True
     """
@@ -40,31 +40,31 @@ class TestCases(unittest.TestCase):
         matrix1 = np.array([[1, 2], [3, 4]])
         matrix2 = np.array([[5, 6], [7, 8]])
         expected_output = " 1  2  5  6\n 3  4  7  8"
-        result = f_680(matrix1, matrix2)
+        result = f_466(matrix1, matrix2)
         self.assertEqual(self.normalize_whitespace(result), self.normalize_whitespace(expected_output))
     def test_different_length_matrices(self):
         """Test concatenation of matrices with different numbers of rows."""
         matrix1 = np.array([[1, 2], [3, 4], [5, 6]])
         matrix2 = np.array([[7, 8]])
         with self.assertRaises(ValueError):
-            f_680(matrix1, matrix2)
+            f_466(matrix1, matrix2)
     def test_mismatched_dimensions(self):
         """Test concatenation with mismatched dimensions."""
         matrix1 = np.array([[1, 2]])
         matrix2 = np.array([[3], [4]])
         with self.assertRaises(ValueError):
-            f_680(matrix1, matrix2)
+            f_466(matrix1, matrix2)
     def test_single_row_matrices(self):
         """Test concatenation of single-row matrices."""
         matrix1 = np.array([[1, 2, 3]])
         matrix2 = np.array([[4, 5, 6]])
         expected_output = " 1  2  3  4  5  6"
-        result = f_680(matrix1, matrix2)
+        result = f_466(matrix1, matrix2)
         self.assertEqual(self.normalize_whitespace(result), self.normalize_whitespace(expected_output))
     def test_non_numeric_matrices(self):
         """Ensure non-numeric matrices are handled."""
         matrix1 = np.array([['a', 'b']])
         matrix2 = np.array([['c', 'd']])
         expected_output = " a  b  c  d"
-        result = f_680(matrix1, matrix2)
+        result = f_466(matrix1, matrix2)
         self.assertEqual(self.normalize_whitespace(result), self.normalize_whitespace(expected_output))

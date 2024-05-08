@@ -4,7 +4,7 @@ import numpy as np
 # Constants
 COLUMNS = ['column1', 'column2', 'column3', 'column4', 'column5']
 
-def f_488(df, dct):
+def f_170(df, dct):
     """
     Replace certain values in a DataFrame with a dictionary mapping and calculate the Pearson correlation coefficient between each pair of columns.
 
@@ -29,7 +29,7 @@ def f_488(df, dct):
     Example:
     >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
     >>> dct = {1: 10, 2: 20, 3: 30, 4: 40, 5: 50, 6: 60}
-    >>> correlation_matrix = f_488(df, dct)
+    >>> correlation_matrix = f_170(df, dct)
     >>> correlation_matrix.shape == (2, 2)
     True
     >>> np.allclose(correlation_matrix, np.array([[1.0, 1.0], [1.0, 1.0]]))
@@ -48,32 +48,32 @@ class TestCases(unittest.TestCase):
         # Test with simple numeric DataFrame
         df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
         dct = {1: 10, 2: 20, 3: 30, 4: 40, 5: 50, 6: 60}
-        result = f_488(df, dct)
+        result = f_170(df, dct)
         self.assertTrue(result.shape == (2, 2))
     def test_case_2(self):
         # Test with DataFrame containing NaN values
         df = pd.DataFrame({'A': [1, 2, None], 'B': [4, None, 6]})
         dct = {1: 10, 2: 20, 4: 40, 6: 60}
-        result = f_488(df, dct)
+        result = f_170(df, dct)
         self.assertTrue(result.isna().sum().sum() > 0)
     def test_case_3(self):
         # Test with DataFrame containing negative values
         df = pd.DataFrame({'A': [-1, -2, -3], 'B': [-4, -5, -6]})
         dct = {-1: 1, -2: 2, -3: 3, -4: 4, -5: 5, -6: 6}
-        result = f_488(df, dct)
+        result = f_170(df, dct)
         self.assertTrue(result.shape == (2, 2))
     def test_case_4(self):
         # Test with DataFrame containing mixed data types
         df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
         dct = {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5}
-        result = f_488(df, dct)
+        result = f_170(df, dct)
         self.assertTrue(result.shape == (2, 2))
     def test_case_5(self):
         # Test with larger DataFrame
         df = pd.DataFrame({'A': range(10), 'B': range(10, 20), 'C': range(20, 30)})
         dct = {i: i + 1 for i in range(30)}
-        result = f_488(df, dct)
+        result = f_170(df, dct)
         self.assertTrue(result.shape == (3, 3))
     def test_case_6(self):
         with self.assertRaises(ValueError):
-            f_488("non_df", {})
+            f_170("non_df", {})

@@ -6,7 +6,7 @@ import json
 PREFICES = ['EMP$$', 'MAN$$', 'DEV$$', 'HR$$']
 LEVELS = ['Junior', 'Mid', 'Senior']
 
-def f_783(department_data):
+def f_981(department_data):
     """
     Generate a JSON object from employee data based on given department codes and their employee counts.
 
@@ -28,7 +28,7 @@ def f_783(department_data):
     Example:
     >>> random.seed(0)
     >>> department_info = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
-    >>> level_data_json = f_783(department_info)
+    >>> level_data_json = f_981(department_info)
     >>> print(level_data_json)
     {"EMP$$": ["Mid", "Mid", "Junior", "Mid", "Senior", "Mid", "Mid", "Mid", "Mid", "Mid"], "MAN$$": ["Senior", "Junior", "Senior", "Junior", "Mid"], "DEV$$": ["Junior", "Junior", "Senior", "Mid", "Senior", "Senior", "Senior", "Junior"], "HR$$": ["Mid", "Junior", "Senior", "Junior", "Senior", "Mid", "Mid"]}
     """
@@ -53,7 +53,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         random.seed(0)
         input_data = {'EMP$$': 5, 'MAN$$': 3, 'DEV$$': 4, 'HR$$': 2}
-        output_data = f_783(input_data)
+        output_data = f_981(input_data)
         parsed_output = json.loads(output_data)
         
         for key, value in input_data.items():
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         random.seed(0)
         input_data = {'EMP$$': 10}
-        output_data = f_783(input_data)
+        output_data = f_981(input_data)
         parsed_output = json.loads(output_data)
         
         self.assertEqual(len(parsed_output), 1)
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         random.seed(0)
         input_data = {'MAN$$': 6, 'DEV$$': 7}
-        output_data = f_783(input_data)
+        output_data = f_981(input_data)
         parsed_output = json.loads(output_data)
         
         self.assertEqual(len(parsed_output), 2)
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         random.seed(0)
         input_data = {'HR$$': 3}
-        output_data = f_783(input_data)
+        output_data = f_981(input_data)
         parsed_output = json.loads(output_data)
         
         self.assertEqual(len(parsed_output), 1)
@@ -101,6 +101,6 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         random.seed(0)
         input_data = {}
-        output_data = f_783(input_data)
+        output_data = f_981(input_data)
         parsed_output = json.loads(output_data)
         self.assertEqual(len(parsed_output), 0)

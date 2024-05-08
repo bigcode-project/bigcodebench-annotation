@@ -2,7 +2,7 @@ import os
 import random
 import json
 
-def f_28(directory, n):
+def f_534(directory, n):
     """
     Create n random files in a directory with json content with the key 'number' and a random integer value between 1 and 100, and then reset the cursor to the beginning of each file.
 
@@ -19,7 +19,7 @@ def f_28(directory, n):
     - json
 
     Example:
-    >>> f_28('/path/to/directory', 1)
+    >>> f_534('/path/to/directory', 1)
     '/path/to/directory'
     """
     if not os.path.exists(directory):
@@ -41,7 +41,7 @@ class TestCases(unittest.TestCase):
         shutil.rmtree('./s', ignore_errors=True)
     def test_case_1(self):
         random.seed(0)
-        directory = f_28('./source', 10)
+        directory = f_534('./source', 10)
         self.assertTrue(os.path.exists(directory))
         read_data = []
         for file in sorted(os.listdir(directory)):
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(directory)
     def test_case_2(self):
         random.seed(1)
-        directory = f_28('./src', 1)
+        directory = f_534('./src', 1)
         self.assertTrue(os.path.exists(directory))
         read_data = []
         for file in os.listdir(directory):
@@ -60,18 +60,18 @@ class TestCases(unittest.TestCase):
         self.assertEqual(read_data, [{'number': 18}])
         shutil.rmtree(directory)
     def test_case_3(self):
-        directory = f_28('./s', 100)
+        directory = f_534('./s', 100)
         self.assertTrue(os.path.exists(directory))
         self.assertEqual(len(os.listdir(directory)), 100)
         shutil.rmtree(directory)
     def test_case_4(self):
-        directory = f_28('./s', 0)
+        directory = f_534('./s', 0)
         self.assertTrue(os.path.exists(directory))
         self.assertEqual(len(os.listdir(directory)), 0)
         shutil.rmtree(directory)
     def test_case_5(self):
         random.seed(2)
-        directory = f_28('./source', 1)
+        directory = f_534('./source', 1)
         self.assertTrue(os.path.exists(directory))
         read_data = []
         for file in os.listdir(directory):

@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
-def f_855(data, columns, target_column):
+def f_569(data, columns, target_column):
     """
     Perform a logistic regression on a DataFrame to predict a specific target column.
     
@@ -24,7 +24,7 @@ def f_855(data, columns, target_column):
     >>> np.random.seed(42)
     >>> data = np.random.randint(0, 100, size=(100, 4))  # Using np to generate random data
     >>> columns = ['A', 'B', 'C', 'target']
-    >>> f_855(data, columns, 'target')
+    >>> f_569(data, columns, 'target')
     0.0
     """
     df = pd.DataFrame(data, columns=columns)
@@ -46,11 +46,11 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         data = np.array([[1, 4, 0], [2, 5, 1], [3, 6, 0]])
         columns = ['A', 'B', 'C']
-        self.assertEqual(f_855(data, columns, 'C'), 0.0)
+        self.assertEqual(f_569(data, columns, 'C'), 0.0)
     def test_case_2(self):
         data = np.array([[1, 2, 3, -10], [4, 5, 6, -10], [1, 1, 1, 0]])
         columns = ['A', 'B', 'C', 'D']
-        self.assertEqual(f_855(data, columns, 'C'), 0.0)
+        self.assertEqual(f_569(data, columns, 'C'), 0.0)
     def test_case_3(self):
         data = np.array([
             [60, 45, 1],
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
             [9,  89, 1]
         ])
         columns = ['A', 'B', 'C']
-        self.assertEqual(f_855(data, columns, 'C'), 1.0)
+        self.assertEqual(f_569(data, columns, 'C'), 1.0)
     def test_case_4(self):
         data = np.array([
             [-10, 2, 3, -10],
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
             [-10, -5, -4, -10]
         ])
         columns = ['A', 'B', 'C', 'D']
-        self.assertEqual(f_855(data, columns, 'D'), 1.0)
+        self.assertEqual(f_569(data, columns, 'D'), 1.0)
     def test_case_5(self):
         data = np.array([
             [-10, 2, 3, -10, 1],
@@ -87,4 +87,4 @@ class TestCases(unittest.TestCase):
             [-10, -5, -4, -10, 1]
         ])
         columns = ['A', 'B', 'C', 'D', 'E']
-        self.assertEqual(f_855(data, columns, 'D'), 1.0)
+        self.assertEqual(f_569(data, columns, 'D'), 1.0)

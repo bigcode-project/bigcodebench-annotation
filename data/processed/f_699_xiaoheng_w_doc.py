@@ -1,7 +1,7 @@
 import textwrap
 import re
 
-def f_108(input_string, width):
+def f_715(input_string, width):
     """
     Divide a multi-line string into separate strings and wrap each line to a certain width.
     
@@ -17,7 +17,7 @@ def f_108(input_string, width):
     - re
     
     Example:
-    >>> f_108('Another line\\nWith wrapping', 8)
+    >>> f_715('Another line\\nWith wrapping', 8)
     'Another\\nline\\nWith\\nwrapping'
     """
     lines = input_string.split('\\n')
@@ -33,7 +33,7 @@ class TestCases(unittest.TestCase):
         input_str = "Hello world\nThis is a test string\nHappy coding!"
         width = 10
         expected_output = "Hello\nworld This\nwas a test\nstring\nHappy\ncoding!"
-        self.assertEqual(f_108(input_str, width), expected_output)
+        self.assertEqual(f_715(input_str, width), expected_output)
         
         
     def test_case_2(self):
@@ -41,24 +41,24 @@ class TestCases(unittest.TestCase):
         input_str = "Hello world"
         width = 5
         expected_output = "Hello\nworld"
-        self.assertEqual(f_108(input_str, width), expected_output)
+        self.assertEqual(f_715(input_str, width), expected_output)
     
     def test_case_3(self):
         # Test with empty string and specific width
         input_str = ""
         width = 10
         expected_output = ""
-        self.assertEqual(f_108(input_str, width), expected_output)
+        self.assertEqual(f_715(input_str, width), expected_output)
     
     def test_case_4(self):
         input_str = "Hello world This is a test string Happy coding!"
         width = 1000
         expected_output = "Hello world This was a test string Happy coding!"  # Very wide width, should not wrap
-        self.assertEqual(f_108(input_str, width), expected_output)
+        self.assertEqual(f_715(input_str, width), expected_output)
     
     def test_case_5(self):
         # Test with special characters and specific width
         input_str = "Hello, @world!\n#This$is^a&test*string"
         width = 10
         expected_output = "Hello,\n@world!\n#This$was^a&test*string"
-        self.assertEqual(f_108(input_str, width), expected_output)
+        self.assertEqual(f_715(input_str, width), expected_output)

@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 
-def f_16(n_rows, scale_cols, columns=['A', 'B', 'C', 'D', 'E'], random_seed=None):
+def f_701(n_rows, scale_cols, columns=['A', 'B', 'C', 'D', 'E'], random_seed=None):
     """
     Generate a DataFrame with columns 'columns' and fill them with random
     values. Scale the columns at the provided indexes with sklearn StandardScaler.
@@ -24,14 +24,14 @@ def f_16(n_rows, scale_cols, columns=['A', 'B', 'C', 'D', 'E'], random_seed=None
     - sklearn
     
     Example:
-    >>> df = f_16(3, [1], columns=['test', 'scale'], random_seed=1)
+    >>> df = f_701(3, [1], columns=['test', 'scale'], random_seed=1)
     >>> print(df)
        test     scale
     0    37  1.162476
     1    72  0.116248
     2    75 -1.278724
 
-    >>> df = f_16(5, [1, 2, 3], random_seed=12)
+    >>> df = f_701(5, [1, 2, 3], random_seed=12)
     >>> print(df)
         A         B         C         D   E
     0  75 -0.840307 -0.791926 -1.462784   3
@@ -52,7 +52,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = f_16(10, [0], random_seed=42)
+        df = f_701(10, [0], random_seed=42)
         self.assertEqual(len(df), 10)
         self.assertEqual(list(df.columns), ['A', 'B', 'C', 'D', 'E'])
         self.assertAlmostEqual(df['A'].mean(), 0.0, delta=0.2)
@@ -75,35 +75,35 @@ class TestCases(unittest.TestCase):
         )
         pd.testing.assert_frame_equal(df, expected, check_dtype=False)
     def test_case_2(self):
-        df = f_16(500, [1, 3], random_seed=1)
+        df = f_701(500, [1, 3], random_seed=1)
         self.assertEqual(len(df), 500)
         self.assertAlmostEqual(df['B'].mean(), 0.0, places=5)
         self.assertAlmostEqual(df['B'].std(), 1.0, places=1)
         self.assertAlmostEqual(df['D'].mean(), 0.0, places=5)
         self.assertAlmostEqual(df['D'].std(), 1.0, places=1)
     def test_case_3(self):
-        df = f_16(50, [])
+        df = f_701(50, [])
         self.assertEqual(len(df), 50)
         self.assertNotEqual(df['A'].mean(), 0.0)
         self.assertNotEqual(df['A'].std(), 1.0)
     def test_case_4(self):
-        df = f_16(200, [0, 1, 2, 3, 4])
+        df = f_701(200, [0, 1, 2, 3, 4])
         self.assertEqual(len(df), 200)
         for col in ['A', 'B', 'C', 'D', 'E']:
             self.assertAlmostEqual(df[col].mean(), 0.0, places=5)
             self.assertAlmostEqual(df[col].std(), 1.0, places=1)
     def test_case_5(self):
-        df = f_16(1, [2])
+        df = f_701(1, [2])
         self.assertEqual(len(df), 1)
         self.assertEqual(df['C'].iloc[0], 0.0)
         # For a single-row DataFrame, the standard deviation will be NaN.
         self.assertTrue(pd.isna(df['C'].std()))
     def test_rng(self):
-        df1 = f_16(50, [1, 2], random_seed=2)
-        df2 = f_16(50, [1, 2], random_seed=2)
+        df1 = f_701(50, [1, 2], random_seed=2)
+        df2 = f_701(50, [1, 2], random_seed=2)
         pd.testing.assert_frame_equal(df1, df2)
     def test_custom_columns(self):
-        df = f_16(10, [1], columns=['test', 'scale'], random_seed=12)
+        df = f_701(10, [1], columns=['test', 'scale'], random_seed=12)
         expected = pd.DataFrame({
             'test': {0: 75, 1: 6, 2: 3, 3: 76, 4: 22, 5: 52, 6: 13, 7: 34, 8: 74, 9: 76},
             'scale': {0: -0.33880664428931573,

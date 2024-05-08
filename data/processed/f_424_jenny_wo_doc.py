@@ -2,7 +2,7 @@ import sqlite3
 import pandas as pd
 
 
-def f_454(db_name, table_name):
+def f_401(db_name, table_name):
     """
     Plot the relationship between the first and second numerical columns of an SQLite3 table, after excluding 'id' column.
 
@@ -21,7 +21,7 @@ def f_454(db_name, table_name):
     - pandas
 
     Example:
-    >>> ax = f_454('/path/to/database/test.db', 'People')
+    >>> ax = f_401('/path/to/database/test.db', 'People')
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_xticklabels()
@@ -86,18 +86,18 @@ class TestCases(unittest.TestCase):
         plt.close("all")
     def test_case_1(self):
         # Test basic functionality
-        ax = f_454(self.test_db_path, "People")
+        ax = f_401(self.test_db_path, "People")
         self.assertEqual(ax.get_xlabel(), "age")
         self.assertEqual(ax.get_ylabel(), "height")
         self.assertEqual(len(ax.collections[0].get_offsets()), 6)
     def test_case_2(self):
         # Test handling non-existent table
         with self.assertRaises(Exception):
-            f_454(self.test_db_path, "NonExistentTable")
+            f_401(self.test_db_path, "NonExistentTable")
     def test_case_3(self):
         # Test handling non-existent db
         with self.assertRaises(Exception):
-            f_454(self.nonexistent_db_path, "People")
+            f_401(self.nonexistent_db_path, "People")
     def test_case_4(self):
         # Table with removed numerical column should raise error
         with sqlite3.connect(self.test_db_path) as conn:
@@ -108,7 +108,7 @@ class TestCases(unittest.TestCase):
             cur.execute(f"DROP TABLE People")
             cur.execute(f"ALTER TABLE temp RENAME TO People")
         with self.assertRaises(Exception):
-            f_454(self.test_db_path, "People")
+            f_401(self.test_db_path, "People")
         # Revert changes
         with sqlite3.connect(self.test_db_path) as conn:
             cur = conn.cursor()
@@ -122,7 +122,7 @@ class TestCases(unittest.TestCase):
             )
     def test_case_5(self):
         # Test another set of data/db
-        ax = f_454(self.another_test_db_path, "Animals")
+        ax = f_401(self.another_test_db_path, "Animals")
         self.assertEqual(ax.get_xlabel(), "lifespan")
         self.assertEqual(ax.get_ylabel(), "weight")
         self.assertEqual(len(ax.collections[0].get_offsets()), 4)
@@ -134,7 +134,7 @@ class TestCases(unittest.TestCase):
                 "CREATE TABLE SingleNumCol (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)"
             )
         with self.assertRaises(Exception):
-            f_454(self.test_db_path, "SingleNumCol")
+            f_401(self.test_db_path, "SingleNumCol")
     def test_case_7(self):
         # Test handling of a table with no numerical columns
         with sqlite3.connect(self.test_db_path) as conn:
@@ -143,14 +143,14 @@ class TestCases(unittest.TestCase):
                 "CREATE TABLE NoNumCols (id INTEGER PRIMARY KEY, name TEXT, description TEXT)"
             )
         with self.assertRaises(Exception):
-            f_454(self.test_db_path, "NoNumCols")
+            f_401(self.test_db_path, "NoNumCols")
     def test_case_8(self):
         # Test a table where 'id' is the only numerical column
         with sqlite3.connect(self.test_db_path) as conn:
             cur = conn.cursor()
             cur.execute("CREATE TABLE OnlyIDNum (id INTEGER PRIMARY KEY, name TEXT)")
         with self.assertRaises(Exception):
-            f_454(self.test_db_path, "OnlyIDNum")
+            f_401(self.test_db_path, "OnlyIDNum")
     def test_case_9(self):
         # Test plotting when the first two numerical columns are not 'id', 'age', or 'height'
         with sqlite3.connect(self.another_test_db_path) as conn:
@@ -160,7 +160,7 @@ class TestCases(unittest.TestCase):
                 "INSERT INTO Animals (name, lifespan, weight) VALUES (?, ?, ?)",
                 custom_data,
             )
-        ax = f_454(self.another_test_db_path, "Animals")
+        ax = f_401(self.another_test_db_path, "Animals")
         self.assertEqual(ax.get_xlabel(), "lifespan")
         self.assertEqual(ax.get_ylabel(), "weight")
         self.assertGreaterEqual(len(ax.collections[0].get_offsets()), 2)

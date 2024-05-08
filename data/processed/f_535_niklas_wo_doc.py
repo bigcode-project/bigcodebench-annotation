@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-def f_4(filename):
+def f_537(filename):
     """
     Read a CSV file of pandas, reverse the order of the lines and write the inverted lines back into the file. Then move the cursor back to the beginning of the file. 
     The header should not be inverted and the file may be empty.
@@ -17,7 +17,7 @@ def f_4(filename):
     - pandas
 
     Example:
-    >>> f_4('file.csv')
+    >>> f_537('file.csv')
     'file.csv'
     """
     if not os.path.exists(filename):
@@ -39,7 +39,7 @@ class TestCases(unittest.TestCase):
         with open(filename, 'w') as f:
             f.write(contents)
         # Run function
-        f_4(filename)
+        f_537(filename)
         # Check file
         with open(filename, 'r') as f:
             self.assertEqual(f.read().strip(), expected.strip())

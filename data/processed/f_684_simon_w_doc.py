@@ -2,7 +2,7 @@ import time
 import threading
 
 
-def f_473(delay_time: float = 1.0, num_threads: int = 5):
+def f_685(delay_time: float = 1.0, num_threads: int = 5):
     '''
     Introduces a delay of 'delay_time' seconds in a specified number of separate threads and 
     returns the thread completion messages.
@@ -21,10 +21,10 @@ def f_473(delay_time: float = 1.0, num_threads: int = 5):
     - threading
 
     Example:
-    >>> f_473(0.1, 3)
+    >>> f_685(0.1, 3)
     ['Delay in thread 0 completed', 'Delay in thread 1 completed', 'Delay in thread 2 completed']
 
-    >>> f_473(1, 10)
+    >>> f_685(1, 10)
     ['Delay in thread 0 completed', 'Delay in thread 1 completed', 'Delay in thread 2 completed', 'Delay in thread 3 completed', 'Delay in thread 4 completed', 'Delay in thread 5 completed', 'Delay in thread 6 completed', 'Delay in thread 7 completed', 'Delay in thread 8 completed', 'Delay in thread 9 completed']
     '''
     results = []
@@ -42,14 +42,14 @@ from faker import Faker
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         start = time.time()
-        result = f_473()
+        result = f_685()
         end = time.time()
         exec_time = end - start
         self.assertAlmostEqual(exec_time, 5, places=0)
         self.assertEqual(len(result), 5)
     def test_case_2(self):
         start = time.time()
-        result = f_473(0.2, 1)
+        result = f_685(0.2, 1)
         end = time.time()
         exec_time = end - start
         self.assertAlmostEqual(exec_time, 0.2, places=1)
@@ -58,19 +58,19 @@ class TestCases(unittest.TestCase):
         delay = 0.1
         threads = 10
         start = time.time()
-        result = f_473(delay, threads)
+        result = f_685(delay, threads)
         end = time.time()
         exec_time = end - start
         self.assertAlmostEqual(exec_time, delay*threads, places=0)
         self.assertEqual(len(result), 10)
     def test_case_4(self):
-        result = f_473(num_threads=0)
+        result = f_685(num_threads=0)
         self.assertEqual(len(result), 0)
     def test_case_5(self):
         'test for exact return string'
         fake = Faker()
         num_threads = fake.random_int(min=1, max=20)
-        result = f_473(num_threads=num_threads)
+        result = f_685(num_threads=num_threads)
         self.assertEqual(len(result), num_threads)
         for i in range(num_threads):
             self.assertIn(f'Delay in thread {i} completed', result)

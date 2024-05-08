@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 import csv
 
-def f_3(directory: str, pattern: str = r'^(.*?)-\d+\.csv$') -> list:
+def f_634(directory: str, pattern: str = r'^(.*?)-\d+\.csv$') -> list:
 
     """
     Processes CSV files in a directory based on a specified pattern and creates new files with altered names while preserving the content, you've laid out a solid foundation with your initial tests.
@@ -28,7 +28,7 @@ def f_3(directory: str, pattern: str = r'^(.*?)-\d+\.csv$') -> list:
     from pathlib import Path
     import csv
 
-    def f_3(directory: str, pattern: str = r'^(.*?)-\d+\.csv$') -> list:
+    def f_634(directory: str, pattern: str = r'^(.*?)-\d+\.csv$') -> list:
         # Define the function body here...
 
     # Create a test directory and some CSV files for testing
@@ -42,7 +42,7 @@ def f_3(directory: str, pattern: str = r'^(.*?)-\d+\.csv$') -> list:
         writer.writerow(['X', 'Y', 'Z'])
 
     # Call the function for testing
-    new_files = f_3(test_dir)
+    new_files = f_634(test_dir)
     print("New files created:", new_files)
     ```
     """
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
             # Prepare the CSV content in the way csv.writer would write it
             mock_csv_data = '\r\n'.join([','.join(row) for row in self.mock_csv_rows]) + '\r\n'
             with patch('builtins.open', mock_open(read_data=mock_csv_data)) as mock_file:
-                result_files = f_3(self.directory)
+                result_files = f_634(self.directory)
                 expected_files = ['Shan.csv', 'Shannon.csv']
                 self.assertListEqual(result_files, expected_files)
                 for expected_file in expected_files:
@@ -91,17 +91,17 @@ class TestCases(unittest.TestCase):
         
     def test_empty_directory(self):
         with patch('os.listdir', return_value=[]):
-            result_files = f_3(self.directory)
+            result_files = f_634(self.directory)
             self.assertEqual(result_files, [])
     def test_non_matching_files(self):
         with patch('os.listdir', return_value=['random.txt', 'test-123.txt']):
-            result_files = f_3(self.directory)
+            result_files = f_634(self.directory)
             self.assertEqual(result_files, [])
     def test_mixed_file_types(self):
         with patch('os.listdir', return_value=['Shan-1.csv', 'test.txt', 'Shannon-2.pdf']):
             mock_csv_data = '\r\n'.join([','.join(row) for row in self.mock_csv_rows]) + '\r\n'
             with patch('builtins.open', mock_open(read_data=mock_csv_data)) as mock_file:
-                result_files = f_3(self.directory)
+                result_files = f_634(self.directory)
                 expected_files = ['Shan.csv']
                 self.assertEqual(result_files, expected_files)
                 # Adjust the expected path to match the OS-specific format
@@ -111,4 +111,4 @@ class TestCases(unittest.TestCase):
         with patch('os.listdir', return_value=['Shan-1.csv']), \
              patch('builtins.open', side_effect=IOError("File not found")):
             with self.assertRaises(IOError):
-                f_3(self.directory)
+                f_634(self.directory)

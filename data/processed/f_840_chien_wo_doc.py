@@ -7,7 +7,7 @@ TARGET_DIR = "downloaded_files"
 TARGET_ZIP_FILE = "downloaded_files.zip"
 
 
-def f_583(url):
+def f_861(url):
     """
     Download and extract a zip file from a specified URL to a designated directory.
 
@@ -32,7 +32,7 @@ def f_583(url):
       Errors such as a failed download, invalid URL, or corrupted zip file will result in an unhandled exception.
 
     Examples:
-    >>> f_583("http://example.com/files.zip")
+    >>> f_861("http://example.com/files.zip")
     'downloaded_files'
     """
     os.makedirs(TARGET_DIR, exist_ok=True)
@@ -48,7 +48,7 @@ from unittest.mock import patch, MagicMock
 import os
 import shutil
 class TestCases(unittest.TestCase):
-    """Test cases for the f_583 function."""
+    """Test cases for the f_861 function."""
     def setUp(self):
         if not os.path.exists(TARGET_DIR):
             os.makedirs(TARGET_DIR)
@@ -60,7 +60,7 @@ class TestCases(unittest.TestCase):
         """Test that the function returns the correct directory path."""
         url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
         mock_zipfile.return_value.__enter__.return_value = MagicMock()
-        result = f_583(url)
+        result = f_861(url)
         mock_urlretrieve.assert_called_with(url, TARGET_ZIP_FILE)
         self.assertEqual(result, TARGET_DIR)
         self.assertTrue(os.path.exists(TARGET_DIR))
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         mock_urlretrieve.side_effect = Exception
         url = "https://invalid.url/invalid.zip"
         with self.assertRaises(Exception):
-            f_583(url)
+            f_861(url)
     @patch("urllib.request.urlretrieve")
     @patch("zipfile.ZipFile")
     def test_non_zip_file(self, mock_zipfile, mock_urlretrieve):
@@ -78,14 +78,14 @@ class TestCases(unittest.TestCase):
         mock_zipfile.side_effect = zipfile.BadZipFile
         url = "https://www.sample-videos.com/img/Sample-jpg-image-5mb.jpg"
         with self.assertRaises(zipfile.BadZipFile):
-            f_583(url)
+            f_861(url)
     @patch("urllib.request.urlretrieve")
     @patch("zipfile.ZipFile")
     def test_cleanup(self, mock_zipfile, mock_urlretrieve):
         """Test that the function deletes the downloaded zip file after extraction."""
         mock_zipfile.return_value.__enter__.return_value = MagicMock()
         url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
-        f_583(url)
+        f_861(url)
         self.assertFalse(os.path.exists(TARGET_ZIP_FILE))
     @patch("urllib.request.urlretrieve")
     @patch("zipfile.ZipFile")
@@ -93,7 +93,7 @@ class TestCases(unittest.TestCase):
         """Test that the function creates a directory to store the extracted files."""
         mock_zipfile.return_value.__enter__.return_value = MagicMock()
         url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
-        f_583(url)
+        f_861(url)
         self.assertTrue(os.path.exists(TARGET_DIR))
         self.assertTrue(os.path.isdir(TARGET_DIR))
     @patch("urllib.request.urlretrieve")
@@ -103,7 +103,7 @@ class TestCases(unittest.TestCase):
         mock_extractall = MagicMock()
         mock_zipfile.return_value.__enter__.return_value.extractall = mock_extractall
         url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
-        f_583(url)
+        f_861(url)
         mock_extractall.assert_called_once()
     @patch("urllib.request.urlretrieve")
     @patch("zipfile.ZipFile")
@@ -113,7 +113,7 @@ class TestCases(unittest.TestCase):
         url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
         # Create a dummy file to simulate download
         open(TARGET_ZIP_FILE, "a").close()
-        f_583(url)
+        f_861(url)
         self.assertFalse(os.path.exists(TARGET_ZIP_FILE))
     def tearDown(self):
         if os.path.exists(TARGET_DIR):

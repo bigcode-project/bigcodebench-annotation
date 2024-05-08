@@ -2,7 +2,7 @@ import binascii
 import io
 import gzip
 
-def f_858(compressed_hex):
+def f_698(compressed_hex):
     """
     Uncompress a gzip-compressed hexadecimal string and decrypt the result to UTF-8.
     
@@ -18,7 +18,7 @@ def f_858(compressed_hex):
     - gzip
     
     Example:
-    >>> f_858('1f8b08000000000002ff0b49494e55560304000000ffff8b202d0b000000')
+    >>> f_698('1f8b08000000000002ff0b49494e55560304000000ffff8b202d0b000000')
     'Error during decompression: CRC check failed 0xff000000 != 0x41449975'
     """
     try:
@@ -44,20 +44,20 @@ class TestCases(unittest.TestCase):
     def test_1(self):
         # Test with the word "HELLO"
         compressed_hex = generate_compressed_hex("HELLO")
-        self.assertEqual(f_858(compressed_hex), "HELLO")
+        self.assertEqual(f_698(compressed_hex), "HELLO")
     def test_2(self):
         # Test with a single character "A"
         compressed_hex = generate_compressed_hex("A")
-        self.assertEqual(f_858(compressed_hex), "A")
+        self.assertEqual(f_698(compressed_hex), "A")
     def test_3(self):
         # Test with numbers "12345"
         compressed_hex = generate_compressed_hex("12345")
-        self.assertEqual(f_858(compressed_hex), "12345")
+        self.assertEqual(f_698(compressed_hex), "12345")
     def test_4(self):
         # Test with special characters "!@#"
         compressed_hex = generate_compressed_hex("!@#")
-        self.assertEqual(f_858(compressed_hex), "!@#")
+        self.assertEqual(f_698(compressed_hex), "!@#")
     def test_5(self):
         # Test with an empty string
         compressed_hex = generate_compressed_hex("")
-        self.assertEqual(f_858(compressed_hex), "")
+        self.assertEqual(f_698(compressed_hex), "")

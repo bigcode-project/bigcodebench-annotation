@@ -3,7 +3,7 @@ from random import randint
 import pandas as pd
 
 
-def f_441(cities_list):
+def f_488(cities_list):
     """
     Generate a DataFrame with population data for a list of cities. The population is generated randomly 
     and rounded up to the next thousand.
@@ -21,7 +21,7 @@ def f_441(cities_list):
 
     Example:
     >>> cities = ['New York', 'London', 'Beijing', 'Tokyo', 'Sydney']
-    >>> pop_data = f_441(cities)
+    >>> pop_data = f_488(cities)
     >>> type(pop_data)
     <class 'pandas.core.frame.DataFrame'>
     """
@@ -36,32 +36,32 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         test_input = ['New York', 'London', 'Beijing']
-        pop_data = f_441(test_input)
+        pop_data = f_488(test_input)
         self.assertIsInstance(pop_data, pd.DataFrame)
         self.assertEqual(list(pop_data['City']), test_input)
         self.assertTrue(all(pop_data['Population'] % 1000 == 0))
     def test_case_2(self):
         test_input = ['Tokyo', 'Sydney']
-        pop_data = f_441(test_input)
+        pop_data = f_488(test_input)
         self.assertIsInstance(pop_data, pd.DataFrame)
         self.assertEqual(list(pop_data['City']), test_input)
         self.assertTrue(all(pop_data['Population'] % 1000 == 0))
     def test_case_3(self):
         test_input = ['Beijing']
-        pop_data = f_441(test_input)
+        pop_data = f_488(test_input)
         self.assertIsInstance(pop_data, pd.DataFrame)
         self.assertEqual(list(pop_data['City']), test_input)
         self.assertTrue(all(pop_data['Population'] % 1000 == 0))
     def test_case_4(self):
         test_input = ['New York', 'London', 'Beijing', 'Tokyo']
-        pop_data = f_441(test_input)
+        pop_data = f_488(test_input)
         self.assertIsInstance(pop_data, pd.DataFrame)
         self.assertEqual(list(pop_data['City']), test_input)
         self.assertTrue(all(pop_data['Population'] % 1000 == 0))
         
     def test_case_5(self):
         test_input = ['New York', 'London', 'Beijing', 'Tokyo', 'Sydney']
-        pop_data = f_441(test_input)
+        pop_data = f_488(test_input)
         self.assertIsInstance(pop_data, pd.DataFrame)
         self.assertEqual(list(pop_data['City']), test_input)
         self.assertTrue(all(pop_data['Population'] % 1000 == 0))

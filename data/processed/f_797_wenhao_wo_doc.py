@@ -2,7 +2,7 @@ import random
 import re
 
 
-def f_489(target_words, n_sentences, vocabulary):
+def f_818(target_words, n_sentences, vocabulary):
     """
     Generate sentences with spaces in certain target words replaced by underscores.
 
@@ -30,9 +30,9 @@ def f_489(target_words, n_sentences, vocabulary):
 
     Examples:
     >>> random.seed(42)
-    >>> f_489(['apple banana'], 1, ['apple', 'banana', 'cherry'])
+    >>> f_818(['apple banana'], 1, ['apple', 'banana', 'cherry'])
     ['banana apple apple apple cherry cherry cherry apple_banana apple']
-    >>> f_489(['Alice Charlie', 'ALICE BOB', 'aLiCe dAn'], 1, ['alice', 'bob', 'charlie', 'dan'])
+    >>> f_818(['Alice Charlie', 'ALICE BOB', 'aLiCe dAn'], 1, ['alice', 'bob', 'charlie', 'dan'])
     ['alice_charlie alice alice_charlie charlie alice_charlie dan alice']
     """
     if n_sentences < 0:
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
         # Test with multiple target words and sentences
         target_words = ["apple banana", "banana cherry"]
         n_sentences = 1000
-        results = f_489(target_words, n_sentences, ["apple", "banana", "cherry"])
+        results = f_818(target_words, n_sentences, ["apple", "banana", "cherry"])
         self.assertEqual(len(results), n_sentences)
         for target in target_words:
             underscored_target = target.replace(" ", "_")
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
         # Test with a single target word in multiple occurrences
         target_words = ["apple"]
         n_sentences = 1
-        results = f_489(target_words, n_sentences, ["apple"] * 10)
+        results = f_818(target_words, n_sentences, ["apple"] * 10)
         self.assertEqual(len(results), n_sentences)
         self.assertTrue(
             results[0].count("apple") > 1,
@@ -89,14 +89,14 @@ class TestCases(unittest.TestCase):
         # Test with no target words
         target_words = []
         n_sentences = 1
-        results = f_489(target_words, n_sentences, self.vocabulary)
+        results = f_818(target_words, n_sentences, self.vocabulary)
         self.assertEqual(len(results), n_sentences)
         self.assertTrue(all(" " in sentence for sentence in results), "")
     def test_case_4(self):
         # Test case sensitivity
         target_words = ["Apple Banana"]
         n_sentences = 2
-        results = f_489(target_words, n_sentences, self.vocabulary + ["apple banana"])
+        results = f_818(target_words, n_sentences, self.vocabulary + ["apple banana"])
         self.assertEqual(len(results), n_sentences)
         for result in results:
             self.assertIn(
@@ -106,32 +106,32 @@ class TestCases(unittest.TestCase):
         # Test generating zero sentences
         target_words = ["apple"]
         n_sentences = 0
-        results = f_489(target_words, n_sentences, self.vocabulary)
+        results = f_818(target_words, n_sentences, self.vocabulary)
         self.assertEqual(len(results), n_sentences, "No sentences should be generated")
     def test_case_6(self):
         # Test function handling invalid inputs - vocabulary
         target_words = ["apple"]
         n_sentences = 1
         with self.assertRaises(ValueError):
-            f_489(target_words, n_sentences, [])
+            f_818(target_words, n_sentences, [])
     def test_case_7(self):
         # Test function handling invalid inputs - n_sentences
         target_words = ["apple"]
         with self.assertRaises(ValueError):
-            f_489(target_words, -1, self.vocabulary)
+            f_818(target_words, -1, self.vocabulary)
         with self.assertRaises(TypeError):
-            f_489(target_words, 1.0, self.vocabulary)
+            f_818(target_words, 1.0, self.vocabulary)
     def test_case_8(self):
         # Test whitespace target word
         target_words = [" "]
         n_sentences = 1
-        results = f_489(target_words, n_sentences, ["apple banana", "cherry"])
+        results = f_818(target_words, n_sentences, ["apple banana", "cherry"])
         assert len(results[0].split("_")) >= 10
     def test_case_9(self):
         # Test target word not in vocabulary
         target_words = ["mango"]
         n_sentences = 2
-        results = f_489(target_words, n_sentences, ["apple", "banana", "cherry"])
+        results = f_818(target_words, n_sentences, ["apple", "banana", "cherry"])
         for sentence in results:
             self.assertNotIn(
                 "mango",

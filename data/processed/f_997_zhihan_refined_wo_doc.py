@@ -3,7 +3,7 @@ import requests
 import re
 import json
 
-def f_479(url: str, output_path: str) -> list:
+def f_1001(url: str, output_path: str) -> list:
     """
     Extracts phone numbers from a given URL or local file and saves them to a specified file in JSON format.
 
@@ -21,7 +21,7 @@ def f_479(url: str, output_path: str) -> list:
     - json
 
     Example:
-    >>> f_479('file:///path/to/local/file.txt', 'output.json')
+    >>> f_1001('file:///path/to/local/file.txt', 'output.json')
     ['+1 (234) 567 8901', '+44 1234 567890']
     """
     HEADERS = {'User-Agent': 'Mozilla/5.0'}
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
         """ Helper method to run individual test cases """
         url = f"file://{os.path.join(self.test_dir, filename)}"
         output_path = os.path.join(self.test_dir, f'output_{filename}')
-        result = f_479(url, output_path)
+        result = f_1001(url, output_path)
         self.assertEqual(result, expected_numbers)
         with open(output_path, 'r') as f:
             saved_numbers = json.load(f)

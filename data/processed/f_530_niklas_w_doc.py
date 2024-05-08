@@ -1,7 +1,7 @@
 import itertools
 import math
 
-def f_163(x):
+def f_532(x):
     """
     Find the key pair in a dictionary, x, which has the highest sum of the cosine of each of its values.
 
@@ -16,10 +16,10 @@ def f_163(x):
     - math
 
     Example:
-    >>> f_163({'a': 1, 'b': 2, 'c': 3})
+    >>> f_532({'a': 1, 'b': 2, 'c': 3})
     ('a', 'b')
     ('a', 'b')
-    >>> f_163({'a': 1, 'b': 2, 'c': 3, 'd': 4})
+    >>> f_532({'a': 1, 'b': 2, 'c': 3, 'd': 4})
     ('a', 'b')
     ('a', 'b')
     """
@@ -31,13 +31,13 @@ def f_163(x):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        self.assertEqual(sorted(f_163({'a': 1, 'b': 2, 'c': 3})), sorted(('a', 'b')))
+        self.assertEqual(sorted(f_532({'a': 1, 'b': 2, 'c': 3})), sorted(('a', 'b')))
     
     def test_case_2(self):
-        self.assertEqual(sorted(f_163({'a': 1, 'b': 2, 'c': 3, 'd': 4})), sorted(('a', 'b')))
+        self.assertEqual(sorted(f_532({'a': 1, 'b': 2, 'c': 3, 'd': 4})), sorted(('a', 'b')))
     def test_case_3(self):
-        self.assertEqual( sorted(f_163({'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5})),  sorted(('e', 'a')))
+        self.assertEqual( sorted(f_532({'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5})),  sorted(('e', 'a')))
     def test_case_4(self):
-        self.assertEqual( sorted(f_163({'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6})),  sorted(('f', 'a')))
+        self.assertEqual( sorted(f_532({'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6})),  sorted(('f', 'a')))
     def test_case_5(self):
-        self.assertEqual( sorted(f_163({'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7})),  sorted(('g', 'f')))
+        self.assertEqual( sorted(f_532({'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7})),  sorted(('g', 'f')))

@@ -10,7 +10,7 @@ SIZE = 1000  # The number of random numbers to generate
 BIN_WIDTH = 100  # The width of bins for the histogram
 
 
-def f_258():
+def f_443():
     """
     Generates a pandas DataFrame with two columns, "Random Numbers" and "Moving Average,"
     filled with random integers and their moving average, respectively.
@@ -33,7 +33,7 @@ def f_258():
         - numpy
 
     Example:
-        >>> df = f_258()
+        >>> df = f_443()
         >>> isinstance(df, pd.DataFrame)
         True
         >>> 'Random Numbers' in df.columns and 'Moving Average' in df.columns
@@ -61,25 +61,25 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_dataframe_shape(self):
         """Test that the DataFrame has the correct shape."""
-        df = f_258()
+        df = f_443()
         self.assertEqual(df.shape, (SIZE, 2))
     def test_random_numbers_range(self):
         """Test that the random numbers fall within the specified range."""
-        df = f_258()
+        df = f_443()
         self.assertTrue(df['Random Numbers'].between(0, RANGE).all())
     def test_moving_average_calculation(self):
         """Test that the moving average is correctly calculated."""
-        df = f_258()
+        df = f_443()
         # Assuming moving average calculation correctness check for the first few entries
         for i in range(6):  # Check the first 6 entries for a window of 6 elements
             expected_avg = statistics.mean(df['Random Numbers'].iloc[max(0, i - 5):i + 1])
             self.assertEqual(df['Moving Average'].iloc[i], expected_avg, "Moving average calculation mismatch.")
     def test_columns_existence(self):
         """Ensure both required columns exist in the DataFrame."""
-        df = f_258()
+        df = f_443()
         self.assertIn('Random Numbers', df.columns)
         self.assertIn('Moving Average', df.columns)
     def test_non_empty_dataframe(self):
         """Check that the DataFrame is not empty."""
-        df = f_258()
+        df = f_443()
         self.assertFalse(df.empty)

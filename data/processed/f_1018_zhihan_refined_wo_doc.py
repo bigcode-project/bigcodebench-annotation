@@ -4,7 +4,7 @@ import glob
 import random
 import os
 
-def f_632(file):
+def f_18(file):
     """
     Divide a CSV file into several smaller files and shuffle the lines in each file.
     
@@ -26,7 +26,7 @@ def f_632(file):
     - os
 
     Example:
-    >>> f_632('/path/to/file.csv')
+    >>> f_18('/path/to/file.csv')
     ['/path/to/split_00', '/path/to/split_01', ...]
     """
     if not os.path.exists(file):
@@ -90,32 +90,32 @@ class TestCases(unittest.TestCase):
             os.remove(file_path)  # Remove each file
     def test_small_csv(self):
         """Test splitting and shuffling a small CSV file."""
-        split_files = f_632(self.small_csv_path)
+        split_files = f_18(self.small_csv_path)
         self.assertTrue(len(split_files) > 0, "No files were split.")
         self.assertNotEqual(self._read_csv(self.small_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
         for filename in split_files:
             os.remove(filename)
     def test_medium_csv(self):
         """Test splitting and shuffling a medium CSV file."""
-        split_files = f_632(self.medium_csv_path)
+        split_files = f_18(self.medium_csv_path)
         self.assertTrue(len(split_files) > 0, "No files were split.")
         self.assertNotEqual(self._read_csv(self.medium_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
         for filename in split_files:
             os.remove(filename)
     def test_large_csv(self):
         """Test splitting and shuffling a large CSV file."""
-        split_files = f_632(self.large_csv_path)
+        split_files = f_18(self.large_csv_path)
         self.assertTrue(len(split_files) > 0, "No files were split.")
         self.assertNotEqual(self._read_csv(self.large_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
         for filename in split_files:
             os.remove(filename)
     def test_invalid_file(self):
         """Test behavior with a non-existent file path."""
-        split_files = f_632("/path/that/does/not/exist.csv")
+        split_files = f_18("/path/that/does/not/exist.csv")
         self.assertEqual(split_files, [], "Expected an empty list for an invalid file path.")
     def test_non_csv_file(self):
         """Test behavior with a non-CSV file."""
-        split_files = f_632(self.non_csv_path)
+        split_files = f_18(self.non_csv_path)
         self.assertEqual(split_files, [], "Expected an empty list for a non-CSV file.")
     def _read_csv(self, filepath):
         """Helper method to read CSV file and return content."""

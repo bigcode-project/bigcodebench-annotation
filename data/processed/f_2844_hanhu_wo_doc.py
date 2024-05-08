@@ -3,7 +3,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from python_http_client.exceptions import HTTPError
 
-def f_312(dir, api_key, recipient_email):
+def f_217(dir, api_key, recipient_email):
     """
     Get a list of files in a directory and send that list by e-mail to a specific recipient using a provided SendGrid API key.
 
@@ -27,9 +27,9 @@ def f_312(dir, api_key, recipient_email):
     - python_http_client.exceptions.HTTPError
 
     Example:
-    >>> isinstance(f_312('./test_directory', 'YOUR_SENDGRID_API_KEY', 'YOUR_EMAIL'), bool)
+    >>> isinstance(f_217('./test_directory', 'YOUR_SENDGRID_API_KEY', 'YOUR_EMAIL'), bool)
     True
-    >>> f_312('/nonexistent_directory', 'YOUR_SENDGRID_API_KEY', 'YOUR_EMAIL')  # This will return False, as the directory does not exist.
+    >>> f_217('/nonexistent_directory', 'YOUR_SENDGRID_API_KEY', 'YOUR_EMAIL')  # This will return False, as the directory does not exist.
     False
     """
     try:
@@ -69,14 +69,14 @@ class TestCases(unittest.TestCase):
         
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
-        result = f_312('./valid_directory', api_key, recipient_email)
+        result = f_217('./valid_directory', api_key, recipient_email)
         self.assertTrue(result)
     def test_invalid_directory(self):
         """Test the handling of an invalid directory."""
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
         with self.assertRaises(FileNotFoundError):
-            f_312('/nonexistent_directory', api_key, recipient_email)
+            f_217('/nonexistent_directory', api_key, recipient_email)
         
     @patch('os.path.exists')
     @patch('os.listdir')
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
         with self.assertRaises(HTTPError):
-            f_312('./valid_directory', api_key, recipient_email)
+            f_217('./valid_directory', api_key, recipient_email)
     @patch('os.path.exists')
     @patch('sendgrid.SendGridAPIClient.send')
     @patch('os.listdir')
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
         mock_exists.return_value = True
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
-        result = f_312('./empty_directory', api_key, recipient_email)
+        result = f_217('./empty_directory', api_key, recipient_email)
         self.assertTrue(result)
     @patch('os.path.exists')
     @patch('sendgrid.SendGridAPIClient.send')
@@ -114,4 +114,4 @@ class TestCases(unittest.TestCase):
         api_key = 'test_api_key'
         recipient_email = 'test@example.com'
         with self.assertRaises(Exception):
-            f_312('./valid_directory', api_key, recipient_email)
+            f_217('./valid_directory', api_key, recipient_email)

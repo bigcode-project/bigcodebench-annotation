@@ -1,7 +1,7 @@
 import json
 import csv
 
-def f_347(json_file, csv_file):
+def f_574(json_file, csv_file):
     """
     Convert a JSON file to CSV.
     
@@ -17,7 +17,7 @@ def f_347(json_file, csv_file):
     - csv
         
     Example:
-    >>> f_347('path_to_json_file.json', 'path_to_csv_file.csv')
+    >>> f_574('path_to_json_file.json', 'path_to_csv_file.csv')
     'path_to_csv_file.csv'
     """
     with open(json_file, 'r') as f:
@@ -41,7 +41,7 @@ class TestCases(unittest.TestCase):
         with open(json_file, 'w') as f:
             json.dump({'a': 1, 'b': 2, 'c': 3}, f)
         # Run function
-        csv_file = f_347(json_file, './test.csv')
+        csv_file = f_574(json_file, './test.csv')
         # Check file
         self.assertTrue(os.path.exists(csv_file))
         with open(csv_file, 'r') as f:
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
         with open(json_file, 'w') as f:
             json.dump({'z': 1, 'y': 2, 'x': 3}, f)
         # Run function
-        csv_file = f_347(json_file, './test.csv')
+        csv_file = f_574(json_file, './test.csv')
         # Check file
         self.assertTrue(os.path.exists(csv_file))
         with open(csv_file, 'r') as f:
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         with open(json_file, 'w') as f:
             json.dump({'xxx': 99}, f)
         # Run function
-        csv_file = f_347(json_file, './testx.csv')
+        csv_file = f_574(json_file, './testx.csv')
         # Check file
         self.assertTrue(os.path.exists(csv_file))
         with open(csv_file, 'r') as f:
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
         with open(json_file, 'w') as f:
             json.dump({'yyy': 99}, f)
         # Run function
-        csv_file = f_347(json_file, './testy.csv')
+        csv_file = f_574(json_file, './testy.csv')
         # Check file
         self.assertTrue(os.path.exists(csv_file))
         with open(csv_file, 'r') as f:
@@ -97,7 +97,7 @@ class TestCases(unittest.TestCase):
         with open(json_file, 'w') as f:
             json.dump({'zzz': 99}, f)
         # Run function
-        csv_file = f_347(json_file, './testz.csv')
+        csv_file = f_574(json_file, './testz.csv')
         # Check file
         self.assertTrue(os.path.exists(csv_file))
         with open(csv_file, 'r') as f:

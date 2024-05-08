@@ -1,7 +1,7 @@
 import random
 import statistics
 
-def f_186(LETTERS):
+def f_2(LETTERS):
     """
     Create a dictionary in which keys are random letters and values are lists of random integers.
     The dictionary is then sorted by the mean of the values in descending order, demonstrating the use of the statistics library.
@@ -19,7 +19,7 @@ def f_186(LETTERS):
     Example:
     >>> import random
     >>> random.seed(42)
-    >>> sorted_dict = f_186(['a', 'b', 'c'])
+    >>> sorted_dict = f_2(['a', 'b', 'c'])
     >>> list(sorted_dict.keys())
     ['a', 'b', 'c']
     >>> isinstance(sorted_dict['a'], list)
@@ -37,7 +37,7 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         # Setting up a common letters array and sorted dictionary for use in all tests
         self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-        self.sorted_dict = f_186(self.letters)
+        self.sorted_dict = f_2(self.letters)
     def test_case_1(self):
         # Check if the function returns a dictionary
         self.assertIsInstance(self.sorted_dict, dict, "The function should return a dictionary.")

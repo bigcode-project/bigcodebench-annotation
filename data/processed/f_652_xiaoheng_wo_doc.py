@@ -2,7 +2,7 @@ import os
 import shutil
 import fnmatch
 
-def f_660(source_directory, destination_directory, file_pattern):
+def f_622(source_directory, destination_directory, file_pattern):
     """
     Moves all files that match a particular pattern from one directory to another.
     
@@ -23,8 +23,8 @@ def f_660(source_directory, destination_directory, file_pattern):
     - fnmatch
     
     Example:
-    >>> f_660('/path/to/source', '/path/to/destination', '*.txt')
-    ['f_660_data_xiaoheng/file1.txt', 'f_660_data_xiaoheng/file2.txt']
+    >>> f_622('/path/to/source', '/path/to/destination', '*.txt')
+    ['f_622_data_xiaoheng/file1.txt', 'f_622_data_xiaoheng/file2.txt']
     """
     moved_files = []
     for path, dirs, files in os.walk(source_directory):
@@ -47,7 +47,7 @@ class TestCases(unittest.TestCase):
     @patch('shutil.move')
     def test_no_files_to_move(self, mock_move, mock_walk):
         mock_walk.return_value = [(self.source_directory, [], ['image.jpg', 'data.log', 'config file.cfg'])]
-        result = f_660(self.source_directory, self.destination_directory, '*.txt')
+        result = f_622(self.source_directory, self.destination_directory, '*.txt')
         self.assertEqual(result, [])
         mock_move.assert_not_called()
     @patch('os.walk')
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
     def test_non_existing_source_directory(self, mock_move, mock_walk):
         mock_walk.side_effect = FileNotFoundError
         with self.assertRaises(FileNotFoundError):
-            f_660('/non/existing/directory', self.destination_directory, '*.txt')
+            f_622('/non/existing/directory', self.destination_directory, '*.txt')
     @patch('os.walk')
     @patch('shutil.move')
     def test_case_sensitivity(self, mock_move, mock_walk):
@@ -64,7 +64,7 @@ class TestCases(unittest.TestCase):
             (self.source_directory, [], ['file1.txt', 'file2.TXT', 'report.TXT'])
         ]
         # Execute the function
-        f_660(self.source_directory, self.destination_directory, '*.TXT')
+        f_622(self.source_directory, self.destination_directory, '*.TXT')
         expected_calls = [
             call(os.path.join(self.source_directory, 'file2.TXT'), os.path.join(self.destination_directory, 'file2.TXT')),
             call(os.path.join(self.source_directory, 'report.TXT'), os.path.join(self.destination_directory, 'report.TXT'))
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
     @patch('shutil.move')
     def test_special_characters_in_filenames(self, mock_move, mock_walk):
         mock_walk.return_value = [(self.source_directory, [], ['config file.cfg'])]
-        f_660(self.source_directory, self.destination_directory, '*.cfg')
+        f_622(self.source_directory, self.destination_directory, '*.cfg')
         expected_call = call(os.path.join(self.source_directory, 'config file.cfg'), os.path.join(self.destination_directory, 'config file.cfg'))
         mock_move.assert_has_calls([expected_call], any_order=True)
     @patch('os.listdir')
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         mock_listdir.return_value = ['file3.jpg']
         mock_exists.return_value = True
         # Call the function
-        moved_files = f_660(self.source_directory, self.destination_directory, '*.txt')
+        moved_files = f_622(self.source_directory, self.destination_directory, '*.txt')
         # Assertions
         mock_move.assert_not_called()
         self.assertEqual(moved_files, [], "No TXT files should be moved")

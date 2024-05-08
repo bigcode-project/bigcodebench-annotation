@@ -2,7 +2,7 @@ import sqlite3
 import random
 
 
-def f_577(db_path,
+def f_706(db_path,
           num_entries,
           users=['Alice', 'Bob', 'Charlie', 'Dave', 'Eve'],
           countries=['USA', 'UK', 'Canada', 'Australia', 'India'],
@@ -33,10 +33,10 @@ def f_577(db_path,
     - random
 
     Example:
-    >>> f_577('/tmp/users.db', 100)
+    >>> f_706('/tmp/users.db', 100)
     '/tmp/users.db'
 
-    >>> path = f_577('test.db', num_entries=3, random_seed=2, users=['Simon', 'Albert'])
+    >>> path = f_706('test.db', num_entries=3, random_seed=2, users=['Simon', 'Albert'])
     >>> conn = sqlite3.connect('test.db')
     >>> c = conn.cursor()
     >>> c.execute("SELECT * FROM users")
@@ -79,16 +79,16 @@ class TestCases(unittest.TestCase):
         self.temp_dir = tempfile.mkdtemp()  # Create a temporary directory for our databases
     def test_rng(self):
         db_path1 = os.path.join(self.temp_dir, self.fake.file_name(extension="db"))
-        output_path1 = f_577(db_path1, 45, random_seed=12)
+        output_path1 = f_706(db_path1, 45, random_seed=12)
         db_path2 = os.path.join(self.temp_dir, self.fake.file_name(extension="db"))
-        output_path2 = f_577(db_path2, 45, random_seed=12)
+        output_path2 = f_706(db_path2, 45, random_seed=12)
         df1 = self._load_table_as_df(db_path=output_path1)
         df2 = self._load_table_as_df(db_path=output_path2)
         pd.testing.assert_frame_equal(df1, df2, check_dtype=False)
     def test_case_1(self):
         # Test with default users and 5 entries
         db_path = os.path.join(self.temp_dir, self.fake.file_name(extension="db"))
-        output_path = f_577(db_path, 5, random_seed=1)
+        output_path = f_706(db_path, 5, random_seed=1)
         self.assertEqual(db_path, output_path)
         self.assertTrue(self._validate_db_structure(db_path))
         self.assertEqual(self._get_db_entries_count(db_path), 5)
@@ -110,7 +110,7 @@ class TestCases(unittest.TestCase):
         # Test with custom users and 10 entries
         db_path = os.path.join(self.temp_dir, self.fake.file_name(extension="db"))
         custom_users = ['Simon', 'Albert', 'Viola', 'Lisa', 'Monica']
-        output_path = f_577(db_path, 10, custom_users, random_seed=2)
+        output_path = f_706(db_path, 10, custom_users, random_seed=2)
         self.assertEqual(db_path, output_path)
         self.assertTrue(self._validate_db_structure(db_path))
         self.assertEqual(self._get_db_entries_count(db_path), 10)
@@ -145,7 +145,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test with 0 entries
         db_path = os.path.join(self.temp_dir, self.fake.file_name(extension="db"))
-        output_path = f_577(db_path, 0, random_seed=3)
+        output_path = f_706(db_path, 0, random_seed=3)
         self.assertEqual(db_path, output_path)
         self.assertTrue(self._validate_db_structure(db_path))
         self.assertEqual(self._get_db_entries_count(db_path), 0)
@@ -153,7 +153,7 @@ class TestCases(unittest.TestCase):
         # Test with a large number of entries (1000 entries) and custom countries
         db_path = os.path.join(self.temp_dir, self.fake.file_name(extension="db"))
         custom_countries = ['test', 'hi', 'abc']
-        output_path = f_577(db_path, 1000, countries=custom_countries, random_seed=4)
+        output_path = f_706(db_path, 1000, countries=custom_countries, random_seed=4)
         self.assertEqual(db_path, output_path)
         self.assertTrue(self._validate_db_structure(db_path))
         self.assertEqual(self._get_db_entries_count(db_path), 1000)
@@ -163,7 +163,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test with special characters in file path and 15 entries
         db_path = os.path.join(self.temp_dir, self.fake.file_name(extension="db").replace("/", "//"))
-        output_path = f_577(db_path, 15, random_seed=55)
+        output_path = f_706(db_path, 15, random_seed=55)
         self.assertEqual(db_path, output_path)
         self.assertTrue(self._validate_db_structure(db_path))
         self.assertEqual(self._get_db_entries_count(db_path), 15)

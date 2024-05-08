@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def f_238(test_scores, student):
+def f_679(test_scores, student):
     """
     Convert a dictionary of test results into a pandas DataFrame and
     Calculate the average test score and the standard deviation for a particular student from this DataFrame.
@@ -29,7 +29,7 @@ def f_238(test_scores, student):
     >>> np.random.seed(10)
     >>> scores = {'Student': list(np.random.choice(STUDENTS, 50, replace=True)), 
     ...                        'Score': np.random.randint(50, 101, size=50)}
-    >>> f_238(scores, 10)
+    >>> f_679(scores, 10)
     (array([70.        ,  7.07106781]),     Student  Score
     0        10     65
     1        16     68
@@ -83,7 +83,7 @@ def f_238(test_scores, student):
     49       10     75)
 
     >>> scores = {'Student': [1, 2, 1, 1], 'Score': [10, 1, 1, 1]}
-    >>> f_238(scores, 1)
+    >>> f_679(scores, 1)
     (array([4.        , 5.19615242]),    Student  Score
     0        1     10
     1        2      1
@@ -116,7 +116,7 @@ class TestCases(unittest.TestCase):
         scores_df = pd.DataFrame(self.scores)
         expected_avg = scores_df[scores_df['Student'] == student_id]['Score'].mean()
         expected_std = scores_df[scores_df['Student'] == student_id]['Score'].std()
-        res, df = f_238(self.scores, student_id)
+        res, df = f_679(self.scores, student_id)
         avg, std = res
         self.assertIsInstance(res, np.ndarray)
         self.assertAlmostEqual(expected_avg, avg, places=2)
@@ -125,19 +125,19 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         student_id = max(self.student_ids) + 1
         with self.assertRaises(ValueError):
-            f_238(self.scores, student_id)
+            f_679(self.scores, student_id)
     def test_case_3(self):
         empty_df = dict.fromkeys(['Student', 'Score'])
         student_id = fake.random_int(min=1, max=100)
         with self.assertRaises(ValueError):
-            f_238(empty_df, student_id)
+            f_679(empty_df, student_id)
     def test_case_4(self):
         scores = {
             'Student': list(self.student_ids), 
             'Score': [100] * len(self.student_ids)
         }
         student_id = self.student_ids[3]
-        res, df = f_238(scores, student_id)
+        res, df = f_679(scores, student_id)
         avg, std = res
         self.assertIsInstance(res, np.ndarray)
         self.assertEqual(avg, 100.0)
@@ -152,7 +152,7 @@ class TestCases(unittest.TestCase):
         scores_df = pd.DataFrame(scores)
         expected_avg = scores_df[scores_df['Student'] == student_id]['Score'].mean()
         expected_std = scores_df[scores_df['Student'] == student_id]['Score'].std()
-        res, df = f_238(scores, student_id)
+        res, df = f_679(scores, student_id)
         avg, std = res
         self.assertAlmostEqual(expected_avg, avg, places=2)
         self.assertAlmostEqual(expected_std, std, places=2)

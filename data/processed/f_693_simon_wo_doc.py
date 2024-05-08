@@ -1,7 +1,7 @@
 import csv
 import random
 
-def f_584(file_path,
+def f_703(file_path,
           num_rows,
           gender=['Male', 'Female', 'Non-Binary'],
           countries=['USA', 'UK', 'Canada', 'Australia', 'India'],
@@ -34,10 +34,10 @@ def f_584(file_path,
     - random
 
     Example:
-    >>> f_584('/tmp/data.csv', 100)
+    >>> f_703('/tmp/data.csv', 100)
     '/tmp/data.csv'
 
-    >>> f_584('/test.csv', 100, gender=['test'], countries['Albania', 'Germany', 'Austria'], seed=12)
+    >>> f_703('/test.csv', 100, gender=['test'], countries['Albania', 'Germany', 'Austria'], seed=12)
     'test.csv'
     """
     FIELDS = ['Name', 'Age', 'Gender', 'Country']
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         return f"{self.fake.file_name(extension='csv')}"
     def test_case_1(self):
         rows = 10
-        returned_path = f_584(self.file_path, rows, seed=12)
+        returned_path = f_703(self.file_path, rows, seed=12)
         self.assertTrue(os.path.exists(returned_path))
         expected = [['Name', 'Age', 'Gender', 'Country'],
    ['MRRDA', '43', 'Female', 'Canada'],
@@ -87,28 +87,28 @@ class TestCases(unittest.TestCase):
             self.assertEqual(list(reader), expected)
     def test_case_2(self):
         rows = 1000
-        returned_path = f_584(self.file_path, rows, seed=13)
+        returned_path = f_703(self.file_path, rows, seed=13)
         self.assertTrue(os.path.exists(returned_path))
         with open(returned_path, 'r') as csv_file:
             reader = csv.reader(csv_file)
             self.assertEqual(len(list(reader)), rows + 1)
     def test_case_3(self):
         rows = 0
-        returned_path = f_584(self.file_path, rows, seed=123)
+        returned_path = f_703(self.file_path, rows, seed=123)
         self.assertTrue(os.path.exists(returned_path))
         with open(returned_path, 'r') as csv_file:
             reader = csv.reader(csv_file)
             self.assertEqual(list(reader), [['Name', 'Age', 'Gender', 'Country']])
     def test_case_4(self):
         rows = -10
-        returned_path = f_584(self.file_path, rows, seed=221)
+        returned_path = f_703(self.file_path, rows, seed=221)
         self.assertTrue(os.path.exists(returned_path))
         with open(returned_path, 'r') as csv_file:
             reader = csv.reader(csv_file)
             self.assertEqual(list(reader), [['Name', 'Age', 'Gender', 'Country']])
     def test_case_5(self):
         rows = 100
-        returned_path = f_584(self.file_path, rows, seed=342)
+        returned_path = f_703(self.file_path, rows, seed=342)
         self.assertTrue(os.path.exists(returned_path))
         with open(returned_path, 'r') as csv_file:
             reader = csv.DictReader(csv_file)
@@ -121,7 +121,7 @@ class TestCases(unittest.TestCase):
                 self.assertEqual(len(row['Name']), 5)
     def test_case_6(self):
         rows = 100
-        returned_path = f_584(self.file_path, rows, seed=342, gender=['a', 'b'], countries=['Austria'])
+        returned_path = f_703(self.file_path, rows, seed=342, gender=['a', 'b'], countries=['Austria'])
         self.assertTrue(os.path.exists(returned_path))
         with open(returned_path, 'r') as csv_file:
             reader = csv.DictReader(csv_file)

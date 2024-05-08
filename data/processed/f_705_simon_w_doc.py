@@ -3,7 +3,7 @@ import string
 from collections import defaultdict
 
 
-def f_416(n, seed=None):
+def f_726(n, seed=None):
     """
     Generate a dictionary with lists of random lowercase english letters. 
     
@@ -33,10 +33,10 @@ def f_416(n, seed=None):
     - string
 
     Example:
-    >>> f_416(5, seed=123)
+    >>> f_726(5, seed=123)
     defaultdict(<class 'list'>, {'b': ['b'], 'i': ['i'], 'c': ['c'], 'y': ['y'], 'n': ['n']})
 
-    >>> f_416(30, seed=1)
+    >>> f_726(30, seed=1)
     defaultdict(<class 'list'>, {'e': ['e'], 's': ['s'], 'z': ['z', 'z', 'z'], 'y': ['y', 'y', 'y', 'y'], 'c': ['c'], 'i': ['i', 'i'], 'd': ['d', 'd'], 'p': ['p', 'p', 'p'], 'o': ['o', 'o'], 'u': ['u'], 'm': ['m', 'm'], 'g': ['g'], 'a': ['a', 'a'], 'n': ['n'], 't': ['t'], 'w': ['w'], 'x': ['x'], 'h': ['h']})
     """
     LETTERS = string.ascii_lowercase
@@ -53,28 +53,28 @@ import string
 import random
 class TestCases(unittest.TestCase):
     def test_return_type(self):
-        result = f_416(10, seed=1)
+        result = f_726(10, seed=1)
         self.assertIsInstance(result, defaultdict)
         for key, value in result.items():
             self.assertIsInstance(value, list)
     def test_dictionary_keys(self):
-        result = f_416(100, seed=2)
+        result = f_726(100, seed=2)
         for key in result.keys():
             self.assertTrue('a' <= key <= 'z')
     def test_random_seed_effect(self):
-        result1 = f_416(50, seed=3)
-        result2 = f_416(50, seed=3)
+        result1 = f_726(50, seed=3)
+        result2 = f_726(50, seed=3)
         self.assertEqual(result1, result2)
     def test_letters_distribution(self):
         n = 60
-        result = f_416(n, seed=4)
+        result = f_726(n, seed=4)
         total_letters = sum(len(lst) for lst in result.values())
         self.assertEqual(total_letters, n)
     def test_edge_cases(self):
-        result = f_416(0, seed=5)
+        result = f_726(0, seed=5)
         for lst in result.values():
             self.assertEqual(len(lst), 0)
         large_n = 10000
-        result = f_416(large_n, seed=6)
+        result = f_726(large_n, seed=6)
         total_letters = sum(len(lst) for lst in result.values())
         self.assertEqual(total_letters, large_n)

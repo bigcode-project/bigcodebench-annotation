@@ -1,7 +1,7 @@
 import numpy as np
 import itertools
 
-def f_261(data_list):
+def f_736(data_list):
     """
     Unzips a list of tuples and calculates the mean of the numeric values for 
     each position.
@@ -26,9 +26,9 @@ def f_261(data_list):
     - itertools
 
     Example:
-    >>> f_261([('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)])
+    >>> f_736([('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)])
     [nan, 3.0, 4.0]
-    >>> f_261([(1, 'a', 2), ('a', 3, 5), ('c', 1, -2)])
+    >>> f_736([(1, 'a', 2), ('a', 3, 5), ('c', 1, -2)])
     [1.0, 2.0, 1.6666666666666667]
     """
     unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
@@ -42,29 +42,29 @@ class TestCases(unittest.TestCase):
         # Test with regular input data
         data_list = [('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)]
         expected_result = [np.nan, 3.0, 4.0]  # Expected mean values
-        result = f_261(data_list)
+        result = f_736(data_list)
         np.testing.assert_almost_equal(result, expected_result)
     def test_non_numeric_values(self):
         # Test with non-numeric values in the tuples
         data_list = [('a', 'x', 2), ('b', 2, 3), ('c', 'y', 4), ('d', 4, 'z'), ('e', 'k', 6)]
         expected_result = [np.nan, 3.0, 3.75]  # Expected mean values, non-numeric items are ignored
-        result = f_261(data_list)
+        result = f_736(data_list)
         np.testing.assert_equal(result, expected_result)
     def test_uneven_tuples(self):
         # Test with uneven tuple lengths
         data_list = [('a', 1), ('b', 2, 3), ('c',), ('d', 4, 5, 6), ('e', 5, 6)]
         expected_result = [np.nan, 3.0, 4.66666666, 6.0]  # Expected mean values
-        result = f_261(data_list)
+        result = f_736(data_list)
         np.testing.assert_almost_equal(result, expected_result)
     def test_all_non_numeric(self):
         # Test where all elements are non-numeric
         data_list = [('a', 'x'), ('b', 'y'), ('c', 'z'), ('d', 'k'), ('e', 'l')]
         expected_result = [np.nan, np.nan]  # No numeric data to calculate the mean
-        result = f_261(data_list)
+        result = f_736(data_list)
         np.testing.assert_equal(result, expected_result)
     def test_empty_input(self):
         # Test with an empty input list
         data_list = []
         expected_result = []  # No data to process
-        result = f_261(data_list)
+        result = f_736(data_list)
         self.assertEqual(result, expected_result)

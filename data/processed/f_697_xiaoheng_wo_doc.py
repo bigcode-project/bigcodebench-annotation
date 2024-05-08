@@ -3,7 +3,7 @@ import os
 import string
 import random
 
-def f_573(input_string, directory='./text_files'):
+def f_711(input_string, directory='./text_files'):
     """
     Split a multi-line string into separate strings, remove special characters, and save each string as a separate text file.
     
@@ -21,7 +21,7 @@ def f_573(input_string, directory='./text_files'):
     - random 
     
     Example:
-    >>> f_573('line a\nfollows by line b\n...bye\n')
+    >>> f_711('line a\nfollows by line b\n...bye\n')
     ['./text_files/12345.txt', './text_files/67890.txt', './text_files/11223.txt']
     """
     lines = input_string.split('\n')
@@ -53,14 +53,14 @@ class TestCases(unittest.TestCase):
     def test_single_line(self):
         # Test with a single line string
         input_string = "Hello, world!"
-        output = f_573(input_string, self.test_dir)
+        output = f_711(input_string, self.test_dir)
         self.assertEqual(len(output), 1)
         with open(output[0], 'r') as file:
             self.assertEqual(file.read(), "Hello world")
     def test_multi_line(self):
         # Test with a multi-line string
         input_string = "Line A\nLine B\nLine C"
-        output = f_573(input_string, self.test_dir)
+        output = f_711(input_string, self.test_dir)
         self.assertEqual(len(output), 3)
         expected_lines = ["Line A", "Line B", "Line C"]
         for i, file_path in enumerate(output):
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
     def test_special_characters(self):
         # Test if special characters are removed
         input_string = "Hello!@$\nWorld!#"
-        output = f_573(input_string, self.test_dir)
+        output = f_711(input_string, self.test_dir)
         self.assertEqual(len(output), 2)
         expected_lines = ["Hello", "World"]
         for i, file_path in enumerate(output):
@@ -78,13 +78,13 @@ class TestCases(unittest.TestCase):
     def test_empty_string(self):
         # Test with an empty string
         input_string = ""
-        output = f_573(input_string, self.test_dir)
+        output = f_711(input_string, self.test_dir)
         self.assertEqual(len(output), 1)
         with open(output[0], 'r') as file:
             self.assertEqual(file.read(), "")
     def test_random_filenames(self):
         # Test if filenames are random and unique
         input_string = "A\nB"
-        output1 = f_573(input_string, self.test_dir)
-        output2 = f_573(input_string, self.test_dir)
+        output1 = f_711(input_string, self.test_dir)
+        output2 = f_711(input_string, self.test_dir)
         self.assertNotEqual(output1, output2)

@@ -2,7 +2,7 @@ import os
 import glob
 import hashlib
 
-def f_370(source_dir, target_dir, prefix='#Hash: '):
+def f_998(source_dir, target_dir, prefix='#Hash: '):
     """
     Computes the MD5 hash of each file's content in the specified `source_dir`, prepends the hash along with a prefix 
     to the original content, and writes the modified content to new files in the `target_dir`. 
@@ -25,7 +25,7 @@ def f_370(source_dir, target_dir, prefix='#Hash: '):
     FileNotFoundError if the source directory does not exist.
 
     Example:
-    >>> f_370(source_dir='samples', target_dir='hashed_samples', prefix='#MD5: ')
+    >>> f_998(source_dir='samples', target_dir='hashed_samples', prefix='#MD5: ')
     ['hashed_samples/file1.txt', 'hashed_samples/file2.txt']
     """
     if not os.path.exists(source_dir):
@@ -64,7 +64,7 @@ class TestCases(unittest.TestCase):
             with open(os.path.join(self.source_dir, file_name), 'w') as f:
                 f.write("Sample content for " + file_name)
         
-        result = f_370(source_dir=self.source_dir, target_dir=self.target_dir)
+        result = f_998(source_dir=self.source_dir, target_dir=self.target_dir)
         expected_files = [os.path.join(self.target_dir, file_name) for file_name in sample_files]
         self.assertListEqual(sorted(result), sorted(expected_files))
         for file in expected_files:
@@ -78,20 +78,20 @@ class TestCases(unittest.TestCase):
         with open(os.path.join(self.source_dir, "file.txt"), 'w') as f:
             f.write("Sample content")
         
-        result = f_370(source_dir=self.source_dir, target_dir=self.target_dir, prefix=custom_prefix)
+        result = f_998(source_dir=self.source_dir, target_dir=self.target_dir, prefix=custom_prefix)
         for file in result:
             with open(file, 'r') as f:
                 lines = f.readlines()
                 self.assertTrue(lines[0].startswith(custom_prefix))
     def test_empty_directory(self):
         # Testing with an empty source directory
-        result = f_370(source_dir=self.source_dir, target_dir=self.target_dir)
+        result = f_998(source_dir=self.source_dir, target_dir=self.target_dir)
         self.assertEqual(result, [])
     def test_non_existing_source_directory(self):
         # Using a non-existing source directory should raise FileNotFoundError
         non_existing_dir = "/path/to/nonexistent/dir"
         with self.assertRaises(FileNotFoundError):
-            f_370(source_dir=non_existing_dir, target_dir=self.target_dir)
+            f_998(source_dir=non_existing_dir, target_dir=self.target_dir)
     def test_overwriting_existing_files(self):
         # Overwriting existing files in the target directory
         file_path = os.path.join(self.target_dir, "file1.txt")
@@ -101,6 +101,6 @@ class TestCases(unittest.TestCase):
         with open(os.path.join(self.source_dir, "file1.txt"), 'w') as f:
             f.write("New content.")
         
-        f_370(source_dir=self.source_dir, target_dir=self.target_dir)
+        f_998(source_dir=self.source_dir, target_dir=self.target_dir)
         with open(file_path, 'r') as f:
             self.assertNotEqual(f.read(), "Initial content.")

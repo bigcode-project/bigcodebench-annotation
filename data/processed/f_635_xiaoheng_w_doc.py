@@ -1,7 +1,7 @@
 import re
 import string
 
-def f_403(content):
+def f_596(content):
     """Count the non-stop words in a sentence without the last word.
 
     Parameters:
@@ -15,7 +15,7 @@ def f_403(content):
     - string
 
     Example:
-    >>> f_403('this is an example content')
+    >>> f_596('this is an example content')
     1
     """
     STOPWORDS = set([
@@ -44,25 +44,25 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test with a mix of stopwords and non-stopwords
-        self.assertEqual(f_403('this is an example content'), 1)
+        self.assertEqual(f_596('this is an example content'), 1)
     def test_case_2(self):
         # Test with all stopwords except the last word
-        self.assertEqual(f_403('this is an the of'), 0)
+        self.assertEqual(f_596('this is an the of'), 0)
     def test_case_3(self):
         # Test with no stopwords
-        self.assertEqual(f_403('example content programming'), 2)
+        self.assertEqual(f_596('example content programming'), 2)
     def test_case_4(self):
         # Test with punctuation
-        self.assertEqual(f_403('example, content; programming, python.'), 3)
+        self.assertEqual(f_596('example, content; programming, python.'), 3)
     def test_case_5(self):
         # Test with an empty string
-        self.assertEqual(f_403(''), 0)
+        self.assertEqual(f_596(''), 0)
     def test_case_6(self):
         # Test with a single non-stopword
-        self.assertEqual(f_403('content'), 0)
+        self.assertEqual(f_596('content'), 0)
     def test_case_7(self):
         # Test with a single stopword
-        self.assertEqual(f_403('the'), 0)
+        self.assertEqual(f_596('the'), 0)
     def test_case_8(self):
         # Test with a mix and uppercase letters
-        self.assertEqual(f_403('This IS an Example Content'), 1)
+        self.assertEqual(f_596('This IS an Example Content'), 1)

@@ -2,7 +2,7 @@ import pandas as pd
 import random
 
 
-def f_793(num_rows=100, categories=["a", "b", "c", "d", "e"], random_seed=42):
+def f_325(num_rows=100, categories=["a", "b", "c", "d", "e"], random_seed=42):
     """
     Create a Pandas DataFrame with specified number of rows. Each row contains a randomly
     selected category from the provided categories list and a random integer between 1 and 100.
@@ -27,7 +27,7 @@ def f_793(num_rows=100, categories=["a", "b", "c", "d", "e"], random_seed=42):
     - random
 
     Example:
-    >>> df, ax = f_793(num_rows=5)
+    >>> df, ax = f_325(num_rows=5)
     >>> df
       Category  Value
     0        a     18
@@ -60,7 +60,7 @@ import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test with default parameters
-        df, ax = f_793()
+        df, ax = f_325()
         self.assertEqual(len(df), 100)
         self.assertTrue(
             set(df["Category"].unique()).issubset(set(["a", "b", "c", "d", "e"]))
@@ -71,23 +71,23 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test num_rows
         for num_rows in [10, 50, 100]:
-            df, _ = f_793(num_rows=num_rows)
+            df, _ = f_325(num_rows=num_rows)
             self.assertEqual(len(df), num_rows)
     def test_case_3(self):
         # Test edge case - 0 rows
         with self.assertRaises(Exception):
-            f_793(num_rows=0)
+            f_325(num_rows=0)
     def test_case_4(self):
         # Test edge case - invalid num_rows
         with self.assertRaises(Exception):
-            f_793(num_rows=-1)
+            f_325(num_rows=-1)
     def test_case_5(self):
         # Test categories
-        df, _ = f_793(categories=["x", "y", "z"])
+        df, _ = f_325(categories=["x", "y", "z"])
         self.assertTrue(set(df["Category"].unique()).issubset(set(["x", "y", "z"])))
     def test_case_6(self):
         # Test edge case - single category
-        df, _ = f_793(categories=["unique"])
+        df, _ = f_325(categories=["unique"])
         self.assertTrue(
             set(["unique"]).issubset(df["Category"].unique()),
             "Should work with a single category",
@@ -95,12 +95,12 @@ class TestCases(unittest.TestCase):
     def test_case_7(self):
         # Test edge case - empty categories
         with self.assertRaises(Exception):
-            f_793(categories=[])
+            f_325(categories=[])
     def test_case_8(self):
         # Test random seed
-        df1, _ = f_793(random_seed=123)
-        df2, _ = f_793(random_seed=123)
-        df3, _ = f_793(random_seed=124)
+        df1, _ = f_325(random_seed=123)
+        df2, _ = f_325(random_seed=123)
+        df3, _ = f_325(random_seed=124)
         self.assertTrue(
             df1.equals(df2), "DataFrames should be identical with the same seed"
         )
@@ -110,7 +110,7 @@ class TestCases(unittest.TestCase):
     def test_case_9(self):
         # Test visualization
         categories = ["x", "y", "z"]
-        _, ax = f_793(num_rows=100, categories=categories, random_seed=42)
+        _, ax = f_325(num_rows=100, categories=categories, random_seed=42)
         ax_categories = [tick.get_text() for tick in ax.get_xticklabels()]
         self.assertListEqual(
             sorted(categories),

@@ -5,7 +5,7 @@ import glob
 # Constants
 DIRECTORY = 'data'
 
-def f_756(directory):
+def f_955(directory):
     """
     Convert all Unicode string representations of dictionaries in all text files 
     in the specified directory to Python dictionaries.
@@ -22,7 +22,7 @@ def f_756(directory):
     - glob
 
     Example:
-    >>> f_756("sample_directory/")
+    >>> f_955("sample_directory/")
     [{'key1': 'value1'}, {'key2': 'value2'}]
 
     Note:
@@ -46,9 +46,9 @@ import ast
 import shutil
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.test_dir = 'testdir_f_756'
+        self.test_dir = 'testdir_f_955'
         os.makedirs(self.test_dir, exist_ok=True)
-        self.sample_directory = 'testdir_f_756/sample_directory'
+        self.sample_directory = 'testdir_f_955/sample_directory'
         os.makedirs(self.sample_directory, exist_ok=True)
         f = open(self.sample_directory+"/1.txt","w")
         f.write("{'key1': 'value1'}")
@@ -65,19 +65,19 @@ class TestCases(unittest.TestCase):
         f = open(self.sample_directory+"/5.txt","w")
         f.write("{'key8': 'value8'}")
         f.close()
-        self.empty_directory = "testdir_f_756/empty_directory"
+        self.empty_directory = "testdir_f_955/empty_directory"
         os.makedirs(self.empty_directory, exist_ok=True)
-        self.multi_line_directory = "testdir_f_756/multi_line_directory"
+        self.multi_line_directory = "testdir_f_955/multi_line_directory"
         os.makedirs(self.multi_line_directory, exist_ok=True)
         f = open(self.multi_line_directory+"/1.txt","w")
         f.write("{'key1': 'value1'}\n{'key2': 'value2'}")
         f.close()
-        self.mixed_directory = "testdir_f_756/mixed_directory"
+        self.mixed_directory = "testdir_f_955/mixed_directory"
         os.makedirs(self.mixed_directory, exist_ok=True)
         f = open(self.mixed_directory+"/1.txt","w")
         f.write("invalid")
         f.close()
-        self.invalid_directory = "testdir_f_756/invalid_directory"
+        self.invalid_directory = "testdir_f_955/invalid_directory"
         os.makedirs(self.invalid_directory, exist_ok=True)
         f = open(self.invalid_directory+"/1.txt","w")
         f.write("invalid")
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(self.test_dir)
     def test_case_1(self):
         # Test with the sample directory
-        result = f_756(self.sample_directory)
+        result = f_955(self.sample_directory)
         expected_result = [
             {'key1': 'value1'},
             {'key2': 'value2', 'key3': 'value3'},
@@ -103,22 +103,22 @@ class TestCases(unittest.TestCase):
         
     def test_case_2(self):
         # Test with an empty directory
-        result = f_756(self.empty_directory)
+        result = f_955(self.empty_directory)
         self.assertEqual(result, [])
         
     def test_case_3(self):
         # Test with a directory containing a text file without valid dictionary representation
         with self.assertRaises(ValueError):
-            f_756(self.invalid_directory)
+            f_955(self.invalid_directory)
             
     def test_case_4(self):
         # Test with a directory containing multiple text files, some of which are invalid
         with self.assertRaises(ValueError):
-            f_756(self.mixed_directory)
+            f_955(self.mixed_directory)
             
     def test_case_5(self):
         # Test with a directory containing a text file with multiple valid dictionary representations
-        result = f_756(self.multi_line_directory)
+        result = f_955(self.multi_line_directory)
         expected_result = [
             {'key1': 'value1'},
             {'key2': 'value2'}

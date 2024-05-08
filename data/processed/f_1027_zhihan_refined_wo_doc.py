@@ -2,7 +2,7 @@ import requests
 import json
 import base64
 
-def f_262(data, url="http://your-api-url.com"):
+def f_27(data, url="http://your-api-url.com"):
     """
     Convert a Python dictionary into a JSON-formatted string, encode this string in base64 format,
     and send it as a payload in a POST request to an API endpoint.
@@ -21,7 +21,7 @@ def f_262(data, url="http://your-api-url.com"):
     
     Example:
     >>> data = {'name': 'John', 'age': 30, 'city': 'New York'}
-    >>> response = f_262(data, url="http://example-api-url.com")
+    >>> response = f_27(data, url="http://example-api-url.com")
     >>> print(response.status_code)
     200
     """
@@ -44,32 +44,32 @@ class TestCases(unittest.TestCase):
     @patch('requests.post', side_effect=mock_post)
     def test_case_1(self, mock_post_method):
         data = {'name': 'John', 'age': 30, 'city': 'New York'}
-        response = f_262(data, url="http://mock-api-url.com")
+        response = f_27(data, url="http://mock-api-url.com")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, "OK")
     
     @patch('requests.post', side_effect=mock_post)
     def test_case_2(self, mock_post_method):
         data = {'task': 'Write code', 'status': 'completed'}
-        response = f_262(data, url="http://mock-api-url.com")
+        response = f_27(data, url="http://mock-api-url.com")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, "OK")
     @patch('requests.post', side_effect=mock_post)
     def test_case_3(self, mock_post_method):
         data = {}
-        response = f_262(data, url="http://mock-api-url.com")
+        response = f_27(data, url="http://mock-api-url.com")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, "OK")
     @patch('requests.post', side_effect=mock_post)
     def test_case_4(self, mock_post_method):
         data = {'fruit': 'apple', 'color': 'red', 'taste': 'sweet'}
-        response = f_262(data, url="http://mock-api-url.com")
+        response = f_27(data, url="http://mock-api-url.com")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, "OK")
     @patch('requests.post', side_effect=mock_post)
     def test_case_5(self, mock_post_method):
         data = {'country': 'USA', 'capital': 'Washington, D.C.'}
-        response = f_262(data, url="http://mock-api-url.com")
+        response = f_27(data, url="http://mock-api-url.com")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, "OK")
     @patch('requests.post', side_effect=mock_post)
@@ -78,5 +78,5 @@ class TestCases(unittest.TestCase):
         data = {'name': 'John', 'age': 30, 'city': 'New York'}
         json_data = json.dumps(data)
         encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')
-        f_262(data, url="http://mock-api-url.com")
+        f_27(data, url="http://mock-api-url.com")
         mock_post_method.assert_called_once_with("http://mock-api-url.com", data={"payload": encoded_data})

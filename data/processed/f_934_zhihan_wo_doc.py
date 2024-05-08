@@ -3,7 +3,7 @@ import json
 from collections import Counter
 
 
-def f_755(file_pointer):
+def f_954(file_pointer):
     """
     Reads from a given file pointer to a JSON file, evaluates strings that represent dictionaries to actual dictionaries,
     and counts the frequency of each key across all dictionary entries in the JSON data.
@@ -26,7 +26,7 @@ def f_755(file_pointer):
     
     Example:
     >>> with open("data.json", "r") as file:
-    >>>    key_frequency = f_755(file)
+    >>>    key_frequency = f_954(file)
     >>>    print(key_frequency)
     Counter({'name': 5, 'age': 5, 'city': 3})
     """
@@ -53,14 +53,14 @@ class TestCases(unittest.TestCase):
         json_file = BytesIO(data)
         # Expected result is a Counter object with the frequency of each key
         expected = Counter({'name': 3, 'age': 2})
-        result = f_755(json_file)
+        result = f_954(json_file)
         self.assertEqual(result, expected)
     def test_with_string_repr_dicts(self):
         # Simulate a JSON file containing string representations of dictionaries
         data = json.dumps(['{"city": "New York"}', '{"city": "Los Angeles", "temp": 75}']).encode('utf-8')
         json_file = BytesIO(data)
         expected = Counter({'city': 2, 'temp': 1})
-        result = f_755(json_file)
+        result = f_954(json_file)
         self.assertEqual(result, expected)
     def test_with_invalid_json(self):
         # Simulate an invalid JSON file
@@ -69,34 +69,34 @@ class TestCases(unittest.TestCase):
         # In this case, the function should either return an empty Counter or raise a specific exception
         # Depending on how you've implemented error handling in your function, adjust this test accordingly
         with self.assertRaises(json.JSONDecodeError):
-            f_755(json_file)
+            f_954(json_file)
     def test_empty_json(self):
         # Simulate an empty JSON file
         data = json.dumps([]).encode('utf-8')
         json_file = BytesIO(data)
         expected = Counter()
-        result = f_755(json_file)
+        result = f_954(json_file)
         self.assertEqual(result, expected)
     def test_mixed_valid_invalid_dicts(self):
         # Simulate a JSON file with a mix of valid and invalid dictionary strings
         data = json.dumps(['{"name": "John"}', 'Invalid', '{"age": 30}']).encode('utf-8')
         json_file = BytesIO(data)
         expected = Counter({'name': 1, 'age': 1})
-        result = f_755(json_file)
+        result = f_954(json_file)
         self.assertEqual(result, expected)
     def test_nested_dicts(self):
         # Simulate a JSON file containing nested dictionaries (should only count top-level keys)
         data = json.dumps([{"person": {"name": "John", "age": 30}}, {"person": {"city": "New York"}}]).encode('utf-8')
         json_file = BytesIO(data)
         expected = Counter({'person': 2})
-        result = f_755(json_file)
+        result = f_954(json_file)
         self.assertEqual(result, expected)
     def test_with_actual_json_objects_instead_of_strings(self):
         # Simulate a JSON file with actual JSON objects (dictionaries) instead of string representations
         data = json.dumps([{"key1": "value1"}, {"key2": "value2", "key3": "value3"}]).encode('utf-8')
         json_file = BytesIO(data)
         expected = Counter({'key1': 1, 'key2': 1, 'key3': 1})
-        result = f_755(json_file)
+        result = f_954(json_file)
         self.assertEqual(result, expected)
     def test_invalid_json_structure(self):
         # Simulate a JSON file that is not a list
@@ -105,4 +105,4 @@ class TestCases(unittest.TestCase):
         # Depending on how you've implemented error handling, adjust this test accordingly
         # Here we expect an error or a specific handling
         with self.assertRaises(SyntaxError):
-            f_755(json_file)
+            f_954(json_file)

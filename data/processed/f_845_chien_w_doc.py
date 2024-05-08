@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def f_455(data, column_name="target_column"):
+def f_866(data, column_name="target_column"):
     """
     Converts a given JSON data into a Pandas DataFrame and plots a histogram of a specified column.
     The function handles non-numeric columns by converting them to categorical type and then to numeric codes. 
@@ -27,7 +27,7 @@ def f_455(data, column_name="target_column"):
 
     Example:
     >>> sample_data = [{'userId': 1, 'value': 10}, {'userId': 2, 'value': 15}]
-    >>> df, ax = f_455(sample_data, 'userId')
+    >>> df, ax = f_866(sample_data, 'userId')
     >>> print(df)
        userId  value
     0       1     10
@@ -47,7 +47,7 @@ def f_455(data, column_name="target_column"):
 import unittest
 import pandas as pd
 class TestCases(unittest.TestCase):
-    """Test cases for the f_455 function."""
+    """Test cases for the f_866 function."""
     def setUp(self):
         # Sample data for testing
         self.sample_data = [
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         ]
     def test_normal_case(self):
         """Test if the function returns correct DataFrame and histogram for a valid column."""
-        df, ax = f_455(self.sample_data, "userId")
+        df, ax = f_866(self.sample_data, "userId")
         self.assertTrue(isinstance(df, pd.DataFrame))
         self.assertEqual(len(df), len(self.sample_data))
         self.assertEqual(ax.get_title(), "Histogram of userId")
@@ -69,20 +69,20 @@ class TestCases(unittest.TestCase):
     def test_non_existent_column(self):
         """Test if the function raises an error for a non-existent column."""
         with self.assertRaises(ValueError):
-            f_455(self.sample_data, "non_existent_column")
+            f_866(self.sample_data, "non_existent_column")
     def test_empty_data(self):
         """Test the function with empty data."""
         with self.assertRaises(ValueError):
-            f_455([], "userId")
+            f_866([], "userId")
     def test_non_numeric_data(self):
         """Test the function with a non-numeric column."""
-        df, ax = f_455(self.sample_data, "title")
+        df, ax = f_866(self.sample_data, "title")
         self.assertTrue(pd.api.types.is_numeric_dtype(df["title"]))
         self.assertEqual(ax.get_title(), "Histogram of title")
         self.assertEqual(ax.get_xlabel(), "title")
     def test_duplicate_values(self):
         """Test the function with a column that has duplicate values."""
-        df, ax = f_455(self.sample_data, "title")
+        df, ax = f_866(self.sample_data, "title")
         self.assertTrue(isinstance(df, pd.DataFrame))
         self.assertEqual(ax.get_title(), "Histogram of title")
         self.assertEqual(ax.get_xlabel(), "title")

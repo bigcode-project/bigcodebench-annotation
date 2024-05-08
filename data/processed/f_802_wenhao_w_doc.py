@@ -2,7 +2,7 @@ import string
 import random
 
 
-def f_586(text, seed=None):
+def f_823(text, seed=None):
     """
     Transforms the input text by replacing each alphabetic character with a random letter,
     while preserving the case and non-alphabetic characters of the original text.
@@ -24,7 +24,7 @@ def f_586(text, seed=None):
 
     Example:
     >>> text = 'Hello, world!'
-    >>> f_586(text, 0)
+    >>> f_823(text, 0)
     'Mynbi, qpmzj!'
     """
     def replace_with_random_char(c):
@@ -43,7 +43,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test single word
         input_text = "Hello"
-        output_text = f_586(input_text, seed=1)
+        output_text = f_823(input_text, seed=1)
         self.assertTrue(
             all(oc.isalpha() == ic.isalpha() for oc, ic in zip(output_text, input_text))
         )
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test multiple words and punctuation
         input_text = "Hello, World!"
-        output_text = f_586(input_text, seed=2)
+        output_text = f_823(input_text, seed=2)
         self.assertTrue(
             all(oc.isalpha() == ic.isalpha() for oc, ic in zip(output_text, input_text))
         )
@@ -59,12 +59,12 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test empty string
         input_text = ""
-        output_text = f_586(input_text, seed=3)
+        output_text = f_823(input_text, seed=3)
         self.assertEqual(output_text, "")
     def test_case_4(self):
         # Test case preservation
         input_text = "HeLlO"
-        output_text = f_586(input_text, seed=4)
+        output_text = f_823(input_text, seed=4)
         self.assertTrue(
             all(
                 oc.isupper() == ic.isupper() and oc.islower() == ic.islower()
@@ -74,13 +74,13 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test numbers, special characters
         input_text = "1234!@#$"
-        output_text = f_586(input_text, seed=5)
+        output_text = f_823(input_text, seed=5)
         self.assertEqual(
             output_text, input_text
         )  # Numbers and special characters should remain unchanged
     def test_case_6(self):
         # Test random seed reproducibility
         input_text = "Colorless green ideas sleep furiously."
-        output1 = f_586(input_text, seed=123)
-        output2 = f_586(input_text, seed=123)
+        output1 = f_823(input_text, seed=123)
+        output2 = f_823(input_text, seed=123)
         self.assertEqual(output1, output2)

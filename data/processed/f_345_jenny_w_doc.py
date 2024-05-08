@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 
-def f_818(P, T):
+def f_303(P, T):
     """
     Calculate the product of matrix "P" and 3D tensor "T" then return dataframe of normalized results.
 
@@ -29,7 +29,7 @@ def f_818(P, T):
     >>> np.random.seed(0)
     >>> P = np.array([[6, 2, 7], [1, 1, 8], [8, 7, 1], [9, 6, 4], [2, 1, 1]])
     >>> T = np.random.rand(3, 5, 5)
-    >>> result = f_818(P, T)
+    >>> result = f_303(P, T)
     >>> type(result)
     <class 'pandas.core.frame.DataFrame'>
     >>> result.head(2)
@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
         np.random.seed(0)
         P = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         T = np.random.rand(3, 4, 4)
-        result = f_818(P, T)
+        result = f_303(P, T)
         manual_result = self.tensor_product_manual(P, T)
         # Reverse normalization for comparison
         scaler = StandardScaler().fit(manual_result)
@@ -79,12 +79,12 @@ class TestCases(unittest.TestCase):
         P = np.array([[1, 2], [3, 4], [5, 6]])
         T = np.random.rand(3, 5, 5)
         with self.assertRaises(ValueError):
-            f_818(P, T)
+            f_303(P, T)
     def test_case_3(self):
         np.random.seed(0)
         P = np.eye(4)
         T = np.random.rand(4, 6, 6)
-        result = f_818(P, T)
+        result = f_303(P, T)
         manual_result = self.tensor_product_manual(P, T)
         # Reverse normalization for comparison
         scaler = StandardScaler().fit(manual_result)
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
         np.random.seed(0)
         P = np.ones((5, 5))
         T = np.random.rand(5, 7, 7)
-        result = f_818(P, T)
+        result = f_303(P, T)
         manual_result = self.tensor_product_manual(P, T)
         # Reverse normalization for comparison
         scaler = StandardScaler().fit(manual_result)
@@ -108,7 +108,7 @@ class TestCases(unittest.TestCase):
         np.random.seed(0)
         P = np.diag(np.arange(1, 7))
         T = np.random.rand(6, 8, 8)
-        result = f_818(P, T)
+        result = f_303(P, T)
         manual_result = self.tensor_product_manual(P, T)
         # Reverse normalization for comparison
         scaler = StandardScaler().fit(manual_result)
@@ -121,24 +121,24 @@ class TestCases(unittest.TestCase):
         P = np.array([])
         T = np.array([])
         with self.assertRaises(ValueError):
-            f_818(P, T)
+            f_303(P, T)
     def test_case_7(self):
         # Test with non-numeric inputs in matrices/tensors to verify type handling
         P = np.array([["a", "b"], ["c", "d"]])
         T = np.random.rand(2, 2, 2)
         with self.assertRaises(Exception):
-            f_818(P, T)
+            f_303(P, T)
     def test_case_8(self):
         # Test with zero matrix and tensor to verify handling of all-zero inputs
         P = np.zeros((5, 5))
         T = np.zeros((5, 3, 3))
-        result = f_818(P, T)
+        result = f_303(P, T)
         self.assertTrue(np.allclose(result, np.zeros((3, 15))))
     def test_case_9(self):
         # Test DataFrame output for correct column names, ensuring they match expected feature naming convention
         P = np.random.rand(3, 3)
         T = np.random.rand(3, 4, 4)
-        result = f_818(P, T)
+        result = f_303(P, T)
         expected_columns = [
             "feature_0",
             "feature_1",
@@ -158,6 +158,6 @@ class TestCases(unittest.TestCase):
         # Test to ensure DataFrame indices start from 0 and are sequential integers
         P = np.random.rand(2, 3)
         T = np.random.rand(3, 5, 5)
-        result = f_818(P, T)
+        result = f_303(P, T)
         expected_indices = list(range(5))  # Expected indices for 5 rows
         self.assertListEqual(list(result.index), expected_indices)

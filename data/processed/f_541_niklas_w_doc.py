@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 
-def f_162(df, features):
+def f_543(df, features):
     """
     Standardize the functions in a DataFrame.
     The function applies standard scaling to the features.
@@ -22,7 +22,7 @@ def f_162(df, features):
     Example:
     >>> np.random.seed(42)
     >>> df = pd.DataFrame(np.random.randn(20, 3), columns=['a', 'b', 'c'])
-    >>> df = f_162(df, ['a', 'b'])
+    >>> df = f_543(df, ['a', 'b'])
     >>> df.head(2)
               a         b         c
     0  0.608932  0.127900  0.647689
@@ -39,7 +39,7 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame(np.random.randn(10, 3), columns=['a', 'b', 'c'])
-        df = f_162(df, ['a', 'b'])
+        df = f_543(df, ['a', 'b'])
         self.assertEqual(df.shape, (10, 3))
         self.assertTrue('a' in df.columns)
         self.assertTrue('b' in df.columns)
@@ -49,7 +49,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(np.all(df['c'] >= -3) and np.all(df['c'] <= 3))
     def test_case_2(self):
         df = pd.DataFrame({'a': [0, 0, 0], 'b': [0, 0, 0], 'c': [0, 0, 0]})
-        df = f_162(df, ['a', 'b'])
+        df = f_543(df, ['a', 'b'])
         self.assertEqual(df.shape, (3, 3))
         self.assertTrue('a' in df.columns)
         self.assertTrue('b' in df.columns)
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(np.all(df['c'] == 0))
     def test_case_3(self):
         df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
-        df = f_162(df, ['a', 'b'])
+        df = f_543(df, ['a', 'b'])
         self.assertEqual(df.shape, (3, 3))
         self.assertTrue('a' in df.columns)
         self.assertTrue('b' in df.columns)
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(np.all(df['c'] == [7, 8, 9]))
     def test_case_4(self):
         df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
-        df = f_162(df, ['c'])
+        df = f_543(df, ['c'])
         self.assertEqual(df.shape, (3, 3))
         self.assertTrue('a' in df.columns)
         self.assertTrue('b' in df.columns)
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
         self.assertTrue(np.all(df['c'] >= -3) and np.all(df['c'] <= 3))
     def test_case_5(self):
         df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
-        df = f_162(df, [])
+        df = f_543(df, [])
         self.assertEqual(df.shape, (3, 3))
         self.assertTrue('a' in df.columns)
         self.assertTrue('b' in df.columns)

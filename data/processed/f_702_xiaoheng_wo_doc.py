@@ -4,7 +4,7 @@ import glob
 import shutil
 import time
 
-def f_450(SOURCE_DIR, DEST_DIR, EXTENSIONS):
+def f_721(SOURCE_DIR, DEST_DIR, EXTENSIONS):
     """
     Transfer files from one directory (SOURCE_DIR) to another (DEST_DIR) based on the specified file extensions (EXTENSIONS).
     It also issues warnings for files that could not be transferred due to any issues.
@@ -25,9 +25,9 @@ def f_450(SOURCE_DIR, DEST_DIR, EXTENSIONS):
     - time
     
     Example:
-    >>> f_450('/path/to/source', '/path/to/destination', ['.txt', '.csv'])
+    >>> f_721('/path/to/source', '/path/to/destination', ['.txt', '.csv'])
     ['file1.txt', 'file2.csv']
-    >>> f_450('/path/to/source', '/path/to/destination', ['.jpg'])
+    >>> f_721('/path/to/source', '/path/to/destination', ['.jpg'])
     []
     """
     warnings.simplefilter('always')
@@ -68,19 +68,19 @@ class TestCases(unittest.TestCase):
     @patch('glob.glob')
     def test_successful_transfer(self, mock_glob, mock_move):
         self.configure_mock_glob_move(mock_glob, mock_move, ['file1.txt', 'file2.csv'])
-        transferred_files = f_450(self.source_dir, self.dest_dir, ['.txt', '.csv'])
+        transferred_files = f_721(self.source_dir, self.dest_dir, ['.txt', '.csv'])
         self.assertEqual(transferred_files, ['file1.txt', 'file2.csv'])
     @patch('shutil.move')
     @patch('glob.glob')
     def test_empty_source_directory(self, mock_glob, mock_move):
         mock_glob.return_value = []
-        transferred_files = f_450(self.source_dir, self.dest_dir, ['.txt', '.csv'])
+        transferred_files = f_721(self.source_dir, self.dest_dir, ['.txt', '.csv'])
         self.assertEqual(transferred_files, [])
     @patch('shutil.move')
     @patch('glob.glob')
     def test_invalid_file_extensions(self, mock_glob, mock_move):
         mock_glob.return_value = []
-        transferred_files = f_450(self.source_dir, self.dest_dir, ['.html', '.png'])
+        transferred_files = f_721(self.source_dir, self.dest_dir, ['.html', '.png'])
         self.assertEqual(transferred_files, [])
     @patch('shutil.move')
     @patch('glob.glob')
@@ -89,12 +89,12 @@ class TestCases(unittest.TestCase):
         mock_move.side_effect = Exception("Permission denied")
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            transferred_files = f_450(self.source_dir, self.dest_dir, ['.jpg'])
+            transferred_files = f_721(self.source_dir, self.dest_dir, ['.jpg'])
         self.assertEqual(transferred_files, [])
         self.assertTrue(any("Unable to move file" in str(warn.message) for warn in w))
     @patch('shutil.move')
     @patch('glob.glob')
     def test_all_extensions(self, mock_glob, mock_move):
         self.configure_mock_glob_move(mock_glob, mock_move, self.files[:4])  # Exclude invalid files
-        transferred_files = f_450(self.source_dir, self.dest_dir, ['.txt', '.csv', '.xlsx', '.jpg'])
+        transferred_files = f_721(self.source_dir, self.dest_dir, ['.txt', '.csv', '.xlsx', '.jpg'])
         self.assertEqual(transferred_files, ['file1.txt', 'file2.csv', 'file3.xlsx', 'file4.jpg'])

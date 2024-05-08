@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 ITEMS = ['apple', 'banana']
 
 
-def f_409(a, b, items=ITEMS):
+def f_415(a, b, items=ITEMS):
     """
     Combine two lists and record the frequency of predefined items in the combined list.
 
@@ -24,7 +24,7 @@ def f_409(a, b, items=ITEMS):
     - matplotlib.pyplot
 
     Example:
-    >>> ax = f_409(['apple', 'banana', 'cherry'], ['date', 'elderberry', 'apple', 'banana', 'cherry'])
+    >>> ax = f_415(['apple', 'banana', 'cherry'], ['date', 'elderberry', 'apple', 'banana', 'cherry'])
     >>> isinstance(ax, matplotlib.axes.Axes)
     True
     """
@@ -47,35 +47,35 @@ class TestCases(unittest.TestCase):
         """Test with typical list inputs."""
         a = ['apple', 'banana', 'cherry']
         b = ['banana', 'apple', 'apple', 'dragonfruit']
-        ax = f_409(a, b)
+        ax = f_415(a, b)
         self.assertIsInstance(ax, plt.Axes)
     def test_empty_lists(self):
         """Test with both lists empty."""
         a = []
         b = []
-        ax = f_409(a, b)
+        ax = f_415(a, b)
         self.assertIsInstance(ax, plt.Axes)
     def test_one_empty_list(self):
         """Test with one list empty."""
         a = ['apple', 'apple']
         b = []
-        ax = f_409(a, b)
+        ax = f_415(a, b)
         self.assertIsInstance(ax, plt.Axes)
     def test_non_predefined_items_only(self):
         """Test with lists containing non-predefined items."""
         a = ['cherry', 'dragonfruit']
         b = ['cherry', 'mango']
-        ax = f_409(a, b)
+        ax = f_415(a, b)
         self.assertIsInstance(ax, plt.Axes)
     def test_all_predefined_items(self):
         """Test with lists containing only predefined items."""
         a = ['apple', 'apple']
         b = ['banana']
-        ax = f_409(a, b)
+        ax = f_415(a, b)
         self.assertIsInstance(ax, plt.Axes)
     def test_duplicate_items(self):
         """Test with lists containing duplicate items."""
         a = ['apple', 'apple']
         b = ['apple', 'banana', 'banana']
-        ax = f_409(a, b)
+        ax = f_415(a, b)
         self.assertIsInstance(ax, plt.Axes)

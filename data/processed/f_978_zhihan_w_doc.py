@@ -3,7 +3,7 @@ import random
 import string
 import hashlib
 
-def f_785(password_length=10, salt="salty"):
+def f_983(password_length=10, salt="salty"):
     """
     Generate a random password of a specified length, including Latin characters, numbers, and symbols. 
     Then, hash the password using the SHA256 algorithm after mixing it with a specified salt.
@@ -23,7 +23,7 @@ def f_785(password_length=10, salt="salty"):
     
     Example:
     >>> random.seed(0)
-    >>> hashed_password = f_785(12, "my_salt")
+    >>> hashed_password = f_983(12, "my_salt")
     >>> print(hashed_password)
     a706478dc5969e90dcfc2fbaffff0b9f8e7f2b006002edac13cb17f5bf9ba941
     """
@@ -43,25 +43,25 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Testing with default parameters
         random.seed(0)
-        hashed_password = f_785()
+        hashed_password = f_983()
         self.assertEqual(len(hashed_password), 64)  # SHA256 produces a 64-character long hash
     def test_case_2(self):
         # Testing with custom password length but default salt
         random.seed(0)
-        hashed_password = f_785(15)
+        hashed_password = f_983(15)
         self.assertEqual(len(hashed_password), 64)
     def test_case_3(self):
         # Testing with default password length but custom salt
         random.seed(0)
-        hashed_password = f_785(salt="custom_salt")
+        hashed_password = f_983(salt="custom_salt")
         self.assertEqual(len(hashed_password), 64)
     def test_case_4(self):
         # Testing with both custom password length and salt
         random.seed(0)
-        hashed_password = f_785(20, "another_salt")
+        hashed_password = f_983(20, "another_salt")
         self.assertEqual(len(hashed_password), 64)
     def test_case_5(self):
         # Testing with edge value for password length (e.g., very small value)
         random.seed(0)
-        hashed_password = f_785(1)
+        hashed_password = f_983(1)
         self.assertEqual(len(hashed_password), 64)

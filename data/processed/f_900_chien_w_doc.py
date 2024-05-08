@@ -7,7 +7,7 @@ LETTERS = list("abcdefghijklmnopqrstuvwxyz")
 NUMBERS = list(range(1, 27))
 
 
-def f_269(n_pairs=26):
+def f_920(n_pairs=26):
     """
     This function generates and displays a bar chart representing random letter-number pairs.
     Each bar corresponds to a unique pair, formed by combining a letter from 'a' to 'z' with a number
@@ -39,7 +39,7 @@ def f_269(n_pairs=26):
     - The random counts assigned to each pair range from 1 to 9.
 
     Example:
-    >>> ax = f_269(5)
+    >>> ax = f_920(5)
     >>> [bar.get_label() for bar in ax]
     ['d:4', 'b:2', 'c:3', 'e:5', 'a:1']
     """
@@ -62,11 +62,11 @@ import matplotlib.pyplot as plt
 from matplotlib.container import BarContainer
 import random
 class TestCases(unittest.TestCase):
-    """Tests for the function f_269."""
+    """Tests for the function f_920."""
     def test_return_type(self):
         """Verify the returned type of the function."""
         random.seed(0)
-        ax = f_269(5)
+        ax = f_920(5)
         self.assertIsInstance(
             ax, BarContainer, "The returned object is not of the expected type."
         )
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
         """Verify the number of bars plotted for different `n_pairs` values."""
         random.seed(1)
         for i in [5, 10, 20]:
-            ax = f_269(i)
+            ax = f_920(i)
             self.assertEqual(
                 len(ax.patches),
                 i,
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
     def test_labels_and_title(self):
         """Verify the labels and the title of the plotted bar chart."""
         random.seed(2)
-        _ = f_269(15)
+        _ = f_920(15)
         fig = plt.gcf()
         axes = fig.gca()
         self.assertEqual(
@@ -97,13 +97,13 @@ class TestCases(unittest.TestCase):
         """Test the function with invalid `n_pairs` values."""
         random.seed(3)
         with self.assertRaises(ValueError):
-            f_269(27)
+            f_920(27)
         with self.assertRaises(ValueError):
-            f_269(0)
+            f_920(0)
     def test_valid_pairs(self):
         """Verify that the pairs generated are valid and correspond to the expected letter:number format."""
         random.seed(4)
-        ax = f_269(5)
+        ax = f_920(5)
         expected_pairs = ["a:1", "b:2", "c:3", "d:4", "e:5"]
         generated_pairs = [bar.get_label() for bar in ax]
         for expected_pair in expected_pairs:

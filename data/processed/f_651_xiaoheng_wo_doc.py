@@ -1,7 +1,7 @@
 import numpy as np
 import datetime
 
-def f_849(arr):
+def f_620(arr):
     """
     Reverse the order of words separated by. "" in all strings of a numpy array.
 
@@ -17,7 +17,7 @@ def f_849(arr):
 
     Example:
     >>> arr = np.array(['apple.orange', 'red.green.yellow'])
-    >>> reversed_arr = f_849(arr)
+    >>> reversed_arr = f_620(arr)
     >>> print(reversed_arr)
     ['orange.apple' 'yellow.green.red']
     """
@@ -30,41 +30,41 @@ import unittest
 import re
 class TestCases(unittest.TestCase):
     """
-    Define test cases for the f_849 function.
+    Define test cases for the f_620 function.
     """
     
     def test_case_1(self):
         # Test description: 
         # Test reversing of words separated by '.' for a typical input.
         arr = np.array(['apple.orange', 'red.green.yellow'])
-        result = f_849(arr)
+        result = f_620(arr)
         expected = np.array(['orange.apple', 'yellow.green.red'])
         np.testing.assert_array_equal(result, expected)
     def test_case_2(self):
         # Test description: 
         # Test reversing of words separated by '.' for another typical input.
         arr = np.array(['hello.world', 'this.is.a.test'])
-        result = f_849(arr)
+        result = f_620(arr)
         expected = np.array(['world.hello', 'test.a.is.this'])
         np.testing.assert_array_equal(result, expected)
     def test_case_3(self):
         # Test description: 
         # Test input where words are not separated by '.', so they should remain unchanged.
         arr = np.array(['hello', 'world'])
-        result = f_849(arr)
+        result = f_620(arr)
         expected = np.array(['hello', 'world'])
         np.testing.assert_array_equal(result, expected)
     def test_case_4(self):
         # Test description: 
         # Test input with empty strings. The result should also be empty strings.
         arr = np.array(['', ''])
-        result = f_849(arr)
+        result = f_620(arr)
         expected = np.array(['', ''])
         np.testing.assert_array_equal(result, expected)
     def test_case_5(self):
         # Test description: 
         # Test reversing of words with a mix of uppercase and lowercase letters.
         arr = np.array(['OpenAI.GPT', 'GPT-4.is.amazing'])
-        result = f_849(arr)
+        result = f_620(arr)
         expected = np.array(['GPT.OpenAI', 'amazing.is.GPT-4'])
         np.testing.assert_array_equal(result, expected)

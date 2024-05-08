@@ -4,7 +4,7 @@ import string
 # Constants
 LETTERS = string.ascii_letters
 
-def f_466(num_words, word_length):
+def f_684(num_words, word_length):
     """
     Create a list of random words of a certain length.
 
@@ -20,7 +20,7 @@ def f_466(num_words, word_length):
     - string
 
     Example:
-    >>> f_466(5, 3)
+    >>> f_684(5, 3)
     ['Ohb', 'Vrp', 'oiV', 'gRV', 'IfL']
     """
     if num_words < 0 or word_length < 0:
@@ -37,7 +37,7 @@ class TestCases(unittest.TestCase):
         This test case checks if the function correctly generates a list of words where each word has the specified length.
         It ensures that the length of the returned list and the length of each word in the list are correct.
         """
-        result = f_466(5, 3)
+        result = f_684(5, 3)
         self.assertEqual(len(result), 5, "The length of the returned list is incorrect.")
         for word in result:
             self.assertEqual(len(word), 3, "The length of a word in the list is incorrect.")
@@ -48,7 +48,7 @@ class TestCases(unittest.TestCase):
         This test case checks the function's behavior when no words are requested.
         The function should return an empty list in this scenario.
         """
-        result = f_466(0, 3)
+        result = f_684(0, 3)
         self.assertEqual(result, [], "The function should return an empty list when num_words is 0.")
     
     def test_zero_length(self):
@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
         This test case checks the function's behavior when the requested word length is 0.
         The function should return a list of empty strings in this scenario.
         """
-        result = f_466(5, 0)
+        result = f_684(5, 0)
         self.assertEqual(result, [''] * 5, "The function should return a list of empty strings when word_length is 0.")
     
     def test_negative_values(self):
@@ -67,9 +67,9 @@ class TestCases(unittest.TestCase):
         The function should raise a ValueError in this scenario.
         """
         with self.assertRaises(ValueError):
-            f_466(5, -3)
+            f_684(5, -3)
         with self.assertRaises(ValueError):
-            f_466(-5, -3)
+            f_684(-5, -3)
     
     def test_non_integer_inputs(self):
         """
@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
         The function should raise a TypeError in this scenario.
         """
         with self.assertRaises(TypeError, msg="The function should raise a TypeError for non-integer values"):
-            f_466(5.5, 3)
+            f_684(5.5, 3)
         
         with self.assertRaises(TypeError, msg="The function should raise a TypeError for non-integer values"):
-            f_466(5, "3")
+            f_684(5, "3")

@@ -2,7 +2,7 @@ import os
 import re
 import hashlib
 
-def f_641(path, delimiter):
+def f_991(path, delimiter):
     """
     Splits a file path by a specified delimiter, retaining the delimiter in the output, and computes the hash of each component if it is a file.
     
@@ -20,7 +20,7 @@ def f_641(path, delimiter):
     - hashlib
 
     Example:
-    >>> f_641("Docs/src/file.txt", "/")
+    >>> f_991("Docs/src/file.txt", "/")
     [('Docs', None), ('/', None), ('src', None), ('/', None), ('file.txt', 'hash_value')]
     """
     path_components = re.split(f'({delimiter})', path)
@@ -55,33 +55,33 @@ class TestCases(unittest.TestCase):
         os.rmdir(self.test_dir)
     def test_simple_path_without_files(self):
         # Test splitting a path without any files
-        result = f_641("Docs/src/", "/")
+        result = f_991("Docs/src/", "/")
         expected = [('Docs', None), ('/', None), ('src', None), ('/', None)]
         self.assertEqual(result, expected)
     def test_path_with_file_but_no_hashing(self):
         # Test splitting a path with a file, assuming file does not exist for hashing
-        result = f_641("Docs/src/file.txt", "/")
+        result = f_991("Docs/src/file.txt", "/")
         expected = [('Docs', None), ('/', None), ('src', None), ('/', None), ('file.txt', None)]
         self.assertEqual(result, expected)
     def test_complex_path_with_no_files(self):
         # Test a more complex path with multiple directories and no files
-        result = f_641("Dir1/file1/Dir2/file2.txt", "/")
+        result = f_991("Dir1/file1/Dir2/file2.txt", "/")
         expected = [('Dir1', None), ('/', None), ('file1', None), ('/', None), ('Dir2', None), ('/', None), ('file2.txt', None)]
         self.assertEqual(result, expected)
     def test_path_with_non_standard_delimiter(self):
         # Test path splitting using a non-standard delimiter
-        result = f_641(f"Dir1-file1-{self.test_file1}-file2.txt", "-")
+        result = f_991(f"Dir1-file1-{self.test_file1}-file2.txt", "-")
         expected = [('Dir1', None), ('-', None), ('file1', None), ('-', None), (self.test_file1, hashlib.sha256(open(self.test_file1, 'rb').read()).hexdigest()), ('-', None), ('file2.txt', None)]
         self.assertEqual(result, expected)
     def test_empty_path(self):
         # Test an empty path string
-        result = f_641("", "/")
+        result = f_991("", "/")
         expected = []
         self.assertEqual(result, expected)
     def test_path_with_existing_files(self):
         # Test a path with existing files to check hashing
         path = f"{self.test_file1}####{self.test_file2}"
-        result = f_641(path, "####")
+        result = f_991(path, "####")
         expected = [(self.test_file1, hashlib.sha256(open(self.test_file1, 'rb').read()).hexdigest()),
                     ('####', None),
                     (self.test_file2, hashlib.sha256(open(self.test_file2, 'rb').read()).hexdigest())]

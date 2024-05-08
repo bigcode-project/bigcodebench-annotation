@@ -2,7 +2,7 @@ import collections
 import json
 import requests
 
-def f_259(user, API_URL = 'https://api.github.com/users/'):
+def f_999(user, API_URL = 'https://api.github.com/users/'):
     """
     Retrieves the names of the repositories of a specified GitHub user, sorted in ascending order by their creation date.
 
@@ -22,7 +22,7 @@ def f_259(user, API_URL = 'https://api.github.com/users/'):
     - requests
 
     Example:
-    >>> f_259('octocat')
+    >>> f_999('octocat')
     ['Spoon-Knife', 'Hello-World', 'octocat.github.io']  # Example output, actual results may vary.
     """
     response = requests.get(API_URL + user + '/repos')
@@ -48,29 +48,29 @@ class TestCases(unittest.TestCase):
     def test_case_1(self, mock_get):
         # Test if the function returns a list
         mock_get.return_value = Mock(status_code=200, text=self.mock_response_with_multiple_repos)
-        result = f_259('octocat')
+        result = f_999('octocat')
         self.assertIsInstance(result, list, "The returned value should be a list.")
     @patch('requests.get')
     def test_case_2(self, mock_get):
         # Test for a user with multiple repositories
         mock_get.return_value = Mock(status_code=200, text=self.mock_response_with_multiple_repos)
-        result = f_259('octocat')
+        result = f_999('octocat')
         self.assertTrue(len(result) > 1, "The user 'octocat' should have more than one repository.")
     @patch('requests.get')
     def test_case_3(self, mock_get):
         # Test for a user with no repositories
         mock_get.return_value = Mock(status_code=200, text=self.mock_response_with_no_repos)
-        result = f_259('dummyuserwithnorepos')
+        result = f_999('dummyuserwithnorepos')
         self.assertEqual(len(result), 0, "The user 'dummyuserwithnorepos' should have zero repositories.")
     @patch('requests.get')
     def test_case_4(self, mock_get):
         # Test for a non-existent user
         mock_get.return_value = Mock(status_code=404, text=self.mock_response_with_no_repos)
-        result = f_259('nonexistentuserxyz')
+        result = f_999('nonexistentuserxyz')
         self.assertEqual(len(result), 0, "A non-existent user should have zero repositories.")
     @patch('requests.get')
     def test_case_5(self, mock_get):
         # Test for a user with a single repository
         mock_get.return_value = Mock(status_code=200, text=self.mock_response_with_single_repo)
-        result = f_259('userwithonerepo')
+        result = f_999('userwithonerepo')
         self.assertEqual(len(result), 1, "The user 'userwithonerepo' should have one repository.")

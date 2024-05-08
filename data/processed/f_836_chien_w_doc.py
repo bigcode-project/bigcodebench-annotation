@@ -4,7 +4,7 @@ from scipy import linalg
 import matplotlib.pyplot as plt
 
 
-def f_12(text):
+def f_857(text):
     """
     This code takes a text input, calculates the lengths of the words, 
     and visualizes the distribution of word lengths using a histogram and a KDE curve (if applicable) on a matplotlib subplot.
@@ -25,7 +25,7 @@ def f_12(text):
     - matplotlib
 
     Example:
-    >>> ax = f_12('Hello world! This is a test.')
+    >>> ax = f_857('Hello world! This is a test.')
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
@@ -48,10 +48,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 class TestCases(unittest.TestCase):
-    """Tests for the f_12 function"""
+    """Tests for the f_857 function"""
     def test_simple_sentence(self):
         """Test a simple sentence"""
-        ax1 = f_12("This is a test")
+        ax1 = f_857("This is a test")
         self.assertIsInstance(ax1, plt.Axes)
         # The number of bars might differ due to matplotlib's binning strategy
         unique_word_lengths = {len(word) for word in "This is a test".split() if word}
@@ -61,14 +61,14 @@ class TestCases(unittest.TestCase):
         )
     def test_empty_string(self):
         """Test an empty string"""
-        ax2 = f_12("")
+        ax2 = f_857("")
         self.assertIsInstance(ax2, plt.Axes)
         self.assertEqual(
             len(ax2.patches), 0, "There should be no bars for an empty string"
         )
     def test_special_characters(self):
         """Test special characters and numbers"""
-        ax3 = f_12("Hello, world! 1234")
+        ax3 = f_857("Hello, world! 1234")
         self.assertIsInstance(ax3, plt.Axes)
         # The number of bars might differ due to matplotlib's binning strategy
         unique_word_lengths = {
@@ -80,14 +80,14 @@ class TestCases(unittest.TestCase):
         )
     def test_repeated_words(self):
         """Test repeated words"""
-        ax4 = f_12("repeat repeat repeat")
+        ax4 = f_857("repeat repeat repeat")
         self.assertIsInstance(ax4, plt.Axes)
         # Only one unique word length: 6
         self.assertTrue(len(ax4.patches) >= 1, "Incorrect handling of repeated words")
     def test_long_text(self):
         """Test a long text"""
         text = "A long text with multiple words of different lengths"
-        ax5 = f_12(text)
+        ax5 = f_857(text)
         self.assertIsInstance(ax5, plt.Axes)
         # Adjust expectation for number of bars due to matplotlib's binning
         words = re.split(r"\W+", text)

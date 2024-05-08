@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 
-def f_64(data):
+def f_283(data):
     """Scales numeric columns of a data dictionary using the StandardScaler.
 
     This function scales the numeric columns of a dataframe using the StandardScaler from scikit-learn.
@@ -20,14 +20,14 @@ def f_64(data):
     - pd.DataFrame: Dataframe with scaled numeric columns.
 
     Example:
-    >>> result = f_64({'x': [10, 20, 30, 40]})
+    >>> result = f_283({'x': [10, 20, 30, 40]})
     >>> result
               x
     0 -1.341641
     1 -0.447214
     2  0.447214
     3  1.341641
-    >>> result2 = f_64({'a': [10.5, 23.4, 15.6, 78.9],'b': [45.6, 67.8, 89.0, 12.3],'c': ['apple', 'banana', 'cherry', 'date']})
+    >>> result2 = f_283({'a': [10.5, 23.4, 15.6, 78.9],'b': [45.6, 67.8, 89.0, 12.3],'c': ['apple', 'banana', 'cherry', 'date']})
     >>> result2
               a         b       c
     0 -0.788098 -0.284409   apple
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             data
         )
-        result = f_64(data)
+        result = f_283(data)
         # Checking if the mean of scaled columns is approximately 0 and standard deviation is approximately 1
         self.assertTrue(np.isclose(result["a"].mean(), 0, atol=1e-7))
         self.assertTrue(np.isclose(result["b"].mean(), 0, atol=1e-7))
@@ -78,7 +78,7 @@ class TestCases(unittest.TestCase):
         # Creating an empty dataframe
         data = {}
         df = pd.DataFrame(data)
-        result = f_64(data)
+        result = f_283(data)
         # Ensuring the result is also an empty dataframe
         self.assertTrue(result.empty)
     def test_case_3(self):
@@ -86,7 +86,7 @@ class TestCases(unittest.TestCase):
         # Creating a dataframe with a single non-numeric column
         data = {"c": ["foo", "bar"]}
         df = pd.DataFrame(data)
-        result = f_64(data)
+        result = f_283(data)
         # Ensuring the output dataframe is unchanged
         pd.testing.assert_frame_equal(result, df, check_dtype=False)
     def test_case_4(self):
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             data
         )
-        result = f_64(data)
+        result = f_283(data)
         # Checking if the mean of scaled columns is approximately 0 and standard deviation is approximately 1
         self.assertTrue(np.isclose(result["a"].mean(), 0, atol=1e-7))
         self.assertTrue(np.isclose(result["b"].mean(), 0, atol=1e-7))
@@ -107,7 +107,7 @@ class TestCases(unittest.TestCase):
         # Creating a dataframe with a single row and three columns
         data = {"a": [5.5], "b": [8.6], "c": [7.7]}
         df = pd.DataFrame(data)
-        result = f_64(data)
+        result = f_283(data)
         self.assertDictEqual(result.to_dict(), {'a': {0: 0.0}, 'b': {0: 0.0}, 'c': {0: 0.0}})
     def test_case_6(self):
         """Test with a DataFrame with mixed datatypes."""
@@ -120,7 +120,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             data
         )
-        result = f_64(data)
+        result = f_283(data)
         # Checking if the mean of scaled columns is approximately 0 and standard deviation is approximately 1
         self.assertTrue(np.isclose(result["a"].mean(), 0, atol=1e-7))
         self.assertTrue(np.isclose(result["b"].mean(), 0, atol=1e-7))
@@ -133,7 +133,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame(
             data
         )
-        result = f_64(data)
+        result = f_283(data)
         # Checking if the mean of scaled columns is approximately 0 and standard deviation is approximately 1
         self.assertTrue(np.isclose(result["a"].mean(), 0, atol=1e-7))
         self.assertTrue(np.isclose(result["b"].mean(), 0, atol=1e-7))

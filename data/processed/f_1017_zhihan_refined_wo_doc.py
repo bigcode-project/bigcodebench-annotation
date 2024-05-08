@@ -2,7 +2,7 @@ import subprocess
 import psutil
 import time
 
-def f_587(process_name: str) -> str:
+def f_17(process_name: str) -> str:
     '''
     Check if a particular process is running based on its name. If it is not running, start it using the process name as a command. 
     If it is running, terminate the process and restart it by executing the process name as a command.
@@ -21,10 +21,10 @@ def f_587(process_name: str) -> str:
     - time
 
     Example:
-    >>> f_587('notepad')
+    >>> f_17('notepad')
     "Process not found. Starting notepad."
     OR
-    >>> f_587('notepad')
+    >>> f_17('notepad')
     "Process found. Restarting notepad."
     '''
     is_running = any([proc for proc in psutil.process_iter() if proc.name() == process_name])
@@ -47,7 +47,7 @@ class TestCases(unittest.TestCase):
     def test_process_not_found_starts_process(self, mock_popen, mock_process_iter):
         # Simulating no running process
         mock_process_iter.return_value = []
-        result = f_587('random_non_existent_process')
+        result = f_17('random_non_existent_process')
         self.assertEqual(result, "Process not found. Starting random_non_existent_process.")
         mock_popen.assert_called_once_with('random_non_existent_process')
     @patch('psutil.process_iter')
@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
         process = MagicMock()
         process.name.return_value = 'notepad'
         mock_process_iter.return_value = [process]
-        result = f_587('notepad')
+        result = f_17('notepad')
         self.assertEqual(result, "Process found. Restarting notepad.")
         # Expecting terminate called on the process and then restarted
         process.terminate.assert_called_once()
@@ -71,7 +71,7 @@ class TestCases(unittest.TestCase):
         process1.name.return_value = 'multi_instance'
         process2.name.return_value = 'multi_instance'
         mock_process_iter.return_value = [process1, process2]
-        result = f_587('multi_instance')
+        result = f_17('multi_instance')
         self.assertEqual(result, "Process found. Restarting multi_instance.")
         process1.terminate.assert_called_once()
         process2.terminate.assert_called_once()

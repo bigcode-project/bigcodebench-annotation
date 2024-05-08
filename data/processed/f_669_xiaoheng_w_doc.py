@@ -4,7 +4,7 @@ import random
 # Constants
 ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
-def f_167(l=None):
+def f_656(l=None):
     """
     Create a numeric array from a list "l" and move the first 3 elements to the end of the array.
 
@@ -20,7 +20,7 @@ def f_167(l=None):
 
     Example:
     >>> random.seed(42)
-    >>> f_167()
+    >>> f_656()
     array(['I', 'F', 'G', 'J', 'E', 'A', 'B', 'H', 'D', 'C'], dtype='<U1')
     """
     if l is None:
@@ -39,7 +39,7 @@ class TestCases(unittest.TestCase):
         # Test Case 1: Default Input
         # Description: This test case checks the function's behavior with its default settings.
         # The random seed is set to ensure reproducibility.
-        result = f_167()
+        result = f_656()
         expected_output = ['I', 'F', 'G', 'J', 'E', 'A', 'B', 'H', 'D', 'C']
         self.assertEqual(result.tolist(), expected_output)
     def test_custom_list_input(self):
@@ -47,26 +47,26 @@ class TestCases(unittest.TestCase):
         # Description: This test case checks the function's behavior with a custom list of elements.
         # The random seed is set to ensure reproducibility.
         input_list = ['X', 'Y', 'Z', 'W', 'V', 'U']
-        result = f_167(input_list)
+        result = f_656(input_list)
         expected_output = ['V', 'X', 'U', 'W', 'Y', 'Z']  # Corrected based on actual shuffle and cycle
         self.assertEqual(result.tolist(), expected_output)
     def test_empty_list(self):
         # Test Case 3: Empty List
         # Description: This test case checks the function's behavior when an empty list is provided as input.
         # The random seed is set to ensure reproducibility, though it doesn't affect the outcome in this case.
-        result = f_167([])
+        result = f_656([])
         self.assertEqual(len(result), 0)
     def test_single_element_list(self):
         # Test Case 4: Single Element List
         # Description: This test case checks the function's behavior with a single element list.
         # The random seed is set to ensure reproducibility.
-        result = f_167(['X'])
+        result = f_656(['X'])
         expected_output = ['X']
         self.assertEqual(result.tolist(), expected_output)
     def test_three_elements_list(self):
         # Test Case 5: Three Elements List
         # Description: This test case checks the function's behavior with a three element list.
         # The random seed is set to ensure reproducibility.
-        result = f_167(['Y', 'X', 'Z'])
+        result = f_656(['Y', 'X', 'Z'])
         expected_output = ['X', 'Y', 'Z']  # Corrected based on actual shuffle and cycle
         self.assertEqual(result.tolist(), expected_output)

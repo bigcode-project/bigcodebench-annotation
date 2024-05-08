@@ -1,7 +1,7 @@
 import os
 import random
 
-def f_159(directory, n_files):
+def f_536(directory, n_files):
     """
     Create n random txt files in a specific directory, write only a single digit random integer into each file, and then reset the cursor to the beginning of each file.
     The file names start from 'file_1.txt' and increment by 1 for each file.
@@ -19,7 +19,7 @@ def f_159(directory, n_files):
 
     Example:
     >>> random.seed(2)
-    >>> f_159('/path/to/directory', 5)
+    >>> f_536('/path/to/directory', 5)
     5
     """
     if not os.path.exists(directory):
@@ -40,7 +40,7 @@ class TestCases(unittest.TestCase):
         if not os.path.exists(dir):
             os.makedirs(dir)
         # Run function
-        n = f_159(dir, n_files)
+        n = f_536(dir, n_files)
         # Check files
         self.assertEqual(n, n_files)
         read_data = []

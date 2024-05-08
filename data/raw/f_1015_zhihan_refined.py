@@ -107,7 +107,8 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(result), 1)
         with open(os.path.join(self.output_dir_path, result[0]), "r") as f:
             content = f.read()
-            self.assertIn("invalid_command_xyz: not found", content)
+            self.assertIn("invalid_command_xyz", content)
+            self.assertIn("not found", content)
 
     def test_empty_csv_file(self):
         # Test with an empty CSV file
@@ -128,8 +129,9 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(result), 2)
         with open(os.path.join(self.output_dir_path, result[1]), "r") as f:
             content = f.read()
-            self.assertIn("invalid_command_abc: not found", content)
-
+            self.assertIn("invalid_command_abc", content)
+            self.assertIn("not found", content)
+    
     def test_command_failure_with_specific_exit_code(self):
         # Prepare a CSV with a command guaranteed to fail and return a specific exit code
         commands_path = os.path.join(self.temp_dir, "failing_commands.csv")

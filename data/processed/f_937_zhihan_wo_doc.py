@@ -1,7 +1,7 @@
 import ast
 import re
 
-def f_758(text_file: str) -> list:
+def f_957(text_file: str) -> list:
     """
     Extract all string representations of dictionaries from a text file using regular expressions and 
     convert them to Python dictionaries.
@@ -35,7 +35,7 @@ import os
 import shutil
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.test_dir = 'testdir_f_758'
+        self.test_dir = 'testdir_f_957'
         os.makedirs(self.test_dir, exist_ok=True)
         
         f = open(self.test_dir+"/sample.txt","w")
@@ -58,22 +58,22 @@ class TestCases(unittest.TestCase):
         # Clean up the test directory
         shutil.rmtree(self.test_dir)
     def test_case_1(self):
-        result = f_758(self.test_dir+"/sample.txt")
+        result = f_957(self.test_dir+"/sample.txt")
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0], {'key1': 'value1'})
         self.assertEqual(result[1], {'key2': 'value2'})
     def test_case_2(self):
-        result = f_758(self.test_dir+"/another_sample.txt")
+        result = f_957(self.test_dir+"/another_sample.txt")
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0], {'name': 'John', 'age': 30})
         self.assertEqual(result[1], {'name': 'Jane', 'age': 25})
     def test_case_3(self):
-        result = f_758(self.test_dir+"/empty.txt")
+        result = f_957(self.test_dir+"/empty.txt")
         self.assertEqual(len(result), 0)
     def test_case_4(self):
-        result = f_758(self.test_dir+"/no_dicts.txt")
+        result = f_957(self.test_dir+"/no_dicts.txt")
         self.assertEqual(len(result), 0)
     def test_case_5(self):
-        result = f_758(self.test_dir+"/nested_dicts.txt")
+        result = f_957(self.test_dir+"/nested_dicts.txt")
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0], {'outer': {'inner': 'value'}})

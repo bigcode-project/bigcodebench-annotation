@@ -2,7 +2,7 @@ import re
 import os
 import subprocess
 
-def f_548(dir_path, exe_pattern, execute_files=True):
+def f_674(dir_path, exe_pattern, execute_files=True):
     """
     Searches for executable files in a specified directory that match a given regular expression pattern.
     Optionally executes any matching files and returns a list of standard outputs from the executed files
@@ -27,9 +27,9 @@ def f_548(dir_path, exe_pattern, execute_files=True):
     - subprocess
     
     Example:
-    >>> f_548("C:\\SomeDir", r"(?<!Distillr)\\AcroTray\.exe")
+    >>> f_674("C:\\SomeDir", r"(?<!Distillr)\\AcroTray\.exe")
     []
-    >>> f_548("C:\\SomeDir", r"(?<!Distillr)\\AcroTray\.exe", execute_files=False)
+    >>> f_674("C:\\SomeDir", r"(?<!Distillr)\\AcroTray\.exe", execute_files=False)
     []
     """
     results = []
@@ -53,21 +53,21 @@ class TestCases(unittest.TestCase):
         mock_walk.return_value = [
             (os.path.normpath("C:\\TestDir"), [], ["test_file.exe"])
         ]
-        found_files = f_548("C:\\TestDir", r"test_file\.exe", execute_files=False)
+        found_files = f_674("C:\\TestDir", r"test_file\.exe", execute_files=False)
         found_files = [os.path.normpath(path) for path in found_files]
         self.assertEqual(len(found_files), 1)
         self.assertNotIn(os.path.normpath("C:\\TestDir\\test_file.exe"), found_files)
     @patch('os.walk')
     def test_invalid_directory(self, mock_walk):
         mock_walk.return_value = []
-        found_files = f_548("C:\\InvalidDir", r"test_pattern", execute_files=False)
+        found_files = f_674("C:\\InvalidDir", r"test_pattern", execute_files=False)
         self.assertEqual(found_files, [])
     @patch('os.walk')
     def test_no_matching_files(self, mock_walk):
         mock_walk.return_value = [
             (os.path.normpath("C:\\TestDir"), [], ["unrelated_file.txt"])
         ]
-        found_files = f_548("C:\\TestDir", r"no_match_pattern", execute_files=False)
+        found_files = f_674("C:\\TestDir", r"no_match_pattern", execute_files=False)
         self.assertEqual(found_files, [])
     @patch('os.walk')
     @patch('subprocess.run')
@@ -78,14 +78,14 @@ class TestCases(unittest.TestCase):
         mock_result = MagicMock()
         mock_result.stdout = b'Execution Result'
         mock_run.return_value = mock_result
-        outputs = f_548("C:\\TestDir", r"test_file\.exe", execute_files=True)
+        outputs = f_674("C:\\TestDir", r"test_file\.exe", execute_files=True)
         self.assertEqual(outputs, ["Execution Result"])
     @patch('os.walk')
     def test_special_characters_in_pattern(self, mock_walk):
         mock_walk.return_value = [
             (os.path.normpath("C:\\TestDir"), [], ["special$file.exe"])
         ]
-        found_files = f_548("C:\\TestDir", r"special\$file\.exe", execute_files=False)
+        found_files = f_674("C:\\TestDir", r"special\$file\.exe", execute_files=False)
         found_files = [os.path.normpath(path) for path in found_files]
         self.assertEqual(len(found_files), 1)
         self.assertNotIn(os.path.normpath("C:\\TestDir\\special$file.exe"), found_files)

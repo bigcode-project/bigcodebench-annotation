@@ -1,7 +1,7 @@
 from collections import defaultdict
 from random import randint
 
-def f_780(dict1):
+def f_978(dict1):
     """
     Create a dictionary of employee data for departments starting with 'EMP$$'. 
     The keys are department codes and the values are lists of the salaries of employees in that department.
@@ -20,7 +20,7 @@ def f_780(dict1):
     >>> import random
     >>> random.seed(0)
     >>> d = {'EMP$$1': 10, 'MAN$$1': 5, 'EMP$$2': 8, 'HR$$1': 7}
-    >>> emp_data = f_780(d)
+    >>> emp_data = f_978(d)
     >>> print(emp_data.keys())
     dict_keys(['EMP$$1', 'EMP$$2'])
     """
@@ -38,7 +38,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         d = {'EMP$$1': 10, 'MAN$$1': 5, 'EMP$$2': 8, 'HR$$1': 7}
         random.seed(0)
-        emp_data = f_780(d)
+        emp_data = f_978(d)
         self.assertIn('EMP$$1', emp_data)
         self.assertIn('EMP$$2', emp_data)
         self.assertNotIn('MAN$$1', emp_data)
@@ -48,20 +48,20 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         d = {'EMP$$A': 5, 'DEV$$A': 5}
         random.seed(0)
-        emp_data = f_780(d)
+        emp_data = f_978(d)
         self.assertIn('EMP$$A', emp_data)
         self.assertNotIn('DEV$$A', emp_data)
         self.assertEqual(len(emp_data['EMP$$A']), 5)
     def test_case_3(self):
         d = {'MAN$$1': 5, 'HR$$1': 7}
         random.seed(0)
-        emp_data = f_780(d)
+        emp_data = f_978(d)
         self.assertNotIn('MAN$$1', emp_data)
         self.assertNotIn('HR$$1', emp_data)
     def test_case_4(self):
         d = {'EMP$$X': 0, 'EMP$$Y': 10}
         random.seed(0)
-        emp_data = f_780(d)
+        emp_data = f_978(d)
         self.assertIn('EMP$$X', emp_data)
         self.assertIn('EMP$$Y', emp_data)
         self.assertEqual(len(emp_data['EMP$$X']), 0)
@@ -69,5 +69,5 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         random.seed(0)
         d = {}
-        emp_data = f_780(d)
+        emp_data = f_978(d)
         self.assertEqual(emp_data, {})

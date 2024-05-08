@@ -3,7 +3,7 @@ import urllib.parse
 import ssl
 import socket
 
-def f_802(myString):
+def f_987(myString):
     """
     Extracts all URLs from a string and retrieves the domain and the expiration date of the SSL certificate 
     for each HTTPS URL. Only HTTPS URLs are processed; HTTP URLs are ignored. The function handles SSL errors 
@@ -25,7 +25,7 @@ def f_802(myString):
     - socket
     
     Example:
-    >>> f_802("Check these links: https://www.google.com, https://www.python.org")
+    >>> f_987("Check these links: https://www.google.com, https://www.python.org")
     {'www.google.com': '2023-06-15 12:00:00', 'www.python.org': '2023-07-20 12:00:00'}
     """
     urls = re.findall(r'https://[^\s,]+', myString)
@@ -71,38 +71,38 @@ class TestCases(unittest.TestCase):
         """Test extracting SSL expiry from properly formatted HTTPS URLs."""
         self.mock_ssl_socket.getpeercert.return_value = {'notAfter': '2023-06-15 12:00:00'}
         input_str = "https://www.google.com, https://www.python.org"
-        result = f_802(input_str)
+        result = f_987(input_str)
         expected = {'www.google.com': '2023-06-15 12:00:00', 'www.python.org': '2023-06-15 12:00:00'}
         self.assertEqual(result, expected)
     def test_urls_with_ports_and_queries(self):
         """Test HTTPS URLs that include port numbers and query strings."""
         self.mock_ssl_socket.getpeercert.return_value = {'notAfter': '2023-06-15 12:00:00'}
         input_str = "https://www.example.com:8080/page?query=test, https://api.example.org/data?info=value"
-        result = f_802(input_str)
+        result = f_987(input_str)
         expected = {'www.example.com:8080': '2023-06-15 12:00:00', 'api.example.org': '2023-06-15 12:00:00'}
         self.assertEqual(result, expected)
     def test_no_urls(self):
         """Test input with no URLs resulting in an empty dictionary."""
-        result = f_802("No links here!")
+        result = f_987("No links here!")
         self.assertEqual(result, {})
     def test_mixed_url_schemes(self):
         """Test input with mixed HTTP and HTTPS URLs; only HTTPS URLs are processed."""
         # Configure the mock to return SSL certificate details only for HTTPS URLs
         self.mock_ssl_socket.getpeercert.return_value = {'notAfter': '2023-06-15 12:00:00'}
         input_str = "http://www.google.com, https://www.python.org"
-        result = f_802(input_str)
+        result = f_987(input_str)
         expected = {'www.python.org': '2023-06-15 12:00:00'}
         self.assertEqual(result, expected)
     def test_invalid_ssl_certificate(self):
         """Test handling of an SSL error like an expired certificate, expecting the domain to be skipped."""
         self.mock_ssl_socket.getpeercert.side_effect = ssl.SSLError("Certificate has expired")
         input_str = "https://expired.example.com"
-        result = f_802(input_str)
+        result = f_987(input_str)
         self.assertNotIn('expired.example.com', result)
     def test_https_with_ssl_errors(self):
         """Test multiple HTTPS URLs where one has SSL errors, expecting only the valid SSL data to be returned."""
         self.mock_ssl_socket.getpeercert.side_effect = [ssl.SSLError("Certificate has expired"), {'notAfter': '2023-07-20 12:00:00'}]
         input_str = "https://badssl.com, https://goodssl.com"
-        result = f_802(input_str)
+        result = f_987(input_str)
         expected = {'goodssl.com': '2023-07-20 12:00:00'}
         self.assertEqual(result, expected)

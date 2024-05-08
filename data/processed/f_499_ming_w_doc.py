@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def f_659(num_teams=5, num_games=100):
+def f_501(num_teams=5, num_games=100):
     """
     Create a Pandas DataFrame that displays the random scores of different teams in multiple games.
     The function generates random scores for each game played by each team and populates them in
@@ -20,7 +20,7 @@ def f_659(num_teams=5, num_games=100):
     - numpy
 
     Example:
-    >>> df = f_659(num_teams=3, num_games=10)
+    >>> df = f_501(num_teams=3, num_games=10)
     >>> type(df)
     <class 'pandas.core.frame.DataFrame'>
     """
@@ -33,20 +33,20 @@ def f_659(num_teams=5, num_games=100):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = f_659()
+        df = f_501()
         self.assertEqual(df.shape, (5, 100))
     def test_case_2(self):
-        df = f_659(num_teams=3, num_games=10)
+        df = f_501(num_teams=3, num_games=10)
         self.assertEqual(df.shape, (3, 10))
         
     def test_case_3(self):
-        df = f_659(num_teams=4, num_games=20)
+        df = f_501(num_teams=4, num_games=20)
         self.assertListEqual(list(df.index), ['Team1', 'Team2', 'Team3', 'Team4'])
         
     def test_case_4(self):
-        df = f_659(num_teams=2, num_games=5)
+        df = f_501(num_teams=2, num_games=5)
         self.assertListEqual(list(df.columns), ['Game1', 'Game2', 'Game3', 'Game4', 'Game5'])
         
     def test_case_5(self):
-        df = f_659(num_teams=2, num_games=5)
+        df = f_501(num_teams=2, num_games=5)
         self.assertTrue((df.dtypes == 'int64').all())

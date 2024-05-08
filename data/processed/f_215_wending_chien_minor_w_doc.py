@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from random import randint
 
 
-def f_480(num_types=5, integer_range=(0, 100)):
+def f_125(num_types=5, integer_range=(0, 100)):
     """
     Generate a DataFrame containing random integer values across a specified number of categories,
     and visualize these data as a horizontal stacked bar chart.
@@ -25,7 +25,7 @@ def f_480(num_types=5, integer_range=(0, 100)):
     data segmented by category.
 
     Example:
-    >>> fig, ax = f_480(3, (0, 50))
+    >>> fig, ax = f_125(3, (0, 50))
     >>> isinstance(fig, plt.Figure)
     True
     """
@@ -40,17 +40,17 @@ import matplotlib
 matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        fig, ax = f_480()
+        fig, ax = f_125()
         self.assertEqual(len(ax.patches), 25)
     def test_case_2(self):
-        fig, ax = f_480(3, (0, 50))
+        fig, ax = f_125(3, (0, 50))
         self.assertEqual(len(ax.patches), 9)
     def test_case_3(self):
-        fig, ax = f_480(10)
+        fig, ax = f_125(10)
         self.assertEqual(len(ax.patches), 100)
     def test_case_4(self):
-        fig, ax = f_480(1, (10, 20))
+        fig, ax = f_125(1, (10, 20))
         self.assertEqual(len(ax.patches), 1)
     def test_case_5(self):
-        fig, ax = f_480(2, (5, 15))
+        fig, ax = f_125(2, (5, 15))
         self.assertEqual(len(ax.patches), 4)

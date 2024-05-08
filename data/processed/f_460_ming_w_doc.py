@@ -2,7 +2,7 @@ import pandas as pd
 import time
 
 
-def f_295(df, letter):
+def f_461(df, letter):
     """
     The function filters rows in a dict of list in which the values of the 'Word' column begin with a specified letter.
     It first convert the dict to Datafrome, then calculates the length of the words in the filtered column and returns
@@ -21,7 +21,7 @@ def f_295(df, letter):
 
     Example:
     >>> df = {'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'kiwi']}
-    >>> f_295(df, 'a')
+    >>> f_461(df, 'a')
     {5: 1}
     """
     start_time = time.time()
@@ -38,26 +38,26 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = {'Word': ['apple', 'banana', 'cherry', 'date', 'elephant', 'fig', 'grape', 'kiwi']}
-        result = f_295(df, 'a')
+        result = f_461(df, 'a')
         expected_result = {5: 1}
         self.assertDictEqual(result, expected_result)
     def test_case_2(self):
         df = {'Word': ['cat', 'dog', 'elephant', 'fish', 'goose']}
-        result = f_295(df, 'e')
+        result = f_461(df, 'e')
         expected_result = {8: 1}
         self.assertDictEqual(result, expected_result)
     def test_case_3(self):
         df = {'Word': ['kiwi', 'lemon', 'mango', 'nectarine', 'orange']}
-        result = f_295(df, 'm')
+        result = f_461(df, 'm')
         expected_result = {5: 1}
         self.assertDictEqual(result, expected_result)
     def test_case_4(self):
         df = {'Word': ['apple', 'banana', 'cherry', 'date', 'elephant', 'fig', 'grape', 'kiwi']}
-        result = f_295(df, 'z')
+        result = f_461(df, 'z')
         expected_result = {}
         self.assertDictEqual(result, expected_result)
     def test_case_5(self):
         df = {'Word': ['zebra', 'zoo', 'zucchini']}
-        result = f_295(df, 'z')
+        result = f_461(df, 'z')
         expected_result = {5: 1, 3: 1, 8: 1}
         self.assertDictEqual(result, expected_result)

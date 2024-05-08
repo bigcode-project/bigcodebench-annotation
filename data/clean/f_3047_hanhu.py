@@ -3,7 +3,7 @@ import math
 
 def calculate_factorial(number: int) -> tuple:
     return number, math.factorial(number)
-
+    
 def f_3049(numbers: list) -> dict:
     """
     Calculate factorials for a list of numbers in parallel using multiprocessing.

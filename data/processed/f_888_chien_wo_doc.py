@@ -4,7 +4,7 @@ from datetime import datetime
 # Constants
 ROOMS = ["Room1", "Room2", "Room3", "Room4", "Room5"]
 
-def f_418(date_str, booking_data):
+def f_908(date_str, booking_data):
     """
     This function generates a status report of room bookings for a specified date
     and displays a bar plot representing the booking statuses of various rooms.
@@ -33,7 +33,7 @@ def f_418(date_str, booking_data):
     Example:
     >>> future_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
     >>> booking_info = {"Room1": "Booked", "Room2": "Available"}
-    >>> report_df, ax = f_418(future_date, booking_info)
+    >>> report_df, ax = f_908(future_date, booking_info)
     >>> print(report_df)
         Room Booking Status
     0  Room1         Booked
@@ -62,47 +62,47 @@ import pandas as pd
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for f_418"""
+    """Test cases for f_908"""
     def test_future_date_valid_booking_data(self):
         """
-        Test f_418 with a future date and valid booking data.
+        Test f_908 with a future date and valid booking data.
         """
         future_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
         booking_data = {"Room1": "Booked", "Room2": "Available"}
-        report_df, _ = f_418(future_date, booking_data)
+        report_df, _ = f_908(future_date, booking_data)
         self.assertIn("Room1", report_df["Room"].values)
         self.assertIn("Booked", report_df["Booking Status"].values)
     def test_past_date(self):
         """
-        Test f_418 with a past date to ensure it raises a ValueError.
+        Test f_908 with a past date to ensure it raises a ValueError.
         """
         past_date = "2020-01-01"
         booking_data = {"Room1": "Booked"}
         with self.assertRaises(ValueError):
-            f_418(past_date, booking_data)
+            f_908(past_date, booking_data)
     def test_invalid_date_format(self):
         """
-        Test f_418 with an invalid date format to check for ValueError.
+        Test f_908 with an invalid date format to check for ValueError.
         """
         invalid_date = "15-06-2023"
         booking_data = {"Room1": "Booked"}
         with self.assertRaises(ValueError):
-            f_418(invalid_date, booking_data)
+            f_908(invalid_date, booking_data)
     def test_booking_data_for_nonexistent_room(self):
         """
-        Test f_418 with booking data for a room not in the ROOMS constant.
+        Test f_908 with booking data for a room not in the ROOMS constant.
         """
         future_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
         booking_data = {"Room6": "Booked"}
-        report_df, _ = f_418(future_date, booking_data)
+        report_df, _ = f_908(future_date, booking_data)
         self.assertIn("Not Listed", report_df["Booking Status"].values)
     def test_no_booking_data(self):
         """
-        Test f_418 with no booking data provided.
+        Test f_908 with no booking data provided.
         """
         future_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
         booking_data = {}
-        report_df, _ = f_418(future_date, booking_data)
+        report_df, _ = f_908(future_date, booking_data)
         self.assertTrue((report_df["Booking Status"] == "Not Listed").all())
     def tearDown(self):
         plt.clf()

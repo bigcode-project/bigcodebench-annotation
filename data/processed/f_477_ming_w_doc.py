@@ -8,7 +8,7 @@ TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 PENALTY_COST = 1000  # in dollars
 
 
-def f_343(goals, penalties, teams=TEAMS, penalty_cost=PENALTY_COST, rng_seed=None):
+def f_479(goals, penalties, teams=TEAMS, penalty_cost=PENALTY_COST, rng_seed=None):
     """
     Generate a Dataframe to show the football match results of teams 'Team' with random goals 'Goals' and
     penalties 'Penalty Cost', and create a bar plot of the results. Penalties are converted into fines according to the
@@ -32,7 +32,7 @@ def f_343(goals, penalties, teams=TEAMS, penalty_cost=PENALTY_COST, rng_seed=Non
 
     Example:
     >>> seed(42)  # Setting seed for reproducibility
-    >>> df, ax = f_343(5, 3, rng_seed=42)
+    >>> df, ax = f_479(5, 3, rng_seed=42)
     >>> isinstance(df, pd.DataFrame) and 'Team' in df.columns and 'Goals' in df.columns and 'Penalty Cost' in df.columns
     True
     >>> all(df['Goals'] <= 5) and all(df['Penalty Cost'] <= 3000)  # Goals and penalties are within expected range
@@ -58,31 +58,31 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_positive_outcomes(self):
         """Test the function with positive goals and penalties."""
-        df, _ = f_343(5, 3, rng_seed=42)
+        df, _ = f_479(5, 3, rng_seed=42)
         # Check if the DataFrame is not empty and has the correct columns
         self.assertFalse(df.empty)
         self.assertListEqual(list(df.columns), ['Team', 'Goals', 'Penalty Cost'])
     def test_zero_goals_penalties(self):
         """Test the function with zero goals and penalties."""
-        df, _ = f_343(0, 0, teams=['Team A'], rng_seed=42)
+        df, _ = f_479(0, 0, teams=['Team A'], rng_seed=42)
         # Check that goals and penalty costs are 0
         self.assertTrue((df['Goals'] == 0).all())
         self.assertTrue((df['Penalty Cost'] == 0).all())
     def test_negative_input(self):
         """Ensure negative inputs are treated as positive."""
-        df, _ = f_343(-5, -3, rng_seed=42)
+        df, _ = f_479(-5, -3, rng_seed=42)
         # Check for absence of negative values in results
         self.assertFalse((df['Goals'] < 0).any())
         self.assertFalse((df['Penalty Cost'] < 0).any())
     def test_single_team(self):
         """Test with a single team to ensure correct results."""
-        df, _ = f_343(10, 5, teams=['Solo Team'], rng_seed=42)
+        df, _ = f_479(10, 5, teams=['Solo Team'], rng_seed=42)
         # Ensure only one row exists and contains 'Solo Team'
         self.assertEqual(len(df), 1)
         self.assertEqual(df.iloc[0]['Team'], 'Solo Team')
     def test_custom_penalty_cost(self):
         """Test the function with a custom penalty cost."""
         custom_cost = 500
-        df, _ = f_343(5, 3, penalty_cost=custom_cost, rng_seed=42)
+        df, _ = f_479(5, 3, penalty_cost=custom_cost, rng_seed=42)
         # Validate that the penalty cost calculation uses the custom cost
         self.assertTrue((df['Penalty Cost'] % custom_cost == 0).all() or (df['Penalty Cost'] == 0).all())

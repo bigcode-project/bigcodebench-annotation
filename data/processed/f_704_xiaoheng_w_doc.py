@@ -4,7 +4,7 @@ from random import choice, seed
 # Constants
 POSSIBLE_ITEMS = ['apple', 'banana', 'cherry', 'date', 'elderberry']
 
-def f_196(list_of_lists):
+def f_725(list_of_lists):
     """
     Create a "shopping cart" (Counter object) for each list in list_of_lists. 
     The items in the cart are randomly selected from a predefined list of possible items (POSSIBLE_ITEMS).
@@ -21,7 +21,7 @@ def f_196(list_of_lists):
     - random
 
     Example:
-    >>> baskets = f_196([[1, 2, 3], [4, 5]])
+    >>> baskets = f_725([[1, 2, 3], [4, 5]])
     >>> all(isinstance(basket, Counter) for basket in baskets) # Illustrative, actual items will vary due to randomness
     True
     >>> sum(len(basket) for basket in baskets) # The sum of lengths of all baskets; illustrative example
@@ -41,31 +41,31 @@ from collections import Counter
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Testing with empty list
-        result = f_196([])
+        result = f_725([])
         self.assertEqual(result, [])
     def test_case_2(self):
         # Testing with empty sublists
-        result = f_196([[], [], []])
+        result = f_725([[], [], []])
         for basket in result:
             self.assertEqual(basket, Counter())
         
     def test_case_3(self):
         # Testing with sublists of different lengths
-        result = f_196([[1], [1, 2], [1, 2, 3]])
+        result = f_725([[1], [1, 2], [1, 2, 3]])
         self.assertEqual(len(result), 3)
         self.assertEqual(sum(result[0].values()), 1)
         self.assertEqual(sum(result[1].values()), 2)
         self.assertEqual(sum(result[2].values()), 3)
     def test_case_4(self):
         # Testing with sublists containing the same element
-        result = f_196([[1, 1, 1], [2, 2, 2, 2]])
+        result = f_725([[1, 1, 1], [2, 2, 2, 2]])
         self.assertEqual(len(result), 2)
         self.assertEqual(sum(result[0].values()), 3)
         self.assertEqual(sum(result[1].values()), 4)
         
     def test_case_5(self):
         # Testing with large sublists
-        result = f_196([[1]*100, [2]*200])
+        result = f_725([[1]*100, [2]*200])
         self.assertEqual(len(result), 2)
         self.assertEqual(sum(result[0].values()), 100)
         self.assertEqual(sum(result[1].values()), 200)

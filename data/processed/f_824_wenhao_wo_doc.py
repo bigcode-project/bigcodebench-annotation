@@ -3,7 +3,7 @@ from datetime import datetime
 import random
 
 
-def f_412(start_date, end_date, num_series, seed=None):
+def f_845(start_date, end_date, num_series, seed=None):
     """
     Generates a DataFrame with multiple random integer time series (each ranging
     from 0 to 100) from a start date to an end date, then returns the generated time series
@@ -34,7 +34,7 @@ def f_412(start_date, end_date, num_series, seed=None):
       entry labeled as "series_x" where x is the series number.
 
     Example:
-    >>> df, ax = f_412('2020-01-01', '2020-12-31', 3, 42)
+    >>> df, ax = f_845('2020-01-01', '2020-12-31', 3, 42)
     >>> df.head(2)
                 series_1  series_2  series_3
     2020-01-01        81        67        19
@@ -67,7 +67,7 @@ import warnings
 class TestCases(unittest.TestCase):
     def test_valid_input(self):
         """Tests correct DataFrame structure and plot type with valid inputs."""
-        df, ax = f_412("2022-01-01", "2022-01-10", 2, seed=42)
+        df, ax = f_845("2022-01-01", "2022-01-10", 2, seed=42)
         self.assertIsInstance(df, pd.DataFrame)
         self.assertEqual(df.shape[1], 2)
         self.assertEqual(len(df.index), 10)
@@ -75,35 +75,35 @@ class TestCases(unittest.TestCase):
         self.assertTrue((df <= 100).all().all() and (df >= 0).all().all())
     def test_seed_reproducibility(self):
         """Tests if providing a seed results in reproducible outputs."""
-        df1, _ = f_412("2022-01-01", "2022-01-05", 1, seed=42)
-        df2, _ = f_412("2022-01-01", "2022-01-05", 1, seed=42)
+        df1, _ = f_845("2022-01-01", "2022-01-05", 1, seed=42)
+        df2, _ = f_845("2022-01-01", "2022-01-05", 1, seed=42)
         pd.testing.assert_frame_equal(df1, df2)
         self.assertTrue((df1 <= 100).all().all() and (df1 >= 0).all().all())
     def test_negative_num_series(self):
         """Tests if function raises an error when num_series is less than 1."""
         with self.assertRaises(ValueError):
-            f_412("2022-01-01", "2022-01-10", 0)
+            f_845("2022-01-01", "2022-01-10", 0)
     def test_start_date_after_end_date(self):
         """Tests if function raises an error when start date is after end date."""
         with self.assertRaises(ValueError):
-            f_412("2022-01-10", "2022-01-01", 1)
+            f_845("2022-01-10", "2022-01-01", 1)
     def test_single_day_series(self):
         """Tests DataFrame structure and plot type when start and end dates are the same."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=UserWarning)
-            df, ax = f_412("2022-07-01", "2022-07-01", 1, seed=42)
+            df, ax = f_845("2022-07-01", "2022-07-01", 1, seed=42)
         self.assertEqual(len(df.index), 1)
         self.assertIsInstance(ax, matplotlib.axes._axes.Axes)
         self.assertTrue((df <= 100).all().all() and (df >= 0).all().all())
     def test_multiple_series_names(self):
         """Tests if the generated DataFrame contains correct series names."""
-        df, _ = f_412("2022-01-01", "2022-01-05", 3, seed=42)
+        df, _ = f_845("2022-01-01", "2022-01-05", 3, seed=42)
         expected_columns = ["series_1", "series_2", "series_3"]
         self.assertListEqual(list(df.columns), expected_columns)
         self.assertTrue((df <= 100).all().all() and (df >= 0).all().all())
     def test_plot_attributes(self):
         """Tests the attributes of the plot, including title, x-label, and y-label."""
-        _, ax = f_412("2022-01-01", "2022-01-05", 2, seed=42)
+        _, ax = f_845("2022-01-01", "2022-01-05", 2, seed=42)
         self.assertEqual(ax.get_title(), "Random Time Series")
         self.assertEqual(ax.get_xlabel(), "Date")
         self.assertEqual(ax.get_ylabel(), "Value")

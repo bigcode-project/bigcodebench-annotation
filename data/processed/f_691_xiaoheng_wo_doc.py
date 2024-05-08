@@ -2,7 +2,7 @@ import os
 import shutil
 import csv
 
-def f_293(target_value='332', csv_dir='./csv_files/', processed_dir='./processed_files/', simulate=False):
+def f_700(target_value='332', csv_dir='./csv_files/', processed_dir='./processed_files/', simulate=False):
     """
     Scans a directory for CSV files, finds for each file the index of the row with the first cell equal to the target value,
     and optionally moves the processed files to another directory.
@@ -22,7 +22,7 @@ def f_293(target_value='332', csv_dir='./csv_files/', processed_dir='./processed
     - csv
     
     Example:
-    >>> f_293(target_value='332', csv_dir='./csv_files/', processed_dir='./processed_files/', simulate=True)
+    >>> f_700(target_value='332', csv_dir='./csv_files/', processed_dir='./processed_files/', simulate=True)
     {'file1.csv': 10, 'file2.csv': 15}
     
     The above example assumes that '332' is found at index 10 in 'file1.csv' and index 15 in 'file2.csv' and that the 
@@ -60,7 +60,7 @@ class TestCases(unittest.TestCase):
     @patch('shutil.move')
     def test_file_with_target(self, mock_move, mock_open, mock_listdir):
         """ Test case for files with the target value. """
-        result = f_293(target_value=self.target_value, csv_dir=self.csv_dir,
+        result = f_700(target_value=self.target_value, csv_dir=self.csv_dir,
                        processed_dir=self.processed_dir, simulate=self.simulate)
         self.assertIn('file_with_target.csv', result)
         self.assertEqual(result['file_with_target.csv'], 0)
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
     @patch('shutil.move')
     def test_file_without_target(self, mock_move, mock_open, mock_listdir):
         """ Test case for files without the target value. """
-        result = f_293(target_value=self.target_value, csv_dir=self.csv_dir,
+        result = f_700(target_value=self.target_value, csv_dir=self.csv_dir,
                        processed_dir=self.processed_dir, simulate=self.simulate)
         self.assertNotIn('file_without_target.csv', result)
         mock_move.assert_not_called()
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
     @patch('shutil.move')
     def test_empty_file(self, mock_move, mock_open, mock_listdir):
         """ Test case for an empty CSV file. """
-        result = f_293(target_value=self.target_value, csv_dir=self.csv_dir,
+        result = f_700(target_value=self.target_value, csv_dir=self.csv_dir,
                        processed_dir=self.processed_dir, simulate=self.simulate)
         self.assertNotIn('empty_file.csv', result)
         mock_move.assert_not_called()
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
     @patch('shutil.move')
     def test_file_with_multiple_targets(self, mock_move, mock_open, mock_listdir):
         """ Test case for files with multiple occurrences of the target value. """
-        result = f_293(target_value=self.target_value, csv_dir=self.csv_dir,
+        result = f_700(target_value=self.target_value, csv_dir=self.csv_dir,
                        processed_dir=self.processed_dir, simulate=self.simulate)
         self.assertIn('file_with_multiple_targets.csv', result)
         self.assertEqual(result['file_with_multiple_targets.csv'], 0)
@@ -98,7 +98,7 @@ class TestCases(unittest.TestCase):
     @patch('shutil.move')
     def test_file_with_target_not_first(self, mock_move, mock_open, mock_listdir):
         """ Test case for a file where the target value is not in the first cell. """
-        result = f_293(target_value='332', csv_dir=self.csv_dir,
+        result = f_700(target_value='332', csv_dir=self.csv_dir,
                     processed_dir=self.processed_dir, simulate=self.simulate)
         # This file should not be in the results because '332' is not in the first cell
         self.assertNotIn('file_with_target_not_first.csv', result)

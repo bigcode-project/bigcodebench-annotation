@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 def f_3325(X, Y):
     """
-    This function performs the following operations:
+    This function should:
     - Splits the input data into training (70%) and test (30%) sets.
     - Constructs a Keras Sequential model with one hidden dense layer and sigmoid activation.
       The input dimension is determined based on the first feature set of X.

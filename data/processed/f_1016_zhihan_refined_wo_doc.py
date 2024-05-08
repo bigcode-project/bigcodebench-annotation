@@ -2,7 +2,7 @@ import os
 import glob
 import subprocess
 
-def f_719(directory, backup_dir='/path/to/backup'):
+def f_16(directory, backup_dir='/path/to/backup'):
     """
     Backup all '.log' files in a specified directory to a tar.gz file and delete the original files after backup.
     The backup file is named 'logs_backup.tar.gz' and placed in the specified backup directory.
@@ -24,9 +24,9 @@ def f_719(directory, backup_dir='/path/to/backup'):
     - os
     
     Example:
-    >>> f_719('/path/to/logs')
+    >>> f_16('/path/to/logs')
     '/path/to/backup/logs_backup.tar.gz'
-    >>> f_719('/path/to/logs', '/alternative/backup/dir')
+    >>> f_16('/path/to/logs', '/alternative/backup/dir')
     '/alternative/backup/dir/logs_backup.tar.gz'
     """
     if not os.path.exists(directory):
@@ -64,21 +64,21 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(self.temp_backup_dir)
     def test_backup_creation_and_log_file_deletion(self):
         # Test the creation of the backup file and deletion of original log files.
-        backup_path = f_719(self.temp_dir, self.temp_backup_dir)
+        backup_path = f_16(self.temp_dir, self.temp_backup_dir)
         self.assertTrue(os.path.exists(backup_path))
         self.assertEqual(backup_path, os.path.join(self.temp_backup_dir, 'logs_backup.tar.gz'))
         self.assertFalse(any(file.endswith('.log') for file in os.listdir(self.temp_dir)))
     def test_no_log_files_to_backup(self):
         # Test behavior when no log files are present in the directory.
         empty_dir = tempfile.mkdtemp()
-        result = f_719(empty_dir, self.temp_backup_dir)
+        result = f_16(empty_dir, self.temp_backup_dir)
         self.assertEqual(result, "No logs found to backup.")
         shutil.rmtree(empty_dir)
     def test_non_log_files_remain(self):
         # Ensure that non-log files are not deleted or included in the backup.
-        backup_path = f_719(self.temp_dir, self.temp_backup_dir)
+        backup_path = f_16(self.temp_dir, self.temp_backup_dir)
         self.assertEqual(len(glob.glob(os.path.join(self.temp_dir, '*.txt'))), 5)  # Check only non-log files remain
     def test_handle_non_existing_directory(self):
         # Verify that a FileNotFoundError is raised for a non-existing source directory.
         with self.assertRaises(FileNotFoundError):
-            f_719('/non/existing/directory', self.temp_backup_dir)
+            f_16('/non/existing/directory', self.temp_backup_dir)

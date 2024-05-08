@@ -7,7 +7,7 @@ from io import StringIO
 CSV_URL = 'https://example.com/data.csv'
 JSON_FILE = 'data.json'
 
-def f_784(csv_url=CSV_URL, json_file_path=JSON_FILE):
+def f_982(csv_url=CSV_URL, json_file_path=JSON_FILE):
     """
     Downloads a CSV file from a specified URL, converts it to JSON format, and saves it to a specified file path.
     
@@ -25,7 +25,7 @@ def f_784(csv_url=CSV_URL, json_file_path=JSON_FILE):
     - io.StringIO
 
     Example:
-    >>> f_784("https://example.com/sample.csv", "sample.json")
+    >>> f_982("https://example.com/sample.csv", "sample.json")
     "sample.json"
     """
     response = requests.get(csv_url)
@@ -56,7 +56,7 @@ class TestCases(unittest.TestCase):
     @patch("requests.get", return_value=mock_response)
     def test_case_1(self, mock_get):
         # Testing with default parameters
-        output_file = f_784()
+        output_file = f_982()
         with open(output_file, 'r') as file:
             data = json.load(file)
         self.assertEqual(len(data), 2)
@@ -65,7 +65,7 @@ class TestCases(unittest.TestCase):
     @patch("requests.get", return_value=mock_response)
     def test_case_2(self, mock_get):
         # Testing with custom parameters
-        output_file = f_784("https://example.com/mock.csv", "mock_output.json")
+        output_file = f_982("https://example.com/mock.csv", "mock_output.json")
         with open(output_file, 'r') as file:
             data = json.load(file)
         self.assertEqual(data[1]['header2'], 'value2b')
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
     @patch("requests.get", return_value=mock_response)
     def test_case_3(self, mock_get):
         # Testing JSON structure
-        output_file = f_784()
+        output_file = f_982()
         with open(output_file, 'r') as file:
             data = json.load(file)
         self.assertIn('header3', data[0])
@@ -82,7 +82,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self, mock_get):
         # Testing CSV with only headers (no data)
         mock_get.return_value.text = "header1,header2,header3\n"
-        output_file = f_784()
+        output_file = f_982()
         with open(output_file, 'r') as file:
             data = json.load(file)
         self.assertEqual(len(data), 0)
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self, mock_get):
         # Testing CSV with multiple data rows
         mock_get.return_value.text = mock_csv_data
-        output_file = f_784()
+        output_file = f_982()
         with open(output_file, 'r') as file:
             data = json.load(file)
         self.assertEqual(len(data), 2)

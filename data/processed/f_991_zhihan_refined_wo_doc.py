@@ -1,7 +1,7 @@
 import hashlib
 import binascii
 
-def f_205(salt, cursor):
+def f_995(salt, cursor):
     """
     Updates the passwords in a user table of an SQLite database by hashing them with SHA256, 
     using a provided salt. The function directly modifies the database via the given cursor.
@@ -23,7 +23,7 @@ def f_205(salt, cursor):
     Example:
     >>> conn = sqlite3.connect('sample.db')
     >>> cursor = conn.cursor()
-    >>> num_updated = f_205('mysalt', cursor)
+    >>> num_updated = f_995('mysalt', cursor)
     >>> print(num_updated)
     5
     """
@@ -65,19 +65,19 @@ class TestCases(unittest.TestCase):
     def test_updated_passwords(self):
         """Verify that the number of updated passwords matches the number of users."""
         salt = "testsalt"
-        num_updated = f_205(salt, self.cursor)
+        num_updated = f_995(salt, self.cursor)
         self.assertEqual(num_updated, 5, "Expected 5 users to be updated")
     def test_hash_correctness(self):
         """Verify that hash correctness."""
         salt = "testsalt1"
-        _ = f_205(salt, self.cursor)
+        _ = f_995(salt, self.cursor)
         self.cursor.execute("SELECT password FROM users")
         init_passwords = []
         for row in self.cursor.fetchall():
             password = row[0]
             init_passwords.append(password)
         salt = "testsalt2"
-        _ = f_205(salt, self.cursor)
+        _ = f_995(salt, self.cursor)
         self.cursor.execute("SELECT password FROM users")
         final_passwords = []
         for row in self.cursor.fetchall():
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
     def test_the_password_len_and_type(self):
         """Verify that hash type and len."""
         salt = "testsalt3"
-        _ = f_205(salt, self.cursor)
+        _ = f_995(salt, self.cursor)
         self.cursor.execute("SELECT password FROM users")
         for row in self.cursor.fetchall():
             password = row[0]
@@ -97,21 +97,21 @@ class TestCases(unittest.TestCase):
     def test_empty_database(self):
         """Check behavior with an empty user table."""
         self.cursor.execute("DELETE FROM users")
-        num_updated = f_205("testsalt", self.cursor)
+        num_updated = f_995("testsalt", self.cursor)
         self.assertEqual(num_updated, 0, "Expected 0 users to be updated when the table is empty")
     def test_varied_salts(self):
         """Ensure different salts produce different hashes for the same password."""
         self.cursor.execute("UPDATE users SET password = 'constant'")
         salt1 = "salt1"
         salt2 = "salt2"
-        f_205(salt1, self.cursor)
+        f_995(salt1, self.cursor)
         hash1 = self.cursor.execute("SELECT password FROM users WHERE id = 1").fetchone()[0]
         
         self.cursor.execute("UPDATE users SET password = 'constant'")
-        f_205(salt2, self.cursor)
+        f_995(salt2, self.cursor)
         hash2 = self.cursor.execute("SELECT password FROM users WHERE id = 1").fetchone()[0]
         
         self.assertNotEqual(hash1, hash2, "Hashes should differ when different salts are used")
     def test_invalid_salt(self):
         with self.assertRaises(TypeError):
-            f_205(1, self.cursor)
+            f_995(1, self.cursor)

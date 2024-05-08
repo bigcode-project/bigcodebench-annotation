@@ -2,7 +2,7 @@ import hashlib
 import base64
 
 
-def f_37(filename, data, password):
+def f_507(filename, data, password):
     """
     Encrypt a string with a password, then write the encrypted string to a file. 
     If the file or directory does not exist, create it.
@@ -20,7 +20,7 @@ def f_37(filename, data, password):
     - base64
 
     Example:
-    >>> f_37('test.txt', 'Hello, World!', 'password')
+    >>> f_507('test.txt', 'Hello, World!', 'password')
     'Fu0k9LUEJCY+ookLrA=='
     """
     directory = os.path.dirname(filename)
@@ -51,7 +51,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Testing basic encryption and file write
         file1 = os.path.join(OUTPUT_DIR, 'test1.txt')
-        encrypted = f_37(file1, 'Hello, World!', 'password123')
+        encrypted = f_507(file1, 'Hello, World!', 'password123')
         with open(file1, 'r') as f:
             file_content = f.read()
         self.assertEqual(encrypted, file_content)
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Testing with different data and password
         file2 = os.path.join(OUTPUT_DIR, 'test2.txt')
-        encrypted = f_37(file2, 'OpenAI', 'secret')
+        encrypted = f_507(file2, 'OpenAI', 'secret')
         with open(file2, 'r') as f:
             file_content = f.read()
         self.assertEqual(encrypted, file_content)
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         file3 = os.path.join(OUTPUT_DIR, 'test3.txt')
         data = '!@#$%^&*()_+'
         password = 'special_chars'
-        encrypted = f_37(file3, data, password)
+        encrypted = f_507(file3, data, password)
         with open(file3, 'r') as f:
             file_content = f.read()
         self.assertEqual(encrypted, file_content)
@@ -79,7 +79,7 @@ class TestCases(unittest.TestCase):
         file4 = os.path.join(OUTPUT_DIR, 'nonexistent_file.txt')
         if os.path.exists(file4):
             os.remove(file4)
-        encrypted = f_37(file4, 'Test Data', 'pwd')
+        encrypted = f_507(file4, 'Test Data', 'pwd')
         self.assertTrue(os.path.exists(file4))
         
     def test_case_5(self):
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
         file5 = os.path.join(OUTPUT_DIR, 'test5.txt')
         data = 'Decryption Test'
         password = 'decrypt_pwd'
-        encrypted = f_37(file5, data, password)
+        encrypted = f_507(file5, data, password)
         
         # Decryption logic (reverse of encryption)
         key = hashlib.sha256(password.encode()).digest()

@@ -2,7 +2,7 @@ from itertools import cycle
 from random import choice, seed
 
 
-def f_30(n_colors, colors=['Red', 'Green', 'Blue', 'Yellow', 'Purple'], rng_seed=None):
+def f_732(n_colors, colors=['Red', 'Green', 'Blue', 'Yellow', 'Purple'], rng_seed=None):
     """
     Generates a list representing a color pattern. The pattern consists of 'n_colors' elements 
     and alternates between a cyclic sequence of colors as defined in the parameter 'colors',
@@ -29,12 +29,12 @@ def f_30(n_colors, colors=['Red', 'Green', 'Blue', 'Yellow', 'Purple'], rng_seed
     - random
 
     Examples:
-    >>> color_pattern = f_30(4, rng_seed=123)
+    >>> color_pattern = f_732(4, rng_seed=123)
     >>> print(color_pattern)
     ['Red', 'Red', 'Green', 'Blue']
 
     >>> colors = ['Brown', 'Green', 'Black']
-    >>> color_pattern = f_30(12, colors=colors, rng_seed=42)
+    >>> color_pattern = f_732(12, colors=colors, rng_seed=42)
     >>> print(color_pattern)
     ['Brown', 'Black', 'Green', 'Brown', 'Black', 'Brown', 'Brown', 'Black', 'Green', 'Green', 'Black', 'Brown']
     """
@@ -51,41 +51,41 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_small_number_of_colors(self):
         # Testing with a small number of colors and a fixed seed for repeatability
-        color_pattern = f_30(4, rng_seed=123)
+        color_pattern = f_732(4, rng_seed=123)
         expected_pattern = ['Red', 'Red', 'Green', 'Blue']  # This pattern is based on the seed value
         self.assertEqual(color_pattern, expected_pattern)
     def test_large_number_of_colors(self):
         # Testing with a large number of colors to check the function's behavior with more extensive patterns
         # Here, we're not checking for exact match due to randomness, but rather size and content
-        color_pattern = f_30(100, rng_seed=123)
+        color_pattern = f_732(100, rng_seed=123)
         self.assertEqual(len(color_pattern), 100)
         self.assertTrue(all(color in ['Red', 'Green', 'Blue', 'Yellow', 'Purple'] for color in color_pattern))
     def test_zero_colors(self):
         # Testing with zero colors, which should return an empty list
-        color_pattern = f_30(0, rng_seed=123)
+        color_pattern = f_732(0, rng_seed=123)
         self.assertEqual(color_pattern, [])
     def test_negative_number_of_colors(self):
         # Testing with a negative number, which should not break the function and return an empty list
-        color_pattern = f_30(-4, rng_seed=123)
+        color_pattern = f_732(-4, rng_seed=123)
         self.assertEqual(color_pattern, [])
     def test_repeatability_with_same_seed(self):
         # Testing the function with the same seed value should produce the same results
-        color_pattern1 = f_30(10, rng_seed=123)
-        color_pattern2 = f_30(10, rng_seed=123)
+        color_pattern1 = f_732(10, rng_seed=123)
+        color_pattern2 = f_732(10, rng_seed=123)
         self.assertEqual(color_pattern1, color_pattern2)
     def test_randomness_with_different_seeds(self):
         # Testing the function with different seeds should produce different results
-        color_pattern1 = f_30(10, rng_seed=123)
-        color_pattern2 = f_30(10, rng_seed=456)
+        color_pattern1 = f_732(10, rng_seed=123)
+        color_pattern2 = f_732(10, rng_seed=456)
         self.assertNotEqual(color_pattern1, color_pattern2)
     def test_no_seed_provided(self):
         # Testing the function without a seed should still produce valid results (though they can't be predetermined)
-        color_pattern = f_30(10)  # No seed provided
+        color_pattern = f_732(10)  # No seed provided
         self.assertEqual(len(color_pattern), 10)
         self.assertTrue(all(color in ['Red', 'Green', 'Blue', 'Yellow', 'Purple'] for color in color_pattern))
     def test_custom_colors(self):
         colors = ['Brown', 'White', 'Black', "Orange"]
-        color_pattern = f_30(10, colors=colors, rng_seed=12)  # No seed provided
+        color_pattern = f_732(10, colors=colors, rng_seed=12)  # No seed provided
         self.assertTrue(all(color in colors for color in color_pattern))
         expected = ['Brown',
                     'Orange',
@@ -99,7 +99,7 @@ class TestCases(unittest.TestCase):
                     'Orange']
         self.assertEqual(color_pattern, expected)
     def test_cyclicity(self):
-        color_pattern = f_30(1000, rng_seed=1234)  # No seed provided
+        color_pattern = f_732(1000, rng_seed=1234)  # No seed provided
         colors = ['Red', 'Green', 'Blue', 'Yellow', 'Purple']
         color_cycle = cycle(colors)
         for i in range(500):

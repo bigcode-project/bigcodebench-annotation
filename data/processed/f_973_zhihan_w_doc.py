@@ -4,7 +4,7 @@ import statistics
 # Constants
 AGE_RANGE = (22, 60)
 
-def f_782(dict1):
+def f_980(dict1):
     """
     Calculate the mean, the median, and the mode(s) of the age of the employees in the department "EMP$$." 
     Generate random ages for each employee within the range [22, 60].
@@ -23,7 +23,7 @@ def f_782(dict1):
     Example:
     >>> random.seed(0)
     >>> d = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
-    >>> stats = f_782(d)
+    >>> stats = f_980(d)
     >>> print(stats)
     (44.7, 46.5, [46, 48, 24, 38, 54, 53, 47, 41, 52, 44])
     """
@@ -48,7 +48,7 @@ class TestCases(unittest.TestCase):
         random.seed(0)
         # Input: 10 employees in "EMP$$" department
         d = {'EMP$$': 10}
-        mean_age, median_age, mode_age = f_782(d)
+        mean_age, median_age, mode_age = f_980(d)
         
         # Checks
         self.assertTrue(22 <= mean_age <= 60)
@@ -59,7 +59,7 @@ class TestCases(unittest.TestCase):
         random.seed(0)
         # Input: Different number of employees in multiple departments
         d = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
-        mean_age, median_age, mode_age = f_782(d)
+        mean_age, median_age, mode_age = f_980(d)
         
         # Checks
         self.assertTrue(22 <= mean_age <= 60)
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         random.seed(0)
         # Input: No employees in "EMP$$" department
         d = {'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
-        mean_age, median_age, mode_age = f_782(d)
+        mean_age, median_age, mode_age = f_980(d)
         
         # Checks
         self.assertEqual(mean_age, 0)
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
         random.seed(0)
         # Input: Large number of employees in "EMP$$" department to increase likelihood of multiple modes
         d = {'EMP$$': 1000}
-        mean_age, median_age, mode_age = f_782(d)
+        mean_age, median_age, mode_age = f_980(d)
         
         # Checks
         self.assertTrue(22 <= mean_age <= 60)
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
         random.seed(0)
         # Input: Only one employee in "EMP$$" department
         d = {'EMP$$': 1}
-        mean_age, median_age, mode_age = f_782(d)
+        mean_age, median_age, mode_age = f_980(d)
         
         # Checks
         self.assertTrue(22 <= mean_age <= 60)

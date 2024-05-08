@@ -4,7 +4,7 @@ import pandas as pd
 import random
 
 
-def f_833(csv_file, column_name='data', pattern='\d+[xX]', sample_size=None, seed=42):
+def f_745(csv_file, column_name='data', pattern='\d+[xX]', sample_size=None, seed=42):
     """ 
     Search for matches with a specified regex pattern in a given column of a CSV file and optionally return a random sample of these matches.
     
@@ -27,7 +27,7 @@ def f_833(csv_file, column_name='data', pattern='\d+[xX]', sample_size=None, see
     - random: for generating the random list of indices
     
     Example:
-    >>> result = f_833('sample.csv', column_name='data', pattern='\d+[xX]', sample_size=10, seed=42)
+    >>> result = f_745('sample.csv', column_name='data', pattern='\d+[xX]', sample_size=10, seed=42)
     >>> print(result)
             index                                               data
     210    211  Fund several agency oil. Evening plant thank t...
@@ -71,7 +71,7 @@ class TestCases(unittest.TestCase):
         # Remove temporary directory after the test
         shutil.rmtree(self.test_dir)
     def test_default_parameters(self):
-        result = f_833(self.test_file)
+        result = f_745(self.test_file)
         expected_data = {
             "data": ["123x good", "456X bad", "789x good"],
             "other_column": ["data1", "data3", "data4"]
@@ -80,9 +80,9 @@ class TestCases(unittest.TestCase):
         pd.testing.assert_frame_equal(result.reset_index(drop=True), expected_df)
     def test_custom_column(self):
         with self.assertRaises(KeyError):
-            f_833(self.test_file, column_name="nonexistent_column")
+            f_745(self.test_file, column_name="nonexistent_column")
     def test_custom_pattern(self):
-        result = f_833(self.test_file, pattern='\d+X')
+        result = f_745(self.test_file, pattern='\d+X')
         expected_data = {
             "data": ["456X bad"],
             "other_column": ["data3"]
@@ -90,14 +90,14 @@ class TestCases(unittest.TestCase):
         expected_df = pd.DataFrame(expected_data)
         pd.testing.assert_frame_equal(result.reset_index(drop=True), expected_df)
     def test_sample_size(self):
-        result = f_833(self.test_file, sample_size=2, seed=42)
+        result = f_745(self.test_file, sample_size=2, seed=42)
         self.assertEqual(len(result), 2)
     def test_no_matches(self):
-        result = f_833(self.test_file, pattern="nope")
+        result = f_745(self.test_file, pattern="nope")
         self.assertTrue(result.empty)
     def test_sample_size_larger_than_matches(self):
-        result = f_833(self.test_file, sample_size=10)
+        result = f_745(self.test_file, sample_size=10)
         self.assertEqual(len(result), 3)  # Only three matches exist
     def test_zero_sample_size(self):
-        result = f_833(self.test_file, sample_size=0)
+        result = f_745(self.test_file, sample_size=0)
         self.assertTrue(result.empty)

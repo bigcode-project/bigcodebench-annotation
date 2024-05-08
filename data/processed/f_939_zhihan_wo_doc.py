@@ -3,7 +3,7 @@ from string import punctuation
 import os
 
 
-def f_760(text, output_filename):
+def f_959(text, output_filename):
     """
     Extracts words from the input text that begin with the '$' character and saves them to a specified file,
     excluding any words that are solely composed of punctuation characters.
@@ -25,7 +25,7 @@ def f_760(text, output_filename):
 
     Example:
     >>> example_text = "$example $valid $!invalid $$ alsoInvalid"
-    >>> f_760(example_text, 'extracted_dollar_words.txt')
+    >>> f_959(example_text, 'extracted_dollar_words.txt')
     '/absolute/path/to/extracted_dollar_words.txt'
     """
     punctuation_set = set(punctuation)
@@ -44,7 +44,7 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         self.filenames = []
         for i in range(1,7):
-            self.filenames.append("f_760_test_output_"+str(i)+".txt")
+            self.filenames.append("f_959_test_output_"+str(i)+".txt")
     def tearDown(self):
         # Clean up the test file
         for filename in self.filenames:
@@ -56,7 +56,7 @@ class TestCases(unittest.TestCase):
         text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
         filename = self.filenames[0]
         expected_words = ["$abc", "$efg", "$hij", "$abc", "$abc", "$hij", "$hij"]
-        output_path = f_760(text, filename)
+        output_path = f_959(text, filename)
         with open(output_path, 'r') as file:
             saved_words = file.read().splitlines()
         self.assertEqual(saved_words, expected_words)
@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
         text = "There are no dollar words here."
         filename = self.filenames[1]
         expected_words = []
-        output_path = f_760(text, filename)
+        output_path = f_959(text, filename)
         with open(output_path, 'r') as file:
             saved_words = file.read().splitlines()
         self.assertEqual(saved_words, expected_words)
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
         text = "$$$$ $$ $$$$ $abc$ $def"
         filename = self.filenames[2]
         expected_words = ["$abc", "$def"]
-        output_path = f_760(text, filename)
+        output_path = f_959(text, filename)
         with open(output_path, 'r') as file:
             saved_words = file.read().splitlines()
         self.assertEqual(saved_words, expected_words)
@@ -86,7 +86,7 @@ class TestCases(unittest.TestCase):
         text = "$hello $world! This is a $test."
         filename = self.filenames[3]
         expected_words = ["$hello", "$world", "$test"]
-        output_path = f_760(text, filename)
+        output_path = f_959(text, filename)
         with open(output_path, 'r') as file:
             saved_words = file.read().splitlines()
         self.assertEqual(saved_words, expected_words)
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
         text = "$"
         filename = self.filenames[4]
         expected_words = []
-        output_path = f_760(text, filename)
+        output_path = f_959(text, filename)
         with open(output_path, 'r') as file:
             saved_words = file.read().splitlines()
         self.assertEqual(saved_words, expected_words)
@@ -110,7 +110,7 @@ class TestCases(unittest.TestCase):
         expected_words = ["$example", "$valid", "$1234"]
         expected_output = "\n".join(expected_words) + "\n"
         # Call the function with the test data
-        output_path = f_760(input_text, filename)
+        output_path = f_959(input_text, filename)
         # Verify the file was created
         self.assertTrue(os.path.exists(output_path))
         # Open the file and read its contents

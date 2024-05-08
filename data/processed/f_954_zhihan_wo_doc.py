@@ -5,7 +5,7 @@ from pathlib import Path
 # Constants
 DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
-def f_771(file_path):
+def f_970(file_path):
     """
     Determine the creation time of a file and convert it to a formatted string '% Y-% m-% d% H:% M:% S'.
     
@@ -23,7 +23,7 @@ def f_771(file_path):
     Example:
     
     Example:
-    >>> f_771('/path/to/file.txt')
+    >>> f_970('/path/to/file.txt')
     '2023-09-28 12:30:45'
     """
     if not Path(file_path).exists():
@@ -52,7 +52,7 @@ class TestCases(unittest.TestCase):
         self.creation_time1 = create_dummy_file(self.file1)
         self.creation_time2 = create_dummy_file(self.file2)
         self.creation_time3 = create_dummy_file(self.file3)
-        self.test_dir = 'testdir_f_771/'
+        self.test_dir = 'testdir_f_970/'
         os.makedirs(self.test_dir, exist_ok=True)
     
     def tearDown(self):
@@ -63,23 +63,23 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(self.test_dir)
     def test_case_1(self):
         expected_output = datetime.fromtimestamp(self.creation_time1).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(f_771(self.file1), expected_output)
+        self.assertEqual(f_970(self.file1), expected_output)
         
     def test_case_2(self):
         expected_output = datetime.fromtimestamp(self.creation_time2).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(f_771(self.file2), expected_output)
+        self.assertEqual(f_970(self.file2), expected_output)
         
     def test_case_3(self):
         expected_output = datetime.fromtimestamp(self.creation_time3).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(f_771(self.file3), expected_output)
+        self.assertEqual(f_970(self.file3), expected_output)
         
     def test_case_4(self):
         # Test for non-existing file
         with self.assertRaises(FileNotFoundError):
-            f_771("non_existing_file.txt")
+            f_970("non_existing_file.txt")
     
     def test_case_5(self):
         # Test for a directory
         dir_creation_time = os.path.getctime(self.test_dir)
         expected_output = datetime.fromtimestamp(dir_creation_time).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(f_771(self.test_dir), expected_output)
+        self.assertEqual(f_970(self.test_dir), expected_output)

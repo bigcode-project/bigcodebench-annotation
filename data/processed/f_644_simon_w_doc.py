@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
 
-def f_210(list_of_pairs):
+def f_605(list_of_pairs):
     """
     Create a Pandas DataFrame from a list of pairs and normalize the data using MinMaxScaler.
     
@@ -25,7 +25,7 @@ def f_210(list_of_pairs):
     
     Example:
     >>> list_of_pairs = [('Fruits', 5), ('Vegetables', 9), ('Dairy', -1), ('Bakery', -2), ('Meat', 4)]
-    >>> df = f_210(list_of_pairs)
+    >>> df = f_605(list_of_pairs)
     >>> print(df)
          Category     Value
     0      Fruits  0.636364
@@ -34,7 +34,7 @@ def f_210(list_of_pairs):
     3      Bakery  0.000000
     4        Meat  0.545455
     >>> list_of_pairs = [('car', 3.2), ('bike', 0), ('train', -1), ('plane', -6.2), ('ship', 1234)]
-    >>> df = f_210(list_of_pairs)
+    >>> df = f_605(list_of_pairs)
     >>> print(df)
       Category     Value
     0      car  0.007579
@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         '''test with normal input data'''
         input_data = [('traditional', -4), ('we', 7), ('because', 3), ('ability', 10), ('exactly', -7)]
-        result = f_210(input_data)
+        result = f_605(input_data)
         self.assertTrue(isinstance(result, pd.DataFrame))
         self.assertTrue('Value' in result.columns)
         self.assertAlmostEqual(result[result['Category'] == 'traditional']['Value'].item(), 0.176471, places=6)
@@ -68,15 +68,15 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         '''test empty input'''
         input_data = []
-        self.assertRaises(Exception, f_210, input_data)
+        self.assertRaises(Exception, f_605, input_data)
     def test_case_3(self):
         '''non numeric values'''
         input_data = [('fast', 'test'), ('ago', -8), ('player', 7), ('standard', 2), ('specific', 0)]
-        self.assertRaises(Exception, f_210, input_data)
+        self.assertRaises(Exception, f_605, input_data)
     def test_case_4(self):
         '''Floating point values'''
         input_data = [('real', 4.453), ('others', -1.12), ('professor', -2.2), ('other', -5), ('task', -7.933)]
-        result = f_210(input_data)
+        result = f_605(input_data)
         self.assertTrue(isinstance(result, pd.DataFrame))
         self.assertTrue('Value' in result.columns)
         self.assertAlmostEqual(result[result['Category'] == 'real']['Value'].item(), 1.000000, places=6)
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         '''test for basic output structure'''
         input_data = [('visit', 4), ('brother', -2), ('experience', -10), ('whether', 8), ('hand', 3)]
-        result = f_210(input_data)
+        result = f_605(input_data)
         self.assertTrue(isinstance(result, pd.DataFrame))
         self.assertTrue('Value' in result.columns)
         self.assertTrue('Category' in result.columns)

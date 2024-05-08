@@ -3,7 +3,7 @@ import random
 import re
 
 
-def f_340(data_list, seed=None):
+def f_345(data_list, seed=None):
     """
     Apply a random operation (remove, replace, shuffle, or randomize) to substrings in a list of strings.
 
@@ -36,7 +36,7 @@ def f_340(data_list, seed=None):
     - re
 
     Example:
-    >>> f_340(['lamp, bag, mirror', 'table, chair, bag, lamp'], seed=0)
+    >>> f_345(['lamp, bag, mirror', 'table, chair, bag, lamp'], seed=0)
                Original String          Modified String
     0        lamp, bag, mirror        bag, lamp, mirror
     1  table, chair, bag, lamp  lamp, chair, bag, table
@@ -75,20 +75,20 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic functionality
         data_list = ["lamp, bag, mirror", "table, chair, bag, lamp"]
-        result = f_340(data_list, seed=self.default_seed)
+        result = f_345(data_list, seed=self.default_seed)
         self.assertEqual(result["Original String"].tolist(), data_list)
         self.assertNotEqual(result["Original String"][0], result["Modified String"][0])
         self.assertNotEqual(result["Original String"][1], result["Modified String"][1])
     def test_case_2(self):
         # Test single string
         data_list = ["apple, orange, banana"]
-        result = f_340(data_list, seed=self.default_seed)
+        result = f_345(data_list, seed=self.default_seed)
         self.assertEqual(result["Original String"].tolist(), data_list)
         self.assertNotEqual(result["Original String"][0], result["Modified String"][0])
     def test_case_3(self):
         # Test single character
         data_list = ["a, b, c", "d, e, f", "g, h, i", "j, k, l", "m, n, o"]
-        result = f_340(data_list, seed=self.default_seed)
+        result = f_345(data_list, seed=self.default_seed)
         self.assertEqual(result["Original String"].tolist(), data_list)
         for idx in range(len(data_list)):
             self.assertNotEqual(
@@ -97,7 +97,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Test whitespace sensitivity
         data_list = ["apple, apple, apple ", " apple,   apple ,   apple "]
-        result = f_340(data_list, seed=self.default_seed)
+        result = f_345(data_list, seed=self.default_seed)
         modified_strings = result["Modified String"].tolist()
         self.assertTrue(
             all(
@@ -109,21 +109,21 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test case sensitivity
         data_list = ["apple, Apple", "APPLE, apple"]
-        result = f_340(data_list, seed=self.default_seed)
+        result = f_345(data_list, seed=self.default_seed)
         self.assertEqual(result["Original String"].tolist(), data_list)
         # Checking that modifications respect case sensitivity
         self.assertNotEqual(result["Modified String"][0], result["Modified String"][1])
     def test_case_6(self):
         # Test same random seed produces same results
         data_list = ["lamp, bag, mirror", "table, chair, bag, lamp"]
-        result1 = f_340(data_list, seed=self.default_seed)
-        result2 = f_340(data_list, seed=self.default_seed)
+        result1 = f_345(data_list, seed=self.default_seed)
+        result2 = f_345(data_list, seed=self.default_seed)
         pd.testing.assert_frame_equal(result1, result2)
     def test_case_7(self):
         # Test function integrity by calculating expected results with fixed random seed
         data_list = ["a, b, c", "d, e, f"]
         expected_modifications = ["b, c", "e, f, d"]
-        result = f_340(data_list, seed=self.default_seed)
+        result = f_345(data_list, seed=self.default_seed)
         self.assertEqual(
             result["Modified String"].tolist(),
             expected_modifications,
@@ -138,11 +138,11 @@ class TestCases(unittest.TestCase):
             [1, "orange", 3],
         ]:
             with self.assertRaises(TypeError):
-                f_340(invalid_data_list, seed=self.default_seed)
+                f_345(invalid_data_list, seed=self.default_seed)
     def test_case_9(self):
         # Test empty list input
         data_list = []
-        result = f_340(data_list, seed=self.default_seed)
+        result = f_345(data_list, seed=self.default_seed)
         self.assertTrue(
             result.empty,
             "The result should be an empty DataFrame for an empty input list.",
@@ -150,7 +150,7 @@ class TestCases(unittest.TestCase):
     def test_case_10(self):
         # Test input list with an empty string
         data_list = [""]
-        result = f_340(data_list, seed=self.default_seed)
+        result = f_345(data_list, seed=self.default_seed)
         self.assertEqual(
             result["Modified String"].tolist(),
             [""],
@@ -159,7 +159,7 @@ class TestCases(unittest.TestCase):
     def test_case_11(self):
         # Test input with a single substring (no commas)
         data_list = ["single"]
-        result = f_340(data_list, seed=self.default_seed)
+        result = f_345(data_list, seed=self.default_seed)
         self.assertEqual(
             result["Modified String"].tolist(),
             ["single"],

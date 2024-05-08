@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def f_304(data):
+def f_943(data):
     """
     Processes a dictionary containing product names and their corresponding prices in string format. 
     The function converts these string prices (which may include commas as thousand separators) into float values. 
@@ -33,7 +33,7 @@ def f_304(data):
     - matplotlib
 
     Example:
-    >>> results = f_304({'Product': ['Apple', 'Banana'], 'Price_String': ['1,234.00', '567.89']})
+    >>> results = f_943({'Product': ['Apple', 'Banana'], 'Price_String': ['1,234.00', '567.89']})
     >>> print(results)
     ({'mean': 900.9449999999999, 'median': 900.9449999999999, 'std_dev': 471.0108980161712}, (array([1., 1.]), array([ 567.89 ,  900.945, 1234.   ]), <BarContainer object of 2 artists>))
 
@@ -55,7 +55,7 @@ def f_304(data):
 import unittest
 import numpy as np
 class TestCases(unittest.TestCase):
-    """Test cases for f_304"""
+    """Test cases for f_943"""
     def test_basic_functionality(self):
         """Test basic functionality."""
         sample_data = {
@@ -68,7 +68,7 @@ class TestCases(unittest.TestCase):
         expected_mean = np.mean(float_prices)
         expected_median = np.median(float_prices)
         expected_std_dev = np.std(float_prices, ddof=1)
-        result, _ = f_304(sample_data)
+        result, _ = f_943(sample_data)
         self.assertAlmostEqual(result["mean"], expected_mean)
         self.assertAlmostEqual(result["median"], expected_median)
         self.assertAlmostEqual(result["std_dev"], expected_std_dev)
@@ -116,23 +116,23 @@ class TestCases(unittest.TestCase):
         expected_mean = np.mean(float_prices)
         expected_median = np.median(float_prices)
         expected_std_dev = np.std(float_prices, ddof=1)
-        result, _ = f_304(sample_data)
+        result, _ = f_943(sample_data)
         self.assertAlmostEqual(result["mean"], expected_mean)
         self.assertAlmostEqual(result["median"], expected_median)
         self.assertAlmostEqual(result["std_dev"], expected_std_dev)
     def test_invalid_input(self):
         """Test invalid input."""
         with self.assertRaises(Exception):
-            f_304({})
+            f_943({})
         with self.assertRaises(Exception):
-            f_304({"Product": ["Apple"], "Price_WrongKey": ["1,234.00"]})
+            f_943({"Product": ["Apple"], "Price_WrongKey": ["1,234.00"]})
     def test_all_zero_prices(self):
         """Test all zero prices."""
         sample_data = {
             "Product": ["Apple", "Banana", "Cherry"],
             "Price_String": ["0.00", "0.00", "0.00"],
         }
-        result, _ = f_304(sample_data)
+        result, _ = f_943(sample_data)
         self.assertEqual(result["mean"], 0)
         self.assertEqual(result["median"], 0)
         self.assertEqual(result["std_dev"], 0)
@@ -148,7 +148,7 @@ class TestCases(unittest.TestCase):
         expected_mean = np.mean(float_prices)
         expected_median = np.median(float_prices)
         expected_std_dev = np.std(float_prices, ddof=1)
-        result, _ = f_304(sample_data)
+        result, _ = f_943(sample_data)
         self.assertAlmostEqual(result["mean"], expected_mean)
         self.assertAlmostEqual(result["median"], expected_median)
         self.assertAlmostEqual(result["std_dev"], expected_std_dev)

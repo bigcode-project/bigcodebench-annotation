@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
 
-def f_617(X, Y):
+def f_339(X, Y):
     """
     Adjust a quadratic function to the given data (X, Y) and plot the data along with the fit.
 
@@ -24,7 +24,7 @@ def f_617(X, Y):
     >>> np.random.seed(42)
     >>> X = np.linspace(-10, 10, 100)
     >>> Y = 3*X**2 + 2*X + 1 + np.random.normal(0, 20, len(X))
-    >>> params, ax = f_617(X, Y)
+    >>> params, ax = f_339(X, Y)
     >>> params
     [3.0366511660907975, 2.1379326607136035, -2.3233168384548284]
     >>> type(ax)
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test fitting a basic quadratic function with expected params near 3, 2.
         X, Y = self.test_data[0]
-        params, ax = f_617(X, Y)
+        params, ax = f_339(X, Y)
         self.assertTrue(len(params) == 3)
         self.assertDataInPlot(X, Y, ax)
         self.assertTrue(isinstance(ax, plt.Axes))
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test fitting a basic quadratic function with expected params near -2, 4.
         X, Y = self.test_data[1]
-        params, ax = f_617(X, Y)
+        params, ax = f_339(X, Y)
         self.assertTrue(len(params) == 3)
         self.assertDataInPlot(X, Y, ax)
         self.assertTrue(isinstance(ax, plt.Axes))
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test fitting a wide parabola with parameters (0.5, 1).
         X, Y = self.test_data[2]
-        params, ax = f_617(X, Y)
+        params, ax = f_339(X, Y)
         self.assertTrue(len(params) == 3)
         self.assertDataInPlot(X, Y, ax)
         self.assertTrue(isinstance(ax, plt.Axes))
@@ -110,7 +110,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         # Test fitting a steep parabola with high coefficients (10, 5).
         X, Y = self.test_data[3]
-        params, ax = f_617(X, Y)
+        params, ax = f_339(X, Y)
         self.assertTrue(len(params) == 3)
         self.assertDataInPlot(X, Y, ax)
         self.assertTrue(isinstance(ax, plt.Axes))
@@ -121,13 +121,13 @@ class TestCases(unittest.TestCase):
         string_int_list = ["1", "2", "3"]
         int_list = [1, 2, 3]
         with self.assertRaises(TypeError):
-            f_617(string_int_list, int_list)
+            f_339(string_int_list, int_list)
         with self.assertRaises(TypeError):
-            f_617(int_list, string_int_list)
+            f_339(int_list, string_int_list)
     def test_case_6(self):
         # Test handling non-numeric data
         for X, Y in itertools.product([["a", "b", "c"], [], np.array([])], repeat=2):
             with self.assertRaises(ValueError):
-                f_617(X, Y)
+                f_339(X, Y)
     def tearDown(self):
         plt.close("all")

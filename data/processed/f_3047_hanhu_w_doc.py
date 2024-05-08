@@ -3,8 +3,8 @@ import math
 
 def calculate_factorial(number: int) -> tuple:
     return number, math.factorial(number)
-
-def f_380(numbers: list) -> dict:
+    
+def f_246(numbers: list) -> dict:
     """
     Calculate factorials for a list of numbers in parallel using multiprocessing.
 
@@ -22,7 +22,7 @@ def f_380(numbers: list) -> dict:
     - math.factorial
 
     Example:
-    >>> factorials = f_380([5, 6, 7, 8, 9])
+    >>> factorials = f_246([5, 6, 7, 8, 9])
     >>> factorials[5] == 120 and factorials[9] == 362880
     True
     """
@@ -37,30 +37,30 @@ import math
 class TestCases(unittest.TestCase):
     def test_return_type(self):
         """Test that the function returns a dictionary."""
-        result = f_380([3, 4, 5])
+        result = f_246([3, 4, 5])
         self.assertIsInstance(result, dict)
     def test_empty_list(self):
         """Test function with an empty list."""
-        result = f_380([])
+        result = f_246([])
         self.assertEqual(result, {})
     def test_single_element(self):
         """Test function with a single-element list."""
-        result = f_380([5])
+        result = f_246([5])
         self.assertEqual(result, {5: 120})
     def test_non_integer_input(self):
         """Test function with non-integer input."""
         with self.assertRaises(ValueError):
-            f_380(["a"])
+            f_246(["a"])
     def test_large_numbers(self):
         """Test function with large numbers."""
-        result = f_380([10])
+        result = f_246([10])
         self.assertEqual(result[10], math.factorial(10))
     def test_negative_numbers(self):
         """Test function with a negative number."""
         with self.assertRaises(ValueError):
-            f_380([-1])  # Assuming we want to enforce non-negative integers only
+            f_246([-1])  # Assuming we want to enforce non-negative integers only
     def test_very_large_number(self):
         """Test function with a very large number to check for performance or overflow issues."""
         number = 20  # A reasonable choice to avoid excessive computation time in tests
-        result = f_380([number])
+        result = f_246([number])
         self.assertEqual(result[number], math.factorial(number))

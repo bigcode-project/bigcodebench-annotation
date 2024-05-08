@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def f_839(data):
+def f_182(data):
     """
     Draw a pie chart that shows the job distribution in the given data and return the plot object.
 
@@ -23,7 +23,7 @@ def f_839(data):
     >>> data = pd.DataFrame({'Name': ['John', 'Jane', 'Joe'],
     ...                      'Date': ['01/03/2012', '02/05/2013', '03/08/2014'],
     ...                      'Job': ['Engineer', 'Doctor', 'Lawyer']})
-    >>> fig = f_839(data)
+    >>> fig = f_182(data)
     >>> type(fig)
     <class 'matplotlib.figure.Figure'>
     >>> len(fig.axes[0].patches) #check slices from pie chart
@@ -47,12 +47,12 @@ import pandas as pd
 class TestCases(unittest.TestCase):
     def test_empty_data(self):
         data = pd.DataFrame(columns=['Name', 'Date', 'Job'])
-        fig = f_839(data)
+        fig = f_182(data)
         self.assertIsInstance(fig, plt.Figure)
         plt.close()
     def test_single_job(self):
         data = pd.DataFrame({'Name': ['John'], 'Date': ['01/03/2012'], 'Job': ['Engineer']})
-        fig = f_839(data)
+        fig = f_182(data)
         self.assertIsInstance(fig, plt.Figure)
         # Check pie sizes
         sizes = fig.axes[0].patches
@@ -60,7 +60,7 @@ class TestCases(unittest.TestCase):
         plt.close()
     def test_multiple_jobs(self):
         data = pd.DataFrame({'Name': ['John', 'Jane'], 'Date': ['01/03/2012', '02/05/2013'], 'Job': ['Engineer', 'Doctor']})
-        fig = f_839(data)
+        fig = f_182(data)
         self.assertIsInstance(fig, plt.Figure)
         # Check pie sizes
         sizes = fig.axes[0].patches
@@ -68,11 +68,11 @@ class TestCases(unittest.TestCase):
         plt.close()
     def test_repeated_jobs(self):
         data = pd.DataFrame({'Name': ['John', 'Jane', 'Joe'], 'Date': ['01/03/2012', '02/05/2013', '03/08/2014'], 'Job': ['Engineer', 'Engineer', 'Lawyer']})
-        fig = f_839(data)
+        fig = f_182(data)
         self.assertIsInstance(fig, plt.Figure)
         plt.close()
     def test_large_dataset(self):
         data = pd.DataFrame({'Name': ['Person' + str(i) for i in range(100)], 'Date': ['01/01/2020' for _ in range(100)], 'Job': ['Job' + str(i % 3) for i in range(100)]})
-        fig = f_839(data)
+        fig = f_182(data)
         self.assertIsInstance(fig, plt.Figure)
         plt.close()

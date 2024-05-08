@@ -2,7 +2,7 @@ import subprocess
 import shlex
 from datetime import datetime
 
-def f_767(script_path: str) -> dict:
+def f_966(script_path: str) -> dict:
     '''
     Run an R script and return the start time, end time, stdout, and stderr as a dictionary.
     
@@ -18,7 +18,7 @@ def f_767(script_path: str) -> dict:
     - dict: A dictionary containing the start time, end time, stdout, and stderr of the script run.
     
     Example:
-    >>> f_767("/path/to/script.r")
+    >>> f_966("/path/to/script.r")
     {
         'Start Time': '2023-09-26 14:30:00',
         'End Time': '2023-09-26 14:32:00',
@@ -48,7 +48,7 @@ class TestCases(unittest.TestCase):
         mock_process.communicate.return_value = (b"Script output here...", b"Any errors here...")
         mock_subprocess.return_value = mock_process
         
-        result = f_767("/path/to/script.r")
+        result = f_966("/path/to/script.r")
         
         self.assertIn('Start Time', result)
         self.assertIn('End Time', result)
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         mock_process.communicate.return_value = (b"Another output...", b"")
         mock_subprocess.return_value = mock_process
         
-        result = f_767("/path/to/different_script.r")
+        result = f_966("/path/to/different_script.r")
         
         self.assertIn('Start Time', result)
         self.assertIn('End Time', result)
@@ -74,7 +74,7 @@ class TestCases(unittest.TestCase):
         mock_process.communicate.return_value = (b"", b"An error occurred...")
         mock_subprocess.return_value = mock_process
         
-        result = f_767("/path/to/erroneous_script.r")
+        result = f_966("/path/to/erroneous_script.r")
         
         self.assertIn('Start Time', result)
         self.assertIn('End Time', result)
@@ -86,7 +86,7 @@ class TestCases(unittest.TestCase):
         mock_process.communicate.return_value = (b"Script output for case 4...", b"")
         mock_subprocess.return_value = mock_process
         
-        result = f_767("/path/to/script_4.r")
+        result = f_966("/path/to/script_4.r")
         
         self.assertIn('Start Time', result)
         self.assertIn('End Time', result)
@@ -99,7 +99,7 @@ class TestCases(unittest.TestCase):
         mock_process.communicate.return_value = (b"", b"Error for case 5...")
         mock_subprocess.return_value = mock_process
         
-        result = f_767("/path/to/erroneous_script_5.r")
+        result = f_966("/path/to/erroneous_script_5.r")
         
         self.assertIn('Start Time', result)
         self.assertIn('End Time', result)

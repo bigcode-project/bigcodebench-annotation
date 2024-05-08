@@ -1,7 +1,7 @@
 from collections import Counter
 import math
 
-def f_301(nested_dict):
+def f_545(nested_dict):
     """
     Aggregate the values of the same keys from a nested dictionary and remove the "ele" key. For each remaining key take the sine.
     
@@ -16,7 +16,7 @@ def f_301(nested_dict):
     - collections
 
     Example:
-    >>> f_301({
+    >>> f_545({
     ...     'dict1': {'ale': 1, 'ele': 2, 'ile': 3},
     ...     'dict2': {'ele': 4, 'ole': 5, 'ule': 6},
     ...     'dict3': {'ile': 7, 'ale': 8, 'ele': 9}
@@ -32,32 +32,32 @@ def f_301(nested_dict):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        self.assertEqual(f_301({
+        self.assertEqual(f_545({
             'dict1': {'ale': 1, 'ele': 2, 'ile': 3},
             'dict2': {'ele': 4, 'ole': 5, 'ule': 6},
             'dict3': {'ile': 7, 'ale': 8, 'ele': 9}
         }), {'ale': math.sin(9), 'ile': math.sin(10), 'ole': math.sin(5), 'ule': math.sin(6)})
     def test_case_2(self):
-        self.assertEqual(f_301({
+        self.assertEqual(f_545({
             'aaa': {'zzz': 1, 'yyy': 2, 'xxx': 3},
             'bbb': {'yyy': 4, 'xxx': 5, 'www': 6},
             'ccc': {'xxx': 7, 'www': 8, 'ele': 9},
             'ddd': {'www': 10, 'ele': 11, 'zzz': 12}
         }), {'zzz': math.sin(13), 'yyy': math.sin(6), 'xxx': math.sin(15), 'www': math.sin(24)})
     def test_case_3(self):
-        self.assertEqual(f_301({
+        self.assertEqual(f_545({
             'x': {'a': 1, 'b': 2, 'c': 3},
             'y': {'b': 4, 'c': 5, 'd': 6},
             'z': {'c': 7, 'd': 8, 'e': 9}
         }), {'a': math.sin(1), 'b': math.sin(6), 'c': math.sin(15), 'd': math.sin(14), 'e': math.sin(9)})
     def test_case_4(self):
-        self.assertEqual(f_301({
+        self.assertEqual(f_545({
             'x': {'a': 1, 'b': 2, 'c': 3},
             'y': {'b': 4, 'c': 5, 'd': 6},
             'z': {'c': 7, 'd': 8, 'ele': 9}
         }), {'a': math.sin(1), 'b': math.sin(6), 'c': math.sin(15), 'd': math.sin(14)})
     def test_case_5(self):
-        self.assertEqual(f_301({
+        self.assertEqual(f_545({
             1: {1: 1, 2: 2, 3: 3},
             2: {2: 4, 3: 5, 4: 6},
             3: {3: 7, 4: 8, 5: 9}

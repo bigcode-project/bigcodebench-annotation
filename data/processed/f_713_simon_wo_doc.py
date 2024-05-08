@@ -2,7 +2,7 @@ import numpy as np
 import itertools
 
 
-def f_706(data_list, file_name):
+def f_735(data_list, file_name):
     """
     This function takes a list of tuples. The first value of each tuple is a string,
     the other values are numeric. E.g. ('test', 2, 12.4, -2)
@@ -32,14 +32,14 @@ def f_706(data_list, file_name):
 
     Example:
     >>> data = [('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)]
-    >>> f_706(data, 'mean_values.txt')
+    >>> f_735(data, 'mean_values.txt')
     [3.0, 4.0]
     >>> with open('mean_values.txt') as file:
     ...    txt_content = file.readlines()
     >>> print(txt_content)
     ['Position 1: 3.0\\n', 'Position 2: 4.0\\n']
     >>> data_list=[('hi', 'test', -12, 4), ('hallo', 1.2, 'test'), ('hola', -3, 34, 12.1)]
-    >>> f_706(data_list, 'test.txt')
+    >>> f_735(data_list, 'test.txt')
     [-0.9, 11.0, 8.05]
     >>> with open('test.txt') as file:
     ...     txt_content = file.readlines()
@@ -77,14 +77,14 @@ class TestCases(unittest.TestCase):
     def test_mean_values_with_valid_data(self):
         expected_means = [3.0, 4.0]  # Expected mean values
         expected_file_content = ["Position 1: 3.0\n", "Position 2: 4.0\n"]
-        result = f_706(self.data_list, self.file_name)
+        result = f_735(self.data_list, self.file_name)
         self.assertEqual(result, expected_means)
         self.assertTrue(os.path.isfile(self.file_name))  # Check file creation
         # Verify the content of the created file
         actual_file_content = self.read_file_content(self.file_name)
         self.assertEqual(actual_file_content, expected_file_content)
     def test_function_with_empty_data(self):
-        result = f_706([], self.file_name)
+        result = f_735([], self.file_name)
         self.assertEqual(result, [])  # Should return an empty list
         self.assertTrue(os.path.isfile(self.file_name))  # Check file creation
         expected_file_content = []
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(actual_file_content, expected_file_content)
     def test_function_with_non_numeric_data(self):
         data_with_non_numeric = [('a', 'x', 'y'), ('b', 'p', 'q')]
-        result = f_706(data_with_non_numeric, self.file_name)
+        result = f_735(data_with_non_numeric, self.file_name)
         self.assertEqual(result, [np.nan, np.nan])
         self.assertTrue(os.path.isfile(self.file_name))  # Check file creation
         expected_file_content = ["Position 1: nan\n", "Position 2: nan\n"]
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
     def test_function_with_incomplete_tuples(self):
         inconsistent_data = [('a', 1), ('b',), ('c', 2, 3)]
         expected_means = [1.5, 3.0]  # Expected means
-        result = f_706(inconsistent_data, self.file_name)
+        result = f_735(inconsistent_data, self.file_name)
         self.assertEqual(result, expected_means)
         self.assertTrue(os.path.isfile(self.file_name))  # Check file creation
         expected_file_content = ["Position 1: 1.5\n", "Position 2: 3.0\n"]
@@ -110,7 +110,7 @@ class TestCases(unittest.TestCase):
     def test_function_with_all_nan_values(self):
         data_all_nan = [('a', np.nan, np.nan) for _ in range(5)]
         expected_means = [np.nan, np.nan]
-        result = f_706(data_all_nan, self.file_name)
+        result = f_735(data_all_nan, self.file_name)
         # Check if all values are 'nan'
         self.assertTrue(result, expected_means)
         self.assertTrue(os.path.isfile(self.file_name))  # Check file creation

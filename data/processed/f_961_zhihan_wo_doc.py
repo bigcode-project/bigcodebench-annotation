@@ -1,7 +1,7 @@
 import os
 from nltk import word_tokenize
 
-def f_774(file_path='File.txt'):
+def f_973(file_path='File.txt'):
     """
     Tokenizes a text file using the NLTK library. This function reads each line from the file, 
     breaks it into words or punctuation, and stores the tokens in a list.
@@ -17,9 +17,9 @@ def f_774(file_path='File.txt'):
     - nltk.word_tokenize
     
     Examples:
-    >>> f_774('sample.txt')
+    >>> f_973('sample.txt')
     ['Hello', ',', 'world', '!']
-    >>> f_774('data.txt')
+    >>> f_973('data.txt')
     ['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog', '.']
     """
     if not os.path.isfile(file_path):
@@ -34,7 +34,7 @@ import unittest
 import shutil
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.test_dir = 'testdir_f_774'
+        self.test_dir = 'testdir_f_973'
         os.makedirs(self.test_dir, exist_ok=True)
         
         f = open(self.test_dir+"/sample1.txt","w")
@@ -59,17 +59,17 @@ class TestCases(unittest.TestCase):
         # Clean up the test directory
         shutil.rmtree(self.test_dir)
     def test_case_1(self):
-        tokens = f_774(self.test_dir+'/sample1.txt')
+        tokens = f_973(self.test_dir+'/sample1.txt')
         self.assertEqual(tokens, ['Hello', ',', 'world', '!'])
     def test_case_2(self):
-        tokens = f_774(self.test_dir+'/sample2.txt')
+        tokens = f_973(self.test_dir+'/sample2.txt')
         self.assertEqual(tokens, ['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog', '.'])
     def test_case_3(self):
-        tokens = f_774(self.test_dir+'/sample3.txt')
+        tokens = f_973(self.test_dir+'/sample3.txt')
         self.assertEqual(tokens, ['NLTK', 'is', 'a', 'leading', 'platform', 'for', 'building', 'Python', 'programs', 'to', 'work', 'with', 'human', 'language', 'data', '.'])
     def test_case_4(self):
-        tokens = f_774(self.test_dir+'/sample4.txt')
+        tokens = f_973(self.test_dir+'/sample4.txt')
         self.assertEqual(tokens, ['OpenAI', 'is', 'an', 'organization', 'focused', 'on', 'ensuring', 'that', 'artificial', 'general', 'intelligence', 'benefits', 'all', 'of', 'humanity', '.'])
     def test_case_5(self):
-        tokens = f_774(self.test_dir+'/sample5.txt')
+        tokens = f_973(self.test_dir+'/sample5.txt')
         self.assertEqual(tokens, ['Python', 'is', 'an', 'interpreted', ',', 'high-level', ',', 'general-purpose', 'programming', 'language', '.'])

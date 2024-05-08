@@ -1,7 +1,7 @@
 import base64
 from cryptography.fernet import Fernet
 
-def f_278(message, encryption_key):
+def f_25(message, encryption_key):
     """
     Encrypts a message with a symmetric encryption key using Fernet encryption, and then encode the 
     encrypted message using base64.
@@ -21,7 +21,7 @@ def f_278(message, encryption_key):
     - cryptography.fernet
 
     Example:
-    >>> encrypted_message = f_278('Hello, World!', '01234567890123456789012345678901')
+    >>> encrypted_message = f_25('Hello, World!', '01234567890123456789012345678901')
     >>> isinstance(encrypted_message, str)
     True
     """
@@ -35,30 +35,30 @@ from cryptography.fernet import Fernet
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test with a basic message and a valid encryption key.
-        result = f_278('Hello, World!', '01234567890123456789012345678901')
+        result = f_25('Hello, World!', '01234567890123456789012345678901')
         self.assertIsInstance(result, str)
         self.assertNotEqual(result, 'Hello, World!')
     def test_case_2(self):
         # Test with an empty message and a valid encryption key.
-        result = f_278('', '01234567890123456789012345678901')
+        result = f_25('', '01234567890123456789012345678901')
         self.assertIsInstance(result, str)
         self.assertNotEqual(result, '')
     def test_case_3(self):
         # Test with a numeric message and a valid encryption key.
-        result = f_278('1234567890', '01234567890123456789012345678901')
+        result = f_25('1234567890', '01234567890123456789012345678901')
         self.assertIsInstance(result, str)
         self.assertNotEqual(result, '1234567890')
     def test_case_4(self):
         # Test with a long message and a valid encryption key.
         long_message = 'A' * 500
-        result = f_278(long_message, '01234567890123456789012345678901')
+        result = f_25(long_message, '01234567890123456789012345678901')
         self.assertIsInstance(result, str)
         self.assertNotEqual(result, long_message)
     def test_case_5(self):
         # Test with a basic message and an incorrectly formatted encryption key.
         with self.assertRaises(ValueError):
-            f_278('Hello, World!', '0123456789')
+            f_25('Hello, World!', '0123456789')
     def test_case_6(self):
         # Test with a non-base64 but correct length key.
         with self.assertRaises(Exception):
-            f_278('Hello, World!', '01234567890123456789012345678901'*2)  # Not base64-encoded
+            f_25('Hello, World!', '01234567890123456789012345678901'*2)  # Not base64-encoded

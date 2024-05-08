@@ -4,7 +4,7 @@ import pandas as pd
 # Constants
 RANGE = (1, 100)
 
-def f_414(L):
+def f_483(L):
     '''
     Generates a DataFrame filled with random integers. The dimensions of the DataFrame (number of rows and columns)
     are determined by multiplying pairs of integers from nested lists within the input list of lists 'L'.
@@ -20,7 +20,7 @@ def f_414(L):
     DataFrame: A pandas DataFrame with random integers.
     
     Example:
-    >>> df = f_414([[2, 3], [5, 6]])
+    >>> df = f_483([[2, 3], [5, 6]])
     >>> type(df)
     <class 'pandas.core.frame.DataFrame'>
     '''
@@ -33,27 +33,27 @@ import unittest
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
-        result = f_414([[2, 3], [5, 6]])
+        result = f_483([[2, 3], [5, 6]])
         self.assertEqual(result.shape, (2*3, 5*6))
         self.assertTrue((result.values >= 1).all())
         self.assertTrue((result.values <= 100).all())
     def test_case_2(self):
-        result = f_414([[1, 1], [1, 1]])
+        result = f_483([[1, 1], [1, 1]])
         self.assertEqual(result.shape, (1*1, 1*1))
         self.assertTrue((result.values >= 1).all())
         self.assertTrue((result.values <= 100).all())
     def test_case_3(self):
-        result = f_414([[4, 5], [2, 3]])
+        result = f_483([[4, 5], [2, 3]])
         self.assertEqual(result.shape, (4*5, 2*3))
         self.assertTrue((result.values >= 1).all())
         self.assertTrue((result.values <= 100).all())
     def test_case_4(self):
-        result = f_414([[3, 2], [6, 5]])
+        result = f_483([[3, 2], [6, 5]])
         self.assertEqual(result.shape, (3*2, 6*5))
         self.assertTrue((result.values >= 1).all())
         self.assertTrue((result.values <= 100).all())
     def test_case_5(self):
-        result = f_414([[7, 8], [1, 2]])
+        result = f_483([[7, 8], [1, 2]])
         self.assertEqual(result.shape, (7*8, 1*2))
         self.assertTrue((result.values >= 1).all())
         self.assertTrue((result.values <= 100).all())

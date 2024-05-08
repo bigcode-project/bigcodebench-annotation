@@ -5,7 +5,7 @@ import numpy as np
 CATEGORIES = ["Electronics", "Clothing", "Home Decor", "Automotive", "Books"]
 
 
-def f_895(s1, s2):
+def f_898(s1, s2):
     """
     Compares and visualizes the sales data of two stores for predefined categories.
     The function generates a bar plot for categories where both stores have sales exceeding a specified threshold.
@@ -28,7 +28,7 @@ def f_895(s1, s2):
     >>> np.random.seed(seed=32)
     >>> s1 = pd.Series(np.random.randint(100, 500, size=5), index=CATEGORIES)
     >>> s2 = pd.Series(np.random.randint(150, 600, size=5), index=CATEGORIES)
-    >>> ax, edit_distance = f_895(s1, s2)
+    >>> ax, edit_distance = f_898(s1, s2)
     >>> ax.get_title()
     'Sales Comparison Above Threshold in Categories'
     >>> edit_distance
@@ -51,14 +51,14 @@ import matplotlib.pyplot as plt
 # Constants (should be kept consistent with function.py)
 CATEGORIES = ["Electronics", "Clothing", "Home Decor", "Automotive", "Books"]
 class TestCases(unittest.TestCase):
-    """Tests for function f_895."""
+    """Tests for function f_898."""
     def test_sales_above_threshold(self):
         """Test that the function returns a plot when sales exceed the threshold"""
         np.random.seed(seed=32)
         s1 = pd.Series(np.random.randint(100, 500, size=5), index=CATEGORIES)
         np.random.seed(seed=32)
         s2 = pd.Series(np.random.randint(150, 600, size=5), index=CATEGORIES)
-        ax, edit_distance = f_895(s1, s2)
+        ax, edit_distance = f_898(s1, s2)
         # Check the correct categories are plotted
         categories_plotted = [label.get_text() for label in ax.get_xticklabels()]
         self.assertListEqual(
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
         s1 = pd.Series(np.random.randint(50, 150, size=5), index=CATEGORIES)
         np.random.seed(seed=32)
         s2 = pd.Series(np.random.randint(50, 150, size=5), index=CATEGORIES)
-        ax, edit_distance = f_895(s1, s2)
+        ax, edit_distance = f_898(s1, s2)
         # Check that no categories are plotted
         self.assertIsNone(
             ax, "Expected None as no categories should meet the threshold"
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
         s1 = pd.Series(np.random.randint(200, 500, size=5), index=CATEGORIES)
         np.random.seed(seed=123)
         s2 = pd.Series(np.random.randint(250, 600, size=5), index=CATEGORIES)
-        ax, edit_distance = f_895(s1, s2)
+        ax, edit_distance = f_898(s1, s2)
         # Check that all categories are plotted
         categories_plotted = [label.get_text() for label in ax.get_xticklabels()]
         self.assertListEqual(categories_plotted, CATEGORIES)
@@ -98,7 +98,7 @@ class TestCases(unittest.TestCase):
         """Test that some categories are plotted when some sales exceed the threshold"""
         s1 = pd.Series([250, 180, 290, 200, 290], index=CATEGORIES)
         s2 = pd.Series([260, 290, 195, 299, 295], index=CATEGORIES)
-        ax, edit_distance = f_895(s1, s2)
+        ax, edit_distance = f_898(s1, s2)
         # Check that only the correct categories are plotted
         categories_plotted = [label.get_text() for label in ax.get_xticklabels()]
         self.assertListEqual(categories_plotted, ["Electronics", "Books"])
@@ -108,7 +108,7 @@ class TestCases(unittest.TestCase):
         """Test that only a single category is plotted when only a single category has sales exceeding the threshold"""
         s1 = pd.Series([150, 180, 290, 200, 190], index=CATEGORIES)
         s2 = pd.Series([160, 190, 295, 199, 195], index=CATEGORIES)
-        ax, edit_distance = f_895(s1, s2)
+        ax, edit_distance = f_898(s1, s2)
         # Check that only a single category is plotted
         categories_plotted = [label.get_text() for label in ax.get_xticklabels()]
         self.assertListEqual(categories_plotted, ["Home Decor"])

@@ -3,7 +3,7 @@ import re
 import shutil
 
 
-def f_457(source_directory: str, target_directory: str, pattern: str = r"\d{4}") -> int:
+def f_829(source_directory: str, target_directory: str, pattern: str = r"\d{4}") -> int:
     """
     Moves files matching a specific regex pattern from a source directory to a target directory.
 
@@ -28,7 +28,7 @@ def f_457(source_directory: str, target_directory: str, pattern: str = r"\d{4}")
     Examples:
     >>> os.listdir('/path/to/source')
     ['1000.txt', '1001.txt', '1002.txt', 'not_a_match.txt']
-    >>> f_457('/path/to/source', '/path/to/target')
+    >>> f_829('/path/to/source', '/path/to/target')
     3
     """
     moved_files_count = 0
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
                     "4321done.txt",
                 ],
             )
-            result = f_457(src, dst)
+            result = f_829(src, dst)
             self.assertEqual(
                 result, 4, "Should move 4 files matching the default pattern."
             )
@@ -94,7 +94,7 @@ class TestCases(unittest.TestCase):
                     "4321done.txt",
                 ],
             )
-            result = f_457(src, dst, r"test\w+")
+            result = f_829(src, dst, r"test\w+")
             self.assertEqual(
                 result, 1, "Should move 1 file matching the custom pattern 'test\\w+.'"
             )
@@ -102,12 +102,12 @@ class TestCases(unittest.TestCase):
         # Test no match
         with tempfile.TemporaryDirectory() as src, tempfile.TemporaryDirectory() as dst:
             self.create_test_files(src, ["nope.txt"])
-            result = f_457(src, dst)
+            result = f_829(src, dst)
             self.assertEqual(result, 0, "Should move 0 files if no match.")
     def test_return_zero_if_source_does_not_exist(self):
         # Test source_directory if not exists
         with tempfile.TemporaryDirectory() as dst:
-            result = f_457(os.path.join(dst, "non_existing_dir"), dst)
+            result = f_829(os.path.join(dst, "non_existing_dir"), dst)
             self.assertEqual(
                 result, 0, "Should return 0 if source directory does not exist."
             )
@@ -116,7 +116,7 @@ class TestCases(unittest.TestCase):
         with tempfile.TemporaryDirectory() as src:
             self.create_test_files(src, ["1234.txt"])
             new_target = os.path.join(src, "new_target_dir")
-            f_457(src, new_target)
+            f_829(src, new_target)
             self.assertTrue(
                 os.path.exists(new_target),
                 "Target directory should be created if it does not exist.",
@@ -124,7 +124,7 @@ class TestCases(unittest.TestCase):
     def test_no_files_in_source(self):
         # Test empty source direcotry
         with tempfile.TemporaryDirectory() as src, tempfile.TemporaryDirectory() as dst:
-            result = f_457(src, dst)
+            result = f_829(src, dst)
             self.assertEqual(
                 result, 0, "Should move 0 files if source directory is empty."
             )

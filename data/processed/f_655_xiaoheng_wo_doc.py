@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import shutil
 
-def f_94(kwargs, target_dir="non_none_files"):
+def f_628(kwargs, target_dir="non_none_files"):
     """
     Process files from a dictionary by checking if the file exists, and if it has content, then copies it to a target directory.
     
@@ -20,9 +20,9 @@ def f_94(kwargs, target_dir="non_none_files"):
 
     Example:
     >>> files = {'/path/to/file1.txt': 'Hello', '/path/to/file2.txt': None, '/path/to/file3.txt': 'World'}
-    >>> f_94(files)
+    >>> f_628(files)
     >>> files = {'/path/to/file4.txt': 'Another', '/path/to/file5.txt': 'Example'}
-    >>> f_94(files, target_dir="another_directory")
+    >>> f_628(files, target_dir="another_directory")
     """
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
@@ -53,7 +53,7 @@ class TestCases(unittest.TestCase):
                 f.write(content)
         
         full_paths = {os.path.join(self.test_dir, k): v for k, v in test_files.items()}
-        copied_files = f_94(full_paths, self.target_dir)
+        copied_files = f_628(full_paths, self.target_dir)
         
         self.assertEqual(len(copied_files), 2)
         for copied in copied_files:
@@ -66,14 +66,14 @@ class TestCases(unittest.TestCase):
                 if content:
                     f.write(content)
         full_paths = {os.path.join(self.test_dir, k): v for k, v in test_files.items()}
-        copied_files = f_94(full_paths, self.target_dir)
+        copied_files = f_628(full_paths, self.target_dir)
         self.assertEqual(len(copied_files), 1)
         self.assertTrue(os.path.isfile(copied_files[0]))
         self.assertTrue(copied_files[0].startswith(self.target_dir))
     def test_files_do_not_exist(self):
         test_files = {'file1.txt': 'Hello', 'file2.txt': 'World'}
         full_paths = {os.path.join(self.test_dir, k): v for k, v in test_files.items()}
-        copied_files = f_94(full_paths, self.target_dir)
+        copied_files = f_628(full_paths, self.target_dir)
         self.assertEqual(len(copied_files), 0)
     def test_mixed_case(self):
         test_files = {'file1.txt': 'Hello', 'file2.txt': None, 'file3.txt': 'World'}
@@ -82,11 +82,11 @@ class TestCases(unittest.TestCase):
                 if content:
                     f.write(content)
         full_paths = {os.path.join(self.test_dir, k): v for k, v in test_files.items()}
-        copied_files = f_94(full_paths, self.target_dir)
+        copied_files = f_628(full_paths, self.target_dir)
         self.assertEqual(len(copied_files), 2)
         for copied in copied_files:
             self.assertTrue(os.path.isfile(copied))
             self.assertTrue(copied.startswith(self.target_dir))
     def test_empty_dict(self):
-        copied_files = f_94({}, self.target_dir)
+        copied_files = f_628({}, self.target_dir)
         self.assertEqual(len(copied_files), 0)

@@ -4,7 +4,7 @@ from sklearn.preprocessing import MinMaxScaler
 # Constants
 ARRAY_LENGTH = 10
 
-def f_595():
+def f_652():
     """
     Generate a random array and apply min-max normalization (scaling) to transform the array values into a range between 0 and 1.
 
@@ -19,7 +19,7 @@ def f_595():
     - sklearn
 
     Example:
-    >>> f_595()
+    >>> f_652()
     array([[0.57142857],
            [0.14285714],
            [0.71428571],
@@ -41,7 +41,7 @@ import unittest
 import numpy as np
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.result = f_595()  # Call the function once to use in multiple tests if needed
+        self.result = f_652()  # Call the function once to use in multiple tests if needed
     def test_normal_functionality(self):
         """Testing the basic functionality and shape of the output array."""
         self.assertEqual(self.result.shape, (10, 1), "Array shape should be (10, 1)")
@@ -57,10 +57,10 @@ class TestCases(unittest.TestCase):
     def test_no_arguments(self):
         """Ensure that no arguments are passed to the function."""
         with self.assertRaises(TypeError):
-            f_595(10)  # This should fail since the function expects no arguments
+            f_652(10)  # This should fail since the function expects no arguments
     def test_unchanging_output(self):
         """Test if multiple calls to the function give the same result due to seed setting."""
-        second_result = f_595()
+        second_result = f_652()
         np.testing.assert_array_equal(self.result, second_result, "Results should be the same on every call due to fixed seed.")
     def test_distribution_of_values(self):
         """Test that the distribution of scaled values is neither constant nor degenerate (not all values the same)."""

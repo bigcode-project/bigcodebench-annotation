@@ -6,7 +6,7 @@ PATH_TO_APPEND = "path/to/whatever"
 DATABASE = "path/to/database.db"
 
 
-def f_494(path_to_append=PATH_TO_APPEND, database=DATABASE):
+def f_856(path_to_append=PATH_TO_APPEND, database=DATABASE):
     """
     This function appends a given path to sys.path and updates an SQLite database with the path, 
     creating the table if needed and avoiding duplicates.
@@ -27,9 +27,9 @@ def f_494(path_to_append=PATH_TO_APPEND, database=DATABASE):
 
 
     Examples:
-    >>> f_494('path/to/new_directory', 'path/to/new_database.db')
+    >>> f_856('path/to/new_directory', 'path/to/new_database.db')
     'path/to/new_directory'
-    >>> f_494()
+    >>> f_856()
     'path/to/whatever'
     """
     sys.path.append(path_to_append)
@@ -46,7 +46,7 @@ import sqlite3
 import os
 import shutil
 class TestCases(unittest.TestCase):
-    """Test cases for f_494"""
+    """Test cases for f_856"""
     def setUp(self):
         path_to_create = os.path.dirname(PATH_TO_APPEND)
         os.makedirs(path_to_create, exist_ok=True)
@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
     def test_basic_path_insertion(self):
         """Test the function when a path is provided."""
         test_path = "path/to/test/path"
-        result = f_494(test_path, self.test_db)
+        result = f_856(test_path, self.test_db)
         self.assertEqual(result, test_path)
         # Check the database to ensure the path was saved
         conn = sqlite3.connect(self.test_db)
@@ -68,9 +68,9 @@ class TestCases(unittest.TestCase):
         """Test the function when an existing path is provided."""
         # Insert an existing path
         existing_path = "existing/path"
-        f_494(existing_path, self.test_db)
+        f_856(existing_path, self.test_db)
         # Attempt to insert the same path again
-        result = f_494(existing_path, self.test_db)
+        result = f_856(existing_path, self.test_db)
         self.assertEqual(result, existing_path)
         # Check the database to ensure there's only one entry for the existing path
         conn = sqlite3.connect(self.test_db)
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
         """Test the function when multiple paths are provided."""
         paths = ["path1", "path2", "path3"]
         for path in paths:
-            result = f_494(path, self.test_db)
+            result = f_856(path, self.test_db)
             self.assertEqual(result, path)
         # Check the database to ensure all paths are saved
         conn = sqlite3.connect(self.test_db)
@@ -97,7 +97,7 @@ class TestCases(unittest.TestCase):
         new_db = "path/to/new_test_database.db"
         test_path = "path/to/new"
         os.makedirs(os.path.dirname(test_path), exist_ok=True)
-        result = f_494(test_path, new_db)
+        result = f_856(test_path, new_db)
         self.assertEqual(result, test_path)
         # Check the new database to ensure the path was saved
         conn = sqlite3.connect(new_db)
@@ -112,7 +112,7 @@ class TestCases(unittest.TestCase):
         invalid_db = "invalid/path/database.db"
         test_path = "test/path"
         with self.assertRaises(sqlite3.OperationalError):
-            f_494(test_path, invalid_db)
+            f_856(test_path, invalid_db)
     def tearDown(self):
         # Cleanup the test databases
         dbs_to_remove = ["path/to/database.db", "path/to/new_test_database.db"]

@@ -3,7 +3,7 @@ from random import randint
 import matplotlib.pyplot as plt
 
 
-def f_60():
+def f_491():
     """
     Create and draw a sine wave with random frequency, amplitude and phase shift. The return ax object
     has 'Random Sine Wave' title, 'Time' on the x axis and 'Amplitude' on the y axis.
@@ -20,7 +20,7 @@ def f_60():
     - matplotlib.pyplot
 
     Example:
-    >>> ax = f_60()
+    >>> ax = f_491()
     """
     x = [i/100 for i in range(1000)]
     frequency = randint(1, 5)
@@ -38,31 +38,31 @@ def f_60():
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        ax = f_60()
+        ax = f_491()
         self.assertEqual(ax.get_title(), 'Random Sine Wave')
         self.assertEqual(ax.get_xlabel(), 'Time')
         self.assertEqual(ax.get_ylabel(), 'Amplitude')
         
     def test_case_2(self):
-        ax = f_60()
+        ax = f_491()
         self.assertEqual(ax.get_title(), 'Random Sine Wave')
         self.assertEqual(ax.get_xlabel(), 'Time')
         self.assertEqual(ax.get_ylabel(), 'Amplitude')
         
     def test_case_3(self):
-        ax = f_60()
+        ax = f_491()
         self.assertEqual(ax.get_title(), 'Random Sine Wave')
         self.assertEqual(ax.get_xlabel(), 'Time')
         self.assertEqual(ax.get_ylabel(), 'Amplitude')
         
     def test_case_4(self):
-        ax = f_60()
+        ax = f_491()
         self.assertEqual(ax.get_title(), 'Random Sine Wave')
         self.assertEqual(ax.get_xlabel(), 'Time')
         self.assertEqual(ax.get_ylabel(), 'Amplitude')
         
     def test_case_5(self):
-        ax = f_60()
+        ax = f_491()
         self.assertEqual(ax.get_title(), 'Random Sine Wave')
         self.assertEqual(ax.get_xlabel(), 'Time')
         self.assertEqual(ax.get_ylabel(), 'Amplitude')

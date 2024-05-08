@@ -1,7 +1,7 @@
 import requests
 import logging
 
-def f_672(repo_url: str) -> dict:
+def f_931(repo_url: str) -> dict:
     """
     Fetches and returns information about a GitHub repository using its API URL. The function makes an HTTP GET
     request to the provided repository URL. It incorporates error handling for various scenarios including API
@@ -25,9 +25,9 @@ def f_672(repo_url: str) -> dict:
     - logging
 
     Example:
-    >>> f_672('https://api.github.com/repos/psf/requests')
+    >>> f_931('https://api.github.com/repos/psf/requests')
     { ... }  # dictionary containing repo information
-    >>> f_672('https://api.github.com/repos/some/repo')
+    >>> f_931('https://api.github.com/repos/some/repo')
     { ... }  # dictionary containing repo information with a possible runtime warning about open issues
     """
     try:
@@ -52,60 +52,60 @@ from unittest.mock import patch, MagicMock
 from io import StringIO
 from contextlib import redirect_stdout
 class TestCases(unittest.TestCase):
-    """Test cases for f_672."""
+    """Test cases for f_931."""
     @patch("requests.get")
     def test_successful_response(self, mock_get):
         """
-        Test f_672 with a successful response.
+        Test f_931 with a successful response.
         """
         mock_get.return_value = MagicMock(
             status_code=200, json=lambda: {"open_issues_count": 5000}
         )
-        response = f_672("https://api.github.com/repos/psf/requests")
+        response = f_931("https://api.github.com/repos/psf/requests")
         self.assertIn("open_issues_count", response)
         self.assertEqual(response["open_issues_count"], 5000)
     @patch("requests.get")
     @patch('logging.warning')
     def test_response_with_more_than_10000_issues(self, mock_warning, mock_get):
         """
-        Test f_672 with a response indicating more than 10000 open issues.
+        Test f_931 with a response indicating more than 10000 open issues.
         """
         mock_get.return_value = MagicMock(
             status_code=200, json=lambda: {"open_issues_count": 15000}
         )
         
-        response = f_672("https://api.github.com/repos/psf/requests")
+        response = f_931("https://api.github.com/repos/psf/requests")
         
         mock_warning.assert_called_once_with("The repository has more than 10000 open issues.")
         self.assertEqual(response["open_issues_count"], 15000)
     @patch("requests.get")
     def test_api_rate_limit_exceeded(self, mock_get):
         """
-        Test f_672 handling API rate limit exceeded error.
+        Test f_931 handling API rate limit exceeded error.
         """
         mock_get.return_value = MagicMock(
             status_code=403, json=lambda: {"message": "API rate limit exceeded"}
         )
         with self.assertRaises(Exception) as context:
-            f_672("https://api.github.com/repos/psf/requests")
+            f_931("https://api.github.com/repos/psf/requests")
         self.assertIn("API rate limit exceeded", str(context.exception))
     @patch("requests.get")
     def test_http_error(self, mock_get):
         """
-        Test f_672 handling HTTP errors.
+        Test f_931 handling HTTP errors.
         """
         mock_get.side_effect = requests.exceptions.HTTPError(
             "404 Client Error: Not Found for url"
         )
         with self.assertRaises(Exception) as context:
-            f_672("https://api.github.com/repos/psf/requests")
+            f_931("https://api.github.com/repos/psf/requests")
         self.assertIn("404 Client Error", str(context.exception))
     @patch("requests.get")
     def test_invalid_url(self, mock_get):
         """
-        Test f_672 with an invalid URL.
+        Test f_931 with an invalid URL.
         """
         mock_get.side_effect = requests.exceptions.InvalidURL("Invalid URL")
         with self.assertRaises(Exception) as context:
-            f_672("invalid_url")
+            f_931("invalid_url")
         self.assertIn("Invalid URL", str(context.exception))

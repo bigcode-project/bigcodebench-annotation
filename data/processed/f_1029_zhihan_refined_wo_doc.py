@@ -2,7 +2,7 @@ import json
 import os
 import re
 
-def f_890(
+def f_29(
     file_path,
     attribute,
     INPUT_JSON={
@@ -45,7 +45,7 @@ def f_890(
     - Raises ValueError if the file does not exist, required attributes are missing, types do not match, or the email format is invalid.
 
     Example:
-    >>> f_890('/path/to/file.json', 'email')
+    >>> f_29('/path/to/file.json', 'email')
     'john.doe@example.com'
     """
     if not os.path.isfile(file_path):
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
         os.remove(self.filepath)
     def test_case_valid_json(self):
         # Test with valid JSON data
-        result = f_890(self.filepath, 'name')
+        result = f_29(self.filepath, 'name')
         self.assertEqual(result, "John Doe")
     
     def test_case_invalid_email_format(self):
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
         with open(self.filepath, 'w') as file:
             json.dump(self.invalid_email_data, file)
         with self.assertRaises(ValueError):
-            f_890(self.filepath, 'email')
+            f_29(self.filepath, 'email')
     
     def test_case_missing_attribute(self):
         # Test with JSON missing a required attribute by removing 'age'
@@ -105,13 +105,13 @@ class TestCases(unittest.TestCase):
         with open(self.filepath, 'w') as file:
             json.dump(modified_data, file)
         with self.assertRaises(ValueError):
-            f_890(self.filepath, 'age')
+            f_29(self.filepath, 'age')
     
     def test_case_retrieve_age(self):
         # Test retrieving age from valid JSON
-        result = f_890(self.filepath, 'age')
+        result = f_29(self.filepath, 'age')
         self.assertEqual(result, 30)
     def test_case_non_existent_file(self):
         # Test with non-existent file path
         with self.assertRaises(ValueError):
-            f_890('/tmp/non_existent.json', 'name')
+            f_29('/tmp/non_existent.json', 'name')

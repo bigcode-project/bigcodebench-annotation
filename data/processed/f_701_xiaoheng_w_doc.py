@@ -5,7 +5,7 @@ import collections
 # Constants
 VALID_CHARACTERS = string.ascii_letters + string.digits
 
-def f_835(n_strings, string_length):
+def f_719(n_strings, string_length):
     """
     Generate n random strings of a specified length, count the frequency of each character across all strings, and return the result as a dictionary.
 
@@ -26,7 +26,7 @@ def f_835(n_strings, string_length):
 
     Example:
     >>> random.seed(42)
-    >>> f_835(2, 3)
+    >>> f_719(2, 3)
     {'O': 1, 'h': 1, 'b': 1, 'V': 1, 'r': 1, 'p': 1}
     """
     strings = [''.join(random.choice(VALID_CHARACTERS) for _ in range(string_length)) for _ in range(n_strings)]
@@ -38,26 +38,26 @@ from collections import Counter
 class TestCases(unittest.TestCase):
     def test_single_string_single_character(self):
         # Test when n_strings=1 and string_length=1 (minimal input)
-        result = f_835(1, 1)
+        result = f_719(1, 1)
         self.assertEqual(len(result), 1)
         self.assertEqual(sum(result.values()), 1)
     def test_multiple_strings_single_character(self):
         # Test when n_strings > 1 and string_length=1
-        result = f_835(5, 1)
+        result = f_719(5, 1)
         self.assertTrue(len(result) <= 5)
         self.assertEqual(sum(result.values()), 5)
     def test_single_string_multiple_characters(self):
         # Test when n_strings=1 and string_length > 1
-        result = f_835(1, 5)
+        result = f_719(1, 5)
         self.assertTrue(len(result) <= 5)
         self.assertEqual(sum(result.values()), 5)
     def test_multiple_strings_multiple_characters(self):
         # Test when n_strings > 1 and string_length > 1
-        result = f_835(5, 5)
+        result = f_719(5, 5)
         self.assertTrue(len(result) <= 25)
         self.assertEqual(sum(result.values()), 25)
     def test_valid_characters(self):
         # Test whether the function only uses valid characters as defined in VALID_CHARACTERS
-        result = f_835(100, 10)
+        result = f_719(100, 10)
         all_characters = ''.join(result.keys())
         self.assertTrue(all(char in VALID_CHARACTERS for char in all_characters))

@@ -2,7 +2,7 @@ import pandas as pd
 from scipy import stats
 import matplotlib.pyplot as plt
 
-def f_134(df):
+def f_173(df):
     """
     Perform a linear regression between "age" and "score" in the DataFrame, excluding rows with duplicate names.
     Plot the regression line and the scatter plot of the data.
@@ -27,7 +27,7 @@ def f_134(df):
 
     Example:
     >>> data = pd.DataFrame([{'Name': 'Alice', 'Age': 20, 'Score': 70}, {'Name': 'Bob', 'Age': 25, 'Score': 75}, {'Name': 'Eve', 'Age': 30, 'Score': 80}])
-    >>> plt, ax = f_134(data)
+    >>> plt, ax = f_173(data)
     >>> ax.lines[0].get_xdata()[0]
     20
     """
@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
             {'Name': 'Alice', 'Age': 25, 'Score': 80},
             {'Name': 'Eve', 'Age': 35, 'Score': 90}
         ])
-        plt, ax = f_134(data)
+        plt, ax = f_173(data)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(len(ax.lines), 1)  # Only one line for the regression
         self.assertEqual(len(ax.collections), 1)  # Only one collection for scatter plot
@@ -67,7 +67,7 @@ class TestCases(unittest.TestCase):
             {'Name': 'Bob', 'Age': 25, 'Score': 75},
             {'Name': 'Eve', 'Age': 30, 'Score': 80}
         ])
-        plt, ax = f_134(data)
+        plt, ax = f_173(data)
         line = ax.lines[0]
         x_data, y_data = line.get_xdata(), line.get_ydata()
         self.assertTrue((y_data[1] - y_data[0]) / (x_data[1] - x_data[0]) > 0)  # Positive slope
@@ -76,7 +76,7 @@ class TestCases(unittest.TestCase):
             {'Name': 'Alice', 'Age': 20, 'Score': 70},
             {'Name': 'Bob', 'Age': 25, 'Score': 75}
         ])
-        plt, ax= f_134(data)
+        plt, ax= f_173(data)
         self.assertEqual(ax.get_xlabel(), 'Age')
         self.assertEqual(ax.get_ylabel(), 'Score')
         self.assertEqual(ax.get_title(), 'Linear Regression')
@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
             {'Name': 'Alice', 'Age': 20, 'Score': 70},
             {'Name': 'Bob', 'Age': 25, 'Score': 75}
         ])
-        plt, ax = f_134(data)
+        plt, ax = f_173(data)
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(len(ax.lines), 1)  # No line for regression
         self.assertGreater(len(ax.collections), 0)
@@ -95,8 +95,8 @@ class TestCases(unittest.TestCase):
             {'Name': 'Bob', 'Age': 25}
         ])
         with self.assertRaises(KeyError):
-            f_134(data)
+            f_173(data)
     
     def test_non_df(self):
         with self.assertRaises(ValueError):
-            f_134("non_df")
+            f_173("non_df")

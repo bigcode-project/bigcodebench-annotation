@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-def f_302(L):
+def f_600(L):
     """
     Calculate the median of all elements in a nested list 'L'.
     
@@ -16,7 +16,7 @@ def f_302(L):
     - math
 
     Example:
-    >>> f_302([[1,2,3],[4,5,6]])
+    >>> f_600([[1,2,3],[4,5,6]])
     3.5
     """
     def flatten(lst):
@@ -46,20 +46,20 @@ import numpy as np
 class TestCases(unittest.TestCase):
     
     def test_median_odd_elements(self):
-        result = f_302([[1, 2, 3], [4, 5, 6], [7]])
+        result = f_600([[1, 2, 3], [4, 5, 6], [7]])
         self.assertEqual(result, 4.0)
     def test_median_even_elements(self):
-        result = f_302([[1, 2, 3], [4, 5, 6]])
+        result = f_600([[1, 2, 3], [4, 5, 6]])
         self.assertEqual(result, 3.5)
         
     def test_median_single_element(self):
-        result = f_302([[5]])
+        result = f_600([[5]])
         self.assertEqual(result, 5.0)
         
     def test_median_deep_nesting(self):
-        result = f_302([1, [2, [3, 4, [5, 6], 7], 8], 9])
+        result = f_600([1, [2, [3, 4, [5, 6], 7], 8], 9])
         self.assertEqual(result, 5.0)
         
     def test_median_empty_list(self):
         with self.assertRaises(ValueError):
-            f_302([])
+            f_600([])

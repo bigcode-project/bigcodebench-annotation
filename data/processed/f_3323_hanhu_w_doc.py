@@ -3,9 +3,9 @@ from sklearn.metrics import precision_recall_curve
 from tensorflow import keras
 import matplotlib.pyplot as plt
 
-def f_433(X, Y):
+def f_282(X, Y):
     """
-    This function performs the following operations:
+    This function should:
     - Splits the input data into training (70%) and test (30%) sets.
     - Constructs a Keras Sequential model with one hidden dense layer and sigmoid activation.
       The input dimension is determined based on the first feature set of X.
@@ -35,7 +35,7 @@ def f_433(X, Y):
     Examples:
     >>> X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     >>> Y = np.array([[0], [1], [1], [0]])
-    >>> model, ax = f_433(X, Y)
+    >>> model, ax = f_282(X, Y)
     >>> isinstance(model, Sequential)
     True
     >>> isinstance(ax, plt.Axes)
@@ -68,31 +68,31 @@ class TestCases(unittest.TestCase):
         self.Y = np.array([0, 1, 1, 0])
     def test_model_and_axes_types(self):
         # Verify if the returned objects include a Keras Sequential model and a matplotlib Axes.
-        model, ax = f_433(self.X, self.Y)
+        model, ax = f_282(self.X, self.Y)
         self.assertIsInstance(model, Sequential, "The function should return a Sequential model.")
         self.assertIsInstance(ax, Axes, "The function should return a matplotlib Axes object.")
     def test_model_output_shape(self):
         # Ensure the model's output shape is correct based on the input data.
-        model, _ = f_433(self.X, self.Y)
+        model, _ = f_282(self.X, self.Y)
         self.assertEqual(model.output_shape, (None, 1), "The model's output shape should have one dimension for binary classification.")
     def test_model_loss(self):
         # Confirm that the model uses binary cross-entropy as its loss function.
-        model, _ = f_433(self.X, self.Y)
+        model, _ = f_282(self.X, self.Y)
         self.assertEqual(model.loss, 'binary_crossentropy', "Binary cross-entropy should be the loss function for the model.")
     def test_model_optimizer(self):
         # Check if the model's optimizer is an instance of SGD.
-        model, _ = f_433(self.X, self.Y)
+        model, _ = f_282(self.X, self.Y)
         self.assertIsNotNone(model.optimizer)
         self.assertIsInstance(model.optimizer, SGD, "The optimizer for the model should be SGD.")
     def test_input_dimension_flexibility(self):
         # Test the model's ability to handle inputs with varying feature dimensions.
         X_varied = np.array([[0], [1], [2], [3]])
         Y_varied = np.array([0, 1, 0, 1])
-        model, _ = f_433(X_varied, Y_varied)
+        model, _ = f_282(X_varied, Y_varied)
         self.assertEqual(model.input_shape[1], X_varied.shape[1], "The model should dynamically adapt to the input feature size.")
     def test_axes_labels_and_title(self):
         # Test if the Axes object has the correct title and labels as specified.
-        _, ax = f_433(self.X, self.Y)
+        _, ax = f_282(self.X, self.Y)
         self.assertEqual(ax.get_title(), 'Precision-Recall Curve', "The plot's title should be 'Precision-Recall Curve'.")
         self.assertEqual(ax.get_xlabel(), 'Recall', "The plot's x-axis label should be 'Recall'.")
         self.assertEqual(ax.get_ylabel(), 'Precision', "The plot's y-axis label should be 'Precision'.")

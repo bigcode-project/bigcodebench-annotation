@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 
 
-def f_819(url: str) -> pd.DataFrame:
+def f_871(url: str) -> pd.DataFrame:
     """
     This function fetches JSON data from a specified URL and converts it into a Pandas DataFrame.
     It expects the JSON to be in a format that is directly convertible to a DataFrame, typically
@@ -28,7 +28,7 @@ def f_819(url: str) -> pd.DataFrame:
     - pandas
 
     Example:
-    >>> f_819('https://example.com/data.json')
+    >>> f_871('https://example.com/data.json')
     DataFrame:
        A  B
 
@@ -53,13 +53,13 @@ import requests
 import pandas as pd
 from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    """Test cases for f_819."""
+    """Test cases for f_871."""
     @patch("requests.get")
     def test_valid_json(self, mock_get):
         """Test a valid JSON."""
         mock_get.return_value.json.return_value = [{"A": 1, "B": 3}, {"A": 2, "B": 4}]
         mock_get.return_value.status_code = 200
-        df = f_819("https://example.com/data.json")
+        df = f_871("https://example.com/data.json")
         self.assertTrue(isinstance(df, pd.DataFrame))
         self.assertListEqual(df.columns.tolist(), ["A", "B"])
         self.assertListEqual(df["A"].tolist(), [1, 2])
@@ -69,7 +69,7 @@ class TestCases(unittest.TestCase):
         """Test an empty JSON."""
         mock_get.return_value.json.return_value = []
         mock_get.return_value.status_code = 200
-        df = f_819("https://example.com/empty.json")
+        df = f_871("https://example.com/empty.json")
         self.assertTrue(isinstance(df, pd.DataFrame))
         self.assertEqual(len(df), 0)
     @patch("requests.get")
@@ -77,13 +77,13 @@ class TestCases(unittest.TestCase):
         """Test an invalid JSON."""
         mock_get.return_value.json.side_effect = ValueError()
         with self.assertRaises(ValueError):
-            f_819("https://example.com/invalid.json")
+            f_871("https://example.com/invalid.json")
     @patch("requests.get")
     def test_large_json(self, mock_get):
         """Test a large JSON."""
         mock_get.return_value.json.return_value = [{"X": i} for i in range(1000)]
         mock_get.return_value.status_code = 200
-        df = f_819("https://example.com/large.json")
+        df = f_871("https://example.com/large.json")
         self.assertTrue(isinstance(df, pd.DataFrame))
         self.assertListEqual(df["X"].tolist(), list(range(1000)))
     @patch("requests.get")
@@ -91,7 +91,7 @@ class TestCases(unittest.TestCase):
         """Test a JSON that is null."""
         mock_get.return_value.json.return_value = None
         mock_get.return_value.status_code = 200
-        df = f_819("https://example.com/null.json")
+        df = f_871("https://example.com/null.json")
         self.assertTrue(isinstance(df, pd.DataFrame))
         self.assertEqual(len(df), 0)
     @patch("requests.get")
@@ -99,4 +99,4 @@ class TestCases(unittest.TestCase):
         """Test a general error."""
         mock_get.side_effect = requests.RequestException
         with self.assertRaises(SystemError):
-            f_819("https://example.com/data.json")
+            f_871("https://example.com/data.json")

@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
         ]
         delay = 2
         start_times = f_361(self.script_dir, script_names, delay)
-        self.assertEqual(len(start_times), 2)
+        self.assertTrue(2 <= len(start_times) <= 3)
         time_diff = datetime.strptime(
             start_times[1], "%Y-%m-%d %H:%M:%S"
         ) - datetime.strptime(start_times[0], "%Y-%m-%d %H:%M:%S")

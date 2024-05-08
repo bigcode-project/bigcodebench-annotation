@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 
-def f_402(filename: str) -> pd.DataFrame:
+def f_508(filename: str) -> pd.DataFrame:
     """
     Read a CSV file into a Pandas DataFrame and then delete the entire contents of the original file.
 
@@ -23,7 +23,7 @@ def f_402(filename: str) -> pd.DataFrame:
     >>> import os
     >>> from unittest.mock import patch
     >>> with patch('os.path.exists', return_value=False):
-    ...     f_402('nonexistent.csv')
+    ...     f_508('nonexistent.csv')
     Traceback (most recent call last):
         ...
     FileNotFoundError: No such file: 'nonexistent.csv'
@@ -58,20 +58,20 @@ class TestCases(unittest.TestCase):
     def test_file_not_found(self):
         """Test the function with a filename that does not exist."""
         with self.assertRaises(FileNotFoundError):
-            f_402('nonexistent.csv')
+            f_508('nonexistent.csv')
     def test_file_removal(self):
         """Ensure the function does not remove the file, only erases contents."""
-        f_402(self.test_file)
+        f_508(self.test_file)
         self.assertTrue(os.path.exists(self.test_file))
     def test_empty_csv(self):
         """Test reading an empty CSV file."""
         open(self.test_file, 'w').close()  # Ensure the file is empty
-        df = f_402(self.test_file)
+        df = f_508(self.test_file)
         self.assertTrue(df.empty, "DataFrame should be empty for an empty CSV file.")
         self.assertEqual(os.path.getsize(self.test_file), 0, "The file should still be erased.")
     def test_file_is_erased_after_reading(self):
         """Ensure the CSV file is erased after its content is read into a DataFrame."""
-        _ = f_402(self.test_file)
+        _ = f_508(self.test_file)
         # Check that the file exists but its content is erased
         self.assertTrue(os.path.exists(self.test_file), "The file should still exist.")
         self.assertEqual(os.path.getsize(self.test_file), 0, "The file's content should be erased.")
@@ -79,4 +79,4 @@ class TestCases(unittest.TestCase):
         """Test the function's response to being given a non-existent file path."""
         non_existent_file = os.path.join(self.output_dir, 'non_existent.csv')
         with self.assertRaises(FileNotFoundError, msg="Expected FileNotFoundError for non-existent file."):
-            _ = f_402(non_existent_file)
+            _ = f_508(non_existent_file)

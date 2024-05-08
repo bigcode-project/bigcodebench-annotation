@@ -2,7 +2,7 @@ import os
 import errno
 import shutil
 
-def f_607(filename, dest_dir):
+def f_692(filename, dest_dir):
     """
     Copy a file to a specified destination directory and clear its contents.
     This function takes in the path to a file and a destination directory path.
@@ -29,7 +29,7 @@ def f_607(filename, dest_dir):
                cannot be copied for reasons other than a pre-existing directory.
 
     Examples:
-    >>> f_607('/path/to/original/test.txt', '/path/to/destination')
+    >>> f_692('/path/to/original/test.txt', '/path/to/destination')
     '/path/to/destination/test.txt'
 
     Notes:
@@ -66,7 +66,7 @@ class TestCases(unittest.TestCase):
         # This test verifies that the function copies the file to the specified
         # destination directory and that the original file's content is cleared.
         dest_dir = os.path.join(self.test_dir, 'dest')
-        copied_file = f_607(self.test_file, dest_dir)
+        copied_file = f_692(self.test_file, dest_dir)
         self.assertTrue(os.path.isfile(copied_file))
         with open(self.test_file, 'r') as f:
             self.assertEqual(f.read(), '')
@@ -75,7 +75,7 @@ class TestCases(unittest.TestCase):
         # This test checks the function's behavior when the destination directory
         # does not exist. It is expected to create the directory and copy the file.
         dest_dir = os.path.join(self.test_dir, 'non_existent_dir')
-        copied_file = f_607(self.test_file, dest_dir)
+        copied_file = f_692(self.test_file, dest_dir)
         self.assertTrue(os.path.isdir(dest_dir))
         self.assertTrue(os.path.isfile(copied_file))
     def test_overwrite_existing_file(self):
@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
         existing_file_path = os.path.join(dest_dir, 'test.txt')
         with open(existing_file_path, 'w') as f:
             f.write('Old content')
-        copied_file = f_607(self.test_file, dest_dir)
+        copied_file = f_692(self.test_file, dest_dir)
         with open(copied_file, 'r') as f:
             self.assertEqual(f.read(), 'This is a test file.')
     def test_same_source_and_destination(self):
@@ -95,10 +95,10 @@ class TestCases(unittest.TestCase):
         # This test checks the function's response when the source and destination
         # directories are the same. An OSError is expected to be raised.
         with self.assertRaises(OSError):
-            f_607(self.test_file, self.test_dir)
+            f_692(self.test_file, self.test_dir)
     def test_invalid_source_file(self):
         # Test case description:
         # This test attempts to copy from an invalid source file path, expecting
         # the function to raise a FileNotFoundError.
         with self.assertRaises(FileNotFoundError):
-            f_607('/invalid/path/to/file.txt', self.test_dir)
+            f_692('/invalid/path/to/file.txt', self.test_dir)

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def f_853(product_dict, product_keys):
+def f_108(product_dict, product_keys):
     """
     Create a profit report for a list of products based on a specific product dictionary that includes the quantity,
     price, and profit of each product. Additionally, calculate the average price and profit for all considered products,
@@ -26,7 +26,7 @@ def f_853(product_dict, product_keys):
     Example:
     >>> product_dict = {'Apple': [100, 2.5], 'Orange': [80, 3.5], 'Banana': [120, 1.5]}
     >>> product_keys = ['Apple', 'Banana']
-    >>> report, ax = f_853(product_dict, product_keys)
+    >>> report, ax = f_108(product_dict, product_keys)
     >>> print(report)
       Product  Quantity  Price  Profit  Average Price  Average Profit
     0   Apple       100    2.5   250.0            2.0           215.0
@@ -64,7 +64,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test with a single product
         product_keys = ['Apple']
-        report, ax = f_853(self.product_dict, product_keys)
+        report, ax = f_108(self.product_dict, product_keys)
         self.assertEqual(len(report), 1)  # Should return 1 row
         self.assertIn('Apple', report['Product'].values)
         self.assertAlmostEqual(report['Average Price'].iloc[0], 2.5)
@@ -72,7 +72,7 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test with multiple products
         product_keys = ['Apple', 'Orange']
-        report, ax = f_853(self.product_dict, product_keys)
+        report, ax = f_108(self.product_dict, product_keys)
         self.assertEqual(len(report), 2)  # Should return 2 rows
         self.assertTrue(all(item in ['Apple', 'Orange'] for item in report['Product'].values))
         expected_avg_price = (2.5 + 3.5) / 2
@@ -82,17 +82,17 @@ class TestCases(unittest.TestCase):
     def test_case_3(self):
         # Test with no products
         product_keys = []
-        report, ax = f_853(self.product_dict, product_keys)
+        report, ax = f_108(self.product_dict, product_keys)
         self.assertTrue(report.empty)  # Should return an empty DataFrame
     def test_case_4(self):
         # Test with a product that doesn't exist in the dictionary
         product_keys = ['Mango']  # Mango is not in product_dict
         with self.assertRaises(KeyError):
-            f_853(self.product_dict, product_keys)
+            f_108(self.product_dict, product_keys)
     def test_case_5(self):
         # Test the DataFrame structure
         product_keys = ['Apple', 'Banana']
-        report, ax = f_853(self.product_dict, product_keys)
+        report, ax = f_108(self.product_dict, product_keys)
         expected_columns = ['Product', 'Quantity', 'Price', 'Profit', 'Average Price', 'Average Profit']
         self.assertEqual(list(report.columns), expected_columns)
         for col in ['Quantity', 'Price', 'Profit', 'Average Price', 'Average Profit']:

@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 
-def f_459(script_name='backup.sh', log_file='/home/user/backup_log.json'):
+def f_12(script_name='backup.sh', log_file='/home/user/backup_log.json'):
     """
     Runs the provided backup shell script and logs the start time, end time, and exit status 
     in a specified JSON log file.
@@ -30,7 +30,7 @@ def f_459(script_name='backup.sh', log_file='/home/user/backup_log.json'):
     - json
     
     Example:
-    >>> f_459()
+    >>> f_12()
     {'start_time': '2023-09-19 14:30:00', 'end_time': '2023-09-19 14:35:00', 'exit_status': 0}
     """
     log_data = {}
@@ -58,7 +58,7 @@ class TestCases(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open, read_data="{}")
     def test_default_values_successful_script(self, mock_file, mock_subprocess, mock_os):
         """Test the function with default parameters and successful execution"""
-        result = f_459()
+        result = f_12()
         self.assertIn('start_time', result)
         self.assertIn('end_time', result)
         self.assertEqual(result['exit_status'], 0)
@@ -66,13 +66,13 @@ class TestCases(unittest.TestCase):
     def test_script_does_not_exist(self, mock_os):
         """Test the function raising FileNotFoundError when the script file does not exist"""
         with self.assertRaises(FileNotFoundError):
-            f_459()
+            f_12()
     @patch("os.path.isfile", return_value=True)
     @patch("subprocess.call", side_effect=Exception("Script failed"))
     def test_script_execution_failure(self, mock_subprocess, mock_os):
         """Test the function raising RuntimeError on script execution failure"""
         with self.assertRaises(RuntimeError):
-            f_459()
+            f_12()
     @patch("os.path.isfile", return_value=True)
     @patch("subprocess.call", return_value=0)
     @patch("builtins.open", new_callable=mock_open, read_data="{}")
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
         """Test the function with custom script name and log file with successful execution"""
         script_name = "custom_backup.sh"
         log_file = "/home/user/custom_backup_log.json"
-        result = f_459(script_name, log_file)
+        result = f_12(script_name, log_file)
         self.assertIn('start_time', result)
         self.assertIn('end_time', result)
         self.assertEqual(result['exit_status'], 0)
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open, read_data="{}")
     def test_log_data_format(self, mock_file, mock_subprocess, mock_os):
         """Test that the timestamps are in the correct format"""
-        result = f_459()
+        result = f_12()
         self.assertTrue(result['start_time'].count(":") == 2)
         self.assertTrue(result['end_time'].count(":") == 2)
     @patch("os.path.isfile", return_value=True)
@@ -97,5 +97,5 @@ class TestCases(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open, read_data="{}")
     def test_non_zero_exit_status(self, mock_file, mock_subprocess, mock_os):
         """Test the function with a non-zero exit status"""
-        result = f_459()
+        result = f_12()
         self.assertEqual(result['exit_status'], 1)

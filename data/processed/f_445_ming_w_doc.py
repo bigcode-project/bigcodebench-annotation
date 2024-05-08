@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def f_122(array_length=100):
+def f_436(array_length=100):
     '''
     Generate two arrays of random numbers of a given length, calculate their mean, median, and standard deviation,
     then store these results in a Panda DataFrame 'statistics' with keys 'Array1' and 'Array2'.
@@ -20,7 +20,7 @@ def f_122(array_length=100):
     - pandas
 
     Example:
-    >>> df, ax = f_122(50)
+    >>> df, ax = f_436(50)
     '''
     array1 = np.random.rand(array_length)
     array2 = np.random.rand(array_length)
@@ -37,14 +37,14 @@ import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     
     def test_default_length(self):
-        df, ax = f_122()
+        df, ax = f_436()
         self.assertEqual(df.shape, (3, 2))
         self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
         self.assertTrue(all(df.columns == ['Array1', 'Array2']))
         self.assertIsInstance(ax, plt.Axes)
     
     def test_custom_length(self):
-        df, ax = f_122(200)
+        df, ax = f_436(200)
         self.assertEqual(df.shape, (3, 2))
         self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
         self.assertTrue(all(df.columns == ['Array1', 'Array2']))
@@ -52,7 +52,7 @@ class TestCases(unittest.TestCase):
     
     def test_statistics_values(self):
         np.random.seed(42)  # Setting seed for reproducibility
-        df, _ = f_122(1000)
+        df, _ = f_436(1000)
         self.assertAlmostEqual(df['Array1']['Mean'], 0.4903, places=3)
         self.assertAlmostEqual(df['Array2']['Mean'], 0.5068, places=3)
         self.assertAlmostEqual(df['Array1']['Median'], 0.4968, places=3)
@@ -62,10 +62,10 @@ class TestCases(unittest.TestCase):
     
     def test_negative_length(self):
         with self.assertRaises(ValueError):
-            f_122(-50)
+            f_436(-50)
     
     def test_zero_length(self):
-        df, ax = f_122(0)
+        df, ax = f_436(0)
         self.assertEqual(df.shape, (3, 2))
         self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
         self.assertTrue(all(df.columns == ['Array1', 'Array2']))

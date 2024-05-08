@@ -4,7 +4,7 @@ import sklearn.svm as svm
 import sklearn.datasets as datasets
 import sklearn.metrics as metrics
 
-def f_701():
+def f_723():
     """
     Perform an SVM classification of the iris dataset and warn if the accuracy is less than 0.9.
     The warning action is set to 'always'. The test size for the train-test split is 0.33.
@@ -22,7 +22,7 @@ def f_701():
     - sklearn
 
     Example:
-    >>> f_701()
+    >>> f_723()
     (1.0, None)
     """
     warnings.simplefilter('always')
@@ -42,25 +42,25 @@ def f_701():
 import unittest
 class TestCases(unittest.TestCase):
     def test_high_accuracy(self):
-        accuracy, warning_msg = f_701()
+        accuracy, warning_msg = f_723()
         self.assertGreaterEqual(accuracy, 0.8)
         self.assertIsNone(warning_msg)
     def test_low_accuracy_warning(self):
-        accuracy, warning_msg = f_701()
+        accuracy, warning_msg = f_723()
         if accuracy < 0.9:
             self.assertEqual(warning_msg, "The accuracy of the SVM classification is below 0.9.")
     def test_accuracy_range(self):
-        accuracy, _ = f_701()
+        accuracy, _ = f_723()
         self.assertGreaterEqual(accuracy, 0)
         self.assertLessEqual(accuracy, 1)
     def test_return_type(self):
-        result = f_701()
+        result = f_723()
         self.assertIsInstance(result, tuple)
         self.assertIsInstance(result[0], float)
         self.assertIn(result[1], [None, "The accuracy of the SVM classification is below 0.9."])
     def test_warning_setting(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
-            _, _ = f_701()
+            _, _ = f_723()
             if w:
                 self.assertEqual(str(w[-1].message), "The accuracy of the SVM classification is below 0.9.")

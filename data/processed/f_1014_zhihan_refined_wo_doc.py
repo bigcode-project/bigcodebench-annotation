@@ -3,7 +3,7 @@ import os
 import shutil
 
 
-def f_476(config_file_path, archieve_dir ='/home/user/archive'):
+def f_14(config_file_path, archieve_dir ='/home/user/archive'):
     """
     Archive a specified project directory into a ZIP file based on the configuration specified in a config file.
     
@@ -31,7 +31,7 @@ def f_476(config_file_path, archieve_dir ='/home/user/archive'):
     - Exception: If the ZIP archive cannot be created.
     
     Example:
-    >>> f_476("/path/to/config.ini")
+    >>> f_14("/path/to/config.ini")
     True
     """
     config = configparser.ConfigParser()
@@ -72,15 +72,15 @@ class TestCases(unittest.TestCase):
         shutil.rmtree(self.archive_dir)
     def test_valid_project_directory(self):
         # Testing with a valid project directory
-        result = f_476(self.valid_config_path, self.archive_dir)
+        result = f_14(self.valid_config_path, self.archive_dir)
         self.assertTrue(result)
     def test_invalid_project_directory(self):
         # Testing with a non-existent project directory
         with self.assertRaises(FileNotFoundError):
-            f_476(self.invalid_config_path, self.archive_dir)
+            f_14(self.invalid_config_path, self.archive_dir)
     def test_archive_creation(self):
         # Run the function to create the archive
-        f_476(self.valid_config_path, self.archive_dir)
+        f_14(self.valid_config_path, self.archive_dir)
         archive_file = os.path.join(self.archive_dir, os.path.basename(self.test_data_dir) + '.zip')
         self.assertTrue(os.path.isfile(archive_file))
     def test_archive_content(self):
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
         sample_file_path = os.path.join(self.test_data_dir, "sample_file.txt")
         with open(sample_file_path, 'w') as f:
             f.write("Hello, world!")
-        f_476(self.valid_config_path, self.archive_dir)
+        f_14(self.valid_config_path, self.archive_dir)
         archive_file = os.path.join(self.archive_dir, os.path.basename(self.test_data_dir) + '.zip')
         content = os.popen(f"unzip -l {archive_file}").read()
         self.assertIn("sample_file.txt", content)

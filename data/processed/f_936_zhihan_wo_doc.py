@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def f_757(url):
+def f_956(url):
     """
     Fetches the content of a webpage specified by its URL, parses it to find <script> tags,
     and attempts to evaluate any string within these tags as a Python dictionary.
@@ -24,7 +24,7 @@ def f_757(url):
     - bs4.BeautifulSoup
 
     Example:
-    >>> f_757('https://example.com')
+    >>> f_956('https://example.com')
     [{'key': 'value'}, ...]
     """
     try:
@@ -66,25 +66,25 @@ class TestCases(unittest.TestCase):
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_1(self, mock_get):
         # Test with a single dictionary in the script tag
-        result = f_757('https://test1.com')
+        result = f_956('https://test1.com')
         self.assertEqual(result, [{"key": "value"}])
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_2(self, mock_get):
         # Test with multiple dictionaries in separate script tags
-        result = f_757('https://test2.com')
+        result = f_956('https://test2.com')
         self.assertEqual(result, [{"key1": "value1"}, {"key2": "value2"}])
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_3(self, mock_get):
         # Test with no script tags
-        result = f_757('https://test3.com')
+        result = f_956('https://test3.com')
         self.assertEqual(result, [])
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_4(self, mock_get):
         # Test with a script tag that doesn't contain a dictionary
-        result = f_757('https://test4.com')
+        result = f_956('https://test4.com')
         self.assertEqual(result, [])
     @patch('requests.get', side_effect=mock_requests_get)
     def test_case_5(self, mock_get):
         # Test with a URL that returns an error
-        result = f_757('https://error.com')
+        result = f_956('https://error.com')
         self.assertEqual(result, [])

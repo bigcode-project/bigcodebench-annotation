@@ -2,7 +2,7 @@ import collections
 import random
 import string
 
-def f_625(length=100):
+def f_1(length=100):
     """
     Generate a random string of the specified length composed of uppercase and lowercase letters, 
     and then count the occurrence of each character in this string.
@@ -25,7 +25,7 @@ def f_625(length=100):
     Example:
     >>> import random
     >>> random.seed(42)  # Ensures reproducibility for demonstration
-    >>> f_625(10)
+    >>> f_1(10)
     {'h': 1, 'B': 2, 'O': 1, 'L': 1, 'm': 1, 'j': 1, 'u': 1, 'E': 1, 'V': 1}
     """
     if length < 0:
@@ -46,16 +46,16 @@ class TestCases(unittest.TestCase):
         test_lengths = [10, 50, 100, 150, 5]
         for length in test_lengths:
             with self.subTest(length=length):
-                result = f_625(length)
+                result = f_1(length)
                 self.assertTrue(len(result) <= length, "Length of result should be <= requested string length")
                 self.assertEqual(sum(result.values()), length, f"Total counts should sum to {length}")
                 self.assertTrue(all(char in self.valid_chars for char in result), "All characters should be valid letters")
     def test_zero_length(self):
         # Test edge case where length is zero
-        result = f_625(0)
+        result = f_1(0)
         self.assertEqual(len(result), 0, "Result should be empty for zero length")
         self.assertEqual(sum(result.values()), 0, "Sum of counts should be zero for zero length")
     def test_negative_length(self):
         # Test handling of negative length input
         with self.assertRaises(ValueError, msg="Negative length should raise an error"):
-            f_625(-1)
+            f_1(-1)

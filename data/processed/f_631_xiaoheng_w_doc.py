@@ -3,7 +3,7 @@ import os
 import random
 import string
 
-def f_785(strings, filename=None):
+def f_592(strings, filename=None):
     
     """
     Save the list of random strings "Strings" in a pickle file and then read it back for validation.
@@ -24,7 +24,7 @@ def f_785(strings, filename=None):
 
     Example:
     >>> strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)) for _ in range(10)]
-    >>> loaded_strings = f_785(strings)
+    >>> loaded_strings = f_592(strings)
     >>> assert strings == loaded_strings
     """
     if filename is None:
@@ -44,26 +44,26 @@ class TestCases(unittest.TestCase):
     def test_default_filename(self):
         # Test with default filename generation
         strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)) for _ in range(10)]
-        loaded_strings = f_785(strings)
+        loaded_strings = f_592(strings)
         self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
     def test_custom_filename(self):
         # Test with a custom filename
         strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5)) for _ in range(5)]
         filename = "custom_filename.pkl"
-        loaded_strings = f_785(strings, filename)
+        loaded_strings = f_592(strings, filename)
         self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
     def test_empty_list(self):
         # Test with an empty list of strings
         strings = []
-        loaded_strings = f_785(strings)
+        loaded_strings = f_592(strings)
         self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
     def test_large_list(self):
         # Test with a large list of strings
         strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(100)) for _ in range(1000)]
-        loaded_strings = f_785(strings)
+        loaded_strings = f_592(strings)
         self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
     def test_special_characters(self):
         # Test with strings containing special characters
         strings = [''.join(random.choice(string.ascii_uppercase + string.digits + string.punctuation) for _ in range(15)) for _ in range(15)]
-        loaded_strings = f_785(strings)
+        loaded_strings = f_592(strings)
         self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")

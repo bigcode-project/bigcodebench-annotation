@@ -5,7 +5,7 @@ import requests
 URL = "http://example.com"
 
 
-def f_442(url=URL, from_encoding="cp1251", use_lxml=False):
+def f_882(url=URL, from_encoding="cp1251", use_lxml=False):
     """
     Fetches a web page from a given URL, decodes its content from a specified encoding,
     and returns the parsed HTML using BeautifulSoup. If specified, 'lxml' is used as
@@ -26,7 +26,7 @@ def f_442(url=URL, from_encoding="cp1251", use_lxml=False):
     - requests
 
     Example:
-    >>> html = f_442('http://example.com', 'cp1251', True)
+    >>> html = f_882('http://example.com', 'cp1251', True)
     >>> print(html.prettify()) if html else print("Error fetching or parsing the webpage.")
 
     Notes:
@@ -57,14 +57,14 @@ from bs4 import BeautifulSoup
 import unittest
 from unittest.mock import patch, MagicMock
 class TestCases(unittest.TestCase):
-    """Test cases for f_442."""
+    """Test cases for f_882."""
     @patch("requests.get")
     def test_successful_fetch_and_parse_html_parser(self, mock_get):
         """Test if the function correctly fetches and parses a webpage with valid encoding using html.parser."""
         mock_get.return_value = MagicMock(
             status_code=200, content=b"Valid HTML content"
         )
-        result = f_442("http://example.com", "utf8")
+        result = f_882("http://example.com", "utf8")
         self.assertIsInstance(result, BeautifulSoup)
     @patch("requests.get")
     def test_successful_fetch_and_parse_lxml_parser(self, mock_get):
@@ -72,13 +72,13 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = MagicMock(
             status_code=200, content=b"Valid HTML content"
         )
-        result = f_442("http://example.com", "utf8", use_lxml=True)
+        result = f_882("http://example.com", "utf8", use_lxml=True)
         self.assertIsInstance(result, BeautifulSoup)
     @patch("requests.get")
     def test_connection_error_handling(self, mock_get):
         """Test how the function handles connection errors."""
         mock_get.side_effect = requests.exceptions.ConnectionError()
-        result = f_442("http://example.com", "utf8")
+        result = f_882("http://example.com", "utf8")
         self.assertIsNone(result)
     @patch("requests.get")
     def test_incorrect_encoding_handling(self, mock_get):
@@ -86,16 +86,16 @@ class TestCases(unittest.TestCase):
         mock_get.return_value = MagicMock(
             status_code=200, content=b"Valid HTML content"
         )
-        result = f_442("http://example.com", "invalid_encoding")
+        result = f_882("http://example.com", "invalid_encoding")
         self.assertIsNone(result)
     @patch("requests.get")
     def test_status_code_handling(self, mock_get):
         """Test if the function handles non-200 status code responses correctly."""
         mock_get.return_value = MagicMock(status_code=404)
-        result = f_442("http://example.com", "utf8")
+        result = f_882("http://example.com", "utf8")
         self.assertIsNone(result)
     @patch("requests.get")
     def test_empty_url_handling(self, mock_get):
         """Test how the function handles an empty URL."""
-        result = f_442("", "utf8")
+        result = f_882("", "utf8")
         self.assertIsNone(result)

@@ -5,7 +5,7 @@ from random import shuffle
 POSSIBLE_VALUES = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 
 
-def f_39(list_of_lists):
+def f_934(list_of_lists):
     """
     Generate a list of pandas DataFrames, each created from a sublist in 'list_of_lists'.
     Each DataFrame has columns named as per the elements of the sublist, and each column
@@ -30,7 +30,7 @@ def f_39(list_of_lists):
     Example:
     >>> import random
     >>> random.seed(0)
-    >>> dfs = f_39([['x', 'y', 'z'], ['a', 'b', 'c']])
+    >>> dfs = f_934([['x', 'y', 'z'], ['a', 'b', 'c']])
     >>> dfs[0].head()
        x  y  z
     0  H  J  H
@@ -52,38 +52,38 @@ import unittest
 import pandas as pd
 import random
 class TestCases(unittest.TestCase):
-    """Test cases for f_39 function."""
+    """Test cases for f_934 function."""
     def test_dataframe_count(self):
         """Test number of dataframes returned."""
         random.seed(0)
         input_data = [["x", "y"], ["a", "b", "c"], ["m"]]
-        dfs = f_39(input_data)
+        dfs = f_934(input_data)
         self.assertEqual(len(dfs), len(input_data))
     def test_dataframe_columns(self):
         """Test each dataframe has correct columns."""
         random.seed(1)
         input_data = [["x", "y"], ["a", "b", "c"], ["m"]]
-        dfs = f_39(input_data)
+        dfs = f_934(input_data)
         for idx, df in enumerate(dfs):
             self.assertListEqual(list(df.columns), input_data[idx])
     def test_dataframe_values(self):
         """Test values in each dataframe column are from the POSSIBLE_VALUES list."""
         random.seed(2)
         input_data = [["x", "y"], ["a", "b", "c"], ["m"]]
-        dfs = f_39(input_data)
+        dfs = f_934(input_data)
         for df in dfs:
             for col in df.columns:
                 self.assertTrue(all(val in POSSIBLE_VALUES for val in df[col].values))
     def test_empty_input(self):
         """Test function with an empty list of lists."""
         random.seed(3)
-        dfs = f_39([])
+        dfs = f_934([])
         self.assertEqual(len(dfs), 0)
     def test_single_list_input(self):
         """Test function with a single list input."""
         random.seed(4)
         input_data = [["x", "y", "z"]]
-        dfs = f_39(input_data)
+        dfs = f_934(input_data)
         self.assertEqual(len(dfs), 1)
         self.assertListEqual(list(dfs[0].columns), input_data[0])
         self.assertTrue(all(val in POSSIBLE_VALUES for val in dfs[0]["x"].values))

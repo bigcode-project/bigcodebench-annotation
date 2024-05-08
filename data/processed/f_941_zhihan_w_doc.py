@@ -14,7 +14,7 @@ PREDEFINED_STOPWORDS = {
     "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "more"
 }
 
-def f_762(text):
+def f_961(text):
     """
     Clean the specified text by removing URLs, stopwords, and punctuation.
 
@@ -29,7 +29,7 @@ def f_762(text):
     - string.punctuation
 
     Example:
-    >>> f_762('Visit https://www.python.org for more info. I love to eat apples.')
+    >>> f_961('Visit https://www.python.org for more info. I love to eat apples.')
     'Visit info love eat apples'
     """
     PUNCTUATION = set(punctuation)
@@ -44,25 +44,25 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         input_text = 'Visit https://www.python.org for more info. I love to eat apples and oranges!'
         expected_output = 'Visit info love eat apples oranges'
-        result = f_762(input_text)
+        result = f_961(input_text)
         self.assertEqual(result, expected_output)
     def test_case_2(self):
         input_text = 'Check out https://www.google.com and also https://www.openai.com'
         expected_output = 'Check also'
-        result = f_762(input_text)
+        result = f_961(input_text)
         self.assertEqual(result, expected_output)
     def test_case_3(self):
         input_text = 'Hello, world! How are you today?'
         expected_output = 'Hello world How today'
-        result = f_762(input_text)
+        result = f_961(input_text)
         self.assertEqual(result, expected_output)
     def test_case_4(self):
         input_text = 'Machine learning AI'
         expected_output = 'Machine learning AI'
-        result = f_762(input_text)
+        result = f_961(input_text)
         self.assertEqual(result, expected_output)
     def test_case_5(self):
         input_text = ''
         expected_output = ''
-        result = f_762(input_text)
+        result = f_961(input_text)
         self.assertEqual(result, expected_output)

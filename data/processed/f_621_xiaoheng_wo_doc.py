@@ -2,7 +2,7 @@ import re
 import os
 import glob
 
-def f_820(directory, word):
+def f_582(directory, word):
     """
     Count the number of files in a directory that contain a specific word.
     
@@ -19,9 +19,9 @@ def f_820(directory, word):
     - glob
     
     Example:
-    >>> f_820('./documents', 'word')
+    >>> f_582('./documents', 'word')
     2
-    >>> f_820('./documents', 'apple')
+    >>> f_582('./documents', 'apple')
     3
     """
     count = 0
@@ -46,17 +46,17 @@ class TestCases(TestCase):
         self.fs.create_file('/mnt/data/documents/orange.txt', contents='Orange is sweet.')
         self.fs.create_file('/mnt/data/documents/grape.txt', contents='I like grapes. Grapes are nice.')
     def test_1(self):
-        result = f_820(self.directory, 'apple')
+        result = f_582(self.directory, 'apple')
         self.assertEqual(result, 1) 
     def test_2(self):
-        result = f_820(self.directory, 'word')
+        result = f_582(self.directory, 'word')
         self.assertEqual(result, 1)  # Ensuring 3 files contain the word "word" 
     def test_3(self):
-        result = f_820(self.directory, 'banana')
+        result = f_582(self.directory, 'banana')
         self.assertEqual(result, 1)  # Should be 1 file that contains "banana" multiple times
     def test_4(self):
-        result = f_820(self.directory, 'orange')
+        result = f_582(self.directory, 'orange')
         self.assertEqual(result, 1)  # 1 file contains the word "orange"
     def test_5(self):
-        result = f_820(self.directory, 'grapes')
+        result = f_582(self.directory, 'grapes')
         self.assertEqual(result, 1)  # Ensuring 1 file contains the word "grape"

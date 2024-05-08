@@ -3,7 +3,7 @@ import requests
 import re
 import csv
 
-def f_57(url="http://example.com", csv_path="emails.csv", 
+def f_1000(url="http://example.com", csv_path="emails.csv", 
           regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b", 
           headers={'User-Agent': 'Mozilla/5.0'}):
     """
@@ -26,9 +26,9 @@ def f_57(url="http://example.com", csv_path="emails.csv",
     - csv
     
     Examples:
-    >>> f_57()
+    >>> f_1000()
     'emails.csv'
-    >>> f_57(url="http://another-example.com", csv_path="another_emails.csv")
+    >>> f_1000(url="http://another-example.com", csv_path="another_emails.csv")
     'another_emails.csv'
     """
     response = requests.get(url, headers=headers)
@@ -64,14 +64,14 @@ class TestCases(unittest.TestCase):
         
         csv_path = os.path.join(self.test_dir, "emails.csv")
         with patch('builtins.open', unittest.mock.mock_open()) as mocked_file:
-            f_57(csv_path=csv_path)
+            f_1000(csv_path=csv_path)
             mocked_file.assert_called_once_with(csv_path, 'w', newline='')
     @patch('requests.get')
     def test_extraction_custom_url(self, mock_get):
         """Test the email extraction from a custom URL and ensure file creation even if no emails are found."""
         mock_get.return_value.text = "<html><body>No email here</body></html>"
         csv_path = os.path.join(self.test_dir, "output.csv")
-        result = f_57(url="http://mocked-url.com", csv_path=csv_path)
+        result = f_1000(url="http://mocked-url.com", csv_path=csv_path)
         self.assertEqual(result, csv_path)
         self.assertTrue(os.path.exists(csv_path))  # Ensuring file is created
         with open(csv_path, 'r') as f:
@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
         mocked_html_content = "<html><body>Email: unique@example.com, other@sample.com</body></html>"
         mock_get.return_value.text = mocked_html_content
         csv_path = os.path.join(self.test_dir, "custom_regex.csv")
-        f_57(csv_path=csv_path, regex=r"\b[A-Za-z0-9._%+-]+@example.com\b")
+        f_1000(csv_path=csv_path, regex=r"\b[A-Za-z0-9._%+-]+@example.com\b")
         with open(csv_path, 'r') as file:
             reader = csv.reader(file)
             emails = [row for row in reader]
@@ -94,5 +94,5 @@ class TestCases(unittest.TestCase):
         """Test extraction with customized headers."""
         mock_get.return_value.text = "<html><body>Email: info@test.com</body></html>"
         csv_path = os.path.join(self.test_dir, "headers.csv")
-        f_57(csv_path=csv_path, headers={'User-Agent': 'Custom-Agent'})
+        f_1000(csv_path=csv_path, headers={'User-Agent': 'Custom-Agent'})
         self.assertTrue(os.path.exists(csv_path))

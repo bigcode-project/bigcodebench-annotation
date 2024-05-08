@@ -2,7 +2,7 @@ import heapq
 import random
 
 
-def f_256(list_length:5, k:int):
+def f_225(list_length:5, k:int):
     """
     Find the k largest numbers in a random-generated list using heapq.
 
@@ -21,7 +21,7 @@ def f_256(list_length:5, k:int):
 
     Example:
     >>> random.seed(0)
-    >>> rand_list, top_k = f_256(5, 3)
+    >>> rand_list, top_k = f_225(5, 3)
     >>> top_k[0] in rand_list
     True
     """
@@ -34,24 +34,24 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_empty_list(self):
         random.seed(0)
-        rand_list, top_k = f_256(0, 3)
+        rand_list, top_k = f_225(0, 3)
         self.assertEqual(rand_list, [])
         self.assertEqual(top_k, [])
     def test_k_larger_than_list_length(self):
         random.seed(0)
-        rand_list, top_k = f_256(5, 10)
+        rand_list, top_k = f_225(5, 10)
         self.assertEqual(len(rand_list), 5)
         self.assertEqual(len(top_k), 5)
     def test_sorted_list(self):
         random.seed(0)
-        rand_list, top_k = f_256(100, 3)
+        rand_list, top_k = f_225(100, 3)
         self.assertEqual(top_k, sorted(rand_list, reverse=True)[:3])
     def test_top_k_sorted(self):
         random.seed(0)
-        rand_list, top_k = f_256(100, 5)
+        rand_list, top_k = f_225(100, 5)
         self.assertEqual(top_k, sorted(top_k, reverse=True)[:5])
     
     def test_top_k_sorted_first(self):
         random.seed(0)
-        rand_list, top_k = f_256(100, 5)
+        rand_list, top_k = f_225(100, 5)
         self.assertEqual(top_k[0], sorted(top_k, reverse=True)[0])

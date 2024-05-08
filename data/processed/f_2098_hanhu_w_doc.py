@@ -2,7 +2,7 @@ import struct
 import io
 import gzip
 
-def f_516(newArray):
+def f_117(newArray):
     """
     Compresses a given NumPy array using gzip compression and returns the compressed data.
 
@@ -23,9 +23,9 @@ def f_516(newArray):
     - gzip
 
     Examples:
-    >>> isinstance(f_516(np.array([1, 2, 3])), bytes)
+    >>> isinstance(f_117(np.array([1, 2, 3])), bytes)
     True
-    >>> len(f_516(np.array([1, 2, 3, 4, 5]))) > 0
+    >>> len(f_117(np.array([1, 2, 3, 4, 5]))) > 0
     True
     """
     buffer = io.BytesIO()
@@ -38,26 +38,26 @@ import numpy as np
 class TestCases(unittest.TestCase):
     def test_return_type(self):
         """Test that the function returns bytes."""
-        result = f_516(np.array([1, 2, 3]))
+        result = f_117(np.array([1, 2, 3]))
         self.assertIsInstance(result, bytes)
     def test_gzipped_data_size(self):
         """Test the size of the gzipped data is greater than 0."""
-        data = f_516(np.array([1, 2, 3]))
+        data = f_117(np.array([1, 2, 3]))
         self.assertGreater(len(data), 0)
     def test_with_different_array_sizes(self):
         """Ensure larger arrays produce gzipped data of greater or equal size compared to smaller arrays."""
-        small_array = f_516(np.array([1]))
-        larger_array = f_516(np.array(range(100)))
+        small_array = f_117(np.array([1]))
+        larger_array = f_117(np.array(range(100)))
         self.assertGreaterEqual(len(larger_array), len(small_array))
     def test_with_different_array_types(self):
         """Compare gzipped sizes of int and float arrays to acknowledge compression differences."""
-        int_array = f_516(np.array([1, 2, 3], dtype=int))
-        float_array = f_516(np.array([1.0, 2.0, 3.0], dtype=float))
+        int_array = f_117(np.array([1, 2, 3], dtype=int))
+        float_array = f_117(np.array([1.0, 2.0, 3.0], dtype=float))
         # Acknowledge that the compression might affect differently due to data representation
         # Therefore, not asserting equality of lengths but rather that they are compressed without error
         self.assertTrue(len(int_array) > 0 and len(float_array) > 0)
     def test_compression_efficiency(self):
         """Test that repeated elements in an array compress to a smaller size than unique elements."""
-        repeated_elements = f_516(np.array([1]*100))
-        unique_elements = f_516(np.array(range(100)))
+        repeated_elements = f_117(np.array([1]*100))
+        unique_elements = f_117(np.array(range(100)))
         self.assertLess(len(repeated_elements), len(unique_elements))

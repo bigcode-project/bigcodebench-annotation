@@ -5,7 +5,7 @@ import string
 LETTERS = string.ascii_letters
 DIGITS = string.digits
 
-def f_181(length, num_digits):
+def f_686(length, num_digits):
     """
     Generate a random password with a specified length and number of digits.
 
@@ -26,9 +26,9 @@ def f_181(length, num_digits):
     - string
 
     Examples:
-    >>> f_181(10, 3)
+    >>> f_686(10, 3)
     'Vpbr812Ooh'
-    >>> f_181(5, 2)
+    >>> f_686(5, 2)
     '4Ob3h'
     """
     random.seed(42)
@@ -53,7 +53,7 @@ class TestCases(unittest.TestCase):
         - Verify that the function returns a password with the correct number of digits.
         - Verify that the function returns a password with the correct number of letters.
         """
-        password = f_181(10, 3)
+        password = f_686(10, 3)
         self.assertEqual(len(password), 10, "Password length should be 10")
         self.assertEqual(sum(c.isdigit() for c in password), 3, "Password should have 3 digits")
         self.assertEqual(sum(c.isalpha() for c in password), 7, "Password should have 7 letters")
@@ -63,25 +63,25 @@ class TestCases(unittest.TestCase):
         - Verify that the function raises a ValueError when the length is zero.
         """
         with self.assertRaises(ValueError, msg="Should raise ValueError for length 0"):
-            f_181(0, 3)
+            f_686(0, 3)
     def test_negative_length(self):
         """
         Test Case 3: Negative Length
         - Verify that the function raises a ValueError when the length is negative.
         """
         with self.assertRaises(ValueError, msg="Should raise ValueError for negative length"):
-            f_181(-5, 3)
+            f_686(-5, 3)
     def test_negative_num_digits(self):
         """
         Test Case 4: Negative Number of Digits
         - Verify that the function raises a ValueError when the number of digits is negative.
         """
         with self.assertRaises(ValueError, msg="Should raise ValueError for negative num_digits"):
-            f_181(10, -3)
+            f_686(10, -3)
     def test_num_digits_greater_than_length(self):
         """
         Test Case 5: Number of Digits Greater than Length
         - Verify that the function raises a ValueError when the number of digits is greater than the length.
         """
         with self.assertRaises(ValueError, msg="Should raise ValueError when num_digits > length"):
-            f_181(5, 10)
+            f_686(5, 10)

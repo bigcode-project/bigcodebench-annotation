@@ -4,7 +4,7 @@ import struct
 
 KEYS = ['470FC614', '4A0FC614', '4B9FC614', '4C8FC614', '4D7FC614']
 
-def f_487(hex_keys=KEYS):
+def f_408(hex_keys=KEYS):
     """
     Generate a random float number from a list of hex strings and then encode the float number in utf-8.
 
@@ -21,7 +21,7 @@ def f_487(hex_keys=KEYS):
 
     Example:
     >>> random.seed(42)
-    >>> f_487()
+    >>> f_408()
     b'36806.078125'
     """
     hex_key = random.choice(hex_keys)
@@ -33,26 +33,26 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_default_functionality(self):
         """Test the function with default parameters."""
-        result = f_487()
+        result = f_408()
         self.assertIsInstance(result, bytes)  # Check if output is correctly encoded in UTF-8
     def test_custom_hex_keys(self):
         """Test the function with a custom list of hexadecimal keys."""
         custom_keys = ['1A2FC614', '1B0FC614', '1C9FC614']
-        result = f_487(hex_keys=custom_keys)
+        result = f_408(hex_keys=custom_keys)
         self.assertIsInstance(result, bytes)
     def test_empty_list(self):
         """Test the function with an empty list."""
         with self.assertRaises(IndexError):  # Assuming random.choice will raise IndexError on empty list
-            f_487(hex_keys=[])
+            f_408(hex_keys=[])
     def test_consistency_of_output(self):
         """Ensure that the output is consistent with a fixed seed."""
         random.seed(42)  # Set the seed for predictability
-        first_result = f_487()
+        first_result = f_408()
         random.seed(42)  # Reset seed to ensure same choice is made
-        second_result = f_487()
+        second_result = f_408()
         self.assertEqual(first_result, second_result)
     def test_invalid_hex_key(self):
         """Test with an invalid hex key."""
         invalid_keys = ['ZZZZZZZZ', 'XXXX']
         with self.assertRaises(ValueError):
-            f_487(hex_keys=invalid_keys)
+            f_408(hex_keys=invalid_keys)

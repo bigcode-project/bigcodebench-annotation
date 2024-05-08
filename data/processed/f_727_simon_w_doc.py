@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
-def f_458(df, col_a='A', col_b='B', col_c='C', seed=None):
+def f_749(df, col_a='A', col_b='B', col_c='C', seed=None):
     """
     This function filters rows from the input DataFrame 'df' based on conditions in columns 'B' and 'C', 
     then uses linear regression to predict values in column 'B' using data from column 'A'. 
@@ -41,7 +41,7 @@ def f_458(df, col_a='A', col_b='B', col_c='C', seed=None):
     >>> df = pd.DataFrame({'A': np.random.randint(0, 100, 1000),
     ...                    'B': np.random.randint(0, 100, 1000),
     ...                    'C': np.random.choice([900, 800, 700, 600], 1000)})
-    >>> predictions, model = f_458(df, seed=1)
+    >>> predictions, model = f_749(df, seed=1)
     >>> print(predictions)
     [77.21974339 76.26960987 76.34878767 77.16695819 76.53353585 76.86344332
      76.86344332 77.19335079 76.81065812 76.77106923 76.79746183 77.0481915
@@ -54,7 +54,7 @@ def f_458(df, col_a='A', col_b='B', col_c='C', seed=None):
     >>> df = pd.DataFrame({'A': [1, 2, 3, 4, 5],
     ...                    'B': [10, 80, 80, 80, 80],
     ...                    'C': [900, 900, 900, 900, 900]})
-    >>> predictions, model = f_458(df, seed=12)
+    >>> predictions, model = f_749(df, seed=12)
     >>> print(predictions) 
     [80.]
     >>> print(model)
@@ -91,40 +91,40 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame({'A': np.random.randint(0, 100, 100),
                            'B': np.random.randint(0, 100, 100),
                            'C': np.random.choice([900, 800], 100)})
-        predictions, model = f_458(df, seed=12)
+        predictions, model = f_749(df, seed=12)
         self.assertIsInstance(model, LinearRegression)
         np.testing.assert_almost_equal(predictions, np.array([73.84, 73.74, 73.02, 73.32, 72.66]), decimal=2)
     def test_empty_dataframe(self):
         # Test with an empty DataFrame
         df = pd.DataFrame()
-        predictions = f_458(df)
+        predictions = f_749(df)
         self.assertIsNone(predictions)
     def test_missing_columns(self):
         # Test with a DataFrame missing one or more columns
         df = pd.DataFrame({'A': np.random.randint(0, 100, 100),
                            'C': np.random.choice([900, 800], 100)})
-        predictions = f_458(df)
+        predictions = f_749(df)
         self.assertIsNone(predictions)
     def test_non_numeric_data(self):
         # Test with non-numeric data
         df = pd.DataFrame({'A': ['a', 'b', 'c'],
                            'B': [1, 2, 3],
                            'C': [900, 900, 900]})
-        predictions = f_458(df)
+        predictions = f_749(df)
         self.assertIsNone(predictions)
     def test_no_rows_matching_criteria(self):
         # Test with no rows matching the criteria
         df = pd.DataFrame({'A': np.random.randint(0, 100, 100),
                            'B': np.random.randint(0, 50, 100),  # B values are always < 50
                            'C': np.random.choice([800, 700], 100)})  # C values are never 900
-        predictions = f_458(df)
+        predictions = f_749(df)
         self.assertIsNone(predictions)
     def test_large_dataset_performance(self):
         # Test with a very large DataFrame (performance test)
         df = pd.DataFrame({'test': np.random.randint(0, 100, 10000),
                            'hi': np.random.randint(0, 100, 10000),
                            'hello': np.random.choice([900, 800], 10000)})
-        predictions, model = f_458(df, col_a='test', col_b='hi', col_c='hello')
+        predictions, model = f_749(df, col_a='test', col_b='hi', col_c='hello')
         self.assertIsInstance(model, LinearRegression)
         self.assertIsNotNone(predictions)
         self.assertEqual(len(predictions), 500)
@@ -133,7 +133,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame({'A': [50] * 100,
                            'B': np.random.randint(50, 100, 100),
                            'C': [900] * 100})
-        predictions, model = f_458(df, seed=1)
+        predictions, model = f_749(df, seed=1)
         self.assertIsInstance(model, LinearRegression)
         np.testing.assert_almost_equal(
             predictions,
@@ -145,7 +145,7 @@ class TestCases(unittest.TestCase):
         df = pd.DataFrame({'A': [10, 20, 30, 40, 50],
                            'B': [60, 70, 80, 90, 100],
                            'C': [900, 900, 900, 900, 900]})
-        predictions, model = f_458(df, seed=100)
+        predictions, model = f_749(df, seed=100)
         # Since the data is linear and simple, the model should predict close to the actual values
         expected_predictions = np.array([70])  # Assuming a perfect model
         np.testing.assert_almost_equal(predictions, expected_predictions)

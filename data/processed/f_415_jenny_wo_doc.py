@@ -6,7 +6,7 @@ import numpy as np
 from collections import defaultdict
 
 
-def f_869(input_file: str) -> plt.Axes:
+def f_390(input_file: str) -> plt.Axes:
     """
     Read a list of dictionaries from a JSON file, calculate the results (mean and median for each key)
     via numpy, convert the input data into a pandas DataFrame with the keys as "X" and values as "Y"
@@ -30,7 +30,7 @@ def f_869(input_file: str) -> plt.Axes:
     - collections.defaultdict
 
     Example:
-    >>> results, ax = f_869("/path/to/data.json")
+    >>> results, ax = f_390("/path/to/data.json")
     >>> ax
     <class 'matplotlib.axes._axes.Axes'>
     >>> results
@@ -76,14 +76,14 @@ class TestCases(unittest.TestCase):
         plt.close("all")
     def test_case_1(self):
         # Test if the function can read the JSON data file and return a plot
-        _, ax = f_869(self.sample_data_file)
+        _, ax = f_390(self.sample_data_file)
         self.assertIsInstance(ax, plt.Axes, "The function should return a plot (Axes).")
         self.assertTrue(len(ax.get_xticks()) > 0, "The plot should have x-axis ticks.")
         self.assertTrue(len(ax.get_yticks()) > 0, "The plot should have y-axis ticks.")
         self.assertTrue(ax.get_title(), "Boxplot of Values for Each Key")
     def test_case_2(self):
         # Check result correctness
-        results, _ = f_869(self.sample_data_file)
+        results, _ = f_390(self.sample_data_file)
         self.assertIn("A", results)
         self.assertIn("B", results)
         self.assertIn("C", results)
@@ -95,7 +95,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(results["C"]["median"], 35.0)
     def test_case_3(self):
         # Test the correctness of the x-axis labels
-        _, ax = f_869(self.sample_data_file)
+        _, ax = f_390(self.sample_data_file)
         x_labels = [label.get_text() for label in ax.get_xticklabels()]
         expected_x_labels = ["A", "B", "C"]
         self.assertListEqual(
@@ -103,7 +103,7 @@ class TestCases(unittest.TestCase):
         )
     def test_case_4(self):
         # Test the correctness of the y-axis data points
-        _, ax = f_869(self.sample_data_file)
+        _, ax = f_390(self.sample_data_file)
         # Correctly extract the height of the boxes in the box plot
         boxes = [
             box.get_height() for box in ax.containers if hasattr(box, "get_height")
@@ -115,8 +115,8 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         # Test if the function raises an error for non-existent file
         with self.assertRaises(FileNotFoundError):
-            f_869(os.path.join(self.temp_dir.name, "non_existent.json"))
+            f_390(os.path.join(self.temp_dir.name, "non_existent.json"))
     def test_case_6(self):
         # Test if the function raises an error for invalid JSON format
         with self.assertRaises(json.JSONDecodeError):
-            f_869(os.path.join(self.temp_dir.name, "invalid.json"))
+            f_390(os.path.join(self.temp_dir.name, "invalid.json"))

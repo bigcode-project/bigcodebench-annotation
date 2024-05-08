@@ -5,7 +5,7 @@ import string
 # Constants
 INVALID_CHARACTERS = string.punctuation + string.whitespace
 
-def f_496(directory_path):
+def f_717(directory_path):
     """
     Scan a directory and organize the files according to their endings. Files with invalid characters in the name will be moved to a new directory called "Invalid."
     
@@ -23,7 +23,7 @@ def f_496(directory_path):
     - string
 
     Example:
-    >>> f_496('path_to_directory')
+    >>> f_717('path_to_directory')
     {'txt': 2, 'jpg': 1, 'Invalid': 1}
     """
     summary = {}
@@ -61,26 +61,26 @@ class TestCases(unittest.TestCase):
             with open(path, 'w') as f:
                 f.write("Dummy content")
     def test_file_moves(self):
-        f_496(self.test_dir_1)
+        f_717(self.test_dir_1)
         invalid_dir = os.path.join(self.test_dir_1, 'Invalid')
         self.assertTrue(os.path.exists(invalid_dir))
         self.assertEqual(len(os.listdir(invalid_dir)), 4)
     def test_empty_directory(self):
-        summary = f_496(self.empty_dir)
+        summary = f_717(self.empty_dir)
         self.assertEqual(summary, {})
     def test_basic_functionality(self):
         # Test basic functionality
-        summary = f_496(self.test_dir_1)
+        summary = f_717(self.test_dir_1)
         expected = {'Invalid': 4}
         self.assertEqual(summary, expected)
         
     def test_invalid_path(self):
         # Test with an invalid directory path
         with self.assertRaises(FileNotFoundError):
-            f_496('invalid_path')
+            f_717('invalid_path')
     def test_summary_content(self):
         # Test the summary content details
-        summary = f_496(self.test_dir_1)
+        summary = f_717(self.test_dir_1)
         
         # Check if the summary contains keys for all unique extensions and "Invalid"
         self.assertTrue(all(key in ['pdf', 'csv', 'jpg', 'Invalid'] for key in summary.keys()))

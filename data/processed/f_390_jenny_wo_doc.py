@@ -3,7 +3,7 @@ import random
 import matplotlib.pyplot as plt
 
 
-def f_236(
+def f_356(
     epoch_milliseconds,
     teams=["Team1", "Team2", "Team3", "Team4", "Team5"],
     random_seed=0,
@@ -30,7 +30,7 @@ def f_236(
     - matplotlib
 
     Example:
-    >>> results, ax = f_236(1236472051807)
+    >>> results, ax = f_356(1236472051807)
     >>> results.keys()
     dict_keys(['Team1', 'Team2', 'Team3', 'Team4', 'Team5'])
     >>> type(ax)
@@ -80,40 +80,40 @@ class TestCases(unittest.TestCase):
         self.assertTrue(ax.get_xlabel().startswith("Days since"))
     def test_case_1(self):
         # Test basic case with default parameters - data
-        performance_data, _ = f_236(self.x)
+        performance_data, _ = f_356(self.x)
         self._check_valid_performance_data(performance_data, self.default_valid_teams)
     def test_case_2(self):
         # Test basic case with default parameters - plot
-        _, fig = f_236(self.x)
+        _, fig = f_356(self.x)
         self._check_plot(fig)
     def test_case_3(self):
         # Test basic case with custom input
-        performance_data, fig = f_236(1236472051807, random_seed=42)
+        performance_data, fig = f_356(1236472051807, random_seed=42)
         self._check_plot(fig)
         self._check_valid_performance_data(performance_data, self.default_valid_teams)
     def test_case_4(self):
         # Test custom parameters - custom teams
         for custom_teams in [["A", "B"], ["c d e", "F", "GH", "ij kl"]]:
-            performance_data, fig = f_236(self.x, teams=custom_teams, random_seed=42)
+            performance_data, fig = f_356(self.x, teams=custom_teams, random_seed=42)
             self._check_plot(fig)
             self._check_valid_performance_data(performance_data, custom_teams)
     def test_case_5(self):
         # Test custom parameters - random seed
-        performance_data1, _ = f_236(self.x, random_seed=42)
-        performance_data2, _ = f_236(self.x, random_seed=42)
-        performance_data3, _ = f_236(self.x, random_seed=0)
+        performance_data1, _ = f_356(self.x, random_seed=42)
+        performance_data2, _ = f_356(self.x, random_seed=42)
+        performance_data3, _ = f_356(self.x, random_seed=0)
         self.assertEqual(performance_data1, performance_data2)
         self.assertNotEqual(performance_data1, performance_data3)
     def test_case_6(self):
         # Test error handling for invalid input time
         future_epoch = int((datetime.now() + timedelta(days=1)).timestamp() * 1000)
         with self.assertRaises(ValueError):
-            f_236(future_epoch)
+            f_356(future_epoch)
     def test_case_7(self):
         # Test error handling for invalid team
         with self.assertRaises(TypeError):
-            f_236(self.x, [1, 2, 3])
+            f_356(self.x, [1, 2, 3])
         with self.assertRaises(TypeError):
-            f_236(self.x, [[]])
+            f_356(self.x, [[]])
     def tearDown(self):
         plt.close("all")

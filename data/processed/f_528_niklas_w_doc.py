@@ -1,7 +1,7 @@
 import heapq
 import collections
 
-def f_148(x, n):
+def f_530(x, n):
     """
     Find the n most common letters in a dictionary, x, where the key letters and the values are their frequencies.
 
@@ -17,7 +17,7 @@ def f_148(x, n):
     - collections
 
     Example:
-    >>> f_148({'a': 1, 'b': 2, 'c': 3}, 2)
+    >>> f_530({'a': 1, 'b': 2, 'c': 3}, 2)
     ['c', 'b']
     """
     counter = collections.Counter(x)
@@ -27,12 +27,12 @@ def f_148(x, n):
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        self.assertEqual(f_148({'a': 1, 'b': 2, 'c': 3}, 2), ['c', 'b'])
+        self.assertEqual(f_530({'a': 1, 'b': 2, 'c': 3}, 2), ['c', 'b'])
     def test_case_2(self):
-        self.assertEqual(f_148({'a': 1, 'b': 2, 'c': 3}, 1), ['c'])
+        self.assertEqual(f_530({'a': 1, 'b': 2, 'c': 3}, 1), ['c'])
     def test_case_3(self):
-        self.assertEqual(f_148({'a': 1, 'b': 2, 'c': 3}, 3), ['c', 'b', 'a'])
+        self.assertEqual(f_530({'a': 1, 'b': 2, 'c': 3}, 3), ['c', 'b', 'a'])
     def test_case_4(self):
-        self.assertEqual(f_148({'a': 1, 'b': 2, 'c': 3}, 0), [])
+        self.assertEqual(f_530({'a': 1, 'b': 2, 'c': 3}, 0), [])
     def test_case_5(self):
-        self.assertEqual(f_148({'a': 1, 'b': 2, 'c': 3}, 4), ['c', 'b', 'a'])
+        self.assertEqual(f_530({'a': 1, 'b': 2, 'c': 3}, 4), ['c', 'b', 'a'])

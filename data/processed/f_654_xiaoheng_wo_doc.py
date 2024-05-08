@@ -4,7 +4,7 @@ import json
 import csv
 
 # Constants
-def f_665(input_file, output_file):
+def f_626(input_file, output_file):
     """
     Read a list of dictionaries from a JSON file, calculate the mean and median for each key, and write the results to a CSV file.
     
@@ -22,7 +22,7 @@ def f_665(input_file, output_file):
     - csv
 
     Example:
-    >>> f_665('data.json', 'stats.csv')
+    >>> f_626('data.json', 'stats.csv')
     """
     with open(input_file, 'r') as f:
         data = json.load(f)
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
         ]
     def validate_data(self, input_file, expected_results):
         output_file = "temp_output.csv"
-        f_665(input_file, output_file)
+        f_626(input_file, output_file)
         with open(output_file, 'r') as f:
             reader = csv.DictReader(f)
             for row in reader:

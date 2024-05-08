@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def f_166(letters, repetitions, colors):
+def f_774(letters, repetitions, colors):
     """
     Create a bar chart to visualize the frequency of each letter in a flattened list 
     formed by multiple repetitions of the original list. Each repetition of the list 
@@ -29,7 +29,7 @@ def f_166(letters, repetitions, colors):
     - matplotlib.pyplot
     
     Example:
-    >>> ax = f_166(['A', 'B', 'C'], [3, 5, 2], ['red', 'green', 'blue'])
+    >>> ax = f_774(['A', 'B', 'C'], [3, 5, 2], ['red', 'green', 'blue'])
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
@@ -47,7 +47,7 @@ import unittest
 class TestCases(unittest.TestCase):
     
     def test_basic_input(self):
-        ax = f_166(['A', 'B', 'C'], [3, 5, 2], ['red', 'green', 'blue'])
+        ax = f_774(['A', 'B', 'C'], [3, 5, 2], ['red', 'green', 'blue'])
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.get_title(), "Frequency of Letters")
         self.assertEqual(ax.get_xlabel(), "Letters")
@@ -61,14 +61,14 @@ class TestCases(unittest.TestCase):
     
     def test_invalid_input_length(self):
         with self.assertRaises(ValueError):
-            f_166(['A', 'B'], [3], ['red', 'green'])
+            f_774(['A', 'B'], [3], ['red', 'green'])
     
     def test_empty_lists(self):
         with self.assertRaises(ValueError):
-            f_166([], [], [])
+            f_774([], [], [])
     
     def test_single_letter(self):
-        ax = f_166(['Z'], [1], ['purple'])
+        ax = f_774(['Z'], [1], ['purple'])
         self.assertIsInstance(ax, plt.Axes)
         self.assertEqual(ax.get_title(), "Frequency of Letters")
         self.assertEqual(ax.get_xlabel(), "Letters")
@@ -77,7 +77,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.patches[0].get_height(), 1)
     
     def test_multiple_repetitions(self):
-        ax = f_166(['D', 'E', 'F'], [10, 20, 15], ['cyan', 'magenta', 'yellow'])
+        ax = f_774(['D', 'E', 'F'], [10, 20, 15], ['cyan', 'magenta', 'yellow'])
         self.assertIsInstance(ax, plt.Axes)
         expected_counts = [10, 20, 15]
         for patch, expected_count in zip(ax.patches, expected_counts):

@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.cluster import KMeans
 
 
-def f_448(data, n_clusters=3, seed=None):
+def f_744(data, n_clusters=3, seed=None):
     """
     Perform K-Means clustering on the given DataFrame using the sklearn KMeans algorithm. 
 
@@ -33,7 +33,7 @@ def f_448(data, n_clusters=3, seed=None):
     Example:
     >>> np.random.seed(12)
     >>> data = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-    >>> labels, model = f_448(data, n_clusters=4, seed=12)
+    >>> labels, model = f_744(data, n_clusters=4, seed=12)
     >>> print(labels) 
     [1 0 1 0 1 2 1 3 3 1 0 3 0 0 2 2 2 3 3 3 1 0 1 0 3 1 1 1 1 3 1 3 0 3 1 0 0
      2 0 3 2 1 2 1 1 3 1 1 1 1 2 2 1 0 0 3 3 0 0 1 1 2 0 0 2 2 0 2 2 2 0 3 2 3
@@ -45,7 +45,7 @@ def f_448(data, n_clusters=3, seed=None):
     ...     'a': [1, 20, 2, 22, 100],
     ...     'b': [1, 20, 2, 22, 100]
     ... })
-    >>> labels, model = f_448(data, seed=213)
+    >>> labels, model = f_744(data, seed=213)
     >>> print(labels)
     [2 0 2 0 1]
     >>> print(model)
@@ -66,11 +66,11 @@ class TestCases(unittest.TestCase):
             'a': [1, 2, 3],
             'b': ['a', 2, 4]
         })
-        self.assertRaises(Exception, f_448, data)
+        self.assertRaises(Exception, f_744, data)
     def test_case_1(self):
         np.random.seed(12)
         data = pd.DataFrame(np.random.randint(0, 20, size=(20, 4)), columns=list('ABCD'))
-        labels, kmeans = f_448(data, n_clusters=4, seed=1)
+        labels, kmeans = f_744(data, n_clusters=4, seed=1)
         unique_labels = np.unique(labels)
         assert all(label in range(4) for label in unique_labels)
         self.assertTrue(isinstance(labels, np.ndarray))
@@ -78,14 +78,14 @@ class TestCases(unittest.TestCase):
         np.testing.assert_equal(labels, [3, 0, 3, 1, 2, 1, 2, 0, 2, 1, 1, 3, 3, 1, 0, 0, 0, 0, 1, 3])
     def test_case_2(self):
         data = pd.DataFrame(np.zeros((100, 4)), columns=list('ABCD'))
-        labels, kmeans = f_448(data, n_clusters=3, seed=12)
+        labels, kmeans = f_744(data, n_clusters=3, seed=12)
         self.assertIsInstance(kmeans, KMeans)
         assert len(np.unique(labels)) == 1
         self.assertTrue(isinstance(labels, np.ndarray))
         self.assertCountEqual(labels, np.zeros(100))
     def test_case_3(self):
         data = pd.DataFrame({'A': range(100), 'B': range(100), 'C': range(100)})
-        labels, kmeans = f_448(data, seed=42)
+        labels, kmeans = f_744(data, seed=42)
         self.assertIsInstance(kmeans, KMeans)
         expected = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -97,7 +97,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self):
         np.random.seed(5)
         data = pd.DataFrame(np.random.rand(100, 20))
-        labels, kmeans = f_448(data, n_clusters=12, seed=12)
+        labels, kmeans = f_744(data, n_clusters=12, seed=12)
         self.assertIsInstance(kmeans, KMeans)
         expected = [ 4,  5,  5,  9, 10,  1,  0,  3,  4,  7,  7,  2, 11, 11,  3,  0,  4,
                     2,  3,  2,  2, 10, 10,  8,  5,  9, 11,  5,  0,  8, 11,  5,  7,  0,
@@ -109,4 +109,4 @@ class TestCases(unittest.TestCase):
         self.assertTrue(isinstance(labels, np.ndarray))
     def test_case_5(self):
         data = pd.DataFrame([])
-        self.assertRaises(Exception, f_448, data)
+        self.assertRaises(Exception, f_744, data)

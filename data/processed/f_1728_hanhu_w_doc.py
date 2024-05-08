@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 
-def f_390(mean, std_dev, num_samples):
+def f_52(mean, std_dev, num_samples):
     """
     Generates a histogram of samples drawn from a normal distribution and overlays
     the probability density function (PDF) of the normal distribution. The plot is titled
@@ -32,7 +32,7 @@ def f_390(mean, std_dev, num_samples):
 
     Examples:
     >>> import matplotlib
-    >>> samples, fig = f_390(0, 1, 1000)
+    >>> samples, fig = f_52(0, 1, 1000)
     >>> len(samples)
     1000
     >>> type(samples)
@@ -61,37 +61,37 @@ class TestCases(unittest.TestCase):
         np.random.seed(0)
     def test_samples_length(self):
         """ Test if the number of generated samples is correct. """
-        samples, _ = f_390(0, 1, 1000)
+        samples, _ = f_52(0, 1, 1000)
         self.assertEqual(len(samples), 1000)
     def test_samples_type(self):
         """ Test the type of the samples. """
-        samples, _ = f_390(0, 1, 1000)
+        samples, _ = f_52(0, 1, 1000)
         self.assertIsInstance(samples, np.ndarray)
     def test_mean_approximation(self):
         """ Test if the mean of the samples is approximately equal to the specified mean. """
-        samples, _ = f_390(0, 1, 1000)
+        samples, _ = f_52(0, 1, 1000)
         self.assertAlmostEqual(np.mean(samples), 0, places=1)
     def test_std_dev_approximation(self):
         """ Test if the standard deviation of the samples is approximately equal to the specified standard deviation. """
-        samples, _ = f_390(0, 1, 1000)
+        samples, _ = f_52(0, 1, 1000)
         self.assertAlmostEqual(np.std(samples), 1, places=1)
     def test_plot_title(self):
         """ Test if the plot title correctly reflects the mean and standard deviation. """
-        _, fig = f_390(0, 1, 1000)
+        _, fig = f_52(0, 1, 1000)
         self.assertIn("mean = 0.00,  std = 1.00", fig.axes[0].get_title())
     def test_histogram_bins(self):
         """ Test if the histogram displays the correct number of bins. """
-        _, fig = f_390(0, 1, 1000)
+        _, fig = f_52(0, 1, 1000)
         self.assertEqual(len(fig.axes[0].patches), 30)  # Check for 30 bins, as defined in the function
     def test_pdf_overlay(self):
         """ Test if the probability density function (PDF) is correctly overlayed on the histogram. """
-        _, fig = f_390(0, 1, 1000)
+        _, fig = f_52(0, 1, 1000)
         lines = fig.axes[0].get_lines()
         self.assertGreater(len(lines), 0)  # Ensure that at l
     def test_pdf_overlay_accuracy(self):
         """ Test if the PDF overlay accurately represents the normal distribution. """
         mean, std_dev, num_samples = 0, 1, 1000
-        _, fig = f_390(mean, std_dev, num_samples)
+        _, fig = f_52(mean, std_dev, num_samples)
         ax = fig.axes[0]
         line = ax.get_lines()[0]  # Assuming the first line is the PDF
         x, y = line.get_data()

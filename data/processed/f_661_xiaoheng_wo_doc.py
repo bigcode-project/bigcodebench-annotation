@@ -2,7 +2,7 @@ import re
 import os
 import zipfile
 
-def f_291(directory, pattern=r'^(.*?)-\d+\.zip$'):
+def f_640(directory, pattern=r'^(.*?)-\d+\.zip$'):
     """
     Unzip all zip files in a directory whose name matches a certain pattern by splitting the filename the last time "-" occurs and using the prefix part of the filename as the directory to extract.
     
@@ -19,7 +19,7 @@ def f_291(directory, pattern=r'^(.*?)-\d+\.zip$'):
     - zipfile
 
     Example:
-    >>> f_291('/tmp/my_data')
+    >>> f_640('/tmp/my_data')
     ('/tmp/backup/backup_20230827010101', [])
 
     """
@@ -48,7 +48,7 @@ class TestCases(unittest.TestCase):
         mock_listdir.return_value = ['sample-123.zip', 'test_data-456.zip', 'data_test-789.zip']
         mock_zipfile.return_value.__enter__.return_value.extractall = MagicMock()
         test_dir = "/fake/test_zip_dir"
-        extracted_dirs = f_291(test_dir)
+        extracted_dirs = f_640(test_dir)
         # Verify directories were correctly created
         expected_dirs = [
             os.path.join(test_dir, 'sample'),
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         mock_listdir.return_value = ['test_data-123.zip']
         mock_zipfile.return_value.__enter__.return_value.extractall = MagicMock()
         test_dir = "/fake/test_zip_dir"
-        f_291(test_dir)
+        f_640(test_dir)
         mock_makedirs.assert_called_once_with(os.path.join(test_dir, 'test_data'), exist_ok=True)
         mock_zipfile.assert_called_once_with(os.path.join(test_dir, 'test_data-123.zip'), 'r')
     @patch('os.makedirs')
@@ -83,7 +83,7 @@ class TestCases(unittest.TestCase):
         mock_listdir.return_value = ['data_test-321.zip']
         mock_zipfile.return_value.__enter__.return_value.extractall = MagicMock()
         test_dir = "/fake/test_zip_dir"
-        f_291(test_dir)
+        f_640(test_dir)
         mock_makedirs.assert_called_once_with(os.path.join(test_dir, 'data_test'), exist_ok=True)
         mock_zipfile.assert_called_once_with(os.path.join(test_dir, 'data_test-321.zip'), 'r')
     @patch('os.makedirs')
@@ -92,7 +92,7 @@ class TestCases(unittest.TestCase):
     def test_case_4(self, mock_listdir, mock_zipfile, mock_makedirs):
         mock_listdir.return_value = []
         test_dir = "/fake/test_zip_dir"
-        f_291(test_dir)
+        f_640(test_dir)
         mock_makedirs.assert_not_called()
         mock_zipfile.assert_not_called()
     @patch('os.makedirs')
@@ -105,7 +105,7 @@ class TestCases(unittest.TestCase):
         mock_listdir.return_value = [filename]
         expected_zip_path = os.path.join(test_dir, filename)
         # Call the function with the test directory
-        f_291(test_dir)
+        f_640(test_dir)
         # Assertions to ensure the ZipFile was handled correctly
         mock_zipfile_class.assert_called_once_with(expected_zip_path, 'r')
         mock_zipfile_class.return_value.__enter__.return_value.extractall.assert_called_once()

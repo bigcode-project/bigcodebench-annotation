@@ -1,11 +1,11 @@
 from collections import Counter
 import logging
 
-def f_128(letter_list, element, log_path):
+def f_681(letter_list, element, log_path):
     """
     Count the frequency of a particular letter in a given list of letters with logging.
 
-    Logs are written to a file named 'f_128.log' with encoding 'utf-8' and logging level DEBUG.
+    Logs are written to a file named 'f_681.log' with encoding 'utf-8' and logging level DEBUG.
     The log file is created by the function or overwritten if already exists.
     For each function call the following is logged with the respective logging level:
         - info: f"Function called with list: {letter_list} and element: {element}"
@@ -31,26 +31,26 @@ def f_128(letter_list, element, log_path):
     - logging
 
     Example:
-    >>> f_128(['a', 'b', 'a', 'c', 'a'], 'a', log_path='./')
+    >>> f_681(['a', 'b', 'a', 'c', 'a'], 'a', log_path='./')
     3
-    >>> with open('f_128.log') as log:
+    >>> with open('f_681.log') as log:
     ...     print(log.read())
     INFO:Function called with list: ['a', 'b', 'a', 'c', 'a'] and element: a
     INFO:Frequency of 'a' is 3
     <BLANKLINE>
 
-    >>> f_128(['x', 'y', 'z'], 'y', log_path='./')
+    >>> f_681(['x', 'y', 'z'], 'y', log_path='./')
     1
-    >>> with open('f_128.log') as log:
+    >>> with open('f_681.log') as log:
     ...     print(log.read())
     INFO:Function called with list: ['x', 'y', 'z'] and element: y
     INFO:Frequency of 'y' is 1
     <BLANKLINE>
 
     >>> try:
-    ...     f_128(['x', 'y', 'z'], 'a', log_path='./')
+    ...     f_681(['x', 'y', 'z'], 'a', log_path='./')
     ... except:
-    ...     with open('f_128.log') as log:
+    ...     with open('f_681.log') as log:
     ...        print(log.read())
     INFO:Function called with list: ['x', 'y', 'z'] and element: a
     ERROR:The element is not in the letter list.
@@ -58,7 +58,7 @@ def f_128(letter_list, element, log_path):
 
     """
     formatter = logging.Formatter('%(levelname)s:%(message)s')
-    handler = logging.FileHandler(log_path+'/f_128.log', mode='w')
+    handler = logging.FileHandler(log_path+'/f_681.log', mode='w')
     logger = logging.getLogger()
     handler.setFormatter(formatter)
     logger.addHandler(handler)
@@ -85,32 +85,32 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         self.temp_folder = tempfile.mkdtemp()
     def test_case_1(self):
-        result = f_128(['a', 'b', 'a', 'c', 'a'], 'a', self.temp_folder)
+        result = f_681(['a', 'b', 'a', 'c', 'a'], 'a', self.temp_folder)
         self.assertEqual(result, 3)
-        with open(self.temp_folder+'/f_128.log') as log:
+        with open(self.temp_folder+'/f_681.log') as log:
             self.assertTrue("INFO:Function called with list: ['a', 'b', 'a', 'c', 'a'] and element: a" in log.readline())
             self.assertTrue("INFO:Frequency of 'a' is 3" in log.readline())
     def test_case_2(self):
-        result = f_128(['x', 'y', 'z'], 'y', self.temp_folder)
+        result = f_681(['x', 'y', 'z'], 'y', self.temp_folder)
         self.assertEqual(result, 1)
-        with open(self.temp_folder+'/f_128.log') as log:
+        with open(self.temp_folder+'/f_681.log') as log:
             self.assertTrue("INFO:Function called with list: ['x', 'y', 'z'] and element: y" in log.readline())
             self.assertTrue("INFO:Frequency of 'y' is 1" in log.readline())
     def test_case_3(self):
-        result = f_128(['m', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v'], 'r', self.temp_folder)
+        result = f_681(['m', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v'], 'r', self.temp_folder)
         self.assertEqual(result, 1)
-        with open(self.temp_folder+'/f_128.log') as log:
+        with open(self.temp_folder+'/f_681.log') as log:
             self.assertTrue("INFO:Function called with list: ['m', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v'] and element: r" in log.readline())
             self.assertTrue("INFO:Frequency of 'r' is 1" in log.readline())
     def test_case_4(self):
-        result = f_128(['z', 'z', 'z', 'z'], 'z', self.temp_folder)
+        result = f_681(['z', 'z', 'z', 'z'], 'z', self.temp_folder)
         self.assertEqual(result, 4)
-        with open(self.temp_folder+'/f_128.log') as log:
+        with open(self.temp_folder+'/f_681.log') as log:
             self.assertTrue("INFO:Function called with list: ['z', 'z', 'z', 'z'] and element: z" in log.readline())
             self.assertTrue("INFO:Frequency of 'z' is 4" in log.readline())
     def test_case_5(self):
         with self.assertRaises(ValueError):
-            f_128(['a', 'b', 'c'], 'z', self.temp_folder)
-        with open(self.temp_folder+'/f_128.log') as log:
+            f_681(['a', 'b', 'c'], 'z', self.temp_folder)
+        with open(self.temp_folder+'/f_681.log') as log:
             self.assertTrue("INFO:Function called with list: ['a', 'b', 'c'] and element: z" in log.readline())
             self.assertTrue("ERROR:The element is not in the letter list." in log.readline())

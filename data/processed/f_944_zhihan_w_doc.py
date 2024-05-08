@@ -2,7 +2,7 @@ import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
-def f_765(texts):
+def f_964(texts):
     """
     Processes a collection of text documents to compute the TF-IDF (Term Frequency-Inverse Document Frequency) scores
     for each word, excluding any URLs present in the texts. The TF-IDF scores help to identify the importance of a word
@@ -24,7 +24,7 @@ def f_765(texts):
     - sklearn.feature_extraction.text.TfidfVectorizer
 
     Example:
-    >>> f_765(['Visit https://www.python.org for more info.', 'Python is great.', 'I love Python.'])
+    >>> f_964(['Visit https://www.python.org for more info.', 'Python is great.', 'I love Python.'])
     ([(0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.0, 0.5), (0.0, 0.62276601, 0.0, 0.62276601, 0.0, 0.0, 0.4736296, 0.0), (0.0, 0.0, 0.0, 0.0, 0.79596054, 0.0, 0.60534851, 0.0)], ['for', 'great', 'info', 'is', 'love', 'more', 'python', 'visit'])
 
     Notes:
@@ -43,7 +43,7 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         input_texts = ['Visit https://www.python.org for more info.', 'Python is great.', 'I love Python.']
-        output = f_765(input_texts)
+        output = f_964(input_texts)
         sorted_indices = sorted(range(len(output[1])), key=lambda k: output[1][k])
         expected_output = (
             [tuple(row[i] for i in sorted_indices) for row in output[0]],
@@ -52,7 +52,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(output, expected_output)
     def test_case_2(self):
         input_texts = ['Hello world!', 'Python programming is fun.', 'Data science with Python.']
-        output = f_765(input_texts)
+        output = f_964(input_texts)
         sorted_indices = sorted(range(len(output[1])), key=lambda k: output[1][k])
         expected_output = (
             [tuple(row[i] for i in sorted_indices) for row in output[0]],
@@ -61,7 +61,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(output, expected_output)
     def test_case_3(self):
         input_texts = ['I love coding.', 'You love coding too.', 'We all love coding.']
-        output = f_765(input_texts)
+        output = f_964(input_texts)
         sorted_indices = sorted(range(len(output[1])), key=lambda k: output[1][k])
         expected_output = (
             [tuple(row[i] for i in sorted_indices) for row in output[0]],
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(output, expected_output)
     def test_case_4(self):
         input_texts = ['Check out this amazing article at https://www.example.com/article']
-        output = f_765(input_texts)
+        output = f_964(input_texts)
         sorted_indices = sorted(range(len(output[1])), key=lambda k: output[1][k])
         expected_output = (
             [tuple(row[i] for i in sorted_indices) for row in output[0]],
@@ -80,4 +80,4 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         input_texts = ['', '', '']
         expected_output = ([], [])
-        self.assertEqual(f_765(input_texts), expected_output)
+        self.assertEqual(f_964(input_texts), expected_output)

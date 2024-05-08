@@ -13,7 +13,7 @@ ALPHANUMERIC = re.compile('[\W_]+')
 STOPWORDS = nltk.corpus.stopwords.words('english')
 
 
-def f_363(texts):
+def f_521(texts):
     """
     Creates a document-term matrix (DTM) from a list of text documents using CountVectorizer from Scikit-learn.
     Texts are preprocessed by removing non-alphanumeric characters (excluding spaces),
@@ -34,7 +34,7 @@ def f_363(texts):
 
     Example:
     >>> texts = ["Hello, world!", "Machine learning is great.", "Python is my favorite programming language."]
-    >>> dtm = f_363(texts)
+    >>> dtm = f_521(texts)
     """
     cleaned_texts = [ALPHANUMERIC.sub(' ', text).lower() for text in texts]
     tokenized_texts = [' '.join(word for word in text.split() if word not in STOPWORDS) for text in cleaned_texts]
@@ -56,22 +56,22 @@ class TestCases(unittest.TestCase):
         ]
     def test_dtm_shape(self):
         """Ensure the DTM has the correct shape."""
-        dtm = f_363(self.texts)
+        dtm = f_521(self.texts)
         self.assertEqual(dtm.shape[0], len(self.texts), "DTM should have one row per document.")
     def test_dtm_non_negative(self):
         """Ensure all values in the DTM are non-negative."""
-        dtm = f_363(self.texts)
+        dtm = f_521(self.texts)
         self.assertTrue((dtm >= 0).all().all(), "All DTM values should be non-negative.")
     def test_stopwords_removal(self):
         """Check if common stopwords are removed."""
-        dtm = f_363(["This is a test.", "Another test here."])
+        dtm = f_521(["This is a test.", "Another test here."])
         self.assertNotIn("is", dtm.columns, "Stopwords should be removed from DTM columns.")
     def test_alphanumeric_filtering(self):
         """Verify that non-alphanumeric characters are filtered out."""
-        dtm = f_363(["Example: test!", "#Another$% test."])
+        dtm = f_521(["Example: test!", "#Another$% test."])
         self.assertFalse(any(char in dtm.columns for char in ":!#$%"), "Non-alphanumeric characters should be filtered out.")
     def test_lowercase_conversion(self):
         """Test if all text is converted to lowercase."""
-        dtm = f_363(["LoWeR and UPPER"])
+        dtm = f_521(["LoWeR and UPPER"])
         self.assertIn("lower", dtm.columns, "All text should be converted to lowercase.")
         self.assertIn("upper", dtm.columns, "All text should be converted to lowercase.")

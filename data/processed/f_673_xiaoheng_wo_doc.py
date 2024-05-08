@@ -20,7 +20,7 @@ def setup_csv():
     ]
     create_test_csv('test_data/test_case_2.csv', content)
 
-def f_590(goals, penalties, csv_file_path=CSV_FILE_PATH):
+def f_664(goals, penalties, csv_file_path=CSV_FILE_PATH):
     """
     Count the total number of goals and penalties from a CSV file and update it with the given goals and penalties.
 
@@ -39,7 +39,7 @@ def f_590(goals, penalties, csv_file_path=CSV_FILE_PATH):
     Example:
     >>> goals = {'Team A': 3, 'Team B': 2, 'Team C': 1, 'Team D': 0, 'Team E': 2}
     >>> penalties = {'Team A': 1, 'Team B': 0, 'Team C': 2, 'Team D': 3, 'Team E': 1}
-    >>> counts = f_590(goals, penalties)
+    >>> counts = f_664(goals, penalties)
     >>> print(counts)
     Counter({'goals': 8, 'penalties': 7})
     """
@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         """
         goals = {}
         penalties = {}
-        result = f_590(goals, penalties)
+        result = f_664(goals, penalties)
         expected_result = Counter({'goals': 0, 'penalties': 0})
         self.assertEqual(result, expected_result, "Test Case 1 Failed")
     def test_case_2(self):
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
         """
         goals = {'Team A': 3, 'Team B': 2}
         penalties = {'Team A': 1, 'Team C': 2}
-        result = f_590(goals, penalties)
+        result = f_664(goals, penalties)
         expected_result = Counter({'goals': 5, 'penalties': 3})  # Update this based on correct input data
         self.assertEqual(result, expected_result, "Test Case 2 Failed")
     def test_case_3(self):
@@ -90,7 +90,7 @@ class TestCases(unittest.TestCase):
         """
         goals = {}
         penalties = {}
-        result = f_590(goals, penalties)
+        result = f_664(goals, penalties)
         expected_result = Counter({'goals': 0, 'penalties': 0})
         self.assertEqual(result, expected_result, "Test Case 3 Failed")
     def test_case_4(self):
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
         """
         goals = {'Team A': 2, 'Team B': 3}
         penalties = {'Team A': 1, 'Team C': 2}
-        result = f_590(goals, penalties)
+        result = f_664(goals, penalties)
         expected_result = {'goals': 5, 'penalties': 3}
         self.assertEqual(result, expected_result, "Test Case 4 Failed")
     def test_case_5(self):
@@ -111,6 +111,6 @@ class TestCases(unittest.TestCase):
         """
         goals = {'Team A': -2, 'Team B': 3}
         penalties = {'Team A': 1, 'Team C': -2}
-        result = f_590(goals, penalties)
+        result = f_664(goals, penalties)
         expected_result = Counter({'goals': 1, 'penalties': -1})
         self.assertEqual(result, expected_result, "Test Case 5 Failed")

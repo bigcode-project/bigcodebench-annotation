@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-def f_147(df):
+def f_560(df):
     """
     Use a linear regression model to predict the "value" of "feature" in the given dataframe and return the coefficients and intercept.
 
@@ -19,7 +19,7 @@ def f_147(df):
     >>> import pandas as pd
     >>> np.random.seed(42)
     >>> df = pd.DataFrame({'feature': np.random.rand(100), 'value': np.random.rand(100)})
-    >>> coefficients = f_147(df)
+    >>> coefficients = f_560(df)
     >>> print(coefficients)
     {'coefficients': [[-0.03353164387961974]], 'intercept': [0.5135976564010359]}
     """
@@ -33,13 +33,13 @@ import pandas as pd
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame({'feature': np.random.rand(100), 'value': np.random.rand(100)})
-        coefficients = f_147(df)
+        coefficients = f_560(df)
         self.assertEqual(len(coefficients['coefficients']), 1)
         self.assertEqual(len(coefficients['coefficients'][0]), 1)
         self.assertEqual(len(coefficients['intercept']), 1)
     def test_case_2(self):
         df = pd.DataFrame({'feature': [1, 2, 3, 4, 5], 'value': [1, 2, 3, 4, 5]})
-        coefficients = f_147(df)
+        coefficients = f_560(df)
         self.assertEqual(len(coefficients['coefficients']), 1)
         self.assertEqual(len(coefficients['coefficients'][0]), 1)
         self.assertEqual(len(coefficients['intercept']), 1)
@@ -47,7 +47,7 @@ class TestCases(unittest.TestCase):
         self.assertAlmostEqual(coefficients['intercept'][0], 0.0)
     def test_case_3(self):
         df = pd.DataFrame({'feature': [1, 2, 3, 4, 5], 'value': [2, 4, 6, 8, 10]})
-        coefficients = f_147(df)
+        coefficients = f_560(df)
         self.assertEqual(len(coefficients['coefficients']), 1)
         self.assertEqual(len(coefficients['coefficients'][0]), 1)
         self.assertEqual(len(coefficients['intercept']), 1)
@@ -55,7 +55,7 @@ class TestCases(unittest.TestCase):
         self.assertAlmostEqual(coefficients['intercept'][0], 0.0)
     def test_case_4(self):
         df = pd.DataFrame({'feature': [0, 0, 0, 0, 0], 'value': [1, 2, 3, 4, 5]})
-        coefficients = f_147(df)
+        coefficients = f_560(df)
         self.assertEqual(len(coefficients['coefficients']), 1)
         self.assertEqual(len(coefficients['coefficients'][0]), 1)
         self.assertEqual(len(coefficients['intercept']), 1)
@@ -63,7 +63,7 @@ class TestCases(unittest.TestCase):
         self.assertAlmostEqual(coefficients['intercept'][0], 3.0)
     def test_case_5(self):
         df = pd.DataFrame({'feature': [1, 2, 3, 4, 5], 'value': [0, 0, 0, 0, 0]})
-        coefficients = f_147(df)
+        coefficients = f_560(df)
         self.assertEqual(len(coefficients['coefficients']), 1)
         self.assertEqual(len(coefficients['coefficients'][0]), 1)
         self.assertEqual(len(coefficients['intercept']), 1)

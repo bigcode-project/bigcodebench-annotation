@@ -1,7 +1,7 @@
 import os
 import json
 
-def f_822(config_path: str) -> dict:
+def f_587(config_path: str) -> dict:
     """
     Load a JSON configuration file and return the configuration dictionary.
     
@@ -19,7 +19,7 @@ def f_822(config_path: str) -> dict:
     - FileNotFoundError: If the provided configuration file does not exist.
     
     Example:
-    >>> f_822("config.json")
+    >>> f_587("config.json")
     {'key': 'value', 'setting': True}
     """
     if not os.path.isfile(config_path):
@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
     
     def test_valid_config(self):
         # Test with a valid configuration file
-        config = f_822(self.valid_config_file.name)
+        config = f_587(self.valid_config_file.name)
         self.assertIsInstance(config, dict)
         self.assertIn("database", config)
         self.assertIn("logging", config)
@@ -62,16 +62,16 @@ class TestCases(unittest.TestCase):
     def test_non_existent_config(self):
         # Test with a non-existent configuration file
         with self.assertRaises(FileNotFoundError):
-            f_822("test_data/non_existent_config.json")
+            f_587("test_data/non_existent_config.json")
     
     def test_invalid_json_format(self):
         # Test with a configuration file containing invalid JSON
         with self.assertRaises(json.JSONDecodeError):
-            f_822(self.invalid_json_file.name)
+            f_587(self.invalid_json_file.name)
     
     def test_empty_config(self):
         # Test with an empty configuration file
-        config = f_822(self.empty_config_file.name)
+        config = f_587(self.empty_config_file.name)
         self.assertIsInstance(config, dict)
         self.assertEqual(len(config), 0)
     
@@ -81,7 +81,7 @@ class TestCases(unittest.TestCase):
         extra_config_file.write('{"database": "test_db", "logging": true, "extra_field": "value"}')
         extra_config_file.close()
         
-        config = f_822(extra_config_file.name)
+        config = f_587(extra_config_file.name)
         self.assertIsInstance(config, dict)
         self.assertIn("database", config)
         self.assertIn("logging", config)

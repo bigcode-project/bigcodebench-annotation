@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-def f_215(url, tag):
+def f_30(url, tag):
     """
     Scrape a web page for the first occurrence of a specified HTML tag and return its text content.
 
@@ -17,7 +17,7 @@ def f_215(url, tag):
     - bs4.BeautifulSoup
 
     Example:
-    >>> f_215("https://www.google.com/", "title")
+    >>> f_30("https://www.google.com/", "title")
     'Google'
     """
     response = requests.get(url)
@@ -38,7 +38,7 @@ class TestCases(unittest.TestCase):
         mock_response = Mock()
         mock_response.text = html_content
         mock_get.return_value = mock_response
-        result = f_215("http://test.com", "title")
+        result = f_30("http://test.com", "title")
         self.assertEqual(result, "Test Page")
     @patch('requests.get')
     def test_h1_tag_found(self, mock_get):
@@ -47,7 +47,7 @@ class TestCases(unittest.TestCase):
         mock_response = Mock()
         mock_response.text = html_content
         mock_get.return_value = mock_response
-        result = f_215("http://test.com", "h1")
+        result = f_30("http://test.com", "h1")
         self.assertEqual(result, "This is a test page")
     @patch('requests.get')
     def test_nonexistent_tag(self, mock_get):
@@ -56,12 +56,12 @@ class TestCases(unittest.TestCase):
         mock_response = Mock()
         mock_response.text = html_content
         mock_get.return_value = mock_response
-        result = f_215("http://test.com", "h2")
+        result = f_30("http://test.com", "h2")
         self.assertIsNone(result)
     def test_invalid_url_handling(self):
         """Test how the function handles an invalid URL."""
         with self.assertRaises(requests.exceptions.RequestException):
-            f_215("invalid_url", "title")
+            f_30("invalid_url", "title")
     @patch('requests.get')
     def test_malformed_html(self, mock_get):
         """Test the function with a malformed HTML input."""
@@ -69,9 +69,9 @@ class TestCases(unittest.TestCase):
         mock_response = Mock()
         mock_response.text = html_content
         mock_get.return_value = mock_response
-        result = f_215("http://test.com", "title")
+        result = f_30("http://test.com", "title")
         self.assertEqual(result, "Test Page")
-        result = f_215("http://test.com", "h1")
+        result = f_30("http://test.com", "h1")
         self.assertIsNone(result)
     @patch('requests.get')
     def test_multiple_matching_tags(self, mock_get):
@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
         mock_response = Mock()
         mock_response.text = html_content
         mock_get.return_value = mock_response
-        result = f_215("http://test.com", "p")
+        result = f_30("http://test.com", "p")
         self.assertEqual(result, "First Paragraph")
     @patch('requests.get')
     def test_empty_tag(self, mock_get):
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
         mock_response = Mock()
         mock_response.text = html_content
         mock_get.return_value = mock_response
-        result = f_215("http://test.com", "div")
+        result = f_30("http://test.com", "div")
         self.assertIsNone(result)
-        result = f_215("http://test.com", "h1")
+        result = f_30("http://test.com", "h1")
         self.assertEqual(result, "Not empty")
