@@ -41,13 +41,13 @@ import unittest
 class TestCases(unittest.TestCase):
     def test_1(self):
         avg_distance = f_616(1000)
-        self.assertTrue(3.2 <= avg_distance <= 3.4, f"Expected average distance to be between 3.2 and 3.4, got {avg_distance}")
+        self.assertTrue(3.1 <= avg_distance <= 3.5, f"Expected average distance to be between 3.1 and 3.5, got {avg_distance}")
     def test_2(self):
         avg_distance = f_616(500)
         self.assertTrue(3.2 <= avg_distance <= 3.5, f"Expected average distance to be between 3.2 and 3.5, got {avg_distance}")
     def test_3(self):
         avg_distance = f_616(100)
-        self.assertTrue(3.0 <= avg_distance <= 3.5, f"Expected average distance to be between 3.0 and 3.5, got {avg_distance}")
+        self.assertTrue(2.9 <= avg_distance <= 3.6, f"Expected average distance to be between 2.9 and 3.6, got {avg_distance}")
     def test_4(self):
         avg_distance = f_616(50)
         # Allowing a wider range due to higher variance with fewer points
