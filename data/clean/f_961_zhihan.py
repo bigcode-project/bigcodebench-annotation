@@ -34,6 +34,7 @@ def f_961(file_path='File.txt'):
     return tokens
 
 import unittest
+import shutil
 
 def run_tests():
     suite = unittest.TestSuite()
@@ -42,24 +43,55 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
+
+    def setUp(self):
+        self.test_dir = 'testdir_f_961'
+        os.makedirs(self.test_dir, exist_ok=True)
+        
+        f = open(self.test_dir+"/sample1.txt","w")
+        f.write("Hello, world!")
+        f.close()
+
+        f = open(self.test_dir+"/sample2.txt","w")
+        f.write("The quick brown fox jumps over the lazy dog .")
+        f.close()
+
+        f = open(self.test_dir+"/sample3.txt","w")
+        f.write("NLTK is a leading platform for building Python programs to work with human language data.")
+        f.close()
+
+        f = open(self.test_dir+"/sample4.txt","w")
+        f.write("OpenAI is an organization focused on    ensuring that artificial general intelligence benefits all   of humanity    .")
+        f.close()
+        
+        
+        f = open(self.test_dir+"/sample5.txt","w")
+        f.write("Python is an interpreted, high-level , general-purpose programming language.")
+        f.close()
+        
+
+    def tearDown(self):
+        # Clean up the test directory
+        shutil.rmtree(self.test_dir)
+
     def test_case_1(self):
-        tokens = f_961('sample1.txt')
+        tokens = f_961(self.test_dir+'/sample1.txt')
         self.assertEqual(tokens, ['Hello', ',', 'world', '!'])
 
     def test_case_2(self):
-        tokens = f_961('sample2.txt')
+        tokens = f_961(self.test_dir+'/sample2.txt')
         self.assertEqual(tokens, ['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog', '.'])
 
     def test_case_3(self):
-        tokens = f_961('sample3.txt')
+        tokens = f_961(self.test_dir+'/sample3.txt')
         self.assertEqual(tokens, ['NLTK', 'is', 'a', 'leading', 'platform', 'for', 'building', 'Python', 'programs', 'to', 'work', 'with', 'human', 'language', 'data', '.'])
 
     def test_case_4(self):
-        tokens = f_961('sample4.txt')
+        tokens = f_961(self.test_dir+'/sample4.txt')
         self.assertEqual(tokens, ['OpenAI', 'is', 'an', 'organization', 'focused', 'on', 'ensuring', 'that', 'artificial', 'general', 'intelligence', 'benefits', 'all', 'of', 'humanity', '.'])
 
     def test_case_5(self):
-        tokens = f_961('sample5.txt')
+        tokens = f_961(self.test_dir+'/sample5.txt')
         self.assertEqual(tokens, ['Python', 'is', 'an', 'interpreted', ',', 'high-level', ',', 'general-purpose', 'programming', 'language', '.'])
 if __name__ == "__main__":
     run_tests()
