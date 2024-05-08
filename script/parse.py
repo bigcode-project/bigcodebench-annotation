@@ -468,20 +468,19 @@ if __name__ == "__main__":
     os.makedirs("data/processed", exist_ok=True)
     with open("data/open-eval.jsonl", "w") as f:
         for i, file in enumerate(tqdm(glob("data/clean/*.py"))):
-            if "zhihan" in file:
-                data = extract_content(file, f"f_{i}")
-                if not validate_lib_num(data):
-                    print(file.replace('clean/', 'raw/'), "Less than 2 libraries are used")
-                if not validate_doc_example(data):
-                    print(file.replace('clean/', 'raw/'), "Example is missing")
-                if not validate_doc_returns(data):
-                    print(file.replace('clean/', 'raw/'), "Returns is missing")
-                if not validate_doc_reqs(data):
-                    print(file.replace('clean/', 'raw/'), "Requirements is missing")
-                if not evaluate_test_class(data["prompt"] + "\n\n" + data["test"]):
-                    print(file.replace('clean/', 'raw/'), "TestCases class is missing")
-                f.write(json.dumps(data) + "\n")
-                file_name = file.split("/")[-1].split(".")[0]
-                file_name = file_name + "_wo_doc" if check_test_wo_doc(data) else file_name + "_w_doc"
-                with open(f"data/processed/{file_name}.py", "w") as f2:
-                    f2.write(reconstruct_problem(data))
+            data = extract_content(file, f"f_{i}")
+            if not validate_lib_num(data):
+                print(file.replace('clean/', 'raw/'), "Less than 2 libraries are used")
+            if not validate_doc_example(data):
+                print(file.replace('clean/', 'raw/'), "Example is missing")
+            if not validate_doc_returns(data):
+                print(file.replace('clean/', 'raw/'), "Returns is missing")
+            if not validate_doc_reqs(data):
+                print(file.replace('clean/', 'raw/'), "Requirements is missing")
+            if not evaluate_test_class(data["prompt"] + "\n\n" + data["test"]):
+                print(file.replace('clean/', 'raw/'), "TestCases class is missing")
+            f.write(json.dumps(data) + "\n")
+            file_name = file.split("/")[-1].split(".")[0]
+            file_name = file_name + "_wo_doc" if check_test_wo_doc(data) else file_name + "_w_doc"
+            with open(f"data/processed/{file_name}.py", "w") as f2:
+                f2.write(reconstruct_problem(data))
