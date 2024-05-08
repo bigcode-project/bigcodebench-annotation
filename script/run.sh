@@ -1,3 +1,5 @@
+# Only running james files to save time
+
 NAMES=(james)
 
 for name in "${NAMES[@]}"; do
