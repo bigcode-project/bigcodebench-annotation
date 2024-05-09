@@ -35,3 +35,4 @@ for name in "${NAMES[@]}"; do
             exit 1
         fi
     done
+done
