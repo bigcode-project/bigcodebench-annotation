@@ -1,5 +1,5 @@
 NAMES=(chien jenny wenhao niklas hanhu ratna simon ming zhihan james xiaoheng armel)
-
+rm -rf data/clean/*
 for name in "${NAMES[@]}"; do
     # Copy all files for other names
     cp data/raw/*"$name"*py data/clean/
@@ -14,25 +14,22 @@ gzip -c data/wild-code-bench.jsonl > data/wild-code-bench.jsonl.gz
 # pip install -U wild-code
 # python script/eval.py --samples data/wild-code-bench.jsonl
 
-for name in "${NAMES[@]}"; do
+for file in data/processed/*wo_doc.py; do
+    
+    if ! pytest "$file"; then
+        echo "Pytest failed on $file, stopping..."
+        exit 1
+    fi
+done
 
-    for file in data/processed/*wo_doc.py; do
-        
-        if ! pytest "$file"; then
-            echo "Pytest failed on $file, stopping..."
-            exit 1
-        fi
-    done
+for file in data/processed/*w_doc.py; do
+    
+    if [[ "$file" == *"189_"* ]]; then
+        continue
+    fi
 
-    for file in data/processed/*w_doc.py; do
-        
-        if [[ "$file" == *"189_"* ]]; then
-            continue
-        fi
-
-        if ! pytest --doctest-modules "$file"; then
-            echo "Pytest failed on $file, stopping..."
-            exit 1
-        fi
-    done
+    if ! pytest --doctest-modules "$file"; then
+        echo "Pytest failed on $file, stopping..."
+        exit 1
+    fi
 done
