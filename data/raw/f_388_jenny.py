@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 def f_388(epoch_milliseconds, seed=None):
     """
     Generate and draw a sales trend for different categories from a particular epoch milliseconds
-    to the current time.
+    to the current UTC time.
 
     The function selects category from ['Electronics', 'Clothing', 'Home', 'Books', 'Sports'].
     Each day's sales are randomly determined between 10 and 50 units for each category.
@@ -45,8 +45,8 @@ def f_388(epoch_milliseconds, seed=None):
     if epoch_milliseconds < 0:
         raise ValueError("Start time cannot be negative.")
 
-    start_time = datetime.fromtimestamp(epoch_milliseconds / 1000.0)
-    current_time = datetime.now()
+    start_time = datetime.utcfromtimestamp(epoch_milliseconds / 1000.0)
+    current_time = datetime.utcnow()
     days_diff = (current_time - start_time).days
     if days_diff <= 0:
         raise ValueError("Start date must be before current time.")
@@ -96,7 +96,7 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(ax, plt.Axes)
         self._check_sales_data(
             sales_data,
-            (datetime.now() - datetime.fromtimestamp(1609459200000 / 1000.0)).days,
+            (datetime.now() - datetime.utcfromtimestamp(1609459200000 / 1000.0)).days,
         )
         self.assertEqual(ax.get_ylabel(), "Sales")
 

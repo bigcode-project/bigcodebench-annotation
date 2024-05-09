@@ -15,7 +15,7 @@ lxml==4.9.3
 psutil==5.9.5
 Django==4.2.7
 selenium==4.15.
-Pillow==8.3.2
+Pillow==10.3.0
 beautifulsoup4==4.8.2
 datetime==5.5
 python-docx==1.1.0
@@ -71,3 +71,4 @@ geopandas==0.13.2
 opencv-python-headless==4.9.0.80
 xlrd==2.0.1
 pytest==8.2.0
+wikipedia==1.4.0

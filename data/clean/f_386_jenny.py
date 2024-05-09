@@ -5,7 +5,7 @@ import numpy as np
 
 def f_386(start_time, end_time, step, amplitude, period, seed=0):
     """
-    Generate a time series with a given seasonality from the start time to the end time
+    Generate a time series with a given seasonality from the start UTC time to the end UTC time
     with a given step, and plot the time series with the seasonality.
 
     Parameters:
@@ -49,7 +49,7 @@ def f_386(start_time, end_time, step, amplitude, period, seed=0):
 
     data = []
     for i, ts in enumerate(timestamps):
-        dt = datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M:%S.%f")
+        dt = datetime.utcfromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M:%S.%f")
         value = values[i] + amplitude * np.sin(2 * np.pi * ts / period)
         data.append([dt, value])
 

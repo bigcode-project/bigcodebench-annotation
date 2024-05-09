@@ -7,6 +7,7 @@ from wildcode.eval.utils import (
     create_tempdir,
     reliability_guard,
 )
+from datetime import datetime
 def get_groundtruth(problems):
     print("\nAsserting the groundtruth...")
     if os.path.exists("checkpoint.txt"):

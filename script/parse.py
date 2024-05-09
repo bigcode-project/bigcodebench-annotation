@@ -266,8 +266,11 @@ def replace_pii(content):
         content = content.replace(name+"_", "")
     return content
 
-def extract_content(file_path, rename_id=None):
-    data = {"task_id": file_path.split("/")[-1]}
+def extract_content(file_path, rename_id=None, task_id=None):
+    if task_id:
+        data = {"task_id": task_id}
+    else:
+        data = {"task_id": file_path.split("/")[-1]}
     with open(file_path, 'r') as file:
         lines = file.read().splitlines()
         for line in lines:
@@ -466,9 +469,9 @@ def validate_doc_reqs(data):
 if __name__ == "__main__":
     shutil.rmtree("data/processed", ignore_errors=True)
     os.makedirs("data/processed", exist_ok=True)
-    with open("data/open-eval.jsonl", "w") as f:
+    with open("data/wild-code-bench.jsonl", "w") as f:
         for i, file in enumerate(tqdm(sorted(glob("data/clean/*.py")))):
-            data = extract_content(file, f"f_{i}")
+            data = extract_content(file, f"task_func", f"WildCodeBench/{i}")
             if not validate_lib_num(data):
                 print(file.replace('clean/', 'raw/'), "Less than 2 libraries are used")
             if not validate_doc_example(data):
@@ -480,7 +483,7 @@ if __name__ == "__main__":
             if not evaluate_test_class(data["prompt"] + "\n\n" + data["test"]):
                 print(file.replace('clean/', 'raw/'), "TestCases class is missing")
             f.write(json.dumps(data) + "\n")
-            file_name = file.split("/")[-1].split(".")[0]
+            file_name = f"{i}"
             file_name = file_name + "_wo_doc" if check_test_wo_doc(data) else file_name + "_w_doc"
             with open(f"data/processed/{file_name}.py", "w") as f2:
                 f2.write(reconstruct_problem(data))
