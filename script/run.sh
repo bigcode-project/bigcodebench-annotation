@@ -16,7 +16,7 @@ gzip -c data/wild-code-bench.jsonl > data/wild-code-bench.jsonl.gz
 
 for name in "${NAMES[@]}"; do
 
-    for file in data/processed/*"$name"*wo_doc.py; do
+    for file in data/processed/*wo_doc.py; do
         
         if ! pytest "$file"; then
             echo "Pytest failed on $file, stopping..."
@@ -24,9 +24,9 @@ for name in "${NAMES[@]}"; do
         fi
     done
 
-    for file in data/processed/*"$name"*w_doc.py; do
+    for file in data/processed/*w_doc.py; do
         
-        if [[ "$file" == *"f_2248_hanhu"* ]]; then
+        if [[ "$file" == *"189_"* ]]; then
             continue
         fi
 
