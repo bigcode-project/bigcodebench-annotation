@@ -1,75 +1,78 @@
-from collections import Counter
-import itertools
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-def task_func(d):
+
+def task_func(df, target_values=[1, 3, 4]):
     """
-    Count the occurrence of each integer in the values of the input dictionary, where each value is a list of integers,
-    and return a dictionary with these counts. The resulting dictionary's keys are the integers, and the values are 
-    their respective counts across all lists in the input dictionary.
+    Replace all elements in DataFrame columns that do not exist in the target_values array with zeros, and then output the distribution of each column after replacing.
+    - label each plot as the name of the column it corresponds to.
 
     Parameters:
-    d (dict): A dictionary where each key is a string and the value is a list of integers.
+    - df (DataFrame): The input pandas DataFrame.
+    - target_values (list) : Array of values not to replace by zero.
 
     Returns:
-    dict: A dictionary where each key is an integer from any of the input lists, and the value is the count of 
-            how often that integer appears in all the lists combined.
+    - matplotlib.axes.Axes: The Axes object of the plotted data.
 
     Requirements:
-    - collections.Counter
-    - itertools
-    
+    - seaborn
+    - matplotlib.pyplot
+
     Example:
-    >>> d = {'a': [1, 2, 3, 1], 'b': [3, 4, 5], 'c': [1, 2]}
-    >>> count_dict = task_func(d)
-    >>> print(count_dict)
-    {1: 3, 2: 2, 3: 2, 4: 1, 5: 1}
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> df = pd.DataFrame(np.random.randint(0,10,size=(100, 5)), columns=list('ABCDE'))
+    >>> print(df.head(2))
+       A  B  C  D  E
+    0  6  3  7  4  6
+    1  9  2  6  7  4
+    >>> df1, ax = task_func(df)
+    >>> print(ax)
+    Axes(0.125,0.11;0.775x0.77)
     """
-    count_dict = Counter(itertools.chain.from_iterable(d.values()))
-    return dict(count_dict)
+    df = df.applymap(lambda x: x if x in target_values else 0)
+    plt.figure(figsize=(10, 5))
+    for column in df.columns:
+        sns.kdeplot(df[column], label=column, warn_singular=False)
+    plt.legend()
+    return df, plt.gca()
 
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
+    """Test cases for the task_func function."""
     def test_case_1(self):
-        """Checks the basic functionality with single-element lists."""
-        input_dict = {'a': [1], 'b': [2], 'c': [3]}
-        expected_output = {1: 1, 2: 1, 3: 1}
-        self.assertEqual(task_func(input_dict), expected_output)
+        df = pd.DataFrame({"A": [1, 4, 7, 6, 7, 3, 4, 4]})
+        df1, ax = task_func(df)
+        self.assertIsInstance(ax, plt.Axes)
     def test_case_2(self):
-        """Verifies the function with lists that have distinct integers."""
-        input_dict = {'a': [1, 2], 'b': [3, 4], 'c': [5, 6]}
-        expected_output = {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}
-        self.assertEqual(task_func(input_dict), expected_output)
-        
+        df = pd.DataFrame({"A": [1, 2, 3, 4, 5], "B": [7, 4, 3, 3, 1]})
+        df1, ax = task_func(df)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines), 2)
     def test_case_3(self):
-        """ Tests the function with lists containing duplicate integers to ensure counts are aggregated correctly."""
-        input_dict = {'a': [1, 1, 2], 'b': [3, 4, 4], 'c': [5, 5, 5]}
-        expected_output = {1: 2, 2: 1, 3: 1, 4: 2, 5: 3}
-        self.assertEqual(task_func(input_dict), expected_output)
-        
+        df = pd.DataFrame({"A": [5, 6, 2, 9, 7, 3, 2, 2, 8, 1]})
+        target_values = [1, 2, 3, 4, 5]
+        df1, ax = task_func(df, target_values=target_values)
+        mask = df1.isin(target_values) | (df1 == 0)
+        self.assertTrue(mask.all().all())
+        self.assertIsInstance(ax, plt.Axes)
     def test_case_4(self):
-        """ Validates how the function handles an empty dictionary."""
-        input_dict = {}
-        expected_output = {}
-        self.assertEqual(task_func(input_dict), expected_output)
-        
+        df = pd.DataFrame({"A": [10, 20, 30, 40, 50], "B": [50, 40, 10, 10, 30]})
+        target_values = [10, 20, 30]
+        df1, ax = task_func(df, target_values=target_values)
+        mask = df1.isin(target_values) | (df1 == 0)
+        self.assertTrue(mask.all().all())
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines), 2)
     def test_case_5(self):
-        """Ensures the function handles dictionaries where lists are empty correctly."""
-        input_dict = {'a': [], 'b': [], 'c': []}
-        expected_output = {}
-        self.assertEqual(task_func(input_dict), expected_output)
-    def test_case_6(self):
-        """Test input with mixed integer and non-integer types to see if function filters or fails gracefully"""
-        input_dict = {'a': [1, 2, 'three'], 'b': [4, None], 'c': [5, [6]]}
-        with self.assertRaises(TypeError):
-            task_func(input_dict)
+        df = pd.DataFrame({"A": [5, 6, 2, 9, 7, 3, 2, 2, 8, 1]})
+        df1, ax = task_func(df, target_values=[])
+        self.assertTrue(df1.eq(0).all().all())
+        self.assertIsInstance(ax, plt.Axes)
     def test_case_7(self):
-        """Test with large lists to evaluate performance"""
-        input_dict = {'a': list(range(1000)), 'b': list(range(1000))}
-        expected_output = {i: 2 for i in range(1000)}
-        result = task_func(input_dict)
-        self.assertEqual(result, expected_output)
-    def test_case_8(self):
-        """Test with non-string keys to see how function handles it"""
-        input_dict = {1: [1, 2, 3], 2.5: [4, 5, 6]}
-        expected_output = {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}
-        self.assertEqual(task_func(input_dict), expected_output)
+        df = pd.DataFrame({"A": [5, 6, 2, 9, 7, 3, 2, 2, 8, 1]})
+        df1, ax = task_func(df, target_values=[5, 6, 2, 9, 7, 3, 8, 1])
+        self.assertTrue(df1.equals(df))
+        self.assertIsInstance(ax, plt.Axes)

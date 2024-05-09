@@ -27,7 +27,7 @@ def f_139(data):
     >>> analyzed_df, ax = f_139(data)
     >>> print(analyzed_df)
     col2  1  2
-    col1
+    col1      
     1     2  1
     2     3  1
     """

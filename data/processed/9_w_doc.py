@@ -1,83 +1,99 @@
-from collections import Counter
-import itertools
-from random import randint
+import pandas as pd
+import seaborn as sns
+from scipy.stats import zscore
 
-def task_func(T1, RANGE=100):
+
+def task_func(data_matrix):
     """
-    Convert elements in 'T1' to integers and create a list of random integers where the number of integers 
-    is determined by the sum of the integers in `T1`. Random integers are generated between 0 and `RANGE` 
-    (default is 100). Count the occurrences of each number in the generated list using a Counter.
-    
+    Calculate the Z-values of a 2D data matrix, calculate the mean value of each row and then visualize the correlation matrix of the Z-values with a heatmap.
+
     Parameters:
-    T1 (tuple of tuples): Each inner tuple contains string representations of numbers that are converted to integers.
-    RANGE (int, optional): The upper limit for the random number generation. Defaults to 100.
-    
+    data_matrix (numpy.array): The 2D data matrix of shape (m, n) where m is the number of rows and n is the number of columns.
+
     Returns:
-    Counter: A Counter object representing the count of each number appearing in the list of generated random integers.
-    
+    tuple: A tuple containing:
+      - pandas.DataFrame: A DataFrame with columns 'Feature 1', 'Feature 2', ..., 'Feature n' containing the Z-scores (per matrix row).
+                      There is also an additional column 'Mean' the mean of z-score per row.
+      - matplotlib.axes.Axes: The Axes object of the plotted heatmap.
+
     Requirements:
-    - collections.Counter
-    - itertools
-    - random.randint
-    
+    - pandas
+    - seaborn
+    - scipy.stats.zscore
+
     Example:
-    >>> import random
-    >>> random.seed(42)
-    >>> T1 = (('13', '17', '18', '21', '32'), ('07', '11', '13', '14', '28'), ('01', '05', '06', '08', '15', '16'))
-    >>> counts = task_func(T1)
-    >>> print(counts)  # Output will be a Counter object with random counts.
-    Counter({20: 6, 81: 5, 14: 5, 97: 5, 48: 5, 68: 5, 87: 5, 35: 4, 28: 4, 11: 4, 54: 4, 27: 4, 29: 4, 64: 4, 77: 4, 33: 4, 58: 4, 10: 4, 46: 4, 8: 4, 98: 4, 34: 4, 3: 3, 94: 3, 31: 3, 17: 3, 13: 3, 69: 3, 71: 3, 89: 3, 0: 3, 43: 3, 19: 3, 93: 3, 37: 3, 80: 3, 82: 3, 76: 3, 92: 3, 75: 2, 4: 2, 25: 2, 91: 2, 83: 2, 12: 2, 45: 2, 5: 2, 70: 2, 84: 2, 47: 2, 59: 2, 41: 2, 99: 2, 7: 2, 40: 2, 51: 2, 72: 2, 63: 2, 95: 2, 74: 2, 96: 2, 67: 2, 62: 2, 30: 2, 16: 2, 86: 1, 53: 1, 57: 1, 44: 1, 15: 1, 79: 1, 73: 1, 24: 1, 90: 1, 26: 1, 85: 1, 9: 1, 21: 1, 88: 1, 50: 1, 18: 1, 65: 1, 6: 1, 49: 1, 32: 1, 1: 1, 55: 1, 22: 1, 38: 1, 2: 1, 39: 1})
+    >>> import numpy as np
+    >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
+    >>> df, ax = task_func(data)
+    >>> print(df)
+       Feature 1  Feature 2  Feature 3  Feature 4  Feature 5          Mean
+    0   0.662085   1.489691  -1.406930  -0.579324  -0.165521 -2.053913e-16
+    1  -1.207020  -0.742781   0.649934   1.578410  -0.278543 -3.330669e-17
     """
-    int_list = [list(map(int, x)) for x in T1]
-    flattened_list = list(itertools.chain(*int_list))
-    total_nums = sum(flattened_list)
-    random_nums = [randint(0, RANGE) for _ in range(total_nums)]
-    counts = Counter(random_nums)
-    return counts
+    z_scores = zscore(data_matrix, axis=1)
+    feature_columns = ["Feature " + str(i + 1) for i in range(data_matrix.shape[1])]
+    df = pd.DataFrame(z_scores, columns=feature_columns)
+    df["Mean"] = df.mean(axis=1)
+    correlation_matrix = df.corr()
+    ax = sns.heatmap(correlation_matrix, annot=True, fmt=".2f")
+    return df, ax
 
 import unittest
-from collections import Counter
+import numpy as np
+import matplotlib
 class TestCases(unittest.TestCase):
+    """Test cases for the task_func function."""
     def test_case_1(self):
-        """Single tuple with small integers as strings"""
-        T1 = (('1', '2', '3'),)
-        result = task_func(T1)
-        self.assertIsInstance(result, Counter)
-        self.assertEqual(sum(result.values()), 6)
+        data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        df, ax = task_func(data)
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
+        np.testing.assert_array_equal(
+            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
+            zscore(data, axis=1),
+        )
+        self.assertTrue("Mean" in df.columns)
     def test_case_2(self):
-        """Multiple tuples with small integers as strings"""
-        T1 = (('1', '2'), ('3', '4'))
-        result = task_func(T1)
-        self.assertIsInstance(result, Counter)
-        self.assertEqual(sum(result.values()), 10)
-        
+        data = np.array([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
+        df, ax = task_func(data)
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
+        np.testing.assert_array_equal(
+            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
+            zscore(data, axis=1),
+        )
+        self.assertTrue("Mean" in df.columns)
     def test_case_3(self):
-        """Single tuple with larger integers as strings"""
-        T1 = (('10', '20', '30'),)
-        result = task_func(T1)
-        self.assertIsInstance(result, Counter)
-        self.assertEqual(sum(result.values()), 60)
+        data = np.array([[3, 5, 7, 1000], [200, 5, 7, 1], [1, -9, 14, 700]])
+        df, ax = task_func(data)
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
+        np.testing.assert_array_equal(
+            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
+            zscore(data, axis=1),
+        )
+        self.assertTrue("Mean" in df.columns)
     def test_case_4(self):
-        """Multiple tuples with mixed small and large integers as strings"""
-        T1 = (('1', '10'), ('100', '1000'))
-        result = task_func(T1)
-        self.assertIsInstance(result, Counter)
-        self.assertEqual(sum(result.values()), 1111)
+        data = np.array(
+            [
+                [1, 2, 3, 4, 5, 4, 3, 2, 1],
+            ]
+        )
+        df, ax = task_func(data)
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
+        np.testing.assert_array_equal(
+            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
+            zscore(data, axis=1),
+        )
+        self.assertTrue("Mean" in df.columns)
     def test_case_5(self):
-        """Single tuple with repeating integers as strings"""
-        T1 = (('1', '1', '1'),)
-        result = task_func(T1)
-        self.assertIsInstance(result, Counter)
-        self.assertEqual(sum(result.values()), 3)
-    def test_empty_input(self):
-        """Empty tuple as input"""
-        T1 = ()
-        result = task_func(T1)
-        self.assertIsInstance(result, Counter)
-        self.assertEqual(sum(result.values()), 0)
-    def test_range_limit(self):
-        """Check if random numbers respect the RANGE parameter"""
-        T1 = (('10',),)
-        RANGE = 20
-        result = task_func(T1, RANGE)
-        self.assertTrue(all(0 <= num <= RANGE for num in result.keys()))
+        data = np.array([[1], [1], [1]])
+        df, ax = task_func(data)
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
+        np.testing.assert_array_equal(
+            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
+            zscore(data, axis=1),
+        )
+        self.assertTrue("Mean" in df.columns)

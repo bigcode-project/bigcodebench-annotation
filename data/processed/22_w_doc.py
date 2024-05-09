@@ -1,71 +1,102 @@
-import psutil
-import platform
+import pandas as pd
+import regex as re
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-def task_func():
+COLUMN_NAMES = ["Name", "Email", "Age", "Country"]
+
+
+def task_func(text):
     """
-    Obtain system details, including operating system, architecture, and memory usage.
-    
-    This function gathers information about the system's operating system, architecture,
-    and memory usage. It calculates the percentage of used memory  by comparing the total
-    and currently used memory. The gathered details are then returned in a dictionary 
-    format with specific keys for each piece of information.
-    
+    Extract data from a text and create a Pandas DataFrame.
+    The text contains several lines, each formatted as 'Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA'.
+    Plot the age distribution using seaborn.
+
+    The data is extracted using the regular expression pattern:
+    "Name: (.*?), Email: (.*?), Age: (.*?), Country: (.*?)($|\n)"
+    and the resulting DataFrame has columns: ['Name', 'Email', 'Age', 'Country']
+
+    Parameters:
+    text (str): The text to analyze.
+
     Returns:
-    dict: A dictionary containing:
-        - 'OS': Operating System name (e.g., 'Windows', 'Linux').
-        - 'Architecture': System architecture (typically first item from platform.architecture(), e.g., '64bit').
-        - 'Memory Usage': Formatted string representing the percentage of memory currently in use, 
-                            calculated as (used memory / total memory) * 100.
-  
-    Requirements:
-    - platform
-    - psutil
+    DataFrame: A pandas DataFrame with extracted data.
 
-    Examples:
-    >>> system_info = task_func()
-    >>> isinstance(system_info, dict)
-    True
-    >>> 'OS' in system_info
-    True
-    >>> 'Architecture' in system_info
-    True
-    >>> 'Memory Usage' in system_info
-    True
+    Requirements:
+    - pandas
+    - regex
+    - seaborn
+    - matplotlib.pyplot
+
+    Example:
+    >>> text = 'Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA\\nName: Jane Doe, Email: jane.doe@example.com, Age: 25, Country: UK'
+    >>> df = task_func(text)
+    >>> print(df)
+           Name                 Email  Age Country
+    0  John Doe  john.doe@example.com   30     USA
+    1  Jane Doe  jane.doe@example.com   25      UK
     """
-    system_info = {}
-    system_info['OS'] = platform.system()
-    system_info['Architecture'] = platform.architecture()[0]
-    total_memory = psutil.virtual_memory().total
-    used_memory = psutil.virtual_memory().used
-    system_info['Memory Usage'] = f'{used_memory/total_memory*100:.2f}%'
-    return system_info
+    pattern = r"Name: (.*?), Email: (.*?), Age: (.*?), Country: (.*?)($|\n)"
+    matches = re.findall(pattern, text)
+    data = []
+    for match in matches:
+        data.append(match[:-1])
+    df = pd.DataFrame(data, columns=COLUMN_NAMES)
+    df["Age"] = df["Age"].astype(int)
+    sns.histplot(data=df, x="Age")
+    plt.show()
+    return df
 
 import unittest
 class TestCases(unittest.TestCase):
-    
-    def test_presence_OS(self):
-        """Test that the result has the correct keys and that each key maps to the expected data type."""
-        result = task_func()
-        self.assertTrue('OS' in result and isinstance(result['OS'], str))
-    def test_presence_architecture(self):
-        """Test that the result has the correct keys and that each key maps to the expected data type."""
-        result = task_func()
-        self.assertTrue('Architecture' in result and isinstance(result['Architecture'], str))
-    def test_presence_memory_usage(self):
-        """Test that the result has the correct keys and that each key maps to the expected data type."""
-        result = task_func()
-        self.assertTrue('Memory Usage' in result and isinstance(result['Memory Usage'], str))
-    def test_return_type(self):
-        """Test that the result has the correct keys and that each key maps to the expected data type."""
-        result = task_func()
-        self.assertIsInstance(result, dict)
-    def test_memory_usage_format(self):
-        """Test that the 'Memory Usage' key is correctly formatted as a percentage."""
-        result = task_func()
-        self.assertRegex(result['Memory Usage'], r"\d{1,3}\.\d{2}%")
-    
-    def test_non_empty_values(self):
-        """Ensure that the values associated with each key are non-empty."""
-        result = task_func()
-        for key, value in result.items():
-            self.assertTrue(bool(value))
+    """Test cases for the task_func function."""
+    def test_case_1(self):
+        input_text = "Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA\nName: Jane Doe, Email: jane.doe@example.com, Age: 25, Country: UK"
+        df = task_func(input_text)
+        self.assertEqual(df.shape, (2, 4))
+        self.assertListEqual(list(df.columns), ["Name", "Email", "Age", "Country"])
+        self.assertListEqual(
+            df.iloc[0].tolist(), ["John Doe", "john.doe@example.com", 30, "USA"]
+        )
+        self.assertListEqual(
+            df.iloc[1].tolist(), ["Jane Doe", "jane.doe@example.com", 25, "UK"]
+        )
+    def test_case_2(self):
+        input_text = (
+            "Name: Alex Smith, Email: alex.smith@example.com, Age: 35, Country: Canada"
+        )
+        df = task_func(input_text)
+        self.assertEqual(df.shape, (1, 4))
+        self.assertListEqual(
+            df.iloc[0].tolist(), ["Alex Smith", "alex.smith@example.com", 35, "Canada"]
+        )
+    def test_case_3(self):
+        input_text = ""
+        df = task_func(input_text)
+        self.assertTrue(df.empty)
+    def test_case_4(self):
+        input_text = (
+            "Name: Alex Smith, Email: alex.smith@example.com, Age: 35, Country: Canada"
+        )
+        df = task_func(input_text)
+        self.assertEqual(df.shape, (1, 4))
+        self.assertListEqual(
+            df.iloc[0].tolist(), ["Alex Smith", "alex.smith@example.com", 35, "Canada"]
+        )
+    def test_case_5(self):
+        input_text = """Name: Alex Smith, Email: alex.smith@example.com, Age: 35, Country: Canada
+        Name: Bob Miller, Email: bob.miller@example.com, Age: 25, Country: USA
+        Name: Anna Karin, Email: anna.karin@example.com, Age: 47, Country: Finland
+        """
+        df = task_func(input_text)
+        self.assertEqual(df.shape, (3, 4))
+        self.assertListEqual(list(df.columns), ["Name", "Email", "Age", "Country"])
+        self.assertListEqual(
+            df.iloc[0].tolist(), ["Alex Smith", "alex.smith@example.com", 35, "Canada"]
+        )
+        self.assertListEqual(
+            df.iloc[1].tolist(), ["Bob Miller", "bob.miller@example.com", 25, "USA"]
+        )
+        self.assertListEqual(
+            df.iloc[2].tolist(), ["Anna Karin", "anna.karin@example.com", 47, "Finland"]
+        )

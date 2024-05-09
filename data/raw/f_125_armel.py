@@ -29,7 +29,7 @@ def f_125(text):
     - matplotlib.pyplot
 
     Example:
-    >>> text = 'Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA\nName: Jane Doe, Email: jane.doe@example.com, Age: 25, Country: UK'
+    >>> text = 'Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA\\nName: Jane Doe, Email: jane.doe@example.com, Age: 25, Country: UK'
     >>> df = f_125(text)
     >>> print(df)
            Name                 Email  Age Country

@@ -1,107 +1,134 @@
-import nltk
-from string import punctuation
-import seaborn as sns
+import pandas as pd
 import matplotlib.pyplot as plt
 
-# Constants
-PUNCTUATION = set(punctuation)
-
-
-def task_func(text):
+def task_func(car_dict):
     """
-    Draw a bar chart of the frequency of words in a text beginning with the "$" character. Words that start with the '$' character but consist only of punctuation (e.g., '$!$' and '$.$') are not included in the frequency count.
-    - If there is no word respecting the above conditions, the plot should be None.
-    - The barplot x words on the x-axis and frequencies on the y-axis.
+    With a dictionary of cars as keys and their colors as values, create a DataFrame and visualize the distribution of vehicle colors in a bar chart.
+    - The columns of the dataframe should be 'Car' and 'Color'.
+    - The plot title should be 'Distribution of Vehicle Colors'.
 
     Parameters:
-        - text (str): The input text.
+    car_dict (dict): The dictionary with car brands as keys and their colors as values.
+
     Returns:
-        - matplotlib.axes._axes.Axes: The plot showing the frequency of words beginning with the '$' character.
+    tuple: A tuple containing:
+        - DataFrame: A pandas DataFrame with car brands and their colors.
+        - Axes: The Axes object of the bar chart visualizing the distribution of vehicle colors.
 
     Requirements:
-        - nltk
-        - string
-        - seaborn
-        - matplotlib
+    - pandas
+    - matplotlib
 
     Example:
-    >>> text = "$child than resource indicate star $community station onto best green $exactly onto then age charge $friend than ready child really $let product coach decision professional $camera life off management factor $alone beat idea bit call $campaign fill stand Congress stuff $performance follow your resource road $data performance himself school here"
-    >>> ax = task_func(text)
-    >>> print(ax)
-    Axes(0.125,0.11;0.775x0.77)
+    >>> car_dict = {'Ford': 'Red', 'Toyota': 'Blue', 'Mercedes': 'Black', 'Tesla': 'White', 'BMW': 'Silver'}
+    >>> df, ax = task_func(car_dict)
+    >>> print(df)
+            Car   Color
+    0      Ford     Red
+    1    Toyota    Blue
+    2  Mercedes   Black
+    3     Tesla   White
+    4       BMW  Silver
     """
-    words = text.split()
-    dollar_words = [
-        word
-        for word in words
-        if word.startswith("$")
-        and not all(c in PUNCTUATION for c in word)
-        and len(word) > 1
-    ]
-    freq = nltk.FreqDist(dollar_words)
-    if not freq:  # If frequency distribution is empty, return None
-        return None
-    plt.figure(figsize=(10, 5))
-    sns.barplot(x=freq.keys(), y=freq.values())
-    return plt.gca()
+    car_data = list(car_dict.items())
+    df = pd.DataFrame(car_data, columns=['Car', 'Color'])
+    color_counts = df["Color"].value_counts()
+    figure = plt.figure()
+    plt.bar(color_counts.keys(), color_counts.values, color="maroon", width=0.4)
+    plt.xlabel("Color")
+    plt.ylabel("Frequency")
+    plt.title("Distribution of Vehicle Colors")
+    plt.show()
+    ax = plt.gca()
+    return df, ax
 
 import unittest
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     @staticmethod
-    def is_bar(ax, expected_values, expected_categories):
-        extracted_values = [
-            bar.get_height() for bar in ax.patches
-        ]  # extract bar height
-        extracted_categories = [
-            tick.get_text() for tick in ax.get_xticklabels()
-        ]  # extract category label
+    def is_barplot(ax, expected_values, expected_categories):
+        extracted_values = [bar.get_height() for bar in ax.patches] # extract bar height
+        extracted_categories = [tick.get_text() for tick in ax.get_xticklabels()] # extract category label
         for actual_value, expected_value in zip(extracted_values, expected_values):
-            assert (
-                actual_value == expected_value
-            ), f"Expected value '{expected_value}', but got '{actual_value}'"
-        for actual_category, expected_category in zip(
-            extracted_categories, expected_categories
-        ):
-            assert (
-                actual_category == expected_category
-            ), f"Expected category '{expected_category}', but got '{actual_category}'"
+            assert actual_value == expected_value, f"Expected value '{expected_value}', but got '{actual_value}'"
+        for actual_category, expected_category in zip(extracted_categories, expected_categories):
+            assert actual_category == expected_category, f"Expected category '{expected_category}', but got '{actual_category}'"
     def test_case_1(self):
-        # Randomly generated sentence with $ words
-        text = "This is the $first $first sentence."
-        plot = task_func(text)
-        self.assertIsInstance(plot, plt.Axes, "Return type should be a plot (Axes).")
-        self.is_bar(plot, expected_categories=["$first"], expected_values=[2.0])
+        car_dict = {
+            "Ford": "Red",
+            "Toyota": "Blue",
+            "Mercedes": "Black",
+            "Tesla": "White",
+            "BMW": "Silver",
+        }
+        df, ax = task_func(car_dict)
+        self.is_barplot(
+            ax,
+            expected_values=[1, 1, 1, 1, 1],
+            expected_categories=['Red', 'Blue', 'Black', 'White', 'Silver']
+        )
+        # Assertions
+        self.assertListEqual(list(df.columns), ['Car', 'Color'])
+        self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
+        self.assertSetEqual(set(df['Color']), set(car_dict.values()))
+        self.assertEqual(ax.get_title(), 'Distribution of Vehicle Colors')
+        self.assertEqual(ax.get_xlabel(), "Color")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
     def test_case_2(self):
-        # Another randomly generated sentence with $ words
-        text = "This $is $is $is the $second $sentence $sentence"
-        plot = task_func(text)
-        self.assertIsInstance(plot, plt.Axes, "Return type should be a plot (Axes).")
-        self.is_bar(
-            plot,
-            expected_categories=["$is", "$second", "$sentence"],
-            expected_values=[3.0, 1.0, 2.0],
-        )
+        car_dict = {
+            "Ford": "Blue",
+            "Toyota": "Red",
+            "Fiat": "Silver",
+            "Tesla": "Silver",
+            "BMW": "White",
+        }
+        df, ax = task_func(car_dict)
+        # Assertions
+        self.assertListEqual(list(df.columns), ['Car', 'Color'])
+        self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
+        self.assertSetEqual(set(df['Color']), set(car_dict.values()))
+        self.assertEqual(ax.get_title(), 'Distribution of Vehicle Colors')
     def test_case_3(self):
-        # Sentence without any $ words
-        text = "This is the third sentence."
-        plot = task_func(text)
-        self.assertIsNone(plot, "The plot should be None since there are no $ words.")
+        car_dict = {
+            "Ford": "Red",
+            "Toyota": "Blue",
+            "Mercedes": "Black",
+            "Tesla": "White",
+            "BMW": "Silver",
+            "Lamborghini": "Black",
+            "Peugeot": "Black",
+        }
+        df, ax = task_func(car_dict)
+        # Assertions
+        self.assertListEqual(list(df.columns), ['Car', 'Color'])
+        self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
+        self.assertSetEqual(set(df['Color']), set(car_dict.values()))
+        self.assertEqual(ax.get_title(), 'Distribution of Vehicle Colors')
     def test_case_4(self):
-        # Sentence with all $ words being single characters or punctuation
-        text = "$ $! $@ $$"
-        plot = task_func(text)
-        self.assertIsNone(
-            plot,
-            "The plot should be None since all $ words are single characters or punctuation.",
-        )
+        car_dict = {
+            "Ford": "Red",
+            "Toyota": "Blue",
+            "Mercedes": "Black",
+            "Tesla": "White",
+            "BMW": "Silver",
+        }
+        df, ax = task_func(car_dict)
+        # Assertions
+        self.assertListEqual(list(df.columns), ['Car', 'Color'])
+        self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
+        self.assertSetEqual(set(df['Color']), set(car_dict.values()))
+        self.assertEqual(ax.get_title(), 'Distribution of Vehicle Colors')
     def test_case_5(self):
-        # Mix of valid $ words and punctuation-only $ words with some repeated words
-        text = "$apple $apple $banana $!$ $@ fruit $cherry"
-        plot = task_func(text)
-        self.assertIsInstance(plot, plt.Axes, "Return type should be a plot (Axes).")
-        self.is_bar(
-            plot,
-            expected_categories=["$apple", "$banana", "$cherry"],
-            expected_values=[2.0, 1.0, 1.0],
-        )
+        car_dict = {
+            "Ford": "Red",
+            "Toyota": "Red",
+            "Mercedes": "Red",
+            "Tesla": "White",
+            "BMW": "Silver",
+        }
+        df, ax = task_func(car_dict)
+        # Assertions
+        self.assertListEqual(list(df.columns), ['Car', 'Color'])
+        self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
+        self.assertSetEqual(set(df['Color']), set(car_dict.values()))
+        self.assertEqual(ax.get_title(), 'Distribution of Vehicle Colors')

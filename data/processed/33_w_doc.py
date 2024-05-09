@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # Constants
 COLUMNS = ['col1', 'col2', 'col3']
 
-def f_139(data):
+def task_func(data):
     """
     You are given a list of elements. Each element is a list with the same length as COLUMNS, representing one row a dataframe df to create. Visualize the distribution of different values in a column "col3" of a pandas DataFrame df, grouped by "col1" and "col2," using a heatmap.
 
@@ -24,7 +24,7 @@ def f_139(data):
 
     Example:
     >>> data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
-    >>> analyzed_df, ax = f_139(data)
+    >>> analyzed_df, ax = task_func(data)
     >>> print(analyzed_df)
     col2  1  2
     col1      
@@ -39,14 +39,12 @@ def f_139(data):
     return analyzed_df, ax
 
 import unittest
-
 class TestCases(unittest.TestCase):
-    """Test cases for the f_139 function."""
+    """Test cases for the task_func function."""
     def test_case_1(self):
         data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
         df = pd.DataFrame(data, columns=COLUMNS)
-        analyzed_df, ax = f_139(df)
-
+        analyzed_df, ax = task_func(df)
         expected_data = [[1, 1, 2], [1, 2, 1], [2, 1, 3], [2, 2, 1]]
         expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
         expected_df = expected_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
@@ -54,7 +52,6 @@ class TestCases(unittest.TestCase):
         self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
         pd.testing.assert_frame_equal(analyzed_df, expected_df)
         self.assertTrue(isinstance(ax, plt.Axes))
-
     def test_case_2(self):
         data = [
             [1, 1, 2],
@@ -63,7 +60,7 @@ class TestCases(unittest.TestCase):
             [1, 1, 5],
             [1, 3, 7]
         ]
-        analyzed_df, ax = f_139(data)
+        analyzed_df, ax = task_func(data)
         expected_data = [
             [1, 1, 3],
             [1, 2, 1],
@@ -75,7 +72,6 @@ class TestCases(unittest.TestCase):
         self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
         pd.testing.assert_frame_equal(analyzed_df, expected_df)
         self.assertTrue(isinstance(ax, plt.Axes))
-
     def test_case_3(self):
         data = [
             [1, 1, 1],
@@ -83,7 +79,7 @@ class TestCases(unittest.TestCase):
             [2, 1, 4],
             [2, 2, 5]
         ]
-        analyzed_df, ax = f_139(data)
+        analyzed_df, ax = task_func(data)
         expected_data = [
             [1, 1, 1],
             [1, 2, 1],
@@ -96,14 +92,13 @@ class TestCases(unittest.TestCase):
         self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
         pd.testing.assert_frame_equal(analyzed_df, expected_df)
         self.assertTrue(isinstance(ax, plt.Axes))
-
     def test_case_4(self):
         data = [
             [1, 1, 1],
             [1, 1, 1],
             [1, 1, 1]
         ]
-        analyzed_df, ax = f_139(data)
+        analyzed_df, ax = task_func(data)
         expected_data = [
             [1, 1, 1],
         ]
@@ -113,7 +108,6 @@ class TestCases(unittest.TestCase):
         self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
         pd.testing.assert_frame_equal(analyzed_df, expected_df)
         self.assertTrue(isinstance(ax, plt.Axes))
-
     def test_case_5(self):
         data = [
             [0, 0, 0],
@@ -125,7 +119,7 @@ class TestCases(unittest.TestCase):
             [1, 0, 1],
             [1, 1, 1],
         ]
-        analyzed_df, ax = f_139(data)
+        analyzed_df, ax = task_func(data)
         expected_data = [
             [0, 0, 2],
             [0, 1, 2],
@@ -138,12 +132,3 @@ class TestCases(unittest.TestCase):
         self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
         pd.testing.assert_frame_equal(analyzed_df, expected_df)
         self.assertTrue(isinstance(ax, plt.Axes))
-
-def run_tests():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCases))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-
-if __name__ == "__main__":
-    run_tests()

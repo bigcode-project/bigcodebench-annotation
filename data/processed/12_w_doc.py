@@ -1,89 +1,111 @@
 import numpy as np
-import itertools
-import random
+import seaborn as sns
 
-
-def task_func(T1, max_value=100):
+def task_func(df):
     """
-    Converts elements in 'T1', a tuple of tuples containing string representations 
-    of integers, to integers and creates a list of random integers. The size of the 
-    list equals the sum of these integers. Returns the 25th, 50th, and 75th percentiles 
-    of this list.
+    Describe a dataframe and draw a distribution chart for each numeric column after replacing the NaN values with the average of the column.
 
     Parameters:
-    T1 (tuple of tuple of str): A tuple of tuples, each containing string representations of integers.
-    max_value (int): The upper bound for random number generation, exclusive. Default is 100.
-    
+    df (DataFrame): The pandas DataFrame.
+
     Returns:
-    tuple: A tuple (p25, p50, p75) representing the 25th, 50th, and 75th percentiles of the list.
+    tuple: A tuple containing:
+        - DataFrame: A pandas DataFrame with statistics. This includes count, mean, standard deviation (std), min, 25%, 50%, 75%, and max values for each numeric column.
+        - List[Axes]: A list of matplotlib Axes objects representing the distribution plots for each numeric column.
+                    Each plot visualizes the distribution of data in the respective column with 10 bins.
 
     Requirements:
     - numpy
-    - itertools
-    - random
-    
+    - seaborn
+
     Example:
-    >>> import random
-    >>> random.seed(42)
-    >>> T1 = (('13', '17', '18', '21', '32'), ('07', '11', '13', '14', '28'), ('01', '05', '06', '08', '15', '16'))
-    >>> percentiles = task_func(T1)
-    >>> print(percentiles)
-    (24.0, 48.0, 77.0)
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> df = pd.DataFrame([[1,2,3],[4,5,6],[7.0,np.nan,9.0]], columns=["c1","c2","c3"])
+    >>> description, plots = task_func(df)
+    >>> print(description)
+            c1    c2   c3
+    count  3.0  3.00  3.0
+    mean   4.0  3.50  6.0
+    std    3.0  1.50  3.0
+    min    1.0  2.00  3.0
+    25%    2.5  2.75  4.5
+    50%    4.0  3.50  6.0
+    75%    5.5  4.25  7.5
+    max    7.0  5.00  9.0
     """
-    int_list = [list(map(int, x)) for x in T1]
-    flattened_list = list(itertools.chain(*int_list))
-    total_nums = sum(flattened_list)
-    random_nums = [random.randint(0, max_value) for _ in range(total_nums)]
-    p25 = np.percentile(random_nums, 25)
-    p50 = np.percentile(random_nums, 50)
-    p75 = np.percentile(random_nums, 75)
-    return p25, p50, p75
+    df = df.fillna(df.mean(axis=0))
+    description = df.describe()
+    plots = []
+    for col in df.select_dtypes(include=[np.number]).columns:
+        plot = sns.displot(df[col], bins=10)
+        plots.append(plot.ax)
+    return description, plots
 
 import unittest
-from unittest.mock import patch
+import pandas as pd
 class TestCases(unittest.TestCase):
-    @patch('random.randint')
-    def test_case_1(self, mock_randint):
-        """Test with diverse values and the default range to ensure percentile calculation."""
-        mock_randint.return_value = 50  # Mocking random.randint to always return 50
-        T1 = (('13', '17', '18', '21', '32'), ('07', '11', '13', '14', '28'), ('01', '05', '06', '08', '15', '16'))
-        p25, p50, p75 = task_func(T1)
-        self.assertEqual(p25, 50)
-        self.assertEqual(p50, 50)
-        self.assertEqual(p75, 50)
-    @patch('random.randint')
-    def test_case_2(self, mock_randint):
-        """Check consistency when the total number of elements are small but repeated."""
-        mock_randint.return_value = 30  # Consistent lower value for a different perspective
-        T1 = (('10',), ('10', '10', '10'))
-        p25, p50, p75 = task_func(T1)
-        self.assertEqual(p25, 30)
-        self.assertEqual(p50, 30)
-        self.assertEqual(p75, 30)
-    @patch('random.randint')
-    def test_case_3(self, mock_randint):
-        """Ensure that percentile calculations are consistent for mixed low and medium values."""
-        mock_randint.return_value = 75  # Higher consistent value
-        T1 = (('5', '5', '5', '5'), ('10', '15'), ('1', '2', '3', '4', '5'))
-        p25, p50, p75 = task_func(T1)
-        self.assertEqual(p25, 75)
-        self.assertEqual(p50, 75)
-        self.assertEqual(p75, 75)
-    @patch('random.randint')
-    def test_case_4(self, mock_randint):
-        """Tests percentile values for a simple large-value case."""
-        mock_randint.return_value = 10  # Low consistent value to see impact on percentiles
-        T1 = (('50',), ('25', '25'))
-        p25, p50, p75 = task_func(T1)
-        self.assertEqual(p25, 10)
-        self.assertEqual(p50, 10)
-        self.assertEqual(p75, 10)
-    @patch('random.randint')
-    def test_case_5(self, mock_randint):
-        """Test with an extreme case where all random numbers are the same, ensuring no variability."""
-        mock_randint.return_value = 90  # High consistent value
-        T1 = (('1', '1', '1', '1', '1', '1', '1', '1', '1', '1'), ('10', '10'))
-        p25, p50, p75 = task_func(T1)
-        self.assertEqual(p25, 90)
-        self.assertEqual(p50, 90)
-        self.assertEqual(p75, 90)
+    """Test cases for the f_112 function."""
+    def setUp(self):
+        # Generating more complex data for testing
+        self.df1 = pd.DataFrame(
+            {"A": [1, 2, 3, 4, 5], "B": [6, 7, 8, 9, 10], "C": [11, 12, 13, 14, 15]}
+        )
+        self.df2 = pd.DataFrame({"X": [1, None, 9, 13], "Y": [None, 3, 4, 8]})
+        self.df3 = pd.DataFrame(
+            {"M": [7, 13, 21, 11, 22, 8, None, 17], "N": [None, 2, 3, 4, 10, 0, 27, 12]}
+        )
+        self.df4 = pd.DataFrame(
+            {"P": [None, None, 4], "Q": [7, None, 3], "R": [2, None, 6]}
+        )
+        self.df5 = pd.DataFrame({"W": [1, 2], "Z": [2, 1]})
+        self.df6 = pd.DataFrame(
+            {
+                "A": [1, 2, 3, 4, 5, 6],
+                "B": [None, 8, 9, 10, 11, None],
+                "C": [13, None, None, None, None, 18],
+                "D": [19, None, 21, None, 23, None],
+            }
+        )
+    def test_case_1(self):
+        description, plots = task_func(self.df1)
+        self.assertFalse(description.isna().any().any())
+        self.assertIsInstance(description, pd.DataFrame)
+        self.assertListEqual(list(description.columns), ["A", "B", "C"])
+        self.assertEqual(len(plots), 3)
+    def test_case_2(self):
+        description, plots = task_func(self.df2)
+        self.assertFalse(description.isna().any().any())
+        self.assertIsInstance(description, pd.DataFrame)
+        self.assertListEqual(list(description.columns), ["X", "Y"])
+        self.assertEqual(len(plots), 2)
+    def test_case_3(self):
+        description, plots = task_func(self.df3)
+        self.assertFalse(description.isna().any().any())
+        self.assertIsInstance(description, pd.DataFrame)
+        self.assertListEqual(list(description.columns), ["M", "N"])
+        self.assertEqual(len(plots), 2)
+    def test_case_4(self):
+        description, plots = task_func(self.df4)
+        self.assertFalse(description.isna().any().any())
+        self.assertIsInstance(description, pd.DataFrame)
+        self.assertListEqual(list(description.columns), ["P", "Q", "R"])
+        self.assertEqual(len(plots), 3)
+    def test_case_5(self):
+        description, plots = task_func(self.df5)
+        self.assertFalse(description.isna().any().any())
+        self.assertIsInstance(description, pd.DataFrame)
+        self.assertListEqual(list(description.columns), ["W", "Z"])
+        self.assertEqual(len(plots), 2)
+    def test_case_6(self):
+        description, plots = task_func(self.df6)
+        self.assertFalse(description.isna().any().any())
+        self.assertIsInstance(description, pd.DataFrame)
+        self.assertListEqual(list(description.columns), ["A", "B", "C", "D"])
+        self.assertEqual(len(plots), 4)
+        self.assertEqual(description.loc["mean", "A"], 3.5)
+        self.assertEqual(description.loc["std", "B"], 1.0)
+        self.assertEqual(description.loc["25%", "A"], 2.25)
+        self.assertEqual(description.loc["50%", "C"], 15.5)
+        self.assertEqual(description.loc["75%", "A"], 4.75)
+        self.assertEqual(description.loc["max", "D"], 23.0)

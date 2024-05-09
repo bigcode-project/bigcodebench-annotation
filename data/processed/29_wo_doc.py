@@ -1,82 +1,116 @@
-import requests
 import json
-import base64
+import pandas as pd
 
-def task_func(data, url="http://your-api-url.com"):
+
+def task_func(result, csv_file_path="test.csv", json_file_path="test.json"):
     """
-    Convert a Python dictionary into a JSON-formatted string, encode this string in base64 format,
-    and send it as a payload in a POST request to an API endpoint.
-    
+    Save the list of dictionaries provided in the 'result' parameter to a CSV file (without index) and a JSON file.
+
     Parameters:
-    data (dict): The Python dictionary to encode and send.
-    url (str, optional): The API endpoint URL. Defaults to "http://your-api-url.com".
-    
+    - result (list): A list of dictionaries.
+    - csv_file_path (str): A path to a CSV file.
+    - json_file_path (str): A path to a JSON file.
+
     Returns:
-    requests.Response: The response object received from the API endpoint after the POST request.
-    
+    None
+
     Requirements:
-    - requests
+    - pandas
     - json
-    - base64
-    
+
     Example:
-    >>> data = {'name': 'John', 'age': 30, 'city': 'New York'}
-    >>> response = task_func(data, url="http://example-api-url.com")
-    >>> print(response.status_code)
-    200
+    >>> result = [{"hi": 7, "bye": 4, "from_user": 0}, {1: 2, 3: 4, 5: 6}]
+    >>> task_func(result, 'test.csv', 'test.json')
     """
-    json_data = json.dumps(data)
-    encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')
-    response = requests.post(url, data={"payload": encoded_data})
-    return response
+    df = pd.DataFrame(result)
+    df.to_csv(csv_file_path, index=False)
+    with open(json_file_path, 'w') as f:
+        json.dump(result, f, indent=4)
+    return None
 
 import unittest
-from unittest.mock import patch, Mock
-import requests
-import json
-# Mocking the requests.post method
-def mock_post(*args, **kwargs):
-    mock_response = Mock()
-    mock_response.status_code = 200
-    mock_response.text = "OK"
-    return mock_response
+import os
 class TestCases(unittest.TestCase):
-    @patch('requests.post', side_effect=mock_post)
-    def test_case_1(self, mock_post_method):
-        data = {'name': 'John', 'age': 30, 'city': 'New York'}
-        response = task_func(data, url="http://mock-api-url.com")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.text, "OK")
-    
-    @patch('requests.post', side_effect=mock_post)
-    def test_case_2(self, mock_post_method):
-        data = {'task': 'Write code', 'status': 'completed'}
-        response = task_func(data, url="http://mock-api-url.com")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.text, "OK")
-    @patch('requests.post', side_effect=mock_post)
-    def test_case_3(self, mock_post_method):
-        data = {}
-        response = task_func(data, url="http://mock-api-url.com")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.text, "OK")
-    @patch('requests.post', side_effect=mock_post)
-    def test_case_4(self, mock_post_method):
-        data = {'fruit': 'apple', 'color': 'red', 'taste': 'sweet'}
-        response = task_func(data, url="http://mock-api-url.com")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.text, "OK")
-    @patch('requests.post', side_effect=mock_post)
-    def test_case_5(self, mock_post_method):
-        data = {'country': 'USA', 'capital': 'Washington, D.C.'}
-        response = task_func(data, url="http://mock-api-url.com")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.text, "OK")
-    @patch('requests.post', side_effect=mock_post)
-    def test_case_6(self, mock_post_method):
-        # Test to verify that the POST request is made with the correct parameters
-        data = {'name': 'John', 'age': 30, 'city': 'New York'}
-        json_data = json.dumps(data)
-        encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')
-        task_func(data, url="http://mock-api-url.com")
-        mock_post_method.assert_called_once_with("http://mock-api-url.com", data={"payload": encoded_data})
+    """Test cases for the task_func function."""
+    def setUp(self):
+        self.test_dir = "data/task_func"
+        os.makedirs(self.test_dir, exist_ok=True)
+        self.f_1 = os.path.join(self.test_dir, "csv_1.csv")
+        self.f_2 = os.path.join(self.test_dir, "csv_2.csv")
+        self.f_3 = os.path.join(self.test_dir, "csv_3.csv")
+        self.f_4 = os.path.join(self.test_dir, "csv_4.csv")
+        self.f_5 = os.path.join(self.test_dir, "csv_5.csv")
+        self.j_1 = os.path.join(self.test_dir, "json_1.json")
+        self.j_2 = os.path.join(self.test_dir, "json_2.json")
+        self.j_3 = os.path.join(self.test_dir, "json_3.json")
+        self.j_4 = os.path.join(self.test_dir, "json_4.json")
+        self.j_5 = os.path.join(self.test_dir, "json_5.json")
+    def tearDown(self):
+        import shutil
+        if os.path.exists(self.test_dir):
+            shutil.rmtree(self.test_dir)
+    def test_case_1(self):
+        # Test with a list of dictionaries with string keys and integer values
+        result = [
+            {"hi": 7, "bye": 4, "from_user": 0}
+        ]
+        task_func(result, self.f_1, self.j_1)
+        self.assertTrue(os.path.exists(self.f_1))
+        self.assertTrue(os.path.exists(self.j_1))
+        with open(self.j_1, 'r') as f:
+            loaded_json = json.load(f)
+        # Adjusting the expected result for JSON's string keys
+        expected_result = [{"hi": 7, "bye": 4, "from_user": 0}]
+        self.assertEqual(loaded_json, expected_result)
+    def test_case_2(self):
+        # Test with a list of dictionaries with integer keys and values
+        result = [{1: 2, 3: 4, 5: 6}]
+        task_func(result, self.f_2, self.j_2)
+        self.assertTrue(os.path.exists(self.f_2))
+        self.assertTrue(os.path.exists(self.j_2))
+        with open(self.j_2, 'r') as f:
+            loaded_json = json.load(f)
+        # Adjusting the expected result for JSON's string keys
+        expected_result = [{"1": 2, "3": 4, "5": 6}]
+        self.assertEqual(loaded_json, expected_result)
+    def test_case_3(self):
+        # Test with an empty list
+        result = []
+        task_func(result, self.f_3, self.j_3)
+        self.assertTrue(os.path.exists(self.f_3))
+        self.assertTrue(os.path.exists(self.j_3))
+        with open(self.j_3, 'r') as f:
+            loaded_json = json.load(f)
+        # Adjusting the expected result for JSON's string keys
+        expected_result = []
+        self.assertEqual(loaded_json, expected_result)
+    def test_case_4(self):
+        # Test with a list of dictionaries with string keys and integer values
+        result = [
+            {"hi": 7, "bye": 4, "from_user": 3}
+        ]
+        task_func(result, self.f_4, self.j_4)
+        self.assertTrue(os.path.exists(self.f_4))
+        self.assertTrue(os.path.exists(self.j_4))
+        with open(self.j_4, 'r') as f:
+            loaded_json = json.load(f)
+        # Adjusting the expected result for JSON's string keys
+        expected_result = [{"hi": 7, "bye": 4, "from_user": 3}]
+        self.assertEqual(loaded_json, expected_result)
+    def test_case_5(self):
+        # Test with a list of dictionaries with string keys and integer values
+        result = [
+            {"hi": 7, "bye": 4, "from_user": 11}
+        ]
+        task_func(result, self.f_5, self.j_5)
+        self.assertTrue(os.path.exists(self.f_5))
+        df = pd.read_csv(self.f_5)
+        self.assertEqual(df.loc[0, "hi"], 7)
+        self.assertEqual(df.loc[0, "bye"], 4)
+        self.assertEqual(df.loc[0, "from_user"], 11)
+        self.assertTrue(os.path.exists(self.j_5))
+        with open(self.j_5, 'r') as f:
+            loaded_json = json.load(f)
+        # Adjusting the expected result for JSON's string keys
+        expected_result = [{"hi": 7, "bye": 4, "from_user": 11}]
+        self.assertEqual(loaded_json, expected_result)

@@ -1,60 +1,71 @@
-import random
-import numpy as np
+import re
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 
-def task_func(LETTERS):
+
+def task_func(text):
     """
-    Create a dictionary where keys are specified letters and values are lists of random integers.
-    Then calculate the mean of these integers for each key and return a dictionary of these means.
+    Create a word cloud from text after removing URLs and plot it.
 
     Parameters:
-        LETTERS (list of str): List of single-character strings to be used as keys in the output dictionary.
-    
+    - text (str): The text to analyze.
+
     Returns:
-        dict: A dictionary where each key is a letter from the input list and the value is the mean of 
-              a randomly generated list of integers (with each list having 1 to 10 integers ranging from 0 to 100).
-    
+    WordCloud object: The generated word cloud.
+    Raises:
+    ValueError("No words available to generate a word cloud after removing URLs."): If there are no words available to generate a word cloud after removing URLs.
+
     Requirements:
-    - random
-    - np (numpy)
-    
+    - re
+    - wordcloud.WordCloud
+    - matplotlib.pyplot
+
     Example:
-    >>> LETTERS = ['a', 'b', 'c']
-    >>> mean_dict = task_func(LETTERS)
-    >>> isinstance(mean_dict, dict)
-    True
-    >>> 'a' in mean_dict.keys() and 'b' in mean_dict.keys() and 'c' in mean_dict.keys()
-    True
-    >>> all(isinstance(v, float) for v in mean_dict.values())  # Check if all values are floats
-    True
+    >>> print(task_func('Visit https://www.python.org for more info. Python is great. I love Python.').words_)
+    {'Python': 1.0, 'Visit': 0.5, 'info': 0.5, 'great': 0.5, 'love': 0.5}
+    >>> print(task_func('Check out this link: http://www.example.com. Machine learning is fascinating.').words_)
+    {'Check': 1.0, 'link': 1.0, 'Machine': 1.0, 'learning': 1.0, 'fascinating': 1.0}
     """
-    random_dict = {k: [random.randint(0, 100) for _ in range(random.randint(1, 10))] for k in LETTERS}
-    mean_dict = {k: np.mean(v) for k, v in random_dict.items()}
-    return mean_dict
+    text = re.sub(r"http[s]?://\S+", "", text)
+    if not text.strip():  # Check if text is not empty after URL removal
+        raise ValueError(
+            "No words available to generate a word cloud after removing URLs."
+        )
+    wordcloud = WordCloud().generate(text)
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud)
+    plt.axis("off")  # Do not show axis to make it visually appealing
+    return wordcloud
 
 import unittest
-    
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Common setup for all tests: explicitly define the list of letters
-        self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+    """Test cases for the task_func function."""
     def test_case_1(self):
-        # Test if the function returns a dictionary
-        mean_dict = task_func(self.letters)
-        self.assertIsInstance(mean_dict, dict)
+        text = (
+            f"Visit https://www.example1.com for more info. This is the first sentence."
+        )
+        result = task_func(text)
+        self.assertIsInstance(result, WordCloud)
+        self.assertNotIn("https://www.example1.com", result.words_)
     def test_case_2(self):
-        # Test if the dictionary contains all letters of the alphabet
-        mean_dict = task_func(self.letters)
-        self.assertTrue(all(letter in mean_dict for letter in self.letters))
-        
+        text = f"Check out this link: https://www.example2.com. This is the second sentence."
+        result = task_func(text)
+        self.assertIsInstance(result, WordCloud)
+        self.assertNotIn("https://www.example2.com", result.words_)
     def test_case_3(self):
-        # Test if the values in the dictionary are floats (means of lists of integers)
-        mean_dict = task_func(self.letters)
-        self.assertTrue(all(isinstance(val, float) for val in mean_dict.values()))
+        text = "There is no url in this sentence."
+        result = task_func(text)
+        self.assertIsInstance(result, WordCloud)
     def test_case_4(self):
-        # Test if the mean values are reasonable given the range of random integers (0-100)
-        mean_dict = task_func(self.letters)
-        self.assertTrue(all(0 <= val <= 100 for val in mean_dict.values()))
+        text = "https://www.example4.com"
+        with self.assertRaises(ValueError) as context:
+            task_func(text)
+        self.assertEqual(
+            str(context.exception),
+            "No words available to generate a word cloud after removing URLs.",
+        )
     def test_case_5(self):
-        # Test if the dictionary has 26 keys (one for each letter of the alphabet)
-        mean_dict = task_func(self.letters)
-        self.assertEqual(len(mean_dict), 26)
+        text = f"Check https://www.example51.com and also visit https://www.example52.com for more details. This is the fifth sentence."
+        result = task_func(text)
+        self.assertIsInstance(result, WordCloud)
+        self.assertNotIn("https://www.example51.com", result.words_)

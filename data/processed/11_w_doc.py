@@ -1,103 +1,94 @@
-import numpy as np
-import itertools
-import random
-import statistics
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
 
-def task_func(T1, RANGE=100):
+
+def task_func(data_matrix, n_components=2):
     """
-    Convert elements in 'T1' to integers and create a list of random integers.
-    The size of the list is the sum of the integers in `T1`. Calculate and 
-    return the mean, median, and mode of the list.
-    
+    Apply PCA with n_components components to a 2D data matrix, calculate the mean value of each component, and then return the cumulative explained variance of the components in a plot.
+    - The function returns a dataframe with columns 'Component 1', 'Component 2', ... etc.
+    - Each row of the dataframe correspond to a row of the original matrix mapped in the PCA space.
+    - The dataframe should also include a column 'Mean' which is the average value of each component value per row
+    - Create a plot of the cumulative explained variance.
+        - the xlabel should be 'Number of Components' and the ylabel 'Cumulative Explained Variance'
+
     Parameters:
-    T1 (tuple of tuples): Each tuple contains string representations of integers which are converted to integers.
-    RANGE (int, optional): The upper limit for generating random integers. Default is 100.
-    
-    Returns:
-    tuple: A tuple containing the mean, median, and mode of the generated list of random integers.
-           The mean and median are floats, and the mode is an integer. The calculations use the generated
-           list whose size is determined by the sum of converted integers from `T1`.
-    
-    Requirements:
-    - numpy
-    - itertools
-    - random
-    - statistics
+    data_matrix (numpy.array): The 2D data matrix.
 
-    Raises:
-    statistics.StatisticsError if T1 is empty
-    
+    Returns:
+    tuple:
+        - pandas.DataFrame: A DataFrame containing the PCA transformed data and the mean of each component.
+        - matplotlib.axes._axes.Axes: A plot showing the cumulative explained variance of the components.
+
+    Requirements:
+    - pandas
+    - matplotlib.pyplot
+    - sklearn.decomposition
+
     Example:
-    >>> import random
-    >>> random.seed(42)
-    >>> T1 = (('13', '17', '18', '21', '32'), ('07', '11', '13', '14', '28'), ('01', '05', '06', '08', '15', '16'))
-    >>> stats = task_func(T1)
-    >>> print(stats)
-    (49.88, 48.0, 20)
-    >>> stats = task_func(T1, RANGE=50)
-    >>> print(stats)
-    (23.773333333333333, 25.0, 15)
+    >>> import numpy as np
+    >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
+    >>> df, ax = task_func(data)
+    >>> print(df["Mean"])
+    0    2.850439
+    1   -2.850439
+    Name: Mean, dtype: float64
     """
-    if len(T1) <= 0:
-        raise statistics.StatisticsError
-    int_list = [list(map(int, x)) for x in T1]
-    flattened_list = list(itertools.chain(*int_list))
-    total_nums = sum(flattened_list)
-    random_nums = [random.randint(0, RANGE) for _ in range(total_nums)]
-    mean = np.mean(random_nums)
-    median = np.median(random_nums)
-    mode = statistics.mode(random_nums)
-    return mean, median, mode
+    pca = PCA(n_components=n_components)
+    transformed_data = pca.fit_transform(data_matrix)
+    df = pd.DataFrame(
+        transformed_data,
+        columns=[f"Component {i+1}" for i in range(transformed_data.shape[1])],
+    )
+    df["Mean"] = df.mean(axis=1)
+    fig, ax = plt.subplots()
+    ax.plot(np.cumsum(pca.explained_variance_ratio_))
+    ax.set_xlabel("Number of Components")
+    ax.set_ylabel("Cumulative Explained Variance")
+    return df, ax
 
 import unittest
 import numpy as np
-import statistics
-from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    @patch('random.randint', return_value=50)
-    def test_case_1(self, mock_randint):
-        """Tests with small numbers and default range."""
-        T1 = (('1', '2'), ('2', '3'), ('3', '4'))
-        mean, median, mode = task_func(T1)
-        total_elements = sum(map(int, sum(T1, ())))
-        self.assertEqual(total_elements, 15)  # Check if the total_elements calculation is correct
-        self.assertTrue(isinstance(mean, float))
-        self.assertTrue(isinstance(median, float))
-        self.assertTrue(isinstance(mode, int))
-    @patch('random.randint', return_value=50)
-    def test_case_2(self, mock_randint):
-        """Tests with mid-range numbers and default range."""
-        T1 = (('1', '2', '3'), ('4', '5'), ('6', '7', '8', '9'))
-        mean, median, mode = task_func(T1)
-        self.assertEqual(mean, 50.0)
-        self.assertEqual(median, 50.0)
-        self.assertEqual(mode, 50)
-    @patch('random.randint', return_value=25)
-    def test_case_3(self, mock_randint):
-        """Tests with adjusted range to 50, checks new bounds."""
-        T1 = (('1', '2', '3'), ('4', '5'), ('6', '7', '8', '9'))
-        mean, median, mode = task_func(T1, RANGE=50)
-        self.assertEqual(mean, 25.0)
-        self.assertEqual(median, 25.0)
-        self.assertEqual(mode, 25)
-    @patch('random.randint', return_value=75)
-    def test_case_4(self, mock_randint):
-        """Tests with minimal input of single-digit numbers."""
-        T1 = (('1',), ('2',), ('3',))
-        mean, median, mode = task_func(T1)
-        self.assertEqual(mean, 75.0)
-        self.assertEqual(median, 75.0)
-        self.assertEqual(mode, 75)
-    @patch('random.randint', return_value=10)
-    def test_case_5(self, mock_randint):
-        """Tests with larger numbers, focusing on correct type checking."""
-        T1 = (('10', '20', '30'), ('40', '50'), ('60', '70', '80', '90'))
-        mean, median, mode = task_func(T1)
-        self.assertEqual(mean, 10.0)
-        self.assertEqual(median, 10.0)
-        self.assertEqual(mode, 10)
-    def test_empty_input(self):
-        """Tests behavior with an empty tuple input."""
-        T1 = ()
-        with self.assertRaises(statistics.StatisticsError):
-            mean, median, mode = task_func(T1)
+    """Test cases for the task_func function."""
+    def test_case_1(self):
+        data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
+        df, ax = task_func(data)
+        self.assertEqual(df.shape, (2, 3))
+        self.assertTrue("Mean" in df.columns)
+        self.assertEqual(ax.get_xlabel(), "Number of Components")
+        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
+    def test_case_2(self):
+        data = np.array([[1, 2], [3, 4], [5, 6]])
+        df, ax = task_func(data)
+        self.assertEqual(df.shape, (3, 3))
+        self.assertTrue("Mean" in df.columns)
+        self.assertEqual(ax.get_xlabel(), "Number of Components")
+        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
+    # Additional test cases
+    def test_case_3(self):
+        data = np.array([[1, 2], [3, 4], [5, 6]])
+        df, ax = task_func(data)
+        expected_columns = min(data.shape) + 1
+        self.assertEqual(df.shape[1], expected_columns)
+        self.assertTrue("Mean" in df.columns)
+        self.assertEqual(ax.get_xlabel(), "Number of Components")
+        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
+    def test_case_4(self):
+        data = np.array([[1, 2], [3, 4], [5, 6]])
+        df, ax = task_func(data)
+        expected_columns = min(data.shape) + 1
+        self.assertEqual(df.shape[1], expected_columns)
+        self.assertTrue("Mean" in df.columns)
+        self.assertEqual(ax.get_xlabel(), "Number of Components")
+        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
+    def test_case_5(self):
+        data = np.array([[1, 2], [3, 4], [5, 6]])
+        df, ax = task_func(data)
+        expected_columns = min(data.shape) + 1
+        self.assertEqual(df.shape[1], expected_columns)
+        self.assertTrue("Mean" in df.columns)
+        self.assertTrue("Component 1" in df.columns)
+        self.assertTrue("Component 2" in df.columns)
+        self.assertEqual(ax.get_xlabel(), "Number of Components")
+        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
