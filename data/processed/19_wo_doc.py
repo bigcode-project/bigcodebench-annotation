@@ -1,122 +1,124 @@
-from datetime import datetime
-import pandas as pd
-import pytz
-import matplotlib.pyplot as plt
+import subprocess
+import csv
+import glob
+import random
+import os
 
-# Constants
-DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
-TIMEZONES = [
-    "America/New_York",
-    "Europe/London",
-    "Asia/Shanghai",
-    "Asia/Tokyo",
-    "Australia/Sydney",
-]
-
-
-def task_func(timestamp):
+def task_func(file):
     """
-    Convert a Unix timestamp to date objects in different time zones, create a Pandas DataFrame, and draw a bar chart.
-    - You should use the time zones mentionned in the constant TIMEZONES.
-    - The date format should be as DATE_FORMAT.
-    - The DataFrame should have 'Timezone' and 'Datetime' as column names.
-    - The x-label of the bar plot should be set to 'Timezone' while the y-label should be set to 'Datetime'.
-    - The plot title should be "Datetime = f(Timezone)"
+    Divide a CSV file into several smaller files and shuffle the lines in each file.
+    
+    This function takes a CSV file path as input, divides it into smaller files using 
+    the shell 'split' command, and shuffles the rows in each of the resulting files.
+    The output files are named with a 'split_' prefix.
 
     Parameters:
-    timestamp (int): The Unix timestamp.
+    - file (str): The path to the CSV file.
 
     Returns:
-    tuple: A tuple containing:
-        - DataFrame: A pandas DataFrame containing the datetime in different timezones.
-        - Axes: A matplotlib Axes object for the generated bar chart.
-
+    - list: The paths to the split files. Returns an empty list if the file does not exist, is not a CSV file, or if an error occurs during processing.
+    
     Requirements:
-    - datetime
-    - pandas
-    - pytz
-    - matplotlib.pyplot
+    - subprocess
+    - csv
+    - glob
+    - random
+    - os
 
     Example:
-    >>> df, ax = task_func(1347517370)
-    >>> print(df)
-               Timezone            Datetime
-    0  America/New_York 2012-09-13 02:22:50
-    1     Europe/London 2012-09-13 07:22:50
-    2     Asia/Shanghai 2012-09-13 14:22:50
-    3        Asia/Tokyo 2012-09-13 15:22:50
-    4  Australia/Sydney 2012-09-13 16:22:50
+    >>> task_func('/path/to/file.csv')
+    ['/path/to/split_00', '/path/to/split_01', ...]
     """
-    datetimes = [
-        datetime.fromtimestamp(timestamp, pytz.timezone(tz)).strftime(DATE_FORMAT)
-        for tz in TIMEZONES
-    ]
-    df = pd.DataFrame({"Timezone": TIMEZONES, "Datetime": datetimes})
-    df["Datetime"] = pd.to_datetime(df["Datetime"])
-    ax = df.plot.bar(x="Timezone", y="Datetime", legend=False)
-    plt.ylabel("Timezone")
-    plt.ylabel("Datetime")
-    plt.title("Datetime = f(Timezone)")
-    plt.close()
-    return df, ax
+    if not os.path.exists(file):
+        print("Provided file does not exist.")
+        return []
+    if not file.endswith('.csv'):
+        print("Provided file is not a CSV.")
+        return []
+    try:
+        subprocess.call(['split', '-n', '5', '-d', file, 'split_'])
+        split_files = glob.glob('split_*')
+        for split_file in split_files:
+            with open(split_file, 'r') as f:
+                reader = csv.reader(f)
+                rows = list(reader)
+            random.shuffle(rows)
+            with open(split_file, 'w') as f:
+                writer = csv.writer(f)
+                writer.writerows(rows)
+        return split_files
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return []
 
 import unittest
+import csv
+import os
+import tempfile
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
-    def test_case_1(self):
-        df, ax = task_func(398024852)
-        self.validate_output(df, ax)
-    def test_case_2(self):
-        df, ax = task_func(229981844)
-        self.validate_output(df, ax)
-    def test_case_3(self):
-        df, ax = task_func(163757150)
-        self.validate_output(df, ax)
-    def test_case_4(self):
-        df, ax = task_func(136821030)
-        self.validate_output(df, ax)
-    def test_case_5(self):
-        df, ax = task_func(1318935276)
-        self.validate_output(df, ax)
-    def test_case_6(self):
-        df, ax = task_func(2078245012)
-        edf = pd.DataFrame(
-            {
-                "Timezone": [
-                    "America/New_York",
-                    "Europe/London",
-                    "Asia/Shanghai",
-                    "Asia/Tokyo",
-                    "Australia/Sydney",
-                ],
-                "Datetime": [
-                    "2035-11-09 13:16:52",
-                    "2035-11-09 18:16:52",
-                    "2035-11-10 02:16:52",
-                    "2035-11-10 03:16:52",
-                    "2035-11-10 05:16:52",
-                ],
-            }
-        )
-        edf = edf.astype({"Timezone": "object", "Datetime": "datetime64[ns]"})
-        pd.testing.assert_frame_equal(df, edf)
-        self.validate_output(df, ax)
-    def validate_output(self, df, ax):
-        # Test the shape of the returned DataFrame
-        self.assertEqual(df.shape, (5, 2))
-        # Test if the Timezones in DataFrame are correct
-        expected_timezones = [
-            "America/New_York",
-            "Europe/London",
-            "Asia/Shanghai",
-            "Asia/Tokyo",
-            "Australia/Sydney",
-        ]
-        self.assertListEqual(df["Timezone"].tolist(), expected_timezones)
-        # Test if the Datetime column in DataFrame is of datetime64 type
-        self.assertEqual(df["Datetime"].dtype, "datetime64[ns]")
-        # Test the title of the plot
-        self.assertEqual(ax.get_title(), "Datetime = f(Timezone)")
-        # Test the x and y axis labels of the plot
-        self.assertEqual(ax.get_xlabel(), "Timezone")
-        self.assertEqual(ax.get_ylabel(), "Datetime")
+    def setUp(self):
+        # Create a temporary directory to hold the files
+        self.test_dir = tempfile.mkdtemp()
+        self.small_csv_path = os.path.join(self.test_dir, "small.csv")
+        self.medium_csv_path = os.path.join(self.test_dir, "medium.csv")
+        self.large_csv_path = os.path.join(self.test_dir, "large.csv")
+        self.non_csv_path = os.path.join(self.test_dir, "test.txt")
+        
+        # Create dummy CSV files of different sizes
+        with open(self.small_csv_path, "w", newline="") as file:
+            writer = csv.writer(file)
+            for i in range(10):  # Small CSV
+                writer.writerow([f"row{i}", f"value{i}"])
+        
+        with open(self.medium_csv_path, "w", newline="") as file:
+            writer = csv.writer(file)
+            for i in range(100):  # Medium CSV
+                writer.writerow([f"row{i}", f"value{i}"])
+        
+        with open(self.large_csv_path, "w", newline="") as file:
+            writer = csv.writer(file)
+            for i in range(1000):  # Large CSV
+                writer.writerow([f"row{i}", f"value{i}"])
+        
+        # Create a non-CSV file
+        with open(self.non_csv_path, "w") as file:
+            file.write("This is a test text file.")
+    def tearDown(self):
+        # Remove all files created in the directory
+        for filename in os.listdir(self.test_dir):
+            file_path = os.path.join(self.test_dir, filename)
+            os.remove(file_path)  # Remove each file
+    def test_small_csv(self):
+        """Test splitting and shuffling a small CSV file."""
+        split_files = task_func(self.small_csv_path)
+        self.assertTrue(len(split_files) > 0, "No files were split.")
+        self.assertNotEqual(self._read_csv(self.small_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
+        for filename in split_files:
+            os.remove(filename)
+    def test_medium_csv(self):
+        """Test splitting and shuffling a medium CSV file."""
+        split_files = task_func(self.medium_csv_path)
+        self.assertTrue(len(split_files) > 0, "No files were split.")
+        self.assertNotEqual(self._read_csv(self.medium_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
+        for filename in split_files:
+            os.remove(filename)
+    def test_large_csv(self):
+        """Test splitting and shuffling a large CSV file."""
+        split_files = task_func(self.large_csv_path)
+        self.assertTrue(len(split_files) > 0, "No files were split.")
+        self.assertNotEqual(self._read_csv(self.large_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
+        for filename in split_files:
+            os.remove(filename)
+    def test_invalid_file(self):
+        """Test behavior with a non-existent file path."""
+        split_files = task_func("/path/that/does/not/exist.csv")
+        self.assertEqual(split_files, [], "Expected an empty list for an invalid file path.")
+    def test_non_csv_file(self):
+        """Test behavior with a non-CSV file."""
+        split_files = task_func(self.non_csv_path)
+        self.assertEqual(split_files, [], "Expected an empty list for a non-CSV file.")
+    def _read_csv(self, filepath):
+        """Helper method to read CSV file and return content."""
+        with open(filepath, "r") as f:
+            reader = csv.reader(f)
+            return list(reader)

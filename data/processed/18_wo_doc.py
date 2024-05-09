@@ -1,96 +1,78 @@
-from datetime import datetime
-import pandas as pd
-import matplotlib.pyplot as plt
+import subprocess
+import psutil
+import time
 
-# Constants
-DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
-
-
-def task_func(timestamps):
-    """
-    Convert a list of Unix timestamps to date objects, create a Pandas DataFrame, and draw a histogram.
-    - The date format should be as DATE_FORMAT.
-    - The DataFrame should have 'Timestamp' and 'Datetime' as column names.
-    - If the list of timestamps is empty, raise a ValueError with the message "Input list of timestamps is empty".
+def task_func(process_name: str) -> str:
+    '''
+    Check if a particular process is running based on its name. If it is not running, start it using the process name as a command. 
+    If it is running, terminate the process and restart it by executing the process name as a command.
 
     Parameters:
-    - timestamps (list): The list of Unix timestamps.
+    - process_name (str): The name of the process to check and manage. This should be executable as a command.
 
     Returns:
-    - pandas.DataFrame: A pandas DataFrame containing the original Unix timestamps and the converted datetime objects.
-    - Axes: The Axes object of the histogram plot. The histogram will have 10 bins by default, representing the distribution of the datetime objects.
-
-    Raises:
-    - ValueError("Input list of timestamps is empty"): If the list of timestamps is empty.
+    - str: A message indicating the action taken:
+        - "Process not found. Starting <process_name>."
+        - "Process found. Restarting <process_name>."
 
     Requirements:
-    - datetime
-    - pandas
-    - matplotlib.pyplot
+    - subprocess
+    - psutil
+    - time
 
-    Examples:
-    >>> df, ax = task_func([1347517370, 1475153730, 1602737300])
-    >>> print(df)
-        Timestamp             Datetime
-    0  1347517370  2012-09-13 02:22:50
-    1  1475153730  2016-09-29 08:55:30
-    2  1602737300  2020-10-15 00:48:20
-    """
-    if not timestamps:
-        raise ValueError("Input list of timestamps is empty.")
-    datetimes = [datetime.fromtimestamp(t).strftime(DATE_FORMAT) for t in timestamps]
-    df = pd.DataFrame({"Timestamp": timestamps, "Datetime": datetimes})
-    ax = plt.hist(pd.to_datetime(df["Datetime"]))
-    plt.close()
-    return df, ax
+    Example:
+    >>> task_func('notepad')
+    "Process not found. Starting notepad."
+    OR
+    >>> task_func('notepad')
+    "Process found. Restarting notepad."
+    '''
+    is_running = any([proc for proc in psutil.process_iter() if proc.name() == process_name])
+    if is_running:
+        for proc in psutil.process_iter():
+            if proc.name() == process_name:
+                proc.terminate()
+                time.sleep(5)
+        subprocess.Popen(process_name)
+        return f"Process found. Restarting {process_name}."
+    else:
+        subprocess.Popen(process_name)
+        return f"Process not found. Starting {process_name}."
 
 import unittest
+from unittest.mock import patch, MagicMock
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
-    def setUp(self):
-        self.test_data = [
-            [1318935276, 1342905276, 23074268],
-            [4235087541, 1234653346, 19862358],
-            [],
-            [1156829289],
-            [1000000000, 2000000000, 3000000000],
-        ]
-    def test_case_1(self):
-        input_timestamps = self.test_data[0]
-        self.assert_function_output(input_timestamps)
-    def test_case_2(self):
-        input_timestamps = self.test_data[1]
-        self.assert_function_output(input_timestamps)
-    def test_case_3(self):
-        input_timestamps = self.test_data[2]
-        with self.assertRaises(ValueError) as context:
-            task_func(input_timestamps)
-        self.assertEqual(
-            str(context.exception),
-            "Input list of timestamps is empty.",
-        )
-    def test_case_4(self):
-        input_timestamps = self.test_data[3]
-        self.assert_function_output(input_timestamps)
-    def test_case_5(self):
-        input_timestamps = self.test_data[4]
-        self.assert_function_output(input_timestamps)
-        df, ax = task_func(input_timestamps)
-        expected_df = pd.DataFrame(
-            {
-                "Timestamp": [1000000000, 2000000000, 3000000000],
-                "Datetime": [
-                    "2001-09-09 01:46:40",
-                    "2033-05-18 03:33:20",
-                    "2065-01-24 05:20:00",
-                ],
-            }
-        )
-        
-        pd.testing.assert_frame_equal(df, expected_df)
-    def assert_function_output(self, input_timestamps):
-        df, ax = task_func(input_timestamps)
-        # Assert that the DataFrame contains the correct timestamps
-        self.assertEqual(df["Timestamp"].tolist(), input_timestamps)
-        # Assert the histogram attributes (e.g., number of bins)
-        self.assertEqual(len(ax[0]), 10)  # There should be 10 bars in the histogram
+    @patch('psutil.process_iter')
+    @patch('subprocess.Popen')
+    def test_process_not_found_starts_process(self, mock_popen, mock_process_iter):
+        # Simulating no running process
+        mock_process_iter.return_value = []
+        result = task_func('random_non_existent_process')
+        self.assertEqual(result, "Process not found. Starting random_non_existent_process.")
+        mock_popen.assert_called_once_with('random_non_existent_process')
+    @patch('psutil.process_iter')
+    @patch('subprocess.Popen')
+    def test_process_found_restarts_process(self, mock_popen, mock_process_iter):
+        # Simulating a running process
+        process = MagicMock()
+        process.name.return_value = 'notepad'
+        mock_process_iter.return_value = [process]
+        result = task_func('notepad')
+        self.assertEqual(result, "Process found. Restarting notepad.")
+        # Expecting terminate called on the process and then restarted
+        process.terminate.assert_called_once()
+        mock_popen.assert_called_once_with('notepad')
+    @patch('psutil.process_iter')
+    @patch('subprocess.Popen')
+    def test_process_terminates_and_restarts_multiple_instances(self, mock_popen, mock_process_iter):
+        # Simulating multiple instances of a running process
+        process1 = MagicMock()
+        process2 = MagicMock()
+        process1.name.return_value = 'multi_instance'
+        process2.name.return_value = 'multi_instance'
+        mock_process_iter.return_value = [process1, process2]
+        result = task_func('multi_instance')
+        self.assertEqual(result, "Process found. Restarting multi_instance.")
+        process1.terminate.assert_called_once()
+        process2.terminate.assert_called_once()
+        mock_popen.assert_called_once_with('multi_instance')

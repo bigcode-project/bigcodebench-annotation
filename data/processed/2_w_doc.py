@@ -1,107 +1,61 @@
-import nltk
-from string import punctuation
-import seaborn as sns
-import matplotlib.pyplot as plt
+import random
+import statistics
 
-# Constants
-PUNCTUATION = set(punctuation)
-
-
-def task_func(text):
+def task_func(LETTERS):
     """
-    Draw a bar chart of the frequency of words in a text beginning with the "$" character. Words that start with the '$' character but consist only of punctuation (e.g., '$!$' and '$.$') are not included in the frequency count.
-    - If there is no word respecting the above conditions, the plot should be None.
-    - The barplot x words on the x-axis and frequencies on the y-axis.
-
+    Create a dictionary in which keys are random letters and values are lists of random integers.
+    The dictionary is then sorted by the mean of the values in descending order, demonstrating the use of the statistics library.
+    
     Parameters:
-        - text (str): The input text.
+        LETTERS (list of str): A list of characters used as keys for the dictionary.
+    
     Returns:
-        - matplotlib.axes._axes.Axes: The plot showing the frequency of words beginning with the '$' character.
-
+    dict: The sorted dictionary with letters as keys and lists of integers as values, sorted by their mean values.
+    
     Requirements:
-        - nltk
-        - string
-        - seaborn
-        - matplotlib
-
+    - random
+    - statistics
+    
     Example:
-    >>> text = "$child than resource indicate star $community station onto best green $exactly onto then age charge $friend than ready child really $let product coach decision professional $camera life off management factor $alone beat idea bit call $campaign fill stand Congress stuff $performance follow your resource road $data performance himself school here"
-    >>> ax = task_func(text)
-    >>> print(ax)
-    Axes(0.125,0.11;0.775x0.77)
+    >>> import random
+    >>> random.seed(42)
+    >>> sorted_dict = task_func(['a', 'b', 'c'])
+    >>> list(sorted_dict.keys())
+    ['a', 'b', 'c']
+    >>> isinstance(sorted_dict['a'], list)
+    True
+    >>> type(sorted_dict['a'])  # Check type of values
+    <class 'list'>
     """
-    words = text.split()
-    dollar_words = [
-        word
-        for word in words
-        if word.startswith("$")
-        and not all(c in PUNCTUATION for c in word)
-        and len(word) > 1
-    ]
-    freq = nltk.FreqDist(dollar_words)
-    if not freq:  # If frequency distribution is empty, return None
-        return None
-    plt.figure(figsize=(10, 5))
-    sns.barplot(x=freq.keys(), y=freq.values())
-    return plt.gca()
+    random_dict = {k: [random.randint(0, 100) for _ in range(random.randint(1, 10))] for k in LETTERS}
+    sorted_dict = dict(sorted(random_dict.items(), key=lambda item: statistics.mean(item[1]), reverse=True))
+    return sorted_dict
 
 import unittest
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
-    @staticmethod
-    def is_bar(ax, expected_values, expected_categories):
-        extracted_values = [
-            bar.get_height() for bar in ax.patches
-        ]  # extract bar height
-        extracted_categories = [
-            tick.get_text() for tick in ax.get_xticklabels()
-        ]  # extract category label
-        for actual_value, expected_value in zip(extracted_values, expected_values):
-            assert (
-                actual_value == expected_value
-            ), f"Expected value '{expected_value}', but got '{actual_value}'"
-        for actual_category, expected_category in zip(
-            extracted_categories, expected_categories
-        ):
-            assert (
-                actual_category == expected_category
-            ), f"Expected category '{expected_category}', but got '{actual_category}'"
+    
+    def setUp(self):
+        # Setting up a common letters array and sorted dictionary for use in all tests
+        self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+        self.sorted_dict = task_func(self.letters)
     def test_case_1(self):
-        # Randomly generated sentence with $ words
-        text = "This is the $first $first sentence."
-        plot = task_func(text)
-        self.assertIsInstance(plot, plt.Axes, "Return type should be a plot (Axes).")
-        self.is_bar(plot, expected_categories=["$first"], expected_values=[2.0])
+        # Check if the function returns a dictionary
+        self.assertIsInstance(self.sorted_dict, dict, "The function should return a dictionary.")
     def test_case_2(self):
-        # Another randomly generated sentence with $ words
-        text = "This $is $is $is the $second $sentence $sentence"
-        plot = task_func(text)
-        self.assertIsInstance(plot, plt.Axes, "Return type should be a plot (Axes).")
-        self.is_bar(
-            plot,
-            expected_categories=["$is", "$second", "$sentence"],
-            expected_values=[3.0, 1.0, 2.0],
-        )
+        # Ensure all keys in the sorted dictionary are within the provided letters
+        all_letters = all([key in self.letters for key in self.sorted_dict.keys()])
+        self.assertTrue(all_letters, "All keys of the dictionary should be letters.")
+        
     def test_case_3(self):
-        # Sentence without any $ words
-        text = "This is the third sentence."
-        plot = task_func(text)
-        self.assertIsNone(plot, "The plot should be None since there are no $ words.")
+        # Ensure all values are lists of integers
+        all_lists = all([isinstance(val, list) and all(isinstance(i, int) for i in val) for val in self.sorted_dict.values()])
+        self.assertTrue(all_lists, "All values of the dictionary should be lists of integers.")
+        
     def test_case_4(self):
-        # Sentence with all $ words being single characters or punctuation
-        text = "$ $! $@ $$"
-        plot = task_func(text)
-        self.assertIsNone(
-            plot,
-            "The plot should be None since all $ words are single characters or punctuation.",
-        )
+        # Check if the dictionary is sorted by the mean values in descending order
+        means = [statistics.mean(val) for val in self.sorted_dict.values()]
+        self.assertTrue(all(means[i] >= means[i + 1] for i in range(len(means) - 1)), "The dictionary should be sorted in descending order based on the mean of its values.")
+    
     def test_case_5(self):
-        # Mix of valid $ words and punctuation-only $ words with some repeated words
-        text = "$apple $apple $banana $!$ $@ fruit $cherry"
-        plot = task_func(text)
-        self.assertIsInstance(plot, plt.Axes, "Return type should be a plot (Axes).")
-        self.is_bar(
-            plot,
-            expected_categories=["$apple", "$banana", "$cherry"],
-            expected_values=[2.0, 1.0, 1.0],
-        )
+        # Check if the dictionary includes all provided letters as keys
+        self.assertEqual(set(self.sorted_dict.keys()), set(self.letters), "The dictionary should have all provided letters as keys.")

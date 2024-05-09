@@ -1,132 +1,68 @@
-import pandas as pd
-import matplotlib.pyplot as plt
+import numpy as np
+from functools import reduce
 
-COLUMNS = ['col1', 'col2', 'col3']
-
-def task_func(data):
-    """
-    You are given a list of elements. Each element is a list with the same length as COLUMNS, representing one row a dataframe df to create. Draw a line chart with unique values in the COLUMNS[-1] of the pandas DataFrame "df", grouped by the rest of the columns.
-    - The x-label should be set to the string obtained by joining all the column names (except the last one) by the character "-".
-    - The y-label should be set to the last column name.
-
+def task_func(list_of_pairs):
+    """ 
+    Calculate the product of the second values in each tuple in a list of tuples and return the product as a single-element numeric array.
+    
     Parameters:
-    - df (pandas.DataFrame): The DataFrame to be plotted.
-
+    list_of_pairs (list): A list of tuples, where the first element is the category 
+                          and the second element is the numeric value.
+    
     Returns:
-    - tuple: A tuple containing:
-        - pandas.DataFrame: The DataFrame of the analyzed data.
-        - plt.Axes: The Axes object of the plotted line chart.
-
+    numpy.ndarray: A numpy array containing a single element that is the product of the second values in the list of tuples.
+    
     Requirements:
-    - pandas
-    - matplotlib
-
+    - numpy
+    - functools.reduce
+    
     Example:
-    >>> data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
-    >>> analyzed_df, ax = task_func(data)
-    >>> print(analyzed_df)
-       col1  col2  col3
-    0     1     1     2
-    1     1     2     1
-    2     2     1     3
-    3     2     2     1
+    >>> list_of_pairs = [('Fruits', 5), ('Vegetables', 9), ('Dairy', -1), ('Bakery', -2), ('Meat', 4)]
+    >>> product_array = task_func(list_of_pairs)
+    >>> print(product_array)
+    360
     """
-    df = pd.DataFrame(data, columns=COLUMNS)
-    analyzed_df = df.groupby(COLUMNS[:-1])[COLUMNS[-1]].nunique().reset_index()
-    fig, ax = plt.subplots()
-    ax.plot(analyzed_df[COLUMNS[:-1]].astype(str).agg('-'.join, axis=1), analyzed_df[COLUMNS[-1]])
-    ax.set_xlabel('-'.join(COLUMNS[:-1]))
-    ax.set_ylabel(COLUMNS[-1])
-    return analyzed_df, ax
+    second_values = [pair[1] for pair in list_of_pairs]
+    product = reduce(np.multiply, second_values)
+    product_array = np.array(product)
+    return product_array
 
 import unittest
+import numpy as np
+from functools import reduce
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
+    
     def test_case_1(self):
-        # Using the provided example as the first test case
-        data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
-        analyzed_df, ax = task_func(data)
-        # Assertions for the returned DataFrame
-        expected_data = [[1, 1, 2], [1, 2, 1], [2, 1, 3], [2, 2, 1]]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        # Assertions for the returned plot
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [2, 1, 3, 1])
+        # Basic test case with positive and negative numbers
+        list_of_pairs = [('Fruits', 5), ('Vegetables', 9), ('Dairy', -1), ('Bakery', -2), ('Meat', 4)]
+        expected_output = np.array(360)
+        actual_output = task_func(list_of_pairs)
+        self.assertTrue(np.array_equal(actual_output, expected_output))
+    
     def test_case_2(self):
-        data = [
-            [1, 1, 2],
-            [1, 1, 3],
-            [1, 2, 4],
-            [1, 1, 5],
-            [1, 3, 7]
-        ]
-        analyzed_df, ax = task_func(data)
-        expected_data = [
-            [1, 1, 3],
-            [1, 2, 1],
-            [1, 3, 1]
-        ]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [3, 1, 1])
+        # Test case with all positive numbers
+        list_of_pairs = [('A', 2), ('B', 3), ('C', 4)]
+        expected_output = np.array(24)
+        actual_output = task_func(list_of_pairs)
+        self.assertTrue(np.array_equal(actual_output, expected_output))
+    
     def test_case_3(self):
-        data = [
-            [1, 1, 1],
-            [1, 2, 3],
-            [2, 1, 4],
-            [2, 2, 5]
-        ]
-        analyzed_df, ax = task_func(data)
-        expected_data = [
-            [1, 1, 1],
-            [1, 2, 1],
-            [2, 1, 1],
-            [2, 2, 1]
-        ]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [1, 1, 1, 1])
+        # Test case with all negative numbers
+        list_of_pairs = [('A', -2), ('B', -3), ('C', -4)]
+        expected_output = np.array(-24)
+        actual_output = task_func(list_of_pairs)
+        self.assertTrue(np.array_equal(actual_output, expected_output))
+    
     def test_case_4(self):
-        data = [
-            [1, 1, 1],
-            [1, 1, 1],
-            [1, 1, 1]
-        ]
-        analyzed_df, ax = task_func(data)
-        expected_data = [
-            [1, 1, 1],
-        ]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [1])
+        # Test case with a single tuple
+        list_of_pairs = [('A', 10)]
+        expected_output = np.array(10)
+        actual_output = task_func(list_of_pairs)
+        self.assertTrue(np.array_equal(actual_output, expected_output))
+    
     def test_case_5(self):
-        data = [
-            [0, 0, 0],
-            [0, 1, 0],
-            [1, 0, 0],
-            [1, 1, 0],
-            [0, 0, 1],
-            [0, 1, 1],
-            [1, 0, 1],
-            [1, 1, 1],
-        ]
-        analyzed_df, ax = task_func(data)
-        expected_data = [
-            [0, 0, 2],
-            [0, 1, 2],
-            [1, 0, 2],
-            [1, 1, 2]
-        ]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [2, 2, 2, 2])
+        # Test case with zeros
+        list_of_pairs = [('A', 0), ('B', 5), ('C', 10)]
+        expected_output = np.array(0)
+        actual_output = task_func(list_of_pairs)
+        self.assertTrue(np.array_equal(actual_output, expected_output))

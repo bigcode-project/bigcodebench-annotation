@@ -1,76 +1,86 @@
-import pandas as pd
-import regex as re
+import base64
+import hashlib
+import os
 
-def task_func(text):
+def task_func(password, SALT_LENGTH = 32):
     """
-    Extract data from a text and create a Pandas DataFrame. The text contains several lines, each formatted as 'Score: 85, Category: Math'. Make sure to convert the scores in integer.
+    Hashes a password using the PBKDF2 HMAC algorithm with SHA-256 as the hashing algorithm, 
+    combined with a randomly generated salt, and returns both the salt and the hashed password, 
+    each base64-encoded.
 
     Parameters:
-    text (str): The text to analyze.
+    password (str): The password to be hashed.
+    SALT_LENGTH (int): the length of the randomly generated salt.
 
     Returns:
-    DataFrame: A pandas DataFrame with extracted data.
+    tuple[bytes, bytes]: A tuple containing the base64-encoded salt and the base64-encoded hashed password as byte strings.
+
+    Raises:
+    ValueError if the password is None or empty
 
     Requirements:
-    - pandas
-    - regex
+    - base64
+    - hashlib
+    - os
 
     Example:
-    >>> text = "Score: 85, Category: Math\\nScore: 90, Category: Science\\nScore: 80, Category: Math"
-    >>> df = task_func(text)
-    >>> print(df)
-       Score Category
-    0     85     Math
-    1     90  Science
-    2     80     Math
+    >>> salt, hashed_password = task_func('my_password')
+    >>> isinstance(salt, bytes)
+    True
+    >>> isinstance(hashed_password, bytes)
+    True
     """
-    pattern = r"Score: (.*?), Category: (.*?)(\n|$)"
-    matches = re.findall(pattern, text)
-    data = [
-        match[:2] for match in matches
-    ]  # Extracting only the score and category from each match
-    df = pd.DataFrame(data, columns=["Score", "Category"])
-    df["Score"] = df["Score"].astype(int)
-    return df
+    if not password:
+        raise ValueError
+    salt = os.urandom(SALT_LENGTH)
+    hashed_password = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100000)
+    return base64.b64encode(salt), base64.b64encode(hashed_password)
 
 import unittest
+import base64
+import hashlib
+import os
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
+    def decode_and_regenerate_password(self, encoded_salt, encoded_hashed_password, original_password):
+        """ Helper function to decode base64 encoded salt and password, and regenerate the hashed password. """
+        decoded_salt = base64.b64decode(encoded_salt)
+        decoded_hashed_password = base64.b64decode(encoded_hashed_password)
+        regenerated_hashed_password = hashlib.pbkdf2_hmac('sha256', original_password.encode(), decoded_salt, 100000)
+        return regenerated_hashed_password, decoded_hashed_password
     def test_case_1(self):
-        text = "Score: 85, Category: Math\nScore: 90, Category: Science\nScore: 80, Category: Math"
-        df = task_func(text)
-        self.assertEqual(len(df), 3)
-        self.assertEqual(df["Score"].iloc[0], 85)
-        self.assertEqual(df["Category"].iloc[0], "Math")
-        self.assertEqual(df["Score"].iloc[1], 90)
-        self.assertEqual(df["Category"].iloc[1], "Science")
-        self.assertEqual(df["Score"].iloc[2], 80)
-        self.assertEqual(df["Category"].iloc[2], "Math")
+        """ Testing with a simple password """
+        salt, hashed_password = task_func('password123')
+        self.assertTrue(isinstance(salt, bytes) and isinstance(hashed_password, bytes))
+        regenerated, original = self.decode_and_regenerate_password(salt, hashed_password, 'password123')
+        self.assertEqual(regenerated, original)
     def test_case_2(self):
-        text = "Score: 70, Category: History"
-        df = task_func(text)
-        self.assertEqual(len(df), 1)
-        self.assertEqual(df["Score"].iloc[0], 70)
-        self.assertEqual(df["Category"].iloc[0], "History")
+        """ Testing with a password containing special characters """
+        salt, hashed_password = task_func('p@ssw0rd$%^&*')
+        self.assertTrue(isinstance(salt, bytes) and isinstance(hashed_password, bytes))
+        regenerated, original = self.decode_and_regenerate_password(salt, hashed_password, 'p@ssw0rd$%^&*')
+        self.assertEqual(regenerated, original)
     def test_case_3(self):
-        text = ""  # Empty string
-        df = task_func(text)
-        self.assertEqual(len(df), 0)  # Expecting an empty DataFrame
+        """ Testing with a long password """
+        long_password = 'a' * 1000
+        salt, hashed_password = task_func(long_password)
+        self.assertTrue(isinstance(salt, bytes) and isinstance(hashed_password, bytes))
+        regenerated, original = self.decode_and_regenerate_password(salt, hashed_password, long_password)
+        self.assertEqual(regenerated, original)
     def test_case_4(self):
-        text = "Score: 70, Category: Chemistry"
-        df = task_func(text)
-        self.assertEqual(len(df), 1)
-        self.assertEqual(df["Score"].iloc[0], 70)
-        self.assertEqual(df["Category"].iloc[0], "Chemistry")
+        """ Testing with a short password """
+        short_password = 'a'
+        salt, hashed_password = task_func(short_password)
+        self.assertTrue(isinstance(salt, bytes) and isinstance(hashed_password, bytes))
+        regenerated, original = self.decode_and_regenerate_password(salt, hashed_password, short_password)
+        self.assertEqual(regenerated, original)
     def test_case_5(self):
-        text = "Score: 70, Category: Literature\nScore: 37, Category: Mathematics\nScore: 90, Category: Japanese\nScore: 58, Category: Machine Learning"
-        df = task_func(text)
-        self.assertEqual(len(df), 4)
-        self.assertEqual(df["Score"].iloc[0], 70)
-        self.assertEqual(df["Category"].iloc[0], "Literature")
-        self.assertEqual(df["Score"].iloc[1], 37)
-        self.assertEqual(df["Category"].iloc[1], "Mathematics")
-        self.assertEqual(df["Score"].iloc[2], 90)
-        self.assertEqual(df["Category"].iloc[2], "Japanese")
-        self.assertEqual(df["Score"].iloc[3], 58)
-        self.assertEqual(df["Category"].iloc[3], "Machine Learning")
+        """ Testing with a password that is a number """
+        number_password = '1234567890'
+        salt, hashed_password = task_func(number_password)
+        self.assertTrue(isinstance(salt, bytes) and isinstance(hashed_password, bytes))
+        regenerated, original = self.decode_and_regenerate_password(salt, hashed_password, number_password)
+        self.assertEqual(regenerated, original)
+    def test_invalid_input(self):
+        """ Testing with invalid input such as None or empty string """
+        with self.assertRaises(ValueError):
+            task_func(None)

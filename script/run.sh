@@ -1,5 +1,5 @@
-# chien jenny wenhao niklas hanhu ratna simon ming zhihan james xiaoheng 
-NAMES=(armel)
+# 
+NAMES=(chien jenny wenhao niklas hanhu ratna simon ming zhihan james xiaoheng armel)
 rm -rf data/clean/*
 for name in "${NAMES[@]}"; do
     # Copy all files for other names

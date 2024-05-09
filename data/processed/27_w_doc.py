@@ -1,89 +1,64 @@
-import numpy as np
-from scipy import stats
-import matplotlib.pyplot as plt
+import base64
+from cryptography.fernet import Fernet
 
-def task_func(mu, sigma, num_samples):
+def task_func(message, encryption_key):
     """
-    Display a plot showing a normal distribution with a given mean and standard deviation and overlay a histogram of randomly generated samples from this distribution.
-    The plot title should be 'Normal Distribution'.
+    Encrypts a message with a symmetric encryption key using Fernet encryption, and then encode the 
+    encrypted message using base64.
 
     Parameters:
-    mu (float): The mean of the distribution.
-    sigma (float): The standard deviation of the distribution.
-    num_samples (int): The number of samples to generate.
+    message (str): The message to be encrypted and encoded.
+    encryption_key (str): The key used for symmetric encryption. It should be a string, which will 
+                          be encoded to bytes, then URL-safe base64 encoded to conform to the requirements 
+                          for Fernet (32 bytes after encoding).
 
     Returns:
-    fig (matplotlib.figure.Figure): The generated figure. Useful for testing purposes.
+    str: The base64 encoded encrypted message. The message is first encrypted using Fernet encryption, 
+         then the result is base64 encoded.
 
     Requirements:
-    - numpy
-    - scipy.stats
-    - matplotlib.pyplot
+    - base64
+    - cryptography.fernet
 
     Example:
-    >>> plt = task_func(0, 1, 1000)
+    >>> encrypted_message = task_func('Hello, World!', '01234567890123456789012345678901')
+    >>> isinstance(encrypted_message, str)
+    True
     """
-    samples = np.random.normal(mu, sigma, num_samples)
-    fig, ax = plt.subplots()
-    ax.hist(samples, bins=30, density=True, alpha=0.6, color='g')
-    xmin, xmax = plt.xlim()
-    x = np.linspace(xmin, xmax, 100)
-    p = stats.norm.pdf(x, mu, sigma)
-    ax.plot(x, p, 'k', linewidth=2)
-    ax.set_title('Normal Distribution')
-    plt.show()
-    return fig
+    fernet = Fernet(base64.urlsafe_b64encode(encryption_key.encode()))
+    encrypted_message = fernet.encrypt(message.encode())
+    return base64.b64encode(encrypted_message).decode()
 
 import unittest
+import base64
+from cryptography.fernet import Fernet
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
     def test_case_1(self):
-        np.random.seed(42)
-        mu = 0
-        sigma = 1
-        num_samples = 1000
-        fig = task_func(mu, sigma, num_samples)
-        ax = fig.gca()
-        self.assertEqual(ax.get_title(), "Normal Distribution")
-        self.assertTrue(len(ax.patches) > 0)
-        self.assertTrue(len(ax.lines) > 0)
+        # Test with a basic message and a valid encryption key.
+        result = task_func('Hello, World!', '01234567890123456789012345678901')
+        self.assertIsInstance(result, str)
+        self.assertNotEqual(result, 'Hello, World!')
     def test_case_2(self):
-        np.random.seed(42)
-        mu = 5
-        sigma = 2
-        num_samples = 1000
-        fig = task_func(mu, sigma, num_samples)
-        ax = fig.gca()
-        self.assertEqual(ax.get_title(), "Normal Distribution")
-        self.assertTrue(len(ax.patches) > 0)
-        self.assertTrue(len(ax.lines) > 0)
+        # Test with an empty message and a valid encryption key.
+        result = task_func('', '01234567890123456789012345678901')
+        self.assertIsInstance(result, str)
+        self.assertNotEqual(result, '')
     def test_case_3(self):
-        np.random.seed(42)
-        mu = 0
-        sigma = 1
-        num_samples = 10
-        fig = task_func(mu, sigma, num_samples)
-        ax = fig.gca()
-        self.assertEqual(ax.get_title(), "Normal Distribution")
-        self.assertTrue(len(ax.patches) > 0)
-        self.assertTrue(len(ax.lines) > 0)
+        # Test with a numeric message and a valid encryption key.
+        result = task_func('1234567890', '01234567890123456789012345678901')
+        self.assertIsInstance(result, str)
+        self.assertNotEqual(result, '1234567890')
     def test_case_4(self):
-        np.random.seed(42)
-        mu = 0
-        sigma = 1
-        num_samples = 10
-        fig = task_func(mu, sigma, num_samples)
-        ax = fig.gca()
-        self.assertEqual(ax.get_title(), "Normal Distribution")
-        self.assertTrue(len(ax.patches) > 0)
-        self.assertTrue(len(ax.lines) > 0)
+        # Test with a long message and a valid encryption key.
+        long_message = 'A' * 500
+        result = task_func(long_message, '01234567890123456789012345678901')
+        self.assertIsInstance(result, str)
+        self.assertNotEqual(result, long_message)
     def test_case_5(self):
-        np.random.seed(42)
-        mu = 0
-        sigma = 1
-        num_samples = 10
-        fig = task_func(mu, sigma, num_samples)
-        ax = fig.gca()
-        self.assertEqual(ax.get_title(), "Normal Distribution")
-        self.assertTrue(len(ax.patches) > 0)
-        self.assertTrue(len(ax.lines) > 0)
+        # Test with a basic message and an incorrectly formatted encryption key.
+        with self.assertRaises(ValueError):
+            task_func('Hello, World!', '0123456789')
+    def test_case_6(self):
+        # Test with a non-base64 but correct length key.
+        with self.assertRaises(Exception):
+            task_func('Hello, World!', '01234567890123456789012345678901'*2)  # Not base64-encoded
