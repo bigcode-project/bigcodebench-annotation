@@ -29,10 +29,10 @@ def f_111(data_matrix, n_components=2):
     >>> import numpy as np
     >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
     >>> df, ax = f_111(data)
-    >>> print(df)
-       Component 1   Component 2      Mean
-    0     5.700877  2.163271e-16  2.850439
-    1    -5.700877  2.163271e-16 -2.850439
+    >>> print(df["Mean"])
+    0    2.850439
+    1   -2.850439
+    Name: Mean, dtype: float64
     """
     pca = PCA(n_components=n_components)
     transformed_data = pca.fit_transform(data_matrix)
