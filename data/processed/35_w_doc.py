@@ -21,10 +21,10 @@ def task_func(text):
     - matplotlib.pyplot
 
     Example:
-    >>> task_func('Visit https://www.python.org for more info. Python is great. I love Python.')
-    <wordcloud.WordCloud object at ...>
-    >>> task_func('Check out this link: http://www.example.com. Machine learning is fascinating.')
-    <wordcloud.WordCloud object at ...>
+    >>> print(task_func('Visit https://www.python.org for more info. Python is great. I love Python.').words_)
+    {'Python': 1.0, 'Visit': 0.5, 'info': 0.5, 'great': 0.5, 'love': 0.5}
+    >>> print(task_func('Check out this link: http://www.example.com. Machine learning is fascinating.').words_)
+    {'Check': 1.0, 'link': 1.0, 'Machine': 1.0, 'learning': 1.0, 'fascinating': 1.0}
     """
     text = re.sub(r"http[s]?://\S+", "", text)
     if not text.strip():  # Check if text is not empty after URL removal
