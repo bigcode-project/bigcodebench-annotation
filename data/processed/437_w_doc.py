@@ -1,148 +1,90 @@
-from collections import Counter
-from sklearn.cluster import KMeans
+import string
 import matplotlib.pyplot as plt
 
 
-def task_func(df, n_clusters=3, random_state=None, n_init=10):
+def task_func(s):
     """
-    Identify duplicate points in a DataFrame, perform KMeans clustering on the unique points,
-    and record the clusters.
+    Calculate the frequency of each letter in a string and return a bar chart of frequencies.
+    Results are case-insensitive. If non-string input is provided, function will throw an error.
 
     Parameters:
-    df (pd.DataFrame): A DataFrame containing at least two columns 'x' and 'y' representing points.
-    n_clusters (int, optional): Number of clusters for KMeans clustering. Default is 3.
-    random_state (int, optional): The seed used by the random number generator for reproducibility. Default is None.
-    n_init (int, optional): Number of time the k-means algorithm will be run with different centroid seeds.
-                            The final results will be the best output of n_init consecutive runs in terms of
-                            within-cluster sum of squares. Default is 10.
+    s (str): The string to calculate letter frequencies.
 
     Returns:
     tuple: A tuple containing:
-        - Counter: A Counter object with the count of duplicate points.
-        - pd.DataFrame: A DataFrame with an additional column 'cluster' representing cluster assignments for unique points.
-        - Axes: A scatter plot of the clustered data.
+        - dict: A dictionary with the frequency of each letter.
+        - Axes: The bar subplot of 'Letter Frequencies' with 'Letters' on the x-axis and 'Frequency'
+                on the y-axis.
 
     Requirements:
-    - collections.Counter
-    - sklearn.cluster.KMeans
+    - string
     - matplotlib.pyplot
 
     Example:
-    >>> df = pd.DataFrame({\
-            'x': [1, 2, 2, 2, 3, 4],\
-            'y': [1, 1, 1, 1, 3, 3]\
-        })
-    >>> duplicates, df_clustered, ax = task_func(df, random_state=42)
-    >>> df_clustered
-       x  y  cluster
-    0  1  1        2
-    1  2  1        0
-    4  3  3        1
-    5  4  3        1
-    >>> duplicates
-    Counter({(2, 1): 3})
+    >>> s = 'This is a test string.'
+    >>> freqs, ax = task_func(s)
+    >>> freqs
+    {'a': 1, 'b': 0, 'c': 0, 'd': 0, 'e': 1, 'f': 0, 'g': 1, 'h': 1, 'i': 3, 'j': 0, 'k': 0, 'l': 0, 'm': 0, 'n': 1, 'o': 0, 'p': 0, 'q': 0, 'r': 1, 's': 4, 't': 4, 'u': 0, 'v': 0, 'w': 0, 'x': 0, 'y': 0, 'z': 0}
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    duplicates = df[df.duplicated(subset=["x", "y"], keep=False)]
-    duplicates_counter = Counter(map(tuple, duplicates[["x", "y"]].values))
-    unique_df = df.drop_duplicates(subset=["x", "y"]).copy()
-    n_clusters = min(n_clusters, len(unique_df))
-    kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=n_init)
-    unique_df["cluster"] = kmeans.fit_predict(unique_df[["x", "y"]])
+    if not isinstance(s, str):
+        raise TypeError("Expected string input")
+    LETTERS = string.ascii_lowercase
+    s = s.lower()
+    letter_counts = {letter: s.count(letter) for letter in LETTERS}
     fig, ax = plt.subplots()
-    scatter = ax.scatter(unique_df["x"], unique_df["y"], c=unique_df["cluster"])
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
-    ax.set_title("KMeans Clusters")
-    return duplicates_counter, unique_df, ax
+    ax.bar(letter_counts.keys(), letter_counts.values())
+    ax.set_xlabel("Letters")
+    ax.set_ylabel("Frequency")
+    ax.set_title("Letter Frequencies")
+    return letter_counts, ax
 
 import unittest
-import pandas as pd
-from collections import Counter
-import matplotlib.pyplot as plt
+import string
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test basic functionality with duplicates
-        df = pd.DataFrame({"x": [1, 2, 2, 2, 3, 4], "y": [1, 1, 1, 1, 3, 3]})
-        duplicates, df_clustered, ax = task_func(df, random_state=42)
-        self.assertEqual(duplicates, Counter({(2, 1): 3}))
-        self.assertIn("cluster", df_clustered.columns)
-        self.assertEqual(ax.get_title(), "KMeans Clusters")
-        self.assertFalse(df_clustered["cluster"].isna().any())
+        # Test with a simple sentence
+        s = "This is a test string."
+        expected_output = {
+            letter: s.lower().count(letter) for letter in string.ascii_lowercase
+        }
+        result, ax = task_func(s)
+        self.assertEqual(result, expected_output)
+        self.assertEqual(ax.get_title(), "Letter Frequencies")
+        self.assertEqual(ax.get_xlabel(), "Letters")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
     def test_case_2(self):
-        # Test functionality without duplicates
-        df = pd.DataFrame({"x": [1, 2, 3, 4, 5, 6], "y": [1, 2, 3, 4, 5, 6]})
-        duplicates, df_clustered, ax = task_func(df, random_state=42)
-        self.assertEqual(duplicates, Counter())
-        self.assertIn("cluster", df_clustered.columns)
-        self.assertEqual(ax.get_title(), "KMeans Clusters")
+        # Test with a string having all alphabets
+        s = "abcdefghijklmnopqrstuvwxyz"
+        expected_output = {letter: 1 for letter in string.ascii_lowercase}
+        result, ax = task_func(s)
+        self.assertEqual(result, expected_output)
+        self.assertEqual(ax.get_title(), "Letter Frequencies")
+        self.assertEqual(ax.get_xlabel(), "Letters")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
     def test_case_3(self):
-        # Test functionality with all points being duplicates
-        df = pd.DataFrame({"x": [1, 1, 1, 1, 1, 1], "y": [1, 1, 1, 1, 1, 1]})
-        duplicates, df_clustered, ax = task_func(df, random_state=42)
-        self.assertEqual(duplicates, Counter({(1, 1): 6}))
-        self.assertIn("cluster", df_clustered.columns)
-        self.assertEqual(ax.get_title(), "KMeans Clusters")
+        # Test with a string having no alphabets
+        s = "1234567890!@#$%^&*()"
+        expected_output = {letter: 0 for letter in string.ascii_lowercase}
+        result, ax = task_func(s)
+        self.assertEqual(result, expected_output)
+        self.assertEqual(ax.get_title(), "Letter Frequencies")
+        self.assertEqual(ax.get_xlabel(), "Letters")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
     def test_case_4(self):
-        # Test with specified number of clusters
-        df = pd.DataFrame({"x": [1, 2, 3, 40, 50, 60], "y": [1, 2, 3, 40, 50, 60]})
-        duplicates, df_clustered, ax = task_func(df, n_clusters=2, random_state=42)
-        self.assertEqual(duplicates, Counter())
-        self.assertIn("cluster", df_clustered.columns)
-        self.assertEqual(ax.get_title(), "KMeans Clusters")
+        # Test with an empty string
+        s = ""
+        expected_output = {letter: 0 for letter in string.ascii_lowercase}
+        result, ax = task_func(s)
+        self.assertEqual(result, expected_output)
+        self.assertEqual(ax.get_title(), "Letter Frequencies")
+        self.assertEqual(ax.get_xlabel(), "Letters")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
     def test_case_5(self):
-        # Test functionality with multiple duplicates
-        df = pd.DataFrame(
-            {"x": [1, 2, 3, 4, 5, 5, 5, 5], "y": [1, 2, 3, 4, 5, 5, 5, 5]}
-        )
-        duplicates, df_clustered, ax = task_func(df, random_state=42)
-        self.assertEqual(duplicates, Counter({(5, 5): 4}))
-        self.assertIn("cluster", df_clustered.columns)
-        self.assertEqual(ax.get_title(), "KMeans Clusters")
-        self.assertFalse(df_clustered["cluster"].isna().any())
-    def test_case_6(self):
-        # Test with a mix of unique points and duplicates
-        df = pd.DataFrame(
-            {"x": [1, 2, 3, 3, 3, 4, 5, 6], "y": [1, 2, 3, 3, 3, 4, 5, 6]}
-        )
-        duplicates, df_clustered, ax = task_func(df, random_state=42)
-        self.assertEqual(duplicates, Counter({(3, 3): 3}))
-        self.assertIn("cluster", df_clustered.columns)
-        self.assertEqual(ax.get_title(), "KMeans Clusters")
-        self.assertFalse(df_clustered["cluster"].isna().any())
-    def test_case_7(self):
-        # Easily separable data
-        df = pd.DataFrame(
-            {
-                "x": [1, 2, 3, 10, 11, 12, 20, 21, 22],
-                "y": [1, 2, 3, 10, 11, 12, 20, 21, 22],
-            }
-        )
-        # We expect 3 clusters because of the natural separation in data
-        duplicates, df_clustered, _ = task_func(df, n_clusters=3, random_state=42)
-        self.assertEqual(duplicates, Counter())
-        # Check that all points in a specific region belong to the same cluster
-        cluster_1 = df_clustered[df_clustered["x"] <= 3]["cluster"].nunique()
-        cluster_2 = df_clustered[(df_clustered["x"] > 3) & (df_clustered["x"] <= 12)][
-            "cluster"
-        ].nunique()
-        cluster_3 = df_clustered[df_clustered["x"] > 12]["cluster"].nunique()
-        self.assertEqual(
-            cluster_1, 1
-        )  # All points in this region should belong to the same cluster
-        self.assertEqual(
-            cluster_2, 1
-        )  # All points in this region should belong to the same cluster
-        self.assertEqual(
-            cluster_3, 1
-        )  # All points in this region should belong to the same cluster
-    def test_case_8(self):
-        # Test effects of random state on clustering outcome
-        df = pd.DataFrame(
-            {"x": [10, 20, 20, 40, 50, 60], "y": [10, 20, 20, 40, 50, 60]}
-        )
-        _, df_clustered_1, _ = task_func(df, n_clusters=2, random_state=42)
-        _, df_clustered_2, _ = task_func(df, n_clusters=2, random_state=42)
-        # Clusters should be the same for the same random state
-        self.assertTrue((df_clustered_1["cluster"] == df_clustered_2["cluster"]).all())
+        # Test error handling
+        for invalid in [123, []]:
+            with self.assertRaises(Exception):
+                task_func(invalid)
     def tearDown(self):
         plt.close("all")

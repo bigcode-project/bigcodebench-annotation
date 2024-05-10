@@ -1,106 +1,79 @@
-from itertools import cycle
-from random import choice, seed
+import numpy as np
+from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import RandomForestRegressor
 
-
-def task_func(n_colors, colors=['Red', 'Green', 'Blue', 'Yellow', 'Purple'], rng_seed=None):
-    """
-    Generates a list representing a color pattern. The pattern consists of 'n_colors' elements 
-    and alternates between a cyclic sequence of colors as defined in the parameter 'colors',
-    and random colors from the same list.
-    Optionally, a seed for the random number generator can be provided for repeatable randomness.
-
-    If n_colors is smaller than or equal to zero an empty list is returned.
+def task_func(num_samples=100, n_estimators=100, random_seed=None, cv=5):
+    '''
+    Generate a dataset with five features sampled from the standard normal
+    distribution and a target variable.
+    The target value is created by computing the sum of the features and adding
+    random numbers sampled from the standard normal distribution.
+    Then cross-validate the dataset using a RandomForestRegressor model and
+    return the mean cross-validation score.
 
     Parameters:
-    n_colors (int): The number of colors to include in the pattern. This number indicates the total 
-                    elements in the returned list, alternating between cyclic and random colors.
-    colors (list of str, optional): The list of colors to generate from. 
-                Defaults to  ['Red', 'Green', 'Blue', 'Yellow', 'Purple'].
-    rng_seed (int, optional): A seed for the random number generator to ensure repeatability of the color selection. 
-                              If 'None', the randomness is based on system time or other sources of entropy.
+    - num_samples (int): Number of samples in the generated dataset. Default is 100.
+    - n_estimators (int): Number of trees in RandomForestRegressor. Default is 100.
+    - random_seed (int): Seed for random number generation. Default is None.
+    - cv (int): Number of cross-validation folds. Default is 5.
 
     Returns:
-    list: A list representing the color pattern. Each element of the list is a string indicating 
-          the color. For example, with n_colors=4 and a specific seed, the result could be consistent 
-          across calls with the same seed.
+    float: The mean cross-validation score.
+    model: the trained model
+
+    Raises:
+    - ValueError: If num_samples / cv < 2
 
     Requirements:
-    - itertools
-    - random
+    - numpy
+    - sklearn.model_selection.cross_val_score
+    - sklearn.ensemble.RandomForestRegressor
 
-    Examples:
-    >>> color_pattern = task_func(4, rng_seed=123)
-    >>> print(color_pattern)
-    ['Red', 'Red', 'Green', 'Blue']
+    Example:
+    >>> res = task_func(random_seed=21, cv=3, n_estimators=90, num_samples=28)
+    >>> print(res)
+    (-0.7631373607354236, RandomForestRegressor(n_estimators=90, random_state=21))
 
-    >>> colors = ['Brown', 'Green', 'Black']
-    >>> color_pattern = task_func(12, colors=colors, rng_seed=42)
-    >>> print(color_pattern)
-    ['Brown', 'Black', 'Green', 'Brown', 'Black', 'Brown', 'Brown', 'Black', 'Green', 'Green', 'Black', 'Brown']
-    """
-    if rng_seed is not None:
-        seed(rng_seed)
-    color_cycle = cycle(colors)
-    color_pattern = []
-    for _ in range(n_colors):
-        color = next(color_cycle) if _ % 2 == 0 else choice(colors)
-        color_pattern.append(color)
-    return color_pattern
+    >>> results = task_func(random_seed=1)
+    >>> print(results)
+    (0.47332912782858, RandomForestRegressor(random_state=1))
+    '''
+    if num_samples / cv < 2:
+        raise ValueError("num_samples / cv should be greater than or equal to 2.")
+    np.random.seed(random_seed)
+    X = np.random.randn(num_samples, 5)
+    y = np.sum(X, axis=1) + np.random.randn(num_samples)
+    model = RandomForestRegressor(n_estimators=n_estimators,
+                                  random_state=random_seed
+                                  )
+    cv_scores = cross_val_score(model, X, y, cv=cv)
+    return np.mean(cv_scores), model
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_small_number_of_colors(self):
-        # Testing with a small number of colors and a fixed seed for repeatability
-        color_pattern = task_func(4, rng_seed=123)
-        expected_pattern = ['Red', 'Red', 'Green', 'Blue']  # This pattern is based on the seed value
-        self.assertEqual(color_pattern, expected_pattern)
-    def test_large_number_of_colors(self):
-        # Testing with a large number of colors to check the function's behavior with more extensive patterns
-        # Here, we're not checking for exact match due to randomness, but rather size and content
-        color_pattern = task_func(100, rng_seed=123)
-        self.assertEqual(len(color_pattern), 100)
-        self.assertTrue(all(color in ['Red', 'Green', 'Blue', 'Yellow', 'Purple'] for color in color_pattern))
-    def test_zero_colors(self):
-        # Testing with zero colors, which should return an empty list
-        color_pattern = task_func(0, rng_seed=123)
-        self.assertEqual(color_pattern, [])
-    def test_negative_number_of_colors(self):
-        # Testing with a negative number, which should not break the function and return an empty list
-        color_pattern = task_func(-4, rng_seed=123)
-        self.assertEqual(color_pattern, [])
-    def test_repeatability_with_same_seed(self):
-        # Testing the function with the same seed value should produce the same results
-        color_pattern1 = task_func(10, rng_seed=123)
-        color_pattern2 = task_func(10, rng_seed=123)
-        self.assertEqual(color_pattern1, color_pattern2)
-    def test_randomness_with_different_seeds(self):
-        # Testing the function with different seeds should produce different results
-        color_pattern1 = task_func(10, rng_seed=123)
-        color_pattern2 = task_func(10, rng_seed=456)
-        self.assertNotEqual(color_pattern1, color_pattern2)
-    def test_no_seed_provided(self):
-        # Testing the function without a seed should still produce valid results (though they can't be predetermined)
-        color_pattern = task_func(10)  # No seed provided
-        self.assertEqual(len(color_pattern), 10)
-        self.assertTrue(all(color in ['Red', 'Green', 'Blue', 'Yellow', 'Purple'] for color in color_pattern))
-    def test_custom_colors(self):
-        colors = ['Brown', 'White', 'Black', "Orange"]
-        color_pattern = task_func(10, colors=colors, rng_seed=12)  # No seed provided
-        self.assertTrue(all(color in colors for color in color_pattern))
-        expected = ['Brown',
-                    'Orange',
-                    'White',
-                    'Black',
-                    'Black',
-                    'Black',
-                    'Orange',
-                    'White',
-                    'Brown',
-                    'Orange']
-        self.assertEqual(color_pattern, expected)
-    def test_cyclicity(self):
-        color_pattern = task_func(1000, rng_seed=1234)  # No seed provided
-        colors = ['Red', 'Green', 'Blue', 'Yellow', 'Purple']
-        color_cycle = cycle(colors)
-        for i in range(500):
-            self.assertEqual(color_pattern[2*i], next(color_cycle))
+    def test_case_rng(self):
+        'rng reproducability'
+        result1, _ = task_func(random_seed=42)
+        result2, _ = task_func(random_seed=42)
+        self.assertAlmostEqual(result1, result2)
+    def test_case_1(self):
+        'default params'
+        result, model = task_func(random_seed=1)
+        self.assertAlmostEqual(result, 0.47332912782858)
+        self.assertTrue(isinstance(model, RandomForestRegressor))
+    def test_case_2(self):
+        'random outcome with distinct seeds'
+        result1, _ = task_func(random_seed=2)
+        result2, _ = task_func(random_seed=3)
+        self.assertFalse(result1 == result2)
+    def test_case_3(self):
+        result, model = task_func(random_seed=2, cv=2, n_estimators=2)
+        self.assertAlmostEqual(result, 0.2316988319594362)
+        self.assertTrue(isinstance(model, RandomForestRegressor))
+    def test_case_4(self):
+        'test exception'
+        self.assertRaises(Exception,
+                          task_func,
+                          {'random_seed': 223, 'cv': 3,
+                           'n_estimators': 100, 'num_samples': 4}
+                          )

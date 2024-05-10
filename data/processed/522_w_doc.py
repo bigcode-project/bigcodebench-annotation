@@ -1,88 +1,111 @@
-from random import randint, seed
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
-# Constants (they can be overridden with default parameters)
-TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
-PENALTY_COST = 1000  # in dollars
-
-
-def task_func(goals, penalties, teams=TEAMS, penalty_cost=PENALTY_COST, rng_seed=None):
+def task_func(data_list):
     """
-    Generate a Dataframe to show the football match results of teams 'Team' with random goals 'Goals' and
-    penalties 'Penalty Cost', and create a bar plot of the results. Penalties are converted into fines according to the
-    penalty costs.
+    Visualizes the scores of students over multiple tests using a line plot.
+
+    The function takes in a list of dictionaries. Each dictionary contains the name of a student (key)
+    and their score (value). It combines these dictionaries into a pandas DataFrame and plots a line graph
+    of student scores over tests, where the x-axis represents the test number and the y-axis represents the score.
+    Each student's scores are plotted as separate lines. Missing scores are handled by not plotting
+    those specific data points, allowing for discontinuous lines where data is missing.
 
     Parameters:
-    - goals (int): The maximum number of goals a team can score in a match.
-    - penalties (int): The maximum number of penalties a team can receive in a match.
-    - teams (list of str, optional): A list of team names. Default is ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'].
-    - penalty_cost (int, optional): Cost of a penalty in dollars. Default is 1000.
-    - rng_seed (int, optional): Random seed for reproducibility. Default is None.
+    - data_list (list of dict): A list of dictionaries with student names as keys and their scores as values.
 
     Returns:
-    - DataFrame: A pandas DataFrame containing columns for teams, their goals, and penalty costs.
-    - Axes: A matplotlib Axes object representing the bar plot of the results.
+    - ax (matplotlib.axes._axes.Axes): The Axes object with the plotted data.
 
     Requirements:
     - pandas
     - matplotlib.pyplot
-    - random
 
     Example:
-    >>> seed(42)  # Setting seed for reproducibility
-    >>> df, ax = task_func(5, 3, rng_seed=42)
-    >>> isinstance(df, pd.DataFrame) and 'Team' in df.columns and 'Goals' in df.columns and 'Penalty Cost' in df.columns
-    True
-    >>> all(df['Goals'] <= 5) and all(df['Penalty Cost'] <= 3000)  # Goals and penalties are within expected range
-    True
+    >>> data = [{'John': 5, 'Jane': 10}, {'John': 6, 'Jane': 8}, {'John': 5, 'Jane': 9}]
+    >>> ax = task_func(data)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax.get_xticklabels()
+    [Text(-0.25, 0, '−0.25'), Text(0.0, 0, '0.00'), Text(0.25, 0, '0.25'), Text(0.5, 0, '0.50'), Text(0.75, 0, '0.75'), Text(1.0, 0, '1.00'), Text(1.25, 0, '1.25'), Text(1.5, 0, '1.50'), Text(1.75, 0, '1.75'), Text(2.0, 0, '2.00'), Text(2.25, 0, '2.25')]
     """
-    if rng_seed is not None:
-        seed(rng_seed)
-    goals = abs(goals)
-    penalties = abs(penalties)
-    match_results = []
-    for team in teams:
-        team_goals = randint(0, goals)
-        team_penalties = randint(0, penalties)
-        team_penalty_cost = penalty_cost * team_penalties
-        match_results.append([team, team_goals, team_penalty_cost])
-    results_df = pd.DataFrame(match_results, columns=['Team', 'Goals', 'Penalty Cost'])
-    ax = results_df.plot(kind='bar', x='Team', y=['Goals', 'Penalty Cost'], stacked=True)
-    plt.ylabel('Results')
-    return results_df, ax
+    df = pd.DataFrame(data_list)
+    fig, ax = plt.subplots()
+    for column in df:
+        ax.plot(df[column], label=column)
+    ax.set_title("Student Scores over Tests")
+    ax.set_xlabel("Test Number")
+    ax.set_ylabel("Score")
+    return ax
 
 import unittest
-# Unit Tests
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_positive_outcomes(self):
-        """Test the function with positive goals and penalties."""
-        df, _ = task_func(5, 3, rng_seed=42)
-        # Check if the DataFrame is not empty and has the correct columns
-        self.assertFalse(df.empty)
-        self.assertListEqual(list(df.columns), ['Team', 'Goals', 'Penalty Cost'])
-    def test_zero_goals_penalties(self):
-        """Test the function with zero goals and penalties."""
-        df, _ = task_func(0, 0, teams=['Team A'], rng_seed=42)
-        # Check that goals and penalty costs are 0
-        self.assertTrue((df['Goals'] == 0).all())
-        self.assertTrue((df['Penalty Cost'] == 0).all())
-    def test_negative_input(self):
-        """Ensure negative inputs are treated as positive."""
-        df, _ = task_func(-5, -3, rng_seed=42)
-        # Check for absence of negative values in results
-        self.assertFalse((df['Goals'] < 0).any())
-        self.assertFalse((df['Penalty Cost'] < 0).any())
-    def test_single_team(self):
-        """Test with a single team to ensure correct results."""
-        df, _ = task_func(10, 5, teams=['Solo Team'], rng_seed=42)
-        # Ensure only one row exists and contains 'Solo Team'
-        self.assertEqual(len(df), 1)
-        self.assertEqual(df.iloc[0]['Team'], 'Solo Team')
-    def test_custom_penalty_cost(self):
-        """Test the function with a custom penalty cost."""
-        custom_cost = 500
-        df, _ = task_func(5, 3, penalty_cost=custom_cost, rng_seed=42)
-        # Validate that the penalty cost calculation uses the custom cost
-        self.assertTrue((df['Penalty Cost'] % custom_cost == 0).all() or (df['Penalty Cost'] == 0).all())
+    def test_case_1(self):
+        data = [
+            {"John": 5, "Jane": 10, "Joe": 7},
+            {"John": 6, "Jane": 8, "Joe": 10},
+            {"John": 5, "Jane": 9, "Joe": 8},
+            {"John": 7, "Jane": 10, "Joe": 9},
+        ]
+        self.validate_plot(data)
+    def test_case_2(self):
+        data = [{"John": 3}, {"John": 4}, {"John": 5}, {"John": 6}]
+        self.validate_plot(data)
+    def test_case_3(self):
+        data = [
+            {"John": 3, "Jane": 2},
+            {"John": 4, "Jane": 3},
+            {"John": 5, "Jane": 4},
+            {"John": 6, "Jane": 5},
+        ]
+        self.validate_plot(data)
+    def test_case_4(self):
+        data = [
+            {"John": 10, "Jane": 20, "Joe": 15, "Jack": 25},
+            {"John": 12, "Jane": 18, "Joe": 14, "Jack": 24},
+            {"John": 11, "Jane": 19, "Joe": 13, "Jack": 23},
+            {"John": 13, "Jane": 21, "Joe": 16, "Jack": 22},
+        ]
+        self.validate_plot(data)
+    def test_case_5(self):
+        data = [
+            {"John": 7, "Jane": 8},
+            {"John": 8, "Jane": 7},
+            {"John": 7, "Jane": 8},
+            {"John": 8, "Jane": 7},
+        ]
+        self.validate_plot(data)
+    def test_case_6(self):
+        data = []
+        self.validate_plot(data)
+    def test_case_7(self):
+        # Floats
+        data = [{"John": 5.5, "Jane": 10.1}, {"John": 6.75, "Jane": 8.25}]
+        self.validate_plot(data)
+    def test_case_8(self):
+        # Missing scores
+        data = [{"John": 5, "Jane": 10}, {"Jane": 8, "Joe": 7}, {"John": 6}]
+        self.validate_plot(data)
+    def validate_plot(self, data):
+        ax = task_func(data)
+        self.assertIsInstance(ax, plt.Axes)
+        df = pd.DataFrame(data)
+        for idx, column in enumerate(df):
+            plotted_data_y = ax.lines[idx].get_ydata()
+            expected_data_y = df[column].values.astype(float)
+            # Handle float comparisons
+            np.testing.assert_allclose(
+                plotted_data_y, expected_data_y, rtol=1e-5, atol=1e-8, equal_nan=True
+            )
+            plotted_data_x = ax.lines[idx].get_xdata().astype(int)
+            expected_data_x = np.arange(len(df[column].values))
+            self.assertTrue(
+                np.array_equal(plotted_data_x, expected_data_x),
+                msg=f"X-data Mismatch for {column}. Plotted: {plotted_data_x}, Expected: {expected_data_x}",
+            )
+    def tearDown(self):
+        plt.close("all")

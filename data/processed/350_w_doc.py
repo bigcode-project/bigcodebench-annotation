@@ -1,78 +1,82 @@
-import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
+import random
 
 
-def task_func(n_points=100, random_seed=None):
+def task_func(product_list, categories):
     """
-    Generate an array of random 3D dots in the range [0, 1) for each dimension
-    and draw them in a 3D scatter plot.
-
+    Create a sales report for a list of products in different categories.
+    The report includes the quantity sold and revenue generated for each product.
+    
     Parameters:
-    n_points (int): The number of points to generate and plot. Default is 100.
-    random_seed (int, optional): Seed for the random number generator. Default is None.
-
+    product_list (list): The list of products.
+    categories (list): A list of categories for the products.
+    
     Returns:
-    tuple: A tuple containing:
-        - points (ndarray): A numpy ndarray of shape (n_points, 3) with the coordinates of the points.
-        - plot (Axes3D): A 3D scatter plot of the generated points.
+    DataFrame: A pandas DataFrame with sales data for the products.
+    
+    Note:
+    - The column names uses are 'Product', 'Category', 'Quantity Sold', and 'Revenue'.
+    - The quantity sold is random number from 1 to 100
+    - The revenue is the number of quantity sold times with the random number from 10 to 100
 
     Requirements:
-    - numpy
-    - matplotlib.pyplot
-
+    - pandas
+    - random
+    
     Example:
-    >>> points, plot = task_func(200, random_seed=42)
-    >>> type(points)
-    <class 'numpy.ndarray'>
-    >>> type(plot)
-    <class 'mpl_toolkits.mplot3d.axes3d.Axes3D'>
+    >>> random.seed(0)
+    >>> report = task_func(['Product 1'], ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports'])
+    >>> report.iloc[0]['Category'] in ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
+    True
     """
-    np.random.seed(random_seed)
-    points = np.random.random((n_points, 3))
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection="3d")
-    ax.scatter(points[:, 0], points[:, 1], points[:, 2])
-    return points, ax
+    report_data = []
+    for product in product_list:
+        category = categories[random.randint(0, len(categories)-1)]
+        quantity_sold = random.randint(1, 100)
+        revenue = quantity_sold * random.randint(10, 100)
+        report_data.append([product, category, quantity_sold, revenue])
+    report_df = pd.DataFrame(report_data, columns=['Product', 'Category', 'Quantity Sold', 'Revenue'])
+    return report_df
 
 import unittest
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+import pandas as pd
+import random
 class TestCases(unittest.TestCase):
+    
+    categories = ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
+    products = ['Product ' + str(i) for i in range(1, 101)]
+    
     def test_case_1(self):
-        # Test default parameters - values
-        points, _ = task_func()
-        self.assertEqual(points.shape, (100, 3))
-        self.assertTrue(
-            (points >= 0).all() and (points < 1).all(),
-            "All points should be in the range [0, 1)",
-        )
+        random.seed(0)
+        report = task_func(self.products[:5], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 5)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_2(self):
-        # Test default parameters - plot
-        _, plot = task_func()
-        self.assertTrue(isinstance(plot, Axes3D))
+        random.seed(0)
+        report = task_func(self.products[5:10], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 5)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_3(self):
-        # Test controlling number of points
-        points1, _ = task_func(n_points=1)
-        points10, _ = task_func(n_points=10)
-        points100, _ = task_func(n_points=100)
-        self.assertEqual(points1.shape, (1, 3))
-        self.assertEqual(points10.shape, (10, 3))
-        self.assertEqual(points100.shape, (100, 3))
+        random.seed(0)
+        report = task_func([self.products[10]], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 1)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_4(self):
-        # Test random seed
-        points1, _ = task_func(random_seed=42)
-        points2, _ = task_func(random_seed=42)
-        self.assertTrue(
-            np.array_equal(points1, points2),
-            "The points should be identical for the same seed",
-        )
+        random.seed(0)
+        report = task_func(self.products[10:20], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 10)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_5(self):
-        # Test handling invalid inputs
-        with self.assertRaises(ValueError):
-            task_func(-1)
-        for invalid in [0.5, "invalid", None, []]:
-            with self.assertRaises(TypeError):
-                task_func(invalid)
-    def tearDown(self):
-        plt.close("all")
+        random.seed(0)
+        report = task_func(self.products[20:40], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 20)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)

@@ -1,97 +1,64 @@
-import re
-import random
-import pandas as pd
+import matplotlib.pyplot as plt
+from collections import Counter
 
 
-def task_func(data_list, seed=None):
+FRUITS = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape', 'Honeydew', 'Indian Prune', 'Jackfruit']
+
+def task_func(fruit_dict):
     """
-    Shuffle the substrings within each string in a given list.
-
-    This function takes a list of comma-separated strings and splits each into substrings.
-    It extracts substrings based on commas, removing leading and trailing whitespaces
-    from each. Then, it shuffles these processed substrings within each string, and
-    returns a pandas DataFrame with two columns: "Original String" and "Shuffled String".
+    Given a constant list of fruits in FRUITS, and a dictionary 'fruit_dict' with keys as people's names and values 
+    as their favorite fruit names, record the frequency of each fruits' occurence. Return a bar chart of the number 
+    of fruits for each fruit type and return the dictionary with fruit names as keys and their counts as values. 
 
     Parameters:
-    data_list (list): The list of comma-separated strings.
-    seed (int, optional): Seed for the random number generator. Default is None.
+    fruit_dict (dict): The dictionary with keys as people's names and values as fruit names.
 
     Returns:
-    DataFrame: A pandas DataFrame with columns 'Original String' and 'Shuffled String'.
+    dict: A dictionary with fruit names as keys and their counts as values.
+    matplotlib.axes.Axes: The axes object of the plot.
 
     Requirements:
-    - pandas
+    - collections
     - random
-    - re
+    - matplotlib
 
     Example:
-    >>> task_func(['lamp, bag, mirror', 'table, chair'], seed=42)
-         Original String    Shuffled String
-    0  lamp, bag, mirror  bag, lamp, mirror
-    1       table, chair       chair, table
+    >>> fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Cherry', 'Charlie': 'Date', 'David': 'Apple'}
+    >>> freq, ax = task_func(fruit_dict)
+    >>> dict(freq)
+    {'Apple': 2, 'Banana': 1, 'Cherry': 1, 'Date': 1}
     """
-    if seed is not None:
-        random.seed(seed)
-    df = pd.DataFrame(data_list, columns=["Original String"])
-    shuffled_strings = []
-    for s in data_list:
-        substrings = re.split("\s*,\s*", s)
-        random.shuffle(substrings)
-        shuffled_s = ", ".join(substrings)
-        shuffled_strings.append(shuffled_s)
-    df["Shuffled String"] = shuffled_strings
-    return df
+    fruit_list = [item for item in fruit_dict.values() if isinstance(item, str) and item in FRUITS]
+    fruit_counter = Counter(fruit_list)
+    plt.bar(fruit_counter.keys(), fruit_counter.values())
+    return Counter([item for item in fruit_dict.values() if isinstance(item, str)]), plt.gca()
 
 import unittest
+import matplotlib.axes
+import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test basic case
-        input_data = ["lamp, bag, mirror", "table, chair"]
-        output_df = task_func(input_data)
-        self.assertEqual(output_df["Original String"].iloc[0], "lamp, bag, mirror")
-        self.assertEqual(output_df["Original String"].iloc[1], "table, chair")
-        self.assertEqual(len(output_df["Shuffled String"].iloc[0].split(", ")), 3)
-        self.assertEqual(len(output_df["Shuffled String"].iloc[1].split(", ")), 2)
+        fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Cherry'}
+        count_dict, ax = task_func(fruit_dict)
+        self.assertEqual(count_dict, {'Apple': 1, 'Banana': 1, 'Cherry': 1})
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_case_2(self):
-        # Test single character substrings
-        input_data = ["A, B, C, D", "E, F, G"]
-        output_df = task_func(input_data)
-        self.assertEqual(output_df["Original String"].iloc[0], "A, B, C, D")
-        self.assertEqual(output_df["Original String"].iloc[1], "E, F, G")
-        self.assertEqual(len(output_df["Shuffled String"].iloc[0].split(", ")), 4)
-        self.assertEqual(len(output_df["Shuffled String"].iloc[1].split(", ")), 3)
+        fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Apple'}
+        count_dict, ax = task_func(fruit_dict)
+        self.assertEqual(count_dict, {'Apple': 2, 'Banana': 1})
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_case_3(self):
-        # Test single-item list
-        input_data = ["word1, word2"]
-        output_df = task_func(input_data)
-        self.assertEqual(output_df["Original String"].iloc[0], "word1, word2")
-        self.assertEqual(len(output_df["Shuffled String"].iloc[0].split(", ")), 2)
+        fruit_dict = {}
+        count_dict, ax = task_func(fruit_dict)
+        self.assertEqual(count_dict, {})
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_case_4(self):
-        # Tests shuffling with an empty string
-        input_data = [""]
-        output_df = task_func(input_data)
-        self.assertEqual(output_df["Original String"].iloc[0], "")
-        self.assertEqual(output_df["Shuffled String"].iloc[0], "")
+        fruit_dict = {'John': 'Apple'}
+        count_dict, ax = task_func(fruit_dict)
+        self.assertEqual(count_dict, {'Apple': 1})
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_case_5(self):
-        # Test shuffling single substring (no shuffling)
-        input_data = ["single"]
-        output_df = task_func(input_data)
-        self.assertEqual(output_df["Original String"].iloc[0], "single")
-        self.assertEqual(output_df["Shuffled String"].iloc[0], "single")
-    def test_case_6(self):
-        # Testing the effect of a specific random seed to ensure reproducibility
-        input_data = ["a, b, c, d"]
-        output_df1 = task_func(input_data, seed=42)
-        output_df2 = task_func(input_data, seed=42)
-        self.assertEqual(
-            output_df1["Shuffled String"].iloc[0], output_df2["Shuffled String"].iloc[0]
-        )
-    def test_case_7(self):
-        # Tests shuffling with varying spaces around commas
-        input_data = ["one,two, three"]
-        corrected_expected_shuffled = "two, one, three"
-        output_df = task_func(input_data, seed=42)
-        self.assertEqual(output_df["Original String"].iloc[0], "one,two, three")
-        self.assertEqual(
-            output_df["Shuffled String"].iloc[0], corrected_expected_shuffled
-        )
+        fruit_dict = {'John': 123, 'Alice': None, 'Bob': 'Apple'}
+        count_dict, ax = task_func(fruit_dict)
+        self.assertEqual(count_dict, {'Apple': 1})
+        self.assertIsInstance(ax, matplotlib.axes.Axes)

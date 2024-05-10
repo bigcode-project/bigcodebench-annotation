@@ -1,60 +1,102 @@
-from collections import Counter
-import re
+import requests
+from urllib.parse import urljoin
+from bs4 import BeautifulSoup
+import csv
 
-def task_func(result):
+
+def task_func(
+    url: str,
+    base_url: str = "https://www.example.com",
+    csv_file: str = "scraped_data.csv",
+) -> int:
     """
-    Get the most common values associated with the url key in the dictionary list "result."
+    This function scrapes a webpage for all hyperlinks and saves them as absolute URLs to a CSV file.
 
     Parameters:
-    result (list): A list of dictionaries.
+    - url (str): The relative URL of the webpage to scrape.
+    - base_url (str, optional): The base URL of the website to prepend to relative links. Defaults to 'https://www.example.com'.
+    - csv_file (str, optional): The filename for the CSV file where the links will be saved. Defaults to 'scraped_data.csv'.
 
     Returns:
-    dict: A dictionary with the most common values and their counts.
+    - int: The number of unique absolute links scraped from the webpage.
 
     Requirements:
-    - collections
-    - re
+    - requests
+    - urllib.parse.urljoin
+    - bs4.BeautifulSoup
+    - csv
 
-    Example:
-    >>> result = [{"hi": 7, "http://google.com": 0}, {"https://google.com": 0}, {"http://www.cwi.nl": 1}]
-    >>> task_func(result)
-    {0: 2}
+    Examples:
+    >>> task_func('/mywebpage')
+    5
+    >>> task_func('/anotherpage', base_url='https://www.different.com', csv_file='other_links.csv')
+    8
     """
-    regex = re.compile(
-        r'^(?:http|ftp)s?://' # http:// or https://
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
-        r'localhost|' #localhost...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-        r'(?::\d+)?' # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-    from_user_values = []
-    for l_res in result:
-        for j in l_res:
-            if re.match(regex, j):
-                from_user_values.append(l_res[j])
-    counter = Counter(from_user_values)
-    most_common = dict(counter.most_common(1))
-    return most_common
+    full_url = urljoin(base_url, url)
+    response = requests.get(full_url)
+    soup = BeautifulSoup(response.text, "html.parser")
+    links = {urljoin(base_url, a["href"]) for a in soup.find_all("a", href=True)}
+    with open(csv_file, "w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile)
+        for link in links:
+            writer.writerow([link])
+    return len(links)
 
 import unittest
+from unittest.mock import patch, MagicMock
+import requests
+import os
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        result = [{"hi": 7, "bye": 4, "http://google.com": 0}, {"https://google.com": 0}, {"http://www.cwi.nl": 1}]
-        expected_output = {0: 2}
-        self.assertEqual(task_func(result), expected_output)
-    def test_case_2(self):
-        result = [{"http://google.com": 2}, {"http://www.cwi.nl": 2}, {"http://google.com": 3}]
-        expected_output = {2: 2}
-        self.assertEqual(task_func(result), expected_output)
-    def test_case_3(self):
-        result = [{"http://google.com": 5}]
-        expected_output = {5: 1}
-        self.assertEqual(task_func(result), expected_output)
-    def test_case_4(self):
-        result = []
-        expected_output = {}
-        self.assertEqual(task_func(result), expected_output)
-    def test_case_5(self):
-        result = [{"hi": 7, "bye": 4}, {"hello": "world"}]
-        expected_output = {}
-        self.assertEqual(task_func(result), expected_output)
+    """Test cases for task_func."""
+    @patch("requests.get")
+    def test_empty_page(self, mock_get):
+        """
+        Test the function with an empty webpage (no links).
+        """
+        mock_get.return_value = MagicMock(text="<html></html>")
+        result = task_func("/empty")
+        self.assertEqual(result, 0)
+    @patch("requests.get")
+    def test_single_link(self, mock_get):
+        """
+        Test the function with a webpage containing a single link.
+        """
+        mock_get.return_value = MagicMock(
+            text='<html><a href="link1.html">Link1</a></html>'
+        )
+        result = task_func("/single-link")
+        self.assertEqual(result, 1)
+    @patch("requests.get")
+    def test_multiple_links(self, mock_get):
+        """
+        Test the function with a webpage containing multiple distinct links.
+        """
+        mock_get.return_value = MagicMock(
+            text='<html><a href="link1.html">Link1</a><a href="link2.html">Link2</a></html>'
+        )
+        result = task_func("/multiple-links")
+        self.assertEqual(result, 2)
+    @patch("requests.get")
+    def test_duplicate_links(self, mock_get):
+        """
+        Test the function with a webpage containing duplicate links.
+        """
+        mock_get.return_value = MagicMock(
+            text='<html><a href="link.html">Link</a><a href="link.html">Link</a></html>'
+        )
+        result = task_func("/duplicate-links")
+        self.assertEqual(result, 1)
+    @patch("requests.get")
+    def test_external_links(self, mock_get):
+        """
+        Test the function with a webpage containing external links.
+        """
+        mock_get.return_value = MagicMock(
+            text='<html><a href="http://external.com/link">External Link</a></html>'
+        )
+        result = task_func("/external-link")
+        self.assertEqual(result, 1)
+    def tearDown(self):
+        """Remove the database file with retries."""
+        if os.path.exists("scraped_data.csv"):
+            os.remove("scraped_data.csv")

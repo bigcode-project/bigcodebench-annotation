@@ -1,76 +1,81 @@
-from texttable import Texttable
-import os
-import psutil
+import itertools
+import statistics
 
-def task_func():
+
+# Refined function after importing required libraries
+def task_func(elements, subset_size):
     """
-    Generates a table displaying the system's CPU usage, memory usage, and disk usage.
+    Generate all subsets of a given size from a tuple and calculate the mean, median, and mode of the sums of the subsets.
+
+    Args:
+    - elements (tuple): A tuple of numbers from which subsets will be generated.
+    - subset_size (int): The size of the subsets to be generated.
 
     Returns:
-        A string representation of a table with the columns of 'Item' and 'Value',
-        and the following system information:
-        - CPU Usage (%)
-        - Memory Usage (%)
-        - Disk Usage (%)
+    dict: A dictionary with the mean, median, and mode of the sums of the subsets.
 
     Requirements:
-    - texttable.Texttable
-    - os
-    - psutil
-
-    Examples:
-    >>> table_str = task_func()
-    >>> isinstance(table_str, str)
-    True
-    >>> 'CPU Usage (%)' in table_str and 'Memory Usage (%)' in table_str
-    True
+    - itertools
+    - statistics
+    
+    Example:
+    >>> task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
+    {'mean': 11, 'median': 11, 'mode': 11}
     """
-    cpu_usage = psutil.cpu_percent(interval=1)
-    memory_info = psutil.virtual_memory()
-    disk_usage = psutil.disk_usage(os.sep)
-    table = Texttable()
-    table.add_rows([
-        ['Item', 'Value'],
-        ['CPU Usage (%)', cpu_usage],
-        ['Memory Usage (%)', memory_info.percent],
-        ['Disk Usage (%)', disk_usage.percent]
-    ])
-    return table.draw()
+    combinations = list(itertools.combinations(elements, subset_size))
+    sums = [sum(combination) for combination in combinations]
+    return {
+        'mean': statistics.mean(sums),
+        'median': statistics.median(sums),
+        'mode': statistics.mode(sums)
+    }
 
 import unittest
-import re  # Import the regular expressions library
+from faker import Faker
+import itertools
+import statistics
+import doctest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.result = task_func()
-    def test_return_type(self):
-        """Test that the function returns a string."""
-        self.assertIsInstance(self.result, str)
-    def test_table_headers(self):
-        """Test the presence of correct headers in the table."""
-        for header in ['CPU Usage (%)', 'Memory Usage (%)', 'Disk Usage (%)']:
-            with self.subTest(header=header):
-                self.assertIn(header, self.result)
-    def test_proper_values(self):
-        """Test that the table's values are not empty or zero."""
-        # Extract numeric values using a regular expression
-        values = re.findall(r'\|\s*[\d.]+\s*\|', self.result)
-        # Convert extracted strings to float and test they are greater than 0
-        for value_str in values:
-            value = float(value_str.strip('| ').strip())
-            with self.subTest(value=value):
-                self.assertTrue(0 <= value <= 100)
-    def test_value_ranges(self):
-        """Test that CPU and memory usage percentages are within 0-100%."""
-        values = re.findall(r'\|\s*[\d.]+\s*\|', self.result)
-        for value_str in values:
-            value = float(value_str.strip('| ').strip())
-            with self.subTest(value=value):
-                self.assertTrue(0 <= value <= 100)
-    def test_table_structure(self):
-        """Test that the table's structure is as expected."""
-        # Split the table into rows based on the unique row separator pattern
-        parts = self.result.split('+------------------+--------+')
-        # Filter out empty parts that might occur due to the split operation
-        non_empty_parts = [part for part in parts if part.strip()]
-        # Expect 4 non-empty parts: 1 header row + 3 data rows
-        self.assertEqual(len(non_empty_parts), 3)
+    
+    def test_case_1(self):
+        # Basic test case
+        elements = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        subset_size = 2
+        result = task_func(elements, subset_size)
+        self.assertEqual(result, {'mean': 11, 'median': 11, 'mode': 11})
+        
+    def test_case_2(self):
+        # Testing with a tuple containing repeated elements
+        elements = (1, 2, 2, 3, 4)
+        subset_size = 2
+        result = task_func(elements, subset_size)
+        self.assertEqual(result, {'mean': 4.8, 'median': 5.0, 'mode': 5})
+        
+    def test_case_3(self):
+        # Testing with a larger subset size
+        elements = (1, 2, 3, 4, 5)
+        subset_size = 4
+        result = task_func(elements, subset_size)
+        self.assertEqual(result, {'mean': 12, 'median': 12, 'mode': 10})
+        
+    def test_case_4(self):
+        # Testing with negative numbers in the tuple
+        elements = (-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5)
+        subset_size = 3
+        result = task_func(elements, subset_size)
+        self.assertEqual(result, {'mean': 0.0, 'median': 0.0, 'mode': 0})
+        
+    def test_case_5(self):
+        # Using the Faker library to generate a random test case
+        fake = Faker()
+        elements = tuple(fake.random_elements(elements=range(1, 101), length=10, unique=True))
+        subset_size = fake.random_int(min=2, max=5)
+        combinations = list(itertools.combinations(elements, subset_size))
+        sums = [sum(combination) for combination in combinations]
+        expected_result = {
+            'mean': statistics.mean(sums),
+            'median': statistics.median(sums),
+            'mode': statistics.mode(sums)
+        }
+        result = task_func(elements, subset_size)
+        self.assertEqual(result, expected_result)

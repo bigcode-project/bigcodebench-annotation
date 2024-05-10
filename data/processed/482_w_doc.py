@@ -1,77 +1,150 @@
-from random import shuffle, randint
 import pandas as pd
+import random
+import re
 
-def task_func(l, n_groups = 5):
+
+def task_func(data_list, seed=42):
     """
-    Generate a Series from a list "l". The function shuffles the list, 
-    then creates a longer series by cycling through the shuffled list. 
-    For each element in the series, it randomly selects n_groups characters
-    from the start of the string and moves them to the end. 
-    
+    Randomizes the order of comma-separated substrings within each string in a list,
+    normalizing spaces to ensure a single space follows each comma using regex, then
+    returns a DataFrame comparing original and randomized strings.
+
     Parameters:
-    - l (list): A list of strings.
-    - n_groups (int): number of groups. Default value is 5.
+    data_list (list of str): List of strings with substrings to be randomized.
+    seed (int, optional): Seed for random number generator for reproducibility. Defaults to None.
 
     Returns:
-    - pd.Series: A Series where each element is modified by moving "n" 
-                 characters from the start to the end.
+    pandas.DataFrame: A DataFrame with columns 'Original String' and 'Randomized String'.
 
     Requirements:
     - pandas
-    - random.shuffle
-    - random.randint
+    - random
+    - re
 
     Example:
-    >>> result = task_func(['ABC', 'DEF', 'GHI'])
-    >>> isinstance(result, pd.Series)  # Check if the output is a pandas Series
-    True
-    >>> len(result) == 15  # Check if the length of the result is as expected for 3 elements cycled 5 times
-    True
+    >>> df = task_func(['lamp, bag, mirror', 'table, chair, bag'], seed=42)
+    >>> df['Original String'][0]
+    'lamp, bag, mirror'
+    >>> df['Randomized String'][0]
+    'mirror, lamp, bag'
     """
-    if not l:
-        return pd.Series()
-    shuffle(l)
-    random_shifts = [(randint(1, max(1, len(x) - 1)), randint(1, max(1, len(x) - 1))) for x in l]
-    modified_elements = []
-    for _ in range(n_groups):
-        for element, (start, end) in zip(l, random_shifts):
-            new_element = element[start:] + element[:end] if len(element) > 1 else element
-            modified_elements.append(new_element)
-    return pd.Series(modified_elements)
+    random.seed(seed)
+    df = pd.DataFrame(data_list, columns=["Original String"])
+    randomized_strings = []
+    for s in data_list:
+        substrings = re.split("\s*,\s*", s)
+        random_positions = random.sample(range(len(substrings)), len(substrings))
+        randomized_s = ", ".join([substrings[i] for i in random_positions])
+        randomized_strings.append(randomized_s)
+    df["Randomized String"] = randomized_strings
+    return df
 
 import unittest
-# Constants
-N_GROUPS = 5
+import pandas as pd
+import re
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Initialize common variables for testing
-        self.elements = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-        self.n_groups = 5
-    def test_series_length(self):
-        """Test the length of the series is as expected."""
-        series = task_func(self.elements.copy())
-        expected_length = len(self.elements) * self.n_groups
-        self.assertEqual(len(series), expected_length, "The series length should match the expected length.")
-    def test_empty_list(self):
-        """Test the function with an empty list to ensure it returns an empty Series."""
-        series = task_func([])
-        self.assertTrue(series.empty, "The series should be empty when the input list is empty.")
-    def test_single_element_list(self):
-        """Test the function with a single-element list."""
-        series = task_func(['X'])
-        self.assertTrue(all([x == 'X' for x in series]),
-                        "All entries in the series should be 'X' for a single-element input.")
-    def test_elements_preserved(self):
-        """Test that all original elements are present in the output series."""
-        series = task_func(self.elements.copy())
-        unique_elements_in_series = set(''.join(series))
-        self.assertTrue(set(self.elements) <= unique_elements_in_series,
-                        "All original elements should be present in the series.")
-    def test_with_repeated_elements(self):
-        """Test the function with a list containing repeated elements."""
-        repeated_elements = ['A', 'A', 'B', 'B', 'C', 'C']
-        series = task_func(repeated_elements)
-        # Check if the series length is correct, considering repetitions
-        expected_length = len(repeated_elements) * self.n_groups
-        self.assertEqual(len(series), expected_length,
-                         "The series length should correctly reflect the input list with repetitions.")
+    def test_case_1(self):
+        # Test basic functionality with a reproducible seed
+        input_data = ["a, b", "c, d, e"]
+        df = task_func(input_data, seed=42)
+        self.assertEqual(len(df), 2)
+        self.assertListEqual(df["Original String"].tolist(), input_data)
+        self.assertNotEqual(
+            df["Original String"].tolist(), df["Randomized String"].tolist()
+        )
+        self.assertSetEqual(
+            set(df["Original String"].tolist()[0].split(", ")),
+            set(df["Randomized String"].tolist()[0].split(", ")),
+        )
+    def test_case_2(self):
+        # Test function's behavior with an empty input list
+        input_data = []
+        df = task_func(input_data)
+        self.assertEqual(len(df), 0)
+    def test_case_3(self):
+        # Test with single items (no commas) to verify output matches input exactly
+        input_data = ["a", "b", "c"]
+        df = task_func(input_data)
+        self.assertListEqual(
+            df["Original String"].tolist(), df["Randomized String"].tolist()
+        )
+    def test_case_4(self):
+        # Test with strings containing only commas
+        input_data = [",,,", ",,"]
+        expected_output = [", , , ", ", , "]
+        df = task_func(input_data)
+        self.assertTrue(
+            all(df["Randomized String"].apply(lambda x: x in expected_output))
+        )
+    def test_case_5(self):
+        # Test strings with inconsistent use of spaces and delimiters
+        input_data = ["a,b,  c", "d ,e, f"]  # Inputs with inconsistent spacing
+        df = task_func(input_data, seed=24)
+        for i in range(len(input_data)):
+            original_substrings = set(re.split("\s*,\s*", input_data[i]))
+            randomized_substrings = set(df["Randomized String"].iloc[i].split(", "))
+            self.assertEqual(
+                original_substrings,
+                randomized_substrings,
+            )
+    def test_case_6(self):
+        # Test with strings that include special characters
+        input_data = ["!@#, $%^", "&*(), )(_+"]
+        df = task_func(input_data, seed=99)
+        self.assertEqual(len(df), 2)
+        for orig, rand in zip(df["Original String"], df["Randomized String"]):
+            self.assertSetEqual(set(orig.split(", ")), set(rand.split(", ")))
+    def test_case_7(self):
+        # Test random seed
+        input_data = ["lamp, bag, mirror", "table, chair, vase"]
+        df1 = task_func(input_data, seed=42)
+        df2 = task_func(input_data, seed=42)
+        self.assertListEqual(
+            df1["Randomized String"].tolist(), df2["Randomized String"].tolist()
+        )
+    def test_case_8(self):
+        # Test the handling of non-standard separators
+        input_data = ["a;b;c", "d:e:f"]
+        df = task_func(input_data)
+        self.assertListEqual(
+            df["Original String"].tolist(), df["Randomized String"].tolist()
+        )
+    def test_case_9(self):
+        ## Test handling of strings with commas not followed by spaces
+        input_data = ["a,b,c", "d,e,f"]
+        df = task_func(input_data, seed=42)
+        for idx in range(len(input_data)):
+            original_substrings = set(re.split(",\s*", input_data[idx].strip()))
+            randomized_substrings = set(df["Randomized String"].iloc[idx].split(", "))
+            self.assertEqual(
+                original_substrings,
+                randomized_substrings,
+                "Substrings should be preserved and normalized after randomization.",
+            )
+    def test_case_10(self):
+        # Test handling of strings with leading or trailing spaces
+        input_data = [" a, b, c ", " d, e, f "]
+        df = task_func(input_data, seed=42)
+        for idx in range(len(input_data)):
+            original_substrings = set(
+                x.strip() for x in re.split(",\s*", input_data[idx].strip())
+            )
+            randomized_substrings = set(
+                x.strip() for x in df["Randomized String"].iloc[idx].split(", ")
+            )
+            self.assertEqual(
+                original_substrings,
+                randomized_substrings,
+                "Ensure substrings match after randomization, ignoring leading/trailing spaces.",
+            )
+    def test_case_11(self):
+        # Test handling of strings with multiple spaces after a comma
+        input_data = ["a,  b,   c", "d,    e, f"]
+        df = task_func(input_data, seed=42)
+        for rand_str in df["Randomized String"].tolist():
+            self.assertTrue(
+                ",  " not in rand_str
+                and ",   " not in rand_str
+                and ",    " not in rand_str,
+                "Multiple spaces after commas should not appear in output.",
+            )

@@ -1,81 +1,75 @@
 import pandas as pd
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
+import random
+from sklearn.preprocessing import StandardScaler
 
-def task_func(df):
+# Constants
+N_DATA_POINTS = 5000
+MIN_VALUE = 0.0
+MAX_VALUE = 10.0
+
+def task_func(n_data_points=5000, min_value=0.0, max_value=10.0):
     """
-    Scale the 'Age' and 'Income' columns between 0 and 1 for each group by 'id' in the provided pandas DataFrame. 
-    Additionally, create a histogram of the 'Income' column after scaling and return both the scaled DataFrame 
-    and the histogram data.
-
+    Generate a random dataset of floating point numbers, truncate each value to 3 decimal places and normalize the data using standard scaling (mean = 0, std = 1).
+    
     Parameters:
-    df (DataFrame): The pandas DataFrame with columns ['id', 'age', 'income'].
-
+    n_data_points (int): Number of data points to generate. Default is 5000.
+    min_value (float): Minimum value range for data points. Default is 0.0.
+    max_value (float): Maximum value range for data points. Default is 10.0.
+    
     Returns:
-    tuple: A tuple containing the scaled DataFrame and the histogram data for the 'income' column.
+    DataFrame: A pandas DataFrame with the normalized data.
+    
+    Raises:
+    If max_value is less than min_value, a ValueError is raised.
+    
+    Note:
+    - The function use "Normalized Value" for the column name in the DataFrame that being returned.
 
     Requirements:
     - pandas
-    - sklearn.preprocessing.MinMaxScaler
-    - numpy
+    - random
+    - sklearn.preprocessing.StandardScaler
 
     Example:
-    >>> df = pd.DataFrame({'id': [1, 1, 2, 2, 3, 3], 'age': [25, 26, 35, 36, 28, 29],'income': [50000, 60000, 70000, 80000, 90000, 100000]})
-    >>> df_scaled, income_hist = task_func(df)
-    >>> print(df_scaled.iloc[0]['age'])
-    0.0
-    >>> print(df_scaled.iloc[0]['income'])
+    >>> random.seed(0)
+    >>> normalized_data = task_func(5000, 5, 5)
+    >>> print(normalized_data['Normalized Value'][0])
     0.0
     """
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    df_grouped = df.groupby('id').apply(
-        lambda x: pd.DataFrame(
-            scaler.fit_transform(x[['age', 'income']]), 
-            columns=['age', 'income'], 
-            index=x.index
-        )
-    )
-    hist, bins = np.histogram(df_grouped['income'], bins=10)
-    return df_grouped, (hist, bins)
+    if max_value < min_value:
+        raise ValueError()
+    data = [round(random.uniform(min_value, max_value), 3) for _ in range(n_data_points)]
+    data_df = pd.DataFrame(data, columns=['Value'])
+    scaler = StandardScaler()
+    normalized_data = scaler.fit_transform(data_df[['Value']])
+    return pd.DataFrame(normalized_data, columns=['Normalized Value'])
 
 import unittest
 import pandas as pd
-from faker import Faker
-import numpy as np
+import random
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Setting up Faker for test data generation
-        self.fake = Faker()
-    def generate_test_dataframe(self, num_rows):
-        # Generating a test DataFrame with 'id', 'age', and 'income' columns
-        data = {
-            'id': [self.fake.random_int(min=1, max=5) for _ in range(num_rows)],
-            'age': [self.fake.random_int(min=18, max=80) for _ in range(num_rows)],
-            'income': [self.fake.random_int(min=20000, max=100000) for _ in range(num_rows)]
-        }
-        return pd.DataFrame(data)
-    def test_empty_dataframe(self):
-        df = pd.DataFrame()
-        with self.assertRaises(Exception):
-            scaled_df, income_hist = task_func(df)
-    def test_single_group_dataframe(self):
-        df = self.generate_test_dataframe(1)
-        scaled_df, income_hist = task_func(df)
-        self.assertEqual(len(scaled_df), 1)  # Only one row, hence one row in scaled DataFrame
-        self.assertEqual(len(income_hist[0]), 10)  # Histogram should have 10 bins by default
-    def test_multiple_groups_dataframe(self):
-        df = self.generate_test_dataframe(100)
-        scaled_df, income_hist = task_func(df)
-        self.assertEqual(len(scaled_df), 100)  # Should have the same number of rows as input DataFrame
-        self.assertEqual(len(income_hist[0]), 10)  # Checking histogram bin count
-    def test_scaled_values_range(self):
-        df = self.generate_test_dataframe(50)
-        scaled_df, _ = task_func(df)
-        self.assertEqual(len(scaled_df[(0.0 > scaled_df['age']) & (scaled_df['age'] > 1.0)]), 0)  # Age should be scaled between 0 and 1
-        self.assertEqual(len(scaled_df[(0.0 > scaled_df['income']) & (scaled_df['income'] > 1.0)]), 0)  # Age should be scaled between 0 and 1
-        
-    def test_histogram_data_integrity(self):
-        df = self.generate_test_dataframe(50)
-        _, income_hist = task_func(df)
-        self.assertTrue(np.all(income_hist[0] >= 0))  # Histogram counts should be non-negative
-        self.assertTrue(np.all(np.diff(income_hist[1]) > 0))  # Histogram bins should be in ascending order
+    def test_default_parameters(self):
+        random.seed(0)
+        df = task_func()
+        self.assertIsInstance(df, pd.DataFrame, "Return type should be a DataFrame.")
+        self.assertEqual(len(df), 5000, "Default number of data points should be 5000.")
+        self.assertAlmostEqual(df['Normalized Value'].mean(), 0, delta=0.1, msg="Mean should be close to 0.")
+        self.assertAlmostEqual(df['Normalized Value'].std(), 1, delta=0.1, msg="Standard deviation should be close to 1.")
+    def test_custom_parameters(self):
+        random.seed(0)
+        df = task_func(1000, 1.0, 5.0)
+        self.assertEqual(len(df), 1000, "Number of data points should match the specified value.")
+        self.assertTrue(df['Normalized Value'].min() >= -3, "Normalized values should be within a reasonable range.")
+        self.assertTrue(df['Normalized Value'].max() <= 3, "Normalized values should be within a reasonable range.")
+    def test_edge_case_empty(self):
+        random.seed(0)
+        with self.assertRaises(ValueError):
+            task_func(0)
+    def test_negative_data_points(self):
+        random.seed(0)
+        with self.assertRaises(ValueError):
+            task_func(-100)
+    def test_invalid_range(self):
+        random.seed(0)
+        with self.assertRaises(ValueError):
+            task_func(1000, 5.0, 1.0)

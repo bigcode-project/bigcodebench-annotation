@@ -1,156 +1,112 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
 
 
-def task_func(data):
+def task_func(df, x_column, y_column):
     """
-    Processes a dictionary containing product names and their corresponding prices in string format. 
-    The function converts these string prices (which may include commas as thousand separators) into float values. 
-    It then calculates statistical measures (mean, median, and standard deviation) of these prices and 
-    generates a histogram to visually represent the distribution of the prices.
+    Draws a scatter plot for the specified columns from a pandas DataFrame and fits a linear regression model to the data.
 
     Parameters:
-    - data (dict): A dictionary with two keys: 'Product' and 'Price_String'. 
-        'Product' is a list of product names, each name corresponding to a product.
-        'Price_String' is a list of prices in string format, associated with these products. 
-        The price strings can contain commas for thousand separators and a period for the decimal point (e.g., "1,234.56").
+    df (DataFrame): The input pandas DataFrame.
+    x_column (str): The column name for the x-axis. Data contained in column must be numeric.
+    y_column (str): The column name for the y-axis. Data contained in column must be numeric.
 
     Returns:
-    - dict: Contains the calculated mean, median, and standard deviation (sample) of the prices. 
-        The keys are 'mean', 'median', and 'std_dev'.
-    - matplotlib.axes._axes.Axes: A subplot object that represents the histogram plot of the product prices. 
-        The histogram displays the frequency distribution of the prices.
-
-    Note:
-    - A histogram plot is generated using these prices, with automatic bin sizing ('auto'), a blue color, 
-      70% opacity (alpha=0.7), and a relative width (rwidth) of 0.85 for the bars. 
-    - The histogram's title is set to 'Histogram of Product Prices', and the x and y-axis are labeled 'Price' and 'Frequency', respectively.
+    matplotlib.axes._axes.Axes: The Axes object containing the scatter plot and the linear regression line.
 
     Requirements:
-    - pandas
-    - numpy
     - matplotlib
+    - sklearn
+
+    Notes:
+    - After plotting the scatterplot, this function overlays the predicted regression line on top in red on the same Axes.
 
     Example:
-    >>> results = task_func({'Product': ['Apple', 'Banana'], 'Price_String': ['1,234.00', '567.89']})
-    >>> print(results)
-    ({'mean': 900.9449999999999, 'median': 900.9449999999999, 'std_dev': 471.0108980161712}, (array([1., 1.]), array([ 567.89 ,  900.945, 1234.   ]), <BarContainer object of 2 artists>))
-
-    Note:
-    - The function assumes that each product name in the 'Product' list has a corresponding price in the 'Price_String' list.
-    - The histogram plot's appearance (like color, alpha, and rwidth) is pre-set but can be customized further if needed.
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [2, 3, 4]})
+    >>> ax = task_func(df, 'A', 'B')
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    df = pd.DataFrame(data)
-    df["Price_Float"] = df["Price_String"].apply(lambda x: float(x.replace(",", "")))
-    mean_price = np.mean(df["Price_Float"])
-    median_price = np.median(df["Price_Float"])
-    std_dev_price = np.std(df["Price_Float"], ddof=1)
-    ax = plt.hist(df["Price_Float"], bins="auto", color="blue", alpha=0.7, rwidth=0.85)
-    plt.title("Histogram of Product Prices")
-    plt.xlabel("Price")
-    plt.ylabel("Frequency")
-    return {"mean": mean_price, "median": median_price, "std_dev": std_dev_price}, ax
+    X = df[x_column].values.reshape(-1, 1)
+    Y = df[y_column].values
+    reg = LinearRegression().fit(X, Y)
+    Y_pred = reg.predict(X)
+    fig, ax = plt.subplots()
+    ax.scatter(X, Y)
+    ax.plot(X, Y_pred, color="red")
+    return ax
 
 import unittest
+import pandas as pd
 import numpy as np
+from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
-    """Test cases for task_func"""
-    def test_basic_functionality(self):
-        """Test basic functionality."""
-        sample_data = {
-            "Product": ["James", "Olivia", "Jamie", "Angela", "Jennifer"],
-            "Price_String": ["2,213.00", "6,083.00", "5,461.00", "884.00", "2,783.00"],
-        }
-        float_prices = [
-            float(price.replace(",", "")) for price in sample_data["Price_String"]
-        ]
-        expected_mean = np.mean(float_prices)
-        expected_median = np.median(float_prices)
-        expected_std_dev = np.std(float_prices, ddof=1)
-        result, _ = task_func(sample_data)
-        self.assertAlmostEqual(result["mean"], expected_mean)
-        self.assertAlmostEqual(result["median"], expected_median)
-        self.assertAlmostEqual(result["std_dev"], expected_std_dev)
-    def test_large_sample_size(self):
-        """Test large sample size."""
-        sample_data = {
-            "Product": [
-                "Adam",
-                "Lisa",
-                "Scott",
-                "Bianca",
-                "Ashlee",
-                "Shannon",
-                "Michelle",
-                "Robert",
-                "Joseph",
-                "Joshua",
-                "Traci",
-                "Jacob",
-                "Daniel",
-                "Timothy",
-                "Paul",
-            ],
-            "Price_String": [
-                "1,691.00",
-                "967.00",
-                "5,789.00",
-                "6,806.00",
-                "3,301.00",
-                "5,319.00",
-                "7,619.00",
-                "134.00",
-                "7,883.00",
-                "5,028.00",
-                "3,330.00",
-                "5,253.00",
-                "8,551.00",
-                "1,631.00",
-                "7,637.00",
-            ],
-        }
-        float_prices = [
-            float(price.replace(",", "")) for price in sample_data["Price_String"]
-        ]
-        expected_mean = np.mean(float_prices)
-        expected_median = np.median(float_prices)
-        expected_std_dev = np.std(float_prices, ddof=1)
-        result, _ = task_func(sample_data)
-        self.assertAlmostEqual(result["mean"], expected_mean)
-        self.assertAlmostEqual(result["median"], expected_median)
-        self.assertAlmostEqual(result["std_dev"], expected_std_dev)
-    def test_invalid_input(self):
-        """Test invalid input."""
-        with self.assertRaises(Exception):
-            task_func({})
-        with self.assertRaises(Exception):
-            task_func({"Product": ["Apple"], "Price_WrongKey": ["1,234.00"]})
-    def test_all_zero_prices(self):
-        """Test all zero prices."""
-        sample_data = {
-            "Product": ["Apple", "Banana", "Cherry"],
-            "Price_String": ["0.00", "0.00", "0.00"],
-        }
-        result, _ = task_func(sample_data)
-        self.assertEqual(result["mean"], 0)
-        self.assertEqual(result["median"], 0)
-        self.assertEqual(result["std_dev"], 0)
-    def test_non_uniform_distribution(self):
-        """Test non-uniform distribution."""
-        sample_data = {
-            "Product": ["Apple", "Banana", "Cherry", "Date", "Fig"],
-            "Price_String": ["1,000.00", "500.00", "1,500.00", "2,000.00", "2,500.00"],
-        }
-        float_prices = [
-            float(price.replace(",", "")) for price in sample_data["Price_String"]
-        ]
-        expected_mean = np.mean(float_prices)
-        expected_median = np.median(float_prices)
-        expected_std_dev = np.std(float_prices, ddof=1)
-        result, _ = task_func(sample_data)
-        self.assertAlmostEqual(result["mean"], expected_mean)
-        self.assertAlmostEqual(result["median"], expected_median)
-        self.assertAlmostEqual(result["std_dev"], expected_std_dev)
-    def tearDown(self):
-        plt.close()
+    def helper_assert_line_correctness(self, ax, expected_slope, expected_intercept):
+        # Helper function to check if linear regression predictions are correct
+        tolerance = 1e-6
+        # Extract line data
+        line = ax.lines[0]
+        x_data, y_data = line.get_xdata(), line.get_ydata()
+        # Calculate slope and intercept of the line plot
+        calculated_slope = (y_data[-1] - y_data[0]) / (x_data[-1] - x_data[0])
+        calculated_intercept = y_data[0] - calculated_slope * x_data[0]
+        # Assert slope and intercept
+        self.assertAlmostEqual(
+            calculated_slope,
+            expected_slope,
+            delta=tolerance,
+            msg="Slope did not match expected value",
+        )
+        self.assertAlmostEqual(
+            calculated_intercept,
+            expected_intercept,
+            delta=tolerance,
+            msg="Intercept did not match expected value",
+        )
+    def test_plot_attributes(self):
+        # Basic case to test plot is correct
+        df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": [1, 2, 3, 4]})
+        ax = task_func(df, "X", "Y")
+        self.assertIsInstance(ax, Axes)
+        self.assertEqual(len(ax.lines), 1)
+        self.assertEqual(len(ax.collections), 1)
+    def test_linear_positive_slope(self):
+        # Testing with a dataset that should produce a positive slope
+        df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": [2, 4, 6, 8]})
+        ax = task_func(df, "X", "Y")
+        self.helper_assert_line_correctness(ax, expected_slope=2, expected_intercept=0)
+    def test_linear_negative_slope(self):
+        # Testing with a dataset that should produce a negative slope
+        df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": [8, 6, 4, 2]})
+        ax = task_func(df, "X", "Y")
+        self.helper_assert_line_correctness(
+            ax, expected_slope=-2, expected_intercept=10
+        )
+    def test_linear_zero_slope(self):
+        # Testing with a dataset that should produce a zero slope
+        df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": [5, 5, 5, 5]})
+        ax = task_func(df, "X", "Y")
+        self.helper_assert_line_correctness(ax, expected_slope=0, expected_intercept=5)
+    def test_single_data_point(self):
+        # Testing with a DataFrame having a single data point
+        df = pd.DataFrame({"X": [1], "Y": [1]})
+        ax = task_func(df, "X", "Y")
+        self.assertIsInstance(ax, Axes)
+        self.assertEqual(len(ax.lines), 1)
+        self.assertEqual(len(ax.collections), 1)
+    def test_missing_values(self):
+        # Testing with missing values in the DataFrame
+        df = pd.DataFrame({"X": [1, 2, np.nan, 4], "Y": [1, np.nan, 3, 4]})
+        with self.assertRaises(ValueError):
+            task_func(df, "X", "Y")
+    def test_with_categorical_data(self):
+        # Testing with categorical data to ensure it fails
+        df = pd.DataFrame({"X": ["a", "b", "c"], "Y": ["d", "e", "f"]})
+        with self.assertRaises(ValueError):
+            task_func(df, "X", "Y")
+    def test_incorrect_column_names(self):
+        # Testing with incorrect column names
+        df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
+        with self.assertRaises(KeyError):
+            task_func(df, "X", "Y")

@@ -1,75 +1,55 @@
-import random
-import re
+from sklearn.preprocessing import MinMaxScaler
+import numpy as np
 
-# Constants
-WORD_LIST = ["sample", "text", "contains", "several", "words", "including"]
-
-def task_func(n_sentences):
+def task_func(myList):
     """
-    Generate a string of random sentences using a predefined word list. 
-    Each sentence is guaranteed to have one period at the end, and no period within the sentence.
-    The generated sentences will be concatenated into a single string, 
-    with all letters in lowercase and all non-alphanumeric characters except spaces removed.
+    Normalize a list of numeric values to the range [0, 1] using min-max scaling.
 
     Parameters:
-    - n_sentences (int): The number of sentences to generate.
+    - myList (list): List of numerical values to normalize.
 
     Returns:
-    - str: A string containing the generated sentences in lowercase 
-         with non-alphanumeric characters removed (except for single periods ending sentences).
-    
+    - ndarray: An array of normalized values.
+
     Requirements:
-    - random
-    - re
-    
+    - sklearn.preprocessing.MinMaxScaler
+    - numpy
+
     Example:
-    >>> random.seed(42)
-    >>> result = task_func(2)
-    >>> print(result)
-    sample sample including contains text text text including sample including. words sample words several sample sample sample text text words.
-    
-    Note: 
-    - The actual output will vary due to the randomness of sentence generation.
+    >>> myList = [10, 20, 30, 40, 50]
+    >>> task_func(myList)
+    array([0.  , 0.25, 0.5 , 0.75, 1.  ])
     """
-    sentences = []
-    for _ in range(n_sentences):
-        sentence_len = random.randint(5, 10)
-        sentence = " ".join(random.choice(WORD_LIST) for _ in range(sentence_len)) + "."
-        sentences.append(sentence)
-    text = " ".join(sentences)
-    text = re.sub(r'[^\w\s.]', '', text).lower()
-    text = re.sub(r'\s+\.', '.', text)
-    text = re.sub(r'\s+', ' ', text)
-    return text.strip()
+    myList = np.array(myList).reshape(-1, 1)
+    scaler = MinMaxScaler()
+    normalized_list = scaler.fit_transform(myList)
+    return normalized_list.flatten()
 
 import unittest
-import re
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_single_sentence(self):
-        result = task_func(1)
-        self.assertIsInstance(result, str)
-        self.assertEqual(result.count('.'), 1)
-        self.assertTrue(result.endswith('.'))
-        self.assertTrue(all(c.isalnum() or c.isspace() or c == '.' for c in result))
-    def test_multiple_sentences(self):
-        result = task_func(3)
-        # Ensure the text ends with a period for accurate splitting
-        self.assertTrue(result.endswith('.'), "The generated text should end with a period.")
-        # Split the sentences properly by using regex that keeps the period with each sentence
-        sentences = re.split(r'(?<=\.)\s+', result.strip())
-        self.assertEqual(len(sentences), 3, "There should be exactly three sentences.")
-        # Check that each sentence (excluding the last split empty due to trailing period) ends with a period
-        self.assertTrue(all(sentence.endswith('.') for sentence in sentences), "Each sentence should end with a period.")
-    def test_no_sentences(self):
-        result = task_func(0)
-        self.assertEqual(result, '')
-    def test_randomness(self):
-        random.seed(42)  # Set seed for reproducibility in testing
-        result1 = task_func(2)
-        random.seed(42)
-        result2 = task_func(2)
-        self.assertEqual(result1, result2)
-    def test_sentence_length(self):
-        result = task_func(1)
-        words = result[:-1].split()  # Remove period and split by spaces
-        self.assertTrue(5 <= len(words) <= 10)
+    def test_1(self):
+        # Testing basic functionality
+        input_data = [10, 20, 30, 40, 50]
+        expected_output = np.array([0. , 0.25, 0.5 , 0.75, 1. ])
+        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
+    def test_2(self):
+        # Testing with negative values
+        input_data = [-50, -40, -30, -20, -10]
+        expected_output = np.array([0. , 0.25, 0.5 , 0.75, 1. ])
+        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
+    def test_3(self):
+        # Testing with mixed negative and positive values
+        input_data = [-50, -25, 0, 25, 50]
+        expected_output = np.array([0. , 0.25, 0.5 , 0.75, 1. ])
+        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
+    def test_4(self):
+        # Testing with single value
+        input_data = [100]
+        expected_output = np.array([0.])
+        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
+    def test_5(self):
+        # Testing with all zeros
+        input_data = [0, 0, 0, 0, 0]
+        expected_output = np.array([0., 0., 0., 0., 0.])
+        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)

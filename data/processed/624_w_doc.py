@@ -1,61 +1,50 @@
-import re
+from itertools import chain
 import numpy as np
-from scipy.stats import ttest_rel
+from sklearn.cluster import KMeans
 
-def task_func(text1, text2):
+
+def task_func(L):
     """
-    Perform a paired t-test for the number of words in two strings, only if the strings produce the same number of words.
-    
-    Parameters:
-    - text1 (str), text2 (str): The two text strings.
-    
-    Returns:
-    - t_statistic (float): The t-statistic, or NaN if tests cannot be performed due to unequal lengths.
-    - p_value (float): The p-value, or NaN if tests cannot be performed due to unequal lengths.
-    
+    Convert a list of lists into a list of integers, apply the KMeans clustering, 
+    and return a scatter plot 'matplotlib.axes.Axes' with data points color-coded by their cluster.
+
     Requirements:
-    - re
+    - itertools.chain
     - numpy
-    - scipy
-    
+    - sklearn.cluster
+
+    Parameters:
+    L (list of lists): A list of lists where each sublist contains integers.
+
+    Returns:
+    matplotlib.axes.Axes: An Axes object representing the scatter plot.
+
     Example:
-    >>> task_func('Words, words, words.', 'And more words!')
-    (1.7320508075688774, 0.22540333075851657)
+    >>> ax = task_func([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
     """
-    word_counts1 = np.array([len(word) for word in re.split(r'\W+', text1) if word])
-    word_counts2 = np.array([len(word) for word in re.split(r'\W+', text2) if word])
-    if len(word_counts1) != len(word_counts2):
-        return (np.nan, np.nan)
-    t_statistic, p_value = ttest_rel(word_counts1, word_counts2)
-    return t_statistic, p_value
+    N_CLUSTERS = 3
+    data = list(chain(*L))
+    data = np.array(data).reshape(-1, 1)
+    kmeans = KMeans(n_clusters=N_CLUSTERS).fit(data)
+    fig, ax = plt.subplots()
+    ax.scatter(data, [0]*len(data), c=kmeans.labels_.astype(float))
+    return ax
 
 import unittest
-import re
-import numpy as np
-from scipy.stats import ttest_rel
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_1(self):
-        t_stat, p_val = task_func("Hello, world!", "Hi, universe!")
-        self.assertTrue(isinstance(t_stat, float))
-        self.assertTrue(isinstance(p_val, float))
-    def test_2(self):
-        t_stat, p_val = task_func("Short text.", "This is a slightly longer text.")
-        self.assertTrue(isinstance(t_stat, float))
-        self.assertTrue(isinstance(p_val, float))
-    def test_3(self):
-        t_stat, p_val = task_func("A, B, C, D, E.", "F, G, H, I, J.")
-        self.assertTrue(isinstance(t_stat, float))
-        self.assertTrue(isinstance(p_val, float))
-        
-    def test_4(self):
-        t_stat, p_val = task_func("", "")
-        self.assertTrue(np.isnan(t_stat))
-        self.assertTrue(np.isnan(p_val))
-    def test_5(self):
-        t_stat, p_val = task_func("Testing with similar lengths.", "Testing with similar lengths.")
-        self.assertTrue(np.isnan(t_stat))  # Since the lengths are the same, t-statistic should be NaN
-        self.assertTrue(np.isnan(p_val))
-    def test_unequal_lengths(self):
-        t_stat, p_val = task_func("Short text.", "This is a slightly longer text.")
-        self.assertTrue(np.isnan(t_stat))
-        self.assertTrue(np.isnan(p_val))
+    def test_case_1(self):
+        ax = task_func([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
+        self.assertIsInstance(ax, plt.Axes)
+    def test_case_2(self):
+        ax = task_func([[1, 5], [2, 6], [3, 7]])
+        self.assertIsInstance(ax, plt.Axes)
+    def test_case_3(self):
+        ax = task_func([[10, 20, 30, 40], [15, 25, 35, 45]])
+        self.assertIsInstance(ax, plt.Axes)
+    def test_case_4(self):
+        ax = task_func([[1000, 2000], [3000, 4000], [5000, 6000]])
+        self.assertIsInstance(ax, plt.Axes)
+    def test_case_5(self):
+        ax = task_func([[-1, -2, -3], [-50, -60, -70], [-100, -110, -120]])
+        self.assertIsInstance(ax, plt.Axes)

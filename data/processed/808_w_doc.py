@@ -1,72 +1,92 @@
-import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
+import re
+import nltk
+nltk.download('stopwords')
 
-# Updated function to handle empty input list
-def task_func(d):
+from nltk.corpus import stopwords
+
+from collections import Counter
+
+# Constants
+STOPWORDS = set(stopwords.words('english'))
+
+def task_func(text, n=2):
     """
-    Scale all values with the keys "x," "y" and "z" from a list of dictionaries "d" with MinMaxScaler.
+    Remove duplicate and stopwords from a string "text."
+    Then, generate a count of n-grams (default is bigrams) in the text.
 
     Parameters:
-    d (list): A list of dictionaries.
+    - text (str): The text string to analyze.
+    - n (int): The size of the n-grams.
 
     Returns:
-    DataFrame: A pandas DataFrame with scaled values.
+    - dict: The count of the n-grams in the text.
 
     Requirements:
-    - pandas
-    - sklearn.preprocessing.MinMaxScaler
+    - re
+    - nltk.corpus.stopwords
+    - collections.Counter
 
-    Examples:
-    >>> data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
-    >>> print(task_func(data))
-         x         y    z
-    0  0.0  0.642857  0.0
-    1  1.0  1.000000  0.5
-    2  0.5  0.000000  1.0
-
-    >>> data = [{'x': -1, 'y': 0, 'z': 5}, {'x': 3, 'y': -15, 'z': 0}, {'x': 0, 'y': 1, 'z': -7}]
-    >>> print(task_func(data))
-          x       y         z
-    0  0.00  0.9375  1.000000
-    1  1.00  0.0000  0.583333
-    2  0.25  1.0000  0.000000
+    Example:
+    >>> text = "The quick brown fox jumps over the lazy dog and the dog was not that quick to respond."
+    >>> ngrams = task_func(text)
+    >>> print(ngrams)
+    Counter({('quick', 'brown'): 1, ('brown', 'fox'): 1, ('fox', 'jumps'): 1, ('jumps', 'lazy'): 1, ('lazy', 'dog'): 1, ('dog', 'dog'): 1, ('dog', 'quick'): 1, ('quick', 'respond'): 1})
     """
-    if not d:  # Check if the input list is empty
-        return pd.DataFrame(columns=['x', 'y', 'z'])  # Return an empty DataFrame with specified columns
-    df = pd.DataFrame(d)
-    scaler = MinMaxScaler()
-    scaled_df = pd.DataFrame(scaler.fit_transform(df[['x', 'y', 'z']]), columns=['x', 'y', 'z'])
-    return scaled_df
+    text = re.sub(r'[^\w\s]', '', text)  # Remove all punctuation
+    text = re.sub(r'\s+', ' ', text)  # Normalize whitespace
+    words = [word.lower() for word in text.split() if word.lower() not in STOPWORDS]
+    ngrams = zip(*[words[i:] for i in range(n)])
+    return Counter(ngrams)
 
 import unittest
+from collections import Counter
+import string
 class TestCases(unittest.TestCase):
-    
     def test_case_1(self):
-        data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
-        result = task_func(data)
-        expected_df = pd.DataFrame({'x': [0.0, 1.0, 0.5], 'y': [0.642857, 1.0, 0.0], 'z': [0.0, 0.5, 1.0]})
-        pd.testing.assert_frame_equal(result, expected_df)
-    
+        """
+        Test Case 1: Simple Text
+        - Input: A simple text string with no duplicated words or stopwords
+        - Expected Output: A Counter object with the count of each bigram
+        """
+        text = "The quick brown fox jumps over the lazy dog."
+        result = task_func(text)
+        expected = Counter({('quick', 'brown'): 1, ('brown', 'fox'): 1, ('fox', 'jumps'): 1, ('jumps', 'lazy'): 1, ('lazy', 'dog'): 1})
+        self.assertEqual(result, expected)
     def test_case_2(self):
-        data = [{'x': -1, 'y': 0, 'z': 5}, {'x': 3, 'y': -15, 'z': 0}, {'x': 0, 'y': 1, 'z': -7}]
-        result = task_func(data)
-        expected_df = pd.DataFrame({'x': [0.0, 1.0, 0.25], 'y': [0.9375, 0.0, 1.0], 'z': [1.0, 0.583333, 0.0]})
-        pd.testing.assert_frame_equal(result, expected_df)
-        
+        """
+        Test Case 2: Text with Duplicated Words
+        - Input: A text string with duplicated consecutive words
+        - Expected Output: A Counter object with the count of each bigram, excluding duplicated words
+        """
+        text = "This is is a simple simple test test."
+        result = task_func(text)
+        expected = Counter({('simple', 'simple'): 1, ('simple', 'test'): 1, ('test', 'test'): 1})
+        self.assertEqual(result, expected)
     def test_case_3(self):
-        data = []
-        result = task_func(data)
-        expected_df = pd.DataFrame(columns=['x', 'y', 'z'])
-        pd.testing.assert_frame_equal(result, expected_df)
-    
+        """
+        Test Case 3: Text with Stopwords
+        - Input: A text string with common English stopwords
+        - Expected Output: A Counter object with the count of each bigram, excluding stopwords
+        """
+        text = "This is a test of the function."
+        result = task_func(text)
+        expected = Counter({('test', 'function'): 1})
+        self.assertEqual(result, expected)
     def test_case_4(self):
-        data = [{'x': 1}, {'y': 2}, {'z': 3}]
-        result = task_func(data)
-        expected_df = pd.DataFrame({'x': [0.0, None, None], 'y': [None, 0.0, None], 'z': [None, None, 0.0]})
-        pd.testing.assert_frame_equal(result, expected_df)
-       
+        # This test involves punctuation; ensure punctuation handling is consistent with function logic
+        text = "Hello, world!"
+        result = task_func(text)
+        expected = Counter({
+            ('hello', 'world'): 1
+        })
+        self.assertEqual(result, expected)
     def test_case_5(self):
-        data = [{'x': 1, 'y': 2}, {'x': 3, 'z': 4}]
-        result = task_func(data)
-        expected_df = pd.DataFrame({'x': [0.0, 1.0], 'y': [0.0, None], 'z': [None, 0.0]})
-        pd.testing.assert_frame_equal(result, expected_df)
+        """
+        Test Case 5: Empty Text
+        - Input: An empty text string
+        - Expected Output: An empty Counter object
+        """
+        text = ""
+        result = task_func(text)
+        expected = Counter()
+        self.assertEqual(result, expected)

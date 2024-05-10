@@ -1,82 +1,127 @@
-import os
 import re
+from pathlib import Path
+import tarfile
 
-def task_func(pattern: str, replacement: str, directory: str) -> bool:
+# Constants
+PATTERN = r"(?<!Distillr)\\\\AcroTray\.exe"
+DIRECTORY = r"C:\\SomeDir\\"
+
+def task_func(directory=DIRECTORY, file_pattern=PATTERN):
     """
-    Renames all files in a directory that match a particular pattern with a given replacement string.
-    
+    Look for files that match the pattern of the regular expression '(? <! Distillr)\\\\ AcroTray\\.exe' in the directory 'C:\\ SomeDir\\'. If found, archive these files in a tar file.
+
     Parameters:
-        - pattern (str): The pattern to search for in the filenames.
-        - replacement (str): The string to replace the pattern with.
-        - directory (str): The directory in which to search for files.
-        
+    - directory: The directory to search for files matching a specified pattern. The function will iterate over all files within this directory, including subdirectories.
+    - file_pattern: A regular expression pattern used to match filenames. Files whose names match this pattern will be added to an archive (tar file).
+
     Returns:
-    - Returns a boolean value. True if the operation was successful, otherwise False.
-    
+    - str: Path to the created tar file.
+
     Requirements:
     - re
-    - os
+    - pathlib
+    - tarfile
 
-    Examples:
-    >>> task_func('draft', 'final', '/home/user/documents')
-    True
-    >>> task_func('tmp', 'temp', '/home/user/downloads')
-    False
+    Example:
+    >>> f_680('/path/to/source', '/path/to/target')
     """
-    try:
-        for file in os.listdir(directory):
-            if re.search(pattern, file):
-                new_filename = re.sub(pattern, replacement, file)
-                os.rename(os.path.join(directory, file), os.path.join(directory, new_filename))
-        return True
-    except Exception as e:
-        return False
+    tar_path = Path(directory) / 'archive.tar'
+    with tarfile.open(tar_path, 'w') as tar:
+        for path in Path(directory).rglob('*'):
+            if re.match(file_pattern, path.name):
+                try:
+                    tar.add(path, arcname=path.relative_to(directory))
+                except PermissionError as e:
+                    print(f"Skipping {path} due to permission error: {e}")
+    return str(tar_path)
 
 import unittest
 import tempfile
-import shutil
+import os
+import tarfile
 from pathlib import Path
+import shutil
 class TestCases(unittest.TestCase):
-    
     def setUp(self):
-        self.test_dir = tempfile.mkdtemp()
-        
+        # Setup directories and files for testing
+        self.source_dir = tempfile.mkdtemp()
+        self.valid_files = {
+            'test1.txt': 'content',
+            'test2.doc': 'content',
+            'AcroTray.exe': 'content',
+            'sample.exe': 'content'
+        }
+        for filename, content in self.valid_files.items():
+            with open(os.path.join(self.source_dir, filename), 'w') as f:
+                f.write(content)
+        self.test_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.test_dir.cleanup) 
+    def create_test_files(self, files):
+        """
+        Helper function to create test files in the temporary directory.
+        """
+        for file_name, content in files.items():
+            with open(os.path.join(self.test_dir.name, file_name), 'w') as f:
+                f.write(content)
     def tearDown(self):
-        shutil.rmtree(self.test_dir)
-    
-    def create_test_files(self, filenames):
-        for filename in filenames:
-            Path(f"{self.test_dir}/{filename}").touch()
-    
-    def test_renafiles(self):
-        self.create_test_files(["draft1.txt", "draft2.txt", "draft3.txt"])
-        result = task_func("draft", "final", self.test_dir)
-        self.assertTrue(result)
-        expected_files = sorted(["final1.txt", "final2.txt", "final3.txt"])
-        actual_files = sorted(os.listdir(self.test_dir))
-        self.assertEqual(expected_files, actual_files)
+        # Clean up the test directory
+        shutil.rmtree(self.source_dir)
+    def test_valid_files_archived(self):
+        # Setup files that should be archived
+        files = {'AcroTray.exe': 'content', 'Ignore.exe': 'ignore this'}
+        self.create_test_files(files)
+        pattern = r"AcroTray\.exe$"
         
-    def test_no_matching_files(self):
-        self.create_test_files(["file1.txt", "file2.txt", "file3.txt"])
-        result = task_func("draft", "final", self.test_dir)
-        self.assertTrue(result)
-        expected_files = sorted(["file1.txt", "file2.txt", "file3.txt"])
-        actual_files = sorted(os.listdir(self.test_dir))
-        self.assertEqual(expected_files, actual_files)
+        # Function to test
+        tar_file_path = task_func(self.test_dir.name, pattern)
         
-    def test_nonexistent_directory(self):
-        result = task_func("draft", "final", "/nonexistent/directory")
-        self.assertFalse(result)
+        # Verify correct files are archived
+        with tarfile.open(tar_file_path, 'r') as tar:
+            archived_files = [m.name for m in tar.getmembers()]
+            self.assertIn('AcroTray.exe', archived_files)
+    def test_no_matches(self):
+        # When no files match, the archive should be empty
+        tar_file_path = task_func(self.source_dir, r"non_matching_pattern")
+        with tarfile.open(tar_file_path, 'r') as tar:
+            self.assertEqual(len(tar.getmembers()), 0)
+    def test_with_subdirectories(self):
+        # Setup files in subdirectories
+        sub_dir = Path(self.test_dir.name) / 'subdir'
+        sub_dir.mkdir(parents=True, exist_ok=True)
+        file_name = 'AcroTray.exe'
+        file_path = sub_dir / file_name
+        with open(file_path, 'w') as f:
+            f.write('content')
+        pattern = r"AcroTray\.exe$"
         
+        # Function to test
+        tar_file_path = task_func(self.test_dir.name, pattern)
+        
+        # Verify correct files are archived
+        with tarfile.open(tar_file_path, 'r') as tar:
+            archived_files = [m.name for m in tar.getmembers()]
+            self.assertIn(os.path.join('subdir', 'AcroTray.exe'), archived_files)
     def test_empty_directory(self):
-        result = task_func("draft", "final", self.test_dir)
-        self.assertTrue(result)
-        self.assertEqual([], os.listdir(self.test_dir))
+        # If the directory is empty, the tar file should also be empty
+        empty_dir = tempfile.mkdtemp()
+        tar_file_path = task_func(empty_dir, PATTERN)
+        with tarfile.open(tar_file_path, 'r') as tar:
+            self.assertEqual(len(tar.getmembers()), 0)
+        shutil.rmtree(empty_dir)
+    def test_file_permission_issues(self):
+        # Setup a file with restricted permissions
+        file_name = 'AcroTray.exe'
+        file_path = os.path.join(self.test_dir.name, file_name)
+        with open(file_path, 'w') as f:
+            f.write('content')
+        os.chmod(file_path, 0o000)  # Make it unreadable
+        pattern = r"AcroTray\.exe$"
         
-    def test_complex_pattern_renaming(self):
-        self.create_test_files(["draft_file1.txt", "file_draft2.txt", "draft3file.txt"])
-        result = task_func("draft", "final", self.test_dir)
-        self.assertTrue(result)
-        expected_files = sorted(["final_file1.txt", "file_final2.txt", "final3file.txt"])
-        actual_files = sorted(os.listdir(self.test_dir))
-        self.assertEqual(expected_files, actual_files)
+        # Function to test
+        tar_file_path = task_func(self.test_dir.name, pattern)
+        
+        # Verify that files with permission issues are handled
+        with tarfile.open(tar_file_path, 'r') as tar:
+            archived_files = [m.name for m in tar.getmembers()]
+            self.assertNotIn('AcroTray.exe', archived_files)
+        os.chmod(file_path, 0o666)  # Restore permissions

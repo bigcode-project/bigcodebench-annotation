@@ -1,73 +1,137 @@
-from collections import Counter
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
 
 
-def task_func(list_of_menuitems):
+def task_func(data: pd.DataFrame) -> (pd.DataFrame, plt.Axes):
     """
-    Given a nested list of menu items, this function flattens the list and visualizes the frequency
-    of each menu item using a seaborn barplot.
+    Normalize the data and visualize it using a heatmap.
+
+    This function takes a pandas DataFrame, normalizes the data to a range [0, 1], and then visualizes this
+    normalized data using a seaborn heatmap.  The heatmap uses the "YlGnBu" colormap to represent normalized
+    values and includes a color bar labeled "Normalized Value" to indicate the range of data values.
+    It returns both the normalized data and the heatmap plot.
 
     Parameters:
-        list_of_menuitems (list): A nested list of menu items.
+    - data (pd.DataFrame): The input data with multiple features in columns.
 
     Returns:
-        matplotlib.axes.Axes: An Axes object representing the visualization, or None if there are no items to plot.
+    - pd.DataFrame: Normalized data.
+    - plt.Axes: Heatmap plot of the normalized data.
 
     Requirements:
-        - collections
-        - seaborn
-        - pandas
-        - matplotlib
-
+    - pandas
+    - numpy
+    - matplotlib.pyplot
+    - seaborn
+    
     Example:
-        >>> ax = task_func([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
-        >>> isinstance(ax, matplotlib.axes.Axes)
-        True
+    >>> df = pd.DataFrame([[1,1,1], [2,2,2], [3,3,3]], columns=['Feature1', 'Feature2', 'Feature3'])
+    >>> normalized_df, _ = task_func(df)
+    >>> type(normalized_df)
+    <class 'pandas.core.frame.DataFrame'>
+    >>> normalized_df['Feature1'].iloc[0]  # Returns a normalized value between 0 and 1
+    0.0
     """
-    if not list_of_menuitems or not any(list_of_menuitems):
-        print("No items to plot.")
-        return None
-    flat_list = [item for sublist in list_of_menuitems for item in sublist]
-    if not flat_list:
-        print("No items to plot.")
-        return None
-    counter = Counter(flat_list)
-    df = pd.DataFrame(counter.items(), columns=['Item', 'Count'])
-    if df.empty:
-        print("No items to plot.")
-        return None
-    sns.set(style="whitegrid")
-    ax = sns.barplot(x="Count", y="Item", data=df, palette="viridis")
-    plt.tight_layout()  # Adjust the layout to make room for the item labels
-    return ax
+    scaler = MinMaxScaler()
+    normalized_data = pd.DataFrame(scaler.fit_transform(data), columns=data.columns)
+    plt.figure(figsize=(10, 8))
+    ax = sns.heatmap(
+        normalized_data, cmap="YlGnBu", cbar_kws={"label": "Normalized Value"}
+    )
+    return normalized_data, ax
 
 import unittest
-import matplotlib
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Set up any repeated data here
-        self.menu_items = [['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']]
-    def test_return_type(self):
-        """Test that the function returns a matplotlib Axes object."""
-        ax = task_func(self.menu_items)
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
-    def test_empty_list(self):
-        """Test the function with an empty list, expecting None as there's nothing to plot."""
-        ax = task_func([])
-        self.assertIsNone(ax)
-    def test_single_item_list(self):
-        """Test the function with a list containing a single menu item."""
-        ax = task_func([['Pizza']])
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
-        # Checks for correct item count can be added if needed
-    def test_identical_items_list(self):
-        """Test the function with a list where all items are identical."""
-        ax = task_func([['Burger'], ['Burger'], ['Burger']])
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
-        # Could verify that 'Burger' is the only item and its count is correct
-    def test_multiple_items_same_count(self):
-        """Test the function with a list where multiple items have the same count."""
-        ax = task_func([['Soda', 'Water'], ['Soda', 'Water']])
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
+        np.random.seed(0)
+        # default columns used for testing, but function is not limited to these options
+        self.expected_columns = [
+            "Feature1",
+            "Feature2",
+            "Feature3",
+            "Feature4",
+            "Feature5",
+        ]
+    def _check_data_structure(self, data, expected_columns):
+        self.assertIsInstance(data, pd.DataFrame)
+        for col in data.columns:
+            self.assertIn(col, expected_columns)
+    def _check_data_value(self, data):
+        # Check if values in normalized data are between 0 and 1
+        # (allowing a small margin for precision issues)
+        self.assertTrue(((data.values >= -1e-10) & (data.values <= 1.00000001)).all())
+    def _check_heatmap(self, ax):
+        # Test visualization
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.collections), 1)  # 1 heatmap
+        cbar = ax.collections[0].colorbar
+        self.assertTrue(cbar is not None)
+        self.assertTrue(cbar.ax.get_ylabel(), "Normalized Value")
+        self.assertEqual(ax.collections[0].cmap.name, "YlGnBu")
+    def test_case_1(self):
+        # Test with random data
+        data = pd.DataFrame(
+            np.random.rand(100, 5),
+            columns=self.expected_columns,
+        )
+        normalized_data, ax = task_func(data)
+        self._check_data_structure(normalized_data, self.expected_columns)
+        self._check_data_value(normalized_data)
+        self._check_heatmap(ax)
+    def test_case_2(self):
+        # Test with data having all zeros
+        data = pd.DataFrame(
+            np.zeros((100, 5)),
+            columns=self.expected_columns,
+        )
+        normalized_data, ax = task_func(data)
+        self._check_data_structure(normalized_data, self.expected_columns)
+        self._check_heatmap(ax)
+        # Check if all values in normalized data are zero
+        self.assertTrue((normalized_data.values == 0).all())
+    def test_case_3(self):
+        # Test with data having incremental values
+        data = pd.DataFrame(
+            np.arange(500).reshape(100, 5),
+            columns=self.expected_columns,
+        )
+        normalized_data, ax = task_func(data)
+        self._check_data_structure(normalized_data, self.expected_columns)
+        self._check_data_value(normalized_data)
+        self._check_heatmap(ax)
+    def test_case_4(self):
+        # Test with data having decremental values
+        data = pd.DataFrame(
+            np.arange(500, 0, -1).reshape(100, 5),
+            columns=self.expected_columns,
+        )
+        normalized_data, ax = task_func(data)
+        self._check_data_structure(normalized_data, self.expected_columns)
+        self._check_data_value(normalized_data)
+        self._check_heatmap(ax)
+    def test_case_5(self):
+        # Test single valid column
+        data = pd.DataFrame(np.random.rand(100, 1), columns=["Feature1"])
+        normalized_data, ax = task_func(data)
+        self._check_data_structure(normalized_data, ["Feature1"])
+        self._check_data_value(normalized_data)
+        self._check_heatmap(ax)
+    def test_case_6(self):
+        # Test should fail when inputs are invalid - string column
+        data = pd.DataFrame(
+            {"Feature1": np.random.rand(100), "Feature2": ["string"] * 100}
+        )
+        with self.assertRaises(ValueError):
+            task_func(data)
+    def test_case_7(self):
+        # Test should fail when inputs are invalid - empty dataframe
+        data = pd.DataFrame()
+        with self.assertRaises(ValueError):
+            task_func(data)
+    def tearDown(self):
+        plt.close("all")

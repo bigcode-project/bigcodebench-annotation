@@ -1,104 +1,58 @@
-import re
 import pandas as pd
+from sklearn.cluster import DBSCAN
 
-def task_func(df: pd.DataFrame) -> int:
+def task_func(data, cols):
     """
-    Count the total number of brackets (i.e., '(', ')', '{', '}', '[', ']') in
-    a pandas DataFrame.
-
+    Perform DBSCAN clustering on the data by transforming it into a DataFrame and recording the clusters in a new column named 'Cluster'.
+    Please choose the parameters eps=3 and min_samples=2.
+    
     Parameters:
-    df (pandas.DataFrame): The DataFrame to process.
-
+    - data (list): List of lists with the data, where the length of the inner list equals the number of columns
+    - cols (list): List of column names
+    
     Returns:
-    int: The total number of brackets.
-
-    Raises:
-    TypeError: If input is not a DataFrame
+    - df (DataFrame): The DataFrame with a new 'Cluster' column.
 
     Requirements:
-    - re
     - pandas
-
-    Note:
-    The function uses a specific pattern '[(){}[\]]' to identify brackets.
+    - sklearn
 
     Example:
-    >>> df = pd.DataFrame({'A': ['(a)', 'b', 'c'], 'B': ['d', 'e', '(f)']})
-    >>> task_func(df)
-    4
-
-    >>> df = pd.DataFrame({'Test': ['(a)', 'b', '[[[[))c']})
-    >>> task_func(df)
-    8
+    >>> data = [[5.1, 3.5], [4.9, 3.0], [4.7, 3.2]]
+    >>> cols = ['x', 'y']
+    >>> df = task_func(data, cols)
+    >>> print(df)
+         x    y  Cluster
+    0  5.1  3.5        0
+    1  4.9  3.0        0
+    2  4.7  3.2        0
     """
-    if not isinstance(df, pd.DataFrame):
-        raise TypeError("df should be a DataFrame.")
-    BRACKETS_PATTERN = '[(){}[\]]'
-    return df.applymap(
-        lambda x: len(re.findall(BRACKETS_PATTERN, str(x)))
-        ).sum().sum()
+    df = pd.DataFrame(data, columns=cols)
+    dbscan = DBSCAN(eps=3, min_samples=2)
+    df['Cluster'] = dbscan.fit_predict(df)
+    return df
 
 import unittest
-import pandas as pd
-from faker import Faker
-fake = Faker()
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_wrong_input(self):
-        # test with non dataframe input
-        self.assertRaises(Exception, task_func, 1)
-        self.assertRaises(Exception, task_func, ['a'])
-        self.assertRaises(Exception, task_func, {'a': 1})
-        self.assertRaises(Exception, task_func, 'asdf')
     def test_case_1(self):
-        # Test with DataFrame containing no brackets
-        df = pd.DataFrame({
-            'A': [fake.word() for _ in range(5)],
-            'B': [fake.word() for _ in range(5)]
-        })
-        result = task_func(df)
-        self.assertEqual(result, 0)
+        df = task_func([[5.1, 3.5], [4.9, 3.0], [4.7, 3.2]], ['x', 'y'])
+        print(df)
+        self.assertTrue('Cluster' in df.columns)
+        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0])))
     def test_case_2(self):
-        # Test with DataFrame containing a few brackets
-        df = pd.DataFrame({
-            'A': ['(a)', 'b', 'c', '{d}', 'e'],
-            'B': ['f', '[g]', 'h', 'i', 'j']
-        })
-        result = task_func(df)
-        self.assertEqual(result, 6)
+        df = task_func([[1, 2], [3, 4], [5, 6]], ['x', 'y'])
+        self.assertTrue('Cluster' in df.columns)
+        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0])))
     def test_case_3(self):
-        # Test with DataFrame where every entry contains a bracket
-        df = pd.DataFrame({
-            'A': ['(a)', '{b}', '[c]', '(d)', '[e]'],
-            'B': ['{f}', '(g)', '[h]', '{i}', '(j)']
-        })
-        result = task_func(df)
-        self.assertEqual(result, 20)
+        df = task_func([[1, 2], [2, 2], [2, 3], [8, 7], [8, 8], [25, 80]], ['x', 'y'])
+        self.assertTrue('Cluster' in df.columns)
+        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0, 1, 1, -1])))
     def test_case_4(self):
-        # Test with DataFrame containing mixed characters and brackets
-        df = pd.DataFrame({
-            'A': ['(a1)', '{b2}', 'c3', 'd4', '[e5]'],
-            'B': ['f6', 'g7', '[h8]', 'i9', 'j0']
-        })
-        result = task_func(df)
-        self.assertEqual(result, 8)
+        df = task_func([[1, 2, 3], [2, 2, 2], [2, 3, 4], [8, 7, 6], [8, 8, 8], [25, 80, 100]], ['x', 'y', 'z'])
+        self.assertTrue('Cluster' in df.columns)
+        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0, 1, 1, -1])))
     def test_case_5(self):
-        # Test with DataFrame containing numbers, letters, and brackets
-        df = pd.DataFrame({
-            'A': ['(123]', '{{456}', '789', '0ab', '[cde]'],
-            'B': ['fgh', 'ijk', '[)lmn]', 'opq', 'rst']
-        })
-        result = task_func(df)
-        self.assertEqual(result, 10)
-    def test_empty(self):
-        # test with empty df
-        df = pd.DataFrame()
-        result = task_func(df)
-        self.assertEqual(result, 0)
-    def test_only(self):
-        # test df with only parenthesis as entries
-        df = pd.DataFrame({
-            'test': ['[[()]', '{}{{{{{{))))}}', '[]'],
-            'asdf': ['{]', '()))', '))}}]]']
-        })
-        result = task_func(df)
-        self.assertEqual(result, 33)
+        df = task_func([[-1, -2], [-2, -2], [-2, -3], [-8, -7], [-8, -8], [-25, -80]], ['x', 'y'])
+        self.assertTrue('Cluster' in df.columns)
+        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0, 1, 1, -1])))

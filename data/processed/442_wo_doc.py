@@ -1,115 +1,85 @@
-import sqlite3
-import pandas as pd
-import os
+import numpy as np
+import matplotlib.pyplot as plt
 
 
-def task_func(db_name, table_name, csv_path="data.csv"):
+def task_func(P, T):
     """
-    Read SQLite3 table via pandas and export to a CSV file.
+    Calculate the product of a matrix "P" and a 3D tensor "T" with numpy and then visualize the
+    result in 3D with matplotlib. The product of the matrix and tensor is based on the Einstein summation.
+    
+    Note:
+    This function only accepts numpy matrices/arrays.
 
     Parameters:
-    - db_name (str): The path to the SQLite3 database.
-    - table_name (str): The name of the table to export.
-    - csv_path (str, optional): The path where the CSV file will be saved. Defaults to 'data.csv'.
-
-    Requirements:
-    - sqlite3
-    - pandas
-    - os
+    P (numpy.ndarray): The input matrix with shape (N, 3), where N is the number of rows.
+    T (numpy.ndarray): The input tensor with shape (3, 3, 3).
 
     Returns:
-    str: The absolute path of the exported CSV file.
+    tuple:
+        - result (numpy.ndarray): The product of matrix P and tensor T with shape (N, 3).
+        - ax (mpl_toolkits.mplot3d.axes3d.Axes3D): The 3D visualization of the result.
+
+    Requirements:
+    - numpy
+    - matplotlib.pyplot
 
     Example:
-    >>> task_func('test.db', 'People')
-    'data.csv'
-    >>> task_func('/absolute/path/to/test.db', 'Orders', 'orders.csv')
-    '/absolute/path/to/orders.csv'
+    >>> P = np.array([[6, 2, 7], [1, 1, 8], [8, 7, 1]])
+    >>> T = np.random.rand(3, 3, 3)
+    >>> result, ax = task_func(P, T)
+    >>> type(result)
+    <class 'numpy.ndarray'>
+    >>> type(ax)
+    <class 'mpl_toolkits.mplot3d.axes3d.Axes3D'>
     """
-    try:
-        conn = sqlite3.connect(db_name)
-        df = pd.read_sql_query(f"SELECT * from {table_name}", conn)
-        df.to_csv(csv_path, index=False)
-        return os.path.abspath(csv_path)
-    finally:
-        conn.close()
+    if not (isinstance(P, np.ndarray) and isinstance(T, np.ndarray)):
+        raise TypeError("Expected inputs to be numpy arrays")
+    result = np.einsum("ij,jkl->ik", P, T)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection="3d")
+    ax.scatter(result[:, 0], result[:, 1], result[:, 2])
+    return result, ax
 
 import unittest
-import os
-import tempfile
-import shutil
-import sqlite3
-import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.temp_dir_obj = tempfile.TemporaryDirectory()
-        self.temp_dir = self.temp_dir_obj.name
-        self.db_path = os.path.join(self.temp_dir, "test.db")
-        # Setup the database and tables
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        # Create tables and insert some data
-        cursor.execute("CREATE TABLE People (Name TEXT, Age INTEGER)")
-        cursor.execute(
-            "INSERT INTO People VALUES ('Alice', 30), ('Bob', 25), ('Charlie', 35)"
-        )
-        cursor.execute("CREATE TABLE Orders (Product TEXT, Quantity INTEGER)")
-        cursor.execute(
-            "INSERT INTO Orders VALUES ('Widgets', 5), ('Gadgets', 10), ('Doodads', 15)"
-        )
-        conn.commit()
-        conn.close()
-    def tearDown(self):
-        self.temp_dir_obj.cleanup()
+        np.random.seed(0)
+        self.test_P = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        self.test_T = np.random.rand(3, 3, 3)
+    def check_result_correctness(self, P, T, result):
+        # Manually compute the expected result for the matrix-tensor product
+        expected_result = np.einsum("ij,jkl->ik", P, T)
+        return np.allclose(result, expected_result)
     def test_case_1(self):
-        # Test exporting the People table
-        csv_path = os.path.join(self.temp_dir, "data.csv")
-        output_path = task_func(self.db_path, "People", csv_path)
-        self.assertTrue(os.path.exists(output_path), "CSV file not created.")
-        df = pd.read_csv(output_path)
-        self.assertEqual(len(df), 3, "CSV contains incorrect number of rows.")
-        self.assertTrue("Alice" in df["Name"].values, "Expected data not found in CSV.")
+        # Test output visualization
+        _, ax = task_func(self.test_P, self.test_T)
+        self.assertIsInstance(ax, plt.Axes)
     def test_case_2(self):
-        # Test exporting the Orders table
-        csv_path = os.path.join(self.temp_dir, "orders.csv")
-        output_path = task_func(self.db_path, "Orders", csv_path)
-        self.assertTrue(os.path.exists(output_path), "CSV file not created.")
-        df = pd.read_csv(output_path)
-        self.assertEqual(len(df), 3, "CSV contains incorrect number of rows.")
-        self.assertTrue(5 in df["Quantity"].values, "Expected data not found in CSV.")
+        # Test result correctness
+        result, _ = task_func(self.test_P, self.test_T)
+        self.assertTrue(self.check_result_correctness(self.test_P, self.test_T, result))
+        self.assertEqual(result.shape, (self.test_P.shape[0], 3))
     def test_case_3(self):
-        # Test exporting with a custom CSV path
-        custom_path = os.path.join(self.temp_dir, "custom_data.csv")
-        output_path = task_func(self.db_path, "People", custom_path)
-        self.assertTrue(
-            os.path.exists(output_path), "CSV file not created at custom path."
-        )
-        self.assertEqual(
-            output_path,
-            os.path.abspath(custom_path),
-            "Returned path does not match expected path.",
-        )
+        # Test with zeros and negative values
+        P = np.array([[0, 0, 0]])
+        T = np.random.rand(3, 3, 3) - 0.5
+        result, _ = task_func(P, T)
+        self.assertTrue(np.all(result == 0))
     def test_case_4(self):
-        # Test with a non-existent database
+        # Test with non-numeric data
+        P = np.array([["a", "b", "c"], [1, 2, 3]])
         with self.assertRaises(Exception):
-            task_func(os.path.join(self.temp_dir, "nonexistent.db"), "People")
+            task_func(P, self.test_T)
     def test_case_5(self):
-        # Test with a non-existent table
-        with self.assertRaises(pd.io.sql.DatabaseError):
-            task_func(self.db_path, "NonexistentTable")
+        # Test incompatible shapes
+        P = np.array([[1, 2], [3, 4]])
+        with self.assertRaises(Exception):
+            task_func(P, self.test_T)
     def test_case_6(self):
-        # Test if the function overwrites an existing CSV file
-        csv_path = os.path.join(self.temp_dir, "data.csv")
-        with open(csv_path, "w") as file:
-            file.write("Old Content")
-        output_path = task_func(self.db_path, "People", csv_path)
-        self.assertTrue(os.path.exists(output_path), "CSV file not created.")
-        with open(output_path, "r") as file:
-            content = file.read()
-            self.assertNotEqual(
-                "Old Content", content, "Old content found in CSV. Overwriting failed."
-            )
-    def test_case_7(self):
-        # Test error handling with invalid CSV path
-        with self.assertRaises(OSError):
-            task_func(self.db_path, "People", "/nonexistent_path/data.csv")
+        # Test incompatible input types
+        with self.assertRaises(Exception):
+            task_func([1, 2], [2, 1])
+    def tearDown(self):
+        plt.close("all")

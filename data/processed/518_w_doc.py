@@ -1,140 +1,119 @@
-from random import choice
-import numpy as np
 import pandas as pd
+import numpy as np
+from sklearn.decomposition import PCA
 
 
-# Constants
-TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
-PENALTIES_COSTS = [100, 200, 300, 400, 500]
-
-
-def task_func(goals, penalties, teams=TEAMS, penalties_costs=PENALTIES_COSTS):
+def task_func(array: list, random_seed: int = 42) -> (pd.DataFrame, np.ndarray):
     """
-    Generates a performance report DataFrame for teams, detailing goals and penalties. For each team, the function fetches
-    goal and penalty counts, calculates 'Penalties Cost' using a random multiplier from a predefined list, and computes
-    a 'Performance Score' as the non-negative difference between goals and penalties. Return a Dataframe with colomns 'Team',
-    'Goals', 'Penalties', 'Penalties Cost' and 'Performance Score'.
+    Converts a 2D list into a pandas DataFrame and applies PCA for dimensionality reduction.
+
+    This function creates a DataFrame from the provided 2D list and then applies PCA to reduce the dataset
+    to its two main components. The function uses a fixed random seed to ensure reproducibility.
 
     Parameters:
-    - goals (dict): Team names as keys, numbers of goals scored as values.
-    - penalties (dict): Team names as keys, numbers of penalties incurred as values.
-    - teams (list, optioanl): input teams. Default value is ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
-    - penalties_costs (list, optional): input penalties_costs. Default value is [100, 200, 300, 400, 500].
+    - array (list of list of int): A 2D list representing data rows and columns.
+    - random_seed (int, optional): The seed for the random number generator. Default is 42.
 
     Returns:
-    - pd.DataFrame: DataFrame with Team, Goals, Penalties, Penalties Cost, Performance Score.
+    - pd.DataFrame: The original data in DataFrame format.
+    - np.ndarray: The data after PCA transformation.
 
     Requirements:
     - pandas
     - numpy
-    - random.choice
+    - sklearn.decomposition.PCA
 
-    Example:
-    >>> goals = {'Team A': 3, 'Team B': 2}
-    >>> penalties = {'Team A': 1, 'Team B': 0}
-    >>> report = task_func(goals, penalties)
+    Examples:
+    >>> data = [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
+    >>> df, transformed = task_func(data)
+    >>> print(df)
+        0   1   2   3   4
+    0   1   2   3   4   5
+    1   6   7   8   9  10
+    2  11  12  13  14  15
+    >>> print(transformed[:, 0])
+    [ 11.18033989  -0.         -11.18033989]
     """
-    report_data = []
-    for team in teams:
-        team_goals = goals.get(team, 0)
-        team_penalties = penalties.get(team, 0)
-        penalties_cost = team_penalties * choice(penalties_costs)
-        performance_score = np.max([0, team_goals - team_penalties])
-        report_data.append({
-            'Team': team,
-            'Goals': team_goals,
-            'Penalties': team_penalties,
-            'Penalties Cost': penalties_cost,
-            'Performance Score': performance_score
-        })
-    report_df = pd.DataFrame(report_data)
-    return report_df
+    df = pd.DataFrame(array)
+    pca = PCA(n_components=2, random_state=random_seed)
+    transformed_data = pca.fit_transform(df)
+    return df, transformed_data
 
 import unittest
-from unittest.mock import patch
+import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
-    @patch(__name__ + '.choice', return_value=400)
-    def test_goals_greater_than_penalties(self, mock_choice):
-        goals = {'Team A': 4, 'Team B': 2, 'Team C': 0, 'Team D': 0, 'Team E': 0}
-        penalties = {'Team A': 1, 'Team B': 1, 'Team C': 0, 'Team D': 0, 'Team E': 0}
-        expected_data = {
-            'Team': TEAMS,
-            'Goals': [4, 2, 0, 0, 0],
-            'Penalties': [1, 1, 0, 0, 0],
-            'Penalties Cost': [400, 400, 0, 0, 0],  # Mocked value is reflected here
-            'Performance Score': [3, 1, 0, 0, 0]  # Assuming Performance Score is Goals - Penalties
-        }
-        expected_df = pd.DataFrame(expected_data)
-        result_df = task_func(goals, penalties)
-        pd.testing.assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
-    @patch(__name__ + '.choice', return_value=200)
-    def test_some_teams_missing(self, mock_choice):
-        goals = {'Team A': 2, 'Team E': 5}
-        penalties = {'Team A': 0, 'Team E': 3}
-        expected_data = {
-            'Team': TEAMS,
-            'Goals': [2, 0, 0, 0, 5],
-            'Penalties': [0, 0, 0, 0, 3],
-            'Penalties Cost': [0, 0, 0, 0, 600],
-            'Performance Score': [2, 0, 0, 0, 2]
-        }
-        expected_df = pd.DataFrame(expected_data)
-        result_df = task_func(goals, penalties)
-        pd.testing.assert_frame_equal(result_df, expected_df)
-    @patch(__name__ + '.choice', return_value=500)
-    def test_penalties_greater_than_goals(self, mock_choice):
-        goals = {'Team B': 1, 'Team D': 2}
-        penalties = {'Team B': 3, 'Team D': 5}
-        expected_data = {
-            'Team': TEAMS,
-            'Goals': [0, 1, 0, 2, 0],
-            'Penalties': [0, 3, 0, 5, 0],
-            'Penalties Cost': [0, 1500, 0, 2500, 0],
-            'Performance Score': [0, 0, 0, 0, 0]
-        }
-        expected_df = pd.DataFrame(expected_data)
-        result_df = task_func(goals, penalties)
-        pd.testing.assert_frame_equal(result_df, expected_df)
-    @patch(__name__ + '.choice', return_value=300)
-    def test_all_teams_penalty(self, mock_choice):
-        goals = {'Team A': 0, 'Team B': 0, 'Team C': 0, 'Team D': 0, 'Team E': 0}
-        penalties = {'Team A': 2, 'Team B': 1, 'Team C': 3, 'Team D': 1, 'Team E': 4}
-        expected_penalties_cost = [penalty * mock_choice.return_value for penalty in penalties.values()]
-        expected_data = {
-            'Team': list(goals.keys()),  # The list of teams from the goals dictionary keys
-            'Goals': list(goals.values()),  # The list of goals from the goals dictionary values
-            'Penalties': list(penalties.values()),  # The list of penalties from the penalties dictionary values
-            'Penalties Cost': expected_penalties_cost,
-            'Performance Score': [0] * len(TEAMS)  # A list of zeros for performance score
-        }
-        expected_df = pd.DataFrame(expected_data)
-        result_df = task_func(goals, penalties)
-        pd.testing.assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
-    @patch(__name__ + '.choice', return_value=100)
-    def test_empty_goals_and_penalties(self, mock_choice):
-        goals = {}
-        penalties = {}
-        expected_data = {
-            'Team': TEAMS,
-            'Goals': [0, 0, 0, 0, 0],
-            'Penalties': [0, 0, 0, 0, 0],
-            'Penalties Cost': [0, 0, 0, 0, 0],
-            'Performance Score': [0, 0, 0, 0, 0]
-        }
-        expected_df = pd.DataFrame(expected_data)
-        result_df = task_func(goals, penalties)
-        pd.testing.assert_frame_equal(result_df, expected_df)
-    @patch(__name__ + '.choice', return_value=300)
-    def test_no_penalties(self, mock_choice):
-        goals = {'Team A': 3, 'Team B': 2}
-        penalties = {'Team A': 0, 'Team B': 0}
-        expected_data = {
-            'Team': ['Team A', 'Team B'] + ['Team C', 'Team D', 'Team E'],
-            'Goals': [3, 2] + [0, 0, 0],
-            'Penalties': [0, 0] + [0, 0, 0],
-            'Penalties Cost': [0, 0] + [0, 0, 0],
-            'Performance Score': [3, 2] + [0, 0, 0]
-        }
-        expected_df = pd.DataFrame(expected_data)
-        result_df = task_func(goals, penalties)
-        pd.testing.assert_frame_equal(result_df, expected_df)
+    def test_case_1(self):
+        # Test basic 2-row dataset
+        data = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (2, 2))
+    def test_case_2(self):
+        # Test basic 3-row dataset
+        data = [[10, 20, 30, 40, 50], [60, 70, 80, 90, 100], [110, 120, 130, 140, 150]]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (3, 2))
+    def test_case_3(self):
+        # Test mix of positive, negative, zero values
+        data = [[-1, -2, -3, -4, -5], [5, 6, 7, 8, 9], [0, 0, 0, 0, 0]]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (3, 2))
+    def test_case_4(self):
+        # Test 4-row dataset with incremental pattern
+        data = [
+            [5, 15, 25, 35, 45],
+            [55, 65, 75, 85, 95],
+            [105, 115, 125, 135, 145],
+            [155, 165, 175, 185, 195],
+        ]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (4, 2))
+    def test_case_5(self):
+        # Test uniform rows
+        data = [[10, 10, 10, 10, 10], [20, 20, 20, 20, 20], [30, 30, 30, 30, 30]]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (3, 2))
+    def test_case_6(self):
+        # Test single row (should fail since it's < n_components)
+        with self.assertRaises(ValueError):
+            data = [[1, 2, 3, 4, 5]]
+            task_func(data)
+    def test_case_7(self):
+        # Test large numbers
+        data = [[1000000000, 2000000000], [-1000000000, -2000000000]]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (2, 2))
+    def test_case_8(self):
+        # Test correctness of PCA
+        data = [[2, 3], [3, 4], [5, 6]]
+        _, transformed_data = task_func(data)
+        # Using the sklearn PCA output as the expected transformation
+        expected_transformation = np.array(
+            [
+                [-1.88561808e00, 1.93816421e-16],
+                [-4.71404521e-01, 3.32511118e-16],
+                [2.35702260e00, 2.21555360e-16],
+            ]
+        )
+        np.testing.assert_almost_equal(
+            transformed_data, expected_transformation, decimal=5
+        )
+    def test_case_9(self):
+        # Test floats
+        data = [[1.5, 2.5], [3.5, 4.5], [5.5, 6.5]]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (3, 2))

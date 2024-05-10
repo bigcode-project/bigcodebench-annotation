@@ -1,87 +1,88 @@
-import random
-from collections import Counter
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
 
-# Constants
-CARDS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 
-def task_func(x=1):
+def task_func(original):
     """
-    Draw x random 5-card poker hands from a 52-card pack (without suits) and return
-    the hands along with a counter of the drawn cards.
+    Given a list of tuples, extract numeric values, compute basic statistics, and 
+    generate a histogram with an overlaid probability density function (PDF).
 
     Parameters:
-    x (int, optional): Number of hands to draw. Default is 1.
+    original (list of tuples): Input list where each tuple's second element is a numeric value.
 
     Returns:
-    tuple: A tuple containing two elements:
-        - list of list str: Each inner list contains 5 strings, representing a 5-card poker hand.
-        - Counter: A counter of the drawn cards.
-
-
-    The output is random; hence, the returned list will vary with each call.
+    np.array: A numpy array of the extracted numeric values.
+    dict: Basic statistics for the array including mean, standard deviation, minimum, and maximum.
+    Axes: A matplotlib Axes object showing the histogram with overlaid PDF. The histogram 
+          is plotted with density set to True, alpha as 0.6, and bins set to 'auto' for automatic bin selection.
 
     Requirements:
-    - random
-    - collections.Counter
+    - numpy
+    - matplotlib.pyplot
+    - scipy.stats
 
     Example:
-    >>> random.seed(0)
-    >>> result = task_func(1)
-    >>> len(result[0][0])
-    5
-    >>> result[0][0][0] in CARDS
-    True
+    >>> original = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+    >>> arr, stats, ax = task_func(original)
+    >>> print(arr)
+    [1 2 3 4]
+    >>> print(stats)
+    {'mean': 2.5, 'std': 1.118033988749895, 'min': 1, 'max': 4}
     """
-    result = []
-    card_counts = Counter()
-    for i in range(x):
-        drawn = random.sample(CARDS, 5)
-        result.append(drawn)
-        card_counts.update(drawn)
-    return result, card_counts
+    arr = np.array([b for (a, b) in original])
+    computed_stats = {
+        'mean': np.mean(arr),
+        'std': np.std(arr),
+        'min': np.min(arr),
+        'max': np.max(arr)
+    }
+    fig, ax = plt.subplots()
+    ax.hist(arr, density=True, alpha=0.6, bins='auto', label='Histogram')
+    xmin, xmax = ax.get_xlim()
+    x = np.linspace(xmin, xmax, 100)
+    p = stats.norm.pdf(x, computed_stats['mean'], computed_stats['std'])
+    ax.plot(x, p, 'k', linewidth=2, label='PDF')
+    ax.set_title('Histogram with PDF')
+    ax.legend()
+    plt.close(fig)  # Close the plot to prevent display here
+    return arr, computed_stats, ax
 
 import unittest
-import random
+import doctest
 class TestCases(unittest.TestCase):
-    def test_hand_size(self):
-        """ Test if the hand contains exactly 5 cards. """
-        random.seed(0)
-        hand, _ = task_func()
-        self.assertEqual(len(hand[0]), 5)
-    
-    
-    def test_drawn_size(self):
-        random.seed(0)
-        hand, _ = task_func(2)
-        self.assertEqual(len(hand[0]), 5)
-        self.assertEqual(len(hand), 2)
-    
-    def test_counter(self):
-        random.seed(0)
-        hand, counter = task_func(1)
-        self.assertEqual(len(hand[0]), 5)
-        self.assertLessEqual(counter[hand[0][0]], 5)
-        self.assertGreaterEqual(counter[hand[0][0]], 1)
-    def test_card_uniqueness(self):
-        """ Test if all cards in the hand are unique. """
-        random.seed(0)
-        hand, _ = task_func()
-        self.assertEqual(len(hand[0]), len(set(hand[0])))
-    def test_valid_cards(self):
-        """ Test if all cards drawn are valid card values. """
-        random.seed(0)
-        hand, _ = task_func()
-        for card in hand[0]:
-            self.assertIn(card, ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'])
-    def test_randomness(self):
-        """ Test if multiple executions return different hands. """
-        random.seed(0)
-        hands = [task_func()[0][0] for _ in range(10)]
-        self.assertTrue(len(set(tuple(hand) for hand in hands[0])) > 1)
-    def test_card_distribution(self):
-        """ Test if all possible cards appear over multiple executions. """
-        random.seed(0)
-        all_cards = set()
-        for _ in range(1000):
-            all_cards.update(task_func()[0][0])
-        self.assertEqual(all_cards, set(['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']))
+    def test_case_1(self):
+        original = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+        arr, stats, ax = task_func(original)
+        self.assertTrue(isinstance(arr, np.ndarray))
+        self.assertEqual(list(arr), [1, 2, 3, 4])
+        self.assertEqual(stats, {'mean': 2.5, 'std': 1.118033988749895, 'min': 1, 'max': 4})
+        self.assertTrue(ax.get_title(), 'Histogram with PDF')
+    def test_case_2(self):
+        original = [('x', 10), ('y', 20)]
+        arr, stats, ax = task_func(original)
+        self.assertTrue(isinstance(arr, np.ndarray))
+        self.assertEqual(list(arr), [10, 20])
+        self.assertEqual(stats, {'mean': 15.0, 'std': 5.0, 'min': 10, 'max': 20})
+        self.assertTrue(ax.get_title(), 'Histogram with PDF')
+    def test_case_3(self):
+        original = [('p', -5), ('q', -10), ('r', -15)]
+        arr, stats, ax = task_func(original)
+        self.assertTrue(isinstance(arr, np.ndarray))
+        self.assertEqual(list(arr), [-5, -10, -15])
+        self.assertEqual(stats, {'mean': -10.0, 'std': 4.08248290463863, 'min': -15, 'max': -5})
+        self.assertTrue(ax.get_title(), 'Histogram with PDF')
+    def test_case_4(self):
+        original = [('m', 0), ('n', 0), ('o', 0)]
+        arr, stats, ax = task_func(original)
+        self.assertTrue(isinstance(arr, np.ndarray))
+        self.assertEqual(list(arr), [0, 0, 0])
+        self.assertEqual(stats, {'mean': 0.0, 'std': 0.0, 'min': 0, 'max': 0})
+        self.assertTrue(ax.get_title(), 'Histogram with PDF')
+    def test_case_5(self):
+        original = [('u', 5.5), ('v', 6.5), ('w', 7.5)]
+        arr, stats, ax = task_func(original)
+        self.assertTrue(isinstance(arr, np.ndarray))
+        self.assertEqual(list(arr), [5.5, 6.5, 7.5])
+        self.assertEqual(stats, {'mean': 6.5, 'std': 0.816496580927726, 'min': 5.5, 'max': 7.5})
+        self.assertTrue(ax.get_title(), 'Histogram with PDF')

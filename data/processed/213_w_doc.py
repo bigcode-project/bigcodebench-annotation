@@ -1,79 +1,79 @@
-import pandas as pd
 import numpy as np
+from operator import itemgetter
+import matplotlib.pyplot as plt
 
-# Constants
-COLUMNS = ['column1', 'column2', 'column3', 'column4', 'column5']
 
-def task_func(df, dct):
+def task_func(data):
     """
-    Replace certain values in a DataFrame with a dictionary mapping and calculate the Pearson correlation coefficient between each pair of columns.
-
+    Draw a scatter plot of dots and mark the point with the maximum y-value. Return the axes object as
+    well as the maximum y-value point. 
+    
     Parameters:
-    df (DataFrame): The input DataFrame, containing numeric or categorical data.
-    dct (dict): A dictionary for replacing values in df, where keys are existing values and values are new values.
-
+    data (list of tuples): A list where each tuple contains two floats representing x and y coordinates.
+    
     Returns:
-    DataFrame: A DataFrame with the correlation coefficients between each pair of columns. The format of the DataFrame is a square matrix with column and index labels matching the columns of the input DataFrame.
+    matplotlib.axes.Axes: Axes object with the scatter plot.
+    tuple: The point with the maximum y-value.
     
     Requirements:
-    - pandas
     - numpy
-    
-    Note:
-    - This function operates on DataFrames containing numeric or categorical data that can be replaced with numeric values, as correlation calculations require numeric data.
-    - This function using pearson method to calculate the correlation matrix.
-    
-    Raises:
-    - This function will raise a ValueError is input df is not a DataFrame.
-        
+    - operator
+    - matplotlib.pyplot
+
     Example:
-    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    >>> dct = {1: 10, 2: 20, 3: 30, 4: 40, 5: 50, 6: 60}
-    >>> correlation_matrix = task_func(df, dct)
-    >>> correlation_matrix.shape == (2, 2)
-    True
-    >>> np.allclose(correlation_matrix, np.array([[1.0, 1.0], [1.0, 1.0]]))
-    True
+    >>> ax, point = task_func([(0.1, 0.2), (0.5, 0.6), (0.3, 0.9)])
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("The input df is not a DataFrame")
-    df = df.replace(dct)
-    correlation_matrix = np.corrcoef(df.values, rowvar=False)
-    return pd.DataFrame(correlation_matrix, columns=df.columns, index=df.columns)
+    max_y_point = max(data, key=itemgetter(1))
+    points = np.array(data)
+    x = points[:,0]
+    y = points[:,1]
+    fig, ax = plt.subplots()
+    ax.scatter(x, y, label='Points')
+    ax.scatter(*max_y_point, color='red', label='Max Y Point')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_title('Points with Max Y Point Highlighted')
+    ax.legend()
+    return ax, max_y_point
 
 import unittest
-import pandas as pd
+import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test with simple numeric DataFrame
-        df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-        dct = {1: 10, 2: 20, 3: 30, 4: 40, 5: 50, 6: 60}
-        result = task_func(df, dct)
-        self.assertTrue(result.shape == (2, 2))
+        # Testing with three points where the third point has the highest y-value
+        ax, _ = task_func([(0.1, 0.2), (0.5, 0.6), (0.3, 0.9)])
+        self.assertEqual(ax.get_title(), 'Points with Max Y Point Highlighted')
+        self.assertEqual(ax.get_xlabel(), 'x')
+        self.assertEqual(ax.get_ylabel(), 'y')
+        
     def test_case_2(self):
-        # Test with DataFrame containing NaN values
-        df = pd.DataFrame({'A': [1, 2, None], 'B': [4, None, 6]})
-        dct = {1: 10, 2: 20, 4: 40, 6: 60}
-        result = task_func(df, dct)
-        self.assertTrue(result.isna().sum().sum() > 0)
+        # Testing with another set of points
+        ax, _ = task_func([(0.2, 0.3), (0.6, 0.7), (0.4, 0.8)])
+        self.assertEqual(ax.get_title(), 'Points with Max Y Point Highlighted')
+        self.assertEqual(ax.get_xlabel(), 'x')
+        self.assertEqual(ax.get_ylabel(), 'y')
+        
     def test_case_3(self):
-        # Test with DataFrame containing negative values
-        df = pd.DataFrame({'A': [-1, -2, -3], 'B': [-4, -5, -6]})
-        dct = {-1: 1, -2: 2, -3: 3, -4: 4, -5: 5, -6: 6}
-        result = task_func(df, dct)
-        self.assertTrue(result.shape == (2, 2))
+        # Testing with another set of points
+        ax, max_y_point = task_func([(0.3, 0.4), (0.7, 0.8), (0.5, 0.7)])
+        self.assertEqual(ax.get_title(), 'Points with Max Y Point Highlighted')
+        self.assertEqual(ax.get_xlabel(), 'x')
+        self.assertEqual(ax.get_ylabel(), 'y')
+        self.assertEqual(max_y_point, (0.7, 0.8))
+        
     def test_case_4(self):
-        # Test with DataFrame containing mixed data types
-        df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-        dct = {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5}
-        result = task_func(df, dct)
-        self.assertTrue(result.shape == (2, 2))
+        # Testing with another set of points
+        ax, max_y_point = task_func([(0.4, 0.5), (0.8, 0.9), (0.6, 0.6)])
+        self.assertEqual(ax.get_title(), 'Points with Max Y Point Highlighted')
+        self.assertEqual(ax.get_xlabel(), 'x')
+        self.assertEqual(ax.get_ylabel(), 'y')
+        self.assertEqual(max_y_point, (0.8, 0.9))
     def test_case_5(self):
-        # Test with larger DataFrame
-        df = pd.DataFrame({'A': range(10), 'B': range(10, 20), 'C': range(20, 30)})
-        dct = {i: i + 1 for i in range(30)}
-        result = task_func(df, dct)
-        self.assertTrue(result.shape == (3, 3))
-    def test_case_6(self):
-        with self.assertRaises(ValueError):
-            task_func("non_df", {})
+        # Testing with another set of points
+        ax, max_y_point = task_func([(0.5, 0.6), (0.9, 0.1), (0.7, 0.5)])
+        self.assertEqual(ax.get_title(), 'Points with Max Y Point Highlighted')
+        self.assertEqual(ax.get_xlabel(), 'x')
+        self.assertEqual(ax.get_ylabel(), 'y')
+        self.assertEqual(max_y_point, (0.5, 0.6))

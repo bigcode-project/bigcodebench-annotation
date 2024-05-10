@@ -1,105 +1,97 @@
-import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
-def task_func(list_of_lists):
+def task_func(array, features=None, seed=None):
     """
-    Generate a list of pandas Series objects, where each Series is indexed by the elements of a sub-list from `list_of_lists`.
-    Each Series contains unique integers starting from 1 and going up to the length of the respective sub-list. These integers
-    are shuffled randomly to create a unique ordering for each Series.
+    Shuffles the columns of a given 2D numpy array and visualizes it as a heatmap.
 
     Parameters:
-    - list_of_lists (list of list): This parameter is expected to be a list where each element is itself a list.
-      These inner lists are used as indices for the Series objects. Each inner list represents the index of one Series.
+    - array (ndarray): The 2D numpy array to shuffle and plot. It must not be empty.
+    - features (list of str, optional): Custom labels for the columns after shuffling.
+                                        If not specified, default numerical labels are used.
+                                        The list must match the number of columns in 'array'.
+    - seed (int, optional): Seed for the random number generator to ensure reproducibility of the shuffle.
 
     Returns:
-    - series_list (list of pandas.Series): This function returns a list. Each element in this list is a pandas Series object.
-      The Series objects are indexed by the elements of the sub-lists provided in `list_of_lists`. The values in each Series
-      are unique integers that are randomly shuffled.
+    - Axes: The matplotlib Axes object containing the heatmap.
+
+    Raises:
+    - ValueError: If 'features' is provided and does not match the number of columns in 'array'; and
+                  if 'array' is empty or not 2-dimensional.
 
     Requirements:
-    - pandas
     - numpy
+    - matplotlib.pyplot
+    - seaborn
+
+    Notes:
+    - This function uses the features list as labels for the heatmap's x-axis if features is provided;
+      otherwise, it defaults to strings of the numerical labels starting from 1 up to the number of
+      columns in the array.
 
     Example:
-    - Here's an example demonstrating how to use this function:
-      >>> import numpy as np
-      >>> np.random.seed(0)  # Setting a seed for reproducibility of the example
-      >>> series = task_func([['x', 'y', 'z'], ['a', 'b', 'c']])
-      >>> for s in series: print(s)
-      x    3
-      y    2
-      z    1
-      dtype: int64
-      a    3
-      b    1
-      c    2
-      dtype: int64
-
-    Note:
-    - The function uses numpy's random shuffle, which modifies the sequence in-place. Therefore, each call to the function
-      may produce different Series values unless the random seed is set beforehand.
+    >>> np.random.seed(0)
+    >>> array = np.random.rand(2, 5)
+    >>> ax = task_func(array, features=['A', 'B', 'C', 'D', 'E'], seed=1)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax.collections[0].get_array().data.flatten()
+    array([0.60276338, 0.71518937, 0.4236548 , 0.5488135 , 0.54488318,
+           0.891773  , 0.43758721, 0.38344152, 0.64589411, 0.96366276])
     """
-    series_list = []
-    for sublist in list_of_lists:
-        values = np.arange(1, len(sublist) + 1)
-        np.random.shuffle(values)
-        s = pd.Series(values, index=sublist)
-        series_list.append(s)
-    return series_list
+    if seed is not None:
+        np.random.seed(seed)
+    if array.size == 0 or len(array.shape) != 2:
+        raise ValueError("Input array must be 2-dimensional and non-empty.")
+    if features is not None and len(features) != array.shape[1]:
+        raise ValueError("Features list must match the number of columns in the array.")
+    shuffled_array = np.random.permutation(array.T).T
+    fig, ax = plt.subplots()
+    sns.heatmap(
+        shuffled_array,
+        xticklabels=features if features is not None else np.arange(array.shape[1]) + 1,
+        ax=ax,
+    )
+    return ax
 
 import unittest
-import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for the function task_func."""
-    def test_basic_functionality(self):
-        """Test basic functionality of the function."""
+    def setUp(self):
         np.random.seed(0)
-        input_data = [["x", "y", "z"], ["a", "b", "c"]]
-        result = task_func(input_data)
-        self.assertEqual(len(result), 2)
-        expected_indexes = [["x", "y", "z"], ["a", "b", "c"]]
-        for i, s in enumerate(result):
-            self.assertIsInstance(s, pd.Series)
-            self.assertListEqual(list(s.index), expected_indexes[i])
-    def test_different_lengths(self):
-        """Test with sub-lists of different lengths."""
-        np.random.seed(1)
-        input_data = [["m", "n"], ["p", "q", "r", "s"]]
-        result = task_func(input_data)
-        self.assertEqual(len(result), 2)
-        expected_indexes = [["m", "n"], ["p", "q", "r", "s"]]
-        for i, s in enumerate(result):
-            self.assertIsInstance(s, pd.Series)
-            self.assertListEqual(list(s.index), expected_indexes[i])
-    def test_single_element_list(self):
-        """Test with a single-element sub-list."""
-        np.random.seed(2)
-        input_data = [["a"]]
-        result = task_func(input_data)
-        self.assertEqual(len(result), 1)
-        expected_indexes = [["a"]]
-        for i, s in enumerate(result):
-            self.assertIsInstance(s, pd.Series)
-            self.assertListEqual(list(s.index), expected_indexes[i])
-    def test_mixed_lengths(self):
-        """Test with sub-lists of different lengths."""
-        np.random.seed(3)
-        input_data = [["x", "y", "z"], ["a", "b"]]
-        result = task_func(input_data)
-        self.assertEqual(len(result), 2)
-        expected_indexes = [["x", "y", "z"], ["a", "b"]]
-        for i, s in enumerate(result):
-            self.assertIsInstance(s, pd.Series)
-            self.assertListEqual(list(s.index), expected_indexes[i])
-    def test_multiple_series(self):
-        """Test with multiple sub-lists."""
-        np.random.seed(4)
-        input_data = [["x", "y"], ["a", "b"], ["m", "n", "o"]]
-        result = task_func(input_data)
-        self.assertEqual(len(result), 3)
-        expected_indexes = [["x", "y"], ["a", "b"], ["m", "n", "o"]]
-        for i, s in enumerate(result):
-            self.assertIsInstance(s, pd.Series)
-            self.assertListEqual(list(s.index), expected_indexes[i])
+        self.array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+        self.expected_labels = ["1", "2", "3", "4", "5"]
+    def test_default_features(self):
+        """Test heatmap with default features."""
+        ax = task_func(self.array)
+        xticklabels = [tick.get_text() for tick in ax.get_xticklabels()]
+        self.assertEqual(xticklabels, self.expected_labels)
+        self.assertTrue(len(ax.collections), 1)
+    def test_custom_features(self):
+        """Test heatmap with custom features."""
+        custom_labels = ["A", "B", "C", "D", "E"]
+        ax = task_func(self.array, features=custom_labels)
+        xticklabels = [tick.get_text() for tick in ax.get_xticklabels()]
+        self.assertEqual(xticklabels, custom_labels)
+        self.assertTrue(len(ax.collections), 1)
+    def test_features_mismatch(self):
+        """Test for error when features list does not match array dimensions."""
+        with self.assertRaises(ValueError):
+            task_func(self.array, features=["A", "B"])
+    def test_seed_reproducibility(self):
+        """Test if seeding makes shuffling reproducible."""
+        ax1 = task_func(self.array, seed=42)
+        ax2 = task_func(self.array, seed=42)
+        heatmap_data1 = ax1.collections[0].get_array().data
+        heatmap_data2 = ax2.collections[0].get_array().data
+        np.testing.assert_array_equal(heatmap_data1, heatmap_data2)
+    def test_empty_array(self):
+        """Test for handling an empty array."""
+        with self.assertRaises(ValueError):
+            task_func(np.array([]))
+    def tearDown(self):
+        """Cleanup plot figures after each test."""
+        plt.close("all")

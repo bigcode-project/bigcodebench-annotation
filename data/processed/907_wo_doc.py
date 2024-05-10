@@ -1,113 +1,91 @@
-import urllib.request
 import os
-import json
-import pandas as pd
+import glob
+import csv
 
-# Constants
-TARGET_JSON_FILE = "downloaded_file.json"
-
-
-def task_func(url):
+def task_func(directory_path, file_extension='.csv'):
     """
-    This function retrieves a JSON file from the given URL using urllib.request.urlretrieve,
-    temporarily saving it as 'downloaded_file.json'. It then opens and reads this file,
-    converts the JSON content into a pandas DataFrame, and finally deletes the temporary JSON file.
+    Reads all files with a specified extension in a given directory and returns their data in a dictionary.
+    - Reads all files with the specified extension in the given directory.
+    - Uses the filename without the extension as a key in the output dictionary.
+    - The value for each key is a list of rows from the file, where each row is represented as a list of values.
 
     Parameters:
-    url (str): The URL of the JSON file to be downloaded.
+    - directory_path (str): The path to the directory containing the files.
+    - file_extension (str, optional): The file extension to look for. Default is '.csv'.
 
     Returns:
-    pandas.DataFrame: A DataFrame constructed from the JSON data in the downloaded file.
+    - Returns a dictionary where each key is the filename (without extension) and the value is a list of rows from the file.
 
     Requirements:
-    - urllib.request
     - os
-    - json
-    - pandas
+    - glob
+    - csv
 
     Example:
-    >>> task_func('http://example.com/employees.json')
-        name  age           city
-    0  Alice   25       New York
-    1    Bob   30  San Francisco
+    >>> data = task_func('/home/user/data')
+    >>> print(data['file1'])
+    [['header1', 'header2'], ['row1_col1', 'row1_col2'], ['row2_col1', 'row2_col2']]
+    
+    >>> data = task_func('/home/user/data', '.txt')
+    >>> print(data)
+    {}
     """
-    urllib.request.urlretrieve(url, TARGET_JSON_FILE)
-    with open(TARGET_JSON_FILE, "r") as f:
-        data = json.load(f)
-    os.remove(TARGET_JSON_FILE)
-    return pd.DataFrame(data)
+    data = {}
+    for file in glob.glob(os.path.join(directory_path, '*' + file_extension)):
+        filename = os.path.splitext(os.path.basename(file))[0]
+        with open(file, 'r') as f:
+            reader = csv.reader(f)
+            data[filename] = list(reader)
+    return data
 
 import unittest
-import pandas as pd
-from unittest.mock import patch, mock_open
+import shutil
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
-    @patch("urllib.request.urlretrieve")
-    @patch("os.remove")
-    def test_sample_1(self, mock_remove, mock_urlretrieve):
-        """Test that the function returns the correct DataFrame for a given JSON file."""
-        url = "http://example.com/sample_1.json"
-        sample_data = '[{"name": "Alice", "age": 25, "city": "New York"}, {"name": "Bob", "age": 30, "city": "San Francisco"}]'
-        mock_urlretrieve.return_value = None
-        with patch("builtins.open", mock_open(read_data=sample_data)):
-            expected_df = pd.DataFrame(
-                [
-                    {"name": "Alice", "age": 25, "city": "New York"},
-                    {"name": "Bob", "age": 30, "city": "San Francisco"},
-                ]
-            )
-            result_df = task_func(url)
-            pd.testing.assert_frame_equal(result_df, expected_df)
-        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
-        mock_remove.assert_called_once_with("downloaded_file.json")
-    @patch("urllib.request.urlretrieve")
-    @patch("os.remove")
-    def test_sample_2(self, mock_remove, mock_urlretrieve):
-        """Test that the function returns the correct DataFrame for a given JSON file."""
-        url = "http://example.com/sample_2.json"
-        sample_data = '[{"product": "Laptop", "price": 1000}, {"product": "Mouse", "price": 20}, {"product": "Keyboard", "price": 50}]'
-        mock_urlretrieve.return_value = None
-        with patch("builtins.open", mock_open(read_data=sample_data)):
-            expected_df = pd.DataFrame(
-                [
-                    {"product": "Laptop", "price": 1000},
-                    {"product": "Mouse", "price": 20},
-                    {"product": "Keyboard", "price": 50},
-                ]
-            )
-            result_df = task_func(url)
-            pd.testing.assert_frame_equal(result_df, expected_df)
-        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
-        mock_remove.assert_called_once_with("downloaded_file.json")
-    @patch("urllib.request.urlretrieve")
-    @patch("os.remove")
-    def test_empty_json(self, mock_remove, mock_urlretrieve):
-        """Test that the function returns an empty DataFrame for an empty JSON file."""
-        url = "http://example.com/empty.json"
-        sample_data = "[]"
-        mock_urlretrieve.return_value = None
-        with patch("builtins.open", mock_open(read_data=sample_data)):
-            expected_df = pd.DataFrame()
-            result_df = task_func(url)
-            pd.testing.assert_frame_equal(result_df, expected_df)
-        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
-    @patch("urllib.request.urlretrieve")
-    def test_invalid_url(self, mock_urlretrieve):
-        """Test that the function raises an exception when the URL is invalid."""
-        url = "http://example.com/non_existent.json"
-        mock_urlretrieve.side_effect = Exception("URL retrieval failed")
-        with self.assertRaises(Exception):
-            task_func(url)
-        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
-    @patch("urllib.request.urlretrieve")
-    @patch("os.remove")
-    def test_invalid_json(self, mock_remove, mock_urlretrieve):
-        """Test that the function raises an exception when the JSON file is invalid."""
-        url = "http://example.com/invalid.json"
-        sample_data = "invalid json content"
-        mock_urlretrieve.return_value = None
-        with patch(
-            "builtins.open", mock_open(read_data=sample_data)
-        ), self.assertRaises(Exception):
-            task_func(url)
-        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
+    def setUp(self):
+        # create a directory with test files
+        os.mkdir('test_1')
+        with open('test_1/file1.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows([['header1', 'header2'], ['row1_col1', 'row1_col2'], ['row2_col1', 'row2_col2']])
+        os.mkdir('test_2')
+        with open('test_2/file2.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows([['name', 'age'], ['Alice', '30'], ['Bob', '40']])
+        os.mkdir('test_5')
+        with open('test_5/file3.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows([['subject', 'marks'], ['Math', '90'], ['Science', '85']])
+    def tearDown(self):
+        # remove the test directories
+        shutil.rmtree('test_1')
+        shutil.rmtree('test_2')
+        shutil.rmtree('test_5')
+    
+    def test_case_1(self):
+        # This test assumes the existence of a directory named 'task_func_data' with a CSV file 'file1.csv'
+        data = task_func('test_1')
+        self.assertIsInstance(data, dict)
+        self.assertIn('file1', data)
+        self.assertEqual(data['file1'], [['header1', 'header2'], ['row1_col1', 'row1_col2'], ['row2_col1', 'row2_col2']])
+    def test_case_2(self):
+        # This test checks explicit file_extension input
+        data = task_func('test_2', '.csv')
+        self.assertIsInstance(data, dict)
+        self.assertIn('file2', data)
+        self.assertEqual(data['file2'], [['name', 'age'], ['Alice', '30'], ['Bob', '40']])
+    def test_case_3(self):
+        # This test checks for a non-existent file extension, expecting an empty dictionary
+        data = task_func('test_3', '.txt')
+        self.assertIsInstance(data, dict)
+        self.assertEqual(len(data), 0)
+    def test_case_4(self):
+        # This test checks for a non-existent directory, expecting an empty dictionary
+        data = task_func('/nonexistent/directory')
+        self.assertIsInstance(data, dict)
+        self.assertEqual(len(data), 0)
+    def test_case_5(self):
+        # This test checks another file's presence and content in the dictionary
+        data = task_func('test_5')
+        self.assertIsInstance(data, dict)
+        self.assertIn('file3', data)
+        self.assertEqual(data['file3'], [['subject', 'marks'], ['Math', '90'], ['Science', '85']])

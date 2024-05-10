@@ -1,78 +1,58 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import seaborn as sns
+import codecs
+import random
+import struct
 
-PRODUCTS = ['Product' + str(i) for i in range(1, 6)]
-MONTHS = ['Month' + str(i) for i in range(1, 13)]
+KEYS = ['470FC614', '4A0FC614', '4B9FC614', '4C8FC614', '4D7FC614']
 
-
-def task_func():
+def task_func(hex_keys=KEYS):
     """
-    Generate a DataFrame representing monthly sales of products and visualize the total sales.
+    Generate a random float number from a list of hex strings and then encode the float number in utf-8.
 
-    The function creates a DataFrame where each row represents a month, each column represents a product,
-    and cell values represent sales figures. It then plots the total sales per product across all months
-    using both a line plot and a heatmap for visualization.
-
+    Parameters:
+    hex_keys (list of str): A list of hexadecimal strings to choose from.
+    
     Returns:
-    - pd.DataFrame: A DataFrame with randomly generated sales figures for each product over 12 months.
-
-    The function also displays:
-    - A line plot showing the total sales per product.
-    - A heatmap visualizing sales figures across products and months.
+    bytes: The utf-8 encoded float number.
 
     Requirements:
-    - pandas
-    - numpy
-    - matplotlib.pyplot
-    - seaborn
+    - struct
+    - codecs
+    - random
 
     Example:
-    >>> df = task_func()
-    >>> df.shape
-    (12, 5)
-    >>> all(df.columns == PRODUCTS)
-    True
-    >>> all(df.index == MONTHS)
-    True
-    >>> (df.values >= 100).all() and (df.values <= 1000).all()
-    True
+    >>> random.seed(42)
+    >>> task_func()
+    b'36806.078125'
     """
-    sales = np.random.randint(100, 1001, size=(len(MONTHS), len(PRODUCTS)))
-    df = pd.DataFrame(sales, index=MONTHS, columns=PRODUCTS)
-    total_sales = df.sum()
-    plt.figure(figsize=(10, 5))
-    total_sales.plot(kind='line', title='Total Sales per Product')
-    plt.ylabel('Total Sales')
-    plt.show()
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(df, annot=True, fmt="d", cmap='viridis')
-    plt.title('Monthly Sales per Product')
-    plt.show()
-    return df
+    hex_key = random.choice(hex_keys)
+    float_num = struct.unpack('!f', bytes.fromhex(hex_key))[0]
+    encoded_float = codecs.encode(str(float_num), 'utf-8')
+    return encoded_float
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_dataframe_shape(self):
-        """Test if the DataFrame has the correct shape."""
-        df = task_func()
-        self.assertEqual(df.shape, (12, 5))  # 12 months and 5 products
-    def test_dataframe_columns(self):
-        """Test if the DataFrame has the correct column names."""
-        df = task_func()
-        expected_columns = PRODUCTS
-        self.assertListEqual(list(df.columns), expected_columns)
-    def test_dataframe_index(self):
-        """Test if the DataFrame has the correct index."""
-        df = task_func()
-        expected_index = MONTHS
-        self.assertListEqual(list(df.index), expected_index)
-    def test_sales_range(self):
-        """Test if sales figures are within the expected range."""
-        df = task_func()
-        self.assertTrue((df >= 100).all().all() and (df <= 1000).all().all())
-    def test_returns_dataframe(self):
-        """Test if the function returns a pandas DataFrame."""
-        df = task_func()
-        self.assertIsInstance(df, pd.DataFrame)
+    def test_default_functionality(self):
+        """Test the function with default parameters."""
+        result = task_func()
+        self.assertIsInstance(result, bytes)  # Check if output is correctly encoded in UTF-8
+    def test_custom_hex_keys(self):
+        """Test the function with a custom list of hexadecimal keys."""
+        custom_keys = ['1A2FC614', '1B0FC614', '1C9FC614']
+        result = task_func(hex_keys=custom_keys)
+        self.assertIsInstance(result, bytes)
+    def test_empty_list(self):
+        """Test the function with an empty list."""
+        with self.assertRaises(IndexError):  # Assuming random.choice will raise IndexError on empty list
+            task_func(hex_keys=[])
+    def test_consistency_of_output(self):
+        """Ensure that the output is consistent with a fixed seed."""
+        random.seed(42)  # Set the seed for predictability
+        first_result = task_func()
+        random.seed(42)  # Reset seed to ensure same choice is made
+        second_result = task_func()
+        self.assertEqual(first_result, second_result)
+    def test_invalid_hex_key(self):
+        """Test with an invalid hex key."""
+        invalid_keys = ['ZZZZZZZZ', 'XXXX']
+        with self.assertRaises(ValueError):
+            task_func(hex_keys=invalid_keys)

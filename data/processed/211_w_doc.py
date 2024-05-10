@@ -1,85 +1,75 @@
-import pandas as pd
+import collections
+from operator import itemgetter
 import matplotlib.pyplot as plt
 
-def task_func(df, dct, columns=None, plot_histograms=False):
-    '''
-    Replace values in a DataFrame with a dictionary mapping and optionally record histograms for specified columns.
+
+def task_func(data):
+    """
+    Generate a bar plot showing the frequency of letters in the given dataset, 
+    and highlight the letter associated with the maximum integer value.
     
     Parameters:
-    df (DataFrame): The input DataFrame.
-    dct (dict): A dictionary for replacing values in df.
-    columns (list of str, optional): List of column names to plot histograms. If None, no histograms are plotted.
-    plot_histograms (bool): If True, plots histograms for specified columns.
+    data (list of tuples): A list where each tuple contains a letter (str) and an integer.
 
     Returns:
-    DataFrame: The DataFrame with replaced values. The columns are in the format of 'col1', 'col2', etc.
-
+    matplotlib.axes.Axes: The Axes object of the generated plot.
+    
     Requirements:
-    - pandas
+    - collections
+    - operator
     - matplotlib.pyplot
-    
-    Raises:
-    - The function will raise a ValueError is input df is not a DataFrame.
-    
-    Example:
-    >>> df = pd.DataFrame({'col1': [1, 2, 3, 4], 'col2': [5, 6, 7, 8], 'col3': [9, 10, 11, 12]})
-    >>> dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j', 11: 'k', 12: 'l'}
-    >>> modified_df = task_func(df, dct)
-    >>> modified_df
-      col1 col2 col3
-    0    a    e    i
-    1    b    f    j
-    2    c    g    k
-    3    d    h    l
-    '''
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("The input df is not a DataFrame")
-    df_replaced = df.replace(dct)
-    if plot_histograms and columns:
-        for column in columns:
-            if column in df_replaced:
-                df_replaced[column].plot.hist(bins=50)
-                plt.title(column)
-    return df_replaced
 
-import pandas as pd
+    Example:
+    >>> dataset = [('a', 10), ('b', 15), ('a', 5), ('c', 20)]
+    >>> ax = task_func(dataset)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    """
+    letter_counts = collections.Counter([item[0] for item in data])
+    max_value_letter = max(data, key=itemgetter(1))[0]
+    letters, counts = zip(*letter_counts.items())
+    plt.figure()
+    ax = plt.bar(letters, counts, label='Letter Counts')
+    if max_value_letter in letter_counts:
+        plt.bar(max_value_letter, letter_counts[max_value_letter], color='red', label='Max Value Letter')
+    plt.xlabel('Letter')
+    plt.ylabel('Count')
+    plt.title('Letter Counts with Max Value Letter Highlighted')
+    plt.legend()
+    return plt.gca()
+
 import unittest
-import matplotlib.pyplot as plt
+import doctest
 class TestCases(unittest.TestCase):
-    def test_basic_functionality(self):
-        df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
-        dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
-        expected_df = pd.DataFrame({'col1': ['a', 'b'], 'col2': ['c', 'd']})
-        result_df = task_func(df, dct)
-        pd.testing.assert_frame_equal(result_df, expected_df)
-        plt.close()
-    def test_complex_dataframe(self):
-        df = pd.DataFrame({'col1': [1, 2, 3, 4], 'col2': [5, 6, 7, 8], 'col3': [9, 10, 11, 12]})
-        dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j', 11: 'k', 12: 'l'}
-        expected_df = pd.DataFrame({'col1': ['a', 'b', 'c', 'd'], 'col2': ['e', 'f', 'g', 'h'], 'col3': ['i', 'j', 'k', 'l']})
-        result_df = task_func(df, dct)
-        pd.testing.assert_frame_equal(result_df, expected_df)
-        plt.close()
-    def test_empty_dataframe(self):
-        df = pd.DataFrame()
-        dct = {1: 'a', 2: 'b'}
-        result_df = task_func(df, dct)
-        pd.testing.assert_frame_equal(result_df, df)
-        plt.close()
-    def test_columns_not_in_dataframe(self):
-        df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
-        dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
-        result_df = task_func(df, dct, columns=['col3', 'col4'], plot_histograms=True)
-        pd.testing.assert_frame_equal(result_df, df.replace(dct))
-        plt.close()
-    def test_histogram_plotting(self):
-        df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
-        dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
-        result_df = task_func(df, dct, columns=['col3', 'col4'], plot_histograms=True)
-        # Since actual plot inspection is not feasible, assume histograms are correctly plotted if no errors are raised
-        pd.testing.assert_frame_equal(result_df, df.replace(dct))
-        plt.close()
-    def test_case_non_df(self):
-        with self.assertRaises(ValueError):
-            task_func("non_df", {})
-        plt.close()
+    def setUp(self):
+        self.data = [('a', 10), ('b', 15), ('a', 5), ('c', 20), ('b', 10)]
+        self.ax = task_func(self.data)
+    def test_case_1(self):
+        """Test if the number of bars in the plot matches the number of unique letters in the dataset."""
+        self.assertEqual(len([rect for rect in self.ax.patches]), len(set([item[0] for item in self.data]))+1)
+    def test_case_2(self):
+        """Test if the letter with the maximum value is correctly highlighted."""
+        max_value_letter = max(self.data, key=lambda item: item[1])[0]
+        for rect in self.ax.patches:
+            if rect.get_label() == 'Max Value Letter':
+                self.assertEqual(rect.get_x(), ord(max_value_letter) - ord('a'))
+    def test_case_3(self):
+        """Test if the plot has correct labels, title, and legend."""
+        self.assertEqual(self.ax.get_xlabel(), 'Letter')
+        self.assertEqual(self.ax.get_ylabel(), 'Count')
+        self.assertEqual(self.ax.get_title(), 'Letter Counts with Max Value Letter Highlighted')
+        self.assertTrue(self.ax.get_legend() is not None)
+    def test_case_4(self):
+        """Test if the frequency counts for each letter are correct."""
+        from collections import Counter
+        letter_freq = Counter([item[0] for item in self.data])
+        for rect in self.ax.patches:
+            if rect.get_label() == 'Letter Counts':
+                self.assertEqual(rect.get_height(), letter_freq[chr(int(rect.get_x()) + ord('a'))])
+    def test_case_5(self):
+        """Test if non-maximum value letters are not highlighted."""
+        max_value_letter = max(self.data, key=lambda item: item[1])[0]
+        non_max_letters = set([item[0] for item in self.data if item[0] != max_value_letter])
+        for rect in self.ax.patches:
+            if rect.get_label() == 'Letter Counts' and chr(int(rect.get_x()) + ord('a')) in non_max_letters:
+                self.assertNotEqual(rect.get_facecolor(), 'red')

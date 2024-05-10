@@ -1,61 +1,76 @@
-import csv
-import sys
+import os
+import pathlib
+from hashlib import md5
+import unicodedata
 
-def task_func(filename):
+def task_func(directory):
     """
-    Read a CSV file, inverse the order of the lines and write the inverted lines back into the file. Then reset the cursor to the beginning of the file.
+    Processes all files within the specified directory, normalizes their filenames to ASCII,
+    calculates their MD5 hashes, and retrieves their sizes. It returns a dictionary where
+    each key is the normalized file name and each value is another dictionary with the file's size
+    and MD5 hash. This method is useful for file integrity checks and file organization tasks.
 
     Parameters:
-    - filename (str): The name of the CSV file.
+    directory (str): The directory path whose files are to be analyzed.
 
     Returns:
-    - filename (str): The name of the CSV file.
+    dict: A dictionary where each key is a normalized file name, and the value is a dictionary
+          containing the 'Size' (in bytes) and 'MD5 Hash' of the file.
 
     Requirements:
-    - csv
-    - sys
+    - os
+    - pathlib
+    - hashlib.md5
+    - unicodedata
 
-    Example:
-    >>> task_func('file.csv')
-    'file.csv'
+    Examples:
+    >>> info = task_func('test')
+    >>> type(info) == dict
+    True
+    >>> 'test.txt' in info
+    True
     """
-    try:
-        with open(filename, 'r+') as file:
-            reader = csv.reader(file)
-            rows = list(reader)
-            file.seek(0)
-            file.truncate()
-            writer = csv.writer(file)
-            writer.writerows(reversed(rows))
-            file.seek(0)
-    except Exception as e:
-        print(f"An error occurred: {e}", file=sys.stderr)
-    return filename
+    files_info = {}
+    for file_path in pathlib.Path(directory).iterdir():
+        if file_path.is_file():
+            normalized_file_name = unicodedata.normalize('NFKD', file_path.name).encode('ascii', 'ignore').decode()
+            with open(file_path, 'rb') as file:
+                file_content = file.read()
+                file_hash = md5(file_content).hexdigest()
+            files_info[normalized_file_name] = {'Size': os.path.getsize(file_path), 'MD5 Hash': file_hash}
+    return files_info
 
 import unittest
 import os
+import tempfile
+import hashlib
 class TestCases(unittest.TestCase):
-    def base(self, filename, contents, expected):
-        # Create file
-        with open(filename, 'w') as file:
-            file.write(contents)
-        # Run function
-        task_func(filename)
-        # Check file
-        with open(filename, 'r') as file:
-            txt = file.read()
-            self.assertEqual(txt, expected)
-        # Remove file
-        os.remove(filename)
-    def test_case_1(self):
-        self.base('file.csv', "a,b\nc,d\ne,f\ng,h\n", "g,h\ne,f\nc,d\na,b\n")
-    
-    def test_case_2(self):
-        self.base('file.csv', "a,b,c\nd,e,f\ng,h,i\n", "g,h,i\nd,e,f\na,b,c\n")
-    def test_case_3(self):
-        self.base('file.csv', "a,b,c,d\ne,f,g,h\ni,j,k,l\n", "i,j,k,l\ne,f,g,h\na,b,c,d\n")
-    
-    def test_case_4(self):
-        self.base('file.csv', "a,b,c,d,e\nf,g,h,i,j\nk,l,m,n,o\n", "k,l,m,n,o\nf,g,h,i,j\na,b,c,d,e\n")
-    def test_case_5(self):
-        self.base('file.csv', "a,b,c,d,e,f\ng,h,i,j,k,l\nm,n,o,p,q,r\n", "m,n,o,p,q,r\ng,h,i,j,k,l\na,b,c,d,e,f\n")
+    def setUp(self):
+        # Setup a temporary directory with files for testing
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.test_file_path = os.path.join(self.temp_dir.name, "tést.txt")
+        with open(self.test_file_path, "w") as file:
+            file.write("Hello World")
+    def test_return_type(self):
+        result = task_func(self.temp_dir.name)
+        self.assertIsInstance(result, dict)
+    def test_file_presence(self):
+        result = task_func(self.temp_dir.name)
+        self.assertIn("test.txt", result)
+    def test_file_size(self):
+        result = task_func(self.temp_dir.name)
+        self.assertEqual(result["test.txt"]["Size"], 11)
+    def test_file_hash(self):
+        # This test could check the MD5 hash of a known file content
+        expected_hash = hashlib.md5("Hello World".encode()).hexdigest()
+        result = task_func(self.temp_dir.name)
+        normalized_file_name = "test.txt"
+        self.assertEqual(result[normalized_file_name]["MD5 Hash"], expected_hash)
+    def test_normalized_filename(self):
+        # This test could check for filename normalization (ASCII conversion)
+        result = task_func(self.temp_dir.name)
+        expected_name = "test.txt"
+        self.assertIn(expected_name, result)
+        self.assertNotIn("tést.txt", result)
+    def tearDown(self):
+        self.temp_dir.cleanup()

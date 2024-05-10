@@ -1,90 +1,74 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
+from random import sample
+import matplotlib.pyplot as plt
 
-def task_func(data, columns, target_column):
+
+# Constants
+COLUMNS = ['A', 'B', 'C', 'D', 'E']
+
+
+def task_func(df, tuples, n_plots):
     """
-    Perform a logistic regression on a DataFrame to predict a specific target column.
-    
+    Removes rows from a DataFrame based on values of multiple columns, 
+    and then create n random line plots of two columns against each other.
+
     Parameters:
-    - data (numpy.array): The input data as a NumPy array.
-    - columns (list): The list of column names.
-    - target_column (str): The target column name.
+    - df (pd.DataFrame): The input pandas DataFrame.
+    - tuples (list of tuple): A list of tuples, each tuple represents values in a row to be removed.
+    - n_plots (int): The number of line plots to generate.
 
     Returns:
-    - accuracy (float): The accuracy of the logistic regression model.
+    - (pd.DataFrame, list): A tuple containing the modified DataFrame and a list of plot details.
+      Each entry in the plot details list is a tuple containing the two columns plotted against each other.
 
     Requirements:
-    - pandas
-    - sklearn
-    
+    - matplotlib.pyplot
+    - random
+
     Example:
-    >>> import numpy as np
-    >>> np.random.seed(42)
-    >>> data = np.random.randint(0, 100, size=(100, 4))  # Using np to generate random data
-    >>> columns = ['A', 'B', 'C', 'target']
-    >>> task_func(data, columns, 'target')
-    0.0
+    >>> import numpy as np, pandas as pd
+    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
+    >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
+    >>> modified_df, plot_details = task_func(df, tuples, 3)
     """
-    df = pd.DataFrame(data, columns=columns)
-    if target_column not in df.columns:
-        raise ValueError('Target column does not exist in DataFrame')
-    X = df.drop(columns=target_column)  # Operate directly on the DataFrame
-    y = df[target_column]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    model = LogisticRegression(max_iter=200)
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    return accuracy
+    mask = df.apply(tuple, axis=1).isin(tuples)
+    df = df[~mask]
+    plot_details = []
+    for _ in range(min(n_plots, len(df))):
+        selected_columns = sample(COLUMNS, 2)
+        df.plot(x=selected_columns[0], y=selected_columns[1], kind='line')
+        plot_details.append((selected_columns[0], selected_columns[1]))
+    plt.show()
+    return df, plot_details
 
 import unittest
 import numpy as np
+import pandas as pd
+# Unit test class
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
-        data = np.array([[1, 4, 0], [2, 5, 1], [3, 6, 0]])
-        columns = ['A', 'B', 'C']
-        self.assertEqual(task_func(data, columns, 'C'), 0.0)
-    def test_case_2(self):
-        data = np.array([[1, 2, 3, -10], [4, 5, 6, -10], [1, 1, 1, 0]])
-        columns = ['A', 'B', 'C', 'D']
-        self.assertEqual(task_func(data, columns, 'C'), 0.0)
-    def test_case_3(self):
-        data = np.array([
-            [60, 45, 1],
-            [40, 55, 1],
-            [30, 71, 1],
-            [20, 82, 1],
-            [10, 95, 1],
-            [59, 40, 0],
-            [39, 60, 1],
-            [29, 70, 1],
-            [19, 80, 1],
-            [9,  89, 1]
-        ])
-        columns = ['A', 'B', 'C']
-        self.assertEqual(task_func(data, columns, 'C'), 1.0)
-    def test_case_4(self):
-        data = np.array([
-            [-10, 2, 3, -10],
-            [-10, 5, 6, 10],
-            [-10, -2, -1, -10],
-            [-10, 1, 0, -10],
-            [-10, 8, 9, 10],
-            [-10, -5, -4, -10]
-        ])
-        columns = ['A', 'B', 'C', 'D']
-        self.assertEqual(task_func(data, columns, 'D'), 1.0)
-    def test_case_5(self):
-        data = np.array([
-            [-10, 2, 3, -10, 1],
-            [-10, 5, 6, 10, 1],
-            [-10, -2, -1, -10, 1],
-            [-10, 1, 0, -10, 1],
-            [-10, 8, 9, 10, 1],
-            [-10, -5, -4, -10, 1]
-        ])
-        columns = ['A', 'B', 'C', 'D', 'E']
-        self.assertEqual(task_func(data, columns, 'D'), 1.0)
+    def setUp(self):
+        self.df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
+        self.tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
+    def test_basic_functionality(self):
+        modified_df, plot_details = task_func(self.df, self.tuples, 3)
+        # Convert DataFrame rows to tuples for comparison
+        df_tuples = set([tuple(x) for x in modified_df.to_numpy()])
+        # Convert list of tuples to a set for efficient searching
+        tuples_to_remove = set(self.tuples)
+        # Check that none of the tuples to remove are in the modified DataFrame
+        intersection = df_tuples.intersection(tuples_to_remove)
+        self.assertTrue(len(intersection) == 0, f"Removed tuples found in the modified DataFrame: {intersection}")
+    def test_empty_dataframe(self):
+        empty_df = pd.DataFrame(columns=list('ABCDE'))
+        modified_df, plot_details = task_func(empty_df, [], 1)
+        self.assertTrue(modified_df.empty)
+    def test_zero_plots(self):
+        modified_df, plot_details = task_func(self.df, [], 0)
+        self.assertEqual(len(plot_details), 0)
+    def test_more_plots_than_data(self):
+        modified_df, plot_details = task_func(self.df.iloc[:5], [], 10)
+        self.assertTrue(len(plot_details) <= 5)
+    def test_plot_details(self):
+        _, plot_details = task_func(self.df, [], 3)
+        self.assertEqual(len(plot_details), 3)
+        all_columns = all(c[0] in COLUMNS and c[1] in COLUMNS for c in plot_details)
+        self.assertTrue(all_columns)

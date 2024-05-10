@@ -1,38 +1,60 @@
-import heapq
-import collections
+from random import randint
+import matplotlib.pyplot as plt
+import numpy as np
 
-def task_func(x, n):
+
+def task_func(array_length=100):
     """
-    Find the n most common letters in a dictionary, x, where the key letters and the values are their frequencies.
+    Generate two arrays of random integers and draw a line diagram with the 
+    maximum values of the respective elements of the two arrays. Set 'Maximum Values' on its y-axis.
 
     Parameters:
-    - x (dict): The dictionary of letter frequencies.
-    - n (int): The number of most frequent letters to return.
+    - array_length (int): Length of the random arrays to be generated. Default is 100.
 
     Returns:
-    - list: The n most frequent letters.
+    - matplotlib.axes.Axes: Axes object with the plot.
 
     Requirements:
-    - heapq
-    - collections
+    - numpy
+    - matplotlib.pyplot
+    - random
 
     Example:
-    >>> task_func({'a': 1, 'b': 2, 'c': 3}, 2)
-    ['c', 'b']
+    >>> ax = task_func(100)
     """
-    counter = collections.Counter(x)
-    most_frequent = heapq.nlargest(n, counter.keys(), key=counter.get)
-    return most_frequent
+    array1 = np.array([randint(1, 100) for _ in range(array_length)])
+    array2 = np.array([randint(1, 100) for _ in range(array_length)])
+    max_values = np.maximum(array1, array2)
+    fig, ax = plt.subplots()
+    ax.plot(max_values)
+    ax.set_ylabel('Maximum Values')
+    return ax
 
 import unittest
+from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
+    
     def test_case_1(self):
-        self.assertEqual(task_func({'a': 1, 'b': 2, 'c': 3}, 2), ['c', 'b'])
-    def test_case_2(self):
-        self.assertEqual(task_func({'a': 1, 'b': 2, 'c': 3}, 1), ['c'])
-    def test_case_3(self):
-        self.assertEqual(task_func({'a': 1, 'b': 2, 'c': 3}, 3), ['c', 'b', 'a'])
-    def test_case_4(self):
-        self.assertEqual(task_func({'a': 1, 'b': 2, 'c': 3}, 0), [])
-    def test_case_5(self):
-        self.assertEqual(task_func({'a': 1, 'b': 2, 'c': 3}, 4), ['c', 'b', 'a'])
+        ax = task_func(50)
+        self.assertIsInstance(ax, Axes)
+        self.assertEqual(len(ax.lines[0].get_ydata()), 50)
+    def test_standard_functionality(self):
+        """Test the function with default array length."""
+        ax = task_func()
+        self.assertIsInstance(ax, plt.Axes)
+    def test_zero_length_array(self):
+        """Test the function with zero array length."""
+        ax = task_func(0)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines[0].get_ydata()), 0)  # Expect no data points in the plot
+    def test_non_default_length_array(self):
+        """Test the function with non-default array lengths."""
+        lengths = [50, 200]
+        for length in lengths:
+            ax = task_func(length)
+            self.assertIsInstance(ax, plt.Axes)
+            self.assertEqual(len(ax.lines[0].get_ydata()), length)
+    def test_plot_output(self):
+        """Verify the plot is generated and is of correct type."""
+        ax = task_func()
+        self.assertTrue(hasattr(ax, 'figure'), "Plot does not have associated figure attribute")

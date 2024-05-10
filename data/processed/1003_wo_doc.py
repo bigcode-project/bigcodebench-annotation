@@ -1,126 +1,93 @@
-from nltk.tokenize import RegexpTokenizer
-from string import punctuation
-import csv
-import os
+import pandas as pd
+import matplotlib.pyplot as plt
 
-PUNCTUATION = set(punctuation)
 
-def task_func(text, filename):
+def task_func(csv_file_path: str):
     """
-    Save all words in a text beginning with the "$" character in a CSV file, excluding any words that are solely composed of punctuation characters.
+    This function reads data from a CSV file, normalizes a specific column named 'column1', and then plots the normalized data.
+
+    - The title is created using Python's string formatting, aligning 'Plot Title' and 'Normalized Column 1' on either side of a 
+    colon, each padded to 20 characters.
+    - Similarly, the x-label is formatted with 'Index' and 'Normalized Value' on either side of a colon, 
+    each padded to 20 characters.
+    - The y-label is set in the same manner, with 'Frequency' and 'Normalized Value' on either side of a colon.
 
     Parameters:
-    text (str): The input text.
-    filename (str): The name of the CSV file to save the '$' words.
+    - csv_file_path (str): Path to the CSV file. The file must contain a column named 'column1'.
 
     Returns:
-    str: The absolute path of the saved CSV file.
-
-    Note:
-    - The header of the csv row is "Word"
+    - The matplotlib.axes.Axes object with the plot of the normalized data.
 
     Requirements:
-    - nltk.tokenize.RegexpTokenizer
-    - string.punctuation
-    - csv
-    - os
+    - pandas
+    - matplotlib
 
     Example:
-    >>> text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
-    >>> task_func(text, 'dollar_words.csv')
-    '/absolute/path/to/dollar_words.csv'
+    >>> ax = task_func('data.csv')
+    >>> ax.get_title()
+    "          Plot Title :  Normalized Column 1"
     """
-    punctuation_set = set(punctuation)
-    tokenizer = RegexpTokenizer(r'\$\w+')
-    dollar_prefixed_words = tokenizer.tokenize(text)
-    dollar_words = [word for word in dollar_prefixed_words if
-                          not all(char in punctuation_set for char in word[1:])]
-    with open(filename, 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(["Word"])
-        for word in dollar_words:
-            writer.writerow([word])
-    return os.path.abspath(filename)
+    df = pd.read_csv(csv_file_path)
+    mean = df["column1"].mean()
+    std = df["column1"].std()
+    df["column1_normalized"] = (df["column1"] - mean) / std
+    _, ax = plt.subplots()
+    ax.plot(df["column1_normalized"])
+    title = "%*s : %*s" % (20, "Plot Title", 20, "Normalized Column 1")
+    xlabel = "%*s : %*s" % (20, "Index", 20, "Normalized Value")
+    ylabel = "%*s : %*s" % (20, "Frequency", 20, "Normalized Value")
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    return ax
 
 import unittest
-import os
-import csv
-# Utility function to read the content of a CSV file
-def read_csv_content(file_path):
-    with open(file_path, 'r') as file:
-        reader = csv.reader(file)
-        return list(reader)
+from unittest.mock import patch
+import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.filenames = []
-        for i in range(1,7):
-            self.filenames.append("task_func_test_output_"+str(i)+".csv")
+    """Test cases for the task_func function."""
+    @patch("pandas.read_csv")
+    def test_title_format(self, mock_read_csv):
+        """Test that the function returns the correct title."""
+        # Mocking the DataFrame
+        mock_data = pd.DataFrame({"column1": np.random.rand(10)})
+        mock_read_csv.return_value = mock_data
+        ax = task_func("dummy_path")
+        expected_title = "          Plot Title :  Normalized Column 1"
+        self.assertEqual(ax.get_title(), expected_title)
+    @patch("pandas.read_csv")
+    def test_xlabel_format(self, mock_read_csv):
+        """Test that the function returns the correct xlabel."""
+        mock_data = pd.DataFrame({"column1": np.random.rand(10)})
+        mock_read_csv.return_value = mock_data
+        ax = task_func("dummy_path")
+        expected_xlabel = "               Index :     Normalized Value"
+        self.assertEqual(ax.get_xlabel(), expected_xlabel)
+    @patch("pandas.read_csv")
+    def test_ylabel_format(self, mock_read_csv):
+        """Test that the function returns the correct ylabel."""
+        mock_data = pd.DataFrame({"column1": np.random.rand(10)})
+        mock_read_csv.return_value = mock_data
+        ax = task_func("dummy_path")
+        expected_ylabel = "           Frequency :     Normalized Value"
+        self.assertEqual(ax.get_ylabel(), expected_ylabel)
+    @patch("pandas.read_csv")
+    def test_data_points_length(self, mock_read_csv):
+        """Test that the function returns the correct number of data points."""
+        mock_data = pd.DataFrame({"column1": np.random.rand(10)})
+        mock_read_csv.return_value = mock_data
+        ax = task_func("dummy_path")
+        line = ax.get_lines()[0]
+        self.assertEqual(len(line.get_data()[1]), 10)
+    @patch("pandas.read_csv")
+    def test_data_points_range(self, mock_read_csv):
+        """Test that the function returns the correct data points."""
+        mock_data = pd.DataFrame({"column1": np.random.rand(10)})
+        mock_read_csv.return_value = mock_data
+        ax = task_func("dummy_path")
+        line = ax.get_lines()[0]
+        data_points = line.get_data()[1]
+        self.assertTrue(all(-3 <= point <= 3 for point in data_points))
     def tearDown(self):
-        # Clean up the test file
-        for filename in self.filenames:
-            if os.path.exists(filename):
-                os.remove(filename)
-    def test_case_1(self):
-        text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
-        filename = self.filenames[0]
-        result_path = task_func(text, filename)
-        
-        # Check if the returned path is correct
-        self.assertTrue(os.path.exists(result_path))
-        
-        # Check the contents of the CSV file
-        content = read_csv_content(result_path)
-        expected_content = [["Word"], ["$abc"], ["$efg"], ["$hij"], ["$abc"], ["$abc"], ["$hij"], ["$hij"]]
-        self.assertEqual(content, expected_content)
-        
-    def test_case_2(self):
-        text = "$hello world $this is a $test"
-        filename = self.filenames[1]
-        result_path = task_func(text, filename)
-        
-        # Check if the returned path is correct
-        self.assertTrue(os.path.exists(result_path))
-        
-        # Check the contents of the CSV file
-        content = read_csv_content(result_path)
-        expected_content = [["Word"], ["$hello"], ["$this"], ["$test"]]
-        self.assertEqual(content, expected_content)
-        
-    def test_case_3(self):
-        text = "There are no dollar words here"
-        filename = self.filenames[2]
-        result_path = task_func(text, filename)
-        
-        # Check if the returned path is correct
-        self.assertTrue(os.path.exists(result_path))
-        
-        # Check the contents of the CSV file (it should only have the header)
-        content = read_csv_content(result_path)
-        expected_content = [["Word"]]
-        self.assertEqual(content, expected_content)
-    
-    def test_case_4(self):
-        text = "$word1 $word2 $word3 $word4 $word5"
-        filename = self.filenames[3]
-        result_path = task_func(text, filename)
-        
-        # Check if the returned path is correct
-        self.assertTrue(os.path.exists(result_path))
-        
-        # Check the contents of the CSV file
-        content = read_csv_content(result_path)
-        expected_content = [["Word"], ["$word1"], ["$word2"], ["$word3"], ["$word4"], ["$word5"]]
-        self.assertEqual(content, expected_content)
-        
-    def test_case_5(self):
-        text = "No dollar words but containing special characters @ # % & *"
-        filename = self.filenames[4]
-        result_path = task_func(text, filename)
-        
-        # Check if the returned path is correct
-        self.assertTrue(os.path.exists(result_path))
-        
-        # Check the contents of the CSV file (it should only have the header)
-        content = read_csv_content(result_path)
-        expected_content = [["Word"]]
-        self.assertEqual(content, expected_content)
+        plt.clf()

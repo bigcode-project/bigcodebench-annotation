@@ -1,66 +1,76 @@
-import os
-import random
+import unicodedata
+import requests
 
-def task_func(directory, n_files):
+URL = 'https://api.github.com/users/'
+
+def task_func(username):
     """
-    Create n random txt files in a specific directory, write only a single digit random integer into each file, and then reset the cursor to the beginning of each file.
-    The file names start from 'file_1.txt' and increment by 1 for each file.
-    
+    Retrieves user information from the GitHub API for a given username, normalizes all string data to ASCII,
+    and returns a dictionary of the normalized data. This function demonstrates data retrieval from a web API
+    and handling of Unicode data normalization.
+
     Parameters:
-    - directory (str): The directory in which to generate the files.
-    - n_files (int): The number of files to generate.
+    username (str): The GitHub username.
 
     Returns:
-    - n_files (int): The number of files generated.
+    dict: A dictionary with the user's data, where all string values are normalized to ASCII.
+
+    Raises:
+    requests.exceptions.HTTPError: For any HTTP response indicating an error.
 
     Requirements:
-    - os
-    - random
+    - unicodedata
+    - requests
 
-    Example:
-    >>> random.seed(2)
-    >>> task_func('/path/to/directory', 5)
-    5
+    Examples:
+    >>> result = task_func('torvalds')
+    >>> isinstance(result, dict)
+    True
+    >>> 'login' in result
+    True
     """
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    for i in range(n_files):
-        filename = os.path.join(directory, f"file_{i+1}.txt")
-        with open(filename, 'w') as file:
-            file.write(str(random.randint(0, 9)))
-            file.seek(0)
-    return n_files
+    response = requests.get(URL + username)
+    try:
+        response.raise_for_status()  # This will raise an HTTPError if the response was an error
+        user_data = response.json()
+    except requests.exceptions.HTTPError as e:
+        error_msg = f"Failed to fetch user data for '{username}'. HTTP status: {e.response.status_code} - {e.response.reason}."
+        raise Exception(error_msg) from e
+    normalized_user_data = {}
+    for key, value in user_data.items():
+        if isinstance(value, str):
+            normalized_value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode()
+            normalized_user_data[key] = normalized_value
+        else:
+            normalized_user_data[key] = value
+    return normalized_user_data
 
 import unittest
-import shutil
+from unittest.mock import patch, Mock
+import requests
 class TestCases(unittest.TestCase):
-    def base(self, dir, n_files, contents):
-        random.seed(42)
-        # Create directory
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        # Run function
-        n = task_func(dir, n_files)
-        # Check files
-        self.assertEqual(n, n_files)
-        read_data = []
-        for f in sorted(os.listdir(dir)):
-            self.assertTrue(f.endswith('.txt'))
-            with open(os.path.join(dir, f), 'r') as file:
-                read_data.append(file.read())
-                file.seek(0)
-        self.assertEqual(read_data, contents)
-    def tearDown(self):
-        shutil.rmtree('./directory', ignore_errors=True)
-        shutil.rmtree('./dir', ignore_errors=True)
-        shutil.rmtree('./d', ignore_errors=True)
-    def test_case_1(self):
-        self.base('./directory', 5, ['1', '0', '4', '3', '3'])
-    def test_case_2(self):
-        self.base('./dir', 10, ['1', '9', '0', '4', '3', '3', '2', '1', '8', '1'])
-    def test_case_3(self):
-        self.base('./d', 15, ['1', '9', '6', '0', '0', '1', '3', '0', '4', '3', '3', '2', '1', '8', '1'])
-    def test_case_4(self):
-        self.base('./d', 20, ['1', '9', '6', '0', '0', '1', '3', '3', '8', '9', '0', '0', '8', '4', '3', '3', '2', '1', '8', '1'])
-    def test_case_5(self):
-        self.base('./directory', 25, ['1', '9', '6', '0', '0', '1', '3', '3', '8', '9', '0', '0', '8', '3', '8', '6', '3', '7', '4', '3', '3', '2', '1', '8', '1'])
+    @patch('requests.get')
+    def test_return_type(self, mock_get):
+        mock_get.return_value.json.return_value = {'login': 'user', 'name': 'Test User'}
+        result = task_func('user')
+        self.assertIsInstance(result, dict)
+    @patch('requests.get')
+    def test_normalized_string(self, mock_get):
+        mock_get.return_value.json.return_value = {'login': 'user', 'name': 'Tést Üser'}
+        result = task_func('user')
+        self.assertEqual(result['name'], 'Test User')
+    @patch('requests.get')
+    def test_non_string_values(self, mock_get):
+        mock_get.return_value.json.return_value = {'login': 'user', 'id': 12345}
+        result = task_func('user')
+        self.assertEqual(result['id'], 12345)
+    @patch('requests.get')
+    def test_empty_username(self, mock_get):
+        mock_get.return_value.json.return_value = {}
+        result = task_func('')
+        self.assertEqual(result, {})
+    @patch('requests.get')
+    def test_error_response(self, mock_get):
+        mock_get.return_value.raise_for_status = Mock(side_effect=requests.exceptions.HTTPError("404 Not Found"))
+        with self.assertRaises(Exception) as context:
+            task_func('nonexistentuser')

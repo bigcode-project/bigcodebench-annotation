@@ -1,65 +1,118 @@
 import pandas as pd
-from random import uniform
+from sklearn.preprocessing import StandardScaler
 
 
-def task_func(n_data_points=1000, min_value=0.0, max_value=10.0, column_name='Value'):
+
+# Constants
+FEATURES = ['feature1', 'feature2', 'feature3', 'feature4', 'feature5']
+TARGET = 'target'
+
+def task_func(df, dict_mapping, plot_histogram=False):
     """
-    Generate a random dataset of floating-point numbers, truncate each value to 3 decimal places, then return the generated DataFrame with
-    the specified column name.
+    Pre-processes a DataFrame by replacing values according to a dictionary mapping, standardizing specified features, 
+    and optionally drawing a histogram of the target variable.
 
     Parameters:
-    n_data_points (int, optional): The number of data points to generate. Default is 1000.
-    min_value (float, optional): The minimum value for the generated data. Default is 0.0.
-    max_value (float, optional): The maximum value for the generated data. Default is 10.0.
-    column_name (str, optional): The column name in generated DataFrame. Default is 'Value'.
-
+    - df (DataFrame): The input DataFrame to be preprocessed. It should contain columns named as in FEATURES and TARGET.
+    - dict_mapping (dict): A dictionary for replacing values in df. The keys should correspond to existing values in df.
+    - plot_histogram (bool, optional): If True, a histogram of the target variable is displayed. Default is False.
 
     Returns:
-    DataFrame: A pandas DataFrame with the generated data.
-    
+    - DataFrame: The preprocessed DataFrame with standardized features and values replaced as per dict_mapping.
+    - Axes: The histogram of the target variable if plot_histogram is True, otherwise None.
+
+    Raises:
+    - The function will raise ValueError if the FEATURES and TARGET columns not in the input DataFrame.
+    - The function will raise ValueError if the input df is not a DataFrame.
+
     Requirements:
     - pandas
-    - random.uniform
+    - sklearn.preprocessing.StandardScaler
 
     Example:
-    >>> random.seed(0)
-    >>> data = task_func()
-    >>> data.shape[0]
-    1000
+    >>> df = pd.DataFrame({'feature1': [1, 2, 3], 'feature2': [4, 5, 6], 'feature3': [7, 8, 9],'feature4': [10, 11, 12], 'feature5': [13, 14, 15], 'target': [0, 1, 1]})
+    >>> dict_mapping = {1: 11, 0: 22}
+    >>> isinstance(task_func(df, dict_mapping, plot_histogram=True)[1], plt.Axes)
+    True
+    >>> plt.close()
     """
-    data = [round(uniform(min_value, max_value), 3) for _ in range(n_data_points)]
-    data_df = pd.DataFrame(data, columns=[column_name])
-    return data_df
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("Input df is not a DataFrame.")
+    required_columns = FEATURES + [TARGET]
+    missing_columns = [col for col in required_columns if col not in df.columns]
+    if missing_columns:
+        raise ValueError(f"Missing columns in DataFrame: {missing_columns}")
+    df = df.replace(dict_mapping)
+    scaler = StandardScaler()
+    df[FEATURES] = scaler.fit_transform(df[FEATURES])
+    if plot_histogram:
+        ax = df[TARGET].plot.hist(bins=50)
+        return df, ax
+    else:
+        return df, None
 
 import unittest
-import random
+import pandas as pd
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_dataframe_type(self):
-        """Test if the returned object is a pandas DataFrame."""
-        random.seed(0)
-        result = task_func()
-        self.assertIsInstance(result, pd.DataFrame, "Returned object is not a pandas DataFrame")
-    def test_dataframe_size(self):
-        """Test if the DataFrame contains the correct number of data points."""
-        random.seed(0)
-        result = task_func()
-        self.assertEqual(len(result), 1000, "DataFrame does not contain 1000 data points")
-    def test_value_range(self):
-        """Test if values are within the specified range."""
-        random.seed(0)
-        result = task_func(100)
-        for value in result['Value']:
-            self.assertGreaterEqual(value, 0.0, "Value is less than 0.0")
-            self.assertLessEqual(value, 10.0, "Value is greater than 10.0")
-    def test_decimal_precision(self):
-        """Test if values have up to 3 decimal places."""
-        random.seed(0)
-        result = task_func(10, 5.0, 8.0)
-        for value in result['Value']:
-            self.assertLessEqual(len(str(value).split('.')[1]), 3, "Value does not have up to 3 decimal places")
-    def test_dataframe_columns(self):
-        """Test if the DataFrame has the correct column name."""
-        random.seed(0)
-        column_name = 'User'
-        result = task_func(10, 5.0, 8.0, column_name)
-        self.assertIn(column_name, result.columns, "DataFrame does not have a column named "+column_name)
+    def test_value_replacement(self):
+        df = pd.DataFrame({
+            'feature1': [1, 2, 3],
+            'feature2': [4, 5, 6],
+            'feature3': [7, 8, 9],
+            'feature4': [10, 11, 12],
+            'feature5': [13, 14, 15],
+            'target': [0, 1, 1]
+        })
+        dict_mapping = {1: 11, 0: 22}
+        result_df, _ = task_func(df, dict_mapping)
+        self.assertTrue(11 in result_df.values)
+        self.assertTrue(22 in result_df.values)
+    def test_feature_standardization(self):
+        df = pd.DataFrame({
+            'feature1': [1, 2, 3],
+            'feature2': [4, 5, 6],
+            'feature3': [7, 8, 9],
+            'feature4': [10, 11, 12],
+            'feature5': [13, 14, 15],
+            'target': [0, 1, 1]
+        })
+        result_df, _ = task_func(df, {})
+        for feature in ['feature1', 'feature2', 'feature3', 'feature4', 'feature5']:
+            self.assertAlmostEqual(result_df[feature].mean(), 0, places=1)
+            self.assertAlmostEqual(int(result_df[feature].std()), 1, places=1)
+    def test_no_histogram_plotting(self):
+        df = pd.DataFrame({
+            'feature1': [1, 2, 3],
+            'feature2': [4, 5, 6],
+            'feature3': [7, 8, 9],
+            'feature4': [10, 11, 12],
+            'feature5': [13, 14, 15],
+            'target': [0, 1, 1]
+        })
+        result, _ = task_func(df, {}, plot_histogram=False)
+        self.assertIsInstance(result, pd.DataFrame)
+    def test_missing_features_handling(self):
+        df = pd.DataFrame({
+            'feature1': [1, 2, 3],
+            'target': [0, 1, 1]
+        })
+        with self.assertRaises(ValueError):
+            task_func(df, {})
+    def test_histogram_plotting(self):
+        df = pd.DataFrame({
+            'feature1': [1, 2, 3],
+            'feature2': [4, 5, 6],
+            'feature3': [7, 8, 9],
+            'feature4': [10, 11, 12],
+            'feature5': [13, 14, 15],
+            'target': [0, 1, 1]
+        })
+        result_df, ax = task_func(df, {}, plot_histogram=True)
+        self.assertTrue(hasattr(ax, 'hist'))
+        self.assertIsInstance(ax, plt.Axes)
+        plt.close()
+    
+    def test_non_df(self):
+        with self.assertRaises(ValueError):
+            task_func("non_df", {})

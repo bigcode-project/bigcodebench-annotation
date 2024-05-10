@@ -1,102 +1,73 @@
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
-def task_func(l):
+def task_func(df):
     """
-    Perform Principal Component Analysis (PCA) on the given array and record the first two main components.
+    Standardize the 'age' and 'income' columns for each group by 'id' in a Pandas DataFrame, and return the standardized DataFrame.
 
     Parameters:
-    l (numpy array): The input array.
+    df (DataFrame): A pandas DataFrame with columns ['id', 'age', 'income'].
 
     Returns:
-    ax (matplotlib.axes._axes.Axes): Axes object of the generated plot
+    DataFrame: The pandas DataFrame after standardizing 'age' and 'income' columns.
 
-    Note:
-    - This function use "PCA Result" as the title of the plot.
-    - This function use "First Principal Component" and "Second Principal Component" as the xlabel 
-    and ylabel of the plot, respectively.
+    Raises:
+    - This function will raise ValueError if the DataFrame does not have the 'id', 'age', and 'income' columns.
 
     Requirements:
-    - sklearn.decomposition.PCA
-    - matplotlib.pyplot
+    - pandas
+    - sklearn.preprocessing.StandardScaler
 
     Example:
-    >>> import numpy as np
-    >>> l = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
-    >>> ax = task_func(l)
-    >>> len(ax.collections[0].get_offsets())
-    4
-    >>> print(ax.get_title())
-    PCA Result
-    >>> plt.close()
+    >>> df = pd.DataFrame({ 'id': [1, 1, 2, 2, 3, 3], 'age': [25, 26, 35, 36, 28, 29], 'income': [50000, 60000, 70000, 80000, 90000, 100000]})
+    >>> df_standardized = task_func(df)
+    >>> print(df_standardized.iloc[0]['age'] == 25)
+    False
     """
-    pca = PCA(n_components=2)
-    principalComponents = pca.fit_transform(l)
-    fig = plt.figure(figsize=(6, 4))
-    ax = fig.add_subplot(111)
-    plt.scatter(principalComponents[:, 0], principalComponents[:, 1])
-    plt.xlabel('First Principal Component')
-    plt.ylabel('Second Principal Component')
-    plt.title('PCA Result')
-    return ax
+    try:
+        scaler = StandardScaler()
+        df_grouped = df.groupby('id').apply(lambda x: pd.DataFrame(scaler.fit_transform(x[['age', 'income']]), columns=['age', 'income'], index=x.index))
+        return df_grouped
+    except:
+        raise ValueError()
 
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
 import unittest
-import numpy as np
-import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Input 1: simple 2D array
-        l = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
-        ax = task_func(l)
-        self.assertTrue(isinstance(ax, plt.Axes))
-        self.assertEqual(ax.get_title(), "PCA Result")
-        self.assertEqual(ax.get_xlabel(), "First Principal Component")
-        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
-        # Check the number of points
-        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
-        plt.close()
-    def test_case_2(self):
-        # Input 2: another simple 2D array
-        l = np.array([[2, 3], [4, 5], [6, 7], [8, 9]])
-        ax = task_func(l)
-        self.assertTrue(isinstance(ax, plt.Axes))
-        self.assertEqual(ax.get_title(), "PCA Result")
-        self.assertEqual(ax.get_xlabel(), "First Principal Component")
-        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
-        # Check the number of points
-        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
-        plt.close()
-    def test_case_3(self):
-        # Input 3: larger array
-        np.random.seed(0)
-        l = np.random.rand(10, 2)
-        ax = task_func(l)
-        self.assertTrue(isinstance(ax, plt.Axes))
-        self.assertEqual(ax.get_title(), "PCA Result")
-        self.assertEqual(ax.get_xlabel(), "First Principal Component")
-        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
-        # Check the number of points
-        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
-        plt.close()
-    def test_case_4(self):
-        # Input 4: array with similar values (less variance)
-        l = np.array([[1, 2], [1, 2.1], [1.1, 2], [1.1, 2.1]])
-        ax = task_func(l)
-        self.assertTrue(isinstance(ax, plt.Axes))
-        self.assertEqual(ax.get_title(), "PCA Result")
-        self.assertEqual(ax.get_xlabel(), "First Principal Component")
-        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
-        # Check the number of points
-        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
-        plt.close()
-    def test_case_5(self):
-        # Input 5: array with larger values
-        l = np.array([[100, 200], [300, 400], [500, 600], [700, 800]])
-        ax = task_func(l)
-        self.assertTrue(isinstance(ax, plt.Axes))
-        self.assertEqual(ax.get_title(), "PCA Result")
-        self.assertEqual(ax.get_xlabel(), "First Principal Component")
-        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
-        # Check the number of points
-        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
-        plt.close()
+    def test_empty_dataframe(self):
+        df = pd.DataFrame(columns=['id', 'age', 'income'])
+        result = task_func(df)
+        self.assertEqual(len(result), 0)
+    def test_example_dataframe(self):
+        df = pd.DataFrame({
+            'id': [1, 1, 2, 2, 3, 3],
+            'age': [25, 26, 35, 36, 28, 29],
+            'income': [50000, 60000, 70000, 80000, 90000, 100000]
+        })
+        result = task_func(df)
+        scaler = StandardScaler()
+        #check random point
+        self.assertEqual(-1, result.iloc[0]['age'])
+    def test_single_group(self):
+        df = pd.DataFrame({'id': [1, 1], 'age': [30, 40], 'income': [50000, 60000]})
+        result = task_func(df)
+        self.assertEqual(len(result), 2)
+        self.assertNotEqual(result.iloc[0]['age'], 30)  # Checking if values are standardized
+    def test_multiple_groups(self):
+        df = pd.DataFrame({'id': [1, 1, 2, 2], 'age': [25, 35, 45, 55], 'income': [30000, 40000, 50000, 60000]})
+        result = task_func(df)
+        self.assertEqual(len(result), 4)
+    def test_negative_values(self):
+        df = pd.DataFrame({'id': [1, 1], 'age': [-20, -30], 'income': [-10000, -20000]})
+        result = task_func(df)
+        self.assertEqual(len(result), 2)
+    def test_large_data(self):
+        df = pd.DataFrame({'id': list(range(1000)), 'age': list(range(1000)), 'income': list(range(1000, 2000))})
+        result = task_func(df)
+        self.assertEqual(len(result), 1000)
+    
+    def test_invalid_df(self):
+        df = pd.DataFrame()
+        with self.assertRaises(ValueError):
+            task_func(df)

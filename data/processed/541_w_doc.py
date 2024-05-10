@@ -1,97 +1,106 @@
-# Importing the required libraries
-import re
-import matplotlib.pyplot as plt
+from collections import Counter
 import numpy as np
-import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer
-from nltk.corpus import stopwords
+import matplotlib.pyplot as plt
+import itertools
 
-
-def task_func(text, n=2):
+def task_func(list_of_menuitems, title="Menu Distribution", color="blue", width=1.0):
     """
-    Analyzes a text string, removing duplicate consecutive words and stopwords defined by nltk.corpus,
-    generates a square co-occurrence matrix of words, and plots this matrix.
+    Given a nested list of menu items, flatten the list using itertool chain, count the occurrences of each item, then
+    plot a histogram with an alphabetically sorted x-axis labeled as "Menu Items" and y-axis as "Frequency".
 
     Parameters:
-    - text (str): Input text to be analyzed.
-    - n (int, optional): Size of n-grams for the co-occurrence matrix. Defaults to 2.
+    - list_of_menuitems (list): A non-empty nested list of menu items. Each element is a list of menu item strings.
+    - title (str, optional): The title of the histogram plot. Default is "Menu Distribution".
+    - color (str, optional): The color of the bars in the histogram. Default is "blue".
+    - width (float, optional): The width of the bars in the histogram. Default is 1.0.
 
     Returns:
-    - tuple:
-        - pd.DataFrame: Square co-occurrence matrix of words.
-        - matplotlib.axes.Axes: Plot object of the co-occurrence matrix.
+    - ax (object): An Axes object representing the histogram plot.
 
     Requirements:
-        - re
-        - pandas
-        - matplotlib.pyplot
-        - numpy
-        - sklearn.feature_extraction.text
-        - nltk.corpus
+    - collections.Counter
+    - numpy
+    - matplotlib.pyplot
+    - itertools
 
     Example:
-    >>> import matplotlib
-    >>> text = "hello hello world world"
-    >>> df, ax = task_func(text, n=2)
-    >>> df.columns.tolist()
-    ['hello world']
-    >>> df.index.tolist()
-    ['hello world']
-    >>> df.iloc[0, 0]
-    0
-    >>> isinstance(ax, matplotlib.axes.Axes)
-    True
+    >>> task_func([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
+    <Axes: title={'center': 'Menu Distribution'}, xlabel='Menu Items', ylabel='Frequency'>
+    >>> task_func(['Burger'], title='A Title', color='red', width=5.0)
+    <Axes: title={'center': 'A Title'}, xlabel='Menu Items', ylabel='Frequency'>
     """
-    text = re.sub(r'\b(\w+)( \1\b)+', r'\1', text)
-    stop_words = set(stopwords.words('english'))
-    words_filtered = ' '.join([word for word in text.lower().split() if word not in stop_words])
-    if not words_filtered.strip():
-        empty_df = pd.DataFrame()
-        fig, ax = plt.subplots()
-        return empty_df, ax
-    vectorizer = CountVectorizer(ngram_range=(n, n))
-    X = vectorizer.fit_transform([words_filtered])  # Ensure input is treated as a single document
-    matrix = (X.T * X).todense()
-    np.fill_diagonal(matrix, 0)
-    feature_names = vectorizer.get_feature_names_out() if hasattr(vectorizer,
-                                                                  'get_feature_names_out') else vectorizer.get_feature_names()
-    matrix_df = pd.DataFrame(matrix, index=feature_names, columns=feature_names)
+    flat_list = list(itertools.chain(*list_of_menuitems))
+    counter = Counter(flat_list)
+    labels, values = zip(*sorted(counter.items(), key=lambda x: x[0]))
+    indexes = np.arange(len(labels))
     fig, ax = plt.subplots()
-    cax = ax.matshow(matrix_df, cmap='hot')
-    fig.colorbar(cax)
-    ax.set_xticks(np.arange(len(matrix_df.columns)))
-    ax.set_yticks(np.arange(len(matrix_df.index)))
-    ax.set_xticklabels(matrix_df.columns, rotation=90)
-    ax.set_yticklabels(matrix_df.index)
-    return matrix_df, ax
+    ax.bar(indexes, values, width, color=color)
+    ax.set_xticklabels(labels)
+    ax.set_xlabel("Menu Items")
+    ax.set_ylabel("Frequency")
+    ax.set_title(title)
+    return ax
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_simple_text(self):
-        """Test with a simple text."""
-        text = "hello world"
-        matrix, _ = task_func(text)
-        self.assertEqual(matrix.shape, (1, 1), "Matrix shape should be (1, 1) for unique words 'hello' and 'world'.")
-    def test_text_with_stopwords(self):
-        """Test text with stopwords removed."""
-        text = "this is a"
-        matrix, _ = task_func(text)
-        self.assertTrue(matrix.empty, "Matrix should be empty after removing stopwords.")
-    def test_duplicate_words(self):
-        """Test text with duplicate consecutive words."""
-        text = "happy happy joy joy"
-        matrix, _ = task_func(text)
-        self.assertIn('happy joy', matrix.columns, "Matrix should contain 'happy joy' after duplicates are removed.")
-    def test_ngram_range(self):
-        """Test with a specific n-gram range."""
-        text = "jump high and run fast"
-        # Assuming no preprocessing that removes words, we expect 3 unique tri-grams.
-        matrix, _ = task_func(text, n=3)
-        # Expecting a 3x3 matrix since there are 3 unique tri-grams with no overlap in this simple case.
-        self.assertEqual(matrix.shape, (2, 2),
-                         "Matrix shape should be (3, 3) for a tri-gram analysis without word removal.")
-    def test_empty_text(self):
-        """Test with an empty string."""
-        text = ""
-        matrix, _ = task_func(text)
-        self.assertTrue(matrix.empty, "Matrix should be empty for an empty string.")
+    def test_case_1(self):
+        input_data = [["Pizza", "Burger"], ["Pizza", "Coke"], ["Pasta", "Coke"]]
+        ax = task_func(input_data)
+        # Test default plot properties
+        self.assertEqual(ax.get_title(), "Menu Distribution")
+        self.assertEqual(ax.get_xlabel(), "Menu Items")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
+        for p in ax.patches:
+            # RGBA color
+            self.assertEqual(p.get_facecolor(), (0.0, 0.0, 1.0, 1.0))
+            # bar width
+            self.assertEqual(p.get_width(), 1.0)
+    def test_case_2(self):
+        input_data = [["Pizza", "Burger"], ["Pizza", "Coke"], ["Pasta", "Coke"]]
+        ax = task_func(input_data, title="Custom Title", color="red", width=0.8)
+        # Test custom plot properties
+        self.assertEqual(ax.get_title(), "Custom Title")
+        self.assertEqual(ax.get_xlabel(), "Menu Items")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
+        for p in ax.patches:
+            # RGBA color
+            self.assertEqual(p.get_facecolor(), (1.0, 0.0, 0.0, 1.0))
+            # bar width
+            self.assertEqual(p.get_width(), 0.8)
+    def test_case_3(self):
+        input_data = [["Burger"], ["Pizza"], ["Pasta"]]
+        ax = task_func(input_data)
+        # Test count
+        bars = [p.get_height() for p in ax.patches]
+        self.assertEqual(bars, [1, 1, 1])
+    def test_case_4(self):
+        input_data = [["Carrot", "Apple"], ["Apple", "Banana"], ["Banana"]]
+        ax = task_func(input_data)
+        # Test x-axis order
+        self.assertEqual(
+            [_._text for _ in ax.get_xticklabels() if _._text],
+            ["Apple", "Banana", "Carrot"],
+        )
+    def test_case_5(self):
+        # Test input edge case: some empty elements
+        ax = task_func([[], ["Apple"]])
+        self.assertEqual(len(ax.patches), 1)
+        for p in ax.patches:
+            # bar width
+            self.assertEqual(p.get_width(), 1.0)
+            self.assertEqual(p.get_height(), 1)
+    def test_case_6(self):
+        with self.assertRaises(ValueError):
+            task_func([])
+        with self.assertRaises(ValueError):
+            task_func([[]])
+        with self.assertRaises(ValueError):
+            task_func("")
+        with self.assertRaises(TypeError):
+            task_func(None)
+        with self.assertRaises(TypeError):
+            task_func(1)
+        with self.assertRaises(TypeError):
+            task_func([1])
+    def tearDown(self):
+        plt.close("all")

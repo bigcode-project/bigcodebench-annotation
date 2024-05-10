@@ -1,83 +1,141 @@
 import pandas as pd
-import seaborn as sns
+from sklearn.preprocessing import StandardScaler
 
 
-def task_func(array):
-    """Generates a DataFrame and heatmap from a 2D list.
+def task_func(data):
+    """Scales numeric columns of a data dictionary using the StandardScaler.
 
-    This function takes a 2D list and returns a pandas DataFrame and a seaborn heatmap
-    representing the correlation matrix of the DataFrame. Assumes sublists of length 5.
-    Also assumes DataFrame columns: 'A', 'B', 'C', 'D', 'E'.
-
-    Parameters:
-    - array (list of list of int): 2D list with sublists of length 5. Must not be empty.
-
-    Returns:
-    - DataFrame: Constructed from the input 2D list.
-    - heatmap: Seaborn heatmap of the DataFrame's correlation matrix.
+    This function scales the numeric columns of a dataframe using the StandardScaler from scikit-learn.
+    Non-numeric columns remain unchanged. If a column contains mixed data types, it tries to convert the entire column
+    to float. If any value in the column cannot be converted to float, the entire column is left unchanged.
 
     Requirements:
     - pandas
-    - seaborn
+    - sklearn.preprocessing.StandardScaler
+    
+    Parameters:
+    - data (dict): Input data.
+
+    Returns:
+    - pd.DataFrame: Dataframe with scaled numeric columns.
 
     Example:
-    >>> df, ax = task_func([[1, 2, 3, 4, 5], [5, 4, 3, 2, 1]])
-    >>> df
-       A  B  C  D  E
-    0  1  2  3  4  5
-    1  5  4  3  2  1
-    >>> ax
-    <Axes: >
+    >>> result = task_func({'x': [10, 20, 30, 40]})
+    >>> result
+              x
+    0 -1.341641
+    1 -0.447214
+    2  0.447214
+    3  1.341641
+    >>> result2 = task_func({'a': [10.5, 23.4, 15.6, 78.9],'b': [45.6, 67.8, 89.0, 12.3],'c': ['apple', 'banana', 'cherry', 'date']})
+    >>> result2
+              a         b       c
+    0 -0.788098 -0.284409   apple
+    1 -0.317428  0.497496  banana
+    2 -0.602019  1.244180  cherry
+    3  1.707546 -1.457267    date
     """
-    COLUMNS = ["A", "B", "C", "D", "E"]
-    if not array or any(len(sublist) != 5 for sublist in array):
-        raise ValueError("array must be non-empty and all sublists must have a length of 5.")
-    df = pd.DataFrame(array, columns=COLUMNS)
-    heatmap = sns.heatmap(df.corr(), annot=True)
-    return df, heatmap
+    dataframe = pd.DataFrame(data)
+    scaler = StandardScaler()
+    for column in dataframe.columns:
+        if dataframe[column].dtype in ["float64", "int64"]:
+            dataframe[column] = scaler.fit_transform(
+                dataframe[column].values.reshape(-1, 1)
+            )
+        else:
+            converted_column = dataframe[column].apply(pd.to_numeric, errors="coerce")
+            if (
+                not converted_column.isna().all()
+            ):  # If all values are convertible to float
+                dataframe[column] = scaler.fit_transform(
+                    converted_column.values.reshape(-1, 1)
+                )
+    return dataframe
 
 import unittest
-import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import random
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        random.seed(42)
-        self.mock_data = [[random.randint(1, 100) for _ in range(5)] for _ in range(5)]
     def test_case_1(self):
-        # Test dataframe creation with valid input
-        df, _ = task_func(self.mock_data)
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(df.shape, (5, 5))
-    def test_case_2(self):
-        # Test heatmap creation with valid input
-        _, heatmap = task_func(self.mock_data)
-        self.assertIsNotNone(heatmap)
-    def test_case_3(self):
-        # Test correlation accuracy with known data
-        correlated_data = [[1, 2, 3, 4, 5], [5, 4, 3, 2, 1]]
-        df, _ = task_func(correlated_data)
-        corr_matrix = df.corr()
-        np.testing.assert_array_almost_equal(
-            corr_matrix, np.corrcoef(correlated_data, rowvar=False)
+        """Test the correctness of the scaling applied by the function."""
+        # Creating a sample dataframe with three numeric columns
+        data = {
+                "a": [10.5, 23.4, 15.6, 78.9],
+                "b": [45.6, 67.8, 89.0, 12.3],
+                "c": [12.3, 45.6, 78.9, 0.1],
+            }
+        df = pd.DataFrame(
+            data
         )
+        result = task_func(data)
+        # Checking if the mean of scaled columns is approximately 0 and standard deviation is approximately 1
+        self.assertTrue(np.isclose(result["a"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(result["b"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(np.std(result["a"]), 1, atol=1e-2))
+        self.assertTrue(np.isclose(np.std(result["b"]), 1, atol=1e-2))
+    def test_case_2(self):
+        """Test with an empty DataFrame."""
+        # Creating an empty dataframe
+        data = {}
+        df = pd.DataFrame(data)
+        result = task_func(data)
+        # Ensuring the result is also an empty dataframe
+        self.assertTrue(result.empty)
+    def test_case_3(self):
+        """Test with a DataFrame that doesn't have any columns to scale."""
+        # Creating a dataframe with a single non-numeric column
+        data = {"c": ["foo", "bar"]}
+        df = pd.DataFrame(data)
+        result = task_func(data)
+        # Ensuring the output dataframe is unchanged
+        pd.testing.assert_frame_equal(result, df, check_dtype=False)
     def test_case_4(self):
-        # Test handling of non-numeric data
-        with self.assertRaises(ValueError):
-            task_func([["a", "b", "c", "d", "e"], [1, 2, 3, 4, 5]])
+        """Test with a DataFrame where all columns are to be scaled."""
+        # Creating a dataframe with two numeric columns
+        data = {"a": [10.5, 23.4, 15.6, 78.9], "b": [45.6, 67.8, 89.0, 12.3]}
+        df = pd.DataFrame(
+            data
+        )
+        result = task_func(data)
+        # Checking if the mean of scaled columns is approximately 0 and standard deviation is approximately 1
+        self.assertTrue(np.isclose(result["a"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(result["b"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(np.std(result["a"]), 1, atol=1e-2))
+        self.assertTrue(np.isclose(np.std(result["b"]), 1, atol=1e-2))
     def test_case_5(self):
-        # Test with empty list
-        with self.assertRaises(ValueError):
-            task_func([])
+        """Test with a DataFrame with single rows."""
+        # Creating a dataframe with a single row and three columns
+        data = {"a": [5.5], "b": [8.6], "c": [7.7]}
+        df = pd.DataFrame(data)
+        result = task_func(data)
+        self.assertDictEqual(result.to_dict(), {'a': {0: 0.0}, 'b': {0: 0.0}, 'c': {0: 0.0}})
     def test_case_6(self):
-        # Test with single sublist
-        single_sublist = [[1, 2, 3, 4, 5]]
-        df, _ = task_func(single_sublist)
-        self.assertEqual(df.shape, (1, 5))
+        """Test with a DataFrame with mixed datatypes."""
+        # Creating a dataframe with mixed data types (both floats and strings) in columns
+        data = {
+                "a": [10.5, 23.4, 15.6, "78.9"],
+                "b": [45.6, "67.8", 89.0, 12.3],
+                "c": [12.3, 45.6, 78.9, "0.1"],
+            }
+        df = pd.DataFrame(
+            data
+        )
+        result = task_func(data)
+        # Checking if the mean of scaled columns is approximately 0 and standard deviation is approximately 1
+        self.assertTrue(np.isclose(result["a"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(result["b"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(np.std(result["a"]), 1, atol=1e-2))
+        self.assertTrue(np.isclose(np.std(result["b"]), 1, atol=1e-2))
     def test_case_7(self):
-        # Test handling sublists of varying lengths
-        with self.assertRaises(ValueError):
-            task_func([[1, 2, 3], [4, 5, 6, 7, 8]])
-    def tearDown(self):
-        plt.close("all")
+        """Test with a DataFrame with negative values."""
+        # Creating a dataframe with negative values in columns
+        data = {"a": [-1, -2, -3, -4], "b": [-4, -5, -6, -7], "c": [-7, -8, -9, -10]}
+        df = pd.DataFrame(
+            data
+        )
+        result = task_func(data)
+        # Checking if the mean of scaled columns is approximately 0 and standard deviation is approximately 1
+        self.assertTrue(np.isclose(result["a"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(result["b"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(np.std(result["a"]), 1, atol=1e-2))
+        self.assertTrue(np.isclose(np.std(result["b"]), 1, atol=1e-2))

@@ -1,83 +1,111 @@
-import random
-import string
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
 
-def task_func(max_length, n_samples, seed=None):
-    """Generate a list containing random strings of lowercase letters. Each string's length varies from 1 to `max_length`.
-    An optional seed can be set for the random number generator for reproducible results.
-
-    Note:
-    The function utilizes the `random.choices` function to generate random strings and combines them into a list.
+def task_func(num_samples, countries=['Russia', 'China', 'USA', 'India', 'Brazil'], 
+           ages=np.arange(18, 60), genders=['Male', 'Female'], rng_seed=None):
+    """
+    Generate a demographic dataset with information about people from different countries, their age, and gender. 
+    Genders are encoded using sklearn LabelEncoder.
+    Datapoints are sampled from the lists using a numpy.random.default_rng with seed: rng_seed.
 
     Parameters:
-    max_length (int): The maximum length of the strings.
-    n_samples (int): The number of strings to return.
-    seed (int, optional): A seed for the random number generator. If None, the generator is initialized without a seed.
-
+    num_samples (int): The number of samples to generate.
+    countries (list of str): A list of country names to use in the dataset. Default is ['Russia', 'China', 'USA', 'India', 'Brazil'].
+    ages (array of int): An array of ages to use in the dataset. Default is np.arange(18, 60).
+    genders (list of str): A list of genders to use in the dataset. Default is ['Male', 'Female'].
+    rng_seed: seed for the random number generator
+    
     Returns:
-    list: A list containing random strings. Each string is a random combination of lowercase letters, 
-    and their lengths will vary from 1 to `max_length`.
-
-    Requirements:
-    - random
-    - string
+    DataFrame: A pandas DataFrame with the demographics data.
 
     Raises:
-    ValueError: If max_length is smaller than 1.
+    - ValueError: If num_samples is not an integer.
+
+    Requirements:
+    - pandas
+    - numpy
+    - sklearn.preprocessing.LabelEncoder
 
     Example:
-    >>> task_func(3, 12, seed=12)
-    ['gn', 'da', 'mq', 'rp', 'aqz', 'ex', 'o', 'b', 'vru', 'a', 'v', 'ncz']
-    >>> task_func(5, n_samples=8, seed=1)
-    ['ou', 'g', 'tmjf', 'avlt', 's', 'sfy', 'aao', 'rzsn']
+    >>> demographics = task_func(5, rng_seed=31)
+    >>> print(demographics)
+      Country  Age  Gender
+    0     USA   46       0
+    1  Brazil   21       1
+    2     USA   37       1
+    3  Russia   32       1
+    4     USA   46       0
 
+    >>> demographics = task_func(5, countries=['Austria', 'Germany'], rng_seed=3)
+    >>> print(demographics)
+       Country  Age  Gender
+    0  Germany   51       1
+    1  Austria   54       1
+    2  Austria   42       0
+    3  Austria   19       1
+    4  Austria   21       1
     """
-    if max_length < 1:
-        raise ValueError("max_length must be larger than or equal to 1.")
-    LETTERS = string.ascii_lowercase
-    if seed is not None:
-        random.seed(seed)
-    all_combinations = []
-    for i in range(n_samples):
-        random_length = random.randint(1, max_length)
-        combination = ''.join(random.choices(LETTERS, k=random_length))
-        all_combinations.append(combination)
-    return all_combinations
+    if not isinstance(num_samples, int):
+        raise ValueError("num_samples should be an integer.")
+    rng = np.random.default_rng(seed=rng_seed)
+    countries = rng.choice(countries, num_samples)
+    ages = rng.choice(ages, num_samples)
+    genders = rng.choice(genders, num_samples)
+    le = LabelEncoder()
+    encoded_genders = le.fit_transform(genders)
+    demographics = pd.DataFrame({
+        'Country': countries,
+        'Age': ages,
+        'Gender': encoded_genders
+    })
+    return demographics
 
-"""
-This script contains tests for the function task_func.
-Each test checks a specific aspect of the function's behavior.
-"""
 import unittest
-import random
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_length_and_content(self):
-        """Test the length of the output and whether it contains valid strings."""
-        seed = 1  # for reproducibility
-        max_length = 5
-        result = task_func(max_length, n_samples=10, seed=seed)
-        
-        # All outputs should be strings
-        self.assertTrue(all(isinstance(item, str) for item in result))
-        # All strings should be of length <= max_length and > 0
-        self.assertTrue(all(1 <= len(item) <= max_length for item in result))
-        expected = ['ou', 'g', 'tmjf', 'avlt', 's', 'sfy', 'aao', 'rzsn', 'yoir', 'yykx']
-        self.assertCountEqual(result, expected)
-    def test_randomness(self):
-        """Test that setting a seed produces reproducible results."""
-        seed = 2
-        result1 = task_func(3, seed=seed, n_samples=100)
-        result2 = task_func(3, seed=seed, n_samples=100)
-        self.assertEqual(result1, result2)  # results should be same with same seed
-    def test_varying_length(self):
-        """Test with varying n to check the function's robustness with different input sizes."""
-        seed = 3
-        for n in range(1, 15):  # testing multiple sizes
-            result = task_func(n, seed=seed, n_samples=10)
-            self.assertTrue(all(1 <= len(item) <= n for item in result))
-    def test_negative_input(self):
-        """Test how the function handles negative input. It should handle it gracefully."""
-        with self.assertRaises(ValueError):
-            task_func(-1, n_samples=22)  # negative numbers shouldn't be allowed
-    def test_zero_length(self):
-        """Test how the function handles zero input. It should handle it gracefully or according to its specification."""
-        self.assertRaises(ValueError, task_func, 0, n_samples=5)
+    def test_case_num_samples(self):
+        'num_samples not an integer'
+        self.assertRaises(Exception, task_func, 'test')
+    
+    # Test Case 1: Basic test with default parameters
+    def test_case_1(self):
+        demographics = task_func(10, rng_seed=1)
+        self.assertEqual(len(demographics), 10)
+        self.assertTrue(set(demographics['Country'].unique()).issubset(['Russia', 'China', 'USA', 'India', 'Brazil']))
+        self.assertTrue(all(18 <= age <= 59 for age in demographics['Age']))
+        self.assertTrue(set(demographics['Gender'].unique()).issubset([0, 1]))
+    # Test Case 2: Test with custom countries list
+    def test_case_2(self):
+        demographics = task_func(5, countries=['Canada', 'Australia'], rng_seed=1)
+        self.assertEqual(len(demographics), 5)
+        self.assertTrue(set(demographics['Country'].unique()).issubset(['Canada', 'Australia']))
+        self.assertTrue(all(18 <= age <= 59 for age in demographics['Age']))
+        self.assertTrue(set(demographics['Gender'].unique()).issubset([0, 1]))
+    # Test Case 3: Test with custom age range
+    def test_case_3(self):
+        demographics = task_func(5, ages=np.arange(25, 40), rng_seed=1)
+        self.assertEqual(len(demographics), 5)
+        self.assertTrue(all(25 <= age <= 40 for age in demographics['Age']))
+        self.assertTrue(set(demographics['Gender'].unique()).issubset([0, 1]))
+    # Test Case 4: Test with custom gender list
+    def test_case_4(self):
+        demographics = task_func(5, genders=['Non-Binary'], rng_seed=1)
+        self.assertEqual(len(demographics), 5)
+        self.assertTrue(set(demographics['Gender'].unique()).issubset([0]))
+    # Test Case 5: Test with larger sample size
+    def test_case_5(self):
+        demographics = task_func(100, rng_seed=1)
+        self.assertEqual(len(demographics), 100)
+        self.assertTrue(set(demographics['Country'].unique()).issubset(['Russia', 'China', 'USA', 'India', 'Brazil']))
+        self.assertTrue(all(18 <= age <= 59 for age in demographics['Age']))
+        self.assertTrue(set(demographics['Gender'].unique()).issubset([0, 1]))
+    def test_case_6(self):
+        'check for specific return value'
+        demographics = task_func(5, rng_seed=3)
+        expected_df = pd.DataFrame({
+            'Country': ['Brazil', 'Russia', 'Russia', 'China', 'Russia'],
+            'Age': [51, 54, 42, 19, 21],
+            'Gender': [1, 1, 0, 1, 1]
+        })
+        pd.testing.assert_frame_equal(demographics, expected_df)

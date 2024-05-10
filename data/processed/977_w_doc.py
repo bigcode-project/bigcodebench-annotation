@@ -1,91 +1,81 @@
+import numpy as np
 import pandas as pd
-from random import shuffle
 
-# Constants
-POSSIBLE_VALUES = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
-
-
-def task_func(list_of_lists):
+def task_func(rows, columns=["A", "B", "C", "D", "E"], seed=0) -> pd.DataFrame:
     """
-    Generate a list of pandas DataFrames, each created from a sublist in 'list_of_lists'.
-    Each DataFrame has columns named as per the elements of the sublist, and each column
-    is filled with randomly shuffled values from 'POSSIBLE_VALUES'.
+    Create a Pandas DataFrame with a specified number of rows filled with random
+    values in [0, 1) and shuffled columns.
+    
+    Note:
+    - The columns should be unique and sorted in the ascending order.
 
     Parameters:
-    - list_of_lists (list of list): A list where each element is a list of strings
-    representing column names for a DataFrame.
-
+    rows (int): The number of rows for the DataFrame. Must not be negative.
+    columns (list of str): Column names for the DataFrame.
+                           Defaults to ['A', 'B', 'C', 'D', 'E'].
+                           If it contains repeated columns, the function deduplicates
+                           it in a case and spacing sensitive way. If it is empty,
+                           the function returns an empty DataFrame.
+    seed (int): The random seed for reproducibility.
+    
     Returns:
-    - list of pandas.DataFrame: A list where each element is a DataFrame with columns as specified
-    in 'list_of_lists', and each column contains shuffled values from 'POSSIBLE_VALUES'.
+    pd.DataFrame: A pandas DataFrame with shuffled columns.
 
     Requirements:
+    - numpy
     - pandas
-    - random.shuffle
-
-    Note:
-    - The length of each DataFrame's columns is equal to the length of 'POSSIBLE_VALUES'.
-    - Each column in the DataFrame has the same shuffled order of 'POSSIBLE_VALUES'.
 
     Example:
-    >>> import random
-    >>> random.seed(0)
-    >>> dfs = task_func([['x', 'y', 'z'], ['a', 'b', 'c']])
-    >>> dfs[0].head()
-       x  y  z
-    0  H  J  H
-    1  I  E  A
-    2  B  I  J
-    3  F  G  D
-    4  D  A  C
+    >>> df = task_func(10)
+    >>> df.head(2)
+              D         E         A         C         B
+    0  0.548814  0.715189  0.602763  0.544883  0.423655
+    1  0.645894  0.437587  0.891773  0.963663  0.383442
     """
-    dataframes = []
-    for list_ in list_of_lists:
-        df_dict = {col: POSSIBLE_VALUES.copy() for col in list_}
-        for col in df_dict:
-            shuffle(df_dict[col])
-        df = pd.DataFrame(df_dict)
-        dataframes.append(df)
-    return dataframes
+    np.random.seed(seed)
+    columns = sorted(list(set(columns)))
+    data = np.random.rand(rows, len(columns))
+    np.random.shuffle(columns)
+    df = pd.DataFrame(data, columns=columns)
+    return df
 
 import unittest
+import numpy as np
 import pandas as pd
-import random
 class TestCases(unittest.TestCase):
-    """Test cases for task_func function."""
-    def test_dataframe_count(self):
-        """Test number of dataframes returned."""
-        random.seed(0)
-        input_data = [["x", "y"], ["a", "b", "c"], ["m"]]
-        dfs = task_func(input_data)
-        self.assertEqual(len(dfs), len(input_data))
-    def test_dataframe_columns(self):
-        """Test each dataframe has correct columns."""
-        random.seed(1)
-        input_data = [["x", "y"], ["a", "b", "c"], ["m"]]
-        dfs = task_func(input_data)
-        for idx, df in enumerate(dfs):
-            self.assertListEqual(list(df.columns), input_data[idx])
-    def test_dataframe_values(self):
-        """Test values in each dataframe column are from the POSSIBLE_VALUES list."""
-        random.seed(2)
-        input_data = [["x", "y"], ["a", "b", "c"], ["m"]]
-        dfs = task_func(input_data)
-        for df in dfs:
-            for col in df.columns:
-                self.assertTrue(all(val in POSSIBLE_VALUES for val in df[col].values))
-    def test_empty_input(self):
-        """Test function with an empty list of lists."""
-        random.seed(3)
-        dfs = task_func([])
-        self.assertEqual(len(dfs), 0)
-    def test_single_list_input(self):
-        """Test function with a single list input."""
-        random.seed(4)
-        input_data = [["x", "y", "z"]]
-        dfs = task_func(input_data)
-        self.assertEqual(len(dfs), 1)
-        self.assertListEqual(list(dfs[0].columns), input_data[0])
-        self.assertTrue(all(val in POSSIBLE_VALUES for val in dfs[0]["x"].values))
-        self.assertTrue(all(val in POSSIBLE_VALUES for val in dfs[0]["y"].values))
-        self.assertTrue(all(val in POSSIBLE_VALUES for val in dfs[0]["z"].values))
+    def test_case_1(self):
+        # Test basic case - data and format correctness
+        df = task_func(10, seed=0)
+        default_columns = ["A", "B", "C", "D", "E"]
+        self.assertEqual(df.shape, (10, 5))
+        for column in default_columns:
+            self.assertEqual(df.dtypes[column], np.float64)
+        self.assertEqual(len(set(df.columns)), len(default_columns))
+    def test_case_2(self):
+        # Test custom columns
+        custom_columns = ["X", "Y", "Z"]
+        df = task_func(5, columns=custom_columns, seed=0)
+        self.assertTrue(all(column in custom_columns for column in df.columns))
+        # assert first 2 rows data
+        self.assertEqual(set(df.iloc[0].tolist()), {0.5488135039273248, 0.7151893663724195, 0.6027633760716439})
+        
+    def test_case_3(self):
+        # Test custom rows
+        for n_rows in [1, 10, 50]:
+            df = task_func(n_rows)
+            self.assertEqual(len(df), n_rows)
+    def test_case_4(self):
+        df = task_func(5, seed=42)
+        self.assertEqual(set(df.iloc[0].tolist()), {0.3745401188473625, 0.9507143064099162, 0.7319939418114051, 0.5986584841970366, 0.15601864044243652})
+    def test_case_5(self):
+        # Test handling edge cases - negative rows
+        with self.assertRaises(ValueError):
+            task_func(-1)
+    def test_case_6(self):
+        # Test handling empty columns
+        df = task_func(5, columns=[])
+        self.assertTrue(df.empty)
+    def test_case_7(self):
+        # Test handling duplicate columns
+        df = task_func(5, columns=["A", "A", "B", "B", "C"], seed=0)
+        self.assertEqual(len(df.columns), 3)

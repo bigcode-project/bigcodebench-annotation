@@ -1,100 +1,100 @@
-import random
-import statistics
+import binascii
+import hashlib
 
-# Constants
-AGE_RANGE = (22, 60)
 
-def task_func(dict1):
+def task_func(input_string, verify_hash=None):
     """
-    Calculate the mean, the median, and the mode(s) of the age of the employees in the department "EMP$$." 
-    Generate random ages for each employee within the range [22, 60].
+    Compute the SHA256 hash of a given input string and return its hexadecimal representation.
+    Optionally, verify the computed hash against a provided hash.
 
     Parameters:
-    dict1 (dict): A dictionary with department codes as keys and number of employees 
-                  as values.
+    - input_string (str): The string to be hashed.
+    - verify_hash (str, optional): A hexadecimal string to be compared with the computed hash.
 
     Returns:
-    tuple: A tuple of mean, median, and a list of mode(s) of employee ages.
+    - str: A hexadecimal string representing the SHA256 hash of the input string.
+    - bool: True if verify_hash is provided and matches the computed hash, otherwise None.
+
+    Raises:
+    - TypeError: If the input is not a string or verify_hash is not a string or None.
 
     Requirements:
-    - random
-    - statistics
+    - hashlib
+    - binascii
 
     Example:
-    >>> random.seed(0)
-    >>> d = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
-    >>> stats = task_func(d)
-    >>> print(stats)
-    (44.7, 46.5, [46, 48, 24, 38, 54, 53, 47, 41, 52, 44])
+    >>> task_func("Hello, World!")
+    'dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f'
+    >>> task_func("Hello, World!", "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f")
+    True
     """
-    emp_ages = []
-    for prefix, num_employees in dict1.items():
-        if not prefix.startswith('EMP$$'):
-            continue
-        for _ in range(num_employees):
-            age = random.randint(*AGE_RANGE)
-            emp_ages.append(age)
-    if not emp_ages:
-        return 0, 0, []
-    mean_age = statistics.mean(emp_ages)
-    median_age = statistics.median(emp_ages)
-    mode_age = statistics.multimode(emp_ages)
-    return mean_age, median_age, mode_age
+    if not isinstance(input_string, str):
+        raise TypeError("Input must be a string")
+    if verify_hash is not None and not isinstance(verify_hash, str):
+        raise TypeError("verify_hash must be a string or None")
+    hashed_bytes = hashlib.sha256(input_string.encode()).digest()
+    hex_encoded_hash = binascii.hexlify(hashed_bytes).decode()
+    if verify_hash is not None:
+        return hex_encoded_hash == verify_hash
+    return hex_encoded_hash
 
 import unittest
+import binascii
+import hashlib
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
-        random.seed(0)
-        # Input: 10 employees in "EMP$$" department
-        d = {'EMP$$': 10}
-        mean_age, median_age, mode_age = task_func(d)
-        
-        # Checks
-        self.assertTrue(22 <= mean_age <= 60)
-        self.assertTrue(22 <= median_age <= 60)
-        self.assertTrue(all(22 <= age <= 60 for age in mode_age))
-    
-    def test_case_2(self):
-        random.seed(0)
-        # Input: Different number of employees in multiple departments
-        d = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
-        mean_age, median_age, mode_age = task_func(d)
-        
-        # Checks
-        self.assertTrue(22 <= mean_age <= 60)
-        self.assertTrue(22 <= median_age <= 60)
-        self.assertTrue(all(22 <= age <= 60 for age in mode_age))
-    
-    def test_case_3(self):
-        random.seed(0)
-        # Input: No employees in "EMP$$" department
-        d = {'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
-        mean_age, median_age, mode_age = task_func(d)
-        
-        # Checks
-        self.assertEqual(mean_age, 0)
-        self.assertEqual(median_age, 0)
-        self.assertEqual(mode_age, [])
-    
-    def test_case_4(self):
-        random.seed(0)
-        # Input: Large number of employees in "EMP$$" department to increase likelihood of multiple modes
-        d = {'EMP$$': 1000}
-        mean_age, median_age, mode_age = task_func(d)
-        
-        # Checks
-        self.assertTrue(22 <= mean_age <= 60)
-        self.assertTrue(22 <= median_age <= 60)
-        self.assertTrue(all(22 <= age <= 60 for age in mode_age))
-    
-    def test_case_5(self):
-        random.seed(0)
-        # Input: Only one employee in "EMP$$" department
-        d = {'EMP$$': 1}
-        mean_age, median_age, mode_age = task_func(d)
-        
-        # Checks
-        self.assertTrue(22 <= mean_age <= 60)
-        self.assertEqual(mean_age, median_age)
-        self.assertEqual([mean_age], mode_age)
+    """Tests for task_func."""
+    def test_string_with_numbers(self):
+        """Test that the function returns the correct hash for a string with numbers."""
+        self.assertEqual(
+            task_func("4a4b4c"),
+            "1a3db6ced8854274567d707b509f7486a9244be0cab89217713fce9bf09f522e",
+        )
+    def test_string_with_space(self):
+        """Test that the function returns the correct hash for a string with space."""
+        self.assertEqual(
+            task_func("Open AI"),
+            "dd7503942d7be003d6faaa93d9951126fde3bdd4f3484404927e79585682878a",
+        )
+    def test_empty_string(self):
+        """Test that the function returns the correct hash for an empty string."""
+        self.assertEqual(
+            task_func(""),
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        )
+    def test_string_numbers(self):
+        """Test that the function returns the correct hash for a string numbers."""
+        self.assertEqual(
+            task_func("123456"),
+            "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+        )
+    def test_long_string(self):
+        """Test that the function returns the correct hash for a long string."""
+        self.assertEqual(
+            task_func("abcdefghijklmnopqrstuvwxyz"),
+            "71c480df93d6ae2f1efad1447c66c9525e316218cf51fc8d9ed832f2daf18b73",
+        )
+    def test_verify_hash_correct(self):
+        """Test that the function returns True when verify_hash is correct."""
+        self.assertTrue(
+            task_func(
+                "Hello, World!",
+                "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f",
+            )
+        )
+    def test_verify_hash_incorrect(self):
+        """Test that the function returns False when verify_hash is incorrect."""
+        self.assertFalse(task_func("Hello, World!", "incorrect_hash"))
+    def test_verify_hash_none(self):
+        """Test that the function returns None when verify_hash is None."""
+        self.assertEqual(
+            task_func("Hello, World!"),
+            "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f",
+        )
+    def test_input_string_not_string(self):
+        """Test that the function raises an error when the input is not a string."""
+        with self.assertRaises(TypeError):
+            task_func(123)
+    def test_verify_hash_not_string_or_none(self):
+        """Test that the function raises an error when verify_hash is not a string or None."""
+        with self.assertRaises(TypeError):
+            task_func("Hello, World!", 123)

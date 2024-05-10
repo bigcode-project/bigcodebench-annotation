@@ -1,79 +1,85 @@
-import numpy as np
-import random
+import pandas as pd
+import matplotlib.pyplot as plt
 
-# Constants
-COLORS = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
-
-def task_func(ax):
-    """
-    Generate a random sine wave function and draw it on a provided matplotlib polar subplot 'ax'. 
-    The function randomly selects a color from a predefined list and sets a random position for radial labels.
-
+def task_func(df, dct, columns=None, plot_histograms=False):
+    '''
+    Replace values in a DataFrame with a dictionary mapping and optionally record histograms for specified columns.
+    
     Parameters:
-    ax (matplotlib.axes._axes.Axes): The ax to plot on.
+    df (DataFrame): The input DataFrame.
+    dct (dict): A dictionary for replacing values in df.
+    columns (list of str, optional): List of column names to plot histograms. If None, no histograms are plotted.
+    plot_histograms (bool): If True, plots histograms for specified columns.
 
     Returns:
-    str: The color code (as a string) of the plotted function.
+    DataFrame: The DataFrame with replaced values. The columns are in the format of 'col1', 'col2', etc.
 
     Requirements:
-    - numpy
-    - random
-
+    - pandas
+    - matplotlib.pyplot
+    
+    Raises:
+    - The function will raise a ValueError is input df is not a DataFrame.
+    
     Example:
-    >>> import matplotlib.pyplot as plt
-    >>> random.seed(0)
-    >>> fig = plt.figure()
-    >>> ax = fig.add_subplot(111, polar=True)
-    >>> color = task_func(ax)
-    >>> color in COLORS
-    True
-    >>> plt.close()
-    """
-    x = np.linspace(0, 2 * np.pi, 1000)
-    y = np.sin(random.randint(1, 10)*x)
-    color = random.choice(COLORS)
-    ax.plot(x, y, color=color)
-    ax.set_rlabel_position(random.randint(0, 180))
-    return color
+    >>> df = pd.DataFrame({'col1': [1, 2, 3, 4], 'col2': [5, 6, 7, 8], 'col3': [9, 10, 11, 12]})
+    >>> dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j', 11: 'k', 12: 'l'}
+    >>> modified_df = task_func(df, dct)
+    >>> modified_df
+      col1 col2 col3
+    0    a    e    i
+    1    b    f    j
+    2    c    g    k
+    3    d    h    l
+    '''
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
+    df_replaced = df.replace(dct)
+    if plot_histograms and columns:
+        for column in columns:
+            if column in df_replaced:
+                df_replaced[column].plot.hist(bins=50)
+                plt.title(column)
+    return df_replaced
 
-import matplotlib.pyplot as plt
+import pandas as pd
 import unittest
-import random
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_color_returned(self):
-        random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        color = task_func(ax)
-        self.assertIn(color, ['b', 'g', 'r', 'c', 'm', 'y', 'k'])
+    def test_basic_functionality(self):
+        df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
+        dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
+        expected_df = pd.DataFrame({'col1': ['a', 'b'], 'col2': ['c', 'd']})
+        result_df = task_func(df, dct)
+        pd.testing.assert_frame_equal(result_df, expected_df)
         plt.close()
-    def test_random_color(self):
-        random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        colors = set(task_func(ax) for _ in range(10))
-        self.assertTrue(len(colors) > 1)
+    def test_complex_dataframe(self):
+        df = pd.DataFrame({'col1': [1, 2, 3, 4], 'col2': [5, 6, 7, 8], 'col3': [9, 10, 11, 12]})
+        dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j', 11: 'k', 12: 'l'}
+        expected_df = pd.DataFrame({'col1': ['a', 'b', 'c', 'd'], 'col2': ['e', 'f', 'g', 'h'], 'col3': ['i', 'j', 'k', 'l']})
+        result_df = task_func(df, dct)
+        pd.testing.assert_frame_equal(result_df, expected_df)
         plt.close()
-    def test_plot_exists(self):
-        random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        task_func(ax)
-        self.assertTrue(len(ax.lines) > 0)
+    def test_empty_dataframe(self):
+        df = pd.DataFrame()
+        dct = {1: 'a', 2: 'b'}
+        result_df = task_func(df, dct)
+        pd.testing.assert_frame_equal(result_df, df)
         plt.close()
-    def test_plot_properties(self):
-        random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        color = task_func(ax)
-        line = ax.lines[0]
-        self.assertEqual(line.get_color(), color)
+    def test_columns_not_in_dataframe(self):
+        df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
+        dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
+        result_df = task_func(df, dct, columns=['col3', 'col4'], plot_histograms=True)
+        pd.testing.assert_frame_equal(result_df, df.replace(dct))
         plt.close()
-    def test_label_position(self):
-        random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        task_func(ax)
-        position = ax.get_rlabel_position()
-        self.assertTrue(position>1.0)
+    def test_histogram_plotting(self):
+        df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
+        dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
+        result_df = task_func(df, dct, columns=['col3', 'col4'], plot_histograms=True)
+        # Since actual plot inspection is not feasible, assume histograms are correctly plotted if no errors are raised
+        pd.testing.assert_frame_equal(result_df, df.replace(dct))
+        plt.close()
+    def test_case_non_df(self):
+        with self.assertRaises(ValueError):
+            task_func("non_df", {})
         plt.close()

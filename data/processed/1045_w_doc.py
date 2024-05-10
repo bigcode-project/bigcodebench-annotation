@@ -1,72 +1,121 @@
-import numpy as np
-import itertools
+import pandas as pd
+import matplotlib.pyplot as plt
 
-def task_func(matrix):
+# Constants
+CATEGORIES = ["A", "B", "C", "D", "E"]
+
+
+def task_func(data_list):
     """
-    Sorts a numeric 2D numpy array in ascending order and finds all unique combinations of two elements from the sorted array.
-    
+    Processes a list of category labels to create a histogram that visualizes their distribution.
+    This histogram compares the distribution of a predefined set of categories (A, B, C, D, E)
+    with any additional categories found in the input list.
+
     Parameters:
-    - matrix (numpy.array): A 2D numpy array of any shape (m, n), where m and n are non-negative integers.
-    
+    - data_list (list): A list containing category labels (strings).
+
     Returns:
-    - tuple: A tuple containing two elements:
-        1. numpy.array: A 1D array with all elements of the input array sorted in ascending order.
-        2. list: A list of tuples, each containing a pair of elements from the sorted array, representing all unique combinations taken two at a time.
+    - Axes object (matplotlib.axes._axes.Axes): The histogram displaying the distribution of categories.
 
     Requirements:
-    - numpy
-    - itertools
-    
+    - pandas
+    - matplotlib
+
+    Notes:
+    - The function evaluates the distribution of predefined categories ('A', 'B', 'C', 'D', 'E') and checks for uniformity.
+      If the distribution is not uniform, a warning message of "The distribution of predefined categories is not uniform." is printed.
+    - Categories in the data_list that are not among the predefined categories are identified and included in the histogram.
+    - The ax.bar call in the function creates a bar plot on the axes object. It uses the following parameters:
+        * all_categories: The categories to be displayed on the x-axis, including both predefined and extra categories.
+        * category_counts.reindex(all_categories, fill_value=0): The counts of each category, where categories not found
+          in the data_list are assigned a count of 0.
+        * width=0.8: Sets the width of the bars in the bar plot.
+        * align="center": Aligns the bars with the center of the x-ticks.
+
+    Raises:
+    - ValueError: If the input data_list is empty, the function raises a ValueError with the message "The data list is empty."
+      In this case, no histogram is generated and the function terminates.
+
+
     Example:
-    >>> task_func(np.array([[1, 3], [2, 4]]))
-    (array([1, 2, 3, 4]), [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)])
+    >>> data = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+    >>> ax = task_func(data)
+    >>> ax.get_xticks()
+    array([0., 1., 2., 3., 4., 5., 6.])
     """
-    sorted_array = np.sort(matrix, axis=None)
-    combinations = list(itertools.combinations(sorted_array, 2))
-    return sorted_array, combinations
+    if not data_list:
+        raise ValueError("The data list is empty.")
+    data_series = pd.Series(data_list)
+    category_counts = data_series.value_counts()
+    predefined_counts = category_counts.reindex(CATEGORIES, fill_value=0)
+    if not all(x == predefined_counts.iloc[0] for x in predefined_counts):
+        print("The distribution of predefined categories is not uniform.")
+    extra_categories = category_counts.drop(CATEGORIES, errors="ignore").index.tolist()
+    all_categories = CATEGORIES + extra_categories
+    _, ax = plt.subplots()
+    ax.bar(
+        all_categories,
+        category_counts.reindex(all_categories, fill_value=0),
+        width=0.8,
+        align="center",
+    )
+    ax.set_xticks(all_categories)
+    return ax
 
 import unittest
-import numpy as np
+from unittest.mock import patch
+import io
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Checks sorting and combination generation for a small 2x2 matrix.
-        matrix = np.array([[1, 3], [2, 4]])
-        sorted_array, combinations = task_func(matrix)
-        self.assertTrue(np.array_equal(sorted_array, np.array([1, 2, 3, 4])))
-        self.assertEqual(combinations, [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)])
-    def test_case_2(self):
-        # Verifies function correctness with a different 2x2 matrix with non-sequential numbers.
-        matrix = np.array([[5, 6], [3, 4]])
-        sorted_array, combinations = task_func(matrix)
-        self.assertTrue(np.array_equal(sorted_array, np.array([3, 4, 5, 6])))
-        self.assertEqual(combinations, [(3, 4), (3, 5), (3, 6), (4, 5), (4, 6), (5, 6)])
-    def test_case_3(self):
-        # Tests handling of a single element matrix.
-        matrix = np.array([[10]])
-        sorted_array, combinations = task_func(matrix)
-        self.assertTrue(np.array_equal(sorted_array, np.array([10])))
-        self.assertEqual(combinations, [])
-    def test_case_4(self):
-        # Checks correct ordering and combination creation for a descending sorted matrix.
-        matrix = np.array([[9, 8], [7, 6]])
-        sorted_array, combinations = task_func(matrix)
-        self.assertTrue(np.array_equal(sorted_array, np.array([6, 7, 8, 9])))
-        self.assertEqual(combinations, [(6, 7), (6, 8), (6, 9), (7, 8), (7, 9), (8, 9)])
-    def test_case_5(self):
-        # Verifies proper function operation on a 2x3 matrix.
-        matrix = np.array([[1, 2, 3], [4, 5, 6]])
-        sorted_array, combinations = task_func(matrix)
-        self.assertTrue(np.array_equal(sorted_array, np.array([1, 2, 3, 4, 5, 6])))
-        self.assertEqual(combinations, [(1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (2, 3), (2, 4), (2, 5), (2, 6), (3, 4), (3, 5), (3, 6), (4, 5), (4, 6), (5, 6)])
-    def test_empty_matrix(self):
-        # Ensures that an empty matrix is handled correctly.
-        matrix = np.array([[]])
-        sorted_array, combinations = task_func(matrix)
-        self.assertTrue(np.array_equal(sorted_array, np.array([])))
-        self.assertEqual(combinations, [])
-    def test_matrix_with_repeated_elements(self):
-        # Tests the function's behavior with repeated elements.
-        matrix = np.array([[2, 2], [2, 2]])
-        sorted_array, combinations = task_func(matrix)
-        self.assertTrue(np.array_equal(sorted_array, np.array([2, 2, 2, 2])))
-        self.assertEqual(combinations, [(2, 2), (2, 2), (2, 2), (2, 2), (2, 2), (2, 2)])
+    """Tests for the function."""
+    def test_empty_list(self):
+        """
+        Test the function with an empty list. Expects ValueError.
+        """
+        with self.assertRaises(ValueError):
+            task_func([])
+    def test_uniform_distribution(self):
+        """
+        Test the function with a uniform distribution of predefined categories.
+        Expects no printed warning about non-uniform distribution.
+        """
+        data = ["A", "B", "C", "D", "E"] * 2
+        with patch("sys.stdout", new=io.StringIO()) as fake_output:
+            task_func(data)
+        self.assertNotIn(
+            "The distribution of predefined categories is not uniform.",
+            fake_output.getvalue(),
+        )
+    def test_non_uniform_distribution(self):
+        """
+        Test the function with a non-uniform distribution of predefined categories.
+        Expects a printed warning about non-uniform distribution.
+        """
+        data = ["A", "A", "B", "C", "D", "E"]
+        with patch("sys.stdout", new=io.StringIO()) as fake_output:
+            task_func(data)
+        self.assertIn(
+            "The distribution of predefined categories is not uniform.",
+            fake_output.getvalue(),
+        )
+    def test_extra_categories(self):
+        """
+        Test the function with extra categories not in the predefined list.
+        Expects extra categories to be included in the histogram.
+        """
+        data = ["A", "B", "C", "D", "E", "F", "G"]
+        ax = task_func(data)
+        self.assertIn("F", [tick.get_text() for tick in ax.get_xticklabels()])
+        self.assertIn("G", [tick.get_text() for tick in ax.get_xticklabels()])
+    def test_no_extra_categories(self):
+        """
+        Test the function with no extra categories.
+        Expects only predefined categories to be included in the histogram.
+        """
+        data = ["A", "B", "C", "D", "E"]
+        ax = task_func(data)
+        for extra_cat in ["F", "G"]:
+            self.assertNotIn(
+                extra_cat, [tick.get_text() for tick in ax.get_xticklabels()]
+            )
+    def tearDown(self):
+        plt.clf()

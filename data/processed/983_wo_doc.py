@@ -1,86 +1,110 @@
-from datetime import datetime
 import pandas as pd
+from datetime import datetime
+import random
 
-# For Python versions lower than 3.9, use 'pytz' instead of 'zoneinfo'
-try:
-    from zoneinfo import ZoneInfo
-except ImportError:
-    from pytz import timezone as ZoneInfo
 
-TIME_FORMAT = "%d/%m/%y %H:%M:%S.%f"
-
-def task_func(time_strings, target_tz):
+def task_func(start_date, end_date, num_series, seed=None):
     """
-    Convert a list of time strings from UTC to a specified timezone and return a DataFrame.
-
-    The function processes each UTC time string in the given list,
-    converts it to the specified timezone, and stores the results in a DataFrame.
+    Generates a DataFrame with multiple random integer time series (each ranging
+    from 0 to 100) from a start date to an end date, then returns the generated time series
+    on a line plot.
 
     Parameters:
-    - time_strings (list of str): A list of time strings in UTC. Each string should be formatted as 'dd/mm/yy HH:MM:SS.fff'.
-    - target_tz (str): The timezone identifier (e.g., 'America/New_York') to which the time strings should be converted.
+    - start_date (str): The start date in "yyyy-mm-dd" format.
+    - end_date (str): The end date in "yyyy-mm-dd" format.
+    - num_series (int): The number of random time series to generate.
+    - seed (int, optional): Seed for the random number generator. Defaults to None (not set).
 
     Returns:
-    - pandas.DataFrame: A DataFrame with two columns: 'Original Time'
-    containing the UTC times and 'Converted Time' containing the times converted to the target timezone.
+    - pandas.DataFrame: A pandas DataFrame containing the generated time series, indexed by date.
+    - plt.Axes: A matplotlib line plot of the time series.
+
+    Raises:
+    - ValueError: If start_date is later than end_date; or if num_series is less than 1.
 
     Requirements:
     - pandas
     - datetime
-    - zoneinfo.ZoneInfo (Python 3.9+) or pytz.timezone.ZoneInfo (Python < 3.9)
-    
-    Note:
-    - The function assumes that the input times are in UTC.
+    - random
+
+    Notes:
+    - The line plot's title is set to "Random Time Series", the x-axis label to "Date",
+      and the y-axis label to "Value".
+    - Each time series is plotted as a separate line with automatic coloring and legend
+      entry labeled as "series_x" where x is the series number.
 
     Example:
-    >>> time_strings = ['30/03/09 16:31:32.123', '15/04/10 14:25:46.789', '20/12/11 12:34:56.000']
-    >>> df = task_func(time_strings, 'America/New_York')
-    >>> print(df)
-               Original Time            Converted Time
-    0  30/03/09 16:31:32.123  30/03/09 12:31:32.123000
-    1  15/04/10 14:25:46.789  15/04/10 10:25:46.789000
-    2  20/12/11 12:34:56.000  20/12/11 07:34:56.000000
+    >>> df, ax = task_func('2020-01-01', '2020-12-31', 3, 42)
+    >>> df.head(2)
+                series_1  series_2  series_3
+    2020-01-01        81        67        19
+    2020-01-02        14        20        29
     """
-    data = []
-    for time_string in time_strings:
-        utc_time = datetime.strptime(time_string, TIME_FORMAT)
-        converted_time = utc_time.replace(tzinfo=ZoneInfo("UTC")).astimezone(
-            ZoneInfo(target_tz)
-        )
-        data.append([time_string, converted_time.strftime(TIME_FORMAT)])
-    df = pd.DataFrame(data, columns=["Original Time", "Converted Time"])
-    return df
+    if seed is not None:
+        random.seed(seed)
+    start_date_dt = datetime.strptime(start_date, "%Y-%m-%d")
+    end_date_dt = datetime.strptime(end_date, "%Y-%m-%d")
+    if start_date_dt > end_date_dt:
+        raise ValueError("start_date must be earlier than or equal to end_date.")
+    if num_series < 1:
+        raise ValueError("num_series must be at least 1.")
+    date_range = pd.date_range(start_date_dt, end_date_dt)
+    data = {}
+    for i in range(num_series):
+        series_name = f"series_{i+1}"
+        data[series_name] = [random.randint(0, 100) for _ in range(len(date_range))]
+    df = pd.DataFrame(data, index=date_range)
+    ax = df.plot()
+    ax.set_title("Random Time Series")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Value")
+    return df, ax
 
 import unittest
-try:
-    from zoneinfo import ZoneInfo
-except ImportError:
-    from pytz import timezone as ZoneInfo
-# Test cases
+import pandas as pd
+import matplotlib
+import warnings
 class TestCases(unittest.TestCase):
-    """Test cases for task_func"""
-    def test_conversion_from_utc(self):
-        """Test conversion from UTC to Eastern Standard Time."""
-        time_strings = ["01/01/21 00:00:00.000", "01/01/21 12:00:00.000"]
-        df = task_func(time_strings, "America/New_York")
-        expected = ["31/12/20 19:00:00.000000", "01/01/21 07:00:00.000000"]
-        self.assertEqual(list(df["Converted Time"]), expected)
-    def test_conversion_from_non_utc(self):
-        """Test conversion from Eastern Standard Time to India Standard Time."""
-        time_strings = ["01/01/21 00:00:00.000", "01/01/21 12:00:00.000"]
-        df = task_func(time_strings, "Asia/Kolkata")
-        expected = ["01/01/21 05:30:00.000000", "01/01/21 17:30:00.000000"]
-        self.assertEqual(list(df["Converted Time"]), expected)
-    def test_empty_list(self):
-        """Test empty list."""
-        df = task_func([], "America/New_York")
-        self.assertEqual(len(df), 0)
-    def test_invalid_time_string(self):
-        """Test invalid time string."""
+    def test_valid_input(self):
+        """Tests correct DataFrame structure and plot type with valid inputs."""
+        df, ax = task_func("2022-01-01", "2022-01-10", 2, seed=42)
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(df.shape[1], 2)
+        self.assertEqual(len(df.index), 10)
+        self.assertIsInstance(ax, matplotlib.axes._axes.Axes)
+        self.assertTrue((df <= 100).all().all() and (df >= 0).all().all())
+    def test_seed_reproducibility(self):
+        """Tests if providing a seed results in reproducible outputs."""
+        df1, _ = task_func("2022-01-01", "2022-01-05", 1, seed=42)
+        df2, _ = task_func("2022-01-01", "2022-01-05", 1, seed=42)
+        pd.testing.assert_frame_equal(df1, df2)
+        self.assertTrue((df1 <= 100).all().all() and (df1 >= 0).all().all())
+    def test_negative_num_series(self):
+        """Tests if function raises an error when num_series is less than 1."""
         with self.assertRaises(ValueError):
-            task_func(["invalid_time_string"], "America/New_York")
-    def test_non_standard_time_format(self):
-        """Test handling of non-standard time format."""
-        time_strings = ["2021-01-01 00:00:00"]
+            task_func("2022-01-01", "2022-01-10", 0)
+    def test_start_date_after_end_date(self):
+        """Tests if function raises an error when start date is after end date."""
         with self.assertRaises(ValueError):
-            task_func(time_strings, "America/New_York")
+            task_func("2022-01-10", "2022-01-01", 1)
+    def test_single_day_series(self):
+        """Tests DataFrame structure and plot type when start and end dates are the same."""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            df, ax = task_func("2022-07-01", "2022-07-01", 1, seed=42)
+        self.assertEqual(len(df.index), 1)
+        self.assertIsInstance(ax, matplotlib.axes._axes.Axes)
+        self.assertTrue((df <= 100).all().all() and (df >= 0).all().all())
+    def test_multiple_series_names(self):
+        """Tests if the generated DataFrame contains correct series names."""
+        df, _ = task_func("2022-01-01", "2022-01-05", 3, seed=42)
+        expected_columns = ["series_1", "series_2", "series_3"]
+        self.assertListEqual(list(df.columns), expected_columns)
+        self.assertTrue((df <= 100).all().all() and (df >= 0).all().all())
+    def test_plot_attributes(self):
+        """Tests the attributes of the plot, including title, x-label, and y-label."""
+        _, ax = task_func("2022-01-01", "2022-01-05", 2, seed=42)
+        self.assertEqual(ax.get_title(), "Random Time Series")
+        self.assertEqual(ax.get_xlabel(), "Date")
+        self.assertEqual(ax.get_ylabel(), "Value")
+        self.assertTrue(len(ax.lines) == 2)

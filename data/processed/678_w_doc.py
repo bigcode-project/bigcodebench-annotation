@@ -1,78 +1,76 @@
 import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error
+import pandas as pd
+from scipy.stats import linregress
 
 
-def task_func(num_samples=1000, k=5, d=2,  random_seed=None):
+def task_func(df):
     """
-    Generate a dataset consisting of random numbers sampled from a gaussian
-    normal distribution that are transformed by applying a linear
-    transformation. Standardize it with the StandardScaler of sklearn,
-    and calculate the average square error between the original dataset
-    and the standardized dataset.
+    Analyze the relationship between two variables in a DataFrame.
+    The function performs a linear regression on the two variables and adds a 'predicted' column to the DataFrame.
 
     Parameters:
-    - num_samples (int): The number of samples to generate. Default is 1000.
-    - k (float): Multiplicative Factor in linear transformation. Default is 5.
-    - d (float): Offset in linear transformation. Default is 2.
-    - random_seed (int): The random seed for reproducibility. Default is None.
-
+    - df (pandas.DataFrame): The input DataFrame with columns 'var1', 'var2'.
+    
     Returns:
-    float: The mean squared error between the original and standardized data.
-           This value represents the average squared difference between each
-           original value and its standardized counterpart. The MSE can vary
-           significantly depending on the random seed and the specified 
-           parameters of the linear transformation.
+    - df (pandas.DataFrame): The DataFrame with the added 'predicted' column.
 
     Requirements:
     - numpy
-    - sklearn.preprocessing.StandardScaler
-    - sklearn.metrics.mean_squared_error
+    - pandas
+    - scipy
 
     Example:
-    >>> mse = task_func(num_samples=123, k=-6.4, d=12.1, random_seed=2)
-    >>> print(mse)
-    193.04172078372736
-
-    >>> mse = task_func()
-    >>> print(mse)
-    19.03543917135251
-
-    >>> mse = task_func(k=1, d=0)
-    >>> print(mse)
-    0.001113785307245742
+    >>> df = pd.DataFrame({'var1': np.random.randn(10),
+    ...                    'var2': np.random.randn(10)})
+    >>> df = task_func(df)
+    >>> assert 'predicted' in df.columns
+    >>> assert len(df) == 10
+    >>> assert len(df.columns) == 3
     """
-    if random_seed is not None:
-        np.random.seed(random_seed)
-    data = np.random.randn(num_samples, 1)*k + d
-    scaler = StandardScaler()
-    scaled_data = scaler.fit_transform(data)
-    mse = mean_squared_error(data, scaled_data)
-    return mse
+    regression = linregress(df['var1'], df['var2'])
+    predictions = np.array(regression.slope) * np.array(df['var1']) + np.array(regression.intercept)
+    df['predicted'] = pd.Series(predictions, index=df.index)
+    return df
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_case_rng(self):
-        'test rng reproducability'
-        result1 = task_func(random_seed=23)
-        result2 = task_func(random_seed=23)
-        self.assertEqual(result1, result2)
     def test_case_1(self):
-        'low mse + mse decreasing with num_samples'
-        result1 = task_func(num_samples=1000000, k=1, d=0, random_seed=1)
-        self.assertAlmostEqual(result1, 0, places=5)
-        result2 = task_func(num_samples=1000, k=1, d=0, random_seed=1)
-        result3 = task_func(num_samples=10000, k=1, d=0, random_seed=1)
-        self.assertTrue(result2 > result3)
+        df = pd.DataFrame({'var1': np.random.randn(10),
+                           'var2': np.random.randn(10)})
+        df = task_func(df)
+        self.assertTrue('predicted' in df.columns)
+        self.assertEqual(len(df), 10)
+        self.assertEqual(len(df.columns), 3)
     def test_case_2(self):
-        'deterministic mse'
-        result = task_func(num_samples=100, k=0, d=10, random_seed=42)
-        self.assertAlmostEqual(result, 100, places=5)
+        df = pd.DataFrame({'var1': [1, 2, 3, 4, 5],
+                            'var2': [1, 2, 3, 4, 5]})
+        df = task_func(df)
+        self.assertTrue('predicted' in df.columns)
+        self.assertEqual(len(df), 5)
+        self.assertEqual(len(df.columns), 3)
+        self.assertTrue(np.all(df['predicted'] == df['var2']))
+    
     def test_case_3(self):
-        'random input'
-        result = task_func(num_samples=10000, k=10, d=0, random_seed=42)
-        self.assertAlmostEqual(result, 81.61581766096013, places=5)
+        df = pd.DataFrame({'var1': [1, 2, 3, 4, 5],
+                            'var2': [5, 4, 3, 2, 1]})
+        df = task_func(df)
+        self.assertTrue('predicted' in df.columns)
+        self.assertEqual(len(df), 5)
+        self.assertEqual(len(df.columns), 3)
+        self.assertTrue(np.all(df['predicted'] == df['var2']))
+    def test_case_4(self):
+        df = pd.DataFrame({'var1': [1, 2, 3, 4, 5],
+                            'var2': [1, 1, 1, 1, 1]})
+        df = task_func(df)
+        self.assertTrue('predicted' in df.columns)
+        self.assertEqual(len(df), 5)
+        self.assertEqual(len(df.columns), 3)
+        self.assertTrue(np.all(df['predicted'] == df['var2']))
     def test_case_5(self):
-        'floats'
-        result = task_func(num_samples=340, k=-3.4, d=123.4, random_seed=42)
-        self.assertAlmostEqual(result, 15220.804873417765, places=5)
+        df = pd.DataFrame({'var1': [0, 1, 2, 3, 4, 5],
+                            'var2': [1, 1, 1, 1, 1, 1]})
+        df = task_func(df)
+        self.assertTrue('predicted' in df.columns)
+        self.assertEqual(len(df), 6)
+        self.assertEqual(len(df.columns), 3)
+        self.assertTrue(np.all(df['predicted'] == df['var2']))

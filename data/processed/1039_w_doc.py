@@ -1,116 +1,118 @@
-import os
-import hashlib
-import base64
+import pandas as pd
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
 
-def task_func(password, PREFIX="ME", SALT_LENGTH=16):
+
+def task_func(s1, s2, n_clusters=3):
     """
-    Generates a hashed password by concatenating a given password with a prefix and a generated salt,
-    and then hashing the combined string using SHA256. The hashed result is then encoded in base64.
+    Perform K-Means clustering on data points from two pandas Series and visualize the clusters.
 
     Parameters:
-    - password (str): The password string to hash.
-    - PREFIX (str): A prefix added to the password before hashing. Defaults to "ME".
-    - SALT_LENGTH (int): The byte length of the random salt to be generated. Defaults to 16.
+    - s1 (pandas.Series): The first series of data. Each value in the series represents a data point's coordinate along one dimension.
+    - s2 (pandas.Series): The second series of data. Each value corresponds to a data point's coordinate along another dimension. The length of s2 must match that of s1.
+    - n_clusters (int, optional): The number of clusters to form as well as the number of centroids to generate. Defaults to 3.
 
     Returns:
-    - str: The base64 encoded SHA256 hash of the password concatenated with the prefix and salt.
+    - tuple: A tuple containing the following elements:
+        - ndarray: An array of cluster labels indicating the cluster each data point belongs to.
+        - matplotlib.axes.Axes: The Axes object of the plot, which shows the data points colored according to their cluster labels.
 
     Raises:
-    ValueError if the SALT_LENGTH is negative
+    - ValueError: If either s1 or s2 is not a pandas Series, raise "s1 and s2 must be pandas Series"
+    - ValueError: If s1 and s2 have different lengths, raise "s1 and s2 must have the same length"
 
     Requirements:
-    - os
-    - hashlib
-    - base64
+    - pandas
+    - scikit-learn
+    - matplotlib
 
+    Notes:
+    - The function needs to ensure that s1 and s2 are pandas Series of equal length. 
+    - It then performs K-Means clustering on the combined data points from s1 and s2. 
+    - After clustering, it creates a scatter plot where each cluster is visualized with a different color. 
+    - The plot title is set to "K-Means Clustering" to describe the visualization technique. 
+    - A legend is added, which uses elements from the scatter plot to describe each cluster.
+        
     Example:
-    >>> hashed_password = task_func('password123', 'ME', 16)
-    >>> isinstance(hashed_password, str)
-    True
-    """
-    if SALT_LENGTH < 0:
-        raise ValueError
-    salt = os.urandom(SALT_LENGTH)
-    salted_password = PREFIX + password + salt.hex()
-    hashed_password = hashlib.sha256(salted_password.encode()).digest()
-    return base64.b64encode(hashed_password).decode()
+    >>> s1 = pd.Series(np.random.rand(100), name='feature1')
+    >>> s2 = pd.Series(np.random.rand(100), name='feature2')
+    >>> labels, ax = task_func(s1, s2, n_clusters=4)
+    >>> print(ax.get_title())
+    K-Means Clustering
 
+   
+    """
+    if not isinstance(s1, pd.Series) or not isinstance(s2, pd.Series):
+        raise ValueError("s1 and s2 must be pandas Series")
+    if len(s1) != len(s2):
+        raise ValueError("s1 and s2 must have the same length")
+    df = pd.concat([s1, s2], axis=1)
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+    labels = kmeans.fit_predict(df)
+    _, ax = plt.subplots()
+    scatter = ax.scatter(df[s1.name], df[s2.name], c=labels)
+    ax.set_xlabel(s1.name)
+    ax.set_ylabel(s2.name)
+    ax.set_title("K-Means Clustering")
+    plt.legend(*scatter.legend_elements(), title="Clusters")
+    return labels, ax
+
+import pandas as pd
+import numpy as np
 import unittest
-from unittest.mock import patch
-import base64
-import hashlib
 import os
+from sklearn.datasets import make_blobs
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Setup a predictable random generator for consistent testing
-        self.expected_salt = bytes([i%256 for i in range(16)])  # a repeatable "random" byte sequence
-        self.patcher = patch('os.urandom', return_value=self.expected_salt)
-        self.mock_urandom = self.patcher.start()
-    def tearDown(self):
-        # Stop patching 'os.urandom'
-        self.patcher.stop()
-    def test_consistent_hashing(self):
-        password = "consistent"
-        hashed_password1 = task_func(password, "ME", 16)
-        hashed_password2 = task_func(password, "ME", 16)
-        self.assertEqual(hashed_password1, hashed_password2)
-    def test_different_prefix_and_salt_length(self):
-        """ Test hashing with different prefixes and salt lengths """
-        password = "password123"
-        prefix1 = "ME"
-        prefix2 = "YOU"
-        hashed_password1 = task_func(password, prefix1, 16)
-        hashed_password2 = task_func(password, prefix2, 32)
-        self.assertNotEqual(hashed_password1, hashed_password2)
-    def test_hash_length(self):
-        """ Ensure the hashed password is always 44 characters """
-        password = "variableLength"
-        hashed_password = task_func(password)
-        self.assertEqual(len(hashed_password), 44)
-        self.assertIsInstance(hashed_password, str)
-    def test_invalid_inputs(self):
-        """ Test function behavior with invalid inputs """
-        with self.assertRaises(TypeError):
-            task_func(None)  # Passing None as password
-        with self.assertRaises(TypeError):
-            task_func("password", PREFIX=123)  # Non-string prefix
+    """Tests for task_func."""
+    def setUp(self) -> None:
+        os.environ["LOKY_MAX_CPU_COUNT"] = "2"
+    def test_random_data_size_100(self):
+        """Test with random data of size 100 and default number of clusters"""
+        np.random.seed(42)
+        s1 = pd.Series(np.random.rand(100), name="feature1")
+        np.random.seed(0)
+        s2 = pd.Series(np.random.rand(100), name="feature2")
+        labels, ax = task_func(s1, s2)
+        # Check if labels are ndarray
+        self.assertIsInstance(labels, np.ndarray)
+        # Check the plot's title
+        self.assertEqual(ax.get_title(), "K-Means Clustering")
+    def test_random_data_custom_clusters(self):
+        """Test with random data of size 100 and custom number of clusters"""
+        np.random.seed(42)
+        s1 = pd.Series(np.random.rand(100), name="feature1")
+        np.random.seed(0)
+        s2 = pd.Series(np.random.rand(100), name="feature2")
+        labels, ax = task_func(s1, s2, n_clusters=5)
+        # Check if labels are ndarray
+        self.assertIsInstance(labels, np.ndarray)
+        self.assertEqual(len(set(labels)), 5)
+        # Check the plot's title
+        self.assertEqual(ax.get_title(), "K-Means Clustering")
+    def test_invalid_input_non_series(self):
+        """Test with invalid input types (non-Series)"""
         with self.assertRaises(ValueError):
-            task_func("password", SALT_LENGTH=-1)  # Invalid salt length
-    def test_empty_password(self):
-        """ Test hashing an empty string """
-        hashed_password = task_func("", "ME", 16)
-        expected_hash = hashlib.sha256(("ME" + "" + self.expected_salt.hex()).encode()).digest()
-        expected_output = base64.b64encode(expected_hash).decode()
-        self.assertEqual(hashed_password, expected_output)
-    def test_special_characters_in_password(self):
-        """ Test passwords that include special characters """
-        special_password = "!@#$%^&*()_+{}:>?<"
-        hashed_password = task_func(special_password, "ME", 16)
-        expected_hash = hashlib.sha256(("ME" + special_password + self.expected_salt.hex()).encode()).digest()
-        expected_output = base64.b64encode(expected_hash).decode()
-        self.assertEqual(hashed_password, expected_output)
-    def test_long_password(self):
-        """ Test with an unusually long password """
-        long_password = "x" * 1000  # A very long password
-        hashed_password = task_func(long_password, "ME", 16)
-        expected_hash = hashlib.sha256(("ME" + long_password + self.expected_salt.hex()).encode()).digest()
-        expected_output = base64.b64encode(expected_hash).decode()
-        self.assertEqual(hashed_password, expected_output)
-    def test_hash_with_different_salts(self):
-        """ Ensure different salts result in different hashes """
-        password = "password"
-        salt1 = bytes([i%256 for i in range(16)])
-        salt2 = bytes([(i+1)%256 for i in range(16)])  # Slightly different salt
-        with patch('os.urandom', return_value=salt1):
-            hashed1 = task_func(password, "ME", 16)
-        with patch('os.urandom', return_value=salt2):
-            hashed2 = task_func(password, "ME", 16)
-        self.assertNotEqual(hashed1, hashed2, "Different salts should result in different hashes")
-    def test_deterministic_output_with_fixed_salt(self):
-        """ Verify that the same salt and input always produces the same hash """
-        password = "consistentOutput"
-        prefix = "ME"
-        hashed_password = task_func(password, prefix, 16)
-        expected_hash = hashlib.sha256((prefix + password + self.expected_salt.hex()).encode()).digest()
-        expected_output = base64.b64encode(expected_hash).decode()
-        self.assertEqual(hashed_password, expected_output)
+            task_func([1, 2, 3], pd.Series([4, 5, 6]))
+    def test_invalid_input_mismatched_length(self):
+        """Test with mismatched length of Series"""
+        s1 = pd.Series([1, 2, 3], name="feature1")
+        s2 = pd.Series([4, 5], name="feature2")
+        with self.assertRaises(ValueError):
+            task_func(s1, s2)
+    def test_custom_clusters_with_synthetic_data(self):
+        """Test with synthetic data and custom number of clusters using make_blobs"""
+        # Generate synthetic data with 2 distinct clusters
+        X, _ = make_blobs(n_samples=100, centers=2, random_state=42)
+        # Convert to pandas Series
+        s1 = pd.Series(X[:, 0], name="feature1")
+        s2 = pd.Series(X[:, 1], name="feature2")
+        # Run the clustering function
+        labels, ax = task_func(s1, s2, n_clusters=2)
+        # Check if labels are ndarray
+        self.assertIsInstance(labels, np.ndarray)
+        # Check the number of unique labels (should be 2 for 2 clusters)
+        self.assertEqual(len(set(labels)), 2)
+        # Check the plot's title
+        self.assertEqual(ax.get_title(), "K-Means Clustering")
+    def tearDown(self):
+        plt.clf()

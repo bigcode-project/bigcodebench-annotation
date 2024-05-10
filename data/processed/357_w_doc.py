@@ -1,107 +1,82 @@
 import numpy as np
-from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-import seaborn as sns
+import cmath
 
-
-def task_func(n_components=2, N_SAMPLES=500, N_FEATURES=50, random_seed=None):
+def task_func(x, y):
     """
-    Generate a high-dimensional dataset, run PCA to reduce its dimensionality, and then draw a heatmap of
-    the covariance matrix of the transformed data.
+    Draw the phase of a complex function over a range of x and y and return the matplotlib axes object
+    along with the 2D array of calculated phase values.
 
     Parameters:
-    n_components (int, optional): The number of components for PCA. Defaults to 2.
-    N_SAMPLES (int, optional): Number of samples in the dataset. Defaults to 500.
-    N_FEATURES (int, optional): Number of features in the dataset. Defaults to 50.
-    random_seed (int, optional): Seed for the numpy and sklearn random number generator. Defaults to None.
+    x (numpy.ndarray): The range of x values.
+    y (numpy.ndarray): The range of y values.
 
     Returns:
-    tuple:
-        transformed_data (ndarray): The transformed data of shape (N_SAMPLES, n_components).
-        heatmap_axes (Axes): The heatmap of the covariance matrix of the transformed data or None if n_components=1.
-
+    tuple: containing
+        - matplotlib.axes.Axes: The axes object with the phase plot.
+        - numpy.ndarray: The 2D array of calculated phase values.
+    
+    Raises:
+    TypeError: If either `x` or `y` is not a numpy.ndarray.
+    ValueError: If `x` and `y` do not have the same length.
+    
     Requirements:
     - numpy
-    - sklearn.decomposition.PCA
     - matplotlib.pyplot
-    - seaborn
+    - cmath
 
-    Example:
-    >>> transformed, ax = task_func(n_components=2, random_seed=42)
-    >>> transformed.shape
-    (500, 2)
+    Examples:
+    >>> ax, Z = task_func(np.array([1, 2, 3]), np.array([1, 2, 3]))
+    >>> isinstance(ax, plt.Axes), isinstance(Z, np.ndarray)
+    (True, True)
+    >>> ax, Z = task_func(np.array([0]), np.array([0]))  # Test with single point
+    >>> isinstance(ax, plt.Axes), isinstance(Z, np.ndarray)
+    (True, True)
     """
-    np.random.seed(random_seed)  # Ensuring reproducibility
-    X = np.random.rand(N_SAMPLES, N_FEATURES)
-    pca = PCA(n_components=n_components, random_state=random_seed)
-    X_transformed = pca.fit_transform(X)
-    if n_components == 1:
-        return X_transformed, None
-    fig, ax = plt.subplots(figsize=(10, 7))
-    sns.heatmap(np.cov(X_transformed.T), annot=True, fmt=".2f", ax=ax)
-    return X_transformed, ax
+    if not isinstance(x, np.ndarray) or not isinstance(y, np.ndarray):
+        raise TypeError("x and y must be numpy.ndarray")
+    if x.size == 0 or y.size == 0:
+        print("Empty x or y array provided.")
+        return None, np.array([])  # Adjusted to return a tuple
+    if len(x) != len(y):
+        raise ValueError("Mismatched array sizes: x and y must have the same length")
+    Z = np.zeros((len(y), len(x)), dtype=float)
+    for i in range(len(y)):
+        for j in range(len(x)):
+            z = complex(x[j], y[i])
+            Z[i, j] = cmath.phase(z**2 - 1)
+    fig, ax = plt.subplots()
+    c = ax.imshow(Z, extent=(np.amin(x), np.amax(x), np.amin(y), np.amax(y)), origin='lower', cmap='hsv')
+    fig.colorbar(c, ax=ax, label="Phase (radians)")
+    ax.grid()
+    return ax, Z
 
 import unittest
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
+import cmath
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.seed = 42
-        # default parameters
-        self.n_components = 2
-        self.N_SAMPLES = 500
-        self.N_FEATURES = 50
-    def test_case_1(self):
-        # Test basic functionality - results
-        transformed_data, _ = task_func()
-        self.assertEqual(transformed_data.shape, (self.N_SAMPLES, self.n_components))
-        np.random.seed(self.seed)
-        X = np.random.rand(self.N_SAMPLES, self.N_FEATURES)
-        pca = PCA(n_components=self.n_components, random_state=self.seed)
-        pca.fit(X)
-        self.assertTrue(np.sum(pca.explained_variance_ratio_) <= 1)
-    def test_case_2(self):
-        # Test basic functionality - visualization
-        _, heatmap_axes = task_func()
-        self.assertIsNotNone(heatmap_axes)
-        self.assertIsInstance(heatmap_axes, plt.Axes)
-        self.assertEqual(len(heatmap_axes.get_xticklabels()), 2)
-        self.assertEqual(len(heatmap_axes.get_yticklabels()), 2)
-    def test_case_3(self):
-        # Test n_components
-        for n_components in [1, 10, self.N_FEATURES]:
-            transformed_data, _ = task_func(
-                n_components=n_components, N_FEATURES=self.N_FEATURES
-            )
-            self.assertEqual(transformed_data.shape, (self.N_SAMPLES, n_components))
-    def test_case_4(self):
-        # Test N_SAMPLES
-        for n_samples in [self.n_components, 10, 50, 100]:
-            transformed_data, _ = task_func(N_SAMPLES=n_samples)
-            self.assertEqual(transformed_data.shape, (n_samples, self.n_components))
-    def test_case_5(self):
-        # Test N_FEATURES
-        for n_features in [self.n_components, 10, 50, 100]:
-            transformed_data, _ = task_func(N_FEATURES=n_features)
-            self.assertEqual(
-                transformed_data.shape, (self.N_SAMPLES, self.n_components)
-            )
-    def test_case_6(self):
-        # Test random_seed
-        transformed_data1, _ = task_func(random_seed=self.seed)
-        transformed_data2, _ = task_func(random_seed=self.seed)
-        np.testing.assert_array_equal(transformed_data1, transformed_data2)
-        transformed_data2, _ = task_func(random_seed=0)
-        with self.assertRaises(AssertionError):
-            np.testing.assert_array_equal(transformed_data1, transformed_data2)
-    def test_case_7(self):
-        # Function should fail at invalid values
+    def test_input_types(self):
+        """Test the function with non-numpy array inputs."""
+        with self.assertRaises(TypeError):
+            task_func([1, 2, 3], np.array([1, 2, 3]))
+    def test_empty_arrays(self):
+        """Test function with empty numpy arrays."""
+        _, Z = task_func(np.array([]), np.array([]))
+        self.assertEqual(Z.size, 0)
+    def test_single_point(self):
+        """Test the function with single-point arrays."""
+        ax, Z = task_func(np.array([0]), np.array([0]))
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertIsInstance(Z, np.ndarray)
+    def test_phase_calculation(self):
+        """Test phase calculation for known values."""
+        x = np.array([1, -1])
+        y = np.array([0, 0])
+        _, Z = task_func(x, y)
+        expected_phases = np.array([cmath.phase((1 + 0j)**2 - 1), cmath.phase((-1 + 0j)**2 - 1)])
+        np.testing.assert_array_almost_equal(Z[0], expected_phases)
+    def test_mismatched_array_sizes(self):
+        """Test function with arrays of different lengths."""
         with self.assertRaises(ValueError):
-            # negative n_components
-            task_func(n_components=-1)
-        with self.assertRaises(ValueError):
-            # more components than features
-            task_func(n_components=self.N_FEATURES + 10, N_FEATURES=self.N_FEATURES)
-    def tearDown(self):
-        plt.close("all")
+            task_func(np.array([0]), np.array([0, 1]))

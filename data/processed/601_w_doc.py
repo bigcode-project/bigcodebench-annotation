@@ -1,51 +1,73 @@
 import numpy as np
-from sklearn.decomposition import PCA
+import pandas as pd
 
-def task_func(tuples_list, n_components):
+
+def task_func(df, letter):
     """
-    Perform Principal Component Analysis (PCA) on a list of tuples.
-    
+    This function converts an input dictionary into a DataFrame, filters rows where 'Word' column values start with a
+    specified letter, calculates the lengths of these words, and returns basic statistics (mean, median, mode) of the
+    word lengths.
+
     Parameters:
-    - tuples_list (list): The list of tuples.
-    
-    Returns:
-    - transformed_data (ndarray): The transformed data.
+    df (dict of list): A dictionary where the key 'Word' maps to a list of strings.
+    letter (str): The letter to filter the 'Word' column.
 
-    Requirements:
-    - numpy
-    - sklearn
+    Returns:
+    dict: A dictionary of mean, median, and mode of word lengths.
     
+    Requirements:
+    - pandas
+    - numpy
+
     Example:
-    >>> data = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)], 2)
-    >>> print(data)
-    [[ 8.00000000e+00  3.84592537e-16]
-     [ 0.00000000e+00  0.00000000e+00]
-     [-8.00000000e+00  3.84592537e-16]]
+    >>> df = {'Word': ['apple', 'banana', 'apricot', 'blueberry', 'cherry', 'avocado']}
+    >>> stats = task_func(df, 'a')
+    >>> stats['mean'] > 0
+    True
+    >>> stats['median'] > 0
+    True
     """
-    data = np.array(tuples_list)
-    pca = PCA(n_components=n_components)
-    transformed_data = pca.fit_transform(data)
-    return transformed_data
+    df = pd.DataFrame(df)
+    regex = '^' + letter
+    filtered_df = df[df['Word'].str.contains(regex, regex=True)]
+    word_lengths = filtered_df['Word'].str.len()
+    statistics = {'mean': np.mean(word_lengths), 'median': np.median(word_lengths), 'mode': word_lengths.mode().values[0]}
+    return statistics
 
 import unittest
+import random
+from string import ascii_lowercase
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        word_list = []
+        num = 1000
+        for _ in range(num):
+            length = random.randint(3, 10)
+            word = ''.join(random.choice(ascii_lowercase) for _ in range(length))
+            word_list.append(word)
+        self.df = {'Word': word_list}
     def test_case_1(self):
-        transformed_data = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)], 2)
-        self.assertEqual(transformed_data.shape, (3, 2))
+        result = task_func(self.df, 'a')
+        self.assertIn('mean', result)
+        self.assertIn('median', result)
+        self.assertIn('mode', result)
     def test_case_2(self):
-        transformed_data = task_func([(0, 0, 0, 0), (0, 0, 0, 0), (0, 0, 0, 0)], 2)
-        self.assertEqual(transformed_data.shape, (3, 2))
-        self.assertTrue(np.all(transformed_data == 0))
+        result = task_func(self.df, 'z')
+        self.assertIn('mean', result)
+        self.assertIn('median', result)
+        self.assertIn('mode', result)
     def test_case_3(self):
-        transformed_data = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)], 3)
-        self.assertEqual(transformed_data.shape, (3, 3))
+        result = task_func(self.df, 'm')
+        self.assertIn('mean', result)
+        self.assertIn('median', result)
+        self.assertIn('mode', result)
     def test_case_4(self):
-        transformed_data = task_func([(0, 1)], 1)
-        self.assertEqual(transformed_data.shape, (1, 1))
-        self.assertTrue(np.all(transformed_data == 0))
+        result = task_func(self.df, 'f')
+        self.assertIn('mean', result)
+        self.assertIn('median', result)
+        self.assertIn('mode', result)
     def test_case_5(self):
-        transformed_data = task_func([(-1, -1, -1), (0, 0, 0), (1, 1, 1)], 1)
-        self.assertEqual(transformed_data.shape, (3, 1))
-        self.assertTrue(transformed_data[0][0] < 0)
-        self.assertTrue(transformed_data[1][0] == 0)
-        self.assertTrue(transformed_data[2][0] > 0)
+        result = task_func(self.df, 't')
+        self.assertIn('mean', result)
+        self.assertIn('median', result)
+        self.assertIn('mode', result)

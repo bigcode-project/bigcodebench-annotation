@@ -1,91 +1,88 @@
-import re
-import os
-import subprocess
+import sys
+import json
+from datetime import datetime
 
-def task_func(dir_path, exe_pattern, execute_files=True):
+# Constants
+PATH_TO_APPEND = '/path/to/whatever'
+JSON_FILE = '/path/to/json_file.json'
+
+def task_func(path_to_append=PATH_TO_APPEND, json_file=JSON_FILE):
     """
-    Searches for executable files in a specified directory that match a given regular expression pattern.
-    Optionally executes any matching files and returns a list of standard outputs from the executed files
-    or the paths of the found files.
+    Add a specific path to sys.path and update a JSON file with the current date and time.
+    This function appends a given path to Python's sys.path and updates a JSON file with the current date and time under the key 'last_updated'.
     
     Parameters:
-    - dir_path (str): The directory path where the search for executable files will be conducted.
-                    It should be a valid directory path.
-    - exe_pattern (str): The regular expression pattern to match the executable files.
-                       It should be a valid regular expression pattern.
-    - execute_files (bool, optional): If True, execute the found files and return their standard output.
-                                    If False, return the paths of the found files. Default is True.
-                       
+    - path_to_append (str): The path to append to sys.path. Default is '/path/to/whatever'.
+    - json_file (str): The path to the JSON file to update. Default is '/path/to/json_file.json'. The file should exist before running the function.
+
     Returns:
-    - results (list): If execute_files is True, a list of standard outputs from the executed files. 
-               If execute_files is False, a list of paths of the found files.
-               Each element in the list corresponds to an executed file or a found file.
-               
+    - json_data (dict): The updated JSON data. The dictionary will contain a 'last_updated' key with the current datetime as its value.
+
     Requirements:
-    - re
-    - os
-    - subprocess
-    
+    - sys
+    - json
+    - datetime.datetime
+
     Example:
-    >>> task_func("C:\\SomeDir", r"(?<!Distillr)\\AcroTray\.exe")
-    []
-    >>> task_func("C:\\SomeDir", r"(?<!Distillr)\\AcroTray\.exe", execute_files=False)
-    []
+    >>> task_func('/path/to/new_directory', '/path/to/new_json_file.json')
+    {'last_updated': '2023-08-28 12:34:56'}
     """
-    results = []
-    for dirpath, dirnames, filenames in os.walk(os.path.normpath(dir_path)):
-        for filename in filenames:
-            if re.search(exe_pattern, filename):
-                file_path = os.path.join(dirpath, filename)
-                if execute_files:
-                    result = subprocess.run([file_path], stdout=subprocess.PIPE)
-                    results.append(result.stdout.decode('utf-8'))
-                else:
-                    results.append(file_path)
-    return results
+    sys.path.append(path_to_append)
+    with open(json_file, 'r+') as file:
+        json_data = json.load(file)
+        json_data['last_updated'] = str(datetime.now())
+        file.seek(0)
+        json.dump(json_data, file, indent=4)
+        file.truncate()
+    return json_data
 
 import unittest
-from unittest.mock import patch, MagicMock
+import json
+import os
+import tempfile
+import sys
+from datetime import datetime
+# Update this path if needed to point to an actual temporary directory
 class TestCases(unittest.TestCase):
-    @patch('os.walk')
-    @patch('subprocess.run')
-    def test_finding_executable_files(self, mock_run, mock_walk):
-        mock_walk.return_value = [
-            (os.path.normpath("C:\\TestDir"), [], ["test_file.exe"])
-        ]
-        found_files = task_func("C:\\TestDir", r"test_file\.exe", execute_files=False)
-        found_files = [os.path.normpath(path) for path in found_files]
-        self.assertEqual(len(found_files), 1)
-        self.assertNotIn(os.path.normpath("C:\\TestDir\\test_file.exe"), found_files)
-    @patch('os.walk')
-    def test_invalid_directory(self, mock_walk):
-        mock_walk.return_value = []
-        found_files = task_func("C:\\InvalidDir", r"test_pattern", execute_files=False)
-        self.assertEqual(found_files, [])
-    @patch('os.walk')
-    def test_no_matching_files(self, mock_walk):
-        mock_walk.return_value = [
-            (os.path.normpath("C:\\TestDir"), [], ["unrelated_file.txt"])
-        ]
-        found_files = task_func("C:\\TestDir", r"no_match_pattern", execute_files=False)
-        self.assertEqual(found_files, [])
-    @patch('os.walk')
-    @patch('subprocess.run')
-    def test_executing_files(self, mock_run, mock_walk):
-        mock_walk.return_value = [
-            (os.path.normpath("C:\\TestDir"), [], ["test_file.exe"])
-        ]
-        mock_result = MagicMock()
-        mock_result.stdout = b'Execution Result'
-        mock_run.return_value = mock_result
-        outputs = task_func("C:\\TestDir", r"test_file\.exe", execute_files=True)
-        self.assertEqual(outputs, ["Execution Result"])
-    @patch('os.walk')
-    def test_special_characters_in_pattern(self, mock_walk):
-        mock_walk.return_value = [
-            (os.path.normpath("C:\\TestDir"), [], ["special$file.exe"])
-        ]
-        found_files = task_func("C:\\TestDir", r"special\$file\.exe", execute_files=False)
-        found_files = [os.path.normpath(path) for path in found_files]
-        self.assertEqual(len(found_files), 1)
-        self.assertNotIn(os.path.normpath("C:\\TestDir\\special$file.exe"), found_files)
+    
+    def setUp(self):
+        # Create temporary JSON files for testing in text mode
+        self.test_json_file_1 = tempfile.NamedTemporaryFile(mode='w+', delete=False)
+        self.test_json_file_2 = tempfile.NamedTemporaryFile(mode='w+', delete=False)
+        json.dump({'key': 'value'}, self.test_json_file_1)
+        json.dump({'key': 'value'}, self.test_json_file_2)
+        self.test_json_file_1.close()
+        self.test_json_file_2.close()
+        self.tmp_file = tempfile.mktemp(suffix='.json')
+        with open(self.tmp_file, 'w') as f:
+            json.dump({'initial_key': 'initial_value'}, f)
+    def tearDown(self):
+        # Remove temporary JSON files after testing
+        os.unlink(self.test_json_file_1.name)
+        os.unlink(self.test_json_file_2.name)
+        os.remove(self.tmp_file)
+        
+    def test_path_append(self):
+        # Test if the path is correctly appended to sys.path
+        new_path = '/new/test/path'
+        task_func(path_to_append=new_path, json_file=self.test_json_file_1.name)
+        self.assertIn(new_path, sys.path)
+    def test_json_update_1(self):
+        # Test if the JSON file is correctly updated (test_json_file_1)
+        output = task_func(json_file=self.test_json_file_1.name)
+        self.assertIn('last_updated', output)
+        self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
+    def test_json_update_2(self):
+        # Test if the JSON file is correctly updated (test_json_file_2)
+        output = task_func(json_file=self.test_json_file_2.name)
+        self.assertIn('last_updated', output)
+        self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
+    def test_default_path(self):
+        # Test if the default path is correctly appended when no argument is passed
+        task_func(json_file=self.test_json_file_1.name)
+        self.assertIn('/path/to/whatever', sys.path)
+    def test_default_json(self):
+        # Test if the default JSON file is correctly updated when no argument is passed
+        output = task_func(json_file=self.tmp_file)
+        self.assertIn('last_updated', output)
+        self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)

@@ -1,68 +1,44 @@
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
+import itertools
+import random
 
-# Constants
-ARRAY_LENGTH = 10
-
-def task_func():
+def task_func(t, n):
     """
-    Generate a random array and apply min-max normalization (scaling) to transform the array values into a range between 0 and 1.
-
+    Generate all combinations from a tuple with length n and return a random combination of length n.
+    
     Parameters:
-    - None
-
+    - t (tuple): The tuple.
+    - n (int): The length of the combinations.
+    
     Returns:
-    - scaled_array (numpy.ndarray): The normalized array.
+    - tuple: A combination of the input tuple.
 
     Requirements:
-    - numpy
-    - sklearn
-
+    - itertools
+    - random
+    
     Example:
-    >>> task_func()
-    array([[0.57142857],
-           [0.14285714],
-           [0.71428571],
-           [0.28571429],
-           [0.57142857],
-           [1.        ],
-           [0.        ],
-           [0.57142857],
-           [0.71428571],
-           [0.28571429]])
+    >>> random.seed(42)
+    >>> task_func((1, 2, 3, 4), 2)
+    (3, 4)
     """
-    np.random.seed(42)  # For reproducibility, as shown in your example
-    array = np.random.randint(0, 10, ARRAY_LENGTH).reshape(-1, 1)
-    scaler = MinMaxScaler()
-    scaled_array = scaler.fit_transform(array)
-    return scaled_array
+    combinations = list(itertools.combinations(t, n))
+    selected_combination = random.choice(combinations)
+    return selected_combination
 
 import unittest
-import numpy as np
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.result = task_func()  # Call the function once to use in multiple tests if needed
-    def test_normal_functionality(self):
-        """Testing the basic functionality and shape of the output array."""
-        self.assertEqual(self.result.shape, (10, 1), "Array shape should be (10, 1)")
-        self.assertTrue((self.result >= 0).all() and (self.result <= 1).all(), "Array values should be in the range [0, 1]")
-    def test_output_values(self):
-        """ Ensuring that the scaling works as expected. """
-        expected_min = 0
-        expected_max = 1
-        actual_min = np.min(self.result)
-        actual_max = np.max(self.result)
-        self.assertEqual(actual_min, expected_min, "The minimum of the scaled array should be 0")
-        self.assertAlmostEqual(actual_max, expected_max, places=15, msg="The maximum of the scaled array should be very close to 1")
-    def test_no_arguments(self):
-        """Ensure that no arguments are passed to the function."""
-        with self.assertRaises(TypeError):
-            task_func(10)  # This should fail since the function expects no arguments
-    def test_unchanging_output(self):
-        """Test if multiple calls to the function give the same result due to seed setting."""
-        second_result = task_func()
-        np.testing.assert_array_equal(self.result, second_result, "Results should be the same on every call due to fixed seed.")
-    def test_distribution_of_values(self):
-        """Test that the distribution of scaled values is neither constant nor degenerate (not all values the same)."""
-        unique_values = np.unique(self.result)
-        self.assertTrue(len(unique_values) > 1, "There should be more than one unique scaled value to confirm distribution.")
+    def test_case_1(self):
+        combination = task_func((1, 2, 3, 4), 2)
+        self.assertTrue(tuple(sorted(combination)) in [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)])
+    def test_case_2(self):
+        combination = task_func((1, 2, 3, 4), 3)
+        self.assertTrue(tuple(sorted(combination)) in [(1, 2, 3), (1, 2, 4), (1, 3, 4), (2, 3, 4)])
+    def test_case_3(self):
+        combination = task_func((1, 2, 3, 4), 4)
+        self.assertTrue(tuple(sorted(combination)) in [(1, 2, 3, 4)])
+    def test_case_4(self):
+        combination = task_func((1, 2, 3, 4), 1)
+        self.assertTrue(tuple(sorted(combination)) in [(1,), (2,), (3,), (4,)])
+    def test_case_5(self):
+        combination = task_func((1, 2, 3, 4), 0)
+        self.assertTrue(tuple(sorted(combination)) in [()])

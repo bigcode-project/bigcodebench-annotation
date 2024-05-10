@@ -1,118 +1,92 @@
-import urllib.request
-from lxml import etree
+import os
 import pandas as pd
+import re
+import matplotlib.pyplot as plt
 
-
-def task_func(url):
+def task_func(directory: str, pattern: str) -> list:
     """
-    Fetches and parses an XML file from a specified URL, then converts it into a Pandas DataFrame.
+    Searches a directory for CSV files matching a given regular expression pattern,
+    reads sales data from these files, and plots the sales data with month on the x-axis and sales on the y-axis.
+    
+    Note:
+    - Each CSV file contains two columns: 'Month' and 'Sales'.
 
     Parameters:
-    url (str): The URL of the CSV file to be downloaded. Must be a valid and accessible URL.
-    
-    Returns:
-    pandas.DataFrame
-        A DataFrame constructed from the parsed XML data. Each row of the DataFrame corresponds to an 'item' element
-        in the XML file, with child elements of 'item' becoming columns in the DataFrame.
+    - directory (str): The directory path where the CSV files are located.
+    - pattern (str): The regular expression pattern to match the filenames.
 
-    Raises:
-    ValueError
-        This error is raised in several scenarios:
-        1. If the URL is invalid or the XML file cannot be fetched from the URL.
-        2. If the XML file has invalid syntax.
-        3. If the XML structure does not conform to the expected format.
+    Returns:
+    - A list of matplotlib.axes._axes.Axes objects, each representing a plot of sales data from a matched CSV file.
 
     Requirements:
-    - urllib
-    - lxml
+    - os
     - pandas
-
+    - re
+    - matplotlib.pyplot
+    
     Examples:
-    # Example with a valid XML structure
-    >>> df = task_func('http://example.com/sample_data.xml')
-    >>> print(df)
-       name age
-    0  John  25
-    1  Jane  30
-
-    # Example with an invalid XML structure
-    >>> df = task_func('http://example.com/invalid_structure.xml')
-    ValueError: XML structure does not match expected format.
+    >>> axes = task_func('/path/to/data/', r'^sales_data_\d{4}.csv')
+    >>> len(axes)
+    2
+    >>> axes[0].get_title()
+    'sales_data_2021.csv'
     """
-    try:
-        with urllib.request.urlopen(url) as response:
-            xml_data = response.read()
-    except Exception as e:
-        raise ValueError(f"Error fetching the XML file: {e}")
-    try:
-        xml_tree = etree.XML(xml_data)
-    except etree.XMLSyntaxError:
-        raise ValueError("Invalid XML syntax")
-    data = []
-    for item in xml_tree.findall(".//item"):
-        data_item = {child.tag: child.text for child in item}
-        data.append(data_item)
-    if not data:
-        raise ValueError("XML structure does not match expected format.")
-    return pd.DataFrame(data)
+    plots = []
+    for file in os.listdir(directory):
+        if re.match(pattern, file):
+            df = pd.read_csv(os.path.join(directory, file))
+            ax = df.plot(x='Month', y='Sales', title=file)
+            plots.append(ax)
+    plt.show()
+    return plots
 
 import unittest
-import pandas as pd
-from unittest.mock import patch
+import shutil
+import numpy as np
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
-    @patch("urllib.request.urlopen")
-    def test_valid_xml(self, mock_urlopen):
-        """Test that the function returns the correct DataFrame for a given XML file."""
-        # Mocking the XML data
-        valid_xml_data = b"<root><item><name>John</name><age>25</age></item><item><name>Jane</name><age>30</age></item></root>"
-        mock_urlopen.return_value.__enter__.return_value.read.return_value = (
-            valid_xml_data
-        )
-        url = "http://example.com/sample_data.xml"
-        expected_df = pd.DataFrame({"name": ["John", "Jane"], "age": ["25", "30"]})
-        result_df = task_func(url)
-        pd.testing.assert_frame_equal(result_df, expected_df)
-    @patch("urllib.request.urlopen")
-    def test_empty_xml(self, mock_urlopen):
-        """Test that the function raises an error for an empty XML file."""
-        # Mocking empty XML data
-        empty_xml_data = b"<root></root>"
-        mock_urlopen.return_value.__enter__.return_value.read.return_value = (
-            empty_xml_data
-        )
-        url = "http://example.com/empty_data.xml"
-        with self.assertRaises(ValueError):
-            task_func(url)
-    @patch("urllib.request.urlopen")
-    def test_different_structure_xml(self, mock_urlopen):
-        """Test that the function raises an error for an XML file with a different structure."""
-        # Mocking XML with different structure
-        different_structure_xml = (
-            b"<root><different><name>John</name></different></root>"
-        )
-        mock_urlopen.return_value.__enter__.return_value.read.return_value = (
-            different_structure_xml
-        )
-        url = "http://example.com/different_structure_data.xml"
-        with self.assertRaises(ValueError):
-            task_func(url)
-    @patch("urllib.request.urlopen")
-    def test_invalid_url(self, mock_urlopen):
-        """Test that the function raises an error for an invalid URL."""
-        # Simulate an error in URL fetching
-        mock_urlopen.side_effect = Exception("URL fetch error")
-        url = "http://example.com/nonexistent/file.xml"
-        with self.assertRaises(ValueError):
-            task_func(url)
-    @patch("urllib.request.urlopen")
-    def test_non_xml_data(self, mock_urlopen):
-        """Test that the function raises an error for non-XML data."""
-        # Mocking non-XML data
-        non_xml_data = b"Not an XML content"
-        mock_urlopen.return_value.__enter__.return_value.read.return_value = (
-            non_xml_data
-        )
-        url = "http://example.com/non_xml_data.txt"
-        with self.assertRaises(ValueError):
-            task_func(url)
+    def setUp(self):
+        # Prepare test data
+        self.directory = "task_func_data/"
+        self.pattern = r"^sales_data_\d{4}.csv"
+        os.makedirs(self.directory, exist_ok=True)
+        data_2021 = pd.DataFrame({
+            'Month': ['January', 'February', 'March'],
+            'Sales': [100, 150, 200]
+        })
+        data_2022 = pd.DataFrame({
+            'Month': ['January', 'February', 'March'],
+            'Sales': [120, 130, 210]
+        })
+        data_2021.to_csv(self.directory + "sales_data_2021.csv", index=False)
+        data_2022.to_csv(self.directory + "sales_data_2022.csv", index=False)
+    def tearDown(self):
+        # Clean up test data
+        shutil.rmtree(self.directory)
+    def test_plots_generated(self):
+        plots = task_func(self.directory, self.pattern)
+        self.assertEqual(len(plots), 2, "Should generate two plots for two CSV files")
+    def test_plot_titles(self):
+        plots = task_func(self.directory, self.pattern)
+        expected_titles = ['sales_data_2022.csv', 'sales_data_2021.csv']
+        plot_titles = [plot.get_title() for plot in plots]
+        self.assertEqual(set(plot_titles), set(expected_titles), "Plot titles should match the CSV filenames")
+    def test_no_files_matched(self):
+        plots = task_func(self.directory, r"^no_match_\d{4}.csv")
+        self.assertEqual(len(plots), 0, "Should return an empty list if no files match the pattern")
+    def test_invalid_directory(self):
+        with self.assertRaises(FileNotFoundError):
+            task_func("/invalid/directory/", self.pattern)
+    def test_plot_data_integrity(self):
+        plots = task_func(self.directory, self.pattern)
+        # Read the CSV files again to get expected data
+        expected_data = []
+        for file in os.listdir(self.directory):
+            if re.match(self.pattern, file):
+                df = pd.read_csv(os.path.join(self.directory, file))
+                expected_data.append(df['Sales'].to_list())
+        for plot, expected_sales in zip(plots, expected_data):
+            lines = plot.get_lines()
+            for line in lines:
+                y_data = line.get_ydata()
+                # Use np.isclose for floating point comparison, if necessary
+                self.assertTrue(any(np.array_equal(y_data, expected) for expected in expected_data), "Plotted data should match the CSV file content")

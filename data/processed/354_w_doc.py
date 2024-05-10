@@ -1,110 +1,109 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.stats import norm
+import pandas as pd
+import random
 
-def task_func(mu=0, sigma=1):
+
+def task_func(product_list, categories, min_value = 10, max_value = 100):
     """
-    Draw and return a subplot of a normal distribution with the given mean and standard deviation,
-    utilizing numpy's linspace to create an array of 100 linearly spaced numbers between
-    `mu - 3*sigma` and `mu + 3*sigma`.
-
+    Create a sales report for a list of products in different categories.
+    The report includes the quantity sold, revenue for 1 product, and total revenue generated for each product.
+    
     Parameters:
-    mu (float): The mean of the distribution. Default is 0.
-    sigma (float): The standard deviation of the distribution. Default is 1.
-
+    product_list (list): The list of products.
+    categories (list): A list of categories for the products.
+    min_value (int): The minimum value for quantity sold and revenue.
+    max_value (int): The maximum value for quantity sold and revenue.
+    
     Returns:
-    matplotlib.axes.Axes: The subplot representing the normal distribution.
+    DataFrame: A pandas DataFrame with sales data for the products.
+    
+    Note:
+    - The column names uses are 'Product', 'Category', 'Quantity Sold', 'Revenue' , and 'Total Revenue'.
 
     Requirements:
-    - numpy
-    - matplotlib.pyplot
-    - scipy.stats.norm
-
+    - pandas
+    - random
+    
     Example:
-    >>> ax = task_func(mu=5, sigma=2)
-    >>> ax
-    <Axes: >
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> random.seed(0)
+    >>> report = task_func(['Product 1'], ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports'], 100, 100)
+    >>> report.iloc[0]['Category'] in ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
+    True
+    >>> report.iloc[0]['Quantity Sold']
+    100
     """
-    x = np.linspace(mu - 3 * sigma, mu + 3 * sigma, 100)
-    y = norm.pdf(x, mu, sigma)
-    fig, ax = plt.subplots()
-    ax.plot(x, y)
-    return ax
+    report_data = []
+    for product in product_list:
+        category = categories[random.randint(0, len(categories)-1)]
+        quantity_sold = random.randint(min_value, max_value)
+        revenue = random.randint(min_value, max_value)
+        total_revenue = quantity_sold * revenue
+        report_data.append([product, category, quantity_sold, revenue, total_revenue])
+    report_df = pd.DataFrame(report_data, columns=['Product', 'Category', 'Quantity Sold', 'Revenue', 'Total Revenue'])
+    return report_df
 
 import unittest
-import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
+import random
 class TestCases(unittest.TestCase):
+    
+    categories = ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
+    products = ['Product ' + str(i) for i in range(1, 101)]
+    
     def test_case_1(self):
-        # Test default parameters
-        ax = task_func()
-        lines = ax.get_lines()
-        x, y = lines[0].get_data()
-        self.assertAlmostEqual(x[np.argmax(y)], 0, delta=0.1)
-        self.assertTrue(min(x) >= -3 and max(x) <= 3)
+        random.seed(0)
+        report = task_func(self.products[:5], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 5)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_2(self):
-        # Test positive mu and sigma with manual calculation
-        ax = task_func(mu=5, sigma=2)
-        lines = ax.get_lines()
-        x, y = lines[0].get_data()
-        expected_min, expected_max = 5 - 3 * 2, 5 + 3 * 2
-        self.assertAlmostEqual(min(x), expected_min, delta=0.1)
-        self.assertAlmostEqual(max(x), expected_max, delta=0.1)
+        random.seed(0)
+        report = task_func(self.products[5:10], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 5)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_3(self):
-        # Test negative mu and small sigma
-        ax = task_func(mu=-3, sigma=0.5)
-        lines = ax.get_lines()
-        x, y = lines[0].get_data()
-        self.assertAlmostEqual(x[np.argmax(y)], -3, delta=0.1)
-        self.assertTrue(min(x) >= -3 - 1.5 and max(x) <= -3 + 1.5)
+        random.seed(0)
+        report = task_func([self.products[10]], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 1)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_4(self):
-        # Test large mu and sigma
-        mu, sigma = 1e6, 1e5
-        ax = task_func(mu=mu, sigma=sigma)
-        lines = ax.get_lines()
-        x, y = lines[0].get_data()
-        self.assertTrue(
-            len(x) > 0 and len(y) > 0,
-            "Plot data should not be empty even for large mu and sigma.",
-        )
+        random.seed(0)
+        report = task_func(self.products[10:20], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 10)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_5(self):
-        # Test negative mu
-        ax = task_func(mu=-5, sigma=4)
-        lines = ax.get_lines()
-        x, y = lines[0].get_data()
-        self.assertAlmostEqual(x[np.argmax(y)], -5, delta=0.15)
-        self.assertTrue(min(x) >= -5 - 12 and max(x) <= -5 + 12)
+        random.seed(0)
+        report = task_func(self.products[20:40], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 20)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+    
     def test_case_6(self):
-        # Test the function with a sigma of 0, which might represent a degenerate distribution
-        ax = task_func(mu=0, sigma=0)
-        lines = ax.get_lines()
-        self.assertEqual(
-            len(lines),
-            1,
-            "Plot should contain exactly one line for a degenerate distribution.",
-        )
+        random.seed(0)
+        report = task_func([self.products[0]], self.categories, 10, 10)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 1)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        self.assertEqual(report.iloc[0]['Quantity Sold'], 10)
+        self.assertEqual(report.iloc[0]['Total Revenue'], 100)
+    
     def test_case_7(self):
-        # Test the function with extremely large values of mu and sigma to ensure it doesn't break
-        ax = task_func(mu=1e6, sigma=1e5)
-        lines = ax.get_lines()
-        x, y = lines[0].get_data()
-        self.assertTrue(
-            len(x) > 0 and len(y) > 0,
-            "Plot data should not be empty even for large mu and sigma.",
-        )
+        random.seed(0)
+        report = task_func([self.products[0]], self.categories, 10, 100)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 1)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        self.assertEqual(report.iloc[0]['Total Revenue'], report.iloc[0]['Quantity Sold']*report.iloc[0]['Revenue'])
     def test_case_8(self):
-        # Test the function with a very small positive sigma to check narrow distributions
-        ax = task_func(mu=0, sigma=1e-5)
-        lines = ax.get_lines()
-        x, y = lines[0].get_data()
-        # Checking that the plot peak is at mu and sigma affects the curve's spread.
-        self.assertAlmostEqual(
-            x[np.argmax(y)],
-            0,
-            delta=1e-5,
-            msg="Peak of the distribution should be at mu.",
-        )
-    def tearDown(self):
-        plt.close("all")
+        random.seed(0)
+        report = task_func(self.products[40:60], self.categories, 100, 200)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 20)
+        for index, row in report.iterrows():
+            self.assertEqual(row['Total Revenue'], row['Quantity Sold']*row['Revenue'])

@@ -1,49 +1,70 @@
+import re
+import pandas as pd
 import numpy as np
-from scipy.stats import iqr
+# Constants
+DATA_PATTERN = r'>\d+\.\d+<'
 
-def task_func(L):
+
+def task_func(dataframe, data_pattern=DATA_PATTERN):
     """
-    Calculate the interquartile range of all elements in a nested list 'L'.
+    Extract numeric data from a Pandas DataFrame based on a specific pattern. The function searches 
+    each cell for occurrences of the regex pattern '>number<number>' (e.g., '>1.23<') and replaces 
+    the cell content with the extracted numeric value. If no match is found, the cell is replaced with NaN.
     
     Parameters:
-    - L (list): The nested list.
+    - dataframe (pd.DataFrame): A pandas DataFrame containing data to be processed.
+    - data_pattern (str, optional): data search pattern. Default value is '>\d+\.\d+<'.
     
     Returns:
-    - iqr_value (float): The interquartile range.
+    - pd.DataFrame: A modified DataFrame with cells containing the extracted numeric values or NaN.
     
     Requirements:
+    - re
+    - pandas
     - numpy
-    - scipy.stats
-
+    
     Example:
-    >>> task_func([[1,2,3],[4,5,6]])
-    2.5
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({'A': ['>1.23<', '>4.56<'], 'B': ['>7.89<', '>0.12<']})
+    >>> task_func(df)
+          A     B
+    0  1.23  7.89
+    1  4.56  0.12
     """
-    flattened = np.array(L).flatten()
-    iqr_value = iqr(flattened)
-    return iqr_value
+    for col in dataframe.columns:
+        dataframe[col] = dataframe[col].apply(lambda x: float(re.search(data_pattern, x).group(0)[1:-1])
+                                              if pd.notnull(x) and re.search(data_pattern, x) else np.nan)
+    return dataframe
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_1(self):
-        result = task_func([[1,2,3],[4,5,6]])
-        expected = 2.5
-        self.assertAlmostEqual(result, expected, places=2)
-    def test_2(self):
-        result = task_func([[1,1,1],[2,2,2]])
-        expected = 1.0
-        self.assertAlmostEqual(result, expected, places=2)
-    def test_3(self):
-        result = task_func([[1,5,3]])
-        expected = 2.0
-        self.assertAlmostEqual(result, expected, places=2)
     
-    def test_4(self):
-        result = task_func([[1],[2],[3],[4],[5]])
-        expected = 2.0
-        self.assertAlmostEqual(result, expected, places=2)
+    def test_case_1(self):
+        df = pd.DataFrame({'A': ['>1.23<', '>4.56<'], 'B': ['>7.89<', '>0.12<']})
+        result = task_func(df)
+        expected = pd.DataFrame({'A': [1.23, 4.56], 'B': [7.89, 0.12]})
+        pd.testing.assert_frame_equal(result, expected)
     
-    def test_5(self):
-        result = task_func([[1,-2,3],[-4,5,6]])
-        expected = 5.75
-        self.assertAlmostEqual(result, expected, places=2)
+    def test_case_2(self):
+        df = pd.DataFrame({'A': ['1.23', '4.56'], 'B': ['7.89', '0.12']})
+        result = task_func(df)
+        expected = pd.DataFrame({'A': [np.nan, np.nan], 'B': [np.nan, np.nan]})
+        pd.testing.assert_frame_equal(result, expected)
+    
+    def test_case_3(self):
+        df = pd.DataFrame({'A': ['>1.23<', '4.56'], 'B': ['>7.89<', '0.12']})
+        result = task_func(df)
+        expected = pd.DataFrame({'A': [1.23, np.nan], 'B': [7.89, np.nan]})
+        pd.testing.assert_frame_equal(result, expected)
+    
+    def test_case_4(self):
+        df = pd.DataFrame({'A': ['>1.23<', None], 'B': [None, '>0.12<']})
+        result = task_func(df)
+        expected = pd.DataFrame({'A': [1.23, np.nan], 'B': [np.nan, 0.12]})
+        pd.testing.assert_frame_equal(result, expected)
+    
+    def test_case_5(self):
+        df = pd.DataFrame()
+        result = task_func(df)
+        expected = pd.DataFrame()
+        pd.testing.assert_frame_equal(result, expected)

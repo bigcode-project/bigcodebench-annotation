@@ -1,56 +1,72 @@
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+from scipy import stats
 
-def task_func(df, target):
+
+def task_func(matrix):
     """
-    Perform a linear regression analysis on a given DataFrame.
+    Normalizes a 2D numeric array (matrix) using the Z score.
     
     Parameters:
-    - df (pd.DataFrame): The pandas DataFrame.
-    - target (str): The target variable.
+    matrix (array): The 2D numpy array.
     
     Returns:
-    - score (float): The R-squared score of the model.
+    DataFrame: The normalized DataFrame.
 
     Requirements:
     - pandas
-    - sklearn
+    - numpy
+    - scipy
 
     Example:
     >>> import numpy as np
-    >>> np.random.seed(42)
-    >>> df = pd.DataFrame({'feature': np.random.rand(100), 'target': np.random.rand(100)})  # Explicitly using pd
-    >>> r_squared = task_func(df, 'target')
-    >>> print(r_squared)
-    0.0011582111228732872
+    >>> matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    >>> normalized_df = task_func(matrix)
+    >>> isinstance(normalized_df, pd.DataFrame)
+    True
+    >>> np.allclose(normalized_df.mean(), 0)
+    True
+    >>> np.allclose(normalized_df.std(ddof=0), 1)
+    True
     """
-    X = pd.DataFrame.drop(df, target, axis=1)  
-    y = pd.Series(df[target])  
-    model = LinearRegression()
-    model.fit(X, y)
-    return model.score(X, y)
+    df = pd.DataFrame(matrix)
+    normalized_df = df.apply(stats.zscore)
+    normalized_df = normalized_df.fillna(0.0)
+    return normalized_df
 
 import unittest
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        df = pd.DataFrame([[0, 1, 2], [3, 4, 5], [6, 7, 8]], columns = ['x', 'y', 'z'])
-        r_squared = task_func(df, 'z')
-        self.assertEqual(r_squared, 1.0)
-        
+    def test_extreme_values_shape(self):
+        """Test the function with extreme values to ensure output shape is correct."""
+        matrix = [[1, 2], [10000, 20000]]
+        result_df = task_func(matrix)
+        # Verify that the shape of the result is the same as the input
+        self.assertEqual(result_df.shape, (2, 2))
     def test_case_2(self):
-        df = pd.DataFrame([[-1, 1, 2], [3, 4, 5], [6, 7, 8]], columns = ['x', 'y', 'z'])
-        r_squared = task_func(df, 'z')
-        self.assertEqual(r_squared, 1.0)
-    
+        matrix = np.array([[2, 5], [5, 2]])
+        result = task_func(matrix)
+        expected_result = pd.DataFrame({
+            0: [-1.0, 1.0],
+            1: [1.0, -1.0]
+        })
+        pd.testing.assert_frame_equal(result, expected_result)
     def test_case_3(self):
-        df = pd.DataFrame([[0, 0, 0], [1, 1, 1], [2, 2, 2]], columns = ['x', 'y', 'z'])
-        r_squared = task_func(df, 'z')
-        self.assertEqual(r_squared, 1.0)
-    def test_case_4(self):
-        df = pd.DataFrame([[0, 0, 9], [1, 1, 35], [2, 2, 78]], columns = ['x', 'y', 'z'])
-        r_squared = task_func(df, 'z')
-        self.assertFalse(r_squared == 1.0)
-    def test_case_5(self):
-        df = pd.DataFrame([[0, 0, 0, 0], [1, 1, 1, 1], [2, 2, 2, 2]], columns = ['x', 'y', 'z', 'w'])
-        r_squared = task_func(df, 'w')
-        self.assertEqual(r_squared, 1.0)
+        matrix = np.array([[5]])
+        result = task_func(matrix)
+        expected_result = pd.DataFrame({
+            0: [0.0]
+        })
+        pd.testing.assert_frame_equal(result, expected_result)
+    def test_uniform_data(self):
+        """Test a matrix where all elements are the same."""
+        matrix = [[1, 1], [1, 1]]
+        expected_result = pd.DataFrame({
+            0: [0.0, 0.0],
+            1: [0.0, 0.0]
+        })
+        pd.testing.assert_frame_equal(task_func(matrix), expected_result)
+    def test_non_numeric_data(self):
+        """Test the function with non-numeric data."""
+        matrix = [['a', 'b'], ['c', 'd']]
+        with self.assertRaises(TypeError):
+            task_func(matrix)

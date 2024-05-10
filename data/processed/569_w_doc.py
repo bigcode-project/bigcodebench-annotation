@@ -1,75 +1,83 @@
-import numpy as np
-from scipy.optimize import curve_fit
+import inspect
+import matplotlib.pyplot as plt
+import pandas as pd
 
-
-def task_func(x, y, labels):
+def task_func(f_list):
     """
-    Fit an exponential curve to given data points and plot the curves with labels.
-    It fits an exponential curve of the form: f(x) = a * exp(-b * x) + c
-    to the provided x and y data points for each set of data and plots the fitted curves
-    with the corresponding labels on a single matplotlib figure.
+    Analyzes a list of functions and draws a bar chart showing the number of arguments for each function.
+    The function names are listed along the x-axis, and the number of arguments are represented as bars.
+    This method showcases the integration of function introspection, data frame creation, and data visualization.
 
     Parameters:
-    - x (list of np.ndarray): List of numpy arrays, each representing the x-values of the data points for a dataset.
-    - y (list of np.ndarray): List of numpy arrays, each representing the y-values of the data points for a dataset.
-    - labels (list of str): List of strings, each representing the label for a dataset.
+    f_list (list): List of functions to inspect.
 
     Returns:
-    - matplotlib.figure.Figure: The figure object that contains the plotted curves.
+    pandas.DataFrame: Returns a DataFrame containing the function names and their respective number of arguments.
+
+    Raises:
+    ValueError: if the input contains lambda function
 
     Requirements:
-    - numpy
-    - scipy.optimize
+    - inspect
+    - matplotlib.pyplot
+    - pandas
 
-    Example:
-    >>> x_data = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
-    >>> y_data = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
-    >>> labels = ['H2O', 'O2', 'CO2']
+    Examples:
+    >>> def f(x): x*x
+    >>> def g(x, y=2): return x*y
+    >>> task_func([f, g])
+                   Number of Arguments
+    Function Name                     
+    f                                1
+    g                                2
+    >>> lambda_func = lambda x: x * 2
+    >>> task_func([f, lambda_func])
+    Traceback (most recent call last):
+    ...
+    ValueError: The function should not be a lambda function.
     """
-    if not x or not y or not labels:
-        raise ValueError("Empty data lists provided.")
-    def exponential_func(x, a, b, c):
-        """Exponential function model for curve fitting."""
-        return a * np.exp(-b * x) + c
-    fig, ax = plt.subplots()
-    for i in range(len(x)):
-        popt, _ = curve_fit(exponential_func, x[i], y[i])
-        ax.plot(x[i], exponential_func(x[i], *popt), label=labels[i])
-    ax.legend()
-    return fig
+    func_info = []
+    for f in f_list:
+        if f.__name__ == "<lambda>":
+            raise ValueError("The function should not be a lambda function.")
+        spec = inspect.getfullargspec(f)
+        func_info.append([f.__name__, len(spec.args)])
+    df = pd.DataFrame(func_info, columns=['Function Name', 'Number of Arguments'])
+    df.set_index('Function Name', inplace=True)
+    df.plot(kind='bar')  # Uncomment to visualize the bar chart
+    plt.show()  # Uncomment to display the plot
+    return df
 
 import unittest
-import matplotlib.pyplot as plt
+import pandas as pd
+import inspect
+from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Example data for all tests
-        self.x = [np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([1, 3, 5])]
-        self.y = [np.array([2, 3, 5]), np.array([5, 7, 10]), np.array([2.5, 3.5, 5.5])]
-        self.labels = ["Test 1", "Test 2", "Test 3"]
-    def test_plot_labels(self):
-        """Ensure the plot includes all specified labels."""
-        fig = task_func(self.x, self.y, self.labels)
-        ax = fig.gca()
-        legend_labels = [text.get_text() for text in ax.get_legend().get_texts()]
-        self.assertListEqual(legend_labels, self.labels, "Legend labels do not match input labels.")
-    def test_curve_fit_success(self):
-        """Verify that curve_fit successfully fits the data."""
-        for x_arr, y_arr in zip(self.x, self.y):
-            with self.subTest(x=x_arr, y=y_arr):
-                popt, _ = curve_fit(lambda x, a, b, c: a * np.exp(-b * x) + c, x_arr, y_arr)
-                self.assertTrue(len(popt) == 3, "Optimal parameters not found for the exponential fit.")
-    def test_output_type(self):
-        """Check the output type to be a matplotlib figure."""
-        fig = task_func(self.x, self.y, self.labels)
-        self.assertIsInstance(fig, plt.Figure, "Output is not a matplotlib figure.")
-    def test_no_data(self):
-        """Test the function with no data provided."""
-        with self.assertRaises(ValueError, msg="Empty data lists should raise a ValueError."):
-            task_func([], [], [])
-    def test_non_numeric_data(self):
-        """Ensure non-numeric data raises a ValueError during fitting."""
-        x = [np.array(["a", "b", "c"])]
-        y = [np.array(["d", "e", "f"])]
-        labels = ["Invalid Data"]
-        with self.assertRaises(ValueError, msg="Non-numeric data should raise a ValueError."):
-            task_func(x, y, labels)
+    def test_single_function(self):
+        def sample_function(x): pass
+        df = task_func([sample_function])
+        self.assertEqual(df.loc['sample_function', 'Number of Arguments'], 1)
+    def test_multiple_functions(self):
+        def f(x): pass
+        def g(x, y): pass
+        df = task_func([f, g])
+        self.assertEqual(df.loc['f', 'Number of Arguments'], 1)
+        self.assertEqual(df.loc['g', 'Number of Arguments'], 2)
+    def test_no_arguments_function(self):
+        def no_arg_func(): pass
+        df = task_func([no_arg_func])
+        self.assertEqual(df.loc['no_arg_func', 'Number of Arguments'], 0)
+    def test_lambda_functions(self):
+        lambda_func = lambda x, y: x + y
+        with self.assertRaises(ValueError):
+            df = task_func([lambda_func])
+    
+    def test_function_with_defaults(self):
+        def func_with_defaults(x, y=2): pass
+        df = task_func([func_with_defaults])
+        self.assertEqual(df.loc['func_with_defaults', 'Number of Arguments'], 2)
+    @patch('matplotlib.pyplot.show')
+    def test_plot_called(self, mock_show):
+        def sample_function(x): pass
+        task_func([sample_function])
+        mock_show.assert_called_once()

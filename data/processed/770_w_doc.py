@@ -1,57 +1,58 @@
-import numpy as np
-import math
+from collections import Counter
+import itertools
+import operator
 
-# Constants
-POSSIBLE_NUMBERS = np.arange(1, 11)
-
-def task_func(list_of_lists):
+def task_func(list_of_menuitems):
     """
-    Calculate the sum of the squares of numbers from a predefined range (POSSIBLE_NUMBERS) 
-    for each list in list_of_lists. The number of elements considered from POSSIBLE_NUMBERS 
-    is determined by the length of each list.
+    Faced with a nested list of menu items, flatten the list and return the most common menu item.
 
     Parameters:
-    - list_of_lists (list): A list of lists, each representing a set of numbers.
+    - list_of_menuitems (list): A nested list of menu items.
 
     Returns:
-    - sums (list): A list of sums of squares.
+    - str: The most common menu item.
 
     Requirements:
-    - numpy
-    - math
+    - collections
+    - itertools
+    - operator
 
     Example:
-    >>> sums = task_func([[1, 2, 3], [4, 5]])
-    >>> print(sums)
-    [14.0, 5.0]
+    >>> task_func([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
+    'Pizza'
     """
-    sums = []
-    for list_ in list_of_lists:
-        sum_ = sum(math.pow(x, 2) for x in POSSIBLE_NUMBERS[:len(list_)])
-        sums.append(sum_)
-    return sums
+    flat_list = list(itertools.chain(*list_of_menuitems))
+    counter = Counter(flat_list)
+    return max(counter.items(), key=operator.itemgetter(1))[0]
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Testing with empty list
-        result = task_func([])
-        self.assertEqual(result, [])
+        # Description: Testing with a list where 'Pizza' appears more frequently than other items.
+        input_data = [['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']]
+        output = task_func(input_data)
+        self.assertEqual(output, 'Pizza')
+    
     def test_case_2(self):
-        # Testing with empty sublists
-        result = task_func([[], [], []])
-        self.assertEqual(result, [0, 0, 0])
-        
+        # Description: Testing with a list where 'Burger' appears more frequently than other items.
+        input_data = [['Burger', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']]
+        output = task_func(input_data)
+        self.assertEqual(output, 'Burger')
+    
     def test_case_3(self):
-        # Testing with sublists of different lengths
-        result = task_func([[1], [1, 2], [1, 2, 3]])
-        self.assertEqual(result, [1, 5, 14])
+        # Description: Testing with a list where 'Pasta' appears more frequently than other items.
+        input_data = [['Pasta', 'Pasta'], ['Pasta', 'Coke'], ['Pizza', 'Coke']]
+        output = task_func(input_data)
+        self.assertEqual(output, 'Pasta')
+    
     def test_case_4(self):
-        # Testing with sublists containing the same element
-        result = task_func([[1, 1, 1], [2, 2, 2, 2]])
-        self.assertEqual(result, [14, 30])
-        
+        # Description: Testing with a list where 'Sushi' appears more frequently than other items.
+        input_data = [['Sushi'], ['Sushi', 'Coke'], ['Pizza', 'Coke']]
+        output = task_func(input_data)
+        self.assertEqual(output, 'Sushi')
+    
     def test_case_5(self):
-        # Testing with large sublists
-        result = task_func([[1]*10, [2]*5])
-        self.assertEqual(result, [385, 55])
+        # Description: Testing with a list where 'Salad' appears more frequently than other items.
+        input_data = [['Salad'], ['Salad', 'Coke'], ['Pizza', 'Coke'], ['Salad', 'Burger']]
+        output = task_func(input_data)
+        self.assertEqual(output, 'Salad')

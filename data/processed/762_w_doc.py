@@ -1,63 +1,72 @@
-import random
-import string
-import collections
+import json
+import re
+from collections import Counter
 
 # Constants
-VALID_CHARACTERS = string.ascii_letters + string.digits
+REPLACE_NONE = "None"
 
-def task_func(n_strings, string_length):
+def task_func(json_str):
     """
-    Generate n random strings of a specified length, count the frequency of each character across all strings, and return the result as a dictionary.
-
+    Process a JSON string by:
+    1. Removing None values.
+    2. Counting the frequency of each unique value.
+    3. Replacing all email addresses with the placeholder "None".
+    
     Parameters:
-    - n_strings (int): The number of random strings to generate.
-    - string_length (int): The length of each random string.
-
+    json_str (str): The JSON string to be processed.
+    
     Returns:
-    - dict: A dictionary containing character counts with characters as keys and their frequencies as values.
-
+    dict: A dictionary containing:
+        - "data": Processed JSON data.
+        - "value_counts": A Counter object with the frequency of each unique value.
+    
     Requirements:
-    - random
-    - string
-    - collections
-
-    Constants:
-    - VALID_CHARACTERS: A string containing all valid characters (ASCII letters and digits) that can be used in the random strings.
-
+    - json
+    - re
+    - collections.Counter
+    
     Example:
-    >>> random.seed(42)
-    >>> task_func(2, 3)
-    {'O': 1, 'h': 1, 'b': 1, 'V': 1, 'r': 1, 'p': 1}
+    >>> json_str = '{"name": "John", "age": null, "email": "john@example.com"}'
+    >>> task_func(json_str)
+    {'data': {'name': 'John', 'email': 'None'}, 'value_counts': Counter({'John': 1, 'None': 1})}
     """
-    strings = [''.join(random.choice(VALID_CHARACTERS) for _ in range(string_length)) for _ in range(n_strings)]
-    character_counts = collections.Counter(''.join(strings))
-    return dict(character_counts)
+    data = json.loads(json_str)
+    processed_data = {}
+    for key, value in data.items():
+        if value is None:
+            continue
+        if isinstance(value, str) and re.match(r"[^@]+@[^@]+\.[^@]+", value):
+            value = REPLACE_NONE
+        processed_data[key] = value
+    value_counts = Counter(processed_data.values())
+    return {"data": processed_data, "value_counts": value_counts}
 
 import unittest
+import json
 from collections import Counter
 class TestCases(unittest.TestCase):
-    def test_single_string_single_character(self):
-        # Test when n_strings=1 and string_length=1 (minimal input)
-        result = task_func(1, 1)
-        self.assertEqual(len(result), 1)
-        self.assertEqual(sum(result.values()), 1)
-    def test_multiple_strings_single_character(self):
-        # Test when n_strings > 1 and string_length=1
-        result = task_func(5, 1)
-        self.assertTrue(len(result) <= 5)
-        self.assertEqual(sum(result.values()), 5)
-    def test_single_string_multiple_characters(self):
-        # Test when n_strings=1 and string_length > 1
-        result = task_func(1, 5)
-        self.assertTrue(len(result) <= 5)
-        self.assertEqual(sum(result.values()), 5)
-    def test_multiple_strings_multiple_characters(self):
-        # Test when n_strings > 1 and string_length > 1
-        result = task_func(5, 5)
-        self.assertTrue(len(result) <= 25)
-        self.assertEqual(sum(result.values()), 25)
-    def test_valid_characters(self):
-        # Test whether the function only uses valid characters as defined in VALID_CHARACTERS
-        result = task_func(100, 10)
-        all_characters = ''.join(result.keys())
-        self.assertTrue(all(char in VALID_CHARACTERS for char in all_characters))
+    def test_basic(self):
+        json_str = '{"name": "John", "age": null, "email": "john@example.com"}'
+        result = task_func(json_str)
+        expected = {'data': {'name': 'John', 'email': 'None'}, 'value_counts': Counter({'John': 1, 'None': 1})}
+        self.assertEqual(result, expected)
+    def test_multiple_none(self):
+        json_str = '{"name": "John", "age": null, "city": null, "email": "john@example.com"}'
+        result = task_func(json_str)
+        expected = {'data': {'name': 'John', 'email': 'None'}, 'value_counts': Counter({'John': 1, 'None': 1})}
+        self.assertEqual(result, expected)
+    def test_multiple_emails(self):
+        json_str = '{"name": "John", "email1": "john1@example.com", "email2": "john2@example.com"}'
+        result = task_func(json_str)
+        expected = {'data': {'name': 'John', 'email1': 'None', 'email2': 'None'}, 'value_counts': Counter({'None': 2, 'John': 1})}
+        self.assertEqual(result, expected)
+    def test_no_emails(self):
+        json_str = '{"name": "John", "age": 25, "city": "NY"}'
+        result = task_func(json_str)
+        expected = {'data': {'name': 'John', 'age': 25, 'city': 'NY'}, 'value_counts': Counter({'John': 1, 25: 1, 'NY': 1})}
+        self.assertEqual(result, expected)
+    def test_different_values(self):
+        json_str = '{"name": "John", "age": 25, "city": "NY", "friend": "John"}'
+        result = task_func(json_str)
+        expected = {'data': {'name': 'John', 'age': 25, 'city': 'NY', 'friend': 'John'}, 'value_counts': Counter({'John': 2, 25: 1, 'NY': 1})}
+        self.assertEqual(result, expected)

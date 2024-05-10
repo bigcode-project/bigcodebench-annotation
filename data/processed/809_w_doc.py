@@ -1,54 +1,87 @@
-import pandas as pd
-from collections import Counter
+import numpy as np
+from scipy.stats import norm
 
-def task_func(d):
+
+def task_func(data: np.ndarray, threshold: float = 2.0) -> list:
     """
-    Count the occurrence of values with the keys "x," "y" and "z" from a list of dictionaries "d."
+    Determine the outlier indices in a 1D numpy array based on the Z score.
 
+    First a normal distribution is fitted to the data, the mean and standard
+    deviation is used to calculate the z scores of each datapoint. 
+    If the absolute z score of a datapoint is larger than threshold it is
+    considered an outlier and its index is recorded.
+
+    If the standard deviation is 0, an empty list is returned as outliers. 
+    
     Parameters:
-    d (list): A list of dictionaries.
+    data (numpy.ndarray): The 1D numpy array to check for outliers.
+    threshold (float): The outlier threshold. Defaults to 2.
 
     Returns:
-    dict: A dictionary with keys as 'x', 'y', and 'z' and values as Counter objects.
+    list: The indices of outliers in the data where Z score > threshold. Empty if standard deviation is 0
+    float: The mean of the fitted normal distribution.
+    float: The variance of the fitted normal distribution.
 
     Requirements:
-    - pandas
-    - collections.Counter
+    - numpy 
+    - scipy.stats.norm
 
     Example:
-    >>> data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 5}, {'x': 2, 'y': 1, 'z': 7}]
-    >>> print(task_func(data))
-    {'x': Counter({1: 1, 3: 1, 2: 1}), 'y': Counter({10: 1, 15: 1, 1: 1}), 'z': Counter({5: 2, 7: 1})}
-    >>> data = [{'x': 2, 'y': 10}, {'y': 15, 'z': 5}, {'x': 2, 'z': 7}]
-    >>> print(task_func(data))
-    {'x': Counter({2.0: 2}), 'y': Counter({10.0: 1, 15.0: 1}), 'z': Counter({5.0: 1, 7.0: 1})}
+    >>> data = np.array([1, 2, 3, 4, 5, 6, 100])
+    >>> task_func(data)
+    ([6], 17.285714285714285, 1142.7755102040817)
+    
+    >>> data = np.array([-10, 3, 5, 5, 5, 5, 5, 7, 20])
+    >>> outliers, mean, var = task_func(data, threshold=4)
+    >>> print(outliers)
+    []
+    >>> print(mean)
+    5.0
+    >>> print(var)
+    50.888888888888886
+
+      
     """
-    df = pd.DataFrame(d)
-    counts = {}
-    for key in ['x', 'y', 'z']:
-        if key in df.columns:
-            counts[key] = Counter(df[key].dropna().tolist())
-        else:
-            counts[key] = Counter()
-    return counts
+    mean, std_dev = norm.fit(data)
+    if std_dev == 0:
+        return [], mean, std_dev**2
+    z_scores = (data - mean) / std_dev
+    outliers = np.where(np.abs(z_scores) > threshold)
+    return list(outliers[0]), mean, std_dev**2
 
 import unittest
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_empty_list(self):
-        self.assertEqual(task_func([]), {'x': Counter(), 'y': Counter(), 'z': Counter()})
-    def test_all_keys_present(self):
-        data = [{'x': 1, 'y': 2, 'z': 3}, {'x': 1, 'y': 3, 'z': 2}]
-        expected = {'x': Counter({1: 2}), 'y': Counter({2: 1, 3: 1}), 'z': Counter({3: 1, 2: 1})}
-        self.assertEqual(task_func(data), expected)
-    def test_missing_keys(self):
-        data = [{'x': 1}, {'y': 2}, {'z': 3}]
-        expected = {'x': Counter({1: 1}), 'y': Counter({2: 1}), 'z': Counter({3: 1})}
-        self.assertEqual(task_func(data), expected)
-    def test_duplicate_values(self):
-        data = [{'x': 1, 'y': 2, 'z': 3}, {'x': 1, 'y': 2, 'z': 3}, {'x': 1, 'y': 2}]
-        expected = {'x': Counter({1: 3}), 'y': Counter({2: 3}), 'z': Counter({3: 2})}
-        self.assertEqual(task_func(data), expected)
-    def test_mixed_data_types(self):
-        data = [{'x': 1, 'y': 'a', 'z': 3.5}, {'x': '1', 'y': 'a', 'z': 3.5}]
-        expected = {'x': Counter({1: 1, '1': 1}), 'y': Counter({'a': 2}), 'z': Counter({3.5: 2})}
-        self.assertEqual(task_func(data), expected)
+    def test_case_1(self):
+        data = np.array([1, 2, 3, 4, 5, 6, 100])
+        result, mean, var = task_func(data)
+        self.assertEqual(result, [6])
+        self.assertAlmostEqual(mean, 17.2, delta=0.1)
+        self.assertAlmostEqual(var, 1142.78, delta=0.1)
+    def test_case_2(self):
+        data = np.array([1, 2, 3, 4, 5, 6, 7])
+        result, mean, var = task_func(data)
+        self.assertEqual(result, [])
+        self.assertAlmostEqual(mean, 4, delta=0.1)
+        self.assertAlmostEqual(var, 4, delta=0.1)
+    def test_case_3(self):
+        data = np.array([5, 5, 5, 5, 5])
+        result, mean, var = task_func(data)
+        self.assertEqual(result, [])
+        self.assertAlmostEqual(mean, 5, delta=0.1)
+        self.assertAlmostEqual(var, 0, delta=0.1)
+    def test_case_4(self):
+        from faker import Faker
+        fake = Faker()
+        fake.seed_instance(12)
+        data = np.array([fake.random_int(min=0, max=100) for _ in range(10000)])
+        result, mean, var = task_func(data)
+        self.assertEqual(len(result), 0)
+        self.assertAlmostEqual(mean, 50.28, delta=0.1)
+        self.assertAlmostEqual(var, 842.86, delta=0.1)
+    def test_case_5(self):
+        data = np.array([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 50])
+        result, mean, var = task_func(data, threshold=0.5)
+        self.assertEqual(result, [0, 1, 2, 11])
+        self.assertAlmostEqual(mean, 4.17, delta=0.1)
+        self.assertAlmostEqual(var, 200.14, delta=0.1)

@@ -1,126 +1,118 @@
-import ast
-import os
-import glob
+import requests
+import json
+from bs4 import BeautifulSoup
 
-# Constants
-DIRECTORY = 'data'
 
-def task_func(directory):
+def task_func(url: str, file_name: str = "Output.txt") -> str:
     """
-    Convert all Unicode string representations of dictionaries in all text files 
-    in the specified directory to Python dictionaries.
+    Scrape the title from a specified web page, save it in JSON format to a given file, 
+    and append to the file if it exists.
 
     Parameters:
-    directory (str): The path to the directory containing the text files.
+    - url (str): The URL of the web page from which the title is to be scraped.
+    - file_name (str, optional): The name of the file to save the scraped title. 
+    If the file already exists, the new data is appended. Defaults to 'Output.txt'.
 
     Returns:
-    list: A list of dictionaries extracted from the text files.
+    - str: The file path where the scraped title is saved.
 
     Requirements:
-    - ast
-    - os
-    - glob
+    - requests
+    - json
+    - bs4
+
+    Notes:
+    - If the web page does not have a title, 'None' is saved as the title value in the JSON data.
+    - Data is appended to the specified file in JSON format, with each title on a new line.
 
     Example:
-    >>> task_func("sample_directory/")
-    [{'key1': 'value1'}, {'key2': 'value2'}]
-
-    Note:
-    Ensure that the text files in the directory contain valid Unicode string representations of dictionaries.
-
-    Raises:
-    - The function would raise a ValueError if there are text file(s) that have invalid dictionary representation
+    >>> task_func("http://example.com")
+    'Output.txt'
+    >>> task_func("http://another-example.com", "AnotherOutput.txt")
+    'AnotherOutput.txt'
     """
-    path = os.path.join(directory, '*.txt')
-    files = glob.glob(path)
-    results = []
-    for file in files:
-        with open(file, 'r') as f:
-            for line in f:
-                results.append(ast.literal_eval(line.strip()))
-    return results
+    response = requests.get(url, timeout=5)
+    soup = BeautifulSoup(response.text, "html.parser")
+    title = soup.title.string if soup.title else None
+    data = {"title": title}
+    json_data = json.dumps(data)
+    with open(file_name, "a", encoding="utf-8") as f:
+        f.write(json_data + "\n")
+    return file_name
 
 import unittest
-import os
-import ast
-import shutil
+from unittest.mock import patch, mock_open
+import requests
+import json
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.test_dir = 'testdir_task_func'
-        os.makedirs(self.test_dir, exist_ok=True)
-        self.sample_directory = 'testdir_task_func/sample_directory'
-        os.makedirs(self.sample_directory, exist_ok=True)
-        f = open(self.sample_directory+"/1.txt","w")
-        f.write("{'key1': 'value1'}")
-        f.close()
-        f = open(self.sample_directory+"/2.txt","w")
-        f.write("{'key2': 'value2', 'key3': 'value3'}")
-        f.close()
-        f = open(self.sample_directory+"/3.txt","w")
-        f.write("{'key4': 'value4'}")
-        f.close()
-        f = open(self.sample_directory+"/4.txt","w")
-        f.write("{'key5': 'value5', 'key6': 'value6', 'key7': 'value7'}")
-        f.close()
-        f = open(self.sample_directory+"/5.txt","w")
-        f.write("{'key8': 'value8'}")
-        f.close()
-        self.empty_directory = "testdir_task_func/empty_directory"
-        os.makedirs(self.empty_directory, exist_ok=True)
-        self.multi_line_directory = "testdir_task_func/multi_line_directory"
-        os.makedirs(self.multi_line_directory, exist_ok=True)
-        f = open(self.multi_line_directory+"/1.txt","w")
-        f.write("{'key1': 'value1'}\n{'key2': 'value2'}")
-        f.close()
-        self.mixed_directory = "testdir_task_func/mixed_directory"
-        os.makedirs(self.mixed_directory, exist_ok=True)
-        f = open(self.mixed_directory+"/1.txt","w")
-        f.write("invalid")
-        f.close()
-        self.invalid_directory = "testdir_task_func/invalid_directory"
-        os.makedirs(self.invalid_directory, exist_ok=True)
-        f = open(self.invalid_directory+"/1.txt","w")
-        f.write("invalid")
-        f.close()
-        f = open(self.invalid_directory+"/2.txt","w")
-        f.write("{'key1': 'value1'}")
-        f.close()
-    def tearDown(self):
-        # Clean up the test directory
-        shutil.rmtree(self.test_dir)
-    def test_case_1(self):
-        # Test with the sample directory
-        result = task_func(self.sample_directory)
-        expected_result = [
-            {'key1': 'value1'},
-            {'key2': 'value2', 'key3': 'value3'},
-            {'key4': 'value4'},
-            {'key5': 'value5', 'key6': 'value6', 'key7': 'value7'},
-            {'key8': 'value8'}
-        ]
-        for i in expected_result:
-            self.assertTrue(i in result)
-        
-    def test_case_2(self):
-        # Test with an empty directory
-        result = task_func(self.empty_directory)
-        self.assertEqual(result, [])
-        
-    def test_case_3(self):
-        # Test with a directory containing a text file without valid dictionary representation
-        with self.assertRaises(ValueError):
-            task_func(self.invalid_directory)
-            
-    def test_case_4(self):
-        # Test with a directory containing multiple text files, some of which are invalid
-        with self.assertRaises(ValueError):
-            task_func(self.mixed_directory)
-            
-    def test_case_5(self):
-        # Test with a directory containing a text file with multiple valid dictionary representations
-        result = task_func(self.multi_line_directory)
-        expected_result = [
-            {'key1': 'value1'},
-            {'key2': 'value2'}
-        ]
-        self.assertEqual(result, expected_result)
+    """Test cases for task_func"""
+    @patch("builtins.open", new_callable=mock_open, read_data="")
+    def test_scrape_title_page_1(self, mock_file):
+        """Test that the title is scraped from a web page and saved to a file"""
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = b"<title>Test Page 1</title>"
+        with patch("requests.get", return_value=mock_response):
+            file_path = task_func("http://example.com")
+            self.assertEqual(file_path, "Output.txt")
+            mock_file().write.assert_called_once_with(
+                json.dumps({"title": "Test Page 1"}) + "\n"
+            )
+    @patch("builtins.open", new_callable=mock_open, read_data="")
+    def test_scrape_title_page_2(self, mock_file):
+        """Test that the title is scraped from a web page and saved to a file"""
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = b"<title>Test Page 2</title>"
+        with patch("requests.get", return_value=mock_response):
+            file_path = task_func("http://example.com", "AnotherOutput.txt")
+            self.assertEqual(file_path, "AnotherOutput.txt")
+            mock_file().write.assert_called_once_with(
+                json.dumps({"title": "Test Page 2"}) + "\n"
+            )
+    @patch("builtins.open", new_callable=mock_open, read_data="")
+    def test_invalid_url(self, mock_file):
+        """Test that an exception is raised when the URL is invalid"""
+        with self.assertRaises(requests.RequestException):
+            task_func("http://invalid-url")
+    @patch("builtins.open", new_callable=mock_open, read_data="")
+    def test_page_without_title(self, mock_file):
+        """Test that 'None' is saved as the title when the web page does not have a title"""
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = b"<html><head></head><body></body></html>"
+        with patch("requests.get", return_value=mock_response):
+            file_path = task_func("http://example.com")
+            self.assertEqual(file_path, "Output.txt")
+            mock_file().write.assert_called_once_with(
+                json.dumps({"title": None}) + "\n"
+            )
+    @patch("builtins.open", new_callable=mock_open, read_data="")
+    def test_very_long_title(self, mock_file):
+        """Test that a very long title is saved correctly"""
+        long_title = "A" * 1024  # A very long title of 1024 characters
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = f"<title>{long_title}</title>".encode()
+        with patch("requests.get", return_value=mock_response):
+            file_path = task_func("http://example.com")
+            self.assertEqual(file_path, "Output.txt")
+            mock_file().write.assert_called_once_with(
+                json.dumps({"title": long_title}) + "\n"
+            )
+    @patch(
+        "builtins.open",
+        new_callable=mock_open,
+        read_data=json.dumps({"title": "Existing Title"}) + "\n",
+    )
+    def test_append_to_existing_file(self, mock_file):
+        """Test that data is appended to an existing file"""
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = b"<title>New Title</title>"
+        with patch("requests.get", return_value=mock_response):
+            file_path = task_func("http://example.com")
+            self.assertEqual(file_path, "Output.txt")
+            mock_file().write.assert_called_with(
+                json.dumps({"title": "New Title"}) + "\n"
+            )

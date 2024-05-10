@@ -1,92 +1,113 @@
-import pandas as pd
-import logging
+from collections import Counter
+import os
+import csv
 
-# Set up basic configuration for logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Constants
+FILE_DIR = './yourdictfiles/'
 
-def task_func(sheet_name, excel_file_location="test.xlsx", csv_file_location="test.csv"):
+def task_func(output_file, test_directory):
     """
-    Reads data from an Excel spreadsheet, converts it to a CSV file, then calculates the sum of each column in the CSV file.
+    Count the number of words in multiple dictionary files (.txt) in a specific directory,
+    export the counts to a CSV file, and then return the total number of words.
 
     Parameters:
-    - sheet_name (str): The name of the sheet to load data from.
-    - excel_file_location (str): The path to the Excel file. Default is 'test.xlsx'.
-    - csv_file_location (str): The path where the CSV file will be saved. Default is 'test.csv'.
+    filename (str): The name of the output CSV file.
+    test_directory (str): The directory containing the dictionary files (.txt).
 
     Returns:
-    - dict: A dictionary with the sum of each column.
+    int: total number of words in .txt files
 
-    Raises:
-    - FileNotFoundError: If the Excel file does not exist at the specified path.
-    - ValueError: If the specified sheet name is not found in the Excel file.
+    Note:
+    - Header for the csv output file is "Word", "Count"
+    - Return 0 if the input invalid or error raised
 
     Requirements:
-    - pandas
-    - logging
+    - collections.Counter
+    - os
+    - csv
 
     Example:
-    >>> test_excel_file = 'dummy_test.xlsx'
-    >>> test_csv_file = 'dummy_test.csv'
-    >>> test_sheet_name = 'TestSheet'
-    >>> data = {'A': [10, 20, 30], 'B': [40, 50, 60]}
-    >>> df = pd.DataFrame(data)
-    >>> df.to_excel(test_excel_file, sheet_name=test_sheet_name, index=False)
-    >>> task_func(sheet_name='TestSheet', excel_file_location=test_excel_file, csv_file_location=test_csv_file) # {'Column1': sum_value1, 'Column2': sum_value2, ...}
-    {'A': 60, 'B': 150}
-    >>> os.remove(test_excel_file)
-    >>> os.remove(test_csv_file)
-    
-    Note:
-    - Ensure the Excel file contains only numerical data for accurate sum calculations.
+    >>> task_func('word_counts.csv')
+    10
     """
+    total_words = 0
     try:
-        logging.info('Reading the Excel file.')
-        df = pd.read_excel(excel_file_location, sheet_name=sheet_name)
-        logging.info('Converting to CSV.')
-        df.to_csv(csv_file_location, index=False)
-        column_sum = df.sum(numeric_only=True)
-    except FileNotFoundError:
-        logging.error(f"Excel file not found at {excel_file_location}")
-        raise FileNotFoundError(f"Excel file not found at {excel_file_location}")
-    except ValueError as e:
-        logging.error(f"Error in processing Excel file: {e}")
-        raise ValueError(f"Error in processing Excel file: {e}")
-    return column_sum.to_dict()
+        word_counts = Counter()
+        for file_name in os.listdir(test_directory):
+            if not file_name.endswith('.txt'):
+                continue
+            with open(os.path.join(test_directory, file_name), 'r') as file:
+                words = file.read().split()
+                word_counts.update(words)
+        with open(output_file, 'w') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Word', 'Count'])
+            writer.writerows(word_counts.items())
+        for word in word_counts:
+            total_words += word_counts[word]
+    except Exception as e:
+        print(e)
+    return total_words
 
 import unittest
-import pandas as pd
-import os
+from unittest.mock import patch, MagicMock
+from collections import Counter
+from faker import Faker
+# Blackbox test cases
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Creating a dummy Excel file for testing
-        self.test_excel_file = 'dummy_test.xlsx'
-        self.test_csv_file = 'dummy_test.csv'
-        self.test_sheet_name = 'TestSheet'
-        data = {'A': [10, 20, 30], 'B': [40, 50, 60]}
-        df = pd.DataFrame(data)
-        df.to_excel(self.test_excel_file, sheet_name=self.test_sheet_name, index=False)
+        self.test_directory = './testdir_f270'
+        self.output_file = 'test_output.csv'
+        self.list_files = []
+    # Function to create fake dictionary files
+    def create_fake_dict_files(self, directory, num_files, num_words):
+        fake = Faker()
+        os.makedirs(directory, exist_ok=True)
+        for _ in range(num_files):
+            file_name = fake.file_name(extension='txt')
+            self.list_files.append(os.path.join(directory, file_name))
+            with open(os.path.join(directory, file_name), 'w') as file:
+                words = [fake.word() for _ in range(num_words)]
+                file.write(' '.join(words))
+    
+    #remove fake files
+    def remove_files(self):
+        for fn in self.list_files:
+            if os.path.exists(fn):
+               os.remove(fn)
+        self.list_files = []
     def tearDown(self):
-        os.remove(self.test_excel_file)
-        if os.path.exists(self.test_csv_file):
-            os.remove(self.test_csv_file)
-    def test_normal_functionality(self):
-        result = task_func(self.test_sheet_name, self.test_excel_file, self.test_csv_file)
-        self.assertEqual(result, {'A': 60, 'B': 150})
-    def test_file_not_found(self):
-        with self.assertRaises(FileNotFoundError):
-            task_func(self.test_sheet_name, 'nonexistent.xlsx', self.test_csv_file)
-    def test_sheet_not_found(self):
-        with self.assertRaises(ValueError):
-            task_func('NonexistentSheet', self.test_excel_file, self.test_csv_file)
-    def test_empty_excel_file(self):
-        empty_excel_file = 'empty_test.xlsx'
-        pd.DataFrame().to_excel(empty_excel_file, index=False)
-        with self.assertRaises(ValueError):
-            task_func(self.test_sheet_name, empty_excel_file, self.test_csv_file)
-        os.remove(empty_excel_file)
-    def test_overwrite_existing_csv(self):
-        with open(self.test_csv_file, 'w') as file:
-            file.write('Old Data')
-        task_func(self.test_sheet_name, self.test_excel_file, self.test_csv_file)
-        with open(self.test_csv_file, 'r') as file:
-            self.assertNotIn('Old Data', file.read())
+        # Remove the test_output.json file after each test
+        if os.path.exists('test_output.csv'):
+            os.remove('test_output.csv')
+        if os.path.exists(self.test_directory):
+            os.rmdir(self.test_directory)
+    def test_no_files_in_directory(self):
+        # Test case where there are no txt files in the directory
+        self.create_fake_dict_files(self.test_directory, 0, 0)
+        result = task_func(self.output_file, self.test_directory)
+        self.assertEqual(result, 0)
+        self.remove_files()
+    def test_single_file_multiple_words(self):
+        # Test case with a single file containing multiple words
+        self.create_fake_dict_files(self.test_directory, 1, 50)
+        result = task_func(self.output_file, self.test_directory)
+        self.assertEqual(50,result)
+        self.remove_files()
+    def test_multiple_files_multiple_words(self):
+        # Test case with multiple files each containing multiple words
+        self.create_fake_dict_files(self.test_directory, 5, 20)
+        result = task_func(self.output_file, self.test_directory)
+        self.remove_files()
+        self.assertEqual(100,result)
+        # self.assertFalse(result)
+    def test_directory_does_not_exist(self):
+        # Test case where the specified directory does not exist
+        result = task_func(self.output_file, self.test_directory)
+        self.assertEqual(0,result)
+    def test_empty_files_in_directory(self):
+        # Test case with empty txt files in the directory
+        self.create_fake_dict_files(self.test_directory, 3, 0)
+        result = task_func(self.output_file, self.test_directory)
+        self.remove_files()
+        self.assertEqual(0,result)

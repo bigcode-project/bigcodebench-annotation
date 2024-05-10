@@ -1,112 +1,122 @@
 import pandas as pd
-from sklearn.cluster import KMeans
+import csv
+import random
 
-
-def task_func(data, n_clusters=3, seed=None):
+def task_func(
+    n, 
+    countries=['USA', 'UK', 'China', 'India', 'Germany'], 
+    products=['Product A', 'Product B', 'Product C', 'Product D', 'Product E'], 
+    output_path=None,
+    random_seed=None):
     """
-    Perform K-Means clustering on the given DataFrame using the sklearn KMeans algorithm. 
-
-    The function expects a DataFrame with numerical values, as KMeans cannot handle categorical data. 
-    It applies standard KMeans clustering from the sklearn library to form clusters. The number of clusters is 
-    configurable via the 'n_clusters' parameter, defaulting to 3. The Number of times the k-means algorithm is run with 
-    different centroid seeds (n_init) is set to 10. The function returns an array of cluster labels 
-    corresponding to each data point in the input as well as the fitted KMeans model.
+    Generate random sales data and return it as a pandas DataFrame.
+    The sales data has the columns 'Country', 'Product' and 'Sales'.
+    Country and Product get sampled from the provided lists / the default values.
+    Sales is populated by generating random integers between 1 and 100.
+    If an output_path is provided, the generated data is saved to a csv file.
 
     Parameters:
-    data (pandas.DataFrame): A DataFrame consisting of only numerical data. Each row represents a distinct data point.
-    n_clusters (int, optional): The number of clusters to form. Defaults to 3.
-    seed (int, optional): The seed used for setting the random stat in the KMeans clustering algorith.
-                          Used for making results reproducable.
+    n (int): The number of sales records to generate.
+    countries (list, optional): List of countries for sales data generation. Defaults to ['USA', 'UK', 'China', 'India', 'Germany'].
+    products (list, optional): List of products for sales data generation. Defaults to ['Product A', 'Product B', 'Product C', 'Product D', 'Product E'].
+    output_path (str, optional): Path to save the generated sales data as a CSV file. If not provided, the data will not be saved to a file.
+    random_seed (int): Seed for rng. Used in generating the sales data. 
 
     Returns:
-    numpy.ndarray: An array of integers (cluster labels) corresponding to the input data. Each label is an integer 
-                   representing the cluster to which a row of data has been assigned.
-    sklearn.cluster.KMeans: The fitted KMeans Model.
-
-    Raises:
-    - ValueError: If the DataFrame contains non numeric entries.
+    DataFrame: A pandas DataFrame with the generated sales data.
 
     Requirements:
     - pandas
-    - sklearn.cluster.KMeans
+    - csv
+    - random
 
     Example:
-    >>> np.random.seed(12)
-    >>> data = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-    >>> labels, model = task_func(data, n_clusters=4, seed=12)
-    >>> print(labels) 
-    [1 0 1 0 1 2 1 3 3 1 0 3 0 0 2 2 2 3 3 3 1 0 1 0 3 1 1 1 1 3 1 3 0 3 1 0 0
-     2 0 3 2 1 2 1 1 3 1 1 1 1 2 2 1 0 0 3 3 0 0 1 1 2 0 0 2 2 0 2 2 2 0 3 2 3
-     3 1 2 1 1 3 1 1 1 2 1 0 0 1 2 1 3 0 0 2 3 3 3 2 3 2]
-    >>> print(model)
-    KMeans(n_clusters=4, n_init=10, random_state=12)
+    >>> df = task_func(5, random_seed=1)
+    >>> print(df)
+      Country    Product  Sales
+    0      UK  Product E     98
+    1     USA  Product C     16
+    2   India  Product D     61
+    3   India  Product B     13
+    4   India  Product A     50
 
-    >>> data = pd.DataFrame({
-    ...     'a': [1, 20, 2, 22, 100],
-    ...     'b': [1, 20, 2, 22, 100]
-    ... })
-    >>> labels, model = task_func(data, seed=213)
-    >>> print(labels)
-    [2 0 2 0 1]
-    >>> print(model)
-    KMeans(n_clusters=3, n_init=10, random_state=213)
+    >>> df = task_func(7, products=['tea', 'coffee'], countries=['Austria', 'Australia'], random_seed=12)
+    >>> print(df)
+         Country Product  Sales
+    0  Australia  coffee     85
+    1  Australia     tea     49
+    2    Austria  coffee     62
+    3  Australia  coffee     89
+    4    Austria     tea     85
+    5    Austria  coffee     48
+    6    Austria  coffee     27
     """
-    if not data.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()).all():
-        raise ValueError("DataFrame should only contain numeric values.")
-    kmeans = KMeans(n_clusters=n_clusters, random_state=seed, n_init=10)
-    kmeans.fit(data)
-    return kmeans.labels_, kmeans
+    random.seed(random_seed)
+    sales_data = []
+    for _ in range(n):
+        country = random.choice(countries)
+        product = random.choice(products)
+        sales = random.randint(1, 100)
+        sales_data.append({'Country': country, 'Product': product, 'Sales': sales})
+    if output_path:
+        with open(output_path, 'w', newline='') as csvfile:
+            fieldnames = ['Country', 'Product', 'Sales']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(sales_data)
+    return pd.DataFrame(sales_data)
 
 import unittest
+from faker import Faker
 import pandas as pd
-import numpy as np
+import os
+fake = Faker()
 class TestCases(unittest.TestCase):
-    def test_nonnumeric(self):
-        data = pd.DataFrame({
-            'a': [1, 2, 3],
-            'b': ['a', 2, 4]
-        })
-        self.assertRaises(Exception, task_func, data)
+    def setUp(self):
+        # Setting up a temporary directory to save CSV files during tests
+        self.temp_dir = "temp_test_dir"
+        os.makedirs(self.temp_dir, exist_ok=True)
+    def test_rng(self):
+        'rng reproducability'
+        df1 = task_func(100, random_seed=1)
+        df2 = task_func(100, random_seed=1)
+        self.assertTrue(pd.testing.assert_frame_equal(df1, df2) is None)
     def test_case_1(self):
-        np.random.seed(12)
-        data = pd.DataFrame(np.random.randint(0, 20, size=(20, 4)), columns=list('ABCD'))
-        labels, kmeans = task_func(data, n_clusters=4, seed=1)
-        unique_labels = np.unique(labels)
-        assert all(label in range(4) for label in unique_labels)
-        self.assertTrue(isinstance(labels, np.ndarray))
-        self.assertIsInstance(kmeans, KMeans)
-        np.testing.assert_equal(labels, [3, 0, 3, 1, 2, 1, 2, 0, 2, 1, 1, 3, 3, 1, 0, 0, 0, 0, 1, 3])
+        'default values'
+        df = task_func(100, random_seed=12)
+        self.assertEqual(len(df), 100)
+        self.assertTrue(set(df["Country"].unique()).issubset(set(['USA', 'UK', 'China', 'India', 'Germany'])))
+        self.assertTrue(set(df["Product"].unique()).issubset(set(['Product A', 'Product B', 'Product C', 'Product D', 'Product E'])))
+        self.assertTrue(df["Sales"].min() >= 1)
+        self.assertTrue(df["Sales"].max() <= 100)
     def test_case_2(self):
-        data = pd.DataFrame(np.zeros((100, 4)), columns=list('ABCD'))
-        labels, kmeans = task_func(data, n_clusters=3, seed=12)
-        self.assertIsInstance(kmeans, KMeans)
-        assert len(np.unique(labels)) == 1
-        self.assertTrue(isinstance(labels, np.ndarray))
-        self.assertCountEqual(labels, np.zeros(100))
+        'test with random countries and products'
+        countries = [fake.country() for _ in range(5)]
+        products = [fake.unique.first_name() for _ in range(5)]
+        df = task_func(200, countries=countries, products=products, random_seed=1)
+        self.assertEqual(len(df), 200)
+        self.assertTrue(set(df["Country"].unique()).issubset(set(countries)))
+        self.assertTrue(set(df["Product"].unique()).issubset(set(products)))
     def test_case_3(self):
-        data = pd.DataFrame({'A': range(100), 'B': range(100), 'C': range(100)})
-        labels, kmeans = task_func(data, seed=42)
-        self.assertIsInstance(kmeans, KMeans)
-        expected = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-       2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-       2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        np.testing.assert_equal(labels, expected)
-        self.assertTrue(isinstance(labels, np.ndarray))
+        'empty'
+        df = task_func(0)
+        self.assertEqual(len(df), 0)
     def test_case_4(self):
-        np.random.seed(5)
-        data = pd.DataFrame(np.random.rand(100, 20))
-        labels, kmeans = task_func(data, n_clusters=12, seed=12)
-        self.assertIsInstance(kmeans, KMeans)
-        expected = [ 4,  5,  5,  9, 10,  1,  0,  3,  4,  7,  7,  2, 11, 11,  3,  0,  4,
-                    2,  3,  2,  2, 10, 10,  8,  5,  9, 11,  5,  0,  8, 11,  5,  7,  0,
-                    8, 11,  7, 11,  6,  1,  1,  7,  0,  9,  3,  7,  8,  0,  4,  1,  7,
-                    2, 10,  3, 11,  9,  1,  1,  7,  4,  5,  7,  6,  9,  8,  6,  5,  9,  0,
-                    11 , 1 , 1,  4,  2,  1,  0,  7,  5,  1,  9,  6,  7, 10, 10,  4,  4,  9,
-                    1,  9,  5,  6,  3, 10,  7, 11,  8,  1,  8,  6, 11]
-        np.testing.assert_equal(labels, expected)
-        self.assertTrue(isinstance(labels, np.ndarray))
+        'only one countrie and product'
+        df = task_func(50, countries=['USA'], products=['Product A'])
+        self.assertEqual(len(df), 50)
+        self.assertTrue(set(df["Country"].unique()) == set(['USA']))
+        self.assertTrue(set(df["Product"].unique()) == set(['Product A']))
     def test_case_5(self):
-        data = pd.DataFrame([])
-        self.assertRaises(Exception, task_func, data)
+        'saving to csv'
+        output_path = self.temp_dir
+        df = task_func(100, output_path=os.path.join(output_path, 'test.csv'))
+        self.assertEqual(len(df), 100)
+        # Verify the file was saved correctly
+        saved_df = pd.read_csv(os.path.join(output_path, 'test.csv'))
+        pd.testing.assert_frame_equal(df, saved_df)
+    def tearDown(self):
+        # Cleanup temporary directory after tests
+        for file in os.listdir(self.temp_dir):
+            os.remove(os.path.join(self.temp_dir, file))
+        os.rmdir(self.temp_dir)

@@ -1,83 +1,67 @@
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-import pandas as pd
+from itertools import zip_longest
+from scipy.spatial import distance
 
-
-def task_func(df: pd.DataFrame) -> pd.DataFrame:
+def task_func(points):
     """
-    Computes the MinMax-normalized cumulative sum for each numeric column in the given DataFrame.
+    Calculate the Euclidean distances between consecutive points in a provided 
+    list of 2D coordinates.
+
+    This function takes a list of tuples, where each tuple contains two numbers
+    representing a point in 2D space. It computes the Euclidean distance between
+    each consecutive pair of points.
+
+    If an empty list or a single point is passed, the function returns an empty list.
+    If a tuple contains just one number it is assumed that both coordinates are equal to this number.
+    Example: (2) == (2, 2)
 
     Parameters:
-    - df (pandas.DataFrame): The input DataFrame containing numerical values.
+    points (list of tuples): A list of tuples where each tuple contains two 
+                             numbers (x, y), representing a point in 2D space.
 
     Returns:
-    - pd.DataFrame: A DataFrame where each column contains the normalized cumulative sum of the
-                    respective column in the input DataFrame, retaining the original column names.
-
-    Raises:
-    - TypeError: If the DataFrame contains non-numeric data types.
-    - ValueError: If the DataFrame is empty or contains NaN values.
-
+    list of floats: A list containing the Euclidean distances between 
+                    consecutive points. Each distance is a float.
+    
     Requirements:
-    - pandas
-    - numpy
-    - sklearn
+    - itertools
+    - scipy.spatial
 
     Example:
-    >>> input_df = pd.DataFrame({'A': [1, 2, 3], 'B': [3, 2, 1]})
-    >>> output_df = task_func(input_df)
-    >>> type(output_df)
-    <class 'pandas.core.frame.DataFrame'>
-    >>> output_df
-         A         B
-    0  0.0  0.000000
-    1  0.4  0.666667
-    2  1.0  1.000000
+    >>> task_func([(1, 2), (3, 4), (5, 6), (7, 8)])
+    [2.8284271247461903, 2.8284271247461903, 2.8284271247461903]
+
+    >>> task_func([(1, 2), (4), (-1.2, 4)])
+    [3.605551275463989, 5.2]
     """
-    if df.select_dtypes(include=np.number).shape[1] != df.shape[1]:
-        raise TypeError("Input DataFrame contains non-numeric data types.")
-    if df.empty or df.isnull().values.any():
-        raise ValueError("Input DataFrame is empty or contains NaN values.")
-    df_cumsum = df.cumsum()
-    scaler = MinMaxScaler()
-    df_norm_cumsum = pd.DataFrame(scaler.fit_transform(df_cumsum), columns=df.columns)
-    return df_norm_cumsum
+    distances = []
+    for point1, point2 in zip_longest(points, points[1:]):
+        if point2 is not None:
+            distances.append(distance.euclidean(point1, point2))
+    return distances
 
 import unittest
-import pandas as pd
-import numpy as np
 class TestCases(unittest.TestCase):
-    def check_cumsum_and_scaling(self, input_df, expected_output):
-        output = task_func(input_df)
-        pd.testing.assert_frame_equal(
-            output, expected_output, check_dtype=False, atol=1e-5
-        )
-    def test_incremental_values(self):
-        before = pd.DataFrame({"A": [1, 2, 3], "B": [3, 2, 1]})
-        after = pd.DataFrame({"A": [0.0, 0.4, 1.0], "B": [0.0, 0.66666667, 1.0]})
-        self.check_cumsum_and_scaling(before, after)
-        self.assertEqual(set(before.columns), set(after.columns))
-    def test_negative_numbers(self):
-        before = pd.DataFrame({"A": [-1, -2, -3], "B": [-3, -2, -1]})
-        after = pd.DataFrame({"A": [1.0, 0.6, 0.0], "B": [1.0, 0.33333333, 0.0]})
-        self.check_cumsum_and_scaling(before, after)
-        self.assertEqual(set(before.columns), set(after.columns))
-    def test_all_zeros(self):
-        before = pd.DataFrame({"A": [0, 0, 0], "B": [0, 0, 0]})
-        after = pd.DataFrame({"A": [0.0, 0.0, 0.0], "B": [0.0, 0.0, 0.0]})
-        self.check_cumsum_and_scaling(before, after)
-        self.assertEqual(set(before.columns), set(after.columns))
-    def test_same_numbers(self):
-        before = pd.DataFrame({"A": [5, 5, 5], "B": [2, 2, 2]})
-        after = pd.DataFrame({"A": [0.0, 0.5, 1.0], "B": [0.0, 0.5, 1.0]})
-        self.check_cumsum_and_scaling(before, after)
-        self.assertEqual(set(before.columns), set(after.columns))
-    def test_non_numeric_data_raises(self):
-        with self.assertRaises(TypeError):
-            task_func(pd.DataFrame({"A": ["one", "two", "three"], "B": [1, 2, 3]}))
-    def test_nan_values_raise(self):
-        with self.assertRaises(ValueError):
-            task_func(pd.DataFrame({"A": [1, np.nan, 3], "B": [3, 2, 1]}))
-    def test_empty_dataframe(self):
-        with self.assertRaises(ValueError):
-            task_func(pd.DataFrame())
+    def test_empty_list(self):
+        # Testing with no points
+        self.assertEqual(task_func([]), [])
+    def test_single_point(self):
+        # Testing with a single point (no distances can be calculated)
+        self.assertEqual(task_func([(0, 0)]), [])
+    def test_zero_distance(self):
+        # Testing with multiple points at the same location (zero distance)
+        self.assertEqual(task_func([(3, 4), (3, 4)]), [0.0])
+    def test_various_distances(self):
+        # Testing with points at various distances
+        points = [(1, 2), (4, 6), (4, 6), (10, 20)]
+        # The distances between the points are approximately:
+        results = task_func(points)
+        self.assertTrue(all(isinstance(x, float) for x in results))
+        self.assertAlmostEqual(results[0], 5.0, places=4)
+        self.assertAlmostEqual(results[1], 0.0, places=4)
+        self.assertAlmostEqual(results[2], 15.2315421, places=4)
+    def test_negative_coordinates(self):
+        # Testing with points in negative coordinates
+        points = [(0, 0), (-1, -1), (-2, -2), (-3, -3)]
+        results = task_func(points)
+        expected = [1.4142135623730951] * 3  # repeating 3 times
+        self.assertEqual(results, expected)

@@ -1,77 +1,97 @@
-from random import shuffle
+import re
+import random
 import pandas as pd
-import numpy as np
-
-# Constants
 
 
-
-def task_func(l, n_groups = 5):
+def task_func(data_list, seed=None):
     """
-    Given a list `l`, this function shuffles the list, constructs a dataframe using the shuffled list,
-    and then for each row in the dataframe, moves the first n_groups elements to the end of the same row.
+    Shuffle the substrings within each string in a given list.
+
+    This function takes a list of comma-separated strings and splits each into substrings.
+    It extracts substrings based on commas, removing leading and trailing whitespaces
+    from each. Then, it shuffles these processed substrings within each string, and
+    returns a pandas DataFrame with two columns: "Original String" and "Shuffled String".
 
     Parameters:
-    - l (list): A list of elements.
-    - n_groups (int): number of groups. Default value is 5.
+    data_list (list): The list of comma-separated strings.
+    seed (int, optional): Seed for the random number generator. Default is None.
 
     Returns:
-    - DataFrame: A modified DataFrame constructed from the shuffled list.
+    DataFrame: A pandas DataFrame with columns 'Original String' and 'Shuffled String'.
 
     Requirements:
     - pandas
-    - numpy
     - random
+    - re
 
     Example:
-    >>> df = task_func(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'])
-    >>> df.shape == (5, 10)
-    True
-    >>> set(df.iloc[0]) == set(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'])
-    True
+    >>> task_func(['lamp, bag, mirror', 'table, chair'], seed=42)
+         Original String    Shuffled String
+    0  lamp, bag, mirror  bag, lamp, mirror
+    1       table, chair       chair, table
     """
-    if not l:
-        return pd.DataFrame()
-    shuffle(l)
-    df = pd.DataFrame([l for _ in range(n_groups)])
-    df = df.apply(lambda row: np.roll(row, -n_groups), axis=1, result_type='expand')
+    if seed is not None:
+        random.seed(seed)
+    df = pd.DataFrame(data_list, columns=["Original String"])
+    shuffled_strings = []
+    for s in data_list:
+        substrings = re.split("\s*,\s*", s)
+        random.shuffle(substrings)
+        shuffled_s = ", ".join(substrings)
+        shuffled_strings.append(shuffled_s)
+    df["Shuffled String"] = shuffled_strings
     return df
 
 import unittest
-ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-N_GROUPS = 5
 class TestCases(unittest.TestCase):
-    def test_with_predefined_elements(self):
-        """Test function with the predefined ELEMENTS list."""
-        df = task_func(ELEMENTS.copy())  # Use a copy to prevent modification of the original list
-        self.assertEqual(df.shape, (N_GROUPS, len(ELEMENTS)))
-        # Ensure all original elements are present in each row
-        for row in df.itertuples(index=False):
-            self.assertTrue(set(ELEMENTS) == set(row))
-    def test_empty_list(self):
-        """Test function with an empty list."""
-        df = task_func([])
-        self.assertTrue(df.empty)
-    def test_single_element_list(self):
-        """Test function with a single-element list."""
-        single_element_list = ['X']
-        df = task_func(single_element_list)
-        self.assertEqual(df.shape, (N_GROUPS, 1))
-        # Ensure the single element is present in each row
-        for row in df.itertuples(index=False):
-            self.assertTrue(all([elem == 'X' for elem in row]))
-    def test_varying_data_types(self):
-        """Test function with a list containing varying data types."""
-        mixed_list = ['A', 1, 3.14, True, None]
-        df = task_func(mixed_list.copy())  # Use a copy to prevent modification of the original list
-        self.assertEqual(df.shape, (N_GROUPS, len(mixed_list)))
-        # Ensure all original elements are present in each row
-        for row in df.itertuples(index=False):
-            self.assertTrue(set(mixed_list) == set(row))
-    def test_shuffle_and_roll_operation(self):
-        """Test to ensure shuffle and roll operations change the list order."""
-        df_initial = pd.DataFrame([ELEMENTS for _ in range(N_GROUPS)])
-        df_modified = task_func(ELEMENTS.copy())
-        # Compare if any row differs from the initial order
-        diff = (df_initial != df_modified).any(axis=1).any()  # True if any row differs
-        self.assertTrue(diff, "Shuffled DataFrame rows should differ from initial order")
+    def test_case_1(self):
+        # Test basic case
+        input_data = ["lamp, bag, mirror", "table, chair"]
+        output_df = task_func(input_data)
+        self.assertEqual(output_df["Original String"].iloc[0], "lamp, bag, mirror")
+        self.assertEqual(output_df["Original String"].iloc[1], "table, chair")
+        self.assertEqual(len(output_df["Shuffled String"].iloc[0].split(", ")), 3)
+        self.assertEqual(len(output_df["Shuffled String"].iloc[1].split(", ")), 2)
+    def test_case_2(self):
+        # Test single character substrings
+        input_data = ["A, B, C, D", "E, F, G"]
+        output_df = task_func(input_data)
+        self.assertEqual(output_df["Original String"].iloc[0], "A, B, C, D")
+        self.assertEqual(output_df["Original String"].iloc[1], "E, F, G")
+        self.assertEqual(len(output_df["Shuffled String"].iloc[0].split(", ")), 4)
+        self.assertEqual(len(output_df["Shuffled String"].iloc[1].split(", ")), 3)
+    def test_case_3(self):
+        # Test single-item list
+        input_data = ["word1, word2"]
+        output_df = task_func(input_data)
+        self.assertEqual(output_df["Original String"].iloc[0], "word1, word2")
+        self.assertEqual(len(output_df["Shuffled String"].iloc[0].split(", ")), 2)
+    def test_case_4(self):
+        # Tests shuffling with an empty string
+        input_data = [""]
+        output_df = task_func(input_data)
+        self.assertEqual(output_df["Original String"].iloc[0], "")
+        self.assertEqual(output_df["Shuffled String"].iloc[0], "")
+    def test_case_5(self):
+        # Test shuffling single substring (no shuffling)
+        input_data = ["single"]
+        output_df = task_func(input_data)
+        self.assertEqual(output_df["Original String"].iloc[0], "single")
+        self.assertEqual(output_df["Shuffled String"].iloc[0], "single")
+    def test_case_6(self):
+        # Testing the effect of a specific random seed to ensure reproducibility
+        input_data = ["a, b, c, d"]
+        output_df1 = task_func(input_data, seed=42)
+        output_df2 = task_func(input_data, seed=42)
+        self.assertEqual(
+            output_df1["Shuffled String"].iloc[0], output_df2["Shuffled String"].iloc[0]
+        )
+    def test_case_7(self):
+        # Tests shuffling with varying spaces around commas
+        input_data = ["one,two, three"]
+        corrected_expected_shuffled = "two, one, three"
+        output_df = task_func(input_data, seed=42)
+        self.assertEqual(output_df["Original String"].iloc[0], "one,two, three")
+        self.assertEqual(
+            output_df["Shuffled String"].iloc[0], corrected_expected_shuffled
+        )

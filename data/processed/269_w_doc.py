@@ -1,69 +1,69 @@
-import bisect
+import collections
 import random
 
-def task_func(num, list_length = 5, min_value = 0, max_value = 0):
+# Constants
+LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+
+def task_func(n_keys, n_values):
     """
-    Insert a number into a randomly generated sorted list and return the new sorted list.
+    Create a Python dictionary with a specified number of keys and values. 
 
     Parameters:
-    num (int): The integer number to insert.
-    list_length (int): The length of the randomly generated list of integers.
-    min_value (int): The minimum value for randomly generated integers.
-    max_value (int): The maximum value for randomly generated integers.
+    n_keys (int): The number of keys to generate.
+    n_values (int): The number of values for each key (consecutive integers starting from 1).
 
     Returns:
-    tuple: A tuple containing two lists: 
-        list[int]: The randomly generated list of integers with the specified length.
-        list[int]: A new sorted list containing the original elements and the inserted number.
-    
+    dict: A Python dictionary with keys as strings and values as lists of integers.
+
+    Note: 
+    - Keys are randomly selected from a predefined list of letters, and values are consecutive integers starting from 1.
+    - Due to the randomness in key selection, the actual keys in the dictionary may vary in each execution.
+
     Requirements:
-    - bisect
+    - collections
     - random
 
     Example:
     >>> random.seed(0)
-    >>> task_func(4, 5, 100, 100)
-    ([100, 100, 100, 100, 100], [4, 100, 100, 100, 100, 100])
-    >>> task_func(15, 0, 10, 20)
-    ([], [15])
+    >>> task_func(3, 5)
+    {'g': [1, 2, 3, 4, 5], 'a': [1, 2, 3, 4, 5]}
+    >>> result = task_func(1, 5)
+    >>> list(result)[0] in LETTERS
+    True
     """
-    numbers = [random.randint(min_value, max_value) for _ in range(list_length)]
-    sorted_list = numbers.copy()
-    bisect.insort(sorted_list, num)
-    return numbers, sorted_list
+    keys = [random.choice(LETTERS) for _ in range(n_keys)]
+    values = list(range(1, n_values + 1))
+    return dict(collections.OrderedDict((k, values) for k in keys))
 
 import unittest
-from unittest.mock import patch
 import random
+LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
 class TestCases(unittest.TestCase):
-    @patch('random.randint', side_effect=[12, 23, 34, 45, 56])
-    def test_insert_into_empty_list(self, mock_randint):
+    def test_basic_functionality(self):
         random.seed(0)
-        result = task_func(15, 0, 5, 60)
-        self.assertEqual(result, ([], [15]))
-    @patch('random.randint', side_effect=[12, 23, 34, 45, 56])
-    def test_insert_into_existing_list(self, mock_randint):
+        result = task_func(3, 5)
+        self.assertLessEqual(len(result), 3)
+        for key in result:
+            self.assertIn(key, LETTERS)
+            self.assertEqual(result[key], [1, 2, 3, 4, 5])
+    def test_no_keys(self):
         random.seed(0)
-        result = task_func(15, 5, 10, 60)
-        self.assertEqual(result, ([12, 23, 34, 45, 56], [12, 15, 23, 34, 45, 56]))
-    @patch('random.randint', side_effect=[12, 23, 34, 45, 56])
-    def test_insert_at_beginning(self, mock_randint):
+        result = task_func(0, 5)
+        self.assertEqual(result, {})
+    def test_no_values(self):
         random.seed(0)
-        result = task_func(4, 4, 10, 60)
-        self.assertEqual(result, ([12, 23, 34, 45], [4, 12, 23, 34, 45]))
-    # @patch('random.randint', side_effect=[12, 23, 34, 45, 56])
-    def test_insert_at_end(self):
+        result = task_func(3, 0)
+        for key in result:
+            self.assertEqual(result[key], [])
+    def test_large_input(self):
         random.seed(0)
-        result = task_func(15, 4, 10, 10)
-        self.assertEqual(result, ([10, 10, 10, 10], [10, 10, 10, 10, 15]))
-    @patch('random.randint', side_effect=[12, 34, 56])
-    def test_insert_in_middle(self, mock_randint):
+        result = task_func(10, 1000)
+        for key in result:
+            self.assertIn(key, LETTERS)
+            self.assertEqual(len(result[key]), 1000)
+    def test_max_keys(self):
         random.seed(0)
-        result = task_func(15, 3, 10, 60)
-        self.assertEqual(result, ([12, 34, 56], [12, 15, 34, 56]))
-    @patch('random.randint', side_effect=[12, 23, 34, 45, 56])
-    def test_random_list_length(self, mock_randint):
-        random.seed(0)
-        result = task_func(15, 5, 10, 20)
-        self.assertEqual(len(result[0]), 5)
-        self.assertIn(15, result[1])
+        result = task_func(len(LETTERS), 5)
+        for key in result:
+            self.assertIn(key, LETTERS)
+            self.assertEqual(result[key], [1, 2, 3, 4, 5])

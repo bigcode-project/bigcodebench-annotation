@@ -1,108 +1,115 @@
 import os
-import random
-import pandas as pd
+import re
 
-
-def task_func(data_dir,
-          csv_files=['file1.csv', 'file2.csv', 'file3.csv'],
-          seed=None):
+def task_func(directory):
     """
-    Randomly select one of the provided csv_files and select a certain number 
-    of records from the file at random.
-    The selected records are returned in a DataFrame. 
-    The name of the selected csv_file is also returned.
+    Finds all files in the specified directory whose names contain any type of 
+    bracket (round, curly, or square).
 
-    If the csv_file is empty return an empty DataFrame.
+    Uses an internal constant BRACKET_PATTERN = '[(){}\\[\\]]', which specifies
+    the brackets that are looked for.
 
+    
     Parameters:
-    data_dir (str): The directory where the CSV files are located.
-    csv_files (list of str): The list of CSV files to choose from. Default is ['file1.csv', 'file2.csv', 'file3.csv'].
-    seed (int, optional): Seed for random number generation and for sampling from the csv.
+    directory (str): The directory path to search in.
     
     Returns:
-    tuple: A tuple containing two elements:
-        - str: The name of the randomly selected file.
-        - DataFrame: A pandas DataFrame with the selected rows.
-
+    list[str]: A list of file paths that contain brackets in their names.
+    
     Requirements:
+    - re
     - os
-    - random
-    - pandas
-
+    
     Example:
-    >>> file_name, df = task_func('test_data')
-    >>> print(file_name)
-    'file2.csv'
-    >>> print(df)
-           Animal     Weight
-     0        Cat          1
-    21      Mouse         12
-    15   Elephant       1000
-     2      Tiger        500
+    >>> task_func('./some_directory/')
+    ['./some_directory/file(1).txt', './some_directory/folder/file[2].jpg']
+    
+    >>> task_func('./another_directory/')
+    ['./another_directory/file{3}.png']
     """
-    random.seed(seed)
-    file = csv_files[random.randint(0, len(csv_files) - 1)]
-    file_path = os.path.join(data_dir, file)
-    try:
-        df = pd.read_csv(file_path)
-    except pd.errors.EmptyDataError:
-        return file, pd.DataFrame()
-    selected_rows = df.sample(n=random.randint(1, len(df)), random_state=seed)
-    return file, selected_rows
+    BRACKET_PATTERN = '[(){}\\[\\]]'  # Corrected pattern to match any type of bracket
+    file_list = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if re.search(BRACKET_PATTERN, file):
+                file_list.append(os.path.join(root, file))
+    return file_list
 
 import unittest
-import pandas as pd
 import os
-import tempfile
+from pathlib import Path
 import shutil
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Create a temporary directory
-        self.test_dir = tempfile.mkdtemp()
-        self.test_files = [
-            'file1.csv', 'file2.csv', 'file3.csv', 'file4.csv', 'file5.csv', 'empty.csv'
-        ]
-        # Sample data for CSV files
-        data = {
-            'file1.csv': pd.DataFrame({'Name': ['Alice', 'Bob'], 'Age': [25, 30]}),
-            'file2.csv': pd.DataFrame({'Name': ['Chris', 'Dana'], 'Age': [35, 40]}),
-            'file3.csv': pd.DataFrame({'Name': ['Eve', 'Frank'], 'Age': [45, 50]}),
-            'file4.csv': pd.DataFrame({'Name': ['Grace', 'Hank'], 'Age': [55, 60]}),
-            'file5.csv': pd.DataFrame({'Name': ['Ivan', 'Julia'], 'Age': [65, 70]}),
-            'empty.csv': pd.DataFrame()
+    # Function to create the mock directory structure and files
+    def create_test_files(self, base_path, file_dict):
+        for name, content in file_dict.items():
+            path = Path(base_path) / name
+            if isinstance(content, dict):  # it's a directory
+                path.mkdir()
+                self.create_test_files(path, content)
+            else:  # it's a file
+                path.write_text(content)
+    # Define a directory structure with files containing brackets and without brackets
+    test_files = {
+        'file1.txt': '',  # without brackets
+        'file(2).txt': '',  # with round brackets
+        'file[3].png': '',  # with square brackets
+        'file{4}.jpg': '',  # with curly brackets
+        'folder1': {
+            'file(5).jpg': '',  # with round brackets
+            'file6.csv': '',  # without brackets
+            'folder2': {
+                'file[7].csv': '',  # with square brackets
+                'file{8}.png': ''  # with curly brackets
+            }
         }
-        # Create CSV files in the directory
-        for file_name, df in data.items():
-            df.to_csv(os.path.join(self.test_dir, file_name), index=False)
+    }
+# Create a temporary directory structure for testing
+    temp_dir = ''
+    def setUp(self):
+        self.temp_dir = os.path.join(os.getcwd(), 'temp_test_dir')
+        if not os.path.exists(self.temp_dir):
+            os.mkdir(self.temp_dir)
+        self.create_test_files(self.temp_dir, self.test_files)
+    
+    def test_case_1(self):
+        # Test with the root directory
+        result = task_func(self.temp_dir)
+        self.assertIn(os.path.join(self.temp_dir, 'file(2).txt'), result)
+        self.assertIn(os.path.join(self.temp_dir, 'file[3].png'), result)
+        self.assertIn(os.path.join(self.temp_dir, 'file{4}.jpg'), result)
+        self.assertIn(os.path.join(self.temp_dir, 'folder1', 'file(5).jpg'), result)
+        self.assertIn(os.path.join(self.temp_dir, 'folder1', 'folder2', 'file[7].csv'), result)
+        self.assertIn(os.path.join(self.temp_dir, 'folder1', 'folder2', 'file{8}.png'), result)
+        self.assertEqual(len(result), 6)
+        
+    def test_case_2(self):
+        # Test with a sub-directory
+        result = task_func(os.path.join(self.temp_dir, 'folder1'))
+        self.assertIn(os.path.join(self.temp_dir, 'folder1', 'file(5).jpg'), result)
+        self.assertIn(os.path.join(self.temp_dir, 'folder1', 'folder2', 'file[7].csv'), result)
+        self.assertIn(os.path.join(self.temp_dir, 'folder1', 'folder2', 'file{8}.png'), result)
+        self.assertEqual(len(result), 3)
+        
+    def test_case_3(self):
+        # Test with a deeper sub-directory
+        result = task_func(os.path.join(self.temp_dir, 'folder1', 'folder2'))
+        self.assertIn(os.path.join(self.temp_dir, 'folder1', 'folder2', 'file[7].csv'), result)
+        self.assertIn(os.path.join(self.temp_dir, 'folder1', 'folder2', 'file{8}.png'), result)
+        self.assertEqual(len(result), 2)
+    def test_case_4(self):
+        # Test with an empty directory
+        empty_dir = os.path.join(self.temp_dir, 'empty_folder')
+        os.mkdir(empty_dir)
+        result = task_func(empty_dir)
+        self.assertEqual(result, [])
+    def test_case_5(self):
+        # Test with directory containing files without brackets
+        no_bracket_dir = os.path.join(self.temp_dir, 'no_bracket_folder')
+        os.mkdir(no_bracket_dir)
+        open(os.path.join(no_bracket_dir, 'file9.txt'), 'w').close()
+        open(os.path.join(no_bracket_dir, 'file10.jpg'), 'w').close()
+        result = task_func(no_bracket_dir)
+        self.assertEqual(result, [])
     def tearDown(self):
-        # Remove the directory after the test
-        shutil.rmtree(self.test_dir)
-    def test_random_selection(self):
-        # Testing random selection and ensuring the file chosen and its data are correct
-        file_name, df = task_func(self.test_dir, seed=42)
-        self.assertTrue(file_name in self.test_files)
-        self.assertFalse(df.empty)
-    def test_specific_file_selection(self):
-        # Test selecting a specific file and checking contents
-        file_name, df = task_func(self.test_dir, ['file1.csv'], seed=42)
-        expected = pd.read_csv(os.path.join(self.test_dir, 'file1.csv'))
-        # Sample from expected and reset index
-        expected_sampled = expected.sample(len(df), random_state=42).reset_index(drop=True)
-        # Reset index of df to ensure indices match
-        df_reset = df.reset_index(drop=True)
-        # Assert frame equality
-        pd.testing.assert_frame_equal(df_reset, expected_sampled)
-    def test_empty_file(self):
-        # Ensure an empty file returns an empty DataFrame
-        file_name, df = task_func(self.test_dir, ['empty.csv'], seed=42)
-        self.assertEqual(file_name, 'empty.csv')
-        self.assertTrue(df.empty)
-    def test_multiple_files(self):
-        # Testing selection from multiple files
-        file_name, df = task_func(self.test_dir, ['file3.csv', 'file4.csv'], seed=24)
-        self.assertIn(file_name, ['file3.csv', 'file4.csv'])
-        self.assertFalse(df.empty)
-    def test_no_file_matches(self):
-        # Testing behavior when no files match the list
-        with self.assertRaises(FileNotFoundError):
-            task_func(self.test_dir, ['nonexistent.csv'], seed=42)
+        shutil.rmtree('temp_test_dir')

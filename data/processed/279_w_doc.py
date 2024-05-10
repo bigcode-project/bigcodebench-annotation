@@ -1,82 +1,72 @@
-import pandas as pd
-import random
+import numpy as np
+from sympy import symbols, solve
 
 
-def task_func(product_list, categories):
+def task_func(precision=2, seed=0):
     """
-    Create a sales report for a list of products in different categories.
-    The report includes the quantity sold and revenue generated for each product.
-    
+    Solve a quadratic equation in the form of ax ^ 2 + bx + c = 0, where a, b, and c randomly generated numbers are between -10 and 10. The solutions are complex numbers rounded to the specified accuracy.
+
     Parameters:
-    product_list (list): The list of products.
-    categories (list): A list of categories for the products.
-    
+    precision (int): The number of decimal places to which to round the solutions.
+    seed (int, Optional): The seed for the random number generator.
+
     Returns:
-    DataFrame: A pandas DataFrame with sales data for the products.
-    
-    Note:
-    - The column names uses are 'Product', 'Category', 'Quantity Sold', and 'Revenue'.
-    - The quantity sold is random number from 1 to 100
-    - The revenue is the number of quantity sold times with the random number from 10 to 100
+    tuple: A tuple of two solutions formatted as complex numbers (rounded to the specified precision).
 
     Requirements:
-    - pandas
-    - random
-    
+    - numpy
+    - math
+    - sympy
+
     Example:
-    >>> random.seed(0)
-    >>> report = task_func(['Product 1'], ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports'])
-    >>> report.iloc[0]['Category'] in ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
-    True
+    >>> result = task_func()
+    >>> len(result)
+    2
+    >>> result
+    ((-3.86+0j), (-0.54+0j))
     """
-    report_data = []
-    for product in product_list:
-        category = categories[random.randint(0, len(categories)-1)]
-        quantity_sold = random.randint(1, 100)
-        revenue = quantity_sold * random.randint(10, 100)
-        report_data.append([product, category, quantity_sold, revenue])
-    report_df = pd.DataFrame(report_data, columns=['Product', 'Category', 'Quantity Sold', 'Revenue'])
-    return report_df
+    np.random.seed(seed)
+    a = np.random.uniform(-10, 10)
+    b = np.random.uniform(-10, 10)
+    c = np.random.uniform(-10, 10)
+    x = symbols('x')
+    equation = a * x**2 + b * x + c
+    solutions = solve(equation, x)
+    solutions = [complex(round(complex(solution).real, precision), round(complex(solution).imag, precision)) for solution in solutions]
+    return tuple(solutions)
 
 import unittest
-import pandas as pd
-import random
+import doctest
 class TestCases(unittest.TestCase):
-    
-    categories = ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
-    products = ['Product ' + str(i) for i in range(1, 101)]
-    
     def test_case_1(self):
-        random.seed(0)
-        report = task_func(self.products[:5], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 5)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        result = task_func(seed=1789)
+        self.assertIsInstance(result, tuple, "The result should be a tuple.")
+        self.assertEqual(len(result), 2, "The tuple should have two values.")
+        for value in result:
+            self.assertEqual(value.real, round(value.real, 2), "The value should be rounded to 2 decimal places.")
+            self.assertEqual(value.imag, round(value.imag, 2), "The value should be rounded to 2 decimal places.")
+        # Test the output
+        self.assertEqual(result, ((-5.15+0j), (0.41+0j)))
         
     def test_case_2(self):
-        random.seed(0)
-        report = task_func(self.products[5:10], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 5)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
-        
+        result = task_func(precision=3)
+        for value in result:
+            self.assertEqual(value.real, round(value.real, 3), "The value should be rounded to 3 decimal places.")
+            self.assertEqual(value.imag, round(value.imag, 3), "The value should be rounded to 3 decimal places.")
     def test_case_3(self):
-        random.seed(0)
-        report = task_func([self.products[10]], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 1)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
-        
+        result = task_func(precision=0)
+        for value in result:
+            self.assertEqual(value.real, round(value.real), "The value should be an integer.")
+            self.assertEqual(value.imag, round(value.imag), "The value should be an integer.")
     def test_case_4(self):
-        random.seed(0)
-        report = task_func(self.products[10:20], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 10)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
-        
+        result = task_func(precision=4)
+        for value in result:
+            self.assertEqual(value.real, round(value.real, 4), "The value should be rounded to 4 decimal places.")
+            self.assertEqual(value.imag, round(value.imag, 4), "The value should be rounded to 4 decimal places.")
     def test_case_5(self):
-        random.seed(0)
-        report = task_func(self.products[20:40], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 20)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        result = task_func(precision=5, seed=1234)
+        for value in result:
+            self.assertEqual(value.real, round(value.real, 5), "The value should be rounded to 5 decimal places.")
+            self.assertEqual(value.imag, round(value.imag, 5), "The value should be rounded to 5 decimal places.")
+        # Test the output
+        self.assertEqual(result, ((0.19792-0.40336j), (0.19792+0.40336j)))

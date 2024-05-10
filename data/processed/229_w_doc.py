@@ -1,92 +1,79 @@
-import matplotlib
+import pandas as pd
 import numpy as np
 
+# Constants
+COLUMNS = ['column1', 'column2', 'column3', 'column4', 'column5']
 
-def task_func(ax, num_points):
+def task_func(df, dct):
     """
-    Plots "num_points" random points on the polar diagram represented by "ax."
-    The radial ticks on the plot are positioned based on the number of points divided by 10 degrees.
+    Replace certain values in a DataFrame with a dictionary mapping and calculate the Pearson correlation coefficient between each pair of columns.
 
     Parameters:
-    ax (matplotlib.axes._axes.Axes): The Axes object for the polar plot.
-    num_points (int): The number of random points to generate and plot.
+    df (DataFrame): The input DataFrame, containing numeric or categorical data.
+    dct (dict): A dictionary for replacing values in df, where keys are existing values and values are new values.
 
     Returns:
-    matplotlib.axes._axes.Axes: The modified Axes object with plotted points.
-
-    Raises:
-    - This function will raise a ValueError if the input ax is not and Axes.
-    - This function will raise a ValueError if it is use the negative number as num_points.
-
+    DataFrame: A DataFrame with the correlation coefficients between each pair of columns. The format of the DataFrame is a square matrix with column and index labels matching the columns of the input DataFrame.
+    
     Requirements:
-    - matplotlib
+    - pandas
     - numpy
-
+    
+    Note:
+    - This function operates on DataFrames containing numeric or categorical data that can be replaced with numeric values, as correlation calculations require numeric data.
+    - This function using pearson method to calculate the correlation matrix.
+    
+    Raises:
+    - This function will raise a ValueError is input df is not a DataFrame.
+        
     Example:
-    >>> np.random.seed(0)
-    >>> fig = plt.figure()
-    >>> ax = fig.add_subplot(111, polar=True)
-    >>> ax = task_func(ax, 100)
-    >>> ax.get_rlabel_position()
-    10.0
-    >>> plt.close()
+    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    >>> dct = {1: 10, 2: 20, 3: 30, 4: 40, 5: 50, 6: 60}
+    >>> correlation_matrix = task_func(df, dct)
+    >>> correlation_matrix.shape == (2, 2)
+    True
+    >>> np.allclose(correlation_matrix, np.array([[1.0, 1.0], [1.0, 1.0]]))
+    True
     """
-    if not isinstance(ax, matplotlib.axes.Axes):
-        raise ValueError("The input is not an axes")
-    r = np.random.rand(num_points)
-    theta = 2 * np.pi * np.random.rand(num_points)
-    ax.scatter(theta, r)
-    ax.set_rlabel_position(num_points / 10)
-    return ax
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
+    df = df.replace(dct)
+    correlation_matrix = np.corrcoef(df.values, rowvar=False)
+    return pd.DataFrame(correlation_matrix, columns=df.columns, index=df.columns)
 
 import unittest
-import matplotlib.pyplot as plt
-import numpy as np
+import pandas as pd
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test with 10 points
-        np.random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        modified_ax = task_func(ax, 10)
-        self.assertIsInstance(modified_ax, plt.Axes, "Should return a matplotlib Axes object")
-        self.assertEqual(modified_ax.get_rlabel_position(), 10 / 10, "Radial label position should be set to 1")
-        plt.close()
+        # Test with simple numeric DataFrame
+        df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+        dct = {1: 10, 2: 20, 3: 30, 4: 40, 5: 50, 6: 60}
+        result = task_func(df, dct)
+        self.assertTrue(result.shape == (2, 2))
     def test_case_2(self):
-        # Test with 100 points
-        np.random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        modified_ax = task_func(ax, 100)
-        self.assertIsInstance(modified_ax, plt.Axes, "Should return a matplotlib Axes object")
-        self.assertEqual(modified_ax.get_rlabel_position(), 100 / 10, "Radial label position should be set to 10")
-        plt.close()
+        # Test with DataFrame containing NaN values
+        df = pd.DataFrame({'A': [1, 2, None], 'B': [4, None, 6]})
+        dct = {1: 10, 2: 20, 4: 40, 6: 60}
+        result = task_func(df, dct)
+        self.assertTrue(result.isna().sum().sum() > 0)
     def test_case_3(self):
-        # Test with 50 points
-        np.random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        modified_ax = task_func(ax, 50)
-        self.assertIsInstance(modified_ax, plt.Axes, "Should return a matplotlib Axes object")
-        self.assertEqual(modified_ax.get_rlabel_position(), 50 / 10, "Radial label position should be set to 5")
-        plt.close()
+        # Test with DataFrame containing negative values
+        df = pd.DataFrame({'A': [-1, -2, -3], 'B': [-4, -5, -6]})
+        dct = {-1: 1, -2: 2, -3: 3, -4: 4, -5: 5, -6: 6}
+        result = task_func(df, dct)
+        self.assertTrue(result.shape == (2, 2))
     def test_case_4(self):
-        # Test with 0 points (edge case)
-        np.random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        modified_ax = task_func(ax, 0)
-        self.assertIsInstance(modified_ax, plt.Axes, "Should return a matplotlib Axes object")
-        self.assertEqual(modified_ax.get_rlabel_position(), 0 / 10, "Radial label position should be set to 0")
-        plt.close()
+        # Test with DataFrame containing mixed data types
+        df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+        dct = {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5}
+        result = task_func(df, dct)
+        self.assertTrue(result.shape == (2, 2))
     def test_case_5(self):
-        # Test with negative points (invalid input)
-        np.random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        with self.assertRaises(ValueError, msg="Should raise ValueError for negative number of points"):
-            task_func(ax, -10)
-        plt.close()
+        # Test with larger DataFrame
+        df = pd.DataFrame({'A': range(10), 'B': range(10, 20), 'C': range(20, 30)})
+        dct = {i: i + 1 for i in range(30)}
+        result = task_func(df, dct)
+        self.assertTrue(result.shape == (3, 3))
     def test_case_6(self):
         with self.assertRaises(ValueError):
-            task_func("non_ax", 1)
+            task_func("non_df", {})

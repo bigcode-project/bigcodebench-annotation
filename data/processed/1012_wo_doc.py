@@ -1,106 +1,106 @@
-import subprocess
-import os
-import time
-import glob
+import requests
+from PIL import Image
+import io
 
-def task_func(r_script_path: str, output_path: str, duration: int) -> (bool, str):
+
+def task_func(url):
     """
-    This function executes an R script and verifies if the output file is generated within a given duration.
-    
+    Fetches an image from a given URL and returns it as a PIL Image object.
+
     Parameters:
-    - r_script_path (str): The absolute path to the R script to be executed.
-    - output_path (str): The absolute path where the output CSV file is expected to be generated.
-    - duration (int): The time, in seconds, within which the output file should be generated.
-    
+    - url (str): The URL of the image to download. It should be a valid HTTP or
+      HTTPS URL pointing directly to an image file.
+
     Returns:
-    - tuple containing:
-      - bool: True if the output file is generated within the specified duration, False otherwise.
-      - str: A message indicating whether the file was generated successfully or not.
-    
+    - PIL.Image.Image: A PIL Image object representing the downloaded image. This
+      object can be manipulated or displayed using PIL's image processing
+      capabilities.
+
+    Raises:
+    - ValueError: This exception is raised in the following scenarios:
+        - The URL is invalid or cannot be reached within the timeout period (5 seconds).
+        - The response from the server is not a successful HTTP status code (i.e., not in the range 200-299).
+        - The content fetched from the URL is not a valid image format that can be handled by PIL.
+
     Requirements:
-    - subprocess
-    - os
-    - time
-    - glob
-    
+    - requests
+    - PIL
+    - io
+
     Example:
-    >>> task_func('/path_to_script/MyrScript.r', '/path_to_output/', 10)
-    (True, 'File generated successfully within the specified duration.')
-    >>> task_func('/path_to_script/InvalidScript.r', '/path_to_output/', 5)
-    (False, 'File not generated within the specified duration.')
+    >>> img = task_func('https://example.com/image.jpg')
+    >>> isinstance(img, Image.Image)
+    True
+
+    Note:
+    - The function uses a timeout of 5 seconds for the HTTP request to prevent
+      indefinite waiting in case of unresponsive URLs.
+    - The function will not handle redirections or authentication scenarios. It
+      expects a direct link to an image resource.
     """
-    command = f'/usr/bin/Rscript --vanilla {r_script_path}'
-    subprocess.call(command, shell=True)
-    start_time = time.time()
-    search_pattern = os.path.join(output_path, '*.csv')
-    while time.time() - start_time < duration:
-        if glob.glob(search_pattern):
-            return True, 'File generated successfully within the specified duration.'
-        time.sleep(0.1)
-    return False, 'File not generated within the specified duration.'
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        image = Image.open(io.BytesIO(response.content))
+        return image
+    except Exception as e:
+        raise ValueError(f"Failed to retrieve image from {url}: {e}") from e
 
 import unittest
-import os
-import shutil
-import time
 from unittest.mock import patch
+from PIL import Image
+from pathlib import Path
+import shutil
+import os
 class TestCases(unittest.TestCase):
+    """Test cases for task_func function."""
+    directory = "mnt/data/f_852_data"
     def setUp(self):
-        # Create a temporary directory to store the mock R script and the output files
-        self.temp_dir = 'task_func_test_dir'
-        os.makedirs(self.temp_dir, exist_ok=True)
-        
-        # Create a mock R script file
-        self.r_script_path = os.path.join(self.temp_dir, 'mock_script.r')
-        with open(self.r_script_path, 'w') as file:
-            file.write('write.csv(data.frame(x=1:10, y=11:20), \"{}/output.csv\")')
-        
-        # Define the output path
-        self.output_path = self.temp_dir
+        """Setup method to create a sample image inr test files."""
+        # Create directory if it doesn't exist
+        self.test_dir = Path(self.directory)
+        self.test_dir.mkdir(parents=True, exist_ok=True)
+        # Create and save a sample image
+        self.sample_image_path = Path(self.test_dir) / "sample_image.png"
+        sample_image = Image.new("RGBA", (100, 100), color="blue")
+        sample_image.save(self.sample_image_path)
+    @patch("requests.get")
+    def test_valid_image_url(self, mock_get):
+        """Test task_func function with a valid image URL."""
+        with open(self.sample_image_path, "rb") as image_file:
+            mock_get.return_value.content = image_file.read()
+        img = task_func("https://www.google.com/images/srpr/logo11w.png")
+        self.assertIsInstance(img, Image.Image, "Returned object is not a PIL Image")
+    @patch("requests.get")
+    def test_invalid_url(self, mock_get):
+        """Test task_func function with an invalid URL (not an image)."""
+        mock_get.side_effect = ValueError("Invalid URL")
+        with self.assertRaises(ValueError):
+            task_func("https://www.google.com")
+    @patch("requests.get")
+    def test_nonexistent_url(self, mock_get):
+        """Test task_func function with a nonexistent URL."""
+        mock_get.side_effect = ValueError("Nonexistent URL")
+        with self.assertRaises(ValueError):
+            task_func("https://example.com/nonexistent_image.jpg")
+    @patch("requests.get")
+    def test_image_properties(self, mock_get):
+        """Test task_func function with a known image and check its properties."""
+        with open(self.sample_image_path, "rb") as image_file:
+            mock_get.return_value.content = image_file.read()
+        img = task_func("https://www.google.com/images/srpr/logo11w.png")
+        self.assertEqual(img.format, "PNG", "Image format does not match expected")
+        self.assertEqual(img.size, (100, 100), "Image size does not match expected")
+    @patch("requests.get")
+    def test_image_mode(self, mock_get):
+        """Test task_func function with a known image and check its mode."""
+        with open(self.sample_image_path, "rb") as image_file:
+            mock_get.return_value.content = image_file.read()
+        img = task_func("https://www.google.com/images/srpr/logo11w.png")
+        self.assertEqual(img.mode, "RGBA", "Image mode does not match expected")
     def tearDown(self):
-        # Remove the temporary directory and its contents after each test case
-        shutil.rmtree(self.temp_dir)
-    
-    @patch('subprocess.call', return_value=None)  # Mock the subprocess.call to avoid actual execution of R script
-    def test_case_1(self, mock_subprocess_call):
-        # Manually create the expected output file to simulate the behavior of a successfully executed R script
-        with open(os.path.join(self.output_path, 'output.csv'), 'w') as file:
-            file.write('x,y\n1,11\n2,12\n3,13\n4,14\n5,15\n6,16\n7,17\n8,18\n9,19\n10,20')
-        # Case where the output file is expected to be generated within the specified duration
-        result, message = task_func(self.r_script_path, self.output_path, 5)
-        self.assertTrue(result)
-        self.assertEqual(message, 'File generated successfully within the specified duration.')
-        
-    @patch('subprocess.call', return_value=None)
-    def test_case_2(self, mock_subprocess_call):
-        # Case where the output file is not expected to be generated within the specified duration
-        result, message = task_func(self.r_script_path, self.output_path, 0)
-        self.assertFalse(result)
-        self.assertEqual(message, 'File not generated within the specified duration.')
-    
-    @patch('subprocess.call', return_value=None)
-    def test_case_3(self, mock_subprocess_call):
-        # Case where an invalid R script path is provided
-        invalid_path = 'invalid/path/mock_script.r'
-        result, message = task_func(invalid_path, self.output_path, 5)
-        self.assertFalse(result)
-        self.assertEqual(message, 'File not generated within the specified duration.')
-    
-    @patch('subprocess.call', return_value=None)
-    def test_case_4(self, mock_subprocess_call):
-        # Manually create the expected output file to simulate the behavior of a successfully executed R script
-        with open(os.path.join(self.output_path, 'output.csv'), 'w') as file:
-            file.write('x,y\n1,11\n2,12\n3,13\n4,14\n5,15\n6,16\n7,17\n8,18\n9,19\n10,20')
-        # Case where a longer duration is provided
-        time.sleep(2)  # Wait for 2 seconds before running the test to simulate different start times
-        result, message = task_func(self.r_script_path, self.output_path, 10)
-        self.assertTrue(result)
-        self.assertEqual(message, 'File generated successfully within the specified duration.')
-    
-    @patch('subprocess.call', return_value=None)
-    def test_case_5(self, mock_subprocess_call):
-        # Case where the output path is invalid
-        invalid_output_path = 'invalid/path/'
-        result, message = task_func(self.r_script_path, invalid_output_path, 5)
-        self.assertFalse(result)
-        self.assertEqual(message, 'File not generated within the specified duration.')
+        # Cleanup the test directories
+        dirs_to_remove = ["mnt/data", "mnt"]
+        for dir_path in dirs_to_remove:
+            if os.path.exists(dir_path):
+                shutil.rmtree(dir_path)

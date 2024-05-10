@@ -1,86 +1,74 @@
-import matplotlib
+import numpy as np
+from scipy import stats
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
 
-def task_func(df):
+
+def task_func(mu=0, sigma=1, sample_size=1000, seed=0):
     """
-    Standardize 'Age' and 'Score' columns in a pandas DataFrame, remove duplicate entries based on 'Name', and plot a scatter plot of these standardized values.
+    Generate a sample from a normal distribution with a given mean and a standard deviation and plot the histogram 
+    together with the probability density function. Returns the Axes object representing the plot and the empirical
+    mean and standard deviation of the sample.
 
     Parameters:
-    df (pandas.DataFrame): DataFrame containing 'Name', 'Age', and 'Score' columns.
+    - mu (float): The mean of the normal distribution. Default is 0.
+    - sigma (float): The standard deviation of the normal distribution. Default is 1.
+    - sample_size (int): The size of the sample to generate. Default is 1000.
 
     Returns:
-    pandas.DataFrame: DataFrame with standardized 'Age' and 'Score', duplicates removed.
-    matplotlib.axes.Axes: Axes object of the scatter plot.
-
-    Note:
-    - The function use "Scatter Plot of Standardized Age and Score" for the plot title.
-    - The function use "Age (standardized)" and "Score (standardized)" as the xlabel and ylabel respectively.
+    - ax (matplotlib.axes._axes.Axes): Axes object with the plotted histogram and normal PDF.
+    - float: The empirical mean of the sample.
+    - float: The empirical standard deviation of the sample.
 
     Requirements:
-    - pandas
-    - numpy
-    - matplotlib.pyplot
-    - sklearn.preprocessing
+    - numpy for data generation.
+    - scipy.stats for statistical functions.
+    - matplotlib.pyplot for plotting.
 
     Example:
-    >>> import pandas as pd
-    >>> data = pd.DataFrame([{'Name': 'James', 'Age': 30, 'Score': 85},{'Name': 'James', 'Age': 35, 'Score': 90},{'Name': 'Lily', 'Age': 28, 'Score': 92},{'Name': 'Sam', 'Age': 40, 'Score': 88},{'Name': 'Nick', 'Age': 50, 'Score': 80}])
-    >>> modified_df, plot_axes = task_func(data)
-    >>> modified_df.head()
-        Name       Age     Score
-    0  James -0.797724 -0.285365
-    2   Lily -1.025645  1.312679
-    3    Sam  0.341882  0.399511
-    4   Nick  1.481487 -1.426825
+    >>> ax, mean, std = task_func(0, 1, 1000)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> print(round(mean, 3))
+    -0.045
+    >>> print(round(std, 3))
+    0.987
     """
-    df = df.drop_duplicates(subset='Name')
-    scaler = StandardScaler()
-    df[['Age', 'Score']] = scaler.fit_transform(df[['Age', 'Score']])
-    plt.figure(figsize=(8, 6))
-    plt.scatter(df['Age'], df['Score'])
-    plt.xlabel('Age (standardized)')
-    plt.ylabel('Score (standardized)')
-    plt.title('Scatter Plot of Standardized Age and Score')
-    ax = plt.gca()  # Get current axes
-    return df, ax
+    np.random.seed(seed)
+    sample = np.random.normal(mu, sigma, sample_size)
+    fig, ax = plt.subplots()
+    ax.hist(sample, bins=30, density=True, alpha=0.5, label='Sample Histogram')
+    xmin, xmax = ax.get_xlim()
+    x = np.linspace(xmin, xmax, 100)
+    p = stats.norm.pdf(x, mu, sigma)
+    ax.plot(x, p, 'k', linewidth=2, label='Normal PDF')
+    ax.set_title("Normal Distribution with $\\mu = %0.2f, \\sigma = %0.2f$" % (mu, sigma))
+    ax.legend()    
+    return ax, np.mean(sample), np.std(sample)
 
 import unittest
-import pandas as pd
-from faker import Faker
-import matplotlib
+import doctest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Using Faker to create test data
-        fake = Faker()
-        self.test_data = pd.DataFrame([{'Name': fake.name(), 'Age': fake.random_int(min=18, max=100), 'Score': fake.random_int(min=0, max=100)} for _ in range(10)])
-    def test_duplicate_removal(self):
-        df, _ = task_func(self.test_data)
-        self.assertEqual(df['Name'].nunique(), df.shape[0])
-    def test_standardization(self):
-        df, _ = task_func(self.test_data)
-        self.assertAlmostEqual(df['Age'].mean(), 0, places=1)
-        self.assertAlmostEqual(int(df['Age'].std()), 1, places=1)
-        self.assertAlmostEqual(df['Score'].mean(), 0, places=1)
-        self.assertAlmostEqual(int(df['Score'].std()), 1, places=1)
-    def test_return_types(self):
-        data = pd.DataFrame([
-            {'Name': 'James', 'Age': 30, 'Score': 85},
-            {'Name': 'James', 'Age': 35, 'Score': 90},
-            {'Name': 'Lily', 'Age': 28, 'Score': 92},
-            {'Name': 'Sam', 'Age': 40, 'Score': 88},
-            {'Name': 'Nick', 'Age': 50, 'Score': 80}
-        ])
-        df, ax = task_func(data)
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-    def test_plot_contents(self):
-        _, ax = task_func(self.test_data)
-        self.assertEqual(ax.get_title(), 'Scatter Plot of Standardized Age and Score')
-        self.assertEqual(ax.get_xlabel(), 'Age (standardized)')
-        self.assertEqual(ax.get_ylabel(), 'Score (standardized)')
-    def test_plot_data_points(self):
-        df, ax = task_func(self.test_data)
-        scatter = [child for child in ax.get_children() if isinstance(child, matplotlib.collections.PathCollection)]
-        self.assertGreater(len(scatter), 0)
-        self.assertEqual(len(scatter[0].get_offsets()), len(df))
+    def test_case_1(self):
+        ax, _, _ = task_func()
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = 0.00, \\sigma = 1.00$")
+    def test_case_2(self):
+        ax, mean, std = task_func(mu=5, sigma=2, sample_size=500, seed=42)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = 5.00, \\sigma = 2.00$")
+        self.assertAlmostEqual(mean, 5.0136, places=3)
+    def test_case_3(self):
+        ax, mean, std = task_func(mu=-3, sigma=5, sample_size=2000, seed=23)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = -3.00, \\sigma = 5.00$")
+        self.assertAlmostEqual(std, 4.978, places=3)
+    def test_case_4(self):
+        ax, _, _ = task_func(mu=1, sigma=0.5, sample_size=100)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = 1.00, \\sigma = 0.50$")
+    def test_case_5(self):
+        ax, mean, std = task_func(mu=10, sigma=0.1, sample_size=1500)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = 10.00, \\sigma = 0.10$")
+        self.assertAlmostEqual(mean, 9.998, places=3)
+        self.assertAlmostEqual(std, 0.09804, places=3)

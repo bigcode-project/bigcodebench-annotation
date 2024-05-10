@@ -1,55 +1,68 @@
-import math
-from sympy import isprime
+import re
+import string
 
-
-def task_func(input_list):
-    """
-    Filter the prime numbers from the specified list, sort the prime numbers 
-    ascending based on their radian value converted to degrees, and return the sorted list.
-    
-    The function uses the isprime function from the sympy library to determine prime numbers 
-    and the degrees function from the math library to sort the numbers based on their degree value.
+def task_func(content):
+    """Count the non-stop words in a sentence without the last word.
 
     Parameters:
-    input_list (list[int]): A list of integers to be filtered and sorted.
+    - content (str): The sentence to count non-stopwords from.
 
     Returns:
-    list[int]: A sorted list of prime numbers based on their degree value.
+    - count (int): The count of non-stopwords.
 
     Requirements:
-    - math
-    - sympy
+    - re
+    - string
 
-    Examples:
-    >>> task_func([4, 5, 2, 7, 89, 90])
-    [2, 5, 7, 89]
-    
-    >>> task_func([101, 102, 103, 104])
-    [101, 103]
+    Example:
+    >>> task_func('this is an example content')
+    1
     """
-    primes = [i for i in input_list if isprime(i)]
-    sorted_primes = sorted(primes, key=lambda x: (math.degrees(x), x))
-    return sorted_primes
+    STOPWORDS = set([
+        "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", 
+        "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", 
+        "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", 
+        "theirs", "themselves", "what", "which", "who", "whom", "this", "that", 
+        "these", "those", "is", "are", "was", "were", "be", "been", "being", "have", 
+        "has", "had", "having", "do", "does", "did", "doing", "an", "the", "and", 
+        "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", 
+        "for", "with", "about", "against", "between", "into", "through", "during", 
+        "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", 
+        "on", "off", "over", "under", "again", "further", "then", "once"
+    ])
+    content = content.split(' ')
+    if len(content) > 1:
+        content = content[:-1]
+    else:
+        content = []
+    words = [word.strip(string.punctuation).lower() for word in re.split(r'\W+', ' '.join(content)) if word]
+    non_stopwords = [word for word in words if word not in STOPWORDS]
+    count = len(non_stopwords)
+    return count
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        input_data = [2, 3, 4, 5, 6, 7, 8, 9, 10]
-        expected_output = [2, 3, 5, 7]
-        self.assertEqual(task_func(input_data), expected_output)
+        # Test with a mix of stopwords and non-stopwords
+        self.assertEqual(task_func('this is an example content'), 1)
     def test_case_2(self):
-        input_data = [2, 3, 5, 7, 11, 13, 17, 19]
-        expected_output = [2, 3, 5, 7, 11, 13, 17, 19]
-        self.assertEqual(task_func(input_data), expected_output)
+        # Test with all stopwords except the last word
+        self.assertEqual(task_func('this is an the of'), 0)
     def test_case_3(self):
-        input_data = [4, 6, 8, 9, 10, 12, 14, 15, 16]
-        expected_output = []
-        self.assertEqual(task_func(input_data), expected_output)
+        # Test with no stopwords
+        self.assertEqual(task_func('example content programming'), 2)
     def test_case_4(self):
-        input_data = []
-        expected_output = []
-        self.assertEqual(task_func(input_data), expected_output)
+        # Test with punctuation
+        self.assertEqual(task_func('example, content; programming, python.'), 3)
     def test_case_5(self):
-        input_data = [89, 90, 91, 97, 98, 99, 100]
-        expected_output = [89, 97]
-        self.assertEqual(task_func(input_data), expected_output)
+        # Test with an empty string
+        self.assertEqual(task_func(''), 0)
+    def test_case_6(self):
+        # Test with a single non-stopword
+        self.assertEqual(task_func('content'), 0)
+    def test_case_7(self):
+        # Test with a single stopword
+        self.assertEqual(task_func('the'), 0)
+    def test_case_8(self):
+        # Test with a mix and uppercase letters
+        self.assertEqual(task_func('This IS an Example Content'), 1)

@@ -1,126 +1,98 @@
-import pandas as pd
-from random import randint
+import json
+import hashlib
+import blake3
 
-
-def task_func(name: str, age: int, code: str, salary: float, bio: str) -> pd.DataFrame:
+def task_func(req_data):
     """
-    Generate a Pandas DataFrame of employees with their details based on the input provided.
+    Hashes the specified request data with BLAKE3 and then converts it into a hexadecimal representation.
+    Additionally, generates an MD5 hash of the BLAKE3 hash for demonstration purposes (not for security).
+    BLAKE3 is a cryptographic hash function that is much faster than MD5 and SHA-1, while providing
+    high security.
 
     Parameters:
-    - name (str): Name of the employee. This is case-sensitive. Must be one of the predefined
-                  names: 'John', 'Alice', 'Bob', 'Charlie', 'David', otherwise the function raises
-                  ValueError.
-    - age (int): Age of the employee.
-    - code (str): Code of the employee.
-    - salary (float): Salary of the employee.
-    - bio (str): Biography of the employee.
+        req_data (dict): The request data to be hashed. It should be a dictionary.
 
     Returns:
-    data_df (pd.DataFrame): dataframe with columns: 'Name', 'Age', 'Code', 'Salary', 'Bio', 'Job Title'.
-               The 'Job Title' is randomly assigned from the predefined job titles:
-               'Engineer', 'Manager', 'Analyst', 'Developer', 'Tester'.
+        tuple: 
+            - str: The hexadecimal representation of the BLAKE3 hash of the request data.
+            - str: An MD5 hash of the hexadecimal BLAKE3 representation, for demonstration.
 
     Requirements:
-    - pandas
-    - random.randint
+    - json
+    - hashlib
+    - blake3
 
-    Example:
-    >>> random.seed(0)
-    >>> df = task_func("John", 30, "A10B", 5000.0, "This is a bio with spaces")
-    >>> print(df)
-       Name  Age  Code  Salary                        Bio  Job Title
-    0  John   30  A10B  5000.0  This is a bio with spaces  Developer
+    Examples:
+    >>> blake3_hash, md5_hash = task_func({'key': 'value'})
+    >>> isinstance(blake3_hash, str) and len(blake3_hash) == 64
+    True
+    >>> isinstance(md5_hash, str) and len(md5_hash) == 32
+    True
+    >>> task_func({'empty': ''})[0] != task_func({'another': 'data'})[0]
+    True
     """
-    EMPLOYEES = ["John", "Alice", "Bob", "Charlie", "David"]
-    JOBS = ["Engineer", "Manager", "Analyst", "Developer", "Tester"]
-    if name not in EMPLOYEES:
-        raise ValueError(f"Invalid employee name. Must be one of {EMPLOYEES}")
-    job = JOBS[randint(0, len(JOBS) - 1)]
-    data_df = pd.DataFrame(
-        [[name, age, code, salary, bio, job]],
-        columns=["Name", "Age", "Code", "Salary", "Bio", "Job Title"],
-    )
-    return data_df
+    json_req_data = json.dumps(req_data)
+    blake3_hex = blake3.blake3(json_req_data.encode('utf-8')).hexdigest()
+    md5_hash = hashlib.md5(blake3_hex.encode('utf-8')).hexdigest()
+    return blake3_hex, md5_hash
 
 import unittest
-import pandas as pd
-import random
+import blake3
+import hashlib
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test the DataFrame structure for a known input
-        df = task_func("John", 30, "A10B", 5000.0, "Sample bio")
-        expected_columns = ["Name", "Age", "Code", "Salary", "Bio", "Job Title"]
-        self.assertListEqual(
-            list(df.columns), expected_columns, "DataFrame columns mismatch"
-        )
-        for col, dtype in zip(
-            df.columns, ["object", "int64", "object", "float64", "object", "object"]
-        ):
-            self.assertTrue(
-                df[col].dtype == dtype,
-                f"Column {col} has incorrect type {df[col].dtype}",
-            )
-    def test_case_2(self):
-        # Test minimum and maximum valid ages and salary, including edge cases
-        df_min_age = task_func("Alice", 18, "X10Y", 0.0, "Minimum age and salary")
-        self.assertEqual(df_min_age["Age"][0], 18)
-        self.assertEqual(df_min_age["Salary"][0], 0.0)
-        df_max_age = task_func("Bob", 65, "Z99W", 1000000.0, "Maximum age and high salary")
-        self.assertEqual(df_max_age["Age"][0], 65)
-        self.assertEqual(df_max_age["Salary"][0], 1000000.0)
-    def test_case_3(self):
-        # Test bio with special characters, very long string, and empty string
-        df_special_bio = task_func("Charlie", 30, "C30D", 5300.0, "!@#$%^&*()_+|")
-        self.assertEqual(df_special_bio["Bio"][0], "!@#$%^&*()_+|")
-        df_long_bio = task_func("David", 30, "D40E", 5400.5, "a" * 1000)
-        self.assertEqual(len(df_long_bio["Bio"][0]), 1000)
-        df_empty_bio = task_func("John", 30, "E50F", 5500.0, "")
-        self.assertEqual(df_empty_bio["Bio"][0], "")
-    def test_case_4(self):
-        # Test code with different formats
-        df_code_special_chars = task_func(
-            "Alice", 25, "!@#$", 5500.5, "Bio with special char code"
-        )
-        self.assertEqual(df_code_special_chars["Code"][0], "!@#$")
-    def test_case_5(self):
-        # Test for case sensitivity
-        with self.assertRaises(ValueError):
-            task_func("john", 30, "J01K", 5000.0, "Case sensitive name test")
-    def test_case_6(self):
-        # Test each predefined name
-        for name in ["John", "Alice", "Bob", "Charlie", "David"]:
-            df = task_func(name, 30, "A10B", 5000.0, f"{name}'s bio")
-            self.assertEqual(
-                df["Name"][0], name, f"Valid name {name} failed to create a DataFrame"
-            )
-    def test_case_7(self):
-        # Test randomness in job assignment
-        job_titles_first_run = []
-        job_titles_second_run = []
-        job_titles_third_run = []
-        n_iter = 15
-        name, age, code, salary, bio = (
-            "Bob",
-            30,
-            "B20C",
-            5000.0,
-            "Testing randomness in job titles",
-        )
-        random.seed(42)  # Set the seed for the first run
-        for _ in range(n_iter):
-            df = task_func(name, age, code, salary, bio)
-            job_titles_first_run.append(df["Job Title"][0])
-        random.seed(42)  # Reset the seed to ensure reproducibility for the second run
-        for _ in range(n_iter):
-            df = task_func(name, age, code, salary, bio)
-            job_titles_second_run.append(df["Job Title"][0])
-        random.seed(0)  # Repeat for third run with different seed
-        for _ in range(n_iter):
-            df = task_func(name, age, code, salary, bio)
-            job_titles_third_run.append(df["Job Title"][0])
-        self.assertEqual(job_titles_first_run, job_titles_second_run)
-        self.assertNotEqual(job_titles_first_run, job_titles_third_run)
-    def test_case_8(self):
-        # Test invalid name
-        with self.assertRaises(ValueError):
-            task_func("InvalidName", 28, "C30D", 5300.0, "Bio of InvalidName")
+    def setUp(self):
+        """Set up common test data."""
+        self.req_data = {'key': 'value'}
+        self.empty_data = {}
+        self.diff_data1 = {'data': 'test1'}
+        self.diff_data2 = {'data': 'test2'}
+    def compute_hex_md5(self):        
+        "Helper to compute the blake3 hex and md5"
+        # Compute BLAKE3 hash
+        json_req_data = json.dumps(self.diff_data1)
+        blake3_hex = blake3.blake3(json_req_data.encode('utf-8')).hexdigest()
+        # Compute MD5 hash of the BLAKE3 hex representation
+        md5_hash = hashlib.md5(blake3_hex.encode('utf-8')).hexdigest()
+        return blake3_hex, md5_hash
+    def test_return_types(self):
+        """Ensure the function returns a tuple of strings."""
+        blake3_hash, md5_hash = task_func(self.req_data)
+        self.assertIsInstance(blake3_hash, str)
+        self.assertIsInstance(md5_hash, str)
+    
+    def test_blake3_length(self):
+        """Test the length of the BLAKE3 hash."""
+        blake3_hash, _ = task_func(self.req_data)
+        self.assertEqual(len(blake3_hash), 64)
+    def test_md5_length(self):
+        """Test the length of the MD5 hash."""
+        _, md5_hash = task_func(self.req_data)
+        self.assertEqual(len(md5_hash), 32)
+    def test_empty_data_hashes(self):
+        """Test function with empty data produces valid hashes."""
+        blake3_hash, md5_hash = task_func(self.empty_data)
+        self.assertEqual(len(blake3_hash), 64)
+        self.assertEqual(len(md5_hash), 32)
+    def test_different_data_different_hashes(self):
+        """Test that different data results in different BLAKE3 and MD5 hashes."""
+        blake3_hash1, md5_hash1 = task_func(self.diff_data1)
+        blake3_hash2, md5_hash2 = task_func(self.diff_data2)
+        self.assertNotEqual(blake3_hash1, blake3_hash2)
+        self.assertNotEqual(md5_hash1, md5_hash2)
+    def test_consistent_hash_with_same_input(self):
+        """Test that hashing the same data multiple times results in the same hashes."""
+        blake3_hash1, md5_hash1 = task_func(self.req_data)
+        blake3_hash2, md5_hash2 = task_func(self.req_data)
+        self.assertEqual(blake3_hash1, blake3_hash2)
+        self.assertEqual(md5_hash1, md5_hash2)
+    def test_known_data_hash_correctness(self):
+        """Test the correctness of BLAKE3 and MD5 hashes for a known input."""
+        # Known input and expected BLAKE3 hash
+        expected_blake3_hex, expected_md5_of_blake3 = self.compute_hex_md5()
+        
+        # Compute the actual hashes
+        blake3_hex, md5_hex = task_func(self.diff_data1)
+        
+        # Verify both hashes match expectations
+        self.assertEqual(blake3_hex, expected_blake3_hex, "BLAKE3 hash does not match expected value.")
+        self.assertEqual(md5_hex, expected_md5_of_blake3, "MD5 hash of BLAKE3 hash does not match expected value.")

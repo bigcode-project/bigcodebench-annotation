@@ -1,93 +1,109 @@
-import ctypes
-import os
-import shutil
-import glob
+import pandas as pd
+import numpy as np
 
 
-
-def task_func(filepath, destination_dir):
+def task_func(file_path="data.csv", columns=["A", "B", "C"]):
     """
-    Loads a DLL file specified by the given filepath and moves all DLL files in the same directory
-    to another specified directory. This function demonstrates file operations including DLL loading,
-    file path manipulation, and file moving using ctypes, os, shutil, and glob modules.
-
+    Read a CSV file into a Pandas DataFrame, convert numeric values into floats,and draw a line chart of data in the specified columns.
+    In addition, compute the cube-root of the data.
+    
     Parameters:
-    filepath (str): The path of the DLL file to be loaded.
-    destination_dir (str): The path of the destination directory where DLL files will be moved.
+    - file_path (str): Path to the CSV file. Default is 'data.csv'.
+    - columns (list of str): List of column names from the data to plot.
+                             Default is ['A', 'B', 'C'].
 
     Returns:
-    str: The name of the loaded DLL file.
-
+    tuple: A tuple containing:
+        - DataFrame: A pandas DataFrame of the data in the CSV file.
+        - Axes: A matplotlib Axes object showing the plotted data.
+        - Series: A pandas Series containing the cube-root of the data.
+        
     Requirements:
-    - ctypes
-    - os
-    - shutil
-    - glob
+    - pandas
+    - numpy
 
-    Examples:
-    >>> destination = 'destination_dir'
-    >>> task_func('libc.so.6', destination) # Doctest will vary based on system and file availability.
-    'libc.so.6'
-    >>> isinstance(task_func('libc.so.6', destination), str)
-    True
+    Example:
+    >>> df, ax, croot = task_func('path_to_csv.csv', ['Column1', 'Column2', 'Column3'])
+    >>> df
+       Column1  Column2  Column3
+    0      1.0      2.0      3.0
+    1      4.0      5.0      6.0
+    >>> ax
+    <matplotlib.axes._axes.Axes object at 0x7f24b00f4a90>
+    >>> croot
+    0    1.0    
     """
-    lib = ctypes.CDLL(filepath)
-    dll_dir = os.path.dirname(filepath)
-    dll_files = glob.glob(os.path.join(dll_dir, '*.dll'))
-    for dll_file in dll_files:
-        shutil.move(dll_file, destination_dir)
-    return lib._name
+    df = pd.read_csv(file_path, dtype=float)
+    ax = df[columns].plot()
+    croot = np.cbrt(df[columns])
+    return df, ax, croot
 
 import unittest
 import tempfile
-from unittest.mock import patch, MagicMock
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Create a temporary directory for DLL files
-        self.dll_dir = tempfile.mkdtemp()
-        self.destination_dir = tempfile.mkdtemp()
-        # Create a sample DLL file in the temporary directory
-        self.sample_dll = os.path.join(self.dll_dir, 'sample.dll')
-        with open(self.sample_dll, 'w') as file:
-            file.write('')
-    @patch('ctypes.CDLL', autospec=True)
-    def test_return_type(self, mock_cdll):
-        self.assertIsInstance(task_func(self.sample_dll, self.destination_dir), str)
-        
-    @patch('ctypes.CDLL', autospec=True)
-    def test_dll_file_movement(self, mock_cdll):
-        """Test if DLL files are correctly moved to the destination directory."""
-        task_func(self.sample_dll, self.destination_dir)
-        
-        # Check that the DLL file has been moved to the destination directory
-        self.assertFalse(os.path.exists(self.sample_dll), "The DLL file should not exist in the source directory after moving.")
-        self.assertTrue(os.path.exists(os.path.join(self.destination_dir, 'sample.dll')), "The DLL file should exist in the destination directory after moving.")
-    def test_invalid_file_path(self):
-        with self.assertRaises(OSError):
-            task_func('invalid_path.dll', self.destination_dir)
-    def test_invalid_destination_dir(self):
-        with self.assertRaises(OSError):
-            task_func(self.sample_dll, 'invalid_destination')
-    @patch('ctypes.CDLL')
-    def test_file_movement_with_mock_cdll(self, mock_cdll):
-        # Setup the mock CDLL instance
-        mock_cdll_instance = MagicMock()
-        mock_cdll.return_value = mock_cdll_instance
-        # Mock a function 'example_function' within the DLL
-        example_function_mock = MagicMock(return_value=42)  # Assume it returns an integer
-        mock_cdll_instance.example_function = example_function_mock
-        # Call the function under test
-        task_func(self.sample_dll, self.destination_dir)
-        # Verify the DLL was "loaded"
-        mock_cdll.assert_called_once_with(self.sample_dll)
-    @patch('ctypes.CDLL', autospec=True)
-    def test_no_dll_in_source(self, cdll):
-        # Remove the DLL file and run the function
-        os.remove(self.sample_dll)
-        task_func(self.sample_dll, self.destination_dir)
-        # Check that no new files are in the destination directory
-        self.assertEqual(len(os.listdir(self.destination_dir)), 0)
+        self.test_dir = tempfile.TemporaryDirectory()
+        self.temp_files = {}
+        # Data setups for different scenarios
+        self.data_sets = {
+            "int": pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6], "C": [7, 8, 9]}),
+            "varied": pd.DataFrame(
+                {
+                    "IntColumn": [1, 2, 3],
+                    "FloatColumn": [1.1, 2.2, 3.3],
+                    "StringColumn": ["4", "5", "6"],
+                }
+            ),
+            "varied_invalid": pd.DataFrame(
+                {
+                    "IntColumn": [1, 2, 3],
+                    "FloatColumn": [1.1, 2.2, 3.3],
+                    "StringColumn": ["a", "b", "c"],
+                }
+            ),
+        }
+        # Write data sets to temporary files
+        for key, df in self.data_sets.items():
+            temp_file_path = os.path.join(self.test_dir.name, f"{key}.csv")
+            df.to_csv(temp_file_path, index=False, header=True)
+            self.temp_files[key] = temp_file_path
     def tearDown(self):
-        # Clean up temporary directories
-        shutil.rmtree(self.dll_dir)
-        shutil.rmtree(self.destination_dir)
+        self.test_dir.cleanup()
+        plt.close("all")
+    def test_case_1(self):
+        file_path = self.temp_files["int"]
+        df, ax, croot = task_func(file_path=file_path, columns=["A", "B", "C"])
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(df.columns.tolist(), ["A", "B", "C"])
+        self.assertTrue((df["A"].tolist() == [1, 2, 3]))
+        self.assertTrue((df["B"].tolist() == [4, 5, 6]))
+        self.assertTrue((df["C"].tolist() == [7, 8, 9]))
+        self.assertEqual(croot.to_dict(), {'A': {0: 1.0, 1: 1.2599210498948734, 2: 1.4422495703074083}, 'B': {0: 1.5874010519681996, 1: 1.7099759466766968, 2: 1.8171205928321394}, 'C': {0: 1.9129311827723894, 1: 2.0, 2: 2.080083823051904}})
+        
+    def test_case_2(self):
+        file_path = self.temp_files["int"]
+        with self.assertRaises(KeyError):
+            task_func(file_path=file_path, columns=["A", "B", "Nonexistent"])
+    def test_case_3(self):
+        file_path = self.temp_files["varied"]
+        df, ax, croot = task_func(
+            file_path=file_path, columns=["IntColumn", "FloatColumn", "StringColumn"]
+        )
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(df["IntColumn"].equals(pd.Series([1.0, 2.0, 3.0])))
+        self.assertTrue(df["FloatColumn"].equals(pd.Series([1.1, 2.2, 3.3])))
+        self.assertTrue(df["StringColumn"].equals(pd.Series([4.0, 5.0, 6.0])))
+        self.assertEqual(croot.to_dict(), {'IntColumn': {0: 1.0, 1: 1.2599210498948734, 2: 1.4422495703074083}, 'FloatColumn': {0: 1.0322801154563672, 1: 1.300591446851387, 2: 1.4888055529538275}, 'StringColumn': {0: 1.5874010519681996, 1: 1.7099759466766968, 2: 1.8171205928321394}})
+        
+    def test_case_4(self):
+        file_path = self.temp_files["varied_invalid"]
+        with self.assertRaises(Exception):
+            task_func(file_path=file_path, columns=["StringColumn"])
+    def test_case_5(self):
+        with self.assertRaises(FileNotFoundError):
+            task_func(file_path="nonexistent_file.csv")

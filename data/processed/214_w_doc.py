@@ -1,118 +1,88 @@
+import time
+import random
 import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
+from scipy.stats import kurtosis
 
-# Constants
-COLUMNS = ['Name', 'Age', 'Country', 'Score']
 
-def task_func(df):
+def task_func(intervals=100, seed=0):
     """
-    Generates a histogram of scores and a boxplot of scores by country from a pandas DataFrame. 
-    It considers only unique names for both plots.
-
+    Generates a series of random numbers over a specified number of intervals with a delay of 1 second between 
+    each interval. It then plots these numbers as a function of elapsed time and returns the Axes object along
+    with the kurtosis value of the generated numbers.
+    
     Parameters:
-    df (DataFrame): A pandas DataFrame containing the columns 'Name', 'Age', 'Country', and 'Score'.
+    - intervals (int, optional): Number of intervals for generating random numbers. Default is 100.
 
     Returns:
-    matplotlib.figure.Figure: A matplotlib figure containing the histogram and boxplot.
+    - matplotlib.axes.Axes: The Axes object representing the plot.
+    - float: The kurtosis value of the generated numbers.
 
     Requirements:
+    - time
+    - random
     - matplotlib.pyplot
-    - seaborn
-    - pandas
-
-    Note:
-    - The function would return "Invalid input" string if the input is invalid (e.g., does not contain the required 'Name' key).
-    - The histogram of scores has a title "Histogram of Scores".
-    - The boxplot of scores has a title "Boxplot of Scores by Country".
 
     Example:
-    >>> data = pd.DataFrame([{'Name': 'James', 'Age': 30, 'Country': 'USA', 'Score': 85}, {'Name': 'Nick', 'Age': 50, 'Country': 'Australia', 'Score': 80}])
-    >>> fig = task_func(data)
-    >>> axes = fig.get_axes()
-    >>> print(axes[0].get_title())
-    Histogram of Scores
-
-    >>> print(task_func("not a dataframe"))
-    Invalid input
+    >>> ax, kurtosis = task_func(5)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    if not isinstance(df, pd.DataFrame):
-        return "Invalid input"
+    random.seed(seed)
+    times = []
+    numbers = []
     try:
-        df = df.drop_duplicates(subset='Name')
-        fig = plt.figure(figsize=(10, 5))
-        plt.subplot(1, 2, 1)
-        sns.histplot(df['Score'], bins=10)
-        plt.title('Histogram of Scores')
-        plt.subplot(1, 2, 2)
-        sns.boxplot(x='Country', y='Score', data=df)
-        plt.title('Boxplot of Scores by Country')
-        plt.tight_layout()
-        return fig
-    except Exception as e:
-        return "Invalid input"
+        for _ in range(intervals):
+            time.sleep(1)
+            times.append(time.time())
+            numbers.append(random.random())
+    except KeyboardInterrupt:
+        print('Interrupted by user')
+    kurtosis_value = kurtosis(numbers, nan_policy='omit')
+    plt.figure()
+    fig, ax = plt.subplots()
+    ax.plot(times, numbers)
+    return ax, kurtosis_value
 
 import unittest
-import pandas as pd
+import doctest
+from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    def test_valid_dataframe(self):
-        # Test with a valid DataFrame with unique and duplicate 'Name' entries
-        data = pd.DataFrame([
-            {'Name': 'James', 'Age': 30, 'Country': 'USA', 'Score': 85},
-            {'Name': 'James', 'Age': 35, 'Country': 'USA', 'Score': 90},
-            {'Name': 'Lily', 'Age': 28, 'Country': 'Canada', 'Score': 92},
-            {'Name': 'Sam', 'Age': 40, 'Country': 'UK', 'Score': 88},
-            {'Name': 'Nick', 'Age': 50, 'Country': 'Australia', 'Score': 80}
-        ])
-        fig = task_func(data)
-        # Retrieve axes from the figure
-        axes = fig.get_axes()
-        # Assert titles
-        self.assertEqual(axes[0].get_title(), 'Histogram of Scores')
-        self.assertEqual(axes[1].get_title(), 'Boxplot of Scores by Country')
+    
+    @patch('time.sleep', return_value=None)  # Mocking time.sleep
+    def test_case_1(self, mock_sleep):
+        ax, kurtosis = task_func(5)
+        self.assertIsInstance(ax, plt.Axes)
+        lines = ax.get_lines()
+        self.assertEqual(len(lines[0].get_xdata()), 5)
+        self.assertEqual(len(lines[0].get_ydata()), 5)
+        self.assertEqual(mock_sleep.call_count, 5)
+    @patch('time.sleep', return_value=None)
+    def test_case_2(self, mock_sleep):
+        ax, kurtosis = task_func(10, 44)
+        self.assertIsInstance(ax, plt.Axes)
+        lines = ax.get_lines()
+        self.assertEqual(len(lines[0].get_xdata()), 10)
+        self.assertEqual(len(lines[0].get_ydata()), 10)
+        self.assertNotAlmostEqual(kurtosis, -0.34024, places=5)
+    @patch('time.sleep', return_value=None)
+    def test_case_3(self, mock_sleep):
+        ax, kurtosis = task_func()  # Default intervals = 100
+        self.assertIsInstance(ax, plt.Axes)
+        lines = ax.get_lines()
+        self.assertEqual(len(lines[0].get_xdata()), 100)
+        self.assertEqual(len(lines[0].get_ydata()), 100)
         
-        # Assert data points in the boxplot
-        for idx, country in enumerate(data['Country']):
-            # Filter collection corresponding to the country
-            for collection in axes[1].collections:
-                if collection.get_label() == country:
-                    self.assertIn(data['Score'][idx], collection.get_offsets()[:, 1])
-                    break  # Exit inner loop once found
-    def test_empty_dataframe(self):
-        # Test with an empty DataFrame
-        data = pd.DataFrame([])
-        result = task_func(data)
-        self.assertEqual(result, "Invalid input")
-    def test_missing_columns(self):
-        # Test with a DataFrame missing required columns
-        data = pd.DataFrame([
-            {'Name': 'James', 'Age': 30, 'Score': 85},
-            {'Name': 'Lily', 'Age': 28, 'Score': 92}
-        ])
-        result = task_func(data)
-        self.assertEqual(result, "Invalid input")
-    def test_non_dataframe_input(self):
-        # Test with a non-DataFrame input
-        data = "not a dataframe"
-        result = task_func(data)
-        self.assertEqual(result, "Invalid input")
-    def test_plot_attributes(self):
-        # Test if the plot contains the correct title, x-axis, y-axis, and data points
-        data = pd.DataFrame([
-            {'Name': 'James', 'Age': 30, 'Country': 'USA', 'Score': 85},
-            {'Name': 'Nick', 'Age': 50, 'Country': 'Australia', 'Score': 80}
-        ])
-        fig = task_func(data)
-        # Retrieve axes from the figure
-        axes = fig.get_axes()
-        # Assert titles
-        self.assertEqual(axes[0].get_title(), 'Histogram of Scores')
-        self.assertEqual(axes[1].get_title(), 'Boxplot of Scores by Country')
-        
-        # Assert data points in the boxplot
-        for idx, country in enumerate(data['Country']):
-            # Filter collection corresponding to the country
-            for collection in axes[1].collections:
-                if collection.get_label() == country:
-                    self.assertIn(data['Score'][idx], collection.get_offsets()[:, 1])
-                    break  # Exit inner loop once found
+    @patch('time.sleep', return_value=None)
+    def test_case_4(self, mock_sleep):
+        ax, kurtosis = task_func(1)
+        self.assertIsInstance(ax, plt.Axes)
+        lines = ax.get_lines()
+        self.assertEqual(len(lines[0].get_xdata()), 1)
+        self.assertEqual(len(lines[0].get_ydata()), 1)
+    @patch('time.sleep', return_value=None)
+    def test_case_5(self, mock_sleep):
+        ax, kurtosis = task_func(0)
+        self.assertIsInstance(ax, plt.Axes)
+        lines = ax.get_lines()
+        self.assertEqual(len(lines[0].get_xdata()), 0)
+        self.assertEqual(len(lines[0].get_ydata()), 0)

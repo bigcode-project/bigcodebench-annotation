@@ -1,86 +1,97 @@
-import matplotlib.pyplot as plt
-import numpy as np
+import re
+import glob
+from docx import Document
 
 
-def task_func(n, seed=0):
+def task_func(directory_path: str) -> int:
     """
-    Generates a simple scatter plot with 'n' points.
-
+    Processes all Word (.docx) files in the provided directory, searching for double quotes in the text 
+    and adding a backslash before each double quote to "protect" it.
+    
     Parameters:
-    - n (int): The number of points to be plotted.
-    - seed (int, optional): The seed for the random number generator. Defaults to None.
-
+    - directory_path (str): Path to the directory containing .docx files to be processed.
+    
     Returns:
-    - plot (matplotlib.figure.Figure): The generated plot titled "Scatter plot of random points", with x-axis labeled "X" and y-axis labeled "Y".
-    - points (list of tuples): List containing the (x, y) coordinates of the plotted points.
+    - int: Number of .docx files processed.
 
     Requirements:
-    - numpy
-    - matplotlib.pyplot
-    
+    - re
+    - docx
+    - glob
+
     Example:
-    >>> task_func(5)
-    (<Figure size 640x480 with 1 Axes>, [(0.5488135039273248, 0.6458941130666561), (0.7151893663724195, 0.4375872112626925), (0.6027633760716439, 0.8917730007820798), (0.5448831829968969, 0.9636627605010293), (0.4236547993389047, 0.3834415188257777)])
+    >>> import tempfile
+    >>> temp_dir = tempfile.mkdtemp()
+    >>> doc = Document()
+    >>> _ = doc.add_paragraph("This is a sample text with double quotes.")
+    >>> doc.save(temp_dir + '/sample.docx')
+    >>> task_func(temp_dir)
+    1
     """
-    np.random.seed(seed)
-    x = np.random.rand(n)
-    y = np.random.rand(n)
-    fig, ax = plt.subplots()
-    ax.scatter(x, y)
-    ax.set_title("Scatter plot of random points")
-    ax.set_xlabel("X")
-    ax.set_ylabel("Y")
-    return fig, list(zip(x, y))
+    docx_files = glob.glob(directory_path + '/*.docx')
+    processed_files = 0
+    for docx_file in docx_files:
+        document = Document(docx_file)
+        for paragraph in document.paragraphs:
+            paragraph.text = re.sub(r'(?<!\\)"', r'\"', paragraph.text)
+        document.save(docx_file)
+        processed_files += 1
+    return processed_files
 
 import unittest
-import matplotlib.pyplot as plt
+import shutil
+import os
+import doctest
+import tempfile
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test basic point type and structure
-        _, points = task_func(5)
-        self.assertTrue(
-            all(
-                isinstance(point, tuple)
-                and len(point) == 2
-                and all(isinstance(coord, float) for coord in point)
-                for point in points
-            ),
-            "Points should be a list of tuples with float coordinates",
-        )
-    def test_case_2(self):
-        # Test parameter 'n'
-        for n in [0, 1, 5, 100]:
-            plot, points = task_func(n)
-            self.assertEqual(len(points), n)
-            self.assertTrue(isinstance(plot, type(plt.figure())))
-    def test_case_3(self):
-        # Test random seed - reproduction
-        _, points1 = task_func(5, seed=1)
-        _, points2 = task_func(5, seed=1)
-        self.assertEqual(
-            points1, points2, "Points generated with the same seed should match exactly"
-        )
-    def test_case_4(self):
-        # Test random seed - differences
-        _, points1 = task_func(5, seed=1)
-        _, points2 = task_func(5, seed=10)
-        self.assertNotEqual(
-            points1, points2, "Points generated with the same seed should match exactly"
-        )
-    def test_case_5(self):
-        # Test invalid inputs
-        with self.assertRaises(ValueError):
-            task_func(-5)
-        with self.assertRaises(TypeError):
-            task_func(5.5)
-        with self.assertRaises(TypeError):
-            task_func("5")
-    def test_case_6(self):
-        # Test visualization
-        fig, _ = task_func(1)
-        ax = fig.axes[0]
-        self.assertEqual(ax.get_title(), "Scatter plot of random points")
-        self.assertEqual(ax.get_xlabel(), "X")
-        self.assertEqual(ax.get_ylabel(), "Y")
+    def setUp(self):
+        self.base_tmp_dir = tempfile.mkdtemp()
+        self.test_directory = f"{self.base_tmp_dir}/test/"
+        if not os.path.exists(self.test_directory):
+            os.makedirs(self.test_directory)
+        test_data = {
+            "file_1.docx": "This is a sample text without any double quotes.",
+            "file_2.docx": "This is a \"sample\" text with double quotes.",
+            "file_3.docx": r'This is a \"sample\" text with double quotes already protected.',
+            "file_4.docx": "Hello \"world\"! How are you \"today\"?",
+            "file_5.docx": "Testing \"multiple\" paragraphs.\n\nAnother paragraph with \"quotes\"."
+        }
+        # Create .docx files for each scenario
+        for file_name, content in test_data.items():
+            doc = Document()
+            for paragraph in content.split("\n"):
+                doc.add_paragraph(paragraph)
+            doc.save(self.test_directory + file_name)
+        super(TestCases, self).setUp()
     def tearDown(self):
-        plt.close("all")
+        shutil.rmtree(self.test_directory)
+        super(TestCases, self).tearDown()
+    def read_docx_content(self, file_path):
+        doc = Document(file_path)
+        return "\n".join([para.text for para in doc.paragraphs])
+    
+    def test_case_1(self):
+        result = task_func(self.test_directory)
+        self.assertEqual(result, 5)
+        content = self.read_docx_content(self.test_directory + "file_1.docx")
+        self.assertEqual(content, "This is a sample text without any double quotes.")
+    def test_case_2(self):
+        result = task_func(self.test_directory)
+        self.assertEqual(result, 5)
+        content = self.read_docx_content(self.test_directory + "file_2.docx")
+        self.assertEqual(content, r'This is a \"sample\" text with double quotes.')
+    def test_case_3(self):
+        result = task_func(self.test_directory)
+        self.assertEqual(result, 5)
+        content = self.read_docx_content(self.test_directory + "file_3.docx")
+        self.assertEqual(content, r'This is a \"sample\" text with double quotes already protected.')
+    def test_case_4(self):
+        result = task_func(self.test_directory)
+        self.assertEqual(result, 5)
+        content = self.read_docx_content(self.test_directory + "file_4.docx")
+        self.assertEqual(content, r'Hello \"world\"! How are you \"today\"?')
+    def test_case_5(self):
+        result = task_func(self.test_directory)
+        self.assertEqual(result, 5)
+        content = self.read_docx_content(self.test_directory + "file_5.docx")
+        self.assertEqual(content, 'Testing \\"multiple\\" paragraphs.\n\nAnother paragraph with \\"quotes\\".')

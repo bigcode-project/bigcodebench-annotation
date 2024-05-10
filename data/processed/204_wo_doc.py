@@ -1,170 +1,131 @@
-import requests
-import os
-import zipfile
+import json
+import smtplib
 
-def task_func(url, destination_directory, headers=None):
+# Constants
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+EMAIL_ADDRESS = "your.email@gmail.com"
+EMAIL_PASSWORD = "your.password"
+
+def task_func(input_data=None, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_address=EMAIL_ADDRESS, email_password=EMAIL_PASSWORD, smtp=None):
     """
-    Download and keep a zip file from a URL, extract its contents to the specified directory, and return the list of extracted files.
+    Extract recepient email address and names from JSON-formatted string and send the names in an email. The sent message should be in the format 'Subject: Extracted Names\n\nName1\nName2\n...'.
 
     Parameters:
-    url (str): The URL of the zip file to download.
-    destination_directory (str): The directory where the contents of the zip file will be extracted.
-    headers (dict, optional): Custom headers to be included in the request. Defaults to {'accept': 'application/octet-stream'}.
-
+    input_data (str): JSON-formatted string containing the recipient email address and the list of names.
+    smtp_server (str): The SMTP server to use for sending the email.
+    smtp_port (int): The port to use for the SMTP server.
+    email_address (str): The email address from which to send the email.
+    email_password (str): The password for the email address.
+    
     Returns:
-    list: A list of filenames of the extracted files.
-
+    list: A list of extracted names.
+    
     Requirements:
-    - requests
-    - os
-    - zipfile
+    - re
+    - smtplib
 
     Example:
-    >>> extracted_files = task_func("https://example.com/data.zip", "/path/to/destination")
-    >>> print(extracted_files)
-    ['file1.txt', 'file2.csv']
+    >>> from unittest.mock import MagicMock
+    >>> mock_smtp_instance = MagicMock()
+    >>> mock_smtp = MagicMock(return_value=mock_smtp_instance)
+    >>> task_func('{"recipient": "recipient@example.com", "names": ["Josie Smith", "Mugsy Dog Smith"]}', smtp=mock_smtp)
+    ['Josie Smith', 'Mugsy Dog Smith']
     """
-    if headers is None:
-        headers = {
-            'accept': 'application/octet-stream'
-        }
-    response = requests.get(url, headers=headers)
-    filename = os.path.basename(url)
-    zip_path = os.path.join(destination_directory, filename)
-    with open(zip_path, 'wb') as f:
-        f.write(response.content)
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(destination_directory)
-    extracted_files = os.listdir(destination_directory)
-    return extracted_files
+    if input_data is None:
+        return []
+    try:
+        data = json.loads(input_data)
+        recipient_email = data.get('recipient')
+        names = data.get('names', [])
+    except (json.JSONDecodeError, ValueError):
+        return []
+    if not recipient_email or not names:
+        return []
+    message = 'Subject: Extracted Names\n\n' + '\n'.join(names)
+    if smtp:
+        server = smtp(smtp_server, smtp_port)
+    else:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+    server.starttls()
+    server.login(email_address, email_password)
+    server.sendmail(email_address, recipient_email, message)
+    server.quit()
+    return names
 
 import unittest
-import os
 from unittest.mock import patch, MagicMock
-import tempfile
-import shutil
-# Mock data
-MOCK_URL = "https://example.com/data.zip"
-MOCK_DESTINATION_DIR = "/path/to/destination"
-MOCK_CONTENT = b"mocked content"
+import smtplib
 class TestCases(unittest.TestCase):
-    @patch('requests.get')
-    @patch('zipfile.ZipFile.extract')
-    @patch('zipfile.ZipFile')
-    @patch('os.listdir')
-    @patch('os.path.basename')
-    @patch('os.path.join')
-    @patch('builtins.open', new_callable=unittest.mock.mock_open)
-    def test_download_and_extract(self, mock_open, mock_join, mock_basename, mock_listdir, mock_zipfile, mock_extract, mock_requests_get):
-        # Mock requests.get response
-        mock_response = MagicMock()
-        mock_response.content = MOCK_CONTENT
-        mock_requests_get.return_value = mock_response
-        # Mock other functions
-        mock_basename.return_value = "data.zip"
-        mock_zip_instance = MagicMock()
-        zip_contents = ['file1.txt', 'file2.csv']  # Files in the zip
-        mock_zip_instance.namelist.return_value = zip_contents
-        mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
+    @patch('smtplib.SMTP')
+    def test_f225(self, mock_smtp):
+        mock_smtp_instance = MagicMock()
+        mock_smtp.return_value = mock_smtp_instance
+        
         # Call the function
-        extracted_files = task_func(MOCK_URL, MOCK_DESTINATION_DIR)
-        # Assertions
-        mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
-        mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data.zip'), 'wb')
-        self.assertEqual(zip_contents, mock_zip_instance.namelist())
-    @patch('requests.get')
-    @patch('zipfile.ZipFile.extract')
-    @patch('zipfile.ZipFile')
-    @patch('os.listdir')
-    @patch('os.path.basename')
-    @patch('os.path.join')
-    @patch('builtins.open', new_callable=unittest.mock.mock_open)
-    def test_2(self, mock_open, mock_join, mock_basename, mock_listdir, mock_zipfile, mock_extract, mock_requests_get):
-        # Mock requests.get response
-        mock_response = MagicMock()
-        mock_response.content = MOCK_CONTENT
-        mock_requests_get.return_value = mock_response
-        # Mock other functions
-        mock_basename.return_value = "data.zip"
-        mock_zip_instance = MagicMock()
-        zip_contents = ['file1.txt', 'file2.csv', 'file3.td']
-        mock_zip_instance.namelist.return_value = zip_contents
-        mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
+        result = task_func('{"recipient": "recipient@example.com", "names": ["Josie Smith", "Mugsy Dog Smith"]}')
+        
+        # Assert that SMTP was called with the right parameters
+        mock_smtp.assert_called_once_with('smtp.gmail.com', 587)
+        # Assert the return value
+        self.assertEqual(result, ['Josie Smith', 'Mugsy Dog Smith'])
+    @patch('smtplib.SMTP')
+    def test_f225_subject(self, mock_smtp):
+        # Create a MagicMock instance to replace the SMTP instance
+        mock_smtp_instance = MagicMock()
+        mock_smtp.return_value = mock_smtp_instance
+        
         # Call the function
-        extracted_files = task_func(MOCK_URL, MOCK_DESTINATION_DIR)
-        # Assertions
-        mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
-        mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data.zip'), 'wb')
-        self.assertEqual(zip_contents, mock_zip_instance.namelist())
-    @patch('requests.get')
-    @patch('zipfile.ZipFile.extract')
-    @patch('zipfile.ZipFile')
-    @patch('os.listdir')
-    @patch('os.path.basename')
-    @patch('os.path.join')
-    @patch('builtins.open', new_callable=unittest.mock.mock_open)
-    def test_3(self, mock_open, mock_join, mock_basename, mock_listdir, mock_zipfile, mock_extract, mock_requests_get):
-        # Mock requests.get response
-        mock_response = MagicMock()
-        mock_response.content = MOCK_CONTENT
-        mock_requests_get.return_value = mock_response
-        # Mock other functions
-        mock_basename.return_value = "data.zip"
-        mock_zip_instance = MagicMock()
-        zip_contents = ['file1.txt']
-        mock_zip_instance.namelist.return_value = zip_contents
-        mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
-        # Call the function
-        extracted_files = task_func(MOCK_URL, MOCK_DESTINATION_DIR)
-        # Assertions
-        mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
-        mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data.zip'), 'wb')
-        self.assertEqual(zip_contents, mock_zip_instance.namelist())
-    @patch('requests.get')
-    @patch('zipfile.ZipFile.extract')
-    @patch('zipfile.ZipFile')
-    @patch('os.listdir')
-    @patch('os.path.basename')
-    @patch('os.path.join')
-    @patch('builtins.open', new_callable=unittest.mock.mock_open)
-    def test_4(self, mock_open, mock_join, mock_basename, mock_listdir, mock_zipfile, mock_extract, mock_requests_get):
-        # Mock requests.get response
-        mock_response = MagicMock()
-        mock_response.content = MOCK_CONTENT
-        mock_requests_get.return_value = mock_response
-        # Mock other functions
-        mock_basename.return_value = "data_download.zip"
-        mock_zip_instance = MagicMock()
-        zip_contents = ['file1.txt', 'file2.xlsx']
-        mock_zip_instance.namelist.return_value = zip_contents
-        mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
-        # Call the function
-        extracted_files = task_func(MOCK_URL, MOCK_DESTINATION_DIR)
-        # Assertions
-        mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
-        mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data_download.zip'), 'wb')
-        self.assertEqual(zip_contents, mock_zip_instance.namelist())
-    @patch('requests.get')
-    @patch('zipfile.ZipFile.extract')
-    @patch('zipfile.ZipFile')
-    @patch('os.listdir')
-    @patch('os.path.basename')
-    @patch('os.path.join')
-    @patch('builtins.open', new_callable=unittest.mock.mock_open)
-    def test_5(self, mock_open, mock_join, mock_basename, mock_listdir, mock_zipfile, mock_extract, mock_requests_get):
-        # Mock requests.get response
-        mock_response = MagicMock()
-        mock_response.content = MOCK_CONTENT
-        mock_requests_get.return_value = mock_response
-        # Mock other functions
-        mock_basename.return_value = "data_download.zip"
-        mock_zip_instance = MagicMock()
-        zip_contents = []
-        mock_zip_instance.namelist.return_value = zip_contents
-        mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
-        # Call the function
-        extracted_files = task_func(MOCK_URL, MOCK_DESTINATION_DIR)
-        # Assertions
-        mock_requests_get.assert_called_once_with(MOCK_URL, headers={'accept': 'application/octet-stream'})
-        mock_open.assert_called_once_with(os.path.join(MOCK_DESTINATION_DIR, 'data_download.zip'), 'wb')
-        self.assertEqual(zip_contents, mock_zip_instance.namelist())
+        result = task_func('{"recipient": "names@gmail.com", "names": ["Josie Smith", "Mugsy Dog Smith"]}')
+        
+        # Assert that SMTP was called with the right parameters
+        mock_smtp.assert_called_once_with('smtp.gmail.com', 587)
+        # Assert that starttls, login, sendmail, and quit were called on the SMTP instance
+        mock_smtp_instance.login.assert_called_once_with('your.email@gmail.com', 'your.password')
+        mock_smtp_instance.sendmail.assert_called_once_with('your.email@gmail.com', 'names@gmail.com', 'Subject: Extracted Names\n\nJosie Smith\nMugsy Dog Smith')
+        
+        # Assert the return value
+        self.assertEqual(result, ['Josie Smith', 'Mugsy Dog Smith'])
+    
+    @patch('smtplib.SMTP')
+    def test_no_names(self, mock_smtp):
+        # Create a MagicMock instance to replace the SMTP instance
+        mock_smtp_instance = MagicMock()
+        mock_smtp.return_value = mock_smtp_instance
+        # Custom input text with no names
+        custom_text = '{"recipient": "names@gmail.com", "names": []}'
+        
+        # Call the function with custom input
+        result = task_func(input_data=custom_text)
+        # Assert the return value
+        self.assertEqual(result, [])
+    @patch('smtplib.SMTP')
+    def test_recepient(self, mock_smtp):
+        # Create a MagicMock instance to replace the SMTP instance
+        mock_smtp_instance = MagicMock()
+        mock_smtp.return_value = mock_smtp_instance
+        # Custom input text with no names
+        custom_text = '{"recipient": "change@gmail.com", "names": []}'
+        
+        # Call the function with custom input
+        result = task_func(input_data=custom_text)
+        
+        # Assert the return value
+        self.assertEqual(result, [])
+    @patch('smtplib.SMTP')
+    def test_login(self, mock_smtp):
+        # Create a MagicMock instance to replace the SMTP instance
+        mock_smtp_instance = MagicMock()
+        mock_smtp.return_value = mock_smtp_instance
+        # Custom input text with no names
+        custom_text = '{"recipient": "change@gmail.com", "names": ["Name 1", "Name 2"]}'
+        
+        # Call the function with custom input
+        result = task_func(input_data=custom_text, email_address="your.email.change@gmail.com", email_password="your.password.change")
+        
+        # Assert that SMTP was called with the right parameters
+        mock_smtp.assert_called_once_with('smtp.gmail.com', 587)
+        # Assert that starttls, login, sendmail, and quit were called on the SMTP instance
+        mock_smtp_instance.login.assert_called_once_with('your.email.change@gmail.com', 'your.password.change')
+        # Assert the return value
+        self.assertEqual(result, ["Name 1", "Name 2"])

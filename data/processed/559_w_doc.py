@@ -1,67 +1,70 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
 
-def task_func(dataframe, target_value='332'):
+def task_func(a, b, columns=['A', 'B']):
     """
-    Searches a given DataFrame for occurrences of a specified target value and visualizes these occurrences using a heatmap.
+    Standardize two lists of numbers using the StandardScaler from sklearn and visualize the standardized values using a bar plot.
 
     Parameters:
-    - dataframe (pd.DataFrame): The input DataFrame to search.
-    - target_value (str, optional): The value to search for in the DataFrame. Defaults to '332'.
+        a (list): A list of numbers.
+        b (list): Another list of numbers.
+        columns (list, optional): Column names for the resulting DataFrame. Defaults to ['A', 'B'].
 
     Returns:
-    - tuple: A tuple containing:
-        - pd.DataFrame: A DataFrame with Boolean values indicating the presence of the target value in the input DataFrame.
-        - matplotlib.axes._axes.Axes: The Axes object of the heatmap.
+        pd.DataFrame: A DataFrame containing the standardized values.
+        matplotlib.axes.Axes: Axes object of the displayed bar plot.
 
     Requirements:
-    - matplotlib.pyplot
-    - seaborn
+        - numpy
+        - pandas
+        - sklearn.preprocessing
+        - matplotlib.pyplot
 
     Example:
-    >>> import pandas as pd
-    >>> df = pd.DataFrame({
-    ...     'Column1': ['0', 'a', '332', '33'],
-    ...     'Column2': ['1', 'bb', '33', '22'],
-    ...     'Column3': ['2', 'ccc', '2', '332']
-    ... })
-    >>> mask, ax = task_func(df, '332')
+        >>> df, ax = task_func([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
+        >>> isinstance(df, pd.DataFrame) and isinstance(ax, matplotlib.axes.Axes)
+        True
     """
-    mask = dataframe.applymap(lambda x: x == target_value)
-    plt.figure(figsize=(8, 6))
-    ax = sns.heatmap(mask, cmap='Blues', cbar=False)  # Adjusted to not display color bar for clarity in Boolean visualization
+    if len(a) == 0 or len(b) == 0:
+        fig, ax = plt.subplots()
+        plt.close(fig)  # Prevent empty plot from displaying
+        return pd.DataFrame(), ax
+    scaler = StandardScaler()
+    standardized_values = scaler.fit_transform(np.array([a, b]).T)
+    df = pd.DataFrame(standardized_values, columns=columns)
+    ax = df.plot(kind='bar')
     plt.show()
-    return mask, ax
+    return df, ax
 
 import unittest
-import pandas as pd
+import matplotlib
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        """Create a sample DataFrame for testing."""
-        self.df = pd.DataFrame({
-            'Column1': ['0', 'a', '332', '33'],
-            'Column2': ['1', 'bb', '33', '22'],
-            'Column3': ['2', 'ccc', '2', '332']
-        })
-    def test_target_value_occurrence(self):
-        """Test if the function correctly identifies the target value."""
-        mask, _ = task_func(self.df, '332')
-        self.assertTrue(mask.iloc[2, 0], "Mask should be True where target value '332' exists.")
-    def test_target_value_absence(self):
-        """Test if the function correctly identifies absence of the target value."""
-        mask, _ = task_func(self.df, '332')
-        self.assertFalse(mask.iloc[0, 0], "Mask should be False where target value '332' does not exist.")
-    def test_return_type(self):
-        """Test the return type of the function."""
-        mask, ax = task_func(self.df, '332')
-        self.assertIsInstance(mask, pd.DataFrame, "First return value should be a DataFrame.")
-        self.assertTrue(hasattr(ax, 'get_figure'), "Second return value should be an Axes object with a 'get_figure' method.")
-    def test_default_target_value(self):
-        """Test the function with the default target value."""
-        mask, _ = task_func(self.df)
-        self.assertEqual(mask.sum().sum(), 2, "There should be exactly 2 occurrences of the default target value '332'.")
-    def test_custom_target_value(self):
-        """Test the function with a custom target value."""
-        mask, _ = task_func(self.df, 'a')
-        self.assertEqual(mask.sum().sum(), 1, "There should be exactly 1 occurrence of the custom target value 'a'.")
+    def test_standard_case(self):
+        """Test the function with non-empty lists."""
+        df, ax = task_func([1, 2, 3], [4, 5, 6])
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(df.shape, (3, 2))
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+    def test_empty_lists(self):
+        """Test the function with empty lists."""
+        df, ax = task_func([], [])
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(df.empty, True)
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+    def test_unequal_length_lists(self):
+        """Test the function with lists of unequal length. Expecting an exception."""
+        with self.assertRaises(ValueError):
+            task_func([1, 2, 3], [4, 5])
+    def test_single_value_lists(self):
+        """Test the function with single-value lists."""
+        df, ax = task_func([1], [1])
+        self.assertEqual(df.shape, (1, 2))
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+    def test_large_lists(self):
+        """Test the function with large lists."""
+        df, ax = task_func(list(range(100)), list(range(100, 200)))
+        self.assertEqual(df.shape, (100, 2))
+        self.assertIsInstance(ax, matplotlib.axes.Axes)

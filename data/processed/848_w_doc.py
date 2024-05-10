@@ -1,78 +1,118 @@
+import collections
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 
-def task_func(start_date: str, periods: int, freq: str, random_seed: int = 0) -> (pd.DataFrame, plt.Axes):
+def task_func(obj_list, attr):
     """
-    Generates and plots a sales forecast starting from a given date, for a specified number of periods and frequency.
-
-    Requirements:
-    - pandas
-    - numpy
-    - matplotlib.pyplot
+    Count the frequency of each value of the given attribute from a list of objects.
     
+    This function returns a pandas Dataframe containing frequency count of the specified attribute from the objects in the list.
+    The DataFrame consist of two columns ('attribute' and 'count'), which contain the attribute and its
+    specific count respectively.
+    
+    If no attributes are found, an empty DataFrame is returned.
+
     Parameters:
-    - start_date (str): Start date for the forecast in 'YYYY-MM-DD' format.
-    - periods (int): Number of periods to forecast.
-    - freq (str): Frequency of the forecast (e.g., 'WOM-2FRI' for the second Friday of each month, 'M' for monthly).
-    - random_seed (int, optional): Seed for the random number generator to ensure reproducibility.
+    obj_list (list): The list of objects with attributes.
+    attr (str): The attribute to count.
 
     Returns:
-    - A tuple containing:
-        1. A DataFrame with columns ['Date', 'Sales'], where 'Date' is the forecast date and 'Sales' are the forecasted sales.
-        2. A matplotlib Axes object for the sales forecast plot.
+    collections.Counter: The frequency count of each value of the attribute.
 
-    Examples:
-    >>> df, ax = task_func('2021-01-01', 5, 'WOM-2FRI')
-    >>> print(df)
-                Sales
-    Date             
-    2021-01-08    272
-    2021-02-12    147
-    2021-03-12    217
-    2021-04-09    292
-    2021-05-14    423
-    >>> df, ax = task_func('2022-02-01', 3, 'M', random_seed=42)
-    >>> print(df)
-                Sales
-    Date             
-    2022-02-28    202
-    2022-03-31    448
-    2022-04-30    370
+    Requirements:
+    - collections
+    - pandas
+    
+    Example:
+    >>> class ExampleObject:
+    ...     def __init__(self, color, shape):
+    ...         self.color = color
+    ...         self.shape = shape
+    ...
+    >>> obj_list = [ExampleObject('Red', 'Square'), ExampleObject('Green', 'Circle'), ExampleObject('Red', 'Rectangle')]
+    >>> count = task_func(obj_list, 'color')
+    >>> print(count)
+      attribute  count
+    0       Red      2
+    1     Green      1
+
+
+    >>> class ExampleObject:
+    ...     def __init__(self, animal, shape):
+    ...         self.animal = animal
+    ...         self.shape = shape
+    ...
+    >>> obj_list = [ExampleObject('tiger', 'Square'), ExampleObject('leopard', 'Circle'), ExampleObject('cat', 'Rectangle'), ExampleObject('elephant', 'Rectangle')]
+    >>> count = task_func(obj_list, 'shape')
+    >>> print(count)
+       attribute  count
+    0     Square      1
+    1     Circle      1
+    2  Rectangle      2
     """
-    np.random.seed(random_seed)
-    date_range = pd.date_range(start_date, periods=periods, freq=freq)
-    sales_forecast = np.random.randint(100, 500, size=periods)
-    forecast_df = pd.DataFrame({'Date': date_range, 'Sales': sales_forecast}).set_index('Date')
-    fig, ax = plt.subplots()
-    forecast_df['Sales'].plot(ax=ax, marker='o')
-    ax.set_title('Sales Forecast')
-    ax.set_xlabel('Date')
-    ax.set_ylabel('Sales')
-    ax.grid(True)
-    return forecast_df, ax
+    attr_values = [getattr(obj, attr) for obj in obj_list]
+    count = collections.Counter(attr_values)
+    if len(count.keys()) == 0:
+        return pd.DataFrame()
+    df = pd.DataFrame.from_dict(count, orient='index').reset_index()
+    df = df.rename(columns={'index':'attribute', 0:'count'})
+    return df
 
 import unittest
+from collections import Counter
 class TestCases(unittest.TestCase):
-    
-    def setUp(self):
-        self.random_seed = 42
-    def test_basic_forecast(self):
-        df, ax = task_func('2021-01-01', 5, 'WOM-2FRI', self.random_seed)
-        self.assertEqual(len(df), 5)
-        self.assertTrue(all(df.columns == ['Sales']))
-        self.assertEqual(ax.get_title(), 'Sales Forecast')
-    def test_monthly_forecast(self):
-        df, ax = task_func('2022-01-01', 3, 'M', self.random_seed)
-        self.assertEqual(len(df), 3)
-        self.assertTrue(all(df.columns == ['Sales']))
-    def test_quarterly_forecast(self):
-        df, ax = task_func('2020-01-01', 4, 'Q', self.random_seed)
-        self.assertEqual(len(df), 4)
-        self.assertTrue(all(df.columns == ['Sales']))
-    def test_invalid_input(self):
-        with self.assertRaises(ValueError):
-            task_func('2021-13-01', 5, 'M', self.random_seed)
-    def test_negative_periods(self):
-        with self.assertRaises(ValueError):
-            task_func('2021-01-01', -5, 'M', self.random_seed)
+    class ExampleObject:
+        def __init__(self, color, shape):
+            self.color = color
+            self.shape = shape
+    def test_case_1(self):
+        obj_list = [
+            self.ExampleObject('Red', 'Square'),
+            self.ExampleObject('Green', 'Circle'),
+            self.ExampleObject('Red', 'Rectangle')
+        ]
+        result = task_func(obj_list, 'color')
+        expected = pd.DataFrame({
+            'attribute': ['Red', 'Green'],
+            'count': [2, 1]
+        })
+        pd.testing.assert_frame_equal(result.sort_index(), expected)
+    def test_case_2(self):
+        obj_list = [
+            self.ExampleObject('Red', 'Square'),
+            self.ExampleObject('Green', 'Circle'),
+            self.ExampleObject('Red', 'Square')
+        ]
+        result = task_func(obj_list, 'shape')
+        expected = pd.DataFrame({
+            'attribute': ['Square', 'Circle'],
+            'count': [2, 1]
+        })
+        pd.testing.assert_frame_equal(result.sort_index(), expected)
+    def test_case_3(self):
+        obj_list = []
+        result = task_func(obj_list, 'color')
+        self.assertTrue(result.empty)
+    def test_case_4(self):
+        obj_list = [
+            self.ExampleObject('Red', 'Square'),
+            self.ExampleObject('Red', 'Square'),
+            self.ExampleObject('Red', 'Square')
+        ]
+        result = task_func(obj_list, 'color')
+        expected = pd.DataFrame({
+            'attribute': ['Red'],
+            'count': [3]
+        })
+        pd.testing.assert_frame_equal(result.sort_index(), expected)
+    def test_case_5(self):
+        obj_list = [
+            self.ExampleObject('Red', 'Square'),
+            self.ExampleObject('Green', 'Circle'),
+            self.ExampleObject('Blue', 'Triangle')
+        ]
+        result = task_func(obj_list, 'shape')
+        expected = pd.DataFrame({
+            'attribute': ['Square', 'Circle', 'Triangle'],
+            'count': [1, 1, 1]
+        })
+        pd.testing.assert_frame_equal(result.sort_index(), expected)

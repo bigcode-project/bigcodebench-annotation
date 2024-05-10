@@ -1,81 +1,65 @@
-import numpy as np
-from scipy import stats
 import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 
-def task_func(l):
-    '''
-    Draw a histogram of the given array with a Gaussian fit.
 
+def task_func(mu, sigma, seed=0):
+    """
+    Draw a normal distribution using a 1000 samples, indicating the mean and standard deviation 
+    with a color bar.
+    
     Parameters:
-    l (numpy array): The input array.
-
+    mu (float): The mean of the distribution.
+    sigma (float): The standard deviation of the distribution.
+    seed (int, Optional): The seed for the random number generator. Defaults to 0.
+    
     Returns:
-    ax (matplotlib.axes._axes.Axes): Axes object with the plot.
-
-    Note:
-    - This function use "Fit results: mu = {mean},  std = {standard deviation}" as the title of the plot, 
-    where the values are rounded to two decimal points.
-
-
+    matplotlib.axes._axes.Axes: The Axes object of the plotted distribution.
+    
     Requirements:
-    - numpy
-    - scipy.stats
     - matplotlib.pyplot
-
+    - numpy
+    - seaborn
+    
     Example:
-    >>> l = np.array([5, 5, 5, 5, 5])
-    >>> ax = task_func(l)
-    >>> print(ax.get_title())
-    Fit results: mu = 5.00,  std = 0.00
-    >>> plt.close()
-    '''
-    fig, ax = plt.subplots()
-    ax.hist(l, bins='auto', density=True, alpha=0.6, color='g')
-    mu, std = stats.norm.fit(l)
-    xmin, xmax = plt.xlim()
-    x = np.linspace(xmin, xmax, 100)
-    p = stats.norm.pdf(x, mu, std)
-    ax.plot(x, p, 'k', linewidth=2)
-    title = "Fit results: mu = %.2f,  std = %.2f" % (mu, std)
-    ax.set_title(title)
-    return ax
+    >>> plot = task_func(0, 1)
+    >>> type(plot)
+    <class 'matplotlib.axes._axes.Axes'>
+    """
+    np.random.seed(seed)
+    samples = np.random.normal(mu, sigma, 1000)
+    mappable = sns.kdeplot(samples, fill=True)
+    plt.colorbar(mappable=mappable.collections[0])
+    return mappable
 
 import unittest
-import numpy as np
-from scipy import stats
-import matplotlib.pyplot as plt
+import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        l1 = np.array([1, 2, 2, 3, 3, 3, 4, 4, 4, 4])
-        ax1 = task_func(l1)
-        mu, std = stats.norm.fit(l1)
-        expected_title_1 = f"Fit results: mu = {mu:.2f},  std = {std:.2f}"
-        self.assertIsInstance(ax1, plt.Axes, "Return type should be a matplotlib Axes object.")
-        self.assertEqual(ax1.get_title(), expected_title_1, "Incorrect title for test case 1.")
-    
+        ax = task_func(0, 1)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(len(ax.collections) > 0, "The plot should have data.")
+        # Check if the colorbar is present
+        self.assertTrue(ax.get_figure().colorbar is not None)
+        
     def test_case_2(self):
-        l2 = np.array([5, 5, 5, 5, 5])
-        ax2 = task_func(l2)
-        self.assertIsInstance(ax2, plt.Axes, "Return type should be a matplotlib Axes object.")
-        self.assertEqual(ax2.get_title(), "Fit results: mu = 5.00,  std = 0.00", "Incorrect title for test case 2.")
+        ax = task_func(2, 0.5)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(len(ax.collections) > 0, "The plot should have data.")
+        # Test the KDE plot data
+        self.assertTrue(len(ax.collections[0].get_offsets()) > 0)
+        
     def test_case_3(self):
-        l3 = np.array([1, 2, 3, 4, 5, 6, 6, 7, 8, 8, 9])
-        ax3 = task_func(l3)
-        mu, std = stats.norm.fit(l3)
-        expected_title_3 = f"Fit results: mu = {mu:.2f},  std = {std:.2f}"
-        self.assertIsInstance(ax3, plt.Axes, "Return type should be a matplotlib Axes object.")
-        self.assertEqual(ax3.get_title(), expected_title_3, "Incorrect title for test case 3.")
-    
+        ax = task_func(-2, 2)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(len(ax.collections) > 0, "The plot should have data.")
+        
     def test_case_4(self):
-        l4 = np.array([10, 10, 10, 10, 10])
-        ax4 = task_func(l4)
-        self.assertIsInstance(ax4, plt.Axes, "Return type should be a matplotlib Axes object.")
-        self.assertEqual(ax4.get_title(), "Fit results: mu = 10.00,  std = 0.00", "Incorrect title for test case 4.")
+        ax = task_func(5, 0.1)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(len(ax.collections) > 0, "The plot should have data.")
         
     def test_case_5(self):
-        l5 = np.array([1, 1, 2, 2, 3, 3, 4, 4, 5, 5])
-        ax5 = task_func(l5)
-        mu, std = stats.norm.fit(l5)
-        expected_title_5 = f"Fit results: mu = {mu:.2f},  std = {std:.2f}"
-        self.assertIsInstance(ax5, plt.Axes, "Return type should be a matplotlib Axes object.")
-        self.assertEqual(ax5.get_title(), expected_title_5, "Incorrect title for test case 5.")
+        ax = task_func(-5, 5)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(len(ax.collections) > 0, "The plot should have data.")

@@ -1,133 +1,178 @@
-import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
+from scipy.stats import chi2_contingency
 
-
-def task_func(
-    feature_array,
-    target_array,
-    feature_names=["f1", "f2", "f3", "f4", "f5"],
-    target_name="target",
-    seed=None,
-):
+def task_func(df, columns=['A', 'B', 'C'], larger=50, equal=900):
     """
-    Shuffle the columns of a given numpy array and train a Random Forest Classifier on the shuffled data.
+    Filters a pandas DataFrame based on the values of specific rows, and performs
+    a chi-square independence test on the first two columns.
+
+    The function filters rows based on the following criteria:
+        Keep only rows where:
+            The value of the second column: df['second'] > larger
+            and
+            The value of the third column: df['third'] == equal
+    
+    After filtering a conigency table of the first two columns is computed,
+    which is then used in the chi2 independence test. The p_value of the test
+    is returned.        
 
     Parameters:
-    - feature_array (numpy.ndarray): 2D array containing the feature data with shape (n_samples, n_features).
-    - target_array (numpy.ndarray): 1D array containing the target data with shape (n_samples,).
-    - feature_names (list of str, optional): Names of the features corresponding to the columns in `feature_array`.
-      Defaults to ['f1', 'f2', 'f3', 'f4', 'f5'].
-    - target_name (str, optional): Name of the target column. Defaults to 'target'.
-    - seed (int, optional): Seed for the random number generator to make shuffling reproducible. Defaults to None.
+    df (pd.DataFrame): A DataFrame containing at least the columns specified in the 'columns' parameter.
+    columns (list): A list of column names to consider for the operation, defaulting to ['A', 'B', 'C'].
+                    The first column should contain categorical data, the second numerical data (used for filtering with values > 'larger'),
+                    and the third numerical data (used for filtering with a fixed value of 'equal').
+    larger (float, optional): Used for filtering rows against the second column where values > 'larger'.
+                              Defaults to 50.
+    equal (float, optional): Used for filtering rows against the third column where values == equal.
+                             Defaults to 900.
 
     Returns:
-    sklearn.ensemble.RandomForestClassifier: A trained Random Forest Classifier on the shuffled feature data.
+    float: The p-value from the chi-square independence test, indicating the statistical significance.
+           
+    Raises:
+    ValueError: If there's insufficient data for the test (no rows meeting the criteria).
+    ValueError: If the number of specified columns is not 3.
+    ValueError: If the specified columns are not contained in df.
+    
 
     Requirements:
-    - numpy
     - pandas
-    - sklearn
+    - scipy.stats
 
-    Examples:
-    >>> feature_array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-    >>> target_array = np.array([0, 1])
-    >>> clf = task_func(feature_array, target_array)
-    >>> type(clf)
-    <class 'sklearn.ensemble._forest.RandomForestClassifier'>
+    Example:
+    >>> df = pd.DataFrame({
+    ...     'A': ['Yes', 'No', 'Yes', 'No'],
+    ...     'B': [55, 70, 40, 85],
+    ...     'C': [900, 900, 800, 900]
+    ... })
+    >>> task_func(df)
+    0.22313016014842973
+
+    >>> df = pd.DataFrame({
+    ...     'test': ['A', 'b', 'b', 'a', 'c', 'd'],
+    ...     'hi': [45, 2, 2, 3, 4, 4],
+    ...     'column3': [50, 50, 50, 50, 50, 50, ]
+    ... })
+    >>> task_func(df, ['test', 'hi', 'column3'], larger=2, equal=50)
+    0.23810330555354436
     """
-    if seed is not None:
-        np.random.seed(seed)
-    shuffled_array = feature_array.copy()
-    np.random.shuffle(shuffled_array.T)
-    df = pd.DataFrame(shuffled_array, columns=feature_names)
-    df[target_name] = target_array
-    clf = RandomForestClassifier()
-    clf.fit(df[feature_names], df[target_name])
-    return clf
+    if len(columns) != 3:
+        raise ValueError("Exactly three columns should be specified.")
+    for column in columns:
+        if column not in df.columns:
+            raise ValueError('The specified columns should exist in the DataFrame.')
+    col_categorical, col_numerical, col_filter = columns
+    selected = df[(df[col_numerical] > larger) & (df[col_filter] == equal)][[col_categorical, col_numerical]]
+    contingency_table = pd.crosstab(selected[col_categorical], selected[col_numerical])
+    if contingency_table.size == 0:
+        raise ValueError("Insufficient data - no matching data for the applied conditions.")
+    _, p_value, _, _ = chi2_contingency(contingency_table)
+    return p_value
 
 import unittest
-import numpy as np
-from sklearn.ensemble import RandomForestClassifier
-import warnings
+import pandas as pd
+import faker
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test basic case
-        array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-        target = np.array([0, 1])
-        clf = task_func(array, target, seed=42)
-        self.assertIsInstance(clf, RandomForestClassifier)
-        self.assertTrue(len(clf.feature_importances_) > 0)
-        self.assertEqual(set(np.unique(target)), set(clf.classes_))
-        with warnings.catch_warnings():
-            # Temporarily suppress warning - clf prefers named array
-            warnings.simplefilter("ignore", category=UserWarning)
-            predictions = clf.predict(array)
-        np.testing.assert_array_equal(
-            predictions,
-            target,
-            "The model's predictions do not match the expected target values.",
+    def test_column_not_in_df(self):
+        fake = faker.Faker()
+        fake.seed_instance(42)
+        rows = 10
+        data = pd.DataFrame(
+            {
+                'A': [fake.name() for i in range(rows)],
+                'B': [81 for i in range(rows)],
+                'D': [900 for i in range(rows)] 
+            }
         )
-    def test_case_2(self):
-        # Test identical features
-        array = np.ones((10, 5))
-        target = np.zeros(10)
-        clf = task_func(array, target)
-        self.assertTrue(len(clf.feature_importances_) > 0)
-    def test_case_3(self):
-        # Test all unique targets
-        array = np.array([[i] * 5 for i in range(10)])
-        target = np.arange(10)
-        clf = task_func(array, target)
-        self.assertEqual(len(np.unique(target)), len(clf.classes_))
-    def test_case_4(self):
-        # Test random seed reproducibility
-        np.random.seed(0)
-        array = np.random.rand(10, 5)
-        target = np.random.randint(0, 2, 10)
-        clf1 = task_func(array, target, seed=42)
-        clf2 = task_func(array, target, seed=42)
-        self.assertEqual(
-            clf1.feature_importances_.tolist(), clf2.feature_importances_.tolist()
+        self.assertRaises(Exception, task_func, data)
+    def test_column_number(self):
+        fake = faker.Faker()
+        fake.seed_instance(42)
+        rows = 10
+        data = pd.DataFrame(
+            {
+                'A': [fake.name() for i in range(rows)],
+                'B': [81 for i in range(rows)],
+                'C': [900 for i in range(rows)] 
+            }
         )
-    def test_case_5(self):
-        # Test negative features
-        array = np.array([[-1, -2, -3, -4, -5], [-6, -7, -8, -9, -10]])
-        target = np.array([0, 1])
-        clf = task_func(array, target)
-        self.assertTrue(len(clf.feature_importances_) > 0)
-    def test_case_6(self):
-        # Test single feature array
-        array = np.arange(10).reshape(-1, 1)
-        target = np.array([0, 1] * 5)
-        feature_names = ["f1"]
-        clf = task_func(array, target, feature_names)
-        self.assertTrue(len(clf.feature_importances_) > 0)
-    def test_case_7(self):
-        # Test exception handling for incompatible shapes among arrays
-        array = np.array([[1, 2, 3], [4, 5, 6]])
-        target = np.array([0, 1, 2])
-        with self.assertRaises(ValueError):
-            task_func(array, target)
-    def test_case_8(self):
-        # Test exception handling for incompatible feature_names vs array shape
-        array = np.array([[1, 2, 3], [4, 5, 6]])  # 2x3 array
-        target = np.array([0, 1])
-        incorrect_feature_names = ["f1", "f2"]  # Only 2 names for a 3-column array
-        with self.assertRaises(ValueError):
-            task_func(array, target, feature_names=incorrect_feature_names)
-    def test_case_9(self):
-        # Test custom feature names
-        array = np.array([[7, 8], [9, 10]])
-        target = np.array([0, 1])
-        custom_feature_names = ["custom1", "custom2"]
-        clf = task_func(array, target, feature_names=custom_feature_names)
-        self.assertEqual(clf.feature_importances_.size, len(custom_feature_names))
-    def test_case_10(self):
-        # Test custom target name
-        array = np.array([[11, 12, 13, 14, 15], [16, 17, 18, 19, 20]])
-        target = np.array([1, 0])
-        custom_target_name = "custom_target"
-        clf = task_func(array, target, target_name=custom_target_name)
-        # Check if the model was trained successfully
-        self.assertTrue(len(clf.feature_importances_) > 0)
+        self.assertRaises(Exception, task_func, data, ['A'])
+        self.assertRaises(Exception, task_func, data, ['A', 'B', 'C', 'D'])
+    def test_no_data_after_filer(self):
+        fake = faker.Faker()
+        fake.seed_instance(42)
+        rows = 10
+        data = pd.DataFrame(
+            {
+                'A': [fake.name() for i in range(rows)],
+                'B': [20 for i in range(rows)],
+                'C': [901 for i in range(rows)] 
+            }
+        )
+        self.assertRaises(Exception, task_func, data)
+    def test_medium_dataframe(self):
+        # Test with a medium-sized dataframe (50 rows)
+        fake = faker.Faker()
+        fake.seed_instance(12)
+        rows = 50
+        data = pd.DataFrame(
+            {
+                'A': [fake.name() for i in range(rows)],
+                'B': [fake.random_int(0, 100) for i in range(rows)],
+                'C': [fake.random_int(899, 901) for i in range(rows)] 
+            }
+        )        
+        p_value = task_func(data)
+        self.assertAlmostEqual(p_value, 0.23, places=1)
+    def test_large_dataframe(self):
+        # Test with a large dataframe (1000 rows)
+        fake = faker.Faker()
+        fake.seed_instance(21)
+        rows = 1000
+        data = pd.DataFrame(
+            {
+                'A': [fake.name() for i in range(rows)],
+                'B': [fake.random_int(0, 100) for i in range(rows)],
+                'C': [fake.random_int(800, 950) for i in range(rows)] 
+            }
+        )        
+        p_value = task_func(data)
+        self.assertAlmostEqual(p_value, 0.22, places=1)
+    def test_very_large_dataframe(self):
+        data = pd.DataFrame(
+            {
+                'A': ['a', 'a', 'a', 'a', 'a'],
+                'B': [70, 70, 70, 70, 70],
+                'C': [900, 900, 900, 900, 900] 
+            }
+        )
+        p_value = task_func(data)
+        self.assertAlmostEqual(p_value, 1.0, places=1)
+    def test_huge_dataframe(self):
+        # different column names
+        fake = faker.Faker()
+        fake.seed_instance(21)
+        rows = 1000
+        data = pd.DataFrame(
+            {
+                'test': [fake.name() for i in range(rows)],
+                'five': [fake.random_int(21, 150) for i in range(rows)],
+                '1': [fake.random_int(821, 950) for i in range(rows)] 
+            }
+        )        
+        p_value = task_func(data, columns=['test', 'five', '1'])
+        self.assertAlmostEqual(p_value, 0.22, places=1)
+    def test_diff_filter(self):
+        # different filter values
+        fake = faker.Faker()
+        fake.seed_instance(21)
+        rows = 1000
+        data = pd.DataFrame(
+            {
+                'test': [fake.name() for i in range(rows)],
+                'five': [fake.random_int(21, 150) for i in range(rows)],
+                '1': [fake.random_int(19, 21) for i in range(rows)] 
+            }
+        )        
+        p_value = task_func(data, columns=['test', 'five', '1'], larger=100, equal=20)
+        self.assertAlmostEqual(p_value, 0.35, places=1)

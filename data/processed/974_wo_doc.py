@@ -1,111 +1,84 @@
-import requests
-import logging
+import pathlib
+import os
 
-def task_func(repo_url: str) -> dict:
+
+def task_func(path: str, delimiter: str = os.path.sep) -> list:
     """
-    Fetches and returns information about a GitHub repository using its API URL. The function makes an HTTP GET
-    request to the provided repository URL. It incorporates error handling for various scenarios including API
-    rate limits, other HTTP errors, and general request issues. The function also checks for a large number of
-    open issues in the repository and prints a warning if they exceed a certain threshold.
+    Validates that a given file path does not contain invalid characters for file paths
+    then splits it into path components using a specified delimiter.
 
     Parameters:
-    - repo_url (str): The URL of the GitHub repository API.
+    - path (str):      The file path to split. If empty, the function returns an empty list.
+    - delimiter (str): The delimiter to use for splitting the path.
+                       Defaults to the system's path separator (os.path.sep).
 
     Returns:
-    - dict: A dictionary containing information about the GitHub repository.
+    - list: A list of the path components if the path is valid;
+            otherwise, an empty list if the path contains invalid characters.
 
     Raises:
-    - requests.exceptions.HTTPError: If an HTTP error occurs, particularly when the GitHub API rate limit is
-            exceeded.
-    - requests.exceptions.RequestException: For other general issues encountered during the API request, such
-            as network problems, invalid responses, or timeouts.
+    - ValueError: If the path contains invalid characters.
 
     Requirements:
-    - requests
-    - logging
+    - pathlib
+    - os
 
-    Example:
-    >>> task_func('https://api.github.com/repos/psf/requests')
-    { ... }  # dictionary containing repo information
-    >>> task_func('https://api.github.com/repos/some/repo')
-    { ... }  # dictionary containing repo information with a possible runtime warning about open issues
+    Notes:
+    - Backslashes ('\\') are internally converted to forward slashes ('/') before processing.
+    - This function treats '<', '>', ':', '"', '|', '?', '*' as invalid characters in paths.
+
+    Examples:
+    >>> task_func('Docs/src/Scripts/temp', '/')
+    ['Docs', 'src', 'Scripts', 'temp']
+    >>> task_func(r'Docs\\src\\Scripts\\temp', '\\\\')
+    ['Docs', 'src', 'Scripts', 'temp']
     """
-    try:
-        response = requests.get(repo_url, timeout=2)
-        response.raise_for_status()  # Raises HTTPError for bad requests
-        repo_info = response.json()
-        if (
-            response.status_code == 403
-            and repo_info.get("message") == "API rate limit exceeded"
-        ):
-            raise requests.exceptions.HTTPError("API rate limit exceeded")
-        if repo_info.get("open_issues_count", 0) > 10000:
-            logging.warning("The repository has more than 10000 open issues.")
-        return repo_info
-    except requests.exceptions.RequestException as e:
-        raise requests.exceptions.RequestException(
-            f"Error fetching repo info: {e}"
-        ) from e
+    if not path:
+        return []
+    path = path.replace("\\", "/")
+    path_obj = pathlib.Path(path)
+    invalid_chars = set('<>:"|?*')
+    if any(
+        set(str(component)).intersection(invalid_chars) for component in path_obj.parts
+    ):
+        return []
+    return [
+        component
+        for component in path_obj.parts
+        if component and component != delimiter
+    ]
 
 import unittest
-from unittest.mock import patch, MagicMock
-from io import StringIO
-from contextlib import redirect_stdout
 class TestCases(unittest.TestCase):
-    """Test cases for task_func."""
-    @patch("requests.get")
-    def test_successful_response(self, mock_get):
-        """
-        Test task_func with a successful response.
-        """
-        mock_get.return_value = MagicMock(
-            status_code=200, json=lambda: {"open_issues_count": 5000}
+    def test_case_1(self):
+        # Testing a standard UNIX-like path with '/' delimiter
+        self.assertEqual(
+            task_func("Docs/src/Scripts/temp", "/"),
+            ["Docs", "src", "Scripts", "temp"],
         )
-        response = task_func("https://api.github.com/repos/psf/requests")
-        self.assertIn("open_issues_count", response)
-        self.assertEqual(response["open_issues_count"], 5000)
-    @patch("requests.get")
-    @patch('logging.warning')
-    def test_response_with_more_than_10000_issues(self, mock_warning, mock_get):
-        """
-        Test task_func with a response indicating more than 10000 open issues.
-        """
-        mock_get.return_value = MagicMock(
-            status_code=200, json=lambda: {"open_issues_count": 15000}
+    def test_case_2(self):
+        # Testing a standard Windows-like path with '\' delimiter
+        self.assertEqual(
+            task_func("Docs\\src\\Scripts\\temp", "\\"),
+            ["Docs", "src", "Scripts", "temp"],
         )
-        
-        response = task_func("https://api.github.com/repos/psf/requests")
-        
-        mock_warning.assert_called_once_with("The repository has more than 10000 open issues.")
-        self.assertEqual(response["open_issues_count"], 15000)
-    @patch("requests.get")
-    def test_api_rate_limit_exceeded(self, mock_get):
-        """
-        Test task_func handling API rate limit exceeded error.
-        """
-        mock_get.return_value = MagicMock(
-            status_code=403, json=lambda: {"message": "API rate limit exceeded"}
+    def test_case_3(self):
+        # Testing an empty path string
+        self.assertEqual(task_func("", "/"), [])
+    def test_case_4(self):
+        # Testing a path with invalid characters
+        self.assertEqual(task_func("Docs/src/Scripts|temp", "/"), [])
+    def test_case_5(self):
+        # Testing a path with a different delimiter
+        self.assertEqual(task_func("Docs|src|Scripts|temp", "|"), [])
+    def test_case_6(self):
+        # Handle leading and trailing delimiters
+        self.assertEqual(task_func("/Docs/src/Scripts/", "/"), ["Docs", "src", "Scripts"])
+    def test_case_7(self):
+        # Test mixed delimiters given expected conversion
+        self.assertEqual(
+            task_func("Docs/src\\Scripts/temp", "\\"), ["Docs", "src", "Scripts", "temp"]
         )
-        with self.assertRaises(Exception) as context:
-            task_func("https://api.github.com/repos/psf/requests")
-        self.assertIn("API rate limit exceeded", str(context.exception))
-    @patch("requests.get")
-    def test_http_error(self, mock_get):
-        """
-        Test task_func handling HTTP errors.
-        """
-        mock_get.side_effect = requests.exceptions.HTTPError(
-            "404 Client Error: Not Found for url"
+        self.assertEqual(
+            task_func("Docs/src\\Scripts/temp", "/"), ["Docs", "src", "Scripts", "temp"]
         )
-        with self.assertRaises(Exception) as context:
-            task_func("https://api.github.com/repos/psf/requests")
-        self.assertIn("404 Client Error", str(context.exception))
-    @patch("requests.get")
-    def test_invalid_url(self, mock_get):
-        """
-        Test task_func with an invalid URL.
-        """
-        mock_get.side_effect = requests.exceptions.InvalidURL("Invalid URL")
-        with self.assertRaises(Exception) as context:
-            task_func("invalid_url")
-        self.assertIn("Invalid URL", str(context.exception))

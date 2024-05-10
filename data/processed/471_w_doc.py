@@ -1,99 +1,89 @@
-import ctypes
-import hashlib
-import binascii
+import matplotlib.pyplot as plt
+import numpy as np
 
-def task_func(filepath):
+
+def task_func(myList):
     """
-    Loads a DLL file from a given filepath, calculates its MD5 and SHA256 hashes,
-    and prints these hashes in hexadecimal format. This function is a demonstration
-    of file handling, usage of the hashlib library for hash calculations, and binascii
-    for hexadecimal conversion. Note that the actual operations performed on the loaded
-    DLL are limited to hash calculation.
+    Draws a histogram of the values in a list and returns the plot's Axes.
+
+    For visualization:
+      - Bin edges are adjusted to align with integer values in `myList`.
+      - Histogram bars are outlined in black.
+      - X-axis label: 'Value'
+      - Y-axis label: 'Frequency'
+      - Plot title: 'Histogram of Values'
 
     Parameters:
-    filepath (str): The path of the DLL file.
+    - myList (list): List of numerical values to plot.
 
     Returns:
-    str: The actual name of the loaded DLL file.
+    - ax (matplotlib.axes._axes.Axes): Axes object of the histogram plot.
 
     Requirements:
-    - ctypes
-    - hashlib
-    - binascii
+    - matplotlib.pyplot
+    - numpy
 
-    Examples:
-    >>> with open('libc.so.6', 'w') as f:
-    ...     _ = f.write("")
-    >>> result = task_func('libc.so.6')
-    MD5 Hash: d41d8cd98f00b204e9800998ecf8427e
-    SHA256 Hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-    >>> isinstance(result, str) 
-    True
-    >>> 'libc.so.6' in result
-    True
+    Example:
+    >>> myList = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+    >>> ax = task_func(myList)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax.get_xticklabels()
+    [Text(0.0, 0, '0.0'), Text(0.5, 0, '0.5'), Text(1.0, 0, '1.0'), Text(1.5, 0, '1.5'), Text(2.0, 0, '2.0'), Text(2.5, 0, '2.5'), Text(3.0, 0, '3.0'), Text(3.5, 0, '3.5'), Text(4.0, 0, '4.0'), Text(4.5, 0, '4.5'), Text(5.0, 0, '5.0')]
     """
-    lib = ctypes.CDLL(filepath)
-    with open(filepath, 'rb') as f:
-        data = f.read()
-    md5_hash = hashlib.md5(data).digest()
-    print(f'MD5 Hash: {binascii.hexlify(md5_hash).decode()}')
-    sha256_hash = hashlib.sha256(data).digest()
-    print(f'SHA256 Hash: {binascii.hexlify(sha256_hash).decode()}')
-    return lib._name
+    _, ax = plt.subplots()
+    ax.hist(
+        myList, bins=np.arange(min(myList), max(myList) + 2) - 0.5, edgecolor="black"
+    )
+    ax.set_xlabel("Value")
+    ax.set_ylabel("Frequency")
+    ax.set_title("Histogram of Values")
+    return ax
 
 import unittest
-from unittest.mock import patch
-import tempfile
-import os
-import sys
-from io import StringIO
-import binascii
+import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Create a temporary DLL file
-        self.temp_file = tempfile.NamedTemporaryFile(suffix='.dll', delete=False)
-        self.filepath = self.temp_file.name
-        # Redirect stdout to capture print statements
-        self.original_stdout = sys.stdout
-        sys.stdout = StringIO()
-    def test_file_existence(self):
-        self.assertTrue(os.path.exists(self.filepath))
-    def test_invalid_file_path(self):
-        with self.assertRaises(OSError):
-            task_func('invalid_path.dll')
-    @patch('ctypes.CDLL')
-    @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data=b'test data')
-    @patch('hashlib.md5')
-    @patch('hashlib.sha256')
-    def test_dll_name_returned(self, mock_sha256, mock_md5, mock_open, mock_cdll):
-        """Test if the function returns the name of the loaded DLL file."""
-        mock_md5.return_value.digest.return_value = b'\x93\x15\x98\x3f\xcd\xb4\xcc\xcb\x28\x7b\xcc\xdb\xdd\x4e\x8a\x45'  # Mock MD5 digest
-        mock_sha256.return_value.digest.return_value = b'\xd7\xa8\xfb\x48\xd2\x8d\x1d\x73\xa0\x34\x6b\xbf\x40\x41\xdf\x98\xc2\x50\x1d\x4a\xe4\x88\x9b\x93\x4f\xaa\x63\xf7\xaf\x67\xe9\xb1'  # Mock SHA256 digest
-        mock_cdll.return_value._name = 'test.dll'
-        dll_name = task_func(self.filepath)  # Replace 'task_func_module.task_func' with the actual path to your task_func function
-        self.assertEqual(dll_name, 'test.dll')
-    @patch('ctypes.CDLL')
-    @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data=b'test data')
-    @patch('hashlib.md5')
-    def test_md5_hash_printed(self, mock_md5, mock_open, mock_cdll):
-        """Test if the MD5 hash is correctly calculated and printed."""
-        expected_hash = b'\x93\x15\x98\x3f\xcd\xb4\xcc\xcb\x28\x7b\xcc\xdb\xdd\x4e\x8a\x45'
-        mock_md5.return_value.digest.return_value = expected_hash
-        with patch('builtins.print') as mock_print:
-            task_func('path/to/test.dll')
-            expected_md5_output = f'MD5 Hash: {binascii.hexlify(expected_hash).decode()}'
-            mock_print.assert_any_call(expected_md5_output)
-    @patch('ctypes.CDLL')
-    @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data=b'test data')
-    @patch('hashlib.sha256')
-    def test_sha256_hash_printed(self, mock_sha256, mock_open, mock_cdll):
-        """Test if the SHA256 hash is correctly calculated and printed."""
-        expected_hash = b'\xd7\xa8\xfb\x48\xd2\x8d\x1d\x73\xa0\x34\x6b\xbf\x40\x41\xdf\x98\xc2\x50\x1d\x4a\xe4\x88\x9b\x93\x4f\xaa\x63\xf7\xaf\x67\xe9\xb1'
-        mock_sha256.return_value.digest.return_value = expected_hash
-        with patch('builtins.print') as mock_print:
-            task_func('path/to/test.dll')
-            expected_sha256_output = f'SHA256 Hash: {binascii.hexlify(expected_hash).decode()}'
-            mock_print.assert_any_call(expected_sha256_output)
+    def test_case_1(self):
+        # Test basic case
+        myList = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+        ax = task_func(myList)
+        heights, _, _ = ax.hist(
+            myList,
+            bins=np.arange(min(myList), max(myList) + 2) - 0.5,
+            edgecolor="black",
+        )
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertListEqual(list(heights), [1, 2, 3, 4])
+        self.assertEqual(ax.get_title(), "Histogram of Values")
+        self.assertEqual(ax.get_xlabel(), "Value")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
+    def test_case_2(self):
+        # Test with empty list
+        with self.assertRaises(ValueError):
+            task_func([])
+    def test_case_3(self):
+        # Test with single element
+        myList = [100]
+        ax = task_func(myList)
+        heights, _, _ = ax.hist(myList)
+        self.assertEqual(heights.max(), 1)
+    def test_case_4(self):
+        # Test with negative values
+        myList = [-5, -4, -3, -3, -2, -2, -2, -1]
+        ax = task_func(myList)
+        heights, _, _ = ax.hist(myList)
+        self.assertGreaterEqual(len(heights), 1)
+    def test_case_5(self):
+        # Test with floats
+        myList = [1.1, 1.2, 2.5, 2.5, 3.75, 4.25]
+        ax = task_func(myList)
+        heights, _, _ = ax.hist(myList)
+        self.assertGreaterEqual(len(heights), 1)
+    def test_case_6(self):
+        # Test handling non-numeric values
+        myList = ["a", "b", "c"]
+        with self.assertRaises(TypeError):
+            task_func(myList)
     def tearDown(self):
-        os.remove(self.filepath)
-        sys.stdout = self.original_stdout
+        plt.close("all")

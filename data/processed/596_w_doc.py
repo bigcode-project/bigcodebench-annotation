@@ -1,67 +1,60 @@
-import pandas as pd
-from sklearn.linear_model import LinearRegression
+import random
+import bisect
+from array import array
 
-ROWS = 100
-COLUMNS = ['X', 'Y']
 
-def task_func(df):
+def task_func(n=10, total=100):
     """
-    Given a Pandas DataFrame with random numeric values and columns X & Y, use sklearn's linear regression to match the data to a linear model.
+    Generates 'n' random integer numbers such that their sum equals 'total', sorts these numbers,
+    and determines the position where a new random number can be inserted to maintain the sorted order.
+    The function uses a retry mechanism to ensure the generated numbers sum up to 'total'.
 
     Parameters:
-    - df (DataFrame): The DataFrame to use.
+    n (int): The number of random numbers to generate. Default is 10.
+    total (int): The total sum of the generated numbers. Default is 100.
 
     Returns:
-    - model (LinearRegression): The fitted linear model.
+    tuple: A tuple containing the sorted numbers as an array and the insertion position for a new number.
 
     Requirements:
-    - pandas
-    - sklearn
+    - random
+    - bisect
+    - array.array
 
-    Example:
-    >>> import numpy as np
-    >>> np.random.seed(42)
-    >>> df = pd.DataFrame(np.random.normal(size=(100, 2)), columns=['X', 'Y'])
-    >>> model = task_func(df)
-    >>> print(model)
-    LinearRegression()
+    Examples:
+    >>> sorted_nums, pos = task_func(5, 50)
+    >>> len(sorted_nums) == 5
+    True
+    >>> sum(sorted_nums) == 50
+    True
     """
-    X = pd.DataFrame(df[['X']])  # Extracting column 'X' as a DataFrame
-    y = pd.Series(df['Y'])       # Extracting column 'Y' as a Series
-    model = LinearRegression().fit(X, y)
-    return model
+    nums = []
+    while sum(nums) != total:
+        nums = [random.randint(0, total) for _ in range(n)]
+    nums.sort()
+    nums = array('i', nums)
+    new_num = random.randint(0, total)
+    pos = bisect.bisect(nums, new_num)
+    return (nums, pos)
 
 import unittest
-import numpy as np
+from array import array
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
-        model = task_func(df)
-        self.assertTrue(model is not None)
-    
-    def test_case_2(self):
-        df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
-        model = task_func(df)
-        self.assertTrue(model is not None)
-        self.assertTrue(model.coef_ is not None)
-    def test_case_3(self):
-        df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
-        model = task_func(df)
-        self.assertTrue(model is not None)
-        self.assertTrue(model.coef_ is not None)
-        self.assertTrue(model.intercept_ is not None)
-    def test_case_4(self):
-        df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
-        model = task_func(df)
-        self.assertTrue(model is not None)
-        self.assertTrue(model.coef_ is not None)
-        self.assertTrue(model.intercept_ is not None)
-        self.assertTrue(model.score(df[['X']], df['Y']) is not None)
-    def test_case_5(self):
-        df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
-        model = task_func(df)
-        self.assertTrue(model is not None)
-        self.assertTrue(model.coef_ is not None)
-        self.assertTrue(model.intercept_ is not None)
-        self.assertTrue(model.score(df[['X']], df['Y']) is not None)
-        self.assertTrue(model.score(df[['X']], df['Y']) >= 0)
+    def test_return_type(self):
+        nums, pos = task_func(5, 50)
+        self.assertIsInstance(nums, array)
+        self.assertIsInstance(pos, int)
+    def test_correct_length(self):
+        nums, _ = task_func(5, 50)
+        self.assertEqual(len(nums), 5)
+    def test_sum_of_numbers(self):
+        nums, _ = task_func(5, 50)
+        self.assertEqual(sum(nums), 50)
+    def test_sorted_order(self):
+        nums, _ = task_func(5, 50)
+        self.assertEqual(list(nums), sorted(nums))
+    def test_insertion_position(self):
+        nums, pos = task_func(5, 50)
+        new_num = random.randint(0, 50)
+        nums.insert(pos, new_num)
+        self.assertEqual(nums[pos], new_num)

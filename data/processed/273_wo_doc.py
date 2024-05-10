@@ -1,99 +1,105 @@
+import cgi
+import http.server
 import json
-import urllib.parse
-import hmac
-import hashlib
 
-def task_func(req_data, secret_key):
+def task_func():
     """
-    Signs the specified request data with a secret key using HMAC SHA256, then URL encodes the signature and replace spaces with '+'.
+    The function creates an HTTP POST request handler for processing incoming data. The data is expected to be in JSON format with a key 'data'. The handler responds with a 200 success message if the data is valid, or an error message otherwise.
 
-    Parameters:
-        req_data (dict): The request data to be signed. It should be a dictionary.
-        secret_key (str): The secret key used for signing the request data.
+    Notes:
+    - If the 'Content-Type' header is not 'application/json', the server responds with a 400 Bad Request status and a JSON object:
+      {"status": "error", "message": "Content-Type header is not application/json"}.
+    - If the received JSON object does not contain a 'data' key, the response is a 400 Bad Request with a JSON object:
+      {"status": "error", "message": "No data received"}.
+    - For successfully processed requests, the server responds with a 200 OK status and a JSON object:
+      {"status": "success", "message": "Data received successfully."}.
 
     Returns:
-        str: The URL encoded HMAC signature of the request data.
-
-    Raises:
-        TypeError: If `req_data` is not a dictionary.
+    class: A class that is a subclass of http.server.BaseHTTPRequestHandler, designed to handle HTTP POST requests.
 
     Requirements:
+    - cgi
+    - http.server
     - json
-    - urllib.parse
-    - hmac
-    - hashlib
 
-    Examples:
-    >>> secret_key = 'my_secret_key'
-    >>> isinstance(task_func({'test': 'just a test'}, secret_key), str)
-    True
-    >>> isinstance(task_func({'another': 'data', 'key': 123}, secret_key), str)
-    True
+    Example:
+    >>> handler = task_func()
+    >>> server = http.server.HTTPServer(('127.0.0.1', 8080), handler)
+    >>> server.serve_forever()
     """
-    if not isinstance(req_data, dict):
-        raise TypeError("req_data must be a dictionary")
-    json_req_data = json.dumps(req_data)
-    hmac_obj = hmac.new(secret_key.encode(), json_req_data.encode(), hashlib.sha256)
-    hmac_signature = hmac_obj.hexdigest()  # Use hexdigest for a hexadecimal representation
-    url_encoded_signature = urllib.parse.quote_plus(hmac_signature)
-    return url_encoded_signature
+    class PostRequestHandler(http.server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
+            error_response = {
+                'status': 'error',
+                'message': ''  # This will be modified based on the error condition
+            }
+            if ctype != 'application/json':
+                self.send_response(400)
+                self.end_headers()
+                error_response['message'] = 'Content-Type header is not application/json'
+                self.wfile.write(json.dumps(error_response).encode())
+                return
+            length = int(self.headers.get('content-length'))
+            message = json.loads(self.rfile.read(length))
+            if 'data' not in message:
+                self.send_response(400)
+                self.end_headers()
+                error_response['message'] = 'No data received'
+                self.wfile.write(json.dumps(error_response).encode())
+                return
+            success_response = {
+                'status': 'success',
+                'message': 'Data received successfully.'
+            }
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(success_response).encode())
+    return PostRequestHandler
 
 import unittest
+import requests_mock
+import requests
+# Constants
+SUCCESS_RESPONSE = {
+    'status': 'success',
+    'message': 'Data received successfully.'
+}
+ERROR_RESPONSE = {
+    'status': 'error',
+    'message': 'Invalid data received.'
+}
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        """Set up common test data and secret key."""
-        self.secret_key = 'test_secret_key'
-    
-    def compute_expected_signature(self, req_data):
-        """Compute the expected HMAC signature for comparison in tests."""
-        json_req_data = json.dumps(req_data)
-        hmac_obj = hmac.new(self.secret_key.encode(), json_req_data.encode(), hashlib.sha256)
-        hmac_hex = hmac_obj.hexdigest()
-        url_encoded_signature = urllib.parse.quote_plus(hmac_hex)
-        
-        return url_encoded_signature
-    def test_return_type(self):
-        """Ensure the function returns a string."""
-        result = task_func({'key': 'value'}, self.secret_key)
-        self.assertIsInstance(result, str)
-    def test_known_data_signature(self):
-        """Validate the HMAC signature against a known output for specific data."""
-        known_data = {'known': 'data'}
-        expected_signature = self.compute_expected_signature(known_data)
-        result = task_func(known_data, self.secret_key)
-        self.assertEqual(result, expected_signature)
-    def test_empty_data(self):
-        """Verify the function behaves correctly with empty input data."""
-        result = task_func({}, self.secret_key)
-        expected_signature_for_empty_data = self.compute_expected_signature({})
-        self.assertEqual(result, expected_signature_for_empty_data)
-    def test_complex_data_structure(self):
-        """Check the function's behavior with complex nested data structures."""
-        complex_data = {'list': [1, 2, 3], 'nested': {'key': 'value'}}
-        result = task_func(complex_data, self.secret_key)
-        expected_signature = self.compute_expected_signature(complex_data)
-        self.assertEqual(result, expected_signature)
-    def test_non_dict_input(self):
-        """Ensure non-dictionary inputs raise the appropriate error."""
-        with self.assertRaises(TypeError):
-            task_func('not a dict', self.secret_key)
-    def test_different_data_different_signatures(self):
-        """Test that different data results in different HMAC signatures."""
-        data1 = {'data': 'test1'}
-        data2 = {'data': 'test2'}
-        result1 = task_func(data1, self.secret_key)
-        result2 = task_func(data2, self.secret_key)
-        expected_signature1 = self.compute_expected_signature(data1)
-        expected_signature2 = self.compute_expected_signature(data2)
-        self.assertEqual(result1, expected_signature1)
-        self.assertEqual(result2, expected_signature2)
-        self.assertNotEqual(result1, result2)
-    def test_consistent_hash_with_same_input(self):
-        """Test that hashing the same data multiple times results in the same hashes."""
-        data = {'consistent': 'data'}
-        result1 = task_func(data, self.secret_key)
-        result2 = task_func(data, self.secret_key)
-        expected_signature = self.compute_expected_signature(data)
-        self.assertEqual(result1, expected_signature)
-        self.assertEqual(result2, expected_signature)
-        self.assertEqual(result1, result2)
+    @requests_mock.mock()
+    def test_invalid_content_type_header(self, m):
+        # Mock the POST request to return a 400 status code for invalid content type
+        m.post("http://testserver/", status_code=400, json=ERROR_RESPONSE)
+        response = requests.post("http://testserver/", headers={"Content-Type": "text/plain"})
+        self.assertEqual(response.json(), ERROR_RESPONSE)
+        self.assertEqual(response.status_code, 400)
+    @requests_mock.mock()
+    def test_missing_data_in_request(self, m):
+        # Mock the POST request to return a 400 status code for missing 'data' key
+        m.post("http://testserver/", status_code=400, json=ERROR_RESPONSE)
+        response = requests.post("http://testserver/", json={"wrong_key": "value"})
+        self.assertEqual(response.json(), ERROR_RESPONSE)
+        self.assertEqual(response.status_code, 400)
+    @requests_mock.mock()
+    def test_valid_post_request(self, m):
+        m.post("http://testserver/", text=json.dumps(SUCCESS_RESPONSE))
+        response = requests.post("http://testserver/", json={"data": "value"})
+        self.assertEqual(response.json(), SUCCESS_RESPONSE)
+        self.assertEqual(response.status_code, 200)
+    @requests_mock.mock()
+    def test_response_content_type(self, m):
+        # Mock the POST request and explicitly set the 'Content-Type' header
+        headers = {'Content-Type': 'application/json'}
+        m.post("http://testserver/", json=SUCCESS_RESPONSE, headers=headers)
+        response = requests.post("http://testserver/", json={"data": "value"})
+        self.assertEqual(response.headers["Content-Type"], "application/json")
+    @requests_mock.mock()
+    def test_incorrect_http_method(self, m):
+        m.get("http://testserver/", status_code=405)
+        response = requests.get("http://testserver/")
+        self.assertEqual(response.status_code, 405)

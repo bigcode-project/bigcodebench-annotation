@@ -1,163 +1,114 @@
-import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+import seaborn as sns
 
-
-def task_func(P, T):
+def task_func(df, col1, col2):
     """
-    Calculate the product of matrix "P" and 3D tensor "T" then return dataframe of normalized results.
-
-    This function performs matrix-tensor multiplication between a matrix "P" and a 3D tensor "T" using numpy.
-    It checks if the shapes of P and T are compatible for multiplication, raising a ValueError if they are not.
-    The function then normalizes the resulting 2D array using sklearn's StandardScaler. The final output
-    is returned as a pandas DataFrame, with columns named feature_0, feature_1, ..., feature_n,
-    where n is the number of features in the flattened result of the matrix-tensor multiplication.
+    Draw a scatter plot with a regression line for two columns from a DataFrame.
 
     Parameters:
-    - P (numpy.ndarray): The input matrix. Must not be empty.
-    - T (numpy.ndarray): The input tensor. Must not be empty.
+    df (DataFrame): Input DataFrame.
+    col1 (str): Name of the first column.
+    col2 (str): Name of the second column.
 
     Returns:
-    pandas.DataFrame: A DataFrame with the normalized result.
+    Axes: A seaborn axes object.
 
     Requirements:
-    - numpy
     - pandas
-    - sklearn.preprocessing
+    - seaborn
+
+    Raises:
+    - Raise ValueError if the input df is not a DataFrame, empty, or does not contain the specified columns.
+    - Raise TypeError if df use non-numeric data
 
     Example:
-    >>> np.random.seed(0)
-    >>> P = np.array([[6, 2, 7], [1, 1, 8], [8, 7, 1], [9, 6, 4], [2, 1, 1]])
-    >>> T = np.random.rand(3, 5, 5)
-    >>> result = task_func(P, T)
-    >>> type(result)
-    <class 'pandas.core.frame.DataFrame'>
-    >>> result.head(2)
-       feature_0  feature_1  feature_2  ...  feature_22  feature_23  feature_24
-    0   0.214791   0.220904   1.697850  ...    1.768847   -1.759510   -0.003527
-    1  -0.652336   1.064228  -0.707134  ...   -0.036116    1.002544   -0.813796
-    <BLANKLINE>
-    [2 rows x 25 columns]
+    >>> import matplotlib.pyplot as plt
+    >>> df = pd.DataFrame({'X': [1, 2, 3, 4, 5], 'Y': [2, 4, 6, 8, 10]})
+    >>> plot = task_func(df, 'X', 'Y')
+    >>> len(plot.collections[0].get_offsets().data)
+    5
+    >>> plt.close()
     """
-    if P.size == 0 or T.size == 0:
-        raise ValueError("Inputs cannot be empty.")
-    if P.shape[1] != T.shape[0]:
-        raise ValueError(
-            f"Matrix P shape {P.shape[1]} and Tensor T shape {T.shape[0]} are incompatible for tensor multiplication."
-        )
-    result = np.tensordot(P, T, axes=[1, 0]).swapaxes(0, 1)
-    result = result.reshape(result.shape[0], -1)
-    scaler = StandardScaler()
-    result = scaler.fit_transform(result)
-    adjusted_feature_names = [f"feature_{i}" for i in range(result.shape[1])]
-    result = pd.DataFrame(result, columns=adjusted_feature_names)
-    return result
+    if not isinstance(df, pd.DataFrame) or df.empty or col1 not in df.columns or col2 not in df.columns:
+        raise ValueError("The DataFrame is empty or the specified column does not exist.")
+    ax = sns.regplot(x=col1, y=col2, data=df)
+    return ax
 
 import unittest
-import numpy as np
-from sklearn.preprocessing import StandardScaler
+import pandas as pd
+import seaborn as sns
+import matplotlib
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def tensor_product_manual(self, P, T):
-        """Manually compute the tensor product without any normalization."""
-        result = np.tensordot(P, T, axes=[1, 0]).swapaxes(0, 1)
-        result = result.reshape(result.shape[0], -1)
-        return result
-    def test_case_1(self):
-        np.random.seed(0)
-        P = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-        T = np.random.rand(3, 4, 4)
-        result = task_func(P, T)
-        manual_result = self.tensor_product_manual(P, T)
-        # Reverse normalization for comparison
-        scaler = StandardScaler().fit(manual_result)
-        reversed_result = scaler.inverse_transform(result)
-        self.assertEqual(result.shape, (4, 12))
-        self.assertTrue(np.isclose(result.mean().mean(), 0, atol=1e-5))
-        self.assertTrue(np.allclose(manual_result, reversed_result, atol=1e-5))
-    def test_case_2(self):
-        np.random.seed(0)
-        P = np.array([[1, 2], [3, 4], [5, 6]])
-        T = np.random.rand(3, 5, 5)
+    def test_numeric_data(self):
+        # Create a DataFrame with numeric data
+        df = pd.DataFrame({
+            'A': [1, 2, 3, 4, 5],
+            'B': [5, 4, 3, 2, 1]
+        })
+        # Call the function with the DataFrame
+        ax = task_func(df, 'A', 'B')
+        
+        # Assertions to validate the output
+        self.assertIsInstance(ax, matplotlib.axes._axes.Axes, "The returned object should be a seaborn FacetGrid.")
+        plt.close()
+    def test_non_numeric_data(self):
+        # Create a DataFrame with non-numeric data
+        df = pd.DataFrame({
+            'A': ['one', 'two', 'three', 'four', 'five'],
+            'B': ['five', 'four', 'three', 'two', 'one']
+        })
+        # We expect a TypeError because non-numeric data can't be used to plot a regression line
+        with self.assertRaises(TypeError, msg="The function should raise a TypeError for non-numeric data."):
+            task_func(df, 'A', 'B')
+        plt.close()
+    def test_missing_data(self):
+        # Create a DataFrame with missing data
+        df = pd.DataFrame({
+            'A': [1, 2, None, 4, 5],
+            'B': [5, None, 3, 2, 1]
+        })
+        # Call the function with the DataFrame
+        ax = task_func(df, 'A', 'B')
+        # Assertions to validate the output
+        # We expect the function to handle missing data according to seaborn's default behavior
+        self.assertIsInstance(ax, matplotlib.axes._axes.Axes, "The returned object should be a seaborn FacetGrid.")
+        # Check if the data plotted is the same length as the original minus the NaNs
+        non_na_length = df.dropna().shape[0]
+        self.assertEqual(len(ax.collections[0].get_offsets().data), non_na_length)  # Check if there's only one data point in the collection
+        plt.close()
+    def test_large_dataset(self):
+        # Create a large DataFrame
+        df = pd.DataFrame({
+            'A': range(10000),
+            'B': range(10000, 20000)
+        })
+        # Call the function with the DataFrame
+        ax = task_func(df, 'A', 'B')
+        # Assertions to validate the output
+        self.assertIsInstance(ax, matplotlib.axes._axes.Axes, "The returned object should be a seaborn FacetGrid.")
+        plt.close()
+    def test_single_data_point(self):
+        # Create a DataFrame with a single data point
+        df = pd.DataFrame({
+            'A': [1],
+            'B': [1]
+        })
+        # Call the function with the DataFrame
+        ax = task_func(df, 'A', 'B')
+        # Assertions to validate the output
+        self.assertIsInstance(ax, matplotlib.axes._axes.Axes, "The returned object should be a seaborn FacetGrid.")
+        self.assertEqual(len(ax.collections), 1)  # Check if there's only one collection of points in the plot
+        self.assertEqual(len(ax.collections[0].get_offsets()), 1)  # Check if there's only one data point in the collection
+        plt.close()
+    
+    def test_non_df(self):
         with self.assertRaises(ValueError):
-            task_func(P, T)
-    def test_case_3(self):
-        np.random.seed(0)
-        P = np.eye(4)
-        T = np.random.rand(4, 6, 6)
-        result = task_func(P, T)
-        manual_result = self.tensor_product_manual(P, T)
-        # Reverse normalization for comparison
-        scaler = StandardScaler().fit(manual_result)
-        reversed_result = scaler.inverse_transform(result)
-        self.assertEqual(result.shape, (6, 24))
-        self.assertTrue(np.isclose(result.mean().mean(), 0, atol=1e-5))
-        self.assertTrue(np.allclose(manual_result, reversed_result, atol=1e-5))
-    def test_case_4(self):
-        np.random.seed(0)
-        P = np.ones((5, 5))
-        T = np.random.rand(5, 7, 7)
-        result = task_func(P, T)
-        manual_result = self.tensor_product_manual(P, T)
-        # Reverse normalization for comparison
-        scaler = StandardScaler().fit(manual_result)
-        reversed_result = scaler.inverse_transform(result)
-        self.assertEqual(result.shape, (7, 35))
-        self.assertTrue(np.isclose(result.mean().mean(), 0, atol=1e-5))
-        self.assertTrue(np.allclose(manual_result, reversed_result, atol=1e-5))
-    def test_case_5(self):
-        np.random.seed(0)
-        P = np.diag(np.arange(1, 7))
-        T = np.random.rand(6, 8, 8)
-        result = task_func(P, T)
-        manual_result = self.tensor_product_manual(P, T)
-        # Reverse normalization for comparison
-        scaler = StandardScaler().fit(manual_result)
-        reversed_result = scaler.inverse_transform(result)
-        self.assertEqual(result.shape, (8, 48))
-        self.assertTrue(np.isclose(result.mean().mean(), 0, atol=1e-5))
-        self.assertTrue(np.allclose(manual_result, reversed_result, atol=1e-5))
-    def test_case_6(self):
-        # Test with an empty matrix and tensor, expecting a ValueError due to incompatible shapes
-        P = np.array([])
-        T = np.array([])
+            task_func("non_df", 'A', 'B')
+    
+    def test_empty_df(self):
         with self.assertRaises(ValueError):
-            task_func(P, T)
-    def test_case_7(self):
-        # Test with non-numeric inputs in matrices/tensors to verify type handling
-        P = np.array([["a", "b"], ["c", "d"]])
-        T = np.random.rand(2, 2, 2)
-        with self.assertRaises(Exception):
-            task_func(P, T)
-    def test_case_8(self):
-        # Test with zero matrix and tensor to verify handling of all-zero inputs
-        P = np.zeros((5, 5))
-        T = np.zeros((5, 3, 3))
-        result = task_func(P, T)
-        self.assertTrue(np.allclose(result, np.zeros((3, 15))))
-    def test_case_9(self):
-        # Test DataFrame output for correct column names, ensuring they match expected feature naming convention
-        P = np.random.rand(3, 3)
-        T = np.random.rand(3, 4, 4)
-        result = task_func(P, T)
-        expected_columns = [
-            "feature_0",
-            "feature_1",
-            "feature_2",
-            "feature_3",
-            "feature_4",
-            "feature_5",
-            "feature_6",
-            "feature_7",
-            "feature_8",
-            "feature_9",
-            "feature_10",
-            "feature_11",
-        ]
-        self.assertListEqual(list(result.columns), expected_columns)
-    def test_case_10(self):
-        # Test to ensure DataFrame indices start from 0 and are sequential integers
-        P = np.random.rand(2, 3)
-        T = np.random.rand(3, 5, 5)
-        result = task_func(P, T)
-        expected_indices = list(range(5))  # Expected indices for 5 rows
-        self.assertListEqual(list(result.index), expected_indices)
+            task_func(pd.DataFrame(), 'A', 'B')
+    def test_column_df(self):
+        with self.assertRaises(ValueError):
+            task_func(pd.DataFrame({'A': [1]}), 'A', 'B')

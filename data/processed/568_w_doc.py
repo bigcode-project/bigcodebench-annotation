@@ -1,88 +1,78 @@
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
 
+def task_func(data):
+    """
+     This function draws a histogram to visualize the frequency distribution of numeric values provided in a string format,
+     with 'Value' on the x-axis, 'Frequency' on the y-axis and 'Histogram of Values' as the title.
 
-def task_func(x, y, labels):
-    """ 
-    Perform Principal Component Analysis (PCA) on "x" as x-values and "y" as y-values and record the results with labels.
 
     Parameters:
-    x (list): List of numpy arrays representing the x-values of the data points.
-    y (list): List of numpy arrays representing the y-values of the data points.
-    labels (list): List of strings representing the labels for the chemical compounds.
+    data (str): The data string in the format 'value-value-value-...'.
 
     Returns:
-    fig: Matplotlib figure object.
+    ax (matplotlib.axes._axes.Axes): The Axes object of the created histogram.
 
     Requirements:
+    - pandas
     - numpy
     - matplotlib.pyplot
-    - sklearn.decomposition
+
+    Notes:
+    - The histogram uses bins calculated as `np.arange(data.min(), data.max()+2) - 0.5`.
 
     Example:
-    >>> x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
-    >>> y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
-    >>> labels = ['H₂O', 'O₂', 'CO₂']
-    >>> fig = task_func(x, y, labels)
+    >>> data = '1-2-3-4-5-6-7-8-9-10'
+    >>> ax = task_func(data)
     """
-    pca = PCA(n_components=2)
-    fig, ax = plt.subplots()
-    for i in range(len(x)):
-        xy = np.vstack((x[i], y[i])).T
-        xy_transformed = pca.fit_transform(xy)
-        ax.plot(xy_transformed[:, 0], xy_transformed[:, 1], label=labels[i])
-    ax.legend()
-    return fig
+    data = data.split('-')
+    data = [int(d) for d in data]
+    df = pd.DataFrame(data, columns=['Values'])
+    plt.figure(figsize=(10, 6))
+    ax = plt.gca()  # Get current Axes
+    ax.hist(df['Values'], bins=np.arange(df['Values'].min(), df['Values'].max()+2) - 0.5, edgecolor='black')
+    ax.set_xlabel('Value')
+    ax.set_ylabel('Frequency')
+    ax.set_title('Histogram of Values')
+    ax.set_xticks(sorted(list(set(data))))  # Set x-ticks based on unique data values
+    plt.show()
+    return ax
 
 import unittest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Generate sample data for testing
-        self.x_data = [
-            np.array([1, 2, 3, 4]),
-            np.array([5, 6, 7, 8]),
-            np.array([9, 10, 11, 12]),
-            np.array([13, 14, 15, 16]),
-            np.array([17, 18, 19, 20])
-        ]
-        
-        self.y_data = [
-            np.array([21, 22, 23, 24]),
-            np.array([25, 26, 27, 28]),
-            np.array([29, 30, 31, 32]),
-            np.array([33, 34, 35, 36]),
-            np.array([37, 38, 39, 40])
-        ]
-        
-        self.labels = ['H₂O', 'O₂', 'CO₂', 'N₂', 'Ar']
     def test_case_1(self):
-        fig = task_func(self.x_data, self.y_data, self.labels)
-        # Check if returned object is a matplotlib figure
-        self.assertIsInstance(fig, plt.Figure)
+        data = '1-2-3-4-5'
+        ax = task_func(data)
+        self.assertEqual(ax.get_title(), 'Histogram of Values')
+        self.assertEqual(ax.get_xlabel(), 'Value')
+        self.assertEqual(ax.get_ylabel(), 'Frequency')
+        self.assertListEqual(list(ax.get_xticks()), [1, 2, 3, 4, 5])
     def test_case_2(self):
-        # Testing with different data lengths
-        x_data = [np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([7, 8, 9])]
-        y_data = [np.array([10, 11, 12]), np.array([13, 14, 15]), np.array([16, 17, 18])]
-        fig = task_func(x_data, y_data, self.labels[:3])
-        self.assertIsInstance(fig, plt.Figure)
+        data = '5-5-5-5-5'
+        ax = task_func(data)
+        self.assertEqual(ax.get_title(), 'Histogram of Values')
+        self.assertEqual(ax.get_xlabel(), 'Value')
+        self.assertEqual(ax.get_ylabel(), 'Frequency')
+        self.assertListEqual(list(ax.get_xticks()), [5])
     def test_case_3(self):
-        # Testing with data of length 2 (to avoid PCA error)
-        x_data = [np.array([1, 2]), np.array([4, 5]), np.array([7, 8])]
-        y_data = [np.array([10, 11]), np.array([13, 14]), np.array([16, 17])]
-        fig = task_func(x_data, y_data, self.labels[:3])
-        self.assertIsInstance(fig, plt.Figure)
-        
+        data = '7'
+        ax = task_func(data)
+        self.assertEqual(ax.get_title(), 'Histogram of Values')
+        self.assertEqual(ax.get_xlabel(), 'Value')
+        self.assertEqual(ax.get_ylabel(), 'Frequency')
+        self.assertListEqual(list(ax.get_xticks()), [7])
     def test_case_4(self):
-        # Testing with longer data
-        x_data = [np.array(range(10)), np.array(range(10, 20)), np.array(range(20, 30))]
-        y_data = [np.array(range(30, 40)), np.array(range(40, 50)), np.array(range(50, 60))]
-        fig = task_func(x_data, y_data, self.labels[:3])
-        self.assertIsInstance(fig, plt.Figure)
-        
+        data = '2-8-4-10-1'
+        ax = task_func(data)
+        self.assertEqual(ax.get_title(), 'Histogram of Values')
+        self.assertEqual(ax.get_xlabel(), 'Value')
+        self.assertEqual(ax.get_ylabel(), 'Frequency')
+        self.assertListEqual(sorted(list(ax.get_xticks())), [1, 2, 4, 8, 10])
     def test_case_5(self):
-        # Testing with random data
-        x_data = [np.random.randn(10) for _ in range(3)]
-        y_data = [np.random.randn(10) for _ in range(3)]
-        fig = task_func(x_data, y_data, self.labels[:3])
-        self.assertIsInstance(fig, plt.Figure)
+        data = '1-50-100-150'
+        ax = task_func(data)
+        self.assertEqual(ax.get_title(), 'Histogram of Values')
+        self.assertEqual(ax.get_xlabel(), 'Value')
+        self.assertEqual(ax.get_ylabel(), 'Frequency')
+        self.assertListEqual(sorted(list(ax.get_xticks())), [1, 50, 100, 150])

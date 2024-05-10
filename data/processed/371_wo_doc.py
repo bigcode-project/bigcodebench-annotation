@@ -1,87 +1,134 @@
+import os
+import re
 import json
-from datetime import datetime
-import numpy as np
-from decimal import Decimal
+import glob
 
-def task_func(my_obj):
+
+def task_func(directory_path: str) -> list:
     """
-    Serializes an object to a JSON string, handling complex data types through a custom JSONEncoder.
-    This function is capable of serializing data types such as datetime, numpy.ndarray, and Decimal
-    which are not natively supported by the default JSON serialization mechanisms.
-
+    Protect all double quotes in all JSON files in the specified directory by prepending them with a double backslash.
+    
+    Functionality:
+    - Reads each JSON file in the given directory.
+    - Escapes the double quotes by prepending them with a double backslash.
+    - Writes back the modified content to the respective JSON file.
+    
     Parameters:
-    my_obj (object):  The object to serialize. This could be any Python object, typically a dictionary or a list containing complex data types.
-
+    - directory_path (str): Path to the directory containing JSON files.
+    
     Returns:
-    str: The serialized JSON string of the object.
+    - list: A list of the processed JSON files.
+    
+    Requirements:
+    - re
+    - json
+    - glob
+    - os
 
     Raises:
-    TypeError: If an object of an unsupported type is encountered that cannot be serialized by both the custom and default JSON encoders. This ensures that users are made aware of serialization limitations for types not explicitly handled.
-
-    Requirements:
-    - json
-    - datetime.datetime
-    - numpy
-    - decimal.Decimal
-
-    Examples:
-    Serialize a dictionary containing datetime, numpy array, and Decimal.
-    >>> result = task_func({'time': datetime(2023, 4, 1, 12, 0, tzinfo=pytz.utc), 'array': np.array([1, 2, 3]), 'amount': Decimal('10.99')})
-    >>> '2023-04-01T12:00:00+00:00' in result and '[1, 2, 3]' in result and '10.99' in result
-    True
-
-    Serialize a simple dictionary.
-    >>> task_func({'name': 'Alice', 'age': 30})
-    '{"name": "Alice", "age": 30}'
+    - FileNotFoundError: If the specified directory does not exist.
+    
+    Example:
+    >>> import tempfile
+    >>> import json
+    >>> directory = tempfile.mkdtemp()
+    >>> with open(directory + "/file1.json", "w") as file:
+    ...     json.dump({"name": "John", "age": 30, "city": "New York"}, file)
+    >>> with open(directory + "/file2.json", "w") as file:
+    ...     json.dump('{"book": "Harry Potter", "author": "J.K. Rowling", "quote": "\\"Magic\\" is everywhere!"}', file)
+    >>> files = task_func(directory)
+    >>> len(files)
+    2
     """
-    class ComplexEncoder(json.JSONEncoder):
-        def default(self, obj):
-            if isinstance(obj, datetime):
-                return obj.isoformat()
-            elif isinstance(obj, np.ndarray):
-                return obj.tolist()
-            elif isinstance(obj, Decimal):
-                return str(obj)
-            return json.JSONEncoder.default(self, obj)
-    return json.dumps(my_obj, cls=ComplexEncoder)
+    if not os.path.exists(directory_path):
+        raise FileNotFoundError(f"Directory {directory_path} not found.")
+    json_files = glob.glob(directory_path + '/*.json')
+    processed_files = []
+    for json_file in json_files:
+        with open(json_file, 'r') as file:
+            data = json.load(file)
+        escaped_data = json.dumps(data, ensure_ascii=False)
+        escaped_data = re.sub(r'(?<!\\)"', r'\\\"', escaped_data)
+        with open(json_file, 'w') as file:
+            file.write(escaped_data)
+        processed_files.append(json_file)
+    return processed_files
 
 import unittest
-from datetime import datetime
-from decimal import Decimal
-import numpy as np
-import pytz
+import doctest
+import shutil
+import tempfile
 class TestCases(unittest.TestCase):
-    def test_datetime_serialization(self):
-        """Test serialization of datetime objects."""
-        obj = {'time': datetime(2023, 1, 1, 12, 0, tzinfo=pytz.utc)}
-        result = task_func(obj)
-        self.assertIn('2023-01-01T12:00:00+00:00', result)
-    def test_decimal_serialization(self):
-        """Test serialization of Decimal objects."""
-        obj = {'price': Decimal('99.99')}
-        result = task_func(obj)
-        self.assertIn('99.99', result)
-    def test_numpy_array_serialization(self):
-        """Test serialization of numpy arrays."""
-        obj = {'data': np.array([1, 2, 3])}
-        result = task_func(obj)
-        self.assertIn('[1, 2, 3]', result)
-    def test_combined_serialization(self):
-        """Test combined serialization of datetime, numpy array, and Decimal."""
-        obj = {'time': datetime(2023, 1, 1, 12, 0, tzinfo=pytz.utc), 'data': np.array([1, 2, 3]), 'price': Decimal('99.99')}
-        result = task_func(obj)
-        self.assertIn('2023-01-01T12:00:00+00:00', result)
-        self.assertIn('[1, 2, 3]', result)
-        self.assertIn('99.99', result)
-    def test_simple_object_serialization(self):
-        """Test serialization of simple objects (e.g., string, int)."""
-        obj = {'name': 'Alice', 'age': 30}
-        result = task_func(obj)
-        self.assertEqual(result, '{"name": "Alice", "age": 30}')
-    def test_unsupported_type_fallback(self):
-        """Test that unsupported types fall back to the default encoder."""
-        class UnsupportedType:
-            pass
-        obj = {'unsupported': UnsupportedType()}
-        with self.assertRaises(TypeError):
-            task_func(obj)
+    def setUp(self):
+        self.base_tmp_dir = tempfile.mkdtemp()
+        self.test_directory = f"{self.base_tmp_dir}/test"
+        self.mixed_directory = f"{self.base_tmp_dir}/test/mixed_directory/"
+        if not os.path.exists(self.test_directory):
+            os.makedirs(self.test_directory)
+        if not os.path.exists(self.mixed_directory):
+            os.makedirs(self.mixed_directory)
+        self.json_data1 = {
+            "name": "John",
+            "age": 30,
+            "city": "New York"
+        }
+        self.json_data2 = {
+            "book": "Harry Potter",
+            "author": "J.K. Rowling",
+            "quote": "\"Magic\" is everywhere!"
+        }
+        # Create sample JSON files
+        with open(os.path.join(self.test_directory, "file1.json"), "w") as file:
+            json.dump(self.json_data1, file)
+        with open(os.path.join(self.test_directory, "file2.json"), "w") as file:
+            json.dump(self.json_data2, file)
+        super(TestCases, self).setUp()
+    def tearDown(self):
+        shutil.rmtree(self.test_directory)
+        super(TestCases, self).tearDown()
+    def test_case_1(self):
+        # Test with the sample directory created
+        result = task_func(self.test_directory)
+        self.assertEqual(len(result), 2)  # 2 files processed
+        result = [os.path.basename(file) for file in result]
+        self.assertTrue("file1.json" in result)
+        self.assertTrue("file2.json" in result)
+        
+        # Check if the files have been modified correctly
+        with open(os.path.join(self.test_directory, "file1.json"), "r") as file:
+            content = file.read()
+            self.assertNotIn(' "', content)  # No unprotected double quotes
+        
+        with open(os.path.join(self.test_directory, "file2.json"), "r") as file:
+            content = file.read()
+            self.assertNotIn(' "Magic"', content)  # Original quote should be escaped
+    
+    def test_case_2(self):
+        # Test with an empty directory (no JSON files)
+        empty_directory = f"{self.test_directory}/empty_directory/"
+        if not os.path.exists(empty_directory):
+            os.makedirs(empty_directory)
+        result = task_func(empty_directory)
+        self.assertEqual(result, [])  # No files processed
+    
+    def test_case_3(self):
+        # Test with a non-existing directory
+        with self.assertRaises(FileNotFoundError):
+            task_func("/mnt/data/non_existent_directory/")
+    
+    def test_case_4(self):
+        # Test with a directory containing non-JSON files
+        if not os.path.exists(self.mixed_directory):
+            os.makedirs(self.mixed_directory)
+        with open(self.mixed_directory + "file.txt", "w") as file:
+            file.write("Sample text")
+        result = task_func(self.mixed_directory)
+        self.assertEqual(result, [])  # No JSON files processed
+    
+    def test_case_5(self):
+        # Test with a directory containing both JSON and non-JSON files
+        with open(self.mixed_directory + "file3.json", "w") as file:
+            json.dump(self.json_data1, file)
+        result = task_func(self.mixed_directory)
+        self.assertEqual(len(result), 1)  # 1 JSON file processed
+        self.assertTrue("file3.json" in result[0])

@@ -1,78 +1,93 @@
-import re
-from datetime import time
+import os
+import shutil
 
-def task_func(logs: list):
+# Constants
+BACKUP_DIR = '/tmp/backup'
+
+def task_func(directory):
     """
-    Analyze the given list of logs for the occurrence of errors and calculate the average time of occurrence of errors.
+    Rollback the update of a directory by restoring it from a backup.
     
     Parameters:
-    - logs (list): A list of log strings.
+    - directory (str): The directory path to rollback.
     
     Returns:
-    - list: A list of times when errors occurred.
-    - time: The average time of occurrence of these errors.
+    - directory (str): The restored directory path if successful, otherwise an error message.
     
     Requirements:
-    - re
-    - datetime
+    - os
+    - shutil
     
-    Example:
-    >>> task_func(['2021-06-15 09:45:00 ERROR: Failed to connect to database',\
-            '2021-06-15 10:15:00 WARNING: Low disk space',\
-            '2021-06-15 10:35:00 INFO: Backup completed successfully'])
-    ([datetime.time(9, 45)], datetime.time(9, 45))
+    Constants:
+    - BACKUP_DIR: The directory where backups are stored. Default is '/tmp/backup'.
+    
+    Examples:
+    >>> task_func('/tmp/my_data')
+    '/tmp/my_data'
+    
+    >>> task_func('/tmp/nonexistent')
+    'Backup directory /tmp/backup does not exist. Cannot rollback update.'
+    
+    Note: 
+    - This function will return the restored directory path on successful rollback, or an error message otherwise.
     """
-    error_times = []
-    total_time = 0
-    for log in logs:
-        if "ERROR" in log:
-            time_match = re.search(r'(\d{2}):(\d{2}):\d{2}', log)
-            if time_match:
-                hour, minute = map(int, time_match.groups())
-                error_times.append(time(hour, minute))
-                total_time += hour * 60 + minute
-    if error_times:
-        avg_hour = (total_time // len(error_times)) // 60
-        avg_minute = (total_time // len(error_times)) % 60
-        avg_time = time(avg_hour, avg_minute)
-    else:
-        avg_time = time(0, 0)
-    return error_times, avg_time
+    if not os.path.exists(BACKUP_DIR):
+        return f'Backup directory {BACKUP_DIR} does not exist. Cannot rollback update.'
+    backups = sorted(os.listdir(BACKUP_DIR))
+    latest_backup = backups[-1] if backups else None
+    if not latest_backup:
+        return f'No backups found in {BACKUP_DIR}. Cannot rollback update.'
+    if os.path.exists(directory):
+        shutil.rmtree(directory)
+    shutil.copytree(os.path.join(BACKUP_DIR, latest_backup), directory)
+    return directory
 
 import unittest
-from datetime import time
+from unittest.mock import patch, MagicMock
+import os
+import shutil
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        logs = ['2021-06-15 09:45:00 ERROR: Failed to connect to database',
-                '2021-06-15 10:15:00 WARNING: Low disk space',
-                '2021-06-15 10:35:00 INFO: Backup completed successfully']
-        result = task_func(logs)
-        self.assertEqual(result, ([time(9, 45)], time(9, 45)))
-    def test_case_2(self):
-        logs = ['2021-06-15 08:45:00 ERROR: Failed to authenticate',
-                '2021-06-15 09:15:00 ERROR: Failed to connect to database',
-                '2021-06-15 10:35:00 INFO: Backup completed successfully']
-        result = task_func(logs)
-        self.assertEqual(result, ([time(8, 45), time(9, 15)], time(9, 0)))
-    def test_case_3(self):
-        logs = ['2021-06-15 07:45:00 INFO: Backup started',
-                '2021-06-15 08:15:00 WARNING: Low memory',
-                '2021-06-15 09:35:00 INFO: Backup completed successfully']
-        result = task_func(logs)
-        self.assertEqual(result, ([], time(0, 0)))
-    def test_case_4(self):
-        logs = []
-        result = task_func(logs)
-        self.assertEqual(result, ([], time(0, 0)))
-    def test_case_5(self):
-        logs = ['2021-06-15 09:45:00 ERROR: Failed to connect to database',
-                '2021-06-15 10:15:00 WARNING: Low disk space',
-                '2021-06-15 11:45:00 ERROR: Failed to authenticate']
-        result = task_func(logs)
-        self.assertEqual(result, ([time(9, 45), time(11, 45)], time(10, 45)))
-    def test_case_invalid_format(self):
-        logs = ['Invalid log format',
-                'Another invalid log format',
-                'Yet another invalid log format']
-        result = task_func(logs)
-        self.assertEqual(result, ([], time(0, 0)))
+    @patch('os.listdir')
+    @patch('os.path.exists')
+    @patch('shutil.rmtree')
+    @patch('shutil.copytree')
+    def test_successful_rollback(self, mock_copytree, mock_rmtree, mock_exists, mock_listdir):
+        mock_exists.side_effect = lambda x: True if x == BACKUP_DIR else False
+        mock_listdir.return_value = ['backup1']
+        result = task_func('/tmp/my_data')
+        self.assertEqual(result, '/tmp/my_data')
+        mock_copytree.assert_called_once()
+    @patch('os.listdir')
+    @patch('os.path.exists')
+    def test_no_backup_directory(self, mock_exists, mock_listdir):
+        mock_exists.return_value = False
+        result = task_func('/tmp/my_data')
+        self.assertEqual(result, 'Backup directory /tmp/backup does not exist. Cannot rollback update.')
+    @patch('os.listdir')
+    @patch('os.path.exists')
+    def test_no_backups_in_backup_directory(self, mock_exists, mock_listdir):
+        mock_exists.return_value = True
+        mock_listdir.return_value = []
+        result = task_func('/tmp/my_data')
+        self.assertEqual(result, 'No backups found in /tmp/backup. Cannot rollback update.')
+    @patch('os.listdir')
+    @patch('os.path.exists')
+    @patch('shutil.rmtree')
+    @patch('shutil.copytree')
+    def test_directory_does_not_exist(self, mock_copytree, mock_rmtree, mock_exists, mock_listdir):
+        mock_exists.side_effect = lambda x: True if x == BACKUP_DIR else False
+        mock_listdir.return_value = ['backup1']
+        result = task_func('/tmp/nonexistent')
+        self.assertEqual(result, '/tmp/nonexistent')
+        mock_copytree.assert_called_once()
+    @patch('os.listdir')
+    @patch('os.path.exists')
+    @patch('shutil.rmtree')
+    @patch('shutil.copytree')
+    def test_erroneous_backup_content(self, mock_copytree, mock_rmtree, mock_exists, mock_listdir):
+        mock_exists.return_value = True
+        mock_listdir.return_value = ['corrupt_backup']
+        mock_copytree.side_effect = Exception("Corruption detected")
+        with self.assertRaises(Exception) as context:
+            task_func('/tmp/my_data')
+        self.assertTrue('Corruption detected' in str(context.exception))

@@ -1,106 +1,94 @@
-import time
-import random
+import codecs
+import os
+import glob
 
+# Constants
+DIRECTORY_PATH = './files/'
 
-def task_func(iterations=5, min_delay=1.0, max_delay=2.0, seed=None):
+def task_func(directory=DIRECTORY_PATH, from_encoding='cp1251', to_encoding='utf8'):
     """
-    Simulates a delay and then returns a message indicating the elapsed time. This is repeated for a specified number of iterations.
-
-    For each iteration the delay is randomly sampled from a uniform distribution specified by min_delay and max_delay.
-    After each iteration the message: '{delay} seconds have passed', where {delay} is replaces with the actual delay
-    of the iteration with 2 positions after the decimal point, is saved to an array.
-
-    The function returns a list of all messages, as well as the total delay.
-
+    Convert the encoding of all text files in a specified directory from one encoding to another. 
+    The function modifies the files in-place.
+    
     Parameters:
-    - iterations (int): The number of times the delay and message should be simulated. Default is 5.
-    - min_delay (float): The duration (in seconds) of the delay between messages. Default is 1.0.
-    - max_delay (float): The max delay of each iteration in seconds. Default is 2.0
-    - seed (float): The seed used for random sampling the delays for each iteration. Defalut is None.
-
+    - directory (str): The directory where the text files are located. Default is './files/'.
+    - from_encoding (str): The original encoding of the text files. Default is 'cp1251'.
+    - to_encoding (str): The encoding to which the text files should be converted. Default is 'utf8'.
+    
     Returns:
-    - list of str: A list of messages indicating the elapsed time for each iteration.
-    - float: The total amount of delay
-
-    Raises:
-    - ValueError: If iterations is not a positive integer or if min_delay/max_delay is not a positive floating point value.
-
+    - None
+    
     Requirements:
-    - time
-    - random
+    - codecs
+    - os
+    - glob
     
     Example:
-    >>> messages, delay = task_func(2, 0.4, seed=1)
-    >>> print(messages)
-    ['0.61 seconds have passed', '1.76 seconds have passed']
-    >>> print(delay)
-    2.3708767696794144
-
-    >>> messages, delay = task_func(2, 2.0, 4.2, seed=12)
-    >>> print(messages)
-    ['3.04 seconds have passed', '3.45 seconds have passed']
-    >>> print(delay)
-    6.490494998960768
+    >>> task_func('./files/', 'cp1251', 'utf8')  # Converts all .txt files in './files/' from 'cp1251' to 'utf8'
+    >>> task_func('./other_files/', 'utf8', 'ascii')  # Converts all .txt files in './other_files/' from 'utf8' to 'ascii'
     """
-    random.seed(seed)
-    if not isinstance(iterations, int) or iterations <= 0:
-        raise ValueError("iterations must be a positive integer.")
-    if not isinstance(min_delay, (int, float)) or min_delay <= 0:
-        raise ValueError("min_delay must be a positive floating point value.")
-    if not isinstance(max_delay, (int, float)) or max_delay <= min_delay:
-        raise ValueError("max_delay must be a floating point value larger than min_delay.")
-    total_delay = 0
-    messages = []
-    for _ in range(iterations):
-        delay = random.uniform(min_delay, max_delay)
-        total_delay += delay
-        time.sleep(delay)
-        message_string = f'{delay:.2f} seconds have passed'
-        messages.append(message_string)
-    return messages, total_delay
+    for filename in glob.glob(os.path.join(directory, '*.txt')):
+        with codecs.open(filename, 'r', from_encoding) as file:
+            content = file.read()
+        with codecs.open(filename, 'w', to_encoding) as file:
+            file.write(content)
 
 import unittest
-import time
+from unittest.mock import patch
+import os
+import glob
+import codecs
+# Helper function to create a text file with specific encoding
+def create_text_file(filename, content, encoding):
+    with codecs.open(filename, 'w', encoding) as file:
+        file.write(content)
+import codecs
+import os
+import glob
+# Constants
+DIRECTORY_PATH = './files/'
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        start_time = time.time()
-        messages, total_delay = task_func(3, 0.2, 0.3, 12)
-        elapsed_time = time.time() - start_time
-        self.assertEqual(messages, ['0.25 seconds have passed', '0.27 seconds have passed', '0.27 seconds have passed'])
-        self.assertAlmostEqual(elapsed_time, total_delay, delta=0.1)
+    def setUp(self):
+        os.makedirs('./test_files/', exist_ok=True)
+        os.makedirs('./empty/', exist_ok=True)
         
-    def test_case_2(self):
-        start_time = time.time()
-        result, total_delay = task_func(1, 0.5, 2.5, seed=42)
-        elapsed_time = time.time() - start_time
-        self.assertEqual(result, ['1.78 seconds have passed'])
-        self.assertAlmostEqual(elapsed_time, total_delay, delta=0.1)
+    def tearDown(self):
+        for filename in glob.glob('./test_files/*.txt'):
+            os.remove(filename)
+        os.rmdir('./test_files/')
+        os.rmdir('./empty/')
+    @patch('glob.glob')
+    def test_encoding_conversion(self, mock_glob):
+        mock_glob.return_value = ['./test_files/file1.txt', './test_files/file2.txt']
+        create_text_file('./test_files/file1.txt', 'Hello', 'utf8')
+        create_text_file('./test_files/file2.txt', 'World', 'utf8')
+        task_func(directory='./test_files/', from_encoding='utf8', to_encoding='ascii')
+        with codecs.open('./test_files/file1.txt', 'r', 'ascii') as file:
+            self.assertEqual(file.read(), 'Hello')
+        with codecs.open('./test_files/file2.txt', 'r', 'ascii') as file:
+            self.assertEqual(file.read(), 'World')
+            
+    @patch('glob.glob')
+    def test_empty_directory(self, mock_glob):
+        mock_glob.return_value = []
+        task_func(directory='./empty/', from_encoding='utf8', to_encoding='ascii')
         
-    def test_case_3(self):
-        start_time = time.time()
-        result, total_delay = task_func(seed=123)
-        elapsed_time = time.time() - start_time
-        self.assertEqual(result, ['1.05 seconds have passed',
-                                  '1.09 seconds have passed',
-                                  '1.41 seconds have passed',
-                                  '1.11 seconds have passed',
-                                  '1.90 seconds have passed'
-                                  ])
-        self.assertAlmostEqual(elapsed_time, total_delay, delta=0.1)
-        
-    def test_case_4(self):
-        with self.assertRaises(ValueError):
-            task_func(-1, 1.0)
-        
-    def test_case_5(self):
-        with self.assertRaises(ValueError):
-            task_func(3, -1.0)
-    def test_case_rng(self):
-        mess1, del1 = task_func(3, 0.1, 0.2, seed=12)
-        mess2, del2 = task_func(3, 0.1, 0.2, seed=12)
-        self.assertEqual(mess1, mess2)
-        self.assertAlmostEqual(del1, del2, delta=0.05)
-        mess3, del3 = task_func(5, 0.01, 0.05)
-        mess4, del4 = task_func(5, 0.01, 0.05)
-        self.assertNotEqual(mess3, mess4)
-        self.assertNotAlmostEqual(del3, del4)
+    @patch('glob.glob')
+    def test_same_encoding(self, mock_glob):
+        mock_glob.return_value = ['./test_files/file3.txt']
+        create_text_file('./test_files/file3.txt', 'Same Encoding', 'utf8')
+        task_func(directory='./test_files/', from_encoding='utf8', to_encoding='utf8')
+        with codecs.open('./test_files/file3.txt', 'r', 'utf8') as file:
+            self.assertEqual(file.read(), 'Same Encoding')
+            
+    @patch('glob.glob')
+    def test_invalid_encoding(self, mock_glob):
+        mock_glob.return_value = ['./test_files/file4.txt']
+        create_text_file('./test_files/file4.txt', 'Invalid', 'utf8')
+        with self.assertRaises(LookupError):
+            task_func(directory='./test_files/', from_encoding='utf8', to_encoding='invalid_encoding')
+            
+    @patch('glob.glob')
+    def test_nonexistent_directory(self, mock_glob):
+        mock_glob.return_value = []
+        task_func(directory='./nonexistent/', from_encoding='utf8', to_encoding='ascii')

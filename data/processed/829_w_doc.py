@@ -1,76 +1,55 @@
-import pandas as pd
-import re
+import math
+from sympy import isprime
 
-# Constants
-STOPWORDS = set([
-    "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself",
-    "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself",
-    "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that",
-    "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had",
-    "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because",
-    "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into",
-    "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out",
-    "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where",
-    "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no",
-    "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just",
-    "don", "should", "now"
-])
 
-def task_func(data, column):
+def task_func(input_list):
     """
-    Removes English stopwords from a text column in a DataFrame and returns the modified DataFrame.
+    Filter the prime numbers from the specified list, sort the prime numbers 
+    ascending based on their radian value converted to degrees, and return the sorted list.
     
+    The function uses the isprime function from the sympy library to determine prime numbers 
+    and the degrees function from the math library to sort the numbers based on their degree value.
+
     Parameters:
-    df (pandas.DataFrame): The DataFrame containing the text column to be processed.
-    column (str): The name of the text column from which stopwords should be removed.
-    
+    input_list (list[int]): A list of integers to be filtered and sorted.
+
     Returns:
-    pandas.DataFrame: A DataFrame with the stopwords removed from the specified column.
-    
+    list[int]: A sorted list of prime numbers based on their degree value.
+
     Requirements:
-    - pandas
-    - re
+    - math
+    - sympy
+
+    Examples:
+    >>> task_func([4, 5, 2, 7, 89, 90])
+    [2, 5, 7, 89]
     
-    Constants:
-    - STOPWORDS: A set containing common English stopwords.
-    
-    Example:
-    >>> data = {'text': ['This is a sample sentence.', 'Another example here.']}
-    >>> print(task_func(data, 'text'))
-                  text
-    0  sample sentence
-    1  Another example
+    >>> task_func([101, 102, 103, 104])
+    [101, 103]
     """
-    df = pd.DataFrame(data)
-    df[column] = df[column].apply(lambda x: ' '.join([word for word in re.findall(r'\b\w+\b', x) if word.lower() not in STOPWORDS]))
-    return df
+    primes = [i for i in input_list if isprime(i)]
+    sorted_primes = sorted(primes, key=lambda x: (math.degrees(x), x))
+    return sorted_primes
 
 import unittest
-import pandas as pd
-# Import the refined function
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        data = {'text': ['This is a sample sentence.', 'Another example here.']}
-        expected_df = pd.DataFrame({'text': ['sample sentence', 'Another example']})
-        result_df = task_func(data, 'text')
-        pd.testing.assert_frame_equal(result_df, expected_df)
+        input_data = [2, 3, 4, 5, 6, 7, 8, 9, 10]
+        expected_output = [2, 3, 5, 7]
+        self.assertEqual(task_func(input_data), expected_output)
     def test_case_2(self):
-        data = {'content': ['Stopwords should be removed.', 'Testing this function.']}
-        expected_df = pd.DataFrame({'content': ['Stopwords removed', 'Testing function']})
-        result_df = task_func(data, 'content')
-        pd.testing.assert_frame_equal(result_df, expected_df)
+        input_data = [2, 3, 5, 7, 11, 13, 17, 19]
+        expected_output = [2, 3, 5, 7, 11, 13, 17, 19]
+        self.assertEqual(task_func(input_data), expected_output)
     def test_case_3(self):
-        data = {'sentence': ['Hello world!', 'Good morning.']}
-        expected_df = pd.DataFrame({'sentence': ['Hello world', 'Good morning']})
-        result_df = task_func(data, 'sentence')
-        pd.testing.assert_frame_equal(result_df, expected_df)
+        input_data = [4, 6, 8, 9, 10, 12, 14, 15, 16]
+        expected_output = []
+        self.assertEqual(task_func(input_data), expected_output)
     def test_case_4(self):
-        data = {'text': ['This is a single sentence.'] * 100}
-        expected_df = pd.DataFrame({'text': ['single sentence'] * 100})
-        result_df = task_func(data, 'text')
-        pd.testing.assert_frame_equal(result_df, expected_df)
+        input_data = []
+        expected_output = []
+        self.assertEqual(task_func(input_data), expected_output)
     def test_case_5(self):
-        data = {'line': [''] * 50}
-        expected_df = pd.DataFrame({'line': [''] * 50})
-        result_df = task_func(data, 'line')
-        pd.testing.assert_frame_equal(result_df, expected_df)
+        input_data = [89, 90, 91, 97, 98, 99, 100]
+        expected_output = [89, 97]
+        self.assertEqual(task_func(input_data), expected_output)

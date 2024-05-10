@@ -1,94 +1,65 @@
+import random
+import seaborn as sns
 import numpy as np
-import bisect
-import statistics
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
-
-def task_func(data, value):
+def task_func(length, range_limit=100, seed=0):
     """
-    Analyzes a list of numerical data, identifies values greater than the average,
-    and counts how many values are greater than a specified value. Additionally, plots the
-    histogram of the sorted numbers.
+    Create a list of random numbers, sort them and record the distribution of the numbers in a histogram using 
+    default settings in a deterministic seaborn plot. Return the axes object and the list of random numbers.
 
     Parameters:
-        data (list): A list of numerical data.
-        value (float): A value to compare against the data.
+    length (int): The length of the list of random numbers.
+    range_limit (int, Optional): The range of the random numbers. Defaults to 100. Must be greater than 1.
+    seed (int, Optional): The seed value for the random number generator. Defaults to 0.
 
     Returns:
-        numpy.ndarray: An array of values from the data that are greater than the average.
-        int: The number of values in the data that are greater than the given value.
+    Tuple[matplotlib.axes._axes.Axes, List[int]]: The axes object with the plot and the list of random numbers.
 
     Requirements:
-    - numpy
-    - bisect
-    - statistics
+    - random
     - matplotlib.pyplot
+    - seaborn
+    - numpy
 
-    Note:
-    - If the data list is empty, the function returns an empty numpy.ndarray and a count of 0. This ensures
-      the function's output remains consistent and predictable even with no input data.
+    Raises:
+    ValueError: If range_limit is less than or equal to 1.
 
-    Examples:
-    >>> greater_avg, count = task_func([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 5)
-    >>> greater_avg.tolist()
-    [6, 7, 8, 9, 10]
-    >>> count
-    5
+    Example:
+    >>> import matplotlib.pyplot as plt
+    >>> ax, data = task_func(1000, 100, 24) # Generate a list of 1000 random numbers between 1 and 100
+    >>> isinstance(ax, plt.Axes)
+    True
     """
-    if not data:  # Handle empty data list
-        return np.array([]), 0
-    data = np.array(data)
-    avg = statistics.mean(data)
-    greater_avg = data[data > avg]
-    data.sort()
-    bpoint = bisect.bisect_right(data, value)
-    num_greater_value = len(data) - bpoint
-    plt.hist(data, bins=10)
-    plt.show()
-    return greater_avg, num_greater_value
+    if range_limit <= 1:
+        raise ValueError("range_limit must be greater than 1")
+    random.seed(seed)
+    np.random.seed(seed)
+    random_numbers = [random.randint(1, range_limit) for _ in range(length)]
+    random_numbers.sort()
+    plt.figure()
+    plot = sns.histplot(random_numbers, kde=False)
+    return plot.axes, random_numbers
 
 import unittest
-from unittest.mock import patch
-import numpy as np
-import statistics
+import doctest
 class TestCases(unittest.TestCase):
-    def test_return_types(self):
-        """Ensure the function returns a numpy.ndarray and an integer."""
-        data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        result = task_func(data, 5)
-        self.assertIsInstance(result[0], np.ndarray, "First return value should be an ndarray")
-        self.assertIsInstance(result[1], int, "Second return value should be an int")
-    def test_greater_than_average(self):
-        """Verify the returned array contains only values greater than the average of the data list."""
-        data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        result = task_func(data, 5)
-        self.assertTrue(all(val > statistics.mean(data) for val in result[0]), "All returned values should be greater than the data's average")
-    def test_count_greater_than_value(self):
-        """Check if the function correctly counts the number of values greater than the specified value."""
-        data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        _, count = task_func(data, 5)
-        self.assertEqual(count, 5, "The count of values greater than 5 should be 5")
-    def test_empty_data(self):
-        """Ensure the function handles an empty data list correctly."""
-        data = []
-        result = task_func(data, 5)
-        self.assertEqual(len(result[0]), 0, "The returned array should be empty for empty input data")
-        self.assertEqual(result[1], 0, "The count should be 0 for empty input data")
-    def test_small_data_set(self):
-        """Test functionality with a small data set."""
-        data = [2, 3, 4]
-        result = task_func(data, 3)
-        self.assertTrue(all(val > statistics.mean(data) for val in result[0]), "All returned values should be greater than the average in a small data set")
-        self.assertEqual(result[1], 1, "The count of values greater than 3 should be 1 in a small data set")
-    @patch('matplotlib.pyplot.show')
-    def test_plotting_mocked(self, mock_show):
-        """Ensure the function triggers a plot display."""
-        data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        _ = task_func(data, 5)
-        mock_show.assert_called_once()
-    def test_with_floats_and_boundary_value(self):
-        """Test function with floating point numbers and a boundary value exactly equal to one of the data points."""
-        data = [1.5, 2.5, 3.5, 4.5, 5.5]
-        greater_avg, count = task_func(data, 3.5)
-        self.assertTrue(all(val > statistics.mean(data) for val in greater_avg), "All returned values should be greater than the average with floats")
-        self.assertEqual(count, 2, "The count of values greater than 3.5 should be 2, including boundary conditions")
+    def test_case_1(self):
+        _, data = task_func(1000)
+        self.assertEqual(len(data), 1000)
+    def test_case_2(self):
+        with self.assertRaises(ValueError):
+            _, data = task_func(1000, -3, 42)
+        
+    def test_case_3(self):
+        _, data = task_func(20, 75, 77)
+        self.assertEqual(data, [1, 4, 15, 19, 23, 25, 25, 26, 31, 31, 33, 36, 38, 42, 61, 64, 65, 65, 72, 72])
+        self.assertTrue(all(1 <= num <= 75 for num in data))
+    def test_case_4(self):
+        ax, data = task_func(1000, 75)
+        target = np.array([98, 103, 106, 73, 87, 92, 94, 84, 90, 95, 78])
+        self.assertTrue((ax.containers[0].datavalues == target).all()) 
+    def test_case_5(self):
+        _, data1 = task_func(1000, seed=42)
+        _, data2 = task_func(1000, seed=42)
+        self.assertEqual(data1, data2)

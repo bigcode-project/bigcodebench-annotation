@@ -1,78 +1,90 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
 
-def task_func(data):
+
+def task_func(myList, n_clusters):
     """
-     This function draws a histogram to visualize the frequency distribution of numeric values provided in a string format,
-     with 'Value' on the x-axis, 'Frequency' on the y-axis and 'Histogram of Values' as the title.
+    Cluster a list of 2D points using KMeans and visualize the clusters.
 
+    Note: This function raises ValueError if it encounters invalid inputs.
+    KMeans is performed with random_state = 42 and n_init = 10. Scatterplot
+    uses red 'x' markers for cluster centers.
 
     Parameters:
-    data (str): The data string in the format 'value-value-value-...'.
+    - myList (list): List of 2D points.
+    - n_clusters (int): Number of clusters to form.
 
     Returns:
-    ax (matplotlib.axes._axes.Axes): The Axes object of the created histogram.
+    - matplotlib.axes._axes.Axes: Axes object with the plotted clusters.
 
     Requirements:
-    - pandas
-    - numpy
     - matplotlib.pyplot
-
-    Notes:
-    - The histogram uses bins calculated as `np.arange(data.min(), data.max()+2) - 0.5`.
+    - sklearn.cluster.KMeans
 
     Example:
-    >>> data = '1-2-3-4-5-6-7-8-9-10'
-    >>> ax = task_func(data)
+    >>> myList = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]
+    >>> ax = task_func(myList, 2)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax.get_xticklabels()
+    [Text(0.0, 0, '0'), Text(1.0, 0, '1'), Text(2.0, 0, '2'), Text(3.0, 0, '3'), Text(4.0, 0, '4'), Text(5.0, 0, '5'), Text(6.0, 0, '6'), Text(7.0, 0, '7'), Text(8.0, 0, '8'), Text(9.0, 0, '9'), Text(10.0, 0, '10')]
     """
-    data = data.split('-')
-    data = [int(d) for d in data]
-    df = pd.DataFrame(data, columns=['Values'])
-    plt.figure(figsize=(10, 6))
-    ax = plt.gca()  # Get current Axes
-    ax.hist(df['Values'], bins=np.arange(df['Values'].min(), df['Values'].max()+2) - 0.5, edgecolor='black')
-    ax.set_xlabel('Value')
-    ax.set_ylabel('Frequency')
-    ax.set_title('Histogram of Values')
-    ax.set_xticks(sorted(list(set(data))))  # Set x-ticks based on unique data values
-    plt.show()
+    if not myList or n_clusters <= 0:
+        raise ValueError("Invalid inputs")
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+    kmeans.fit(myList)
+    fig, ax = plt.subplots()
+    ax.scatter(*zip(*myList), c=kmeans.labels_)
+    ax.scatter(*zip(*kmeans.cluster_centers_), marker="x", color="red")
     return ax
 
 import unittest
+import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.test_list = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]
     def test_case_1(self):
-        data = '1-2-3-4-5'
-        ax = task_func(data)
-        self.assertEqual(ax.get_title(), 'Histogram of Values')
-        self.assertEqual(ax.get_xlabel(), 'Value')
-        self.assertEqual(ax.get_ylabel(), 'Frequency')
-        self.assertListEqual(list(ax.get_xticks()), [1, 2, 3, 4, 5])
+        # Test single cluster
+        myList = [[1, 1], [1, 1], [1, 1], [1, 1]]
+        ax = task_func(myList, 1)
+        self.assertEqual(len(set(ax.collections[0].get_array())), 1)
     def test_case_2(self):
-        data = '5-5-5-5-5'
-        ax = task_func(data)
-        self.assertEqual(ax.get_title(), 'Histogram of Values')
-        self.assertEqual(ax.get_xlabel(), 'Value')
-        self.assertEqual(ax.get_ylabel(), 'Frequency')
-        self.assertListEqual(list(ax.get_xticks()), [5])
+        # Test arbitrary number of clusters
+        myList = self.test_list
+        for n in range(1, 6):
+            ax = task_func(myList, n)
+            self.assertEqual(len(set(ax.collections[0].get_array())), n)
     def test_case_3(self):
-        data = '7'
-        ax = task_func(data)
-        self.assertEqual(ax.get_title(), 'Histogram of Values')
-        self.assertEqual(ax.get_xlabel(), 'Value')
-        self.assertEqual(ax.get_ylabel(), 'Frequency')
-        self.assertListEqual(list(ax.get_xticks()), [7])
+        # Test visualization
+        myList = self.test_list
+        ax = task_func(myList, 2)
+        red_collection = next(
+            coll
+            for coll in ax.collections
+            if (
+                coll.get_facecolor()[0][0] == 1.0
+                and coll.get_facecolor()[0][1] == 0.0
+                and coll.get_facecolor()[0][2] == 0.0
+            )
+        )
+        red_x_markers_count = len(red_collection.get_offsets())
+        self.assertEqual(red_x_markers_count, 2)
     def test_case_4(self):
-        data = '2-8-4-10-1'
-        ax = task_func(data)
-        self.assertEqual(ax.get_title(), 'Histogram of Values')
-        self.assertEqual(ax.get_xlabel(), 'Value')
-        self.assertEqual(ax.get_ylabel(), 'Frequency')
-        self.assertListEqual(sorted(list(ax.get_xticks())), [1, 2, 4, 8, 10])
+        # Test handling invalid inputs
+        with self.assertRaises(ValueError):
+            task_func([], 1)
+        with self.assertRaises(ValueError):
+            task_func([[1, 1], [2, 2]], 0)
+        with self.assertRaises(ValueError):
+            task_func(self.test_list, len(self.test_list) + 1)
     def test_case_5(self):
-        data = '1-50-100-150'
-        ax = task_func(data)
-        self.assertEqual(ax.get_title(), 'Histogram of Values')
-        self.assertEqual(ax.get_xlabel(), 'Value')
-        self.assertEqual(ax.get_ylabel(), 'Frequency')
-        self.assertListEqual(sorted(list(ax.get_xticks())), [1, 50, 100, 150])
+        # Test consistency across runs with built-in random seed
+        myList = self.test_list
+        ax1 = task_func(myList, 2)
+        ax2 = task_func(myList, 2)
+        colors1 = ax1.collections[0].get_array()
+        colors2 = ax2.collections[0].get_array()
+        self.assertTrue(all(c1 == c2 for c1, c2 in zip(colors1, colors2)))
+    def tearDown(self):
+        plt.close("all")

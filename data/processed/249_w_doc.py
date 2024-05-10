@@ -1,73 +1,67 @@
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
+import numpy as np
+import matplotlib.pyplot as plt
+import itertools
 
-def task_func(df):
+
+def task_func(data_list):
     """
-    Standardize the 'age' and 'income' columns for each group by 'id' in a Pandas DataFrame, and return the standardized DataFrame.
-
+    Unzips the provided list of tuples and plots the numerical values for each position.
+    
     Parameters:
-    df (DataFrame): A pandas DataFrame with columns ['id', 'age', 'income'].
-
+    - data_list (list of tuples): A list containing tuples. Each tuple should contain a character and two numerical values.
+    
     Returns:
-    DataFrame: The pandas DataFrame after standardizing 'age' and 'income' columns.
+    - Axes: The plot with the unzipped numerical values.
+    
+    Requirements:
+    - numpy
+    - matplotlib.pyplot
+    - itertools
 
     Raises:
-    - This function will raise ValueError if the DataFrame does not have the 'id', 'age', and 'income' columns.
-
-    Requirements:
-    - pandas
-    - sklearn.preprocessing.StandardScaler
-
-    Example:
-    >>> df = pd.DataFrame({ 'id': [1, 1, 2, 2, 3, 3], 'age': [25, 26, 35, 36, 28, 29], 'income': [50000, 60000, 70000, 80000, 90000, 100000]})
-    >>> df_standardized = task_func(df)
-    >>> print(df_standardized.iloc[0]['age'] == 25)
-    False
-    """
-    try:
-        scaler = StandardScaler()
-        df_grouped = df.groupby('id').apply(lambda x: pd.DataFrame(scaler.fit_transform(x[['age', 'income']]), columns=['age', 'income'], index=x.index))
-        return df_grouped
-    except:
-        raise ValueError()
-
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
-import unittest
-class TestCases(unittest.TestCase):
-    def test_empty_dataframe(self):
-        df = pd.DataFrame(columns=['id', 'age', 'income'])
-        result = task_func(df)
-        self.assertEqual(len(result), 0)
-    def test_example_dataframe(self):
-        df = pd.DataFrame({
-            'id': [1, 1, 2, 2, 3, 3],
-            'age': [25, 26, 35, 36, 28, 29],
-            'income': [50000, 60000, 70000, 80000, 90000, 100000]
-        })
-        result = task_func(df)
-        scaler = StandardScaler()
-        #check random point
-        self.assertEqual(-1, result.iloc[0]['age'])
-    def test_single_group(self):
-        df = pd.DataFrame({'id': [1, 1], 'age': [30, 40], 'income': [50000, 60000]})
-        result = task_func(df)
-        self.assertEqual(len(result), 2)
-        self.assertNotEqual(result.iloc[0]['age'], 30)  # Checking if values are standardized
-    def test_multiple_groups(self):
-        df = pd.DataFrame({'id': [1, 1, 2, 2], 'age': [25, 35, 45, 55], 'income': [30000, 40000, 50000, 60000]})
-        result = task_func(df)
-        self.assertEqual(len(result), 4)
-    def test_negative_values(self):
-        df = pd.DataFrame({'id': [1, 1], 'age': [-20, -30], 'income': [-10000, -20000]})
-        result = task_func(df)
-        self.assertEqual(len(result), 2)
-    def test_large_data(self):
-        df = pd.DataFrame({'id': list(range(1000)), 'age': list(range(1000)), 'income': list(range(1000, 2000))})
-        result = task_func(df)
-        self.assertEqual(len(result), 1000)
+    - ValueError: If the data_list is empty.
     
-    def test_invalid_df(self):
-        df = pd.DataFrame()
-        with self.assertRaises(ValueError):
-            task_func(df)
+    Example:
+    >>> plot = task_func([('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)])
+    >>> type(plot)
+    <class 'matplotlib.axes._axes.Axes'>
+    """
+    unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
+    if len(unzipped_data) == 0:
+        raise ValueError('Empty data_list')
+    fig, ax = plt.subplots()
+    for i, column in enumerate(unzipped_data[1:], start=1):
+        ax.plot(column, label='Position {}'.format(i))
+    ax.legend()
+    return ax
+
+import unittest
+import doctest
+class TestCases(unittest.TestCase):
+    def test_case_1(self):
+        data_list = [('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)]
+        plot = task_func(data_list)
+        self.assertIsInstance(plot, type(plt.gca()))
+    def test_case_2(self):
+        data_list = [('a', 6, 7), ('b', 7, 8), ('c', 8, 9)]
+        plot = task_func(data_list)
+        self.assertIsInstance(plot, type(plt.gca()))
+        # Test the plot data
+        self.assertEqual(len(plot.lines), 2)
+    def test_case_3(self):
+        data_list = []
+        with self.assertRaises(ValueError):  # Expecting a ValueError due to empty data_list
+            task_func(data_list)
+    def test_case_4(self):
+        data_list = [('a', 10, 11), ('b', 11, 12), ('c', 12, 13), ('d', 13, 14)]
+        plot = task_func(data_list)
+        self.assertIsInstance(plot, type(plt.gca()))
+        # Test the plot data array
+        self.assertEqual(len(plot.lines), 2)
+        # Test the plot limits
+        self.assertAlmostEqual(plot.get_xlim()[0], -0.15, places=1)
+        self.assertAlmostEqual(plot.get_xlim()[1], 3.15, places=1)
+    def test_case_5(self):
+        data_list = [('a', np.nan, np.nan), ('b', np.nan, np.nan)]
+        plot = task_func(data_list)
+        self.assertIsInstance(plot, type(plt.gca()))

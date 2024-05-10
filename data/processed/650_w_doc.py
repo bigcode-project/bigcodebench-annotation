@@ -1,114 +1,77 @@
-import nltk
-from string import punctuation
+import numpy as np
 import pandas as pd
+from dateutil.parser import parse
 
 
-def task_func(text):
+
+def task_func(dates_str_list):
     """
-    Finds all words in a text, that are seperated by whitespace, 
-    beginning with the "$" character and computes their number of occurences.
+    Analyze the weekday distribution in a list of date strings. Implemented by dateutil.parser.
+
+    This function takes a list of date strings in "yyyy-mm-dd" format, calculates 
+    the weekday for each date, and returns a distribution of the weekdays.
 
     Parameters:
-    text (str): The input text.
+    - dates_str_list (list): The list of date strings in "yyyy-mm-dd" format.
 
     Returns:
-    DataFrame: A pandas DataFrame with two columns: "Word" and "Frequency". 
-               "Word" contains the '$' prefixed words, and "Frequency" contains their occurrences.
+    - Series: A pandas Series of the weekday distribution, where the index represents 
+              the weekdays (from Monday to Sunday) and the values represent the counts 
+              of each weekday in the provided list.
 
-               
-    Raises:
-    ValueError: if text is not a string
-    
     Requirements:
-    - nltk
-    - string
+    - datetime
+    - dateutil.parser
+    - numpy
     - pandas
 
-    Note:
-    The function ignores words that are entirely made up of punctuation, even if they start with a '$'.
-
     Example:
-    >>> text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
-    >>> task_func(text)
-       Word  Frequency
-    0  $abc          3
-    1  $efg          1
-    2  $hij          3
-
-    >>> text = "$hello this i$s a $test $test $test"
-    >>> task_func(text)
-         Word  Frequency
-    0  $hello          1
-    1   $test          3
+    >>> task_func(['2022-10-22', '2022-10-23', '2022-10-24', '2022-10-25'])
+    Monday       1
+    Tuesday      1
+    Wednesday    0
+    Thursday     0
+    Friday       0
+    Saturday     1
+    Sunday       1
+    dtype: int64
     """
-    if not isinstance(text, str):
-        raise ValueError("The input should be a string.")
-    tk = nltk.WhitespaceTokenizer()
-    words = tk.tokenize(text)    
-    dollar_words = [word for word in words if word.startswith('$') and not all(c in set(punctuation) for c in word)]
-    freq = nltk.FreqDist(dollar_words)
-    df = pd.DataFrame(list(freq.items()), columns=["Word", "Frequency"])
-    return df
+    DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    weekdays = [parse(date_str).weekday() for date_str in dates_str_list]
+    weekday_counts = np.bincount(weekdays, minlength=7)
+    distribution = pd.Series(weekday_counts, index=DAYS_OF_WEEK)
+    return distribution
 
 import unittest
+DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
-        result = task_func(text)
-        expected_words = ["$abc", "$efg", "$hij"]
-        expected_freqs = [3, 1, 3]
-        self.assertListEqual(result["Word"].tolist(), expected_words)
-        self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
+        # Input 1: Testing with a sample date list
+        input_dates = ['2022-10-22', '2022-10-23', '2022-10-24', '2022-10-25']
+        expected_output = pd.Series([1, 1, 0, 0, 0, 1, 1], index=DAYS_OF_WEEK)
+        result = task_func(input_dates)
+        pd.testing.assert_series_equal(result, expected_output)
     def test_case_2(self):
-        text = "This is a test without dollar words."
-        result = task_func(text)
-        self.assertEqual(len(result), 0)
+        # Input 2: Testing with a list where all dates fall on a single weekday
+        input_dates = ['2022-10-24', '2022-10-31', '2022-11-07']
+        expected_output = pd.Series([3, 0, 0, 0, 0, 0, 0], index=DAYS_OF_WEEK)
+        result = task_func(input_dates)
+        pd.testing.assert_series_equal(result, expected_output)
     def test_case_3(self):
-        text = "$test1 $test2 $test1 $test3"
-        result = task_func(text)
-        expected_words = ["$test1", "$test2", "$test3"]
-        expected_freqs = [2, 1, 1]
-        self.assertListEqual(result["Word"].tolist(), expected_words)
-        self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
+        # Input 3: Testing with an empty list
+        input_dates = []
+        expected_output = pd.Series([0, 0, 0, 0, 0, 0, 0], index=DAYS_OF_WEEK)
+        result = task_func(input_dates)
+        pd.testing.assert_series_equal(result, expected_output)
     def test_case_4(self):
-        text = "$! $$ $a $a $a"
-        result = task_func(text)
-        expected_words = ["$a"]
-        expected_freqs = [3]
-        self.assertListEqual(result["Word"].tolist(), expected_words)
-        self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
+        # Input 4: Testing with a mixed list of dates
+        input_dates = ['2022-01-01', '2022-02-14', '2022-03-17', '2022-12-31']
+        expected_output = pd.Series([1, 0, 0, 1, 0, 2, 0], index=DAYS_OF_WEEK)
+        result = task_func(input_dates)
+        pd.testing.assert_series_equal(result, expected_output)
     def test_case_5(self):
-        text = "$word1 word2 $word2 $word1 $word3 $word1"
-        result = task_func(text)
-        expected_words = ["$word1", "$word2", "$word3"]
-        expected_freqs = [3, 1, 1]
-        self.assertListEqual(result["Word"].tolist(), expected_words)
-        self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
-    def test_case_6(self):
-        '''empty input string'''
-        text = ""
-        result = task_func(text)
-        expected_words = []
-        expected_freqs = []
-        self.assertListEqual(result["Word"].tolist(), expected_words)
-        self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
-    
-    def test_case_7(self):
-        '''check for correct return type'''
-        text = "$test 123 abcd.aef"
-        result = task_func(text)
-        self.assertTrue(isinstance(result, pd.DataFrame))
-        self.assertTrue('Word' in result.columns)
-        self.assertTrue('Frequency' in result.columns)
-    def test_case_8(self):
-        '''word with $ in the middle'''
-        text = "asdfj;alskdfj;$kjhkjhdf"
-        result = task_func(text)
-        expected_words = []
-        expected_freqs = []
-        self.assertListEqual(result["Word"].tolist(), expected_words)
-        self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
-    def test_case_9(self):
-        '''non string input'''
-        input = 24
-        self.assertRaises(Exception, task_func, input)
+        # Input 5: Testing with dates spanning multiple weeks
+        input_dates = ['2022-01-01', '2022-01-02', '2022-01-03', '2022-01-04', '2022-01-05', '2022-01-06', '2022-01-07']
+        expected_output = pd.Series([1, 1, 1, 1, 1, 1, 1], index=DAYS_OF_WEEK)
+        result = task_func(input_dates)
+        pd.testing.assert_series_equal(result, expected_output)

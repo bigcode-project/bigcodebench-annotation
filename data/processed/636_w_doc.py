@@ -1,70 +1,97 @@
-import pickle
-import os
+# Importing the required libraries
+import re
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from nltk.corpus import stopwords
 
-# Constants
-FILE_NAME = 'save.pkl'
 
-def task_func(dt):
+def task_func(text, n=2):
     """
-    Save the date time object "dt" in the pickle file "save.pkl" and then read it back for validation.
+    Analyzes a text string, removing duplicate consecutive words and stopwords defined by nltk.corpus,
+    generates a square co-occurrence matrix of words, and plots this matrix.
 
     Parameters:
-    - dt (datetime): The datetime object to be saved.
+    - text (str): Input text to be analyzed.
+    - n (int, optional): Size of n-grams for the co-occurrence matrix. Defaults to 2.
 
     Returns:
-    - loaded_dt (datetime): The loaded datetime object from 'save.pkl'.
+    - tuple:
+        - pd.DataFrame: Square co-occurrence matrix of words.
+        - matplotlib.axes.Axes: Plot object of the co-occurrence matrix.
 
     Requirements:
-    - pickle
-    - os
+        - re
+        - pandas
+        - matplotlib.pyplot
+        - numpy
+        - sklearn.feature_extraction.text
+        - nltk.corpus
 
     Example:
-    >>> dt = datetime.now(pytz.UTC)
-    >>> loaded_dt = task_func(dt)
-    >>> assert dt == loaded_dt
+    >>> import matplotlib
+    >>> text = "hello hello world world"
+    >>> df, ax = task_func(text, n=2)
+    >>> df.columns.tolist()
+    ['hello world']
+    >>> df.index.tolist()
+    ['hello world']
+    >>> df.iloc[0, 0]
+    0
+    >>> isinstance(ax, matplotlib.axes.Axes)
+    True
     """
-    with open(FILE_NAME, 'wb') as file:
-        pickle.dump(dt, file)
-    with open(FILE_NAME, 'rb') as file:
-        loaded_dt = pickle.load(file)
-    os.remove(FILE_NAME)
-    return loaded_dt
+    text = re.sub(r'\b(\w+)( \1\b)+', r'\1', text)
+    stop_words = set(stopwords.words('english'))
+    words_filtered = ' '.join([word for word in text.lower().split() if word not in stop_words])
+    if not words_filtered.strip():
+        empty_df = pd.DataFrame()
+        fig, ax = plt.subplots()
+        return empty_df, ax
+    vectorizer = CountVectorizer(ngram_range=(n, n))
+    X = vectorizer.fit_transform([words_filtered])  # Ensure input is treated as a single document
+    matrix = (X.T * X).todense()
+    np.fill_diagonal(matrix, 0)
+    feature_names = vectorizer.get_feature_names_out() if hasattr(vectorizer,
+                                                                  'get_feature_names_out') else vectorizer.get_feature_names()
+    matrix_df = pd.DataFrame(matrix, index=feature_names, columns=feature_names)
+    fig, ax = plt.subplots()
+    cax = ax.matshow(matrix_df, cmap='hot')
+    fig.colorbar(cax)
+    ax.set_xticks(np.arange(len(matrix_df.columns)))
+    ax.set_yticks(np.arange(len(matrix_df.index)))
+    ax.set_xticklabels(matrix_df.columns, rotation=90)
+    ax.set_yticklabels(matrix_df.index)
+    return matrix_df, ax
 
 import unittest
-from datetime import datetime
-import pytz
 class TestCases(unittest.TestCase):
-    def test_datetime_saving_and_loading(self):
-        # Test saving and loading the current datetime with UTC timezone
-        dt = datetime.now(pytz.UTC)
-        loaded_dt = task_func(dt)
-        self.assertEqual(dt, loaded_dt, "The loaded datetime object should match the original")
-    def test_timezone_awareness(self):
-        # Test saving and loading a timezone-aware datetime object
-        tz = pytz.timezone('Asia/Tokyo')
-        dt = datetime.now(tz)
-        loaded_dt = task_func(dt)
-        self.assertEqual(dt, loaded_dt, "The loaded datetime object should be timezone aware and match the original")
-    def test_file_cleanup(self):
-        # Test whether the pickle file is properly cleaned up
-        dt = datetime.now(pytz.UTC)
-        task_func(dt)
-        self.assertFalse(os.path.exists(FILE_NAME), "The pickle file should be cleaned up after loading")
-    def test_naive_datetime(self):
-        # Test saving and loading a naive datetime object
-        dt = datetime.now()
-        loaded_dt = task_func(dt)
-        self.assertEqual(dt, loaded_dt, "The loaded datetime object should match the original naive datetime")
-        self.assertIsNone(loaded_dt.tzinfo, "The loaded datetime object should be naive (no timezone)")
-    def test_different_timezones(self):
-        # Test saving and loading datetime objects with different timezones
-        tz1 = pytz.timezone('US/Eastern')
-        tz2 = pytz.timezone('Europe/London')
-        dt1 = datetime.now(tz1)
-        dt2 = datetime.now(tz2)
-        loaded_dt1 = task_func(dt1)
-        loaded_dt2 = task_func(dt2)
-        self.assertEqual(dt1, loaded_dt1, "The loaded datetime object should match the original (US/Eastern)")
-        self.assertEqual(dt2, loaded_dt2, "The loaded datetime object should match the original (Europe/London)")
-        self.assertEqual(dt1.tzinfo, loaded_dt1.tzinfo, "The loaded datetime object should have the same timezone (US/Eastern)")
-        self.assertEqual(dt2.tzinfo, loaded_dt2.tzinfo, "The loaded datetime object should have the same timezone (Europe/London)")
+    def test_simple_text(self):
+        """Test with a simple text."""
+        text = "hello world"
+        matrix, _ = task_func(text)
+        self.assertEqual(matrix.shape, (1, 1), "Matrix shape should be (1, 1) for unique words 'hello' and 'world'.")
+    def test_text_with_stopwords(self):
+        """Test text with stopwords removed."""
+        text = "this is a"
+        matrix, _ = task_func(text)
+        self.assertTrue(matrix.empty, "Matrix should be empty after removing stopwords.")
+    def test_duplicate_words(self):
+        """Test text with duplicate consecutive words."""
+        text = "happy happy joy joy"
+        matrix, _ = task_func(text)
+        self.assertIn('happy joy', matrix.columns, "Matrix should contain 'happy joy' after duplicates are removed.")
+    def test_ngram_range(self):
+        """Test with a specific n-gram range."""
+        text = "jump high and run fast"
+        # Assuming no preprocessing that removes words, we expect 3 unique tri-grams.
+        matrix, _ = task_func(text, n=3)
+        # Expecting a 3x3 matrix since there are 3 unique tri-grams with no overlap in this simple case.
+        self.assertEqual(matrix.shape, (2, 2),
+                         "Matrix shape should be (3, 3) for a tri-gram analysis without word removal.")
+    def test_empty_text(self):
+        """Test with an empty string."""
+        text = ""
+        matrix, _ = task_func(text)
+        self.assertTrue(matrix.empty, "Matrix should be empty for an empty string.")

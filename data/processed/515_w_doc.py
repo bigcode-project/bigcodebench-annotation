@@ -1,65 +1,108 @@
-from itertools import combinations
-from random import sample
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
-def task_func(df, tuples, n_plots):
+def task_func(array):
     """
-    Removes rows from a DataFrame based on a list of tuples, each representing row values to match and remove.
-    Generates up to 'n_plots' scatter plots for random combinations of two columns from the remaining DataFrame.
+    Create a Pandas DataFrame from a 2D list and plot the sum of each column.
 
     Parameters:
-    - df (pd.DataFrame): The input DataFrame.
-    - tuples (list): A list of tuples, where each tuple contains values that, if matched, should result in the row being removed.
-    - n_plots (int): The maximum number of scatter plots to generate from the remaining data.
+    array (list of list of int): The 2D list representing the data.
 
     Returns:
-    - pd.DataFrame: The DataFrame after specified rows have been removed.
-    - list: A list of tuples, each containing a pair of column names used for the plot and the corresponding plot object.
+    DataFrame, Axes: A pandas DataFrame with the data and a matplotlib Axes object showing the sum of each column.
 
     Requirements:
-    - random
-    - itertools
+    - pandas
+    - matplotlib.pyplot
+
+    Internal Constants:
+    COLUMNS: List of column names used for the DataFrame ['A', 'B', 'C', 'D', 'E']
 
     Example:
-    >>> import numpy as np, pandas as pd
-    >>> df = pd.DataFrame(np.random.rand(10, 5), columns=['A', 'B', 'C', 'D', 'E'])
-    >>> tuples = [(0.1, 0.2, 0.3, 0.4, 0.5)]
-    >>> modified_df, plots = task_func(df, tuples, 3)
+    >>> df, ax = task_func([[1,2,3,4,5], [6,7,8,9,10]])
+    >>> print(df)
+       A  B  C  D   E
+    0  1  2  3  4   5
+    1  6  7  8  9  10
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    COLUMNS = ['A', 'B', 'C', 'D', 'E']
-    df = df.set_index(list('ABCDE')).drop(tuples, errors='ignore').reset_index()
-    plots = []
-    possible_combinations = list(combinations(COLUMNS, 2))
-    for _ in range(min(n_plots, len(possible_combinations))):
-        selected_columns = sample(possible_combinations, 1)[0]
-        possible_combinations.remove(selected_columns)
-        ax = df.plot.scatter(x=selected_columns[0], y=selected_columns[1])
-        plots.append((selected_columns, ax))
-    return df, plots
+    COLUMNS = ["A", "B", "C", "D", "E"]
+    df = pd.DataFrame(array, columns=COLUMNS)
+    sums = df.sum()
+    fig, ax = plt.subplots()
+    sums.plot(kind="bar", ax=ax)
+    return df, ax
 
 import unittest
-import pandas as pd
-import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
     def test_case_1(self):
-        tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-        modified_df, _ = task_func(self.df, tuples, 3)
-        self.assertFalse(any(modified_df.apply(tuple, axis=1).isin(tuples)))
+        df, ax = task_func([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+        self.assertEqual(df.values.tolist(), [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+        self.assertEqual(df.columns.tolist(), ["A", "B", "C", "D", "E"])
+        self.assertTrue(isinstance(ax, plt.Axes))
     def test_case_2(self):
-        n_plots = 4
-        _, plots = task_func(self.df, [], n_plots)
-        self.assertEqual(len(plots), n_plots)
+        df, ax = task_func(
+            [[10, 20, 30, 40, 50], [15, 25, 35, 45, 55], [5, 15, 25, 35, 45]]
+        )
+        self.assertEqual(
+            df.values.tolist(),
+            [[10, 20, 30, 40, 50], [15, 25, 35, 45, 55], [5, 15, 25, 35, 45]],
+        )
+        self.assertTrue(isinstance(ax, plt.Axes))
     def test_case_3(self):
-        _, plots = task_func(self.df, [], 5)
-        selected_columns = [plot[0] for plot in plots]
-        self.assertTrue(len(selected_columns) == len(set(tuple(item) for item in selected_columns)))
+        # Test handling uniform data
+        df, ax = task_func([[1, 1, 1, 1, 1]])
+        self.assertEqual(df.values.tolist(), [[1, 1, 1, 1, 1]])
+        self.assertTrue(isinstance(ax, plt.Axes))
     def test_case_4(self):
-        modified_df, plots = task_func(self.df, [], 2)
-        self.assertEqual(len(modified_df), len(self.df))
-        self.assertEqual(len(plots), 2)
+        # Test handling all zero
+        df, ax = task_func([[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]])
+        self.assertEqual(df.values.tolist(), [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]])
+        self.assertTrue(isinstance(ax, plt.Axes))
     def test_case_5(self):
-        tuples = [(101, 202, 303, 404, 505), (606, 707, 808, 909, 1000)]
-        modified_df, _ = task_func(self.df, tuples, 3)
-        self.assertEqual(len(modified_df), len(self.df))
+        # Handle negatives
+        df, ax = task_func([[-1, -2, -3, -4, -5], [1, 2, 3, 4, 5]])
+        self.assertEqual(df.values.tolist(), [[-1, -2, -3, -4, -5], [1, 2, 3, 4, 5]])
+        self.assertTrue(isinstance(ax, plt.Axes))
+    def test_case_6(self):
+        # Handle empty
+        df, ax = task_func([])
+        self.assertEqual(df.values.tolist(), [])
+        self.assertTrue(isinstance(ax, plt.Axes))
+    def test_case_7(self):
+        # Handle invalid input
+        with self.assertRaises(TypeError):
+            task_func([["a", "b", "c", "d", "e"]])
+    def test_case_8(self):
+        # Handle large numbers
+        df, _ = task_func([[1000000, 2000000, 3000000, 4000000, 5000000]])
+        self.assertTrue(
+            all(
+                df.sum()
+                == pd.Series(
+                    [1000000, 2000000, 3000000, 4000000, 5000000],
+                    index=["A", "B", "C", "D", "E"],
+                )
+            )
+        )
+    def test_case_9(self):
+        # Test plot details
+        _, ax = task_func([[1, 2, 3, 4, 5]])
+        self.assertEqual(len(ax.patches), 5)  # Checks if there are exactly 5 bars
+        bar_labels = [bar.get_x() for bar in ax.patches]
+        self.assertEqual(len(bar_labels), 5)
+    def test_case_10(self):
+        # Test column sums with plot check
+        data = [[1, 2, 3, 4, 5], [5, 4, 3, 2, 1], [2, 3, 4, 5, 6]]
+        df, ax = task_func(data)
+        column_sums = df.sum().tolist()
+        bar_heights = [bar.get_height() for bar in ax.patches]
+        self.assertEqual(column_sums, bar_heights)
+        self.assertEqual(
+            len(ax.patches), len(data[0])
+        )  # Ensure there's a bar for each column
+    def tearDown(self):
+        plt.close("all")

@@ -1,62 +1,49 @@
-import subprocess
-import random
+from datetime import datetime
+import pytz
+from dateutil.parser import parse
 
-# Constants
-SCRIPTS = ['script1.sh', 'script2.sh', 'script3.sh']
-SCRIPTS_DIR = '/path/to/scripts'  
 
-def task_func():
+def task_func(date_str, tz_str):
     """
-    Run a random bash script from a list of scripts.
+    Determine the time in seconds until the next turn of the year in a certain time zone from a given date string.
 
     Parameters:
-    - None
+    - date_str (str): The date string in "yyyy-mm-dd hh:mm:ss" format.
+    - tz_str (str): The IANA timezone string (e.g., 'America/Chicago').
 
     Returns:
-    - script (str): The full path of the script that was executed.
+    - int: The time in seconds until the next New Year in the specified timezone.
 
     Requirements:
-    - subprocess
-    - random
+    - datetime
+    - dateutil.parser
+    - pytz
 
     Example:
-    >>> task_func()
+    >>> type(task_func('2022-10-22 11:59:59', 'America/Chicago'))
+    <class 'int'>
     """
-    script_name = random.choice(SCRIPTS)
-    script_path = os.path.join(SCRIPTS_DIR, script_name)  # Generate the full path
-    subprocess.call(script_path, shell=True)
-    return script_path  # Return the full path
+    tz = pytz.timezone(tz_str)
+    given_date = parse(date_str).astimezone(tz)  # Correctly handle timezone conversion
+    next_year = given_date.year + 1
+    new_year = tz.localize(datetime(next_year, 1, 1, 0, 0, 0))  # Correctly create the New Year moment in the specified timezone
+    time_until_new_year = new_year - given_date
+    return int(time_until_new_year.total_seconds())
 
 import unittest
-from unittest.mock import patch, MagicMock
-import subprocess
-import os
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.temp_dir = '/path/to/scripts'
-        self.scripts_full_path = [os.path.join(self.temp_dir, script) for script in SCRIPTS]
-        self.patcher = patch('subprocess.call', return_value=0)
-        self.mock_subprocess_call = self.patcher.start()
-    def tearDown(self):
-        self.patcher.stop()
-    def test_script_execution(self):
-        # Test that the selected script is actually executed
-        script_name = task_func()
-        self.mock_subprocess_call.assert_called_with(script_name, shell=True)
-        # Check if the script is called with the correct base name (only the script name, not full path)
-        called_script_name = os.path.basename(self.mock_subprocess_call.call_args[0][0])
-        self.assertIn(called_script_name, SCRIPTS)  # SCRIPTS only contains the base names like 'script1.sh'
-    def test_random_script_selection(self):
-        executions = {task_func() for _ in range(10)}
-        self.assertTrue(len(executions) > 1, "Script selection is not random.")
-    def test_script_execution_failure_handling(self):
-        with patch('subprocess.call', side_effect=Exception("Failed to execute")):
-            with self.assertRaises(Exception):
-                task_func()
-    def test_full_path_execution(self):
-        script_name = task_func()
-        self.mock_subprocess_call.assert_called_with(script_name, shell=True)  # Expect the base name
-    def test_environment_variables(self):
-        with patch.dict(os.environ, {'MY_VAR': '123'}, clear=True):
-            task_func()
-            self.assertEqual(os.environ['MY_VAR'], '123')
+    def test_time_until_new_year(self):
+        # Test with a specific date and timezone
+        self.assertIsInstance(task_func('2023-12-31 23:59:59', 'UTC'), int)
+    def test_start_of_year(self):
+        # Test exactly at the start of a year
+        self.assertIsInstance(task_func('2023-01-01 00:00:00', 'UTC'), int)
+    def test_leap_year(self):
+        # Test a date in a leap year
+        self.assertIsInstance(task_func('2024-02-29 00:00:00', 'UTC'), int)
+    def test_different_timezone(self):
+        # Test with a non-UTC timezone
+        self.assertIsInstance(task_func('2023-12-31 23:59:59', 'America/New_York'), int)
+    def test_midyear(self):
+        # Test a date in the middle of the year
+        self.assertIsInstance(task_func('2023-06-15 12:00:00', 'UTC'), int)

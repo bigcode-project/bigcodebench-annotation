@@ -1,67 +1,59 @@
-import pandas as pd
-import numpy as np
+import itertools
+import collections
 
-# Constants
-COLUMNS = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
 
-def task_func(length):
+def task_func(elements, subset_size):
     """
-    Generate a Pandas DataFrame with specified length and random data and then record the data.
-
-    Parameters:
-    length (int): The length of the DataFrame to be generated.
+    Generate all 2-element subsets of a tuple and count the occurrences of each sum in the subsets.
 
     Returns:
-    DataFrame: A pandas DataFrame with random data.
+    dict: A dictionary with the sums and their counts.
 
     Requirements:
-    - pandas
-    - numpy
-
+    - itertools
+    - random
+    - collections
+    
+    
     Example:
-    >>> np.random.seed(0)
-    >>> df = task_func(5)
-    >>> df.shape
-    (5, 5)
+    >>> dict(task_func((1, 2, 3, 4, 5), 2))
+    {3: 1, 4: 1, 5: 2, 6: 2, 7: 2, 8: 1, 9: 1}
     """
-    data = np.random.randint(0,100,size=(length, len(COLUMNS)))
-    df = pd.DataFrame(data, columns=COLUMNS)
-    return df
+    combinations = list(itertools.combinations(elements, subset_size))
+    sums = [sum(combination) for combination in combinations]
+    return collections.Counter(sums)
 
 import unittest
-import pandas as pd
-import numpy as np
+from collections import Counter
+import doctest
 class TestCases(unittest.TestCase):
-    
     def test_case_1(self):
-        # Testing basic functionality
-        np.random.seed(0)
-        df = task_func(5)
-        self.assertIsInstance(df, pd.DataFrame, "Output should be a DataFrame.")
-        self.assertEqual(df.shape, (5, 5), "DataFrame shape mismatch.")
-        
+        # Test with a tuple of positive integers and subset_size of 2
+        elements = (1, 2, 3, 4, 5)
+        subset_size = 2
+        expected_result = Counter({3: 1, 4: 1, 5: 2, 6: 2, 7: 2, 8: 1, 9: 1})
+        self.assertEqual(task_func(elements, subset_size), expected_result)
     def test_case_2(self):
-        # Testing custom columns
-        np.random.seed(0)
-        custom_columns = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
-        df = task_func(3)
-        self.assertListEqual(list(df.columns), custom_columns, "Column names mismatch.")
-        
+        # Test with a tuple containing negative, positive and zero integers and subset_size of 3
+        elements = (-3, -2, 0, 2, 3, 5)
+        subset_size = 3
+        expected_result = Counter({0: 3, 5: 3, 2: 2, 3: 2, -5: 1, -3: 1, -2: 1, -1: 1, 4: 1, 1: 1, 6: 1, 7: 1, 8: 1, 10: 1})
+        self.assertEqual(task_func(elements, subset_size), expected_result)
     def test_case_3(self):
-        # Testing return plot
-        np.random.seed(0)
-        df = task_func(4)
-        self.assertIsInstance(df, pd.DataFrame, "Output should be a DataFrame.")
-        
+        # Test with a tuple of positive integers and subset_size of 1
+        elements = (1, 2, 3, 4, 5)
+        subset_size = 1
+        expected_result = Counter({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
+        self.assertEqual(task_func(elements, subset_size), expected_result)
     def test_case_4(self):
-        # Testing data range
-        np.random.seed(0)
-        df = task_func(10)
-        self.assertTrue((df.values >= 0).all() and (df.values < 100).all(), "Data values should be between 0 and 99.")
-        
+        # Test with an empty tuple
+        elements = ()
+        subset_size = 2
+        expected_result = Counter()
+        self.assertEqual(task_func(elements, subset_size), expected_result)
     def test_case_5(self):
-        # Testing default columns
-        np.random.seed(0)
-        df = task_func(7)
-        default_columns = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
-        self.assertListEqual(list(df.columns), default_columns, "Default column names mismatch.")
+        # Test with a subset_size greater than tuple length
+        elements = (1, 2, 3)
+        subset_size = 5
+        expected_result = Counter()
+        self.assertEqual(task_func(elements, subset_size), expected_result)

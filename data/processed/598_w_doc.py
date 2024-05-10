@@ -1,105 +1,70 @@
-import math
 import pandas as pd
+import time
+# Constants
+LETTERS = list('abcdefghijklmnopqrstuvwxyz')
 
-def task_func(tuples_list):
+
+def task_func(data, letter):
     """
-    Given a list of tuples turn them into a Pandas DataFrame with math.sin applied to each number.
+    Filters rows in a dictionary where the 'Name' column values start with a specified letter.
+    First, convert the dict to a DataFrame and then filter rows in this DataFrame.
 
     Parameters:
-    - tuples_list (list): The list of tuples.
-    
+    - df (dic of list): The input dict. It should have a 'Name' key.
+    - letter (str): The letter to filter the 'Name' column by.
+
     Returns:
-    - df (DataFrame): A pandas DataFrame. Each row of df corresponds to a tuple from tuples_list, with the values being the sine of the original values in the tuple.
+    - pd.Series: A Series of filtered 'Name' column.
 
     Requirements:
-    - math
     - pandas
+    - time
 
     Example:
-    >>> df = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)])
-    >>> print(df)
-              0         1         2         3
-    0  0.841471  0.909297  0.141120 -0.756802
-    1 -0.958924 -0.279415  0.656987  0.989358
-    2  0.412118 -0.544021 -0.999990 -0.536573
+    >>> data = {'Name': ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Fiona']}
+    >>> filtered_names = task_func(data, 'a')
+    >>> filtered_names.index[0].startswith('A')
+    True
+    >>> len(filtered_names)
+    1
     """
-    df = pd.DataFrame([(math.sin(n) for n in t) for t in tuples_list])
-    return df
+    df = pd.DataFrame(data)
+    start_time = time.time()
+    regex = f'^{letter}'
+    filtered_df = df[df['Name'].str.contains(regex, case=False, regex=True)]
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
+    return filtered_df['Name'].value_counts()
 
+### Unit Tests
+from random import choice, randint
 import unittest
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        df = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)])
-        self.assertEqual(df.shape, (3, 4))
-        self.assertEqual(df.iloc[0, 0], math.sin(1))
-        self.assertEqual(df.iloc[0, 1], math.sin(2))
-        self.assertEqual(df.iloc[0, 2], math.sin(3))
-        self.assertEqual(df.iloc[0, 3], math.sin(4))
-        self.assertEqual(df.iloc[1, 0], math.sin(5))
-        self.assertEqual(df.iloc[1, 1], math.sin(6))
-        self.assertEqual(df.iloc[1, 2], math.sin(7))
-        self.assertEqual(df.iloc[1, 3], math.sin(8))
-        self.assertEqual(df.iloc[2, 0], math.sin(9))
-        self.assertEqual(df.iloc[2, 1], math.sin(10))
-        self.assertEqual(df.iloc[2, 2], math.sin(11))
-        self.assertEqual(df.iloc[2, 3], math.sin(12))
-    def test_case_2(self):
-        df = task_func([(1, 2, 3, 4)])
-        self.assertEqual(df.shape, (1, 4))
-        self.assertEqual(df.iloc[0, 0], math.sin(1))
-        self.assertEqual(df.iloc[0, 1], math.sin(2))
-        self.assertEqual(df.iloc[0, 2], math.sin(3))
-        self.assertEqual(df.iloc[0, 3], math.sin(4))
-    def test_case_3(self):
-        df = task_func([(1, 2, 3, 4), (5, 6, 7, 8)])
-        self.assertEqual(df.shape, (2, 4))
-        self.assertEqual(df.iloc[0, 0], math.sin(1))
-        self.assertEqual(df.iloc[0, 1], math.sin(2))
-        self.assertEqual(df.iloc[0, 2], math.sin(3))
-        self.assertEqual(df.iloc[0, 3], math.sin(4))
-        self.assertEqual(df.iloc[1, 0], math.sin(5))
-        self.assertEqual(df.iloc[1, 1], math.sin(6))
-        self.assertEqual(df.iloc[1, 2], math.sin(7))
-        self.assertEqual(df.iloc[1, 3], math.sin(8))
-    def test_case_4(self):
-        df = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12), (13, 14, 15, 16)])
-        self.assertEqual(df.shape, (4, 4))
-        self.assertEqual(df.iloc[0, 0], math.sin(1))
-        self.assertEqual(df.iloc[0, 1], math.sin(2))
-        self.assertEqual(df.iloc[0, 2], math.sin(3))
-        self.assertEqual(df.iloc[0, 3], math.sin(4))
-        self.assertEqual(df.iloc[1, 0], math.sin(5))
-        self.assertEqual(df.iloc[1, 1], math.sin(6))
-        self.assertEqual(df.iloc[1, 2], math.sin(7))
-        self.assertEqual(df.iloc[1, 3], math.sin(8))
-        self.assertEqual(df.iloc[2, 0], math.sin(9))
-        self.assertEqual(df.iloc[2, 1], math.sin(10))
-        self.assertEqual(df.iloc[2, 2], math.sin(11))
-        self.assertEqual(df.iloc[2, 3], math.sin(12))
-        self.assertEqual(df.iloc[3, 0], math.sin(13))
-        self.assertEqual(df.iloc[3, 1], math.sin(14))
-        self.assertEqual(df.iloc[3, 2], math.sin(15))
-        self.assertEqual(df.iloc[3, 3], math.sin(16))
-    def test_case_5(self):
-        df = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12), (13, 14, 15, 16), (17, 18, 19, 20)])
-        self.assertEqual(df.shape, (5, 4))
-        self.assertEqual(df.iloc[0, 0], math.sin(1))
-        self.assertEqual(df.iloc[0, 1], math.sin(2))
-        self.assertEqual(df.iloc[0, 2], math.sin(3))
-        self.assertEqual(df.iloc[0, 3], math.sin(4))
-        self.assertEqual(df.iloc[1, 0], math.sin(5))
-        self.assertEqual(df.iloc[1, 1], math.sin(6))
-        self.assertEqual(df.iloc[1, 2], math.sin(7))
-        self.assertEqual(df.iloc[1, 3], math.sin(8))
-        self.assertEqual(df.iloc[2, 0], math.sin(9))
-        self.assertEqual(df.iloc[2, 1], math.sin(10))
-        self.assertEqual(df.iloc[2, 2], math.sin(11))
-        self.assertEqual(df.iloc[2, 3], math.sin(12))
-        self.assertEqual(df.iloc[3, 0], math.sin(13))
-        self.assertEqual(df.iloc[3, 1], math.sin(14))
-        self.assertEqual(df.iloc[3, 2], math.sin(15))
-        self.assertEqual(df.iloc[3, 3], math.sin(16))
-        self.assertEqual(df.iloc[4, 0], math.sin(17))
-        self.assertEqual(df.iloc[4, 1], math.sin(18))
-        self.assertEqual(df.iloc[4, 2], math.sin(19))
-        self.assertEqual(df.iloc[4, 3], math.sin(20))
+    def setUp(self):
+        """Generate a DataFrame for testing."""
+        self.df = {'Name': [choice(LETTERS) + 'name' + str(randint(1, 100)) for _ in range(100)]}
+    def test_filter_letter_a(self):
+        """Test filtering by letter 'a'."""
+        result = task_func(self.df, 'a')
+        all_start_with_a = all(name.startswith('a') for name in result.index)
+        self.assertTrue(all_start_with_a)
+    def test_filter_returns_series(self):
+        """Test that the function returns a pandas Series."""
+        result = task_func(self.df, 'b')
+        self.assertIsInstance(result, pd.Series)
+    def test_series_sorted_by_value_counts(self):
+        """Test that the Series is sorted by value counts."""
+        result = task_func(self.df, 'c')
+        self.assertTrue(result.equals(result.sort_values(ascending=False)))
+    def test_nonexistent_letter(self):
+        """Test filtering by a letter not present."""
+        # Use a fixed DataFrame with known values that do not start with 'z'
+        df = pd.DataFrame({'Name': ['Apple', 'Banana', 'Cherry', 'Date']})
+        result = task_func(df, 'z')
+        # Expecting the length of the result to be 0 since no names start with 'z'
+        self.assertEqual(len(result), 0)
+    def test_case_insensitivity(self):
+        """Test case insensitivity of the filter."""
+        df = pd.DataFrame({'Name': ['Apple', 'apple', 'banana', 'Banana']})
+        result = task_func(df, 'a')
+        self.assertEqual(sum(result), 2)

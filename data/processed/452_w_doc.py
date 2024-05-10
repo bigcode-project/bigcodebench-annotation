@@ -1,64 +1,107 @@
-from collections import OrderedDict
-from prettytable import PrettyTable
+import numpy as np
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
-def task_func(my_dict):
+def task_func(n_components=2, N_SAMPLES=500, N_FEATURES=50, random_seed=None):
     """
-    Sorts a given dictionary by its keys in ascending order and returns a PrettyTable object displaying the sorted items with the names 'Key' and 'Value'.
+    Generate a high-dimensional dataset, run PCA to reduce its dimensionality, and then draw a heatmap of
+    the covariance matrix of the transformed data.
 
     Parameters:
-    my_dict (dict): The dictionary to be sorted and displayed.
+    n_components (int, optional): The number of components for PCA. Defaults to 2.
+    N_SAMPLES (int, optional): Number of samples in the dataset. Defaults to 500.
+    N_FEATURES (int, optional): Number of features in the dataset. Defaults to 50.
+    random_seed (int, optional): Seed for the numpy and sklearn random number generator. Defaults to None.
 
     Returns:
-    PrettyTable: A PrettyTable object representing the sorted dictionary.
+    tuple:
+        transformed_data (ndarray): The transformed data of shape (N_SAMPLES, n_components).
+        heatmap_axes (Axes): The heatmap of the covariance matrix of the transformed data or None if n_components=1.
 
     Requirements:
-    - collections.OrderedDict
-    - prettytable.PrettyTable
+    - numpy
+    - sklearn.decomposition.PCA
+    - matplotlib.pyplot
+    - seaborn
 
-    Examples:
-    Display a simple dictionary in a sorted table format.
-    >>> table = task_func({3: 'apple', 1: 'banana', 2: 'cherry'})
-    >>> str(table).startswith('+') and 'banana' in str(table)
-    True
-
-    Display an empty dictionary.
-    >>> str(task_func({})).startswith('+')
-    True
+    Example:
+    >>> transformed, ax = task_func(n_components=2, random_seed=42)
+    >>> transformed.shape
+    (500, 2)
     """
-    ordered_dict = OrderedDict(sorted(my_dict.items(), key=lambda t: t[0]))
-    table = PrettyTable(['Key', 'Value'])
-    for key, value in ordered_dict.items():
-        table.add_row([key, value])
-    return table
+    np.random.seed(random_seed)  # Ensuring reproducibility
+    X = np.random.rand(N_SAMPLES, N_FEATURES)
+    pca = PCA(n_components=n_components, random_state=random_seed)
+    X_transformed = pca.fit_transform(X)
+    if n_components == 1:
+        return X_transformed, None
+    fig, ax = plt.subplots(figsize=(10, 7))
+    sns.heatmap(np.cov(X_transformed.T), annot=True, fmt=".2f", ax=ax)
+    return X_transformed, ax
 
 import unittest
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
 class TestCases(unittest.TestCase):
-    def test_sort_and_display_dict(self):
-        my_dict = {3: 'apple', 1: 'banana', 2: 'cherry'}
-        table = task_func(my_dict)
-        expected_header = '+-----+--------+'
-        self.assertIn(expected_header, str(table))
-        self.assertIn('banana', str(table))
-    def test_empty_dict(self):
-        table = task_func({})
-        expected_header = '+-----+-------+'
-        self.assertIn(expected_header, str(table))
-    def test_single_element_dict(self):
-        my_dict = {1: 'single'}
-        table = task_func(my_dict)
-        self.assertIn('single', str(table))
-    def test_non_string_values(self):
-        my_dict = {1: 100, 2: 200.5}
-        table = task_func(my_dict)
-        self.assertIn('100', str(table))
-        self.assertIn('200.5', str(table))
-    def test_string_keys(self):
-        my_dict = {'a': 'apple', 'b': 'banana'}
-        table = task_func(my_dict)
-        self.assertIn('apple', str(table))
-        self.assertIn('banana', str(table))
-    def test_large_dict(self):
-        my_dict = {i: str(i) for i in range(1000)}
-        table = task_func(my_dict)
-        self.assertEqual(len(table._rows), 1000)
+    def setUp(self):
+        self.seed = 42
+        # default parameters
+        self.n_components = 2
+        self.N_SAMPLES = 500
+        self.N_FEATURES = 50
+    def test_case_1(self):
+        # Test basic functionality - results
+        transformed_data, _ = task_func()
+        self.assertEqual(transformed_data.shape, (self.N_SAMPLES, self.n_components))
+        np.random.seed(self.seed)
+        X = np.random.rand(self.N_SAMPLES, self.N_FEATURES)
+        pca = PCA(n_components=self.n_components, random_state=self.seed)
+        pca.fit(X)
+        self.assertTrue(np.sum(pca.explained_variance_ratio_) <= 1)
+    def test_case_2(self):
+        # Test basic functionality - visualization
+        _, heatmap_axes = task_func()
+        self.assertIsNotNone(heatmap_axes)
+        self.assertIsInstance(heatmap_axes, plt.Axes)
+        self.assertEqual(len(heatmap_axes.get_xticklabels()), 2)
+        self.assertEqual(len(heatmap_axes.get_yticklabels()), 2)
+    def test_case_3(self):
+        # Test n_components
+        for n_components in [1, 10, self.N_FEATURES]:
+            transformed_data, _ = task_func(
+                n_components=n_components, N_FEATURES=self.N_FEATURES
+            )
+            self.assertEqual(transformed_data.shape, (self.N_SAMPLES, n_components))
+    def test_case_4(self):
+        # Test N_SAMPLES
+        for n_samples in [self.n_components, 10, 50, 100]:
+            transformed_data, _ = task_func(N_SAMPLES=n_samples)
+            self.assertEqual(transformed_data.shape, (n_samples, self.n_components))
+    def test_case_5(self):
+        # Test N_FEATURES
+        for n_features in [self.n_components, 10, 50, 100]:
+            transformed_data, _ = task_func(N_FEATURES=n_features)
+            self.assertEqual(
+                transformed_data.shape, (self.N_SAMPLES, self.n_components)
+            )
+    def test_case_6(self):
+        # Test random_seed
+        transformed_data1, _ = task_func(random_seed=self.seed)
+        transformed_data2, _ = task_func(random_seed=self.seed)
+        np.testing.assert_array_equal(transformed_data1, transformed_data2)
+        transformed_data2, _ = task_func(random_seed=0)
+        with self.assertRaises(AssertionError):
+            np.testing.assert_array_equal(transformed_data1, transformed_data2)
+    def test_case_7(self):
+        # Function should fail at invalid values
+        with self.assertRaises(ValueError):
+            # negative n_components
+            task_func(n_components=-1)
+        with self.assertRaises(ValueError):
+            # more components than features
+            task_func(n_components=self.N_FEATURES + 10, N_FEATURES=self.N_FEATURES)
+    def tearDown(self):
+        plt.close("all")

@@ -1,67 +1,99 @@
-import numpy as np
 import pandas as pd
+from scipy.stats import zscore
+import matplotlib.pyplot as plt
 
-# Constants
-COLUMNS = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
-
-def task_func(length, min_value = 0, max_value = 100):
+def task_func(df):
     """
-    Randomly generate a pandas DataFrame with specified ranges and length, and calculate the cumulative distribution function (CDF).
+    Processes a pandas DataFrame with 'Date' and 'Value' columns. The 'Value' column contains lists of numbers. 
+    Converts 'Date' to datetime, splits 'Value' lists into separate columns, calculates Z-scores, 
+    and creates a box plot for Z-scores over time.
 
     Parameters:
-    length (int): The length of the DataFrame to be generated.
-    min_value (int, optional): The minimum value for random data generation. Default is 0.
-    max_value (int, optional): The maximum value for random data generation. Default is 100.
+    df (DataFrame): A pandas DataFrame with two columns: 'Date' (date strings) and 'Value' (lists of numbers).
 
     Returns:
-    DataFrame: A pandas DataFrame with the calculated cumulative distribution function (CDF).
+    DataFrame: With original 'Value' lists split into separate columns and replaced with Z-scores.
+    Figure: A matplotlib figure of a box plot of Z-scores over time.
 
     Note:
-    - DataFrame columns are defined by the COLUMNS constant.
+    - This function use "Z-Scores Over Time" for the plot title.
+    - This function use "Date" and "Z-Score" as the xlabel and ylabel respectively.
+
+    Raises:
+    - This function will raise KeyError if the DataFrame does not have the 'Date' and 'Value' columns.
 
     Requirements:
-    - numpy
     - pandas
+    - scipy.stats.zscore
     - matplotlib.pyplot
 
     Example:
-    >>> np.random.seed(0)
-    >>> cdf = task_func(100, 0, 1)
-    >>> print(len(cdf))
-    1
+    >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
+    >>> zscore_df, fig = task_func(df)
+    >>> print(zscore_df.shape)
+    (2, 4)
+    >>> plt.close()
     """
-    data = np.random.randint(min_value, max_value, size=(length, len(COLUMNS)))
-    df = pd.DataFrame(data, columns=COLUMNS)
-    df = df.apply(lambda x: x.value_counts().sort_index().cumsum())
-    return df
+    df['Date'] = pd.to_datetime(df['Date'])
+    df = pd.concat([df['Date'], df['Value'].apply(pd.Series)], axis=1)
+    df.iloc[:,1:] = df.iloc[:,1:].apply(zscore)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    df.set_index('Date').boxplot(ax=ax)
+    ax.set_title('Z-Scores Over Time')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Z-Score')
+    return df, fig
 
 import unittest
+import pandas as pd
+from faker import Faker
+import matplotlib.pyplot as plt
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        np.random.seed(0)
-        df = task_func(100, 0, 1)
-        self.assertEqual(df.shape[0], 1)
-        self.assertEqual(list(df.columns), ['Column1', 'Column2', 'Column3', 'Column4', 'Column5'])
-    def test_case_2(self):
-        np.random.seed(0)
-        min_value = 0
-        max_value = 1
-        length = 10
-        cdf = task_func(length, min_value, max_value)
-        self.assertEqual(cdf.iloc[0]['Column1'], 10)
-    def test_case_3(self):
-        np.random.seed(0)
-        df = task_func(100)
-        #self.assertEqual(df.shape[0], 100)
-        self.assertEqual(list(df.columns), ['Column1', 'Column2', 'Column3', 'Column4', 'Column5'])
-    def test_case_4(self):
-        np.random.seed(0)
-        df = task_func(100, 50, 100)
-        self.assertEqual(list(df.columns), ['Column1', 'Column2', 'Column3', 'Column4', 'Column5'])
-        for column in df.columns:
-            self.assertTrue(all(df[column].diff().dropna() >= 0))
-    def test_case_5(self):
-        np.random.seed(0)
-        df  = task_func(0)
-        self.assertEqual(df.shape[0], 0)
-        self.assertEqual(list(df.columns), ['Column1', 'Column2', 'Column3', 'Column4', 'Column5'])
+    def setUp(self):
+        self.fake = Faker()
+    
+    def test_empty_dataframe(self):
+        df = pd.DataFrame(columns=['Date', 'Value'])
+        with self.assertRaises(Exception):
+            task_func(df)
+        plt.close()
+    def test_typical_data(self):
+        df = pd.DataFrame([[self.fake.date(), [self.fake.random_number(digits=2) for _ in range(3)]] for _ in range(5)],
+                          columns=['Date', 'Value'])
+        zscore_df, fig = task_func(df)
+        self.assertEqual(zscore_df.shape, (5, 4))
+        self.assertIsInstance(fig, plt.Figure)
+        self.assertEqual(len(fig.axes), 1)
+        ax = fig.axes[0]
+        self.assertEqual(ax.get_title(), 'Z-Scores Over Time')
+        self.assertEqual(ax.get_xlabel(), 'Date')
+        self.assertEqual(ax.get_ylabel(), 'Z-Score')
+        plt.close()
+    def test_nan_values(self):
+        df = pd.DataFrame([['2021-01-01', [5, np.nan, 7]], ['2021-01-02', [np.nan, 9, 10]]], columns=['Date', 'Value'])
+        zscore_df, fig = task_func(df)
+        self.assertEqual(zscore_df.shape, (2, 4))
+        self.assertIsInstance(fig, plt.Figure)
+        plt.close()
+    def test_single_row_data(self):
+        df = pd.DataFrame([[self.fake.date(), [self.fake.random_number(digits=2) for _ in range(3)]]],
+                          columns=['Date', 'Value'])
+        zscore_df, fig = task_func(df)
+        self.assertEqual(zscore_df.shape, (1, 4))
+        self.assertIsInstance(fig, plt.Figure)
+        plt.close()
+    def test_non_numeric_values(self):
+        df = pd.DataFrame([[self.fake.date(), [self.fake.word() for _ in range(3)]] for _ in range(5)],
+                          columns=['Date', 'Value'])
+        with self.assertRaises(Exception):
+            task_func(df)
+        plt.close()
+    def test_large_dataset(self):
+        df = pd.DataFrame([[self.fake.date(), [self.fake.random_number(digits=2) for _ in range(10)]] for _ in range(100)],
+                          columns=['Date', 'Value'])
+        zscore_df, fig = task_func(df)
+        self.assertEqual(zscore_df.shape, (100, 11))
+        self.assertIsInstance(fig, plt.Figure)
+        plt.close()

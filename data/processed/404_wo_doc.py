@@ -1,92 +1,86 @@
-import xmltodict
-import json
+from PIL import Image, ImageFilter
+import cv2
+import numpy as np
+import os
 
-def task_func(s, save_json, json_file_path):
-    """ 
-    Converts an XML string into a dictionary representation and optionally saves it as a JSON file.
-
-    This function is useful for easily accessing data stored in XML format and saving it for future use.
+def task_func(img_path, blur_radius=5):
+    """
+    Open an RGB image from a specific path, apply a blur filter, convert it to grayscale, and then display both the original and the edited images side by side.
+    Returns numpy arrays representing both the original and the processed images.
 
     Parameters:
-    s (str): The XML string to be converted.
-    save_json (bool): Whether to save the parsed XML as a JSON file.
-    json_file_path (str): The file path to save the JSON file. Required if save_json is True.
+    - img_path (str): The path of the image file.
+    - blur_radius (int): The radius of the Gaussian blur filter. Default is 5.
 
     Returns:
-    dict: A dictionary representation of the XML string.
+    - tuple: A tuple containing two numpy arrays, the first representing the original image and 
+             the second representing the blurred and grayscaled image.
 
     Raises:
-    ValueError: If the input XML string is empty or contains only whitespace.
+    - FileNotFoundError: If the image file does not exist at the specified path.
 
     Requirements:
-    - xmltodict
-    - json
+    - PIL
+    - opencv-python
+    - numpy
+    - os
 
-    Examples:
-    Convert a simple XML string to a dictionary.
-    >>> result = task_func('<person><name>John</name><age>30</age></person>')
-    >>> result['person']['name'] + ', ' + result['person']['age']
-    'John, 30'
-
-    Convert an XML string with nested elements.
-    >>> result = task_func('<school><class><student>Emma</student></class></school>')
-    >>> result['school']['class']['student']
-    'Emma'
-
-    Save the parsed XML as a JSON file.
-    >>> task_func('<data><item>1</item><item>2</item></data>', save_json=True, json_file_path='data.json')
-    # A JSON file 'data.json' will be created with the parsed XML data.
+    Example:
+    >>> image_path = 'sample.png'
+    >>> create_dummy_image(image_path=image_path)
+    >>> original, processed = task_func(image_path)
+    >>> os.remove(image_path)
     """
-    if not s.strip():  # Check for empty or whitespace-only string
-        raise ValueError("The input XML string is empty or contains only whitespace.")
-    my_dict = xmltodict.parse(s)
-    if save_json and json_file_path:
-        with open(json_file_path, 'w') as json_file:
-            json.dump(my_dict, json_file, indent=4)
-    return my_dict
+    if not os.path.exists(img_path):
+        raise FileNotFoundError(f"No file found at {img_path}")
+    img = Image.open(img_path)
+    img = img.convert("RGB")
+    blurred_img = img.filter(ImageFilter.GaussianBlur(blur_radius))
+    grey_img = cv2.cvtColor(np.array(blurred_img), cv2.COLOR_RGB2GRAY)
+    return np.array(img), np.array(grey_img)
 
 import unittest
-import os
+import numpy as np
+from PIL import Image, ImageDraw
+def create_dummy_image(image_path='test_image.jpg', size=(10, 10)):
+    img = Image.new('RGB', size, color='white')
+    draw = ImageDraw.Draw(img)
+    draw.rectangle([2, 2, 8, 8], fill='black')
+    img.save(image_path)
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.json_file_path = 'test_output.json'
-    
-    def tearDown(self):
-        if os.path.exists(self.json_file_path):
-            os.remove(self.json_file_path)
-    def test_simple_xml_to_dict(self):
-        xml_str = '<person><name>John</name><age>30</age></person>'
-        result = task_func(xml_str, False, '')
-        self.assertEqual(result['person']['name'], 'John')
-        self.assertEqual(result['person']['age'], '30')
-    def test_nested_xml_to_dict(self):
-        xml_str = '<school><class><student>Emma</student></class></school>'
-        result = task_func(xml_str, False, '',)
-        self.assertEqual(result['school']['class']['student'], 'Emma')
-    def test_empty_xml_to_dict(self):
-        xml_str = '<empty></empty>'
-        result = task_func(xml_str, False, '')
-        self.assertTrue('empty' in result and result['empty'] is None or result['empty'] == '')
-    def test_attribute_xml_to_dict(self):
-        xml_str = '<book id="123">Python Guide</book>'
-        result = task_func(xml_str, False, '')
-        self.assertEqual(result['book']['@id'], '123')
-        self.assertEqual(result['book']['#text'], 'Python Guide')
-    def test_complex_xml_to_dict(self):
-        xml_str = '<family><person name="John"><age>30</age></person><person name="Jane"><age>28</age></person></family>'
-        result = task_func(xml_str, False, '')
-        self.assertEqual(result['family']['person'][0]['@name'], 'John')
-        self.assertEqual(result['family']['person'][0]['age'], '30')
-        self.assertEqual(result['family']['person'][1]['@name'], 'Jane')
-        self.assertEqual(result['family']['person'][1]['age'], '28')
-    def test_save_xml_to_json(self):
-        xml_str = '<data><item>1</item></data>'
-        task_func(xml_str, True, self.json_file_path,)
-        self.assertTrue(os.path.exists(self.json_file_path))
-        with open(self.json_file_path, 'r') as file:
-            data = file.read()
-            self.assertIn('1', data)
-    def test_empty_string_input(self):
-        xml_str = ''
-        with self.assertRaises(ValueError):
-            task_func(xml_str, False, '')
+    def setUp(cls):
+        create_dummy_image()
+    def tearDown(cls):
+        os.remove('test_image.jpg')
+    def test_normal_functionality(self):
+        original, processed = task_func('test_image.jpg')
+        self.assertIsInstance(original, np.ndarray)
+        self.assertIsInstance(processed, np.ndarray)
+        
+        original_img_list = original.tolist()
+        processed_img_list = processed.tolist()
+        
+        # self.assertTrue(np.array_equal(segmented_img_list, segment_expect), "The arrays should not be equal")
+        
+        with open('df_contents.txt', 'w') as file:
+            file.write(str(processed_img_list))
+            
+        expect_original = [[[255, 255, 255], [252, 252, 252], [251, 251, 251], [255, 255, 255], [255, 255, 255], [255, 255, 255], [249, 249, 249], [249, 249, 249], [255, 255, 255], [247, 247, 247]], [[242, 242, 242], [255, 255, 255], [241, 241, 241], [255, 255, 255], [255, 255, 255], [250, 250, 250], [255, 255, 255], [255, 255, 255], [233, 233, 233], [255, 255, 255]], [[255, 255, 255], [237, 237, 237], [4, 4, 4], [0, 0, 0], [0, 0, 0], [0, 0, 0], [12, 12, 12], [0, 0, 0], [23, 23, 23], [250, 250, 250]], [[255, 255, 255], [255, 255, 255], [0, 0, 0], [5, 5, 5], [10, 10, 10], [3, 3, 3], [7, 7, 7], [0, 0, 0], [0, 0, 0], [255, 255, 255]], [[253, 253, 253], [255, 255, 255], [8, 8, 8], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [17, 17, 17], [11, 11, 11], [255, 255, 255]], [[255, 255, 255], [255, 255, 255], [2, 2, 2], [0, 0, 0], [12, 12, 12], [15, 15, 15], [0, 0, 0], [0, 0, 0], [0, 0, 0], [246, 246, 246]], [[254, 254, 254], [255, 255, 255], [4, 4, 4], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [3, 3, 3], [16, 16, 16], [254, 254, 254]], [[253, 253, 253], [255, 255, 255], [0, 0, 0], [0, 0, 0], [12, 12, 12], [0, 0, 0], [11, 11, 11], [0, 0, 0], [0, 0, 0], [249, 249, 249]], [[255, 255, 255], [250, 250, 250], [4, 4, 4], [0, 0, 0], [0, 0, 0], [7, 7, 7], [0, 0, 0], [7, 7, 7], [13, 13, 13], [241, 241, 241]], [[248, 248, 248], [255, 255, 255], [230, 230, 230], [255, 255, 255], [255, 255, 255], [255, 255, 255], [244, 244, 244], [249, 249, 249], [241, 241, 241], [255, 255, 255]]]
+        
+        expect_processed = [[190, 188, 187, 186, 185, 183, 182, 182, 182, 182], [189, 187, 185, 184, 183, 181, 180, 180, 180, 180], [187, 185, 184, 182, 181, 179, 178, 178, 178, 178], [185, 184, 182, 180, 179, 178, 177, 177, 177, 177], [184, 182, 181, 179, 178, 176, 175, 175, 175, 176], [183, 181, 179, 178, 177, 175, 174, 174, 174, 174], [182, 180, 178, 177, 176, 174, 173, 173, 173, 174], [182, 180, 178, 176, 175, 174, 173, 173, 173, 173], [182, 180, 178, 176, 175, 174, 173, 173, 173, 173], [182, 180, 178, 176, 176, 174, 173, 173, 173, 174]]
+        self.assertTrue(np.array_equal(expect_processed, processed_img_list), "The arrays should not be equal")
+        self.assertTrue(np.array_equal(expect_original, original_img_list), "The arrays should not be equal")
+    def test_non_existent_file(self):
+        with self.assertRaises(FileNotFoundError):
+            task_func('non_existent.jpg')
+    def test_blur_effectiveness(self):
+        _, processed = task_func('test_image.jpg')
+        self.assertNotEqual(np.mean(processed), 255)  # Ensuring it's not all white
+    def test_returned_image_shapes(self):
+        original, processed = task_func('test_image.jpg')
+        self.assertEqual(original.shape, (10, 10, 3))
+        self.assertEqual(processed.shape, (10, 10))
+    def test_different_blur_radius(self):
+        _, processed_default = task_func('test_image.jpg')
+        _, processed_custom = task_func('test_image.jpg', blur_radius=10)
+        self.assertFalse(np.array_equal(processed_default, processed_custom))

@@ -1,81 +1,72 @@
-import numpy as np
-from itertools import product
-import string
+import pickle
+import os
+from sklearn.datasets import make_classification
 
+# Constants
+FILE_NAME = 'save.pkl'
+DATA, TARGET = make_classification(n_samples=100, n_features=20, n_informative=2, n_redundant=10, n_classes=2, random_state=1)
 
-def task_func(length, seed=None, alphabets=list(string.ascii_lowercase)):
+def task_func(data, target):
     """
-    Generate a list of 10 randomly picked strings from all possible strings of a given
-    length from the provided series of characters, using a specific seed for
-    reproducibility.
+    Save the Sklearn dataset ("Data" and "Destination") in the pickle file "save.pkl" and then read it back for validation.
 
     Parameters:
-    length (int): The length of the strings to generate.
-    seed (int): The seed for the random number generator. Default is None.
-    alphabets (list, optional): The series of characters to generate the strings from. 
-                Default is lowercase English alphabets.
+    - data (numpy array): The data part of the sklearn dataset.
+    - target (numpy array): The target part of the sklearn dataset.
 
     Returns:
-    list: A list of generated strings.
+    tuple: The loaded tuple (data, target) from 'save.pkl'.
 
     Requirements:
-    - numpy
-    - itertools.product
-    - string
+    - pickle
+    - os
+    - sklearn.datasets
 
     Example:
-    >>> task_func(2, 123)
-    ['tq', 'ob', 'os', 'mk', 'du', 'ar', 'wx', 'ec', 'et', 'vx']
-
-    >>> task_func(2, 123, alphabets=['x', 'y', 'z'])
-    ['xz', 'xz', 'zx', 'xy', 'yx', 'zx', 'xy', 'xx', 'xy', 'xx']
+    >>> data, target = make_classification(n_samples=100, n_features=20, n_informative=2, n_redundant=10, n_classes=2, random_state=1)
+    >>> loaded_data, loaded_target = task_func(data, target)
+    >>> assert np.array_equal(data, loaded_data) and np.array_equal(target, loaded_target)
     """
-    np.random.seed(seed)
-    all_combinations = [''.join(p) for p in product(alphabets, repeat=length)]
-    return np.random.choice(all_combinations, size=10).tolist()
+    with open(FILE_NAME, 'wb') as file:
+        pickle.dump((data, target), file)
+    with open(FILE_NAME, 'rb') as file:
+        loaded_data, loaded_target = pickle.load(file)
+    os.remove(FILE_NAME)
+    return loaded_data, loaded_target
 
+from sklearn.datasets import make_classification
+import numpy as np
 import unittest
+import sys
+sys.path.append("/mnt/data")
+# Defining the test function
 class TestCases(unittest.TestCase):
-    def test_rng(self):
-        output1 = task_func(2, 123)
-        output2 = task_func(2, 123)
-        self.assertCountEqual(output1, output2)
+    def test_save_and_load_data(self):
+        data, target = make_classification(n_samples=100, n_features=20, n_informative=2, n_redundant=10, n_classes=2, random_state=1)
+        loaded_data, loaded_target = task_func(data, target)
+        self.assertTrue(np.array_equal(data, loaded_data))
+        self.assertTrue(np.array_equal(target, loaded_target))
     
-    def test_case_1(self):
-        output = task_func(2, 123)
-        self.assertEqual(len(output), 10)
-        self.assertTrue(all(len(word) == 2 for word in output))
-        self.assertTrue(all(word.islower() for word in output))
-        expected = ['tq', 'ob', 'os', 'mk', 'du', 'ar', 'wx', 'ec', 'et', 'vx']
-        self.assertCountEqual(output, expected)
-        
-    def test_case_2(self):
-        output = task_func(3, 456)
-        self.assertEqual(len(output), 10)
-        self.assertTrue(all(len(word) == 3 for word in output))
-        self.assertTrue(all(word.islower() for word in output))
-        expected = ['axp', 'xtb', 'pwx', 'rxv', 'soa', 'rkf', 'cdp', 'igv', 'ruh', 'vmz']
-        self.assertCountEqual(output, expected)
-        
-    def test_case_3(self):
-        output = task_func(2, 789, alphabets=['x', 'y', 'z'])
-        self.assertEqual(len(output), 10)
-        self.assertTrue(all(len(word) == 2 for word in output))
-        self.assertTrue(all(letter in ['x', 'y', 'z'] for word in output for letter in word))
-        expected = ['yx', 'xz', 'xy', 'yx', 'yy', 'zz', 'yy', 'xy', 'zz', 'xx']
-        self.assertCountEqual(output, expected)
-    def test_case_4(self):
-        output = task_func(1, 100)
-        self.assertEqual(len(output), 10)
-        self.assertTrue(all(len(word) == 1 for word in output))
-        self.assertTrue(all(word.islower() for word in output))
-        expected = ['i', 'y', 'd', 'h', 'x', 'p', 'q', 'k', 'u', 'c']
-        self.assertCountEqual(output, expected)
-        
-    def test_case_5(self):
-        output = task_func(4, 200, alphabets=['a', 'b'])
-        self.assertEqual(len(output), 10)
-        self.assertTrue(all(len(word) == 4 for word in output))
-        self.assertTrue(all(letter in ['a', 'b'] for word in output for letter in word))
-        expected = ['baba', 'baab', 'aaaa', 'abaa', 'baba', 'abbb', 'bbaa', 'bbbb', 'baab', 'bbba']
-        self.assertCountEqual(output, expected)
+    def test_save_and_load_empty_data(self):
+        data, target = np.array([]), np.array([])
+        loaded_data, loaded_target = task_func(data, target)
+        self.assertTrue(np.array_equal(data, loaded_data))
+        self.assertTrue(np.array_equal(target, loaded_target))
+    
+    def test_save_and_load_single_element_data(self):
+        data, target = np.array([5]), np.array([1])
+        loaded_data, loaded_target = task_func(data, target)
+        self.assertTrue(np.array_equal(data, loaded_data))
+        self.assertTrue(np.array_equal(target, loaded_target))
+    
+    def test_save_and_load_large_data(self):
+        data, target = make_classification(n_samples=1000, n_features=50, n_informative=5, n_redundant=25, n_classes=3, random_state=2)
+        loaded_data, loaded_target = task_func(data, target)
+        self.assertTrue(np.array_equal(data, loaded_data))
+        self.assertTrue(np.array_equal(target, loaded_target))
+    
+    def test_save_and_load_random_data(self):
+        data, target = np.random.rand(50, 5), np.random.randint(0, 2, 50)
+        loaded_data, loaded_target = task_func(data, target)
+        self.assertTrue(np.array_equal(data, loaded_data))
+        self.assertTrue(np.array_equal(target, loaded_target))

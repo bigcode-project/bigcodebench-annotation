@@ -1,96 +1,66 @@
-from random import sample
-from typing import Tuple
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
+import hashlib
+import random
+import struct
+
+KEYS = ['470FC614', '4A0FC614', '4B9FC614', '4C8FC614', '4D7FC614']
 
 
-
-def task_func(num_students):
+def task_func(hex_keys=KEYS, seed=42):
     """
-    Generate a Pandas DataFrame that displays the grades of a randomly selected group of students in multiple courses.
-    Calculate the average grade in each course, the number of students with a passing grade (>= 60), 
-    and visualize this information using a bar plot with title 'Course-wise Average and Passing Grade Counts'.
+    Given a list of hexadecimal string keys, this function selects one at random,
+    converts it into a floating-point number, and then computes its MD5 hash. An optional
+    seed parameter allows for deterministic random choices for testing purposes.
 
     Parameters:
-    num_students (int): The number of students in the sample.
+    hex_keys (list of str): A list of hexadecimal strings to choose from.
+    seed (int, optional): A seed for the random number generator to ensure deterministic behavior.
 
     Returns:
-    Tuple[pd.DataFrame, plt.Axes]: A tuple containing the generated DataFrame and the bar plot's Axes object.
+    str: The MD5 hash of the floating-point number derived from the randomly selected hexadecimal string.
+
+    Raises:
+    ValueError: If contains invalid hexadecimal strings.
 
     Requirements:
-    - pandas
-    - numpy
-    - matplotlib.pyplot
+    - struct
+    - hashlib
     - random
-    - typing
 
     Example:
-    >>> df, ax = task_func(50)
-    >>> ax.get_title()
-    'Course-wise Average and Passing Grade Counts'
+    >>> task_func(['1a2b3c4d', '5e6f7g8h'])
+    '426614caa490f2c185aebf58f1d4adac'
     """
-    STUDENTS = ['Student' + str(i) for i in range(1, 101)]
-    COURSES = ['Course' + str(i) for i in range(1, 6)]
-    students_sample = sample(STUDENTS, num_students)
-    grades = np.random.randint(40, 101, size=(num_students, len(COURSES)))
-    df = pd.DataFrame(grades, index=students_sample, columns=COURSES)
-    fig, ax = plt.subplots()
-    df.mean().plot(kind='bar', ax=ax, position=1, width=0.4, color='b', label='Average Grade')
-    df[df >= 60].count().plot(kind='bar', ax=ax, position=0, width=0.4, color='g', label='Passing Grade Counts')
-    ax.set_title('Course-wise Average and Passing Grade Counts')
-    ax.legend()
-    return df, ax
+    random.seed(seed)
+    hex_key = random.choice(hex_keys)
+    try:
+        float_num = struct.unpack('!f', bytes.fromhex(hex_key))[0]
+    except ValueError as e:
+        raise ValueError("Invalid hexadecimal string in hex_keys.") from e
+    hashed_float = hashlib.md5(str(float_num).encode()).hexdigest()
+    return hashed_float
 
 import unittest
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
-        # Test with 10 students
-        df, ax = task_func(10)
-        
-        # Check DataFrame dimensions
-        self.assertEqual(df.shape, (10, 5))
-        
-        # Check plot title
-        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
-    
-    def test_case_2(self):
-        # Test with 50 students
-        df, ax = task_func(50)
-        
-        # Check DataFrame dimensions
-        self.assertEqual(df.shape, (50, 5))
-        
-        # Check plot title
-        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
-        
-    def test_case_3(self):
-        # Test with 100 students
-        df, ax = task_func(100)
-        
-        # Check DataFrame dimensions
-        self.assertEqual(df.shape, (100, 5))
-        
-        # Check plot title
-        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
-    
-    def test_case_4(self):
-        # Test with 1 student
-        df, ax = task_func(1)
-        
-        # Check DataFrame dimensions
-        self.assertEqual(df.shape, (1, 5))
-        
-        # Check plot title
-        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
-        
-    def test_case_5(self):
-        # Test with 5 students
-        df, ax = task_func(5)
-        
-        # Check DataFrame dimensions
-        self.assertEqual(df.shape, (5, 5))
-        
-        # Check plot title
-        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
+    def test_normal_functionality(self):
+        """Test the function with default parameters."""
+        result = task_func()
+        self.assertIsInstance(result, str)
+    def test_custom_keys_list(self):
+        """Test the function with a custom list of hexadecimal keys."""
+        custom_keys = ['1A2FC614', '1B0FC614', '1C9FC614']
+        result = task_func(hex_keys=custom_keys)
+        self.assertIsInstance(result, str)
+    def test_empty_key_list(self):
+        """Test the function with an empty list to check for error handling."""
+        with self.assertRaises(IndexError):
+            task_func(hex_keys=[])
+    def test_invalid_hexadecimal(self):
+        """Test the function with an invalid hexadecimal string."""
+        invalid_keys = ['ZZZ', '4A0FC614']
+        with self.assertRaises(ValueError):
+            task_func(hex_keys=invalid_keys)
+    def test_consistent_output_with_same_seed(self):
+        """Test that the same seed returns the same result."""
+        result1 = task_func(seed=99)
+        result2 = task_func(seed=99)
+        self.assertEqual(result1, result2)

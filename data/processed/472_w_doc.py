@@ -1,63 +1,93 @@
-import inspect
-import types
+from collections import Counter
+import pandas as pd
 
-def task_func(f):
+
+def task_func(myList):
     """
-    Inspects a given function 'f' and returns its specifications, including the function's name,
-    whether it is a lambda function, its arguments, defaults, and annotations. This method
-    utilizes the inspect and types modules to introspect function properties.
+    Count the frequency of each word in a list and return a DataFrame of words and their number.
 
     Parameters:
-    f (function): The function to inspect.
+    myList (list): List of strings. Each string is considered a word regardless of its content,
+                                    however the function is case insensitive, and it removes
+                                    leading and trailing whitespaces. If empty, function returns
+                                    a DataFrame with a Count column that is otherwise empty.
 
     Returns:
-    dict: A dictionary containing details about the function, such as its name, if it's a lambda function,
-          arguments, default values, and annotations.
+    DataFrame: A pandas DataFrame with words and their counts.
 
     Requirements:
-    - inspect
-    - types
+    - collections.Counter
+    - pandas
 
-    Examples:
-    >>> def sample_function(x, y=5): return x + y
-    >>> result = task_func(sample_function)
-    >>> 'sample_function' == result['function_name'] and len(result['args']) == 2
-    True
-    >>> lambda_func = lambda x: x * 2
-    >>> task_func(lambda_func)['is_lambda']
-    True
+    Example:
+    >>> myList = ['apple', 'banana', 'apple', 'cherry', 'banana', 'banana']
+    >>> task_func(myList)
+            Count
+    apple       2
+    banana      3
+    cherry      1
     """
-    spec = inspect.getfullargspec(f)
-    return {
-        'function_name': f.__name__,
-        'is_lambda': isinstance(f, types.LambdaType),
-        'args': spec.args,
-        'defaults': spec.defaults,
-        'annotations': spec.annotations
-    }
+    words = [w.lower().strip() for w in myList]
+    word_counts = dict(Counter(words))
+    report_df = pd.DataFrame.from_dict(word_counts, orient="index", columns=["Count"])
+    return report_df
 
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_regular_function(self):
-        def test_func(a, b=1): pass
-        result = task_func(test_func)
-        self.assertEqual(result['function_name'], 'test_func')
-        self.assertListEqual(result['args'], ['a', 'b'])
-        self.assertTupleEqual(result['defaults'], (1,))
-    def test_lambda_function(self):
-        lambda_func = lambda x, y=2: x + y
-        result = task_func(lambda_func)
-        self.assertTrue(result['is_lambda'])
-    def test_no_arguments(self):
-        def test_func(): pass
-        result = task_func(test_func)
-        self.assertEqual(len(result['args']), 0)
-    def test_annotations(self):
-        def test_func(a: int, b: str = 'hello') -> int: pass
-        result = task_func(test_func)
-        self.assertIn('a', result['annotations'])
-        self.assertIn('return', result['annotations'])
-    def test_defaults_none(self):
-        def test_func(a, b=None): pass
-        result = task_func(test_func)
-        self.assertIsNone(result['defaults'][0])
+    def test_case_1(self):
+        # Test basic case
+        input_data = ["apple", "banana", "apple", "cherry", "banana", "banana"]
+        expected_output = pd.DataFrame(
+            {"Count": [2, 3, 1]}, index=["apple", "banana", "cherry"]
+        )
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_2(self):
+        # Test repeated value
+        input_data = ["apple", "apple", "apple"]
+        expected_output = pd.DataFrame({"Count": [3]}, index=["apple"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_3(self):
+        # Test empty list
+        input_data = []
+        expected_output = pd.DataFrame(columns=["Count"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_4(self):
+        # Test single entry
+        input_data = ["kiwi"]
+        expected_output = pd.DataFrame({"Count": [1]}, index=["kiwi"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_5(self):
+        # Tests the function's ability to handle mixed case words correctly.
+        input_data = ["Apple", "apple", "APPLE"]
+        expected_output = pd.DataFrame({"Count": [3]}, index=["apple"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_6(self):
+        # Tests the function's ability to handle words with leading/trailing spaces.
+        input_data = ["banana ", " banana", "  banana"]
+        expected_output = pd.DataFrame({"Count": [3]}, index=["banana"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_7(self):
+        # Tests the function's ability to handle words with special characters.
+        input_data = ["kiwi!", "!kiwi", "kiwi"]
+        expected_output = pd.DataFrame(
+            {"Count": [1, 1, 1]}, index=["kiwi!", "!kiwi", "kiwi"]
+        )
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_8(self):
+        # Tests the function's handling of numeric strings as words.
+        input_data = ["123", "456", "123", "456", "789"]
+        expected_output = pd.DataFrame(
+            {"Count": [2, 2, 1]}, index=["123", "456", "789"]
+        )
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_9(self):
+        # Tests the function's handling of empty strings and strings with only spaces.
+        input_data = [" ", "  ", "", "apple", "apple "]
+        expected_output = pd.DataFrame({"Count": [3, 2]}, index=["", "apple"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_10(self):
+        # Tests handling of strings that become duplicates after strip() is applied.
+        input_data = ["banana", "banana ", " banana", "banana"]
+        expected_output = pd.DataFrame({"Count": [4]}, index=["banana"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)

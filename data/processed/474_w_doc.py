@@ -1,83 +1,95 @@
-import inspect
+import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
+import itertools
 
-def task_func(f_list):
+def task_func(n_walks, n_steps, seed=None):
     """
-    Analyzes a list of functions and draws a bar chart showing the number of arguments for each function.
-    The function names are listed along the x-axis, and the number of arguments are represented as bars.
-    This method showcases the integration of function introspection, data frame creation, and data visualization.
+    Create and plot `n_walks` number of random walks, each with `n_steps` steps.
+
+    The function checks for valid n_walks and n_steps, then generates walks via numpy.
+    Each walk is plotted in a different color cycling through a predefined set of colors:
+    ['b', 'g', 'r', 'c', 'm', 'y', 'k'].
 
     Parameters:
-    f_list (list): List of functions to inspect.
+    - n_walks (int): The number of random walks to be generated and plotted.
+    - n_steps (int): The number of steps in each random walk.
+    - seed (int, optional): Seed for random number generation. Default is None.
 
     Returns:
-    pandas.DataFrame: Returns a DataFrame containing the function names and their respective number of arguments.
-
-    Raises:
-    ValueError: if the input contains lambda function
+    - ax (plt.Axes): A Matplotlib Axes containing the plotted random walks.
 
     Requirements:
-    - inspect
-    - matplotlib.pyplot
-    - pandas
+    - numpy
+    - matplotlib
+    - itertools
 
-    Examples:
-    >>> def f(x): x*x
-    >>> def g(x, y=2): return x*y
-    >>> task_func([f, g])
-                   Number of Arguments
-    Function Name                     
-    f                                1
-    g                                2
-    >>> lambda_func = lambda x: x * 2
-    >>> task_func([f, lambda_func])
-    Traceback (most recent call last):
-    ...
-    ValueError: The function should not be a lambda function.
+    Example:
+    >>> ax = task_func(5, 100, seed=42)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax.get_xticklabels()
+    [Text(-20.0, 0, '−20'), Text(0.0, 0, '0'), Text(20.0, 0, '20'), Text(40.0, 0, '40'), Text(60.0, 0, '60'), Text(80.0, 0, '80'), Text(100.0, 0, '100'), Text(120.0, 0, '120')]
     """
-    func_info = []
-    for f in f_list:
-        if f.__name__ == "<lambda>":
-            raise ValueError("The function should not be a lambda function.")
-        spec = inspect.getfullargspec(f)
-        func_info.append([f.__name__, len(spec.args)])
-    df = pd.DataFrame(func_info, columns=['Function Name', 'Number of Arguments'])
-    df.set_index('Function Name', inplace=True)
-    df.plot(kind='bar')  # Uncomment to visualize the bar chart
-    plt.show()  # Uncomment to display the plot
-    return df
+    if n_walks < 0 or n_steps < 0:
+        raise ValueError("Walks and steps cannot be negative.")
+    np.random.seed(seed)
+    COLORS = ["b", "g", "r", "c", "m", "y", "k"]
+    color_cycle = itertools.cycle(COLORS)
+    fig, ax = plt.subplots()
+    for _ in range(n_walks):
+        walk = np.random.choice([-1, 1], size=n_steps)
+        walk = np.cumsum(walk)
+        ax.plot(walk, next(color_cycle))
+    return ax
 
 import unittest
-import pandas as pd
-import inspect
-from unittest.mock import patch
+import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_single_function(self):
-        def sample_function(x): pass
-        df = task_func([sample_function])
-        self.assertEqual(df.loc['sample_function', 'Number of Arguments'], 1)
-    def test_multiple_functions(self):
-        def f(x): pass
-        def g(x, y): pass
-        df = task_func([f, g])
-        self.assertEqual(df.loc['f', 'Number of Arguments'], 1)
-        self.assertEqual(df.loc['g', 'Number of Arguments'], 2)
-    def test_no_arguments_function(self):
-        def no_arg_func(): pass
-        df = task_func([no_arg_func])
-        self.assertEqual(df.loc['no_arg_func', 'Number of Arguments'], 0)
-    def test_lambda_functions(self):
-        lambda_func = lambda x, y: x + y
+    def test_case_1(self):
+        # Test basic setup
+        ax = task_func(5, 100, seed=42)
+        self.assertIsInstance(ax, plt.Axes)
+    def test_case_2(self):
+        # Test number of walks
+        for n_walk in [0, 1, 2, 10, 50]:
+            ax = task_func(n_walk, 10, seed=42)
+            lines = ax.get_lines()
+            self.assertEqual(len(lines), n_walk)
+    def test_case_3(self):
+        # Test number of steps
+        for n_steps in [0, 1, 10, 100, 500]:
+            ax = task_func(2, n_steps, seed=42)
+            lines = ax.get_lines()
+            self.assertEqual(len(lines[0].get_ydata()), n_steps)
+    def test_case_4(self):
+        # Test random seed
+        ax1 = task_func(5, 100, seed=42)
+        ax2 = task_func(5, 100, seed=42)
+        ax3 = task_func(5, 100, seed=0)
+        lines1 = ax1.get_lines()
+        lines2 = ax2.get_lines()
+        lines3 = ax3.get_lines()
+        self.assertTrue(
+            all(
+                np.array_equal(line1.get_ydata(), line2.get_ydata())
+                for line1, line2 in zip(lines1, lines2)
+            )
+        )
+        self.assertFalse(
+            all(
+                np.array_equal(line1.get_ydata(), line3.get_ydata())
+                for line1, line3 in zip(lines1, lines3)
+            ),
+            "Random walks are not reproducible using the same seed.",
+        )
+    def test_case_5(self):
+        # Test invalid n_walks
         with self.assertRaises(ValueError):
-            df = task_func([lambda_func])
-    
-    def test_function_with_defaults(self):
-        def func_with_defaults(x, y=2): pass
-        df = task_func([func_with_defaults])
-        self.assertEqual(df.loc['func_with_defaults', 'Number of Arguments'], 2)
-    @patch('matplotlib.pyplot.show')
-    def test_plot_called(self, mock_show):
-        def sample_function(x): pass
-        task_func([sample_function])
-        mock_show.assert_called_once()
+            task_func(-1, 100, seed=42)
+    def test_case_6(self):
+        # Test negative n_steps
+        with self.assertRaises(ValueError):
+            task_func(1, -100, seed=42)
+    def tearDown(self):
+        plt.close("all")

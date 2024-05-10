@@ -1,85 +1,78 @@
 import pandas as pd
-import seaborn as sns
+import numpy as np
 import matplotlib.pyplot as plt
 
-
-def task_func(s1, s2):
+def task_func(start_date: str, periods: int, freq: str, random_seed: int = 0) -> (pd.DataFrame, plt.Axes):
     """
-    Visualize two Series using a swarm plot with a highlight on their intersecting data points.
-
-    This function creates a swarm plot to visually compare two pandas Series. 
-    It highlights the intersection points between these two series by drawing red dashed lines at the intersecting data points.
-
-    Parameters:
-    - s1 (pd.Series): The first series of data. This series must have a unique name that identifies it in the plot.
-    - s2 (pd.Series): The second series of data. Similar to s1, this series must also have a unique name.
-
-    Returns:
-    - ax (matplotlib.Axes): The Axes object of the plotted swarm chart. This object can be used for further customization of the plot if required.
-    intersection_count (int): The number of unique intersecting data points between s1 and s2. 
-    This count gives a quick numerical summary of the overlap between the two series.
+    Generates and plots a sales forecast starting from a given date, for a specified number of periods and frequency.
 
     Requirements:
     - pandas
-    - seaborn
-    - matplotlib
+    - numpy
+    - matplotlib.pyplot
+    
+    Parameters:
+    - start_date (str): Start date for the forecast in 'YYYY-MM-DD' format.
+    - periods (int): Number of periods to forecast.
+    - freq (str): Frequency of the forecast (e.g., 'WOM-2FRI' for the second Friday of each month, 'M' for monthly).
+    - random_seed (int, optional): Seed for the random number generator to ensure reproducibility.
 
-    Example:
-    >>> s1 = pd.Series([1, 2, 3, 4, 5], name='Series1')
-    >>> s2 = pd.Series([4, 5, 6, 7, 8], name='Series2')
-    >>> ax, count = task_func(s1, s2)
-    >>> ax.get_title()
-    'Overlap Between Series1 and Series2'
+    Returns:
+    - A tuple containing:
+        1. A DataFrame with columns ['Date', 'Sales'], where 'Date' is the forecast date and 'Sales' are the forecasted sales.
+        2. A matplotlib Axes object for the sales forecast plot.
+
+    Examples:
+    >>> df, ax = task_func('2021-01-01', 5, 'WOM-2FRI')
+    >>> print(df)
+                Sales
+    Date             
+    2021-01-08    272
+    2021-02-12    147
+    2021-03-12    217
+    2021-04-09    292
+    2021-05-14    423
+    >>> df, ax = task_func('2022-02-01', 3, 'M', random_seed=42)
+    >>> print(df)
+                Sales
+    Date             
+    2022-02-28    202
+    2022-03-31    448
+    2022-04-30    370
     """
-    intersection = set(s1).intersection(set(s2))
-    df1 = pd.DataFrame({s1.name: s1, "Type": "Series1"})
-    df2 = pd.DataFrame({s2.name: s2, "Type": "Series2"})
-    df = pd.concat([df1, df2], axis=0, ignore_index=True)
-    _, ax = plt.subplots(figsize=(10, 6))
-    sns.swarmplot(x=df.columns[0], y="Type", data=df, ax=ax)
-    for point in intersection:
-        ax.axvline(x=point, color="red", linestyle="--")
-    ax.set_title(f"Overlap Between {s1.name} and {s2.name}")
-    return ax, len(intersection)
+    np.random.seed(random_seed)
+    date_range = pd.date_range(start_date, periods=periods, freq=freq)
+    sales_forecast = np.random.randint(100, 500, size=periods)
+    forecast_df = pd.DataFrame({'Date': date_range, 'Sales': sales_forecast}).set_index('Date')
+    fig, ax = plt.subplots()
+    forecast_df['Sales'].plot(ax=ax, marker='o')
+    ax.set_title('Sales Forecast')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Sales')
+    ax.grid(True)
+    return forecast_df, ax
 
-import pandas as pd
 import unittest
 class TestCases(unittest.TestCase):
-    """Tests for the function task_func."""
-    def test_intersection_exists(self):
-        """Test that the function works when the two series have an intersection."""
-        s1 = pd.Series([1, 2, 3, 4, 5], name="Series1")
-        s2 = pd.Series([4, 5, 6, 7, 8], name="Series2")
-        ax, intersection_count = task_func(s1, s2)
-        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
-        self.assertEqual(intersection_count, 2)
-    def test_no_intersection(self):
-        """Test that the function works when the two series have no intersection."""
-        s1 = pd.Series([1, 2, 3], name="Series1")
-        s2 = pd.Series([4, 5, 6], name="Series2")
-        ax, intersection_count = task_func(s1, s2)
-        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
-        self.assertEqual(intersection_count, 0)
-    def test_empty_series(self):
-        """Test that the function works when one of the series is empty."""
-        s1 = pd.Series([], name="Series1")
-        s2 = pd.Series([], name="Series2")
-        ax, intersection_count = task_func(s1, s2)
-        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
-        self.assertEqual(intersection_count, 0)
-    def test_partial_intersection(self):
-        """Test that the function works when the two series have a partial intersection."""
-        s1 = pd.Series([1, 2], name="Series1")
-        s2 = pd.Series([2, 3], name="Series2")
-        ax, intersection_count = task_func(s1, s2)
-        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
-        self.assertEqual(intersection_count, 1)
-    def test_identical_series(self):
-        """Test that the function works when the two series are identical."""
-        s1 = pd.Series([1, 2, 3], name="Series1")
-        s2 = pd.Series([1, 2, 3], name="Series2")
-        ax, intersection_count = task_func(s1, s2)
-        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
-        self.assertEqual(intersection_count, 3)
-    def tearDown(self):
-        plt.clf()
+    
+    def setUp(self):
+        self.random_seed = 42
+    def test_basic_forecast(self):
+        df, ax = task_func('2021-01-01', 5, 'WOM-2FRI', self.random_seed)
+        self.assertEqual(len(df), 5)
+        self.assertTrue(all(df.columns == ['Sales']))
+        self.assertEqual(ax.get_title(), 'Sales Forecast')
+    def test_monthly_forecast(self):
+        df, ax = task_func('2022-01-01', 3, 'M', self.random_seed)
+        self.assertEqual(len(df), 3)
+        self.assertTrue(all(df.columns == ['Sales']))
+    def test_quarterly_forecast(self):
+        df, ax = task_func('2020-01-01', 4, 'Q', self.random_seed)
+        self.assertEqual(len(df), 4)
+        self.assertTrue(all(df.columns == ['Sales']))
+    def test_invalid_input(self):
+        with self.assertRaises(ValueError):
+            task_func('2021-13-01', 5, 'M', self.random_seed)
+    def test_negative_periods(self):
+        with self.assertRaises(ValueError):
+            task_func('2021-01-01', -5, 'M', self.random_seed)

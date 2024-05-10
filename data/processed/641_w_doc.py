@@ -1,71 +1,78 @@
+import matplotlib.pyplot as plt
 import numpy as np
-from itertools import chain
+import pandas as pd
+import seaborn as sns
 
-def task_func(L):
+PRODUCTS = ['Product' + str(i) for i in range(1, 6)]
+MONTHS = ['Month' + str(i) for i in range(1, 13)]
+
+
+def task_func():
     """
-    Calculate the mean and variance of all elements in a nested list 'L'.
-    
-    Parameters:
-    - L (list): The nested list.
-    
+    Generate a DataFrame representing monthly sales of products and visualize the total sales.
+
+    The function creates a DataFrame where each row represents a month, each column represents a product,
+    and cell values represent sales figures. It then plots the total sales per product across all months
+    using both a line plot and a heatmap for visualization.
+
     Returns:
-    - dict: A dictionary containing the mean and variance.
-    
+    - pd.DataFrame: A DataFrame with randomly generated sales figures for each product over 12 months.
+
+    The function also displays:
+    - A line plot showing the total sales per product.
+    - A heatmap visualizing sales figures across products and months.
+
     Requirements:
+    - pandas
     - numpy
-    - itertools.chain
+    - matplotlib.pyplot
+    - seaborn
 
     Example:
-    >>> task_func([[1,2,3],[4,5,6]])
-    {'mean': 3.5, 'variance': 2.9166666666666665}
+    >>> df = task_func()
+    >>> df.shape
+    (12, 5)
+    >>> all(df.columns == PRODUCTS)
+    True
+    >>> all(df.index == MONTHS)
+    True
+    >>> (df.values >= 100).all() and (df.values <= 1000).all()
+    True
     """
-    flattened = list(chain.from_iterable(L))
-    mean = np.mean(flattened)
-    variance = np.var(flattened)
-    return {'mean': mean, 'variance': variance}
+    sales = np.random.randint(100, 1001, size=(len(MONTHS), len(PRODUCTS)))
+    df = pd.DataFrame(sales, index=MONTHS, columns=PRODUCTS)
+    total_sales = df.sum()
+    plt.figure(figsize=(10, 5))
+    total_sales.plot(kind='line', title='Total Sales per Product')
+    plt.ylabel('Total Sales')
+    plt.show()
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(df, annot=True, fmt="d", cmap='viridis')
+    plt.title('Monthly Sales per Product')
+    plt.show()
+    return df
 
 import unittest
-import numpy as np
-from itertools import chain
 class TestCases(unittest.TestCase):
-    
-    def test_1(self):
-        L = [[1, 2, 3], [4, 5, 6]]
-        result = task_func(L)
-        flattened = list(chain.from_iterable(L))
-        expected_mean = np.mean(flattened)
-        expected_variance = np.var(flattened)
-        self.assertEqual(result['mean'], expected_mean)
-        self.assertEqual(result['variance'], expected_variance)
-    def test_2(self):
-        L = [[10, 20], [30, 40], [50, 60]]
-        result = task_func(L)
-        flattened = list(chain.from_iterable(L))
-        expected_mean = np.mean(flattened)
-        expected_variance = np.var(flattened)
-        self.assertEqual(result['mean'], expected_mean)
-        self.assertEqual(result['variance'], expected_variance)
-    def test_3(self):
-        L = [[5]]
-        result = task_func(L)
-        flattened = list(chain.from_iterable(L))
-        expected_mean = np.mean(flattened)
-        expected_variance = np.var(flattened)
-        self.assertEqual(result['mean'], expected_mean)
-        self.assertEqual(result['variance'], expected_variance)
-    def test_4(self):
-        L = [[1, 2, 3], [3, 2, 1], [4, 5, 6], [6, 5, 4]]
-        result = task_func(L)
-        flattened = list(chain.from_iterable(L))
-        expected_mean = np.mean(flattened)
-        expected_variance = np.var(flattened)
-        self.assertEqual(result['mean'], expected_mean)
-        self.assertEqual(result['variance'], expected_variance)
-    def test_5(self):
-        L = [[10, 11, 12], [13, 14, 15], [16, 17, 18], [19, 20, 21]]
-        result = task_func(L)
-        flattened = list(chain.from_iterable(L))
-        expected_mean = np.mean(flattened)
-        expected_variance = np.var(flattened)
-        self.assertEqual(result['mean'], expected_mean)
-        self.assertEqual(result['variance'], expected_variance)
+    def test_dataframe_shape(self):
+        """Test if the DataFrame has the correct shape."""
+        df = task_func()
+        self.assertEqual(df.shape, (12, 5))  # 12 months and 5 products
+    def test_dataframe_columns(self):
+        """Test if the DataFrame has the correct column names."""
+        df = task_func()
+        expected_columns = PRODUCTS
+        self.assertListEqual(list(df.columns), expected_columns)
+    def test_dataframe_index(self):
+        """Test if the DataFrame has the correct index."""
+        df = task_func()
+        expected_index = MONTHS
+        self.assertListEqual(list(df.index), expected_index)
+    def test_sales_range(self):
+        """Test if sales figures are within the expected range."""
+        df = task_func()
+        self.assertTrue((df >= 100).all().all() and (df <= 1000).all().all())
+    def test_returns_dataframe(self):
+        """Test if the function returns a pandas DataFrame."""
+        df = task_func()
+        self.assertIsInstance(df, pd.DataFrame)

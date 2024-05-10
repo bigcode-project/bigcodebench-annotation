@@ -1,98 +1,134 @@
-import rsa
-import urllib.request
-from hashlib import sha256
+import pandas as pd
+from datetime import datetime, timedelta
+import random
 
-def task_func(url):
+
+def task_func(epoch_milliseconds, seed=0):
     """
-    Generates RSA public and private keys, retrieves the content from the specified URL, calculates
-    its SHA256 hash, and signs the hash with the private key. Returns the public key and the signed hash
-    as a hexadecimal string.
+    Generate user activity logs from a given epoch time to the current time.
+
+    This function iterates from the starting epoch time to the current system
+    time, incrementally increasing the time by a random number of seconds (an
+    integer in [1, 10]) between each log entry. Each log entry records a user
+    performing an activity at a specific time.
 
     Parameters:
-    url (str): The URL whose content is to be fetched and signed.
+    - epoch_milliseconds (int): Starting epoch time in milliseconds. Must be in
+                                the past compared to current system time.
+    - seed (int): random seed for reproducibility. Defaults to 0.
 
     Returns:
-    rsa.PublicKey: The RSA public key.
-    str: The hexadecimal string of the signed SHA256 hash of the URL content.
-    bytes: The hashed URL content, for verification purpose
+    - pd.DataFrame: A DataFrame containing logs of user activities, with columns:
+        - 'User':   User names, randomly chosen from a predefined list of users,
+                    ['user1', 'user2', 'user3', 'user4', 'user5'].
+        - 'Activity': Activities performed by the users, randomly chosen from a
+                      predefined list of activities, ['login', 'logout', 'browse',
+                      'search', 'purchase'].
+        - 'Time': The timestamp of when the activity occurred, incrementally
+                  increasing from the starting epoch time to the current time.
 
     Raises:
-    ValueError: If there's an issue reaching the server (e.g., network error, invalid URL)
-                or if the server returns an HTTP error.
-    rsa.pkcs1.VerificationError: If there's a failure in signing the hash with the RSA private key.
-    urllib.error.URLError: If the server is not reachable
-
+    - ValueError: If the start time is after the current system time.
+    
     Requirements:
-    - rsa
-    - urllib.request
-    - hashlib.sha256
+    - pandas
+    - datetime.datetime.fromtimestamp
+    - datetime.timedelta
+    - random
 
-    Examples:
-    >>> pub_key, signed_hash, hash_value = task_func('https://www.example.com')
-    >>> isinstance(pub_key, rsa.PublicKey)
-    True
-    >>> isinstance(signed_hash, str)
-    True
-    >>> isinstance(hash_value, bytes)
-    True
+    Example:
+    >>> log = task_func(1615168051807)
+    >>> type(log)
+    <class 'pandas.core.frame.DataFrame'>
+    >>> log.iloc[0]
+    User                             user4
+    Activity                        search
+    Time        2021-03-08 12:47:31.807000
+    Name: 0, dtype: object
     """
-    try:
-        (pub_key, priv_key) = rsa.newkeys(512)
-        response = urllib.request.urlopen(url)
-        content = response.read()
-        hash_value = sha256(content).digest()
-        signed_hash = rsa.sign(hash_value, priv_key, 'SHA-256').hex()
-        return pub_key, signed_hash, hash_value
-    except urllib.error.HTTPError as e:
-        raise ValueError(f"Server returned an HTTP error: {e.code} {e.reason}") from e
-    except urllib.error.URLError as e:
-        raise urllib.error.URLError(f"Failed to reach the server. URL might be invalid: {e}") from e
-    except rsa.pkcs1.VerificationError as e:
-        raise rsa.pkcs1.VerificationError(f"Failed to sign the hash: {e}") from e    
+    random.seed(seed)
+    USERS = ["user1", "user2", "user3", "user4", "user5"]
+    ACTIVITIES = ["login", "logout", "browse", "search", "purchase"]
+    start_time = datetime.fromtimestamp(epoch_milliseconds / 1000.0)
+    end_time = datetime.now()
+    if start_time >= end_time:
+        raise ValueError("Start time must be before current system time")
+    logs = []
+    current_time = start_time
+    while current_time <= end_time:
+        user = random.choice(USERS)
+        activity = random.choice(ACTIVITIES)
+        logs.append([user, activity, current_time])
+        current_time += timedelta(seconds=random.randint(1, 10))
+    log_df = pd.DataFrame(logs, columns=["User", "Activity", "Time"])
+    return log_df
 
 import unittest
-from unittest.mock import patch
-import rsa
-from hashlib import sha256
+import pandas as pd
+from datetime import datetime, timedelta
 class TestCases(unittest.TestCase):
-    @patch('urllib.request.urlopen')
-    def test_return_type(self, mock_urlopen):
-        mock_urlopen.return_value.read.return_value = b"test content"
-        pub_key, signed_hash, hash_value = task_func("https://www.example.com")
-        self.assertIsInstance(pub_key, rsa.PublicKey)
-        self.assertIsInstance(signed_hash, str)
-        self.assertIsInstance(hash_value, bytes)
-    @patch('urllib.request.urlopen')
-    def test_valid_signature(self, mock_urlopen):
-        mock_urlopen.return_value.read.return_value = b"test content"
-        pub_key, signed_hash, hash_value = task_func("https://www.example.com")
-        content_hash = sha256(b"test content").digest()
-        try:
-            rsa.verify(content_hash, bytes.fromhex(signed_hash), pub_key)
-            verified = True
-        except rsa.VerificationError:
-            verified = False
-        self.assertTrue(verified)
-    @patch('urllib.request.urlopen')
-    def test_hashing_of_content(self, mock_urlopen):
-        mock_urlopen.return_value.read.return_value = b"test content"
-        pub_key, signed_hash, hash_value = task_func("https://www.example.com")
-        # Assuming the function is modified to return the content hash for testing
-        self.assertEqual(sha256(b"test content").digest(), hash_value)
-    @patch('urllib.request.urlopen')
-    def test_network_error_handling_1(self, mock_urlopen):
-        mock_urlopen.side_effect = urllib.error.URLError("URL error")
-        with self.assertRaises(urllib.error.URLError) as context:
-            pub_key, signed_hash, hash_value = task_func("https://www.example.com")
-    @patch('urllib.request.urlopen')
-    def test_http_error_handling_2(self, mock_urlopen):
-        mock_urlopen.side_effect = urllib.error.HTTPError("https://www.example.com", 404, "Not Found", hdrs={}, fp=None)
-        with self.assertRaises(ValueError) as context:
-            pub_key, signed_hash = task_func("https://www.example.com")
-    @patch('urllib.request.urlopen')
-    @patch('rsa.sign')
-    def test_verification_error_handling(self, mock_sign, mock_urlopen):
-        mock_urlopen.return_value.read.return_value = b"test content"
-        mock_sign.side_effect = rsa.pkcs1.VerificationError("Verification failed")
-        with self.assertRaises(rsa.pkcs1.VerificationError) as context:
-            pub_key, signed_hash, hash_value = task_func("https://www.example.com")
+    def test_case_1(self):
+        # Test basic functionality - 1 day ago
+        epoch_milliseconds = int(
+            (datetime.now() - timedelta(days=1)).timestamp() * 1000
+        )
+        log = task_func(epoch_milliseconds)
+        self.assertTrue(isinstance(log, pd.DataFrame))
+        self.assertTrue("User" in log.columns)
+        self.assertTrue("Activity" in log.columns)
+        self.assertTrue("Time" in log.columns)
+        start_time = datetime.fromtimestamp(epoch_milliseconds / 1000.0)
+        self.assertEqual(log.iloc[0]["Time"], start_time)
+    def test_case_2(self):
+        # Test with a short time frame - 1 minutes ago
+        epoch_milliseconds = int(
+            (datetime.now() - timedelta(minutes=1)).timestamp() * 1000
+        )
+        log = task_func(epoch_milliseconds)
+        self.assertTrue(len(log) > 0)  # Should have at least one entry
+        self.assertTrue(
+            log["Time"].min() >= datetime.fromtimestamp(epoch_milliseconds / 1000.0)
+        )
+    def test_case_3(self):
+        # Test with a specific seed
+        epoch_milliseconds = int(
+            (datetime.now() - timedelta(days=1)).timestamp() * 1000
+        )
+        seed = 42
+        log = task_func(epoch_milliseconds, seed=seed)
+        first_row = log.iloc[0]
+        expected_user = "user1"
+        expected_activity = "login"
+        self.assertEqual(first_row["User"], expected_user)
+        self.assertEqual(first_row["Activity"], expected_activity)
+    def test_case_4(self):
+        # Test functionality over a longer period - 1 month ago
+        epoch_milliseconds = int(
+            (datetime.now() - timedelta(days=30)).timestamp() * 1000
+        )
+        log = task_func(epoch_milliseconds)
+        # Ensure that log timestamps are properly incrementing
+        time_diffs = log["Time"].diff().dropna()
+        self.assertTrue(all(time_diffs > timedelta(seconds=0)))
+        seconds_in_a_month = (
+            30 * 24 * 60 * 60
+        )  # Approximate number of seconds in a month
+        max_possible_entries = (
+            seconds_in_a_month  # Assuming a minimum of 1-second increments
+        )
+        min_possible_entries = (
+            seconds_in_a_month // 10
+        )  # Assuming a maximum of 10-second increments
+        # Verify that the log has a reasonable number of entries given the time frame
+        self.assertTrue(min_possible_entries <= len(log) <= max_possible_entries)
+        self.assertTrue(
+            log["Time"].min() >= datetime.fromtimestamp(epoch_milliseconds / 1000.0)
+        )
+        self.assertTrue(log["Time"].max() <= datetime.now())
+    def test_case_5(self):
+        # Test invalid start time (future)
+        epoch_milliseconds = int(
+            (datetime.now() + timedelta(days=1)).timestamp() * 1000
+        )
+        with self.assertRaises(Exception):
+            task_func(epoch_milliseconds)

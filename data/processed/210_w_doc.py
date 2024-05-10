@@ -1,100 +1,146 @@
-import pandas as pd
-from sklearn.preprocessing import LabelEncoder
+import numpy as np
+from operator import itemgetter
+import matplotlib.pyplot as plt
 
-def task_func(df, dct, columns=None):
+
+def task_func(data):
     """
-    This function preprocesses a pandas DataFrame by replacing specified values, encoding categorical attributes, 
-    and standardizing numerical attributes. It's designed to be flexible for data preprocessing in machine learning tasks.
-
+    Plot a scatter graph of tuples and highlight the tuple with the maximum value at index 1.
+    
     Parameters:
-    - df (DataFrame): The input DataFrame to be preprocessed.
-    - dct (dict): A dictionary for replacing values in the DataFrame. Keys are existing values, and values are new values.
-    - columns (list of str, optional): Specific column names to be encoded. If None, all object-type columns in the DataFrame are encoded.
-
+    data (list of tuple): A list of tuples where each tuple contains two integers.
+    
     Returns:
-    - DataFrame: The preprocessed DataFrame with encoded categorical attributes and standardized numerical attributes.
-
+    matplotlib.axes.Axes: The Axes object of the plot for further manipulation and testing.
+    
     Requirements:
-    - pandas
-    - sklearn.preprocessing.LabelEncoder
-
+    - numpy
+    - operator
+    - matplotlib.pyplot
+    
     Example:
-    >>> df = pd.DataFrame({'col1': ['a', 'b', 'c'], 'col2': [1, 2, 3]})
-    >>> dct = {'a': 'x', 'b': 'y'}
-    >>> result = task_func(df, dct)
-    >>> result.shape == df.shape
-    True
-    >>> result['col1'].mean() == 0.0
-    True
-
-    Note:
-    - The function assumes that the DataFrame and the dictionary are well-formed and relevant to each other.
-    - The encoding of categorical columns is done using LabelEncoder, which encodes labels with value between 0 and n_classes-1.
-    - Numerical standardization is performed by subtracting the mean and dividing by the standard deviation of each column.
-
-    Raises:
-    - The function will raise a ValueError is input df is not a DataFrame.
+    >>> ax = task_func([(10, 20), (30, 40), (25, 50)])
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("The input df is not a DataFrame")
-    df = df.replace(dct)
-    if columns is None:
-        columns = df.select_dtypes(include=['object']).columns.tolist()
-    for column in columns:
-        if df[column].dtype == 'object':
-            le = LabelEncoder()
-            df[column] = le.fit_transform(df[column])
-    df = (df - df.mean()) / df.std()
-    return df
+    max_tuple = max(data, key=itemgetter(1))
+    tuples = np.array(data)
+    x = tuples[:,0]
+    y = tuples[:,1]
+    fig, ax = plt.subplots()
+    ax.scatter(x, y, label='Data')
+    ax.scatter(*max_tuple, color='red', label='Max Tuple')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_title('Max Tuple Highlighted')
+    ax.legend()
+    return ax
 
 import unittest
-import pandas as pd
-import numpy as np
+import doctest
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Testing with a mix of categorical and numerical columns
-        df = pd.DataFrame({'cat': ['a', 'b', 'c'], 'num': [1, 2, 3]})
-        dct = {'a': 'x', 'b': 'y', 'c': 'z'}
-        result = task_func(df, dct)
-        # Assertions
-        self.assertEqual(result.shape, df.shape)
-        self.assertTrue('cat' in result.columns)
-        self.assertTrue('num' in result.columns)
-    def test_case_2(self):
-        # Testing with only numerical columns
-        df = pd.DataFrame({'num1': [10, 20, 30], 'num2': [40, 50, 60]})
-        dct = {}
-        result = task_func(df, dct)
-        # Assertions
-        self.assertEqual(result.shape, df.shape)
-        self.assertAlmostEqual(result['num1'].mean(), 0, places=5)
-        self.assertAlmostEqual(result['num2'].mean(), 0, places=5)
-    def test_case_3(self):
-        # Testing with only categorical columns
-        df = pd.DataFrame({'cat1': ['u', 'v', 'w'], 'cat2': ['x', 'y', 'z']})
-        dct = {'u': 'a', 'v': 'b', 'w': 'c', 'x': 'd', 'y': 'e', 'z': 'f'}
-        result = task_func(df, dct)
-        # Assertions
-        self.assertEqual(result.shape, df.shape)
-        self.assertIn(result['cat1'].dtype, [np.float64])
-        self.assertIn(result['cat2'].dtype, [np.float64])
-    def test_case_4(self):
-        # Testing with an empty DataFrame
-        df = pd.DataFrame({})
-        dct = {}
-        result = task_func(df, dct)
-        # Assertions
-        self.assertEqual(result.empty, True)
-    def test_case_5(self):
-        # Testing with complex DataFrame and no changes through dictionary
-        df = pd.DataFrame({'num': [100, 200, 300], 'cat': ['alpha', 'beta', 'gamma']})
-        dct = {'delta': 400}
-        result = task_func(df, dct)
-        # Assertions
-        self.assertEqual(result.shape, df.shape)
-        self.assertAlmostEqual(result['num'].std(), 1, places=5)
-        self.assertIn(result['cat'].dtype, [np.float64])
     
-    def test_case_6(self):
-        with self.assertRaises(ValueError):
-            task_func("non_df", {})
+    def test_case_1(self):
+        data = [(10, 20), (30, 50), (60, 25), (80, 65)]
+        ax = task_func(data)
+        
+        # Check the title of the plot
+        self.assertEqual(ax.get_title(), "Max Tuple Highlighted")
+        
+        # Check the x and y axis labels
+        self.assertEqual(ax.get_xlabel(), "x")
+        self.assertEqual(ax.get_ylabel(), "y")
+        
+        # Check the data points
+        x_data, y_data = ax.collections[0].get_offsets().T
+        self.assertTrue(np.array_equal(x_data, [10, 30, 60, 80]))
+        self.assertTrue(np.array_equal(y_data, [20, 50, 25, 65]))
+        
+        # Check the highlighted point (Max Tuple)
+        x_max, y_max = ax.collections[1].get_offsets().T
+        self.assertEqual(x_max, 80)
+        self.assertEqual(y_max, 65)
+        
+    def test_case_2(self):
+        data = [(5, 10), (15, 35), (40, 55), (70, 30)]
+        ax = task_func(data)
+        
+        # Check the title of the plot
+        self.assertEqual(ax.get_title(), "Max Tuple Highlighted")
+        
+        # Check the x and y axis labels
+        self.assertEqual(ax.get_xlabel(), "x")
+        self.assertEqual(ax.get_ylabel(), "y")
+        
+        # Check the data points
+        x_data, y_data = ax.collections[0].get_offsets().T
+        self.assertTrue(np.array_equal(x_data, [5, 15, 40, 70]))
+        self.assertTrue(np.array_equal(y_data, [10, 35, 55, 30]))
+        
+        # Check the highlighted point (Max Tuple)
+        x_max, y_max = ax.collections[1].get_offsets().T
+        self.assertEqual(x_max, 40)
+        self.assertEqual(y_max, 55)
+        
+    def test_case_3(self):
+        data = [(3, 7), (9, 11), (13, 17), (19, 23)]
+        ax = task_func(data)
+        
+        # Check the title of the plot
+        self.assertEqual(ax.get_title(), "Max Tuple Highlighted")
+        
+        # Check the x and y axis labels
+        self.assertEqual(ax.get_xlabel(), "x")
+        self.assertEqual(ax.get_ylabel(), "y")
+        
+        # Check the data points
+        x_data, y_data = ax.collections[0].get_offsets().T
+        self.assertTrue(np.array_equal(x_data, [3, 9, 13, 19]))
+        self.assertTrue(np.array_equal(y_data, [7, 11, 17, 23]))
+        
+        # Check the highlighted point (Max Tuple)
+        x_max, y_max = ax.collections[1].get_offsets().T
+        self.assertEqual(x_max, 19)
+        self.assertEqual(y_max, 23)
+    
+    def test_case_4(self):
+        data = [(2, 3), (4, 5), (6, 7), (8, 9)]
+        ax = task_func(data)
+        
+        # Check the title of the plot
+        self.assertEqual(ax.get_title(), "Max Tuple Highlighted")
+        
+        # Check the x and y axis labels
+        self.assertEqual(ax.get_xlabel(), "x")
+        self.assertEqual(ax.get_ylabel(), "y")
+        
+        # Check the data points
+        x_data, y_data = ax.collections[0].get_offsets().T
+        self.assertTrue(np.array_equal(x_data, [2, 4, 6, 8]))
+        self.assertTrue(np.array_equal(y_data, [3, 5, 7, 9]))
+        
+        # Check the highlighted point (Max Tuple)
+        x_max, y_max = ax.collections[1].get_offsets().T
+        self.assertEqual(x_max, 8)
+        self.assertEqual(y_max, 9)
+        
+    def test_case_5(self):
+        data = [(20, 30), (40, 50), (60, 10), (80, 90)]
+        ax = task_func(data)
+        
+        # Check the title of the plot
+        self.assertEqual(ax.get_title(), "Max Tuple Highlighted")
+        
+        # Check the x and y axis labels
+        self.assertEqual(ax.get_xlabel(), "x")
+        self.assertEqual(ax.get_ylabel(), "y")
+        
+        # Check the data points
+        x_data, y_data = ax.collections[0].get_offsets().T
+        self.assertTrue(np.array_equal(x_data, [20, 40, 60, 80]))
+        self.assertTrue(np.array_equal(y_data, [30, 50, 10, 90]))
+        
+        # Check the highlighted point (Max Tuple)
+        x_max, y_max = ax.collections[1].get_offsets().T
+        self.assertEqual(x_max, 80)
+        self.assertEqual(y_max, 90)

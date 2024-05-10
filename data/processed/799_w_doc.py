@@ -1,58 +1,104 @@
-import random
-from collections import Counter
+import re
+import pandas as pd
 
-def task_func(strings: list) -> dict:
+def task_func(df: pd.DataFrame) -> int:
     """
-    Analyzes a given list of strings for the occurrence of a specific pattern and counts the occurrences.
+    Count the total number of brackets (i.e., '(', ')', '{', '}', '[', ']') in
+    a pandas DataFrame.
 
     Parameters:
-    - strings (list): A list of strings to be analyzed.
+    df (pandas.DataFrame): The DataFrame to process.
 
     Returns:
-    dict: A dictionary with results of string analysis showing counts of the pattern.
+    int: The total number of brackets.
+
+    Raises:
+    TypeError: If input is not a DataFrame
 
     Requirements:
-    - random
-    - collections
+    - re
+    - pandas
+
+    Note:
+    The function uses a specific pattern '[(){}[\]]' to identify brackets.
 
     Example:
-    >>> task_func(['abcd}def}', 'pqrs}tuv}', 'wxyz}123}', '456}789}', '0ab}cde}'])
-    Counter({2: 10})
+    >>> df = pd.DataFrame({'A': ['(a)', 'b', 'c'], 'B': ['d', 'e', '(f)']})
+    >>> task_func(df)
+    4
+
+    >>> df = pd.DataFrame({'Test': ['(a)', 'b', '[[[[))c']})
+    >>> task_func(df)
+    8
     """
-    if not strings:
-        return Counter()
-    pattern = '}'
-    random_choices = random.choices(strings, k=10)
-    pattern_counts = Counter([string.count(pattern) for string in random_choices])
-    return pattern_counts
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("df should be a DataFrame.")
+    BRACKETS_PATTERN = '[(){}[\]]'
+    return df.applymap(
+        lambda x: len(re.findall(BRACKETS_PATTERN, str(x)))
+        ).sum().sum()
 
 import unittest
+import pandas as pd
+from faker import Faker
+fake = Faker()
 class TestCases(unittest.TestCase):
-    
+    def test_wrong_input(self):
+        # test with non dataframe input
+        self.assertRaises(Exception, task_func, 1)
+        self.assertRaises(Exception, task_func, ['a'])
+        self.assertRaises(Exception, task_func, {'a': 1})
+        self.assertRaises(Exception, task_func, 'asdf')
     def test_case_1(self):
-        result = task_func(['abcd}def}', 'pqrs}tuv}', 'wxyz}123}', '456}789}', '0ab}cde}'])
-        total_counts = sum(result.values())
-        self.assertEqual(total_counts, 10)
-        for key in result:
-            self.assertTrue(1 <= key <= 2)
+        # Test with DataFrame containing no brackets
+        df = pd.DataFrame({
+            'A': [fake.word() for _ in range(5)],
+            'B': [fake.word() for _ in range(5)]
+        })
+        result = task_func(df)
+        self.assertEqual(result, 0)
     def test_case_2(self):
-        result = task_func(['abcd', 'pqrs', 'wxyz', '456', '0ab'])
-        total_counts = sum(result.values())
-        self.assertEqual(total_counts, 10)
-        self.assertTrue(0 in result)
-        self.assertEqual(result[0], 10)
+        # Test with DataFrame containing a few brackets
+        df = pd.DataFrame({
+            'A': ['(a)', 'b', 'c', '{d}', 'e'],
+            'B': ['f', '[g]', 'h', 'i', 'j']
+        })
+        result = task_func(df)
+        self.assertEqual(result, 6)
     def test_case_3(self):
-        result = task_func(['a}b}c}d', 'p}q}r}s', 'w}x}y}z', '4}5}6', '0}a}b'])
-        total_counts = sum(result.values())
-        self.assertEqual(total_counts, 10)
-        for key in result:
-            self.assertTrue(2 <= key <= 4)
+        # Test with DataFrame where every entry contains a bracket
+        df = pd.DataFrame({
+            'A': ['(a)', '{b}', '[c]', '(d)', '[e]'],
+            'B': ['{f}', '(g)', '[h]', '{i}', '(j)']
+        })
+        result = task_func(df)
+        self.assertEqual(result, 20)
     def test_case_4(self):
-        result = task_func([])
-        self.assertEqual(result, Counter())
+        # Test with DataFrame containing mixed characters and brackets
+        df = pd.DataFrame({
+            'A': ['(a1)', '{b2}', 'c3', 'd4', '[e5]'],
+            'B': ['f6', 'g7', '[h8]', 'i9', 'j0']
+        })
+        result = task_func(df)
+        self.assertEqual(result, 8)
     def test_case_5(self):
-        result = task_func(['a}b}c}d}e}f}g}h}i}j}k}l}'])
-        total_counts = sum(result.values())
-        self.assertEqual(total_counts, 10)
-        self.assertTrue(12 in result)
-        self.assertEqual(result[12], 10)
+        # Test with DataFrame containing numbers, letters, and brackets
+        df = pd.DataFrame({
+            'A': ['(123]', '{{456}', '789', '0ab', '[cde]'],
+            'B': ['fgh', 'ijk', '[)lmn]', 'opq', 'rst']
+        })
+        result = task_func(df)
+        self.assertEqual(result, 10)
+    def test_empty(self):
+        # test with empty df
+        df = pd.DataFrame()
+        result = task_func(df)
+        self.assertEqual(result, 0)
+    def test_only(self):
+        # test df with only parenthesis as entries
+        df = pd.DataFrame({
+            'test': ['[[()]', '{}{{{{{{))))}}', '[]'],
+            'asdf': ['{]', '()))', '))}}]]']
+        })
+        result = task_func(df)
+        self.assertEqual(result, 33)

@@ -1,75 +1,79 @@
-import random
+import numpy as np
+import matplotlib.pyplot as plt
 import string
-import pandas as pd
 
+# Constants
+ALPHABET = list(string.ascii_lowercase)
 
-def task_func(n_rows=1000):
+def task_func(word):
     """
-    Generate a histogram of the frequency of the top 30 unique random 3-letter strings.
-    The function creates random strings, each consisting of 3 letters from the lowercase English alphabet.
-    It then plots a histogram showing the frequencies of the top 30 most common strings among the generated set.
-
-    Parameters:
-    - n_rows (int): Number of random 3-letter strings to generate.
-    Must be positive. Default is 1000.
-
-    Returns:
-    - ax (matplotlib.axes.Axes): A Matplotlib Axes object containing the histogram.
-    Each bar represents one of the top 30 most frequent 3-letter strings.
-
-    Raises:
-    - ValueError: If `n_rows` is less than or equal to 0.
-
-    Requirements:
-    - random
-    - string
-    - pandas
+    Draws a bar chart representing the positions of each letter in the given word 
+    within the English alphabet using numpy and matplotlib.pyplot.
     
-    Example:
-    >>> ax = task_func(1000)
-    >>> ax.get_title()
-    'Top 30 Frequencies of Random 3-Letter Strings'
+    Parameters:
+    word (str): The word whose letters' positions will be plotted. 
+                Should contain only lowercase alphabetic characters.
+                
+    Returns:
+    Axes: A matplotlib.axes._axes.Axes object representing the generated plot.
+    
+    Requirements:
+    - numpy
+    - matplotlib.pyplot
+    
+    Constants:
+    - ALPHABET: A list containing all lowercase letters of the English alphabet.
+    
+    Examples:
+    >>> ax = task_func('abc')
+    >>> ax = task_func('hello')
+    
+    Note: 
+    The function uses the index of each letter in the English alphabet to represent its position.
+    For example, 'a' will be represented by 1, 'b' by 2, and so on.
     """
-    if n_rows <= 0:
-        raise ValueError("Number of rows must be greater than 0")
-    data = ["".join(random.choices(string.ascii_lowercase, k=3)) for _ in range(n_rows)]
-    df = pd.DataFrame(data, columns=["String"])
-    frequency = df["String"].value_counts()
-    ax = frequency.head(30).plot(
-        kind="bar"
-    )  # Limit to the top 30 frequencies for readability
-    ax.set_title("Top 30 Frequencies of Random 3-Letter Strings")
-    ax.set_xlabel("String")
-    ax.set_ylabel("Frequency")
+    if not all(char in ALPHABET for char in word):
+        raise ValueError("The word should contain only lowercase alphabetic characters.")
+    letter_positions = np.array(list(map(lambda x: ALPHABET.index(x) + 1, word)))
+    fig, ax = plt.subplots()
+    ax.bar(np.arange(len(letter_positions)), letter_positions)
+    ax.set_xlabel('Letter Index')
+    ax.set_ylabel('Alphabetical Position')
+    ax.set_title('Alphabetical Position of Letters in Word')
+    plt.show()
     return ax
 
 import unittest
-import random
 from matplotlib.axes import Axes
-import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Tests for the function task_func."""
-    def test_return_type(self):
-        """Test if the function returns a Matplotlib Axes object."""
-        random.seed(0)
-        result = task_func(100)
-        self.assertIsInstance(result, Axes)
-    def test_default_parameter(self):
-        """Test the function with the default parameter."""
-        result = task_func()
-        self.assertIsInstance(result, Axes)
-    def test_zero_rows(self):
-        """Test the function with zero rows."""
+    
+    def test_case_1(self):
+        ax = task_func('abc')
+        self.assertIsInstance(ax, Axes, "The returned object is not an instance of Axes.")
+        self.assertEqual(ax.patches[0].get_height(), 1, "The height of the first bar should be 1.")
+        self.assertEqual(ax.patches[1].get_height(), 2, "The height of the second bar should be 2.")
+        self.assertEqual(ax.patches[2].get_height(), 3, "The height of the third bar should be 3.")
+    
+    def test_case_2(self):
+        ax = task_func('xyz')
+        self.assertIsInstance(ax, Axes, "The returned object is not an instance of Axes.")
+        self.assertEqual(ax.patches[0].get_height(), 24, "The height of the first bar should be 24.")
+        self.assertEqual(ax.patches[1].get_height(), 25, "The height of the second bar should be 25.")
+        self.assertEqual(ax.patches[2].get_height(), 26, "The height of the third bar should be 26.")
+        
+    def test_case_3(self):
+        ax = task_func('ace')
+        self.assertIsInstance(ax, Axes, "The returned object is not an instance of Axes.")
+        self.assertEqual(ax.patches[0].get_height(), 1, "The height of the first bar should be 1.")
+        self.assertEqual(ax.patches[1].get_height(), 3, "The height of the second bar should be 3.")
+        self.assertEqual(ax.patches[2].get_height(), 5, "The height of the third bar should be 5.")
+        
+    def test_case_4(self):
+        ax = task_func('bd')
+        self.assertIsInstance(ax, Axes, "The returned object is not an instance of Axes.")
+        self.assertEqual(ax.patches[0].get_height(), 2, "The height of the first bar should be 2.")
+        self.assertEqual(ax.patches[1].get_height(), 4, "The height of the second bar should be 4.")
+        
+    def test_case_5(self):
         with self.assertRaises(ValueError):
-            task_func(0)
-    def test_negative_rows(self):
-        """Test the function with a negative number of rows."""
-        with self.assertRaises(ValueError):
-            task_func(-1)
-    def test_large_number_of_rows(self):
-        """Test the function with a large number of rows."""
-        random.seed(2)
-        result = task_func(10000)
-        self.assertIsInstance(result, Axes)
-    def tearDown(self):
-        plt.close()
+            task_func('a1b')

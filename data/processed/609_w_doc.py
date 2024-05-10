@@ -1,58 +1,85 @@
-import pandas as pd
-from sklearn.cluster import DBSCAN
+import seaborn as sns
+from random import sample
 
-def task_func(data, cols):
+
+# Constants
+COLUMNS = ['A', 'B', 'C', 'D', 'E']
+
+def task_func(df, tuples, n_plots):
     """
-    Perform DBSCAN clustering on the data by transforming it into a DataFrame and recording the clusters in a new column named 'Cluster'.
-    Please choose the parameters eps=3 and min_samples=2.
-    
+    Remove rows from a dataframe based on values of multiple columns, and then create n random pairs of two columns 
+    against each other to generate pairplots.
+
     Parameters:
-    - data (list): List of lists with the data, where the length of the inner list equals the number of columns
-    - cols (list): List of column names
-    
+    df (DataFrame): The pandas DataFrame.
+    tuples (list of tuple): A list of tuples, where each tuple represents a row to be removed based on its values.
+    n_plots (int): The number of pairplots to be generated using randomly selected column pairs.
+
     Returns:
-    - df (DataFrame): The DataFrame with a new 'Cluster' column.
+    tuple: A tuple containing:
+        - DataFrame: The modified DataFrame after removing specified rows.
+        - list of Axes: A list containing the generated pairplots.
 
     Requirements:
-    - pandas
-    - sklearn
+    - seaborn
+    - random
 
     Example:
-    >>> data = [[5.1, 3.5], [4.9, 3.0], [4.7, 3.2]]
-    >>> cols = ['x', 'y']
-    >>> df = task_func(data, cols)
-    >>> print(df)
-         x    y  Cluster
-    0  5.1  3.5        0
-    1  4.9  3.0        0
-    2  4.7  3.2        0
+    >>> import numpy as np, pandas as pd
+    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
+    >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
+    >>> modified_df, plots = task_func(df, tuples, 3)
     """
-    df = pd.DataFrame(data, columns=cols)
-    dbscan = DBSCAN(eps=3, min_samples=2)
-    df['Cluster'] = dbscan.fit_predict(df)
-    return df
+    if not df.empty:
+        df = df[~df.apply(tuple, axis=1).isin(tuples)]
+    plots = []
+    if n_plots > 0 and not df.empty:
+        available_columns = df.columns.tolist()
+        for _ in range(min(n_plots, len(available_columns) // 2)):  # Ensure we have enough columns
+            selected_columns = sample(available_columns, 2)
+            plot = sns.pairplot(df, vars=selected_columns)
+            plots.append(plot)
+    return df, plots
 
 import unittest
-import numpy as np
+import pandas as pd
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        # Common setup for generating DataFrame for testing
+        self.df = pd.DataFrame({
+            'A': list(range(0, 100, 10)) + [10, 60],
+            'B': list(range(10, 110, 10)) + [20, 70],
+            'C': list(range(20, 120, 10)) + [30, 80],
+            'D': list(range(30, 130, 10)) + [40, 90],
+            'E': list(range(40, 140, 10)) + [50, 100]
+        })
     def test_case_1(self):
-        df = task_func([[5.1, 3.5], [4.9, 3.0], [4.7, 3.2]], ['x', 'y'])
-        print(df)
-        self.assertTrue('Cluster' in df.columns)
-        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0])))
+        tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
+        modified_df, plots = task_func(self.df, tuples, 3)
+        self.assertTrue(all(tuple(row) not in tuples for row in modified_df.to_numpy()))
+        # Check the number of plots does not exceed min(n_plots, len(df.columns) // 2)
+        expected_plot_count = min(3, len(self.df.columns) // 2)
+        self.assertEqual(len(plots), expected_plot_count)
     def test_case_2(self):
-        df = task_func([[1, 2], [3, 4], [5, 6]], ['x', 'y'])
-        self.assertTrue('Cluster' in df.columns)
-        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0])))
+        tuples = [(200, 200, 200, 200, 200), (300, 300, 300, 300, 300)]
+        modified_df, plots = task_func(self.df, tuples, 2)
+        self.assertEqual(len(modified_df), len(self.df))
+        self.assertEqual(len(plots), 2)
     def test_case_3(self):
-        df = task_func([[1, 2], [2, 2], [2, 3], [8, 7], [8, 8], [25, 80]], ['x', 'y'])
-        self.assertTrue('Cluster' in df.columns)
-        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0, 1, 1, -1])))
+        tuples = []
+        modified_df, plots = task_func(self.df, tuples, 1)
+        self.assertEqual(len(modified_df), len(self.df))
+        self.assertEqual(len(plots), 1)
     def test_case_4(self):
-        df = task_func([[1, 2, 3], [2, 2, 2], [2, 3, 4], [8, 7, 6], [8, 8, 8], [25, 80, 100]], ['x', 'y', 'z'])
-        self.assertTrue('Cluster' in df.columns)
-        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0, 1, 1, -1])))
+        tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
+        modified_df, plots = task_func(self.df, tuples, 0)
+        self.assertTrue(all(row not in modified_df.values for row in tuples))
+        self.assertEqual(len(plots), 0)
     def test_case_5(self):
-        df = task_func([[-1, -2], [-2, -2], [-2, -3], [-8, -7], [-8, -8], [-25, -80]], ['x', 'y'])
-        self.assertTrue('Cluster' in df.columns)
-        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0, 1, 1, -1])))
+        tuples = [(10, 20, 30, 40, 50), (200, 200, 200, 200, 200)]
+        modified_df, plots = task_func(self.df, tuples, 4)
+        # Ensure the specific tuple is not in the DataFrame
+        self.assertTrue((10, 20, 30, 40, 50) not in modified_df.values)
+        # Check the number of plots does not exceed min(n_plots, len(df.columns) // 2)
+        expected_plot_count = min(4, len(self.df.columns) // 2)
+        self.assertEqual(len(plots), expected_plot_count)

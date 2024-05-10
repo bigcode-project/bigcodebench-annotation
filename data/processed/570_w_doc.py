@@ -1,91 +1,87 @@
-import statistics
-import matplotlib.pyplot as plt
+import inspect
+import types
+import math
 
-
-def task_func(sales_data):
+def task_func(f):
     """
-    Plot sales trends for five products over a year, highlighting variability with standard deviation shading
-    with 'Month' on x-axis and 'Sales' on y-axis.
+    Analyzes a given function 'f' and returns a dictionary containing its name, the square root of
+    the number of arguments, and the count of lambda functions present in its default values.
+    This function demonstrates introspection of Python functions and the use of mathematical
+    operations on the introspected data.
 
     Parameters:
-    - sales_data (pd.DataFrame): DataFrame with sales data, expected columns: 'Month', 'Product A' to 'Product E'.
+    f (function): The function to inspect.
 
     Returns:
-    - ax (matplotlib.axes.Axes): Axes object with the sales trends plot.
+    dict: A dictionary containing the function's name, the square root of the number of arguments,
+          and the count of lambda functions in default values.
 
     Requirements:
-    - matplotlib.pyplot
-    - statistics
+    - inspect
+    - types
+    - math
 
-    Example:
-    >>> import pandas as pd, numpy as np
-    >>> sales_data = pd.DataFrame({
-    ...     'Month': range(1, 13),
-    ...     'Product A': np.random.randint(100, 200, size=12),
-    ...     'Product B': np.random.randint(150, 250, size=12),
-    ...     'Product C': np.random.randint(120, 220, size=12),
-    ...     'Product D': np.random.randint(130, 230, size=12),
-    ...     'Product E': np.random.randint(140, 240, size=12)
-    ... })
-    >>> ax = task_func(sales_data)
-    >>> plt.show()  # Displays the plot
+    Examples:
+    >>> def sample_function(x, y=2): return x + y
+    >>> result = task_func(sample_function)
+    >>> 'sample_function' == result['function_name'] and result['sqrt_args'] == math.sqrt(2)
+    True
+    >>> lambda_func = lambda x: x * 2
+    >>> task_func(lambda_func)['lambda_in_defaults'] == 0
+    True
     """
-    fig, ax = plt.subplots()
-    for label in sales_data.columns[1:]:  # Skipping 'Month' column
-        monthly_sales = sales_data[label]
-        std_dev = statistics.stdev(monthly_sales)
-        ax.plot(sales_data['Month'], monthly_sales, label=label)
-        ax.fill_between(sales_data['Month'],
-                        monthly_sales - std_dev,
-                        monthly_sales + std_dev,
-                        alpha=0.2)
-    ax.set_xlabel('Month')
-    ax.set_ylabel('Sales')
-    ax.set_title('Monthly Sales Trends with Standard Deviation')
-    ax.legend()
-    ax.set_xticks(sales_data['Month'])
-    return ax
+    spec = inspect.getfullargspec(f)
+    info = {
+        'function_name': f.__name__,
+        'sqrt_args': math.sqrt(len(spec.args)),
+    }
+    if spec.defaults:
+        info['lambda_in_defaults'] = sum(1 for d in spec.defaults if isinstance(d, types.LambdaType))
+    else:
+        info['lambda_in_defaults'] = 0
+    return info
 
 import unittest
-import pandas as pd
-import numpy as np
+import math
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Generating a sample sales DataFrame
-        self.sales_data = pd.DataFrame({
-            'Month': range(1, 13),
-            'Product A': np.random.randint(100, 200, size=12),
-            'Product B': np.random.randint(150, 250, size=12),
-            'Product C': np.random.randint(120, 220, size=12),
-            'Product D': np.random.randint(130, 230, size=12),
-            'Product E': np.random.randint(140, 240, size=12)
-        })
-    def test_plot_labels(self):
-        """Ensure all product labels are present in the plot legend."""
-        ax = task_func(self.sales_data)
-        legend_labels = [text.get_text() for text in ax.get_legend().get_texts()]
-        self.assertEqual(set(legend_labels), set(self.sales_data.columns[1:]),
-                         "Not all product labels are present in the plot legend.")
-    def test_plot_lines(self):
-        """Check if the plot contains lines for each product."""
-        ax = task_func(self.sales_data)
-        self.assertEqual(len(ax.lines), len(self.sales_data.columns) - 1,
-                         "Plot does not contain the correct number of lines.")
-    def test_monthly_ticks(self):
-        """Verify that all months are correctly plotted as x-ticks."""
-        ax = task_func(self.sales_data)
-        # Convert x-ticks to integers for comparison
-        x_ticks = [int(tick) for tick in ax.get_xticks() if isinstance(tick, (int, np.integer))]
-        expected_ticks = self.sales_data['Month'].tolist()
-        self.assertListEqual(x_ticks, expected_ticks, "Not all months are correctly plotted as x-ticks.")
-    def test_positive_sales(self):
-        """Ensure all plotted sales values are positive."""
-        ax = task_func(self.sales_data)
-        for line in ax.lines:
-            self.assertTrue(all(y >= 0 for y in line.get_ydata()),
-                            "Plotted sales values should be positive.")
-    def test_std_dev_shading(self):
-        """Check for standard deviation shading around each product line."""
-        ax = task_func(self.sales_data)
-        self.assertGreaterEqual(len(ax.collections), len(self.sales_data.columns) - 1,
-                                "Missing standard deviation shading for one or more products.")
+    def test_regular_function(self):
+        def sample_function(x, y, z=3): pass
+        result = task_func(sample_function)
+        self.assertEqual(result['function_name'], 'sample_function')
+        self.assertEqual(result['sqrt_args'], math.sqrt(3))
+    def test_lambda_in_defaults(self):
+        def func_with_lambda(x, y=lambda a: a+2): pass
+        result = task_func(func_with_lambda)
+        self.assertEqual(result['lambda_in_defaults'], 1)
+    def test_no_arguments(self):
+        def no_arg_func(): pass
+        result = task_func(no_arg_func)
+        self.assertEqual(result['sqrt_args'], 0)
+    def test_function_with_no_lambda_defaults(self):
+        def func_without_lambda(x, y=2): pass
+        result = task_func(func_without_lambda)
+        self.assertEqual(result['lambda_in_defaults'], 0)
+    def test_function_with_multiple_defaults(self):
+        def sample_function(x, y=2, z=lambda a: a+2, w=lambda b: b*2): pass
+        result = task_func(sample_function)
+        self.assertEqual(result['lambda_in_defaults'], 2)
+    def test_lambda_function(self):
+        lambda_func = lambda x, y=lambda a: a * 2: x + y(2)
+        result = task_func(lambda_func)
+        self.assertEqual(result['function_name'], '<lambda>')
+        self.assertEqual(result['sqrt_args'], math.sqrt(2), "Sqrt of args should be sqrt(2) for lambda_func with 2 args")
+        self.assertEqual(result['lambda_in_defaults'], 1, "There should be 1 lambda in defaults")
+    
+    def test_sqrt_args_correctness(self):
+        def test_func(a, b, c=3, d=lambda x: x + 1): pass
+        result = task_func(test_func)
+        self.assertEqual(result['sqrt_args'], math.sqrt(4), "Sqrt of args count should match expected value")
+    # Test for edge case or error handling
+    def test_non_function_input(self):
+        with self.assertRaises(TypeError):
+            task_func("This is not a function")
+    # Directly verifying the math operation
+    def test_math_operation_direct_check(self):
+        def test_func(a, b, c=3, d=lambda x: x + 1): pass
+        result = task_func(test_func)
+        self.assertAlmostEqual(result['sqrt_args'], math.sqrt(4), msg="sqrt_args should accurately represent the square root of the number of arguments.")

@@ -1,79 +1,59 @@
-import numpy as np
-from sklearn.model_selection import cross_val_score
-from sklearn.ensemble import RandomForestRegressor
+import pandas as pd
+from collections import Counter
 
-def task_func(num_samples=100, n_estimators=100, random_seed=None, cv=5):
-    '''
-    Generate a dataset with five features sampled from the standard normal
-    distribution and a target variable.
-    The target value is created by computing the sum of the features and adding
-    random numbers sampled from the standard normal distribution.
-    Then cross-validate the dataset using a RandomForestRegressor model and
-    return the mean cross-validation score.
-
+def task_func(df):
+    """
+    Calculate the frequency of combinations of elements in a DataFrame.
+    The function adds a 'combination' column to the DataFrame, which is the combination of items in each row.
+    It then calculates the frequency of each combination.
+    
     Parameters:
-    - num_samples (int): Number of samples in the generated dataset. Default is 100.
-    - n_estimators (int): Number of trees in RandomForestRegressor. Default is 100.
-    - random_seed (int): Seed for random number generation. Default is None.
-    - cv (int): Number of cross-validation folds. Default is 5.
-
+    - df (pandas.DataFrame): The input DataFrame with columns 'item1', 'item2', 'item3', 'item4', 'item5'.
+    
     Returns:
-    float: The mean cross-validation score.
-    model: the trained model
-
-    Raises:
-    - ValueError: If num_samples / cv < 2
+    - dict: A dictionary containing the frequency of all combination.
 
     Requirements:
-    - numpy
-    - sklearn.model_selection.cross_val_score
-    - sklearn.ensemble.RandomForestRegressor
+    - pandas
+    - collections
 
     Example:
-    >>> res = task_func(random_seed=21, cv=3, n_estimators=90, num_samples=28)
-    >>> print(res)
-    (-0.7631373607354236, RandomForestRegressor(n_estimators=90, random_state=21))
-
-    >>> results = task_func(random_seed=1)
-    >>> print(results)
-    (0.47332912782858, RandomForestRegressor(random_state=1))
-    '''
-    if num_samples / cv < 2:
-        raise ValueError("num_samples / cv should be greater than or equal to 2.")
-    np.random.seed(random_seed)
-    X = np.random.randn(num_samples, 5)
-    y = np.sum(X, axis=1) + np.random.randn(num_samples)
-    model = RandomForestRegressor(n_estimators=n_estimators,
-                                  random_state=random_seed
-                                  )
-    cv_scores = cross_val_score(model, X, y, cv=cv)
-    return np.mean(cv_scores), model
+    >>> df = pd.DataFrame({'item1': ['a', 'b', 'a'], 'item2': ['b', 'c', 'b'], 'item3': ['c', 'd', 'c'], 'item4': ['d', 'e', 'd'], 'item5': ['e', 'f', 'e']})
+    >>> task_func(df)
+    {('a', 'b', 'c', 'd', 'e'): 2, ('b', 'c', 'd', 'e', 'f'): 1}
+    """
+    df['combination'] = pd.Series(df.apply(lambda row: tuple(sorted(row)), axis=1))
+    combination_freq = Counter(df['combination'])
+    return dict(combination_freq)
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_case_rng(self):
-        'rng reproducability'
-        result1, _ = task_func(random_seed=42)
-        result2, _ = task_func(random_seed=42)
-        self.assertAlmostEqual(result1, result2)
     def test_case_1(self):
-        'default params'
-        result, model = task_func(random_seed=1)
-        self.assertAlmostEqual(result, 0.47332912782858)
-        self.assertTrue(isinstance(model, RandomForestRegressor))
+        df = pd.DataFrame({'item1': ['a', 'b', 'a'], 'item2': ['b', 'c', 'b'], 'item3': ['c', 'd', 'c'], 'item4': ['d', 'e', 'd'], 'item5': ['e', 'f', 'e']})
+        freq = task_func(df)
+        self.assertEqual(freq[('a', 'b', 'c', 'd', 'e')], 2)
+        self.assertEqual(freq[('b', 'c', 'd', 'e', 'f')], 1)
     def test_case_2(self):
-        'random outcome with distinct seeds'
-        result1, _ = task_func(random_seed=2)
-        result2, _ = task_func(random_seed=3)
-        self.assertFalse(result1 == result2)
+        df = pd.DataFrame({'item1': ['c', 'b', 'a'], 'item2': ['b', 'c', 'b'], 'item3': ['c', 'd', 'c'], 'item4': ['d', 'e', 'd'], 'item5': ['e', 'f', 'e']})
+        freq = task_func(df)
+        print(freq)
+        self.assertEqual(freq[('a', 'b', 'c', 'd', 'e')], 1)
+        self.assertEqual(freq[('b', 'c', 'd', 'e', 'f')], 1)
+        if ('b', 'c', 'c', 'd', 'e') in freq:
+            self.assertEqual(freq[('b', 'c', 'c', 'd', 'e')], 1)
+        elif ('c', 'b', 'c', 'd', 'e') in freq:
+            self.assertEqual(freq[('c', 'b', 'c', 'd', 'e')], 1)
     def test_case_3(self):
-        result, model = task_func(random_seed=2, cv=2, n_estimators=2)
-        self.assertAlmostEqual(result, 0.2316988319594362)
-        self.assertTrue(isinstance(model, RandomForestRegressor))
+        df = pd.DataFrame({'item1': ['a'], 'item2': ['a'], 'item3': ['a'], 'item4': ['a'], 'item5': ['a']})
+        freq = task_func(df)
+        self.assertEqual(freq[('a', 'a', 'a', 'a', 'a')], 1)
     def test_case_4(self):
-        'test exception'
-        self.assertRaises(Exception,
-                          task_func,
-                          {'random_seed': 223, 'cv': 3,
-                           'n_estimators': 100, 'num_samples': 4}
-                          )
+        df = pd.DataFrame({'item1': ['a', 'b', 'c'], 'item2': ['b', 'c', 'd'], 'item3': ['c', 'd', 'e'], 'item4': ['d', 'e', 'f'], 'item5': ['e', 'f', 'g']})
+        freq = task_func(df)
+        self.assertEqual(freq[('a', 'b', 'c', 'd', 'e')], 1)
+        self.assertEqual(freq[('b', 'c', 'd', 'e', 'f')], 1)
+        self.assertEqual(freq[('c', 'd', 'e', 'f', 'g')], 1)
+    def test_case_5(self):
+        df = pd.DataFrame({'item1': ['a', 'a', 'a'], 'item2': ['b', 'b', 'b'], 'item3': ['c', 'c', 'c'], 'item4': ['d', 'd', 'd'], 'item5': ['e', 'e', 'e']})
+        freq = task_func(df)
+        self.assertEqual(freq[('a', 'b', 'c', 'd', 'e')], 3)

@@ -1,75 +1,84 @@
-import os
-from nltk import word_tokenize
+import requests
+import pandas as pd
 
-def task_func(file_path='File.txt'):
+
+def task_func(api_url):
     """
-    Tokenizes a text file using the NLTK library. This function reads each line from the file, 
-    breaks it into words or punctuation, and stores the tokens in a list.
-    
+    Fetches data from a specified API, processes the JSON response, converts it into a pandas DataFrame,
+    and plots the data using matplotlib.
+    If the data is empty, no plot is generated. If the API request fails, it raises an HTTPError.
+    The function also checks if the provided API URL is a string.
+
     Parameters:
-    - file_path (str): The path to the text file. Defaults to 'File.txt'.
-    
+    - api_url (str): The URL of the API to fetch data from.
+
     Returns:
-    - list: A list of tokens.
-    
+    - DataFrame: A pandas DataFrame with the parsed data from the API.
+    - Axes or None: A matplotlib Axes object representing the plot of the data, or None if the data is empty.
+
+    Raises:
+    - HTTPError: If the API request fails due to issues like network problems, invalid response, etc.
+    - TypeError: If the `api_url` is not a string.
+
     Requirements:
-    - os
-    - nltk.word_tokenize
-    
-    Examples:
-    >>> task_func('sample.txt')
-    ['Hello', ',', 'world', '!']
-    >>> task_func('data.txt')
-    ['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog', '.']
+    - requests
+    - pandas
+    - matplotlib.pyplot
+
+    Example:
+    >>> df, plot = task_func("https://api.example.com/data")
+    >>> df.head()
+    >>> if plot:
+    >>>     plot.show()
     """
-    if not os.path.isfile(file_path):
-        raise FileNotFoundError(f"File not found: {file_path}")
-    tokens = []
-    with open(file_path, 'r') as file:
-        for line in file:
-            tokens.extend(word_tokenize(line))
-    return tokens
+    if not isinstance(api_url, str):
+        raise TypeError("api_url must be a string")
+    response = requests.get(api_url, timeout=5)
+    response.raise_for_status()
+    data = response.json()
+    df = pd.DataFrame(data)
+    plot = df.plot() if not df.empty else None
+    return df, plot
 
 import unittest
-import shutil
+from unittest.mock import patch, Mock
+import pandas as pd
+import matplotlib.pyplot as plt
+API_URL = "https://api.example.com/data"
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.test_dir = 'testdir_task_func'
-        os.makedirs(self.test_dir, exist_ok=True)
-        
-        f = open(self.test_dir+"/sample1.txt","w")
-        f.write("Hello, world!")
-        f.close()
-        f = open(self.test_dir+"/sample2.txt","w")
-        f.write("The quick brown fox jumps over the lazy dog .")
-        f.close()
-        f = open(self.test_dir+"/sample3.txt","w")
-        f.write("NLTK is a leading platform for building Python programs to work with human language data.")
-        f.close()
-        f = open(self.test_dir+"/sample4.txt","w")
-        f.write("OpenAI is an organization focused on    ensuring that artificial general intelligence benefits all   of humanity    .")
-        f.close()
-        
-        
-        f = open(self.test_dir+"/sample5.txt","w")
-        f.write("Python is an interpreted, high-level , general-purpose programming language.")
-        f.close()
-        
+    """Test cases for the function."""
+    @patch("requests.get")
+    def test_successful_api_call_with_data(self, mock_get):
+        """Test the function with a successful API call returning non-empty data."""
+        mock_get.return_value = Mock(status_code=200, json=lambda: [{"a": 1, "b": 2}])
+        df, plot = task_func("http://example.com/api")
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertIsInstance(plot, plt.Axes)
+    @patch("requests.get")
+    def test_successful_api_call_with_empty_data(self, mock_get):
+        """Test the function with a successful API call returning empty data."""
+        mock_get.return_value = Mock(status_code=200, json=lambda: [])
+        df, plot = task_func("http://example.com/api")
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertTrue(df.empty)
+        self.assertIsNone(plot)
+    @patch("requests.get")
+    def test_api_call_with_invalid_json(self, mock_get):
+        """Test the function with an API call returning invalid JSON."""
+        mock_get.return_value = Mock(
+            status_code=200, json=lambda: Exception("Invalid JSON")
+        )
+        with self.assertRaises(Exception):
+            task_func("http://example.com/api")
+    @patch("requests.get")
+    def test_api_call_with_http_error(self, mock_get):
+        """Test the function with an API call that raises an HTTP error."""
+        mock_get.side_effect = requests.HTTPError()
+        with self.assertRaises(requests.HTTPError):
+            task_func("http://example.com/api")
+    def test_incorrect_url_type(self):
+        """Test the function with an incorrect type for the URL."""
+        with self.assertRaises(TypeError):
+            task_func(123)
     def tearDown(self):
-        # Clean up the test directory
-        shutil.rmtree(self.test_dir)
-    def test_case_1(self):
-        tokens = task_func(self.test_dir+'/sample1.txt')
-        self.assertEqual(tokens, ['Hello', ',', 'world', '!'])
-    def test_case_2(self):
-        tokens = task_func(self.test_dir+'/sample2.txt')
-        self.assertEqual(tokens, ['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog', '.'])
-    def test_case_3(self):
-        tokens = task_func(self.test_dir+'/sample3.txt')
-        self.assertEqual(tokens, ['NLTK', 'is', 'a', 'leading', 'platform', 'for', 'building', 'Python', 'programs', 'to', 'work', 'with', 'human', 'language', 'data', '.'])
-    def test_case_4(self):
-        tokens = task_func(self.test_dir+'/sample4.txt')
-        self.assertEqual(tokens, ['OpenAI', 'is', 'an', 'organization', 'focused', 'on', 'ensuring', 'that', 'artificial', 'general', 'intelligence', 'benefits', 'all', 'of', 'humanity', '.'])
-    def test_case_5(self):
-        tokens = task_func(self.test_dir+'/sample5.txt')
-        self.assertEqual(tokens, ['Python', 'is', 'an', 'interpreted', ',', 'high-level', ',', 'general-purpose', 'programming', 'language', '.'])
+        plt.close()

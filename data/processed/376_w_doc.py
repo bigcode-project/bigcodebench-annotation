@@ -1,43 +1,43 @@
+from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-import numpy as np
 
-
-def task_func(myList):
+def task_func(l):
     """
-    Draws a histogram of the values in a list and returns the plot's Axes.
-
-    For visualization:
-      - Bin edges are adjusted to align with integer values in `myList`.
-      - Histogram bars are outlined in black.
-      - X-axis label: 'Value'
-      - Y-axis label: 'Frequency'
-      - Plot title: 'Histogram of Values'
+    Perform Principal Component Analysis (PCA) on the given array and record the first two main components.
 
     Parameters:
-    - myList (list): List of numerical values to plot.
+    l (numpy array): The input array.
 
     Returns:
-    - ax (matplotlib.axes._axes.Axes): Axes object of the histogram plot.
+    ax (matplotlib.axes._axes.Axes): Axes object of the generated plot
+
+    Note:
+    - This function use "PCA Result" as the title of the plot.
+    - This function use "First Principal Component" and "Second Principal Component" as the xlabel 
+    and ylabel of the plot, respectively.
 
     Requirements:
+    - sklearn.decomposition.PCA
     - matplotlib.pyplot
-    - numpy
 
     Example:
-    >>> myList = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
-    >>> ax = task_func(myList)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> ax.get_xticklabels()
-    [Text(0.0, 0, '0.0'), Text(0.5, 0, '0.5'), Text(1.0, 0, '1.0'), Text(1.5, 0, '1.5'), Text(2.0, 0, '2.0'), Text(2.5, 0, '2.5'), Text(3.0, 0, '3.0'), Text(3.5, 0, '3.5'), Text(4.0, 0, '4.0'), Text(4.5, 0, '4.5'), Text(5.0, 0, '5.0')]
+    >>> import numpy as np
+    >>> l = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+    >>> ax = task_func(l)
+    >>> len(ax.collections[0].get_offsets())
+    4
+    >>> print(ax.get_title())
+    PCA Result
+    >>> plt.close()
     """
-    _, ax = plt.subplots()
-    ax.hist(
-        myList, bins=np.arange(min(myList), max(myList) + 2) - 0.5, edgecolor="black"
-    )
-    ax.set_xlabel("Value")
-    ax.set_ylabel("Frequency")
-    ax.set_title("Histogram of Values")
+    pca = PCA(n_components=2)
+    principalComponents = pca.fit_transform(l)
+    fig = plt.figure(figsize=(6, 4))
+    ax = fig.add_subplot(111)
+    plt.scatter(principalComponents[:, 0], principalComponents[:, 1])
+    plt.xlabel('First Principal Component')
+    plt.ylabel('Second Principal Component')
+    plt.title('PCA Result')
     return ax
 
 import unittest
@@ -45,45 +45,58 @@ import numpy as np
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test basic case
-        myList = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
-        ax = task_func(myList)
-        heights, _, _ = ax.hist(
-            myList,
-            bins=np.arange(min(myList), max(myList) + 2) - 0.5,
-            edgecolor="black",
-        )
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertListEqual(list(heights), [1, 2, 3, 4])
-        self.assertEqual(ax.get_title(), "Histogram of Values")
-        self.assertEqual(ax.get_xlabel(), "Value")
-        self.assertEqual(ax.get_ylabel(), "Frequency")
+        # Input 1: simple 2D array
+        l = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+        ax = task_func(l)
+        self.assertTrue(isinstance(ax, plt.Axes))
+        self.assertEqual(ax.get_title(), "PCA Result")
+        self.assertEqual(ax.get_xlabel(), "First Principal Component")
+        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
+        # Check the number of points
+        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
     def test_case_2(self):
-        # Test with empty list
-        with self.assertRaises(ValueError):
-            task_func([])
+        # Input 2: another simple 2D array
+        l = np.array([[2, 3], [4, 5], [6, 7], [8, 9]])
+        ax = task_func(l)
+        self.assertTrue(isinstance(ax, plt.Axes))
+        self.assertEqual(ax.get_title(), "PCA Result")
+        self.assertEqual(ax.get_xlabel(), "First Principal Component")
+        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
+        # Check the number of points
+        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
     def test_case_3(self):
-        # Test with single element
-        myList = [100]
-        ax = task_func(myList)
-        heights, _, _ = ax.hist(myList)
-        self.assertEqual(heights.max(), 1)
+        # Input 3: larger array
+        np.random.seed(0)
+        l = np.random.rand(10, 2)
+        ax = task_func(l)
+        self.assertTrue(isinstance(ax, plt.Axes))
+        self.assertEqual(ax.get_title(), "PCA Result")
+        self.assertEqual(ax.get_xlabel(), "First Principal Component")
+        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
+        # Check the number of points
+        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
     def test_case_4(self):
-        # Test with negative values
-        myList = [-5, -4, -3, -3, -2, -2, -2, -1]
-        ax = task_func(myList)
-        heights, _, _ = ax.hist(myList)
-        self.assertGreaterEqual(len(heights), 1)
+        # Input 4: array with similar values (less variance)
+        l = np.array([[1, 2], [1, 2.1], [1.1, 2], [1.1, 2.1]])
+        ax = task_func(l)
+        self.assertTrue(isinstance(ax, plt.Axes))
+        self.assertEqual(ax.get_title(), "PCA Result")
+        self.assertEqual(ax.get_xlabel(), "First Principal Component")
+        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
+        # Check the number of points
+        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()
     def test_case_5(self):
-        # Test with floats
-        myList = [1.1, 1.2, 2.5, 2.5, 3.75, 4.25]
-        ax = task_func(myList)
-        heights, _, _ = ax.hist(myList)
-        self.assertGreaterEqual(len(heights), 1)
-    def test_case_6(self):
-        # Test handling non-numeric values
-        myList = ["a", "b", "c"]
-        with self.assertRaises(TypeError):
-            task_func(myList)
-    def tearDown(self):
-        plt.close("all")
+        # Input 5: array with larger values
+        l = np.array([[100, 200], [300, 400], [500, 600], [700, 800]])
+        ax = task_func(l)
+        self.assertTrue(isinstance(ax, plt.Axes))
+        self.assertEqual(ax.get_title(), "PCA Result")
+        self.assertEqual(ax.get_xlabel(), "First Principal Component")
+        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
+        # Check the number of points
+        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
+        plt.close()

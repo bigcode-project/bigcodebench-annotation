@@ -1,93 +1,62 @@
+import nltk
+import re
 from collections import Counter
-import pandas as pd
 
 
-def task_func(myList):
+# Constants
+STOPWORDS = nltk.corpus.stopwords.words('english')
+
+def task_func(text):
     """
-    Count the frequency of each word in a list and return a DataFrame of words and their number.
+    Calculate the frequency of continuous words in a text string. The function splits the text into words, 
+    converts them to lowercase, removes punctuation marks and common stopwords (provided as a constant), 
+    and then calculates the frequency of each word.
 
     Parameters:
-    myList (list): List of strings. Each string is considered a word regardless of its content,
-                                    however the function is case insensitive, and it removes
-                                    leading and trailing whitespaces. If empty, function returns
-                                    a DataFrame with a Count column that is otherwise empty.
+    text (str): The input text string.
 
     Returns:
-    DataFrame: A pandas DataFrame with words and their counts.
+    dict: A dictionary with words as keys and their frequencies as values.
 
     Requirements:
-    - collections.Counter
-    - pandas
+    - nltk for stopwords (ensure the stopwords dataset is downloaded using nltk.download('stopwords'))
+    - re for regular expressions
+    - collections.Counter for counting occurrences
 
     Example:
-    >>> myList = ['apple', 'banana', 'apple', 'cherry', 'banana', 'banana']
-    >>> task_func(myList)
-            Count
-    apple       2
-    banana      3
-    cherry      1
+    >>> task_func('This is a sample text. This text is for testing.')
+    {'sample': 1, 'text': 2, 'testing': 1}
     """
-    words = [w.lower().strip() for w in myList]
-    word_counts = dict(Counter(words))
-    report_df = pd.DataFrame.from_dict(word_counts, orient="index", columns=["Count"])
-    return report_df
+    words = re.split(r'\W+', text.lower())
+    words = [word for word in words if word not in STOPWORDS and word != '']
+    word_freq = dict(Counter(words))
+    return word_freq
 
 import unittest
-import pandas as pd
+import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test basic case
-        input_data = ["apple", "banana", "apple", "cherry", "banana", "banana"]
-        expected_output = pd.DataFrame(
-            {"Count": [2, 3, 1]}, index=["apple", "banana", "cherry"]
-        )
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+        # Basic test
+        text = 'This is a sample text. This text is for testing.'
+        expected_output = {'sample': 1, 'text': 2, 'testing': 1}
+        self.assertEqual(task_func(text), expected_output)
     def test_case_2(self):
-        # Test repeated value
-        input_data = ["apple", "apple", "apple"]
-        expected_output = pd.DataFrame({"Count": [3]}, index=["apple"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+        # Test with stopwords
+        text = 'The quick brown fox jumped over the lazy dog.'
+        expected_output = {'quick': 1, 'brown': 1, 'fox': 1, 'jumped': 1, 'lazy': 1, 'dog': 1}
+        self.assertEqual(task_func(text), expected_output)
     def test_case_3(self):
-        # Test empty list
-        input_data = []
-        expected_output = pd.DataFrame(columns=["Count"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+        # Test with punctuation
+        text = 'Hello, world! How are you today?'
+        expected_output = {'hello': 1, 'world': 1, 'today': 1}
+        self.assertEqual(task_func(text), expected_output)
     def test_case_4(self):
-        # Test single entry
-        input_data = ["kiwi"]
-        expected_output = pd.DataFrame({"Count": [1]}, index=["kiwi"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+        # Test with empty string
+        text = ''
+        expected_output = {}
+        self.assertEqual(task_func(text), expected_output)
     def test_case_5(self):
-        # Tests the function's ability to handle mixed case words correctly.
-        input_data = ["Apple", "apple", "APPLE"]
-        expected_output = pd.DataFrame({"Count": [3]}, index=["apple"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
-    def test_case_6(self):
-        # Tests the function's ability to handle words with leading/trailing spaces.
-        input_data = ["banana ", " banana", "  banana"]
-        expected_output = pd.DataFrame({"Count": [3]}, index=["banana"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
-    def test_case_7(self):
-        # Tests the function's ability to handle words with special characters.
-        input_data = ["kiwi!", "!kiwi", "kiwi"]
-        expected_output = pd.DataFrame(
-            {"Count": [1, 1, 1]}, index=["kiwi!", "!kiwi", "kiwi"]
-        )
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
-    def test_case_8(self):
-        # Tests the function's handling of numeric strings as words.
-        input_data = ["123", "456", "123", "456", "789"]
-        expected_output = pd.DataFrame(
-            {"Count": [2, 2, 1]}, index=["123", "456", "789"]
-        )
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
-    def test_case_9(self):
-        # Tests the function's handling of empty strings and strings with only spaces.
-        input_data = [" ", "  ", "", "apple", "apple "]
-        expected_output = pd.DataFrame({"Count": [3, 2]}, index=["", "apple"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
-    def test_case_10(self):
-        # Tests handling of strings that become duplicates after strip() is applied.
-        input_data = ["banana", "banana ", " banana", "banana"]
-        expected_output = pd.DataFrame({"Count": [4]}, index=["banana"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+        # Test with numeric values and special characters
+        text = 'Python3 is better than Python2. I love Python3.5!'
+        expected_output = {'python3': 2, 'better': 1, 'python2': 1, 'love': 1, '5': 1}
+        self.assertEqual(task_func(text), expected_output)

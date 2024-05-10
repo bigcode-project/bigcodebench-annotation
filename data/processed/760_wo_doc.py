@@ -1,86 +1,91 @@
 import os
 import shutil
-import string
+import fnmatch
 
-# Constants
-INVALID_CHARACTERS = string.punctuation + string.whitespace
-
-def task_func(directory_path):
+def task_func(source_directory, destination_directory, file_pattern):
     """
-    Scan a directory and organize the files according to their endings. Files with invalid characters in the name will be moved to a new directory called "Invalid."
+    Moves all files that match a particular pattern from one directory to another.
     
-    The invalid characters are defined by the constant INVALID_CHARACTERS, which includes all punctuation and whitespace characters.
-
+    Functionality:
+    - Moves files from 'source_directory' to 'destination_directory' based on a filename pattern 'file_pattern'.
+    
     Parameters:
-    - directory_path (str): The path to the directory.
-
+    - source_directory (str): The path to the source directory from which files will be moved.
+    - destination_directory (str): The path to the destination directory to which files will be moved.
+    - file_pattern (str): The file pattern to match (e.g., '*.txt' for all text files).
+    
     Returns:
-    - summary (dict): A summary dictionary containing the count of files moved to each directory.
-
+    - Returns a list of filenames that were moved.
+    
     Requirements:
     - os
     - shutil
-    - string
-
+    - fnmatch
+    
     Example:
-    >>> task_func('path_to_directory')
-    {'txt': 2, 'jpg': 1, 'Invalid': 1}
+    >>> task_func('/path/to/source', '/path/to/destination', '*.txt')
+    ['task_func_data_xiaoheng/file1.txt', 'task_func_data_xiaoheng/file2.txt']
     """
-    summary = {}
-    for filename in os.listdir(directory_path):
-        if any(char in INVALID_CHARACTERS for char in filename):
-            if not os.path.exists(os.path.join(directory_path, 'Invalid')):
-                os.mkdir(os.path.join(directory_path, 'Invalid'))
-            shutil.move(os.path.join(directory_path, filename), os.path.join(directory_path, 'Invalid'))
-            summary['Invalid'] = summary.get('Invalid', 0) + 1
-        else:
-            extension = os.path.splitext(filename)[-1].strip('.')
-            if not os.path.exists(os.path.join(directory_path, extension)):
-                os.mkdir(os.path.join(directory_path, extension))
-            shutil.move(os.path.join(directory_path, filename), os.path.join(directory_path, extension))
-            summary[extension] = summary.get(extension, 0) + 1
-    return summary
+    moved_files = []
+    for path, dirs, files in os.walk(source_directory):
+        for filename in fnmatch.filter(files, file_pattern):
+            shutil.move(os.path.join(path, filename), os.path.join(destination_directory, filename))
+            moved_files.append(filename)
+    return moved_files
 
 import unittest
-import os
+from unittest.mock import patch, MagicMock, call
 import shutil
-import tempfile
+import os
+import fnmatch
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.temp_dir = tempfile.mkdtemp()
-        self.test_dir_1 = os.path.join(self.temp_dir, 'test_dir_1')
-        self.empty_dir = os.path.join(self.temp_dir, 'empty_dir')
-        os.mkdir(self.test_dir_1)
-        os.mkdir(self.empty_dir)
-        self.create_test_files(self.test_dir_1, ['test1.pdf', 'data.csv', 'image.jpg', 'invalid file name.jpg'])
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir)
-    def create_test_files(self, directory, filenames):
-        for filename in filenames:
-            path = os.path.join(directory, filename)
-            with open(path, 'w') as f:
-                f.write("Dummy content")
-    def test_file_moves(self):
-        task_func(self.test_dir_1)
-        invalid_dir = os.path.join(self.test_dir_1, 'Invalid')
-        self.assertTrue(os.path.exists(invalid_dir))
-        self.assertEqual(len(os.listdir(invalid_dir)), 4)
-    def test_empty_directory(self):
-        summary = task_func(self.empty_dir)
-        self.assertEqual(summary, {})
-    def test_basic_functionality(self):
-        # Test basic functionality
-        summary = task_func(self.test_dir_1)
-        expected = {'Invalid': 4}
-        self.assertEqual(summary, expected)
-        
-    def test_invalid_path(self):
-        # Test with an invalid directory path
+        self.source_directory = "/fake/source_directory"
+        self.destination_directory = "/fake/destination_directory"
+        self.files = ['file1.txt', 'file2.txt', 'image.jpg', 'data.log', 'report.TXT', 'config file.cfg']
+    @patch('os.walk')
+    @patch('shutil.move')
+    def test_no_files_to_move(self, mock_move, mock_walk):
+        mock_walk.return_value = [(self.source_directory, [], ['image.jpg', 'data.log', 'config file.cfg'])]
+        result = task_func(self.source_directory, self.destination_directory, '*.txt')
+        self.assertEqual(result, [])
+        mock_move.assert_not_called()
+    @patch('os.walk')
+    @patch('shutil.move')
+    def test_non_existing_source_directory(self, mock_move, mock_walk):
+        mock_walk.side_effect = FileNotFoundError
         with self.assertRaises(FileNotFoundError):
-            task_func('invalid_path')
-    def test_summary_content(self):
-        # Test the summary content details
-        summary = task_func(self.test_dir_1)
-        
-        # Check if the summary contains keys for all unique extensions and "Invalid"
-        self.assertTrue(all(key in ['pdf', 'csv', 'jpg', 'Invalid'] for key in summary.keys()))
+            task_func('/non/existing/directory', self.destination_directory, '*.txt')
+    @patch('os.walk')
+    @patch('shutil.move')
+    def test_case_sensitivity(self, mock_move, mock_walk):
+        # Setting up os.walk to simulate case sensitivity in file matching
+        mock_walk.return_value = [
+            (self.source_directory, [], ['file1.txt', 'file2.TXT', 'report.TXT'])
+        ]
+        # Execute the function
+        task_func(self.source_directory, self.destination_directory, '*.TXT')
+        expected_calls = [
+            call(os.path.join(self.source_directory, 'file2.TXT'), os.path.join(self.destination_directory, 'file2.TXT')),
+            call(os.path.join(self.source_directory, 'report.TXT'), os.path.join(self.destination_directory, 'report.TXT'))
+        ]
+        mock_move.assert_has_calls(expected_calls, any_order=True)
+    @patch('os.walk')
+    @patch('shutil.move')
+    def test_special_characters_in_filenames(self, mock_move, mock_walk):
+        mock_walk.return_value = [(self.source_directory, [], ['config file.cfg'])]
+        task_func(self.source_directory, self.destination_directory, '*.cfg')
+        expected_call = call(os.path.join(self.source_directory, 'config file.cfg'), os.path.join(self.destination_directory, 'config file.cfg'))
+        mock_move.assert_has_calls([expected_call], any_order=True)
+    @patch('os.listdir')
+    @patch('shutil.move')
+    @patch('os.path.exists')
+    def test_no_matching_files(self, mock_exists, mock_move, mock_listdir):
+        # Setup mocks to simulate no matching files
+        mock_listdir.return_value = ['file3.jpg']
+        mock_exists.return_value = True
+        # Call the function
+        moved_files = task_func(self.source_directory, self.destination_directory, '*.txt')
+        # Assertions
+        mock_move.assert_not_called()
+        self.assertEqual(moved_files, [], "No TXT files should be moved")

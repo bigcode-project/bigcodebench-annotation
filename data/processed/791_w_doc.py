@@ -1,178 +1,140 @@
-import pandas as pd
-from scipy.stats import chi2_contingency
+import heapq
+from sklearn.preprocessing import StandardScaler
 
-def task_func(df, columns=['A', 'B', 'C'], larger=50, equal=900):
+def task_func(df, col1, col2, N=10):
     """
-    Filters a pandas DataFrame based on the values of specific rows, and performs
-    a chi-square independence test on the first two columns.
-
-    The function filters rows based on the following criteria:
-        Keep only rows where:
-            The value of the second column: df['second'] > larger
-            and
-            The value of the third column: df['third'] == equal
+    Standardize two columns ('col1' and 'col2') in the DataFrame, find the biggest differences between the individual 
+    elements of the standardized columns, and return the indices of the N largest differences.
     
-    After filtering a conigency table of the first two columns is computed,
-    which is then used in the chi2 independence test. The p_value of the test
-    is returned.        
-
     Parameters:
-    df (pd.DataFrame): A DataFrame containing at least the columns specified in the 'columns' parameter.
-    columns (list): A list of column names to consider for the operation, defaulting to ['A', 'B', 'C'].
-                    The first column should contain categorical data, the second numerical data (used for filtering with values > 'larger'),
-                    and the third numerical data (used for filtering with a fixed value of 'equal').
-    larger (float, optional): Used for filtering rows against the second column where values > 'larger'.
-                              Defaults to 50.
-    equal (float, optional): Used for filtering rows against the third column where values == equal.
-                             Defaults to 900.
-
-    Returns:
-    float: The p-value from the chi-square independence test, indicating the statistical significance.
-           
-    Raises:
-    ValueError: If there's insufficient data for the test (no rows meeting the criteria).
-    ValueError: If the number of specified columns is not 3.
-    ValueError: If the specified columns are not contained in df.
+    df (pandas.DataFrame): A DataFrame with at least two numerical columns.
+    col1, col2 (str): Names of the columns to compare.
+    N (int, optional): Number of indices to return. Default is 10.
     
+    Returns:
+    list[int]: The indices of the N largest differences.
+    
+    Raises:
+    ValueError: If specified columns are not in the provided DataFrame.
 
     Requirements:
-    - pandas
-    - scipy.stats
-
+    - heapq
+    - sklearn.preprocessing
+    
     Example:
     >>> df = pd.DataFrame({
-    ...     'A': ['Yes', 'No', 'Yes', 'No'],
-    ...     'B': [55, 70, 40, 85],
-    ...     'C': [900, 900, 800, 900]
+    ...     'col1': [99, 86, 90, 70, 86, 95, 56, 98, 80, 81, 1, 2],
+    ...     'col2': [21, 11, 21, 1, 26, 40, 4, 50, 34, 37, 3, 4]
     ... })
-    >>> task_func(df)
-    0.22313016014842973
+    >>> indices = task_func(df, 'col1', 'col2', N=6)
+    >>> print(indices)     
+    [3, 1, 11, 10, 7, 0]
 
     >>> df = pd.DataFrame({
-    ...     'test': ['A', 'b', 'b', 'a', 'c', 'd'],
-    ...     'hi': [45, 2, 2, 3, 4, 4],
-    ...     'column3': [50, 50, 50, 50, 50, 50, ]
+    ...     'a': [1, 2, 3, 4],
+    ...     'b': [1, 2, 3, 5]
     ... })
-    >>> task_func(df, ['test', 'hi', 'column3'], larger=2, equal=50)
-    0.23810330555354436
+    >>> indices = task_func(df, 'a', 'b')
+    >>> print(indices)   
+    [2, 3, 0, 1]
     """
-    if len(columns) != 3:
-        raise ValueError("Exactly three columns should be specified.")
-    for column in columns:
-        if column not in df.columns:
-            raise ValueError('The specified columns should exist in the DataFrame.')
-    col_categorical, col_numerical, col_filter = columns
-    selected = df[(df[col_numerical] > larger) & (df[col_filter] == equal)][[col_categorical, col_numerical]]
-    contingency_table = pd.crosstab(selected[col_categorical], selected[col_numerical])
-    if contingency_table.size == 0:
-        raise ValueError("Insufficient data - no matching data for the applied conditions.")
-    _, p_value, _, _ = chi2_contingency(contingency_table)
-    return p_value
+    if col1 not in df.columns or col2 not in df.columns:
+        raise ValueError(f"Columns {col1} or {col2} not found in the DataFrame.")
+    scaler = StandardScaler()
+    df[[col1, col2]] = scaler.fit_transform(df[[col1, col2]])
+    l1 = df[col1].values
+    l2 = df[col2].values
+    largest_diff_indices = heapq.nlargest(N, range(len(l1)), key=lambda i: abs(l1[i] - l2[i]))
+    return largest_diff_indices
 
 import unittest
+from faker import Faker
 import pandas as pd
-import faker
 class TestCases(unittest.TestCase):
-    def test_column_not_in_df(self):
-        fake = faker.Faker()
-        fake.seed_instance(42)
-        rows = 10
-        data = pd.DataFrame(
-            {
-                'A': [fake.name() for i in range(rows)],
-                'B': [81 for i in range(rows)],
-                'D': [900 for i in range(rows)] 
-            }
-        )
-        self.assertRaises(Exception, task_func, data)
-    def test_column_number(self):
-        fake = faker.Faker()
-        fake.seed_instance(42)
-        rows = 10
-        data = pd.DataFrame(
-            {
-                'A': [fake.name() for i in range(rows)],
-                'B': [81 for i in range(rows)],
-                'C': [900 for i in range(rows)] 
-            }
-        )
-        self.assertRaises(Exception, task_func, data, ['A'])
-        self.assertRaises(Exception, task_func, data, ['A', 'B', 'C', 'D'])
-    def test_no_data_after_filer(self):
-        fake = faker.Faker()
-        fake.seed_instance(42)
-        rows = 10
-        data = pd.DataFrame(
-            {
-                'A': [fake.name() for i in range(rows)],
-                'B': [20 for i in range(rows)],
-                'C': [901 for i in range(rows)] 
-            }
-        )
-        self.assertRaises(Exception, task_func, data)
-    def test_medium_dataframe(self):
-        # Test with a medium-sized dataframe (50 rows)
-        fake = faker.Faker()
-        fake.seed_instance(12)
-        rows = 50
-        data = pd.DataFrame(
-            {
-                'A': [fake.name() for i in range(rows)],
-                'B': [fake.random_int(0, 100) for i in range(rows)],
-                'C': [fake.random_int(899, 901) for i in range(rows)] 
-            }
-        )        
-        p_value = task_func(data)
-        self.assertAlmostEqual(p_value, 0.23, places=1)
-    def test_large_dataframe(self):
-        # Test with a large dataframe (1000 rows)
-        fake = faker.Faker()
-        fake.seed_instance(21)
-        rows = 1000
-        data = pd.DataFrame(
-            {
-                'A': [fake.name() for i in range(rows)],
-                'B': [fake.random_int(0, 100) for i in range(rows)],
-                'C': [fake.random_int(800, 950) for i in range(rows)] 
-            }
-        )        
-        p_value = task_func(data)
-        self.assertAlmostEqual(p_value, 0.22, places=1)
-    def test_very_large_dataframe(self):
-        data = pd.DataFrame(
-            {
-                'A': ['a', 'a', 'a', 'a', 'a'],
-                'B': [70, 70, 70, 70, 70],
-                'C': [900, 900, 900, 900, 900] 
-            }
-        )
-        p_value = task_func(data)
-        self.assertAlmostEqual(p_value, 1.0, places=1)
-    def test_huge_dataframe(self):
-        # different column names
-        fake = faker.Faker()
-        fake.seed_instance(21)
-        rows = 1000
-        data = pd.DataFrame(
-            {
-                'test': [fake.name() for i in range(rows)],
-                'five': [fake.random_int(21, 150) for i in range(rows)],
-                '1': [fake.random_int(821, 950) for i in range(rows)] 
-            }
-        )        
-        p_value = task_func(data, columns=['test', 'five', '1'])
-        self.assertAlmostEqual(p_value, 0.22, places=1)
-    def test_diff_filter(self):
-        # different filter values
-        fake = faker.Faker()
-        fake.seed_instance(21)
-        rows = 1000
-        data = pd.DataFrame(
-            {
-                'test': [fake.name() for i in range(rows)],
-                'five': [fake.random_int(21, 150) for i in range(rows)],
-                '1': [fake.random_int(19, 21) for i in range(rows)] 
-            }
-        )        
-        p_value = task_func(data, columns=['test', 'five', '1'], larger=100, equal=20)
-        self.assertAlmostEqual(p_value, 0.35, places=1)
+    
+    def setUp(self):
+        fake = Faker()
+        self.df1 = pd.DataFrame({
+            'col1': [fake.random_int(min=10, max=100) for _ in range(10)],
+            'col2': [fake.random_int(min=10, max=100) for _ in range(10)]
+        })
+        self.df2 = pd.DataFrame({
+            'col1': [fake.random_int(min=-100, max=-10) for _ in range(10)],
+            'col2': [fake.random_int(min=10, max=100) for _ in range(10)]
+        })
+        self.df3 = pd.DataFrame({
+            'col1': [fake.random_int(min=-100, max=100) for _ in range(10)],
+            'col2': [fake.random_int(min=-100, max=100) for _ in range(10)]
+        })
+        self.df4 = pd.DataFrame({
+            'col1': [fake.random_int(min=0, max=10) for _ in range(10)],
+            'col2': [fake.random_int(min=90, max=100) for _ in range(10)]
+        })
+        self.df5 = pd.DataFrame({
+            'col1': [fake.random_int(min=10, max=20) for _ in range(10)],
+            'col2': [fake.random_int(min=10, max=20) for _ in range(10)]
+        })
+    
+    def test_wrong_columns(self):
+        # test with wrong columns
+        data = {
+            'col1': [1, 2, 3, 4, 5],
+            'col2': [2, 3, 4, 5, 6]
+        }
+        df = pd.DataFrame(data)
+        self.assertRaises(Exception, task_func, df, 'a', 'col2')
+        self.assertRaises(Exception, task_func, df, 'col1', 'a')
+        self.assertRaises(Exception, task_func, df, 'a', 'b')
+    # Original test cases
+    def test_case_1(self):
+        result = task_func(self.df1, 'col1', 'col2')
+        self.assertTrue(isinstance(result, list))
+        self.assertEqual(len(result), 10)
+        
+    def test_case_2(self):
+        result = task_func(self.df2, 'col1', 'col2', 5)
+        self.assertTrue(isinstance(result, list))
+        self.assertEqual(len(result), 5)
+        
+    def test_case_3(self):
+        result = task_func(self.df3, 'col1', 'col2', 7)
+        self.assertTrue(isinstance(result, list))
+        self.assertEqual(len(result), 7)
+        
+    def test_case_4(self):
+        result = task_func(self.df4, 'col1', 'col2', 8)
+        self.assertTrue(isinstance(result, list))
+        self.assertEqual(len(result), 8)
+        
+    def test_case_5(self):
+        result = task_func(self.df5, 'col1', 'col2', 6)
+        self.assertTrue(isinstance(result, list))
+        self.assertEqual(len(result), 6)
+class CorrectedDeterministicTestCases(unittest.TestCase):
+    # Corrected deterministic test cases
+    def test_deterministic_case_1(self):
+        df = pd.DataFrame({
+            'col1': [1, 2, 3, 4, 5],
+            'col2': [5, 4, 3, 2, 1]
+        })
+        expected_result = [0, 4, 1, 3, 2]
+        result = task_func(df, 'col1', 'col2')
+        self.assertListEqual(sorted(result), sorted(expected_result))
+        
+    def test_deterministic_case_2(self):
+        df = pd.DataFrame({
+            'col1': [10, 20, 30, 40, 50],
+            'col2': [10, 20, 30, 40, 50]
+        })
+        expected_result = [0, 1, 2, 3, 4]
+        result = task_func(df, 'col1', 'col2')
+        self.assertListEqual(sorted(result), sorted(expected_result))
+        
+    def test_deterministic_case_3(self):
+        df = pd.DataFrame({
+            'col1': [1, 1, 1, 1, 1],
+            'col2': [2, 2, 2, 2, 2]
+        })
+        expected_result = [0, 1, 2, 3, 4]
+        result = task_func(df, 'col1', 'col2')
+        self.assertListEqual(sorted(result), sorted(expected_result))

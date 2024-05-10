@@ -1,65 +1,81 @@
-import pandas as pd
-import seaborn as sns
+import numpy as np
+from itertools import product
+import string
 
-def task_func(data):
+
+def task_func(length, seed=None, alphabets=list(string.ascii_lowercase)):
     """
-    Draw and return a correlation matrix heatmap for a DataFrame containing numerical columns.
-    The title of the heatmap is set to 'Correlation Matrix'.
-    
+    Generate a list of 10 randomly picked strings from all possible strings of a given
+    length from the provided series of characters, using a specific seed for
+    reproducibility.
+
     Parameters:
-    df (pandas.DataFrame): The DataFrame containing numerical columns to be used for correlation.
+    length (int): The length of the strings to generate.
+    seed (int): The seed for the random number generator. Default is None.
+    alphabets (list, optional): The series of characters to generate the strings from. 
+                Default is lowercase English alphabets.
 
     Returns:
-    matplotlib.axes._axes.Axes: The matplotlib Axes object representing the heatmap.
+    list: A list of generated strings.
 
     Requirements:
-    - pandas
-    - seaborn
+    - numpy
+    - itertools.product
+    - string
 
     Example:
-    >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]}
-    >>> ax = task_func(data)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> task_func(2, 123)
+    ['tq', 'ob', 'os', 'mk', 'du', 'ar', 'wx', 'ec', 'et', 'vx']
 
+    >>> task_func(2, 123, alphabets=['x', 'y', 'z'])
+    ['xz', 'xz', 'zx', 'xy', 'yx', 'zx', 'xy', 'xx', 'xy', 'xx']
     """
-    df = pd.DataFrame(data)
-    correlation_matrix = df.corr()
-    ax = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
-    ax.set_title('Correlation Matrix')
-    return ax
+    np.random.seed(seed)
+    all_combinations = [''.join(p) for p in product(alphabets, repeat=length)]
+    return np.random.choice(all_combinations, size=10).tolist()
 
 import unittest
-import pandas as pd
-import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
+    def test_rng(self):
+        output1 = task_func(2, 123)
+        output2 = task_func(2, 123)
+        self.assertCountEqual(output1, output2)
     
     def test_case_1(self):
-        data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]}
-        ax = task_func(data)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
+        output = task_func(2, 123)
+        self.assertEqual(len(output), 10)
+        self.assertTrue(all(len(word) == 2 for word in output))
+        self.assertTrue(all(word.islower() for word in output))
+        expected = ['tq', 'ob', 'os', 'mk', 'du', 'ar', 'wx', 'ec', 'et', 'vx']
+        self.assertCountEqual(output, expected)
         
     def test_case_2(self):
-        data = {'a': [1, 2, 3], 'b': [-4, -5, -6], 'c': [-7, -8, -9]}
-        ax = task_func(data)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
+        output = task_func(3, 456)
+        self.assertEqual(len(output), 10)
+        self.assertTrue(all(len(word) == 3 for word in output))
+        self.assertTrue(all(word.islower() for word in output))
+        expected = ['axp', 'xtb', 'pwx', 'rxv', 'soa', 'rkf', 'cdp', 'igv', 'ruh', 'vmz']
+        self.assertCountEqual(output, expected)
         
     def test_case_3(self):
-        data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [-7, -8, -9]}
-        ax = task_func(data)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
-        
+        output = task_func(2, 789, alphabets=['x', 'y', 'z'])
+        self.assertEqual(len(output), 10)
+        self.assertTrue(all(len(word) == 2 for word in output))
+        self.assertTrue(all(letter in ['x', 'y', 'z'] for word in output for letter in word))
+        expected = ['yx', 'xz', 'xy', 'yx', 'yy', 'zz', 'yy', 'xy', 'zz', 'xx']
+        self.assertCountEqual(output, expected)
     def test_case_4(self):
-        data = {'a': [1, 1, 1], 'b': [2, 2, 2], 'c': [3, 3, 3]}
-        ax = task_func(data)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
+        output = task_func(1, 100)
+        self.assertEqual(len(output), 10)
+        self.assertTrue(all(len(word) == 1 for word in output))
+        self.assertTrue(all(word.islower() for word in output))
+        expected = ['i', 'y', 'd', 'h', 'x', 'p', 'q', 'k', 'u', 'c']
+        self.assertCountEqual(output, expected)
         
     def test_case_5(self):
-        data = {'a': [1, 2, None], 'b': [4, None, 6], 'c': [None, 8, 9]}
-        ax = task_func(data)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
+        output = task_func(4, 200, alphabets=['a', 'b'])
+        self.assertEqual(len(output), 10)
+        self.assertTrue(all(len(word) == 4 for word in output))
+        self.assertTrue(all(letter in ['a', 'b'] for word in output for letter in word))
+        expected = ['baba', 'baab', 'aaaa', 'abaa', 'baba', 'abbb', 'bbaa', 'bbbb', 'baab', 'bbba']
+        self.assertCountEqual(output, expected)
