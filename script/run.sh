@@ -1,6 +1,7 @@
 # 
 NAMES=(chien jenny wenhao niklas hanhu ratna simon ming zhihan james xiaoheng armel)
 rm -rf data/clean/*
+mkdir -p data/clean
 for name in "${NAMES[@]}"; do
     # Copy all files for other names
     cp data/raw/*"$name"*py data/clean/
