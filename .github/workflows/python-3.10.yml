@@ -5,7 +5,7 @@ name: python-3.10
 
 on:
   push:
-    branches: [ "main" , "indraneil-test" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
