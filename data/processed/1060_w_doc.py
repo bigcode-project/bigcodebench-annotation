@@ -1,117 +1,116 @@
+import numpy as np
+import random
 import itertools
-import seaborn as sns
-import matplotlib.pyplot as plt
+import pandas as pd
 
 # Constants
-SHAPES = [
-    "Circle",
-    "Square",
-    "Triangle",
-    "Rectangle",
-    "Pentagon",
-    "Hexagon",
-    "Heptagon",
-    "Octagon",
-    "Nonagon",
-    "Decagon",
+PLANETS = [
+    "Mercury",
+    "Venus",
+    "Earth",
+    "Mars",
+    "Jupiter",
+    "Saturn",
+    "Uranus",
+    "Neptune",
 ]
-COLORS = [
-    "Red",
-    "Blue",
-    "Green",
-    "Yellow",
-    "Black",
-    "White",
-    "Purple",
-    "Orange",
-    "Pink",
-    "Brown",
+ELEMENTS = [
+    "Hydrogen",
+    "Helium",
+    "Oxygen",
+    "Carbon",
+    "Nitrogen",
+    "Magnesium",
+    "Silicon",
+    "Iron",
+    "Nickel",
 ]
 
 
-def task_func(num_pairs=10):
+def task_func():
     """
-    Generate and display a countplot of predefined shape-color pairs.
-
-    This function creates a visual representation of a specified number of unique shape-color combinations,
-    each displayed as a bar in the countplot. The shape-color pairs are selected from a predefined list.
+    Generate a DataFrame where each row contains random planet-element pairs.
+    Each pair is formatted as 'Planet:Element'. The number of rows is determined by
+    the number of planets, and each row will contain as many planet-element pairs as there are elements.
 
     Parameters:
-    - num_pairs (int): The number of unique shape-color pairs to be displayed in the countplot.
-                       Default is 10. If the requested number is less than 1 or greater than the total
-                       possible unique combinations (100), it is adjusted to the valid range (1 to 100).
+    - None
 
     Returns:
-    - ax (matplotlib.axes._axes.Axes): The Axes object of the countplot, which can be used for
-                                                  further customizations or to retrieve information about the plot.
+    pandas.DataFrame: A DataFrame where each cell contains a string in the format 'Planet:Element'.
+                      The DataFrame has a number of rows equal to the number of planets and
+                      a number of columns equal to the number of elements.
 
     Requirements:
+    - numpy
+    - random
     - itertools
-    - seaborn
-    - matplotlib
+    - pandas
 
     Example:
-    >>> ax = task_func(10)
-    >>> [tick.get_text() for tick in ax.get_xticklabels()]
-    ['Circle:Red', 'Circle:Blue', 'Circle:Green', 'Circle:Yellow', 'Circle:Black', 'Circle:White', 'Circle:Purple', 'Circle:Orange', 'Circle:Pink', 'Circle:Brown']
-    >>> ax = task_func(9)
-    >>> [tick.get_text() for tick in ax.get_xticklabels()]
-    ['Circle:Red', 'Circle:Blue', 'Circle:Green', 'Circle:Yellow', 'Circle:Black', 'Circle:White', 'Circle:Purple', 'Circle:Orange', 'Circle:Pink', 'Circle:Brown']
-    >>> ax = task_func(8)
-    >>> [tick.get_text() for tick in ax.get_xticklabels()]
-    ['Circle:Red', 'Circle:Blue', 'Circle:Green', 'Circle:Yellow', 'Circle:Black', 'Circle:White', 'Circle:Purple', 'Circle:Orange', 'Circle:Pink', 'Circle:Brown']
-    >>> ax = task_func(7)
-    >>> [tick.get_text() for tick in ax.get_xticklabels()]
-    ['Circle:Red', 'Circle:Blue', 'Circle:Green', 'Circle:Yellow', 'Circle:Black', 'Circle:White', 'Circle:Purple', 'Circle:Orange', 'Circle:Pink', 'Circle:Brown']
-    >>> ax = task_func(6)
-    >>> [tick.get_text() for tick in ax.get_xticklabels()]
-    ['Circle:Red', 'Circle:Blue', 'Circle:Green', 'Circle:Yellow', 'Circle:Black', 'Circle:White', 'Circle:Purple', 'Circle:Orange', 'Circle:Pink', 'Circle:Brown']
+    >>> random.seed(0)
+    >>> planet_elements_table = task_func()
+    >>> planet_elements_table.head(2)
+              Hydrogen         Helium  ...          Iron         Nickel
+    0   Uranus:Silicon  Earth:Silicon  ...  Earth:Nickel  Uranus:Helium
+    1  Venus:Magnesium  Saturn:Helium  ...  Mercury:Iron   Venus:Helium
+    <BLANKLINE>
+    [2 rows x 9 columns]
     """
-    max_pairs = len(SHAPES) * len(COLORS)
-    num_pairs = min(num_pairs, max_pairs)
-    pairs = [f"{s}:{c}" for s, c in itertools.product(SHAPES, COLORS)][:num_pairs]
-    ax = sns.countplot(x=pairs, hue=pairs, palette="Set3", legend=False)
-    plt.xticks(rotation=90)
-    return ax
+    pairs = [
+        f"{planet}:{element}"
+        for planet, element in itertools.product(PLANETS, ELEMENTS)
+    ]
+    random.shuffle(pairs)
+    data = np.array(pairs).reshape(len(PLANETS), len(ELEMENTS))
+    df = pd.DataFrame(data, columns=ELEMENTS)
+    return df
 
 import unittest
-import matplotlib.pyplot as plt
+import itertools
+import pandas as pd
 import random
 class TestCases(unittest.TestCase):
-    """Tests for task_func."""
-    def tearDown(self):
-        plt.clf()
-    def test_basic_functionality(self):
-        """Test basic functionality with default parameters."""
+    """Tests for `task_func`."""
+    def test_basic_structure(self):
+        """Test the basic structure of the table."""
         random.seed(0)
-        ax = task_func()
-        self.assertIsInstance(ax, plt.Axes)
-    def test_pair_count(self):
-        """Test if the number of displayed shape-color pairs matches the input."""
+        table = task_func()
+        # Verify the structure of the table
+        self.assertEqual(len(table), len(PLANETS))
+        self.assertEqual(list(table.columns), ELEMENTS)
+    def test_pair_existence(self):
+        """Test the existence of planet-element pairs."""
         random.seed(1)
-        num_pairs = 7
-        ax = task_func(num_pairs)
-        displayed_pairs = len(set(tick.get_text() for tick in ax.get_xticklabels()))
-        self.assertEqual(displayed_pairs, num_pairs)
-    def test_valid_pairs(self):
-        """Ensure displayed shape-color pairs are valid combinations."""
+        table = task_func()
+        # Verify all planet-element pairs are present
+        all_pairs = set(f"{p}:{e}" for p, e in itertools.product(PLANETS, ELEMENTS))
+        generated_pairs = set(table.values.flatten())
+        self.assertEqual(all_pairs, generated_pairs)
+        # Verify no extra pairs are present
+        self.assertEqual(len(all_pairs), len(generated_pairs))
+    def test_data_type(self):
+        """Test the data type of the table and its elements."""
         random.seed(2)
-        ax = task_func(10)
-        displayed_pairs = [tick.get_text() for tick in ax.get_xticklabels()]
-        for pair in displayed_pairs:
-            shape, color = pair.split(":")
-            self.assertIn(shape, SHAPES)
-            self.assertIn(color, COLORS)
-    def test_max_pairs(self):
-        """Test with the maximum number of pairs possible."""
+        table = task_func()
+        # Check the data type of the table and its elements
+        self.assertIsInstance(table, pd.DataFrame)
+        self.assertTrue(all(isinstance(cell, str) for cell in table.values.flatten()))
+    def test_data_format(self):
+        """Test the format of the elements in the table."""
         random.seed(3)
-        max_pairs = len(SHAPES) * len(COLORS)
-        ax = task_func(max_pairs)
-        displayed_pairs = len(set(tick.get_text() for tick in ax.get_xticklabels()))
-        self.assertEqual(displayed_pairs, max_pairs)
-    def test_min_pairs(self):
-        """Test with the minimum number of pairs, which is 1."""
+        table = task_func()
+        # Check the format of the elements in the table
+        self.assertTrue(
+            all(
+                ":" in cell and len(cell.split(":")) == 2
+                for cell in table.values.flatten()
+            )
+        )
+    def test_uniqueness(self):
+        """Test the uniqueness of the pairs."""
         random.seed(4)
-        ax = task_func(1)
-        displayed_pairs = len(set(tick.get_text() for tick in ax.get_xticklabels()))
-        self.assertEqual(displayed_pairs, 1)
+        table = task_func()
+        # Check uniqueness of the pairs
+        generated_pairs = table.values.flatten()
+        self.assertEqual(len(generated_pairs), len(set(generated_pairs)))

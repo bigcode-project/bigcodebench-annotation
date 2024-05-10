@@ -1,88 +1,71 @@
-import re
-import random
-import string
+from collections import Counter
+from random import choice, seed
 
-def task_func(n, pattern, seed=None):
+# Constants
+POSSIBLE_ITEMS = ['apple', 'banana', 'cherry', 'date', 'elderberry']
+
+def task_func(list_of_lists):
     """
-    Generate a random string of length 'n' and find all non-overlapping matches
-    of the regex 'pattern'.
+    Create a "shopping cart" (Counter object) for each list in list_of_lists. 
+    The items in the cart are randomly selected from a predefined list of possible items (POSSIBLE_ITEMS).
+    The frequency of each item in the cart corresponds to the length of the list.
 
-    The function generates a random string of ASCII Letters and Digits using 
-    the random module. By providing a seed the results are reproducable.
-    Non overlapping matches of the provided pattern are then found using the re
-    module.
-    
     Parameters:
-    n (int): The length of the random string to be generated.
-    pattern (str): The regex pattern to search for in the random string.
-    seed (int, optional): A seed parameter for the random number generator for reproducible results. Defaults to None.
+    - list_of_lists (list): A list of lists, each representing a 'basket'.
 
     Returns:
-    list: A list of all non-overlapping matches of the regex pattern in the generated string.
+    - baskets (list): A list of Counters, each representing a 'shopping cart'.
 
     Requirements:
-    - re
+    - collections
     - random
-    - string
 
     Example:
-    >>> task_func(100, r'[A-Za-z]{5}', seed=12345)
-    ['mrKBk', 'BqJOl', 'NJlwV', 'UfHVA', 'LGkjn', 'vubDv', 'GSVAa', 'kXLls', 'RKlVy', 'vZcoh', 'FnVZW', 'JQlqL']
-
-    >>> task_func(1000, r'[1-9]{2}', seed=1)
-    ['51', '84', '16', '79', '16', '28', '63', '82', '94', '18', '68', '42', '95', '33', '64', '38', '69', '56', '32', '16', '18', '19', '27']
-     """
-    if seed is not None:
-        random.seed(seed)
-    rand_str = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(n))
-    matches = re.findall(pattern, rand_str)
-    return matches
+    >>> baskets = task_func([[1, 2, 3], [4, 5]])
+    >>> all(isinstance(basket, Counter) for basket in baskets) # Illustrative, actual items will vary due to randomness
+    True
+    >>> sum(len(basket) for basket in baskets) # The sum of lengths of all baskets; illustrative example
+    3
+    """
+    seed(42)  # Set the seed for reproducibility
+    baskets = []
+    for list_ in list_of_lists:
+        basket = Counter()
+        for _ in list_:
+            basket[choice(POSSIBLE_ITEMS)] += 1
+        baskets.append(basket)
+    return baskets
 
 import unittest
+from collections import Counter
 class TestCases(unittest.TestCase):
-    
-    def test_valid_pattern_matching(self):
-        test_length = 100
-        test_pattern = r'[A-Za-z]{5}'
-        test_seed = 12345  # using a seed for consistency
-        expected_matches = [
-            'mrKBk',
-            'BqJOl',
-            'NJlwV',
-            'UfHVA',
-            'LGkjn',
-            'vubDv',
-            'GSVAa',
-            'kXLls',
-            'RKlVy',
-            'vZcoh',
-            'FnVZW',
-            'JQlqL'
-        ]
-        actual_matches = task_func(test_length, test_pattern, seed=test_seed)
-        self.assertEqual(actual_matches, expected_matches)
-    def test_no_matches_found(self):
-        test_length = 100
-        test_pattern = r'XYZ'
-        test_seed = 12345
-        expected_matches = []
-        actual_matches = task_func(test_length, test_pattern, seed=test_seed)
-        self.assertEqual(actual_matches, expected_matches)
-    def test_zero_length_string(self):
-        test_length = 0
-        test_pattern = r'[A-Za-z0-9]{5}'
-        expected_matches = []
-        actual_matches = task_func(test_length, test_pattern, seed=None)
-        self.assertEqual(actual_matches, expected_matches)
-    def test_unusual_pattern(self):
-        test_length = 100
-        test_pattern = r'[^A-Za-z0-9]+'
-        test_seed = 67890
-        expected_matches = []
-        actual_matches = task_func(test_length, test_pattern, seed=test_seed)
-        self.assertEqual(actual_matches, expected_matches)
-    def test_extreme_input_values(self):
-        test_length = 10000  # Reduced size for the environment's stability
-        test_pattern = r'[A-Za-z]{5}'
-        actual_matches = task_func(test_length, test_pattern, seed=None)
-        self.assertIsInstance(actual_matches, list)
+    def test_case_1(self):
+        # Testing with empty list
+        result = task_func([])
+        self.assertEqual(result, [])
+    def test_case_2(self):
+        # Testing with empty sublists
+        result = task_func([[], [], []])
+        for basket in result:
+            self.assertEqual(basket, Counter())
+        
+    def test_case_3(self):
+        # Testing with sublists of different lengths
+        result = task_func([[1], [1, 2], [1, 2, 3]])
+        self.assertEqual(len(result), 3)
+        self.assertEqual(sum(result[0].values()), 1)
+        self.assertEqual(sum(result[1].values()), 2)
+        self.assertEqual(sum(result[2].values()), 3)
+    def test_case_4(self):
+        # Testing with sublists containing the same element
+        result = task_func([[1, 1, 1], [2, 2, 2, 2]])
+        self.assertEqual(len(result), 2)
+        self.assertEqual(sum(result[0].values()), 3)
+        self.assertEqual(sum(result[1].values()), 4)
+        
+    def test_case_5(self):
+        # Testing with large sublists
+        result = task_func([[1]*100, [2]*200])
+        self.assertEqual(len(result), 2)
+        self.assertEqual(sum(result[0].values()), 100)
+        self.assertEqual(sum(result[1].values()), 200)

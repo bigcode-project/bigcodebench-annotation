@@ -1,90 +1,143 @@
+import json
 import os
-import re
 import hashlib
+import base64
+import time
 
-def task_func(path, delimiter):
+def task_func(file_path, unknown_key):
     """
-    Splits a file path by a specified delimiter, retaining the delimiter in the output, and computes the hash of each component if it is a file.
-    
+    Reads a JSON file, extracts a value specified by an 'unknown_key' within a nested structure, hashes this value using SHA256,
+    and writes the base64-encoded hash to a new file with a timestamp in its name. The JSON should contain a specific 
+    structure where the value to be hashed is under 'A' -> [unknown_key] -> 'maindata' -> [index 0] -> 'Info'.
+
     Parameters:
-    path (str): The file path to split.
-    delimiter (str): The delimiter to use for splitting the path.
+    - file_path (str): The file path to read the JSON data from.
+    - unknown_key (str): The key to look for in the nested JSON structure under the top-level key 'A'. This key should 
+                         lead to a list of dictionaries under 'maindata', with the first dictionary containing the 'Info' key.
 
     Returns:
-    list[tuple]: A list of tuples, where each tuple contains a path component and its hash (if it's a file).
-                 If the component is not a file, its hash will be None.
-
+    str: The absolute file path of the newly created file containing the hashed value.
+    
     Requirements:
+    - json
     - os
-    - re
     - hashlib
-
+    - base64
+    - time
+    
     Example:
-    >>> task_func("Docs/src/file.txt", "/")
-    [('Docs', None), ('/', None), ('src', None), ('/', None), ('file.txt', 'hash_value')]
+    >>> json_file = '/path/to/file.json'
+    >>> new_file = task_func(json_file, 'B')
+    >>> print(f"Hashed data saved at: {new_file}")
     """
-    path_components = re.split(f'({delimiter})', path)
-    hashes = []
-    for component in path_components:
-        if not component:  # Remove empty components
-            continue
-        if component != delimiter and os.path.isfile(component):
-            with open(component, 'rb') as f:
-                hashes.append(hashlib.sha256(f.read()).hexdigest())
-        else:
-            hashes.append(None)
-    return list(zip(path_components, hashes))
+    with open(file_path, 'r') as f:
+        data = json.load(f)
+    value = data['A'][unknown_key]["maindata"][0]["Info"]
+    hashed_value = hashlib.sha256(value.encode()).digest()
+    hashed_str = base64.b64encode(hashed_value).decode()
+    new_file_name = f"{unknown_key}_hashed_{int(time.time())}.txt"
+    new_file_path = os.path.join(os.getcwd(), new_file_name)
+    with open(new_file_path, 'w') as f:
+        f.write(hashed_str)
+    return new_file_path
 
 import unittest
 import os
+import json
+import hashlib
+import base64
 import tempfile
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Setup a temporary directory and files for testing
-        self.test_dir = tempfile.mkdtemp()
-        self.test_file1 = os.path.join(self.test_dir, 'file1.txt')
-        self.test_file2 = os.path.join(self.test_dir, 'file2.txt')
-        with open(self.test_file1, 'w') as f:
-            f.write('Hello World')
-        with open(self.test_file2, 'w') as f:
-            f.write('Goodbye World')
+        # Setup temporary directory for tests
+        self.temp_dir = tempfile.mkdtemp()
+        # Create sample JSON data for the tests
+        self.path_1 = os.path.join(self.temp_dir, 'test1.json')
+        self.path_2 = os.path.join(self.temp_dir, 'test2.json')
+        sample_data_1 = {
+            'A': {
+                'B': {
+                    'maindata': [{'Info': 'hello world'}],
+                },
+                'C': {
+                    'maindata': [{'Info': 'goodbye world'}],
+                }
+            }
+        }
+        sample_data_2 = {
+            'A': {
+                'D': {
+                    'maindata': [{'Info': 'another world'}],
+                },
+                'E': {
+                    'maindata': [{'Info': 'yet another world'}],
+                }
+            }
+        }
+        # Write sample data to files
+        with open(self.path_1, 'w') as f:
+            json.dump(sample_data_1, f)
+        with open(self.path_2, 'w') as f:
+            json.dump(sample_data_2, f)
     def tearDown(self):
-        # Remove temporary files and directory after testing
-        os.remove(self.test_file1)
-        os.remove(self.test_file2)
-        os.rmdir(self.test_dir)
-    def test_simple_path_without_files(self):
-        # Test splitting a path without any files
-        result = task_func("Docs/src/", "/")
-        expected = [('Docs', None), ('/', None), ('src', None), ('/', None)]
-        self.assertEqual(result, expected)
-    def test_path_with_file_but_no_hashing(self):
-        # Test splitting a path with a file, assuming file does not exist for hashing
-        result = task_func("Docs/src/file.txt", "/")
-        expected = [('Docs', None), ('/', None), ('src', None), ('/', None), ('file.txt', None)]
-        self.assertEqual(result, expected)
-    def test_complex_path_with_no_files(self):
-        # Test a more complex path with multiple directories and no files
-        result = task_func("Dir1/file1/Dir2/file2.txt", "/")
-        expected = [('Dir1', None), ('/', None), ('file1', None), ('/', None), ('Dir2', None), ('/', None), ('file2.txt', None)]
-        self.assertEqual(result, expected)
-    def test_path_with_non_standard_delimiter(self):
-        # Test path splitting using a non-standard delimiter
-        result = task_func(f"Dir1-file1-{self.test_file1}-file2.txt", "-")
-        expected = [('Dir1', None), ('-', None), ('file1', None), ('-', None), (self.test_file1, hashlib.sha256(open(self.test_file1, 'rb').read()).hexdigest()), ('-', None), ('file2.txt', None)]
-        self.assertEqual(result, expected)
-    def test_empty_path(self):
-        # Test an empty path string
-        result = task_func("", "/")
-        expected = []
-        self.assertEqual(result, expected)
-    def test_path_with_existing_files(self):
-        # Test a path with existing files to check hashing
-        path = f"{self.test_file1}####{self.test_file2}"
-        result = task_func(path, "####")
-        expected = [(self.test_file1, hashlib.sha256(open(self.test_file1, 'rb').read()).hexdigest()),
-                    ('####', None),
-                    (self.test_file2, hashlib.sha256(open(self.test_file2, 'rb').read()).hexdigest())]
-        print(result)
-        print(expected)
-        self.assertEqual(result, expected)
+        # Clean up the temporary directory
+        os.remove(self.path_1)
+        os.remove(self.path_2)
+        os.rmdir(self.temp_dir)
+    def test_hash_length_for_key_B(self):
+        # Check the length of the base64-encoded SHA-256 hash for key B
+        result = task_func(self.path_1, 'B')
+        self.assertTrue(os.path.exists(result))
+        with open(result, 'r') as f:
+            hashed_value = f.read()
+        self.assertEqual(len(hashed_value), 44)
+        os.remove(result)
+    def test_hash_length_for_key_C(self):
+        # Check the length of the base64-encoded SHA-256 hash for key C
+        result = task_func(self.path_1, 'C')
+        self.assertTrue(os.path.exists(result))
+        with open(result, 'r') as f:
+            hashed_value = f.read()
+        self.assertEqual(len(hashed_value), 44)
+        os.remove(result)
+    def test_hash_length_for_key_D(self):
+        # Check the length of the base64-encoded SHA-256 hash for key D
+        result = task_func(self.path_2, 'D')
+        self.assertTrue(os.path.exists(result))
+        with open(result, 'r') as f:
+            hashed_value = f.read()
+        self.assertEqual(len(hashed_value), 44)
+        os.remove(result)
+    def test_hash_length_for_key_E(self):
+        # Check the length of the base64-encoded SHA-256 hash for key E
+        result = task_func(self.path_2, 'E')
+        self.assertTrue(os.path.exists(result))
+        with open(result, 'r') as f:
+            hashed_value = f.read()
+        self.assertEqual(len(hashed_value), 44)
+        os.remove(result)
+    def test_hash_value_for_key_B(self):
+        # Verify the hash value for key B is correctly computed and encoded
+        result = task_func(self.path_1, 'B')
+        expected_info = 'hello world'
+        expected_hash = hashlib.sha256(expected_info.encode()).digest()
+        expected_base64 = base64.b64encode(expected_hash).decode()
+        with open(result, 'r') as f:
+            hashed_value = f.read()
+        self.assertEqual(hashed_value, expected_base64)
+        os.remove(result)
+    def test_hash_value_for_key_C(self):
+        # Verify the hash value for key C is correctly computed and encoded
+        result = task_func(self.path_1, 'C')
+        expected_info = 'goodbye world'
+        expected_hash = hashlib.sha256(expected_info.encode()).digest()
+        expected_base64 = base64.b64encode(expected_hash).decode()
+        with open(result, 'r') as f:
+            hashed_value = f.read()
+        self.assertEqual(hashed_value, expected_base64)
+        os.remove(result)
+    def test_invalid_key_error(self):
+        # Test handling of invalid key
+        with self.assertRaises(KeyError):
+            task_func(self.path_1, 'Z')
+# Define this function only if needed to run tests manually

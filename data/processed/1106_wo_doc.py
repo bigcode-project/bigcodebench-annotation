@@ -1,95 +1,106 @@
 import subprocess
 import os
-import threading
+import time
+import glob
 
-def task_func(script_path: str, timeout: int = 60) -> str:
+def task_func(r_script_path: str, output_path: str, duration: int) -> (bool, str):
     """
-    Execute a specified python code with a given timeout. If the script execution exceeds the timeout, it is terminated.
-
+    This function executes an R script and verifies if the output file is generated within a given duration.
+    
     Parameters:
-    - script_path (str): The path to the Python code to be executed.
-    - timeout (int): The maximum allowed time (in seconds) for the script execution. Default is 60 seconds.
-
+    - r_script_path (str): The absolute path to the R script to be executed.
+    - output_path (str): The absolute path where the output CSV file is expected to be generated.
+    - duration (int): The time, in seconds, within which the output file should be generated.
+    
     Returns:
-    - str: A message indicating if the code was terminated due to timeout or executed successfully.
-
+    - tuple containing:
+      - bool: True if the output file is generated within the specified duration, False otherwise.
+      - str: A message indicating whether the file was generated successfully or not.
+    
     Requirements:
     - subprocess
     - os
-    - threading
-
-    Examples:
-    >>> task_func('/pathto/MyrScript.py')
-    'Script executed successfully.'
+    - time
+    - glob
     
-    >>> task_func('/pathto/LongRunningScript.py', 30)
-    'Terminating process due to timeout.'
-
-    Note:
-    - If the script was terminated due to timeout it will return "Script executed successfully.", otherwise "Terminating process due to timeout."
-
-    Raise:
-    - The code will raise FileNotFoundError if the file is not exist.
+    Example:
+    >>> task_func('/path_to_script/MyrScript.r', '/path_to_output/', 10)
+    (True, 'File generated successfully within the specified duration.')
+    >>> task_func('/path_to_script/InvalidScript.r', '/path_to_output/', 5)
+    (False, 'File not generated within the specified duration.')
     """
-    def target():
-        subprocess.call(['python', script_path])
-    thread = threading.Thread(target=target)
-    thread.start()
-    thread.join(timeout)
-    if thread.is_alive():
-        os.system(f'pkill -f "{script_path}"')
-        thread.join()
-        return 'Terminating process due to timeout.'
-    else:
-        return 'Script executed successfully.'
+    command = f'/usr/bin/Rscript --vanilla {r_script_path}'
+    subprocess.call(command, shell=True)
+    start_time = time.time()
+    search_pattern = os.path.join(output_path, '*.csv')
+    while time.time() - start_time < duration:
+        if glob.glob(search_pattern):
+            return True, 'File generated successfully within the specified duration.'
+        time.sleep(0.1)
+    return False, 'File not generated within the specified duration.'
 
 import unittest
-from unittest.mock import patch
-import time
+import os
 import shutil
+import time
+from unittest.mock import patch
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.test_dir = 'testdir_task_func'
-        os.makedirs(self.test_dir, exist_ok=True)
-        f = open(self.test_dir+"/script4.py","w")
-        f.write("print('Hello from script4')")
-        f.close()
-        f = open(self.test_dir+"/script1.py","w")
-        f.write("import time\ntime.sleep(10)\nprint('waiting')")
-        f.close()
-        f = open(self.test_dir+"/script2.py","w")
-        f.close()
-        f = open(self.test_dir+"/script3.py","w")
-        f.write("import time\ntime.sleep(62)\nprint('waiting')")
-        f.close()
-        
-        self.temp_dir = 'testdir_f_947/temp_dir'
+        # Create a temporary directory to store the mock R script and the output files
+        self.temp_dir = 'task_func_test_dir'
         os.makedirs(self.temp_dir, exist_ok=True)
         
+        # Create a mock R script file
+        self.r_script_path = os.path.join(self.temp_dir, 'mock_script.r')
+        with open(self.r_script_path, 'w') as file:
+            file.write('write.csv(data.frame(x=1:10, y=11:20), \"{}/output.csv\")')
+        
+        # Define the output path
+        self.output_path = self.temp_dir
     def tearDown(self):
-        # Clean up the test directory
-        shutil.rmtree(self.test_dir)
+        # Remove the temporary directory and its contents after each test case
+        shutil.rmtree(self.temp_dir)
+    
+    @patch('subprocess.call', return_value=None)  # Mock the subprocess.call to avoid actual execution of R script
+    def test_case_1(self, mock_subprocess_call):
+        # Manually create the expected output file to simulate the behavior of a successfully executed R script
+        with open(os.path.join(self.output_path, 'output.csv'), 'w') as file:
+            file.write('x,y\n1,11\n2,12\n3,13\n4,14\n5,15\n6,16\n7,17\n8,18\n9,19\n10,20')
+        # Case where the output file is expected to be generated within the specified duration
+        result, message = task_func(self.r_script_path, self.output_path, 5)
+        self.assertTrue(result)
+        self.assertEqual(message, 'File generated successfully within the specified duration.')
+        
+    @patch('subprocess.call', return_value=None)
+    def test_case_2(self, mock_subprocess_call):
+        # Case where the output file is not expected to be generated within the specified duration
+        result, message = task_func(self.r_script_path, self.output_path, 0)
+        self.assertFalse(result)
+        self.assertEqual(message, 'File not generated within the specified duration.')
     
     @patch('subprocess.call', return_value=None)
-    def test_case_1(self, mock_subprocess):
-        # Test with a short-running script
-        result = task_func('/path/to/short_script.py', 10)
-        self.assertEqual(result, 'Script executed successfully.')
+    def test_case_3(self, mock_subprocess_call):
+        # Case where an invalid R script path is provided
+        invalid_path = 'invalid/path/mock_script.r'
+        result, message = task_func(invalid_path, self.output_path, 5)
+        self.assertFalse(result)
+        self.assertEqual(message, 'File not generated within the specified duration.')
     
-    def test_case_2(self):
-        # Test with a long-running script and short timeout
-        result = task_func(self.test_dir+"/script1.py", 3)
-        self.assertEqual(result, 'Terminating process due to timeout.')
     @patch('subprocess.call', return_value=None)
-    def test_case_3(self, mock_subprocess):
-        # Test default timeout behavior
-        result = task_func('/path/to/short_script.py')
-        self.assertEqual(result, 'Script executed successfully.')
-    def test_case_4(self):
-        # Test with a long-running script and long timeout
-        result = task_func(self.test_dir+"/script1.py", 20)
-        self.assertEqual(result, 'Script executed successfully.')
-    def test_case_5(self):
-        # Test with a long-running script and default timeout
-        result = task_func(self.test_dir+"/script3.py")
-        self.assertEqual(result, 'Terminating process due to timeout.')
+    def test_case_4(self, mock_subprocess_call):
+        # Manually create the expected output file to simulate the behavior of a successfully executed R script
+        with open(os.path.join(self.output_path, 'output.csv'), 'w') as file:
+            file.write('x,y\n1,11\n2,12\n3,13\n4,14\n5,15\n6,16\n7,17\n8,18\n9,19\n10,20')
+        # Case where a longer duration is provided
+        time.sleep(2)  # Wait for 2 seconds before running the test to simulate different start times
+        result, message = task_func(self.r_script_path, self.output_path, 10)
+        self.assertTrue(result)
+        self.assertEqual(message, 'File generated successfully within the specified duration.')
+    
+    @patch('subprocess.call', return_value=None)
+    def test_case_5(self, mock_subprocess_call):
+        # Case where the output path is invalid
+        invalid_output_path = 'invalid/path/'
+        result, message = task_func(self.r_script_path, invalid_output_path, 5)
+        self.assertFalse(result)
+        self.assertEqual(message, 'File not generated within the specified duration.')

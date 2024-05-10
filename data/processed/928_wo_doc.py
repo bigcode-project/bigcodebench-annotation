@@ -1,82 +1,106 @@
 import pandas as pd
-import sqlite3
+from sklearn.preprocessing import LabelEncoder
 
-def task_func(db_path: str, table_name: str, column_name: str) -> pd.DataFrame:
+def task_func(file_path: str, column_name: str) -> pd.DataFrame:
     """
-    Loads data from an SQLite database into a Pandas DataFrame and performs a string replacement operation
-    on a specified column. Specifically, replaces all occurrences of the newline character '\n' with the HTML line
-    break tag '<br>'.
+    Load a CSV file into a Pandas DataFrame, replace all occurrences of the string '\n' with the string '<br>'
+    in the specified column, and encode the specified column as a categorical variable using LabelEncoder from sklearn.
+    
+    Parameters:
+    - file_path (str): The path to the CSV file to be read.
+    - column_name (str): The name of the column in which to replace '\n' and to encode.
+    
+    Returns:
+    pd.DataFrame: The updated and encoded Pandas DataFrame.
     
     Requirements:
     - pandas
-    - sqlite3
+    - sklearn.preprocessing.LabelEncoder
     
-    Parameters:
-    - db_path (str): The path to the SQLite database file.
-    - table_name (str): The name of the table from which to load data.
-    - column_name (str): The name of the column in which to perform string replacement.
-    
-    Returns:
-    pd.DataFrame: The modified DataFrame with replaced strings in the specified column.
-
-    Examples:
-    >>> df = task_func('./data.db', 'messages', 'content')
-    >>> df.loc[0, 'content']  # Assuming the first row originally contained "Hello\nWorld"
-    'Hello<br>World'
-    >>> df = task_func('./another_data.db', 'comments', 'text')
-    >>> df.loc[1, 'text']  # Assuming the second row originally contained "Good\nMorning"
-    'Good<br>Morning'
+    Example:
+    >>> df = task_func('data.csv', 'Category')
+    >>> print(df.head())
     """
-    try:
-        conn = sqlite3.connect(db_path)
-        df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
-        df[column_name] = df[column_name].replace({'\n': '<br>'}, regex=True)
-    finally:
-        conn.close()
+    df = pd.read_csv(file_path)
+    df[column_name] = df[column_name].replace({'\n': '<br>'}, regex=True)
+    le = LabelEncoder()
+    df[column_name] = le.fit_transform(df[column_name])
     return df
 
-def create_mock_db(db_path: str, table_name: str, column_name: str):
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    cursor.execute(f"CREATE TABLE {table_name} ({column_name} TEXT)")
-    cursor.executemany(f"INSERT INTO {table_name} ({column_name}) VALUES (?)", [("Hello\nWorld",), ("Good\nMorning",), ("Welcome\nBack",)])
-    conn.commit()
-    conn.close()
-import unittest
 import os
+import unittest
+import pandas as pd
+import shutil
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.db1_path = 'test_db1.db'
-        self.db2_path = 'test_db2.db'
-        self.table_name1 = 'TestData1'
-        self.table_name2 = 'TestData2'
-        self.column_name1 = 'TextColumn1'
-        self.column_name2 = 'TextColumn2'
-        create_mock_db(self.db1_path, self.table_name1, self.column_name1)
-        create_mock_db(self.db2_path, self.table_name2, self.column_name2)
-    def tearDown(self):
-        os.remove(self.db1_path)
-        os.remove(self.db2_path)
-        if os.path.exists('nonexistent.db'):
-            os.remove('nonexistent.db')
+        # create folder for test data
+        os.makedirs('test_data', exist_ok=True)
+        data = {
+            'Category': ['Fruit\n', 'Vegetable\n', 'Meat\n', 'Dairy\n'],
+            'Price': [1.2, 2.3, 3.4, 4.5]
+        }
+        pd.DataFrame(data).to_csv('test_data/test_case_1.csv', index=False)
+        
+        data = {
+            'Name': ['Alice', 'Bob', 'Charlie', 'David', 'Eve'],
+            'Age': [25, 30, 35, 40, 45],
+            'Language': ['Python\nJava', 'C++\nJavaScript', 'Ruby\nC#', 'PHP\nSwift', 'Kotlin\nR']
+        }
+        pd.DataFrame(data).to_csv('test_data/test_case_2.csv', index=False)
+        
+        data = {
+            'Item': ['Item1', 'Item2', 'Item3', 'Item4', 'Item5']
+        }
+        pd.DataFrame(data).to_csv('test_data/test_case_3.csv', index=False)
+        
+        data = {
+            'Language': ['Python\nJava', 'C++\nJavaScript', 'Ruby\nC#', 'PHP\nSwift', 'Kotlin\nR'],
+            'Country': ['USA', 'UK', 'China', 'Japan', 'Australia']
+        }
+        pd.DataFrame(data).to_csv('test_data/test_case_4.csv', index=False)
     
-    def test_valid_input(self):
-        df1 = task_func(self.db1_path, self.table_name1, self.column_name1)
-        self.assertIn('<br>', df1[self.column_name1].iloc[0])
-    def test_different_table_and_column(self):
-        df2 = task_func(self.db2_path, self.table_name2, self.column_name2)
-        self.assertIn('<br>', df2[self.column_name2].iloc[1])
-    def test_invalid_db_path(self):
-        # Adjusting for the fact that a non-existent database doesn't cause sqlite3.OperationalError when using pandas
-        try:
-            task_func('nonexistent.db', self.table_name1, self.column_name1)
-            self.fail("Expected an exception due to nonexistent database path")
-        except Exception as e:
-            self.assertIsInstance(e, (sqlite3.OperationalError, pd.errors.DatabaseError))
-    def test_invalid_table_name(self):
-        with self.assertRaises(pd.errors.DatabaseError):
-            task_func(self.db1_path, 'NonexistentTable', self.column_name1)
-    def test_invalid_column_name(self):
-        # This checks for a KeyError since pandas will raise this if the column does not exist
-        with self.assertRaises(KeyError):
-            task_func(self.db1_path, self.table_name1, 'NonexistentColumn')
+    def tearDown(self):
+        shutil.rmtree('test_data')
+        
+    def test_case_1(self):
+        # Input 1: A simple CSV file with a 'Category' column containing '\n' characters
+        # Expected: The '\n' should be replaced with '<br>' and the column should be encoded
+        df = task_func('test_data/test_case_1.csv', 'Category')
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertIn('Category', df.columns)
+        self.assertNotIn('\n', df['Category'].astype(str))
+        self.assertTrue(df['Category'].dtype.name == 'int64')
+        
+    def test_case_2(self):
+        # Input 2: A CSV file with different columns
+        # Expected: Only the specified column should be affected
+        df = task_func('test_data/test_case_2.csv', 'Name')
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertIn('Name', df.columns)
+        self.assertNotIn('\n', df['Name'].astype(str))
+        self.assertTrue(df['Name'].dtype.name == 'int64')
+        self.assertTrue(df['Age'].dtype.name == 'int64')
+        
+    def test_case_3(self):
+        # Input 3: A CSV file with a column that doesn't contain '\n'
+        # Expected: The column should still be encoded
+        df = task_func('test_data/test_case_3.csv', 'Item')
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertIn('Item', df.columns)
+        self.assertTrue(df['Item'].dtype.name == 'int64')
+    
+    def test_case_4(self):
+        # Input 4: A CSV file with multiple columns, affecting only one
+        # Expected: Only the specified column should be encoded
+        df = task_func('test_data/test_case_4.csv', 'Language')
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertIn('Language', df.columns)
+        self.assertNotIn('\n', df['Language'].astype(str))
+        self.assertTrue(df['Language'].dtype.name == 'int64')
+        self.assertTrue(df['Country'].dtype.name == 'object')
+        
+    def test_case_5(self):
+        # Input 5: A CSV file with no columns matching the specified column
+        # Expected: An exception should be raised
+        with self.assertRaises(Exception):
+            df = task_func('test_data/test_case_5.csv', 'NonExistentColumn')

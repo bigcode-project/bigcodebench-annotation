@@ -4,83 +4,92 @@ import random
 
 def task_func(text, seed=None):
     """
-    Transforms the input text by replacing each alphabetic character with a random letter,
-    while preserving the case and non-alphabetic characters of the original text.
+    Generates a password that mirrors the structure of the given text by replacing alphabetic
+    characters with random ascii lowercase letters, digits with random single-digit numbers,
+    spaces wth either a random digit or random lowercase letter at equal probabilities, and
+    leaving other characters unchanged.
 
     Parameters:
-    - text (str): The input text to be transformed.
-    - seed (int, optional): Random seed for reproducibility. Defaults to None (not set).
+    - text (str): The text to be mirrored in the generated password. Must not be empty.
+    - seed (int, optional): Seed for the random number generator. Defaults to None (not set).
 
     Returns:
-    - str: A transformed string with random letters replacing the alphabetic characters of the input text,
-      preserving non-alphabetic characters and the original case.
+    - str: The generated password.
+
+    Raises:
+    - ValueError: If the input text is empty.
 
     Requirements:
-    - string
     - random
+    - string
 
-    Notes:
-    - Alphabet replacements are chosen from ascii characters of the same case as the original.
+    Note:
+    - This function does not handle high Unicode characters and focuses only on ASCII values.
 
-    Example:
-    >>> text = 'Hello, world!'
-    >>> task_func(text, 0)
-    'Mynbi, qpmzj!'
+    Examples:
+    >>> task_func("hello world! 123", 0)
+    'mbqmp3jytre!v553'
+    >>> task_func("apple321#", seed=42)
+    'uahev901#'
     """
-    def replace_with_random_char(c):
-        if c.isalpha():
-            if c.islower():
-                return random.choice(string.ascii_lowercase)
-            else:
-                return random.choice(string.ascii_uppercase)
-        return c
     if seed is not None:
         random.seed(seed)
-    return "".join(replace_with_random_char(c) for c in text)
+    if not text:
+        raise ValueError("text cannot be empty.")
+    password = ""
+    for char in text:
+        random_lowercase = random.choice(string.ascii_lowercase)
+        random_digit = random.choice(string.digits)
+        if char.isalpha():
+            password += random_lowercase
+        elif char.isdigit():
+            password += random_digit
+        elif char == " ":
+            if random.random() < 0.5:
+                password += random_lowercase
+            else:
+                password += random_digit
+        else:
+            password += char
+    return password
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test single word
-        input_text = "Hello"
-        output_text = task_func(input_text, seed=1)
-        self.assertTrue(
-            all(oc.isalpha() == ic.isalpha() for oc, ic in zip(output_text, input_text))
-        )
-        self.assertEqual(len(output_text), len(input_text))
+        # Test basic case
+        result = task_func("Hello123", seed=1)
+        self.assertEqual(len(result), 8)
+        for i, char in enumerate("Hello123"):
+            if char.isalpha():
+                self.assertTrue(result[i].isalpha())
+            elif char.isdigit():
+                self.assertTrue(result[i].isdigit())
     def test_case_2(self):
-        # Test multiple words and punctuation
-        input_text = "Hello, World!"
-        output_text = task_func(input_text, seed=2)
-        self.assertTrue(
-            all(oc.isalpha() == ic.isalpha() for oc, ic in zip(output_text, input_text))
-        )
-        self.assertEqual(len(output_text), len(input_text))
+        # Test basic case with alphabet only
+        result = task_func("ABC", seed=2)
+        self.assertEqual(len(result), 3)
+        self.assertTrue(all(char.isalpha() for char in result))
     def test_case_3(self):
-        # Test empty string
-        input_text = ""
-        output_text = task_func(input_text, seed=3)
-        self.assertEqual(output_text, "")
+        # Test basic case with digit only
+        result = task_func("123", seed=3)
+        self.assertEqual(len(result), 3)
+        self.assertTrue(all(char.isdigit() for char in result))
     def test_case_4(self):
-        # Test case preservation
-        input_text = "HeLlO"
-        output_text = task_func(input_text, seed=4)
-        self.assertTrue(
-            all(
-                oc.isupper() == ic.isupper() and oc.islower() == ic.islower()
-                for oc, ic in zip(output_text, input_text)
-            )
-        )
+        # Test basic case with whitespace, alphabet, number, special char
+        text = "Hello, world!"
+        result = task_func(text, seed=4)
+        self.assertEqual(len(result), 13)
+        for i, char in enumerate(text):
+            result_char = result[i]
+            if char.isalpha():
+                self.assertTrue(result_char.isalpha())
+            elif char.isdigit():
+                self.assertTrue(result_char.isdigit())
+            elif char == " ":
+                self.assertTrue(result_char.isalnum())
+            else:
+                self.assertEqual(result[i], char)
     def test_case_5(self):
-        # Test numbers, special characters
-        input_text = "1234!@#$"
-        output_text = task_func(input_text, seed=5)
-        self.assertEqual(
-            output_text, input_text
-        )  # Numbers and special characters should remain unchanged
-    def test_case_6(self):
-        # Test random seed reproducibility
-        input_text = "Colorless green ideas sleep furiously."
-        output1 = task_func(input_text, seed=123)
-        output2 = task_func(input_text, seed=123)
-        self.assertEqual(output1, output2)
+        # Test handling empty string
+        with self.assertRaises(Exception):
+            task_func("", seed=5)

@@ -1,93 +1,117 @@
-import pandas as pd
+import numpy as np
+from scipy.stats import ttest_ind
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
-
-# Constants
-PLOT_TITLE = "Scaled Values"
 
 
-def task_func(data_dict):
+def task_func(kwargs):
     """
-    Scales the values in a given dictionary using MinMaxScaler and plots the scaled data.
+    Performs a two-sample t-test on numerical data from two groups to determine if there is a significant
+    difference in their means. The function handles NaN values, computes descriptive statistics for each group,
+    and generates a boxplot and histograms for data visualization.
 
     Parameters:
-    - data_dict (dict): A dictionary where keys represent column names and values are lists of numerical data.
-                        The values may contain missing data (None), which are handled by dropping them before scaling.
+    - kwargs (dict): A dictionary with two keys, 'group1' and 'group2'. Each key maps to a list of numbers.
+                     Lists can contain NaN values, which will be excluded from analysis.
 
     Returns:
-    - pandas.DataFrame containing the scaled data.
-    - matplotlib Axes object that displays the plot of the scaled data.
+    - dict: A dictionary containing:
+        - 'significant': Boolean. True if the means of the two groups are significantly different (p < 0.05).
+        - 'group1_stats': Dictionary with mean and standard deviation of 'group1' (excluding NaNs).
+        - 'group2_stats': Dictionary with mean and standard deviation of 'group2' (excluding NaNs).
+        - 'ax_boxplot': A matplotlib Axes object with a boxplot comparing 'group1' and 'group2'.
+        - 'ax_histogram': A matplotlib Axes object with histograms of 'group1' and 'group2'.
+
+    Raises:
+    - ValueError: If either group is empty, contains only NaN values, has less than two non-NaN values,
+                  or if the variance in one or both groups is below a threshold (1e-8).
 
     Requirements:
-    - pandas
-    - scikit-learn
+    - numpy
+    - scipy
     - matplotlib
 
+    Note:
+    - The function sets the significance level (alpha) at 0.05.
+    - It removes NaN values before performing any calculations or plotting.
+    - A t-test is performed with the 'nan_policy' set to 'omit' to ignore NaNs.
+    - The function checks for sufficient non-NaN data points and adequate variance in each group before conducting the t-test.
+    - The boxplot and histograms provide a visual comparison of the data distributions.
+    
     Example:
-    >>> data = {'a': [1, 2, None, 4], 'b': [5, None, 7, 8]}
-    >>> scaled_df, plot_ax = task_func(data)
-    >>> scaled_df
-         a    b
-    0  0.0  0.0
-    1  1.0  1.0
-    >>> plot_ax.get_title()
-    'Scaled Values'
+    >>> data = {'group1': [1, 2, 3, 4], 'group2': [5, 6, 7, 8]}
+    >>> results = task_func(data)
+    >>> results['significant']
+    True
     """
-    df = pd.DataFrame(data_dict).dropna()
-    if df.empty:
-        ax = plt.gca()
-        ax.set_title(PLOT_TITLE)
-        return df, ax
-    scaler = MinMaxScaler()
-    scaled_data = scaler.fit_transform(df)
-    df_scaled = pd.DataFrame(scaled_data, columns=df.columns)
-    ax = df_scaled.plot()
-    ax.set_title(PLOT_TITLE)
-    return df_scaled, ax
+    alpha = 0.05  # Define the significance level
+    group1 = np.array(kwargs.get("group1", []))
+    group2 = np.array(kwargs.get("group2", []))
+    if (
+        len(group1) == 0
+        or len(group2) == 0
+        or np.all(np.isnan(group1))
+        or np.all(np.isnan(group2))
+    ):
+        raise ValueError("One or both groups are empty or contain only NaN values.")
+    valid_group1 = group1[~np.isnan(group1)]
+    valid_group2 = group2[~np.isnan(group2)]
+    if len(valid_group1) < 2 or len(valid_group2) < 2:
+        raise ValueError("Each group must have at least two non-NaN values.")
+    if np.var(valid_group1) < 1e-8 or np.var(valid_group2) < 1e-8:
+        raise ValueError("Variance in one or both groups is too low.")
+    _, p_val = ttest_ind(valid_group1, valid_group2, nan_policy="omit")
+    significant = p_val < alpha
+    group1_stats = {"mean": np.mean(valid_group1), "std": np.std(valid_group1)}
+    group2_stats = {"mean": np.mean(valid_group2), "std": np.std(valid_group2)}
+    _, (ax_boxplot, ax_histogram) = plt.subplots(2, 1, figsize=(8, 12))
+    ax_boxplot.boxplot([valid_group1, valid_group2], labels=["group1", "group2"])
+    ax_histogram.hist(valid_group1, alpha=0.5, label="group1")
+    ax_histogram.hist(valid_group2, alpha=0.5, label="group2")
+    ax_histogram.legend()
+    return {
+        "significant": significant,
+        "group1_stats": group1_stats,
+        "group2_stats": group2_stats,
+        "ax_boxplot": ax_boxplot,
+        "ax_histogram": ax_histogram,
+    }
 
 import unittest
-import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
-    """Unit tests for the function."""
-    def test_empty_data(self):
-        """
-        Test with an empty dictionary. Should return an empty DataFrame and a plot object.
-        """
-        result_df, result_ax = task_func({})
-        self.assertTrue(result_df.empty)
-        self.assertIsNotNone(result_ax)
-    def test_all_none_data(self):
-        """
-        Test with a dictionary where all values are None. Should return an empty DataFrame and a plot object.
-        """
-        data = {"a": [None, None], "b": [None, None]}
-        result_df, result_ax = task_func(data)
-        self.assertTrue(result_df.empty)
-        self.assertIsNotNone(result_ax)
-    def test_normal_data(self):
-        """
-        Test with a normal data dictionary. Should return a non-empty DataFrame and a plot object.
-        """
-        data = {"a": [1, 2, 3], "b": [4, 5, 6]}
-        result_df, result_ax = task_func(data)
-        self.assertEqual(result_ax.get_title(), "Scaled Values")
-        self.assertFalse(result_df.empty)
-        self.assertEqual(result_df.shape, (3, 2))
-        self.assertIsNotNone(result_ax)
-    def test_with_missing_values(self):
-        """
-        Test data with some missing values. Missing values should be dropped, and scaled data should be returned.
-        """
-        data = {"a": [1, None, 3], "b": [4, 5, None]}
-        result_df, result_ax = task_func(data)
-        self.assertEqual(result_df.shape, (1, 2))  # Only one row without missing values
-        self.assertIsNotNone(result_ax)
-    def test_with_negative_values(self):
-        """
-        Test data with negative values. Should handle negative values correctly and return scaled data.
-        """
-        data = {"a": [-1, -2, -3], "b": [1, 2, 3]}
-        result_df, result_ax = task_func(data)
-        self.assertFalse(result_df.empty)
-        self.assertEqual(result_df.shape, (3, 2))
-        self.assertIsNotNone(result_ax)
+    """Test cases for the function."""
+    def test_different_means(self):
+        """Test with groups having significantly different means."""
+        data = {"group1": [1, 2, 3], "group2": [4, 5, 6]}
+        result = task_func(data)
+        self.assertTrue(result["significant"])
+    def test_similar_means(self):
+        """Test with groups having similar means."""
+        data = {"group1": [1, 2, 3], "group2": [1, 2, 3]}
+        result = task_func(data)
+        self.assertFalse(result["significant"])
+    def test_with_nan_values(self):
+        """Test with groups containing NaN values but with at least two non-NaN values in each group."""
+        data = {"group1": [np.nan, 2, 3], "group2": [1, np.nan, 3]}
+        result = task_func(data)
+        self.assertIsNotNone(result)
+    def test_empty_group(self):
+        """Test with one of the groups being empty."""
+        data = {"group1": [], "group2": [1, 2, 3]}
+        with self.assertRaises(ValueError):
+            task_func(data)
+    def test_all_nan_values(self):
+        """Test with groups containing only NaN values."""
+        data = {"group1": [np.nan, np.nan], "group2": [np.nan, np.nan]}
+        with self.assertRaises(ValueError):
+            task_func(data)
+    def test_insufficient_group_size(self):
+        """Test with one of the groups having less than two non-NaN values."""
+        data = {"group1": [1, np.nan], "group2": [2, 3, 4]}
+        with self.assertRaises(ValueError):
+            task_func(data)
+    def test_low_variance(self):
+        """Test with one of the groups having extremely low variance."""
+        data = {"group1": [1.00000001, 1.00000002], "group2": [2, 3, 4]}
+        with self.assertRaises(ValueError):
+            task_func(data)

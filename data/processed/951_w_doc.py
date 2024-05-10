@@ -1,69 +1,79 @@
 import numpy as np
-import pandas as pd
+from scipy.linalg import svd
 
-def task_func(rows, columns, seed=None):
+def task_func(rows=3, columns=2, seed=0):
     """
-    Generate a DataFrame with random values within a specified range.
-    
-    This function creates a matrix of given dimensions filled with random values between 0 and 1 and returns it as a Pandas DataFrame. Users have the option to set a random seed for reproducible results.
-    
-    Parameters:
-    - rows (int): The number of rows for the matrix.
-    - columns (int): The number of columns for the matrix.
-    - seed (int, optional): The seed for the random number generator. Default is None.
-    
-    Returns:
-    - DataFrame: A Pandas DataFrame containing the generated random values.
-    
+    Generate a matrix of random values with specified dimensions and perform Singular Value Decomposition (SVD) on it.
+
     Requirements:
     - numpy
-    - pandas
-    
-    Examples:
-    >>> df = task_func(3, 2, seed=42)
-    >>> print(df.shape)
-    (3, 2)
-    >>> df = task_func(1, 1, seed=24)
-    >>> print(df.shape)
-    (1, 1)
+    - scipy.linalg.svd
+
+    Parameters:
+    - rows (int): Number of rows for the random matrix. Default is 3.
+    - columns (int): Number of columns for the random matrix. Default is 2.
+    - seed (int, optional): Seed for the random number generator to ensure reproducibility. Default is None.
+
+    Returns:
+    tuple: A tuple containing three elements:
+        - U (ndarray): The unitary matrix U.
+        - s (ndarray): The singular values, sorted in descending order.
+        - Vh (ndarray): The conjugate transpose of the unitary matrix V.
+
+    Example:
+    >>> U, s, Vh = task_func(3, 2, seed=42)
+    >>> print('U shape:', U.shape)
+    U shape: (3, 3)
+    >>> print('s shape:', s.shape)
+    s shape: (2,)
+    >>> print('Vh shape:', Vh.shape)
+    Vh shape: (2, 2)
     """
-    if seed is not None:
-        np.random.seed(seed)
+    np.random.seed(seed)
     matrix = np.random.rand(rows, columns)
-    df = pd.DataFrame(matrix)
-    return df
+    U, s, Vh = svd(matrix)
+    return U, s, Vh
 
 import unittest
+import numpy as np
 class TestCases(unittest.TestCase):
     
-    def setUp(self):
-        self.seed = 42
     def test_case_1(self):
-        df = task_func(3, 2, seed=self.seed)
-        self.assertEqual(df.shape, (3, 2))
-        self.assertTrue((df >= 0).all().all())
-        self.assertTrue((df <= 1).all().all())
+        # Test with default 3x2 matrix
+        U, s, Vh = task_func(seed=3)
+        self.assertEqual(U.shape, (3, 3))
+        self.assertEqual(s.shape, (2,))
+        self.assertEqual(Vh.shape, (2, 2))
+        self.assertTrue(np.all(s >= 0))
         
     def test_case_2(self):
-        df = task_func(5, 5, seed=self.seed)
-        self.assertEqual(df.shape, (5, 5))
-        self.assertTrue((df >= 0).all().all())
-        self.assertTrue((df <= 1).all().all())
-        
+        # Test with a 5x5 square matrix
+        U, s, Vh = task_func(5, 5, seed=42)
+        self.assertEqual(U.shape, (5, 5))
+        self.assertEqual(s.shape, (5,))
+        self.assertEqual(Vh.shape, (5, 5))
+        self.assertTrue(np.all(s >= 0))
+    
     def test_case_3(self):
-        df = task_func(1, 1, seed=self.seed)
-        self.assertEqual(df.shape, (1, 1))
-        self.assertTrue((df >= 0).all().all())
-        self.assertTrue((df <= 1).all().all())
+        # Test with a 2x3 matrix (more columns than rows)
+        U, s, Vh = task_func(2, 3, seed=12)
+        self.assertEqual(U.shape, (2, 2))
+        self.assertEqual(s.shape, (2,))
+        self.assertEqual(Vh.shape, (3, 3))
+        self.assertTrue(np.all(s >= 0))
         
     def test_case_4(self):
-        df = task_func(4, 3, seed=self.seed)
-        self.assertEqual(df.shape, (4, 3))
-        self.assertTrue((df >= 0).all().all())
-        self.assertTrue((df <= 1).all().all())
+        # Test with a 1x1 matrix (a scalar)
+        U, s, Vh = task_func(1, 1, seed=0)
+        self.assertEqual(U.shape, (1, 1))
+        self.assertEqual(s.shape, (1,))
+        self.assertEqual(Vh.shape, (1, 1))
+        self.assertTrue(np.all(s >= 0))
         
     def test_case_5(self):
-        df = task_func(2, 2, seed=self.seed)
-        self.assertEqual(df.shape, (2, 2))
-        self.assertTrue((df >= 0).all().all())
-        self.assertTrue((df <= 1).all().all())
+        # Test with a 4x3 matrix
+        U, s, Vh = task_func(4, 3, seed=1)
+        self.assertEqual(U.shape, (4, 4))
+        self.assertEqual(s.shape, (3,))
+        self.assertEqual(Vh.shape, (3, 3))
+        self.assertTrue(np.all(s >= 0))

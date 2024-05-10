@@ -1,60 +1,75 @@
-from collections import Counter
-import re
+import os
+from nltk import word_tokenize
 
-def task_func(result):
+def task_func(file_path='File.txt'):
     """
-    Get the most common values associated with the url key in the dictionary list "result."
-
+    Tokenizes a text file using the NLTK library. This function reads each line from the file, 
+    breaks it into words or punctuation, and stores the tokens in a list.
+    
     Parameters:
-    result (list): A list of dictionaries.
-
+    - file_path (str): The path to the text file. Defaults to 'File.txt'.
+    
     Returns:
-    dict: A dictionary with the most common values and their counts.
-
+    - list: A list of tokens.
+    
     Requirements:
-    - collections
-    - re
-
-    Example:
-    >>> result = [{"hi": 7, "http://google.com": 0}, {"https://google.com": 0}, {"http://www.cwi.nl": 1}]
-    >>> task_func(result)
-    {0: 2}
+    - os
+    - nltk.word_tokenize
+    
+    Examples:
+    >>> task_func('sample.txt')
+    ['Hello', ',', 'world', '!']
+    >>> task_func('data.txt')
+    ['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog', '.']
     """
-    regex = re.compile(
-        r'^(?:http|ftp)s?://' # http:// or https://
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
-        r'localhost|' #localhost...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-        r'(?::\d+)?' # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-    from_user_values = []
-    for l_res in result:
-        for j in l_res:
-            if re.match(regex, j):
-                from_user_values.append(l_res[j])
-    counter = Counter(from_user_values)
-    most_common = dict(counter.most_common(1))
-    return most_common
+    if not os.path.isfile(file_path):
+        raise FileNotFoundError(f"File not found: {file_path}")
+    tokens = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            tokens.extend(word_tokenize(line))
+    return tokens
 
 import unittest
+import shutil
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.test_dir = 'testdir_task_func'
+        os.makedirs(self.test_dir, exist_ok=True)
+        
+        f = open(self.test_dir+"/sample1.txt","w")
+        f.write("Hello, world!")
+        f.close()
+        f = open(self.test_dir+"/sample2.txt","w")
+        f.write("The quick brown fox jumps over the lazy dog .")
+        f.close()
+        f = open(self.test_dir+"/sample3.txt","w")
+        f.write("NLTK is a leading platform for building Python programs to work with human language data.")
+        f.close()
+        f = open(self.test_dir+"/sample4.txt","w")
+        f.write("OpenAI is an organization focused on    ensuring that artificial general intelligence benefits all   of humanity    .")
+        f.close()
+        
+        
+        f = open(self.test_dir+"/sample5.txt","w")
+        f.write("Python is an interpreted, high-level , general-purpose programming language.")
+        f.close()
+        
+    def tearDown(self):
+        # Clean up the test directory
+        shutil.rmtree(self.test_dir)
     def test_case_1(self):
-        result = [{"hi": 7, "bye": 4, "http://google.com": 0}, {"https://google.com": 0}, {"http://www.cwi.nl": 1}]
-        expected_output = {0: 2}
-        self.assertEqual(task_func(result), expected_output)
+        tokens = task_func(self.test_dir+'/sample1.txt')
+        self.assertEqual(tokens, ['Hello', ',', 'world', '!'])
     def test_case_2(self):
-        result = [{"http://google.com": 2}, {"http://www.cwi.nl": 2}, {"http://google.com": 3}]
-        expected_output = {2: 2}
-        self.assertEqual(task_func(result), expected_output)
+        tokens = task_func(self.test_dir+'/sample2.txt')
+        self.assertEqual(tokens, ['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog', '.'])
     def test_case_3(self):
-        result = [{"http://google.com": 5}]
-        expected_output = {5: 1}
-        self.assertEqual(task_func(result), expected_output)
+        tokens = task_func(self.test_dir+'/sample3.txt')
+        self.assertEqual(tokens, ['NLTK', 'is', 'a', 'leading', 'platform', 'for', 'building', 'Python', 'programs', 'to', 'work', 'with', 'human', 'language', 'data', '.'])
     def test_case_4(self):
-        result = []
-        expected_output = {}
-        self.assertEqual(task_func(result), expected_output)
+        tokens = task_func(self.test_dir+'/sample4.txt')
+        self.assertEqual(tokens, ['OpenAI', 'is', 'an', 'organization', 'focused', 'on', 'ensuring', 'that', 'artificial', 'general', 'intelligence', 'benefits', 'all', 'of', 'humanity', '.'])
     def test_case_5(self):
-        result = [{"hi": 7, "bye": 4}, {"hello": "world"}]
-        expected_output = {}
-        self.assertEqual(task_func(result), expected_output)
+        tokens = task_func(self.test_dir+'/sample5.txt')
+        self.assertEqual(tokens, ['Python', 'is', 'an', 'interpreted', ',', 'high-level', ',', 'general-purpose', 'programming', 'language', '.'])

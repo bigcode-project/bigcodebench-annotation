@@ -1,65 +1,96 @@
 import pandas as pd
-from sklearn.linear_model import LinearRegression
-
-DATA = {
-    "Area_String": ["1,000", "2,000", "3,000", "4,000", "5,000"],
-    "Price": [100, 200, 300, 400, 500],
-}
+import seaborn as sns
 
 
-def task_func(area_string, data=DATA):
+def task_func(data=None):
     """
-    Predicts the price based on a given area after training a linear regression model.
+    Converts string-formatted weights to floats and plots a scatter plot of weight against height.
 
+    This function takes a dictionary with two keys: 'Weight_String' and 'Height'. The 'Weight_String' key should 
+    contain a list of weight values in string format, while the 'Height' key should have a list of corresponding 
+    height values in numerical format. If the input dictionary is not provided, the function uses a default dataset.
+    The function then converts the string-formatted weights into float, and plots a scatter plot to visualize 
+    the relationship between weight and height.
+       
     Parameters:
-    - area_string (str): A string representing the area (in square units) for
-    which the price needs to be predicted. The string may contain commas.
-    - data (dict): Optional. A dictionary with keys 'Area_String' and 'Price'
-    representing area values (as strings) and their corresponding prices. Defaults to a predefined dataset.
+    - data (dict, optional): A dictionary with keys 'Weight_String' and 'Height'. 'Weight_String' is expected to be 
+                           a list of weight values in string format (e.g., ['60.5', '65.7']), and 'Height' is expected 
+                           to be a list of corresponding numerical height values (e.g., [160, 165]). If no dictionary 
+                           is provided, a default dataset with predetermined values is used.
+                           Default dictionary:
+                           {
+                               'Weight_String': ['60.5', '65.7', '70.2', '75.9', '80.1'],
+                               'Height': [160, 165, 170, 175, 180]
+                           }
 
     Returns:
-    - float: The predicted price for the given area.
+    - ax (matplotlib.axes._axes.Axes): A scatter plot with weight on the x-axis and height on the y-axis, titled "Weight vs Height".
+
+    Raises:
+    - ValueError: If any of the values in the 'Weight_String' key are not formatted as strings. This validation ensures 
+                that the weight data is in the expected format for conversion to float.
 
     Requirements:
     - pandas
-    - sklearn.linear_model
+    - seaborn
 
     Example:
-    >>> task_func('6,000')
-    600.0
+    >>> ax = task_func()
+    >>> print(ax.get_title())
+    Weight vs Height
     """
+    if data is None:
+        data = {
+            "Weight_String": ["60.5", "65.7", "70.2", "75.9", "80.1"],
+            "Height": [160, 165, 170, 175, 180],
+        }
     df = pd.DataFrame(data)
-    df["Area_Float"] = df["Area_String"].str.replace(",", "").astype(float)
-    X = df[["Area_Float"]]
-    Y = df["Price"]
-    model = LinearRegression()
-    model.fit(X, Y)
-    area_float = float(area_string.replace(",", ""))
-    prediction_data = pd.DataFrame([area_float], columns=["Area_Float"])
-    price_predicted = model.predict(prediction_data)
-    return price_predicted[0]
+    if not all(isinstance(weight, str) for weight in df["Weight_String"]):
+        raise ValueError("Weights must be provided as strings.")
+    df["Weight_Float"] = df["Weight_String"].astype(float)
+    ax = sns.scatterplot(data=df, x="Weight_Float", y="Height")
+    ax.set_title("Weight vs Height")
+    return ax
 
 import unittest
+import pandas as pd
+from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
     """Test cases for task_func"""
-    def test_correctness(self):
-        """Test correctness."""
-        self.assertAlmostEqual(task_func("6,000"), 600, delta=10)
-        self.assertAlmostEqual(task_func("7,000"), 700, delta=10)
-    def test_input_formats(self):
-        """Test input formats."""
-        self.assertAlmostEqual(task_func("6,500"), 650, delta=10)
-        self.assertAlmostEqual(task_func("6500"), 650, delta=10)
+    def test_default_data(self):
+        """Test task_func with its default data."""
+        result = task_func()
+        self.assertIsInstance(result, Axes)
     def test_custom_data(self):
-        """Test custom data."""
+        """Test task_func with custom data."""
         custom_data = {
-            "Area_String": ["10", "20", "30", "40", "50"],
-            "Price": [1, 2, 3, 4, 5],
+            "Weight_String": ["50.5", "55.7", "60.2"],
+            "Height": [150, 155, 160],
         }
-        self.assertAlmostEqual(task_func("60", data=custom_data), 6, delta=0.1)
-    def test_existing_area(self):
-        """Test existing area."""
-        self.assertAlmostEqual(task_func("5,000"), 500, delta=5)
-    def test_large_area(self):
-        """Test large area."""
-        self.assertAlmostEqual(task_func("100,000"), 10000, delta=100)
+        result = task_func(custom_data)
+        self.assertIsInstance(result, Axes)
+    def test_incorrect_data_type(self):
+        """Test task_func with incorrect data types in Weight_String."""
+        incorrect_data = {
+            "Weight_String": [
+                60.5,
+                65.7,
+                70.2,
+            ],  # Intentionally using floats instead of strings
+            "Height": [160, 165, 170],
+        }
+        with self.assertRaises(ValueError):
+            task_func(incorrect_data)
+    def test_empty_data(self):
+        """Test task_func with empty data."""
+        empty_data = {"Weight_String": [], "Height": []}
+        result = task_func(empty_data)
+        self.assertIsInstance(result, Axes)
+    def test_mismatched_data_length(self):
+        """Test task_func with mismatched lengths of Weight_String and Height."""
+        mismatched_data = {
+            "Weight_String": ["60.5", "65.7"],  # Less weights than heights
+            "Height": [160, 165, 170],
+        }
+        with self.assertRaises(ValueError):
+            task_func(mismatched_data)

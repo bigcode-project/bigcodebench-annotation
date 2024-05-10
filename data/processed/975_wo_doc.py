@@ -1,168 +1,160 @@
-import os
 import shutil
+import pathlib
 
 
-def task_func(path, delimiter="/"):
+def task_func(source_path, destination_path):
     """
-    Splits a given file path by a specific delimiter and computes disk usage for each directory component.
+    Lists files in the specified source directory without descending into subdirectories and copies them to a
+    destination directory.
 
     Parameters:
-    - path (str): The file path to split.
-    - delimiter (str, optional): The delimiter to use for splitting the path. Default is '/'.
+    - source_path (str):      The source directory path to analyze. Must be an existing, accessible directory.
+    - destination_path (str): The destination directory path where files will be copied.
+                              If it does not exist, this function will create it.
 
     Returns:
-    list: A list of tuples where each tuple contains a path component and its disk usage as a dictionary.
-          The disk usage dictionary contains keys 'total', 'used', and 'free'.
+    Tuple[str, List[str]]: A tuple containing the name of the source directory and a list of filenames (not
+                           full paths) that were copied.
 
     Raises:
-    - ValueError: If the 'path' is empty, not a string, or contain invalid components.
-    - FileNotFoundError: If the 'path' does not exist in the filesystem.
+    - ValueError: If source_path does not exist or is not a directory.
 
     Requirements:
-    - os
     - shutil
+    - pathlib
 
-    Examples:
-    >>> task_func('Docs/src', '/')
-    [('Docs', {'total': 100, 'used': 50, 'free': 50}), ('src', {'total': 200, 'used': 100, 'free': 100})]
-
-    >>> task_func('a/b', '/')
-    [('a', {'total': 300, 'used': 150, 'free': 150}), ('b', {'total': 400, 'used': 200, 'free': 200})]
+    Example:
+    >>> x = task_func('/Docs/src/Scripts')
+    >>> type(x)
+    <class 'tuple'>
+    >>> x
+    ('Scripts', ['file_1_in_scripts_dir.txt', 'file_2_in_scripts_dir.txt'])
     """
-    if not path or not isinstance(path, str):
-        raise ValueError("Path must be a non-empty string")
-    if not os.path.exists(path):
-        raise FileNotFoundError(f"Path '{path}' does not exist")
-    path_components = path.strip(delimiter).split(delimiter)
-    if not all(path_components):
-        raise ValueError("Path contains invalid components")
+    source_path = pathlib.Path(source_path).resolve()
+    destination_path = pathlib.Path(destination_path).resolve()
+    if not (source_path.exists() and source_path.is_dir()):
+        raise ValueError("source_path must be an existing directory.")
+    destination_path.mkdir(parents=True, exist_ok=True)
     results = []
-    for index, component in enumerate(path_components):
-        sub_path = delimiter.join(path_components[: index + 1])
-        if not sub_path.startswith(delimiter):
-            sub_path = delimiter + sub_path
-        usage = shutil.disk_usage(sub_path)
-        results.append(
-            (component, {"total": usage.total, "used": usage.used, "free": usage.free})
-        )
-    return results
+    for entry in source_path.iterdir():
+        if entry.is_file():
+            results.append(str(entry.name))
+            shutil.copy(str(entry), str(destination_path))
+    return (source_path.name, results)
 
 import unittest
-from collections import namedtuple
-from unittest.mock import patch
 import tempfile
-import os
+import pathlib
 class TestCases(unittest.TestCase):
     def setUp(self):
-        DiskUsage = namedtuple("DiskUsage", ["total", "used", "free"])
-        # Setup realistic disk usage values for different directories
-        self.mock_usage_root = DiskUsage(500000000000, 300000000000, 200000000000)
-        self.mock_usage_docs = DiskUsage(100000000000, 50000000000, 50000000000)
-        self.mock_usage_src = DiskUsage(50000000000, 25000000000, 25000000000)
-        self.mock_usage_home = DiskUsage(200000000000, 100000000000, 100000000000)
-    def disk_usage_side_effect(self, path):
-        # Helper for mocking
-        if path.endswith("src"):
-            return self.mock_usage_src
-        elif path.endswith("Docs"):
-            return self.mock_usage_docs
-        elif path == "/home":
-            return self.mock_usage_home
-        return self.mock_usage_root
-    @patch("os.path.exists")
-    def test_nonexist_path(self, mock_exists):
-        # Test function should raise error if path does not exist
-        mock_exists.return_value = True
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            non_exist_path = os.path.join(tmpdirname, "nonexist")
-            with self.assertRaises(FileNotFoundError):
-                task_func(non_exist_path)
-    def test_invalid_path(self):
-        # Test function should raise error if path is not valid
-        with self.assertRaises(ValueError):
-            task_func("")
-        with self.assertRaises(ValueError):
-            task_func(123)
-    @patch("os.path.exists")
-    @patch("shutil.disk_usage")
-    def test_varied_path(self, mock_disk_usage, mock_exists):
-        # Test functionality
-        mock_exists.return_value = True
-        mock_disk_usage.side_effect = self.disk_usage_side_effect
-        result = task_func("Docs/src")
-        expected = [
-            (
-                "Docs",
-                {
-                    "total": self.mock_usage_docs.total,
-                    "used": self.mock_usage_docs.used,
-                    "free": self.mock_usage_docs.free,
-                },
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.test_source_dir = pathlib.Path(self.temp_dir.name) / "testf817-source"
+        self.test_target_dir = pathlib.Path(self.temp_dir.name) / "testf817-target"
+        self.test_source_dir.mkdir(parents=True, exist_ok=True)
+        self.test_target_dir.mkdir(parents=True, exist_ok=True)
+    def tearDown(self):
+        self.temp_dir.cleanup()
+    def create_files(self, paths):
+        for path in paths:
+            full_path = self.test_source_dir / path
+            full_path.parent.mkdir(parents=True, exist_ok=True)
+            full_path.touch()
+    def test_case_1(self):
+        # Test empty directory
+        target_dir_before = list(self.test_target_dir.iterdir())
+        result = task_func(str(self.test_source_dir), str(self.test_target_dir))
+        target_dir_after = list(self.test_target_dir.iterdir())
+        self.assertEqual(result, ("testf817-source", []))
+        self.assertEqual(target_dir_before, target_dir_after)
+    def test_case_2(self):
+        # Test directory with one file
+        self.create_files(["file1.txt"])
+        result = task_func(str(self.test_source_dir), str(self.test_target_dir))
+        self.assertEqual(result, ("testf817-source", ["file1.txt"]))
+        # Check if files are copied correctly
+        self.assertEqual(
+            list(self.test_target_dir.iterdir()), [self.test_target_dir / "file1.txt"]
+        )
+    def test_case_3(self):
+        # Test directory with multiple files
+        self.create_files(["file1.txt", "file2.txt", "file3.txt"])
+        result = task_func(str(self.test_source_dir), str(self.test_target_dir))
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], "testf817-source")
+        self.assertEqual(
+            sorted(result[1]), sorted(["file1.txt", "file2.txt", "file3.txt"])
+        )
+        self.assertEqual(
+            sorted(self.test_target_dir.iterdir()),
+            sorted(
+                [
+                    self.test_target_dir / "file1.txt",
+                    self.test_target_dir / "file2.txt",
+                    self.test_target_dir / "file3.txt",
+                ]
             ),
-            (
-                "src",
-                {
-                    "total": self.mock_usage_src.total,
-                    "used": self.mock_usage_src.used,
-                    "free": self.mock_usage_src.free,
-                },
+        )
+    def test_case_4(self):
+        # Test directory with subdirectories
+        self.test_source_dir.joinpath("subdir1").mkdir()
+        self.create_files(["file1.txt", "file2.txt"])
+        self.create_files(["subdir1/file3.txt"])  # File inside subdirectory
+        result = task_func(str(self.test_source_dir), str(self.test_target_dir))
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], "testf817-source")
+        self.assertEqual(sorted(result[1]), sorted(["file1.txt", "file2.txt"]))
+        # Check if files in subdirectories are ignored and only files in the source directory are copied
+        self.assertEqual(
+            sorted(self.test_target_dir.iterdir()),
+            sorted(
+                [self.test_target_dir / "file1.txt", self.test_target_dir / "file2.txt"]
             ),
-        ]
-        self.assertEqual(result, expected)
-    @patch("os.path.exists")
-    @patch("shutil.disk_usage")
-    def test_deep_nested_path(self, mock_disk_usage, mock_exists):
-        # Test nested paths
-        mock_exists.return_value = True
-        mock_disk_usage.return_value = self.mock_usage_src
-        deep_path = "Docs/src/Projects/Python/Example"
-        result = task_func(deep_path)
-        expected = [
-            ("Docs", self.mock_usage_src._asdict()),
-            ("src", self.mock_usage_src._asdict()),
-            ("Projects", self.mock_usage_src._asdict()),
-            ("Python", self.mock_usage_src._asdict()),
-            ("Example", self.mock_usage_src._asdict()),
-        ]
-        self.assertEqual(result, expected)
-    @patch("os.path.exists")
-    @patch("shutil.disk_usage")
-    def test_single_directory(self, mock_disk_usage, mock_exists):
-        # Test function works on single directory
-        mock_exists.return_value = True
-        mock_disk_usage.return_value = self.mock_usage_home
-        result = task_func("home")
-        expected = [("home", self.mock_usage_home._asdict())]
-        self.assertEqual(result, expected)
-    @patch("os.path.exists")
-    @patch("shutil.disk_usage")
-    def test_path_with_multiple_delimiters(self, mock_disk_usage, mock_exists):
-        # Test should fail if there is an invalid path component
-        mock_exists.return_value = True
-        mock_disk_usage.side_effect = lambda path: {
-            "/Docs": self.mock_usage_docs,
-            "/Docs/src": self.mock_usage_src,
-        }.get(path, self.mock_usage_root)
+        )
+    def test_case_5(self):
+        # Test non-existent source directory
         with self.assertRaises(ValueError):
-            result = task_func("Docs//src")
-            expected = [
-                ("Docs", self.mock_usage_docs._asdict()),
-                ("", {"total": 0, "used": 0, "free": 0}),
-                ("src", self.mock_usage_src._asdict()),
-            ]
-            self.assertEqual(result, expected)
-    @patch("os.path.exists")
-    @patch("shutil.disk_usage")
-    def test_path_with_trailing_delimiter(self, mock_disk_usage, mock_exists):
-        # Test should handle trailing delimiter
-        mock_exists.return_value = True
-        mock_disk_usage.side_effect = lambda path: {
-            "/Docs": self.mock_usage_docs,
-            "/Docs/src": self.mock_usage_src,
-        }.get(path, self.mock_usage_root)
-        result = task_func("Docs/src/")
-        expected = [
-            ("Docs", self.mock_usage_docs._asdict()),
-            ("src", self.mock_usage_src._asdict()),
-        ]
-        self.assertEqual(result, expected)
+            task_func(str(self.test_source_dir / "nonexistent"), str(self.test_target_dir))
+    def test_case_6(self):
+        # Test non-existent destination directory
+        shutil.rmtree(self.test_target_dir)
+        result = task_func(str(self.test_source_dir), str(self.test_target_dir))
+        self.assertEqual(result, ("testf817-source", []))
+        # Check if destination directory is created
+        self.assertTrue(self.test_target_dir.exists())
+    def test_case_7(self):
+        # Test copying files to existing destination directory
+        self.create_files(["file1.txt", "file2.txt"])
+        result = task_func(str(self.test_source_dir), str(self.test_target_dir))
+        self.assertEqual(sorted(result[1]), sorted(["file1.txt", "file2.txt"]))
+        # Call the function again
+        self.create_files(["file3.txt", "file4.txt"])
+        result = task_func(str(self.test_source_dir), str(self.test_target_dir))
+        # There should now be 4 files in the directory
+        self.assertEqual(
+            sorted(self.test_source_dir.iterdir()),
+            sorted(
+                [
+                    self.test_source_dir / "file1.txt",
+                    self.test_source_dir / "file2.txt",
+                    self.test_source_dir / "file3.txt",
+                    self.test_source_dir / "file4.txt",
+                ]
+            ),
+        )
+        # which means 4 files should have been copied
+        self.assertEqual(
+            sorted(result[1]),
+            sorted(["file1.txt", "file2.txt", "file3.txt", "file4.txt"]),
+        )
+        # and 4 files should be in the destination
+        self.assertEqual(
+            sorted(self.test_target_dir.iterdir()),
+            sorted(
+                [
+                    self.test_target_dir / "file1.txt",
+                    self.test_target_dir / "file2.txt",
+                    self.test_target_dir / "file3.txt",
+                    self.test_target_dir / "file4.txt",
+                ]
+            ),
+        )

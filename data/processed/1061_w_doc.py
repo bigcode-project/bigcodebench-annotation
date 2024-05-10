@@ -1,116 +1,104 @@
-import numpy as np
-import random
-import itertools
 import pandas as pd
-
-# Constants
-PLANETS = [
-    "Mercury",
-    "Venus",
-    "Earth",
-    "Mars",
-    "Jupiter",
-    "Saturn",
-    "Uranus",
-    "Neptune",
-]
-ELEMENTS = [
-    "Hydrogen",
-    "Helium",
-    "Oxygen",
-    "Carbon",
-    "Nitrogen",
-    "Magnesium",
-    "Silicon",
-    "Iron",
-    "Nickel",
-]
+import matplotlib.pyplot as plt
 
 
-def task_func():
+def task_func(df: pd.DataFrame, column_name: str) -> (str, plt.Axes):
     """
-    Generate a DataFrame where each row contains random planet-element pairs.
-    Each pair is formatted as 'Planet:Element'. The number of rows is determined by
-    the number of planets, and each row will contain as many planet-element pairs as there are elements.
+    This function assesses whether the distribution of values in a specified column of a DataFrame is
+    uniform and visualizes this distribution using a histogram.
 
     Parameters:
-    - None
+    - df (pd.DataFrame): The DataFrame containing the data.
+    - column_name (str): The name of the column to be evaluated.
 
     Returns:
-    pandas.DataFrame: A DataFrame where each cell contains a string in the format 'Planet:Element'.
-                      The DataFrame has a number of rows equal to the number of planets and
-                      a number of columns equal to the number of elements.
+    - str: A message indicating whether the distribution in the column is uniform or not. The message is one of the following:
+        - "The distribution of values is uniform."
+        - "The distribution of values is not uniform."
+    - plt.Axes: An Axes object displaying the histogram of the value distribution in the specified column.
+
+    The function handles the following cases:
+    - If the DataFrame is empty, the specified column does not exist in the DataFrame, or
+        if the specified column contains only null values, the function returns a message
+        "The DataFrame is empty or the specified column has no data."
+        In this case, a blank histogram with a title "Distribution of values in [column_name] (No Data)" is generated.
+    - If the DataFrame and column are valid, the function calculates if the distribution of values is uniform.
+        It returns a message stating whether the distribution is uniform or not.
+        A histogram is generated to visualize the distribution of values in the specified column.
+        This histogram displays the frequency of each value, with the number of bins set to the number
+        of unique values in the column, an edge color of black, and a transparency alpha value of 0.7.
+        The x-axis is labeled "Values", the y-axis is labeled "Frequency", and
+        the title of the plot is "Distribution of values in [column_name]".
 
     Requirements:
-    - numpy
-    - random
-    - itertools
     - pandas
+    - matplotlib
 
     Example:
-    >>> random.seed(0)
-    >>> planet_elements_table = task_func()
-    >>> planet_elements_table.head(2)
-              Hydrogen         Helium  ...          Iron         Nickel
-    0   Uranus:Silicon  Earth:Silicon  ...  Earth:Nickel  Uranus:Helium
-    1  Venus:Magnesium  Saturn:Helium  ...  Mercury:Iron   Venus:Helium
-    <BLANKLINE>
-    [2 rows x 9 columns]
+    >>> df = pd.DataFrame({'Category': ['A', 'A', 'B', 'B', 'B', 'C', 'C', 'C', 'C', 'D', 'E', 'E']})
+    >>> message, ax = task_func(df, 'Category')
+    >>> print(message)
+    The distribution of values is not uniform.
     """
-    pairs = [
-        f"{planet}:{element}"
-        for planet, element in itertools.product(PLANETS, ELEMENTS)
-    ]
-    random.shuffle(pairs)
-    data = np.array(pairs).reshape(len(PLANETS), len(ELEMENTS))
-    df = pd.DataFrame(data, columns=ELEMENTS)
-    return df
+    if df.empty or column_name not in df.columns or df[column_name].isnull().all():
+        message = "The DataFrame is empty or the specified column has no data."
+        _, ax = plt.subplots()
+        ax.set_title(f"Distribution of values in {column_name} (No Data)")
+        return message, ax
+    unique_values_count = df[column_name].nunique()
+    total_values = len(df[column_name])
+    is_uniform = total_values % unique_values_count == 0 and all(
+        df[column_name].value_counts() == total_values / unique_values_count
+    )
+    message = (
+        "The distribution of values is uniform."
+        if is_uniform
+        else "The distribution of values is not uniform."
+    )
+    _, ax = plt.subplots()
+    ax.hist(df[column_name], bins=unique_values_count, edgecolor="black", alpha=0.7)
+    ax.set_xticks(range(unique_values_count))
+    ax.set_xlabel("Values")
+    ax.set_ylabel("Frequency")
+    ax.set_title(f"Distribution of values in {column_name}")
+    return message, ax
 
 import unittest
-import itertools
 import pandas as pd
-import random
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     """Tests for `task_func`."""
-    def test_basic_structure(self):
-        """Test the basic structure of the table."""
-        random.seed(0)
-        table = task_func()
-        # Verify the structure of the table
-        self.assertEqual(len(table), len(PLANETS))
-        self.assertEqual(list(table.columns), ELEMENTS)
-    def test_pair_existence(self):
-        """Test the existence of planet-element pairs."""
-        random.seed(1)
-        table = task_func()
-        # Verify all planet-element pairs are present
-        all_pairs = set(f"{p}:{e}" for p, e in itertools.product(PLANETS, ELEMENTS))
-        generated_pairs = set(table.values.flatten())
-        self.assertEqual(all_pairs, generated_pairs)
-        # Verify no extra pairs are present
-        self.assertEqual(len(all_pairs), len(generated_pairs))
-    def test_data_type(self):
-        """Test the data type of the table and its elements."""
-        random.seed(2)
-        table = task_func()
-        # Check the data type of the table and its elements
-        self.assertIsInstance(table, pd.DataFrame)
-        self.assertTrue(all(isinstance(cell, str) for cell in table.values.flatten()))
-    def test_data_format(self):
-        """Test the format of the elements in the table."""
-        random.seed(3)
-        table = task_func()
-        # Check the format of the elements in the table
-        self.assertTrue(
-            all(
-                ":" in cell and len(cell.split(":")) == 2
-                for cell in table.values.flatten()
-            )
+    def test_uniform_distribution(self):
+        """Test the distribution of values in a column with a uniform distribution."""
+        df = pd.DataFrame({"Category": ["A", "A", "B", "B", "C", "C"]})
+        message, _ = task_func(df, "Category")
+        self.assertEqual(message, "The distribution of values is uniform.")
+    def test_non_uniform_distribution(self):
+        """Test the distribution of values in a column with a non-uniform distribution."""
+        df = pd.DataFrame({"Category": ["A", "A", "B", "B", "B", "C", "C", "C", "C"]})
+        message, _ = task_func(df, "Category")
+        self.assertEqual(message, "The distribution of values is not uniform.")
+    def test_single_value(self):
+        """Test the distribution of values in a column with a single value."""
+        df = pd.DataFrame({"Category": ["A", "A", "A", "A", "A", "A"]})
+        message, _ = task_func(df, "Category")
+        self.assertEqual(message, "The distribution of values is uniform.")
+    def test_multi_column(self):
+        """Test the distribution of values in a column with a multi-column DataFrame."""
+        df = pd.DataFrame(
+            {
+                "Category": ["A", "A", "B", "B", "C", "C"],
+                "Type": ["X", "X", "Y", "Y", "Z", "Z"],
+            }
         )
-    def test_uniqueness(self):
-        """Test the uniqueness of the pairs."""
-        random.seed(4)
-        table = task_func()
-        # Check uniqueness of the pairs
-        generated_pairs = table.values.flatten()
-        self.assertEqual(len(generated_pairs), len(set(generated_pairs)))
+        message, _ = task_func(df, "Type")
+        self.assertEqual(message, "The distribution of values is uniform.")
+    def test_empty_dataframe(self):
+        """Test the distribution of values in a column with an empty DataFrame."""
+        df = pd.DataFrame({"Category": []})
+        message, _ = task_func(df, "Category")
+        self.assertEqual(
+            message, "The DataFrame is empty or the specified column has no data."
+        )
+    def tearDown(self):
+        plt.close()

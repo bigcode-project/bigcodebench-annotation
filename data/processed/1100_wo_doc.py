@@ -1,54 +1,77 @@
 import re
 from collections import Counter
 
+# Predefined list of common stopwords
+PREDEFINED_STOPWORDS = {
+    "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", 
+    "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", 
+    "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", 
+    "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", 
+    "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", 
+    "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", 
+    "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", 
+    "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", 
+    "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "more"
+}
 
-def task_func(text, top_n):
+def task_func(text):
     """
-    Count the N most common words in a text after removing URLs.
+    Count the stopwords found in the text after you have removed URLs.
 
     Parameters:
-    text (str): The text to analyze.
-    top_n (int): The number of top words to return.
+    text (str): The text to summarize.
 
     Returns:
     list: A list of tuples where each tuple contains a word and its frequency.
 
     Requirements:
     - re
-    - collections.Counter
+    - collection.Counter
 
     Example:
-    >>> task_func('Visit https://www.python.org for more info. Python is great. I love Python.', 2)
-    [('Python', 2), ('Visit', 1)]
+    >>> task_func('Visit https://www.python.org for more info. Python is great, we love Python.')
+    [('for', 1), ('more', 1), ('is', 1), ('we', 1)]
+    >>> task_func('Visit https://www.python.org for more info. Python is great, we love Python, and we also love Rust.')
+    [('for', 1), ('more', 1), ('is', 1), ('we', 2), ('and', 1)]
 
     Note:
     - Valid url is start with http or https
+    - The capitilization need to macth the stopwords
     """
     text = re.sub('http[s]?://\S+', '', text)
     words = re.findall(r'\b\w+\b', text)
     word_freq = Counter(words)
-    return word_freq.most_common(top_n)
+    result = Counter(words)
+    for i in word_freq:
+        if i not in PREDEFINED_STOPWORDS:
+            del result[i]
+    return list(result.items())
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = task_func('Python is great. I love Python.', 2)
-        expected = [('Python', 2), ('is', 1)]
-        self.assertEqual(result, expected)
+        # Test with a URL
+        input_text = 'Visit https://www.python.org for more info. Python is great.'
+        expected_output = [('for', 1), ('more', 1), ('is', 1)]
+        self.assertEqual(task_func(input_text), expected_output)
     def test_case_2(self):
-        result = task_func('Visit https://www.python.org for more info. Python is great. I love Python.', 2)
-        expected = [('Python', 2), ('Visit', 1)]
-        self.assertEqual(result, expected)
+        # Test without a URL
+        input_text = 'Python is an amazing programming language.'
+        expected_output = [('is', 1), ('an', 1)]
+        self.assertEqual(task_func(input_text), expected_output)
     def test_case_3(self):
-        text = 'Visit https://www.python.org and http://www.example.com. Python é ótimo! Adoro Python!'
-        result = task_func(text, 2)
-        expected = [('Python', 2), ('Visit', 1)]
-        self.assertEqual(result, expected)
+        # Test with long text
+        input_text = "Python is an interpreted, high-level and general-purpose programming language. Created by Guido van Rossum and first released in 1991, Python's design philosophy emphasizes code readability with its notable use of significant whitespace. Its language constructs and object-oriented approach aim to help programmers write clear, logical code for small and large-scale projects."
+        expected_output = [('is', 1), ('an', 1), ('and', 4), ('by', 1), ('in', 1), ('with', 1), ('its', 1), ('of', 1), ('to', 1), ('for', 1)]
+        print(task_func(input_text))
+        self.assertEqual(task_func(input_text), expected_output)
     def test_case_4(self):
-        result = task_func('', 2)
-        expected = []
-        self.assertEqual(result, expected)
+        # Test with multiple URLs
+        input_text = 'Check out https://www.python.org and https://www.djangoproject.com. Both are amazing.'
+        expected_output = [('out', 1), ('and', 1), ('are', 1)]
+        self.assertEqual(task_func(input_text), expected_output)
     def test_case_5(self):
-        result = task_func('Hello, world! How are you?', 2)
-        expected = [('Hello', 1), ('world', 1)]
-        self.assertEqual(result, expected)
+        # Test with short text
+        input_text = 'I love Python.'
+        expected_output = []
+        self.assertEqual(task_func(input_text), expected_output)

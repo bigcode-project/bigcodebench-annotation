@@ -1,116 +1,104 @@
 import pandas as pd
-from collections import Counter
+import numpy as np
+import itertools
 
-
-def task_func(data):
+def task_func(T1, row_num=50, seed=None):
     """
-    Analyze a dictionary of student data to return a dataframe sorted by name and age in ascending order, 
-    the average score per student as a pandas Series, and the most common age as an integer.
-    
+    Convert elements in 'T1' to integers and create a Pandas DataFrame with random numbers. 
+    The number of columns in the DataFrame is determined by the sum of the integers in 'T1', 
+    and the number of rows is defined by the 'row_num' parameter.
+
     Parameters:
-    data (dict): A dictionary containing student data with three keys:
-        - 'Name': List of student names.
-        - 'Age': List of student ages.
-        - 'Score': List of student scores.
+    T1 (tuple): A tuple of tuples, each containing string representations of integers.
+    row_num (int, optional): Number of rows for the DataFrame. Defaults to 50.
+    seed (int, optional): Seed for random number generation. Defaults to None.
 
     Returns:
-    pd.DataFrame, pd.Series, int or None: 
-        - A dataframe sorted by 'Name' and 'Age' in ascending order.
-        - A series representing average scores indexed by student names.
-        - An integer representing the most common age or None if no data is available.
-
-    Raises:
-    ValueError: If the dictionary does not have the required keys.
+    DataFrame: A pandas DataFrame with random numbers.
 
     Requirements:
     - pandas
-    - collections
+    - numpy
+    - itertools
 
     Example:
-    >>> data = {
-    ...     'Name': ['Tom', 'Nick', 'John', 'Tom', 'John', 'John', 'Nick', 'Tom', 'John', 'Tom'],
-    ...     'Age': [20, 21, 19, 20, 19, 19, 21, 20, 19, 20],
-    ...     'Score': [85, 79, 92, 88, 90, 92, 81, 86, 90, 85]
-    ... }
-    >>> df, avg_scores, common_age = task_func(data)
+    >>> T1 = (('13', '17', '18', '21', '32'), ('07', '11', '13', '14', '28'), ('01', '05', '06', '08', '15', '16'))
+    >>> df = task_func(T1, row_num=5, seed=2022)
     >>> print(df)
-       Name  Age  Score
-    2  John   19     92
-    4  John   19     90
-    5  John   19     92
-    8  John   19     90
-    1  Nick   21     79
-    6  Nick   21     81
-    0   Tom   20     85
-    3   Tom   20     88
-    7   Tom   20     86
-    9   Tom   20     85
+       Col_1  Col_2  Col_3  Col_4  ...  Col_222  Col_223  Col_224  Col_225
+    0     92     45     49     55  ...        6       60       45       99
+    1     51     17     38     83  ...       63       86       82       59
+    2     27     64     73     92  ...       39       25       91       95
+    3     52     40     35     22  ...       71       34       52       13
+    4     54      1     79     61  ...       41       78       97       27
+    <BLANKLINE>
+    [5 rows x 225 columns]
+
+    >>> df = task_func(('1', ('1', '3')), row_num=2, seed=32)
+    >>> print(df)
+       Col_1  Col_2  Col_3  Col_4  Col_5
+    0     87     43      5     54     62
+    1     88     19     71     89      3
+
+    >>> T1 = (('1', '12'), ('1', '-12'))
+    >>> df = task_func(T1, row_num=6, seed=21)
+    >>> print(df)
+       Col_1  Col_2
+    0     73     79
+    1     56      4
+    2     48     35
+    3     60     98
+    4     74     72
+    5     63     44
     """
-    if not all(key in data for key in ['Name', 'Age', 'Score']):
-        raise ValueError("The dictionary must have the keys 'Name', 'Age', 'Score'")
-    df = pd.DataFrame(data).sort_values(['Name', 'Age'])
-    avg_scores = df.groupby('Name')['Score'].mean()
-    age_counts = Counter(df['Age'])
-    most_common_age = age_counts.most_common(1)[0][0] if age_counts else None
-    return df, avg_scores, most_common_age
+    np.random.seed(seed)
+    int_list = [list(map(int, x)) for x in T1]
+    flattened_list = list(itertools.chain(*int_list))
+    total_cols = sum(flattened_list)
+    data = np.random.randint(0, 100, size=(row_num, total_cols))
+    df = pd.DataFrame(data, columns=[f'Col_{i+1}' for i in range(total_cols)])
+    return df
 
 import unittest
 import pandas as pd
-import os
 class TestCases(unittest.TestCase):
-    def test_wrong_keys(self):
-        # Testing with incorrect dictionary keys
-        data = {
-            'Names': ['Tom', 'Nick'],
-            'Ages': [20, 21],
-            'Scores': [85, 79]
-        }
-        with self.assertRaises(ValueError):
-            task_func(data)
-    def test_correct_processing(self):
-        # Testing with correctly formatted data
-        data = {
-            'Name': ['Tom', 'Nick', 'Tom', 'John'],
-            'Age': [20, 21, 20, 19],
-            'Score': [85, 79, 88, 92]
-        }
-        df, avg_scores, common_age = task_func(data)
-        self.assertEqual(df.iloc[0]['Name'], 'John')
-        self.assertAlmostEqual(avg_scores['Tom'], 86.5)
-        self.assertEqual(common_age, 20)
-    def test_empty_data(self):
-        # Testing with empty lists
-        data = {'Name': [], 'Age': [], 'Score': []}
-        df, avg_scores, common_age = task_func(data)
-        self.assertTrue(df.empty)
-        self.assertTrue(avg_scores.empty)
-        self.assertIsNone(common_age)
-    def test_all_same_age(self):
-        # Testing with all students having the same age
-        data = {
-            'Name': ['Alice', 'Bob', 'Cindy'],
-            'Age': [25, 25, 25],
-            'Score': [88, 92, 85]
-        }
-        df, avg_scores, common_age = task_func(data)
-        self.assertEqual(common_age, 25)
-    def test_no_common_age(self):
-        # Testing with no common age, each student has a unique age
-        data = {
-            'Name': ['Alice', 'Bob', 'Cindy'],
-            'Age': [24, 25, 26],
-            'Score': [88, 92, 85]
-        }
-        df, avg_scores, common_age = task_func(data)
-        self.assertEqual(common_age, 24)  # Assuming the first element is taken if all are equally common
-    def test_duplicate_names_different_ages(self):
-        # Testing with duplicate names but different ages
-        data = {
-            'Name': ['Tom', 'Tom', 'Nick'],
-            'Age': [20, 21, 21],
-            'Score': [85, 88, 79]
-        }
-        df, avg_scores, common_age = task_func(data)
-        self.assertEqual(len(df[df['Name'] == 'Tom']), 2)
-        self.assertNotEqual(df.iloc[0]['Age'], df.iloc[1]['Age'])
-        self.assertTrue(df[df['Name'] == 'Tom'].Age.isin([20, 21]).all())
+    def test_rng(self):
+        T1 = (('13', '17', '18', '21', '32'))
+        df1 = task_func(T1, row_num=50, seed=2022)
+        df2 = task_func(T1, row_num=50, seed=2022)
+        pd.testing.assert_frame_equal(df1, df2)
+        df4 = task_func(T1, row_num=50, seed=12)
+        try:
+            pd.testing.assert_frame_equal(df1, df4)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError('frames are equal but should not be')
+    def test_case_1(self):
+        T1 = (('13', '17', '18', '21', '32'), ('07', '11', '13', '14', '28'), ('01', '05', '06', '08', '15', '16'))
+        df = task_func(T1, row_num=50, seed=2022)
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(df.shape, (50, sum([13, 17, 18, 21, 32, 7, 11, 13, 14, 28, 1, 5, 6, 8, 15, 16])))
+    def test_case_2(self):
+        T1 = (('1', '2', '3'), ('4', '5', '6'), ('7', '8', '9'))
+        df = task_func(T1, row_num=50, seed=2022)
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(df.shape, (50, sum([1, 2, 3, 4, 5, 6, 7, 8, 9])))
+    def test_case_3(self):
+        T1 = (('10', '20', '30'), ('40', '50', '60'), ('70', '80', '90'))
+        df = task_func(T1, row_num=70, seed=2022)
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(df.shape, (70, sum([10, 20, 30, 40, 50, 60, 70, 80, 90])))
+    def test_case_4(self):
+        T1 = ()
+        df = task_func(T1, row_num=50, seed=2022)
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(df.shape, (50, 0))
+    def test_case_5(self):
+        T1 = (('1', '2', '3'), (), ('7', '8', '9'))
+        df = task_func(T1, row_num=50, seed=21)
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(df.shape, (50, sum([1, 2, 3, 7, 8, 9])))
+    def test_non_int(self):
+        a = (('1', '2.45'))
+        self.assertRaises(Exception, task_func, a, 120, 21)

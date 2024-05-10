@@ -1,113 +1,93 @@
-import urllib.request
-import os
-import json
 import pandas as pd
-
-# Constants
-TARGET_JSON_FILE = "downloaded_file.json"
+import matplotlib.pyplot as plt
 
 
-def task_func(url):
+def task_func(csv_file_path: str):
     """
-    This function retrieves a JSON file from the given URL using urllib.request.urlretrieve,
-    temporarily saving it as 'downloaded_file.json'. It then opens and reads this file,
-    converts the JSON content into a pandas DataFrame, and finally deletes the temporary JSON file.
+    This function reads data from a CSV file, normalizes a specific column named 'column1', and then plots the normalized data.
+
+    - The title is created using Python's string formatting, aligning 'Plot Title' and 'Normalized Column 1' on either side of a 
+    colon, each padded to 20 characters.
+    - Similarly, the x-label is formatted with 'Index' and 'Normalized Value' on either side of a colon, 
+    each padded to 20 characters.
+    - The y-label is set in the same manner, with 'Frequency' and 'Normalized Value' on either side of a colon.
 
     Parameters:
-    url (str): The URL of the JSON file to be downloaded.
+    - csv_file_path (str): Path to the CSV file. The file must contain a column named 'column1'.
 
     Returns:
-    pandas.DataFrame: A DataFrame constructed from the JSON data in the downloaded file.
+    - The matplotlib.axes.Axes object with the plot of the normalized data.
 
     Requirements:
-    - urllib.request
-    - os
-    - json
     - pandas
+    - matplotlib
 
     Example:
-    >>> task_func('http://example.com/employees.json')
-        name  age           city
-    0  Alice   25       New York
-    1    Bob   30  San Francisco
+    >>> ax = task_func('data.csv')
+    >>> ax.get_title()
+    "          Plot Title :  Normalized Column 1"
     """
-    urllib.request.urlretrieve(url, TARGET_JSON_FILE)
-    with open(TARGET_JSON_FILE, "r") as f:
-        data = json.load(f)
-    os.remove(TARGET_JSON_FILE)
-    return pd.DataFrame(data)
+    df = pd.read_csv(csv_file_path)
+    mean = df["column1"].mean()
+    std = df["column1"].std()
+    df["column1_normalized"] = (df["column1"] - mean) / std
+    _, ax = plt.subplots()
+    ax.plot(df["column1_normalized"])
+    title = "%*s : %*s" % (20, "Plot Title", 20, "Normalized Column 1")
+    xlabel = "%*s : %*s" % (20, "Index", 20, "Normalized Value")
+    ylabel = "%*s : %*s" % (20, "Frequency", 20, "Normalized Value")
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    return ax
 
 import unittest
+from unittest.mock import patch
 import pandas as pd
-from unittest.mock import patch, mock_open
+import numpy as np
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
-    @patch("urllib.request.urlretrieve")
-    @patch("os.remove")
-    def test_sample_1(self, mock_remove, mock_urlretrieve):
-        """Test that the function returns the correct DataFrame for a given JSON file."""
-        url = "http://example.com/sample_1.json"
-        sample_data = '[{"name": "Alice", "age": 25, "city": "New York"}, {"name": "Bob", "age": 30, "city": "San Francisco"}]'
-        mock_urlretrieve.return_value = None
-        with patch("builtins.open", mock_open(read_data=sample_data)):
-            expected_df = pd.DataFrame(
-                [
-                    {"name": "Alice", "age": 25, "city": "New York"},
-                    {"name": "Bob", "age": 30, "city": "San Francisco"},
-                ]
-            )
-            result_df = task_func(url)
-            pd.testing.assert_frame_equal(result_df, expected_df)
-        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
-        mock_remove.assert_called_once_with("downloaded_file.json")
-    @patch("urllib.request.urlretrieve")
-    @patch("os.remove")
-    def test_sample_2(self, mock_remove, mock_urlretrieve):
-        """Test that the function returns the correct DataFrame for a given JSON file."""
-        url = "http://example.com/sample_2.json"
-        sample_data = '[{"product": "Laptop", "price": 1000}, {"product": "Mouse", "price": 20}, {"product": "Keyboard", "price": 50}]'
-        mock_urlretrieve.return_value = None
-        with patch("builtins.open", mock_open(read_data=sample_data)):
-            expected_df = pd.DataFrame(
-                [
-                    {"product": "Laptop", "price": 1000},
-                    {"product": "Mouse", "price": 20},
-                    {"product": "Keyboard", "price": 50},
-                ]
-            )
-            result_df = task_func(url)
-            pd.testing.assert_frame_equal(result_df, expected_df)
-        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
-        mock_remove.assert_called_once_with("downloaded_file.json")
-    @patch("urllib.request.urlretrieve")
-    @patch("os.remove")
-    def test_empty_json(self, mock_remove, mock_urlretrieve):
-        """Test that the function returns an empty DataFrame for an empty JSON file."""
-        url = "http://example.com/empty.json"
-        sample_data = "[]"
-        mock_urlretrieve.return_value = None
-        with patch("builtins.open", mock_open(read_data=sample_data)):
-            expected_df = pd.DataFrame()
-            result_df = task_func(url)
-            pd.testing.assert_frame_equal(result_df, expected_df)
-        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
-    @patch("urllib.request.urlretrieve")
-    def test_invalid_url(self, mock_urlretrieve):
-        """Test that the function raises an exception when the URL is invalid."""
-        url = "http://example.com/non_existent.json"
-        mock_urlretrieve.side_effect = Exception("URL retrieval failed")
-        with self.assertRaises(Exception):
-            task_func(url)
-        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
-    @patch("urllib.request.urlretrieve")
-    @patch("os.remove")
-    def test_invalid_json(self, mock_remove, mock_urlretrieve):
-        """Test that the function raises an exception when the JSON file is invalid."""
-        url = "http://example.com/invalid.json"
-        sample_data = "invalid json content"
-        mock_urlretrieve.return_value = None
-        with patch(
-            "builtins.open", mock_open(read_data=sample_data)
-        ), self.assertRaises(Exception):
-            task_func(url)
-        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
+    @patch("pandas.read_csv")
+    def test_title_format(self, mock_read_csv):
+        """Test that the function returns the correct title."""
+        # Mocking the DataFrame
+        mock_data = pd.DataFrame({"column1": np.random.rand(10)})
+        mock_read_csv.return_value = mock_data
+        ax = task_func("dummy_path")
+        expected_title = "          Plot Title :  Normalized Column 1"
+        self.assertEqual(ax.get_title(), expected_title)
+    @patch("pandas.read_csv")
+    def test_xlabel_format(self, mock_read_csv):
+        """Test that the function returns the correct xlabel."""
+        mock_data = pd.DataFrame({"column1": np.random.rand(10)})
+        mock_read_csv.return_value = mock_data
+        ax = task_func("dummy_path")
+        expected_xlabel = "               Index :     Normalized Value"
+        self.assertEqual(ax.get_xlabel(), expected_xlabel)
+    @patch("pandas.read_csv")
+    def test_ylabel_format(self, mock_read_csv):
+        """Test that the function returns the correct ylabel."""
+        mock_data = pd.DataFrame({"column1": np.random.rand(10)})
+        mock_read_csv.return_value = mock_data
+        ax = task_func("dummy_path")
+        expected_ylabel = "           Frequency :     Normalized Value"
+        self.assertEqual(ax.get_ylabel(), expected_ylabel)
+    @patch("pandas.read_csv")
+    def test_data_points_length(self, mock_read_csv):
+        """Test that the function returns the correct number of data points."""
+        mock_data = pd.DataFrame({"column1": np.random.rand(10)})
+        mock_read_csv.return_value = mock_data
+        ax = task_func("dummy_path")
+        line = ax.get_lines()[0]
+        self.assertEqual(len(line.get_data()[1]), 10)
+    @patch("pandas.read_csv")
+    def test_data_points_range(self, mock_read_csv):
+        """Test that the function returns the correct data points."""
+        mock_data = pd.DataFrame({"column1": np.random.rand(10)})
+        mock_read_csv.return_value = mock_data
+        ax = task_func("dummy_path")
+        line = ax.get_lines()[0]
+        data_points = line.get_data()[1]
+        self.assertTrue(all(-3 <= point <= 3 for point in data_points))
+    def tearDown(self):
+        plt.clf()

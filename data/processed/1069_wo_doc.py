@@ -1,111 +1,117 @@
-import requests
-import logging
+import warnings
+import sqlite3
+import pandas as pd
 
-def task_func(repo_url: str) -> dict:
+
+def task_func(db_path, query, warn_large_dataset=True):
     """
-    Fetches and returns information about a GitHub repository using its API URL. The function makes an HTTP GET
-    request to the provided repository URL. It incorporates error handling for various scenarios including API
-    rate limits, other HTTP errors, and general request issues. The function also checks for a large number of
-    open issues in the repository and prints a warning if they exceed a certain threshold.
+    Fetches data from an SQLite database using the provided database path and SQL query.
+    This function will issue a warning of "The data contains more than 10000 rows." when this condition is met.
 
     Parameters:
-    - repo_url (str): The URL of the GitHub repository API.
+    - db_path (str): The file path to the SQLite database from which data needs to be fetched.
+    - query (str): The SQL query string used to retrieve data from the specified database.
+    - warn_large_dataset (bool, optional): A boolean flag that, when set to True, triggers a 
+      warning if the retrieved dataset has more than 10,000 rows. Default is True.
 
     Returns:
-    - dict: A dictionary containing information about the GitHub repository.
-
-    Raises:
-    - requests.exceptions.HTTPError: If an HTTP error occurs, particularly when the GitHub API rate limit is
-            exceeded.
-    - requests.exceptions.RequestException: For other general issues encountered during the API request, such
-            as network problems, invalid responses, or timeouts.
+    - pandas.DataFrame: A DataFrame containing the data fetched from the database.
 
     Requirements:
-    - requests
-    - logging
+    - sqlite3
+    - pandas
+    - warnings
+
+    Raises:
+    - Exception: If any error occurs during database connection, SQL query execution, or data 
+      fetching. The error message provides details about the issue, starting with "Error fetching data from the database: ".
 
     Example:
-    >>> task_func('https://api.github.com/repos/psf/requests')
-    { ... }  # dictionary containing repo information
-    >>> task_func('https://api.github.com/repos/some/repo')
-    { ... }  # dictionary containing repo information with a possible runtime warning about open issues
+    >>> data = task_func('/path/to/sqlite.db', 'SELECT * FROM table_name')
+    >>> print(data)
+        column1  column2
+    0         1        4
+    1         2        5
+    2         3        6
     """
+    if warn_large_dataset:
+        warnings.simplefilter("always")
     try:
-        response = requests.get(repo_url, timeout=2)
-        response.raise_for_status()  # Raises HTTPError for bad requests
-        repo_info = response.json()
-        if (
-            response.status_code == 403
-            and repo_info.get("message") == "API rate limit exceeded"
-        ):
-            raise requests.exceptions.HTTPError("API rate limit exceeded")
-        if repo_info.get("open_issues_count", 0) > 10000:
-            logging.warning("The repository has more than 10000 open issues.")
-        return repo_info
-    except requests.exceptions.RequestException as e:
-        raise requests.exceptions.RequestException(
-            f"Error fetching repo info: {e}"
-        ) from e
+        with sqlite3.connect(db_path) as conn:
+            data = pd.read_sql_query(query, conn)
+        if warn_large_dataset and data.shape[0] > 10000:
+            warnings.warn("The data contains more than 10000 rows.")
+        return data
+    except Exception as e:
+        raise Exception(f"Error fetching data from the database: {str(e)}") from e
 
 import unittest
 from unittest.mock import patch, MagicMock
-from io import StringIO
-from contextlib import redirect_stdout
+import pandas as pd
+import sqlite3
+import warnings
 class TestCases(unittest.TestCase):
-    """Test cases for task_func."""
-    @patch("requests.get")
-    def test_successful_response(self, mock_get):
+    """Test cases for task_func function."""
+    def setUp(self):
+        self.db_path = "/path/to/sqlite.db"
+        self.query = "SELECT * FROM table_name"
+        self.mock_data = pd.DataFrame({"column1": [1, 2, 3], "column2": [4, 5, 6]})
+    @patch("pandas.read_sql_query")
+    @patch("sqlite3.connect")
+    def test_successful_query(self, mock_connect, mock_read_sql):
         """
-        Test task_func with a successful response.
+        Test task_func function for successful query execution.
         """
-        mock_get.return_value = MagicMock(
-            status_code=200, json=lambda: {"open_issues_count": 5000}
+        mock_connect.return_value.__enter__.return_value = MagicMock()
+        mock_read_sql.return_value = self.mock_data
+        result = task_func(self.db_path, self.query)
+        print(result)
+        mock_connect.assert_called_with(self.db_path)
+        mock_read_sql.assert_called_with(
+            self.query, mock_connect.return_value.__enter__.return_value
         )
-        response = task_func("https://api.github.com/repos/psf/requests")
-        self.assertIn("open_issues_count", response)
-        self.assertEqual(response["open_issues_count"], 5000)
-    @patch("requests.get")
-    @patch('logging.warning')
-    def test_response_with_more_than_10000_issues(self, mock_warning, mock_get):
+        self.assertTrue(result.equals(self.mock_data))
+    @patch("pandas.read_sql_query")
+    @patch("sqlite3.connect")
+    def test_large_dataset_warning(self, mock_connect, mock_read_sql):
         """
-        Test task_func with a response indicating more than 10000 open issues.
+        Test task_func function to check if it issues a warning for large datasets.
         """
-        mock_get.return_value = MagicMock(
-            status_code=200, json=lambda: {"open_issues_count": 15000}
-        )
-        
-        response = task_func("https://api.github.com/repos/psf/requests")
-        
-        mock_warning.assert_called_once_with("The repository has more than 10000 open issues.")
-        self.assertEqual(response["open_issues_count"], 15000)
-    @patch("requests.get")
-    def test_api_rate_limit_exceeded(self, mock_get):
+        large_data = pd.DataFrame({"column1": range(10001)})
+        mock_read_sql.return_value = large_data
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            task_func(self.db_path, self.query)
+            self.assertEqual(len(w), 1)
+            self.assertTrue("more than 10000 rows" in str(w[-1].message))
+    @patch("pandas.read_sql_query")
+    @patch("sqlite3.connect")
+    def test_no_warning_for_small_dataset(self, mock_connect, mock_read_sql):
         """
-        Test task_func handling API rate limit exceeded error.
+        Test task_func function to ensure no warning for datasets smaller than 10000 rows.
         """
-        mock_get.return_value = MagicMock(
-            status_code=403, json=lambda: {"message": "API rate limit exceeded"}
-        )
+        mock_read_sql.return_value = self.mock_data
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            task_func(self.db_path, self.query)
+            self.assertEqual(len(w), 0)
+    @patch("pandas.read_sql_query")
+    @patch("sqlite3.connect")
+    def test_database_exception(self, mock_connect, mock_read_sql):
+        """
+        Test task_func function to handle database connection exceptions.
+        """
+        mock_connect.side_effect = sqlite3.OperationalError("Failed to connect")
         with self.assertRaises(Exception) as context:
-            task_func("https://api.github.com/repos/psf/requests")
-        self.assertIn("API rate limit exceeded", str(context.exception))
-    @patch("requests.get")
-    def test_http_error(self, mock_get):
+            task_func(self.db_path, self.query)
+        self.assertIn("Error fetching data from the database", str(context.exception))
+    @patch("pandas.read_sql_query")
+    @patch("sqlite3.connect")
+    def test_sql_query_exception(self, mock_connect, mock_read_sql):
         """
-        Test task_func handling HTTP errors.
+        Test task_func function to handle SQL query execution exceptions.
         """
-        mock_get.side_effect = requests.exceptions.HTTPError(
-            "404 Client Error: Not Found for url"
-        )
+        mock_read_sql.side_effect = pd.io.sql.DatabaseError("Failed to execute query")
         with self.assertRaises(Exception) as context:
-            task_func("https://api.github.com/repos/psf/requests")
-        self.assertIn("404 Client Error", str(context.exception))
-    @patch("requests.get")
-    def test_invalid_url(self, mock_get):
-        """
-        Test task_func with an invalid URL.
-        """
-        mock_get.side_effect = requests.exceptions.InvalidURL("Invalid URL")
-        with self.assertRaises(Exception) as context:
-            task_func("invalid_url")
-        self.assertIn("Invalid URL", str(context.exception))
+            task_func(self.db_path, self.query)
+        self.assertIn("Error fetching data from the database", str(context.exception))

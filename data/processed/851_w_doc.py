@@ -1,55 +1,88 @@
-import re
-from nltk.corpus import stopwords
-from collections import Counter
+import pandas as pd
+import statistics
+import random
 
-STOPWORDS = set(stopwords.words('english'))
-
-def task_func(input_string):
+def task_func(students, subjects, seed=None):
     """
-    Divide a multi-line string into individual lines, remove stopwords, and count the frequency of each word.
+    Create a grade report for a list of students across various subjects. Each student's grades are randomly generated, 
+    and the report includes the average grade for each student. The randomness is seeded for reproducibility if a seed is provided.
 
     Parameters:
-    - input_string (str): The multi-line string.
+    students (list of str): The students for whom the report is being generated.
+    subjects (list of str): The subjects included in the report.
+    seed (int, optional): A seed for the random number generator to ensure reproducibility. If None, the randomness is seeded by the system.
 
     Returns:
-    - dict: A dictionary with word frequencies where each key is a unique word and the value is its frequency.
+    DataFrame: A pandas DataFrame containing each student's grades across the subjects and their average grade. 
+               Columns are ['Student', 'Subject1', 'Subject2', ..., 'Average Grade'].
 
     Requirements:
-    - re
-    - nltk.corpus
-    - collections
+    - pandas
+    - statistics
+    - random
 
     Example:
-    >>> task_func('line a\\nfollows by line b\\n...bye\\n')
-    {'line': 2, 'follows': 1, 'b': 1, 'bye': 1}
+    >>> students = ['Alice', 'Bob', 'Charlie']
+    >>> subjects = ['Math', 'Physics', 'English']
+    >>> report = task_func(students, subjects, seed=123)
+    >>> print(report)
+       Student  Math  Physics  English  Average Grade
+    0    Alice     6       34       11      17.000000
+    1      Bob    98       52       34      61.333333
+    2  Charlie    13        4       48      21.666667
     """
-    lines = input_string.split('\n')
-    word_count = Counter()
-    for line in lines:
-        words = re.findall(r'\b\w+\b', line)
-        words = [word for word in words if word not in STOPWORDS]
-        word_count.update(words)
-    return dict(word_count)
+    if seed is not None:
+        random.seed(seed)
+    report_data = []
+    for student in students:
+        grades = [random.randint(0, 100) for _ in subjects]
+        avg_grade = statistics.mean(grades)
+        report_data.append((student,) + tuple(grades) + (avg_grade,))
+    report_df = pd.DataFrame(report_data, columns=['Student'] + subjects + ['Average Grade'])
+    return report_df
 
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        input_string = "This is line one.\nThis is line two."
-        expected_output = {'This': 2, 'line': 2, 'one': 1, 'two': 1}
-        self.assertEqual(task_func(input_string), expected_output)
-    def test_case_2(self):
-        input_string = "apple orange apple\norange apple\napple"
-        expected_output = {'apple': 4, 'orange': 2}
-        self.assertEqual(task_func(input_string), expected_output)
-    def test_case_3(self):
-        input_string = "This\nThis\nThis"
-        expected_output = {'This': 3}
-        self.assertEqual(task_func(input_string), expected_output)
-    def test_case_4(self):
-        input_string = "This is a test.\nThis is only a test."
-        expected_output = {'This': 2, 'test': 2}
-        self.assertEqual(task_func(input_string), expected_output)
-    def test_case_5(self):
-        input_string = "Stop this\nStop"
-        expected_output = {'Stop': 2}
-        self.assertEqual(task_func(input_string), expected_output)
+    def test_dataframe_structure(self):
+        students = ['Alice', 'Bob']
+        subjects = ['Math', 'Physics']
+        report = task_func(students, subjects, seed=42)
+        
+        # Check if the output is a DataFrame
+        self.assertIsInstance(report, pd.DataFrame)
+        
+        # Check the structure of the DataFrame
+        expected_columns = ['Student'] + subjects + ['Average Grade']
+        self.assertEqual(list(report.columns), expected_columns)
+    def test_average_grade_calculation(self):
+        students = ['Alice']
+        subjects = ['Math', 'Physics']
+        report = task_func(students, subjects, seed=42)
+        # Since we know the seed, we know the grades. Let's check the average.
+        alice_grades = report.iloc[0, 1:-1]
+        self.assertEqual(report.at[0, 'Average Grade'], alice_grades.mean())
+    def test_varying_input_sizes(self):
+        # Testing with different numbers of students and subjects
+        students = ['Alice', 'Bob', 'Charlie']
+        subjects = ['Math', 'Physics', 'Biology', 'English']
+        report = task_func(students, subjects, seed=42)
+        # Check if the number of rows matches the number of students
+        self.assertEqual(len(report), len(students))
+    def test_random_seed_reproducibility(self):
+        students = ['Alice', 'Bob']
+        subjects = ['Math', 'Physics']
+        
+        # If we run the function with the same seed, we should get the same results.
+        report1 = task_func(students, subjects, seed=42)
+        report2 = task_func(students, subjects, seed=42)
+        pd.testing.assert_frame_equal(report1, report2)
+    def test_without_seed(self):
+        students = ['Alice', 'Bob']
+        subjects = ['Math', 'Physics']
+        
+        # When run without a seed, there should be variability in results.
+        report1 = task_func(students, subjects)  # No seed here
+        report2 = task_func(students, subjects)  # No seed here
+        with self.assertRaises(AssertionError):
+            pd.testing.assert_frame_equal(report1, report2)

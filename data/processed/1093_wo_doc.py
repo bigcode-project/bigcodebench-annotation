@@ -1,126 +1,90 @@
 import ast
-import os
-import glob
+import requests
+from bs4 import BeautifulSoup
 
-# Constants
-DIRECTORY = 'data'
 
-def task_func(directory):
+def task_func(url):
     """
-    Convert all Unicode string representations of dictionaries in all text files 
-    in the specified directory to Python dictionaries.
+    Fetches the content of a webpage specified by its URL, parses it to find <script> tags,
+    and attempts to evaluate any string within these tags as a Python dictionary.
 
     Parameters:
-    directory (str): The path to the directory containing the text files.
+    - url (str): The URL of the webpage to scrape.
 
     Returns:
-    list: A list of dictionaries extracted from the text files.
+    - list of dict: A list containing dictionaries that were successfully evaluated from string representations
+      found within <script> tags on the webpage. 
+    
+    Note:
+    - If an error occurs during the request or if no dictionaries are found/evaluable, an empty list is returned.
 
     Requirements:
     - ast
-    - os
-    - glob
+    - requests
+    - bs4.BeautifulSoup
 
     Example:
-    >>> task_func("sample_directory/")
-    [{'key1': 'value1'}, {'key2': 'value2'}]
-
-    Note:
-    Ensure that the text files in the directory contain valid Unicode string representations of dictionaries.
-
-    Raises:
-    - The function would raise a ValueError if there are text file(s) that have invalid dictionary representation
+    >>> task_func('https://example.com')
+    [{'key': 'value'}, ...]
     """
-    path = os.path.join(directory, '*.txt')
-    files = glob.glob(path)
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+    except requests.RequestException:
+        return []
+    soup = BeautifulSoup(response.text, 'html.parser')
     results = []
-    for file in files:
-        with open(file, 'r') as f:
-            for line in f:
-                results.append(ast.literal_eval(line.strip()))
+    for script in soup.find_all('script'):
+        try:
+            results.append(ast.literal_eval(script.string))
+        except (ValueError, SyntaxError):
+            continue
     return results
 
 import unittest
-import os
-import ast
-import shutil
+from unittest.mock import patch, Mock
+def mock_requests_get(*args, **kwargs):
+    class MockResponse:
+        def __init__(self, text, status_code):
+            self.text = text
+            self.status_code = status_code
+        def raise_for_status(self):
+            if self.status_code != 200:
+                raise requests.RequestException("Mocked error")
+    if args[0] == 'https://test1.com':
+        return MockResponse('<script>{"key": "value"}</script>', 200)
+    elif args[0] == 'https://test2.com':
+        return MockResponse('<script>{"key1": "value1"}</script><script>{"key2": "value2"}</script>', 200)
+    elif args[0] == 'https://test3.com':
+        return MockResponse('<div>No script tags here</div>', 200)
+    elif args[0] == 'https://test4.com':
+        return MockResponse('<script>Not a dictionary</script>', 200)
+    elif args[0] == 'https://error.com':
+        return MockResponse('Error', 404)
+    return MockResponse('', 404)
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.test_dir = 'testdir_task_func'
-        os.makedirs(self.test_dir, exist_ok=True)
-        self.sample_directory = 'testdir_task_func/sample_directory'
-        os.makedirs(self.sample_directory, exist_ok=True)
-        f = open(self.sample_directory+"/1.txt","w")
-        f.write("{'key1': 'value1'}")
-        f.close()
-        f = open(self.sample_directory+"/2.txt","w")
-        f.write("{'key2': 'value2', 'key3': 'value3'}")
-        f.close()
-        f = open(self.sample_directory+"/3.txt","w")
-        f.write("{'key4': 'value4'}")
-        f.close()
-        f = open(self.sample_directory+"/4.txt","w")
-        f.write("{'key5': 'value5', 'key6': 'value6', 'key7': 'value7'}")
-        f.close()
-        f = open(self.sample_directory+"/5.txt","w")
-        f.write("{'key8': 'value8'}")
-        f.close()
-        self.empty_directory = "testdir_task_func/empty_directory"
-        os.makedirs(self.empty_directory, exist_ok=True)
-        self.multi_line_directory = "testdir_task_func/multi_line_directory"
-        os.makedirs(self.multi_line_directory, exist_ok=True)
-        f = open(self.multi_line_directory+"/1.txt","w")
-        f.write("{'key1': 'value1'}\n{'key2': 'value2'}")
-        f.close()
-        self.mixed_directory = "testdir_task_func/mixed_directory"
-        os.makedirs(self.mixed_directory, exist_ok=True)
-        f = open(self.mixed_directory+"/1.txt","w")
-        f.write("invalid")
-        f.close()
-        self.invalid_directory = "testdir_task_func/invalid_directory"
-        os.makedirs(self.invalid_directory, exist_ok=True)
-        f = open(self.invalid_directory+"/1.txt","w")
-        f.write("invalid")
-        f.close()
-        f = open(self.invalid_directory+"/2.txt","w")
-        f.write("{'key1': 'value1'}")
-        f.close()
-    def tearDown(self):
-        # Clean up the test directory
-        shutil.rmtree(self.test_dir)
-    def test_case_1(self):
-        # Test with the sample directory
-        result = task_func(self.sample_directory)
-        expected_result = [
-            {'key1': 'value1'},
-            {'key2': 'value2', 'key3': 'value3'},
-            {'key4': 'value4'},
-            {'key5': 'value5', 'key6': 'value6', 'key7': 'value7'},
-            {'key8': 'value8'}
-        ]
-        for i in expected_result:
-            self.assertTrue(i in result)
-        
-    def test_case_2(self):
-        # Test with an empty directory
-        result = task_func(self.empty_directory)
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_1(self, mock_get):
+        # Test with a single dictionary in the script tag
+        result = task_func('https://test1.com')
+        self.assertEqual(result, [{"key": "value"}])
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_2(self, mock_get):
+        # Test with multiple dictionaries in separate script tags
+        result = task_func('https://test2.com')
+        self.assertEqual(result, [{"key1": "value1"}, {"key2": "value2"}])
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_3(self, mock_get):
+        # Test with no script tags
+        result = task_func('https://test3.com')
         self.assertEqual(result, [])
-        
-    def test_case_3(self):
-        # Test with a directory containing a text file without valid dictionary representation
-        with self.assertRaises(ValueError):
-            task_func(self.invalid_directory)
-            
-    def test_case_4(self):
-        # Test with a directory containing multiple text files, some of which are invalid
-        with self.assertRaises(ValueError):
-            task_func(self.mixed_directory)
-            
-    def test_case_5(self):
-        # Test with a directory containing a text file with multiple valid dictionary representations
-        result = task_func(self.multi_line_directory)
-        expected_result = [
-            {'key1': 'value1'},
-            {'key2': 'value2'}
-        ]
-        self.assertEqual(result, expected_result)
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_4(self, mock_get):
+        # Test with a script tag that doesn't contain a dictionary
+        result = task_func('https://test4.com')
+        self.assertEqual(result, [])
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_5(self, mock_get):
+        # Test with a URL that returns an error
+        result = task_func('https://error.com')
+        self.assertEqual(result, [])

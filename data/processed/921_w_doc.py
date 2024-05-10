@@ -1,71 +1,65 @@
 import pandas as pd
-import matplotlib.pyplot as plt
+import seaborn as sns
 
-def task_func(data, column):
+def task_func(data):
     """
-    Draw and return a bar chart that shows the distribution of categories in a specific column of a dictionary.
-    
-    Note:
-    The categories are defined by the constant CATEGORIES, 
-    which is a list containing ['A', 'B', 'C', 'D', 'E']. If some categories are missing in the DataFrame, 
-    they will be included in the plot with a count of zero.
-    The x label of the plot is set to 'Category', the y label is set to 'Count', and the title is set to 'Distribution of {column}'.
+    Draw and return a correlation matrix heatmap for a DataFrame containing numerical columns.
+    The title of the heatmap is set to 'Correlation Matrix'.
     
     Parameters:
-    - data (dict): A dictionary where the keys are the column names and the values are the column values.
-    - column (str): The name of the column in the DataFrame that contains the categories.
-    
+    df (pandas.DataFrame): The DataFrame containing numerical columns to be used for correlation.
+
     Returns:
-    - matplotlib.axes._axes.Axes: The Axes object for the generated plot.
-    
+    matplotlib.axes._axes.Axes: The matplotlib Axes object representing the heatmap.
+
     Requirements:
     - pandas
-    - numpy
-    - matplotlib.pyplot
-    
+    - seaborn
+
     Example:
-    >>> data = {'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']}
-    >>> ax = task_func(data, 'Category')    
-    >>> data = {'Type': ['A', 'A', 'C', 'E', 'D', 'E', 'D']}
-    >>> ax = task_func(data, 'Type')
+    >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]}
+    >>> ax = task_func(data)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+
     """
     df = pd.DataFrame(data)
-    CATEGORIES = ['A', 'B', 'C', 'D', 'E']
-    counts = df[column].value_counts()
-    missing_categories = list(set(CATEGORIES) - set(counts.index))
-    for category in missing_categories:
-        counts[category] = 0
-    counts = counts.reindex(CATEGORIES)
-    ax = counts.plot(kind='bar')
-    ax.set_xlabel('Category')
-    ax.set_ylabel('Count')
-    ax.set_title(f'Distribution of {column}')
-    plt.show()
+    correlation_matrix = df.corr()
+    ax = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+    ax.set_title('Correlation Matrix')
     return ax
 
 import unittest
 import pandas as pd
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     
-    def test_with_all_categories(self):
-        """Test with all categories present."""
-        data = {'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']}
-        ax = task_func(data, 'Category')
+    def test_case_1(self):
+        data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]}
+        ax = task_func(data)
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_xlabel(), 'Category')
-        self.assertEqual(ax.get_ylabel(), 'Count')
-        self.assertEqual(ax.get_title(), 'Distribution of Category')
-        self.assertEqual(len(ax.get_xticks()), 5)  # Check the number of x-axis ticks instead
-    def test_with_missing_categories(self):
-        """Test with some categories missing."""
-        data = {'Category': ['A', 'A', 'B', 'C']}
-        ax = task_func(data, 'Category')
+        self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
+        
+    def test_case_2(self):
+        data = {'a': [1, 2, 3], 'b': [-4, -5, -6], 'c': [-7, -8, -9]}
+        ax = task_func(data)
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.get_xticks()), 5)  # Ensure all categories are accounted for, including missing ones
-    def test_with_unexpected_category(self):
-        """Test with a category not in predefined list."""
-        data = {'Category': ['F', 'A', 'B']}  # 'F' is not a predefined category
-        ax = task_func(data, 'Category')
+        self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
+        
+    def test_case_3(self):
+        data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [-7, -8, -9]}
+        ax = task_func(data)
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.get_xticks()), 5)  # 'F' is ignored, only predefined categories are considered
+        self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
+        
+    def test_case_4(self):
+        data = {'a': [1, 1, 1], 'b': [2, 2, 2], 'c': [3, 3, 3]}
+        ax = task_func(data)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.title.get_text(), 'Correlation Matrix')
+        
+    def test_case_5(self):
+        data = {'a': [1, 2, None], 'b': [4, None, 6], 'c': [None, 8, 9]}
+        ax = task_func(data)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.title.get_text(), 'Correlation Matrix')

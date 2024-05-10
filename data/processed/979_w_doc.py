@@ -1,97 +1,124 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+import pandas as pd
+from sklearn.decomposition import PCA
 
 
-def task_func(array, features=None, seed=None):
+def task_func(array, seed=None):
     """
-    Shuffles the columns of a given 2D numpy array and visualizes it as a heatmap.
+    Shuffles the columns of a numpy array randomly, performs Principal Component Analysis (PCA)
+    to reduce the dimensionality to 2 principal components, and returns these components as a pandas DataFrame.
 
     Parameters:
-    - array (ndarray): The 2D numpy array to shuffle and plot. It must not be empty.
-    - features (list of str, optional): Custom labels for the columns after shuffling.
-                                        If not specified, default numerical labels are used.
-                                        The list must match the number of columns in 'array'.
-    - seed (int, optional): Seed for the random number generator to ensure reproducibility of the shuffle.
+    - array (numpy.ndarray): A 2D numpy array where each row is an observation and each column is a feature.
+    - seed (int, optional): Seed for the random number generator. Defaults to None (not set).
 
     Returns:
-    - Axes: The matplotlib Axes object containing the heatmap.
+    - pandas.DataFrame: DataFrame with columns 'PC1' and 'PC2' representing the two principal components.
 
     Raises:
-    - ValueError: If 'features' is provided and does not match the number of columns in 'array'; and
-                  if 'array' is empty or not 2-dimensional.
+    - ValueError: If the input array is not 2D.
 
     Requirements:
     - numpy
-    - matplotlib.pyplot
-    - seaborn
+    - pandas
+    - sklearn
 
-    Notes:
-    - This function uses the features list as labels for the heatmap's x-axis if features is provided;
-      otherwise, it defaults to strings of the numerical labels starting from 1 up to the number of
-      columns in the array.
+    Note:
+    - PCA reduction will default to the number of features if fewer than 2.
+    - An named but empty DataFrame is returned for arrays without features or with empty content.
 
-    Example:
-    >>> np.random.seed(0)
-    >>> array = np.random.rand(2, 5)
-    >>> ax = task_func(array, features=['A', 'B', 'C', 'D', 'E'], seed=1)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> ax.collections[0].get_array().data.flatten()
-    array([0.60276338, 0.71518937, 0.4236548 , 0.5488135 , 0.54488318,
-           0.891773  , 0.43758721, 0.38344152, 0.64589411, 0.96366276])
+    Examples:
+    >>> array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+    >>> df = task_func(array, seed=42)
+    >>> df["PC1"]
+    0    5.59017
+    1   -5.59017
+    Name: PC1, dtype: float64
+    >>> df.shape
+    (2, 2)
     """
     if seed is not None:
         np.random.seed(seed)
-    if array.size == 0 or len(array.shape) != 2:
-        raise ValueError("Input array must be 2-dimensional and non-empty.")
-    if features is not None and len(features) != array.shape[1]:
-        raise ValueError("Features list must match the number of columns in the array.")
-    shuffled_array = np.random.permutation(array.T).T
-    fig, ax = plt.subplots()
-    sns.heatmap(
-        shuffled_array,
-        xticklabels=features if features is not None else np.arange(array.shape[1]) + 1,
-        ax=ax,
-    )
-    return ax
+    if not isinstance(array, np.ndarray) or len(array.shape) != 2:
+        raise ValueError("Input must be a 2D numpy array.")
+    if array.size == 0 or array.shape[1] == 0:
+        return pd.DataFrame(columns=["PC1", "PC2"])
+    shuffled_array = np.copy(array)
+    np.random.shuffle(np.transpose(shuffled_array))
+    n_components = min(2, shuffled_array.shape[1])
+    pca = PCA(n_components=n_components)
+    principal_components = pca.fit_transform(shuffled_array)
+    column_labels = ["PC1", "PC2"][:n_components]
+    df = pd.DataFrame(data=principal_components, columns=column_labels)
+    return df
 
 import unittest
 import numpy as np
-import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def setUp(self):
-        np.random.seed(0)
-        self.array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-        self.expected_labels = ["1", "2", "3", "4", "5"]
-    def test_default_features(self):
-        """Test heatmap with default features."""
-        ax = task_func(self.array)
-        xticklabels = [tick.get_text() for tick in ax.get_xticklabels()]
-        self.assertEqual(xticklabels, self.expected_labels)
-        self.assertTrue(len(ax.collections), 1)
-    def test_custom_features(self):
-        """Test heatmap with custom features."""
-        custom_labels = ["A", "B", "C", "D", "E"]
-        ax = task_func(self.array, features=custom_labels)
-        xticklabels = [tick.get_text() for tick in ax.get_xticklabels()]
-        self.assertEqual(xticklabels, custom_labels)
-        self.assertTrue(len(ax.collections), 1)
-    def test_features_mismatch(self):
-        """Test for error when features list does not match array dimensions."""
+        self.array2x5 = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+        self.array5x1 = np.array([[1], [2], [3], [4], [5]])
+    def test_with_empty_array(self):
+        """Test handling of an empty array."""
+        array = np.empty((0, 0))
+        df = task_func(array, seed=42)
+        self.assertTrue(df.empty, "The returned DataFrame should be empty.")
+        self.assertTrue(
+            (df.columns == ["PC1", "PC2"]).all(),
+            "Column names should be 'PC1' and 'PC2' even for an empty DataFrame.",
+        )
+    def test_with_2x5_array(self):
+        """Test PCA on a 2x5 array with shuffled columns."""
+        df = task_func(self.array2x5, seed=42)
+        self.assertEqual(df.shape, (2, 2), "DataFrame shape should be (2, 2).")
+        self.assertTrue(
+            (df.columns == ["PC1", "PC2"]).all(),
+            "Column names should be 'PC1' and 'PC2'.",
+        )
+    def test_with_5x1_array(self):
+        """Test PCA on a 5x1 array."""
+        df = task_func(self.array5x1, seed=0)
+        self.assertEqual(
+            df.shape, (5, 1), "DataFrame shape should be (5, 1) for a single component."
+        )
+        self.assertTrue(
+            (df.columns == ["PC1"]).all(),
+            "Column name should be 'PC1' for a single component.",
+        )
+    def test_invalid_input(self):
+        """Test handling of invalid input."""
         with self.assertRaises(ValueError):
-            task_func(self.array, features=["A", "B"])
-    def test_seed_reproducibility(self):
-        """Test if seeding makes shuffling reproducible."""
-        ax1 = task_func(self.array, seed=42)
-        ax2 = task_func(self.array, seed=42)
-        heatmap_data1 = ax1.collections[0].get_array().data
-        heatmap_data2 = ax2.collections[0].get_array().data
-        np.testing.assert_array_equal(heatmap_data1, heatmap_data2)
-    def test_empty_array(self):
-        """Test for handling an empty array."""
-        with self.assertRaises(ValueError):
-            task_func(np.array([]))
-    def tearDown(self):
-        """Cleanup plot figures after each test."""
-        plt.close("all")
+            task_func(np.array([1, 2, 3]), seed=42)
+    def test_reproducibility(self):
+        """Test if the function is reproducible with the same seed."""
+        df1 = task_func(self.array2x5, seed=42)
+        df2 = task_func(self.array2x5, seed=42)
+        pd.testing.assert_frame_equal(
+            df1, df2, "Results should be identical when using the same seed."
+        )
+    def test_pca_correctness(self):
+        """
+        Test PCA correctness by ensuring that the variance is captured correctly
+        in the principal components.
+        """
+        # Creating a simple array where variance is higher in one dimension
+        # This dataset is designed so that the first principal component should
+        # capture the majority of the variance.
+        array = np.array(
+            [
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [10, 10, 10, 10, 10],
+            ]
+        )  # Increased variance in the last row
+        df = task_func(array, seed=0)
+        # The PCA should be able to capture the variance in the first principal component
+        # significantly more than in the second, if applicable.
+        # Asserting that the first PC values are not all the same,
+        # which indicates it captured the variance.
+        self.assertFalse(
+            df["PC1"].std() == 0,
+            "PCA should capture variance along the first principal component.",
+        )

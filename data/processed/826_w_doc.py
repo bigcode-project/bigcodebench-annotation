@@ -1,56 +1,81 @@
-import re
+import numpy as np
+from itertools import product
 import string
 
-# Constants
-PUNCTUATION = string.punctuation
 
-def task_func(text):
+def task_func(length, seed=None, alphabets=list(string.ascii_lowercase)):
     """
-    Count the number of words and punctuation marks in a string.
+    Generate a list of 10 randomly picked strings from all possible strings of a given
+    length from the provided series of characters, using a specific seed for
+    reproducibility.
 
     Parameters:
-    - text (str): The input string.
+    length (int): The length of the strings to generate.
+    seed (int): The seed for the random number generator. Default is None.
+    alphabets (list, optional): The series of characters to generate the strings from. 
+                Default is lowercase English alphabets.
 
     Returns:
-    - tuple: A tuple containing the number of words and punctuation marks.
+    list: A list of generated strings.
 
     Requirements:
-    - re
+    - numpy
+    - itertools.product
     - string
 
     Example:
-    >>> task_func("Hello, world! This is a test.")
-    (6, 3)
+    >>> task_func(2, 123)
+    ['tq', 'ob', 'os', 'mk', 'du', 'ar', 'wx', 'ec', 'et', 'vx']
+
+    >>> task_func(2, 123, alphabets=['x', 'y', 'z'])
+    ['xz', 'xz', 'zx', 'xy', 'yx', 'zx', 'xy', 'xx', 'xy', 'xx']
     """
-    words = re.findall(r'\b\w+\b', text)
-    punctuation_marks = [char for char in text if char in PUNCTUATION]
-    return len(words), len(punctuation_marks)
+    np.random.seed(seed)
+    all_combinations = [''.join(p) for p in product(alphabets, repeat=length)]
+    return np.random.choice(all_combinations, size=10).tolist()
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_basic_input(self):
-        """Test with basic input string"""
-        result = task_func("Hello, world! This is a test.")
-        self.assertEqual(result, (6, 3))
-    def test_no_punctuation(self):
-        """Test with a string that has words but no punctuation"""
-        result = task_func("No punctuation here just words")
-        self.assertEqual(result, (5, 0))
+    def test_rng(self):
+        output1 = task_func(2, 123)
+        output2 = task_func(2, 123)
+        self.assertCountEqual(output1, output2)
     
-    def test_with_empty_string(self):
-        """Test with an empty string"""
-        result = task_func("")
-        self.assertEqual(result, (0, 0))
-    def test_with_multiple_spaces(self):
-        """Test with a string that has multiple spaces between words"""
-        result = task_func("This  is   a    test     with      multiple       spaces")
-        self.assertEqual(result, (7, 0))
-    def test_with_only_punctuation(self):
-        """Test with a string that consists only of punctuation marks"""
-        result = task_func("!!!")
-        self.assertEqual(result, (0, 3))
-    
-    def test_with_single_punctuation(self):
-        """Test with a string that is a single punctuation mark"""
-        result = task_func("!")
-        self.assertEqual(result, (0, 1))
+    def test_case_1(self):
+        output = task_func(2, 123)
+        self.assertEqual(len(output), 10)
+        self.assertTrue(all(len(word) == 2 for word in output))
+        self.assertTrue(all(word.islower() for word in output))
+        expected = ['tq', 'ob', 'os', 'mk', 'du', 'ar', 'wx', 'ec', 'et', 'vx']
+        self.assertCountEqual(output, expected)
+        
+    def test_case_2(self):
+        output = task_func(3, 456)
+        self.assertEqual(len(output), 10)
+        self.assertTrue(all(len(word) == 3 for word in output))
+        self.assertTrue(all(word.islower() for word in output))
+        expected = ['axp', 'xtb', 'pwx', 'rxv', 'soa', 'rkf', 'cdp', 'igv', 'ruh', 'vmz']
+        self.assertCountEqual(output, expected)
+        
+    def test_case_3(self):
+        output = task_func(2, 789, alphabets=['x', 'y', 'z'])
+        self.assertEqual(len(output), 10)
+        self.assertTrue(all(len(word) == 2 for word in output))
+        self.assertTrue(all(letter in ['x', 'y', 'z'] for word in output for letter in word))
+        expected = ['yx', 'xz', 'xy', 'yx', 'yy', 'zz', 'yy', 'xy', 'zz', 'xx']
+        self.assertCountEqual(output, expected)
+    def test_case_4(self):
+        output = task_func(1, 100)
+        self.assertEqual(len(output), 10)
+        self.assertTrue(all(len(word) == 1 for word in output))
+        self.assertTrue(all(word.islower() for word in output))
+        expected = ['i', 'y', 'd', 'h', 'x', 'p', 'q', 'k', 'u', 'c']
+        self.assertCountEqual(output, expected)
+        
+    def test_case_5(self):
+        output = task_func(4, 200, alphabets=['a', 'b'])
+        self.assertEqual(len(output), 10)
+        self.assertTrue(all(len(word) == 4 for word in output))
+        self.assertTrue(all(letter in ['a', 'b'] for word in output for letter in word))
+        expected = ['baba', 'baab', 'aaaa', 'abaa', 'baba', 'abbb', 'bbaa', 'bbbb', 'baab', 'bbba']
+        self.assertCountEqual(output, expected)

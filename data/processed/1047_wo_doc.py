@@ -1,112 +1,70 @@
 from datetime import datetime
-import numpy as np
-from dateutil.parser import parse
+import pandas as pd
+from itertools import product
 
-LEAP_SECONDS = np.array(
-    [
-        1972,
-        1973,
-        1974,
-        1975,
-        1976,
-        1977,
-        1978,
-        1979,
-        1980,
-        1981,
-        1982,
-        1983,
-        1985,
-        1988,
-        1990,
-        1993,
-        1994,
-        1997,
-        1999,
-        2006,
-        2009,
-        2012,
-        2015,
-        2016,
-        2020,
-    ]
-)
+# Constants
+EMPLOYEES = ["John", "Alice", "Bob", "Charlie", "Dave"]
 
 
 def task_func(date_str):
     """
-    Calculate the total number of seconds elapsed from a given date until the current time,
-    including any leap seconds that occurred in this period.
+    Generate a Pandas DataFrame containing a series of dates for a predefined list of employees.
 
     Parameters:
-    date_str (str): The date and time from which to calculate, in "yyyy-mm-dd hh:mm:ss" format.
+    - date_str (str): A date string in the "yyyy-mm-dd" format to define the starting date.
 
     Returns:
-    int: The total number of elapsed seconds, including leap seconds, since the given date.
+    - DataFrame: A pandas DataFrame with 'Employee' and 'Date' columns, listing the next 10 days for each employee.
 
     Requirements:
     - datetime.datetime
-    - numpy
-    - dateutil.parser.parse
-    
-    Note:
-    This function uses the datetime, numpy, and dateutil.parser modules.
-    The LEAP_SECONDS array should contain years when leap seconds were added.
+    - pandas
+    - itertools
 
     Example:
-    >>> total_seconds = task_func('1970-01-01 00:00:00')
-    >>> print(total_seconds)
-    1702597276
+    >>> df = task_func('2023-06-15')
+    >>> print(df)
+       Employee       Date
+    0      John 2023-06-15
+    1      John 2023-06-16
+    ...
+    49     Dave 2023-06-24
     """
-    given_date = parse(date_str)
-    current_date = datetime.now()
-    total_seconds = (current_date - given_date).total_seconds()
-    leap_seconds = np.sum(LEAP_SECONDS >= given_date.year)
-    total_seconds += leap_seconds
-    return int(total_seconds)
+    start_date = datetime.strptime(date_str, "%Y-%m-%d")
+    dates = pd.date_range(start_date, periods=10).tolist()
+    df = pd.DataFrame(list(product(EMPLOYEES, dates)), columns=["Employee", "Date"])
+    return df
 
 import unittest
+import pandas as pd
 from datetime import datetime, timedelta
-import numpy as np
 class TestCases(unittest.TestCase):
-    """Test cases for the function task_func."""
-    def test_recent_date(self):
-        """
-        Test the function with a recent date.
-        """
-        test_date = "2022-01-01 00:00:00"
-        expected_result = (datetime.now() - datetime(2022, 1, 1)).total_seconds()
-        expected_result += np.sum(LEAP_SECONDS >= 2022)
-        self.assertEqual(task_func(test_date), int(expected_result))
-    def test_date_before_leap_seconds(self):
-        """
-        Test the function with a date before the introduction of leap seconds.
-        """
-        test_date = "1960-01-01 00:00:00"
-        expected_result = (datetime.now() - datetime(1960, 1, 1)).total_seconds()
-        expected_result += np.sum(LEAP_SECONDS >= 1960)
-        self.assertEqual(task_func(test_date), int(expected_result))
-    def test_date_with_leap_second(self):
-        """
-        Test the function with a date in a year when a leap second was added.
-        """
-        test_date = "2016-01-01 00:00:00"
-        expected_result = (datetime.now() - datetime(2016, 1, 1)).total_seconds()
-        expected_result += np.sum(LEAP_SECONDS >= 2016)
-        self.assertAlmostEqual(task_func(test_date), int(expected_result), delta=1)
-    def test_future_date(self):
-        """
-        Test the function with a future date.
-        """
-        future_date = datetime.now() + timedelta(days=30)
-        future_date_str = future_date.strftime("%Y-%m-%d %H:%M:%S")
-        result = task_func(future_date_str)
-        expected_result = -30 * 24 * 3600  # Negative seconds for future dates
-        # Allowing a margin of error of 1 second
-        self.assertTrue(abs(result - expected_result) <= 1)
-    def test_current_date(self):
-        """
-        Test the function with the current date and time.
-        """
-        current_date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.assertEqual(task_func(current_date_str), 0)
+    """Test cases for the function."""
+    def test_return_type(self):
+        """Test if the function returns a Pandas DataFrame."""
+        df_test = task_func("2023-01-01")
+        self.assertIsInstance(df_test, pd.DataFrame)
+    def test_correct_columns(self):
+        """Test if the DataFrame has the correct columns: 'Employee' and 'Date'."""
+        df_test = task_func("2023-01-01")
+        self.assertListEqual(df_test.columns.tolist(), ["Employee", "Date"])
+    def test_date_range(self):
+        """Test if the function generates the correct date range for 10 days."""
+        start_date = "2023-01-01"
+        df_test = task_func(start_date)
+        end_date = (
+            datetime.strptime(start_date, "%Y-%m-%d") + timedelta(days=9)
+        ).date()
+        self.assertTrue(all(df_test["Date"] <= pd.Timestamp(end_date)))
+    def test_number_of_rows(self):
+        """Test if the DataFrame has the correct number of rows (10 days * number of employees)."""
+        df_test = task_func("2023-01-01")
+        expected_rows = 10 * len(EMPLOYEES)  # 10 days for each employee
+        self.assertEqual(len(df_test), expected_rows)
+    def test_leap_year(self):
+        """Test if the function correctly handles the date range for a leap year."""
+        df_test = task_func("2024-02-28")
+        leap_year_end_date = (
+            datetime.strptime("2024-02-28", "%Y-%m-%d") + timedelta(days=9)
+        ).date()
+        self.assertIn(pd.Timestamp(leap_year_end_date), df_test["Date"].values)

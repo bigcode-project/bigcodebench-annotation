@@ -2,16 +2,21 @@ from collections import Counter
 from operator import itemgetter
 import itertools
 
+#CONSTANT
+ANIMAL = ['cat', 'camel', 'cow', 'dog', 'elephant', 'fox', 'giraffe', 'hippo', 'iguana', 'jaguar']
 
-def task_func(word_dict):
+def task_func(animal_dict):
     """
-    Given a dictionary of words as keys and letters as values, count the frequency of each letter in the words.
+    Given a dictionary of animals as keys and letters as values, count the frequency of each letter in the animals.
     
+    Note:
+    - Remove key in the dictionary if it is not an animal from ANIMAL constant
+
     Parameters:
-    word_dict (dict): The dictionary with words as keys and their letters as values.
+    animal_dict (dict): The dictionary with animals as keys and their letters as values.
     
     Returns:
-    dict: A dictionary with letters as keys and their frequencies as values.
+    dict: A dictionary with letters as keys and their frequencies as values, sorted in descending order by frequency. Format: {letter: frequency}.
     
     Requirements:
     - collections.Counter
@@ -19,12 +24,16 @@ def task_func(word_dict):
     - itertools
     
     Example:
-    >>> word_dict = {'apple': 'a', 'banana': 'b', 'cherry': 'c', 'date': 'd', 'elderberry': 'e', 'fig': 'f', 'grape': 'g', 'honeydew': 'h'}
-    >>> counts = task_func(word_dict)
+    >>> animal_dict = {'cat': 'c', 'dog': 'd', 'elephant': 'e', 'fox': 'f', 'giraffe': 'g', 'hippo': 'h', 'iguana': 'i', 'jaguar': 'j'}
+    >>> counts = task_func(animal_dict)
     >>> print(counts)
-    {'e': 9, 'a': 6, 'r': 6, 'p': 3, 'n': 3, 'y': 3, 'd': 3, 'l': 2, 'b': 2, 'h': 2, 'g': 2, 'c': 1, 't': 1, 'f': 1, 'i': 1, 'o': 1, 'w': 1}
+    {'a': 7, 'g': 4, 'o': 3, 'e': 3, 'p': 3, 'f': 3, 'i': 3, 't': 2, 'h': 2, 'n': 2, 'r': 2, 'u': 2, 'c': 1, 'd': 1, 'l': 1, 'x': 1, 'j': 1}
     """
-    letters = list(itertools.chain.from_iterable(word_dict.keys()))
+    animal_dict_copy = {}
+    for i in animal_dict:
+        if i in ANIMAL:
+            animal_dict_copy[i] = animal_dict[i]
+    letters = list(itertools.chain.from_iterable(animal_dict_copy.keys()))
     count_dict = dict(Counter(letters))
     sorted_dict = dict(sorted(count_dict.items(), key=itemgetter(1), reverse=True))
     return sorted_dict
@@ -33,31 +42,27 @@ import unittest
 from collections import Counter
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        input_dict = {'apple': 'a', 'banana': 'b', 'cherry': 'c', 'date': 'd'}
-        expected_output = dict(Counter('apple' + 'banana' + 'cherry' + 'date'))
-        result = task_func(input_dict)
-        self.assertDictEqual(result, expected_output)
-        
+        # Input: A dictionary with multiple animal names and their initial letters.
+        animal_dict = {'cat': 'c', 'dog': 'd', 'elephant': 'e', 'fox': 'f'}
+        expected_output = dict(Counter('catdogelephantfox'))
+        self.assertDictEqual(task_func(animal_dict), expected_output)
     def test_case_2(self):
-        input_dict = {'fig': 'f', 'grape': 'g', 'honeydew': 'h'}
-        expected_output = dict(Counter('fig' + 'grape' + 'honeydew'))
-        result = task_func(input_dict)
-        self.assertDictEqual(result, expected_output)
-    
+        # Input: An empty dictionary.
+        animal_dict = {}
+        expected_output = {}
+        self.assertDictEqual(task_func(animal_dict), expected_output)
     def test_case_3(self):
-        input_dict = {'apple': 'a', 'elderberry': 'e', 'grape': 'g'}
-        expected_output = dict(Counter('apple' + 'elderberry' + 'grape'))
-        result = task_func(input_dict)
-        self.assertDictEqual(result, expected_output)
-    
+        # Input: A dictionary with one animal name and its initial letter.
+        animal_dict = {'cat': 'c'}
+        expected_output = {'c': 1, 'a': 1, 't': 1}
+        self.assertDictEqual(task_func(animal_dict), expected_output)
     def test_case_4(self):
-        input_dict = {'date': 'd', 'fig': 'f'}
-        expected_output = dict(Counter('date' + 'fig'))
-        result = task_func(input_dict)
-        self.assertDictEqual(result, expected_output)
-        
+        # Input: A dictionary with animal names having repetitive initial letters.
+        animal_dict = {'cat': 'c', 'camel': 'c', 'cow': 'c'}
+        expected_output = dict(Counter('catcamelcow'))
+        self.assertDictEqual(task_func(animal_dict), expected_output)
     def test_case_5(self):
-        input_dict = {'apple': 'a', 'banana': 'b', 'cherry': 'c', 'date': 'd', 'elderberry': 'e', 'fig': 'f', 'grape': 'g', 'honeydew': 'h'}
-        expected_output = dict(Counter('apple' + 'banana' + 'cherry' + 'date' + 'elderberry' + 'fig' + 'grape' + 'honeydew'))
-        result = task_func(input_dict)
-        self.assertDictEqual(result, expected_output)
+        # Input: A dictionary with non-animal words and their initial letters.
+        animal_dict = {'hello': 'h', 'world': 'w'}
+        expected_output = {}
+        self.assertDictEqual(task_func(animal_dict), expected_output)

@@ -1,108 +1,126 @@
 import ast
-import json
-from collections import Counter
+import os
+import glob
 
+# Constants
+DIRECTORY = 'data'
 
-def task_func(file_pointer):
+def task_func(directory):
     """
-    Reads from a given file pointer to a JSON file, evaluates strings that represent dictionaries to actual dictionaries,
-    and counts the frequency of each key across all dictionary entries in the JSON data.
+    Convert all Unicode string representations of dictionaries in all text files 
+    in the specified directory to Python dictionaries.
 
-    
     Parameters:
-    file_pointer (file object): An open file object pointing to the JSON file containing the data. This file should
-                                already be opened in the correct mode (e.g., 'r' for reading).
+    directory (str): The path to the directory containing the text files.
 
     Returns:
-    collections.Counter: A Counter object representing the frequency of each key found in the dictionaries.
+    list: A list of dictionaries extracted from the text files.
 
     Requirements:
     - ast
-    - json
-    - collections.Counter
-    
-    Note:
-    This function assumes the input JSON data is a list of dictionaries or strings that can be evaluated as dictionaries.
-    
+    - os
+    - glob
+
     Example:
-    >>> with open("data.json", "r") as file:
-    >>>    key_frequency = task_func(file)
-    >>>    print(key_frequency)
-    Counter({'name': 5, 'age': 5, 'city': 3})
+    >>> task_func("sample_directory/")
+    [{'key1': 'value1'}, {'key2': 'value2'}]
+
+    Note:
+    Ensure that the text files in the directory contain valid Unicode string representations of dictionaries.
+
+    Raises:
+    - The function would raise a ValueError if there are text file(s) that have invalid dictionary representation
     """
-    data = json.load(file_pointer)
-    key_frequency_counter = Counter()
-    for item in data:
-        if isinstance(item, str):
-            try:
-                item = ast.literal_eval(item)
-            except ValueError:
-                continue
-        if isinstance(item, dict):
-            key_frequency_counter.update(item.keys())
-    return key_frequency_counter
+    path = os.path.join(directory, '*.txt')
+    files = glob.glob(path)
+    results = []
+    for file in files:
+        with open(file, 'r') as f:
+            for line in f:
+                results.append(ast.literal_eval(line.strip()))
+    return results
 
 import unittest
-from io import BytesIO
-from collections import Counter
-import json
+import os
+import ast
+import shutil
 class TestCases(unittest.TestCase):
-    def test_with_dicts(self):
-        # Simulate a JSON file containing dictionaries
-        data = json.dumps([{"name": "John", "age": 30}, {"name": "Jane", "age": 25}, {"name": "Jake"}]).encode('utf-8')
-        json_file = BytesIO(data)
-        # Expected result is a Counter object with the frequency of each key
-        expected = Counter({'name': 3, 'age': 2})
-        result = task_func(json_file)
-        self.assertEqual(result, expected)
-    def test_with_string_repr_dicts(self):
-        # Simulate a JSON file containing string representations of dictionaries
-        data = json.dumps(['{"city": "New York"}', '{"city": "Los Angeles", "temp": 75}']).encode('utf-8')
-        json_file = BytesIO(data)
-        expected = Counter({'city': 2, 'temp': 1})
-        result = task_func(json_file)
-        self.assertEqual(result, expected)
-    def test_with_invalid_json(self):
-        # Simulate an invalid JSON file
-        data = b'invalid json'
-        json_file = BytesIO(data)
-        # In this case, the function should either return an empty Counter or raise a specific exception
-        # Depending on how you've implemented error handling in your function, adjust this test accordingly
-        with self.assertRaises(json.JSONDecodeError):
-            task_func(json_file)
-    def test_empty_json(self):
-        # Simulate an empty JSON file
-        data = json.dumps([]).encode('utf-8')
-        json_file = BytesIO(data)
-        expected = Counter()
-        result = task_func(json_file)
-        self.assertEqual(result, expected)
-    def test_mixed_valid_invalid_dicts(self):
-        # Simulate a JSON file with a mix of valid and invalid dictionary strings
-        data = json.dumps(['{"name": "John"}', 'Invalid', '{"age": 30}']).encode('utf-8')
-        json_file = BytesIO(data)
-        expected = Counter({'name': 1, 'age': 1})
-        result = task_func(json_file)
-        self.assertEqual(result, expected)
-    def test_nested_dicts(self):
-        # Simulate a JSON file containing nested dictionaries (should only count top-level keys)
-        data = json.dumps([{"person": {"name": "John", "age": 30}}, {"person": {"city": "New York"}}]).encode('utf-8')
-        json_file = BytesIO(data)
-        expected = Counter({'person': 2})
-        result = task_func(json_file)
-        self.assertEqual(result, expected)
-    def test_with_actual_json_objects_instead_of_strings(self):
-        # Simulate a JSON file with actual JSON objects (dictionaries) instead of string representations
-        data = json.dumps([{"key1": "value1"}, {"key2": "value2", "key3": "value3"}]).encode('utf-8')
-        json_file = BytesIO(data)
-        expected = Counter({'key1': 1, 'key2': 1, 'key3': 1})
-        result = task_func(json_file)
-        self.assertEqual(result, expected)
-    def test_invalid_json_structure(self):
-        # Simulate a JSON file that is not a list
-        data = json.dumps({"not": "a list"}).encode('utf-8')
-        json_file = BytesIO(data)
-        # Depending on how you've implemented error handling, adjust this test accordingly
-        # Here we expect an error or a specific handling
-        with self.assertRaises(SyntaxError):
-            task_func(json_file)
+    def setUp(self):
+        self.test_dir = 'testdir_task_func'
+        os.makedirs(self.test_dir, exist_ok=True)
+        self.sample_directory = 'testdir_task_func/sample_directory'
+        os.makedirs(self.sample_directory, exist_ok=True)
+        f = open(self.sample_directory+"/1.txt","w")
+        f.write("{'key1': 'value1'}")
+        f.close()
+        f = open(self.sample_directory+"/2.txt","w")
+        f.write("{'key2': 'value2', 'key3': 'value3'}")
+        f.close()
+        f = open(self.sample_directory+"/3.txt","w")
+        f.write("{'key4': 'value4'}")
+        f.close()
+        f = open(self.sample_directory+"/4.txt","w")
+        f.write("{'key5': 'value5', 'key6': 'value6', 'key7': 'value7'}")
+        f.close()
+        f = open(self.sample_directory+"/5.txt","w")
+        f.write("{'key8': 'value8'}")
+        f.close()
+        self.empty_directory = "testdir_task_func/empty_directory"
+        os.makedirs(self.empty_directory, exist_ok=True)
+        self.multi_line_directory = "testdir_task_func/multi_line_directory"
+        os.makedirs(self.multi_line_directory, exist_ok=True)
+        f = open(self.multi_line_directory+"/1.txt","w")
+        f.write("{'key1': 'value1'}\n{'key2': 'value2'}")
+        f.close()
+        self.mixed_directory = "testdir_task_func/mixed_directory"
+        os.makedirs(self.mixed_directory, exist_ok=True)
+        f = open(self.mixed_directory+"/1.txt","w")
+        f.write("invalid")
+        f.close()
+        self.invalid_directory = "testdir_task_func/invalid_directory"
+        os.makedirs(self.invalid_directory, exist_ok=True)
+        f = open(self.invalid_directory+"/1.txt","w")
+        f.write("invalid")
+        f.close()
+        f = open(self.invalid_directory+"/2.txt","w")
+        f.write("{'key1': 'value1'}")
+        f.close()
+    def tearDown(self):
+        # Clean up the test directory
+        shutil.rmtree(self.test_dir)
+    def test_case_1(self):
+        # Test with the sample directory
+        result = task_func(self.sample_directory)
+        expected_result = [
+            {'key1': 'value1'},
+            {'key2': 'value2', 'key3': 'value3'},
+            {'key4': 'value4'},
+            {'key5': 'value5', 'key6': 'value6', 'key7': 'value7'},
+            {'key8': 'value8'}
+        ]
+        for i in expected_result:
+            self.assertTrue(i in result)
+        
+    def test_case_2(self):
+        # Test with an empty directory
+        result = task_func(self.empty_directory)
+        self.assertEqual(result, [])
+        
+    def test_case_3(self):
+        # Test with a directory containing a text file without valid dictionary representation
+        with self.assertRaises(ValueError):
+            task_func(self.invalid_directory)
+            
+    def test_case_4(self):
+        # Test with a directory containing multiple text files, some of which are invalid
+        with self.assertRaises(ValueError):
+            task_func(self.mixed_directory)
+            
+    def test_case_5(self):
+        # Test with a directory containing a text file with multiple valid dictionary representations
+        result = task_func(self.multi_line_directory)
+        expected_result = [
+            {'key1': 'value1'},
+            {'key2': 'value2'}
+        ]
+        self.assertEqual(result, expected_result)

@@ -1,105 +1,122 @@
 import urllib.request
-import re
-from collections import Counter
-import matplotlib.pyplot as plt
+import zipfile
+import os
+import urllib.error
 
 
-def task_func(url):
+def task_func(
+    url: str,
+    save_path: str = "downloaded_file.zip",
+    extract_path: str = "extracted_files",
+) -> str:
     """
-    Downloads a text file from a specified URL, processes the text to count the frequency of each word,
-    and then plots a bar chart showing the ten most frequently occurring words.
+    Downloads, extracts, and deletes a ZIP file from a specified URL.
+
+    The function includes comprehensive error handling to manage issues such as invalid URLs, unreachable servers, corrupted ZIP files, and file I/O errors. In the event of a failure, it provides a descriptive error message.
 
     Parameters:
-    url (str): The URL from which the text file is to be downloaded. The URL should point directly to a text file.
+    - url (str): The URL of the ZIP file to be downloaded.
+    - save_path (str, optional): The local file path where the ZIP file will be saved temporarily. Defaults to 'downloaded_file.zip'.
+    - extract_path (str, optional): The directory where the ZIP file's contents will be extracted. Defaults to 'extracted_files'.
 
     Returns:
-    tuple: A tuple containing two elements:
-        - Counter: A Counter object from the collections module, containing word frequencies in the text.
-        - Axes: A matplotlib Axes object that represents the plotted bar chart of the ten most common words.
+    - str: The path to the directory where the ZIP file's contents have been extracted. Returns an error message in case of failure.
 
-    Note:
-    - The function assumes the URL points to a plain text file and may not handle binary files or non-text content correctly.
-    - Words are identified using a basic regular expression and are case-sensitive.
-    - The function does not remove common stopwords; all words are counted as is.
-    - Requires internet access to download the file from the URL.
-
-    Example:
-    >>> word_freq, ax = task_func('http://www.example.com/data.txt')
-    >>> print(word_freq.most_common(5))
-    [('the', 102), ('of', 76), ('and', 64), ('to', 52), ('in', 41)]
+    Raises:
+    - urllib.error.URLError: If the URL is invalid or the server cannot be reached. 
+    In this case, the function returns a string in the format "URL Error: [error reason]".
 
     Requirements:
     - urllib
-    - re
-    - collections
-    - matplotlib
-    
+    - zipfile
+    - os
+    - urllib
+
+    Example:
+    >>> extracted_path = task_func('http://www.example.com/data.zip')
+    >>> print(extracted_path)
+    'extracted_files'
+
+
     """
-    with urllib.request.urlopen(url) as response:
-        text = response.read().decode()
-        words = re.findall(r"\b\w+\b", text)
-        word_freq = Counter(words)
-        top_words = word_freq.most_common(10)
-        _, ax = plt.subplots()
-        ax.bar([word[0] for word in top_words], [word[1] for word in top_words])
-        ax.set_title("Top 10 Most Common Words")
-        ax.set_xlabel("Words")
-        ax.set_ylabel("Frequency")
-        return word_freq, ax
+    try:
+        if os.path.exists(save_path):
+            os.remove(save_path)
+        urllib.request.urlretrieve(url, save_path)
+        if not os.path.exists(extract_path):
+            os.makedirs(extract_path)
+        with zipfile.ZipFile(save_path, "r") as zip_ref:
+            zip_ref.extractall(extract_path)
+        os.remove(save_path)
+        return extract_path
+    except urllib.error.URLError as e:
+        return f"URL Error: {e.reason}"
 
 import unittest
-from unittest.mock import patch
-from collections import Counter
+import os
+import urllib.error
+import shutil
+from pathlib import Path
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
-    @patch("urllib.request.urlopen")
-    def test_word_frequencies(self, mock_urlopen):
-        """Test that the function returns the correct word frequencies."""
-        # Mock the response data
-        mock_urlopen.return_value.__enter__.return_value.read.return_value = (
-            b"OpenAI OpenAI OpenAI benefits"
-        )
-        word_freq, ax = task_func("http://example.com")
-        self.assertIsInstance(word_freq, Counter)
-        self.assertEqual(word_freq["OpenAI"], 3)
-        self.assertEqual(word_freq["benefits"], 1)
-        self.assertIsNotNone(ax)
-    @patch("urllib.request.urlopen")
-    def test_empty_file(self, mock_urlopen):
-        """Test that the function returns an empty Counter object for an empty file."""
-        mock_urlopen.return_value.__enter__.return_value.read.return_value = b""
-        word_freq, ax = task_func("http://example.com")
-        self.assertIsInstance(word_freq, Counter)
-        self.assertEqual(len(word_freq), 0)
-        self.assertIsNotNone(ax)
-    @patch("urllib.request.urlopen")
-    def test_non_text_file(self, mock_urlopen):
-        """Test that the function raises an error for a non-text file."""
-        # Simulate a case where the URL does not point to a text file
-        mock_urlopen.side_effect = Exception("Non-text file error")
-        with self.assertRaises(Exception):
-            task_func("http://example.com")
-    @patch("urllib.request.urlopen")
-    def test_special_characters(self, mock_urlopen):
-        """Test that the function counts special characters as words."""
-        mock_urlopen.return_value.__enter__.return_value.read.return_value = (
-            b"1234567890"
-        )
-        word_freq, ax = task_func("http://example.com")
-        self.assertIsInstance(word_freq, Counter)
-        self.assertEqual(word_freq["1234567890"], 1)
-        self.assertIsNotNone(ax)
-    @patch("urllib.request.urlopen")
-    def test_large_input(self, mock_urlopen):
-        """Test that the function can handle a large input."""
-        # Mock a large input
-        mock_text = " ".join(["OpenAI"] * 10000)
-        mock_urlopen.return_value.__enter__.return_value.read.return_value = (
-            mock_text.encode()
-        )
-        word_freq, ax = task_func("http://example.com")
-        self.assertIsInstance(word_freq, Counter)
-        self.assertEqual(word_freq["OpenAI"], 10000)
-        self.assertIsNotNone(ax)
+    base_path = "mnt/data/task_func_data"
+    def setUp(self):
+        # Ensure the base path is absolute
+        self.base_path = os.path.abspath(self.base_path)
+        # Create base directory for test data
+        if not os.path.exists(self.base_path):
+            os.makedirs(self.base_path)
+    def test_successful_download_and_extraction_sample_1(self):
+        """Test Case 1: Successful Download and Extraction of Sample 1"""
+        url = "https://getsamplefiles.com/download/zip/sample-1.zip"
+        save_path = Path(self.base_path) / "sample_1_download.zip"
+        extract_path = Path(self.base_path) / "sample_1_extract"
+        result_path = task_func(url, save_path, extract_path)
+        self.assertEqual(result_path, extract_path)
+        self.assertTrue(os.path.exists(extract_path))
+        self.assertFalse(os.path.exists(save_path))
+    def test_successful_download_and_extraction_sample_2(self):
+        """Test Case 2: Successful Download and Extraction of Sample 2"""
+        url = "https://getsamplefiles.com/download/zip/sample-2.zip"
+        save_path = Path(self.base_path) / "sample_2_download.zip"
+        extract_path = Path(self.base_path) / "sample_2_extract"
+        result_path = task_func(url, save_path, extract_path)
+        self.assertEqual(result_path, extract_path)
+        self.assertTrue(os.path.exists(extract_path))
+        self.assertFalse(os.path.exists(save_path))
+    def test_invalid_url(self):
+        """Test Case 3: Invalid URL"""
+        url = "https://invalidurl.com/nonexistent.zip"
+        save_path = Path(self.base_path) / "invalid_url.zip"
+        extract_path = Path(self.base_path) / "invalid_url_extract"
+        result = task_func(url, save_path, extract_path)
+        self.assertTrue(result.startswith("URL Error:"))
+    def test_file_already_exists_at_save_path(self):
+        """Test Case 4: File Already Exists at Save Path"""
+        url = "https://getsamplefiles.com/download/zip/sample-1.zip"
+        save_path = Path(self.base_path) / "existing_file.zip"
+        extract_path = Path(self.base_path) / "existing_file_extract"
+        # Create a dummy file at the save path
+        with open(save_path, "w") as file:
+            file.write("Dummy content")
+        result_path = task_func(url, save_path, extract_path)
+        self.assertEqual(result_path, extract_path)
+        self.assertFalse(os.path.exists(save_path))
+    def test_extraction_path_already_exists(self):
+        """Test Case 5: Extraction Path Already Exists"""
+        url = "https://getsamplefiles.com/download/zip/sample-2.zip"
+        save_path = Path(self.base_path) / "extract_path_exists.zip"
+        extract_path = Path(self.base_path) / "existing_extract_path"
+        # Create the extraction path directory
+        if not os.path.exists(extract_path):
+            os.makedirs(extract_path)
+        result_path = task_func(url, save_path, extract_path)
+        self.assertEqual(result_path, extract_path)
     def tearDown(self):
-        plt.clf()
+        # Clean up any files or directories created during the tests
+        shutil.rmtree(self.base_path, ignore_errors=True)
+        # Cleanup the test directories
+        dirs_to_remove = ["mnt/data", "mnt"]
+        for dir_path in dirs_to_remove:
+            if os.path.exists(dir_path):
+                shutil.rmtree(dir_path)

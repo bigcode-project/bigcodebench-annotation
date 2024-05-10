@@ -1,88 +1,64 @@
-import pandas as pd
-import statistics
-import random
+import textwrap
+import re
 
-def task_func(students, subjects, seed=None):
+def task_func(input_string, width):
     """
-    Create a grade report for a list of students across various subjects. Each student's grades are randomly generated, 
-    and the report includes the average grade for each student. The randomness is seeded for reproducibility if a seed is provided.
-
+    Divide a multi-line string into separate strings and wrap each line to a certain width.
+    
     Parameters:
-    students (list of str): The students for whom the report is being generated.
-    subjects (list of str): The subjects included in the report.
-    seed (int, optional): A seed for the random number generator to ensure reproducibility. If None, the randomness is seeded by the system.
-
+    - input_string (str): The multi-line string that needs to be wrapped.
+    - width (int): The width to wrap each line to.
+    
     Returns:
-    DataFrame: A pandas DataFrame containing each student's grades across the subjects and their average grade. 
-               Columns are ['Student', 'Subject1', 'Subject2', ..., 'Average Grade'].
-
+    - str: The wrapped string where each line is wrapped to the specified width.
+    
     Requirements:
-    - pandas
-    - statistics
-    - random
-
+    - textwrap
+    - re
+    
     Example:
-    >>> students = ['Alice', 'Bob', 'Charlie']
-    >>> subjects = ['Math', 'Physics', 'English']
-    >>> report = task_func(students, subjects, seed=123)
-    >>> print(report)
-       Student  Math  Physics  English  Average Grade
-    0    Alice     6       34       11      17.000000
-    1      Bob    98       52       34      61.333333
-    2  Charlie    13        4       48      21.666667
+    >>> task_func('Another line\\nWith wrapping', 8)
+    'Another\\nline\\nWith\\nwrapping'
     """
-    if seed is not None:
-        random.seed(seed)
-    report_data = []
-    for student in students:
-        grades = [random.randint(0, 100) for _ in subjects]
-        avg_grade = statistics.mean(grades)
-        report_data.append((student,) + tuple(grades) + (avg_grade,))
-    report_df = pd.DataFrame(report_data, columns=['Student'] + subjects + ['Average Grade'])
-    return report_df
+    lines = input_string.split('\\n')
+    wrapped_lines = [textwrap.fill(line, width, break_long_words=False) for line in lines]
+    wrapped_string = '\\n'.join(wrapped_lines)
+    wrapped_string = re.sub(r'\bis\b', 'was', wrapped_string)
+    return wrapped_string
 
 import unittest
-import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_dataframe_structure(self):
-        students = ['Alice', 'Bob']
-        subjects = ['Math', 'Physics']
-        report = task_func(students, subjects, seed=42)
+    
+    def test_case_1(self):
+        input_str = "Hello world\nThis is a test string\nHappy coding!"
+        width = 10
+        expected_output = "Hello\nworld This\nwas a test\nstring\nHappy\ncoding!"
+        self.assertEqual(task_func(input_str, width), expected_output)
         
-        # Check if the output is a DataFrame
-        self.assertIsInstance(report, pd.DataFrame)
         
-        # Check the structure of the DataFrame
-        expected_columns = ['Student'] + subjects + ['Average Grade']
-        self.assertEqual(list(report.columns), expected_columns)
-    def test_average_grade_calculation(self):
-        students = ['Alice']
-        subjects = ['Math', 'Physics']
-        report = task_func(students, subjects, seed=42)
-        # Since we know the seed, we know the grades. Let's check the average.
-        alice_grades = report.iloc[0, 1:-1]
-        self.assertEqual(report.at[0, 'Average Grade'], alice_grades.mean())
-    def test_varying_input_sizes(self):
-        # Testing with different numbers of students and subjects
-        students = ['Alice', 'Bob', 'Charlie']
-        subjects = ['Math', 'Physics', 'Biology', 'English']
-        report = task_func(students, subjects, seed=42)
-        # Check if the number of rows matches the number of students
-        self.assertEqual(len(report), len(students))
-    def test_random_seed_reproducibility(self):
-        students = ['Alice', 'Bob']
-        subjects = ['Math', 'Physics']
-        
-        # If we run the function with the same seed, we should get the same results.
-        report1 = task_func(students, subjects, seed=42)
-        report2 = task_func(students, subjects, seed=42)
-        pd.testing.assert_frame_equal(report1, report2)
-    def test_without_seed(self):
-        students = ['Alice', 'Bob']
-        subjects = ['Math', 'Physics']
-        
-        # When run without a seed, there should be variability in results.
-        report1 = task_func(students, subjects)  # No seed here
-        report2 = task_func(students, subjects)  # No seed here
-        with self.assertRaises(AssertionError):
-            pd.testing.assert_frame_equal(report1, report2)
+    def test_case_2(self):
+        # Test with single line and specific width
+        input_str = "Hello world"
+        width = 5
+        expected_output = "Hello\nworld"
+        self.assertEqual(task_func(input_str, width), expected_output)
+    
+    def test_case_3(self):
+        # Test with empty string and specific width
+        input_str = ""
+        width = 10
+        expected_output = ""
+        self.assertEqual(task_func(input_str, width), expected_output)
+    
+    def test_case_4(self):
+        input_str = "Hello world This is a test string Happy coding!"
+        width = 1000
+        expected_output = "Hello world This was a test string Happy coding!"  # Very wide width, should not wrap
+        self.assertEqual(task_func(input_str, width), expected_output)
+    
+    def test_case_5(self):
+        # Test with special characters and specific width
+        input_str = "Hello, @world!\n#This$is^a&test*string"
+        width = 10
+        expected_output = "Hello,\n@world!\n#This$was^a&test*string"
+        self.assertEqual(task_func(input_str, width), expected_output)

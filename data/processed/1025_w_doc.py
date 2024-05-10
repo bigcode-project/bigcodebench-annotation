@@ -1,138 +1,102 @@
-import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+# Constants
+PLOT_TITLE = "Value Distribution"
 
 
-def task_func(dataframe):
+def task_func(data_dict):
     """
-    Calculate the correlation matrix of a DataFrame and plot a scatter plot for the pair of columns with the highest absolute correlation.
+    Processes a dictionary of numerical data to create a pandas DataFrame, removes None values, and generates a histogram 
+    of the data values using seaborn. The histogram's bins are dynamically calculated based on the range of the data. Specifically,
+    the number of bins is set to the minimum of 11 and half the number of data points, with a minimum of 2 bins.
+    If the DataFrame is empty or the data lacks variability (all values are the same after removing None values), 
+    the function does not generate a plot.
 
     Parameters:
-    - dataframe (pd.DataFrame): The DataFrame containing numeric columns for correlation calculation.
+    - data_dict (dict): A dictionary with keys as column names and values as lists of numerical data. 
+                      The data can include None values, which will be removed.
 
     Returns:
-    - ax (plt.Axes): The scatter plot of the pair of columns with the highest absolute correlation.
+    - DataFrame: A pandas DataFrame created from the input dictionary, excluding None values.
+    - Axes or None: A seaborn histogram plot object if the DataFrame contains variable data; 
+                               None if the DataFrame is empty or if all values are identical.
 
     Requirements:
     - pandas
     - numpy
-    - matplotlib
+    - seaborn
 
-    Exception Handling:
-    - Raises ValueError if the input DataFrame is empty.
-    - Raises TypeError if any column in the DataFrame is non-numeric.
-    - Raises ValueError if the DataFrame has fewer than two columns.
+    Note:
+    - Calculates the minimum and maximum values in the DataFrame.
+    - Dynamically sets the number of bins for the histogram based on the number of data points, with a minimum of 2 
+         and a maximum of 11 bins.
+    - Create evenly spaced bin edges between the minimum and maximum values.
+    - KDE (Kernel Density Estimate) is turned off. 
+    - Sets the plot title to the predefined constant `PLOT_TITLE`.
+
 
     Example:
-    >>> df = pd.DataFrame({
-    ...     'A': np.random.rand(100),
-    ...     'B': np.random.rand(100),
-    ...     'C': np.random.rand(100)
-    ... })
-    >>> ax = task_func(df)
-    >>> print(ax)
-    Axes(0.125,0.11;0.775x0.77)
+    >>> data = {'a': [1, 2, 3, None], 'b': [5, 6, None, 8]}
+    >>> df, plot = task_func(data)
+    >>> df
+         a    b
+    0  1.0  5.0
+    1  2.0  6.0
+    >>> plot.get_title() if plot is not None else 'No plot generated'
+    'Value Distribution'
     """
-    if dataframe.empty:
-        raise ValueError("DataFrame is empty.")
-    if not all(dataframe.dtypes.apply(lambda x: np.issubdtype(x, np.number))):
-        raise TypeError("All columns must be numeric for correlation calculation.")
-    if dataframe.shape[1] < 2:
-        raise ValueError("DataFrame must have at least two columns for correlation calculation.")
-    corr_matrix = pd.DataFrame.corr(dataframe)
-    abs_corr_matrix = corr_matrix.abs()
-    highest_corr_value = abs_corr_matrix.unstack().dropna().nlargest(2).iloc[-1]
-    max_corr_pair = np.where(abs_corr_matrix == highest_corr_value)
-    column_x = dataframe.columns[max_corr_pair[0][0]]
-    column_y = dataframe.columns[max_corr_pair[1][0]]
-    plt.figure(figsize=(10, 6))  # Creating a figure
-    plt.scatter(dataframe[column_x], dataframe[column_y])  # Plotting the scatter plot
-    plt.title(f"Scatter plot between {column_x} and {column_y}")  # Setting the title
-    plt.xlabel(column_x)  # Setting the x-axis label
-    plt.ylabel(column_y)  # Setting the y-axis label
-    plt.show()  # Displaying the figure
-    return plt.gca()  # Returning the current Axes object for further use
+    df = pd.DataFrame(data_dict).dropna()
+    if df.empty or df.nunique().min() < 2:
+        return df, None
+    min_val, max_val = df.values.min(), df.values.max()
+    num_bins = max(min(11, len(df) // 2), 2)
+    bin_edges = np.linspace(min_val, max_val, num_bins)
+    plot = sns.histplot(df.values.flatten(), bins=bin_edges, kde=False)
+    plot.set_title(PLOT_TITLE)
+    return df, plot
 
 import unittest
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for the function task_func."""
-    def test_high_correlation(self):
+    """Test cases for function task_func."""
+    def test_dataframe_creation(self):
         """
-        Test if the function correctly identifies and plots the pair of columns with the highest positive correlation.
+        Test if the function correctly creates a DataFrame from the input dictionary.
         """
-        np.random.seed(0)  # Set a fixed seed for reproducibility
-        df = pd.DataFrame(
-            {"A": np.arange(100), "B": np.arange(100) * 2, "C": np.random.rand(100)}
-        )
-        ax = task_func(df)
-        corr = df.corr()
-        abs_corr = corr.abs()
-        max_corr = abs_corr.unstack().dropna().nlargest(3).iloc[-1]
-        expected_pair = np.where(abs_corr == max_corr)
-        expected_labels = (
-            df.columns[expected_pair[0][0]],
-            df.columns[expected_pair[1][0]],
-        )
-        self.assertEqual((ax.get_xlabel(), ax.get_ylabel()), expected_labels)
-    def test_no_correlation(self):
+        data = {"a": [1, 2, 3, 4], "b": [5, 6, 7, 8]}
+        df, _ = task_func(data)
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(df.shape, (4, 2))
+    def test_distribution_plot(self):
         """
-        Test if the function handles a case where there is no significant correlation between columns.
+        Test if the function correctly creates a distribution plot with the correct title and non-empty bars.
         """
-        np.random.seed(1)
-        df = pd.DataFrame(
-            {
-                "A": np.random.rand(100),
-                "B": np.random.rand(100),
-                "C": np.random.rand(100),
-            }
-        )
-        ax = task_func(df)
-        self.assertIsInstance(ax, plt.Axes)
-    def test_negative_correlation(self):
+        data = {"a": [1, 2, 3, 4], "b": [5, 6, 7, 8]}
+        _, plot = task_func(data)
+        self.assertEqual(plot.get_title(), "Value Distribution")
+        self.assertTrue(len(plot.patches) > 0)
+    def test_empty_dictionary(self):
         """
-        Test if the function correctly identifies and plots the pair of columns with the highest absolute correlation,
-        including negative correlations.
+        Test if the function correctly handles an empty dictionary, returning an empty DataFrame and no plot.
         """
-        np.random.seed(2)
-        df = pd.DataFrame(
-            {"A": np.arange(100), "B": np.random.rand(100), "C": -np.arange(100) + 50}
-        )
-        ax = task_func(df)
-        corr = df.corr()
-        # Get the pair with the highest absolute correlation excluding self-correlations
-        abs_corr = corr.abs()
-        max_corr = abs_corr.unstack().dropna().nlargest(3).iloc[-1]
-        expected_pair = np.where(abs_corr == max_corr)
-        expected_labels = (
-            df.columns[expected_pair[0][0]],
-            df.columns[expected_pair[1][0]],
-        )
-        self.assertEqual((ax.get_xlabel(), ax.get_ylabel()), expected_labels)
-    def test_single_column(self):
+        data = {}
+        df, plot = task_func(data)
+        self.assertEqual(df.shape, (0, 0))
+        self.assertIsNone(plot)
+    def test_number_of_bins(self):
         """
-        Test if the function raises a ValueError when provided with a DataFrame containing only one column.
+        Test if the function dynamically calculates the number of bins for the plot based on the data.
         """
-        np.random.seed(3)
-        df = pd.DataFrame({"A": np.random.rand(100)})
-        with self.assertRaises(ValueError):
-            task_func(df)
-    def test_non_numeric_columns(self):
+        data = {"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+        _, plot = task_func(data)
+        self.assertTrue(len(plot.patches) <= 11)
+    def test_dataframe_without_none(self):
         """
-        Test if the function raises a TypeError when provided with a DataFrame containing non-numeric columns.
+        Test if the function correctly removes rows with None values from the DataFrame.
         """
-        np.random.seed(4)
-        df = pd.DataFrame(
-            {"A": np.random.rand(100), "B": ["text"] * 100, "C": np.random.rand(100)}
-        )
-        with self.assertRaises(TypeError):
-            task_func(df)
-    def test_empty_dataframe(self):
-        """
-        Test if the function raises a ValueError when provided with an empty DataFrame.
-        """
-        df = pd.DataFrame()  # Create an empty DataFrame
-        with self.assertRaises(ValueError):
-            task_func(df)
+        data = {"a": [1, 2, None, 4], "b": [5, None, 7, 8]}
+        df, _ = task_func(data)
+        self.assertEqual(df.shape, (2, 2))
+        self.assertNotIn(None, df.values.flatten())

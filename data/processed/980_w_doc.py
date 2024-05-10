@@ -1,124 +1,133 @@
 import numpy as np
 import pandas as pd
-from sklearn.decomposition import PCA
+from sklearn.ensemble import RandomForestClassifier
 
 
-def task_func(array, seed=None):
+def task_func(
+    feature_array,
+    target_array,
+    feature_names=["f1", "f2", "f3", "f4", "f5"],
+    target_name="target",
+    seed=None,
+):
     """
-    Shuffles the columns of a numpy array randomly, performs Principal Component Analysis (PCA)
-    to reduce the dimensionality to 2 principal components, and returns these components as a pandas DataFrame.
+    Shuffle the columns of a given numpy array and train a Random Forest Classifier on the shuffled data.
 
     Parameters:
-    - array (numpy.ndarray): A 2D numpy array where each row is an observation and each column is a feature.
-    - seed (int, optional): Seed for the random number generator. Defaults to None (not set).
+    - feature_array (numpy.ndarray): 2D array containing the feature data with shape (n_samples, n_features).
+    - target_array (numpy.ndarray): 1D array containing the target data with shape (n_samples,).
+    - feature_names (list of str, optional): Names of the features corresponding to the columns in `feature_array`.
+      Defaults to ['f1', 'f2', 'f3', 'f4', 'f5'].
+    - target_name (str, optional): Name of the target column. Defaults to 'target'.
+    - seed (int, optional): Seed for the random number generator to make shuffling reproducible. Defaults to None.
 
     Returns:
-    - pandas.DataFrame: DataFrame with columns 'PC1' and 'PC2' representing the two principal components.
-
-    Raises:
-    - ValueError: If the input array is not 2D.
+    sklearn.ensemble.RandomForestClassifier: A trained Random Forest Classifier on the shuffled feature data.
 
     Requirements:
     - numpy
     - pandas
     - sklearn
 
-    Note:
-    - PCA reduction will default to the number of features if fewer than 2.
-    - An named but empty DataFrame is returned for arrays without features or with empty content.
-
     Examples:
-    >>> array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-    >>> df = task_func(array, seed=42)
-    >>> df["PC1"]
-    0    5.59017
-    1   -5.59017
-    Name: PC1, dtype: float64
-    >>> df.shape
-    (2, 2)
+    >>> feature_array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+    >>> target_array = np.array([0, 1])
+    >>> clf = task_func(feature_array, target_array)
+    >>> type(clf)
+    <class 'sklearn.ensemble._forest.RandomForestClassifier'>
     """
     if seed is not None:
         np.random.seed(seed)
-    if not isinstance(array, np.ndarray) or len(array.shape) != 2:
-        raise ValueError("Input must be a 2D numpy array.")
-    if array.size == 0 or array.shape[1] == 0:
-        return pd.DataFrame(columns=["PC1", "PC2"])
-    shuffled_array = np.copy(array)
-    np.random.shuffle(np.transpose(shuffled_array))
-    n_components = min(2, shuffled_array.shape[1])
-    pca = PCA(n_components=n_components)
-    principal_components = pca.fit_transform(shuffled_array)
-    column_labels = ["PC1", "PC2"][:n_components]
-    df = pd.DataFrame(data=principal_components, columns=column_labels)
-    return df
+    shuffled_array = feature_array.copy()
+    np.random.shuffle(shuffled_array.T)
+    df = pd.DataFrame(shuffled_array, columns=feature_names)
+    df[target_name] = target_array
+    clf = RandomForestClassifier()
+    clf.fit(df[feature_names], df[target_name])
+    return clf
 
 import unittest
 import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+import warnings
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.array2x5 = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-        self.array5x1 = np.array([[1], [2], [3], [4], [5]])
-    def test_with_empty_array(self):
-        """Test handling of an empty array."""
-        array = np.empty((0, 0))
-        df = task_func(array, seed=42)
-        self.assertTrue(df.empty, "The returned DataFrame should be empty.")
-        self.assertTrue(
-            (df.columns == ["PC1", "PC2"]).all(),
-            "Column names should be 'PC1' and 'PC2' even for an empty DataFrame.",
+    def test_case_1(self):
+        # Test basic case
+        array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+        target = np.array([0, 1])
+        clf = task_func(array, target, seed=42)
+        self.assertIsInstance(clf, RandomForestClassifier)
+        self.assertTrue(len(clf.feature_importances_) > 0)
+        self.assertEqual(set(np.unique(target)), set(clf.classes_))
+        with warnings.catch_warnings():
+            # Temporarily suppress warning - clf prefers named array
+            warnings.simplefilter("ignore", category=UserWarning)
+            predictions = clf.predict(array)
+        np.testing.assert_array_equal(
+            predictions,
+            target,
+            "The model's predictions do not match the expected target values.",
         )
-    def test_with_2x5_array(self):
-        """Test PCA on a 2x5 array with shuffled columns."""
-        df = task_func(self.array2x5, seed=42)
-        self.assertEqual(df.shape, (2, 2), "DataFrame shape should be (2, 2).")
-        self.assertTrue(
-            (df.columns == ["PC1", "PC2"]).all(),
-            "Column names should be 'PC1' and 'PC2'.",
-        )
-    def test_with_5x1_array(self):
-        """Test PCA on a 5x1 array."""
-        df = task_func(self.array5x1, seed=0)
+    def test_case_2(self):
+        # Test identical features
+        array = np.ones((10, 5))
+        target = np.zeros(10)
+        clf = task_func(array, target)
+        self.assertTrue(len(clf.feature_importances_) > 0)
+    def test_case_3(self):
+        # Test all unique targets
+        array = np.array([[i] * 5 for i in range(10)])
+        target = np.arange(10)
+        clf = task_func(array, target)
+        self.assertEqual(len(np.unique(target)), len(clf.classes_))
+    def test_case_4(self):
+        # Test random seed reproducibility
+        np.random.seed(0)
+        array = np.random.rand(10, 5)
+        target = np.random.randint(0, 2, 10)
+        clf1 = task_func(array, target, seed=42)
+        clf2 = task_func(array, target, seed=42)
         self.assertEqual(
-            df.shape, (5, 1), "DataFrame shape should be (5, 1) for a single component."
+            clf1.feature_importances_.tolist(), clf2.feature_importances_.tolist()
         )
-        self.assertTrue(
-            (df.columns == ["PC1"]).all(),
-            "Column name should be 'PC1' for a single component.",
-        )
-    def test_invalid_input(self):
-        """Test handling of invalid input."""
+    def test_case_5(self):
+        # Test negative features
+        array = np.array([[-1, -2, -3, -4, -5], [-6, -7, -8, -9, -10]])
+        target = np.array([0, 1])
+        clf = task_func(array, target)
+        self.assertTrue(len(clf.feature_importances_) > 0)
+    def test_case_6(self):
+        # Test single feature array
+        array = np.arange(10).reshape(-1, 1)
+        target = np.array([0, 1] * 5)
+        feature_names = ["f1"]
+        clf = task_func(array, target, feature_names)
+        self.assertTrue(len(clf.feature_importances_) > 0)
+    def test_case_7(self):
+        # Test exception handling for incompatible shapes among arrays
+        array = np.array([[1, 2, 3], [4, 5, 6]])
+        target = np.array([0, 1, 2])
         with self.assertRaises(ValueError):
-            task_func(np.array([1, 2, 3]), seed=42)
-    def test_reproducibility(self):
-        """Test if the function is reproducible with the same seed."""
-        df1 = task_func(self.array2x5, seed=42)
-        df2 = task_func(self.array2x5, seed=42)
-        pd.testing.assert_frame_equal(
-            df1, df2, "Results should be identical when using the same seed."
-        )
-    def test_pca_correctness(self):
-        """
-        Test PCA correctness by ensuring that the variance is captured correctly
-        in the principal components.
-        """
-        # Creating a simple array where variance is higher in one dimension
-        # This dataset is designed so that the first principal component should
-        # capture the majority of the variance.
-        array = np.array(
-            [
-                [1, 2, 3, 4, 5],
-                [1, 2, 3, 4, 5],
-                [1, 2, 3, 4, 5],
-                [1, 2, 3, 4, 5],
-                [10, 10, 10, 10, 10],
-            ]
-        )  # Increased variance in the last row
-        df = task_func(array, seed=0)
-        # The PCA should be able to capture the variance in the first principal component
-        # significantly more than in the second, if applicable.
-        # Asserting that the first PC values are not all the same,
-        # which indicates it captured the variance.
-        self.assertFalse(
-            df["PC1"].std() == 0,
-            "PCA should capture variance along the first principal component.",
-        )
+            task_func(array, target)
+    def test_case_8(self):
+        # Test exception handling for incompatible feature_names vs array shape
+        array = np.array([[1, 2, 3], [4, 5, 6]])  # 2x3 array
+        target = np.array([0, 1])
+        incorrect_feature_names = ["f1", "f2"]  # Only 2 names for a 3-column array
+        with self.assertRaises(ValueError):
+            task_func(array, target, feature_names=incorrect_feature_names)
+    def test_case_9(self):
+        # Test custom feature names
+        array = np.array([[7, 8], [9, 10]])
+        target = np.array([0, 1])
+        custom_feature_names = ["custom1", "custom2"]
+        clf = task_func(array, target, feature_names=custom_feature_names)
+        self.assertEqual(clf.feature_importances_.size, len(custom_feature_names))
+    def test_case_10(self):
+        # Test custom target name
+        array = np.array([[11, 12, 13, 14, 15], [16, 17, 18, 19, 20]])
+        target = np.array([1, 0])
+        custom_target_name = "custom_target"
+        clf = task_func(array, target, target_name=custom_target_name)
+        # Check if the model was trained successfully
+        self.assertTrue(len(clf.feature_importances_) > 0)

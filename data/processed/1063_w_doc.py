@@ -1,99 +1,116 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.stats import norm
+import pandas as pd
+from matplotlib import pyplot as plt
 
 
-def task_func(arr: np.ndarray) -> (plt.Axes, np.ndarray):
+def task_func(arr):
     """
-    Plots a histogram of normalized data from an input 2D numpy array alongside the probability density function (PDF)
-    of a standard normal distribution.
+    Calculate the sum of each row in a 2D numpy array and plot these sums as a time series.
 
-    Note:
-    - Takes in a 2D numpy array as input.
-    - Calculates the sum of elements in each row of the array.
-    - Normalizes these row sums to have a mean of 0 and a standard deviation of 1.
-      - Normalization is achieved by first calculating the mean and standard deviation of the row sums.
-      - Each row sum is then transformed by subtracting the mean and dividing by the standard deviation.
-      - If the standard deviation is 0 (indicating all row sums are equal), normalization results in an array of zeros with the same shape.
-    - Plots a histogram of the normalized data.
-      - Uses 30 bins for the histogram.
-      - The histogram is density-based, meaning it represents the probability density rather than raw frequencies.
-      - The bars of the histogram are semi-transparent (60% opacity) and green in color.
-    - Overlays the PDF of a standard normal distribution on the histogram for comparison.
-      - The PDF curve is plotted in red with a line width of 2.
-      - The range of the PDF curve is set to cover 99% of a standard normal distribution.
-    - Sets the title of the plot to "Histogram of Normalized Data with Standard Normal PDF".
+    This function takes a 2D numpy array and computes the sum of elements in each row. It
+    then creates a Pandas DataFrame with these row sums and plots them as a time series,
+    using dates starting from January 1, 2020, for each row.
 
     Parameters:
-    - arr: A 2D numpy array. The array should contain numerical data.
+    arr (numpy.ndarray): A 2D numpy array.
 
     Returns:
-    - A tuple containing:
-      - A matplotlib Axes object with the histogram of the normalized data and the overlaid standard normal PDF.
-      - The normalized data as a 1D numpy array.
+    matplotlib.axes._axes.Axes: A plot representing the time series of row sums.
 
     Requirements:
-    - numpy
-    - scipy
+    - pandas
     - matplotlib
 
+    Handling Scenarios:
+    - For non-empty arrays: The function computes the sum of elements for each row, 
+    stores these sums in a Pandas DataFrame, and then plots them. Each row in the plot represents 
+    the sum for a specific day, starting from January 1, 2020.
+    - For empty arrays: The function creates an empty plot with the 
+    title 'Time Series of Row Sums' but without data. This is achieved by checking if the array size 
+    is zero (empty array) and if so, creating a subplot without any data.
+    
+    Note: 
+    - The function uses 'pandas' for DataFrame creation and 'matplotlib.pyplot' for plotting. 
+    The dates in the plot start from January 1, 2020, and each subsequent row represents the next day.
+    
     Example:
-    >>> ax, normalized_data = task_func(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> print(normalized_data)
-    [-1.22474487  0.          1.22474487]
+    >>> arr = np.array([[i + j for i in range(3)] for j in range(5)])
+    >>> ax = task_func(arr)
+    >>> ax.get_title()
+    'Time Series of Row Sums'
     """
+    if not arr.size:  # Check for empty array
+        _, ax = plt.subplots()
+        ax.set_title("Time Series of Row Sums")
+        return ax
     row_sums = arr.sum(axis=1)
-    mean = np.mean(row_sums)
-    std_dev = np.std(row_sums)
-    normalized_data = (
-        (row_sums - mean) / std_dev if std_dev != 0 else np.zeros_like(row_sums)
-    )
-    _, ax = plt.subplots()
-    ax.hist(normalized_data, bins=30, density=True, alpha=0.6, color="g")
-    x = np.linspace(norm.ppf(0.01), norm.ppf(0.99), 100)
-    ax.plot(x, norm.pdf(x), "r-", lw=2)
-    ax.set_title("Histogram of Normalized Data with Standard Normal PDF")
-    return ax, normalized_data
+    df = pd.DataFrame(row_sums, columns=["Sum"])
+    df.index = pd.date_range(start="1/1/2020", periods=df.shape[0])
+    ax = df.plot(title="Time Series of Row Sums")
+    return ax
 
 import unittest
 import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Tests for `task_func`."""
-    def test_histogram_and_pdf(self):
-        """Test that the histogram and PDF are plotted."""
+    """Test cases for the function task_func."""
+    def test_basic_functionality(self):
+        """Test the basic functionality of the function."""
         arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        ax, _ = task_func(arr)
-        self.assertEqual(
-            ax.get_title(),
-            "Histogram of Normalized Data with Standard Normal PDF",
-        )
-        self.assertEqual(len(ax.lines), 1)
-        self.assertEqual(len(ax.patches), 30)
-    def test_normalized_data(self):
-        """Test that the normalized data is correct."""
-        arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-        _, normalized_data = task_func(arr)
-        expected_data = [-1.22474487, 0.0, 1.22474487]
-        for i in range(len(expected_data)):
-            self.assertTrue(np.isclose(normalized_data[i], expected_data[i]))
+        ax = task_func(arr)
+        # Check if the function returns Axes object
+        self.assertIsInstance(ax, plt.Axes)
+        # Check the title of the plot
+        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
+        # Check if the data plotted matches the expected sum of rows
+        y_data = [line.get_ydata() for line in ax.get_lines()][0]
+        expected_sums = arr.sum(axis=1)
+        np.testing.assert_array_equal(y_data, expected_sums)
     def test_empty_array(self):
-        """Test empty array."""
-        arr = np.array([[], [], []])
-        _, normalized_data = task_func(arr)
-        for value in normalized_data:
-            self.assertTrue(np.isclose(value, 0))
-    def test_single_value_array(self):
-        """Test single value array."""
-        arr = np.array([[5], [5], [5]])
-        _, normalized_data = task_func(arr)
-        for value in normalized_data:
-            self.assertTrue(np.isclose(value, 0))
-    def test_large_values(self):
-        """Test large values."""
-        arr = np.array([[1e6, 2e6, 3e6], [4e6, 5e6, 6e6], [7e6, 8e6, 9e6]])
-        _, normalized_data = task_func(arr)
-        expected_data = [-1.22474487, 0.0, 1.22474487]
-        for i in range(len(expected_data)):
-            self.assertTrue(np.isclose(normalized_data[i], expected_data[i]))
+        """Test the function with an empty array."""
+        arr = np.array([])
+        ax = task_func(arr)
+        # Check if the function returns Axes object
+        self.assertIsInstance(ax, plt.Axes)
+        # Check the title of the plot
+        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
+        # Check if the data plotted is empty
+        lines = ax.get_lines()
+        self.assertEqual(len(lines), 0)
+    def test_single_row_array(self):
+        """Test the function with a single row array."""
+        arr = np.array([[1, 2, 3]])
+        ax = task_func(arr)
+        # Check if the function returns Axes object
+        self.assertIsInstance(ax, plt.Axes)
+        # Check the title of the plot
+        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
+        # Check if the data plotted matches the expected sum of the single row
+        y_data = [line.get_ydata() for line in ax.get_lines()][0]
+        expected_sum = arr.sum(axis=1)
+        np.testing.assert_array_equal(y_data, expected_sum)
+    def test_negative_values(self):
+        """Test the function with negative values."""
+        arr = np.array([[-1, -2, -3], [-4, -5, -6]])
+        ax = task_func(arr)
+        # Check if the function returns Axes object
+        self.assertIsInstance(ax, plt.Axes)
+        # Check the title of the plot
+        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
+        # Check if the data plotted matches the expected sum of rows
+        y_data = [line.get_ydata() for line in ax.get_lines()][0]
+        expected_sums = arr.sum(axis=1)
+        np.testing.assert_array_equal(y_data, expected_sums)
+    def test_zero_values(self):
+        """Test the function with zero values."""
+        arr = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+        ax = task_func(arr)
+        # Check if the function returns Axes object
+        self.assertIsInstance(ax, plt.Axes)
+        # Check the title of the plot
+        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
+        # Check if the data plotted matches the expected sum of rows
+        y_data = [line.get_ydata() for line in ax.get_lines()][0]
+        expected_sums = arr.sum(axis=1)
+        np.testing.assert_array_equal(y_data, expected_sums)
+    def tearDown(self):
+        plt.close()

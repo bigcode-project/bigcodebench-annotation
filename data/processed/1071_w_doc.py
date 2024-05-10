@@ -1,82 +1,91 @@
 import pandas as pd
-import matplotlib.pyplot as plt
+from random import shuffle
 
-def task_func(data_dict):
+# Constants
+POSSIBLE_VALUES = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
+
+
+def task_func(list_of_lists):
     """
-    Generates histograms for each column in the given DataFrame and checks if the value distributions
-    are uniform. It prints a message for each non-uniform distribution.
+    Generate a list of pandas DataFrames, each created from a sublist in 'list_of_lists'.
+    Each DataFrame has columns named as per the elements of the sublist, and each column
+    is filled with randomly shuffled values from 'POSSIBLE_VALUES'.
 
     Parameters:
-    df (pd.DataFrame): The DataFrame to be analyzed.
+    - list_of_lists (list of list): A list where each element is a list of strings
+    representing column names for a DataFrame.
 
     Returns:
-    List[plt.Axes]: A list of matplotlib Axes objects, each representing the histogram for a column.
-    
+    - list of pandas.DataFrame: A list where each element is a DataFrame with columns as specified
+    in 'list_of_lists', and each column contains shuffled values from 'POSSIBLE_VALUES'.
+
     Requirements:
     - pandas
-    - matplotlib.pyplot
+    - random.shuffle
+
+    Note:
+    - The length of each DataFrame's columns is equal to the length of 'POSSIBLE_VALUES'.
+    - Each column in the DataFrame has the same shuffled order of 'POSSIBLE_VALUES'.
 
     Example:
-    >>> data = {'Category1': ['A', 'A', 'B', 'B', 'B', 'C', 'C', 'C', 'C', 'D', 'E', 'E'],
-    ...                    'Category2': ['X', 'Y', 'Y', 'Z', 'Z', 'Z', 'Z', 'W', 'W', 'W', 'W', 'W']}
-    >>> axes = task_func(data)
-    The distribution of values in column 'Category1' is not uniform.
-    The distribution of values in column 'Category2' is not uniform.
-    >>> [ax.get_title() for ax in axes]
-    ['Category1', 'Category2']
+    >>> import random
+    >>> random.seed(0)
+    >>> dfs = task_func([['x', 'y', 'z'], ['a', 'b', 'c']])
+    >>> dfs[0].head()
+       x  y  z
+    0  H  J  H
+    1  I  E  A
+    2  B  I  J
+    3  F  G  D
+    4  D  A  C
     """
-    df = pd.DataFrame(data_dict)
-    axes_list = []
-    for column in df.columns:
-        counts = df[column].value_counts()
-        uniform = (
-            len(set(counts)) == 1
-        )  # Check if all counts are the same (uniform distribution)
-        if not uniform:
-            print(f"The distribution of values in column '{column}' is not uniform.")
-        ax = counts.plot(kind="bar")
-        ax.set_title(column)
-        axes_list.append(ax)
-        plt.close()
-    return axes_list
+    dataframes = []
+    for list_ in list_of_lists:
+        df_dict = {col: POSSIBLE_VALUES.copy() for col in list_}
+        for col in df_dict:
+            shuffle(df_dict[col])
+        df = pd.DataFrame(df_dict)
+        dataframes.append(df)
+    return dataframes
 
 import unittest
 import pandas as pd
+import random
 class TestCases(unittest.TestCase):
     """Test cases for task_func function."""
-    def test_uniform_distribution(self):
-        """Test for uniform distribution."""
-        data = {
-                "Category1": ["A", "A", "B", "B", "C", "C"],
-                "Category2": ["X", "X", "Y", "Y", "Z", "Z"],
-            }
-        axes = task_func(data)
-        self.assertEqual([ax.get_title() for ax in axes], ["Category1", "Category2"])
-    def test_non_uniform_distribution(self):
-        """Test for non-uniform distribution."""
-        data = {
-                "Category1": ["A", "A", "B", "B", "C", "C", "C"],
-                "Category2": ["X", "X", "Y", "Y", "Z", "Z", "Z"],
-            }
-        axes = task_func(data)
-        self.assertEqual([ax.get_title() for ax in axes], ["Category1", "Category2"])
-    def test_single_column(self):
-        """Test for single column."""
-        data = {
-                "Category1": ["A", "A", "B", "B", "C", "C"],
-            }
-        axes = task_func(data)
-        self.assertEqual([ax.get_title() for ax in axes], ["Category1"])
-    def test_multiple_categories(self):
-        """Test for multiple categories."""
-        data = {
-                "Category1": ["A", "A", "B", "B", "C", "C", "D", "D", "E", "E"],
-                "Category2": ["X", "X", "Y", "Y", "Z", "Z", "W", "W", "V", "V"],
-            }
-        axes = task_func(data)
-        self.assertEqual([ax.get_title() for ax in axes], ["Category1", "Category2"])
-    def test_empty_dataframe(self):
-        """Test for empty dataframe."""
-        data = {}
-        axes = task_func(data)
-        self.assertEqual(axes, [])
+    def test_dataframe_count(self):
+        """Test number of dataframes returned."""
+        random.seed(0)
+        input_data = [["x", "y"], ["a", "b", "c"], ["m"]]
+        dfs = task_func(input_data)
+        self.assertEqual(len(dfs), len(input_data))
+    def test_dataframe_columns(self):
+        """Test each dataframe has correct columns."""
+        random.seed(1)
+        input_data = [["x", "y"], ["a", "b", "c"], ["m"]]
+        dfs = task_func(input_data)
+        for idx, df in enumerate(dfs):
+            self.assertListEqual(list(df.columns), input_data[idx])
+    def test_dataframe_values(self):
+        """Test values in each dataframe column are from the POSSIBLE_VALUES list."""
+        random.seed(2)
+        input_data = [["x", "y"], ["a", "b", "c"], ["m"]]
+        dfs = task_func(input_data)
+        for df in dfs:
+            for col in df.columns:
+                self.assertTrue(all(val in POSSIBLE_VALUES for val in df[col].values))
+    def test_empty_input(self):
+        """Test function with an empty list of lists."""
+        random.seed(3)
+        dfs = task_func([])
+        self.assertEqual(len(dfs), 0)
+    def test_single_list_input(self):
+        """Test function with a single list input."""
+        random.seed(4)
+        input_data = [["x", "y", "z"]]
+        dfs = task_func(input_data)
+        self.assertEqual(len(dfs), 1)
+        self.assertListEqual(list(dfs[0].columns), input_data[0])
+        self.assertTrue(all(val in POSSIBLE_VALUES for val in dfs[0]["x"].values))
+        self.assertTrue(all(val in POSSIBLE_VALUES for val in dfs[0]["y"].values))
+        self.assertTrue(all(val in POSSIBLE_VALUES for val in dfs[0]["z"].values))

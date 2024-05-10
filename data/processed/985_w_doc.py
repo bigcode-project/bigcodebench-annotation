@@ -1,81 +1,112 @@
-import seaborn as sns
-import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
 
 
-def task_func(df):
+def task_func(df, x_column, y_column):
     """
-    Generates a pair plot from a numeric DataFrame and calculates its covariance matrix.
+    Draws a scatter plot for the specified columns from a pandas DataFrame and fits a linear regression model to the data.
 
     Parameters:
-    - df (pandas.DataFrame): A pandas DataFrame with only numeric columns.
+    df (DataFrame): The input pandas DataFrame.
+    x_column (str): The column name for the x-axis. Data contained in column must be numeric.
+    y_column (str): The column name for the y-axis. Data contained in column must be numeric.
 
     Returns:
-    - tuple:
-        - covariance_df (pandas.DataFrame): The covariance matrix of the input DataFrame.
-        - pair_plot (sns.axisgrid.PairGrid): Pair plot of the input DataFrame.
-
-    Raises:
-    - ValueError: If the DataFrame is empty.
-    - TypeError: If the DataFrame contains non-numeric data types.
+    matplotlib.axes._axes.Axes: The Axes object containing the scatter plot and the linear regression line.
 
     Requirements:
-    - numpy
-    - seaborn
+    - matplotlib
+    - sklearn
 
-    Examples:
+    Notes:
+    - After plotting the scatterplot, this function overlays the predicted regression line on top in red on the same Axes.
+
+    Example:
     >>> import pandas as pd
-    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'C': [7, 8, 9]})
-    >>> covariance_df, ax = task_func(df)
+    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [2, 3, 4]})
+    >>> ax = task_func(df, 'A', 'B')
     >>> type(ax)
-    <class 'seaborn.axisgrid.PairGrid'>
-    >>> covariance_df
-         A    B    C
-    A  1.0  1.0  1.0
-    B  1.0  1.0  1.0
-    C  1.0  1.0  1.0
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    if df.empty:
-        raise ValueError("DataFrame is empty. Non-empty DataFrame required.")
-    if not all(df.dtypes.apply(lambda x: np.issubdtype(x, np.number))):
-        raise TypeError(
-            "DataFrame contains non-numeric data. Only numeric data types are supported."
-        )
-    covariance_df = df.cov()
-    pair_plot = sns.pairplot(df)
-    return covariance_df, pair_plot
+    X = df[x_column].values.reshape(-1, 1)
+    Y = df[y_column].values
+    reg = LinearRegression().fit(X, Y)
+    Y_pred = reg.predict(X)
+    fig, ax = plt.subplots()
+    ax.scatter(X, Y)
+    ax.plot(X, Y_pred, color="red")
+    return ax
 
 import unittest
 import pandas as pd
+import numpy as np
+from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
-    def test_covariance_one(self):
-        """Test basic case with expected covariance of 1.0"""
-        df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6], "C": [7, 8, 9]})
-        covariance_df, _ = task_func(df)
-        self.assertTrue((covariance_df == 1).all().all())
-    def test_identical_values_dataframe(self):
-        """Test DataFrame where all rows have identical values."""
-        df = pd.DataFrame({"A": [1, 1, 1], "B": [2, 2, 2]})
-        covariance_df, _ = task_func(df)
-        self.assertTrue((covariance_df == 0).all().all())
-    def test_with_empty_dataframe(self):
-        """Test handling empty input (should raise error)."""
-        df = pd.DataFrame()
-        with self.assertRaises(ValueError):
-            task_func(df)
-    def test_with_non_numeric_dataframe(self):
-        """Test handling unsupported data types."""
-        df = pd.DataFrame({"A": ["a", "b", "c"], "B": ["d", "e", "f"]})
-        with self.assertRaises(TypeError):
-            task_func(df)
+    def helper_assert_line_correctness(self, ax, expected_slope, expected_intercept):
+        # Helper function to check if linear regression predictions are correct
+        tolerance = 1e-6
+        # Extract line data
+        line = ax.lines[0]
+        x_data, y_data = line.get_xdata(), line.get_ydata()
+        # Calculate slope and intercept of the line plot
+        calculated_slope = (y_data[-1] - y_data[0]) / (x_data[-1] - x_data[0])
+        calculated_intercept = y_data[0] - calculated_slope * x_data[0]
+        # Assert slope and intercept
+        self.assertAlmostEqual(
+            calculated_slope,
+            expected_slope,
+            delta=tolerance,
+            msg="Slope did not match expected value",
+        )
+        self.assertAlmostEqual(
+            calculated_intercept,
+            expected_intercept,
+            delta=tolerance,
+            msg="Intercept did not match expected value",
+        )
     def test_plot_attributes(self):
-        """Test plot attributes."""
-        df = pd.DataFrame({"X": [10, 20, 30], "Y": [15, 25, 35]})
-        _, pair_plot = task_func(df)
-        self.assertIsInstance(pair_plot, sns.axisgrid.PairGrid)
-        self.assertEqual(len(pair_plot.axes), 2)  # Should have 2x2 grid for pair plot
-    def test_single_column_dataframe(self):
-        """Test handling of DataFrame with a single numeric column."""
-        df = pd.DataFrame({"A": [1, 2, 3]})
-        covariance_df, _ = task_func(df)
-        self.assertEqual(covariance_df.loc["A"].item(), 1.0)
-        self.assertEqual(covariance_df.shape, (1, 1))
+        # Basic case to test plot is correct
+        df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": [1, 2, 3, 4]})
+        ax = task_func(df, "X", "Y")
+        self.assertIsInstance(ax, Axes)
+        self.assertEqual(len(ax.lines), 1)
+        self.assertEqual(len(ax.collections), 1)
+    def test_linear_positive_slope(self):
+        # Testing with a dataset that should produce a positive slope
+        df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": [2, 4, 6, 8]})
+        ax = task_func(df, "X", "Y")
+        self.helper_assert_line_correctness(ax, expected_slope=2, expected_intercept=0)
+    def test_linear_negative_slope(self):
+        # Testing with a dataset that should produce a negative slope
+        df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": [8, 6, 4, 2]})
+        ax = task_func(df, "X", "Y")
+        self.helper_assert_line_correctness(
+            ax, expected_slope=-2, expected_intercept=10
+        )
+    def test_linear_zero_slope(self):
+        # Testing with a dataset that should produce a zero slope
+        df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": [5, 5, 5, 5]})
+        ax = task_func(df, "X", "Y")
+        self.helper_assert_line_correctness(ax, expected_slope=0, expected_intercept=5)
+    def test_single_data_point(self):
+        # Testing with a DataFrame having a single data point
+        df = pd.DataFrame({"X": [1], "Y": [1]})
+        ax = task_func(df, "X", "Y")
+        self.assertIsInstance(ax, Axes)
+        self.assertEqual(len(ax.lines), 1)
+        self.assertEqual(len(ax.collections), 1)
+    def test_missing_values(self):
+        # Testing with missing values in the DataFrame
+        df = pd.DataFrame({"X": [1, 2, np.nan, 4], "Y": [1, np.nan, 3, 4]})
+        with self.assertRaises(ValueError):
+            task_func(df, "X", "Y")
+    def test_with_categorical_data(self):
+        # Testing with categorical data to ensure it fails
+        df = pd.DataFrame({"X": ["a", "b", "c"], "Y": ["d", "e", "f"]})
+        with self.assertRaises(ValueError):
+            task_func(df, "X", "Y")
+    def test_incorrect_column_names(self):
+        # Testing with incorrect column names
+        df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
+        with self.assertRaises(KeyError):
+            task_func(df, "X", "Y")

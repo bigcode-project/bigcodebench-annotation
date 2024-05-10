@@ -1,145 +1,134 @@
-import requests
-from PIL import Image
-import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
 
 
-def task_func(url: str) -> "matplotlib.axes._axes.Axes":
+def task_func(csv_file_path, target_column="target", test_size=0.2, n_estimators=100):
     """
-    Downloads an image from the specified URL, converts it to grayscale, and generates a histogram of its grayscale values.
+    Processes a CSV file to train a Random Forest classifier and generates a formatted classification report.
 
     Parameters:
-    - url (str): The URL of the image to be downloaded. Must be a valid URL pointing to an image.
+        csv_file_path (str): The path to the CSV file containing the data.
+        target_column (str, optional): The name of the target variable column. Defaults to 'target'.
+        test_size (float, optional): The proportion of the dataset to include in the test split. Defaults to 0.2.
+        n_estimators (int, optional): The number of trees in the RandomForestClassifier. Defaults to 100.
 
     Returns:
-    - matplotlib.axes._axes.Axes: The Axes object of the generated histogram.
+        str: A formatted classification report. The report includes metrics such as precision, recall,
+             f1-score for each class, as well as overall accuracy, macro average, and weighted average.
 
     Raises:
-    - ValueError: If the URL is invalid or if there's an error downloading the image. Error message will specify the download issue.
-    - IOError: If there's an error in opening or processing the downloaded image. Error message will specify the processing issue.
+        ValueError: If the specified target_column is not found in the CSV file.
 
     Requirements:
-    - requests
-    - PIL
-    - numpy
-    - matplotlib.pyplot
+        - pandas
+        - sklearn
 
     Example:
-    >>> ax = task_func("https://www.example.com/myimage.jpg")
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> report = task_func('/path/to/data.csv')
+    >>> print(report)
+    class 0        0.88       0.90       0.89          50
+    class 1        0.89       0.87       0.88          48
+    ...
+    accuracy                           0.89         100
+    macro avg       0.88       0.89       0.88         100
+    weighted avg    0.89       0.89       0.89         100
+
+    Note:
+        The CSV file must have a column with the name specified by 'target_column', and it should be in a
+        format readable by pandas.read_csv().
     """
-    response = None  # Initialize response to None
-    if not isinstance(url, str) or not url:
-        raise ValueError("Invalid URL provided.")
-    try:
-        response = requests.get(url, stream=True, timeout=10)
-        response.raise_for_status()
-        img = Image.open(response.raw).convert("L")
-    except requests.RequestException as e:
-        raise ValueError(f"Error downloading the image: {e}") from e
-    except IOError as e:
-        raise IOError(f"Error processing the image: {e}") from e
-    finally:
-        if response:  # Check if response is not None before closing
-            response.close()
-    img_array = np.array(img)
-    _, ax = plt.subplots()
-    ax.hist(img_array.ravel(), bins=256, color="gray", alpha=0.7)
-    ax.set_title("Grayscale Histogram")
-    return ax
+    df = pd.read_csv(csv_file_path)
+    if target_column not in df.columns:
+        raise ValueError(f"'{target_column}' column not found in the CSV file.")
+    X = df.drop(target_column, axis=1)
+    y = df[target_column]
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=42
+    )
+    clf = RandomForestClassifier(n_estimators=n_estimators, random_state=42)
+    clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    report = classification_report(y_test, y_pred)
+    lines = report.split("\n")
+    formatted_lines = []
+    for line in lines:
+        parts = line.split()
+        if len(parts) == 5:  # Class-specific metrics
+            formatted_line = f"{parts[0]:<15}{parts[1]:>10}{parts[2]:>10}{parts[3]:>10}{parts[4]:>10}"
+        elif len(parts) == 4:  # Overall metrics
+            formatted_line = f"{parts[0]:<15}{parts[1]:>10}{parts[2]:>10}{parts[3]:>10}"
+        else:
+            formatted_line = line  # Header or empty lines
+        formatted_lines.append(formatted_line)
+    formatted_report = "\n".join(formatted_lines)
+    return formatted_report
 
 import unittest
-from unittest.mock import patch, MagicMock, Mock
-import requests
-import matplotlib
-from PIL import Image
-import io
+from unittest.mock import patch
+import pandas as pd
 class TestCases(unittest.TestCase):
     """Test cases for task_func."""
-    def create_mock_image(self):
+    @patch("pandas.read_csv")
+    def test_default_parameters(self, mock_read_csv):
         """
-        Creates a mock grayscale image in memory.
+        Test task_func with default parameters using an adequately sized mock dataset.
         """
-        img = Image.new("L", (100, 100), color="gray")
-        img_byte_arr = io.BytesIO()
-        img.save(img_byte_arr, format="JPEG")
-        img_byte_arr.seek(0)  # Important: move to the start of the BytesIO object
-        return img_byte_arr
-    @patch("requests.get")
-    def test_valid_image_url(self, mock_get):
+        mock_data = {
+            "feature1": range(100),
+            "feature2": range(100, 200),
+            "target": [0, 1] * 50,  # Alternating 0s and 1s
+        }
+        mock_read_csv.return_value = pd.DataFrame(mock_data)
+        result = task_func("dummy_path.csv")
+        self.assertIn("precision", result)
+    @patch("pandas.read_csv")
+    def test_non_default_target_column(self, mock_read_csv):
         """
-        Test if the function correctly processes a valid image URL and returns a matplotlib Axes object with the correct title.
+        Test task_func with a non-default target column using a larger mock dataset.
         """
-        mock_img = self.create_mock_image()
-        mock_get.return_value = Mock(ok=True)
-        mock_get.return_value.raw = mock_img
-        ax = task_func("https://www.google.com/images/srpr/logo11w.png")
-        self.assertIsInstance(
-            ax,
-            matplotlib.axes._axes.Axes,
-            "Return type should be matplotlib.axes._axes.Axes",
+        mock_data = {
+            "feature1": range(100),
+            "feature2": range(100, 200),
+            "label": [1, 0] * 50,  # Alternating 1s and 0s
+        }
+        mock_read_csv.return_value = pd.DataFrame(mock_data)
+        result = task_func("dummy_path.csv", target_column="label")
+        self.assertIn("precision", result)
+    @patch("pandas.read_csv")
+    def test_different_test_size(self, mock_read_csv):
+        """
+        Test task_func with a different test size and a larger dataset.
+        """
+        mock_data = {
+            "feature1": range(100),
+            "feature2": range(100, 200),
+            "target": [0, 1, 1, 0] * 25,  # Repeated pattern
+        }
+        mock_read_csv.return_value = pd.DataFrame(mock_data)
+        result = task_func("dummy_path.csv", test_size=0.5)
+        self.assertIn("precision", result)
+    @patch("pandas.read_csv")
+    def test_different_n_estimators(self, mock_read_csv):
+        """
+        Test task_func with a different number of estimators and an expanded dataset.
+        """
+        mock_data = {
+            "feature1": range(100),
+            "feature2": range(100, 200),
+            "target": [1, 0] * 50,  # Alternating 1s and 0s
+        }
+        mock_read_csv.return_value = pd.DataFrame(mock_data)
+        result = task_func("dummy_path.csv", n_estimators=50)
+        self.assertIn("precision", result)
+    @patch("pandas.read_csv")
+    def test_missing_target_column(self, mock_read_csv):
+        """
+        Test task_func with a missing target column.
+        """
+        mock_read_csv.return_value = pd.DataFrame(
+            {"feature1": [1, 2], "feature2": [3, 4]}
         )
-        self.assertEqual(
-            ax.get_title(),
-            "Grayscale Histogram",
-            "Histogram should have the title 'Grayscale Histogram'",
-        )
-    @patch("requests.get")
-    def test_invalid_image_url(self, mock_get):
-        """
-        Test if the function raises a ValueError when provided with an invalid URL.
-        """
-        mock_get.side_effect = requests.exceptions.RequestException
         with self.assertRaises(ValueError):
-            task_func("invalid_url")
-    @patch("requests.get")
-    def test_histogram_bins(self, mock_get):
-        """
-        Test if the histogram generated by the function contains the correct number of bins.
-        """
-        mock_img = self.create_mock_image()
-        mock_get.return_value = Mock(ok=True)
-        mock_get.return_value.raw = mock_img
-        ax = task_func("https://www.google.com/images/srpr/logo11w.png")
-        n, bins, _ = ax.hist([], bins=256)
-        self.assertEqual(len(bins), 257, "There should be 257 bin edges for 256 bins")
-    @patch("requests.get")
-    def test_histogram_data_range(self, mock_get):
-        """
-        Test if the data range of the histogram is appropriate for a grayscale image (0 to 255).
-        """
-        mock_img = self.create_mock_image()
-        mock_get.return_value = Mock(ok=True)
-        mock_get.return_value.raw = mock_img
-        ax = task_func("https://www.google.com/images/srpr/logo11w.png")
-        n, bins, _ = ax.hist([], bins=256)
-        self.assertTrue(
-            bins[0] >= 0 and bins[-1] <= 255, "Data range should be between 0 and 255"
-        )
-    @patch("requests.get")
-    def test_empty_url(self, mock_get):
-        """
-        Test if the function raises a ValueError when provided with an empty URL string.
-        """
-        mock_get.side_effect = requests.exceptions.RequestException
-        with self.assertRaises(ValueError):
-            task_func("")
-    @patch("requests.get")
-    @patch("PIL.Image.open")
-    def test_ioerror_image_processing(self, mock_image_open, mock_get):
-        """
-        Test if the function raises an IOError when there is an error in processing the image.
-        """
-        # Mock requests.get to return a valid response
-        mock_get.return_value = MagicMock(ok=True)
-        mock_get.return_value.raw = MagicMock()
-        # Mock PIL.Image.open to raise IOError
-        mock_image_open.side_effect = IOError("Mocked IOError")
-        with self.assertRaises(IOError) as context:
-            task_func("https://www.example.com/image.jpg")
-        self.assertEqual(
-            str(context.exception), "Error processing the image: Mocked IOError"
-        )
-    def tearDown(self):
-        plt.close()
+            task_func("dummy_path.csv", target_column="not_exist")

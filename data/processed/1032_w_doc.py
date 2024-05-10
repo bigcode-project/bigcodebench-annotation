@@ -1,94 +1,75 @@
-import itertools
+import random
 import string
 import pandas as pd
 
 
-def task_func():
+def task_func(n_rows=1000):
     """
-    Generate all possible combinations (with replacement) of three letters from the alphabet and save them in a pandas DataFrame.
+    Generate a histogram of the frequency of the top 30 unique random 3-letter strings.
+    The function creates random strings, each consisting of 3 letters from the lowercase English alphabet.
+    It then plots a histogram showing the frequencies of the top 30 most common strings among the generated set.
 
     Parameters:
-    - None
+    - n_rows (int): Number of random 3-letter strings to generate.
+    Must be positive. Default is 1000.
 
     Returns:
-    - DataFrame: A pandas DataFrame with each row representing a unique combination of three letters.
+    - ax (matplotlib.axes.Axes): A Matplotlib Axes object containing the histogram.
+    Each bar represents one of the top 30 most frequent 3-letter strings.
+
+    Raises:
+    - ValueError: If `n_rows` is less than or equal to 0.
 
     Requirements:
-    - itertools
+    - random
     - string
     - pandas
-
+    
     Example:
-    >>> df = task_func()
-    >>> print(df.head())
-      Letter 1 Letter 2 Letter 3
-    0        a        a        a
-    1        a        a        b
-    2        a        a        c
-    3        a        a        d
-    4        a        a        e
+    >>> ax = task_func(1000)
+    >>> ax.get_title()
+    'Top 30 Frequencies of Random 3-Letter Strings'
     """
-    LETTERS = list(string.ascii_lowercase)
-    combinations = list(itertools.product(LETTERS, repeat=3))
-    df = pd.DataFrame(combinations, columns=["Letter 1", "Letter 2", "Letter 3"])
-    return df
+    if n_rows <= 0:
+        raise ValueError("Number of rows must be greater than 0")
+    data = ["".join(random.choices(string.ascii_lowercase, k=3)) for _ in range(n_rows)]
+    df = pd.DataFrame(data, columns=["String"])
+    frequency = df["String"].value_counts()
+    ax = frequency.head(30).plot(
+        kind="bar"
+    )  # Limit to the top 30 frequencies for readability
+    ax.set_title("Top 30 Frequencies of Random 3-Letter Strings")
+    ax.set_xlabel("String")
+    ax.set_ylabel("Frequency")
+    return ax
 
 import unittest
-import pandas as pd
-from itertools import product
-import string
+import random
+from matplotlib.axes import Axes
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     """Tests for the function task_func."""
-    def test_combinations(self):
-        """
-        Test if the function generates the correct combinations with replacement.
-        """
-        correct_combinations = list(product(string.ascii_lowercase, repeat=3))
-        result_df = task_func()
-        result_combinations = [tuple(row) for row in result_df.values]
-        self.assertEqual(
-            result_combinations,
-            correct_combinations,
-            "The combinations are not correct.",
-        )
-    def test_columns(self):
-        """
-        Test if the DataFrame has the correct column names.
-        """
-        result_df = task_func()
-        self.assertEqual(
-            list(result_df.columns),
-            ["Letter 1", "Letter 2", "Letter 3"],
-            "Column names are not correct.",
-        )
-    def test_shape(self):
-        """
-        Test if the shape of the DataFrame is correct.
-        """
-        result_df = task_func()
-        self.assertEqual(
-            result_df.shape,
-            (26**3, 3),
-            "Shape of the DataFrame is not correct.",
-        )
-    def test_data_type(self):
-        """
-        Test if all DataFrame columns contain strings.
-        """
-        result_df = task_func()
-        for col in result_df.columns:
-            self.assertTrue(
-                result_df[col].apply(lambda x: isinstance(x, str)).all(),
-                f"Column {col} does not contain all strings.",
-            )
-    def test_no_duplicates(self):
-        """
-        Test if there are no duplicate combinations in the DataFrame.
-        """
-        result_df = task_func()
-        result_combinations = [tuple(row) for row in result_df.values]
-        self.assertEqual(
-            len(result_combinations),
-            len(set(result_combinations)),
-            "Found duplicate combinations.",
-        )
+    def test_return_type(self):
+        """Test if the function returns a Matplotlib Axes object."""
+        random.seed(0)
+        result = task_func(100)
+        self.assertIsInstance(result, Axes)
+    def test_default_parameter(self):
+        """Test the function with the default parameter."""
+        result = task_func()
+        self.assertIsInstance(result, Axes)
+    def test_zero_rows(self):
+        """Test the function with zero rows."""
+        with self.assertRaises(ValueError):
+            task_func(0)
+    def test_negative_rows(self):
+        """Test the function with a negative number of rows."""
+        with self.assertRaises(ValueError):
+            task_func(-1)
+    def test_large_number_of_rows(self):
+        """Test the function with a large number of rows."""
+        random.seed(2)
+        result = task_func(10000)
+        self.assertIsInstance(result, Axes)
+    def tearDown(self):
+        plt.close()

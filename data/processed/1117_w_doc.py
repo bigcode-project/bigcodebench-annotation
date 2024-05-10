@@ -1,67 +1,100 @@
 import random
-from string import ascii_uppercase
+import statistics
+
+# Constants
+AGE_RANGE = (22, 60)
 
 def task_func(dict1):
     """
-    Assign each employee of a company a unique ID based on their department code, consisting of the department code, followed by a random string of 5 letters.
+    Calculate the mean, the median, and the mode(s) of the age of the employees in the department "EMP$$." 
+    Generate random ages for each employee within the range [22, 60].
 
     Parameters:
     dict1 (dict): A dictionary with department codes as keys and number of employees 
                   as values.
 
     Returns:
-    list: A list of unique employee IDs for all departments.
+    tuple: A tuple of mean, median, and a list of mode(s) of employee ages.
 
     Requirements:
     - random
-    - string.ascii_uppercase
+    - statistics
 
     Example:
     >>> random.seed(0)
     >>> d = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
-    >>> emp_ids = task_func(d)
-    >>> print(emp_ids)
-    ['EMP$$MYNBI', 'EMP$$QPMZJ', 'EMP$$PLSGQ', 'EMP$$EJEYD', 'EMP$$TZIRW', 'EMP$$ZTEJD', 'EMP$$XCVKP', 'EMP$$RDLNK', 'EMP$$TUGRP', 'EMP$$OQIBZ', 'MAN$$RACXM', 'MAN$$WZVUA', 'MAN$$TPKHX', 'MAN$$KWCGS', 'MAN$$HHZEZ', 'DEV$$ROCCK', 'DEV$$QPDJR', 'DEV$$JWDRK', 'DEV$$RGZTR', 'DEV$$SJOCT', 'DEV$$ZMKSH', 'DEV$$JFGFB', 'DEV$$TVIPC', 'HR$$CVYEE', 'HR$$BCWRV', 'HR$$MWQIQ', 'HR$$ZHGVS', 'HR$$NSIOP', 'HR$$VUWZL', 'HR$$CKTDP']
+    >>> stats = task_func(d)
+    >>> print(stats)
+    (44.7, 46.5, [46, 48, 24, 38, 54, 53, 47, 41, 52, 44])
     """
-    employee_ids = []
+    emp_ages = []
     for prefix, num_employees in dict1.items():
+        if not prefix.startswith('EMP$$'):
+            continue
         for _ in range(num_employees):
-            random_str = ''.join(random.choice(ascii_uppercase) for _ in range(5))
-            employee_ids.append(f'{prefix}{random_str}')
-    return employee_ids
+            age = random.randint(*AGE_RANGE)
+            emp_ages.append(age)
+    if not emp_ages:
+        return 0, 0, []
+    mean_age = statistics.mean(emp_ages)
+    median_age = statistics.median(emp_ages)
+    mode_age = statistics.multimode(emp_ages)
+    return mean_age, median_age, mode_age
 
 import unittest
-import random
 class TestCases(unittest.TestCase):
+    
     def test_case_1(self):
         random.seed(0)
-        d = {'EMP$$': 2, 'MAN$$': 2}
-        emp_ids = task_func(d)
-        self.assertEqual(len(emp_ids), 4)
-        self.assertTrue(all(id.startswith('EMP$$') or id.startswith('MAN$$') for id in emp_ids))
+        # Input: 10 employees in "EMP$$" department
+        d = {'EMP$$': 10}
+        mean_age, median_age, mode_age = task_func(d)
         
+        # Checks
+        self.assertTrue(22 <= mean_age <= 60)
+        self.assertTrue(22 <= median_age <= 60)
+        self.assertTrue(all(22 <= age <= 60 for age in mode_age))
+    
     def test_case_2(self):
         random.seed(0)
-        d = {'HR$$': 3}
-        emp_ids = task_func(d)
-        self.assertEqual(len(emp_ids), 3)
-        self.assertTrue(all(id.startswith('HR$$') for id in emp_ids))
+        # Input: Different number of employees in multiple departments
+        d = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
+        mean_age, median_age, mode_age = task_func(d)
         
+        # Checks
+        self.assertTrue(22 <= mean_age <= 60)
+        self.assertTrue(22 <= median_age <= 60)
+        self.assertTrue(all(22 <= age <= 60 for age in mode_age))
+    
     def test_case_3(self):
         random.seed(0)
-        d = {'DEV$$': 1, 'HR$$': 1, 'EMP$$': 1, 'MAN$$': 1}
-        emp_ids = task_func(d)
-        self.assertEqual(len(emp_ids), 4)
+        # Input: No employees in "EMP$$" department
+        d = {'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
+        mean_age, median_age, mode_age = task_func(d)
         
+        # Checks
+        self.assertEqual(mean_age, 0)
+        self.assertEqual(median_age, 0)
+        self.assertEqual(mode_age, [])
+    
     def test_case_4(self):
         random.seed(0)
-        d = {}
-        emp_ids = task_func(d)
-        self.assertEqual(len(emp_ids), 0)
+        # Input: Large number of employees in "EMP$$" department to increase likelihood of multiple modes
+        d = {'EMP$$': 1000}
+        mean_age, median_age, mode_age = task_func(d)
         
+        # Checks
+        self.assertTrue(22 <= mean_age <= 60)
+        self.assertTrue(22 <= median_age <= 60)
+        self.assertTrue(all(22 <= age <= 60 for age in mode_age))
+    
     def test_case_5(self):
         random.seed(0)
-        d = {'DEV$$': 5}
-        emp_ids = task_func(d)
-        self.assertEqual(len(emp_ids), 5)
-        self.assertTrue(all(id.startswith('DEV$$') for id in emp_ids))
+        # Input: Only one employee in "EMP$$" department
+        d = {'EMP$$': 1}
+        mean_age, median_age, mode_age = task_func(d)
+        
+        # Checks
+        self.assertTrue(22 <= mean_age <= 60)
+        self.assertEqual(mean_age, median_age)
+        self.assertEqual([mean_age], mode_age)

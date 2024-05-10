@@ -1,66 +1,88 @@
-import warnings
-import sklearn.model_selection as model_selection
-import sklearn.svm as svm
-import sklearn.datasets as datasets
-import sklearn.metrics as metrics
+import re
+import random
+import string
 
-def task_func():
+def task_func(n, pattern, seed=None):
     """
-    Perform an SVM classification of the iris dataset and warn if the accuracy is less than 0.9.
-    The warning action is set to 'always'. The test size for the train-test split is 0.33.
+    Generate a random string of length 'n' and find all non-overlapping matches
+    of the regex 'pattern'.
 
+    The function generates a random string of ASCII Letters and Digits using 
+    the random module. By providing a seed the results are reproducable.
+    Non overlapping matches of the provided pattern are then found using the re
+    module.
+    
     Parameters:
-    - None
+    n (int): The length of the random string to be generated.
+    pattern (str): The regex pattern to search for in the random string.
+    seed (int, optional): A seed parameter for the random number generator for reproducible results. Defaults to None.
 
     Returns:
-    tuple: A tuple containing:
-        - accuracy (float): The accuracy of the SVM classification.
-        - warning_msg (str or None): A warning message if the accuracy is below 0.9, None otherwise.
+    list: A list of all non-overlapping matches of the regex pattern in the generated string.
 
     Requirements:
-    - warnings
-    - sklearn
+    - re
+    - random
+    - string
 
     Example:
-    >>> task_func()
-    (1.0, None)
-    """
-    warnings.simplefilter('always')
-    iris = datasets.load_iris()
-    X_train, X_test, y_train, y_test = model_selection.train_test_split(
-        iris.data, iris.target, test_size=0.33, random_state=42)
-    clf = svm.SVC(random_state=42)
-    clf.fit(X_train, y_train)
-    predictions = clf.predict(X_test)
-    accuracy = metrics.accuracy_score(y_test, predictions)
-    warning_msg = None
-    if accuracy < 0.9:
-        warning_msg = "The accuracy of the SVM classification is below 0.9."
-        warnings.warn(warning_msg)
-    return accuracy, warning_msg
+    >>> task_func(100, r'[A-Za-z]{5}', seed=12345)
+    ['mrKBk', 'BqJOl', 'NJlwV', 'UfHVA', 'LGkjn', 'vubDv', 'GSVAa', 'kXLls', 'RKlVy', 'vZcoh', 'FnVZW', 'JQlqL']
+
+    >>> task_func(1000, r'[1-9]{2}', seed=1)
+    ['51', '84', '16', '79', '16', '28', '63', '82', '94', '18', '68', '42', '95', '33', '64', '38', '69', '56', '32', '16', '18', '19', '27']
+     """
+    if seed is not None:
+        random.seed(seed)
+    rand_str = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(n))
+    matches = re.findall(pattern, rand_str)
+    return matches
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_high_accuracy(self):
-        accuracy, warning_msg = task_func()
-        self.assertGreaterEqual(accuracy, 0.8)
-        self.assertIsNone(warning_msg)
-    def test_low_accuracy_warning(self):
-        accuracy, warning_msg = task_func()
-        if accuracy < 0.9:
-            self.assertEqual(warning_msg, "The accuracy of the SVM classification is below 0.9.")
-    def test_accuracy_range(self):
-        accuracy, _ = task_func()
-        self.assertGreaterEqual(accuracy, 0)
-        self.assertLessEqual(accuracy, 1)
-    def test_return_type(self):
-        result = task_func()
-        self.assertIsInstance(result, tuple)
-        self.assertIsInstance(result[0], float)
-        self.assertIn(result[1], [None, "The accuracy of the SVM classification is below 0.9."])
-    def test_warning_setting(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            _, _ = task_func()
-            if w:
-                self.assertEqual(str(w[-1].message), "The accuracy of the SVM classification is below 0.9.")
+    
+    def test_valid_pattern_matching(self):
+        test_length = 100
+        test_pattern = r'[A-Za-z]{5}'
+        test_seed = 12345  # using a seed for consistency
+        expected_matches = [
+            'mrKBk',
+            'BqJOl',
+            'NJlwV',
+            'UfHVA',
+            'LGkjn',
+            'vubDv',
+            'GSVAa',
+            'kXLls',
+            'RKlVy',
+            'vZcoh',
+            'FnVZW',
+            'JQlqL'
+        ]
+        actual_matches = task_func(test_length, test_pattern, seed=test_seed)
+        self.assertEqual(actual_matches, expected_matches)
+    def test_no_matches_found(self):
+        test_length = 100
+        test_pattern = r'XYZ'
+        test_seed = 12345
+        expected_matches = []
+        actual_matches = task_func(test_length, test_pattern, seed=test_seed)
+        self.assertEqual(actual_matches, expected_matches)
+    def test_zero_length_string(self):
+        test_length = 0
+        test_pattern = r'[A-Za-z0-9]{5}'
+        expected_matches = []
+        actual_matches = task_func(test_length, test_pattern, seed=None)
+        self.assertEqual(actual_matches, expected_matches)
+    def test_unusual_pattern(self):
+        test_length = 100
+        test_pattern = r'[^A-Za-z0-9]+'
+        test_seed = 67890
+        expected_matches = []
+        actual_matches = task_func(test_length, test_pattern, seed=test_seed)
+        self.assertEqual(actual_matches, expected_matches)
+    def test_extreme_input_values(self):
+        test_length = 10000  # Reduced size for the environment's stability
+        test_pattern = r'[A-Za-z]{5}'
+        actual_matches = task_func(test_length, test_pattern, seed=None)
+        self.assertIsInstance(actual_matches, list)

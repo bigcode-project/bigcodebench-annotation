@@ -1,73 +1,67 @@
-from collections import defaultdict
-from random import randint
+import random
+from string import ascii_uppercase
 
 def task_func(dict1):
     """
-    Create a dictionary of employee data for departments starting with 'EMP$$'. 
-    The keys are department codes and the values are lists of the salaries of employees in that department.
-    
+    Assign each employee of a company a unique ID based on their department code, consisting of the department code, followed by a random string of 5 letters.
+
     Parameters:
-    dict1 (dict): A dictionary with department codes as keys and number of employees as values.
-    
+    dict1 (dict): A dictionary with department codes as keys and number of employees 
+                  as values.
+
     Returns:
-    dict: A dictionary with department codes starting with 'EMP$$' as keys and lists of employee salaries as values.
-    
+    list: A list of unique employee IDs for all departments.
+
     Requirements:
-    - collections
     - random
-    
+    - string.ascii_uppercase
+
     Example:
-    >>> import random
     >>> random.seed(0)
-    >>> d = {'EMP$$1': 10, 'MAN$$1': 5, 'EMP$$2': 8, 'HR$$1': 7}
-    >>> emp_data = task_func(d)
-    >>> print(emp_data.keys())
-    dict_keys(['EMP$$1', 'EMP$$2'])
+    >>> d = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
+    >>> emp_ids = task_func(d)
+    >>> print(emp_ids)
+    ['EMP$$MYNBI', 'EMP$$QPMZJ', 'EMP$$PLSGQ', 'EMP$$EJEYD', 'EMP$$TZIRW', 'EMP$$ZTEJD', 'EMP$$XCVKP', 'EMP$$RDLNK', 'EMP$$TUGRP', 'EMP$$OQIBZ', 'MAN$$RACXM', 'MAN$$WZVUA', 'MAN$$TPKHX', 'MAN$$KWCGS', 'MAN$$HHZEZ', 'DEV$$ROCCK', 'DEV$$QPDJR', 'DEV$$JWDRK', 'DEV$$RGZTR', 'DEV$$SJOCT', 'DEV$$ZMKSH', 'DEV$$JFGFB', 'DEV$$TVIPC', 'HR$$CVYEE', 'HR$$BCWRV', 'HR$$MWQIQ', 'HR$$ZHGVS', 'HR$$NSIOP', 'HR$$VUWZL', 'HR$$CKTDP']
     """
-    employee_data = defaultdict(list)
+    employee_ids = []
     for prefix, num_employees in dict1.items():
-        if not prefix.startswith('EMP$$'):
-            continue
-        salaries = [randint(1, 100) for _ in range(num_employees)]
-        employee_data[prefix].extend(salaries)
-    return dict(employee_data)
+        for _ in range(num_employees):
+            random_str = ''.join(random.choice(ascii_uppercase) for _ in range(5))
+            employee_ids.append(f'{prefix}{random_str}')
+    return employee_ids
 
 import unittest
 import random
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        d = {'EMP$$1': 10, 'MAN$$1': 5, 'EMP$$2': 8, 'HR$$1': 7}
         random.seed(0)
-        emp_data = task_func(d)
-        self.assertIn('EMP$$1', emp_data)
-        self.assertIn('EMP$$2', emp_data)
-        self.assertNotIn('MAN$$1', emp_data)
-        self.assertNotIn('HR$$1', emp_data)
-        self.assertEqual(len(emp_data['EMP$$1']), 10)
-        self.assertEqual(len(emp_data['EMP$$2']), 8)
+        d = {'EMP$$': 2, 'MAN$$': 2}
+        emp_ids = task_func(d)
+        self.assertEqual(len(emp_ids), 4)
+        self.assertTrue(all(id.startswith('EMP$$') or id.startswith('MAN$$') for id in emp_ids))
+        
     def test_case_2(self):
-        d = {'EMP$$A': 5, 'DEV$$A': 5}
         random.seed(0)
-        emp_data = task_func(d)
-        self.assertIn('EMP$$A', emp_data)
-        self.assertNotIn('DEV$$A', emp_data)
-        self.assertEqual(len(emp_data['EMP$$A']), 5)
+        d = {'HR$$': 3}
+        emp_ids = task_func(d)
+        self.assertEqual(len(emp_ids), 3)
+        self.assertTrue(all(id.startswith('HR$$') for id in emp_ids))
+        
     def test_case_3(self):
-        d = {'MAN$$1': 5, 'HR$$1': 7}
         random.seed(0)
-        emp_data = task_func(d)
-        self.assertNotIn('MAN$$1', emp_data)
-        self.assertNotIn('HR$$1', emp_data)
+        d = {'DEV$$': 1, 'HR$$': 1, 'EMP$$': 1, 'MAN$$': 1}
+        emp_ids = task_func(d)
+        self.assertEqual(len(emp_ids), 4)
+        
     def test_case_4(self):
-        d = {'EMP$$X': 0, 'EMP$$Y': 10}
-        random.seed(0)
-        emp_data = task_func(d)
-        self.assertIn('EMP$$X', emp_data)
-        self.assertIn('EMP$$Y', emp_data)
-        self.assertEqual(len(emp_data['EMP$$X']), 0)
-        self.assertEqual(len(emp_data['EMP$$Y']), 10)
-    def test_case_5(self):
         random.seed(0)
         d = {}
-        emp_data = task_func(d)
-        self.assertEqual(emp_data, {})
+        emp_ids = task_func(d)
+        self.assertEqual(len(emp_ids), 0)
+        
+    def test_case_5(self):
+        random.seed(0)
+        d = {'DEV$$': 5}
+        emp_ids = task_func(d)
+        self.assertEqual(len(emp_ids), 5)
+        self.assertTrue(all(id.startswith('DEV$$') for id in emp_ids))

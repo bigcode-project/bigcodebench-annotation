@@ -1,112 +1,83 @@
-import matplotlib.pyplot as plt
-import random
+import itertools
 import string
 import pandas as pd
-import seaborn as sns
-
-# Constants
-LETTERS = list(string.ascii_lowercase)
 
 
-def task_func(rows=1000, string_length=3):
+def task_func():
     """
-    Generate a dataframe of random strings and create a heatmap showing the correlation
-    in the frequency of each letter in these strings.
+    Generate all possible 3-letter combinations of the alphabet, save them in a pandas DataFrame,
+    and draw a histogram of the frequency of the first letters in these combinations.
 
-    This function generates a specified number of random strings, each of a given length,
-    and calculates the frequency of each letter in these strings. A heatmap of the 
-    correlation matrix is then displayed, showing the co-occurrence frequencies of different 
-    letters within these strings.
-
-    If the number of rows specified is zero, the function will print a message indicating
-    that no data is available to generate the heatmap and will return None. Otherwise, 
-    it processes the DataFrame to convert the generated strings into a one-hot encoded format
-    and then sums up these encodings to calculate the frequency of each letter.
+    This function uses itertools.product to create all possible combinations of three letters.
+    It then creates a DataFrame from these combinations and plots a histogram to show the frequency
+    of each letter appearing as the first letter in these combinations.
 
     Parameters:
-    - rows (int, optional): Number of random strings to generate. Must be non-negative. 
-      Default is 1000. If set to 0, the function returns None after printing a message.
-    - string_length (int, optional): Length of each random string. Must be non-negative. 
-      Default is 3. A value of 0 results in the generation of empty strings.
+    - None
 
     Returns:
-    - matplotlib.axes._axes.Axes or None: A seaborn heatmap plot object if 
-      data is generated; otherwise, None.
+    tuple: A tuple containing:
+        - DataFrame: A pandas DataFrame with all 3-letter combinations.
+        - Axes: A matplotlib Axes object representing the histogram plot.
 
     Requirements:
-    - random
+    - itertools
     - string
     - pandas
-    - seaborn
-    - matplotlib
 
-    Note
-    - If no strings are generated (e.g., rows = 0), the 
-       DataFrame will be empty. In this case, the function prints a message "No data to generate heatmap." and returns None.
-    - If the DataFrame is not empty, each string is split into its 
-       constituent letters, converted into one-hot encoded format, and then the frequency 
-       of each letter is calculated by summing these encodings.
-       
     Example:
-    >>> ax = task_func(1000, 3)
-    >>> ax.get_xlim()
-    (0.0, 26.0)
+    >>> df, ax = task_func()
+    >>> print(df.head())
+       a  b  c
+    0  a  a  a
+    1  a  a  b
+    2  a  a  c
+    3  a  a  d
+    4  a  a  e
     """
-    data = ["".join(random.choices(LETTERS, k=string_length)) for _ in range(rows)]
-    df = pd.DataFrame({"String": data})
-    if df.empty:
-        print("No data to generate heatmap.")
-        return None
-    df = pd.get_dummies(df["String"].apply(list).explode()).groupby(level=0).sum()
-    corr = df.corr()
-    ax = sns.heatmap(corr, annot=True, fmt=".2f")
-    plt.close()  # Close the plot to prevent it from showing during function call
-    return ax
+    LETTERS = list(string.ascii_lowercase)
+    combinations = list(itertools.product(LETTERS, repeat=3))
+    df = pd.DataFrame(combinations, columns=["a", "b", "c"])
+    value_counts = df["a"].value_counts().reindex(LETTERS, fill_value=0)
+    ax = value_counts.plot(kind="bar")
+    return df, ax
 
 import unittest
+import itertools
+import string
 import matplotlib.pyplot as plt
-import random
+LETTERS = list(string.ascii_lowercase)
 class TestCases(unittest.TestCase):
-    """Tests for task_func."""
-    def test_default_parameters(self):
+    """Tests for the function task_func"""
+    def test_dataframe_shape(self):
         """
-        Test task_func with default parameters (rows=1000, string_length=3).
-        Verifies if the function returns a matplotlib Axes object.
+        Test if the DataFrame has the correct shape (17576 rows, 3 columns)
         """
-        random.seed(0)
-        result = task_func()
-        self.assertIsInstance(result, plt.Axes)
-    def test_custom_rows(self):
+        df, _ = task_func()
+        self.assertEqual(df.shape, (17576, 3))
+    def test_dataframe_columns(self):
         """
-        Test task_func with a custom number of rows.
-        Verifies if the function still returns a matplotlib Axes object.
+        Test if the DataFrame has the correct column names (a, b, c)
         """
-        random.seed(1)
-        result = task_func(rows=500)
-        self.assertIsInstance(result, plt.Axes)
-    def test_custom_string_length(self):
+        df, _ = task_func()
+        self.assertListEqual(list(df.columns), ["a", "b", "c"])
+    def test_histogram_plot(self):
         """
-        Test task_func with a custom string length.
-        Verifies if the function still returns a matplotlib Axes object.
+        Test if the histogram plot is an instance of matplotlib Axes
         """
-        random.seed(2)
-        result = task_func(string_length=5)
-        self.assertIsInstance(result, plt.Axes)
-    def test_large_dataset(self):
+        _, ax = task_func()
+        self.assertTrue(isinstance(ax, plt.Axes))
+    def test_first_column_values(self):
         """
-        Test task_func with a large dataset.
-        Verifies if the function can handle a large number of rows without errors.
+        Test if the first column of the DataFrame contains only lowercase letters
         """
-        random.seed(3)
-        result = task_func(rows=10000, string_length=3)
-        self.assertIsInstance(result, plt.Axes)
-    def test_zero_rows(self):
+        df, _ = task_func()
+        self.assertTrue(all(letter in string.ascii_lowercase for letter in df["a"]))
+    def test_no_empty_values(self):
         """
-        Test task_func with zero rows.
-        Verifies if the function handles edge case of zero rows by returning None.
+        Test if there are no empty values in the DataFrame
         """
-        random.seed(4)
-        result = task_func(rows=0)
-        self.assertIsNone(result, "Function should return None for zero rows.")
+        df, _ = task_func()
+        self.assertFalse(df.isnull().values.any())
     def tearDown(self):
         plt.close()

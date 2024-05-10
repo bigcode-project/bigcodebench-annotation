@@ -1,102 +1,84 @@
 import requests
-from urllib.parse import urljoin
-from bs4 import BeautifulSoup
-import csv
+import pandas as pd
 
 
-def task_func(
-    url: str,
-    base_url: str = "https://www.example.com",
-    csv_file: str = "scraped_data.csv",
-) -> int:
+def task_func(api_url):
     """
-    This function scrapes a webpage for all hyperlinks and saves them as absolute URLs to a CSV file.
+    Fetches data from a specified API, processes the JSON response, converts it into a pandas DataFrame,
+    and plots the data using matplotlib.
+    If the data is empty, no plot is generated. If the API request fails, it raises an HTTPError.
+    The function also checks if the provided API URL is a string.
 
     Parameters:
-    - url (str): The relative URL of the webpage to scrape.
-    - base_url (str, optional): The base URL of the website to prepend to relative links. Defaults to 'https://www.example.com'.
-    - csv_file (str, optional): The filename for the CSV file where the links will be saved. Defaults to 'scraped_data.csv'.
+    - api_url (str): The URL of the API to fetch data from.
 
     Returns:
-    - int: The number of unique absolute links scraped from the webpage.
+    - DataFrame: A pandas DataFrame with the parsed data from the API.
+    - Axes or None: A matplotlib Axes object representing the plot of the data, or None if the data is empty.
+
+    Raises:
+    - HTTPError: If the API request fails due to issues like network problems, invalid response, etc.
+    - TypeError: If the `api_url` is not a string.
 
     Requirements:
     - requests
-    - urllib.parse.urljoin
-    - bs4.BeautifulSoup
-    - csv
+    - pandas
+    - matplotlib.pyplot
 
-    Examples:
-    >>> task_func('/mywebpage')
-    5
-    >>> task_func('/anotherpage', base_url='https://www.different.com', csv_file='other_links.csv')
-    8
+    Example:
+    >>> df, plot = task_func("https://api.example.com/data")
+    >>> df.head()
+    >>> if plot:
+    >>>     plot.show()
     """
-    full_url = urljoin(base_url, url)
-    response = requests.get(full_url)
-    soup = BeautifulSoup(response.text, "html.parser")
-    links = {urljoin(base_url, a["href"]) for a in soup.find_all("a", href=True)}
-    with open(csv_file, "w", newline="", encoding="utf-8") as csvfile:
-        writer = csv.writer(csvfile)
-        for link in links:
-            writer.writerow([link])
-    return len(links)
+    if not isinstance(api_url, str):
+        raise TypeError("api_url must be a string")
+    response = requests.get(api_url, timeout=5)
+    response.raise_for_status()
+    data = response.json()
+    df = pd.DataFrame(data)
+    plot = df.plot() if not df.empty else None
+    return df, plot
 
 import unittest
-from unittest.mock import patch, MagicMock
-import requests
-import os
+from unittest.mock import patch, Mock
+import pandas as pd
+import matplotlib.pyplot as plt
+API_URL = "https://api.example.com/data"
 class TestCases(unittest.TestCase):
-    """Test cases for task_func."""
+    """Test cases for the function."""
     @patch("requests.get")
-    def test_empty_page(self, mock_get):
-        """
-        Test the function with an empty webpage (no links).
-        """
-        mock_get.return_value = MagicMock(text="<html></html>")
-        result = task_func("/empty")
-        self.assertEqual(result, 0)
+    def test_successful_api_call_with_data(self, mock_get):
+        """Test the function with a successful API call returning non-empty data."""
+        mock_get.return_value = Mock(status_code=200, json=lambda: [{"a": 1, "b": 2}])
+        df, plot = task_func("http://example.com/api")
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertIsInstance(plot, plt.Axes)
     @patch("requests.get")
-    def test_single_link(self, mock_get):
-        """
-        Test the function with a webpage containing a single link.
-        """
-        mock_get.return_value = MagicMock(
-            text='<html><a href="link1.html">Link1</a></html>'
+    def test_successful_api_call_with_empty_data(self, mock_get):
+        """Test the function with a successful API call returning empty data."""
+        mock_get.return_value = Mock(status_code=200, json=lambda: [])
+        df, plot = task_func("http://example.com/api")
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertTrue(df.empty)
+        self.assertIsNone(plot)
+    @patch("requests.get")
+    def test_api_call_with_invalid_json(self, mock_get):
+        """Test the function with an API call returning invalid JSON."""
+        mock_get.return_value = Mock(
+            status_code=200, json=lambda: Exception("Invalid JSON")
         )
-        result = task_func("/single-link")
-        self.assertEqual(result, 1)
+        with self.assertRaises(Exception):
+            task_func("http://example.com/api")
     @patch("requests.get")
-    def test_multiple_links(self, mock_get):
-        """
-        Test the function with a webpage containing multiple distinct links.
-        """
-        mock_get.return_value = MagicMock(
-            text='<html><a href="link1.html">Link1</a><a href="link2.html">Link2</a></html>'
-        )
-        result = task_func("/multiple-links")
-        self.assertEqual(result, 2)
-    @patch("requests.get")
-    def test_duplicate_links(self, mock_get):
-        """
-        Test the function with a webpage containing duplicate links.
-        """
-        mock_get.return_value = MagicMock(
-            text='<html><a href="link.html">Link</a><a href="link.html">Link</a></html>'
-        )
-        result = task_func("/duplicate-links")
-        self.assertEqual(result, 1)
-    @patch("requests.get")
-    def test_external_links(self, mock_get):
-        """
-        Test the function with a webpage containing external links.
-        """
-        mock_get.return_value = MagicMock(
-            text='<html><a href="http://external.com/link">External Link</a></html>'
-        )
-        result = task_func("/external-link")
-        self.assertEqual(result, 1)
+    def test_api_call_with_http_error(self, mock_get):
+        """Test the function with an API call that raises an HTTP error."""
+        mock_get.side_effect = requests.HTTPError()
+        with self.assertRaises(requests.HTTPError):
+            task_func("http://example.com/api")
+    def test_incorrect_url_type(self):
+        """Test the function with an incorrect type for the URL."""
+        with self.assertRaises(TypeError):
+            task_func(123)
     def tearDown(self):
-        """Remove the database file with retries."""
-        if os.path.exists("scraped_data.csv"):
-            os.remove("scraped_data.csv")
+        plt.close()

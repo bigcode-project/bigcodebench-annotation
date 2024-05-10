@@ -8,14 +8,14 @@ def task_func():
     """
     Create a numeric array of random integers, calculate the mean and standard deviation, and draw a histogram of the distribution.
 
-    Note:
-        The random integers are generated between 1 and 100. The title of the histogram is "Histogram of Random Integers". 
-        The x-axis is labeled "Value" and the y-axis is labeled "Frequency". 
-        The mean is plotted as a red dashed line, and the standard deviation is plotted as purple dashed lines.
-        
     Returns:
     Tuple: A tuple containing the array, mean, standard deviation, and the histogram plot (Axes).
 
+    Note:
+        The random integers are generated between 1 and 100. The title of the histogram is "Histogram of Random Values". 
+        The x-axis is labeled "Val" and the y-axis is labeled "Freq". 
+        The mean is plotted as a red dashed line, and the standard deviation is plotted as purple dashed lines.
+        
     Requirements:
     - numpy
     - matplotlib.pyplot
@@ -25,22 +25,17 @@ def task_func():
     >>> np.random.seed(0)
     >>> array, mean, std, ax = task_func()
     >>> print(mean, std)
-    49.6135 28.5323416100046
+    250.7154 142.85617453522966
     >>> plt.show()
     """
-    array = np.random.randint(1, 100, size=ARRAY_SIZE)
+    array = np.random.randint(1, 500, size=ARRAY_SIZE)
     mean = np.mean(array)
     std = np.std(array)
     fig, ax = plt.subplots()
     ax.hist(array, bins='auto')
-    ax.set_title('Histogram of Random Integers')
-    ax.set_xlabel('Value')
-    ax.set_ylabel('Frequency')
-    ax.axvline(mean, color='red', linestyle='dashed', linewidth=1)
-    ax.axvline(mean + std, color='purple', linestyle='dashed', linewidth=1)
-    ax.axvline(mean - std, color='purple', linestyle='dashed', linewidth=1)
-    ax.legend(["Mean", "Standard Deviation"])
-    plt.show()
+    ax.set_title('Histogram of Random Values')
+    ax.set_xlabel('Val')
+    ax.set_ylabel('Freq')
     return array, mean, std, ax
 
 import unittest
@@ -50,25 +45,32 @@ class TestCases(unittest.TestCase):
         np.random.seed(0)
         array, mean, std, ax = task_func()
         self.assertEqual(array.size, ARRAY_SIZE)
-        self.assertEqual(mean, 49.6135)
-        self.assertEqual(std, 28.5323416100046)
-        self.assertEqual(ax.get_title(), 'Histogram of Random Integers')
+        self.assertEqual(mean, 250.7154)
+        self.assertEqual(std, 142.85617453522966)
+        self.assertEqual(ax.get_title(), 'Histogram of Random Values')
     def test_case_2(self):
         array, mean, std, ax = task_func()
-        self.assertEqual(ax.get_xlabel(), 'Value')
-        self.assertEqual(ax.get_ylabel(), 'Frequency')
+        self.assertEqual(ax.get_xlabel(), 'Val')
+        self.assertEqual(ax.get_ylabel(), 'Freq')
     def test_case_3(self):
-        np.random.seed(1)
+        np.random.seed(42)
         array, mean, std, ax = task_func()
-        self.assertEqual(mean, 50.0717)
-        self.assertEqual(std, 28.559862729186918)
+        self.assertEqual(array[0], 103)
+        self.assertEqual(array[-1], 474)
+        self.assertEqual(mean, 250.171)
+        self.assertEqual(std, 144.01374920124815)
+        
     def test_case_4(self):
-        np.random.seed(100)
+        np.random.seed(142)
         array, mean, std, ax = task_func()
-        self.assertEqual(mean, 50.2223)
-        self.assertEqual(std, 28.494467580742757)
+        self.assertEqual(array[0], 278)
+        self.assertEqual(array[-1], 113)
+        self.assertEqual(mean, 251.1245)
+        self.assertEqual(std, 144.49066405740547)
     def test_case_5(self):
-        np.random.seed(500)
+        np.random.seed(250)
         array, mean, std, ax = task_func()
-        self.assertEqual(mean, 49.8636)
-        self.assertEqual(std, 28.516030492338864)
+        self.assertEqual(array[0], 367)
+        self.assertEqual(array[-1], 190)
+        self.assertEqual(mean, 249.037)
+        self.assertEqual(std, 144.32681882103546)

@@ -1,92 +1,83 @@
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
-import seaborn as sns
 
-def task_func(data):
+
+def task_func(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Creates and return a heatmap of the cumulative sum of each column in a dictionary.
+    Computes the MinMax-normalized cumulative sum for each numeric column in the given DataFrame.
 
     Parameters:
-    - data (dict): A dictionary where the keys are the column names and the values are the column values.
+    - df (pandas.DataFrame): The input DataFrame containing numerical values.
 
     Returns:
-    - matplotlib.axes._axes.Axes: The Axes object of the Seaborn heatmap.
+    - pd.DataFrame: A DataFrame where each column contains the normalized cumulative sum of the
+                    respective column in the input DataFrame, retaining the original column names.
 
     Raises:
-    - ValueError: If the DataFrame is empty or if no numeric columns are present.
+    - TypeError: If the DataFrame contains non-numeric data types.
+    - ValueError: If the DataFrame is empty or contains NaN values.
 
     Requirements:
     - pandas
-    - seaborn
-
-    Notes:
-    - Only numeric columns are considered for the heatmap. Non-numeric columns are ignored.
+    - numpy
+    - sklearn
 
     Example:
-    >>> data = {'A': [1, 2, 3], 'B': [4, 5, 6]}
-    >>> ax = task_func(data)
+    >>> input_df = pd.DataFrame({'A': [1, 2, 3], 'B': [3, 2, 1]})
+    >>> output_df = task_func(input_df)
+    >>> type(output_df)
+    <class 'pandas.core.frame.DataFrame'>
+    >>> output_df
+         A         B
+    0  0.0  0.000000
+    1  0.4  0.666667
+    2  1.0  1.000000
     """
-    df = pd.DataFrame(data)
-    numeric_df = df.select_dtypes(include=["number"])
-    if numeric_df.empty:
-        raise ValueError("No numeric columns present")
-    df_cumsum = numeric_df.cumsum()
-    ax = sns.heatmap(df_cumsum)
-    return ax
+    if df.select_dtypes(include=np.number).shape[1] != df.shape[1]:
+        raise TypeError("Input DataFrame contains non-numeric data types.")
+    if df.empty or df.isnull().values.any():
+        raise ValueError("Input DataFrame is empty or contains NaN values.")
+    df_cumsum = df.cumsum()
+    scaler = MinMaxScaler()
+    df_norm_cumsum = pd.DataFrame(scaler.fit_transform(df_cumsum), columns=df.columns)
+    return df_norm_cumsum
 
 import unittest
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+import numpy as np
 class TestCases(unittest.TestCase):
-    def tearDown(self):
-        plt.close("all")
-    def test_cumsum_correctness(self):
-        data = {"A": [1, 2, 3], "B": [4, 5, 6]}
-        df = pd.DataFrame(data)
-        ax = task_func(data)
-        result_cumsum = df.cumsum().values.flatten()
-        heatmap_data = ax.collections[0].get_array().data.flatten()
-        np.testing.assert_array_equal(
-            result_cumsum, heatmap_data, "Cumulative sum calculation is incorrect"
+    def check_cumsum_and_scaling(self, input_df, expected_output):
+        output = task_func(input_df)
+        pd.testing.assert_frame_equal(
+            output, expected_output, check_dtype=False, atol=1e-5
         )
-    def test_non_numeric_columns_ignored(self):
-        data = {"A": [1, 2, 3], "B": ["one", "two", "three"]}
-        ax = task_func(data)
-        self.assertIsInstance(
-            ax, plt.Axes, "The result should be a matplotlib Axes object"
-        )
-        self.assertEqual(
-            len(ax.get_xticklabels()), 1, "Non-numeric columns should be ignored"
-        )
-    def test_with_positive_numbers(self):
-        data = {"A": [1, 2, 3], "B": [4, 5, 6]}
-        result = task_func(data)
-        self.assertIsInstance(
-            result, plt.Axes, "The result should be a matplotlib Axes object"
-        )
-    def test_with_negative_numbers(self):
-        data = {"A": [-1, -2, -3], "B": [-4, -5, -6]}
-        result = task_func(data)
-        self.assertIsInstance(
-            result, plt.Axes, "The result should be a matplotlib Axes object"
-        )
-    def test_with_mixed_numbers(self):
-        data = {"A": [1, -2, 3], "B": [-4, 5, -6]}
-        result = task_func(data)
-        self.assertIsInstance(
-            result, plt.Axes, "The result should be a matplotlib Axes object"
-        )
-    def test_with_zeroes(self):
-        data = {"A": [0, 0, 0], "B": [0, 0, 0]}
-        result = task_func(data)
-        self.assertIsInstance(
-            result, plt.Axes, "The result should be a matplotlib Axes object"
-        )
-    def test_with_empty_dataframe(self):
-        data = {"A": [], "B": []}
+    def test_incremental_values(self):
+        before = pd.DataFrame({"A": [1, 2, 3], "B": [3, 2, 1]})
+        after = pd.DataFrame({"A": [0.0, 0.4, 1.0], "B": [0.0, 0.66666667, 1.0]})
+        self.check_cumsum_and_scaling(before, after)
+        self.assertEqual(set(before.columns), set(after.columns))
+    def test_negative_numbers(self):
+        before = pd.DataFrame({"A": [-1, -2, -3], "B": [-3, -2, -1]})
+        after = pd.DataFrame({"A": [1.0, 0.6, 0.0], "B": [1.0, 0.33333333, 0.0]})
+        self.check_cumsum_and_scaling(before, after)
+        self.assertEqual(set(before.columns), set(after.columns))
+    def test_all_zeros(self):
+        before = pd.DataFrame({"A": [0, 0, 0], "B": [0, 0, 0]})
+        after = pd.DataFrame({"A": [0.0, 0.0, 0.0], "B": [0.0, 0.0, 0.0]})
+        self.check_cumsum_and_scaling(before, after)
+        self.assertEqual(set(before.columns), set(after.columns))
+    def test_same_numbers(self):
+        before = pd.DataFrame({"A": [5, 5, 5], "B": [2, 2, 2]})
+        after = pd.DataFrame({"A": [0.0, 0.5, 1.0], "B": [0.0, 0.5, 1.0]})
+        self.check_cumsum_and_scaling(before, after)
+        self.assertEqual(set(before.columns), set(after.columns))
+    def test_non_numeric_data_raises(self):
+        with self.assertRaises(TypeError):
+            task_func(pd.DataFrame({"A": ["one", "two", "three"], "B": [1, 2, 3]}))
+    def test_nan_values_raise(self):
         with self.assertRaises(ValueError):
-            task_func(data)
-    def test_no_numeric_columns(self):
-        data = {"A": ["one", "two", "three"], "B": ["four", "five", "six"]}
+            task_func(pd.DataFrame({"A": [1, np.nan, 3], "B": [3, 2, 1]}))
+    def test_empty_dataframe(self):
         with self.assertRaises(ValueError):
-            task_func(data)
+            task_func(pd.DataFrame())

@@ -1,120 +1,159 @@
 import os
+from pathlib import Path
 import glob
-from collections import Counter
+import shutil
 
 
-def task_func(directory, extensions=[".txt", ".docx", ".xlsx", ".csv"], keep_zero=True):
+def task_func(source_directory: str, target_directory: str):
     """
-    Traverses a given directory recursively to count files by specified extensions.
+    Moves files with specific extensions from a source directory to a target directory,
+    handling naming conflicts by renaming duplicates.
 
     Parameters:
-    - directory (str): The path of the directory to search.
-    - extensions (list of str): File extensions to count. Defaults to ['.txt', '.docx', '.xlsx', '.csv'].
-    - keep_zero (bool): Whether to include extensions with zero counts. Defaults to True.
+    - source_directory (str): The absolute or relative path of the source directory.
+    - target_directory (str): The absolute or relative path of the target directory.
+                              This function will create it if it does not exist.
 
     Returns:
-    - Counter: An object containing counts of files for each of the specified extensions.
+    - int: The number of files successfully moved.
 
     Raises:
-    - OSError: If the specified directory does not exist.
+    - FileNotFoundError: If source_directory does not exist.
 
     Requirements:
     - os
+    - pathlib
     - glob
-    - collections
+    - shutil
 
-    Note:
-    - This function counts files in a case-sensitive manner.
+    Notes:
+    - This function scans the source directory recursively to find files.
+    - Files are filtered by the extensions: ".txt", ".docx", ".xlsx", ".csv".
+    - Renaming of files due to naming conflicts follows the pattern '<original_name>-n.<extension>'.
 
     Examples:
-    >>> task_func('/path/to/documents')
-    Counter({'.txt': 5, '.docx': 2, '.xlsx': 1, '.csv': 0})
-    >>> task_func('/path/to/documents', keep_zero=False)
-    Counter({'.txt': 5, '.docx': 2, '.xlsx': 1})
-    >>> task_func('/path/to/documents', extensions=['.txt'], keep_zero=False)
-    Counter({'.txt': 5})
+    >>> task_func('./source_folder', './target_folder')
+    3
+    >>> task_func('./empty_folder', './target_folder')
+    0
     """
-    if not os.path.exists(directory):
-        raise OSError("directory must exist.")
-    counter = Counter()
-    for suffix in extensions:
-        count = len(
-            glob.glob(os.path.join(directory, "**", "*" + suffix), recursive=True)
+    moved_files = 0
+    if not os.path.exists(source_directory):
+        raise FileNotFoundError("source_directory must exist.")
+    if not os.path.exists(target_directory):
+        os.makedirs(target_directory)
+    for extension in [".txt", ".docx", ".xlsx", ".csv"]:
+        filepaths = glob.glob(
+            os.path.join(source_directory, "**", "*" + extension), recursive=True
         )
-        if count:
-            counter[suffix] += count
-        else:
-            if keep_zero:
-                counter[suffix] += count
-    return counter
+        for filepath in filepaths:
+            filename = Path(filepath).name
+            stem = Path(filepath).stem
+            target_filepath = os.path.join(target_directory, filename)
+            count = 1
+            while os.path.exists(target_filepath):
+                new_filename = f"{stem}-{count}{extension}"
+                target_filepath = os.path.join(target_directory, new_filename)
+                count += 1
+            shutil.move(filepath, target_filepath)
+            moved_files += 1
+    return moved_files
 
 import unittest
-from collections import Counter
-from tempfile import TemporaryDirectory
-import os
+import tempfile
+from pathlib import Path
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.temp_dir = TemporaryDirectory()
-    def tearDown(self):
-        self.temp_dir.cleanup()
-    def create_test_files(self, directory, file_list):
-        for file_name in file_list:
-            with open(os.path.join(directory, file_name), "w") as f:
-                f.write("Test")
+        self.valid_extensions = [".txt", ".docx", ".xlsx", ".csv"]
     def test_case_1(self):
-        # Test basic case with default extensions
-        file_names = ["file1.txt", "file2.docx", "file3.xlsx", "file4.csv", "file5.txt"]
-        self.create_test_files(self.temp_dir.name, file_names)
-        result = task_func(self.temp_dir.name)
-        expected = Counter({".txt": 2, ".docx": 1, ".xlsx": 1, ".csv": 1})
-        self.assertEqual(result, expected)
+        # Test with an empty source directory
+        with tempfile.TemporaryDirectory() as source_dir, tempfile.TemporaryDirectory() as target_dir:
+            result = task_func(source_dir, target_dir)
+            self.assertEqual(
+                result, 0, "Should return 0 for an empty source directory."
+            )
     def test_case_2(self):
-        # Test empty directory
-        result = task_func(self.temp_dir.name)
-        expected = Counter({".txt": 0, ".docx": 0, ".xlsx": 0, ".csv": 0})
-        self.assertEqual(result, expected)
+        # Test with a source directory containing only files with no extensions
+        with tempfile.TemporaryDirectory() as source_dir, tempfile.TemporaryDirectory() as target_dir:
+            for i in range(3):
+                Path(f"{source_dir}/file_{i}").touch()
+            result = task_func(source_dir, target_dir)
+            self.assertEqual(
+                result, 0, "Should return 0 for files with non-matching extensions."
+            )
     def test_case_3(self):
-        # Test error handling - non-existent directory
-        with self.assertRaises(OSError):
-            task_func("/path/to/nonexistent/directory")
+        # Test with a source directory containing files with a mix of extensions
+        with tempfile.TemporaryDirectory() as source_dir, tempfile.TemporaryDirectory() as target_dir:
+            extensions = self.valid_extensions + [".pdf", ".jpg"]
+            for i, ext in enumerate(extensions):
+                Path(f"{source_dir}/file_{i}{ext}").touch()
+            result = task_func(source_dir, target_dir)
+            self.assertTrue(result == len(self.valid_extensions))
     def test_case_4(self):
-        # Test ignoring unspecified extensions
-        file_names = ["file1.pdf", "file2.png", "file3.txt"]
-        self.create_test_files(self.temp_dir.name, file_names)
-        result = task_func(self.temp_dir.name)
-        expected = Counter({".txt": 1, ".docx": 0, ".xlsx": 0, ".csv": 0})
-        self.assertEqual(result, expected)
+        # Test with a source directory containing files with all matching extensions
+        with tempfile.TemporaryDirectory() as source_dir, tempfile.TemporaryDirectory() as target_dir:
+            for i, ext in enumerate(self.valid_extensions):
+                Path(f"{source_dir}/file_{i}{ext}").touch()
+            result = task_func(source_dir, target_dir)
+            self.assertEqual(
+                result, 4, "Should return 4 for all files with matching extensions."
+            )
     def test_case_5(self):
-        # Test nested folders
-        nested_dir_path = os.path.join(self.temp_dir.name, "nested")
-        os.makedirs(nested_dir_path)
-        file_names = ["nested_file1.txt", "nested_file2.xlsx"]
-        self.create_test_files(nested_dir_path, file_names)
-        result = task_func(self.temp_dir.name)
-        expected = Counter({".txt": 1, ".xlsx": 1, ".docx": 0, ".csv": 0})
-        self.assertEqual(result, expected)
+        # Test with a source directory containing nested directories with files
+        with tempfile.TemporaryDirectory() as source_dir, tempfile.TemporaryDirectory() as target_dir:
+            extensions = [".txt", ".docx", ".xlsx", ".csv"]
+            Path(f"{source_dir}/subdir1").mkdir()
+            Path(f"{source_dir}/subdir1/subdir2").mkdir()
+            for i, ext in enumerate(extensions):
+                Path(f"{source_dir}/file_{i}{ext}").touch()
+                Path(f"{source_dir}/subdir1/file_{i}{ext}").touch()
+                Path(f"{source_dir}/subdir1/subdir2/file_{i}{ext}").touch()
+            result = task_func(source_dir, target_dir)
+            self.assertEqual(
+                result,
+                12,
+                "Should return 12 for all files in nested directories with matching extensions.",
+            )
     def test_case_6(self):
-        # Test custom extensions
-        file_names = ["image.jpeg", "video.mp4", "document.pdf"]
-        self.create_test_files(self.temp_dir.name, file_names)
-        result = task_func(
-            self.temp_dir.name, extensions=[".jpeg", ".mp4"], keep_zero=False
-        )
-        expected = Counter({".jpeg": 1, ".mp4": 1})
-        self.assertEqual(result, expected)
+        # Test files with the same name in different subdirectories of the source directory
+        with tempfile.TemporaryDirectory() as source_dir, tempfile.TemporaryDirectory() as target_dir:
+            Path(f"{source_dir}/subdir1").mkdir()
+            Path(f"{source_dir}/subdir2").mkdir()
+            extensions = [".txt", ".docx", ".xlsx", ".csv"]
+            # Create files with the same name in different subdirectories
+            for ext in extensions:
+                (Path(f"{source_dir}/subdir1") / f"file{ext}").touch()
+                (Path(f"{source_dir}/subdir2") / f"file{ext}").touch()
+            result = task_func(source_dir, target_dir)
+            self.assertEqual(
+                result,
+                8,
+                "Should correctly move files with the same name from different source directories.",
+            )
     def test_case_7(self):
-        # Test custom extensions
-        file_names = ["file1.txt", "file2.docx"]
-        self.create_test_files(self.temp_dir.name, file_names)
-        result = task_func(self.temp_dir.name, keep_zero=False)
-        expected = Counter(
-            {".txt": 1, ".docx": 1}
-        )  # .xlsx and .csv are omitted because their count is 0 and keep_zero is False
-        self.assertEqual(result, expected)
+        # Test handling of invalid path inputs
+        source_dir = "/path/does/not/exist"
+        with tempfile.TemporaryDirectory() as target_dir:
+            with self.assertRaises(FileNotFoundError):
+                task_func(source_dir, target_dir)
     def test_case_8(self):
-        # Test case sensitivity
-        file_names = ["file1.txt", "file1.tXt", "fiLE.txt", "fiLE.TXt"]
-        self.create_test_files(self.temp_dir.name, file_names)
-        result = task_func(self.temp_dir.name, extensions=[".txt"])
-        expected = Counter({".txt": 2})
-        self.assertEqual(result, expected)
+        # Test file renaming when handling duplicate files
+        with tempfile.TemporaryDirectory() as source_dir, tempfile.TemporaryDirectory() as target_dir:
+            extensions = self.valid_extensions
+            for i, ext in enumerate(extensions):
+                filename = f"file_{i}{ext}"
+                # Create duplicate files in the source directory
+                Path(os.path.join(source_dir, filename)).touch()
+                # Create expected duplicate files in the target directory to force renaming
+                Path(os.path.join(target_dir, filename)).touch()
+            result = task_func(source_dir, target_dir)
+            self.assertEqual(result, len(extensions), "Should have moved all files.")
+            # Check if files were renamed correctly to avoid overwriting
+            expected_files = [f"file_{i}-1{ext}" for i, ext in enumerate(extensions)]
+            actual_files = [Path(f).name for f in glob.glob(f"{target_dir}/*")]
+            for expected_file in expected_files:
+                self.assertIn(
+                    expected_file,
+                    actual_files,
+                    f"{expected_file} was not found in target directory.",
+                )

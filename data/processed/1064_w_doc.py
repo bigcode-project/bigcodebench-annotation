@@ -1,116 +1,82 @@
-import pandas as pd
 from matplotlib import pyplot as plt
+from sklearn.decomposition import PCA
 
 
 def task_func(arr):
     """
-    Calculate the sum of each row in a 2D numpy array and plot these sums as a time series.
+    Performs Principal Component Analysis (PCA) on the sum of rows of a 2D numpy array and plots the explained variance ratio.
 
-    This function takes a 2D numpy array and computes the sum of elements in each row. It
-    then creates a Pandas DataFrame with these row sums and plots them as a time series,
-    using dates starting from January 1, 2020, for each row.
+    Note:
+    - The title of the plot is set to "Explained Variance Ratio of Principal Components".
 
     Parameters:
-    arr (numpy.ndarray): A 2D numpy array.
+    - arr (numpy.ndarray): A 2D numpy array. The input data for PCA.
 
     Returns:
-    matplotlib.axes._axes.Axes: A plot representing the time series of row sums.
+    - ax (matplotlib.axes.Axes): An Axes object from matplotlib.
 
     Requirements:
-    - pandas
+    - scikit-learn
     - matplotlib
 
-    Handling Scenarios:
-    - For non-empty arrays: The function computes the sum of elements for each row, 
-    stores these sums in a Pandas DataFrame, and then plots them. Each row in the plot represents 
-    the sum for a specific day, starting from January 1, 2020.
-    - For empty arrays: The function creates an empty plot with the 
-    title 'Time Series of Row Sums' but without data. This is achieved by checking if the array size 
-    is zero (empty array) and if so, creating a subplot without any data.
-    
-    Note: 
-    - The function uses 'pandas' for DataFrame creation and 'matplotlib.pyplot' for plotting. 
-    The dates in the plot start from January 1, 2020, and each subsequent row represents the next day.
+    Notes:
+    - The function assumes that 'arr' is a valid 2D numpy array.
+    - Only the first principal component is considered in this analysis.
+    - The plot illustrates the proportion of the dataset's variance that lies along the axis of this first principal component.
     
     Example:
-    >>> arr = np.array([[i + j for i in range(3)] for j in range(5)])
-    >>> ax = task_func(arr)
-    >>> ax.get_title()
-    'Time Series of Row Sums'
+    >>> import numpy as np
+    >>> arr = np.array([[i+j for i in range(3)] for j in range(5)])
+    >>> axes = task_func(arr)
+    >>> axes.get_title()
+    'Explained Variance Ratio of Principal Components'
     """
-    if not arr.size:  # Check for empty array
-        _, ax = plt.subplots()
-        ax.set_title("Time Series of Row Sums")
-        return ax
     row_sums = arr.sum(axis=1)
-    df = pd.DataFrame(row_sums, columns=["Sum"])
-    df.index = pd.date_range(start="1/1/2020", periods=df.shape[0])
-    ax = df.plot(title="Time Series of Row Sums")
+    pca = PCA(n_components=1)
+    pca.fit(row_sums.reshape(-1, 1))
+    _, ax = plt.subplots()
+    ax.bar([0], pca.explained_variance_ratio_)
+    ax.set_title("Explained Variance Ratio of Principal Components")
+    ax.set_xticks([0])
+    ax.set_xticklabels(["PC1"])
     return ax
 
 import unittest
 import numpy as np
-import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from matplotlib import pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for the function task_func."""
+    """Tests for function task_func."""
     def test_basic_functionality(self):
-        """Test the basic functionality of the function."""
+        """Test basic functionality of task_func."""
         arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        ax = task_func(arr)
-        # Check if the function returns Axes object
-        self.assertIsInstance(ax, plt.Axes)
-        # Check the title of the plot
-        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
-        # Check if the data plotted matches the expected sum of rows
-        y_data = [line.get_ydata() for line in ax.get_lines()][0]
-        expected_sums = arr.sum(axis=1)
-        np.testing.assert_array_equal(y_data, expected_sums)
-    def test_empty_array(self):
-        """Test the function with an empty array."""
+        result = task_func(arr)
+        self.assertIsInstance(result, plt.Axes)
+    def test_plot_title_verification(self):
+        """Test that the plot title is correct."""
+        arr = np.array([[i + j for i in range(3)] for j in range(5)])
+        result = task_func(arr)
+        self.assertEqual(
+            result.get_title(), "Explained Variance Ratio of Principal Components"
+        )
+    def test_bar_count_verification(self):
+        """Test that the number of bars is correct."""
+        arr = np.array([[i + j for i in range(3)] for j in range(5)])
+        result = task_func(arr)
+        n_components = min(2, arr.sum(axis=1).reshape(-1, 1).shape[1])
+        self.assertEqual(len(result.patches), n_components)
+    def test_variance_ratios_verification(self):
+        """Test that the variance ratios are correct."""
+        arr = np.array([[i + j for i in range(3)] for j in range(5)])
+        row_sums = arr.sum(axis=1)
+        n_components = min(2, row_sums.reshape(-1, 1).shape[1])
+        pca = PCA(n_components=n_components)
+        pca.fit(row_sums.reshape(-1, 1))
+        result = task_func(arr)
+        for bar, variance_ratio in zip(result.patches, pca.explained_variance_ratio_):
+            self.assertAlmostEqual(bar.get_height(), variance_ratio)
+    def test_empty_input(self):
+        """Test that an empty input raises a ValueError."""
         arr = np.array([])
-        ax = task_func(arr)
-        # Check if the function returns Axes object
-        self.assertIsInstance(ax, plt.Axes)
-        # Check the title of the plot
-        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
-        # Check if the data plotted is empty
-        lines = ax.get_lines()
-        self.assertEqual(len(lines), 0)
-    def test_single_row_array(self):
-        """Test the function with a single row array."""
-        arr = np.array([[1, 2, 3]])
-        ax = task_func(arr)
-        # Check if the function returns Axes object
-        self.assertIsInstance(ax, plt.Axes)
-        # Check the title of the plot
-        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
-        # Check if the data plotted matches the expected sum of the single row
-        y_data = [line.get_ydata() for line in ax.get_lines()][0]
-        expected_sum = arr.sum(axis=1)
-        np.testing.assert_array_equal(y_data, expected_sum)
-    def test_negative_values(self):
-        """Test the function with negative values."""
-        arr = np.array([[-1, -2, -3], [-4, -5, -6]])
-        ax = task_func(arr)
-        # Check if the function returns Axes object
-        self.assertIsInstance(ax, plt.Axes)
-        # Check the title of the plot
-        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
-        # Check if the data plotted matches the expected sum of rows
-        y_data = [line.get_ydata() for line in ax.get_lines()][0]
-        expected_sums = arr.sum(axis=1)
-        np.testing.assert_array_equal(y_data, expected_sums)
-    def test_zero_values(self):
-        """Test the function with zero values."""
-        arr = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
-        ax = task_func(arr)
-        # Check if the function returns Axes object
-        self.assertIsInstance(ax, plt.Axes)
-        # Check the title of the plot
-        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
-        # Check if the data plotted matches the expected sum of rows
-        y_data = [line.get_ydata() for line in ax.get_lines()][0]
-        expected_sums = arr.sum(axis=1)
-        np.testing.assert_array_equal(y_data, expected_sums)
-    def tearDown(self):
-        plt.close()
+        with self.assertRaises(ValueError):
+            task_func(arr)

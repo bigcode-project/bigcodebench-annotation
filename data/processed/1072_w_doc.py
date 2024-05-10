@@ -1,91 +1,112 @@
-import pandas as pd
+import matplotlib.pyplot as plt
+from itertools import cycle
+import numpy as np
 from random import shuffle
 
-# Constants
-POSSIBLE_VALUES = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
+COLORS = ["b", "g", "r", "c", "m", "y", "k"]
 
 
 def task_func(list_of_lists):
     """
-    Generate a list of pandas DataFrames, each created from a sublist in 'list_of_lists'.
-    Each DataFrame has columns named as per the elements of the sublist, and each column
-    is filled with randomly shuffled values from 'POSSIBLE_VALUES'.
+    Plots a series of lines for each list in `list_of_lists`. Each line is plotted with shuffled y-values
+    and sequential x-values starting from 1. The function shuffles the y-values of each inner list before plotting.
+    Each line is plotted with a different color from a predetermined set of colors. The function cycles through 
+    these colors for each inner list.
 
     Parameters:
-    - list_of_lists (list of list): A list where each element is a list of strings
-    representing column names for a DataFrame.
+    - list_of_lists (list of list): A list of lists where each inner
+    list represents a set of y-values to be shuffled and plotted. The x-values are automatically
+    generated as a sequence starting from 1 up to the length of the inner list.
 
     Returns:
-    - list of pandas.DataFrame: A list where each element is a DataFrame with columns as specified
-    in 'list_of_lists', and each column contains shuffled values from 'POSSIBLE_VALUES'.
+    - tuple: A tuple containing the figure and axes objects of the plotted graph.
 
     Requirements:
-    - pandas
-    - random.shuffle
-
-    Note:
-    - The length of each DataFrame's columns is equal to the length of 'POSSIBLE_VALUES'.
-    - Each column in the DataFrame has the same shuffled order of 'POSSIBLE_VALUES'.
+    - matplotlib
+    - itertools
+    - numpy
+    - random
 
     Example:
     >>> import random
     >>> random.seed(0)
-    >>> dfs = task_func([['x', 'y', 'z'], ['a', 'b', 'c']])
-    >>> dfs[0].head()
-       x  y  z
-    0  H  J  H
-    1  I  E  A
-    2  B  I  J
-    3  F  G  D
-    4  D  A  C
+    >>> fig, ax = task_func([[1, 2, 3], [4, 5, 6]])
+    >>> ax.lines[0].get_color()
+    (0.0, 0.0, 1.0, 1)
+
+    Note:
+    - If an inner list is empty, it will be skipped and no line will be plotted for it.
+    - The colors are reused cyclically if there are more inner lists than colors available.
+    - The shuffling of y-values is random and different each time the function is called,
+      unless a random seed is set externally.
+    - The function uses a default set of colors defined in the COLORS constant.
     """
-    dataframes = []
+    fig, ax = plt.subplots()
+    color_cycle = cycle(COLORS)
     for list_ in list_of_lists:
-        df_dict = {col: POSSIBLE_VALUES.copy() for col in list_}
-        for col in df_dict:
-            shuffle(df_dict[col])
-        df = pd.DataFrame(df_dict)
-        dataframes.append(df)
-    return dataframes
+        y_values = np.arange(1, len(list_) + 1)
+        shuffle(y_values)
+        ax.plot(y_values, next(color_cycle))
+    return fig, ax
 
 import unittest
-import pandas as pd
+from matplotlib.figure import Figure
+from matplotlib.axes import Axes
+import matplotlib.colors as mcolors
 import random
 class TestCases(unittest.TestCase):
-    """Test cases for task_func function."""
-    def test_dataframe_count(self):
-        """Test number of dataframes returned."""
+    """Tests for the function task_func."""
+    def test_return_types(self):
+        """Check that the function returns the correct types."""
         random.seed(0)
-        input_data = [["x", "y"], ["a", "b", "c"], ["m"]]
-        dfs = task_func(input_data)
-        self.assertEqual(len(dfs), len(input_data))
-    def test_dataframe_columns(self):
-        """Test each dataframe has correct columns."""
+        fig, ax = task_func([["x", "y", "z"], ["a", "b", "c"]])
+        self.assertIsInstance(
+            fig,
+            Figure,
+            "The first return value should be an instance of matplotlib.figure.Figure.",
+        )
+        self.assertIsInstance(
+            ax,
+            Axes,
+            "The second return value should be an instance of matplotlib.axes._axes.Axes.",
+        )
+    def test_number_of_lines(self):
+        """Check that the correct number of lines are plotted."""
         random.seed(1)
-        input_data = [["x", "y"], ["a", "b", "c"], ["m"]]
-        dfs = task_func(input_data)
-        for idx, df in enumerate(dfs):
-            self.assertListEqual(list(df.columns), input_data[idx])
-    def test_dataframe_values(self):
-        """Test values in each dataframe column are from the POSSIBLE_VALUES list."""
+        _, ax = task_func([["x", "y", "z"], ["a", "b", "c"]])
+        self.assertEqual(
+            len(ax.lines), 2, "There should be 2 lines plotted for 2 lists."
+        )
+        _, ax = task_func([["x", "y", "z"]])
+        self.assertEqual(len(ax.lines), 1, "There should be 1 line plotted for 1 list.")
+    def test_color_cycle(self):
+        """Check that the colors of the plotted lines follow the specified cycle."""
         random.seed(2)
-        input_data = [["x", "y"], ["a", "b", "c"], ["m"]]
-        dfs = task_func(input_data)
-        for df in dfs:
-            for col in df.columns:
-                self.assertTrue(all(val in POSSIBLE_VALUES for val in df[col].values))
-    def test_empty_input(self):
-        """Test function with an empty list of lists."""
+        _, ax = task_func([["x"], ["y"], ["z"], ["a"], ["b"], ["c"], ["d"], ["e"]])
+        expected_colors = ["b", "g", "r", "c", "m", "y", "k", "b"]
+        # Convert color codes to RGBA format
+        expected_colors_rgba = [mcolors.to_rgba(c) for c in expected_colors]
+        actual_colors_rgba = [line.get_color() for line in ax.lines]
+        self.assertEqual(
+            actual_colors_rgba,
+            expected_colors_rgba,
+            "The colors of the plotted lines should follow the specified cycle.",
+        )
+    def test_y_values(self):
+        """Check that the y-values are shuffled."""
         random.seed(3)
-        dfs = task_func([])
-        self.assertEqual(len(dfs), 0)
-    def test_single_list_input(self):
-        """Test function with a single list input."""
+        _, ax = task_func([["x", "y", "z"]])
+        y_data = ax.lines[0].get_ydata()
+        self.assertTrue(
+            set(y_data) == {1, 2, 3},
+            "The y-values should be shuffled numbers from the range [1, len(list)].",
+        )
+    def test_empty_input(self):
+        """Check that no lines are plotted for an empty input list."""
         random.seed(4)
-        input_data = [["x", "y", "z"]]
-        dfs = task_func(input_data)
-        self.assertEqual(len(dfs), 1)
-        self.assertListEqual(list(dfs[0].columns), input_data[0])
-        self.assertTrue(all(val in POSSIBLE_VALUES for val in dfs[0]["x"].values))
-        self.assertTrue(all(val in POSSIBLE_VALUES for val in dfs[0]["y"].values))
-        self.assertTrue(all(val in POSSIBLE_VALUES for val in dfs[0]["z"].values))
+        _, ax = task_func([])
+        self.assertEqual(
+            len(ax.lines),
+            0,
+            "There should be no lines plotted for an empty input list.",
+        )

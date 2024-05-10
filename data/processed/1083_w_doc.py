@@ -1,96 +1,81 @@
 import pandas as pd
-import seaborn as sns
+from scipy.stats import pearsonr
 
 
-def task_func(data=None):
+def task_func(data):
     """
-    Converts string-formatted weights to floats and plots a scatter plot of weight against height.
+    Calculates the Pearson correlation coefficient between numerical scores and categorical grades.
 
-    This function takes a dictionary with two keys: 'Weight_String' and 'Height'. The 'Weight_String' key should 
-    contain a list of weight values in string format, while the 'Height' key should have a list of corresponding 
-    height values in numerical format. If the input dictionary is not provided, the function uses a default dataset.
-    The function then converts the string-formatted weights into float, and plots a scatter plot to visualize 
-    the relationship between weight and height.
-       
+    This function performs three main tasks:
+    1. Converts scores from string format to floats.
+    2. Encodes categorical grades into numerical values based on their rank order.
+    3. Computes the Pearson correlation coefficient between the numerical scores and the encoded grades.
+
     Parameters:
-    - data (dict, optional): A dictionary with keys 'Weight_String' and 'Height'. 'Weight_String' is expected to be 
-                           a list of weight values in string format (e.g., ['60.5', '65.7']), and 'Height' is expected 
-                           to be a list of corresponding numerical height values (e.g., [160, 165]). If no dictionary 
-                           is provided, a default dataset with predetermined values is used.
-                           Default dictionary:
-                           {
-                               'Weight_String': ['60.5', '65.7', '70.2', '75.9', '80.1'],
-                               'Height': [160, 165, 170, 175, 180]
-                           }
+    - data (dict): A dictionary containing two keys:
+                 - 'Score_String': A list of scores in string format.
+                 - 'Grade': A list of corresponding grades in string format.
+                 Each list under these keys must have the same length.
 
     Returns:
-    - ax (matplotlib.axes._axes.Axes): A scatter plot with weight on the x-axis and height on the y-axis, titled "Weight vs Height".
-
-    Raises:
-    - ValueError: If any of the values in the 'Weight_String' key are not formatted as strings. This validation ensures 
-                that the weight data is in the expected format for conversion to float.
+    - correlation (float): The Pearson correlation coefficient between the converted numerical scores and encoded grades.
+           Returns NaN if the input data frame has less than 2 rows, as the correlation coefficient cannot be calculated in this case.
 
     Requirements:
     - pandas
-    - seaborn
+    - scipy
 
     Example:
-    >>> ax = task_func()
-    >>> print(ax.get_title())
-    Weight vs Height
+    >>> round(task_func({'Score_String': ['80.5', '85.7', '90.2'], 'Grade': ['B', 'B+', 'A-']}),2)
+    -0.46
     """
-    if data is None:
-        data = {
-            "Weight_String": ["60.5", "65.7", "70.2", "75.9", "80.1"],
-            "Height": [160, 165, 170, 175, 180],
-        }
     df = pd.DataFrame(data)
-    if not all(isinstance(weight, str) for weight in df["Weight_String"]):
-        raise ValueError("Weights must be provided as strings.")
-    df["Weight_Float"] = df["Weight_String"].astype(float)
-    ax = sns.scatterplot(data=df, x="Weight_Float", y="Height")
-    ax.set_title("Weight vs Height")
-    return ax
+    if len(df) < 2:  # Check if the data frame has less than 2 rows
+        return float("nan")  # or return None
+    df["Score_Float"] = df["Score_String"].astype(float)
+    df["Grade_Encoded"] = df["Grade"].astype("category").cat.codes
+    correlation = pearsonr(df["Score_Float"], df["Grade_Encoded"])[0]
+    return correlation
 
 import unittest
 import pandas as pd
-from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
     """Test cases for task_func"""
-    def test_default_data(self):
-        """Test task_func with its default data."""
-        result = task_func()
-        self.assertIsInstance(result, Axes)
-    def test_custom_data(self):
-        """Test task_func with custom data."""
-        custom_data = {
-            "Weight_String": ["50.5", "55.7", "60.2"],
-            "Height": [150, 155, 160],
-        }
-        result = task_func(custom_data)
-        self.assertIsInstance(result, Axes)
-    def test_incorrect_data_type(self):
-        """Test task_func with incorrect data types in Weight_String."""
-        incorrect_data = {
-            "Weight_String": [
-                60.5,
-                65.7,
-                70.2,
-            ],  # Intentionally using floats instead of strings
-            "Height": [160, 165, 170],
-        }
+    def test_normal_operation(self):
+        """
+        Test normal operation with valid input.
+        """
+        data = {"Score_String": ["80.5", "85.7", "90.2"], "Grade": ["B", "B+", "A-"]}
+        result = task_func(data)
+        self.assertIsInstance(result, float)
+    def test_empty_input(self):
+        """
+        Test the function with empty input.
+        """
+        data = {"Score_String": [], "Grade": []}
+        result = task_func(data)
+        self.assertTrue(pd.isna(result))
+    def test_invalid_score_format(self):
+        """
+        Test the function with invalid score format.
+        """
+        data = {"Score_String": ["eighty", "85.7", "90.2"], "Grade": ["B", "B+", "A-"]}
         with self.assertRaises(ValueError):
-            task_func(incorrect_data)
-    def test_empty_data(self):
-        """Test task_func with empty data."""
-        empty_data = {"Weight_String": [], "Height": []}
-        result = task_func(empty_data)
-        self.assertIsInstance(result, Axes)
-    def test_mismatched_data_length(self):
-        """Test task_func with mismatched lengths of Weight_String and Height."""
-        mismatched_data = {
-            "Weight_String": ["60.5", "65.7"],  # Less weights than heights
-            "Height": [160, 165, 170],
-        }
+            task_func(data)
+    def test_mismatched_lengths(self):
+        """
+        Test the function with mismatched lengths of scores and grades.
+        """
+        data = {"Score_String": ["80.5", "85.7"], "Grade": ["B", "B+", "A-"]}
         with self.assertRaises(ValueError):
-            task_func(mismatched_data)
+            task_func(data)
+    def test_non_ordinal_grades(self):
+        """
+        Test the function with non-ordinal grade inputs.
+        """
+        data = {
+            "Score_String": ["80.5", "85.7", "90.2"],
+            "Grade": ["Pass", "Fail", "Pass"],
+        }
+        result = task_func(data)
+        self.assertIsInstance(result, float)

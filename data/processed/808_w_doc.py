@@ -1,92 +1,87 @@
-import re
-import nltk
-nltk.download('stopwords')
+import numpy as np
+from scipy.stats import norm
 
-from nltk.corpus import stopwords
 
-from collections import Counter
-
-# Constants
-STOPWORDS = set(stopwords.words('english'))
-
-def task_func(text, n=2):
+def task_func(data: np.ndarray, threshold: float = 2.0) -> list:
     """
-    Remove duplicate and stopwords from a string "text."
-    Then, generate a count of n-grams (default is bigrams) in the text.
+    Determine the outlier indices in a 1D numpy array based on the Z score.
 
+    First a normal distribution is fitted to the data, the mean and standard
+    deviation is used to calculate the z scores of each datapoint. 
+    If the absolute z score of a datapoint is larger than threshold it is
+    considered an outlier and its index is recorded.
+
+    If the standard deviation is 0, an empty list is returned as outliers. 
+    
     Parameters:
-    - text (str): The text string to analyze.
-    - n (int): The size of the n-grams.
+    data (numpy.ndarray): The 1D numpy array to check for outliers.
+    threshold (float): The outlier threshold. Defaults to 2.
 
     Returns:
-    - dict: The count of the n-grams in the text.
+    list: The indices of outliers in the data where Z score > threshold. Empty if standard deviation is 0
+    float: The mean of the fitted normal distribution.
+    float: The variance of the fitted normal distribution.
 
     Requirements:
-    - re
-    - nltk.corpus.stopwords
-    - collections.Counter
+    - numpy 
+    - scipy.stats.norm
 
     Example:
-    >>> text = "The quick brown fox jumps over the lazy dog and the dog was not that quick to respond."
-    >>> ngrams = task_func(text)
-    >>> print(ngrams)
-    Counter({('quick', 'brown'): 1, ('brown', 'fox'): 1, ('fox', 'jumps'): 1, ('jumps', 'lazy'): 1, ('lazy', 'dog'): 1, ('dog', 'dog'): 1, ('dog', 'quick'): 1, ('quick', 'respond'): 1})
+    >>> data = np.array([1, 2, 3, 4, 5, 6, 100])
+    >>> task_func(data)
+    ([6], 17.285714285714285, 1142.7755102040817)
+    
+    >>> data = np.array([-10, 3, 5, 5, 5, 5, 5, 7, 20])
+    >>> outliers, mean, var = task_func(data, threshold=4)
+    >>> print(outliers)
+    []
+    >>> print(mean)
+    5.0
+    >>> print(var)
+    50.888888888888886
+
+      
     """
-    text = re.sub(r'[^\w\s]', '', text)  # Remove all punctuation
-    text = re.sub(r'\s+', ' ', text)  # Normalize whitespace
-    words = [word.lower() for word in text.split() if word.lower() not in STOPWORDS]
-    ngrams = zip(*[words[i:] for i in range(n)])
-    return Counter(ngrams)
+    mean, std_dev = norm.fit(data)
+    if std_dev == 0:
+        return [], mean, std_dev**2
+    z_scores = (data - mean) / std_dev
+    outliers = np.where(np.abs(z_scores) > threshold)
+    return list(outliers[0]), mean, std_dev**2
 
 import unittest
-from collections import Counter
-import string
+import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        """
-        Test Case 1: Simple Text
-        - Input: A simple text string with no duplicated words or stopwords
-        - Expected Output: A Counter object with the count of each bigram
-        """
-        text = "The quick brown fox jumps over the lazy dog."
-        result = task_func(text)
-        expected = Counter({('quick', 'brown'): 1, ('brown', 'fox'): 1, ('fox', 'jumps'): 1, ('jumps', 'lazy'): 1, ('lazy', 'dog'): 1})
-        self.assertEqual(result, expected)
+        data = np.array([1, 2, 3, 4, 5, 6, 100])
+        result, mean, var = task_func(data)
+        self.assertEqual(result, [6])
+        self.assertAlmostEqual(mean, 17.2, delta=0.1)
+        self.assertAlmostEqual(var, 1142.78, delta=0.1)
     def test_case_2(self):
-        """
-        Test Case 2: Text with Duplicated Words
-        - Input: A text string with duplicated consecutive words
-        - Expected Output: A Counter object with the count of each bigram, excluding duplicated words
-        """
-        text = "This is is a simple simple test test."
-        result = task_func(text)
-        expected = Counter({('simple', 'simple'): 1, ('simple', 'test'): 1, ('test', 'test'): 1})
-        self.assertEqual(result, expected)
+        data = np.array([1, 2, 3, 4, 5, 6, 7])
+        result, mean, var = task_func(data)
+        self.assertEqual(result, [])
+        self.assertAlmostEqual(mean, 4, delta=0.1)
+        self.assertAlmostEqual(var, 4, delta=0.1)
     def test_case_3(self):
-        """
-        Test Case 3: Text with Stopwords
-        - Input: A text string with common English stopwords
-        - Expected Output: A Counter object with the count of each bigram, excluding stopwords
-        """
-        text = "This is a test of the function."
-        result = task_func(text)
-        expected = Counter({('test', 'function'): 1})
-        self.assertEqual(result, expected)
+        data = np.array([5, 5, 5, 5, 5])
+        result, mean, var = task_func(data)
+        self.assertEqual(result, [])
+        self.assertAlmostEqual(mean, 5, delta=0.1)
+        self.assertAlmostEqual(var, 0, delta=0.1)
     def test_case_4(self):
-        # This test involves punctuation; ensure punctuation handling is consistent with function logic
-        text = "Hello, world!"
-        result = task_func(text)
-        expected = Counter({
-            ('hello', 'world'): 1
-        })
-        self.assertEqual(result, expected)
+        from faker import Faker
+        fake = Faker()
+        fake.seed_instance(12)
+        data = np.array([fake.random_int(min=0, max=100) for _ in range(10000)])
+        result, mean, var = task_func(data)
+        self.assertEqual(len(result), 0)
+        self.assertAlmostEqual(mean, 50.28, delta=0.1)
+        self.assertAlmostEqual(var, 842.86, delta=0.1)
     def test_case_5(self):
-        """
-        Test Case 5: Empty Text
-        - Input: An empty text string
-        - Expected Output: An empty Counter object
-        """
-        text = ""
-        result = task_func(text)
-        expected = Counter()
-        self.assertEqual(result, expected)
+        data = np.array([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 50])
+        result, mean, var = task_func(data, threshold=0.5)
+        self.assertEqual(result, [0, 1, 2, 11])
+        self.assertAlmostEqual(mean, 4.17, delta=0.1)
+        self.assertAlmostEqual(var, 200.14, delta=0.1)

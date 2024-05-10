@@ -1,103 +1,112 @@
+import sqlite3
 import pandas as pd
-
-import pandas as pd
-import random
+import os
 
 
-def task_func(csv_file, column_name='data', pattern='\d+[xX]', sample_size=None, seed=42):
-    """ 
-    Search for matches with a specified regex pattern in a given column of a CSV file and optionally return a random sample of these matches.
+def task_func(db_file, table_name, column_name, pattern='\d+[xX]'):
+    """
+    Find all matches with a regex pattern in a list of strings in an SQL database.
     
-    The random sampling is implemented by generating a random list of integers which are used as indices.
-    The number of generated indices is given by sample_size.
-    
+    The function loads an sql database and selects all entries from the specified
+    table. Matches are returned in a DataFrame.
 
     Parameters:
-    csv_file (str): Path to the CSV file.
-    column_name (str, optional): The name of the column to search. Defaults to 'data'.
+    db_file (str): The SQLite database file.
+    table_name (str): The name of the table to search.
+    column_name (str): The name of the column to search.
     pattern (str, optional): The regex pattern to search for. Defaults to '\d+[xX]'.
-    sample_size (int, optional): Number of random samples to return from the matches. If None, all matches are returned. Defaults to None.
-    seed (int, optional): Seed for the random number generator for reproducibility. Defaults to 42.
-    
+
     Returns:
-    DataFrame: A pandas DataFrame containing either all the rows with matches or a random sample of them.
-    
+    DataFrame: A pandas DataFrame with the matches.
+        
+    Raises:
+    ValueError: If db_file does not exist.
+
     Requirements:
+    - sqlite3
     - pandas
-    - random: for generating the random list of indices
-    
+    - os
+        
     Example:
-    >>> result = task_func('sample.csv', column_name='data', pattern='\d+[xX]', sample_size=10, seed=42)
-    >>> print(result)
-            index                                               data
-    210    211  Fund several agency oil. Evening plant thank t...
-    45      46  Language interest four take old. Education if ...
-    525    526  Action million cultural stand. Heart explain a...
-    465    466  Security face clearly every could. Image beaut...
-    430    431  Popular produce floor part soldier human. Youn...
-    260    261  Customer game focus respond that central. Nigh...
-    195    196  The writer parent. Life social house west ten ...
-    165    166  Main hotel production nothing.\r\nCoach voice ...
-    810    811  Early right nature technology. Conference mind...
-    60      61  Interest require gas wall. Different it see fi...
+    >>> result = task_func('task_func_data_simon/sample.db', 'test_table', 'test_column')
+    >>> print(result.head(10))
+        id              test_column
+    0    1                  4x4 car
+    1    2           New 3x3 puzzle
+    3    4  Product with 5X feature
+    55  56                   1xsafe
+    56  57                 3xmother
+    57  58                  5xenjoy
+    58  59                   2xhome
+    59  60                 3xanswer
+    60  61                   5xgirl
+    61  62                   5xkind
     """
-    df = pd.read_csv(csv_file)
-    matches = df[df[column_name].str.contains(pattern, na=False)]
-    if sample_size is not None:
-        random.seed(seed)  # Set the seed for reproducibility
-        sample_size = min(sample_size, len(matches))  # Ensure sample size is not greater than the number of matches
-        sampled_indices = random.sample(range(len(matches)), sample_size)  # Randomly select indices
-        matches = matches.iloc[sampled_indices]  # Select rows corresponding to sampled indices
+    if not os.path.isfile(db_file):
+        raise ValueError('db_file does not exist.')
+    conn = sqlite3.connect(db_file)
+    df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
+    if df[column_name].dtype == 'object':  # Check if the column data type is a string
+        matches = df[df[column_name].str.contains(pattern)]
+    else:
+        matches = pd.DataFrame(columns=df.columns)  # Return an empty DataFrame
     return matches
 
 import unittest
+import sqlite3
 import pandas as pd
-import tempfile
-import shutil
 import os
+import tempfile
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Create a temporary directory to store the test CSV files
+        # Create a temporary directory to hold the database
         self.test_dir = tempfile.mkdtemp()
-        self.test_file = os.path.join(self.test_dir, "test_data.csv")
-        # Create a sample DataFrame
-        data = {
-            "data": ["123x good", "no match here", "456X bad", "789x good", "ABC"],
-            "other_column": ["data1", "data2", "data3", "data4", "data5"]
-        }
-        self.df = pd.DataFrame(data)
-        self.df.to_csv(self.test_file, index=False)
+        self.db_path = os.path.join(self.test_dir, "test.db")
+        # Set up a new database and populate it with initial data
+        self.conn = sqlite3.connect(self.db_path)
+        self.conn.execute("CREATE TABLE test_table (id INTEGER PRIMARY KEY, test_column TEXT)")
+        data = [
+            (1, "4x4 car"),
+            (2, "New 3x3 puzzle"),
+            (3, "Product with 5X feature"),
+            (4, "1xsafe"),
+            (5, "3xmother")
+        ]
+        self.conn.executemany("INSERT INTO test_table (id, test_column) VALUES (?, ?)", data)
+        self.conn.commit()
     def tearDown(self):
-        # Remove temporary directory after the test
-        shutil.rmtree(self.test_dir)
-    def test_default_parameters(self):
-        result = task_func(self.test_file)
-        expected_data = {
-            "data": ["123x good", "456X bad", "789x good"],
-            "other_column": ["data1", "data3", "data4"]
-        }
-        expected_df = pd.DataFrame(expected_data)
-        pd.testing.assert_frame_equal(result.reset_index(drop=True), expected_df)
-    def test_custom_column(self):
-        with self.assertRaises(KeyError):
-            task_func(self.test_file, column_name="nonexistent_column")
-    def test_custom_pattern(self):
-        result = task_func(self.test_file, pattern='\d+X')
-        expected_data = {
-            "data": ["456X bad"],
-            "other_column": ["data3"]
-        }
-        expected_df = pd.DataFrame(expected_data)
-        pd.testing.assert_frame_equal(result.reset_index(drop=True), expected_df)
-    def test_sample_size(self):
-        result = task_func(self.test_file, sample_size=2, seed=42)
-        self.assertEqual(len(result), 2)
+        # Close the connection and remove the temporary directory
+        self.conn.close()
+        os.remove(self.db_path)
+        os.rmdir(self.test_dir)
+    def test_regular_expression_match(self):
+        # Test case with known data and expected matches
+        result = task_func(self.db_path, 'test_table', 'test_column')
+        expected = pd.DataFrame({
+            'id': [1, 2, 3, 4, 5],
+            'test_column': ['4x4 car', 'New 3x3 puzzle', 'Product with 5X feature', '1xsafe', '3xmother']
+        }, index=[0, 1, 2, 3, 4])
+        pd.testing.assert_frame_equal(result, expected)
     def test_no_matches(self):
-        result = task_func(self.test_file, pattern="nope")
+        # Test case where no entries match the pattern
+        result = task_func(self.db_path, 'test_table', 'test_column', pattern='abc')
         self.assertTrue(result.empty)
-    def test_sample_size_larger_than_matches(self):
-        result = task_func(self.test_file, sample_size=10)
-        self.assertEqual(len(result), 3)  # Only three matches exist
-    def test_zero_sample_size(self):
-        result = task_func(self.test_file, sample_size=0)
-        self.assertTrue(result.empty)
+    def test_non_existent_table(self):
+        # Catch the OperationalError from sqlite directly
+        with self.assertRaises(Exception):
+            task_func(self.db_path, 'fake_table', 'test_column')
+    def test_non_existent_column(self):
+        # Catch the correct exception for non-existent column
+        with self.assertRaises(KeyError):
+            task_func(self.db_path, 'test_table', 'fake_column')
+    def test_different_pattern(self):
+        # Test case with a different pattern
+        self.conn.execute("INSERT INTO test_table (id, test_column) VALUES (?, ?)", (6, "something 1ab2x"))
+        self.conn.commit()
+        result = task_func(self.db_path, 'test_table', 'test_column', pattern='1ab2x')
+        result.reset_index(drop=True, inplace=True)  # Resetting index before comparison
+        expected = pd.DataFrame({
+            'id': [6],
+            'test_column': ['something 1ab2x']
+        }, index=[0])
+        pd.testing.assert_frame_equal(result, expected)

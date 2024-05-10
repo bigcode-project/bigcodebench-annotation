@@ -1,108 +1,112 @@
-import pandas as pd
 from datetime import datetime
+import numpy as np
+from dateutil.parser import parse
 
-# Constants
-ROOMS = ["Room1", "Room2", "Room3", "Room4", "Room5"]
+LEAP_SECONDS = np.array(
+    [
+        1972,
+        1973,
+        1974,
+        1975,
+        1976,
+        1977,
+        1978,
+        1979,
+        1980,
+        1981,
+        1982,
+        1983,
+        1985,
+        1988,
+        1990,
+        1993,
+        1994,
+        1997,
+        1999,
+        2006,
+        2009,
+        2012,
+        2015,
+        2016,
+        2020,
+    ]
+)
 
-def task_func(date_str, booking_data):
+
+def task_func(date_str):
     """
-    This function generates a status report of room bookings for a specified date
-    and displays a bar plot representing the booking statuses of various rooms.
-    It validates the provided date, compiles a booking status report, and visualizes
-    the data in a bar plot.
+    Calculate the total number of seconds elapsed from a given date until the current time,
+    including any leap seconds that occurred in this period.
 
     Parameters:
-    - date_str (str): The date for which the booking status needs to be checked,
-                      in "yyyy-mm-dd" format. The function validates this date.
-    - booking_data (dict): A dictionary with room names as keys and booking statuses
-                           as values. The keys should match the rooms listed in the ROOMS constant.
+    date_str (str): The date and time from which to calculate, in "yyyy-mm-dd hh:mm:ss" format.
 
     Returns:
-    - DataFrame: A pandas DataFrame containing booking status for each room.
-    - matplotlib.pyplot.Axes: A matplotlib Axes object for the bar plot of booking statuses.
-
-    Raises:
-    - ValueError: Raised in two scenarios:
-                  1. If `date_str` does not follow the "yyyy-mm-dd" format or is not a valid date.
-                  2. If `date_str` refers to a past date.
+    int: The total number of elapsed seconds, including leap seconds, since the given date.
 
     Requirements:
-    - pandas
-    - datetime
+    - datetime.datetime
+    - numpy
+    - dateutil.parser.parse
+    
+    Note:
+    This function uses the datetime, numpy, and dateutil.parser modules.
+    The LEAP_SECONDS array should contain years when leap seconds were added.
 
     Example:
-    >>> future_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
-    >>> booking_info = {"Room1": "Booked", "Room2": "Available"}
-    >>> report_df, ax = task_func(future_date, booking_info)
-    >>> print(report_df)
-        Room Booking Status
-    0  Room1         Booked
-    1  Room2      Available
-    2  Room3     Not Listed
-    3  Room4     Not Listed
-    4  Room5     Not Listed
+    >>> total_seconds = task_func('1970-01-01 00:00:00')
+    >>> print(total_seconds)
+    1702597276
     """
-    try:
-        date = datetime.strptime(date_str, "%Y-%m-%d")
-        if date < datetime.now():
-            raise ValueError("Date is in the past. Please provide a future date.")
-    except ValueError as e:
-        raise ValueError(f"Invalid date: {e}") from e
-    report_data = [[room, booking_data.get(room, "Not Listed")] for room in ROOMS]
-    report_df = pd.DataFrame(report_data, columns=["Room", "Booking Status"])
-    ax = (
-        report_df["Booking Status"]
-        .value_counts()
-        .plot(kind="bar", title="Booking Statuses for " + date_str)
-    )
-    return report_df, ax
+    given_date = parse(date_str)
+    current_date = datetime.now()
+    total_seconds = (current_date - given_date).total_seconds()
+    leap_seconds = np.sum(LEAP_SECONDS >= given_date.year)
+    total_seconds += leap_seconds
+    return int(total_seconds)
 
 import unittest
-import pandas as pd
 from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
+import numpy as np
 class TestCases(unittest.TestCase):
-    """Test cases for task_func"""
-    def test_future_date_valid_booking_data(self):
+    """Test cases for the function task_func."""
+    def test_recent_date(self):
         """
-        Test task_func with a future date and valid booking data.
+        Test the function with a recent date.
         """
-        future_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
-        booking_data = {"Room1": "Booked", "Room2": "Available"}
-        report_df, _ = task_func(future_date, booking_data)
-        self.assertIn("Room1", report_df["Room"].values)
-        self.assertIn("Booked", report_df["Booking Status"].values)
-    def test_past_date(self):
+        test_date = "2022-01-01 00:00:00"
+        expected_result = (datetime.now() - datetime(2022, 1, 1)).total_seconds()
+        expected_result += np.sum(LEAP_SECONDS >= 2022)
+        self.assertEqual(task_func(test_date), int(expected_result))
+    def test_date_before_leap_seconds(self):
         """
-        Test task_func with a past date to ensure it raises a ValueError.
+        Test the function with a date before the introduction of leap seconds.
         """
-        past_date = "2020-01-01"
-        booking_data = {"Room1": "Booked"}
-        with self.assertRaises(ValueError):
-            task_func(past_date, booking_data)
-    def test_invalid_date_format(self):
+        test_date = "1960-01-01 00:00:00"
+        expected_result = (datetime.now() - datetime(1960, 1, 1)).total_seconds()
+        expected_result += np.sum(LEAP_SECONDS >= 1960)
+        self.assertEqual(task_func(test_date), int(expected_result))
+    def test_date_with_leap_second(self):
         """
-        Test task_func with an invalid date format to check for ValueError.
+        Test the function with a date in a year when a leap second was added.
         """
-        invalid_date = "15-06-2023"
-        booking_data = {"Room1": "Booked"}
-        with self.assertRaises(ValueError):
-            task_func(invalid_date, booking_data)
-    def test_booking_data_for_nonexistent_room(self):
+        test_date = "2016-01-01 00:00:00"
+        expected_result = (datetime.now() - datetime(2016, 1, 1)).total_seconds()
+        expected_result += np.sum(LEAP_SECONDS >= 2016)
+        self.assertAlmostEqual(task_func(test_date), int(expected_result), delta=1)
+    def test_future_date(self):
         """
-        Test task_func with booking data for a room not in the ROOMS constant.
+        Test the function with a future date.
         """
-        future_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
-        booking_data = {"Room6": "Booked"}
-        report_df, _ = task_func(future_date, booking_data)
-        self.assertIn("Not Listed", report_df["Booking Status"].values)
-    def test_no_booking_data(self):
+        future_date = datetime.now() + timedelta(days=30)
+        future_date_str = future_date.strftime("%Y-%m-%d %H:%M:%S")
+        result = task_func(future_date_str)
+        expected_result = -30 * 24 * 3600  # Negative seconds for future dates
+        # Allowing a margin of error of 1 second
+        self.assertTrue(abs(result - expected_result) <= 1)
+    def test_current_date(self):
         """
-        Test task_func with no booking data provided.
+        Test the function with the current date and time.
         """
-        future_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
-        booking_data = {}
-        report_df, _ = task_func(future_date, booking_data)
-        self.assertTrue((report_df["Booking Status"] == "Not Listed").all())
-    def tearDown(self):
-        plt.clf()
+        current_date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.assertEqual(task_func(current_date_str), 0)

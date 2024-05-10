@@ -1,54 +1,71 @@
+import pandas as pd
 import numpy as np
-import random
 
-def task_func(length=10000, seed=0):
+def task_func(d):
     """
-    Generates a random walk of a specified length. A random walk is a path that consists of a series of random steps
-    on some mathematical space. In this case, the steps are either +1 or -1, chosen with equal probability.
-
+    Calculate mean, sum, max, min and standard deviation for the keys "x," "y" and "z" from a list of dictionaries "d."
+    
     Parameters:
-    - length (int): The number of steps in the random walk. Must be a non-negative integer. Default is 10000.
-    - seed (int, optional): An optional seed value to initialize the random number generator. Use this for reproducible results.
-    
-    Requirements:
-    - numpy
-    - random
-    
+    d (list): A list of dictionaries.
+
     Returns:
-    - np.array: A numpy array representing the positions of the walk at each step. Starts at 0.
+    dict: A dictionary with keys as 'x', 'y', and 'z' and values as dictionaries of statistics.
 
     Raises:
-    - ValueError: If `length` is negative.
-    
-    Example:
-    >>> random.seed(0)     # For reproducibility in doctest
-    >>> walk = task_func(5)
-    >>> walk.tolist()
-    [0, 1, 2, 1, 0, 1]
-    """
-    if length < 0:
-        raise ValueError("length must be a non-negative integer")
-    random.seed(seed)
-    steps = [1 if random.random() > 0.5 else -1 for _ in range(length)]
-    walk = np.cumsum([0] + steps)  # Starts at 0
-    return walk
+    - ValueError: If input is not a list of dictionaries.
 
+    Requirements:
+    - pandas
+    - numpy
+
+    Examples:
+    >>> data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
+    >>> task_func(data)
+    {'x': {'mean': 2.0, 'sum': 6, 'max': 3, 'min': 1, 'std': 0.816496580927726}, 'y': {'mean': 8.666666666666666, 'sum': 26, 'max': 15, 'min': 1, 'std': 5.792715732327589}, 'z': {'mean': 6.0, 'sum': 18, 'max': 7, 'min': 5, 'std': 0.816496580927726}}
+    >>> task_func([])
+    {'x': None, 'y': None, 'z': None}
+    >>> task_func([{'a': 1}])
+    {'x': None, 'y': None, 'z': None}
+    """
+    if not isinstance(d, list) or any(not isinstance(item, dict) for item in d):
+        raise ValueError("Input must be a list of dictionaries.")
+    if not d:
+        return {key: None for key in ['x', 'y', 'z']}
+    df = pd.DataFrame(d).fillna(0)  # Replace missing values with 0 to allow computations
+    stats = {}
+    for key in ['x', 'y', 'z']:
+        if key in df.columns:
+            stats[key] = {
+                'mean': np.mean(df[key]),
+                'sum': np.sum(df[key]),
+                'max': np.max(df[key]),
+                'min': np.min(df[key]),
+                'std': np.std(df[key], ddof=0)  # Population standard deviation
+            }
+        else:
+            stats[key] = None
+    return stats
+
+# Test suite
 import unittest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        random.seed(42)  # Setting seed for reproducibility
-    def test_default_length(self):
-        walk = task_func(seed=42)
-        self.assertEqual(len(walk), 10001)  # Includes starting point
-    def test_custom_length(self):
-        walk = task_func(5000, seed=42)
-        self.assertEqual(len(walk), 5001)  # Includes starting point
-    def test_first_step_zero(self):
-        walk = task_func(1, seed=42)
-        self.assertEqual(walk[0], 0)  # First position should be 0
-    def test_negative_length(self):
+    def test_empty_list(self):
+        self.assertEqual(task_func([]), {'x': None, 'y': None, 'z': None})
+    def test_valid_input(self):
+        data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
+        result = task_func(data)
+        self.assertAlmostEqual(result['x']['mean'], 2.0)
+        self.assertAlmostEqual(result['y']['mean'], 8.666666666666666)
+        self.assertAlmostEqual(result['z']['mean'], 6.0)
+    def test_invalid_input_type(self):
         with self.assertRaises(ValueError):
-            task_func(-1)
-    def test_output_type(self):
-        walk = task_func(5, seed=42)
-        self.assertEqual(walk.tolist(), [0, 1, 0, -1, -2, -1])
+            task_func("not a list")
+    def test_partial_keys(self):
+        data = [{'x': 1, 'y': 2}, {'y': 3, 'z': 4}]
+        result = task_func(data)
+        self.assertIsNotNone(result['x'])
+        self.assertIsNotNone(result['y'])
+        self.assertIsNotNone(result['z'])
+    def test_all_keys_missing(self):
+        data = [{'a': 1}, {'b': 2}]
+        self.assertEqual(task_func(data), {'x': None, 'y': None, 'z': None})

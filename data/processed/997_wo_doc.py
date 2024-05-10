@@ -1,173 +1,118 @@
-import os
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
+import requests
+import json
+from bs4 import BeautifulSoup
 
 
-def task_func(file_path: str, plot_path: str) -> (float, float, str):
+def task_func(url: str, file_name: str = "Output.txt") -> str:
     """
-    Processes a CSV file at the given path by reading its contents, cleaning the data,
-    performing statistical analysis, and generating a plot, which is saved to the specified path.
-
-    Sets the title of the plot to "Data Visualization".
-    Labels the x-axis as "Index" and the y-axis as "Value".
-    Saves the generated plot to the file path specified in 'plot_path'.
+    Scrape the title from a specified web page, save it in JSON format to a given file, 
+    and append to the file if it exists.
 
     Parameters:
-    - file_path (str): Path to the CSV input file.
-    - plot_path (str): Path where the plot will be saved.
+    - url (str): The URL of the web page from which the title is to be scraped.
+    - file_name (str, optional): The name of the file to save the scraped title. 
+    If the file already exists, the new data is appended. Defaults to 'Output.txt'.
 
     Returns:
-    - tuple: A tuple containing the following elements:
-        - Mean (float): The average value of the data. Returns NaN if data is empty or non-numeric.
-        - Median (float): The middle value of the data when sorted. Returns NaN if data is empty or non-numeric.
-        - Plot Path (str): The path where the plot is saved.
-
-    Raises:
-    - FileNotFoundError: If the CSV file at 'file_path' does not exist.
+    - str: The file path where the scraped title is saved.
 
     Requirements:
-    - os
-    - pandas
-    - matplotlib
-    - numpy
+    - requests
+    - json
+    - bs4
+
+    Notes:
+    - If the web page does not have a title, 'None' is saved as the title value in the JSON data.
+    - Data is appended to the specified file in JSON format, with each title on a new line.
 
     Example:
-    >>> task_func("sample_data.csv", "output_plot.png")
-    (25.5, 23.0, "output_plot.png")
+    >>> task_func("http://example.com")
+    'Output.txt'
+    >>> task_func("http://another-example.com", "AnotherOutput.txt")
+    'AnotherOutput.txt'
     """
-    if not os.path.isfile(file_path):
-        raise FileNotFoundError(f"File {file_path} does not exist.")
-    try:
-        data = pd.read_csv(file_path)
-    except pd.errors.EmptyDataError:
-        return np.nan, np.nan, plot_path
-    data = pd.to_numeric(data.squeeze(), errors="coerce")
-    if not isinstance(data, pd.Series):
-        data = pd.Series(data)
-    data = data.dropna()
-    if data.empty:
-        mean = median = np.nan
-    else:
-        mean = float(np.mean(data))
-        median = float(np.median(data))
-    plt.figure(figsize=(10, 6))
-    plt.plot(data)
-    plt.title("Data Visualization")
-    plt.xlabel("Index")
-    plt.ylabel("Value")
-    plt.savefig(plot_path)
-    plt.close()
-    return mean, median, plot_path
+    response = requests.get(url, timeout=5)
+    soup = BeautifulSoup(response.text, "html.parser")
+    title = soup.title.string if soup.title else None
+    data = {"title": title}
+    json_data = json.dumps(data)
+    with open(file_name, "a", encoding="utf-8") as f:
+        f.write(json_data + "\n")
+    return file_name
 
 import unittest
-import os
-import numpy as np
-import pandas as pd
-import shutil
+from unittest.mock import patch, mock_open
+import requests
+import json
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
-    def setUp(self):
-        # Create a directory for test files if it doesn't exist
-        self.test_dir = "mnt/data/task_func_data_test"
-        os.makedirs(self.test_dir, exist_ok=True)
-        # Create a valid data file
-        self.valid_data_path = os.path.join(self.test_dir, "valid_data.csv")
-        pd.DataFrame({"data": np.random.rand(100)}).to_csv(
-            self.valid_data_path, index=False
-        )
-        # Create an empty data file
-        self.empty_data_path = os.path.join(self.test_dir, "empty_data.csv")
-        with open(self.empty_data_path, "w") as f:
-            f.write("")
-        # Create a non-numeric data file
-        self.non_numeric_data_path = os.path.join(self.test_dir, "non_numeric_data.csv")
-        pd.DataFrame({"data": ["a", "b", "c", "d"]}).to_csv(
-            self.non_numeric_data_path, index=False
-        )
-        # Create a large data file
-        self.large_data_path = os.path.join(self.test_dir, "large_data.csv")
-        pd.DataFrame({"data": np.random.rand(10000)}).to_csv(
-            self.large_data_path, index=False
-        )
-        # Create a data file with NaN values
-        self.nan_data_path = os.path.join(self.test_dir, "nan_data.csv")
-        pd.DataFrame({"data": [1, np.nan, 2, np.nan, 3]}).to_csv(
-            self.nan_data_path, index=False
-        )
-        # Create a data file with a single value
-        self.single_value_path = os.path.join(self.test_dir, "single_value.csv")
-        pd.DataFrame({"data": [42]}).to_csv(self.single_value_path, index=False)
-        # Create a data file where all values are NaN
-        self.all_nan_path = os.path.join(self.test_dir, "all_nan.csv")
-        pd.DataFrame({"data": [np.nan, np.nan, np.nan]}).to_csv(
-            self.all_nan_path, index=False
-        )
-    def test_valid_input(self):
-        """Test that the function runs without errors and returns the correct output."""
-        plot_path = os.path.join(self.test_dir, "valid_plot.png")
-        mean, median, plot_path = task_func(self.valid_data_path, plot_path)
-        self.assertIsInstance(mean, float)
-        self.assertIsInstance(median, float)
-        self.assertTrue(os.path.exists(plot_path))
-    def test_file_not_found(self):
-        """Test that the function raises a FileNotFoundError when the specified file does not exist."""
-        plot_path = os.path.join(self.test_dir, "not_found_plot.png")
-        with self.assertRaises(FileNotFoundError):
-            task_func(os.path.join(self.test_dir, "non_existent_file.csv"), plot_path)
-    def test_empty_file(self):
-        """Test that the function returns NaN for mean and median when the file is empty."""
-        plot_path = os.path.join(self.test_dir, "empty_plot.png")
-        mean, median, returned_plot_path = task_func(self.empty_data_path, plot_path)
-        self.assertTrue(np.isnan(mean))
-        self.assertTrue(np.isnan(median))
-        self.assertFalse(
-            os.path.exists(returned_plot_path)
-        )  # Plot should not exist for empty file
-    def test_non_numeric_data(self):
-        """Test that the function returns NaN for mean and median when the file contains non-numeric data."""
-        plot_path = os.path.join(self.test_dir, "non_numeric_plot.png")
-        mean, median, returned_plot_path = task_func(self.non_numeric_data_path, plot_path)
-        self.assertTrue(np.isnan(mean))
-        self.assertTrue(np.isnan(median))
-        self.assertTrue(os.path.exists(returned_plot_path))
-    def test_large_data(self):
-        """Test that the function runs without errors and returns the correct output for a large data file."""
-        plot_path = os.path.join(self.test_dir, "large_data_plot.png")
-        mean, median, returned_plot_path = task_func(self.large_data_path, plot_path)
-        self.assertIsInstance(mean, float)
-        self.assertIsInstance(median, float)
-        self.assertTrue(os.path.exists(returned_plot_path))
-    def test_data_with_nan_values(self):
-        """Test that the function returns the correct output for a data file with NaN values."""
-        plot_path = os.path.join(self.test_dir, "nan_data_plot.png")
-        mean, median, returned_plot_path = task_func(self.nan_data_path, plot_path)
-        self.assertNotEqual(mean, np.nan)
-        self.assertNotEqual(median, np.nan)
-        self.assertTrue(os.path.exists(returned_plot_path))
-    def test_single_value_data(self):
-        """Test that the function returns the correct output for a data file with a single value."""
-        plot_path = os.path.join(self.test_dir, "single_value_plot.png")
-        mean, median, returned_plot_path = task_func(self.single_value_path, plot_path)
-        self.assertEqual(mean, 42)
-        self.assertEqual(median, 42)
-        self.assertTrue(os.path.exists(returned_plot_path))
-    def test_all_nan_data(self):
-        """Test that the function returns NaN for mean and median when the file contains all NaN values."""
-        plot_path = os.path.join(self.test_dir, "all_nan_plot.png")
-        mean, median, returned_plot_path = task_func(self.all_nan_path, plot_path)
-        self.assertTrue(np.isnan(mean))
-        self.assertTrue(np.isnan(median))
-        self.assertTrue(os.path.exists(returned_plot_path))
-    def tearDown(self):
-        # Remove all created files
-        plt.clf()
-        for filename in os.listdir(self.test_dir):
-            file_path = os.path.join(self.test_dir, filename)
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.remove(file_path)
-        # Remove the test directory
-        dirs_to_remove = ["mnt/data", "mnt"]
-        for dir_path in dirs_to_remove:
-            if os.path.exists(dir_path):
-                shutil.rmtree(dir_path)
+    """Test cases for task_func"""
+    @patch("builtins.open", new_callable=mock_open, read_data="")
+    def test_scrape_title_page_1(self, mock_file):
+        """Test that the title is scraped from a web page and saved to a file"""
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = b"<title>Test Page 1</title>"
+        with patch("requests.get", return_value=mock_response):
+            file_path = task_func("http://example.com")
+            self.assertEqual(file_path, "Output.txt")
+            mock_file().write.assert_called_once_with(
+                json.dumps({"title": "Test Page 1"}) + "\n"
+            )
+    @patch("builtins.open", new_callable=mock_open, read_data="")
+    def test_scrape_title_page_2(self, mock_file):
+        """Test that the title is scraped from a web page and saved to a file"""
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = b"<title>Test Page 2</title>"
+        with patch("requests.get", return_value=mock_response):
+            file_path = task_func("http://example.com", "AnotherOutput.txt")
+            self.assertEqual(file_path, "AnotherOutput.txt")
+            mock_file().write.assert_called_once_with(
+                json.dumps({"title": "Test Page 2"}) + "\n"
+            )
+    @patch("builtins.open", new_callable=mock_open, read_data="")
+    def test_invalid_url(self, mock_file):
+        """Test that an exception is raised when the URL is invalid"""
+        with self.assertRaises(requests.RequestException):
+            task_func("http://invalid-url")
+    @patch("builtins.open", new_callable=mock_open, read_data="")
+    def test_page_without_title(self, mock_file):
+        """Test that 'None' is saved as the title when the web page does not have a title"""
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = b"<html><head></head><body></body></html>"
+        with patch("requests.get", return_value=mock_response):
+            file_path = task_func("http://example.com")
+            self.assertEqual(file_path, "Output.txt")
+            mock_file().write.assert_called_once_with(
+                json.dumps({"title": None}) + "\n"
+            )
+    @patch("builtins.open", new_callable=mock_open, read_data="")
+    def test_very_long_title(self, mock_file):
+        """Test that a very long title is saved correctly"""
+        long_title = "A" * 1024  # A very long title of 1024 characters
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = f"<title>{long_title}</title>".encode()
+        with patch("requests.get", return_value=mock_response):
+            file_path = task_func("http://example.com")
+            self.assertEqual(file_path, "Output.txt")
+            mock_file().write.assert_called_once_with(
+                json.dumps({"title": long_title}) + "\n"
+            )
+    @patch(
+        "builtins.open",
+        new_callable=mock_open,
+        read_data=json.dumps({"title": "Existing Title"}) + "\n",
+    )
+    def test_append_to_existing_file(self, mock_file):
+        """Test that data is appended to an existing file"""
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = b"<title>New Title</title>"
+        with patch("requests.get", return_value=mock_response):
+            file_path = task_func("http://example.com")
+            self.assertEqual(file_path, "Output.txt")
+            mock_file().write.assert_called_with(
+                json.dumps({"title": "New Title"}) + "\n"
+            )

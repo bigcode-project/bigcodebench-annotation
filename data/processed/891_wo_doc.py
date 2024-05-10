@@ -1,116 +1,108 @@
 import os
+import random
 import pandas as pd
-import numpy as np
 
 
-def task_func(data_dir: str, csv_file: str) -> pd.DataFrame:
+def task_func(data_dir,
+          csv_files=['file1.csv', 'file2.csv', 'file3.csv'],
+          seed=None):
     """
-    Load a CSV file into a pandas DataFrame and replace the NaN values in
-    numeric columns with the mean of the corresponding column.
-    The resulting DataFrame is returned.
+    Randomly select one of the provided csv_files and select a certain number 
+    of records from the file at random.
+    The selected records are returned in a DataFrame. 
+    The name of the selected csv_file is also returned.
 
-    If an empty csv is passed, an empty DataFrame is returned.
+    If the csv_file is empty return an empty DataFrame.
 
     Parameters:
-    - data_dir (str): The path to the directory containing the CSV file.
-    - csv_file (str): The name of the CSV file to be processed.
-
+    data_dir (str): The directory where the CSV files are located.
+    csv_files (list of str): The list of CSV files to choose from. Default is ['file1.csv', 'file2.csv', 'file3.csv'].
+    seed (int, optional): Seed for random number generation and for sampling from the csv.
+    
     Returns:
-    pd.DataFrame: A pandas DataFrame with the processed data.
-
-    Raises:
-    FileNotFoundError: If csv_file does not exist.
+    tuple: A tuple containing two elements:
+        - str: The name of the randomly selected file.
+        - DataFrame: A pandas DataFrame with the selected rows.
 
     Requirements:
     - os
+    - random
     - pandas
-    - numpy
-    
+
     Example:
-    >>> df = task_func("/path/to/data/directory", "file.csv")
+    >>> file_name, df = task_func('test_data')
+    >>> print(file_name)
+    'file2.csv'
     >>> print(df)
-         Fruit     Taste     Cost
-    0    Apple      Good        1
-    1   Orange       NaN        2
-    2  Avocado       Bad        1.667
-    3  Coconut     Tasty        2
+           Animal     Weight
+     0        Cat          1
+    21      Mouse         12
+    15   Elephant       1000
+     2      Tiger        500
     """
-    file_path = os.path.join(data_dir, csv_file)
+    random.seed(seed)
+    file = csv_files[random.randint(0, len(csv_files) - 1)]
+    file_path = os.path.join(data_dir, file)
     try:
         df = pd.read_csv(file_path)
     except pd.errors.EmptyDataError:
-        return pd.DataFrame()
-    for column in df.columns:
-        if np.issubdtype(df[column].dtype, np.number):  # checking for numeric columns
-            df[column].fillna(df[column].mean(), inplace=True)
-    return df
+        return file, pd.DataFrame()
+    selected_rows = df.sample(n=random.randint(1, len(df)), random_state=seed)
+    return file, selected_rows
 
 import unittest
 import pandas as pd
-import numpy as np
 import os
 import tempfile
 import shutil
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.folder_path = 'task_func_data_simon'
-    def setUp(self):
-        # Create a temporary directory for test data
+        # Create a temporary directory
         self.test_dir = tempfile.mkdtemp()
+        self.test_files = [
+            'file1.csv', 'file2.csv', 'file3.csv', 'file4.csv', 'file5.csv', 'empty.csv'
+        ]
+        # Sample data for CSV files
+        data = {
+            'file1.csv': pd.DataFrame({'Name': ['Alice', 'Bob'], 'Age': [25, 30]}),
+            'file2.csv': pd.DataFrame({'Name': ['Chris', 'Dana'], 'Age': [35, 40]}),
+            'file3.csv': pd.DataFrame({'Name': ['Eve', 'Frank'], 'Age': [45, 50]}),
+            'file4.csv': pd.DataFrame({'Name': ['Grace', 'Hank'], 'Age': [55, 60]}),
+            'file5.csv': pd.DataFrame({'Name': ['Ivan', 'Julia'], 'Age': [65, 70]}),
+            'empty.csv': pd.DataFrame()
+        }
+        # Create CSV files in the directory
+        for file_name, df in data.items():
+            df.to_csv(os.path.join(self.test_dir, file_name), index=False)
     def tearDown(self):
-        # Remove the temporary directory after the test
+        # Remove the directory after the test
         shutil.rmtree(self.test_dir)
-    def create_csv(self, filename, data):
-        # Helper method to create a CSV file
-        filepath = os.path.join(self.test_dir, filename)
-        data.to_csv(filepath, index=False)
-        return filename
-    def test_empty_csv(self):
-        # Test with an empty CSV file
-        filename = self.create_csv('empty.csv', pd.DataFrame())
-        result = task_func(self.test_dir, filename)
-        self.assertTrue(result.empty)
-    def test_numeric_columns_nan_replacement(self):
-        data = pd.DataFrame({
-            'Age': [25, np.nan, 30],
-            'Salary': [50000, 60000, np.nan]
-        })
-        filename = self.create_csv('data.csv', data)
-        expected = pd.DataFrame({
-            'Age': [25.0, 27.5, 30.0],  # Ensure all ages are floats
-            'Salary': [50000.0, 60000.0, 55000.0]  # Ensure all salaries are floats
-        })
-        result = task_func(self.test_dir, filename)
-        pd.testing.assert_frame_equal(result, expected)
-    def test_mixed_columns(self):
-        data = pd.DataFrame({
-            'Name': ['Alice', 'Bob', 'Charlie'],
-            'Score': [np.nan, 88, 92]
-        })
-        filename = self.create_csv('mixed.csv', data)
-        expected = pd.DataFrame({
-            'Name': ['Alice', 'Bob', 'Charlie'],
-            'Score': [90.0, 88.0, 92.0]  # Ensure all scores are floats
-        })
-        result = task_func(self.test_dir, filename)
-        pd.testing.assert_frame_equal(result, expected)
-    def test_all_nan_column(self):
-        # Test with a column that is entirely NaN
-        data = pd.DataFrame({
-            'Empty': [np.nan, np.nan, np.nan]
-        })
-        filename = self.create_csv('all_nan.csv', data)
-        result = task_func(self.test_dir, filename)
-        self.assertTrue(result['Empty'].isnull().all())
-    def test_no_numeric_data(self):
-        # Test a CSV file with no numeric data
-        data = pd.DataFrame({
-            'City': ['New York', 'Los Angeles', 'Chicago']
-        })
-        filename = self.create_csv('cities.csv', data)
-        result = task_func(self.test_dir, filename)
-        pd.testing.assert_frame_equal(result, data)
-    def test_file_not_found(self):
-        # Test the FileNotFoundError
+    def test_random_selection(self):
+        # Testing random selection and ensuring the file chosen and its data are correct
+        file_name, df = task_func(self.test_dir, seed=42)
+        self.assertTrue(file_name in self.test_files)
+        self.assertFalse(df.empty)
+    def test_specific_file_selection(self):
+        # Test selecting a specific file and checking contents
+        file_name, df = task_func(self.test_dir, ['file1.csv'], seed=42)
+        expected = pd.read_csv(os.path.join(self.test_dir, 'file1.csv'))
+        # Sample from expected and reset index
+        expected_sampled = expected.sample(len(df), random_state=42).reset_index(drop=True)
+        # Reset index of df to ensure indices match
+        df_reset = df.reset_index(drop=True)
+        # Assert frame equality
+        pd.testing.assert_frame_equal(df_reset, expected_sampled)
+    def test_empty_file(self):
+        # Ensure an empty file returns an empty DataFrame
+        file_name, df = task_func(self.test_dir, ['empty.csv'], seed=42)
+        self.assertEqual(file_name, 'empty.csv')
+        self.assertTrue(df.empty)
+    def test_multiple_files(self):
+        # Testing selection from multiple files
+        file_name, df = task_func(self.test_dir, ['file3.csv', 'file4.csv'], seed=24)
+        self.assertIn(file_name, ['file3.csv', 'file4.csv'])
+        self.assertFalse(df.empty)
+    def test_no_file_matches(self):
+        # Testing behavior when no files match the list
         with self.assertRaises(FileNotFoundError):
-            task_func(self.test_dir, "non_existent.csv")
+            task_func(self.test_dir, ['nonexistent.csv'], seed=42)

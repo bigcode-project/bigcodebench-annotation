@@ -1,65 +1,61 @@
-from collections import defaultdict
+from collections import Counter
 import re
 
-def task_func(word: str) -> dict:
+def task_func(word: str) -> list:
     """
-    Find the occurrences of each two-letter combination in the sanitized word,
-    where only alphabetic characters are considered.
-
+    Finds the most common two-letter combination in a given, cleaned word (lowercased and alphabetic characters only) 
+    and returns its frequency. The search is case-insensitive and ignores non-alphabetic characters.
+    
     Requirements:
-    - collections.defaultdict
+    - collections.Counter
     - re
     
     Parameters:
-    word (str): The input string.
-
+    - word (str): The input string containing the word to analyze. The word should have a length of at least 2 to form pairs.
+    
     Returns:
-    collections.defaultdict: A dictionary with keys as two-letter combinations and values as their counts in the sanitized word.
-
-    Example:
-    >>> task_func('abcdef')
-    defaultdict(<class 'int'>, {'ab': 1, 'bc': 1, 'cd': 1, 'de': 1, 'ef': 1})
-    >>> task_func('aabbcc')
-    defaultdict(<class 'int'>, {'aa': 1, 'ab': 1, 'bb': 1, 'bc': 1, 'cc': 1})
-    >>> task_func('a1!b@c#d$')
-    defaultdict(<class 'int'>, {'ab': 1, 'bc': 1, 'cd': 1})
+    - list: A list containing a single tuple. The tuple consists of the most frequent two-letter combination (str) 
+      and its frequency (int). Returns an empty list if the word has fewer than 2 letters, or after cleaning, 
+      the word has fewer than 2 alphabetic characters.
+    
+    Examples:
+    >>> task_func("aaBBcc")
+    [('aa', 1)]
+    >>> task_func("abc!abc")
+    [('ab', 2)]
+    >>> task_func("a")
+    []
+    >>> task_func("abcd")
+    [('ab', 1)]
+    >>> task_func("a1b2c3")
+    [('ab', 1)]
     """
-    sanitized_word = re.sub('[^A-Za-z]', '', word)
-    occurrences = defaultdict(int)
-    pairs = [''.join(x) for x in zip(sanitized_word, sanitized_word[1:])]
-    for pair in pairs:
-        occurrences[pair] += 1
-    return occurrences
+    clean_word = re.sub('[^a-z]', '', word.lower())
+    if len(clean_word) < 2:
+        return []
+    pairs = [clean_word[i:i+2] for i in range(len(clean_word) - 1)]
+    pair_counter = Counter(pairs)
+    most_common = pair_counter.most_common(1)
+    return most_common
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        result = task_func('abcdef')
-        expected = {'ab': 1, 'bc': 1, 'cd': 1, 'de': 1, 'ef': 1}
-        self.assertEqual(result, expected)
-    def test_case_2(self):
-        result = task_func('aabbcc')
-        expected = {'aa': 1, 'ab': 1, 'bb': 1, 'bc': 1, 'cc': 1}
-        self.assertEqual(result, expected)
-    def test_case_3(self):
-        result = task_func('a')
-        expected = {}
-        self.assertEqual(result, expected)
-    def test_case_4(self):
-        result = task_func('')
-        expected = {}
-        self.assertEqual(result, expected)
-    def test_case_5(self):
-        result = task_func('AbCd')
-        expected = {'Ab': 1, 'bC': 1, 'Cd': 1}
-        self.assertEqual(result, expected)
-    def test_case_6(self):
-        # Test with non-alphabetic characters in the word
-        result = task_func('a1!b@c#d$')
-        expected = {'ab': 1, 'bc': 1, 'cd': 1}
-        self.assertEqual(result, expected)
-    def test_case_7(self):
-        # Test with mixed case and non-alphabetic characters
-        result = task_func('AaBb!!Cc123')
-        expected = {'Aa': 1, 'aB': 1, 'Bb': 1, 'bC': 1, 'Cc': 1}
-        self.assertEqual(result, expected)
+    def test_repeating_pairs(self):
+        self.assertEqual(task_func("aabbcc"), [('aa', 1)], "Should identify single repeating pair")
+        
+    def test_mixed_repeating_pairs(self):
+        self.assertEqual(task_func("abcabc"), [('ab', 2)], "Should identify most frequent pair in mixed sequence")
+        
+    def test_single_character(self):
+        self.assertEqual(task_func("a"), [], "Should return empty list for single character")
+        
+    def test_unique_pairs(self):
+        self.assertEqual(task_func("abcdef"), [('ab', 1)], "Should handle all unique pairs")
+        
+    def test_empty_string(self):
+        self.assertEqual(task_func(""), [], "Should return empty list for empty string")
+    def test_case_insensitive(self):
+        # Corrected the expected count to match the correct behavior of the function
+        self.assertEqual(task_func("aAaAbbBB"), [('aa', 3)], "Should be case-insensitive")
+    def test_ignore_non_alphabetic(self):
+        self.assertEqual(task_func("abc123abc!"), [('ab', 2)], "Should ignore non-alphabetic characters")

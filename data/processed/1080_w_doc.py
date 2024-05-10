@@ -1,75 +1,156 @@
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-def task_func(arr):
+def task_func(data):
     """
-    Analyzes the distribution of values in a NumPy array to determine if it is uniform and
-    generates a histogram representing this distribution.
+    Processes a dictionary containing product names and their corresponding prices in string format. 
+    The function converts these string prices (which may include commas as thousand separators) into float values. 
+    It then calculates statistical measures (mean, median, and standard deviation) of these prices and 
+    generates a histogram to visually represent the distribution of the prices.
 
     Parameters:
-    - arr (numpy.ndarray): A NumPy array containing the values to be analyzed. 
-      The array can contain any hashable data type (e.g., integers, floats, strings).
+    - data (dict): A dictionary with two keys: 'Product' and 'Price_String'. 
+        'Product' is a list of product names, each name corresponding to a product.
+        'Price_String' is a list of prices in string format, associated with these products. 
+        The price strings can contain commas for thousand separators and a period for the decimal point (e.g., "1,234.56").
 
     Returns:
-    - tuple: A tuple containing two elements:
-        - uniform_distribution (bool): A boolean value indicating whether the distribution is uniform. 
-           - Returns True if every unique value in the array appears the same number of times,
-             indicating a uniform distribution.
-           - Returns False otherwise.
-        - ax (matplotlib.axes.Axes): An Axes object displaying the histogram of the array's value distribution.
-           - The histogram's bins correspond to the unique values in the array.
-           - The frequency of each unique value is represented by the height of the corresponding bin.
+    - dict: Contains the calculated mean, median, and standard deviation (sample) of the prices. 
+        The keys are 'mean', 'median', and 'std_dev'.
+    - matplotlib.axes._axes.Axes: A subplot object that represents the histogram plot of the product prices. 
+        The histogram displays the frequency distribution of the prices.
 
     Note:
-      - The bin is set to `np.arange(len(unique) + 1) - 0.5` to align each bin with its corresponding unique value.
+    - A histogram plot is generated using these prices, with automatic bin sizing ('auto'), a blue color, 
+      70% opacity (alpha=0.7), and a relative width (rwidth) of 0.85 for the bars. 
+    - The histogram's title is set to 'Histogram of Product Prices', and the x and y-axis are labeled 'Price' and 'Frequency', respectively.
 
     Requirements:
+    - pandas
     - numpy
     - matplotlib
 
     Example:
-    >>> arr = np.array(["A", "A", "B", "B"])
-    >>> is_uniform, ax = task_func(arr)
-    >>> is_uniform
-    True
-    """
-    unique, counts = np.unique(arr, return_counts=True)
-    uniform_distribution = len(set(counts)) == 1
-    _, ax = plt.subplots()
-    ax.hist(arr, bins=np.arange(len(unique) + 1) - 0.5, rwidth=0.8, align="mid")
-    ax.set_xticks(range(len(unique)))
-    ax.set_xticklabels(unique)
-    return uniform_distribution, ax
+    >>> results = task_func({'Product': ['Apple', 'Banana'], 'Price_String': ['1,234.00', '567.89']})
+    >>> print(results)
+    ({'mean': 900.9449999999999, 'median': 900.9449999999999, 'std_dev': 471.0108980161712}, (array([1., 1.]), array([ 567.89 ,  900.945, 1234.   ]), <BarContainer object of 2 artists>))
 
-import numpy as np
+    Note:
+    - The function assumes that each product name in the 'Product' list has a corresponding price in the 'Price_String' list.
+    - The histogram plot's appearance (like color, alpha, and rwidth) is pre-set but can be customized further if needed.
+    """
+    df = pd.DataFrame(data)
+    df["Price_Float"] = df["Price_String"].apply(lambda x: float(x.replace(",", "")))
+    mean_price = np.mean(df["Price_Float"])
+    median_price = np.median(df["Price_Float"])
+    std_dev_price = np.std(df["Price_Float"], ddof=1)
+    ax = plt.hist(df["Price_Float"], bins="auto", color="blue", alpha=0.7, rwidth=0.85)
+    plt.title("Histogram of Product Prices")
+    plt.xlabel("Price")
+    plt.ylabel("Frequency")
+    return {"mean": mean_price, "median": median_price, "std_dev": std_dev_price}, ax
+
 import unittest
+import numpy as np
 class TestCases(unittest.TestCase):
     """Test cases for task_func"""
-    def test_uniform_distribution(self):
-        """Test uniform distribution."""
-        arr = np.array(["A", "A", "B", "B"])
-        uniform, _ = task_func(arr)
-        self.assertTrue(uniform)
+    def test_basic_functionality(self):
+        """Test basic functionality."""
+        sample_data = {
+            "Product": ["James", "Olivia", "Jamie", "Angela", "Jennifer"],
+            "Price_String": ["2,213.00", "6,083.00", "5,461.00", "884.00", "2,783.00"],
+        }
+        float_prices = [
+            float(price.replace(",", "")) for price in sample_data["Price_String"]
+        ]
+        expected_mean = np.mean(float_prices)
+        expected_median = np.median(float_prices)
+        expected_std_dev = np.std(float_prices, ddof=1)
+        result, _ = task_func(sample_data)
+        self.assertAlmostEqual(result["mean"], expected_mean)
+        self.assertAlmostEqual(result["median"], expected_median)
+        self.assertAlmostEqual(result["std_dev"], expected_std_dev)
+    def test_large_sample_size(self):
+        """Test large sample size."""
+        sample_data = {
+            "Product": [
+                "Adam",
+                "Lisa",
+                "Scott",
+                "Bianca",
+                "Ashlee",
+                "Shannon",
+                "Michelle",
+                "Robert",
+                "Joseph",
+                "Joshua",
+                "Traci",
+                "Jacob",
+                "Daniel",
+                "Timothy",
+                "Paul",
+            ],
+            "Price_String": [
+                "1,691.00",
+                "967.00",
+                "5,789.00",
+                "6,806.00",
+                "3,301.00",
+                "5,319.00",
+                "7,619.00",
+                "134.00",
+                "7,883.00",
+                "5,028.00",
+                "3,330.00",
+                "5,253.00",
+                "8,551.00",
+                "1,631.00",
+                "7,637.00",
+            ],
+        }
+        float_prices = [
+            float(price.replace(",", "")) for price in sample_data["Price_String"]
+        ]
+        expected_mean = np.mean(float_prices)
+        expected_median = np.median(float_prices)
+        expected_std_dev = np.std(float_prices, ddof=1)
+        result, _ = task_func(sample_data)
+        self.assertAlmostEqual(result["mean"], expected_mean)
+        self.assertAlmostEqual(result["median"], expected_median)
+        self.assertAlmostEqual(result["std_dev"], expected_std_dev)
+    def test_invalid_input(self):
+        """Test invalid input."""
+        with self.assertRaises(Exception):
+            task_func({})
+        with self.assertRaises(Exception):
+            task_func({"Product": ["Apple"], "Price_WrongKey": ["1,234.00"]})
+    def test_all_zero_prices(self):
+        """Test all zero prices."""
+        sample_data = {
+            "Product": ["Apple", "Banana", "Cherry"],
+            "Price_String": ["0.00", "0.00", "0.00"],
+        }
+        result, _ = task_func(sample_data)
+        self.assertEqual(result["mean"], 0)
+        self.assertEqual(result["median"], 0)
+        self.assertEqual(result["std_dev"], 0)
     def test_non_uniform_distribution(self):
         """Test non-uniform distribution."""
-        arr = np.array(["A", "A", "B", "B", "B", "C", "C", "C", "C", "D", "E", "E"])
-        uniform, _ = task_func(arr)
-        self.assertFalse(uniform)
-    def test_single_value(self):
-        """Test single value."""
-        arr = np.array(["A", "A", "A", "A"])
-        uniform, _ = task_func(arr)
-        self.assertTrue(uniform)
-    def test_multiple_equal_values(self):
-        """Test multiple equal values."""
-        arr = np.array(["A", "A", "B", "B", "C", "C", "D", "D"])
-        uniform, _ = task_func(arr)
-        self.assertTrue(uniform)
-    def test_varying_values(self):
-        """Test varying values."""
-        arr = np.array(["A", "B", "B", "C", "C", "C", "D", "D", "D", "D"])
-        uniform, _ = task_func(arr)
-        self.assertFalse(uniform)
+        sample_data = {
+            "Product": ["Apple", "Banana", "Cherry", "Date", "Fig"],
+            "Price_String": ["1,000.00", "500.00", "1,500.00", "2,000.00", "2,500.00"],
+        }
+        float_prices = [
+            float(price.replace(",", "")) for price in sample_data["Price_String"]
+        ]
+        expected_mean = np.mean(float_prices)
+        expected_median = np.median(float_prices)
+        expected_std_dev = np.std(float_prices, ddof=1)
+        result, _ = task_func(sample_data)
+        self.assertAlmostEqual(result["mean"], expected_mean)
+        self.assertAlmostEqual(result["median"], expected_median)
+        self.assertAlmostEqual(result["std_dev"], expected_std_dev)
     def tearDown(self):
         plt.close()

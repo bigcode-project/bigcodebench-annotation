@@ -1,54 +1,67 @@
 import pandas as pd
-from collections import Counter
+from sklearn.linear_model import LinearRegression
 
-def task_func(d):
+def task_func(d, target='z'):
     """
-    Count the occurrence of values with the keys "x," "y" and "z" from a list of dictionaries "d."
+    Perform linear regression to "x," "y," against "z" from a list of dictionaries "d."
 
     Parameters:
     d (list): A list of dictionaries.
+    target (str): The target variable for the regression.
 
     Returns:
-    dict: A dictionary with keys as 'x', 'y', and 'z' and values as Counter objects.
+    LinearRegression: A LinearRegression model.
 
     Requirements:
     - pandas
-    - collections.Counter
+    - sklearn.linear_model.LinearRegression
 
-    Example:
-    >>> data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 5}, {'x': 2, 'y': 1, 'z': 7}]
-    >>> print(task_func(data))
-    {'x': Counter({1: 1, 3: 1, 2: 1}), 'y': Counter({10: 1, 15: 1, 1: 1}), 'z': Counter({5: 2, 7: 1})}
-    >>> data = [{'x': 2, 'y': 10}, {'y': 15, 'z': 5}, {'x': 2, 'z': 7}]
-    >>> print(task_func(data))
-    {'x': Counter({2.0: 2}), 'y': Counter({10.0: 1, 15.0: 1}), 'z': Counter({5.0: 1, 7.0: 1})}
+    Examples:
+    >>> data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
+    >>> model = task_func(data)
+    >>> isinstance(model, LinearRegression)
+    True
+
+    >>> data = [{'x': 4, 'y': 20, 'z': 10}, {'x': 5, 'y': 25, 'z': 15}, {'x': 6, 'y': 5, 'z': 20}]
+    >>> model = task_func(data, target='y')
+    >>> isinstance(model, LinearRegression)
+    True
     """
     df = pd.DataFrame(d)
-    counts = {}
-    for key in ['x', 'y', 'z']:
-        if key in df.columns:
-            counts[key] = Counter(df[key].dropna().tolist())
-        else:
-            counts[key] = Counter()
-    return counts
+    predictors = [k for k in df.columns if k != target]
+    X = df[predictors]
+    y = df[target]
+    model = LinearRegression().fit(X, y)
+    return model
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_empty_list(self):
-        self.assertEqual(task_func([]), {'x': Counter(), 'y': Counter(), 'z': Counter()})
-    def test_all_keys_present(self):
-        data = [{'x': 1, 'y': 2, 'z': 3}, {'x': 1, 'y': 3, 'z': 2}]
-        expected = {'x': Counter({1: 2}), 'y': Counter({2: 1, 3: 1}), 'z': Counter({3: 1, 2: 1})}
-        self.assertEqual(task_func(data), expected)
-    def test_missing_keys(self):
-        data = [{'x': 1}, {'y': 2}, {'z': 3}]
-        expected = {'x': Counter({1: 1}), 'y': Counter({2: 1}), 'z': Counter({3: 1})}
-        self.assertEqual(task_func(data), expected)
-    def test_duplicate_values(self):
-        data = [{'x': 1, 'y': 2, 'z': 3}, {'x': 1, 'y': 2, 'z': 3}, {'x': 1, 'y': 2}]
-        expected = {'x': Counter({1: 3}), 'y': Counter({2: 3}), 'z': Counter({3: 2})}
-        self.assertEqual(task_func(data), expected)
-    def test_mixed_data_types(self):
-        data = [{'x': 1, 'y': 'a', 'z': 3.5}, {'x': '1', 'y': 'a', 'z': 3.5}]
-        expected = {'x': Counter({1: 1, '1': 1}), 'y': Counter({'a': 2}), 'z': Counter({3.5: 2})}
-        self.assertEqual(task_func(data), expected)
+    
+    def test_basic_regression(self):
+        data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
+        model = task_func(data)
+        self.assertIsInstance(model, LinearRegression)
+        self.assertEqual(len(model.coef_), 2)
+    def test_negative_values(self):
+        data = [{'x': -1, 'y': -10, 'z': -5}, {'x': -3, 'y': -15, 'z': -6}, {'x': -2, 'y': -1, 'z': -7}]
+        model = task_func(data)
+        self.assertIsInstance(model, LinearRegression)
+        self.assertEqual(len(model.coef_), 2)
+    
+    def test_zero_values(self):
+        data = [{'x': 0, 'y': 0, 'z': 0}, {'x': 0, 'y': 0, 'z': 0}, {'x': 0, 'y': 0, 'z': 0}]
+        model = task_func(data)
+        self.assertIsInstance(model, LinearRegression)
+        self.assertEqual(len(model.coef_), 2)
+    
+    def test_different_target(self):
+        data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
+        model = task_func(data, target='y')
+        self.assertIsInstance(model, LinearRegression)
+        self.assertEqual(len(model.coef_), 2)
+    
+    def test_single_predictor(self):
+        data = [{'x': 1, 'z': 5}, {'x': 3, 'z': 6}, {'x': 2, 'z': 7}]
+        model = task_func(data, target='z')
+        self.assertIsInstance(model, LinearRegression)
+        self.assertEqual(len(model.coef_), 1)
