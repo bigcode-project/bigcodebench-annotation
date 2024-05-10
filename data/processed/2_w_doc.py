@@ -1,61 +1,67 @@
-import random
-import statistics
+import re
+import json
+from collections import Counter
 
-def task_func(LETTERS):
+
+def task_func(json_str, top_n=10):
     """
-    Create a dictionary in which keys are random letters and values are lists of random integers.
-    The dictionary is then sorted by the mean of the values in descending order, demonstrating the use of the statistics library.
-    
+    Extract all URLs from a string-serialized JSON dict using a specific URL pattern and return a dict
+    with the URLs as keys and the number of times they appear as values.
+
     Parameters:
-        LETTERS (list of str): A list of characters used as keys for the dictionary.
-    
+    json_str (str): The JSON string.
+    top_n (int, Optional): The number of URLs to return. Defaults to 10. 
+
     Returns:
-    dict: The sorted dictionary with letters as keys and lists of integers as values, sorted by their mean values.
-    
+    dict: A dict with URLs as keys and the number of times they appear as values.
+
     Requirements:
-    - random
-    - statistics
-    
+    - re
+    - json
+    - collections.Counter
+
     Example:
-    >>> import random
-    >>> random.seed(42)
-    >>> sorted_dict = task_func(['a', 'b', 'c'])
-    >>> list(sorted_dict.keys())
-    ['a', 'b', 'c']
-    >>> isinstance(sorted_dict['a'], list)
-    True
-    >>> type(sorted_dict['a'])  # Check type of values
-    <class 'list'>
+    >>> task_func('{"name": "John", "website": "https://www.example.com"}')
+    {'https://www.example.com': 1}
     """
-    random_dict = {k: [random.randint(0, 100) for _ in range(random.randint(1, 10))] for k in LETTERS}
-    sorted_dict = dict(sorted(random_dict.items(), key=lambda item: statistics.mean(item[1]), reverse=True))
-    return sorted_dict
+    pattern = r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})'
+    data = json.loads(json_str)
+    urls = []
+    def extract(dictionary):
+        for key, value in dictionary.items():
+            if isinstance(value, dict):
+                extract(value)
+            elif isinstance(value, str) and re.match(pattern, value):
+                urls.append(value)
+    extract(data)
+    if not urls:
+        return {}
+    elif len(urls) <= top_n:
+        return dict(Counter(urls))
+    return dict(Counter(urls).most_common(top_n))
 
 import unittest
+import doctest
 class TestCases(unittest.TestCase):
-    
-    def setUp(self):
-        # Setting up a common letters array and sorted dictionary for use in all tests
-        self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-        self.sorted_dict = task_func(self.letters)
     def test_case_1(self):
-        # Check if the function returns a dictionary
-        self.assertIsInstance(self.sorted_dict, dict, "The function should return a dictionary.")
+        json_str = '{"name": "John", "website": "qwerthttps://www.example.com"}'
+        result = task_func(json_str)
+        self.assertEqual(result, {})
     def test_case_2(self):
-        # Ensure all keys in the sorted dictionary are within the provided letters
-        all_letters = all([key in self.letters for key in self.sorted_dict.keys()])
-        self.assertTrue(all_letters, "All keys of the dictionary should be letters.")
-        
+        json_str = '{"name": "John", "social": {"twitter": "https://twitter.com/john", "linkedin": "https://linkedin.com/in/john"}, "website": "https://linkedin.com/in/john"}'
+        result = task_func(json_str)
+        self.assertEqual(result, {'https://twitter.com/john': 1, 'https://linkedin.com/in/john': 2})
+        result = task_func(json_str, 1)
+        self.assertEqual(result, {'https://linkedin.com/in/john': 2})
     def test_case_3(self):
-        # Ensure all values are lists of integers
-        all_lists = all([isinstance(val, list) and all(isinstance(i, int) for i in val) for val in self.sorted_dict.values()])
-        self.assertTrue(all_lists, "All values of the dictionary should be lists of integers.")
-        
+        json_str = 'This is an adversarial input 0061'
+        with self.assertRaises(json.decoder.JSONDecodeError):
+            result = task_func(json_str)
     def test_case_4(self):
-        # Check if the dictionary is sorted by the mean values in descending order
-        means = [statistics.mean(val) for val in self.sorted_dict.values()]
-        self.assertTrue(all(means[i] >= means[i + 1] for i in range(len(means) - 1)), "The dictionary should be sorted in descending order based on the mean of its values.")
-    
+        json_str = '{"name": "John", "age": 30}'
+        result = task_func(json_str)
+        self.assertEqual(result, {})
     def test_case_5(self):
-        # Check if the dictionary includes all provided letters as keys
-        self.assertEqual(set(self.sorted_dict.keys()), set(self.letters), "The dictionary should have all provided letters as keys.")
+        json_str = '{"name": "John", "website": "example.com", "blog": "www.johnblog.com"}'
+        result = task_func(json_str)
+        self.assertEqual(result, {'www.johnblog.com': 1})

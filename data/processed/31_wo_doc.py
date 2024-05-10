@@ -1,117 +1,128 @@
 import json
 import os
-import re
+import glob
 
-def task_func(
-    file_path,
-    attribute,
-    INPUT_JSON={
-        "type": "object",
-        "properties": {
-            "name": {"type": str},  
-            "age": {"type": int},   
-            "email": {"type": str}  
-        },
-        "required": ["name", "age", "email"]
-    },
-    EMAIL_REGEX=r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"):
+
+# Constants
+KEY = 'mynewkey'
+VALUE = 'mynewvalue'
+
+def task_func(directory):
     """
-    Validate the structure and contents of a JSON file against predefined schema rules and retrieve a specified attribute from the JSON object. Ensures that all required fields exist, match their defined types, and checks the validity of the email format using a regular expression.
+    Add a new key-value pair to all JSON files in a specific directory and save the updated JSON files.
     
+    Specifically, the function searches for all JSON files within the provided directory and 
+    updates each JSON file by adding a new key-value pair ('mynewkey': 'mynewvalue') if the key 
+    doesn't already exist. The function modifies the JSON files in place.
+
     Parameters:
-    file_path (str): The path to the JSON file.
-    attribute (str): The attribute to retrieve from the JSON object.
-    INPUT_JSON (dict): The input json to validate. The default value is:
-    '{
-        "type": "object",
-        "properties": {
-            "name": {"type": str},  
-            "age": {"type": int},   
-            "email": {"type": str}  
-        },
-        "required": ["name", "age", "email"]
-    }'.
-    EMAIL_REGEX (str): The regex used to check the email validity. Default to 'r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$")'
+    directory (str): The directory containing the JSON files.
 
     Returns:
-    Any: The value of the specified attribute, consistent with the type defined in the JSON schema.
+    int: The number of JSON files updated.
 
     Requirements:
     - json
     - os
-    - re
-
-    Errors:
-    - Raises ValueError if the file does not exist, required attributes are missing, types do not match, or the email format is invalid.
+    - glob
 
     Example:
-    >>> task_func('/path/to/file.json', 'email')
-    'john.doe@example.com'
+    >>> task_func('./json_files') # Random test case with no JSON files
+    0
     """
-    if not os.path.isfile(file_path):
-        raise ValueError(f'{file_path} does not exist.')
-    with open(file_path, 'r') as f:
-        data = json.load(f)
-    for key in INPUT_JSON['required']:
-        if key not in data:
-            raise ValueError(f'{key} is missing from the JSON object.')
-        if not isinstance(data[key], INPUT_JSON['properties'][key]['type']):
-            raise ValueError(f'{key} is not of type {INPUT_JSON["properties"][key]["type"]}.')
-    if 'email' in data and not re.fullmatch(EMAIL_REGEX, data['email']):
-        raise ValueError('Email is not valid.')
-    return data[attribute]
+    files = glob.glob(os.path.join(directory, '*.json'))
+    updated_files = 0
+    for file in files:
+        with open(file, 'r+') as f:
+            data = json.load(f)
+            if KEY not in data:
+                data[KEY] = VALUE
+                f.seek(0)
+                f.truncate()
+                json.dump(data, f)
+                updated_files += 1
+    return updated_files
 
 import unittest
-import json
-import os
-import re
-EMAIL_REGEX = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+import tempfile
+import shutil
+import doctest
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Creating a dummy JSON file
-        self.filepath = '/tmp/test_data.json'
-        self.valid_data = {
-            "name": "John Doe",
-            "age": 30,
-            "email": "john.doe@example.com"
-        }
-        self.invalid_email_data = {
-            "name": "John Doe",
-            "age": 30,
-            "email": "johndoe@example"
-        }
-        with open(self.filepath, 'w') as file:
-            json.dump(self.valid_data, file)
-    
+        # Create a temporary directory for testing
+        self.test_dir = tempfile.mkdtemp()
     def tearDown(self):
-        # Remove the dummy JSON file after the test
-        os.remove(self.filepath)
-    def test_case_valid_json(self):
-        # Test with valid JSON data
-        result = task_func(self.filepath, 'name')
-        self.assertEqual(result, "John Doe")
-    
-    def test_case_invalid_email_format(self):
-        # Overwrite with invalid email format data and test
-        with open(self.filepath, 'w') as file:
-            json.dump(self.invalid_email_data, file)
-        with self.assertRaises(ValueError):
-            task_func(self.filepath, 'email')
-    
-    def test_case_missing_attribute(self):
-        # Test with JSON missing a required attribute by removing 'age'
-        modified_data = self.valid_data.copy()
-        del modified_data['age']
-        with open(self.filepath, 'w') as file:
-            json.dump(modified_data, file)
-        with self.assertRaises(ValueError):
-            task_func(self.filepath, 'age')
-    
-    def test_case_retrieve_age(self):
-        # Test retrieving age from valid JSON
-        result = task_func(self.filepath, 'age')
-        self.assertEqual(result, 30)
-    def test_case_non_existent_file(self):
-        # Test with non-existent file path
-        with self.assertRaises(ValueError):
-            task_func('/tmp/non_existent.json', 'name')
+        # Remove the temporary directory after testing
+        shutil.rmtree(self.test_dir)
+    def test_case_1(self):
+        # Create mock JSON files
+        file_1 = os.path.join(self.test_dir, "file_1.json")
+        file_2 = os.path.join(self.test_dir, "file_2.json")
+        
+        with open(file_1, 'w') as f:
+            json.dump({"name": "Alice"}, f)
+        with open(file_2, 'w') as f:
+            json.dump({"name": "Bob", "mynewkey": "existingvalue"}, f)
+        # Run the function
+        updated_files = task_func(self.test_dir)
+        # Assert number of updated files
+        self.assertEqual(updated_files, 1)
+        # Assert content of the updated file
+        with open(file_1, 'r') as f:
+            data = json.load(f)
+            self.assertEqual(data, {"name": "Alice", "mynewkey": "mynewvalue"})
+        with open(file_2, 'r') as f:
+            data = json.load(f)
+            self.assertEqual(data, {"name": "Bob", "mynewkey": "existingvalue"})
+    def test_case_2(self):
+        # Create mock JSON files
+        file_1 = os.path.join(self.test_dir, "file_3.json")
+        file_2 = os.path.join(self.test_dir, "file_4.json")
+        
+        with open(file_1, 'w') as f:
+            json.dump({"id": 1}, f)
+        with open(file_2, 'w') as f:
+            json.dump({"id": 2}, f)
+        # Run the function
+        updated_files = task_func(self.test_dir)
+        # Assert number of updated files
+        self.assertEqual(updated_files, 2)
+        # Assert content of the updated files
+        with open(file_1, 'r') as f:
+            data = json.load(f)
+            self.assertEqual(data, {"id": 1, "mynewkey": "mynewvalue"})
+        with open(file_2, 'r') as f:
+            data = json.load(f)
+            self.assertEqual(data, {"id": 2, "mynewkey": "mynewvalue"})
+    def test_case_3(self):
+        # No JSON files in the directory
+        updated_files = task_func(self.test_dir)
+        self.assertEqual(updated_files, 0)
+    def test_case_4(self):
+        # Create mock JSON files with nested structures
+        file_1 = os.path.join(self.test_dir, "file_5.json")
+        
+        with open(file_1, 'w') as f:
+            json.dump({"details": {"name": "Charlie", "age": 30}}, f)
+        # Run the function
+        updated_files = task_func(self.test_dir)
+        # Assert number of updated files
+        self.assertEqual(updated_files, 1)
+        # Assert content of the updated files
+        with open(file_1, 'r') as f:
+            data = json.load(f)
+            self.assertEqual(data, {"details": {"name": "Charlie", "age": 30}, "mynewkey": "mynewvalue"})
+    def test_case_5(self):
+        # Create mock JSON files with list structures
+        file_1 = os.path.join(self.test_dir, "file_6.json")
+        
+        with open(file_1, 'w') as f:
+            json.dump({"items": ["apple", "banana", "cherry"]}, f)
+        # Run the function
+        updated_files = task_func(self.test_dir)
+        # Assert number of updated files
+        self.assertEqual(updated_files, 1)
+        # Assert content of the updated files
+        with open(file_1, 'r') as f:
+            data = json.load(f)
+            self.assertEqual(data, {"items": ["apple", "banana", "cherry"], "mynewkey": "mynewvalue"})

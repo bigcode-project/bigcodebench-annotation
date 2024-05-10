@@ -1,87 +1,76 @@
-import pandas as pd
-import regex as re
-
-# Constants
-STOPWORDS = ["a", "an", "the", "in", "is", "are"]
+import numpy as np
+import random
+from sklearn.preprocessing import MinMaxScaler
 
 
-def task_func(text):
+def task_func(list_of_lists, seed=42):
     """
-    Count the frequency of each word in a text after removing specific stopwords.
-
+    Scale the values in a list of lists to a (0,1) range using MinMaxScaler.
+    If any inner list is empty, the function fills it with five random integers between 0 and 100, and then scales the values.
+    
     Parameters:
-    text (str): The text to analyze.
-
+    list_of_lists (list of list of int): A list containing inner lists of integers.
+    seed (int, Optional): Seed for random number generation. Default is 42.
+    
     Returns:
-    Series: A pandas Series with word frequencies excluding the words in STOPWORDS list.
-
+    list of list of float: A list of lists containing scaled values between the range [0, 1].
+    
     Requirements:
-    - pandas
-    - regex
-
+    - numpy
+    - random
+    - sklearn.preprocessing.MinMaxScaler
+    
     Example:
-    >>> text = "This is a sample text. This text contains sample words."
-    >>> word_counts = task_func(text)
-    >>> print(word_counts)
-    this        2
-    sample      2
-    text        2
-    contains    1
-    words       1
-    dtype: int64
+    >>> task_func([[1, 2, 3], [], [4, 5, 6]])
+    [[0.0, 0.5, 1.0], [0.8571428571428572, 0.1208791208791209, 0.0, 1.0, 0.3516483516483517], [0.0, 0.5, 1.0]]
     """
-    words = re.findall(r"\b\w+\b", text.lower())
-    words = [word for word in words if word not in STOPWORDS]
-    word_counts = pd.Series(words).value_counts().rename(None)
-    return word_counts
+    np.random.seed(seed)
+    random.seed(seed)
+    scaled_data = []
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    for list_ in list_of_lists:
+        if not list_:
+            list_ = [random.randint(0, 100) for _ in range(5)]
+        reshaped_data = np.array(list_).reshape(-1, 1)
+        scaled_list = scaler.fit_transform(reshaped_data)
+        scaled_data.append(scaled_list.flatten().tolist())
+    return scaled_data
 
 import unittest
+import doctest
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
+    
     def test_case_1(self):
-        text = "This is a sample text This text contains sample words"
-        word_counts = task_func(text)
-        expected_counts = pd.Series(
-            {"this": 2, "sample": 2, "text": 2, "contains": 1, "words": 1}
-        )
-        pd.testing.assert_series_equal(word_counts, expected_counts)
+        input_data = [[1, 2, 3], [], [4, 5, 6]]
+        output = task_func(input_data)
+        for inner_list in output:
+            self.assertTrue(0.0 <= min(inner_list) <= 1.0)
+            self.assertTrue(0.0 <= max(inner_list) <= 1.0)
+            self.assertTrue(len(inner_list) <= 5)
+    
     def test_case_2(self):
-        text = "Hello world Hello everyone"
-        word_counts = task_func(text)
-        expected_counts = pd.Series({"hello": 2, "world": 1, "everyone": 1})
-        pd.testing.assert_series_equal(word_counts, expected_counts)
+        input_data = [[10, 20, 30, 40, 50], [], [60, 70, 80, 90, 100]]
+        output = task_func(input_data)
+        for inner_list in output:
+            self.assertTrue(0.0 <= min(inner_list) <= 1.0)
+            self.assertTrue(0.0 <= max(inner_list) <= 1.0)
+            self.assertEqual(len(inner_list), 5)
+        
     def test_case_3(self):
-        text = "a an the in is are"
-        word_counts = task_func(text)
-        expected_counts = pd.Series(dtype="int64")
-        pd.testing.assert_series_equal(
-            word_counts.reset_index(drop=True), expected_counts.reset_index(drop=True)
-        )
+        input_data = [[], [], []]
+        output = task_func(input_data)
+        for inner_list in output:
+            self.assertTrue(0.0 <= min(inner_list) <= 1.0)
+            self.assertTrue(0.0 <= max(inner_list) <= 1.0)
+            self.assertEqual(len(inner_list), 5)
     def test_case_4(self):
-        text = "This is a test sentence which has a bunch of words and no period"
-        word_counts = task_func(text)
-        expected_counts = pd.Series(
-            {
-                "this": 1,
-                "test": 1,
-                "sentence": 1,
-                "which": 1,
-                "has": 1,
-                "bunch": 1,
-                "of": 1,
-                "words": 1,
-                "and": 1,
-                "no": 1,
-                "period": 1,
-            }
-        )
-        pd.testing.assert_series_equal(word_counts, expected_counts)
+        input_data = [[15], [25], [35], [45], [55]]
+        expected_output = [[0.0], [0.0], [0.0], [0.0], [0.0]]
+        output = task_func(input_data)
+        self.assertEqual(output, expected_output)
+    
     def test_case_5(self):
-        text = (
-            "I I I want want to to to to to go to to to the olympics olympics this year"
-        )
-        word_counts = task_func(text)
-        expected_counts = pd.Series(
-            {"i": 3, "want": 2, "to": 8, "go": 1, "olympics": 2, "this": 1, "year": 1}
-        ).sort_values(ascending=False)
-        pd.testing.assert_series_equal(word_counts, expected_counts)
+        input_data = [[0, 100], [0, 50], [50, 100]]
+        expected_output = [[0.0, 1.0], [0.0, 1.0], [0.0, 1.0]]
+        output = task_func(input_data)
+        self.assertEqual(output, expected_output)

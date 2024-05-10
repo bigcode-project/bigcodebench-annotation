@@ -1,122 +1,59 @@
-from scipy.stats import zscore
-import matplotlib.pyplot as plt
+import itertools
+import collections
 
 
-def task_func(df):
+def task_func(elements, subset_size):
     """
-    Calculate Z-scores for numeric columns in a DataFrame and draw a histogram for each column.
-    - Missing values are replaced by the column's average.
-    - The histograms are plotted with 10 bins.
-
-    Parameters:
-    - df (pandas.DataFrame): The input pandas DataFrame with numeric columns.
+    Generate all 2-element subsets of a tuple and count the occurrences of each sum in the subsets.
 
     Returns:
-    - tuple:
-        1. pandas.DataFrame: A DataFrame with computed z-scores.
-        2. list: A list of Axes objects representing the histograms of the numeric columns.
+    dict: A dictionary with the sums and their counts.
 
     Requirements:
-    - pandas.
-    - numpy.
-    - scipy.stats.zscore.
-    - matplotlib.pyplot.
-
+    - itertools
+    - random
+    - collections
+    
+    
     Example:
-    >>> import pandas as pd
-    >>> import numpy as np
-    >>> df_input = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7.0, np.nan, 9.0]], columns=["col1", "col2", "col3"])
-    >>> zscore_output, plots = task_func(df_input)
+    >>> dict(task_func((1, 2, 3, 4, 5), 2))
+    {3: 1, 4: 1, 5: 2, 6: 2, 7: 2, 8: 1, 9: 1}
     """
-    df = df.fillna(df.mean(axis=0))
-    df = df.apply(zscore)
-    axes = df.hist(grid=False, bins=10, layout=(1, df.shape[1]))
-    plt.tight_layout()
-    return df, axes
+    combinations = list(itertools.combinations(elements, subset_size))
+    sums = [sum(combination) for combination in combinations]
+    return collections.Counter(sums)
 
 import unittest
-import pandas as pd
-import numpy as np
+from collections import Counter
+import doctest
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
     def test_case_1(self):
-        df = pd.DataFrame(
-            {
-                "col1": [1, 7, 3],
-                "col2": [4, 5, 7],
-                "col3": [None, None, None],
-            }
-        )
-        zscores, plots = task_func(df)
-        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
-        self.assertEqual(len(plots[0]), 3)
+        # Test with a tuple of positive integers and subset_size of 2
+        elements = (1, 2, 3, 4, 5)
+        subset_size = 2
+        expected_result = Counter({3: 1, 4: 1, 5: 2, 6: 2, 7: 2, 8: 1, 9: 1})
+        self.assertEqual(task_func(elements, subset_size), expected_result)
     def test_case_2(self):
-        df = pd.DataFrame(
-            {
-                "col1": [None, None, 3],
-                "col2": [None, 5, 7],
-                "col3": [8, 6, 4],
-            }
-        )
-        zscores, plots = task_func(df)
-        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
-        self.assertEqual(len(plots[0]), 3)
+        # Test with a tuple containing negative, positive and zero integers and subset_size of 3
+        elements = (-3, -2, 0, 2, 3, 5)
+        subset_size = 3
+        expected_result = Counter({0: 3, 5: 3, 2: 2, 3: 2, -5: 1, -3: 1, -2: 1, -1: 1, 4: 1, 1: 1, 6: 1, 7: 1, 8: 1, 10: 1})
+        self.assertEqual(task_func(elements, subset_size), expected_result)
     def test_case_3(self):
-        df = pd.DataFrame(
-            {
-                "col1": [None, 17, 11, None],
-                "col2": [0, 4, 15, 27],
-                "col3": [7, 9, 3, 8],
-            }
-        )
-        # Expected solutions
-        expected_df = df.copy()
-        expected_df = expected_df.fillna(expected_df.mean(axis=0))
-        expected_df = expected_df.apply(zscore)
-        # Function execution
-        zscores, plots = task_func(df)
-        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
-        self.assertEqual(len(plots[0]), 3)
-        pd.testing.assert_frame_equal(zscores, expected_df)
+        # Test with a tuple of positive integers and subset_size of 1
+        elements = (1, 2, 3, 4, 5)
+        subset_size = 1
+        expected_result = Counter({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
+        self.assertEqual(task_func(elements, subset_size), expected_result)
     def test_case_4(self):
-        df = pd.DataFrame(
-            {
-                "col1": [1, 7, 3, None],
-                "col2": [4, 5, 7, 2],
-            }
-        )
-        zscores, plots = task_func(df)
-        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
-        self.assertEqual(len(plots[0]), 2)
+        # Test with an empty tuple
+        elements = ()
+        subset_size = 2
+        expected_result = Counter()
+        self.assertEqual(task_func(elements, subset_size), expected_result)
     def test_case_5(self):
-        df = pd.DataFrame(
-            {
-                "col1": [1, 2, 3, 4, 5],
-                "col2": [None, None, None, None, None],
-            }
-        )
-        zscores, plots = task_func(df)
-        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
-        self.assertEqual(len(plots[0]), 2)
-    def test_case_6(self):
-        df = pd.DataFrame(
-            {
-                "A": [np.nan, np.nan, np.nan],
-                "B": [np.nan, np.nan, np.nan],
-                "C": [np.nan, np.nan, np.nan],
-            }
-        )
-        zscores, plots = task_func(df)
-        self.assertTrue(zscores.isnull().all().all())
-        self.assertEqual(len(plots[0]), 3)
-    def test_case_7(self):
-        df = pd.DataFrame(
-            {
-                "A": [1, 2.5, 3, 4.5, 5],
-                "B": [5, 4.5, np.nan, 2, 1.5],
-                "C": [2.5, 3, 4, 5.5, 6],
-            }
-        )
-        zscores, plots = task_func(df)
-        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
-        self.assertEqual(len(plots[0]), 3)
+        # Test with a subset_size greater than tuple length
+        elements = (1, 2, 3)
+        subset_size = 5
+        expected_result = Counter()
+        self.assertEqual(task_func(elements, subset_size), expected_result)

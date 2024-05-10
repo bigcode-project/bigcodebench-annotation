@@ -1,71 +1,117 @@
-import re
-from wordcloud import WordCloud
+import numpy as np
+from scipy import fftpack
 import matplotlib.pyplot as plt
 
 
-def task_func(text):
+def task_func(data, sample_rate=8000):
     """
-    Create a word cloud from text after removing URLs and plot it.
-
+    Given a dictionary "data", this function performs the following operations:
+    1. Adds a new key "a" with the value 1 to the dictionary.
+    2. Generates a signal based on the values in "data".
+    3. Runs a Fast Fourier Transform (FFT) on the signal.
+    4. Plots and returns the FFT of the signal.
+    
     Parameters:
-    - text (str): The text to analyze.
+    data (dict): The input data as a dictionary.
 
     Returns:
-    WordCloud object: The generated word cloud.
-    Raises:
-    ValueError("No words available to generate a word cloud after removing URLs."): If there are no words available to generate a word cloud after removing URLs.
+    tuple: A tuple containing:
+        - ndarray: The FFT of the signal.
+        - Axes: The plot of the FFT.
 
     Requirements:
-    - re
-    - wordcloud.WordCloud
-    - matplotlib.pyplot
+    - numpy
+    - scipy.fftpack
+    - matplotlib
 
     Example:
-    >>> print(task_func('Visit https://www.python.org for more info. Python is great. I love Python.').words_)
-    {'Python': 1.0, 'Visit': 0.5, 'info': 0.5, 'great': 0.5, 'love': 0.5}
-    >>> print(task_func('Check out this link: http://www.example.com. Machine learning is fascinating.').words_)
-    {'Check': 1.0, 'link': 1.0, 'Machine': 1.0, 'learning': 1.0, 'fascinating': 1.0}
+    >>> data = {'key1': 1, 'key2': 2, 'key3': 3}
+    >>> fft, ax = task_func(data)
     """
-    text = re.sub(r"http[s]?://\S+", "", text)
-    if not text.strip():  # Check if text is not empty after URL removal
-        raise ValueError(
-            "No words available to generate a word cloud after removing URLs."
-        )
-    wordcloud = WordCloud().generate(text)
-    plt.figure(figsize=(10, 5))
-    plt.imshow(wordcloud)
-    plt.axis("off")  # Do not show axis to make it visually appealing
-    return wordcloud
+    data['a'] = 1
+    signal = np.array(list(data.values()))
+    time = np.linspace(0, 2, 2 * sample_rate, False)
+    signal = np.sin(np.outer(time, signal) * np.pi)
+    fft = fftpack.fft(signal)
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(np.abs(fft))
+    ax.set_title('FFT of the Signal')
+    ax.set_xlabel('Frequency [Hz]')
+    ax.set_ylabel('Frequency Spectrum Magnitude')
+    return fft, ax
 
 import unittest
+import doctest
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
     def test_case_1(self):
-        text = (
-            f"Visit https://www.example1.com for more info. This is the first sentence."
-        )
-        result = task_func(text)
-        self.assertIsInstance(result, WordCloud)
-        self.assertNotIn("https://www.example1.com", result.words_)
+        data = {'key1': 1, 'key2': 2, 'key3': 3}
+        fft, ax = task_func(data)
+        
+        # Assert the key 'a' is added to the dictionary
+        self.assertIn('a', data)
+        
+        # Assert the FFT is returned as ndarray
+        self.assertIsInstance(fft, np.ndarray)
+        
+        # Assert the plot attributes
+        self.assertEqual(ax.get_title(), 'FFT of the Signal')
+        self.assertEqual(ax.get_xlabel(), 'Frequency [Hz]')
+        self.assertEqual(ax.get_ylabel(), 'Frequency Spectrum Magnitude')
     def test_case_2(self):
-        text = f"Check out this link: https://www.example2.com. This is the second sentence."
-        result = task_func(text)
-        self.assertIsInstance(result, WordCloud)
-        self.assertNotIn("https://www.example2.com", result.words_)
+        data = {'a': 5, 'b': 10}
+        fft, ax = task_func(data)
+        
+        # Assert the key 'a' is added to the dictionary
+        self.assertIn('a', data)
+        
+        # Assert the FFT is returned as ndarray
+        self.assertIsInstance(fft, np.ndarray)
+        
+        # Assert the plot attributes
+        self.assertEqual(ax.get_title(), 'FFT of the Signal')
+        self.assertEqual(ax.get_xlabel(), 'Frequency [Hz]')
+        self.assertEqual(ax.get_ylabel(), 'Frequency Spectrum Magnitude')
     def test_case_3(self):
-        text = "There is no url in this sentence."
-        result = task_func(text)
-        self.assertIsInstance(result, WordCloud)
+        data = {}
+        fft, ax = task_func(data)
+        
+        # Assert the key 'a' is added to the dictionary
+        self.assertIn('a', data)
+        
+        # Assert the FFT is returned as ndarray
+        self.assertIsInstance(fft, np.ndarray)
+        
+        # Assert the plot attributes
+        self.assertEqual(ax.get_title(), 'FFT of the Signal')
+        self.assertEqual(ax.get_xlabel(), 'Frequency [Hz]')
+        self.assertEqual(ax.get_ylabel(), 'Frequency Spectrum Magnitude')
+        
     def test_case_4(self):
-        text = "https://www.example4.com"
-        with self.assertRaises(ValueError) as context:
-            task_func(text)
-        self.assertEqual(
-            str(context.exception),
-            "No words available to generate a word cloud after removing URLs.",
-        )
+        data = {'x': 15, 'y': 30, 'z': 45}
+        fft, ax = task_func(data)
+        
+        # Assert the key 'a' is added to the dictionary
+        self.assertIn('a', data)
+        
+        # Assert the FFT is returned as ndarray
+        self.assertIsInstance(fft, np.ndarray)
+        
+        # Assert the plot attributes
+        self.assertEqual(ax.get_title(), 'FFT of the Signal')
+        self.assertEqual(ax.get_xlabel(), 'Frequency [Hz]')
+        self.assertEqual(ax.get_ylabel(), 'Frequency Spectrum Magnitude')
+        
     def test_case_5(self):
-        text = f"Check https://www.example51.com and also visit https://www.example52.com for more details. This is the fifth sentence."
-        result = task_func(text)
-        self.assertIsInstance(result, WordCloud)
-        self.assertNotIn("https://www.example51.com", result.words_)
+        data = {'one': 1, 'two': 2}
+        fft, ax = task_func(data)
+        
+        # Assert the key 'a' is added to the dictionary
+        self.assertIn('a', data)
+        
+        # Assert the FFT is returned as ndarray
+        self.assertIsInstance(fft, np.ndarray)
+        
+        # Assert the plot attributes
+        self.assertEqual(ax.get_title(), 'FFT of the Signal')
+        self.assertEqual(ax.get_xlabel(), 'Frequency [Hz]')
+        self.assertEqual(ax.get_ylabel(), 'Frequency Spectrum Magnitude')

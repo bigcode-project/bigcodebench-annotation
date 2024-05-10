@@ -1,86 +1,112 @@
-from flask import Flask
-from flask_restful import Resource, Api
-import requests
+import re
+import os
+import shutil
 
-def task_func(api_url, template_folder):
+
+def task_func(directory):
     """
-    Creates a Flask application with a RESTful API endpoint. The endpoint, when accessed,
-    fetches data from an external API and returns the response as JSON. It is configured
-    to use a specified templates folder, which must be provided when calling this function.
-    The URL for the external API must also be provided when initializing the app.
+    Arrange files in a directory by their extensions. Create a new directory for each extension and move the 
+    files to the corresponding directories.
 
     Parameters:
-    - api_url (str): The URL of the external API from which data is fetched.
-    - template_folder (str): The path to the folder containing Flask templates.
+    directory (str): The path to the directory.
 
     Returns:
-    - app (Flask): A Flask application instance with a configured RESTful API endpoint.
-    
+    None
+
     Requirements:
-    - flask.Flask
-    - flask_restful.Resource
-    - flask_restful.Api
-    - requests
+    - re
+    - os
+    - shutil
 
     Example:
-    >>> app = task_func('https://api.example.com/data', 'templates')
-    >>> 'data' in [str(route) for route in app.url_map.iter_rules()]
-    True
-    >>> api = Api(app)
-    >>> type(api).__name__
-    'Api'
+    >>> import tempfile
+    >>> temp_dir = tempfile.mkdtemp()
+    >>> with open(temp_dir + '/file1.txt', 'w') as f:
+    ...     _ = f.write('This is a text file.')
+    >>> task_func(temp_dir)
+    >>> os.listdir(temp_dir)
+    ['txt']
     """
-    app = Flask(__name__, template_folder=template_folder)
-    api = Api(app)
-    class DataResource(Resource):
-        def get(self):
-            response = requests.get(api_url)
-            data = response.json()
-            return data
-    api.add_resource(DataResource, '/data')
-    return app
+    for filename in os.listdir(directory):
+        match = re.search(r'\.(.*?)$', filename)
+        if match:
+            ext_dir = os.path.join(directory, match.group(1))
+            if not os.path.exists(ext_dir):
+                os.mkdir(ext_dir)
+            shutil.move(os.path.join(directory, filename), ext_dir)
 
 import unittest
-from unittest.mock import patch
-from flask import Flask
+import os
+import shutil
+import doctest
+import tempfile
+# Define the TestCases class containing the blackbox test cases
 class TestCases(unittest.TestCase):
     def setUp(self):
-        """Set up test variables."""
-        self.api_url = 'https://api.example.com/data'
-        self.template_folder = 'templates'
-    def test_app_instance(self):
-        """Test if the function returns a Flask app instance."""
-        app = task_func(self.api_url, self.template_folder)
-        self.assertIsInstance(app, Flask)
-    def test_api_endpoint_configuration(self):
-        """Test if the API endpoint '/data' is configured correctly."""
-        app = task_func(self.api_url, self.template_folder)
-        with app.test_request_context('/data'):
-            self.assertTrue('/data' in [str(route) for route in app.url_map.iter_rules()])
-    @patch('requests.get')
-    def test_data_endpoint_response(self, mock_get):
-        """Test if the data endpoint returns expected JSON data."""
-        mock_get.return_value.json.return_value = {'test': 'value'}
-        app = task_func(self.api_url, self.template_folder)
-        client = app.test_client()
-        response = client.get('/data')
-        self.assertEqual(response.json, {'test': 'value'})
-    @patch('requests.get')
-    def test_external_api_call(self, mock_get):
-        """Test if the external API is called with the correct URL."""
-        mock_get.return_value.status_code = 200  # Assume that the API call is successful
-        mock_get.return_value.json.return_value = {'test': 'value'}  # Ensure this returns a serializable dictionary
-        app = task_func(self.api_url, self.template_folder)
-        client = app.test_client()
-        client.get('/data')
-        mock_get.assert_called_once_with(self.api_url)
-    @patch('requests.get')
-    def test_api_endpoint_status_code(self, mock_get):
-        """Test if the API endpoint returns the correct status code when accessed."""
-        mock_get.return_value.status_code = 200  # Mock the status code as 200
-        mock_get.return_value.json.return_value = {'data': 'example'}
+        # Setup function to create a test directory before each test case
+        self.base_tmp_dir = tempfile.mkdtemp()
+        self.test_directory = f"{self.base_tmp_dir}/test"
+        if os.path.exists(self.test_directory):
+            shutil.rmtree(self.test_directory)
+        os.mkdir(self.test_directory)
+    def tearDown(self):
+        # Teardown function to remove the test directory after each test case
+        shutil.rmtree(self.test_directory)
+    def create_sample_files(self, file_list):
+        # Helper function to create sample files for test cases
+        for file in file_list:
+            with open(os.path.join(self.test_directory, file), "w") as f:
+                f.write(f"Content of {file}")
+    def test_case_1(self):
+        # Test case 1: Organizing files with standard extensions
+        files = ["file1.txt", "image1.jpg", "document1.pdf"]
+        self.create_sample_files(files)
         
-        app = task_func(self.api_url, self.template_folder)
-        client = app.test_client()
-        response = client.get('/data')
-        self.assertEqual(response.status_code, 200)
+        task_func(self.test_directory)
+        
+        expected_directories = ["txt", "jpg", "pdf"]
+        actual_directories = os.listdir(self.test_directory)
+        
+        for dir_name in expected_directories:
+            self.assertIn(dir_name, actual_directories)
+    def test_case_2(self):
+        # Test case 2: Organizing files with no extensions
+        files = ["file1", "document2"]
+        self.create_sample_files(files)
+        
+        task_func(self.test_directory)
+        
+        # Expected behavior: files without extensions remain in the main directory
+        for file_name in files:
+            self.assertIn(file_name, os.listdir(self.test_directory))
+    def test_case_3(self):
+        # Test case 3: Organizing files with uncommon or made-up extensions
+        files = ["data.xyz", "notes.abc123"]
+        self.create_sample_files(files)
+        
+        task_func(self.test_directory)
+        
+        expected_directories = ["xyz", "abc123"]
+        actual_directories = os.listdir(self.test_directory)
+        
+        for dir_name in expected_directories:
+            self.assertIn(dir_name, actual_directories)
+    def test_case_4(self):
+        # Test case 4: Checking the behavior when the directory is empty
+        task_func(self.test_directory)
+        
+        # Expected behavior: directory remains empty
+        self.assertEqual(len(os.listdir(self.test_directory)), 0)
+    def test_case_5(self):
+        # Test case 5: Checking the behavior when some sub-directories already exist
+        os.mkdir(os.path.join(self.test_directory, "txt"))
+        files = ["file1.txt", "file2.txt"]
+        self.create_sample_files(files)
+        
+        task_func(self.test_directory)
+        
+        # Expected behavior: files are moved to the existing "txt" sub-directory
+        txt_files = os.listdir(os.path.join(self.test_directory, "txt"))
+        for file_name in files:
+            self.assertIn(file_name, txt_files)

@@ -1,132 +1,101 @@
-import pandas as pd
-import matplotlib.pyplot as plt
+import random
+import string
+from matplotlib import pyplot as plt
 
-COLUMNS = ['col1', 'col2', 'col3']
 
-def task_func(data):
+def task_func(elements, seed=100):
     """
-    You are given a list of elements. Each element is a list with the same length as COLUMNS, representing one row a dataframe df to create. Draw a line chart with unique values in the COLUMNS[-1] of the pandas DataFrame "df", grouped by the rest of the columns.
-    - The x-label should be set to the string obtained by joining all the column names (except the last one) by the character "-".
-    - The y-label should be set to the last column name.
-
+    Format each string in the given list "elements" into a pattern "% {0}%", 
+    where {0} is a randomly generated alphanumeric string of length 5. Additionally,
+    return the plot axes of an histogram of the occurrence of each character across 
+    all the strings and a dictionary containing the count of each character in all 
+    the formatted strings.
+    
     Parameters:
-    - df (pandas.DataFrame): The DataFrame to be plotted.
-
+    elements (List[str]): A list of string elements to be formatted.
+    seed (int, Optional): The seed for the random number generator. Defaults to 100.
+    
     Returns:
-    - tuple: A tuple containing:
-        - pandas.DataFrame: The DataFrame of the analyzed data.
-        - plt.Axes: The Axes object of the plotted line chart.
-
+    List[str]: A list of elements formatted with random patterns.
+    plt.Axes: The axes object of the histogram plot.
+    dict: A dictionary containing the count of each character in the formatted strings.
+    
     Requirements:
-    - pandas
-    - matplotlib
-
+    - random
+    - string
+    - matplotlib.pyplot
+    
     Example:
-    >>> data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
-    >>> analyzed_df, ax = task_func(data)
-    >>> print(analyzed_df)
-       col1  col2  col3
-    0     1     1     2
-    1     1     2     1
-    2     2     1     3
-    3     2     2     1
+    >>> patterns, ax, counts = task_func(['abc', 'def'])
+    >>> patterns
+    ['% jCVRT%', '% AXHeC%']
+    >>> counts
+    {'%': 4, ' ': 2, 'j': 1, 'C': 2, 'V': 1, 'R': 1, 'T': 1, 'A': 1, 'X': 1, 'H': 1, 'e': 1}
     """
-    df = pd.DataFrame(data, columns=COLUMNS)
-    analyzed_df = df.groupby(COLUMNS[:-1])[COLUMNS[-1]].nunique().reset_index()
-    fig, ax = plt.subplots()
-    ax.plot(analyzed_df[COLUMNS[:-1]].astype(str).agg('-'.join, axis=1), analyzed_df[COLUMNS[-1]])
-    ax.set_xlabel('-'.join(COLUMNS[:-1]))
-    ax.set_ylabel(COLUMNS[-1])
-    return analyzed_df, ax
+    random.seed(seed)
+    random_patterns = []
+    for element in elements:
+        random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=5))
+        pattern = '% {}%'.format(random_str)
+        random_patterns.append(pattern)
+    char_count = {}
+    for pattern in random_patterns:
+        for char in pattern:
+            if char in char_count:
+                char_count[char] += 1
+            else:
+                char_count[char] = 1
+    _, ax = plt.subplots()
+    ax.bar(char_count.keys(), char_count.values())
+    return random_patterns, ax, char_count
 
 import unittest
+import doctest
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
     def test_case_1(self):
-        # Using the provided example as the first test case
-        data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
-        analyzed_df, ax = task_func(data)
-        # Assertions for the returned DataFrame
-        expected_data = [[1, 1, 2], [1, 2, 1], [2, 1, 3], [2, 2, 1]]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        # Assertions for the returned plot
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [2, 1, 3, 1])
+        # Test with a list containing two strings
+        result, ax, data = task_func(['hello', 'world'], seed=39)
+        self.assertEqual(len(result), 2)
+        for pattern in result:
+            self.assertTrue(pattern.startswith('%'))
+            self.assertTrue(pattern.endswith('%'))
+            self.assertEqual(len(pattern), 8) # 5 characters + 3 special characters
+        
+        # Test the histogram plot
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.patches), 12)
+        # Test the character count dictionary
+        self.assertEqual(data['%'], 4)
     def test_case_2(self):
-        data = [
-            [1, 1, 2],
-            [1, 1, 3],
-            [1, 2, 4],
-            [1, 1, 5],
-            [1, 3, 7]
-        ]
-        analyzed_df, ax = task_func(data)
-        expected_data = [
-            [1, 1, 3],
-            [1, 2, 1],
-            [1, 3, 1]
-        ]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [3, 1, 1])
+        # Test with an empty list
+        result, _, _ = task_func([])
+        self.assertEqual(result, [])
     def test_case_3(self):
-        data = [
-            [1, 1, 1],
-            [1, 2, 3],
-            [2, 1, 4],
-            [2, 2, 5]
-        ]
-        analyzed_df, ax = task_func(data)
-        expected_data = [
-            [1, 1, 1],
-            [1, 2, 1],
-            [2, 1, 1],
-            [2, 2, 1]
-        ]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [1, 1, 1, 1])
+        # Test with a list containing multiple identical strings
+        result, _, _ = task_func(['test', 'test', 'test'])
+        self.assertEqual(len(result), 3)
+        for pattern in result:
+            self.assertTrue(pattern.startswith('%'))
+            self.assertTrue(pattern.endswith('%'))
+            self.assertEqual(len(pattern), 8)
     def test_case_4(self):
-        data = [
-            [1, 1, 1],
-            [1, 1, 1],
-            [1, 1, 1]
-        ]
-        analyzed_df, ax = task_func(data)
-        expected_data = [
-            [1, 1, 1],
-        ]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [1])
+        # Test with a list containing single character strings
+        result, ax, data = task_func(['a', 'b', 'c'])
+        self.assertEqual(len(result), 3)
+        for pattern in result:
+            self.assertTrue(pattern.startswith('%'))
+            self.assertTrue(pattern.endswith('%'))
+            self.assertEqual(len(pattern), 8)
+        # Test the character count dictionary
+        self.assertEqual(data['C'], 2)
+        self.assertEqual(data['%'], 6)
+        self.assertEqual(data['V'], 1)
+    
     def test_case_5(self):
-        data = [
-            [0, 0, 0],
-            [0, 1, 0],
-            [1, 0, 0],
-            [1, 1, 0],
-            [0, 0, 1],
-            [0, 1, 1],
-            [1, 0, 1],
-            [1, 1, 1],
-        ]
-        analyzed_df, ax = task_func(data)
-        expected_data = [
-            [0, 0, 2],
-            [0, 1, 2],
-            [1, 0, 2],
-            [1, 1, 2]
-        ]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [2, 2, 2, 2])
+        # Test with a list containing strings of varying lengths
+        result, _, _ = task_func(['short', 'mediumlength', 'averyverylongstring'])
+        self.assertEqual(len(result), 3)
+        for pattern in result:
+            self.assertTrue(pattern.startswith('%'))
+            self.assertTrue(pattern.endswith('%'))
+            self.assertEqual(len(pattern), 8)

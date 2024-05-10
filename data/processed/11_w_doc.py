@@ -1,103 +1,74 @@
 import numpy as np
-import itertools
-import random
-import statistics
+from scipy import stats
+import matplotlib.pyplot as plt
 
-def task_func(T1, RANGE=100):
+
+def task_func(mu=0, sigma=1, sample_size=1000, seed=0):
     """
-    Convert elements in 'T1' to integers and create a list of random integers.
-    The size of the list is the sum of the integers in `T1`. Calculate and 
-    return the mean, median, and mode of the list.
-    
+    Generate a sample from a normal distribution with a given mean and a standard deviation and plot the histogram 
+    together with the probability density function. Returns the Axes object representing the plot and the empirical
+    mean and standard deviation of the sample.
+
     Parameters:
-    T1 (tuple of tuples): Each tuple contains string representations of integers which are converted to integers.
-    RANGE (int, optional): The upper limit for generating random integers. Default is 100.
-    
-    Returns:
-    tuple: A tuple containing the mean, median, and mode of the generated list of random integers.
-           The mean and median are floats, and the mode is an integer. The calculations use the generated
-           list whose size is determined by the sum of converted integers from `T1`.
-    
-    Requirements:
-    - numpy
-    - itertools
-    - random
-    - statistics
+    - mu (float): The mean of the normal distribution. Default is 0.
+    - sigma (float): The standard deviation of the normal distribution. Default is 1.
+    - sample_size (int): The size of the sample to generate. Default is 1000.
 
-    Raises:
-    statistics.StatisticsError if T1 is empty
-    
+    Returns:
+    - ax (matplotlib.axes._axes.Axes): Axes object with the plotted histogram and normal PDF.
+    - float: The empirical mean of the sample.
+    - float: The empirical standard deviation of the sample.
+
+    Requirements:
+    - numpy for data generation.
+    - scipy.stats for statistical functions.
+    - matplotlib.pyplot for plotting.
+
     Example:
-    >>> import random
-    >>> random.seed(42)
-    >>> T1 = (('13', '17', '18', '21', '32'), ('07', '11', '13', '14', '28'), ('01', '05', '06', '08', '15', '16'))
-    >>> stats = task_func(T1)
-    >>> print(stats)
-    (49.88, 48.0, 20)
-    >>> stats = task_func(T1, RANGE=50)
-    >>> print(stats)
-    (23.773333333333333, 25.0, 15)
+    >>> ax, mean, std = task_func(0, 1, 1000)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> print(round(mean, 3))
+    -0.045
+    >>> print(round(std, 3))
+    0.987
     """
-    if len(T1) <= 0:
-        raise statistics.StatisticsError
-    int_list = [list(map(int, x)) for x in T1]
-    flattened_list = list(itertools.chain(*int_list))
-    total_nums = sum(flattened_list)
-    random_nums = [random.randint(0, RANGE) for _ in range(total_nums)]
-    mean = np.mean(random_nums)
-    median = np.median(random_nums)
-    mode = statistics.mode(random_nums)
-    return mean, median, mode
+    np.random.seed(seed)
+    sample = np.random.normal(mu, sigma, sample_size)
+    fig, ax = plt.subplots()
+    ax.hist(sample, bins=30, density=True, alpha=0.5, label='Sample Histogram')
+    xmin, xmax = ax.get_xlim()
+    x = np.linspace(xmin, xmax, 100)
+    p = stats.norm.pdf(x, mu, sigma)
+    ax.plot(x, p, 'k', linewidth=2, label='Normal PDF')
+    ax.set_title("Normal Distribution with $\\mu = %0.2f, \\sigma = %0.2f$" % (mu, sigma))
+    ax.legend()    
+    return ax, np.mean(sample), np.std(sample)
 
 import unittest
-import numpy as np
-import statistics
-from unittest.mock import patch
+import doctest
 class TestCases(unittest.TestCase):
-    @patch('random.randint', return_value=50)
-    def test_case_1(self, mock_randint):
-        """Tests with small numbers and default range."""
-        T1 = (('1', '2'), ('2', '3'), ('3', '4'))
-        mean, median, mode = task_func(T1)
-        total_elements = sum(map(int, sum(T1, ())))
-        self.assertEqual(total_elements, 15)  # Check if the total_elements calculation is correct
-        self.assertTrue(isinstance(mean, float))
-        self.assertTrue(isinstance(median, float))
-        self.assertTrue(isinstance(mode, int))
-    @patch('random.randint', return_value=50)
-    def test_case_2(self, mock_randint):
-        """Tests with mid-range numbers and default range."""
-        T1 = (('1', '2', '3'), ('4', '5'), ('6', '7', '8', '9'))
-        mean, median, mode = task_func(T1)
-        self.assertEqual(mean, 50.0)
-        self.assertEqual(median, 50.0)
-        self.assertEqual(mode, 50)
-    @patch('random.randint', return_value=25)
-    def test_case_3(self, mock_randint):
-        """Tests with adjusted range to 50, checks new bounds."""
-        T1 = (('1', '2', '3'), ('4', '5'), ('6', '7', '8', '9'))
-        mean, median, mode = task_func(T1, RANGE=50)
-        self.assertEqual(mean, 25.0)
-        self.assertEqual(median, 25.0)
-        self.assertEqual(mode, 25)
-    @patch('random.randint', return_value=75)
-    def test_case_4(self, mock_randint):
-        """Tests with minimal input of single-digit numbers."""
-        T1 = (('1',), ('2',), ('3',))
-        mean, median, mode = task_func(T1)
-        self.assertEqual(mean, 75.0)
-        self.assertEqual(median, 75.0)
-        self.assertEqual(mode, 75)
-    @patch('random.randint', return_value=10)
-    def test_case_5(self, mock_randint):
-        """Tests with larger numbers, focusing on correct type checking."""
-        T1 = (('10', '20', '30'), ('40', '50'), ('60', '70', '80', '90'))
-        mean, median, mode = task_func(T1)
-        self.assertEqual(mean, 10.0)
-        self.assertEqual(median, 10.0)
-        self.assertEqual(mode, 10)
-    def test_empty_input(self):
-        """Tests behavior with an empty tuple input."""
-        T1 = ()
-        with self.assertRaises(statistics.StatisticsError):
-            mean, median, mode = task_func(T1)
+    def test_case_1(self):
+        ax, _, _ = task_func()
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = 0.00, \\sigma = 1.00$")
+    def test_case_2(self):
+        ax, mean, std = task_func(mu=5, sigma=2, sample_size=500, seed=42)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = 5.00, \\sigma = 2.00$")
+        self.assertAlmostEqual(mean, 5.0136, places=3)
+    def test_case_3(self):
+        ax, mean, std = task_func(mu=-3, sigma=5, sample_size=2000, seed=23)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = -3.00, \\sigma = 5.00$")
+        self.assertAlmostEqual(std, 4.978, places=3)
+    def test_case_4(self):
+        ax, _, _ = task_func(mu=1, sigma=0.5, sample_size=100)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = 1.00, \\sigma = 0.50$")
+    def test_case_5(self):
+        ax, mean, std = task_func(mu=10, sigma=0.1, sample_size=1500)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = 10.00, \\sigma = 0.10$")
+        self.assertAlmostEqual(mean, 9.998, places=3)
+        self.assertAlmostEqual(std, 0.09804, places=3)

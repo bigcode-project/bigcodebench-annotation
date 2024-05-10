@@ -1,95 +1,70 @@
-from sklearn.preprocessing import MinMaxScaler
+import itertools
+import numpy as np
 import matplotlib.pyplot as plt
 
 
-def task_func(df):
+def task_func(elements, subset_size):
     """
-    Normalize numeric columns in a DataFrame and draw a box plot for each column. Missing values are replaced by column's average.
+    Generate all subsets of a given size from a tuple and draw a histogram of the sums of the subsets. Additionally,
+    return the Axes object of the plotted histogram and the combinations of the subsets and their sums.
 
     Parameters:
-    df (DataFrame): The pandas DataFrame.
+    - elements (tuple): A tuple of integers for which subsets will be generated.
+    - subset_size (int): Size of the subsets to be generated.
 
     Returns:
-    DataFrame: A pandas DataFrame after normalization.
-    Axes: A matplotlib Axes displaying a box plot for each column.
+    - matplotlib.axes.Axes: Axes object of the plotted histogram.
+    - list: List of all the combinations of subsets.
+    - list: List of the sums of all the subsets.
 
     Requirements:
-    - pandas
+    - itertools
     - numpy
-    - sklearn.preprocessing.MinMaxScaler
-    - matplotlib.pyplot
+    - matplotlib
 
     Example:
-    >>> import pandas as pd
-    >>> import numpy as np
-    >>> df = pd.DataFrame([[1,2,3],[4,5,6],[7.0,np.nan,9.0]], columns=["c1","c2","c3"])
-    >>> df, ax = task_func(df)
-    >>> print(df)
-        c1   c2   c3
-    0  0.0  0.0  0.0
-    1  0.5  1.0  0.5
-    2  1.0  0.5  1.0
+    >>> ax, combs, sums = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> len(combs)
+    45
+    >>> len(sums)
+    45
     """
-    df = df.fillna(df.mean(axis=0))
-    scaler = MinMaxScaler()
-    df[df.columns] = scaler.fit_transform(df[df.columns])
-    plt.figure(figsize=(10, 5))
-    df.boxplot(grid=False, vert=False, fontsize=15)
-    return df, plt.gca()
+    combinations = list(itertools.combinations(elements, subset_size))
+    sums = [sum(combination) for combination in combinations]
+    ax = plt.hist(sums, bins=np.arange(min(sums), max(sums) + 2) - 0.5, rwidth=0.8, align='left')
+    return plt.gca(), combinations, sums
 
 import unittest
-import pandas as pd
-import numpy as np
+import doctest
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
     def test_case_1(self):
-        df = pd.DataFrame(
-            [[1, 2, 3], [4, 5, 6], [7.0, np.nan, 9.0]], columns=["c1", "c2", "c3"]
-        )
-        normalized_df, ax = task_func(df)
-        self.assertTrue(np.allclose(normalized_df["c1"].tolist(), [0.0, 0.5, 1.0]))
-        self.assertTrue(np.allclose(normalized_df["c2"].tolist(), [0.0, 1.0, 0.5]))
-        self.assertTrue(np.allclose(normalized_df["c3"].tolist(), [0.0, 0.5, 1.0]))
-        self.assertIsInstance(ax, plt.Axes)
+        # Testing with a tuple of size 10 and subset size 2
+        ax, combs, sums = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
+        self.assertIsInstance(ax, plt.Axes)  # Check if the return type is correct
+        # Test the combinations and sums
+        self.assertEqual(len(combs), 45)
+        self.assertEqual(len(sums), 45)
     def test_case_2(self):
-        df = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9]], columns=["c1", "c2", "c3"])
-        normalized_df, ax = task_func(df)
-        self.assertTrue(np.allclose(normalized_df["c1"].tolist(), [0.0, 0.5, 1.0]))
-        self.assertTrue(np.allclose(normalized_df["c2"].tolist(), [0.0, 0.5, 1.0]))
-        self.assertTrue(np.allclose(normalized_df["c3"].tolist(), [0.0, 0.5, 1.0]))
+        # Testing with a tuple of size 5 and subset size 3
+        ax, combs, sums = task_func((2, 4, 6, 8, 10), 3)
         self.assertIsInstance(ax, plt.Axes)
+        # Test the combinations and sums
+        self.assertEqual(len(combs), 10)
+        self.assertEqual(len(sums), 10)
     def test_case_3(self):
-        df = pd.DataFrame(
-            [[1, 2, 3, 4, 5], [None, None, None, None, None]],
-            columns=["c1", "c2", "c3", "c4", "c5"],
-        )
-        normalized_df, ax = task_func(df)
-        for col in df.columns:
-            self.assertTrue(normalized_df[col].max() <= 1.0)
-            self.assertTrue(normalized_df[col].min() >= 0.0)
+        # Testing with an empty tuple
+        ax, combs, sums = task_func((), 0)
         self.assertIsInstance(ax, plt.Axes)
     def test_case_4(self):
-        df = pd.DataFrame(
-            [[11, 2, 13, 7], [1, 5, 6, 16], [15, 3, 14, 9], [8, 10, 4, 12]],
-            columns=["c1", "c2", "c3", "c4"],
-        )
-        normalized_df, ax = task_func(df)
-        for col in df.columns:
-            self.assertTrue(normalized_df[col].max() <= 1.0)
-            self.assertTrue(normalized_df[col].min() >= 0.0)
+        # Testing with negative numbers in the tuple
+        ax, combs, sums = task_func((-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5), 2)
         self.assertIsInstance(ax, plt.Axes)
     def test_case_5(self):
-        df = pd.DataFrame(
-            [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]], columns=["c1", "c2"]
-        )
-        normalized_df, ax = task_func(df)
-        for col in df.columns:
-            self.assertTrue(np.isclose(normalized_df[col].max(), 1.0, atol=1e-5))
-            self.assertTrue(normalized_df[col].min() >= 0.0)
-        self.assertListEqual(
-            normalized_df.loc[:, "c1"].tolist(), [0.0, 0.25, 0.5, 0.75, 1.0]
-        )
-        self.assertListEqual(
-            normalized_df.loc[:, "c2"].tolist(), [0.0, 0.25, 0.5, 0.75, 1.0]
-        )
+        # Testing with a subset size of 0
+        ax, combs, sums = task_func((1, 2, 3, 4, 5), 2)
         self.assertIsInstance(ax, plt.Axes)
+        # Test the combinations and sums
+        self.assertEqual(combs, [(1, 2), (1, 3), (1, 4), (1, 5), (2, 3), (2, 4), (2, 5), (3, 4), (3, 5), (4, 5)])
+        self.assertEqual(sums, [3, 4, 5, 6, 5, 6, 7, 7, 8, 9])

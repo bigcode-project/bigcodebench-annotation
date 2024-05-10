@@ -1,102 +1,82 @@
-import pandas as pd
-import regex as re
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-COLUMN_NAMES = ["Name", "Email", "Age", "Country"]
+import numpy as np
+import random
+from scipy import stats
 
 
-def task_func(text):
+def task_func(list_of_lists, size=5, seed=0):
     """
-    Extract data from a text and create a Pandas DataFrame.
-    The text contains several lines, each formatted as 'Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA'.
-    Plot the age distribution using seaborn.
-
-    The data is extracted using the regular expression pattern:
-    "Name: (.*?), Email: (.*?), Age: (.*?), Country: (.*?)($|\n)"
-    and the resulting DataFrame has columns: ['Name', 'Email', 'Age', 'Country']
-
+    Calculate the mean, median, and mode of values in a list of lists.
+    If a list is empty, fill it with SIZE (default: 5) random integers between 0 and 100, 
+    and then calculate the statistics.
+    
     Parameters:
-    text (str): The text to analyze.
-
+    list_of_lists (list): The list of lists.
+    size (int, Optional): The number of random integers to generate. Default is 5.
+    seed (int, Optional): Seed value for random number generation. Default is 0.
+    
     Returns:
-    DataFrame: A pandas DataFrame with extracted data.
-
+    dict: A dictionary with the mean, median, and mode of the values.
+    
     Requirements:
-    - pandas
-    - regex
-    - seaborn
-    - matplotlib.pyplot
-
+    - numpy
+    - random
+    - scipy.stats
+    
     Example:
-    >>> text = 'Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA\\nName: Jane Doe, Email: jane.doe@example.com, Age: 25, Country: UK'
-    >>> df = task_func(text)
-    >>> print(df)
-           Name                 Email  Age Country
-    0  John Doe  john.doe@example.com   30     USA
-    1  Jane Doe  jane.doe@example.com   25      UK
+    >>> task_func([[1, 2, 3], [], [4, 5, 6]])
+    {'mean': 23.454545454545453, 'median': 5.0, 'mode': array([5])}
     """
-    pattern = r"Name: (.*?), Email: (.*?), Age: (.*?), Country: (.*?)($|\n)"
-    matches = re.findall(pattern, text)
+    random.seed(seed)
     data = []
-    for match in matches:
-        data.append(match[:-1])
-    df = pd.DataFrame(data, columns=COLUMN_NAMES)
-    df["Age"] = df["Age"].astype(int)
-    sns.histplot(data=df, x="Age")
-    plt.show()
-    return df
+    for list_ in list_of_lists:
+        if list_:
+            data += list_
+        else:
+            data += [random.randint(0, 100) for _ in range(size)]
+    return {
+        'mean': np.mean(data),
+        'median': np.median(data),
+        'mode': stats.mode(data)[0]
+    }
 
 import unittest
+import doctest
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
+    
     def test_case_1(self):
-        input_text = "Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA\nName: Jane Doe, Email: jane.doe@example.com, Age: 25, Country: UK"
-        df = task_func(input_text)
-        self.assertEqual(df.shape, (2, 4))
-        self.assertListEqual(list(df.columns), ["Name", "Email", "Age", "Country"])
-        self.assertListEqual(
-            df.iloc[0].tolist(), ["John Doe", "john.doe@example.com", 30, "USA"]
-        )
-        self.assertListEqual(
-            df.iloc[1].tolist(), ["Jane Doe", "jane.doe@example.com", 25, "UK"]
-        )
+        # Test with a mix of non-empty and empty lists.
+        input_data = [[1, 2, 3], [], [4, 5, 6]]
+        result = task_func(input_data)
+        self.assertTrue(result["mean"] < 100)
+        self.assertTrue(result["median"] < 100)
+        self.assertTrue(result["mode"] < 100)
     def test_case_2(self):
-        input_text = (
-            "Name: Alex Smith, Email: alex.smith@example.com, Age: 35, Country: Canada"
-        )
-        df = task_func(input_text)
-        self.assertEqual(df.shape, (1, 4))
-        self.assertListEqual(
-            df.iloc[0].tolist(), ["Alex Smith", "alex.smith@example.com", 35, "Canada"]
-        )
+        # Test with all non-empty lists.
+        input_data = [[7, 8, 9], [10, 11, 12], [13, 14, 15]]
+        result = task_func(input_data, 4)
+        combined_data = [7, 8, 9, 10, 11, 12, 13, 14, 15]
+        self.assertEqual(result["mean"], np.mean(combined_data))
+        self.assertEqual(result["median"], np.median(combined_data))
+        self.assertEqual(result["mode"], stats.mode(combined_data).mode)
     def test_case_3(self):
-        input_text = ""
-        df = task_func(input_text)
-        self.assertTrue(df.empty)
+        # Test with all empty lists.
+        input_data = [[], [], []]
+        result = task_func(input_data)
+        self.assertTrue(result["mean"] < 100)
+        self.assertTrue(result["median"] < 100)
+        self.assertTrue(result["mode"] < 100)
     def test_case_4(self):
-        input_text = (
-            "Name: Alex Smith, Email: alex.smith@example.com, Age: 35, Country: Canada"
-        )
-        df = task_func(input_text)
-        self.assertEqual(df.shape, (1, 4))
-        self.assertListEqual(
-            df.iloc[0].tolist(), ["Alex Smith", "alex.smith@example.com", 35, "Canada"]
-        )
+        # Test with lists containing both negative and positive integers.
+        input_data = [[-1, -2, -3], [4, 5, 6], [-7, -8, -9]]
+        result = task_func(input_data, 2)
+        combined_data = [-1, -2, -3, 4, 5, 6, -7, -8, -9]
+        self.assertEqual(result["mean"], np.mean(combined_data))
+        self.assertEqual(result["median"], np.median(combined_data))
+        self.assertEqual(result["mode"], stats.mode(combined_data).mode)
     def test_case_5(self):
-        input_text = """Name: Alex Smith, Email: alex.smith@example.com, Age: 35, Country: Canada
-        Name: Bob Miller, Email: bob.miller@example.com, Age: 25, Country: USA
-        Name: Anna Karin, Email: anna.karin@example.com, Age: 47, Country: Finland
-        """
-        df = task_func(input_text)
-        self.assertEqual(df.shape, (3, 4))
-        self.assertListEqual(list(df.columns), ["Name", "Email", "Age", "Country"])
-        self.assertListEqual(
-            df.iloc[0].tolist(), ["Alex Smith", "alex.smith@example.com", 35, "Canada"]
-        )
-        self.assertListEqual(
-            df.iloc[1].tolist(), ["Bob Miller", "bob.miller@example.com", 25, "USA"]
-        )
-        self.assertListEqual(
-            df.iloc[2].tolist(), ["Anna Karin", "anna.karin@example.com", 47, "Finland"]
-        )
+        # Test with a single list.
+        input_data = [[1, 2, 3, 4, 5]]
+        result = task_func(input_data)
+        self.assertEqual(result["mean"], np.mean(input_data[0]))
+        self.assertEqual(result["median"], np.median(input_data[0]))
+        self.assertEqual(result["mode"], stats.mode(input_data[0]).mode)

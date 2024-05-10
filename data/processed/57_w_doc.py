@@ -1,76 +1,73 @@
-import pandas as pd
-import regex as re
+import re
+import matplotlib.pyplot as plt
+from nltk.probability import FreqDist
 
-def task_func(text):
+
+def task_func(example_str, top_n=30):
     """
-    Extract data from a text and create a Pandas DataFrame. The text contains several lines, each formatted as 'Score: 85, Category: Math'. Make sure to convert the scores in integer.
+    Extract all texts that are not enclosed in square brackets from the given string and plot 
+    a frequency distribution of the words. Also return the top_n most common words in the frequency distribution
+    as a dictionary.
 
     Parameters:
-    text (str): The text to analyze.
+    - example_str (str): The input string.
+    - top_n (int, Optional): The number of most common words to display in the frequency distribution plot. Default is 30.
 
     Returns:
-    DataFrame: A pandas DataFrame with extracted data.
+    - Axes: A matplotlib Axes object representing the frequency distribution plot.
+    - dict: A dictionary containing the top_n most common words and their frequencies.
 
     Requirements:
-    - pandas
-    - regex
+    - re
+    - nltk.probability.FreqDist
+    - matplotlib.pyplot
 
     Example:
-    >>> text = "Score: 85, Category: Math\\nScore: 90, Category: Science\\nScore: 80, Category: Math"
-    >>> df = task_func(text)
-    >>> print(df)
-       Score Category
-    0     85     Math
-    1     90  Science
-    2     80     Math
+    >>> ax, top_n_words = task_func("Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003] Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]")
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    pattern = r"Score: (.*?), Category: (.*?)(\n|$)"
-    matches = re.findall(pattern, text)
-    data = [
-        match[:2] for match in matches
-    ]  # Extracting only the score and category from each match
-    df = pd.DataFrame(data, columns=["Score", "Category"])
-    df["Score"] = df["Score"].astype(int)
-    return df
+    text = ' '.join(re.findall('(.*?)\\[.*?\\]', example_str))
+    words = text.split()
+    fdist = FreqDist(words)
+    if top_n > len(fdist):
+        top_n = len(fdist)
+    plt.figure()
+    ax = fdist.plot(top_n, cumulative=False, show=False)
+    plt.close()
+    top_n_words = dict(fdist.most_common(top_n))
+    return ax, top_n_words
 
 import unittest
+import doctest
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
     def test_case_1(self):
-        text = "Score: 85, Category: Math\nScore: 90, Category: Science\nScore: 80, Category: Math"
-        df = task_func(text)
-        self.assertEqual(len(df), 3)
-        self.assertEqual(df["Score"].iloc[0], 85)
-        self.assertEqual(df["Category"].iloc[0], "Math")
-        self.assertEqual(df["Score"].iloc[1], 90)
-        self.assertEqual(df["Category"].iloc[1], "Science")
-        self.assertEqual(df["Score"].iloc[2], 80)
-        self.assertEqual(df["Category"].iloc[2], "Math")
+        example_str = "Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003] Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]"
+        ax, top_n_words = task_func(example_str)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+        # Test the number of words in the plot
+        self.assertEqual(len(ax.get_xticklabels()), 4, "The number of words in the plot is not 30.")
+        # Test the top_n_words dictionary
+        self.assertEqual(top_n_words, {'Smith': 2, 'Josie': 1, 'Mugsy': 1, 'Dog': 1}, "The top_n_words dictionary is incorrect.")
     def test_case_2(self):
-        text = "Score: 70, Category: History"
-        df = task_func(text)
-        self.assertEqual(len(df), 1)
-        self.assertEqual(df["Score"].iloc[0], 70)
-        self.assertEqual(df["Category"].iloc[0], "History")
+        example_str = "Hello [1234 STREET, CITY, STATE 12345] World [5678 LANE, TOWN, PROVINCE 67890]"
+        ax, _ = task_func(example_str)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
     def test_case_3(self):
-        text = ""  # Empty string
-        df = task_func(text)
-        self.assertEqual(len(df), 0)  # Expecting an empty DataFrame
+        example_str = "[IGNORE THIS] This is a simple test string [ANOTHER IGNORE]"
+        ax, top_n_words = task_func(example_str, top_n=5)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+        # Test the histogram data
+        #self.assertEqual(len(ax.patches), 5, "The number of words in the plot is not 5.")
+        # Test the top_n_words dictionary
+        self.assertEqual(top_n_words, {'This': 1, 'is': 1, 'a': 1, 'simple': 1, 'test': 1}, "The top_n_words dictionary is incorrect.")
+    
     def test_case_4(self):
-        text = "Score: 70, Category: Chemistry"
-        df = task_func(text)
-        self.assertEqual(len(df), 1)
-        self.assertEqual(df["Score"].iloc[0], 70)
-        self.assertEqual(df["Category"].iloc[0], "Chemistry")
+        example_str = "[BEGIN] Testing the function with different [MIDDLE] types of input strings [END]"
+        ax, _ = task_func(example_str)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+    
     def test_case_5(self):
-        text = "Score: 70, Category: Literature\nScore: 37, Category: Mathematics\nScore: 90, Category: Japanese\nScore: 58, Category: Machine Learning"
-        df = task_func(text)
-        self.assertEqual(len(df), 4)
-        self.assertEqual(df["Score"].iloc[0], 70)
-        self.assertEqual(df["Category"].iloc[0], "Literature")
-        self.assertEqual(df["Score"].iloc[1], 37)
-        self.assertEqual(df["Category"].iloc[1], "Mathematics")
-        self.assertEqual(df["Score"].iloc[2], 90)
-        self.assertEqual(df["Category"].iloc[2], "Japanese")
-        self.assertEqual(df["Score"].iloc[3], 58)
-        self.assertEqual(df["Category"].iloc[3], "Machine Learning")
+        example_str = "Example without any brackets so all words should be considered."
+        ax, _ = task_func(example_str)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")

@@ -1,96 +1,67 @@
-from datetime import datetime
-import pandas as pd
-import matplotlib.pyplot as plt
-
-# Constants
-DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+import pytz
+import numpy as np
+from dateutil.parser import parse
+import math
 
 
-def task_func(timestamps):
+MOON_PHASES_YEARS = np.array([1987, 1994, 2001, 2008, 2015, 2022])
+
+def task_func(date_str, from_tz, to_tz):
     """
-    Convert a list of Unix timestamps to date objects, create a Pandas DataFrame, and draw a histogram.
-    - The date format should be as DATE_FORMAT.
-    - The DataFrame should have 'Timestamp' and 'Datetime' as column names.
-    - If the list of timestamps is empty, raise a ValueError with the message "Input list of timestamps is empty".
+    Calculate the moon phase by the date and time taking into account the lunar phase cycle of 7 years. The 
+    function uses a constant array `MOON_PHASES_YEARS` to determine the reference years for the moon phases.
 
     Parameters:
-    - timestamps (list): The list of Unix timestamps.
+    date_str (str): The date string in "yyyy-mm-dd hh:mm:ss" format.
+    from_tz (str): The timezone of the given date string.
+    to_tz (str): The timezone to which the given date and time should be converted.
 
     Returns:
-    - pandas.DataFrame: A pandas DataFrame containing the original Unix timestamps and the converted datetime objects.
-    - Axes: The Axes object of the histogram plot. The histogram will have 10 bins by default, representing the distribution of the datetime objects.
-
-    Raises:
-    - ValueError("Input list of timestamps is empty"): If the list of timestamps is empty.
+    float: The moon phase between 0 and 1. A value of 0 indicates a new moon and a value of 1 indicates a full moon.
 
     Requirements:
-    - datetime
-    - pandas
-    - matplotlib.pyplot
+    - pytz
+    - numpy
+    - dateutil.parser
+    - math
 
-    Examples:
-    >>> df, ax = task_func([1347517370, 1475153730, 1602737300])
-    >>> print(df)
-        Timestamp             Datetime
-    0  1347517370  2012-09-13 02:22:50
-    1  1475153730  2016-09-29 08:55:30
-    2  1602737300  2020-10-15 00:48:20
+    Example:
+    >>> task_func('1970-01-01 00:00:00', 'UTC', 'America/New_York')
+    0.9749279121818237
     """
-    if not timestamps:
-        raise ValueError("Input list of timestamps is empty.")
-    datetimes = [datetime.fromtimestamp(t).strftime(DATE_FORMAT) for t in timestamps]
-    df = pd.DataFrame({"Timestamp": timestamps, "Datetime": datetimes})
-    ax = plt.hist(pd.to_datetime(df["Datetime"]))
-    plt.close()
-    return df, ax
+    from_tz = pytz.timezone(from_tz)
+    to_tz = pytz.timezone(to_tz)
+    given_date = parse(date_str).replace(tzinfo=from_tz)
+    converted_date = given_date.astimezone(to_tz)
+    moon_phase_year = MOON_PHASES_YEARS[np.argmin(np.abs(MOON_PHASES_YEARS - converted_date.year))]
+    years_since_moon_phase_year = abs(converted_date.year - moon_phase_year)
+    moon_phase = math.sin(math.pi * years_since_moon_phase_year / 7)
+    return moon_phase
 
 import unittest
+import doctest
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
-    def setUp(self):
-        self.test_data = [
-            [1318935276, 1342905276, 23074268],
-            [4235087541, 1234653346, 19862358],
-            [],
-            [1156829289],
-            [1000000000, 2000000000, 3000000000],
-        ]
+    
     def test_case_1(self):
-        input_timestamps = self.test_data[0]
-        self.assert_function_output(input_timestamps)
+        # Given a date in the past, in UTC timezone, convert to America/New_York timezone
+        result = task_func('1970-01-01 00:00:00', 'UTC', 'America/New_York')
+        self.assertTrue(-1 <= result <= 1)  # The returned value should be between 0 and 1
+    
     def test_case_2(self):
-        input_timestamps = self.test_data[1]
-        self.assert_function_output(input_timestamps)
+        # Given a date in the future, in Asia/Kolkata timezone, convert to Europe/London timezone
+        result = task_func('2050-12-31 23:59:59', 'Asia/Kolkata', 'Europe/London')
+        self.assertTrue(-1 <= result <= 1)  # The returned value should be between 0 and 1
     def test_case_3(self):
-        input_timestamps = self.test_data[2]
-        with self.assertRaises(ValueError) as context:
-            task_func(input_timestamps)
-        self.assertEqual(
-            str(context.exception),
-            "Input list of timestamps is empty.",
-        )
+        # Given a date close to a reference year in MOON_PHASES_YEARS, in UTC timezone, convert to America/New_York timezone
+        result = task_func('2016-06-15 12:00:00', 'UTC', 'America/New_York')
+        self.assertTrue(-1 <= result <= 1)  # The returned value should be between 0 and 1
+    
     def test_case_4(self):
-        input_timestamps = self.test_data[3]
-        self.assert_function_output(input_timestamps)
+        # Given a date far from any reference year in MOON_PHASES_YEARS, in America/Los_Angeles timezone, convert to Asia/Tokyo timezone
+        result = task_func('2110-03-10 08:30:00', 'America/Los_Angeles', 'Asia/Tokyo')
+        self.assertTrue(-1 <= result <= 1)  # The returned value should be between 0 and 1
+    
     def test_case_5(self):
-        input_timestamps = self.test_data[4]
-        self.assert_function_output(input_timestamps)
-        df, ax = task_func(input_timestamps)
-        expected_df = pd.DataFrame(
-            {
-                "Timestamp": [1000000000, 2000000000, 3000000000],
-                "Datetime": [
-                    "2001-09-09 01:46:40",
-                    "2033-05-18 03:33:20",
-                    "2065-01-24 05:20:00",
-                ],
-            }
-        )
-        
-        pd.testing.assert_frame_equal(df, expected_df)
-    def assert_function_output(self, input_timestamps):
-        df, ax = task_func(input_timestamps)
-        # Assert that the DataFrame contains the correct timestamps
-        self.assertEqual(df["Timestamp"].tolist(), input_timestamps)
-        # Assert the histogram attributes (e.g., number of bins)
-        self.assertEqual(len(ax[0]), 10)  # There should be 10 bars in the histogram
+        # Given a date with a different date format, in UTC timezone, convert to America/New_York timezone
+        result = task_func('01 Jan 1990 01:01:01', 'UTC', 'America/New_York')
+        self.assertTrue(-1 <= result <= 1)  # The returned value should be between 0 and 1

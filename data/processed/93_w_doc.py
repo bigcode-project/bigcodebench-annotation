@@ -1,82 +1,73 @@
-import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
-from matplotlib.collections import PathCollection
+import math
 
-def task_func(data, n_clusters=3):
+
+def task_func(frequency, sample_size=10000):
     """
-    Perform K-means clustering on a dataset and generate a scatter plot visualizing the clusters and their centroids.
+    Create a diagram of a sine wave and cosine wave with a given frequency and return the plot.
 
     Parameters:
-        data (pd.DataFrame): The dataset to be clustered, where rows are samples and columns are features.
-        n_clusters (int): The number of clusters to form. Must be greater than 1. Defaults to 3.
+    frequency (float): The frequency of the wave. Must be a non-negative float.
+    sample_size (int, Optional): A positive integer integer denoting the number of samples to be taken for the 
+    wave. Default is 10000.
 
     Returns:
-        tuple: 
-            - np.ndarray: An array of cluster labels assigned to each sample.
-            - plt.Axes: An Axes object with the scatter plot showing the clusters and centroids.
-
-    Raises:
-        ValueError: If 'data' is not a pd.DataFrame.
-        ValueError: If 'n_clusters' is not an integer greater than 1.
+    matplotlib.figure.Figure: The figure object containing the plot.
+    matplotlib.axes.Axes: The axes object of the plot.
 
     Requirements:
-        - numpy
-        - pandas
-        - matplotlib
-        - sklearn
-    
+    - numpy for data generation
+    - matplotlib.pyplot for plotting
+    - math for mathematical constants
+
     Example:
-    >>> np.random.seed(42)
-    >>> data = pd.DataFrame(np.random.rand(100, 2), columns=['Feature1', 'Feature2'])
-    >>> _, ax = task_func(data, 3)
-    >>> ax.get_title()
-    'K-Means Clustering'
+    >>> fig, ax = task_func(1, 2500)
+    >>> type(fig)
+    <class 'matplotlib.figure.Figure'>
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    if not isinstance(data, pd.DataFrame):
-        raise ValueError("Input 'data' must be a pandas DataFrame.")
-    if not isinstance(n_clusters, int) or n_clusters <= 1:
-        raise ValueError("'n_clusters' must be an integer greater than 1.")
-    kmeans = KMeans(n_clusters=n_clusters)
-    labels = kmeans.fit_predict(data)
-    centroids = kmeans.cluster_centers_
+    if frequency < 0:
+        raise ValueError("Frequency cannot be negative")
+    if sample_size <= 0:
+        raise ValueError("Sample size cannot be negative or zero")
+    x = np.linspace(0, 2 * math.pi, sample_size)
+    y_sin = np.sin(frequency * x)
+    y_cos = np.cos(frequency * x)
+    plt.figure()
     fig, ax = plt.subplots()
-    ax.scatter(data.iloc[:, 0], data.iloc[:, 1], c=labels, cmap='viridis', alpha=0.6, label='Data points')
-    ax.scatter(centroids[:, 0], centroids[:, 1], marker='x', s=200, c='red', label='Centroids')
-    ax.set_xlabel('Feature 1')
-    ax.set_ylabel('Feature 2')
-    ax.set_title('K-Means Clustering')
+    ax.plot(x, y_sin, label='sin')
+    ax.plot(x, y_cos, label='cos')
     ax.legend()
-    return labels, ax
+    return fig, ax
 
 import unittest
-from matplotlib.collections import PathCollection  # Correct import
-import numpy as np
+import doctest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        np.random.seed(42)
-        self.data = pd.DataFrame(np.random.rand(100, 2), columns=['Feature1', 'Feature2'])
-    def test_cluster_centers(self):
-        _, ax = task_func(self.data, 3)
-        centroids = [child for child in ax.get_children() if isinstance(child, PathCollection) and child.get_label() == 'Centroids']
-        self.assertTrue(len(centroids) > 0, "Centroids should be marked in the plot.")
-        self.assertEqual(len(centroids[0].get_offsets()), 3, "There should be 3 centroids marked in the plot.")
-    def test_single_cluster_error(self):
+    def test_case_1(self):
+        fig, ax = task_func(1, 2500)
+        self.assertEqual(len(ax.lines), 2)  # Should have two lines (sin and cos)
+        self.assertTrue(all(label in [line.get_label() for line in ax.lines] for label in ['sin', 'cos']))
+    def test_case_2(self):
+        fig, ax = task_func(0)
+        # At frequency 0, sin wave should be a line at y=0 and cos wave should be a line at y=1
+        y_data_sin = ax.lines[0].get_ydata()
+        y_data_cos = ax.lines[1].get_ydata()
+        self.assertTrue(np.all(y_data_sin == 0))
+        self.assertTrue(np.all(y_data_cos == 1))
+    def test_case_3(self):
         with self.assertRaises(ValueError):
-            _, _ = task_func(self.data, 1)
-    def test_valid_input(self):
-        labels, ax = task_func(self.data, 3)
-        self.assertEqual(len(labels), 100)  # Ensure labels array matches data length
-    def test_invalid_data_type(self):
+            fig, ax = task_func(-1)
         with self.assertRaises(ValueError):
-            _, _ = task_func([[1, 2], [3, 4]], 3)
-    def test_invalid_cluster_number(self):
-        with self.assertRaises(ValueError):
-            _, _ = task_func(self.data, -1)
-    def test_return_type(self):
-        _, ax = task_func(self.data, 3)
-        self.assertIsInstance(ax, plt.Axes)  # Ensuring the plot is returned
-    def test_return_labels(self):
-        labels, _ = task_func(self.data, 3)
-        unique_labels = np.unique(labels)
-        self.assertEqual(len(unique_labels), 3)  # Checking if 3 unique labels are returned
+            fig, ax = task_func(5, -1)
+    def test_case_4(self):
+        fig, ax = task_func(10, 5000)
+        # Check if the data is correctly oscillating for high frequency
+        y_data_sin = ax.lines[0].get_ydata()
+        y_data_cos = ax.lines[1].get_ydata()
+        self.assertTrue(np.any(y_data_sin >= 0) and np.any(y_data_sin <= 0))  # Sin wave oscillates
+        self.assertTrue(np.any(y_data_cos >= 0) and np.any(y_data_cos <= 0))  # Cos wave oscillates
+    def test_case_5(self):
+        fig, ax = task_func(1)
+        self.assertIsNotNone(ax.get_legend())  # Check if legend is present
