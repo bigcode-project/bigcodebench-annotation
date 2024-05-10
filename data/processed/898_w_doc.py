@@ -1,69 +1,62 @@
-import binascii
-import string
+from collections import Counter
 import random
+import itertools
 
-def task_func(length):
+def task_func(length, count, seed=0):
     """
-    Generate a random hexadecimal string of a given length and then attempt to decode it in ASCII.
-    The resulting ASCII string may contain non-printable characters
-    or be shorter than the input length.
-
+    Generate a number of random strings with a specified length from a fixed set of letters ('a', 'b', 'c', 'd', 'e'),
+    and analyze the frequency of each letter in the generated strings.
+    
     Parameters:
-    length (int): The length of the hexadecimal string.
-
-    Returns:
-    str: The decoded ASCII string.
-
+    - length (int): The length of each string to be generated. Should be a non-negative integer.
+    - count (int): The number of random strings to generate. Should be a non-negative integer.
+    - seed (int, optional): A seed for the random number generator to ensure reproducibility.
+    
     Requirements:
-    - binascii
-    - string
+    - collections.Counter
     - random
-
+    - itertools
+    
+    Returns:
+    - Counter: A collections.Counter object containing the frequency of each letter in the generated strings.
+    
     Example:
-    >>> random.seed(0)
-    >>> task_func(6)
-    '\\x18'
-    >>> task_func(8)
-    'Ƥ'
+    >>> task_func(5, 2, seed=1)
+    Counter({'a': 3, 'd': 3, 'c': 2, 'e': 1, 'b': 1})
+    >>> task_func(0, 100, seed=2)
+    Counter()
     """
-    HEX_CHARS = string.hexdigits.lower()
-    hex_string = "".join(random.choice(HEX_CHARS) for _ in range(length))
-    return binascii.unhexlify(hex_string).decode("utf-8", "ignore")
+    random.seed(seed)
+    strings = [''.join(random.choices(['a', 'b', 'c', 'd', 'e'], k=length)) for _ in range(count)]
+    letter_frequency = Counter(itertools.chain(*strings))
+    return letter_frequency
 
 import unittest
-import string
-import random
+from collections import Counter
 class TestCases(unittest.TestCase):
-    """Test cases for task_func"""
-    def test_correct_length(self):
-        """Test the length of the hexadecimal string before decoding."""
-        random.seed(2)
-        length = 8
-        HEX_CHARS = string.hexdigits.lower()
-        hex_string = "".join(random.choice(HEX_CHARS) for _ in range(length))
-        result = task_func(length)
-        # Check if the length of the hexadecimal string before decoding is correct
-        self.assertEqual(len(hex_string), length)
-        self.assertEqual(result, "]")
-    def test_correct_type(self):
-        """Test the type of the output."""
-        random.seed(4)
-        result = task_func(6)
-        self.assertIsInstance(result, str)
-        self.assertEqual(result, "y<")
-    def test_non_empty_string_positive_length(self):
-        """Test the output for a positive length."""
-        random.seed(6)
-        result = task_func(6)
-        self.assertNotEqual(result, "")
-        self.assertEqual(result, "\x10")
+    def test_length_one_count_ten(self):
+        result = task_func(1, 10, seed=0)
+        self.assertIsInstance(result, Counter)
+        self.assertEqual(sum(result.values()), 10, "The total count of letters should be 10.")
+        
+    def test_length_five_count_hundred(self):
+        result = task_func(5, 100, seed=1)
+        self.assertIsInstance(result, Counter)
+        self.assertEqual(sum(result.values()), 500, "The total count of letters should be 500.")
+        
     def test_zero_length(self):
-        """Test the output for a zero length."""
-        random.seed(8)
-        result = task_func(0)
-        self.assertEqual(result, "")
-    def test_negative_length_handling(self):
-        """Test the output for a negative length."""
-        random.seed(10)
-        result = task_func(-1)
-        self.assertEqual(result, "")
+        result = task_func(0, 100, seed=2)
+        self.assertIsInstance(result, Counter)
+        self.assertEqual(sum(result.values()), 0, "With length 0, there should be no letters.")
+        
+    def test_zero_count(self):
+        result = task_func(5, 0, seed=3)
+        self.assertIsInstance(result, Counter)
+        self.assertEqual(sum(result.values()), 0, "With count 0, there should be no letters.")
+        
+    def test_specific_distribution(self):
+        # Assuming the seed value of 4 leads to a specific, known distribution
+        result = task_func(5, 2, seed=4)
+        # Correct the expected distribution based on actual output
+        correct_expected_distribution = Counter({'b': 3, 'a': 3, 'e': 2, 'c': 1, 'd': 1})
+        self.assertEqual(result, correct_expected_distribution, "The letter distribution should match the expected distribution.")

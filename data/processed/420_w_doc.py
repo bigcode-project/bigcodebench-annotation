@@ -1,108 +1,98 @@
-import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import precision_recall_curve
+from tensorflow import keras
 import matplotlib.pyplot as plt
 
-
-def task_func(array):
+def task_func(X, Y):
     """
-    Create a Pandas DataFrame from a 2D list and plot the sum of each column.
+    This function should:
+    - Splits the input data into training (70%) and test (30%) sets.
+    - Constructs a Keras Sequential model with one hidden dense layer and sigmoid activation.
+      The input dimension is determined based on the first feature set of X.
+    - Compiles the model using binary cross-entropy loss and SGD optimizer.
+    - Fits the model to the training data in a non-verbose mode.
+    - Plots the Precision-Recall curve for the model based on the test set data.
 
     Parameters:
-    array (list of list of int): The 2D list representing the data.
+    X (np.ndarray): Input data for the model. Must have at least one feature.
+    Y (np.ndarray): Target labels for the model.
 
     Returns:
-    DataFrame, Axes: A pandas DataFrame with the data and a matplotlib Axes object showing the sum of each column.
+    - keras.models.Sequential: The trained Keras model.
+    - matplotlib.axes._axes.Axes: The matplotlib Axes object for the Precision-Recall curve plot.
+    
+    Notes:
+    - The plot's x-axis is labeled 'Recall', and the y-axis is labeled 'Precision'.
+    - The title of the axes is set to 'Precision-Recall curve'.
+    - The axes object allows for further customization of the plot outside the function.
 
     Requirements:
-    - pandas
+    - tensorflow.keras
+    - sklearn.model_selection.train_test_split
+    - sklearn.metrics.precision_recall_curve
     - matplotlib.pyplot
 
-    Internal Constants:
-    COLUMNS: List of column names used for the DataFrame ['A', 'B', 'C', 'D', 'E']
-
-    Example:
-    >>> df, ax = task_func([[1,2,3,4,5], [6,7,8,9,10]])
-    >>> print(df)
-       A  B  C  D   E
-    0  1  2  3  4   5
-    1  6  7  8  9  10
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
+    Examples:
+    >>> X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    >>> Y = np.array([[0], [1], [1], [0]])
+    >>> model, ax = task_func(X, Y)
+    >>> isinstance(model, Sequential)
+    True
+    >>> isinstance(ax, plt.Axes)
+    True
     """
-    COLUMNS = ["A", "B", "C", "D", "E"]
-    df = pd.DataFrame(array, columns=COLUMNS)
-    sums = df.sum()
-    fig, ax = plt.subplots()
-    sums.plot(kind="bar", ax=ax)
-    return df, ax
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
+    input_dim = X.shape[1]  # Dynamically set input dimension
+    model = keras.models.Sequential([keras.layers.Dense(units=1, input_dim=input_dim, activation='sigmoid')])
+    model.compile(loss='binary_crossentropy', optimizer=keras.optimizers.SGD(learning_rate=0.1))
+    model.fit(X_train, Y_train, epochs=200, batch_size=1, verbose=0)
+    Y_pred = model.predict(X_test, verbose=0).ravel()
+    precision, recall, thresholds = precision_recall_curve(Y_test, Y_pred)
+    fig, ax = plt.subplots()  # Modify here to return Axes object
+    ax.plot(recall, precision, label='Precision-Recall curve')
+    ax.set_xlabel('Recall')
+    ax.set_ylabel('Precision')
+    ax.set_title('Precision-Recall Curve')
+    ax.legend(loc='best')
+    return model, ax  # Return both the model and the axes object
 
 import unittest
-import matplotlib.pyplot as plt
+import numpy as np
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import SGD
+from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        df, ax = task_func([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-        self.assertEqual(df.values.tolist(), [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-        self.assertEqual(df.columns.tolist(), ["A", "B", "C", "D", "E"])
-        self.assertTrue(isinstance(ax, plt.Axes))
-    def test_case_2(self):
-        df, ax = task_func(
-            [[10, 20, 30, 40, 50], [15, 25, 35, 45, 55], [5, 15, 25, 35, 45]]
-        )
-        self.assertEqual(
-            df.values.tolist(),
-            [[10, 20, 30, 40, 50], [15, 25, 35, 45, 55], [5, 15, 25, 35, 45]],
-        )
-        self.assertTrue(isinstance(ax, plt.Axes))
-    def test_case_3(self):
-        # Test handling uniform data
-        df, ax = task_func([[1, 1, 1, 1, 1]])
-        self.assertEqual(df.values.tolist(), [[1, 1, 1, 1, 1]])
-        self.assertTrue(isinstance(ax, plt.Axes))
-    def test_case_4(self):
-        # Test handling all zero
-        df, ax = task_func([[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]])
-        self.assertEqual(df.values.tolist(), [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]])
-        self.assertTrue(isinstance(ax, plt.Axes))
-    def test_case_5(self):
-        # Handle negatives
-        df, ax = task_func([[-1, -2, -3, -4, -5], [1, 2, 3, 4, 5]])
-        self.assertEqual(df.values.tolist(), [[-1, -2, -3, -4, -5], [1, 2, 3, 4, 5]])
-        self.assertTrue(isinstance(ax, plt.Axes))
-    def test_case_6(self):
-        # Handle empty
-        df, ax = task_func([])
-        self.assertEqual(df.values.tolist(), [])
-        self.assertTrue(isinstance(ax, plt.Axes))
-    def test_case_7(self):
-        # Handle invalid input
-        with self.assertRaises(TypeError):
-            task_func([["a", "b", "c", "d", "e"]])
-    def test_case_8(self):
-        # Handle large numbers
-        df, _ = task_func([[1000000, 2000000, 3000000, 4000000, 5000000]])
-        self.assertTrue(
-            all(
-                df.sum()
-                == pd.Series(
-                    [1000000, 2000000, 3000000, 4000000, 5000000],
-                    index=["A", "B", "C", "D", "E"],
-                )
-            )
-        )
-    def test_case_9(self):
-        # Test plot details
-        _, ax = task_func([[1, 2, 3, 4, 5]])
-        self.assertEqual(len(ax.patches), 5)  # Checks if there are exactly 5 bars
-        bar_labels = [bar.get_x() for bar in ax.patches]
-        self.assertEqual(len(bar_labels), 5)
-    def test_case_10(self):
-        # Test column sums with plot check
-        data = [[1, 2, 3, 4, 5], [5, 4, 3, 2, 1], [2, 3, 4, 5, 6]]
-        df, ax = task_func(data)
-        column_sums = df.sum().tolist()
-        bar_heights = [bar.get_height() for bar in ax.patches]
-        self.assertEqual(column_sums, bar_heights)
-        self.assertEqual(
-            len(ax.patches), len(data[0])
-        )  # Ensure there's a bar for each column
-    def tearDown(self):
-        plt.close("all")
+    def setUp(self):
+        # Initialize common test data used in multiple test cases.
+        self.X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+        self.Y = np.array([0, 1, 1, 0])
+    def test_model_and_axes_types(self):
+        # Verify if the returned objects include a Keras Sequential model and a matplotlib Axes.
+        model, ax = task_func(self.X, self.Y)
+        self.assertIsInstance(model, Sequential, "The function should return a Sequential model.")
+        self.assertIsInstance(ax, Axes, "The function should return a matplotlib Axes object.")
+    def test_model_output_shape(self):
+        # Ensure the model's output shape is correct based on the input data.
+        model, _ = task_func(self.X, self.Y)
+        self.assertEqual(model.output_shape, (None, 1), "The model's output shape should have one dimension for binary classification.")
+    def test_model_loss(self):
+        # Confirm that the model uses binary cross-entropy as its loss function.
+        model, _ = task_func(self.X, self.Y)
+        self.assertEqual(model.loss, 'binary_crossentropy', "Binary cross-entropy should be the loss function for the model.")
+    def test_model_optimizer(self):
+        # Check if the model's optimizer is an instance of SGD.
+        model, _ = task_func(self.X, self.Y)
+        self.assertIsNotNone(model.optimizer)
+        self.assertIsInstance(model.optimizer, SGD, "The optimizer for the model should be SGD.")
+    def test_input_dimension_flexibility(self):
+        # Test the model's ability to handle inputs with varying feature dimensions.
+        X_varied = np.array([[0], [1], [2], [3]])
+        Y_varied = np.array([0, 1, 0, 1])
+        model, _ = task_func(X_varied, Y_varied)
+        self.assertEqual(model.input_shape[1], X_varied.shape[1], "The model should dynamically adapt to the input feature size.")
+    def test_axes_labels_and_title(self):
+        # Test if the Axes object has the correct title and labels as specified.
+        _, ax = task_func(self.X, self.Y)
+        self.assertEqual(ax.get_title(), 'Precision-Recall Curve', "The plot's title should be 'Precision-Recall Curve'.")
+        self.assertEqual(ax.get_xlabel(), 'Recall', "The plot's x-axis label should be 'Recall'.")
+        self.assertEqual(ax.get_ylabel(), 'Precision', "The plot's y-axis label should be 'Precision'.")

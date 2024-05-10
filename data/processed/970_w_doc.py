@@ -1,82 +1,92 @@
-from matplotlib import pyplot as plt
-from sklearn.decomposition import PCA
+import pandas as pd
+import seaborn as sns
 
-
-def task_func(arr):
+def task_func(data):
     """
-    Performs Principal Component Analysis (PCA) on the sum of rows of a 2D numpy array and plots the explained variance ratio.
-
-    Note:
-    - The title of the plot is set to "Explained Variance Ratio of Principal Components".
+    Creates and return a heatmap of the cumulative sum of each column in a dictionary.
 
     Parameters:
-    - arr (numpy.ndarray): A 2D numpy array. The input data for PCA.
+    - data (dict): A dictionary where the keys are the column names and the values are the column values.
 
     Returns:
-    - ax (matplotlib.axes.Axes): An Axes object from matplotlib.
+    - matplotlib.axes._axes.Axes: The Axes object of the Seaborn heatmap.
+
+    Raises:
+    - ValueError: If the DataFrame is empty or if no numeric columns are present.
 
     Requirements:
-    - scikit-learn
-    - matplotlib
+    - pandas
+    - seaborn
 
     Notes:
-    - The function assumes that 'arr' is a valid 2D numpy array.
-    - Only the first principal component is considered in this analysis.
-    - The plot illustrates the proportion of the dataset's variance that lies along the axis of this first principal component.
-    
+    - Only numeric columns are considered for the heatmap. Non-numeric columns are ignored.
+
     Example:
-    >>> import numpy as np
-    >>> arr = np.array([[i+j for i in range(3)] for j in range(5)])
-    >>> axes = task_func(arr)
-    >>> axes.get_title()
-    'Explained Variance Ratio of Principal Components'
+    >>> data = {'A': [1, 2, 3], 'B': [4, 5, 6]}
+    >>> ax = task_func(data)
     """
-    row_sums = arr.sum(axis=1)
-    pca = PCA(n_components=1)
-    pca.fit(row_sums.reshape(-1, 1))
-    _, ax = plt.subplots()
-    ax.bar([0], pca.explained_variance_ratio_)
-    ax.set_title("Explained Variance Ratio of Principal Components")
-    ax.set_xticks([0])
-    ax.set_xticklabels(["PC1"])
+    df = pd.DataFrame(data)
+    numeric_df = df.select_dtypes(include=["number"])
+    if numeric_df.empty:
+        raise ValueError("No numeric columns present")
+    df_cumsum = numeric_df.cumsum()
+    ax = sns.heatmap(df_cumsum)
     return ax
 
 import unittest
 import numpy as np
-from sklearn.decomposition import PCA
-from matplotlib import pyplot as plt
+import pandas as pd
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Tests for function task_func."""
-    def test_basic_functionality(self):
-        """Test basic functionality of task_func."""
-        arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        result = task_func(arr)
-        self.assertIsInstance(result, plt.Axes)
-    def test_plot_title_verification(self):
-        """Test that the plot title is correct."""
-        arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        result = task_func(arr)
-        self.assertEqual(
-            result.get_title(), "Explained Variance Ratio of Principal Components"
+    def tearDown(self):
+        plt.close("all")
+    def test_cumsum_correctness(self):
+        data = {"A": [1, 2, 3], "B": [4, 5, 6]}
+        df = pd.DataFrame(data)
+        ax = task_func(data)
+        result_cumsum = df.cumsum().values.flatten()
+        heatmap_data = ax.collections[0].get_array().data.flatten()
+        np.testing.assert_array_equal(
+            result_cumsum, heatmap_data, "Cumulative sum calculation is incorrect"
         )
-    def test_bar_count_verification(self):
-        """Test that the number of bars is correct."""
-        arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        result = task_func(arr)
-        n_components = min(2, arr.sum(axis=1).reshape(-1, 1).shape[1])
-        self.assertEqual(len(result.patches), n_components)
-    def test_variance_ratios_verification(self):
-        """Test that the variance ratios are correct."""
-        arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        row_sums = arr.sum(axis=1)
-        n_components = min(2, row_sums.reshape(-1, 1).shape[1])
-        pca = PCA(n_components=n_components)
-        pca.fit(row_sums.reshape(-1, 1))
-        result = task_func(arr)
-        for bar, variance_ratio in zip(result.patches, pca.explained_variance_ratio_):
-            self.assertAlmostEqual(bar.get_height(), variance_ratio)
-    def test_empty_input(self):
-        """Test that an empty input raises a ValueError."""
-        arr = np.array([])
+    def test_non_numeric_columns_ignored(self):
+        data = {"A": [1, 2, 3], "B": ["one", "two", "three"]}
+        ax = task_func(data)
+        self.assertIsInstance(
+            ax, plt.Axes, "The result should be a matplotlib Axes object"
+        )
+        self.assertEqual(
+            len(ax.get_xticklabels()), 1, "Non-numeric columns should be ignored"
+        )
+    def test_with_positive_numbers(self):
+        data = {"A": [1, 2, 3], "B": [4, 5, 6]}
+        result = task_func(data)
+        self.assertIsInstance(
+            result, plt.Axes, "The result should be a matplotlib Axes object"
+        )
+    def test_with_negative_numbers(self):
+        data = {"A": [-1, -2, -3], "B": [-4, -5, -6]}
+        result = task_func(data)
+        self.assertIsInstance(
+            result, plt.Axes, "The result should be a matplotlib Axes object"
+        )
+    def test_with_mixed_numbers(self):
+        data = {"A": [1, -2, 3], "B": [-4, 5, -6]}
+        result = task_func(data)
+        self.assertIsInstance(
+            result, plt.Axes, "The result should be a matplotlib Axes object"
+        )
+    def test_with_zeroes(self):
+        data = {"A": [0, 0, 0], "B": [0, 0, 0]}
+        result = task_func(data)
+        self.assertIsInstance(
+            result, plt.Axes, "The result should be a matplotlib Axes object"
+        )
+    def test_with_empty_dataframe(self):
+        data = {"A": [], "B": []}
         with self.assertRaises(ValueError):
-            task_func(arr)
+            task_func(data)
+    def test_no_numeric_columns(self):
+        data = {"A": ["one", "two", "three"], "B": ["four", "five", "six"]}
+        with self.assertRaises(ValueError):
+            task_func(data)

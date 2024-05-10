@@ -1,55 +1,81 @@
-import string
-import wordninja
+import re
+from nltk.stem import PorterStemmer
 
-def task_func(word):
+def task_func(text_series):
     """
-    Converts a word into a list of tuples, with each tuple containing a lowercase English letter from the word and its position in the alphabet.
-    Then, split the given word into a list of words.
+    Process a pandas Series of text data by lowercasing all letters, removing non-alphanumeric 
+    characters (except spaces), removing punctuation, and stemming each word to its root form.
     
-    Requirements:
-    - string
-    - wordninja
+    Stemming is done using the NLTK's PorterStemmer, which applies a series of rules to find the stem of each word.
     
     Parameters:
-    - word (str): A string composed of lowercase letters.
-    
+    - text_series (pandas.Series): A Series object containing string entries representing text data.
+
+    Requirements:
+    - re
+    - nltk
+
     Returns:
-    - list of tuples: Each tuple consists of a letter from the input string and its corresponding position in the alphabet.
+    - pandas.Series: A Series where each string has been processed to remove non-alphanumeric characters,
+      punctuation, converted to lowercase, and where each word has been stemmed.
     
     Examples:
-    >>> task_func('abc')
-    ([('a', 1), ('b', 2), ('c', 3)], ['abc'])
-    >>> task_func('howistheweathertoday')
-    ([('h', 8), ('o', 15), ('w', 23), ('i', 9), ('s', 19), ('t', 20), ('h', 8), ('e', 5), ('w', 23), ('e', 5), ('a', 1), ('t', 20), ('h', 8), ('e', 5), ('r', 18), ('t', 20), ('o', 15), ('d', 4), ('a', 1), ('y', 25)], ['how', 'is', 'the', 'weather', 'today'])
+    >>> input_series = pd.Series(["This is a sample text.", "Another example!"])
+    >>> output_series = task_func(input_series)
+    >>> print(output_series.iloc[0])
+    thi is a sampl text
+    >>> print(output_series.iloc[1])
+    anoth exampl
+
     """
-    ALPHABET = list(string.ascii_lowercase)
-    word_numbers = [ALPHABET.index(letter) + 1 for letter in word]
-    return [(word[i], word_numbers[i]) for i in range(len(word))],  wordninja.split(word)
+    stemmer = PorterStemmer()
+    def process_text(text):
+        text = re.sub('[^\sa-zA-Z0-9]', '', text).lower().strip()
+        text = " ".join([stemmer.stem(word) for word in text.split()])
+        return text
+    return text_series.apply(process_text)
 
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
     
-    def test_basic_word(self):
-        self.assertEqual(task_func('abc'), ([('a', 1), ('b', 2), ('c', 3)], ['abc']))
-        
-    def test_non_consecutive_letters(self):
-        self.assertEqual(task_func('ihatehim'), ([('i', 9), ('h', 8), ('a', 1), ('t', 20), ('e', 5), ('h', 8), ('i', 9), ('m', 13)], ['i', 'hate', 'him']))
-    
-    def test_single_letter(self):
-        self.assertEqual(task_func('hellohello'), ([('h', 8), ('e', 5), ('l', 12), ('l', 12), ('o', 15), ('h', 8), ('e', 5), ('l', 12), ('l', 12), ('o', 15)], ['hello', 'hello']))
-        
-    def test_repeated_letters(self):
-        self.assertEqual(task_func('aa'), ([('a', 1), ('a', 1)], ['a', 'a']))
-        
-    def test_empty_string(self):
-        self.assertEqual(task_func(''), ([], []))
-        
-    def test_long_word(self):
-        result = task_func('abcdefghijklmnopqrstuvwxyz')
-        ALPHABET = list(string.ascii_lowercase)
-        expected = [(letter, index + 1) for index, letter in enumerate(ALPHABET)]
-        self.assertEqual(result, (expected, ['abcde', 'fg', 'hi', 'j', 'klm', 'no', 'p', 'qrs', 'tu', 'vw', 'xyz']))
-        
-    def test_word_with_uppercase_should_fail(self):
-        with self.assertRaises(ValueError):
-            task_func('aBc')
+    def test_lowercase_and_stemming(self):
+        """
+        Test case to ensure that all text is converted to lowercase and words are stemmed properly.
+        """
+        input_series = pd.Series(["THIS IS A TEST.", "Test, case number 2!"])
+        expected_output = pd.Series(["thi is a test", "test case number 2"])
+        processed_series = task_func(input_series)
+        pd.testing.assert_series_equal(processed_series, expected_output)
+    def test_numerics_and_special_characters(self):
+        """
+        Test case to verify that numeric characters are retained and special characters are removed.
+        """
+        input_series = pd.Series(["Another Test 123.", "456 Anoth3r one!"])
+        expected_output = pd.Series(["anoth test 123", "456 anoth3r one"])
+        processed_series = task_func(input_series)
+        pd.testing.assert_series_equal(processed_series, expected_output)
+    def test_empty_strings(self):
+        """
+        Test case to check the function's handling of empty strings.
+        """
+        input_series = pd.Series(["", " "])
+        expected_output = pd.Series(["", ""])
+        processed_series = task_func(input_series)
+        pd.testing.assert_series_equal(processed_series, expected_output)
+    def test_punctuation(self):
+        """
+        Test case to check that punctuation is removed from the text.
+        """
+        input_series = pd.Series(["Punctuation! Should, be: removed; right?"])
+        expected_output = pd.Series(["punctuat should be remov right"])
+        processed_series = task_func(input_series)
+        pd.testing.assert_series_equal(processed_series, expected_output)
+    def test_stemconsistency(self):
+        """
+        Test case to ensure that stemming is consistent across different forms of words.
+        """
+        input_series = pd.Series(["Stemming should work on words like running", "stemmed works on stemmed"])
+        expected_output = pd.Series(["stem should work on word like run", "stem work on stem"])
+        processed_series = task_func(input_series)
+        pd.testing.assert_series_equal(processed_series, expected_output)

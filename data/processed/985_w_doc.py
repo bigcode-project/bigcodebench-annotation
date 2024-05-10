@@ -1,75 +1,81 @@
+import seaborn as sns
 import numpy as np
-import matplotlib.pyplot as plt
 
 
-def task_func(arr):
+def task_func(df):
     """
-    Analyzes the distribution of values in a NumPy array to determine if it is uniform and
-    generates a histogram representing this distribution.
+    Generates a pair plot from a numeric DataFrame and calculates its covariance matrix.
 
     Parameters:
-    - arr (numpy.ndarray): A NumPy array containing the values to be analyzed. 
-      The array can contain any hashable data type (e.g., integers, floats, strings).
+    - df (pandas.DataFrame): A pandas DataFrame with only numeric columns.
 
     Returns:
-    - tuple: A tuple containing two elements:
-        - uniform_distribution (bool): A boolean value indicating whether the distribution is uniform. 
-           - Returns True if every unique value in the array appears the same number of times,
-             indicating a uniform distribution.
-           - Returns False otherwise.
-        - ax (matplotlib.axes.Axes): An Axes object displaying the histogram of the array's value distribution.
-           - The histogram's bins correspond to the unique values in the array.
-           - The frequency of each unique value is represented by the height of the corresponding bin.
+    - tuple:
+        - covariance_df (pandas.DataFrame): The covariance matrix of the input DataFrame.
+        - pair_plot (sns.axisgrid.PairGrid): Pair plot of the input DataFrame.
 
-    Note:
-      - The bin is set to `np.arange(len(unique) + 1) - 0.5` to align each bin with its corresponding unique value.
+    Raises:
+    - ValueError: If the DataFrame is empty.
+    - TypeError: If the DataFrame contains non-numeric data types.
 
     Requirements:
     - numpy
-    - matplotlib
+    - seaborn
 
-    Example:
-    >>> arr = np.array(["A", "A", "B", "B"])
-    >>> is_uniform, ax = task_func(arr)
-    >>> is_uniform
-    True
+    Examples:
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'C': [7, 8, 9]})
+    >>> covariance_df, ax = task_func(df)
+    >>> type(ax)
+    <class 'seaborn.axisgrid.PairGrid'>
+    >>> covariance_df
+         A    B    C
+    A  1.0  1.0  1.0
+    B  1.0  1.0  1.0
+    C  1.0  1.0  1.0
     """
-    unique, counts = np.unique(arr, return_counts=True)
-    uniform_distribution = len(set(counts)) == 1
-    _, ax = plt.subplots()
-    ax.hist(arr, bins=np.arange(len(unique) + 1) - 0.5, rwidth=0.8, align="mid")
-    ax.set_xticks(range(len(unique)))
-    ax.set_xticklabels(unique)
-    return uniform_distribution, ax
+    if df.empty:
+        raise ValueError("DataFrame is empty. Non-empty DataFrame required.")
+    if not all(df.dtypes.apply(lambda x: np.issubdtype(x, np.number))):
+        raise TypeError(
+            "DataFrame contains non-numeric data. Only numeric data types are supported."
+        )
+    covariance_df = df.cov()
+    pair_plot = sns.pairplot(df)
+    return covariance_df, pair_plot
 
-import numpy as np
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
-    """Test cases for task_func"""
-    def test_uniform_distribution(self):
-        """Test uniform distribution."""
-        arr = np.array(["A", "A", "B", "B"])
-        uniform, _ = task_func(arr)
-        self.assertTrue(uniform)
-    def test_non_uniform_distribution(self):
-        """Test non-uniform distribution."""
-        arr = np.array(["A", "A", "B", "B", "B", "C", "C", "C", "C", "D", "E", "E"])
-        uniform, _ = task_func(arr)
-        self.assertFalse(uniform)
-    def test_single_value(self):
-        """Test single value."""
-        arr = np.array(["A", "A", "A", "A"])
-        uniform, _ = task_func(arr)
-        self.assertTrue(uniform)
-    def test_multiple_equal_values(self):
-        """Test multiple equal values."""
-        arr = np.array(["A", "A", "B", "B", "C", "C", "D", "D"])
-        uniform, _ = task_func(arr)
-        self.assertTrue(uniform)
-    def test_varying_values(self):
-        """Test varying values."""
-        arr = np.array(["A", "B", "B", "C", "C", "C", "D", "D", "D", "D"])
-        uniform, _ = task_func(arr)
-        self.assertFalse(uniform)
-    def tearDown(self):
-        plt.close()
+    def test_covariance_one(self):
+        """Test basic case with expected covariance of 1.0"""
+        df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6], "C": [7, 8, 9]})
+        covariance_df, _ = task_func(df)
+        self.assertTrue((covariance_df == 1).all().all())
+    def test_identical_values_dataframe(self):
+        """Test DataFrame where all rows have identical values."""
+        df = pd.DataFrame({"A": [1, 1, 1], "B": [2, 2, 2]})
+        covariance_df, _ = task_func(df)
+        self.assertTrue((covariance_df == 0).all().all())
+    def test_with_empty_dataframe(self):
+        """Test handling empty input (should raise error)."""
+        df = pd.DataFrame()
+        with self.assertRaises(ValueError):
+            task_func(df)
+    def test_with_non_numeric_dataframe(self):
+        """Test handling unsupported data types."""
+        df = pd.DataFrame({"A": ["a", "b", "c"], "B": ["d", "e", "f"]})
+        with self.assertRaises(TypeError):
+            task_func(df)
+    def test_plot_attributes(self):
+        """Test plot attributes."""
+        df = pd.DataFrame({"X": [10, 20, 30], "Y": [15, 25, 35]})
+        _, pair_plot = task_func(df)
+        self.assertIsInstance(pair_plot, sns.axisgrid.PairGrid)
+        self.assertEqual(len(pair_plot.axes), 2)  # Should have 2x2 grid for pair plot
+    def test_single_column_dataframe(self):
+        """Test handling of DataFrame with a single numeric column."""
+        df = pd.DataFrame({"A": [1, 2, 3]})
+        covariance_df, _ = task_func(df)
+        self.assertEqual(covariance_df.loc["A"].item(), 1.0)
+        self.assertEqual(covariance_df.shape, (1, 1))

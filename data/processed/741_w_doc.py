@@ -1,63 +1,70 @@
-import binascii
-import io
-import gzip
+from collections import Counter
+import heapq
 
-def task_func(compressed_hex):
+# Constants
+LETTERS = list('abcdefghijklmnopqrstuvwxyz')
+
+def task_func(my_dict):
     """
-    Uncompress a gzip-compressed hexadecimal string and decrypt the result to UTF-8.
-    
+    Create a dictionary in which the keys are letters and the values are random integers.
+    Find the 3 most common letters in the dictionary.
+
     Parameters:
-    - compressed_hex (str): The gzip-compressed hexadecimal string.
-    
+    - my_dict (dict): The dictionary to process.
+
     Returns:
-    - decoded_string (str): The decoded and decompressed string in UTF-8 format, or an error message.
-    
+    - most_common_letters (list): The 3 most common letters.
+
     Requirements:
-    - binascii
-    - io
-    - gzip
-    
+    - collections
+    - heapq
+
     Example:
-    >>> task_func('1f8b08000000000002ff0b49494e55560304000000ffff8b202d0b000000')
-    'Error during decompression: CRC check failed 0xff000000 != 0x41449975'
+    >>> random.seed(43)
+    >>> my_dict = {letter: random.randint(1, 100) for letter in LETTERS}
+    >>> most_common_letters = task_func(my_dict)
+    >>> print(most_common_letters)
+    ['d', 'v', 'c']
     """
-    try:
-        compressed_bytes = binascii.unhexlify(compressed_hex)
-        decompressed_bytes = gzip.GzipFile(fileobj=io.BytesIO(compressed_bytes)).read()
-        decoded_string = decompressed_bytes.decode('utf-8')
-        return decoded_string
-    except gzip.BadGzipFile as e:
-        return "Error during decompression: " + str(e)
+    letter_counter = Counter(my_dict)
+    most_common_letters = heapq.nlargest(3, letter_counter, key=letter_counter.get)
+    return most_common_letters
 
 import unittest
-import binascii
-import io
-import gzip
-def generate_compressed_hex(original_string):
-    """
-    Helper function to generate a gzip-compressed hexadecimal string from an original string.
-    """
-    compressed_bytes = gzip.compress(original_string.encode('utf-8'))
-    compressed_hex = binascii.hexlify(compressed_bytes).decode('utf-8')
-    return compressed_hex
+import random
+LETTERS = list('abcdefghijklmnopqrstuvwxyz')
+def generate_random_dict(size=26, min_val=1, max_val=100):
+    """Generate a random dictionary with letters as keys and random integers as values."""
+    letters = random.sample(LETTERS, size)
+    return {letter: random.randint(min_val, max_val) for letter in letters}
 class TestCases(unittest.TestCase):
-    def test_1(self):
-        # Test with the word "HELLO"
-        compressed_hex = generate_compressed_hex("HELLO")
-        self.assertEqual(task_func(compressed_hex), "HELLO")
-    def test_2(self):
-        # Test with a single character "A"
-        compressed_hex = generate_compressed_hex("A")
-        self.assertEqual(task_func(compressed_hex), "A")
-    def test_3(self):
-        # Test with numbers "12345"
-        compressed_hex = generate_compressed_hex("12345")
-        self.assertEqual(task_func(compressed_hex), "12345")
-    def test_4(self):
-        # Test with special characters "!@#"
-        compressed_hex = generate_compressed_hex("!@#")
-        self.assertEqual(task_func(compressed_hex), "!@#")
-    def test_5(self):
-        # Test with an empty string
-        compressed_hex = generate_compressed_hex("")
-        self.assertEqual(task_func(compressed_hex), "")
+    def test_basic(self):
+        # Basic Test
+        test_dict = generate_random_dict()
+        result = task_func(test_dict)
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 3)
+        self.assertTrue(all(isinstance(letter, str) for letter in result))
+    def test_few_letters(self):
+        # Edge Case: Fewer than 3 letters
+        test_dict = {'a': 10, 'b': 20}
+        result = task_func(test_dict)
+        self.assertEqual(result, ['b', 'a'])
+    def test_empty_dict(self):
+        # Edge Case: Empty dictionary
+        test_dict = {}
+        result = task_func(test_dict)
+        self.assertEqual(result, [])
+    def test_specific_letters(self):
+        # Specific Test: Known output
+        test_dict = {'a': 100, 'b': 90, 'c': 80, 'd': 70}
+        result = task_func(test_dict)
+        self.assertEqual(result, ['a', 'b', 'c'])
+    def test_general(self):
+        # General Test: Check top 3 values
+        test_dict = generate_random_dict()
+        result = task_func(test_dict)
+        sorted_values = sorted(test_dict.values(), reverse=True)[:3]
+        sorted_keys = [k for k, v in sorted(test_dict.items(), key=lambda item: item[1], reverse=True)][:3]
+        self.assertEqual(result, sorted_keys)
+        self.assertEqual([test_dict[key] for key in result], sorted_values)

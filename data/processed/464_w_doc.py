@@ -1,70 +1,116 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 
 
-def task_func(a, b, columns=['A', 'B']):
+def task_func(data_str, separator=",", bins=20):
     """
-    Standardize two lists of numbers using the StandardScaler from sklearn and visualize the standardized values using a bar plot.
+    Convert a string of numerical values separated by a specified separator into a pandas
+    numerical series with int64, and then draw a histogram of the data.
+
+    The function raises a ValueError if data is empty or it fails to convert the data.
+    It plots the histogram with the following attributes:
+    - grid: True
+    - rwidth: 0.9
+    - color: '#607c8e'
 
     Parameters:
-        a (list): A list of numbers.
-        b (list): Another list of numbers.
-        columns (list, optional): Column names for the resulting DataFrame. Defaults to ['A', 'B'].
+    - data_str (str): The string of numbers separated by the specified separator.
+    - separator (str, optional): The separator used in the data string. Default is ','.
+    - bins (int, optional): Number of histogram bins. Default is 20.
 
     Returns:
-        pd.DataFrame: A DataFrame containing the standardized values.
-        matplotlib.axes.Axes: Axes object of the displayed bar plot.
+    - tuple: A tuple containing:
+        1. Series: A pandas Series of the data coonverted into integers.
+        2. Axes: The Axes object of the plotted histogram.
 
     Requirements:
-        - numpy
-        - pandas
-        - sklearn.preprocessing
-        - matplotlib.pyplot
+    - numpy
+    - pandas
 
     Example:
-        >>> df, ax = task_func([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
-        >>> isinstance(df, pd.DataFrame) and isinstance(ax, matplotlib.axes.Axes)
-        True
+    >>> series, ax = task_func('1,2,3,4,5,5,5,4,3,2,1')
+    >>> print(type(series), series.tolist())
+    <class 'pandas.core.series.Series'> [1, 2, 3, 4, 5, 5, 5, 4, 3, 2, 1]
+    >>> print(type(ax))
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    if len(a) == 0 or len(b) == 0:
-        fig, ax = plt.subplots()
-        plt.close(fig)  # Prevent empty plot from displaying
-        return pd.DataFrame(), ax
-    scaler = StandardScaler()
-    standardized_values = scaler.fit_transform(np.array([a, b]).T)
-    df = pd.DataFrame(standardized_values, columns=columns)
-    ax = df.plot(kind='bar')
-    plt.show()
-    return df, ax
+    data = np.fromstring(data_str, sep=separator)
+    if data.size == 0:
+        raise ValueError("Failed to find valid data")
+    data = pd.Series(data, dtype='int64')
+    ax = data.plot.hist(grid=True, bins=bins, rwidth=0.9, color="#607c8e")
+    return data, ax
 
 import unittest
+import pandas as pd
 import matplotlib
+from matplotlib import pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_standard_case(self):
-        """Test the function with non-empty lists."""
-        df, ax = task_func([1, 2, 3], [4, 5, 6])
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(df.shape, (3, 2))
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-    def test_empty_lists(self):
-        """Test the function with empty lists."""
-        df, ax = task_func([], [])
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(df.empty, True)
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-    def test_unequal_length_lists(self):
-        """Test the function with lists of unequal length. Expecting an exception."""
+    def setUp(self) -> None:
+        self.default_str = "1,2,3,4,5,5,5,4,3,2,1"
+        self.default_expected = pd.Series([1, 2, 3, 4, 5, 5, 5, 4, 3, 2, 1])
+    def assertHistogramAttributes(self, series, ax):
+        # Check that the y-axis gridlines are set to True
+        self.assertTrue(ax.yaxis.grid)
+        # Ensure the histogram bars have the correct color
+        self.assertEqual(matplotlib.colors.to_hex(ax.patches[0].get_fc()), "#607c8e")
+        # Validate the heights of the histogram bars
+        for patch in ax.patches:
+            if (
+                round(patch.get_x()) in series.values
+                or round(patch.get_x() + patch.get_width()) in series.values
+            ):
+                self.assertTrue(patch.get_height() >= 0)
+    def test_case_1(self):
+        # Test default case
+        series, ax = task_func(self.default_str)
+        self.assertIsInstance(series, pd.Series)
+        self.assertHistogramAttributes(series, ax)
+        pd.testing.assert_series_equal(series, self.default_expected)
+    def test_case_2(self):
+        # Test function works on different bin sizes
+        for bins in [5, 10, 15, 30, 100]:
+            with self.subTest(bins=bins):
+                series, ax = task_func(self.default_str, bins=bins)
+                self.assertIsInstance(series, pd.Series)
+                self.assertHistogramAttributes(series, ax)
+                pd.testing.assert_series_equal(series, self.default_expected)
+    def test_case_3(self):
+        # Test custom separators
+        data_str = "1|2|3|4|5"
+        series, ax = task_func(data_str, separator="|")
+        self.assertIsInstance(series, pd.Series)
+        self.assertHistogramAttributes(series, ax)
+        pd.testing.assert_series_equal(series, pd.Series([1, 2, 3, 4, 5]))
+    def test_case_4(self):
+        # Test negative and zero
+        data_str = "-5,-4,-3,-2,-1,0"
+        series, ax = task_func(data_str)
+        self.assertIsInstance(series, pd.Series)
+        self.assertHistogramAttributes(series, ax)
+        pd.testing.assert_series_equal(series, pd.Series([-5, -4, -3, -2, -1, 0]))
+    def test_case_5(self):
+        # Test single item
+        data_str = "1"
+        series, ax = task_func(data_str)
+        self.assertIsInstance(series, pd.Series)
+        self.assertHistogramAttributes(series, ax)
+        pd.testing.assert_series_equal(series, pd.Series([1]))
+    def test_case_6(self):
+        # Test with float
+        series, ax = task_func("1.0,2.0,3.0,4.0,5.0,5.0,5.0,4.0,3.0,2.0,1.0")
+        self.assertIsInstance(series, pd.Series)
+        self.assertHistogramAttributes(series, ax)
+        pd.testing.assert_series_equal(series, self.default_expected)
+    def test_case_7(self):
+        # Test with empty string
+        data_str = ""
         with self.assertRaises(ValueError):
-            task_func([1, 2, 3], [4, 5])
-    def test_single_value_lists(self):
-        """Test the function with single-value lists."""
-        df, ax = task_func([1], [1])
-        self.assertEqual(df.shape, (1, 2))
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-    def test_large_lists(self):
-        """Test the function with large lists."""
-        df, ax = task_func(list(range(100)), list(range(100, 200)))
-        self.assertEqual(df.shape, (100, 2))
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+            task_func(data_str)
+    def test_case_8(self):
+        # Test with invalid data (contains string)
+        data_str = "a,b,c, 1"
+        with self.assertRaises(ValueError):
+            task_func(data_str)
+    def tearDown(self):
+        plt.close("all")

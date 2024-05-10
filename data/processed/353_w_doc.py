@@ -1,128 +1,88 @@
-import numpy as np
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
+import pandas as pd
+from collections import Counter
 
 
-def task_func(data, n_components=2, random_state=None):
+def task_func(text_dict, word_keys, top_k=2):
     """
-    Performs Principal Component Analysis (PCA) on the provided dataset to reduce its dimensionality,
-    and visualizes the results using a scatter plot.
-
-    This function applies PCA to the dataset, reducing its features to the specified number of principal components.
-    It then visualizes the reduced data in a scatter plot. For datasets reduced to a single component, the function
-    generates a 1D scatter plot along the X-axis, with all Y-values set to zero. For reductions resulting in two or more
-    components, only the first two principal components are visualized.
-
+    Calculate the frequency of certain words in a text dictionary and return a bar chart's Axes object and a dictionary
+    containing the frequencies of the top_k most common words in text_dict. 
+    
+    The function takes a dictionary containing word frequencies and a list of words. It calculates the frequency 
+    of the provided words in the dictionary and returns the Axes object of the bar chart displaying the frequencies
+    along with the top_k most common words and their frequencies as a dictionary. If a word in word_keys is not present 
+    in text_dict, its frequency is considered to be 0.
+    
     Parameters:
-    - data (ndarray): A numpy ndarray of shape (n_samples, n_features) representing the data.
-    - n_components (int, optional): Number of components to keep. Defaults to 2.
-    - random_state (int, optional): Seed for reproducibility. Defaults to None.
-
+    - text_dict (dict): The dictionary containing word frequencies. Key is the word and value is its frequency.
+    - word_keys (list of str): The list of words to consider.
+    - top_k (int, Optional): A positive integer denoting the number of most common words to return. Default is 2.
+    
     Returns:
-    dict: A dictionary containing:
-        - "transformed_data" (np.ndarray): The transformed data.
-        - "ax" (plt.Axes): The scatter plot visualizing the transformed data.
-
+    - matplotlib.axes._axes.Axes: Axes object of the bar chart displaying the frequencies.
+    - dict: Dictionary containing the frequencies of the top_k most common words. Key is the word and value is 
+    its frequency.
+    
     Requirements:
-    - numpy
-    - matplotlib
-    - sklearn
+    - pandas
+    - collections.Counter
 
+    Raises:
+    - ValueError: If top_k is a negative integer.
+    
     Example:
-    >>> data = np.random.random((100, 5))
-    >>> results = task_func(data, random_state=42)
-    >>> results['transformed_data'].shape
-    (100, 2)
-    >>> type(results['ax'])
+    >>> import collections
+    >>> text_dict = collections.Counter(['the', 'be', 'to', 'the', 'that', 'and', 'a', 'in', 'the', 'that', 'have', 'I'])
+    >>> word_keys = ['the', 'and', 'I']
+    >>> ax, frequencies = task_func(text_dict, word_keys, 3)
+    >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
+    >>> frequencies
+    {'the': 3, 'that': 2, 'be': 1}
     """
-    pca = PCA(n_components=n_components, random_state=random_state)
-    transformed_data = pca.fit_transform(data)
-    fig, ax = plt.subplots()
-    if transformed_data.shape[1] == 1:
-        ax.scatter(transformed_data[:, 0], np.zeros_like(transformed_data[:, 0]))
-    else:
-        ax.scatter(transformed_data[:, 0], transformed_data[:, 1])
-    return {"transformed_data": transformed_data, "ax": ax}
+    if top_k < 0:
+        raise ValueError('top_k must be a positive integer.')
+    elif top_k >= len(text_dict):
+        top_k = len(text_dict)
+    frequencies = [text_dict.get(word, 0) for word in word_keys]
+    freq_dict = Counter(text_dict)
+    top_k_words = freq_dict.most_common(top_k)
+    word_series = pd.Series(frequencies, index=word_keys)
+    ax = word_series.plot(kind='bar')
+    return ax, dict(top_k_words)
 
 import unittest
-from sklearn.decomposition import PCA
-import numpy as np
-import matplotlib.pyplot as plt
+import doctest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.seed = 42
-        self.n = 100
-        self.n_dims = 5
-        self.n_components = 2
-        self.data = np.random.RandomState(self.seed).random((self.n, self.n_dims))
-    def assert_pca_correctness(self, data, results, n_components, random_state):
-        """Helper method to assert PCA correctness"""
-        # 1. Variance explained
-        pca = PCA(n_components=n_components, random_state=random_state)
-        pca.fit(data)
-        explained_variance_ratio = pca.explained_variance_ratio_
-        if data.shape[1] == 1:
-            # For one-dimensional data, the explained variance ratio should be 1
-            self.assertAlmostEqual(explained_variance_ratio[0], 1.0, delta=1e-2)
-        else:
-            cov_matrix = np.cov(data, rowvar=False)
-            eigenvalues = np.linalg.eigvals(cov_matrix)
-            sorted_eigenvalues = np.sort(eigenvalues)[::-1][:n_components]
-            normalized_eigenvalues = sorted_eigenvalues / sum(eigenvalues)
-            self.assertTrue(
-                np.allclose(explained_variance_ratio, normalized_eigenvalues, atol=1e-1)
-            )
-        # 2. Orthogonality
-        for i in range(n_components):
-            for j in range(i + 1, n_components):
-                dot_product = np.dot(
-                    results["transformed_data"][:, i], results["transformed_data"][:, j]
-                )
-                self.assertAlmostEqual(dot_product, 0, delta=1e-2)
     def test_case_1(self):
-        # Test with default settings
-        results = task_func(self.data, random_state=self.seed)
-        self.assertEqual(results["transformed_data"].shape, (self.n, self.n_components))
-        x_data = results["ax"].collections[0].get_offsets()[:, 0]
-        y_data = results["ax"].collections[0].get_offsets()[:, 1]
-        self.assertTrue(np.array_equal(x_data, results["transformed_data"][:, 0]))
-        self.assertTrue(np.array_equal(y_data, results["transformed_data"][:, 1]))
-        self.assert_pca_correctness(self.data, results, self.n_components, self.seed)
+        text_dict = Counter(['the', 'be', 'to', 'the', 'and', 'that', 'a', 'in', 'the', 'that', 'have', 'I'])
+        word_keys = ['the', 'and', 'I']
+        ax, top_k_dict = task_func(text_dict, word_keys, 3)
+        self.assertDictContainsSubset(top_k_dict, {'the': 3, 'that': 2, 'be': 1})
+        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
+        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
     def test_case_2(self):
-        # Test n_components
-        for n_components in [1, 2, min(self.data.shape)]:
-            results = task_func(self.data, n_components=n_components, random_state=42)
-            self.assertEqual(results["transformed_data"].shape[1], n_components)
-            self.assert_pca_correctness(self.data, results, n_components, self.seed)
+        text_dict = Counter(['apple', 'banana', 'apple', 'orange', 'grape', 'apple', 'banana'])
+        word_keys = ['apple', 'banana', 'cherry']
+        ax, top_k_dict = task_func(text_dict, word_keys)
+        self.assertDictContainsSubset(top_k_dict, {'apple': 3, 'banana': 2})
+        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
+        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
     def test_case_3(self):
-        # Test when one of the features has zero variance
-        data = self.data.copy()
-        data[:, 1] = 0  # Second feature has zero variance
-        results = task_func(data, n_components=2, random_state=self.seed)
-        self.assertEqual(results["transformed_data"].shape, (100, 2))
-        self.assert_pca_correctness(data, results, 2, self.seed)
+        text_dict = Counter([])
+        word_keys = ['apple', 'banana', 'cherry']
+        ax, top_k_dict = task_func(text_dict, word_keys)
+        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
+        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
     def test_case_4(self):
-        # Test with n_components greater than min(n_samples, n_features)
-        data = np.random.RandomState(self.seed).randn(10, 2)
-        with self.assertRaises(ValueError):
-            task_func(data, n_components=3, random_state=self.seed)
+        text_dict = Counter(['a', 'a', 'b', 'b', 'b', 'c', 'c'])
+        word_keys = ['a', 'b', 'c', 'd']
+        ax, top_k_dict = task_func(text_dict, word_keys)
+        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
+        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
     def test_case_5(self):
-        # Test with a single sample
-        data = np.random.RandomState(self.seed).randn(1, self.n_dims)
-        with self.assertRaises(ValueError):
-            task_func(data)
-    def test_case_6(self):
-        # Edge case - test when dataset contains NaN
-        data = self.data.copy()
-        data[0, 0] = np.nan  # Introduce a NaN value
-        with self.assertRaises(ValueError):
-            task_func(data, n_components=2, random_state=self.seed)
-    def test_case_7(self):
-        # Edge case - test when dataset contains infinite values
-        data = self.data.copy()
-        data[0, 0] = np.inf  # Introduce an infinite value
-        with self.assertRaises(ValueError):
-            task_func(data, n_components=2, random_state=self.seed)
-    def tearDown(self):
-        plt.close("all")
+        text_dict = Counter(['cat', 'dog', 'cat', 'fish', 'fish', 'fish', 'bird'])
+        word_keys = ['cat', 'dog', 'bird', 'elephant']
+        ax, top_k_dict = task_func(text_dict, word_keys,9)
+        self.assertDictContainsSubset(top_k_dict, {'fish': 3, 'cat': 2, 'dog': 1, 'bird': 1})
+        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
+        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)

@@ -1,108 +1,160 @@
-import re
-import urllib.parse
-import ssl
-import socket
+import subprocess
+import time
+import json
+import platform
 
-def task_func(myString):
+LOGFILE_PATH = "logfile.log"
+
+
+def task_func(interval, duration):
     """
-    Extracts all URLs from a string and retrieves the domain and the expiration date of the SSL certificate 
-    for each HTTPS URL. Only HTTPS URLs are processed; HTTP URLs are ignored. The function handles SSL errors 
-    by ignoring any HTTPS URLs where the SSL certificate cannot be retrieved due to such errors, and these domains 
-    are not included in the returned dictionary.
+    Monitors and logs CPU usage at specified intervals over a given duration.
 
     Parameters:
-    myString (str): The string from which to extract URLs.
-    
+    interval (int): The frequency, in seconds, at which CPU usage data is captured. Must be greater than zero.
+    duration (int): The total duration, in seconds, for which CPU usage is monitored. Must be greater than zero.
+
     Returns:
-    dict: A dictionary with domains as keys and SSL certificate expiry dates in UTC format as values. 
-          The dictionary includes only those HTTPS URLs for which the SSL certificate was successfully retrieved.
-          Domains with SSL errors are excluded.
+    str: Path to the log file where CPU usage data is saved. Returns None if an IOError occurs during file operations.
+
+    Raises:
+    ValueError: If either 'interval' or 'duration' is less than or equal to zero.
 
     Requirements:
-    - re
-    - urllib.parse
-    - ssl
-    - socket
+    - subprocess
+    - time
+    - json
+    - platform
+
+    Note: 
+    Actual run time of the function may slightly exceed the specified 'duration' due to processing time and system response delay.
+    The function records the CPU usage percentage at regular intervals for a specified duration.
+    The data is captured every 'interval' seconds until the 'duration' is reached or exceeded.
+    Each record includes a timestamp and the CPU usage percentage at that moment.
+    The data is saved in JSON format in a log file named 'logfile.log'.
+    The function supports different commands for CPU usage monitoring on Windows and Unix/Linux platforms.
     
     Example:
-    >>> task_func("Check these links: https://www.google.com, https://www.python.org")
-    {'www.google.com': '2023-06-15 12:00:00', 'www.python.org': '2023-07-20 12:00:00'}
+    >>> task_func(5, 60)
+    'logfile.log'
     """
-    urls = re.findall(r'https://[^\s,]+', myString)
-    ssl_expiry_dates = {}
-    for url in urls:
-        try:
-            domain = urllib.parse.urlparse(url).netloc
-            context = ssl.create_default_context()
-            with socket.create_connection((domain, 443)) as sock:
-                with context.wrap_socket(sock, server_hostname=domain) as ssock:
-                    ssl_expiry_dates[domain] = ssock.getpeercert()['notAfter']
-        except ssl.SSLError:
-            continue  # Ignore SSL errors or log them if necessary
-    return ssl_expiry_dates
+    if interval <= 0 or duration <= 0:
+        raise ValueError("Interval and duration must be greater than zero.")
+    start_time = time.time()
+    try:
+        with open(LOGFILE_PATH, "w", encoding="utf-8") as logfile:
+            while time.time() - start_time <= duration:
+                operation_start_time = time.time()
+                if platform.system() == "Windows":
+                    command = [
+                        "typeperf",
+                        "\\Processor(_Total)\\% Processor Time",
+                        "-sc",
+                        "1",
+                    ]
+                else:
+                    command = ["top", "-b", "-n1"]
+                output = subprocess.check_output(command)
+                cpu_usage_line = (
+                    output.decode("utf-8").split("\n")[2]
+                    if platform.system() == "Windows"
+                    else output.decode("utf-8").split("\n")[2]
+                )
+                cpu_usage = (
+                    cpu_usage_line.split(",")[-1].strip().replace('"', "")
+                    if platform.system() == "Windows"
+                    else cpu_usage_line.split(":")[1].split(",")[0].strip()
+                )
+                log_data = {"timestamp": time.time(), "cpu_usage": cpu_usage}
+                json.dump(log_data, logfile)
+                logfile.write("\n")
+                sleep_time = max(0, interval - (time.time() - operation_start_time))
+                time.sleep(sleep_time)
+    except IOError as e:
+        print(f"Error writing to file {LOGFILE_PATH}: {e}")
+        return None
+    return LOGFILE_PATH
 
 import unittest
-from unittest.mock import patch, MagicMock
-import unittest
-import re
-import urllib.parse
-import ssl
-import socket
+import os
+import json
+from unittest.mock import patch
 class TestCases(unittest.TestCase):
+    """Test cases for task_func."""
     def setUp(self):
-        self.patcher1 = patch('socket.create_connection')
-        self.patcher2 = patch('ssl.create_default_context')
-        
-        self.mock_create_connection = self.patcher1.start()
-        self.mock_create_default_context = self.patcher2.start()
-        
-        self.mock_socket = MagicMock()
-        self.mock_ssl_context = MagicMock()
-        self.mock_ssl_socket = MagicMock()
-        
-        self.mock_create_connection.return_value.__enter__.return_value = self.mock_socket
-        self.mock_create_default_context.return_value = self.mock_ssl_context
-        self.mock_ssl_context.wrap_socket.return_value.__enter__.return_value = self.mock_ssl_socket
+        """
+        Setup before each test case.
+        """
+        self.logfile_path = "logfile.log"
     def tearDown(self):
-        self.patcher1.stop()
-        self.patcher2.stop()
-        
-    def test_basic_https_functionality(self):
-        """Test extracting SSL expiry from properly formatted HTTPS URLs."""
-        self.mock_ssl_socket.getpeercert.return_value = {'notAfter': '2023-06-15 12:00:00'}
-        input_str = "https://www.google.com, https://www.python.org"
-        result = task_func(input_str)
-        expected = {'www.google.com': '2023-06-15 12:00:00', 'www.python.org': '2023-06-15 12:00:00'}
-        self.assertEqual(result, expected)
-    def test_urls_with_ports_and_queries(self):
-        """Test HTTPS URLs that include port numbers and query strings."""
-        self.mock_ssl_socket.getpeercert.return_value = {'notAfter': '2023-06-15 12:00:00'}
-        input_str = "https://www.example.com:8080/page?query=test, https://api.example.org/data?info=value"
-        result = task_func(input_str)
-        expected = {'www.example.com:8080': '2023-06-15 12:00:00', 'api.example.org': '2023-06-15 12:00:00'}
-        self.assertEqual(result, expected)
-    def test_no_urls(self):
-        """Test input with no URLs resulting in an empty dictionary."""
-        result = task_func("No links here!")
-        self.assertEqual(result, {})
-    def test_mixed_url_schemes(self):
-        """Test input with mixed HTTP and HTTPS URLs; only HTTPS URLs are processed."""
-        # Configure the mock to return SSL certificate details only for HTTPS URLs
-        self.mock_ssl_socket.getpeercert.return_value = {'notAfter': '2023-06-15 12:00:00'}
-        input_str = "http://www.google.com, https://www.python.org"
-        result = task_func(input_str)
-        expected = {'www.python.org': '2023-06-15 12:00:00'}
-        self.assertEqual(result, expected)
-    def test_invalid_ssl_certificate(self):
-        """Test handling of an SSL error like an expired certificate, expecting the domain to be skipped."""
-        self.mock_ssl_socket.getpeercert.side_effect = ssl.SSLError("Certificate has expired")
-        input_str = "https://expired.example.com"
-        result = task_func(input_str)
-        self.assertNotIn('expired.example.com', result)
-    def test_https_with_ssl_errors(self):
-        """Test multiple HTTPS URLs where one has SSL errors, expecting only the valid SSL data to be returned."""
-        self.mock_ssl_socket.getpeercert.side_effect = [ssl.SSLError("Certificate has expired"), {'notAfter': '2023-07-20 12:00:00'}]
-        input_str = "https://badssl.com, https://goodssl.com"
-        result = task_func(input_str)
-        expected = {'goodssl.com': '2023-07-20 12:00:00'}
-        self.assertEqual(result, expected)
+        """
+        Cleanup after each test case.
+        """
+        if os.path.exists(self.logfile_path):
+            os.remove(self.logfile_path)
+    @patch("time.time")
+    def test_normal_operation(self, mock_time):
+        """
+        Test the normal operation of the function.
+        It should create a log file with the expected content.
+        """
+        # Create an iterator that starts at 0 and increments by 5 every time it's called
+        time_iter = iter(range(0, 100, 5))
+        mock_time.side_effect = lambda: next(time_iter)
+        result = task_func(5, 25)
+        self.assertEqual(result, self.logfile_path)
+        self.assertTrue(os.path.exists(self.logfile_path))
+    def test_invalid_interval(self):
+        """
+        Test the function with an invalid interval value (less than or equal to zero).
+        It should raise a ValueError.
+        """
+        with self.assertRaises(ValueError):
+            task_func(-1, 10)
+    def test_invalid_duration(self):
+        """
+        Test the function with an invalid duration value (less than or equal to zero).
+        It should raise a ValueError.
+        """
+        with self.assertRaises(ValueError):
+            task_func(5, -10)
+    @patch("subprocess.check_output")
+    @patch("time.time")
+    @patch("platform.system")
+    def test_subprocess_output_handling_windows(
+        self, mock_platform, mock_time, mock_subprocess
+    ):
+        """
+        Test handling of subprocess output on Windows.
+        It should correctly parse the CPU usage from the subprocess output.
+        """
+        mock_platform.return_value = "Windows"
+        mock_time.side_effect = iter(range(0, 100, 5))
+        mock_output = b'"\\Processor(_Total)\\% Processor Time","5.0"\n\n"2023-04-01 12:34:56.789","5.0"\n'
+        mock_subprocess.return_value = mock_output
+        result = task_func(5, 10)
+        self.assertEqual(result, self.logfile_path)
+    @patch("subprocess.check_output")
+    @patch("time.time")
+    @patch("platform.system")
+    def test_subprocess_output_handling_linux(
+        self, mock_platform, mock_time, mock_subprocess
+    ):
+        """
+        Test handling of subprocess output on Linux.
+        It should correctly parse the CPU usage from the subprocess output.
+        """
+        mock_platform.return_value = "Linux"
+        mock_time.side_effect = iter(range(0, 100, 5))
+        mock_output = b"Linux 4.15.0-54-generic (ubuntu) \nTasks: 195 total...\n%Cpu(s):  5.0 us,  2.0 sy,  0.0 ni, 92.0 id,  0.0 wa,  0.0 hi,  1.0 si,  0.0 st\n"
+        mock_subprocess.return_value = mock_output
+        result = task_func(5, 10)
+        self.assertEqual(result, self.logfile_path)
+    @patch("builtins.open", side_effect=IOError("Mocked error"))
+    def test_io_error_handling(self, mock_open):
+        """
+        Test the function's behavior when an IOError occurs during file operations.
+        It should handle the error and return None.
+        """
+        result = task_func(5, 10)
+        self.assertIsNone(result)

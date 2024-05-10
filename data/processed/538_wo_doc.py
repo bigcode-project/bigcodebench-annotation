@@ -1,75 +1,129 @@
+import sqlite3
 import pandas as pd
-import time
-OUTPUT_DIR = './output'
+import seaborn as sns
 
 
-def task_func(df: pd.DataFrame, filename: str) -> str:
+def task_func(db_name="test.db", table_name="People"):
     """
-    Write a Pandas DataFrame into a JSON Lines file and save it in a specified directory.
+    Draw the age distribution of the persons in an SQLite3 table and returns the Axes object of the plot.
+    Raises a ValueError if the loaded data contains negative age values.
 
     Parameters:
-    - df (pd.DataFrame): A Pandas DataFrame to be saved.
-    - filename (str): The filename of the JSON Lines file to be saved.
+    db_name (str, optional): The full path to the SQLite3 database file. Defaults to 'test.db'.
+    table_name (str, optional): The name of the table to plot from. Defaults to 'People'.
 
     Returns:
-    - str: The full path where the JSON Lines file was saved.
+    matplotlib.axes._axes.Axes: Axes object representing the age distribution plot,
+                                           with x-axis showing age and a default of bins=30, kde=True.
 
     Requirements:
+    - sqlite3
     - pandas
-    - time
+    - seaborn
 
-    Example:
-    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    >>> 'data.jsonl' in task_func(df, 'data.jsonl')
-    True
+    Examples:
+    >>> ax = task_func('path/to/test.db', 'People')
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax = task_func()
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    start_time = time.time()
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
-    file_path = os.path.join(OUTPUT_DIR, filename)
-    with open(file_path, 'w') as file:
-        for record in df.to_dict(orient='records'):
-            json.dump(record, file)
-            file.write('\n')
-    end_time = time.time()  # End timing
-    cost = f"Operation completed in {end_time - start_time} seconds."
-    return os.path.abspath(file_path)
+    conn = sqlite3.connect(db_name)
+    df = pd.read_sql_query(f"SELECT age from {table_name}", conn)
+    if (df["age"] < 0).any():
+        raise ValueError("Data contains negative age values.")
+    ax = sns.histplot(data=df, x="age", bins=30, kde=True)
+    ax.set_xlabel("age")
+    return ax
 
 import unittest
-import pandas as pd
 import os
-import json
-import shutil
+import sqlite3
+import matplotlib.pyplot as plt
+import tempfile
 class TestCases(unittest.TestCase):
     def setUp(self):
-        """Create the data directory if it doesn't exist."""
-        if not os.path.exists(OUTPUT_DIR):
-            os.makedirs(OUTPUT_DIR)
+        # Setup temporary directory
+        self.test_dir = tempfile.TemporaryDirectory()
+        # Create test_alt.db with People table
+        self.alt_db_path = os.path.join(self.test_dir.name, "test_alt.db")
+        conn = sqlite3.connect(self.alt_db_path)
+        cursor = conn.cursor()
+        cursor.execute("CREATE TABLE People (name TEXT, age INT)")
+        cursor.executemany(
+            "INSERT INTO People VALUES (?, ?)", [("Alice", 25), ("Bob", 30)]
+        )
+        conn.commit()
+        conn.close()
+        # Create a standard test.db with Employees table
+        self.default_db_path = os.path.join(self.test_dir.name, "test.db")
+        conn = sqlite3.connect(self.default_db_path)
+        cursor = conn.cursor()
+        cursor.execute("CREATE TABLE Employees (name TEXT, age INT)")
+        cursor.executemany(
+            "INSERT INTO Employees VALUES (?, ?)", [("Charlie", 35), ("David", 40)]
+        )
+        conn.commit()
+        conn.close()
+        # Create standard db with more examples
+        self.multiple_db_path = os.path.join(self.test_dir.name, "test_multiple.db")
+        conn = sqlite3.connect(self.multiple_db_path)
+        cursor = conn.cursor()
+        cursor.execute("CREATE TABLE MultipleAge (name TEXT, age INT)")
+        cursor.executemany(
+            "INSERT INTO MultipleAge VALUES (?, ?)",
+            [("Alice", 25), ("Bob", 30), ("Charlie", 35)],
+        )
+        conn.commit()
+        conn.close()
+        # Create a db for testing edge cases - negative age
+        self.negative_age_db_path = os.path.join(
+            self.test_dir.name, "test_negative_age.db"
+        )
+        conn = sqlite3.connect(self.negative_age_db_path)
+        cursor = conn.cursor()
+        cursor.execute("CREATE TABLE NegativeAge (name TEXT, age INT)")
+        cursor.executemany(
+            "INSERT INTO NegativeAge VALUES (?, ?)", [("Eve", -1), ("Frank", 20)]
+        )
+        conn.commit()
+        conn.close()
+        # Create a db for testing edge cases - empty
+        self.empty_db_path = os.path.join(self.test_dir.name, "test_empty.db")
+        conn = sqlite3.connect(self.empty_db_path)
+        cursor = conn.cursor()
+        cursor.execute("CREATE TABLE EmptyAge (name TEXT, age INT)")
+        conn.commit()
+        conn.close()
     def tearDown(self):
-        """Clean up by removing the data directory and its contents after tests."""
-        shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
-    def test_basic_dataframe(self):
-        """Ensure basic DataFrame is saved correctly."""
-        df = pd.DataFrame({'A': [1, 2], 'B': ['x', 'y']})
-        path = task_func(df, 'test_basic.jsonl')
-        self.assertTrue(os.path.exists(path))
-    def test_empty_dataframe(self):
-        """Ensure method handles empty DataFrame correctly."""
-        df = pd.DataFrame()
-        path = task_func(df, 'test_empty.jsonl')
-        self.assertTrue(os.path.exists(path))
-    def test_with_nan_values(self):
-        """Ensure NaN values are handled correctly."""
-        df = pd.DataFrame({'A': [1, None], 'B': [None, 2]})
-        path = task_func(df, 'test_nan.jsonl')
-        self.assertTrue(os.path.exists(path))
-    def test_large_dataframe(self):
-        """Test with a large DataFrame."""
-        df = pd.DataFrame({'A': range(1000)})
-        path = task_func(df, 'test_large.jsonl')
-        self.assertTrue(os.path.exists(path))
-    def test_special_characters(self):
-        """Test DataFrame containing special characters."""
-        df = pd.DataFrame({'A': ['Hello, "World"', "It's alright"]})
-        path = task_func(df, 'test_special_chars.jsonl')
-        self.assertTrue(os.path.exists(path))
+        self.test_dir.cleanup()
+        plt.close("all")
+    def _check_plot(self, ax, contains_data=True):
+        self.assertTrue(isinstance(ax, plt.Axes), "The plot should be an Axes object.")
+        self.assertEqual(ax.get_xlabel(), "age", "The x-axis label should be 'age'.")
+        if contains_data:
+            self.assertTrue(len(ax.lines) > 0, "The plot should contain a KDE line.")
+    def test_case_1(self):
+        ax = task_func(db_name=self.default_db_path, table_name="Employees")
+        self._check_plot(ax)
+    def test_case_2(self):
+        ax = task_func(db_name=self.alt_db_path)
+        self._check_plot(ax)
+    def test_case_3(self):
+        ax = task_func(db_name=self.default_db_path, table_name="Employees")
+        self._check_plot(ax)
+    def test_case_4(self):
+        ax = task_func(db_name=self.multiple_db_path, table_name="MultipleAge")
+        self._check_plot(ax)
+    def test_case_5(self):
+        ax = task_func(db_name=self.empty_db_path, table_name="EmptyAge")
+        self._check_plot(ax, False)
+    def test_case_6(self):
+        # Test for non-existent table
+        with self.assertRaises(Exception):
+            task_func(db_name=self.default_db_path, table_name="Nonexistent")
+    def test_case_7(self):
+        # Test for negative age values
+        with self.assertRaises(ValueError):
+            task_func(db_name=self.negative_age_db_path, table_name="NegativeAge")

@@ -1,63 +1,85 @@
-from collections import Counter
-import pandas as pd
+import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
 
-
-def task_func(list_of_menuitems):
+def task_func(mean, std_dev, n):
     """
-    Given a nested list of menu items, this function flattens the list and returns a Pandas DataFrame
-    detailing the count of each individual menu item with index name 'MenuItem'.
+    Generates a set of samples from a normal distribution with a specified mean and standard deviation.
+    It also visualizes the generated samples by plotting their histogram and the probability density function.
 
     Parameters:
-        list_of_menuitems (list): A nested list of menu items.
+    mean (float): The mean (mu) of the normal distribution.
+    std_dev (float): The standard deviation (sigma) of the distribution.
+    n (int): The number of samples to generate.
 
     Returns:
-        DataFrame: A pandas DataFrame with menu items as indices and a 'Count' column showing the count of each menu item.
+    numpy.ndarray: An array of generated samples from the normal distribution.
 
     Requirements:
-        - collections
-        - pandas
+    - numpy
+    - scipy.stats
+    - matplotlib.pyplot
 
-    Example:
-        >>> result = task_func([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
-        >>> result.loc['Pizza', 'Count']
-        2
-        >>> result.loc['Coke', 'Count']
-        2
+    Examples:
+    Generate 1000 samples from a normal distribution with mean 0 and standard deviation 1.
+    >>> len(task_func(0, 1, 1000))
+    1000
+
+    Generate 500 samples from a normal distribution with mean 5 and standard deviation 2.
+    >>> len(task_func(5, 2, 500))
+    500
     """
-    flat_list = [item for sublist in list_of_menuitems for item in sublist]
-    counter = Counter(flat_list)
-    df = pd.DataFrame.from_dict(counter, orient='index', columns=['Count'])
-    df.index.name = 'MenuItem'
-    return df
+    samples = np.random.normal(mean, std_dev, n)
+    plt.figure(figsize=(10, 6))
+    plt.hist(samples, bins=30, density=True, alpha=0.6, color='g')
+    xmin, xmax = plt.xlim()
+    x = np.linspace(xmin, xmax, 100)
+    p = stats.norm.pdf(x, mean, std_dev)
+    plt.plot(x, p, 'k', linewidth=2)
+    title = f'Normal Distribution: Mean = {mean}, Std Dev = {std_dev}'
+    plt.title(title)
+    plt.xlabel('Value')
+    plt.ylabel('Density')
+    plt.show()
+    return samples
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_normal_functionality(self):
-        """Test the function with typical nested lists."""
-        input_list = [['apple', 'banana'], ['apple'], ['banana', 'orange']]
-        expected_df = pd.DataFrame({'Count': [2, 2, 1]}, index=['apple', 'banana', 'orange'])
-        expected_df.index.name = 'MenuItem'
-        pd.testing.assert_frame_equal(task_func(input_list), expected_df)
-    def test_empty_list(self):
-        """Test the function with an empty list."""
-        expected_df = pd.DataFrame(columns=['Count'])
-        expected_df.index.name = 'MenuItem'
-        pd.testing.assert_frame_equal(task_func([]), expected_df)
-    def test_single_level_list(self):
-        """Test with a non-nested, single-level list."""
-        input_list = [['apple', 'banana', 'apple']]
-        expected_df = pd.DataFrame({'Count': [2, 1]}, index=['apple', 'banana'])
-        expected_df.index.name = 'MenuItem'
-        pd.testing.assert_frame_equal(task_func(input_list), expected_df)
-    def test_uniform_list(self):
-        """Test with a list where all sublists contain the same item."""
-        input_list = [['apple'], ['apple'], ['apple']]
-        expected_df = pd.DataFrame({'Count': [3]}, index=['apple'])
-        expected_df.index.name = 'MenuItem'
-        pd.testing.assert_frame_equal(task_func(input_list), expected_df)
-    def test_duplicate_items_across_sublists(self):
-        """Ensure items appearing in multiple sublists are counted correctly."""
-        input_list = [['apple', 'banana'], ['banana', 'banana', 'apple']]
-        expected_df = pd.DataFrame({'Count': [2, 3]}, index=['apple', 'banana'])
-        expected_df.index.name = 'MenuItem'
-        pd.testing.assert_frame_equal(task_func(input_list), expected_df)
+    def test_sample_length(self):
+        # Test if the function returns the correct number of samples
+        samples = task_func(0, 1, 1000)
+        self.assertEqual(len(samples), 1000)
+    def test_sample_mean(self):
+        # Test if the mean of the samples is approximately equal to the specified mean
+        samples = task_func(0, 1, 100000)
+        self.assertAlmostEqual(np.mean(samples), 0, places=1)
+    def test_sample_std_dev(self):
+        # Test if the standard deviation of the samples is approximately equal to the specified standard deviation
+        samples = task_func(0, 1, 100000)
+        self.assertAlmostEqual(np.std(samples), 1, places=1)
+    def test_negative_std_dev(self):
+        # Test if a ValueError is raised for negative standard deviations
+        with self.assertRaises(ValueError):
+            task_func(0, -1, 1000)
+    def test_zero_samples(self):
+        # Test if the function can handle a request for zero samples
+        samples = task_func(0, 1, 0)
+        self.assertEqual(len(samples), 0)
+    def test_return_type(self):
+        # Test if the function returns a numpy array
+        samples = task_func(0, 1, 100)
+        self.assertIsInstance(samples, np.ndarray)
+    def test_non_integer_samples(self):
+        # Test if the function raises a TypeError for non-integer n
+        with self.assertRaises(TypeError):
+            task_func(0, 1, '100')
+    def test_non_numeric_mean_or_std(self):
+        # Test if the function raises a TypeError for non-numeric mean or std_dev
+        with self.assertRaises(TypeError):
+            task_func('0', 1, 100)
+        with self.assertRaises(TypeError):
+            task_func(0, '1', 100)
+    def test_very_small_n(self):
+        # Test if the function behaves correctly for very small n
+        samples = task_func(0, 1, 1)
+        self.assertEqual(len(samples), 1)

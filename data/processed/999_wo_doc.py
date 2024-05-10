@@ -1,90 +1,120 @@
-import ast
-import requests
-from bs4 import BeautifulSoup
+import urllib.request
+import os
+import zipfile
+
+# Constants
+TARGET_DIR = "downloaded_files"
+TARGET_ZIP_FILE = "downloaded_files.zip"
 
 
 def task_func(url):
     """
-    Fetches the content of a webpage specified by its URL, parses it to find <script> tags,
-    and attempts to evaluate any string within these tags as a Python dictionary.
+    Download and extract a zip file from a specified URL to a designated directory.
 
     Parameters:
-    - url (str): The URL of the webpage to scrape.
+    - url (str): The URL of the zip file.
 
     Returns:
-    - list of dict: A list containing dictionaries that were successfully evaluated from string representations
-      found within <script> tags on the webpage. 
-    
-    Note:
-    - If an error occurs during the request or if no dictionaries are found/evaluable, an empty list is returned.
+    - str: The path of the directory where the contents of the zip file are extracted.
 
     Requirements:
-    - ast
-    - requests
-    - bs4.BeautifulSoup
+      - urllib
+      - os
+      - zipfile
 
-    Example:
-    >>> task_func('https://example.com')
-    [{'key': 'value'}, ...]
+    Behavior:
+    - If the target directory TARGET_DIR does not exist, it is created.
+    - The zip file is downloaded from the given URL and saved locally as TARGET_ZIP_FILE.
+    - The local zip file TARGET_ZIP_FILE is deleted after extraction.
+
+    Error Handling:
+    - The function does not explicitly handle errors that may occur during the download or extraction process.
+      Errors such as a failed download, invalid URL, or corrupted zip file will result in an unhandled exception.
+
+    Examples:
+    >>> task_func("http://example.com/files.zip")
+    'downloaded_files'
     """
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-    except requests.RequestException:
-        return []
-    soup = BeautifulSoup(response.text, 'html.parser')
-    results = []
-    for script in soup.find_all('script'):
-        try:
-            results.append(ast.literal_eval(script.string))
-        except (ValueError, SyntaxError):
-            continue
-    return results
+    os.makedirs(TARGET_DIR, exist_ok=True)
+    urllib.request.urlretrieve(url, TARGET_ZIP_FILE)
+    with zipfile.ZipFile(TARGET_ZIP_FILE, "r") as zip_ref:
+        zip_ref.extractall(TARGET_DIR)
+    if os.path.exists(TARGET_ZIP_FILE):
+        os.remove(TARGET_ZIP_FILE)
+    return TARGET_DIR
 
 import unittest
-from unittest.mock import patch, Mock
-def mock_requests_get(*args, **kwargs):
-    class MockResponse:
-        def __init__(self, text, status_code):
-            self.text = text
-            self.status_code = status_code
-        def raise_for_status(self):
-            if self.status_code != 200:
-                raise requests.RequestException("Mocked error")
-    if args[0] == 'https://test1.com':
-        return MockResponse('<script>{"key": "value"}</script>', 200)
-    elif args[0] == 'https://test2.com':
-        return MockResponse('<script>{"key1": "value1"}</script><script>{"key2": "value2"}</script>', 200)
-    elif args[0] == 'https://test3.com':
-        return MockResponse('<div>No script tags here</div>', 200)
-    elif args[0] == 'https://test4.com':
-        return MockResponse('<script>Not a dictionary</script>', 200)
-    elif args[0] == 'https://error.com':
-        return MockResponse('Error', 404)
-    return MockResponse('', 404)
+from unittest.mock import patch, MagicMock
+import os
+import shutil
 class TestCases(unittest.TestCase):
-    @patch('requests.get', side_effect=mock_requests_get)
-    def test_case_1(self, mock_get):
-        # Test with a single dictionary in the script tag
-        result = task_func('https://test1.com')
-        self.assertEqual(result, [{"key": "value"}])
-    @patch('requests.get', side_effect=mock_requests_get)
-    def test_case_2(self, mock_get):
-        # Test with multiple dictionaries in separate script tags
-        result = task_func('https://test2.com')
-        self.assertEqual(result, [{"key1": "value1"}, {"key2": "value2"}])
-    @patch('requests.get', side_effect=mock_requests_get)
-    def test_case_3(self, mock_get):
-        # Test with no script tags
-        result = task_func('https://test3.com')
-        self.assertEqual(result, [])
-    @patch('requests.get', side_effect=mock_requests_get)
-    def test_case_4(self, mock_get):
-        # Test with a script tag that doesn't contain a dictionary
-        result = task_func('https://test4.com')
-        self.assertEqual(result, [])
-    @patch('requests.get', side_effect=mock_requests_get)
-    def test_case_5(self, mock_get):
-        # Test with a URL that returns an error
-        result = task_func('https://error.com')
-        self.assertEqual(result, [])
+    """Test cases for the task_func function."""
+    def setUp(self):
+        if not os.path.exists(TARGET_DIR):
+            os.makedirs(TARGET_DIR)
+        if os.path.exists(TARGET_DIR):
+            shutil.rmtree(TARGET_DIR)
+    @patch("urllib.request.urlretrieve")
+    @patch("zipfile.ZipFile")
+    def test_valid_zip_file(self, mock_zipfile, mock_urlretrieve):
+        """Test that the function returns the correct directory path."""
+        url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
+        mock_zipfile.return_value.__enter__.return_value = MagicMock()
+        result = task_func(url)
+        mock_urlretrieve.assert_called_with(url, TARGET_ZIP_FILE)
+        self.assertEqual(result, TARGET_DIR)
+        self.assertTrue(os.path.exists(TARGET_DIR))
+    @patch("urllib.request.urlretrieve")
+    def test_invalid_url(self, mock_urlretrieve):
+        """Test that the function raises an exception when the URL is invalid."""
+        mock_urlretrieve.side_effect = Exception
+        url = "https://invalid.url/invalid.zip"
+        with self.assertRaises(Exception):
+            task_func(url)
+    @patch("urllib.request.urlretrieve")
+    @patch("zipfile.ZipFile")
+    def test_non_zip_file(self, mock_zipfile, mock_urlretrieve):
+        """Test that the function raises an exception when the URL does not point to a zip file."""
+        mock_zipfile.side_effect = zipfile.BadZipFile
+        url = "https://www.sample-videos.com/img/Sample-jpg-image-5mb.jpg"
+        with self.assertRaises(zipfile.BadZipFile):
+            task_func(url)
+    @patch("urllib.request.urlretrieve")
+    @patch("zipfile.ZipFile")
+    def test_cleanup(self, mock_zipfile, mock_urlretrieve):
+        """Test that the function deletes the downloaded zip file after extraction."""
+        mock_zipfile.return_value.__enter__.return_value = MagicMock()
+        url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
+        task_func(url)
+        self.assertFalse(os.path.exists(TARGET_ZIP_FILE))
+    @patch("urllib.request.urlretrieve")
+    @patch("zipfile.ZipFile")
+    def test_directory_creation(self, mock_zipfile, mock_urlretrieve):
+        """Test that the function creates a directory to store the extracted files."""
+        mock_zipfile.return_value.__enter__.return_value = MagicMock()
+        url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
+        task_func(url)
+        self.assertTrue(os.path.exists(TARGET_DIR))
+        self.assertTrue(os.path.isdir(TARGET_DIR))
+    @patch("urllib.request.urlretrieve")
+    @patch("zipfile.ZipFile")
+    def test_zip_extraction_content(self, mock_zipfile, mock_urlretrieve):
+        """Test that the function extracts the contents of the zip file."""
+        mock_extractall = MagicMock()
+        mock_zipfile.return_value.__enter__.return_value.extractall = mock_extractall
+        url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
+        task_func(url)
+        mock_extractall.assert_called_once()
+    @patch("urllib.request.urlretrieve")
+    @patch("zipfile.ZipFile")
+    def test_file_removal(self, mock_zipfile, mock_urlretrieve):
+        """Test that the function deletes the downloaded zip file even if extraction fails."""
+        mock_zipfile.return_value.__enter__.return_value = MagicMock()
+        url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
+        # Create a dummy file to simulate download
+        open(TARGET_ZIP_FILE, "a").close()
+        task_func(url)
+        self.assertFalse(os.path.exists(TARGET_ZIP_FILE))
+    def tearDown(self):
+        if os.path.exists(TARGET_DIR):
+            shutil.rmtree(TARGET_DIR)

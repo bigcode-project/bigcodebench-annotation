@@ -1,113 +1,74 @@
-import random
-import string
+import numpy as np
+import matplotlib.pyplot as plt
 
+# Constants
+ARRAY_SIZE = 10000
 
-def task_func(length: int, predicates: list, seed: int = None):
+def task_func():
     """
-    Generates a random string of specified length and evaluates it for specific characteristics.
+    Create a numeric array of random integers, calculate the mean and standard deviation, and draw a histogram of the distribution.
 
-    Parameters:
-    - length (int): Desired length of the generated string.
-    - predicates (list of strings): Conditions to evaluate the string.
-        Must contain options from 'has_uppercase', 'has_lowercase', 'has_special_chars', 'has_numbers'.
-    - seed (int, optional): Seed for the random number generator for reproducibility.
-
+    Note:
+        The random integers are generated between 1 and 100. The title of the histogram is "Histogram of Random Integers". 
+        The x-axis is labeled "Value" and the y-axis is labeled "Frequency". 
+        The mean is plotted as a red dashed line, and the standard deviation is plotted as purple dashed lines.
+        
     Returns:
-    - tuple:
-        - string: the generated random text
-        - dict: the text's characteristics
-
-    Raises:
-    - ValueError: If the specified length is negative.
-    - KeyError: If any predicate is not recognized.
-
-    Notes:
-    - Predicates are deduplicated.
-    - Characters are randomly sampled from string ascii_letters, digits, and punctuation with replacement.
-    - Any invalid predicates provided will result in a KeyError.
-    - If no predicates are provided, the result dictionary will be empty.
+    Tuple: A tuple containing the array, mean, standard deviation, and the histogram plot (Axes).
 
     Requirements:
-    - string
-    - random
-
+    - numpy
+    - matplotlib.pyplot
+    
     Example:
-    >>> task_func(10, ['has_uppercase', 'has_numbers'], seed=42)[0]
-    '8czu("@iNc'
-    >>> task_func(5, ['has_lowercase'], seed=123)
-    ('eiMk[', {'has_lowercase': True})
+    >>> import numpy as np
+    >>> np.random.seed(0)
+    >>> array, mean, std, ax = task_func()
+    >>> print(mean, std)
+    49.6135 28.5323416100046
+    >>> plt.show()
     """
-    if seed is not None:
-        random.seed(seed)
-    if length < 0:
-        raise ValueError("Length must be non-negative.")
-    predicate_functions = {
-        "has_uppercase": lambda x: any(c.isupper() for c in x),
-        "has_lowercase": lambda x: any(c.islower() for c in x),
-        "has_special_chars": lambda x: any(c in string.punctuation for c in x),
-        "has_numbers": lambda x: any(c.isdigit() for c in x),
-    }
-    predicates = list(set(predicates))
-    if any(p not in predicate_functions for p in predicates):
-        raise KeyError(f"Invalid predicate provided.")
-    characters = string.ascii_letters + string.digits + string.punctuation
-    generated_string = "".join(random.choices(characters, k=length))
-    results = {
-        predicate: predicate_functions[predicate](generated_string)
-        for predicate in predicates
-    }
-    return generated_string, results
+    array = np.random.randint(1, 100, size=ARRAY_SIZE)
+    mean = np.mean(array)
+    std = np.std(array)
+    fig, ax = plt.subplots()
+    ax.hist(array, bins='auto')
+    ax.set_title('Histogram of Random Integers')
+    ax.set_xlabel('Value')
+    ax.set_ylabel('Frequency')
+    ax.axvline(mean, color='red', linestyle='dashed', linewidth=1)
+    ax.axvline(mean + std, color='purple', linestyle='dashed', linewidth=1)
+    ax.axvline(mean - std, color='purple', linestyle='dashed', linewidth=1)
+    ax.legend(["Mean", "Standard Deviation"])
+    plt.show()
+    return array, mean, std, ax
 
 import unittest
-import string
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_valid_length_and_predicates(self):
-        result_str, result_dict = task_func(
-            10,
-            ["has_uppercase", "has_lowercase", "has_numbers", "has_special_chars"],
-            seed=1,
-        )
-        self.assertEqual(len(result_str), 10)
-        self.assertTrue(result_dict["has_uppercase"])
-        self.assertTrue(result_dict["has_lowercase"])
-        self.assertTrue(result_dict["has_numbers"])
-        self.assertTrue(result_dict["has_special_chars"])
-    def test_result_correctness(self):
-        n_repetitions = 1000
-        for _ in range(n_repetitions):
-            result_str, result_dict = task_func(
-                10,
-                ["has_uppercase", "has_lowercase", "has_numbers", "has_special_chars"],
-                seed=1,
-            )
-            if any(c.isupper() for c in result_str):
-                self.assertTrue(result_dict["has_uppercase"])
-            if any(c.islower() for c in result_str):
-                self.assertTrue(result_dict["has_lowercase"])
-            if any(c in string.punctuation for c in result_str):
-                self.assertTrue(result_dict["has_special_chars"])
-            if any(c.isdigit() for c in result_str):
-                self.assertTrue(result_dict["has_numbers"])
-    def test_empty_string(self):
-        result_str, result_dict = task_func(0, ["has_uppercase", "has_numbers"], seed=3)
-        self.assertEqual(result_str, "")
-        self.assertFalse(result_dict["has_uppercase"])
-        self.assertFalse(result_dict["has_numbers"])
-    def test_negative_length(self):
-        with self.assertRaises(ValueError):
-            task_func(-1, ["has_uppercase"])
-    def test_no_predicates(self):
-        result_str, result_dict = task_func(10, [], seed=5)
-        self.assertEqual(len(result_str), 10)
-        self.assertEqual(result_dict, {})
-    def test_key_error(self):
-        with self.assertRaises(KeyError):
-            task_func(10, ["has_uppercase", "invalid"])
-    def test_deduplicate_predicates(self):
-        _, result_dict = task_func(15, ["has_uppercase", "has_uppercase"], seed=7)
-        self.assertEqual(len(result_dict), 1)
-    def test_random_seed_reproducibility(self):
-        result_str1, result_dict1 = task_func(10, ["has_uppercase", "has_numbers"], seed=8)
-        result_str2, result_dict2 = task_func(10, ["has_uppercase", "has_numbers"], seed=8)
-        self.assertEqual(result_str1, result_str2)
-        self.assertEqual(result_dict1, result_dict2)
+    def test_case_1(self):
+        np.random.seed(0)
+        array, mean, std, ax = task_func()
+        self.assertEqual(array.size, ARRAY_SIZE)
+        self.assertEqual(mean, 49.6135)
+        self.assertEqual(std, 28.5323416100046)
+        self.assertEqual(ax.get_title(), 'Histogram of Random Integers')
+    def test_case_2(self):
+        array, mean, std, ax = task_func()
+        self.assertEqual(ax.get_xlabel(), 'Value')
+        self.assertEqual(ax.get_ylabel(), 'Frequency')
+    def test_case_3(self):
+        np.random.seed(1)
+        array, mean, std, ax = task_func()
+        self.assertEqual(mean, 50.0717)
+        self.assertEqual(std, 28.559862729186918)
+    def test_case_4(self):
+        np.random.seed(100)
+        array, mean, std, ax = task_func()
+        self.assertEqual(mean, 50.2223)
+        self.assertEqual(std, 28.494467580742757)
+    def test_case_5(self):
+        np.random.seed(500)
+        array, mean, std, ax = task_func()
+        self.assertEqual(mean, 49.8636)
+        self.assertEqual(std, 28.516030492338864)

@@ -1,69 +1,85 @@
+import pandas as pd
 import collections
-import random
 
-# Constants
-LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
-
-def task_func(n_keys, n_values):
+def task_func(df):
     """
-    Create a Python dictionary with a specified number of keys and values. 
+    Generate a sales report from a DataFrame, excluding duplicate customer names. 
+    The report includes total sales and the most popular sales category.
 
     Parameters:
-    n_keys (int): The number of keys to generate.
-    n_values (int): The number of values for each key (consecutive integers starting from 1).
+    df (DataFrame): A pandas DataFrame with columns 'Customer', 'Category', and 'Sales'.
 
     Returns:
-    dict: A Python dictionary with keys as strings and values as lists of integers.
-
-    Note: 
-    - Keys are randomly selected from a predefined list of letters, and values are consecutive integers starting from 1.
-    - Due to the randomness in key selection, the actual keys in the dictionary may vary in each execution.
+    dict: A dictionary with keys 'Total Sales' (sum of sales) and 'Most Popular Category' (most frequent category).
 
     Requirements:
+    - pandas
     - collections
-    - random
+
+    Raises:
+    - The function will raise a ValueError is input df is not a DataFrame.
+
+    Note:
+    - The function would return the first category in alphabetical order for "Most Popular Category' in the case of tie
 
     Example:
-    >>> random.seed(0)
-    >>> task_func(3, 5)
-    {'g': [1, 2, 3, 4, 5], 'a': [1, 2, 3, 4, 5]}
-    >>> result = task_func(1, 5)
-    >>> list(result)[0] in LETTERS
-    True
+    >>> data = pd.DataFrame([{'Customer': 'John', 'Category': 'Electronics', 'Sales': 500}, {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}])
+    >>> report = task_func(data)
+    >>> print(report)
+    {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
     """
-    keys = [random.choice(LETTERS) for _ in range(n_keys)]
-    values = list(range(1, n_values + 1))
-    return dict(collections.OrderedDict((k, values) for k in keys))
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
+    df = df.drop_duplicates(subset='Customer')
+    total_sales = df['Sales'].sum()
+    popular_category = collections.Counter(df['Category']).most_common(1)[0][0]
+    return {'Total Sales': total_sales, 'Most Popular Category': popular_category}
 
 import unittest
-import random
-LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_basic_functionality(self):
-        random.seed(0)
-        result = task_func(3, 5)
-        self.assertLessEqual(len(result), 3)
-        for key in result:
-            self.assertIn(key, LETTERS)
-            self.assertEqual(result[key], [1, 2, 3, 4, 5])
-    def test_no_keys(self):
-        random.seed(0)
-        result = task_func(0, 5)
-        self.assertEqual(result, {})
-    def test_no_values(self):
-        random.seed(0)
-        result = task_func(3, 0)
-        for key in result:
-            self.assertEqual(result[key], [])
-    def test_large_input(self):
-        random.seed(0)
-        result = task_func(10, 1000)
-        for key in result:
-            self.assertIn(key, LETTERS)
-            self.assertEqual(len(result[key]), 1000)
-    def test_max_keys(self):
-        random.seed(0)
-        result = task_func(len(LETTERS), 5)
-        for key in result:
-            self.assertIn(key, LETTERS)
-            self.assertEqual(result[key], [1, 2, 3, 4, 5])
+    def test_case_regular(self):
+        data = pd.DataFrame([
+            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
+            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300},
+            {'Customer': 'Peter', 'Category': 'Beauty', 'Sales': 400},
+            {'Customer': 'Nick', 'Category': 'Sports', 'Sales': 600}
+        ])
+        expected_output = {'Total Sales': 1800, 'Most Popular Category': 'Electronics'}
+        self.assertEqual(task_func(data), expected_output)
+    def test_case_with_duplicates(self):
+        data = pd.DataFrame([
+            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
+            {'Customer': 'John', 'Category': 'Fashion', 'Sales': 200},
+            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300},
+            {'Customer': 'Peter', 'Category': 'Beauty', 'Sales': 400}
+        ])
+        expected_output = {'Total Sales': 1200, 'Most Popular Category': 'Electronics'}
+        self.assertEqual(task_func(data), expected_output)
+    def test_case_empty(self):
+        data = pd.DataFrame([
+            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
+            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}
+        ])
+        expected_output = {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
+        self.assertEqual(task_func(data), expected_output)
+    def test_case_unique_customers(self):
+        data = pd.DataFrame([
+            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
+            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}
+        ])
+        expected_output = {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
+        self.assertEqual(task_func(data), expected_output)
+    def test_case_tie_categories(self):
+        data = pd.DataFrame([
+            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
+            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300},
+            {'Customer': 'Nick', 'Category': 'Home', 'Sales': 200},
+            {'Customer': 'Alice', 'Category': 'Electronics', 'Sales': 300}
+        ])
+        # In case of a tie, the first category in alphabetical order will be chosen
+        expected_output = {'Total Sales': 1300, 'Most Popular Category': 'Electronics'}
+        self.assertEqual(task_func(data), expected_output)
+    def test_case_6(self):
+        with self.assertRaises(ValueError):
+            task_func("non_df")

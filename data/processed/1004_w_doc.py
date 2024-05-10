@@ -1,68 +1,90 @@
-import re
-from string import punctuation
+import pandas as pd
+import matplotlib.pyplot as plt
 
-# Predefined list of common stopwords
-PREDEFINED_STOPWORDS = {
-    "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", 
-    "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", 
-    "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", 
-    "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", 
-    "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", 
-    "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", 
-    "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", 
-    "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", 
-    "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "more"
-}
-
-def task_func(text):
+def task_func(data, column_name="target_column"):
     """
-    Clean the specified text by removing URLs, stopwords, and punctuation.
+    Converts a given JSON data into a Pandas DataFrame and plots a histogram of a specified column.
+    The function handles non-numeric columns by converting them to categorical type and then to numeric codes. 
+    It also checks if the specified column exists in the DataFrame.
 
+    - The histogram's title is set to 'Histogram of <column_name>'.
+    - The histogram's x-label are set to the name of the specified column.
+    
     Parameters:
-    text (str): The text to be cleaned.
+    - data (list of dict)
+    - column_name (str, optional)
 
     Returns:
-    str: The cleaned text with URLs, predefined stopwords, and punctuation removed.
+    - DataFrame: A pandas DataFrame created from the input JSON data.
+    - Axes: A matplotlib Axes object showing the histogram plot of the specified column.
+
+    Exceptions:
+    - ValueError: Raised if the specified column name does not exist in the DataFrame.
 
     Requirements:
-    - re
-    - string.punctuation
+    - pandas
+    - matplotlib
 
     Example:
-    >>> task_func('Visit https://www.python.org for more info. I love to eat apples.')
-    'Visit info love eat apples'
+    >>> sample_data = [{'userId': 1, 'value': 10}, {'userId': 2, 'value': 15}]
+    >>> df, ax = task_func(sample_data, 'userId')
+    >>> print(df)
+       userId  value
+    0       1     10
+    1       2     15
     """
-    PUNCTUATION = set(punctuation)
-    text = re.sub('http[s]?://\S+', '', text)
-    text = re.sub('[{}]'.format(re.escape(''.join(PUNCTUATION))), '', text)
-    words = text.split()
-    cleaned_words = [word for word in words if word.lower() not in PREDEFINED_STOPWORDS]
-    return ' '.join(cleaned_words)
+    df = pd.DataFrame(data)
+    if column_name not in df.columns:
+        raise ValueError(f"Column '{column_name}' not found in the DataFrame.")
+    if not pd.api.types.is_numeric_dtype(df[column_name]):
+        df[column_name] = df[column_name].astype("category").cat.codes
+    _, ax = plt.subplots()
+    df[column_name].hist(ax=ax)
+    ax.set_title(f"Histogram of {column_name}")
+    ax.set_xlabel(column_name)
+    return df, ax
 
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        input_text = 'Visit https://www.python.org for more info. I love to eat apples and oranges!'
-        expected_output = 'Visit info love eat apples oranges'
-        result = task_func(input_text)
-        self.assertEqual(result, expected_output)
-    def test_case_2(self):
-        input_text = 'Check out https://www.google.com and also https://www.openai.com'
-        expected_output = 'Check also'
-        result = task_func(input_text)
-        self.assertEqual(result, expected_output)
-    def test_case_3(self):
-        input_text = 'Hello, world! How are you today?'
-        expected_output = 'Hello world How today'
-        result = task_func(input_text)
-        self.assertEqual(result, expected_output)
-    def test_case_4(self):
-        input_text = 'Machine learning AI'
-        expected_output = 'Machine learning AI'
-        result = task_func(input_text)
-        self.assertEqual(result, expected_output)
-    def test_case_5(self):
-        input_text = ''
-        expected_output = ''
-        result = task_func(input_text)
-        self.assertEqual(result, expected_output)
+    """Test cases for the task_func function."""
+    def setUp(self):
+        # Sample data for testing
+        self.sample_data = [
+            {"userId": 1, "id": 1, "title": "A", "completed": False},
+            {"userId": 1, "id": 2, "title": "B", "completed": True},
+            {"userId": 2, "id": 3, "title": "A", "completed": False},
+            {"userId": 2, "id": 4, "title": "B", "completed": True},
+            {"userId": 3, "id": 5, "title": "A", "completed": False},
+            {"userId": 3, "id": 6, "title": "B", "completed": True},
+            {"userId": 3, "id": 7, "title": "B", "completed": True},
+        ]
+    def test_normal_case(self):
+        """Test if the function returns correct DataFrame and histogram for a valid column."""
+        df, ax = task_func(self.sample_data, "userId")
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertEqual(len(df), len(self.sample_data))
+        self.assertEqual(ax.get_title(), "Histogram of userId")
+        self.assertEqual(ax.get_xlabel(), "userId")
+    def test_non_existent_column(self):
+        """Test if the function raises an error for a non-existent column."""
+        with self.assertRaises(ValueError):
+            task_func(self.sample_data, "non_existent_column")
+    def test_empty_data(self):
+        """Test the function with empty data."""
+        with self.assertRaises(ValueError):
+            task_func([], "userId")
+    def test_non_numeric_data(self):
+        """Test the function with a non-numeric column."""
+        df, ax = task_func(self.sample_data, "title")
+        self.assertTrue(pd.api.types.is_numeric_dtype(df["title"]))
+        self.assertEqual(ax.get_title(), "Histogram of title")
+        self.assertEqual(ax.get_xlabel(), "title")
+    def test_duplicate_values(self):
+        """Test the function with a column that has duplicate values."""
+        df, ax = task_func(self.sample_data, "title")
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertEqual(ax.get_title(), "Histogram of title")
+        self.assertEqual(ax.get_xlabel(), "title")
+    def tearDown(self):
+        plt.clf()

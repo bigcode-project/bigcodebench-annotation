@@ -1,93 +1,142 @@
-import collections
-import numpy as np
-import matplotlib.pyplot as plt
+import re
+import string
+import random
 
 
-def task_func(data_dict):
+def task_func(text: str, seed=None) -> str:
     """
-    Analyze the uniformity of a distribution represented by a dictionary of categories and their counts,
-    and create a description to introduce this distribution.
+    Transforms a given string by removing special characters, normalizing whitespace,
+    and randomizing character casing.
 
     Parameters:
-    - data_dict (dict): A dictionary with categories as keys and counts as values.
+    - text (str): The text string to be preprocessed.
+    - seed (int, optional): Random seed for reproducibility. Defaults to None (not set).
 
     Returns:
-    - tuple: A tuple containing:
-        - matplotlib.axes._axes.Axes: The axes object of the histogram.
-        - str: A message indicating whether the distribution is uniform ("The distribution is uniform.")
-               or not ("The distribution is not uniform.").
-
-    Note:
-    - If 'data_dict' is empty, the function returns None and a message "The distribution is uniform."
-       indicating that an empty distribution is considered uniform by default.
-    - If 'data_dict' is not empty, it calculates the average count of the categories.
-       - The distribution is considered uniform if the absolute difference between each count and the
-         average count is less than or equal to 1e-5.
-       - If any count's absolute difference with the average count is more than 1e-5, the distribution
-         is considered not uniform.
-    - The function then creates a histogram of the counts using matplotlib, with the number of bins
-       being the lesser of 10 or the number of unique counts. The histogram's x-ticks are labeled with
-       the category names.
+    - str: The preprocessed text string.
 
     Requirements:
-    - collections
-    - numpy
-    - matplotlib
+    - re
+    - string
+    - random
+
+    Note:
+    - This function considers special characters to be string punctuations.
+    - Spaces, tabs, and newlines are replaced with with '_', '__', and '___' respectively.
+    - To randomize casing, this function converts characters to uppercase with a 50% probability.
 
     Example:
-    >>> data = {'A': 2, 'B': 3, 'C': 4, 'D': 1, 'E': 2}
-    >>> ax, message = task_func(data)
-    >>> print(message)
-    The distribution is not uniform.
+    >>> task_func('Hello   World!', 0)
+    'HeLlo___WORlD'
+    >>> task_func('attention is all you need', 42)
+    'ATtENTIOn_IS_ALL_You_Need'
     """
-    if not data_dict:
-        return None, "The distribution is uniform."
-    data_counter = collections.Counter(data_dict)
-    counts = list(data_counter.values())
-    avg_count = sum(counts) / len(counts)
-    uniform = all(abs(count - avg_count) <= 1e-5 for count in counts)
-    message = (
-        "The distribution is uniform."
-        if uniform
-        else "The distribution is not uniform."
-    )
-    _, ax = plt.subplots()
-    ax.hist(
-        counts,
-        bins=np.linspace(min(counts), max(counts), min(10, len(counts))),
-        rwidth=0.8,
-    )
-    ax.set_xticks(np.arange(len(data_dict)) + 1)
-    ax.set_xticklabels(list(data_dict.keys()))
-    return ax, message
+    if seed is not None:
+        random.seed(seed)
+    text = re.sub("[%s]" % re.escape(string.punctuation), "", text)
+    REPLACEMENTS = {" ": "_", "\t": "__", "\n": "___"}
+    for k, v in REPLACEMENTS.items():
+        text = text.replace(k, v)
+    text = "".join(random.choice([k.upper(), k]) for k in text)
+    return text
 
-import numpy as np
-import matplotlib.pyplot as plt
 import unittest
 class TestCases(unittest.TestCase):
-    """Tests for task_func."""
-    def test_uniform_distribution(self):
-        """Test whether the function correctly identifies a uniform distribution."""
-        data = {"A": 5, "B": 5, "C": 5}
-        _, message = task_func(data)
-        self.assertEqual(message, "The distribution is uniform.")
-    def test_non_uniform_distribution(self):
-        """Test whether the function correctly identifies a non-uniform distribution."""
-        data = {"A": 3, "B": 2, "C": 4}
-        _, message = task_func(data)
-        self.assertEqual(message, "The distribution is not uniform.")
-    def test_empty_dictionary(self):
-        """Test the function with an empty dictionary."""
-        data = {}
-        _, message = task_func(data)
-        self.assertEqual(message, "The distribution is uniform.")
-    def test_single_category(self):
-        """Test the function with a single category."""
-        data = {"A": 1}
-        _, message = task_func(data)
-        self.assertEqual(message, "The distribution is uniform.")
-    def test_large_distribution(self):
-        """Test the function with a large number of categories."""
-        data = {chr(i): i for i in range(65, 91)}  # A to Z with ascending counts
-        _, message = task_func(data)
-        self.assertEqual(message, "The distribution is not uniform.")
+    def test_case_1(self):
+        result = task_func("Hello   World!", seed=1)
+        self.assertNotIn(" ", result, "Spaces should be replaced.")
+        self.assertNotIn("!", result, "Special characters should be removed.")
+        self.assertEqual(
+            len(result), len("Hello___World"), "Length should match processed input."
+        )
+    def test_case_2(self):
+        result = task_func("Python!", seed=2)
+        self.assertNotIn("!", result, "Special characters should be removed.")
+        self.assertEqual(
+            len(result), len("Python"), "Length should match processed input."
+        )
+    def test_case_3(self):
+        result = task_func("  ", seed=3)
+        self.assertEqual(result, "__", "Spaces should be replaced with underscores.")
+    def test_case_4(self):
+        result = task_func("\t\n", seed=4)
+        self.assertEqual(
+            result, "_____", "Tab and newline should be replaced with underscores."
+        )
+    def test_case_5(self):
+        result = task_func("a!b@c#", seed=5)
+        self.assertTrue(result.isalpha(), "Output should only contain alphabets.")
+        self.assertEqual(
+            len(result), len("abc"), "Length should match processed input."
+        )
+    def test_case_6(self):
+        # Test with all types of whitespace characters
+        result = task_func("a b\tc\nd", seed=6)
+        self.assertEqual(
+            result.lower(),
+            "a_b__c___d",
+            "Should replace all types of whitespaces correctly.",
+        )
+    def test_case_7(self):
+        # Test with a mix of alphanumeric and special characters
+        result = task_func("a1! b2@ c3#", seed=7)
+        self.assertTrue(
+            all(char.isalnum() or char == "_" for char in result),
+            "Should only contain alphanumeric characters and underscores.",
+        )
+    def test_case_8(self):
+        # Test with an empty string
+        result = task_func("", seed=8)
+        self.assertEqual(result, "", "Should handle empty string correctly.")
+    def test_case_9(self):
+        # Test with a string that contains no special characters or whitespaces
+        result = task_func("abcdefg", seed=9)
+        self.assertTrue(result.isalpha(), "Should contain only letters.")
+        self.assertEqual(len(result), 7, "Length should match the input.")
+    def test_case_10(self):
+        # Test with a long string of repeated characters
+        result = task_func("a" * 50, seed=10)
+        self.assertTrue(
+            all(char.lower() == "a" for char in result),
+            "All characters should be 'a' or 'A'.",
+        )
+        self.assertEqual(len(result), 50, "Length should match the input.")
+    def test_case_11(self):
+        # Test with only special characters
+        result = task_func("!@#$%^&*", seed=11)
+        self.assertEqual(
+            result, "", "Should return an empty string for only special characters."
+        )
+    def test_case_12(self):
+        # Test with numeric characters
+        result = task_func("12345", seed=13)
+        self.assertTrue(result.isdigit(), "Should contain only digits.")
+        self.assertEqual(len(result), 5, "Length should match the input.")
+    def test_case_13(self):
+        # Test with a string containing only whitespace characters
+        result = task_func(" \t\n", seed=14)
+        self.assertEqual(
+            result,
+            "______",
+            "Should replace all types of whitespaces correctly, with two underscores for tab and three for newline.",
+        )
+    def test_case_14(self):
+        # Test the randomness of uppercase conversion with a long string
+        result = task_func("a" * 100, seed=15)
+        self.assertTrue(
+            all(char.lower() == "a" for char in result),
+            "All characters should be 'a' or 'A'.",
+        )
+        self.assertNotEqual(
+            result, "a" * 100, "Should have some uppercase transformations."
+        )
+        self.assertNotEqual(
+            result, "A" * 100, "Should have some lowercase transformations."
+        )
+    def test_case_15(self):
+        # Test random seed impact
+        result1 = task_func("test seed impact", seed=42)
+        result2 = task_func("test seed impact", seed=42)
+        self.assertEqual(
+            result1, result2, "Results with the same seed should be identical."
+        )

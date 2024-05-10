@@ -1,50 +1,65 @@
-import pandas as pd
 from itertools import combinations
+from random import sample
 
-# Constants
-MIN_PERCENTAGE = 0.75
 
-def task_func(data, cols, percentage):
+def task_func(df, tuples, n_plots):
     """
-    Find all combinations of columns from a given DataFrame so that the absolute correlation between them is greater than a certain threshold.
+    Removes rows from a DataFrame based on a list of tuples, each representing row values to match and remove.
+    Generates up to 'n_plots' scatter plots for random combinations of two columns from the remaining DataFrame.
 
     Parameters:
-    - data (list): List of lists with the data, where the length of the inner list equals the number of columns
-    - cols (list): List of column names
-    - percentage (float): The threshold for the absolute correlation.
+    - df (pd.DataFrame): The input DataFrame.
+    - tuples (list): A list of tuples, where each tuple contains values that, if matched, should result in the row being removed.
+    - n_plots (int): The maximum number of scatter plots to generate from the remaining data.
 
     Returns:
-    - corr_combinations (list): A list of tuples where each tuple contains two column names.
+    - pd.DataFrame: The DataFrame after specified rows have been removed.
+    - list: A list of tuples, each containing a pair of column names used for the plot and the corresponding plot object.
 
     Requirements:
-    - pandas
+    - random
     - itertools
 
     Example:
-    >>> result = task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.9)
-    >>> print(result)
-    [('x', 'y')]
+    >>> import numpy as np, pandas as pd
+    >>> df = pd.DataFrame(np.random.rand(10, 5), columns=['A', 'B', 'C', 'D', 'E'])
+    >>> tuples = [(0.1, 0.2, 0.3, 0.4, 0.5)]
+    >>> modified_df, plots = task_func(df, tuples, 3)
     """
-    if not 0 <= percentage <= 1:
-        raise ValueError('Percentage must be between 0 and 1')
-    df = pd.DataFrame(data, columns=cols)
-    corr_matrix = df.corr().abs()
-    columns = corr_matrix.columns
-    corr_combinations = []
-    for col1, col2 in combinations(columns, 2):
-        if corr_matrix.loc[col1, col2] > percentage:
-            corr_combinations.append((col1, col2))
-    return corr_combinations
+    COLUMNS = ['A', 'B', 'C', 'D', 'E']
+    df = df.set_index(list('ABCDE')).drop(tuples, errors='ignore').reset_index()
+    plots = []
+    possible_combinations = list(combinations(COLUMNS, 2))
+    for _ in range(min(n_plots, len(possible_combinations))):
+        selected_columns = sample(possible_combinations, 1)[0]
+        possible_combinations.remove(selected_columns)
+        ax = df.plot.scatter(x=selected_columns[0], y=selected_columns[1])
+        plots.append((selected_columns, ax))
+    return df, plots
 
 import unittest
+import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
     def test_case_1(self):
-        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.9), [('x', 'y')])
+        tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
+        modified_df, _ = task_func(self.df, tuples, 3)
+        self.assertFalse(any(modified_df.apply(tuple, axis=1).isin(tuples)))
     def test_case_2(self):
-        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.5), [('x', 'y'), ('x', 'z'), ('y', 'z')])
+        n_plots = 4
+        _, plots = task_func(self.df, [], n_plots)
+        self.assertEqual(len(plots), n_plots)
     def test_case_3(self):
-        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.1), [('x', 'y'), ('x', 'z'), ('y', 'z')])
+        _, plots = task_func(self.df, [], 5)
+        selected_columns = [plot[0] for plot in plots]
+        self.assertTrue(len(selected_columns) == len(set(tuple(item) for item in selected_columns)))
     def test_case_4(self):
-        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.0), [('x', 'y'), ('x', 'z'), ('y', 'z')])
+        modified_df, plots = task_func(self.df, [], 2)
+        self.assertEqual(len(modified_df), len(self.df))
+        self.assertEqual(len(plots), 2)
     def test_case_5(self):
-        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 1.0), [])
+        tuples = [(101, 202, 303, 404, 505), (606, 707, 808, 909, 1000)]
+        modified_df, _ = task_func(self.df, tuples, 3)
+        self.assertEqual(len(modified_df), len(self.df))

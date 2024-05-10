@@ -1,114 +1,134 @@
-from random import randint, seed
-import pandas as pd
+import collections
+import matplotlib.pyplot as plt
 
 
-# Method
-def task_func(goals, penalties, rng_seed=None):
+def task_func(data):
     """
-    Generate a Pandas DataFrame with colomns 'Team' and 'Match Result' of the results of football matches for multiple
-    teams, incorporating random goals and penalties. Penalties are converted into fines using a predefined cost.
+    Combine a list of dictionaries with the same keys (fruit names) into a single dictionary,
+    calculate the total turnover for each fruit, and return a bar chart's axes with colors representing
+    different fruits. The colors are selected from: 'red', 'yellow', 'green', 'blue', 'purple'. The function
+    ensures that sales quantity must not be negative, throwing a ValueError if encountered.
 
     Parameters:
-    - goals (int): The maximum number of goals a team can score in a match. Must be non-negative.
-    - penalties (int): The maximum number of penalties a team can receive in a match. Must be non-negative.
-    - rng_seed (int, optional): Seed for the random number generator to ensure reproducible results. Defaults to None.
+    data (list): A list of dictionaries. The keys are fruit names and the values are sales quantities.
+                 Sales quantity must not be negative.
 
     Returns:
-    - pd.DataFrame: A pandas DataFrame with columns ['Team', 'Match Result'], detailing each team's goals and accumulated fines.
+    total_sales (dict): A dictionary containing the total sales for each fruit.
+    ax (matplotlib.container.BarContainer): A bar chart of total fruit sales, or None if data is empty
 
     Requirements:
-    - pandas
-    - random
+    - collections
+    - matplotlib.pyplot
 
     Example:
-    >>> seed(42)  # Setting seed for reproducibility in this example
-    >>> results = task_func(5, 3, 42)
-    >>> print(results)
-         Team      Match Result
-    0  Team A     (5 goals, $0)
-    1  Team B  (0 goals, $2000)
-    2  Team C  (1 goals, $1000)
-    3  Team D     (1 goals, $0)
-    4  Team E     (5 goals, $0)
+    >>> sales, plot = task_func([{'apple': 10, 'banana': 15, 'cherry': 12},\
+                             {'apple': 12, 'banana': 20, 'cherry': 14},\
+                             {'apple': 15, 'banana': 18, 'cherry': 15},\
+                             {'apple': 11, 'banana': 17, 'cherry': 13}])
+    >>> sales
+    {'apple': 48, 'banana': 70, 'cherry': 54}
+    >>> type(plot)
+    <class 'matplotlib.container.BarContainer'>
     """
-    TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
-    PENALTY_COST = 1000  # in dollars
-    if rng_seed is not None:
-        seed(rng_seed)  # Set seed for reproducibility
-    match_results = []
-    for team in TEAMS:
-        team_goals = randint(0, abs(goals))
-        team_penalties = randint(0, abs(penalties))
-        penalty_cost = PENALTY_COST * team_penalties
-        result_string = f"({team_goals} goals, ${penalty_cost})"
-        match_results.append([team, result_string])
-    results_df = pd.DataFrame(match_results, columns=['Team', 'Match Result'])
-    return results_df
+    if not data:
+        return dict(), None
+    all_keys = set().union(*data)
+    for d in data:
+        for k, v in d.items():
+            if v < 0:
+                raise ValueError("Sales quantity must not be negative.")
+    combined_dict = dict((k, [d.get(k, 0) for d in data]) for k in all_keys)
+    total_sales = {k: sum(v) for k, v in combined_dict.items()}
+    total_sales = dict(collections.OrderedDict(sorted(total_sales.items())))
+    labels, values = zip(*total_sales.items())
+    colors = ["red", "yellow", "green", "blue", "purple"] * (len(labels) // 5 + 1)
+    ax = plt.bar(labels, values, color=colors[: len(labels)])
+    plt.xlabel("Fruit")
+    plt.ylabel("Total Sales")
+    plt.title("Total Fruit Sales")
+    return total_sales, ax
 
 import unittest
-# Test Suite
+import collections
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.teams = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
-        self.penalty_cost = 1000  # Match the PENALTY_COST used in task_func
-    def test_goals_and_penalties_within_range(self):
-        """Test that goals and penalties fall within specified ranges."""
-        max_goals = 5
-        max_penalties = 3
-        df = task_func(max_goals, max_penalties)
-        for _, row in df.iterrows():
-            # Correctly extract goals and penalty cost from the 'Match Result' string
-            match_result = row['Match Result']
-            goals = int(match_result.split(' ')[0][1:])
-            penalty_cost = int(match_result.split('$')[-1][:-1])
-            # Check if goals are within the expected range
-            self.assertTrue(0 <= goals <= max_goals, f"Goals {goals} not within range 0 to {max_goals}")
-            # Calculate the maximum possible penalty cost and check it
-            max_penalty_cost = max_penalties * self.penalty_cost
-            self.assertTrue(0 <= penalty_cost <= max_penalty_cost,
-                            f"Penalty cost {penalty_cost} not within range 0 to {max_penalty_cost}")
-    def test_negative_input_handling(self):
-        """Test that negative inputs are handled correctly."""
-        max_goals = -5
-        max_penalties = -3
-        df = task_func(max_goals, max_penalties)
-        for _, row in df.iterrows():
-            # Correctly extract and check values as before, ensuring no negative values are produced
-            match_result = row['Match Result']
-            goals = int(match_result.split(' ')[0][1:])
-            penalty_cost = int(match_result.split('$')[-1][:-1])
-            self.assertTrue(0 <= goals, "Goals are negative which is not expected")
-            self.assertTrue(0 <= penalty_cost, "Penalty cost is negative which is not expected")
-    def test_zero_goals_and_penalties(self):
-        """Test that the function handles 0 goals and 0 penalties correctly."""
-        df = task_func(0, 0)
-        for _, row in df.iterrows():
-            match_result = row['Match Result']
-            goals = int(match_result.split(' ')[0][1:])
-            penalty_cost = int(match_result.split('$')[-1][:-1])
-            self.assertEqual(goals, 0, "Goals should be 0 when max_goals is set to 0")
-            self.assertEqual(penalty_cost, 0, "Penalty cost should be 0 when max_penalties is set to 0")
-    def test_extremely_high_values(self):
-        """Test the function with extremely high values for goals and penalties."""
-        max_goals = 1000
-        max_penalties = 500
-        df = task_func(max_goals, max_penalties)
-        for _, row in df.iterrows():
-            match_result = row['Match Result']
-            goals = int(match_result.split(' ')[0][1:])
-            penalty_cost = int(match_result.split('$')[-1][:-1])
-            self.assertTrue(0 <= goals <= max_goals, f"Goals {goals} not within range 0 to {max_goals}")
-            max_penalty_cost = max_penalties * self.penalty_cost
-            self.assertTrue(0 <= penalty_cost <= max_penalty_cost, f"Penalty cost {penalty_cost} not within range 0 to {max_penalty_cost}")
-    def test_mixed_values(self):
-        """Test the function with a mix of low and high values for goals and penalties."""
-        max_goals = 10
-        max_penalties = 1
-        df = task_func(max_goals, max_penalties)
-        for _, row in df.iterrows():
-            match_result = row['Match Result']
-            goals = int(match_result.split(' ')[0][1:])
-            penalty_cost = int(match_result.split('$')[-1][:-1])
-            self.assertTrue(0 <= goals <= max_goals, f"Goals {goals} not within range 0 to {max_goals}")
-            max_penalty_cost = max_penalties * self.penalty_cost
-            self.assertTrue(0 <= penalty_cost <= max_penalty_cost, f"Penalty cost {penalty_cost} not within range 0 to {max_penalty_cost}")
+    def test_case_1(self):
+        # Test basic case with one fruit
+        data = [{"apple": 5}, {"apple": 7}, {"apple": 3}]
+        sales, _ = task_func(data)
+        expected_sales = {"apple": 15}
+        self.assertDictEqual(sales, expected_sales)
+    def test_case_2(self):
+        # Test basic case with multiple fruits
+        data = [
+            {"apple": 10, "banana": 15, "cherry": 12, "date": 10},
+            {"apple": 12, "banana": 20, "cherry": 14, "date": 9},
+            {"apple": 15, "banana": 18, "cherry": 15, "date": 8},
+            {"apple": 11, "banana": 17, "cherry": 13, "date": 7},
+        ]
+        sales, _ = task_func(data)
+        expected_sales = {"apple": 48, "banana": 70, "cherry": 54, "date": 34}
+        self.assertDictEqual(sales, expected_sales)
+    def test_case_3(self):
+        # Test basic case with one entry per fruit
+        data = [{"apple": 1}, {"banana": 2}, {"cherry": 3}]
+        sales, _ = task_func(data)
+        expected_sales = {"apple": 1, "banana": 2, "cherry": 3}
+        self.assertDictEqual(sales, expected_sales)
+    def test_case_4(self):
+        # Test zero quantities
+        data = [
+            {"apple": 0, "banana": 0},
+            {"apple": 0, "banana": 0},
+            {"apple": 0, "banana": 0},
+        ]
+        sales, _ = task_func(data)
+        expected_sales = {"apple": 0, "banana": 0}
+        self.assertDictEqual(sales, expected_sales)
+    def test_case_5(self):
+        # Test empty data
+        data = []
+        sales, _ = task_func(data)
+        expected_sales = {}
+        self.assertDictEqual(sales, expected_sales)
+    def test_case_6(self):
+        # Test missing fruit
+        data = [{"apple": 10, "banana": 5}, {"banana": 15, "cherry": 7}, {"cherry": 3}]
+        sales, _ = task_func(data)
+        expected_sales = {"apple": 10, "banana": 20, "cherry": 10}
+        self.assertDictEqual(sales, expected_sales)
+    def test_case_7(self):
+        # Test negative sales
+        data = [{"apple": -10, "banana": 15}, {"apple": 12, "banana": -20}]
+        with self.assertRaises(ValueError):
+            task_func(data)
+    def test_case_8(self):
+        # Test large values
+        data = [
+            {"apple": 1000000, "banana": 500000},
+            {"apple": 2000000, "banana": 1500000},
+        ]
+        sales, _ = task_func(data)
+        expected_sales = {"apple": 3000000, "banana": 2000000}
+        self.assertDictEqual(sales, expected_sales)
+    def test_case_9(self):
+        # Test visualization
+        data = [{"apple": 10, "banana": 15}, {"banana": 5, "apple": 10}]
+        _, plot = task_func(data)
+        self.assertEqual(
+            len(plot.patches), 2
+        )  # Checking if the number of bars in the plot is correct
+    def test_case_10(self):
+        # Test non-string keys
+        data = [{5: 10, "banana": 15}, {"banana": 5, 5: 10}]
+        with self.assertRaises(TypeError):
+            task_func(data)
+    def test_case_11(self):
+        # Test mixed types in sales
+        data = [{"apple": 10.5, "banana": 15}, {"apple": 12, "banana": 20.5}]
+        sales, _ = task_func(data)
+        expected_sales = {"apple": 22.5, "banana": 35.5}
+        self.assertDictEqual(sales, expected_sales)
+    def tearDown(self):
+        plt.close("all")

@@ -1,111 +1,75 @@
-import pandas as pd
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
+from scipy.optimize import curve_fit
 
-def task_func(num_samples, countries=['Russia', 'China', 'USA', 'India', 'Brazil'], 
-           ages=np.arange(18, 60), genders=['Male', 'Female'], rng_seed=None):
+
+def task_func(x, y, labels):
     """
-    Generate a demographic dataset with information about people from different countries, their age, and gender. 
-    Genders are encoded using sklearn LabelEncoder.
-    Datapoints are sampled from the lists using a numpy.random.default_rng with seed: rng_seed.
+    Fit an exponential curve to given data points and plot the curves with labels.
+    It fits an exponential curve of the form: f(x) = a * exp(-b * x) + c
+    to the provided x and y data points for each set of data and plots the fitted curves
+    with the corresponding labels on a single matplotlib figure.
 
     Parameters:
-    num_samples (int): The number of samples to generate.
-    countries (list of str): A list of country names to use in the dataset. Default is ['Russia', 'China', 'USA', 'India', 'Brazil'].
-    ages (array of int): An array of ages to use in the dataset. Default is np.arange(18, 60).
-    genders (list of str): A list of genders to use in the dataset. Default is ['Male', 'Female'].
-    rng_seed: seed for the random number generator
-    
-    Returns:
-    DataFrame: A pandas DataFrame with the demographics data.
+    - x (list of np.ndarray): List of numpy arrays, each representing the x-values of the data points for a dataset.
+    - y (list of np.ndarray): List of numpy arrays, each representing the y-values of the data points for a dataset.
+    - labels (list of str): List of strings, each representing the label for a dataset.
 
-    Raises:
-    - ValueError: If num_samples is not an integer.
+    Returns:
+    - matplotlib.figure.Figure: The figure object that contains the plotted curves.
 
     Requirements:
-    - pandas
     - numpy
-    - sklearn.preprocessing.LabelEncoder
+    - scipy.optimize
 
     Example:
-    >>> demographics = task_func(5, rng_seed=31)
-    >>> print(demographics)
-      Country  Age  Gender
-    0     USA   46       0
-    1  Brazil   21       1
-    2     USA   37       1
-    3  Russia   32       1
-    4     USA   46       0
-
-    >>> demographics = task_func(5, countries=['Austria', 'Germany'], rng_seed=3)
-    >>> print(demographics)
-       Country  Age  Gender
-    0  Germany   51       1
-    1  Austria   54       1
-    2  Austria   42       0
-    3  Austria   19       1
-    4  Austria   21       1
+    >>> x_data = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
+    >>> y_data = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
+    >>> labels = ['H2O', 'O2', 'CO2']
     """
-    if not isinstance(num_samples, int):
-        raise ValueError("num_samples should be an integer.")
-    rng = np.random.default_rng(seed=rng_seed)
-    countries = rng.choice(countries, num_samples)
-    ages = rng.choice(ages, num_samples)
-    genders = rng.choice(genders, num_samples)
-    le = LabelEncoder()
-    encoded_genders = le.fit_transform(genders)
-    demographics = pd.DataFrame({
-        'Country': countries,
-        'Age': ages,
-        'Gender': encoded_genders
-    })
-    return demographics
+    if not x or not y or not labels:
+        raise ValueError("Empty data lists provided.")
+    def exponential_func(x, a, b, c):
+        """Exponential function model for curve fitting."""
+        return a * np.exp(-b * x) + c
+    fig, ax = plt.subplots()
+    for i in range(len(x)):
+        popt, _ = curve_fit(exponential_func, x[i], y[i])
+        ax.plot(x[i], exponential_func(x[i], *popt), label=labels[i])
+    ax.legend()
+    return fig
 
 import unittest
-import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_case_num_samples(self):
-        'num_samples not an integer'
-        self.assertRaises(Exception, task_func, 'test')
-    
-    # Test Case 1: Basic test with default parameters
-    def test_case_1(self):
-        demographics = task_func(10, rng_seed=1)
-        self.assertEqual(len(demographics), 10)
-        self.assertTrue(set(demographics['Country'].unique()).issubset(['Russia', 'China', 'USA', 'India', 'Brazil']))
-        self.assertTrue(all(18 <= age <= 59 for age in demographics['Age']))
-        self.assertTrue(set(demographics['Gender'].unique()).issubset([0, 1]))
-    # Test Case 2: Test with custom countries list
-    def test_case_2(self):
-        demographics = task_func(5, countries=['Canada', 'Australia'], rng_seed=1)
-        self.assertEqual(len(demographics), 5)
-        self.assertTrue(set(demographics['Country'].unique()).issubset(['Canada', 'Australia']))
-        self.assertTrue(all(18 <= age <= 59 for age in demographics['Age']))
-        self.assertTrue(set(demographics['Gender'].unique()).issubset([0, 1]))
-    # Test Case 3: Test with custom age range
-    def test_case_3(self):
-        demographics = task_func(5, ages=np.arange(25, 40), rng_seed=1)
-        self.assertEqual(len(demographics), 5)
-        self.assertTrue(all(25 <= age <= 40 for age in demographics['Age']))
-        self.assertTrue(set(demographics['Gender'].unique()).issubset([0, 1]))
-    # Test Case 4: Test with custom gender list
-    def test_case_4(self):
-        demographics = task_func(5, genders=['Non-Binary'], rng_seed=1)
-        self.assertEqual(len(demographics), 5)
-        self.assertTrue(set(demographics['Gender'].unique()).issubset([0]))
-    # Test Case 5: Test with larger sample size
-    def test_case_5(self):
-        demographics = task_func(100, rng_seed=1)
-        self.assertEqual(len(demographics), 100)
-        self.assertTrue(set(demographics['Country'].unique()).issubset(['Russia', 'China', 'USA', 'India', 'Brazil']))
-        self.assertTrue(all(18 <= age <= 59 for age in demographics['Age']))
-        self.assertTrue(set(demographics['Gender'].unique()).issubset([0, 1]))
-    def test_case_6(self):
-        'check for specific return value'
-        demographics = task_func(5, rng_seed=3)
-        expected_df = pd.DataFrame({
-            'Country': ['Brazil', 'Russia', 'Russia', 'China', 'Russia'],
-            'Age': [51, 54, 42, 19, 21],
-            'Gender': [1, 1, 0, 1, 1]
-        })
-        pd.testing.assert_frame_equal(demographics, expected_df)
+    def setUp(self):
+        # Example data for all tests
+        self.x = [np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([1, 3, 5])]
+        self.y = [np.array([2, 3, 5]), np.array([5, 7, 10]), np.array([2.5, 3.5, 5.5])]
+        self.labels = ["Test 1", "Test 2", "Test 3"]
+    def test_plot_labels(self):
+        """Ensure the plot includes all specified labels."""
+        fig = task_func(self.x, self.y, self.labels)
+        ax = fig.gca()
+        legend_labels = [text.get_text() for text in ax.get_legend().get_texts()]
+        self.assertListEqual(legend_labels, self.labels, "Legend labels do not match input labels.")
+    def test_curve_fit_success(self):
+        """Verify that curve_fit successfully fits the data."""
+        for x_arr, y_arr in zip(self.x, self.y):
+            with self.subTest(x=x_arr, y=y_arr):
+                popt, _ = curve_fit(lambda x, a, b, c: a * np.exp(-b * x) + c, x_arr, y_arr)
+                self.assertTrue(len(popt) == 3, "Optimal parameters not found for the exponential fit.")
+    def test_output_type(self):
+        """Check the output type to be a matplotlib figure."""
+        fig = task_func(self.x, self.y, self.labels)
+        self.assertIsInstance(fig, plt.Figure, "Output is not a matplotlib figure.")
+    def test_no_data(self):
+        """Test the function with no data provided."""
+        with self.assertRaises(ValueError, msg="Empty data lists should raise a ValueError."):
+            task_func([], [], [])
+    def test_non_numeric_data(self):
+        """Ensure non-numeric data raises a ValueError during fitting."""
+        x = [np.array(["a", "b", "c"])]
+        y = [np.array(["d", "e", "f"])]
+        labels = ["Invalid Data"]
+        with self.assertRaises(ValueError, msg="Non-numeric data should raise a ValueError."):
+            task_func(x, y, labels)

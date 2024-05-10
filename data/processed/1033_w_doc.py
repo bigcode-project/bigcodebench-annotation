@@ -1,75 +1,75 @@
-import re
-import hashlib
+import random
+import string
+import pandas as pd
 
-def task_func(input_str):
+
+def task_func(n_rows=1000):
     """
-    Removes all special characters, punctuation marks, and spaces from the input string using a regular expression,
-    retaining only alphanumeric characters. Then hashes the cleaned string with SHA256.
+    Generate a histogram of the frequency of the top 30 unique random 3-letter strings.
+    The function creates random strings, each consisting of 3 letters from the lowercase English alphabet.
+    It then plots a histogram showing the frequencies of the top 30 most common strings among the generated set.
 
     Parameters:
-    input_str (str): The input string to be cleaned and hashed.
+    - n_rows (int): Number of random 3-letter strings to generate.
+    Must be positive. Default is 1000.
 
     Returns:
-    str: The SHA256 hash of the cleaned string.
+    - ax (matplotlib.axes.Axes): A Matplotlib Axes object containing the histogram.
+    Each bar represents one of the top 30 most frequent 3-letter strings.
+
+    Raises:
+    - ValueError: If `n_rows` is less than or equal to 0.
 
     Requirements:
-    - re
-    - hashlib
-
+    - random
+    - string
+    - pandas
+    
     Example:
-    >>> task_func('Special $#! characters   spaces 888323')
-    'af30263c4d44d67917a4f0727191a4149e1ab615b772b2aeda859068178b146c'
+    >>> ax = task_func(1000)
+    >>> ax.get_title()
+    'Top 30 Frequencies of Random 3-Letter Strings'
     """
-    cleaned_str = re.sub('[^A-Za-z0-9]+', '', input_str)
-    hashed_str = hashlib.sha256(cleaned_str.encode()).hexdigest()
-    return hashed_str
+    if n_rows <= 0:
+        raise ValueError("Number of rows must be greater than 0")
+    data = ["".join(random.choices(string.ascii_lowercase, k=3)) for _ in range(n_rows)]
+    df = pd.DataFrame(data, columns=["String"])
+    frequency = df["String"].value_counts()
+    ax = frequency.head(30).plot(
+        kind="bar"
+    )  # Limit to the top 30 frequencies for readability
+    ax.set_title("Top 30 Frequencies of Random 3-Letter Strings")
+    ax.set_xlabel("String")
+    ax.set_ylabel("Frequency")
+    return ax
 
 import unittest
-import hashlib
+import random
+from matplotlib.axes import Axes
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
-        # Test with special characters and spaces
-        result = task_func('Special $#! characters   spaces 888323')
-        expected = hashlib.sha256('Specialcharactersspaces888323'.encode()).hexdigest()
-        self.assertEqual(result, expected)
-    def test_case_2(self):
-        # Test with a standard phrase
-        result = task_func('Hello World!')
-        expected = hashlib.sha256('HelloWorld'.encode()).hexdigest()
-        self.assertEqual(result, expected)
-    def test_case_3(self):
-        # Test with numeric input
-        result = task_func('1234567890')
-        expected = hashlib.sha256('1234567890'.encode()).hexdigest()
-        self.assertEqual(result, expected)
-    def test_case_4(self):
-        # Test with an empty string
-        result = task_func('')
-        expected = hashlib.sha256(''.encode()).hexdigest()
-        self.assertEqual(result, expected)
-    def test_case_5(self):
-        # Test with a single word
-        result = task_func('A')
-        expected = hashlib.sha256('A'.encode()).hexdigest()
-        self.assertEqual(result, expected)
-    def test_case_6(self):
-        # Test with only special characters
-        result = task_func('$#!@%')
-        expected = hashlib.sha256(''.encode()).hexdigest()
-        self.assertEqual(result, expected)
-    def test_case_7(self):
-        # Test with leading and trailing whitespace
-        result = task_func('   leading and trailing spaces   ')
-        expected = hashlib.sha256('leadingandtrailingspaces'.encode()).hexdigest()
-        self.assertEqual(result, expected)
-    def test_case_8(self):
-        # Test with mixed case and numbers
-        result = task_func('Test123')
-        expected = hashlib.sha256('Test123'.encode()).hexdigest()
-        self.assertEqual(result, expected)
-    def test_case_9(self):
-        # Test with non-ASCII unicode characters
-        result = task_func('Café123')
-        expected = hashlib.sha256('Caf123'.encode()).hexdigest()  # Assumes non-ASCII chars are removed
-        self.assertEqual(result, expected)
+    """Tests for the function task_func."""
+    def test_return_type(self):
+        """Test if the function returns a Matplotlib Axes object."""
+        random.seed(0)
+        result = task_func(100)
+        self.assertIsInstance(result, Axes)
+    def test_default_parameter(self):
+        """Test the function with the default parameter."""
+        result = task_func()
+        self.assertIsInstance(result, Axes)
+    def test_zero_rows(self):
+        """Test the function with zero rows."""
+        with self.assertRaises(ValueError):
+            task_func(0)
+    def test_negative_rows(self):
+        """Test the function with a negative number of rows."""
+        with self.assertRaises(ValueError):
+            task_func(-1)
+    def test_large_number_of_rows(self):
+        """Test the function with a large number of rows."""
+        random.seed(2)
+        result = task_func(10000)
+        self.assertIsInstance(result, Axes)
+    def tearDown(self):
+        plt.close()

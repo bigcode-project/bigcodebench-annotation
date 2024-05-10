@@ -1,74 +1,115 @@
-from random import sample
-import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import statsmodels.api as sm
 
 
-# Constants
-COLUMNS = ['A', 'B', 'C', 'D', 'E']
-
-
-def task_func(df, tuples, n_plots):
+def task_func(
+    array: list, random_seed: int = 0
+) -> (pd.DataFrame, sm.regression.linear_model.RegressionResultsWrapper):
     """
-    Removes rows from a DataFrame based on values of multiple columns, 
-    and then create n random line plots of two columns against each other.
+    Generate a Pandas DataFrame from a 2D list and perform a multiple linear regression.
+
+    The function first validates the input list, creates a DataFrame, separates independent and dependent variables,
+    adds a constant to the model, and fits a linear regression using statsmodels.
 
     Parameters:
-    - df (pd.DataFrame): The input pandas DataFrame.
-    - tuples (list of tuple): A list of tuples, each tuple represents values in a row to be removed.
-    - n_plots (int): The number of line plots to generate.
+    - array (list of list of int): A 2D list where each sub-list represents a row of data.
+                                   Each sub-list should have exactly 5 elements, where the first 4 elements are
+                                   treated as independent variables ('A', 'B', 'C', 'D') and the last element is
+                                   the dependent (Response) variable.
+
+    - random_seed (int): A seed for reproducibility in numpy for statsmodels. Defaults to 0.
 
     Returns:
-    - (pd.DataFrame, list): A tuple containing the modified DataFrame and a list of plot details.
-      Each entry in the plot details list is a tuple containing the two columns plotted against each other.
+    - df (pd.DataFrame): DataFrame with columns 'A', 'B', 'C', 'D', 'Response'.
+    - results (statsmodels.RegressionResults): Results of the linear regression.
 
     Requirements:
-    - matplotlib.pyplot
-    - random
+    - pandas
+    - numpy
+    - statsmodels.api.sm
 
     Example:
-    >>> import numpy as np, pandas as pd
-    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
-    >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-    >>> modified_df, plot_details = task_func(df, tuples, 3)
+    >>> df, results = task_func([[1,2,3,4,5], [6,7,8,9,10]])
+    >>> print(df)
+       A  B  C  D  Response
+    0  1  2  3  4         5
+    1  6  7  8  9        10
     """
-    mask = df.apply(tuple, axis=1).isin(tuples)
-    df = df[~mask]
-    plot_details = []
-    for _ in range(min(n_plots, len(df))):
-        selected_columns = sample(COLUMNS, 2)
-        df.plot(x=selected_columns[0], y=selected_columns[1], kind='line')
-        plot_details.append((selected_columns[0], selected_columns[1]))
-    plt.show()
-    return df, plot_details
+    COLUMNS = ["A", "B", "C", "D", "Response"]
+    np.random.seed(random_seed)
+    if not all(len(row) == len(COLUMNS) for row in array):
+        raise ValueError(
+            "Each sub-list in the input 2D list must have exactly 5 elements."
+        )
+    df = pd.DataFrame(array, columns=COLUMNS)
+    X = df[COLUMNS[:-1]]
+    y = df["Response"]
+    X = sm.add_constant(X)
+    model = sm.OLS(y, X)
+    results = model.fit()
+    return df, results
 
 import unittest
-import numpy as np
 import pandas as pd
-# Unit test class
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
-        self.tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-    def test_basic_functionality(self):
-        modified_df, plot_details = task_func(self.df, self.tuples, 3)
-        # Convert DataFrame rows to tuples for comparison
-        df_tuples = set([tuple(x) for x in modified_df.to_numpy()])
-        # Convert list of tuples to a set for efficient searching
-        tuples_to_remove = set(self.tuples)
-        # Check that none of the tuples to remove are in the modified DataFrame
-        intersection = df_tuples.intersection(tuples_to_remove)
-        self.assertTrue(len(intersection) == 0, f"Removed tuples found in the modified DataFrame: {intersection}")
-    def test_empty_dataframe(self):
-        empty_df = pd.DataFrame(columns=list('ABCDE'))
-        modified_df, plot_details = task_func(empty_df, [], 1)
-        self.assertTrue(modified_df.empty)
-    def test_zero_plots(self):
-        modified_df, plot_details = task_func(self.df, [], 0)
-        self.assertEqual(len(plot_details), 0)
-    def test_more_plots_than_data(self):
-        modified_df, plot_details = task_func(self.df.iloc[:5], [], 10)
-        self.assertTrue(len(plot_details) <= 5)
-    def test_plot_details(self):
-        _, plot_details = task_func(self.df, [], 3)
-        self.assertEqual(len(plot_details), 3)
-        all_columns = all(c[0] in COLUMNS and c[1] in COLUMNS for c in plot_details)
-        self.assertTrue(all_columns)
+    def test_case_1(self):
+        # Testing dataframe creation, model accuracy, and parameters with various numeric data types
+        test_data = [
+            ([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]], 42, 1.0),  # Positive values
+            ([[-1, -2, -3, -4, -5], [-6, -7, -8, -9, -10]], 42, 1.0),  # Negative values
+            (
+                [[100, 200, 300, 400, 500], [600, 700, 800, 900, 1000]],
+                42,
+                1.0,
+            ),  # Large values
+        ]
+        for array, random_seed, expected_r2 in test_data:
+            with self.subTest(array=array):
+                df, results = task_func(array, random_seed=random_seed)
+                expected_df = pd.DataFrame(
+                    array, columns=["A", "B", "C", "D", "Response"]
+                )
+                self.assertTrue(df.equals(expected_df))
+                self.assertAlmostEqual(results.rsquared, expected_r2, places=2)
+                for param in results.params:
+                    self.assertNotEqual(param, 0)
+    def test_case_2(self):
+        # Testing with more rows in the 2D list to ensure model scalability and consistency
+        random_seed = 42
+        array = [
+            [1, 2, 3, 4, 5],
+            [6, 7, 8, 9, 10],
+            [11, 12, 13, 14, 15],
+            [16, 17, 18, 19, 20],
+        ]
+        df, results = task_func(array, random_seed=random_seed)
+        expected_df = pd.DataFrame(array, columns=["A", "B", "C", "D", "Response"])
+        self.assertTrue(df.equals(expected_df))
+        self.assertAlmostEqual(results.rsquared, 1.0, places=2)
+        for param in results.params:
+            self.assertNotEqual(param, 0)
+    def test_case_3(self):
+        # Testing input validation for incorrect number of columns in a row
+        array = [[1, 2, 3, 4], [5, 6, 7, 8]]  # Missing dependent variable
+        with self.assertRaises(ValueError):
+            task_func(array)
+    def test_case_4(self):
+        # Testing handling of non-numeric values to ensure type safety
+        array = [["a", "b", "c", "d", "e"]]  # All elements as strings
+        with self.assertRaises(ValueError):
+            df, results = task_func(array)
+            # This assumes the function is modified to catch and raise ValueError for non-numeric inputs
+    def test_case_5(self):
+        # Testing reproducibility by using the same random_seed
+        array = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
+        random_seed = 123
+        df1, results1 = task_func(array, random_seed=random_seed)
+        df2, results2 = task_func(array, random_seed=random_seed)
+        self.assertTrue(df1.equals(df2))
+        self.assertEqual(results1.params.tolist(), results2.params.tolist())
+    def test_case_6(self):
+        # Testing with an empty array to check function's handling of no input data
+        array = []
+        with self.assertRaises(ValueError):
+            task_func(array)

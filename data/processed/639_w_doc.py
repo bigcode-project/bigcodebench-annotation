@@ -1,68 +1,52 @@
-import re
-import string
+import numpy as np
+import pandas as pd
 
-def task_func(content):
-    """Count the non-stop words in a sentence without the last word.
+
+def task_func(num_teams=5, num_games=100):
+    """
+    Create a Pandas DataFrame that displays the random scores of different teams in multiple games.
+    The function generates random scores for each game played by each team and populates them in
+    a DataFrame with index=teams, columns=games.
 
     Parameters:
-    - content (str): The sentence to count non-stopwords from.
+    - num_teams (int, optional): The number of teams participating. Default is 5.
+    - num_games (int, optional): The number of games played. Default is 100.
 
     Returns:
-    - count (int): The count of non-stopwords.
+    DataFrame: The generated DataFrame containing random scores for each team in each game.
 
     Requirements:
-    - re
-    - string
+    - pandas
+    - numpy
 
     Example:
-    >>> task_func('this is an example content')
-    1
+    >>> df = task_func(num_teams=3, num_games=10)
+    >>> type(df)
+    <class 'pandas.core.frame.DataFrame'>
     """
-    STOPWORDS = set([
-        "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", 
-        "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", 
-        "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", 
-        "theirs", "themselves", "what", "which", "who", "whom", "this", "that", 
-        "these", "those", "is", "are", "was", "were", "be", "been", "being", "have", 
-        "has", "had", "having", "do", "does", "did", "doing", "an", "the", "and", 
-        "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", 
-        "for", "with", "about", "against", "between", "into", "through", "during", 
-        "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", 
-        "on", "off", "over", "under", "again", "further", "then", "once"
-    ])
-    content = content.split(' ')
-    if len(content) > 1:
-        content = content[:-1]
-    else:
-        content = []
-    words = [word.strip(string.punctuation).lower() for word in re.split(r'\W+', ' '.join(content)) if word]
-    non_stopwords = [word for word in words if word not in STOPWORDS]
-    count = len(non_stopwords)
-    return count
+    scores = np.random.randint(0, 101, size=(num_teams, num_games))
+    teams = ['Team' + str(i) for i in range(1, num_teams + 1)]
+    games = ['Game' + str(i) for i in range(1, num_games + 1)]
+    df = pd.DataFrame(scores, index=teams, columns=games)
+    return df
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test with a mix of stopwords and non-stopwords
-        self.assertEqual(task_func('this is an example content'), 1)
+        df = task_func()
+        self.assertEqual(df.shape, (5, 100))
     def test_case_2(self):
-        # Test with all stopwords except the last word
-        self.assertEqual(task_func('this is an the of'), 0)
+        df = task_func(num_teams=3, num_games=10)
+        self.assertEqual(df.shape, (3, 10))
+        
     def test_case_3(self):
-        # Test with no stopwords
-        self.assertEqual(task_func('example content programming'), 2)
+        df = task_func(num_teams=4, num_games=20)
+        self.assertListEqual(list(df.index), ['Team1', 'Team2', 'Team3', 'Team4'])
+        
     def test_case_4(self):
-        # Test with punctuation
-        self.assertEqual(task_func('example, content; programming, python.'), 3)
+        df = task_func(num_teams=2, num_games=5)
+        self.assertListEqual(list(df.columns), ['Game1', 'Game2', 'Game3', 'Game4', 'Game5'])
+        
     def test_case_5(self):
-        # Test with an empty string
-        self.assertEqual(task_func(''), 0)
-    def test_case_6(self):
-        # Test with a single non-stopword
-        self.assertEqual(task_func('content'), 0)
-    def test_case_7(self):
-        # Test with a single stopword
-        self.assertEqual(task_func('the'), 0)
-    def test_case_8(self):
-        # Test with a mix and uppercase letters
-        self.assertEqual(task_func('This IS an Example Content'), 1)
+        df = task_func(num_teams=2, num_games=5)
+        self.assertTrue((df.dtypes == 'int64').all())

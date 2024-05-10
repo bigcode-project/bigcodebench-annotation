@@ -1,92 +1,80 @@
-import subprocess
 import os
+import glob
 import shutil
-import sys
+import time
 
 # Constants
-DIRECTORY = 'c:\Program Files\VMware\VMware Server'
-BACKUP_DIRECTORY = 'c:\Program Files\VMware\VMware Server\Backup'
+FILE_EXTENSIONS = ['.txt', '.csv', '.xlsx', '.docx', '.pdf']
 
-def task_func(filename):
+def task_func(my_path: str, days_old: int) -> str:
     """
-    Backs up a specified file from a predefined directory to a backup directory and executes it as a subprocess.
-    
+    Archive files that were changed older than a specified number of days in a given directory. This function searches for files with specific extensions (.txt, .csv, .xlsx, .docx, .pdf) in the given directory.
+    Files older than 'days_old' are moved to an 'archive' subdirectory within the specified directory.
+
     Parameters:
-    filename (str): The name of the file to be backed up and executed.
+    my_path (str): The path of the directory to search.
+    days_old (int): The age of files to archive, in days.
 
     Returns:
-    int: The exit code of the subprocess, or -1 if the backup process fails.
+    str: The path of the archive subdirectory where files are moved.
 
     Requirements:
-    - subprocess
+    - os
+    - glob
     - shutil
+    - time
 
     Example:
-    >>> task_func('vmware-cmd.bat') # Assuming successful execution
-    0
-    >>> task_func('nonexistent.bat') # If backup fails or file doesn't exist
-    -1
+    >>> task_func('/usr/my_directory', 30)
+    '/usr/my_directory/archive'
     """
-    file_path = os.path.join(DIRECTORY, filename)
-    backup_path = os.path.join(BACKUP_DIRECTORY, filename)
-    try:
-        shutil.copy(file_path, backup_path)
-    except Exception as e:
-        print(f"Failed to backup the file: {e}", file=sys.stderr)
-        return -1
-    try:
-        process = subprocess.Popen(file_path)
-        return process.poll()  # return the exit code
-    except Exception as e:
-        print(f"Failed to execute the file: {e}", file=sys.stderr)
-        return -1
+    archive_dir = os.path.join(my_path, 'archive')
+    os.makedirs(archive_dir, exist_ok=True)
+    for ext in FILE_EXTENSIONS:
+        files = glob.glob(os.path.join(my_path, '*' + ext))
+        for file in files:
+            if os.path.isfile(file) and os.path.getmtime(file) < time.time() - days_old * 86400:
+                shutil.move(file, archive_dir)
+    return archive_dir
 
+import tempfile
 import unittest
-import os
-from unittest.mock import patch, mock_open, MagicMock
 class TestCases(unittest.TestCase):
-    def test_successful_execution(self):
-        # Test with a valid file that exists in the DIRECTORY and can be executed
-        test_filename = 'valid_file.bat'
-        with patch('os.path.exists', return_value=True):
-            with patch('os.access', return_value=True):
-                with patch('shutil.copy', return_value=None):  # Mock shutil.copy to avoid actual file operations
-                    with patch('subprocess.Popen') as mock_popen:
-                        mock_popen.return_value.poll.return_value = 0
-                        result = task_func(test_filename)
-        self.assertEqual(result, 0)
-    def test_failed_backup_nonexistent_file(self):
-        # Test with a non-existent file to simulate backup failure
-        test_filename = 'nonexistent_file.bat'
-        with patch('os.path.exists', return_value=False):
-            result = task_func(test_filename)
-        self.assertEqual(result, -1)
-    def test_failed_backup_non_executable_file(self):
-        # Test with an existing but non-executable file
-        test_filename = 'non_executable_file.txt'
-        with patch('os.path.exists', return_value=True):
-            with patch('os.access', return_value=False):
-                with patch('shutil.copy', return_value=None):  # Mock shutil.copy to avoid actual file operations
-                    with patch('subprocess.Popen') as mock_popen:
-                        mock_popen.side_effect = FileNotFoundError("File not executable")
-                        result = task_func(test_filename)
-        self.assertNotEqual(result, 0)
-    def test_backup_of_large_file(self):
-        # Test backing up a large file (size testing)
-        test_filename = 'large_file.dat'
-        with patch('os.path.exists', return_value=True):
-            with patch('os.path.getsize', return_value=1024*1024*10):  # 10 MB
-                with patch('shutil.copy', return_value=None):  # Mock shutil.copy to avoid actual file operations
-                    with patch('subprocess.Popen') as mock_popen:
-                        mock_popen.return_value.poll.return_value = 0
-                        result = task_func(test_filename)
-        self.assertEqual(result, 0)
-    def test_backup_with_special_characters(self):
-        # Test with a file name containing special characters
-        test_filename = 'special_#&@.bat'
-        with patch('os.path.exists', return_value=True):
-            with patch('os.access', return_value=True):
-                 with patch('shutil.copy', side_effect=Exception("Special character failed")):  # Mock shutil.copy to simulate backup failure
-                    with patch('subprocess.Popen') as mock_popen:
-                        result = task_func(test_filename)
-        self.assertEqual(result, -1)
+    def create_test_file(self, directory, filename, age_days):
+        file_path = os.path.join(directory, filename)
+        with open(file_path, 'w') as f:
+            f.write('Test content')
+        # Set the last modified time to 'age_days' days ago
+        old_time = time.time() - (age_days * 86400)
+        os.utime(file_path, (old_time, old_time))
+        return file_path
+    def test_empty_directory(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            archive_dir = task_func(tmpdir, 30)
+            self.assertTrue(os.path.isdir(archive_dir), 'Archive directory not created')
+            self.assertEqual(len(os.listdir(archive_dir)), 0, 'Archive directory is not empty')
+    def test_no_old_files(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.create_test_file(tmpdir, 'test1.txt', 10)
+            archive_dir = task_func(tmpdir, 30)
+            self.assertTrue(os.path.isdir(archive_dir), 'Archive directory not created')
+            self.assertEqual(len(os.listdir(archive_dir)), 0, 'Old files incorrectly archived')
+    def test_old_files_archived(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            old_file = self.create_test_file(tmpdir, 'test2.txt', 40)
+            archive_dir = task_func(tmpdir, 30)
+            self.assertTrue(os.path.isfile(os.path.join(archive_dir, 'test2.txt')), 'Old file not archived')
+    def test_mixed_file_ages(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.create_test_file(tmpdir, 'recent.txt', 10)
+            old_file = self.create_test_file(tmpdir, 'old.txt', 40)
+            archive_dir = task_func(tmpdir, 30)
+            self.assertTrue(os.path.isfile(os.path.join(archive_dir, 'old.txt')), 'Old file not archived')
+            self.assertFalse(os.path.isfile(os.path.join(archive_dir, 'recent.txt')), 'Recent file incorrectly archived')
+    def test_different_extensions(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.create_test_file(tmpdir, 'test.pdf', 40)
+            self.create_test_file(tmpdir, 'test.xlsx', 50)
+            archive_dir = task_func(tmpdir, 30)
+            self.assertTrue(os.path.isfile(os.path.join(archive_dir, 'test.pdf')), 'PDF file not archived')
+            self.assertTrue(os.path.isfile(os.path.join(archive_dir, 'test.xlsx')), 'XLSX file not archived')

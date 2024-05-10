@@ -1,153 +1,151 @@
-from collections import defaultdict
-import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.feature_selection import SelectKBest, f_classif
+import seaborn as sns
 
 
-def task_func(data):
-    """
-    Calculate statistical measurements (mean and standard deviation) of the values associated with
-    each key in a list of dictionaries, and visualize mean and standard deviation with bar charts.
+def task_func(df1, df2):
+    """Perform the feature selection with SelectKBest (k=2) and return a heatmap of the feature correlations.
 
     Parameters:
-    data (list): The list of dictionaries. Must not be empty. Each dictionary must have numeric values.
+    - df1 (pd.DataFrame): The dataframe containing features.
+    - df2 (pd.DataFrame): The dataframe containing the target variable. Must have an 'id' column corresponding to df1.
 
     Returns:
-    tuple:
-        - dict: A dictionary with keys and their corresponding mean and standard deviation.
-        - list: A list of matplotlib Axes objects for each key's visualization.
+    - tuple: A tuple containing:
+        - list: A list of the selected features.
+        - Axes: A heatmap showing the correlation between the selected features.
 
     Requirements:
-    - numpy
-    - matplotlib.pyplot
-    - collections.defaultdict
-    
-    Raises:
-    - ValueError: If the input data is empty.
-    - TypeError: If the input is not a list of dictionaries or if any value in the dictionaries is not numeric.
-    
+    - pandas
+    - sklearn.feature_selection.SelectKBest
+    - sklearn.feature_selection.f_classif
+    - seaborn
+
     Example:
-    >>> stats, axes = task_func([{'cat': 1, 'dog': 3}, {'cat' : 2, 'dog': 5}, {'cat' : 3, 'dog': 7}])
-    >>> stats
-    {'cat': {'mean': 2.0, 'std': 0.816496580927726}, 'dog': {'mean': 5.0, 'std': 1.632993161855452}}
-    >>> axes
-    [<Axes: title={'center': 'Statistics of cat'}, ylabel='Value'>, <Axes: title={'center': 'Statistics of dog'}, ylabel='Value'>]
+    >>> df1 = pd.DataFrame({'id': [1, 2, 3], 'feature1': [1.2, 3.4, 5.6], 'feature2': [2.3, 4.5, 6.7], 'feature3': [3.4, 5.6, 7.8]})
+    >>> df2 = pd.DataFrame({'id': [1, 2, 3], 'target': [4.5, 6.7, 8.9]})
+    >>> selected_features, heatmap = task_func(df1, df2)
+    >>> heatmap
+    <Axes: >
+    >>> selected_features
+    ['feature2', 'feature3']
     """
-    if not data:
-        raise ValueError("Input data is empty.")
-    if not isinstance(data, list) or not all(isinstance(d, dict) for d in data):
-        raise TypeError("Input must be a list of dictionaries.")
-    for d in data:
-        if not all(isinstance(value, (int, float)) for value in d.values()):
-            raise TypeError("All values in the dictionaries must be numeric.")
-    stats = defaultdict(list)
-    for d in data:
-        for key, value in d.items():
-            stats[key].append(value)
-    result = {k: {"mean": np.mean(v), "std": np.std(v)} for k, v in stats.items()}
-    axes = []
-    for key in result:
-        fig, ax = plt.subplots()
-        ax.bar(x=["mean", "std"], height=result[key].values())
-        ax.set_title(f"Statistics of {key}")
-        ax.set_ylabel("Value")
-        axes.append(ax)
-    return result, axes
+    df = pd.merge(df1, df2, on="id")
+    features = df1.columns.drop("id")
+    X = df[features]
+    y = df["target"]
+    selector = SelectKBest(f_classif, k=2)
+    X_new = selector.fit_transform(X, y)
+    selected_features = [x for x, y in zip(features, selector.get_support()) if y]
+    heatmap = sns.heatmap(
+        pd.DataFrame(X_new, columns=selected_features).corr(), annot=True
+    )
+    return selected_features, heatmap
 
 import unittest
+import pandas as pd
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test basic case
-        data = [{"cat": 1, "dog": 3}, {"cat": 2, "dog": 5}, {"cat": 3, "dog": 7}]
-        stats, axes = task_func(data)
-        self.assertAlmostEqual(stats["cat"]["mean"], 2.0)
-        self.assertAlmostEqual(stats["cat"]["std"], 0.816496580927726)
-        self.assertAlmostEqual(stats["dog"]["mean"], 5.0)
-        self.assertAlmostEqual(stats["dog"]["std"], 1.632993161855452)
-        
-        self.assertEqual(axes[0].get_title(), "Statistics of cat")
-        self.assertEqual(axes[1].get_title(), "Statistics of dog")
-        for ax, key in zip(axes, stats):
-            heights = [rect.get_height() for rect in ax.patches]
-            self.assertListEqual(heights, list(stats[key].values()))
-    def test_case_2(self):
-        # Test other keys (animals)
-        data = [{"bird": 5, "fish": 10}, {"bird": 6, "fish": 8}, {"bird": 7, "fish": 9}]
-        stats, axes = task_func(data)
-        self.assertAlmostEqual(stats["bird"]["mean"], 6.0)
-        self.assertAlmostEqual(stats["bird"]["std"], 0.816496580927726)
-        self.assertAlmostEqual(stats["fish"]["mean"], 9.0)
-        self.assertAlmostEqual(stats["fish"]["std"], 0.816496580927726)
-        self.assertEqual(axes[0].get_title(), "Statistics of bird")
-        self.assertEqual(axes[1].get_title(), "Statistics of fish")
-        for ax, key in zip(axes, stats):
-            heights = [rect.get_height() for rect in ax.patches]
-            self.assertListEqual(heights, list(stats[key].values()))
-    def test_case_3(self):
-        # Test handling negatives
-        data = [{"cat": -1, "dog": -3}, {"cat": -2, "dog": -5}, {"cat": -3, "dog": -7}]
-        stats, axes = task_func(data)
-        self.assertAlmostEqual(stats["cat"]["mean"], -2.0)
-        self.assertAlmostEqual(stats["cat"]["std"], 0.816496580927726)
-        self.assertAlmostEqual(stats["dog"]["mean"], -5.0)
-        self.assertAlmostEqual(stats["dog"]["std"], 1.632993161855452)
-        
-        self.assertEqual(axes[0].get_title(), "Statistics of cat")
-        self.assertEqual(axes[1].get_title(), "Statistics of dog")
-        for ax, key in zip(axes, stats):
-            heights = [rect.get_height() for rect in ax.patches]
-            self.assertListEqual(heights, list(stats[key].values()))
-    def test_case_4(self):
-        # Test single input
-        data = [{"cat": 1}]
-        stats, axes = task_func(data)
-        self.assertEqual(stats, {"cat": {"mean": 1.0, "std": 0.0}})
-        self.assertEqual(axes[0].get_title(), "Statistics of cat")
-        for ax, key in zip(axes, stats):
-            heights = [rect.get_height() for rect in ax.patches]
-            self.assertListEqual(heights, list(stats[key].values()))
-    def test_case_5(self):
-        # Test handling zero
-        data = [{"cat": 0, "dog": 0}, {"cat": 0, "dog": 0}, {"cat": 0, "dog": 0}]
-        stats, axes = task_func(data)
-        self.assertEqual(
-            stats, {"cat": {"mean": 0.0, "std": 0.0}, "dog": {"mean": 0.0, "std": 0.0}}
-        )
-        self.assertEqual(axes[0].get_title(), "Statistics of cat")
-        self.assertEqual(axes[1].get_title(), "Statistics of dog")
-        for ax, key in zip(axes, stats):
-            heights = [rect.get_height() for rect in ax.patches]
-            self.assertListEqual(heights, list(stats[key].values()))
-    def test_case_6(self):
-        # Test correct handling of empty input
-        with self.assertRaises(ValueError):
-            task_func([])
-    def test_case_7(self):
-        # Test correct handling of incorrect input types
-        with self.assertRaises(TypeError):
-            task_func("not a list")
-        with self.assertRaises(TypeError):
-            task_func([123])
-        with self.assertRaises(TypeError):
-            task_func([{"cat": "not numeric"}])
-    def test_case_8(self):
-        # Test with a mix of positive and negative integers
-        data = [
-            {"apple": -2, "banana": 4},
-            {"apple": -4, "banana": 6},
-            {"apple": -6, "banana": 8},
-        ]
-        stats, _ = task_func(data)
-        self.assertAlmostEqual(stats["apple"]["mean"], -4.0)
-        self.assertAlmostEqual(stats["apple"]["std"], 1.632993161855452)
-        self.assertAlmostEqual(stats["banana"]["mean"], 6.0)
-        self.assertAlmostEqual(stats["banana"]["std"], 1.632993161855452)
-    def test_case_9(self):
-        # Test with floating point numbers
-        data = [{"x": 0.5, "y": 1.5}, {"x": 2.5, "y": 3.5}, {"x": 4.5, "y": 5.5}]
-        stats, _ = task_func(data)
-        self.assertAlmostEqual(stats["x"]["mean"], 2.5)
-        self.assertAlmostEqual(stats["x"]["std"], 1.632993161855452)
-        self.assertAlmostEqual(stats["y"]["mean"], 3.5)
-        self.assertAlmostEqual(stats["y"]["std"], 1.632993161855452)
     def tearDown(self):
         plt.close("all")
+    def test_case_1(self):
+        # Dataset with clear distinction between features
+        df1 = pd.DataFrame(
+            {
+                "id": [1, 2, 3, 4, 5],
+                "feature1": [5.5, 6.7, 7.8, 8.9, 9.0],
+                "feature2": [1.1, 2.2, 3.3, 4.4, 5.5],
+                "feature3": [0.5, 1.5, 2.5, 3.5, 4.5],
+            }
+        )
+        df2 = pd.DataFrame({"id": [1, 2, 3, 4, 5], "target": [1, 0, 1, 0, 1]})
+        # Calling the function and asserting results
+        selected_features, ax = task_func(df1, df2)
+        self.assertListEqual(selected_features, ["feature1", "feature3"])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(ax.has_data())
+    def test_case_2(self):
+        # Dataset with features having moderate correlation
+        df1 = pd.DataFrame(
+            {
+                "id": [1, 2, 3],
+                "feature1": [1.2, 3.4, 5.6],
+                "feature2": [2.3, 4.5, 6.7],
+                "feature3": [3.4, 5.6, 7.8],
+            }
+        )
+        df2 = pd.DataFrame({"id": [1, 2, 3], "target": [4.5, 6.7, 8.9]})
+        # Calling the function and asserting results
+        selected_features, ax = task_func(df1, df2)
+        self.assertListEqual(selected_features, ["feature2", "feature3"])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(ax.has_data())
+    def test_case_3(self):
+        # Dataset with balanced target values
+        df1 = pd.DataFrame(
+            {
+                "id": [1, 2, 3, 4],
+                "feature1": [2.5, 3.5, 4.5, 5.5],
+                "feature2": [6.6, 7.7, 8.8, 9.9],
+                "feature3": [10.1, 11.1, 12.1, 13.1],
+            }
+        )
+        df2 = pd.DataFrame({"id": [1, 2, 3, 4], "target": [0, 1, 0, 1]})
+        # Calling the function and asserting results
+        selected_features, ax = task_func(df1, df2)
+        self.assertListEqual(selected_features, ["feature2", "feature3"])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(ax.has_data())
+    def test_case_4(self):
+        # Smaller dataset
+        df1 = pd.DataFrame(
+            {
+                "id": [1, 2],
+                "feature1": [3.3, 4.4],
+                "feature2": [5.5, 6.6],
+                "feature3": [7.7, 8.8],
+            }
+        )
+        df2 = pd.DataFrame({"id": [1, 2], "target": [1, 0]})
+        # Calling the function and asserting results
+        selected_features, ax = task_func(df1, df2)
+        self.assertListEqual(selected_features, ["feature2", "feature3"])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(ax.has_data())
+    def test_case_5(self):
+        # Dataset with different feature correlations
+        df1 = pd.DataFrame(
+            {
+                "id": [1, 2, 3],
+                "feature1": [10, 20, 30],
+                "feature2": [40, 50, 60],
+                "feature3": [70, 80, 90],
+            }
+        )
+        df2 = pd.DataFrame({"id": [1, 2, 3], "target": [1, 0, 1]})
+        # Calling the function and asserting results
+        selected_features, ax = task_func(df1, df2)
+        self.assertListEqual(selected_features, ["feature2", "feature3"])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(ax.has_data())
+    def test_case_6(self):
+        # Test handling errors - no "id"
+        df1 = pd.DataFrame(
+            {
+                "feature1": [10, 20, 30],
+            }
+        )
+        df2 = pd.DataFrame({"id": [1, 2, 3], "target": [1, 0, 1]})
+        with self.assertRaises(KeyError):
+            task_func(df1, df2)
+    def test_case_7(self):
+        # Test handling errors - wrong types
+        df1 = pd.DataFrame(
+            {
+                "id": [1, 2, 3],
+                "feature1": ["a", "b", 3],
+            }
+        )
+        df2 = pd.DataFrame({"id": [1, 2, 3], "target": [1, 0, 1]})
+        with self.assertRaises(ValueError):
+            task_func(df1, df2)

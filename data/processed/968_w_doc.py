@@ -1,99 +1,106 @@
-import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.stats import norm
 
 
-def task_func(arr: np.ndarray) -> (plt.Axes, np.ndarray):
+def task_func(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Plots a histogram of normalized data from an input 2D numpy array alongside the probability density function (PDF)
-    of a standard normal distribution.
-
-    Note:
-    - Takes in a 2D numpy array as input.
-    - Calculates the sum of elements in each row of the array.
-    - Normalizes these row sums to have a mean of 0 and a standard deviation of 1.
-      - Normalization is achieved by first calculating the mean and standard deviation of the row sums.
-      - Each row sum is then transformed by subtracting the mean and dividing by the standard deviation.
-      - If the standard deviation is 0 (indicating all row sums are equal), normalization results in an array of zeros with the same shape.
-    - Plots a histogram of the normalized data.
-      - Uses 30 bins for the histogram.
-      - The histogram is density-based, meaning it represents the probability density rather than raw frequencies.
-      - The bars of the histogram are semi-transparent (60% opacity) and green in color.
-    - Overlays the PDF of a standard normal distribution on the histogram for comparison.
-      - The PDF curve is plotted in red with a line width of 2.
-      - The range of the PDF curve is set to cover 99% of a standard normal distribution.
-    - Sets the title of the plot to "Histogram of Normalized Data with Standard Normal PDF".
+    Calculate the cumulative sum for each column in a given DataFrame and plot
+    the results in a bar chart.
 
     Parameters:
-    - arr: A 2D numpy array. The array should contain numerical data.
-
+    df (pd.DataFrame): The input DataFrame with numerical values.
+                       Must not be empty and must contain numeric data to plot.
     Returns:
-    - A tuple containing:
-      - A matplotlib Axes object with the histogram of the normalized data and the overlaid standard normal PDF.
-      - The normalized data as a 1D numpy array.
+    - tuple: A tuple containing:
+             (1) A DataFrame with cumulative sums for each column.
+             (2) A matplotlib bar chart Figure of these cumulative sums.
+
+    Raises:
+    - ValueError: If the DataFrame is empty or contains non-numeric data.
 
     Requirements:
-    - numpy
-    - scipy
+    - pandas
     - matplotlib
 
-    Example:
-    >>> ax, normalized_data = task_func(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> print(normalized_data)
-    [-1.22474487  0.          1.22474487]
-    """
-    row_sums = arr.sum(axis=1)
-    mean = np.mean(row_sums)
-    std_dev = np.std(row_sums)
-    normalized_data = (
-        (row_sums - mean) / std_dev if std_dev != 0 else np.zeros_like(row_sums)
-    )
-    _, ax = plt.subplots()
-    ax.hist(normalized_data, bins=30, density=True, alpha=0.6, color="g")
-    x = np.linspace(norm.ppf(0.01), norm.ppf(0.99), 100)
-    ax.plot(x, norm.pdf(x), "r-", lw=2)
-    ax.set_title("Histogram of Normalized Data with Standard Normal PDF")
-    return ax, normalized_data
+    Note:
+    - NaN values are ignored in the cumulative sum calculation, i.e. treated as
+      zero for the purpose of the sum without changing existing values to NaN.
+    - The plot title is set to 'Cumulative Sum per Column'.
+    - X-axis label is 'Index' and Y-axis label is 'Cumulative Sum'.
+    - A legend is included in the plot.
 
-import unittest
+    Example:
+    >>> input_df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    >>> output_df, fig = task_func(input_df)
+    >>> output_df
+       A   B
+    0  1   4
+    1  3   9
+    2  6  15
+    >>> fig
+    <Figure size 640x480 with 1 Axes>
+    """
+    cumsum_df = df.cumsum()
+    fig, ax = plt.subplots()
+    cumsum_df.plot(kind="bar", ax=ax)
+    ax.set_title("Cumulative Sum per Column")
+    ax.set_xlabel("Index")
+    ax.set_ylabel("Cumulative Sum")
+    ax.legend()
+    return cumsum_df, fig
+
 import numpy as np
+import pandas as pd
+import unittest
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Tests for `task_func`."""
-    def test_histogram_and_pdf(self):
-        """Test that the histogram and PDF are plotted."""
-        arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        ax, _ = task_func(arr)
-        self.assertEqual(
-            ax.get_title(),
-            "Histogram of Normalized Data with Standard Normal PDF",
-        )
-        self.assertEqual(len(ax.lines), 1)
-        self.assertEqual(len(ax.patches), 30)
-    def test_normalized_data(self):
-        """Test that the normalized data is correct."""
-        arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-        _, normalized_data = task_func(arr)
-        expected_data = [-1.22474487, 0.0, 1.22474487]
-        for i in range(len(expected_data)):
-            self.assertTrue(np.isclose(normalized_data[i], expected_data[i]))
-    def test_empty_array(self):
-        """Test empty array."""
-        arr = np.array([[], [], []])
-        _, normalized_data = task_func(arr)
-        for value in normalized_data:
-            self.assertTrue(np.isclose(value, 0))
-    def test_single_value_array(self):
-        """Test single value array."""
-        arr = np.array([[5], [5], [5]])
-        _, normalized_data = task_func(arr)
-        for value in normalized_data:
-            self.assertTrue(np.isclose(value, 0))
-    def test_large_values(self):
-        """Test large values."""
-        arr = np.array([[1e6, 2e6, 3e6], [4e6, 5e6, 6e6], [7e6, 8e6, 9e6]])
-        _, normalized_data = task_func(arr)
-        expected_data = [-1.22474487, 0.0, 1.22474487]
-        for i in range(len(expected_data)):
-            self.assertTrue(np.isclose(normalized_data[i], expected_data[i]))
+    def setUp(self):
+        # Setup common for all tests
+        self.input_df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
+        self.expected_df = pd.DataFrame({"A": [1, 3, 6], "B": [4, 9, 15]})
+    def test_case_1(self):
+        # Test basic case
+        output_df, _ = task_func(self.input_df)
+        pd.testing.assert_frame_equal(output_df, self.expected_df)
+    def test_case_2(self):
+        # Test cumulative sum correctness for a case with negative values
+        input_df_neg = pd.DataFrame({"A": [1, -2, 3], "B": [-4, 5, -6]})
+        expected_df_neg = pd.DataFrame({"A": [1, -1, 2], "B": [-4, 1, -5]})
+        output_df_neg, _ = task_func(input_df_neg)
+        pd.testing.assert_frame_equal(output_df_neg, expected_df_neg)
+    def test_case_3(self):
+        # Test bar chart properties
+        _, fig = task_func(self.input_df)
+        self.assertIsInstance(fig, plt.Figure)
+        ax = fig.axes[0]  # Get the Axes object from the figure
+        # Verify the title, x-label, and y-label
+        self.assertEqual(ax.get_title(), "Cumulative Sum per Column")
+        self.assertEqual(ax.get_xlabel(), "Index")
+        self.assertEqual(ax.get_ylabel(), "Cumulative Sum")
+        # Ensure that a legend is present and contains the correct labels
+        legend_labels = [text.get_text() for text in ax.get_legend().get_texts()]
+        expected_labels = self.input_df.columns.tolist()
+        self.assertEqual(legend_labels, expected_labels)
+    def test_case_4(self):
+        # Test with an empty DataFrame
+        empty_df = pd.DataFrame()
+        with self.assertRaises(Exception):
+            task_func(empty_df)
+    def test_case_5(self):
+        # Test with DataFrame containing NaN values
+        nan_df = pd.DataFrame({"A": [1, np.nan, 3], "B": [4, 5, np.nan]})
+        nan_df_cumsum = nan_df.cumsum()
+        output_nan_df, _ = task_func(nan_df)
+        pd.testing.assert_frame_equal(output_nan_df, nan_df_cumsum)
+    def test_case_6(self):
+        # Test with DataFrame containing all zeros
+        zeros_df = pd.DataFrame({"A": [0, 0, 0], "B": [0, 0, 0]})
+        expected_zeros_df = pd.DataFrame({"A": [0, 0, 0], "B": [0, 0, 0]})
+        output_zeros_df, _ = task_func(zeros_df)
+        pd.testing.assert_frame_equal(output_zeros_df, expected_zeros_df)
+    def test_case_7(self):
+        # Test with a DataFrame containing only one row
+        one_row_df = pd.DataFrame({"A": [1], "B": [2]})
+        expected_one_row_df = pd.DataFrame({"A": [1], "B": [2]})
+        output_one_row_df, _ = task_func(one_row_df)
+        pd.testing.assert_frame_equal(output_one_row_df, expected_one_row_df)

@@ -1,100 +1,92 @@
-from datetime import datetime
-from random import randint
+from datetime import datetime, timedelta
+import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 
-
-TEMP_CATEGORIES = ['Cold', 'Normal', 'Hot']
-FILE_PATH = 'custom_data.csv'
-
-
-def task_func(hours, file_path=FILE_PATH):
+def task_func(days_in_past=7, random_seed=0):
     """
-    Generate temperature data for the specified number of hours, save it in a CSV file, 
-    and plot the data using matplotlib.
-    
+    Draw a graph of temperature trends over the past week using randomly generated data.
+
+    This function generates random integer temperatures in Celcius with a low of 15 and high of 35.
+    To show temperature trend, it plots date on the x-axis and temperature on the y-axis.
+
     Parameters:
-    hours (int): The number of hours for which temperature data is to be generated.
-    file_path (str, optional): Path where the CSV file will be saved. Defaults to 'temp_data.csv'.
-    
+    days_in_past (int, optional): The number of days in the past for which to generate the graph.
+                                  Defaults to 7 days.
+    random_seed (int, optional): Seed for random number generation. Defaults to 0.
+
     Returns:
-    tuple: 
-        - str: The path of the generated CSV file.
-        - Axes: The plot object for further manipulation or saving.
+    ax (matplotlib.axes._axes.Axes): Generated plot showing 'Temperature Trends Over the Past Week',
+                                     with 'Date' on the a-xis and 'Temperature (°C)' on the y-axis.
+
+
+    Raises:
+    ValueError: If days_in_past is less than 1.
     
     Requirements:
-    - pandas
-    - datetime
-    - random
+    - datetime.datetime
+    - datetime.timedelta
+    - numpy
     - matplotlib.pyplot
-    
-    Data Structure:
-    The function uses a dictionary to manage the generated temperature data with keys: 'Time', 'Temperature', and 'Category'.
-    
+
     Example:
-    >>> file_path, ax = task_func(24)
-    >>> isinstance(file_path, str)
-    True
-    >>> 'custom_data.csv' in file_path
-    True
+    >>> ax = task_func(random_seed=42)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax.get_xticklabels()
+    [Text(19810.0, 0, '2024-03-28'), Text(19811.0, 0, '2024-03-29'), Text(19812.0, 0, '2024-03-30'), Text(19813.0, 0, '2024-03-31'), Text(19814.0, 0, '2024-04-01'), Text(19815.0, 0, '2024-04-02'), Text(19816.0, 0, '2024-04-03')]
     """
-    data = {'Time': [], 'Temperature': [], 'Category': []}
-    for i in range(hours):
-        temp = randint(-10, 40)  # random temperature between -10 and 40
-        data['Time'].append(datetime.now().strftime('%H:%M:%S.%f'))
-        data['Temperature'].append(temp)
-        if temp < 0:
-            data['Category'].append(TEMP_CATEGORIES[0])
-        elif temp > 25:
-            data['Category'].append(TEMP_CATEGORIES[2])
-        else:
-            data['Category'].append(TEMP_CATEGORIES[1])
-    df = pd.DataFrame(data)
-    df.to_csv(file_path, index=False)
-    ax = df.plot(x = 'Time', y = 'Temperature', kind = 'line', title="Temperature Data Over Time")
-    plt.show()
-    return file_path, ax
+    np.random.seed(random_seed)
+    if days_in_past < 1:
+        raise ValueError("days_in_past must be in the past")
+    dates = [datetime.now().date() - timedelta(days=i) for i in range(days_in_past)]
+    temperatures = np.random.randint(low=15, high=35, size=days_in_past)
+    fig, ax = plt.subplots()
+    ax.plot(dates, temperatures)
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Temperature (°C)")
+    ax.set_title("Temperature Trend")
+    return ax
 
 import unittest
-import os
+import matplotlib.pyplot as plt
+import numpy as np
 class TestCases(unittest.TestCase):
-    def tearDown(self):
-        """Clean up any files created during the tests."""
-        # Check and remove the expected file if it exists
-        if os.path.exists(FILE_PATH):
-            os.remove(FILE_PATH)
+    def _test_plot(self, ax):
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_xlabel(), "Date")
+        self.assertEqual(ax.get_ylabel(), "Temperature (°C)")
+        self.assertEqual(ax.get_title(), "Temperature Trend")
     def test_case_1(self):
-        # Testing with 1 hour
-        file_path, ax = task_func(1)
-        self.assertEqual(file_path, FILE_PATH)
-        self.assertTrue(os.path.exists(file_path))
-        df = pd.read_csv(file_path)
-        self.assertEqual(len(df), 1)
+        # Test default parameters
+        ax = task_func()
+        self._test_plot(ax)
     def test_case_2(self):
-        # Testing with 24 hours
-        file_path, ax = task_func(24)
-        self.assertEqual(file_path, FILE_PATH)
-        self.assertTrue(os.path.exists(file_path))
-        df = pd.read_csv(file_path)
-        self.assertEqual(len(df), 24)
+        # Test days in the past
+        for n_days in [1, 5, 50, 100]:
+            ax = task_func(n_days, random_seed=2)
+            self._test_plot(ax)
+            self.assertEqual(len(ax.lines[0].get_ydata()), n_days)
     def test_case_3(self):
-        # Testing with 120 hours
-        file_path, ax = task_func(120)
-        self.assertEqual(file_path, FILE_PATH)
-        self.assertTrue(os.path.exists(file_path))
-        df = pd.read_csv(file_path)
-        self.assertEqual(len(df), 120)
+        # Test handling invalid days in the past
+        with self.assertRaises(Exception):
+            task_func(0, random_seed=4)
     def test_case_4(self):
-        # Testing with a custom file path
-        file_path, ax = task_func(24, FILE_PATH)
-        self.assertEqual(file_path, FILE_PATH)
-        self.assertTrue(os.path.exists(FILE_PATH))
-        df = pd.read_csv(file_path)
-        self.assertEqual(len(df), 24)
+        # Test handling invalid days in the past
+        with self.assertRaises(Exception):
+            task_func(-1, random_seed=4)
     def test_case_5(self):
-        # Testing the categories in the generated CSV file
-        file_path, ax = task_func(24, FILE_PATH)
-        df = pd.read_csv(file_path)
-        categories = df['Category'].unique().tolist()
-        for cat in categories:
-            self.assertIn(cat, ['Cold', 'Normal', 'Hot'])
+        # Test random seed reproducibility
+        ax1 = task_func(5, random_seed=42)
+        ax2 = task_func(5, random_seed=42)
+        self.assertTrue(
+            np.array_equal(ax1.lines[0].get_ydata(), ax2.lines[0].get_ydata())
+        )
+    def test_case_6(self):
+        # Test random seed difference
+        ax1 = task_func(5, random_seed=0)
+        ax2 = task_func(5, random_seed=42)
+        self.assertFalse(
+            np.array_equal(ax1.lines[0].get_ydata(), ax2.lines[0].get_ydata())
+        )
+    def tearDown(self):
+        plt.close("all")

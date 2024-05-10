@@ -1,101 +1,63 @@
-import pandas as pd
-import seaborn as sns
-import numpy as np
+import inspect
+import types
 
-# Constants
-LABELS = ['H\u2082O', 'O\u2082', 'CO\u2082', 'N\u2082', 'Ar']
-
-
-def task_func(x, y, labels):
+def task_func(f):
     """
-    Create a heatmap using the seaborn library for "x" as x-values and "y" as y-values with labels.
+    Inspects a given function 'f' and returns its specifications, including the function's name,
+    whether it is a lambda function, its arguments, defaults, and annotations. This method
+    utilizes the inspect and types modules to introspect function properties.
 
     Parameters:
-    x (list): List of numpy arrays representing the x-values of the data points.
-    y (list): List of numpy arrays representing the y-values of the data points.
-    labels (list): List of strings representing the labels for the chemical compounds.
+    f (function): The function to inspect.
 
     Returns:
-    ax (Axes): A seaborn heatmap object.
-    df (DataFrame): The dataframe used to create the heatmap.
+    dict: A dictionary containing details about the function, such as its name, if it's a lambda function,
+          arguments, default values, and annotations.
 
     Requirements:
-    - numpy
-    - pandas
-    - seaborn
+    - inspect
+    - types
 
-    Example:
-    >>> x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
-    >>> y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
-    >>> labels = ['H\u2082O', 'O\u2082', 'CO\u2082']
-    >>> ax = task_func(x, y, labels)
+    Examples:
+    >>> def sample_function(x, y=5): return x + y
+    >>> result = task_func(sample_function)
+    >>> 'sample_function' == result['function_name'] and len(result['args']) == 2
+    True
+    >>> lambda_func = lambda x: x * 2
+    >>> task_func(lambda_func)['is_lambda']
+    True
     """
-    data = []
-    for i in range(len(x)):
-        data.append(np.concatenate((x[i], y[i])))
-    df = pd.DataFrame(data, index=labels)
-    ax = sns.heatmap(df, cmap='coolwarm')
-    return ax, df
+    spec = inspect.getfullargspec(f)
+    return {
+        'function_name': f.__name__,
+        'is_lambda': isinstance(f, types.LambdaType),
+        'args': spec.args,
+        'defaults': spec.defaults,
+        'annotations': spec.annotations
+    }
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
-        y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
-        labels = ['H₂O', 'O₂', 'CO₂']
-        ax, df = task_func(x, y, labels)
-        
-        # Assert the shape of the dataframe
-        self.assertEqual(df.shape, (3, 6))
-        
-        # Assert the data values of the dataframe
-        expected_data = np.array([[1,2,3,4,5,6], [4,5,6,7,8,9], [7,8,9,10,11,12]])
-        np.testing.assert_array_equal(df.values, expected_data)
-    def test_case_2(self):
-        x = [np.array([1,1]), np.array([2,2])]
-        y = [np.array([3,3]), np.array([4,4])]
-        labels = ['H₂O', 'O₂']
-        ax, df = task_func(x, y, labels)
-        
-        # Assert the shape of the dataframe
-        self.assertEqual(df.shape, (2, 4))
-        
-        # Assert the data values of the dataframe
-        expected_data = np.array([[1,1,3,3], [2,2,4,4]])
-        np.testing.assert_array_equal(df.values, expected_data)
-    def test_case_3(self):
-        x = [np.array([10])]
-        y = [np.array([20])]
-        labels = ['H₂O']
-        ax, df = task_func(x, y, labels)
-        
-        # Assert the shape of the dataframe
-        self.assertEqual(df.shape, (1, 2))
-        
-        # Assert the data values of the dataframe
-        expected_data = np.array([[10, 20]])
-        np.testing.assert_array_equal(df.values, expected_data)
-    def test_case_4(self):
-        x = [np.array([5,6,7]), np.array([8,9,10]), np.array([11,12,13])]
-        y = [np.array([15,16,17]), np.array([18,19,20]), np.array([21,22,23])]
-        labels = ['A', 'B', 'C']
-        ax, df = task_func(x, y, labels)
-        
-        # Assert the shape of the dataframe
-        self.assertEqual(df.shape, (3, 6))
-        
-        # Assert the data values of the dataframe
-        expected_data = np.array([[5,6,7,15,16,17], [8,9,10,18,19,20], [11,12,13,21,22,23]])
-        np.testing.assert_array_equal(df.values, expected_data)
-    def test_case_5(self):
-        x = [np.array([2,3]), np.array([5,6])]
-        y = [np.array([8,9]), np.array([11,12])]
-        labels = ['X', 'Y']
-        ax, df = task_func(x, y, labels)
-        
-        # Assert the shape of the dataframe
-        self.assertEqual(df.shape, (2, 4))
-        
-        # Assert the data values of the dataframe
-        expected_data = np.array([[2,3,8,9], [5,6,11,12]])
-        np.testing.assert_array_equal(df.values, expected_data)
+    def test_regular_function(self):
+        def test_func(a, b=1): pass
+        result = task_func(test_func)
+        self.assertEqual(result['function_name'], 'test_func')
+        self.assertListEqual(result['args'], ['a', 'b'])
+        self.assertTupleEqual(result['defaults'], (1,))
+    def test_lambda_function(self):
+        lambda_func = lambda x, y=2: x + y
+        result = task_func(lambda_func)
+        self.assertTrue(result['is_lambda'])
+    def test_no_arguments(self):
+        def test_func(): pass
+        result = task_func(test_func)
+        self.assertEqual(len(result['args']), 0)
+    def test_annotations(self):
+        def test_func(a: int, b: str = 'hello') -> int: pass
+        result = task_func(test_func)
+        self.assertIn('a', result['annotations'])
+        self.assertIn('return', result['annotations'])
+    def test_defaults_none(self):
+        def test_func(a, b=None): pass
+        result = task_func(test_func)
+        self.assertIsNone(result['defaults'][0])

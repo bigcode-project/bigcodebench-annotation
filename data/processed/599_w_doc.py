@@ -1,59 +1,63 @@
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+import time
 
 
-def task_func(tuples_list, columns):
+def task_func(df, letter):
     """
-    Convert a list of tuples into a Pandas DataFrame, perform a default scaling in each column, and return the transformed DataFrame.
-    
-    Parameters:
-    - tuples_list (list): The list of tuples.
-    - columns (list): The list of column names.
-    
-    Returns:
-    - df_scaled (DataFrame): A pandas DataFrame containing the scaled versions of the original data.
+    The function filters rows in a dict of list in which the values of the 'Word' column begin with a specified letter.
+    It first convert the dict to Datafrome, then calculates the length of the words in the filtered column and returns
+    a dictionary of word lengths and their respective counts.
 
+    Parameters:
+    df (dict of list): A dictionary where the key 'Word' maps to a list of strings.
+    letter (str): The letter to filter the 'Word' column by. 
+
+    Returns:
+    dict: A dictionary of word lengths and their counts.
+    
     Requirements:
     - pandas
-    - sklearn
-    
+    - time
+
     Example:
-    >>> df = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)], ['A', 'B', 'C', 'D'])
-    >>> print(df)
-              A         B         C         D
-    0 -1.224745 -1.224745 -1.224745 -1.224745
-    1  0.000000  0.000000  0.000000  0.000000
-    2  1.224745  1.224745  1.224745  1.224745
+    >>> df = {'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'kiwi']}
+    >>> task_func(df, 'a')
+    {5: 1}
     """
-    df = pd.DataFrame(tuples_list, columns=columns)
-    scaler = StandardScaler()
-    df_scaled = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
-    return df_scaled
+    start_time = time.time()
+    df = pd.DataFrame(df)
+    regex = '^' + letter
+    filtered_df = df[df['Word'].str.contains(regex, regex=True)]
+    word_lengths = filtered_df['Word'].str.len()
+    count_dict = word_lengths.value_counts().to_dict()
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
+    return count_dict
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)], ['A', 'B', 'C', 'D'])
-        self.assertEqual(df.shape, (3, 4))
-        self.assertEqual(df.columns.tolist(), ['A', 'B', 'C', 'D'])
-        self.assertEqual(df['A'].tolist(), [-1.224744871391589, 0.0, 1.224744871391589])
+        df = {'Word': ['apple', 'banana', 'cherry', 'date', 'elephant', 'fig', 'grape', 'kiwi']}
+        result = task_func(df, 'a')
+        expected_result = {5: 1}
+        self.assertDictEqual(result, expected_result)
     def test_case_2(self):
-        df = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)], ['A', 'B', 'C', 'D'])
-        self.assertEqual(df.shape, (3, 4))
-        self.assertEqual(df.columns.tolist(), ['A', 'B', 'C', 'D'])
-        self.assertEqual(df['B'].tolist(), [-1.224744871391589, 0.0, 1.224744871391589])
+        df = {'Word': ['cat', 'dog', 'elephant', 'fish', 'goose']}
+        result = task_func(df, 'e')
+        expected_result = {8: 1}
+        self.assertDictEqual(result, expected_result)
     def test_case_3(self):
-        df = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)], ['A', 'B', 'C', 'D'])
-        self.assertEqual(df.shape, (3, 4))
-        self.assertEqual(df.columns.tolist(), ['A', 'B', 'C', 'D'])
-        self.assertEqual(df['C'].tolist(), [-1.224744871391589, 0.0, 1.224744871391589])
+        df = {'Word': ['kiwi', 'lemon', 'mango', 'nectarine', 'orange']}
+        result = task_func(df, 'm')
+        expected_result = {5: 1}
+        self.assertDictEqual(result, expected_result)
     def test_case_4(self):
-        df = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)], ['A', 'B', 'C', 'D'])
-        self.assertEqual(df.shape, (3, 4))
-        self.assertEqual(df.columns.tolist(), ['A', 'B', 'C', 'D'])
-        self.assertEqual(df['D'].tolist(), [-1.224744871391589, 0.0, 1.224744871391589])
+        df = {'Word': ['apple', 'banana', 'cherry', 'date', 'elephant', 'fig', 'grape', 'kiwi']}
+        result = task_func(df, 'z')
+        expected_result = {}
+        self.assertDictEqual(result, expected_result)
     def test_case_5(self):
-        df = task_func([(0, 0, 0, 0), (0, 0, 0, 0), (0, 0, 0, 0)], ['A', 'B', 'C', 'D'])
-        self.assertEqual(df.shape, (3, 4))
-        self.assertEqual(df.columns.tolist(), ['A', 'B', 'C', 'D'])
-        self.assertEqual(df['A'].tolist(), [0.0, 0.0, 0.0])
+        df = {'Word': ['zebra', 'zoo', 'zucchini']}
+        result = task_func(df, 'z')
+        expected_result = {5: 1, 3: 1, 8: 1}
+        self.assertDictEqual(result, expected_result)

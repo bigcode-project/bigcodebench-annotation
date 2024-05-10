@@ -1,58 +1,86 @@
-import random
-from itertools import combinations
-import math
+import matplotlib
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 
-def task_func(n):
+def task_func(df):
     """
-    Generate n random dots within a unit square (0 to 1 on both axes) in a 2D space 
-    and find the pair that comes closest to each other.
+    Standardize 'Age' and 'Score' columns in a pandas DataFrame, remove duplicate entries based on 'Name', and plot a scatter plot of these standardized values.
 
     Parameters:
-    n (int): The number of points to generate. If n is less than 2, the function returns None.
+    df (pandas.DataFrame): DataFrame containing 'Name', 'Age', and 'Score' columns.
 
     Returns:
-    tuple or None: A tuple of the form ((x1, y1), (x2, y2)), which are the coordinates of the closest pair,
-                   or None if n is less than 2.
-    
+    pandas.DataFrame: DataFrame with standardized 'Age' and 'Score', duplicates removed.
+    matplotlib.axes.Axes: Axes object of the scatter plot.
+
     Note:
-    - This function will return None if the input n less than 2.
-    
+    - The function use "Scatter Plot of Standardized Age and Score" for the plot title.
+    - The function use "Age (standardized)" and "Score (standardized)" as the xlabel and ylabel respectively.
+
     Requirements:
-    - random
-    - itertools.combinations
-    - math
+    - pandas
+    - numpy
+    - matplotlib.pyplot
+    - sklearn.preprocessing
 
     Example:
-    >>> random.seed(0)
-    >>> print(task_func(2))
-    ((0.8444218515250481, 0.7579544029403025), (0.420571580830845, 0.25891675029296335))
+    >>> import pandas as pd
+    >>> data = pd.DataFrame([{'Name': 'James', 'Age': 30, 'Score': 85},{'Name': 'James', 'Age': 35, 'Score': 90},{'Name': 'Lily', 'Age': 28, 'Score': 92},{'Name': 'Sam', 'Age': 40, 'Score': 88},{'Name': 'Nick', 'Age': 50, 'Score': 80}])
+    >>> modified_df, plot_axes = task_func(data)
+    >>> modified_df.head()
+        Name       Age     Score
+    0  James -0.797724 -0.285365
+    2   Lily -1.025645  1.312679
+    3    Sam  0.341882  0.399511
+    4   Nick  1.481487 -1.426825
     """
-    if n < 2:
-        return None
-    points = [(random.random(), random.random()) for i in range(n)]
-    closest_pair = min(combinations(points, 2), key=lambda pair: math.hypot(pair[0][0] - pair[1][0], pair[0][1] - pair[1][1]))
-    return closest_pair
+    df = df.drop_duplicates(subset='Name')
+    scaler = StandardScaler()
+    df[['Age', 'Score']] = scaler.fit_transform(df[['Age', 'Score']])
+    plt.figure(figsize=(8, 6))
+    plt.scatter(df['Age'], df['Score'])
+    plt.xlabel('Age (standardized)')
+    plt.ylabel('Score (standardized)')
+    plt.title('Scatter Plot of Standardized Age and Score')
+    ax = plt.gca()  # Get current axes
+    return df, ax
 
 import unittest
-import random
+import pandas as pd
+from faker import Faker
+import matplotlib
 class TestCases(unittest.TestCase):
-    def test_typical_use_case(self):
-        random.seed(0)
-        result = task_func(5)
-        self.assertIsInstance(result, tuple, "Should return a tuple for 5 points")
-    def test_zero_points(self):
-        random.seed(0)
-        result = task_func(0)
-        self.assertIsNone(result, "Should return None for 0 points")
-    def test_one_point(self):
-        random.seed(0)
-        result = task_func(1)
-        self.assertIsNone(result, "Should return None for 1 point")
-    def test_large_number_of_points(self):
-        random.seed(0)
-        result = task_func(1000)
-        self.assertIsInstance(result, tuple, "Should return a tuple for 1000 points")
-    def test_minimum_points(self):
-        random.seed(0)
-        result = task_func(2)
-        self.assertIsInstance(result, tuple, "Should return a tuple for 2 points")
+    def setUp(self):
+        # Using Faker to create test data
+        fake = Faker()
+        self.test_data = pd.DataFrame([{'Name': fake.name(), 'Age': fake.random_int(min=18, max=100), 'Score': fake.random_int(min=0, max=100)} for _ in range(10)])
+    def test_duplicate_removal(self):
+        df, _ = task_func(self.test_data)
+        self.assertEqual(df['Name'].nunique(), df.shape[0])
+    def test_standardization(self):
+        df, _ = task_func(self.test_data)
+        self.assertAlmostEqual(df['Age'].mean(), 0, places=1)
+        self.assertAlmostEqual(int(df['Age'].std()), 1, places=1)
+        self.assertAlmostEqual(df['Score'].mean(), 0, places=1)
+        self.assertAlmostEqual(int(df['Score'].std()), 1, places=1)
+    def test_return_types(self):
+        data = pd.DataFrame([
+            {'Name': 'James', 'Age': 30, 'Score': 85},
+            {'Name': 'James', 'Age': 35, 'Score': 90},
+            {'Name': 'Lily', 'Age': 28, 'Score': 92},
+            {'Name': 'Sam', 'Age': 40, 'Score': 88},
+            {'Name': 'Nick', 'Age': 50, 'Score': 80}
+        ])
+        df, ax = task_func(data)
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+    def test_plot_contents(self):
+        _, ax = task_func(self.test_data)
+        self.assertEqual(ax.get_title(), 'Scatter Plot of Standardized Age and Score')
+        self.assertEqual(ax.get_xlabel(), 'Age (standardized)')
+        self.assertEqual(ax.get_ylabel(), 'Score (standardized)')
+    def test_plot_data_points(self):
+        df, ax = task_func(self.test_data)
+        scatter = [child for child in ax.get_children() if isinstance(child, matplotlib.collections.PathCollection)]
+        self.assertGreater(len(scatter), 0)
+        self.assertEqual(len(scatter[0].get_offsets()), len(df))

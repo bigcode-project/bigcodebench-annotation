@@ -1,83 +1,101 @@
-import numpy as np
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
+import re
+from scipy.stats import gaussian_kde
+from scipy import linalg
+import matplotlib.pyplot as plt
 
 
-def task_func(data=None):
+def task_func(text):
     """
-    Pre-process a dataset by converting it to a Pandas DataFrame,
-    replacing values less than 0.5 with zeros, and
-    standardizing the data using StandardScaler.
+    This code takes a text input, calculates the lengths of the words, 
+    and visualizes the distribution of word lengths using a histogram and a KDE curve (if applicable) on a matplotlib subplot.
 
     Parameters:
-    - data (numpy.ndarray, optional): A numpy array representing the dataset. If not provided, a random dataset
-      of shape (100, 5) is generated.
+    text (str): The text string to be analyzed. The function can handle strings with various types 
+                of characters and punctuation.
 
     Returns:
-    - pandas.DataFrame: The preprocessed dataset. Original values less than 0.5 are replaced with zeros, and the
-      entire dataset is standardized.
+    matplotlib.axes._axes.Axes: An Axes object showing the histogram and optionally the KDE 
+                                           plot of word lengths. This visual representation helps in 
+                                           understanding the distribution of word lengths in the given text.
 
     Requirements:
-    - numpy
-    - pandas
-    - sklearn.preprocessing.StandardScaler
+    - re
+    - matplotlib
+    - scipy
+    - matplotlib
 
     Example:
-    >>> np.random.seed(0)
-    >>> dataset = np.random.rand(10, 5)
-    >>> preprocessed_data = task_func(dataset)
-    >>> preprocessed_data.head(2)
-              0         1         2        3         4
-    0  0.175481  1.062315  0.244316 -0.17039 -0.647463
-    1  0.461851 -0.978767  1.052947  1.06408 -0.647463
+    >>> ax = task_func('Hello world! This is a test.')
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    if data is None:
-        data = np.random.rand(100, 5)
-    df = pd.DataFrame(data)
-    df[df < 0.5] = 0
-    scaler = StandardScaler()
-    scaled_data = scaler.fit_transform(df)
-    standardized_df = pd.DataFrame(scaled_data, columns=df.columns)
-    return standardized_df
+    words = re.split(r"\W+", text)
+    word_counts = [len(word) for word in words if word]
+    _, ax = plt.subplots()
+    if word_counts:  # Check if word_counts is not empty
+        ax.hist(word_counts, bins=30, edgecolor='black', alpha=0.7)
+        if len(word_counts) > 1 and np.var(word_counts) != 0:
+            try:
+                kde = gaussian_kde(word_counts)
+                x_range = np.linspace(min(word_counts), max(word_counts), 100)
+                ax.plot(x_range, kde(x_range), color='red')  # KDE line in red
+            except linalg.LinAlgError:
+                pass
+    return ax
 
+import unittest
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
-import unittest
 class TestCases(unittest.TestCase):
-    """Test cases for the function task_func."""
-    def test_default_dataset(self):
-        """Test the function with default dataset."""
-        result = task_func()
-        self.assertIsInstance(result, pd.DataFrame)
-        self.assertEqual(result.shape, (100, 5))
-    def test_small_dataset(self):
-        """Test the function with a small dataset."""
-        data = np.array([[0.1, 0.9], [0.4, 0.8]])
-        result = task_func(data)
-        self.assertEqual(result.shape, (2, 2))
-    def test_replacement(self):
-        """Test the replacement of values less than 0.5."""
-        data = np.array([[0.1, 0.9], [0.4, 0.8]])
-        result = task_func(data)
-        self.assertNotIn(0.1, result.values)
-        self.assertNotIn(0.4, result.values)
-    def test_no_replacement(self):
-        """Test no replacement for values greater than 0.5."""
-        data = np.array([[0.6, 0.9], [0.7, 0.8]])
-        result = task_func(data)
-        self.assertNotIn(0.6, result.values)
-        self.assertNotIn(0.7, result.values)
-        self.assertNotIn(0.8, result.values)
-        self.assertNotIn(0.9, result.values)
-    def test_standardization(self):
-        """Test the standardization of the dataset."""
-        data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-        result = task_func(data)
-        self.assertTrue(np.isclose(result.mean().mean(), 0, atol=1e-5))
-        self.assertTrue(np.isclose(result.std().mean(), 1.225, atol=0.01))
-        """Test the replacement of values less than 0.5."""
-        data = np.array([[0.1, 0.9], [0.4, 0.8]])
-        result = task_func(data)
-        self.assertNotIn(0.1, result.values)
-        self.assertNotIn(0.4, result.values)
+    """Tests for the task_func function"""
+    def test_simple_sentence(self):
+        """Test a simple sentence"""
+        ax1 = task_func("This is a test")
+        self.assertIsInstance(ax1, plt.Axes)
+        # The number of bars might differ due to matplotlib's binning strategy
+        unique_word_lengths = {len(word) for word in "This is a test".split() if word}
+        self.assertTrue(
+            len(ax1.patches) >= len(unique_word_lengths),
+            "Incorrect number of bars for a simple sentence",
+        )
+    def test_empty_string(self):
+        """Test an empty string"""
+        ax2 = task_func("")
+        self.assertIsInstance(ax2, plt.Axes)
+        self.assertEqual(
+            len(ax2.patches), 0, "There should be no bars for an empty string"
+        )
+    def test_special_characters(self):
+        """Test special characters and numbers"""
+        ax3 = task_func("Hello, world! 1234")
+        self.assertIsInstance(ax3, plt.Axes)
+        # The number of bars might differ due to matplotlib's binning strategy
+        unique_word_lengths = {
+            len(word) for word in "Hello, world! 1234".split() if word
+        }
+        self.assertTrue(
+            len(ax3.patches) >= len(unique_word_lengths),
+            "Incorrect handling of special characters and numbers",
+        )
+    def test_repeated_words(self):
+        """Test repeated words"""
+        ax4 = task_func("repeat repeat repeat")
+        self.assertIsInstance(ax4, plt.Axes)
+        # Only one unique word length: 6
+        self.assertTrue(len(ax4.patches) >= 1, "Incorrect handling of repeated words")
+    def test_long_text(self):
+        """Test a long text"""
+        text = "A long text with multiple words of different lengths"
+        ax5 = task_func(text)
+        self.assertIsInstance(ax5, plt.Axes)
+        # Adjust expectation for number of bars due to matplotlib's binning
+        words = re.split(r"\W+", text)
+        word_counts = pd.Series([len(word) for word in words if word])
+        expected_unique_lengths = len(set(word_counts))
+        self.assertTrue(
+            len(ax5.patches) >= expected_unique_lengths,
+            "Incorrect plot for a long text",
+        )
+    def tearDown(self):
+        plt.clf()

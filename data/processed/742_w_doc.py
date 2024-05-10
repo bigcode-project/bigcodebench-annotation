@@ -1,83 +1,60 @@
-import numpy as np
-import pandas as pd
+from itertools import groupby
+from operator import itemgetter
 
+# Constants
+KEY_FUNC = itemgetter(0)
 
-def task_func(n_rows, remove_cols, columns=['A', 'B', 'C', 'D', 'E'], random_seed=None):
+def task_func(my_dict):
     """
-    Generate a DataFrame with columns 'columns' and fill them with random 
-    integer values between 0 and 100. Remove some columns based on the provided indexes.
-    
+    Group the dictionary entries after the first character of the key and add the values for each group.
+
     Parameters:
-    n_rows (int): The number of rows in the DataFrame.
-    remove_cols (list of int): The indices of columns to be removed.
-    columns (list of str, optional): The columns to be included in the DataFrame. Defaults to ['A', 'B', 'C', 'D', 'E'].
-    random_seed (int): Seed for the rng. Default is None.
+    - my_dict (dict): The dictionary to process.
 
     Returns:
-    DataFrame: The resulting DataFrame after removal of columns.
-    
+    - aggregated_dict (dict): The aggregated dictionary.
+
     Requirements:
-    - numpy
-    - pandas
+    - itertools
+    - operator
     
     Example:
-    >>> df = task_func(10, [1, 3], random_seed=1)
-    >>> print(df)
-        A   C   E
-    0  37  72  75
-    1   5  64   1
-    2  76   6  50
-    3  20  84  28
-    4  29  50  87
-    5  87  96  13
-    6   9  63  22
-    7  57   0  81
-    8   8  13  72
-    9  30   3  21
-
-    >>> df = task_func(3, [1, 3], columns=['test', 'rem1', 'apple', 'remove'], random_seed=12)
-    >>> print(df)
-       test  apple
-    0    75      6
-    1     3     76
-    2    22     52
-
+    >>> my_dict = {'apple': 1, 'banana': 2, 'avocado': 3, 'blueberry': 4, 'blackberry': 5}
+    >>> aggregated_dict = task_func(my_dict)
+    >>> print(aggregated_dict)
+    {'a': 4, 'b': 11}
     """
-    np.random.seed(random_seed)
-    df = pd.DataFrame(np.random.randint(0, 100, size=(n_rows, len(columns))), columns=columns)
-    df = df.drop(df.columns[remove_cols], axis=1)
-    return df
+    sorted_items = sorted(my_dict.items(), key=lambda item: item[0][0])
+    aggregated_dict = {k: sum(item[1] for item in g) for k, g in groupby(sorted_items, key=lambda item: item[0][0])}
+    return aggregated_dict
 
 import unittest
-import numpy as np
-import pandas as pd
+# Import the function from the provided file
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        df = task_func(5, [1, 3], random_seed=1)
-        expected = pd.DataFrame({
-            'A': {0: 37, 1: 5, 2: 76, 3: 20, 4: 29},
-            'C': {0: 72, 1: 64, 2: 6, 3: 84, 4: 50},
-            'E': {0: 75, 1: 1, 2: 50, 3: 28, 4: 87}
-        })
-        pd.testing.assert_frame_equal(df, expected, check_dtype=False)
-    def test_case_2(self):
-        df = task_func(10, [], columns=['X', 'Y', 'Z'], random_seed=12)
-        expected = pd.DataFrame({
-            'X': {0: 75, 1: 2, 2: 76, 3: 49, 4: 13, 5: 75, 6: 76, 7: 89, 8: 35, 9: 63},
-            'Y': {0: 27, 1: 3, 2: 48, 3: 52, 4: 89, 5: 74, 6: 13, 7: 35, 8: 33, 9: 96},
-            'Z': {0: 6, 1: 67, 2: 22, 3: 5, 4: 34, 5: 0, 6: 82, 7: 62, 8: 30, 9: 18}
-        })
-        pd.testing.assert_frame_equal(df, expected, check_dtype=False)
-    def test_case_3(self):
-        df = task_func(0, remove_cols=[], random_seed=42)
-        expected = pd.DataFrame(
-            {'A': {}, 'B': {}, 'C': {}, 'D': {}, 'E': {}}
-        )
-        pd.testing.assert_frame_equal(df, expected, check_dtype=False, check_index_type=False)
-    def test_case_4(self):
-        df1 = task_func(10, [], random_seed=12)
-        df2 = task_func(10, [], random_seed=12)
-        pd.testing.assert_frame_equal(df1, df2, check_dtype=False, check_index_type=False)
-    def test_case_5(self):
-        df = task_func(6, [0, 1, 2, 3, 4], random_seed=1)
-        self.assertEqual(list(df.columns), [])
+    
+    def test_1(self):
+        my_dict = {'apple': 1, 'banana': 2, 'avocado': 3, 'blueberry': 4, 'blackberry': 5}
+        result = task_func(my_dict)
+        expected = {'a': 4, 'b': 11}
+        self.assertEqual(result, expected)
+        
+    def test_2(self):
+        my_dict = {'apple': 10, 'apricot': 10, 'banana': 10, 'blueberry': 10}
+        result = task_func(my_dict)
+        expected = {'a': 20, 'b': 20}
+        self.assertEqual(result, expected)
+    def test_3(self):
+        my_dict = {}
+        result = task_func(my_dict)
+        expected = {}
+        self.assertEqual(result, expected)
+    def test_4(self):
+        my_dict = {'apple': 1, 'orange': 2, 'cherry': 3, 'blueberry': 4}
+        result = task_func(my_dict)
+        expected = {'a': 1, 'o': 2, 'c': 3, 'b': 4}
+        self.assertEqual(result, expected)
+    def test_5(self):
+        my_dict = {'apple': 1, 'apricot': 2, 'banana': 3, 'blueberry': 4, 'cherry': 5, 'date': 6}
+        result = task_func(my_dict)
+        expected = {'a': 3, 'b': 7, 'c': 5, 'd': 6}
+        self.assertEqual(result, expected)

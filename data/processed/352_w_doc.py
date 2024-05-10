@@ -1,97 +1,95 @@
-import matplotlib.pyplot as plt
-from sklearn.datasets import make_blobs
+import pandas as pd
+import random
 
 
-def task_func(n_samples=100, centers=3, n_features=2, random_seed=42):
+def task_func(product_list, categories, min_value = 10, max_value = 100):
     """
-    Create isotropic Gaussian blobs to form clusters and visualize them.
-
+    Create a sales report for a list of products in different categories.
+    The report includes the quantity sold and revenue generated for each product.
+    
     Parameters:
-    - n_samples (int): The total number of points divided among clusters.
-    - centers (int): The number of centers to generate.
-    - n_features (int): The number of features for each sample.
-    - random_seed (int): The seed for the random number generator.
-
+    product_list (list): The list of products.
+    categories (list): A list of categories for the products.
+    min_value (int): The minimum value for quantity sold and revenue.
+    max_value (int): The maximum value for quantity sold and revenue.
+    
     Returns:
-    tuple: A tuple containing:
-        - X (numpy.ndarray): The matrix of blob points.
-        - y (numpy.ndarray): The vector of blob labels.
-        - ax (matplotlib.axes.Axes): The Axes object with the scatter plot.
+    DataFrame: A pandas DataFrame with sales data for the products.
+    
+    Note:
+    - The column names uses are 'Product', 'Category', 'Quantity Sold', and 'Revenue'.
 
     Requirements:
-    - matplotlib.pyplot
-    - sklearn
-
+    - pandas
+    - random
+    
     Example:
-    >>> X, y, ax = task_func(n_samples=500, centers=5, random_seed=0)
-    >>> type(X), type(y), type(ax)
-    (<class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'matplotlib.axes._axes.Axes'>)
-    >>> ax
-    <Axes: >
+    >>> random.seed(0)
+    >>> report = task_func(['Product 1'], ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports'], 100, 100)
+    >>> report.iloc[0]['Category'] in ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
+    True
+    >>> report.iloc[0]['Quantity Sold']
+    100
+    >>> report.iloc[0]['Revenue']
+    10000
     """
-    X, y = make_blobs(
-        n_samples=n_samples,
-        centers=centers,
-        n_features=n_features,
-        random_state=random_seed,
-    )
-    fig, ax = plt.subplots()
-    ax.scatter(X[:, 0], X[:, 1], c=y)
-    return X, y, ax
+    report_data = []
+    for product in product_list:
+        category = categories[random.randint(0, len(categories)-1)]
+        quantity_sold = random.randint(min_value, max_value)
+        revenue = quantity_sold * random.randint(min_value, max_value)
+        report_data.append([product, category, quantity_sold, revenue])
+    report_df = pd.DataFrame(report_data, columns=['Product', 'Category', 'Quantity Sold', 'Revenue'])
+    return report_df
 
 import unittest
-import matplotlib
-import matplotlib.pyplot as plt
+import pandas as pd
+import random
 class TestCases(unittest.TestCase):
+    
+    categories = ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
+    products = ['Product ' + str(i) for i in range(1, 101)]
+    
     def test_case_1(self):
-        # Test default case
-        n_samples, n_features, centers = 100, 2, 3
-        X, y, ax = task_func()
-        self.assertEqual(X.shape, (n_samples, n_features))
-        self.assertEqual(y.shape, (n_samples,))
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertEqual(len(set(y)), centers)
+        random.seed(0)
+        report = task_func(self.products[:5], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 5)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_2(self):
-        # Test n_samples
-        for n_samples in [1, 50, 100]:
-            X, y, _ = task_func(n_samples=n_samples)
-            self.assertEqual(X.shape[0], n_samples)
-            self.assertEqual(y.shape[0], n_samples)
+        random.seed(0)
+        report = task_func(self.products[5:10], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 5)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_3(self):
-        # Test centers
-        for centers in [1, 50, 100]:
-            _, y, _ = task_func(centers=centers)
-        self.assertEqual(len(set(y)), centers)
+        random.seed(0)
+        report = task_func([self.products[10]], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 1)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_4(self):
-        # Test n_features
-        for n_features in [2, 50, 100]:
-            X, y, _ = task_func(n_features=n_features)
-            self.assertEqual(X.shape[1], n_features)
+        random.seed(0)
+        report = task_func(self.products[10:20], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 10)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_5(self):
-        # Test random seed
-        X1, y1, _ = task_func(n_samples=100, centers=3, n_features=2, random_seed=42)
-        X2, y2, _ = task_func(n_samples=100, centers=3, n_features=2, random_seed=42)
-        self.assertTrue((X1 == X2).all())
-        self.assertTrue((y1 == y2).all())
+        random.seed(0)
+        report = task_func(self.products[20:40], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 20)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+    
     def test_case_6(self):
-        # Test with the minimum possible values that are still valid
-        n_samples, n_features, centers = 1, 2, 1
-        X, y, ax = task_func(
-            n_samples=1, centers=centers, n_features=n_features, random_seed=0
-        )
-        self.assertEqual(X.shape, (n_samples, n_features))
-        self.assertEqual(y.shape, (n_samples,))
-        self.assertEqual(len(set(y)), centers)
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-    def test_case_7(self):
-        # Example of handling an expected failure due to invalid input
-        with self.assertRaises(ValueError):
-            task_func(n_samples=-100)
-        with self.assertRaises(ValueError):
-            task_func(centers=-10)
-        with self.assertRaises(Exception):
-            task_func(n_features=0)
-        with self.assertRaises(ValueError):
-            task_func(random_seed="invalid")
-    def tearDown(self):
-        plt.close("all")
+        random.seed(0)
+        report = task_func([self.products[0]], self.categories, 10, 10)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 1)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        self.assertEqual(report.iloc[0]['Quantity Sold'], 10)
+        self.assertEqual(report.iloc[0]['Revenue'], 100)

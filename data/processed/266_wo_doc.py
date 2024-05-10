@@ -1,86 +1,89 @@
-import subprocess
+import collections
+import json
 import os
-import sys
-import glob
 
-def task_func(directory_path):
+
+def task_func(data, json_file_name='data.json'):
     """
-    Find and run all .bat files in a given directory, returning their file names and exit codes.
+    Add a new key "a" with the value 1 to the input dictionary, calculate the frequency of its values, and save the updated dictionary along with its frequency distribution to a JSON file.
 
     Parameters:
-    directory_path (str): The path of the directory to search for .bat files.
+    data (dict): The input data as a dictionary.
+    json_file_name (str): The name of the JSON file to be saved.
 
     Returns:
-    list of tuples: A list where each tuple contains the file name and its exit code. 
-                    The exit code is None if the file could not be executed.
+    str: The path of the JSON file.
 
     Requirements:
-    - subprocess
+    - collections
+    - re
+    - json
     - os
-    - sys
-    - glob
 
     Example:
-    >>> task_func("path/to/directory")
-    [("file1.bat", 0), ("file2.bat", 1)]
+    >>> import tempfile
+    >>> json_file = tempfile.NamedTemporaryFile(delete=False)
+    >>> data = {'key1': 'value1', 'key2': 'value2', 'key3': 'value1'}
+    >>> task_func(data, json_file.name) is not None
+    True
     """
-    results = []
-    file_paths = glob.glob(os.path.join(directory_path, '*.bat'))
-    for file_path in file_paths:
-        try:
-            process = subprocess.Popen(file_path, shell=True)
-            exit_code = process.wait()
-            results.append((os.path.basename(file_path), exit_code))
-        except Exception as e:
-            print(f"Failed to execute the file: {file_path}. Error: {e}", file=sys.stderr)
-            results.append((os.path.basename(file_path), None))
-    return results
+    data['a'] = 1
+    freq = collections.Counter(data.values())
+    json_data = {'data': data, 'freq': dict(freq)}
+    json_file_path = os.path.join(os.getcwd(), json_file_name)
+    with open(json_file_path, 'w') as json_file:
+        json.dump(json_data, json_file)
+    return json_file_path
 
 import unittest
-from unittest.mock import patch, MagicMock
-import os
+import tempfile
+import doctest
 class TestCases(unittest.TestCase):
-    @patch('subprocess.Popen')
-    @patch('glob.glob')
-    def test_no_bat_files(self, mock_glob, mock_popen):
-        mock_glob.return_value = []
-        result = task_func("path/to/directory")
-        self.assertEqual(result, [])
-    @patch('subprocess.Popen')
-    @patch('glob.glob')
-    def test_single_bat_file_success(self, mock_glob, mock_popen):
-        mock_glob.return_value = ['file1.bat']
-        mock_process = MagicMock()
-        mock_process.wait.return_value = 0
-        mock_popen.return_value = mock_process
-        result = task_func("path/to/directory")
-        self.assertEqual(result, [("file1.bat", 0)])
-    @patch('subprocess.Popen')
-    @patch('glob.glob')
-    def test_single_bat_file_failure(self, mock_glob, mock_popen):
-        mock_glob.return_value = ['file1.bat']
-        mock_process = MagicMock()
-        mock_process.wait.return_value = 1
-        mock_popen.return_value = mock_process
-        result = task_func("path/to/directory")
-        self.assertEqual(result, [("file1.bat", 1)])
-    @patch('subprocess.Popen')
-    @patch('glob.glob')
-    def test_multiple_bat_files_mixed_results(self, mock_glob, mock_popen):
-        mock_glob.return_value = ['file1.bat', 'file2.bat', 'file3.bat']
-        mock_process1 = MagicMock()
-        mock_process1.wait.return_value = 0
-        mock_process2 = MagicMock()
-        mock_process2.wait.return_value = 1
-        mock_process3 = MagicMock()
-        mock_process3.wait.side_effect = Exception("Mocked exception")
-        mock_popen.side_effect = [mock_process1, mock_process2, mock_process3]
-        result = task_func("path/to/directory")
-        self.assertEqual(result, [("file1.bat", 0), ("file2.bat", 1), ("file3.bat", None)])
-    @patch('subprocess.Popen')
-    @patch('glob.glob')
-    def test_exception_handling(self, mock_glob, mock_popen):
-        mock_glob.return_value = ['file1.bat']
-        mock_popen.side_effect = Exception("Mocked exception")
-        result = task_func("path/to/directory")
-        self.assertEqual(result, [("file1.bat", None)])
+    def setUp(self):
+        self.json_file = tempfile.NamedTemporaryFile(delete=False)
+    def tearDown(self):
+        os.unlink(self.json_file.name)
+    def test_case_1(self):
+        data = {'key1': 'value1', 'key2': 'value2', 'key3': 'value1'}
+        result_path = task_func(data, self.json_file.name)
+        self.assertTrue(os.path.exists(result_path), "JSON file doesn't exist.")
+        with open(result_path, 'r') as f:
+            json_data = json.load(f)
+            self.assertEqual(json_data['data']['a'], 1)
+            self.assertEqual(json_data['freq']['value1'], 2)
+    
+    def test_case_2(self):
+        data = {}
+        result_path = task_func(data, self.json_file.name)
+        self.assertTrue(os.path.exists(result_path), "JSON file doesn't exist.")
+        with open(result_path, 'r') as f:
+            json_data = json.load(f)
+            self.assertEqual(json_data['data']['a'], 1)
+            self.assertEqual(json_data['freq']['1'], 1)
+    
+    def test_case_3(self):
+        data = {'x': 'y', 'z': 'y'}
+        result_path = task_func(data, self.json_file.name)
+        self.assertTrue(os.path.exists(result_path), "JSON file doesn't exist.")
+        with open(result_path, 'r') as f:
+            json_data = json.load(f)
+            self.assertEqual(json_data['data']['a'], 1)
+            self.assertEqual(json_data['freq']['y'], 2)
+            
+    def test_case_4(self):
+        data = {'e': 'b', 'c': 'd'}
+        result_path = task_func(data, self.json_file.name)
+        self.assertTrue(os.path.exists(result_path), "JSON file doesn't exist.")
+        with open(result_path, 'r') as f:
+            json_data = json.load(f)
+            self.assertEqual(json_data['data']['a'], 1)
+            self.assertEqual(json_data['freq']['b'], 1)
+            
+    def test_case_5(self):
+        data = {'apple': 'fruit', 'carrot': 'vegetable'}
+        result_path = task_func(data, self.json_file.name)
+        self.assertTrue(os.path.exists(result_path), "JSON file doesn't exist.")
+        with open(result_path, 'r') as f:
+            json_data = json.load(f)
+            self.assertEqual(json_data['data']['a'], 1)
+            self.assertEqual(json_data['freq']['fruit'], 1)

@@ -1,88 +1,81 @@
 import re
-import random
-import string
+import collections
 
-def task_func(n, pattern, seed=None):
+
+def task_func(string, patterns=['nnn', 'aaa', 'sss', 'ddd', 'fff']):
     """
-    Generate a random string of length 'n' and find all non-overlapping matches
-    of the regex 'pattern'.
-
-    The function generates a random string of ASCII Letters and Digits using 
-    the random module. By providing a seed the results are reproducable.
-    Non overlapping matches of the provided pattern are then found using the re
-    module.
+    Counts the occurrence of specific patterns in a string.
     
     Parameters:
-    n (int): The length of the random string to be generated.
-    pattern (str): The regex pattern to search for in the random string.
-    seed (int, optional): A seed parameter for the random number generator for reproducible results. Defaults to None.
-
+    string (str): The input string.
+    patterns (list[str], optional): List of patterns to search for. Defaults to ['nnn', 'aaa', 'sss', 'ddd', 'fff'].
+    
     Returns:
-    list: A list of all non-overlapping matches of the regex pattern in the generated string.
+    dict: A dictionary with patterns as keys and their counts as values.
 
+    Raises:
+    - TypeError: If string is not a str.
+    - TypeError: If patterns is not a list of str.
+    
     Requirements:
     - re
-    - random
-    - string
-
+    - collections
+    
     Example:
-    >>> task_func(100, r'[A-Za-z]{5}', seed=12345)
-    ['mrKBk', 'BqJOl', 'NJlwV', 'UfHVA', 'LGkjn', 'vubDv', 'GSVAa', 'kXLls', 'RKlVy', 'vZcoh', 'FnVZW', 'JQlqL']
-
-    >>> task_func(1000, r'[1-9]{2}', seed=1)
-    ['51', '84', '16', '79', '16', '28', '63', '82', '94', '18', '68', '42', '95', '33', '64', '38', '69', '56', '32', '16', '18', '19', '27']
-     """
-    if seed is not None:
-        random.seed(seed)
-    rand_str = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(n))
-    matches = re.findall(pattern, rand_str)
-    return matches
+    >>> task_func("nnnaaaasssdddeeefffggg")
+    {'nnn': 1, 'aaa': 1, 'sss': 1, 'ddd': 1, 'fff': 1}
+    >>> task_func('asdfasdfasdfasdaaaaf', patterns=['a', 'asdf'])
+    {'a': 8, 'asdf': 3}
+    >>> task_func('123kajhdlkfah12345k,jk123', patterns=['123', '1234'])
+    {'123': 3, '1234': 1}
+    """
+    if not isinstance(string, str):
+        raise TypeError("Input string should be of type string.")
+    if not isinstance(patterns, list):
+        raise TypeError("patterns should be a list of strings.")
+    if not all(isinstance(s, str) for s in patterns):
+        raise TypeError("patterns should be a list of strings.")
+    pattern_counts = collections.defaultdict(int)
+    for pattern in patterns:
+        pattern_counts[pattern] = len(re.findall(pattern, string))
+    return dict(pattern_counts)
 
 import unittest
 class TestCases(unittest.TestCase):
+    def test_empty_pattern(self):
+        'empty pattern'
+        result = task_func('asdf', patterns=[])
+        expected_result = {}
+        self.assertEqual(result, expected_result)
     
-    def test_valid_pattern_matching(self):
-        test_length = 100
-        test_pattern = r'[A-Za-z]{5}'
-        test_seed = 12345  # using a seed for consistency
-        expected_matches = [
-            'mrKBk',
-            'BqJOl',
-            'NJlwV',
-            'UfHVA',
-            'LGkjn',
-            'vubDv',
-            'GSVAa',
-            'kXLls',
-            'RKlVy',
-            'vZcoh',
-            'FnVZW',
-            'JQlqL'
-        ]
-        actual_matches = task_func(test_length, test_pattern, seed=test_seed)
-        self.assertEqual(actual_matches, expected_matches)
-    def test_no_matches_found(self):
-        test_length = 100
-        test_pattern = r'XYZ'
-        test_seed = 12345
-        expected_matches = []
-        actual_matches = task_func(test_length, test_pattern, seed=test_seed)
-        self.assertEqual(actual_matches, expected_matches)
-    def test_zero_length_string(self):
-        test_length = 0
-        test_pattern = r'[A-Za-z0-9]{5}'
-        expected_matches = []
-        actual_matches = task_func(test_length, test_pattern, seed=None)
-        self.assertEqual(actual_matches, expected_matches)
-    def test_unusual_pattern(self):
-        test_length = 100
-        test_pattern = r'[^A-Za-z0-9]+'
-        test_seed = 67890
-        expected_matches = []
-        actual_matches = task_func(test_length, test_pattern, seed=test_seed)
-        self.assertEqual(actual_matches, expected_matches)
-    def test_extreme_input_values(self):
-        test_length = 10000  # Reduced size for the environment's stability
-        test_pattern = r'[A-Za-z]{5}'
-        actual_matches = task_func(test_length, test_pattern, seed=None)
-        self.assertIsInstance(actual_matches, list)
+    def test_wrong_type(self):
+        'wrong input types'
+        self.assertRaises(Exception, task_func, {'string': 123})
+        self.assertRaises(Exception, task_func, {'string': ['asdf']})
+        self.assertRaises(Exception, task_func, {'string': {'a': 3}})
+        self.assertRaises(Exception, task_func, {'string': ['test'], 'patterns': 3})
+        self.assertRaises(Exception, task_func, {'string': ['test'], 'patterns': ['3', 1]})
+    def test_case_1(self):
+        result = task_func("nnnaaaasssdddeeefffggg")
+        expected_result = {'nnn': 1, 'aaa': 1, 'sss': 1, 'ddd': 1, 'fff': 1}
+        self.assertEqual(result, expected_result)
+    
+    def test_case_2(self):
+        result = task_func("")
+        expected_result = {'nnn': 0, 'aaa': 0, 'sss': 0, 'ddd': 0, 'fff': 0}
+        self.assertEqual(result, expected_result)
+    
+    def test_case_3(self):
+        result = task_func("xyz")
+        expected_result = {'nnn': 0, 'aaa': 0, 'sss': 0, 'ddd': 0, 'fff': 0}
+        self.assertEqual(result, expected_result)
+    
+    def test_case_4(self):
+        result = task_func("nnnaaannnsssdddfffnnn")
+        expected_result = {'nnn': 3, 'aaa': 1, 'sss': 1, 'ddd': 1, 'fff': 1}
+        self.assertEqual(result, expected_result)
+    
+    def test_case_5(self):
+        result = task_func("xxxyyyzzz", patterns=['xxx', 'yyy', 'zzz', 'aaa'])
+        expected_result = {'xxx': 1, 'yyy': 1, 'zzz': 1, 'aaa': 0}
+        self.assertEqual(result, expected_result)

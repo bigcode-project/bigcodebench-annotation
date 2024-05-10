@@ -1,93 +1,65 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
+import random
+import string
 
-# Constants
-PLOT_TITLE = "Scaled Values"
-
-
-def task_func(data_dict):
+POSSIBLE_LETTERS = ['a', 'b', 'c']
+def task_func(word):
     """
-    Scales the values in a given dictionary using MinMaxScaler and plots the scaled data.
-
+    Generates a list of random pairs of adjacent letters from the given word. The number of such pairs will be equal to the length of the constant POSSIBLE_LETTERS.
+    
     Parameters:
-    - data_dict (dict): A dictionary where keys represent column names and values are lists of numerical data.
-                        The values may contain missing data (None), which are handled by dropping them before scaling.
-
+    word (str): The input string. Must only contain letters.
+    
     Returns:
-    - pandas.DataFrame containing the scaled data.
-    - matplotlib Axes object that displays the plot of the scaled data.
-
+    list: A list of random pairs of adjacent letters from the word. If the word has fewer than 2 letters, returns a list of empty strings based on POSSIBLE_LETTERS length.
+    
     Requirements:
-    - pandas
-    - scikit-learn
-    - matplotlib
-
-    Example:
-    >>> data = {'a': [1, 2, None, 4], 'b': [5, None, 7, 8]}
-    >>> scaled_df, plot_ax = task_func(data)
-    >>> scaled_df
-         a    b
-    0  0.0  0.0
-    1  1.0  1.0
-    >>> plot_ax.get_title()
-    'Scaled Values'
+    - random
+    - string
+    
+    Examples:
+    >>> random.seed(0)
+    >>> task_func('abcdef')
+    ['de', 'de', 'ab']
+    >>> task_func('xyz')
+    ['yz', 'yz', 'yz']
     """
-    df = pd.DataFrame(data_dict).dropna()
-    if df.empty:
-        ax = plt.gca()
-        ax.set_title(PLOT_TITLE)
-        return df, ax
-    scaler = MinMaxScaler()
-    scaled_data = scaler.fit_transform(df)
-    df_scaled = pd.DataFrame(scaled_data, columns=df.columns)
-    ax = df_scaled.plot()
-    ax.set_title(PLOT_TITLE)
-    return df_scaled, ax
+    if not all(char in string.ascii_letters for char in word):
+        raise ValueError("Input must only contain letters.")
+    if len(word) < 2:
+        return ['' for _ in range(len(POSSIBLE_LETTERS))]
+    pairs = [''.join(x) for x in zip(word, word[1:])]
+    random_pairs = [random.choice(pairs) for _ in range(len(POSSIBLE_LETTERS))]
+    return random_pairs
 
 import unittest
-import pandas as pd
+import random
+# Assuming the function is correctly imported from its script
+# from task_func import task_func  
 class TestCases(unittest.TestCase):
-    """Unit tests for the function."""
-    def test_empty_data(self):
-        """
-        Test with an empty dictionary. Should return an empty DataFrame and a plot object.
-        """
-        result_df, result_ax = task_func({})
-        self.assertTrue(result_df.empty)
-        self.assertIsNotNone(result_ax)
-    def test_all_none_data(self):
-        """
-        Test with a dictionary where all values are None. Should return an empty DataFrame and a plot object.
-        """
-        data = {"a": [None, None], "b": [None, None]}
-        result_df, result_ax = task_func(data)
-        self.assertTrue(result_df.empty)
-        self.assertIsNotNone(result_ax)
-    def test_normal_data(self):
-        """
-        Test with a normal data dictionary. Should return a non-empty DataFrame and a plot object.
-        """
-        data = {"a": [1, 2, 3], "b": [4, 5, 6]}
-        result_df, result_ax = task_func(data)
-        self.assertEqual(result_ax.get_title(), "Scaled Values")
-        self.assertFalse(result_df.empty)
-        self.assertEqual(result_df.shape, (3, 2))
-        self.assertIsNotNone(result_ax)
-    def test_with_missing_values(self):
-        """
-        Test data with some missing values. Missing values should be dropped, and scaled data should be returned.
-        """
-        data = {"a": [1, None, 3], "b": [4, 5, None]}
-        result_df, result_ax = task_func(data)
-        self.assertEqual(result_df.shape, (1, 2))  # Only one row without missing values
-        self.assertIsNotNone(result_ax)
-    def test_with_negative_values(self):
-        """
-        Test data with negative values. Should handle negative values correctly and return scaled data.
-        """
-        data = {"a": [-1, -2, -3], "b": [1, 2, 3]}
-        result_df, result_ax = task_func(data)
-        self.assertFalse(result_df.empty)
-        self.assertEqual(result_df.shape, (3, 2))
-        self.assertIsNotNone(result_ax)
+    def test_with_valid_input(self):
+        random.seed(0)
+        result = task_func('abcdef')
+        self.assertEqual(len(result), 3, "Output list should have length 3")
+        valid_pairs = ['ab', 'bc', 'cd', 'de', 'ef']
+        for pair in result:
+            self.assertIn(pair, valid_pairs, f"Pair '{pair}' is not a valid adjacent pair in 'abcdef'")
+    def test_single_character(self):
+        random.seed(42)
+        result = task_func('a')
+        expected = ['', '', '']
+        self.assertEqual(result, expected, "Should return list of empty strings for a single character")
+    def test_empty_string(self):
+        random.seed(55)
+        result = task_func('')
+        expected = ['', '', '']
+        self.assertEqual(result, expected, "Should return list of empty strings for an empty string")
+    def test_non_letter_input(self):
+        random.seed(0)
+        with self.assertRaises(ValueError):
+            task_func('123')
+    def test_long_input(self):
+        random.seed(5)
+        result = task_func('abcdefghijklmnopqrstuvwxyz')
+        all_pairs = [''.join(x) for x in zip('abcdefghijklmnopqrstuvwxyz', 'abcdefghijklmnopqrstuvwxyz'[1:])]
+        for pair in result:
+            self.assertIn(pair, all_pairs, f"Pair '{pair}' is not a valid adjacent pair in the alphabet")

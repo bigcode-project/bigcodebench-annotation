@@ -1,78 +1,61 @@
-import json
-from enum import Enum
+from sklearn.preprocessing import MinMaxScaler
+import pandas as pd
 
-class Color(Enum):
-    RED = 1
-    GREEN = 2
-    BLUE = 3
-
-
-def task_func(my_obj):
+def task_func(l):
     """
-    Serializes an object into a JSON string with support for complex data types like Enum.
-    The function uses a custom JSONEncoder to handle Enum types by converting them to their names or values.
+    Scale the input field to the range [0, 1] and display it as a DataFrame.
 
     Parameters:
-    my_obj (object): The object to be serialized. Can be a dictionary, list, etc.
+    l (numpy array): The input array.
 
     Returns:
-    str: The serialized JSON string of the object.
+    DataFrame: A pandas DataFrame of the scaled array.
 
     Requirements:
-    - json
-    - enum
+    - numpy
+    - sklearn.preprocessing
+    - pandas
 
-    Examples:
-    Serialize a dictionary containing Enum.
-    >>> result = task_func({'color': Color.RED})
-    >>> 'RED' in result
-    True
+    Note:
+    - The return DataFrame use 'Scaled Values' as the column name.
 
-    Serialize a simple dictionary.
-    >>> task_func({'name': 'Alice', 'age': 30})
-    '{"name": "Alice", "age": 30}'
+    Example:
+    >>> import numpy as np
+    >>> l = np.array([10, 20, 30, 40, 50])
+    >>> df = task_func(l)
+    >>> print(int(df.iloc[0]['Scaled Values']))
+    0
     """
-    class EnumEncoder(json.JSONEncoder):
-        def default(self, obj):
-            if isinstance(obj, Enum):
-                return obj.name  # or obj.value, depending on the requirement
-            return json.JSONEncoder.default(self, obj)
-    return json.dumps(my_obj, cls=EnumEncoder)
+    scaler = MinMaxScaler()
+    l_scaled = scaler.fit_transform(l.reshape(-1, 1))
+    df = pd.DataFrame(l_scaled, columns=['Scaled Values'])
+    return df
 
 import unittest
+import numpy as np
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_enum_serialization(self):
-        # Test serialization of a dictionary containing an Enum to check if the Enum is properly converted to its name.
-        obj = {'color': Color.RED}
-        result = task_func(obj)
-        self.assertIn('"color": "RED"', result)
-    def test_multiple_enum_serialization(self):
-        # Test serialization of a dictionary with a list of Enums to verify if all Enums are correctly serialized by their names.
-        obj = {'colors': [Color.RED, Color.GREEN, Color.BLUE]}
-        result = task_func(obj)
-        self.assertIn('"colors": ["RED", "GREEN", "BLUE"]', result)
-    def test_no_enum_serialization(self):
-        # Test serialization of a simple dictionary without Enums to ensure basic JSON serialization functionality is unaffected.
-        obj = {'name': 'Bob', 'age': 25}
-        result = task_func(obj)
-        self.assertEqual(result, '{"name": "Bob", "age": 25}')
-    def test_nested_enum_serialization(self):
-        # Test serialization of a nested dictionary containing an Enum to ensure deep serialization handles Enums correctly.
-        obj = {'person': {'name': 'Alice', 'favorite_color': Color.BLUE}}
-        result = task_func(obj)
-        self.assertIn('"favorite_color": "BLUE"', result)
-    def test_empty_object_serialization(self):
-        # Test serialization of an empty dictionary to verify the encoder handles empty objects correctly.
-        obj = {}
-        result = task_func(obj)
-        self.assertEqual(result, '{}')
-    def test_direct_enum_serialization(self):
-        # Test direct serialization of an Enum instance
-        result = task_func(Color.GREEN)
-        self.assertEqual(result, '"GREEN"')
-    def test_complex_nested_structures(self):
-        # Test serialization of complex nested structures including Enum
-        obj = {'people': [{'name': 'Alice', 'favorite_color': Color.BLUE}, {'name': 'Bob', 'favorite_color': Color.RED}]}
-        result = task_func(obj)
-        self.assertIn('"favorite_color": "BLUE"', result)
-        self.assertIn('"favorite_color": "RED"', result)
+    def test_case_1(self):
+        l1 = np.array([10, 20, 30, 40, 50])
+        expected_df1 = pd.DataFrame({'Scaled Values': [0.0, 0.25, 0.5, 0.75, 1.0]})
+        self.assertTrue(task_func(l1).equals(expected_df1))
+    
+    def test_case_2(self):
+        l2 = np.array([-10, 0, 10])
+        expected_df2 = pd.DataFrame({'Scaled Values': [0.0, 0.5, 1.0]})
+        self.assertTrue(task_func(l2).equals(expected_df2))
+    
+    def test_case_3(self):
+        l3 = np.array([5, 5, 5])
+        expected_df3 = pd.DataFrame({'Scaled Values': [0.0, 0.0, 0.0]})
+        self.assertTrue(task_func(l3).equals(expected_df3))
+        
+    def test_case_4(self):
+        l4 = np.array([100])
+        expected_df4 = pd.DataFrame({'Scaled Values': [0.0]})
+        self.assertTrue(task_func(l4).equals(expected_df4))
+    
+    def test_case_5(self):
+        l5 = np.array([10, 50, 30, 40, 20])
+        expected_df5 = pd.DataFrame({'Scaled Values': [0.0, 1.0, 0.5, 0.75, 0.25]})
+        self.assertTrue(task_func(l5).equals(expected_df5))

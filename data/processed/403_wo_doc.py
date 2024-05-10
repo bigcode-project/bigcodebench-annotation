@@ -1,87 +1,112 @@
-from datetime import datetime, timedelta
-import pytz
-import calendar
+import re
+import requests
+import json
+import csv
+import os  
 
+# Constants
+API_URL = 'https://api.example.com/data'
 
-def task_func(days_in_past=7):
+def task_func(pattern):
     """
-    Get the weekday of the date 'days_in_past' days ago from today.
-
-    This function computes the date that is 'days_in_past' number of days ago from the current
-    system time's date in UTC. It then determines the weekday of this target date using calendar
-    and returns its name as a string.
+    Make a GET request to an API, extract data that matches a RegEx pattern, and write it to a CSV file.
 
     Parameters:
-    days_in_past (int): The number of days to go back from the current date to find the weekday.
-                        Defaults to 7 (one week ago). Must be a non-negative integer.
+    pattern (str): The regex pattern to match.
 
     Returns:
-    weekday (str)     : The name of the weekday (e.g., 'Monday', 'Tuesday') for the computed date.
+    str: The absolute path to the CSV file containing matched data. If no data is matched, the file will be empty.
 
-    Raises:
-    ValueError: If 'days_in_past' is negative.
-    
+    Note:
+    - The CSV file generated name is "matched_data.csv"
+    - The JSON response from the GET request in the API contains a key named "data", from which the data is extracted.
+
     Requirements:
-    - datetime.datetime
-    - datetime.timedelta
-    - pytz
-    - calendar
+    - requests
+    - json
+    - csv
+    - re
+    - os
 
     Example:
-    >>> task_func()
-    'Monday'
-    >>> task_func(3)
-    'Friday'
+    >>> task_func(r'\\\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,}\\\\b')
+    '/absolute/path/to/matched_data.csv'
+    >>> task_func(r'\\\\d{3}-\\\\d{2}-\\\\d{4}')  # For matching SSN format
+    '/absolute/path/to/matched_data.csv'
     """
-    if days_in_past < 0:
-        raise ValueError("Days in the past cannot be negative")
-    date = datetime.now(pytz.UTC) - timedelta(days=days_in_past)
-    weekday = calendar.day_name[date.weekday()]
-    return weekday
+    response = requests.get(API_URL)
+    data = json.loads(response.text)
+    matched_data = [re.findall(pattern, str(item)) for item in data['data']]
+    with open('matched_data.csv', 'w') as f:
+        writer = csv.writer(f)
+        writer.writerows(matched_data)
+    return os.path.abspath('matched_data.csv')
 
 import unittest
-from datetime import datetime, timedelta
-import pytz
-import calendar
+from unittest.mock import patch, Mock
+import os
+def mock_requests_get(*args, **kwargs):
+    class MockResponse:
+        def __init__(self, json_data):
+            self.json_data = json_data
+            self.text = json.dumps(json_data)
+        
+        def json(self):
+            return self.json_data
+    if args[0] == 'https://api.example.com/data':
+        return MockResponse(MOCK_API_RESPONSES.pop(0))
+    return MockResponse(None)
+MOCK_API_RESPONSES = [
+    {"data": ["john.doe@example.com", "jane.smith@domain.org"]},
+    {"data": ["123-45-6789", "987-65-4321"]},
+    {"data": ["apple", "banana", "cherry"]},
+    {"data": []},
+    {"data": ["test1@example.com", "test2@domain.org", "123-45-6789", "apple"]}
+]
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Input 1: Default input
-        result = task_func()
-        self.assertIsInstance(result, str)
-        self.assertIn(result, list(calendar.day_name))
-        # Ensure the result matches the expected output for 7 days ago
-        expected_date = datetime.now(pytz.UTC) - timedelta(days=7)
-        expected_weekday = calendar.day_name[expected_date.weekday()]
-        self.assertEqual(result, expected_weekday)
-    def test_case_2(self):
-        # Input 2: Test with 3 days in the past
-        result = task_func(3)
-        self.assertIsInstance(result, str)
-        self.assertIn(result, list(calendar.day_name))
-        # Ensure the result matches the expected output for 3 days ago
-        expected_date = datetime.now(pytz.UTC) - timedelta(days=3)
-        expected_weekday = calendar.day_name[expected_date.weekday()]
-        self.assertEqual(result, expected_weekday)
-    def test_case_3(self):
-        # Input 3: Test with 0 days in the past (today)
-        result = task_func(0)
-        self.assertIsInstance(result, str)
-        self.assertIn(result, list(calendar.day_name))
-        # Ensure the result matches the expected output for today
-        expected_date = datetime.now(pytz.UTC)
-        expected_weekday = calendar.day_name[expected_date.weekday()]
-        self.assertEqual(result, expected_weekday)
-    def test_case_4(self):
-        # Input 4: Test with 30 days in the past (approximately a month ago)
-        result = task_func(30)
-        self.assertIsInstance(result, str)
-        self.assertIn(result, list(calendar.day_name))
-        # Ensure the result matches the expected output for 30 days ago
-        expected_date = datetime.now(pytz.UTC) - timedelta(days=30)
-        expected_weekday = calendar.day_name[expected_date.weekday()]
-        self.assertEqual(result, expected_weekday)
-    def test_case_5(self):
-        # Input 5: Test handling invalid days_in_the_past
-        for invalid in [-1, "1"]:
-            with self.assertRaises(Exception):
-                task_func(invalid)
+    def setUp(self):
+        if os.path.exists("matched_data.csv"):
+            os.remove("matched_data.csv")
+    def tearDown(self):
+        if os.path.exists("matched_data.csv"):
+            os.remove("matched_data.csv")
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_1(self, mock_get):
+        result = task_func(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b')
+        self.assertTrue(os.path.exists(result))
+        with open("matched_data.csv", "r") as file:
+            content = file.read()
+            self.assertIn("john.doe@example.com", content)
+            self.assertIn("jane.smith@domain.org", content)
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_2(self, mock_get):
+        result = task_func('\d{3}-\d{2}-\d{4}')
+        self.assertTrue(os.path.exists(result))
+        with open("matched_data.csv", "r") as file:
+            content = file.read()
+            self.assertIn("123-45-6789", content)
+            self.assertIn("987-65-4321", content)
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_3(self, mock_get):
+        result = task_func(r'apple')
+        self.assertTrue(os.path.exists(result))
+        with open("matched_data.csv", "r") as file:
+            content = file.read()
+            self.assertIn("apple", content)
+            self.assertNotIn("banana", content)
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_4(self, mock_get):
+        result = task_func(r'no_match')
+        self.assertTrue(os.path.exists(result))
+        with open("matched_data.csv", "r") as file:
+            content = file.read()
+            self.assertEqual(content, "")
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_5(self, mock_get):
+        result = task_func(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b')
+        self.assertTrue(os.path.exists(result))
+        with open("matched_data.csv", "r") as file:
+            content = file.read()
+            self.assertNotIn("john.doe@example.com", content)
+            self.assertNotIn("jane.smith@domain.org", content)
+            self.assertIn("test1@example.com", content)

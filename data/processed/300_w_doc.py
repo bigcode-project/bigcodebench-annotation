@@ -1,84 +1,73 @@
-import numpy as np
-from scipy.stats import norm
-import matplotlib.pyplot as plt
+import itertools
+import math
+from pandas import Series
 
-def task_func(length):
+
+def task_func(elements, subset_size, top_n=2):
     """
-    Create a normal distribution with a given length, plot its histogram alongside the 
-    probability density function, and return the distribution and the plot.
-    
+    Generate all subsets of a given size from a tuple and calculate the product of the sums of the subsets. Additionally, 
+    return the top_n sums of the subsets. If the subset size is larger than the tuple length, return 1. If the subset size is 0,
+    return 1.
+
     Parameters:
-    - length (int): The length of the distribution to be generated.
-    
+    - elements (tuple): A tuple of elements to create subsets from.
+    - subset_size (int): The size of the subsets to be generated.
+    - top_n (int, Optional): The number of top subsets to return. Defaults to None.
+
     Returns:
-    - tuple: A tuple containing:
-        1. numpy array with the normal distribution.
-        2. matplotlib Axes object representing the plot.
-    
+    int: The product of the sums of the subsets.
+    list: The top_n sums of the subsets as a pandas Series.
+
+
     Requirements:
-    - numpy
-    - scipy.stats.norm
-    - matplotlib.pyplot
-    
-    Note:
-    - This function use this constant MU (mean): 0, SIGMA (standard deviation): 1
+    - itertools
+    - math
     
     Example:
-    >>> np.random.seed(0)
-    >>> distribution, ax = task_func(1000)
-    >>> print(type(distribution))
-    <class 'numpy.ndarray'>
-    >>> len(ax.get_lines())
-    1
-    >>> plt.close()
+    >>> prod, sums = task_func((1, 2, 3), 2)
+    >>> prod
+    60
+    >>> list(sums)
+    [5, 4]
     """
-    MU = 0
-    SIGMA = 1
-    distribution = np.random.normal(MU, SIGMA, length)
-    fig, ax = plt.subplots()
-    ax.hist(distribution, 30, density=True, label='Histogram')
-    ax.plot(np.sort(distribution), norm.pdf(np.sort(distribution), MU, SIGMA), 
-            linewidth=2, color='r', label='PDF')
-    ax.legend()
-    return distribution, ax
+    if subset_size > len(elements) or subset_size <= 0:
+        return 1, []
+    combinations = list(itertools.combinations(elements, subset_size))
+    sums = [sum(combination) for combination in combinations if len(combination) != 0]
+    product = math.prod(sums)
+    top_sums = sorted(sums, reverse=True)[:top_n]
+    top_sums = Series(top_sums)
+    return product, top_sums
 
 import unittest
-import numpy as np
-import matplotlib.pyplot as plt
+import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        np.random.seed(0)
-        distribution, ax = task_func(1000)
-        self.assertIsInstance(distribution, np.ndarray, "Expected distribution to be a numpy array")
-        self.assertIsInstance(ax, plt.Axes, "Expected ax to be a matplotlib Axes object")
-        plt.close()
+        # Default values
+        result, _ = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
+        expected = 2781259372192376861719959017613164544000000000
+        self.assertEqual(result, expected)
     def test_case_2(self):
-        np.random.seed(0)
-        length = 500
-        distribution, _ = task_func(length)
-        self.assertEqual(len(distribution), length, f"Expected distribution length to be {length}")
-        plt.close()
-    
+        # Custom tuple and subset size
+        result, sums = task_func((1, 2, 3), 2)
+        expected = 60
+        self.assertEqual(result, expected)
+        # Test the top sums
+        self.assertEqual(list(sums), [5, 4])
+        # Test the type of the top sums
+        self.assertIsInstance(sums, Series)
     def test_case_3(self):
-        np.random.seed(0)
-        distribution, _ = task_func(1000)
-        mean = distribution.mean()
-        std_dev = distribution.std()
-        self.assertAlmostEqual(mean, 0, delta=0.1, msg=f"Expected mean to be close to 0, got {mean}")
-        self.assertAlmostEqual(std_dev, 1, delta=0.1, msg=f"Expected std_dev to be close to 1, got {std_dev}")
-        plt.close()
-    
+        # Larger subset size than tuple length
+        result, _ = task_func((1, 2, 3), 5)
+        expected = 1  # No subset of size 5 can be formed, so the product will be 1
+        self.assertEqual(result, expected)
     def test_case_4(self):
-        np.random.seed(0)
-        distribution, ax = task_func(1000)
-        lines = ax.get_lines()
-        self.assertEqual(len(lines), 1, "Expected one line representing PDF in the plot")
-        bars = [rect for rect in ax.get_children() if isinstance(rect, plt.Rectangle)]
-        self.assertGreater(len(bars), 1, "Expected multiple bars representing histogram in the plot")
-        plt.close()
-    
+        # Subset size of 0
+        result, sums = task_func((1, 2, 3), 0)
+        expected = 1  # No subset of size 0 can be formed, so the product will be 1
+        self.assertEqual(result, expected)
+        self.assertEqual(list(sums), [])
     def test_case_5(self):
-        np.random.seed(0)
-        distribution, _ = task_func(2000)
-        self.assertEqual(distribution.shape, (2000,), "Expected shape of distribution to match input length")
-        plt.close()
+        # Larger tuple
+        result, _ = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), 4)
+        self.assertIsInstance(result, int)  # Ensure the result is an integer

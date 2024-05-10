@@ -1,129 +1,111 @@
-import sqlite3
-import pandas as pd
-import seaborn as sns
+import numpy as np
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
 
 
-def task_func(db_name="test.db", table_name="People"):
+def task_func(P, T, tensor_shape=(3, 3, 3)):
     """
-    Draw the age distribution of the persons in an SQLite3 table and returns the Axes object of the plot.
-    Raises a ValueError if the loaded data contains negative age values.
+    Calculate the product of a matrix "P" and a 3D tensor "T" with numpy and then apply PCA to reduce the
+    dimensionality of the result. The resulting 2D data is then visualized.
+    Note: This function only accepts numpy matrices/arrays.
 
     Parameters:
-    db_name (str, optional): The full path to the SQLite3 database file. Defaults to 'test.db'.
-    table_name (str, optional): The name of the table to plot from. Defaults to 'People'.
+    P (numpy.ndarray): The input matrix.
+    T (numpy.ndarray): The input tensor. Must have same shape as tensor_shape.
+    tensor_shape (tuple, optional): The shape of the tensor. Must be same as T.shape. Default is (3, 3, 3).
 
     Returns:
-    matplotlib.axes._axes.Axes: Axes object representing the age distribution plot,
-                                           with x-axis showing age and a default of bins=30, kde=True.
+    pca_result (numpy.ndarray): The result of PCA of shape (N, 2), where N is the number of rows in matrix P.
+    ax (matplotlib.axes.Axes): Plot of 'PCA Result Visualization', with 'Principal Component 1' on the x-axis
+                               and 'Principal Component 2' on the y-axis.
+
+
 
     Requirements:
-    - sqlite3
-    - pandas
-    - seaborn
+    - numpy
+    - sklearn.decomposition
+    - matplotlib.pyplot
 
-    Examples:
-    >>> ax = task_func('path/to/test.db', 'People')
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> ax = task_func()
+    Example:
+    >>> P = np.array([[6, 2, 7], [1, 1, 8], [8, 7, 1], [9, 6, 4], [2, 1, 1]])
+    >>> T = np.array([[[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
+    >>> pca_result, ax = task_func(P, T)
+    >>> pca_result.shape
+    (3, 2)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-    conn = sqlite3.connect(db_name)
-    df = pd.read_sql_query(f"SELECT age from {table_name}", conn)
-    if (df["age"] < 0).any():
-        raise ValueError("Data contains negative age values.")
-    ax = sns.histplot(data=df, x="age", bins=30, kde=True)
-    ax.set_xlabel("age")
-    return ax
+    if not (isinstance(P, np.ndarray) and isinstance(T, np.ndarray)):
+        raise TypeError("Expected inputs to be numpy arrays")
+    if not T.shape == tensor_shape:
+        raise ValueError("Provided tensor does not match the specified tensor_shape.")
+    result = np.tensordot(P, T, axes=[1, 1]).swapaxes(0, 1)
+    result = result.reshape(result.shape[0], -1)
+    pca = PCA(n_components=2)
+    pca_result = pca.fit_transform(result)
+    fig, ax = plt.subplots()
+    ax.scatter(pca_result[:, 0], pca_result[:, 1])
+    ax.set_title("PCA Result Visualization")
+    ax.set_xlabel("Principal Component 1")
+    ax.set_ylabel("Principal Component 2")
+    return pca_result, ax
 
 import unittest
-import os
-import sqlite3
-import matplotlib.pyplot as plt
-import tempfile
+import numpy as np
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Setup temporary directory
-        self.test_dir = tempfile.TemporaryDirectory()
-        # Create test_alt.db with People table
-        self.alt_db_path = os.path.join(self.test_dir.name, "test_alt.db")
-        conn = sqlite3.connect(self.alt_db_path)
-        cursor = conn.cursor()
-        cursor.execute("CREATE TABLE People (name TEXT, age INT)")
-        cursor.executemany(
-            "INSERT INTO People VALUES (?, ?)", [("Alice", 25), ("Bob", 30)]
-        )
-        conn.commit()
-        conn.close()
-        # Create a standard test.db with Employees table
-        self.default_db_path = os.path.join(self.test_dir.name, "test.db")
-        conn = sqlite3.connect(self.default_db_path)
-        cursor = conn.cursor()
-        cursor.execute("CREATE TABLE Employees (name TEXT, age INT)")
-        cursor.executemany(
-            "INSERT INTO Employees VALUES (?, ?)", [("Charlie", 35), ("David", 40)]
-        )
-        conn.commit()
-        conn.close()
-        # Create standard db with more examples
-        self.multiple_db_path = os.path.join(self.test_dir.name, "test_multiple.db")
-        conn = sqlite3.connect(self.multiple_db_path)
-        cursor = conn.cursor()
-        cursor.execute("CREATE TABLE MultipleAge (name TEXT, age INT)")
-        cursor.executemany(
-            "INSERT INTO MultipleAge VALUES (?, ?)",
-            [("Alice", 25), ("Bob", 30), ("Charlie", 35)],
-        )
-        conn.commit()
-        conn.close()
-        # Create a db for testing edge cases - negative age
-        self.negative_age_db_path = os.path.join(
-            self.test_dir.name, "test_negative_age.db"
-        )
-        conn = sqlite3.connect(self.negative_age_db_path)
-        cursor = conn.cursor()
-        cursor.execute("CREATE TABLE NegativeAge (name TEXT, age INT)")
-        cursor.executemany(
-            "INSERT INTO NegativeAge VALUES (?, ?)", [("Eve", -1), ("Frank", 20)]
-        )
-        conn.commit()
-        conn.close()
-        # Create a db for testing edge cases - empty
-        self.empty_db_path = os.path.join(self.test_dir.name, "test_empty.db")
-        conn = sqlite3.connect(self.empty_db_path)
-        cursor = conn.cursor()
-        cursor.execute("CREATE TABLE EmptyAge (name TEXT, age INT)")
-        conn.commit()
-        conn.close()
-    def tearDown(self):
-        self.test_dir.cleanup()
-        plt.close("all")
-    def _check_plot(self, ax, contains_data=True):
-        self.assertTrue(isinstance(ax, plt.Axes), "The plot should be an Axes object.")
-        self.assertEqual(ax.get_xlabel(), "age", "The x-axis label should be 'age'.")
-        if contains_data:
-            self.assertTrue(len(ax.lines) > 0, "The plot should contain a KDE line.")
+        np.random.seed(0)
+        # Set up common matrices and tensors for testing
+        self.TENSOR_SHAPE = (3, 3, 3)
+        self.P = np.array([[6, 2, 7], [1, 1, 8], [8, 7, 1]])
+        self.T = np.random.rand(*self.TENSOR_SHAPE)
+        self.T_zeros = np.zeros(self.TENSOR_SHAPE)
+        self.T_ones = np.ones(self.TENSOR_SHAPE)
     def test_case_1(self):
-        ax = task_func(db_name=self.default_db_path, table_name="Employees")
-        self._check_plot(ax)
+        # Test results and plot correctness
+        pca_result, ax = task_func(self.P, self.T)
+        self._common_assertions(pca_result, ax)
     def test_case_2(self):
-        ax = task_func(db_name=self.alt_db_path)
-        self._check_plot(ax)
-    def test_case_3(self):
-        ax = task_func(db_name=self.default_db_path, table_name="Employees")
-        self._check_plot(ax)
-    def test_case_4(self):
-        ax = task_func(db_name=self.multiple_db_path, table_name="MultipleAge")
-        self._check_plot(ax)
-    def test_case_5(self):
-        ax = task_func(db_name=self.empty_db_path, table_name="EmptyAge")
-        self._check_plot(ax, False)
-    def test_case_6(self):
-        # Test for non-existent table
+        # Function should fail when input types are invalid
         with self.assertRaises(Exception):
-            task_func(db_name=self.default_db_path, table_name="Nonexistent")
-    def test_case_7(self):
-        # Test for negative age values
-        with self.assertRaises(ValueError):
-            task_func(db_name=self.negative_age_db_path, table_name="NegativeAge")
+            task_func("not a numpy array", self.T, self.TENSOR_SHAPE)
+        with self.assertRaises(Exception):
+            task_func(self.P, "not a numpy array", self.TENSOR_SHAPE)
+        with self.assertRaises(Exception):
+            task_func([], [], self.TENSOR_SHAPE)
+    def test_case_3(self):
+        # Function should fail when input shapes are invalid
+        T_incorrect_shape = np.random.rand(2, 2, 2)
+        with self.assertRaises(Exception):
+            task_func(self.P, T_incorrect_shape, self.TENSOR_SHAPE)
+        with self.assertRaises(Exception):
+            task_func(np.array([]), np.array([]), self.TENSOR_SHAPE)
+    def test_case_4(self):
+        # Test custom shapes
+        P = np.random.rand(5, 4)
+        T = np.random.rand(5, 4, 4)
+        pca_result, ax = task_func(P, T, tensor_shape=T.shape)
+        self._common_assertions(pca_result, ax)
+    def test_case_5(self):
+        # Test with zeros
+        pca_result, ax = task_func(self.P, self.T_zeros)
+        self._common_assertions(pca_result, ax)
+    def test_case_6(self):
+        # Adjusting the matrix and tensor to have a slight variation
+        P = np.array([[1.01, 0.01, 0.01], [0.01, 1.01, 0.01], [0.01, 0.01, 1.01]])
+        T = np.ones(self.TENSOR_SHAPE) + 0.01 * np.random.rand(*self.TENSOR_SHAPE)
+        pca_result, ax = task_func(P, T)
+        # Assert that the PCA results don't produce NaN values and that there's a reduction in dimensionality
+        self.assertFalse(np.isnan(pca_result).any())
+        self.assertEqual(pca_result.shape[1], 2)
+        # Also check common assertions
+        self._common_assertions(pca_result, ax)
+    def _common_assertions(self, pca_result, ax):
+        # Common assertions for shape and plot labels
+        self.assertEqual(pca_result.shape[1], 2)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "PCA Result Visualization")
+        self.assertEqual(ax.get_xlabel(), "Principal Component 1")
+        self.assertEqual(ax.get_ylabel(), "Principal Component 2")
+    def tearDown(self):
+        plt.close("all")

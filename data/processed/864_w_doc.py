@@ -1,74 +1,80 @@
+import random
 import string
-import re
+from collections import defaultdict
 
 
-def task_func(text: str) -> tuple:
+def task_func(n, seed=None):
     """
-    Counts the number of words, characters, and unique characters in a given text.
+    Generate a dictionary with lists of random lowercase english letters. 
+    
+    Each key in the dictionary  represents a unique letter from the alphabet,
+    and the associated value is a list, containing randomly generated instances
+    of that letter based on a seed.
+
+    The function randomly selects 'n' letters from the alphabet (a-z) and places each 
+    occurrence in the corresponding list within the dictionary. The randomness is based
+    on the provided seed value; the same seed will produce the same distribution of letters.
+
+    The dictionary has only those keys for which a letter was generated.
 
     Parameters:
-    - text (str): The input text to be analyzed.
+    n (int): The number of random letters to generate.
+    seed (int, optional): A seed value for the random number generator. If None, the randomness
+                          is based on system time or the OS's randomness source.
 
     Returns:
-    - tuple: A tuple containing three integers: the number of words,
-                                                the number of characters,
-                                                the number of unique characters.
+    defaultdict: A dictionary where the keys are characters ('a' to 'z') and the values 
+                 are lists of randomly generated letters. Each list may have 0 to 'n' occurrences of 
+                 its associated letter, depending on the randomness and seed.
 
     Requirements:
+    - collections.defaultdict
+    - random
     - string
-    - re
-
-    Note:
-    - This function considers whitespace-separated substrings as words.
-    - When counting characters, this function excludes whitespace and special
-      characters (i.e. string.punctuation).
 
     Example:
-    >>> task_func('Hello, world!')
-    (2, 10, 7)
-    >>> task_func('Python is  awesome!  ')
-    (3, 15, 12)
+    >>> task_func(5, seed=123)
+    defaultdict(<class 'list'>, {'b': ['b'], 'i': ['i'], 'c': ['c'], 'y': ['y'], 'n': ['n']})
+
+    >>> task_func(30, seed=1)
+    defaultdict(<class 'list'>, {'e': ['e'], 's': ['s'], 'z': ['z', 'z', 'z'], 'y': ['y', 'y', 'y', 'y'], 'c': ['c'], 'i': ['i', 'i'], 'd': ['d', 'd'], 'p': ['p', 'p', 'p'], 'o': ['o', 'o'], 'u': ['u'], 'm': ['m', 'm'], 'g': ['g'], 'a': ['a', 'a'], 'n': ['n'], 't': ['t'], 'w': ['w'], 'x': ['x'], 'h': ['h']})
     """
-    words = text.split()
-    chars = re.sub("\s", "", re.sub(f"[{string.punctuation}]", "", text))
-    return len(words), len(chars), len(set(chars))
+    LETTERS = string.ascii_lowercase
+    random.seed(seed)
+    letter_dict = defaultdict(list)
+    for _ in range(n):
+        letter = random.choice(LETTERS)
+        letter_dict[letter].append(letter)
+    return letter_dict
 
 import unittest
+from collections import defaultdict
+import string
+import random
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test simple text without any punctuation.
-        result = task_func("Hello world")
-        self.assertEqual(result, (2, 10, 7))
-    def test_case_2(self):
-        # Test simple text that includes punctuation.
-        result = task_func("Hello, world!")
-        self.assertEqual(result, (2, 10, 7))
-    def test_case_3(self):
-        # Test single word and no punctuation.
-        result = task_func("Hello")
-        self.assertEqual(result, (1, 5, 4))
-    def test_case_4(self):
-        # Test single word that includes punctuation.
-        result = task_func("Hello!")
-        self.assertEqual(result, (1, 5, 4))
-    def test_case_5(self):
-        # Test empty string.
-        result = task_func("")
-        self.assertEqual(result, (0, 0, 0))
-    def test_case_6(self):
-        # Test text with numbers and punctuation.
-        result = task_func("There are 4 numbers here: 1, 2, 3, and 4.")
-        self.assertEqual(result, (10, 27, 15))
-    def test_case_7(self):
-        # Test text with only whitespace and punctuation.
-        result = task_func("     , , !")
-        self.assertEqual(result, (3, 0, 0))
-    def test_case_8(self):
-        # Test text with multiple spaces between words.
-        result = task_func("Multiple    spaces    here")
-        self.assertEqual(result, (3, 18, 12))
-    def test_case_9(self):
-        # Test a long text.
-        long_text = "This is a longer text designed to test the function's ability to handle more complex input, including a variety of characters and spaces."
-        result = task_func(long_text)
-        self.assertEqual(result, (23, 112, 22))
+    def test_return_type(self):
+        result = task_func(10, seed=1)
+        self.assertIsInstance(result, defaultdict)
+        for key, value in result.items():
+            self.assertIsInstance(value, list)
+    def test_dictionary_keys(self):
+        result = task_func(100, seed=2)
+        for key in result.keys():
+            self.assertTrue('a' <= key <= 'z')
+    def test_random_seed_effect(self):
+        result1 = task_func(50, seed=3)
+        result2 = task_func(50, seed=3)
+        self.assertEqual(result1, result2)
+    def test_letters_distribution(self):
+        n = 60
+        result = task_func(n, seed=4)
+        total_letters = sum(len(lst) for lst in result.values())
+        self.assertEqual(total_letters, n)
+    def test_edge_cases(self):
+        result = task_func(0, seed=5)
+        for lst in result.values():
+            self.assertEqual(len(lst), 0)
+        large_n = 10000
+        result = task_func(large_n, seed=6)
+        total_letters = sum(len(lst) for lst in result.values())
+        self.assertEqual(total_letters, large_n)

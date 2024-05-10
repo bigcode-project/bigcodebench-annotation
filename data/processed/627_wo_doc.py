@@ -1,84 +1,78 @@
-import os
-import csv
-from collections import Counter
+from random import choice
+import pytz
+from dateutil.parser import parse
 
 # Constants
-BASE_PATH = 'task_func_data_xiaoheng'
-FILE_NAME = os.path.join(BASE_PATH, 'Output.txt')
+TIMEZONES = ['America/New_York', 'Europe/London', 'Asia/Shanghai', 'Asia/Tokyo', 'Australia/Sydney']
 
-def task_func(file_path):
+
+def task_func(date_str, from_tz):
     """
-    This function reads the specified CSV file, counts the frequency of each word, and returns the most common word 
-    along with its frequency.
+    Converts a datetime string from a given timezone to a datetime string in a randomly chosen timezone.
 
     Parameters:
-    - file_path (str): The path to the CSV file.
-
-    Requirements:
-    - os
-    - csv
-    - collections
+    - date_str (str): The datetime string in "yyyy-mm-dd hh:mm:ss" format.
+    - from_tz (str): The timezone of the given datetime string.
 
     Returns:
-    - tuple: The most common word and its frequency, or None if the file doesn't exist or is empty.
+    - tuple: A tuple containing the converted datetime string and the randomly chosen timezone.
+    
+    Requirements:
+    - pytz
+    - dateutil.parser
+    - random
 
     Example:
-    >>> # Assuming 'example.txt' contains multiple repetitions of the word 'example'
-    >>> task_func('example.txt')  # doctest: +SKIP
-    ('example', <some_positive_integer>)
-
-    Note:
-    - The function specifically reads from the given file path.
-    - This example uses +SKIP because it relies on external file content.
+    >>> date_str, from_tz = '2023-06-15 12:00:00', 'UTC'
+    >>> converted_date, to_tz = task_func(date_str, from_tz)
+    >>> to_tz in TIMEZONES
+    True
     """
-    if not os.path.isfile(file_path):
-        return None
-    word_counter = Counter()
-    with open(file_path, 'r') as f:
-        csv_reader = csv.reader(f, delimiter=',', skipinitialspace=True)
-        for row in csv_reader:
-            for word in row:
-                word_counter[word.strip()] += 1
-    if not word_counter:
-        return None
-    most_common_word, frequency = word_counter.most_common(1)[0]
-    return most_common_word, frequency
+    from_tz = pytz.timezone(from_tz)
+    to_tz = pytz.timezone(choice(TIMEZONES))
+    given_date = parse(date_str).replace(tzinfo=from_tz)
+    converted_date = given_date.astimezone(to_tz)
+    return converted_date.strftime('%Y-%m-%d %H:%M:%S'), to_tz.zone
 
 import unittest
+from datetime import datetime
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        """Create the directory for test files."""
-        os.makedirs(BASE_PATH, exist_ok=True)
-    def tearDown(self):
-        """Remove all created test files and the directory after all tests."""
-        for filename in os.listdir(BASE_PATH):
-            os.remove(os.path.join(BASE_PATH, filename))
-        os.rmdir(BASE_PATH)
-    def create_and_fill_file(self, filename, contents):
-        """Helper method to create and populate a file with given contents."""
-        full_path = os.path.join(BASE_PATH, filename)
-        with open(full_path, 'w', newline='') as file:
-            writer = csv.writer(file)
-            for content in contents:
-                writer.writerow([content])
-        return full_path
-    def test_1(self):
-        file_path = self.create_and_fill_file('Output.txt', ['banana']*5)
-        result = task_func(file_path)
-        self.assertEqual(result, ('banana', 5))
-    def test_2(self):
-        file_path = self.create_and_fill_file('AnotherOutput.txt', ['cat']*5)
-        result = task_func(file_path)
-        self.assertEqual(result, ('cat', 5))
-    def test_3(self):
-        file_path = self.create_and_fill_file('YetAnotherOutput.txt', ['moon']*5)
-        result = task_func(file_path)
-        self.assertEqual(result, ('moon', 5))
-    def test_4(self):
-        file_path = self.create_and_fill_file('Nonexistent.txt', [])
-        result = task_func(file_path)
-        self.assertIsNone(result)
-    def test_5(self):
-        file_path = self.create_and_fill_file('EmptyFile.txt', [])
-        result = task_func(file_path)
-        self.assertIsNone(result)
+    def test_case_1(self):
+        result = task_func('2023-06-15 12:00:00', 'UTC')
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
+        datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
+        self.assertIsInstance(datetime_obj, datetime)
+        self.assertIn(result[1], TIMEZONES)
+    
+    def test_case_2(self):
+        result = task_func('2022-01-01 00:00:00', 'America/New_York')
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
+        datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
+        self.assertIsInstance(datetime_obj, datetime)
+        self.assertIn(result[1], TIMEZONES)
+        
+    def test_case_3(self):
+        result = task_func('2020-12-31 23:59:59', 'Asia/Shanghai')
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
+        datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
+        self.assertIsInstance(datetime_obj, datetime)
+        self.assertIn(result[1], TIMEZONES)
+        
+    def test_case_4(self):
+        result = task_func('2019-07-04 04:04:04', 'Europe/London')
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
+        datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
+        self.assertIsInstance(datetime_obj, datetime)
+        self.assertIn(result[1], TIMEZONES)
+    
+    def test_case_5(self):
+        result = task_func('2018-02-28 14:28:58', 'Australia/Sydney')
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
+        datetime_obj = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
+        self.assertIsInstance(datetime_obj, datetime)
+        self.assertIn(result[1], TIMEZONES)

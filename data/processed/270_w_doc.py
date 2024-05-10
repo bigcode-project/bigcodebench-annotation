@@ -1,63 +1,92 @@
-import heapq
-import random
+import numpy as np
+from scipy import stats
+from sklearn.preprocessing import MinMaxScaler
+import matplotlib.pyplot as plt
 
-def task_func(k, list_length = 5, min_value = 0, max_value = 100):
+
+def task_func(data_dict):
     """
-    Find the k smallest numbers in a randomly generated list using heapq.
-
+    Performs the following operations on the input dictionary 'data_dict':
+    1. Adds a key "a" with a value of 1.
+    2. Conducts statistical analysis on its values (mean, median, mode).
+    3. Normalizes the values using MinMaxScaler to a range of (0, 1).
+    4. Plots a histogram of the normalized values.
+    
     Parameters:
-    k (int): The number of smallest elements to find.
-    list_length (int): The length of the randomly generated list of integers.
-    min_value (int): The minimum value for randomly generated integers.
-    max_value (int): The maximum value for randomly generated integers.
-
+    data_dict (dict): The dictionary to be processed, containing numerical values.
+    
     Returns:
-    tuple: A tuple containing two lists: 
-        - list[int]: The randomly generated list of integers with the specified length.
-        - list[int]: The k smallest numbers found using heapq.
-
+    tuple: A tuple containing:
+        - dict: The processed dictionary with key "a" added.
+        - dict: A dictionary containing statistical properties (mean, median, mode).
+        - matplotlib.axes.Axes: The histogram plot of normalized values.
+    
     Requirements:
-    - heapq
-    - random
-
+    - numpy
+    - scipy
+    - sklearn.preprocessing
+    - matplotlib.pyplot
+    
     Example:
-    >>> random.seed(0)
-    >>> rand_list, least_k = task_func(3)
-    >>> least_k[0] in rand_list
-    True
-    >>> rand_list, least_k = task_func(3,5,100,100)
-    >>> print(least_k)
-    [100, 100, 100]
+    >>> data, stats, plot = task_func({'key': 5, 'another_key': 10})
+    >>> data
+    {'key': 5, 'another_key': 10, 'a': 1}
+    >>> stats
+    {'mean': 5.33, 'median': 5.0, 'mode': array([1])}
     """
-    numbers = [random.randint(min_value, max_value) for _ in range(list_length)]
-    heapq.heapify(numbers)
-    smallest_numbers = heapq.nsmallest(k, numbers)
-    return numbers, smallest_numbers
+    SCALER_RANGE = (0, 1)
+    data_dict.update(dict(a=1))
+    values = np.array(list(data_dict.values()))
+    mean = round(np.mean(values), 2)
+    median = np.median(values)
+    mode_value, _ = stats.mode(values)
+    scaler = MinMaxScaler(feature_range=SCALER_RANGE)
+    normalized_values = scaler.fit_transform(values.reshape(-1, 1))
+    fig, ax = plt.subplots()
+    ax.hist(normalized_values, bins=10, edgecolor='black')
+    ax.set_title("Histogram of Normalized Values")
+    ax.set_xlabel("Value")
+    ax.set_ylabel("Frequency")
+    return data_dict, {"mean": mean, "median": median, "mode": mode_value}, ax
 
 import unittest
-import random
+import doctest
 class TestCases(unittest.TestCase):
-    
-    def test_empty_list(self):
-        random.seed(0)
-        rand_list, least_k = task_func(0, 0)
-        self.assertEqual(rand_list, [])
-        self.assertEqual(least_k, [])
-    def test_k_larger_than_list_length(self):
-        random.seed(0)
-        rand_list, least_k = task_func(5, 10)
-        self.assertEqual(len(rand_list), 10)
-        self.assertEqual(len(least_k), 5)
-    def test_sorted_list(self):
-        random.seed(0)
-        rand_list, least_k = task_func(100, 3)
-        self.assertEqual(least_k, sorted(rand_list)[:3])
-    def test_least_k_sorted(self):
-        random.seed(0)
-        rand_list, least_k = task_func(100, 5, 100, 100)
-        self.assertEqual(least_k, sorted(least_k)[:5])
-    
-    def test_least_k_sorted_first(self):
-        random.seed(0)
-        rand_list, least_k = task_func(100, 5)
-        self.assertEqual(least_k[0], sorted(least_k)[0])
+    def test_case_1(self):
+        data_dict = {'key1': 2, 'key2': 4}
+        modified_data, stats, plot = task_func(data_dict)
+        self.assertEqual(modified_data, {'key1': 2, 'key2': 4, 'a': 1})
+        self.assertEqual(stats['mean'], 2.33)
+        self.assertEqual(stats['median'], 2.0)
+        self.assertEqual(stats['mode'], 1)
+        self.assertEqual(plot.get_title(), "Histogram of Normalized Values")
+        self.assertEqual(plot.get_xlabel(), "Value")
+        self.assertEqual(plot.get_ylabel(), "Frequency")
+    def test_case_2(self):
+        data_dict = {}
+        modified_data, stats, plot = task_func(data_dict)
+        self.assertEqual(modified_data, {'a': 1})
+        self.assertEqual(stats['mean'], 1.0)
+        self.assertEqual(stats['median'], 1.0)
+        self.assertEqual(stats['mode'], 1)
+        
+    def test_case_3(self):
+        data_dict = {'key1': 10, 'key2': 20, 'key3': 30}
+        modified_data, stats, plot = task_func(data_dict)
+        self.assertEqual(stats['mean'], 15.25)
+        self.assertEqual(stats['median'], 15.0)
+        self.assertEqual(stats['mode'], 1)
+        
+    def test_case_4(self):
+        data_dict = {'key1': -5, 'key2': -10}
+        modified_data, stats, plot = task_func(data_dict)
+        self.assertEqual(stats['mean'], -4.67)
+        self.assertEqual(stats['median'], -5.0)
+        self.assertEqual(stats['mode'], -10)
+        
+    def test_case_5(self):
+        data_dict = {'key1': 0, 'key2': 0, 'key3': 0, 'key4': 0}
+        modified_data, stats, plot = task_func(data_dict)
+        self.assertEqual(stats['mean'], 0.2)
+        self.assertEqual(stats['median'], 0.0)
+        self.assertEqual(stats['mode'], 0)

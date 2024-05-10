@@ -1,73 +1,63 @@
-import numpy as np
-from scipy import stats
-def task_func(word: str) -> np.ndarray:
+import binascii
+import io
+import gzip
+
+def task_func(compressed_hex):
     """
-    Calculate the difference between the ASCII values of each pair of adjacent letters in the input word.
-    After calculating the difference, calculate the entropy of the differences.
-    
-    Requirements:
-    - numpy
-    - scipy.stats
+    Uncompress a gzip-compressed hexadecimal string and decrypt the result to UTF-8.
     
     Parameters:
-    - word (str): The input word as a string.
+    - compressed_hex (str): The gzip-compressed hexadecimal string.
     
     Returns:
-    - np.ndarray: A numpy array containing the difference between the ASCII values of each pair of adjacent letters in the word.
-    - float: The entropy of the differences.
+    - decoded_string (str): The decoded and decompressed string in UTF-8 format, or an error message.
     
-    Examples:
-    >>> task_func('abcdef')
-    (array([1, 1, 1, 1, 1]), 1.6094379124341005)
-    >>> task_func('hello')
-    (array([-3,  7,  0,  3]), -inf)
+    Requirements:
+    - binascii
+    - io
+    - gzip
+    
+    Example:
+    >>> task_func('1f8b08000000000002ff0b49494e55560304000000ffff8b202d0b000000')
+    'Error during decompression: CRC check failed 0xff000000 != 0x41449975'
     """
-    if not word:  # Handling the case for empty string
-        return np.array([])
-    word_ascii_values = np.array([ord(x) for x in word])
-    difference = np.diff(word_ascii_values)
-    entropy = stats.entropy(difference)
-    return difference, entropy
+    try:
+        compressed_bytes = binascii.unhexlify(compressed_hex)
+        decompressed_bytes = gzip.GzipFile(fileobj=io.BytesIO(compressed_bytes)).read()
+        decoded_string = decompressed_bytes.decode('utf-8')
+        return decoded_string
+    except gzip.BadGzipFile as e:
+        return "Error during decompression: " + str(e)
 
 import unittest
+import binascii
+import io
+import gzip
+def generate_compressed_hex(original_string):
+    """
+    Helper function to generate a gzip-compressed hexadecimal string from an original string.
+    """
+    compressed_bytes = gzip.compress(original_string.encode('utf-8'))
+    compressed_hex = binascii.hexlify(compressed_bytes).decode('utf-8')
+    return compressed_hex
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        result = task_func('abcdef')
-        expected_diff = np.array([1, 1, 1, 1, 1])
-        np.testing.assert_array_equal(result[0], expected_diff)
-        self.assertEqual(result[1], 1.6094379124341005)
-        
-    def test_case_2(self):
-        result = task_func('hell')
-        expected_diff = np.array([-3, 7, 0])
-        np.testing.assert_array_equal(result[0], expected_diff)
-        self.assertEqual(result[1], -np.inf)
-        
-    def test_case_3(self):
-        result = task_func('az')
-        expected_diff = np.array([25])
-        np.testing.assert_array_equal(result[0], expected_diff)
-        self.assertEqual(result[1], 0.0)
-        
-    def test_case_4(self):
-        result = task_func('a')
-        expected_diff = np.array([])
-        np.testing.assert_array_equal(result[0], expected_diff)
-        self.assertEqual(result[1], 0.0)
-        
-    def test_case_5(self):
-        result = task_func('i love Python')
-        expected_diff = np.array([-73,  76,   3,   7, -17, -69,  48,  41,  -5, -12,   7,  -1])
-        np.testing.assert_array_equal(result[0], expected_diff)
-        self.assertEqual(result[1], -np.inf)
-        
-    def test_case_6(self):
-        result = task_func('Za')
-        expected_diff = np.array([7])
-        np.testing.assert_array_equal(result[0], expected_diff)
-        self.assertEqual(result[1], 0.0)
-    def test_case_7(self):
-        result = task_func('racecar')
-        expected_diff = np.array([-17, 2, 2, -2, -2, 17])
-        np.testing.assert_array_equal(result[0], expected_diff)
-        self.assertEqual(result[1], -np.inf)
+    def test_1(self):
+        # Test with the word "HELLO"
+        compressed_hex = generate_compressed_hex("HELLO")
+        self.assertEqual(task_func(compressed_hex), "HELLO")
+    def test_2(self):
+        # Test with a single character "A"
+        compressed_hex = generate_compressed_hex("A")
+        self.assertEqual(task_func(compressed_hex), "A")
+    def test_3(self):
+        # Test with numbers "12345"
+        compressed_hex = generate_compressed_hex("12345")
+        self.assertEqual(task_func(compressed_hex), "12345")
+    def test_4(self):
+        # Test with special characters "!@#"
+        compressed_hex = generate_compressed_hex("!@#")
+        self.assertEqual(task_func(compressed_hex), "!@#")
+    def test_5(self):
+        # Test with an empty string
+        compressed_hex = generate_compressed_hex("")
+        self.assertEqual(task_func(compressed_hex), "")

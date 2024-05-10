@@ -1,71 +1,98 @@
 import pandas as pd
-import numpy as np
+import random
 
-def task_func(d):
+
+def task_func(dictionary, item, seed):
     """
-    Calculate mean, sum, max, min and standard deviation for the keys "x," "y" and "z" from a list of dictionaries "d."
-    
+    Converts a dictionary to a pandas DataFrame and find the locations of a particular item in the resulting DataFrame.
+    Counts the number of occurences and adds a random integer x, where 0 <=x < 10, to it.
+
     Parameters:
-    d (list): A list of dictionaries.
+    dict (dictionary): The dictionary to search.
+    item (str): The item to find.
+    seed(int): seed for random number generation.
 
     Returns:
-    dict: A dictionary with keys as 'x', 'y', and 'z' and values as dictionaries of statistics.
-
-    Raises:
-    - ValueError: If input is not a list of dictionaries.
+    list: A list of tuples. Each tuple contains the row-index and column-name where the item is found.
+    int: The number of occurences with the added random number.
+    DataFrame: The converted dictionary.
 
     Requirements:
     - pandas
-    - numpy
+    - random
 
-    Examples:
-    >>> data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
-    >>> task_func(data)
-    {'x': {'mean': 2.0, 'sum': 6, 'max': 3, 'min': 1, 'std': 0.816496580927726}, 'y': {'mean': 8.666666666666666, 'sum': 26, 'max': 15, 'min': 1, 'std': 5.792715732327589}, 'z': {'mean': 6.0, 'sum': 18, 'max': 7, 'min': 5, 'std': 0.816496580927726}}
-    >>> task_func([])
-    {'x': None, 'y': None, 'z': None}
-    >>> task_func([{'a': 1}])
-    {'x': None, 'y': None, 'z': None}
+    Example:
+    >>> dict = {'A': ['apple', 'banana'], 'B': ['orange', 'apple']}
+    >>> task_func(dict, 'apple', seed=12)
+    ([(0, 'A'), (1, 'B')], 9,         A       B
+    0   apple  orange
+    1  banana   apple)
+    
+    >>> dict = {'A': ['a', 'b', 'e'], 'B': ['c', 'd', 'd'], '2': ['asdf', 'ddd', 'aaaa'], '12': ['e', 'e', 'd']}
+    >>> task_func(dict, 'e', seed=2)
+    ([(2, 'A'), (0, '12'), (1, '12')], 3,    A  B     2 12
+    0  a  c  asdf  e
+    1  b  d   ddd  e
+    2  e  d  aaaa  d)
     """
-    if not isinstance(d, list) or any(not isinstance(item, dict) for item in d):
-        raise ValueError("Input must be a list of dictionaries.")
-    if not d:
-        return {key: None for key in ['x', 'y', 'z']}
-    df = pd.DataFrame(d).fillna(0)  # Replace missing values with 0 to allow computations
-    stats = {}
-    for key in ['x', 'y', 'z']:
-        if key in df.columns:
-            stats[key] = {
-                'mean': np.mean(df[key]),
-                'sum': np.sum(df[key]),
-                'max': np.max(df[key]),
-                'min': np.min(df[key]),
-                'std': np.std(df[key], ddof=0)  # Population standard deviation
-            }
-        else:
-            stats[key] = None
-    return stats
+    random.seed(seed)
+    random_int = random.randint(0, 9)
+    df = pd.DataFrame(dictionary)
+    positions = [(index, col) for col in df for index, val in enumerate(df[col]) if val == item]
+    return positions, len(positions) + random_int , df
 
-# Test suite
 import unittest
+import pandas as pd
+from faker import Faker
+fake = Faker()
 class TestCases(unittest.TestCase):
-    def test_empty_list(self):
-        self.assertEqual(task_func([]), {'x': None, 'y': None, 'z': None})
-    def test_valid_input(self):
-        data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
-        result = task_func(data)
-        self.assertAlmostEqual(result['x']['mean'], 2.0)
-        self.assertAlmostEqual(result['y']['mean'], 8.666666666666666)
-        self.assertAlmostEqual(result['z']['mean'], 6.0)
-    def test_invalid_input_type(self):
-        with self.assertRaises(ValueError):
-            task_func("not a list")
-    def test_partial_keys(self):
-        data = [{'x': 1, 'y': 2}, {'y': 3, 'z': 4}]
-        result = task_func(data)
-        self.assertIsNotNone(result['x'])
-        self.assertIsNotNone(result['y'])
-        self.assertIsNotNone(result['z'])
-    def test_all_keys_missing(self):
-        data = [{'a': 1}, {'b': 2}]
-        self.assertEqual(task_func(data), {'x': None, 'y': None, 'z': None})
+    
+    def test_case_1(self):
+        # Simple dict
+        dictionary = {'A': ['apple', 'banana'], 'B': ['orange', 'apple']}
+        result, count, df = task_func(dictionary, 'apple', 2222)
+        expected_result = [(0, 'A'), (1, 'B')]
+        self.assertCountEqual(result, expected_result)
+        self.assertEqual(count, 5)
+        pd.testing.assert_frame_equal(pd.DataFrame(dictionary), df)
+    def test_case_2(self):
+        # No occurrence of the item
+        dictionary = {'A': ['orange', 'banana'], 'B': ['orange', 'banana']}
+        result, count, df = task_func(dictionary, 'apple', seed=12)
+        expected_result = []
+        self.assertCountEqual(result, expected_result)
+        self.assertEqual(count, 7)
+        pd.testing.assert_frame_equal(pd.DataFrame(dictionary), df)
+    def test_case_3(self):
+        # Larger dict
+        fake.random.seed(111)
+        dictionary = {
+            'A': [fake.random_element(elements=('apple', 'banana', 'orange')) for _ in range(10)],
+            'B': [fake.random_element(elements=('apple', 'banana', 'orange')) for _ in range(10)],
+            'C': [fake.random_element(elements=('apple', 'banana', 'orange')) for _ in range(10)]
+        }
+        result, count, df = task_func(dictionary, 'apple', seed=22)
+        expected_result = [(index, col) for col in df for index, val in enumerate(df[col]) if val == 'apple']
+        self.assertCountEqual(result, expected_result)
+        self.assertEqual(count, 10)
+        pd.testing.assert_frame_equal(pd.DataFrame(dictionary), df)
+    
+    def test_case_4(self):
+        # Empty dict
+        dictionary = {}
+        result, count, df = task_func(dictionary, 'apple', seed=112)
+        expected_result = []
+        self.assertCountEqual(result, expected_result)
+        self.assertEqual(count, 7)
+        pd.testing.assert_frame_equal(pd.DataFrame(dictionary), df)
+    def test_case_5(self):
+        # dict with non-string values
+        dictionary = {
+            'A': [1, 2, 3, 4, 5],
+            'B': [2, 3, 4, 5, 6]
+        }
+        result, count, df = task_func(dictionary, 3, seed=32)
+        expected_result = [(2, 'A'), (1, 'B')]
+        self.assertCountEqual(result, expected_result)
+        self.assertEqual(count, 3)
+        pd.testing.assert_frame_equal(pd.DataFrame(dictionary), df)

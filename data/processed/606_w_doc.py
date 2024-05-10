@@ -1,55 +1,65 @@
 import pandas as pd
-import numpy as np
+import matplotlib.pyplot as plt
 
-def task_func(data, cols):
+def task_func(matrix):
     """
-    Turn the provided data into a DataFrame and then calculate the correlation matrix of numeric columns.
+    Visualize a 2D numeric array (matrix) as a heatmap using matplotlib, specifying a cmap for the color mapping
+    and interpolation to control the pixel rendering.
     
     Parameters:
-    - data (list): List of lists with the data, where the length of the inner list equals the number of columns
-    - cols (list): List of column names
+    matrix (array): The 2D numpy array.
     
     Returns:
-    - correlation_matrix (pd.DataFrame): The correlation matrix.
-
+    ax (matplotlib.axes._axes.Axes): The Axes object with the heatmap.
+    
     Requirements:
     - pandas
-    - numpy
+    - matplotlib.pyplot
     
     Example:
-    >>> correlation_matrix = task_func([[5.1, 3.5, 1.4], [4.9, 3.0, 1.4], [4.7, 3.2, 1.3]], ['x', 'y', 'z'])
-    >>> print(correlation_matrix)
-              x         y         z
-    x  1.000000  0.596040  0.866025
-    y  0.596040  1.000000  0.114708
-    z  0.866025  0.114708  1.000000
+    >>> import numpy as np
+    >>> matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    >>> ax = task_func(matrix)
     """
-    df = pd.DataFrame(data, columns=cols)
-    df_np = np.array(df)
-    df = pd.DataFrame(df_np, columns=cols)
-    correlation_matrix = df.corr()
-    return correlation_matrix
+    df = pd.DataFrame(matrix)
+    fig, ax = plt.subplots()
+    ax.imshow(df, cmap='hot', interpolation='nearest')
+    return ax
 
 import unittest
+import numpy as np
+import matplotlib
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = pd.DataFrame([[5.1, 3.5, 1.4], [4.9, 3.0, 1.4], [4.7, 3.2, 1.3]], columns = ['x', 'y', 'z'])
-        correlation_matrix = task_func([[5.1, 3.5, 1.4], [4.9, 3.0, 1.4], [4.7, 3.2, 1.3]], ['x', 'y', 'z'])
-        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
+        matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        ax = task_func(matrix)
+        
+        # Asserting the return type
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        
+        # Asserting the colormap used
+        self.assertEqual(ax.images[0].get_cmap().name, 'hot')
     def test_case_2(self):
-        df = pd.DataFrame([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], columns = ['x', 'y', 'z'])
-        correlation_matrix = task_func([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], ['x', 'y', 'z'])
-        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
+        matrix = np.array([[10, 20], [30, 40]])
+        ax = task_func(matrix)
+        
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        self.assertEqual(ax.images[0].get_cmap().name, 'hot')
     def test_case_3(self):
-        df = pd.DataFrame([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]], columns = ['x', 'y', 'z'])
-        correlation_matrix = task_func([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]], ['x', 'y', 'z'])
-        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
-    
+        matrix = np.array([[1, 1], [1, 1], [1, 1]])
+        ax = task_func(matrix)
+        
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        self.assertEqual(ax.images[0].get_cmap().name, 'hot')
     def test_case_4(self):
-        df = pd.DataFrame([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0]], columns = ['x', 'y', 'z'])
-        correlation_matrix = task_func([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0]], ['x', 'y', 'z'])
-        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
+        matrix = np.array([[1]])
+        ax = task_func(matrix)
+        
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        self.assertEqual(ax.images[0].get_cmap().name, 'hot')
     def test_case_5(self):
-        df = pd.DataFrame([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0], [-7.0, -8.0, -9.0]], columns = ['x', 'y', 'z'])
-        correlation_matrix = task_func([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0], [-7.0, -8.0, -9.0]], ['x', 'y', 'z'])
-        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
+        matrix = np.random.rand(5, 5)  # Random 5x5 matrix
+        ax = task_func(matrix)
+        
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        self.assertEqual(ax.images[0].get_cmap().name, 'hot')

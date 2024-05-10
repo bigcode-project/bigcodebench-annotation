@@ -1,92 +1,71 @@
-import tensorflow as tf
-from sklearn.model_selection import KFold
-from sklearn.preprocessing import MinMaxScaler
+import pandas as pd
+import random
+from scipy import stats
 
-def task_func(X, y, n_splits, batch_size, epochs):
+def task_func(n_data_points=5000, min_value=0.0, max_value=10.0):
     """
-    Trains a simple neural network on provided data using k-fold cross-validation.
-    The network has one hidden layer with 50 neurons and ReLU activation, and
-    an output layer with sigmoid activation for binary classification.
-
+    Generate a random dataset of floating-point numbers within a specified range, 
+    truncate each value to 3 decimal places, and calculate statistical measures (mean, median, mode) of the data.
+    
     Parameters:
-        X (numpy.array): The input data.
-        y (numpy.array): The target data.
-        n_splits (int): The number of splits for k-fold cross-validation. Default is 5.
-        batch_size (int): The size of the batch used during training. Default is 32.
-        epochs (int): The number of epochs for training the model. Default is 10.
+    n_data_points (int): Number of data points to generate. Default is 5000.
+    min_value (float): Minimum value range for data points. Default is 0.0.
+    max_value (float): Maximum value range for data points. Default is 10.0.
 
     Returns:
-        list: A list containing the training history of the model for each fold. Each history
-              object includes training loss and accuracy.
-
+    dict: A dictionary with keys 'mean', 'median', 'mode' and their corresponding calculated values.
+    
     Requirements:
-    - tensorflow
-    - sklearn.model_selection.KFold
-    - sklearn.preprocessing.MinMaxScaler
+    - pandas
+    - random
+    - scipy.stats
 
-    Examples:
-    >>> import numpy as np
-    >>> X = np.random.rand(100, 10)
-    >>> y = np.random.randint(0, 2, 100)
-    >>> history = task_func(X, y, 5, 32, 1)
-    >>> isinstance(history, list)
-    True
-    >>> len(history)
-    5
-    >>> all('loss' in hist.history.keys() for hist in history)
-    True
+    Example:
+    >>> random.seed(0)
+    >>> stats = task_func(1000, 5.0, 5.0)
+    >>> print(stats)
+    {'mean': 5.0, 'median': 5.0, 'mode': 5.0}
     """
-    scaler = MinMaxScaler()
-    X_scaled = scaler.fit_transform(X)
-    kf = KFold(n_splits=n_splits)
-    history = []
-    for train_index, test_index in kf.split(X_scaled):
-        X_train, X_test = X_scaled[train_index], X_scaled[test_index]
-        y_train, y_test = y[train_index], y[test_index]
-        model = tf.keras.models.Sequential([
-            tf.keras.layers.Dense(50, activation='relu'),
-            tf.keras.layers.Dense(1, activation='sigmoid')
-        ])
-        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        hist = model.fit(X_train, y_train, validation_data=(X_test, y_test), batch_size=batch_size, epochs=epochs, verbose=0)
-        history.append(hist)
-    return history
+    data = [round(random.uniform(min_value, max_value), 3) for _ in range(n_data_points)]
+    data_df = pd.DataFrame(data, columns=['Value'])
+    mean = data_df['Value'].mean()
+    median = data_df['Value'].median()
+    mode = stats.mode(data_df['Value'].values)[0][0]
+    return {'mean': mean, 'median': median, 'mode': mode}
 
 import unittest
-import numpy as np
-import tensorflow as tf
+import random
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Common setup for all tests
-        self.X = np.random.rand(100, 10)
-        self.y = np.random.randint(0, 2, 100)
-        self.n_splits = 5
-        self.batch_size = 32
-        self.epochs = 10
-    def test_return_type(self):
-        """Test that the function returns a list."""
-        result = task_func(self.X, self.y, self.n_splits, self.batch_size, self.epochs)
-        self.assertIsInstance(result, list)
-    def test_history_length_with_default_splits(self):
-        """Test the length of the history list matches the number of splits."""
-        result = task_func(self.X, self.y, self.n_splits, self.batch_size, self.epochs)
-        self.assertEqual(len(result), self.n_splits)
-    def test_training_metrics_inclusion(self):
-        """Test that key metrics are included in the training history."""
-        result = task_func(self.X, self.y, self.n_splits, self.batch_size, self.epochs)
-        self.assertTrue(all('accuracy' in hist.history for hist in result))
-    def test_effect_of_different_n_splits(self):
-        """Test function behavior with different values of n_splits."""
-        for n_splits in [3, 7]:
-            result = task_func(self.X, self.y, n_splits, self.batch_size, self.epochs)
-            self.assertEqual(len(result), n_splits)
-    def test_effect_of_different_batch_sizes(self):
-        """Test function behavior with different batch sizes."""
-        for batch_size in [16, 64]:
-            result = task_func(self.X, self.y, self.n_splits, batch_size, self.epochs)
-            self.assertEqual(len(result), self.n_splits)  # Validating function execution
-    def test_effect_of_different_epochs(self):
-        """Test function behavior with different epochs."""
-        for epochs in [5, 20]:
-            result = task_func(self.X, self.y, self.n_splits, self.batch_size, epochs)
-            self.assertEqual(len(result), self.n_splits)  # Validating function execution
+    def test_default_parameters(self):
+        random.seed(0)
+        result = task_func()
+        self.assertIn('mean', result)
+        self.assertIn('median', result)
+        self.assertIn('mode', result)
+    def test_custom_range(self):
+        random.seed(0)
+        result = task_func(1000, 1.0, 5.0)
+        self.assertGreaterEqual(result['mean'], 1.0)
+        self.assertLessEqual(result['mean'], 5.0)
+        self.assertGreaterEqual(result['median'], 1.0)
+        self.assertLessEqual(result['median'], 5.0)
+        self.assertGreaterEqual(result['mode'], 1.0)
+        self.assertLessEqual(result['mode'], 5.0)
+    def test_small_dataset(self):
+        random.seed(0)
+        result = task_func(10, 2.0, 2.0)
+        self.assertEqual(result['mean'], 2.0)
+        self.assertEqual(result['median'], 2.0)
+        self.assertEqual(result['mode'], 2.0)
+    def test_large_dataset(self):
+        random.seed(0)
+        result = task_func(10000, 0.0, 100.0)
+        self.assertTrue(0.0 <= result['mean'] <= 100.0)
+        self.assertTrue(0.0 <= result['median'] <= 100.0)
+        self.assertTrue(0.0 <= result['mode'] <= 100.0)
+    def test_single_value_range(self):
+        random.seed(0)
+        result = task_func(100, 5.0, 5.0)
+        self.assertEqual(result['mean'], 5.0)
+        self.assertEqual(result['median'], 5.0)
+        self.assertEqual(result['mode'], 5.0)

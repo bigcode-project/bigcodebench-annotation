@@ -1,55 +1,110 @@
-import base64
-import os
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm
 
-
-def task_func():
+def task_func(mu=0, sigma=1):
     """
-    Generates a random float number, converts it to a hexadecimal string,
-    and then encodes this hexadecimal representation in base64.
+    Draw and return a subplot of a normal distribution with the given mean and standard deviation,
+    utilizing numpy's linspace to create an array of 100 linearly spaced numbers between
+    `mu - 3*sigma` and `mu + 3*sigma`.
+
+    Parameters:
+    mu (float): The mean of the distribution. Default is 0.
+    sigma (float): The standard deviation of the distribution. Default is 1.
 
     Returns:
-        str: The base64 encoded string of the hexadecimal representation of a random float.
+    matplotlib.axes.Axes: The subplot representing the normal distribution.
 
     Requirements:
-        - os
-        - base64
+    - numpy
+    - matplotlib.pyplot
+    - scipy.stats.norm
 
     Example:
-    >>> example_output = task_func()
-    >>> isinstance(example_output, str)
-    True
-    >>> len(example_output) > 0
-    True
+    >>> ax = task_func(mu=5, sigma=2)
+    >>> ax
+    <Axes: >
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    float_bytes = os.urandom(4)
-    encoded_str = base64.b64encode(float_bytes)
-    return encoded_str.decode()
+    x = np.linspace(mu - 3 * sigma, mu + 3 * sigma, 100)
+    y = norm.pdf(x, mu, sigma)
+    fig, ax = plt.subplots()
+    ax.plot(x, y)
+    return ax
 
-import string
 import unittest
-import binascii
+import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_return_type(self):
-        """Test that the return type is a string."""
-        self.assertIsInstance(task_func(), str)
-    def test_non_empty_output(self):
-        """Test that the output is not an empty string."""
-        self.assertTrue(len(task_func()) > 0)
-    def test_base64_encoding(self):
-        """Test that the output is correctly base64 encoded."""
-        output = task_func()
-        try:
-            decoded_bytes = base64.b64decode(output)
-            # If decoding succeeds, output was correctly base64 encoded.
-            is_base64 = True
-        except binascii.Error:
-            # Decoding failed, output was not correctly base64 encoded.
-            is_base64 = False
-        self.assertTrue(is_base64, "Output should be a valid base64 encoded string.")
-    def test_output_variability(self):
-        """Test that two consecutive calls to the function produce different outputs."""
-        self.assertNotEqual(task_func(), task_func())
-    def test_string_representation(self):
-        """Test that the output can be represented as ASCII string."""
-        output = task_func()
-        self.assertTrue(all(c in string.ascii_letters + string.digits + '+/=' for c in output))
+    def test_case_1(self):
+        # Test default parameters
+        ax = task_func()
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        self.assertAlmostEqual(x[np.argmax(y)], 0, delta=0.1)
+        self.assertTrue(min(x) >= -3 and max(x) <= 3)
+    def test_case_2(self):
+        # Test positive mu and sigma with manual calculation
+        ax = task_func(mu=5, sigma=2)
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        expected_min, expected_max = 5 - 3 * 2, 5 + 3 * 2
+        self.assertAlmostEqual(min(x), expected_min, delta=0.1)
+        self.assertAlmostEqual(max(x), expected_max, delta=0.1)
+    def test_case_3(self):
+        # Test negative mu and small sigma
+        ax = task_func(mu=-3, sigma=0.5)
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        self.assertAlmostEqual(x[np.argmax(y)], -3, delta=0.1)
+        self.assertTrue(min(x) >= -3 - 1.5 and max(x) <= -3 + 1.5)
+    def test_case_4(self):
+        # Test large mu and sigma
+        mu, sigma = 1e6, 1e5
+        ax = task_func(mu=mu, sigma=sigma)
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        self.assertTrue(
+            len(x) > 0 and len(y) > 0,
+            "Plot data should not be empty even for large mu and sigma.",
+        )
+    def test_case_5(self):
+        # Test negative mu
+        ax = task_func(mu=-5, sigma=4)
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        self.assertAlmostEqual(x[np.argmax(y)], -5, delta=0.15)
+        self.assertTrue(min(x) >= -5 - 12 and max(x) <= -5 + 12)
+    def test_case_6(self):
+        # Test the function with a sigma of 0, which might represent a degenerate distribution
+        ax = task_func(mu=0, sigma=0)
+        lines = ax.get_lines()
+        self.assertEqual(
+            len(lines),
+            1,
+            "Plot should contain exactly one line for a degenerate distribution.",
+        )
+    def test_case_7(self):
+        # Test the function with extremely large values of mu and sigma to ensure it doesn't break
+        ax = task_func(mu=1e6, sigma=1e5)
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        self.assertTrue(
+            len(x) > 0 and len(y) > 0,
+            "Plot data should not be empty even for large mu and sigma.",
+        )
+    def test_case_8(self):
+        # Test the function with a very small positive sigma to check narrow distributions
+        ax = task_func(mu=0, sigma=1e-5)
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        # Checking that the plot peak is at mu and sigma affects the curve's spread.
+        self.assertAlmostEqual(
+            x[np.argmax(y)],
+            0,
+            delta=1e-5,
+            msg="Peak of the distribution should be at mu.",
+        )
+    def tearDown(self):
+        plt.close("all")

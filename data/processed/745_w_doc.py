@@ -1,81 +1,114 @@
-import re
-from nltk.stem import PorterStemmer
+import nltk
+from string import punctuation
+import pandas as pd
 
-def task_func(text_series):
+
+def task_func(text):
     """
-    Process a pandas Series of text data by lowercasing all letters, removing non-alphanumeric 
-    characters (except spaces), removing punctuation, and stemming each word to its root form.
-    
-    Stemming is done using the NLTK's PorterStemmer, which applies a series of rules to find the stem of each word.
-    
-    Parameters:
-    - text_series (pandas.Series): A Series object containing string entries representing text data.
+    Finds all words in a text, that are seperated by whitespace, 
+    beginning with the "$" character and computes their number of occurences.
 
-    Requirements:
-    - re
-    - nltk
+    Parameters:
+    text (str): The input text.
 
     Returns:
-    - pandas.Series: A Series where each string has been processed to remove non-alphanumeric characters,
-      punctuation, converted to lowercase, and where each word has been stemmed.
-    
-    Examples:
-    >>> input_series = pd.Series(["This is a sample text.", "Another example!"])
-    >>> output_series = task_func(input_series)
-    >>> print(output_series.iloc[0])
-    thi is a sampl text
-    >>> print(output_series.iloc[1])
-    anoth exampl
+    DataFrame: A pandas DataFrame with two columns: "Word" and "Frequency". 
+               "Word" contains the '$' prefixed words, and "Frequency" contains their occurrences.
 
+               
+    Raises:
+    ValueError: if text is not a string
+    
+    Requirements:
+    - nltk
+    - string
+    - pandas
+
+    Note:
+    The function ignores words that are entirely made up of punctuation, even if they start with a '$'.
+
+    Example:
+    >>> text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
+    >>> task_func(text)
+       Word  Frequency
+    0  $abc          3
+    1  $efg          1
+    2  $hij          3
+
+    >>> text = "$hello this i$s a $test $test $test"
+    >>> task_func(text)
+         Word  Frequency
+    0  $hello          1
+    1   $test          3
     """
-    stemmer = PorterStemmer()
-    def process_text(text):
-        text = re.sub('[^\sa-zA-Z0-9]', '', text).lower().strip()
-        text = " ".join([stemmer.stem(word) for word in text.split()])
-        return text
-    return text_series.apply(process_text)
+    if not isinstance(text, str):
+        raise ValueError("The input should be a string.")
+    tk = nltk.WhitespaceTokenizer()
+    words = tk.tokenize(text)    
+    dollar_words = [word for word in words if word.startswith('$') and not all(c in set(punctuation) for c in word)]
+    freq = nltk.FreqDist(dollar_words)
+    df = pd.DataFrame(list(freq.items()), columns=["Word", "Frequency"])
+    return df
 
 import unittest
-import pandas as pd
 class TestCases(unittest.TestCase):
+    def test_case_1(self):
+        text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
+        result = task_func(text)
+        expected_words = ["$abc", "$efg", "$hij"]
+        expected_freqs = [3, 1, 3]
+        self.assertListEqual(result["Word"].tolist(), expected_words)
+        self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
+    def test_case_2(self):
+        text = "This is a test without dollar words."
+        result = task_func(text)
+        self.assertEqual(len(result), 0)
+    def test_case_3(self):
+        text = "$test1 $test2 $test1 $test3"
+        result = task_func(text)
+        expected_words = ["$test1", "$test2", "$test3"]
+        expected_freqs = [2, 1, 1]
+        self.assertListEqual(result["Word"].tolist(), expected_words)
+        self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
+    def test_case_4(self):
+        text = "$! $$ $a $a $a"
+        result = task_func(text)
+        expected_words = ["$a"]
+        expected_freqs = [3]
+        self.assertListEqual(result["Word"].tolist(), expected_words)
+        self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
+    def test_case_5(self):
+        text = "$word1 word2 $word2 $word1 $word3 $word1"
+        result = task_func(text)
+        expected_words = ["$word1", "$word2", "$word3"]
+        expected_freqs = [3, 1, 1]
+        self.assertListEqual(result["Word"].tolist(), expected_words)
+        self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
+    def test_case_6(self):
+        '''empty input string'''
+        text = ""
+        result = task_func(text)
+        expected_words = []
+        expected_freqs = []
+        self.assertListEqual(result["Word"].tolist(), expected_words)
+        self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
     
-    def test_lowercase_and_stemming(self):
-        """
-        Test case to ensure that all text is converted to lowercase and words are stemmed properly.
-        """
-        input_series = pd.Series(["THIS IS A TEST.", "Test, case number 2!"])
-        expected_output = pd.Series(["thi is a test", "test case number 2"])
-        processed_series = task_func(input_series)
-        pd.testing.assert_series_equal(processed_series, expected_output)
-    def test_numerics_and_special_characters(self):
-        """
-        Test case to verify that numeric characters are retained and special characters are removed.
-        """
-        input_series = pd.Series(["Another Test 123.", "456 Anoth3r one!"])
-        expected_output = pd.Series(["anoth test 123", "456 anoth3r one"])
-        processed_series = task_func(input_series)
-        pd.testing.assert_series_equal(processed_series, expected_output)
-    def test_empty_strings(self):
-        """
-        Test case to check the function's handling of empty strings.
-        """
-        input_series = pd.Series(["", " "])
-        expected_output = pd.Series(["", ""])
-        processed_series = task_func(input_series)
-        pd.testing.assert_series_equal(processed_series, expected_output)
-    def test_punctuation(self):
-        """
-        Test case to check that punctuation is removed from the text.
-        """
-        input_series = pd.Series(["Punctuation! Should, be: removed; right?"])
-        expected_output = pd.Series(["punctuat should be remov right"])
-        processed_series = task_func(input_series)
-        pd.testing.assert_series_equal(processed_series, expected_output)
-    def test_stemconsistency(self):
-        """
-        Test case to ensure that stemming is consistent across different forms of words.
-        """
-        input_series = pd.Series(["Stemming should work on words like running", "stemmed works on stemmed"])
-        expected_output = pd.Series(["stem should work on word like run", "stem work on stem"])
-        processed_series = task_func(input_series)
-        pd.testing.assert_series_equal(processed_series, expected_output)
+    def test_case_7(self):
+        '''check for correct return type'''
+        text = "$test 123 abcd.aef"
+        result = task_func(text)
+        self.assertTrue(isinstance(result, pd.DataFrame))
+        self.assertTrue('Word' in result.columns)
+        self.assertTrue('Frequency' in result.columns)
+    def test_case_8(self):
+        '''word with $ in the middle'''
+        text = "asdfj;alskdfj;$kjhkjhdf"
+        result = task_func(text)
+        expected_words = []
+        expected_freqs = []
+        self.assertListEqual(result["Word"].tolist(), expected_words)
+        self.assertListEqual(result["Frequency"].tolist(), expected_freqs)
+    def test_case_9(self):
+        '''non string input'''
+        input = 24
+        self.assertRaises(Exception, task_func, input)

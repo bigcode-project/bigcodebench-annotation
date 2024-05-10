@@ -1,84 +1,83 @@
 import numpy as np
-import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
+import pandas as pd
 
 
-def task_func(arr):
+def task_func(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Plots a heatmap of a given 2D numerical array and prints the sum of each row.
-    The heatmap's color range is set based on the minimum and maximum values in the array.
+    Computes the MinMax-normalized cumulative sum for each numeric column in the given DataFrame.
 
     Parameters:
-    arr (numpy.array): A 2D numpy array of numerical values.
+    - df (pandas.DataFrame): The input DataFrame containing numerical values.
 
     Returns:
-    ax (matplotlib.axes.Axes): The Axes object with the plotted heatmap.
+    - pd.DataFrame: A DataFrame where each column contains the normalized cumulative sum of the
+                    respective column in the input DataFrame, retaining the original column names.
+
+    Raises:
+    - TypeError: If the DataFrame contains non-numeric data types.
+    - ValueError: If the DataFrame is empty or contains NaN values.
 
     Requirements:
+    - pandas
     - numpy
-    - seaborn
-
-    Note:
-    The function calculates the sum of each row and prints these values.
-    The heatmap is plotted based on the original array with its color range set from the minimum to the maximum value in the array.
+    - sklearn
 
     Example:
-    >>> arr = np.array([[i + j for i in range(3)] for j in range(5)])
-    >>> ax = task_func(arr)
-    >>> ax.get_title()
-    'Heatmap of the 2D Array'
+    >>> input_df = pd.DataFrame({'A': [1, 2, 3], 'B': [3, 2, 1]})
+    >>> output_df = task_func(input_df)
+    >>> type(output_df)
+    <class 'pandas.core.frame.DataFrame'>
+    >>> output_df
+         A         B
+    0  0.0  0.000000
+    1  0.4  0.666667
+    2  1.0  1.000000
     """
-    row_sums = arr.sum(axis=1)
-    vmax = np.max(arr)  # Set vmax to the maximum value in the array
-    vmin = np.min(arr)  # Set vmin to the minimum value in the array
-    ax = sns.heatmap(
-        arr, annot=True, vmax=vmax, vmin=vmin
-    )  # Include both vmin and vmax in the heatmap call
-    ax.set_title("Heatmap of the 2D Array")
-    return ax
+    if df.select_dtypes(include=np.number).shape[1] != df.shape[1]:
+        raise TypeError("Input DataFrame contains non-numeric data types.")
+    if df.empty or df.isnull().values.any():
+        raise ValueError("Input DataFrame is empty or contains NaN values.")
+    df_cumsum = df.cumsum()
+    scaler = MinMaxScaler()
+    df_norm_cumsum = pd.DataFrame(scaler.fit_transform(df_cumsum), columns=df.columns)
+    return df_norm_cumsum
 
 import unittest
+import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for the function task_func."""
-    def tearDown(self):
-        plt.clf()
-    def test_scenario_1(self):
-        """Scenario 1: Testing with a 2D array created by adding row and column indices."""
-        arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        expected_vmax = np.max(arr)  # Calculate the expected vmax
-        ax = task_func(arr)
-        self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
-        self.assertEqual(ax.collections[0].colorbar.vmax, expected_vmax)
-    def test_scenario_2(self):
-        """Scenario 2: Testing with a 2D array where each column has identical values based on the column index."""
-        arr = np.array([[i for i in range(3)] for j in range(5)])
-        expected_vmax = np.max(arr)  # Calculate the expected vmax
-        ax = task_func(arr)
-        self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
-        self.assertEqual(ax.collections[0].colorbar.vmax, expected_vmax)
-    def test_scenario_3(self):
-        """Scenario 3: Testing with a 2D array where each row has identical values based on the row index."""
-        arr = np.array([[j for i in range(3)] for j in range(5)])
-        expected_vmax = np.max(arr)  # Calculate the expected vmax
-        ax = task_func(arr)
-        self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
-        self.assertEqual(ax.collections[0].colorbar.vmax, expected_vmax)
-    def test_scenario_4(self):
-        """Scenario 4: Testing with a 2D array of zeros."""
-        arr = np.zeros((5, 3))
-        expected_vmax = np.max(arr)  # Calculate the expected vmax
-        ax = task_func(arr)
-        self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
-        self.assertAlmostEqual(
-            ax.collections[0].colorbar.vmax, expected_vmax, delta=0.2
+    def check_cumsum_and_scaling(self, input_df, expected_output):
+        output = task_func(input_df)
+        pd.testing.assert_frame_equal(
+            output, expected_output, check_dtype=False, atol=1e-5
         )
-    def test_scenario_5(self):
-        """Scenario 5: Testing with a 2D array of ones."""
-        arr = np.ones((5, 3))
-        expected_vmax = np.max(arr)  # Calculate the expected vmax
-        ax = task_func(arr)
-        self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
-        self.assertAlmostEqual(
-            ax.collections[0].colorbar.vmax, expected_vmax, delta=0.2
-        )
+    def test_incremental_values(self):
+        before = pd.DataFrame({"A": [1, 2, 3], "B": [3, 2, 1]})
+        after = pd.DataFrame({"A": [0.0, 0.4, 1.0], "B": [0.0, 0.66666667, 1.0]})
+        self.check_cumsum_and_scaling(before, after)
+        self.assertEqual(set(before.columns), set(after.columns))
+    def test_negative_numbers(self):
+        before = pd.DataFrame({"A": [-1, -2, -3], "B": [-3, -2, -1]})
+        after = pd.DataFrame({"A": [1.0, 0.6, 0.0], "B": [1.0, 0.33333333, 0.0]})
+        self.check_cumsum_and_scaling(before, after)
+        self.assertEqual(set(before.columns), set(after.columns))
+    def test_all_zeros(self):
+        before = pd.DataFrame({"A": [0, 0, 0], "B": [0, 0, 0]})
+        after = pd.DataFrame({"A": [0.0, 0.0, 0.0], "B": [0.0, 0.0, 0.0]})
+        self.check_cumsum_and_scaling(before, after)
+        self.assertEqual(set(before.columns), set(after.columns))
+    def test_same_numbers(self):
+        before = pd.DataFrame({"A": [5, 5, 5], "B": [2, 2, 2]})
+        after = pd.DataFrame({"A": [0.0, 0.5, 1.0], "B": [0.0, 0.5, 1.0]})
+        self.check_cumsum_and_scaling(before, after)
+        self.assertEqual(set(before.columns), set(after.columns))
+    def test_non_numeric_data_raises(self):
+        with self.assertRaises(TypeError):
+            task_func(pd.DataFrame({"A": ["one", "two", "three"], "B": [1, 2, 3]}))
+    def test_nan_values_raise(self):
+        with self.assertRaises(ValueError):
+            task_func(pd.DataFrame({"A": [1, np.nan, 3], "B": [3, 2, 1]}))
+    def test_empty_dataframe(self):
+        with self.assertRaises(ValueError):
+            task_func(pd.DataFrame())

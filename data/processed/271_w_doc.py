@@ -1,74 +1,49 @@
-import collections
-from queue import PriorityQueue
-import random
+import re
+from collections import Counter
 
-# Constants
-LETTERS = ['a', 'b', 'c', 'd', 'e']
-
-def task_func(string_length=100):
+def task_func(sentence):
     """
-    Create a random string of a given length from a predefined list of letters and count the frequency 
-    of each letter, returning an ordered dictionary sorted by frequency in descending order.
+    Count the occurrence of each word in a sentence and return the result as a dictionary.
+    This function uses a regular expression to find words and a Counter to count their occurrences.
 
     Parameters:
-    - string_length (int, optional): The length of the random string to be generated. Default is 100.
+    sentence (str): The sentence to count the words in.
 
     Returns:
-    - collections.OrderedDict: An ordered dictionary where keys are letters and values are 
-      their frequencies in the generated string, sorted in descending order of frequency.
+    dict: A dictionary where the keys are the words and the values are their counts.
 
     Requirements:
-    - collections
-    - queue.PriorityQueue
-    - random
-
+    - re
+    - collections.Counter
+    
     Example:
-    >>> random.seed(0)
-    >>> freq = task_func(50)
-    >>> freq  # Example output: OrderedDict([('e', 15), ('a', 12), ('b', 10), ('d', 8), ('c', 5)])
-    OrderedDict(...)
+    >>> task_func("apple banana apple orange orange orange")
+    {'apple': 2, 'banana': 1, 'orange': 3}
     """
-    string = ''.join([LETTERS[random.randint(0, len(LETTERS)-1)] for _ in range(string_length)])
-    freq = collections.Counter(string)
-    pq = PriorityQueue()
-    for letter, count in freq.items():
-        pq.put((-count, letter))
-    sorted_freq = collections.OrderedDict()
-    while not pq.empty():
-        count, letter = pq.get()
-        sorted_freq[letter] = -count
-    return sorted_freq
+    words = re.findall(r'\b\w+\b', sentence)
+    return dict(Counter(words))
 
 import unittest
-import collections
+from faker import Faker
+fake = Faker()
 class TestCases(unittest.TestCase):
-    def test_default_length(self):
-        random.seed(0)
-        freq = task_func()
-        self.assertIsInstance(freq, collections.OrderedDict, "Output should be an OrderedDict")
-        self.assertEqual(sum(freq.values()), 100, "Total count of letters should be 100 for default length")
-        self.assertTrue(all(freq[key] >= freq[key2] for key, key2 in zip(list(freq)[:-1], list(freq)[1:])), "Frequencies should be sorted in descending order")
-    def test_specific_length(self):
-        random.seed(0)
-        freq = task_func(50)
-        self.assertIsInstance(freq, collections.OrderedDict, "Output should be an OrderedDict")
-        self.assertEqual(sum(freq.values()), 50, "Total count of letters should be 50 for specific length")
-        self.assertTrue(all(freq[key] >= freq[key2] for key, key2 in zip(list(freq)[:-1], list(freq)[1:])), "Frequencies should be sorted in descending order")
-    def test_minimum_length(self):
-        random.seed(0)
-        freq = task_func(1)
-        self.assertIsInstance(freq, collections.OrderedDict, "Output should be an OrderedDict")
-        self.assertEqual(sum(freq.values()), 1, "Total count of letters should be 1 for minimum length")
-        self.assertEqual(len(freq), 1, "Only one letter should be present for minimum length")
-    def test_large_length(self):
-        random.seed(0)
-        freq = task_func(1000)
-        self.assertIsInstance(freq, collections.OrderedDict, "Output should be an OrderedDict")
-        self.assertEqual(sum(freq.values()), 1000, "Total count of letters should be 1000 for large length")
-        self.assertTrue(all(freq[key] >= freq[key2] for key, key2 in zip(list(freq)[:-1], list(freq)[1:])), "Frequencies should be sorted in descending order")
-    def test_zero_length(self):
-        random.seed(0)
-        freq = task_func(0)
-        self.assertIsInstance(freq, collections.OrderedDict, "Output should be an OrderedDict")
-        self.assertEqual(sum(freq.values()), 0, "Total count of letters should be 0 for zero length")
-        self.assertEqual(len(freq), 0, "No letters should be present for zero length")
+    def test_empty_string(self):
+        self.assertEqual(task_func(""), {})
+    def test_single_word(self):
+        word = fake.word()
+        self.assertEqual(task_func(word)[word], 1)
+    def test_multiple_words(self):
+        sentence = fake.sentence()
+        expected_result = {}
+        for word in sentence.split():
+            expected_result[word] = expected_result.get(word, 0) + 1
+        self.assertEqual(len(task_func(sentence)), len(expected_result))
+    def test_case_sensitivity(self):
+        sentence = 'Apple apple'
+        self.assertEqual(task_func(sentence), {"Apple": 1, "apple": 1})
+    def test_punctuation_inclusion(self):
+        sentence = 'apple, apple; banana!'
+        self.assertEqual(task_func(sentence), {"apple": 2, "banana": 1})
+    def test_numeric_and_special_characters(self):
+        sentence = '123 $%^& 123'
+        self.assertEqual(task_func(sentence), {'123': 2})

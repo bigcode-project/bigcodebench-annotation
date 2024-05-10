@@ -1,45 +1,72 @@
-import itertools
-import math
+import numpy as np
+import pandas as pd
 
-def task_func(x):
-    """
-    Find the sub-sequence of a dictionary, x, with the minimum total length, where the keys are letters and the values are their lengths.
+
+def task_func(array_length=100):
+    '''
+    Generate two arrays of random numbers of a given length, calculate their mean, median, and standard deviation,
+    then store these results in a Panda DataFrame 'statistics' with keys 'Array1' and 'Array2'.
+    Draw a bar chart to compare these statistics with indices 'Mean', 'Median', and 'Standard Deviation'.
 
     Parameters:
-    - x (dict): The dictionary of letter lengths.
+    - array_length (int, optional): The length of the arrays to be generated. Default is 100.
 
     Returns:
-    - list: The subsequence with the minimum total length.
+    - DataFrame: A pandas DataFrame with the statistics of the arrays.
+    - Axes: The bar chart plot comparing the statistics.
 
     Requirements:
-    - itertools
-    - math
+    - numpy
+    - pandas
 
     Example:
-    >>> task_func({'a': 1, 'b': 2, 'c': 3})
-    ['a']
-    >>> task_func({'a': 1, 'b': -2, 'c': -5, 'd': 4})
-    ['b', 'c']
-    """
-    min_length = math.inf
-    min_subseq = []
-    for r in range(1, len(x) + 1):
-        for subseq in itertools.combinations(x.items(), r):
-            length = sum(length for letter, length in subseq)
-            if length < min_length:
-                min_length = length
-                min_subseq = [letter for letter, length in subseq]
-    return min_subseq
+    >>> df, ax = task_func(50)
+    '''
+    array1 = np.random.rand(array_length)
+    array2 = np.random.rand(array_length)
+    statistics = {
+        'Array1': [np.mean(array1), np.median(array1), np.std(array1)],
+        'Array2': [np.mean(array2), np.median(array2), np.std(array2)]
+    }
+    df = pd.DataFrame(statistics, index=['Mean', 'Median', 'Standard Deviation'])
+    ax = df.plot(kind='bar')
+    return df, ax
 
 import unittest
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        self.assertEqual(task_func({'a': 1, 'b': 2, 'c': 3}), ['a'])
-    def test_case_2(self):
-        self.assertEqual(sorted(task_func({'a': 1, 'b': -2, 'c': -5, 'd': 4})), sorted(['b', 'c']))
-    def test_case_3(self):
-        self.assertEqual(task_func({'a': 1, 'b': 2, 'c': 3, 'd': 4}), ['a'])
-    def test_case_4(self):
-        self.assertEqual(sorted(task_func({'a': -1, 'b': 2, 'c': 3, 'd': 4, 'e': -5})), sorted(['a', 'e']))
-    def test_case_5(self):
-        self.assertEqual(sorted(task_func({'a': -1, 'b': -2, 'c': -3, 'd': 4, 'e': 5})), sorted(['a', 'b', 'c']))
+    
+    def test_default_length(self):
+        df, ax = task_func()
+        self.assertEqual(df.shape, (3, 2))
+        self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
+        self.assertTrue(all(df.columns == ['Array1', 'Array2']))
+        self.assertIsInstance(ax, plt.Axes)
+    
+    def test_custom_length(self):
+        df, ax = task_func(200)
+        self.assertEqual(df.shape, (3, 2))
+        self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
+        self.assertTrue(all(df.columns == ['Array1', 'Array2']))
+        self.assertIsInstance(ax, plt.Axes)
+    
+    def test_statistics_values(self):
+        np.random.seed(42)  # Setting seed for reproducibility
+        df, _ = task_func(1000)
+        self.assertAlmostEqual(df['Array1']['Mean'], 0.4903, places=3)
+        self.assertAlmostEqual(df['Array2']['Mean'], 0.5068, places=3)
+        self.assertAlmostEqual(df['Array1']['Median'], 0.4968, places=3)
+        self.assertAlmostEqual(df['Array2']['Median'], 0.5187, places=3)
+        self.assertAlmostEqual(df['Array1']['Standard Deviation'], 0.2920, places=3)
+        self.assertAlmostEqual(df['Array2']['Standard Deviation'], 0.2921, places=3)
+    
+    def test_negative_length(self):
+        with self.assertRaises(ValueError):
+            task_func(-50)
+    
+    def test_zero_length(self):
+        df, ax = task_func(0)
+        self.assertEqual(df.shape, (3, 2))
+        self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
+        self.assertTrue(all(df.columns == ['Array1', 'Array2']))
+        self.assertIsInstance(ax, plt.Axes)

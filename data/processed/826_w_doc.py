@@ -1,71 +1,56 @@
-import pandas as pd
-import matplotlib.pyplot as plt
+import re
+import string
 
-def task_func(data, column):
+# Constants
+PUNCTUATION = string.punctuation
+
+def task_func(text):
     """
-    Draw and return a bar chart that shows the distribution of categories in a specific column of a dictionary.
-    
-    Note:
-    The categories are defined by the constant CATEGORIES, 
-    which is a list containing ['A', 'B', 'C', 'D', 'E']. If some categories are missing in the DataFrame, 
-    they will be included in the plot with a count of zero.
-    The x label of the plot is set to 'Category', the y label is set to 'Count', and the title is set to 'Distribution of {column}'.
-    
+    Count the number of words and punctuation marks in a string.
+
     Parameters:
-    - data (dict): A dictionary where the keys are the column names and the values are the column values.
-    - column (str): The name of the column in the DataFrame that contains the categories.
-    
+    - text (str): The input string.
+
     Returns:
-    - matplotlib.axes._axes.Axes: The Axes object for the generated plot.
-    
+    - tuple: A tuple containing the number of words and punctuation marks.
+
     Requirements:
-    - pandas
-    - numpy
-    - matplotlib.pyplot
-    
+    - re
+    - string
+
     Example:
-    >>> data = {'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']}
-    >>> ax = task_func(data, 'Category')    
-    >>> data = {'Type': ['A', 'A', 'C', 'E', 'D', 'E', 'D']}
-    >>> ax = task_func(data, 'Type')
+    >>> task_func("Hello, world! This is a test.")
+    (6, 3)
     """
-    df = pd.DataFrame(data)
-    CATEGORIES = ['A', 'B', 'C', 'D', 'E']
-    counts = df[column].value_counts()
-    missing_categories = list(set(CATEGORIES) - set(counts.index))
-    for category in missing_categories:
-        counts[category] = 0
-    counts = counts.reindex(CATEGORIES)
-    ax = counts.plot(kind='bar')
-    ax.set_xlabel('Category')
-    ax.set_ylabel('Count')
-    ax.set_title(f'Distribution of {column}')
-    plt.show()
-    return ax
+    words = re.findall(r'\b\w+\b', text)
+    punctuation_marks = [char for char in text if char in PUNCTUATION]
+    return len(words), len(punctuation_marks)
 
 import unittest
-import pandas as pd
-from matplotlib import pyplot as plt
 class TestCases(unittest.TestCase):
+    def test_basic_input(self):
+        """Test with basic input string"""
+        result = task_func("Hello, world! This is a test.")
+        self.assertEqual(result, (6, 3))
+    def test_no_punctuation(self):
+        """Test with a string that has words but no punctuation"""
+        result = task_func("No punctuation here just words")
+        self.assertEqual(result, (5, 0))
     
-    def test_with_all_categories(self):
-        """Test with all categories present."""
-        data = {'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']}
-        ax = task_func(data, 'Category')
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_xlabel(), 'Category')
-        self.assertEqual(ax.get_ylabel(), 'Count')
-        self.assertEqual(ax.get_title(), 'Distribution of Category')
-        self.assertEqual(len(ax.get_xticks()), 5)  # Check the number of x-axis ticks instead
-    def test_with_missing_categories(self):
-        """Test with some categories missing."""
-        data = {'Category': ['A', 'A', 'B', 'C']}
-        ax = task_func(data, 'Category')
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.get_xticks()), 5)  # Ensure all categories are accounted for, including missing ones
-    def test_with_unexpected_category(self):
-        """Test with a category not in predefined list."""
-        data = {'Category': ['F', 'A', 'B']}  # 'F' is not a predefined category
-        ax = task_func(data, 'Category')
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.get_xticks()), 5)  # 'F' is ignored, only predefined categories are considered
+    def test_with_empty_string(self):
+        """Test with an empty string"""
+        result = task_func("")
+        self.assertEqual(result, (0, 0))
+    def test_with_multiple_spaces(self):
+        """Test with a string that has multiple spaces between words"""
+        result = task_func("This  is   a    test     with      multiple       spaces")
+        self.assertEqual(result, (7, 0))
+    def test_with_only_punctuation(self):
+        """Test with a string that consists only of punctuation marks"""
+        result = task_func("!!!")
+        self.assertEqual(result, (0, 3))
+    
+    def test_with_single_punctuation(self):
+        """Test with a string that is a single punctuation mark"""
+        result = task_func("!")
+        self.assertEqual(result, (0, 1))

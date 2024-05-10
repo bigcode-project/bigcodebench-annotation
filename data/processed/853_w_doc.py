@@ -1,65 +1,64 @@
-import numpy as np
-import pandas as pd
-import random
+import textwrap
+import re
 
-def task_func(rows=3, cols=2, min_val=0, max_val=100, seed=0):
+def task_func(input_string, width):
     """
-    Creates a matrix of specified dimensions with random integers within a given range,
-    and then converts it into a pandas DataFrame.
+    Divide a multi-line string into separate strings and wrap each line to a certain width.
     
     Parameters:
-    - rows (int): Number of rows in the matrix. Default is 3.
-    - cols (int): Number of columns in the matrix. Default is 2.
-    - min_val (int): Minimum integer value for the random integers. Default is 0.
-    - max_val (int): Maximum integer value for the random integers. Default is 100.
+    - input_string (str): The multi-line string that needs to be wrapped.
+    - width (int): The width to wrap each line to.
     
     Returns:
-    DataFrame: A pandas DataFrame containing random integers within the specified range.
+    - str: The wrapped string where each line is wrapped to the specified width.
     
     Requirements:
-    - numpy
-    - pandas
-    - random
-
+    - textwrap
+    - re
+    
     Example:
-    >>> df = task_func(3, 2, 0, 100)
-    >>> print(type(df))
-    <class 'pandas.core.frame.DataFrame'>
-    >>> print(df.shape)
-    (3, 2)
+    >>> task_func('Another line\\nWith wrapping', 8)
+    'Another\\nline\\nWith\\nwrapping'
     """
-    random.seed(seed)
-    if min_val == max_val:
-        matrix = np.full((rows, cols), min_val)
-    else:
-        matrix = np.array([[random.randrange(min_val, max_val) for j in range(cols)] for i in range(rows)])
-    df = pd.DataFrame(matrix)
-    return df
+    lines = input_string.split('\\n')
+    wrapped_lines = [textwrap.fill(line, width, break_long_words=False) for line in lines]
+    wrapped_string = '\\n'.join(wrapped_lines)
+    wrapped_string = re.sub(r'\bis\b', 'was', wrapped_string)
+    return wrapped_string
 
 import unittest
-import pandas as pd
 class TestCases(unittest.TestCase):
+    
     def test_case_1(self):
-        df = task_func()
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(df.iloc[:, 0].tolist(), [49, 53, 33])
-        self.assertEqual(df.iloc[:, 1].tolist(), [97, 5, 65])
+        input_str = "Hello world\nThis is a test string\nHappy coding!"
+        width = 10
+        expected_output = "Hello\nworld This\nwas a test\nstring\nHappy\ncoding!"
+        self.assertEqual(task_func(input_str, width), expected_output)
+        
         
     def test_case_2(self):
-        df = task_func(rows=5, cols=4)
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(df.iloc[:, 0].tolist(), [49, 33, 38, 27, 17])
-        self.assertEqual(df.iloc[:, 1].tolist(), [97, 65, 61, 64, 96])
-        self.assertEqual(df.iloc[:, 2].tolist(), [53, 62, 45, 17, 12])
+        # Test with single line and specific width
+        input_str = "Hello world"
+        width = 5
+        expected_output = "Hello\nworld"
+        self.assertEqual(task_func(input_str, width), expected_output)
+    
     def test_case_3(self):
-        df = task_func(min_val=10, max_val=20)
-        self.assertEqual(df.iloc[:, 0].tolist(), [16, 10, 18])
-        self.assertEqual(df.iloc[:, 1].tolist(), [16, 14, 17])
-        
+        # Test with empty string and specific width
+        input_str = ""
+        width = 10
+        expected_output = ""
+        self.assertEqual(task_func(input_str, width), expected_output)
+    
     def test_case_4(self):
-        df = task_func(min_val=50, max_val=50)
-        self.assertEqual(df.iloc[:, 0].tolist(), [50, 50, 50])
-        self.assertEqual(df.iloc[:, 1].tolist(), [50, 50, 50])
+        input_str = "Hello world This is a test string Happy coding!"
+        width = 1000
+        expected_output = "Hello world This was a test string Happy coding!"  # Very wide width, should not wrap
+        self.assertEqual(task_func(input_str, width), expected_output)
+    
     def test_case_5(self):
-        df = task_func(rows=0, cols=2)
-        self.assertTrue(df.empty)
+        # Test with special characters and specific width
+        input_str = "Hello, @world!\n#This$is^a&test*string"
+        width = 10
+        expected_output = "Hello,\n@world!\n#This$was^a&test*string"
+        self.assertEqual(task_func(input_str, width), expected_output)

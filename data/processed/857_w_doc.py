@@ -1,79 +1,63 @@
-import numpy as np
-from scipy.linalg import svd
+import random
+import string
+import collections
 
-def task_func(rows=3, columns=2, seed=0):
+# Constants
+VALID_CHARACTERS = string.ascii_letters + string.digits
+
+def task_func(n_strings, string_length):
     """
-    Generate a matrix of random values with specified dimensions and perform Singular Value Decomposition (SVD) on it.
-
-    Requirements:
-    - numpy
-    - scipy.linalg.svd
+    Generate n random strings of a specified length, count the frequency of each character across all strings, and return the result as a dictionary.
 
     Parameters:
-    - rows (int): Number of rows for the random matrix. Default is 3.
-    - columns (int): Number of columns for the random matrix. Default is 2.
-    - seed (int, optional): Seed for the random number generator to ensure reproducibility. Default is None.
+    - n_strings (int): The number of random strings to generate.
+    - string_length (int): The length of each random string.
 
     Returns:
-    tuple: A tuple containing three elements:
-        - U (ndarray): The unitary matrix U.
-        - s (ndarray): The singular values, sorted in descending order.
-        - Vh (ndarray): The conjugate transpose of the unitary matrix V.
+    - dict: A dictionary containing character counts with characters as keys and their frequencies as values.
+
+    Requirements:
+    - random
+    - string
+    - collections
+
+    Constants:
+    - VALID_CHARACTERS: A string containing all valid characters (ASCII letters and digits) that can be used in the random strings.
 
     Example:
-    >>> U, s, Vh = task_func(3, 2, seed=42)
-    >>> print('U shape:', U.shape)
-    U shape: (3, 3)
-    >>> print('s shape:', s.shape)
-    s shape: (2,)
-    >>> print('Vh shape:', Vh.shape)
-    Vh shape: (2, 2)
+    >>> random.seed(42)
+    >>> task_func(2, 3)
+    {'O': 1, 'h': 1, 'b': 1, 'V': 1, 'r': 1, 'p': 1}
     """
-    np.random.seed(seed)
-    matrix = np.random.rand(rows, columns)
-    U, s, Vh = svd(matrix)
-    return U, s, Vh
+    strings = [''.join(random.choice(VALID_CHARACTERS) for _ in range(string_length)) for _ in range(n_strings)]
+    character_counts = collections.Counter(''.join(strings))
+    return dict(character_counts)
 
 import unittest
-import numpy as np
+from collections import Counter
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
-        # Test with default 3x2 matrix
-        U, s, Vh = task_func(seed=3)
-        self.assertEqual(U.shape, (3, 3))
-        self.assertEqual(s.shape, (2,))
-        self.assertEqual(Vh.shape, (2, 2))
-        self.assertTrue(np.all(s >= 0))
-        
-    def test_case_2(self):
-        # Test with a 5x5 square matrix
-        U, s, Vh = task_func(5, 5, seed=42)
-        self.assertEqual(U.shape, (5, 5))
-        self.assertEqual(s.shape, (5,))
-        self.assertEqual(Vh.shape, (5, 5))
-        self.assertTrue(np.all(s >= 0))
-    
-    def test_case_3(self):
-        # Test with a 2x3 matrix (more columns than rows)
-        U, s, Vh = task_func(2, 3, seed=12)
-        self.assertEqual(U.shape, (2, 2))
-        self.assertEqual(s.shape, (2,))
-        self.assertEqual(Vh.shape, (3, 3))
-        self.assertTrue(np.all(s >= 0))
-        
-    def test_case_4(self):
-        # Test with a 1x1 matrix (a scalar)
-        U, s, Vh = task_func(1, 1, seed=0)
-        self.assertEqual(U.shape, (1, 1))
-        self.assertEqual(s.shape, (1,))
-        self.assertEqual(Vh.shape, (1, 1))
-        self.assertTrue(np.all(s >= 0))
-        
-    def test_case_5(self):
-        # Test with a 4x3 matrix
-        U, s, Vh = task_func(4, 3, seed=1)
-        self.assertEqual(U.shape, (4, 4))
-        self.assertEqual(s.shape, (3,))
-        self.assertEqual(Vh.shape, (3, 3))
-        self.assertTrue(np.all(s >= 0))
+    def test_single_string_single_character(self):
+        # Test when n_strings=1 and string_length=1 (minimal input)
+        result = task_func(1, 1)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(sum(result.values()), 1)
+    def test_multiple_strings_single_character(self):
+        # Test when n_strings > 1 and string_length=1
+        result = task_func(5, 1)
+        self.assertTrue(len(result) <= 5)
+        self.assertEqual(sum(result.values()), 5)
+    def test_single_string_multiple_characters(self):
+        # Test when n_strings=1 and string_length > 1
+        result = task_func(1, 5)
+        self.assertTrue(len(result) <= 5)
+        self.assertEqual(sum(result.values()), 5)
+    def test_multiple_strings_multiple_characters(self):
+        # Test when n_strings > 1 and string_length > 1
+        result = task_func(5, 5)
+        self.assertTrue(len(result) <= 25)
+        self.assertEqual(sum(result.values()), 25)
+    def test_valid_characters(self):
+        # Test whether the function only uses valid characters as defined in VALID_CHARACTERS
+        result = task_func(100, 10)
+        all_characters = ''.join(result.keys())
+        self.assertTrue(all(char in VALID_CHARACTERS for char in all_characters))

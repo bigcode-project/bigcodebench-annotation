@@ -1,94 +1,70 @@
-import itertools
-import string
 import pandas as pd
+import string
 
-
-def task_func():
+def task_func(word):
     """
-    Generate all possible combinations (with replacement) of three letters from the alphabet and save them in a pandas DataFrame.
-
-    Parameters:
-    - None
-
-    Returns:
-    - DataFrame: A pandas DataFrame with each row representing a unique combination of three letters.
+    Creates a Pandas DataFrame from a single word, where each row contains a letter from the word 
+    and its 1-based position in the alphabet.
 
     Requirements:
-    - itertools
-    - string
     - pandas
+    - string
+    
+    Parameters:
+    - word (str): The word to create the DataFrame from. The word should be in lowercase and consist of alphabetic characters only.
+    
+    Returns:
+    - pandas.DataFrame: A DataFrame with two columns: 'Letter' and 'Position', 
+      where 'Position' is the letter's position in the English alphabet.
+    
+    Examples:
+    >>> task_func('abc')
+      Letter  Position
+    0      a         1
+    1      b         2
+    2      c         3
 
-    Example:
-    >>> df = task_func()
-    >>> print(df.head())
-      Letter 1 Letter 2 Letter 3
-    0        a        a        a
-    1        a        a        b
-    2        a        a        c
-    3        a        a        d
-    4        a        a        e
+    >>> task_func('zoo')
+      Letter  Position
+    0      z        26
+    1      o        15
+    2      o        15
+    
+    Raises:
+    - ValueError: If the input word is not in lowercase or contains non-alphabetic characters.
     """
-    LETTERS = list(string.ascii_lowercase)
-    combinations = list(itertools.product(LETTERS, repeat=3))
-    df = pd.DataFrame(combinations, columns=["Letter 1", "Letter 2", "Letter 3"])
+    if not word:  # Check if the input word is empty and return an empty DataFrame
+        return pd.DataFrame({'Letter': [], 'Position': []})
+    elif not word.isalpha() or not word.islower():
+        raise ValueError("Input word must be in lowercase alphabetic characters only.")
+    alphabet = string.ascii_lowercase
+    positions = [alphabet.index(char) + 1 for char in word]
+    df = pd.DataFrame({'Letter': list(word), 'Position': positions})
     return df
 
 import unittest
 import pandas as pd
-from itertools import product
-import string
 class TestCases(unittest.TestCase):
-    """Tests for the function task_func."""
-    def test_combinations(self):
-        """
-        Test if the function generates the correct combinations with replacement.
-        """
-        correct_combinations = list(product(string.ascii_lowercase, repeat=3))
-        result_df = task_func()
-        result_combinations = [tuple(row) for row in result_df.values]
-        self.assertEqual(
-            result_combinations,
-            correct_combinations,
-            "The combinations are not correct.",
-        )
-    def test_columns(self):
-        """
-        Test if the DataFrame has the correct column names.
-        """
-        result_df = task_func()
-        self.assertEqual(
-            list(result_df.columns),
-            ["Letter 1", "Letter 2", "Letter 3"],
-            "Column names are not correct.",
-        )
-    def test_shape(self):
-        """
-        Test if the shape of the DataFrame is correct.
-        """
-        result_df = task_func()
-        self.assertEqual(
-            result_df.shape,
-            (26**3, 3),
-            "Shape of the DataFrame is not correct.",
-        )
-    def test_data_type(self):
-        """
-        Test if all DataFrame columns contain strings.
-        """
-        result_df = task_func()
-        for col in result_df.columns:
-            self.assertTrue(
-                result_df[col].apply(lambda x: isinstance(x, str)).all(),
-                f"Column {col} does not contain all strings.",
-            )
-    def test_no_duplicates(self):
-        """
-        Test if there are no duplicate combinations in the DataFrame.
-        """
-        result_df = task_func()
-        result_combinations = [tuple(row) for row in result_df.values]
-        self.assertEqual(
-            len(result_combinations),
-            len(set(result_combinations)),
-            "Found duplicate combinations.",
-        )
+    def test_abc(self):
+        """Test with the word 'abc'."""
+        result = task_func('abc')
+        expected = pd.DataFrame({'Letter': ['a', 'b', 'c'], 'Position': [1, 2, 3]})
+        pd.testing.assert_frame_equal(result, expected)
+    def test_xyz(self):
+        """Test with the word 'xyz'."""
+        result = task_func('xyz')
+        expected = pd.DataFrame({'Letter': ['x', 'y', 'z'], 'Position': [24, 25, 26]})
+        pd.testing.assert_frame_equal(result, expected)
+    def test_mixed_case_error(self):
+        """Test with a mixed case word, expecting a ValueError."""
+        with self.assertRaises(ValueError):
+            task_func('AbC')
+    def test_non_alpha_error(self):
+        """Test with a non-alphabetic word, expecting a ValueError."""
+        with self.assertRaises(ValueError):
+            task_func('123')
+    def test_empty_string(self):
+        """Test with an empty string, expecting an empty DataFrame."""
+        result = task_func('')
+        expected = pd.DataFrame({'Letter': [], 'Position': []})
+        pd.testing.assert_frame_equal(result, expected)

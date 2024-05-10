@@ -1,55 +1,79 @@
-from sklearn.preprocessing import MinMaxScaler
+import matplotlib.pyplot as plt
+import scipy.optimize as optimize
 import numpy as np
 
-def task_func(myList):
+
+def task_func(array, target_value):
     """
-    Normalize a list of numeric values to the range [0, 1] using min-max scaling.
+    Fit an exponential decay function to the indices in the array where the first column matches the target value.
 
     Parameters:
-    - myList (list): List of numerical values to normalize.
+    - array (np.ndarray): A numpy array where the first column will be searched for the target value.
+    - target_value (float or int): The value in the first column to filter the data for fitting.
 
     Returns:
-    - ndarray: An array of normalized values.
+    - tuple: Containing the optimized parameters of the fitting function (popt) and the matplotlib Axes object.
 
     Requirements:
-    - sklearn.preprocessing.MinMaxScaler
     - numpy
+    - scipy.optimize
+    - matplotlib.pyplot
 
     Example:
-    >>> myList = [10, 20, 30, 40, 50]
-    >>> task_func(myList)
-    array([0.  , 0.25, 0.5 , 0.75, 1.  ])
+    >>> import numpy as np
+    >>> array = np.array([[1, 2], [1, 3], [1, 4], [2, 5], [2, 6]])
+    >>> target = 1
+    >>> params, ax = task_func(array, target)
+    >>> len(params)
+    3
     """
-    myList = np.array(myList).reshape(-1, 1)
-    scaler = MinMaxScaler()
-    normalized_list = scaler.fit_transform(myList)
-    return normalized_list.flatten()
+    def func(x, a, b, c):
+        return a * np.exp(-b * x) + c
+    indices = np.where(array[:, 0] == target_value)[0]
+    if indices.size < 3:
+        raise ValueError("Not enough points to perform the fitting.")
+    x_data = np.arange(len(indices))
+    y_data = indices
+    initial_guess = [1, 0.1, min(y_data)]
+    popt, _ = optimize.curve_fit(func, x_data, y_data, p0=initial_guess, maxfev=10000)
+    x_fit = np.linspace(min(x_data), max(x_data), 500)
+    plt.figure()
+    plt.plot(x_data, y_data, 'bo', label='Data')
+    plt.plot(x_fit, func(x_fit, *popt), 'r-', label='Fit')
+    plt.legend()
+    plt.show()
+    return popt, plt.gca()
 
 import unittest
-import numpy as np
 class TestCases(unittest.TestCase):
-    def test_1(self):
-        # Testing basic functionality
-        input_data = [10, 20, 30, 40, 50]
-        expected_output = np.array([0. , 0.25, 0.5 , 0.75, 1. ])
-        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
-    def test_2(self):
-        # Testing with negative values
-        input_data = [-50, -40, -30, -20, -10]
-        expected_output = np.array([0. , 0.25, 0.5 , 0.75, 1. ])
-        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
-    def test_3(self):
-        # Testing with mixed negative and positive values
-        input_data = [-50, -25, 0, 25, 50]
-        expected_output = np.array([0. , 0.25, 0.5 , 0.75, 1. ])
-        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
-    def test_4(self):
-        # Testing with single value
-        input_data = [100]
-        expected_output = np.array([0.])
-        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
-    def test_5(self):
-        # Testing with all zeros
-        input_data = [0, 0, 0, 0, 0]
-        expected_output = np.array([0., 0., 0., 0., 0.])
-        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
+    def setUp(self):
+        """Create a sample numpy array for testing."""
+        self.array = np.array([
+            ['332', '1', '2'],
+            ['a', 'bb', 'ccc'],
+            ['332', '33', '2'],
+            ['b', '22', '3'],
+            ['332', '44', '5']  # Adding more rows with '332' to ensure fitting can occur
+        ])
+    def test_return_types(self):
+        """Test the return types of the function."""
+        coeffs, ax = task_func(self.array, '332')
+        self.assertIsInstance(coeffs, np.ndarray, "Coefficients should be a numpy array.")
+        self.assertTrue(hasattr(ax, 'plot'), "The second return value should be an Axes object.")
+    def test_target_value_found(self):
+        """Test when the target value is found."""
+        coeffs, _ = task_func(self.array, '332')
+        self.assertGreater(coeffs.size, 0, "Should return coefficients when target value is found.")
+    def test_target_value_not_found(self):
+        """Test when the target value is not found."""
+        with self.assertRaises(ValueError):
+            task_func(self.array, '999')
+    def test_not_enough_points(self):
+        """Test with not enough points for fitting."""
+        small_array = np.array([['332'], ['a'], ['b']])
+        with self.assertRaises(ValueError):
+            task_func(small_array, '332')
+    def test_functionality(self):
+        """Test the overall functionality."""
+        coeffs, _ = task_func(self.array, '332')
+        self.assertEqual(coeffs.shape, (3,), "Should return three coefficients.")

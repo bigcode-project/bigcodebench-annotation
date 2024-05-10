@@ -1,61 +1,81 @@
-from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 
-def task_func(l):
+def task_func(df):
     """
-    Scale the input field to the range [0, 1] and display it as a DataFrame.
+    Scale the 'Age' and 'Income' columns between 0 and 1 for each group by 'id' in the provided pandas DataFrame. 
+    Additionally, create a histogram of the 'Income' column after scaling and return both the scaled DataFrame 
+    and the histogram data.
 
     Parameters:
-    l (numpy array): The input array.
+    df (DataFrame): The pandas DataFrame with columns ['id', 'age', 'income'].
 
     Returns:
-    DataFrame: A pandas DataFrame of the scaled array.
+    tuple: A tuple containing the scaled DataFrame and the histogram data for the 'income' column.
 
     Requirements:
-    - numpy
-    - sklearn.preprocessing
     - pandas
-
-    Note:
-    - The return DataFrame use 'Scaled Values' as the column name.
+    - sklearn.preprocessing.MinMaxScaler
+    - numpy
 
     Example:
-    >>> import numpy as np
-    >>> l = np.array([10, 20, 30, 40, 50])
-    >>> df = task_func(l)
-    >>> print(int(df.iloc[0]['Scaled Values']))
-    0
+    >>> df = pd.DataFrame({'id': [1, 1, 2, 2, 3, 3], 'age': [25, 26, 35, 36, 28, 29],'income': [50000, 60000, 70000, 80000, 90000, 100000]})
+    >>> df_scaled, income_hist = task_func(df)
+    >>> print(df_scaled.iloc[0]['age'])
+    0.0
+    >>> print(df_scaled.iloc[0]['income'])
+    0.0
     """
-    scaler = MinMaxScaler()
-    l_scaled = scaler.fit_transform(l.reshape(-1, 1))
-    df = pd.DataFrame(l_scaled, columns=['Scaled Values'])
-    return df
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    df_grouped = df.groupby('id').apply(
+        lambda x: pd.DataFrame(
+            scaler.fit_transform(x[['age', 'income']]), 
+            columns=['age', 'income'], 
+            index=x.index
+        )
+    )
+    hist, bins = np.histogram(df_grouped['income'], bins=10)
+    return df_grouped, (hist, bins)
 
 import unittest
-import numpy as np
 import pandas as pd
+from faker import Faker
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        l1 = np.array([10, 20, 30, 40, 50])
-        expected_df1 = pd.DataFrame({'Scaled Values': [0.0, 0.25, 0.5, 0.75, 1.0]})
-        self.assertTrue(task_func(l1).equals(expected_df1))
-    
-    def test_case_2(self):
-        l2 = np.array([-10, 0, 10])
-        expected_df2 = pd.DataFrame({'Scaled Values': [0.0, 0.5, 1.0]})
-        self.assertTrue(task_func(l2).equals(expected_df2))
-    
-    def test_case_3(self):
-        l3 = np.array([5, 5, 5])
-        expected_df3 = pd.DataFrame({'Scaled Values': [0.0, 0.0, 0.0]})
-        self.assertTrue(task_func(l3).equals(expected_df3))
+    def setUp(self):
+        # Setting up Faker for test data generation
+        self.fake = Faker()
+    def generate_test_dataframe(self, num_rows):
+        # Generating a test DataFrame with 'id', 'age', and 'income' columns
+        data = {
+            'id': [self.fake.random_int(min=1, max=5) for _ in range(num_rows)],
+            'age': [self.fake.random_int(min=18, max=80) for _ in range(num_rows)],
+            'income': [self.fake.random_int(min=20000, max=100000) for _ in range(num_rows)]
+        }
+        return pd.DataFrame(data)
+    def test_empty_dataframe(self):
+        df = pd.DataFrame()
+        with self.assertRaises(Exception):
+            scaled_df, income_hist = task_func(df)
+    def test_single_group_dataframe(self):
+        df = self.generate_test_dataframe(1)
+        scaled_df, income_hist = task_func(df)
+        self.assertEqual(len(scaled_df), 1)  # Only one row, hence one row in scaled DataFrame
+        self.assertEqual(len(income_hist[0]), 10)  # Histogram should have 10 bins by default
+    def test_multiple_groups_dataframe(self):
+        df = self.generate_test_dataframe(100)
+        scaled_df, income_hist = task_func(df)
+        self.assertEqual(len(scaled_df), 100)  # Should have the same number of rows as input DataFrame
+        self.assertEqual(len(income_hist[0]), 10)  # Checking histogram bin count
+    def test_scaled_values_range(self):
+        df = self.generate_test_dataframe(50)
+        scaled_df, _ = task_func(df)
+        self.assertEqual(len(scaled_df[(0.0 > scaled_df['age']) & (scaled_df['age'] > 1.0)]), 0)  # Age should be scaled between 0 and 1
+        self.assertEqual(len(scaled_df[(0.0 > scaled_df['income']) & (scaled_df['income'] > 1.0)]), 0)  # Age should be scaled between 0 and 1
         
-    def test_case_4(self):
-        l4 = np.array([100])
-        expected_df4 = pd.DataFrame({'Scaled Values': [0.0]})
-        self.assertTrue(task_func(l4).equals(expected_df4))
-    
-    def test_case_5(self):
-        l5 = np.array([10, 50, 30, 40, 20])
-        expected_df5 = pd.DataFrame({'Scaled Values': [0.0, 1.0, 0.5, 0.75, 0.25]})
-        self.assertTrue(task_func(l5).equals(expected_df5))
+    def test_histogram_data_integrity(self):
+        df = self.generate_test_dataframe(50)
+        _, income_hist = task_func(df)
+        self.assertTrue(np.all(income_hist[0] >= 0))  # Histogram counts should be non-negative
+        self.assertTrue(np.all(np.diff(income_hist[1]) > 0))  # Histogram bins should be in ascending order

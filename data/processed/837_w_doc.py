@@ -1,65 +1,83 @@
-import random
-import string
+import numpy as np
+import pandas as pd
 
-POSSIBLE_LETTERS = ['a', 'b', 'c']
-def task_func(word):
+
+def task_func(n_rows, remove_cols, columns=['A', 'B', 'C', 'D', 'E'], random_seed=None):
     """
-    Generates a list of random pairs of adjacent letters from the given word. The number of such pairs will be equal to the length of the constant POSSIBLE_LETTERS.
+    Generate a DataFrame with columns 'columns' and fill them with random 
+    integer values between 0 and 100. Remove some columns based on the provided indexes.
     
     Parameters:
-    word (str): The input string. Must only contain letters.
-    
+    n_rows (int): The number of rows in the DataFrame.
+    remove_cols (list of int): The indices of columns to be removed.
+    columns (list of str, optional): The columns to be included in the DataFrame. Defaults to ['A', 'B', 'C', 'D', 'E'].
+    random_seed (int): Seed for the rng. Default is None.
+
     Returns:
-    list: A list of random pairs of adjacent letters from the word. If the word has fewer than 2 letters, returns a list of empty strings based on POSSIBLE_LETTERS length.
+    DataFrame: The resulting DataFrame after removal of columns.
     
     Requirements:
-    - random
-    - string
+    - numpy
+    - pandas
     
-    Examples:
-    >>> random.seed(0)
-    >>> task_func('abcdef')
-    ['de', 'de', 'ab']
-    >>> task_func('xyz')
-    ['yz', 'yz', 'yz']
+    Example:
+    >>> df = task_func(10, [1, 3], random_seed=1)
+    >>> print(df)
+        A   C   E
+    0  37  72  75
+    1   5  64   1
+    2  76   6  50
+    3  20  84  28
+    4  29  50  87
+    5  87  96  13
+    6   9  63  22
+    7  57   0  81
+    8   8  13  72
+    9  30   3  21
+
+    >>> df = task_func(3, [1, 3], columns=['test', 'rem1', 'apple', 'remove'], random_seed=12)
+    >>> print(df)
+       test  apple
+    0    75      6
+    1     3     76
+    2    22     52
+
     """
-    if not all(char in string.ascii_letters for char in word):
-        raise ValueError("Input must only contain letters.")
-    if len(word) < 2:
-        return ['' for _ in range(len(POSSIBLE_LETTERS))]
-    pairs = [''.join(x) for x in zip(word, word[1:])]
-    random_pairs = [random.choice(pairs) for _ in range(len(POSSIBLE_LETTERS))]
-    return random_pairs
+    np.random.seed(random_seed)
+    df = pd.DataFrame(np.random.randint(0, 100, size=(n_rows, len(columns))), columns=columns)
+    df = df.drop(df.columns[remove_cols], axis=1)
+    return df
 
 import unittest
-import random
-# Assuming the function is correctly imported from its script
-# from task_func import task_func  
+import numpy as np
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_with_valid_input(self):
-        random.seed(0)
-        result = task_func('abcdef')
-        self.assertEqual(len(result), 3, "Output list should have length 3")
-        valid_pairs = ['ab', 'bc', 'cd', 'de', 'ef']
-        for pair in result:
-            self.assertIn(pair, valid_pairs, f"Pair '{pair}' is not a valid adjacent pair in 'abcdef'")
-    def test_single_character(self):
-        random.seed(42)
-        result = task_func('a')
-        expected = ['', '', '']
-        self.assertEqual(result, expected, "Should return list of empty strings for a single character")
-    def test_empty_string(self):
-        random.seed(55)
-        result = task_func('')
-        expected = ['', '', '']
-        self.assertEqual(result, expected, "Should return list of empty strings for an empty string")
-    def test_non_letter_input(self):
-        random.seed(0)
-        with self.assertRaises(ValueError):
-            task_func('123')
-    def test_long_input(self):
-        random.seed(5)
-        result = task_func('abcdefghijklmnopqrstuvwxyz')
-        all_pairs = [''.join(x) for x in zip('abcdefghijklmnopqrstuvwxyz', 'abcdefghijklmnopqrstuvwxyz'[1:])]
-        for pair in result:
-            self.assertIn(pair, all_pairs, f"Pair '{pair}' is not a valid adjacent pair in the alphabet")
+    def test_case_1(self):
+        df = task_func(5, [1, 3], random_seed=1)
+        expected = pd.DataFrame({
+            'A': {0: 37, 1: 5, 2: 76, 3: 20, 4: 29},
+            'C': {0: 72, 1: 64, 2: 6, 3: 84, 4: 50},
+            'E': {0: 75, 1: 1, 2: 50, 3: 28, 4: 87}
+        })
+        pd.testing.assert_frame_equal(df, expected, check_dtype=False)
+    def test_case_2(self):
+        df = task_func(10, [], columns=['X', 'Y', 'Z'], random_seed=12)
+        expected = pd.DataFrame({
+            'X': {0: 75, 1: 2, 2: 76, 3: 49, 4: 13, 5: 75, 6: 76, 7: 89, 8: 35, 9: 63},
+            'Y': {0: 27, 1: 3, 2: 48, 3: 52, 4: 89, 5: 74, 6: 13, 7: 35, 8: 33, 9: 96},
+            'Z': {0: 6, 1: 67, 2: 22, 3: 5, 4: 34, 5: 0, 6: 82, 7: 62, 8: 30, 9: 18}
+        })
+        pd.testing.assert_frame_equal(df, expected, check_dtype=False)
+    def test_case_3(self):
+        df = task_func(0, remove_cols=[], random_seed=42)
+        expected = pd.DataFrame(
+            {'A': {}, 'B': {}, 'C': {}, 'D': {}, 'E': {}}
+        )
+        pd.testing.assert_frame_equal(df, expected, check_dtype=False, check_index_type=False)
+    def test_case_4(self):
+        df1 = task_func(10, [], random_seed=12)
+        df2 = task_func(10, [], random_seed=12)
+        pd.testing.assert_frame_equal(df1, df2, check_dtype=False, check_index_type=False)
+    def test_case_5(self):
+        df = task_func(6, [0, 1, 2, 3, 4], random_seed=1)
+        self.assertEqual(list(df.columns), [])

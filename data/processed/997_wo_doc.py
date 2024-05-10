@@ -1,108 +1,173 @@
-import ast
-import json
-from collections import Counter
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 
-def task_func(file_pointer):
+def task_func(file_path: str, plot_path: str) -> (float, float, str):
     """
-    Reads from a given file pointer to a JSON file, evaluates strings that represent dictionaries to actual dictionaries,
-    and counts the frequency of each key across all dictionary entries in the JSON data.
+    Processes a CSV file at the given path by reading its contents, cleaning the data,
+    performing statistical analysis, and generating a plot, which is saved to the specified path.
 
-    
+    Sets the title of the plot to "Data Visualization".
+    Labels the x-axis as "Index" and the y-axis as "Value".
+    Saves the generated plot to the file path specified in 'plot_path'.
+
     Parameters:
-    file_pointer (file object): An open file object pointing to the JSON file containing the data. This file should
-                                already be opened in the correct mode (e.g., 'r' for reading).
+    - file_path (str): Path to the CSV input file.
+    - plot_path (str): Path where the plot will be saved.
 
     Returns:
-    collections.Counter: A Counter object representing the frequency of each key found in the dictionaries.
+    - tuple: A tuple containing the following elements:
+        - Mean (float): The average value of the data. Returns NaN if data is empty or non-numeric.
+        - Median (float): The middle value of the data when sorted. Returns NaN if data is empty or non-numeric.
+        - Plot Path (str): The path where the plot is saved.
+
+    Raises:
+    - FileNotFoundError: If the CSV file at 'file_path' does not exist.
 
     Requirements:
-    - ast
-    - json
-    - collections.Counter
-    
-    Note:
-    This function assumes the input JSON data is a list of dictionaries or strings that can be evaluated as dictionaries.
-    
+    - os
+    - pandas
+    - matplotlib
+    - numpy
+
     Example:
-    >>> with open("data.json", "r") as file:
-    >>>    key_frequency = task_func(file)
-    >>>    print(key_frequency)
-    Counter({'name': 5, 'age': 5, 'city': 3})
+    >>> task_func("sample_data.csv", "output_plot.png")
+    (25.5, 23.0, "output_plot.png")
     """
-    data = json.load(file_pointer)
-    key_frequency_counter = Counter()
-    for item in data:
-        if isinstance(item, str):
-            try:
-                item = ast.literal_eval(item)
-            except ValueError:
-                continue
-        if isinstance(item, dict):
-            key_frequency_counter.update(item.keys())
-    return key_frequency_counter
+    if not os.path.isfile(file_path):
+        raise FileNotFoundError(f"File {file_path} does not exist.")
+    try:
+        data = pd.read_csv(file_path)
+    except pd.errors.EmptyDataError:
+        return np.nan, np.nan, plot_path
+    data = pd.to_numeric(data.squeeze(), errors="coerce")
+    if not isinstance(data, pd.Series):
+        data = pd.Series(data)
+    data = data.dropna()
+    if data.empty:
+        mean = median = np.nan
+    else:
+        mean = float(np.mean(data))
+        median = float(np.median(data))
+    plt.figure(figsize=(10, 6))
+    plt.plot(data)
+    plt.title("Data Visualization")
+    plt.xlabel("Index")
+    plt.ylabel("Value")
+    plt.savefig(plot_path)
+    plt.close()
+    return mean, median, plot_path
 
 import unittest
-from io import BytesIO
-from collections import Counter
-import json
+import os
+import numpy as np
+import pandas as pd
+import shutil
 class TestCases(unittest.TestCase):
-    def test_with_dicts(self):
-        # Simulate a JSON file containing dictionaries
-        data = json.dumps([{"name": "John", "age": 30}, {"name": "Jane", "age": 25}, {"name": "Jake"}]).encode('utf-8')
-        json_file = BytesIO(data)
-        # Expected result is a Counter object with the frequency of each key
-        expected = Counter({'name': 3, 'age': 2})
-        result = task_func(json_file)
-        self.assertEqual(result, expected)
-    def test_with_string_repr_dicts(self):
-        # Simulate a JSON file containing string representations of dictionaries
-        data = json.dumps(['{"city": "New York"}', '{"city": "Los Angeles", "temp": 75}']).encode('utf-8')
-        json_file = BytesIO(data)
-        expected = Counter({'city': 2, 'temp': 1})
-        result = task_func(json_file)
-        self.assertEqual(result, expected)
-    def test_with_invalid_json(self):
-        # Simulate an invalid JSON file
-        data = b'invalid json'
-        json_file = BytesIO(data)
-        # In this case, the function should either return an empty Counter or raise a specific exception
-        # Depending on how you've implemented error handling in your function, adjust this test accordingly
-        with self.assertRaises(json.JSONDecodeError):
-            task_func(json_file)
-    def test_empty_json(self):
-        # Simulate an empty JSON file
-        data = json.dumps([]).encode('utf-8')
-        json_file = BytesIO(data)
-        expected = Counter()
-        result = task_func(json_file)
-        self.assertEqual(result, expected)
-    def test_mixed_valid_invalid_dicts(self):
-        # Simulate a JSON file with a mix of valid and invalid dictionary strings
-        data = json.dumps(['{"name": "John"}', 'Invalid', '{"age": 30}']).encode('utf-8')
-        json_file = BytesIO(data)
-        expected = Counter({'name': 1, 'age': 1})
-        result = task_func(json_file)
-        self.assertEqual(result, expected)
-    def test_nested_dicts(self):
-        # Simulate a JSON file containing nested dictionaries (should only count top-level keys)
-        data = json.dumps([{"person": {"name": "John", "age": 30}}, {"person": {"city": "New York"}}]).encode('utf-8')
-        json_file = BytesIO(data)
-        expected = Counter({'person': 2})
-        result = task_func(json_file)
-        self.assertEqual(result, expected)
-    def test_with_actual_json_objects_instead_of_strings(self):
-        # Simulate a JSON file with actual JSON objects (dictionaries) instead of string representations
-        data = json.dumps([{"key1": "value1"}, {"key2": "value2", "key3": "value3"}]).encode('utf-8')
-        json_file = BytesIO(data)
-        expected = Counter({'key1': 1, 'key2': 1, 'key3': 1})
-        result = task_func(json_file)
-        self.assertEqual(result, expected)
-    def test_invalid_json_structure(self):
-        # Simulate a JSON file that is not a list
-        data = json.dumps({"not": "a list"}).encode('utf-8')
-        json_file = BytesIO(data)
-        # Depending on how you've implemented error handling, adjust this test accordingly
-        # Here we expect an error or a specific handling
-        with self.assertRaises(SyntaxError):
-            task_func(json_file)
+    """Test cases for the task_func function."""
+    def setUp(self):
+        # Create a directory for test files if it doesn't exist
+        self.test_dir = "mnt/data/task_func_data_test"
+        os.makedirs(self.test_dir, exist_ok=True)
+        # Create a valid data file
+        self.valid_data_path = os.path.join(self.test_dir, "valid_data.csv")
+        pd.DataFrame({"data": np.random.rand(100)}).to_csv(
+            self.valid_data_path, index=False
+        )
+        # Create an empty data file
+        self.empty_data_path = os.path.join(self.test_dir, "empty_data.csv")
+        with open(self.empty_data_path, "w") as f:
+            f.write("")
+        # Create a non-numeric data file
+        self.non_numeric_data_path = os.path.join(self.test_dir, "non_numeric_data.csv")
+        pd.DataFrame({"data": ["a", "b", "c", "d"]}).to_csv(
+            self.non_numeric_data_path, index=False
+        )
+        # Create a large data file
+        self.large_data_path = os.path.join(self.test_dir, "large_data.csv")
+        pd.DataFrame({"data": np.random.rand(10000)}).to_csv(
+            self.large_data_path, index=False
+        )
+        # Create a data file with NaN values
+        self.nan_data_path = os.path.join(self.test_dir, "nan_data.csv")
+        pd.DataFrame({"data": [1, np.nan, 2, np.nan, 3]}).to_csv(
+            self.nan_data_path, index=False
+        )
+        # Create a data file with a single value
+        self.single_value_path = os.path.join(self.test_dir, "single_value.csv")
+        pd.DataFrame({"data": [42]}).to_csv(self.single_value_path, index=False)
+        # Create a data file where all values are NaN
+        self.all_nan_path = os.path.join(self.test_dir, "all_nan.csv")
+        pd.DataFrame({"data": [np.nan, np.nan, np.nan]}).to_csv(
+            self.all_nan_path, index=False
+        )
+    def test_valid_input(self):
+        """Test that the function runs without errors and returns the correct output."""
+        plot_path = os.path.join(self.test_dir, "valid_plot.png")
+        mean, median, plot_path = task_func(self.valid_data_path, plot_path)
+        self.assertIsInstance(mean, float)
+        self.assertIsInstance(median, float)
+        self.assertTrue(os.path.exists(plot_path))
+    def test_file_not_found(self):
+        """Test that the function raises a FileNotFoundError when the specified file does not exist."""
+        plot_path = os.path.join(self.test_dir, "not_found_plot.png")
+        with self.assertRaises(FileNotFoundError):
+            task_func(os.path.join(self.test_dir, "non_existent_file.csv"), plot_path)
+    def test_empty_file(self):
+        """Test that the function returns NaN for mean and median when the file is empty."""
+        plot_path = os.path.join(self.test_dir, "empty_plot.png")
+        mean, median, returned_plot_path = task_func(self.empty_data_path, plot_path)
+        self.assertTrue(np.isnan(mean))
+        self.assertTrue(np.isnan(median))
+        self.assertFalse(
+            os.path.exists(returned_plot_path)
+        )  # Plot should not exist for empty file
+    def test_non_numeric_data(self):
+        """Test that the function returns NaN for mean and median when the file contains non-numeric data."""
+        plot_path = os.path.join(self.test_dir, "non_numeric_plot.png")
+        mean, median, returned_plot_path = task_func(self.non_numeric_data_path, plot_path)
+        self.assertTrue(np.isnan(mean))
+        self.assertTrue(np.isnan(median))
+        self.assertTrue(os.path.exists(returned_plot_path))
+    def test_large_data(self):
+        """Test that the function runs without errors and returns the correct output for a large data file."""
+        plot_path = os.path.join(self.test_dir, "large_data_plot.png")
+        mean, median, returned_plot_path = task_func(self.large_data_path, plot_path)
+        self.assertIsInstance(mean, float)
+        self.assertIsInstance(median, float)
+        self.assertTrue(os.path.exists(returned_plot_path))
+    def test_data_with_nan_values(self):
+        """Test that the function returns the correct output for a data file with NaN values."""
+        plot_path = os.path.join(self.test_dir, "nan_data_plot.png")
+        mean, median, returned_plot_path = task_func(self.nan_data_path, plot_path)
+        self.assertNotEqual(mean, np.nan)
+        self.assertNotEqual(median, np.nan)
+        self.assertTrue(os.path.exists(returned_plot_path))
+    def test_single_value_data(self):
+        """Test that the function returns the correct output for a data file with a single value."""
+        plot_path = os.path.join(self.test_dir, "single_value_plot.png")
+        mean, median, returned_plot_path = task_func(self.single_value_path, plot_path)
+        self.assertEqual(mean, 42)
+        self.assertEqual(median, 42)
+        self.assertTrue(os.path.exists(returned_plot_path))
+    def test_all_nan_data(self):
+        """Test that the function returns NaN for mean and median when the file contains all NaN values."""
+        plot_path = os.path.join(self.test_dir, "all_nan_plot.png")
+        mean, median, returned_plot_path = task_func(self.all_nan_path, plot_path)
+        self.assertTrue(np.isnan(mean))
+        self.assertTrue(np.isnan(median))
+        self.assertTrue(os.path.exists(returned_plot_path))
+    def tearDown(self):
+        # Remove all created files
+        plt.clf()
+        for filename in os.listdir(self.test_dir):
+            file_path = os.path.join(self.test_dir, filename)
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.remove(file_path)
+        # Remove the test directory
+        dirs_to_remove = ["mnt/data", "mnt"]
+        for dir_path in dirs_to_remove:
+            if os.path.exists(dir_path):
+                shutil.rmtree(dir_path)

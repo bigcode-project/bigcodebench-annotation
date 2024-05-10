@@ -1,79 +1,85 @@
+import pandas as pd
+from scipy.spatial import distance
 import matplotlib.pyplot as plt
-import scipy.optimize as optimize
-import numpy as np
 
 
-def task_func(array, target_value):
+def task_func(a, b):
     """
-    Fit an exponential decay function to the indices in the array where the first column matches the target value.
+    Calculate the Euclidean distance between two lists, create a Pandas DataFrame from these lists
+    with indices 'A' and 'B', and then draw the values with a line displaying the Euclidean distance.
 
     Parameters:
-    - array (np.ndarray): A numpy array where the first column will be searched for the target value.
-    - target_value (float or int): The value in the first column to filter the data for fitting.
+    a (list): A list of numbers.
+    b (list): Another list of numbers.
 
     Returns:
-    - tuple: Containing the optimized parameters of the fitting function (popt) and the matplotlib Axes object.
+    float: The computed Euclidean distance between the two lists.
+    pd.DataFrame: A DataFrame containing the two lists as columns.
+    matplotlib.axes.Axes: The generated plot's Axes object.
 
     Requirements:
-    - numpy
-    - scipy.optimize
+    - pandas
+    - scipy.spatial
     - matplotlib.pyplot
 
     Example:
-    >>> import numpy as np
-    >>> array = np.array([[1, 2], [1, 3], [1, 4], [2, 5], [2, 6]])
-    >>> target = 1
-    >>> params, ax = task_func(array, target)
-    >>> len(params)
-    3
+    >>> euclidean_distance, df, ax = task_func([1, 2, 3], [2, 3, 4])
+    >>> print(euclidean_distance)
+    1.7320508075688772
     """
-    def func(x, a, b, c):
-        return a * np.exp(-b * x) + c
-    indices = np.where(array[:, 0] == target_value)[0]
-    if indices.size < 3:
-        raise ValueError("Not enough points to perform the fitting.")
-    x_data = np.arange(len(indices))
-    y_data = indices
-    initial_guess = [1, 0.1, min(y_data)]
-    popt, _ = optimize.curve_fit(func, x_data, y_data, p0=initial_guess, maxfev=10000)
-    x_fit = np.linspace(min(x_data), max(x_data), 500)
-    plt.figure()
-    plt.plot(x_data, y_data, 'bo', label='Data')
-    plt.plot(x_fit, func(x_fit, *popt), 'r-', label='Fit')
-    plt.legend()
-    plt.show()
-    return popt, plt.gca()
+    euclidean_distance = distance.euclidean(a, b)
+    df = pd.DataFrame({'A': a, 'B': b})
+    fig, ax = plt.subplots()
+    ax.plot(df['A'], df['B'])
+    ax.plot([df['A'].iloc[0], df['B'].iloc[0]], [df['A'].iloc[-1], df['B'].iloc[-1]], 'ro-')
+    return euclidean_distance, df, ax
 
 import unittest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        """Create a sample numpy array for testing."""
-        self.array = np.array([
-            ['332', '1', '2'],
-            ['a', 'bb', 'ccc'],
-            ['332', '33', '2'],
-            ['b', '22', '3'],
-            ['332', '44', '5']  # Adding more rows with '332' to ensure fitting can occur
-        ])
-    def test_return_types(self):
-        """Test the return types of the function."""
-        coeffs, ax = task_func(self.array, '332')
-        self.assertIsInstance(coeffs, np.ndarray, "Coefficients should be a numpy array.")
-        self.assertTrue(hasattr(ax, 'plot'), "The second return value should be an Axes object.")
-    def test_target_value_found(self):
-        """Test when the target value is found."""
-        coeffs, _ = task_func(self.array, '332')
-        self.assertGreater(coeffs.size, 0, "Should return coefficients when target value is found.")
-    def test_target_value_not_found(self):
-        """Test when the target value is not found."""
-        with self.assertRaises(ValueError):
-            task_func(self.array, '999')
-    def test_not_enough_points(self):
-        """Test with not enough points for fitting."""
-        small_array = np.array([['332'], ['a'], ['b']])
-        with self.assertRaises(ValueError):
-            task_func(small_array, '332')
-    def test_functionality(self):
-        """Test the overall functionality."""
-        coeffs, _ = task_func(self.array, '332')
-        self.assertEqual(coeffs.shape, (3,), "Should return three coefficients.")
+    def test_case_1(self):
+        a = [1, 2, 3]
+        b = [2, 3, 4]
+        euclidean_distance, df, ax = task_func(a, b)
+        self.assertAlmostEqual(euclidean_distance, 1.732, places=3)
+        self.assertTrue('A' in df.columns)
+        self.assertTrue('B' in df.columns)
+        self.assertListEqual(df['A'].tolist(), a)
+        self.assertListEqual(df['B'].tolist(), b)
+        lines = ax.get_lines()
+        self.assertTrue(len(lines) > 0)
+    def test_case_2(self):
+        a = [1, 1, 1]
+        b = [1, 1, 1]
+        euclidean_distance, df, ax = task_func(a, b)
+        self.assertEqual(euclidean_distance, 0)
+        self.assertListEqual(df['A'].tolist(), a)
+        self.assertListEqual(df['B'].tolist(), b)
+        lines = ax.get_lines()
+        self.assertTrue(len(lines) > 0)
+    def test_case_3(self):
+        a = [0, 5, 10]
+        b = [10, 5, 0]
+        euclidean_distance, df, ax = task_func(a, b)
+        self.assertAlmostEqual(euclidean_distance, 14.142, places=3)
+        self.assertListEqual(df['A'].tolist(), a)
+        self.assertListEqual(df['B'].tolist(), b)
+        lines = ax.get_lines()
+        self.assertTrue(len(lines) > 0)
+    def test_case_4(self):
+        a = [3, 3, 3, 3]
+        b = [4, 4, 4, 4]
+        euclidean_distance, df, ax = task_func(a, b)
+        self.assertAlmostEqual(euclidean_distance, 2.0, places=3)
+        self.assertListEqual(df['A'].tolist(), a)
+        self.assertListEqual(df['B'].tolist(), b)
+        lines = ax.get_lines()
+        self.assertTrue(len(lines) > 0)
+    def test_case_5(self):
+        a = [1, 2, 3, 4, 5]
+        b = [5, 4, 3, 2, 1]
+        euclidean_distance, df, ax = task_func(a, b)
+        self.assertAlmostEqual(euclidean_distance, 6.325, places=3)
+        self.assertListEqual(df['A'].tolist(), a)
+        self.assertListEqual(df['B'].tolist(), b)
+        lines = ax.get_lines()
+        self.assertTrue(len(lines) > 0)

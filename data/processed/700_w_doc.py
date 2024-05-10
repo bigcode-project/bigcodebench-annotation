@@ -1,82 +1,80 @@
-import string
-import random
+import pandas as pd
+from sklearn.cluster import KMeans
 
-
-
-def task_func(length, random_seed=None):
+def task_func(x_list, y_list):
     """
-    Generate a random string of a given length, with each character being either
-    a parenthesis (from the set "(){}[]") 
-    or a lowercase English character.
-    For function uses a optional random_seed when sampling characters.
+    Perform K-Means clustering on the given data by first turning it into a DataFrame with two columns "x" and "y" and then return the labels and centroids.
 
     Parameters:
-    length (int): The length of the string to generate.
-    random_seed (int): Random seed for rng. Used in picking random characters.
-                       Defaults to None.
+    - x_list (list): List of data corresponding to 'x'
+    - y_list (list): List of data corresponding to 'y'
 
     Returns:
-    str: The generated string.
+    tuple: The labels and centroids as numpy arrays.
+        - kmeans.labels_: A NumPy array where each element is the cluster label assigned to each data point. 
+        - kmeans.cluster_centers_: A NumPy array containing the coordinates of the cluster centers.
 
     Requirements:
-    - string
-    - random
-
-    Note: The function uses the internal string constant BRACKETS for 
-          definition of the bracket set.
+    - pandas
+    - sklearn
 
     Example:
-    >>> string = task_func(10, random_seed=1)
-    >>> print(string)
-    ieqh]{[yng
-    
-    >>> string = task_func(34, random_seed=42)
-    >>> print(string)
-    hbrpoigf)cbfnobm(o{rak)vrjnvgfygww
-
-    >>> string = task_func(23, random_seed=1)
-    >>> print(string)
-    ieqh]{[yng]by)a{rogubbb
+    >>> df = pd.DataFrame({'x': [1, 2, 3, 4, 5, 6], 'y': [2, 3, 4, 5, 6, 7]})
+    >>> labels, centroids = task_func([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
     """
-    random.seed(random_seed)
-    BRACKETS = "(){}[]"
-    return ''.join(random.choice(string.ascii_lowercase + BRACKETS) for _ in range(length))
+    df = pd.DataFrame({'x': x_list, 'y': y_list})
+    kmeans = KMeans(n_clusters=2, random_state=0).fit(df)
+    return kmeans.labels_, kmeans.cluster_centers_
 
 import unittest
-import string
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.BRACKETS = "(){}[]"
-        return 
-    def test_rng(self):
-        # rng reproducability
-        res1 = task_func(100, random_seed=42)
-        res2 = task_func(100, random_seed=42)
-        self.assertEqual(res1, res2)
     def test_case_1(self):
-        # Testing with length = 5
-        result = task_func(5, random_seed=1)
-        self.assertEqual(len(result), 5)
-        for char in result:
-            self.assertIn(char, string.ascii_lowercase + self.BRACKETS)
+        labels, centroids = task_func([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
+        self.assertEqual(labels[0], 0)
+        self.assertEqual(labels[1], 0)
+        self.assertEqual(labels[2], 0)
+        self.assertEqual(labels[3], 1)
+        self.assertEqual(labels[4], 1)
+        self.assertEqual(labels[5], 1)
+        self.assertEqual(centroids[0][0], 2.)
+        self.assertEqual(centroids[0][1], 3.)
+        self.assertEqual(centroids[1][0], 5.)
+        self.assertEqual(centroids[1][1], 6.)
     def test_case_2(self):
-        # Testing with length = 0 (edge case)
-        result = task_func(0, random_seed=2)
-        self.assertEqual(len(result), 0)
+        labels, centroids = task_func([1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2])
+        self.assertEqual(labels[0], 0)
+        self.assertEqual(labels[1], 0)
+        self.assertEqual(labels[2], 0)
+        self.assertEqual(labels[3], 0)
+        self.assertEqual(labels[4], 0)
+        self.assertEqual(labels[5], 0)
+        self.assertEqual(centroids[0][0], 1.)
+        self.assertEqual(centroids[0][1], 2.)
     def test_case_3(self):
-        # Testing with length = 10
-        result = task_func(10, random_seed=3)
-        self.assertEqual(len(result), 10)
-        for char in result:
-            self.assertIn(char, string.ascii_lowercase + self.BRACKETS)
+        labels, centroids = task_func([1, 2, 3, 4, 5, 6], [2, 2, 2, 2, 2, 2])
+        self.assertEqual(labels[0], 0)
+        self.assertEqual(labels[1], 0)
+        self.assertEqual(labels[2], 0)
+        self.assertEqual(labels[3], 1)
+        self.assertEqual(labels[4], 1)
+        self.assertEqual(labels[5], 1)
+        self.assertEqual(centroids[0][0], 2.)
+        self.assertEqual(centroids[0][1], 2.)
+        self.assertEqual(centroids[1][0], 5.)
+        self.assertEqual(centroids[1][1], 2.)
     def test_case_4(self):
-        # Testing with length = 1 (edge case)
-        result = task_func(1, random_seed=34)
-        self.assertEqual(len(result), 1)
-        self.assertIn(result, string.ascii_lowercase + self.BRACKETS)
+        labels, centroids = task_func([0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0])
+        self.assertEqual(labels[0], 0)
+        self.assertEqual(labels[1], 0)
     def test_case_5(self):
-        # Testing with length = 50
-        result = task_func(50, random_seed=777)
-        self.assertEqual(len(result), 50)
-        for char in result:
-            self.assertIn(char, string.ascii_lowercase + self.BRACKETS)
+        labels, centroids = task_func([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6])
+        self.assertEqual(labels[0], 0)
+        self.assertEqual(labels[1], 0)
+        self.assertEqual(labels[2], 0)
+        self.assertEqual(labels[3], 1)
+        self.assertEqual(labels[4], 1)
+        self.assertEqual(labels[5], 1)
+        self.assertEqual(centroids[0][0], 2.)
+        self.assertEqual(centroids[0][1], 2.)
+        self.assertEqual(centroids[1][0], 5.)
+        self.assertEqual(centroids[1][1], 5.)

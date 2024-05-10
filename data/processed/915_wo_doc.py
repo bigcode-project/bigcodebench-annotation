@@ -1,144 +1,71 @@
-import requests
-from bs4 import BeautifulSoup
-import pandas as pd
-from io import StringIO
+from typing import List, Union
+import numpy as np
+import scipy.fft
 
-
-def task_func(url, table_id):
+def task_func(data: List[Union[int, str]], repetitions: int = 1):
     """
-    Extracts and converts data from a specified HTML table based on the given 'table_id' on a webpage into a Pandas DataFrame.
-    If the table is present but contains no data rows (i.e., no <tr> tags),
-    the function returns an empty DataFrame.
-
+    Calculates the mode(s), their count(s), and the fast fourier transform of the data after repeating it a specified number of times.
+    in a list of elements that can be repeated a specified number of times.
+    
+    Note:
+    If the data is empty or the number of repetitions is less than or equal to 0, the function will return empty arrays.
+    
     Parameters:
-    - url (str): The URL of the webpage from which to extract the table.
-    - table_id (str): The 'id' attribute of the HTML table to be extracted.
-
-    Returns:
-    - df (pd.DataFrame): A DataFrame containing the data extracted from the specified HTML table.
-                  If the table is found but has no rows (<tr> elements), an empty DataFrame is returned.
-
-    Raises:
-    - requests.exceptions.HTTPError: If the HTTP request fails (e.g., due to connection issues or
-                                   a non-successful status code like 404 or 500).
-    - ValueError: If no table with the specified 'table_id' is found on the webpage. The error message will be
-                "Table with the specified ID not found."
+    - data (List[Union[int, str]]): The original list of elements (integers and/or strings).
+    - repetitions (int, optional): The number of times to repeat the original list before calculating the mode. Defaults to 1.
 
     Requirements:
-    - requests
-    - bs4.BeautifulSoup
-    - pandas
-    - io
+    - numpy
+    - scipy
     
-    Notes:
-    - The function raises an HTTPError for unsuccessful HTTP requests, which includes scenarios like
-      network problems or non-2xx HTTP responses.
-    - A ValueError is raised specifically when the HTML table with the specified ID is not present
-      in the webpage's content, indicating either an incorrect ID or the absence of the table.
-    - If the located table has no rows, indicated by the absence of <tr> tags, an empty DataFrame is returned.
-      This is useful for handling tables that are structurally present in the HTML but are devoid of data.
-
-    Example:
-    >>> task_func('https://example.com/data.html', 'table1')
-    DataFrame:
-       Name  Age
-    0  Alice  25
-    1  Bob    30
-
-    Example of ValueError:
-    >>> task_func('https://example.com/data.html', 'nonexistent_table')
-    ValueError: Table with the specified ID not found.
-
-    Example of empty table:
-    >>> task_func('https://example.com/emptytable.html', 'empty_table')
-    DataFrame:
-    Empty DataFrame
-    Columns: []
-    Index: []
+    Returns:
+    - dict: A dictionary with two keys:
+        'mode': a numpy array of the mode(s), sorted in ascending order.
+        'count': a numpy array of the count(s) of the mode(s).
+        
+    Examples:
+    >>> task_func([1, '2', '2'], repetitions=1)
+    {'mode': array(['2'], dtype='<U1'), 'count': [2], 'fft': array([ 5.-0.j, -1.+0.j, -1.-0.j])}
     """
-    try:
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
-    except requests.exceptions.HTTPError as e:
-        raise e
-    soup = BeautifulSoup(response.text, "html.parser")
-    table = soup.find("table", {"id": table_id})
-    if table is None:
-        raise ValueError("Table with the specified ID not found.")
-    if not table.find_all("tr"):
-        return pd.DataFrame()
-    df = pd.read_html(StringIO(str(table)))[0]
-    return df
+    def calculate_mode(data):
+        counts = {}
+        for item in data:
+            key = (item, type(item))  # Distinguish between types
+            counts[key] = counts.get(key, 0) + 1
+        max_count = max(counts.values())
+        mode_items = [value for (value, value_type), count in counts.items() if count == max_count]
+        return mode_items, [max_count] * len(mode_items)
+    if not data or repetitions <= 0:  # Handle empty data or no repetitions
+        return {'mode': np.array([], dtype='object'), 'count': np.array([], dtype=int), 'fft': np.array([])}
+    repeated_data = data * repetitions
+    mode, count = calculate_mode(repeated_data)
+    return {'mode': np.sort(mode), 'count': count, 'fft': scipy.fft.fft(data)}
 
 import unittest
-from unittest.mock import patch, MagicMock
-import pandas as pd
 class TestCases(unittest.TestCase):
-    """Test cases for task_func."""
-    @patch("requests.get")
-    def test_successful_scrape(self, mock_get):
-        """Test a successful scrape."""
-        mock_html_content = """
-            <html>
-            <body>
-                <table id="table0">
-                    <tr><th>Name</th><th>Age</th></tr>
-                    <tr><td>Alice</td><td>25</td></tr>
-                    <tr><td>Bob</td><td>30</td></tr>
-                </table>
-            </body>
-            </html>
-        """
-        # Mock the response
-        mock_response = MagicMock()
-        mock_response.text = mock_html_content
-        mock_get.return_value = mock_response
-        # Test
-        df = task_func("http://example.com", "table0")
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertGreater(len(df), 0)
-        self.assertIn("Name", df.columns)
-        self.assertIn("Age", df.columns)
-    @patch("requests.get")
-    def test_table_not_found(self, mock_get):
-        """Test table not found."""
-        mock_html_content = "<html><body></body></html>"
-        mock_response = MagicMock()
-        mock_response.text = mock_html_content
-        mock_get.return_value = mock_response
-        # Test
-        with self.assertRaises(ValueError):
-            task_func("http://example.com", "non_existent_table")
-    @patch("requests.get")
-    def test_network_error(self, mock_get):
-        """Test network error."""
-        mock_get.side_effect = requests.exceptions.ConnectionError
-        with self.assertRaises(requests.exceptions.ConnectionError):
-            task_func("http://example.com", "table0")
-    @patch("requests.get")
-    def test_http_error(self, mock_get):
-        """Test HTTP error."""
-        mock_get.return_value.raise_for_status.side_effect = (
-            requests.exceptions.HTTPError
-        )
-        # Test
-        with self.assertRaises(requests.exceptions.HTTPError):
-            task_func("http://example.com", "table0")
-    @patch("requests.get")
-    def test_empty_table(self, mock_get):
-        # Mock HTML content with an empty table
-        mock_html_content = """
-            <html>
-            <body>
-                <table id="table0"></table>
-            </body>
-            </html>
-        """
-        # Mock the response
-        mock_response = MagicMock()
-        mock_response.text = mock_html_content
-        mock_get.return_value = mock_response
-        # Test
-        df = task_func("http://example.com", "table0")
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(len(df), 0)
+    def test_empty_list(self):
+        expected = {'mode': np.array([], dtype='object').tolist(), 'count': np.array([], dtype=int).tolist(), 'fft': np.array([]).tolist()}
+        result = task_func([], repetitions=1)
+        self.assertEqual({'mode': result['mode'].tolist(), 'count': result['count'].tolist(), 'fft': result['fft'].tolist()}, expected)
+    def test_single_mode(self):
+        result = task_func([1, 2, 2, 3], repetitions=1)
+        np.testing.assert_array_equal(result['mode'], np.array([2]))
+        np.testing.assert_array_equal(result['count'], np.array([2]))
+        np.testing.assert_array_equal(result['fft'], np.array([ 8.-0.j, -1.+1.j, -2.-0.j, -1.-1.j]))
+    def test_multiple_modes_repeated(self):
+        result = task_func(['00', '01'], repetitions=3)
+        np.testing.assert_array_equal(result['mode'], np.array(['00', '01']))
+        np.testing.assert_array_equal(result['count'], np.array([3, 3]))
+        np.testing.assert_array_equal(result['fft'], np.array([ 1.-0.j, -1.-0.j]))
+    def test_mixed_types(self):
+        # Assuming '1' (string) appears twice, and 1 (int) appears once.
+        # The test expects the string '1' to be the mode with a count of 2.
+        result = task_func([1, '1', '1', 2], repetitions=1)
+        np.testing.assert_array_equal(result['mode'], np.array(['1']))
+        np.testing.assert_array_equal(result['count'], np.array([2]))  # Expected count is 2 for '1'
+        np.testing.assert_array_equal(result['fft'], np.array([ 5.-0.j,  0.+1.j, -1.-0.j,  0.-1.j]))
+        
+    def test_no_repetitions(self):
+        expected = {'mode': np.array([], dtype='object').tolist(), 'count': np.array([], dtype=int).tolist(), 'fft': np.array([]).tolist()}
+        result = task_func(['111', '222', '333'], repetitions=0)
+        self.assertEqual({'mode': result['mode'].tolist(), 'count': result['count'].tolist(), 'fft': result['fft'].tolist()}, expected)

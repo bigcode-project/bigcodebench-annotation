@@ -1,71 +1,82 @@
-import pandas as pd
-import re
+import time
+import numpy as np
 
-# Function to replace acronyms in DataFrame
-def task_func(data, mapping):
+
+def task_func(samples=10, delay=0.1):
     """
-    Replace all acronyms in a DataFrame with their full words according to a provided dictionary.
-    
-    Requirements:
-    - pandas
-    - re
+    Make a delay for a given amount of time for a specified number of samples,
+    measure the actual delay and calculate the statistical properties of the
+    delay times.
 
     Parameters:
-    - data (dict): A dictionary where keys are column names and values are lists of strings.
-    - mapping (dict): A dictionary where keys are acronyms and values are the full words.
-    
+    - samples (int): Number of samples for which the delay is measured.
+                     Default is 10.
+    - delay (float): Amount of time (in seconds) for each delay.
+                     Default is 0.1 second.
+
     Returns:
-    - pd.DataFrame: A DataFrame where all acronyms in string cells have been replaced with their full words.
-    
-    Examples:
-    >>> data = {'text': ['NASA is great', 'I live in the USA']}
-    >>> mapping = {'NASA': 'National Aeronautics and Space Administration', 'USA': 'United States of America'}
-    >>> print(task_func(data, mapping))
-                                                    text
-    0  National Aeronautics and Space Administration ...
-    1             I live in the United States of America
+    tuple: The mean and standard deviation of the delay times.
+
+    Requirements:
+    - time
+    - numpy
+
+    Example:
+    >>> mean, std = task_func(samples=5, delay=0.05)
+    >>> print(f'Mean: %.3f, Std: %.1f' % (mean, std))
+    Mean: 0.050, Std: 0.0
+    >>> mean, std = task_func(100, 0.001)
+    >>> print(f'Mean: %.3f, Std: %.4f' % (mean, std))
+    Mean: 0.001, Std: 0.0000
     """
-    df = pd.DataFrame(data)
-    pattern = re.compile(r'\b[A-Z]+\b')
-    def replace_match(match):
-        return mapping.get(match.group(0), match.group(0))
-    df = df.applymap(lambda x: pattern.sub(replace_match, x) if isinstance(x, str) else x)
-    return df
+    delay_times = []
+    for _ in range(samples):
+        t1 = time.time()
+        time.sleep(delay)
+        t2 = time.time()
+        delay_times.append(t2 - t1)
+    delay_times = np.array(delay_times)
+    mean = np.mean(delay_times)
+    std = np.std(delay_times)
+    return mean, std
 
 import unittest
-# Unit tests for the task_func function
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_acronyms_single_column(self):
-        data = {'text': ['NASA rocks', 'Visit the USA']}
-        mapping = {'NASA': 'National Aeronautics and Space Administration', 'USA': 'United States of America'}
-        expected = pd.DataFrame({'text': ['National Aeronautics and Space Administration rocks', 'Visit the United States of America']})
-        result = task_func(data, mapping)
-        pd.testing.assert_frame_equal(result, expected)
     
-    def test_acronyms_multiple_columns(self):
-        data = {'col1': ['NASA exploration'], 'col2': ['Made in USA']}
-        mapping = {'NASA': 'National Aeronautics and Space Administration', 'USA': 'United States of America'}
-        expected = pd.DataFrame({'col1': ['National Aeronautics and Space Administration exploration'], 'col2': ['Made in United States of America']})
-        result = task_func(data, mapping)
-        pd.testing.assert_frame_equal(result, expected)
-    
-    def test_no_acronyms(self):
-        data = {'text': ['A sunny day', 'A rainy night']}
-        mapping = {'NASA': 'National Aeronautics and Space Administration'}
-        expected = pd.DataFrame({'text': ['A sunny day', 'A rainy night']})
-        result = task_func(data, mapping)
-        pd.testing.assert_frame_equal(result, expected)
-    
-    def test_non_string_types(self):
-        data = {'text': ['NASA mission', 2020, None]}
-        mapping = {'NASA': 'National Aeronautics and Space Administration'}
-        expected = pd.DataFrame({'text': ['National Aeronautics and Space Administration mission', 2020, None]})
-        result = task_func(data, mapping)
-        pd.testing.assert_frame_equal(result, expected)
-    
-    def test_empty_dataframe(self):
-        data = {'text': []}
-        mapping = {'NASA': 'National Aeronautics and Space Administration'}
-        expected = pd.DataFrame({'text': []})
-        result = task_func(data, mapping)
-        pd.testing.assert_frame_equal(result, expected)
+    def test_case_1(self):
+        start = time.time()
+        mean, std = task_func(samples=100, delay=0.001)
+        end = time.time()
+        self.assertAlmostEqual(100 * 0.001, end-start, delta=3)
+        self.assertAlmostEqual(mean, 0.001, places=0)
+        self.assertTrue(0 <= std <= 0.01)
+        
+    def test_case_2(self):
+        start = time.time()
+        mean, std = task_func(samples=3, delay=0.1)
+        end = time.time()
+        self.assertAlmostEqual(3 * 0.1, end-start, places=1)
+        self.assertAlmostEqual(mean, 0.1, delta=0.2)
+        self.assertTrue(0 <= std <= 0.01)
+    def test_case_3(self):
+        start = time.time()
+        mean, std = task_func(samples=2, delay=0.2)
+        end = time.time()
+        self.assertAlmostEqual(2 * 0.2, end-start, places=1)
+        self.assertTrue(0.19 <= mean <= 0.21)
+        self.assertTrue(0 <= std <= 0.02)
+    def test_case_4(self):
+        start = time.time()
+        mean, std = task_func(samples=100, delay=0.05)
+        end = time.time()
+        self.assertTrue(3 <= end-start <= 7)
+        self.assertTrue(0.03 <= mean <= 0.07)
+        self.assertTrue(0 <= std <= 0.05)
+    def test_case_5(self):
+        start = time.time()
+        mean, std = task_func(samples=1, delay=1)
+        end = time.time()
+        self.assertAlmostEqual(1, end-start, places=0)
+        self.assertTrue(0.9 <= mean <= 1.1)
+        self.assertTrue(0 <= std <= 0.1)

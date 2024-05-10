@@ -1,59 +1,89 @@
-from string import ascii_lowercase
-import re
-from collections import Counter
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler
 
-# Constants
-LETTERS_PATTERN = re.compile(r'^(.*?)-[a-z]$')
-LETTERS = ascii_lowercase
-
-def task_func(string):
+def task_func(df, features):
     """
-    If a string occurs, divide it the last time "-" occurs and count the frequency of each lowercase letter in the prefix of the string.
+    Standardize the functions in a DataFrame.
+    The function applies standard scaling to the features.
     
     Parameters:
-    - string (str): The input string.
+    - df (pandas.DataFrame): The input DataFrame.
+    - features (list): The list of features to standardize. May be empty.
+    
+    Returns:
+    - df (pandas.DataFrame): The DataFrame with the standardized features.
 
     Requirements:
-    - string
-    - re
-    - collections
-
-    Returns:
-    - dict: A dictionary with the frequency of each lowercase letter.
+    - pandas
+    - numpy
+    - scikit-learn
 
     Example:
-    >>> task_func('abc-def-ghij')
-    {'a': 1, 'b': 1, 'c': 1, 'd': 1, 'e': 1, 'f': 1, 'g': 0, 'h': 0, 'i': 0, 'j': 0, 'k': 0, 'l': 0, 'm': 0, 'n': 0, 'o': 0, 'p': 0, 'q': 0, 'r': 0, 's': 0, 't': 0, 'u': 0, 'v': 0, 'w': 0, 'x': 0, 'y': 0, 'z': 0}
+    >>> np.random.seed(42)
+    >>> df = pd.DataFrame(np.random.randn(20, 3), columns=['a', 'b', 'c'])
+    >>> df = task_func(df, ['a', 'b'])
+    >>> df.head(2)
+              a         b         c
+    0  0.608932  0.127900  0.647689
+    1  2.025355  0.031682 -0.234137
     """
-    match = re.search(r'^(.*)-', string)
-    if match:
-        prefix = match.group(1)
-    else:
-        prefix = string if string.isalpha() else ""
-    letter_counts = Counter(prefix)
-    result = {letter: 0 for letter in ascii_lowercase}
-    result.update({letter: letter_counts.get(letter, 0) for letter in letter_counts if letter in result})
-    return result
+    if not features:
+        return df
+    scaler = StandardScaler()
+    df.loc[:, features] = pd.DataFrame(scaler.fit_transform(df.loc[:, features]), columns=features, index=df.index)
+    df['dummy'] = np.zeros(len(df))
+    return df.drop('dummy', axis=1)  
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = task_func('abc-def-ghij')
-        expected = {letter: 1 if letter in 'abcdef' else 0 for letter in ascii_lowercase}
-        self.assertEqual(result, expected)
+        df = pd.DataFrame(np.random.randn(10, 3), columns=['a', 'b', 'c'])
+        df = task_func(df, ['a', 'b'])
+        self.assertEqual(df.shape, (10, 3))
+        self.assertTrue('a' in df.columns)
+        self.assertTrue('b' in df.columns)
+        self.assertTrue('c' in df.columns)
+        self.assertTrue(np.all(df['a'] >= -3) and np.all(df['a'] <= 3))
+        self.assertTrue(np.all(df['b'] >= -3) and np.all(df['b'] <= 3))
+        self.assertTrue(np.all(df['c'] >= -3) and np.all(df['c'] <= 3))
     def test_case_2(self):
-        result = task_func('abcdefghij')
-        expected = {letter: 1 if letter in 'abcdefghij' else 0 for letter in ascii_lowercase}
-        self.assertEqual(result, expected)
+        df = pd.DataFrame({'a': [0, 0, 0], 'b': [0, 0, 0], 'c': [0, 0, 0]})
+        df = task_func(df, ['a', 'b'])
+        self.assertEqual(df.shape, (3, 3))
+        self.assertTrue('a' in df.columns)
+        self.assertTrue('b' in df.columns)
+        self.assertTrue('c' in df.columns)
+        self.assertTrue(np.all(df['a'] == 0))
+        self.assertTrue(np.all(df['b'] == 0))
+        self.assertTrue(np.all(df['c'] == 0))
     def test_case_3(self):
-        result = task_func('aabbcc-def')
-        expected = {letter: 2 if letter in 'aabbcc' else 0 for letter in ascii_lowercase}
-        self.assertEqual(result, expected)
+        df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
+        df = task_func(df, ['a', 'b'])
+        self.assertEqual(df.shape, (3, 3))
+        self.assertTrue('a' in df.columns)
+        self.assertTrue('b' in df.columns)
+        self.assertTrue('c' in df.columns)
+        self.assertTrue(np.all(df['a'] >= -3) and np.all(df['a'] <= 3))
+        self.assertTrue(np.all(df['b'] >= -3) and np.all(df['b'] <= 3))
+        self.assertTrue(np.all(df['c'] == [7, 8, 9]))
     def test_case_4(self):
-        result = task_func('')
-        expected = {letter: 0 for letter in ascii_lowercase}
-        self.assertEqual(result, expected)
+        df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
+        df = task_func(df, ['c'])
+        self.assertEqual(df.shape, (3, 3))
+        self.assertTrue('a' in df.columns)
+        self.assertTrue('b' in df.columns)
+        self.assertTrue('c' in df.columns)
+        self.assertTrue(np.all(df['a'] == [1, 2, 3]))
+        self.assertTrue(np.all(df['b'] == [4, 5, 6]))
+        self.assertTrue(np.all(df['c'] >= -3) and np.all(df['c'] <= 3))
     def test_case_5(self):
-        result = task_func('xyz-abc')
-        expected = {letter: 1 if letter in 'xyz' else 0 for letter in ascii_lowercase}
-        self.assertEqual(result, expected)
+        df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
+        df = task_func(df, [])
+        self.assertEqual(df.shape, (3, 3))
+        self.assertTrue('a' in df.columns)
+        self.assertTrue('b' in df.columns)
+        self.assertTrue('c' in df.columns)
+        self.assertTrue(np.all(df['a'] == [1, 2, 3]))
+        self.assertTrue(np.all(df['b'] == [4, 5, 6]))
+        self.assertTrue(np.all(df['c'] == [7, 8, 9]))

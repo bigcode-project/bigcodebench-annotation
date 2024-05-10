@@ -1,64 +1,77 @@
-from functools import reduce
-import operator
-import string
+from collections import Counter
+import random
 
-def task_func(letters):
+# Constants
+HAND_RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+SUITS = ['H', 'D', 'C', 'S']
+
+def task_func():
     """
-    Calculate the product of the corresponding numbers for a list of uppercase letters, 
-    where \"A\" corresponds to 1, \"B\" to 2, etc.
-    
+    Generate a random poker hand consisting of five cards, and count the frequency of each card rank.
+
+    The function creates a list of five cards where each card is a string made up of a rank and a suit (e.g., "10H" for Ten of Hearts).
+    It then counts the frequency of each card rank in the hand using a Counter dictionary.
+
     Parameters:
-    letters (list of str): A list of uppercase letters.
-    
+    - None
+
     Returns:
-    int: The product of the numbers corresponding to the input letters.
-    
+    tuple: A tuple containing two elements:
+        - hand (list): A list of five cards.
+        - rank_count (counter): A Counter dictionary of card ranks with their frequencies in the hand.
+
     Requirements:
-    - functools.reduce
-    - operator
-    - string
-    
-    Examples:
-    >>> task_func([\"A\", \"B\", \"C\"])
-    6
-    
-    >>> task_func([\"A\", \"E\", \"I\"])
-    45
-    
-    Note:
-    The function uses a predefined dictionary to map each uppercase letter to its corresponding number.
+    - collections
+    - random
+
+    Example:
+        >>> hand, rank_counts = task_func()
+        >>> print(hand)  
+        ['QH', '2C', '5D', '4H', 'QH']
+        >>> print(rank_counts)  
+        Counter({'Q': 2, '2': 1, '5': 1, '4': 1})
     """
-    letter_to_number = {letter: i+1 for i, letter in enumerate(string.ascii_uppercase)}
-    numbers = [letter_to_number[letter] for letter in letters]
-    product = reduce(operator.mul, numbers, 1)
-    return product
+    random.seed(42)
+    hand = []
+    for _ in range(5):
+        rank = random.choice(HAND_RANKS)
+        suit = random.choice(SUITS)
+        card = f'{rank}{suit}'
+        hand.append(card)
+    rank_counts = Counter([card[:-1] for card in hand])
+    return hand, rank_counts
 
 import unittest
+from collections import Counter
+HAND_RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+SUITS = ['H', 'D', 'C', 'S']
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Input: ["A", "B", "C"]
-        # Expected Output: 6 (1 * 2 * 3)
-        result = task_func(["A", "B", "C"])
-        self.assertEqual(result, 6)
-        
-    def test_case_2(self):
-        # Input: ["A", "E", "I"]
-        # Expected Output: 45 (1 * 5 * 9)
-        result = task_func(["A", "E", "I"])
-        self.assertEqual(result, 45)
-    def test_case_3(self):
-        # Input: ["Z"]
-        # Expected Output: 26
-        result = task_func(["Z"])
-        self.assertEqual(result, 26)
-    def test_case_4(self):
-        # Input: ["X", "Y", "Z"]
-        # Expected Output: 24 * 25 * 26
-        result = task_func(["X", "Y", "Z"])
-        self.assertEqual(result, 24 * 25 * 26)
-        
-    def test_case_5(self):
-        # Input: ["A", "A", "A"]
-        # Expected Output: 1 (1 * 1 * 1)
-        result = task_func(["A", "A", "A"])
-        self.assertEqual(result, 1)
+    def test_poker_hand_length(self):
+        """Test if the poker hand has 5 cards."""
+        hand, rank_counts = task_func()
+        self.assertEqual(len(hand), 5, "The poker hand should contain 5 cards.")
+    
+    def test_card_format(self):
+        """Test if each card in the hand is formatted correctly."""
+        hand, rank_counts = task_func()
+        for card in hand:
+            self.assertIn(len(card), [2, 3], "Each card should be a string of length 2 or 3.")
+            self.assertIn(card[:-1], HAND_RANKS, "The rank of each card should be valid.")
+            self.assertIn(card[-1], SUITS, "The suit of each card should be valid.")
+    
+    def test_rank_counts_type(self):
+        """Test if rank_counts is of type Counter."""
+        hand, rank_counts = task_func()
+        self.assertIsInstance(rank_counts, Counter, "rank_counts should be a Counter dictionary.")
+    
+    def test_rank_counts_keys(self):
+        """Test if the keys of rank_counts are valid ranks."""
+        hand, rank_counts = task_func()
+        for rank in rank_counts.keys():
+            self.assertIn(rank, HAND_RANKS, "The ranks in rank_counts should be valid.")
+    
+    def test_rank_counts_values(self):
+        """Test if the values of rank_counts are integers."""
+        hand, rank_counts = task_func()
+        for count in rank_counts.values():
+            self.assertIsInstance(count, int, "The counts in rank_counts should be integers.")

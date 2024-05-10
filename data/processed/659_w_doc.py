@@ -1,58 +1,77 @@
-import math
-import random
-import statistics
+import re
+import nltk
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
 
-# Constants
-RADIUS = 5
+# Make sure to download NLTK stopwords
+nltk.download('stopwords')
 
-def task_func(n):
+# Define a regex pattern for matching all non-alphanumeric characters
+ALPHANUMERIC = re.compile('[\W_]+')
+
+# Load NLTK's list of English stop words
+STOPWORDS = nltk.corpus.stopwords.words('english')
+
+
+def task_func(texts):
     """
-    Generate n random points within a circle of radius RADIUS (default value is 5) and return their average distance from the center.
+    Creates a document-term matrix (DTM) from a list of text documents using CountVectorizer from Scikit-learn.
+    Texts are preprocessed by removing non-alphanumeric characters (excluding spaces),
+    converting to lowercase, and excluding English stop words defined in NLTK.
 
     Parameters:
-    - n (int): The number of points to be generated.
+    - texts (list of str): The list of text documents to convert into a DTM.
 
     Returns:
-    - float: The average distance from the center of the circle.
+    - pd.DataFrame: A DataFrame where rows represent documents and columns represent unique terms;
+                    cell values indicate the frequency of a term in a document.
 
     Requirements:
-    - math
-    - random
-    - statistics
+    - re
+    - nltk
+    - pandas
+    - sklearn.feature_extraction.text
 
     Example:
-    >>> random.seed(42)
-    >>> task_func(100)
-    3.2406
-    >>> task_func(50)
-    3.4443
+    >>> texts = ["Hello, world!", "Machine learning is great.", "Python is my favorite programming language."]
+    >>> dtm = task_func(texts)
     """
-    distances = []
-    for _ in range(n):
-        theta = 2 * math.pi * random.random()
-        r = RADIUS * math.sqrt(random.random())
-        x = r * math.cos(theta)
-        y = r * math.sin(theta)
-        distance = math.sqrt(x**2 + y**2)
-        distances.append(distance)
-    return round(statistics.mean(distances), 4)
+    cleaned_texts = [ALPHANUMERIC.sub(' ', text).lower() for text in texts]
+    tokenized_texts = [' '.join(word for word in text.split() if word not in STOPWORDS) for text in cleaned_texts]
+    vectorizer = CountVectorizer()
+    dtm = vectorizer.fit_transform(tokenized_texts)
+    dtm_df = pd.DataFrame(dtm.toarray(), columns= vectorizer.get_feature_names_out() if hasattr(vectorizer,
+                                                                  'get_feature_names_out') else vectorizer.get_feature_names())
+    return dtm_df
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_1(self):
-        avg_distance = task_func(1000)
-        self.assertTrue(3.1 <= avg_distance <= 3.5, f"Expected average distance to be between 3.1 and 3.5, got {avg_distance}")
-    def test_2(self):
-        avg_distance = task_func(500)
-        self.assertTrue(3.2 <= avg_distance <= 3.5, f"Expected average distance to be between 3.2 and 3.5, got {avg_distance}")
-    def test_3(self):
-        avg_distance = task_func(100)
-        self.assertTrue(2.8 <= avg_distance <= 3.7, f"Expected average distance to be between 2.8 and 3.7, got {avg_distance}")
-    def test_4(self):
-        avg_distance = task_func(50)
-        # Allowing a wider range due to higher variance with fewer points
-        self.assertTrue(2.4 <= avg_distance <= 4.1, f"Expected average distance to be between 2.4 and 4.1, got {avg_distance}")
-    def test_5(self):
-        avg_distance = task_func(10)
-        # Even wider range for very few points
-        self.assertTrue(1.4 <= avg_distance <= 4.6, f"Expected average distance to be between 1.4 and 4.6, got {avg_distance}")
+    def setUp(self):
+        self.texts = [
+            "Hello, world!",
+            "Data science is about the extraction of knowledge from data.",
+            "Machine learning is a fascinating field.",
+            "Python is a versatile programming language.",
+            "Stop words are filtered out in text preprocessing."
+        ]
+    def test_dtm_shape(self):
+        """Ensure the DTM has the correct shape."""
+        dtm = task_func(self.texts)
+        self.assertEqual(dtm.shape[0], len(self.texts), "DTM should have one row per document.")
+    def test_dtm_non_negative(self):
+        """Ensure all values in the DTM are non-negative."""
+        dtm = task_func(self.texts)
+        self.assertTrue((dtm >= 0).all().all(), "All DTM values should be non-negative.")
+    def test_stopwords_removal(self):
+        """Check if common stopwords are removed."""
+        dtm = task_func(["This is a test.", "Another test here."])
+        self.assertNotIn("is", dtm.columns, "Stopwords should be removed from DTM columns.")
+    def test_alphanumeric_filtering(self):
+        """Verify that non-alphanumeric characters are filtered out."""
+        dtm = task_func(["Example: test!", "#Another$% test."])
+        self.assertFalse(any(char in dtm.columns for char in ":!#$%"), "Non-alphanumeric characters should be filtered out.")
+    def test_lowercase_conversion(self):
+        """Test if all text is converted to lowercase."""
+        dtm = task_func(["LoWeR and UPPER"])
+        self.assertIn("lower", dtm.columns, "All text should be converted to lowercase.")
+        self.assertIn("upper", dtm.columns, "All text should be converted to lowercase.")

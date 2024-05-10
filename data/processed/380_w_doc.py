@@ -1,155 +1,67 @@
+import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy.stats import norm
 
+# Constants
+COLUMNS = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
 
-def task_func(n_samples=1000, mu=0, sigma=1, random_seed=0):
+def task_func(length):
     """
-    Generates a histogram and a probability density function (PDF) plot for a specified normal distribution.
-
-    This function draws n_samples from a normal distribution defined by mean (mu) and standard deviation (sigma),
-    plots a histogram of the samples, and overlays the PDF of the normal distribution. The histogram's density
-    is normalized, and the PDF is plotted with a red line with linewidth=2.
+    Generate a Pandas DataFrame with specified length and random data and then record the data.
 
     Parameters:
-    - n_samples (int): Number of samples for the histogram. Must be greater than 0. Default is 1000.
-    - mu (float): Mean for the normal distribution. Default is 0.
-    - sigma (float): Standard deviation for the normal distribution. Must be greater than 0. Default is 1.
-    - random_seed (int): Random seed for reproducibility. Defaults to 0.
+    length (int): The length of the DataFrame to be generated.
 
     Returns:
-    - ax (matplotlib.axes._axes.Axes): Axes object with the histogram and PDF plotted.
-    - samples (numpy.ndarray): Generated sample data.
+    DataFrame: A pandas DataFrame with random data.
 
     Requirements:
+    - pandas
     - numpy
-    - matplotlib.pyplot
-    - scipy.stats.norm
 
     Example:
-    >>> ax, samples = task_func()
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> ax.get_xticklabels()
-    [Text(-5.0, 0, '−5'), Text(-4.0, 0, '−4'), Text(-3.0, 0, '−3'), Text(-2.0, 0, '−2'), Text(-1.0, 0, '−1'), Text(0.0, 0, '0'), Text(1.0, 0, '1'), Text(2.0, 0, '2'), Text(3.0, 0, '3'), Text(4.0, 0, '4'), Text(5.0, 0, '5')]
+    >>> np.random.seed(0)
+    >>> df = task_func(5)
+    >>> df.shape
+    (5, 5)
     """
-    if n_samples <= 0 or sigma <= 0:
-        raise ValueError("Invalid n_samples or sigma")
-    np.random.seed(random_seed)
-    plt.figure()
-    samples = np.random.normal(mu, sigma, n_samples)
-    _, _, _ = plt.hist(samples, 30, density=True)
-    ax = plt.gca()
-    ax.plot(
-        np.linspace(mu - 4 * sigma, mu + 4 * sigma, 1000),
-        norm.pdf(np.linspace(mu - 4 * sigma, mu + 4 * sigma, 1000), mu, sigma),
-        linewidth=2,
-        color="r",
-    )
-    return ax, samples
+    data = np.random.randint(0,100,size=(length, len(COLUMNS)))
+    df = pd.DataFrame(data, columns=COLUMNS)
+    return df
 
 import unittest
-import matplotlib.pyplot as plt
+import pandas as pd
 import numpy as np
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.default_seed = 42
-        self.large_n_samples = 100000
-        self.small_n_samples = 100
-        self.zero_n_samples = 0
-        self.negative_n_samples = -100
-        self.default_mu = 0
-        self.default_sigma = 1
-        self.large_sigma = 5
-        self.small_sigma = 0.2
-        self.zero_sigma = 0
-        self.negative_sigma = -1
-        self.custom_mu = 5
-        self.custom_sigma = 2
+    
     def test_case_1(self):
-        # Test data generation correctness
-        mu_test = 3
-        sigma_test = 2
-        n_samples_test = 10000
-        random_seed_test = 42
-        _, samples = task_func(
-            n_samples=n_samples_test,
-            mu=mu_test,
-            sigma=sigma_test,
-            random_seed=random_seed_test,
-        )
-        # Calculate sample mean and standard deviation
-        sample_mean = np.mean(samples)
-        sample_std = np.std(samples)
-        # Verify sample mean and standard deviation are close to mu and sigma within a tolerance
-        self.assertAlmostEqual(
-            sample_mean,
-            mu_test,
-            places=1,
-            msg="Sample mean does not match expected mean.",
-        )
-        self.assertAlmostEqual(
-            sample_std,
-            sigma_test,
-            places=1,
-            msg="Sample standard deviation does not match expected sigma.",
-        )
+        # Testing basic functionality
+        np.random.seed(0)
+        df = task_func(5)
+        self.assertIsInstance(df, pd.DataFrame, "Output should be a DataFrame.")
+        self.assertEqual(df.shape, (5, 5), "DataFrame shape mismatch.")
+        
     def test_case_2(self):
-        # Default parameters
-        ax, _ = task_func(random_seed=self.default_seed)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.patches), 30)
+        # Testing custom columns
+        np.random.seed(0)
+        custom_columns = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
+        df = task_func(3)
+        self.assertListEqual(list(df.columns), custom_columns, "Column names mismatch.")
+        
     def test_case_3(self):
-        # Custom parameters: small number of samples, custom mean and standard deviation
-        ax, _ = task_func(
-            n_samples=self.small_n_samples,
-            mu=self.custom_mu,
-            sigma=self.custom_sigma,
-            random_seed=self.default_seed,
-        )
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.patches), 30)
+        # Testing return plot
+        np.random.seed(0)
+        df = task_func(4)
+        self.assertIsInstance(df, pd.DataFrame, "Output should be a DataFrame.")
+        
     def test_case_4(self):
-        # Large number of samples
-        ax, _ = task_func(n_samples=self.large_n_samples, random_seed=self.default_seed)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertTrue(len(ax.patches) >= 30)
+        # Testing data range
+        np.random.seed(0)
+        df = task_func(10)
+        self.assertTrue((df.values >= 0).all() and (df.values < 100).all(), "Data values should be between 0 and 99.")
+        
     def test_case_5(self):
-        # Small number of samples
-        ax, _ = task_func(n_samples=self.small_n_samples, random_seed=self.default_seed)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertTrue(len(ax.patches) <= 30)
-    def test_case_6(self):
-        # Large standard deviation
-        ax, _ = task_func(sigma=self.large_sigma, random_seed=self.default_seed)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.patches), 30)
-    def test_case_7(self):
-        # Small standard deviation
-        ax, _ = task_func(sigma=self.small_sigma, random_seed=self.default_seed)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.patches), 30)
-    def test_case_8(self):
-        # Invalid negative standard deviation
-        with self.assertRaises(ValueError):
-            task_func(sigma=self.negative_sigma)
-    def test_case_9(self):
-        # Invalid zero standard deviation
-        with self.assertRaises(Exception):
-            task_func(sigma=self.zero_sigma)
-    def test_case_10(self):
-        # Invalid zero samples
-        with self.assertRaises(Exception):
-            task_func(n_samples=self.zero_n_samples)
-    def test_case_11(self):
-        # Invalid negative samples
-        with self.assertRaises(ValueError):
-            task_func(n_samples=self.negative_n_samples)
-    def test_case_12(self):
-        # Reproducibility with same seed
-        ax1, sample1 = task_func(random_seed=self.default_seed)
-        ax2, sample2 = task_func(random_seed=self.default_seed)
-        self.assertEqual(ax1.patches[0].get_height(), ax2.patches[0].get_height())
-        self.assertTrue((sample1 == sample2).all())
-    def tearDown(self):
-        plt.close("all")
+        # Testing default columns
+        np.random.seed(0)
+        df = task_func(7)
+        default_columns = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
+        self.assertListEqual(list(df.columns), default_columns, "Default column names mismatch.")

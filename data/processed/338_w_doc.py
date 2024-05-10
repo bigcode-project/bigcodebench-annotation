@@ -1,88 +1,144 @@
-import seaborn as sns
-from scipy.stats import chi2_contingency
+import numpy as np
+import matplotlib.pyplot as plt
 
+# Constants
+COLORS = ['r', 'g', 'b']
 
-def task_func(df1, df2, column1="feature1", column2="feature2"):
+def task_func(df, group_col, value_col):
     """
-    Merge two dataframes based on the 'id' column, perform a chi-square independence test on the merged dataframe,
-    and draw a heatmap of the contingency table created from the features in column1, column2.
+    Create a bar chart of data in multiple groups with error bars.
 
     Parameters:
-    - df1 (DataFrame): Left dataframe to merge. Must contain columns 'id' and one matching column1.
-    - df2 (DataFrame): Right dataframe to merge from. Must contain columns 'id' and one matching column2.
-    - column1   (str): Name of column containing features in df1. Defaults to 'feature1'.
-    - column2   (str): Name of column containing features in df2. Defaults to 'feature2'.
+    - df (DataFrame): The input DataFrame containing the data.
+    - group_col (str): The name of the column to group the data by.
+    - value_col (str): The name of the column containing the values to plot.
 
     Returns:
-    tuple: A tuple containing:
-        - p (float): The p-value of the Chi-Squared test.
-        - heatmap (matplotlib.pyplot.Axes): Seaborn heatmap of the contingency table.
+    - Axes: A matplotlib axes object with the bar chart.
 
     Requirements:
-    - seaborn
-    - scipy.stats.chi2_contingency
+    - matplotlib.pyplot
+    - numpy
 
     Example:
+    >>> import matplotlib.pyplot as plt
     >>> import pandas as pd
-    >>> df1 = pd.DataFrame({'id': [1, 2, 3], 'feature1': ['A', 'B', 'A']})
-    >>> df2 = pd.DataFrame({'id': [1, 2, 3], 'feature2': ['X', 'Y', 'X']})
-    >>> p_value, heatmap = task_func(df1, df2)
-    >>> p_value
-    0.6650055421020291
-    >>> heatmap
-    <Axes: xlabel='feature2', ylabel='feature1'>
+    >>> df = pd.DataFrame({'Group': ['A', 'B', 'A', 'B', 'A', 'B'], 'Value': [1, 2, 3, 4, 5, 6]})
+    >>> ax = task_func(df, 'Group', 'Value')
+    >>> len(ax.patches)
+    2
+    >>> plt.close()
+
+    Note:
+    - The function uses a predefined set of colors for the bars. If there are more groups than colors,
+      the colors will repeat from the beginning of the COLORS list.
+    - This function use "Bar chart of {value_col} by {group_col}" for the plot title.
+    - This function use value of variables group_col and value_col as the xlabel and ylabel respectively.
+
+    Raises:
+    -This function will raise TypeError if the 'Value' has non-numeric values.
     """
-    df = pd.merge(df1, df2, on="id")
-    contingency_table = pd.crosstab(df[column1], df[column2])
-    heatmap = sns.heatmap(contingency_table)
-    chi2, p, dof, expected = chi2_contingency(contingency_table)
-    return p, heatmap
+    group_mean = df.groupby(group_col)[value_col].mean()
+    group_std = df.groupby(group_col)[value_col].std()
+    num_groups = len(group_mean)
+    index = np.arange(num_groups)
+    for i, (mean, std) in enumerate(zip(group_mean, group_std)):
+        plt.bar(index[i], mean, yerr=std, color=COLORS[i % len(COLORS)], capsize=4, label=f'Group {i+1}')
+    plt.xlabel(group_col)
+    plt.ylabel(value_col)
+    plt.title(f'Bar chart of {value_col} by {group_col}')
+    plt.xticks(index, group_mean.index)  # Set x-axis labels to group names
+    plt.legend()
+    return plt.gca()
 
 import unittest
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
+from faker import Faker
+faker = Faker()
+# Constants
+COLORS = ['r', 'g', 'b']
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Testing basic functionality with simple data
-        df1 = pd.DataFrame({"id": [1, 2, 3], "feature1": ["A", "B", "A"]})
-        df2 = pd.DataFrame({"id": [1, 2, 3], "feature2": ["X", "Y", "X"]})
-        p_value, heatmap = task_func(df1, df2)
-        # P-value should be between 0 and 1 inclusive
-        self.assertTrue(0.0 <= p_value <= 1.0)
-        self.assertEqual(len(heatmap.get_yticklabels()), 2)  # A and B
-        self.assertEqual(len(heatmap.get_xticklabels()), 2)  # X and Y
-    def test_case_2(self):
-        # Testing with distinct feature values across both dataframes
-        df1 = pd.DataFrame({"id": [1, 2, 3], "feature1": ["C", "D", "C"]})
-        df2 = pd.DataFrame({"id": [1, 2, 3], "feature2": ["W", "W", "Z"]})
-        p_value, heatmap = task_func(df1, df2)
-        self.assertTrue(0.0 <= p_value <= 1.0)
-        self.assertEqual(len(heatmap.get_yticklabels()), 2)  # C and D
-        self.assertEqual(len(heatmap.get_xticklabels()), 2)  # W and Z
-    def test_case_3(self):
-        # Test custom feature column names
-        df1 = pd.DataFrame({"id": [1, 2, 3], "foo": ["A", "B", "A"]})
-        df2 = pd.DataFrame({"id": [1, 2, 3], "bar": ["X", "Y", "X"]})
-        p_value, heatmap = task_func(df1, df2, column1="foo", column2="bar")
-        self.assertTrue(0.0 <= p_value <= 1.0)
-        self.assertEqual(len(heatmap.get_yticklabels()), 2)
-        self.assertEqual(len(heatmap.get_xticklabels()), 2)
-    def test_case_4(self):
-        # Testing a scenario where the p-value is expected to be close to 0
-        # This is because there's a strong association between feature1 and feature2
-        df1 = pd.DataFrame(
-            {"id": list(range(1, 21)), "feature1": ["A"] * 10 + ["B"] * 10}
-        )
-        df2 = pd.DataFrame(
-            {"id": list(range(1, 21)), "feature2": ["X"] * 10 + ["Y"] * 10}
-        )
-        p_value, _ = task_func(df1, df2)
-        self.assertTrue(0.0 <= p_value < 0.01)  # Expected p-value to be close to 0
-    def test_case_5(self):
-        # Test error handling - should fail when there is no 'id' column
-        df1 = pd.DataFrame({"foo": [1, 2], "bar": [3, 4]})
-        df2 = pd.DataFrame({"foo": [1, 2], "bar": [3, 4]})
-        with self.assertRaises(KeyError):
-            task_func(df1, df2)
-    def tearDown(self):
-        plt.close("all")
+    def setUp(self):
+        self.df = pd.DataFrame({'Group': ['A', 'B', 'C'], 'Value': [10, 20, 30]})
+        self.ax = task_func(self.df, 'Group', 'Value')
+        plt.close()
+    def test_bar_chart(self):
+        # Create a figure and render the plot
+        fig = plt.figure()
+        canvas = FigureCanvas(fig)
+        ax = fig.add_subplot(111)
+        canvas = FigureCanvas(fig)
+        self.ax.set_title('Bar chart of Value by Group')
+        self.ax.set_xlabel('Group')
+        self.ax.set_ylabel('Value')
+        self.ax.legend(['Group 1', 'Group 2', 'Group 3'])
+        canvas.draw()
+        
+        # Get the RGBA buffer and convert to RGB
+        buf = canvas.buffer_rgba()
+        rgb = np.asarray(buf)
+        # Check that bars are present in the plot
+        self.assertTrue(np.any(rgb[:, :, 3] != 0), msg="No bars found in the plot")
+        plt.close()
+    def test_single_group(self):
+        # Test for a single group with a single value
+        df_single_group = pd.DataFrame({
+            'Group': ['A'] * 4,
+            'Value': [1, 2, 3, 4]
+        })
+        ax = task_func(df_single_group, 'Group', 'Value')
+        self.assertIsNotNone(ax, "The axes object should not be None")
+        plt.close()
+    def test_multiple_groups(self):
+        # Test for multiple groups
+        df_multiple_groups = pd.DataFrame({
+            'Group': ['A', 'B', 'C', 'D'] * 4,
+            'Value': [1, 2, 3, 4] * 4
+        })
+        ax = task_func(df_multiple_groups, 'Group', 'Value')
+        self.assertIsNotNone(ax, "The axes object should not be None")
+        plt.close()
+    def test_with_nan(self):
+        # Test handling of NaN values
+        df_with_nan = pd.DataFrame({
+            'Group': ['A', 'B', 'C', 'D', None],
+            'Value': [1, 2, 3, 4, None]
+        })
+        ax = task_func(df_with_nan, 'Group', 'Value')
+        self.assertIsNotNone(ax, "The axes object should not be None")
+        plt.close()
+    def test_non_numeric_values(self):
+        # Test with non-numeric values to ensure TypeError is raised
+        df_non_numeric = pd.DataFrame({
+            'Group': ['A', 'B', 'C', 'D'],
+            'Value': [1, 'two', 3, 4]
+        })
+        with self.assertRaises(TypeError):
+            task_func(df_non_numeric, 'Group', 'Value')
+        plt.close()
+    def test_large_numbers(self):
+        # Test with a large range of numbers
+        df_large_numbers = pd.DataFrame({
+            'Group': ['A'] * 100,
+            'Value': range(1, 101)
+        })
+        ax = task_func(df_large_numbers, 'Group', 'Value')
+        self.assertIsNotNone(ax, "The axes object should not be None")
+        plt.close()
+    def test_complex_data(self):
+        # Test with complex data generated by Faker
+        df_complex = generate_complex_test_data(num_rows=100)
+        ax = task_func(df_complex, 'Group', 'Value')
+        self.assertIsNotNone(ax, "The axes object should not be None for complex data")
+        plt.close()
+def generate_complex_test_data(num_rows=100):
+    """Generate a DataFrame with a mix of numeric and text data, including some potential outliers."""
+    data = {
+        'Group': [faker.random_element(elements=('A', 'B', 'C', 'D')) for _ in range(num_rows)],
+        'Value': [faker.random_int(min=0, max=1000) for _ in range(num_rows)]
+    }
+    complex_df = pd.DataFrame(data)
+    return complex_df

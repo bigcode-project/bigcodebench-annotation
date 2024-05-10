@@ -1,83 +1,72 @@
-import collections
-import pandas as pd
+import pytz
+import numpy as np
+from dateutil.parser import parse
+import math
 
-def task_func(my_tuple, path_csv_files):
+
+SOLAR_CYCLE_YEARS = np.array([1986, 1996, 2008, 2019])
+
+def task_func(date_str, from_tz, to_tz):
     """
-    Count the occurrences of each value in the specified columns in multiple CSV files.
+    Calculate solar activity based on the date and time, taking into account the solar cycle of 11 years.
 
     Parameters:
-    my_tuple (tuple): The tuple of column names.
-    path_csv_files (list of string): The list of csv files to read.
+    date_str (str): The date string in "yyyy-mm-dd hh:mm:ss" format.
+    from_tz (str): The timezone of the given date string.
+    to_tz (str): The timezone to which the given date and time should be converted.
 
     Returns:
-    dict: A dictionary where keys are column names and values are dictionaries 
-        with unique values in the column as keys and their counts as values.
+    float: The solar activity between 0 and 1. The value represents the solar activity 
+           calculated using a cosine function based on the years since the closest solar cycle year.
 
     Requirements:
-    - collections
-    - pandas
+    - pytz
+    - numpy
+    - dateutil.parser
+    - math
 
     Example:
-    >>> from unittest.mock import MagicMock
-    >>> import pandas as pd
-    >>> df1 = pd.DataFrame({'Country': ['USA', 'Canada', 'USA'], 'Gender': ['Male', 'Female', 'Male']})
-    >>> df2 = pd.DataFrame({'Country': ['UK', 'USA', 'Germany'], 'Gender': ['Male', 'Male', 'Female']})
-    >>> pd.read_csv = MagicMock(side_effect=[df1, df2])
-    >>> result = task_func(('Country', 'Gender'), ['file1.csv', 'file2.csv'])
-    >>> print(result['Country'])
-    Counter({'USA': 3, 'Canada': 1, 'UK': 1, 'Germany': 1})
+    >>> task_func('1970-01-01 00:00:00', 'UTC', 'America/New_York')
+    0.14231483827328487
+    >>> task_func('1990-01-01 00:00:00', 'UTC', 'America/New_York')
+    0.6548607339452851
     """
-    counter = {column: collections.Counter() for column in my_tuple}
-    for csv_file in path_csv_files:
-        df = pd.read_csv(csv_file)
-        for column in my_tuple:
-            if column in df:
-                counter[column].update(df[column])
-    return counter
+    from_tz = pytz.timezone(from_tz)
+    to_tz = pytz.timezone(to_tz)
+    given_date = parse(date_str).replace(tzinfo=from_tz)
+    converted_date = given_date.astimezone(to_tz)
+    solar_cycle_year = SOLAR_CYCLE_YEARS[np.argmin(np.abs(SOLAR_CYCLE_YEARS - converted_date.year))]
+    years_since_solar_cycle_year = abs(converted_date.year - solar_cycle_year)
+    solar_activity = math.cos(math.pi * years_since_solar_cycle_year / 11)
+    return solar_activity
 
 import unittest
-from unittest.mock import patch, MagicMock
-import pandas as pd
+import math
+import doctest
 class TestCases(unittest.TestCase):
-    @patch('pandas.read_csv')
-    def test_read_csv_files(self, mock_read_csv):
-        # Mocking pandas.read_csv to return a DataFrame
-        mock_read_csv.side_effect = lambda x: pd.DataFrame({'Country': ['USA', 'Canada', 'USA'], 'Gender': ['Male', 'Female', 'Male']})
-        # Call the function with mocked data
-        result = task_func(('Country', 'Gender'), ['file1.csv'])
-        # Assertions to verify the function behavior
-        self.assertEqual(result['Country'], {'USA': 2, 'Canada': 1})
-        self.assertEqual(result['Gender'], {'Male': 2, 'Female': 1})
-   
-    @patch('pandas.read_csv')
-    def test_empty_csv_files(self, mock_read_csv):
-        # Mocking pandas.read_csv to return an empty DataFrame
-        mock_read_csv.side_effect = lambda x: pd.DataFrame(columns=['Country', 'Gender'])
-        # Call the function with mocked data
-        result = task_func(('Country', 'Gender'), ['file1.csv'])
-        # Assertions to verify the function behavior
-        self.assertEqual(result['Country'], {})
-        self.assertEqual(result['Gender'], {})
-    @patch('pandas.read_csv')
-    def test_missing_column(self, mock_read_csv):
-        # Mocking pandas.read_csv to return a DataFrame with missing 'Gender' column
-        mock_read_csv.side_effect = lambda x: pd.DataFrame({'Country': ['USA', 'Canada', 'USA']})
-        # Call the function with mocked data
-        result = task_func(('Country', 'Gender'), ['file1.csv', 'file2.csv'])
-        # Assertions to verify the function behavior
-        self.assertEqual(result['Country'], {'USA': 4, 'Canada': 2})
-        self.assertEqual(result['Gender'], {})
-    @patch('pandas.read_csv')
-    def test_no_csv_files(self, mock_read_csv):
-        # Call the function with mocked data
-        result = task_func(('Country', 'Gender'), [])
-        # Assertions to verify the function behavior
-        self.assertEqual(result['Country'], {})
-        self.assertEqual(result['Gender'], {})
-    @patch('pandas.read_csv')
-    def test_invalid_csv_files(self, mock_read_csv):
-        # Mocking pandas.read_csv to raise an exception when reading the CSV files
-        mock_read_csv.side_effect = Exception
-        # Call the function with mocked data
-        with self.assertRaises(Exception):
-            result = task_func(('Country', 'Gender'), ['file3.csv'])
+    def test_case_1(self):
+        # Input 1: Testing with a date from the first solar cycle year
+        result = task_func('1986-01-01 00:00:00', 'UTC', 'America/New_York')
+        expected = 0.95949
+        self.assertAlmostEqual(result, expected, places=5)
+        
+    def test_case_2(self):
+        # Input 2: Testing with a date from a year halfway between two solar cycle years
+        result = task_func('1991-01-01 00:00:00', 'UTC', 'America/New_York')
+        expected = 0.415415
+        self.assertAlmostEqual(result, expected, places=5)
+    def test_case_3(self):
+        # Input 3: Testing with a date from the third solar cycle year
+        result = task_func('2008-01-01 00:00:00', 'UTC', 'America/New_York')
+        expected = 0.959492
+        self.assertAlmostEqual(result, expected, places=5)
+    def test_case_4(self):
+        # Input 4: Testing with a date from a recent year
+        result = task_func('2023-01-01 00:00:00', 'UTC', 'America/New_York')
+        expected = 0.654860
+        self.assertAlmostEqual(result, expected, places=5)
+    def test_case_5(self):
+        # Input 5: Testing with a date from a year close to a solar cycle year
+        result = task_func('2018-01-01 00:00:00', 'UTC', 'America/New_York')
+        expected = 0.841253
+        self.assertAlmostEqual(result, expected, places=5)

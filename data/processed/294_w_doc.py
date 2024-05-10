@@ -1,79 +1,70 @@
-from scipy.optimize import curve_fit
+import itertools
+import numpy as np
 import matplotlib.pyplot as plt
 
-def task_func(l, x_data, plot=False):
+
+def task_func(elements, subset_size):
     """
-    Adjust a quadratic curve to the specified data and return the parameters and fitted values.
-    
+    Generate all subsets of a given size from a tuple and draw a histogram of the sums of the subsets. Additionally,
+    return the Axes object of the plotted histogram and the combinations of the subsets and their sums.
+
     Parameters:
-    l (numpy array): The input y-values.
-    x_data (numpy array): The x-values corresponding to l.
-    plot (bool, optional): If True, a plot will be returned. Default is False.
-    
+    - elements (tuple): A tuple of integers for which subsets will be generated.
+    - subset_size (int): Size of the subsets to be generated.
+
     Returns:
-    tuple: A tuple containing the following:
-        - params (numpy array): Parameters of the fitted curve.
-        - fitted_values (numpy array): Fitted y-values for the provided x_data.
-        - ax (matplotlib.axes._axes.Axes, optional): Axes object of the plot if plot=True.
+    - matplotlib.axes.Axes: Axes object of the plotted histogram.
+    - list: List of all the combinations of subsets.
+    - list: List of the sums of all the subsets.
 
     Requirements:
-    - scipy.optimize.curve_fit
-    - matplotlib.pyplot
+    - itertools
+    - numpy
+    - matplotlib
 
     Example:
-    >>> import numpy as np
-    >>> l = np.array([1, 4, 9, 16, 25])
-    >>> x_data = np.array([1, 2, 3, 4, 5])
-    >>> params, fitted_values = task_func(l, x_data)
-    >>> print(fitted_values)
-    [ 1.  4.  9. 16. 25.]
+    >>> ax, combs, sums = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> len(combs)
+    45
+    >>> len(sums)
+    45
     """
-    def func(x, a, b):
-        return a * x**2 + b
-    params, _ = curve_fit(func, x_data, l)
-    fitted_values = func(x_data, *params)
-    if plot:
-        fig, ax = plt.subplots(figsize=(6, 4))
-        ax.scatter(x_data, l, label='Data')
-        ax.plot(x_data, fitted_values, label='Fitted function')
-        ax.legend(loc='best')
-        return params, fitted_values, ax
-    return params, fitted_values
+    combinations = list(itertools.combinations(elements, subset_size))
+    sums = [sum(combination) for combination in combinations]
+    ax = plt.hist(sums, bins=np.arange(min(sums), max(sums) + 2) - 0.5, rwidth=0.8, align='left')
+    return plt.gca(), combinations, sums
 
 import unittest
-import numpy as np
+import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        l = np.array([1, 4, 9, 16, 25])
-        x_data = np.array([1, 2, 3, 4, 5])
-        params, fitted_values = task_func(l, x_data)
-        # Check the correctness of the fitted parameters
-        self.assertAlmostEqual(params[0], 1.0, places=5)
-        self.assertAlmostEqual(params[1], 0, places=5)
-        # Check the correctness of the fitted values
-        np.testing.assert_array_almost_equal(fitted_values, l, decimal=5)
+        # Testing with a tuple of size 10 and subset size 2
+        ax, combs, sums = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
+        self.assertIsInstance(ax, plt.Axes)  # Check if the return type is correct
+        # Test the combinations and sums
+        self.assertEqual(len(combs), 45)
+        self.assertEqual(len(sums), 45)
     def test_case_2(self):
-        l = np.array([2, 5, 10, 17, 26])
-        x_data = np.array([1, 2, 3, 4, 5])
-        params, fitted_values = task_func(l, x_data)
-        # Check the correctness of the fitted values
-        np.testing.assert_array_almost_equal(fitted_values, l, decimal=5)
+        # Testing with a tuple of size 5 and subset size 3
+        ax, combs, sums = task_func((2, 4, 6, 8, 10), 3)
+        self.assertIsInstance(ax, plt.Axes)
+        # Test the combinations and sums
+        self.assertEqual(len(combs), 10)
+        self.assertEqual(len(sums), 10)
     def test_case_3(self):
-        l = np.array([0, 3, 8, 15, 24])
-        x_data = np.array([1, 2, 3, 4, 5])
-        params, fitted_values, ax = task_func(l, x_data, plot=True)
-        # Ensure the fitted values are correct
-        np.testing.assert_array_almost_equal(fitted_values, l, decimal=5)
-        # Ensure a plot is returned by checking the type of ax
+        # Testing with an empty tuple
+        ax, combs, sums = task_func((), 0)
         self.assertIsInstance(ax, plt.Axes)
     def test_case_4(self):
-        x_data = np.array([1, 2, 3, 4, 5])
-        l = x_data ** 2
-        params, fitted_values, ax = task_func(l, x_data, plot=True)
-        line = ax.lines[0].get_xydata()
-        self.assertTrue(np.allclose(line[:, 1], l))  # The plotted curve should match the fitted values
+        # Testing with negative numbers in the tuple
+        ax, combs, sums = task_func((-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5), 2)
+        self.assertIsInstance(ax, plt.Axes)
     def test_case_5(self):
-        x_data = np.array([1, 2, 3, 4, 5])
-        l = x_data ** 2
-        
-        self.assertEqual(len(task_func(l, x_data, plot=False)), 2)  # If plot=False, no Axes object should be returned
+        # Testing with a subset size of 0
+        ax, combs, sums = task_func((1, 2, 3, 4, 5), 2)
+        self.assertIsInstance(ax, plt.Axes)
+        # Test the combinations and sums
+        self.assertEqual(combs, [(1, 2), (1, 3), (1, 4), (1, 5), (2, 3), (2, 4), (2, 5), (3, 4), (3, 5), (4, 5)])
+        self.assertEqual(sums, [3, 4, 5, 6, 5, 6, 7, 7, 8, 9])

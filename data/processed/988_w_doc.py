@@ -1,96 +1,90 @@
-import pandas as pd
+import json
+import numpy as np
+import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
 
 
-def task_func(data=None):
+def task_func(json_data: str, key_path: list):
     """
-    Converts string-formatted weights to floats and plots a scatter plot of weight against height.
+    Extracts and visualizes numerical data from a JSON structure based on a specified path of keys.
 
-    This function takes a dictionary with two keys: 'Weight_String' and 'Height'. The 'Weight_String' key should 
-    contain a list of weight values in string format, while the 'Height' key should have a list of corresponding 
-    height values in numerical format. If the input dictionary is not provided, the function uses a default dataset.
-    The function then converts the string-formatted weights into float, and plots a scatter plot to visualize 
-    the relationship between weight and height.
-       
     Parameters:
-    - data (dict, optional): A dictionary with keys 'Weight_String' and 'Height'. 'Weight_String' is expected to be 
-                           a list of weight values in string format (e.g., ['60.5', '65.7']), and 'Height' is expected 
-                           to be a list of corresponding numerical height values (e.g., [160, 165]). If no dictionary 
-                           is provided, a default dataset with predetermined values is used.
-                           Default dictionary:
-                           {
-                               'Weight_String': ['60.5', '65.7', '70.2', '75.9', '80.1'],
-                               'Height': [160, 165, 170, 175, 180]
-                           }
+    json_data (str): JSON formatted string.
+    key_path (list): List of strings representing the nested keys to locate the data within the JSON.
 
     Returns:
-    - ax (matplotlib.axes._axes.Axes): A scatter plot with weight on the x-axis and height on the y-axis, titled "Weight vs Height".
+    matplotlib.figure.Figure: A matplotlib figure showing a boxplot of the data values.
 
     Raises:
-    - ValueError: If any of the values in the 'Weight_String' key are not formatted as strings. This validation ensures 
-                that the weight data is in the expected format for conversion to float.
+    KeyError: If a specified key is not found.
+    ValueError: If no numeric data is found, or the data string is empty or corrupted.
 
     Requirements:
-    - pandas
+    - json
+    - numpy
+    - matplotlib
     - seaborn
+    - pandas
 
-    Example:
-    >>> ax = task_func()
-    >>> print(ax.get_title())
-    Weight vs Height
+    Examples:
+    >>> json_data = '{"level1":{"level2":{"data":"1,2,3,4"}}}'
+    >>> key_path = ['level1', 'level2', 'data']
+    >>> fig = task_func(json_data, key_path)
+    >>> isinstance(fig, plt.Figure)
+    True
     """
-    if data is None:
-        data = {
-            "Weight_String": ["60.5", "65.7", "70.2", "75.9", "80.1"],
-            "Height": [160, 165, 170, 175, 180],
-        }
-    df = pd.DataFrame(data)
-    if not all(isinstance(weight, str) for weight in df["Weight_String"]):
-        raise ValueError("Weights must be provided as strings.")
-    df["Weight_Float"] = df["Weight_String"].astype(float)
-    ax = sns.scatterplot(data=df, x="Weight_Float", y="Height")
-    ax.set_title("Weight vs Height")
-    return ax
+    try:
+        data = json.loads(json_data)
+        for key in key_path:
+            data = data[key]
+        values = np.fromstring(data, sep=",")
+        if values.size == 0:
+            raise ValueError("No numeric data found or empty data string.")
+        df = pd.DataFrame(values, columns=["Values"])
+        fig, ax = plt.subplots()
+        sns.boxplot(data=df, ax=ax)
+        return fig
+    except json.decoder.JSONDecodeError as e:
+        raise ValueError(f"Input malformed: {e}")
+    except KeyError as e:
+        raise KeyError(f"Key error occurred: {e}")
+    except ValueError as e:
+        raise ValueError(f"Value error occurred: {e}")
 
 import unittest
-import pandas as pd
-from matplotlib.axes import Axes
+import warnings
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for task_func"""
-    def test_default_data(self):
-        """Test task_func with its default data."""
-        result = task_func()
-        self.assertIsInstance(result, Axes)
-    def test_custom_data(self):
-        """Test task_func with custom data."""
-        custom_data = {
-            "Weight_String": ["50.5", "55.7", "60.2"],
-            "Height": [150, 155, 160],
-        }
-        result = task_func(custom_data)
-        self.assertIsInstance(result, Axes)
-    def test_incorrect_data_type(self):
-        """Test task_func with incorrect data types in Weight_String."""
-        incorrect_data = {
-            "Weight_String": [
-                60.5,
-                65.7,
-                70.2,
-            ],  # Intentionally using floats instead of strings
-            "Height": [160, 165, 170],
-        }
+    def test_correct_data_extraction(self):
+        """Tests correct extraction and visualization from valid JSON data."""
+        json_data = '{"level1":{"level2":{"data":"1,2,3,4"}}}'
+        key_path = ["level1", "level2", "data"]
+        fig = task_func(json_data, key_path)
+        self.assertIsInstance(fig, plt.Figure)
+    def test_missing_key_error(self):
+        """Tests response to missing key in JSON data."""
+        json_data = '{"level1":{}}'
+        key_path = ["level1", "level2", "data"]
+        with self.assertRaises(KeyError):
+            task_func(json_data, key_path)
+    def test_corrupted_json(self):
+        """Tests response to malformed data."""
+        key_path = ["level1", "level2", "data"]
+        for x in ["{'level1':{}}", '{"level1":{"level' "invalid", ""]:
+            with self.assertRaises(ValueError):
+                task_func(x, key_path)
+    def test_empty_data_value_error(self):
+        """Tests response to empty numeric data."""
+        json_data = '{"level1":{"level2":{"data":""}}}'
+        key_path = ["level1", "level2", "data"]
         with self.assertRaises(ValueError):
-            task_func(incorrect_data)
-    def test_empty_data(self):
-        """Test task_func with empty data."""
-        empty_data = {"Weight_String": [], "Height": []}
-        result = task_func(empty_data)
-        self.assertIsInstance(result, Axes)
-    def test_mismatched_data_length(self):
-        """Test task_func with mismatched lengths of Weight_String and Height."""
-        mismatched_data = {
-            "Weight_String": ["60.5", "65.7"],  # Less weights than heights
-            "Height": [160, 165, 170],
-        }
-        with self.assertRaises(ValueError):
-            task_func(mismatched_data)
+            task_func(json_data, key_path)
+    def test_non_numeric_data_value_error(self):
+        """Tests response to non-numeric data."""
+        json_data = '{"level1":{"level2":{"data":"a,b,c"}}}'
+        key_path = ["level1", "level2", "data"]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            with self.assertRaises(ValueError):
+                task_func(json_data, key_path)

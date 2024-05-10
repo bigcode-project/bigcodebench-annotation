@@ -1,109 +1,128 @@
-from datetime import datetime, timedelta
-import pytz
-import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
+import requests
+from io import StringIO
 
-
-def task_func(start_time, end_time):
+def task_func(csv_url_dict, sort_by_column="title"):
     """
-    Plots the hourly difference between UTC and specified global time zones across a date range.
-
-    This function visualizes the time difference in hours between UTC and predefined time zones for each day
-    within the specified date range. Predefined time zones include UTC, America/Los_Angeles, Europe/Paris,
-    Asia/Kolkata, and Australia/Sydney. The differences are plotted on a graph, using a distinct color for
-    each time zone's time difference curve, selecting from ["b", "g", "r", "c", "m", "y", "k"].
-
+    Fetches data from a given dictionary that includes a CSV URL and returns a pandas DataFrame sorted based on two specified columns.
+    
     Parameters:
-    - start_time (str): The start date in the format "yyyy-mm-dd".
-    - end_time (str): The end date in the format "yyyy-mm-dd".
-
+    - csv_url_dict (dict): The dictionary with the key "URL" to fetch the CSV data from.
+    - sort_by_column (str): The column name based on which the data needs to be sorted. Default is "title".
+    
     Returns:
-    - matplotlib.axes.Axes: The Axes object with the plotted time differences in hours between UTC and 
-                            other time zones.
+    DataFrame: The pandas DataFrame sorted based on the specified column.
+    
+    Raises:
+    - This function will raise a ValueError if the dictionary is empty or the key "URL" does not exist in the dictionary.
 
     Requirements:
-    - datetime.datetime
-    - datetime.timedelta
-    - pytz
-    - numpy
-    - matplotlib.pyplot
-
+    - pandas
+    - requests
+    - io.StringIO
+    
     Example:
-    >>> ax = task_func('2021-01-01', '2021-01-10')
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> ax.get_xticklabels()
-    [Text(18628.0, 0, '2021-01-01'), Text(18629.0, 0, '2021-01-02'), Text(18630.0, 0, '2021-01-03'), Text(18631.0, 0, '2021-01-04'), Text(18632.0, 0, '2021-01-05'), Text(18633.0, 0, '2021-01-06'), Text(18634.0, 0, '2021-01-07'), Text(18635.0, 0, '2021-01-08'), Text(18636.0, 0, '2021-01-09')]
+    >>> task_func({"URL": "http://example.com/data.csv"}, "title")
+       id   title  price
+    0   1   Apple    0.3
+    1   2  Banana    0.5
+    2   3  Cherry    0.2
+
+    >>> task_func({"URL": "http://example.com/test.csv"}, "price")
+       id   title  price
+    2   3  Cherry    0.2
+    0   1   Apple    0.3
+    1   2  Banana    0.5
     """
-    TIMEZONES = [
-        "UTC",
-        "America/Los_Angeles",
-        "Europe/Paris",
-        "Asia/Kolkata",
-        "Australia/Sydney",
-    ]
-    COLORS = ["b", "g", "r", "c", "m", "y", "k"]
-    start_date = datetime.strptime(start_time, "%Y-%m-%d")
-    end_date = datetime.strptime(end_time, "%Y-%m-%d")
-    current_tz = pytz.timezone("UTC")
-    dates = np.arange(start_date, end_date, timedelta(days=1)).astype(datetime)
-    differences = []
-    for tz in TIMEZONES:
-        other_tz = pytz.timezone(tz)
-        difference = [
-            (other_tz.localize(dt) - current_tz.localize(dt)).total_seconds() / 3600
-            for dt in dates
-        ]
-        differences.append(difference)
-    fig, ax = plt.subplots()
-    for i, difference in enumerate(differences):
-        ax.plot(dates, difference, color=COLORS[i % len(COLORS)], label=TIMEZONES[i])
-    ax.set_xlabel("Date")
-    ax.set_ylabel("Time difference (hours)")
-    ax.legend()
-    return ax
+    if "URL" not in csv_url_dict or not csv_url_dict:
+        raise ValueError("The dictionary must contain a 'URL' key.")
+    response = requests.get(csv_url_dict["URL"])
+    response.raise_for_status()  # Raise an exception for invalid responses
+    csv_data = response.text
+    df = pd.read_csv(StringIO(csv_data))
+    sorted_df = df.sort_values(by=sort_by_column)
+    return sorted_df
 
 import unittest
-import matplotlib.pyplot as plt
+from unittest.mock import patch
+from io import StringIO
+import pandas as pd
+import requests
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test basic functionality
-        ax = task_func("2021-01-01", "2021-01-10")
-        self._common_assertions(ax)
-    def test_case_2(self):
-        # Test single day range
-        ax = task_func("2021-01-01", "2021-01-01")
-        self._common_assertions(ax)
-    def test_case_3(self):
-        # Test leap year
-        ax = task_func("2020-02-28", "2020-03-01")
-        self._common_assertions(ax)
-    def test_case_4(self):
-        # Test DST transition
-        ax = task_func("2021-03-27", "2021-03-29")
-        self._common_assertions(ax)
-    def test_case_5(self):
-        # Test plotting consistency
-        ax = task_func("2021-01-01", "2021-01-10")
-        colors = [line.get_color() for line in ax.get_lines()]
-        self.assertEqual(len(set(colors)), len(colors))  # Check if colors are unique
-    def test_case_6(self):
-        # Testing input validation via invalid date format
+    @patch('requests.get')
+    def test_case_1(self, mock_get):
+        mock_csv_content = "id,title,price\n2,Banana,0.5\n1,Apple,0.3\n3,Cherry,0.2\n"
+        mock_response = requests.models.Response()
+        mock_response.status_code = 200
+        mock_response.headers['content-type'] = 'text/csv'
+        mock_response._content = mock_csv_content.encode('utf-8')
+        mock_get.return_value = mock_response
+        
+        result = task_func({"URL": "http://example.com/data.csv"}, 'title')
+        expected_titles = ["Apple", "Banana", "Cherry"]
+        actual_titles = result['title'].tolist()
+        self.assertEqual(actual_titles, expected_titles)
+    @patch('requests.get')
+    def test_case_2(self, mock_get):
+        mock_csv_content = "id,title,price\n2,Banana,0.5\n1,Apple,0.3\n3,Cherry,0.2\n"
+        
+        mock_response = requests.models.Response()
+        mock_response.status_code = 200
+        mock_response.headers['content-type'] = 'text/csv'
+        mock_response._content = mock_csv_content.encode('utf-8')
+        mock_get.return_value = mock_response
+        
+        result = task_func({"URL": "http://example.com/tst.csv"}, 'price')
+        self.assertEqual(result.iloc[0]['price'], 0.2)
+        self.assertEqual(result.iloc[1]['price'], 0.3)
+        self.assertEqual(result.iloc[2]['price'], 0.5)
+    @patch('requests.get')
+    def test_case_3(self, mock_get):
+        mock_csv_content = "id,title,price\n2,Banana,0.5\n1,Apple,0.3\n3,Cherry,0.2\n"
+        
+        
+        mock_response = requests.models.Response()
+        mock_response.status_code = 200
+        mock_response.headers['content-type'] = 'text/csv'
+        mock_response._content = mock_csv_content.encode('utf-8')
+        mock_get.return_value = mock_response
+        
+        result = task_func({"URL": "http://example.com/tst.csv"})
+        self.assertEqual(result.iloc[0]['title'], "Apple")
+        self.assertEqual(result.iloc[1]['title'], "Banana")
+        self.assertEqual(result.iloc[2]['title'], "Cherry")
+    @patch('requests.get')
+    def test_case_4(self, mock_get):
+        mock_csv_content =  "id,title,price\n"
+        mock_response = requests.models.Response()
+        mock_response.status_code = 200
+        mock_response.headers['content-type'] = 'text/csv'
+        mock_response._content = mock_csv_content.encode('utf-8')
+        mock_get.return_value = mock_response
+        
+        result = task_func({"URL": "http://example.com/empty.csv"})
+        self.assertTrue(result.empty)
+    @patch('requests.get')
+    def test_case_5(self, mock_get):
+        mock_csv_content = "id,name,age\n2,John,25\n1,Alice,30\n3,Bob,20\n"
+        mock_response = requests.models.Response()
+        mock_response.status_code = 200
+        mock_response.headers['content-type'] = 'text/csv'
+        mock_response._content = mock_csv_content.encode('utf-8')
+        mock_get.return_value = mock_response
+        
+        result = task_func({"URL": "http://example.com/test_2.csv"}, "age")
+        self.assertEqual(result.iloc[0]['name'], "Bob")
+        self.assertEqual(result.iloc[1]['name'], "John")
+        self.assertEqual(result.iloc[2]['name'], "Alice")
+    
+    @patch('requests.get')
+    def test_case_6(self, mock_get):
+        mock_csv_content =  "id,title,price\n"
+        mock_response = requests.models.Response()
+        mock_response.status_code = 400
+        mock_response.headers['content-type'] = 'text/csv'
+        mock_response._content = mock_csv_content.encode('utf-8')
+        mock_get.return_value = mock_response
         with self.assertRaises(ValueError):
-            task_func("01-01-2021", "10-01-2021")
-    def _common_assertions(self, ax):
-        """Common assertions for all test cases"""
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_xlabel(), "Date")
-        self.assertEqual(ax.get_ylabel().lower(), "time difference (hours)".lower())
-        legend_labels = [text.get_text() for text in ax.get_legend().get_texts()]
-        expected_timezones = [
-            "UTC",
-            "America/Los_Angeles",
-            "Europe/Paris",
-            "Asia/Kolkata",
-            "Australia/Sydney",
-        ]
-        self.assertListEqual(legend_labels, expected_timezones)
-    def tearDown(self):
-        plt.close("all")
+            result = task_func({"link": "http://example.com/error.csv"})

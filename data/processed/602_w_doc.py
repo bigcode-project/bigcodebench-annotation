@@ -1,58 +1,81 @@
-import numpy as np
-import math
-import random
-from random import uniform
+import seaborn as sns
+import time
 
-
-def task_func(radius, num_points):
+def task_func(df, letter):
     """
-    Create a tuple with a list of random points within a circle of a given radius.
-    
+    Filters rows in a DataFrame based on the starting letter of the values in the 'Word' column.
+    It then calculates the lengths of these words and returns a box plot representing the distribution
+    of these lengths.
+
     Parameters:
-    - radius (int): The radius of the circle.
-    - num_points (int): The number of points to be generated.
+    - df (pd.DataFrame): The input DataFrame containing a 'Word' column with string values.
+    - letter (str): A lowercase letter to filter words in the 'Word' column.
 
     Returns:
-    - out (list): A list of points within a circle.
+    - Axes: A box plot visualizing the distribution of the word lengths for words starting
+                   with the specified letter. If the DataFrame is empty or the 'Word' column is missing,
+                   returns None.
 
     Requirements:
-    - numpy
-    - math
-    - random
+    - seaborn
+    - time
 
     Example:
-    >>> random.seed(42)
-    >>> task_func(1, 3)
-    [(-0.10124546928297637, -0.12149119380571095), (-0.07399370924760951, 0.46662154808860146), (-0.06984148700093858, -0.8196472742078809)]
+    >>> import pandas as pd
+    >>> words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
+    >>> df = pd.DataFrame({'Word': words})
+    >>> _ = task_func(df, 'apple')
     """
-    out = []
-    for _ in range(num_points):
-        theta = uniform(0, 2*np.pi)
-        r = radius * math.sqrt(uniform(0, 1))
-        x = r * math.cos(theta)
-        y = r * math.sin(theta)
-        out.append((x, y))
-    return out
+    start_time = time.time()
+    if 'Word' not in df.columns:
+        raise ValueError("The DataFrame should contain a 'Word' column.")
+    if df.empty:
+        print("The DataFrame is empty.")
+        return None
+    regex = f'^{letter}'
+    filtered_df = df[df['Word'].str.match(regex)]
+    if filtered_df.empty:
+        print(f"No words start with the letter '{letter}'.")
+        return None
+    word_lengths = filtered_df['Word'].str.len()
+    ax = sns.boxplot(x=word_lengths)
+    ax.set_title(f"Word Lengths Distribution for Words Starting with '{letter}'")
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
+    return ax
 
 import unittest
+from unittest.mock import patch
+import matplotlib.pyplot as plt
+import pandas as pd
+# Check and set the backend
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        points = task_func(1, 3)
-        for x, y in points:
-            self.assertTrue(x**2 + y**2 <= 1)
-    def test_case_2(self):
-        points = task_func(2, 3)
-        for x, y in points:
-            self.assertTrue(x**2 + y**2 <= 4)
-    def test_case_3(self):
-        points = task_func(3, 3)
-        for x, y in points:
-            self.assertTrue(x**2 + y**2 <= 9)
-    def test_case_4(self):
-        points = task_func(4, 3)
-        for x, y in points:
-            self.assertTrue(x**2 + y**2 <= 16)
-    def test_case_5(self):
-        points = task_func(5, 3)
-        for x, y in points:
-            self.assertTrue(x**2 + y**2 <= 25)
+    def setUp(self):
+        self.words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
+        self.df = pd.DataFrame({'Word': self.words})
+    @patch('seaborn.boxplot')
+    def test_word_filtering(self, mock_boxplot):
+        """Test if the function correctly filters words starting with a given letter."""
+        task_func(self.df, 'a')
+        filtered_words = ['apple', 'apricot', 'avocado']
+        self.assertTrue(all(word.startswith('a') for word in filtered_words), "Word filtering by letter 'a' failed.")
+    @patch('seaborn.boxplot')
+    def test_boxplot_called(self, mock_boxplot):
+        """Test if seaborn's boxplot is called when valid data is provided."""
+        task_func(self.df, 'a')
+        mock_boxplot.assert_called_once()
+    @patch('matplotlib.pyplot.show')
+    def test_return_type(self, mock_show):
+        """Test the return type is an Axes."""
+        ax = task_func(self.df, 'a')
+        self.assertIsInstance(ax, plt.Axes)
+    def test_empty_dataframe(self):
+        """Test handling of empty DataFrame."""
+        empty_df = pd.DataFrame({'Word': []})
+        result = task_func(empty_df, 'a')
+        self.assertIsNone(result, "Empty DataFrame should return None.")
+    def test_no_word_column(self):
+        """Test handling of DataFrame without 'Word' column."""
+        df_without_word = pd.DataFrame({'NoWord': self.words})
+        with self.assertRaises(ValueError):
+            task_func(df_without_word, 'a')

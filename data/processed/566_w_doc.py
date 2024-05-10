@@ -1,77 +1,99 @@
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.preprocessing import StandardScaler
+import ctypes
+import hashlib
+import binascii
 
-
-def task_func(x, y, labels):
+def task_func(filepath):
     """
-    Scale the "x" and "y" arrays using the standard scaler of sklearn and plot them with given labels.
-    Each pair of x and y arrays are scaled independently and plotted as a separate series with a label.
+    Loads a DLL file from a given filepath, calculates its MD5 and SHA256 hashes,
+    and prints these hashes in hexadecimal format. This function is a demonstration
+    of file handling, usage of the hashlib library for hash calculations, and binascii
+    for hexadecimal conversion. Note that the actual operations performed on the loaded
+    DLL are limited to hash calculation.
 
     Parameters:
-    - x (list of np.ndarray): List of numpy arrays representing the x-values of the data points.
-    - y (list of np.ndarray): List of numpy arrays representing the y-values of the data points.
-    - labels (list of str): List of strings representing the labels for each data series.
+    filepath (str): The path of the DLL file.
 
     Returns:
-    - matplotlib.figure.Figure: The figure object containing the plot.
+    str: The actual name of the loaded DLL file.
 
     Requirements:
-    - numpy
-    - matplotlib.pyplot
-    - sklearn.preprocessing
+    - ctypes
+    - hashlib
+    - binascii
 
-    Example:
-    >>> x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
-    >>> y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
-    >>> labels = ['A', 'B', 'C']
-    >>> fig = task_func(x, y, labels)
-    >>> plt.show()
+    Examples:
+    >>> with open('libc.so.6', 'w') as f:
+    ...     _ = f.write("")
+    >>> result = task_func('libc.so.6')
+    MD5 Hash: d41d8cd98f00b204e9800998ecf8427e
+    SHA256 Hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    >>> isinstance(result, str) 
+    True
+    >>> 'libc.so.6' in result
+    True
     """
-    scaler = StandardScaler()
-    fig, ax = plt.subplots()
-    for i in range(len(x)):
-        xy = np.vstack((x[i], y[i])).T  # Transpose to get correct shape for scaling
-        xy_scaled = scaler.fit_transform(xy)  # Scale data
-        ax.plot(xy_scaled[:, 0], xy_scaled[:, 1], label=labels[i])
-    ax.legend()  # Add a legend to the plot
-    return fig  # Return the figure object containing the plot
+    lib = ctypes.CDLL(filepath)
+    with open(filepath, 'rb') as f:
+        data = f.read()
+    md5_hash = hashlib.md5(data).digest()
+    print(f'MD5 Hash: {binascii.hexlify(md5_hash).decode()}')
+    sha256_hash = hashlib.sha256(data).digest()
+    print(f'SHA256 Hash: {binascii.hexlify(sha256_hash).decode()}')
+    return lib._name
 
 import unittest
-import numpy.testing as npt
+from unittest.mock import patch
+import tempfile
+import os
+import sys
+from io import StringIO
+import binascii
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Sample data for testing
-        self.x = [np.array([1,2,3]), np.array([4,5,6])]
-        self.y = [np.array([4,5,6]), np.array([7,8,9])]
-        self.labels = ['Group 1', 'Group 2']
-    def test_figure_type(self):
-        """Test that the function returns a matplotlib figure."""
-        fig = task_func(self.x, self.y, self.labels)
-        self.assertTrue(str(type(fig)).endswith("matplotlib.figure.Figure'>"))
-    def test_plot_labels(self):
-        """Test that the correct number of labels are in the legend."""
-        fig = task_func(self.x, self.y, self.labels)
-        ax = fig.axes[0]
-        self.assertEqual(len(ax.get_legend_handles_labels()[1]), len(self.labels))
-    def test_non_empty_plot(self):
-        """Test that the plot is not empty."""
-        fig = task_func(self.x, self.y, self.labels)
-        ax = fig.axes[0]
-        self.assertTrue(len(ax.lines) > 0)
-    def test_scaled_values_range(self):
-        """Test that the scaled values have a mean close to 0 and a standard deviation close to 1."""
-        scaler = StandardScaler()
-        for xy in zip(self.x, self.y):
-            xy_scaled = scaler.fit_transform(np.vstack(xy).T)
-            self.assertTrue(np.allclose(np.mean(xy_scaled, axis=0), 0, atol=1e-7))
-            self.assertTrue(np.allclose(np.std(xy_scaled, axis=0), 1, atol=1e-7))
-    def test_input_unchanged(self):
-        """Test that the original input arrays are unchanged after scaling."""
-        x_original = [arr.copy() for arr in self.x]
-        y_original = [arr.copy() for arr in self.y]
-        task_func(self.x, self.y, self.labels)
-        for orig, after in zip(x_original, self.x):
-            npt.assert_array_equal(orig, after)
-        for orig, after in zip(y_original, self.y):
-            npt.assert_array_equal(orig, after)
+        # Create a temporary DLL file
+        self.temp_file = tempfile.NamedTemporaryFile(suffix='.dll', delete=False)
+        self.filepath = self.temp_file.name
+        # Redirect stdout to capture print statements
+        self.original_stdout = sys.stdout
+        sys.stdout = StringIO()
+    def test_file_existence(self):
+        self.assertTrue(os.path.exists(self.filepath))
+    def test_invalid_file_path(self):
+        with self.assertRaises(OSError):
+            task_func('invalid_path.dll')
+    @patch('ctypes.CDLL')
+    @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data=b'test data')
+    @patch('hashlib.md5')
+    @patch('hashlib.sha256')
+    def test_dll_name_returned(self, mock_sha256, mock_md5, mock_open, mock_cdll):
+        """Test if the function returns the name of the loaded DLL file."""
+        mock_md5.return_value.digest.return_value = b'\x93\x15\x98\x3f\xcd\xb4\xcc\xcb\x28\x7b\xcc\xdb\xdd\x4e\x8a\x45'  # Mock MD5 digest
+        mock_sha256.return_value.digest.return_value = b'\xd7\xa8\xfb\x48\xd2\x8d\x1d\x73\xa0\x34\x6b\xbf\x40\x41\xdf\x98\xc2\x50\x1d\x4a\xe4\x88\x9b\x93\x4f\xaa\x63\xf7\xaf\x67\xe9\xb1'  # Mock SHA256 digest
+        mock_cdll.return_value._name = 'test.dll'
+        dll_name = task_func(self.filepath)  # Replace 'task_func_module.task_func' with the actual path to your task_func function
+        self.assertEqual(dll_name, 'test.dll')
+    @patch('ctypes.CDLL')
+    @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data=b'test data')
+    @patch('hashlib.md5')
+    def test_md5_hash_printed(self, mock_md5, mock_open, mock_cdll):
+        """Test if the MD5 hash is correctly calculated and printed."""
+        expected_hash = b'\x93\x15\x98\x3f\xcd\xb4\xcc\xcb\x28\x7b\xcc\xdb\xdd\x4e\x8a\x45'
+        mock_md5.return_value.digest.return_value = expected_hash
+        with patch('builtins.print') as mock_print:
+            task_func('path/to/test.dll')
+            expected_md5_output = f'MD5 Hash: {binascii.hexlify(expected_hash).decode()}'
+            mock_print.assert_any_call(expected_md5_output)
+    @patch('ctypes.CDLL')
+    @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data=b'test data')
+    @patch('hashlib.sha256')
+    def test_sha256_hash_printed(self, mock_sha256, mock_open, mock_cdll):
+        """Test if the SHA256 hash is correctly calculated and printed."""
+        expected_hash = b'\xd7\xa8\xfb\x48\xd2\x8d\x1d\x73\xa0\x34\x6b\xbf\x40\x41\xdf\x98\xc2\x50\x1d\x4a\xe4\x88\x9b\x93\x4f\xaa\x63\xf7\xaf\x67\xe9\xb1'
+        mock_sha256.return_value.digest.return_value = expected_hash
+        with patch('builtins.print') as mock_print:
+            task_func('path/to/test.dll')
+            expected_sha256_output = f'SHA256 Hash: {binascii.hexlify(expected_hash).decode()}'
+            mock_print.assert_any_call(expected_sha256_output)
+    def tearDown(self):
+        os.remove(self.filepath)
+        sys.stdout = self.original_stdout

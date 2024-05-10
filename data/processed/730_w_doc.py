@@ -1,82 +1,69 @@
-import time
-import numpy as np
+import pickle
+import os
+import random
+import string
 
-
-def task_func(samples=10, delay=0.1):
+def task_func(strings, filename=None):
+    
     """
-    Make a delay for a given amount of time for a specified number of samples,
-    measure the actual delay and calculate the statistical properties of the
-    delay times.
+    Save the list of random strings "Strings" in a pickle file and then read it back for validation.
+    If a filename is not provided, a unique filename is generated.
 
     Parameters:
-    - samples (int): Number of samples for which the delay is measured.
-                     Default is 10.
-    - delay (float): Amount of time (in seconds) for each delay.
-                     Default is 0.1 second.
+    - strings (list): The list of random strings to be saved.
+    - filename (str, optional): The filename for saving the pickle file. Defaults to a unique generated name.
 
     Returns:
-    tuple: The mean and standard deviation of the delay times.
+    - loaded_strings (list): The loaded list of strings from the pickle file.
 
     Requirements:
-    - time
-    - numpy
+    - pickle
+    - os
+    - random
+    - string
 
     Example:
-    >>> mean, std = task_func(samples=5, delay=0.05)
-    >>> print(f'Mean: %.3f, Std: %.1f' % (mean, std))
-    Mean: 0.050, Std: 0.0
-    >>> mean, std = task_func(100, 0.001)
-    >>> print(f'Mean: %.3f, Std: %.4f' % (mean, std))
-    Mean: 0.001, Std: 0.0000
+    >>> strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)) for _ in range(10)]
+    >>> loaded_strings = task_func(strings)
+    >>> assert strings == loaded_strings
     """
-    delay_times = []
-    for _ in range(samples):
-        t1 = time.time()
-        time.sleep(delay)
-        t2 = time.time()
-        delay_times.append(t2 - t1)
-    delay_times = np.array(delay_times)
-    mean = np.mean(delay_times)
-    std = np.std(delay_times)
-    return mean, std
+    if filename is None:
+        filename = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)) + ".pkl"
+    with open(filename, 'wb') as file:
+        pickle.dump(strings, file)
+    with open(filename, 'rb') as file:
+        loaded_strings = pickle.load(file)
+    os.remove(filename)
+    return loaded_strings
 
 import unittest
-import numpy as np
+import string
+import random
+# Import the refined function
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
-        start = time.time()
-        mean, std = task_func(samples=100, delay=0.001)
-        end = time.time()
-        self.assertAlmostEqual(100 * 0.001, end-start, delta=3)
-        self.assertAlmostEqual(mean, 0.001, places=0)
-        self.assertTrue(0 <= std <= 0.01)
-        
-    def test_case_2(self):
-        start = time.time()
-        mean, std = task_func(samples=3, delay=0.1)
-        end = time.time()
-        self.assertAlmostEqual(3 * 0.1, end-start, places=1)
-        self.assertAlmostEqual(mean, 0.1, delta=0.2)
-        self.assertTrue(0 <= std <= 0.01)
-    def test_case_3(self):
-        start = time.time()
-        mean, std = task_func(samples=2, delay=0.2)
-        end = time.time()
-        self.assertAlmostEqual(2 * 0.2, end-start, places=1)
-        self.assertTrue(0.19 <= mean <= 0.21)
-        self.assertTrue(0 <= std <= 0.02)
-    def test_case_4(self):
-        start = time.time()
-        mean, std = task_func(samples=100, delay=0.05)
-        end = time.time()
-        self.assertTrue(3 <= end-start <= 7)
-        self.assertTrue(0.03 <= mean <= 0.07)
-        self.assertTrue(0 <= std <= 0.05)
-    def test_case_5(self):
-        start = time.time()
-        mean, std = task_func(samples=1, delay=1)
-        end = time.time()
-        self.assertAlmostEqual(1, end-start, places=0)
-        self.assertTrue(0.9 <= mean <= 1.1)
-        self.assertTrue(0 <= std <= 0.1)
+    def test_default_filename(self):
+        # Test with default filename generation
+        strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)) for _ in range(10)]
+        loaded_strings = task_func(strings)
+        self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
+    def test_custom_filename(self):
+        # Test with a custom filename
+        strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5)) for _ in range(5)]
+        filename = "custom_filename.pkl"
+        loaded_strings = task_func(strings, filename)
+        self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
+    def test_empty_list(self):
+        # Test with an empty list of strings
+        strings = []
+        loaded_strings = task_func(strings)
+        self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
+    def test_large_list(self):
+        # Test with a large list of strings
+        strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(100)) for _ in range(1000)]
+        loaded_strings = task_func(strings)
+        self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
+    def test_special_characters(self):
+        # Test with strings containing special characters
+        strings = [''.join(random.choice(string.ascii_uppercase + string.digits + string.punctuation) for _ in range(15)) for _ in range(15)]
+        loaded_strings = task_func(strings)
+        self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")

@@ -1,86 +1,87 @@
-import csv
-import os
-from datetime import datetime
-from random import randint
+from datetime import datetime, timedelta
+import pytz
+import calendar
 
-# Constants
-SENSORS = ['Temperature', 'Humidity', 'Pressure']
-OUTPUT_DIR = './output'
 
-def task_func(hours, output_dir=OUTPUT_DIR):
+def task_func(days_in_past=7):
     """
-    Create sensor data for the specified number of hours and save it in a CSV file
-    with coloumns 'Time', 'Temperature', 'Humidity' and 'Pressure'.
+    Get the weekday of the date 'days_in_past' days ago from today.
+
+    This function computes the date that is 'days_in_past' number of days ago from the current
+    system time's date in UTC. It then determines the weekday of this target date using calendar
+    and returns its name as a string.
 
     Parameters:
-    - hours (int): The number of hours for which sensor data is to be generated.
-    - output_dir (str, optional): The output file path
+    days_in_past (int): The number of days to go back from the current date to find the weekday.
+                        Defaults to 7 (one week ago). Must be a non-negative integer.
 
     Returns:
-    - hours (int): Number of hours to generate data for.
+    weekday (str)     : The name of the weekday (e.g., 'Monday', 'Tuesday') for the computed date.
 
-
+    Raises:
+    ValueError: If 'days_in_past' is negative.
+    
     Requirements:
-    - datetime
-    - os
-    - random
-    - csv
+    - datetime.datetime
+    - datetime.timedelta
+    - pytz
+    - calendar
 
     Example:
-    >>> file_path = task_func(1)  # Generate data for 1 hour
-    >>> os.path.exists(file_path)  # Check if the file was actually created
-    True
-    >>> isinstance(file_path, str)  # Validate that the return type is a string
-    True
-    >>> 'sensor_data.csv' in file_path  # Ensure the filename is correct
-    True
+    >>> task_func()
+    'Monday'
+    >>> task_func(3)
+    'Friday'
     """
-    FILE_PATH = os.path.join(output_dir, 'sensor_data.csv')
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    data = [['Time'] + SENSORS]
-    for i in range(hours):
-        row = [datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')] + [randint(0, 100) for _ in SENSORS]
-        data.append(row)
-    with open(FILE_PATH, 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerows(data)
-    return FILE_PATH
+    if days_in_past < 0:
+        raise ValueError("Days in the past cannot be negative")
+    date = datetime.now(pytz.UTC) - timedelta(days=days_in_past)
+    weekday = calendar.day_name[date.weekday()]
+    return weekday
 
 import unittest
-import os
-import shutil
-FILE_PATH = os.path.join(OUTPUT_DIR, 'sensor_data.csv')
+from datetime import datetime, timedelta
+import pytz
+import calendar
 class TestCases(unittest.TestCase):
-    def tearDown(self):
-        """Clean up any files created during the tests."""
-        # Check and remove the expected file if it exists
-        # if os.path.exists(FILE_PATH):
-        #     os.remove(FILE_PATH)
-        if os.path.exists(OUTPUT_DIR):
-            shutil.rmtree(OUTPUT_DIR)
-    def test_csv_file_creation(self):
-        """Test if the CSV file is successfully created."""
-        task_func(1)
-        self.assertTrue(os.path.exists(FILE_PATH))
-    def test_csv_file_rows(self):
-        """Test if the CSV file contains the correct number of rows for 24 hours."""
-        task_func(24)
-        with open(FILE_PATH, 'r') as f:
-            self.assertEqual(len(f.readlines()), 25)  # Including header
-    def test_csv_file_header(self):
-        """Test if the CSV file header matches the expected sensors."""
-        task_func(0)
-        with open(FILE_PATH, 'r') as f:
-            reader = csv.reader(f)
-            header = next(reader)
-            self.assertEqual(header, ['Time', 'Temperature', 'Humidity', 'Pressure'])
-    def test_file_path_return(self):
-        """Test if the correct file path is returned."""
-        file_path = task_func(1)
-        self.assertEqual(file_path, FILE_PATH)
-    def test_no_hours_data(self):
-        """Test sensor data generation with 0 hours."""
-        task_func(0)
-        with open(FILE_PATH, 'r') as f:
-            self.assertEqual(len(f.readlines()), 1)  # Only header row expected
+    def test_case_1(self):
+        # Input 1: Default input
+        result = task_func()
+        self.assertIsInstance(result, str)
+        self.assertIn(result, list(calendar.day_name))
+        # Ensure the result matches the expected output for 7 days ago
+        expected_date = datetime.now(pytz.UTC) - timedelta(days=7)
+        expected_weekday = calendar.day_name[expected_date.weekday()]
+        self.assertEqual(result, expected_weekday)
+    def test_case_2(self):
+        # Input 2: Test with 3 days in the past
+        result = task_func(3)
+        self.assertIsInstance(result, str)
+        self.assertIn(result, list(calendar.day_name))
+        # Ensure the result matches the expected output for 3 days ago
+        expected_date = datetime.now(pytz.UTC) - timedelta(days=3)
+        expected_weekday = calendar.day_name[expected_date.weekday()]
+        self.assertEqual(result, expected_weekday)
+    def test_case_3(self):
+        # Input 3: Test with 0 days in the past (today)
+        result = task_func(0)
+        self.assertIsInstance(result, str)
+        self.assertIn(result, list(calendar.day_name))
+        # Ensure the result matches the expected output for today
+        expected_date = datetime.now(pytz.UTC)
+        expected_weekday = calendar.day_name[expected_date.weekday()]
+        self.assertEqual(result, expected_weekday)
+    def test_case_4(self):
+        # Input 4: Test with 30 days in the past (approximately a month ago)
+        result = task_func(30)
+        self.assertIsInstance(result, str)
+        self.assertIn(result, list(calendar.day_name))
+        # Ensure the result matches the expected output for 30 days ago
+        expected_date = datetime.now(pytz.UTC) - timedelta(days=30)
+        expected_weekday = calendar.day_name[expected_date.weekday()]
+        self.assertEqual(result, expected_weekday)
+    def test_case_5(self):
+        # Input 5: Test handling invalid days_in_the_past
+        for invalid in [-1, "1"]:
+            with self.assertRaises(Exception):
+                task_func(invalid)

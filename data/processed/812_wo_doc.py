@@ -1,91 +1,91 @@
+import re
 import os
-import glob
-import csv
+import subprocess
 
-def task_func(directory_path, file_extension='.csv'):
+def task_func(dir_path, exe_pattern, execute_files=True):
     """
-    Reads all files with a specified extension in a given directory and returns their data in a dictionary.
-    - Reads all files with the specified extension in the given directory.
-    - Uses the filename without the extension as a key in the output dictionary.
-    - The value for each key is a list of rows from the file, where each row is represented as a list of values.
-
-    Parameters:
-    - directory_path (str): The path to the directory containing the files.
-    - file_extension (str, optional): The file extension to look for. Default is '.csv'.
-
-    Returns:
-    - Returns a dictionary where each key is the filename (without extension) and the value is a list of rows from the file.
-
-    Requirements:
-    - os
-    - glob
-    - csv
-
-    Example:
-    >>> data = task_func('/home/user/data')
-    >>> print(data['file1'])
-    [['header1', 'header2'], ['row1_col1', 'row1_col2'], ['row2_col1', 'row2_col2']]
+    Searches for executable files in a specified directory that match a given regular expression pattern.
+    Optionally executes any matching files and returns a list of standard outputs from the executed files
+    or the paths of the found files.
     
-    >>> data = task_func('/home/user/data', '.txt')
-    >>> print(data)
-    {}
+    Parameters:
+    - dir_path (str): The directory path where the search for executable files will be conducted.
+                    It should be a valid directory path.
+    - exe_pattern (str): The regular expression pattern to match the executable files.
+                       It should be a valid regular expression pattern.
+    - execute_files (bool, optional): If True, execute the found files and return their standard output.
+                                    If False, return the paths of the found files. Default is True.
+                       
+    Returns:
+    - results (list): If execute_files is True, a list of standard outputs from the executed files. 
+               If execute_files is False, a list of paths of the found files.
+               Each element in the list corresponds to an executed file or a found file.
+               
+    Requirements:
+    - re
+    - os
+    - subprocess
+    
+    Example:
+    >>> task_func("C:\\SomeDir", r"(?<!Distillr)\\AcroTray\.exe")
+    []
+    >>> task_func("C:\\SomeDir", r"(?<!Distillr)\\AcroTray\.exe", execute_files=False)
+    []
     """
-    data = {}
-    for file in glob.glob(os.path.join(directory_path, '*' + file_extension)):
-        filename = os.path.splitext(os.path.basename(file))[0]
-        with open(file, 'r') as f:
-            reader = csv.reader(f)
-            data[filename] = list(reader)
-    return data
+    results = []
+    for dirpath, dirnames, filenames in os.walk(os.path.normpath(dir_path)):
+        for filename in filenames:
+            if re.search(exe_pattern, filename):
+                file_path = os.path.join(dirpath, filename)
+                if execute_files:
+                    result = subprocess.run([file_path], stdout=subprocess.PIPE)
+                    results.append(result.stdout.decode('utf-8'))
+                else:
+                    results.append(file_path)
+    return results
 
 import unittest
-import shutil
+from unittest.mock import patch, MagicMock
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # create a directory with test files
-        os.mkdir('test_1')
-        with open('test_1/file1.csv', 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerows([['header1', 'header2'], ['row1_col1', 'row1_col2'], ['row2_col1', 'row2_col2']])
-        os.mkdir('test_2')
-        with open('test_2/file2.csv', 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerows([['name', 'age'], ['Alice', '30'], ['Bob', '40']])
-        os.mkdir('test_5')
-        with open('test_5/file3.csv', 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerows([['subject', 'marks'], ['Math', '90'], ['Science', '85']])
-    def tearDown(self):
-        # remove the test directories
-        shutil.rmtree('test_1')
-        shutil.rmtree('test_2')
-        shutil.rmtree('test_5')
-    
-    def test_case_1(self):
-        # This test assumes the existence of a directory named 'task_func_data' with a CSV file 'file1.csv'
-        data = task_func('test_1')
-        self.assertIsInstance(data, dict)
-        self.assertIn('file1', data)
-        self.assertEqual(data['file1'], [['header1', 'header2'], ['row1_col1', 'row1_col2'], ['row2_col1', 'row2_col2']])
-    def test_case_2(self):
-        # This test checks explicit file_extension input
-        data = task_func('test_2', '.csv')
-        self.assertIsInstance(data, dict)
-        self.assertIn('file2', data)
-        self.assertEqual(data['file2'], [['name', 'age'], ['Alice', '30'], ['Bob', '40']])
-    def test_case_3(self):
-        # This test checks for a non-existent file extension, expecting an empty dictionary
-        data = task_func('test_3', '.txt')
-        self.assertIsInstance(data, dict)
-        self.assertEqual(len(data), 0)
-    def test_case_4(self):
-        # This test checks for a non-existent directory, expecting an empty dictionary
-        data = task_func('/nonexistent/directory')
-        self.assertIsInstance(data, dict)
-        self.assertEqual(len(data), 0)
-    def test_case_5(self):
-        # This test checks another file's presence and content in the dictionary
-        data = task_func('test_5')
-        self.assertIsInstance(data, dict)
-        self.assertIn('file3', data)
-        self.assertEqual(data['file3'], [['subject', 'marks'], ['Math', '90'], ['Science', '85']])
+    @patch('os.walk')
+    @patch('subprocess.run')
+    def test_finding_executable_files(self, mock_run, mock_walk):
+        mock_walk.return_value = [
+            (os.path.normpath("C:\\TestDir"), [], ["test_file.exe"])
+        ]
+        found_files = task_func("C:\\TestDir", r"test_file\.exe", execute_files=False)
+        found_files = [os.path.normpath(path) for path in found_files]
+        self.assertEqual(len(found_files), 1)
+        self.assertNotIn(os.path.normpath("C:\\TestDir\\test_file.exe"), found_files)
+    @patch('os.walk')
+    def test_invalid_directory(self, mock_walk):
+        mock_walk.return_value = []
+        found_files = task_func("C:\\InvalidDir", r"test_pattern", execute_files=False)
+        self.assertEqual(found_files, [])
+    @patch('os.walk')
+    def test_no_matching_files(self, mock_walk):
+        mock_walk.return_value = [
+            (os.path.normpath("C:\\TestDir"), [], ["unrelated_file.txt"])
+        ]
+        found_files = task_func("C:\\TestDir", r"no_match_pattern", execute_files=False)
+        self.assertEqual(found_files, [])
+    @patch('os.walk')
+    @patch('subprocess.run')
+    def test_executing_files(self, mock_run, mock_walk):
+        mock_walk.return_value = [
+            (os.path.normpath("C:\\TestDir"), [], ["test_file.exe"])
+        ]
+        mock_result = MagicMock()
+        mock_result.stdout = b'Execution Result'
+        mock_run.return_value = mock_result
+        outputs = task_func("C:\\TestDir", r"test_file\.exe", execute_files=True)
+        self.assertEqual(outputs, ["Execution Result"])
+    @patch('os.walk')
+    def test_special_characters_in_pattern(self, mock_walk):
+        mock_walk.return_value = [
+            (os.path.normpath("C:\\TestDir"), [], ["special$file.exe"])
+        ]
+        found_files = task_func("C:\\TestDir", r"special\$file\.exe", execute_files=False)
+        found_files = [os.path.normpath(path) for path in found_files]
+        self.assertEqual(len(found_files), 1)
+        self.assertNotIn(os.path.normpath("C:\\TestDir\\special$file.exe"), found_files)

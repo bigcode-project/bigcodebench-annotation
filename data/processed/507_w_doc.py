@@ -1,81 +1,116 @@
-import seaborn as sns
-import time
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
-def task_func(df, letter):
+def task_func(column, data):
     """
-    Filters rows in a DataFrame based on the starting letter of the values in the 'Word' column.
-    It then calculates the lengths of these words and returns a box plot representing the distribution
-    of these lengths.
+    Analyze and visualize statistical properties of a specified weather data column.
+
+    This function calculates the sum, mean, minimum, and maximum values of a specified column in the given data.
+    It also generates a histogram plot of the data in the column. The dataset is expected to be a list of weather
+    observations, where each observation includes date, temperature, humidity, wind speed, and precipitation values.
+    If the provided data list is empty, resulting in an empty DataFrame, the function handles it by setting:
+    - The 'mean' value to np.nan.
+    - The 'min' value to np.inf.
+    - The 'max' value to -np.inf.
 
     Parameters:
-    - df (pd.DataFrame): The input DataFrame containing a 'Word' column with string values.
-    - letter (str): A lowercase letter to filter words in the 'Word' column.
+    column (str): The column to analyze. Valid columns include 'Temperature', 'Humidity', 'Wind Speed', and 'Precipitation'.
+    data (list of lists): The weather data where each inner list contains the following format:
+                          [Date (datetime object), Temperature (int), Humidity (int), Wind Speed (int), Precipitation (float)]
 
     Returns:
-    - Axes: A box plot visualizing the distribution of the word lengths for words starting
-                   with the specified letter. If the DataFrame is empty or the 'Word' column is missing,
-                   returns None.
+    - result (dict): A dictionary containing:
+        - 'sum': Sum of the values in the specified column.
+        - 'mean': Mean of the values in the specified column.
+        - 'min': Minimum value in the specified column.
+        - 'max': Maximum value in the specified column.
+        - 'plot': A matplotlib BarContainer object of the histogram plot for the specified column.
 
     Requirements:
-    - seaborn
-    - time
+    - pandas
+    - numpy
+    - matplotlib.pyplot
 
     Example:
-    >>> import pandas as pd
-    >>> words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
-    >>> df = pd.DataFrame({'Word': words})
-    >>> _ = task_func(df, 'apple')
+    >>> data = [[datetime(2022, 1, 1), -5, 80, 10, 0], [datetime(2022, 1, 3), -2, 83, 15, 0]]
+    >>> result = task_func('Temperature', data)
+    >>> result['sum']
+    -7
+    >>> type(result['plot'])
+    <class 'matplotlib.container.BarContainer'>
     """
-    start_time = time.time()
-    if 'Word' not in df.columns:
-        raise ValueError("The DataFrame should contain a 'Word' column.")
-    if df.empty:
-        print("The DataFrame is empty.")
-        return None
-    regex = f'^{letter}'
-    filtered_df = df[df['Word'].str.match(regex)]
-    if filtered_df.empty:
-        print(f"No words start with the letter '{letter}'.")
-        return None
-    word_lengths = filtered_df['Word'].str.len()
-    ax = sns.boxplot(x=word_lengths)
-    ax.set_title(f"Word Lengths Distribution for Words Starting with '{letter}'")
-    end_time = time.time()  # End timing
-    cost = f"Operation completed in {end_time - start_time} seconds."
-    return ax
+    COLUMNS = ["Date", "Temperature", "Humidity", "Wind Speed", "Precipitation"]
+    df = pd.DataFrame(data, columns=COLUMNS)
+    column_data = df[column]
+    result = {
+        "sum": np.sum(column_data),
+        "mean": np.nan if df.empty else np.mean(column_data),
+        "min": np.inf if df.empty else np.min(column_data),
+        "max": -np.inf if df.empty else np.max(column_data),
+    }
+    _, _, ax = plt.hist(column_data)
+    plt.title(f"Histogram of {column}")
+    result["plot"] = ax
+    return result
 
 import unittest
-from unittest.mock import patch
+import matplotlib
 import matplotlib.pyplot as plt
-import pandas as pd
-# Check and set the backend
+from datetime import datetime
+import numpy as np
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
-        self.df = pd.DataFrame({'Word': self.words})
-    @patch('seaborn.boxplot')
-    def test_word_filtering(self, mock_boxplot):
-        """Test if the function correctly filters words starting with a given letter."""
-        task_func(self.df, 'a')
-        filtered_words = ['apple', 'apricot', 'avocado']
-        self.assertTrue(all(word.startswith('a') for word in filtered_words), "Word filtering by letter 'a' failed.")
-    @patch('seaborn.boxplot')
-    def test_boxplot_called(self, mock_boxplot):
-        """Test if seaborn's boxplot is called when valid data is provided."""
-        task_func(self.df, 'a')
-        mock_boxplot.assert_called_once()
-    @patch('matplotlib.pyplot.show')
-    def test_return_type(self, mock_show):
-        """Test the return type is an Axes."""
-        ax = task_func(self.df, 'a')
-        self.assertIsInstance(ax, plt.Axes)
-    def test_empty_dataframe(self):
-        """Test handling of empty DataFrame."""
-        empty_df = pd.DataFrame({'Word': []})
-        result = task_func(empty_df, 'a')
-        self.assertIsNone(result, "Empty DataFrame should return None.")
-    def test_no_word_column(self):
-        """Test handling of DataFrame without 'Word' column."""
-        df_without_word = pd.DataFrame({'NoWord': self.words})
-        with self.assertRaises(ValueError):
-            task_func(df_without_word, 'a')
+        self.data = [
+            [datetime(2022, 1, 1), -5, 80, 10, 0],
+            [datetime(2022, 1, 2), -3, 85, 12, 0.5],
+            [datetime(2022, 1, 3), -2, 83, 15, 0],
+            [datetime(2022, 1, 4), -1, 82, 13, 0.2],
+            [datetime(2022, 1, 5), 0, 80, 11, 0.1],
+        ]
+    def test_case_1(self):
+        # Testing the 'Temperature' column
+        result = task_func("Temperature", self.data)
+        self.assertEqual(result["sum"], -11)
+        self.assertEqual(result["mean"], -2.2)
+        self.assertEqual(result["min"], -5)
+        self.assertEqual(result["max"], 0)
+        self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
+    def test_case_2(self):
+        # Testing the 'Humidity' column
+        result = task_func("Humidity", self.data)
+        self.assertEqual(result["sum"], 410)
+        self.assertEqual(result["mean"], 82)
+        self.assertEqual(result["min"], 80)
+        self.assertEqual(result["max"], 85)
+        self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
+    def test_case_3(self):
+        # Testing the 'Wind Speed' column
+        result = task_func("Wind Speed", self.data)
+        self.assertEqual(result["sum"], 61)
+        self.assertEqual(result["mean"], 12.2)
+        self.assertEqual(result["min"], 10)
+        self.assertEqual(result["max"], 15)
+        self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
+    def test_case_4(self):
+        # Testing the 'Precipitation' column
+        result = task_func("Precipitation", self.data)
+        self.assertAlmostEqual(result["sum"], 0.8, places=6)
+        self.assertAlmostEqual(result["mean"], 0.16, places=6)
+        self.assertAlmostEqual(result["min"], 0, places=6)
+        self.assertAlmostEqual(result["max"], 0.5, places=6)
+        self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
+    def test_case_5(self):
+        # Testing with empty data
+        result = task_func("Temperature", [])
+        self.assertTrue(np.isnan(result["mean"]))
+        self.assertEqual(result["sum"], 0)
+        self.assertTrue(
+            np.isinf(result["min"]) and result["min"] > 0
+        )  # Checking for positive infinity for min
+        self.assertTrue(
+            np.isinf(result["max"]) and result["max"] < 0
+        )  # Checking for negative infinity for max
+        self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
+    def tearDown(self):
+        plt.close("all")

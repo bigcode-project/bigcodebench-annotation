@@ -1,156 +1,104 @@
-import json
-import pandas as pd
+import cv2
+import os
 import numpy as np
-from collections import defaultdict
 
-
-def task_func(input_file="data.json"):
+def task_func(image_file: str) -> np.ndarray:
     """
-    Read a list of dictionaries from a JSON file, calculate the mean and median for each key
-    (ignoring non-numeric or missing values), and convert the results into a Pandas DataFrame.
+    Creates a histogram of the pixel values of a grayscale image.
 
     Parameters:
-    - input_file (str, optional): The input JSON file name. Defaults to 'data.json'.
-                                  The file should contain a list of dictionaries. If a key is
-                                  missing in a dictionary, it is treated as NaN for that record.
-                                  Non-numeric values are ignored for the calculation of mean
-                                  and median. If all values for a key are non-numeric or missing,
-                                  the statistics for that key will be NaN.
+    - image_file (str): The path to the image file.
 
     Returns:
-    - df (pd.DataFrame): A DataFrame indexed and sorted by the variable names (keys) from the
-                         input data, containing columns 'mean' and 'median'.
+    - np.ndarray: A 1D numpy array representing the histogram of the image, with 256 bins corresponding to 
+      the pixel values in the range [0, 256). Each entry in the array represents the frequency of a pixel value 
+      in the grayscale image.
+
+    Raises:
+    - FileNotFoundError: If the specified image file does not exist.
+    - ValueError: If the image file is not a valid image.
 
     Requirements:
-    - numpy
-    - collections
-    - json
-    - pandas
+    - opencv: For reading the image file in grayscale.
+    - os: For checking the existence of the image file.
+    - numpy: For calculating and storing the histogram data.
 
     Example:
-    >>> df = task_func('data_1.json')
-    a        mean  median
-    b        mean  median
-    c        mean  median
+    >>> dummy_image_path = 'dummy_image.png'
+    >>> np.random.seed(48)
+    >>> dummy_image = np.random.randint(0, 256, (10, 10), dtype=np.uint8)
+    >>> cv2.imwrite(dummy_image_path, dummy_image)
+    True
+    >>> histogram = task_func(dummy_image_path)
+    >>> os.remove(dummy_image_path)
+    >>> print(histogram.shape)
+    (256,)
+
+    Note:
+    - The function assumes the image is in grayscale format.
+    - The histogram array is 1D with a size of 256, where each index corresponds to a pixel value, and the value at each index
+      represents the count of pixels in the image with that pixel value.
     """
-    with open(input_file, "r") as f:
-        data = json.load(f)
-    all_keys = set().union(*(d.keys() for d in data))
-    stats = defaultdict(list)
-    for d in data:
-        for key in all_keys:
-            value = d.get(key, np.nan)
-            if isinstance(value, (int, float)):
-                stats[key].append(value)
-            else:
-                stats[key].append(np.nan)
-    result = {
-        k: {"mean": np.nanmean(v), "median": np.nanmedian(v)} for k, v in stats.items()
-    }
-    df = pd.DataFrame(result).transpose().sort_index()
-    return df
+    if not os.path.exists(image_file):
+        raise FileNotFoundError(f"The file {image_file} does not exist.")
+    img = cv2.imread(image_file, cv2.IMREAD_GRAYSCALE)
+    if img is None:
+        raise ValueError("Invalid image file.")
+    histogram, _ = np.histogram(img.ravel(), bins=256, range=[0,256])
+    return histogram
 
 import unittest
 import numpy as np
-import tempfile
-import json
+import cv2
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.temp_dir = tempfile.TemporaryDirectory()
-        self.test_data_paths = []
-        test_data = [
-            [{"a": 2, "b": 3, "c": 4}],  # Test data for test_case_1
-            [{"a": 1}],  # Test data for test_case_2
-            [{"a": 1.5}, {"b": None}],  # Test data for test_case_3
-            [],  # Test data for test_case_4
-            [{"a": 1.5, "c": 4}, {"b": None}],  # Test data for test_case_5
-        ]
-        for idx, data in enumerate(test_data, start=1):
-            path = self.temp_dir.name + f"/test_data_{idx}.json"
-            with open(path, "w") as f:
-                json.dump(data, f)
-            self.test_data_paths.append(path)
-    def test_case_1(self):
-        # Basic test
-        df = task_func(self.test_data_paths[0])
-        self.assertListEqual(df.index.tolist(), ["a", "b", "c"])
-        self.assertAlmostEqual(df.loc["a", "mean"], 2.0)
-        self.assertAlmostEqual(df.loc["a", "median"], 2.0)
-    def test_case_2(self):
-        # Test with a single key
-        df = task_func(self.test_data_paths[1])
-        self.assertListEqual(df.index.tolist(), ["a"])
-        self.assertAlmostEqual(df.loc["a", "mean"], 1.0)
-        self.assertAlmostEqual(df.loc["a", "median"], 1.0)
-    def test_case_3(self):
-        # Test with missing values to ensure handling of NaN
-        df = task_func(self.test_data_paths[2])
-        self.assertListEqual(df.index.tolist(), ["a", "b"])
-        self.assertAlmostEqual(df.loc["a", "mean"], 1.5)
-        self.assertAlmostEqual(df.loc["a", "median"], 1.5)
-        self.assertTrue(np.isnan(df.loc["b", "mean"]))
-        self.assertTrue(np.isnan(df.loc["b", "median"]))
-    def test_case_4(self):
-        # Test empty dataframe creation from an empty input file
-        df = task_func(self.test_data_paths[3])
-        self.assertEqual(df.shape[0], 0)
-    def test_case_5(self):
-        # Test handling of mixed data, including valid values and NaN
-        df = task_func(self.test_data_paths[4])
-        self.assertListEqual(df.index.tolist(), ["a", "b", "c"])
-        self.assertAlmostEqual(df.loc["a", "mean"], 1.5)
-        self.assertAlmostEqual(df.loc["a", "median"], 1.5)
-        self.assertTrue(np.isnan(df.loc["b", "mean"]))
-        self.assertTrue(np.isnan(df.loc["b", "median"]))
-        self.assertAlmostEqual(df.loc["c", "mean"], 4.0)
-        self.assertAlmostEqual(df.loc["c", "median"], 4.0)
-    def test_case_6(self):
-        # Test with mixed types in values
-        data = [{"a": 5, "b": "text", "c": 7}, {"a": "more text", "b": 4, "c": None}]
-        path = self.temp_dir.name + "/test_data_6.json"
-        with open(path, "w") as f:
-            json.dump(data, f)
-        df = task_func(path)
-        self.assertListEqual(df.index.tolist(), ["a", "b", "c"])
-        self.assertAlmostEqual(df.loc["a", "mean"], 5.0)
-        self.assertAlmostEqual(df.loc["c", "mean"], 7.0)
-        self.assertAlmostEqual(df.loc["b", "mean"], 4.0)
-    def test_case_7(self):
-        # Test a larger dataset with missing values
-        data = [{"a": i, "b": i * 2 if i % 2 == 0 else None} for i in range(1, 101)]
-        path = self.temp_dir.name + "/test_data_7.json"
-        with open(path, "w") as f:
-            json.dump(data, f)
-        df = task_func(path)
-        self.assertAlmostEqual(df.loc["a", "mean"], 50.5)
-        self.assertAlmostEqual(
-            df.loc["b", "mean"], np.mean([2 * i for i in range(2, 101, 2)])
-        )
-    def test_case_8(self):
-        # Test with all non-numeric values for a key
-        data = [
-            {"a": "text", "b": "more text"},
-            {"a": "even more text", "b": "still more text"},
-        ]
-        path = self.temp_dir.name + "/test_data_8.json"
-        with open(path, "w") as f:
-            json.dump(data, f)
-        df = task_func(path)
-        self.assertTrue(np.isnan(df.loc["a", "mean"]))
-        self.assertTrue(np.isnan(df.loc["b", "mean"]))
-    def test_case_9(self):
-        # Test varying numbers of missing and non-numeric values
-        data = [
-            {"a": 10, "b": 20, "c": "ignore"},
-            {"a": None, "b": 25, "c": 30},
-            {"a": 5, "b": "ignore", "c": "ignore"},
-        ]
-        path = self.temp_dir.name + "/test_data_9.json"
-        with open(path, "w") as f:
-            json.dump(data, f)
-        df = task_func(path)
-        self.assertAlmostEqual(df.loc["a", "mean"], 7.5)
-        self.assertAlmostEqual(df.loc["b", "mean"], 22.5)
-        self.assertAlmostEqual(df.loc["c", "mean"], 30.0)
+        # Create a dummy grayscale image for testing
+        self.dummy_image_path = 'dummy_image.png'
+        np.random.seed(48)
+        dummy_image = np.random.randint(0, 256, (10, 10), dtype=np.uint8)
+        cv2.imwrite(self.dummy_image_path, dummy_image)
+        
+        self.dummy_image_path_zero = 'dummy_image_zero.png'
+        self.dummy_image_path_max = 'dummy_image_max.png'
+        # Create an all-zero grayscale image
+        zero_image = np.zeros((10, 10), dtype=np.uint8)
+        cv2.imwrite(self.dummy_image_path_zero, zero_image)
+        # Create an all-max-value grayscale image
+        max_image = np.full((10, 10), 255, dtype=np.uint8)
+        cv2.imwrite(self.dummy_image_path_max, max_image)
     def tearDown(self):
-        self.temp_dir.cleanup()
+        # Cleanup the dummy image
+        os.remove(self.dummy_image_path)
+        os.remove(self.dummy_image_path_zero)
+        os.remove(self.dummy_image_path_max)
+    def test_histogram_output(self):
+        histogram = task_func(self.dummy_image_path)
+        with open('df_contents.txt', 'w') as file:
+            file.write(str(histogram.tolist()))
+        self.assertEqual(histogram.shape, (256,))
+        self.assertTrue(np.all(histogram >= 0))
+        
+        expect = [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 3, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 1, 0, 0, 3, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 2, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 2, 1, 0, 2, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 2, 1, 1, 1, 2, 0, 2, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        
+        self.assertEqual(histogram.tolist(), expect, "DataFrame contents should match the expected output")
+    def test_nonexistent_image_file(self):
+        with self.assertRaises(FileNotFoundError):
+            task_func('nonexistent_image.png')
+    def test_invalid_image_file(self):
+        with open('invalid_image.txt', 'w') as file:
+            file.write("This is not an image file.")
+        with self.assertRaises(ValueError):
+            task_func('invalid_image.txt')
+        os.remove('invalid_image.txt')
+    def test_histogram_values(self):
+        histogram = task_func(self.dummy_image_path)
+        self.assertTrue(np.sum(histogram) == 100)  # 10x10 pixels
+    
+    def test_all_zero_image_histogram(self):
+        histogram = task_func(self.dummy_image_path_zero)
+        self.assertEqual(histogram[0], 100, "All pixels should be at value 0")
+        self.assertTrue(np.all(histogram[1:] == 0), "No pixels should be present at other values")
+    def test_all_max_value_image_histogram(self):
+        histogram = task_func(self.dummy_image_path_max)
+        self.assertEqual(histogram[-1], 100, "All pixels should be at maximum value 255")
+        self.assertTrue(np.all(histogram[:-1] == 0), "No pixels should be present at other values")

@@ -1,103 +1,134 @@
-import csv
-import random
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
 
-# Constants
-DATA = ['Temperature', 'Humidity', 'Pressure']
-RANGE = {
-    'Temperature': (-50, 50),
-    'Humidity': (0, 100),
-    'Pressure': (980, 1040)
-}
 
-def task_func(file_name="data.csv"):
+def task_func(csv_file_path, target_column="target", test_size=0.2, n_estimators=100):
     """
-    Generate a CSV file with weather data for each hour of the current day.
+    Processes a CSV file to train a Random Forest classifier and generates a formatted classification report.
 
     Parameters:
-    file_name (str): The path to the CSV file to be created.
-    
-    Returns:
-    str: The path to the created file.
+        csv_file_path (str): The path to the CSV file containing the data.
+        target_column (str, optional): The name of the target variable column. Defaults to 'target'.
+        test_size (float, optional): The proportion of the dataset to include in the test split. Defaults to 0.2.
+        n_estimators (int, optional): The number of trees in the RandomForestClassifier. Defaults to 100.
 
-    Note:
-    - The row names for the csv are 'Temperature', 'Humidity', and 'Pressure' 
-    - Temperature ranged rom -50 to 50
-    - Humidity ranged rom 0 to 100
-    - Pressure ranged rom 980 to 1040
+    Returns:
+        str: A formatted classification report. The report includes metrics such as precision, recall,
+             f1-score for each class, as well as overall accuracy, macro average, and weighted average.
+
+    Raises:
+        ValueError: If the specified target_column is not found in the CSV file.
 
     Requirements:
-    - os
-    - datetime
-    - csv
-    - random
+        - pandas
+        - sklearn
 
     Example:
-    >>> task_func("data.csv")
-    'path/to/data.csv'
+    >>> report = task_func('/path/to/data.csv')
+    >>> print(report)
+    class 0        0.88       0.90       0.89          50
+    class 1        0.89       0.87       0.88          48
+    ...
+    accuracy                           0.89         100
+    macro avg       0.88       0.89       0.88         100
+    weighted avg    0.89       0.89       0.89         100
+
+    Note:
+        The CSV file must have a column with the name specified by 'target_column', and it should be in a
+        format readable by pandas.read_csv().
     """
-    with open(file_name, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Time'] + DATA)
-        for hour in range(24):
-            row = [f'{hour}:00']
-            for data_type in DATA:
-                min_val, max_val = RANGE[data_type]
-                row.append(random.uniform(min_val, max_val))
-            writer.writerow(row)
-    return file_name
+    df = pd.read_csv(csv_file_path)
+    if target_column not in df.columns:
+        raise ValueError(f"'{target_column}' column not found in the CSV file.")
+    X = df.drop(target_column, axis=1)
+    y = df[target_column]
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=42
+    )
+    clf = RandomForestClassifier(n_estimators=n_estimators, random_state=42)
+    clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    report = classification_report(y_test, y_pred)
+    lines = report.split("\n")
+    formatted_lines = []
+    for line in lines:
+        parts = line.split()
+        if len(parts) == 5:  # Class-specific metrics
+            formatted_line = f"{parts[0]:<15}{parts[1]:>10}{parts[2]:>10}{parts[3]:>10}{parts[4]:>10}"
+        elif len(parts) == 4:  # Overall metrics
+            formatted_line = f"{parts[0]:<15}{parts[1]:>10}{parts[2]:>10}{parts[3]:>10}"
+        else:
+            formatted_line = line  # Header or empty lines
+        formatted_lines.append(formatted_line)
+    formatted_report = "\n".join(formatted_lines)
+    return formatted_report
 
 import unittest
-import os
-import csv
-import random
+from unittest.mock import patch
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Setup for the test cases, creating a mock file name
-        self.mock_file_name = "test_task_func_data.csv"
-        
-    def tearDown(self):
-        # Cleanup after each test, removing the generated file if it exists
-        if os.path.exists(self.mock_file_name):
-            os.remove(self.mock_file_name)
-    def test_case_1(self):
-        # Testing default file name
-        random.seed(0)
-        returned_file = task_func(self.mock_file_name)
-        self.assertTrue(os.path.exists(returned_file))
-        
-    def test_case_2(self):
-        # Testing custom file name
-        random.seed(0)
-        returned_file = task_func(self.mock_file_name)
-        self.assertTrue(os.path.exists(returned_file))
-        
-    def test_case_3(self):
-        # Testing content structure of the CSV file
-        random.seed(0)
-        task_func(self.mock_file_name)
-        with open(self.mock_file_name, 'r') as file:
-            reader = csv.reader(file)
-            header = next(reader)
-            self.assertEqual(header, ['Time', 'Temperature', 'Humidity', 'Pressure'])
-            
-    def test_case_4(self):
-        # Testing content data ranges of the CSV file
-        random.seed(0)
-        task_func(self.mock_file_name)
-        with open(self.mock_file_name, 'r') as file:
-            reader = csv.reader(file)
-            next(reader)  # Skip header
-            for row in reader:
-                temp, humidity, pressure = float(row[1]), float(row[2]), float(row[3])
-                self.assertTrue(-50 <= temp <= 50)
-                self.assertTrue(0 <= humidity <= 100)
-                self.assertTrue(980 <= pressure <= 1040)
-                
-    def test_case_5(self):
-        # Testing number of rows (24 hours + header)
-        random.seed(0)
-        task_func(self.mock_file_name)
-        with open(self.mock_file_name, 'r') as file:
-            reader = csv.reader(file)
-            rows = list(reader)
-            self.assertEqual(len(rows), 25)
+    """Test cases for task_func."""
+    @patch("pandas.read_csv")
+    def test_default_parameters(self, mock_read_csv):
+        """
+        Test task_func with default parameters using an adequately sized mock dataset.
+        """
+        mock_data = {
+            "feature1": range(100),
+            "feature2": range(100, 200),
+            "target": [0, 1] * 50,  # Alternating 0s and 1s
+        }
+        mock_read_csv.return_value = pd.DataFrame(mock_data)
+        result = task_func("dummy_path.csv")
+        self.assertIn("precision", result)
+    @patch("pandas.read_csv")
+    def test_non_default_target_column(self, mock_read_csv):
+        """
+        Test task_func with a non-default target column using a larger mock dataset.
+        """
+        mock_data = {
+            "feature1": range(100),
+            "feature2": range(100, 200),
+            "label": [1, 0] * 50,  # Alternating 1s and 0s
+        }
+        mock_read_csv.return_value = pd.DataFrame(mock_data)
+        result = task_func("dummy_path.csv", target_column="label")
+        self.assertIn("precision", result)
+    @patch("pandas.read_csv")
+    def test_different_test_size(self, mock_read_csv):
+        """
+        Test task_func with a different test size and a larger dataset.
+        """
+        mock_data = {
+            "feature1": range(100),
+            "feature2": range(100, 200),
+            "target": [0, 1, 1, 0] * 25,  # Repeated pattern
+        }
+        mock_read_csv.return_value = pd.DataFrame(mock_data)
+        result = task_func("dummy_path.csv", test_size=0.5)
+        self.assertIn("precision", result)
+    @patch("pandas.read_csv")
+    def test_different_n_estimators(self, mock_read_csv):
+        """
+        Test task_func with a different number of estimators and an expanded dataset.
+        """
+        mock_data = {
+            "feature1": range(100),
+            "feature2": range(100, 200),
+            "target": [1, 0] * 50,  # Alternating 1s and 0s
+        }
+        mock_read_csv.return_value = pd.DataFrame(mock_data)
+        result = task_func("dummy_path.csv", n_estimators=50)
+        self.assertIn("precision", result)
+    @patch("pandas.read_csv")
+    def test_missing_target_column(self, mock_read_csv):
+        """
+        Test task_func with a missing target column.
+        """
+        mock_read_csv.return_value = pd.DataFrame(
+            {"feature1": [1, 2], "feature2": [3, 4]}
+        )
+        with self.assertRaises(ValueError):
+            task_func("dummy_path.csv", target_column="not_exist")

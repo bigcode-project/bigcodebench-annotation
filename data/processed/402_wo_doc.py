@@ -1,92 +1,92 @@
-from datetime import datetime, timedelta
-import numpy as np
-import matplotlib.pyplot as plt
+from flask import Flask
+import os
+from flask_mail import Mail
 
-def task_func(days_in_past=7, random_seed=0):
+def task_func(app_name):
     """
-    Draw a graph of temperature trends over the past week using randomly generated data.
-
-    This function generates random integer temperatures in Celcius with a low of 15 and high of 35.
-    To show temperature trend, it plots date on the x-axis and temperature on the y-axis.
-
+    Initializes a Flask-Mail instance for sending emails using the generated Flask application with the specified app_name. 
+    
     Parameters:
-    days_in_past (int, optional): The number of days in the past for which to generate the graph.
-                                  Defaults to 7 days.
-    random_seed (int, optional): Seed for random number generation. Defaults to 0.
+    app_name (string): The Flask application name
 
     Returns:
-    ax (matplotlib.axes._axes.Axes): Generated plot showing 'Temperature Trends Over the Past Week',
-                                     with 'Date' on the a-xis and 'Temperature (°C)' on the y-axis.
+    tuple: A tuple containing the Flask-Mail instance and the app's mail configurations.
 
-
-    Raises:
-    ValueError: If days_in_past is less than 1.
+    Note:
+    - The details of the email server are retrieved from environment variables. 
+    - If the variables do not exist, use defaults:
+      - 'MAIL_SERVER': 'localhost'
+      - 'MAIL_PORT': 25
+      - 'MAIL_USE_TLS': False (boolean)
+      - 'MAIL_USERNAME': None
+      - 'MAIL_PASSWORD': None
     
     Requirements:
-    - datetime.datetime
-    - datetime.timedelta
-    - numpy
-    - matplotlib.pyplot
+    - flask
+    - os
+    - flask_mail
 
     Example:
-    >>> ax = task_func(random_seed=42)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> ax.get_xticklabels()
-    [Text(19810.0, 0, '2024-03-28'), Text(19811.0, 0, '2024-03-29'), Text(19812.0, 0, '2024-03-30'), Text(19813.0, 0, '2024-03-31'), Text(19814.0, 0, '2024-04-01'), Text(19815.0, 0, '2024-04-02'), Text(19816.0, 0, '2024-04-03')]
+    >>> mail, configs = task_func("test")
+    >>> print(mail.__getattribute__("app").name)
+    test
     """
-    np.random.seed(random_seed)
-    if days_in_past < 1:
-        raise ValueError("days_in_past must be in the past")
-    dates = [datetime.now().date() - timedelta(days=i) for i in range(days_in_past)]
-    temperatures = np.random.randint(low=15, high=35, size=days_in_past)
-    fig, ax = plt.subplots()
-    ax.plot(dates, temperatures)
-    ax.set_xlabel("Date")
-    ax.set_ylabel("Temperature (°C)")
-    ax.set_title("Temperature Trend")
-    return ax
+    app = Flask(app_name)
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'localhost')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 25))
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', False) == 'True'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', None)
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', None)
+    mail = Mail(app)
+    return mail, {
+        'MAIL_SERVER': app.config['MAIL_SERVER'],
+        'MAIL_PORT': app.config['MAIL_PORT'],
+        'MAIL_USE_TLS': app.config['MAIL_USE_TLS'],
+        'MAIL_USERNAME': app.config['MAIL_USERNAME'],
+        'MAIL_PASSWORD': app.config['MAIL_PASSWORD']
+    }
 
 import unittest
-import matplotlib.pyplot as plt
-import numpy as np
+from unittest.mock import patch
+from flask import Flask
 class TestCases(unittest.TestCase):
-    def _test_plot(self, ax):
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_xlabel(), "Date")
-        self.assertEqual(ax.get_ylabel(), "Temperature (°C)")
-        self.assertEqual(ax.get_title(), "Temperature Trend")
     def test_case_1(self):
-        # Test default parameters
-        ax = task_func()
-        self._test_plot(ax)
+        mail_instance, configs = task_func("test_case")
+        self.assertEqual(configs["MAIL_SERVER"], "localhost")
+        self.assertEqual(configs["MAIL_PORT"], 25)
+        self.assertEqual(configs["MAIL_USE_TLS"], False)
+        self.assertIsNone(configs["MAIL_USERNAME"])
+        self.assertIsNone(configs["MAIL_PASSWORD"])
+    @patch.dict('os.environ', {'MAIL_SERVER': 'test_server', 'MAIL_PORT': '2525', 'MAIL_USE_TLS': 'True', 'MAIL_USERNAME': 'test', 'MAIL_PASSWORD': 'password'})
     def test_case_2(self):
-        # Test days in the past
-        for n_days in [1, 5, 50, 100]:
-            ax = task_func(n_days, random_seed=2)
-            self._test_plot(ax)
-            self.assertEqual(len(ax.lines[0].get_ydata()), n_days)
+        mail_instance, configs = task_func("test_case_2")
+        self.assertEqual(configs["MAIL_SERVER"], "test_server")
+        self.assertEqual(configs["MAIL_PORT"], 2525)
+        self.assertEqual(configs["MAIL_USE_TLS"], True)
+        self.assertEqual(configs["MAIL_USERNAME"], "test")
+        self.assertEqual(configs["MAIL_PASSWORD"], "password")
+        self.assertEqual(mail_instance.__getattribute__("app").name, "test_case_2")
+    @patch.dict('os.environ', {'MAIL_SERVER': 'another_server'})
     def test_case_3(self):
-        # Test handling invalid days in the past
-        with self.assertRaises(Exception):
-            task_func(0, random_seed=4)
+        mail_instance, configs = task_func("test_case")
+        self.assertEqual(configs["MAIL_SERVER"], "another_server")
+        self.assertEqual(configs["MAIL_PORT"], 25)
+        self.assertEqual(configs["MAIL_USE_TLS"], False)
+        self.assertIsNone(configs["MAIL_USERNAME"])
+        self.assertIsNone(configs["MAIL_PASSWORD"])
+    @patch.dict('os.environ', {'MAIL_PORT': '3030', 'MAIL_USE_TLS': 'False'})
     def test_case_4(self):
-        # Test handling invalid days in the past
-        with self.assertRaises(Exception):
-            task_func(-1, random_seed=4)
+        mail_instance, configs = task_func("test_case")
+        self.assertEqual(configs["MAIL_SERVER"], "localhost")
+        self.assertEqual(configs["MAIL_PORT"], 3030)
+        self.assertEqual(configs["MAIL_USE_TLS"], False)
+        self.assertIsNone(configs["MAIL_USERNAME"])
+        self.assertIsNone(configs["MAIL_PASSWORD"])
+    @patch.dict('os.environ', {'MAIL_USERNAME': 'username'})
     def test_case_5(self):
-        # Test random seed reproducibility
-        ax1 = task_func(5, random_seed=42)
-        ax2 = task_func(5, random_seed=42)
-        self.assertTrue(
-            np.array_equal(ax1.lines[0].get_ydata(), ax2.lines[0].get_ydata())
-        )
-    def test_case_6(self):
-        # Test random seed difference
-        ax1 = task_func(5, random_seed=0)
-        ax2 = task_func(5, random_seed=42)
-        self.assertFalse(
-            np.array_equal(ax1.lines[0].get_ydata(), ax2.lines[0].get_ydata())
-        )
-    def tearDown(self):
-        plt.close("all")
+        mail_instance, configs = task_func("test_case")
+        self.assertEqual(configs["MAIL_SERVER"], "localhost")
+        self.assertEqual(configs["MAIL_PORT"], 25)
+        self.assertEqual(configs["MAIL_USE_TLS"], False)
+        self.assertEqual(configs["MAIL_USERNAME"], "username")
+        self.assertIsNone(configs["MAIL_PASSWORD"])

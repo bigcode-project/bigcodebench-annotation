@@ -1,106 +1,90 @@
-from collections import Counter
 import numpy as np
+from scipy.spatial import Voronoi, voronoi_plot_2d
 import matplotlib.pyplot as plt
-import itertools
 
-def task_func(list_of_menuitems, title="Menu Distribution", color="blue", width=1.0):
+
+def task_func(points, seed=0):
     """
-    Given a nested list of menu items, flatten the list using itertool chain, count the occurrences of each item, then
-    plot a histogram with an alphabetically sorted x-axis labeled as "Menu Items" and y-axis as "Frequency".
+    Calculate the Voronoi diagram for a number of points in 2D and plot it.
+    Note: this function will raise errors when input is invalid, for example wrong type or shape.
+    Jittering is applied prior to plotting.
 
     Parameters:
-    - list_of_menuitems (list): A non-empty nested list of menu items. Each element is a list of menu item strings.
-    - title (str, optional): The title of the histogram plot. Default is "Menu Distribution".
-    - color (str, optional): The color of the bars in the histogram. Default is "blue".
-    - width (float, optional): The width of the bars in the histogram. Default is 1.0.
+    - points (np.ndarray): A numpy ndarray of shape (n_points, 2) with the coordinates of the points.
+    - seed (int): Random seed for reproducibility. Defaults to 0.
 
     Returns:
-    - ax (object): An Axes object representing the histogram plot.
+    tuple (vor, ax): A tuple containing:
+        - vor (Voronoi): A Voronoi object representing the Voronoi diagram of the points.
+        - ax (Axes): The axes of the plotted Voronoi diagram.
 
     Requirements:
-    - collections.Counter
     - numpy
+    - scipy
     - matplotlib.pyplot
-    - itertools
 
     Example:
-    >>> task_func([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
-    <Axes: title={'center': 'Menu Distribution'}, xlabel='Menu Items', ylabel='Frequency'>
-    >>> task_func(['Burger'], title='A Title', color='red', width=5.0)
-    <Axes: title={'center': 'A Title'}, xlabel='Menu Items', ylabel='Frequency'>
+    >>> points = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    >>> vor, ax = task_func(points)
+    >>> type(vor)
+    <class 'scipy.spatial.qhull.Voronoi'>
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    flat_list = list(itertools.chain(*list_of_menuitems))
-    counter = Counter(flat_list)
-    labels, values = zip(*sorted(counter.items(), key=lambda x: x[0]))
-    indexes = np.arange(len(labels))
+    if not isinstance(points, np.ndarray):
+        raise TypeError("Expected Numpy array")
+    if len(points) < 3:
+        raise ValueError("Voronoi diagram needs at least 3 points")
+    if points.shape[-1] != 2:
+        raise ValueError("Expected array of 2D points")
+    np.random.seed(seed)
+    jittered_points = points + np.random.normal(0, 1e-10, points.shape)
+    vor = Voronoi(jittered_points)
     fig, ax = plt.subplots()
-    ax.bar(indexes, values, width, color=color)
-    ax.set_xticklabels(labels)
-    ax.set_xlabel("Menu Items")
-    ax.set_ylabel("Frequency")
-    ax.set_title(title)
-    return ax
+    voronoi_plot_2d(vor, ax=ax)
+    return vor, ax
 
 import unittest
+import numpy as np
+from scipy.spatial import Voronoi
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.points = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     def test_case_1(self):
-        input_data = [["Pizza", "Burger"], ["Pizza", "Coke"], ["Pasta", "Coke"]]
-        ax = task_func(input_data)
-        # Test default plot properties
-        self.assertEqual(ax.get_title(), "Menu Distribution")
-        self.assertEqual(ax.get_xlabel(), "Menu Items")
-        self.assertEqual(ax.get_ylabel(), "Frequency")
-        for p in ax.patches:
-            # RGBA color
-            self.assertEqual(p.get_facecolor(), (0.0, 0.0, 1.0, 1.0))
-            # bar width
-            self.assertEqual(p.get_width(), 1.0)
+        # Standard tests
+        vor, ax = task_func(self.points)
+        self._run_test(self.points, vor, ax)
     def test_case_2(self):
-        input_data = [["Pizza", "Burger"], ["Pizza", "Coke"], ["Pasta", "Coke"]]
-        ax = task_func(input_data, title="Custom Title", color="red", width=0.8)
-        # Test custom plot properties
-        self.assertEqual(ax.get_title(), "Custom Title")
-        self.assertEqual(ax.get_xlabel(), "Menu Items")
-        self.assertEqual(ax.get_ylabel(), "Frequency")
-        for p in ax.patches:
-            # RGBA color
-            self.assertEqual(p.get_facecolor(), (1.0, 0.0, 0.0, 1.0))
-            # bar width
-            self.assertEqual(p.get_width(), 0.8)
+        # Test random seed
+        vor, _ = task_func(self.points, seed=0)
+        vor1, _ = task_func(self.points, seed=0)
+        vor2, _ = task_func(self.points, seed=1)
+        self.assertTrue((vor.ridge_points == vor1.ridge_points).all())
+        self.assertFalse((vor1.ridge_points == vor2.ridge_points).all())
     def test_case_3(self):
-        input_data = [["Burger"], ["Pizza"], ["Pasta"]]
-        ax = task_func(input_data)
-        # Test count
-        bars = [p.get_height() for p in ax.patches]
-        self.assertEqual(bars, [1, 1, 1])
+        # Test with points that are extremely close to each other
+        points = np.array([[0, 0], [0, 1e-12], [1, 0]])
+        vor, ax = task_func(points)
+        self._run_test(points, vor, ax)
     def test_case_4(self):
-        input_data = [["Carrot", "Apple"], ["Apple", "Banana"], ["Banana"]]
-        ax = task_func(input_data)
-        # Test x-axis order
-        self.assertEqual(
-            [_._text for _ in ax.get_xticklabels() if _._text],
-            ["Apple", "Banana", "Carrot"],
-        )
+        # Test with fewer than three points, which is the minimum to form a Voronoi diagram.
+        points = np.array([[0, 0], [1, 1]])
+        with self.assertRaises(Exception):
+            task_func(points)
     def test_case_5(self):
-        # Test input edge case: some empty elements
-        ax = task_func([[], ["Apple"]])
-        self.assertEqual(len(ax.patches), 1)
-        for p in ax.patches:
-            # bar width
-            self.assertEqual(p.get_width(), 1.0)
-            self.assertEqual(p.get_height(), 1)
+        # Test with invalid input shapes, such as one-dimensional array.
+        points = np.array([1, 2, 3])
+        with self.assertRaises(Exception):
+            task_func(points)
     def test_case_6(self):
-        with self.assertRaises(ValueError):
-            task_func([])
-        with self.assertRaises(ValueError):
-            task_func([[]])
-        with self.assertRaises(ValueError):
-            task_func("")
-        with self.assertRaises(TypeError):
-            task_func(None)
-        with self.assertRaises(TypeError):
-            task_func(1)
-        with self.assertRaises(TypeError):
-            task_func([1])
+        # Test with invalid input types
+        with self.assertRaises(Exception):
+            task_func("Not valid points")
+    def _run_test(self, points, vor, ax):
+        # Check the point_region attribute of Voronoi object
+        self.assertIsInstance(vor, Voronoi)
+        self.assertEqual(len(vor.point_region), len(points))
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(len(ax.get_children()) > 0, "The plot should have elements.")
     def tearDown(self):
         plt.close("all")

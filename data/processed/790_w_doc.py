@@ -1,81 +1,68 @@
-import pandas as pd
-from statsmodels.tsa.stattools import adfuller
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 
+# Constants
+ARRAY_LENGTH = 10
 
-def task_func(df: pd.DataFrame, column_a: str, column_b: str, column_c: str) -> bool:
+def task_func():
     """
-    Determines if a specific subset of data is stationary by filtering rows where column_b bigger than 50 and column_c equal to 900. 
-    Data is considered to be stationary if the p_value returned by the Augmented Dickey-Fuller test is smaller than 0.05.
+    Generate a random array and apply min-max normalization (scaling) to transform the array values into a range between 0 and 1.
 
-    If column_a is empty after filtering or if its values are constant, True
-    is returned.
-    
     Parameters:
-        df (pd.DataFrame): A DataFrame containing the data.
-        column_a (str): The name of the column to test for stationarity.
-        column_b (str): The name of the column used for filtering based on its value being greater than 50.
-        column_c (str): The name of the column used for filtering based on its value being equal to 900.
-    
+    - None
+
     Returns:
-        bool: True if the data in column_a (after filtering based on column_b and column_c) is stationary, False otherwise.
-    
+    - scaled_array (numpy.ndarray): The normalized array.
+
     Requirements:
-        pandas
-        statsmodels: for using the adfuller test
+    - numpy
+    - sklearn
 
     Example:
-    >>> df = pd.DataFrame({
-    ...      'A': [1, 2, 3, 4, 5, 6],
-    ...      'B': [60, 70, 80, 90, 100, 110],
-    ...      'C': [900, 900, 900, 900, 900, 900]
-    ... })
-    >>> task_func(df, 'A', 'B', 'C')
-    False
+    >>> task_func()
+    array([[0.57142857],
+           [0.14285714],
+           [0.71428571],
+           [0.28571429],
+           [0.57142857],
+           [1.        ],
+           [0.        ],
+           [0.57142857],
+           [0.71428571],
+           [0.28571429]])
     """
-    filtered_df = df[(df[column_b] > 50) & (df[column_c] == 900)]
-    if filtered_df[column_a].nunique() <= 1:
-        return True
-    if filtered_df.empty:
-        return True
-    adf_result = adfuller(filtered_df[column_a])
-    p_value = adf_result[1]
-    return p_value <= 0.05
+    np.random.seed(42)  # For reproducibility, as shown in your example
+    array = np.random.randint(0, 10, ARRAY_LENGTH).reshape(-1, 1)
+    scaler = MinMaxScaler()
+    scaled_array = scaler.fit_transform(array)
+    return scaled_array
 
 import unittest
-import os
-import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Create DataFrame in setUp for test isolation
-        self.data = pd.DataFrame({
-            'A': list(range(100)),
-            'B': [x * 2 for x in range(100)],
-            'C': [900 if x % 2 == 0 else 800 for x in range(100)]
-        })
-    def test_constant_value(self):
-        # All values in column A are constant after filtering
-        self.data['A'] = 5
-        result = task_func(self.data, 'A', 'B', 'C')
-        self.assertTrue(result, "Should be True as data is constant.")
-    def test_empty_after_filter(self):
-        # After filtering, no rows remain
-        result = task_func(self.data[self.data['B'] > 1000], 'A', 'B', 'C')
-        self.assertTrue(result, "Should be True as no data remains after filter.")
-    def test_non_stationary_data(self):
-        # Test a clearly non-stationary dataset
-        result = task_func(self.data, 'A', 'B', 'C')
-        self.assertFalse(result, "Should be False as data is non-stationary.")
-    def test_stationary_data(self):
-        # Test a stationary dataset
-        self.data['A'] = 5
-        result = task_func(self.data, 'A', 'B', 'C')
-        self.assertTrue(result, "Should be True as data is stationary.")
-    def test_edge_case_small_dataset(self):
-        # Test a very small dataset
-        small_data = pd.DataFrame({
-            'A': [1, 1],
-            'B': [60, 70],
-            'C': [900, 900]
-        })
-        result = task_func(small_data, 'A', 'B', 'C')
-        self.assertTrue(result, "Should be True due to small dataset size or no variation.")
+        self.result = task_func()  # Call the function once to use in multiple tests if needed
+    def test_normal_functionality(self):
+        """Testing the basic functionality and shape of the output array."""
+        self.assertEqual(self.result.shape, (10, 1), "Array shape should be (10, 1)")
+        self.assertTrue((self.result >= 0).all() and (self.result <= 1).all(), "Array values should be in the range [0, 1]")
+    def test_output_values(self):
+        """ Ensuring that the scaling works as expected. """
+        expected_min = 0
+        expected_max = 1
+        actual_min = np.min(self.result)
+        actual_max = np.max(self.result)
+        self.assertEqual(actual_min, expected_min, "The minimum of the scaled array should be 0")
+        self.assertAlmostEqual(actual_max, expected_max, places=15, msg="The maximum of the scaled array should be very close to 1")
+    def test_no_arguments(self):
+        """Ensure that no arguments are passed to the function."""
+        with self.assertRaises(TypeError):
+            task_func(10)  # This should fail since the function expects no arguments
+    def test_unchanging_output(self):
+        """Test if multiple calls to the function give the same result due to seed setting."""
+        second_result = task_func()
+        np.testing.assert_array_equal(self.result, second_result, "Results should be the same on every call due to fixed seed.")
+    def test_distribution_of_values(self):
+        """Test that the distribution of scaled values is neither constant nor degenerate (not all values the same)."""
+        unique_values = np.unique(self.result)
+        self.assertTrue(len(unique_values) > 1, "There should be more than one unique scaled value to confirm distribution.")

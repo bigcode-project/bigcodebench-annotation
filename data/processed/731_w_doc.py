@@ -1,56 +1,70 @@
-import re
-import string
+import pickle
+import os
 
 # Constants
-PUNCTUATION = string.punctuation
+FILE_NAME = 'save.pkl'
 
-def task_func(text):
+def task_func(dt):
     """
-    Count the number of words and punctuation marks in a string.
+    Save the date time object "dt" in the pickle file "save.pkl" and then read it back for validation.
 
     Parameters:
-    - text (str): The input string.
+    - dt (datetime): The datetime object to be saved.
 
     Returns:
-    - tuple: A tuple containing the number of words and punctuation marks.
+    - loaded_dt (datetime): The loaded datetime object from 'save.pkl'.
 
     Requirements:
-    - re
-    - string
+    - pickle
+    - os
 
     Example:
-    >>> task_func("Hello, world! This is a test.")
-    (6, 3)
+    >>> dt = datetime.now(pytz.UTC)
+    >>> loaded_dt = task_func(dt)
+    >>> assert dt == loaded_dt
     """
-    words = re.findall(r'\b\w+\b', text)
-    punctuation_marks = [char for char in text if char in PUNCTUATION]
-    return len(words), len(punctuation_marks)
+    with open(FILE_NAME, 'wb') as file:
+        pickle.dump(dt, file)
+    with open(FILE_NAME, 'rb') as file:
+        loaded_dt = pickle.load(file)
+    os.remove(FILE_NAME)
+    return loaded_dt
 
 import unittest
+from datetime import datetime
+import pytz
 class TestCases(unittest.TestCase):
-    def test_basic_input(self):
-        """Test with basic input string"""
-        result = task_func("Hello, world! This is a test.")
-        self.assertEqual(result, (6, 3))
-    def test_no_punctuation(self):
-        """Test with a string that has words but no punctuation"""
-        result = task_func("No punctuation here just words")
-        self.assertEqual(result, (5, 0))
-    
-    def test_with_empty_string(self):
-        """Test with an empty string"""
-        result = task_func("")
-        self.assertEqual(result, (0, 0))
-    def test_with_multiple_spaces(self):
-        """Test with a string that has multiple spaces between words"""
-        result = task_func("This  is   a    test     with      multiple       spaces")
-        self.assertEqual(result, (7, 0))
-    def test_with_only_punctuation(self):
-        """Test with a string that consists only of punctuation marks"""
-        result = task_func("!!!")
-        self.assertEqual(result, (0, 3))
-    
-    def test_with_single_punctuation(self):
-        """Test with a string that is a single punctuation mark"""
-        result = task_func("!")
-        self.assertEqual(result, (0, 1))
+    def test_datetime_saving_and_loading(self):
+        # Test saving and loading the current datetime with UTC timezone
+        dt = datetime.now(pytz.UTC)
+        loaded_dt = task_func(dt)
+        self.assertEqual(dt, loaded_dt, "The loaded datetime object should match the original")
+    def test_timezone_awareness(self):
+        # Test saving and loading a timezone-aware datetime object
+        tz = pytz.timezone('Asia/Tokyo')
+        dt = datetime.now(tz)
+        loaded_dt = task_func(dt)
+        self.assertEqual(dt, loaded_dt, "The loaded datetime object should be timezone aware and match the original")
+    def test_file_cleanup(self):
+        # Test whether the pickle file is properly cleaned up
+        dt = datetime.now(pytz.UTC)
+        task_func(dt)
+        self.assertFalse(os.path.exists(FILE_NAME), "The pickle file should be cleaned up after loading")
+    def test_naive_datetime(self):
+        # Test saving and loading a naive datetime object
+        dt = datetime.now()
+        loaded_dt = task_func(dt)
+        self.assertEqual(dt, loaded_dt, "The loaded datetime object should match the original naive datetime")
+        self.assertIsNone(loaded_dt.tzinfo, "The loaded datetime object should be naive (no timezone)")
+    def test_different_timezones(self):
+        # Test saving and loading datetime objects with different timezones
+        tz1 = pytz.timezone('US/Eastern')
+        tz2 = pytz.timezone('Europe/London')
+        dt1 = datetime.now(tz1)
+        dt2 = datetime.now(tz2)
+        loaded_dt1 = task_func(dt1)
+        loaded_dt2 = task_func(dt2)
+        self.assertEqual(dt1, loaded_dt1, "The loaded datetime object should match the original (US/Eastern)")
+        self.assertEqual(dt2, loaded_dt2, "The loaded datetime object should match the original (Europe/London)")
+        self.assertEqual(dt1.tzinfo, loaded_dt1.tzinfo, "The loaded datetime object should have the same timezone (US/Eastern)")
+        self.assertEqual(dt2.tzinfo, loaded_dt2.tzinfo, "The loaded datetime object should have the same timezone (Europe/London)")

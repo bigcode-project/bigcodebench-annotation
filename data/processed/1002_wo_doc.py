@@ -1,120 +1,113 @@
-from nltk.tokenize import RegexpTokenizer
-from string import punctuation
+import urllib.request
 import os
+import json
+import pandas as pd
+
+# Constants
+TARGET_JSON_FILE = "downloaded_file.json"
 
 
-def task_func(text, output_filename):
+def task_func(url):
     """
-    Extracts words from the input text that begin with the '$' character and saves them to a specified file,
-    excluding any words that are solely composed of punctuation characters.
-
-    This function is useful for processing texts where '$' is used to denote special terms or entities and saves
-    these terms to a file for further analysis or usage.
+    This function retrieves a JSON file from the given URL using urllib.request.urlretrieve,
+    temporarily saving it as 'downloaded_file.json'. It then opens and reads this file,
+    converts the JSON content into a pandas DataFrame, and finally deletes the temporary JSON file.
 
     Parameters:
-    input_text (str): The text from which to extract '$' prefixed words.
-    output_filename (str): The filename for the output file where the extracted words will be saved.
+    url (str): The URL of the JSON file to be downloaded.
 
     Returns:
-    str: The absolute path to the output file containing the '$' prefixed words.
+    pandas.DataFrame: A DataFrame constructed from the JSON data in the downloaded file.
 
     Requirements:
-    - nltk.tokenize.RegexpTokenizer
-    - string.punctuation
+    - urllib.request
     - os
+    - json
+    - pandas
 
     Example:
-    >>> example_text = "$example $valid $!invalid $$ alsoInvalid"
-    >>> task_func(example_text, 'extracted_dollar_words.txt')
-    '/absolute/path/to/extracted_dollar_words.txt'
+    >>> task_func('http://example.com/employees.json')
+        name  age           city
+    0  Alice   25       New York
+    1    Bob   30  San Francisco
     """
-    punctuation_set = set(punctuation)
-    tokenizer = RegexpTokenizer(r'\$\w+')
-    dollar_prefixed_words = tokenizer.tokenize(text)
-    valid_dollar_words = [word for word in dollar_prefixed_words if
-                          not all(char in punctuation_set for char in word[1:])]
-    with open(output_filename, 'w') as file:
-        for word in valid_dollar_words:
-            file.write(word + '\n')
-    return os.path.abspath(output_filename)
+    urllib.request.urlretrieve(url, TARGET_JSON_FILE)
+    with open(TARGET_JSON_FILE, "r") as f:
+        data = json.load(f)
+    os.remove(TARGET_JSON_FILE)
+    return pd.DataFrame(data)
 
 import unittest
-import os
+import pandas as pd
+from unittest.mock import patch, mock_open
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.filenames = []
-        for i in range(1,7):
-            self.filenames.append("task_func_test_output_"+str(i)+".txt")
-    def tearDown(self):
-        # Clean up the test file
-        for filename in self.filenames:
-            if os.path.exists(filename):
-                os.remove(filename)
-        
-    def test_case_1(self):
-        # Input 1
-        text = "$abc def $efg $hij klm $ $abc $abc $hij $hij"
-        filename = self.filenames[0]
-        expected_words = ["$abc", "$efg", "$hij", "$abc", "$abc", "$hij", "$hij"]
-        output_path = task_func(text, filename)
-        with open(output_path, 'r') as file:
-            saved_words = file.read().splitlines()
-        self.assertEqual(saved_words, expected_words)
-        self.assertTrue(os.path.exists(output_path))
-    def test_case_2(self):
-        # Input 2
-        text = "There are no dollar words here."
-        filename = self.filenames[1]
-        expected_words = []
-        output_path = task_func(text, filename)
-        with open(output_path, 'r') as file:
-            saved_words = file.read().splitlines()
-        self.assertEqual(saved_words, expected_words)
-        self.assertTrue(os.path.exists(output_path))
-    def test_case_3(self):
-        # Input 3
-        text = "$$$$ $$ $$$$ $abc$ $def"
-        filename = self.filenames[2]
-        expected_words = ["$abc", "$def"]
-        output_path = task_func(text, filename)
-        with open(output_path, 'r') as file:
-            saved_words = file.read().splitlines()
-        self.assertEqual(saved_words, expected_words)
-        self.assertTrue(os.path.exists(output_path))
-    def test_case_4(self):
-        # Input 4
-        text = "$hello $world! This is a $test."
-        filename = self.filenames[3]
-        expected_words = ["$hello", "$world", "$test"]
-        output_path = task_func(text, filename)
-        with open(output_path, 'r') as file:
-            saved_words = file.read().splitlines()
-        self.assertEqual(saved_words, expected_words)
-        self.assertTrue(os.path.exists(output_path))
-    def test_case_5(self):
-        # Input 5
-        text = "$"
-        filename = self.filenames[4]
-        expected_words = []
-        output_path = task_func(text, filename)
-        with open(output_path, 'r') as file:
-            saved_words = file.read().splitlines()
-        self.assertEqual(saved_words, expected_words)
-        self.assertTrue(os.path.exists(output_path))
-    def test_save_dollar_prefixed_words_to_file(self):
-        # Example input text containing various cases
-        input_text = "$example $valid word $!invalid $$ $1234"
-        # Temporary output file name for testing
-        filename = self.filenames[5]
-        # Expected result: Only valid $ prefixed words should be saved
-        expected_words = ["$example", "$valid", "$1234"]
-        expected_output = "\n".join(expected_words) + "\n"
-        # Call the function with the test data
-        output_path = task_func(input_text, filename)
-        # Verify the file was created
-        self.assertTrue(os.path.exists(output_path))
-        # Open the file and read its contents
-        with open(filename, 'r') as file:
-            content = file.read()
-        # Check the content against the expected output
-        self.assertEqual(content, expected_output)
+    """Test cases for the task_func function."""
+    @patch("urllib.request.urlretrieve")
+    @patch("os.remove")
+    def test_sample_1(self, mock_remove, mock_urlretrieve):
+        """Test that the function returns the correct DataFrame for a given JSON file."""
+        url = "http://example.com/sample_1.json"
+        sample_data = '[{"name": "Alice", "age": 25, "city": "New York"}, {"name": "Bob", "age": 30, "city": "San Francisco"}]'
+        mock_urlretrieve.return_value = None
+        with patch("builtins.open", mock_open(read_data=sample_data)):
+            expected_df = pd.DataFrame(
+                [
+                    {"name": "Alice", "age": 25, "city": "New York"},
+                    {"name": "Bob", "age": 30, "city": "San Francisco"},
+                ]
+            )
+            result_df = task_func(url)
+            pd.testing.assert_frame_equal(result_df, expected_df)
+        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
+        mock_remove.assert_called_once_with("downloaded_file.json")
+    @patch("urllib.request.urlretrieve")
+    @patch("os.remove")
+    def test_sample_2(self, mock_remove, mock_urlretrieve):
+        """Test that the function returns the correct DataFrame for a given JSON file."""
+        url = "http://example.com/sample_2.json"
+        sample_data = '[{"product": "Laptop", "price": 1000}, {"product": "Mouse", "price": 20}, {"product": "Keyboard", "price": 50}]'
+        mock_urlretrieve.return_value = None
+        with patch("builtins.open", mock_open(read_data=sample_data)):
+            expected_df = pd.DataFrame(
+                [
+                    {"product": "Laptop", "price": 1000},
+                    {"product": "Mouse", "price": 20},
+                    {"product": "Keyboard", "price": 50},
+                ]
+            )
+            result_df = task_func(url)
+            pd.testing.assert_frame_equal(result_df, expected_df)
+        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
+        mock_remove.assert_called_once_with("downloaded_file.json")
+    @patch("urllib.request.urlretrieve")
+    @patch("os.remove")
+    def test_empty_json(self, mock_remove, mock_urlretrieve):
+        """Test that the function returns an empty DataFrame for an empty JSON file."""
+        url = "http://example.com/empty.json"
+        sample_data = "[]"
+        mock_urlretrieve.return_value = None
+        with patch("builtins.open", mock_open(read_data=sample_data)):
+            expected_df = pd.DataFrame()
+            result_df = task_func(url)
+            pd.testing.assert_frame_equal(result_df, expected_df)
+        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
+    @patch("urllib.request.urlretrieve")
+    def test_invalid_url(self, mock_urlretrieve):
+        """Test that the function raises an exception when the URL is invalid."""
+        url = "http://example.com/non_existent.json"
+        mock_urlretrieve.side_effect = Exception("URL retrieval failed")
+        with self.assertRaises(Exception):
+            task_func(url)
+        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")
+    @patch("urllib.request.urlretrieve")
+    @patch("os.remove")
+    def test_invalid_json(self, mock_remove, mock_urlretrieve):
+        """Test that the function raises an exception when the JSON file is invalid."""
+        url = "http://example.com/invalid.json"
+        sample_data = "invalid json content"
+        mock_urlretrieve.return_value = None
+        with patch(
+            "builtins.open", mock_open(read_data=sample_data)
+        ), self.assertRaises(Exception):
+            task_func(url)
+        mock_urlretrieve.assert_called_once_with(url, "downloaded_file.json")

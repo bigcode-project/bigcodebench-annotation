@@ -1,71 +1,133 @@
-import pandas as pd
-import random
+import numpy as np
 from scipy import stats
 
-def task_func(n_data_points=5000, min_value=0.0, max_value=10.0):
+# Constants
+FEATURES = ['feature1', 'feature2', 'feature3', 'feature4', 'feature5']
+
+def task_func(df, dct):
     """
-    Generate a random dataset of floating-point numbers within a specified range, 
-    truncate each value to 3 decimal places, and calculate statistical measures (mean, median, mode) of the data.
+    This function calculates and returns the mean, median, mode, and variance for specified features in a DataFrame. 
+    It replaces certain values in the DataFrame based on a provided dictionary mapping before performing the calculations.
     
     Parameters:
-    n_data_points (int): Number of data points to generate. Default is 5000.
-    min_value (float): Minimum value range for data points. Default is 0.0.
-    max_value (float): Maximum value range for data points. Default is 10.0.
-
+    df (DataFrame): The input DataFrame.
+    dct (dict): A dictionary for replacing values in df.
+    
     Returns:
-    dict: A dictionary with keys 'mean', 'median', 'mode' and their corresponding calculated values.
+    dict: A dictionary containing statistics (mean, median, mode, variance) for each feature defined in the 'FEATURES' constant.
     
     Requirements:
-    - pandas
-    - random
+    - numpy
     - scipy.stats
 
+    Note:
+    - The function would return "Invalid input" string if the input is invalid (e.g., does not contain the required 'feature1' key) or if there is an error in the calculation.
+    
     Example:
-    >>> random.seed(0)
-    >>> stats = task_func(1000, 5.0, 5.0)
-    >>> print(stats)
-    {'mean': 5.0, 'median': 5.0, 'mode': 5.0}
+    >>> df = pd.DataFrame({'feature1': [1, 2, 3, 4, 5], 'feature2': [5, 4, 3, 2, 1], 'feature3': [2, 2, 2, 2, 2], 'feature4': [1, 1, 3, 3, 5], 'feature5': [0, 1, 1, 1, 1]})
+    >>> dct = {}
+    >>> task_func(df, dct)
+    {'feature1': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 'feature2': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 'feature3': {'mean': 2.0, 'median': 2.0, 'mode': 2, 'variance': 0.0}, 'feature4': {'mean': 2.6, 'median': 3.0, 'mode': 1, 'variance': 2.24}, 'feature5': {'mean': 0.8, 'median': 1.0, 'mode': 1, 'variance': 0.16000000000000006}}
     """
-    data = [round(random.uniform(min_value, max_value), 3) for _ in range(n_data_points)]
-    data_df = pd.DataFrame(data, columns=['Value'])
-    mean = data_df['Value'].mean()
-    median = data_df['Value'].median()
-    mode = stats.mode(data_df['Value'].values)[0][0]
-    return {'mean': mean, 'median': median, 'mode': mode}
+    df = df.replace(dct)
+    statistics = {}
+    try:
+        for feature in FEATURES:
+            mean = np.mean(df[feature])
+            median = np.median(df[feature])
+            mode = stats.mode(df[feature])[0][0]
+            variance = np.var(df[feature])
+            statistics[feature] = {'mean': mean, 'median': median, 'mode': mode, 'variance': variance}
+    except Exception as e:
+        return "Invalid input"        
+    return statistics
 
 import unittest
-import random
+import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_default_parameters(self):
-        random.seed(0)
-        result = task_func()
-        self.assertIn('mean', result)
-        self.assertIn('median', result)
-        self.assertIn('mode', result)
-    def test_custom_range(self):
-        random.seed(0)
-        result = task_func(1000, 1.0, 5.0)
-        self.assertGreaterEqual(result['mean'], 1.0)
-        self.assertLessEqual(result['mean'], 5.0)
-        self.assertGreaterEqual(result['median'], 1.0)
-        self.assertLessEqual(result['median'], 5.0)
-        self.assertGreaterEqual(result['mode'], 1.0)
-        self.assertLessEqual(result['mode'], 5.0)
-    def test_small_dataset(self):
-        random.seed(0)
-        result = task_func(10, 2.0, 2.0)
-        self.assertEqual(result['mean'], 2.0)
-        self.assertEqual(result['median'], 2.0)
-        self.assertEqual(result['mode'], 2.0)
-    def test_large_dataset(self):
-        random.seed(0)
-        result = task_func(10000, 0.0, 100.0)
-        self.assertTrue(0.0 <= result['mean'] <= 100.0)
-        self.assertTrue(0.0 <= result['median'] <= 100.0)
-        self.assertTrue(0.0 <= result['mode'] <= 100.0)
-    def test_single_value_range(self):
-        random.seed(0)
-        result = task_func(100, 5.0, 5.0)
-        self.assertEqual(result['mean'], 5.0)
-        self.assertEqual(result['median'], 5.0)
-        self.assertEqual(result['mode'], 5.0)
+    def test_case_1(self):
+        # Test with simple numeric values
+        df = pd.DataFrame({
+            'feature1': [1, 2, 3, 4, 5],
+            'feature2': [5, 4, 3, 2, 1],
+            'feature3': [2, 2, 2, 2, 2],
+            'feature4': [1, 1, 3, 3, 5],
+            'feature5': [0, 1, 1, 1, 1]
+        })
+        dct = {}
+        
+        expected_result = {
+            'feature1': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 
+            'feature2': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 
+            'feature3': {'mean': 2.0, 'median': 2.0, 'mode': 2, 'variance': 0.0}, 
+            'feature4': {'mean': 2.6, 'median': 3.0, 'mode': 1, 'variance': 2.24}, 
+            'feature5': {'mean': 0.8, 'median': 1.0, 'mode': 1, 'variance': 0.16000000000000006},
+        }
+        result = task_func(df, dct)
+        self.assertEqual(result, expected_result)
+    def test_case_2(self):
+        # Test with string replacements
+        df = pd.DataFrame({
+            'feature1': ['a', 'b', 'a', 'a', 'c'],
+            'feature2': ['d', 'e', 'd', 'f', 'g'],
+            'feature3': ['h', 'i', 'j', 'k', 'l'],
+            'feature4': ['m', 'n', 'o', 'p', 'q'],
+            'feature5': ['r', 's', 't', 'u', 'v']
+        })
+        dct = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9, 'j': 10, 'k': 11, 'l': 12, 'm': 13, 'n': 14, 'o': 15, 'p': 16, 'q': 17, 'r': 18, 's': 19, 't': 20, 'u': 21, 'v': 22}
+        
+        expected_result = {
+            'feature1': {'mean': 1.6, 'median': 1.0, 'mode': 1, 'variance': 0.64}, 
+            'feature2': {'mean': 5.2, 'median': 5.0, 'mode': 4, 'variance': 1.3599999999999999},
+            'feature3': {'mean': 10.0, 'median': 10.0, 'mode': 8, 'variance': 2.0}, 
+            'feature4': {'mean': 15.0, 'median': 15.0, 'mode': 13, 'variance': 2.0}, 
+            'feature5': {'mean': 20.0, 'median': 20.0, 'mode': 18, 'variance': 2.0}
+        }
+        result = task_func(df, dct)
+        self.assertEqual(result, expected_result)
+    def test_case_3(self):
+        # Test with missing features in DataFrame
+        df = pd.DataFrame({
+            'feature1': [1, 2, 3],
+            'feature2': [2, 3, 1],
+            'feature3': [4, 5, 6],
+            'feature4': [5, 6, 7],
+            'feature5': [7, 8, 9]
+        })
+        dct = {}
+        expected_result = {
+            'feature1': {'mean': 2.0, 'median': 2.0, 'mode': 1, 'variance': 0.6666666666666666}, 
+            'feature2': {'mean': 2.0, 'median': 2.0, 'mode': 1, 'variance': 0.6666666666666666}, 
+            'feature3': {'mean': 5.0, 'median': 5.0, 'mode': 4, 'variance': 0.6666666666666666}, 
+            'feature4': {'mean': 6.0, 'median': 6.0, 'mode': 5, 'variance': 0.6666666666666666}, 
+            'feature5': {'mean': 8.0, 'median': 8.0, 'mode': 7, 'variance': 0.6666666666666666}
+        }
+        result = task_func(df, dct)
+        self.assertEqual(result, expected_result)
+    def test_case_4(self):
+        # Test with string replacements
+        df = pd.DataFrame({
+            'feature1': ['a', 'b', 'c'],
+            'feature2': ['d', 'e', 'f'],
+            'feature3': ['h', 'i', 'j'],
+            'feature4': ['m', 'n', 'o'],
+            'feature5': ['r', 's', 't']
+        })
+        dct = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9, 'j': 10, 'k': 11, 'l': 12, 'm': 13, 'n': 14, 'o': 15, 'p': 16, 'q': 17, 'r': 18, 's': 19, 't': 20, 'u': 21, 'v': 22}
+        
+        expected_result = {
+            'feature1': {'mean': 2.0, 'median': 2.0, 'mode': 1, 'variance': 0.6666666666666666}, 
+            'feature2': {'mean': 5.0, 'median': 5.0, 'mode': 4, 'variance': 0.6666666666666666}, 
+            'feature3': {'mean': 9.0, 'median': 9.0, 'mode': 8, 'variance': 0.6666666666666666}, 
+            'feature4': {'mean': 14.0, 'median': 14.0, 'mode': 13, 'variance': 0.6666666666666666}, 
+            'feature5': {'mean': 19.0, 'median': 19.0, 'mode': 18, 'variance': 0.6666666666666666}
+        }
+        result = task_func(df, dct)
+        self.assertEqual(result, expected_result)
+    
+    def test_case_5(self):
+        # Test with invalid input
+        df = pd.DataFrame({})
+        result = task_func(df, {})
+        self.assertEqual(result, "Invalid input")

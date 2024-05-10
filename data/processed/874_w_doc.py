@@ -1,88 +1,70 @@
 import numpy as np
-from scipy import integrate
-import matplotlib.pyplot as plt
+import itertools
 
-
-def task_func(func, x_range=(-2, 2), num_points=1000):
+def task_func(data_list):
     """
-    Calculates and plots both a given function and its cumulative integral over a specified range,
-    using a linearly spaced range of x-values.
+    Unzips a list of tuples and calculates the mean of the numeric values for 
+    each position.
+
+    The function accepts a list of tuples, where each tuple consists of 
+    alphanumeric values. It unzips the tuples, and calculates the mean of 
+    numeric values at each position using numpy, where non numeric values are
+    ignores. If all values at a position are non numeric, the mean at this
+    position is set to be np.nan.
+    If the provided tuples have different number of entries, missing values are 
+    treated as zeros.
 
     Parameters:
-    func (function): A function of a single variable to integrate and plot.
-    x_range (tuple, optional): The range (start, end) over which to evaluate `func`. Defaults to (-2, 2).
-    num_points (int, optional): Number of points to generate in `x_range`. Defaults to 1000.
+    - data_list (list of tuples): The data to process, structured as a list of tuples. Each tuple can contain alphanumeric values.
 
     Returns:
-    matplotlib.axes.Axes: The Axes object containing the plots of the function and its integral.
+    - list: A list of mean values for each numeric position across the tuples. Non-numeric positions are ignored.
+            An empty list is returned if the input list (data_list) is empty.
 
     Requirements:
     - numpy
-    - scipy
-    - matplotlib
-
-    Note:
-    - The plot includes a legend and labels for the x and y axes that include the function's name.
+    - itertools
 
     Example:
-    >>> ax = task_func(np.sin)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> ax.get_legend_handles_labels()[-1]
-    ['sin(x)', 'Integral of sin(x)']
+    >>> task_func([('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)])
+    [nan, 3.0, 4.0]
+    >>> task_func([(1, 'a', 2), ('a', 3, 5), ('c', 1, -2)])
+    [1.0, 2.0, 1.6666666666666667]
     """
-    X = np.linspace(x_range[0], x_range[1], num_points)
-    y = func(X)
-    y_int = integrate.cumulative_trapezoid(y, X, initial=0)
-    fig, ax = plt.subplots()
-    ax.plot(X, y, label=f"{func.__name__}(x)")
-    ax.plot(X, y_int, label=f"Integral of {func.__name__}(x)")
-    ax.legend()
-    return ax
+    unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
+    mean_values = [np.nanmean([val for val in column if isinstance(val, (int, float))]) for column in unzipped_data]
+    return mean_values
 
 import unittest
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
-    def tearDown(self):
-        plt.close("all")
-    def helper_assert_plot_attributes(self, func):
-        # Test plot attributes are as expected
-        ax = task_func(func)
-        function_name = func.__name__
-        legend_labels = ax.get_legend_handles_labels()[-1]
-        self.assertIsInstance(ax, Axes)
-        self.assertIn(function_name, legend_labels[0])
-        self.assertIn(function_name, legend_labels[1])
-    def test_case_1(self):
-        # Test basic case in docstring
-        ax = task_func(np.sin)
-        self.helper_assert_plot_attributes(np.sin)
-    def test_case_2(self):
-        # Test other functions - numpy
-        for func in [np.cos, np.exp]:
-            ax = task_func(func)
-            self.helper_assert_plot_attributes(func)
-    def test_case_3(self):
-        # Test other functions - lambda
-        func = lambda x: x ** 2
-        ax = task_func(func)
-        self.helper_assert_plot_attributes(func)
-    def test_case_4(self):
-        # Test custom range and points
-        ax = task_func(np.cos, x_range=(0, np.pi), num_points=500)
-        self.assertEqual(len(ax.lines[0].get_xdata()), 500)
-        self.assertEqual(ax.lines[0].get_xdata()[0], 0)
-        self.assertEqual(ax.lines[0].get_xdata()[-1], np.pi)
-    def test_case_5(self):
-        # Test correct integral calculation
-        # Test integral of x^2 in the range [0,1], should be close to 1/3
-        func = lambda x: x ** 2
-        X = np.linspace(0, 1, 1000)
-        expected_integral = 1 / 3 * X ** 3  # Analytical integral of x^2
-        ax = task_func(func, x_range=(0, 1), num_points=1000)
-        computed_integral = ax.lines[1].get_ydata()[
-            -1
-        ]  # Last value of the computed integral
-        self.assertAlmostEqual(computed_integral, expected_integral[-1], places=4)
+    def test_regular_input(self):
+        # Test with regular input data
+        data_list = [('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)]
+        expected_result = [np.nan, 3.0, 4.0]  # Expected mean values
+        result = task_func(data_list)
+        np.testing.assert_almost_equal(result, expected_result)
+    def test_non_numeric_values(self):
+        # Test with non-numeric values in the tuples
+        data_list = [('a', 'x', 2), ('b', 2, 3), ('c', 'y', 4), ('d', 4, 'z'), ('e', 'k', 6)]
+        expected_result = [np.nan, 3.0, 3.75]  # Expected mean values, non-numeric items are ignored
+        result = task_func(data_list)
+        np.testing.assert_equal(result, expected_result)
+    def test_uneven_tuples(self):
+        # Test with uneven tuple lengths
+        data_list = [('a', 1), ('b', 2, 3), ('c',), ('d', 4, 5, 6), ('e', 5, 6)]
+        expected_result = [np.nan, 3.0, 4.66666666, 6.0]  # Expected mean values
+        result = task_func(data_list)
+        np.testing.assert_almost_equal(result, expected_result)
+    def test_all_non_numeric(self):
+        # Test where all elements are non-numeric
+        data_list = [('a', 'x'), ('b', 'y'), ('c', 'z'), ('d', 'k'), ('e', 'l')]
+        expected_result = [np.nan, np.nan]  # No numeric data to calculate the mean
+        result = task_func(data_list)
+        np.testing.assert_equal(result, expected_result)
+    def test_empty_input(self):
+        # Test with an empty input list
+        data_list = []
+        expected_result = []  # No data to process
+        result = task_func(data_list)
+        self.assertEqual(result, expected_result)

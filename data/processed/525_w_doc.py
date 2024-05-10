@@ -1,77 +1,153 @@
-from random import randint, seed
-import pandas as pd
-from sklearn.linear_model import LinearRegression
+from collections import defaultdict
+import numpy as np
+import matplotlib.pyplot as plt
 
 
-# Constants
-TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
-PENALTY_COST = 1000  # in dollars
-
-
-def task_func(goals, penalties, rng_seed=None):
+def task_func(data):
     """
-    Simulates football match results with random goals and penalties for multiple teams,
-    and trains a linear regression model to predict penalty costs from goals.
+    Calculate statistical measurements (mean and standard deviation) of the values associated with
+    each key in a list of dictionaries, and visualize mean and standard deviation with bar charts.
 
     Parameters:
-    - goals (int): Maximum number of goals a team can score in a match.
-    - penalties (int): Maximum number of penalties a team can receive in a match.
-    - rng_seed (int, optional): Seed for the random number generator to ensure reproducibility. Defaults to None.
+    data (list): The list of dictionaries. Must not be empty. Each dictionary must have numeric values.
 
     Returns:
-    - tuple:
-        - pd.DataFrame: Contains 'Team', 'Goals', and 'Penalty Cost' columns.
-        - LinearRegression: Trained model to predict 'Penalty Cost' based on 'Goals'.
+    tuple:
+        - dict: A dictionary with keys and their corresponding mean and standard deviation.
+        - list: A list of matplotlib Axes objects for each key's visualization.
 
     Requirements:
-    - pandas
-    - sklearn.linear_model
-    - random
-
+    - numpy
+    - matplotlib.pyplot
+    - collections.defaultdict
+    
+    Raises:
+    - ValueError: If the input data is empty.
+    - TypeError: If the input is not a list of dictionaries or if any value in the dictionaries is not numeric.
+    
     Example:
-    >>> df, model = task_func(5, 3, rng_seed=42)
-    >>> predictions = model.predict([[2], [3]])
-    >>> print(predictions)
-    [706.89655172 439.65517241]
+    >>> stats, axes = task_func([{'cat': 1, 'dog': 3}, {'cat' : 2, 'dog': 5}, {'cat' : 3, 'dog': 7}])
+    >>> stats
+    {'cat': {'mean': 2.0, 'std': 0.816496580927726}, 'dog': {'mean': 5.0, 'std': 1.632993161855452}}
+    >>> axes
+    [<Axes: title={'center': 'Statistics of cat'}, ylabel='Value'>, <Axes: title={'center': 'Statistics of dog'}, ylabel='Value'>]
     """
-    if rng_seed is not None:
-        seed(rng_seed)
-    match_results = []
-    for team in TEAMS:
-        team_goals = randint(0, goals)
-        team_penalties = randint(0, penalties)
-        penalty_cost = PENALTY_COST * team_penalties
-        match_results.append([team, team_goals, penalty_cost])
-    results_df = pd.DataFrame(match_results, columns=['Team', 'Goals', 'Penalty Cost'])
-    X = results_df[['Goals']]
-    y = results_df['Penalty Cost']
-    model = LinearRegression().fit(X, y)
-    return results_df, model
+    if not data:
+        raise ValueError("Input data is empty.")
+    if not isinstance(data, list) or not all(isinstance(d, dict) for d in data):
+        raise TypeError("Input must be a list of dictionaries.")
+    for d in data:
+        if not all(isinstance(value, (int, float)) for value in d.values()):
+            raise TypeError("All values in the dictionaries must be numeric.")
+    stats = defaultdict(list)
+    for d in data:
+        for key, value in d.items():
+            stats[key].append(value)
+    result = {k: {"mean": np.mean(v), "std": np.std(v)} for k, v in stats.items()}
+    axes = []
+    for key in result:
+        fig, ax = plt.subplots()
+        ax.bar(x=["mean", "std"], height=result[key].values())
+        ax.set_title(f"Statistics of {key}")
+        ax.set_ylabel("Value")
+        axes.append(ax)
+    return result, axes
 
 import unittest
-import numpy as np
-# Unit Tests
 class TestCases(unittest.TestCase):
-    """A set of unit tests to ensure the functionality of task_func."""
-    def test_dataframe_structure(self):
-        """Ensures the DataFrame has the correct structure."""
-        df, _ = task_func(5, 3, rng_seed=42)
-        self.assertListEqual(list(df.columns), ['Team', 'Goals', 'Penalty Cost'])
-    def test_model_type(self):
-        """Checks if the returned model is a LinearRegression instance."""
-        _, model = task_func(5, 3, rng_seed=42)
-        self.assertIsInstance(model, LinearRegression)
-    def test_predictions_type(self):
-        """Verifies that model predictions return a numpy array."""
-        _, model = task_func(5, 3, rng_seed=42)
-        predictions = model.predict(np.array([[2], [3]]))
-        self.assertIsInstance(predictions, np.ndarray)
-    def test_positive_goals_and_penalties(self):
-        """Confirms goals and penalty costs are non-negative."""
-        df, _ = task_func(5, 3, rng_seed=42)
-        self.assertTrue((df['Goals'] >= 0).all())
-        self.assertTrue((df['Penalty Cost'] >= 0).all())
-    def test_regression_coefficients_sign(self):
-        """Checks that the regression model produces a coefficient."""
-        df, model = task_func(5, 3, rng_seed=42)
-        self.assertIsNotNone(model.coef_[0])
+    def test_case_1(self):
+        # Test basic case
+        data = [{"cat": 1, "dog": 3}, {"cat": 2, "dog": 5}, {"cat": 3, "dog": 7}]
+        stats, axes = task_func(data)
+        self.assertAlmostEqual(stats["cat"]["mean"], 2.0)
+        self.assertAlmostEqual(stats["cat"]["std"], 0.816496580927726)
+        self.assertAlmostEqual(stats["dog"]["mean"], 5.0)
+        self.assertAlmostEqual(stats["dog"]["std"], 1.632993161855452)
+        
+        self.assertEqual(axes[0].get_title(), "Statistics of cat")
+        self.assertEqual(axes[1].get_title(), "Statistics of dog")
+        for ax, key in zip(axes, stats):
+            heights = [rect.get_height() for rect in ax.patches]
+            self.assertListEqual(heights, list(stats[key].values()))
+    def test_case_2(self):
+        # Test other keys (animals)
+        data = [{"bird": 5, "fish": 10}, {"bird": 6, "fish": 8}, {"bird": 7, "fish": 9}]
+        stats, axes = task_func(data)
+        self.assertAlmostEqual(stats["bird"]["mean"], 6.0)
+        self.assertAlmostEqual(stats["bird"]["std"], 0.816496580927726)
+        self.assertAlmostEqual(stats["fish"]["mean"], 9.0)
+        self.assertAlmostEqual(stats["fish"]["std"], 0.816496580927726)
+        self.assertEqual(axes[0].get_title(), "Statistics of bird")
+        self.assertEqual(axes[1].get_title(), "Statistics of fish")
+        for ax, key in zip(axes, stats):
+            heights = [rect.get_height() for rect in ax.patches]
+            self.assertListEqual(heights, list(stats[key].values()))
+    def test_case_3(self):
+        # Test handling negatives
+        data = [{"cat": -1, "dog": -3}, {"cat": -2, "dog": -5}, {"cat": -3, "dog": -7}]
+        stats, axes = task_func(data)
+        self.assertAlmostEqual(stats["cat"]["mean"], -2.0)
+        self.assertAlmostEqual(stats["cat"]["std"], 0.816496580927726)
+        self.assertAlmostEqual(stats["dog"]["mean"], -5.0)
+        self.assertAlmostEqual(stats["dog"]["std"], 1.632993161855452)
+        
+        self.assertEqual(axes[0].get_title(), "Statistics of cat")
+        self.assertEqual(axes[1].get_title(), "Statistics of dog")
+        for ax, key in zip(axes, stats):
+            heights = [rect.get_height() for rect in ax.patches]
+            self.assertListEqual(heights, list(stats[key].values()))
+    def test_case_4(self):
+        # Test single input
+        data = [{"cat": 1}]
+        stats, axes = task_func(data)
+        self.assertEqual(stats, {"cat": {"mean": 1.0, "std": 0.0}})
+        self.assertEqual(axes[0].get_title(), "Statistics of cat")
+        for ax, key in zip(axes, stats):
+            heights = [rect.get_height() for rect in ax.patches]
+            self.assertListEqual(heights, list(stats[key].values()))
+    def test_case_5(self):
+        # Test handling zero
+        data = [{"cat": 0, "dog": 0}, {"cat": 0, "dog": 0}, {"cat": 0, "dog": 0}]
+        stats, axes = task_func(data)
+        self.assertEqual(
+            stats, {"cat": {"mean": 0.0, "std": 0.0}, "dog": {"mean": 0.0, "std": 0.0}}
+        )
+        self.assertEqual(axes[0].get_title(), "Statistics of cat")
+        self.assertEqual(axes[1].get_title(), "Statistics of dog")
+        for ax, key in zip(axes, stats):
+            heights = [rect.get_height() for rect in ax.patches]
+            self.assertListEqual(heights, list(stats[key].values()))
+    def test_case_6(self):
+        # Test correct handling of empty input
+        with self.assertRaises(ValueError):
+            task_func([])
+    def test_case_7(self):
+        # Test correct handling of incorrect input types
+        with self.assertRaises(TypeError):
+            task_func("not a list")
+        with self.assertRaises(TypeError):
+            task_func([123])
+        with self.assertRaises(TypeError):
+            task_func([{"cat": "not numeric"}])
+    def test_case_8(self):
+        # Test with a mix of positive and negative integers
+        data = [
+            {"apple": -2, "banana": 4},
+            {"apple": -4, "banana": 6},
+            {"apple": -6, "banana": 8},
+        ]
+        stats, _ = task_func(data)
+        self.assertAlmostEqual(stats["apple"]["mean"], -4.0)
+        self.assertAlmostEqual(stats["apple"]["std"], 1.632993161855452)
+        self.assertAlmostEqual(stats["banana"]["mean"], 6.0)
+        self.assertAlmostEqual(stats["banana"]["std"], 1.632993161855452)
+    def test_case_9(self):
+        # Test with floating point numbers
+        data = [{"x": 0.5, "y": 1.5}, {"x": 2.5, "y": 3.5}, {"x": 4.5, "y": 5.5}]
+        stats, _ = task_func(data)
+        self.assertAlmostEqual(stats["x"]["mean"], 2.5)
+        self.assertAlmostEqual(stats["x"]["std"], 1.632993161855452)
+        self.assertAlmostEqual(stats["y"]["mean"], 3.5)
+        self.assertAlmostEqual(stats["y"]["std"], 1.632993161855452)
+    def tearDown(self):
+        plt.close("all")

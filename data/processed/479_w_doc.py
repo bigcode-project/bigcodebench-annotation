@@ -1,72 +1,113 @@
-import numpy as np
 import pandas as pd
+import re
+import random
 
 
-def task_func(array_length=100):
-    '''
-    Generate two arrays of random numbers of a given length, calculate their mean, median, and standard deviation,
-    then store these results in a Panda DataFrame 'statistics' with keys 'Array1' and 'Array2'.
-    Draw a bar chart to compare these statistics with indices 'Mean', 'Median', and 'Standard Deviation'.
+def task_func(data_list, seed=None):
+    """
+    Removes a random comma-separated value (treated as a "substring") from each string
+    in a list and returns a pandas DataFrame containing the original and modified strings.
 
     Parameters:
-    - array_length (int, optional): The length of the arrays to be generated. Default is 100.
+    - data_list (list of str): A list of comma-separated strings. The function will remove
+                               leading and trailing whitespaces first before processing.
+    - seed (int, optional): Seed for the random number generator for reproducibility.
+      Default is None, which uses system time.
 
     Returns:
-    - DataFrame: A pandas DataFrame with the statistics of the arrays.
-    - Axes: The bar chart plot comparing the statistics.
+    - DataFrame: A pandas DataFrame with columns 'Original String' and 'Modified String'.
 
     Requirements:
-    - numpy
     - pandas
+    - re
+    - random
 
     Example:
-    >>> df, ax = task_func(50)
-    '''
-    array1 = np.random.rand(array_length)
-    array2 = np.random.rand(array_length)
-    statistics = {
-        'Array1': [np.mean(array1), np.median(array1), np.std(array1)],
-        'Array2': [np.mean(array2), np.median(array2), np.std(array2)]
-    }
-    df = pd.DataFrame(statistics, index=['Mean', 'Median', 'Standard Deviation'])
-    ax = df.plot(kind='bar')
-    return df, ax
+    >>> task_func(['lamp, bag, mirror', 'table, chair, bag, lamp'], seed=42)
+               Original String   Modified String
+    0        lamp, bag, mirror         lamp, bag
+    1  table, chair, bag, lamp  chair, bag, lamp
+    """
+    if seed is not None:
+        random.seed(seed)
+    df = pd.DataFrame([s.strip() for s in data_list], columns=["Original String"])
+    modified_strings = []
+    for s in data_list:
+        substrings = re.split(", ", s)
+        random_substring = random.choice(substrings)
+        modified_s = (
+            s.replace(", " + random_substring, "")
+            if ", " + random_substring in s
+            else s.replace(random_substring + ", ", "")
+        )
+        modified_strings.append(modified_s)
+    df["Modified String"] = modified_strings
+    return df
 
 import unittest
-import matplotlib.pyplot as plt
+import pandas as pd
 class TestCases(unittest.TestCase):
-    
-    def test_default_length(self):
-        df, ax = task_func()
-        self.assertEqual(df.shape, (3, 2))
-        self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
-        self.assertTrue(all(df.columns == ['Array1', 'Array2']))
-        self.assertIsInstance(ax, plt.Axes)
-    
-    def test_custom_length(self):
-        df, ax = task_func(200)
-        self.assertEqual(df.shape, (3, 2))
-        self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
-        self.assertTrue(all(df.columns == ['Array1', 'Array2']))
-        self.assertIsInstance(ax, plt.Axes)
-    
-    def test_statistics_values(self):
-        np.random.seed(42)  # Setting seed for reproducibility
-        df, _ = task_func(1000)
-        self.assertAlmostEqual(df['Array1']['Mean'], 0.4903, places=3)
-        self.assertAlmostEqual(df['Array2']['Mean'], 0.5068, places=3)
-        self.assertAlmostEqual(df['Array1']['Median'], 0.4968, places=3)
-        self.assertAlmostEqual(df['Array2']['Median'], 0.5187, places=3)
-        self.assertAlmostEqual(df['Array1']['Standard Deviation'], 0.2920, places=3)
-        self.assertAlmostEqual(df['Array2']['Standard Deviation'], 0.2921, places=3)
-    
-    def test_negative_length(self):
-        with self.assertRaises(ValueError):
-            task_func(-50)
-    
-    def test_zero_length(self):
-        df, ax = task_func(0)
-        self.assertEqual(df.shape, (3, 2))
-        self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
-        self.assertTrue(all(df.columns == ['Array1', 'Array2']))
-        self.assertIsInstance(ax, plt.Axes)
+    def setUp(self):
+        self.columns = ["Original String", "Modified String"]
+    def test_case_1(self):
+        # Test basic case
+        input_data = ["apple, orange, banana", "car, bike, plane"]
+        result = task_func(input_data, seed=42)
+        self._test_dataframe(result, input_data)
+    def test_case_2(self):
+        # Test single character
+        input_data = ["a, b, c, d, e", "f, g, h, i, j"]
+        result = task_func(input_data, seed=42)
+        self._test_dataframe(result, input_data)
+    def test_case_3(self):
+        # Test single numeric characters
+        input_data = ["1, 2, 3", "4, 5, 6, 7"]
+        result = task_func(input_data, seed=42)
+        self._test_dataframe(result, input_data)
+    def test_case_4(self):
+        # Test with an empty list
+        input_data = []
+        result = task_func(input_data, seed=42)
+        self.assertTrue(result.empty)
+    def test_case_5(self):
+        # Test with strings without commas
+        input_data = ["apple", "car"]
+        result = task_func(input_data, seed=42)
+        # Ensure dataframe has correct columns
+        self.assertListEqual(list(result.columns), self.columns)
+        # Ensure 'Modified String' is the same as 'Original String' for single values
+        for orig, mod in zip(result["Original String"], result["Modified String"]):
+            self.assertEqual(orig.strip(), mod)
+    def test_case_6(self):
+        # Test strings with leading and trailing spaces
+        input_data = [" apple, orange, banana ", " car, bike, plane"]
+        expected_data = ["apple, orange, banana", "car, bike, plane"]
+        result = task_func(input_data, seed=42)
+        self._test_dataframe(result, expected_data)
+    def test_case_7(self):
+        # Test strings where the same value appears multiple times
+        input_data = ["apple, apple, banana", "car, car, bike, plane"]
+        result = task_func(input_data, seed=42)
+        # Special case where substrings might be duplicated
+        for orig, mod in zip(result["Original String"], result["Modified String"]):
+            diff = len(orig.split(", ")) - len(mod.split(", "))
+            self.assertTrue(diff in [0, 1])  # Either no change or one substring removed
+    def test_case_8(self):
+        # Test reproducibility with the same seed
+        input_data = ["apple, orange, banana", "car, bike, plane"]
+        result1 = task_func(input_data, seed=42)
+        result2 = task_func(input_data, seed=42)
+        pd.testing.assert_frame_equal(result1, result2)
+    def test_case_9(self):
+        # Test difference with different seeds
+        input_data = ["apple, orange, banana", "car, bike, plane"]
+        result1 = task_func(input_data, seed=42)
+        result2 = task_func(input_data, seed=43)
+        self.assertFalse(result1.equals(result2))
+    def _test_dataframe(self, df, input_data):
+        # Ensure dataframe has correct columns
+        self.assertListEqual(list(df.columns), self.columns)
+        # Ensure 'Modified String' has one less substring than 'Original String'
+        for orig, mod in zip(df["Original String"], df["Modified String"]):
+            self.assertTrue(orig in input_data)  # Ensure original string is from input
+            self.assertEqual(len(orig.split(", ")) - 1, len(mod.split(", ")))

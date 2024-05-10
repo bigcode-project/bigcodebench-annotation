@@ -1,124 +1,81 @@
-import numpy as np
 import pandas as pd
-from sklearn.decomposition import PCA
+from statsmodels.tsa.stattools import adfuller
 
 
-def task_func(array, seed=None):
+def task_func(df: pd.DataFrame, column_a: str, column_b: str, column_c: str) -> bool:
     """
-    Shuffles the columns of a numpy array randomly, performs Principal Component Analysis (PCA)
-    to reduce the dimensionality to 2 principal components, and returns these components as a pandas DataFrame.
+    Determines if a specific subset of data is stationary by filtering rows where column_b bigger than 50 and column_c equal to 900. 
+    Data is considered to be stationary if the p_value returned by the Augmented Dickey-Fuller test is smaller than 0.05.
 
+    If column_a is empty after filtering or if its values are constant, True
+    is returned.
+    
     Parameters:
-    - array (numpy.ndarray): A 2D numpy array where each row is an observation and each column is a feature.
-    - seed (int, optional): Seed for the random number generator. Defaults to None (not set).
-
+        df (pd.DataFrame): A DataFrame containing the data.
+        column_a (str): The name of the column to test for stationarity.
+        column_b (str): The name of the column used for filtering based on its value being greater than 50.
+        column_c (str): The name of the column used for filtering based on its value being equal to 900.
+    
     Returns:
-    - pandas.DataFrame: DataFrame with columns 'PC1' and 'PC2' representing the two principal components.
-
-    Raises:
-    - ValueError: If the input array is not 2D.
-
+        bool: True if the data in column_a (after filtering based on column_b and column_c) is stationary, False otherwise.
+    
     Requirements:
-    - numpy
-    - pandas
-    - sklearn
+        pandas
+        statsmodels: for using the adfuller test
 
-    Note:
-    - PCA reduction will default to the number of features if fewer than 2.
-    - An named but empty DataFrame is returned for arrays without features or with empty content.
-
-    Examples:
-    >>> array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-    >>> df = task_func(array, seed=42)
-    >>> df["PC1"]
-    0    5.59017
-    1   -5.59017
-    Name: PC1, dtype: float64
-    >>> df.shape
-    (2, 2)
+    Example:
+    >>> df = pd.DataFrame({
+    ...      'A': [1, 2, 3, 4, 5, 6],
+    ...      'B': [60, 70, 80, 90, 100, 110],
+    ...      'C': [900, 900, 900, 900, 900, 900]
+    ... })
+    >>> task_func(df, 'A', 'B', 'C')
+    False
     """
-    if seed is not None:
-        np.random.seed(seed)
-    if not isinstance(array, np.ndarray) or len(array.shape) != 2:
-        raise ValueError("Input must be a 2D numpy array.")
-    if array.size == 0 or array.shape[1] == 0:
-        return pd.DataFrame(columns=["PC1", "PC2"])
-    shuffled_array = np.copy(array)
-    np.random.shuffle(np.transpose(shuffled_array))
-    n_components = min(2, shuffled_array.shape[1])
-    pca = PCA(n_components=n_components)
-    principal_components = pca.fit_transform(shuffled_array)
-    column_labels = ["PC1", "PC2"][:n_components]
-    df = pd.DataFrame(data=principal_components, columns=column_labels)
-    return df
+    filtered_df = df[(df[column_b] > 50) & (df[column_c] == 900)]
+    if filtered_df[column_a].nunique() <= 1:
+        return True
+    if filtered_df.empty:
+        return True
+    adf_result = adfuller(filtered_df[column_a])
+    p_value = adf_result[1]
+    return p_value <= 0.05
 
 import unittest
-import numpy as np
+import os
+import pandas as pd
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.array2x5 = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-        self.array5x1 = np.array([[1], [2], [3], [4], [5]])
-    def test_with_empty_array(self):
-        """Test handling of an empty array."""
-        array = np.empty((0, 0))
-        df = task_func(array, seed=42)
-        self.assertTrue(df.empty, "The returned DataFrame should be empty.")
-        self.assertTrue(
-            (df.columns == ["PC1", "PC2"]).all(),
-            "Column names should be 'PC1' and 'PC2' even for an empty DataFrame.",
-        )
-    def test_with_2x5_array(self):
-        """Test PCA on a 2x5 array with shuffled columns."""
-        df = task_func(self.array2x5, seed=42)
-        self.assertEqual(df.shape, (2, 2), "DataFrame shape should be (2, 2).")
-        self.assertTrue(
-            (df.columns == ["PC1", "PC2"]).all(),
-            "Column names should be 'PC1' and 'PC2'.",
-        )
-    def test_with_5x1_array(self):
-        """Test PCA on a 5x1 array."""
-        df = task_func(self.array5x1, seed=0)
-        self.assertEqual(
-            df.shape, (5, 1), "DataFrame shape should be (5, 1) for a single component."
-        )
-        self.assertTrue(
-            (df.columns == ["PC1"]).all(),
-            "Column name should be 'PC1' for a single component.",
-        )
-    def test_invalid_input(self):
-        """Test handling of invalid input."""
-        with self.assertRaises(ValueError):
-            task_func(np.array([1, 2, 3]), seed=42)
-    def test_reproducibility(self):
-        """Test if the function is reproducible with the same seed."""
-        df1 = task_func(self.array2x5, seed=42)
-        df2 = task_func(self.array2x5, seed=42)
-        pd.testing.assert_frame_equal(
-            df1, df2, "Results should be identical when using the same seed."
-        )
-    def test_pca_correctness(self):
-        """
-        Test PCA correctness by ensuring that the variance is captured correctly
-        in the principal components.
-        """
-        # Creating a simple array where variance is higher in one dimension
-        # This dataset is designed so that the first principal component should
-        # capture the majority of the variance.
-        array = np.array(
-            [
-                [1, 2, 3, 4, 5],
-                [1, 2, 3, 4, 5],
-                [1, 2, 3, 4, 5],
-                [1, 2, 3, 4, 5],
-                [10, 10, 10, 10, 10],
-            ]
-        )  # Increased variance in the last row
-        df = task_func(array, seed=0)
-        # The PCA should be able to capture the variance in the first principal component
-        # significantly more than in the second, if applicable.
-        # Asserting that the first PC values are not all the same,
-        # which indicates it captured the variance.
-        self.assertFalse(
-            df["PC1"].std() == 0,
-            "PCA should capture variance along the first principal component.",
-        )
+        # Create DataFrame in setUp for test isolation
+        self.data = pd.DataFrame({
+            'A': list(range(100)),
+            'B': [x * 2 for x in range(100)],
+            'C': [900 if x % 2 == 0 else 800 for x in range(100)]
+        })
+    def test_constant_value(self):
+        # All values in column A are constant after filtering
+        self.data['A'] = 5
+        result = task_func(self.data, 'A', 'B', 'C')
+        self.assertTrue(result, "Should be True as data is constant.")
+    def test_empty_after_filter(self):
+        # After filtering, no rows remain
+        result = task_func(self.data[self.data['B'] > 1000], 'A', 'B', 'C')
+        self.assertTrue(result, "Should be True as no data remains after filter.")
+    def test_non_stationary_data(self):
+        # Test a clearly non-stationary dataset
+        result = task_func(self.data, 'A', 'B', 'C')
+        self.assertFalse(result, "Should be False as data is non-stationary.")
+    def test_stationary_data(self):
+        # Test a stationary dataset
+        self.data['A'] = 5
+        result = task_func(self.data, 'A', 'B', 'C')
+        self.assertTrue(result, "Should be True as data is stationary.")
+    def test_edge_case_small_dataset(self):
+        # Test a very small dataset
+        small_data = pd.DataFrame({
+            'A': [1, 1],
+            'B': [60, 70],
+            'C': [900, 900]
+        })
+        result = task_func(small_data, 'A', 'B', 'C')
+        self.assertTrue(result, "Should be True due to small dataset size or no variation.")

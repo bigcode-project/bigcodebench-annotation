@@ -1,75 +1,71 @@
-import pandas as pd
-import random
-from sklearn.preprocessing import StandardScaler
+import math
+import numpy as np
+import matplotlib.pyplot as plt
 
-# Constants
-N_DATA_POINTS = 5000
-MIN_VALUE = 0.0
-MAX_VALUE = 10.0
 
-def task_func(n_data_points=5000, min_value=0.0, max_value=10.0):
+def task_func(list_input):
     """
-    Generate a random dataset of floating point numbers, truncate each value to 3 decimal places and normalize the data using standard scaling (mean = 0, std = 1).
-    
+    Sort the given list in ascending order based on the degree value of its elements, calculate the cumulative sum of 
+    the sorted list, and draw a line chart of the cumulative sum.
+
     Parameters:
-    n_data_points (int): Number of data points to generate. Default is 5000.
-    min_value (float): Minimum value range for data points. Default is 0.0.
-    max_value (float): Maximum value range for data points. Default is 10.0.
-    
+    list_input (list): The list to be sorted.
+
     Returns:
-    DataFrame: A pandas DataFrame with the normalized data.
-    
-    Raises:
-    If max_value is less than min_value, a ValueError is raised.
-    
-    Note:
-    - The function use "Normalized Value" for the column name in the DataFrame that being returned.
+    tuple: A tuple containing:
+           - numpy array: The cumulative sum of the sorted list.
+           - matplotlib.axes._axes.Axes: The Axes object of the plotted line chart.
 
     Requirements:
-    - pandas
-    - random
-    - sklearn.preprocessing.StandardScaler
+    - math
+    - numpy
+    - matplotlib.pyplot
 
     Example:
-    >>> random.seed(0)
-    >>> normalized_data = task_func(5000, 5, 5)
-    >>> print(normalized_data['Normalized Value'][0])
-    0.0
+    >>> cumsum, ax = task_func([10, 20, 30])
+    >>> print(cumsum)
+    [10 30 60]
+    >>> ax.get_title()
+    'Cumulative Sum Plot'
     """
-    if max_value < min_value:
-        raise ValueError()
-    data = [round(random.uniform(min_value, max_value), 3) for _ in range(n_data_points)]
-    data_df = pd.DataFrame(data, columns=['Value'])
-    scaler = StandardScaler()
-    normalized_data = scaler.fit_transform(data_df[['Value']])
-    return pd.DataFrame(normalized_data, columns=['Normalized Value'])
+    sorted_list = sorted(list_input, key=lambda x: (math.degrees(x), x))
+    cumsum = np.cumsum(sorted_list)
+    ax = plt.plot(cumsum)[0].axes
+    ax.set_title("Cumulative Sum Plot")
+    ax.set_xlabel("Index")
+    ax.set_ylabel("Cumulative Sum")
+    return cumsum, ax
 
 import unittest
-import pandas as pd
-import random
+import doctest
 class TestCases(unittest.TestCase):
-    def test_default_parameters(self):
-        random.seed(0)
-        df = task_func()
-        self.assertIsInstance(df, pd.DataFrame, "Return type should be a DataFrame.")
-        self.assertEqual(len(df), 5000, "Default number of data points should be 5000.")
-        self.assertAlmostEqual(df['Normalized Value'].mean(), 0, delta=0.1, msg="Mean should be close to 0.")
-        self.assertAlmostEqual(df['Normalized Value'].std(), 1, delta=0.1, msg="Standard deviation should be close to 1.")
-    def test_custom_parameters(self):
-        random.seed(0)
-        df = task_func(1000, 1.0, 5.0)
-        self.assertEqual(len(df), 1000, "Number of data points should match the specified value.")
-        self.assertTrue(df['Normalized Value'].min() >= -3, "Normalized values should be within a reasonable range.")
-        self.assertTrue(df['Normalized Value'].max() <= 3, "Normalized values should be within a reasonable range.")
-    def test_edge_case_empty(self):
-        random.seed(0)
-        with self.assertRaises(ValueError):
-            task_func(0)
-    def test_negative_data_points(self):
-        random.seed(0)
-        with self.assertRaises(ValueError):
-            task_func(-100)
-    def test_invalid_range(self):
-        random.seed(0)
-        with self.assertRaises(ValueError):
-            task_func(1000, 5.0, 1.0)
+    def test_case_1(self):
+        cumsum, ax = task_func([10, 20, 30])
+        self.assertListEqual(list(cumsum), [10, 30, 60])
+        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
+        self.assertEqual(ax.get_xlabel(), 'Index')
+        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
+    def test_case_2(self):
+        cumsum, ax = task_func([5, 15, 25])
+        self.assertListEqual(list(cumsum), [5, 20, 45])
+        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
+        self.assertEqual(ax.get_xlabel(), 'Index')
+        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
+    def test_case_3(self):
+        cumsum, ax = task_func([])
+        self.assertListEqual(list(cumsum), [])
+        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
+        self.assertEqual(ax.get_xlabel(), 'Index')
+        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
+    def test_case_4(self):
+        cumsum, ax = task_func([1, 2, 3, 4, 5])
+        self.assertListEqual(list(cumsum), [1, 3, 6, 10, 15])
+        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
+        self.assertEqual(ax.get_xlabel(), 'Index')
+        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
+    def test_case_5(self):
+        cumsum, ax = task_func([5])
+        self.assertListEqual(list(cumsum), [5])
+        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
+        self.assertEqual(ax.get_xlabel(), 'Index')
+        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')

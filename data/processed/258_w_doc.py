@@ -1,72 +1,60 @@
-import random
-import matplotlib.pyplot as plt
+import numpy as np
+import math
 
-# Constants
-DISTRIBUTION_SIZE = 1000
-
-def task_func(bins=30):
+def task_func(ax, num_turns):
     """
-    Generate a Gaussian distribution and plot its histogram.
+    Draws a spiral on the polar diagram 'ax' with the specified number of turns 'num_turns'.
+    The spiral starts at the center and expands outward with each turn.
+    The radial ticks on the plot are positioned at intervals corresponding to the number of turns multiplied by 45 degrees.
 
     Parameters:
-    - bins (int, optional): Number of bins for the histogram. Default is 30.
+    ax (matplotlib.axes._axes.Axes): The Axes object for plotting the spiral.
+    num_turns (int): The number of turns for the spiral.
 
     Returns:
-    - tuple: A tuple containing the distribution list and the Axes patch object of the histogram plot.
+    matplotlib.axes._axes.Axes: The modified Axes object with the spiral plot.
 
     Requirements:
-    - random
-    - matplotlib.pyplot
+    - numpy
+    - math
 
     Example:
-    >>> random.seed(0)
-    >>> distribution, ax = task_func()
-    >>> len(ax.patches) == 30
-    True
-    >>> len(distribution)
-    1000
-    >>> plt.close()
+    >>> import matplotlib.pyplot as plt
+    >>> fig, ax = plt.subplots(subplot_kw={'polar': True})
+    >>> ax = task_func(ax, 3)
+    >>> ax.get_rlabel_position()
+    135.0
     """
-    distribution = [random.gauss(0, 1) for _ in range(DISTRIBUTION_SIZE)]
-    ax = plt.hist(distribution, bins=bins, edgecolor='black')[2]
-    return distribution, ax
+    r = np.linspace(0, num_turns * 2 * math.pi, 1000)
+    theta = r
+    ax.plot(theta, r)
+    ax.set_rlabel_position(num_turns * 45)
+    return ax
 
 import unittest
 import matplotlib.pyplot as plt
-import numpy as np
-import random
 class TestCases(unittest.TestCase):
-    def test_histogram_axes_type(self):
-        random.seed(0)
-        _, ax = task_func()
-        self.assertTrue(ax, plt.Axes)
-        plt.close()
-    def test_distribution_length(self):
-        random.seed(0)
-        distribution, _ = task_func()
-        self.assertEqual(len(distribution), 1000)
-        plt.close()
-    def test_distribution_type(self):
-        random.seed(0)
-        distribution, _ = task_func()
-        self.assertIsInstance(distribution, list, "Distribution should be a list")
-        self.assertTrue(all(isinstance(x, float) for x in distribution))
-        plt.close()
-    def test_histogram_bin_count(self):
-        random.seed(0)
-        _, ax = task_func(bins=20)
-        self.assertEqual(len(ax.patches), 20)
-        plt.close()
-    def test_default_bin_count(self):
-        random.seed(0)
-        _, ax = task_func()
-        self.assertEqual(len(ax.patches), 30)
-        plt.close()
-    
-    def test_plot_distribution(self):
-        random.seed(0)
-        distribution, ax = task_func()
-        heights, bins, _ = plt.hist(distribution)
-        expected_heights, _ = np.histogram(distribution, bins=bins)
-        np.testing.assert_allclose(heights, expected_heights, rtol=0.1, err_msg="Distribution not plotted correctly")
-        plt.close()
+    def setUp(self):
+        self.fig, self.ax = plt.subplots(subplot_kw={'polar': True})
+    def test_positive_turns(self):
+        """ Test the function with positive number of turns """
+        num_turns = 3
+        ax_modified = task_func(self.ax, num_turns)
+        self.assertEqual(len(ax_modified.lines), 1)  # Checking if a spiral is plotted
+        self.assertEqual(ax_modified.get_rlabel_position(), num_turns * 45)  # Radial label position
+    def test_zero_turns(self):
+        """ Test the function with zero turns """
+        ax_modified = task_func(self.ax, 0)
+        self.assertEqual(len(ax_modified.lines), 1)  # A line should still be plotted
+    def test_negative_turns(self):
+        """ Test the function with negative number of turns """
+        ax_modified = task_func(self.ax, -3)
+        self.assertEqual(len(ax_modified.lines), 1)  # A line should still be plotted
+    def test_large_number_of_turns(self):
+        """ Test the function with a large number of turns """
+        ax_modified = task_func(self.ax, 100)
+        self.assertEqual(len(ax_modified.lines), 1)  # A line should still be plotted
+    def test_fractional_turns(self):
+        """ Test the function with fractional number of turns """
+        ax_modified = task_func(self.ax, 2.5)
+        self.assertEqual(len(ax_modified.lines), 1)  # A line should still be plotted

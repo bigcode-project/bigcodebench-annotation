@@ -1,77 +1,82 @@
 import numpy as np
-import pandas as pd
-from dateutil.parser import parse
+import random
 
-
-
-def task_func(dates_str_list):
+def task_func(MIN_WORDS, MAX_WORDS, WORDS_POOL):
     """
-    Analyze the weekday distribution in a list of date strings. Implemented by dateutil.parser.
-
-    This function takes a list of date strings in "yyyy-mm-dd" format, calculates 
-    the weekday for each date, and returns a distribution of the weekdays.
+    Generates a palindrome sentence using random words from a specified pool. The sentence's length is randomly
+    chosen between a minimum (MIN_WORDS) and maximum (MAX_WORDS) number of words. The function ensures that the
+    sentence reads the same forwards and backwards.
 
     Parameters:
-    - dates_str_list (list): The list of date strings in "yyyy-mm-dd" format.
+    MIN_WORDS (int): Minimum number of words in the palindrome sentence.
+    MAX_WORDS (int): Maximum number of words in the palindrome sentence.
+    WORDS_POOL (list): List of words to choose from for generating the palindrome.
 
     Returns:
-    - Series: A pandas Series of the weekday distribution, where the index represents 
-              the weekdays (from Monday to Sunday) and the values represent the counts 
-              of each weekday in the provided list.
+    str: The generated palindrome sentence.
 
     Requirements:
-    - datetime
-    - dateutil.parser
     - numpy
-    - pandas
+    - random
 
-    Example:
-    >>> task_func(['2022-10-22', '2022-10-23', '2022-10-24', '2022-10-25'])
-    Monday       1
-    Tuesday      1
-    Wednesday    0
-    Thursday     0
-    Friday       0
-    Saturday     1
-    Sunday       1
-    dtype: int64
+    Examples:
+    Generate a palindrome sentence and check if it's indeed a palindrome.
+    >>> MIN_WORDS, MAX_WORDS, WORDS_POOL = 3, 10, ['apple', 'banana', 'racecar', 'world', 'level', 'madam', 'radar', 'rotor']
+    >>> sentence = task_func(MIN_WORDS, MAX_WORDS, WORDS_POOL)
+    >>> re_sentence = " ".join(sentence.split()[::-1])
+    >>> sentence == re_sentence
+    True
+
+    Check if the generated sentence length is within the specified range.
+    >>> sentence = task_func(MIN_WORDS, MAX_WORDS, WORDS_POOL)
+    >>> MIN_WORDS <= len(sentence.split()) <= MAX_WORDS
+    True
     """
-    DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    weekdays = [parse(date_str).weekday() for date_str in dates_str_list]
-    weekday_counts = np.bincount(weekdays, minlength=7)
-    distribution = pd.Series(weekday_counts, index=DAYS_OF_WEEK)
-    return distribution
+    sentence_length = np.random.randint(MIN_WORDS, MAX_WORDS + 1)
+    first_half = [random.choice(WORDS_POOL) for _ in range(sentence_length // 2)]
+    if sentence_length % 2 == 1:
+        middle_word = [random.choice(WORDS_POOL)]
+        second_half = first_half[::-1]
+        sentence = first_half + middle_word + second_half
+    else:
+        second_half = first_half[::-1]
+        sentence = first_half + second_half
+    return ' '.join(sentence)
 
 import unittest
-DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+# Constants for testing
+MIN_WORDS = 3
+MAX_WORDS = 10
+WORDS_POOL = ['apple', 'banana', 'racecar', 'world', 'level', 'madam', 'radar', 'rotor']
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Input 1: Testing with a sample date list
-        input_dates = ['2022-10-22', '2022-10-23', '2022-10-24', '2022-10-25']
-        expected_output = pd.Series([1, 1, 0, 0, 0, 1, 1], index=DAYS_OF_WEEK)
-        result = task_func(input_dates)
-        pd.testing.assert_series_equal(result, expected_output)
-    def test_case_2(self):
-        # Input 2: Testing with a list where all dates fall on a single weekday
-        input_dates = ['2022-10-24', '2022-10-31', '2022-11-07']
-        expected_output = pd.Series([3, 0, 0, 0, 0, 0, 0], index=DAYS_OF_WEEK)
-        result = task_func(input_dates)
-        pd.testing.assert_series_equal(result, expected_output)
-    def test_case_3(self):
-        # Input 3: Testing with an empty list
-        input_dates = []
-        expected_output = pd.Series([0, 0, 0, 0, 0, 0, 0], index=DAYS_OF_WEEK)
-        result = task_func(input_dates)
-        pd.testing.assert_series_equal(result, expected_output)
-    def test_case_4(self):
-        # Input 4: Testing with a mixed list of dates
-        input_dates = ['2022-01-01', '2022-02-14', '2022-03-17', '2022-12-31']
-        expected_output = pd.Series([1, 0, 0, 1, 0, 2, 0], index=DAYS_OF_WEEK)
-        result = task_func(input_dates)
-        pd.testing.assert_series_equal(result, expected_output)
-    def test_case_5(self):
-        # Input 5: Testing with dates spanning multiple weeks
-        input_dates = ['2022-01-01', '2022-01-02', '2022-01-03', '2022-01-04', '2022-01-05', '2022-01-06', '2022-01-07']
-        expected_output = pd.Series([1, 1, 1, 1, 1, 1, 1], index=DAYS_OF_WEEK)
-        result = task_func(input_dates)
-        pd.testing.assert_series_equal(result, expected_output)
+    def test_is_palindrome(self):
+        """Test that the sentence generated is a palindrome."""
+        sentence = task_func(MIN_WORDS, MAX_WORDS, WORDS_POOL)
+        processed_sentence = " ".join(sentence.split()[::-1])
+        self.assertEqual(processed_sentence, sentence)
+    def test_sentence_length_within_range(self):
+        """Test that the sentence length is within the specified range."""
+        sentence = task_func(MIN_WORDS, MAX_WORDS, WORDS_POOL)
+        length = len(sentence.split())
+        self.assertTrue(MIN_WORDS <= length <= MAX_WORDS)
+    def test_multiple_sentences(self):
+        """Test that multiple generated sentences are palindromes."""
+        for _ in range(5):
+            sentence = task_func(MIN_WORDS, MAX_WORDS, WORDS_POOL)
+            processed_sentence = " ".join(sentence.split()[::-1])
+            self.assertEqual(processed_sentence, sentence)
+    def test_word_choice_from_pool(self):
+        """Test that all words in the sentence are from the provided word pool."""
+        sentence = task_func(MIN_WORDS, MAX_WORDS, WORDS_POOL)
+        words = sentence.split()
+        for word in words:
+            self.assertIn(word, WORDS_POOL)
+    def test_symmetry_of_sentence(self):
+        """Test that the sentence is symmetric around its center."""
+        sentence = task_func(MIN_WORDS, MAX_WORDS, WORDS_POOL)
+        words = sentence.split()
+        mid = len(words) // 2
+        if len(words) % 2 == 0:
+            self.assertEqual(words[:mid], words[:-mid-1:-1])
+        else:
+            self.assertEqual(words[:mid], words[-mid:][::-1])

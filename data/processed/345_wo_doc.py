@@ -1,90 +1,85 @@
-import numpy as np
-import seaborn as sns
+import os
+import shutil
 
 
-def task_func(P, T):
+def task_func(src_folder, backup_dir):
     """
-    Calculate the product of a matrix 'P' and a 3D tensor 'T' using numpy and visualize the results as a heatmap.
-    Note: This function only accepts numpy matrices/arrays.
-
+    Backs up a given source folder to the specified backup directory, then deletes the source folder.
+    
     Parameters:
-    - P (numpy.ndarray): Input matrix of shape (M, 3), where M can be any positive integer.
-    - T (numpy.ndarray): Input tensor of shape (3, 3, 3).
-
+    src_folder (str): The path of the source folder to be backed up and deleted.
+    backup_dir (str): The path of the directory where the source folder will be backed up.
+    
     Returns:
-    - numpy.ndarray: Resultant product after matrix-tensor multiplication.
-    - matplotlib.axes.Axes: Axes object displaying the heatmap of the 2D result.
-
+    bool: True if the operation is successful, False otherwise.
+    
     Requirements:
-    - numpy
-    - seaborn
-
+    - os
+    - shutil
+    
     Example:
-    >>> np.random.seed(0)
-    >>> P = np.array([[6, 2, 7], [1, 1, 8]])
-    >>> T = np.random.rand(3, 3, 3)
-    >>> product, heatmap = task_func(P, T)
-    >>> product
-    array([[[ 9.50686132, 11.96467131, 11.52469849],
-            [ 9.99949817,  7.62347761,  9.48114103],
-            [ 3.62770285,  9.87052195,  8.45068927]],
-    <BLANKLINE>
-           [[ 7.15750903,  8.46701159,  8.96060503],
-            [ 7.50619626,  5.04108634,  6.96116358],
-            [ 1.47091192,  6.03135957,  2.94310891]]])
-    >>> type(heatmap)
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> import tempfile
+    >>> src_folder = tempfile.mkdtemp()
+    >>> backup_dir = tempfile.mkdtemp()
+    >>> with open(os.path.join(src_folder, 'sample.txt'), 'w') as f:
+    ...     _ = f.write('This is a sample file.')
+    >>> task_func(src_folder, backup_dir)
+    True
     """
-    if not (isinstance(P, np.ndarray) and isinstance(T, np.ndarray)):
-        raise TypeError("Expected inputs to be numpy arrays")
-    result = np.tensordot(P, T, axes=[1, 0])
-    result_2D = np.sum(result, axis=-1)
-    heatmap = sns.heatmap(result_2D)
-    return result, heatmap
+    if not os.path.isdir(src_folder):
+        raise ValueError(f"Source folder '{src_folder}' does not exist.")
+    backup_folder = os.path.join(backup_dir, os.path.basename(src_folder))
+    shutil.copytree(src_folder, backup_folder)
+    try:
+        shutil.rmtree(src_folder)
+        return True
+    except Exception as e:
+        print(f"Error while deleting source folder: {e}")
+        return False
 
 import unittest
-import numpy as np
-import matplotlib.pyplot as plt
+import tempfile
+import doctest
 class TestCases(unittest.TestCase):
+    
     def setUp(self):
-        np.random.seed(0)
-        self.test_P = np.array([[6, 2, 7], [1, 1, 8]])
-        self.test_P_zeros = np.zeros((2, 3))
-        self.test_T = np.array(
-            [
-                [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
-                [[2, 3, 4], [5, 6, 7], [8, 9, 10]],
-                [[3, 4, 5], [6, 7, 8], [9, 10, 11]],
-            ]
-        )
-    def test_case_1(self):
-        # Test return types
-        product, heatmap = task_func(self.test_P, self.test_T)
-        self.assertIsInstance(product, np.ndarray)
-        self.assertIsInstance(heatmap, plt.Axes)
-    def test_case_2(self):
-        # Test output correctness
-        product, _ = task_func(self.test_P, self.test_T)
-        expected_product = np.tensordot(self.test_P, self.test_T, axes=[1, 0])
-        self.assertTrue(np.allclose(product, expected_product))
-    def test_case_3(self):
-        # Test output correctness with zeros
-        product, _ = task_func(self.test_P_zeros, self.test_T)
-        self.assertTrue(np.all(product == 0))
-    def test_case_4(self):
-        # Test return shape
-        product, _ = task_func(self.test_P, self.test_T)
-        expected_shape = (2, 3, 3)
-        self.assertEqual(product.shape, expected_shape, "Output shape is incorrect")
-    def test_case_5(self):
-        # Test handling invalid input types
-        with self.assertRaises(TypeError):
-            task_func([1, 2], [2, 1])
-    def test_case_6(self):
-        # Test handling invalid shape
-        P = np.array([[1, 2], [3, 4]])
-        T = np.random.rand(3, 3, 3)
-        with self.assertRaises(ValueError):
-            task_func(P, T)
+        # Create a temporary directory for testing
+        self.src_folder = tempfile.mkdtemp()
+        self.backup_dir = tempfile.mkdtemp()
+        
+        # Create a sample file in the source folder
+        with open(os.path.join(self.src_folder, "sample.txt"), "w") as f:
+            f.write("This is a sample file.")
+    
     def tearDown(self):
-        plt.close("all")
+        # Cleanup
+        if os.path.exists(self.src_folder):
+            shutil.rmtree(self.src_folder)
+        if os.path.exists(self.backup_dir):
+            shutil.rmtree(self.backup_dir)
+    
+    def test_case_1(self):
+        result = task_func(self.src_folder, self.backup_dir)
+        self.assertTrue(result)
+        self.assertFalse(os.path.exists(self.src_folder))
+        self.assertTrue(os.path.exists(os.path.join(self.backup_dir, os.path.basename(self.src_folder), "sample.txt")))
+    
+    def test_case_2(self):
+        shutil.rmtree(self.src_folder)
+        with self.assertRaises(ValueError):
+            task_func(self.src_folder, self.backup_dir)
+    
+    def test_case_3(self):
+        os.rmdir(self.backup_dir)
+        result = task_func(self.src_folder, self.backup_dir)
+        self.assertTrue(result)
+        self.assertFalse(os.path.exists(self.src_folder))
+        self.assertTrue(os.path.exists(os.path.join(self.backup_dir, os.path.basename(self.src_folder), "sample.txt")))
+    
+    def test_case_4(self):
+        self.assertTrue(task_func(self.src_folder, self.src_folder))
+    
+    def test_case_5(self):
+        os.makedirs(os.path.join(self.backup_dir, os.path.basename(self.src_folder)))
+        with self.assertRaises(FileExistsError):
+            task_func(self.src_folder, self.backup_dir)

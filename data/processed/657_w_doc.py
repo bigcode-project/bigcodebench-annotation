@@ -1,46 +1,77 @@
-import random
-from collections import Counter
+import re
+import string
+import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
-def task_func(values, weights, n_samples):
-    """
-    Sample random numbers based on a given weighted distribution and return a histogram of the samples.
+nltk.download('vader_lexicon')
+# Constants
+ALPHANUMERIC = re.compile('[\W_]+')
+PUNCTUATIONS = string.punctuation
 
+
+def task_func(text: str, sia: SentimentIntensityAnalyzer) -> dict:
+    """Analyze the sentiment of a text using the provided SentimentIntensityAnalyzer.
+    The text is first cleaned by:
+    - Removing all non-alphanumeric characters except spaces.
+    - Converting to lowercase.
+    - Removing punctuation.
+    
     Parameters:
-    - values (list): List of values to be sampled from.
-    - weights (list): List of weights corresponding to the values.
-    - n_samples (int): Number of samples to be drawn.
-
+    text (str): The string to analyze.
+    sia (SentimentIntensityAnalyzer): An instance of the SentimentIntensityAnalyzer for sentiment analysis.
+    
     Returns:
-    - histogram (dict): A histogram as a dictionary with the values as keys and counts as values.
-
+    dict: A dictionary with sentiment scores. The dictionary contains four scores:
+          - 'compound': The overall sentiment score.
+          - 'neg': Negative sentiment score.
+          - 'neu': Neutral sentiment score.
+          - 'pos': Positive sentiment score.
+    
     Requirements:
-    - collections.Counter
-    - random
-
+    - re
+    - string
+    - nltk
+    - nltk.sentiment.vader
+    
     Example:
-    >>> random.seed(42)
-    >>> task_func([1, 2, 3], [3, 2, 1], 1000)
-    {2: 342, 1: 480, 3: 178}
+    >>> from nltk.sentiment import SentimentIntensityAnalyzer
+    >>> sia = SentimentIntensityAnalyzer()
+    >>> task_func("I love Python!", sia)
+    {'neg': 0.0, 'neu': 0.192, 'pos': 0.808, 'compound': 0.6369}
     """
-    import random
-    samples = random.choices(values, weights=weights, k=n_samples)
-    histogram = dict(Counter(samples))
-    return histogram
+    text = ALPHANUMERIC.sub(' ', text).lower()
+    text = text.translate(str.maketrans('', '', PUNCTUATIONS))
+    sentiment_scores = sia.polarity_scores(text)
+    return sentiment_scores
 
 import unittest
+# Mock the SentimentIntensityAnalyzer for our tests
+class MockedSentimentIntensityAnalyzer:
+    def polarity_scores(self, text):
+        return {'compound': 0.5, 'neg': 0.25, 'neu': 0.25, 'pos': 0.5}
 class TestCases(unittest.TestCase):
-    def test_1(self):
-        result = task_func([1, 2, 3], [3, 2, 1], 1000)
-        self.assertTrue(set(result.keys()) == {1, 2, 3})
-    def test_2(self):
-        result = task_func([1, 2], [1, 1], 500)
-        self.assertTrue(set(result.keys()) == {1, 2})
-    def test_3(self):
-        result = task_func([1], [1], 300)
-        self.assertTrue(result == {1: 300})
-    def test_4(self):
-        result = task_func(list(range(1, 11)), list(range(10, 0, -1)), 5000)
-        self.assertTrue(set(result.keys()) == set(range(1, 11)))
-    def test_5(self):
-        result = task_func([1, 2, 3, 4, 5], [5, 4, 3, 2, 1], 2500)
-        self.assertTrue(set(result.keys()) == {1, 2, 3, 4, 5})
+    def test_case_1(self):
+        sia = MockedSentimentIntensityAnalyzer()
+        result = task_func("I love Python!", sia)
+        expected = {'compound': 0.5, 'neg': 0.25, 'neu': 0.25, 'pos': 0.5}
+        self.assertEqual(result, expected)
+    
+    def test_case_2(self):
+        sia = MockedSentimentIntensityAnalyzer()
+        result = task_func("I hate rainy days.", sia)
+        self.assertEqual(result['neg'], 0.25)
+    
+    def test_case_3(self):
+        sia = MockedSentimentIntensityAnalyzer()
+        result = task_func("The weather is neutral today.", sia)
+        self.assertEqual(result['neu'], 0.25)
+    
+    def test_case_4(self):
+        sia = MockedSentimentIntensityAnalyzer()
+        result = task_func("Absolutely fantastic!", sia)
+        self.assertEqual(result['pos'], 0.5)
+    
+    def test_case_5(self):
+        sia = MockedSentimentIntensityAnalyzer()
+        result = task_func("This is a bad idea!", sia)
+        self.assertEqual(result['neg'], 0.25)

@@ -1,116 +1,88 @@
-import pandas as pd
-from matplotlib import pyplot as plt
+import numpy as np
+from scipy import integrate
+import matplotlib.pyplot as plt
 
 
-def task_func(arr):
+def task_func(func, x_range=(-2, 2), num_points=1000):
     """
-    Calculate the sum of each row in a 2D numpy array and plot these sums as a time series.
-
-    This function takes a 2D numpy array and computes the sum of elements in each row. It
-    then creates a Pandas DataFrame with these row sums and plots them as a time series,
-    using dates starting from January 1, 2020, for each row.
+    Calculates and plots both a given function and its cumulative integral over a specified range,
+    using a linearly spaced range of x-values.
 
     Parameters:
-    arr (numpy.ndarray): A 2D numpy array.
+    func (function): A function of a single variable to integrate and plot.
+    x_range (tuple, optional): The range (start, end) over which to evaluate `func`. Defaults to (-2, 2).
+    num_points (int, optional): Number of points to generate in `x_range`. Defaults to 1000.
 
     Returns:
-    matplotlib.axes._axes.Axes: A plot representing the time series of row sums.
+    matplotlib.axes.Axes: The Axes object containing the plots of the function and its integral.
 
     Requirements:
-    - pandas
+    - numpy
+    - scipy
     - matplotlib
 
-    Handling Scenarios:
-    - For non-empty arrays: The function computes the sum of elements for each row, 
-    stores these sums in a Pandas DataFrame, and then plots them. Each row in the plot represents 
-    the sum for a specific day, starting from January 1, 2020.
-    - For empty arrays: The function creates an empty plot with the 
-    title 'Time Series of Row Sums' but without data. This is achieved by checking if the array size 
-    is zero (empty array) and if so, creating a subplot without any data.
-    
-    Note: 
-    - The function uses 'pandas' for DataFrame creation and 'matplotlib.pyplot' for plotting. 
-    The dates in the plot start from January 1, 2020, and each subsequent row represents the next day.
-    
+    Note:
+    - The plot includes a legend and labels for the x and y axes that include the function's name.
+
     Example:
-    >>> arr = np.array([[i + j for i in range(3)] for j in range(5)])
-    >>> ax = task_func(arr)
-    >>> ax.get_title()
-    'Time Series of Row Sums'
+    >>> ax = task_func(np.sin)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax.get_legend_handles_labels()[-1]
+    ['sin(x)', 'Integral of sin(x)']
     """
-    if not arr.size:  # Check for empty array
-        _, ax = plt.subplots()
-        ax.set_title("Time Series of Row Sums")
-        return ax
-    row_sums = arr.sum(axis=1)
-    df = pd.DataFrame(row_sums, columns=["Sum"])
-    df.index = pd.date_range(start="1/1/2020", periods=df.shape[0])
-    ax = df.plot(title="Time Series of Row Sums")
+    X = np.linspace(x_range[0], x_range[1], num_points)
+    y = func(X)
+    y_int = integrate.cumulative_trapezoid(y, X, initial=0)
+    fig, ax = plt.subplots()
+    ax.plot(X, y, label=f"{func.__name__}(x)")
+    ax.plot(X, y_int, label=f"Integral of {func.__name__}(x)")
+    ax.legend()
     return ax
 
 import unittest
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
-    """Test cases for the function task_func."""
-    def test_basic_functionality(self):
-        """Test the basic functionality of the function."""
-        arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        ax = task_func(arr)
-        # Check if the function returns Axes object
-        self.assertIsInstance(ax, plt.Axes)
-        # Check the title of the plot
-        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
-        # Check if the data plotted matches the expected sum of rows
-        y_data = [line.get_ydata() for line in ax.get_lines()][0]
-        expected_sums = arr.sum(axis=1)
-        np.testing.assert_array_equal(y_data, expected_sums)
-    def test_empty_array(self):
-        """Test the function with an empty array."""
-        arr = np.array([])
-        ax = task_func(arr)
-        # Check if the function returns Axes object
-        self.assertIsInstance(ax, plt.Axes)
-        # Check the title of the plot
-        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
-        # Check if the data plotted is empty
-        lines = ax.get_lines()
-        self.assertEqual(len(lines), 0)
-    def test_single_row_array(self):
-        """Test the function with a single row array."""
-        arr = np.array([[1, 2, 3]])
-        ax = task_func(arr)
-        # Check if the function returns Axes object
-        self.assertIsInstance(ax, plt.Axes)
-        # Check the title of the plot
-        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
-        # Check if the data plotted matches the expected sum of the single row
-        y_data = [line.get_ydata() for line in ax.get_lines()][0]
-        expected_sum = arr.sum(axis=1)
-        np.testing.assert_array_equal(y_data, expected_sum)
-    def test_negative_values(self):
-        """Test the function with negative values."""
-        arr = np.array([[-1, -2, -3], [-4, -5, -6]])
-        ax = task_func(arr)
-        # Check if the function returns Axes object
-        self.assertIsInstance(ax, plt.Axes)
-        # Check the title of the plot
-        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
-        # Check if the data plotted matches the expected sum of rows
-        y_data = [line.get_ydata() for line in ax.get_lines()][0]
-        expected_sums = arr.sum(axis=1)
-        np.testing.assert_array_equal(y_data, expected_sums)
-    def test_zero_values(self):
-        """Test the function with zero values."""
-        arr = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
-        ax = task_func(arr)
-        # Check if the function returns Axes object
-        self.assertIsInstance(ax, plt.Axes)
-        # Check the title of the plot
-        self.assertEqual(ax.get_title(), "Time Series of Row Sums")
-        # Check if the data plotted matches the expected sum of rows
-        y_data = [line.get_ydata() for line in ax.get_lines()][0]
-        expected_sums = arr.sum(axis=1)
-        np.testing.assert_array_equal(y_data, expected_sums)
     def tearDown(self):
-        plt.close()
+        plt.close("all")
+    def helper_assert_plot_attributes(self, func):
+        # Test plot attributes are as expected
+        ax = task_func(func)
+        function_name = func.__name__
+        legend_labels = ax.get_legend_handles_labels()[-1]
+        self.assertIsInstance(ax, Axes)
+        self.assertIn(function_name, legend_labels[0])
+        self.assertIn(function_name, legend_labels[1])
+    def test_case_1(self):
+        # Test basic case in docstring
+        ax = task_func(np.sin)
+        self.helper_assert_plot_attributes(np.sin)
+    def test_case_2(self):
+        # Test other functions - numpy
+        for func in [np.cos, np.exp]:
+            ax = task_func(func)
+            self.helper_assert_plot_attributes(func)
+    def test_case_3(self):
+        # Test other functions - lambda
+        func = lambda x: x ** 2
+        ax = task_func(func)
+        self.helper_assert_plot_attributes(func)
+    def test_case_4(self):
+        # Test custom range and points
+        ax = task_func(np.cos, x_range=(0, np.pi), num_points=500)
+        self.assertEqual(len(ax.lines[0].get_xdata()), 500)
+        self.assertEqual(ax.lines[0].get_xdata()[0], 0)
+        self.assertEqual(ax.lines[0].get_xdata()[-1], np.pi)
+    def test_case_5(self):
+        # Test correct integral calculation
+        # Test integral of x^2 in the range [0,1], should be close to 1/3
+        func = lambda x: x ** 2
+        X = np.linspace(0, 1, 1000)
+        expected_integral = 1 / 3 * X ** 3  # Analytical integral of x^2
+        ax = task_func(func, x_range=(0, 1), num_points=1000)
+        computed_integral = ax.lines[1].get_ydata()[
+            -1
+        ]  # Last value of the computed integral
+        self.assertAlmostEqual(computed_integral, expected_integral[-1], places=4)

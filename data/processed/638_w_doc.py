@@ -1,54 +1,96 @@
-import re
-import string
-from nltk.stem import PorterStemmer
-from collections import Counter
+from random import sample
+from typing import Tuple
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
-STEMMER = PorterStemmer()
 
-def task_func(content):
+
+def task_func(num_students):
     """
-    Stem every word in a sentence, except the last, and count the frequency of each stem.
+    Generate a Pandas DataFrame that displays the grades of a randomly selected group of students in multiple courses.
+    Calculate the average grade in each course, the number of students with a passing grade (>= 60), 
+    and visualize this information using a bar plot with title 'Course-wise Average and Passing Grade Counts'.
 
     Parameters:
-    content (str): The sentence to stem and count.
+    num_students (int): The number of students in the sample.
 
     Returns:
-    dict: A dictionary with stemmed words as keys and their frequency as values.
+    Tuple[pd.DataFrame, plt.Axes]: A tuple containing the generated DataFrame and the bar plot's Axes object.
 
     Requirements:
-    - re
-    - string
-    - nltk.stem
-    - collections.Counter
+    - pandas
+    - numpy
+    - matplotlib.pyplot
+    - random
+    - typing
 
     Example:
-    >>> task_func('running runner run')
-    {'run': 1, 'runner': 1}
+    >>> df, ax = task_func(50)
+    >>> ax.get_title()
+    'Course-wise Average and Passing Grade Counts'
     """
-    content = content.split(' ')[:-1]
-    words = [word.strip(string.punctuation).lower() for word in re.split('\W+', ' '.join(content))]
-    stemmed_words = [STEMMER.stem(word) for word in words]
-    word_counts = Counter(stemmed_words)
-    return dict(word_counts)
+    STUDENTS = ['Student' + str(i) for i in range(1, 101)]
+    COURSES = ['Course' + str(i) for i in range(1, 6)]
+    students_sample = sample(STUDENTS, num_students)
+    grades = np.random.randint(40, 101, size=(num_students, len(COURSES)))
+    df = pd.DataFrame(grades, index=students_sample, columns=COURSES)
+    fig, ax = plt.subplots()
+    df.mean().plot(kind='bar', ax=ax, position=1, width=0.4, color='b', label='Average Grade')
+    df[df >= 60].count().plot(kind='bar', ax=ax, position=0, width=0.4, color='g', label='Passing Grade Counts')
+    ax.set_title('Course-wise Average and Passing Grade Counts')
+    ax.legend()
+    return df, ax
 
 import unittest
 class TestCases(unittest.TestCase):
+    
     def test_case_1(self):
-        result = task_func('running runner run')
-        self.assertEqual(result, {'run': 1, 'runner': 1})
+        # Test with 10 students
+        df, ax = task_func(10)
+        
+        # Check DataFrame dimensions
+        self.assertEqual(df.shape, (10, 5))
+        
+        # Check plot title
+        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
     
     def test_case_2(self):
-        result = task_func('dancing dancer danced')
-        self.assertEqual(result, {'danc': 1, 'dancer': 1})
+        # Test with 50 students
+        df, ax = task_func(50)
+        
+        # Check DataFrame dimensions
+        self.assertEqual(df.shape, (50, 5))
+        
+        # Check plot title
+        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
         
     def test_case_3(self):
-        result = task_func('loving lover love')
-        self.assertEqual(result, {'love': 1, 'lover': 1})
+        # Test with 100 students
+        df, ax = task_func(100)
         
+        # Check DataFrame dimensions
+        self.assertEqual(df.shape, (100, 5))
+        
+        # Check plot title
+        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
+    
     def test_case_4(self):
-        result = task_func('computing computer compute')
-        self.assertEqual(result, {'comput': 2})
+        # Test with 1 student
+        df, ax = task_func(1)
+        
+        # Check DataFrame dimensions
+        self.assertEqual(df.shape, (1, 5))
+        
+        # Check plot title
+        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
         
     def test_case_5(self):
-        result = task_func('swimming swimmer swim')
-        self.assertEqual(result, {'swim': 1, 'swimmer': 1})
+        # Test with 5 students
+        df, ax = task_func(5)
+        
+        # Check DataFrame dimensions
+        self.assertEqual(df.shape, (5, 5))
+        
+        # Check plot title
+        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')

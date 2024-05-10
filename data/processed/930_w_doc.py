@@ -1,138 +1,74 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+from collections import Counter
+import itertools
+import string
 
 
-def task_func(dataframe):
+def task_func(word: str) -> dict:
     """
-    Calculate the correlation matrix of a DataFrame and plot a scatter plot for the pair of columns with the highest absolute correlation.
-
-    Parameters:
-    - dataframe (pd.DataFrame): The DataFrame containing numeric columns for correlation calculation.
-
-    Returns:
-    - ax (plt.Axes): The scatter plot of the pair of columns with the highest absolute correlation.
+    Create a dictionary containing all possible two-letter combinations of the lowercase English alphabets. 
+    The dictionary values represent the frequency of these two-letter combinations in the given word.
+    If a combination does not appear in the word, its value will be 0.
 
     Requirements:
-    - pandas
-    - numpy
-    - matplotlib
+    - collections.Counter
+    - itertools
+    - string
+    
+    Parameters:
+    - word (str): The input string containing alphabetic characters.
 
-    Exception Handling:
-    - Raises ValueError if the input DataFrame is empty.
-    - Raises TypeError if any column in the DataFrame is non-numeric.
-    - Raises ValueError if the DataFrame has fewer than two columns.
+    Returns:
+    - dict: A dictionary with keys as two-letter alphabet combinations and values as their counts in the word.
+
+    Requirements:
+    - The function uses the `collections.Counter` library to count the occurrences of two-letter combinations.
+    - The function uses the `itertools.permutations` method to generate all two-letter combinations of alphabets.
+    - The function uses the `string` library to get a string of lowercase alphabets.
 
     Example:
-    >>> df = pd.DataFrame({
-    ...     'A': np.random.rand(100),
-    ...     'B': np.random.rand(100),
-    ...     'C': np.random.rand(100)
-    ... })
-    >>> ax = task_func(df)
-    >>> print(ax)
-    Axes(0.125,0.11;0.775x0.77)
+    >>> list(task_func('abcdef').items())[:5]
+    [('ab', 1), ('ac', 0), ('ad', 0), ('ae', 0), ('af', 0)]
     """
-    if dataframe.empty:
-        raise ValueError("DataFrame is empty.")
-    if not all(dataframe.dtypes.apply(lambda x: np.issubdtype(x, np.number))):
-        raise TypeError("All columns must be numeric for correlation calculation.")
-    if dataframe.shape[1] < 2:
-        raise ValueError("DataFrame must have at least two columns for correlation calculation.")
-    corr_matrix = pd.DataFrame.corr(dataframe)
-    abs_corr_matrix = corr_matrix.abs()
-    highest_corr_value = abs_corr_matrix.unstack().dropna().nlargest(2).iloc[-1]
-    max_corr_pair = np.where(abs_corr_matrix == highest_corr_value)
-    column_x = dataframe.columns[max_corr_pair[0][0]]
-    column_y = dataframe.columns[max_corr_pair[1][0]]
-    plt.figure(figsize=(10, 6))  # Creating a figure
-    plt.scatter(dataframe[column_x], dataframe[column_y])  # Plotting the scatter plot
-    plt.title(f"Scatter plot between {column_x} and {column_y}")  # Setting the title
-    plt.xlabel(column_x)  # Setting the x-axis label
-    plt.ylabel(column_y)  # Setting the y-axis label
-    plt.show()  # Displaying the figure
-    return plt.gca()  # Returning the current Axes object for further use
+    ALPHABETS = string.ascii_lowercase
+    permutations = [''.join(x) for x in itertools.permutations(ALPHABETS, 2)]
+    combinations = permutations + [x*2 for x in ALPHABETS]
+    word_combinations = [''.join(x) for x in zip(word, word[1:])]
+    word_counter = Counter(word_combinations)
+    return {key: word_counter.get(key, 0) for key in combinations}
 
 import unittest
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for the function task_func."""
-    def test_high_correlation(self):
-        """
-        Test if the function correctly identifies and plots the pair of columns with the highest positive correlation.
-        """
-        np.random.seed(0)  # Set a fixed seed for reproducibility
-        df = pd.DataFrame(
-            {"A": np.arange(100), "B": np.arange(100) * 2, "C": np.random.rand(100)}
-        )
-        ax = task_func(df)
-        corr = df.corr()
-        abs_corr = corr.abs()
-        max_corr = abs_corr.unstack().dropna().nlargest(3).iloc[-1]
-        expected_pair = np.where(abs_corr == max_corr)
-        expected_labels = (
-            df.columns[expected_pair[0][0]],
-            df.columns[expected_pair[1][0]],
-        )
-        self.assertEqual((ax.get_xlabel(), ax.get_ylabel()), expected_labels)
-    def test_no_correlation(self):
-        """
-        Test if the function handles a case where there is no significant correlation between columns.
-        """
-        np.random.seed(1)
-        df = pd.DataFrame(
-            {
-                "A": np.random.rand(100),
-                "B": np.random.rand(100),
-                "C": np.random.rand(100),
-            }
-        )
-        ax = task_func(df)
-        self.assertIsInstance(ax, plt.Axes)
-    def test_negative_correlation(self):
-        """
-        Test if the function correctly identifies and plots the pair of columns with the highest absolute correlation,
-        including negative correlations.
-        """
-        np.random.seed(2)
-        df = pd.DataFrame(
-            {"A": np.arange(100), "B": np.random.rand(100), "C": -np.arange(100) + 50}
-        )
-        ax = task_func(df)
-        corr = df.corr()
-        # Get the pair with the highest absolute correlation excluding self-correlations
-        abs_corr = corr.abs()
-        max_corr = abs_corr.unstack().dropna().nlargest(3).iloc[-1]
-        expected_pair = np.where(abs_corr == max_corr)
-        expected_labels = (
-            df.columns[expected_pair[0][0]],
-            df.columns[expected_pair[1][0]],
-        )
-        self.assertEqual((ax.get_xlabel(), ax.get_ylabel()), expected_labels)
-    def test_single_column(self):
-        """
-        Test if the function raises a ValueError when provided with a DataFrame containing only one column.
-        """
-        np.random.seed(3)
-        df = pd.DataFrame({"A": np.random.rand(100)})
-        with self.assertRaises(ValueError):
-            task_func(df)
-    def test_non_numeric_columns(self):
-        """
-        Test if the function raises a TypeError when provided with a DataFrame containing non-numeric columns.
-        """
-        np.random.seed(4)
-        df = pd.DataFrame(
-            {"A": np.random.rand(100), "B": ["text"] * 100, "C": np.random.rand(100)}
-        )
-        with self.assertRaises(TypeError):
-            task_func(df)
-    def test_empty_dataframe(self):
-        """
-        Test if the function raises a ValueError when provided with an empty DataFrame.
-        """
-        df = pd.DataFrame()  # Create an empty DataFrame
-        with self.assertRaises(ValueError):
-            task_func(df)
+    def test_case_1(self):
+        result = task_func('abcdef')
+        self.assertEqual(result['ab'], 1)
+        self.assertEqual(result['ac'], 0)
+        self.assertEqual(result['bc'], 1)
+        self.assertEqual(result['cb'], 0)
+        self.assertEqual(result['zz'], 0)
+        
+    def test_case_2(self):
+        result = task_func('aabbcc')
+        self.assertEqual(result['aa'], 1)
+        self.assertEqual(result['ab'], 1)
+        self.assertEqual(result['ba'], 0)
+        self.assertEqual(result['bb'], 1)
+        self.assertEqual(result['bc'], 1)
+        
+    def test_case_3(self):
+        result = task_func('fedcba')
+        self.assertEqual(result['fe'], 1)
+        self.assertEqual(result['ef'], 0)
+        self.assertEqual(result['dc'], 1)
+        self.assertEqual(result['ba'], 1)
+        self.assertEqual(result['zz'], 0)
+    def test_case_4(self):
+        result = task_func('cadbfe')
+        self.assertEqual(result['ca'], 1)
+        self.assertEqual(result['ad'], 1)
+        self.assertEqual(result['db'], 1)
+        self.assertEqual(result['fe'], 1)
+        self.assertEqual(result['zz'], 0)
+    def test_case_5(self):
+        result = task_func('')
+        self.assertEqual(result['ab'], 0)
+        self.assertEqual(result['zz'], 0)

@@ -1,142 +1,71 @@
-import re
-import string
-import random
+from collections import Counter
+from random import choice, seed
 
+# Constants
+POSSIBLE_ITEMS = ['apple', 'banana', 'cherry', 'date', 'elderberry']
 
-def task_func(text: str, seed=None) -> str:
+def task_func(list_of_lists):
     """
-    Transforms a given string by removing special characters, normalizing whitespace,
-    and randomizing character casing.
+    Create a "shopping cart" (Counter object) for each list in list_of_lists. 
+    The items in the cart are randomly selected from a predefined list of possible items (POSSIBLE_ITEMS).
+    The frequency of each item in the cart corresponds to the length of the list.
 
     Parameters:
-    - text (str): The text string to be preprocessed.
-    - seed (int, optional): Random seed for reproducibility. Defaults to None (not set).
+    - list_of_lists (list): A list of lists, each representing a 'basket'.
 
     Returns:
-    - str: The preprocessed text string.
+    - baskets (list): A list of Counters, each representing a 'shopping cart'.
 
     Requirements:
-    - re
-    - string
+    - collections
     - random
 
-    Note:
-    - This function considers special characters to be string punctuations.
-    - Spaces, tabs, and newlines are replaced with with '_', '__', and '___' respectively.
-    - To randomize casing, this function converts characters to uppercase with a 50% probability.
-
     Example:
-    >>> task_func('Hello   World!', 0)
-    'HeLlo___WORlD'
-    >>> task_func('attention is all you need', 42)
-    'ATtENTIOn_IS_ALL_You_Need'
+    >>> baskets = task_func([[1, 2, 3], [4, 5]])
+    >>> all(isinstance(basket, Counter) for basket in baskets) # Illustrative, actual items will vary due to randomness
+    True
+    >>> sum(len(basket) for basket in baskets) # The sum of lengths of all baskets; illustrative example
+    3
     """
-    if seed is not None:
-        random.seed(seed)
-    text = re.sub("[%s]" % re.escape(string.punctuation), "", text)
-    REPLACEMENTS = {" ": "_", "\t": "__", "\n": "___"}
-    for k, v in REPLACEMENTS.items():
-        text = text.replace(k, v)
-    text = "".join(random.choice([k.upper(), k]) for k in text)
-    return text
+    seed(42)  # Set the seed for reproducibility
+    baskets = []
+    for list_ in list_of_lists:
+        basket = Counter()
+        for _ in list_:
+            basket[choice(POSSIBLE_ITEMS)] += 1
+        baskets.append(basket)
+    return baskets
 
 import unittest
+from collections import Counter
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = task_func("Hello   World!", seed=1)
-        self.assertNotIn(" ", result, "Spaces should be replaced.")
-        self.assertNotIn("!", result, "Special characters should be removed.")
-        self.assertEqual(
-            len(result), len("Hello___World"), "Length should match processed input."
-        )
+        # Testing with empty list
+        result = task_func([])
+        self.assertEqual(result, [])
     def test_case_2(self):
-        result = task_func("Python!", seed=2)
-        self.assertNotIn("!", result, "Special characters should be removed.")
-        self.assertEqual(
-            len(result), len("Python"), "Length should match processed input."
-        )
+        # Testing with empty sublists
+        result = task_func([[], [], []])
+        for basket in result:
+            self.assertEqual(basket, Counter())
+        
     def test_case_3(self):
-        result = task_func("  ", seed=3)
-        self.assertEqual(result, "__", "Spaces should be replaced with underscores.")
+        # Testing with sublists of different lengths
+        result = task_func([[1], [1, 2], [1, 2, 3]])
+        self.assertEqual(len(result), 3)
+        self.assertEqual(sum(result[0].values()), 1)
+        self.assertEqual(sum(result[1].values()), 2)
+        self.assertEqual(sum(result[2].values()), 3)
     def test_case_4(self):
-        result = task_func("\t\n", seed=4)
-        self.assertEqual(
-            result, "_____", "Tab and newline should be replaced with underscores."
-        )
+        # Testing with sublists containing the same element
+        result = task_func([[1, 1, 1], [2, 2, 2, 2]])
+        self.assertEqual(len(result), 2)
+        self.assertEqual(sum(result[0].values()), 3)
+        self.assertEqual(sum(result[1].values()), 4)
+        
     def test_case_5(self):
-        result = task_func("a!b@c#", seed=5)
-        self.assertTrue(result.isalpha(), "Output should only contain alphabets.")
-        self.assertEqual(
-            len(result), len("abc"), "Length should match processed input."
-        )
-    def test_case_6(self):
-        # Test with all types of whitespace characters
-        result = task_func("a b\tc\nd", seed=6)
-        self.assertEqual(
-            result.lower(),
-            "a_b__c___d",
-            "Should replace all types of whitespaces correctly.",
-        )
-    def test_case_7(self):
-        # Test with a mix of alphanumeric and special characters
-        result = task_func("a1! b2@ c3#", seed=7)
-        self.assertTrue(
-            all(char.isalnum() or char == "_" for char in result),
-            "Should only contain alphanumeric characters and underscores.",
-        )
-    def test_case_8(self):
-        # Test with an empty string
-        result = task_func("", seed=8)
-        self.assertEqual(result, "", "Should handle empty string correctly.")
-    def test_case_9(self):
-        # Test with a string that contains no special characters or whitespaces
-        result = task_func("abcdefg", seed=9)
-        self.assertTrue(result.isalpha(), "Should contain only letters.")
-        self.assertEqual(len(result), 7, "Length should match the input.")
-    def test_case_10(self):
-        # Test with a long string of repeated characters
-        result = task_func("a" * 50, seed=10)
-        self.assertTrue(
-            all(char.lower() == "a" for char in result),
-            "All characters should be 'a' or 'A'.",
-        )
-        self.assertEqual(len(result), 50, "Length should match the input.")
-    def test_case_11(self):
-        # Test with only special characters
-        result = task_func("!@#$%^&*", seed=11)
-        self.assertEqual(
-            result, "", "Should return an empty string for only special characters."
-        )
-    def test_case_12(self):
-        # Test with numeric characters
-        result = task_func("12345", seed=13)
-        self.assertTrue(result.isdigit(), "Should contain only digits.")
-        self.assertEqual(len(result), 5, "Length should match the input.")
-    def test_case_13(self):
-        # Test with a string containing only whitespace characters
-        result = task_func(" \t\n", seed=14)
-        self.assertEqual(
-            result,
-            "______",
-            "Should replace all types of whitespaces correctly, with two underscores for tab and three for newline.",
-        )
-    def test_case_14(self):
-        # Test the randomness of uppercase conversion with a long string
-        result = task_func("a" * 100, seed=15)
-        self.assertTrue(
-            all(char.lower() == "a" for char in result),
-            "All characters should be 'a' or 'A'.",
-        )
-        self.assertNotEqual(
-            result, "a" * 100, "Should have some uppercase transformations."
-        )
-        self.assertNotEqual(
-            result, "A" * 100, "Should have some lowercase transformations."
-        )
-    def test_case_15(self):
-        # Test random seed impact
-        result1 = task_func("test seed impact", seed=42)
-        result2 = task_func("test seed impact", seed=42)
-        self.assertEqual(
-            result1, result2, "Results with the same seed should be identical."
-        )
+        # Testing with large sublists
+        result = task_func([[1]*100, [2]*200])
+        self.assertEqual(len(result), 2)
+        self.assertEqual(sum(result[0].values()), 100)
+        self.assertEqual(sum(result[1].values()), 200)

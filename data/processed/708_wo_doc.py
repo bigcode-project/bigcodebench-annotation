@@ -1,100 +1,95 @@
-import collections
+import json
 import numpy as np
 
-
-def task_func(file_name):
+def task_func(df):
     """
-    Find the most common value in each column of a csv file with column names.
+    Given a DataFrame with random values and an 'IntCol' column, transform the 'IntCol' column by a logarithm (base 10) and write it to a `IntCol.json` file as a list. Also return the DataFrame.
 
-    If some values occur the same number of times, the values are sorted
-    alphabetically and the first is considered most common.
-
-    If an empty csv is passed, an empty dictionary is returned. 
-    
     Parameters:
-    file_name (str): The name of the csv file.
-    
+    - df (DataFrame): A pandas DataFrame with a 'IntCol' column.
+
     Returns:
-    dict: A dictionary with column names as keys and most common values as values.
+    - df (DataFrame): A pandas DataFrame to describe the transformed data.
 
     Requirements:
-    - collections
+    - json
+    - pandas
     - numpy
-    
+    - os
+
     Example:
-    >>> common_values = task_func('sample.csv')
-    >>> print(common_values)
-    {'Name': 'Simon Velasquez',
-    'Age': 21,
-    'Fruit': 'Apple',
-    'Genre': 'HipHop',
-    'Height': 172}
+    >>> df = pd.DataFrame({'IntCol': [10, 100, 1000, 10000, 100000]})
+    >>> df_transformed = task_func(df)
+    >>> print(df_transformed)
+       IntCol
+    0     1.0
+    1     2.0
+    2     3.0
+    3     4.0
+    4     5.0
+
     """
-    data = np.genfromtxt(file_name, delimiter=',', names=True,
-                         dtype=None, encoding=None)
-    common_values = {}
-    if len(np.atleast_1d(data)) == 0:
-        return {}
-    if len(np.atleast_1d(data)) == 1:
-        for col in data.dtype.names:
-            common_values[col] = data[col].item()
-    else:
-        for col in data.dtype.names:
-            counter = collections.Counter(data[col])
-            if counter.most_common(2)[0][1] == counter.most_common(2)[1][1]:
-                common_values[col] = sorted(counter.items())[0][0]
-            else:
-                common_values[col] = counter.most_common(1)[0][0]
-    return common_values
+    df['IntCol'] = np.log10(df['IntCol'])
+    int_col_list = df['IntCol'].tolist()
+    with open('IntCol.json', 'w') as json_file:
+        json.dump(int_col_list, json_file)
+    return df
 
 import unittest
 import os
-import shutil
-import tempfile
-import csv
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Create a temporary directory to house the CSV files
-        self.test_dir = tempfile.mkdtemp()
     def tearDown(self):
-        # Remove the temporary directory after the test
-        shutil.rmtree(self.test_dir)
-    def create_csv(self, file_name, headers, data):
-        # Helper function to create a CSV file
-        path = os.path.join(self.test_dir, file_name)
-        with open(path, 'w', newline='') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=headers)
-            writer.writeheader()
-            for row in data:
-                writer.writerow(row)
-        return path
-    def test_empty_csv(self):
-        # Test for an empty CSV file
-        file_path = self.create_csv('empty.csv', ['Name', 'Age'], [])
-        result = task_func(file_path)
-        self.assertEqual(result, {})
-    def test_single_entry(self):
-        # Test for a CSV file with a single entry
-        file_path = self.create_csv('single.csv', ['Name', 'Age'], [{'Name': 'John', 'Age': '30'}])
-        result = task_func(file_path)
-        self.assertEqual(result, {'Name': 'John', 'Age': 30})
-    def test_common_values_sorted(self):
-        # Test for common values, ensuring alphabetical sorting
-        file_path = self.create_csv('common_values.csv', ['Fruit'], [{'Fruit': 'Apple'}, {'Fruit': 'Banana'}, {'Fruit': 'Apple'}, {'Fruit': 'Banana'}, {'Fruit': 'Cherry'}])
-        result = task_func(file_path)
-        self.assertEqual(result, {'Fruit': 'Apple'})
-    def test_multiple_columns(self):
-        # Test for multiple columns and entries
-        data = [{'Name': 'Alice', 'Age': '25', 'Country': 'USA'},
-                {'Name': 'Bob', 'Age': '30', 'Country': 'USA'},
-                {'Name': 'Alice', 'Age': '25', 'Country': 'Canada'}]
-        file_path = self.create_csv('multi_columns.csv', ['Name', 'Age', 'Country'], data)
-        result = task_func(file_path)
-        expected = {'Name': 'Alice', 'Age': 25, 'Country': 'USA'}
-        self.assertEqual(result, expected)
-    def test_tie_breaking(self):
-        # Test for tie-breaking in value counts
-        data = [{'Name': 'Alice'}, {'Name': 'Bob'}, {'Name': 'Alice'}, {'Name': 'Bob'}]
-        file_path = self.create_csv('tie.csv', ['Name'], data)
-        result = task_func(file_path)
-        self.assertEqual(result, {'Name': 'Alice'})
+        if os.path.exists('IntCol.json'):
+            os.remove('IntCol.json')
+    
+    def test_case_1(self):
+        df = pd.DataFrame({'IntCol': [10, 100, 1000, 10000, 100000]})
+        df_transformed = task_func(df)
+        self.assertTrue(np.allclose(df_transformed['IntCol'], [1, 2, 3, 4, 5]))
+        # Check if JSON file exists
+        self.assertTrue(os.path.exists('IntCol.json'))
+        # Check the contents of the JSON file
+        with open('IntCol.json', 'r') as json_file:
+            int_col_data = json.load(json_file)
+        self.assertTrue(np.allclose(int_col_data, [1, 2, 3, 4, 5]))
+    def test_case_2(self):
+        df = pd.DataFrame({'IntCol': [10000000, 100000000, 1000000000, 10000000000, 100000000000]})
+        df_transformed = task_func(df)
+        self.assertTrue(np.allclose(df_transformed['IntCol'], [7, 8, 9, 10, 11]))
+        # Check if JSON file exists
+        self.assertTrue(os.path.exists('IntCol.json'))
+        # Check the contents of the JSON file
+        with open('IntCol.json', 'r') as json_file:
+            int_col_data = json.load(json_file)
+        self.assertTrue(np.allclose(int_col_data, [7, 8, 9, 10, 11]))
+    def test_case_3(self):
+        df = pd.DataFrame({'IntCol': [0, 0, 0, 0, 0]})
+        df_transformed = task_func(df)
+        self.assertTrue(np.allclose(df_transformed['IntCol'], [-np.inf, -np.inf, -np.inf, -np.inf, -np.inf]))
+        # Check if JSON file exists
+        self.assertTrue(os.path.exists('IntCol.json'))
+        # Check the contents of the JSON file
+        with open('IntCol.json', 'r') as json_file:
+            int_col_data = json.load(json_file)
+        self.assertTrue(np.allclose(int_col_data, [-np.inf, -np.inf, -np.inf, -np.inf, -np.inf]))
+    def test_case_4(self):
+        df = pd.DataFrame({'IntCol': [10000000]})
+        df_transformed = task_func(df)
+        self.assertTrue(np.allclose(df_transformed['IntCol'], [7]))
+        # Check if JSON file exists
+        self.assertTrue(os.path.exists('IntCol.json'))
+        # Check the contents of the JSON file
+        with open('IntCol.json', 'r') as json_file:
+            int_col_data = json.load(json_file)
+        self.assertTrue(np.allclose(int_col_data, [7]))
+    def test_case_5(self):
+        df = pd.DataFrame({'IntCol': [1, 10, 100, 1000, 10000, 100000]})
+        df_transformed = task_func(df)
+        self.assertTrue(np.allclose(df_transformed['IntCol'], [0, 1, 2, 3, 4, 5]))
+        # Check if JSON file exists
+        self.assertTrue(os.path.exists('IntCol.json'))
+        # Check the contents of the JSON file
+        with open('IntCol.json', 'r') as json_file:
+            int_col_data = json.load(json_file)
+        self.assertTrue(np.allclose(int_col_data, [0, 1, 2, 3, 4, 5]))

@@ -1,96 +1,106 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
+import time
+import random
 
-def task_func(df):
+
+def task_func(iterations=5, min_delay=1.0, max_delay=2.0, seed=None):
     """
-    Predicts the stock closing prices for the next 7 days using simple linear regression and plots the data.
+    Simulates a delay and then returns a message indicating the elapsed time. This is repeated for a specified number of iterations.
+
+    For each iteration the delay is randomly sampled from a uniform distribution specified by min_delay and max_delay.
+    After each iteration the message: '{delay} seconds have passed', where {delay} is replaces with the actual delay
+    of the iteration with 2 positions after the decimal point, is saved to an array.
+
+    The function returns a list of all messages, as well as the total delay.
 
     Parameters:
-    df (DataFrame): The input dataframe with columns 'date' and 'closing_price'. 'date' should be in datetime format.
+    - iterations (int): The number of times the delay and message should be simulated. Default is 5.
+    - min_delay (float): The duration (in seconds) of the delay between messages. Default is 1.0.
+    - max_delay (float): The max delay of each iteration in seconds. Default is 2.0
+    - seed (float): The seed used for random sampling the delays for each iteration. Defalut is None.
 
     Returns:
-    tuple: A tuple containing:
-        - list: A list with predicted prices for the next 7 days.
-        - Axes: The matplotlib Axes object containing the plot.
-    
+    - list of str: A list of messages indicating the elapsed time for each iteration.
+    - float: The total amount of delay
+
+    Raises:
+    - ValueError: If iterations is not a positive integer or if min_delay/max_delay is not a positive floating point value.
+
     Requirements:
-    - pandas
-    - numpy
-    - matplotlib.pyplot
-    - sklearn.linear_model.LinearRegression
-
-    Constants:
-    - The function uses a constant time step of 24*60*60 seconds to generate future timestamps.
-
+    - time
+    - random
+    
     Example:
-    >>> df = pd.DataFrame({
-    ...     'date': pd.date_range(start='1/1/2021', end='1/7/2021'),
-    ...     'closing_price': [100, 101, 102, 103, 104, 105, 106]
-    ... })
-    >>> pred_prices, plot = task_func(df)
-    >>> print(pred_prices)
-    [107.0, 108.0, 109.0, 110.0, 111.0, 112.0, 113.0]
+    >>> messages, delay = task_func(2, 0.4, seed=1)
+    >>> print(messages)
+    ['0.61 seconds have passed', '1.76 seconds have passed']
+    >>> print(delay)
+    2.3708767696794144
+
+    >>> messages, delay = task_func(2, 2.0, 4.2, seed=12)
+    >>> print(messages)
+    ['3.04 seconds have passed', '3.45 seconds have passed']
+    >>> print(delay)
+    6.490494998960768
     """
-    df['date'] = pd.to_datetime(df['date'])
-    df['date'] = df['date'].map(pd.Timestamp.timestamp)
-    X = df['date'].values.reshape(-1, 1)
-    y = df['closing_price'].values
-    model = LinearRegression()
-    model.fit(X, y)
-    future_dates = np.array([df['date'].max() + i*24*60*60 for i in range(1, 8)]).reshape(-1, 1)
-    pred_prices = model.predict(future_dates)
-    fig, ax = plt.subplots()
-    ax.scatter(df['date'], df['closing_price'], color='black')
-    ax.plot(future_dates, pred_prices, color='blue', linewidth=3)
-    return pred_prices.tolist(), ax
+    random.seed(seed)
+    if not isinstance(iterations, int) or iterations <= 0:
+        raise ValueError("iterations must be a positive integer.")
+    if not isinstance(min_delay, (int, float)) or min_delay <= 0:
+        raise ValueError("min_delay must be a positive floating point value.")
+    if not isinstance(max_delay, (int, float)) or max_delay <= min_delay:
+        raise ValueError("max_delay must be a floating point value larger than min_delay.")
+    total_delay = 0
+    messages = []
+    for _ in range(iterations):
+        delay = random.uniform(min_delay, max_delay)
+        total_delay += delay
+        time.sleep(delay)
+        message_string = f'{delay:.2f} seconds have passed'
+        messages.append(message_string)
+    return messages, total_delay
 
 import unittest
-import pandas as pd
+import time
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = pd.DataFrame({
-            'date': pd.date_range(start='1/1/2021', end='1/7/2021'),
-            'closing_price': [100, 101, 102, 103, 104, 105, 106]
-        })
-        pred_prices, ax = task_func(df)
-        self.assertEqual(pred_prices, [107.0, 108.0, 109.0, 110.0, 111.0, 112.0, 113.0])
-        self.assertEqual(ax.get_xlabel(), '')
-        self.assertEqual(ax.get_ylabel(), '')
+        start_time = time.time()
+        messages, total_delay = task_func(3, 0.2, 0.3, 12)
+        elapsed_time = time.time() - start_time
+        self.assertEqual(messages, ['0.25 seconds have passed', '0.27 seconds have passed', '0.27 seconds have passed'])
+        self.assertAlmostEqual(elapsed_time, total_delay, delta=0.1)
+        
     def test_case_2(self):
-        df = pd.DataFrame({
-            'date': pd.date_range(start='2/1/2021', end='2/7/2021'),
-            'closing_price': [200, 201, 202, 203, 204, 205, 206]
-        })
-        pred_prices, ax = task_func(df)
-        self.assertEqual(pred_prices, [207.0, 208.0, 209.0, 210.0, 211.0, 212.0, 213.0])
-        self.assertEqual(ax.get_xlabel(), '')
-        self.assertEqual(ax.get_ylabel(), '')
+        start_time = time.time()
+        result, total_delay = task_func(1, 0.5, 2.5, seed=42)
+        elapsed_time = time.time() - start_time
+        self.assertEqual(result, ['1.78 seconds have passed'])
+        self.assertAlmostEqual(elapsed_time, total_delay, delta=0.1)
+        
     def test_case_3(self):
-        df = pd.DataFrame({
-            'date': pd.date_range(start='3/1/2021', end='3/7/2021'),
-            'closing_price': [300, 301, 302, 303, 304, 305, 306]
-        })
-        pred_prices, ax = task_func(df)
-        self.assertEqual(pred_prices, [307.0, 308.0, 309.0, 310.0, 311.0, 312.0, 313.0])
-        self.assertEqual(ax.get_xlabel(), '')
-        self.assertEqual(ax.get_ylabel(), '')
+        start_time = time.time()
+        result, total_delay = task_func(seed=123)
+        elapsed_time = time.time() - start_time
+        self.assertEqual(result, ['1.05 seconds have passed',
+                                  '1.09 seconds have passed',
+                                  '1.41 seconds have passed',
+                                  '1.11 seconds have passed',
+                                  '1.90 seconds have passed'
+                                  ])
+        self.assertAlmostEqual(elapsed_time, total_delay, delta=0.1)
+        
     def test_case_4(self):
-        df = pd.DataFrame({
-            'date': pd.date_range(start='4/1/2021', end='4/7/2021'),
-            'closing_price': [400, 401, 402, 403, 404, 405, 406]
-        })
-        pred_prices, ax = task_func(df)
-        self.assertEqual(pred_prices, [407.0, 408.0, 409.0, 410.0, 411.0, 412.0, 413.0])
-        self.assertEqual(ax.get_xlabel(), '')
-        self.assertEqual(ax.get_ylabel(), '')
+        with self.assertRaises(ValueError):
+            task_func(-1, 1.0)
+        
     def test_case_5(self):
-        df = pd.DataFrame({
-            'date': pd.date_range(start='5/1/2021', end='5/7/2021'),
-            'closing_price': [500, 501, 502, 503, 504, 505, 506]
-        })
-        pred_prices, ax = task_func(df)
-        self.assertEqual(pred_prices, [507.0, 508.0, 509.0, 510.0, 511.0, 512.0, 513.0])
-        self.assertEqual(ax.get_xlabel(), '')
-        self.assertEqual(ax.get_ylabel(), '')
+        with self.assertRaises(ValueError):
+            task_func(3, -1.0)
+    def test_case_rng(self):
+        mess1, del1 = task_func(3, 0.1, 0.2, seed=12)
+        mess2, del2 = task_func(3, 0.1, 0.2, seed=12)
+        self.assertEqual(mess1, mess2)
+        self.assertAlmostEqual(del1, del2, delta=0.05)
+        mess3, del3 = task_func(5, 0.01, 0.05)
+        mess4, del4 = task_func(5, 0.01, 0.05)
+        self.assertNotEqual(mess3, mess4)
+        self.assertNotAlmostEqual(del3, del4)

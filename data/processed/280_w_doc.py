@@ -1,95 +1,87 @@
-import pandas as pd
 import random
+from collections import Counter
 
+# Constants
+CARDS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 
-def task_func(product_list, categories, min_value = 10, max_value = 100):
+def task_func(x=1):
     """
-    Create a sales report for a list of products in different categories.
-    The report includes the quantity sold and revenue generated for each product.
-    
+    Draw x random 5-card poker hands from a 52-card pack (without suits) and return
+    the hands along with a counter of the drawn cards.
+
     Parameters:
-    product_list (list): The list of products.
-    categories (list): A list of categories for the products.
-    min_value (int): The minimum value for quantity sold and revenue.
-    max_value (int): The maximum value for quantity sold and revenue.
-    
+    x (int, optional): Number of hands to draw. Default is 1.
+
     Returns:
-    DataFrame: A pandas DataFrame with sales data for the products.
-    
-    Note:
-    - The column names uses are 'Product', 'Category', 'Quantity Sold', and 'Revenue'.
+    tuple: A tuple containing two elements:
+        - list of list str: Each inner list contains 5 strings, representing a 5-card poker hand.
+        - Counter: A counter of the drawn cards.
+
+
+    The output is random; hence, the returned list will vary with each call.
 
     Requirements:
-    - pandas
     - random
-    
+    - collections.Counter
+
     Example:
     >>> random.seed(0)
-    >>> report = task_func(['Product 1'], ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports'], 100, 100)
-    >>> report.iloc[0]['Category'] in ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
+    >>> result = task_func(1)
+    >>> len(result[0][0])
+    5
+    >>> result[0][0][0] in CARDS
     True
-    >>> report.iloc[0]['Quantity Sold']
-    100
-    >>> report.iloc[0]['Revenue']
-    10000
     """
-    report_data = []
-    for product in product_list:
-        category = categories[random.randint(0, len(categories)-1)]
-        quantity_sold = random.randint(min_value, max_value)
-        revenue = quantity_sold * random.randint(min_value, max_value)
-        report_data.append([product, category, quantity_sold, revenue])
-    report_df = pd.DataFrame(report_data, columns=['Product', 'Category', 'Quantity Sold', 'Revenue'])
-    return report_df
+    result = []
+    card_counts = Counter()
+    for i in range(x):
+        drawn = random.sample(CARDS, 5)
+        result.append(drawn)
+        card_counts.update(drawn)
+    return result, card_counts
 
 import unittest
-import pandas as pd
 import random
 class TestCases(unittest.TestCase):
+    def test_hand_size(self):
+        """ Test if the hand contains exactly 5 cards. """
+        random.seed(0)
+        hand, _ = task_func()
+        self.assertEqual(len(hand[0]), 5)
     
-    categories = ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
-    products = ['Product ' + str(i) for i in range(1, 101)]
     
-    def test_case_1(self):
+    def test_drawn_size(self):
         random.seed(0)
-        report = task_func(self.products[:5], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 5)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
-        
-    def test_case_2(self):
-        random.seed(0)
-        report = task_func(self.products[5:10], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 5)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
-        
-    def test_case_3(self):
-        random.seed(0)
-        report = task_func([self.products[10]], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 1)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
-        
-    def test_case_4(self):
-        random.seed(0)
-        report = task_func(self.products[10:20], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 10)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
-        
-    def test_case_5(self):
-        random.seed(0)
-        report = task_func(self.products[20:40], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 20)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        hand, _ = task_func(2)
+        self.assertEqual(len(hand[0]), 5)
+        self.assertEqual(len(hand), 2)
     
-    def test_case_6(self):
+    def test_counter(self):
         random.seed(0)
-        report = task_func([self.products[0]], self.categories, 10, 10)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 1)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
-        self.assertEqual(report.iloc[0]['Quantity Sold'], 10)
-        self.assertEqual(report.iloc[0]['Revenue'], 100)
+        hand, counter = task_func(1)
+        self.assertEqual(len(hand[0]), 5)
+        self.assertLessEqual(counter[hand[0][0]], 5)
+        self.assertGreaterEqual(counter[hand[0][0]], 1)
+    def test_card_uniqueness(self):
+        """ Test if all cards in the hand are unique. """
+        random.seed(0)
+        hand, _ = task_func()
+        self.assertEqual(len(hand[0]), len(set(hand[0])))
+    def test_valid_cards(self):
+        """ Test if all cards drawn are valid card values. """
+        random.seed(0)
+        hand, _ = task_func()
+        for card in hand[0]:
+            self.assertIn(card, ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'])
+    def test_randomness(self):
+        """ Test if multiple executions return different hands. """
+        random.seed(0)
+        hands = [task_func()[0][0] for _ in range(10)]
+        self.assertTrue(len(set(tuple(hand) for hand in hands[0])) > 1)
+    def test_card_distribution(self):
+        """ Test if all possible cards appear over multiple executions. """
+        random.seed(0)
+        all_cards = set()
+        for _ in range(1000):
+            all_cards.update(task_func()[0][0])
+        self.assertEqual(all_cards, set(['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']))

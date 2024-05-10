@@ -1,90 +1,78 @@
 import os
-import json
+import time
+OUTPUT_DIR = './output'
 
-def task_func(config_path: str) -> dict:
+
+def task_func(dataset, filename, output_dir=OUTPUT_DIR):
     """
-    Load a JSON configuration file and return the configuration dictionary.
-    
+    Writes multiple Pandas DataFrames to a single CSV file, separating each DataFrame by a line of hyphens ("------").
+
     Parameters:
-    - config_path (str): Path to the configuration file.
-    
+    - dataset (list of pd.DataFrame): A list containing the DataFrames to be written to the file.
+    - filename (str): The name of the file (excluding the path) where the DataFrames will be written.
+    - output_dir (str, optional): the ouput directory.
+
     Returns:
-    - config (dict): Configuration dictionary loaded from the file.
-    
+    None: The function writes the DataFrames to a CSV file but does not return any value.
+
     Requirements:
     - os
-    - json
-    
-    Raises:
-    - FileNotFoundError: If the provided configuration file does not exist.
-    
+    - time
+
     Example:
-    >>> task_func("config.json")
-    {'key': 'value', 'setting': True}
+    >>> import pandas as pd
+    >>> df1 = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
+    >>> df2 = pd.DataFrame({"D": [5, 6], "E": [7, 8]})
+    >>> task_func([df1, df2], 'sample.csv')
     """
-    if not os.path.isfile(config_path):
-        raise FileNotFoundError(f"The configuration file {config_path} does not exist.")
-    with open(config_path) as f:
-        config = json.load(f)
-    return config
+    start_time = time.time()
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    filepath = os.path.join(output_dir, filename)
+    with open(filepath, 'w', newline='') as f:
+        for i, df in enumerate(dataset):
+            if i > 0:
+                f.write('------\n')
+            df.to_csv(f, index=False, header=True, mode='a')
+            if i < len(dataset) - 1:
+                f.write('\n')
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
 
 import unittest
-import json
-import tempfile
+import shutil
+import pandas as pd
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Create temporary configuration files for testing
-        self.valid_config_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        self.valid_config_file.write('{"database": "test_db", "logging": true}')
-        self.valid_config_file.close()
-        
-        self.empty_config_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        self.empty_config_file.write('{}')
-        self.empty_config_file.close()
-        
-        self.invalid_json_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        self.invalid_json_file.write('invalid json')
-        self.invalid_json_file.close()
-    
+        """Ensure the data directory exists before any tests are run."""
+        if not os.path.exists(OUTPUT_DIR):
+            os.makedirs(OUTPUT_DIR)
     def tearDown(self):
-        # Clean up temporary configuration files after testing
-        os.unlink(self.valid_config_file.name)
-        os.unlink(self.empty_config_file.name)
-        os.unlink(self.invalid_json_file.name)
-    
-    def test_valid_config(self):
-        # Test with a valid configuration file
-        config = task_func(self.valid_config_file.name)
-        self.assertIsInstance(config, dict)
-        self.assertIn("database", config)
-        self.assertIn("logging", config)
-    
-    def test_non_existent_config(self):
-        # Test with a non-existent configuration file
-        with self.assertRaises(FileNotFoundError):
-            task_func("test_data/non_existent_config.json")
-    
-    def test_invalid_json_format(self):
-        # Test with a configuration file containing invalid JSON
-        with self.assertRaises(json.JSONDecodeError):
-            task_func(self.invalid_json_file.name)
-    
-    def test_empty_config(self):
-        # Test with an empty configuration file
-        config = task_func(self.empty_config_file.name)
-        self.assertIsInstance(config, dict)
-        self.assertEqual(len(config), 0)
-    
-    def test_additional_config_fields(self):
-        # Test with a configuration file containing additional fields
-        extra_config_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        extra_config_file.write('{"database": "test_db", "logging": true, "extra_field": "value"}')
-        extra_config_file.close()
-        
-        config = task_func(extra_config_file.name)
-        self.assertIsInstance(config, dict)
-        self.assertIn("database", config)
-        self.assertIn("logging", config)
-        self.assertIn("extra_field", config)
-        
-        os.unlink(extra_config_file.name)
+        """Clean up by removing the data directory and its contents after all tests."""
+        shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
+    def test_single_dataframe(self):
+        """Test with a single DataFrame."""
+        df = pd.DataFrame({"Column1": [1, 2], "Column2": [3, 4]})
+        task_func([df], 'single_dataframe.csv')
+        self.assertTrue(os.path.exists(os.path.join(OUTPUT_DIR, 'single_dataframe.csv')))
+    def test_multiple_dataframes(self):
+        """Test with multiple DataFrames."""
+        df1 = pd.DataFrame({"A": [5, 6], "B": [7, 8]})
+        df2 = pd.DataFrame({"C": [9, 10], "D": [11, 12]})
+        task_func([df1, df2], 'multiple_dataframes.csv')
+        self.assertTrue(os.path.exists(os.path.join(OUTPUT_DIR, 'multiple_dataframes.csv')))
+    def test_empty_dataframe(self):
+        """Test with an empty DataFrame."""
+        df = pd.DataFrame()
+        task_func([df], 'empty_dataframe.csv')
+        self.assertTrue(os.path.exists(os.path.join(OUTPUT_DIR, 'empty_dataframe.csv')))
+    def test_varying_row_counts(self):
+        """Test with DataFrames having varying numbers of rows."""
+        df1 = pd.DataFrame({"E": [13], "F": [14]})
+        df2 = pd.DataFrame({"G": [15, 16, 17], "H": [18, 19, 20]})
+        task_func([df1, df2], 'varying_row_counts.csv')
+        self.assertTrue(os.path.exists(os.path.join(OUTPUT_DIR, 'varying_row_counts.csv')))
+    def test_no_dataframes(self):
+        """Test with no DataFrames provided."""
+        task_func([], 'no_dataframes.csv')
+        self.assertTrue(os.path.exists(os.path.join(OUTPUT_DIR, 'no_dataframes.csv')))

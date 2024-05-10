@@ -1,95 +1,130 @@
-import subprocess
-import os
-import threading
+import xml.etree.ElementTree as ET
+import csv
 
-def task_func(script_path: str, timeout: int = 60) -> str:
+
+def task_func(xml_content, output_csv_path):
     """
-    Execute a specified python code with a given timeout. If the script execution exceeds the timeout, it is terminated.
+    Parses XML content from a string and converts it into a CSV format.
 
     Parameters:
-    - script_path (str): The path to the Python code to be executed.
-    - timeout (int): The maximum allowed time (in seconds) for the script execution. Default is 60 seconds.
+    - xml_content (str): A string containing the XML content to be parsed. It should
+                       be well-formed XML.
+    - output_csv_path (str): The file path where the resulting CSV file will be saved.
+                           This path must be valid and accessible for writing.
 
     Returns:
-    - str: A message indicating if the code was terminated due to timeout or executed successfully.
+    - None: The function does not return any value. Instead, it writes the output to
+          a CSV file at the specified path.
+
+    Raises:
+    - ET.ParseError: This exception is raised if the input XML content is malformed or
+                   cannot be successfully parsed. The exception message includes
+                   details about the parsing error.
+    - IOError: Raised if there is an issue with writing to the specified CSV file path.
+             This can happen due to reasons like invalid file path, full disk space,
+             lack of write permissions, etc. The exception message provides details
+             about the IO error.
+
 
     Requirements:
-    - subprocess
-    - os
-    - threading
+    - xml
+    - csv
 
-    Examples:
-    >>> task_func('/pathto/MyrScript.py')
-    'Script executed successfully.'
-    
-    >>> task_func('/pathto/LongRunningScript.py', 30)
-    'Terminating process due to timeout.'
+    Example:
+    >>> task_func('<root><element>data</element></root>', 'path/to/output.csv')
+    >>> with open('path/to/output.csv', 'r') as f:
+    ...     print(f.read())
+    element,data
 
     Note:
-    - If the script was terminated due to timeout it will return "Script executed successfully.", otherwise "Terminating process due to timeout."
-
-    Raise:
-    - The code will raise FileNotFoundError if the file is not exist.
+    - Ensure that the XML content passed to the function is well-formed.
+    - The output CSV path should be a valid file path where the user has write
+      permissions, to prevent IOError.
     """
-    def target():
-        subprocess.call(['python', script_path])
-    thread = threading.Thread(target=target)
-    thread.start()
-    thread.join(timeout)
-    if thread.is_alive():
-        os.system(f'pkill -f "{script_path}"')
-        thread.join()
-        return 'Terminating process due to timeout.'
-    else:
-        return 'Script executed successfully.'
+    try:
+        root = ET.fromstring(xml_content)
+        data = [[elem.tag, elem.text] for elem in root.iter()]
+        with open(output_csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerows(data)
+    except ET.ParseError as e:
+        raise ET.ParseError(f"Error parsing XML: {e}") from e
+    except IOError as e:
+        raise IOError(f"Error writing CSV file: {e}") from e
 
 import unittest
-from unittest.mock import patch
-import time
+import xml.etree.ElementTree as ET
+import csv
 import shutil
+from pathlib import Path
+import os
 class TestCases(unittest.TestCase):
+    """Test cases for task_func."""
+    test_data_dir = "mnt/data/task_func_data"
     def setUp(self):
-        self.test_dir = 'testdir_task_func'
-        os.makedirs(self.test_dir, exist_ok=True)
-        f = open(self.test_dir+"/script4.py","w")
-        f.write("print('Hello from script4')")
-        f.close()
-        f = open(self.test_dir+"/script1.py","w")
-        f.write("import time\ntime.sleep(10)\nprint('waiting')")
-        f.close()
-        f = open(self.test_dir+"/script2.py","w")
-        f.close()
-        f = open(self.test_dir+"/script3.py","w")
-        f.write("import time\ntime.sleep(62)\nprint('waiting')")
-        f.close()
-        
-        self.temp_dir = 'testdir_f_947/temp_dir'
-        os.makedirs(self.temp_dir, exist_ok=True)
-        
+        """Set up method to create a directory for test files."""
+        self.test_dir = Path(self.test_data_dir)
+        self.test_dir.mkdir(parents=True, exist_ok=True)
+    def check_csv_content(self, xml_content, csv_path):
+        """Helper function to check if the CSV content matches the XML content."""
+        root = ET.fromstring(xml_content)
+        expected_data = [
+            [elem.tag, elem.text if elem.text is not None else ""]
+            for elem in root.iter()
+        ]
+        with open(csv_path, "r", encoding="utf-8") as file:
+            reader = csv.reader(file)
+            csv_data = list(reader)
+        self.assertEqual(expected_data, csv_data)
+    def test_simple_xml(self):
+        """Test with simple XML content."""
+        xml_content = "<root><element>data</element></root>"
+        csv_output = self.test_dir / "output_scenario_0.csv"
+        task_func(xml_content, csv_output)
+        self.check_csv_content(xml_content, csv_output)
+    def test_nested_xml(self):
+        """Test with nested XML content."""
+        xml_content = "<root><parent><child>data</child></parent></root>"
+        csv_output = self.test_dir / "output_scenario_1.csv"
+        task_func(xml_content, csv_output)
+        self.check_csv_content(xml_content, csv_output)
+    def test_empty_xml(self):
+        """Test with an empty XML."""
+        xml_content = "<root></root>"
+        csv_output = self.test_dir / "output_scenario_2.csv"
+        task_func(xml_content, csv_output)
+        self.check_csv_content(xml_content, csv_output)
+    def test_xml_with_attributes(self):
+        """Test with an XML that contains elements with attributes."""
+        xml_content = '<root><element attr="value">data</element></root>'
+        csv_output = self.test_dir / "output_scenario_3.csv"
+        task_func(xml_content, csv_output)
+        self.check_csv_content(xml_content, csv_output)
+    def test_large_xml(self):
+        """Test with a larger XML file."""
+        xml_content = (
+            "<root>"
+            + "".join([f"<element>{i}</element>" for i in range(100)])
+            + "</root>"
+        )
+        csv_output = self.test_dir / "output_scenario_4.csv"
+        task_func(xml_content, csv_output)
+        self.check_csv_content(xml_content, csv_output)
+    def test_invalid_xml_content(self):
+        """Test with invalid XML content to trigger ET.ParseError."""
+        xml_content = "<root><element>data</element"  # Malformed XML
+        csv_output = self.test_dir / "output_invalid_xml.csv"
+        with self.assertRaises(ET.ParseError):
+            task_func(xml_content, csv_output)
+    def test_unwritable_csv_path(self):
+        """Test with an unwritable CSV path to trigger IOError."""
+        xml_content = "<root><element>data</element></root>"
+        csv_output = self.test_dir / "non_existent_directory" / "output.csv"
+        with self.assertRaises(IOError):
+            task_func(xml_content, csv_output)
     def tearDown(self):
-        # Clean up the test directory
-        shutil.rmtree(self.test_dir)
-    
-    @patch('subprocess.call', return_value=None)
-    def test_case_1(self, mock_subprocess):
-        # Test with a short-running script
-        result = task_func('/path/to/short_script.py', 10)
-        self.assertEqual(result, 'Script executed successfully.')
-    
-    def test_case_2(self):
-        # Test with a long-running script and short timeout
-        result = task_func(self.test_dir+"/script1.py", 3)
-        self.assertEqual(result, 'Terminating process due to timeout.')
-    @patch('subprocess.call', return_value=None)
-    def test_case_3(self, mock_subprocess):
-        # Test default timeout behavior
-        result = task_func('/path/to/short_script.py')
-        self.assertEqual(result, 'Script executed successfully.')
-    def test_case_4(self):
-        # Test with a long-running script and long timeout
-        result = task_func(self.test_dir+"/script1.py", 20)
-        self.assertEqual(result, 'Script executed successfully.')
-    def test_case_5(self):
-        # Test with a long-running script and default timeout
-        result = task_func(self.test_dir+"/script3.py")
-        self.assertEqual(result, 'Terminating process due to timeout.')
+        # Cleanup the test directories
+        dirs_to_remove = ["mnt/data", "mnt"]
+        for dir_path in dirs_to_remove:
+            if os.path.exists(dir_path):
+                shutil.rmtree(dir_path)

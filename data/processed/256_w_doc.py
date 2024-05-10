@@ -1,92 +1,74 @@
-import pandas as pd
-from statistics import mean
-import random
+import matplotlib
+import numpy as np
 
-# Constants for generating the report data
-FIELDS = ['Physics', 'Math', 'Chemistry', 'Biology', 'English', 'History']
-STUDENTS = ['Student_' + str(i) for i in range(1, 101)]
+# Constants
+FUNCTIONS = [np.sin, np.cos, np.tan]
 
-def task_func(additional_fields = []):
+def task_func(ax, func_index):
     """
-    Create a report on students' grades in different subjects and then calculate the average grade for each student and subject.
-    
+    Draw a mathematical function (sine, cosine, or tangent) on a polar diagram 'ax'.
+    The radial ticks are placed at a position corresponding to the index of the function multiplied by 45 degrees.
+
     Parameters:
-    additional_fields (list of string, optional): The additional list of student subjects that are not duplicate with the constants (default = [])
+    ax (matplotlib.axes._axes.Axes): The ax to plot on.
+    func_index (int): The index of the function in the FUNCTIONS list (0 for sine, 1 for cosine, 2 for tangent).
 
     Returns:
-    DataFrame: A pandas DataFrame with the columns being subjects, each student's grades, and their average grades. 
-               The DataFrame also includes the average grade per subject.
-
-    Note:
-    - This function does not take any input parameters and generates a report based on predefined constants and additional fields from input (if any).
-    - This function use 'Average' as the row name for the average grade for each subject.
-    - This function use 'Average Grade' as the column name for the average grade for each student
-    - Grade of each subject is between 0 to 100.
-
+    matplotlib.axes._axes.Axes: The modified ax with the plotted function.
+    
+    Raises:
+    - This function will raise a ValueError if the input ax is not and Axes.
+    
     Requirements:
-    - pandas
-    - random
-    - statistics.mean
+    - matplotlib
+    - numpy
 
     Example:
-    >>> random.seed(0)
-    >>> report = task_func(['Computer Science', 'Geography'])
-    >>> print(report.columns)
-    Index(['Physics', 'Math', 'Chemistry', 'Biology', 'English', 'History',
-           'Computer Science', 'Geography', 'Average Grade'],
-          dtype='object')
+    >>> import matplotlib.pyplot as plt
+    >>> fig = plt.figure()
+    >>> ax = fig.add_subplot(111, polar=True)
+    >>> ax_up = task_func(ax, 1)
+    <class 'matplotlib.projections.polar.PolarAxes'>
+    >>> ax_up.lines[0].get_ydata()[0]
+    1.0
+    >>> plt.close()
     """
-    FIELDS_ALL = FIELDS + additional_fields
-    report_data = {field: [random.randint(0, 100) for _ in STUDENTS] for field in FIELDS_ALL}
-    df = pd.DataFrame(report_data, index=STUDENTS)
-    df['Average Grade'] = df.apply(mean, axis=1)
-    df.loc['Average'] = df.apply(mean)
-    return df
+    print(type(ax))
+    if not isinstance(ax, matplotlib.axes.Axes):
+        raise ValueError("The input is not an axes")
+    x = np.linspace(0, 2 * np.pi, 1000)
+    y = FUNCTIONS[func_index](x)
+    ax.plot(x, y)
+    ax.set_rlabel_position(func_index * 45)
+    return ax
 
 import unittest
-import pandas as pd
-import random
+import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_dataframe_structure(self):
-        """Test if the returned object is a pandas DataFrame with expected columns."""
-        random.seed(0)
-        df = task_func()
-        self.assertIsInstance(df, pd.DataFrame)
-        expected_columns = ['Physics', 'Math', 'Chemistry', 'Biology', 'English', 'History', 'Average Grade']
-        self.assertListEqual(list(df.columns), expected_columns)
-    def test_additional_fields(self):
-        """Test if the returned object is a pandas DataFrame with expected columns."""
-        random.seed(0)
-        df = task_func(['Computer Science', 'Geography'])
-        self.assertIsInstance(df, pd.DataFrame)
-        expected_columns = ['Physics', 'Math', 'Chemistry', 'Biology', 'English', 'History', 'Computer Science', 'Geography', 'Average Grade']
-        self.assertListEqual(list(df.columns), expected_columns)
-        for column in df.columns:
-            if column != 'Average Grade':
-                self.assertTrue(df[column].between(0, 100).all())
-    def test_grades_range(self):
-        """Test if the grades are within the expected range (0 to 100)."""
-        random.seed(0)
-        df = task_func()
-        for column in df.columns:
-            if column != 'Average Grade':
-                self.assertTrue(df[column].between(0, 100).all())
-    def test_average_grade(self):
-        """Test if the average grade is correctly calculated."""
-        random.seed(0)
-        df = task_func()
-        for index, row in df.iterrows():
-            if index != 'Average':
-                self.assertAlmostEqual(row['Average Grade'], row[:-1].mean())
-    def test_subject_average(self):
-        """Test if the subject average is correctly calculated and placed at the bottom row."""
-        random.seed(0)
-        df = task_func()
-        subject_avg = df.loc['Average'][:-1]
-        for column in df.columns[:-1]:
-            self.assertAlmostEqual(subject_avg[column], df[column].mean())
-    def test_non_negative_grades(self):
-        """Test if there are no negative grades."""
-        random.seed(0)
-        df = task_func()
-        self.assertTrue((df >= 0).all().all())
+    def setUp(self):
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(111, polar=True)
+    def test_sine_function(self):
+        ax = task_func(self.ax, 0)
+        self.assertIsNotNone(ax, "Ax should not be None")
+        # Verify if the plotted function matches the sine function
+        x = np.linspace(0, 2 * np.pi, 1000)
+        y_expected = np.sin(x)
+        y_actual = ax.lines[0].get_ydata()
+        np.testing.assert_allclose(y_actual, y_expected, atol=1e-5)
+    def test_cosine_function(self):
+        ax = task_func(self.ax, 1)
+        self.assertIsNotNone(ax, "Ax should not be None")
+    def test_tangent_function(self):
+        ax = task_func(self.ax, 2)
+        self.assertIsNotNone(ax, "Ax should not be None")
+    def test_invalid_index(self):
+        with self.assertRaises(IndexError):
+            task_func(self.ax, 3)
+    def test_rlabel_position(self):
+        ax = task_func(self.ax, 1)
+        self.assertEqual(ax.get_rlabel_position(), 45, "Rlabel position should be 45 for index 1")
+    def test_case_non_ax(self):
+        with self.assertRaises(ValueError):
+            task_func("non_ax", 1)

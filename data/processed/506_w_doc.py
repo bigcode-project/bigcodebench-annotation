@@ -1,73 +1,49 @@
-import numpy as np
-import pandas as pd
+import hashlib
+import hmac
 
-
-def task_func(df, letter):
+def task_func(secret, message):
     """
-    This function converts an input dictionary into a DataFrame, filters rows where 'Word' column values start with a
-    specified letter, calculates the lengths of these words, and returns basic statistics (mean, median, mode) of the
-    word lengths.
+    Generates an HMAC (Hash-based Message Authentication Code) signature for a given message using a secret key.
+    The function uses SHA-256 as the hash function to create the HMAC signature.
 
     Parameters:
-    df (dict of list): A dictionary where the key 'Word' maps to a list of strings.
-    letter (str): The letter to filter the 'Word' column.
+    secret (str): The secret key used for HMAC generation.
+    message (str): The message for which the HMAC signature is to be generated.
 
     Returns:
-    dict: A dictionary of mean, median, and mode of word lengths.
-    
-    Requirements:
-    - pandas
-    - numpy
+    str: The HMAC signature of the message, returned as a hexadecimal string.
 
-    Example:
-    >>> df = {'Word': ['apple', 'banana', 'apricot', 'blueberry', 'cherry', 'avocado']}
-    >>> stats = task_func(df, 'a')
-    >>> stats['mean'] > 0
+    Requirements:
+    - hashlib
+    - hmac
+
+    Examples:
+    Generate an HMAC signature for a message.
+    >>> len(task_func('mysecretkey', 'Hello, world!')) == 64
     True
-    >>> stats['median'] > 0
+
+    Generate an HMAC for a different message with the same key.
+    >>> len(task_func('mysecretkey', 'Goodbye, world!')) == 64
     True
     """
-    df = pd.DataFrame(df)
-    regex = '^' + letter
-    filtered_df = df[df['Word'].str.contains(regex, regex=True)]
-    word_lengths = filtered_df['Word'].str.len()
-    statistics = {'mean': np.mean(word_lengths), 'median': np.median(word_lengths), 'mode': word_lengths.mode().values[0]}
-    return statistics
+    return hmac.new(secret.encode(), message.encode(), hashlib.sha256).hexdigest()
 
 import unittest
-import random
-from string import ascii_lowercase
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        word_list = []
-        num = 1000
-        for _ in range(num):
-            length = random.randint(3, 10)
-            word = ''.join(random.choice(ascii_lowercase) for _ in range(length))
-            word_list.append(word)
-        self.df = {'Word': word_list}
-    def test_case_1(self):
-        result = task_func(self.df, 'a')
-        self.assertIn('mean', result)
-        self.assertIn('median', result)
-        self.assertIn('mode', result)
-    def test_case_2(self):
-        result = task_func(self.df, 'z')
-        self.assertIn('mean', result)
-        self.assertIn('median', result)
-        self.assertIn('mode', result)
-    def test_case_3(self):
-        result = task_func(self.df, 'm')
-        self.assertIn('mean', result)
-        self.assertIn('median', result)
-        self.assertIn('mode', result)
-    def test_case_4(self):
-        result = task_func(self.df, 'f')
-        self.assertIn('mean', result)
-        self.assertIn('median', result)
-        self.assertIn('mode', result)
-    def test_case_5(self):
-        result = task_func(self.df, 't')
-        self.assertIn('mean', result)
-        self.assertIn('median', result)
-        self.assertIn('mode', result)
+    def test_hmac_signature_length(self):
+        signature = task_func('secretkey', 'Hello, world!')
+        self.assertEqual(len(signature), 64)
+    def test_hmac_signature_different_messages(self):
+        sig1 = task_func('secretkey', 'Hello, world!')
+        sig2 = task_func('secretkey', 'Goodbye, world!')
+        self.assertNotEqual(sig1, sig2)
+    def test_hmac_signature_same_message_different_keys(self):
+        sig1 = task_func('key1', 'Hello, world!')
+        sig2 = task_func('key2', 'Hello, world!')
+        self.assertNotEqual(sig1, sig2)
+    def test_hmac_signature_empty_message(self):
+        signature = task_func('secretkey', '')
+        self.assertEqual(len(signature), 64)
+    def test_hmac_signature_empty_key(self):
+        signature = task_func('', 'Hello, world!')
+        self.assertEqual(len(signature), 64)

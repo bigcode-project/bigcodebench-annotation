@@ -1,167 +1,73 @@
-import pandas as pd
-import numpy as np
+import re
+import matplotlib.pyplot as plt
+from nltk.probability import FreqDist
 
 
-def task_func(data, column="c"):
+def task_func(example_str, top_n=30):
     """
-    Remove a column from a data dictionary if it exists, and then plot the remaining data
-    if it contains numeric data.
+    Extract all texts that are not enclosed in square brackets from the given string and plot 
+    a frequency distribution of the words. Also return the top_n most common words in the frequency distribution
+    as a dictionary.
 
     Parameters:
-    - data (dict): The input data dictionary.
-    - column (str): Name of column to remove. Defaults to "c".
+    - example_str (str): The input string.
+    - top_n (int, Optional): The number of most common words to display in the frequency distribution plot. Default is 30.
 
     Returns:
-    - df (pd.DataFrame): The modified DataFrame after removing the specified column.
-    - ax (matplotlib.axes._axes.Axes or None): The plot of the modified DataFrame if there's
-      numeric data to plot, otherwise None.
+    - Axes: A matplotlib Axes object representing the frequency distribution plot.
+    - dict: A dictionary containing the top_n most common words and their frequencies.
 
     Requirements:
-    - pandas
-    - numpy
+    - re
+    - nltk.probability.FreqDist
+    - matplotlib.pyplot
 
     Example:
-    >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]}
-    >>> modified_df, ax = task_func(data)
-    >>> ax
-    <Axes: >
-    >>> modified_df
-       a  b
-    0  1  4
-    1  2  5
-    2  3  6
+    >>> ax, top_n_words = task_func("Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003] Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]")
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    df = pd.DataFrame(data)
-    if column in df.columns:
-        df = df.drop(columns=column)
-    if df.empty or not np.any(df.dtypes.apply(pd.api.types.is_numeric_dtype)):
-        return df, None
-    ax = df.plot()
-    return df, ax
+    text = ' '.join(re.findall('(.*?)\\[.*?\\]', example_str))
+    words = text.split()
+    fdist = FreqDist(words)
+    if top_n > len(fdist):
+        top_n = len(fdist)
+    plt.figure()
+    ax = fdist.plot(top_n, cumulative=False, show=False)
+    plt.close()
+    top_n_words = dict(fdist.most_common(top_n))
+    return ax, top_n_words
 
 import unittest
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Scenario: DataFrame with columns 'a', 'b', and 'c'.
-        np.random.seed(0)
-        data = {
-                "a": np.random.randn(10),
-                "b": np.random.randn(10),
-                "c": np.random.randn(10),
-            }
-        df = pd.DataFrame(
-            data
-        )
-        modified_df, ax = task_func(data)  # Remove default column 'c'.
-        # Assert column 'c' removal and plot data verification.
-        self.assertNotIn("c", modified_df.columns)
-        plotted_data = [line.get_ydata() for line in ax.get_lines()]
-        self.assertTrue(
-            all(
-                [
-                    np.array_equal(data, modified_df[col].values)
-                    for data, col in zip(plotted_data, modified_df.columns)
-                ]
-            )
-        )
+        example_str = "Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003] Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]"
+        ax, top_n_words = task_func(example_str)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+        # Test the number of words in the plot
+        self.assertEqual(len(ax.get_xticklabels()), 4, "The number of words in the plot is not 30.")
+        # Test the top_n_words dictionary
+        self.assertEqual(top_n_words, {'Smith': 2, 'Josie': 1, 'Mugsy': 1, 'Dog': 1}, "The top_n_words dictionary is incorrect.")
     def test_case_2(self):
-        # Scenario: DataFrame with columns 'a' and 'b' (no 'c').
-        np.random.seed(0)
-        data = {"a": np.random.randn(10), "b": np.random.randn(10)}
-        df = pd.DataFrame(data)
-        modified_df, ax = task_func(data)
-        # Assert that the modified DataFrame remains unchanged and plot is generated.
-        self.assertEqual(list(df.columns), list(modified_df.columns))
-        self.assertIsNotNone(ax)
+        example_str = "Hello [1234 STREET, CITY, STATE 12345] World [5678 LANE, TOWN, PROVINCE 67890]"
+        ax, _ = task_func(example_str)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
     def test_case_3(self):
-        # Scenario: Empty DataFrame
-        data = {}
-        df = pd.DataFrame(data)
-        modified_df, ax = task_func(data)
-        # Assert empty DataFrame and no plot.
-        self.assertTrue(modified_df.empty)
-        self.assertIsNone(ax)
+        example_str = "[IGNORE THIS] This is a simple test string [ANOTHER IGNORE]"
+        ax, top_n_words = task_func(example_str, top_n=5)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+        # Test the histogram data
+        #self.assertEqual(len(ax.patches), 5, "The number of words in the plot is not 5.")
+        # Test the top_n_words dictionary
+        self.assertEqual(top_n_words, {'This': 1, 'is': 1, 'a': 1, 'simple': 1, 'test': 1}, "The top_n_words dictionary is incorrect.")
+    
     def test_case_4(self):
-        # Scenario: DataFrame with single non-numeric column 'c'.
-        data = {"c": ["apple", "banana", "cherry"]}
-        df = pd.DataFrame(data)
-        modified_df, ax = task_func(data)
-        # Assert empty DataFrame after 'c' removal and no plot.
-        self.assertTrue(modified_df.empty)
-        self.assertIsNone(ax)
+        example_str = "[BEGIN] Testing the function with different [MIDDLE] types of input strings [END]"
+        ax, _ = task_func(example_str)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+    
     def test_case_5(self):
-        np.random.seed(0)
-        # Scenario: DataFrame with columns 'a', 'b', 'c', and non-numeric column 'd'.
-        data = {
-                "a": np.random.randn(10),
-                "b": np.random.randn(10),
-                "c": np.random.randn(10),
-                "d": [
-                    "apple",
-                    "banana",
-                    "cherry",
-                    "date",
-                    "fig",
-                    "grape",
-                    "honeydew",
-                    "kiwi",
-                    "lime",
-                    "mango",
-                ],
-            }
-        df = pd.DataFrame(
-            data
-        )
-        modified_df, ax = task_func(data)
-        # Assert column 'c' removal and plot data verification excluding non-numeric column 'd'.
-        self.assertNotIn("c", modified_df.columns)
-        plotted_data = [line.get_ydata() for line in ax.get_lines()]
-        self.assertTrue(
-            all(
-                [
-                    np.array_equal(data, modified_df[col].values)
-                    for data, col in zip(plotted_data, modified_df.columns)
-                    if col != "d"
-                ]
-            )
-        )
-    def test_case_6(self):
-        # Scenario: Remove specified column.
-        np.random.seed(0)
-        data = {
-                "a": np.random.randn(10),
-                "b": np.random.randn(10),
-            }
-        df = pd.DataFrame(
-            data
-        )
-        modified_df, ax = task_func(df, column="a")
-        self.assertNotIn("a", modified_df.columns)
-        plotted_data = [line.get_ydata() for line in ax.get_lines()]
-        self.assertTrue(
-            all(
-                [
-                    np.array_equal(data, modified_df[col].values)
-                    for data, col in zip(plotted_data, modified_df.columns)
-                ]
-            )
-        )
-    def test_case_7(self):
-        # Scenario: Only non-numeric columns.
-        data = {
-                "a": ["apple", "banana"],
-                "b": ["cherry", "date"],
-                "c": ["fig", "grape"],
-            }
-        df = pd.DataFrame(
-            data
-        )
-        modified_df, ax = task_func(data)
-        self.assertNotIn("c", modified_df.columns)
-        pd.testing.assert_frame_equal(df[["a", "b"]], modified_df)
-        self.assertEqual(ax, None)
-    def tearDown(self):
-        plt.close("all")
+        example_str = "Example without any brackets so all words should be considered."
+        ax, _ = task_func(example_str)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")

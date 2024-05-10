@@ -1,107 +1,102 @@
-import subprocess
-import shlex
-from datetime import datetime
+import requests
+import pandas as pd
 
-def task_func(script_path: str) -> dict:
-    '''
-    Run an R script and return the start time, end time, stdout, and stderr as a dictionary.
-    
-    Requirements:
-    - subprocess
-    - shlex
-    - datetime
-    
+
+def task_func(url: str) -> pd.DataFrame:
+    """
+    This function fetches JSON data from a specified URL and converts it into a Pandas DataFrame.
+    It expects the JSON to be in a format that is directly convertible to a DataFrame, typically
+    a list of dictionaries. The function handles various scenarios including successful data
+    retrieval and conversion, network issues, and invalid JSON format.
+
     Parameters:
-    - script_path (str): Path to the R script to be executed.
-    
+    - url (str): The URL where the JSON file is located.
+
     Returns:
-    - dict: A dictionary containing the start time, end time, stdout, and stderr of the script run.
-    
+    - pd.DataFrame: A DataFrame constructed from the JSON data fetched from the URL.
+
+    Raises:
+    - SystemError: If there is a network-related issue such as a connection error, timeout,
+      or if the server responded with an unsuccessful status code (like 404 or 500). This is a
+      re-raised exception from requests.RequestException to provide a more specific error message.
+    - ValueError: If the fetched data is not in a valid JSON format that can be converted into
+      a DataFrame. This could occur if the data structure does not match the expected format (e.g.,
+      not a list of dictionaries).
+
+    Requirements:
+    - requests
+    - pandas
+
     Example:
-    >>> task_func("/path/to/script.r")
-    {
-        'Start Time': '2023-09-26 14:30:00',
-        'End Time': '2023-09-26 14:32:00',
-        'Stdout': 'Script output here...',
-        'Stderr': 'Any errors here...'
-    }
-    '''
-    start_time = datetime.now()
-    process = subprocess.Popen(shlex.split(f"/usr/bin/Rscript --vanilla {script_path}"),
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    end_time = datetime.now()
-    log_details = {
-        'Start Time': str(start_time),
-        'End Time': str(end_time),
-        'Stdout': stdout.decode('utf-8'),
-        'Stderr': stderr.decode('utf-8')
-    }
-    return log_details
+    >>> task_func('https://example.com/data.json')
+    DataFrame:
+       A  B
+
+    Notes:
+    - The function uses a timeout of 5 seconds for the network request to avoid hanging indefinitely.
+    - It checks the HTTP response status and raises an HTTPError for unsuccessful status codes.
+    - Directly converts the HTTP response to JSON and then to a DataFrame, without intermediate processing.
+    """
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
+        data = response.json()  # Directly converts the response content to JSON
+        df = pd.DataFrame(data)
+        return df
+    except requests.RequestException as e:
+        raise SystemError(f"Network error occurred: {e}") from e
+    except ValueError as exc:
+        raise ValueError("Invalid JSON format for DataFrame conversion") from exc
 
 import unittest
-from unittest.mock import patch, Mock
+import requests
+import pandas as pd
+from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    @patch('subprocess.Popen')
-    def test_case_1(self, mock_subprocess):
-        mock_process = Mock()
-        mock_process.communicate.return_value = (b"Script output here...", b"Any errors here...")
-        mock_subprocess.return_value = mock_process
-        
-        result = task_func("/path/to/script.r")
-        
-        self.assertIn('Start Time', result)
-        self.assertIn('End Time', result)
-        self.assertEqual(result['Stdout'], "Script output here...")
-        self.assertEqual(result['Stderr'], "Any errors here...")
-    
-    @patch('subprocess.Popen')
-    def test_case_2(self, mock_subprocess):
-        mock_process = Mock()
-        mock_process.communicate.return_value = (b"Another output...", b"")
-        mock_subprocess.return_value = mock_process
-        
-        result = task_func("/path/to/different_script.r")
-        
-        self.assertIn('Start Time', result)
-        self.assertIn('End Time', result)
-        self.assertEqual(result['Stdout'], "Another output...")
-        self.assertEqual(result['Stderr'], "")
-    
-    @patch('subprocess.Popen')
-    def test_case_3(self, mock_subprocess):
-        mock_process = Mock()
-        mock_process.communicate.return_value = (b"", b"An error occurred...")
-        mock_subprocess.return_value = mock_process
-        
-        result = task_func("/path/to/erroneous_script.r")
-        
-        self.assertIn('Start Time', result)
-        self.assertIn('End Time', result)
-        self.assertEqual(result['Stdout'], "")
-        self.assertEqual(result['Stderr'], "An error occurred...")
-    @patch('subprocess.Popen')
-    def test_case_4(self, mock_subprocess):
-        mock_process = Mock()
-        mock_process.communicate.return_value = (b"Script output for case 4...", b"")
-        mock_subprocess.return_value = mock_process
-        
-        result = task_func("/path/to/script_4.r")
-        
-        self.assertIn('Start Time', result)
-        self.assertIn('End Time', result)
-        self.assertEqual(result['Stdout'], "Script output for case 4...")
-        self.assertEqual(result['Stderr'], "")
-    
-    @patch('subprocess.Popen')
-    def test_case_5(self, mock_subprocess):
-        mock_process = Mock()
-        mock_process.communicate.return_value = (b"", b"Error for case 5...")
-        mock_subprocess.return_value = mock_process
-        
-        result = task_func("/path/to/erroneous_script_5.r")
-        
-        self.assertIn('Start Time', result)
-        self.assertIn('End Time', result)
-        self.assertEqual(result['Stdout'], "")
-        self.assertEqual(result['Stderr'], "Error for case 5...")
+    """Test cases for task_func."""
+    @patch("requests.get")
+    def test_valid_json(self, mock_get):
+        """Test a valid JSON."""
+        mock_get.return_value.json.return_value = [{"A": 1, "B": 3}, {"A": 2, "B": 4}]
+        mock_get.return_value.status_code = 200
+        df = task_func("https://example.com/data.json")
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertListEqual(df.columns.tolist(), ["A", "B"])
+        self.assertListEqual(df["A"].tolist(), [1, 2])
+        self.assertListEqual(df["B"].tolist(), [3, 4])
+    @patch("requests.get")
+    def test_empty_json(self, mock_get):
+        """Test an empty JSON."""
+        mock_get.return_value.json.return_value = []
+        mock_get.return_value.status_code = 200
+        df = task_func("https://example.com/empty.json")
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertEqual(len(df), 0)
+    @patch("requests.get")
+    def test_invalid_json(self, mock_get):
+        """Test an invalid JSON."""
+        mock_get.return_value.json.side_effect = ValueError()
+        with self.assertRaises(ValueError):
+            task_func("https://example.com/invalid.json")
+    @patch("requests.get")
+    def test_large_json(self, mock_get):
+        """Test a large JSON."""
+        mock_get.return_value.json.return_value = [{"X": i} for i in range(1000)]
+        mock_get.return_value.status_code = 200
+        df = task_func("https://example.com/large.json")
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertListEqual(df["X"].tolist(), list(range(1000)))
+    @patch("requests.get")
+    def test_null_json(self, mock_get):
+        """Test a JSON that is null."""
+        mock_get.return_value.json.return_value = None
+        mock_get.return_value.status_code = 200
+        df = task_func("https://example.com/null.json")
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertEqual(len(df), 0)
+    @patch("requests.get")
+    def test_system_error(self, mock_get):
+        """Test a general error."""
+        mock_get.side_effect = requests.RequestException
+        with self.assertRaises(SystemError):
+            task_func("https://example.com/data.json")
