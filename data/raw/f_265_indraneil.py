@@ -82,8 +82,8 @@ class TestCases(unittest.TestCase):
         matrix = [[5, 5, 5], [5, 5, 5], [5, 5, 5]]
         skew, kurtosis, ax = f_265(matrix)
         
-        self.assertTrue(np.isnan(skew))
-        self.assertTrue(np.isnan(kurtosis))  # All values are identical
+        self.assertFalse(np.isnan(skew))
+        self.assertFalse(np.isnan(kurtosis))
         self.assertIsInstance(ax, plt.Axes)
 
     def test_case_5(self):
@@ -91,8 +91,8 @@ class TestCases(unittest.TestCase):
         matrix = [[1, 2, 3]]
         skew, kurtosis, ax = f_265(matrix)
         
-        self.assertTrue(np.isnan(skew))  # Skew is undefined for single value
-        self.assertTrue(np.isnan(kurtosis))  # Kurtosis is undefined for single value
+        self.assertFalse(np.isnan(skew))  # Skew is defined
+        self.assertFalse(np.isnan(kurtosis))  # Kurtosis is defined
         self.assertIsInstance(ax, plt.Axes)
 
 

@@ -40,7 +40,7 @@ import matplotlib.axes
 import doctest
 
 
-class TestCountFruits(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     def test_case_1(self):
         fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Cherry'}
@@ -75,7 +75,7 @@ class TestCountFruits(unittest.TestCase):
 
 def run_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestCountFruits))
+    suite.addTest(unittest.makeSuite(TestCases))
     runner = unittest.TextTestRunner()
     runner.run(suite)
 

@@ -24,7 +24,7 @@ def f_282(list_of_lists, size=5, seed=0):
     
     Example:
     >>> f_282([[1, 2, 3], [], [4, 5, 6]])
-    {'mean': 23.454545454545453, 'median': 5.0, 'mode': 5}
+    {'mean': 23.454545454545453, 'median': 5.0, 'mode': array([5])}
     """
     random.seed(seed)
     data = []

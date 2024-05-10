@@ -32,7 +32,7 @@ def f_263(data_dict):
     >>> data
     {'key': 5, 'another_key': 10, 'a': 1}
     >>> stats
-    {'mean': 5.33, 'median': 5.0, 'mode': 1}
+    {'mean': 5.33, 'median': 5.0, 'mode': array([1])}
     """
     # Constants
     SCALER_RANGE = (0, 1)

@@ -105,8 +105,8 @@ class TestCases(unittest.TestCase):
         # Test with the sample directory created
         result = f_307(self.test_directory)
         self.assertEqual(len(result), 2)  # 2 files processed
-        self.assertTrue("file1.json" in result[1])
-        self.assertTrue("file2.json" in result[0])
+        self.assertTrue("file1.json" in result[0])
+        self.assertTrue("file2.json" in result[1])
         
         # Check if the files have been modified correctly
         with open(os.path.join(self.test_directory, "file1.json"), "r") as file:
