@@ -1,72 +1,85 @@
-import matplotlib
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy import stats
+import math
 
-
-def task_func(mu, sigma, sample_size, seed=0):
+def task_func(data, target, k):
     """
-    Create a Gaussian kernel density estimate diagram of a normal distribution with a given mean and a 
-    standard deviation using a random sample of a size determined by the sample_size parameter. The density 
-    diagram is plotted using default settings in a deterministic matplotlib plot. Return the axes object.
-    
+    Calculate the 'k' nearest neighbors by geographic coordinates using a dataset 
+    and a target data point. The function returns a list of the 'k' nearest neighbors, 
+    sorted in ascending order of their distances from the target.
+
     Parameters:
-    mu (float): The mean of the normal distribution.
-    sigma (float): The standard deviation of the normal distribution.
-    sample_size (int): The size of the sample to generate. Must be a positive integer.
-    seed (int, Optional): The seed to be used for the random number generator. Default is 0.
-    
+    data (DataFrame): The dataset containing geographical coordinates with columns ['Latitude', 'Longitude'].
+    target (list): The target data point as [Latitude, Longitude].
+    k (int): The number of nearest neighbors to return. Must be a non-negative integer.
+
     Returns:
-    matplotlib.axes._axes.Axes: Axes object containing the plot of the normal distribution.
-    
+    list: List of the 'k' nearest neighbors as [Latitude, Longitude].
+
+    Raises:
+    ValueError: If 'k' is a negative integer or not an integer.
+
+    Constants:
+    radius of earth is 6371 km
+
     Requirements:
     - numpy
-    - matplotlib
-    - scipy.stats
-    
+    - math
+
     Example:
-    >>> ax = task_func(0, 1, 1000)
-    >>> type(ax) # The result should be a matplotlib.axes._axes.Axes object
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> data = pd.DataFrame([[14, 25], [1, 22], [7, 8]], columns=['Latitude', 'Longitude'])
+    >>> target = [10, 15]
+    >>> k = 2
+    >>> task_func(data, target, k)
+    [[7, 8], [14, 25]]
     """
-    if sample_size <= 0:
-        raise ValueError('sample_size must be a positive integer.')
-    np.random.seed(seed)
-    sample = np.random.normal(mu, sigma, sample_size)
-    density = stats.gaussian_kde(sample)
-    x = np.linspace(min(sample), max(sample), sample_size)
-    fig, ax = plt.subplots()
-    ax.plot(x, density(x))
-    return ax
+    if not isinstance(k, int) or k < 0:
+        raise ValueError("'k' must be a non-negative integer")
+    RADIUS_EARTH_KM = 6371.0  # Radius of the Earth in kilometers
+    def calculate_distance(coord1, coord2):
+        lat1, lon1 = math.radians(coord1[0]), math.radians(coord1[1])
+        lat2, lon2 = math.radians(coord2[0]), math.radians(coord2[1])
+        dlat = lat2 - lat1
+        dlon = lon2 - lon1
+        a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        return RADIUS_EARTH_KM * c
+    distances = np.array([calculate_distance(target, coord) for coord in data.to_numpy()])
+    nearest_indices = distances.argsort()[:k]
+    nearest_neighbors = data.iloc[nearest_indices].values.tolist()
+    return nearest_neighbors
 
 import unittest
-import doctest
+import pandas as pd
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
+    def setUp(self):
+        self.data = pd.DataFrame([[14, 25], [1, 22], [7, 8], [10, 15]], columns=['Latitude', 'Longitude'])
+        self.target = [10, 15]
+    def test_correct_number_of_neighbors(self):
+        k = 2
+        result = task_func(self.data, self.target, k)
+        self.assertEqual(len(result), k)
+    def test_correct_neighbors(self):
+        result = task_func(self.data, self.target, 1)
+        self.assertEqual(result, [[10, 15]])
+    def test_invalid_k_value_negative(self):
         with self.assertRaises(ValueError):
-            ax = task_func(0, 1, 0, 77)        
-    def test_case_2(self):
-        mu, sigma, sample_size, seed = 0, 1, 10000, 42
-        ax = task_func(mu, sigma, sample_size, seed)
-        line = ax.lines[0]
-        x_data, y_data = line.get_data()
-        assert isinstance(ax, matplotlib.axes._axes.Axes)
-        assert min(x_data) < mu - 3*sigma and max(x_data) > mu + 3*sigma
-    def test_case_3(self):
-        ax = task_func(0, 1, 10000, 42)
-        xlim = ax.get_xlim()
-        ylim = ax.get_ylim()
-        assert xlim[0] < 0 and xlim[1] > 0
-        assert ylim[0] < 0 and ylim[1] > 0
-    def test_case_4(self):
-        ax = task_func(0, 1, 1000, 42)
-        assert len(ax.lines) == 1
-    def test_case_5(self):
-        ax1 = task_func(0, 1, 42)
-        ax2 = task_func(0, 1, 42)
-        line1 = ax1.lines[0]
-        line2 = ax2.lines[0]
-        x_data1, y_data1 = line1.get_data()
-        x_data2, y_data2 = line2.get_data()
-        assert np.array_equal(x_data1, x_data2) and np.array_equal(y_data1, y_data2)
+            task_func(self.data, self.target, -1)
+    def test_invalid_k_value_not_integer(self):
+        with self.assertRaises(ValueError):
+            task_func(self.data, self.target, "two")
+    def test_large_k_value(self):
+        k = 100
+        result = task_func(self.data, self.target, k)
+        self.assertEqual(len(result), len(self.data))
+    def test_zero_k_value(self):
+        k = 0
+        result = task_func(self.data, self.target, k)
+        self.assertEqual(result, [])
+        
+    def test_large_k_value(self):
+        k = 100
+        result = task_func(self.data, self.target, k)
+        # with open('df_contents.txt', 'w') as file:
+        #     file.write(str(result))
+        expect = [[10, 15], [7, 8], [14, 25], [1, 22]]
+        self.assertAlmostEqual(result, expect)

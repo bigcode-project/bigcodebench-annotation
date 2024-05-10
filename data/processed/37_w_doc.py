@@ -1,95 +1,111 @@
-import random
-import string
-import hashlib
-import time
+import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
 
+TARGET_VALUES = np.array([1, 3, 4])
 
-def task_func(data_dict: dict, seed=0) -> dict:
+def task_func(df):
     """
-    Process the given dictionary by performing the following operations:
-    1. Add a key "a" with a value of 1.
-    2. Generate a random salt of length 5 using lowercase ASCII letters.
-    3. For each key-value pair in the dictionary, concatenate the value with the generated salt, 
-       hash the concatenated string using SHA-256, and update the value with the hashed string.
-    4. Add a 'timestamp' key with the current UNIX timestamp as its value.
+    Replace all elements in DataFrame columns that do not exist in the TARGET_VALUES array with zeros, then perform a Box-Cox transformation on each column (if data is not constant, add 1 to account for zeros) and display the resulting KDE plots.
 
     Parameters:
-    data_dict (dict): The dictionary to be processed. Values should be string-convertible.
-    seed (int, Optional): Seed value for the random number generator. Defaults to 0.
+        - df (pandas.DataFrame): The input pandas DataFrame with positive values.
 
     Returns:
-    dict: The processed dictionary with the hashed values and added keys.
+        - pandas.DataFrame: The transformed DataFrame after Box-Cox transformation.
+        - matplotlib.figure.Figure: Figure containing KDE plots of the transformed columns.
 
     Requirements:
-    - Uses the random, string, hashlib, and time libraries.
+    - numpy
+    - scipy.stats
+    - matplotlib.pyplot
 
     Example:
-    >>> task_func({'key': 'value'})["key"]
-    '8691a011016e0fba3c2b0b8a26e4c9c722975f1defe42f580ab55a9c97dfccf8'
-
+    >>> np.random.seed(42)
+    >>> df = pd.DataFrame(np.random.randint(1, 10, size=(100, 5)), columns=list('ABCDE'))  # Values should be positive for Box-Cox
+    >>> transformed_df, fig = task_func(df)
+    >>> print(transformed_df.head(2))
+              A         B    C    D         E
+    0  0.000000  0.566735  0.0  0.0  0.000000
+    1  0.530493  0.000000  0.0  0.0  0.607007
     """
-    random.seed(seed)
-    SALT_LENGTH = 5
-    data_dict.update(dict(a=1))
-    salt = ''.join(random.choice(string.ascii_lowercase) for _ in range(SALT_LENGTH))
-    for key in data_dict.keys():
-        data_dict[key] = hashlib.sha256((str(data_dict[key]) + salt).encode()).hexdigest()
-    data_dict['timestamp'] = time.time()
-    return data_dict
+    if (df <= 0).any().any():
+        raise ValueError("Input DataFrame should contain only positive values.")
+    df = df.applymap(lambda x: x if x in TARGET_VALUES else 0)
+    transformed_df = pd.DataFrame()
+    fig, ax = plt.subplots()
+    for column in df.columns:
+        if df[column].nunique() == 1:
+            transformed_df[column] = df[column]
+        else:
+            transformed_data, _ = stats.boxcox(
+                df[column] + 1
+            )  # Add 1 since the are some null values
+            transformed_df[column] = transformed_data
+            kde = stats.gaussian_kde(transformed_df[column])
+            x_vals = np.linspace(
+                min(transformed_df[column]), max(transformed_df[column]), 1000
+            )
+            ax.plot(x_vals, kde(x_vals), label=column)
+    ax.legend()
+    plt.show()
+    return transformed_df, fig
 
 import unittest
-import doctest
+import pandas as pd
 class TestCases(unittest.TestCase):
+    """Test cases for the task_func function."""
     def test_case_1(self):
-        # Testing with a simple dictionary
-        result = task_func({'key': 'value'})
-        # The result should have 3 keys now: key, a, and timestamp
-        self.assertIn('key', result)
-        self.assertIn('a', result)
-        self.assertIn('timestamp', result)
-        # The value for 'a' should be hashed
-        self.assertNotEqual(result['a'], '1')
-        self.assertEqual(result['key'], '8691a011016e0fba3c2b0b8a26e4c9c722975f1defe42f580ab55a9c97dfccf8')
-        self.assertEqual(result['a'], '373f3d39a5d5075dfb4503ebe44f70eed8a48e1a32be02d182b2a26695c6f694')
-        self.assertIsInstance(result['timestamp'], float)
+        df = pd.DataFrame(
+            {
+                "A": [1, 2, 3, 4, 3, 2, 2, 1],
+                "B": [7, 8, 9, 1, 2, 3, 5, 6],
+                "C": [9, 7, 3, 1, 8, 6, 2, 1],
+            }
+        )
+        transformed_df, fig = task_func(df)
+        self.assertEqual(transformed_df.shape, df.shape)
     def test_case_2(self):
-        # Testing with an empty dictionary
-        result = task_func({})
-        # The result should have 2 keys now: a, and timestamp
-        self.assertIn('a', result)
-        self.assertIn('timestamp', result)
+        df = pd.DataFrame({"A": [1, 1, 1], "B": [3, 3, 3], "C": [4, 4, 4]})
+        transformed_df, fig = task_func(df)
+        self.assertEqual(transformed_df.shape, df.shape)
+        self.assertEqual(len(fig.axes[0].lines), 0)
+        pd.testing.assert_frame_equal(transformed_df, df)
     def test_case_3(self):
-        # Testing with a dictionary having multiple key-value pairs
-        result = task_func({'first': '1', 'second': '2'})
-        # The result should have 4 keys now: first, second, a, and timestamp
-        self.assertIn('first', result)
-        self.assertIn('second', result)
-        self.assertIn('a', result)
-        self.assertIn('timestamp', result)
-        # The values should be hashed
-        self.assertNotEqual(result['first'], '1')
-        self.assertNotEqual(result['second'], '2')
+        df = pd.DataFrame(
+            {
+                "A": [1, 7, 5, 4],
+                "B": [3, 11, 1, 29],
+                "C": [4, 9, 8, 4],
+                "D": [16, 12, 20, 8],
+            }
+        )
+        transformed_df, fig = task_func(df)
+        self.assertEqual(transformed_df.shape, df.shape)
+        self.assertEqual(len(fig.axes[0].lines), 3)
     def test_case_4(self):
-        # Testing with a dictionary having non-string values
-        result = task_func({'number': 123, 'float': 45.67}, seed=11)
-        # The result should have 4 keys now: number, float, a, and timestamp
-        self.assertIn('number', result)
-        self.assertIn('float', result)
-        self.assertIn('a', result)
-        self.assertIn('timestamp', result)
-        # The values should be hashed
-        self.assertNotEqual(result['number'], '123')
-        self.assertNotEqual(result['float'], '45.67')
-        self.assertEqual(result['number'], '99a44a377de81b704fcc13054924e260927064689112828e9385597a93d65f76')
-        self.assertEqual(result['float'], '69e1ba5bed469d999e8d79b4ddbd5a96671502264c0bb0b005ded4e4d5057f16')
-        self.assertEqual(result['a'], 'c2189c194ccc63dc89a683f1b0e9682a423681074b4a69832de82ed4eaaa2ac7')
-        self.assertIsInstance(result['timestamp'], float)
+        df = pd.DataFrame(
+            {
+                "E": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                "F": [11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            }
+        )
+        transformed_df, fig = task_func(df)
+        self.assertEqual(transformed_df.shape, df.shape)
+        self.assertEqual(len(fig.axes[0].lines), 1)
     def test_case_5(self):
-        # Testing with a dictionary having special characters in values
-        result = task_func({'special': '!@#$%^'})
-        # The result should have 3 keys now: special, a, and timestamp
-        self.assertIn('special', result)
-        self.assertIn('a', result)
-        self.assertIn('timestamp', result)
-        # The values should be hashed
-        self.assertNotEqual(result['special'], '!@#$%^')
+        df = pd.DataFrame(
+            {
+                "A": [0, 0, 0, 0],
+            }
+        )
+        with self.assertRaises(ValueError):
+            transformed_df, _ = task_func(df)
+    def test_case_6(self):
+        df = pd.DataFrame(
+            {
+                "A": [1, 2, 3, -4],
+            }
+        )
+        with self.assertRaises(ValueError):
+            transformed_df, _ = task_func(df)

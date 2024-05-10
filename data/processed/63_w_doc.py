@@ -1,60 +1,90 @@
-import re
-from collections import Counter
-from nltk.corpus import stopwords
+import random
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-
-def task_func(text: str) -> dict:
+def task_func(result, colors=['b', 'g', 'r', 'c', 'm', 'y', 'k']):
     """
-    Count the number of non-stop words in a given text.
-    
+    Draws a histogram of the "from_user" values in the provided result. The color of the histogram bars is selected at random from the provided colors list.
+
     Parameters:
-    - text (str): The input text for word counting.
-    
+    result (list): A list of dictionaries containing the key "from_user".
+    colors (list, optional): A list of colors to choose from for the histogram bars. Defaults is ['b', 'g', 'r', 'c', 'm', 'y', 'k'].
+
     Returns:
-    dict: A dictionary with the words (as keys) and their counts (as values).
-    
+    None: The function displays the histogram and does not return any value.
+
     Requirements:
-    - re
-    - collections.Counter
-    
+    - random
+    - matplotlib
+    - seaborn
+
     Example:
-    >>> count = task_func("This is a sample text. Some words are repeated.")
-    >>> print(count)
-    {'sample': 1, 'text': 1, 'words': 1, 'repeated': 1}
+    >>> result = [{"from_user": 0}, {"from_user": 0}, {"from_user": 1}]
+    >>> task_func(result)
     """
-    words = re.findall(r'\b\w+\b', text)
-    non_stopwords = [word for word in words if word.lower() not in set(stopwords.words('english'))]
-    count = dict(Counter(non_stopwords))
-    return count
+    from_user_values = [d['from_user'] for d in result if 'from_user' in d]
+    color = random.choice(colors)
+    plt.figure()
+    sns.histplot(from_user_values, color=color)
+    plt.show()
 
 import unittest
-import doctest
+from unittest.mock import patch
 class TestCases(unittest.TestCase):
+    """Test cases for the task_func function."""
     def test_case_1(self):
-        # Simple sentence with some stopwords
-        input_text = "This is a simple test."
-        expected_output = {'simple': 1, 'test': 1}
-        self.assertDictEqual(task_func(input_text), expected_output)
+        random.seed(42)
+        result = [
+            {"from_user": 0}, 
+            {"from_user": 0}, 
+            {"from_user": 1}
+        ]
+        with patch("matplotlib.pyplot.show") as mocked_show:
+            task_func(result)
+            mocked_show.assert_called_once()
     def test_case_2(self):
-        # Longer sentence with repeated words
-        input_text = "Some words are repeated more than once. Repeated words are common."
-        expected_output = {'words': 2, 'repeated': 1, 'Repeated': 1, 'common': 1}
-        self.assertDictEqual(task_func(input_text), expected_output)
-        
+        random.seed(42)
+        result = []
+        with patch("matplotlib.pyplot.show") as mocked_show:
+            task_func(result)
+            mocked_show.assert_called_once()
     def test_case_3(self):
-        # Text with no stopwords
-        input_text = "Python programming language."
-        expected_output = {'Python': 1, 'programming': 1, 'language': 1}
-        self.assertDictEqual(task_func(input_text), expected_output)
-        
+        random.seed(42)
+        result = [
+            {"hello": 0}, 
+            {"world": 1}
+        ]
+        with patch("matplotlib.pyplot.show") as mocked_show:
+            task_func(result)
+            mocked_show.assert_called_once()
     def test_case_4(self):
-        # Text with all stopwords
-        input_text = "This is an and the with"
-        expected_output = {}
-        self.assertDictEqual(task_func(input_text), expected_output)
-        
+        random.seed(42)
+        result = [
+            {"from_user": 0}, 
+            {"from_user": 1}, 
+            {"from_user": 2}
+        ]
+        colors = ["orange", "purple"]
+        with patch("matplotlib.pyplot.show") as mocked_show, patch("random.choice", return_value="orange") as mocked_choice:
+            task_func(result, colors)
+            mocked_choice.assert_called_with(colors)
+            mocked_show.assert_called_once()
     def test_case_5(self):
-        # Empty text
-        input_text = ""
-        expected_output = {}
-        self.assertDictEqual(task_func(input_text), expected_output)
+        random.seed(42)
+        result = [
+            {
+                "hello": 0,
+                "from_user": 1,
+            },
+            {
+                "world": 1,
+                "from_user": 1
+            },
+            {
+                "love": 1,
+                "from_user": 1
+            }
+        ]
+        with patch("matplotlib.pyplot.show") as mocked_show:
+            task_func(result)
+            mocked_show.assert_called_once()

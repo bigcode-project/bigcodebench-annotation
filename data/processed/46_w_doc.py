@@ -1,81 +1,111 @@
-import itertools
-import statistics
+import pandas as pd
+import numpy as np
+from sklearn.decomposition import PCA
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-
-# Refined function after importing required libraries
-def task_func(elements, subset_size):
+def task_func(df: pd.DataFrame):
     """
-    Generate all subsets of a given size from a tuple and calculate the mean, median, and mode of the sums of the subsets.
+    Perform PCA on a DataFrame (excluding non-numeric columns) and draw a scatter plot of the first two main components. The principal columns should be name 'Component 1' and 'Component 2'.
+    Missing values are replaced by column's average.
 
-    Args:
-    - elements (tuple): A tuple of numbers from which subsets will be generated.
-    - subset_size (int): The size of the subsets to be generated.
+    Parameters:
+    df (DataFrame): The pandas DataFrame.
 
     Returns:
-    dict: A dictionary with the mean, median, and mode of the sums of the subsets.
+    DataFrame: A pandas DataFrame with the first two principal components. The columns should be 'principal component 1' and 'principal component 2'.
+    Axes: A matplotlib Axes object representing the scatter plot. The xlabel should be 'principal component' and the ylabel 'principal component 2'.
 
     Requirements:
-    - itertools
-    - statistics
-    
+    - pandas
+    - numpy
+    - sklearn.decomposition.PCA
+    - seaborn
+    - matplotlib
+
     Example:
-    >>> task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
-    {'mean': 11, 'median': 11, 'mode': 11}
+    >>> df = pd.DataFrame([[1,2,3],[4,5,6],[7.0,np.nan,9.0]], columns=["c1","c2","c3"])
+    >>> principalDf, ax = task_func(df)
+    >>> print(principalDf)
+       Component 1  Component 2
+    0     4.450915    -0.662840
+    1    -0.286236     1.472436
+    2    -4.164679    -0.809596
     """
-    combinations = list(itertools.combinations(elements, subset_size))
-    sums = [sum(combination) for combination in combinations]
-    return {
-        'mean': statistics.mean(sums),
-        'median': statistics.median(sums),
-        'mode': statistics.mode(sums)
-    }
+    df_numeric = df.select_dtypes(include=[np.number])
+    df_numeric = df_numeric.fillna(df_numeric.mean(axis=0))
+    pca = PCA(n_components=2)
+    principalComponents = pca.fit_transform(df_numeric)
+    principalDf = pd.DataFrame(
+        data=principalComponents,
+        columns=["Component 1", "Component 2"],
+    )
+    ax = sns.scatterplot(data=principalDf, x="Component 1", y="Component 2")
+    plt.show()
+    return principalDf, ax
 
 import unittest
-from faker import Faker
-import itertools
-import statistics
-import doctest
 class TestCases(unittest.TestCase):
-    
+    """Test cases for the task_func function."""
     def test_case_1(self):
-        # Basic test case
-        elements = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-        subset_size = 2
-        result = task_func(elements, subset_size)
-        self.assertEqual(result, {'mean': 11, 'median': 11, 'mode': 11})
-        
+        df = pd.DataFrame(
+            [[1, 2, 3], [4, 5, 6], [7.0, np.nan, 9.0]], columns=["c1", "c2", "c3"]
+        )
+        principalDf, ax = task_func(df)
+        self.assertTrue("Component 1" in principalDf.columns)
+        self.assertTrue("Component 2" in principalDf.columns)
+        self.assertEqual(principalDf.shape, (3, 2))
+        self.assertEqual(ax.get_xlabel(), "Component 1")
+        self.assertEqual(ax.get_ylabel(), "Component 2")
     def test_case_2(self):
-        # Testing with a tuple containing repeated elements
-        elements = (1, 2, 2, 3, 4)
-        subset_size = 2
-        result = task_func(elements, subset_size)
-        self.assertEqual(result, {'mean': 4.8, 'median': 5.0, 'mode': 5})
-        
+        df = pd.DataFrame(
+            {
+                "A": [1, 2.5, 3, 4.5, 5],
+                "B": [5, 4.5, np.nan, 2, 1.5],
+                "C": [2.5, 3, 4, 5.5, 6],
+                "categoral_1": ["A", "B", "B", "B", "A"],
+                "categoral_2": ["0", "1", "1", "0", "1"],
+            }
+        )
+        principalDf, ax = task_func(df)
+        self.assertTrue("Component 1" in principalDf.columns)
+        self.assertTrue("Component 2" in principalDf.columns)
+        self.assertEqual(principalDf.shape, (5, 2))
+        self.assertEqual(ax.get_xlabel(), "Component 1")
+        self.assertEqual(ax.get_ylabel(), "Component 2")
     def test_case_3(self):
-        # Testing with a larger subset size
-        elements = (1, 2, 3, 4, 5)
-        subset_size = 4
-        result = task_func(elements, subset_size)
-        self.assertEqual(result, {'mean': 12, 'median': 12, 'mode': 10})
-        
+        df = pd.DataFrame(
+            {
+                "col1": [None, 17, 11, None],
+                "col2": [0, 4, 15, 27],
+                "col3": [7, 9, 3, 8],
+            }
+        )
+        principalDf, ax = task_func(df)
+        self.assertTrue("Component 1" in principalDf.columns)
+        self.assertTrue("Component 2" in principalDf.columns)
+        self.assertEqual(principalDf.shape, (4, 2))
+        self.assertEqual(ax.get_xlabel(), "Component 1")
+        self.assertEqual(ax.get_ylabel(), "Component 2")
     def test_case_4(self):
-        # Testing with negative numbers in the tuple
-        elements = (-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5)
-        subset_size = 3
-        result = task_func(elements, subset_size)
-        self.assertEqual(result, {'mean': 0.0, 'median': 0.0, 'mode': 0})
-        
+        df = pd.DataFrame(
+            {
+                "c1": [np.nan] * 9 + [10],
+                "c2": [np.nan] * 8 + [20, 30],
+                "c3": [np.nan] * 7 + [40, 50, 60],
+            }
+        )
+        principalDf, ax = task_func(df)
+        self.assertTrue("Component 1" in principalDf.columns)
+        self.assertTrue("Component 2" in principalDf.columns)
+        self.assertEqual(principalDf.shape, (10, 2))
+        self.assertEqual(ax.get_xlabel(), "Component 1")
+        self.assertEqual(ax.get_ylabel(), "Component 2")
     def test_case_5(self):
-        # Using the Faker library to generate a random test case
-        fake = Faker()
-        elements = tuple(fake.random_elements(elements=range(1, 101), length=10, unique=True))
-        subset_size = fake.random_int(min=2, max=5)
-        combinations = list(itertools.combinations(elements, subset_size))
-        sums = [sum(combination) for combination in combinations]
-        expected_result = {
-            'mean': statistics.mean(sums),
-            'median': statistics.median(sums),
-            'mode': statistics.mode(sums)
-        }
-        result = task_func(elements, subset_size)
-        self.assertEqual(result, expected_result)
+        df = pd.DataFrame({"c1": [1] * 10, "c2": [2] * 10, "c3": [3] * 10})
+        principalDf, ax = task_func(df)
+        self.assertTrue("Component 1" in principalDf.columns)
+        self.assertTrue("Component 2" in principalDf.columns)
+        self.assertEqual(principalDf.shape, (10, 2))
+        self.assertEqual(ax.get_xlabel(), "Component 1")
+        self.assertEqual(ax.get_ylabel(), "Component 2")

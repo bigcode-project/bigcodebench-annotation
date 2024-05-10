@@ -1,70 +1,107 @@
-import collections
+import nltk
+from string import punctuation
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+# Constants
+PUNCTUATION = set(punctuation)
 
-def task_func(dictionary, new_key, new_value):
+
+def task_func(text):
     """
-    Add a new key-value pair to the dictionary and plot the distribution of its values.
+    Draw a bar chart of the frequency of words in a text beginning with the "$" character. Words that start with the '$' character but consist only of punctuation (e.g., '$!$' and '$.$') are not included in the frequency count.
+    - If there is no word respecting the above conditions, the plot should be None.
+    - The barplot x words on the x-axis and frequencies on the y-axis.
 
     Parameters:
-    dictionary (dict): The dictionary to be updated.
-    new_key (str): The new key to be added to the dictionary.
-    new_value (str): The corresponding value for the new key.
-
+        - text (str): The input text.
     Returns:
-    dict: The updated dictionary.
-    matplotlib.axes.Axes: The axes object of the plotted bar graph.
+        - matplotlib.axes._axes.Axes: The plot showing the frequency of words beginning with the '$' character.
 
     Requirements:
-    - collections
-    - numpy
-    - seaborn
-    - matplotlib
+        - nltk
+        - string
+        - seaborn
+        - matplotlib
 
     Example:
-    >>> updated_dict, plot_axes = task_func({'key1': 'value1', 'key2': 'value2'}, 'key3', 'value3')
-    >>> updated_dict
-    {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+    >>> text = "$child than resource indicate star $community station onto best green $exactly onto then age charge $friend than ready child really $let product coach decision professional $camera life off management factor $alone beat idea bit call $campaign fill stand Congress stuff $performance follow your resource road $data performance himself school here"
+    >>> ax = task_func(text)
+    >>> print(ax)
+    Axes(0.125,0.11;0.775x0.77)
     """
-    dictionary[new_key] = new_value
-    values_counts = collections.Counter(dictionary.values())
-    ax = sns.barplot(y=list(values_counts.keys()), x=list(values_counts.values()))
-    plt.title("Distribution of Dictionary Values")
-    plt.xlabel("Values")
-    plt.ylabel("Counts")
-    return dictionary, ax
+    words = text.split()
+    dollar_words = [
+        word
+        for word in words
+        if word.startswith("$")
+        and not all(c in PUNCTUATION for c in word)
+        and len(word) > 1
+    ]
+    freq = nltk.FreqDist(dollar_words)
+    if not freq:  # If frequency distribution is empty, return None
+        return None
+    plt.figure(figsize=(10, 5))
+    sns.barplot(x=freq.keys(), y=freq.values())
+    return plt.gca()
 
 import unittest
-import doctest
 class TestCases(unittest.TestCase):
+    """Test cases for the task_func function."""
+    @staticmethod
+    def is_bar(ax, expected_values, expected_categories):
+        extracted_values = [
+            bar.get_height() for bar in ax.patches
+        ]  # extract bar height
+        extracted_categories = [
+            tick.get_text() for tick in ax.get_xticklabels()
+        ]  # extract category label
+        for actual_value, expected_value in zip(extracted_values, expected_values):
+            assert (
+                actual_value == expected_value
+            ), f"Expected value '{expected_value}', but got '{actual_value}'"
+        for actual_category, expected_category in zip(
+            extracted_categories, expected_categories
+        ):
+            assert (
+                actual_category == expected_category
+            ), f"Expected category '{expected_category}', but got '{actual_category}'"
     def test_case_1(self):
-        dictionary = {'a': 'apple', 'b': 'banana'}
-        new_key = 'c'
-        new_value = 'cherry'
-        updated_dict, _ = task_func(dictionary, new_key, new_value)
-        self.assertEqual(updated_dict, {'a': 'apple', 'b': 'banana', 'c': 'cherry'})
+        # Randomly generated sentence with $ words
+        text = "This is the $first $first sentence."
+        plot = task_func(text)
+        self.assertIsInstance(plot, plt.Axes, "Return type should be a plot (Axes).")
+        self.is_bar(plot, expected_categories=["$first"], expected_values=[2.0])
     def test_case_2(self):
-        dictionary = {}
-        new_key = 'd'
-        new_value = 'date'
-        updated_dict, _ = task_func(dictionary, new_key, new_value)
-        self.assertEqual(updated_dict, {'d': 'date'})
+        # Another randomly generated sentence with $ words
+        text = "This $is $is $is the $second $sentence $sentence"
+        plot = task_func(text)
+        self.assertIsInstance(plot, plt.Axes, "Return type should be a plot (Axes).")
+        self.is_bar(
+            plot,
+            expected_categories=["$is", "$second", "$sentence"],
+            expected_values=[3.0, 1.0, 2.0],
+        )
     def test_case_3(self):
-        dictionary = {'a': 'apple', 'b': 'apple'}
-        new_key = 'c'
-        new_value = 'apple'
-        updated_dict, _ = task_func(dictionary, new_key, new_value)
-        self.assertEqual(updated_dict, {'a': 'apple', 'b': 'apple', 'c': 'apple'})
+        # Sentence without any $ words
+        text = "This is the third sentence."
+        plot = task_func(text)
+        self.assertIsNone(plot, "The plot should be None since there are no $ words.")
     def test_case_4(self):
-        dictionary = {'e': 'eggplant', 'f': 'fig', 'g': 'grape'}
-        new_key = 'h'
-        new_value = 'honeydew'
-        updated_dict, _ = task_func(dictionary, new_key, new_value)
-        self.assertEqual(updated_dict, {'e': 'eggplant', 'f': 'fig', 'g': 'grape', 'h': 'honeydew'})
+        # Sentence with all $ words being single characters or punctuation
+        text = "$ $! $@ $$"
+        plot = task_func(text)
+        self.assertIsNone(
+            plot,
+            "The plot should be None since all $ words are single characters or punctuation.",
+        )
     def test_case_5(self):
-        dictionary = {'i': 'ice cream'}
-        new_key = 'i'
-        new_value = 'icing'
-        updated_dict, _ = task_func(dictionary, new_key, new_value)
-        self.assertEqual(updated_dict, {'i': 'icing'})  # The value should be updated
+        # Mix of valid $ words and punctuation-only $ words with some repeated words
+        text = "$apple $apple $banana $!$ $@ fruit $cherry"
+        plot = task_func(text)
+        self.assertIsInstance(plot, plt.Axes, "Return type should be a plot (Axes).")
+        self.is_bar(
+            plot,
+            expected_categories=["$apple", "$banana", "$cherry"],
+            expected_values=[2.0, 1.0, 1.0],
+        )

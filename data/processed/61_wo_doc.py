@@ -1,95 +1,116 @@
-import csv
-import re
-from collections import Counter
+import json
+import pandas as pd
 
 
-def task_func(file_path, regex_pattern=r'\(.+?\)|\w+|[\W_]+'):
+def task_func(result, csv_file_path="test.csv", json_file_path="test.json"):
     """
-    Counts matches from a CSV file based on a given regex pattern. 
-    By default, it captures content between parentheses as a single match and 
-    any word or sequence of non-alphanumeric characters outside as matches in a string.
-    
+    Save the list of dictionaries provided in the 'result' parameter to a CSV file (without index) and a JSON file.
+
     Parameters:
-    - file_path (str): The path to the CSV file.
-    - regex_pattern (str, optional): The regex pattern to find matches. Defaults to capturing content between parentheses or individual words or sequences of non-alphanumeric characters.
-    
+    - result (list): A list of dictionaries.
+    - csv_file_path (str): A path to a CSV file.
+    - json_file_path (str): A path to a JSON file.
+
     Returns:
-    dict: A dictionary with counts of matches.
+    None
 
     Requirements:
-    - re
-    - csv
-    - collections.Counter
-    
+    - pandas
+    - json
+
     Example:
-    >>> import tempfile
-    >>> temp_dir = tempfile.gettempdir()
-    >>> file_path = os.path.join(temp_dir, 'data.csv')
-    >>> with open(file_path, 'w', newline='') as file:
-    ...     writer = csv.writer(file)
-    ...     _ = writer.writerow(['a'])
-    ...     _ = writer.writerow(['b'])
-    ...     _ = writer.writerow(['(abc)'])
-    >>> counts = task_func(file_path)
-    >>> print(counts)
-    {'a': 1, ' ': 1, 'b': 1, ' (': 1, 'abc': 1, ')': 1}
+    >>> result = [{"hi": 7, "bye": 4, "from_user": 0}, {1: 2, 3: 4, 5: 6}]
+    >>> task_func(result, 'test.csv', 'test.json')
     """
-    with open(file_path, 'r') as file:
-        reader = csv.reader(file)
-        text = ' '.join(row[0] for row in reader)
-        matches = re.findall(regex_pattern, text)
-    counts = Counter(matches)
-    return dict(counts)
+    df = pd.DataFrame(result)
+    df.to_csv(csv_file_path, index=False)
+    with open(json_file_path, 'w') as f:
+        json.dump(result, f, indent=4)
+    return None
 
 import unittest
 import os
-import shutil
-import doctest
-import tempfile
-from collections import Counter
 class TestCases(unittest.TestCase):
-    base_tmp_dir = tempfile.gettempdir()
-    test_data_dir = f"{base_tmp_dir}/test"
+    """Test cases for the task_func function."""
     def setUp(self):
-        self.csv_file_path = 'data.csv'
-        # Create the directory if it doesn't exist
-        if not os.path.exists(self.test_data_dir):
-            os.makedirs(self.test_data_dir)
-        test_files = {
-            "test1.csv": ["a", "b", "(abc)", "a", "a", "(def)", "b", "(ghi)", "a", "c", "(abc)"],
-            "test2.csv": ["x", "y", "(xyz)", "x", "(uvw)", "z", "y", "(rst)", "(xyz)"],
-            "test3.csv": ["1", "2", "(345)", "(678)", "2", "3", "(901)", "4", "(234)"],
-            "test4.csv": ["@", "#", "($%^)", "&", "*", "(*)_+", "@", "(#&)"],
-            "test5.csv": ["apple", "banana", "(cherry)", "date", "(fig)", "grape", "(kiwi)", "lemon", "(mango)"]
-        }
-        self.file_paths = {}
-        # Write test data to CSV files
-        for file_name, data in test_files.items():
-            file_path = os.path.join(self.test_data_dir, file_name)
-            with open(file_path, "w", newline='') as file:
-                writer = csv.writer(file)
-                for item in data:
-                    writer.writerow([item])
-            self.file_paths[file_name] = file_path
+        self.test_dir = "data/task_func"
+        os.makedirs(self.test_dir, exist_ok=True)
+        self.f_1 = os.path.join(self.test_dir, "csv_1.csv")
+        self.f_2 = os.path.join(self.test_dir, "csv_2.csv")
+        self.f_3 = os.path.join(self.test_dir, "csv_3.csv")
+        self.f_4 = os.path.join(self.test_dir, "csv_4.csv")
+        self.f_5 = os.path.join(self.test_dir, "csv_5.csv")
+        self.j_1 = os.path.join(self.test_dir, "json_1.json")
+        self.j_2 = os.path.join(self.test_dir, "json_2.json")
+        self.j_3 = os.path.join(self.test_dir, "json_3.json")
+        self.j_4 = os.path.join(self.test_dir, "json_4.json")
+        self.j_5 = os.path.join(self.test_dir, "json_5.json")
     def tearDown(self):
-        shutil.rmtree(self.test_data_dir)
+        import shutil
+        if os.path.exists(self.test_dir):
+            shutil.rmtree(self.test_dir)
     def test_case_1(self):
-        result = task_func(self.file_paths["test1.csv"])
-        expected = {'a': 4, ' ': 3, 'b': 2, ' (': 4, 'abc': 2, ') ': 3, 'def': 1, 'ghi': 1, 'c': 1, ')': 1}
-        self.assertEqual(result, expected, f"Expected {expected} but got {result}")
+        # Test with a list of dictionaries with string keys and integer values
+        result = [
+            {"hi": 7, "bye": 4, "from_user": 0}
+        ]
+        task_func(result, self.f_1, self.j_1)
+        self.assertTrue(os.path.exists(self.f_1))
+        self.assertTrue(os.path.exists(self.j_1))
+        with open(self.j_1, 'r') as f:
+            loaded_json = json.load(f)
+        # Adjusting the expected result for JSON's string keys
+        expected_result = [{"hi": 7, "bye": 4, "from_user": 0}]
+        self.assertEqual(loaded_json, expected_result)
     def test_case_2(self):
-        result = task_func(self.file_paths["test2.csv"])
-        expected = {'x': 2, ' ': 2, 'y': 2, ' (': 3, 'xyz': 2, ') ': 2, 'uvw': 1, 'z': 1, 'rst': 1, ') (': 1, ')': 1}
-        self.assertEqual(result, expected, f"Expected {expected} but got {result}")
+        # Test with a list of dictionaries with integer keys and values
+        result = [{1: 2, 3: 4, 5: 6}]
+        task_func(result, self.f_2, self.j_2)
+        self.assertTrue(os.path.exists(self.f_2))
+        self.assertTrue(os.path.exists(self.j_2))
+        with open(self.j_2, 'r') as f:
+            loaded_json = json.load(f)
+        # Adjusting the expected result for JSON's string keys
+        expected_result = [{"1": 2, "3": 4, "5": 6}]
+        self.assertEqual(loaded_json, expected_result)
     def test_case_3(self):
-        result = task_func(self.file_paths["test3.csv"])
-        expected = {'1': 1, ' ': 2, '2': 2, ' (': 3, '345': 1, ') (': 1, '678': 1, ') ': 2, '3': 1, '901': 1, '4': 1, '234': 1, ')': 1}
-        self.assertEqual(result, expected, f"Expected {expected} but got {result}")
+        # Test with an empty list
+        result = []
+        task_func(result, self.f_3, self.j_3)
+        self.assertTrue(os.path.exists(self.f_3))
+        self.assertTrue(os.path.exists(self.j_3))
+        with open(self.j_3, 'r') as f:
+            loaded_json = json.load(f)
+        # Adjusting the expected result for JSON's string keys
+        expected_result = []
+        self.assertEqual(loaded_json, expected_result)
     def test_case_4(self):
-        result = task_func(self.file_paths["test4.csv"])
-        expected = {'@ # ($%^) & * (*)_+ @ (#&)': 1}
-        self.assertEqual(result, expected, f"Expected {expected} but got {result}")
+        # Test with a list of dictionaries with string keys and integer values
+        result = [
+            {"hi": 7, "bye": 4, "from_user": 3}
+        ]
+        task_func(result, self.f_4, self.j_4)
+        self.assertTrue(os.path.exists(self.f_4))
+        self.assertTrue(os.path.exists(self.j_4))
+        with open(self.j_4, 'r') as f:
+            loaded_json = json.load(f)
+        # Adjusting the expected result for JSON's string keys
+        expected_result = [{"hi": 7, "bye": 4, "from_user": 3}]
+        self.assertEqual(loaded_json, expected_result)
     def test_case_5(self):
-        result = task_func(self.file_paths["test5.csv"])
-        expected = {'apple': 1, ' ': 1, 'banana': 1, ' (': 4, 'cherry': 1, ') ': 3, 'date': 1, 'fig': 1, 'grape': 1, 'kiwi': 1, 'lemon': 1, 'mango': 1, ')': 1}
-        self.assertEqual(result, expected, f"Expected {expected} but got {result}")
+        # Test with a list of dictionaries with string keys and integer values
+        result = [
+            {"hi": 7, "bye": 4, "from_user": 11}
+        ]
+        task_func(result, self.f_5, self.j_5)
+        self.assertTrue(os.path.exists(self.f_5))
+        df = pd.read_csv(self.f_5)
+        self.assertEqual(df.loc[0, "hi"], 7)
+        self.assertEqual(df.loc[0, "bye"], 4)
+        self.assertEqual(df.loc[0, "from_user"], 11)
+        self.assertTrue(os.path.exists(self.j_5))
+        with open(self.j_5, 'r') as f:
+            loaded_json = json.load(f)
+        # Adjusting the expected result for JSON's string keys
+        expected_result = [{"hi": 7, "bye": 4, "from_user": 11}]
+        self.assertEqual(loaded_json, expected_result)

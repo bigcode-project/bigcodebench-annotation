@@ -1,72 +1,152 @@
-import numpy as np
-from sympy import symbols, solve
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+# Constants
+FEATURE_NAMES = ["Feature 1", "Feature 2", "Feature 3", "Feature 4", "Feature 5"]
 
 
-def task_func(precision=2, seed=0):
+def task_func(data_matrix):
     """
-    Solve a quadratic equation in the form of ax ^ 2 + bx + c = 0, where a, b, and c randomly generated numbers are between -10 and 10. The solutions are complex numbers rounded to the specified accuracy.
+    Standardize a 2D data matrix, calculate the mean value of each row and then visualize the distribution of the mean values with an histogram.
+    - Each row of the matrix represent a data point, its length is the same as that of FEATURE_NAMES.
+    - The plot title should be 'Distribution of Means'.
 
     Parameters:
-    precision (int): The number of decimal places to which to round the solutions.
-    seed (int, Optional): The seed for the random number generator.
+    data_matrix (numpy.array): The 2D data matrix.
 
     Returns:
-    tuple: A tuple of two solutions formatted as complex numbers (rounded to the specified precision).
+    tuple: A tuple containing:
+        - pandas.DataFrame: A DataFrame containing the standardized data and the mean of each row.
+                            Its column names should be FEATURE_NAMES and 'Mean'.
+        - matplotlib.axes.Axes: The histogram plot of the distribution of means.
 
     Requirements:
-    - numpy
-    - math
-    - sympy
+    - pandas
+    - sklearn.preprocessing.StandardScaler
+    - matplotlib.pyplot
 
     Example:
-    >>> result = task_func()
-    >>> len(result)
-    2
-    >>> result
-    ((-3.86+0j), (-0.54+0j))
+    >>> import numpy as np
+    >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
+    >>> df, ax = task_func(data)
+    >>> print(df)
+       Feature 1  Feature 2  Feature 3  Feature 4  Feature 5  Mean
+    0        1.0        1.0       -1.0       -1.0        1.0   0.2
+    1       -1.0       -1.0        1.0        1.0       -1.0  -0.2
     """
-    np.random.seed(seed)
-    a = np.random.uniform(-10, 10)
-    b = np.random.uniform(-10, 10)
-    c = np.random.uniform(-10, 10)
-    x = symbols('x')
-    equation = a * x**2 + b * x + c
-    solutions = solve(equation, x)
-    solutions = [complex(round(complex(solution).real, precision), round(complex(solution).imag, precision)) for solution in solutions]
-    return tuple(solutions)
+    scaler = StandardScaler()
+    standardized_data = scaler.fit_transform(data_matrix)
+    df = pd.DataFrame(standardized_data, columns=FEATURE_NAMES)
+    df["Mean"] = df.mean(axis=1)
+    plt.figure(figsize=(10, 5))
+    ax = df["Mean"].plot(kind="hist", title="Distribution of Means")
+    return df, ax
 
 import unittest
-import doctest
+import numpy as np
 class TestCases(unittest.TestCase):
+    """Test cases for the task_func function."""
     def test_case_1(self):
-        result = task_func(seed=1789)
-        self.assertIsInstance(result, tuple, "The result should be a tuple.")
-        self.assertEqual(len(result), 2, "The tuple should have two values.")
-        for value in result:
-            self.assertEqual(value.real, round(value.real, 2), "The value should be rounded to 2 decimal places.")
-            self.assertEqual(value.imag, round(value.imag, 2), "The value should be rounded to 2 decimal places.")
-        # Test the output
-        self.assertEqual(result, ((-5.15+0j), (0.41+0j)))
-        
+        data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
+        df, ax = task_func(data)
+        # Check the dataframe structure and values
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertListEqual(
+            list(df.columns),
+            ["Feature 1", "Feature 2", "Feature 3", "Feature 4", "Feature 5", "Mean"],
+        )
+        self.assertAlmostEqual(df["Mean"].iloc[0], 0.2)
+        self.assertAlmostEqual(df["Mean"].iloc[1], -0.2)
+        # Check the histogram plot
+        self.assertEqual(ax.get_title(), "Distribution of Means")
+        self.assertIsNotNone(ax.patches)  # Check if histogram bars exist
     def test_case_2(self):
-        result = task_func(precision=3)
-        for value in result:
-            self.assertEqual(value.real, round(value.real, 3), "The value should be rounded to 3 decimal places.")
-            self.assertEqual(value.imag, round(value.imag, 3), "The value should be rounded to 3 decimal places.")
+        data = np.array([[1, 2, 3, 4, 5], [5, 4, 3, 2, 1]])
+        df, ax = task_func(data)
+        # Check the dataframe structure and values
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertListEqual(
+            list(df.columns),
+            ["Feature 1", "Feature 2", "Feature 3", "Feature 4", "Feature 5", "Mean"],
+        )
+        self.assertAlmostEqual(df["Mean"].iloc[0], 0.0)
+        self.assertAlmostEqual(df["Mean"].iloc[1], 0.0)
+        # Check the histogram plot
+        self.assertEqual(ax.get_title(), "Distribution of Means")
+        self.assertIsNotNone(ax.patches)  # Check if histogram bars exist
     def test_case_3(self):
-        result = task_func(precision=0)
-        for value in result:
-            self.assertEqual(value.real, round(value.real), "The value should be an integer.")
-            self.assertEqual(value.imag, round(value.imag), "The value should be an integer.")
+        data = np.array([[1, 7, 9, 4, 2], [8, 3, 5, 6, 10]])
+        df, ax = task_func(data)
+        # Check the dataframe structure and values
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertListEqual(
+            list(df.columns),
+            ["Feature 1", "Feature 2", "Feature 3", "Feature 4", "Feature 5", "Mean"],
+        )
+        self.assertAlmostEqual(df["Mean"].iloc[0], -0.2)
+        self.assertAlmostEqual(df["Mean"].iloc[1], 0.2)
+        # Check the histogram plot
+        self.assertEqual(ax.get_title(), "Distribution of Means")
+        self.assertIsNotNone(ax.patches)  # Check if histogram bars exist
     def test_case_4(self):
-        result = task_func(precision=4)
-        for value in result:
-            self.assertEqual(value.real, round(value.real, 4), "The value should be rounded to 4 decimal places.")
-            self.assertEqual(value.imag, round(value.imag, 4), "The value should be rounded to 4 decimal places.")
+        data = np.array(
+            [
+                [16, 3, 1, 9, 20],
+                [2, 12, 13, 8, 17],
+                [2, 4, 5, 11, 19],
+                [15, 7, 6, 14, 18],
+            ]
+        )
+        df, ax = task_func(data)
+        # Check the dataframe structure and values
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertListEqual(
+            list(df.columns),
+            ["Feature 1", "Feature 2", "Feature 3", "Feature 4", "Feature 5", "Mean"],
+        )
+        # Check the histogram plot
+        self.assertEqual(ax.get_title(), "Distribution of Means")
+        self.assertIsNotNone(ax.patches)  # Check if histogram bars exist
+        # Expected output
+        FEATURE_NAMES = [
+            "Feature 1",
+            "Feature 2",
+            "Feature 3",
+            "Feature 4",
+            "Feature 5",
+        ]
+        scaler = StandardScaler()
+        expected_data = scaler.fit_transform(data)
+        np.testing.assert_array_equal(df.loc[:, FEATURE_NAMES].values, expected_data)
     def test_case_5(self):
-        result = task_func(precision=5, seed=1234)
-        for value in result:
-            self.assertEqual(value.real, round(value.real, 5), "The value should be rounded to 5 decimal places.")
-            self.assertEqual(value.imag, round(value.imag, 5), "The value should be rounded to 5 decimal places.")
-        # Test the output
-        self.assertEqual(result, ((0.19792-0.40336j), (0.19792+0.40336j)))
+        data = np.array(
+            [
+                [1, 2, 3, 4, 5],
+                [6, 7, 8, 9, 10],
+                [11, 12, 13, 14, 15],
+                [16, 17, 18, 19, 20],
+                [21, 22, 23, 24, 25],
+            ]
+        )
+        df, ax = task_func(data)
+        # Check the dataframe structure and values
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertListEqual(
+            list(df.columns),
+            ["Feature 1", "Feature 2", "Feature 3", "Feature 4", "Feature 5", "Mean"],
+        )
+        # Check the histogram plot
+        self.assertEqual(ax.get_title(), "Distribution of Means")
+        self.assertIsNotNone(ax.patches)  # Check if histogram bars exist
+        # Expected output
+        FEATURE_NAMES = [
+            "Feature 1",
+            "Feature 2",
+            "Feature 3",
+            "Feature 4",
+            "Feature 5",
+        ]
+        scaler = StandardScaler()
+        expected_data = scaler.fit_transform(data)
+        np.testing.assert_array_equal(df.loc[:, FEATURE_NAMES].values, expected_data)

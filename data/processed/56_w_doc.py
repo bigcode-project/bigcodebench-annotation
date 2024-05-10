@@ -1,84 +1,74 @@
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
 import re
+import pandas as pd
+
+STOPWORDS = ["Those", "are", "the", "words", "to", "ignore"]
 
 
-def task_func(example_str):
+def task_func(text):
     """
-    Extract all texts not enclosed in square brackets into a string and calculate the TF-IDF values
-    which are returned as a dictionary.
+    Given a text as input, the function should split it into multiple sentences and build a dictionary where each key is associated with a sentence and the corresponding value is the number of words in the sentence. The function returns a pandas Series built from the dictionary.
+    - The keys of the dictionary (which correspond to the Index of the pandas Series) should be named "Sentence 1", "Sentence 2" etc.
+    - When counting the words in a sentence, do not consider those included in the constant STOPWORDS.
+    - Do not consider empty sentences.
 
     Parameters:
-    example_str (str): The input string.
+    text (str): The text to analyze.
 
     Returns:
-    dict: A dictionary with words as keys and TF-IDF scores as values.
+    pandas.core.series.Series: A pandas Series each sentence and its number of words that are not in STOPWORDS.
 
     Requirements:
-    - sklearn.feature_extraction.text.TfidfVectorizer
-    - numpy
-    - re
+    - pandas
+    - regex
 
     Example:
-    >>> tfidf_scores = task_func("Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003] Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]")
-    >>> print(tfidf_scores)
-    {'dog': 0.3779644730092272, 'josie': 0.3779644730092272, 'mugsy': 0.3779644730092272, 'smith': 0.7559289460184544}
+    >>> text = "This is a sample sentence. This sentence contains sample words."
+    >>> df = task_func("I am good at programming. I learned it in college.")
+    >>> print(df)
+    Sentence 1    5
+    Sentence 2    5
+    dtype: int64
     """
-    pattern = r'\[.*?\]'
-    text = re.sub(pattern, '', example_str)
-    if not text.strip():
-        return {}
-    tfidf_vectorizer = TfidfVectorizer()
-    tfidf_matrix = tfidf_vectorizer.fit_transform([text])
-    feature_names = tfidf_vectorizer.get_feature_names_out()
-    tfidf_scores = dict(zip(feature_names, np.squeeze(tfidf_matrix.toarray())))
-    return tfidf_scores
+    sentences = re.split(r"\.\s*", text)
+    sentence_counts = {}
+    for i, sentence in enumerate(sentences):
+        if sentence.strip() == "":
+            continue
+        words = re.split(r"\s+", sentence.lower())
+        words = [word for word in words if word not in STOPWORDS]
+        sentence_counts[f"Sentence {i+1}"] = len(words)
+    sentence_counts = pd.Series(sentence_counts)
+    return sentence_counts
 
 import unittest
-import doctest
 class TestCases(unittest.TestCase):
+    """Test cases for the task_func function."""
     def test_case_1(self):
-        input_str = "Adversarial ] input ][[][ i[s []] a [ problem ] in [ machine learning ]"
-        output = task_func(input_str)
-        expected_output = {
-            'adversarial': 0.5773502691896258, 
-            'in': 0.5773502691896258, 
-            'input': 0.5773502691896258
-        }
-        self.assertDictEqual(output, expected_output)
+        text = "This is a sample sentence. This sentence contains sample words."
+        expected_output = pd.Series({"Sentence 1": 5, "Sentence 2": 4})
+        result = task_func(text)
+        pd.testing.assert_series_equal(result, expected_output)
     def test_case_2(self):
-        input_str = "Alice [1234 Street, City, State] Bob Charlie [5678 Street, AnotherCity, State]"
-        output = task_func(input_str)
-        expected_output = {
-            'alice': 0.5773502691896258, 
-            'bob': 0.5773502691896258, 
-            'charlie': 0.5773502691896258
-        }
-        self.assertDictEqual(output, expected_output)
+        text = "Hello. My name is Marc. I'm here to help. How can I assist you today?"
+        expected_output = pd.Series(
+            {"Sentence 1": 1, "Sentence 2": 4, "Sentence 3": 3, "Sentence 4": 6}
+        )
+        result = task_func(text)
+        pd.testing.assert_series_equal(result, expected_output)
     def test_case_3(self):
-        input_str = "No brackets here at all"
-        output = task_func(input_str)
-        expected_output = {
-            'all': 0.4472135954999579, 
-            'at': 0.4472135954999579, 
-            'brackets': 0.4472135954999579, 
-            'here': 0.4472135954999579, 
-            'no': 0.4472135954999579
-        }
-        self.assertDictEqual(output, expected_output)
+        text = "This is a test. Stopwords are words which do not contain important meaning."
+        expected_output = pd.Series({"Sentence 1": 4, "Sentence 2": 7})
+        result = task_func(text)
+        pd.testing.assert_series_equal(result, expected_output)
     def test_case_4(self):
-        input_str = "Mix [bracketed content] (and non-bracketed) content"
-        output = task_func(input_str)
-        expected_output = {
-            'and': 0.4472135954999579, 
-            'bracketed': 0.4472135954999579, 
-            'content': 0.4472135954999579, 
-            'mix': 0.4472135954999579, 
-            'non': 0.4472135954999579
-        }
-        self.assertDictEqual(output, expected_output)
+        text = "Hello! How are you? I'm fine, thanks."
+        expected_output = pd.Series(
+            {"Sentence 1": 6}
+        )  # Only the last sentence is split by a period
+        result = task_func(text)
+        pd.testing.assert_series_equal(result, expected_output)
     def test_case_5(self):
-        input_str = "[Only bracketed content]"
-        output = task_func(input_str)
-        expected_output = {}
-        self.assertDictEqual(output, expected_output)
+        text = ""
+        expected_output = pd.Series()
+        result = task_func(text)
+        pd.testing.assert_series_equal(result, expected_output)

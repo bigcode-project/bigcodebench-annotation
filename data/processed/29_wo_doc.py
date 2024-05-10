@@ -1,110 +1,82 @@
+import requests
 import json
-import random
-import hashlib
-from datetime import datetime
+import base64
 
-
-def task_func(utc_datetime, salt='salt', password_length=10, seed=0):
+def task_func(data, url="http://your-api-url.com"):
     """
-    Generate a random lowercase alphanumeric password of length password_length
-    and then encrypt it as a JSON string. The password is hashed using SHA-256.
-    The hashing uses the combination of the user provided salt and the complete 
-    conventional string representation of the user provided UTC datetime. 
+    Convert a Python dictionary into a JSON-formatted string, encode this string in base64 format,
+    and send it as a payload in a POST request to an API endpoint.
     
     Parameters:
-    utc_datetime (datetime): The datetime in UTC.
-    salt (str, optional): The salt to be used for hashing the password. Defaults to 'salt'.
-    password_length (int, optional): The length of the password to be generated. Defaults to 10.
-    seed (int, optional): The seed for the random number generator. Defaults to 0.
+    data (dict): The Python dictionary to encode and send.
+    url (str, optional): The API endpoint URL. Defaults to "http://your-api-url.com".
     
     Returns:
-    str: The hashed password encoded as a JSON string.
+    requests.Response: The response object received from the API endpoint after the POST request.
     
     Requirements:
+    - requests
     - json
-    - datetime
-    - random
-    - hashlib
-
-    Raises:
-    - ValueError: If the utc_datetime is not a datetime object or the salt is not a string.
+    - base64
     
     Example:
-    >>> utc_time = datetime(2023, 6, 15, 12, 0, 0, tzinfo=pytz.UTC)
-    >>> password_json_str = task_func(utc_time)
+    >>> data = {'name': 'John', 'age': 30, 'city': 'New York'}
+    >>> response = task_func(data, url="http://example-api-url.com")
+    >>> print(response.status_code)
+    200
     """
-    random.seed(seed)
-    if not isinstance(utc_datetime, datetime):
-        raise ValueError("Input should be a datetime object")
-    if not isinstance(salt, str):
-        raise ValueError("Salt should be a string")
-    utc_time_str = utc_datetime.strftime("%Y-%m-%d %H:%M:%S")
-    salted_string = utc_time_str + salt
-    password = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz0123456789') for _ in range(password_length))
-    hashed_password = hashlib.sha256((password + salted_string).encode('utf-8')).hexdigest()
-    password_json_str = json.dumps(hashed_password)
-    return password_json_str
+    json_data = json.dumps(data)
+    encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')
+    response = requests.post(url, data={"payload": encoded_data})
+    return response
 
-import re
-import pytz
 import unittest
-import doctest
+from unittest.mock import patch, Mock
+import requests
+import json
+# Mocking the requests.post method
+def mock_post(*args, **kwargs):
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.text = "OK"
+    return mock_response
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Input 1
-        utc_time = datetime(2023, 6, 15, 12, 0, 0, tzinfo=pytz.UTC)
-        password_json_str = task_func(utc_time, seed=79)
-        
-        # Decoding the JSON string
-        decoded_str = json.loads(password_json_str)
-        
-        # Check if the decoded string is a valid SHA-256 hash
-        self.assertEqual(len(decoded_str), 64)  # SHA-256 produces a 64 character hash
-        self.assertTrue(re.match(r"^[a-f0-9]{64}$", decoded_str))  # Check if it's a valid hexadecimal
-        # Check the hashed password
-        self.assertEqual(decoded_str, "3da4b6faf766416fe75b2e5efd831f0fc907e0cc450e7fb58f61110be0a6ab3a") # Expected hash
-    def test_case_2(self):
-        # Input 2
-        utc_time = datetime(2021, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)
-        password_json_str = task_func(utc_time)
-        
-        # Decoding the JSON string
-        decoded_str = json.loads(password_json_str)
-        
-        # Check if the decoded string is a valid SHA-256 hash
-        self.assertEqual(len(decoded_str), 64)
-        self.assertTrue(re.match(r"^[a-f0-9]{64}$", decoded_str))
-    def test_case_3(self):
-        # Input 3
-        utc_time = datetime(2050, 12, 31, 23, 59, 59, tzinfo=pytz.UTC)
-        password_json_str = task_func(utc_time, salt="random salt be like")
-        
-        # Decoding the JSON string
-        decoded_str = json.loads(password_json_str)
-        
-        # Check if the decoded string is a valid SHA-256 hash
-        self.assertEqual(len(decoded_str), 64)
-        self.assertTrue(re.match(r"^[a-f0-9]{64}$", decoded_str))
-        self.assertEqual(decoded_str, "afd33d74be6cbfb08c6ad76d6f8556ef910e252912d7ebb13603ace3edccd260") # Expected hash
-    def test_case_4(self):
-        # Input 4
-        utc_time = datetime(2020, 2, 29, 5, 30, 15, tzinfo=pytz.UTC)  # A leap year date
-        password_json_str = task_func(utc_time)
-        
-        # Decoding the JSON string
-        decoded_str = json.loads(password_json_str)
-        
-        # Check if the decoded string is a valid SHA-256 hash
-        self.assertEqual(len(decoded_str), 64)
-        self.assertTrue(re.match(r"^[a-f0-9]{64}$", decoded_str))
-    def test_case_5(self):
-        # Input 5
-        utc_time = datetime(2000, 1, 1, 12, 0, 0, tzinfo=pytz.UTC)  # A date from the past millennium
-        password_json_str = task_func(utc_time)
-        
-        # Decoding the JSON string
-        decoded_str = json.loads(password_json_str)
-        
-        # Check if the decoded string is a valid SHA-256 hash
-        self.assertEqual(len(decoded_str), 64)
-        self.assertTrue(re.match(r"^[a-f0-9]{64}$", decoded_str))
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_1(self, mock_post_method):
+        data = {'name': 'John', 'age': 30, 'city': 'New York'}
+        response = task_func(data, url="http://mock-api-url.com")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, "OK")
+    
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_2(self, mock_post_method):
+        data = {'task': 'Write code', 'status': 'completed'}
+        response = task_func(data, url="http://mock-api-url.com")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, "OK")
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_3(self, mock_post_method):
+        data = {}
+        response = task_func(data, url="http://mock-api-url.com")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, "OK")
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_4(self, mock_post_method):
+        data = {'fruit': 'apple', 'color': 'red', 'taste': 'sweet'}
+        response = task_func(data, url="http://mock-api-url.com")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, "OK")
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_5(self, mock_post_method):
+        data = {'country': 'USA', 'capital': 'Washington, D.C.'}
+        response = task_func(data, url="http://mock-api-url.com")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, "OK")
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_6(self, mock_post_method):
+        # Test to verify that the POST request is made with the correct parameters
+        data = {'name': 'John', 'age': 30, 'city': 'New York'}
+        json_data = json.dumps(data)
+        encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')
+        task_func(data, url="http://mock-api-url.com")
+        mock_post_method.assert_called_once_with("http://mock-api-url.com", data={"payload": encoded_data})

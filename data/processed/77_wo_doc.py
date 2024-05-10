@@ -1,108 +1,111 @@
-import os
-import shutil
 import random
+import string
+from django.http import HttpResponse
 
 
-def task_func(src_dir: str, dest_dir: str, seed:int = 100) -> str:
+def task_func(request, session_expire_time):
     """
-    Moves a random file from the source directory to the specified destination directory.
-    
+    This function creates a random session key comprising letters and digits with a specific length of 20,
+    then sets this key in a cookie on an HttpResponse object with the specified expiration time.
+
     Parameters:
-    - src_dir (str): The path of the source directory from which a file will be randomly selected and moved.
-    - dest_dir (str): The path of the destination directory where the file will be moved.
-    - seed (int, Optional): The seed for the random number generator. Defaults to 100.
-    
+    request (django.http.HttpRequest): The incoming Django HttpRequest.
+    session_expire_time (int): The expiration time for the session cookie in seconds.
+
     Returns:
-    str: The name of the file moved. Format: 'filename.extension' (e.g., 'file1.txt').
-    
-    Requirements:
-    - os
-    - shutil
-    - random
+    django.http.HttpResponse: A Django HttpResponse with the session key set in a cookie.
+
+    Raises:
+    ValueError: If the session key does not contain both letters and digits or
+                the session key length is not equal to 20.
+
+    Note:
+    -   The function set the response content to "Session key generated successfully." if the session key
+        is valid.
 
     Examples:
-    >>> import tempfile
-    >>> src_dir = tempfile.mkdtemp()
-    >>> dest_dir = tempfile.mkdtemp()
-    >>> open(os.path.join(src_dir, 'file1.txt'), 'w').close()
-    >>> open(os.path.join(src_dir, 'file2.txt'), 'w').close()
-    >>> task_func(src_dir, dest_dir, seed=1)
-    'file2.txt'
+    >>> from django.conf import settings
+    >>> from django.http import HttpRequest
+    >>> if not settings.configured:
+    ...     settings.configure()
+    >>> request = HttpRequest()
+    >>> response = task_func(request, 60)
+    >>> 'session_key' in response.cookies
+    True
+    >>> len(response.cookies['session_key'].value) == 20
+    True
+    >>> response.cookies['session_key']['max-age'] == 60
+    True
+
+    Requirements:
+    - django.http
+    - django.conf
+    - random
+    - string
     """
-    random.seed(seed)
-    files = os.listdir(src_dir)
-    if len(files) == 0:
-        raise FileNotFoundError(f"No files found in {src_dir}")
-    file_name = random.choice(files)
-    src_file = os.path.join(src_dir, file_name)
-    dest_file = os.path.join(dest_dir, file_name)
-    shutil.move(src_file, dest_file)
-    return file_name
+    session_key = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
+    has_digit = any(char.isdigit() for char in session_key)
+    has_letter = any(char.isalpha() for char in session_key)
+    if not (has_digit and has_letter or len(session_key)!=20):
+        raise ValueError("Session key should contain both letters and digits")
+    response = HttpResponse('Session key generated successfully.')
+    response.set_cookie('session_key', session_key, max_age=session_expire_time)
+    return response
 
 import unittest
-import doctest
-import tempfile
+from unittest.mock import patch
+from django.http import HttpRequest
+from django.conf import settings
+# Configure Django settings if not already configured
+if not settings.configured:
+    settings.configure(
+        DEFAULT_CHARSET='utf-8',
+        SECRET_KEY='a-very-secret-key',
+    )
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.base_temp_dir = tempfile.mkdtemp()
-        self.base_test_dir = f"{self.base_temp_dir}/test"
-        if os.path.exists(self.base_test_dir):
-            shutil.rmtree(self.base_test_dir)
-        os.makedirs(self.base_test_dir, exist_ok=True)
-        self.test_dirs = {
-            f"{self.base_test_dir}/src_test_dir_1": [f"file{i}.txt" for i in range(1, 6)],
-            f"{self.base_test_dir}/src_test_dir_2": [f"file{i}.txt" for i in range(6, 11)],
-            f"{self.base_test_dir}/src_test_dir_3": [],
-            f"{self.base_test_dir}/src_test_dir_4": [f"file{i}.txt" for i in range(11, 16)],
-            f"{self.base_test_dir}/src_test_dir_5": [f"file{i}.txt" for i in range(16, 21)],
-        }
-        self.dest_dirs = {
-            f"{self.base_test_dir}/dest_test_dir_1": [],
-            f"{self.base_test_dir}/dest_test_dir_2": [],
-            f"{self.base_test_dir}/dest_test_dir_3": [],
-            f"{self.base_test_dir}/dest_test_dir_4": [],
-            f"{self.base_test_dir}/dest_test_dir_5": [],
-        }
-        # Create the test directories and files
-        for dir_name, files in self.test_dirs.items():
-            os.makedirs(dir_name, exist_ok=True)
-            for file_name in files:
-                with open(os.path.join(dir_name, file_name), 'w') as file:
-                    file.write(f"This is content for {file_name}")
-        for dir_name in self.dest_dirs.keys():
-            os.makedirs(dir_name, exist_ok=True)
-        return super().setUp()
-    def tearDown(self):
-        shutil.rmtree(self.base_test_dir)
-        return super().tearDown()
-    def test_case_1(self):
-        moved_file = task_func(
-            f'{self.base_test_dir}/src_test_dir_1', 
-            f'{self.base_test_dir}/dest_test_dir_1', 
-            seed=1
-        )
-        self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_1'])
-        self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_1', moved_file)))
-        # Test the name of the moved file
-        self.assertTrue(moved_file.endswith('.txt'))
-    def test_case_2(self):
-        moved_file = task_func(f'{self.base_test_dir}/src_test_dir_2', f'{self.base_test_dir}/dest_test_dir_2')
-        self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_2'])
-        self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_2', moved_file)))
-    def test_case_3(self):
-        with self.assertRaises(FileNotFoundError):
-            task_func(f'{self.base_test_dir}/src_test_dir_3', f'{self.base_test_dir}/dest_test_dir_3')
-    def test_case_4(self):
-        moved_file = task_func(
-            f'{self.base_test_dir}/src_test_dir_4', 
-            f'{self.base_test_dir}/dest_test_dir_4', 
-            seed=2
-        )
-        self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_4'])
-        self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_4', moved_file)))
-        # Test the name of the moved file
-        self.assertTrue(moved_file.endswith('.txt'))
-    def test_case_5(self):
-        moved_file = task_func(f'{self.base_test_dir}/src_test_dir_5', f'{self.base_test_dir}/dest_test_dir_5')
-        self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_5'])
-        self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_5', moved_file)))
+    @patch('random.choices')
+    def test_session_key_in_cookies(self, mock_random_choices):
+        """Test if 'session_key' is set in the response cookies with the correct expiration."""
+        mock_random_choices.return_value = ['1a'] * 10  # Mock session key as 'aaaaaaaaaaaaaaaaaaaa'
+        request = HttpRequest()
+        response = task_func(request, 60)  # pass the session_expire_time
+        self.assertIn('session_key', response.cookies)
+        self.assertEqual(response.cookies['session_key']['max-age'], 60)
+    @patch('random.choices')
+    def test_session_key_length(self, mock_random_choices):
+        """Test if the length of 'session_key' is 20."""
+        mock_random_choices.return_value = ['1a'] * 10
+        request = HttpRequest()
+        response = task_func(request, 60)  # pass the session_expire_time
+        self.assertEqual(len(response.cookies['session_key'].value), 20)
+    @patch('random.choices')
+    def test_response_content(self, mock_random_choices):
+        """Test if the response content includes the expected message."""
+        mock_random_choices.return_value = ['1a'] * 10
+        request = HttpRequest()
+        response = task_func(request, 60)  # pass the session_expire_time
+        self.assertIn('Session key generated successfully.', response.content.decode())
+    @patch('random.choices')
+    def test_response_type(self, mock_random_choices):
+        """Test if the response object is of type HttpResponse."""
+        mock_random_choices.return_value = ['1a'] * 10
+        request = HttpRequest()
+        response = task_func(request, 60)  # pass the session_expire_time
+        self.assertIsInstance(response, HttpResponse)
+    @patch('random.choices')
+    def test_raise_error(self, mock_random_choices):
+        """Test if the function raises ValueError when the session key does not contain both letters and digits."""
+        mock_random_choices.return_value = ['a'] * 20  # Only letters, no digits
+        request = HttpRequest()
+        with self.assertRaises(ValueError):
+            task_func(request, 60)  # pass the session_expire_time
+    @patch('random.choices')
+    def test_valid_session_key(self, mock_random_choices):
+        """Test if the function completes without error when session key is valid."""
+        # Ensure the mock session key always contains both letters and digits
+        mock_random_choices.return_value = list('A1' * 10)  # This creates a string 'A1A1A1A1A1A1A1A1A1A1'
+        request = HttpRequest()
+        response = task_func(request, 60)  # pass the session_expire_time
+        self.assertEqual(len(response.cookies['session_key'].value), 20)
+        self.assertTrue(any(char.isalpha() for char in response.cookies['session_key'].value))
+        self.assertTrue(any(char.isdigit() for char in response.cookies['session_key'].value))

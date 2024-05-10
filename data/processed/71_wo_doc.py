@@ -1,144 +1,180 @@
-import subprocess
-import os
-import shutil
-from glob import glob
+import pandas as pd
+import json
+import numpy as np
 
+# Constants
+COLUMNS = ['email', 'list']
 
-def task_func(src_folder, dst_folder):
-    """Compress all files in the specified source folder and move the compressed files to a destination folder.
-    This operation is executed as a background process using the 'gzip' command.
+def task_func(json_file):
+    """
+    Load e-mail data from a JSON file, convert it into a Pandas DataFrame, calculate the sum and mean
+    of the list associated with each e-mail, and then record those values. Additionally, it plots the sum
+    and mean values for each email.
+
+    If there is no e-mail data, return an empty dataframe with the right columns (['email', 'list', 'sum', 'mean']), and None as the plot.
 
     Parameters:
-    src_folder (str): The path of the source folder containing the files to be compressed.
-    dst_folder (str): The path of the destination folder where the compressed files will be moved.
+    json_file (str): The path to the JSON file. The JSON file should have the structure:
+                     [
+                         {"email": "email1@example.com", "list": [value1, value2, ...]},
+                         ...
+                     ]
 
     Returns:
-    dict: A dictionary containing:
-        - 'success': A boolean indicating if all files were compressed and moved successfully.
-        - 'message': A descriptive message about the operation's result.
-        - 'failed_files': A list of filenames that failed to compress or move.
+    tuple: A tuple containing:
+        - DataFrame: A pandas DataFrame with columns ['email', 'list', 'sum', 'mean'].
+        - Axes: The Axes object for the plot. None if the dataframe is empty.
 
     Requirements:
-    - subprocess
-    - os
-    - shutil
-    - glob
-    - gzip
+    - pandas
+    - json
+    - numpy
 
     Example:
-    >>> import tempfile
-    >>> import os
-    >>> src_folder = tempfile.mkdtemp()
-    >>> dst_folder = tempfile.mkdtemp()
-    >>> for i in range(3):
-    ...     with open(os.path.join(src_folder, f'file{i}.txt'), 'w') as f:
-    ...         _ = f.write(f'This is file {i}.')
-    >>> task_func(src_folder, dst_folder)
-    {'success': True, 'message': 'All files compressed and moved successfully.', 'failed_files': []}
+    >>> df, ax = task_func('data/task_func/json_1.json')
+    >>> print(df)
     """
-    if not os.path.isdir(src_folder):
-        raise ValueError(f"Source folder '{src_folder}' does not exist.")
-    if not os.path.isdir(dst_folder):
-        raise ValueError(f"Destination folder '{dst_folder}' does not exist.")
-    processes = []
-    failed_files = []
-    for file in glob(os.path.join(src_folder, '*')):
-        process = subprocess.Popen(['gzip', file])
-        processes.append((process, file))
-    for process, file in processes:
-        retcode = process.wait()
-        if retcode != 0:
-            failed_files.append(os.path.basename(file))
-    for file in glob(os.path.join(src_folder, '*.gz')):
-        try:
-            shutil.move(file, dst_folder)
-        except Exception as e:
-            failed_files.append(os.path.basename(file))
-    if failed_files:
-        return {'success': False, 'message': 'Some files failed to compress or move.', 'failed_files': failed_files}
-    else:
-        return {'success': True, 'message': 'All files compressed and moved successfully.', 'failed_files': []}
+    with open(json_file, 'r') as file:
+        email_data = json.load(file)
+    if not email_data :
+        return pd.DataFrame([], columns = COLUMNS + ["sum", "mean"]), None
+    df = pd.DataFrame(email_data, columns=COLUMNS)
+    df['sum'] = df['list'].apply(np.sum)
+    df['mean'] = df['list'].apply(np.mean)
+    ax = df[['sum', 'mean']].plot(kind='bar')
+    return df, ax
 
+import os
+import shutil
 import unittest
-import doctest
-import tempfile
 class TestCases(unittest.TestCase):
+    """Test cases for the task_func function."""
     def setUp(self):
-        self.base_tmp_dir = tempfile.mkdtemp()
-        self.src_folder_path = f"{self.base_tmp_dir}/test/source_folder"
-        self.dst_folder_path = f"{self.base_tmp_dir}/test/destination_folder"
-        
-        # Reset the test folders before each test
-        os.makedirs(self.src_folder_path, exist_ok=True)
-        os.makedirs(self.dst_folder_path, exist_ok=True)
-        # Create source and destination folders if they don't exist
-        os.makedirs(self.src_folder_path, exist_ok=True)
-        os.makedirs(self.dst_folder_path, exist_ok=True)
-        # Create some sample files in the source folder
-        self.file_contents = ["This is file 1.", "This is file 2.", "This is file 3."]
-        file_paths = []
-        for idx, content in enumerate(self.file_contents, 1):
-            file_path = os.path.join(self.src_folder_path, f"file{idx}.txt")
-            with open(file_path, "w") as file:
-                file.write(content)
-            file_paths.append(file_path)
-        return super().setUp()
-    
+        self.test_dir = 'data/task_func'
+        os.makedirs(self.test_dir, exist_ok=True)
+        self.f_1 = os.path.join(self.test_dir, "json_1.json")
+        self.f_2 = os.path.join(self.test_dir, "json_2.json")
+        self.f_3 = os.path.join(self.test_dir, "json_3.json")
+        self.f_4 = os.path.join(self.test_dir, "json_4.json")
+        self.f_5 = os.path.join(self.test_dir, "json_5.json")
+        with open(self.f_1, "w") as fout :
+            json.dump(
+                [
+                    {
+                        "email" : "first@example.com",
+                        "list" : [12, 17, 29, 45, 7, 3]
+                    },
+                    {
+                        "email" : "second@example.com",
+                        "list" : [1, 1, 3, 73, 21, 19, 12]
+                    },
+                    {
+                        "email" : "third@example.com",
+                        "list" : [91, 23, 7, 14, 66]
+                    }
+                ],
+                fout
+            )
+        with open(self.f_2, "w") as fout :
+            json.dump(
+                [
+                    {
+                        "email" : "fourth@example.com",
+                        "list" : [12, 21, 35, 2, 1]
+                    },
+                    {
+                        "email" : "fifth@example.com",
+                        "list" : [13, 4, 10, 20]
+                    },
+                    {
+                        "email" : "sixth@example.com",
+                        "list" : [82, 23, 7, 14, 66]
+                    },
+                    {
+                        "email" : "seventh@example.com",
+                        "list" : [111, 23, 4]
+                    }
+                ],
+                fout
+            )
+        with open(self.f_3, "w") as fout :
+            json.dump(
+                [
+                    {
+                        "email" : "eight@example.com",
+                        "list" : [1, 2, 3, 4, 5]
+                    },
+                    {
+                        "email" : "ninth@example.com",
+                        "list" : [6, 7, 8, 9, 10]
+                    }
+                ],
+                fout
+            )
+        with open(self.f_4, "w") as fout :
+            json.dump(
+                [
+                    {
+                        "email" : "tenth@example.com",
+                        "list" : [11, 12, 13, 14, 15]
+                    }
+                ],
+                fout
+            )
+        with open(self.f_5, "w") as fout :
+            json.dump(
+                [],
+                fout
+            )
     def tearDown(self):
-        # Reset the test folders after each test
-        shutil.rmtree(self.base_tmp_dir, ignore_errors=True)
-        return super().tearDown()
-        
+        if os.path.exists(self.test_dir):
+            shutil.rmtree(self.test_dir)
     def test_case_1(self):
-        """Test basic functionality."""
-        # Create some sample files in the source folder
-        for idx, content in enumerate(self.file_contents, 1):
-            file_path = os.path.join(self.src_folder_path, f"file{idx}.txt")
-            with open(file_path, "w") as file:
-                file.write(content)
-        
-        result = task_func(self.src_folder_path, self.dst_folder_path)
-        self.assertTrue(result['success'])
-        self.assertEqual(result['message'], 'All files compressed and moved successfully.')
-        self.assertEqual(result['failed_files'], [])
-        for idx in range(1, 4):
-            self.assertTrue(os.path.exists(os.path.join(self.dst_folder_path, f"file{idx}.txt.gz")))
+        # Test with sample JSON data
+        df, ax = task_func(self.f_1)
+        # Assert DataFrame values
+        self.assertEqual(df["email"].tolist(), ["first@example.com", "second@example.com", "third@example.com"])
+        self.assertEqual(df["sum"].tolist(), [113, 130, 201])
+        self.assertEqual(df["mean"].tolist(), [113/6.0, 130/7.0, 201/5.0])
+        # Assert plot attributes
+        self.assertEqual(ax.get_title(), '')
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], ['0', '1', '2'])
+        self.assertListEqual([label.get_text() for label in ax.get_legend().get_texts()], ['sum', 'mean'])
     def test_case_2(self):
-        """Test non-existent source folder."""
-        with self.assertRaises(ValueError) as context:
-            task_func("/non/existent/path", self.dst_folder_path)
-        self.assertEqual(str(context.exception), "Source folder '/non/existent/path' does not exist.")
+        # Test with sample JSON data
+        df, ax = task_func(self.f_2)
+        # Assert DataFrame values
+        self.assertEqual(df["email"].tolist(), ["fourth@example.com", "fifth@example.com", "sixth@example.com", "seventh@example.com"])
+        self.assertEqual(df["sum"].tolist(), [71, 47, 192, 138])
+        self.assertEqual(df["mean"].tolist(), [71/5.0, 47/4.0, 192/5.0, 138/3.0])
+        # Assert plot attributes
+        self.assertEqual(ax.get_title(), '')
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], ['0', '1', '2', '3'])
+        self.assertListEqual([label.get_text() for label in ax.get_legend().get_texts()], ['sum', 'mean'])
     def test_case_3(self):
-        """Test non-existent destination folder."""
-        with self.assertRaises(ValueError) as context:
-            task_func(self.src_folder_path, "/non/existent/path")
-        self.assertEqual(str(context.exception), "Destination folder '/non/existent/path' does not exist.")
+        # Test with sample JSON data
+        df, ax = task_func(self.f_3)
+        # Assert DataFrame values
+        self.assertEqual(df["email"].tolist(), ["eight@example.com", "ninth@example.com"])
+        self.assertEqual(df["sum"].tolist(), [15.0, 40.0])
+        self.assertEqual(df["mean"].tolist(), [3.0, 8.0])
+        # Assert plot attributes
+        self.assertEqual(ax.get_title(), '')
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], ['0', '1'])
+        self.assertListEqual([label.get_text() for label in ax.get_legend().get_texts()], ['sum', 'mean'])
     def test_case_4(self):
-        """Test empty source folder."""
-        result = task_func(self.src_folder_path, self.dst_folder_path)
-        self.assertTrue(result['success'])
-        self.assertEqual(result['message'], 'All files compressed and moved successfully.')
-        self.assertEqual(result['failed_files'], [])
-    
+        # Test with sample JSON data
+        df, ax = task_func(self.f_4)
+        # Assert DataFrame values
+        self.assertEqual(df["email"].tolist(), ["tenth@example.com"])
+        self.assertEqual(df["sum"].tolist(), [65.0])
+        self.assertEqual(df["mean"].tolist(), [13.0])
+        # Assert plot attributes
+        self.assertEqual(ax.get_title(), '')
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], ['0'])
+        self.assertListEqual([label.get_text() for label in ax.get_legend().get_texts()], ['sum', 'mean'])
     def test_case_5(self):
-        """Test with destination folder having some files."""
-        # Create some files in the destination folder
-        with open(os.path.join(self.dst_folder_path, "existing_file.txt"), "w") as file:
-            file.write("This is an existing file.")
-        with open(os.path.join(self.dst_folder_path, "existing_file.txt.gz"), "w") as file:
-            file.write("This is an existing compressed file.")
-        
-        # Create some sample files in the source folder
-        for idx, content in enumerate(self.file_contents, 1):
-            file_path = os.path.join(self.src_folder_path, f"file{idx}.txt")
-            with open(file_path, "w") as file:
-                file.write(content)
-        
-        result = task_func(self.src_folder_path, self.dst_folder_path)
-        self.assertTrue(result['success'])
-        self.assertEqual(result['message'], 'All files compressed and moved successfully.')
-        self.assertEqual(result['failed_files'], [])
-        for idx in range(1, 4):
-            self.assertTrue(os.path.exists(os.path.join(self.dst_folder_path, f"file{idx}.txt.gz")))
-        self.assertTrue(os.path.exists(os.path.join(self.dst_folder_path, "existing_file.txt")))
-        self.assertTrue(os.path.exists(os.path.join(self.dst_folder_path, "existing_file.txt.gz")))
+        # Test with empty JSON data
+        df, ax = task_func(self.f_5)
+        self.assertIsNone(ax)
+        self.assertTrue(df.empty)

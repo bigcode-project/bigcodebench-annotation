@@ -1,110 +1,138 @@
-from datetime import datetime
-from collections import defaultdict
-import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import itertools
+from datetime import datetime, timedelta
+import seaborn as sns
 
-
-def task_func(activities):
+def task_func(df, fruits=None, days=None, seed=None, sales_lower_bound=1, sales_upper_bound=50):
     """
-    Return a bar chart of the number of activities performed on each day of the week based on the provided list of activities.
-    If the activities are not datetime objects, raise a TypeError.
+    Appends randomly generated sales data for specified fruits over a given range of days to a DataFrame, 
+    and returns a seaborn boxplot of the sales.
 
     Parameters:
-    - activities (list of datetime objects): A list of datetime objects representing when each activity occurred.
+    - df (pd.DataFrame): Initial Empty DataFrame to append sales data to. Must be empty. 
+    - fruits (List[str], optional): List of fruits for sales data. Defaults to ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'].
+    - days (List[datetime], optional): List of days for sales data. Defaults to the range from January 1, 2024, to January 7, 2024.
+    - seed (int, optional): Seed for the random number generator. Defaults to None.
+    - sales_lower_bound (int, optional): Lower bound for random sales values. Defaults to 1.
+    - sales_upper_bound (int, optional): Upper bound for random sales values. Defaults to 50.
 
     Returns:
-    - matplotlib.axes.Axes: Axes object representing the bar chart.
-
-    Requirements:
-    - datetime
-    - collections
-    - matplotlib.pyplot
+    Tuple[pd.DataFrame, sns.axisgrid.FacetGrid]: Updated DataFrame with sales data and a seaborn boxplot of the sales.
 
     Raises:
-    - TypeError: If the activities are not datetime objects.
+    TypeError: If 'df' is not a pandas DataFrame.
+    ValueError: If 'df' is not empty or  If 'sales_lower_bound' is not less than 'sales_upper_bound'.
+
+    Requirements:
+    - pandas 
+    - numpy
+    - itertools
+    - datetime
+    - seaborn
 
     Example:
-    >>> ax = task_func([datetime(2023, 10, 25), datetime(2023, 10, 26)])
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> initial_df = pd.DataFrame()
+    >>> report_df, plot = task_func(initial_df, seed=42)
+    >>> print(report_df.head())
+       Fruit        Day  Sales
+    0  Apple 2024-01-01     39
+    1  Apple 2024-01-02     29
+    2  Apple 2024-01-03     15
+    3  Apple 2024-01-04     43
+    4  Apple 2024-01-05      8
+    >>> plot.figure.show()
+
     """
-    if not all(isinstance(activity, datetime) for activity in activities):
-        raise TypeError('All activities must be datetime objects')
-    activity_counts = defaultdict(int)
-    for activity in activities:
-        day = activity.strftime('%A')
-        activity_counts[day] += 1
-    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    counts = [activity_counts[day] for day in days]
-    plt.figure()
-    fig, ax = plt.subplots()
-    ax.bar(days, counts)
-    ax.set_xlabel('Day of the Week')
-    ax.set_ylabel('Number of Activities')
-    ax.set_title('Weekly Activity')
-    return ax
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame")
+    if not df.empty:
+        raise ValueError("Input DataFrame must be empty")
+    if sales_lower_bound >= sales_upper_bound:
+        raise ValueError("sales_lower_bound must be less than sales_upper_bound")
+    if fruits is None:
+        fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry']
+    if days is None:
+        days = [datetime(2024, 1, 1) + timedelta(days=x) for x in range(7)]
+    if seed is not None:
+        np.random.seed(seed)
+    data = list(itertools.product(fruits, days))
+    sales_data = pd.DataFrame(data, columns=['Fruit', 'Day'])
+    sales_data['Sales'] = np.random.randint(sales_lower_bound, sales_upper_bound, size=len(data))
+    result_df = pd.concat([df, sales_data])
+    plot = sns.boxplot(x='Fruit', y='Sales', data=result_df)
+    return result_df, plot
 
 import unittest
-import doctest
+import pandas as pd
+import numpy as np
+from datetime import datetime
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Input: Activities on Monday and Tuesday
-        activities = [datetime(2023, 10, 23), datetime(2023, 10, 24)]
-        ax = task_func(activities)
-        bars = ax.patches
-        # Assert correct title, x and y labels
-        self.assertEqual(ax.get_title(), 'Weekly Activity')
-        self.assertEqual(ax.get_xlabel(), 'Day of the Week')
-        self.assertEqual(ax.get_ylabel(), 'Number of Activities')
-        # Assert correct data points
-        self.assertEqual(bars[0].get_height(), 1)  # Monday
-        self.assertEqual(bars[1].get_height(), 1)  # Tuesday
-        for i in range(2, 7):
-            self.assertEqual(bars[i].get_height(), 0)  # Rest of the days
-    def test_case_2(self):
-        # Input: Activities on multiple days
-        activities = [datetime(2023, 10, 23), datetime(2023, 10, 24), datetime(2023, 10, 24), datetime(2023, 10, 26)]
-        ax = task_func(activities)
-        bars = ax.patches
-        # Assert correct title, x and y labels
-        self.assertEqual(ax.get_title(), 'Weekly Activity')
-        self.assertEqual(ax.get_xlabel(), 'Day of the Week')
-        self.assertEqual(ax.get_ylabel(), 'Number of Activities')
-        # Assert correct data points
-        self.assertEqual(bars[0].get_height(), 1)  # Monday
-        self.assertEqual(bars[1].get_height(), 2)  # Tuesday
-        self.assertEqual(bars[2].get_height(), 0)  # Wednesday
-        self.assertEqual(bars[3].get_height(), 1)  # Thursday
-        for i in range(4, 7):
-            self.assertEqual(bars[i].get_height(), 0)  # Rest of the days
-    def test_case_3(self):
-        # Input: Activities only on Sunday
-        activities = [datetime(2023, 10, 29), datetime(2023, 10, 29)]
-        ax = task_func(activities)
-        bars = ax.patches
-        # Assert correct data points
-        for i in range(0, 6):
-            self.assertEqual(bars[i].get_height(), 0)  # Days before Sunday
-        self.assertEqual(bars[6].get_height(), 2)  # Sunday
-    def test_case_4(self):
-        # Input: No activities
-        activities = []
-        ax = task_func(activities)
-        bars = ax.patches
-        # Assert correct data points
-        for i in range(0, 7):
-            self.assertEqual(bars[i].get_height(), 0)  # All days
-        # Test for non datetime objects
+    def setUp(self):
+        # Define the default date range for comparison in tests
+        self.default_days = [datetime(2024, 1, 1) + timedelta(days=x) for x in range(7)]
+    def test_default_days_range(self):
+        """Test the default days range is correctly applied."""
+        initial_df = pd.DataFrame()
+        report_df, _ = task_func(initial_df, seed=42)
+        unique_days = sorted(report_df['Day'].dt.date.unique())
+        expected_days = [day.date() for day in self.default_days]
+        self.assertEqual(len(unique_days), len(expected_days), "The number of unique days should match the default range.")
+        for day in unique_days:
+            self.assertIn(day, expected_days, "Each unique day should be within the default range.")
+    def test_custom_days_range(self):
+        """Test functionality with a custom days range."""
+        initial_df = pd.DataFrame()
+        custom_days = [datetime(2024, 1, 10), datetime(2024, 1, 11)]
+        report_df, _ = task_func(initial_df, days=custom_days, seed=42)
+        unique_days = sorted(report_df['Day'].dt.date.unique())
+        expected_custom_days = [day.date() for day in custom_days]
+        self.assertEqual(len(unique_days), len(expected_custom_days), "The number of unique days should match the custom range.")
+        for day in unique_days:
+            self.assertIn(day, expected_custom_days, "Each unique day should be within the custom range.")
+    def test_sales_bounds(self):
+        """Test custom sales bounds are respected."""
+        initial_df = pd.DataFrame()
+        report_df, _ = task_func(initial_df, seed=42, sales_lower_bound=20, sales_upper_bound=30)
+        sales_values = report_df['Sales'].unique()
+        self.assertTrue(all(20 <= val < 30 for val in sales_values), "All sales values should be within the specified bounds.")
+    def test_invalid_sales_bounds(self):
+        """Test error handling for invalid sales bounds."""
+        with self.assertRaises(ValueError):
+            task_func(pd.DataFrame(), sales_lower_bound=50, sales_upper_bound=10)
+    def test_with_non_dataframe_input(self):
+        """Test that providing a non-DataFrame input raises a TypeError."""
         with self.assertRaises(TypeError):
-            task_func([1, 2, 3])
-    def test_case_5(self):
-        # Input: Activities on all days
-        activities = [
-            datetime(2023, 10, 23), datetime(2023, 10, 24), datetime(2023, 10, 25),
-            datetime(2023, 10, 26), datetime(2023, 10, 27), datetime(2023, 10, 28),
-            datetime(2023, 10, 29)
-        ]
-        ax = task_func(activities)
-        bars = ax.patches
-        # Assert correct data points
-        for i in range(0, 7):
-            self.assertEqual(bars[i].get_height(), 1)  # All days
+            task_func("not_a_dataframe")
+    def test_reproducibility_with_seed(self):
+        """Test reproducibility of sales data generation with a fixed seed."""
+        initial_df = pd.DataFrame()
+        df1, _ = task_func(initial_df, seed=42)
+        df2, _ = task_func(initial_df, seed=42)
+        pd.testing.assert_frame_equal(df1, df2, "DataFrames generated with the same seed should be identical.")
+        
+    def test_with_custom_fruits_and_days(self):
+        fruits = ['Mango', 'Pineapple']
+        days = [pd.Timestamp('2023-01-01'), pd.Timestamp('2023-01-02')]
+        initial_df = pd.DataFrame()
+        report_df, plot = task_func(initial_df, fruits=fruits, days=days, sales_lower_bound=1, sales_upper_bound=50, seed=42)
+        self.assertEqual(len(report_df['Fruit'].unique()), len(fruits), "Number of unique fruits should match the input")
+        self.assertEqual(len(report_df['Day'].unique()), len(days), "Number of unique days should match the input")
+        self.assertTrue(hasattr(plot, 'figure'), "Plot object should have a 'figure' attribute")
+        # Convert DataFrame to a list of strings for each row
+        df_list = report_df.apply(lambda row: ','.join(row.values.astype(str)), axis=1).tolist()
+        # Check if the converted list matches the expected output 
+        expect_output = ['Mango,2023-01-01 00:00:00,39', 'Mango,2023-01-02 00:00:00,29', 'Pineapple,2023-01-01 00:00:00,15', 'Pineapple,2023-01-02 00:00:00,43']
+        self.assertAlmostEqual(df_list, expect_output, "DataFrame contents should match the expected output")
+    
+    def test_error_on_non_empty_dataframe(self):
+        """Test that a ValueError is raised if the input DataFrame is not empty."""
+        # Create a non-empty DataFrame
+        non_empty_df = pd.DataFrame({'A': [1, 2, 3]})
+        
+        # Attempt to call task_func with a non-empty DataFrame and check for ValueError
+        with self.assertRaises(ValueError) as context:
+            task_func(non_empty_df, seed=42)
+        
+        # Optionally, check the error message to ensure it's for the non-empty DataFrame condition
+        self.assertTrue("Input DataFrame must be empty" in str(context.exception), "Function should raise ValueError for non-empty DataFrame input.")

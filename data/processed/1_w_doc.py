@@ -1,69 +1,61 @@
-import heapq
-import math
-import matplotlib.pyplot as plt
+import collections
+import random
+import string
 
-
-def task_func(l1, l2, N=10):
-    """ 
-    Find the N biggest differences between the respective elements of the list 'l1' and list 'l2', 
-    square the differences, take the square root and return the plotted values as a matplotlib Axes object.
+def task_func(length=100):
+    """
+    Generate a random string of the specified length composed of uppercase and lowercase letters, 
+    and then count the occurrence of each character in this string.
 
     Parameters:
-    l1 (list): A list of numbers.
-    l2 (list): A list of numbers.
-    N (int): Number of largest differences to consider. Default is 10.
+    length (int, optional): The number of characters in the generated string. Default is 100.
 
     Returns:
-    matplotlib.axes._axes.Axes: A matplotlib Axes object with the plotted differences.
+    dict: A dictionary where each key is a character from the generated string and the value 
+            is the count of how many times that character appears in the string.
 
     Requirements:
-    - heapq
-    - math
-    - matplotlib.pyplot
+    - collections
+    - random
+    - string
+
+    Raises:
+    ValueError if the length is a negative number
 
     Example:
-    >>> l1 = [99, 86, 90, 70, 86, 95, 56, 98, 80, 81]
-    >>> l2 = [21, 11, 21, 1, 26, 40, 4, 50, 34, 37]
-    >>> ax = task_func(l1, l2)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> import random
+    >>> random.seed(42)  # Ensures reproducibility for demonstration
+    >>> task_func(10)
+    {'h': 1, 'B': 2, 'O': 1, 'L': 1, 'm': 1, 'j': 1, 'u': 1, 'E': 1, 'V': 1}
     """
-    largest_diff_indices = heapq.nlargest(N, range(len(l1)), key=lambda i: abs(l1[i] - l2[i]))
-    largest_diffs = [math.sqrt((l1[i] - l2[i])**2) for i in largest_diff_indices]
-    fig, ax = plt.subplots()
-    ax.plot(largest_diffs)
-    return ax
+    if length < 0:
+        raise ValueError
+    random_string = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase, k=length))
+    char_counts = collections.Counter(random_string)
+    return dict(char_counts)
 
 import unittest
-import doctest
+import string
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        l1 = [99, 86, 90, 70, 86, 95, 56, 98, 80, 81]
-        l2 = [21, 11, 21, 1, 26, 40, 4, 50, 34, 37]
-        ax = task_func(l1, l2)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 10)
-    def test_case_2(self):
-        l1 = [10, 20, 30, 40, 50]
-        l2 = [1, 2, 3, 4, 5]
-        ax = task_func(l1, l2, 3)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 3)
-    def test_case_3(self):
-        l1 = [0, 10, 20, 30, 40, 50]
-        l2 = [0, 0, 0, 0, 0, 0]
-        ax = task_func(l1, l2)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 6)
-    def test_case_4(self):
-        l1 = [1, 2, 3, 4, 5]
-        l2 = [5, 4, 3, 2, 1]
-        ax = task_func(l1, l2)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 5)
-    def test_case_5(self):
-        l1 = [0, 0, 0, 0, 0]
-        l2 = [0, 0, 0, 0, 0]
-        ax = task_func(l1, l2)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 5)
+    def setUp(self):
+        # Prepare valid characters and set a random seed for reproducibility
+        self.valid_chars = string.ascii_uppercase + string.ascii_lowercase
+        random.seed(42)  # Ensuring reproducibility for tests
+    def test_generated_string_properties(self):
+        # Consolidated test for different lengths to check structure and correctness
+        test_lengths = [10, 50, 100, 150, 5]
+        for length in test_lengths:
+            with self.subTest(length=length):
+                result = task_func(length)
+                self.assertTrue(len(result) <= length, "Length of result should be <= requested string length")
+                self.assertEqual(sum(result.values()), length, f"Total counts should sum to {length}")
+                self.assertTrue(all(char in self.valid_chars for char in result), "All characters should be valid letters")
+    def test_zero_length(self):
+        # Test edge case where length is zero
+        result = task_func(0)
+        self.assertEqual(len(result), 0, "Result should be empty for zero length")
+        self.assertEqual(sum(result.values()), 0, "Sum of counts should be zero for zero length")
+    def test_negative_length(self):
+        # Test handling of negative length input
+        with self.assertRaises(ValueError, msg="Negative length should raise an error"):
+            task_func(-1)

@@ -1,85 +1,89 @@
+import pandas as pd
+import re
 import os
-import shutil
 
-
-def task_func(src_folder, backup_dir):
+def task_func(dir_path: str, pattern: str = '^EMP'):
     """
-    Backs up a given source folder to the specified backup directory, then deletes the source folder.
-    
+    Look for all ascendingly sorted files in a directory that start with a given pattern, and return the number of files against their size. You should return a pandas DataFrame with 2 columns 'File' and 'Size' with correspond to the file name and the size respectively.
+
     Parameters:
-    src_folder (str): The path of the source folder to be backed up and deleted.
-    backup_dir (str): The path of the directory where the source folder will be backed up.
-    
+    - dir_path (str): The path to the directory.
+    - pattern (str): The pattern to match. Default is '^EMP' (files starting with 'EMP').
+
     Returns:
-    bool: True if the operation is successful, False otherwise.
-    
+    - pandas.DataFrame: A pandas DataFrame with file names and their sizes.
+
     Requirements:
+    - pandas
+    - re
     - os
-    - shutil
-    
+
     Example:
-    >>> import tempfile
-    >>> src_folder = tempfile.mkdtemp()
-    >>> backup_dir = tempfile.mkdtemp()
-    >>> with open(os.path.join(src_folder, 'sample.txt'), 'w') as f:
-    ...     _ = f.write('This is a sample file.')
-    >>> task_func(src_folder, backup_dir)
-    True
+    >>> report = task_func('/path/to/directory')
+    >>> print(report)
     """
-    if not os.path.isdir(src_folder):
-        raise ValueError(f"Source folder '{src_folder}' does not exist.")
-    backup_folder = os.path.join(backup_dir, os.path.basename(src_folder))
-    shutil.copytree(src_folder, backup_folder)
-    try:
-        shutil.rmtree(src_folder)
-        return True
-    except Exception as e:
-        print(f"Error while deleting source folder: {e}")
-        return False
+    file_sizes = []
+    for file in sorted(os.listdir(dir_path)):
+        if re.match(pattern, file):
+            file_sizes.append((file, os.path.getsize(os.path.join(dir_path, file))))
+    df = pd.DataFrame(file_sizes, columns=['File', 'Size'])
+    return df
 
 import unittest
-import tempfile
-import doctest
 class TestCases(unittest.TestCase):
-    
+    """Test cases for the task_func function."""
     def setUp(self):
-        # Create a temporary directory for testing
-        self.src_folder = tempfile.mkdtemp()
-        self.backup_dir = tempfile.mkdtemp()
-        
-        # Create a sample file in the source folder
-        with open(os.path.join(self.src_folder, "sample.txt"), "w") as f:
-            f.write("This is a sample file.")
-    
+        self.test_dir = "data/task_func"
+        os.makedirs(self.test_dir, exist_ok=True)
+        self.f_1 = os.path.join(self.test_dir, "EMP001.doc")
+        self.f_2 = os.path.join(self.test_dir, "EMP002.doc")
+        self.f_3 = os.path.join(self.test_dir, "EMP003.doc")
+        self.f_4 = os.path.join(self.test_dir, "NOTEMP1.txt")
+        self.f_5 = os.path.join(self.test_dir, "NOTEMP2.txt")
+        self.f_6 = os.path.join(self.test_dir, "A1.txt")
+        self.f_7 = os.path.join(self.test_dir, "A2.txt")
+        self.f_8 = os.path.join(self.test_dir, "A3.txt")
+        self.f_9 = os.path.join(self.test_dir, "B1.py")
+        self.f_10 = os.path.join(self.test_dir, "B2.py")
+        for i, element in enumerate([self.f_1, self.f_2, self.f_3, self.f_4, self.f_5, self.f_6, self.f_7, self.f_8, self.f_9, self.f_10]) :
+            with open(element, "w") as f :
+                f.write(f"Test content {i+1}")
     def tearDown(self):
-        # Cleanup
-        if os.path.exists(self.src_folder):
-            shutil.rmtree(self.src_folder)
-        if os.path.exists(self.backup_dir):
-            shutil.rmtree(self.backup_dir)
-    
+        for filename in [
+            self.f_1, self.f_2, self.f_3, self.f_4, self.f_5,
+            self.f_6, self.f_7, self.f_8, self.f_9, self.f_10
+        ]:
+            os.remove(filename)
+        os.rmdir(self.test_dir)
     def test_case_1(self):
-        result = task_func(self.src_folder, self.backup_dir)
-        self.assertTrue(result)
-        self.assertFalse(os.path.exists(self.src_folder))
-        self.assertTrue(os.path.exists(os.path.join(self.backup_dir, os.path.basename(self.src_folder), "sample.txt")))
-    
+        report = task_func(self.test_dir)
+        self.assertEqual(len(report), 3)
+        for i, row in report.iterrows():
+            self.assertEqual(row['Size'], os.path.getsize(os.path.join(self.test_dir, f"EMP00{i+1}.doc")))
     def test_case_2(self):
-        shutil.rmtree(self.src_folder)
-        with self.assertRaises(ValueError):
-            task_func(self.src_folder, self.backup_dir)
-    
+        report = task_func(self.test_dir, pattern="^NOTEMP")
+        self.assertEqual(len(report), 2)
+        for i, row in report.iterrows():
+            self.assertEqual(row['Size'], os.path.getsize(os.path.join(self.test_dir, f"NOTEMP{i+1}.txt")))
     def test_case_3(self):
-        os.rmdir(self.backup_dir)
-        result = task_func(self.src_folder, self.backup_dir)
-        self.assertTrue(result)
-        self.assertFalse(os.path.exists(self.src_folder))
-        self.assertTrue(os.path.exists(os.path.join(self.backup_dir, os.path.basename(self.src_folder), "sample.txt")))
-    
+        report = task_func(self.test_dir, pattern="NOTFOUND")
+        expected_df = pd.DataFrame(
+            {
+                "File" : [],
+                "Size" : []
+            }
+        ).astype({"File" : "object", "Size" : "object"})
+        self.assertTrue(
+            report.empty
+        )
+        self.assertTrue(report.shape == expected_df.shape)
     def test_case_4(self):
-        self.assertTrue(task_func(self.src_folder, self.src_folder))
-    
+        report = task_func(self.test_dir, pattern="^A")
+        self.assertEqual(len(report), 3)
+        for i, row in report.iterrows():
+            self.assertEqual(row['Size'], os.path.getsize(os.path.join(self.test_dir, f"A{i+1}.txt")))
     def test_case_5(self):
-        os.makedirs(os.path.join(self.backup_dir, os.path.basename(self.src_folder)))
-        with self.assertRaises(FileExistsError):
-            task_func(self.src_folder, self.backup_dir)
+        report = task_func(self.test_dir, pattern="^B")
+        self.assertEqual(len(report), 2)
+        for i, row in report.iterrows():
+            self.assertEqual(row['Size'], os.path.getsize(os.path.join(self.test_dir, f"B{i+1}.py")))

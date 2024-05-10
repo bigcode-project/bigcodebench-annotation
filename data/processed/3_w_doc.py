@@ -1,83 +1,60 @@
+import random
 import numpy as np
-from collections import Counter
-import matplotlib.pyplot as plt
 
-def task_func(L):
+def task_func(LETTERS):
     """
-    Analyze an "L" list by calculating the mean, median, mode, and standard deviation.
-    Visualize the data by returning a histogram plot.
-    
+    Create a dictionary where keys are specified letters and values are lists of random integers.
+    Then calculate the mean of these integers for each key and return a dictionary of these means.
+
     Parameters:
-    L (list): Input list.
+        LETTERS (list of str): List of single-character strings to be used as keys in the output dictionary.
     
     Returns:
-    dict: A dictionary with the mean, median, mode, and standard deviation of 'L'.
+        dict: A dictionary where each key is a letter from the input list and the value is the mean of 
+              a randomly generated list of integers (with each list having 1 to 10 integers ranging from 0 to 100).
     
     Requirements:
-    - numpy
-    - collections.Counter
-    - matplotlib.pyplot
+    - random
+    - np (numpy)
     
     Example:
-    >>> L = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    >>> stats = task_func(L)
-    >>> print(stats["mean"])
-    5.0
-    >>> print(stats["median"])
-    5.0
-    >>> print(stats["mode"])
-    1
+    >>> LETTERS = ['a', 'b', 'c']
+    >>> mean_dict = task_func(LETTERS)
+    >>> isinstance(mean_dict, dict)
+    True
+    >>> 'a' in mean_dict.keys() and 'b' in mean_dict.keys() and 'c' in mean_dict.keys()
+    True
+    >>> all(isinstance(v, float) for v in mean_dict.values())  # Check if all values are floats
+    True
     """
-    mean = np.mean(L)
-    median = np.median(L)
-    mode = Counter(L).most_common(1)[0][0]
-    std_dev = np.std(L)
-    plt.hist(L, bins='auto')
-    plt.title('Histogram of Data')
-    plt.xlabel('Value')
-    plt.ylabel('Frequency')
-    return {'mean': mean, 'median': median, 'mode': mode, 'std_dev': std_dev, 'plot': plt.gca()}
+    random_dict = {k: [random.randint(0, 100) for _ in range(random.randint(1, 10))] for k in LETTERS}
+    mean_dict = {k: np.mean(v) for k, v in random_dict.items()}
+    return mean_dict
 
 import unittest
-import doctest
+    
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        # Common setup for all tests: explicitly define the list of letters
+        self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
     def test_case_1(self):
-        L = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-        stats = task_func(L)
-        self.assertAlmostEqual(stats['mean'], np.mean(L))
-        self.assertAlmostEqual(stats['median'], np.median(L))
-        self.assertEqual(stats['mode'], 1)
-        self.assertAlmostEqual(stats['std_dev'], np.std(L))
-        self.assertIsInstance(stats['plot'], plt.Axes)
+        # Test if the function returns a dictionary
+        mean_dict = task_func(self.letters)
+        self.assertIsInstance(mean_dict, dict)
     def test_case_2(self):
-        L = [5, 5, 5, 5, 5]
-        stats = task_func(L)
-        self.assertAlmostEqual(stats['mean'], 5.0)
-        self.assertAlmostEqual(stats['median'], 5.0)
-        self.assertEqual(stats['mode'], 5)
-        self.assertAlmostEqual(stats['std_dev'], 0.0)
-        self.assertIsInstance(stats['plot'], plt.Axes)
+        # Test if the dictionary contains all letters of the alphabet
+        mean_dict = task_func(self.letters)
+        self.assertTrue(all(letter in mean_dict for letter in self.letters))
+        
     def test_case_3(self):
-        L = [1, 2, 3, 4, 5, 5, 6, 7, 8, 8, 8, 9]
-        stats = task_func(L)
-        self.assertAlmostEqual(stats['mean'], np.mean(L))
-        self.assertAlmostEqual(stats['median'], np.median(L))
-        self.assertEqual(stats['mode'], 8)
-        self.assertAlmostEqual(stats['std_dev'], np.std(L))
-        self.assertIsInstance(stats['plot'], plt.Axes)
+        # Test if the values in the dictionary are floats (means of lists of integers)
+        mean_dict = task_func(self.letters)
+        self.assertTrue(all(isinstance(val, float) for val in mean_dict.values()))
     def test_case_4(self):
-        L = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-        stats = task_func(L)
-        self.assertAlmostEqual(stats['mean'], np.mean(L))
-        self.assertAlmostEqual(stats['median'], np.median(L))
-        self.assertEqual(stats['mode'], 10)
-        self.assertAlmostEqual(stats['std_dev'], np.std(L))
-        self.assertIsInstance(stats['plot'], plt.Axes)
+        # Test if the mean values are reasonable given the range of random integers (0-100)
+        mean_dict = task_func(self.letters)
+        self.assertTrue(all(0 <= val <= 100 for val in mean_dict.values()))
     def test_case_5(self):
-        L = [5]
-        stats = task_func(L)
-        self.assertAlmostEqual(stats['mean'], 5.0)
-        self.assertAlmostEqual(stats['median'], 5.0)
-        self.assertEqual(stats['mode'], 5)
-        self.assertAlmostEqual(stats['std_dev'], 0.0)
-        self.assertIsInstance(stats['plot'], plt.Axes)
+        # Test if the dictionary has 26 keys (one for each letter of the alphabet)
+        mean_dict = task_func(self.letters)
+        self.assertEqual(len(mean_dict), 26)

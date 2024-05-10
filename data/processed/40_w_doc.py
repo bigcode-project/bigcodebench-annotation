@@ -1,99 +1,86 @@
 import numpy as np
+from scipy.stats import ttest_1samp
 import matplotlib.pyplot as plt
-from scipy.fft import fft
+
+# Constants
+ALPHA = 0.05
 
 
-def task_func(signal, precision=2, seed=777):
+def task_func(data_matrix):
     """
-    Calculate the one-dimensional discrete N-point Fourier Transform (DFT) for a real or complex sequence (signal) 
-    using the Fast Fourier Transform (FFT) algorithm. Plot the original signal and the transformed signal, rounding 
-    the transformed signal values to the specified accuracy.
+    Calculate the mean value of each row in a 2D data matrix, run a t-test from a sample against the population value, and record the mean values that differ significantly.
+    - Create a lineplot with the mean of rows in red. Its label is 'Means'.
+    - Create a line plot with the significant_indices (those with a pvalue less than ALPHA) on the x-axis and the corresponding means on the y-axis. This plot should be blue. Its label is 'Significant Means'.
+    - Create an horizontal line which represent the mean computed on the whole 2D matrix. It should be in green. Its label is 'Population Mean'.
 
     Parameters:
-    - signal (array): An array representing the signal.
-    - precision (int, optional): The number of decimal places to which to round the transformed signal values. 
-                                 Defaults to 2.
-    - seed (int, optional): The seed for the random number generator. Defaults to 777.
+    data_matrix (numpy.array): The 2D data matrix.
 
     Returns:
-    - ndarray: A numpy array of transformed signal values (rounded to the specified precision).
-    - tuple: A tuple containing the Axes objects for the original signal and transformed signal plots.
+    tuple: A tuple containing:
+        - list: A list of indices of the means that are significantly different from the population mean.
+        - Axes: The plot showing the means and significant means.
 
     Requirements:
     - numpy
-    - matplotlib
-    - scipy
+    - scipy.stats.ttest_1samp
+    - matplotlib.pyplot
 
     Example:
-    >>> signal = np.array([0., 1., 0., -1.])
-    >>> transformed_signal, (ax1, ax2) = task_func(signal)
-    >>> print(transformed_signal)
-    [0.-0.j 0.-2.j 0.-0.j 0.+2.j]
+    >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
+    >>> indices, ax = task_func(data)
+    >>> print(indices)
+    []
+
+    Example 2:
+    >>> data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    >>> indices, ax = task_func(data)
+    >>> print(indices)
+    []
     """
-    np.random.seed(seed)
-    transformed_signal = fft(signal)
-    transformed_signal_rounded = np.round(transformed_signal, precision).tolist()
-    fig, ax = plt.subplots(2, 1)
-    ax[0].plot(signal)
-    ax[0].set_title('Original Signal')
-    ax[1].plot(transformed_signal_rounded)
-    ax[1].set_title('Transformed Signal')
-    plt.tight_layout()  # Adjust layout to avoid overlap
-    return np.array(transformed_signal_rounded), ax
+    means = np.mean(data_matrix, axis=1)
+    population_mean = np.mean(data_matrix)
+    _, p_value = ttest_1samp(means, population_mean)
+    significant_indices = np.where(p_value < ALPHA)[0]
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(means, "ro", label="Means")
+    ax.plot(
+        significant_indices, means[significant_indices], "bo", label="Significant Means"
+    )
+    ax.axhline(y=population_mean, color="g", linestyle="-", label="Population Mean")
+    ax.legend()
+    return significant_indices.tolist(), ax
 
 import unittest
-import doctest
 class TestCases(unittest.TestCase):
+    """Test cases for the task_func function."""
     def test_case_1(self):
-        # Test with a constant signal
-        signal = np.array([1.0, 1.0, 1.0, 1.0])
-        transformed_signal, (ax1, ax2) = task_func(signal)
-        
-        # Assert transformed signal
-        self.assertTrue(all(transformed_signal == np.array([4.0, 0.0, 0.0, 0.0])))
-        
-        # Assert plot titles
-        self.assertEqual(ax1.get_title(), 'Original Signal')
-        self.assertEqual(ax2.get_title(), 'Transformed Signal')
-    
+        data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        self._validate_function(data)
     def test_case_2(self):
-        # Test with a sine wave signal
-        signal = np.sin(np.linspace(0, 2 * np.pi, 100))
-        transformed_signal, (ax1, ax2) = task_func(signal, precision=3)
-        
-        # Assert transformed signal values (checking just the first few)
-        self.assertTrue(np.isclose(transformed_signal[0], 0.0, atol=1e-3))
-        
-        # Assert plot titles
-        self.assertEqual(ax1.get_title(), 'Original Signal')
-        self.assertEqual(ax2.get_title(), 'Transformed Signal')
-    
+        data = np.array([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
+        self._validate_function(data)
     def test_case_3(self):
-        # Test with a random signal
-        signal = np.random.rand(50)
-        transformed_signal, (ax1, ax2) = task_func(signal, precision=4)
-        
-        # Assert plot titles
-        self.assertEqual(ax1.get_title(), 'Original Signal')
-        self.assertEqual(ax2.get_title(), 'Transformed Signal')
-    
+        data = np.array([[3, 5, 7, 1000], [200, 5, 7, 1], [1, 9, 14, 700]])
+        self._validate_function(data)
     def test_case_4(self):
-        # Test with a short signal
-        signal = np.array([0., 1., 0., -1.])
-        transformed_signal, (ax1, ax2) = task_func(signal, precision=1)
-        
-        # Assert transformed signal
-        self.assertTrue(all(transformed_signal == np.array([-0.-0.j, 0.-2.j, 0.-0.j, 0.+2.j])))
-        
-        # Assert plot titles
-        self.assertEqual(ax1.get_title(), 'Original Signal')
-        self.assertEqual(ax2.get_title(), 'Transformed Signal')
-    
+        data = np.array(
+            [
+                [1, 2, 3, 4, 5, 4, 3, 2, 1],
+            ]
+        )
+        self._validate_function(data)
     def test_case_5(self):
-        # Test with a complex signal
-        signal = np.array([1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j])
-        transformed_signal, (ax1, ax2) = task_func(signal, precision=2)
-        
-        # Assert plot titles
-        self.assertEqual(ax1.get_title(), 'Original Signal')
-        self.assertEqual(ax2.get_title(), 'Transformed Signal')
+        data = np.array([[1], [1], [1]])
+        self._validate_function(data)
+    def _validate_function(self, data):
+        indices, ax = task_func(data)
+        self.assertIsInstance(indices, list)
+        lines = ax.get_lines()
+        self.assertEqual(len(lines), 3)
+        self.assertEqual(lines[0].get_color(), "r")
+        self.assertEqual(lines[0].get_label(), "Means")
+        self.assertEqual(lines[1].get_color(), "b")
+        self.assertEqual(lines[1].get_label(), "Significant Means")
+        self.assertEqual(lines[2].get_color(), "g")
+        self.assertEqual(lines[2].get_label(), "Population Mean")

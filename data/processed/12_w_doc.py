@@ -1,67 +1,89 @@
-import math
-import statistics
 import numpy as np
+import itertools
+import random
 
 
-def task_func(input_list):
+def task_func(T1, max_value=100):
     """
-    Sorts the input list in ascending order based on the degree value of its elements, and then 
-    calculates the mean, median, and mode of both the sorted list and the same for the magnitude of 
-    the fast fourier transform of the degree values upto the nearest integer.
+    Converts elements in 'T1', a tuple of tuples containing string representations 
+    of integers, to integers and creates a list of random integers. The size of the 
+    list equals the sum of these integers. Returns the 25th, 50th, and 75th percentiles 
+    of this list.
 
     Parameters:
-    input_list (list): A list of numbers to be sorted and analyzed.
-
+    T1 (tuple of tuple of str): A tuple of tuples, each containing string representations of integers.
+    max_value (int): The upper bound for random number generation, exclusive. Default is 100.
+    
     Returns:
-    tuple: A tuple containing the rounded mean, median and mode of the sorted list along with those 
-    for the magnitude of the fast fourier transform of the degree values.
+    tuple: A tuple (p25, p50, p75) representing the 25th, 50th, and 75th percentiles of the list.
 
     Requirements:
-    - math
-    - statistics
     - numpy
-
+    - itertools
+    - random
+    
     Example:
-    >>> input_list = [30, 45, 60, 90, 180]
-    >>> stats = task_func(input_list)
-    >>> print(stats)
-    (81, 60, 30, 10712, 8460, 8460)
+    >>> import random
+    >>> random.seed(42)
+    >>> T1 = (('13', '17', '18', '21', '32'), ('07', '11', '13', '14', '28'), ('01', '05', '06', '08', '15', '16'))
+    >>> percentiles = task_func(T1)
+    >>> print(percentiles)
+    (24.0, 48.0, 77.0)
     """
-    fft = np.abs(np.fft.fft([math.degrees(x) for x in input_list]))
-    sorted_list = sorted(input_list, key=lambda x: (math.degrees(x), x))
-    mean = statistics.mean(sorted_list)
-    median = statistics.median(sorted_list)
-    mode = statistics.mode(sorted_list)
-    mean_fft = round(statistics.mean(fft))
-    median_fft = round(statistics.median(fft))
-    mode_fft = round(statistics.mode(fft))
-    return (mean, median, mode, mean_fft, median_fft, mode_fft)
+    int_list = [list(map(int, x)) for x in T1]
+    flattened_list = list(itertools.chain(*int_list))
+    total_nums = sum(flattened_list)
+    random_nums = [random.randint(0, max_value) for _ in range(total_nums)]
+    p25 = np.percentile(random_nums, 25)
+    p50 = np.percentile(random_nums, 50)
+    p75 = np.percentile(random_nums, 75)
+    return p25, p50, p75
 
 import unittest
-import doctest
+from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
-        input_data = [30, 45, 60, 90, 180]
-        result = task_func(input_data)
-        self.assertEqual(result, (81, 60, 30, 10712, 8460, 8460))
-        
-    def test_case_2(self):
-        input_data = [0, 90, 180, 270, 360]
-        result = task_func(input_data)
-        self.assertEqual(result, (180, 180, 0, 24508, 21932, 21932))
-        
-    def test_case_3(self):
-        input_data = [10, 20, 30, 40, 50]
-        result = task_func(input_data)
-        self.assertEqual(result, (30, 30, 10, 3296, 2437, 2437))
-        
-    def test_case_4(self):
-        input_data = [15, 30, 45, 60, 75, 90, 105, 120, 135, 150]
-        result = task_func(input_data)
-        self.assertEqual(result[:5], (82.5, 82.5, 15, 11366, 6311))
-        
-    def test_case_5(self):
-        input_data = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
-        result = task_func(input_data)
-        self.assertEqual(result, (32.5, 32.5, 5, 4718, 2431, 6641))
+    @patch('random.randint')
+    def test_case_1(self, mock_randint):
+        """Test with diverse values and the default range to ensure percentile calculation."""
+        mock_randint.return_value = 50  # Mocking random.randint to always return 50
+        T1 = (('13', '17', '18', '21', '32'), ('07', '11', '13', '14', '28'), ('01', '05', '06', '08', '15', '16'))
+        p25, p50, p75 = task_func(T1)
+        self.assertEqual(p25, 50)
+        self.assertEqual(p50, 50)
+        self.assertEqual(p75, 50)
+    @patch('random.randint')
+    def test_case_2(self, mock_randint):
+        """Check consistency when the total number of elements are small but repeated."""
+        mock_randint.return_value = 30  # Consistent lower value for a different perspective
+        T1 = (('10',), ('10', '10', '10'))
+        p25, p50, p75 = task_func(T1)
+        self.assertEqual(p25, 30)
+        self.assertEqual(p50, 30)
+        self.assertEqual(p75, 30)
+    @patch('random.randint')
+    def test_case_3(self, mock_randint):
+        """Ensure that percentile calculations are consistent for mixed low and medium values."""
+        mock_randint.return_value = 75  # Higher consistent value
+        T1 = (('5', '5', '5', '5'), ('10', '15'), ('1', '2', '3', '4', '5'))
+        p25, p50, p75 = task_func(T1)
+        self.assertEqual(p25, 75)
+        self.assertEqual(p50, 75)
+        self.assertEqual(p75, 75)
+    @patch('random.randint')
+    def test_case_4(self, mock_randint):
+        """Tests percentile values for a simple large-value case."""
+        mock_randint.return_value = 10  # Low consistent value to see impact on percentiles
+        T1 = (('50',), ('25', '25'))
+        p25, p50, p75 = task_func(T1)
+        self.assertEqual(p25, 10)
+        self.assertEqual(p50, 10)
+        self.assertEqual(p75, 10)
+    @patch('random.randint')
+    def test_case_5(self, mock_randint):
+        """Test with an extreme case where all random numbers are the same, ensuring no variability."""
+        mock_randint.return_value = 90  # High consistent value
+        T1 = (('1', '1', '1', '1', '1', '1', '1', '1', '1', '1'), ('10', '10'))
+        p25, p50, p75 = task_func(T1)
+        self.assertEqual(p25, 90)
+        self.assertEqual(p50, 90)
+        self.assertEqual(p75, 90)

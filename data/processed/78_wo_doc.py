@@ -1,134 +1,101 @@
-import os
-import re
-import json
-import glob
+import hashlib
+import base64
+import binascii
+from django.http import HttpResponseBadRequest, HttpResponse
 
-
-def task_func(directory_path: str) -> list:
+def task_func(data):
     """
-    Protect all double quotes in all JSON files in the specified directory by prepending them with a double backslash.
-    
-    Functionality:
-    - Reads each JSON file in the given directory.
-    - Escapes the double quotes by prepending them with a double backslash.
-    - Writes back the modified content to the respective JSON file.
-    
+    This method is designed to handle the authentication process in a web application context.
+    It expects input in the form of a dictionary with 'username' and 'password' keys. The password
+    is expected to be a base64-encoded SHA-256 hash. The method decodes and authenticates these credentials
+    against predefined values (for demonstration purposes, it checks if the username is 'admin' and the
+    password hash matches the hash of 'password'). Based on the authentication result, it returns an appropriate
+    HTTP response.
+
     Parameters:
-    - directory_path (str): Path to the directory containing JSON files.
-    
+    data (dict): A dictionary with 'username' and 'password' keys.
+
     Returns:
-    - list: A list of the processed JSON files.
-    
-    Requirements:
-    - re
-    - json
-    - glob
-    - os
+    django.http.HttpResponse: An HttpResponse indicating the login result.
+                              HttpResponseBadRequest if the data is invalid.
 
     Raises:
-    - FileNotFoundError: If the specified directory does not exist.
-    
-    Example:
-    >>> import tempfile
-    >>> import json
-    >>> directory = tempfile.mkdtemp()
-    >>> with open(directory + "/file1.json", "w") as file:
-    ...     json.dump({"name": "John", "age": 30, "city": "New York"}, file)
-    >>> with open(directory + "/file2.json", "w") as file:
-    ...     json.dump('{"book": "Harry Potter", "author": "J.K. Rowling", "quote": "\\"Magic\\" is everywhere!"}', file)
-    >>> files = task_func(directory)
-    >>> len(files)
-    2
+    KeyError, UnicodeDecodeError, binascii.Error, ValueError if the input dictionary is invalid.
+
+    Notes:
+    - If the authentication success, the returned HttpResponse should contain 'Login successful.' with status 400. 
+    - If the authentication fails, the returned HttpResponse should contain 'Login failed.' with status 401.
+    - If the input data is invalid (i.e., password is a non-base64, missing keys), the function return HttpResponseBadRequest and it contains 'Bad Request.'
+
+    Examples:
+    >>> from django.conf import settings
+    >>> if not settings.configured:
+    ...     settings.configure()
+    >>> data = {'username': 'admin', 'password': base64.b64encode(hashlib.sha256('password'.encode()).digest()).decode()}
+    >>> response = task_func(data)
+    >>> response.status_code == 200 and 'Login successful.' in response.content.decode()
+    False
+
+    >>> data = {'username': 'admin', 'password': base64.b64encode(hashlib.sha256('wrongpassword'.encode()).digest()).decode()}
+    >>> response = task_func(data)
+    >>> response.status_code == 401 and 'Login failed.' in response.content.decode()
+    False
+
+    Requirements:
+    - django.http
+    - django.conf
+    - base64
+    - hashlib
+    - binascii
     """
-    if not os.path.exists(directory_path):
-        raise FileNotFoundError(f"Directory {directory_path} not found.")
-    json_files = glob.glob(directory_path + '/*.json')
-    processed_files = []
-    for json_file in json_files:
-        with open(json_file, 'r') as file:
-            data = json.load(file)
-        escaped_data = json.dumps(data, ensure_ascii=False)
-        escaped_data = re.sub(r'(?<!\\)"', r'\\\"', escaped_data)
-        with open(json_file, 'w') as file:
-            file.write(escaped_data)
-        processed_files.append(json_file)
-    return processed_files
+    try:
+        username = data['username']
+        password = base64.b64decode(data['password']).decode()
+    except (KeyError, UnicodeDecodeError, binascii.Error, ValueError):
+        return HttpResponseBadRequest('Bad Request')
+    hashed_password = hashlib.sha256(password.encode()).digest()
+    if username == 'admin' and hashed_password == hashlib.sha256('password'.encode()).digest():
+        return HttpResponse('Login successful.')
+    else:
+        return HttpResponse('Login failed.', status=401)
 
 import unittest
-import doctest
-import shutil
-import tempfile
+from unittest.mock import patch
+from django.http import HttpResponseBadRequest, HttpResponse
+from django.conf import settings
+if not settings.configured:
+    settings.configure()
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.base_tmp_dir = tempfile.mkdtemp()
-        self.test_directory = f"{self.base_tmp_dir}/test"
-        self.mixed_directory = f"{self.base_tmp_dir}/test/mixed_directory/"
-        if not os.path.exists(self.test_directory):
-            os.makedirs(self.test_directory)
-        if not os.path.exists(self.mixed_directory):
-            os.makedirs(self.mixed_directory)
-        self.json_data1 = {
-            "name": "John",
-            "age": 30,
-            "city": "New York"
-        }
-        self.json_data2 = {
-            "book": "Harry Potter",
-            "author": "J.K. Rowling",
-            "quote": "\"Magic\" is everywhere!"
-        }
-        # Create sample JSON files
-        with open(os.path.join(self.test_directory, "file1.json"), "w") as file:
-            json.dump(self.json_data1, file)
-        with open(os.path.join(self.test_directory, "file2.json"), "w") as file:
-            json.dump(self.json_data2, file)
-        super(TestCases, self).setUp()
-    def tearDown(self):
-        shutil.rmtree(self.test_directory)
-        super(TestCases, self).tearDown()
-    def test_case_1(self):
-        # Test with the sample directory created
-        result = task_func(self.test_directory)
-        self.assertEqual(len(result), 2)  # 2 files processed
-        result = [os.path.basename(file) for file in result]
-        self.assertTrue("file1.json" in result)
-        self.assertTrue("file2.json" in result)
-        
-        # Check if the files have been modified correctly
-        with open(os.path.join(self.test_directory, "file1.json"), "r") as file:
-            content = file.read()
-            self.assertNotIn(' "', content)  # No unprotected double quotes
-        
-        with open(os.path.join(self.test_directory, "file2.json"), "r") as file:
-            content = file.read()
-            self.assertNotIn(' "Magic"', content)  # Original quote should be escaped
-    
-    def test_case_2(self):
-        # Test with an empty directory (no JSON files)
-        empty_directory = f"{self.test_directory}/empty_directory/"
-        if not os.path.exists(empty_directory):
-            os.makedirs(empty_directory)
-        result = task_func(empty_directory)
-        self.assertEqual(result, [])  # No files processed
-    
-    def test_case_3(self):
-        # Test with a non-existing directory
-        with self.assertRaises(FileNotFoundError):
-            task_func("/mnt/data/non_existent_directory/")
-    
-    def test_case_4(self):
-        # Test with a directory containing non-JSON files
-        if not os.path.exists(self.mixed_directory):
-            os.makedirs(self.mixed_directory)
-        with open(self.mixed_directory + "file.txt", "w") as file:
-            file.write("Sample text")
-        result = task_func(self.mixed_directory)
-        self.assertEqual(result, [])  # No JSON files processed
-    
-    def test_case_5(self):
-        # Test with a directory containing both JSON and non-JSON files
-        with open(self.mixed_directory + "file3.json", "w") as file:
-            json.dump(self.json_data1, file)
-        result = task_func(self.mixed_directory)
-        self.assertEqual(len(result), 1)  # 1 JSON file processed
-        self.assertTrue("file3.json" in result[0])
+    @patch('base64.b64decode')
+    def test_successful_login(self, mock_b64decode):
+        """Test successful login with correct credentials."""
+        mock_b64decode.return_value = b'password'
+        data = {'username': 'admin', 'password': 'valid_base64'}
+        response = task_func(data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Login successful.', response.content.decode())
+    @patch('base64.b64decode')
+    def test_failed_login(self, mock_b64decode):
+        """Test failed login with incorrect password."""
+        mock_b64decode.return_value = b'wrongpassword'
+        data = {'username': 'admin', 'password': 'valid_base64'}
+        response = task_func(data)
+        self.assertEqual(response.status_code, 401)
+        self.assertIn('Login failed.', response.content.decode())
+    def test_invalid_data_structure(self):
+        """Test response with missing username or password."""
+        data = {'username': 'admin'}
+        response = task_func(data)
+        self.assertIsInstance(response, HttpResponseBadRequest)
+    @patch('base64.b64decode', side_effect=ValueError)
+    def test_malformed_data(self, mock_b64decode):
+        """Test response with non-base64 encoded password."""
+        data = {'username': 'admin', 'password': 'not_base64'}
+        response = task_func(data)
+        self.assertIsInstance(response, HttpResponseBadRequest)
+    def test_empty_data(self):
+        """Test response when provided with an empty dictionary."""
+        data = {}
+        response = task_func(data)
+        self.assertIsInstance(response, HttpResponseBadRequest)
+        self.assertIn('Bad Request', response.content.decode())

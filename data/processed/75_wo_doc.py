@@ -1,100 +1,93 @@
-from collections import Counter
-import json
-import random
+import socket
+import requests
 
-
-# Constants
-WORDS = ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape', 'honeydew']
-
-def task_func(n, file_name, seed=77):
+def task_func(host):
     """
-    Create a json file with a number of n randomly selected words from a constant list named WORDS.
-    
-    Parameters:
-    n (int): The number of words to select from the list.
-    file_name (str): The name of the json file to be generated.
-    seed (int, Optional): The seed for the random number generator. Defaults to 77.
-    
-    Returns:
-    str: The name of the json file generated.
+    This function resolves the IP address of the given host and then uses the IP address 
+    to fetch geolocation information from the ipinfo.io API. The function is robust against
+    various common errors, such as invalid hostnames, network issues, or problems with the 
+    geolocation service.
 
-    Requirements:
-    - collections
-    - json
-    - random
+    Parameters:
+    host (str): The hostname to be resolved.
+
+    Returns:
+    dict: A dictionary containing the IP address and geolocation information if successful.
+
+    Raises:
+    ValueError: If 'host' is None or an empty string.
+    ConnectionError: If there is a problem connecting to the geolocation service.
 
     Example:
-    >>> import tempfile
-    >>> temp_dir = tempfile.mkdtemp()
-    >>> file_name = temp_dir + "/word_counts.json"
-    >>> task_func(5, file_name, 29).endswith('word_counts.json')
+    >>> result = task_func('google.com')
+    >>> 'ip_address' in result and 'geolocation' in result
     True
+    >>> task_func('')
+    Traceback (most recent call last):
+       ...
+    ValueError: Host must be a non-empty string.
+    
+    Requirements:
+    - socket
+    - requests
     """
-    random.seed(seed)
-    if n < 1 or n > len(WORDS):
-        raise ValueError('n must be greater than 0')
-    random.shuffle(WORDS)
-    selected_words = WORDS[:n]
-    counts = Counter(selected_words)
-    with open(file_name, 'w') as f:
-        json.dump(dict(counts), f)
-    return file_name
+    if not host:
+        raise ValueError("Host must be a non-empty string.")
+    try:
+        ip_address = socket.gethostbyname(host)
+        response = requests.get(f"https://ipinfo.io/{ip_address}")
+        response.raise_for_status()
+        geolocation = response.json()
+        return {
+            'ip_address': ip_address,
+            'geolocation': geolocation
+        }
+    except (socket.gaierror, requests.HTTPError) as e:
+        raise ConnectionError(f"Failed to retrieve information for {host}: {e}")
 
 import unittest
-import os
-import doctest
+import unittest.mock as mock
+import socket
+import requests
 class TestCases(unittest.TestCase):
-    file_name = "word_counts.json"
-    def tearDown(self) -> None:
-        if os.path.exists(self.file_name):
-            os.remove(self.file_name)
-        return super().tearDown()
-    def test_case_1(self):
-        # Test with n = 3
-        self.file_name = task_func(3, self.file_name)
-        self.assertTrue(os.path.exists(self.file_name))
-        with open(self.file_name, 'r') as f:
-            data = json.load(f)
-        self.assertEqual(len(data), 3)
-        
-    def test_case_2(self):
-        # Test with n = 5
-        self.file_name = task_func(5, self.file_name, 29)
-        self.assertTrue(os.path.exists(self.file_name))
-        with open(self.file_name, 'r') as f:
-            data = json.load(f)
-        self.assertEqual(len(data), 5)
-        # Test if the counts are correct
-        self.assertEqual(data['honeydew'], 1)
-        self.assertEqual(data['elderberry'], 1)
-        self.assertEqual(data['grape'], 1)
-        self.assertEqual(data['cherry'], 1)
-        self.assertEqual(data['banana'], 1)
-        
-    def test_case_3(self):
-        # Test with n less than 1
+    @mock.patch('socket.gethostbyname')
+    @mock.patch('requests.get')
+    def test_valid_host(self, mock_get, mock_gethostbyname):
+        # Simulates a valid response scenario.
+        mock_gethostbyname.return_value = '8.8.8.8'
+        mock_get.return_value = mock.Mock(status_code=200, json=lambda: {"city": "Mountain View", "country": "US"})
+        result = task_func('google.com')
+        self.assertIn('ip_address', result)
+        self.assertIn('geolocation', result)
+        self.assertEqual(result['ip_address'], '8.8.8.8')
+        self.assertEqual(result['geolocation'], {"city": "Mountain View", "country": "US"})
+    def test_invalid_host(self):
+        # Checks for handling of empty strings as host.
         with self.assertRaises(ValueError):
-            task_func(0, self.file_name)
-            
-    def test_case_4(self):
-        # Test with n greater than length of WORDS list
+            task_func('')
+    def test_invalid_host_none(self):
+        # Checks for handling None as host.
         with self.assertRaises(ValueError):
-            task_func(100, self.file_name)
-            
-    def test_case_5(self):
-        # Test with n equal to length of WORDS list
-        self.file_name = task_func(
-            len(
-                ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape', 'honeydew']
-            ),
-            self.file_name
-        )
-        self.assertTrue(os.path.exists(self.file_name))
-        with open(self.file_name, 'r') as f:
-            data = json.load(f)
-        self.assertEqual(
-            len(data), 
-            len(
-                ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape', 'honeydew']
-            )
-        )
+            task_func(None)
+    @mock.patch('socket.gethostbyname')
+    def test_connection_error(self, mock_gethostbyname):
+        # Simulates a DNS resolution error.
+        mock_gethostbyname.side_effect = socket.gaierror
+        with self.assertRaises(ConnectionError):
+            task_func('invalidhost.com')
+    @mock.patch('socket.gethostbyname')
+    @mock.patch('requests.get')
+    def test_http_error(self, mock_get, mock_gethostbyname):
+        # Simulates an HTTP error from the geolocation service.
+        mock_gethostbyname.return_value = '8.8.8.8'
+        mock_get.return_value = mock.Mock(status_code=500)
+        mock_get.return_value.raise_for_status.side_effect = requests.HTTPError
+        with self.assertRaises(ConnectionError):
+            task_func('example.com')
+    @mock.patch('socket.gethostbyname')
+    @mock.patch('requests.get')
+    def test_nonexistent_host(self, mock_get, mock_gethostbyname):
+        # Simulates a DNS error for a nonexistent domain.
+        mock_gethostbyname.side_effect = socket.gaierror
+        with self.assertRaises(ConnectionError):
+            task_func('nonexistentdomain.com')

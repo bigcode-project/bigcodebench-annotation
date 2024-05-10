@@ -1,127 +1,115 @@
-import re
-import json
-import os
+import numpy as np
+import matplotlib.pyplot as plt
+from datetime import datetime
 
+# Constants
+PLOT_TITLE = 'Square root plot'
+X_LABEL = 'x'
+Y_LABEL = 'sqrt(x)'
+TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
-def task_func(file_path: str, regex_pattern=r'\(.+?\)|\w') -> dict:
+def task_func(result):
     """
-    Extracts matches from a JSON file based on a predefined regular pattern.
-    The default regular expression pattern is designed to extract any content between parentheses
-    as a single match and any individual character outside the parentheses as a separate match.
-    
+    Plots the square root function for values associated with the key 'from_user' from the input list of dictionaries. Annotates the graph with the current date and time.
+    - Round each square root value to 2 decimals.
+
     Parameters:
-    - file_path (str): The path to the JSON file. The JSON file should contain key-value pairs
-                       where the values are strings to be matched against the regex pattern.
-                       
+    result (list): A list of dictionaries containing numeric values with the key 'from_user'.
+
     Returns:
-    - dict: A dictionary with the JSON file name as the key and a list of matches as values.
-            The format is: {filename: [match1, match2, ...]}.
-            
+    - numpy.ndarray: list of square values associated with the key 'from_user' from the input list of dictionaries.
+    - matplotlib.axes.Axes: plot of square root values.
+
     Requirements:
-    - The function makes use of the following libraries/modules: re, json, os.
-    
+    - numpy
+    - matplotlib.pyplot
+    - datetime
+
+    Constants:
+    - PLOT_TITLE: Title of the plot (default is 'Square root plot').
+    - X_LABEL: Label for the x-axis (default is 'x').
+    - Y_LABEL: Label for the y-axis (default is 'sqrt(x)').
+    - TIME_FORMAT: Format for displaying the current date and time (default is '%Y-%m-%d %H:%M:%S').
+
     Example:
-    >>> import tempfile
-    >>> temp_dir = tempfile.gettempdir()
-    >>> file_path = os.path.join(temp_dir, 'sample_data.json')
-    >>> with open(file_path, 'w') as file:
-    ...     json.dump({'content': 'This is a (sample) text with some (matches) and characters.'}, file)
-    >>> matches = task_func(file_path)
-    >>> len(matches['sample_data.json'])
-    34
+    >>> result = [{"hi": 7, "bye": 4, "from_user": 16}, {"some_key": 2, "another_key": 4, "from_user": 9}]
+    >>> square_roots, ax = task_func(result)
+    >>> print(square_roots)
+    [4. 3.]
     """
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-        text = ' '.join(data.values())
-        matches = re.findall(regex_pattern, text)
-    match_dict = {os.path.basename(file_path): matches}
-    return match_dict
+    from_user_values = [d['from_user'] for d in result if 'from_user' in d]
+    square_roots = np.round(np.sqrt(from_user_values), 2)
+    plt.figure()
+    plt.plot(from_user_values, square_roots)
+    plt.title(PLOT_TITLE)
+    plt.xlabel(X_LABEL)
+    plt.ylabel(Y_LABEL)
+    now = datetime.now()
+    now_str = now.strftime(TIME_FORMAT)
+    plt.annotate(now_str, (0.05, 0.95), xycoords='axes fraction')
+    ax = plt.gca()
+    return square_roots, ax
 
 import unittest
-import shutil
-import doctest
-import tempfile
+import matplotlib
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        sample_data = {
-            "data1.json": {
-                "text1": "This is a (sample) text with some (matches) and characters.",
-                "text2": "Another (example) with multiple matches."
-            },
-            "data2.json": {
-                "text1": "(Hello) world!",
-                "text2": "No matches here."
-            },
-            "data3.json": {
-                "text1": "Testing (with) another (file).",
-                "text2": "Just some (random) text."
-            },
-            "data4.json": {
-                "text1": "(A) quick brown (fox) jumps.",
-                "text2": "Over the lazy (dog)."
-            },
-            "data5.json": {
-                "text1": "Yet (another) test file.",
-                "text2": "With (various) matches."
-            }
-        }
-        # Directory to save the test data
-        self.base_tmp_dir = tempfile.mkdtemp()
-        self.test_data_dir = f"{self.base_tmp_dir}/test/"
-        # Create the directory if it doesn't exist
-        if not os.path.exists(self.test_data_dir):
-            os.makedirs(self.test_data_dir)
-        # Saving the test data as JSON files
-        for filename, content in sample_data.items():
-            with open(os.path.join(self.test_data_dir, filename), "w") as file:
-                json.dump(content, file)
-    def tearDown(self):
-        # Remove the test data directory
-        shutil.rmtree(self.test_data_dir)
+    """Test cases for the task_func function."""
     def test_case_1(self):
-        matches = task_func(os.path.join(self.test_data_dir, "data1.json"))
-        expected = {
-            "data1.json": [
-                'T', 'h', 'i', 's', 'i', 's', 'a', '(sample)', 't', 'e', 'x', 't', 'w', 'i', 't', 
-                'h', 's', 'o', 'm', 'e', '(matches)', 'a', 'n', 'd', 'c', 'h', 'a', 'r', 'a', 'c', 
-                't', 'e', 'r', 's', 'A', 'n', 'o', 't', 'h', 'e', 'r', '(example)', 'w', 'i', 't',
-                'h', 'm', 'u', 'l', 't', 'i', 'p', 'l', 'e', 'm', 'a', 't', 'c', 'h', 'e', 's'
-            ]
-        }
-        self.assertEqual(matches, expected)
+        # Input 1: Normal case with 2 dictionaries with 'from_user' keys.
+        data = [
+            {"key_1": 7, "key_2": 4, "from_user": 16},
+            {"key_1": 2, "key_2": 4, "from_user": 9},
+        ]
+        square_roots, ax = task_func(data)
+        self.assertEqual(ax.get_title(), PLOT_TITLE)
+        self.assertEqual(ax.get_xlabel(), X_LABEL)
+        self.assertEqual(ax.get_ylabel(), Y_LABEL)
+        np.testing.assert_array_equal(square_roots, np.array([4.0, 3.0]))
+        annotations = [child for child in ax.get_children() if isinstance(child, matplotlib.text.Annotation)]
+        try:
+            datetime.strptime(annotations[0].get_text(), TIME_FORMAT)
+        except:
+            raise ValueError(f"The datetime in annotation ({annotations[0]}) does not have the right format ({TIME_FORMAT}).")
     def test_case_2(self):
-        matches = task_func(os.path.join(self.test_data_dir, "data2.json"))
-        expected = {
-            "data2.json": [
-                '(Hello)', 'w', 'o', 'r', 'l', 'd', 'N', 'o', 'm', 'a', 't', 'c', 'h', 
-                'e', 's', 'h', 'e', 'r', 'e'
-            ]
-        }
-        self.assertEqual(matches, expected)
+        # Input 2: List with 1 dictionary without the 'from_user' key.
+        data = [
+            {
+                "key_1": 7,
+                "key_2": 4
+            }
+        ]
+        square_roots, ax = task_func(data)
+        self.assertEqual(len(square_roots), 0)
     def test_case_3(self):
-        matches = task_func(os.path.join(self.test_data_dir, "data3.json"))
-        expected = {
-            "data3.json": [
-                'T', 'e', 's', 't', 'i', 'n', 'g', '(with)', 'a', 'n', 'o', 't', 'h', 'e', 'r', '(file)', 'J',
-                'u', 's', 't', 's', 'o', 'm', 'e', '(random)', 't', 'e', 'x', 't'    
-            ]
-        }
-        self.assertEqual(matches, expected)
+        # Input 3: Empty list.
+        data = []
+        square_roots, ax = task_func(data)
+        self.assertEqual(len(square_roots), 0)
     def test_case_4(self):
-        matches = task_func(os.path.join(self.test_data_dir, "data4.json"))
-        expected = {
-            "data4.json": [
-                '(A)', 'q', 'u', 'i', 'c', 'k', 'b', 'r', 'o', 'w', 'n', '(fox)', 'j', 'u', 'm', 'p',
-                's', 'O', 'v', 'e', 'r', 't', 'h', 'e', 'l', 'a', 'z', 'y', '(dog)'
-            ]
-        }
-        self.assertEqual(matches, expected)
+        # Input 4: Normal case with 5 dictionaries with 'from_user' keys.
+        data = [
+            {
+                "from_user": 121,
+                "unused_key": 45,
+            },
+            {
+                "from_user": 169,
+                "unused_key": -1,
+            },
+            {
+                "from_user": 225,
+            },
+            {
+                "from_user": 9,
+            },
+            {
+                "from_user": 49,
+            },
+        ]
+        square_roots, ax = task_func(data)
+        np.testing.assert_array_equal(square_roots, np.array([11.0, 13.0, 15.0, 3.0, 7.0]))
     def test_case_5(self):
-        matches = task_func(os.path.join(self.test_data_dir, "data5.json"))
-        expected = {
-            "data5.json": [
-                'Y', 'e', 't', '(another)', 't', 'e', 's', 't', 'f', 'i', 'l', 'e', 'W', 'i', 't', 
-                'h', '(various)', 'm', 'a', 't', 'c', 'h', 'e', 's'   
-            ]
-        }
-        self.assertEqual(matches, expected)
+        # Input 5: List with 1 dictionary with the 'from_user' key.
+        data = [{"from_user": 7, "bye": 4}]
+        square_roots, ax = task_func(data)
+        np.testing.assert_array_equal(square_roots, np.array([2.65]))

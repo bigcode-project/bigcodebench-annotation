@@ -1,99 +1,105 @@
-import numpy as np
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
+import os
+import glob
+import zipfile
 
-
-def task_func(data, save_plot=False, plot_path=None):
+def task_func(directory):
     """
-    Unzip a list of objects and their 3D coordinates, run PCA to reduce the dimensionality to 2D, 
-    and depending on the value of save_plot parameter, either save the plot to the provided path and 
-    return the 2D coordinates or return the 2D coordinates and the plot's Axes.
-
+    Zips all files (not including subdirectories) located in the specified directory and returns the path to the created zip file.
+    
     Parameters:
-    - data (list of tuple): A list containing tuples of an object and its 3D coordinates.
-    - save_plot (bool, optional): If True, the plot will be saved. Defaults to False.
-    - plot_path (str, optional): The path where the plot will be saved. Required if save_plot is True.
-
+    directory (str): The directory path containing the files to be zipped.
+    
     Returns:
-    - coordinates_2d (numpy.ndarray): The 2D coordinates after applying PCA.
-    - ax (matplotlib.axes._axes.Axes, optional): The plot's Axes if save_plot is True.
+    str: The path to the generated zip file. Returns None if the directory does not contain any files.
+    
+    Raises:
+    FileNotFoundError: if the specified directory does not exist
 
     Requirements:
-    - numpy
-    - sklearn.decomposition.PCA
-    - matplotlib.pyplot
-
-    Raises:
-    - ValueError: If save_plot is True but plot_path is not provided.
+    - os
+    - glob
+    - zipfile
+    
+    Notes:
+    - The zip name is always 'files.zip'
 
     Example:
-    >>> import tempfile
-    >>> temp_dir = tempfile.gettempdir()
-    >>> task_func([('A', 1, 1, 1), ('B', 2, 2, 2)], save_plot=True, plot_path=f"{temp_dir}/temp_plot.png")[0]
-    array([[ 8.66025404e-01,  4.09680598e-17],
-           [-8.66025404e-01,  4.09680598e-17]])
+    >>> path = task_func('/path/to/files')
+    >>> isinstance(path, str)
+    True
     """
-    items, x_values, y_values, z_values = zip(*data)
-    coordinates = np.array(list(zip(x_values, y_values, z_values)))
-    pca = PCA(n_components=2)
-    coordinates_2d = pca.fit_transform(coordinates)
-    plt.figure()
-    fig, ax = plt.subplots()
-    ax.scatter(*zip(*coordinates_2d))
-    if save_plot:
-        if plot_path:
-            plt.savefig(plot_path)
-            plt.close(fig)
-            return coordinates_2d, ax
-        else:
-            raise ValueError("plot_path is required if save_plot is True")
-    else:
-        return coordinates_2d
+    if not os.path.exists(directory):
+        raise FileNotFoundError(f"Directory '{directory}' not found.")
+    files = [f for f in glob.glob(os.path.join(directory, '*')) if os.path.isfile(f)]
+    if not files:
+        return None
+    zip_file_path = os.path.join(directory, 'files.zip')
+    with zipfile.ZipFile(zip_file_path, 'w') as zipf:
+        for file in files:
+            zipf.write(file, os.path.basename(file))
+    return zip_file_path
 
 import unittest
 import os
-import doctest
+import tempfile
+import zipfile
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Basic functionality test
-        data = [('A', 1, 1, 1), ('B', 2, 2, 2)]
-        result = task_func(data)
-        self.assertIsInstance(result, np.ndarray)
-        self.assertEqual(result.shape, (2, 2))
-        # Test the return value
-        self.assertTrue(np.allclose(result, [[0.866, 0], [-0.866, 0]], atol=0.1))
-    def test_case_2(self):
-        # Test with save_plot=True without providing plot_path
-        data = [('A', 1, 1, 1), ('B', 2, 2, 2)]
-        with self.assertRaises(ValueError):
-            task_func(data, save_plot=True)
-    def test_case_3(self):
-        # Test with save_plot=True and providing plot_path
-        data = [('A', 1, 1, 1), ('B', 2, 2, 2)]
-        plot_path = "temp_plot.png"
-        result, ax = task_func(data, save_plot=True, plot_path=plot_path)
-        self.assertTrue(os.path.exists(plot_path))
-        os.remove(plot_path)
-    def test_case_4(self):
-        # Test with different data
-        data = [('A', 3, 2, 1), ('B', 5, 6, 7), ('C', 8, 9, 10)]
-        result = task_func(data)
-        self.assertIsInstance(result, np.ndarray)
-        self.assertEqual(result.shape, (3, 2))
-    def test_case_5(self):
-        # Test with larger data
-        data = [('A', i, i+1, i+2) for i in range(10)]
-        result = task_func(data)
-        self.assertIsInstance(result, np.ndarray)
-        self.assertEqual(result.shape, (10, 2))
-        # Test the return value
-        self.assertTrue(
-            np.allclose(
-                result, 
-                [
-                    [-7.79, 0.], [-6.06, 0.], [-4.33, -0.], [-2.6, -0.], [-0.87, -0.], 
-                    [0.87, 0.], [2.6, 0.], [4.33, 0.], [6.06, -0.], [7.79, 0.]
-                ], 
-                atol=0.1
-            )
-        )
+    
+    def setUp(self):
+        """Setup a temporary directory before each test."""
+        self.test_dir = tempfile.mkdtemp()
+    
+    def tearDown(self):
+        """Clean up the temporary directory after each test."""
+        for root, dirs, files in os.walk(self.test_dir, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                os.rmdir(os.path.join(root, name))
+        os.rmdir(self.test_dir)
+    
+    def test_single_file_zip(self):
+        """Test zipping a directory with one file."""
+        with open(os.path.join(self.test_dir, "testfile1.txt"), "w") as f:
+            f.write("This is a test file.")
+        zip_path = task_func(self.test_dir)
+        self.assertTrue(os.path.exists(zip_path))
+    
+    def test_multiple_files_zip(self):
+        """Test zipping a directory with multiple files."""
+        for i in range(5):
+            with open(os.path.join(self.test_dir, f"testfile{i}.txt"), "w") as f:
+                f.write(f"This is test file {i}.")
+        zip_path = task_func(self.test_dir)
+        self.assertTrue(os.path.exists(zip_path))
+    
+    def test_empty_directory(self):
+        """Test zipping an empty directory should return None."""
+        zip_path = task_func(self.test_dir)
+        self.assertIsNone(zip_path)
+    
+    def test_non_existent_directory(self):
+        """Test behavior when the specified directory does not exist."""
+        with self.assertRaises(FileNotFoundError):
+            task_func("/non/existent/directory")
+    
+    def test_exclusion_of_subdirectories(self):
+        """Ensure that subdirectories within the specified directory are not included in the zip."""
+        os.makedirs(os.path.join(self.test_dir, "subdir"))
+        with open(os.path.join(self.test_dir, "testfile.txt"), "w") as f:
+            f.write("This is a test file.")
+        with open(os.path.join(self.test_dir, "subdir", "nestedfile.txt"), "w") as f:
+            f.write("This is a nested file.")
+        zip_path = task_func(self.test_dir)
+        with zipfile.ZipFile(zip_path, 'r') as zipf:
+            self.assertEqual(len(zipf.namelist()), 1)  # Only testfile.txt should be included
+    def test_file_integrity_in_zip(self):
+        """Check that files zipped are intact and readable."""
+        filename = "testfile.txt"
+        content = "This is a test file."
+        with open(os.path.join(self.test_dir, filename), "w") as f:
+            f.write(content)
+        zip_path = task_func(self.test_dir)
+        with zipfile.ZipFile(zip_path, 'r') as zipf:
+            with zipf.open(filename) as file:
+                self.assertEqual(file.read().decode(), content)
