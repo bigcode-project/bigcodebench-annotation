@@ -1,5 +1,5 @@
 # 
-NAMES=(indraneil) #chien jenny wenhao niklas hanhu ratna simon ming zhihan james xiaoheng armel)
+NAMES=(indraneil chien jenny wenhao niklas hanhu ratna simon ming zhihan james xiaoheng armel)
 rm -rf data/clean/*
 mkdir -p data/clean
 for name in "${NAMES[@]}"; do
@@ -13,8 +13,8 @@ python script/parse.py
 gzip -c data/wild-code-bench.jsonl > data/wild-code-bench.jsonl.gz
 
 # # used for WildCode evaluation
-pip install -U wild-code
-python script/eval.py --samples data/wild-code-bench.jsonl
+# pip install -U wild-code
+# python script/eval.py --samples data/wild-code-bench.jsonl
 
 for file in data/processed/*wo_doc.py; do
     
