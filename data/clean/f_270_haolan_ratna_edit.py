@@ -56,20 +56,21 @@ import unittest
 from unittest.mock import patch, MagicMock
 from collections import Counter
 from faker import Faker
-
+import shutil
 
 
 # Blackbox test cases
 class TestCases(unittest.TestCase):
     def setUp(self):
         self.test_directory = './testdir_f270'
+        os.makedirs(self.test_directory, exist_ok=True)
+        
         self.output_file = 'test_output.csv'
         self.list_files = []
 
     # Function to create fake dictionary files
     def create_fake_dict_files(self, directory, num_files, num_words):
         fake = Faker()
-        os.makedirs(directory, exist_ok=True)
         for _ in range(num_files):
             file_name = fake.file_name(extension='txt')
             self.list_files.append(os.path.join(directory, file_name))
@@ -89,7 +90,7 @@ class TestCases(unittest.TestCase):
         if os.path.exists('test_output.csv'):
             os.remove('test_output.csv')
         if os.path.exists(self.test_directory):
-            os.rmdir(self.test_directory)
+            shutil.rmtree(self.test_directory)
 
     def test_no_files_in_directory(self):
         # Test case where there are no txt files in the directory
@@ -97,7 +98,7 @@ class TestCases(unittest.TestCase):
         result = f_270(self.output_file, self.test_directory)
         self.assertEqual(result, 0)
         self.remove_files()
-
+    
     def test_single_file_multiple_words(self):
         # Test case with a single file containing multiple words
         self.create_fake_dict_files(self.test_directory, 1, 50)
@@ -112,7 +113,6 @@ class TestCases(unittest.TestCase):
         result = f_270(self.output_file, self.test_directory)
         self.remove_files()
         self.assertEqual(100,result)
-        # self.assertFalse(result)
 
     def test_directory_does_not_exist(self):
         # Test case where the specified directory does not exist
