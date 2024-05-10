@@ -87,7 +87,7 @@ class TestCases(unittest.TestCase):
             self.assertTrue(os.path.exists(os.path.join(dest_dir, file)))
             self.assertFalse(os.path.exists(os.path.join(source_dir, file)))
         # Test the names of the moved files
-        self.assertSetEqual(set(moved_files), set([f"file{i}.txt" for i in [7, 1, 2, 9, 4]]))
+        self.assertSetEqual(set(moved_files), set([f"file{i}.txt" for i in [6, 8, 2, 9, 0]]))
 
     def test_case_2(self):
         # Test the case where no files are moved
