@@ -31,6 +31,7 @@
  - Wen-Ding Li
  - Ming Xu
  - Zhihan Zhang
+ - Indraneil Paul
 
 ## Round 2: Manual Code Refinement
  - Terry Yue Zhuo
@@ -45,6 +46,7 @@
  - Dmitry Abulkhanov
  - Wen-Ding Li
  - Wenhao Yu
+ - Indraneil Paul
 
 ## Round 3: Data Quality Check
  - Terry Yue Zhuo
