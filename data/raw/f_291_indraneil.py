@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
         errors = f_291(self.log_dir)
         self.assertIsInstance(errors, pd.DataFrame)
         self.assertEqual(len(errors), 2)
-        self.assertEqual(errors.iloc[0]['Timestamp'], "2023-10-25 10:10:10,111")
+        self.assertEqual(errors.iloc[0]['Timestamp'], "2023-10-24 12:34:56,789")
         self.assertEqual(errors.iloc[0]['Message'], "Sample error message 2.")
         
     def test_case_2(self):
