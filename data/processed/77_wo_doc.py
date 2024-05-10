@@ -1,100 +1,110 @@
-from collections import Counter
-import json
-import random
+from datetime import datetime
+from collections import defaultdict
+import matplotlib.pyplot as plt
 
 
-# Constants
-WORDS = ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape', 'honeydew']
-
-def task_func(n, file_name, seed=77):
+def task_func(activities):
     """
-    Create a json file with a number of n randomly selected words from a constant list named WORDS.
-    
+    Return a bar chart of the number of activities performed on each day of the week based on the provided list of activities.
+    If the activities are not datetime objects, raise a TypeError.
+
     Parameters:
-    n (int): The number of words to select from the list.
-    file_name (str): The name of the json file to be generated.
-    seed (int, Optional): The seed for the random number generator. Defaults to 77.
-    
+    - activities (list of datetime objects): A list of datetime objects representing when each activity occurred.
+
     Returns:
-    str: The name of the json file generated.
+    - matplotlib.axes.Axes: Axes object representing the bar chart.
 
     Requirements:
+    - datetime
     - collections
-    - json
-    - random
+    - matplotlib.pyplot
+
+    Raises:
+    - TypeError: If the activities are not datetime objects.
 
     Example:
-    >>> import tempfile
-    >>> temp_dir = tempfile.mkdtemp()
-    >>> file_name = temp_dir + "/word_counts.json"
-    >>> task_func(5, file_name, 29).endswith('word_counts.json')
-    True
+    >>> ax = task_func([datetime(2023, 10, 25), datetime(2023, 10, 26)])
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    random.seed(seed)
-    if n < 1 or n > len(WORDS):
-        raise ValueError('n must be greater than 0')
-    random.shuffle(WORDS)
-    selected_words = WORDS[:n]
-    counts = Counter(selected_words)
-    with open(file_name, 'w') as f:
-        json.dump(dict(counts), f)
-    return file_name
+    if not all(isinstance(activity, datetime) for activity in activities):
+        raise TypeError('All activities must be datetime objects')
+    activity_counts = defaultdict(int)
+    for activity in activities:
+        day = activity.strftime('%A')
+        activity_counts[day] += 1
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    counts = [activity_counts[day] for day in days]
+    plt.figure()
+    fig, ax = plt.subplots()
+    ax.bar(days, counts)
+    ax.set_xlabel('Day of the Week')
+    ax.set_ylabel('Number of Activities')
+    ax.set_title('Weekly Activity')
+    return ax
 
 import unittest
-import os
 import doctest
 class TestCases(unittest.TestCase):
-    file_name = "word_counts.json"
-    def tearDown(self) -> None:
-        if os.path.exists(self.file_name):
-            os.remove(self.file_name)
-        return super().tearDown()
     def test_case_1(self):
-        # Test with n = 3
-        self.file_name = task_func(3, self.file_name)
-        self.assertTrue(os.path.exists(self.file_name))
-        with open(self.file_name, 'r') as f:
-            data = json.load(f)
-        self.assertEqual(len(data), 3)
-        
+        # Input: Activities on Monday and Tuesday
+        activities = [datetime(2023, 10, 23), datetime(2023, 10, 24)]
+        ax = task_func(activities)
+        bars = ax.patches
+        # Assert correct title, x and y labels
+        self.assertEqual(ax.get_title(), 'Weekly Activity')
+        self.assertEqual(ax.get_xlabel(), 'Day of the Week')
+        self.assertEqual(ax.get_ylabel(), 'Number of Activities')
+        # Assert correct data points
+        self.assertEqual(bars[0].get_height(), 1)  # Monday
+        self.assertEqual(bars[1].get_height(), 1)  # Tuesday
+        for i in range(2, 7):
+            self.assertEqual(bars[i].get_height(), 0)  # Rest of the days
     def test_case_2(self):
-        # Test with n = 5
-        self.file_name = task_func(5, self.file_name, 29)
-        self.assertTrue(os.path.exists(self.file_name))
-        with open(self.file_name, 'r') as f:
-            data = json.load(f)
-        self.assertEqual(len(data), 5)
-        # Test if the counts are correct
-        self.assertEqual(data['honeydew'], 1)
-        self.assertEqual(data['elderberry'], 1)
-        self.assertEqual(data['grape'], 1)
-        self.assertEqual(data['cherry'], 1)
-        self.assertEqual(data['banana'], 1)
-        
+        # Input: Activities on multiple days
+        activities = [datetime(2023, 10, 23), datetime(2023, 10, 24), datetime(2023, 10, 24), datetime(2023, 10, 26)]
+        ax = task_func(activities)
+        bars = ax.patches
+        # Assert correct title, x and y labels
+        self.assertEqual(ax.get_title(), 'Weekly Activity')
+        self.assertEqual(ax.get_xlabel(), 'Day of the Week')
+        self.assertEqual(ax.get_ylabel(), 'Number of Activities')
+        # Assert correct data points
+        self.assertEqual(bars[0].get_height(), 1)  # Monday
+        self.assertEqual(bars[1].get_height(), 2)  # Tuesday
+        self.assertEqual(bars[2].get_height(), 0)  # Wednesday
+        self.assertEqual(bars[3].get_height(), 1)  # Thursday
+        for i in range(4, 7):
+            self.assertEqual(bars[i].get_height(), 0)  # Rest of the days
     def test_case_3(self):
-        # Test with n less than 1
-        with self.assertRaises(ValueError):
-            task_func(0, self.file_name)
-            
+        # Input: Activities only on Sunday
+        activities = [datetime(2023, 10, 29), datetime(2023, 10, 29)]
+        ax = task_func(activities)
+        bars = ax.patches
+        # Assert correct data points
+        for i in range(0, 6):
+            self.assertEqual(bars[i].get_height(), 0)  # Days before Sunday
+        self.assertEqual(bars[6].get_height(), 2)  # Sunday
     def test_case_4(self):
-        # Test with n greater than length of WORDS list
-        with self.assertRaises(ValueError):
-            task_func(100, self.file_name)
-            
+        # Input: No activities
+        activities = []
+        ax = task_func(activities)
+        bars = ax.patches
+        # Assert correct data points
+        for i in range(0, 7):
+            self.assertEqual(bars[i].get_height(), 0)  # All days
+        # Test for non datetime objects
+        with self.assertRaises(TypeError):
+            task_func([1, 2, 3])
     def test_case_5(self):
-        # Test with n equal to length of WORDS list
-        self.file_name = task_func(
-            len(
-                ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape', 'honeydew']
-            ),
-            self.file_name
-        )
-        self.assertTrue(os.path.exists(self.file_name))
-        with open(self.file_name, 'r') as f:
-            data = json.load(f)
-        self.assertEqual(
-            len(data), 
-            len(
-                ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape', 'honeydew']
-            )
-        )
+        # Input: Activities on all days
+        activities = [
+            datetime(2023, 10, 23), datetime(2023, 10, 24), datetime(2023, 10, 25),
+            datetime(2023, 10, 26), datetime(2023, 10, 27), datetime(2023, 10, 28),
+            datetime(2023, 10, 29)
+        ]
+        ax = task_func(activities)
+        bars = ax.patches
+        # Assert correct data points
+        for i in range(0, 7):
+            self.assertEqual(bars[i].get_height(), 1)  # All days

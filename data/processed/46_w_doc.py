@@ -1,70 +1,81 @@
 import itertools
-import numpy as np
-import matplotlib.pyplot as plt
+import statistics
 
 
+# Refined function after importing required libraries
 def task_func(elements, subset_size):
     """
-    Generate all subsets of a given size from a tuple and draw a histogram of the sums of the subsets. Additionally,
-    return the Axes object of the plotted histogram and the combinations of the subsets and their sums.
+    Generate all subsets of a given size from a tuple and calculate the mean, median, and mode of the sums of the subsets.
 
-    Parameters:
-    - elements (tuple): A tuple of integers for which subsets will be generated.
-    - subset_size (int): Size of the subsets to be generated.
+    Args:
+    - elements (tuple): A tuple of numbers from which subsets will be generated.
+    - subset_size (int): The size of the subsets to be generated.
 
     Returns:
-    - matplotlib.axes.Axes: Axes object of the plotted histogram.
-    - list: List of all the combinations of subsets.
-    - list: List of the sums of all the subsets.
+    dict: A dictionary with the mean, median, and mode of the sums of the subsets.
 
     Requirements:
     - itertools
-    - numpy
-    - matplotlib
-
+    - statistics
+    
     Example:
-    >>> ax, combs, sums = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> len(combs)
-    45
-    >>> len(sums)
-    45
+    >>> task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
+    {'mean': 11, 'median': 11, 'mode': 11}
     """
     combinations = list(itertools.combinations(elements, subset_size))
     sums = [sum(combination) for combination in combinations]
-    ax = plt.hist(sums, bins=np.arange(min(sums), max(sums) + 2) - 0.5, rwidth=0.8, align='left')
-    return plt.gca(), combinations, sums
+    return {
+        'mean': statistics.mean(sums),
+        'median': statistics.median(sums),
+        'mode': statistics.mode(sums)
+    }
 
 import unittest
+from faker import Faker
+import itertools
+import statistics
 import doctest
 class TestCases(unittest.TestCase):
+    
     def test_case_1(self):
-        # Testing with a tuple of size 10 and subset size 2
-        ax, combs, sums = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
-        self.assertIsInstance(ax, plt.Axes)  # Check if the return type is correct
-        # Test the combinations and sums
-        self.assertEqual(len(combs), 45)
-        self.assertEqual(len(sums), 45)
+        # Basic test case
+        elements = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        subset_size = 2
+        result = task_func(elements, subset_size)
+        self.assertEqual(result, {'mean': 11, 'median': 11, 'mode': 11})
+        
     def test_case_2(self):
-        # Testing with a tuple of size 5 and subset size 3
-        ax, combs, sums = task_func((2, 4, 6, 8, 10), 3)
-        self.assertIsInstance(ax, plt.Axes)
-        # Test the combinations and sums
-        self.assertEqual(len(combs), 10)
-        self.assertEqual(len(sums), 10)
+        # Testing with a tuple containing repeated elements
+        elements = (1, 2, 2, 3, 4)
+        subset_size = 2
+        result = task_func(elements, subset_size)
+        self.assertEqual(result, {'mean': 4.8, 'median': 5.0, 'mode': 5})
+        
     def test_case_3(self):
-        # Testing with an empty tuple
-        ax, combs, sums = task_func((), 0)
-        self.assertIsInstance(ax, plt.Axes)
+        # Testing with a larger subset size
+        elements = (1, 2, 3, 4, 5)
+        subset_size = 4
+        result = task_func(elements, subset_size)
+        self.assertEqual(result, {'mean': 12, 'median': 12, 'mode': 10})
+        
     def test_case_4(self):
         # Testing with negative numbers in the tuple
-        ax, combs, sums = task_func((-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5), 2)
-        self.assertIsInstance(ax, plt.Axes)
+        elements = (-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5)
+        subset_size = 3
+        result = task_func(elements, subset_size)
+        self.assertEqual(result, {'mean': 0.0, 'median': 0.0, 'mode': 0})
+        
     def test_case_5(self):
-        # Testing with a subset size of 0
-        ax, combs, sums = task_func((1, 2, 3, 4, 5), 2)
-        self.assertIsInstance(ax, plt.Axes)
-        # Test the combinations and sums
-        self.assertEqual(combs, [(1, 2), (1, 3), (1, 4), (1, 5), (2, 3), (2, 4), (2, 5), (3, 4), (3, 5), (4, 5)])
-        self.assertEqual(sums, [3, 4, 5, 6, 5, 6, 7, 7, 8, 9])
+        # Using the Faker library to generate a random test case
+        fake = Faker()
+        elements = tuple(fake.random_elements(elements=range(1, 101), length=10, unique=True))
+        subset_size = fake.random_int(min=2, max=5)
+        combinations = list(itertools.combinations(elements, subset_size))
+        sums = [sum(combination) for combination in combinations]
+        expected_result = {
+            'mean': statistics.mean(sums),
+            'median': statistics.median(sums),
+            'mode': statistics.mode(sums)
+        }
+        result = task_func(elements, subset_size)
+        self.assertEqual(result, expected_result)

@@ -1,76 +1,82 @@
 import numpy as np
 import random
-from sklearn.preprocessing import MinMaxScaler
+from scipy import stats
 
 
-def task_func(list_of_lists, seed=42):
+def task_func(list_of_lists, size=5, seed=0):
     """
-    Scale the values in a list of lists to a (0,1) range using MinMaxScaler.
-    If any inner list is empty, the function fills it with five random integers between 0 and 100, and then scales the values.
+    Calculate the mean, median, and mode of values in a list of lists.
+    If a list is empty, fill it with SIZE (default: 5) random integers between 0 and 100, 
+    and then calculate the statistics.
     
     Parameters:
-    list_of_lists (list of list of int): A list containing inner lists of integers.
-    seed (int, Optional): Seed for random number generation. Default is 42.
+    list_of_lists (list): The list of lists.
+    size (int, Optional): The number of random integers to generate. Default is 5.
+    seed (int, Optional): Seed value for random number generation. Default is 0.
     
     Returns:
-    list of list of float: A list of lists containing scaled values between the range [0, 1].
+    dict: A dictionary with the mean, median, and mode of the values.
     
     Requirements:
     - numpy
     - random
-    - sklearn.preprocessing.MinMaxScaler
+    - scipy.stats
     
     Example:
     >>> task_func([[1, 2, 3], [], [4, 5, 6]])
-    [[0.0, 0.5, 1.0], [0.8571428571428572, 0.1208791208791209, 0.0, 1.0, 0.3516483516483517], [0.0, 0.5, 1.0]]
+    {'mean': 23.454545454545453, 'median': 5.0, 'mode': array([5])}
     """
-    np.random.seed(seed)
     random.seed(seed)
-    scaled_data = []
-    scaler = MinMaxScaler(feature_range=(0, 1))
+    data = []
     for list_ in list_of_lists:
-        if not list_:
-            list_ = [random.randint(0, 100) for _ in range(5)]
-        reshaped_data = np.array(list_).reshape(-1, 1)
-        scaled_list = scaler.fit_transform(reshaped_data)
-        scaled_data.append(scaled_list.flatten().tolist())
-    return scaled_data
+        if list_:
+            data += list_
+        else:
+            data += [random.randint(0, 100) for _ in range(size)]
+    return {
+        'mean': np.mean(data),
+        'median': np.median(data),
+        'mode': stats.mode(data)[0]
+    }
 
 import unittest
 import doctest
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
+        # Test with a mix of non-empty and empty lists.
         input_data = [[1, 2, 3], [], [4, 5, 6]]
-        output = task_func(input_data)
-        for inner_list in output:
-            self.assertTrue(0.0 <= min(inner_list) <= 1.0)
-            self.assertTrue(0.0 <= max(inner_list) <= 1.0)
-            self.assertTrue(len(inner_list) <= 5)
-    
+        result = task_func(input_data)
+        self.assertTrue(result["mean"] < 100)
+        self.assertTrue(result["median"] < 100)
+        self.assertTrue(result["mode"] < 100)
     def test_case_2(self):
-        input_data = [[10, 20, 30, 40, 50], [], [60, 70, 80, 90, 100]]
-        output = task_func(input_data)
-        for inner_list in output:
-            self.assertTrue(0.0 <= min(inner_list) <= 1.0)
-            self.assertTrue(0.0 <= max(inner_list) <= 1.0)
-            self.assertEqual(len(inner_list), 5)
-        
+        # Test with all non-empty lists.
+        input_data = [[7, 8, 9], [10, 11, 12], [13, 14, 15]]
+        result = task_func(input_data, 4)
+        combined_data = [7, 8, 9, 10, 11, 12, 13, 14, 15]
+        self.assertEqual(result["mean"], np.mean(combined_data))
+        self.assertEqual(result["median"], np.median(combined_data))
+        self.assertEqual(result["mode"], stats.mode(combined_data).mode)
     def test_case_3(self):
+        # Test with all empty lists.
         input_data = [[], [], []]
-        output = task_func(input_data)
-        for inner_list in output:
-            self.assertTrue(0.0 <= min(inner_list) <= 1.0)
-            self.assertTrue(0.0 <= max(inner_list) <= 1.0)
-            self.assertEqual(len(inner_list), 5)
+        result = task_func(input_data)
+        self.assertTrue(result["mean"] < 100)
+        self.assertTrue(result["median"] < 100)
+        self.assertTrue(result["mode"] < 100)
     def test_case_4(self):
-        input_data = [[15], [25], [35], [45], [55]]
-        expected_output = [[0.0], [0.0], [0.0], [0.0], [0.0]]
-        output = task_func(input_data)
-        self.assertEqual(output, expected_output)
-    
+        # Test with lists containing both negative and positive integers.
+        input_data = [[-1, -2, -3], [4, 5, 6], [-7, -8, -9]]
+        result = task_func(input_data, 2)
+        combined_data = [-1, -2, -3, 4, 5, 6, -7, -8, -9]
+        self.assertEqual(result["mean"], np.mean(combined_data))
+        self.assertEqual(result["median"], np.median(combined_data))
+        self.assertEqual(result["mode"], stats.mode(combined_data).mode)
     def test_case_5(self):
-        input_data = [[0, 100], [0, 50], [50, 100]]
-        expected_output = [[0.0, 1.0], [0.0, 1.0], [0.0, 1.0]]
-        output = task_func(input_data)
-        self.assertEqual(output, expected_output)
+        # Test with a single list.
+        input_data = [[1, 2, 3, 4, 5]]
+        result = task_func(input_data)
+        self.assertEqual(result["mean"], np.mean(input_data[0]))
+        self.assertEqual(result["median"], np.median(input_data[0]))
+        self.assertEqual(result["mode"], stats.mode(input_data[0]).mode)

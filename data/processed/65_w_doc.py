@@ -1,60 +1,74 @@
-import re
-from collections import Counter
-from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from sklearn.feature_extraction.text import TfidfVectorizer
+import pandas as pd
 
 
-def task_func(text: str) -> dict:
+def task_func(documents):
     """
-    Count the number of non-stop words in a given text.
+    Calculate the TF-IDF score of the words in a list of documents.
     
     Parameters:
-    - text (str): The input text for word counting.
+    - documents (list of str): A list of text documents.
     
     Returns:
-    dict: A dictionary with the words (as keys) and their counts (as values).
+    pandas.DataFrame: A DataFrame with words as columns and documents as rows, containing the TF-IDF scores.
     
     Requirements:
-    - re
-    - collections.Counter
+    - nltk.tokenize.word_tokenize
+    - sklearn.feature_extraction.text.TfidfVectorizer
+    - pandas
     
     Example:
-    >>> count = task_func("This is a sample text. Some words are repeated.")
-    >>> print(count)
-    {'sample': 1, 'text': 1, 'words': 1, 'repeated': 1}
+    >>> docs = ['This is the first document.', 'This document is the second document.', 'And this is the third one.', 'Is this the first document?']
+    >>> tfidf = task_func(docs)
+    >>> print(tfidf.shape)
+    (4, 11)
     """
-    words = re.findall(r'\b\w+\b', text)
-    non_stopwords = [word for word in words if word.lower() not in set(stopwords.words('english'))]
-    count = dict(Counter(non_stopwords))
-    return count
+    vectorizer = TfidfVectorizer(tokenizer=word_tokenize)
+    tfidf_matrix = vectorizer.fit_transform(documents)
+    tfidf_df = pd.DataFrame(tfidf_matrix.toarray(), columns=vectorizer.get_feature_names_out())
+    return tfidf_df
 
 import unittest
 import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Simple sentence with some stopwords
-        input_text = "This is a simple test."
-        expected_output = {'simple': 1, 'test': 1}
-        self.assertDictEqual(task_func(input_text), expected_output)
+        docs = ['This is the first document.', 'This document is the second document.']
+        tfidf = task_func(docs)
+        self.assertTrue(isinstance(tfidf, pd.DataFrame))
+        self.assertEqual(tfidf.shape[0], 2)
+        self.assertIn('first', tfidf.columns)
+        self.assertIn('second', tfidf.columns)
+        self.assertNotIn('third', tfidf.columns)
     def test_case_2(self):
-        # Longer sentence with repeated words
-        input_text = "Some words are repeated more than once. Repeated words are common."
-        expected_output = {'words': 2, 'repeated': 1, 'Repeated': 1, 'common': 1}
-        self.assertDictEqual(task_func(input_text), expected_output)
-        
+        docs = ['And this is the third one.', 'Is this the first document?']
+        tfidf = task_func(docs)
+        self.assertTrue(isinstance(tfidf, pd.DataFrame))
+        self.assertEqual(tfidf.shape[0], 2)
+        self.assertIn('first', tfidf.columns)
+        self.assertNotIn('second', tfidf.columns)
+        self.assertIn('third', tfidf.columns)
     def test_case_3(self):
-        # Text with no stopwords
-        input_text = "Python programming language."
-        expected_output = {'Python': 1, 'programming': 1, 'language': 1}
-        self.assertDictEqual(task_func(input_text), expected_output)
-        
+        docs = ['Hello world!', 'Machine learning is fun.']
+        tfidf = task_func(docs)
+        self.assertTrue(isinstance(tfidf, pd.DataFrame))
+        self.assertEqual(tfidf.shape[0], 2)
+        self.assertIn('hello', tfidf.columns)
+        self.assertIn('world', tfidf.columns)
+        self.assertIn('machine', tfidf.columns)
     def test_case_4(self):
-        # Text with all stopwords
-        input_text = "This is an and the with"
-        expected_output = {}
-        self.assertDictEqual(task_func(input_text), expected_output)
-        
+        docs = ['Natural Language Processing.', 'Deep learning and neural networks.']
+        tfidf = task_func(docs)
+        self.assertTrue(isinstance(tfidf, pd.DataFrame))
+        self.assertEqual(tfidf.shape[0], 2)
+        self.assertIn('natural', tfidf.columns)
+        self.assertIn('processing', tfidf.columns)
+        self.assertIn('deep', tfidf.columns)
     def test_case_5(self):
-        # Empty text
-        input_text = ""
-        expected_output = {}
-        self.assertDictEqual(task_func(input_text), expected_output)
+        docs = ['Data science is a field.', 'It involves statistics and algorithms.']
+        tfidf = task_func(docs)
+        self.assertTrue(isinstance(tfidf, pd.DataFrame))
+        self.assertEqual(tfidf.shape[0], 2)
+        self.assertIn('data', tfidf.columns)
+        self.assertIn('science', tfidf.columns)
+        self.assertIn('statistics', tfidf.columns)

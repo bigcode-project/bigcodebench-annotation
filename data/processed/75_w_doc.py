@@ -1,113 +1,75 @@
-import collections
+from scipy import stats
 import matplotlib.pyplot as plt
-import pandas as pd
 
 
-# Constants
-WORDS = ['the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'I']
-
-def task_func(sentences_dict, word_keys):
+def task_func(data_dict, data_keys):
     """
-    Calculate the occurrence of certain words in a collection of sentences and return a bar chart.
-
+    Calculate the correlation between two data series and return a scatter plot along with the correlation coefficient.
+    
     Parameters:
-    sentences_dict (dict): The dictionary containing sentences.
-    word_keys (list): The list of words.
-
+    data_dict (dict): The dictionary containing data. Keys should match those provided in data_keys.
+    data_keys (list): The list of keys (length of 2) used to access data in data_dict for correlation.
+    
     Returns:
-    - matplotlib.axes._axes.Axes: Axes object of the bar chart displaying the frequencies.
-
+    tuple: 
+        - float: The correlation coefficient.
+        - Axes: The scatter plot of the two data series.
+    
     Requirements:
-    - collections
+    - scipy
     - matplotlib.pyplot
-    - pandas
-
+    
     Example:
-    >>> sentences_dict = {'Sentence1': 'the quick brown fox', 'Sentence2': 'jumps over the lazy dog', 'Sentence3': 'the dog is brown'}
-    >>> word_keys = ['the', 'dog']
-    >>> type(task_func(sentences_dict, word_keys))
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> data_dict = {'X': [1, 2, 3, 4, 5], 'Y': [2, 3, 5, 7, 8]}
+    >>> data_keys = ['X', 'Y']
+    >>> correlation, plot = task_func(data_dict, data_keys)
+    >>> round(correlation, 4)
+    0.9923
+    >>> isinstance(plot, plt.Axes)
+    True
     """
-    word_counts = collections.Counter(' '.join(sentences_dict.values()).split())
-    frequencies = [word_counts[word] for word in word_keys]
-    word_series = pd.Series(frequencies, index=word_keys)
-    plt.figure()
-    word_series.plot(kind='bar')
-    return word_series.plot(kind='bar')
+    x = data_dict[data_keys[0]]
+    y = data_dict[data_keys[1]]
+    correlation, _ = stats.pearsonr(x, y)
+    fig, ax = plt.subplots()
+    ax.scatter(x, y)
+    return correlation, ax
 
 import unittest
+import numpy as np
 import doctest
 class TestCases(unittest.TestCase):
-    
     def test_case_1(self):
-        sentences_dict = {
-            'Sentence1': 'the quick brown fox',
-            'Sentence2': 'jumps over the lazy dog',
-            'Sentence3': 'the dog is brown'
-        }
-        word_keys = ['the', 'dog']
-        ax = task_func(sentences_dict, word_keys)
-        
-        # Check the x-tick labels
-        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
-        
-        # Check the bar heights
-        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 2, 3, 2])
+        data_dict = {'X': [1, 2, 3, 4, 5], 'Y': [2, 3, 5, 7, 8]}
+        data_keys = ['X', 'Y']
+        correlation, plot = task_func(data_dict, data_keys)
+        self.assertAlmostEqual(correlation, 0.9923, places=4)
+        self.assertTrue(isinstance(plot, plt.Axes))
         
     def test_case_2(self):
-        sentences_dict = {
-            'Sentence1': 'apple orange banana',
-            'Sentence2': 'apple apple',
-            'Sentence3': 'banana orange orange'
-        }
-        word_keys = ['apple', 'orange', 'banana']
-        ax = task_func(sentences_dict, word_keys)
-        
-        # Check the x-tick labels
-        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
-        
-        # Check the bar heights
-        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 3, 2, 3, 3, 2])
+        data_dict = {'A': [5, 4, 3, 2, 1], 'B': [1, 2, 3, 4, 5]}
+        data_keys = ['A', 'B']
+        correlation, plot = task_func(data_dict, data_keys)
+        self.assertAlmostEqual(correlation, -1.0, places=4)
+        self.assertTrue(isinstance(plot, plt.Axes))
         
     def test_case_3(self):
-        sentences_dict = {
-            'Sentence1': 'cat mouse',
-            'Sentence2': 'dog cat',
-            'Sentence3': 'mouse mouse cat'
-        }
-        word_keys = ['cat', 'mouse', 'dog']
-        ax = task_func(sentences_dict, word_keys)
+        data_dict = {'X': [1, 1, 1, 1, 1], 'Y': [1, 1, 1, 1, 1]}
+        data_keys = ['X', 'Y']
+        correlation, plot = task_func(data_dict, data_keys)
+        self.assertTrue(np.isnan(correlation))
+        self.assertTrue(isinstance(plot, plt.Axes))
         
-        # Check the x-tick labels
-        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
-        
-        # Check the bar heights
-        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 3, 1, 3, 3, 1])
     def test_case_4(self):
-        sentences_dict = {
-            'Sentence1': 'sun moon stars',
-            'Sentence2': 'sun sun',
-            'Sentence3': 'moon stars stars'
-        }
-        word_keys = ['sun', 'stars', 'moon']
-        ax = task_func(sentences_dict, word_keys)
+        data_dict = {'X': [1, 2, 3, 4, 5], 'Y': [1, 4, 9, 16, 25]}
+        data_keys = ['X', 'Y']
+        correlation, plot = task_func(data_dict, data_keys)
+        self.assertAlmostEqual(correlation, 0.9811, places=4)
+        self.assertTrue(isinstance(plot, plt.Axes))
         
-        # Check the x-tick labels
-        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
-        
-        # Check the bar heights
-        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 3, 2, 3, 3, 2])
     def test_case_5(self):
-        sentences_dict = {
-            'Sentence1': 'car bus bike',
-            'Sentence2': 'bus bus bike',
-            'Sentence3': 'car car bus'
-        }
-        word_keys = ['car', 'bus', 'bike']
-        ax = task_func(sentences_dict, word_keys)
-        
-        # Check the x-tick labels
-        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
-        
-        # Check the bar heights
-        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 4, 2, 3, 4, 2])
+        data_dict = {'X': [1, 3, 5, 7, 9], 'Y': [2, 6, 10, 14, 18]}
+        data_keys = ['X', 'Y']
+        correlation, plot = task_func(data_dict, data_keys)
+        self.assertAlmostEqual(correlation, 1.0, places=4)
+        self.assertTrue(isinstance(plot, plt.Axes))

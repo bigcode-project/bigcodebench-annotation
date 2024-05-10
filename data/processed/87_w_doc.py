@@ -1,64 +1,87 @@
+import numpy as np
 import matplotlib.pyplot as plt
-from collections import Counter
 
 
-FRUITS = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape', 'Honeydew', 'Indian Prune', 'Jackfruit']
+# Constants
+CITIES = ['New York', 'London', 'Beijing', 'Tokyo', 'Sydney', 'Paris', 'Berlin', 'Moscow', 'Madrid', 'Rome']
 
-def task_func(fruit_dict):
+def task_func(city_dict, max_range=1000000, seed=0):
     """
-    Given a constant list of fruits in FRUITS, and a dictionary 'fruit_dict' with keys as people's names and values 
-    as their favorite fruit names, record the frequency of each fruits' occurence. Return a bar chart of the number 
-    of fruits for each fruit type and return the dictionary with fruit names as keys and their counts as values. 
+    Given a constant list of cities (CITIES) and a dictionary 'city_dict' of people's names and their favorite cities, 
+    this function generates a dictionary of city populations for the cities in the list and plots the population 
+    data using a bar chart. The population values are randomly generated integers between 1 and 'max_range' if 
+    the city is in the list of cities, otherwise the population value is -1. The random number generator is seeded
+    with the value 'seed' before generating the population values.
 
     Parameters:
-    fruit_dict (dict): The dictionary with keys as people's names and values as fruit names.
+    city_dict (dict): The dictionary with keys as people's names and values as city names. 
+    max_range (int, Optional): The maximum population value for the randomly generated population. Defaults to 1000000.
+    Must be greater than 1.
+    seed (int, Optional): The seed for the random number generator. Defaults to 0.
 
     Returns:
-    dict: A dictionary with fruit names as keys and their counts as values.
-    matplotlib.axes.Axes: The axes object of the plot.
+    dict: A dictionary with city names as keys and randomly generated populations as values.
+    matplotlib.axes.Axes: The Axes object of the plot for further manipulation or testing.
 
     Requirements:
-    - collections
-    - random
-    - matplotlib
+    - numpy for random number generation
+    - matplotlib for plotting
 
     Example:
-    >>> fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Cherry', 'Charlie': 'Date', 'David': 'Apple'}
-    >>> freq, ax = task_func(fruit_dict)
-    >>> dict(freq)
-    {'Apple': 2, 'Banana': 1, 'Cherry': 1, 'Date': 1}
+    >>> city_dict = {'John': 'New York', 'Alice': 'London', 'Bob': 'Beijing', 'Charlie': 'Tokyo', 'David': 'Sydney'}
+    >>> population_dict, plot_axes = task_func(city_dict)
     """
-    fruit_list = [item for item in fruit_dict.values() if isinstance(item, str) and item in FRUITS]
-    fruit_counter = Counter(fruit_list)
-    plt.bar(fruit_counter.keys(), fruit_counter.values())
-    return Counter([item for item in fruit_dict.values() if isinstance(item, str)]), plt.gca()
+    if max_range < 1:
+        raise ValueError("max_range must be a positive integer")
+    np.random.seed(seed)
+    city_population = {
+        city: (np.random.randint(1, max_range) if city in CITIES else -1) 
+        for _, city in city_dict.items() if isinstance(city, str)
+    }
+    plt.figure()
+    ax = plt.bar(city_population.keys(), city_population.values())
+    plt.xlabel('City')
+    plt.ylabel('Population')
+    plt.title('City Populations')
+    return city_population, plt.gca()
 
 import unittest
-import matplotlib.axes
+from matplotlib.axes import Axes
 import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Cherry'}
-        count_dict, ax = task_func(fruit_dict)
-        self.assertEqual(count_dict, {'Apple': 1, 'Banana': 1, 'Cherry': 1})
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        """Test if the population dictionary has correct structure and values."""
+        city_dict = {'John': 'New York', 'Alice': 'London', 'Bob': 'Beijing', 'Charlie': 'Tokyo', 'David': 'Mumbai'}
+        population_dict, _ = task_func(city_dict, 250000, 56)
+        self.assertSetEqual(set(population_dict.keys()), {'New York', 'London', 'Beijing', 'Tokyo', 'Mumbai'})
+        for population in population_dict.values():
+            self.assertTrue(-1 <= population <= 250000)
     def test_case_2(self):
-        fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Apple'}
-        count_dict, ax = task_func(fruit_dict)
-        self.assertEqual(count_dict, {'Apple': 2, 'Banana': 1})
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        """Test if the bar chart plot has the correct attributes."""
+        city_dict = {'Summer': 'New York', 'Alice': 'London', 'April': 'Beijing', 'Charlie': 'Tokyo', 'David': 'Sydney'}
+        population_dict, ax = task_func(city_dict, seed=54)
+        self.assertIsInstance(ax, Axes)
+        self.assertEqual(ax.get_title(), 'City Populations')
+        self.assertEqual(ax.get_xlabel(), 'City')
+        self.assertEqual(ax.get_ylabel(), 'Population')
+        self.assertEqual(population_dict, {'New York': 72816, 'London': 367942, 'Beijing': 869251, 'Tokyo': 323344, 'Sydney': 267288})
+        bars = [rect for rect in ax.get_children() if isinstance(rect, plt.Rectangle) and rect.get_width() > 0]
+        bars = [bar for bar in bars if bar.get_xy()[0] != 0]  # Exclude the non-data bar
+        self.assertEqual(len(bars), 5)
     def test_case_3(self):
-        fruit_dict = {}
-        count_dict, ax = task_func(fruit_dict)
-        self.assertEqual(count_dict, {})
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        """Test the function with an empty input dictionary."""
+        city_dict = {}
+        population_dict, _ = task_func(city_dict)
+        self.assertSetEqual(set(population_dict.keys()), set({}))
+        self.assertTrue(all(1000000 <= pop <= 10000000 for pop in population_dict.values()))
     def test_case_4(self):
-        fruit_dict = {'John': 'Apple'}
-        count_dict, ax = task_func(fruit_dict)
-        self.assertEqual(count_dict, {'Apple': 1})
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        """Test the function with a differently structured input dictionary."""
+        city_dict = {'Person1': 'City1', 'Person2': 'City2'}
+        population_dict, _ = task_func(city_dict)
+        self.assertEqual(population_dict, {'City1': -1, 'City2': -1})
     def test_case_5(self):
-        fruit_dict = {'John': 123, 'Alice': None, 'Bob': 'Apple'}
-        count_dict, ax = task_func(fruit_dict)
-        self.assertEqual(count_dict, {'Apple': 1})
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        """Test if the population values are random with the same input and different seeds."""
+        city_dict = {'John': 'New York', 'Alice': 'London'}
+        population_dict1, _ = task_func(city_dict, seed=77)
+        population_dict2, _ = task_func(city_dict, seed=42)
+        self.assertNotEqual(population_dict1, population_dict2)

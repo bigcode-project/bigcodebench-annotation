@@ -1,117 +1,96 @@
-import pandas as pd
 import re
-from scipy import stats
+import numpy as np
+from collections import Counter
+from sklearn.mixture import GaussianMixture
 
 
-def task_func(text):
-    """
-    Extracts all names from a given text string that are not surrounded by square brackets 
-    and counts the frequency of each extracted name. It then creates a bar chart of the name frequencies and
-    returns the name frequencies as a pandas Series and the bar chart plot's axes object along with the skewness 
-    and kurtosis of the name frequencies. If the skewness and kurtosis are nan, they are returned as None.
+def task_func(text, num_gaussians=1, seed=42):
+    '''
+    Extract names from a string that aren't enclosed by square brackets, 
+    tokenize the names into words, and count the frequency of each word.
+    Finally, fit a mixture of num_gaussians 1-D Gaussian distributions to 
+    the word frequencies and return the means and variances of the fitted 
+    Gaussians.
     
     Parameters:
-    text (str): The text from which to extract names. Each name should be separated by square brackets containing addresses.
+    text (str): The text from which to extract names and count word frequencies.
+    num_gaussians (int, Optional): The number of Gaussian distributions to fit to 
+                                   the word frequencies. Defaults to 1.
+    seed (int, Optional): The seed for the random number generator. Defaults to 42.
     
     Returns:
-    tuple: A tuple containing:
-        - pd.Series: A pandas Series with the frequency of each name.
-        - Axes: A bar chart plot showing the name frequencies. If no names are found, this will be None.
-        - float: The skewness of the name frequencies.
-        - float: The kurtosis of the name frequencies.
+    dict: A dictionary with the frequency of each word.
     
-    Libraries Used:
-    - re
-    - pandas
-    - matplotlib.pyplot
-    - scipy.stats
+    Requirements:
+    - re module for regular expression operations.
+    - numpy for setting the random seed.
+    - collections.Counter for counting word frequencies.
+    - scipy.stats.gmm for fitting Gaussian mixture models.
+
+    Raises:
+    ValueError: If num_gaussians is less than or equal to 0.
+    Exception: If num_gaussians is greater than the number of unique words.
     
-    Example:
-    >>> text_input = "Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003]Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]"
-    >>> name_freqs, plot, skew, kurtosis = task_func(text_input)
-    >>> print(list(name_freqs.items())[0])
-    ('Josie Smith', 1)
-    >>> type(plot)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> round(kurtosis, 2) is not None
-    True
-    """
+    Examples:
+    >>> freqs, means = task_func("Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003]Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]")
+    >>> freqs
+    {'Josie': 1, 'Smith': 2, 'Mugsy': 1, 'Dog': 1}
+    '''
+    np.random.seed(seed)
     names = re.findall(r'(.*?)(?:\[.*?\]|$)', text)
-    names = [name.strip() for name in names if name.strip()]  # Removing any empty or whitespace names
-    name_freqs = pd.Series(names).value_counts()
-    if not name_freqs.empty:
-        ax = name_freqs.plot(kind='bar', title="Name Frequencies")
-        skewness = stats.skew(name_freqs)
-        kurtosis = stats.kurtosis(name_freqs)
-    else:
-        ax = skewness = kurtosis = None
-    if skewness == float('nan'):
-        skewness = None
-    if kurtosis == float('nan'):
-        kurtosis = None
-    return name_freqs, ax, skewness, kurtosis
+    words = ' '.join(names).split()
+    word_freqs = Counter(words)
+    if num_gaussians <= 0:
+        raise ValueError('Number of Gaussians must be greater than 0.')
+    if len(word_freqs) < num_gaussians:
+        raise Exception('Number of Gaussians must be less than or equal to the number of unique words.')
+    mixture = GaussianMixture(n_components=num_gaussians)
+    mixture.fit([[freq] for freq in word_freqs.values()])
+    means = mixture.means_
+    return dict(word_freqs), means
 
 import unittest
 import doctest
-test_data = [
-    # Test Case 1: Basic names separated by addresses in square brackets
-    "John Doe [123 MAIN ST, TOWN, ST 12345]Jane Smith [456 OTHER ST, CITY, ST 67890]",
-    
-    # Test Case 2: Multiple occurrences of the same name
-    "Alice [111 ALPHA ST, PLACE, ST 11111]Bob [222 BETA ST, LOCATION, ST 22222]Alice [333 GAMMA ST, REGION, ST 33333]",
-    
-    # Test Case 3: Names with special characters and different patterns
-    "Mr. X [444 X ST, XPLACE, ST 44444]Dr. Y [555 Y ST, YCITY, ST 55555]Z [666 Z ST, ZTOWN, ST 66666]",
-    
-    # Test Case 4: Empty string
-    "",
-    
-    # Test Case 5: Only addresses without names
-    "[777 FIRST ST, APLACE, ST 77777][888 SECOND ST, BCITY, ST 88888][999 THIRD ST, CTOWN, ST 99999]",
-    # Long test case with multiple names and addresses
-    "John Doe [123 MAIN ST, TOWN, ST 12345]Jane Smith [456 OTHER ST, CITY, ST 67890]Alice [111 ALPHA ST, PLACE, ST 11111]Bob [222 BETA ST, LOCATION, ST 22222]Alice [333 GAMMA ST, REGION, ST 33333]Mr. X [444 X ST, XPLACE, ST 44444]Dr. Y [555 Y ST, YCITY, ST 55555]Z [666 Z ST, ZTOWN, ST 66666]"
-]
 class TestCases(unittest.TestCase):
-    
     def test_case_1(self):
-        # Test Case 1: Basic names separated by addresses in square brackets
-        input_text = test_data[0]
-        name_freqs, plot, _, _ = task_func(input_text)
-        self.assertEqual(name_freqs["John Doe"], 1)
-        self.assertEqual(name_freqs["Jane Smith"], 1)
-        self.assertTrue("Name Frequencies" in plot.get_title())
-    
+        text = "John Doe [1234 Elm St, Springfield, IL 12345]Jane Smith [5678 Maple Dr, Anytown, CA 67890]"
+        result, _ = task_func(text)
+        expected = {'John': 1, 'Doe': 1, 'Jane': 1, 'Smith': 1}
+        self.assertDictEqual(result, expected)
     def test_case_2(self):
-        # Test Case 2: Multiple occurrences of the same name
-        input_text = test_data[1]
-        name_freqs, plot, _, _ = task_func(input_text)
-        self.assertEqual(name_freqs["Alice"], 2)
-        self.assertEqual(name_freqs["Bob"], 1)
-    
+        text = "Alice [7890 Oak Ln, Someplace, TX 23456]Bob Charlie Bob [2345 Birch Rd, Otherplace, NY 34567]"
+        result, means = task_func(text, 2)
+        expected = {'Alice': 1, 'Bob': 2, 'Charlie': 1}
+        self.assertDictEqual(result, expected)
+        self.assertAlmostEquals(means[0][0], 2.00, places=2)
+        self.assertAlmostEquals(means[1][0], 1.00, places=2)
     def test_case_3(self):
-        # Test Case 3: Names with special characters and different patterns
-        input_text = test_data[2]
-        name_freqs, plot, _, _ = task_func(input_text)
-        self.assertEqual(name_freqs["Mr. X"], 1)
-        self.assertEqual(name_freqs["Dr. Y"], 1)
-        self.assertEqual(name_freqs["Z"], 1)
-    
+        text = "Eve [3456 Cedar St, Thisplace, WA 45678]"
+        self.assertRaises(Exception, task_func, text)
     def test_case_4(self):
-        # Test Case 4: Empty string
-        input_text = test_data[3]
-        name_freqs, plot, _, _ = task_func(input_text)
-        self.assertTrue(name_freqs.empty)
-    
+        text = "Frank Grace Holly [4567 Pine Pl, Thatplace, NV 56789]"
+        result, _ = task_func(text)
+        expected = {'Frank': 1, 'Grace': 1, 'Holly': 1}
+        self.assertDictEqual(result, expected)
     def test_case_5(self):
-        # Test Case 5: Only addresses without names
-        input_text = test_data[4]
-        name_freqs, plot, _, _ = task_func(input_text)
-        print(name_freqs)
-        self.assertTrue(name_freqs.empty)
-        # Long test case with multiple names and addresses
-        input_text = test_data[5]
-        name_freqs, plot, skewness, kurtosis = task_func(input_text)
-        self.assertEqual(name_freqs["John Doe"], 1)
-        # Test for skewness and kurtosis
-        self.assertAlmostEqual(skewness, 2.04, places=2)
-        self.assertAlmostEqual(kurtosis, 2.17, places=2)
+        text = "Ivy Jack [5678 Spruce Way, Hereplace, ME 67890]Katherine [6789 Fir Blvd, Thereplace, VT 78901]Leo"
+        result, _ = task_func(text)
+        expected = {'Ivy': 1, 'Jack': 1, 'Katherine': 1, 'Leo': 1}
+        self.assertDictEqual(result, expected)
+        # Long test case
+        long_text = "Antony [2345 Elm St, Thiscity, CA 34567]Barbara [3456 Oak Dr, Thatcity, NY 45678]" + \
+                    "Barbara [4567 Maple Ave, Othercity, TX 56789]Diana [5678 Birch Rd, Newcity, WA 67890]" + \
+                    "Edward [6789 Cedar Ln, Oldcity, NV 78901]Antony [7890 Pine St, Anytown, ME 89012]" + \
+                    "George [8901 Spruce Dr, Someplace, VT 90123]Helen [9012 Fir Ave, Anywhere, MD 01234]" + \
+                    "Ian [0123 Elm Blvd, Nowhere, WI 12345]Jessica [1234 Oak Way, Everywhere, IL 23456]" + \
+                    "Kevin [2345 Maple Pl, Somewhere, CA 34567]Laura [3456 Birch St, Thisplace, NY 45678]" + \
+                    "Michael [4567 Cedar Dr, Thatplace, TX 56789]Barbara [5678 Pine Ave, Otherplace, WA 67890]" + \
+                    "Oliver [6789 Spruce Rd, Newplace, NV 78901]Patricia [7890 Fir St, Oldplace, ME 89012]" + \
+                    "Quentin [8901 Elm Dr, Anyplace, VT 90123]Rachel [9012 Oak Ln, Somecity, MD 01234]" + \
+                    "Samuel [0123 Maple Dr, Thatcity, WI 12345]Antony [1234 Birch St, Othercity, IL 23456]" + \
+                    "Ursula [2345 Cedar Ave, Newcity, CA 34567]Victor [3456 Pine Rd, Oldcity, NY 45678]" + \
+                    "Wendy [4567 Spruce St, Anytown, TX 56789]John [5678 Fir Dr, Someplace, WA 67890]" + \
+                    "Zachary [6789 Elm Way, Anywhere, NV 78901]Zachary [7890 Oak Pl, Nowhere, ME 89012]"
+        result, means = task_func(long_text, 2)
+        self.assertAlmostEquals(means[0][0], 1.05, places=2)
+        self.assertAlmostEquals(means[1][0], 3.00, places=2)

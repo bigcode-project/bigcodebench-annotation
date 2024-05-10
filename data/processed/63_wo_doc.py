@@ -1,127 +1,108 @@
+# Importing the necessary libraries
 import re
-import json
 import os
+import glob
+import pandas as pd
 
 
-def task_func(file_path: str, regex_pattern=r'\(.+?\)|\w') -> dict:
+LOG_PATTERN = r'ERROR (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}): (.*?)$'
+# Redefining the function with the refined docstring and input parameters
+def task_func(file_dir: str, file_pattern: str = '*.log') -> pd.DataFrame:
     """
-    Extracts matches from a JSON file based on a predefined regular pattern.
-    The default regular expression pattern is designed to extract any content between parentheses
-    as a single match and any individual character outside the parentheses as a separate match.
+    Find all error logs in the log files in the specified directory and return them in a Pandas DataFrame. The log scan uses
+    the pattern 'ERROR <timestamp>: <message>'. The function reads all files in the directory matching the specified pattern
+    and extracts the timestamp and message for each ERROR log entry.
     
     Parameters:
-    - file_path (str): The path to the JSON file. The JSON file should contain key-value pairs
-                       where the values are strings to be matched against the regex pattern.
-                       
+    - file_dir (str): The directory path where the log files are located.
+    - file_pattern (str, optional): The file pattern to search for within the directory. Defaults to '*.log'.
+    
     Returns:
-    - dict: A dictionary with the JSON file name as the key and a list of matches as values.
-            The format is: {filename: [match1, match2, ...]}.
-            
+    pd.DataFrame: A DataFrame with columns 'Timestamp' and 'Message' containing the timestamp and error message of the ERROR logs.
+    
     Requirements:
-    - The function makes use of the following libraries/modules: re, json, os.
+    - re
+    - os
+    - glob
+    - pandas
     
     Example:
-    >>> import tempfile
-    >>> temp_dir = tempfile.gettempdir()
-    >>> file_path = os.path.join(temp_dir, 'sample_data.json')
-    >>> with open(file_path, 'w') as file:
-    ...     json.dump({'content': 'This is a (sample) text with some (matches) and characters.'}, file)
-    >>> matches = task_func(file_path)
-    >>> len(matches['sample_data.json'])
-    34
+    >>> errors = task_func('/path/to/files', '*.txt') # Search in empty directory
+    >>> print(len(errors))
+    0
     """
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-        text = ' '.join(data.values())
-        matches = re.findall(regex_pattern, text)
-    match_dict = {os.path.basename(file_path): matches}
-    return match_dict
+    errors = []
+    for file in glob.glob(os.path.join(file_dir, file_pattern)):
+        with open(file, 'r') as f:
+            for line in f:
+                match = re.match(LOG_PATTERN, line)
+                if match:
+                    timestamp, message = match.groups()
+                    errors.append([timestamp, message])
+    errors_df = pd.DataFrame(errors, columns=['Timestamp', 'Message'])
+    return errors_df
 
 import unittest
-import shutil
 import doctest
+import shutil
 import tempfile
 class TestCases(unittest.TestCase):
+    
     def setUp(self):
-        sample_data = {
-            "data1.json": {
-                "text1": "This is a (sample) text with some (matches) and characters.",
-                "text2": "Another (example) with multiple matches."
-            },
-            "data2.json": {
-                "text1": "(Hello) world!",
-                "text2": "No matches here."
-            },
-            "data3.json": {
-                "text1": "Testing (with) another (file).",
-                "text2": "Just some (random) text."
-            },
-            "data4.json": {
-                "text1": "(A) quick brown (fox) jumps.",
-                "text2": "Over the lazy (dog)."
-            },
-            "data5.json": {
-                "text1": "Yet (another) test file.",
-                "text2": "With (various) matches."
-            }
-        }
-        # Directory to save the test data
+        # Sample log entries
+        self.error_log_1 = "ERROR 2023-10-24 12:34:56,789: Sample error message 1."
+        self.error_log_2 = "ERROR 2023-10-25 10:10:10,111: Sample error message 2."
+        self.non_error_log = "INFO 2023-10-24 12:00:00,000: This is a non-error log message."
+        # Directory to save log files
         self.base_tmp_dir = tempfile.mkdtemp()
-        self.test_data_dir = f"{self.base_tmp_dir}/test/"
-        # Create the directory if it doesn't exist
-        if not os.path.exists(self.test_data_dir):
-            os.makedirs(self.test_data_dir)
-        # Saving the test data as JSON files
-        for filename, content in sample_data.items():
-            with open(os.path.join(self.test_data_dir, filename), "w") as file:
-                json.dump(content, file)
+        self.log_dir = f"{self.base_tmp_dir}/test/"
+        os.makedirs(self.log_dir, exist_ok=True)
+        # Creating sample log files
+        with open(os.path.join(self.log_dir, "file1.log"), "w") as f:
+            f.write(self.error_log_1 + "\n")
+            f.write(self.non_error_log + "\n")
+        with open(os.path.join(self.log_dir, "file2.log"), "w") as f:
+            f.write(self.error_log_2 + "\n")
+            f.write(self.non_error_log + "\n")
+            f.write(self.non_error_log + "\n")
     def tearDown(self):
-        # Remove the test data directory
-        shutil.rmtree(self.test_data_dir)
+        # Remove the test directory and its contents
+        shutil.rmtree(self.base_tmp_dir)
     def test_case_1(self):
-        matches = task_func(os.path.join(self.test_data_dir, "data1.json"))
-        expected = {
-            "data1.json": [
-                'T', 'h', 'i', 's', 'i', 's', 'a', '(sample)', 't', 'e', 'x', 't', 'w', 'i', 't', 
-                'h', 's', 'o', 'm', 'e', '(matches)', 'a', 'n', 'd', 'c', 'h', 'a', 'r', 'a', 'c', 
-                't', 'e', 'r', 's', 'A', 'n', 'o', 't', 'h', 'e', 'r', '(example)', 'w', 'i', 't',
-                'h', 'm', 'u', 'l', 't', 'i', 'p', 'l', 'e', 'm', 'a', 't', 'c', 'h', 'e', 's'
-            ]
-        }
-        self.assertEqual(matches, expected)
+        """Test if the function correctly extracts error logs from multiple files."""
+        errors = task_func(self.log_dir)
+        self.assertIsInstance(errors, pd.DataFrame)
+        self.assertEqual(len(errors), 2)
+        self.assertEqual(errors.iloc[0]['Timestamp'], "2023-10-24 12:34:56,789")
+        self.assertEqual(errors.iloc[0]['Message'], "Sample error message 1.")
+        
     def test_case_2(self):
-        matches = task_func(os.path.join(self.test_data_dir, "data2.json"))
-        expected = {
-            "data2.json": [
-                '(Hello)', 'w', 'o', 'r', 'l', 'd', 'N', 'o', 'm', 'a', 't', 'c', 'h', 
-                'e', 's', 'h', 'e', 'r', 'e'
-            ]
-        }
-        self.assertEqual(matches, expected)
+        """Confirm that non-error logs are excluded."""
+        errors = task_func(self.log_dir)
+        self.assertNotIn("This is a non-error log message.", errors['Message'].values)
+        
     def test_case_3(self):
-        matches = task_func(os.path.join(self.test_data_dir, "data3.json"))
-        expected = {
-            "data3.json": [
-                'T', 'e', 's', 't', 'i', 'n', 'g', '(with)', 'a', 'n', 'o', 't', 'h', 'e', 'r', '(file)', 'J',
-                'u', 's', 't', 's', 'o', 'm', 'e', '(random)', 't', 'e', 'x', 't'    
-            ]
-        }
-        self.assertEqual(matches, expected)
+        """Test the file_pattern parameter."""
+        # Creating a sample txt log file
+        with open(os.path.join(self.log_dir, "file3.txt"), "w") as f:
+            f.write(self.error_log_1 + "\n")
+            f.write(self.non_error_log + "\n")
+            
+        errors = task_func(self.log_dir, "*.txt")
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors.iloc[0]['Timestamp'], "2023-10-24 12:34:56,789")
+        self.assertEqual(errors.iloc[0]['Message'], "Sample error message 1.")
+        
     def test_case_4(self):
-        matches = task_func(os.path.join(self.test_data_dir, "data4.json"))
-        expected = {
-            "data4.json": [
-                '(A)', 'q', 'u', 'i', 'c', 'k', 'b', 'r', 'o', 'w', 'n', '(fox)', 'j', 'u', 'm', 'p',
-                's', 'O', 'v', 'e', 'r', 't', 'h', 'e', 'l', 'a', 'z', 'y', '(dog)'
-            ]
-        }
-        self.assertEqual(matches, expected)
+        """Ensure the correct columns are present in the DataFrame."""
+        errors = task_func(self.log_dir)
+        self.assertIn('Timestamp', errors.columns)
+        self.assertIn('Message', errors.columns)
+        
     def test_case_5(self):
-        matches = task_func(os.path.join(self.test_data_dir, "data5.json"))
-        expected = {
-            "data5.json": [
-                'Y', 'e', 't', '(another)', 't', 'e', 's', 't', 'f', 'i', 'l', 'e', 'W', 'i', 't', 
-                'h', '(various)', 'm', 'a', 't', 'c', 'h', 'e', 's'   
-            ]
-        }
-        self.assertEqual(matches, expected)
+        """Check edge case: Empty directory."""
+        empty_dir = f"{self.base_tmp_dir}/test/empty"
+        os.makedirs(empty_dir, exist_ok=True)
+        errors = task_func(empty_dir)
+        self.assertIsInstance(errors, pd.DataFrame)
+        self.assertTrue(errors.empty)

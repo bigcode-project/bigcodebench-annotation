@@ -1,90 +1,64 @@
-import collections
-import random
-import itertools
+import matplotlib.pyplot as plt
+from collections import Counter
 
 
-ANIMALS = ['Cat', 'Dog', 'Elephant', 'Lion', 'Tiger', 'Bear', 'Giraffe', 'Horse', 'Rabbit', 'Snake', 'Zebra']
+FRUITS = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape', 'Honeydew', 'Indian Prune', 'Jackfruit']
 
-def task_func(animal_dict, max_count=10, seed=0):
+def task_func(fruit_dict):
     """
-    Given a constant list of animals in ANIMALS, and a dictionary 'animal_dict' with keys as people's names and values
-    as their favorite animal names, reverse the keys and values in a given dictionary and count the occurrences of each
-    predefined animal name with a random count. Return the reversed dictionary and the counter with animal name
-    occurrences.
-
-    This function performs two tasks:
-    1. It reverses the given dictionary (animal_dict) such that the original values become keys and the original 
-    keys become lists of values.
-    2. It counts the occurrences of each animal name in a predefined list (ANIMALS). The count of each animal name
-    is a random integer between 1 and max_count (inclusive).
+    Given a constant list of fruits in FRUITS, and a dictionary 'fruit_dict' with keys as people's names and values 
+    as their favorite fruit names, record the frequency of each fruits' occurence. Return a bar chart of the number 
+    of fruits for each fruit type and return the dictionary with fruit names as keys and their counts as values. 
 
     Parameters:
-    animal_dict (dict): A dictionary with keys as names and values as animal names.
-    max_count (int, Optional): A positive integer denoting the maximum count of each animal. Default is 10.
-    Must be greater than 0.
-    seed (int, Optional): An integer to seed the random number generator. Default is 0.
+    fruit_dict (dict): The dictionary with keys as people's names and values as fruit names.
 
     Returns:
-    tuple: A tuple where the first element is a reversed dictionary and the second element is a counter with animal 
-           name occurrences (with randomness in count).
+    dict: A dictionary with fruit names as keys and their counts as values.
+    matplotlib.axes.Axes: The axes object of the plot.
 
     Requirements:
     - collections
     - random
-    - itertools
+    - matplotlib
 
     Example:
-    >>> animal_dict = {'John': 'Cat', 'Alice': 'Dog', 'Bob': 'Elephant', 'Charlie': 'Lion', 'David': 'Tiger', 'Sue': 'Pangolin'}
-    >>> reversed_dict, animal_counter = task_func(animal_dict, 15, 77)
-    >>> reversed_dict
-    {'Cat': ['John'], 'Dog': ['Alice'], 'Elephant': ['Bob'], 'Lion': ['Charlie'], 'Tiger': ['David']}
-    >>> dict(animal_counter.most_common(5))
-    {'Giraffe': 14, 'Cat': 13, 'Zebra': 9, 'Snake': 8, 'Elephant': 6}
+    >>> fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Cherry', 'Charlie': 'Date', 'David': 'Apple'}
+    >>> freq, ax = task_func(fruit_dict)
+    >>> dict(freq)
+    {'Apple': 2, 'Banana': 1, 'Cherry': 1, 'Date': 1}
     """
-    if max_count < 1:
-        raise ValueError("max_count must be a positive integer")
-    random.seed(seed)
-    reversed_dict = {v: [] for v in animal_dict.values() if isinstance(v, str) and v in ANIMALS}
-    for k, v in animal_dict.items():
-        if isinstance(v, str) and v in ANIMALS:
-            reversed_dict[v].append(k)
-    animal_counter = collections.Counter(itertools.chain.from_iterable([[v] * random.randint(1, max_count) for v in ANIMALS]))
-    return reversed_dict, animal_counter
+    fruit_list = [item for item in fruit_dict.values() if isinstance(item, str) and item in FRUITS]
+    fruit_counter = Counter(fruit_list)
+    plt.bar(fruit_counter.keys(), fruit_counter.values())
+    return Counter([item for item in fruit_dict.values() if isinstance(item, str)]), plt.gca()
 
 import unittest
+import matplotlib.axes
 import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Testing if the dictionary is correctly reversed
-        input_dict = {'John': 'Cat', 'Alice': 'Dog', 'Bob': 'Elephant'}
-        expected_output = {'Cat': ['John'], 'Dog': ['Alice'], 'Elephant': ['Bob']}
-        reversed_dict, animal_counter = task_func(input_dict)
-        self.assertEqual(reversed_dict, expected_output)
-        self.assertEqual(set(animal_counter.keys()), set(ANIMALS))
+        fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Cherry'}
+        count_dict, ax = task_func(fruit_dict)
+        self.assertEqual(count_dict, {'Apple': 1, 'Banana': 1, 'Cherry': 1})
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_case_2(self):
-        # Testing if the animal counts are within the range of 1 to 10
-        _, animal_counter = task_func({})
-        for animal in ANIMALS:
-            self.assertIn(animal, animal_counter)
-            self.assertTrue(1 <= animal_counter[animal] <= 10)
+        fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Apple'}
+        count_dict, ax = task_func(fruit_dict)
+        self.assertEqual(count_dict, {'Apple': 2, 'Banana': 1})
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_case_3(self):
-        # Testing if all predefined animals are counted
-        _, animal_counter = task_func({}, 17, 42)
-        target = {'Rabbit': 14, 'Elephant': 9, 'Lion': 8, 'Tiger': 8, 'Bear': 5, 'Cat': 4, 
-                  'Giraffe': 4, 'Horse': 3, 'Snake': 2, 'Dog': 1, 'Zebra': 1}
-        self.assertEqual(animal_counter, target)
+        fruit_dict = {}
+        count_dict, ax = task_func(fruit_dict)
+        self.assertEqual(count_dict, {})
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_case_4(self):
-        # Testing function behavior with an empty dictionary
-        expected_reversed_dict = {}
-        reversed_dict, animal_counter = task_func(expected_reversed_dict)
-        self.assertEqual(reversed_dict, expected_reversed_dict)
-        self.assertEqual(set(animal_counter.keys()), set(ANIMALS))
-        with self.assertRaises(ValueError):
-            task_func(expected_reversed_dict, -1)
+        fruit_dict = {'John': 'Apple'}
+        count_dict, ax = task_func(fruit_dict)
+        self.assertEqual(count_dict, {'Apple': 1})
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
     def test_case_5(self):
-        # Testing function behavior with a non-empty dictionary
-        input_dict = {'John': 'Lion', 'Alice': 'Tiger'}
-        expected_reversed_dict = {'Lion': ['John'], 'Tiger': ['Alice']}
-        reversed_dict, animal_counter = task_func(input_dict)
-        self.assertEqual(reversed_dict, expected_reversed_dict)
-        self.assertEqual(set(animal_counter.keys()), set(ANIMALS))
+        fruit_dict = {'John': 123, 'Alice': None, 'Bob': 'Apple'}
+        count_dict, ax = task_func(fruit_dict)
+        self.assertEqual(count_dict, {'Apple': 1})
+        self.assertIsInstance(ax, matplotlib.axes.Axes)

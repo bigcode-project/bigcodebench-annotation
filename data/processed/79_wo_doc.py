@@ -1,108 +1,134 @@
 import os
-import shutil
-import random
+import re
+import json
+import glob
 
 
-def task_func(src_dir: str, dest_dir: str, seed:int = 100) -> str:
+def task_func(directory_path: str) -> list:
     """
-    Moves a random file from the source directory to the specified destination directory.
+    Protect all double quotes in all JSON files in the specified directory by prepending them with a double backslash.
+    
+    Functionality:
+    - Reads each JSON file in the given directory.
+    - Escapes the double quotes by prepending them with a double backslash.
+    - Writes back the modified content to the respective JSON file.
     
     Parameters:
-    - src_dir (str): The path of the source directory from which a file will be randomly selected and moved.
-    - dest_dir (str): The path of the destination directory where the file will be moved.
-    - seed (int, Optional): The seed for the random number generator. Defaults to 100.
+    - directory_path (str): Path to the directory containing JSON files.
     
     Returns:
-    str: The name of the file moved. Format: 'filename.extension' (e.g., 'file1.txt').
+    - list: A list of the processed JSON files.
     
     Requirements:
+    - re
+    - json
+    - glob
     - os
-    - shutil
-    - random
 
-    Examples:
+    Raises:
+    - FileNotFoundError: If the specified directory does not exist.
+    
+    Example:
     >>> import tempfile
-    >>> src_dir = tempfile.mkdtemp()
-    >>> dest_dir = tempfile.mkdtemp()
-    >>> open(os.path.join(src_dir, 'file1.txt'), 'w').close()
-    >>> open(os.path.join(src_dir, 'file2.txt'), 'w').close()
-    >>> task_func(src_dir, dest_dir, seed=1)
-    'file2.txt'
+    >>> import json
+    >>> directory = tempfile.mkdtemp()
+    >>> with open(directory + "/file1.json", "w") as file:
+    ...     json.dump({"name": "John", "age": 30, "city": "New York"}, file)
+    >>> with open(directory + "/file2.json", "w") as file:
+    ...     json.dump('{"book": "Harry Potter", "author": "J.K. Rowling", "quote": "\\"Magic\\" is everywhere!"}', file)
+    >>> files = task_func(directory)
+    >>> len(files)
+    2
     """
-    random.seed(seed)
-    files = os.listdir(src_dir)
-    if len(files) == 0:
-        raise FileNotFoundError(f"No files found in {src_dir}")
-    file_name = random.choice(files)
-    src_file = os.path.join(src_dir, file_name)
-    dest_file = os.path.join(dest_dir, file_name)
-    shutil.move(src_file, dest_file)
-    return file_name
+    if not os.path.exists(directory_path):
+        raise FileNotFoundError(f"Directory {directory_path} not found.")
+    json_files = glob.glob(directory_path + '/*.json')
+    processed_files = []
+    for json_file in json_files:
+        with open(json_file, 'r') as file:
+            data = json.load(file)
+        escaped_data = json.dumps(data, ensure_ascii=False)
+        escaped_data = re.sub(r'(?<!\\)"', r'\\\"', escaped_data)
+        with open(json_file, 'w') as file:
+            file.write(escaped_data)
+        processed_files.append(json_file)
+    return processed_files
 
 import unittest
 import doctest
+import shutil
 import tempfile
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.base_temp_dir = tempfile.mkdtemp()
-        self.base_test_dir = f"{self.base_temp_dir}/test"
-        if os.path.exists(self.base_test_dir):
-            shutil.rmtree(self.base_test_dir)
-        os.makedirs(self.base_test_dir, exist_ok=True)
-        self.test_dirs = {
-            f"{self.base_test_dir}/src_test_dir_1": [f"file{i}.txt" for i in range(1, 6)],
-            f"{self.base_test_dir}/src_test_dir_2": [f"file{i}.txt" for i in range(6, 11)],
-            f"{self.base_test_dir}/src_test_dir_3": [],
-            f"{self.base_test_dir}/src_test_dir_4": [f"file{i}.txt" for i in range(11, 16)],
-            f"{self.base_test_dir}/src_test_dir_5": [f"file{i}.txt" for i in range(16, 21)],
+        self.base_tmp_dir = tempfile.mkdtemp()
+        self.test_directory = f"{self.base_tmp_dir}/test"
+        self.mixed_directory = f"{self.base_tmp_dir}/test/mixed_directory/"
+        if not os.path.exists(self.test_directory):
+            os.makedirs(self.test_directory)
+        if not os.path.exists(self.mixed_directory):
+            os.makedirs(self.mixed_directory)
+        self.json_data1 = {
+            "name": "John",
+            "age": 30,
+            "city": "New York"
         }
-        self.dest_dirs = {
-            f"{self.base_test_dir}/dest_test_dir_1": [],
-            f"{self.base_test_dir}/dest_test_dir_2": [],
-            f"{self.base_test_dir}/dest_test_dir_3": [],
-            f"{self.base_test_dir}/dest_test_dir_4": [],
-            f"{self.base_test_dir}/dest_test_dir_5": [],
+        self.json_data2 = {
+            "book": "Harry Potter",
+            "author": "J.K. Rowling",
+            "quote": "\"Magic\" is everywhere!"
         }
-        # Create the test directories and files
-        for dir_name, files in self.test_dirs.items():
-            os.makedirs(dir_name, exist_ok=True)
-            for file_name in files:
-                with open(os.path.join(dir_name, file_name), 'w') as file:
-                    file.write(f"This is content for {file_name}")
-        for dir_name in self.dest_dirs.keys():
-            os.makedirs(dir_name, exist_ok=True)
-        return super().setUp()
+        # Create sample JSON files
+        with open(os.path.join(self.test_directory, "file1.json"), "w") as file:
+            json.dump(self.json_data1, file)
+        with open(os.path.join(self.test_directory, "file2.json"), "w") as file:
+            json.dump(self.json_data2, file)
+        super(TestCases, self).setUp()
     def tearDown(self):
-        shutil.rmtree(self.base_test_dir)
-        return super().tearDown()
+        shutil.rmtree(self.test_directory)
+        super(TestCases, self).tearDown()
     def test_case_1(self):
-        moved_file = task_func(
-            f'{self.base_test_dir}/src_test_dir_1', 
-            f'{self.base_test_dir}/dest_test_dir_1', 
-            seed=1
-        )
-        self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_1'])
-        self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_1', moved_file)))
-        # Test the name of the moved file
-        self.assertEqual(moved_file, 'file3.txt')
+        # Test with the sample directory created
+        result = task_func(self.test_directory)
+        self.assertEqual(len(result), 2)  # 2 files processed
+        result = [os.path.basename(file) for file in result]
+        self.assertTrue("file1.json" in result)
+        self.assertTrue("file2.json" in result)
+        
+        # Check if the files have been modified correctly
+        with open(os.path.join(self.test_directory, "file1.json"), "r") as file:
+            content = file.read()
+            self.assertNotIn(' "', content)  # No unprotected double quotes
+        
+        with open(os.path.join(self.test_directory, "file2.json"), "r") as file:
+            content = file.read()
+            self.assertNotIn(' "Magic"', content)  # Original quote should be escaped
+    
     def test_case_2(self):
-        moved_file = task_func(f'{self.base_test_dir}/src_test_dir_2', f'{self.base_test_dir}/dest_test_dir_2')
-        self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_2'])
-        self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_2', moved_file)))
+        # Test with an empty directory (no JSON files)
+        empty_directory = f"{self.test_directory}/empty_directory/"
+        if not os.path.exists(empty_directory):
+            os.makedirs(empty_directory)
+        result = task_func(empty_directory)
+        self.assertEqual(result, [])  # No files processed
+    
     def test_case_3(self):
+        # Test with a non-existing directory
         with self.assertRaises(FileNotFoundError):
-            task_func(f'{self.base_test_dir}/src_test_dir_3', f'{self.base_test_dir}/dest_test_dir_3')
+            task_func("/mnt/data/non_existent_directory/")
+    
     def test_case_4(self):
-        moved_file = task_func(
-            f'{self.base_test_dir}/src_test_dir_4', 
-            f'{self.base_test_dir}/dest_test_dir_4', 
-            seed=2
-        )
-        self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_4'])
-        self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_4', moved_file)))
-        # Test the name of the moved file
-        self.assertEqual(moved_file, 'file11.txt')
+        # Test with a directory containing non-JSON files
+        if not os.path.exists(self.mixed_directory):
+            os.makedirs(self.mixed_directory)
+        with open(self.mixed_directory + "file.txt", "w") as file:
+            file.write("Sample text")
+        result = task_func(self.mixed_directory)
+        self.assertEqual(result, [])  # No JSON files processed
+    
     def test_case_5(self):
-        moved_file = task_func(f'{self.base_test_dir}/src_test_dir_5', f'{self.base_test_dir}/dest_test_dir_5')
-        self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_5'])
-        self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_5', moved_file)))
+        # Test with a directory containing both JSON and non-JSON files
+        with open(self.mixed_directory + "file3.json", "w") as file:
+            json.dump(self.json_data1, file)
+        result = task_func(self.mixed_directory)
+        self.assertEqual(len(result), 1)  # 1 JSON file processed
+        self.assertTrue("file3.json" in result[0])

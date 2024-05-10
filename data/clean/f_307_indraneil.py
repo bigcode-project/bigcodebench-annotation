@@ -13,13 +13,13 @@ def f_307(directory_path: str) -> list:
     - Escapes the double quotes by prepending them with a double backslash.
     - Writes back the modified content to the respective JSON file.
     
-    Input:
+    Parameters:
     - directory_path (str): Path to the directory containing JSON files.
     
-    Output:
-    - Returns a list of processed JSON files.
+    Returns:
+    - list: A list of the processed JSON files.
     
-    Requirements of the imported libraries/modules to be used:
+    Requirements:
     - re
     - json
     - glob
@@ -105,8 +105,9 @@ class TestCases(unittest.TestCase):
         # Test with the sample directory created
         result = f_307(self.test_directory)
         self.assertEqual(len(result), 2)  # 2 files processed
-        self.assertTrue("file1.json" in result[0])
-        self.assertTrue("file2.json" in result[1])
+        result = [os.path.basename(file) for file in result]
+        self.assertTrue("file1.json" in result)
+        self.assertTrue("file2.json" in result)
         
         # Check if the files have been modified correctly
         with open(os.path.join(self.test_directory, "file1.json"), "r") as file:
@@ -158,3 +159,4 @@ def run_tests():
 if __name__ == "__main__":
     doctest.testmod()
     run_tests()
+

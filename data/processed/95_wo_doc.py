@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 from glob import glob
 
 
@@ -27,6 +26,18 @@ def task_func(directory, string):
     just as a substring in the file content.
     - If the directory does not contain any JSON files or if no JSON files contain the string, an empty list 
     is returned.
+
+    Example:
+    >>> import tempfile
+    >>> import json
+    >>> directory = tempfile.mkdtemp()
+    >>> with open(directory + "/file1.json", "w") as file:
+    ...     json.dump({"name": "John", "age": 30, "city": "New York"}, file)
+    >>> with open(directory + "/file2.json", "w") as file:
+    ...     json.dump({"book": "Harry Potter", "author": "J.K. Rowling", "quote": "Magic is everywhere!"}, file)
+    >>> files = task_func(directory, "book")
+    >>> len(files)
+    1
     """
     json_files = glob(f"{directory}/**/*.json", recursive=True)
     found_files = []
@@ -45,6 +56,7 @@ import os
 import shutil
 import doctest
 import tempfile
+from pathlib import Path
 # Test cases for the function
 class TestCases(unittest.TestCase):
         

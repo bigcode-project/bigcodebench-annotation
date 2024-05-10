@@ -20,7 +20,7 @@ def f_286(text):
         - float: The skewness of the name frequencies.
         - float: The kurtosis of the name frequencies.
     
-    Libraries Used:
+    Requirements:
     - re
     - pandas
     - matplotlib.pyplot
@@ -141,3 +141,4 @@ def run_tests():
 if __name__ == "__main__":
     doctest.testmod()
     run_tests()
+

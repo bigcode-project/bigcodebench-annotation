@@ -1,73 +1,117 @@
+import pandas as pd
 import re
-import matplotlib.pyplot as plt
-from nltk.probability import FreqDist
+from scipy import stats
 
 
-def task_func(example_str, top_n=30):
+def task_func(text):
     """
-    Extract all texts that are not enclosed in square brackets from the given string and plot 
-    a frequency distribution of the words. Also return the top_n most common words in the frequency distribution
-    as a dictionary.
-
+    Extracts all names from a given text string that are not surrounded by square brackets 
+    and counts the frequency of each extracted name. It then creates a bar chart of the name frequencies and
+    returns the name frequencies as a pandas Series and the bar chart plot's axes object along with the skewness 
+    and kurtosis of the name frequencies. If the skewness and kurtosis are nan, they are returned as None.
+    
     Parameters:
-    - example_str (str): The input string.
-    - top_n (int, Optional): The number of most common words to display in the frequency distribution plot. Default is 30.
-
+    text (str): The text from which to extract names. Each name should be separated by square brackets containing addresses.
+    
     Returns:
-    - Axes: A matplotlib Axes object representing the frequency distribution plot.
-    - dict: A dictionary containing the top_n most common words and their frequencies.
-
+    tuple: A tuple containing:
+        - pd.Series: A pandas Series with the frequency of each name.
+        - Axes: A bar chart plot showing the name frequencies. If no names are found, this will be None.
+        - float: The skewness of the name frequencies.
+        - float: The kurtosis of the name frequencies.
+    
     Requirements:
     - re
-    - nltk.probability.FreqDist
+    - pandas
     - matplotlib.pyplot
-
+    - scipy.stats
+    
     Example:
-    >>> ax, top_n_words = task_func("Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003] Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]")
-    >>> type(ax)
+    >>> text_input = "Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003]Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]"
+    >>> name_freqs, plot, skew, kurtosis = task_func(text_input)
+    >>> print(list(name_freqs.items())[0])
+    ('Josie Smith', 1)
+    >>> type(plot)
     <class 'matplotlib.axes._axes.Axes'>
+    >>> round(kurtosis, 2) is not None
+    True
     """
-    text = ' '.join(re.findall('(.*?)\\[.*?\\]', example_str))
-    words = text.split()
-    fdist = FreqDist(words)
-    if top_n > len(fdist):
-        top_n = len(fdist)
-    plt.figure()
-    ax = fdist.plot(top_n, cumulative=False, show=False)
-    plt.close()
-    top_n_words = dict(fdist.most_common(top_n))
-    return ax, top_n_words
+    names = re.findall(r'(.*?)(?:\[.*?\]|$)', text)
+    names = [name.strip() for name in names if name.strip()]  # Removing any empty or whitespace names
+    name_freqs = pd.Series(names).value_counts()
+    if not name_freqs.empty:
+        ax = name_freqs.plot(kind='bar', title="Name Frequencies")
+        skewness = stats.skew(name_freqs)
+        kurtosis = stats.kurtosis(name_freqs)
+    else:
+        ax = skewness = kurtosis = None
+    if skewness == float('nan'):
+        skewness = None
+    if kurtosis == float('nan'):
+        kurtosis = None
+    return name_freqs, ax, skewness, kurtosis
 
 import unittest
 import doctest
+test_data = [
+    # Test Case 1: Basic names separated by addresses in square brackets
+    "John Doe [123 MAIN ST, TOWN, ST 12345]Jane Smith [456 OTHER ST, CITY, ST 67890]",
+    
+    # Test Case 2: Multiple occurrences of the same name
+    "Alice [111 ALPHA ST, PLACE, ST 11111]Bob [222 BETA ST, LOCATION, ST 22222]Alice [333 GAMMA ST, REGION, ST 33333]",
+    
+    # Test Case 3: Names with special characters and different patterns
+    "Mr. X [444 X ST, XPLACE, ST 44444]Dr. Y [555 Y ST, YCITY, ST 55555]Z [666 Z ST, ZTOWN, ST 66666]",
+    
+    # Test Case 4: Empty string
+    "",
+    
+    # Test Case 5: Only addresses without names
+    "[777 FIRST ST, APLACE, ST 77777][888 SECOND ST, BCITY, ST 88888][999 THIRD ST, CTOWN, ST 99999]",
+    # Long test case with multiple names and addresses
+    "John Doe [123 MAIN ST, TOWN, ST 12345]Jane Smith [456 OTHER ST, CITY, ST 67890]Alice [111 ALPHA ST, PLACE, ST 11111]Bob [222 BETA ST, LOCATION, ST 22222]Alice [333 GAMMA ST, REGION, ST 33333]Mr. X [444 X ST, XPLACE, ST 44444]Dr. Y [555 Y ST, YCITY, ST 55555]Z [666 Z ST, ZTOWN, ST 66666]"
+]
 class TestCases(unittest.TestCase):
+    
     def test_case_1(self):
-        example_str = "Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003] Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]"
-        ax, top_n_words = task_func(example_str)
-        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
-        # Test the number of words in the plot
-        self.assertEqual(len(ax.get_xticklabels()), 4, "The number of words in the plot is not 30.")
-        # Test the top_n_words dictionary
-        self.assertEqual(top_n_words, {'Smith': 2, 'Josie': 1, 'Mugsy': 1, 'Dog': 1}, "The top_n_words dictionary is incorrect.")
+        # Test Case 1: Basic names separated by addresses in square brackets
+        input_text = test_data[0]
+        name_freqs, plot, _, _ = task_func(input_text)
+        self.assertEqual(name_freqs["John Doe"], 1)
+        self.assertEqual(name_freqs["Jane Smith"], 1)
+        self.assertTrue("Name Frequencies" in plot.get_title())
+    
     def test_case_2(self):
-        example_str = "Hello [1234 STREET, CITY, STATE 12345] World [5678 LANE, TOWN, PROVINCE 67890]"
-        ax, _ = task_func(example_str)
-        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+        # Test Case 2: Multiple occurrences of the same name
+        input_text = test_data[1]
+        name_freqs, plot, _, _ = task_func(input_text)
+        self.assertEqual(name_freqs["Alice"], 2)
+        self.assertEqual(name_freqs["Bob"], 1)
+    
     def test_case_3(self):
-        example_str = "[IGNORE THIS] This is a simple test string [ANOTHER IGNORE]"
-        ax, top_n_words = task_func(example_str, top_n=5)
-        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
-        # Test the histogram data
-        #self.assertEqual(len(ax.patches), 5, "The number of words in the plot is not 5.")
-        # Test the top_n_words dictionary
-        self.assertEqual(top_n_words, {'This': 1, 'is': 1, 'a': 1, 'simple': 1, 'test': 1}, "The top_n_words dictionary is incorrect.")
+        # Test Case 3: Names with special characters and different patterns
+        input_text = test_data[2]
+        name_freqs, plot, _, _ = task_func(input_text)
+        self.assertEqual(name_freqs["Mr. X"], 1)
+        self.assertEqual(name_freqs["Dr. Y"], 1)
+        self.assertEqual(name_freqs["Z"], 1)
     
     def test_case_4(self):
-        example_str = "[BEGIN] Testing the function with different [MIDDLE] types of input strings [END]"
-        ax, _ = task_func(example_str)
-        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+        # Test Case 4: Empty string
+        input_text = test_data[3]
+        name_freqs, plot, _, _ = task_func(input_text)
+        self.assertTrue(name_freqs.empty)
     
     def test_case_5(self):
-        example_str = "Example without any brackets so all words should be considered."
-        ax, _ = task_func(example_str)
-        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+        # Test Case 5: Only addresses without names
+        input_text = test_data[4]
+        name_freqs, plot, _, _ = task_func(input_text)
+        print(name_freqs)
+        self.assertTrue(name_freqs.empty)
+        # Long test case with multiple names and addresses
+        input_text = test_data[5]
+        name_freqs, plot, skewness, kurtosis = task_func(input_text)
+        self.assertEqual(name_freqs["John Doe"], 1)
+        # Test for skewness and kurtosis
+        self.assertAlmostEqual(skewness, 2.04, places=2)
+        self.assertAlmostEqual(kurtosis, 2.17, places=2)

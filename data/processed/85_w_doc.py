@@ -1,77 +1,90 @@
-import pandas as pd
-import seaborn as sns
-from collections import Counter
-from textblob import TextBlob
-from matplotlib import pyplot as plt
+import collections
+import random
+import itertools
 
 
-def task_func(text, n, top_k):
+ANIMALS = ['Cat', 'Dog', 'Elephant', 'Lion', 'Tiger', 'Bear', 'Giraffe', 'Horse', 'Rabbit', 'Snake', 'Zebra']
+
+def task_func(animal_dict, max_count=10, seed=0):
     """
-    Visualize the uppermost K n-grams in a given text string.
+    Given a constant list of animals in ANIMALS, and a dictionary 'animal_dict' with keys as people's names and values
+    as their favorite animal names, reverse the keys and values in a given dictionary and count the occurrences of each
+    predefined animal name with a random count. Return the reversed dictionary and the counter with animal name
+    occurrences.
+
+    This function performs two tasks:
+    1. It reverses the given dictionary (animal_dict) such that the original values become keys and the original 
+    keys become lists of values.
+    2. It counts the occurrences of each animal name in a predefined list (ANIMALS). The count of each animal name
+    is a random integer between 1 and max_count (inclusive).
 
     Parameters:
-    text (str): The text string.
-    n (int): The value of n for the n-grams.
-    top_k (int): The number of top n-grams to visualize.
+    animal_dict (dict): A dictionary with keys as names and values as animal names.
+    max_count (int, Optional): A positive integer denoting the maximum count of each animal. Default is 10.
+    Must be greater than 0.
+    seed (int, Optional): An integer to seed the random number generator. Default is 0.
 
     Returns:
-    None
+    tuple: A tuple where the first element is a reversed dictionary and the second element is a counter with animal 
+           name occurrences (with randomness in count).
 
     Requirements:
-    - re
-    - pandas
-    - seaborn
-    - textblob
-    - matplotlib
+    - collections
+    - random
+    - itertools
 
     Example:
-    >>> type(task_func('This is a sample text for testing.', 2, 5))
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> animal_dict = {'John': 'Cat', 'Alice': 'Dog', 'Bob': 'Elephant', 'Charlie': 'Lion', 'David': 'Tiger', 'Sue': 'Pangolin'}
+    >>> reversed_dict, animal_counter = task_func(animal_dict, 15, 77)
+    >>> reversed_dict
+    {'Cat': ['John'], 'Dog': ['Alice'], 'Elephant': ['Bob'], 'Lion': ['Charlie'], 'Tiger': ['David']}
+    >>> dict(animal_counter.most_common(5))
+    {'Giraffe': 14, 'Cat': 13, 'Zebra': 9, 'Snake': 8, 'Elephant': 6}
     """
-    blob = TextBlob(text.lower())
-    words_freq = Counter([' '.join(list(span)) for span in blob.ngrams(n=n)])  # Get n-grams and count frequency
-    words_freq_filtered = words_freq.most_common(top_k)  # Get top k n-grams
-    top_df = pd.DataFrame(words_freq_filtered, columns=['n-gram', 'Frequency'])
-    plt.figure()
-    return sns.barplot(x='n-gram', y='Frequency', data=top_df)
+    if max_count < 1:
+        raise ValueError("max_count must be a positive integer")
+    random.seed(seed)
+    reversed_dict = {v: [] for v in animal_dict.values() if isinstance(v, str) and v in ANIMALS}
+    for k, v in animal_dict.items():
+        if isinstance(v, str) and v in ANIMALS:
+            reversed_dict[v].append(k)
+    animal_counter = collections.Counter(itertools.chain.from_iterable([[v] * random.randint(1, max_count) for v in ANIMALS]))
+    return reversed_dict, animal_counter
 
 import unittest
-import matplotlib.pyplot as plt
 import doctest
 class TestCases(unittest.TestCase):
-    def tearDown(self) -> None:
-        plt.close('all')
-        return super().tearDown()
     def test_case_1(self):
-        # Test with a simple text, bigram (n=2) and top 2 n-grams
-        ax = task_func('This is a sample text for testing.', 2, 2)
-        ngrams = [label.get_text() for label in ax.get_xticklabels()]
-        self.assertNotIn('sample text', ngrams)
-        self.assertIn('is a', ngrams)
+        # Testing if the dictionary is correctly reversed
+        input_dict = {'John': 'Cat', 'Alice': 'Dog', 'Bob': 'Elephant'}
+        expected_output = {'Cat': ['John'], 'Dog': ['Alice'], 'Elephant': ['Bob']}
+        reversed_dict, animal_counter = task_func(input_dict)
+        self.assertEqual(reversed_dict, expected_output)
+        self.assertEqual(set(animal_counter.keys()), set(ANIMALS))
     def test_case_2(self):
-        # Test with a longer text, trigram (n=3) and top 3 n-grams
-        text = 'The sun shines bright in the clear blue sky. The sky is blue and beautiful.'
-        ax = task_func(text, 3, 3)
-        ngrams = [label.get_text() for label in ax.get_xticklabels()]
-        self.assertNotIn('the clear blue', ngrams)
-        self.assertNotIn('sky the sky', ngrams)
-        self.assertIn('the sun shines', ngrams)
+        # Testing if the animal counts are within the range of 1 to 10
+        _, animal_counter = task_func({})
+        for animal in ANIMALS:
+            self.assertIn(animal, animal_counter)
+            self.assertTrue(1 <= animal_counter[animal] <= 10)
     def test_case_3(self):
-        # Test with no repeating n-grams, unigram (n=1) and top 3 n-grams
-        text = 'Each word is unique.'
-        ax = task_func(text, 1, 3)
-        ngrams = [label.get_text() for label in ax.get_xticklabels()]
-        self.assertEqual(len(ngrams), 3)  # Only 4 unique words bu top 3 n-grams
+        # Testing if all predefined animals are counted
+        _, animal_counter = task_func({}, 17, 42)
+        target = {'Rabbit': 14, 'Elephant': 9, 'Lion': 8, 'Tiger': 8, 'Bear': 5, 'Cat': 4, 
+                  'Giraffe': 4, 'Horse': 3, 'Snake': 2, 'Dog': 1, 'Zebra': 1}
+        self.assertEqual(animal_counter, target)
     def test_case_4(self):
-        # Test with a repeated word, bigram (n=2) and top 1 n-grams
-        text = 'Repeat repeat repeat again.'
-        ax = task_func(text, 2, 1)
-        ngrams = [label.get_text() for label in ax.get_xticklabels()]
-        self.assertIn('repeat repeat', ngrams)
+        # Testing function behavior with an empty dictionary
+        expected_reversed_dict = {}
+        reversed_dict, animal_counter = task_func(expected_reversed_dict)
+        self.assertEqual(reversed_dict, expected_reversed_dict)
+        self.assertEqual(set(animal_counter.keys()), set(ANIMALS))
+        with self.assertRaises(ValueError):
+            task_func(expected_reversed_dict, -1)
     def test_case_5(self):
-        # Test with punctuation in text, bigram (n=2) and top 3 n-grams
-        text = 'Hello, world! How are you, world?'
-        ax = task_func(text, 2, 3)
-        ngrams = [label.get_text() for label in ax.get_xticklabels()]
-        self.assertIn('hello world', ngrams)
-        self.assertNotIn('you world', ngrams)
+        # Testing function behavior with a non-empty dictionary
+        input_dict = {'John': 'Lion', 'Alice': 'Tiger'}
+        expected_reversed_dict = {'Lion': ['John'], 'Tiger': ['Alice']}
+        reversed_dict, animal_counter = task_func(input_dict)
+        self.assertEqual(reversed_dict, expected_reversed_dict)
+        self.assertEqual(set(animal_counter.keys()), set(ANIMALS))

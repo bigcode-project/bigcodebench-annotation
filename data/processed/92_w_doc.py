@@ -1,65 +1,72 @@
-import collections
-import string
-import random
+import matplotlib
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
 
 
-def task_func(length, seed=0):
+def task_func(mu, sigma, sample_size, seed=0):
     """
-    Generate a random string of a given length using ASCII letters and calculate the frequency of each character.​
-
+    Create a Gaussian kernel density estimate diagram of a normal distribution with a given mean and a 
+    standard deviation using a random sample of a size determined by the sample_size parameter. The density 
+    diagram is plotted using default settings in a deterministic matplotlib plot. Return the axes object.
+    
     Parameters:
-    length (int): The length of the random string to be generated.
+    mu (float): The mean of the normal distribution.
+    sigma (float): The standard deviation of the normal distribution.
+    sample_size (int): The size of the sample to generate. Must be a positive integer.
     seed (int, Optional): The seed to be used for the random number generator. Default is 0.
-
+    
     Returns:
-    dict: A dictionary with the frequency of each character in the generated string.
-
+    matplotlib.axes._axes.Axes: Axes object containing the plot of the normal distribution.
+    
     Requirements:
-    - The function uses the 'collections', 'string', and 'random' modules from the Python standard library.
-    - The generated string consists only of ASCII letters.
-
+    - numpy
+    - matplotlib
+    - scipy.stats
+    
     Example:
-    >>> result = task_func(4)
-    >>> isinstance(result, dict)  # The result should be a dictionary
-    True
-    >>> all(key in string.ascii_letters for key in result.keys())  # All keys should be ASCII letters
-    True
-    >>> task_func(5, 0)  # The result should be deterministic for a given seed
-    {'y': 1, 'W': 1, 'A': 1, 'c': 1, 'q': 1}
+    >>> ax = task_func(0, 1, 1000)
+    >>> type(ax) # The result should be a matplotlib.axes._axes.Axes object
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    random.seed(seed)
-    random_string = ''.join(random.choice(string.ascii_letters) for _ in range(length))
-    char_freq = collections.Counter(random_string)
-    return dict(char_freq)
+    if sample_size <= 0:
+        raise ValueError('sample_size must be a positive integer.')
+    np.random.seed(seed)
+    sample = np.random.normal(mu, sigma, sample_size)
+    density = stats.gaussian_kde(sample)
+    x = np.linspace(min(sample), max(sample), sample_size)
+    fig, ax = plt.subplots()
+    ax.plot(x, density(x))
+    return ax
 
 import unittest
 import doctest
 class TestCases(unittest.TestCase):
+    
     def test_case_1(self):
-        result = task_func(0, 77)
-        self.assertEquals(result, {})
-        self.assertIsInstance(result, dict)
-        self.assertEqual(len(result), 0)
+        with self.assertRaises(ValueError):
+            ax = task_func(0, 1, 0, 77)        
     def test_case_2(self):
-        result = task_func(1)
-        self.assertIsInstance(result, dict)
-        self.assertEqual(sum(result.values()), 1)
-        self.assertEqual(len(result), 1)
+        mu, sigma, sample_size, seed = 0, 1, 10000, 42
+        ax = task_func(mu, sigma, sample_size, seed)
+        line = ax.lines[0]
+        x_data, y_data = line.get_data()
+        assert isinstance(ax, matplotlib.axes._axes.Axes)
+        assert min(x_data) < mu - 3*sigma and max(x_data) > mu + 3*sigma
     def test_case_3(self):
-        length = 10000
-        result = task_func(length, 34)
-        self.assertIsInstance(result, dict)
-        self.assertEqual(sum(result.values()), length)
-        self.assertTrue(all(char in string.ascii_letters for char in result))
+        ax = task_func(0, 1, 10000, 42)
+        xlim = ax.get_xlim()
+        ylim = ax.get_ylim()
+        assert xlim[0] < 0 and xlim[1] > 0
+        assert ylim[0] < 0 and ylim[1] > 0
     def test_case_4(self):
-        length = 10
-        result = task_func(length, 77)
-        self.assertIsInstance(result, dict)
-        self.assertEqual(result, {'Z': 1, 'q': 1, 'u': 1, 'm': 2, 'p': 1, 'h': 1, 's': 1, 'E': 1, 'J': 1})
-        self.assertTrue(all(char in string.ascii_letters for char in result))
+        ax = task_func(0, 1, 1000, 42)
+        assert len(ax.lines) == 1
     def test_case_5(self):
-        length = random.randint(1, 1000)
-        result = task_func(length)
-        self.assertIsInstance(result, dict)
-        self.assertEqual(sum(result.values()), length)
-        self.assertTrue(all(char in string.ascii_letters for char in result))
+        ax1 = task_func(0, 1, 42)
+        ax2 = task_func(0, 1, 42)
+        line1 = ax1.lines[0]
+        line2 = ax2.lines[0]
+        x_data1, y_data1 = line1.get_data()
+        x_data2, y_data2 = line2.get_data()
+        assert np.array_equal(x_data1, x_data2) and np.array_equal(y_data1, y_data2)

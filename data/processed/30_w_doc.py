@@ -1,6 +1,5 @@
 import json
 import random
-from datetime import datetime
 
 
 # Constants
@@ -36,6 +35,7 @@ def task_func(utc_datetime, seed=0):
     - random
     
     Example:
+    >>> from datetime import datetime
     >>> utc_time = datetime(2023, 6, 15, 12, 0, 0, tzinfo=pytz.UTC)
     >>> person_json_str = task_func(utc_time)
     >>> json_data = json.loads(person_json_str)
@@ -53,6 +53,7 @@ def task_func(utc_datetime, seed=0):
 import unittest
 import pytz
 import doctest
+from datetime import datetime
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):

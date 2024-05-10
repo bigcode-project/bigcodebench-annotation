@@ -1,110 +1,108 @@
-from datetime import datetime
-from collections import defaultdict
-import matplotlib.pyplot as plt
+import os
+import shutil
+import random
 
 
-def task_func(activities):
+def task_func(src_dir: str, dest_dir: str, seed:int = 100) -> str:
     """
-    Return a bar chart of the number of activities performed on each day of the week based on the provided list of activities.
-    If the activities are not datetime objects, raise a TypeError.
-
+    Moves a random file from the source directory to the specified destination directory.
+    
     Parameters:
-    - activities (list of datetime objects): A list of datetime objects representing when each activity occurred.
-
+    - src_dir (str): The path of the source directory from which a file will be randomly selected and moved.
+    - dest_dir (str): The path of the destination directory where the file will be moved.
+    - seed (int, Optional): The seed for the random number generator. Defaults to 100.
+    
     Returns:
-    - matplotlib.axes.Axes: Axes object representing the bar chart.
-
+    str: The name of the file moved. Format: 'filename.extension' (e.g., 'file1.txt').
+    
     Requirements:
-    - datetime
-    - collections
-    - matplotlib.pyplot
+    - os
+    - shutil
+    - random
 
-    Raises:
-    - TypeError: If the activities are not datetime objects.
-
-    Example:
-    >>> ax = task_func([datetime(2023, 10, 25), datetime(2023, 10, 26)])
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
+    Examples:
+    >>> import tempfile
+    >>> src_dir = tempfile.mkdtemp()
+    >>> dest_dir = tempfile.mkdtemp()
+    >>> open(os.path.join(src_dir, 'file1.txt'), 'w').close()
+    >>> open(os.path.join(src_dir, 'file2.txt'), 'w').close()
+    >>> task_func(src_dir, dest_dir, seed=1)
+    'file2.txt'
     """
-    if not all(isinstance(activity, datetime) for activity in activities):
-        raise TypeError('All activities must be datetime objects')
-    activity_counts = defaultdict(int)
-    for activity in activities:
-        day = activity.strftime('%A')
-        activity_counts[day] += 1
-    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    counts = [activity_counts[day] for day in days]
-    plt.figure()
-    fig, ax = plt.subplots()
-    ax.bar(days, counts)
-    ax.set_xlabel('Day of the Week')
-    ax.set_ylabel('Number of Activities')
-    ax.set_title('Weekly Activity')
-    return ax
+    random.seed(seed)
+    files = os.listdir(src_dir)
+    if len(files) == 0:
+        raise FileNotFoundError(f"No files found in {src_dir}")
+    file_name = random.choice(files)
+    src_file = os.path.join(src_dir, file_name)
+    dest_file = os.path.join(dest_dir, file_name)
+    shutil.move(src_file, dest_file)
+    return file_name
 
 import unittest
 import doctest
+import tempfile
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.base_temp_dir = tempfile.mkdtemp()
+        self.base_test_dir = f"{self.base_temp_dir}/test"
+        if os.path.exists(self.base_test_dir):
+            shutil.rmtree(self.base_test_dir)
+        os.makedirs(self.base_test_dir, exist_ok=True)
+        self.test_dirs = {
+            f"{self.base_test_dir}/src_test_dir_1": [f"file{i}.txt" for i in range(1, 6)],
+            f"{self.base_test_dir}/src_test_dir_2": [f"file{i}.txt" for i in range(6, 11)],
+            f"{self.base_test_dir}/src_test_dir_3": [],
+            f"{self.base_test_dir}/src_test_dir_4": [f"file{i}.txt" for i in range(11, 16)],
+            f"{self.base_test_dir}/src_test_dir_5": [f"file{i}.txt" for i in range(16, 21)],
+        }
+        self.dest_dirs = {
+            f"{self.base_test_dir}/dest_test_dir_1": [],
+            f"{self.base_test_dir}/dest_test_dir_2": [],
+            f"{self.base_test_dir}/dest_test_dir_3": [],
+            f"{self.base_test_dir}/dest_test_dir_4": [],
+            f"{self.base_test_dir}/dest_test_dir_5": [],
+        }
+        # Create the test directories and files
+        for dir_name, files in self.test_dirs.items():
+            os.makedirs(dir_name, exist_ok=True)
+            for file_name in files:
+                with open(os.path.join(dir_name, file_name), 'w') as file:
+                    file.write(f"This is content for {file_name}")
+        for dir_name in self.dest_dirs.keys():
+            os.makedirs(dir_name, exist_ok=True)
+        return super().setUp()
+    def tearDown(self):
+        shutil.rmtree(self.base_test_dir)
+        return super().tearDown()
     def test_case_1(self):
-        # Input: Activities on Monday and Tuesday
-        activities = [datetime(2023, 10, 23), datetime(2023, 10, 24)]
-        ax = task_func(activities)
-        bars = ax.patches
-        # Assert correct title, x and y labels
-        self.assertEqual(ax.get_title(), 'Weekly Activity')
-        self.assertEqual(ax.get_xlabel(), 'Day of the Week')
-        self.assertEqual(ax.get_ylabel(), 'Number of Activities')
-        # Assert correct data points
-        self.assertEqual(bars[0].get_height(), 1)  # Monday
-        self.assertEqual(bars[1].get_height(), 1)  # Tuesday
-        for i in range(2, 7):
-            self.assertEqual(bars[i].get_height(), 0)  # Rest of the days
+        moved_file = task_func(
+            f'{self.base_test_dir}/src_test_dir_1', 
+            f'{self.base_test_dir}/dest_test_dir_1', 
+            seed=1
+        )
+        self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_1'])
+        self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_1', moved_file)))
+        # Test the name of the moved file
+        self.assertEqual(moved_file, 'file3.txt')
     def test_case_2(self):
-        # Input: Activities on multiple days
-        activities = [datetime(2023, 10, 23), datetime(2023, 10, 24), datetime(2023, 10, 24), datetime(2023, 10, 26)]
-        ax = task_func(activities)
-        bars = ax.patches
-        # Assert correct title, x and y labels
-        self.assertEqual(ax.get_title(), 'Weekly Activity')
-        self.assertEqual(ax.get_xlabel(), 'Day of the Week')
-        self.assertEqual(ax.get_ylabel(), 'Number of Activities')
-        # Assert correct data points
-        self.assertEqual(bars[0].get_height(), 1)  # Monday
-        self.assertEqual(bars[1].get_height(), 2)  # Tuesday
-        self.assertEqual(bars[2].get_height(), 0)  # Wednesday
-        self.assertEqual(bars[3].get_height(), 1)  # Thursday
-        for i in range(4, 7):
-            self.assertEqual(bars[i].get_height(), 0)  # Rest of the days
+        moved_file = task_func(f'{self.base_test_dir}/src_test_dir_2', f'{self.base_test_dir}/dest_test_dir_2')
+        self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_2'])
+        self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_2', moved_file)))
     def test_case_3(self):
-        # Input: Activities only on Sunday
-        activities = [datetime(2023, 10, 29), datetime(2023, 10, 29)]
-        ax = task_func(activities)
-        bars = ax.patches
-        # Assert correct data points
-        for i in range(0, 6):
-            self.assertEqual(bars[i].get_height(), 0)  # Days before Sunday
-        self.assertEqual(bars[6].get_height(), 2)  # Sunday
+        with self.assertRaises(FileNotFoundError):
+            task_func(f'{self.base_test_dir}/src_test_dir_3', f'{self.base_test_dir}/dest_test_dir_3')
     def test_case_4(self):
-        # Input: No activities
-        activities = []
-        ax = task_func(activities)
-        bars = ax.patches
-        # Assert correct data points
-        for i in range(0, 7):
-            self.assertEqual(bars[i].get_height(), 0)  # All days
-        # Test for non datetime objects
-        with self.assertRaises(TypeError):
-            task_func([1, 2, 3])
+        moved_file = task_func(
+            f'{self.base_test_dir}/src_test_dir_4', 
+            f'{self.base_test_dir}/dest_test_dir_4', 
+            seed=2
+        )
+        self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_4'])
+        self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_4', moved_file)))
+        # Test the name of the moved file
+        self.assertEqual(moved_file, 'file11.txt')
     def test_case_5(self):
-        # Input: Activities on all days
-        activities = [
-            datetime(2023, 10, 23), datetime(2023, 10, 24), datetime(2023, 10, 25),
-            datetime(2023, 10, 26), datetime(2023, 10, 27), datetime(2023, 10, 28),
-            datetime(2023, 10, 29)
-        ]
-        ax = task_func(activities)
-        bars = ax.patches
-        # Assert correct data points
-        for i in range(0, 7):
-            self.assertEqual(bars[i].get_height(), 1)  # All days
+        moved_file = task_func(f'{self.base_test_dir}/src_test_dir_5', f'{self.base_test_dir}/dest_test_dir_5')
+        self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_5'])
+        self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_5', moved_file)))

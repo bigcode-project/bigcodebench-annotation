@@ -1,88 +1,113 @@
+import collections
+import matplotlib.pyplot as plt
 import pandas as pd
-from collections import Counter
 
 
-def task_func(text_dict, word_keys, top_k=2):
+# Constants
+WORDS = ['the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'I']
+
+def task_func(sentences_dict, word_keys):
     """
-    Calculate the frequency of certain words in a text dictionary and return a bar chart's Axes object and a dictionary
-    containing the frequencies of the top_k most common words in text_dict. 
-    
-    The function takes a dictionary containing word frequencies and a list of words. It calculates the frequency 
-    of the provided words in the dictionary and returns the Axes object of the bar chart displaying the frequencies
-    along with the top_k most common words and their frequencies as a dictionary. If a word in word_keys is not present 
-    in text_dict, its frequency is considered to be 0.
-    
+    Calculate the occurrence of certain words in a collection of sentences and return a bar chart.
+
     Parameters:
-    - text_dict (dict): The dictionary containing word frequencies. Key is the word and value is its frequency.
-    - word_keys (list of str): The list of words to consider.
-    - top_k (int, Optional): A positive integer denoting the number of most common words to return. Default is 2.
-    
+    sentences_dict (dict): The dictionary containing sentences.
+    word_keys (list): The list of words.
+
     Returns:
     - matplotlib.axes._axes.Axes: Axes object of the bar chart displaying the frequencies.
-    - dict: Dictionary containing the frequencies of the top_k most common words. Key is the word and value is 
-    its frequency.
-    
-    Requirements:
-    - pandas
-    - collections.Counter
 
-    Raises:
-    - ValueError: If top_k is a negative integer.
-    
+    Requirements:
+    - collections
+    - matplotlib.pyplot
+    - pandas
+
     Example:
-    >>> import collections
-    >>> text_dict = collections.Counter(['the', 'be', 'to', 'the', 'that', 'and', 'a', 'in', 'the', 'that', 'have', 'I'])
-    >>> word_keys = ['the', 'and', 'I']
-    >>> ax, frequencies = task_func(text_dict, word_keys, 3)
-    >>> type(ax)
+    >>> sentences_dict = {'Sentence1': 'the quick brown fox', 'Sentence2': 'jumps over the lazy dog', 'Sentence3': 'the dog is brown'}
+    >>> word_keys = ['the', 'dog']
+    >>> type(task_func(sentences_dict, word_keys))
     <class 'matplotlib.axes._axes.Axes'>
-    >>> frequencies
-    {'the': 3, 'that': 2, 'be': 1}
     """
-    if top_k < 0:
-        raise ValueError('top_k must be a positive integer.')
-    elif top_k >= len(text_dict):
-        top_k = len(text_dict)
-    frequencies = [text_dict.get(word, 0) for word in word_keys]
-    freq_dict = Counter(text_dict)
-    top_k_words = freq_dict.most_common(top_k)
+    word_counts = collections.Counter(' '.join(sentences_dict.values()).split())
+    frequencies = [word_counts[word] for word in word_keys]
     word_series = pd.Series(frequencies, index=word_keys)
-    ax = word_series.plot(kind='bar')
-    return ax, dict(top_k_words)
+    plt.figure()
+    word_series.plot(kind='bar')
+    return word_series.plot(kind='bar')
 
 import unittest
 import doctest
 class TestCases(unittest.TestCase):
+    
     def test_case_1(self):
-        text_dict = Counter(['the', 'be', 'to', 'the', 'and', 'that', 'a', 'in', 'the', 'that', 'have', 'I'])
-        word_keys = ['the', 'and', 'I']
-        ax, top_k_dict = task_func(text_dict, word_keys, 3)
-        self.assertDictContainsSubset(top_k_dict, {'the': 3, 'that': 2, 'be': 1})
-        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
-        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        sentences_dict = {
+            'Sentence1': 'the quick brown fox',
+            'Sentence2': 'jumps over the lazy dog',
+            'Sentence3': 'the dog is brown'
+        }
+        word_keys = ['the', 'dog']
+        ax = task_func(sentences_dict, word_keys)
+        
+        # Check the x-tick labels
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        
+        # Check the bar heights
+        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 2, 3, 2])
+        
     def test_case_2(self):
-        text_dict = Counter(['apple', 'banana', 'apple', 'orange', 'grape', 'apple', 'banana'])
-        word_keys = ['apple', 'banana', 'cherry']
-        ax, top_k_dict = task_func(text_dict, word_keys)
-        self.assertDictContainsSubset(top_k_dict, {'apple': 3, 'banana': 2})
-        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
-        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        sentences_dict = {
+            'Sentence1': 'apple orange banana',
+            'Sentence2': 'apple apple',
+            'Sentence3': 'banana orange orange'
+        }
+        word_keys = ['apple', 'orange', 'banana']
+        ax = task_func(sentences_dict, word_keys)
+        
+        # Check the x-tick labels
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        
+        # Check the bar heights
+        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 3, 2, 3, 3, 2])
+        
     def test_case_3(self):
-        text_dict = Counter([])
-        word_keys = ['apple', 'banana', 'cherry']
-        ax, top_k_dict = task_func(text_dict, word_keys)
-        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
-        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        sentences_dict = {
+            'Sentence1': 'cat mouse',
+            'Sentence2': 'dog cat',
+            'Sentence3': 'mouse mouse cat'
+        }
+        word_keys = ['cat', 'mouse', 'dog']
+        ax = task_func(sentences_dict, word_keys)
+        
+        # Check the x-tick labels
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        
+        # Check the bar heights
+        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 3, 1, 3, 3, 1])
     def test_case_4(self):
-        text_dict = Counter(['a', 'a', 'b', 'b', 'b', 'c', 'c'])
-        word_keys = ['a', 'b', 'c', 'd']
-        ax, top_k_dict = task_func(text_dict, word_keys)
-        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
-        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        sentences_dict = {
+            'Sentence1': 'sun moon stars',
+            'Sentence2': 'sun sun',
+            'Sentence3': 'moon stars stars'
+        }
+        word_keys = ['sun', 'stars', 'moon']
+        ax = task_func(sentences_dict, word_keys)
+        
+        # Check the x-tick labels
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        
+        # Check the bar heights
+        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 3, 2, 3, 3, 2])
     def test_case_5(self):
-        text_dict = Counter(['cat', 'dog', 'cat', 'fish', 'fish', 'fish', 'bird'])
-        word_keys = ['cat', 'dog', 'bird', 'elephant']
-        ax, top_k_dict = task_func(text_dict, word_keys,9)
-        self.assertDictContainsSubset(top_k_dict, {'fish': 3, 'cat': 2, 'dog': 1, 'bird': 1})
-        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
-        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        sentences_dict = {
+            'Sentence1': 'car bus bike',
+            'Sentence2': 'bus bus bike',
+            'Sentence3': 'car car bus'
+        }
+        word_keys = ['car', 'bus', 'bike']
+        ax = task_func(sentences_dict, word_keys)
+        
+        # Check the x-tick labels
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        
+        # Check the bar heights
+        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 4, 2, 3, 4, 2])
