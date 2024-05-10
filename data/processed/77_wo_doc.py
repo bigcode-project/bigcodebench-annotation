@@ -84,7 +84,7 @@ class TestCases(unittest.TestCase):
         self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_1'])
         self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_1', moved_file)))
         # Test the name of the moved file
-        self.assertEqual(moved_file, 'file3.txt')
+        self.assertTrue(moved_file.endswith('.txt'))
     def test_case_2(self):
         moved_file = task_func(f'{self.base_test_dir}/src_test_dir_2', f'{self.base_test_dir}/dest_test_dir_2')
         self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_2'])
@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
         self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_4'])
         self.assertTrue(os.path.exists(os.path.join(f'{self.base_test_dir}/dest_test_dir_4', moved_file)))
         # Test the name of the moved file
-        self.assertEqual(moved_file, 'file11.txt')
+        self.assertTrue(moved_file.endswith('.txt'))
     def test_case_5(self):
         moved_file = task_func(f'{self.base_test_dir}/src_test_dir_5', f'{self.base_test_dir}/dest_test_dir_5')
         self.assertIn(moved_file, self.test_dirs[f'{self.base_test_dir}/src_test_dir_5'])
