@@ -1,63 +1,117 @@
-import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 
-def task_func(rows=5, cols=5):
+def task_func(num_labels=5, data_range=(0, 1)):
     """
-    Generates a DataFrame with random numerical data and visualizes this data in a stacked bar chart for
-    specified categories.
+    Generate random numeric data across a specified range for a given number of categories and visualize it with
+     a stacked bar chart.
 
     Parameters:
-    rows (int, optional): Number of rows for the DataFrame. Defaults to 5.
-    cols (int, optional): Number of columns for the DataFrame, corresponding to the number of categories.
-    Defaults to 5, with a maximum of 5 categories ("A", "B", "C", "D", "E").
+    num_labels (int): Specifies the number of distinct categories or labels to generate data for. Defaults to 5.
+    data_range (tuple): Defines the lower and upper bounds for the random data values. Defaults to (0, 1).
 
     Returns:
-    matplotlib.axes._axes.Axes: The Axes object displaying the stacked bar chart.
+    matplotlib.figure.Figure: A Figure object containing the stacked bar chart of the generated data.
 
     Requirements:
-    - numpy
     - pandas
-
-    Raises:
-    ValueError: If the number of columns exceeds the number of available categories.
+    - matplotlib
+    - numpy
 
     Example:
-    >>> import matplotlib
-    >>> ax = task_func(3, 3)  # Generates a 3x3 DataFrame and plots it
-    >>> isinstance(ax, matplotlib.axes.Axes)
-    True
+    >>> fig = task_func()
+    >>> fig.show()  # This will display the figure with default parameters
+
+    >>> fig = task_func(num_labels=3, data_range=(1, 10))
+    >>> fig.show()  # This will display the figure with three labels and data range from 1 to 10
     """
     np.random.seed(0)
-    categories = ['A', 'B', 'C', 'D', 'E']
-    if cols > len(categories):
-        raise ValueError(f"Maximum number of columns allowed is {len(categories)}")
-    data = pd.DataFrame(np.random.rand(rows, cols) * 100, columns=categories[:cols])
-    ax = data.plot(kind='bar', stacked=True, figsize=(10, 6))
-    ax.set_ylabel('Value')
-    ax.set_title('Stacked Bar Chart')
-    return ax
+    columns = [f'Label{i + 1}' for i in range(num_labels)]
+    data = pd.DataFrame(np.random.uniform(data_range[0], data_range[1], size=(num_labels, num_labels)), columns=columns)
+    fig, ax = plt.subplots()
+    data.plot(kind='bar', stacked=True, ax=ax)
+    return fig
 
 import unittest
+from unittest.mock import patch, MagicMock
 import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.use('Agg')
+import numpy as np
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def tearDown(self):
-        # Cleanup any opened figures in matplotlib
-        plt.close('all')
-    def test_case_1(self):
-        ax = task_func(5, 5)
-        self.assertEqual(len(ax.patches), 25)  # 5 bars with 5 segments each, each segment represents a stacked part
-    def test_case_2(self):
-        ax = task_func(7, 3)
-        self.assertEqual(len(ax.patches), 21)  # 7 bars with 3 segments each
-    def test_case_3(self):
-        ax = task_func(10, 2)
-        self.assertEqual(len(ax.patches), 20)  # 10 bars with 2 segments each
-    def test_case_4(self):
-        with self.assertRaises(ValueError):  # Testing for more columns than categories
-            ax = task_func(5, 6)
-    def test_case_5(self):
-        ax = task_func(3, 1)
-        self.assertEqual(len(ax.patches), 3)  # 3 bars with 1 segment each
+    def setUp(self):
+        np.random.seed(0)  # Fixing the seed for the sake of determinism in tests
+    @patch('matplotlib.pyplot.subplots')
+    @patch('pandas.DataFrame.plot')
+    def test_default_parameters(self, mock_plot, mock_subplots):
+        """Test using default parameters."""
+        # Mock figure and axes creation
+        mock_fig = MagicMock()
+        mock_ax = MagicMock()
+        mock_subplots.return_value = (mock_fig, mock_ax)
+        # Call the function
+        fig = task_func()
+        # Assertions to ensure plot was called correctly
+        mock_plot.assert_called_once()
+        mock_plot.assert_called_with(kind='bar', stacked=True, ax=mock_ax)
+        self.assertIsInstance(fig, MagicMock)
+    @patch('matplotlib.pyplot.subplots')
+    @patch('pandas.DataFrame.plot')
+    def test_custom_parameters(self, mock_plot, mock_subplots):
+        """Test with custom parameters."""
+        # Mock figure and axes creation
+        mock_fig = MagicMock()
+        mock_ax = MagicMock()
+        mock_subplots.return_value = (mock_fig, mock_ax)
+        # Call the function with custom parameters
+        num_labels = 4
+        data_range = (1, 10)
+        fig = task_func(num_labels=num_labels, data_range=data_range)
+        # Assertions to ensure plot was called correctly
+        mock_plot.assert_called_once()
+        mock_plot.assert_called_with(kind='bar', stacked=True, ax=mock_ax)
+        self.assertIsInstance(fig, MagicMock)
+    @patch('matplotlib.pyplot.subplots')
+    @patch('pandas.DataFrame.plot')
+    def test_custom_data_range(self, mock_plot, mock_subplots):
+        """Test with a custom data range."""
+        data_range = (10, 20)
+        mock_fig = MagicMock()
+        mock_ax = MagicMock()
+        mock_subplots.return_value = (mock_fig, mock_ax)
+        # Call the function with a custom data range
+        fig = task_func(data_range=data_range)
+        # Assertions to ensure plot was called correctly
+        mock_plot.assert_called_once()
+        mock_plot.assert_called_with(kind='bar', stacked=True, ax=mock_ax)
+        self.assertIsInstance(fig, MagicMock)
+    @patch('matplotlib.pyplot.subplots')
+    @patch('pandas.DataFrame.plot')
+    def test_combined_parameters(self, mock_plot, mock_subplots):
+        """Test with combined custom parameters."""
+        num_labels = 7
+        data_range = (5, 15)
+        mock_fig = MagicMock()
+        mock_ax = MagicMock()
+        mock_subplots.return_value = (mock_fig, mock_ax)
+        # Call the function with custom number of labels and data range
+        fig = task_func(num_labels=num_labels, data_range=data_range)
+        # Assertions to ensure plot was called correctly
+        mock_plot.assert_called_once()
+        mock_plot.assert_called_with(kind='bar', stacked=True, ax=mock_ax)
+        self.assertIsInstance(fig, MagicMock)
+    def test_generate_data_structure(self):
+        """Test the structure and range of generated data"""
+        num_labels = 4
+        data_range = (10, 20)
+        columns = [f'Label{i + 1}' for i in range(num_labels)]
+        df = pd.DataFrame(np.random.uniform(data_range[0], data_range[1], size=(num_labels, num_labels)),
+                          columns=columns)
+        # Check correct number of labels (columns)
+        self.assertEqual(len(df.columns), num_labels)
+        # Check correct number of entries (rows)
+        self.assertEqual(len(df), num_labels)
+        # Check all values are within specified range
+        for value in df.values.flatten():
+            self.assertTrue(data_range[0] <= value <= data_range[1])

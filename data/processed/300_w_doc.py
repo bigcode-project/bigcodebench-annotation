@@ -1,73 +1,99 @@
-import itertools
-import math
-from pandas import Series
+import pandas as pd
+from scipy.stats import zscore
+import matplotlib.pyplot as plt
 
-
-def task_func(elements, subset_size, top_n=2):
+def task_func(df):
     """
-    Generate all subsets of a given size from a tuple and calculate the product of the sums of the subsets. Additionally, 
-    return the top_n sums of the subsets. If the subset size is larger than the tuple length, return 1. If the subset size is 0,
-    return 1.
+    Processes a pandas DataFrame with 'Date' and 'Value' columns. The 'Value' column contains lists of numbers. 
+    Converts 'Date' to datetime, splits 'Value' lists into separate columns, calculates Z-scores, 
+    and creates a box plot for Z-scores over time.
 
     Parameters:
-    - elements (tuple): A tuple of elements to create subsets from.
-    - subset_size (int): The size of the subsets to be generated.
-    - top_n (int, Optional): The number of top subsets to return. Defaults to None.
+    df (DataFrame): A pandas DataFrame with two columns: 'Date' (date strings) and 'Value' (lists of numbers).
 
     Returns:
-    int: The product of the sums of the subsets.
-    list: The top_n sums of the subsets as a pandas Series.
+    DataFrame: With original 'Value' lists split into separate columns and replaced with Z-scores.
+    Figure: A matplotlib figure of a box plot of Z-scores over time.
 
+    Note:
+    - This function use "Z-Scores Over Time" for the plot title.
+    - This function use "Date" and "Z-Score" as the xlabel and ylabel respectively.
+
+    Raises:
+    - This function will raise KeyError if the DataFrame does not have the 'Date' and 'Value' columns.
 
     Requirements:
-    - itertools
-    - math
-    
+    - pandas
+    - scipy.stats.zscore
+    - matplotlib.pyplot
+
     Example:
-    >>> prod, sums = task_func((1, 2, 3), 2)
-    >>> prod
-    60
-    >>> list(sums)
-    [5, 4]
+    >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
+    >>> zscore_df, fig = task_func(df)
+    >>> print(zscore_df.shape)
+    (2, 4)
+    >>> plt.close()
     """
-    if subset_size > len(elements) or subset_size <= 0:
-        return 1, []
-    combinations = list(itertools.combinations(elements, subset_size))
-    sums = [sum(combination) for combination in combinations if len(combination) != 0]
-    product = math.prod(sums)
-    top_sums = sorted(sums, reverse=True)[:top_n]
-    top_sums = Series(top_sums)
-    return product, top_sums
+    df['Date'] = pd.to_datetime(df['Date'])
+    df = pd.concat([df['Date'], df['Value'].apply(pd.Series)], axis=1)
+    df.iloc[:,1:] = df.iloc[:,1:].apply(zscore)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    df.set_index('Date').boxplot(ax=ax)
+    ax.set_title('Z-Scores Over Time')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Z-Score')
+    return df, fig
 
 import unittest
-import doctest
+import pandas as pd
+from faker import Faker
+import matplotlib.pyplot as plt
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Default values
-        result, _ = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
-        expected = 2781259372192376861719959017613164544000000000
-        self.assertEqual(result, expected)
-    def test_case_2(self):
-        # Custom tuple and subset size
-        result, sums = task_func((1, 2, 3), 2)
-        expected = 60
-        self.assertEqual(result, expected)
-        # Test the top sums
-        self.assertEqual(list(sums), [5, 4])
-        # Test the type of the top sums
-        self.assertIsInstance(sums, Series)
-    def test_case_3(self):
-        # Larger subset size than tuple length
-        result, _ = task_func((1, 2, 3), 5)
-        expected = 1  # No subset of size 5 can be formed, so the product will be 1
-        self.assertEqual(result, expected)
-    def test_case_4(self):
-        # Subset size of 0
-        result, sums = task_func((1, 2, 3), 0)
-        expected = 1  # No subset of size 0 can be formed, so the product will be 1
-        self.assertEqual(result, expected)
-        self.assertEqual(list(sums), [])
-    def test_case_5(self):
-        # Larger tuple
-        result, _ = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), 4)
-        self.assertIsInstance(result, int)  # Ensure the result is an integer
+    def setUp(self):
+        self.fake = Faker()
+    
+    def test_empty_dataframe(self):
+        df = pd.DataFrame(columns=['Date', 'Value'])
+        with self.assertRaises(Exception):
+            task_func(df)
+        plt.close()
+    def test_typical_data(self):
+        df = pd.DataFrame([[self.fake.date(), [self.fake.random_number(digits=2) for _ in range(3)]] for _ in range(5)],
+                          columns=['Date', 'Value'])
+        zscore_df, fig = task_func(df)
+        self.assertEqual(zscore_df.shape, (5, 4))
+        self.assertIsInstance(fig, plt.Figure)
+        self.assertEqual(len(fig.axes), 1)
+        ax = fig.axes[0]
+        self.assertEqual(ax.get_title(), 'Z-Scores Over Time')
+        self.assertEqual(ax.get_xlabel(), 'Date')
+        self.assertEqual(ax.get_ylabel(), 'Z-Score')
+        plt.close()
+    def test_nan_values(self):
+        df = pd.DataFrame([['2021-01-01', [5, np.nan, 7]], ['2021-01-02', [np.nan, 9, 10]]], columns=['Date', 'Value'])
+        zscore_df, fig = task_func(df)
+        self.assertEqual(zscore_df.shape, (2, 4))
+        self.assertIsInstance(fig, plt.Figure)
+        plt.close()
+    def test_single_row_data(self):
+        df = pd.DataFrame([[self.fake.date(), [self.fake.random_number(digits=2) for _ in range(3)]]],
+                          columns=['Date', 'Value'])
+        zscore_df, fig = task_func(df)
+        self.assertEqual(zscore_df.shape, (1, 4))
+        self.assertIsInstance(fig, plt.Figure)
+        plt.close()
+    def test_non_numeric_values(self):
+        df = pd.DataFrame([[self.fake.date(), [self.fake.word() for _ in range(3)]] for _ in range(5)],
+                          columns=['Date', 'Value'])
+        with self.assertRaises(Exception):
+            task_func(df)
+        plt.close()
+    def test_large_dataset(self):
+        df = pd.DataFrame([[self.fake.date(), [self.fake.random_number(digits=2) for _ in range(10)]] for _ in range(100)],
+                          columns=['Date', 'Value'])
+        zscore_df, fig = task_func(df)
+        self.assertEqual(zscore_df.shape, (100, 11))
+        self.assertIsInstance(fig, plt.Figure)
+        plt.close()

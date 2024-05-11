@@ -1,55 +1,51 @@
-import numpy as np
-from scipy import stats
+from sklearn.ensemble import RandomForestClassifier
+import seaborn as sns
 import matplotlib.pyplot as plt
 
-TARGET_VALUES = np.array([1, 3, 4])
 
-def task_func(df):
+def task_func(df, target_column):
     """
-    Replace all elements in DataFrame columns that do not exist in the TARGET_VALUES array with zeros, then perform a Box-Cox transformation on each column (if data is not constant, add 1 to account for zeros) and display the resulting KDE plots.
+    Train a random forest classifier to perform the classification of the rows in a dataframe with respect to the column of interest plot the bar plot of feature importance of each column in the dataframe.
+    - The xlabel of the bar plot should be 'Feature Importance Score', the ylabel 'Features' and the title 'Visualizing Important Features'.
+    - Sort the feature importances in a descending order.
+    - Use the feature importances on the x-axis and the feature names on the y-axis.
 
     Parameters:
-        - df (pandas.DataFrame): The input pandas DataFrame with positive values.
+    - df (pandas.DataFrame) : Dataframe containing the data to classify.
+    - target_column (str) : Name of the target column.
 
     Returns:
-        - pandas.DataFrame: The transformed DataFrame after Box-Cox transformation.
-        - matplotlib.figure.Figure: Figure containing KDE plots of the transformed columns.
+    - sklearn.model.RandomForestClassifier : The random forest classifier trained on the input data.
+    - matplotlib.axes.Axes: The Axes object of the plotted data.
 
     Requirements:
-    - numpy
-    - scipy.stats
+    - sklearn.ensemble
+    - seaborn
     - matplotlib.pyplot
 
     Example:
-    >>> np.random.seed(42)
-    >>> df = pd.DataFrame(np.random.randint(1, 10, size=(100, 5)), columns=list('ABCDE'))  # Values should be positive for Box-Cox
-    >>> transformed_df, fig = task_func(df)
-    >>> print(transformed_df.head(2))
-              A         B    C    D         E
-    0  0.000000  0.566735  0.0  0.0  0.000000
-    1  0.530493  0.000000  0.0  0.0  0.607007
+    >>> import pandas as pd
+    >>> data = pd.DataFrame({"X" : [-1, 3, 5, -4, 7, 2], "label": [0, 1, 1, 0, 1, 1]})
+    >>> model, ax = task_func(data, "label")
+    >>> print(data.head(2))
+       X  label
+    0 -1      0
+    1  3      1
+    >>> print(model)
+    RandomForestClassifier(random_state=42)
     """
-    if (df <= 0).any().any():
-        raise ValueError("Input DataFrame should contain only positive values.")
-    df = df.applymap(lambda x: x if x in TARGET_VALUES else 0)
-    transformed_df = pd.DataFrame()
-    fig, ax = plt.subplots()
-    for column in df.columns:
-        if df[column].nunique() == 1:
-            transformed_df[column] = df[column]
-        else:
-            transformed_data, _ = stats.boxcox(
-                df[column] + 1
-            )  # Add 1 since the are some null values
-            transformed_df[column] = transformed_data
-            kde = stats.gaussian_kde(transformed_df[column])
-            x_vals = np.linspace(
-                min(transformed_df[column]), max(transformed_df[column]), 1000
-            )
-            ax.plot(x_vals, kde(x_vals), label=column)
-    ax.legend()
-    plt.show()
-    return transformed_df, fig
+    X = df.drop(target_column, axis=1)
+    y = df[target_column]
+    model = RandomForestClassifier(random_state=42).fit(X, y)
+    feature_imp = pd.Series(model.feature_importances_, index=X.columns).sort_values(
+        ascending=False
+    )
+    plt.figure(figsize=(10, 5))
+    ax = sns.barplot(x=feature_imp, y=feature_imp.index)
+    ax.set_xlabel("Feature Importance Score")
+    ax.set_ylabel("Features")
+    ax.set_title("Visualizing Important Features")
+    return model, ax
 
 import unittest
 import pandas as pd
@@ -58,54 +54,78 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         df = pd.DataFrame(
             {
-                "A": [1, 2, 3, 4, 3, 2, 2, 1],
-                "B": [7, 8, 9, 1, 2, 3, 5, 6],
-                "C": [9, 7, 3, 1, 8, 6, 2, 1],
+                "A": [4, 6, 2, 11],
+                "B": [7, 5, 3, 12],
+                "C": [1, 9, 8, 10],
+                "D": [1, 0, 1, 0],
             }
         )
-        transformed_df, fig = task_func(df)
-        self.assertEqual(transformed_df.shape, df.shape)
+        target_column = "D"
+        model, ax = task_func(df, target_column)
+        self._validate_results(model, ax)
     def test_case_2(self):
-        df = pd.DataFrame({"A": [1, 1, 1], "B": [3, 3, 3], "C": [4, 4, 4]})
-        transformed_df, fig = task_func(df)
-        self.assertEqual(transformed_df.shape, df.shape)
-        self.assertEqual(len(fig.axes[0].lines), 0)
-        pd.testing.assert_frame_equal(transformed_df, df)
+        df = pd.DataFrame(
+            {
+                "E": [1, 2, 3, 4, 5],
+                "F": [6, 7, 8, 9, 10],
+                "G": [11, 12, 13, 14, 15],
+                "H": [0, 0, 1, 0, 1],
+            }
+        )
+        target_column = "H"
+        model, ax = task_func(df, target_column)
+        self._validate_results(model, ax)
     def test_case_3(self):
         df = pd.DataFrame(
             {
-                "A": [1, 7, 5, 4],
-                "B": [3, 11, 1, 29],
-                "C": [4, 9, 8, 4],
-                "D": [16, 12, 20, 8],
+                "I": [21, 17, -2, 33, 11, 19],
+                "J": [-3, -25, 3, 12, 2, 2],
+                "K": [31, 29, 8, -10, -2, -1],
+                "L": [6, 5, 4, 40, -35, 23],
+                "M": [1, 1, 1, 0, 0, 0],
             }
         )
-        transformed_df, fig = task_func(df)
-        self.assertEqual(transformed_df.shape, df.shape)
-        self.assertEqual(len(fig.axes[0].lines), 3)
+        target_column = "M"
+        model, ax = task_func(df, target_column)
+        self._validate_results(model, ax)
     def test_case_4(self):
         df = pd.DataFrame(
             {
-                "E": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                "F": [11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+                "N": [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5],
+                "O": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
             }
         )
-        transformed_df, fig = task_func(df)
-        self.assertEqual(transformed_df.shape, df.shape)
-        self.assertEqual(len(fig.axes[0].lines), 1)
+        target_column = "O"
+        model, ax = task_func(df, target_column)
+        self._validate_results(model, ax)
     def test_case_5(self):
         df = pd.DataFrame(
             {
-                "A": [0, 0, 0, 0],
+                "P": [-1, -1, -1, -1],
+                "Q": [-1, -1, -1, 1],
+                "R": [-1, -1, 1, 1],
+                "S": [-1, 1, 1, 1],
+                "T": [1, -1, 1, -1],
+                "U": [1, 1, 0, 1],
+                "V": [0, -1, 0, 0],
+                "W": [-1, 0, 1, 1],
+                "X": [1, 0, 1, 0],
             }
         )
-        with self.assertRaises(ValueError):
-            transformed_df, _ = task_func(df)
-    def test_case_6(self):
-        df = pd.DataFrame(
-            {
-                "A": [1, 2, 3, -4],
-            }
+        target_column = "X"
+        model, ax = task_func(df, target_column)
+        self._validate_results(model, ax)
+    def _validate_results(self, model, ax):
+        # Asserting that the trained model is an instance of RandomForestClassifier
+        self.assertIsInstance(model, RandomForestClassifier)
+        # Asserting that the axes object is returned for visualization
+        self.assertIsInstance(ax, plt.Axes)
+        # Asserting that the title of the plot is as expected
+        self.assertEqual(ax.get_title(), "Visualizing Important Features")
+        self.assertEqual(ax.get_xlabel(), "Feature Importance Score")
+        self.assertEqual(ax.get_ylabel(), "Features")
+        # Feature importances
+        self.assertListEqual(
+            sorted(list(model.feature_importances_))[::-1],
+            [bar.get_width() for bar in ax.patches],
         )
-        with self.assertRaises(ValueError):
-            transformed_df, _ = task_func(df)

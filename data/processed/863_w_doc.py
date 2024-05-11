@@ -1,80 +1,57 @@
-import random
-import string
-from collections import defaultdict
+import numpy as np
+import math
 
+# Constants
+POSSIBLE_NUMBERS = np.arange(1, 11)
 
-def task_func(n, seed=None):
+def task_func(list_of_lists):
     """
-    Generate a dictionary with lists of random lowercase english letters. 
-    
-    Each key in the dictionary  represents a unique letter from the alphabet,
-    and the associated value is a list, containing randomly generated instances
-    of that letter based on a seed.
-
-    The function randomly selects 'n' letters from the alphabet (a-z) and places each 
-    occurrence in the corresponding list within the dictionary. The randomness is based
-    on the provided seed value; the same seed will produce the same distribution of letters.
-
-    The dictionary has only those keys for which a letter was generated.
+    Calculate the sum of the squares of numbers from a predefined range (POSSIBLE_NUMBERS) 
+    for each list in list_of_lists. The number of elements considered from POSSIBLE_NUMBERS 
+    is determined by the length of each list.
 
     Parameters:
-    n (int): The number of random letters to generate.
-    seed (int, optional): A seed value for the random number generator. If None, the randomness
-                          is based on system time or the OS's randomness source.
+    - list_of_lists (list): A list of lists, each representing a set of numbers.
 
     Returns:
-    defaultdict: A dictionary where the keys are characters ('a' to 'z') and the values 
-                 are lists of randomly generated letters. Each list may have 0 to 'n' occurrences of 
-                 its associated letter, depending on the randomness and seed.
+    - sums (list): A list of sums of squares.
 
     Requirements:
-    - collections.defaultdict
-    - random
-    - string
+    - numpy
+    - math
 
     Example:
-    >>> task_func(5, seed=123)
-    defaultdict(<class 'list'>, {'b': ['b'], 'i': ['i'], 'c': ['c'], 'y': ['y'], 'n': ['n']})
-
-    >>> task_func(30, seed=1)
-    defaultdict(<class 'list'>, {'e': ['e'], 's': ['s'], 'z': ['z', 'z', 'z'], 'y': ['y', 'y', 'y', 'y'], 'c': ['c'], 'i': ['i', 'i'], 'd': ['d', 'd'], 'p': ['p', 'p', 'p'], 'o': ['o', 'o'], 'u': ['u'], 'm': ['m', 'm'], 'g': ['g'], 'a': ['a', 'a'], 'n': ['n'], 't': ['t'], 'w': ['w'], 'x': ['x'], 'h': ['h']})
+    >>> sums = task_func([[1, 2, 3], [4, 5]])
+    >>> print(sums)
+    [14.0, 5.0]
     """
-    LETTERS = string.ascii_lowercase
-    random.seed(seed)
-    letter_dict = defaultdict(list)
-    for _ in range(n):
-        letter = random.choice(LETTERS)
-        letter_dict[letter].append(letter)
-    return letter_dict
+    sums = []
+    for list_ in list_of_lists:
+        sum_ = sum(math.pow(x, 2) for x in POSSIBLE_NUMBERS[:len(list_)])
+        sums.append(sum_)
+    return sums
 
 import unittest
-from collections import defaultdict
-import string
-import random
 class TestCases(unittest.TestCase):
-    def test_return_type(self):
-        result = task_func(10, seed=1)
-        self.assertIsInstance(result, defaultdict)
-        for key, value in result.items():
-            self.assertIsInstance(value, list)
-    def test_dictionary_keys(self):
-        result = task_func(100, seed=2)
-        for key in result.keys():
-            self.assertTrue('a' <= key <= 'z')
-    def test_random_seed_effect(self):
-        result1 = task_func(50, seed=3)
-        result2 = task_func(50, seed=3)
-        self.assertEqual(result1, result2)
-    def test_letters_distribution(self):
-        n = 60
-        result = task_func(n, seed=4)
-        total_letters = sum(len(lst) for lst in result.values())
-        self.assertEqual(total_letters, n)
-    def test_edge_cases(self):
-        result = task_func(0, seed=5)
-        for lst in result.values():
-            self.assertEqual(len(lst), 0)
-        large_n = 10000
-        result = task_func(large_n, seed=6)
-        total_letters = sum(len(lst) for lst in result.values())
-        self.assertEqual(total_letters, large_n)
+    def test_case_1(self):
+        # Testing with empty list
+        result = task_func([])
+        self.assertEqual(result, [])
+    def test_case_2(self):
+        # Testing with empty sublists
+        result = task_func([[], [], []])
+        self.assertEqual(result, [0, 0, 0])
+        
+    def test_case_3(self):
+        # Testing with sublists of different lengths
+        result = task_func([[1], [1, 2], [1, 2, 3]])
+        self.assertEqual(result, [1, 5, 14])
+    def test_case_4(self):
+        # Testing with sublists containing the same element
+        result = task_func([[1, 1, 1], [2, 2, 2, 2]])
+        self.assertEqual(result, [14, 30])
+        
+    def test_case_5(self):
+        # Testing with large sublists
+        result = task_func([[1]*10, [2]*5])
+        self.assertEqual(result, [385, 55])

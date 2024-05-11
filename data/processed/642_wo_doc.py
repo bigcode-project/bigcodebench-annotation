@@ -1,82 +1,98 @@
-import os
+import binascii
+import hashlib
 import re
-import pandas as pd
+OUTPUT_DIR = './output'
 
 
-def task_func(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
+def task_func(directory: str, pattern: str = r"(?<!Distillr)\\AcroTray\.exe") -> dict:
     """
-    Searches for files in the specified directory that match a given regex pattern.
-    This function walks through the directory, matches filenames against the pattern,
-    and saves the matched file paths to a CSV file. It returns a DataFrame of these paths
-    with colomn 'File Path'.
+    Searches for files within the specified directory matching a given regex pattern
+    and computes a SHA256 hash of each file's content.
 
     Parameters:
-    - pattern (str): Regex pattern to match filenames.
     - directory (str): Directory to search for files.
-    - output_csv (str): CSV file path to save matched file paths.
+    - pattern (str): Regex pattern that filenames must match. Default pattern matches 'AcroTray.exe'.
 
     Returns:
-    - pd.DataFrame: DataFrame with a single column 'File Path' of matched paths.
+    - dict: A dictionary with file paths as keys and their SHA256 hashes as values.
 
     Requirements:
     - re
-    - pandas
-    - os
+    - hashlib
+    - binascii
 
     Example:
-    >>> df = task_func(".*\.txt$", "/path/to/search", "matched_files.csv")
+    >>> task_func(OUTPUT_DIR)
+    {}
     """
-    matched_paths = []
+    hashes = {}
     for root, _, files in os.walk(directory):
         for file in files:
-            if re.match(pattern, file):
-                matched_paths.append(os.path.join(root, file))
-    df = pd.DataFrame(matched_paths, columns=['File Path'])
-    df.to_csv(output_csv, index=False)
-    return df
+            if re.search(pattern, file):
+                path = os.path.join(root, file)
+                with open(path, 'rb') as f:
+                    data = f.read()
+                    hash_digest = hashlib.sha256(data).digest()
+                    hashes[path] = binascii.hexlify(hash_digest).decode()
+    return hashes
 
 import unittest
+import tempfile
 import shutil
-OUTPUT_DIR = './output'
+import os
 class TestCases(unittest.TestCase):
     def setUp(self):
         self.test_dir = OUTPUT_DIR
         if not os.path.exists(self.test_dir):
             os.makedirs(self.test_dir)
-        # Create test files
-        self.test_file1 = os.path.join(self.test_dir, "test1.txt")
-        self.test_file2 = os.path.join(self.test_dir, "ignore.exe")
-        with open(self.test_file1, 'w') as f:
-            f.write("This is a test file.")
-        with open(self.test_file2, 'w') as f:
-            f.write("This file should be ignored.")
+        # Create a test file within the test_dir
+        self.test_file = os.path.join(self.test_dir, "AcroTray.exe")
+        with open(self.test_file, 'wb') as f:
+            f.write(b"Dummy content for testing.")
     def tearDown(self):
-        # Remove the test directory and all its contents
+        # Clean up by removing the test directory and its contents
         shutil.rmtree(self.test_dir, ignore_errors=True)
-    def test_file_matching(self):
-        """Ensure function matches correct files."""
-        output_csv = os.path.join(self.test_dir, "matched_files.csv")
-        df = task_func(r".*\.txt$", self.test_dir, output_csv)
-        self.assertTrue(os.path.exists(output_csv))
-        self.assertIn(self.test_file1, df['File Path'].values)
-    def test_no_files_matched(self):
-        """Test when no files match the pattern."""
-        output_csv = os.path.join(self.test_dir, "no_match.csv")
-        df = task_func(r".*\.md$", self.test_dir, output_csv)
-        self.assertTrue(df.empty)
-    def test_output_file_creation(self):
-        """Ensure the output file is created."""
-        output_csv = os.path.join(self.test_dir, "output_creation.csv")
-        _ = task_func(r".*\.txt$", self.test_dir, output_csv)
-        self.assertTrue(os.path.exists(output_csv))
-    def test_correct_number_of_matches(self):
-        """Test the number of files matched is correct."""
-        output_csv = os.path.join(self.test_dir, "correct_number.csv")
-        df = task_func(r".*\.txt$", self.test_dir, output_csv)
-        self.assertEqual(len(df), 1)
-    def test_pattern_specificity(self):
-        """Ensure the regex pattern correctly distinguishes file types."""
-        output_csv = os.path.join(self.test_dir, "pattern_specificity.csv")
-        df = task_func(r"test1\.txt$", self.test_dir, output_csv)
-        self.assertEqual(len(df), 1)
-        self.assertIn("test1.txt", df['File Path'].values[0])
+    def test_matching_file(self):
+        """Ensure the method correctly identifies and hashes a matching file."""
+        # Use the directory, not the file path, and adjust the pattern if necessary.
+        result = task_func(self.test_dir, r"AcroTray\.exe$")
+        # Verify that the file's full path is included in the results
+        self.assertIn(self.test_file, result.keys(), "The file should be found and hashed.")
+        # Optionally, verify the correctness of the hash value for added robustness.
+        # Compute the expected hash for comparison
+        with open(self.test_file, 'rb') as file:
+            data = file.read()
+            expected_hash = hashlib.sha256(data).hexdigest()
+        self.assertEqual(result[self.test_file], expected_hash, "The hash value should match the expected hash.")
+    def test_no_matching_file(self):
+        """Test directory with no files matching the pattern."""
+        no_match_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, no_match_dir)  # Ensure cleanup
+        result = task_func(no_match_dir)
+        self.assertEqual(len(result), 0)
+    def test_empty_directory(self):
+        """Test an empty directory."""
+        empty_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, empty_dir)  # Ensure cleanup
+        result = task_func(empty_dir)
+        self.assertEqual(len(result), 0)
+    def test_hash_correctness(self):
+        """Verify that the SHA256 hash is correctly computed."""
+        # Adjust the call to search within the test directory and specify a pattern that matches the test file
+        pattern = "AcroTray\.exe$"  # Simplified pattern to match the filename directly
+        result = task_func(self.test_dir, pattern)
+        # Construct the expected key as it would appear in the result
+        expected_key = self.test_file
+        # Ensure the file was matched and the hash is present in the results
+        self.assertIn(expected_key, result)
+        hash_value = result[expected_key]
+        # Compute the expected hash for comparison
+        with open(self.test_file, 'rb') as f:
+            data = f.read()
+            expected_hash = hashlib.sha256(data).hexdigest()
+        self.assertEqual(hash_value, expected_hash)
+    def test_custom_pattern(self):
+        """Test functionality with a custom pattern that does not match any file."""
+        custom_pattern = r"non_matching_pattern\.exe$"
+        result = task_func(self.test_file, custom_pattern)
+        self.assertEqual(len(result), 0)

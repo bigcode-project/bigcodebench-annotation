@@ -1,148 +1,115 @@
 import sqlite3
-import numpy as np
-from random import choice, seed
+import pandas as pd
+import os
 
 
-def task_func(db_path, table_name, num_entries, random_seed=None):
+def task_func(db_name, table_name, csv_path="data.csv"):
     """
-    Insert random data into an SQLite3 table that contains random names, ages, and heights.
-    If the table does not exist, it will be created.
-    This function uses the following constants:
-    - NAMES: List of possible names ['John', 'Jane', 'Steve', 'Emma', 'Liam', 'Olivia'].
-    - AGES: Range of possible ages from 18 to 64.
-    - HEIGHTS: Range of possible heights from 150cm to 199cm.
+    Read SQLite3 table via pandas and export to a CSV file.
 
     Parameters:
-    db_path (str): The path to the SQLite3 database file.
-    table_name (str): The name of the table to insert data into.
-    num_entries (int): The number of entries to insert. Must not be negative.
-    random_seed (int, optional): Seed for random number generation. Defaults to None (no fixed seed).
+    - db_name (str): The path to the SQLite3 database.
+    - table_name (str): The name of the table to export.
+    - csv_path (str, optional): The path where the CSV file will be saved. Defaults to 'data.csv'.
 
-    Returns:
-    int: The number of rows inserted.
-
-    Raises:
-    ValueError: If num_entries is negative.
-    
     Requirements:
     - sqlite3
-    - numpy
-    - random.choice
-    - random.seed
+    - pandas
+    - os
+
+    Returns:
+    str: The absolute path of the exported CSV file.
 
     Example:
-    >>> task_func('path_to_test.db', 'People', 100, random_seed=42)
-    100
+    >>> task_func('test.db', 'People')
+    'data.csv'
+    >>> task_func('/absolute/path/to/test.db', 'Orders', 'orders.csv')
+    '/absolute/path/to/orders.csv'
     """
-    if random_seed is not None:
-        seed(random_seed)
-        np.random.seed(random_seed)
-    if num_entries < 0:
-        raise ValueError("num_entries cannot be negative.")
-    NAMES = ["John", "Jane", "Steve", "Emma", "Liam", "Olivia"]
-    AGES = list(range(18, 65))
-    HEIGHTS = list(range(150, 200))
-    conn = sqlite3.connect(db_path)
-    cur = conn.cursor()
-    table_creation_sql = (
-        "CREATE TABLE IF NOT EXISTS {} (name TEXT, age INTEGER, height INTEGER)".format(
-            table_name
-        )
-    )
-    cur.execute(table_creation_sql)
-    inserted_rows = 0
-    for _ in range(num_entries):
-        name = choice(NAMES)
-        age = choice(AGES)
-        height = choice(HEIGHTS)
-        insertion_sql = "INSERT INTO {} VALUES (?, ?, ?)".format(table_name)
-        cur.execute(insertion_sql, (name, age, height))
-        inserted_rows += cur.rowcount
-    conn.commit()
-    return inserted_rows
+    try:
+        conn = sqlite3.connect(db_name)
+        df = pd.read_sql_query(f"SELECT * from {table_name}", conn)
+        df.to_csv(csv_path, index=False)
+        return os.path.abspath(csv_path)
+    finally:
+        conn.close()
 
 import unittest
 import os
-import sqlite3
 import tempfile
+import shutil
+import sqlite3
+import pandas as pd
 class TestCases(unittest.TestCase):
-    NAMES = ["John", "Jane", "Steve", "Emma", "Liam", "Olivia"]
-    AGES = range(18, 65)
-    HEIGHTS = range(150, 200)
     def setUp(self):
-        # Setup a temporary directory before each test
-        self.temp_dir = tempfile.TemporaryDirectory()
-        self.db_path = os.path.join(self.temp_dir.name, "test.db")
-    def tearDown(self):
-        # Clean up the temporary directory after each test
-        self.temp_dir.cleanup()
-    def test_case_1(self):
-        # Test inserting 50 entries with a fixed seed
-        result = task_func(self.db_path, "SamplePeople", 50, random_seed=42)
-        self.assertEqual(result, 50)
-    def test_case_2(self):
-        # Test inserting 30 entries into a new table with a fixed seed
-        result = task_func(self.db_path, "NewPeople", 30, random_seed=42)
-        self.assertEqual(result, 30)
-    def test_case_3(self):
-        # Test inserting 20 entries, verifying smaller batch works as expected
-        result = task_func(self.db_path, "SamplePeople", 20, random_seed=42)
-        self.assertEqual(result, 20)
-    def test_case_4(self):
-        # Test inserting a large number of entries (200) with a fixed seed
-        result = task_func(self.db_path, "SamplePeople", 200, random_seed=42)
-        self.assertEqual(result, 200)
-    def test_case_5(self):
-        # Test inserting 0 entries to check handling of empty input
-        result = task_func(self.db_path, "SamplePeople", 0, random_seed=42)
-        self.assertEqual(result, 0)
-    def test_case_6(self):
-        # Test the content of the rows for correctness against expected values
-        task_func(self.db_path, "ContentCheck", 10, random_seed=42)
+        self.temp_dir_obj = tempfile.TemporaryDirectory()
+        self.temp_dir = self.temp_dir_obj.name
+        self.db_path = os.path.join(self.temp_dir, "test.db")
+        # Setup the database and tables
         conn = sqlite3.connect(self.db_path)
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM ContentCheck")
-        rows = cur.fetchall()
-        for row in rows:
-            self.assertIn(row[0], self.NAMES)
-            self.assertIn(row[1], self.AGES)
-            self.assertIn(row[2], self.HEIGHTS)
-    def test_case_7(self):
-        # Test invalid db path
-        with self.assertRaises(sqlite3.OperationalError):
-            task_func("/invalid/path.db", "TestTable", 10)
-    def test_case_8(self):
-        # Test invalid table names (SQL keywords)
-        with self.assertRaises(sqlite3.OperationalError):
-            task_func(self.db_path, "Select", 10)
-    def test_case_9(self):
-        # Test handling invalid num_entries
-        with self.assertRaises(Exception):
-            task_func(self.db_path, "TestTable", -1)
-        with self.assertRaises(TypeError):
-            task_func(self.db_path, "TestTable", "ten")
-    def test_case_10(self):
-        # Test handling invalid random seed
-        with self.assertRaises(Exception):
-            task_func(self.db_path, "TestTable", 10, random_seed="invalid")
-    def test_case_11(self):
-        # Test different schema in existing table
-        conn = sqlite3.connect(self.db_path)
-        cur = conn.cursor()
-        cur.execute("CREATE TABLE TestTable (id INTEGER)")
+        cursor = conn.cursor()
+        # Create tables and insert some data
+        cursor.execute("CREATE TABLE People (Name TEXT, Age INTEGER)")
+        cursor.execute(
+            "INSERT INTO People VALUES ('Alice', 30), ('Bob', 25), ('Charlie', 35)"
+        )
+        cursor.execute("CREATE TABLE Orders (Product TEXT, Quantity INTEGER)")
+        cursor.execute(
+            "INSERT INTO Orders VALUES ('Widgets', 5), ('Gadgets', 10), ('Doodads', 15)"
+        )
+        conn.commit()
         conn.close()
-        with self.assertRaises(sqlite3.OperationalError):
-            task_func(self.db_path, "TestTable", 10)
-    def test_case_12(self):
-        # Insert a known set of data and verify its integrity
-        task_func(self.db_path, "IntegrityCheck", 1, random_seed=42)
-        conn = sqlite3.connect(self.db_path)
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM IntegrityCheck")
-        row = cur.fetchone()
-        self.assertIsNotNone(row)
-    def test_case_13(self):
-        # Test against SQL injection in table_name parameter
-        malicious_name = "Test; DROP TABLE IntegrityCheck;"
-        with self.assertRaises(sqlite3.OperationalError):
-            task_func(self.db_path, malicious_name, 1)
+    def tearDown(self):
+        self.temp_dir_obj.cleanup()
+    def test_case_1(self):
+        # Test exporting the People table
+        csv_path = os.path.join(self.temp_dir, "data.csv")
+        output_path = task_func(self.db_path, "People", csv_path)
+        self.assertTrue(os.path.exists(output_path), "CSV file not created.")
+        df = pd.read_csv(output_path)
+        self.assertEqual(len(df), 3, "CSV contains incorrect number of rows.")
+        self.assertTrue("Alice" in df["Name"].values, "Expected data not found in CSV.")
+    def test_case_2(self):
+        # Test exporting the Orders table
+        csv_path = os.path.join(self.temp_dir, "orders.csv")
+        output_path = task_func(self.db_path, "Orders", csv_path)
+        self.assertTrue(os.path.exists(output_path), "CSV file not created.")
+        df = pd.read_csv(output_path)
+        self.assertEqual(len(df), 3, "CSV contains incorrect number of rows.")
+        self.assertTrue(5 in df["Quantity"].values, "Expected data not found in CSV.")
+    def test_case_3(self):
+        # Test exporting with a custom CSV path
+        custom_path = os.path.join(self.temp_dir, "custom_data.csv")
+        output_path = task_func(self.db_path, "People", custom_path)
+        self.assertTrue(
+            os.path.exists(output_path), "CSV file not created at custom path."
+        )
+        self.assertEqual(
+            output_path,
+            os.path.abspath(custom_path),
+            "Returned path does not match expected path.",
+        )
+    def test_case_4(self):
+        # Test with a non-existent database
+        with self.assertRaises(Exception):
+            task_func(os.path.join(self.temp_dir, "nonexistent.db"), "People")
+    def test_case_5(self):
+        # Test with a non-existent table
+        with self.assertRaises(pd.io.sql.DatabaseError):
+            task_func(self.db_path, "NonexistentTable")
+    def test_case_6(self):
+        # Test if the function overwrites an existing CSV file
+        csv_path = os.path.join(self.temp_dir, "data.csv")
+        with open(csv_path, "w") as file:
+            file.write("Old Content")
+        output_path = task_func(self.db_path, "People", csv_path)
+        self.assertTrue(os.path.exists(output_path), "CSV file not created.")
+        with open(output_path, "r") as file:
+            content = file.read()
+            self.assertNotEqual(
+                "Old Content", content, "Old content found in CSV. Overwriting failed."
+            )
+    def test_case_7(self):
+        # Test error handling with invalid CSV path
+        with self.assertRaises(OSError):
+            task_func(self.db_path, "People", "/nonexistent_path/data.csv")

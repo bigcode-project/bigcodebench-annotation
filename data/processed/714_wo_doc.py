@@ -1,65 +1,73 @@
-import os
-import re
+import sys
+from pathlib import Path
 
-def task_func(log_file_path: str, keywords: list):
-    '''
-    Check a log file and format the lines that contain certain keywords. This code reads the log file specified by log_file_path; searches for lines containing any of the keywords provided in the list;
-    and formats each line to display the keyword, the timestamp, and the message separated by 20 spaces.
-    
+# Constants
+PATH_TO_APPEND = '/path/to/whatever'
+
+def task_func(path_to_append=PATH_TO_APPEND):
+    """
+    Add a specific path to sys.path and create a directory in that path if it does not exist.
+
+    Note:
+    - The function uses a constant PATH_TO_APPEND which defaults to '/path/to/whatever'.
+
     Parameters:
-    - log_file_path (str): The path to the log file to be checked.
-    - keywords (list): A list of keywords to be searched for in the log file.
-    
-    Returns:
-    - formatted_lines (list): Returns a list of formatted strings containing the relevant information.
-    
-    Requirements:
-    - os
-    - re
-    
-    Example:
-    >>> task_func('/path/to/log_file.log', ['ERROR', 'WARNING'])
-    ['    ERROR :    11:30:10 : This is an error message', '    WARNING :    11:35:10 : This is a warning message']
-    '''
-    if not os.path.exists(log_file_path):
-        raise FileNotFoundError(f"Log file {log_file_path} does not exist.")
-    formatted_lines = []
-    with open(log_file_path, 'r') as log:
-        for line in log:
-            for keyword in keywords:
-                if keyword in line:
-                    parts = re.split(r'\s+', line.strip(), maxsplit=2)
-                    if len(parts) == 3:
-                        formatted_line = f"{keyword:>{20}} : {parts[1]:>{20}} : {parts[2]:>{20}}"
-                        formatted_lines.append(formatted_line)
-                    else:
-                        formatted_lines.append(f"Line format unexpected: {line.strip()}")
-    return formatted_lines
+    - path_to_append (str): The path to append to sys.path and to create a directory. Default is '/path/to/whatever'.
 
+    Returns:
+    - path_to_append (str): The path that was appended and where the directory was created.
+
+    Requirements:
+    - sys
+    - pathlib
+ 
+    Examples:
+    >>> task_func("/new/path/to/append")
+    "/new/path/to/append"
+
+    >>> task_func()
+    "/path/to/whatever"
+
+    """
+    Path(path_to_append).mkdir(parents=True, exist_ok=True)
+    sys.path.append(path_to_append)
+    return path_to_append
+
+import tempfile
 import unittest
-import os
-import shutil
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Setup code to create a test log file
-        self.test_file_path = "test_log_file.log"
-        with open(self.test_file_path, 'w') as f:
-            f.write("ERROR 11:30:10 This is an error message\n")
-            f.write("WARNING 11:35:10 This is a warning message\n")
+        # Creating a temporary directory
+        self.temp_dir = tempfile.TemporaryDirectory()
+        # Removing the appended path from sys.path for each test case
+        if self.temp_dir.name + '/test/path' in sys.path:
+            sys.path.remove(self.temp_dir.name + '/test/path')
+        if self.temp_dir.name + '/another/test/path' in sys.path:
+            sys.path.remove(self.temp_dir.name + '/another/test/path')
     def tearDown(self):
-        # Cleanup the test log file
-        os.remove(self.test_file_path)
-    def test_nonexistent_file(self):
-        with self.assertRaises(FileNotFoundError):
-            task_func("/path/to/nonexistent/file.log", ['ERROR', 'WARNING'])
-    def test_empty_keywords(self):
-        self.assertEqual(task_func(self.test_file_path, []), [])
-    def test_single_keyword(self):
-        result = task_func(self.test_file_path, ['ERROR'])
-        self.assertTrue(all('ERROR' in line for line in result))
-    def test_multiple_keywords(self):
-        result = task_func(self.test_file_path, ['ERROR', 'WARNING'])
-        self.assertTrue(all(any(kw in line for kw in ['ERROR', 'WARNING']) for line in result))
-    def test_all_keywords(self):
-        result = task_func(self.test_file_path, ['ERROR', 'WARNING', 'INFO'])
-        self.assertTrue(len(result) >= 2)
+        # Cleaning up the temporary directory
+        self.temp_dir.cleanup()
+    def test_1(self):
+        # Testing with the default path
+        result = task_func(self.temp_dir.name + '/path/to/whatever')
+        self.assertEqual(result, self.temp_dir.name + '/path/to/whatever')
+        self.assertTrue(self.temp_dir.name + '/path/to/whatever' in sys.path)
+        self.assertTrue(Path(self.temp_dir.name + '/path/to/whatever').exists())
+    def test_2(self):
+        # Testing with a custom path
+        result = task_func(self.temp_dir.name + '/test/path')
+        self.assertEqual(result, self.temp_dir.name + '/test/path')
+        self.assertTrue(self.temp_dir.name + '/test/path' in sys.path)
+        self.assertTrue(Path(self.temp_dir.name + '/test/path').exists())
+    def test_3(self):
+        # Testing if the directory is actually created
+        task_func(self.temp_dir.name + '/another/test/path')
+        self.assertTrue(Path(self.temp_dir.name + '/another/test/path').exists())
+    def test_4(self):
+        # Testing if the path is appended to sys.path
+        task_func(self.temp_dir.name + '/test/path')
+        self.assertTrue(self.temp_dir.name + '/test/path' in sys.path)
+    def test_5(self):
+        # Testing if the function returns the correct path
+        result = task_func(self.temp_dir.name + '/test/path')
+        self.assertEqual(result, self.temp_dir.name + '/test/path')

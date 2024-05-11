@@ -1,110 +1,70 @@
-import shutil
-from pathlib import Path
-from typing import List
+import numpy as np
+import datetime
 
-def task_func(source_dir: str, target_dir: str, extensions: List[str]) -> int:
-    '''
-    Move all files with certain extensions from one directory to another.
+def task_func(arr):
+    """
+    Reverse the order of words separated by. "" in all strings of a numpy array.
 
     Parameters:
-    - source_dir (str): The directory containing the source files.
-    - target_dir (str): The directory to which the files should be moved.
-    - extensions (List[str]): The list of file extensions to be moved.
+    - arr (numpy array): The numpy array.
 
     Returns:
-    int: The number of moved files.
-
-    Raises:
-    - ValueError: If source_dir or target_dir does not exist.
+    - numpy.ndarray: The numpy array with the strings reversed.
 
     Requirements:
-    - shutil
-    - pathlib.Path
+    - numpy
+    - datetime
 
     Example:
-    >>> task_func('path/to/source/', 'path/to/target/', ['.jpg', '.png', '.gif'])
-    15
-    >>> task_func('path/to/source/', 'path/to/target/', ['.txt'])
-    1
-    '''
-    if Path(source_dir).is_dir() == False:
-        raise ValueError("source_dir does not exist.")
-    if Path(target_dir).is_dir() == False:
-        raise ValueError("target_dir does not exist.")
-    count = 0
-    for extension in extensions:
-        for file_name in Path(source_dir).glob(f'*{extension}'):
-            shutil.move(str(file_name), target_dir)
-            count += 1
-    return count
+    >>> arr = np.array(['apple.orange', 'red.green.yellow'])
+    >>> reversed_arr = task_func(arr)
+    >>> print(reversed_arr)
+    ['orange.apple' 'yellow.green.red']
+    """
+    vectorized_reverse = np.vectorize(lambda s: '.'.join(s.split('.')[::-1]))
+    now = datetime.datetime.now()
+    return vectorized_reverse(arr)
 
+import numpy as np
 import unittest
-import tempfile
-import os
-import shutil
-def setup_test_environment(extensions, num_files_per_extension):
-    # Create temporary directories
-    source_dir = tempfile.mkdtemp()
-    target_dir = tempfile.mkdtemp()
-    file_list = []
-    # Populate source_dir with files
-    for ext in extensions:
-        for i in range(num_files_per_extension):
-            with open(os.path.join(source_dir, f"file_{i}{ext}"), "w") as f:
-                f.write(f"This is a sample {ext} file.")
-                file_list.append(f"file_{i}{ext}")
-    return source_dir, target_dir, file_list
-# Cleanup function to remove temporary directories after test
-def cleanup_test_environment(source_dir, target_dir):
-    shutil.rmtree(source_dir)
-    shutil.rmtree(target_dir)
-# Define the test cases
+import re
 class TestCases(unittest.TestCase):
-    def test_case_dir(self):
-        source_dir, target_dir, file_list = setup_test_environment(['.jpg', '.png', '.gif'], 3)
-        self.assertRaises(Exception, task_func, 'non_existent', target_dir, ['.test'])
-        self.assertRaises(Exception, task_func, source_dir, 'non_existent', ['.test'])
+    """
+    Define test cases for the task_func function.
+    """
     
     def test_case_1(self):
-        # Test basic functionality with jpg, png, and gif extensions
-        source_dir, target_dir, file_list = setup_test_environment(['.jpg', '.png', '.gif'], 3)
-        result = task_func(source_dir, target_dir, ['.jpg', '.png', '.gif'])
-        self.assertEqual(result, 9)  # 3 files for each of the 3 extensions
-        self.assertEqual(len(os.listdir(target_dir)), 9)
-        self.assertCountEqual(file_list, os.listdir(target_dir))
-        cleanup_test_environment(source_dir, target_dir)
+        # Test description: 
+        # Test reversing of words separated by '.' for a typical input.
+        arr = np.array(['apple.orange', 'red.green.yellow'])
+        result = task_func(arr)
+        expected = np.array(['orange.apple', 'yellow.green.red'])
+        np.testing.assert_array_equal(result, expected)
     def test_case_2(self):
-        # Test only one extension
-        source_dir, target_dir, file_list = setup_test_environment(['.jpg', '.png', '.gif', '.txt'], 12)
-        result = task_func(source_dir, target_dir, ['.jpg'])
-        file_list = [file for file in file_list if file[-4:] == '.jpg']
-        self.assertEqual(result, 12)  # Only jpg files should be moved
-        self.assertEqual(len(os.listdir(target_dir)), 12)
-        self.assertCountEqual(file_list, os.listdir(target_dir))
-        cleanup_test_environment(source_dir, target_dir)
+        # Test description: 
+        # Test reversing of words separated by '.' for another typical input.
+        arr = np.array(['hello.world', 'this.is.a.test'])
+        result = task_func(arr)
+        expected = np.array(['world.hello', 'test.a.is.this'])
+        np.testing.assert_array_equal(result, expected)
     def test_case_3(self):
-        # Test with no files to move
-        source_dir, target_dir, file_list = setup_test_environment(['.jpg'], 8)
-        result = task_func(source_dir, target_dir, ['.png'])
-        self.assertEqual(result, 0)  # No png files in source
-        self.assertEqual(len(os.listdir(target_dir)), 0)
-        self.assertCountEqual([], os.listdir(target_dir))
-        cleanup_test_environment(source_dir, target_dir)
+        # Test description: 
+        # Test input where words are not separated by '.', so they should remain unchanged.
+        arr = np.array(['hello', 'world'])
+        result = task_func(arr)
+        expected = np.array(['hello', 'world'])
+        np.testing.assert_array_equal(result, expected)
     def test_case_4(self):
-        # Test with empty source directory
-        source_dir = tempfile.mkdtemp()
-        target_dir = tempfile.mkdtemp()
-        result = task_func(source_dir, target_dir, ['.jpg', '.png', '.gif'])
-        self.assertEqual(result, 0)  # No files to move
-        self.assertEqual(len(os.listdir(target_dir)), 0)
-        self.assertCountEqual([], os.listdir(target_dir))
-        cleanup_test_environment(source_dir, target_dir)
+        # Test description: 
+        # Test input with empty strings. The result should also be empty strings.
+        arr = np.array(['', ''])
+        result = task_func(arr)
+        expected = np.array(['', ''])
+        np.testing.assert_array_equal(result, expected)
     def test_case_5(self):
-        # Test moving multiple extensions but not all
-        source_dir, target_dir, file_list = setup_test_environment(['.jpg', '.txt', '.doc', 'png'], 5)
-        result = task_func(source_dir, target_dir, ['.jpg', '.txt', '.doc'])
-        file_list = [file for file in file_list if file[-4:] in ['.jpg', '.txt', '.doc']]
-        self.assertEqual(result, 15)  # All files should be moved
-        self.assertEqual(len(os.listdir(target_dir)), 15)
-        self.assertCountEqual(file_list, os.listdir(target_dir))
-        cleanup_test_environment(source_dir, target_dir)
+        # Test description: 
+        # Test reversing of words with a mix of uppercase and lowercase letters.
+        arr = np.array(['OpenAI.GPT', 'GPT-4.is.amazing'])
+        result = task_func(arr)
+        expected = np.array(['GPT.OpenAI', 'amazing.is.GPT-4'])
+        np.testing.assert_array_equal(result, expected)

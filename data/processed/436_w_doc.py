@@ -1,126 +1,90 @@
-import pandas as pd
-from random import randint
+import string
+import matplotlib.pyplot as plt
 
 
-def task_func(name: str, age: int, code: str, salary: float, bio: str) -> pd.DataFrame:
+def task_func(s):
     """
-    Generate a Pandas DataFrame of employees with their details based on the input provided.
+    Calculate the frequency of each letter in a string and return a bar chart of frequencies.
+    Results are case-insensitive. If non-string input is provided, function will throw an error.
 
     Parameters:
-    - name (str): Name of the employee. This is case-sensitive. Must be one of the predefined
-                  names: 'John', 'Alice', 'Bob', 'Charlie', 'David', otherwise the function raises
-                  ValueError.
-    - age (int): Age of the employee.
-    - code (str): Code of the employee.
-    - salary (float): Salary of the employee.
-    - bio (str): Biography of the employee.
+    s (str): The string to calculate letter frequencies.
 
     Returns:
-    data_df (pd.DataFrame): dataframe with columns: 'Name', 'Age', 'Code', 'Salary', 'Bio', 'Job Title'.
-               The 'Job Title' is randomly assigned from the predefined job titles:
-               'Engineer', 'Manager', 'Analyst', 'Developer', 'Tester'.
+    tuple: A tuple containing:
+        - dict: A dictionary with the frequency of each letter.
+        - Axes: The bar subplot of 'Letter Frequencies' with 'Letters' on the x-axis and 'Frequency'
+                on the y-axis.
 
     Requirements:
-    - pandas
-    - random.randint
+    - string
+    - matplotlib.pyplot
 
     Example:
-    >>> random.seed(0)
-    >>> df = task_func("John", 30, "A10B", 5000.0, "This is a bio with spaces")
-    >>> print(df)
-       Name  Age  Code  Salary                        Bio  Job Title
-    0  John   30  A10B  5000.0  This is a bio with spaces  Developer
+    >>> s = 'This is a test string.'
+    >>> freqs, ax = task_func(s)
+    >>> freqs
+    {'a': 1, 'b': 0, 'c': 0, 'd': 0, 'e': 1, 'f': 0, 'g': 1, 'h': 1, 'i': 3, 'j': 0, 'k': 0, 'l': 0, 'm': 0, 'n': 1, 'o': 0, 'p': 0, 'q': 0, 'r': 1, 's': 4, 't': 4, 'u': 0, 'v': 0, 'w': 0, 'x': 0, 'y': 0, 'z': 0}
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    EMPLOYEES = ["John", "Alice", "Bob", "Charlie", "David"]
-    JOBS = ["Engineer", "Manager", "Analyst", "Developer", "Tester"]
-    if name not in EMPLOYEES:
-        raise ValueError(f"Invalid employee name. Must be one of {EMPLOYEES}")
-    job = JOBS[randint(0, len(JOBS) - 1)]
-    data_df = pd.DataFrame(
-        [[name, age, code, salary, bio, job]],
-        columns=["Name", "Age", "Code", "Salary", "Bio", "Job Title"],
-    )
-    return data_df
+    if not isinstance(s, str):
+        raise TypeError("Expected string input")
+    LETTERS = string.ascii_lowercase
+    s = s.lower()
+    letter_counts = {letter: s.count(letter) for letter in LETTERS}
+    fig, ax = plt.subplots()
+    ax.bar(letter_counts.keys(), letter_counts.values())
+    ax.set_xlabel("Letters")
+    ax.set_ylabel("Frequency")
+    ax.set_title("Letter Frequencies")
+    return letter_counts, ax
 
 import unittest
-import pandas as pd
-import random
+import string
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test the DataFrame structure for a known input
-        df = task_func("John", 30, "A10B", 5000.0, "Sample bio")
-        expected_columns = ["Name", "Age", "Code", "Salary", "Bio", "Job Title"]
-        self.assertListEqual(
-            list(df.columns), expected_columns, "DataFrame columns mismatch"
-        )
-        for col, dtype in zip(
-            df.columns, ["object", "int64", "object", "float64", "object", "object"]
-        ):
-            self.assertTrue(
-                df[col].dtype == dtype,
-                f"Column {col} has incorrect type {df[col].dtype}",
-            )
+        # Test with a simple sentence
+        s = "This is a test string."
+        expected_output = {
+            letter: s.lower().count(letter) for letter in string.ascii_lowercase
+        }
+        result, ax = task_func(s)
+        self.assertEqual(result, expected_output)
+        self.assertEqual(ax.get_title(), "Letter Frequencies")
+        self.assertEqual(ax.get_xlabel(), "Letters")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
     def test_case_2(self):
-        # Test minimum and maximum valid ages and salary, including edge cases
-        df_min_age = task_func("Alice", 18, "X10Y", 0.0, "Minimum age and salary")
-        self.assertEqual(df_min_age["Age"][0], 18)
-        self.assertEqual(df_min_age["Salary"][0], 0.0)
-        df_max_age = task_func("Bob", 65, "Z99W", 1000000.0, "Maximum age and high salary")
-        self.assertEqual(df_max_age["Age"][0], 65)
-        self.assertEqual(df_max_age["Salary"][0], 1000000.0)
+        # Test with a string having all alphabets
+        s = "abcdefghijklmnopqrstuvwxyz"
+        expected_output = {letter: 1 for letter in string.ascii_lowercase}
+        result, ax = task_func(s)
+        self.assertEqual(result, expected_output)
+        self.assertEqual(ax.get_title(), "Letter Frequencies")
+        self.assertEqual(ax.get_xlabel(), "Letters")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
     def test_case_3(self):
-        # Test bio with special characters, very long string, and empty string
-        df_special_bio = task_func("Charlie", 30, "C30D", 5300.0, "!@#$%^&*()_+|")
-        self.assertEqual(df_special_bio["Bio"][0], "!@#$%^&*()_+|")
-        df_long_bio = task_func("David", 30, "D40E", 5400.5, "a" * 1000)
-        self.assertEqual(len(df_long_bio["Bio"][0]), 1000)
-        df_empty_bio = task_func("John", 30, "E50F", 5500.0, "")
-        self.assertEqual(df_empty_bio["Bio"][0], "")
+        # Test with a string having no alphabets
+        s = "1234567890!@#$%^&*()"
+        expected_output = {letter: 0 for letter in string.ascii_lowercase}
+        result, ax = task_func(s)
+        self.assertEqual(result, expected_output)
+        self.assertEqual(ax.get_title(), "Letter Frequencies")
+        self.assertEqual(ax.get_xlabel(), "Letters")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
     def test_case_4(self):
-        # Test code with different formats
-        df_code_special_chars = task_func(
-            "Alice", 25, "!@#$", 5500.5, "Bio with special char code"
-        )
-        self.assertEqual(df_code_special_chars["Code"][0], "!@#$")
+        # Test with an empty string
+        s = ""
+        expected_output = {letter: 0 for letter in string.ascii_lowercase}
+        result, ax = task_func(s)
+        self.assertEqual(result, expected_output)
+        self.assertEqual(ax.get_title(), "Letter Frequencies")
+        self.assertEqual(ax.get_xlabel(), "Letters")
+        self.assertEqual(ax.get_ylabel(), "Frequency")
     def test_case_5(self):
-        # Test for case sensitivity
-        with self.assertRaises(ValueError):
-            task_func("john", 30, "J01K", 5000.0, "Case sensitive name test")
-    def test_case_6(self):
-        # Test each predefined name
-        for name in ["John", "Alice", "Bob", "Charlie", "David"]:
-            df = task_func(name, 30, "A10B", 5000.0, f"{name}'s bio")
-            self.assertEqual(
-                df["Name"][0], name, f"Valid name {name} failed to create a DataFrame"
-            )
-    def test_case_7(self):
-        # Test randomness in job assignment
-        job_titles_first_run = []
-        job_titles_second_run = []
-        job_titles_third_run = []
-        n_iter = 15
-        name, age, code, salary, bio = (
-            "Bob",
-            30,
-            "B20C",
-            5000.0,
-            "Testing randomness in job titles",
-        )
-        random.seed(42)  # Set the seed for the first run
-        for _ in range(n_iter):
-            df = task_func(name, age, code, salary, bio)
-            job_titles_first_run.append(df["Job Title"][0])
-        random.seed(42)  # Reset the seed to ensure reproducibility for the second run
-        for _ in range(n_iter):
-            df = task_func(name, age, code, salary, bio)
-            job_titles_second_run.append(df["Job Title"][0])
-        random.seed(0)  # Repeat for third run with different seed
-        for _ in range(n_iter):
-            df = task_func(name, age, code, salary, bio)
-            job_titles_third_run.append(df["Job Title"][0])
-        self.assertEqual(job_titles_first_run, job_titles_second_run)
-        self.assertNotEqual(job_titles_first_run, job_titles_third_run)
-    def test_case_8(self):
-        # Test invalid name
-        with self.assertRaises(ValueError):
-            task_func("InvalidName", 28, "C30D", 5300.0, "Bio of InvalidName")
+        # Test error handling
+        for invalid in [123, []]:
+            with self.assertRaises(Exception):
+                task_func(invalid)
+    def tearDown(self):
+        plt.close("all")

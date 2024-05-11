@@ -1,92 +1,75 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.fft import fft
+import pandas as pd
+import random
+from sklearn.preprocessing import StandardScaler
 
+# Constants
+N_DATA_POINTS = 5000
+MIN_VALUE = 0.0
+MAX_VALUE = 10.0
 
-ANGLES = np.arange(0, 2*np.pi, 0.01)
-
-def task_func(n_waves, seed=0):
+def task_func(n_data_points=5000, min_value=0.0, max_value=10.0):
     """
-    Generate a series of n sine waves with increasing frequency with a fidelity of 0.01 radians as 
-    provided by the ANGLES array. The amplitude of each wave is 1. The function returns a list of
-    numpy arrays with the y values of the sine waves. Additionally, calculate the Fast Fourier Transform
-    (FFT) of the mixed signal and plot the histogram of the magnitude of the FFT data. If n_waves is less
-    than 1, return an empty list for the sine waves, an empty array for the FFT data, and None for the axes
-    object.
+    Generate a random dataset of floating point numbers, truncate each value to 3 decimal places and normalize the data using standard scaling (mean = 0, std = 1).
     
     Parameters:
-    n_waves (int): The number of sine waves in the series.
-    seed (int, Optional): The seed for the random number generator. Defaults to 0.
+    n_data_points (int): Number of data points to generate. Default is 5000.
+    min_value (float): Minimum value range for data points. Default is 0.0.
+    max_value (float): Maximum value range for data points. Default is 10.0.
     
     Returns:
-    list: A list of numpy arrays with the y values of the sine waves.
-    np.array: FFT data.
-    plt.Axes: The axes object of the plot.
+    DataFrame: A pandas DataFrame with the normalized data.
     
+    Raises:
+    If max_value is less than min_value, a ValueError is raised.
+    
+    Note:
+    - The function use "Normalized Value" for the column name in the DataFrame that being returned.
+
     Requirements:
-    - numpy
-    - matplotlib.pyplot
-    - scipy.fft
+    - pandas
+    - random
+    - sklearn.preprocessing.StandardScaler
 
     Example:
-    >>> sine_waves, fft_data, ax = task_func(5)
-    >>> len(sine_waves)
-    5
-    >>> fft_data.shape
-    (629,)
+    >>> random.seed(0)
+    >>> normalized_data = task_func(5000, 5, 5)
+    >>> print(normalized_data['Normalized Value'][0])
+    0.0
     """
-    np.random.seed(seed)
-    sine_wave_series = []
-    if n_waves < 1:
-        return sine_wave_series, np.array([]), None
-    for frequency in range(1, n_waves+1):
-        wave = np.sin(frequency * ANGLES)
-        sine_wave_series.append(wave)
-    fft_data = fft(np.sum(sine_wave_series, axis=0))
-    _, ax = plt.subplots()
-    ax.hist(np.abs(fft_data))
-    return sine_wave_series, fft_data, ax
+    if max_value < min_value:
+        raise ValueError()
+    data = [round(random.uniform(min_value, max_value), 3) for _ in range(n_data_points)]
+    data_df = pd.DataFrame(data, columns=['Value'])
+    scaler = StandardScaler()
+    normalized_data = scaler.fit_transform(data_df[['Value']])
+    return pd.DataFrame(normalized_data, columns=['Normalized Value'])
 
 import unittest
-import doctest
+import pandas as pd
+import random
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Testing basic functionality with 3 waves
-        sine_waves, fft_data, ax = task_func(3)
-        self.assertEqual(len(sine_waves), 3)  # Should return 3 waves
-        self.assertTrue(isinstance(sine_waves[0], np.ndarray))  # Each wave should be a numpy array
-        # Testing if the FFT data is a numpy array
-        self.assertIsInstance(fft_data, np.ndarray)
-        # Testing if the axes object is returned
-        self.assertIsInstance(ax, plt.Axes)
-    def test_case_2(self):
-        # Testing with 5 waves
-        sine_waves, fft_data, ax = task_func(5)
-        self.assertEqual(len(sine_waves), 5)
-        self.assertTrue(isinstance(sine_waves[4], np.ndarray))
-        # Test the axis limits of the histogram
-        self.assertAlmostEqual(ax.get_xlim()[1], 331.2, places=1)
-        # Test the axis bins
-        self.assertEqual(len(ax.patches), 10)
-    def test_case_3(self):
-        # Testing with 1 wave
-        sine_waves, fft_data, ax = task_func(1, seed=5)
-        self.assertEqual(len(sine_waves), 1)
-        self.assertTrue(isinstance(sine_waves[0], np.ndarray))
-        # Test the FFT data
-        self.assertIsInstance(fft_data, np.ndarray)
-        self.assertEqual(fft_data.shape, (629,))
-        # test the maximum value of the FFT data
-        self.assertAlmostEqual(np.max(np.abs(fft_data)), 314.3, places=1)
-    def test_case_4(self):
-        # Testing edge case with 0 waves
-        sine_waves, fft_data, ax = task_func(0)
-        self.assertEqual(len(sine_waves), 0)
-        self.assertEqual(fft_data.shape, (0,))
-        self.assertIsNone(ax)
-    def test_case_5(self):
-        # Testing with negative number, should return empty list
-        sine_waves, fft_data, ax = task_func(-5)
-        self.assertEqual(len(sine_waves), 0)
-        self.assertEqual(fft_data.shape, (0,))
-        self.assertIsNone(ax)
+    def test_default_parameters(self):
+        random.seed(0)
+        df = task_func()
+        self.assertIsInstance(df, pd.DataFrame, "Return type should be a DataFrame.")
+        self.assertEqual(len(df), 5000, "Default number of data points should be 5000.")
+        self.assertAlmostEqual(df['Normalized Value'].mean(), 0, delta=0.1, msg="Mean should be close to 0.")
+        self.assertAlmostEqual(df['Normalized Value'].std(), 1, delta=0.1, msg="Standard deviation should be close to 1.")
+    def test_custom_parameters(self):
+        random.seed(0)
+        df = task_func(1000, 1.0, 5.0)
+        self.assertEqual(len(df), 1000, "Number of data points should match the specified value.")
+        self.assertTrue(df['Normalized Value'].min() >= -3, "Normalized values should be within a reasonable range.")
+        self.assertTrue(df['Normalized Value'].max() <= 3, "Normalized values should be within a reasonable range.")
+    def test_edge_case_empty(self):
+        random.seed(0)
+        with self.assertRaises(ValueError):
+            task_func(0)
+    def test_negative_data_points(self):
+        random.seed(0)
+        with self.assertRaises(ValueError):
+            task_func(-100)
+    def test_invalid_range(self):
+        random.seed(0)
+        with self.assertRaises(ValueError):
+            task_func(1000, 5.0, 1.0)

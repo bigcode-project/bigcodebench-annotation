@@ -1,55 +1,81 @@
-from sklearn.preprocessing import MinMaxScaler
-import numpy as np
+import pandas as pd
+import statsmodels.api as sm
 
-def task_func(myList):
+
+def task_func(df: pd.DataFrame, height: int, weight: int, columns: list) -> sm.regression.linear_model.RegressionResultsWrapper:
     """
-    Normalize a list of numeric values to the range [0, 1] using min-max scaling.
+    Performs an OLS linear regression on a subset of the provided DataFrame. The subset is created by filtering rows 
+    where the value in the second column of 'columns' is greater than 'height' and the value in the third column is 
+    less than 'weight'. The first column in 'columns' is used as the dependent variable / target (y), and the rest as independent 
+    variables (X) in the regression.
+
+    If df is empty, or if no rows match the conditions None is returned.
+
 
     Parameters:
-    - myList (list): List of numerical values to normalize.
+    - df (pd.DataFrame): The DataFrame to analyze.
+    - height (int): The threshold to filter rows based on the second column in 'columns'.
+    - weight (int): The threshold to filter rows based on the third column in 'columns'.
+    - columns (list of str): A list of column names to use, where the first is the dependent variable.
 
     Returns:
-    - ndarray: An array of normalized values.
+    - sm.regression.linear_model.RegressionResultsWrapper: The result of the OLS regression, or None if no rows meet the criteria or DataFrame is empty.
 
     Requirements:
-    - sklearn.preprocessing.MinMaxScaler
-    - numpy
+    - pandas
+    - statsmodels
 
     Example:
-    >>> myList = [10, 20, 30, 40, 50]
-    >>> task_func(myList)
-    array([0.  , 0.25, 0.5 , 0.75, 1.  ])
+    >>> df = pd.DataFrame({'Age': [30, 40], 'Height': [60, 70], 'Weight': [100, 150]})
+    >>> model = task_func(df, 50, 120, ['Age', 'Height', 'Weight'])
+
+    >>> df = pd.DataFrame(np.random.randint(10,98,size=(100, 3)), columns=['Age', 'Height', 'Weight'])
+    >>> model = task_func(df, 45, 72, columns=['Age', 'Height', 'Weight'])
+
     """
-    myList = np.array(myList).reshape(-1, 1)
-    scaler = MinMaxScaler()
-    normalized_list = scaler.fit_transform(myList)
-    return normalized_list.flatten()
+    if df.empty:
+        return None
+    selected_df = df[(df[columns[1]] > height) & (df[columns[2]] < weight)]
+    if selected_df.empty:
+        return None
+    X = selected_df[columns[1:]]
+    y = selected_df[columns[0]]
+    X = sm.add_constant(X)
+    model = sm.OLS(y, X)
+    results = model.fit()
+    return results
 
 import unittest
 import numpy as np
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_1(self):
-        # Testing basic functionality
-        input_data = [10, 20, 30, 40, 50]
-        expected_output = np.array([0. , 0.25, 0.5 , 0.75, 1. ])
-        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
-    def test_2(self):
-        # Testing with negative values
-        input_data = [-50, -40, -30, -20, -10]
-        expected_output = np.array([0. , 0.25, 0.5 , 0.75, 1. ])
-        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
-    def test_3(self):
-        # Testing with mixed negative and positive values
-        input_data = [-50, -25, 0, 25, 50]
-        expected_output = np.array([0. , 0.25, 0.5 , 0.75, 1. ])
-        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
-    def test_4(self):
-        # Testing with single value
-        input_data = [100]
-        expected_output = np.array([0.])
-        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
-    def test_5(self):
-        # Testing with all zeros
-        input_data = [0, 0, 0, 0, 0]
-        expected_output = np.array([0., 0., 0., 0., 0.])
-        np.testing.assert_array_almost_equal(task_func(input_data), expected_output, decimal=2)
+    def setUp(self):
+        np.random.seed(42)  # Set a seed for reproducibility
+    def test_case_1(self):
+        # Test with a DataFrame of random values
+        df = pd.DataFrame(np.random.randint(0,100,size=(100, 3)), columns=['Age', 'Height', 'Weight'])
+        results = task_func(df, 50, 70, columns=['Age', 'Height', 'Weight'])
+        self.assertIsInstance(results, sm.regression.linear_model.RegressionResultsWrapper) 
+        self.assertEqual(results.params.index.to_list(), ['const', 'Height', 'Weight']) # There should be 3 parameters: const, Height, Weight
+    def test_case_2(self):
+        # Test with a DataFrame where no rows match the condition
+        df = pd.DataFrame(np.random.randint(30,40,size=(100, 3)), columns=['Age', 'Height', 'Weight'])
+        results = task_func(df, 50, 70, columns=['Age', 'Height', 'Weight'])
+        self.assertIsNone(results) # There should be no regression result since no rows match the condition
+    def test_case_3(self):
+        # Test with a DataFrame where all rows match the condition
+        df = pd.DataFrame(np.random.randint(60,80,size=(100, 3)), columns=['Age', 'Height', 'Weight'])
+        results = task_func(df, 50, 70, columns=['Age', 'Height', 'Weight'])
+        self.assertIsInstance(results, sm.regression.linear_model.RegressionResultsWrapper) 
+        self.assertEqual(results.params.index.to_list(), ['const', 'Height', 'Weight']) # There should be 3 parameters: const, Height, Weight
+    def test_case_4(self):
+        # Test with a DataFrame with different column names
+        df = pd.DataFrame(np.random.randint(0,100,size=(100, 3)), columns=['Years', 'Size', 'Mass'])
+        results = task_func(df, 50, 70, columns=['Years', 'Size', 'Mass'])
+        self.assertIsInstance(results, sm.regression.linear_model.RegressionResultsWrapper) 
+        self.assertEqual(results.params.index.to_list(), ['const', 'Size', 'Mass']) # There should be 3 parameters: const, Height, Weight
+    def test_case_5(self):
+        # Test with an empty DataFrame
+        df = pd.DataFrame(columns=['Age', 'Height', 'Weight'])
+        results = task_func(df, 50, 70, columns=['Age', 'Height', 'Weight'])
+        self.assertIsNone(results) # There should be no regression result since DataFrame is empty

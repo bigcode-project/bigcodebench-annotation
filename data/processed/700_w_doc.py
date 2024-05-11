@@ -1,80 +1,55 @@
 import pandas as pd
-from sklearn.cluster import KMeans
+import numpy as np
 
-def task_func(x_list, y_list):
+def task_func(data, cols):
     """
-    Perform K-Means clustering on the given data by first turning it into a DataFrame with two columns "x" and "y" and then return the labels and centroids.
-
+    Turn the provided data into a DataFrame and then calculate the correlation matrix of numeric columns.
+    
     Parameters:
-    - x_list (list): List of data corresponding to 'x'
-    - y_list (list): List of data corresponding to 'y'
-
+    - data (list): List of lists with the data, where the length of the inner list equals the number of columns
+    - cols (list): List of column names
+    
     Returns:
-    tuple: The labels and centroids as numpy arrays.
-        - kmeans.labels_: A NumPy array where each element is the cluster label assigned to each data point. 
-        - kmeans.cluster_centers_: A NumPy array containing the coordinates of the cluster centers.
+    - correlation_matrix (pd.DataFrame): The correlation matrix.
 
     Requirements:
     - pandas
-    - sklearn
-
+    - numpy
+    
     Example:
-    >>> df = pd.DataFrame({'x': [1, 2, 3, 4, 5, 6], 'y': [2, 3, 4, 5, 6, 7]})
-    >>> labels, centroids = task_func([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
+    >>> correlation_matrix = task_func([[5.1, 3.5, 1.4], [4.9, 3.0, 1.4], [4.7, 3.2, 1.3]], ['x', 'y', 'z'])
+    >>> print(correlation_matrix)
+              x         y         z
+    x  1.000000  0.596040  0.866025
+    y  0.596040  1.000000  0.114708
+    z  0.866025  0.114708  1.000000
     """
-    df = pd.DataFrame({'x': x_list, 'y': y_list})
-    kmeans = KMeans(n_clusters=2, random_state=0).fit(df)
-    return kmeans.labels_, kmeans.cluster_centers_
+    df = pd.DataFrame(data, columns=cols)
+    df_np = np.array(df)
+    df = pd.DataFrame(df_np, columns=cols)
+    correlation_matrix = df.corr()
+    return correlation_matrix
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        labels, centroids = task_func([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
-        self.assertEqual(labels[0], 0)
-        self.assertEqual(labels[1], 0)
-        self.assertEqual(labels[2], 0)
-        self.assertEqual(labels[3], 1)
-        self.assertEqual(labels[4], 1)
-        self.assertEqual(labels[5], 1)
-        self.assertEqual(centroids[0][0], 2.)
-        self.assertEqual(centroids[0][1], 3.)
-        self.assertEqual(centroids[1][0], 5.)
-        self.assertEqual(centroids[1][1], 6.)
+        df = pd.DataFrame([[5.1, 3.5, 1.4], [4.9, 3.0, 1.4], [4.7, 3.2, 1.3]], columns = ['x', 'y', 'z'])
+        correlation_matrix = task_func([[5.1, 3.5, 1.4], [4.9, 3.0, 1.4], [4.7, 3.2, 1.3]], ['x', 'y', 'z'])
+        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
     def test_case_2(self):
-        labels, centroids = task_func([1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2])
-        self.assertEqual(labels[0], 0)
-        self.assertEqual(labels[1], 0)
-        self.assertEqual(labels[2], 0)
-        self.assertEqual(labels[3], 0)
-        self.assertEqual(labels[4], 0)
-        self.assertEqual(labels[5], 0)
-        self.assertEqual(centroids[0][0], 1.)
-        self.assertEqual(centroids[0][1], 2.)
+        df = pd.DataFrame([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], columns = ['x', 'y', 'z'])
+        correlation_matrix = task_func([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], ['x', 'y', 'z'])
+        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
     def test_case_3(self):
-        labels, centroids = task_func([1, 2, 3, 4, 5, 6], [2, 2, 2, 2, 2, 2])
-        self.assertEqual(labels[0], 0)
-        self.assertEqual(labels[1], 0)
-        self.assertEqual(labels[2], 0)
-        self.assertEqual(labels[3], 1)
-        self.assertEqual(labels[4], 1)
-        self.assertEqual(labels[5], 1)
-        self.assertEqual(centroids[0][0], 2.)
-        self.assertEqual(centroids[0][1], 2.)
-        self.assertEqual(centroids[1][0], 5.)
-        self.assertEqual(centroids[1][1], 2.)
+        df = pd.DataFrame([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]], columns = ['x', 'y', 'z'])
+        correlation_matrix = task_func([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]], ['x', 'y', 'z'])
+        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
+    
     def test_case_4(self):
-        labels, centroids = task_func([0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0])
-        self.assertEqual(labels[0], 0)
-        self.assertEqual(labels[1], 0)
+        df = pd.DataFrame([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0]], columns = ['x', 'y', 'z'])
+        correlation_matrix = task_func([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0]], ['x', 'y', 'z'])
+        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
     def test_case_5(self):
-        labels, centroids = task_func([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6])
-        self.assertEqual(labels[0], 0)
-        self.assertEqual(labels[1], 0)
-        self.assertEqual(labels[2], 0)
-        self.assertEqual(labels[3], 1)
-        self.assertEqual(labels[4], 1)
-        self.assertEqual(labels[5], 1)
-        self.assertEqual(centroids[0][0], 2.)
-        self.assertEqual(centroids[0][1], 2.)
-        self.assertEqual(centroids[1][0], 5.)
-        self.assertEqual(centroids[1][1], 5.)
+        df = pd.DataFrame([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0], [-7.0, -8.0, -9.0]], columns = ['x', 'y', 'z'])
+        correlation_matrix = task_func([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0], [-7.0, -8.0, -9.0]], ['x', 'y', 'z'])
+        self.assertTrue(np.allclose(correlation_matrix, df.corr()))

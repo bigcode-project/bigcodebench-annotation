@@ -1,70 +1,85 @@
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+from scipy.spatial import distance
+import matplotlib.pyplot as plt
 
 
-def task_func(a, b, columns=['A', 'B']):
+def task_func(a, b):
     """
-    Standardize two lists of numbers using the StandardScaler from sklearn and visualize the standardized values using a bar plot.
+    Calculate the Euclidean distance between two lists, create a Pandas DataFrame from these lists
+    with indices 'A' and 'B', and then draw the values with a line displaying the Euclidean distance.
 
     Parameters:
-        a (list): A list of numbers.
-        b (list): Another list of numbers.
-        columns (list, optional): Column names for the resulting DataFrame. Defaults to ['A', 'B'].
+    a (list): A list of numbers.
+    b (list): Another list of numbers.
 
     Returns:
-        pd.DataFrame: A DataFrame containing the standardized values.
-        matplotlib.axes.Axes: Axes object of the displayed bar plot.
+    float: The computed Euclidean distance between the two lists.
+    pd.DataFrame: A DataFrame containing the two lists as columns.
+    matplotlib.axes.Axes: The generated plot's Axes object.
 
     Requirements:
-        - numpy
-        - pandas
-        - sklearn.preprocessing
-        - matplotlib.pyplot
+    - pandas
+    - scipy.spatial
+    - matplotlib.pyplot
 
     Example:
-        >>> df, ax = task_func([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
-        >>> isinstance(df, pd.DataFrame) and isinstance(ax, matplotlib.axes.Axes)
-        True
+    >>> euclidean_distance, df, ax = task_func([1, 2, 3], [2, 3, 4])
+    >>> print(euclidean_distance)
+    1.7320508075688772
     """
-    if len(a) == 0 or len(b) == 0:
-        fig, ax = plt.subplots()
-        plt.close(fig)  # Prevent empty plot from displaying
-        return pd.DataFrame(), ax
-    scaler = StandardScaler()
-    standardized_values = scaler.fit_transform(np.array([a, b]).T)
-    df = pd.DataFrame(standardized_values, columns=columns)
-    ax = df.plot(kind='bar')
-    plt.show()
-    return df, ax
+    euclidean_distance = distance.euclidean(a, b)
+    df = pd.DataFrame({'A': a, 'B': b})
+    fig, ax = plt.subplots()
+    ax.plot(df['A'], df['B'])
+    ax.plot([df['A'].iloc[0], df['B'].iloc[0]], [df['A'].iloc[-1], df['B'].iloc[-1]], 'ro-')
+    return euclidean_distance, df, ax
 
 import unittest
-import matplotlib
 class TestCases(unittest.TestCase):
-    def test_standard_case(self):
-        """Test the function with non-empty lists."""
-        df, ax = task_func([1, 2, 3], [4, 5, 6])
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(df.shape, (3, 2))
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-    def test_empty_lists(self):
-        """Test the function with empty lists."""
-        df, ax = task_func([], [])
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(df.empty, True)
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-    def test_unequal_length_lists(self):
-        """Test the function with lists of unequal length. Expecting an exception."""
-        with self.assertRaises(ValueError):
-            task_func([1, 2, 3], [4, 5])
-    def test_single_value_lists(self):
-        """Test the function with single-value lists."""
-        df, ax = task_func([1], [1])
-        self.assertEqual(df.shape, (1, 2))
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-    def test_large_lists(self):
-        """Test the function with large lists."""
-        df, ax = task_func(list(range(100)), list(range(100, 200)))
-        self.assertEqual(df.shape, (100, 2))
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+    def test_case_1(self):
+        a = [1, 2, 3]
+        b = [2, 3, 4]
+        euclidean_distance, df, ax = task_func(a, b)
+        self.assertAlmostEqual(euclidean_distance, 1.732, places=3)
+        self.assertTrue('A' in df.columns)
+        self.assertTrue('B' in df.columns)
+        self.assertListEqual(df['A'].tolist(), a)
+        self.assertListEqual(df['B'].tolist(), b)
+        lines = ax.get_lines()
+        self.assertTrue(len(lines) > 0)
+    def test_case_2(self):
+        a = [1, 1, 1]
+        b = [1, 1, 1]
+        euclidean_distance, df, ax = task_func(a, b)
+        self.assertEqual(euclidean_distance, 0)
+        self.assertListEqual(df['A'].tolist(), a)
+        self.assertListEqual(df['B'].tolist(), b)
+        lines = ax.get_lines()
+        self.assertTrue(len(lines) > 0)
+    def test_case_3(self):
+        a = [0, 5, 10]
+        b = [10, 5, 0]
+        euclidean_distance, df, ax = task_func(a, b)
+        self.assertAlmostEqual(euclidean_distance, 14.142, places=3)
+        self.assertListEqual(df['A'].tolist(), a)
+        self.assertListEqual(df['B'].tolist(), b)
+        lines = ax.get_lines()
+        self.assertTrue(len(lines) > 0)
+    def test_case_4(self):
+        a = [3, 3, 3, 3]
+        b = [4, 4, 4, 4]
+        euclidean_distance, df, ax = task_func(a, b)
+        self.assertAlmostEqual(euclidean_distance, 2.0, places=3)
+        self.assertListEqual(df['A'].tolist(), a)
+        self.assertListEqual(df['B'].tolist(), b)
+        lines = ax.get_lines()
+        self.assertTrue(len(lines) > 0)
+    def test_case_5(self):
+        a = [1, 2, 3, 4, 5]
+        b = [5, 4, 3, 2, 1]
+        euclidean_distance, df, ax = task_func(a, b)
+        self.assertAlmostEqual(euclidean_distance, 6.325, places=3)
+        self.assertListEqual(df['A'].tolist(), a)
+        self.assertListEqual(df['B'].tolist(), b)
+        lines = ax.get_lines()
+        self.assertTrue(len(lines) > 0)

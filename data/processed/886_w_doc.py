@@ -1,151 +1,116 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from collections import Counter
 
-def task_func(df, col_a='A', col_b='B', col_c='C', seed=None):
+
+def task_func(data):
     """
-    This function filters rows from the input DataFrame 'df' based on conditions in columns 'B' and 'C', 
-    then uses linear regression to predict values in column 'B' using data from column 'A'. 
-    Specifically, it selects rows where column 'B' values are greater than 50 and column 'C' values equal 900.
+    Analyze a dictionary of student data to return a dataframe sorted by name and age in ascending order, 
+    the average score per student as a pandas Series, and the most common age as an integer.
     
-    A train test split of the remaining data is performed, where the test_size = 0.2
-    and col_a is used as X value and col_b is used as Y values / target.
-
-    This data is used to train a LinearRegression model. 
-
-    The test split is used to generate predictions for col_b. These predictions
-    are returned as well as the trained model.
-
-    If df is empty or empty after the filtering, None is returned.
-    If df does contain non numeric data None is returned.
-    If the specified columns are not contained in df, None is returned.
-
     Parameters:
-    df (DataFrame): The input pandas DataFrame with numeric data.
-    col_a (str): The name of the first column to use for prediction (default is 'A').
-    col_b (str): The name of the second column, the values of which are to be predicted (default is 'B').
-    col_c (str): The name of the third column to use for row selection (default is 'C').
-    seed (int, optional): random seed for the train test split. Default is None.
+    data (dict): A dictionary containing student data with three keys:
+        - 'Name': List of student names.
+        - 'Age': List of student ages.
+        - 'Score': List of student scores.
 
     Returns:
-    ndarray: The predicted values for the filtered rows in column 'B', or None if input is invalid.
-    LinearRegression: The trained linear regression model is returned, if 
-    
+    pd.DataFrame, pd.Series, int or None: 
+        - A dataframe sorted by 'Name' and 'Age' in ascending order.
+        - A series representing average scores indexed by student names.
+        - An integer representing the most common age or None if no data is available.
+
+    Raises:
+    ValueError: If the dictionary does not have the required keys.
+
     Requirements:
     - pandas
-    - sklearn.model_selection
-    - sklearn.linear_model
+    - collections
 
     Example:
-    >>> np.random.seed(32)
-    >>> df = pd.DataFrame({'A': np.random.randint(0, 100, 1000),
-    ...                    'B': np.random.randint(0, 100, 1000),
-    ...                    'C': np.random.choice([900, 800, 700, 600], 1000)})
-    >>> predictions, model = task_func(df, seed=1)
-    >>> print(predictions)
-    [77.21974339 76.26960987 76.34878767 77.16695819 76.53353585 76.86344332
-     76.86344332 77.19335079 76.81065812 76.77106923 76.79746183 77.0481915
-     76.23002098 76.63910624 77.114173   76.04527279 77.0217989  76.0188802
-     77.18015449 76.91622851 76.62590994 76.90303222 76.75787293 77.29892118
-     77.18015449 76.07166539 76.04527279 76.88983592]
-    >>> print(model)
-    LinearRegression()
-
-    >>> df = pd.DataFrame({'A': [1, 2, 3, 4, 5],
-    ...                    'B': [10, 80, 80, 80, 80],
-    ...                    'C': [900, 900, 900, 900, 900]})
-    >>> predictions, model = task_func(df, seed=12)
-    >>> print(predictions) 
-    [80.]
-    >>> print(model)
-    LinearRegression()
+    >>> data = {
+    ...     'Name': ['Tom', 'Nick', 'John', 'Tom', 'John', 'John', 'Nick', 'Tom', 'John', 'Tom'],
+    ...     'Age': [20, 21, 19, 20, 19, 19, 21, 20, 19, 20],
+    ...     'Score': [85, 79, 92, 88, 90, 92, 81, 86, 90, 85]
+    ... }
+    >>> df, avg_scores, common_age = task_func(data)
+    >>> print(df)
+       Name  Age  Score
+    2  John   19     92
+    4  John   19     90
+    5  John   19     92
+    8  John   19     90
+    1  Nick   21     79
+    6  Nick   21     81
+    0   Tom   20     85
+    3   Tom   20     88
+    7   Tom   20     86
+    9   Tom   20     85
     """
-    if df.empty or not all(col in df for col in [col_a, col_b, col_c]):
-        return None  # Invalid input scenario
-    try:
-        df[[col_a, col_b, col_c]] = df[[col_a, col_b, col_c]].apply(pd.to_numeric, errors='raise')
-    except ValueError:
-        return None  # Non-numeric data encountered
-    selected = df[(df[col_b] > 50) & (df[col_c] == 900)][[col_a, col_b]]
-    if selected.empty:
-        return None
-    X_train, X_test, y_train, _ = train_test_split(selected[col_a].values.reshape(-1, 1),
-                                                   selected[col_b].values,
-                                                   test_size=0.2,
-                                                   random_state=seed)
-    model = LinearRegression()
-    model.fit(X_train, y_train)
-    predictions = model.predict(X_test)
-    return predictions, model
+    if not all(key in data for key in ['Name', 'Age', 'Score']):
+        raise ValueError("The dictionary must have the keys 'Name', 'Age', 'Score'")
+    df = pd.DataFrame(data).sort_values(['Name', 'Age'])
+    avg_scores = df.groupby('Name')['Score'].mean()
+    age_counts = Counter(df['Age'])
+    most_common_age = age_counts.most_common(1)[0][0] if age_counts else None
+    return df, avg_scores, most_common_age
 
 import unittest
 import pandas as pd
-import numpy as np
-from sklearn.metrics import mean_squared_error
-from sklearn.linear_model import LinearRegression
+import os
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        np.random.seed(0)  # Set a seed for reproducibility
-    def test_normal_case(self):
-        # Test with a normal DataFrame
-        df = pd.DataFrame({'A': np.random.randint(0, 100, 100),
-                           'B': np.random.randint(0, 100, 100),
-                           'C': np.random.choice([900, 800], 100)})
-        predictions, model = task_func(df, seed=12)
-        self.assertIsInstance(model, LinearRegression)
-        np.testing.assert_almost_equal(predictions, np.array([73.84, 73.74, 73.02, 73.32, 72.66]), decimal=2)
-    def test_empty_dataframe(self):
-        # Test with an empty DataFrame
-        df = pd.DataFrame()
-        predictions = task_func(df)
-        self.assertIsNone(predictions)
-    def test_missing_columns(self):
-        # Test with a DataFrame missing one or more columns
-        df = pd.DataFrame({'A': np.random.randint(0, 100, 100),
-                           'C': np.random.choice([900, 800], 100)})
-        predictions = task_func(df)
-        self.assertIsNone(predictions)
-    def test_non_numeric_data(self):
-        # Test with non-numeric data
-        df = pd.DataFrame({'A': ['a', 'b', 'c'],
-                           'B': [1, 2, 3],
-                           'C': [900, 900, 900]})
-        predictions = task_func(df)
-        self.assertIsNone(predictions)
-    def test_no_rows_matching_criteria(self):
-        # Test with no rows matching the criteria
-        df = pd.DataFrame({'A': np.random.randint(0, 100, 100),
-                           'B': np.random.randint(0, 50, 100),  # B values are always < 50
-                           'C': np.random.choice([800, 700], 100)})  # C values are never 900
-        predictions = task_func(df)
-        self.assertIsNone(predictions)
-    def test_large_dataset_performance(self):
-        # Test with a very large DataFrame (performance test)
-        df = pd.DataFrame({'test': np.random.randint(0, 100, 10000),
-                           'hi': np.random.randint(0, 100, 10000),
-                           'hello': np.random.choice([900, 800], 10000)})
-        predictions, model = task_func(df, col_a='test', col_b='hi', col_c='hello')
-        self.assertIsInstance(model, LinearRegression)
-        self.assertIsNotNone(predictions)
-        self.assertEqual(len(predictions), 500)
-    def test_single_value_column(self):
-        # Test with a DataFrame where one column has the same value
-        df = pd.DataFrame({'A': [50] * 100,
-                           'B': np.random.randint(50, 100, 100),
-                           'C': [900] * 100})
-        predictions, model = task_func(df, seed=1)
-        self.assertIsInstance(model, LinearRegression)
-        np.testing.assert_almost_equal(
-            predictions,
-            np.array([73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61]),
-            decimal=2
-            )
-    def test_specific_return_values(self):
-        # Test with known data to check specific return values
-        df = pd.DataFrame({'A': [10, 20, 30, 40, 50],
-                           'B': [60, 70, 80, 90, 100],
-                           'C': [900, 900, 900, 900, 900]})
-        predictions, model = task_func(df, seed=100)
-        # Since the data is linear and simple, the model should predict close to the actual values
-        expected_predictions = np.array([70])  # Assuming a perfect model
-        np.testing.assert_almost_equal(predictions, expected_predictions)
+    def test_wrong_keys(self):
+        # Testing with incorrect dictionary keys
+        data = {
+            'Names': ['Tom', 'Nick'],
+            'Ages': [20, 21],
+            'Scores': [85, 79]
+        }
+        with self.assertRaises(ValueError):
+            task_func(data)
+    def test_correct_processing(self):
+        # Testing with correctly formatted data
+        data = {
+            'Name': ['Tom', 'Nick', 'Tom', 'John'],
+            'Age': [20, 21, 20, 19],
+            'Score': [85, 79, 88, 92]
+        }
+        df, avg_scores, common_age = task_func(data)
+        self.assertEqual(df.iloc[0]['Name'], 'John')
+        self.assertAlmostEqual(avg_scores['Tom'], 86.5)
+        self.assertEqual(common_age, 20)
+    def test_empty_data(self):
+        # Testing with empty lists
+        data = {'Name': [], 'Age': [], 'Score': []}
+        df, avg_scores, common_age = task_func(data)
+        self.assertTrue(df.empty)
+        self.assertTrue(avg_scores.empty)
+        self.assertIsNone(common_age)
+    def test_all_same_age(self):
+        # Testing with all students having the same age
+        data = {
+            'Name': ['Alice', 'Bob', 'Cindy'],
+            'Age': [25, 25, 25],
+            'Score': [88, 92, 85]
+        }
+        df, avg_scores, common_age = task_func(data)
+        self.assertEqual(common_age, 25)
+    def test_no_common_age(self):
+        # Testing with no common age, each student has a unique age
+        data = {
+            'Name': ['Alice', 'Bob', 'Cindy'],
+            'Age': [24, 25, 26],
+            'Score': [88, 92, 85]
+        }
+        df, avg_scores, common_age = task_func(data)
+        self.assertEqual(common_age, 24)  # Assuming the first element is taken if all are equally common
+    def test_duplicate_names_different_ages(self):
+        # Testing with duplicate names but different ages
+        data = {
+            'Name': ['Tom', 'Tom', 'Nick'],
+            'Age': [20, 21, 21],
+            'Score': [85, 88, 79]
+        }
+        df, avg_scores, common_age = task_func(data)
+        self.assertEqual(len(df[df['Name'] == 'Tom']), 2)
+        self.assertNotEqual(df.iloc[0]['Age'], df.iloc[1]['Age'])
+        self.assertTrue(df[df['Name'] == 'Tom'].Age.isin([20, 21]).all())

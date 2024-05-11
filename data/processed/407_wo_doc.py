@@ -1,85 +1,104 @@
-from PIL import Image
-import matplotlib.pyplot as plt
-import numpy as np
 import os
+import csv
+from openpyxl import load_workbook
 
-def task_func(img_path, angle):
+def task_func(file_name, excel_file_path, csv_file_path) -> str:
     """
-    Open an image, rotate it around a certain angle, and then display both the original and the rotated images side by side. 
-    Additionally, return both images as numpy arrays.
+    Converts an Excel file (.xls or .xlsx) to a CSV file by reading the contents of the Excel file
+    and writing them to a new CSV file with the same name but a different extension. Allows specifying
+    separate paths for the Excel file source and the CSV file destination.
 
     Parameters:
-    img_path (str): The path of the image file.
-    angle (float): The angle to rotate the image (in degrees).
+        file_name (str): The name of the Excel file to be converted.
+        excel_file_path (str): The directory path where the Excel file is located.
+        csv_file_path (str): The directory path where the CSV file should be saved.
 
     Returns:
-    tuple: A tuple containing two numpy arrays, the first representing the original image and 
-           the second representing the rotated image. Expands the rotated image to make it large enough to hold the entire rotated image.
-
-    Raises:
-    FileNotFoundError: If the image file does not exist at the specified path.
+        str: The name of the created CSV file.
 
     Requirements:
-    - PIL
-    - matplotlib
-    - numpy
+    - openpyxl.load_workbook
     - os
+    - csv
 
     Example:
-    >>> img_path = 'sample.png'
-    >>> create_dummy_image(image_path=img_path)
-    >>> original_img_array, rotated_img_array = task_func(img_path, 45)
-    >>> os.remove(img_path)
+    >>> task_func('test.xlsx', '/path/to/excel/files', '/path/to/csv/files')
+    'test.csv'
+    >>> task_func('nonexistent.xlsx', '/path/to/excel/files', '/path/to/csv/files')
+    Traceback (most recent call last):
+       ...
+    FileNotFoundError: [Errno 2] No such file or directory: '/path/to/excel/files/nonexistent.xlsx'
+
+    Note:
+    - This function assumes the active sheet is the one to be converted.
     """
-    if not os.path.exists(img_path):
-        raise FileNotFoundError(f"No file found at {img_path}")
-    img = Image.open(img_path)
-    rotated_img = img.rotate(angle,expand=True)
-    original_img_array = np.array(img)
-    rotated_img_array = np.array(rotated_img)
-    plt.figure(figsize=(10, 5))
-    plt.subplot(1, 2, 1)
-    plt.imshow(img)
-    plt.title('Original Image')
-    plt.subplot(1, 2, 2)
-    plt.imshow(rotated_img)
-    plt.title('Rotated Image')
-    return original_img_array, rotated_img_array
+    excel_file = os.path.join(excel_file_path, file_name)
+    if not os.path.isfile(excel_file):
+        raise FileNotFoundError(f"[Errno 2] No such file or directory: '{excel_file}'")
+    workbook = load_workbook(filename=excel_file, read_only=True)
+    sheet = workbook.active
+    data = [[cell.value for cell in row] for row in sheet.iter_rows()]
+    csv_file_name = os.path.splitext(file_name)[0] + '.csv'
+    csv_file = os.path.join(csv_file_path, csv_file_name)
+    with open(csv_file, 'w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerows(data)
+    return csv_file_name
 
 import unittest
-from PIL import Image, ImageDraw
-import numpy as np
-import os
-def create_dummy_image(image_path='test_image.png', size=(10, 10)):
-    """
-    Creates a dummy color image for testing.
-    The image size is 10x10 pixels.
-    """
-    img = Image.new('RGB', size, color='white')
-    draw = ImageDraw.Draw(img)
-    # Draw small shapes
-    draw.point((2, 2), fill='red')  # Red point
-    draw.point((5, 5), fill='green')  # Green point
-    draw.point((8, 8), fill='blue')  # Blue point
-    img.save(image_path)
+from unittest.mock import patch
+import tempfile
+import shutil
+from pathlib import Path
+import openpyxl
 class TestCases(unittest.TestCase):
     def setUp(self):
-        create_dummy_image()
+        # Create a temporary directory
+        self.test_dir = tempfile.mkdtemp()
+        self.mock_excel_path = Path(self.test_dir)
+        self.mock_csv_path = Path(self.test_dir)
     def tearDown(self):
-        os.remove('test_image.png')
-    def test_normal_functionality(self):
-        original_img, rotated_img = task_func('test_image.png', 45)
-        self.assertIsInstance(original_img, np.ndarray)
-        self.assertIsInstance(rotated_img, np.ndarray)
-    def test_non_existent_file(self):
+        # Remove the directory after the test
+        shutil.rmtree(self.test_dir)
+    def create_temp_excel_file(self, file_name: str):
+        """Helper function to create a temporary Excel file for testing."""
+        workbook = openpyxl.Workbook()
+        worksheet = workbook.active
+        worksheet['A1'] = 'Hello'
+        worksheet['B1'] = 'World'
+        temp_file_path = self.mock_excel_path / file_name
+        workbook.save(filename=temp_file_path)
+        return temp_file_path
+    def test_successful_conversion(self):
+        """Test that an Excel file is successfully converted to a CSV file."""
+        excel_file_name = 'test.xlsx'
+        self.create_temp_excel_file(excel_file_name)
+        result = task_func(excel_file_name, str(self.mock_excel_path), str(self.mock_csv_path))
+        self.assertEqual(result, 'test.csv')
+    @patch('openpyxl.load_workbook')
+    def test_return_type(self, mock_load_workbook):
+        """Ensure the function returns a string indicating the CSV file name."""
+        excel_file_name = 'test.xlsx'
+        temp_file_path = self.create_temp_excel_file(excel_file_name)
+        mock_load_workbook.return_value.active.iter_rows.return_value = iter([])
+        result = task_func(excel_file_name, str(self.mock_excel_path), str(self.mock_csv_path))
+        self.assertIsInstance(result, str)
+    def test_file_not_found(self):
+        """Check that FileNotFoundError is raised when the Excel file does not exist."""
         with self.assertRaises(FileNotFoundError):
-            task_func('non_existent.png', 45)
-    def test_zero_rotation(self):
-        original_img, rotated_img = task_func('test_image.png', 0)
-        self.assertTrue(np.array_equal(original_img, rotated_img))
-    def test_full_rotation(self):
-        original_img, rotated_img = task_func('test_image.png', 360)
-        self.assertTrue(np.array_equal(original_img, rotated_img))
-    def test_negative_angle(self):
-        _, rotated_img = task_func('test_image.png', -45)
-        self.assertIsInstance(rotated_img, np.ndarray)
+            task_func('nonexistent.xlsx', str(self.mock_excel_path), str(self.mock_csv_path))
+    def test_csv_file_creation(self):
+        """Test that a CSV file is created with the expected content from the Excel file."""
+        excel_file_name = 'test.xlsx'
+        self.create_temp_excel_file(excel_file_name)
+        # Call the function under test
+        csv_file_name = task_func(excel_file_name, str(self.mock_excel_path), str(self.mock_csv_path))
+        csv_file_path = self.mock_csv_path / csv_file_name
+        # Check if the CSV file was actually created
+        self.assertTrue(os.path.exists(csv_file_path), f"CSV file was not created: {csv_file_path}")
+        # Check the content of the created CSV file
+        expected_content = [['Hello', 'World']]  # Adjust this based on the actual content of your Excel file
+        with open(csv_file_path, newline='', encoding='utf-8') as csv_file:
+            reader = csv.reader(csv_file)
+            actual_content = list(reader)
+            self.assertEqual(actual_content, expected_content, "CSV file content does not match expected content.")

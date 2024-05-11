@@ -1,86 +1,96 @@
-from PIL import Image, ImageFilter
 import cv2
 import numpy as np
 import os
 
-def task_func(img_path, blur_radius=5):
+def task_func(img_path):
     """
-    Open an RGB image from a specific path, apply a blur filter, convert it to grayscale, and then display both the original and the edited images side by side.
-    Returns numpy arrays representing both the original and the processed images.
+    Open an RGB image, convert it to grayscale, find contours using the cv2 library, and return the original image and contours.
 
     Parameters:
     - img_path (str): The path of the image file.
-    - blur_radius (int): The radius of the Gaussian blur filter. Default is 5.
 
     Returns:
-    - tuple: A tuple containing two numpy arrays, the first representing the original image and 
-             the second representing the blurred and grayscaled image.
+    - tuple: A tuple containing the original image as a numpy array and a list of contours.
 
     Raises:
     - FileNotFoundError: If the image file does not exist at the specified path.
 
     Requirements:
-    - PIL
     - opencv-python
     - numpy
     - os
 
     Example:
-    >>> image_path = 'sample.png'
-    >>> create_dummy_image(image_path=image_path)
-    >>> original, processed = task_func(image_path)
-    >>> os.remove(image_path)
+    >>> img_path = 'sample.png'
+    >>> create_dummy_image(image_path=img_path)
+    >>> img, contours = task_func(img_path)
+    >>> os.remove(img_path)
     """
     if not os.path.exists(img_path):
         raise FileNotFoundError(f"No file found at {img_path}")
-    img = Image.open(img_path)
-    img = img.convert("RGB")
-    blurred_img = img.filter(ImageFilter.GaussianBlur(blur_radius))
-    grey_img = cv2.cvtColor(np.array(blurred_img), cv2.COLOR_RGB2GRAY)
-    return np.array(img), np.array(grey_img)
+    img = cv2.imread(img_path)
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    contours, _ = cv2.findContours(gray_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    return np.array(img), contours
 
 import unittest
 import numpy as np
 from PIL import Image, ImageDraw
+import os
+            
+            
 def create_dummy_image(image_path='test_image.jpg', size=(10, 10)):
     img = Image.new('RGB', size, color='white')
     draw = ImageDraw.Draw(img)
     draw.rectangle([2, 2, 8, 8], fill='black')
     img.save(image_path)
 class TestCases(unittest.TestCase):
-    def setUp(cls):
+    def setUp(self):
         create_dummy_image()
-    def tearDown(cls):
+    def tearDown(self):
         os.remove('test_image.jpg')
     def test_normal_functionality(self):
-        original, processed = task_func('test_image.jpg')
-        self.assertIsInstance(original, np.ndarray)
-        self.assertIsInstance(processed, np.ndarray)
-        
-        original_img_list = original.tolist()
-        processed_img_list = processed.tolist()
-        
-        # self.assertTrue(np.array_equal(segmented_img_list, segment_expect), "The arrays should not be equal")
-        
-        with open('df_contents.txt', 'w') as file:
-            file.write(str(processed_img_list))
+        img, contours = task_func('test_image.jpg')
+        self.assertIsInstance(img, np.ndarray)
+        self.assertTrue(isinstance(contours, tuple) and len(contours) > 0)
+        with open("filename", 'w') as file:
+            # Convert the image array to a list and save
+            file.write("# Image Array\n")
+            image_list = img.tolist()
+            file.write(f"{image_list}\n")
             
-        expect_original = [[[255, 255, 255], [252, 252, 252], [251, 251, 251], [255, 255, 255], [255, 255, 255], [255, 255, 255], [249, 249, 249], [249, 249, 249], [255, 255, 255], [247, 247, 247]], [[242, 242, 242], [255, 255, 255], [241, 241, 241], [255, 255, 255], [255, 255, 255], [250, 250, 250], [255, 255, 255], [255, 255, 255], [233, 233, 233], [255, 255, 255]], [[255, 255, 255], [237, 237, 237], [4, 4, 4], [0, 0, 0], [0, 0, 0], [0, 0, 0], [12, 12, 12], [0, 0, 0], [23, 23, 23], [250, 250, 250]], [[255, 255, 255], [255, 255, 255], [0, 0, 0], [5, 5, 5], [10, 10, 10], [3, 3, 3], [7, 7, 7], [0, 0, 0], [0, 0, 0], [255, 255, 255]], [[253, 253, 253], [255, 255, 255], [8, 8, 8], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [17, 17, 17], [11, 11, 11], [255, 255, 255]], [[255, 255, 255], [255, 255, 255], [2, 2, 2], [0, 0, 0], [12, 12, 12], [15, 15, 15], [0, 0, 0], [0, 0, 0], [0, 0, 0], [246, 246, 246]], [[254, 254, 254], [255, 255, 255], [4, 4, 4], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [3, 3, 3], [16, 16, 16], [254, 254, 254]], [[253, 253, 253], [255, 255, 255], [0, 0, 0], [0, 0, 0], [12, 12, 12], [0, 0, 0], [11, 11, 11], [0, 0, 0], [0, 0, 0], [249, 249, 249]], [[255, 255, 255], [250, 250, 250], [4, 4, 4], [0, 0, 0], [0, 0, 0], [7, 7, 7], [0, 0, 0], [7, 7, 7], [13, 13, 13], [241, 241, 241]], [[248, 248, 248], [255, 255, 255], [230, 230, 230], [255, 255, 255], [255, 255, 255], [255, 255, 255], [244, 244, 244], [249, 249, 249], [241, 241, 241], [255, 255, 255]]]
+            # Save the contours
+            file.write("\n# Contours\n")
+            for contour in contours:
+                # Convert each contour array to a list
+                contour_list = contour.tolist()
+                file.write(f"{contour_list}\n")
         
-        expect_processed = [[190, 188, 187, 186, 185, 183, 182, 182, 182, 182], [189, 187, 185, 184, 183, 181, 180, 180, 180, 180], [187, 185, 184, 182, 181, 179, 178, 178, 178, 178], [185, 184, 182, 180, 179, 178, 177, 177, 177, 177], [184, 182, 181, 179, 178, 176, 175, 175, 175, 176], [183, 181, 179, 178, 177, 175, 174, 174, 174, 174], [182, 180, 178, 177, 176, 174, 173, 173, 173, 174], [182, 180, 178, 176, 175, 174, 173, 173, 173, 173], [182, 180, 178, 176, 175, 174, 173, 173, 173, 173], [182, 180, 178, 176, 176, 174, 173, 173, 173, 174]]
-        self.assertTrue(np.array_equal(expect_processed, processed_img_list), "The arrays should not be equal")
-        self.assertTrue(np.array_equal(expect_original, original_img_list), "The arrays should not be equal")
+        expect_img = [[[255, 255, 255], [252, 252, 252], [251, 251, 251], [255, 255, 255], [255, 255, 255], [255, 255, 255], [249, 249, 249], [249, 249, 249], [255, 255, 255], [247, 247, 247]], [[242, 242, 242], [255, 255, 255], [241, 241, 241], [255, 255, 255], [255, 255, 255], [250, 250, 250], [255, 255, 255], [255, 255, 255], [233, 233, 233], [255, 255, 255]], [[255, 255, 255], [237, 237, 237], [4, 4, 4], [0, 0, 0], [0, 0, 0], [0, 0, 0], [12, 12, 12], [0, 0, 0], [23, 23, 23], [250, 250, 250]], [[255, 255, 255], [255, 255, 255], [0, 0, 0], [5, 5, 5], [10, 10, 10], [3, 3, 3], [7, 7, 7], [0, 0, 0], [0, 0, 0], [255, 255, 255]], [[253, 253, 253], [255, 255, 255], [8, 8, 8], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [17, 17, 17], [11, 11, 11], [255, 255, 255]], [[255, 255, 255], [255, 255, 255], [2, 2, 2], [0, 0, 0], [12, 12, 12], [15, 15, 15], [0, 0, 0], [0, 0, 0], [0, 0, 0], [246, 246, 246]], [[254, 254, 254], [255, 255, 255], [4, 4, 4], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [3, 3, 3], [16, 16, 16], [254, 254, 254]], [[253, 253, 253], [255, 255, 255], [0, 0, 0], [0, 0, 0], [12, 12, 12], [0, 0, 0], [11, 11, 11], [0, 0, 0], [0, 0, 0], [249, 249, 249]], [[255, 255, 255], [250, 250, 250], [4, 4, 4], [0, 0, 0], [0, 0, 0], [7, 7, 7], [0, 0, 0], [7, 7, 7], [13, 13, 13], [241, 241, 241]], [[248, 248, 248], [255, 255, 255], [230, 230, 230], [255, 255, 255], [255, 255, 255], [255, 255, 255], [244, 244, 244], [249, 249, 249], [241, 241, 241], [255, 255, 255]]]
+        
+        expect_contours = [[[[0, 0]], [[0, 9]], [[9, 9]], [[9, 0]]],
+                            [[[5, 8]], [[6, 7]], [[7, 8]], [[6, 9]]],
+                            [[[6, 7]], [[7, 6]], [[8, 6]], [[9, 7]], [[8, 8]], [[7, 8]]],
+                            [[[2, 4]], [[3, 3]], [[6, 3]], [[7, 4]], [[8, 4]], [[9, 5]], [[8, 6]], [[7, 6]], [[5, 8]], [[4, 7]], [[5, 8]], [[4, 9]], [[3, 9]], [[1, 7]], [[2, 6]]],
+                            [[[4, 5]], [[5, 5]]],
+                            [[[1, 3]], [[2, 2]], [[3, 3]], [[2, 4]]],
+                            [[[6, 2]], [[7, 1]], [[9, 3]], [[8, 4]], [[7, 4]], [[6, 3]]],
+                            [[[2, 2]], [[3, 1]], [[5, 1]], [[6, 2]], [[5, 3]], [[3, 3]]]]
+        
+        self.assertTrue(np.array_equal(expect_img, img), "The arrays should not be equal")
+        
+        for i in range(len(contours)):
+            self.assertTrue(np.array_equal(contours[i], expect_contours[i]), "The arrays should not be equal")
+        
     def test_non_existent_file(self):
         with self.assertRaises(FileNotFoundError):
             task_func('non_existent.jpg')
-    def test_blur_effectiveness(self):
-        _, processed = task_func('test_image.jpg')
-        self.assertNotEqual(np.mean(processed), 255)  # Ensuring it's not all white
-    def test_returned_image_shapes(self):
-        original, processed = task_func('test_image.jpg')
-        self.assertEqual(original.shape, (10, 10, 3))
-        self.assertEqual(processed.shape, (10, 10))
-    def test_different_blur_radius(self):
-        _, processed_default = task_func('test_image.jpg')
-        _, processed_custom = task_func('test_image.jpg', blur_radius=10)
-        self.assertFalse(np.array_equal(processed_default, processed_custom))
+    def test_image_shape(self):
+        img, _ = task_func('test_image.jpg')
+        self.assertEqual(img.shape, (10, 10, 3))
+    def test_contours_output_type(self):
+        _, contours = task_func('test_image.jpg')
+        self.assertIsInstance(contours, tuple)
+    def test_invalid_img_path_type(self):
+        with self.assertRaises(FileNotFoundError):
+            task_func(123)  # Passing a non-string path

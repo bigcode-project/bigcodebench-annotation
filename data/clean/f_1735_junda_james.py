@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 
-def f_1735(seed=42):
+def f_1735(data_url="http://lib.stat.cmu.edu/datasets/boston", seed=42):
     """
     Draw the correlation heatmap of the Boston Housing dataset using Seaborn, with an option to save it to a specified file.
 
@@ -38,7 +38,6 @@ def f_1735(seed=42):
         # boston_df = pd.DataFrame(data=boston.data, columns=boston.feature_names)
         # corr = boston_df.corr()
 
-        data_url = "http://lib.stat.cmu.edu/datasets/boston"
         raw_df = pd.read_csv(data_url, sep="\s+", skiprows=22, header=None)
         data = np.hstack([raw_df.values[::2, :], raw_df.values[1::2, :2]])
         target = raw_df.values[1::2, 2]

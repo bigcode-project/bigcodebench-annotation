@@ -1,108 +1,97 @@
-import os
-import random
 import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
 
 
-def task_func(data_dir,
-          csv_files=['file1.csv', 'file2.csv', 'file3.csv'],
-          seed=None):
+def task_func(csv_file_path, attribute, test_size=0.2, random_state=42):
     """
-    Randomly select one of the provided csv_files and select a certain number 
-    of records from the file at random.
-    The selected records are returned in a DataFrame. 
-    The name of the selected csv_file is also returned.
-
-    If the csv_file is empty return an empty DataFrame.
+    Train a linear regression model on a dataset and predict the value of a particular attribute.
+    This function reads a CSV file to create a pandas DataFrame, separates the data into 
+    training and testing sets, and performs linear regression. It returns the predicted 
+    values for the testing set as well as the trained model.
 
     Parameters:
-    data_dir (str): The directory where the CSV files are located.
-    csv_files (list of str): The list of CSV files to choose from. Default is ['file1.csv', 'file2.csv', 'file3.csv'].
-    seed (int, optional): Seed for random number generation and for sampling from the csv.
-    
+    csv_file_path (str): The path to the CSV file containing the data set.
+    attribute (str): The attribute to predict.
+    test_size (float, optional): Proportion of the dataset to include in the test split. Default is 0.2.
+    random_state (int, optional): Seed used by the random number generator. Default is 42.
+
     Returns:
-    tuple: A tuple containing two elements:
-        - str: The name of the randomly selected file.
-        - DataFrame: A pandas DataFrame with the selected rows.
+    tuple: A tuple containing:
+        - model (LinearRegression): The trained linear regression model.
+        - predictions (ndarray): An array of predicted values for the test set.
 
     Requirements:
-    - os
-    - random
     - pandas
+    - sklearn.linear_model
+    - sklearn.model_selection
+
+    Note: The function assumes that the CSV file is correctly formatted and that the specified attribute exists.
 
     Example:
-    >>> file_name, df = task_func('test_data')
-    >>> print(file_name)
-    'file2.csv'
-    >>> print(df)
-           Animal     Weight
-     0        Cat          1
-    21      Mouse         12
-    15   Elephant       1000
-     2      Tiger        500
+    >>> model, predictions = task_func("/path/to/data.csv", "target")
+    >>> print(predictions)
+    [123.45, ..., 126.78]
     """
-    random.seed(seed)
-    file = csv_files[random.randint(0, len(csv_files) - 1)]
-    file_path = os.path.join(data_dir, file)
-    try:
-        df = pd.read_csv(file_path)
-    except pd.errors.EmptyDataError:
-        return file, pd.DataFrame()
-    selected_rows = df.sample(n=random.randint(1, len(df)), random_state=seed)
-    return file, selected_rows
+    df = pd.read_csv(csv_file_path)
+    X = df.drop(columns=[attribute])
+    y = df[attribute]
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state
+    )
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_test)
+    return model, predictions
 
 import unittest
+import numpy as np
 import pandas as pd
-import os
 import tempfile
-import shutil
+import os
+from sklearn.linear_model import LinearRegression
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Create a temporary directory
-        self.test_dir = tempfile.mkdtemp()
-        self.test_files = [
-            'file1.csv', 'file2.csv', 'file3.csv', 'file4.csv', 'file5.csv', 'empty.csv'
-        ]
-        # Sample data for CSV files
-        data = {
-            'file1.csv': pd.DataFrame({'Name': ['Alice', 'Bob'], 'Age': [25, 30]}),
-            'file2.csv': pd.DataFrame({'Name': ['Chris', 'Dana'], 'Age': [35, 40]}),
-            'file3.csv': pd.DataFrame({'Name': ['Eve', 'Frank'], 'Age': [45, 50]}),
-            'file4.csv': pd.DataFrame({'Name': ['Grace', 'Hank'], 'Age': [55, 60]}),
-            'file5.csv': pd.DataFrame({'Name': ['Ivan', 'Julia'], 'Age': [65, 70]}),
-            'empty.csv': pd.DataFrame()
-        }
-        # Create CSV files in the directory
-        for file_name, df in data.items():
-            df.to_csv(os.path.join(self.test_dir, file_name), index=False)
+        # Create a temporary CSV file to simulate test environments
+        self.temp_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.csv')
+        self.csv_file_path = self.temp_file.name
+        self.temp_file.close()  # Close the file immediately after creation
     def tearDown(self):
-        # Remove the directory after the test
-        shutil.rmtree(self.test_dir)
-    def test_random_selection(self):
-        # Testing random selection and ensuring the file chosen and its data are correct
-        file_name, df = task_func(self.test_dir, seed=42)
-        self.assertTrue(file_name in self.test_files)
-        self.assertFalse(df.empty)
-    def test_specific_file_selection(self):
-        # Test selecting a specific file and checking contents
-        file_name, df = task_func(self.test_dir, ['file1.csv'], seed=42)
-        expected = pd.read_csv(os.path.join(self.test_dir, 'file1.csv'))
-        # Sample from expected and reset index
-        expected_sampled = expected.sample(len(df), random_state=42).reset_index(drop=True)
-        # Reset index of df to ensure indices match
-        df_reset = df.reset_index(drop=True)
-        # Assert frame equality
-        pd.testing.assert_frame_equal(df_reset, expected_sampled)
-    def test_empty_file(self):
-        # Ensure an empty file returns an empty DataFrame
-        file_name, df = task_func(self.test_dir, ['empty.csv'], seed=42)
-        self.assertEqual(file_name, 'empty.csv')
-        self.assertTrue(df.empty)
-    def test_multiple_files(self):
-        # Testing selection from multiple files
-        file_name, df = task_func(self.test_dir, ['file3.csv', 'file4.csv'], seed=24)
-        self.assertIn(file_name, ['file3.csv', 'file4.csv'])
-        self.assertFalse(df.empty)
-    def test_no_file_matches(self):
-        # Testing behavior when no files match the list
-        with self.assertRaises(FileNotFoundError):
-            task_func(self.test_dir, ['nonexistent.csv'], seed=42)
+        # Remove the temporary file after the test
+        os.unlink(self.csv_file_path)
+    def create_csv(self, data, header=True):
+        # Utility to create CSV content
+        df = pd.DataFrame(data)
+        df.to_csv(self.csv_file_path, index=False, header=header)
+    def test_valid_data(self):
+        # Valid CSV and attribute
+        data = {'feature1': [1, 2, 3], 'feature2': [4, 5, 6], 'target': [7, 8, 9]}
+        self.create_csv(data)
+        model, predictions = task_func(self.csv_file_path, "target")
+        self.assertIsInstance(model, LinearRegression)
+        self.assertIsInstance(predictions, np.ndarray)
+        self.assertEqual(len(predictions), 1)  # 20% of 3 is 0.6, rounds to 1
+    def test_different_test_size(self):
+        # Changing the test size
+        data = {'feature1': range(10), 'feature2': range(10, 20), 'target': range(20, 30)}
+        self.create_csv(data)
+        model, predictions = task_func(self.csv_file_path, "target", test_size=0.3)
+        self.assertEqual(len(predictions), 3)  # 30% of 10 is 3
+    def test_invalid_attribute(self):
+        # Attribute not present in the CSV
+        data = {'feature1': [1, 2], 'feature2': [3, 4]}
+        self.create_csv(data)
+        with self.assertRaises(KeyError):
+            task_func(self.csv_file_path, "nonexistent_target")
+    def test_csv_with_missing_values(self):
+        # CSV containing missing values in features
+        data = {'feature1': [1, np.nan, 3], 'feature2': [4, 5, 6], 'target': [7, 8, 9]}
+        self.create_csv(data)
+        with self.assertRaises(ValueError):
+            task_func(self.csv_file_path, "target")
+    def test_predicting_non_numerical_data(self):
+        # Non-numerical data in target
+        data = {'feature1': [1, 2, 3], 'feature2': [4, 5, 6], 'target': ['a', 'b', 'c']}
+        self.create_csv(data)
+        with self.assertRaises(ValueError):
+            task_func(self.csv_file_path, "target")

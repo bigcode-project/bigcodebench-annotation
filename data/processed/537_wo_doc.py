@@ -1,115 +1,132 @@
 import sqlite3
 import pandas as pd
-import os
+import seaborn as sns
 
 
-def task_func(db_name, table_name, csv_path="data.csv"):
+def task_func(db_name="test.db", table_name="People"):
     """
-    Read SQLite3 table via pandas and export to a CSV file.
+    Draw the age distribution of the persons in an SQLite3 table and returns the Axes object of the plot.
+    Raises a ValueError if the loaded data contains negative age values.
 
     Parameters:
-    - db_name (str): The path to the SQLite3 database.
-    - table_name (str): The name of the table to export.
-    - csv_path (str, optional): The path where the CSV file will be saved. Defaults to 'data.csv'.
+    db_name (str, optional): The full path to the SQLite3 database file. Defaults to 'test.db'.
+    table_name (str, optional): The name of the table to plot from. Defaults to 'People'.
+
+    Returns:
+    matplotlib.axes._axes.Axes: Axes object representing the age distribution plot,
+                                           with x-axis showing 'age' and a default of bins of 30, and kde set to True.
 
     Requirements:
     - sqlite3
     - pandas
-    - os
+    - seaborn
 
-    Returns:
-    str: The absolute path of the exported CSV file.
-
-    Example:
-    >>> task_func('test.db', 'People')
-    'data.csv'
-    >>> task_func('/absolute/path/to/test.db', 'Orders', 'orders.csv')
-    '/absolute/path/to/orders.csv'
+    Raises:
+    ValueError: If the data contains negative age values.
+    
+    Examples:
+    >>> ax = task_func('path/to/test.db', 'People')
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax = task_func()
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    try:
-        conn = sqlite3.connect(db_name)
-        df = pd.read_sql_query(f"SELECT * from {table_name}", conn)
-        df.to_csv(csv_path, index=False)
-        return os.path.abspath(csv_path)
-    finally:
-        conn.close()
+    conn = sqlite3.connect(db_name)
+    df = pd.read_sql_query(f"SELECT age from {table_name}", conn)
+    if (df["age"] < 0).any():
+        raise ValueError("Data contains negative age values.")
+    ax = sns.histplot(data=df, x="age", bins=30, kde=True)
+    ax.set_xlabel("age")
+    return ax
 
 import unittest
 import os
-import tempfile
-import shutil
 import sqlite3
-import pandas as pd
+import matplotlib.pyplot as plt
+import tempfile
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.temp_dir_obj = tempfile.TemporaryDirectory()
-        self.temp_dir = self.temp_dir_obj.name
-        self.db_path = os.path.join(self.temp_dir, "test.db")
-        # Setup the database and tables
-        conn = sqlite3.connect(self.db_path)
+        # Setup temporary directory
+        self.test_dir = tempfile.TemporaryDirectory()
+        # Create test_alt.db with People table
+        self.alt_db_path = os.path.join(self.test_dir.name, "test_alt.db")
+        conn = sqlite3.connect(self.alt_db_path)
         cursor = conn.cursor()
-        # Create tables and insert some data
-        cursor.execute("CREATE TABLE People (Name TEXT, Age INTEGER)")
-        cursor.execute(
-            "INSERT INTO People VALUES ('Alice', 30), ('Bob', 25), ('Charlie', 35)"
-        )
-        cursor.execute("CREATE TABLE Orders (Product TEXT, Quantity INTEGER)")
-        cursor.execute(
-            "INSERT INTO Orders VALUES ('Widgets', 5), ('Gadgets', 10), ('Doodads', 15)"
+        cursor.execute("CREATE TABLE People (name TEXT, age INT)")
+        cursor.executemany(
+            "INSERT INTO People VALUES (?, ?)", [("Alice", 25), ("Bob", 30)]
         )
         conn.commit()
         conn.close()
+        # Create a standard test.db with Employees table
+        self.default_db_path = os.path.join(self.test_dir.name, "test.db")
+        conn = sqlite3.connect(self.default_db_path)
+        cursor = conn.cursor()
+        cursor.execute("CREATE TABLE Employees (name TEXT, age INT)")
+        cursor.executemany(
+            "INSERT INTO Employees VALUES (?, ?)", [("Charlie", 35), ("David", 40)]
+        )
+        conn.commit()
+        conn.close()
+        # Create standard db with more examples
+        self.multiple_db_path = os.path.join(self.test_dir.name, "test_multiple.db")
+        conn = sqlite3.connect(self.multiple_db_path)
+        cursor = conn.cursor()
+        cursor.execute("CREATE TABLE MultipleAge (name TEXT, age INT)")
+        cursor.executemany(
+            "INSERT INTO MultipleAge VALUES (?, ?)",
+            [("Alice", 25), ("Bob", 30), ("Charlie", 35)],
+        )
+        conn.commit()
+        conn.close()
+        # Create a db for testing edge cases - negative age
+        self.negative_age_db_path = os.path.join(
+            self.test_dir.name, "test_negative_age.db"
+        )
+        conn = sqlite3.connect(self.negative_age_db_path)
+        cursor = conn.cursor()
+        cursor.execute("CREATE TABLE NegativeAge (name TEXT, age INT)")
+        cursor.executemany(
+            "INSERT INTO NegativeAge VALUES (?, ?)", [("Eve", -1), ("Frank", 20)]
+        )
+        conn.commit()
+        conn.close()
+        # Create a db for testing edge cases - empty
+        self.empty_db_path = os.path.join(self.test_dir.name, "test_empty.db")
+        conn = sqlite3.connect(self.empty_db_path)
+        cursor = conn.cursor()
+        cursor.execute("CREATE TABLE EmptyAge (name TEXT, age INT)")
+        conn.commit()
+        conn.close()
     def tearDown(self):
-        self.temp_dir_obj.cleanup()
+        self.test_dir.cleanup()
+        plt.close("all")
+    def _check_plot(self, ax, contains_data=True):
+        self.assertTrue(isinstance(ax, plt.Axes), "The plot should be an Axes object.")
+        self.assertEqual(ax.get_xlabel(), "age", "The x-axis label should be 'age'.")
+        if contains_data:
+            self.assertTrue(len(ax.lines) > 0, "The plot should contain a KDE line.")
     def test_case_1(self):
-        # Test exporting the People table
-        csv_path = os.path.join(self.temp_dir, "data.csv")
-        output_path = task_func(self.db_path, "People", csv_path)
-        self.assertTrue(os.path.exists(output_path), "CSV file not created.")
-        df = pd.read_csv(output_path)
-        self.assertEqual(len(df), 3, "CSV contains incorrect number of rows.")
-        self.assertTrue("Alice" in df["Name"].values, "Expected data not found in CSV.")
+        ax = task_func(db_name=self.default_db_path, table_name="Employees")
+        self._check_plot(ax)
     def test_case_2(self):
-        # Test exporting the Orders table
-        csv_path = os.path.join(self.temp_dir, "orders.csv")
-        output_path = task_func(self.db_path, "Orders", csv_path)
-        self.assertTrue(os.path.exists(output_path), "CSV file not created.")
-        df = pd.read_csv(output_path)
-        self.assertEqual(len(df), 3, "CSV contains incorrect number of rows.")
-        self.assertTrue(5 in df["Quantity"].values, "Expected data not found in CSV.")
+        ax = task_func(db_name=self.alt_db_path)
+        self._check_plot(ax)
     def test_case_3(self):
-        # Test exporting with a custom CSV path
-        custom_path = os.path.join(self.temp_dir, "custom_data.csv")
-        output_path = task_func(self.db_path, "People", custom_path)
-        self.assertTrue(
-            os.path.exists(output_path), "CSV file not created at custom path."
-        )
-        self.assertEqual(
-            output_path,
-            os.path.abspath(custom_path),
-            "Returned path does not match expected path.",
-        )
+        ax = task_func(db_name=self.default_db_path, table_name="Employees")
+        self._check_plot(ax)
     def test_case_4(self):
-        # Test with a non-existent database
-        with self.assertRaises(Exception):
-            task_func(os.path.join(self.temp_dir, "nonexistent.db"), "People")
+        ax = task_func(db_name=self.multiple_db_path, table_name="MultipleAge")
+        self._check_plot(ax)
     def test_case_5(self):
-        # Test with a non-existent table
-        with self.assertRaises(pd.io.sql.DatabaseError):
-            task_func(self.db_path, "NonexistentTable")
+        ax = task_func(db_name=self.empty_db_path, table_name="EmptyAge")
+        self._check_plot(ax, False)
     def test_case_6(self):
-        # Test if the function overwrites an existing CSV file
-        csv_path = os.path.join(self.temp_dir, "data.csv")
-        with open(csv_path, "w") as file:
-            file.write("Old Content")
-        output_path = task_func(self.db_path, "People", csv_path)
-        self.assertTrue(os.path.exists(output_path), "CSV file not created.")
-        with open(output_path, "r") as file:
-            content = file.read()
-            self.assertNotEqual(
-                "Old Content", content, "Old content found in CSV. Overwriting failed."
-            )
+        # Test for non-existent table
+        with self.assertRaises(Exception):
+            task_func(db_name=self.default_db_path, table_name="Nonexistent")
     def test_case_7(self):
-        # Test error handling with invalid CSV path
-        with self.assertRaises(OSError):
-            task_func(self.db_path, "People", "/nonexistent_path/data.csv")
+        # Test for negative age values
+        with self.assertRaises(ValueError):
+            task_func(db_name=self.negative_age_db_path, table_name="NegativeAge")

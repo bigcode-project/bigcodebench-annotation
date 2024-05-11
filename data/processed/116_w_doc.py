@@ -1,75 +1,95 @@
 import numpy as np
-from scipy.stats import mode
-from scipy.stats import entropy
+import matplotlib.pyplot as plt
 
-
-def task_func(numbers):
+def task_func(mu, sigma, sample_size):
     """
-    Creates and returns a dictionary with the mode and entropy of a numpy array constructed from a given list.
-    The function first converts the list into a numpy array, then calculates the mode and the entropy (base 2) of this array,
-    and finally adds them to the initial dictionary with the keys 'mode' and 'entropy'.
+    Generates a numpy array of random samples drawn from a normal distribution
+    and plots the histogram of these samples. This function specifies the mean (mu), 
+    standard deviation (sigma), and sample size (sample_size), making it useful 
+    for simulating data, conducting statistical experiments, or initializing 
+    algorithms that require normally distributed data with visualization.
 
     Parameters:
-        numbers (list): A non-empty list of numbers from which a numpy array is created to calculate mode and entropy.
+        mu (float): The mean of the normal distribution.
+        sigma (float): The standard deviation of the normal distribution.
+        sample_size (int): The number of samples to draw from the distribution.
 
     Returns:
-        dict: A dictionary containing the 'mode' and 'entropy' of the array with their respective calculated values.
+        ndarray: A numpy array of shape (sample_size,) containing samples drawn from the
+                 specified normal distribution.
 
-    Raises:
-        ValueError if the input list `numbers` is empty
+    Notes:
+        Plots a histogram of the generated samples to show the distribution. The histogram
+        features:
+        - X-axis labeled "Sample values", representing the value of the samples.
+        - Y-axis labeled "Frequency", showing how often each value occurs.
+        - Title "Histogram of Generated Samples", describing the content of the graph.
+        - Number of bins set to 30, to discretize the sample data into 30 intervals.
+        - Alpha value of 0.75 for bin transparency, making the histogram semi-transparent.
+        - Color 'blue', giving the histogram a blue color.
 
     Requirements:
-        - numpy
-        - scipy.stats.mode
-        - scipy.stats.entropy
+    - numpy
+    - matplotlib.pyplot
 
     Examples:
-        >>> result = task_func([1, 2, 2, 3, 3, 3])
-        >>> 'mode' in result and result['mode'] == 3 and 'entropy' in result
-        True
+    >>> data = task_func(0, 1, 1000)
+    >>> len(data)
+    1000
+    >>> isinstance(data, np.ndarray)
+    True
     """
-    if len(numbers) == 0:
-        raise ValueError
-    my_dict = {'array': np.array(numbers)}
-    mode_value = mode(my_dict['array']).mode[0]
-    ent = entropy(my_dict['array'], base=2)
-    my_dict['mode'] = mode_value
-    my_dict['entropy'] = ent
-    return my_dict
+    samples = np.random.normal(mu, sigma, sample_size)
+    plt.hist(samples, bins=30, alpha=0.75, color='blue')
+    plt.title('Histogram of Generated Samples')
+    plt.xlabel('Sample values')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    plt.show()
+    return samples
 
 import unittest
+from unittest.mock import patch
 import numpy as np
-from scipy.stats import mode, entropy
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_return_type(self):
-        """Test that the function returns a dictionary."""
-        result = task_func([1, 2, 3])
-        self.assertIsInstance(result, dict)
-    def test_mode_calculation(self):
-        """Test that the mode is correctly calculated."""
-        result = task_func([1, 2, 2, 3])
-        self.assertEqual(result['mode'], 2)
-    def test_entropy_calculation(self):
-        """Test that the entropy is correctly calculated."""
-        test_array = np.array([1, 2, 2, 3])
-        expected_entropy = entropy(test_array, base=2)
-        result = task_func([1, 2, 2, 3])
-        self.assertAlmostEqual(result['entropy'], expected_entropy)
-    def test_multiple_modes(self):
-        """Test that in case of multiple modes, the first mode encountered is returned."""
-        result = task_func([1, 1, 2, 2, 3])
-        self.assertEqual(result['mode'], 1)
-    def test_dictionary_keys(self):
-        """Test that the returned dictionary contains the correct keys."""
-        result = task_func([1, 1, 2, 2, 3])
-        self.assertIn('mode', result)
-        self.assertIn('entropy', result)
-    def test_empty_input_list(self):
-        """Test that the function raises a ValueError when the input list is empty."""
-        with self.assertRaises(ValueError):
-            task_func([])
-    def test_single_element_list(self):
-        """Test that the function correctly handles a list with a single element."""
-        result = task_func([42])
-        self.assertEqual(result['mode'], 42)
-        self.assertEqual(result['entropy'], 0.0)
+        """ Test that the function returns a numpy array. """
+        result = task_func(0, 1, 1000)
+        self.assertIsInstance(result, np.ndarray)
+    def test_sample_size(self):
+        """ Test that the returned array has the correct size. """
+        result = task_func(0, 1, 1000)
+        self.assertEqual(len(result), 1000)
+    def test_normal_distribution_properties(self):
+        """ Test if the generated samples have the correct mean and standard deviation. """
+        mu, sigma = 0, 1
+        result = task_func(mu, sigma, 1000000)
+        self.assertAlmostEqual(np.mean(result), mu, places=1)
+        self.assertAlmostEqual(np.std(result), sigma, places=1)
+    @patch('matplotlib.pyplot.show')
+    def test_plot_labels_and_title(self, mock_show):
+        """ Test if the plot has correct labels and title. """
+        with patch('matplotlib.pyplot.hist') as mock_hist:
+            task_func(0, 1, 1000)
+            args, kwargs = mock_hist.call_args
+            self.assertIn('bins', kwargs)
+            self.assertEqual(kwargs['bins'], 30)
+            self.assertEqual(kwargs['alpha'], 0.75)
+            self.assertEqual(kwargs['color'], 'blue')
+            self.assertEqual(plt.gca().get_xlabel(), 'Sample values')
+            self.assertEqual(plt.gca().get_ylabel(), 'Frequency')
+            self.assertEqual(plt.gca().get_title(), 'Histogram of Generated Samples')
+    def test_mock_random_normal(self):
+        """ Test the function with a mock of np.random.normal. """
+        with patch('numpy.random.normal', return_value=np.full(1000, 0.5)) as mock_random_normal:
+            mu, sigma = 0, 1
+            result = task_func(mu, sigma, 1000)
+            mock_random_normal.assert_called_once_with(mu, sigma, 1000)
+            self.assertTrue(all(x == 0.5 for x in result))
+    def test_output_consistency(self):
+        """ Test if repeated calls with the same parameters produce different results. """
+        mu, sigma = 0, 1
+        result1 = task_func(mu, sigma, 1000)
+        result2 = task_func(mu, sigma, 1000)
+        self.assertFalse(np.array_equal(result1, result2))

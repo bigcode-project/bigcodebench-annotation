@@ -1,27 +1,32 @@
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 
-def task_func(df):
+def task_func(df, n_clusters=3, random_state=0):
     """
-    Performs linear regression on a DataFrame using 'date' (converted to ordinal) as the predictor for 'value'. It plots both the original and 
-    predicted values, showcasing the linear relationship.
+    Convert the 'date' column of a DataFrame to ordinal, perform KMeans clustering on 'date' and 'value' columns, and plot the clusters.
 
     Parameters:
-        df (DataFrame): DataFrame containing 'group', 'date' (in datetime format), and 'value' columns.
+        df (pandas.DataFrame): The DataFrame with columns 'group', 'date', and 'value'.
+        n_clusters (int): The number of clusters for KMeans. Defaults to 3.
+        random_state (int): Random state for KMeans to ensure reproducibility. Defaults to 0.
+
 
     Returns:
-        tuple: Consists of the LinearRegression model, the predictions array, and the matplotlib Axes object of the plot.
-               The Axes object will have a title 'Value vs Date (Linear Regression Prediction)', 
-               x-axis labeled as 'Date (ordinal)', and y-axis labeled as 'Value'.
+        matplotlib.axes.Axes: The Axes object containing the scatter plot of the clusters.
 
+    Required names:
+        x: 'Date (ordinal)'
+        ylabel: 'Value'
+        title: 'KMeans Clustering of Value vs Date'
+    
     Raises:
-        ValueError: If 'df' is not a valid DataFrame, lacks the required columns, or if 'date' column is not in datetime format.
+        ValueError: If the DataFrame is empty or lacks required columns.
 
     Requirements:
         - pandas
-        - sklearn
-        - matplotlib
+        - sklearn.cluster
+        - matplotlib.pyplot
 
     Example:
         >>> df = pd.DataFrame({
@@ -29,29 +34,26 @@ def task_func(df):
         ...     "date": pd.to_datetime(["2022-01-02", "2022-01-13", "2022-02-01", "2022-02-23", "2022-03-05"]),
         ...     "value": [10, 20, 16, 31, 56],
         ... })
-        >>> model, predictions, ax = task_func(df)
-        >>> plt.show()  # Displays the plot with original and predicted values
+        >>> ax = task_func(df)
     """
-    if not isinstance(df, pd.DataFrame) or not all(col in df.columns for col in ['group', 'date', 'value']):
-        raise ValueError("Invalid 'df': must be a DataFrame with 'group', 'date', and 'value' columns.")
+    if df.empty or not all(col in df.columns for col in ['group', 'date', 'value']):
+        raise ValueError("DataFrame must be non-empty and contain 'group', 'date', and 'value' columns.")
+    if not pd.api.types.is_datetime64_any_dtype(df['date']):
+        raise ValueError("'date' column must be in datetime format.")
     df['date'] = df['date'].apply(lambda x: x.toordinal())
-    X = df[['date']]
-    y = df['value']
-    model = LinearRegression()
-    model.fit(X, y)
-    y_pred = model.predict(X)
+    X = df[['date', 'value']]
+    kmeans = KMeans(n_clusters=n_clusters, random_state=random_state)
+    kmeans.fit(X)
+    y_kmeans = kmeans.predict(X)
     fig, ax = plt.subplots()
-    ax.scatter(X, y, color='red')
-    ax.plot(X, y_pred, color='blue')
-    ax.set_title('Value vs Date (Linear Regression Prediction)')
+    ax.scatter(X['date'], X['value'], c=y_kmeans, cmap='viridis')
+    ax.set_title('KMeans Clustering of Value vs Date')
     ax.set_xlabel('Date (ordinal)')
     ax.set_ylabel('Value')
-    return model, y_pred, ax
+    return ax
 
 import unittest
 import pandas as pd
-import numpy as np
-from sklearn.linear_model import LinearRegression
 class TestCases(unittest.TestCase):
     def setUp(self):
         self.df = pd.DataFrame({
@@ -59,19 +61,23 @@ class TestCases(unittest.TestCase):
             "date": pd.to_datetime(["2022-01-02", "2022-01-13", "2022-02-01", "2022-02-23", "2022-03-05"]),
             "value": [10, 20, 16, 31, 56],
         })
-    def test_return_types(self):
-        model, predictions, ax = task_func(self.df)
-        self.assertIsInstance(model, LinearRegression)
-        self.assertIsInstance(predictions, np.ndarray)
-        self.assertEqual(predictions.shape, (self.df.shape[0],))
-        self.assertEqual(ax.get_title(), 'Value vs Date (Linear Regression Prediction)')
-    def test_invalid_input(self):
-        with self.assertRaises(ValueError):
-            task_func(pd.DataFrame({'a': [1, 2], 'b': [3, 4]}))
-    def test_plot_labels(self):
-        _, _, ax = task_func(self.df)
-        self.assertEqual(ax.get_xlabel(), 'Date (ordinal)')
-        self.assertEqual(ax.get_ylabel(), 'Value')
+    def test_basic_functionality(self):
+        ax = task_func(self.df)
+        self.assertEqual(len(ax.collections), 1)  # Check if scatter plot is created
     def test_empty_dataframe(self):
         with self.assertRaises(ValueError):
             task_func(pd.DataFrame())
+    def test_missing_columns(self):
+        incomplete_df = self.df.drop(columns=['date'])
+        with self.assertRaises(ValueError):
+            task_func(incomplete_df)
+    def test_invalid_date_column(self):
+        invalid_df = self.df.copy()
+        invalid_df['date'] = "not a date"
+        with self.assertRaises(ValueError):
+            task_func(invalid_df)
+    def test_plot_labels_and_title(self):
+        ax = task_func(self.df)
+        self.assertEqual(ax.get_xlabel(), 'Date (ordinal)')
+        self.assertEqual(ax.get_ylabel(), 'Value')
+        self.assertEqual(ax.get_title(), 'KMeans Clustering of Value vs Date')

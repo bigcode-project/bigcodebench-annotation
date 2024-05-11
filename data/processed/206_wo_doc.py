@@ -1,79 +1,126 @@
-import subprocess
-from multiprocessing import Pool
+import csv
+import json
+import os
 
-def execute_command(command):
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    output, _ = process.communicate()
-    return output
 
-def task_func(commands):
+def task_func(file_name):
     """
-    Executes a list of shell commands in parallel using multiprocessing, and collects their outputs.
+    Convert a csv file to a json file.
     
     Parameters:
-        commands (list): A list of shell commands to be executed.
-
+    file_name (str): The name of the csv file.
+    
     Returns:
-        list: A list of byte strings, each representing the output of a command. Returns an empty list if `commands` is empty.
+    str: The file name of the created json file.
 
     Requirements:
-    - subprocess
-    - multiprocessing.Pool
+    - csv
+    - json
+    - os
 
-    Notes:
-    - If `commands` is an empty list, the function returns an empty list without attempting to execute any commands.
+    Raises:
+    FileNotFoundError: If the file does not exist.
     
-    Examples:
-    >>> result = task_func(['ls', 'pwd', 'date'])
-    >>> isinstance(result, list)
-    True
-    >>> all(isinstance(output, bytes) for output in result)
+    Example:
+    >>> import tempfile
+    >>> FILE_NAME = tempfile.NamedTemporaryFile(prefix='report_', suffix='.csv', dir='/tmp').name
+    >>> with open(FILE_NAME, 'w', newline='') as csvfile:
+    ...     fieldnames = ['id', 'name', 'age']
+    ...     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    ...     _ = writer.writeheader()
+    ...     _ = writer.writerow({'id': '1', 'name': 'John', 'age': '25'})
+    ...     _ = writer.writerow({'id': '2', 'name': 'Doe', 'age': '30'})
+    >>> json_file = task_func(FILE_NAME)
+    >>> print(json_file.startswith('/tmp/report_') and json_file.endswith('.json'))
     True
     """
-    if not commands:  # Handle case where commands list is empty
-        return []
-    with Pool(processes=len(commands)) as pool:
-        outputs = pool.map(execute_command, commands)
-    return outputs
+    if not os.path.exists(file_name):
+        raise FileNotFoundError("File does not exist.")
+    data = []
+    with open(file_name, 'r') as f:
+        csv_reader = csv.DictReader(f)
+        for row in csv_reader:
+            data.append(row)
+    json_file_name = file_name.split('.')[0] + '.json'
+    with open(json_file_name, 'w') as f:
+        json.dump(data, f)
+    return json_file_name
 
 import unittest
-from unittest.mock import patch
+import doctest
 class TestCases(unittest.TestCase):
-    @patch('subprocess.Popen')
-    def test_return_type(self, mock_popen):
-        """Test that the function returns a list of byte strings."""
-        mock_popen.return_value.communicate.return_value = (b'output', b'')
-        commands = ['ls']
-        result = task_func(commands)
-        self.assertIsInstance(result, list)
-        self.assertTrue(all(isinstance(output, bytes) for output in result))
-    @patch('subprocess.Popen')
-    def test_empty_command_list(self, mock_popen):
-        """Test the function with an empty command list."""
-        mock_popen.return_value.communicate.return_value = (b'', b'')
-        result = task_func([])
-        self.assertEqual(result, [])
-        mock_popen.assert_not_called()
-    @patch('subprocess.Popen')
-    def test_return_type_with_mocked_commands(self, mock_popen):
-        """Test that the function returns a list with mocked commands."""
-        mock_popen.return_value.communicate.return_value = (b'Hello', b''), (b'World', b'')
-        commands = ['echo "Hello"', 'echo "World"']
-        result = task_func(commands)
-        self.assertIsInstance(result, list)
-        self.assertEqual(len(result), 2)
-    @patch('subprocess.Popen')
-    def test_handling_specific_number_of_commands(self, mock_popen):
-        """Test the function with a specific number of commands."""
-        mock_popen.return_value.communicate.side_effect = [(b'output1', b''), (b'output2', b'')]
-        commands = ['ls', 'pwd']
-        result = task_func(commands)
-        self.assertEqual(len(result), 2)
-    @patch('subprocess.Popen')
-    def test_handling_empty_string_command(self, mock_popen):
-        """Test the function with an empty string as a command."""
-        mock_popen.return_value.communicate.return_value = (b'', b'')
-        commands = ['']
-        result = task_func(commands)
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0], b'')
+    def setUp(self):
+        # Creating sample CSV files for testing
+        self.csv_file_1 = "sample_1.csv"
+        with open(self.csv_file_1, 'w', newline='') as csvfile:
+            fieldnames = ['id', 'name', 'age']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerow({'id': '1', 'name': 'John', 'age': '25'})
+            writer.writerow({'id': '2', 'name': 'Doe', 'age': '30'})
+            
+        self.csv_file_2 = "sample_2.csv"
+        with open(self.csv_file_2, 'w', newline='') as csvfile:
+            fieldnames = ['product', 'price']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerow({'product': 'apple', 'price': '0.5'})
+            writer.writerow({'product': 'banana', 'price': '0.3'})
+    def tearDown(self):
+        # Cleaning up the created files after testing
+        os.remove(self.csv_file_1)
+        if os.path.exists(self.csv_file_1.split('.')[0] + '.json'):
+            os.remove(self.csv_file_1.split('.')[0] + '.json')
+        
+        os.remove(self.csv_file_2)
+        if os.path.exists(self.csv_file_2.split('.')[0] + '.json'):
+            os.remove(self.csv_file_2.split('.')[0] + '.json')
+    def test_case_1(self):
+        # Testing with the first sample CSV
+        json_file = task_func(self.csv_file_1)
+        self.assertTrue(os.path.exists(json_file))
+        with open(json_file, 'r') as f:
+            data = json.load(f)
+            self.assertEqual(len(data), 2)
+            self.assertEqual(data[0]['id'], '1')
+            self.assertEqual(data[0]['name'], 'John')
+            self.assertEqual(data[0]['age'], '25')
+    def test_case_2(self):
+        # Testing with the second sample CSV
+        json_file = task_func(self.csv_file_2)
+        self.assertTrue(os.path.exists(json_file))
+        with open(json_file, 'r') as f:
+            data = json.load(f)
+            self.assertEqual(len(data), 2)
+            self.assertEqual(data[0]['product'], 'apple')
+            self.assertEqual(data[0]['price'], '0.5')
+    def test_case_3(self):
+        # Testing with a non-existing file
+        with self.assertRaises(FileNotFoundError):
+            task_func("non_existing.csv")
+    def test_case_4(self):
+        # Testing with an empty CSV file
+        empty_csv = "empty.csv"
+        with open(empty_csv, 'w', newline='') as csvfile:
+            pass
+        json_file = task_func(empty_csv)
+        self.assertTrue(os.path.exists(json_file))
+        with open(json_file, 'r') as f:
+            data = json.load(f)
+            self.assertEqual(len(data), 0)
+        os.remove(empty_csv)
+        os.remove(empty_csv.split('.')[0] + '.json')
+    def test_case_5(self):
+        # Testing with a CSV file having only headers
+        headers_csv = "headers_only.csv"
+        with open(headers_csv, 'w', newline='') as csvfile:
+            fieldnames = ['field1', 'field2']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+        json_file = task_func(headers_csv)
+        self.assertTrue(os.path.exists(json_file))
+        with open(json_file, 'r') as f:
+            data = json.load(f)
+            self.assertEqual(len(data), 0)
+        os.remove(headers_csv)
+        os.remove(headers_csv.split('.')[0] + '.json')

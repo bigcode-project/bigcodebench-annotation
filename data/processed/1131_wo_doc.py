@@ -1,114 +1,117 @@
-import os
 import hashlib
-import json
-from pathlib import Path
+import binascii
 
-def task_func(directory: str) -> str:
+def task_func(salt, cursor):
     """
-    Create SHA256 hashes for all files in the specified directory, including files in subdirectories, 
-    and save these hashes in a JSON file named 'hashes.json' in the given directory.
+    Updates the passwords in a user table of an SQLite database by hashing them with SHA256, 
+    using a provided salt. The function directly modifies the database via the given cursor.
 
     Parameters:
-    - directory (str): The path to the directory containing files to be hashed.
-    
-    Returns:
-    str: The absolute path of the JSON file ('hashes.json') containing the hashes.
-    
-    Requirements:
-    - os
-    - hashlib
-    - json
-    - pathlib.Path
+    - salt (str): The salt value to be appended to each password before hashing.
+    - cursor (sqlite3.Cursor): A cursor object through which SQL commands are executed.
 
+    Returns:
+    - int: The number of users whose passwords were successfully updated.
+
+    Requirements:
+    - hashlib
+    - binascii
+
+    Raises:
+    TypeError if the salt is not a string
+    
     Example:
-    >>> json_file = task_func("/path/to/directory")
-    >>> print(f"Hashes saved at: {json_file}")
+    >>> conn = sqlite3.connect('sample.db')
+    >>> cursor = conn.cursor()
+    >>> num_updated = task_func('mysalt', cursor)
+    >>> print(num_updated)
+    5
     """
-    hash_dict = {}
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            file_path = Path(root) / file
-            with open(file_path, 'rb') as f:
-                bytes = f.read()  # read entire file as bytes
-                readable_hash = hashlib.sha256(bytes).hexdigest()
-                hash_dict[str(file_path)] = readable_hash
-    json_file = Path(directory) / 'hashes.json'
-    with open(json_file, 'w') as f:
-        json.dump(hash_dict, f)
-    return str(json_file)
+    if not isinstance(salt, str):
+        raise TypeError
+    cursor.execute("SELECT id, password FROM users")
+    users = cursor.fetchall()
+    count_updated = 0
+    for user in users:
+        password = user[1].encode('utf-8')
+        salted_password = password + salt.encode('utf-8')
+        hash_obj = hashlib.sha256(salted_password)
+        hashed_password = binascii.hexlify(hash_obj.digest()).decode('utf-8')
+        cursor.execute(f"UPDATE users SET password = '{hashed_password}' WHERE id = {user[0]}")
+        count_updated += 1
+    return count_updated
 
 import unittest
-import os
+import sqlite3
 import hashlib
-import json
-from pathlib import Path
-import tempfile
+import binascii
+def create_mock_db():
+    """Helper function to create a mock SQLite database with a users table."""
+    conn = sqlite3.connect(":memory:")
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, password TEXT)")
+    passwords = [("password1",), ("password2",), ("password3",), ("password4",), ("password5",)]
+    cursor.executemany("INSERT INTO users (password) VALUES (?)", passwords)
+    conn.commit()
+    return conn
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Creating a temporary directory for testing
-        self.test_dir = tempfile.mkdtemp()
+        """Setup mock database for testing."""
+        self.conn = create_mock_db()
+        self.cursor = self.conn.cursor()
     def tearDown(self):
-        # Cleaning up the temporary directory
-        for root, dirs, files in os.walk(self.test_dir, topdown=False):
-            for name in files:
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                os.rmdir(os.path.join(root, name))
-        os.rmdir(self.test_dir)
-    def test_empty_directory(self):
-        # Testing with an empty directory
-        json_file = task_func(self.test_dir)
-        self.assertTrue(os.path.exists(json_file))
-        with open(json_file, 'r') as f:
-            data = json.load(f)
-            self.assertEqual(data, {})
-    def test_single_file(self):
-        # Testing with a directory containing a single file
-        filepath = os.path.join(self.test_dir, 'file1.txt')
-        with open(filepath, 'w') as f:
-            f.write("Hello, world!")
-        json_file = task_func(self.test_dir)
-        self.assertTrue(os.path.exists(json_file))
-        with open(json_file, 'r') as f:
-            data = json.load(f)
-            self.assertIn(filepath, data.keys())
-    def test_multiple_files(self):
-        # Testing with a directory containing multiple files
-        files_content = {'file2.txt': "Hello again!", 'file3.txt': "Goodbye!"}
-        filepaths = {}
-        for filename, content in files_content.items():
-            filepath = os.path.join(self.test_dir, filename)
-            filepaths[filepath] = content
-            with open(filepath, 'w') as f:
-                f.write(content)
-        json_file = task_func(self.test_dir)
-        self.assertTrue(os.path.exists(json_file))
-        with open(json_file, 'r') as f:
-            data = json.load(f)
-            for filepath in filepaths.keys():
-                self.assertIn(filepath, data.keys())
-    def test_nested_directories(self):
-        # Testing with a directory containing nested subdirectories and files
-        sub_dir = os.path.join(self.test_dir, 'sub_dir')
-        filepath = os.path.join(sub_dir, 'file4.txt')
-        Path(sub_dir).mkdir(parents=True, exist_ok=True)
-        with open(filepath, 'w') as f:
-            f.write("Nested file content!")
-        json_file = task_func(self.test_dir)
-        self.assertTrue(os.path.exists(json_file))
-        with open(json_file, 'r') as f:
-            data = json.load(f)
-            self.assertIn(filepath, data.keys())
-    def test_correct_hash(self):
-        # Testing if the computed hash is correct
-        filepath = os.path.join(self.test_dir, 'file5.txt')
-        with open(filepath, 'w') as f:
-            f.write("Check hash!")
-        json_file = task_func(self.test_dir)
-        self.assertTrue(os.path.exists(json_file))
-        with open(filepath, 'rb') as f:
-            bytes = f.read()
-            expected_hash = hashlib.sha256(bytes).hexdigest()
-        with open(json_file, 'r') as f:
-            data = json.load(f)
-            self.assertEqual(data[filepath], expected_hash)
+        """Tear down and close the mock database after testing."""
+        self.conn.close()
+    def test_updated_passwords(self):
+        """Verify that the number of updated passwords matches the number of users."""
+        salt = "testsalt"
+        num_updated = task_func(salt, self.cursor)
+        self.assertEqual(num_updated, 5, "Expected 5 users to be updated")
+    def test_hash_correctness(self):
+        """Verify that hash correctness."""
+        salt = "testsalt1"
+        _ = task_func(salt, self.cursor)
+        self.cursor.execute("SELECT password FROM users")
+        init_passwords = []
+        for row in self.cursor.fetchall():
+            password = row[0]
+            init_passwords.append(password)
+        salt = "testsalt2"
+        _ = task_func(salt, self.cursor)
+        self.cursor.execute("SELECT password FROM users")
+        final_passwords = []
+        for row in self.cursor.fetchall():
+            password = row[0]
+            final_passwords.append(password)
+        for init, final in zip(init_passwords, final_passwords):
+            self.assertNotEqual(init, final)
+    def test_the_password_len_and_type(self):
+        """Verify that hash type and len."""
+        salt = "testsalt3"
+        _ = task_func(salt, self.cursor)
+        self.cursor.execute("SELECT password FROM users")
+        for row in self.cursor.fetchall():
+            password = row[0]
+            self.assertTrue(isinstance(password, str) and len(password) == 64,
+                            "Expected hashed password to be 64 characters long")
+    def test_empty_database(self):
+        """Check behavior with an empty user table."""
+        self.cursor.execute("DELETE FROM users")
+        num_updated = task_func("testsalt", self.cursor)
+        self.assertEqual(num_updated, 0, "Expected 0 users to be updated when the table is empty")
+    def test_varied_salts(self):
+        """Ensure different salts produce different hashes for the same password."""
+        self.cursor.execute("UPDATE users SET password = 'constant'")
+        salt1 = "salt1"
+        salt2 = "salt2"
+        task_func(salt1, self.cursor)
+        hash1 = self.cursor.execute("SELECT password FROM users WHERE id = 1").fetchone()[0]
+        
+        self.cursor.execute("UPDATE users SET password = 'constant'")
+        task_func(salt2, self.cursor)
+        hash2 = self.cursor.execute("SELECT password FROM users WHERE id = 1").fetchone()[0]
+        
+        self.assertNotEqual(hash1, hash2, "Hashes should differ when different salts are used")
+    def test_invalid_salt(self):
+        with self.assertRaises(TypeError):
+            task_func(1, self.cursor)

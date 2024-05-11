@@ -1,112 +1,128 @@
-import re
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+import seaborn as sns
+import matplotlib.pyplot as plt
 import os
-import shutil
 
-
-def task_func(directory):
+def task_func(file_path='arena.csv', target_column='Index', seed=42):
     """
-    Arrange files in a directory by their extensions. Create a new directory for each extension and move the 
-    files to the corresponding directories.
+    Trains a random forest model on data from a CSV file, using one column as the target variable (y) 
+    and the rest as features (X), and visualizes the feature importances in a bar plot. This function 
+    also handles missing values by dropping rows with any NaN values.
 
     Parameters:
-    directory (str): The path to the directory.
+    - file_path (str): Path to the CSV file containing the dataset. Defaults to 'arena.csv'.
+    - target_column (str): Name of the column to be used as the target variable (y). Defaults to 'Index'.
+    - seed (int): Seed for the random state of the RandomForestClassifier to ensure reproducibility. Defaults to 42.
 
     Returns:
-    None
+    - matplotlib.axes.Axes: Axes object displaying the bar plot of feature importances.
+    - numpy.ndarray: Array containing the feature importances derived from the random forest model.
+
+    Raises:
+    - FileNotFoundError: Raised if the specified file_path does not lead to a valid file.
+    - ValueError: Raised if the specified target_column is not found in the CSV file's columns, or if the input data contains NaN, infinity or a value too large for dtype('float32').
 
     Requirements:
-    - re
-    - os
-    - shutil
+    - pandas: For loading and manipulating the CSV file.
+    - sklearn.ensemble.RandomForestClassifier: For training the random forest model.
+    - seaborn and matplotlib for plotting the feature importances.
+    - os 
 
     Example:
-    >>> import tempfile
-    >>> temp_dir = tempfile.mkdtemp()
-    >>> with open(temp_dir + '/file1.txt', 'w') as f:
-    ...     _ = f.write('This is a text file.')
-    >>> task_func(temp_dir)
-    >>> os.listdir(temp_dir)
-    ['txt']
+    The CSV file format:
+        Index,Score1,Score2,Score3
+        1,10,20,30
+        2,15,25,35
+        3,20,30,40
+    
+    >>> file_path = 'arena.csv'
+    >>> create_dummy_file(file_path)
+    >>> ax, importances = task_func(file_path, 'Index') # This will train a random forest model predicting 'Index' from 'Score1', 'Score2', and 'Score3', then plot and return the importances of 'Score1', 'Score2', and 'Score3' as features (X).
+    >>> os.remove(file_path)
     """
-    for filename in os.listdir(directory):
-        match = re.search(r'\.(.*?)$', filename)
-        if match:
-            ext_dir = os.path.join(directory, match.group(1))
-            if not os.path.exists(ext_dir):
-                os.mkdir(ext_dir)
-            shutil.move(os.path.join(directory, filename), ext_dir)
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"The file '{file_path}' does not exist.")
+    df = pd.read_csv(file_path)
+    if target_column not in df.columns:
+        raise ValueError(f"The specified target column '{target_column}' does not exist in the CSV file.")
+    df_cleaned = df.dropna()
+    X = df_cleaned.drop(target_column, axis=1)
+    y = df_cleaned[target_column]
+    clf = RandomForestClassifier(random_state=seed)
+    clf.fit(X, y)
+    importances = clf.feature_importances_
+    fig, ax = plt.subplots()
+    sns.barplot(x=X.columns, y=importances, ax=ax)
+    ax.set_title('Feature Importances')
+    return ax, importances
 
 import unittest
+import pandas as pd
 import os
-import shutil
-import doctest
-import tempfile
-# Define the TestCases class containing the blackbox test cases
-class TestCases(unittest.TestCase):
+import numpy as np
+from numpy.testing import assert_array_almost_equal
+def create_dummy_file(file_path):
+    data = {
+        'Index': [1, 2, 3],
+        'Score1': [10, 15, 20],
+        'Score2': [20, 25, 30],
+        'Score3': [30, 35, 40]
+    }
+    df = pd.DataFrame(data)
+    df.to_csv(file_path, index=False)
+class TestCases(unittest.TestCase):    
     def setUp(self):
-        # Setup function to create a test directory before each test case
-        self.base_tmp_dir = tempfile.mkdtemp()
-        self.test_directory = f"{self.base_tmp_dir}/test"
-        if os.path.exists(self.test_directory):
-            shutil.rmtree(self.test_directory)
-        os.mkdir(self.test_directory)
+        # Create a dummy CSV for testing
+        data = {
+            'Index': [1, 2, 3],
+            'Score1': [10, 15, 20],
+            'Score2': [20, 25, 30],
+            'Score3': [30, 35, 40]
+        }
+        df = pd.DataFrame(data)
+        df.to_csv('dummy_arena.csv', index=False)
+        
+        # Create a more complex dummy CSV for advanced testing
+        np.random.seed(42)  # For reproducibility
+        complex_data = {
+            'Index': np.arange(1, 11),
+            'Feature1': np.random.randint(-10, 50, 10),
+            'Feature2': np.random.normal(0, 5, 10),
+            'Feature3': np.random.uniform(25, 75, 10),
+            'Feature4': np.random.lognormal(0, 1, 10),
+            'Feature5': np.linspace(10, 100, 10),
+            'Outcome': np.random.choice([0, 1], 10)  # Binary outcome for classification
+        }
+        complex_df = pd.DataFrame(complex_data)
+        # Introduce some missing values
+        complex_df.loc[4:6, 'Feature2'] = np.nan
+        complex_df.loc[2:3, 'Feature4'] = np.nan
+        complex_df.to_csv('complex_dummy_arena.csv', index=False)
     def tearDown(self):
-        # Teardown function to remove the test directory after each test case
-        shutil.rmtree(self.test_directory)
-    def create_sample_files(self, file_list):
-        # Helper function to create sample files for test cases
-        for file in file_list:
-            with open(os.path.join(self.test_directory, file), "w") as f:
-                f.write(f"Content of {file}")
-    def test_case_1(self):
-        # Test case 1: Organizing files with standard extensions
-        files = ["file1.txt", "image1.jpg", "document1.pdf"]
-        self.create_sample_files(files)
+        os.remove('dummy_arena.csv')
+        os.remove('complex_dummy_arena.csv')
+    def test_feature_importances(self):
+        # Test the function for normal functionality
+        ax, importances = task_func('dummy_arena.csv', 'Index')
+        self.assertEqual(len(importances), 3)  # Expecting 3 features
+        self.assertTrue(np.all(importances >= 0))  # Importances should be non-negative
+        expect = np.array([0.35294118, 0.36470588, 0.28235294])
+        assert_array_almost_equal(importances, expect, decimal=6)
         
-        task_func(self.test_directory)
-        
-        expected_directories = ["txt", "jpg", "pdf"]
-        actual_directories = os.listdir(self.test_directory)
-        
-        for dir_name in expected_directories:
-            self.assertIn(dir_name, actual_directories)
-    def test_case_2(self):
-        # Test case 2: Organizing files with no extensions
-        files = ["file1", "document2"]
-        self.create_sample_files(files)
-        
-        task_func(self.test_directory)
-        
-        # Expected behavior: files without extensions remain in the main directory
-        for file_name in files:
-            self.assertIn(file_name, os.listdir(self.test_directory))
-    def test_case_3(self):
-        # Test case 3: Organizing files with uncommon or made-up extensions
-        files = ["data.xyz", "notes.abc123"]
-        self.create_sample_files(files)
-        
-        task_func(self.test_directory)
-        
-        expected_directories = ["xyz", "abc123"]
-        actual_directories = os.listdir(self.test_directory)
-        
-        for dir_name in expected_directories:
-            self.assertIn(dir_name, actual_directories)
-    def test_case_4(self):
-        # Test case 4: Checking the behavior when the directory is empty
-        task_func(self.test_directory)
-        
-        # Expected behavior: directory remains empty
-        self.assertEqual(len(os.listdir(self.test_directory)), 0)
-    def test_case_5(self):
-        # Test case 5: Checking the behavior when some sub-directories already exist
-        os.mkdir(os.path.join(self.test_directory, "txt"))
-        files = ["file1.txt", "file2.txt"]
-        self.create_sample_files(files)
-        
-        task_func(self.test_directory)
-        
-        # Expected behavior: files are moved to the existing "txt" sub-directory
-        txt_files = os.listdir(os.path.join(self.test_directory, "txt"))
-        for file_name in files:
-            self.assertIn(file_name, txt_files)
+    def test_file_not_found(self):
+        # Test FileNotFoundError
+        with self.assertRaises(FileNotFoundError):
+            task_func('nonexistent.csv', 'Index')
+    def test_invalid_target_column(self):
+        # Test ValueError for invalid target column
+        with self.assertRaises(ValueError):
+            task_func('dummy_arena.csv', 'NonexistentColumn')
+            
+    
+    def test_feature_importances1(self):
+        # Test the function for normal functionality
+        ax, importances = task_func('complex_dummy_arena.csv', 'Index')
+        print(importances)
+        expect = np.array([0.16335979, 0.22973545, 0.15900794, 0.18597884, 0.19796296, 0.06395503])
+        assert_array_almost_equal(importances, expect, decimal=6)

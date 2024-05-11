@@ -1,56 +1,68 @@
 import pandas as pd
-from scipy.stats import skew
+import matplotlib.pyplot as plt
 
-def task_func(df):
+def task_func(df, letters=list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')):
     """
-    Calculate the skewness of the last column of the dataframe.
+    Create and return a bar chart of the frequency of letters in a DataFrame 
+    where the column 'Letters' contains English uppercase letters.
 
     Parameters:
-    df (DataFrame): The input dataframe.
+    df (DataFrame): The DataFrame with a 'Letters' column.
+    letters (list, optional): List of English uppercase letters. Defaults to A-Z.
 
     Returns:
-    float: The skewness of the last column of the dataframe.
+    Axes: A Matplotlib Axes object representing the bar graph of letter frequency, with the x-axis labeled 'Letters', the y-axis labeled 'Frequency', and the title 'Letter Frequency'.
 
     Raises:
-    ValueError: If the input is not a DataFrame or has no columns.
+    ValueError: If 'df' is not a DataFrame or lacks the 'Letters' column.
 
     Requirements:
     - pandas
-    - scipy.stats
-    
+    - matplotlib.pyplot
+
     Example:
-    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-    >>> skewness = task_func(df)
+    >>> import random
+    >>> random.seed(42)
+    >>> df = pd.DataFrame({'Letters': random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ', k=100)})
+    >>> ax = task_func(df)
+    >>> plt.show()
     """
-    if not isinstance(df, pd.DataFrame) or df.empty:
-        raise ValueError("Input must be a non-empty pandas DataFrame.")
-    last_col = df.columns[-1]
-    skewness = skew(df[last_col].dropna())  # dropna() to handle NaN values
-    return skewness
+    if not isinstance(df, pd.DataFrame) or 'Letters' not in df.columns:
+        raise ValueError("The input must be a pandas DataFrame with a 'Letters' column.")
+    letter_frequency = df['Letters'].value_counts().reindex(letters, fill_value=0)
+    ax = letter_frequency.plot(kind='bar')
+    ax.set_title('Letter Frequency')
+    ax.set_xlabel('Letters')
+    ax.set_ylabel('Frequency')
+    plt.show()
+    return ax
 
 import unittest
-import numpy as np
-import pandas as pd 
+import pandas as pd
+import random
 class TestCases(unittest.TestCase):
     def setUp(self):
-        np.random.seed(42)
-        self.df = pd.DataFrame(np.random.randint(0, 100, size=(100, 4)), columns=list('ABCD'))
-    def test_skewness_calculation(self):
-        skewness = task_func(self.df)
-        # print(skewness)
-        self.assertIsInstance(skewness, float)
-        self.assertAlmostEqual(-0.1670862308059806, skewness)
+        self.letters = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        random.seed(42)
+        self.df = pd.DataFrame({'Letters': random.choices(self.letters, k=100)})
+    def test_return_type(self):
+        ax = task_func(self.df)
+        self.assertIsInstance(ax, plt.Axes)
+    def test_invalid_input_empty_dataframe(self):
+        with self.assertRaises(ValueError):
+            task_func(pd.DataFrame())
     def test_invalid_input_type(self):
         with self.assertRaises(ValueError):
             task_func("not a dataframe")
-    def test_empty_dataframe(self):
-        with self.assertRaises(ValueError):
-            task_func(pd.DataFrame())
-    def test_with_nan_values(self):
-        self.df.iloc[::10, -1] = np.nan
-        skewness = task_func(self.df)
-        self.assertIsInstance(skewness, float)
-    def test_single_column_df(self):
-        df_single_col = pd.DataFrame(self.df.iloc[:, 0])
-        skewness = task_func(df_single_col)
-        self.assertIsInstance(skewness, float)
+    def test_plot_labels(self):
+        ax = task_func(self.df)
+        self.assertEqual(ax.get_title(), 'Letter Frequency')
+        self.assertEqual(ax.get_xlabel(), 'Letters')
+        self.assertEqual(ax.get_ylabel(), 'Frequency')
+    def test_bar_chart_values(self):
+        letter_counts = self.df['Letters'].value_counts()
+        ax = task_func(self.df)
+        bars = ax.containers[0]
+        for i, bar in enumerate(bars):
+            expected_height = letter_counts.get(self.letters[i], 0)
+            self.assertEqual(bar.get_height(), expected_height)

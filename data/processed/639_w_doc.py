@@ -1,52 +1,62 @@
 import numpy as np
 import pandas as pd
+import seaborn as sns
 
 
-def task_func(num_teams=5, num_games=100):
+def task_func(num_samples=100, num_features=5):
     """
-    Create a Pandas DataFrame that displays the random scores of different teams in multiple games.
-    The function generates random scores for each game played by each team and populates them in
-    a DataFrame with index=teams, columns=games.
-
+    Generate a Pandas DataFrame with random values, representing a dataset with multiple features. 
+    Calculate the correlation between the features and visualize this information using a heatmap.
+    
     Parameters:
-    - num_teams (int, optional): The number of teams participating. Default is 5.
-    - num_games (int, optional): The number of games played. Default is 100.
-
+    - num_samples (int): The number of samples to generate. Default is 100.
+    - num_features (int): The number of features to generate. Default is 5.
+    
     Returns:
-    DataFrame: The generated DataFrame containing random scores for each team in each game.
+    - DataFrame: The generated DataFrame with random values.
+    - Axes: The heatmap visualization of the correlation matrix.
 
     Requirements:
     - pandas
     - numpy
-
+    - seaborn
+    
     Example:
-    >>> df = task_func(num_teams=3, num_games=10)
-    >>> type(df)
-    <class 'pandas.core.frame.DataFrame'>
+    >>> df, ax = task_func(10, 3)
+    >>> ax.figure.show()
     """
-    scores = np.random.randint(0, 101, size=(num_teams, num_games))
-    teams = ['Team' + str(i) for i in range(1, num_teams + 1)]
-    games = ['Game' + str(i) for i in range(1, num_games + 1)]
-    df = pd.DataFrame(scores, index=teams, columns=games)
-    return df
+    FEATURES = ['Feature' + str(i) for i in range(1, num_features + 1)]
+    SAMPLES = ['Sample' + str(i) for i in range(1, num_samples + 1)]
+    data = np.random.rand(len(SAMPLES), len(FEATURES))
+    df = pd.DataFrame(data, index=SAMPLES, columns=FEATURES)
+    corr_matrix = df.corr()
+    ax = sns.heatmap(corr_matrix, annot=True)
+    return df, ax
 
 import unittest
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
+    
     def test_case_1(self):
-        df = task_func()
-        self.assertEqual(df.shape, (5, 100))
-    def test_case_2(self):
-        df = task_func(num_teams=3, num_games=10)
-        self.assertEqual(df.shape, (3, 10))
+        df, ax = task_func()
+        self.assertEqual(df.shape, (100, 5))
+        self.assertIsInstance(ax, plt.Axes)
         
+    def test_case_2(self):
+        df, ax = task_func(10, 3)
+        self.assertEqual(df.shape, (10, 3))
+        self.assertIsInstance(ax, plt.Axes)
     def test_case_3(self):
-        df = task_func(num_teams=4, num_games=20)
-        self.assertListEqual(list(df.index), ['Team1', 'Team2', 'Team3', 'Team4'])
+        df, ax = task_func(50, 2)
+        self.assertEqual(df.shape, (50, 2))
+        self.assertIsInstance(ax, plt.Axes)
         
     def test_case_4(self):
-        df = task_func(num_teams=2, num_games=5)
-        self.assertListEqual(list(df.columns), ['Game1', 'Game2', 'Game3', 'Game4', 'Game5'])
+        df, ax = task_func(150, 6)
+        self.assertEqual(df.shape, (150, 6))
+        self.assertIsInstance(ax, plt.Axes)
         
     def test_case_5(self):
-        df = task_func(num_teams=2, num_games=5)
-        self.assertTrue((df.dtypes == 'int64').all())
+        df, ax = task_func(5, 10)
+        self.assertEqual(df.shape, (5, 10))
+        self.assertIsInstance(ax, plt.Axes)

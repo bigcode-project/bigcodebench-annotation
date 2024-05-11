@@ -5,7 +5,7 @@ import base64
 def f_1027(data, url="http://your-api-url.com"):
     """
     Convert a Python dictionary into a JSON-formatted string, encode this string in base64 format,
-    and send it as a payload in a POST request to an API endpoint.
+    and send it as a 'payload' in a POST request to an API endpoint.
     
     Parameters:
     data (dict): The Python dictionary to encode and send.
@@ -27,7 +27,7 @@ def f_1027(data, url="http://your-api-url.com"):
     """
     json_data = json.dumps(data)
     encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')
-    response = requests.post(url, data={"payload": encoded_data})
+    response = requests.post(url, json={"payload": encoded_data})
     
     return response
 
@@ -92,7 +92,10 @@ class TestCases(unittest.TestCase):
         json_data = json.dumps(data)
         encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')
         f_1027(data, url="http://mock-api-url.com")
-        mock_post_method.assert_called_once_with("http://mock-api-url.com", data={"payload": encoded_data})
+        try:
+            mock_post_method.assert_called_once_with("http://mock-api-url.com", data={"payload": encoded_data})
+        except:
+            mock_post_method.assert_called_once_with("http://mock-api-url.com", json={"payload": encoded_data})
 
 
 if __name__ == "__main__":

@@ -1,120 +1,118 @@
-import os
-import json
-from collections import Counter
+import mechanize
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
-
-def task_func(json_files_path='./json_files/', key='name'):
+def task_func(url):
     """
-    Count the occurrence of a particular key in all json files in a specified directory 
-    and return a dictionary with the values of the specified key and their counts.
-    
+    Extracts all hyperlinks (href attributes) from the specified URL using the mechanize
+    browser object and BeautifulSoup. Absolute URLs are combined with the base URL.
+
     Parameters:
-    - json_files_path (str): The path to the directory containing the JSON files. Default is './json_files/'.
-    - key (str): The key in the JSON files whose values need to be counted. Default is 'name'.
-    
-    Returns:
-    dict: A dictionary with values of the key as keys and their counts as values.
-    
-    Requirements:
-    - os
-    - json
-    - collections.Counter
-    
-    Example:
-    >>> import tempfile
-    >>> import json
-    >>> directory = tempfile.mkdtemp()
-    >>> data = [{'product': 'apple', 'quantity': 5}, {'product': 'banana', 'quantity': 3}]
-    >>> for i, d in enumerate(data):
-    ...     with open(f"{directory}/{i}.json", 'w') as file:
-    ...         json.dump(d, file)
+        url (str): The URL from which hyperlinks are to be extracted.
 
-    >>> task_func(json_files_path=directory, key='product')
-    {'apple': 1, 'banana': 1}
+    Returns:
+        list: A list of strings, each being a hyperlink found on the page.
+
+    Requirements:
+        - mechanize
+        - urllib.parse.urljoin
+        - bs4.BeautifulSoup
+
+    Examples:
+        >>> isinstance(task_func('https://www.example.com'), list)
+        True
+        >>> 'https://www.example.com/about' in task_func('https://www.example.com')
+        True or False, depending on the actual content of 'https://www.example.com'
     """
-    key_values = []
-    for filename in os.listdir(json_files_path):
-        if filename.endswith('.json'):
-            file_path = os.path.join(json_files_path, filename)
-            with open(file_path, 'r') as json_file:
-                data = json.load(json_file)
-                if key in data:
-                    key_values.append(data[key])
-    return dict(Counter(key_values))
+    br = mechanize.Browser()
+    response = br.open(url)
+    soup = BeautifulSoup(response.read(), 'html.parser')
+    links = [urljoin(url, a['href']) for a in soup.find_all('a', href=True)]
+    return links
 
 import unittest
-import doctest
-import tempfile
+from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.mock_data_directory = tempfile.mkdtemp()
-        
-        # Create mock data
-        mock_data = [
-            {'name': 'John', 'city': 'New York'},
-            {'name': 'Jane', 'city': 'Los Angeles'},
-            {'name': 'John', 'city': 'New York'},
-            {'name': 'Alice', 'city': 'Chicago'},
-            {'name': 'Bob', 'city': 'New York'},
-            {'name': 'Alice', 'city': 'Chicago'},
-            {'name': 'Alice', 'city': 'Chicago'},
-            {'city': 'Los Angeles'},
-            {'city': 'Chicago'},
-            {'city': 'New York'},
-            {'city': 'New York'},
-            {'city': 'New York'},
-        ]
-        
-        for i, data in enumerate(mock_data):
-            with open(f"{self.mock_data_directory}/{i}.json", 'w') as file:
-                json.dump(data, file)
-    
-    def test_case_1(self):
-        # Test with mock data directory and 'name' key
-        result = task_func(self.mock_data_directory, 'name')
-        
-        # To verify the result, we need to read all JSON files and count the occurrences of the 'name' key values
-        expected_counts = []
-        for filename in os.listdir(self.mock_data_directory):
-            if filename.endswith('.json'):
-                with open(os.path.join(self.mock_data_directory, filename), 'r') as file:
-                    data = json.load(file)
-                    if 'name' in data:
-                        expected_counts.append(data['name'])
-                        
-        expected_result = dict(Counter(expected_counts))
-        
-        self.assertDictEqual(result, expected_result)
-    def test_case_2(self):
-        # Test with a non-existent key
-        result = task_func(self.mock_data_directory, 'non_existent_key')
-        self.assertDictEqual(result, {})
-    def test_case_3(self):
-        # Test with another key present in our mock data ('city' in this case)
-        result = task_func(self.mock_data_directory, 'city')
-        
-        # To verify the result, we need to read all JSON files and count the occurrences of the 'city' key values
-        expected_counts = []
-        for filename in os.listdir(self.mock_data_directory):
-            if filename.endswith('.json'):
-                with open(os.path.join(self.mock_data_directory, filename), 'r') as file:
-                    data = json.load(file)
-                    if 'city' in data:
-                        expected_counts.append(data['city'])
-                        
-        expected_result = dict(Counter(expected_counts))
-        
-        self.assertDictEqual(result, expected_result)
-    def test_case_4(self):
-        # Test with a directory that doesn't contain any JSON files
-        empty_directory = f"{self.mock_data_directory}/empty_directory/"
-        os.makedirs(empty_directory, exist_ok=True)
-        
-        result = task_func(empty_directory, 'name')
-        self.assertDictEqual(result, {})
-    def test_case_5(self):
-        # Test with a directory that doesn't exist
-        non_existent_directory = f"{self.mock_data_directory}/non_existent_directory/"
-        
-        with self.assertRaises(FileNotFoundError):
-            task_func(non_existent_directory, 'name')
+    @patch('mechanize.Browser')
+    def test_return_type(self, mock_browser):
+        """Test that the function returns a list."""
+        html_content = "<html><body><a href='https://www.example.com'>Example</a></body></html>"
+        mock_browser_instance = mock_browser.return_value
+        mock_browser_instance.open.return_value.read.return_value = html_content
+        result = task_func('https://www.example.com')
+        self.assertIsInstance(result, list)
+    @patch('mechanize.Browser')
+    def test_extracted_links(self, mock_browser):
+        """Test the extracted links from a mock HTML page."""
+        html_content = "<html><body><a href='https://www.example.com'>Example</a></body></html>"
+        mock_browser_instance = mock_browser.return_value
+        mock_browser_instance.open.return_value.read.return_value = html_content
+        result = task_func('https://www.example.com')
+        self.assertIn('https://www.example.com', result)
+    @patch('mechanize.Browser')
+    def test_invalid_url(self, mock_browser):
+        """Test the function with an invalid URL."""
+        mock_browser_instance = mock_browser.return_value
+        mock_browser_instance.open.side_effect = mechanize.URLError('Invalid URL')
+        with self.assertRaises(mechanize.URLError):
+            task_func('invalid_url')
+    @patch('mechanize.Browser')
+    def test_no_links(self, mock_browser):
+        """Test a page with no links."""
+        html_content = "<html><body>No links here</body></html>"
+        mock_browser_instance = mock_browser.return_value
+        mock_browser_instance.open.return_value.read.return_value = html_content
+        result = task_func('https://www.example.com')
+        self.assertEqual(result, [])
+    @patch('mechanize.Browser')
+    def test_multiple_links_extraction(self, mock_browser):
+        """Test extraction of multiple links."""
+        html_content = "<html><body><a href='https://www.example.com'>Example 1</a><a href='https://www.example.com/about'>Example 2</a></body></html>"
+        mock_browser_instance = mock_browser.return_value
+        mock_browser_instance.open.return_value.read.return_value = html_content
+        result = task_func('https://www.example.com')
+        self.assertEqual(len(result), 2)
+    @patch('mechanize.Browser')
+    def test_relative_urls(self, mock_browser):
+        """Test handling of relative URLs."""
+        html_content = "<html><body><a href='/about'>About</a></body></html>"
+        mock_browser_instance = mock_browser.return_value
+        mock_browser_instance.open.return_value.read.return_value = html_content
+        result = task_func('https://www.example.com')
+        self.assertIn('https://www.example.com/about', result)
+    @patch('mechanize.Browser')
+    def test_https_and_http_urls(self, mock_browser):
+        """Test handling of both HTTPS and HTTP URLs."""
+        html_content = "<html><body><a href='https://www.example.com'>Secure Link</a><a href='http://www.example.com'>Regular Link</a></body></html>"
+        mock_browser_instance = mock_browser.return_value
+        mock_browser_instance.open.return_value.read.return_value = html_content
+        result = task_func('https://www.example.com')
+        self.assertIn('https://www.example.com', result)
+        self.assertIn('http://www.example.com', result)
+    @patch('mechanize.Browser')
+    def test_links_with_different_attributes(self, mock_browser):
+        """Test extraction of links with different attributes."""
+        html_content = "<html><body><a href='https://www.example.com' id='link1' class='link'>Example Link</a></body></html>"
+        mock_browser_instance = mock_browser.return_value
+        mock_browser_instance.open.return_value.read.return_value = html_content
+        result = task_func('https://www.example.com')
+        self.assertIn('https://www.example.com', result)
+    @patch('mechanize.Browser')
+    def test_html_content_with_nested_elements(self, mock_browser):
+        """Test extraction of links with nested elements."""
+        html_content = "<html><body><a href='https://www.example.com'><span>Nested Link</span></a></body></html>"
+        mock_browser_instance = mock_browser.return_value
+        mock_browser_instance.open.return_value.read.return_value = html_content
+        result = task_func('https://www.example.com')
+        self.assertIn('https://www.example.com', result)
+    @patch('mechanize.Browser')
+    def test_performance_with_large_html_content(self, mock_browser):
+        """Test performance with large HTML content."""
+        html_content = "<html><body>"
+        for i in range(10000):
+            html_content += "<a href='https://www.example.com/page{}'>Link{}</a>".format(i, i)
+        html_content += "</body></html>"
+        mock_browser_instance = mock_browser.return_value
+        mock_browser_instance.open.return_value.read.return_value = html_content
+        result = task_func('https://www.example.com')
+        self.assertEqual(len(result), 10000)

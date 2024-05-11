@@ -1,128 +1,110 @@
 import numpy as np
-from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
+from scipy.stats import norm
 
-
-def task_func(data, n_components=2, random_state=None):
+def task_func(mu=0, sigma=1):
     """
-    Performs Principal Component Analysis (PCA) on the provided dataset to reduce its dimensionality,
-    and visualizes the results using a scatter plot.
-
-    This function applies PCA to the dataset, reducing its features to the specified number of principal components.
-    It then visualizes the reduced data in a scatter plot. For datasets reduced to a single component, the function
-    generates a 1D scatter plot along the X-axis, with all Y-values set to zero. For reductions resulting in two or more
-    components, only the first two principal components are visualized.
+    Draw and return a subplot of a normal distribution with the given mean and standard deviation,
+    utilizing numpy's linspace to create an array of 100 linearly spaced numbers between
+    `mu - 3*sigma` and `mu + 3*sigma`.
 
     Parameters:
-    - data (ndarray): A numpy ndarray of shape (n_samples, n_features) representing the data.
-    - n_components (int, optional): Number of components to keep. Defaults to 2.
-    - random_state (int, optional): Seed for reproducibility. Defaults to None.
+    mu (float): The mean of the distribution. Default is 0.
+    sigma (float): The standard deviation of the distribution. Default is 1.
 
     Returns:
-    dict: A dictionary containing:
-        - "transformed_data" (np.ndarray): The transformed data.
-        - "ax" (plt.Axes): The scatter plot visualizing the transformed data.
+    matplotlib.axes.Axes: The subplot representing the normal distribution.
 
     Requirements:
     - numpy
-    - matplotlib
-    - sklearn
+    - matplotlib.pyplot
+    - scipy.stats.norm
 
     Example:
-    >>> data = np.random.random((100, 5))
-    >>> results = task_func(data, random_state=42)
-    >>> results['transformed_data'].shape
-    (100, 2)
-    >>> type(results['ax'])
+    >>> ax = task_func(mu=5, sigma=2)
+    >>> ax
+    <Axes: >
+    >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-    pca = PCA(n_components=n_components, random_state=random_state)
-    transformed_data = pca.fit_transform(data)
+    x = np.linspace(mu - 3 * sigma, mu + 3 * sigma, 100)
+    y = norm.pdf(x, mu, sigma)
     fig, ax = plt.subplots()
-    if transformed_data.shape[1] == 1:
-        ax.scatter(transformed_data[:, 0], np.zeros_like(transformed_data[:, 0]))
-    else:
-        ax.scatter(transformed_data[:, 0], transformed_data[:, 1])
-    return {"transformed_data": transformed_data, "ax": ax}
+    ax.plot(x, y)
+    return ax
 
 import unittest
-from sklearn.decomposition import PCA
 import numpy as np
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.seed = 42
-        self.n = 100
-        self.n_dims = 5
-        self.n_components = 2
-        self.data = np.random.RandomState(self.seed).random((self.n, self.n_dims))
-    def assert_pca_correctness(self, data, results, n_components, random_state):
-        """Helper method to assert PCA correctness"""
-        # 1. Variance explained
-        pca = PCA(n_components=n_components, random_state=random_state)
-        pca.fit(data)
-        explained_variance_ratio = pca.explained_variance_ratio_
-        if data.shape[1] == 1:
-            # For one-dimensional data, the explained variance ratio should be 1
-            self.assertAlmostEqual(explained_variance_ratio[0], 1.0, delta=1e-2)
-        else:
-            cov_matrix = np.cov(data, rowvar=False)
-            eigenvalues = np.linalg.eigvals(cov_matrix)
-            sorted_eigenvalues = np.sort(eigenvalues)[::-1][:n_components]
-            normalized_eigenvalues = sorted_eigenvalues / sum(eigenvalues)
-            self.assertTrue(
-                np.allclose(explained_variance_ratio, normalized_eigenvalues, atol=1e-1)
-            )
-        # 2. Orthogonality
-        for i in range(n_components):
-            for j in range(i + 1, n_components):
-                dot_product = np.dot(
-                    results["transformed_data"][:, i], results["transformed_data"][:, j]
-                )
-                self.assertAlmostEqual(dot_product, 0, delta=1e-2)
     def test_case_1(self):
-        # Test with default settings
-        results = task_func(self.data, random_state=self.seed)
-        self.assertEqual(results["transformed_data"].shape, (self.n, self.n_components))
-        x_data = results["ax"].collections[0].get_offsets()[:, 0]
-        y_data = results["ax"].collections[0].get_offsets()[:, 1]
-        self.assertTrue(np.array_equal(x_data, results["transformed_data"][:, 0]))
-        self.assertTrue(np.array_equal(y_data, results["transformed_data"][:, 1]))
-        self.assert_pca_correctness(self.data, results, self.n_components, self.seed)
+        # Test default parameters
+        ax = task_func()
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        self.assertAlmostEqual(x[np.argmax(y)], 0, delta=0.1)
+        self.assertTrue(min(x) >= -3 and max(x) <= 3)
     def test_case_2(self):
-        # Test n_components
-        for n_components in [1, 2, min(self.data.shape)]:
-            results = task_func(self.data, n_components=n_components, random_state=42)
-            self.assertEqual(results["transformed_data"].shape[1], n_components)
-            self.assert_pca_correctness(self.data, results, n_components, self.seed)
+        # Test positive mu and sigma with manual calculation
+        ax = task_func(mu=5, sigma=2)
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        expected_min, expected_max = 5 - 3 * 2, 5 + 3 * 2
+        self.assertAlmostEqual(min(x), expected_min, delta=0.1)
+        self.assertAlmostEqual(max(x), expected_max, delta=0.1)
     def test_case_3(self):
-        # Test when one of the features has zero variance
-        data = self.data.copy()
-        data[:, 1] = 0  # Second feature has zero variance
-        results = task_func(data, n_components=2, random_state=self.seed)
-        self.assertEqual(results["transformed_data"].shape, (100, 2))
-        self.assert_pca_correctness(data, results, 2, self.seed)
+        # Test negative mu and small sigma
+        ax = task_func(mu=-3, sigma=0.5)
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        self.assertAlmostEqual(x[np.argmax(y)], -3, delta=0.1)
+        self.assertTrue(min(x) >= -3 - 1.5 and max(x) <= -3 + 1.5)
     def test_case_4(self):
-        # Test with n_components greater than min(n_samples, n_features)
-        data = np.random.RandomState(self.seed).randn(10, 2)
-        with self.assertRaises(ValueError):
-            task_func(data, n_components=3, random_state=self.seed)
+        # Test large mu and sigma
+        mu, sigma = 1e6, 1e5
+        ax = task_func(mu=mu, sigma=sigma)
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        self.assertTrue(
+            len(x) > 0 and len(y) > 0,
+            "Plot data should not be empty even for large mu and sigma.",
+        )
     def test_case_5(self):
-        # Test with a single sample
-        data = np.random.RandomState(self.seed).randn(1, self.n_dims)
-        with self.assertRaises(ValueError):
-            task_func(data)
+        # Test negative mu
+        ax = task_func(mu=-5, sigma=4)
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        self.assertAlmostEqual(x[np.argmax(y)], -5, delta=0.15)
+        self.assertTrue(min(x) >= -5 - 12 and max(x) <= -5 + 12)
     def test_case_6(self):
-        # Edge case - test when dataset contains NaN
-        data = self.data.copy()
-        data[0, 0] = np.nan  # Introduce a NaN value
-        with self.assertRaises(ValueError):
-            task_func(data, n_components=2, random_state=self.seed)
+        # Test the function with a sigma of 0, which might represent a degenerate distribution
+        ax = task_func(mu=0, sigma=0)
+        lines = ax.get_lines()
+        self.assertEqual(
+            len(lines),
+            1,
+            "Plot should contain exactly one line for a degenerate distribution.",
+        )
     def test_case_7(self):
-        # Edge case - test when dataset contains infinite values
-        data = self.data.copy()
-        data[0, 0] = np.inf  # Introduce an infinite value
-        with self.assertRaises(ValueError):
-            task_func(data, n_components=2, random_state=self.seed)
+        # Test the function with extremely large values of mu and sigma to ensure it doesn't break
+        ax = task_func(mu=1e6, sigma=1e5)
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        self.assertTrue(
+            len(x) > 0 and len(y) > 0,
+            "Plot data should not be empty even for large mu and sigma.",
+        )
+    def test_case_8(self):
+        # Test the function with a very small positive sigma to check narrow distributions
+        ax = task_func(mu=0, sigma=1e-5)
+        lines = ax.get_lines()
+        x, y = lines[0].get_data()
+        # Checking that the plot peak is at mu and sigma affects the curve's spread.
+        self.assertAlmostEqual(
+            x[np.argmax(y)],
+            0,
+            delta=1e-5,
+            msg="Peak of the distribution should be at mu.",
+        )
     def tearDown(self):
         plt.close("all")

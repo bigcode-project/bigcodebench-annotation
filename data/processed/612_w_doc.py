@@ -1,74 +1,140 @@
-from random import sample
-import matplotlib.pyplot as plt
+from random import choice
+import numpy as np
+import pandas as pd
 
 
 # Constants
-COLUMNS = ['A', 'B', 'C', 'D', 'E']
+TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
+PENALTIES_COSTS = [100, 200, 300, 400, 500]
 
 
-def task_func(df, tuples, n_plots):
+def task_func(goals, penalties, teams=TEAMS, penalties_costs=PENALTIES_COSTS):
     """
-    Removes rows from a DataFrame based on values of multiple columns, 
-    and then create n random line plots of two columns against each other.
+    Generates a performance report DataFrame for teams, detailing goals and penalties. For each team, the function fetches
+    goal and penalty counts, calculates 'Penalties Cost' using a random multiplier from a predefined list, and computes
+    a 'Performance Score' as the non-negative difference between goals and penalties. Return a Dataframe with colomns 'Team',
+    'Goals', 'Penalties', 'Penalties Cost' and 'Performance Score'.
 
     Parameters:
-    - df (pd.DataFrame): The input pandas DataFrame.
-    - tuples (list of tuple): A list of tuples, each tuple represents values in a row to be removed.
-    - n_plots (int): The number of line plots to generate.
+    - goals (dict): Team names as keys, numbers of goals scored as values.
+    - penalties (dict): Team names as keys, numbers of penalties incurred as values.
+    - teams (list, optioanl): input teams. Default value is ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
+    - penalties_costs (list, optional): input penalties_costs. Default value is [100, 200, 300, 400, 500].
 
     Returns:
-    - (pd.DataFrame, list): A tuple containing the modified DataFrame and a list of plot details.
-      Each entry in the plot details list is a tuple containing the two columns plotted against each other.
+    - pd.DataFrame: DataFrame with Team, Goals, Penalties, Penalties Cost, Performance Score.
 
     Requirements:
-    - matplotlib.pyplot
-    - random
+    - pandas
+    - numpy
+    - random.choice
 
     Example:
-    >>> import numpy as np, pandas as pd
-    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
-    >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-    >>> modified_df, plot_details = task_func(df, tuples, 3)
+    >>> goals = {'Team A': 3, 'Team B': 2}
+    >>> penalties = {'Team A': 1, 'Team B': 0}
+    >>> report = task_func(goals, penalties)
     """
-    mask = df.apply(tuple, axis=1).isin(tuples)
-    df = df[~mask]
-    plot_details = []
-    for _ in range(min(n_plots, len(df))):
-        selected_columns = sample(COLUMNS, 2)
-        df.plot(x=selected_columns[0], y=selected_columns[1], kind='line')
-        plot_details.append((selected_columns[0], selected_columns[1]))
-    plt.show()
-    return df, plot_details
+    report_data = []
+    for team in teams:
+        team_goals = goals.get(team, 0)
+        team_penalties = penalties.get(team, 0)
+        penalties_cost = team_penalties * choice(penalties_costs)
+        performance_score = np.max([0, team_goals - team_penalties])
+        report_data.append({
+            'Team': team,
+            'Goals': team_goals,
+            'Penalties': team_penalties,
+            'Penalties Cost': penalties_cost,
+            'Performance Score': performance_score
+        })
+    report_df = pd.DataFrame(report_data)
+    return report_df
 
 import unittest
-import numpy as np
-import pandas as pd
-# Unit test class
+from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
-        self.tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-    def test_basic_functionality(self):
-        modified_df, plot_details = task_func(self.df, self.tuples, 3)
-        # Convert DataFrame rows to tuples for comparison
-        df_tuples = set([tuple(x) for x in modified_df.to_numpy()])
-        # Convert list of tuples to a set for efficient searching
-        tuples_to_remove = set(self.tuples)
-        # Check that none of the tuples to remove are in the modified DataFrame
-        intersection = df_tuples.intersection(tuples_to_remove)
-        self.assertTrue(len(intersection) == 0, f"Removed tuples found in the modified DataFrame: {intersection}")
-    def test_empty_dataframe(self):
-        empty_df = pd.DataFrame(columns=list('ABCDE'))
-        modified_df, plot_details = task_func(empty_df, [], 1)
-        self.assertTrue(modified_df.empty)
-    def test_zero_plots(self):
-        modified_df, plot_details = task_func(self.df, [], 0)
-        self.assertEqual(len(plot_details), 0)
-    def test_more_plots_than_data(self):
-        modified_df, plot_details = task_func(self.df.iloc[:5], [], 10)
-        self.assertTrue(len(plot_details) <= 5)
-    def test_plot_details(self):
-        _, plot_details = task_func(self.df, [], 3)
-        self.assertEqual(len(plot_details), 3)
-        all_columns = all(c[0] in COLUMNS and c[1] in COLUMNS for c in plot_details)
-        self.assertTrue(all_columns)
+    @patch(__name__ + '.choice', return_value=400)
+    def test_goals_greater_than_penalties(self, mock_choice):
+        goals = {'Team A': 4, 'Team B': 2, 'Team C': 0, 'Team D': 0, 'Team E': 0}
+        penalties = {'Team A': 1, 'Team B': 1, 'Team C': 0, 'Team D': 0, 'Team E': 0}
+        expected_data = {
+            'Team': TEAMS,
+            'Goals': [4, 2, 0, 0, 0],
+            'Penalties': [1, 1, 0, 0, 0],
+            'Penalties Cost': [400, 400, 0, 0, 0],  # Mocked value is reflected here
+            'Performance Score': [3, 1, 0, 0, 0]  # Assuming Performance Score is Goals - Penalties
+        }
+        expected_df = pd.DataFrame(expected_data)
+        result_df = task_func(goals, penalties)
+        pd.testing.assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
+    @patch(__name__ + '.choice', return_value=200)
+    def test_some_teams_missing(self, mock_choice):
+        goals = {'Team A': 2, 'Team E': 5}
+        penalties = {'Team A': 0, 'Team E': 3}
+        expected_data = {
+            'Team': TEAMS,
+            'Goals': [2, 0, 0, 0, 5],
+            'Penalties': [0, 0, 0, 0, 3],
+            'Penalties Cost': [0, 0, 0, 0, 600],
+            'Performance Score': [2, 0, 0, 0, 2]
+        }
+        expected_df = pd.DataFrame(expected_data)
+        result_df = task_func(goals, penalties)
+        pd.testing.assert_frame_equal(result_df, expected_df)
+    @patch(__name__ + '.choice', return_value=500)
+    def test_penalties_greater_than_goals(self, mock_choice):
+        goals = {'Team B': 1, 'Team D': 2}
+        penalties = {'Team B': 3, 'Team D': 5}
+        expected_data = {
+            'Team': TEAMS,
+            'Goals': [0, 1, 0, 2, 0],
+            'Penalties': [0, 3, 0, 5, 0],
+            'Penalties Cost': [0, 1500, 0, 2500, 0],
+            'Performance Score': [0, 0, 0, 0, 0]
+        }
+        expected_df = pd.DataFrame(expected_data)
+        result_df = task_func(goals, penalties)
+        pd.testing.assert_frame_equal(result_df, expected_df)
+    @patch(__name__ + '.choice', return_value=300)
+    def test_all_teams_penalty(self, mock_choice):
+        goals = {'Team A': 0, 'Team B': 0, 'Team C': 0, 'Team D': 0, 'Team E': 0}
+        penalties = {'Team A': 2, 'Team B': 1, 'Team C': 3, 'Team D': 1, 'Team E': 4}
+        expected_penalties_cost = [penalty * mock_choice.return_value for penalty in penalties.values()]
+        expected_data = {
+            'Team': list(goals.keys()),  # The list of teams from the goals dictionary keys
+            'Goals': list(goals.values()),  # The list of goals from the goals dictionary values
+            'Penalties': list(penalties.values()),  # The list of penalties from the penalties dictionary values
+            'Penalties Cost': expected_penalties_cost,
+            'Performance Score': [0] * len(TEAMS)  # A list of zeros for performance score
+        }
+        expected_df = pd.DataFrame(expected_data)
+        result_df = task_func(goals, penalties)
+        pd.testing.assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
+    @patch(__name__ + '.choice', return_value=100)
+    def test_empty_goals_and_penalties(self, mock_choice):
+        goals = {}
+        penalties = {}
+        expected_data = {
+            'Team': TEAMS,
+            'Goals': [0, 0, 0, 0, 0],
+            'Penalties': [0, 0, 0, 0, 0],
+            'Penalties Cost': [0, 0, 0, 0, 0],
+            'Performance Score': [0, 0, 0, 0, 0]
+        }
+        expected_df = pd.DataFrame(expected_data)
+        result_df = task_func(goals, penalties)
+        pd.testing.assert_frame_equal(result_df, expected_df)
+    @patch(__name__ + '.choice', return_value=300)
+    def test_no_penalties(self, mock_choice):
+        goals = {'Team A': 3, 'Team B': 2}
+        penalties = {'Team A': 0, 'Team B': 0}
+        expected_data = {
+            'Team': ['Team A', 'Team B'] + ['Team C', 'Team D', 'Team E'],
+            'Goals': [3, 2] + [0, 0, 0],
+            'Penalties': [0, 0] + [0, 0, 0],
+            'Penalties Cost': [0, 0] + [0, 0, 0],
+            'Performance Score': [3, 2] + [0, 0, 0]
+        }
+        expected_df = pd.DataFrame(expected_data)
+        result_df = task_func(goals, penalties)
+        pd.testing.assert_frame_equal(result_df, expected_df)

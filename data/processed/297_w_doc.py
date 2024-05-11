@@ -1,97 +1,59 @@
-import pandas as pd
-import matplotlib.pyplot as plt
+import itertools
+import collections
 
-def task_func(df):
+
+def task_func(elements, subset_size):
     """
-    Draw a bar chart of the counts of each unique value in the 'value' column of a pandas DataFrame and return the Axes object.
-    Empty DataFrame will return an empty bar chart.
-    
-    Parameters:
-    df (DataFrame): The pandas DataFrame with columns ['id', 'value'].
+    Generate all 2-element subsets of a tuple and count the occurrences of each sum in the subsets.
 
     Returns:
-    Axes: The matplotlib Axes object of the bar chart.
-
-    Raises:
-    - The function will raise a ValueError is input df is not a DataFrame.
-
-    Note:
-    - This function use "Value Distribution" for the plot title.
-    - This function use "Value" and "Count" as the xlabel and ylabel respectively.
+    dict: A dictionary with the sums and their counts.
 
     Requirements:
-    - pandas
-    - matplotlib.pyplot
-
+    - itertools
+    - random
+    - collections
+    
+    
     Example:
-    >>> df = pd.DataFrame({'id': [1, 1, 2, 2, 3, 3],'value': ['A', 'B', 'A', 'B', 'A', 'B']})
-    >>> ax = task_func(df)
-    >>> len(ax.patches)
-    2
-    >>> plt.close()
+    >>> dict(task_func((1, 2, 3, 4, 5), 2))
+    {3: 1, 4: 1, 5: 2, 6: 2, 7: 2, 8: 1, 9: 1}
     """
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("The input df is not a DataFrame")
-    value_counts = df['value'].value_counts()
-    ax = plt.bar(value_counts.index, value_counts.values)
-    plt.xlabel('Value')
-    plt.ylabel('Count')
-    plt.title('Value Distribution')
-    return plt.gca()
+    combinations = list(itertools.combinations(elements, subset_size))
+    sums = [sum(combination) for combination in combinations]
+    return collections.Counter(sums)
 
 import unittest
-import pandas as pd
-import matplotlib.pyplot as plt
+from collections import Counter
+import doctest
 class TestCases(unittest.TestCase):
-    def test_normal_dataframe(self):
-        df = pd.DataFrame({
-            'id': [1, 1, 2, 2, 3, 3],
-            'value': ['A', 'B', 'A', 'B', 'A', 'B']
-        })
-        ax = task_func(df)
-        self.assertIsInstance(ax, plt.Axes, "Should return an Axes object")
-        self.assertEqual(len(ax.patches), 2, "Should have 2 bars for values 'A' and 'B'")
-        self.assertEqual(ax.get_title(), "Value Distribution", "Incorrect title")
-        plt.close()
-    def test_empty_dataframe(self):
-        df = pd.DataFrame(columns=['id', 'value'])
-        ax = task_func(df)
-        self.assertIsInstance(ax, plt.Axes, "Should handle empty DataFrame")
-        self.assertEqual(len(ax.patches), 0, "Should have no bars for an empty DataFrame")
-        plt.close()
-    def test_numeric_values(self):
-        df = pd.DataFrame({
-            'id': [1, 2, 3],
-            'value': [100, 200, 300]
-        })
-        ax = task_func(df)
-        self.assertIsInstance(ax, plt.Axes, "Should handle numeric values in 'value' column")
-        plt.close()
-    
-    def test_plot_attributes(self):
-        df = pd.DataFrame({
-            'id': [1, 2, 3],
-            'value': [100, 200, 300]
-        })
-        ax = task_func(df)
-        self.assertEqual(ax.get_title(), 'Value Distribution')
-        self.assertEqual(ax.get_xlabel(), 'Value')
-        self.assertEqual(ax.get_ylabel(), 'Count')
-        plt.close()
-    
-    def test_plot_point(self):
-        df = pd.DataFrame({
-            'id': [1, 1, 2, 2],
-            'value': ['A', 'B', 'A', 'B']
-        })
-        ax = task_func(df)
-        # Get the actual value counts from the DataFrame
-        actual_value_counts = df['value'].value_counts()
-        # Get the patches from the bar plot
-        patches = ax.patches
-        # Ensure that each patch (bar) has the correct height (count)
-        for i, patch in enumerate(patches):
-            # The height of each bar should match the count of its corresponding value
-            expected_height = actual_value_counts.iloc[i]
-            self.assertAlmostEqual(patch.get_height(), expected_height, delta=0.1, msg=f"Bar {i+1} does not have the correct height")
-        plt.close()
+    def test_case_1(self):
+        # Test with a tuple of positive integers and subset_size of 2
+        elements = (1, 2, 3, 4, 5)
+        subset_size = 2
+        expected_result = Counter({3: 1, 4: 1, 5: 2, 6: 2, 7: 2, 8: 1, 9: 1})
+        self.assertEqual(task_func(elements, subset_size), expected_result)
+    def test_case_2(self):
+        # Test with a tuple containing negative, positive and zero integers and subset_size of 3
+        elements = (-3, -2, 0, 2, 3, 5)
+        subset_size = 3
+        expected_result = Counter({0: 3, 5: 3, 2: 2, 3: 2, -5: 1, -3: 1, -2: 1, -1: 1, 4: 1, 1: 1, 6: 1, 7: 1, 8: 1, 10: 1})
+        self.assertEqual(task_func(elements, subset_size), expected_result)
+    def test_case_3(self):
+        # Test with a tuple of positive integers and subset_size of 1
+        elements = (1, 2, 3, 4, 5)
+        subset_size = 1
+        expected_result = Counter({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
+        self.assertEqual(task_func(elements, subset_size), expected_result)
+    def test_case_4(self):
+        # Test with an empty tuple
+        elements = ()
+        subset_size = 2
+        expected_result = Counter()
+        self.assertEqual(task_func(elements, subset_size), expected_result)
+    def test_case_5(self):
+        # Test with a subset_size greater than tuple length
+        elements = (1, 2, 3)
+        subset_size = 5
+        expected_result = Counter()
+        self.assertEqual(task_func(elements, subset_size), expected_result)

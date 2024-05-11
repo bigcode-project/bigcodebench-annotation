@@ -1,62 +1,41 @@
-import pandas as pd
-import numpy as np
+from collections import Counter
+from itertools import chain
 
-def task_func(df, col):
+def task_func(list_of_lists):
     """
-    Process a Pandas DataFrame by removing a specific column and adding a 'IsEvenIndex' column.
-    The 'IsEvenIndex' column is a boolean flag indicating if the index of each row is even.
+    Merge all sublists from a list of lists into a list and return a count of the elements.
     
     Parameters:
-    - df (pd.DataFrame): The pandas DataFrame to process.
-    - col (str): The column to remove.
+    - list_of_lists (list): The list to be processed.
 
     Returns:
-    - df (pd.DataFrame): The processed pandas DataFrame with the specified column removed and a new 'IsEvenIndex' column added.
+    - collections.Counter: Counter object with the counts of the elements in the merged list.
 
     Requirements:
-    - pandas
-    - numpy
-
+    - itertools
+    - collections
+    
     Example:
-    >>> np.random.seed(42)
-    >>> df = pd.DataFrame(np.random.randint(0,100,size=(5, 4)), columns=list('ABCD'))
-    >>> df = task_func(df, 'C')
-    >>> print(df)
-        A   B   D  IsEvenIndex
-    0  51  92  71         True
-    1  60  20  86        False
-    2  74  74  99         True
-    3  23   2  52        False
-    4   1  87  37         True
+    >>> task_func([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    Counter({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1})
     """
-    updated_df = pd.DataFrame(df).drop(col, axis=1)
-    updated_df['IsEvenIndex'] = np.arange(len(updated_df)) % 2 == 0
-    return updated_df
+    merged_list = list(chain.from_iterable(list_of_lists))
+    return Counter(merged_list)
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-        df = task_func(df, 'A')
-        self.assertEqual(df.shape, (100, 4))
-        self.assertFalse('A' in df.columns)
+        list_of_lists = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        self.assertEqual(task_func(list_of_lists), Counter({1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}))
     def test_case_2(self):
-        df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-        df = task_func(df, 'B')
-        self.assertEqual(df.shape, (100, 4))
-        self.assertFalse('B' in df.columns)
+        list_of_lists = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 2]]
+        self.assertEqual(task_func(list_of_lists), Counter({1: 2, 2: 2, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}))
     def test_case_3(self):
-        df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-        df = task_func(df, 'C')
-        self.assertEqual(df.shape, (100, 4))
-        self.assertFalse('C' in df.columns)
+        list_of_lists = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 2], [1, 2, 3, 4, 5, 6, 7, 8, 9]]
+        self.assertEqual(task_func(list_of_lists), Counter({1: 3, 2: 3, 3: 2, 4: 2, 5: 2, 6: 2, 7: 2, 8: 2, 9: 2}))
     def test_case_4(self):
-        df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-        df = task_func(df, 'D')
-        self.assertEqual(df.shape, (100, 4))
-        self.assertFalse('D' in df.columns)
+        list_of_lists = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 2], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3]]
+        self.assertEqual(task_func(list_of_lists), Counter({1: 4, 2: 4, 3: 3, 4: 2, 5: 2, 6: 2, 7: 2, 8: 2, 9: 2}))
     def test_case_5(self):
-        df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-        df = task_func(df, 'A')
-        self.assertEqual(df.shape, (100, 4))
-        self.assertFalse('A' in df.columns)
+        list_of_lists = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 2], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3], [1, 2, 3, 4, 5, 6, 7, 8, 9]]
+        self.assertEqual(task_func(list_of_lists), Counter({1: 5, 2: 5, 3: 4, 4: 3, 5: 3, 6: 3, 7: 3, 8: 3, 9: 3}))

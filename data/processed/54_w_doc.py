@@ -1,102 +1,88 @@
 import pandas as pd
 import regex as re
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-COLUMN_NAMES = ["Name", "Email", "Age", "Country"]
+from sklearn.feature_extraction.text import CountVectorizer
 
 
 def task_func(text):
     """
-    Extract data from a text and create a Pandas DataFrame.
-    The text contains several lines, each formatted as 'Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA'.
-    Plot the age distribution using seaborn.
-
-    The data is extracted using the regular expression pattern:
-    "Name: (.*?), Email: (.*?), Age: (.*?), Country: (.*?)($|\n)"
-    and the resulting DataFrame has columns: ['Name', 'Email', 'Age', 'Country']
+    Analyze a text by creating a document term matrix with CountVectorizer. The text contains several sentences, each separated by a period.
+    Ignore empty sentences.
 
     Parameters:
     text (str): The text to analyze.
 
     Returns:
-    DataFrame: A pandas DataFrame with extracted data.
+    DataFrame: A pandas DataFrame with the document-term matrix. Its column names should be adapted from the vectorizer feature names.
 
     Requirements:
     - pandas
     - regex
-    - seaborn
-    - matplotlib.pyplot
+    - sklearn.feature_extraction.text.CountVectorizer
 
     Example:
-    >>> text = 'Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA\\nName: Jane Doe, Email: jane.doe@example.com, Age: 25, Country: UK'
-    >>> df = task_func(text)
-    >>> print(df)
-           Name                 Email  Age Country
-    0  John Doe  john.doe@example.com   30     USA
-    1  Jane Doe  jane.doe@example.com   25      UK
+    >>> text = "This is a sample sentence. This sentence contains sample words."
+    >>> dtm = task_func(text)
+    >>> print(dtm)
+       contains  is  sample  sentence  this  words
+    0         0   1       1         1     1      0
+    1         1   0       1         1     1      1
     """
-    pattern = r"Name: (.*?), Email: (.*?), Age: (.*?), Country: (.*?)($|\n)"
-    matches = re.findall(pattern, text)
-    data = []
-    for match in matches:
-        data.append(match[:-1])
-    df = pd.DataFrame(data, columns=COLUMN_NAMES)
-    df["Age"] = df["Age"].astype(int)
-    sns.histplot(data=df, x="Age")
-    plt.show()
+    sentences = re.split(r"\.\s*", text)
+    sentences = [sentence for sentence in sentences if len(sentence.strip()) != 0]
+    vectorizer = CountVectorizer()
+    dtm = vectorizer.fit_transform(sentences)
+    df = pd.DataFrame(dtm.toarray(), columns=vectorizer.get_feature_names_out())
     return df
 
 import unittest
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def test_case_1(self):
-        input_text = "Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA\nName: Jane Doe, Email: jane.doe@example.com, Age: 25, Country: UK"
-        df = task_func(input_text)
-        self.assertEqual(df.shape, (2, 4))
-        self.assertListEqual(list(df.columns), ["Name", "Email", "Age", "Country"])
-        self.assertListEqual(
-            df.iloc[0].tolist(), ["John Doe", "john.doe@example.com", 30, "USA"]
-        )
-        self.assertListEqual(
-            df.iloc[1].tolist(), ["Jane Doe", "jane.doe@example.com", 25, "UK"]
-        )
+        # Test with a basic input
+        text = "This is a sample sentence. This sentence contains sample words."
+        dtm = task_func(text)
+        # Assertions
+        self.assertEqual(
+            dtm.shape, (2, 6)
+        )  # Expected 2 rows (sentences) and 6 unique words
+        self.assertEqual(dtm["sample"].tolist(), [1, 1])
+        self.assertEqual(dtm["this"].tolist(), [1, 1])
     def test_case_2(self):
-        input_text = (
-            "Name: Alex Smith, Email: alex.smith@example.com, Age: 35, Country: Canada"
-        )
-        df = task_func(input_text)
-        self.assertEqual(df.shape, (1, 4))
-        self.assertListEqual(
-            df.iloc[0].tolist(), ["Alex Smith", "alex.smith@example.com", 35, "Canada"]
-        )
+        # Test with a single sentence (with a trailing period)
+        text = "A single sentence."
+        dtm = task_func(text)
+        # Assertions
+        self.assertEqual(
+            dtm.shape, (1, 2)
+        )  # Expected 1 rows (sentences) and 2 unique words
+        self.assertEqual(dtm["single"].tolist(), [1])
     def test_case_3(self):
-        input_text = ""
-        df = task_func(input_text)
-        self.assertTrue(df.empty)
+        # Test with no periods (still should consider it as one sentence)
+        text = "No periods in this text"
+        dtm = task_func(text)
+        # Assertions
+        self.assertEqual(
+            dtm.shape, (1, 5)
+        )  # Expected 1 row (sentence) and 5 unique words
+        self.assertEqual(dtm["text"].tolist(), [1])
     def test_case_4(self):
-        input_text = (
-            "Name: Alex Smith, Email: alex.smith@example.com, Age: 35, Country: Canada"
-        )
-        df = task_func(input_text)
-        self.assertEqual(df.shape, (1, 4))
-        self.assertListEqual(
-            df.iloc[0].tolist(), ["Alex Smith", "alex.smith@example.com", 35, "Canada"]
-        )
+        # Test with a single sentence (with same word multiple times)
+        text = ("test test test test test test test test test test test " * 3).strip()
+        dtm = task_func(text)
+        # Assertions
+        self.assertEqual(
+            dtm.shape, (1, 1)
+        )  # Expected 1 row (sentence) and 1 unique words
+        self.assertEqual(dtm["test"].tolist(), [33])
     def test_case_5(self):
-        input_text = """Name: Alex Smith, Email: alex.smith@example.com, Age: 35, Country: Canada
-        Name: Bob Miller, Email: bob.miller@example.com, Age: 25, Country: USA
-        Name: Anna Karin, Email: anna.karin@example.com, Age: 47, Country: Finland
-        """
-        df = task_func(input_text)
-        self.assertEqual(df.shape, (3, 4))
-        self.assertListEqual(list(df.columns), ["Name", "Email", "Age", "Country"])
-        self.assertListEqual(
-            df.iloc[0].tolist(), ["Alex Smith", "alex.smith@example.com", 35, "Canada"]
-        )
-        self.assertListEqual(
-            df.iloc[1].tolist(), ["Bob Miller", "bob.miller@example.com", 25, "USA"]
-        )
-        self.assertListEqual(
-            df.iloc[2].tolist(), ["Anna Karin", "anna.karin@example.com", 47, "Finland"]
-        )
+        # Test with no periods (still should consider it as one sentence)
+        text = "This is the first sentence. This is the second sentence. This is the third sentence. This is the fourth sentence. This is the fith and last sentence."
+        dtm = task_func(text)
+        # Assertions
+        self.assertEqual(
+            dtm.shape, (5, 11)
+        )  # Expected 5 rows (sentence) and 11 unique words
+        self.assertEqual(dtm["this"].tolist(), [1, 1, 1, 1, 1])
+        self.assertEqual(dtm["is"].tolist(), [1, 1, 1, 1, 1])
+        self.assertEqual(dtm["the"].tolist(), [1, 1, 1, 1, 1])
+        self.assertEqual(dtm["sentence"].tolist(), [1, 1, 1, 1, 1])

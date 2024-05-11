@@ -21,7 +21,7 @@ def f_119(timestamps):
     - Axes: The Axes object of the histogram plot. The histogram will have 10 bins by default, representing the distribution of the datetime objects.
 
     Raises:
-    - ValueError("Input list of timestamps is empty"): If the list of timestamps is empty.
+    - ValueError("Input list of timestamps is empty."): If the list of timestamps is empty.
 
     Requirements:
     - datetime

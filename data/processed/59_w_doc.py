@@ -1,89 +1,75 @@
-import numpy as np
-from scipy import stats
+import wikipedia
+from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
-def task_func(mu, sigma, num_samples):
+def task_func(page_title):
     """
-    Display a plot showing a normal distribution with a given mean and standard deviation and overlay a histogram of randomly generated samples from this distribution.
-    The plot title should be 'Normal Distribution'.
+    Create a word cloud from the text of a Wikipedia page.
 
     Parameters:
-    mu (float): The mean of the distribution.
-    sigma (float): The standard deviation of the distribution.
-    num_samples (int): The number of samples to generate.
+    page_title (str): The title of the Wikipedia page.
 
     Returns:
-    fig (matplotlib.figure.Figure): The generated figure. Useful for testing purposes.
+    matplotlib.axes.Axes: The Axes object of the plotted data. Is None if there is no wikipedia page with the title given as input.
 
     Requirements:
-    - numpy
-    - scipy.stats
+    - wikipedia
+    - wordcloud.WordCloud
     - matplotlib.pyplot
 
     Example:
-    >>> plt = task_func(0, 1, 1000)
+    >>> ax = task_func('Python (programming language)')
     """
-    samples = np.random.normal(mu, sigma, num_samples)
-    fig, ax = plt.subplots()
-    ax.hist(samples, bins=30, density=True, alpha=0.6, color='g')
-    xmin, xmax = plt.xlim()
-    x = np.linspace(xmin, xmax, 100)
-    p = stats.norm.pdf(x, mu, sigma)
-    ax.plot(x, p, 'k', linewidth=2)
-    ax.set_title('Normal Distribution')
-    plt.show()
-    return fig
+    try:
+        text = wikipedia.page(page_title).content
+    except Exception as e:
+        print(f"An error occured: {e}")
+        return None
+    wordcloud = WordCloud().generate(text)
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis('off')
+    ax = plt.gca()
+    return ax
 
 import unittest
+from unittest.mock import patch
+class A :
+    def __init__(self, content) -> None:
+        self.content = content
+        self.text = content
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
-    def test_case_1(self):
-        np.random.seed(42)
-        mu = 0
-        sigma = 1
-        num_samples = 1000
-        fig = task_func(mu, sigma, num_samples)
-        ax = fig.gca()
-        self.assertEqual(ax.get_title(), "Normal Distribution")
-        self.assertTrue(len(ax.patches) > 0)
-        self.assertTrue(len(ax.lines) > 0)
-    def test_case_2(self):
-        np.random.seed(42)
-        mu = 5
-        sigma = 2
-        num_samples = 1000
-        fig = task_func(mu, sigma, num_samples)
-        ax = fig.gca()
-        self.assertEqual(ax.get_title(), "Normal Distribution")
-        self.assertTrue(len(ax.patches) > 0)
-        self.assertTrue(len(ax.lines) > 0)
-    def test_case_3(self):
-        np.random.seed(42)
-        mu = 0
-        sigma = 1
-        num_samples = 10
-        fig = task_func(mu, sigma, num_samples)
-        ax = fig.gca()
-        self.assertEqual(ax.get_title(), "Normal Distribution")
-        self.assertTrue(len(ax.patches) > 0)
-        self.assertTrue(len(ax.lines) > 0)
-    def test_case_4(self):
-        np.random.seed(42)
-        mu = 0
-        sigma = 1
-        num_samples = 10
-        fig = task_func(mu, sigma, num_samples)
-        ax = fig.gca()
-        self.assertEqual(ax.get_title(), "Normal Distribution")
-        self.assertTrue(len(ax.patches) > 0)
-        self.assertTrue(len(ax.lines) > 0)
-    def test_case_5(self):
-        np.random.seed(42)
-        mu = 0
-        sigma = 1
-        num_samples = 10
-        fig = task_func(mu, sigma, num_samples)
-        ax = fig.gca()
-        self.assertEqual(ax.get_title(), "Normal Distribution")
-        self.assertTrue(len(ax.patches) > 0)
-        self.assertTrue(len(ax.lines) > 0)
+    @patch('wikipedia.page')
+    def test_case_1(self, mock_function):
+        # Mocking the function to prevent actual execution
+        mock_function.return_value = A("I want to sleep")
+        # Running the function
+        _ = task_func('Python (programming language)')
+    @patch('wikipedia.page')
+    def test_case_2(self, mock_function):
+        # Mocking the function to prevent actual execution
+        mock_function.return_value = A("I want to sleep because it is important to sleep.")
+        # Running the function
+        _ = task_func('Python (programming language)')
+    @patch('wikipedia.page')
+    def test_case_3(self, mock_function):
+        # Mocking the function to prevent actual execution
+        mock_function.return_value = A("I want to sleep")
+        # Running the function
+        _ = task_func('Python (programming language)')
+    @patch('wikipedia.page')
+    def test_case_4(self, mock_function):
+        # Mocking the function to prevent actual execution
+        mock_function.return_value =A("I want to eat")
+        # Running the function
+        _ = task_func('Python (programming language)')
+    @patch('wikipedia.page')
+    def test_case_5(self, mock_function):
+        # Mocking the function to prevent actual execution
+        mock_function.return_value = A("I want to help you to get your business to work.")
+        # Running the function
+        _ = task_func('Python (programming language)')
+    def test_case_6(self):
+        ax = task_func("Invalid Page Title")
+        self.assertIsNone(ax)

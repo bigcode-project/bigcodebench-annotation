@@ -1,75 +1,78 @@
 import pandas as pd
 import numpy as np
-from statsmodels.tsa.seasonal import seasonal_decompose
+import matplotlib.pyplot as plt
 
-def task_func(start_date='2016-01-01', periods=24, freq='M', model='additive'):
+def task_func(start_date='2016-01-01', periods=13, freq='WOM-2FRI', seed=0):
     """
-    Generate a sales time-series and decompose it into trend, seasonal, and residual components.
+    Generate a share price series for a specific period of time, plot the share prices, and return the DataFrame and the plot on the share prices over the given date range.
+    The share prices are randomly generated between 100 and 500 from a uniform distribution.
     
     Parameters:
-    - start_date (str): The start date of the time-series in the format 'YYYY-MM-DD'. Default is '2016-01-01'.
-    - periods (int): The number of periods to generate for the time-series. Default is 24.
-    - freq (str): The frequency of the time-series data. Default is 'M' (Monthly End).
-    - model (str): The type of seasonal decomposition ('additive' or 'multiplicative'). Default is 'additive'.
+    - start_date (str): The start date for the share price series in 'YYYY-MM-DD' format. Default is '2016-01-01'.
+    - periods (int): The number of periods for which the share price needs to be generated. Default is 13.
+    - freq (str): The frequency string conforming to pandas date offset aliases. Default is 'WOM-2FRI'.
+    - seed (int, optional): The seed for the random number generator to ensure reproducibility. Default is None.
 
     Returns:
-    - A dictionary containing 'trend', 'seasonal', and 'residual' components as Pandas Series.
-    
+    - A tuple containing a pandas DataFrame with columns ['Date', 'Price'] and a Matplotlib Axes object for the plot.
+
     Requirements:
-    - numpy
     - pandas
-    - statsmodels
+    - numpy
+    - matplotlib.pyplot
     
     Examples:
-    >>> result = task_func('2016-01-01', 24, 'M')
-    >>> all(key in result for key in ['trend', 'seasonal', 'residual'])
-    True
-
-    >>> result = task_func('2020-01-01', 24, 'M', 'multiplicative')
-    >>> len(result['seasonal'])
-    24
+    >>> df, ax = task_func('2020-01-01', 5, 'M', seed=42)
+    >>> len(df)
+    5
+    >>> df.iloc[0]['Price']
+    249.81604753894499
+    >>> ax.title.get_text()
+    'Stock Prices'
     """
+    if seed is not None:
+        np.random.seed(seed)
     date_range = pd.date_range(start=start_date, periods=periods, freq=freq)
-    sales_data = np.random.randint(low=100, high=500, size=periods)
-    sales_series = pd.Series(sales_data, index=date_range)
-    try:
-        decomposition = seasonal_decompose(sales_series, model=model, period=12 if freq == 'M' else 4)
-    except ValueError as e:
-        return {'error': str(e)}
-    return {
-        'trend': decomposition.trend,
-        'seasonal': decomposition.seasonal,
-        'residual': decomposition.resid
-    }
+    stock_prices = np.random.uniform(low=100, high=500, size=periods)
+    prices_df = pd.DataFrame({'Date': date_range, 'Price': stock_prices})
+    prices_df.set_index('Date', inplace=True)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    prices_df.plot(ax=ax, marker='o')
+    pd.plotting.register_matplotlib_converters()
+    ax.set_title('Stock Prices')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Price')
+    ax.grid(True)
+    return prices_df, ax
 
 import unittest
+import pandas as pd
+from pandas.tseries.frequencies import to_offset
+from matplotlib import axes
+import numpy as np
 class TestCases(unittest.TestCase):
+    
     def test_default_parameters(self):
-        np.random.seed(42)  # For reproducibility
-        result = task_func(periods=24)  # Adjust to meet the minimum requirement for decomposition
-        self.assertTrue(all(key in result for key in ['trend', 'seasonal', 'residual']))
-    def test_multiplicative_model(self):
-        np.random.seed(0)  # For reproducibility
-        result = task_func('2020-01-01', 24, 'M', 'multiplicative')
-        self.assertTrue(all(key in result for key in ['trend', 'seasonal', 'residual']))
-    def test_custom_parameters(self):
-        np.random.seed(55)  # For reproducibility
-        result = task_func('2017-01-01', 36, 'M')
-        self.assertEqual(len(result['trend']), 36)
-    def test_weekly_frequency(self):
-        np.random.seed(1)  # For reproducibility
-        result = task_func('2022-01-01', 104, 'W', 'additive')
-        self.assertTrue(all(key in result for key in ['trend', 'seasonal', 'residual']))
-        self.assertEqual(len(result['seasonal']), 104)
-        
-    def test_insufficient_periods_error(self):
-        np.random.seed(66)  # For reproducibility
-        result = task_func('2022-01-01', 12, 'M')
-        self.assertIn('error', result)
-        
-    def test_additive_decomposition_properties(self):
-        np.random.seed(42)  # For reproducibility
-        periods = 36
-        result = task_func('2020-01-01', periods, 'M')
-        reconstructed = result['trend'].fillna(0) + result['seasonal'].fillna(0) + result['residual'].fillna(0)
-        self.assertTrue(np.allclose(reconstructed.head(12), reconstructed.head(12), atol=1))
+        df, ax = task_func(seed=42)
+        self.assertIsInstance(df, pd.DataFrame, "The output should be a pandas DataFrame")
+        self.assertIsInstance(ax, axes.Axes, "The output should be a Matplotlib Axes object")
+        self.assertEqual(len(df), 13, "DataFrame should contain 13 rows by default")
+        self.assertTrue((100 <= df['Price']).all() and (df['Price'] <= 500).all(), "Stock prices should be between 100 and 500")
+        self.assertEqual(ax.title.get_text(), 'Stock Prices', "Plot title should be 'Stock Prices'")
+    
+    def test_specified_parameters(self):
+        df, ax = task_func('2021-01-01', 5, 'M', seed=42)
+        self.assertEqual(len(df), 5, "DataFrame should contain 5 rows")
+        self.assertTrue((100 <= df['Price']).all() and (df['Price'] <= 500).all(), "Stock prices should be between 100 and 500")
+    
+    def test_business_day_frequency(self):
+        df, ax = task_func('2021-01-01', 5, 'B', seed=42)
+        self.assertEqual(len(df), 5, "DataFrame should contain 5 rows")
+    
+    def test_weekly_frequency_more_periods(self):
+        df, ax = task_func('2021-01-01', 20, 'W', seed=42)
+        self.assertEqual(len(df), 20, "DataFrame should contain 20 rows")
+    
+    def test_different_year(self):
+        df, ax = task_func('2019-01-01', 10, 'W', seed=42)
+        self.assertEqual

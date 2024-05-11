@@ -1,106 +1,190 @@
-import json
-import csv
+import os
+import shutil
+import glob
 
-def task_func(json_file, csv_file):
+def task_func(source_dir, dest_dir, extension):
     """
-    Convert a JSON file to CSV.
+    Move all files with a particular extension from one directory to another.
     
     Parameters:
-    - json_file (str): The path to the JSON file.
-    - csv_file (str): The path to the CSV file.
+    - source_dir (str): The source directory.
+    - dest_dir (str): The destination directory.
+    - extension (str): The file extension.
 
     Returns:
-    - csv_file: The function returns the path to the CSV file that was written.
+    - result (int): The count of files that were moved. 
 
     Requirements:
-    - json
-    - csv
+    - os
+    - shutil
+    - glob
         
     Example:
-    >>> task_func('path_to_json_file.json', 'path_to_csv_file.csv')
-    'path_to_csv_file.csv'
+    >>> task_func('path_to_source_dir', 'path_to_dest_dir', '.txt')
+    10
     """
-    with open(json_file, 'r') as f:
-        data = json.load(f)
-    with open(csv_file, 'w') as f:
-        writer = csv.writer(f)
-        writer.writerow(data.keys())
-        writer.writerow(data.values())
-    return csv_file
+    files = glob.glob(os.path.join(source_dir, f'*.{extension}'))
+    for file in files:
+        shutil.move(file, dest_dir)
+    result = len(files)
+    return result
 
 import unittest
-import os
 class TestCases(unittest.TestCase):
     def tearDown(self):
-        for file in ['./test.json', './test.csv', './testx.json', './testx.csv', './testy.json', './testy.csv', './testz.json', './testz.csv']:
-            if os.path.exists(file):
-                os.remove(file)
+        for d in ['./source', './destination', './src', './dst', './s', './d']:
+            if os.path.exists(d):
+                shutil.rmtree(d)
     def test_case_1(self):
-        # Create json file
-        json_file = './test.json'
-        with open(json_file, 'w') as f:
-            json.dump({'a': 1, 'b': 2, 'c': 3}, f)
+        # Create source directory
+        if os.path.exists('./source'):
+            shutil.rmtree('./source')
+        os.mkdir('./source')
+        # Create destination directory
+        if os.path.exists('./destination'):
+            shutil.rmtree('./destination')
+        os.mkdir('./destination')
+        # Create files
+        for filename in ['a.txt', 'b.txt', 'c.docx', 'd.docx', 'e.txt', 'a.pdf', 'a.doc']:
+            with open(os.path.join('./source', filename), 'w') as f:
+                f.write('test')
         # Run function
-        csv_file = task_func(json_file, './test.csv')
-        # Check file
-        self.assertTrue(os.path.exists(csv_file))
-        with open(csv_file, 'r') as f:
-            reader = csv.reader(f)
-            csv_data = list(reader)
-        self.assertEqual(csv_data, [['a', 'b', 'c'], ['1', '2', '3']])
-        
+        task_func('./source', './destination', 'txt')
+        # Check files
+        for d in ['./destination', './source']:
+            if d == './source':
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.pdf')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.doc')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'c.docx')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'd.docx')))  
+            else:
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.txt')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'b.txt')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'e.txt')))
+                self.assertFalse(os.path.exists(os.path.join(d, 'f.txt')))
+        # Remove files
+        shutil.rmtree('./source')
+        shutil.rmtree('./destination')
     def test_case_2(self):
-        # Create json file
-        json_file = './test.json'
-        with open(json_file, 'w') as f:
-            json.dump({'z': 1, 'y': 2, 'x': 3}, f)
+        # Create source directory
+        if os.path.exists('./src'):
+            shutil.rmtree('./src')
+        os.mkdir('./src')
+        # Create destination directory
+        if os.path.exists('./dst'):
+            shutil.rmtree('./dst')
+        os.mkdir('./dst')
+        # Create files
+        for filename in ['a.txt', 'b.txt', 'c.docx', 'd.docx', 'e.txt', 'a.pdf', 'a.doc']:
+            with open(os.path.join('./src', filename), 'w') as f:
+                f.write('test')
         # Run function
-        csv_file = task_func(json_file, './test.csv')
-        # Check file
-        self.assertTrue(os.path.exists(csv_file))
-        with open(csv_file, 'r') as f:
-            reader = csv.reader(f)
-            csv_data = list(reader)
-        self.assertEqual(csv_data, [['z', 'y', 'x'], ['1', '2', '3']])
-        
+        task_func('./src', './dst', 'txt')
+        # Check files
+        for d in ['./dst', './src']:
+            if d == './src':
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.pdf')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.doc')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'c.docx')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'd.docx')))  
+            else:
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.txt')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'b.txt')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'e.txt')))
+                self.assertFalse(os.path.exists(os.path.join(d, 'f.txt')))
+        # Remove files
+        shutil.rmtree('./src')
+        shutil.rmtree('./dst')
     def test_case_3(self):
-        # Create json file
-        json_file = './testx.json'
-        with open(json_file, 'w') as f:
-            json.dump({'xxx': 99}, f)
+        # Create source directory
+        if os.path.exists('./s'):
+            shutil.rmtree('./s')
+        os.mkdir('./s')
+        # Create destination directory
+        if os.path.exists('./d'):
+            shutil.rmtree('./d')
+        os.mkdir('./d')
+        # Create files
+        for filename in ['a.txt', 'b.txt', 'c.docx', 'd.docx', 'e.txt', 'a.pdf', 'a.doc']:
+            with open(os.path.join('./s', filename), 'w') as f:
+                f.write('test')
         # Run function
-        csv_file = task_func(json_file, './testx.csv')
-        # Check file
-        self.assertTrue(os.path.exists(csv_file))
-        with open(csv_file, 'r') as f:
-            reader = csv.reader(f)
-            csv_data = list(reader)
-        self.assertEqual(csv_data, [['xxx'], ['99']])
-        
+        task_func('./s', './d', 'txt')
+        # Check files
+        for d in ['./d', './s']:
+            if d == './s':
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.pdf')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.doc')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'c.docx')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'd.docx')))  
+            else:
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.txt')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'b.txt')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'e.txt')))
+                self.assertFalse(os.path.exists(os.path.join(d, 'f.txt')))
+        # Remove files
+        shutil.rmtree('./s')
+        shutil.rmtree('./d')
     def test_case_4(self):
-        # Create json file
-        json_file = './testy.json'
-        with open(json_file, 'w') as f:
-            json.dump({'yyy': 99}, f)
+        # Create source directory
+        if os.path.exists('./s'):
+            shutil.rmtree('./s')
+        os.mkdir('./s')
+        # Create destination directory
+        if os.path.exists('./destination'):
+            shutil.rmtree('./destination')
+        os.mkdir('./destination')
+        # Create files
+        for filename in ['bbb.txt', 'a.txt', 'b.txt', 'c.docx', 'd.docx', 'e.txt', 'a.pdf', 'a.doc']:
+            with open(os.path.join('./s', filename), 'w') as f:
+                f.write('test')
         # Run function
-        csv_file = task_func(json_file, './testy.csv')
-        # Check file
-        self.assertTrue(os.path.exists(csv_file))
-        with open(csv_file, 'r') as f:
-            reader = csv.reader(f)
-            csv_data = list(reader)
-        self.assertEqual(csv_data, [['yyy'], ['99']])
-        
+        task_func('./s', './destination', 'txt')
+        # Check files
+        for d in ['./destination', './s']:
+            if d == './s':
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.pdf')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.doc')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'c.docx')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'd.docx')))  
+            else:
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.txt')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'b.txt')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'e.txt')))
+                self.assertFalse(os.path.exists(os.path.join(d, 'f.txt')))
+        # Remove files
+        shutil.rmtree('./s')
+        shutil.rmtree('./destination')
     def test_case_5(self):
-        # Create json file
-        json_file = './testz.json'
-        with open(json_file, 'w') as f:
-            json.dump({'zzz': 99}, f)
+        # Create source directory
+        if os.path.exists('./source'):
+            shutil.rmtree('./source')
+        os.mkdir('./source')
+        # Create destination directory
+        if os.path.exists('./d'):
+            shutil.rmtree('./d')
+        os.mkdir('./d')
+        # Create files
+        for filename in ['a.txt', 'b.txt', 'c.docx', 'd.docx', 'e.txt', 'a.pdf', 'a.doc']:
+            with open(os.path.join('./source', filename), 'w') as f:
+                f.write('xxx')
         # Run function
-        csv_file = task_func(json_file, './testz.csv')
-        # Check file
-        self.assertTrue(os.path.exists(csv_file))
-        with open(csv_file, 'r') as f:
-            reader = csv.reader(f)
-            csv_data = list(reader)
-        self.assertEqual(csv_data, [['zzz'], ['99']])
+        task_func('./source', './d', 'docx')
+        # Check files
+        for d in ['./d', './source']:
+            if d == './source':
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.pdf')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.doc')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'a.txt')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'b.txt')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'e.txt')))
+                self.assertFalse(os.path.exists(os.path.join(d, 'f.txt')))
+            else:
+                self.assertTrue(os.path.exists(os.path.join(d, 'c.docx')))
+                self.assertTrue(os.path.exists(os.path.join(d, 'd.docx')))
+                self.assertFalse(os.path.exists(os.path.join(d, 'a.pdf')))
+                self.assertFalse(os.path.exists(os.path.join(d, 'a.doc')))
+                self.assertFalse(os.path.exists(os.path.join(d, 'a.txt')))
+                self.assertFalse(os.path.exists(os.path.join(d, 'b.txt')))
+                self.assertFalse(os.path.exists(os.path.join(d, 'e.txt')))
+                self.assertFalse(os.path.exists(os.path.join(d, 'f.txt')))

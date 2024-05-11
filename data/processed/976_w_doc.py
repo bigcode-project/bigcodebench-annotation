@@ -1,81 +1,100 @@
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
-def task_func(rows, columns=["A", "B", "C", "D", "E"], seed=0) -> pd.DataFrame:
+
+def task_func(records: np.ndarray, random_seed: int = 0) -> pd.DataFrame:
     """
-    Create a Pandas DataFrame with a specified number of rows filled with random
-    values in [0, 1) and shuffled columns.
-    
-    Note:
-    - The columns should be unique and sorted in the ascending order.
+    Randomly shuffle the given array's features, normalize its values, then convert to a DataFrame
+    with shuffled feature names.
 
     Parameters:
-    rows (int): The number of rows for the DataFrame. Must not be negative.
-    columns (list of str): Column names for the DataFrame.
-                           Defaults to ['A', 'B', 'C', 'D', 'E'].
-                           If it contains repeated columns, the function deduplicates
-                           it in a case and spacing sensitive way. If it is empty,
-                           the function returns an empty DataFrame.
-    seed (int): The random seed for reproducibility.
-    
+    - records (np.ndarray): A 2D numpy array with each row as a record and each column as a feature.
+    - random_seed (int, optional): Seed for random operations to ensure reproducibility.
+
     Returns:
-    pd.DataFrame: A pandas DataFrame with shuffled columns.
+    - pd.DataFrame: A pandas DataFrame containing the preprocessed data, with shuffled feature names.
+
+    Raises:
+    - ValueError: If records is not 2D.
 
     Requirements:
     - numpy
     - pandas
+    - sklearn
 
-    Example:
-    >>> df = task_func(10)
-    >>> df.head(2)
-              D         E         A         C         B
-    0  0.548814  0.715189  0.602763  0.544883  0.423655
-    1  0.645894  0.437587  0.891773  0.963663  0.383442
+    Notes:
+    - This function normalizes data by subtracting the mean and scaling to unit variance.
+    - Feature names are of format f{n}; for example, if the records have 5 features, feature
+      names will be ["f1", "f2", "f3", "f4", "f5"] shuffled.
+
+    Examples:
+    >>> data = np.array([[1, 2, 3], [4, 5, 6]])
+    >>> df = task_func(data, random_seed=42)
+    >>> df.shape
+    (2, 3)
+    >>> df.columns
+    Index(['f2', 'f3', 'f1'], dtype='object')
+    >>> data = np.array([[-1, -2, -3, -4, -5], [0, 0, 0, 0, 0], [1, 2, 3, 4, 5]])
+    >>> df = task_func(data, random_seed=24)
+    >>> df
+             f3        f1        f4        f5        f2
+    0 -1.224745 -1.224745 -1.224745 -1.224745 -1.224745
+    1  0.000000  0.000000  0.000000  0.000000  0.000000
+    2  1.224745  1.224745  1.224745  1.224745  1.224745
     """
-    np.random.seed(seed)
-    columns = sorted(list(set(columns)))
-    data = np.random.rand(rows, len(columns))
-    np.random.shuffle(columns)
-    df = pd.DataFrame(data, columns=columns)
+    if random_seed is not None:
+        np.random.seed(random_seed)
+    if not (records.ndim == 2):
+        raise ValueError("Input must be a 2D numpy array.")
+    records_copy = records.copy()
+    np.random.shuffle(records_copy.T)
+    scaler = StandardScaler()
+    normalized_records = scaler.fit_transform(records_copy)
+    features = [f"f{i+1}" for i in range(records[0].shape[0])]
+    np.random.shuffle(features)
+    df = pd.DataFrame(normalized_records, columns=features)
     return df
 
 import unittest
 import numpy as np
-import pandas as pd
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.data = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+        self.expected_shape = (2, 5)
     def test_case_1(self):
-        # Test basic case - data and format correctness
-        df = task_func(10, seed=0)
-        default_columns = ["A", "B", "C", "D", "E"]
-        self.assertEqual(df.shape, (10, 5))
-        for column in default_columns:
-            self.assertEqual(df.dtypes[column], np.float64)
-        self.assertEqual(len(set(df.columns)), len(default_columns))
+        # Test basic shape and columns
+        df = task_func(self.data, random_seed=1)
+        self.assertEqual(df.shape, self.expected_shape)
+        self.assertTrue(set(df.columns) == set(["f1", "f2", "f3", "f4", "f5"]))
+        # assert last row values
+        self.assertEqual(df.iloc[-1].tolist(), [1.0, 1.0, 1.0, 1.0, 1.0])
+        self.assertEqual(df.iloc[0].tolist(), [-1.0, -1.0, -1.0, -1.0, -1.0])
+        
     def test_case_2(self):
-        # Test custom columns
-        custom_columns = ["X", "Y", "Z"]
-        df = task_func(5, columns=custom_columns, seed=0)
-        self.assertTrue(all(column in custom_columns for column in df.columns))
-        # assert first 2 rows data
-        self.assertEqual(set(df.iloc[0].tolist()), {0.5488135039273248, 0.7151893663724195, 0.6027633760716439})
+        # Test normalization
+        df = task_func(self.data, random_seed=2)
+        np.testing.assert_array_almost_equal(
+            df.mean(axis=0), np.zeros(self.expected_shape[1]), decimal=5
+        )
+        np.testing.assert_array_almost_equal(
+            df.std(axis=0, ddof=0), np.ones(self.expected_shape[1]), decimal=5
+        )
         
     def test_case_3(self):
-        # Test custom rows
-        for n_rows in [1, 10, 50]:
-            df = task_func(n_rows)
-            self.assertEqual(len(df), n_rows)
+        # Test random seed effect
+        df1 = task_func(self.data, random_seed=3)
+        df2 = task_func(self.data, random_seed=3)
+        pd.testing.assert_frame_equal(df1, df2)
     def test_case_4(self):
-        df = task_func(5, seed=42)
-        self.assertEqual(set(df.iloc[0].tolist()), {0.3745401188473625, 0.9507143064099162, 0.7319939418114051, 0.5986584841970366, 0.15601864044243652})
-    def test_case_5(self):
-        # Test handling edge cases - negative rows
+        # Test handling invalid inputs
         with self.assertRaises(ValueError):
-            task_func(-1)
-    def test_case_6(self):
-        # Test handling empty columns
-        df = task_func(5, columns=[])
-        self.assertTrue(df.empty)
-    def test_case_7(self):
-        # Test handling duplicate columns
-        df = task_func(5, columns=["A", "A", "B", "B", "C"], seed=0)
-        self.assertEqual(len(df.columns), 3)
+            task_func(np.array([1, 2, 3]), random_seed=4)
+        with self.assertRaises(ValueError):
+            task_func(np.array([[1, 2, 3], [4, 5]], dtype=object), random_seed=4)
+    def test_case_5(self):
+        # Test handling zero variance
+        data = np.array([[1, 1, 1, 1, 1], [1, 1, 1, 1, 1]])
+        df = task_func(data, random_seed=42)
+        # In cases of zero variance, StandardScaler will set values to 0
+        np.testing.assert_array_equal(df.values, np.zeros(data.shape))

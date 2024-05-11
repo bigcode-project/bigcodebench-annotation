@@ -1,81 +1,57 @@
-import re
-import collections
+from collections import Counter
+import random
+import string
 
+# Constants
+LETTERS = string.ascii_letters
 
-def task_func(string, patterns=['nnn', 'aaa', 'sss', 'ddd', 'fff']):
+def task_func(list_of_lists):
     """
-    Counts the occurrence of specific patterns in a string.
-    
+    If you have a nested list, replace each sublist with a random letter and return a count of each letter in the final list.
+
     Parameters:
-    string (str): The input string.
-    patterns (list[str], optional): List of patterns to search for. Defaults to ['nnn', 'aaa', 'sss', 'ddd', 'fff'].
-    
-    Returns:
-    dict: A dictionary with patterns as keys and their counts as values.
+    - list_of_lists (list): A nested list.
 
-    Raises:
-    - TypeError: If string is not a str.
-    - TypeError: If patterns is not a list of str.
-    
+    Returns:
+    - dict: A dictionary containing count of each letter in the list.
+
     Requirements:
-    - re
     - collections
-    
+    - random
+    - string
+
     Example:
-    >>> task_func("nnnaaaasssdddeeefffggg")
-    {'nnn': 1, 'aaa': 1, 'sss': 1, 'ddd': 1, 'fff': 1}
-    >>> task_func('asdfasdfasdfasdaaaaf', patterns=['a', 'asdf'])
-    {'a': 8, 'asdf': 3}
-    >>> task_func('123kajhdlkfah12345k,jk123', patterns=['123', '1234'])
-    {'123': 3, '1234': 1}
+    >>> random.seed(42)
+    >>> task_func([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
+    {'O': 1, 'h': 1, 'b': 1}
     """
-    if not isinstance(string, str):
-        raise TypeError("Input string should be of type string.")
-    if not isinstance(patterns, list):
-        raise TypeError("patterns should be a list of strings.")
-    if not all(isinstance(s, str) for s in patterns):
-        raise TypeError("patterns should be a list of strings.")
-    pattern_counts = collections.defaultdict(int)
-    for pattern in patterns:
-        pattern_counts[pattern] = len(re.findall(pattern, string))
-    return dict(pattern_counts)
+    flat_list = [random.choice(LETTERS) for _ in list_of_lists]
+    return dict(Counter(flat_list))
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_empty_pattern(self):
-        'empty pattern'
-        result = task_func('asdf', patterns=[])
-        expected_result = {}
-        self.assertEqual(result, expected_result)
-    
-    def test_wrong_type(self):
-        'wrong input types'
-        self.assertRaises(Exception, task_func, {'string': 123})
-        self.assertRaises(Exception, task_func, {'string': ['asdf']})
-        self.assertRaises(Exception, task_func, {'string': {'a': 3}})
-        self.assertRaises(Exception, task_func, {'string': ['test'], 'patterns': 3})
-        self.assertRaises(Exception, task_func, {'string': ['test'], 'patterns': ['3', 1]})
+    # Input 1: Standard nested list with string values
     def test_case_1(self):
-        result = task_func("nnnaaaasssdddeeefffggg")
-        expected_result = {'nnn': 1, 'aaa': 1, 'sss': 1, 'ddd': 1, 'fff': 1}
-        self.assertEqual(result, expected_result)
-    
+        result = task_func([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
+        assert isinstance(result, dict)
+        assert sum(result.values()) == 3
+    # Input 2: Nested list with numerical values
     def test_case_2(self):
-        result = task_func("")
-        expected_result = {'nnn': 0, 'aaa': 0, 'sss': 0, 'ddd': 0, 'fff': 0}
-        self.assertEqual(result, expected_result)
-    
+        result = task_func([[1, 2], [3, 4], [5, 6]])
+        assert isinstance(result, dict)
+        assert sum(result.values()) == 3
+    # Input 3: Nested list with mixed string and numerical values
     def test_case_3(self):
-        result = task_func("xyz")
-        expected_result = {'nnn': 0, 'aaa': 0, 'sss': 0, 'ddd': 0, 'fff': 0}
-        self.assertEqual(result, expected_result)
-    
+        result = task_func([['Pizza', 1], [2, 'Coke'], ['Pasta', 3]])
+        assert isinstance(result, dict)
+        assert sum(result.values()) == 3
+    # Input 4: Empty list
     def test_case_4(self):
-        result = task_func("nnnaaannnsssdddfffnnn")
-        expected_result = {'nnn': 3, 'aaa': 1, 'sss': 1, 'ddd': 1, 'fff': 1}
-        self.assertEqual(result, expected_result)
-    
+        result = task_func([])
+        assert isinstance(result, dict)
+        assert sum(result.values()) == 0
+    # Input 5: Nested list with a single sublist
     def test_case_5(self):
-        result = task_func("xxxyyyzzz", patterns=['xxx', 'yyy', 'zzz', 'aaa'])
-        expected_result = {'xxx': 1, 'yyy': 1, 'zzz': 1, 'aaa': 0}
-        self.assertEqual(result, expected_result)
+        result = task_func([['Pizza']])
+        assert isinstance(result, dict)
+        assert sum(result.values()) == 1

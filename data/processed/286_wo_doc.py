@@ -1,87 +1,115 @@
-import mechanize
-from bs4 import BeautifulSoup
+from collections import Counter
+import os
+import csv
 
+# Constants
+FILE_DIR = './yourdictfiles/'
 
-def task_func(url, form_id, data):
+def task_func(output_file, test_directory):
     """
-    Submits a form on a given webpage using mechanize and extracts the title of the response page.
+    Count the number of words in multiple dictionary files (.txt) in a specific directory,
+    export the counts to a CSV file, and then return the total number of words.
 
     Parameters:
-        url (str): The URL of the webpage containing the form.
-        form_id (int): The index of the form to be submitted.
-        data (dict): A dictionary containing form data keys and values.
+    filename (str): The name of the output CSV file.
+    test_directory (str): The directory containing the dictionary files (.txt).
 
     Returns:
-        str: The title of the page resulting from the form submission.
+    int: total number of words in .txt files
 
-    Notes:
-        - If the page has no title, it returns 'No Title'.
+    Note:
+    - Header for the csv output file is "Word", "Count"
+    - Return 0 if the input invalid or error raised
 
     Requirements:
-        - mechanize
-        - bs4.BeautifulSoup
+    - collections.Counter
+    - os
+    - csv
 
-    Examples:
-        >>> data = {'username': 'admin', 'password': 'password'}
-        >>> title = task_func('https://www.example.com/login', 0, data)
-        >>> isinstance(title, str)
-        True
+    Example:
+    >>> task_func('word_counts.csv')
+    10
     """
-    br = mechanize.Browser()
-    br.open(url)
-    br.select_form(nr=form_id)
-    for key, value in data.items():
-        br[key] = value
-    response = br.submit()
-    soup = BeautifulSoup(response.read(), 'html.parser')
-    title = soup.title.string if soup.title else 'No Title'
-    return title
+    total_words = 0
+    try:
+        word_counts = Counter()
+        for file_name in os.listdir(test_directory):
+            if not file_name.endswith('.txt'):
+                continue
+            with open(os.path.join(test_directory, file_name), 'r') as file:
+                words = file.read().split()
+                word_counts.update(words)
+        with open(output_file, 'w') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Word', 'Count'])
+            writer.writerows(word_counts.items())
+        for word in word_counts:
+            total_words += word_counts[word]
+    except Exception as e:
+        print(e)
+    return total_words
 
 import unittest
 from unittest.mock import patch, MagicMock
+from collections import Counter
+from faker import Faker
+import shutil
+# Blackbox test cases
 class TestCases(unittest.TestCase):
-    @patch('mechanize.Browser')
-    def test_return_type(self, mock_browser):
-        """ Test that the function returns a string. """
-        mock_browser.return_value.open.return_value = MagicMock()
-        mock_browser.return_value.select_form.return_value = MagicMock()
-        mock_browser.return_value.submit.return_value.read.return_value = "<html><head><title>Test Page</title></head></html>"
-        result = task_func('https://www.example.com/login', 0, {'username': 'admin'})
-        self.assertIsInstance(result, str)
-    @patch('mechanize.Browser')
-    def test_form_submission(self, mock_browser):
-        """ Test form submission with mock data. """
-        mock_browser.return_value.open.return_value = MagicMock()
-        mock_browser.return_value.select_form.return_value = MagicMock()
-        mock_browser.return_value.submit.return_value.read.return_value = "<html><head><title>Successful Submission</title></head></html>"
-        result = task_func('https://www.example.com/submit', 0, {'data': 'test'})
-        self.assertEqual("Successful Submission", result)
-    @patch('mechanize.Browser')
-    def test_incorrect_form_id(self, mock_browser):
-        """ Test handling of incorrect form ID. """
-        mock_browser.return_value.open.return_value = MagicMock()
-        mock_browser.return_value.select_form.side_effect = mechanize.FormNotFoundError
-        with self.assertRaises(mechanize.FormNotFoundError):
-            task_func('https://www.example.com/login', 99, {'username': 'admin'})
-    @patch('mechanize.Browser')
-    def test_no_title_page(self, mock_browser):
-        """ Test handling of pages with no title. """
-        mock_browser.return_value.open.return_value = MagicMock()
-        mock_browser.return_value.select_form.return_value = MagicMock()
-        mock_browser.return_value.submit.return_value.read.return_value = "<html><body><h1>No Title Page</h1></body></html>"
-        result = task_func('https://www.example.com/no_title', 0, {})
-        self.assertEqual("No Title", result)
-    @patch('mechanize.Browser')
-    def test_different_data_inputs(self, mock_browser):
-        """ Test the function with different data inputs. """
-        mock_browser.return_value.open.return_value = MagicMock()
-        mock_browser.return_value.select_form.return_value = MagicMock()
-        mock_browser.return_value.submit.return_value.read.return_value = "<html><head><title>Different Input</title></head></html>"
-        result = task_func('https://www.example.com/different', 0, {'new_field': 'new_value'})
-        self.assertIn("Different Input", result)
-    @patch('mechanize.Browser')
-    def test_invalid_url(self, mock_browser):
-        """ Test handling of invalid URL. """
-        mock_browser.return_value.open.side_effect = mechanize.URLError(None)
-        with self.assertRaises(mechanize.URLError):
-            task_func('invalid_url', 0, {'username': 'admin'})
+    def setUp(self):
+        self.test_directory = './testdir_f270'
+        os.makedirs(self.test_directory, exist_ok=True)
+        
+        self.output_file = 'test_output.csv'
+        self.list_files = []
+    # Function to create fake dictionary files
+    def create_fake_dict_files(self, directory, num_files, num_words):
+        fake = Faker()
+        for _ in range(num_files):
+            file_name = fake.file_name(extension='txt')
+            self.list_files.append(os.path.join(directory, file_name))
+            with open(os.path.join(directory, file_name), 'w') as file:
+                words = [fake.word() for _ in range(num_words)]
+                file.write(' '.join(words))
+    
+    #remove fake files
+    def remove_files(self):
+        for fn in self.list_files:
+            if os.path.exists(fn):
+               os.remove(fn)
+        self.list_files = []
+    def tearDown(self):
+        # Remove the test_output.json file after each test
+        if os.path.exists('test_output.csv'):
+            os.remove('test_output.csv')
+        if os.path.exists(self.test_directory):
+            shutil.rmtree(self.test_directory)
+    def test_no_files_in_directory(self):
+        # Test case where there are no txt files in the directory
+        self.create_fake_dict_files(self.test_directory, 0, 0)
+        result = task_func(self.output_file, self.test_directory)
+        self.assertEqual(result, 0)
+        self.remove_files()
+    
+    def test_single_file_multiple_words(self):
+        # Test case with a single file containing multiple words
+        self.create_fake_dict_files(self.test_directory, 1, 50)
+        result = task_func(self.output_file, self.test_directory)
+        self.assertEqual(50,result)
+        self.remove_files()
+    def test_multiple_files_multiple_words(self):
+        # Test case with multiple files each containing multiple words
+        self.create_fake_dict_files(self.test_directory, 5, 20)
+        result = task_func(self.output_file, self.test_directory)
+        self.remove_files()
+        self.assertEqual(100,result)
+    def test_directory_does_not_exist(self):
+        # Test case where the specified directory does not exist
+        result = task_func(self.output_file, self.test_directory)
+        self.assertEqual(0,result)
+    def test_empty_files_in_directory(self):
+        # Test case with empty txt files in the directory
+        self.create_fake_dict_files(self.test_directory, 3, 0)
+        result = task_func(self.output_file, self.test_directory)
+        self.remove_files()
+        self.assertEqual(0,result)

@@ -1,97 +1,82 @@
-import hashlib
-import base64
+import os
+import pandas as pd
 
 
-def task_func(filename, data, password):
+def task_func(filename: str) -> pd.DataFrame:
     """
-    Encrypt a string with a password, then write the encrypted string to a file. 
-    If the file or directory does not exist, create it.
+    Read a CSV file into a Pandas DataFrame and then delete the entire contents of the original file.
 
     Parameters:
-    filename (str): The name of the file to write to.
-    data (str): The string to encrypt and write to the file.
-    password (str): The password to use for encryption.
+    - filename (str): The name of the CSV file to read and erase.
 
     Returns:
-    str: The encrypted string.
+    - DataFrame: The contents of the CSV file as a pandas DataFrame.
+
+    Raises:
+    - FileNotFoundError: If the CSV file does not exist.
 
     Requirements:
-    - hashlib
-    - base64
+    - os
+    - pandas
 
     Example:
-    >>> task_func('test.txt', 'Hello, World!', 'password')
-    'Fu0k9LUEJCY+ookLrA=='
+    >>> import os
+    >>> from unittest.mock import patch
+    >>> with patch('os.path.exists', return_value=False):
+    ...     task_func('nonexistent.csv')
+    Traceback (most recent call last):
+        ...
+    FileNotFoundError: No such file: 'nonexistent.csv'
     """
-    directory = os.path.dirname(filename)
-    os.makedirs(directory, exist_ok=True)
     if not os.path.exists(filename):
-        open(filename, 'a').close()
-    key = hashlib.sha256(password.encode()).digest()
-    encrypted_bytes = [byte ^ key[i % len(key)] for i, byte in enumerate(data.encode())]
-    encrypted = base64.b64encode(bytes(encrypted_bytes)).decode()
-    with open(filename, 'w') as f:
-        f.write(encrypted)
-    return encrypted
+        raise FileNotFoundError(f"No such file: '{filename}'")
+    if os.stat(filename).st_size == 0:
+        return pd.DataFrame()
+    df = pd.read_csv(filename)
+    with open(filename, 'w') as file:
+        file.truncate()
+    return df
 
 import unittest
-import os
 import shutil
-OUTPUT_DIR = './output'
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
+OUTPUT_DIR = r'./output'
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.output_dir = OUTPUT_DIR
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+        self.test_file = os.path.join(self.output_dir, 'test.csv')
+        with open(self.test_file, 'w') as f:
+            f.write("col1,col2\n1,2\n3,4")
+        # Debugging: Verify file content immediately after writing
+        with open(self.test_file, 'r') as f:
+            content = f.read()
+        print(f"Debug: Content written to {self.test_file}: {content}")
     def tearDown(self):
-        """Clean up any files created during the tests."""
-        # Check and remove the expected file if it exists
-        # if os.path.exists(FILE_PATH):
-        #     os.remove(FILE_PATH)
-        if os.path.exists(OUTPUT_DIR):
-            shutil.rmtree(OUTPUT_DIR)
-    def test_case_1(self):
-        # Testing basic encryption and file write
-        file1 = os.path.join(OUTPUT_DIR, 'test1.txt')
-        encrypted = task_func(file1, 'Hello, World!', 'password123')
-        with open(file1, 'r') as f:
-            file_content = f.read()
-        self.assertEqual(encrypted, file_content)
-        
-    def test_case_2(self):
-        # Testing with different data and password
-        file2 = os.path.join(OUTPUT_DIR, 'test2.txt')
-        encrypted = task_func(file2, 'OpenAI', 'secret')
-        with open(file2, 'r') as f:
-            file_content = f.read()
-        self.assertEqual(encrypted, file_content)
-        
-    def test_case_3(self):
-        # Testing with special characters in data and password
-        file3 = os.path.join(OUTPUT_DIR, 'test3.txt')
-        data = '!@#$%^&*()_+'
-        password = 'special_chars'
-        encrypted = task_func(file3, data, password)
-        with open(file3, 'r') as f:
-            file_content = f.read()
-        self.assertEqual(encrypted, file_content)
-        
-    def test_case_4(self):
-        # Testing file creation if it doesn't exist
-        file4 = os.path.join(OUTPUT_DIR, 'nonexistent_file.txt')
-        if os.path.exists(file4):
-            os.remove(file4)
-        encrypted = task_func(file4, 'Test Data', 'pwd')
-        self.assertTrue(os.path.exists(file4))
-        
-    def test_case_5(self):
-        # Testing decryption to ensure encryption is reversible
-        file5 = os.path.join(OUTPUT_DIR, 'test5.txt')
-        data = 'Decryption Test'
-        password = 'decrypt_pwd'
-        encrypted = task_func(file5, data, password)
-        
-        # Decryption logic (reverse of encryption)
-        key = hashlib.sha256(password.encode()).digest()
-        decrypted_bytes = [byte ^ key[i % len(key)] for i, byte in enumerate(base64.b64decode(encrypted))]
-        decrypted = bytes(decrypted_bytes).decode()
-        
-        self.assertEqual(data, decrypted)
+        # Clean up by removing the test file and the test_data directory
+        shutil.rmtree(self.output_dir, ignore_errors=True)
+    def test_file_not_found(self):
+        """Test the function with a filename that does not exist."""
+        with self.assertRaises(FileNotFoundError):
+            task_func('nonexistent.csv')
+    def test_file_removal(self):
+        """Ensure the function does not remove the file, only erases contents."""
+        task_func(self.test_file)
+        self.assertTrue(os.path.exists(self.test_file))
+    def test_empty_csv(self):
+        """Test reading an empty CSV file."""
+        open(self.test_file, 'w').close()  # Ensure the file is empty
+        df = task_func(self.test_file)
+        self.assertTrue(df.empty, "DataFrame should be empty for an empty CSV file.")
+        self.assertEqual(os.path.getsize(self.test_file), 0, "The file should still be erased.")
+    def test_file_is_erased_after_reading(self):
+        """Ensure the CSV file is erased after its content is read into a DataFrame."""
+        _ = task_func(self.test_file)
+        # Check that the file exists but its content is erased
+        self.assertTrue(os.path.exists(self.test_file), "The file should still exist.")
+        self.assertEqual(os.path.getsize(self.test_file), 0, "The file's content should be erased.")
+    def test_handling_non_existent_file(self):
+        """Test the function's response to being given a non-existent file path."""
+        non_existent_file = os.path.join(self.output_dir, 'non_existent.csv')
+        with self.assertRaises(FileNotFoundError, msg="Expected FileNotFoundError for non-existent file."):
+            _ = task_func(non_existent_file)

@@ -1,70 +1,79 @@
 from datetime import datetime
-import pandas as pd
-from itertools import product
-
-# Constants
-EMPLOYEES = ["John", "Alice", "Bob", "Charlie", "Dave"]
+import random
+import matplotlib.pyplot as plt
 
 
 def task_func(date_str):
     """
-    Generate a Pandas DataFrame containing a series of dates for a predefined list of employees.
+    Generates a list of random integers, where the count of integers equals the day of the month in the
+    provided date, then generates a line plot of these integers and returns the Axes object of the plot.
 
     Parameters:
-    - date_str (str): A date string in the "yyyy-mm-dd" format to define the starting date.
+    - date_str (str): The date string in "yyyy-mm-dd" format.
 
     Returns:
-    - DataFrame: A pandas DataFrame with 'Employee' and 'Date' columns, listing the next 10 days for each employee.
+    - matplotlib.axes.Axes: The Axes object containing the plot.
 
     Requirements:
     - datetime.datetime
-    - pandas
-    - itertools
+    - random
+    - matplotlib.pyplot
 
     Example:
-    >>> df = task_func('2023-06-15')
-    >>> print(df)
-       Employee       Date
-    0      John 2023-06-15
-    1      John 2023-06-16
-    ...
-    49     Dave 2023-06-24
+    >>> ax = task_func('2023-06-15')
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    start_date = datetime.strptime(date_str, "%Y-%m-%d")
-    dates = pd.date_range(start_date, periods=10).tolist()
-    df = pd.DataFrame(list(product(EMPLOYEES, dates)), columns=["Employee", "Date"])
-    return df
+    date = datetime.strptime(date_str, "%Y-%m-%d")
+    num_of_values = date.day
+    random_values = [random.randint(1, 100) for _ in range(num_of_values)]
+    _, ax = plt.subplots()
+    ax.plot(random_values)
+    return ax
 
 import unittest
-import pandas as pd
-from datetime import datetime, timedelta
+import matplotlib.axes
+from datetime import datetime
 class TestCases(unittest.TestCase):
-    """Test cases for the function."""
-    def test_return_type(self):
-        """Test if the function returns a Pandas DataFrame."""
-        df_test = task_func("2023-01-01")
-        self.assertIsInstance(df_test, pd.DataFrame)
-    def test_correct_columns(self):
-        """Test if the DataFrame has the correct columns: 'Employee' and 'Date'."""
-        df_test = task_func("2023-01-01")
-        self.assertListEqual(df_test.columns.tolist(), ["Employee", "Date"])
-    def test_date_range(self):
-        """Test if the function generates the correct date range for 10 days."""
-        start_date = "2023-01-01"
-        df_test = task_func(start_date)
-        end_date = (
-            datetime.strptime(start_date, "%Y-%m-%d") + timedelta(days=9)
-        ).date()
-        self.assertTrue(all(df_test["Date"] <= pd.Timestamp(end_date)))
-    def test_number_of_rows(self):
-        """Test if the DataFrame has the correct number of rows (10 days * number of employees)."""
-        df_test = task_func("2023-01-01")
-        expected_rows = 10 * len(EMPLOYEES)  # 10 days for each employee
-        self.assertEqual(len(df_test), expected_rows)
+    """Test cases for task_func."""
+    def test_mid_month(self):
+        """
+        Test the function with a mid-month date.
+        Checks if the generated plot has 15 data points for a date like '2023-06-15'.
+        """
+        ax = task_func("2023-06-15")
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        self.assertEqual(len(ax.lines[0].get_ydata()), 15)
+    def test_beginning_of_month(self):
+        """
+        Test the function with a date at the beginning of the month.
+        Checks if the plot has 1 data point for a date like '2023-06-01'.
+        """
+        ax = task_func("2023-06-01")
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        self.assertEqual(len(ax.lines[0].get_ydata()), 1)
+    def test_end_of_month(self):
+        """
+        Test the function with a date at the end of the month.
+        Checks if the plot has 31 data points for a date like '2023-07-31'.
+        """
+        ax = task_func("2023-07-31")
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        self.assertEqual(len(ax.lines[0].get_ydata()), 31)
     def test_leap_year(self):
-        """Test if the function correctly handles the date range for a leap year."""
-        df_test = task_func("2024-02-28")
-        leap_year_end_date = (
-            datetime.strptime("2024-02-28", "%Y-%m-%d") + timedelta(days=9)
-        ).date()
-        self.assertIn(pd.Timestamp(leap_year_end_date), df_test["Date"].values)
+        """
+        Test the function with a leap year date.
+        Checks if the plot has 29 data points for a leap year date like '2024-02-29'.
+        """
+        ax = task_func("2024-02-29")
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        self.assertEqual(len(ax.lines[0].get_ydata()), 29)
+    def test_invalid_date(self):
+        """
+        Test the function with an invalid date format.
+        Expects a ValueError to be raised for an incorrectly formatted date.
+        """
+        with self.assertRaises(ValueError):
+            task_func("2023/06/15")
+    def tearDown(self):
+        plt.clf()

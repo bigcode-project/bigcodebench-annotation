@@ -9,7 +9,7 @@ USERS = ['Alice', 'Bob', 'Charlie', 'Dave', 'Eve']
 def f_243(file_path, num_entries, seed=None):
     """
     Create a JSON file on a specific file path with random user activity data.
-    The number of entries in the JSON file is determined by num_entries.
+    The number of entries in the JSON file is determined by num_entries. The written JSON file contains a list of dictionaries, with each dictionary representing a log entry with the following keys: 'user', 'action', and 'timestamp'.
 
     Parameters:
     file_path (str): The file path where the JSON file should be created.

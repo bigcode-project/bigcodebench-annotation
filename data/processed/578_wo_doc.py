@@ -1,76 +1,76 @@
-import os
-import pathlib
-from hashlib import md5
 import unicodedata
+import requests
 
-def task_func(directory):
+URL = 'https://api.github.com/users/'
+
+def task_func(username):
     """
-    Processes all files within the specified directory, normalizes their filenames to ASCII,
-    calculates their MD5 hashes, and retrieves their sizes. It returns a dictionary where
-    each key is the normalized file name and each value is another dictionary with the file's size
-    and MD5 hash. This method is useful for file integrity checks and file organization tasks.
+    Retrieves user information from the GitHub API for a given username, normalizes all string data to ASCII,
+    and returns a dictionary of the normalized data. This function demonstrates data retrieval from a web API
+    and handling of Unicode data normalization.
 
     Parameters:
-    directory (str): The directory path whose files are to be analyzed.
+    username (str): The GitHub username.
 
     Returns:
-    dict: A dictionary where each key is a normalized file name, and the value is a dictionary
-          containing the 'Size' (in bytes) and 'MD5 Hash' of the file.
+    dict: A dictionary with the user's data, where all string values are normalized to ASCII.
+
+    Raises:
+    requests.exceptions.HTTPError: For any HTTP response indicating an error.
 
     Requirements:
-    - os
-    - pathlib
-    - hashlib.md5
     - unicodedata
+    - requests
 
     Examples:
-    >>> info = task_func('test')
-    >>> type(info) == dict
+    >>> result = task_func('torvalds')
+    >>> isinstance(result, dict)
     True
-    >>> 'test.txt' in info
+    >>> 'login' in result
     True
     """
-    files_info = {}
-    for file_path in pathlib.Path(directory).iterdir():
-        if file_path.is_file():
-            normalized_file_name = unicodedata.normalize('NFKD', file_path.name).encode('ascii', 'ignore').decode()
-            with open(file_path, 'rb') as file:
-                file_content = file.read()
-                file_hash = md5(file_content).hexdigest()
-            files_info[normalized_file_name] = {'Size': os.path.getsize(file_path), 'MD5 Hash': file_hash}
-    return files_info
+    response = requests.get(URL + username)
+    try:
+        response.raise_for_status()  # This will raise an HTTPError if the response was an error
+        user_data = response.json()
+    except requests.exceptions.HTTPError as e:
+        error_msg = f"Failed to fetch user data for '{username}'. HTTP status: {e.response.status_code} - {e.response.reason}."
+        raise Exception(error_msg) from e
+    normalized_user_data = {}
+    for key, value in user_data.items():
+        if isinstance(value, str):
+            normalized_value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode()
+            normalized_user_data[key] = normalized_value
+        else:
+            normalized_user_data[key] = value
+    return normalized_user_data
 
 import unittest
-import os
-import tempfile
-import hashlib
+from unittest.mock import patch, Mock
+import requests
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Setup a temporary directory with files for testing
-        self.temp_dir = tempfile.TemporaryDirectory()
-        self.test_file_path = os.path.join(self.temp_dir.name, "tést.txt")
-        with open(self.test_file_path, "w") as file:
-            file.write("Hello World")
-    def test_return_type(self):
-        result = task_func(self.temp_dir.name)
+    @patch('requests.get')
+    def test_return_type(self, mock_get):
+        mock_get.return_value.json.return_value = {'login': 'user', 'name': 'Test User'}
+        result = task_func('user')
         self.assertIsInstance(result, dict)
-    def test_file_presence(self):
-        result = task_func(self.temp_dir.name)
-        self.assertIn("test.txt", result)
-    def test_file_size(self):
-        result = task_func(self.temp_dir.name)
-        self.assertEqual(result["test.txt"]["Size"], 11)
-    def test_file_hash(self):
-        # This test could check the MD5 hash of a known file content
-        expected_hash = hashlib.md5("Hello World".encode()).hexdigest()
-        result = task_func(self.temp_dir.name)
-        normalized_file_name = "test.txt"
-        self.assertEqual(result[normalized_file_name]["MD5 Hash"], expected_hash)
-    def test_normalized_filename(self):
-        # This test could check for filename normalization (ASCII conversion)
-        result = task_func(self.temp_dir.name)
-        expected_name = "test.txt"
-        self.assertIn(expected_name, result)
-        self.assertNotIn("tést.txt", result)
-    def tearDown(self):
-        self.temp_dir.cleanup()
+    @patch('requests.get')
+    def test_normalized_string(self, mock_get):
+        mock_get.return_value.json.return_value = {'login': 'user', 'name': 'Tést Üser'}
+        result = task_func('user')
+        self.assertEqual(result['name'], 'Test User')
+    @patch('requests.get')
+    def test_non_string_values(self, mock_get):
+        mock_get.return_value.json.return_value = {'login': 'user', 'id': 12345}
+        result = task_func('user')
+        self.assertEqual(result['id'], 12345)
+    @patch('requests.get')
+    def test_empty_username(self, mock_get):
+        mock_get.return_value.json.return_value = {}
+        result = task_func('')
+        self.assertEqual(result, {})
+    @patch('requests.get')
+    def test_error_response(self, mock_get):
+        mock_get.return_value.raise_for_status = Mock(side_effect=requests.exceptions.HTTPError("404 Not Found"))
+        with self.assertRaises(Exception) as context:
+            task_func('nonexistentuser')

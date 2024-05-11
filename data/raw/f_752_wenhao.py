@@ -22,7 +22,10 @@ def f_752(letters, repetitions, colors):
       Must be the same length as `letters`.
     
     Returns:
-    - Returns the Matplotlib Axes object representing the created bar chart.
+    - Returns the Matplotlib Axes object representing the created bar chart, with the x-axis labeled 'Letters', y-axis labeled 'Frequency', and title 'Frequency of Letters'.
+    
+    Raises:
+    - ValueError: If the lengths of the input lists do not match or if any list is empty.
     
     Requirements:
     - numpy

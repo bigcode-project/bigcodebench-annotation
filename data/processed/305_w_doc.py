@@ -1,82 +1,61 @@
-import pandas as pd
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
+from collections import Counter
+import itertools
+import random
 
-def task_func(df):
-    '''
-    Processes a DataFrame containing dates and lists of numbers. It converts the lists into separate columns,
-    performs Principal Component Analysis (PCA), and returns the explained variance ratio of the principal components
-    along with a bar chart visualizing this ratio. Returns 0,0 if the input DataFrame is empty.
 
+# Constants
+ALPHABET = 'abcdefghijklmnopqrstuvwxyz'
+
+def task_func(list_of_lists, seed=0):
+    """
+    Count the frequency of each letter in a list of lists. If a list is empty, 
+    fill it with a random sample from the alphabet, and then count the letters.
+    
     Parameters:
-    df (DataFrame): A pandas DataFrame with columns 'Date' and 'Value'. 'Date' is a date column, and 'Value' contains 
-                    lists of numbers.
-
+    list_of_lists (list): The list of lists.
+    seed (int): The seed for the random number generator. Defaults to 0.
+    
     Returns:
-    tuple: (explained_variance_ratio, ax)
-           explained_variance_ratio (ndarray): The explained variance ratio of the principal components.
-           ax (Axes): The matplotlib Axes object for the variance ratio bar chart.
-
-    Note:
-    - The function use "Explained Variance Ratio of Principal Components" for the plot title.
-    - The function use "Principal Component" and "Explained Variance Ratio" as the xlabel and ylabel respectively.
+    Counter: A Counter object with the frequency of each letter.
     
     Requirements:
-    - pandas
-    - sklearn.decomposition
-    - matplotlib.pyplot
-
+    - collections.Counter
+    - itertools
+    - random.sample
+    
     Example:
-    >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-    >>> explained_variance_ratio, ax = task_func(df)
-    >>> print(len(explained_variance_ratio))
-    2
-    '''
-    if df.empty:
-        return 0,0
-    df['Date'] = pd.to_datetime(df['Date'])
-    df = pd.concat([df['Date'], df['Value'].apply(pd.Series)], axis=1)
-    pca = PCA()
-    pca.fit(df.iloc[:,1:])
-    explained_variance_ratio = pca.explained_variance_ratio_
-    fig, ax = plt.subplots()
-    ax.bar(range(len(explained_variance_ratio)), explained_variance_ratio)
-    ax.set_title('Explained Variance Ratio of Principal Components')
-    ax.set_xlabel('Principal Component')
-    ax.set_ylabel('Explained Variance Ratio')
-    return explained_variance_ratio, ax
+    >>> dict(task_func([['a', 'b', 'c'], [], ['d', 'e', 'f']]))
+    {'a': 1, 'b': 2, 'c': 1, 'd': 1, 'e': 1, 'f': 1, 'm': 1, 'y': 1, 'n': 1, 'i': 1, 'q': 1, 'p': 1, 'z': 1, 'j': 1, 't': 1}
+    """
+    random.seed(seed)
+    flattened_list = list(itertools.chain(*list_of_lists))
+    for list_item in list_of_lists:
+        if list_item == []:
+            flattened_list += random.sample(ALPHABET, 10)
+    counter = Counter(flattened_list)
+    return counter
 
 import unittest
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+from collections import Counter
+import doctest
 class TestCases(unittest.TestCase):
-    def test_return_types(self):
-        df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        variance_ratio, plot = task_func(df)
-        self.assertIsInstance(variance_ratio, np.ndarray)
-        self.assertIsInstance(plot, plt.Axes)
-    def test_known_input_output(self):
-        df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        variance_ratio, plot = task_func(df)
-        self.assertIsInstance(variance_ratio, np.ndarray)
-        self.assertIsInstance(plot, plt.Axes)
-    def test_empty_dataframe(self):
-        empty_df = pd.DataFrame()
-        variance_ratio, _ = task_func(empty_df)
-        self.assertEqual(variance_ratio, 0)
-    def test_single_row_dataframe(self):
-        single_row_df = pd.DataFrame([['2021-01-01', [8, 10, 12]]], columns=['Date', 'Value'])
-        variance_ratio, _ = task_func(single_row_df)
-        self.assertEqual(len(variance_ratio), 1)
-    def test_plot_attributes(self):
-        df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        _, ax = task_func(df)
-        self.assertEqual(ax.get_title(), 'Explained Variance Ratio of Principal Components')
-        self.assertEqual(ax.get_xlabel(), 'Principal Component')
-        self.assertEqual(ax.get_ylabel(), 'Explained Variance Ratio')
-    def test_plot_explained_variance_ratio(self):
-        df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        variance_ratio, ax = task_func(df)
-        bar_heights = [rect.get_height() for rect in ax.patches]
-        self.assertListEqual(bar_heights, list(variance_ratio))
+    def test_case_1(self):
+        result = task_func([['a', 'b', 'c'], ['d', 'e', 'f']])
+        expected = Counter({'a': 1, 'b': 1, 'c': 1, 'd': 1, 'e': 1, 'f': 1})
+        self.assertEqual(result, expected)
+    def test_case_2(self):
+        result = task_func([['a', 'b', 'c'], [], ['d', 'e', 'f']])
+        # Since the function can add random letters, we'll ensure that the known letters are counted correctly
+        self.assertEqual(sum(result.values()), 16)  # 6 known letters + 10 random letters
+    def test_case_3(self):
+        result = task_func([[], [], []])
+        # Here, the function should add 30 random letters (10 for each empty list)
+        self.assertEqual(sum(result.values()), 30)
+    def test_case_4(self):
+        result = task_func([])
+        # For an entirely empty input list, the result should also be an empty Counter
+        self.assertEqual(result, Counter())
+    def test_case_5(self):
+        result = task_func([['x', 'y', 'z'], ['a', 'b', 'c']])
+        expected = Counter({'x': 1, 'y': 1, 'z': 1, 'a': 1, 'b': 1, 'c': 1})
+        self.assertEqual(result, expected)

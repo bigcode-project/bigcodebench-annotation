@@ -1,78 +1,59 @@
 import pandas as pd
-import seaborn as sns
-from scipy.stats import zscore
+import matplotlib.pyplot as plt
+from scipy.stats import skew
 
 
 def task_func(data_matrix):
     """
-    Calculate the Z-values of a 2D data matrix, calculate the mean value of each row and then visualize the correlation matrix of the Z-values with a heatmap.
+    Calculate the skew of each row in a 2D data matrix and plot the distribution.
 
     Parameters:
-    data_matrix (numpy.array): The 2D data matrix of shape (m, n) where m is the number of rows and n is the number of columns.
+    - data_matrix (numpy.array): The 2D data matrix.
 
     Returns:
-    tuple: A tuple containing:
-      - pandas.DataFrame: A DataFrame with columns 'Feature 1', 'Feature 2', ..., 'Feature n' containing the Z-scores (per matrix row).
-                      There is also an additional column 'Mean' the mean of z-score per row.
-      - matplotlib.axes.Axes: The Axes object of the plotted heatmap.
+    pandas.DataFrame: A DataFrame containing the skewness of each row. The skweness is stored in a new column which name is 'Skewness'.
+    matplotlib.axes.Axes: The Axes object of the plotted distribution.
 
     Requirements:
     - pandas
-    - seaborn
-    - scipy.stats.zscore
+    - matplotlib.pyplot
+    - scipy.stats.skew
 
     Example:
     >>> import numpy as np
     >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
     >>> df, ax = task_func(data)
     >>> print(df)
-       Feature 1  Feature 2  Feature 3  Feature 4  Feature 5          Mean
-    0   0.662085   1.489691  -1.406930  -0.579324  -0.165521 -2.053913e-16
-    1  -1.207020  -0.742781   0.649934   1.578410  -0.278543 -3.330669e-17
+       Skewness
+    0  0.122440
+    1  0.403407
     """
-    z_scores = zscore(data_matrix, axis=1)
-    feature_columns = ["Feature " + str(i + 1) for i in range(data_matrix.shape[1])]
-    df = pd.DataFrame(z_scores, columns=feature_columns)
-    df["Mean"] = df.mean(axis=1)
-    correlation_matrix = df.corr()
-    ax = sns.heatmap(correlation_matrix, annot=True, fmt=".2f")
-    return df, ax
+    skewness = skew(data_matrix, axis=1)
+    df = pd.DataFrame(skewness, columns=["Skewness"])
+    plt.figure(figsize=(10, 5))
+    df["Skewness"].plot(kind="hist", title="Distribution of Skewness")
+    return df, plt.gca()
 
 import unittest
+import os
 import numpy as np
-import matplotlib
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
+    def setUp(self):
+        self.test_dir = "data/task_func"
+        os.makedirs(self.test_dir, exist_ok=True)
     def test_case_1(self):
         data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         df, ax = task_func(data)
-        self.assertTrue(isinstance(df, pd.DataFrame))
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
-        np.testing.assert_array_equal(
-            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
-            zscore(data, axis=1),
-        )
-        self.assertTrue("Mean" in df.columns)
+        self.verify_output(df, ax, data.shape[0], data)
     def test_case_2(self):
         data = np.array([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
         df, ax = task_func(data)
-        self.assertTrue(isinstance(df, pd.DataFrame))
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
-        np.testing.assert_array_equal(
-            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
-            zscore(data, axis=1),
-        )
-        self.assertTrue("Mean" in df.columns)
+        self.verify_output(df, ax, data.shape[0], data)
     def test_case_3(self):
         data = np.array([[3, 5, 7, 1000], [200, 5, 7, 1], [1, -9, 14, 700]])
         df, ax = task_func(data)
-        self.assertTrue(isinstance(df, pd.DataFrame))
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
-        np.testing.assert_array_equal(
-            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
-            zscore(data, axis=1),
-        )
-        self.assertTrue("Mean" in df.columns)
+        self.verify_output(df, ax, data.shape[0], data)
     def test_case_4(self):
         data = np.array(
             [
@@ -80,20 +61,25 @@ class TestCases(unittest.TestCase):
             ]
         )
         df, ax = task_func(data)
-        self.assertTrue(isinstance(df, pd.DataFrame))
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
-        np.testing.assert_array_equal(
-            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
-            zscore(data, axis=1),
-        )
-        self.assertTrue("Mean" in df.columns)
+        self.verify_output(df, ax, data.shape[0], data)
     def test_case_5(self):
-        data = np.array([[1], [1], [1]])
+        data = np.array([[1, 1], [1, 1], [1, 1]])
         df, ax = task_func(data)
-        self.assertTrue(isinstance(df, pd.DataFrame))
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
-        np.testing.assert_array_equal(
-            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
-            zscore(data, axis=1),
-        )
-        self.assertTrue("Mean" in df.columns)
+        # Check if DataFrame is returned with correct values
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(df.shape, (3, 1))
+        self.assertIn("Skewness", df.columns)
+        # Check if Axes object is returned for the plot
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "Distribution of Skewness")
+    def verify_output(self, df, ax, expected_rows, data):
+        # Check if DataFrame is returned with correct values
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(df.shape, (expected_rows, 1))
+        self.assertIn("Skewness", df.columns)
+        # Check if Axes object is returned for the plot
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_title(), "Distribution of Skewness")
+        # Check skewness values
+        skewness = skew(data, axis=1)
+        self.assertListEqual(df["Skewness"].tolist(), list(skewness))

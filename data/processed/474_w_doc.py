@@ -1,95 +1,155 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import itertools
+from scipy.stats import norm
 
-def task_func(n_walks, n_steps, seed=None):
+
+def task_func(n_samples=1000, mu=0, sigma=1, random_seed=0):
     """
-    Create and plot `n_walks` number of random walks, each with `n_steps` steps.
+    Generates a histogram and a probability density function (PDF) plot for a specified normal distribution.
 
-    The function checks for valid n_walks and n_steps, then generates walks via numpy.
-    Each walk is plotted in a different color cycling through a predefined set of colors:
-    ['b', 'g', 'r', 'c', 'm', 'y', 'k'].
+    This function draws n_samples from a normal distribution defined by mean (mu) and standard deviation (sigma),
+    plots a histogram of the samples, and overlays the PDF of the normal distribution. The histogram's density
+    is normalized, and the PDF is plotted with a red line with linewidth=2.
 
     Parameters:
-    - n_walks (int): The number of random walks to be generated and plotted.
-    - n_steps (int): The number of steps in each random walk.
-    - seed (int, optional): Seed for random number generation. Default is None.
+    - n_samples (int): Number of samples for the histogram. Must be greater than 0. Default is 1000.
+    - mu (float): Mean for the normal distribution. Default is 0.
+    - sigma (float): Standard deviation for the normal distribution. Must be greater than 0. Default is 1.
+    - random_seed (int): Random seed for reproducibility. Defaults to 0.
 
     Returns:
-    - ax (plt.Axes): A Matplotlib Axes containing the plotted random walks.
+    - ax (matplotlib.axes._axes.Axes): Axes object with the histogram and PDF plotted.
+    - samples (numpy.ndarray): Generated sample data.
 
     Requirements:
     - numpy
-    - matplotlib
-    - itertools
+    - matplotlib.pyplot
+    - scipy.stats.norm
 
     Example:
-    >>> ax = task_func(5, 100, seed=42)
+    >>> ax, samples = task_func()
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_xticklabels()
-    [Text(-20.0, 0, '−20'), Text(0.0, 0, '0'), Text(20.0, 0, '20'), Text(40.0, 0, '40'), Text(60.0, 0, '60'), Text(80.0, 0, '80'), Text(100.0, 0, '100'), Text(120.0, 0, '120')]
+    [Text(-5.0, 0, '−5'), Text(-4.0, 0, '−4'), Text(-3.0, 0, '−3'), Text(-2.0, 0, '−2'), Text(-1.0, 0, '−1'), Text(0.0, 0, '0'), Text(1.0, 0, '1'), Text(2.0, 0, '2'), Text(3.0, 0, '3'), Text(4.0, 0, '4'), Text(5.0, 0, '5')]
     """
-    if n_walks < 0 or n_steps < 0:
-        raise ValueError("Walks and steps cannot be negative.")
-    np.random.seed(seed)
-    COLORS = ["b", "g", "r", "c", "m", "y", "k"]
-    color_cycle = itertools.cycle(COLORS)
-    fig, ax = plt.subplots()
-    for _ in range(n_walks):
-        walk = np.random.choice([-1, 1], size=n_steps)
-        walk = np.cumsum(walk)
-        ax.plot(walk, next(color_cycle))
-    return ax
+    if n_samples <= 0 or sigma <= 0:
+        raise ValueError("Invalid n_samples or sigma")
+    np.random.seed(random_seed)
+    plt.figure()
+    samples = np.random.normal(mu, sigma, n_samples)
+    _, _, _ = plt.hist(samples, 30, density=True)
+    ax = plt.gca()
+    ax.plot(
+        np.linspace(mu - 4 * sigma, mu + 4 * sigma, 1000),
+        norm.pdf(np.linspace(mu - 4 * sigma, mu + 4 * sigma, 1000), mu, sigma),
+        linewidth=2,
+        color="r",
+    )
+    return ax, samples
 
 import unittest
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.default_seed = 42
+        self.large_n_samples = 100000
+        self.small_n_samples = 100
+        self.zero_n_samples = 0
+        self.negative_n_samples = -100
+        self.default_mu = 0
+        self.default_sigma = 1
+        self.large_sigma = 5
+        self.small_sigma = 0.2
+        self.zero_sigma = 0
+        self.negative_sigma = -1
+        self.custom_mu = 5
+        self.custom_sigma = 2
     def test_case_1(self):
-        # Test basic setup
-        ax = task_func(5, 100, seed=42)
-        self.assertIsInstance(ax, plt.Axes)
+        # Test data generation correctness
+        mu_test = 3
+        sigma_test = 2
+        n_samples_test = 10000
+        random_seed_test = 42
+        _, samples = task_func(
+            n_samples=n_samples_test,
+            mu=mu_test,
+            sigma=sigma_test,
+            random_seed=random_seed_test,
+        )
+        # Calculate sample mean and standard deviation
+        sample_mean = np.mean(samples)
+        sample_std = np.std(samples)
+        # Verify sample mean and standard deviation are close to mu and sigma within a tolerance
+        self.assertAlmostEqual(
+            sample_mean,
+            mu_test,
+            places=1,
+            msg="Sample mean does not match expected mean.",
+        )
+        self.assertAlmostEqual(
+            sample_std,
+            sigma_test,
+            places=1,
+            msg="Sample standard deviation does not match expected sigma.",
+        )
     def test_case_2(self):
-        # Test number of walks
-        for n_walk in [0, 1, 2, 10, 50]:
-            ax = task_func(n_walk, 10, seed=42)
-            lines = ax.get_lines()
-            self.assertEqual(len(lines), n_walk)
+        # Default parameters
+        ax, _ = task_func(random_seed=self.default_seed)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.patches), 30)
     def test_case_3(self):
-        # Test number of steps
-        for n_steps in [0, 1, 10, 100, 500]:
-            ax = task_func(2, n_steps, seed=42)
-            lines = ax.get_lines()
-            self.assertEqual(len(lines[0].get_ydata()), n_steps)
+        # Custom parameters: small number of samples, custom mean and standard deviation
+        ax, _ = task_func(
+            n_samples=self.small_n_samples,
+            mu=self.custom_mu,
+            sigma=self.custom_sigma,
+            random_seed=self.default_seed,
+        )
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.patches), 30)
     def test_case_4(self):
-        # Test random seed
-        ax1 = task_func(5, 100, seed=42)
-        ax2 = task_func(5, 100, seed=42)
-        ax3 = task_func(5, 100, seed=0)
-        lines1 = ax1.get_lines()
-        lines2 = ax2.get_lines()
-        lines3 = ax3.get_lines()
-        self.assertTrue(
-            all(
-                np.array_equal(line1.get_ydata(), line2.get_ydata())
-                for line1, line2 in zip(lines1, lines2)
-            )
-        )
-        self.assertFalse(
-            all(
-                np.array_equal(line1.get_ydata(), line3.get_ydata())
-                for line1, line3 in zip(lines1, lines3)
-            ),
-            "Random walks are not reproducible using the same seed.",
-        )
+        # Large number of samples
+        ax, _ = task_func(n_samples=self.large_n_samples, random_seed=self.default_seed)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(len(ax.patches) >= 30)
     def test_case_5(self):
-        # Test invalid n_walks
-        with self.assertRaises(ValueError):
-            task_func(-1, 100, seed=42)
+        # Small number of samples
+        ax, _ = task_func(n_samples=self.small_n_samples, random_seed=self.default_seed)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertTrue(len(ax.patches) <= 30)
     def test_case_6(self):
-        # Test negative n_steps
+        # Large standard deviation
+        ax, _ = task_func(sigma=self.large_sigma, random_seed=self.default_seed)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.patches), 30)
+    def test_case_7(self):
+        # Small standard deviation
+        ax, _ = task_func(sigma=self.small_sigma, random_seed=self.default_seed)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.patches), 30)
+    def test_case_8(self):
+        # Invalid negative standard deviation
         with self.assertRaises(ValueError):
-            task_func(1, -100, seed=42)
+            task_func(sigma=self.negative_sigma)
+    def test_case_9(self):
+        # Invalid zero standard deviation
+        with self.assertRaises(Exception):
+            task_func(sigma=self.zero_sigma)
+    def test_case_10(self):
+        # Invalid zero samples
+        with self.assertRaises(Exception):
+            task_func(n_samples=self.zero_n_samples)
+    def test_case_11(self):
+        # Invalid negative samples
+        with self.assertRaises(ValueError):
+            task_func(n_samples=self.negative_n_samples)
+    def test_case_12(self):
+        # Reproducibility with same seed
+        ax1, sample1 = task_func(random_seed=self.default_seed)
+        ax2, sample2 = task_func(random_seed=self.default_seed)
+        self.assertEqual(ax1.patches[0].get_height(), ax2.patches[0].get_height())
+        self.assertTrue((sample1 == sample2).all())
     def tearDown(self):
         plt.close("all")

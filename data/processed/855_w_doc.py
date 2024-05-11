@@ -1,88 +1,63 @@
-from functools import reduce
-from itertools import permutations
-import math
+import random
+import string
+import collections
 
-def task_func(numbers):
-    '''
-    Generate all permutations of a given list of numbers and calculate the sum 
-    of the factorials of each number in each permutation.
-    If an empty list is given, the function returns empty lists.
+# Constants
+VALID_CHARACTERS = string.ascii_letters + string.digits
+
+def task_func(n_strings, string_length):
+    """
+    Generate n random strings of a specified length, count the frequency of each character across all strings, and return the result as a dictionary.
 
     Parameters:
-    numbers (list of int): A list of integers to permute and calculate 
-                           factorial sums.
+    - n_strings (int): The number of random strings to generate.
+    - string_length (int): The length of each random string.
 
     Returns:
-    list of int: A list containing the sums of the factorials of each number 
-                 in each permutation.
-    list of list of int: A list containing all permutations of numbers.
-
-    Raises:
-    TypeError: If numbers is not a list of integers.
-    ValueError: If input numbers are negative.
+    - dict: A dictionary containing character counts with characters as keys and their frequencies as values.
 
     Requirements:
-    - functools.reduce
-    - itertools.permutations
-    - math.factorial
+    - random
+    - string
+    - collections
+
+    Constants:
+    - VALID_CHARACTERS: A string containing all valid characters (ASCII letters and digits) that can be used in the random strings.
 
     Example:
-    >>> fac, perm = task_func([1, 2, 3])
-    >>> print(fac)
-    [9, 9, 9, 9, 9, 9]
-    >>> print(perm)
-    [(1, 2, 3), (1, 3, 2), (2, 1, 3), (2, 3, 1), (3, 1, 2), (3, 2, 1)]
-
-    >>> fac, perm = task_func([0, 4])
-    >>> print(fac)
-    [25, 25]
-    >>> print(perm)
-    [(0, 4), (4, 0)]
-    '''
-    if not isinstance(numbers, list):
-        raise TypeError("numbers should be a list of integers.")
-    if not all(isinstance(number, int) for number in numbers):
-        raise TypeError("numbers should be a list of integers.")
-    if not all(number >= 0 for number in numbers):
-        raise ValueError("each number in numbers should be non negative.")
-    if len(numbers) == 0:
-        return [], []
-    all_permutations = list(permutations(numbers))
-    sums = [reduce(lambda a, b: a + b, [math.factorial(n) for n in permutation]) for permutation in all_permutations]
-    return sums, all_permutations
+    >>> random.seed(42)
+    >>> task_func(2, 3)
+    {'O': 1, 'h': 1, 'b': 1, 'V': 1, 'r': 1, 'p': 1}
+    """
+    strings = [''.join(random.choice(VALID_CHARACTERS) for _ in range(string_length)) for _ in range(n_strings)]
+    character_counts = collections.Counter(''.join(strings))
+    return dict(character_counts)
 
 import unittest
+from collections import Counter
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        result, perm = task_func([1, 2])
-        expected = [3, 3]
-        expected_perm = [(2, 1), (1, 2)]
-        self.assertEqual(result, expected)
-        self.assertCountEqual(perm, expected_perm)
-    def test_case_2(self):
-        result, perm = task_func([1, 2, 3])
-        expected = [9, 9, 9, 9, 9, 9]
-        expected_perm = [(1, 2, 3), (1, 3, 2), (2, 1, 3), (2, 3, 1), (3, 1, 2), (3, 2, 1)]
-        self.assertEqual(result, expected)
-        self.assertCountEqual(perm, expected_perm)
-    def test_case_3(self):
-        result, perm = task_func([1])
-        expected = [1]
-        expected_perm = [(1,)]
-        self.assertEqual(result, expected)
-        self.assertCountEqual(perm, expected_perm)
-    def test_case_4(self):
-        result, perm = task_func([])
-        expected = []
-        expected_perm = []
-        self.assertEqual(result, expected)
-        self.assertCountEqual(perm, expected_perm)
-    def test_case_5(self):
-        'wrong input'
-        self.assertRaises(Exception, task_func, 'a')
-        self.assertRaises(Exception, task_func, 1)
-        self.assertRaises(Exception, task_func, {})
-        self.assertRaises(Exception, task_func, -1.2)
-        self.assertRaises(Exception, task_func, [1.2, 1, 4])
-        self.assertRaises(Exception, task_func, [1, 'a', 4])
-        self.assertRaises(Exception, task_func, [1, 2, 4, 5, 7, 9, -1])
+    def test_single_string_single_character(self):
+        # Test when n_strings=1 and string_length=1 (minimal input)
+        result = task_func(1, 1)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(sum(result.values()), 1)
+    def test_multiple_strings_single_character(self):
+        # Test when n_strings > 1 and string_length=1
+        result = task_func(5, 1)
+        self.assertTrue(len(result) <= 5)
+        self.assertEqual(sum(result.values()), 5)
+    def test_single_string_multiple_characters(self):
+        # Test when n_strings=1 and string_length > 1
+        result = task_func(1, 5)
+        self.assertTrue(len(result) <= 5)
+        self.assertEqual(sum(result.values()), 5)
+    def test_multiple_strings_multiple_characters(self):
+        # Test when n_strings > 1 and string_length > 1
+        result = task_func(5, 5)
+        self.assertTrue(len(result) <= 25)
+        self.assertEqual(sum(result.values()), 25)
+    def test_valid_characters(self):
+        # Test whether the function only uses valid characters as defined in VALID_CHARACTERS
+        result = task_func(100, 10)
+        all_characters = ''.join(result.keys())
+        self.assertTrue(all(char in VALID_CHARACTERS for char in all_characters))

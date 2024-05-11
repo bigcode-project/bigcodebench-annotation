@@ -1,29 +1,35 @@
 import pandas as pd
-import matplotlib.pyplot as plt
+import seaborn as sns
 
+# Constants
 COLUMNS = ['col1', 'col2', 'col3']
 
 def task_func(data):
     """
-    You are given a list of elements. Each element is a list with the same length as COLUMNS, representing one row a dataframe df to create. Draw a line chart with unique values in the COLUMNS[-1] of the pandas DataFrame "df", grouped by the rest of the columns.
-    - The x-label should be set to the string obtained by joining all the column names (except the last one) by the character "-".
-    - The y-label should be set to the last column name.
+    You are given a list of elements. Each element of the list is a list of 3 values. Use this list of elements to build a dataframe with 3 columns 'col1', 'col2' and 'col3' and create a distribution of chart of the different values of "col3" grouped by "col1" and "col2" using seaborn.
+
+    The function's logic is as follows:
+    1. Build a pandas DataFrame by using list of elements. Make sure to name the columns as 'col1', 'col2' and 'col3', the constant COLUMNS is provided for this purpose.
+    2. Create a new dataframe by grouping the values in the column 'col3' by ['col1', 'col2'].
+    3. Reset the index of the newly created dataframe. This dataframe is the first element of the output tuple.
+    4. Create a distribution plot of the 'col3' column of the previous dataframe using seaborn. This plot is the second and last element of the output tuple.
+        - The xlabel (label for the x-axis) is set to the 'col3'.
 
     Parameters:
-    - df (pandas.DataFrame): The DataFrame to be plotted.
+    data (list): The DataFrame to be visualized.
 
     Returns:
-    - tuple: A tuple containing:
-        - pandas.DataFrame: The DataFrame of the analyzed data.
-        - plt.Axes: The Axes object of the plotted line chart.
+    tuple:
+        pandas.DataFrame: The DataFrame of the analyzed data.
+        plt.Axes: The seaborn plot object.
 
     Requirements:
     - pandas
-    - matplotlib
+    - seaborn
 
     Example:
     >>> data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
-    >>> analyzed_df, ax = task_func(data)
+    >>> analyzed_df, plot = task_func(data)
     >>> print(analyzed_df)
        col1  col2  col3
     0     1     1     2
@@ -33,80 +39,71 @@ def task_func(data):
     """
     df = pd.DataFrame(data, columns=COLUMNS)
     analyzed_df = df.groupby(COLUMNS[:-1])[COLUMNS[-1]].nunique().reset_index()
-    fig, ax = plt.subplots()
-    ax.plot(analyzed_df[COLUMNS[:-1]].astype(str).agg('-'.join, axis=1), analyzed_df[COLUMNS[-1]])
-    ax.set_xlabel('-'.join(COLUMNS[:-1]))
-    ax.set_ylabel(COLUMNS[-1])
+    ax = sns.distplot(analyzed_df[COLUMNS[-1]])
     return analyzed_df, ax
 
 import unittest
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def test_case_1(self):
-        # Using the provided example as the first test case
         data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
-        analyzed_df, ax = task_func(data)
-        # Assertions for the returned DataFrame
-        expected_data = [[1, 1, 2], [1, 2, 1], [2, 1, 3], [2, 2, 1]]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        # Assertions for the returned plot
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [2, 1, 3, 1])
+        analyzed_df, plot = task_func(data)
+        # Asserting the analyzed DataFrame
+        expected_df = pd.DataFrame({
+            'col1': [1, 1, 2, 2],
+            'col2': [1, 2, 1, 2],
+            'col3': [2, 1, 3, 1]
+        })
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
+        # Asserting plot attributes (e.g., title, x-axis, y-axis)
+        self.assertEqual(plot.get_xlabel(), 'col3')
     def test_case_2(self):
-        data = [
-            [1, 1, 2],
-            [1, 1, 3],
-            [1, 2, 4],
-            [1, 1, 5],
-            [1, 3, 7]
-        ]
-        analyzed_df, ax = task_func(data)
-        expected_data = [
-            [1, 1, 3],
-            [1, 2, 1],
-            [1, 3, 1]
-        ]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [3, 1, 1])
+        # Testing with a different dataset
+        data = [[1, 1, 1], [1, 1, 2], [1, 1, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]]
+        analyzed_df, plot = task_func(data)
+        # Asserting the analyzed DataFrame
+        expected_df = pd.DataFrame({
+            'col1': [1, 1],
+            'col2': [1, 2],
+            'col3': [3, 1]
+        })
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
+        # Asserting plot attributes
+        self.assertEqual(plot.get_xlabel(), 'col3')
     def test_case_3(self):
-        data = [
-            [1, 1, 1],
-            [1, 2, 3],
-            [2, 1, 4],
-            [2, 2, 5]
-        ]
-        analyzed_df, ax = task_func(data)
-        expected_data = [
-            [1, 1, 1],
-            [1, 2, 1],
-            [2, 1, 1],
-            [2, 2, 1]
-        ]
-        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [1, 1, 1, 1])
+        data = [[1, 2, 3], [1, 2, 4], [1, 2, 5], [6, 7, 8]]
+        analyzed_df, plot = task_func(data)
+        # Asserting the analyzed DataFrame
+        expected_df = pd.DataFrame({
+            'col1': [1, 6],
+            'col2': [2, 7],
+            'col3': [3, 1]
+        })
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
+        # Asserting plot attributes
+        self.assertEqual(plot.get_xlabel(), 'col3')
     def test_case_4(self):
         data = [
+            [0, 0, 1],
+            [0, 0, 4],
+            [0, 1, 1],
+            [0, 1, 7],
+            [1, 0, 0],
             [1, 1, 1],
             [1, 1, 1],
+            [1, 1, 1],
+        ]
+        analyzed_df, plot = task_func(data)
+        expected_data = [
+            [0, 0, 2],
+            [0, 1, 2],
+            [1, 0, 1],
             [1, 1, 1]
         ]
-        analyzed_df, ax = task_func(data)
-        expected_data = [
-            [1, 1, 1],
-        ]
         expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [1])
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
+        # Asserting plot attributes
+        self.assertEqual(plot.get_xlabel(), 'col3')
     def test_case_5(self):
         data = [
             [0, 0, 0],
@@ -118,7 +115,7 @@ class TestCases(unittest.TestCase):
             [1, 0, 1],
             [1, 1, 1],
         ]
-        analyzed_df, ax = task_func(data)
+        analyzed_df, plot = task_func(data)
         expected_data = [
             [0, 0, 2],
             [0, 1, 2],
@@ -126,7 +123,6 @@ class TestCases(unittest.TestCase):
             [1, 1, 2]
         ]
         expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
-        self.assertEqual(ax.get_xlabel(), 'col1-col2')
-        self.assertEqual(ax.get_ylabel(), 'col3')
-        self.assertListEqual(list(ax.lines[0].get_ydata()), [2, 2, 2, 2])
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
+        # Asserting plot attributes
+        self.assertEqual(plot.get_xlabel(), 'col3')

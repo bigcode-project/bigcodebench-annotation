@@ -1,59 +1,103 @@
-import itertools
-import collections
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
 
+# Constants
+COLUMNS = ['Date', 'Value']
 
-def task_func(elements, subset_size):
-    """
-    Generate all 2-element subsets of a tuple and count the occurrences of each sum in the subsets.
+def task_func(df, plot=False):
+    '''
+    Splits a list in the 'Value' column of a DataFrame into several columns, scales these columns using StandardScaler, 
+    and optionally returned the scaled data using a bar chart. The 'Date' column is converted to datetime and used as 
+    the index in the plot.
+
+    Parameters:
+    df (DataFrame): A pandas DataFrame with a 'Date' column and a 'Value' column where 'Value' contains lists of numbers.
+    plot (bool): If True, a bar chart of the scaled values is displayed. Defaults to False.
 
     Returns:
-    dict: A dictionary with the sums and their counts.
+    DataFrame: A pandas DataFrame with the 'Date' column and additional columns for each element in the original 'Value' list,
+               where these columns contain the scaled values.
+    Axes (optional): A matplotlib Axes object containing the bar chart, returned if 'plot' is True.
+
+    Note:
+    - This function use "Scaled Values Over Time" for the plot title.
+    - This function use "Date" and "Scaled Value" as the xlabel and ylabel respectively.
+
+    Raises:
+    - This function will raise KeyError if the DataFrame does not have the 'Date' and 'Value' columns.
 
     Requirements:
-    - itertools
-    - random
-    - collections
-    
-    
+    - pandas
+    - sklearn.preprocessing.StandardScaler
+    - matplotlib.pyplot
+
     Example:
-    >>> dict(task_func((1, 2, 3, 4, 5), 2))
-    {3: 1, 4: 1, 5: 2, 6: 2, 7: 2, 8: 1, 9: 1}
-    """
-    combinations = list(itertools.combinations(elements, subset_size))
-    sums = [sum(combination) for combination in combinations]
-    return collections.Counter(sums)
+    >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=COLUMNS)
+    >>> scaled_df, ax = task_func(df, plot=True)
+    >>> print(scaled_df.shape)
+    (2, 4)
+    >>> plt.close()
+    '''
+    df['Date'] = pd.to_datetime(df['Date'])
+    df = pd.concat([df['Date'], df['Value'].apply(pd.Series)], axis=1)
+    scaler = StandardScaler()
+    df.iloc[:,1:] = scaler.fit_transform(df.iloc[:,1:])
+    if plot:
+        plt.figure()
+        ax = df.set_index('Date').plot(kind='bar', stacked=True)
+        plt.title('Scaled Values Over Time')
+        plt.xlabel('Date')
+        plt.ylabel('Scaled Value')
+        return df, ax
+    return df
 
 import unittest
-from collections import Counter
-import doctest
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test with a tuple of positive integers and subset_size of 2
-        elements = (1, 2, 3, 4, 5)
-        subset_size = 2
-        expected_result = Counter({3: 1, 4: 1, 5: 2, 6: 2, 7: 2, 8: 1, 9: 1})
-        self.assertEqual(task_func(elements, subset_size), expected_result)
-    def test_case_2(self):
-        # Test with a tuple containing negative, positive and zero integers and subset_size of 3
-        elements = (-3, -2, 0, 2, 3, 5)
-        subset_size = 3
-        expected_result = Counter({0: 3, 5: 3, 2: 2, 3: 2, -5: 1, -3: 1, -2: 1, -1: 1, 4: 1, 1: 1, 6: 1, 7: 1, 8: 1, 10: 1})
-        self.assertEqual(task_func(elements, subset_size), expected_result)
-    def test_case_3(self):
-        # Test with a tuple of positive integers and subset_size of 1
-        elements = (1, 2, 3, 4, 5)
-        subset_size = 1
-        expected_result = Counter({1: 1, 2: 1, 3: 1, 4: 1, 5: 1})
-        self.assertEqual(task_func(elements, subset_size), expected_result)
-    def test_case_4(self):
-        # Test with an empty tuple
-        elements = ()
-        subset_size = 2
-        expected_result = Counter()
-        self.assertEqual(task_func(elements, subset_size), expected_result)
-    def test_case_5(self):
-        # Test with a subset_size greater than tuple length
-        elements = (1, 2, 3)
-        subset_size = 5
-        expected_result = Counter()
-        self.assertEqual(task_func(elements, subset_size), expected_result)
+    def test_normal_case(self):
+        # Normal case with valid DataFrame
+        df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
+        result= task_func(df)
+        self.assertEqual(result.shape, (2, 4))  # Checking if the DataFrame has the correct shape
+        plt.close()
+    def test_varying_length_lists(self):
+        # DataFrame where 'Value' contains lists of varying lengths
+        df = pd.DataFrame([['2021-01-01', [8, 10]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
+        result = task_func(df)
+        self.assertEqual(result.shape, (2, 4))  # The function should handle varying lengths
+        plt.close()
+    def test_varying_length_list_2(self):
+        df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
+        result = task_func(df)
+        self.assertEqual(result.empty, False)  
+        plt.close()
+    def test_missing_columns(self):
+        # DataFrame missing 'Value' column
+        df = pd.DataFrame([['2021-01-01'], ['2021-01-02']], columns=['Date'])
+        with self.assertRaises(KeyError):
+            task_func(df)  # Expecting a KeyError due to missing 'Value' column
+        plt.close()
+    def test_empty(self):
+        df = pd.DataFrame()
+        with self.assertRaises(KeyError):
+            task_func(df)  
+        plt.close()
+    def test_plot_attributes(self):
+        df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
+        _, ax = task_func(df, True)
+        self.assertEqual(ax.get_title(), 'Scaled Values Over Time')
+        self.assertEqual(ax.get_xlabel(), 'Date')
+        self.assertEqual(ax.get_ylabel(), 'Scaled Value')
+        plt.close()
+    def test_plot_point(self):
+        df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
+        result, ax = task_func(df, True)
+        list_result = []
+        for column in result:
+            if column != "Date":
+                columnSeriesObj = result[column]
+                list_result.extend(columnSeriesObj.values)
+        bar_heights = [rect.get_height() for rect in ax.patches]
+        self.assertListEqual(bar_heights, list_result)
+        plt.close()

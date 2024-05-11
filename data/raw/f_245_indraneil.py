@@ -24,7 +24,7 @@ def f_1238(obj_list, attr, num_bins=30, seed=0):
     seed (int, Optional): The seed for the random number generator. Defaults to 0.
 
     Returns:
-    matplotlib.axes._subplots.AxesSubplot: The histogram plot of the attribute values.
+    matplotlib.axes._subplots.AxesSubplot: The histogram plot of the attribute values, with the title 'Histogram of attribute values', x-axis labeled 'Attribute Value', and y-axis labeled 'Count'.
 
     Requirements:
     - random (used for default object generation)

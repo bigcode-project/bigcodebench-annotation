@@ -1,92 +1,76 @@
-import pandas as pd
-from statistics import mean
+import numpy as np
 import random
+from sklearn.preprocessing import MinMaxScaler
 
-# Constants for generating the report data
-FIELDS = ['Physics', 'Math', 'Chemistry', 'Biology', 'English', 'History']
-STUDENTS = ['Student_' + str(i) for i in range(1, 101)]
 
-def task_func(additional_fields = []):
+def task_func(list_of_lists, seed=42):
     """
-    Create a report on students' grades in different subjects and then calculate the average grade for each student and subject.
+    Scale the values in a list of lists to a (0,1) range using MinMaxScaler.
+    If any inner list is empty, the function fills it with five random integers between 0 and 100, and then scales the values.
     
     Parameters:
-    additional_fields (list of string, optional): The additional list of student subjects that are not duplicate with the constants (default = [])
-
+    list_of_lists (list of list of int): A list containing inner lists of integers.
+    seed (int, Optional): Seed for random number generation. Default is 42.
+    
     Returns:
-    DataFrame: A pandas DataFrame with the columns being subjects, each student's grades, and their average grades. 
-               The DataFrame also includes the average grade per subject.
-
-    Note:
-    - This function does not take any input parameters and generates a report based on predefined constants and additional fields from input (if any).
-    - This function use 'Average' as the row name for the average grade for each subject.
-    - This function use 'Average Grade' as the column name for the average grade for each student
-    - Grade of each subject is between 0 to 100.
-
+    list of list of float: A list of lists containing scaled values between the range [0, 1].
+    
     Requirements:
-    - pandas
+    - numpy
     - random
-    - statistics.mean
-
+    - sklearn.preprocessing.MinMaxScaler
+    
     Example:
-    >>> random.seed(0)
-    >>> report = task_func(['Computer Science', 'Geography'])
-    >>> print(report.columns)
-    Index(['Physics', 'Math', 'Chemistry', 'Biology', 'English', 'History',
-           'Computer Science', 'Geography', 'Average Grade'],
-          dtype='object')
+    >>> task_func([[1, 2, 3], [], [4, 5, 6]])
+    [[0.0, 0.5, 1.0], [0.8571428571428572, 0.1208791208791209, 0.0, 1.0, 0.3516483516483517], [0.0, 0.5, 1.0]]
     """
-    FIELDS_ALL = FIELDS + additional_fields
-    report_data = {field: [random.randint(0, 100) for _ in STUDENTS] for field in FIELDS_ALL}
-    df = pd.DataFrame(report_data, index=STUDENTS)
-    df['Average Grade'] = df.apply(mean, axis=1)
-    df.loc['Average'] = df.apply(mean)
-    return df
+    np.random.seed(seed)
+    random.seed(seed)
+    scaled_data = []
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    for list_ in list_of_lists:
+        if not list_:
+            list_ = [random.randint(0, 100) for _ in range(5)]
+        reshaped_data = np.array(list_).reshape(-1, 1)
+        scaled_list = scaler.fit_transform(reshaped_data)
+        scaled_data.append(scaled_list.flatten().tolist())
+    return scaled_data
 
 import unittest
-import pandas as pd
-import random
+import doctest
 class TestCases(unittest.TestCase):
-    def test_dataframe_structure(self):
-        """Test if the returned object is a pandas DataFrame with expected columns."""
-        random.seed(0)
-        df = task_func()
-        self.assertIsInstance(df, pd.DataFrame)
-        expected_columns = ['Physics', 'Math', 'Chemistry', 'Biology', 'English', 'History', 'Average Grade']
-        self.assertListEqual(list(df.columns), expected_columns)
-    def test_additional_fields(self):
-        """Test if the returned object is a pandas DataFrame with expected columns."""
-        random.seed(0)
-        df = task_func(['Computer Science', 'Geography'])
-        self.assertIsInstance(df, pd.DataFrame)
-        expected_columns = ['Physics', 'Math', 'Chemistry', 'Biology', 'English', 'History', 'Computer Science', 'Geography', 'Average Grade']
-        self.assertListEqual(list(df.columns), expected_columns)
-        for column in df.columns:
-            if column != 'Average Grade':
-                self.assertTrue(df[column].between(0, 100).all())
-    def test_grades_range(self):
-        """Test if the grades are within the expected range (0 to 100)."""
-        random.seed(0)
-        df = task_func()
-        for column in df.columns:
-            if column != 'Average Grade':
-                self.assertTrue(df[column].between(0, 100).all())
-    def test_average_grade(self):
-        """Test if the average grade is correctly calculated."""
-        random.seed(0)
-        df = task_func()
-        for index, row in df.iterrows():
-            if index != 'Average':
-                self.assertAlmostEqual(row['Average Grade'], row[:-1].mean())
-    def test_subject_average(self):
-        """Test if the subject average is correctly calculated and placed at the bottom row."""
-        random.seed(0)
-        df = task_func()
-        subject_avg = df.loc['Average'][:-1]
-        for column in df.columns[:-1]:
-            self.assertAlmostEqual(subject_avg[column], df[column].mean())
-    def test_non_negative_grades(self):
-        """Test if there are no negative grades."""
-        random.seed(0)
-        df = task_func()
-        self.assertTrue((df >= 0).all().all())
+    
+    def test_case_1(self):
+        input_data = [[1, 2, 3], [], [4, 5, 6]]
+        output = task_func(input_data)
+        for inner_list in output:
+            self.assertTrue(0.0 <= min(inner_list) <= 1.0)
+            self.assertTrue(0.0 <= max(inner_list) <= 1.0)
+            self.assertTrue(len(inner_list) <= 5)
+    
+    def test_case_2(self):
+        input_data = [[10, 20, 30, 40, 50], [], [60, 70, 80, 90, 100]]
+        output = task_func(input_data)
+        for inner_list in output:
+            self.assertTrue(0.0 <= min(inner_list) <= 1.0)
+            self.assertTrue(0.0 <= max(inner_list) <= 1.0)
+            self.assertEqual(len(inner_list), 5)
+        
+    def test_case_3(self):
+        input_data = [[], [], []]
+        output = task_func(input_data)
+        for inner_list in output:
+            self.assertTrue(0.0 <= min(inner_list) <= 1.0)
+            self.assertTrue(0.0 <= max(inner_list) <= 1.0)
+            self.assertEqual(len(inner_list), 5)
+    def test_case_4(self):
+        input_data = [[15], [25], [35], [45], [55]]
+        expected_output = [[0.0], [0.0], [0.0], [0.0], [0.0]]
+        output = task_func(input_data)
+        self.assertEqual(output, expected_output)
+    
+    def test_case_5(self):
+        input_data = [[0, 100], [0, 50], [50, 100]]
+        expected_output = [[0.0, 1.0], [0.0, 1.0], [0.0, 1.0]]
+        output = task_func(input_data)
+        self.assertEqual(output, expected_output)

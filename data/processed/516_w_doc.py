@@ -1,83 +1,115 @@
 import pandas as pd
-import seaborn as sns
+import numpy as np
+import statsmodels.api as sm
 
 
-def task_func(array):
-    """Generates a DataFrame and heatmap from a 2D list.
+def task_func(
+    array: list, random_seed: int = 0
+) -> (pd.DataFrame, sm.regression.linear_model.RegressionResultsWrapper):
+    """
+    Generate a Pandas DataFrame from a 2D list and perform a multiple linear regression.
 
-    This function takes a 2D list and returns a pandas DataFrame and a seaborn heatmap
-    representing the correlation matrix of the DataFrame. Assumes sublists of length 5.
-    Also assumes DataFrame columns: 'A', 'B', 'C', 'D', 'E'.
+    The function first validates the input list, creates a DataFrame, separates independent and dependent variables,
+    adds a constant to the model, and fits a linear regression using statsmodels.
 
     Parameters:
-    - array (list of list of int): 2D list with sublists of length 5. Must not be empty.
+    - array (list of list of int): A 2D list where each sub-list represents a row of data.
+                                   Each sub-list should have exactly 5 elements, where the first 4 elements are
+                                   treated as independent variables ('A', 'B', 'C', 'D') and the last element is
+                                   the dependent (Response) variable.
+
+    - random_seed (int): A seed for reproducibility in numpy for statsmodels. Defaults to 0.
 
     Returns:
-    - DataFrame: Constructed from the input 2D list.
-    - heatmap: Seaborn heatmap of the DataFrame's correlation matrix.
+    - df (pd.DataFrame): DataFrame with columns 'A', 'B', 'C', 'D', 'Response'.
+    - results (statsmodels.RegressionResults): Results of the linear regression.
 
     Requirements:
     - pandas
-    - seaborn
+    - numpy
+    - statsmodels.api.sm
 
     Example:
-    >>> df, ax = task_func([[1, 2, 3, 4, 5], [5, 4, 3, 2, 1]])
-    >>> df
-       A  B  C  D  E
-    0  1  2  3  4  5
-    1  5  4  3  2  1
-    >>> ax
-    <Axes: >
+    >>> df, results = task_func([[1,2,3,4,5], [6,7,8,9,10]])
+    >>> print(df)
+       A  B  C  D  Response
+    0  1  2  3  4         5
+    1  6  7  8  9        10
     """
-    COLUMNS = ["A", "B", "C", "D", "E"]
-    if not array or any(len(sublist) != 5 for sublist in array):
-        raise ValueError("array must be non-empty and all sublists must have a length of 5.")
+    COLUMNS = ["A", "B", "C", "D", "Response"]
+    np.random.seed(random_seed)
+    if not all(len(row) == len(COLUMNS) for row in array):
+        raise ValueError(
+            "Each sub-list in the input 2D list must have exactly 5 elements."
+        )
     df = pd.DataFrame(array, columns=COLUMNS)
-    heatmap = sns.heatmap(df.corr(), annot=True)
-    return df, heatmap
+    X = df[COLUMNS[:-1]]
+    y = df["Response"]
+    X = sm.add_constant(X)
+    model = sm.OLS(y, X)
+    results = model.fit()
+    return df, results
 
 import unittest
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import random
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        random.seed(42)
-        self.mock_data = [[random.randint(1, 100) for _ in range(5)] for _ in range(5)]
     def test_case_1(self):
-        # Test dataframe creation with valid input
-        df, _ = task_func(self.mock_data)
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(df.shape, (5, 5))
+        # Testing dataframe creation, model accuracy, and parameters with various numeric data types
+        test_data = [
+            ([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]], 42, 1.0),  # Positive values
+            ([[-1, -2, -3, -4, -5], [-6, -7, -8, -9, -10]], 42, 1.0),  # Negative values
+            (
+                [[100, 200, 300, 400, 500], [600, 700, 800, 900, 1000]],
+                42,
+                1.0,
+            ),  # Large values
+        ]
+        for array, random_seed, expected_r2 in test_data:
+            with self.subTest(array=array):
+                df, results = task_func(array, random_seed=random_seed)
+                expected_df = pd.DataFrame(
+                    array, columns=["A", "B", "C", "D", "Response"]
+                )
+                self.assertTrue(df.equals(expected_df))
+                self.assertAlmostEqual(results.rsquared, expected_r2, places=2)
+                for param in results.params:
+                    self.assertNotEqual(param, 0)
     def test_case_2(self):
-        # Test heatmap creation with valid input
-        _, heatmap = task_func(self.mock_data)
-        self.assertIsNotNone(heatmap)
+        # Testing with more rows in the 2D list to ensure model scalability and consistency
+        random_seed = 42
+        array = [
+            [1, 2, 3, 4, 5],
+            [6, 7, 8, 9, 10],
+            [11, 12, 13, 14, 15],
+            [16, 17, 18, 19, 20],
+        ]
+        df, results = task_func(array, random_seed=random_seed)
+        expected_df = pd.DataFrame(array, columns=["A", "B", "C", "D", "Response"])
+        self.assertTrue(df.equals(expected_df))
+        self.assertAlmostEqual(results.rsquared, 1.0, places=2)
+        for param in results.params:
+            self.assertNotEqual(param, 0)
     def test_case_3(self):
-        # Test correlation accuracy with known data
-        correlated_data = [[1, 2, 3, 4, 5], [5, 4, 3, 2, 1]]
-        df, _ = task_func(correlated_data)
-        corr_matrix = df.corr()
-        np.testing.assert_array_almost_equal(
-            corr_matrix, np.corrcoef(correlated_data, rowvar=False)
-        )
+        # Testing input validation for incorrect number of columns in a row
+        array = [[1, 2, 3, 4], [5, 6, 7, 8]]  # Missing dependent variable
+        with self.assertRaises(ValueError):
+            task_func(array)
     def test_case_4(self):
-        # Test handling of non-numeric data
+        # Testing handling of non-numeric values to ensure type safety
+        array = [["a", "b", "c", "d", "e"]]  # All elements as strings
         with self.assertRaises(ValueError):
-            task_func([["a", "b", "c", "d", "e"], [1, 2, 3, 4, 5]])
+            df, results = task_func(array)
+            # This assumes the function is modified to catch and raise ValueError for non-numeric inputs
     def test_case_5(self):
-        # Test with empty list
-        with self.assertRaises(ValueError):
-            task_func([])
+        # Testing reproducibility by using the same random_seed
+        array = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
+        random_seed = 123
+        df1, results1 = task_func(array, random_seed=random_seed)
+        df2, results2 = task_func(array, random_seed=random_seed)
+        self.assertTrue(df1.equals(df2))
+        self.assertEqual(results1.params.tolist(), results2.params.tolist())
     def test_case_6(self):
-        # Test with single sublist
-        single_sublist = [[1, 2, 3, 4, 5]]
-        df, _ = task_func(single_sublist)
-        self.assertEqual(df.shape, (1, 5))
-    def test_case_7(self):
-        # Test handling sublists of varying lengths
+        # Testing with an empty array to check function's handling of no input data
+        array = []
         with self.assertRaises(ValueError):
-            task_func([[1, 2, 3], [4, 5, 6, 7, 8]])
-    def tearDown(self):
-        plt.close("all")
+            task_func(array)

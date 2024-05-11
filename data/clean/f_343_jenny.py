@@ -20,6 +20,9 @@ def f_343(numbers, file_path="save.pkl"):
     - os
     - matplotlib.pyplot
 
+    Raises:
+    - TypeError: If the input is not a list of numbers.
+    
     Example:
     >>> numbers = [random.random() for _ in range(100)]
     >>> loaded_fig = f_343(numbers)

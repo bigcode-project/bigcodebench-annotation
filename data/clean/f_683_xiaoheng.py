@@ -19,6 +19,9 @@ def f_683(num_words, word_length):
     - random
     - string
 
+    Raises:
+    - ValueError: If num_words or word_length is negative.
+    
     Example:
     >>> f_683(5, 3)
     ['Ohb', 'Vrp', 'oiV', 'gRV', 'IfL']

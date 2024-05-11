@@ -1,72 +1,72 @@
-import numpy as np
-import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
-
-# Constants defining the range of random integers and the size of the DataFrame
+import numpy as np
+from sklearn.cluster import KMeans
+# Constants for configuration
 RANGE = 100
 SIZE = 1000
+CLUSTERS = 5
 
 
 def task_func():
     """
-    Generates a DataFrame with two columns, 'X' and 'Y', each filled with random integers within a specified range,
-    and plots these points using a scatter plot. The visualization is created using Seaborn on top of Matplotlib.
+    Generates a set of 2D random points within a specified range and size,
+    applies KMeans clustering to these points, and plots the results with
+    cluster centroids.
 
-    The function is designed to be parameter-free for simplicity, utilizing constants for configuration.
-
-    Returns:
-        pd.DataFrame: A DataFrame with 'X' and 'Y' columns containing the generated random integers.
+    The function creates a scatter plot of the clustered points with each
+    cluster displayed in a different color and the centroids of these clusters
+    highlighted.
 
     Requirements:
         - numpy
-        - pandas
-        - seaborn
+        - sklearn.cluster
         - matplotlib.pyplot
 
-    No Parameters.
+    Returns:
+        A tuple containing the numpy array of data points and the fitted KMeans model.
 
     Example:
-        >>> df = task_func()
-        >>> isinstance(df, pd.DataFrame)
-        True
-        >>> 'X' in df.columns and 'Y' in df.columns
-        True
-        >>> len(df)
-        1000
-        >>> all(df['X'].between(0, RANGE - 1)) and all(df['Y'].between(0, RANGE - 1))
-        True
+    >>> data, kmeans = task_func()
+    >>> isinstance(data, np.ndarray)  # Check if data is a numpy array
+    True
+    >>> data.shape == (1000, 2)  # Verify the shape of the data array
+    True
+    >>> isinstance(kmeans, KMeans)  # Confirm kmeans is an instance of KMeans
+    True
+    >>> len(kmeans.cluster_centers_) == 5  # Check the number of clusters
+    True
     """
-    df = pd.DataFrame({
-        'X': np.random.randint(0, RANGE, SIZE),
-        'Y': np.random.randint(0, RANGE, SIZE)
-    })
-    sns.scatterplot(data=df, x='X', y='Y')
+    data = np.array([(np.random.randint(0, RANGE), np.random.randint(0, RANGE)) for _ in range(SIZE)])
+    kmeans = KMeans(n_clusters=CLUSTERS)
+    kmeans.fit(data)
+    plt.scatter(data[:, 0], data[:, 1], c=kmeans.labels_, cmap='viridis', marker='.')
+    plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=300, c='red', marker='x')
+    plt.title("KMeans Clustering of Random 2D Points")
+    plt.xlabel("X")
+    plt.ylabel("Y")
     plt.show()
-    return df
+    return data, kmeans
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_dataframe_shape(self):
-        """Test that the DataFrame has the correct shape."""
-        df = task_func()
-        self.assertEqual(df.shape, (SIZE, 2))
-    def test_random_range(self):
-        """Test that the random numbers fall within the specified range."""
-        df = task_func()
-        self.assertTrue(df['X'].between(0, RANGE-1).all())
-        self.assertTrue(df['Y'].between(0, RANGE-1).all())
-    def test_columns_existence(self):
-        """Ensure both 'X' and 'Y' columns exist."""
-        df = task_func()
-        self.assertIn('X', df.columns)
-        self.assertIn('Y', df.columns)
-    def test_non_empty_dataframe(self):
-        """Check that the DataFrame is not empty."""
-        df = task_func()
-        self.assertFalse(df.empty)
-    def test_columns_type(self):
-        """Test that 'X' and 'Y' columns are of integer type."""
-        df = task_func()
-        self.assertTrue(np.issubdtype(df['X'].dtype, np.integer))
-        self.assertTrue(np.issubdtype(df['Y'].dtype, np.integer))
+    def test_data_size(self):
+        """Ensure the generated data has the correct size."""
+        data, _ = task_func()
+        self.assertEqual(data.shape, (SIZE, 2))
+    def test_cluster_centers_shape(self):
+        """Check the shape of the cluster centers array."""
+        _, kmeans = task_func()
+        self.assertEqual(kmeans.cluster_centers_.shape, (CLUSTERS, 2))
+    def test_fitted_model(self):
+        """Verify the model is a KMeans instance and is fitted."""
+        _, kmeans = task_func()
+        self.assertIsInstance(kmeans, KMeans)
+        self.assertTrue(hasattr(kmeans, 'labels_'))
+    def test_data_range(self):
+        """Ensure that generated data points fall within the specified range."""
+        data, _ = task_func()
+        self.assertTrue((data >= 0).all() and (data <= RANGE).all())
+    def test_cluster_labels(self):
+        """Verify that cluster labels are assigned to each data point."""
+        _, kmeans = task_func()
+        self.assertEqual(len(kmeans.labels_), SIZE)

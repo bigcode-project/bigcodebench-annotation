@@ -19,7 +19,7 @@ DATA = [
 def f_257(utc_datetime, seed=0):
     """
     Select a random person from a dataset of people and their attributes (name, age, city) provided as a global 
-    variable DATA. Add a UTC timestamp to the person's data which is passed as an argument utc_datetime. Finally, 
+    variable DATA. Add a UTC timestamp to the person's data which is passed as an argument utc_datetime 'timestamp'. Finally, 
     encode that person's data as a JSON string.
     
     Parameters:

@@ -16,6 +16,9 @@ def f_772(word):
     - random
     - string
     
+    Raises:
+    ValueError: If the input contains non-letter characters.
+    
     Examples:
     >>> random.seed(0)
     >>> f_772('abcdef')

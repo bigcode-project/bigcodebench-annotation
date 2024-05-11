@@ -10,7 +10,7 @@ def f_1031(list_of_pairs):
                           and the second element is the numeric value.
     
     Returns:
-    numpy.ndarray: A numpy array containing a single element that is the product of the second values in the list of tuples.
+    numpy.ndarray: A 1D numpy array containing a single element that is the product of the second values in the list of tuples.
     
     Requirements:
     - numpy
@@ -22,11 +22,14 @@ def f_1031(list_of_pairs):
     >>> print(product_array)
     360
     """
-    second_values = [pair[1] for pair in list_of_pairs]
-    product = reduce(np.multiply, second_values)
-    product_array = np.array(product)
-
-    return product_array
+    # Extract the second element from each tuple using a list comprehension
+    values = [pair[1] for pair in list_of_pairs]
+    
+    # Use reduce to calculate the product of all elements in the values list
+    product = reduce(lambda x, y: x * y, values)
+    
+    # Return the result as a numpy array with a single element
+    return np.array([product])
 
 import unittest
 import numpy as np
@@ -45,6 +48,7 @@ class TestCases(unittest.TestCase):
         list_of_pairs = [('Fruits', 5), ('Vegetables', 9), ('Dairy', -1), ('Bakery', -2), ('Meat', 4)]
         expected_output = np.array(360)
         actual_output = f_1031(list_of_pairs)
+        print(actual_output, expected_output)
         self.assertTrue(np.array_equal(actual_output, expected_output))
     
     def test_case_2(self):

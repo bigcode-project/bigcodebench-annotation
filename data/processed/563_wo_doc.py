@@ -1,115 +1,93 @@
-import os
 import ctypes
-import sys
-import subprocess
+import os
+import shutil
+import glob
 
 
-def task_func(filepath):
+
+def task_func(filepath, destination_dir):
     """
-    Loads a DLL file specified by the given filepath, then retrieves and prints system information
-    including system name, node name, release, version, machine, Python version, and PIP version.
-    This function demonstrates the use of various system-related libraries in Python.
-
-    The format of the printed message is:
-    System: <system-name-here>
-    Node Name: <node-name-here>
-    Release: <release-here>
-    Version: <version-here>
-    Machine: <type-of-the-machine-here>
-    Python Version: <python-version-here> 
-    PIP Version: <pip-version-here>
+    Loads a DLL file specified by the given filepath and moves all DLL files in the same directory
+    to another specified directory. This function demonstrates file operations including DLL loading,
+    file path manipulation, and file moving using ctypes, os, shutil, and glob modules.
 
     Parameters:
     filepath (str): The path of the DLL file to be loaded.
+    destination_dir (str): The path of the destination directory where DLL files will be moved.
 
     Returns:
     str: The name of the loaded DLL file.
 
-    Raises:
-    OSError: if the input filepath is invalid or empty
-    TypeError: if the input filepath is not a string
-    
     Requirements:
     - ctypes
     - os
-    - sys
-    - subprocess
+    - shutil
+    - glob
 
     Examples:
-    >>> task_func('libc.so.6') # Doctest will vary based on the system and DLL file.
+    >>> destination = 'destination_dir'
+    >>> task_func('libc.so.6', destination) # Doctest will vary based on system and file availability.
     'libc.so.6'
-    >>> isinstance(task_func('libc.so.6'), str)
+    >>> isinstance(task_func('libc.so.6', destination), str)
     True
     """
-    if not isinstance(filepath, str):
-        raise TypeError("Invalid filepath type")
-    elif filepath == "" or not os.path.exists(filepath):
-        raise OSError("Invalid filepath")
-    else:
-        lib = ctypes.CDLL(filepath)
-    uname = os.uname()
-    print(f'System: {uname.sysname}')
-    print(f'Node Name: {uname.nodename}')
-    print(f'Release: {uname.release}')
-    print(f'Version: {uname.version}')
-    print(f'Machine: {uname.machine}')
-    python_version = sys.version
-    print(f'Python Version: {python_version}')
-    pip_version = subprocess.check_output(['pip', '--version'])
-    print(f'PIP Version: {pip_version.decode("utf-8")}')
+    lib = ctypes.CDLL(filepath)
+    dll_dir = os.path.dirname(filepath)
+    dll_files = glob.glob(os.path.join(dll_dir, '*.dll'))
+    for dll_file in dll_files:
+        shutil.move(dll_file, destination_dir)
     return lib._name
 
 import unittest
+import tempfile
 from unittest.mock import patch, MagicMock
-import io
-import sys
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        # Create a temporary directory for DLL files
+        self.dll_dir = tempfile.mkdtemp()
+        self.destination_dir = tempfile.mkdtemp()
+        # Create a sample DLL file in the temporary directory
+        self.sample_dll = os.path.join(self.dll_dir, 'sample.dll')
+        with open(self.sample_dll, 'w') as file:
+            file.write('')
     @patch('ctypes.CDLL', autospec=True)
-    @patch('os.path.exists', return_value=True)
-    @patch('subprocess.check_output', return_value=b'pip 20.2.3 from /usr/lib/python3.8/site-packages/pip (python 3.8)')
-    def test_system_info_printing(self, mock_check_output, mock_exists, mock_cdll):
-        """Check if system information is correctly printed."""
-        # Set up the mock CDLL instance
-        mock_cdll_instance = MagicMock()
-        mock_cdll.return_value = mock_cdll_instance
-        mock_cdll_instance._name = 'libc.so.6'
-        # Capture the output of print statements
-        captured_output = io.StringIO()
-        sys.stdout = captured_output
-        task_func('libc.so.6')
-        # Restore stdout
-        sys.stdout = sys.__stdout__
-        # Verify that the expected information is printed
-        output = captured_output.getvalue()
-        self.assertIn('System:', output)
-        self.assertIn('Node Name:', output)
-        self.assertIn('Release:', output)
-        self.assertIn('Version:', output)
-        self.assertIn('Machine:', output)
-        self.assertIn('Python Version:', output)
-        self.assertIn('PIP Version:', output)
+    def test_return_type(self, mock_cdll):
+        self.assertIsInstance(task_func(self.sample_dll, self.destination_dir), str)
+        
     @patch('ctypes.CDLL', autospec=True)
-    @patch('os.path.exists', return_value=True)
-    def test_return_type(self, mock_exists, mock_cdll):
-        # Set up the mock CDLL instance
-        mock_cdll_instance = MagicMock()
-        mock_cdll.return_value = mock_cdll_instance
-        mock_cdll_instance._name = 'libc.so.6'  # Setting up the expected return value
-        # Invoke task_func with a filepath
-        filepath = 'libc.so.6'
-        result = task_func(filepath)
-        # Check that the function returns a string and that the string is the name of the DLL
-        self.assertIsInstance(result, str)  # Ensure the return type is string
-        self.assertEqual(result, 'libc.so.6')  # Check if the name matches what's expected
+    def test_dll_file_movement(self, mock_cdll):
+        """Test if DLL files are correctly moved to the destination directory."""
+        task_func(self.sample_dll, self.destination_dir)
+        
+        # Check that the DLL file has been moved to the destination directory
+        self.assertFalse(os.path.exists(self.sample_dll), "The DLL file should not exist in the source directory after moving.")
+        self.assertTrue(os.path.exists(os.path.join(self.destination_dir, 'sample.dll')), "The DLL file should exist in the destination directory after moving.")
     def test_invalid_file_path(self):
         with self.assertRaises(OSError):
-            task_func('invalid_path.dll')
-    def test_empty_file_path(self):
+            task_func('invalid_path.dll', self.destination_dir)
+    def test_invalid_destination_dir(self):
         with self.assertRaises(OSError):
-            task_func('')
-    def test_non_string_input(self):
-        with self.assertRaises(TypeError):
-            task_func(123)
-    def test_os_uname_output(self):
-        filepath = 'libc.so.6'
-        self.assertFalse('sysname' in os.uname())
+            task_func(self.sample_dll, 'invalid_destination')
+    @patch('ctypes.CDLL')
+    def test_file_movement_with_mock_cdll(self, mock_cdll):
+        # Setup the mock CDLL instance
+        mock_cdll_instance = MagicMock()
+        mock_cdll.return_value = mock_cdll_instance
+        # Mock a function 'example_function' within the DLL
+        example_function_mock = MagicMock(return_value=42)  # Assume it returns an integer
+        mock_cdll_instance.example_function = example_function_mock
+        # Call the function under test
+        task_func(self.sample_dll, self.destination_dir)
+        # Verify the DLL was "loaded"
+        mock_cdll.assert_called_once_with(self.sample_dll)
+    @patch('ctypes.CDLL', autospec=True)
+    def test_no_dll_in_source(self, cdll):
+        # Remove the DLL file and run the function
+        os.remove(self.sample_dll)
+        task_func(self.sample_dll, self.destination_dir)
+        # Check that no new files are in the destination directory
+        self.assertEqual(len(os.listdir(self.destination_dir)), 0)
+    def tearDown(self):
+        # Clean up temporary directories
+        shutil.rmtree(self.dll_dir)
+        shutil.rmtree(self.destination_dir)

@@ -1,101 +1,86 @@
-from flask import Flask, render_template, request
-import json
-import logging
+from flask import Flask
+from flask_restful import Resource, Api
+import requests
 
-logging.basicConfig(filename="out.log", level=logging.INFO)
-
-def task_func(template_folder):
+def task_func(api_url, template_folder):
     """
-    Creates a Flask application with a specified templates folder. It defines a route at the root ('/')
-    which handles POST requests, logs the information request data as a JSON, and renders an 'index.html' template using
-    the data provided in POST requests.
+    Creates a Flask application with a RESTful API endpoint. The endpoint, when accessed,
+    fetches data from an external API and returns the response as JSON. It is configured
+    to use a specified templates folder, which must be provided when calling this function.
+    The URL for the external API must also be provided when initializing the app.
 
     Parameters:
-    template_folder (str): The folder containing the Flask application's templates.
+    - api_url (str): The URL of the external API from which data is fetched.
+    - template_folder (str): The path to the folder containing Flask templates.
 
     Returns:
-    flask.app.Flask: A Flask application instance configured with a root route that handles POST requests.
-    The route logs incoming request data as JSON and serves the 'index.html' template with the provided data.
-
+    - app (Flask): A Flask application instance with a configured RESTful API endpoint.
+    
     Requirements:
     - flask.Flask
-    - flask.render_template
-    - flask.request
-    - json
-    - logging
+    - flask_restful.Resource
+    - flask_restful.Api
+    - requests
 
     Example:
-    >>> app = task_func('my_templates')
-    >>> isinstance(app, Flask)
+    >>> app = task_func('https://api.example.com/data', 'templates')
+    >>> 'data' in [str(route) for route in app.url_map.iter_rules()]
     True
-    >>> 'POST' in app.url_map.bind('').match('/', method='POST')
-    False
+    >>> api = Api(app)
+    >>> type(api).__name__
+    'Api'
     """
     app = Flask(__name__, template_folder=template_folder)
-    @app.route('/', methods=['POST'])
-    def handle_post():
-        data = request.get_json()
-        logging.info(json.dumps(data))
-        return render_template('index.html', data=data)
+    api = Api(app)
+    class DataResource(Resource):
+        def get(self):
+            response = requests.get(api_url)
+            data = response.json()
+            return data
+    api.add_resource(DataResource, '/data')
     return app
 
 import unittest
 from unittest.mock import patch
-from flask import Flask, request
-import logging
-import os
-import tempfile
+from flask import Flask
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.template_folder = tempfile.mkdtemp()
-        self.index_html_path = os.path.join(self.template_folder, 'index.html')
-        with open(self.index_html_path, 'w') as f:
-            f.write('<html><body>{{ data }}</body></html>')
-                    
-    def tearDown(self):
-        os.remove(self.index_html_path)
-        os.rmdir(self.template_folder)
-    def test_app_creation(self):
-        """Test if the function properly creates an app with given parameters."""
-        app = task_func(self.template_folder)
-        app.config['TESTING'] = True
-        self.assertIsInstance(app, Flask, "The function should return a Flask app instance.")
-        self.assertEqual(app.template_folder, self.template_folder, "The template folder should be set correctly.")
+        """Set up test variables."""
+        self.api_url = 'https://api.example.com/data'
+        self.template_folder = 'templates'
     def test_app_instance(self):
         """Test if the function returns a Flask app instance."""
-        app = task_func(self.template_folder)
-        app.config['TESTING'] = True
+        app = task_func(self.api_url, self.template_folder)
         self.assertIsInstance(app, Flask)
-    def test_template_folder_configuration(self):
-        """Test if the template folder is correctly configured."""
-        app = task_func(self.template_folder)
-        app.config['TESTING'] = True
-        self.assertEqual(app.template_folder, self.template_folder, "The template folder should be set correctly.")
-    def test_logging_info_called_with_correct_arguments(self):
-            """Test if logging.info is called with the correct JSON data."""
-            template_folder = 'path_to_templates'
-            app = task_func(self.template_folder)
-            app.config['TESTING'] = True
-            test_data = {"test": "data"}
-            with app.test_client() as client:
-                with patch('logging.info') as mock_logging_info:
-                    client.post('/', json=test_data)
-                    mock_logging_info.assert_called_once_with(json.dumps(test_data))
-    @patch('logging.info')
-    def test_logging_request_data(self, mock_logging):
-        """Test if logging correctly logs POST request data."""
-        app = task_func(self.template_folder)
-        app.config['TESTING'] = True
-        test_data = {"test": "data"}
-        client =app.test_client()
-        client.post('/', json=test_data)
-        # Ensure that logging.info was called with the JSON-dumped test data
-        mock_logging.assert_called_once_with(json.dumps(test_data))
-    @patch('flask.Flask.url_for')
-    def test_home_route(self, mock_url_for):
-        """Test if the '/' route is defined correctly."""
-        app = task_func(self.template_folder)
-        app.config['TESTING'] = True
-        with app.test_request_context('/'):
-            mock_url_for.return_value = '/'
-            self.assertEqual(request.path, mock_url_for('home'))
+    def test_api_endpoint_configuration(self):
+        """Test if the API endpoint '/data' is configured correctly."""
+        app = task_func(self.api_url, self.template_folder)
+        with app.test_request_context('/data'):
+            self.assertTrue('/data' in [str(route) for route in app.url_map.iter_rules()])
+    @patch('requests.get')
+    def test_data_endpoint_response(self, mock_get):
+        """Test if the data endpoint returns expected JSON data."""
+        mock_get.return_value.json.return_value = {'test': 'value'}
+        app = task_func(self.api_url, self.template_folder)
+        client = app.test_client()
+        response = client.get('/data')
+        self.assertEqual(response.json, {'test': 'value'})
+    @patch('requests.get')
+    def test_external_api_call(self, mock_get):
+        """Test if the external API is called with the correct URL."""
+        mock_get.return_value.status_code = 200  # Assume that the API call is successful
+        mock_get.return_value.json.return_value = {'test': 'value'}  # Ensure this returns a serializable dictionary
+        app = task_func(self.api_url, self.template_folder)
+        client = app.test_client()
+        client.get('/data')
+        mock_get.assert_called_once_with(self.api_url)
+    @patch('requests.get')
+    def test_api_endpoint_status_code(self, mock_get):
+        """Test if the API endpoint returns the correct status code when accessed."""
+        mock_get.return_value.status_code = 200  # Mock the status code as 200
+        mock_get.return_value.json.return_value = {'data': 'example'}
+        
+        app = task_func(self.api_url, self.template_folder)
+        client = app.test_client()
+        response = client.get('/data')
+        self.assertEqual(response.status_code, 200)

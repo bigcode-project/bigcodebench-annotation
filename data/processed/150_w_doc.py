@@ -1,64 +1,99 @@
 import pandas as pd
 import numpy as np
 
-DEFAULT_COLUMNS = ['Element', 'Count']
 
-
-def task_func(elements, include_index=False):
+def task_func(product_dict, product_keys):
     """
-    Constructs a DataFrame that enumerates the character counts of each string in a provided list of elements. This
-    function can optionally include an index column for each row in the DataFrame.
+    Create a profit report for a list of products based on a specific product dictionary that includes the quantity,
+    price, and profit of each product. Additionally, calculate the average price and profit for all considered products,
+    and plot a bar chart of the profit for each product.
 
     Parameters:
-    elements (List[str]): A list of strings whose character counts are to be calculated.
-    include_index (bool): Flag to decide whether to add an index column in the resulting DataFrame.
+    - product_dict (dict): The dictionary containing product details with product name as key and a list
+    [quantity, price] as value.
+    - product_keys (list): The list of product keys to consider for the report.
 
-    Returns: DataFrame: Returns a pandas DataFrame with columns for elements and their respective character counts.
-    Includes an 'Index' column if requested.
+    Returns: tuple: A tuple containing:
+    - DataFrame: A pandas DataFrame with columns
+    ['Product', 'Quantity', 'Price', 'Profit', 'Average Price', 'Average Profit'].
+    - Axes: A matplotlib Axes object representing the plotted bar chart of profit for each product
+    (None if no products).
 
     Requirements:
     - pandas
     - numpy
 
-    Note:
-    The order of columns in the returned DataFrame will be ['Index', 'Element', 'Count'] if the index is included.
-
     Example:
-    >>> result = task_func(['abc', 'def'], include_index=True)
-    >>> print(result.to_string(index=False))
-     Index Element  Count
-         0     abc      3
-         1     def      3
+    >>> product_dict = {'Apple': [100, 2.5], 'Orange': [80, 3.5], 'Banana': [120, 1.5]}
+    >>> product_keys = ['Apple', 'Banana']
+    >>> report, ax = task_func(product_dict, product_keys)
+    >>> print(report)
+      Product  Quantity  Price  Profit  Average Price  Average Profit
+    0   Apple       100    2.5   250.0            2.0           215.0
+    1  Banana       120    1.5   180.0            2.0           215.0
+
     """
-    elements_series = pd.Series(elements)
-    count_series = elements_series.apply(lambda x: len(x))
-    data_dict = {'Element': elements_series, 'Count': count_series}
-    if include_index:
-        data_dict['Index'] = np.arange(len(elements))
-    count_df = pd.DataFrame(data_dict)
-    if include_index:
-        count_df = count_df[['Index', 'Element', 'Count']]  # Reordering columns to put 'Index' first
-    return count_df
+    columns = ['Product', 'Quantity', 'Price', 'Profit']
+    data = []
+    for key in product_keys:
+        quantity, price = product_dict[key]
+        profit = quantity * price
+        data.append([key, quantity, price, profit])
+    df = pd.DataFrame(data, columns=columns)
+    if not df.empty:
+        avg_price = np.mean(df['Price'])
+        avg_profit = np.mean(df['Profit'])
+        df['Average Price'] = avg_price
+        df['Average Profit'] = avg_profit
+        ax = df.plot(x='Product', y='Profit', kind='bar', legend=False, title="Profit for each product")
+        ax.set_ylabel("Profit")
+    else:
+        ax = None
+    return df, ax
 
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        # Setup common to all tests: A product dictionary
+        self.product_dict = {
+            'Apple': [100, 2.5],
+            'Orange': [80, 3.5],
+            'Banana': [120, 1.5]
+        }
     def test_case_1(self):
-        result = task_func(['hello'])
-        expected = pd.DataFrame({'Element': ['hello'], 'Count': [5]})
-        pd.testing.assert_frame_equal(result, expected)
+        # Test with a single product
+        product_keys = ['Apple']
+        report, ax = task_func(self.product_dict, product_keys)
+        self.assertEqual(len(report), 1)  # Should return 1 row
+        self.assertIn('Apple', report['Product'].values)
+        self.assertAlmostEqual(report['Average Price'].iloc[0], 2.5)
+        self.assertAlmostEqual(report['Average Profit'].iloc[0], 250.0)
     def test_case_2(self):
-        result = task_func(['a', 'bc', 'def'])
-        expected = pd.DataFrame({'Element': ['a', 'bc', 'def'], 'Count': [1, 2, 3]})
-        pd.testing.assert_frame_equal(result, expected)
+        # Test with multiple products
+        product_keys = ['Apple', 'Orange']
+        report, ax = task_func(self.product_dict, product_keys)
+        self.assertEqual(len(report), 2)  # Should return 2 rows
+        self.assertTrue(all(item in ['Apple', 'Orange'] for item in report['Product'].values))
+        expected_avg_price = (2.5 + 3.5) / 2
+        expected_avg_profit = (250.0 + 280.0) / 2
+        self.assertTrue(all(report['Average Price'] == expected_avg_price))
+        self.assertTrue(all(report['Average Profit'] == expected_avg_profit))
     def test_case_3(self):
-        result = task_func(['zzz', 'zzz'])
-        expected = pd.DataFrame({'Element': ['zzz', 'zzz'], 'Count': [3, 3]})
-        pd.testing.assert_frame_equal(result, expected)
+        # Test with no products
+        product_keys = []
+        report, ax = task_func(self.product_dict, product_keys)
+        self.assertTrue(report.empty)  # Should return an empty DataFrame
     def test_case_4(self):
-        result = task_func(['hello world', 'open ai'])
-        expected = pd.DataFrame({'Element': ['hello world', 'open ai'], 'Count': [11, 7]})
-        pd.testing.assert_frame_equal(result, expected)
+        # Test with a product that doesn't exist in the dictionary
+        product_keys = ['Mango']  # Mango is not in product_dict
+        with self.assertRaises(KeyError):
+            task_func(self.product_dict, product_keys)
     def test_case_5(self):
-        result = task_func(['hello', 'world'], include_index=True)
-        expected = pd.DataFrame({'Index': np.array([0, 1], dtype='int64'), 'Element': ['hello', 'world'], 'Count': [5, 5]})
-        pd.testing.assert_frame_equal(result, expected)
+        # Test the DataFrame structure
+        product_keys = ['Apple', 'Banana']
+        report, ax = task_func(self.product_dict, product_keys)
+        expected_columns = ['Product', 'Quantity', 'Price', 'Profit', 'Average Price', 'Average Profit']
+        self.assertEqual(list(report.columns), expected_columns)
+        for col in ['Quantity', 'Price', 'Profit', 'Average Price', 'Average Profit']:
+            self.assertTrue(pd.api.types.is_numeric_dtype(report[col]), f"{col} should be numeric type")

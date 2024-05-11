@@ -1,117 +1,69 @@
-import numpy as np
-from scipy import fftpack
-import matplotlib.pyplot as plt
+import collections
+import random
 
+# Constants
+LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
 
-def task_func(data, sample_rate=8000):
+def task_func(n_keys, n_values):
     """
-    Given a dictionary "data", this function performs the following operations:
-    1. Adds a new key "a" with the value 1 to the dictionary.
-    2. Generates a signal based on the values in "data".
-    3. Runs a Fast Fourier Transform (FFT) on the signal.
-    4. Plots and returns the FFT of the signal.
-    
+    Create a Python dictionary with a specified number of keys and values. 
+
     Parameters:
-    data (dict): The input data as a dictionary.
+    n_keys (int): The number of keys to generate.
+    n_values (int): The number of values for each key (consecutive integers starting from 1).
 
     Returns:
-    tuple: A tuple containing:
-        - ndarray: The FFT of the signal.
-        - Axes: The plot of the FFT.
+    dict: A Python dictionary with keys as strings and values as lists of integers.
+
+    Note: 
+    - Keys are randomly selected from a predefined list of letters, and values are consecutive integers starting from 1.
+    - Due to the randomness in key selection, the actual keys in the dictionary may vary in each execution.
 
     Requirements:
-    - numpy
-    - scipy.fftpack
-    - matplotlib
+    - collections
+    - random
 
     Example:
-    >>> data = {'key1': 1, 'key2': 2, 'key3': 3}
-    >>> fft, ax = task_func(data)
+    >>> random.seed(0)
+    >>> task_func(3, 5)
+    {'g': [1, 2, 3, 4, 5], 'a': [1, 2, 3, 4, 5]}
+    >>> result = task_func(1, 5)
+    >>> list(result)[0] in LETTERS
+    True
     """
-    data['a'] = 1
-    signal = np.array(list(data.values()))
-    time = np.linspace(0, 2, 2 * sample_rate, False)
-    signal = np.sin(np.outer(time, signal) * np.pi)
-    fft = fftpack.fft(signal)
-    fig, ax = plt.subplots(figsize=(12, 6))
-    ax.plot(np.abs(fft))
-    ax.set_title('FFT of the Signal')
-    ax.set_xlabel('Frequency [Hz]')
-    ax.set_ylabel('Frequency Spectrum Magnitude')
-    return fft, ax
+    keys = [random.choice(LETTERS) for _ in range(n_keys)]
+    values = list(range(1, n_values + 1))
+    return dict(collections.OrderedDict((k, values) for k in keys))
 
 import unittest
-import doctest
+import random
+LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        data = {'key1': 1, 'key2': 2, 'key3': 3}
-        fft, ax = task_func(data)
-        
-        # Assert the key 'a' is added to the dictionary
-        self.assertIn('a', data)
-        
-        # Assert the FFT is returned as ndarray
-        self.assertIsInstance(fft, np.ndarray)
-        
-        # Assert the plot attributes
-        self.assertEqual(ax.get_title(), 'FFT of the Signal')
-        self.assertEqual(ax.get_xlabel(), 'Frequency [Hz]')
-        self.assertEqual(ax.get_ylabel(), 'Frequency Spectrum Magnitude')
-    def test_case_2(self):
-        data = {'a': 5, 'b': 10}
-        fft, ax = task_func(data)
-        
-        # Assert the key 'a' is added to the dictionary
-        self.assertIn('a', data)
-        
-        # Assert the FFT is returned as ndarray
-        self.assertIsInstance(fft, np.ndarray)
-        
-        # Assert the plot attributes
-        self.assertEqual(ax.get_title(), 'FFT of the Signal')
-        self.assertEqual(ax.get_xlabel(), 'Frequency [Hz]')
-        self.assertEqual(ax.get_ylabel(), 'Frequency Spectrum Magnitude')
-    def test_case_3(self):
-        data = {}
-        fft, ax = task_func(data)
-        
-        # Assert the key 'a' is added to the dictionary
-        self.assertIn('a', data)
-        
-        # Assert the FFT is returned as ndarray
-        self.assertIsInstance(fft, np.ndarray)
-        
-        # Assert the plot attributes
-        self.assertEqual(ax.get_title(), 'FFT of the Signal')
-        self.assertEqual(ax.get_xlabel(), 'Frequency [Hz]')
-        self.assertEqual(ax.get_ylabel(), 'Frequency Spectrum Magnitude')
-        
-    def test_case_4(self):
-        data = {'x': 15, 'y': 30, 'z': 45}
-        fft, ax = task_func(data)
-        
-        # Assert the key 'a' is added to the dictionary
-        self.assertIn('a', data)
-        
-        # Assert the FFT is returned as ndarray
-        self.assertIsInstance(fft, np.ndarray)
-        
-        # Assert the plot attributes
-        self.assertEqual(ax.get_title(), 'FFT of the Signal')
-        self.assertEqual(ax.get_xlabel(), 'Frequency [Hz]')
-        self.assertEqual(ax.get_ylabel(), 'Frequency Spectrum Magnitude')
-        
-    def test_case_5(self):
-        data = {'one': 1, 'two': 2}
-        fft, ax = task_func(data)
-        
-        # Assert the key 'a' is added to the dictionary
-        self.assertIn('a', data)
-        
-        # Assert the FFT is returned as ndarray
-        self.assertIsInstance(fft, np.ndarray)
-        
-        # Assert the plot attributes
-        self.assertEqual(ax.get_title(), 'FFT of the Signal')
-        self.assertEqual(ax.get_xlabel(), 'Frequency [Hz]')
-        self.assertEqual(ax.get_ylabel(), 'Frequency Spectrum Magnitude')
+    def test_basic_functionality(self):
+        random.seed(0)
+        result = task_func(3, 5)
+        self.assertLessEqual(len(result), 3)
+        for key in result:
+            self.assertIn(key, LETTERS)
+            self.assertEqual(result[key], [1, 2, 3, 4, 5])
+    def test_no_keys(self):
+        random.seed(0)
+        result = task_func(0, 5)
+        self.assertEqual(result, {})
+    def test_no_values(self):
+        random.seed(0)
+        result = task_func(3, 0)
+        for key in result:
+            self.assertEqual(result[key], [])
+    def test_large_input(self):
+        random.seed(0)
+        result = task_func(10, 1000)
+        for key in result:
+            self.assertIn(key, LETTERS)
+            self.assertEqual(len(result[key]), 1000)
+    def test_max_keys(self):
+        random.seed(0)
+        result = task_func(len(LETTERS), 5)
+        for key in result:
+            self.assertIn(key, LETTERS)
+            self.assertEqual(result[key], [1, 2, 3, 4, 5])

@@ -1,67 +1,156 @@
-import base64
-import hashlib
-import hmac
-import binascii
+import pandas as pd
+import re
+import random
 
-def task_func(s, signature, secret_key):
+
+def task_func(s: str, seed: int = 0) -> pd.DataFrame:
     """
-    Validates the HMAC SHA-1 signature of a base64-encoded message against a provided signature using a specified secret key.
-    This function first decodes the base64-encoded message, then computes its HMAC SHA-1 hash using the provided secret key,
-    and finally compares this computed hash with the provided signature.
+    Generate a Pandas DataFrame of products with their ID, quantity, code, price, product, and description
+    based on a specified string of product data.
+
+    The input string is expected to be divided into segments by newlines. Each segment is expected to
+    be further split into parts by whitespace: ID, quantity, code, price, and a product description.
+    The function will remove trailing whitespaces in each field and assign a product name per unique code.
+    Product name is randomly sampled from: ['Apple', 'Banana', 'Orange', 'Pear', 'Grape'].
+    The same product name will be assigned to each code for each input s, however different codes can be
+    mapped to the same name.
 
     Parameters:
-    s (str): The base64-encoded message to validate.
-    signature (str): The HMAC SHA-1 signature to compare against.
-    secret_key (str): The secret key used to compute the HMAC SHA-1 hash.
+    - s    (str): Product data string split by newline, then whitespace.
+                  Expected format per segment: '<ID> <Quantity> <Code> <Price> <Description>'
+                  If incomplete, this function raises ValueError.
+    - seed (int): Random seed for reproducibility. Defaults to 0.
 
     Returns:
-    bool: Returns True if the provided signature matches the computed signature, False otherwise.
+    - data_df (pd.DataFrame): DataFrame with columns: ['ID', 'Quantity', 'Code', 'Price', 'Product', 'Description'].
+                              Quantity and Price are expected to be integers.
 
     Requirements:
-    - base64
-    - hashlib
-    - hmac
-    - binascii
+    - pandas
+    - re
+    - random
 
     Examples:
-    >>> task_func('SGVsbG8gV29ybGQ=', 'c47c23299efca3c220f4c19a5f2e4ced14729322', 'my_secret_key')
-    True
+    >>> s = '1 10 A10B 100 This is a description with spaces'
+    >>> df = task_func(s)
+    >>> df
+      ID  Quantity  Code  Price Product                        Description
+    0  1        10  A10B    100    Pear  This is a description with spaces
 
-    >>> task_func('SGVsbG8gV29ybGQ=', 'incorrect_signature', 'my_secret_key')
-    False
+    >>> s = '1 10 A10B 100 This is a description with spaces\\n2 20 B20C 200 Another description example'
+    >>> df = task_func(s)
+    >>> df
+      ID  Quantity  Code  Price Product                        Description
+    0  1        10  A10B    100    Pear  This is a description with spaces
+    1  2        20  B20C    200    Pear        Another description example
     """
-    decoded_msg = base64.b64decode(s).decode()
-    computed_signature = hmac.new(secret_key.encode(), decoded_msg.encode(), hashlib.sha1)
-    return binascii.hexlify(computed_signature.digest()).decode() == signature
+    if not s:
+        raise ValueError("Incomplete data provided.")
+    random.seed(seed)
+    products = ["Apple", "Banana", "Orange", "Pear", "Grape"]
+    code_to_product = dict()
+    data_list = []
+    segments = [segment.strip() for segment in s.split("\n")]
+    for segment in segments:
+        if segment:
+            elements = re.split(r"\s+", segment.strip(), 4)
+            if len(elements) < 5:
+                raise ValueError("Incomplete data provided.")
+            id, quantity, code, price, description = elements
+            product = code_to_product.get(code, random.choice(products))
+            data_list.append([id, quantity, code, price, product, description])
+    df = pd.DataFrame(
+        data_list, columns=["ID", "Quantity", "Code", "Price", "Product", "Description"]
+    )
+    df["Quantity"] = df["Quantity"].astype(int)
+    df["Price"] = df["Price"].astype(int)
+    return df
 
 import unittest
-import binascii
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_valid_signature(self):
-        # Test that a correctly signed message returns True
-        self.assertTrue(task_func('SGVsbG8gV29ybGQ=', 'c47c23299efca3c220f4c19a5f2e4ced14729322', 'my_secret_key'))
-    def test_invalid_signature(self):
-        # Test that an incorrectly signed message returns False
-        self.assertFalse(task_func('SGVsbG8gV29ybGQ=', 'incorrect_signature', 'my_secret_key'))
-    def test_empty_message(self):
-        # Test that an empty message with its correct signature verifies successfully
-        self.assertTrue(task_func('', '4b4f493acb45332879e4812a98473fc98209fee6', 'my_secret_key'))
-    def test_empty_signature(self):
-        # Test that a non-empty message with an empty signature returns False
-        self.assertFalse(task_func('SGVsbG8gV29ybGQ=', '', 'my_secret_key'))
-    def test_invalid_base64(self):
-        # Test that invalid base64 input raises a binascii.Error
-        with self.assertRaises(binascii.Error):
-            task_func('Invalid base64', '2ef7bde608ce5404e97d5f042f95f89f1c232871', 'my_secret_key')
-    def test_non_ascii_characters(self):
-        # Test handling of base64-encoded non-ASCII characters
-        self.assertTrue(task_func('SGVsbG8sIOS4lueVjA==', '960b22b65fba025f6a7e75fb18be1acfb5babe90', 'my_secret_key'))
-    def test_long_message(self):
-        # Test with a longer base64-encoded message to ensure robust handling
-        long_message = "A"*100
-        # Expected signature will vary; this is a placeholder for the correct HMAC SHA-1 hash
-        expected_signature = 'b609cc34db26376fadbcb71ae371427cb4e2426d'
-        self.assertTrue(task_func(long_message, expected_signature, 'my_secret_key'))
-    def test_signature_case_sensitivity(self):
-        # Verify that signature comparison is case-sensitive
-        self.assertFalse(task_func('SGVsbG8gV29ybGQ=', 'c47c23299efca3c220f4c19a5f2e4ced14729322'.upper(), 'my_secret_key'))
+    def setUp(self):
+        self.df1 = pd.DataFrame(
+            {
+                "ID": ["1"],
+                "Quantity": ["10"],
+                "Code": ["A10B"],
+                "Price": ["100"],
+                "Description": ["This is a description with spaces"],
+            }
+        )
+        self.df2 = pd.DataFrame(
+            {
+                "ID": ["2"],
+                "Quantity": ["15"],
+                "Code": ["B20C"],
+                "Price": ["200"],
+                "Description": ["Another description with spaces"],
+            }
+        )
+        self.df_multiple = pd.concat([self.df1, self.df2]).reset_index(drop=True)
+        for col in ["Quantity", "Price"]:
+            self.df1[col] = self.df1[col].astype(int)
+            self.df2[col] = self.df2[col].astype(int)
+            self.df_multiple[col] = self.df_multiple[col].astype(int)
+    def _test_most_columns(self, df1, df2):
+        columns_to_test = ["ID", "Quantity", "Code", "Price", "Description"]
+        for col in columns_to_test:
+            pd.testing.assert_series_equal(df1[col], df2[col])
+    def test_case_1(self):
+        # Test basic structure and data correctness
+        input_str = "1 10 A10B 100 This is a description with spaces"
+        result = task_func(input_str)
+        self.assertIsInstance(result, pd.DataFrame)
+        self._test_most_columns(result, self.df1)
+    def test_case_2(self):
+        # Test multiline basic structure and correctness
+        input_str = "\n".join(
+            [
+                "1 10 A10B 100 This is a description with spaces",
+                "2 15 B20C 200 Another description with spaces",
+            ]
+        )
+        result = task_func(input_str)
+        self._test_most_columns(result, self.df_multiple)
+    def test_case_3(self):
+        # Test multiline with trailing whitespaces
+        input_str = "\n".join(
+            [
+                "1 10 A10B 100 This is a description with spaces         ",
+                "2 15 B20C 200 Another description with spaces     ",
+            ]
+        )
+        result = task_func(input_str)
+        self._test_most_columns(result, self.df_multiple)
+    def test_case_4(self):
+        # Test behavior with extra spaces in the input string
+        input_str = "\n".join(
+            [
+                "1   10 A10B 100       This is a description with spaces",
+                "2  15   B20C   200 Another description with spaces     ",
+            ]
+        )
+        result = task_func(input_str)
+        self._test_most_columns(result, self.df_multiple)
+    def test_case_5(self):
+        # Test code to product mapping when there are duplicates
+        input_str = "\n".join(
+            [
+                "1 10 A10B 100 This is a description with spaces",
+                "2 15 A10B 200 Another description with spaces",
+            ]
+        )
+        result = task_func(input_str)
+        product_names = result["Product"]
+        self.assertEqual(product_names.iloc[0], product_names.iloc[1])
+    def test_case_6(self):
+        # Test behavior with empty input string
+        input_str = ""
+        with self.assertRaises(ValueError):
+            task_func(input_str)
+    def test_case_7(self):
+        # Test behavior with incomplete input string
+        input_str = "1 10"
+        with self.assertRaises(ValueError):
+            task_func(input_str)

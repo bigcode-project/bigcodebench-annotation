@@ -1,108 +1,107 @@
-import pandas as pd
-import numpy as np
+import re
+import matplotlib.pyplot as plt
 
 
-def task_func(data, key, min_value, max_value):
-    '''
-    Add a new column with random values to the "data" DataFrame.
+def task_func(df):
+    """
+    Analyzes a DataFrame to find videos with titles containing "how" or "what" and visualizes their like ratios.
+    The like ratio for each video is calculated by dividing the number of likes by the number of views.
+    This function generates a bar plot of the like ratios for these specific videos.
+    If the DataFrame is empty, lacks the required columns, or contains no titles matching the criteria,
+    an empty subplot is returned.
 
     Parameters:
-    data (DataFrame): The input data as a pandas DataFrame.
-    key (str): The name of the new column to be added.
-    min_value (int): The minimum value for randomly generated integers in the new column.
-    max_value (int): The maximum value for randomly generated integers in the new column.
+    df (DataFrame): A DataFrame containing video data with columns 'Title', 'Views', and 'Likes'.
 
     Returns:
-    DataFrame: Updated DataFrame with the new column added.
+    Axes: A matplotlib.axes.Axes object of the bar plot. The plot will be empty if the DataFrame is insufficient
+    or no video titles match the search criteria.
 
-    Raises:
-    - The function will raise an error if the input data is not pandas DataFrame
-    
     Requirements:
-    - numpy
-    - pandas
-    
-    Example:
-    >>> np.random.seed(0)
-    >>> data = pd.DataFrame({'key1': ['value1', 'value2', 'value3'], 'key2': [1, 2, 3]})
-    >>> updated_data = task_func(data, 'new_key', 0, 10)
-    >>> print(updated_data)
-         key1  key2  new_key
-    0  value1     1        5
-    1  value2     2        0
-    2  value3     3        3
-    '''
-    if not isinstance(data, pd.DataFrame):
-        raise ValueError("Input 'data' must be a pandas DataFrame.")
-    random_generated = np.random.randint(min_value, max_value + 1, size=len(data))
-    data[key] = random_generated
-    return data
+    - re
+    - matplotlib
 
-import unittest
-import numpy as np
+    Note:
+    The function checks for the presence of the necessary data columns ('Title', 'Views', 'Likes') and whether
+    there are any entries matching the search criteria. If these conditions are not met, it returns an empty plot.
+
+    Example:
+    >>> import pandas as pd
+    >>> data = {'Title': ['How to code', 'What is Python', 'Tutorial'], 'Views': [1500, 1200, 1000], 'Likes': [150, 300, 100]}
+    >>> df = pd.DataFrame(data)
+    >>> ax = task_func(df)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    """
+    if df.empty or 'Likes' not in df.columns or 'Views' not in df.columns or 'Title' not in df.columns:
+        fig, ax = plt.subplots()
+        return ax
+    pattern = re.compile(r'(how|what)', re.IGNORECASE)
+    interesting_videos = df[df['Title'].apply(lambda x: bool(pattern.search(x)))]
+    if interesting_videos.empty:
+        fig, ax = plt.subplots()
+        return ax
+    interesting_videos = interesting_videos.copy()  # Create a copy to avoid modifying the input df
+    interesting_videos['Like Ratio'] = interesting_videos['Likes'] / interesting_videos['Views']
+    ax = interesting_videos.plot(kind='bar', x='Title', y='Like Ratio', legend=False)
+    ax.set_ylabel('Like Ratio')
+    ax.set_xticklabels(interesting_videos['Title'], rotation='vertical')
+    return ax
+
+# Integrating the test_cases function into the TestCases class methods and running the tests
 import pandas as pd
-# Blackbox test cases
+import unittest
+import matplotlib
+matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
-    def test_empty_data(self):
-        np.random.seed(0)
-        data = pd.DataFrame()
-        key = 'new_column'
-        min_value = 0
-        max_value = 10
-        updated_data = task_func(data, key, min_value, max_value)
-        self.assertIsInstance(updated_data, pd.DataFrame)
-        self.assertTrue(key in updated_data.columns)
-        self.assertEqual(len(updated_data), 0)
-    
-    def test_non_empty_data(self):
-        np.random.seed(0)
-        data = pd.DataFrame({'A': [1, 2, 3], 'B': ['a', 'b', 'c']})
-        key = 'random_values'
-        min_value = 0
-        max_value = 10
-        updated_data = task_func(data, key, min_value, max_value)
-        self.assertIsInstance(updated_data, pd.DataFrame)
-        self.assertTrue(key in updated_data.columns)
-        self.assertEqual(len(updated_data), 3)  # Assuming the length of the input data is 3
-        self.assertTrue(all(min_value <= val <= max_value for val in updated_data[key]))
-        
-    def test_negative_values(self):
-        np.random.seed(0)
-        data = pd.DataFrame({'X': ['x1', 'x2'], 'Y': ['y1', 'y2']})
-        key = 'random'
-        min_value = -10
-        max_value = -5
-        updated_data = task_func(data, key, min_value, max_value)
-        self.assertIsInstance(updated_data, pd.DataFrame)
-        self.assertTrue(key in updated_data.columns)
-        self.assertEqual(len(updated_data), 2)
-        self.assertTrue(all(min_value <= val <= max_value for val in updated_data[key]))
-        
-    def test_single_row_data(self):
-        np.random.seed(0)
-        data = pd.DataFrame({'A': [5], 'B': ['abc']})
-        key = 'new_col'
-        min_value = 0
-        max_value = 10
-        updated_data = task_func(data, key, min_value, max_value)
-        self.assertIsInstance(updated_data, pd.DataFrame)
-        self.assertTrue(key in updated_data.columns)
-        self.assertEqual(len(updated_data), 1)
-        self.assertTrue(all(min_value <= val <= max_value for val in updated_data[key]))
-        
-    def test_large_data(self):
-        np.random.seed(0)
-        data = pd.DataFrame({'X': ['x' + str(i) for i in range(1000)], 'Y': ['y' + str(i) for i in range(1000)]})
-        key = 'random_numbers'
-        min_value = 1
-        max_value = 100
-        updated_data = task_func(data, key, min_value, max_value)
-        self.assertIsInstance(updated_data, pd.DataFrame)
-        self.assertTrue(key in updated_data.columns)
-        self.assertEqual(len(updated_data), 1000)
-        self.assertTrue(all(min_value <= val <= max_value for val in updated_data[key]))
-    def test_non_dataframe_input(self):
-        np.random.seed(0)
-        with self.assertRaises(ValueError):
-            data = {'key1': ['value1', 'value2', 'value3'], 'key2': [1, 2, 3]}
-            task_func(data, 'new_key', 0, 10)
+    def test_case_1(self):
+        data_1 = pd.DataFrame({
+            'Title': ['How to code?', 'What is Python?', 'The art of programming', 'How to cook?', 'What is life?'],
+            'Views': [1000, 500, 200, 300, 800],
+            'Likes': [500, 250, 100, 150, 600]
+        })
+        ax = task_func(data_1)
+        self.assertIsInstance(ax, matplotlib.axes.Axes, "The returned object should be of type Axes.")
+        y_data = [rect.get_height() for rect in ax.patches]
+        expected_y_data = [0.5, 0.5, 0.5, 0.75]
+        self.assertEqual(y_data, expected_y_data, f"Expected {expected_y_data}, but got {y_data}")
+    def test_case_2(self):
+        data_2 = pd.DataFrame({
+            'Title': ['How to swim?', 'What is Java?', 'The beauty of nature', 'How to paint?', 'What is art?'],
+            'Views': [1200, 400, 250, 350, 900],
+            'Likes': [600, 200, 125, 175, 450]
+        })
+        ax = task_func(data_2)
+        self.assertIsInstance(ax, matplotlib.axes.Axes, "The returned object should be of type Axes.")
+        y_data = [rect.get_height() for rect in ax.patches]
+        expected_y_data = [0.5, 0.5, 0.5, 0.5]
+        self.assertEqual(y_data, expected_y_data, f"Expected {expected_y_data}, but got {y_data}")
+    def test_case_3(self):
+        data_3 = pd.DataFrame({
+            'Title': [],
+            'Views': [],
+            'Likes': []
+        })
+        ax = task_func(data_3)
+        self.assertIsInstance(ax, matplotlib.axes.Axes, "The returned object should be of type Axes.")
+    def test_case_4(self):
+        data_4 = pd.DataFrame({
+            'Title': ['Learning to code', 'Python basics', 'Advanced programming', 'Cooking basics',
+                      'Life and philosophy'],
+            'Views': [1100, 450, 220, 320, 850],
+            'Likes': [550, 225, 110, 160, 425]
+        })
+        ax = task_func(data_4)
+        self.assertIsInstance(ax, matplotlib.axes.Axes, "The returned object should be of type Axes.")
+    def test_case_5(self):
+        data_5 = pd.DataFrame({
+            'Title': ['How to sing?', 'What is C++?', 'The mysteries of the universe', 'How to dance?',
+                      'What is time?'],
+            'Views': [1300, 420, 270, 370, 950],
+            'Likes': [650, 210, 135, 185, 475]
+        })
+        ax = task_func(data_5)
+        self.assertIsInstance(ax, matplotlib.axes.Axes, "The returned object should be of type Axes.")
+        y_data = [rect.get_height() for rect in ax.patches]
+        expected_y_data = [0.5, 0.5, 0.5, 0.5]
+        self.assertEqual(y_data, expected_y_data, f"Expected {expected_y_data}, but got {y_data}")

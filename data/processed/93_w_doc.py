@@ -1,82 +1,76 @@
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
-from matplotlib.collections import PathCollection
+from sklearn.decomposition import PCA
 
-def task_func(data, n_clusters=3):
+def task_func(data, n_components=2):
     """
-    Perform K-means clustering on a dataset and generate a scatter plot visualizing the clusters and their centroids.
+    Perform Principal Component Analysis (PCA) on a dataset and record the result.
+    Also, generates a scatter plot of the transformed data.
 
     Parameters:
-        data (pd.DataFrame): The dataset to be clustered, where rows are samples and columns are features.
-        n_clusters (int): The number of clusters to form. Must be greater than 1. Defaults to 3.
+    data (DataFrame): The dataset.
+    n_components (int): The number of principal components to calculate. Default is 2.
 
     Returns:
-        tuple: 
-            - np.ndarray: An array of cluster labels assigned to each sample.
-            - plt.Axes: An Axes object with the scatter plot showing the clusters and centroids.
+    DataFrame: The transformed data with principal components.
+    Axes: The matplotlib Axes object containing the scatter plot.
 
     Raises:
-        ValueError: If 'data' is not a pd.DataFrame.
-        ValueError: If 'n_clusters' is not an integer greater than 1.
+    ValueError: If n_components is not a positive integer.
 
     Requirements:
-        - numpy
-        - pandas
-        - matplotlib
-        - sklearn
-    
+    - numpy
+    - pandas
+    - matplotlib.pyplot
+    - sklearn.decomposition
+
     Example:
-    >>> np.random.seed(42)
-    >>> data = pd.DataFrame(np.random.rand(100, 2), columns=['Feature1', 'Feature2'])
-    >>> _, ax = task_func(data, 3)
-    >>> ax.get_title()
-    'K-Means Clustering'
+    >>> data = pd.DataFrame([[14, 25], [1, 22], [7, 8]], columns=['Column1', 'Column2'])
+    >>> transformed_data, plot = task_func(data)
     """
-    if not isinstance(data, pd.DataFrame):
-        raise ValueError("Input 'data' must be a pandas DataFrame.")
-    if not isinstance(n_clusters, int) or n_clusters <= 1:
-        raise ValueError("'n_clusters' must be an integer greater than 1.")
-    kmeans = KMeans(n_clusters=n_clusters)
-    labels = kmeans.fit_predict(data)
-    centroids = kmeans.cluster_centers_
+    np.random.seed(42)
+    if not isinstance(n_components, int) or n_components <= 0:
+        raise ValueError("n_components must be a positive integer")
+    pca = PCA(n_components=n_components)
+    transformed_data = pca.fit_transform(data)
     fig, ax = plt.subplots()
-    ax.scatter(data.iloc[:, 0], data.iloc[:, 1], c=labels, cmap='viridis', alpha=0.6, label='Data points')
-    ax.scatter(centroids[:, 0], centroids[:, 1], marker='x', s=200, c='red', label='Centroids')
-    ax.set_xlabel('Feature 1')
-    ax.set_ylabel('Feature 2')
-    ax.set_title('K-Means Clustering')
-    ax.legend()
-    return labels, ax
+    ax.scatter(transformed_data[:, 0], transformed_data[:, 1])
+    return pd.DataFrame(transformed_data, columns=[f'PC{i+1}' for i in range(n_components)]), ax
 
 import unittest
-from matplotlib.collections import PathCollection  # Correct import
+import pandas as pd
 import numpy as np
 class TestCases(unittest.TestCase):
     def setUp(self):
+        self.data = pd.DataFrame({
+            'Column1': np.random.rand(10),
+            'Column2': np.random.rand(10)
+        })
+    def test_transformed_data_shape(self):
+        transformed_data, _ = task_func(self.data, 2)
+        self.assertEqual(transformed_data.shape, (10, 2))
+    def test_invalid_n_components(self):
+        with self.assertRaises(ValueError):
+            task_func(self.data, 0)
+    def test_invalid_n_components_type(self):
+        with self.assertRaises(ValueError):
+            task_func(self.data, "two")
+    def test_plot_axes(self):
+        _, ax = task_func(self.data, 2)
+        self.assertEqual(len(ax.collections), 1)  # One scatter plot
+    def test_values(self):
         np.random.seed(42)
-        self.data = pd.DataFrame(np.random.rand(100, 2), columns=['Feature1', 'Feature2'])
-    def test_cluster_centers(self):
-        _, ax = task_func(self.data, 3)
-        centroids = [child for child in ax.get_children() if isinstance(child, PathCollection) and child.get_label() == 'Centroids']
-        self.assertTrue(len(centroids) > 0, "Centroids should be marked in the plot.")
-        self.assertEqual(len(centroids[0].get_offsets()), 3, "There should be 3 centroids marked in the plot.")
-    def test_single_cluster_error(self):
-        with self.assertRaises(ValueError):
-            _, _ = task_func(self.data, 1)
-    def test_valid_input(self):
-        labels, ax = task_func(self.data, 3)
-        self.assertEqual(len(labels), 100)  # Ensure labels array matches data length
-    def test_invalid_data_type(self):
-        with self.assertRaises(ValueError):
-            _, _ = task_func([[1, 2], [3, 4]], 3)
-    def test_invalid_cluster_number(self):
-        with self.assertRaises(ValueError):
-            _, _ = task_func(self.data, -1)
-    def test_return_type(self):
-        _, ax = task_func(self.data, 3)
-        self.assertIsInstance(ax, plt.Axes)  # Ensuring the plot is returned
-    def test_return_labels(self):
-        labels, _ = task_func(self.data, 3)
-        unique_labels = np.unique(labels)
-        self.assertEqual(len(unique_labels), 3)  # Checking if 3 unique labels are returned
+        transformed_data, _ = task_func(self.data, 2)
+        df_list = transformed_data.apply(lambda row: ','.join(row.values.astype(str)), axis=1).tolist()
+        # with open('df_contents.txt', 'w') as file:
+        #     file.write(str(df_list))
+        # Convert string pairs to list of tuples of floats
+        expect = ['-0.36270132751314693,-0.17330242962071069', '0.7073025303719391,0.12382897836601565', '0.45378164000836924,0.1734575007991456', '-0.06806713223200053,-0.18707071063291186', '-0.41150042971259093,0.09384691859758798', '-0.4104362188060755,0.09501439103733277', '-0.3990216926714853,0.2501208456858351', '0.34082913981297874,-0.14263963596803247', '0.08412503285413396,-0.028734567486117184', '0.06568845788787812,-0.20452129077814485']
+        # self.assertEqual(df_list, expect, "DataFrame contents should match the expected output")
+        df_tuples = [tuple(map(float, item.split(','))) for item in df_list]
+        expect_tuples = [tuple(map(float, item.split(','))) for item in expect]
+        # Assert each pair of tuples is approximately equal
+        for actual, expected in zip(df_tuples, expect_tuples):
+            self.assertAlmostEqual(actual[0], expected[0], places=7, msg="DataFrame contents should match the expected output")
+            self.assertAlmostEqual(actual[1], expected[1], places=7, msg="DataFrame contents should match the expected output")

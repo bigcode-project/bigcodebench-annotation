@@ -1,82 +1,96 @@
-import time
 from datetime import datetime
-import random
+import pandas as pd
 import matplotlib.pyplot as plt
 
 # Constants
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
-def task_func(n, output_path=None):
+def task_func(timestamps):
     """
-    Generate n random Unix timestamps and convert them to strings formatted as UTC DATE_FORMAT.
-    Plot a histogram of the distribution of the generated timestamps. If an output path is provided,
-    save the histogram to the specified path. Otherwise, display the plot.
+    Convert a list of Unix timestamps to date objects, create a Pandas DataFrame, and draw a histogram.
+    - The date format should be as DATE_FORMAT.
+    - The DataFrame should have 'Timestamp' and 'Datetime' as column names.
+    - If the list of timestamps is empty, raise a ValueError with the message "Input list of timestamps is empty".
 
     Parameters:
-    n (int): The number of timestamps to generate.
-    output_path (str, optional): Path to save the histogram plot. Defaults to None.
+    - timestamps (list): The list of Unix timestamps.
 
     Returns:
-    list: The list of n formatted timestamps.
+    - pandas.DataFrame: A pandas DataFrame containing the original Unix timestamps and the converted datetime objects.
+    - Axes: The Axes object of the histogram plot. The histogram will have 10 bins by default, representing the distribution of the datetime objects.
+
+    Raises:
+    - ValueError("Input list of timestamps is empty."): If the list of timestamps is empty.
 
     Requirements:
-    - time
     - datetime
-    - random
+    - pandas
     - matplotlib.pyplot
 
-    Example:
-    >>> random.seed(42)
-    >>> timestamps = task_func(n=3, output_path=None)
-    >>> print(timestamps)
-    ['2013-07-06 20:56:46', '1977-07-29 23:34:23', '1971-09-14 11:29:44']
+    Examples:
+    >>> df, ax = task_func([1347517370, 1475153730, 1602737300])
+    >>> print(df)
+        Timestamp             Datetime
+    0  1347517370  2012-09-13 02:22:50
+    1  1475153730  2016-09-29 08:55:30
+    2  1602737300  2020-10-15 00:48:20
     """
-    timestamps = []
-    for _ in range(n):
-        timestamp = random.randint(0, int(time.time()))
-        formatted_time = datetime.utcfromtimestamp(timestamp).strftime(DATE_FORMAT)
-        timestamps.append(formatted_time)
-    plt.hist([datetime.strptime(t, DATE_FORMAT) for t in timestamps])
-    if output_path:
-        plt.savefig(output_path)
-    else:
-        plt.show()
-    return timestamps
+    if not timestamps:
+        raise ValueError("Input list of timestamps is empty.")
+    datetimes = [datetime.fromtimestamp(t).strftime(DATE_FORMAT) for t in timestamps]
+    df = pd.DataFrame({"Timestamp": timestamps, "Datetime": datetimes})
+    ax = plt.hist(pd.to_datetime(df["Datetime"]))
+    plt.close()
+    return df, ax
 
 import unittest
-import os
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def setUp(self):
-        self.test_dir = "data/task_func"
-        os.makedirs(self.test_dir, exist_ok=True)
-        self.o_1 = os.path.join(self.test_dir, "histogram_1.png")
-    def tearDown(self) -> None:
-        import shutil
-        try:
-            shutil.rmtree(self.test_dir)
-        except:
-            pass
+        self.test_data = [
+            [1318935276, 1342905276, 23074268],
+            [4235087541, 1234653346, 19862358],
+            [],
+            [1156829289],
+            [1000000000, 2000000000, 3000000000],
+        ]
     def test_case_1(self):
-        random.seed(42)
-        result = task_func(10)
-        self.assertEqual(len(result), 10)
+        input_timestamps = self.test_data[0]
+        self.assert_function_output(input_timestamps)
     def test_case_2(self):
-        random.seed(42)
-        result = task_func(15)
-        for timestamp in result:
-            try:
-                datetime.strptime(timestamp, DATE_FORMAT)
-            except ValueError:
-                self.fail(f"Timestamp {timestamp} doesn't match the specified format.")
+        input_timestamps = self.test_data[1]
+        self.assert_function_output(input_timestamps)
     def test_case_3(self):
-        random.seed(42)
-        task_func(20, output_path=self.o_1)
-        self.assertTrue(os.path.exists(self.o_1))
+        input_timestamps = self.test_data[2]
+        with self.assertRaises(ValueError) as context:
+            task_func(input_timestamps)
+        self.assertEqual(
+            str(context.exception),
+            "Input list of timestamps is empty.",
+        )
     def test_case_4(self):
-        result = task_func(50)
-        self.assertEqual(len(result), len(set(result)))
+        input_timestamps = self.test_data[3]
+        self.assert_function_output(input_timestamps)
     def test_case_5(self):
-        result = task_func(0)
-        self.assertEqual(len(result), 0)
+        input_timestamps = self.test_data[4]
+        self.assert_function_output(input_timestamps)
+        df, ax = task_func(input_timestamps)
+        expected_df = pd.DataFrame(
+            {
+                "Timestamp": [1000000000, 2000000000, 3000000000],
+                "Datetime": [
+                    "2001-09-09 01:46:40",
+                    "2033-05-18 03:33:20",
+                    "2065-01-24 05:20:00",
+                ],
+            }
+        )
+        
+        pd.testing.assert_frame_equal(df, expected_df)
+    def assert_function_output(self, input_timestamps):
+        df, ax = task_func(input_timestamps)
+        # Assert that the DataFrame contains the correct timestamps
+        self.assertEqual(df["Timestamp"].tolist(), input_timestamps)
+        # Assert the histogram attributes (e.g., number of bins)
+        self.assertEqual(len(ax[0]), 10)  # There should be 10 bars in the histogram

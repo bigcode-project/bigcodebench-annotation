@@ -1,102 +1,62 @@
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
+import nltk
+import re
+from collections import Counter
 
-def task_func(l):
+
+# Constants
+STOPWORDS = nltk.corpus.stopwords.words('english')
+
+def task_func(text):
     """
-    Perform Principal Component Analysis (PCA) on the given array and record the first two main components.
+    Calculate the frequency of continuous words in a text string. The function splits the text into words, 
+    converts them to lowercase, removes punctuation marks and common stopwords (provided as a constant), 
+    and then calculates the frequency of each word.
 
     Parameters:
-    l (numpy array): The input array.
+    text (str): The input text string.
 
     Returns:
-    ax (matplotlib.axes._axes.Axes): Axes object of the generated plot
-
-    Note:
-    - This function use "PCA Result" as the title of the plot.
-    - This function use "First Principal Component" and "Second Principal Component" as the xlabel 
-    and ylabel of the plot, respectively.
+    dict: A dictionary with words as keys and their frequencies as values.
 
     Requirements:
-    - sklearn.decomposition.PCA
-    - matplotlib.pyplot
+    - nltk for stopwords (ensure the stopwords dataset is downloaded using nltk.download('stopwords'))
+    - re for regular expressions
+    - collections.Counter for counting occurrences
 
     Example:
-    >>> import numpy as np
-    >>> l = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
-    >>> ax = task_func(l)
-    >>> len(ax.collections[0].get_offsets())
-    4
-    >>> print(ax.get_title())
-    PCA Result
-    >>> plt.close()
+    >>> task_func('This is a sample text. This text is for testing.')
+    {'sample': 1, 'text': 2, 'testing': 1}
     """
-    pca = PCA(n_components=2)
-    principalComponents = pca.fit_transform(l)
-    fig = plt.figure(figsize=(6, 4))
-    ax = fig.add_subplot(111)
-    plt.scatter(principalComponents[:, 0], principalComponents[:, 1])
-    plt.xlabel('First Principal Component')
-    plt.ylabel('Second Principal Component')
-    plt.title('PCA Result')
-    return ax
+    words = re.split(r'\W+', text.lower())
+    words = [word for word in words if word not in STOPWORDS and word != '']
+    word_freq = dict(Counter(words))
+    return word_freq
 
 import unittest
-import numpy as np
-import matplotlib.pyplot as plt
+import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Input 1: simple 2D array
-        l = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
-        ax = task_func(l)
-        self.assertTrue(isinstance(ax, plt.Axes))
-        self.assertEqual(ax.get_title(), "PCA Result")
-        self.assertEqual(ax.get_xlabel(), "First Principal Component")
-        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
-        # Check the number of points
-        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
-        plt.close()
+        # Basic test
+        text = 'This is a sample text. This text is for testing.'
+        expected_output = {'sample': 1, 'text': 2, 'testing': 1}
+        self.assertEqual(task_func(text), expected_output)
     def test_case_2(self):
-        # Input 2: another simple 2D array
-        l = np.array([[2, 3], [4, 5], [6, 7], [8, 9]])
-        ax = task_func(l)
-        self.assertTrue(isinstance(ax, plt.Axes))
-        self.assertEqual(ax.get_title(), "PCA Result")
-        self.assertEqual(ax.get_xlabel(), "First Principal Component")
-        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
-        # Check the number of points
-        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
-        plt.close()
+        # Test with stopwords
+        text = 'The quick brown fox jumped over the lazy dog.'
+        expected_output = {'quick': 1, 'brown': 1, 'fox': 1, 'jumped': 1, 'lazy': 1, 'dog': 1}
+        self.assertEqual(task_func(text), expected_output)
     def test_case_3(self):
-        # Input 3: larger array
-        np.random.seed(0)
-        l = np.random.rand(10, 2)
-        ax = task_func(l)
-        self.assertTrue(isinstance(ax, plt.Axes))
-        self.assertEqual(ax.get_title(), "PCA Result")
-        self.assertEqual(ax.get_xlabel(), "First Principal Component")
-        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
-        # Check the number of points
-        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
-        plt.close()
+        # Test with punctuation
+        text = 'Hello, world! How are you today?'
+        expected_output = {'hello': 1, 'world': 1, 'today': 1}
+        self.assertEqual(task_func(text), expected_output)
     def test_case_4(self):
-        # Input 4: array with similar values (less variance)
-        l = np.array([[1, 2], [1, 2.1], [1.1, 2], [1.1, 2.1]])
-        ax = task_func(l)
-        self.assertTrue(isinstance(ax, plt.Axes))
-        self.assertEqual(ax.get_title(), "PCA Result")
-        self.assertEqual(ax.get_xlabel(), "First Principal Component")
-        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
-        # Check the number of points
-        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
-        plt.close()
+        # Test with empty string
+        text = ''
+        expected_output = {}
+        self.assertEqual(task_func(text), expected_output)
     def test_case_5(self):
-        # Input 5: array with larger values
-        l = np.array([[100, 200], [300, 400], [500, 600], [700, 800]])
-        ax = task_func(l)
-        self.assertTrue(isinstance(ax, plt.Axes))
-        self.assertEqual(ax.get_title(), "PCA Result")
-        self.assertEqual(ax.get_xlabel(), "First Principal Component")
-        self.assertEqual(ax.get_ylabel(), "Second Principal Component")
-        # Check the number of points
-        self.assertEqual(len(ax.collections[0].get_offsets()), len(l))
-        plt.close()
+        # Test with numeric values and special characters
+        text = 'Python3 is better than Python2. I love Python3.5!'
+        expected_output = {'python3': 2, 'better': 1, 'python2': 1, 'love': 1, '5': 1}
+        self.assertEqual(task_func(text), expected_output)

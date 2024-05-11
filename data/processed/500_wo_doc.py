@@ -1,16 +1,18 @@
 import xlwt
 import os
-import io
-import csv
 
-def task_func(csv_content, filename):
+# Constants
+FIELDS = ['ID', 'Name', 'Age']
+
+def task_func(values, filename):
     """
-    Converts CSV content into an Excel file and saves it with the given filename. The function reads the CSV content,
-    creates a new Excel workbook, writes the data into the workbook, and saves it as an Excel file.
+    Writes a list of OrderedDicts to an Excel file. Each OrderedDict in the list represents a row in the Excel sheet,
+    and each key in the OrderedDict corresponds to a column defined in the FIELDS constant comprising column names 
+    'ID', 'Name', and 'Age'.
 
     Parameters:
-    csv_content (str): The CSV content as a string, where rows are separated by newlines and columns by commas.
-    filename (str): The name of the Excel file to be created, including the .xls extension.
+    values (list of OrderedDict): A list where each element is an OrderedDict with keys matching the FIELDS constant.
+    filename (str): The filename for the Excel file to be created. It should include the '.xls' extension.
 
     Returns:
     str: The absolute path of the created Excel file.
@@ -18,66 +20,67 @@ def task_func(csv_content, filename):
     Requirements:
     - xlwt
     - os
-    - io
-    - csv
 
     Examples:
-    Convert simple CSV content to an Excel file and return its path.
-    >>> csv_content = 'ID,Name,Age\\n1,John Doe,30\\n2,Jane Doe,28'
-    >>> os.path.isfile(task_func(csv_content, 'test_data.xls'))
+    Create an Excel file with data from a list of OrderedDicts.
+    >>> data = [OrderedDict([('ID', 1), ('Name', 'John Doe'), ('Age', 30)]),
+    ...         OrderedDict([('ID', 2), ('Name', 'Jane Doe'), ('Age', 28)])]
+    >>> path = task_func(data, 'test_data.xls')
+    >>> os.path.exists(path) and 'test_data.xls' in path
     True
 
-    Create an Excel file with a single cell.
-    >>> csv_content = 'Hello'
-    >>> os.path.isfile(task_func(csv_content, 'single_cell.xls'))
+    Create an Excel file with no data.
+    >>> empty_data = []
+    >>> path = task_func(empty_data, 'empty_data.xls')
+    >>> os.path.exists(path) and 'empty_data.xls' in path
     True
     """
     book = xlwt.Workbook()
-    sheet1 = book.add_sheet("sheet1")
-    reader = csv.reader(io.StringIO(csv_content))
-    for row_index, row in enumerate(reader):
-        for col_index, col in enumerate(row):
-            sheet1.write(row_index, col_index, col)
+    sheet1 = book.add_sheet("persons")
+    for col_index, col in enumerate(FIELDS):
+        sheet1.write(0, col_index, col)
+    for row_index, row_values in enumerate(values, 1):
+        for col_index, col in enumerate(FIELDS):
+            value = row_values.get(col, "")
+            sheet1.write(row_index, col_index, value)
     book.save(filename)
     return os.path.abspath(filename)
 
 import unittest
 import os
 import tempfile
+from collections import OrderedDict
+# Assume task_func is imported or defined elsewhere
 class TestCases(unittest.TestCase):
     def setUp(self):
-        """Set up a temporary directory for test files."""
-        self.temp_dir = tempfile.TemporaryDirectory()
+        # Create a temporary directory to store test files
+        self.test_dir = tempfile.TemporaryDirectory()
     def tearDown(self):
-        """Clean up and remove the temporary directory after tests."""
-        self.temp_dir.cleanup()
-    def test_csv_to_excel_conversion(self):
-        """Test conversion of basic CSV content to an Excel file."""
-        csv_content = 'ID,Name,Age\n1,John Doe,30\n2,Jane Doe,28'
-        filename = os.path.join(self.temp_dir.name, 'test_data.xls')
-        result_path = task_func(csv_content, filename)
+        # Cleanup the temporary directory after tests
+        self.test_dir.cleanup()
+    def test_ordered_dict_to_excel(self):
+        values = [OrderedDict([('ID', 1), ('Name', 'John Doe'), ('Age', 30)]),
+                  OrderedDict([('ID', 2), ('Name', 'Jane Doe'), ('Age', 28)])]
+        filename = os.path.join(self.test_dir.name, 'test_data.xls')
+        result_path = task_func(values, filename)
         self.assertTrue(os.path.isfile(result_path))
-    def test_single_cell_excel(self):
-        """Test creation of an Excel file from CSV content with a single cell."""
-        csv_content = 'Hello'
-        filename = os.path.join(self.temp_dir.name, 'single_cell.xls')
-        result_path = task_func(csv_content, filename)
+    def test_empty_data_to_excel(self):
+        values = []
+        filename = os.path.join(self.test_dir.name, 'empty_data.xls')
+        result_path = task_func(values, filename)
         self.assertTrue(os.path.isfile(result_path))
-    def test_empty_csv(self):
-        """Test handling of empty CSV content without causing errors."""
-        csv_content = ''
-        filename = os.path.join(self.temp_dir.name, 'empty.xls')
-        result_path = task_func(csv_content, filename)
+    def test_incomplete_data_to_excel(self):
+        values = [OrderedDict([('ID', 1), ('Name', 'John Doe')])]
+        filename = os.path.join(self.test_dir.name, 'incomplete_data.xls')
+        result_path = task_func(values, filename)
         self.assertTrue(os.path.isfile(result_path))
-    def test_nonstandard_csv(self):
-        """Ensure the function can handle non-standard CSV formats, expecting failure or adaptation."""
-        csv_content = 'One;Two;Three\n1;2;3'  # This test may need function adaptation to pass.
-        filename = os.path.join(self.temp_dir.name, 'nonstandard.xls')  # Corrected extension to .xls
-        result_path = task_func(csv_content, filename)
-        self.assertTrue(os.path.isfile(result_path))  # This assertion may fail without function adaptation.
+    def test_mismatched_fields(self):
+        values = [OrderedDict([('ID', 1), ('Name', 'John Doe'), ('Gender', 'Male')])]
+        filename = os.path.join(self.test_dir.name, 'mismatched_fields.xls')
+        result_path = task_func(values, filename)
+        self.assertTrue(os.path.isfile(result_path))
     def test_multiple_rows(self):
-        """Test conversion of multi-row CSV content to ensure all rows are processed."""
-        csv_content = 'A,B,C\n1,2,3\n4,5,6'
-        filename = os.path.join(self.temp_dir.name, 'multi_rows.xls')
-        result_path = task_func(csv_content, filename)
+        values = [OrderedDict([('ID', i), ('Name', f'Name {i}'), ('Age', 20+i)]) for i in range(5)]
+        filename = os.path.join(self.test_dir.name, 'multiple_rows.xls')
+        result_path = task_func(values, filename)
         self.assertTrue(os.path.isfile(result_path))

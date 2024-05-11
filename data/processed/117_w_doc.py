@@ -1,95 +1,102 @@
+import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+from random import choice, seed as set_seed
 
-def task_func(mu, sigma, sample_size):
+def task_func(num_of_students, seed=42, name_list=None, gender_list=None, age_range=(15, 20), score_range=(50, 100)):
     """
-    Generates a numpy array of random samples drawn from a normal distribution
-    and plots the histogram of these samples. This function specifies the mean (mu), 
-    standard deviation (sigma), and sample size (sample_size), making it useful 
-    for simulating data, conducting statistical experiments, or initializing 
-    algorithms that require normally distributed data with visualization.
+    Generate a Pandas DataFrame with randomized student data. This function allows for specifying 
+    the total number of students and the randomness seed for reproducible outcomes. Data attributes 
+    include student names, ages, genders, and scores, each derived from provided parameters or defaults.
 
     Parameters:
-        mu (float): The mean of the normal distribution.
-        sigma (float): The standard deviation of the normal distribution.
-        sample_size (int): The number of samples to draw from the distribution.
+    - num_of_students (int): The number of student records to generate. Must be a positive integer.
+    - seed (int, optional): Seed for the random number generator to ensure reproducible data. Defaults to 42.
+    - name_list (list of str, optional): A list of names from which student names are randomly selected. 
+      If not provided, defaults to ['John', 'Mike', 'Sara', 'Emma', 'Nick'].
+    - gender_list (list of str, optional): A list of genders from which student genders are randomly selected. 
+      If not provided, defaults to ['Male', 'Female'].
+    - age_range (tuple of int, optional): A tuple specifying the inclusive range of student ages. Defaults to (15, 20).
+    - score_range (tuple of int, optional): A tuple specifying the inclusive range of student scores. Defaults to (50, 100).
 
     Returns:
-        ndarray: A numpy array of shape (sample_size,) containing samples drawn from the
-                 specified normal distribution.
+    - pandas.DataFrame: A DataFrame object with columns ['Name', 'Age', 'Gender', 'Score'], containing 
+      randomly generated data for the specified number of students. Names and genders are randomly selected 
+      from the provided lists (or defaults). Ages and scores are randomly generated within the specified ranges.
+
+    Raises:
+    - ValueError: If num_of_students is non-positive.
 
     Notes:
-        Plots a histogram of the generated samples to show the distribution. The histogram
-        features:
-        - X-axis labeled "Sample values", representing the value of the samples.
-        - Y-axis labeled "Frequency", showing how often each value occurs.
-        - Title "Histogram of Generated Samples", describing the content of the graph.
-        - Number of bins set to 30, to discretize the sample data into 30 intervals.
-        - Alpha value of 0.75 for bin transparency, making the histogram semi-transparent.
-        - Color 'blue', giving the histogram a blue color.
+    - The 'Name' column values are selected randomly from the 'name_list'.
+    - The 'Age' column values are integers randomly generated within the 'age_range', inclusive.
+    - The 'Gender' column values are selected randomly from the 'gender_list'.
+    - The 'Score' column values are integers randomly generated within the 'score_range', inclusive.
+    - Setting the same seed value ensures the reproducibility of the dataset across different function calls.
 
     Requirements:
+    - pandas
     - numpy
-    - matplotlib.pyplot
+    - random
 
-    Examples:
-    >>> data = task_func(0, 1, 1000)
-    >>> len(data)
-    1000
-    >>> isinstance(data, np.ndarray)
-    True
+    Example:
+    >>> student_data = task_func(5, seed=123)
+    >>> print(student_data.head())
+       Name  Age  Gender  Score
+    0  John   20  Female     52
+    1  John   19  Female     84
+    2  Sara   16    Male     69
+    3  John   17  Female     72
+    4  Nick   16  Female     82
     """
-    samples = np.random.normal(mu, sigma, sample_size)
-    plt.hist(samples, bins=30, alpha=0.75, color='blue')
-    plt.title('Histogram of Generated Samples')
-    plt.xlabel('Sample values')
-    plt.ylabel('Frequency')
-    plt.grid(True)
-    plt.show()
-    return samples
+    if num_of_students <= 0:
+        raise ValueError("num_of_students must be positive.")
+    set_seed(seed)
+    np.random.seed(seed)
+    name_list = name_list or ['John', 'Mike', 'Sara', 'Emma', 'Nick']
+    gender_list = gender_list or ['Male', 'Female']
+    data = []
+    for _ in range(num_of_students):
+        name = choice(name_list)
+        age = np.random.randint(age_range[0], age_range[1] + 1)
+        gender = choice(gender_list)
+        score = np.random.randint(score_range[0], score_range[1] + 1)
+        data.append([name, age, gender, score])
+    columns = ['Name', 'Age', 'Gender', 'Score']
+    df = pd.DataFrame(data, columns=columns)
+    return df
 
 import unittest
-from unittest.mock import patch
+import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_return_type(self):
-        """ Test that the function returns a numpy array. """
-        result = task_func(0, 1, 1000)
-        self.assertIsInstance(result, np.ndarray)
-    def test_sample_size(self):
-        """ Test that the returned array has the correct size. """
-        result = task_func(0, 1, 1000)
-        self.assertEqual(len(result), 1000)
-    def test_normal_distribution_properties(self):
-        """ Test if the generated samples have the correct mean and standard deviation. """
-        mu, sigma = 0, 1
-        result = task_func(mu, sigma, 1000000)
-        self.assertAlmostEqual(np.mean(result), mu, places=1)
-        self.assertAlmostEqual(np.std(result), sigma, places=1)
-    @patch('matplotlib.pyplot.show')
-    def test_plot_labels_and_title(self, mock_show):
-        """ Test if the plot has correct labels and title. """
-        with patch('matplotlib.pyplot.hist') as mock_hist:
-            task_func(0, 1, 1000)
-            args, kwargs = mock_hist.call_args
-            self.assertIn('bins', kwargs)
-            self.assertEqual(kwargs['bins'], 30)
-            self.assertEqual(kwargs['alpha'], 0.75)
-            self.assertEqual(kwargs['color'], 'blue')
-            self.assertEqual(plt.gca().get_xlabel(), 'Sample values')
-            self.assertEqual(plt.gca().get_ylabel(), 'Frequency')
-            self.assertEqual(plt.gca().get_title(), 'Histogram of Generated Samples')
-    def test_mock_random_normal(self):
-        """ Test the function with a mock of np.random.normal. """
-        with patch('numpy.random.normal', return_value=np.full(1000, 0.5)) as mock_random_normal:
-            mu, sigma = 0, 1
-            result = task_func(mu, sigma, 1000)
-            mock_random_normal.assert_called_once_with(mu, sigma, 1000)
-            self.assertTrue(all(x == 0.5 for x in result))
-    def test_output_consistency(self):
-        """ Test if repeated calls with the same parameters produce different results. """
-        mu, sigma = 0, 1
-        result1 = task_func(mu, sigma, 1000)
-        result2 = task_func(mu, sigma, 1000)
-        self.assertFalse(np.array_equal(result1, result2))
+    def test_with_seed(self):
+        df1 = task_func(5, seed=42)        
+        df_list = df1.apply(lambda row: ','.join(row.values.astype(str)), axis=1).tolist()
+        expect = ['John,18,Male,78', 'Sara,17,Male,57', 'Mike,19,Male,70', 'John,16,Male,68', 'Nick,17,Female,60']
+        self.assertEqual(df_list, expect, "DataFrame contents should match the expected output")
+        
+    def test_reproducibility_with_seed(self):
+        df1 = task_func(3, seed=123)
+        df2 = task_func(3, seed=123)
+        pd.testing.assert_frame_equal(df1, df2)
+    def test_positive_num_students(self):
+        df = task_func(5)
+        self.assertEqual(len(df), 5)
+    def test_invalid_num_students(self):
+        with self.assertRaises(ValueError):
+            task_func(-1)
+    def test_column_names(self):
+        df = task_func(1)
+        self.assertListEqual(list(df.columns), ['Name', 'Age', 'Gender', 'Score'])
+    def test_age_range(self):
+        df = task_func(10, age_range=(18, 22))
+        self.assertTrue(all(18 <= age <= 22 for age in df['Age']))
+    def test_custom_name_and_gender_list(self):
+        custom_names = ['Alex', 'Bob']
+        custom_genders = ['Non-Binary']
+        df = task_func(2, name_list=custom_names, gender_list=custom_genders)
+        self.assertIn(df.iloc[0]['Name'], custom_names)
+        self.assertIn(df.iloc[0]['Gender'], custom_genders)
+    def test_score_range(self):
+        df = task_func(10, score_range=(60, 70))
+        self.assertTrue(all(60 <= score <= 70 for score in df['Score']))

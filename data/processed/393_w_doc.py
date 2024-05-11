@@ -1,105 +1,94 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import stats
 
-# Constants
-COLORS = ['r', 'g', 'b']
 
-def task_func(df, group_col, value_col, group_name):
+def task_func(mu, sigma, num_samples=1000, seed=77):
     """
-    Create a bar subplot of a specific group from the input dataframe.
+    Generate a normal distribution with the given mean and standard deviation. 
+    Creates a figure containing a histogram and a Q-Q plot of the generated samples.
 
     Parameters:
-    - df (DataFrame): The input DataFrame containing the data.
-    - group_col (str): The name of the column to group the data by.
-    - value_col (str): The name of the column containing the values to plot.
-    - group_name (str): The name of the group to plot.
+    mu (float): The mean of the normal distribution.
+    sigma (float): The standard deviation of the normal distribution.
+    num_samples (int, Optional): The number of samples to generate. Default is 1000.
+    seed (int, Optional): The seed for the random number generator. Default is 77.
 
     Returns:
-    - Axes: A matplotlib axes object with the bar chart.
+    matplotlib.figure.Figure: A matplotlib figure containing the histogram and Q-Q plot.
 
     Requirements:
-    - matplotlib.pyplot
-    - numpy
-
-    Note:
-    - The title of the plot will be 'Bar chart of [value_col] for [group_name]'.
-    - The x-axis label will be the name of the grouping column [group_col].
-    - The y-axis label will be the name of the value column [value_col].
-
-    Raises:
-    - Raise ValueError if the group_name does not exist in df.
+    - numpy for generating the samples.
+    - matplotlib.pyplot for plotting.
+    - scipy.stats for the Q-Q plot.
 
     Example:
-    >>> import pandas as pd
-    >>> df = pd.DataFrame({'Group': ['A', 'B', 'C'], 'Value': [10, 20, 30]})
-    >>> ax = task_func(df, 'Group', 'Value', 'B')
-    >>> num_bars = len(ax.containers[0])  # Number of bars in the plot
-    >>> num_bars == 1  # There should be 1 bar in the plot for group 'B'
-    True
-    >>> ax.containers[0][0].get_height() == 20 # The bar height of Group B should be 20
-    True
-    >>> plt.close()
+    >>> fig = task_func(0, 1)
+    >>> type(fig)
+    <class 'matplotlib.figure.Figure'>
     """
-    group_data = df[df[group_col] == group_name]
-    if group_data.empty:
-        raise ValueError
-    fig, ax = plt.subplots()
-    num_bars = len(group_data)
-    bar_width = 0.35
-    index = np.arange(num_bars)
-    bars = ax.bar(index, group_data[value_col], bar_width, color=COLORS[:num_bars])
-    ax.set_xlabel(group_col)
-    ax.set_ylabel(value_col)
-    ax.set_title(f'Bar chart of {value_col} for {group_name}')
-    ax.set_xticks(index)
-    ax.set_xticklabels(group_data[group_col])
-    return ax
+    np.random.seed(seed)
+    samples = np.random.normal(mu, sigma, num_samples)
+    fig = plt.figure(figsize=(12, 6))
+    plt.subplot(1, 2, 1)
+    plt.hist(samples, bins=30, density=True, alpha=0.6, color='g')
+    plt.subplot(1, 2, 2)
+    stats.probplot(samples, dist="norm", plot=plt)
+    return fig
 
 import unittest
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from faker import Faker
-faker = Faker()
-# Constants
-COLORS = ['r', 'g', 'b']
+from matplotlib import colors as mcolors
+from matplotlib.figure import Figure
+import doctest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.df = pd.DataFrame({'Group': ['A', 'B', 'C'], 'Value': [10, 20, 30]})
-        
-    def test_single_group_bar_chart(self):
-        ax = task_func(self.df, 'Group', 'Value', 'B')
-        num_bars = len(ax.containers[0])  # Number of bars in the plot
-        self.assertEqual(num_bars, 1)  # There should be 1 bar in the plot for group 'B'
-        plt.close()
-    def test_missing_group(self):
-        with self.assertRaises(ValueError):
-            ax = task_func(self.df, 'Group', 'Value', 'D')  # Group 'D' does not exist in the DataFrame
-        plt.close()
-    def test_correct_labels(self):
-        ax = task_func(self.df, 'Group', 'Value', 'B')
-        self.assertEqual(ax.get_xlabel(), 'Group')  # x-axis label should be 'Group'
-        self.assertEqual(ax.get_ylabel(), 'Value')  # y-axis label should be 'Value'
-        plt.close()
-    def test_inline_points(self):
-        ax = task_func(self.df, 'Group', 'Value', 'B')
-        bars = ax.containers[0]
-        for bar in bars:
-            self.assertAlmostEqual(bar.get_height(), 20, delta=0.01)  # Check if points are inline
-        plt.close()
-    
-    
-    def test_inline_points(self):
-        ax = task_func(self.df, 'Group', 'Value', 'C')
-        bars = ax.containers[0]
-        for bar in bars:
-            self.assertAlmostEqual(bar.get_height(), 30, delta=0.01)  # Check if points are inline
-        plt.close()
-def generate_complex_test_data(num_rows=100):
-    """Generate a DataFrame with a mix of numeric and text data, including some potential outliers."""
-    data = {
-        'Group': [faker.random_element(elements=('A', 'B', 'C', 'D')) for _ in range(num_rows)],
-        'Value': [faker.random_int(min=0, max=1000) for _ in range(num_rows)]
-    }
-    complex_df = pd.DataFrame(data)
-    return complex_df
+    def test_standard_normal_distribution(self):
+        """Test with standard normal distribution parameters (mu=0, sigma=1)."""
+        fig = task_func(0, 1)
+        self.assertIsInstance(fig, Figure)
+        self.assertEqual(len(fig.axes), 2)  # Should contain two subplots
+        self._test_histogram_attributes(fig.axes[0], expected_bins=30, color='g')
+        self._test_qq_plot_attributes(fig.axes[1])
+    def test_nonzero_mean(self):
+        """Test with a nonzero mean."""
+        mu = 5
+        sigma = 1
+        fig = task_func(mu, sigma)
+        self.assertIsInstance(fig, Figure)
+        self.assertEqual(len(fig.axes), 2)
+        self._test_histogram_attributes(fig.axes[0], expected_bins=30, color='g')
+        self._test_qq_plot_attributes(fig.axes[1])
+    def test_different_standard_deviation(self):
+        """Test with a different standard deviation."""
+        mu = 0
+        sigma = 2
+        fig = task_func(mu, sigma)
+        self.assertIsInstance(fig, Figure)
+        self.assertEqual(len(fig.axes), 2)
+        self._test_histogram_attributes(fig.axes[0], expected_bins=30, color='g')
+        self._test_qq_plot_attributes(fig.axes[1])
+    def test_negative_mean(self):
+        """Test with a negative mean."""
+        mu = -5
+        sigma = 1
+        fig = task_func(mu, sigma)
+        self.assertIsInstance(fig, Figure)
+        self.assertEqual(len(fig.axes), 2)
+        self._test_histogram_attributes(fig.axes[0], expected_bins=30, color='g')
+        self._test_qq_plot_attributes(fig.axes[1])
+    def test_large_standard_deviation(self):
+        """Test with a large standard deviation."""
+        mu = 0
+        sigma = 5
+        fig = task_func(mu, sigma)
+        self.assertIsInstance(fig, Figure)
+        self.assertEqual(len(fig.axes), 2)
+        self._test_histogram_attributes(fig.axes[0], expected_bins=30, color='g')
+        self._test_qq_plot_attributes(fig.axes[1])
+    def _test_histogram_attributes(self, ax, expected_bins, color):
+        """Helper function to test histogram attributes."""
+        n, bins, patches = ax.hist([], bins=expected_bins, color=color)  # Dummy histogram to get attributes
+        self.assertEqual(expected_bins, len(patches))  # The number of bars should match the number of bins
+        self.assertEqual(patches[0].get_facecolor(), mcolors.to_rgba(color))  # Checking the color of the bars
+    def _test_qq_plot_attributes(self, ax):
+        """Helper function to test Q-Q plot attributes."""
+        self.assertTrue(len(ax.get_lines()) > 0)  # Check if there are lines in the Q-Q plot

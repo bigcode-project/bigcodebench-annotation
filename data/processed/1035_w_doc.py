@@ -1,118 +1,116 @@
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
 import numpy as np
+import matplotlib.pyplot as plt
 
 
-CATEGORIES = ["Electronics", "Clothing", "Home Decor", "Automotive", "Books"]
-
-
-def task_func(s1, s2):
+def task_func(feature: pd.Series, target: pd.Series) -> (np.ndarray, plt.Axes):
     """
-    Compares and visualizes the sales data of two stores for predefined categories.
-    The function generates a bar plot for categories where both stores have sales exceeding a specified threshold.
-    The Euclidean distance between the two series is also computed.
-    
+    Train a logistic regression model on one feature and evaluate its performance using a confusion matrix plot.
+    The function takes a feature and a target series, splits them into training and testing sets, trains the logistic
+    regression model, predicts the target for the test set, and plots the confusion matrix.
+
     Parameters:
-    s1 (pd.Series): Sales data for store 1, indexed by categories.
-    s2 (pd.Series): Sales data for store 2, indexed by categories.
+    feature (pd.Series): Series representing the single feature for the logistic regression model.
+    target (pd.Series): Series representing the target variable.
 
     Returns:
-    matplotlib.axes.Axes or None: A bar plot for categories where both stores' sales exceed the threshold of 200,
-    or None if no such categories exist.
-    float: The Euclidean distance between the two series or 0.0 if no categories meet the threshold.
+    (np.ndarray, plt.Axes): A tuple containing the confusion matrix and the matplotlib Axes object of the confusion matrix plot.
 
     Requirements:
     - pandas
+    - sklearn.model_selection.train_test_split
+    - sklearn.linear_model.LogisticRegression
+    - sklearn.metrics.confusion_matrix
     - numpy
+    - matplotlib.pyplot
 
     Example:
-    >>> np.random.seed(seed=32)
-    >>> s1 = pd.Series(np.random.randint(100, 500, size=5), index=CATEGORIES)
-    >>> s2 = pd.Series(np.random.randint(150, 600, size=5), index=CATEGORIES)
-    >>> ax, edit_distance = task_func(s1, s2)
+    >>> feature = pd.Series(np.random.rand(1000)) # Feature data
+    >>> target = pd.Series(np.random.randint(0, 2, size=1000)) # Target data (binary)
+    >>> cm, ax = task_func(feature, target)
     >>> ax.get_title()
-    'Sales Comparison Above Threshold in Categories'
-    >>> edit_distance
-    387.5590277622236
+    'Confusion Matrix'
     """
-    high_sales_categories = s1.index[(s1 > 200) & (s2 > 200)]
-    if high_sales_categories.empty:
-        return None, 0.0
-    df = pd.DataFrame(
-        {"Store 1": s1[high_sales_categories], "Store 2": s2[high_sales_categories]}
+    df = pd.DataFrame({"Feature": feature, "Target": target})
+    X_train, X_test, y_train, y_test = train_test_split(
+        df["Feature"], df["Target"], test_size=0.2, random_state=42
     )
-    edit_distance = np.linalg.norm(df["Store 1"] - df["Store 2"])
-    ax = df.plot(kind="bar", title="Sales Comparison Above Threshold in Categories")
-    return ax, edit_distance
+    model = LogisticRegression()
+    model.fit(X_train.values.reshape(-1, 1), y_train)
+    y_pred = model.predict(X_test.values.reshape(-1, 1))
+    cm = confusion_matrix(y_test, y_pred)
+    _, ax = plt.subplots()
+    cax = ax.matshow(cm, cmap="Blues")
+    plt.title("Confusion Matrix")
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.colorbar(cax)
+    ax.set_xticks([0, 1])
+    ax.set_yticks([0, 1])
+    ax.set_xticklabels(["No", "Yes"])
+    ax.set_yticklabels(["No", "Yes"])
+    return cm, ax
 
+import unittest
 import pandas as pd
 import numpy as np
-import unittest
-import matplotlib.pyplot as plt
-# Constants (should be kept consistent with function.py)
-CATEGORIES = ["Electronics", "Clothing", "Home Decor", "Automotive", "Books"]
+from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
-    """Tests for function task_func."""
-    def test_sales_above_threshold(self):
-        """Test that the function returns a plot when sales exceed the threshold"""
-        np.random.seed(seed=32)
-        s1 = pd.Series(np.random.randint(100, 500, size=5), index=CATEGORIES)
-        np.random.seed(seed=32)
-        s2 = pd.Series(np.random.randint(150, 600, size=5), index=CATEGORIES)
-        ax, edit_distance = task_func(s1, s2)
-        # Check the correct categories are plotted
-        categories_plotted = [label.get_text() for label in ax.get_xticklabels()]
-        self.assertListEqual(
-            categories_plotted, ["Electronics", "Home Decor", "Automotive", "Books"]
-        )
-        # Check the title of the plot
-        self.assertEqual(
-            ax.get_title(), "Sales Comparison Above Threshold in Categories"
-        )
-        self.assertAlmostEqual(edit_distance, 100.0)
-        
-    def test_no_sales_above_threshold(self):
-        """Test that no categories are plotted when no sales exceed the threshold"""
-        np.random.seed(seed=32)
-        s1 = pd.Series(np.random.randint(50, 150, size=5), index=CATEGORIES)
-        np.random.seed(seed=32)
-        s2 = pd.Series(np.random.randint(50, 150, size=5), index=CATEGORIES)
-        ax, edit_distance = task_func(s1, s2)
-        # Check that no categories are plotted
-        self.assertIsNone(
-            ax, "Expected None as no categories should meet the threshold"
-        )
-        self.assertAlmostEqual(edit_distance, 0.0)
-    def test_all_sales_above_threshold(self):
-        """Test that all categories are plotted when all sales exceed the threshold"""
-        np.random.seed(seed=123)
-        s1 = pd.Series(np.random.randint(200, 500, size=5), index=CATEGORIES)
-        np.random.seed(seed=123)
-        s2 = pd.Series(np.random.randint(250, 600, size=5), index=CATEGORIES)
-        ax, edit_distance = task_func(s1, s2)
-        # Check that all categories are plotted
-        categories_plotted = [label.get_text() for label in ax.get_xticklabels()]
-        self.assertListEqual(categories_plotted, CATEGORIES)
-        self.assertAlmostEqual(edit_distance, 389.8127755730948)
-        
-    def test_some_sales_above_threshold(self):
-        """Test that some categories are plotted when some sales exceed the threshold"""
-        s1 = pd.Series([250, 180, 290, 200, 290], index=CATEGORIES)
-        s2 = pd.Series([260, 290, 195, 299, 295], index=CATEGORIES)
-        ax, edit_distance = task_func(s1, s2)
-        # Check that only the correct categories are plotted
-        categories_plotted = [label.get_text() for label in ax.get_xticklabels()]
-        self.assertListEqual(categories_plotted, ["Electronics", "Books"])
-        self.assertAlmostEqual(edit_distance, 11.180339887498949)
-        
-    def test_single_sales_above_threshold(self):
-        """Test that only a single category is plotted when only a single category has sales exceeding the threshold"""
-        s1 = pd.Series([150, 180, 290, 200, 190], index=CATEGORIES)
-        s2 = pd.Series([160, 190, 295, 199, 195], index=CATEGORIES)
-        ax, edit_distance = task_func(s1, s2)
-        # Check that only a single category is plotted
-        categories_plotted = [label.get_text() for label in ax.get_xticklabels()]
-        self.assertListEqual(categories_plotted, ["Home Decor"])
-        self.assertAlmostEqual(edit_distance, 5.0)
-        
+    """Test cases for the function task_func."""
+    def test_with_random_data(self):
+        """
+        Test the function with random data to ensure normal functionality.
+        """
+        np.random.seed(42)
+        feature = pd.Series(np.random.rand(100))
+        np.random.seed(42)
+        target = pd.Series(np.random.randint(0, 2, size=100))
+        cm, ax = task_func(feature, target)
+        self.assertIsInstance(cm, np.ndarray)
+        self.assertIsInstance(ax, Axes)
+    def test_with_all_zeroes(self):
+        """
+        Test the function with all zeroes in the feature set.
+        """
+        feature = pd.Series(np.zeros(100))
+        np.random.seed(123)
+        target = pd.Series(np.random.randint(0, 2, size=100))
+        cm, ax = task_func(feature, target)
+        self.assertIsInstance(cm, np.ndarray)
+        self.assertIsInstance(ax, Axes)
+    def test_with_all_ones(self):
+        """
+        Test the function with all ones in the feature set.
+        """
+        feature = pd.Series(np.ones(100))
+        np.random.seed(42)
+        target = pd.Series(np.random.randint(0, 2, size=100))
+        cm, ax = task_func(feature, target)
+        self.assertIsInstance(cm, np.ndarray)
+        self.assertIsInstance(ax, Axes)
+    def test_with_perfect_correlation(self):
+        """
+        Test the function when the feature perfectly predicts the target.
+        """
+        np.random.seed(123)
+        feature = pd.Series(np.random.rand(100))
+        target = feature.round()
+        cm, ax = task_func(feature, target)
+        self.assertIsInstance(cm, np.ndarray)
+        self.assertIsInstance(ax, Axes)
+    def test_with_no_correlation(self):
+        """
+        Test the function when there is no correlation between feature and target.
+        """
+        np.random.seed(42)
+        feature = pd.Series(np.random.rand(100))
+        np.random.seed(42)
+        target = pd.Series(np.random.choice([0, 1], size=100))
+        cm, ax = task_func(feature, target)
+        self.assertIsInstance(cm, np.ndarray)
+        self.assertIsInstance(ax, Axes)
     def tearDown(self):
         plt.close()

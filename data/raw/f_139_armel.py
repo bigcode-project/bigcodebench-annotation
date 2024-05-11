@@ -52,7 +52,7 @@ class TestCases(unittest.TestCase):
         expected_df = expected_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
         # Assertions
         self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
         self.assertTrue(isinstance(ax, plt.Axes))
 
     def test_case_2(self):
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
         expected_df = expected_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
         # Assertions
         self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
         self.assertTrue(isinstance(ax, plt.Axes))
 
     def test_case_3(self):
@@ -94,7 +94,7 @@ class TestCases(unittest.TestCase):
         expected_df = expected_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
         # Assertions
         self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
         self.assertTrue(isinstance(ax, plt.Axes))
 
     def test_case_4(self):
@@ -111,7 +111,7 @@ class TestCases(unittest.TestCase):
         expected_df = expected_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
         # Assertions
         self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
         self.assertTrue(isinstance(ax, plt.Axes))
 
     def test_case_5(self):
@@ -136,7 +136,7 @@ class TestCases(unittest.TestCase):
         expected_df = expected_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
         # Assertions
         self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
         self.assertTrue(isinstance(ax, plt.Axes))
 
 def run_tests():

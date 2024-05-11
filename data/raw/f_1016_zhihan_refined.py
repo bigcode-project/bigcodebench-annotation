@@ -13,7 +13,7 @@ def f_1016(directory, backup_dir='/path/to/backup'):
                                   Default is '/path/to/backup'.
     
     Returns:
-    - str: The path to the backup file if logs are found, otherwise returns a message stating no logs were found.
+    - str: The path to the backup file if logs are found, otherwise returns a message 'No logs found to backup'.
     
     Raises:
     - FileNotFoundError: If the specified directory does not exist.

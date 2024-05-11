@@ -17,6 +17,10 @@ def f_297(src_folder, backup_dir):
     - os
     - shutil
     
+    Raises:
+    - ValueError: If the source folder does not exist.
+    - Exception: If an error occurs while deleting the source folder.
+    
     Example:
     >>> import tempfile
     >>> src_folder = tempfile.mkdtemp()

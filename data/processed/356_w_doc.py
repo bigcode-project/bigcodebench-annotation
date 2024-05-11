@@ -1,112 +1,82 @@
 import numpy as np
-import math
 import matplotlib.pyplot as plt
-from scipy.signal import get_window
+import cmath
 
-def task_func(amplitude, frequency, time):
+def task_func(x, y):
     """
-    Generates and plots a complex wave with a specified amplitude and frequency over given time points,
-    applying a Hann window to reduce edge effects. The wave is represented as a complex number where the real part 
-    is the cosine component, and the imaginary part is the sine component. It returns both the wave and the plot object.
+    Draw the phase of a complex function over a range of x and y and return the matplotlib axes object
+    along with the 2D array of calculated phase values.
 
     Parameters:
-        amplitude (float): The amplitude of the complex wave.
-        frequency (float): The frequency of the complex wave.
-        time (numpy.ndarray): The time points to generate the wave.
+    x (numpy.ndarray): The range of x values.
+    y (numpy.ndarray): The range of y values.
 
     Returns:
-        numpy.ndarray: The generated complex wave as a numpy array of complex numbers.
-        matplotlib.figure.Figure: The figure object of the plot.
-        matplotlib.axes.Axes: The axes object of the plot.
-
+    tuple: containing
+        - matplotlib.axes.Axes: The axes object with the phase plot.
+        - numpy.ndarray: The 2D array of calculated phase values.
+    
+    Raises:
+    TypeError: If either `x` or `y` is not a numpy.ndarray.
+    ValueError: If `x` and `y` do not have the same length.
+    
     Requirements:
     - numpy
-    - math
     - matplotlib.pyplot
-    - scipy.signal.get_window
-
-    Notes:
-    - The plot title is "Complex Wave with Hann Window".
-    - The x-label of the plot is "Time".
-    - The y-label of the plot is "Amplitude".
-    - The plot displays both the real and imaginary parts of the complex wave.
+    - cmath
 
     Examples:
-    >>> wave, fig, ax = task_func(1, 1, np.linspace(0, 1, 10, endpoint=False))
-    >>> len(wave) == 10
-    True
-    >>> isinstance(wave[0], complex)
-    True
+    >>> ax, Z = task_func(np.array([1, 2, 3]), np.array([1, 2, 3]))
+    >>> isinstance(ax, plt.Axes), isinstance(Z, np.ndarray)
+    (True, True)
+    >>> ax, Z = task_func(np.array([0]), np.array([0]))  # Test with single point
+    >>> isinstance(ax, plt.Axes), isinstance(Z, np.ndarray)
+    (True, True)
     """
-    wave = amplitude * np.exp(1j * 2 * math.pi * frequency * time)
-    window = get_window('hann', time.size)  # Apply a Hann window
-    wave *= window  # Apply the window to the wave
-    fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(time, np.real(wave), label="Real Part")
-    ax.plot(time, np.imag(wave), label="Imaginary Part")
-    ax.set_title("Complex Wave with Hann Window")
-    ax.set_xlabel("Time")
-    ax.set_ylabel("Amplitude")
-    ax.legend()
-    return wave, fig, ax
+    if not isinstance(x, np.ndarray) or not isinstance(y, np.ndarray):
+        raise TypeError("x and y must be numpy.ndarray")
+    if x.size == 0 or y.size == 0:
+        print("Empty x or y array provided.")
+        return None, np.array([])  # Adjusted to return a tuple
+    if len(x) != len(y):
+        raise ValueError("Mismatched array sizes: x and y must have the same length")
+    Z = np.zeros((len(y), len(x)), dtype=float)
+    for i in range(len(y)):
+        for j in range(len(x)):
+            z = complex(x[j], y[i])
+            Z[i, j] = cmath.phase(z**2 - 1)
+    fig, ax = plt.subplots()
+    c = ax.imshow(Z, extent=(np.amin(x), np.amax(x), np.amin(y), np.amax(y)), origin='lower', cmap='hsv')
+    fig.colorbar(c, ax=ax, label="Phase (radians)")
+    ax.grid()
+    return ax, Z
 
 import unittest
 import numpy as np
 import matplotlib.pyplot as plt
-import math
-from scipy.signal import get_window
+import cmath
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        """Set up common constants for the tests."""
-        self.amplitude = 1
-        self.frequency = 5
-        self.time = np.linspace(0, 1, 500, endpoint=False)
-    def test_return_types(self):
-        """Test that the function returns a numpy array, a matplotlib figure, and axes objects."""
-        wave, fig, ax = task_func(self.amplitude, self.frequency, self.time)
-        self.assertIsInstance(wave, np.ndarray)
-        self.assertIsInstance(fig, plt.Figure)
+    def test_input_types(self):
+        """Test the function with non-numpy array inputs."""
+        with self.assertRaises(TypeError):
+            task_func([1, 2, 3], np.array([1, 2, 3]))
+    def test_empty_arrays(self):
+        """Test function with empty numpy arrays."""
+        _, Z = task_func(np.array([]), np.array([]))
+        self.assertEqual(Z.size, 0)
+    def test_single_point(self):
+        """Test the function with single-point arrays."""
+        ax, Z = task_func(np.array([0]), np.array([0]))
         self.assertIsInstance(ax, plt.Axes)
-    def test_array_length(self):
-        """Test the length of the returned array matches the length of the time array."""
-        wave, _, _ = task_func(self.amplitude, self.frequency, self.time)
-        self.assertEqual(len(wave), len(self.time))
-    def test_wave_properties(self):
-        """Test that the wave properties conform to expected cosine and sine functions with Hann window applied."""
-        wave, _, _ = task_func(self.amplitude, self.frequency, self.time)
-        window = get_window('hann', self.time.size)  # Apply a Hann window
-        expected_wave = self.amplitude * np.exp(1j * 2 * math.pi * self.frequency * self.time) * window
-        np.testing.assert_array_almost_equal(wave, expected_wave)
-    def test_zero_amplitude(self):
-        """Test that the wave is zero throughout when amplitude is zero."""
-        wave, _, _ = task_func(0, self.frequency, self.time)
-        self.assertTrue(np.all(wave == 0))
-    def test_different_frequencies(self):
-        """Test the function with different frequencies to ensure the wave changes accordingly."""
-        wave_1, _, _ = task_func(self.amplitude, 1, self.time)
-        wave_2, _, _ = task_func(self.amplitude, 2, self.time)
-        self.assertFalse(np.array_equal(wave_1, wave_2))
-    def test_negative_frequency(self):
-        """Test that the function correctly handles negative frequencies with Hann window applied."""
-        wave, _, _ = task_func(self.amplitude, -1, self.time)
-        window = get_window('hann', self.time.size)  # Apply a Hann window
-        expected_wave = self.amplitude * np.exp(-1j * 2 * math.pi * self.time) * window
-        np.testing.assert_array_almost_equal(wave, expected_wave)
-    def test_plot_title(self):
-        """Test that the plot title is correctly set."""
-        _, fig, _ = task_func(self.amplitude, self.frequency, self.time)
-        self.assertEqual(fig.axes[0].get_title(), "Complex Wave with Hann Window")
-    def test_plot_x_label(self):
-        """Test that the x-axis label is correctly set to 'Time'."""
-        _, _, ax = task_func(self.amplitude, self.frequency, self.time)
-        self.assertEqual(ax.get_xlabel(), "Time")
-    def test_plot_y_label(self):
-        """Test that the y-axis label is correctly set to 'Amplitude'."""
-        _, _, ax = task_func(self.amplitude, self.frequency, self.time)
-        self.assertEqual(ax.get_ylabel(), "Amplitude")
-    def test_plot_lines(self):
-        """Test that the plot includes both real and imaginary parts of the complex wave."""
-        _, _, ax = task_func(self.amplitude, self.frequency, self.time)
-        lines = ax.get_lines()
-        # Assuming the first line is the real part and the second line is the imaginary part
-        self.assertEqual(len(lines), 2, "Plot does not contain two lines for real and imaginary parts")
+        self.assertIsInstance(Z, np.ndarray)
+    def test_phase_calculation(self):
+        """Test phase calculation for known values."""
+        x = np.array([1, -1])
+        y = np.array([0, 0])
+        _, Z = task_func(x, y)
+        expected_phases = np.array([cmath.phase((1 + 0j)**2 - 1), cmath.phase((-1 + 0j)**2 - 1)])
+        np.testing.assert_array_almost_equal(Z[0], expected_phases)
+    def test_mismatched_array_sizes(self):
+        """Test function with arrays of different lengths."""
+        with self.assertRaises(ValueError):
+            task_func(np.array([0]), np.array([0, 1]))

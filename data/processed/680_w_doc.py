@@ -1,59 +1,89 @@
 import pandas as pd
-from collections import Counter
+import numpy as np
+from sklearn.preprocessing import StandardScaler
 
-def task_func(df):
+def task_func(df, features):
     """
-    Calculate the frequency of combinations of elements in a DataFrame.
-    The function adds a 'combination' column to the DataFrame, which is the combination of items in each row.
-    It then calculates the frequency of each combination.
+    Standardize the functions in a DataFrame.
+    The function applies standard scaling to the features.
     
     Parameters:
-    - df (pandas.DataFrame): The input DataFrame with columns 'item1', 'item2', 'item3', 'item4', 'item5'.
+    - df (pandas.DataFrame): The input DataFrame.
+    - features (list): The list of features to standardize. May be empty.
     
     Returns:
-    - dict: A dictionary containing the frequency of all combination.
+    - df (pandas.DataFrame): The DataFrame with the standardized features.
 
     Requirements:
     - pandas
-    - collections
+    - numpy
+    - scikit-learn
 
     Example:
-    >>> df = pd.DataFrame({'item1': ['a', 'b', 'a'], 'item2': ['b', 'c', 'b'], 'item3': ['c', 'd', 'c'], 'item4': ['d', 'e', 'd'], 'item5': ['e', 'f', 'e']})
-    >>> task_func(df)
-    {('a', 'b', 'c', 'd', 'e'): 2, ('b', 'c', 'd', 'e', 'f'): 1}
+    >>> np.random.seed(42)
+    >>> df = pd.DataFrame(np.random.randn(20, 3), columns=['a', 'b', 'c'])
+    >>> df = task_func(df, ['a', 'b'])
+    >>> df.head(2)
+              a         b         c
+    0  0.608932  0.127900  0.647689
+    1  2.025355  0.031682 -0.234137
     """
-    df['combination'] = pd.Series(df.apply(lambda row: tuple(sorted(row)), axis=1))
-    combination_freq = Counter(df['combination'])
-    return dict(combination_freq)
+    if not features:
+        return df
+    scaler = StandardScaler()
+    df.loc[:, features] = pd.DataFrame(scaler.fit_transform(df.loc[:, features]), columns=features, index=df.index)
+    df['dummy'] = np.zeros(len(df))
+    return df.drop('dummy', axis=1)  
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = pd.DataFrame({'item1': ['a', 'b', 'a'], 'item2': ['b', 'c', 'b'], 'item3': ['c', 'd', 'c'], 'item4': ['d', 'e', 'd'], 'item5': ['e', 'f', 'e']})
-        freq = task_func(df)
-        self.assertEqual(freq[('a', 'b', 'c', 'd', 'e')], 2)
-        self.assertEqual(freq[('b', 'c', 'd', 'e', 'f')], 1)
+        df = pd.DataFrame(np.random.randn(10, 3), columns=['a', 'b', 'c'])
+        df = task_func(df, ['a', 'b'])
+        self.assertEqual(df.shape, (10, 3))
+        self.assertTrue('a' in df.columns)
+        self.assertTrue('b' in df.columns)
+        self.assertTrue('c' in df.columns)
+        self.assertTrue(np.all(df['a'] >= -3) and np.all(df['a'] <= 3))
+        self.assertTrue(np.all(df['b'] >= -3) and np.all(df['b'] <= 3))
+        self.assertTrue(np.all(df['c'] >= -3) and np.all(df['c'] <= 3))
     def test_case_2(self):
-        df = pd.DataFrame({'item1': ['c', 'b', 'a'], 'item2': ['b', 'c', 'b'], 'item3': ['c', 'd', 'c'], 'item4': ['d', 'e', 'd'], 'item5': ['e', 'f', 'e']})
-        freq = task_func(df)
-        print(freq)
-        self.assertEqual(freq[('a', 'b', 'c', 'd', 'e')], 1)
-        self.assertEqual(freq[('b', 'c', 'd', 'e', 'f')], 1)
-        if ('b', 'c', 'c', 'd', 'e') in freq:
-            self.assertEqual(freq[('b', 'c', 'c', 'd', 'e')], 1)
-        elif ('c', 'b', 'c', 'd', 'e') in freq:
-            self.assertEqual(freq[('c', 'b', 'c', 'd', 'e')], 1)
+        df = pd.DataFrame({'a': [0, 0, 0], 'b': [0, 0, 0], 'c': [0, 0, 0]})
+        df = task_func(df, ['a', 'b'])
+        self.assertEqual(df.shape, (3, 3))
+        self.assertTrue('a' in df.columns)
+        self.assertTrue('b' in df.columns)
+        self.assertTrue('c' in df.columns)
+        self.assertTrue(np.all(df['a'] == 0))
+        self.assertTrue(np.all(df['b'] == 0))
+        self.assertTrue(np.all(df['c'] == 0))
     def test_case_3(self):
-        df = pd.DataFrame({'item1': ['a'], 'item2': ['a'], 'item3': ['a'], 'item4': ['a'], 'item5': ['a']})
-        freq = task_func(df)
-        self.assertEqual(freq[('a', 'a', 'a', 'a', 'a')], 1)
+        df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
+        df = task_func(df, ['a', 'b'])
+        self.assertEqual(df.shape, (3, 3))
+        self.assertTrue('a' in df.columns)
+        self.assertTrue('b' in df.columns)
+        self.assertTrue('c' in df.columns)
+        self.assertTrue(np.all(df['a'] >= -3) and np.all(df['a'] <= 3))
+        self.assertTrue(np.all(df['b'] >= -3) and np.all(df['b'] <= 3))
+        self.assertTrue(np.all(df['c'] == [7, 8, 9]))
     def test_case_4(self):
-        df = pd.DataFrame({'item1': ['a', 'b', 'c'], 'item2': ['b', 'c', 'd'], 'item3': ['c', 'd', 'e'], 'item4': ['d', 'e', 'f'], 'item5': ['e', 'f', 'g']})
-        freq = task_func(df)
-        self.assertEqual(freq[('a', 'b', 'c', 'd', 'e')], 1)
-        self.assertEqual(freq[('b', 'c', 'd', 'e', 'f')], 1)
-        self.assertEqual(freq[('c', 'd', 'e', 'f', 'g')], 1)
+        df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
+        df = task_func(df, ['c'])
+        self.assertEqual(df.shape, (3, 3))
+        self.assertTrue('a' in df.columns)
+        self.assertTrue('b' in df.columns)
+        self.assertTrue('c' in df.columns)
+        self.assertTrue(np.all(df['a'] == [1, 2, 3]))
+        self.assertTrue(np.all(df['b'] == [4, 5, 6]))
+        self.assertTrue(np.all(df['c'] >= -3) and np.all(df['c'] <= 3))
     def test_case_5(self):
-        df = pd.DataFrame({'item1': ['a', 'a', 'a'], 'item2': ['b', 'b', 'b'], 'item3': ['c', 'c', 'c'], 'item4': ['d', 'd', 'd'], 'item5': ['e', 'e', 'e']})
-        freq = task_func(df)
-        self.assertEqual(freq[('a', 'b', 'c', 'd', 'e')], 3)
+        df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
+        df = task_func(df, [])
+        self.assertEqual(df.shape, (3, 3))
+        self.assertTrue('a' in df.columns)
+        self.assertTrue('b' in df.columns)
+        self.assertTrue('c' in df.columns)
+        self.assertTrue(np.all(df['a'] == [1, 2, 3]))
+        self.assertTrue(np.all(df['b'] == [4, 5, 6]))
+        self.assertTrue(np.all(df['c'] == [7, 8, 9]))

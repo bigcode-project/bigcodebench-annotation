@@ -1,74 +1,82 @@
-from scipy.stats import linregress
+import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from matplotlib.collections import PathCollection
 
-def task_func(data, column1, column2):
+def task_func(data, n_clusters=3):
     """
-    Perform a linear regression on two columns of a dataset and record the result.
-    Additionally, generates a plot representing the original data and the fitted line.
+    Perform K-means clustering on a dataset and generate a scatter plot visualizing the clusters and their centroids.
 
     Parameters:
-    data (DataFrame): The dataset.
-    column1 (str): The name of the first column.
-    column2 (str): The name of the second column.
+        data (pd.DataFrame): The dataset to be clustered, where rows are samples and columns are features.
+        n_clusters (int): The number of clusters to form. Must be greater than 1. Defaults to 3.
 
     Returns:
-    tuple: The slope, intercept, r-value, p-value, and standard error of the regression.
-    Axes: The matplotlib Axes object containing the plot.
+        tuple: 
+            - np.ndarray: An array of cluster labels assigned to each sample.
+            - plt.Axes: An Axes object with the scatter plot showing the clusters and centroids.
 
     Raises:
-    ValueError: If the specified columns do not exist in the DataFrame.
+        ValueError: If 'data' is not a pd.DataFrame.
+        ValueError: If 'n_clusters' is not an integer greater than 1.
 
     Requirements:
-    - scipy.stats
-    - matplotlib.pyplot
-
+        - numpy
+        - pandas
+        - matplotlib
+        - sklearn
+    
     Example:
-    >>> data = pd.DataFrame([[14, 25], [1, 22], [7, 8]], columns=['Column1', 'Column2'])
-    >>> result, ax = task_func(data, 'Column1', 'Column2')
+    >>> np.random.seed(42)
+    >>> data = pd.DataFrame(np.random.rand(100, 2), columns=['Feature1', 'Feature2'])
+    >>> _, ax = task_func(data, 3)
+    >>> ax.get_title()
+    'K-Means Clustering'
     """
-    if column1 not in data.columns or column2 not in data.columns:
-        raise ValueError("Specified columns must exist in the DataFrame")
-    x = data[column1].values
-    y = data[column2].values
-    slope, intercept, r_value, p_value, std_err = linregress(x, y)
+    if not isinstance(data, pd.DataFrame):
+        raise ValueError("Input 'data' must be a pandas DataFrame.")
+    if not isinstance(n_clusters, int) or n_clusters <= 1:
+        raise ValueError("'n_clusters' must be an integer greater than 1.")
+    kmeans = KMeans(n_clusters=n_clusters)
+    labels = kmeans.fit_predict(data)
+    centroids = kmeans.cluster_centers_
     fig, ax = plt.subplots()
-    ax.plot(x, y, 'o', label='original data')
-    ax.plot(x, intercept + slope*x, 'r', label='fitted line')
+    ax.scatter(data.iloc[:, 0], data.iloc[:, 1], c=labels, cmap='viridis', alpha=0.6, label='Data points')
+    ax.scatter(centroids[:, 0], centroids[:, 1], marker='x', s=200, c='red', label='Centroids')
+    ax.set_xlabel('Feature 1')
+    ax.set_ylabel('Feature 2')
+    ax.set_title('K-Means Clustering')
     ax.legend()
-    return (slope, intercept, r_value, p_value, std_err), ax
+    return labels, ax
 
 import unittest
-import pandas as pd
+from matplotlib.collections import PathCollection  # Correct import
+import numpy as np
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.data = pd.DataFrame({
-            'Column1': [14, 1, 7, 10, 5],
-            'Column2': [25, 22, 8, 15, 11]
-        })
-    def test_regression_results(self):
-        result, _ = task_func(self.data, 'Column1', 'Column2')
-        self.assertIsInstance(result, tuple)
-        self.assertEqual(len(result), 5)
-    def test_invalid_columns(self):
+        np.random.seed(42)
+        self.data = pd.DataFrame(np.random.rand(100, 2), columns=['Feature1', 'Feature2'])
+    def test_cluster_centers(self):
+        _, ax = task_func(self.data, 3)
+        centroids = [child for child in ax.get_children() if isinstance(child, PathCollection) and child.get_label() == 'Centroids']
+        self.assertTrue(len(centroids) > 0, "Centroids should be marked in the plot.")
+        self.assertEqual(len(centroids[0].get_offsets()), 3, "There should be 3 centroids marked in the plot.")
+    def test_single_cluster_error(self):
         with self.assertRaises(ValueError):
-            task_func(self.data, 'Invalid1', 'Column2')
-    def test_plot_axes(self):
-        _, ax = task_func(self.data, 'Column1', 'Column2')
-        self.assertEqual(len(ax.lines), 2)  # Original data and fitted line
-    def test_empty_dataframe(self):
+            _, _ = task_func(self.data, 1)
+    def test_valid_input(self):
+        labels, ax = task_func(self.data, 3)
+        self.assertEqual(len(labels), 100)  # Ensure labels array matches data length
+    def test_invalid_data_type(self):
         with self.assertRaises(ValueError):
-            task_func(pd.DataFrame(), 'Column1', 'Column2')
-    def test_single_point_regression(self):
-        single_point_data = pd.DataFrame({'Column1': [1], 'Column2': [2]})
-        result, ax = task_func(single_point_data, 'Column1', 'Column2')
-        # self.assertEqual(result[0], np.nan)
-        self.assertEqual(result[2], 0)  # Slope should be 0 for single point
-    
-    def test_return_values(self):
-        result, ax = task_func(self.data, 'Column1', 'Column2')
-        # print(result)
-        # with open('df_contents.txt', 'w') as file:
-        #     file.write(str(result))
-        expect = (0.3456790123456789, 13.641975308641975, 0.23699046752221187, 0.7011032163730078, 0.8181438416490141)
-        for res, exp in zip(result, expect):
-            self.assertAlmostEqual(res, exp, places=7)
+            _, _ = task_func([[1, 2], [3, 4]], 3)
+    def test_invalid_cluster_number(self):
+        with self.assertRaises(ValueError):
+            _, _ = task_func(self.data, -1)
+    def test_return_type(self):
+        _, ax = task_func(self.data, 3)
+        self.assertIsInstance(ax, plt.Axes)  # Ensuring the plot is returned
+    def test_return_labels(self):
+        labels, _ = task_func(self.data, 3)
+        unique_labels = np.unique(labels)
+        self.assertEqual(len(unique_labels), 3)  # Checking if 3 unique labels are returned

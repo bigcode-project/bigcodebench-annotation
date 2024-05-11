@@ -10,7 +10,7 @@ def f_145(data='/path/to/data.csv', emp_prefix='EMP'):
     - emp_prefix (str): The prefix of the employee IDs. Default is 'EMP$$'.
 
     Returns:
-    - DataFrame: A pandas DataFrame with the filtered data.
+    - DataFrame: A pandas DataFrame with the filtered data, containing the columns 'Employee ID' and 'Age'.
     - AxesSubplot: A histogram plot of the 'Age' column of the filtered data.
 
     Requirements:

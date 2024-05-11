@@ -1,71 +1,85 @@
-import pandas as pd
-import matplotlib.pyplot as plt
+import seaborn as sns
 from random import sample
 
-# Constants for column names to use in plots
+
+# Constants
 COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
-
-def task_func(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
-    '''
-    Remove rows from a dataframe based on column values and generate random scatter plots.
+def task_func(df, tuples, n_plots):
+    """
+    Remove rows from a dataframe based on values of multiple columns, and then create n random pairs of two columns 
+    against each other to generate pairplots.
 
     Parameters:
-    - df (pd.DataFrame): The input DataFrame to be modified.
-    - tuples (list): A list of tuples, each representing a row's values for removal.
-    - n_plots (int): Number of scatter plots to generate from random pairs of columns.
+    df (DataFrame): The pandas DataFrame.
+    tuples (list of tuple): A list of tuples, where each tuple represents a row to be removed based on its values.
+    n_plots (int): The number of pairplots to be generated using randomly selected column pairs.
 
     Returns:
-    - pd.DataFrame: The DataFrame after removal of specified rows.
-    - list: A list containing matplotlib Axes objects of the generated plots.
+    tuple: A tuple containing:
+        - DataFrame: The modified DataFrame after removing specified rows.
+        - list of Axes: A list containing the generated pairplots.
 
     Requirements:
-    - pandas
-    - matplotlib.pyplot
+    - seaborn
     - random
 
     Example:
-    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=COLUMNS)
+    >>> import numpy as np, pandas as pd
+    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
     >>> modified_df, plots = task_func(df, tuples, 3)
-    '''
-    df = df[~df.apply(tuple, axis=1).isin(tuples)]
+    """
+    if not df.empty:
+        df = df[~df.apply(tuple, axis=1).isin(tuples)]
     plots = []
-    for _ in range(n_plots):
-        selected_columns = sample(COLUMNS, 2)
-        ax = df.plot(x=selected_columns[0], y=selected_columns[1], kind='scatter')
-        plots.append(ax)
-    plt.show()
+    if n_plots > 0 and not df.empty:
+        available_columns = df.columns.tolist()
+        for _ in range(min(n_plots, len(available_columns) // 2)):  # Ensure we have enough columns
+            selected_columns = sample(available_columns, 2)
+            plot = sns.pairplot(df, vars=selected_columns)
+            plots.append(plot)
     return df, plots
 
 import unittest
-from unittest.mock import patch
-import numpy as np
+import pandas as pd
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=COLUMNS)
-        self.tuples = [(self.df.iloc[0].values), (self.df.iloc[1].values)]
-    def test_no_plots_generated(self):
-        """Test case with zero plots requested."""
-        _, plots = task_func(self.df, [], 0)  # Request 0 plots.
-        self.assertEqual(len(plots), 0, "No plots should be generated when n_plots is 0.")
-    def test_plot_generation(self):
-        _, plots = task_func(self.df, [], 3)
-        self.assertEqual(len(plots), 3, "Should generate exactly 3 plots.")
-    @patch('matplotlib.pyplot.show')
-    def test_empty_dataframe(self, mock_show):
-        empty_df = pd.DataFrame(columns=COLUMNS)
-        modified_df, plots = task_func(empty_df, [], 2)
-        self.assertTrue(modified_df.empty, "DataFrame should be empty.")
-        self.assertEqual(len(plots), 2, "Should attempt to generate 2 plots even for an empty DataFrame.")
-    def test_no_row_removal(self):
-        modified_df, _ = task_func(self.df, [(999, 999, 999, 999, 999)], 0)
-        self.assertEqual(len(modified_df), len(self.df), "No rows should be removed.")
-    def test_random_plot_columns(self):
-        _, plots = task_func(self.df, [], 1)
-        # Assuming task_func generates at least one plot and adds it to the list,
-        # access the first plot for testing.
-        first_plot = plots[0]
-        plot_columns = [first_plot.get_xlabel(), first_plot.get_ylabel()]
-        self.assertIn(plot_columns[0], COLUMNS, "X-axis should be from COLUMNS.")
-        self.assertIn(plot_columns[1], COLUMNS, "Y-axis should be from COLUMNS.")
+        # Common setup for generating DataFrame for testing
+        self.df = pd.DataFrame({
+            'A': list(range(0, 100, 10)) + [10, 60],
+            'B': list(range(10, 110, 10)) + [20, 70],
+            'C': list(range(20, 120, 10)) + [30, 80],
+            'D': list(range(30, 130, 10)) + [40, 90],
+            'E': list(range(40, 140, 10)) + [50, 100]
+        })
+    def test_case_1(self):
+        tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
+        modified_df, plots = task_func(self.df, tuples, 3)
+        self.assertTrue(all(tuple(row) not in tuples for row in modified_df.to_numpy()))
+        # Check the number of plots does not exceed min(n_plots, len(df.columns) // 2)
+        expected_plot_count = min(3, len(self.df.columns) // 2)
+        self.assertEqual(len(plots), expected_plot_count)
+    def test_case_2(self):
+        tuples = [(200, 200, 200, 200, 200), (300, 300, 300, 300, 300)]
+        modified_df, plots = task_func(self.df, tuples, 2)
+        self.assertEqual(len(modified_df), len(self.df))
+        self.assertEqual(len(plots), 2)
+    def test_case_3(self):
+        tuples = []
+        modified_df, plots = task_func(self.df, tuples, 1)
+        self.assertEqual(len(modified_df), len(self.df))
+        self.assertEqual(len(plots), 1)
+    def test_case_4(self):
+        tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
+        modified_df, plots = task_func(self.df, tuples, 0)
+        self.assertTrue(all(row not in modified_df.values for row in tuples))
+        self.assertEqual(len(plots), 0)
+    def test_case_5(self):
+        tuples = [(10, 20, 30, 40, 50), (200, 200, 200, 200, 200)]
+        modified_df, plots = task_func(self.df, tuples, 4)
+        # Ensure the specific tuple is not in the DataFrame
+        self.assertTrue((10, 20, 30, 40, 50) not in modified_df.values)
+        # Check the number of plots does not exceed min(n_plots, len(df.columns) // 2)
+        expected_plot_count = min(4, len(self.df.columns) // 2)
+        self.assertEqual(len(plots), expected_plot_count)

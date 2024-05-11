@@ -1,102 +1,93 @@
-import numpy as np
 import pandas as pd
-import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
 
 # Constants
-PLOT_TITLE = "Value Distribution"
+PLOT_TITLE = "Scaled Values"
 
 
 def task_func(data_dict):
     """
-    Processes a dictionary of numerical data to create a pandas DataFrame, removes None values, and generates a histogram 
-    of the data values using seaborn. The histogram's bins are dynamically calculated based on the range of the data. Specifically,
-    the number of bins is set to the minimum of 11 and half the number of data points, with a minimum of 2 bins.
-    If the DataFrame is empty or the data lacks variability (all values are the same after removing None values), 
-    the function does not generate a plot.
+    Scales the values in a given dictionary using MinMaxScaler and plots the scaled data.
 
     Parameters:
-    - data_dict (dict): A dictionary with keys as column names and values as lists of numerical data. 
-                      The data can include None values, which will be removed.
+    - data_dict (dict): A dictionary where keys represent column names and values are lists of numerical data.
+                        The values may contain missing data (None), which are handled by dropping them before scaling.
 
     Returns:
-    - DataFrame: A pandas DataFrame created from the input dictionary, excluding None values.
-    - Axes or None: A seaborn histogram plot object if the DataFrame contains variable data; 
-                               None if the DataFrame is empty or if all values are identical.
+    - pandas.DataFrame containing the scaled data.
+    - matplotlib Axes object that displays the plot of the scaled data.
 
     Requirements:
     - pandas
-    - numpy
-    - seaborn
-
-    Note:
-    - Calculates the minimum and maximum values in the DataFrame.
-    - Dynamically sets the number of bins for the histogram based on the number of data points, with a minimum of 2 
-         and a maximum of 11 bins.
-    - Create evenly spaced bin edges between the minimum and maximum values.
-    - KDE (Kernel Density Estimate) is turned off. 
-    - Sets the plot title to the predefined constant `PLOT_TITLE`.
-
+    - scikit-learn
+    - matplotlib
 
     Example:
-    >>> data = {'a': [1, 2, 3, None], 'b': [5, 6, None, 8]}
-    >>> df, plot = task_func(data)
-    >>> df
+    >>> data = {'a': [1, 2, None, 4], 'b': [5, None, 7, 8]}
+    >>> scaled_df, plot_ax = task_func(data)
+    >>> scaled_df
          a    b
-    0  1.0  5.0
-    1  2.0  6.0
-    >>> plot.get_title() if plot is not None else 'No plot generated'
-    'Value Distribution'
+    0  0.0  0.0
+    1  1.0  1.0
+    >>> plot_ax.get_title()
+    'Scaled Values'
     """
     df = pd.DataFrame(data_dict).dropna()
-    if df.empty or df.nunique().min() < 2:
-        return df, None
-    min_val, max_val = df.values.min(), df.values.max()
-    num_bins = max(min(11, len(df) // 2), 2)
-    bin_edges = np.linspace(min_val, max_val, num_bins)
-    plot = sns.histplot(df.values.flatten(), bins=bin_edges, kde=False)
-    plot.set_title(PLOT_TITLE)
-    return df, plot
+    if df.empty:
+        ax = plt.gca()
+        ax.set_title(PLOT_TITLE)
+        return df, ax
+    scaler = MinMaxScaler()
+    scaled_data = scaler.fit_transform(df)
+    df_scaled = pd.DataFrame(scaled_data, columns=df.columns)
+    ax = df_scaled.plot()
+    ax.set_title(PLOT_TITLE)
+    return df_scaled, ax
 
 import unittest
 import pandas as pd
 class TestCases(unittest.TestCase):
-    """Test cases for function task_func."""
-    def test_dataframe_creation(self):
+    """Unit tests for the function."""
+    def test_empty_data(self):
         """
-        Test if the function correctly creates a DataFrame from the input dictionary.
+        Test with an empty dictionary. Should return an empty DataFrame and a plot object.
         """
-        data = {"a": [1, 2, 3, 4], "b": [5, 6, 7, 8]}
-        df, _ = task_func(data)
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(df.shape, (4, 2))
-    def test_distribution_plot(self):
+        result_df, result_ax = task_func({})
+        self.assertTrue(result_df.empty)
+        self.assertIsNotNone(result_ax)
+    def test_all_none_data(self):
         """
-        Test if the function correctly creates a distribution plot with the correct title and non-empty bars.
+        Test with a dictionary where all values are None. Should return an empty DataFrame and a plot object.
         """
-        data = {"a": [1, 2, 3, 4], "b": [5, 6, 7, 8]}
-        _, plot = task_func(data)
-        self.assertEqual(plot.get_title(), "Value Distribution")
-        self.assertTrue(len(plot.patches) > 0)
-    def test_empty_dictionary(self):
+        data = {"a": [None, None], "b": [None, None]}
+        result_df, result_ax = task_func(data)
+        self.assertTrue(result_df.empty)
+        self.assertIsNotNone(result_ax)
+    def test_normal_data(self):
         """
-        Test if the function correctly handles an empty dictionary, returning an empty DataFrame and no plot.
+        Test with a normal data dictionary. Should return a non-empty DataFrame and a plot object.
         """
-        data = {}
-        df, plot = task_func(data)
-        self.assertEqual(df.shape, (0, 0))
-        self.assertIsNone(plot)
-    def test_number_of_bins(self):
+        data = {"a": [1, 2, 3], "b": [4, 5, 6]}
+        result_df, result_ax = task_func(data)
+        self.assertEqual(result_ax.get_title(), "Scaled Values")
+        self.assertFalse(result_df.empty)
+        self.assertEqual(result_df.shape, (3, 2))
+        self.assertIsNotNone(result_ax)
+    def test_with_missing_values(self):
         """
-        Test if the function dynamically calculates the number of bins for the plot based on the data.
+        Test data with some missing values. Missing values should be dropped, and scaled data should be returned.
         """
-        data = {"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-        _, plot = task_func(data)
-        self.assertTrue(len(plot.patches) <= 11)
-    def test_dataframe_without_none(self):
+        data = {"a": [1, None, 3], "b": [4, 5, None]}
+        result_df, result_ax = task_func(data)
+        self.assertEqual(result_df.shape, (1, 2))  # Only one row without missing values
+        self.assertIsNotNone(result_ax)
+    def test_with_negative_values(self):
         """
-        Test if the function correctly removes rows with None values from the DataFrame.
+        Test data with negative values. Should handle negative values correctly and return scaled data.
         """
-        data = {"a": [1, 2, None, 4], "b": [5, None, 7, 8]}
-        df, _ = task_func(data)
-        self.assertEqual(df.shape, (2, 2))
-        self.assertNotIn(None, df.values.flatten())
+        data = {"a": [-1, -2, -3], "b": [1, 2, 3]}
+        result_df, result_ax = task_func(data)
+        self.assertFalse(result_df.empty)
+        self.assertEqual(result_df.shape, (3, 2))
+        self.assertIsNotNone(result_ax)

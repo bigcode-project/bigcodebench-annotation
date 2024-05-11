@@ -1,99 +1,85 @@
 import pandas as pd
-import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 
 
-def task_func(product_dict, product_keys):
+def task_func(data_dict, data_keys):
     """
-    Create a profit report for a list of products based on a specific product dictionary that includes the quantity,
-    price, and profit of each product. Additionally, calculate the average price and profit for all considered products,
-    and plot a bar chart of the profit for each product.
+    Normalize data specified by keys in a dictionary using MinMax scaling and plot the results. This function is
+    useful for preprocessing data for machine learning models where data scaling can impact performance.
 
     Parameters:
-    - product_dict (dict): The dictionary containing product details with product name as key and a list
-    [quantity, price] as value.
-    - product_keys (list): The list of product keys to consider for the report.
+    data_dict (dict): A dictionary where keys map to lists of numeric values.
+    data_keys (list): Keys within the dictionary whose corresponding values are to be normalized.
 
-    Returns: tuple: A tuple containing:
-    - DataFrame: A pandas DataFrame with columns
-    ['Product', 'Quantity', 'Price', 'Profit', 'Average Price', 'Average Profit'].
-    - Axes: A matplotlib Axes object representing the plotted bar chart of profit for each product
-    (None if no products).
+    Returns:
+    tuple: A tuple containing a DataFrame of normalized values and a matplotlib Axes object representing a plot of the
+    normalized data.
 
     Requirements:
     - pandas
-    - numpy
+    - sklearn
+
+    Raises:
+    ValueError: If no keys in `data_keys` are found in `data_dict`.
 
     Example:
-    >>> product_dict = {'Apple': [100, 2.5], 'Orange': [80, 3.5], 'Banana': [120, 1.5]}
-    >>> product_keys = ['Apple', 'Banana']
-    >>> report, ax = task_func(product_dict, product_keys)
-    >>> print(report)
-      Product  Quantity  Price  Profit  Average Price  Average Profit
-    0   Apple       100    2.5   250.0            2.0           215.0
-    1  Banana       120    1.5   180.0            2.0           215.0
-
+    >>> data_dict = {'A': [1, 2, 3], 'B': [4, 5, 6]}
+    >>> data_keys = ['A', 'B']
+    >>> normalized_df, ax = task_func(data_dict, data_keys)
+    >>> print(normalized_df.to_string(index=False))
+      A   B
+    0.0 0.0
+    0.5 0.5
+    1.0 1.0
     """
-    columns = ['Product', 'Quantity', 'Price', 'Profit']
-    data = []
-    for key in product_keys:
-        quantity, price = product_dict[key]
-        profit = quantity * price
-        data.append([key, quantity, price, profit])
-    df = pd.DataFrame(data, columns=columns)
-    if not df.empty:
-        avg_price = np.mean(df['Price'])
-        avg_profit = np.mean(df['Profit'])
-        df['Average Price'] = avg_price
-        df['Average Profit'] = avg_profit
-        ax = df.plot(x='Product', y='Profit', kind='bar', legend=False, title="Profit for each product")
-        ax.set_ylabel("Profit")
-    else:
-        ax = None
-    return df, ax
+    data_for_keys = {key: data_dict[key] for key in data_keys if key in data_dict}
+    df = pd.DataFrame(data_for_keys)
+    if df.empty:
+        raise ValueError("No matching keys found in data dictionary, or keys list is empty.")
+    scaler = MinMaxScaler()
+    normalized_data = scaler.fit_transform(df)
+    normalized_df = pd.DataFrame(normalized_data, columns=data_keys)
+    ax = normalized_df.plot(kind='line')
+    ax.set_title('Normalized Data')
+    ax.set_ylabel('Normalized Value')
+    ax.set_xlabel('Index')
+    return normalized_df, ax
 
 import unittest
-import pandas as pd
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Setup common to all tests: A product dictionary
-        self.product_dict = {
-            'Apple': [100, 2.5],
-            'Orange': [80, 3.5],
-            'Banana': [120, 1.5]
+        # Sample data dictionary
+        self.data_dict = {
+            'A': [10, 20, 30, 40],
+            'B': [20, 30, 40, 50],
+            'C': [30, 40, 50, 60]
         }
-    def test_case_1(self):
-        # Test with a single product
-        product_keys = ['Apple']
-        report, ax = task_func(self.product_dict, product_keys)
-        self.assertEqual(len(report), 1)  # Should return 1 row
-        self.assertIn('Apple', report['Product'].values)
-        self.assertAlmostEqual(report['Average Price'].iloc[0], 2.5)
-        self.assertAlmostEqual(report['Average Profit'].iloc[0], 250.0)
-    def test_case_2(self):
-        # Test with multiple products
-        product_keys = ['Apple', 'Orange']
-        report, ax = task_func(self.product_dict, product_keys)
-        self.assertEqual(len(report), 2)  # Should return 2 rows
-        self.assertTrue(all(item in ['Apple', 'Orange'] for item in report['Product'].values))
-        expected_avg_price = (2.5 + 3.5) / 2
-        expected_avg_profit = (250.0 + 280.0) / 2
-        self.assertTrue(all(report['Average Price'] == expected_avg_price))
-        self.assertTrue(all(report['Average Profit'] == expected_avg_profit))
-    def test_case_3(self):
-        # Test with no products
-        product_keys = []
-        report, ax = task_func(self.product_dict, product_keys)
-        self.assertTrue(report.empty)  # Should return an empty DataFrame
-    def test_case_4(self):
-        # Test with a product that doesn't exist in the dictionary
-        product_keys = ['Mango']  # Mango is not in product_dict
-        with self.assertRaises(KeyError):
-            task_func(self.product_dict, product_keys)
-    def test_case_5(self):
-        # Test the DataFrame structure
-        product_keys = ['Apple', 'Banana']
-        report, ax = task_func(self.product_dict, product_keys)
-        expected_columns = ['Product', 'Quantity', 'Price', 'Profit', 'Average Price', 'Average Profit']
-        self.assertEqual(list(report.columns), expected_columns)
-        for col in ['Quantity', 'Price', 'Profit', 'Average Price', 'Average Profit']:
-            self.assertTrue(pd.api.types.is_numeric_dtype(report[col]), f"{col} should be numeric type")
+    def test_normalization_single_key(self):
+        # Test normalization with a single key
+        data_keys = ['A']
+        normalized_df, ax = task_func(self.data_dict, data_keys)
+        self.assertTrue((normalized_df >= 0).all().all() and (normalized_df <= 1).all().all(),
+                        "Normalized data should be in the range [0, 1]")
+    def test_normalization_multiple_keys(self):
+        # Test normalization with multiple keys
+        data_keys = ['A', 'B']
+        normalized_df, ax = task_func(self.data_dict, data_keys)
+        self.assertEqual(len(normalized_df.columns), 2, "Normalized DataFrame should have 2 columns")
+        self.assertTrue({'A', 'B'}.issubset(normalized_df.columns), "DataFrame should contain specified keys")
+    def test_normalization_all_keys(self):
+        # Test normalization with all keys in the dictionary
+        data_keys = list(self.data_dict.keys())
+        normalized_df, ax = task_func(self.data_dict, data_keys)
+        self.assertEqual(len(normalized_df.columns), 3, "Normalized DataFrame should have 3 columns")
+        self.assertTrue({'A', 'B', 'C'}.issubset(normalized_df.columns), "DataFrame should contain all keys")
+    def test_empty_keys(self):
+        # Test with no keys specified
+        data_keys = []
+        with self.assertRaises(ValueError):
+            task_func(self.data_dict, data_keys)
+    def test_key_not_in_dict(self):
+        # Test with a key that's not in the dictionary
+        data_keys = ['D']  # Assuming 'D' is not in `data_dict`
+        with self.assertRaises(ValueError):
+            task_func(self.data_dict, data_keys)

@@ -1,81 +1,70 @@
-import pandas as pd
+import itertools
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
+import matplotlib.pyplot as plt
 
-def task_func(df):
+
+def task_func(elements, subset_size):
     """
-    Scale the 'Age' and 'Income' columns between 0 and 1 for each group by 'id' in the provided pandas DataFrame. 
-    Additionally, create a histogram of the 'Income' column after scaling and return both the scaled DataFrame 
-    and the histogram data.
+    Generate all subsets of a given size from a tuple and draw a histogram of the sums of the subsets. Additionally,
+    return the Axes object of the plotted histogram and the combinations of the subsets and their sums.
 
     Parameters:
-    df (DataFrame): The pandas DataFrame with columns ['id', 'age', 'income'].
+    - elements (tuple): A tuple of integers for which subsets will be generated.
+    - subset_size (int): Size of the subsets to be generated.
 
     Returns:
-    tuple: A tuple containing the scaled DataFrame and the histogram data for the 'income' column.
+    - matplotlib.axes.Axes: Axes object of the plotted histogram.
+    - list: List of all the combinations of subsets.
+    - list: List of the sums of all the subsets.
 
     Requirements:
-    - pandas
-    - sklearn.preprocessing.MinMaxScaler
+    - itertools
     - numpy
+    - matplotlib
 
     Example:
-    >>> df = pd.DataFrame({'id': [1, 1, 2, 2, 3, 3], 'age': [25, 26, 35, 36, 28, 29],'income': [50000, 60000, 70000, 80000, 90000, 100000]})
-    >>> df_scaled, income_hist = task_func(df)
-    >>> print(df_scaled.iloc[0]['age'])
-    0.0
-    >>> print(df_scaled.iloc[0]['income'])
-    0.0
+    >>> ax, combs, sums = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> len(combs)
+    45
+    >>> len(sums)
+    45
     """
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    df_grouped = df.groupby('id').apply(
-        lambda x: pd.DataFrame(
-            scaler.fit_transform(x[['age', 'income']]), 
-            columns=['age', 'income'], 
-            index=x.index
-        )
-    )
-    hist, bins = np.histogram(df_grouped['income'], bins=10)
-    return df_grouped, (hist, bins)
+    combinations = list(itertools.combinations(elements, subset_size))
+    sums = [sum(combination) for combination in combinations]
+    ax = plt.hist(sums, bins=np.arange(min(sums), max(sums) + 2) - 0.5, rwidth=0.8, align='left')
+    return plt.gca(), combinations, sums
 
 import unittest
-import pandas as pd
-from faker import Faker
-import numpy as np
+import doctest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Setting up Faker for test data generation
-        self.fake = Faker()
-    def generate_test_dataframe(self, num_rows):
-        # Generating a test DataFrame with 'id', 'age', and 'income' columns
-        data = {
-            'id': [self.fake.random_int(min=1, max=5) for _ in range(num_rows)],
-            'age': [self.fake.random_int(min=18, max=80) for _ in range(num_rows)],
-            'income': [self.fake.random_int(min=20000, max=100000) for _ in range(num_rows)]
-        }
-        return pd.DataFrame(data)
-    def test_empty_dataframe(self):
-        df = pd.DataFrame()
-        with self.assertRaises(Exception):
-            scaled_df, income_hist = task_func(df)
-    def test_single_group_dataframe(self):
-        df = self.generate_test_dataframe(1)
-        scaled_df, income_hist = task_func(df)
-        self.assertEqual(len(scaled_df), 1)  # Only one row, hence one row in scaled DataFrame
-        self.assertEqual(len(income_hist[0]), 10)  # Histogram should have 10 bins by default
-    def test_multiple_groups_dataframe(self):
-        df = self.generate_test_dataframe(100)
-        scaled_df, income_hist = task_func(df)
-        self.assertEqual(len(scaled_df), 100)  # Should have the same number of rows as input DataFrame
-        self.assertEqual(len(income_hist[0]), 10)  # Checking histogram bin count
-    def test_scaled_values_range(self):
-        df = self.generate_test_dataframe(50)
-        scaled_df, _ = task_func(df)
-        self.assertEqual(len(scaled_df[(0.0 > scaled_df['age']) & (scaled_df['age'] > 1.0)]), 0)  # Age should be scaled between 0 and 1
-        self.assertEqual(len(scaled_df[(0.0 > scaled_df['income']) & (scaled_df['income'] > 1.0)]), 0)  # Age should be scaled between 0 and 1
-        
-    def test_histogram_data_integrity(self):
-        df = self.generate_test_dataframe(50)
-        _, income_hist = task_func(df)
-        self.assertTrue(np.all(income_hist[0] >= 0))  # Histogram counts should be non-negative
-        self.assertTrue(np.all(np.diff(income_hist[1]) > 0))  # Histogram bins should be in ascending order
+    def test_case_1(self):
+        # Testing with a tuple of size 10 and subset size 2
+        ax, combs, sums = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
+        self.assertIsInstance(ax, plt.Axes)  # Check if the return type is correct
+        # Test the combinations and sums
+        self.assertEqual(len(combs), 45)
+        self.assertEqual(len(sums), 45)
+    def test_case_2(self):
+        # Testing with a tuple of size 5 and subset size 3
+        ax, combs, sums = task_func((2, 4, 6, 8, 10), 3)
+        self.assertIsInstance(ax, plt.Axes)
+        # Test the combinations and sums
+        self.assertEqual(len(combs), 10)
+        self.assertEqual(len(sums), 10)
+    def test_case_3(self):
+        # Testing with an empty tuple
+        ax, combs, sums = task_func((), 0)
+        self.assertIsInstance(ax, plt.Axes)
+    def test_case_4(self):
+        # Testing with negative numbers in the tuple
+        ax, combs, sums = task_func((-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5), 2)
+        self.assertIsInstance(ax, plt.Axes)
+    def test_case_5(self):
+        # Testing with a subset size of 0
+        ax, combs, sums = task_func((1, 2, 3, 4, 5), 2)
+        self.assertIsInstance(ax, plt.Axes)
+        # Test the combinations and sums
+        self.assertEqual(combs, [(1, 2), (1, 3), (1, 4), (1, 5), (2, 3), (2, 4), (2, 5), (3, 4), (3, 5), (4, 5)])
+        self.assertEqual(sums, [3, 4, 5, 6, 5, 6, 7, 7, 8, 9])

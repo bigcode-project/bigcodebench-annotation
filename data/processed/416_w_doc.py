@@ -1,70 +1,130 @@
 import pandas as pd
-import codecs
+import seaborn as sns
 
-def task_func(dataframe: pd.DataFrame) -> pd.DataFrame:
+
+def task_func(data, column="c"):
     """
-    Decodes all Unicode escape strings in a particular column ("UnicodeString") in a given Pandas DataFrame.
+    Removes a column from a given data dictionary and creates a heatmap
+    of the correlation matrix of the remaining data. Non-numeric columns are
+    excluded from the heatmap. If the data is empty or has no numeric columns,
+    the function returns None.
 
     Parameters:
-    dataframe (pd.DataFrame): The pandas DataFrame which must contain the column "UnicodeString".
+    - data: The input data dictionary.
+    - column (str): Name of column to remove. Defaults to "c".
 
     Returns:
-    pd.DataFrame: The DataFrame with decoded strings in the "UnicodeString" column.
-
-    Raises:
-    KeyError: If the column "UnicodeString" does not exist in the DataFrame.
-    TypeError: If the input is not a Pandas DataFrame.
-
-    Example:
-    >>> df = pd.DataFrame({
-    ...     'Name': ['John', 'Anna', 'Peter'],
-    ...     'Age': [27, 23, 29],
-    ...     'Salary': [50000, 60000, 70000],
-    ...     'UnicodeString': ['\u004A\u006F\u0068\u006E', '\u0041\u006E\u006E\u0061', '\u0050\u0065\u0074\u0065\u0072']
-    ... })
-    >>> task_func(df)
-        Name  Age  Salary UnicodeString
-    0   John   27   50000          John
-    1   Anna   23   60000          Anna
-    2  Peter   29   70000         Peter
+    - matplotlib.axes._axes.Axes or None: The Axes object of the heatmap
+      or None if the heatmap is not generated.
 
     Requirements:
     - pandas
-    - codecs
+    - seaborn
+
+    Example:
+    >>> task_func({'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]})
+    <Axes: >
+    >>> task_func(pd.DataFrame({'a': ["foo", "bar"]}))
     """
-    if not isinstance(dataframe, pd.DataFrame):
-        raise TypeError("The input must be a pandas DataFrame.")
-    if 'UnicodeString' not in dataframe.columns:
-        raise KeyError("'UnicodeString' column not found in the DataFrame.")
-    dataframe['UnicodeString'] = dataframe['UnicodeString'].apply(lambda x: codecs.decode(x, 'unicode_escape'))
-    return dataframe
+    df = pd.DataFrame(data)
+    if column in df.columns:
+        df = df.drop(columns=column)
+    df = df.select_dtypes(include=["number"])
+    if df.empty:
+        return None
+    return sns.heatmap(df.corr())
 
 import unittest
 import pandas as pd
+import numpy as np
+from matplotlib import pyplot as plt
 class TestCases(unittest.TestCase):
-    
-    def setUp(self):
-        self.test_data = pd.DataFrame({
-            'Name': ['John', 'Anna', 'Peter'],
-            'Age': [27, 23, 29],
-            'Salary': [50000, 60000, 70000],
-            'UnicodeString': ['\u004A\u006F\u0068\u006E', '\u0041\u006E\u006E\u0061', '\u0050\u0065\u0074\u0065\u0072']
-        })
-    def test_unicode_decoding(self):
-        decoded_df = task_func(self.test_data)
-        expected_strings = ['John', 'Anna', 'Peter']
-        self.assertListEqual(list(decoded_df['UnicodeString']), expected_strings)
-    def test_missing_column(self):
-        with self.assertRaises(KeyError):
-            task_func(pd.DataFrame({'Name': ['John']}))
-    def test_non_dataframe_input(self):
-        with self.assertRaises(TypeError):
-            task_func("Not a DataFrame")
-    def test_empty_dataframe(self):
-        empty_df = pd.DataFrame({'UnicodeString': []})
-        result_df = task_func(empty_df)
-        self.assertTrue(result_df['UnicodeString'].empty)
-    def test_non_string_unicode_values(self):
-        df_with_non_string = pd.DataFrame({'UnicodeString': [123, 456]})
-        with self.assertRaises(Exception):
-            task_func(df_with_non_string)
+    def _assert_heatmap_matches_corr(self, ax, corr):
+        # Helper function to assert that the heatmap matches the correlation matrix
+        heatmap_data = ax.collections[0].get_array().data
+        np.testing.assert_array_almost_equal(
+            heatmap_data, corr.values.flatten(), decimal=2
+        )
+    def test_case_1(self):
+        # Input: DataFrame with column "c".
+        data = {
+                "a": list(range(10)),
+                "b": list(range(10)),
+                "c": list(range(10)),
+            }
+        df = pd.DataFrame(
+            data
+        )
+        ax = task_func(data)
+        # Assert that column "c" is not in the heatmap
+        self.assertNotIn("c", [col.get_text() for col in ax.get_xticklabels()])
+        # Check plotted value correctness
+        self._assert_heatmap_matches_corr(ax, df.drop(columns=["c"]).corr())
+    def test_case_2(self):
+        # Input: DataFrame without column "c".
+        data = {"a": list(range(10)), "b": list(range(10))}
+        df = pd.DataFrame(data)
+        ax = task_func(data)
+        # Assert that columns "a" and "b" are in the heatmap
+        self.assertIn("a", [col.get_text() for col in ax.get_xticklabels()])
+        self.assertIn("b", [col.get_text() for col in ax.get_xticklabels()])
+        # Check plotted value correctness
+        self._assert_heatmap_matches_corr(ax, df.corr())
+    def test_case_3(self):
+        # Input: DataFrame with column "c", but we specify another column to remove
+        data = {
+                "a": list(range(10)),
+                "b": list(range(10)),
+                "c": list(range(10)),
+            }
+        df = pd.DataFrame(
+            data
+        )
+        ax = task_func(data, column="b")
+        # Assert that column "b" is not in the heatmap
+        self.assertNotIn("b", [col.get_text() for col in ax.get_xticklabels()])
+        # Assert that other columns are in the heatmap
+        self.assertIn("a", [col.get_text() for col in ax.get_xticklabels()])
+        self.assertIn("c", [col.get_text() for col in ax.get_xticklabels()])
+        # Check plotted value correctness
+        self._assert_heatmap_matches_corr(ax, df.drop(columns=["b"]).corr())
+    def test_case_4(self):
+        # Input: DataFrame with non-numeric columns and column "c".
+        data = {
+                "a": list(range(4)),
+                "b": ["low", "medium", "high", "medium"],
+                "c": ["apple", "banana", "cherry", "dates"],
+            }
+        df = pd.DataFrame(
+            data
+        )
+        ax = task_func(data)
+        # Assert that only numeric column "a" is in the heatmap
+        self.assertIn("a", [col.get_text() for col in ax.get_xticklabels()])
+        self.assertNotIn("b", [col.get_text() for col in ax.get_xticklabels()])
+        self.assertNotIn("c", [col.get_text() for col in ax.get_xticklabels()])
+    def test_case_5(self):
+        # Input: DataFrame with missing values and column "c".
+        np.random.seed(0)
+        data = {
+                "a": np.random.choice([1, np.nan], 100),
+                "b": np.random.choice([2, np.nan], 100),
+                "c": np.random.choice([3, np.nan], 100),
+            }
+        df = pd.DataFrame(
+            data
+        )
+        ax = task_func(data)
+        # Assert that columns "a" and "b" are in the heatmap and column "c" is not
+        self.assertIn("a", [col.get_text() for col in ax.get_xticklabels()])
+        self.assertIn("b", [col.get_text() for col in ax.get_xticklabels()])
+        self.assertNotIn("c", [col.get_text() for col in ax.get_xticklabels()])
+    def test_case_6(self):
+        # Input: Empty DataFrame.
+        data = {}
+        df = pd.DataFrame(data)
+        ax = task_func(data)
+        # Assert that the function returns None for an empty DataFrame
+        self.assertIsNone(ax)
+    def tearDown(self):
+        plt.close("all")

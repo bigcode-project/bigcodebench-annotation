@@ -1,67 +1,82 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import itertools
+import pandas as pd
+import random
+from sklearn.model_selection import train_test_split
 
+def task_func(n_data_points=10000, min_value=0.0, max_value=10.0, test_size=0.2):
+    '''
+    Generate a random set of floating-point numbers within a specified range, truncate each value to 3 decimal places,
+    and divide the data into train and test sets based on a given test size.
 
-def task_func(data_list):
-    """
-    Unzips the provided list of tuples and plots the numerical values for each position.
-    
     Parameters:
-    - data_list (list of tuples): A list containing tuples. Each tuple should contain a character and two numerical values.
-    
-    Returns:
-    - Axes: The plot with the unzipped numerical values.
-    
-    Requirements:
-    - numpy
-    - matplotlib.pyplot
-    - itertools
+    - n_data_points (int): Number of data points to generate. Default is 10000.
+    - min_value (float): Minimum value of the generated data points. Default is 0.0.
+    - max_value (float): Maximum value of the generated data points. Default is 10.0.
+    - test_size (float): Proportion of the dataset to include in the test split. Default is 0.2.
 
-    Raises:
-    - ValueError: If the data_list is empty.
-    
+    Returns:
+    tuple: A tuple with two pandas DataFrames (train set, test set).
+
+    Requirements:
+    - pandas
+    - random
+    - sklearn.model_selection
+
+    Note:
+    - The function use "Value" for the column name in the DataFrames (train set, test set) that being returned.
+
     Example:
-    >>> plot = task_func([('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)])
-    >>> type(plot)
-    <class 'matplotlib.axes._axes.Axes'>
-    """
-    unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
-    if len(unzipped_data) == 0:
-        raise ValueError('Empty data_list')
-    fig, ax = plt.subplots()
-    for i, column in enumerate(unzipped_data[1:], start=1):
-        ax.plot(column, label='Position {}'.format(i))
-    ax.legend()
-    return ax
+    >>> random.seed(0)
+    >>> train_data, test_data = task_func()
+    >>> print(train_data.shape[0])
+    8000
+    >>> print(test_data.shape[0])
+    2000
+    >>> random.seed(0)
+    >>> train_data, test_data = task_func(n_data_points=500, min_value=1.0, max_value=1.0, test_size=0.3)
+    >>> print(train_data.shape[0])
+    350
+    >>> print(test_data.shape[0])
+    150
+    >>> print(test_data.iloc[0]['Value'])
+    1.0
+    '''
+    data = [round(random.uniform(min_value, max_value), 3) for _ in range(n_data_points)]
+    data_df = pd.DataFrame(data, columns=['Value'])
+    train_data, test_data = train_test_split(data_df, test_size=test_size)
+    return train_data, test_data
 
 import unittest
-import doctest
+import random
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        data_list = [('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)]
-        plot = task_func(data_list)
-        self.assertIsInstance(plot, type(plt.gca()))
-    def test_case_2(self):
-        data_list = [('a', 6, 7), ('b', 7, 8), ('c', 8, 9)]
-        plot = task_func(data_list)
-        self.assertIsInstance(plot, type(plt.gca()))
-        # Test the plot data
-        self.assertEqual(len(plot.lines), 2)
-    def test_case_3(self):
-        data_list = []
-        with self.assertRaises(ValueError):  # Expecting a ValueError due to empty data_list
-            task_func(data_list)
-    def test_case_4(self):
-        data_list = [('a', 10, 11), ('b', 11, 12), ('c', 12, 13), ('d', 13, 14)]
-        plot = task_func(data_list)
-        self.assertIsInstance(plot, type(plt.gca()))
-        # Test the plot data array
-        self.assertEqual(len(plot.lines), 2)
-        # Test the plot limits
-        self.assertAlmostEqual(plot.get_xlim()[0], -0.15, places=1)
-        self.assertAlmostEqual(plot.get_xlim()[1], 3.15, places=1)
-    def test_case_5(self):
-        data_list = [('a', np.nan, np.nan), ('b', np.nan, np.nan)]
-        plot = task_func(data_list)
-        self.assertIsInstance(plot, type(plt.gca()))
+    def test_default_parameters(self):
+        random.seed(0)
+        train_data, test_data = task_func()
+        self.assertEqual(len(train_data), 8000)  # 80% of 10000
+        self.assertEqual(len(test_data), 2000)  # 20% of 10000
+    def test_custom_parameters(self):
+        random.seed(0)
+        train_data, test_data = task_func(n_data_points=500, min_value=1.0, max_value=5.0, test_size=0.3)
+        self.assertEqual(len(train_data), 350)  # 70% of 500
+        self.assertEqual(len(test_data), 150)  # 30% of 500
+        self.assertTrue(train_data['Value'].between(1.0, 5.0).all())
+        self.assertTrue(test_data['Value'].between(1.0, 5.0).all())
+    def test_train_test_size_ratio(self):
+        random.seed(0)
+        n_data_points = 1000
+        test_size = 0.25
+        train_data, test_data = task_func(n_data_points=n_data_points, test_size=test_size)
+        expected_train_size = int(n_data_points * (1 - test_size))
+        expected_test_size = n_data_points - expected_train_size
+        self.assertEqual(len(train_data), expected_train_size)
+        self.assertEqual(len(test_data), expected_test_size)
+    def test_value_range(self):
+        random.seed(0)
+        min_value = 2.0
+        max_value = 3.0
+        train_data, _ = task_func(min_value=min_value, max_value=max_value)
+        self.assertTrue(train_data['Value'].between(min_value, max_value).all())
+    def test_value_precision(self):
+        random.seed(0)
+        train_data, _ = task_func()
+        all_three_decimal = all(train_data['Value'].apply(lambda x: len(str(x).split('.')[1]) == 3))
+        self.assertFalse(all_three_decimal)

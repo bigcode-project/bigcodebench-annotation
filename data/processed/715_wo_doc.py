@@ -1,73 +1,71 @@
 import sys
-from pathlib import Path
+import subprocess
 
 # Constants
+PYTHON_VERSION = '3.8'
 PATH_TO_APPEND = '/path/to/whatever'
 
-def task_func(path_to_append=PATH_TO_APPEND):
+def task_func(python_version=PYTHON_VERSION, path_to_append=PATH_TO_APPEND):
     """
-    Add a specific path to sys.path and create a directory in that path if it does not exist.
-
-    Note:
-    - The function uses a constant PATH_TO_APPEND which defaults to '/path/to/whatever'.
-
+    Switch to a specific version of Python and add a specific path to sys.path.
+    
+    Note: This function changes the global Python version and should be used carefully.
+    
     Parameters:
-    - path_to_append (str): The path to append to sys.path and to create a directory. Default is '/path/to/whatever'.
+    - python_version (str): The Python version to switch to. Default is '3.8'.
+    - path_to_append (str): The path to append to sys.path. Default is '/path/to/whatever'.
 
     Returns:
-    - path_to_append (str): The path that was appended and where the directory was created.
+    - python_version (str): The Python version that was switched to.
 
     Requirements:
     - sys
-    - pathlib
- 
-    Examples:
-    >>> task_func("/new/path/to/append")
-    "/new/path/to/append"
+    - subprocess
 
-    >>> task_func()
-    "/path/to/whatever"
-
+    Example:
+    >>> task_func('3.7', '/path/to/new_directory')
+    '3.7'
     """
-    Path(path_to_append).mkdir(parents=True, exist_ok=True)
+    subprocess.run(['pyenv', 'global', python_version], check=True)
     sys.path.append(path_to_append)
-    return path_to_append
+    return python_version
 
-import tempfile
+import sys
 import unittest
+from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Creating a temporary directory
-        self.temp_dir = tempfile.TemporaryDirectory()
-        # Removing the appended path from sys.path for each test case
-        if self.temp_dir.name + '/test/path' in sys.path:
-            sys.path.remove(self.temp_dir.name + '/test/path')
-        if self.temp_dir.name + '/another/test/path' in sys.path:
-            sys.path.remove(self.temp_dir.name + '/another/test/path')
-    def tearDown(self):
-        # Cleaning up the temporary directory
-        self.temp_dir.cleanup()
-    def test_1(self):
-        # Testing with the default path
-        result = task_func(self.temp_dir.name + '/path/to/whatever')
-        self.assertEqual(result, self.temp_dir.name + '/path/to/whatever')
-        self.assertTrue(self.temp_dir.name + '/path/to/whatever' in sys.path)
-        self.assertTrue(Path(self.temp_dir.name + '/path/to/whatever').exists())
-    def test_2(self):
-        # Testing with a custom path
-        result = task_func(self.temp_dir.name + '/test/path')
-        self.assertEqual(result, self.temp_dir.name + '/test/path')
-        self.assertTrue(self.temp_dir.name + '/test/path' in sys.path)
-        self.assertTrue(Path(self.temp_dir.name + '/test/path').exists())
-    def test_3(self):
-        # Testing if the directory is actually created
-        task_func(self.temp_dir.name + '/another/test/path')
-        self.assertTrue(Path(self.temp_dir.name + '/another/test/path').exists())
-    def test_4(self):
-        # Testing if the path is appended to sys.path
-        task_func(self.temp_dir.name + '/test/path')
-        self.assertTrue(self.temp_dir.name + '/test/path' in sys.path)
-    def test_5(self):
-        # Testing if the function returns the correct path
-        result = task_func(self.temp_dir.name + '/test/path')
-        self.assertEqual(result, self.temp_dir.name + '/test/path')
+    @patch('subprocess.run')
+    def test_switch_to_default_python_version(self, mock_run):
+        original_path_length = len(sys.path)
+        task_func()
+        mock_run.assert_called_with(['pyenv', 'global', '3.8'], check=True)
+        self.assertEqual(sys.path[-1], '/path/to/whatever')
+        sys.path = sys.path[:original_path_length]  # Reset sys.path to original state
+    @patch('subprocess.run')
+    def test_switch_to_python_3_7(self, mock_run):
+        original_path_length = len(sys.path)
+        task_func('3.7', '/another/path')
+        mock_run.assert_called_with(['pyenv', 'global', '3.7'], check=True)
+        self.assertEqual(sys.path[-1], '/another/path')
+        sys.path = sys.path[:original_path_length]
+    @patch('subprocess.run')
+    def test_switch_to_python_3_9(self, mock_run):
+        original_path_length = len(sys.path)
+        task_func('3.9')
+        mock_run.assert_called_with(['pyenv', 'global', '3.9'], check=True)
+        self.assertEqual(sys.path[-1], '/path/to/whatever')
+        sys.path = sys.path[:original_path_length]
+    @patch('subprocess.run')
+    def test_switch_to_python_2_7(self, mock_run):
+        original_path_length = len(sys.path)
+        task_func('2.7')
+        mock_run.assert_called_with(['pyenv', 'global', '2.7'], check=True)
+        self.assertEqual(sys.path[-1], '/path/to/whatever')
+        sys.path = sys.path[:original_path_length]
+    @patch('subprocess.run')
+    def test_switch_to_python_3_6(self, mock_run):
+        original_path_length = len(sys.path)
+        task_func('3.6', '/different/path')
+        mock_run.assert_called_with(['pyenv', 'global', '3.6'], check=True)
+        self.assertEqual(sys.path[-1], '/different/path')
+        sys.path = sys.path[:original_path_length]

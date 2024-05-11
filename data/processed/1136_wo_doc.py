@@ -1,76 +1,104 @@
-import collections
-import json
+import bs4
 import requests
+import re
+import csv
 
-def task_func(user, API_URL = 'https://api.github.com/users/'):
+def task_func(url="http://example.com", csv_path="emails.csv", 
+          regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b", 
+          headers={'User-Agent': 'Mozilla/5.0'}):
     """
-    Retrieves the names of the repositories of a specified GitHub user, sorted in ascending order by their creation date.
-
-    The function queries the GitHub API for all repositories of a given user, parses the response to extract the names and creation dates, and returns the repository names sorted by the date they were created.
+    Scrapes a web page to extract all email addresses using a specified regular expression pattern and writes them to a CSV file. The csv file is
+    always created eventhough no email is found in the url. The header of the csv should be "Emails".
 
     Parameters:
-    - user (str): The GitHub username whose repositories are to be retrieved.
-    - API_URL (str): The base URL of the GitHub API. Default is 'https://api.github.com/users/'.
+    - url (str): The URL of the web page to scrape. Default is "http://example.com".
+    - csv_path (str): The filesystem path where the CSV file should be saved. Default is "emails.csv".
+    - regex (str): The regular expression pattern used to identify email addresses. Default is a pattern that matches common email formats.
+    - headers (dict): The HTTP headers to use for the request. Default includes a User-Agent header.
 
     Returns:
-    - list of str: A list of repository names, sorted by their creation dates from oldest to newest.
-
+    - str: The path to the CSV file where the extracted email addresses have been saved.
 
     Requirements:
-    - collections
-    - json
+    - bs4
     - requests
-
-    Example:
-    >>> task_func('octocat')
-    ['Spoon-Knife', 'Hello-World', 'octocat.github.io']  # Example output, actual results may vary.
+    - re
+    - csv
+    
+    Examples:
+    >>> task_func()
+    'emails.csv'
+    >>> task_func(url="http://another-example.com", csv_path="another_emails.csv")
+    'another_emails.csv'
     """
-    response = requests.get(API_URL + user + '/repos')
-    data = json.loads(response.text)
-    repos = {repo['name']: repo['created_at'] for repo in data}
-    sorted_repos = collections.OrderedDict(sorted(repos.items(), key=lambda x: x[1]))
-    return list(sorted_repos.keys())
+    response = requests.get(url, headers=headers)
+    soup = bs4.BeautifulSoup(response.text, 'html.parser')
+    text = soup.get_text()
+    emails = re.findall(regex, text)
+    with open(csv_path, 'w', newline='') as f:
+        write = csv.writer(f)
+        write.writerow(['Emails'])
+        for email in emails:
+            write.writerow([email])
+    return csv_path
 
 import unittest
-from unittest.mock import patch, Mock
-import json
+from unittest.mock import patch, ANY
+import os
+import csv
+import tempfile
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.mock_response_with_multiple_repos = json.dumps([
-        {"name": "Repo1", "created_at": "2021-01-01T00:00:00Z"},
-        {"name": "Repo2", "created_at": "2021-01-02T00:00:00Z"}
-    ])
-        self.mock_response_with_single_repo = json.dumps([
-        {"name": "SingleRepo", "created_at": "2021-01-01T00:00:00Z"}
-    ])
-        self.mock_response_with_no_repos = json.dumps([])
+        # Create a temporary directory to hold any output files
+        self.test_dir = tempfile.mkdtemp()
+        self.addCleanup(lambda: os.rmdir(self.test_dir))
+    def tearDown(self):
+        # Clean up all files created during the tests
+        for filename in os.listdir(self.test_dir):
+            os.remove(os.path.join(self.test_dir, filename))
     @patch('requests.get')
-    def test_case_1(self, mock_get):
-        # Test if the function returns a list
-        mock_get.return_value = Mock(status_code=200, text=self.mock_response_with_multiple_repos)
-        result = task_func('octocat')
-        self.assertIsInstance(result, list, "The returned value should be a list.")
+    def test_extraction_and_saving_default(self, mock_get):
+        """Test extracting emails using default parameters and saving to default path."""
+        mocked_html_content = """<html><body>Emails: test1@example.com, test2@domain.com</body></html>"""
+        mock_get.return_value.text = mocked_html_content
+        
+        csv_path = os.path.join(self.test_dir, "emails.csv")
+        with patch('builtins.open', unittest.mock.mock_open()) as mocked_file:
+            task_func(csv_path=csv_path)
+            args, kwargs = mocked_file.call_args
+            self.assertEqual(args[0], csv_path)  # Assert the first argument is the file path
+            try:
+                self.assertEqual(kwargs['mode'], 'w')  # Assert the file is opened in write mode
+            except:
+                self.assertEqual(args[1], 'w')
+            self.assertEqual(kwargs['newline'], '')  # Assert newline handling
     @patch('requests.get')
-    def test_case_2(self, mock_get):
-        # Test for a user with multiple repositories
-        mock_get.return_value = Mock(status_code=200, text=self.mock_response_with_multiple_repos)
-        result = task_func('octocat')
-        self.assertTrue(len(result) > 1, "The user 'octocat' should have more than one repository.")
+    def test_extraction_custom_url(self, mock_get):
+        """Test the email extraction from a custom URL and ensure file creation even if no emails are found."""
+        mock_get.return_value.text = "<html><body>No email here</body></html>"
+        csv_path = os.path.join(self.test_dir, "output.csv")
+        result = task_func(url="http://mocked-url.com", csv_path=csv_path)
+        self.assertEqual(result, csv_path)
+        self.assertTrue(os.path.exists(csv_path))  # Ensuring file is created
+        with open(csv_path, 'r') as f:
+            reader = csv.reader(f)
+            data = list(reader)
+        self.assertEqual(data, [['Emails']])
     @patch('requests.get')
-    def test_case_3(self, mock_get):
-        # Test for a user with no repositories
-        mock_get.return_value = Mock(status_code=200, text=self.mock_response_with_no_repos)
-        result = task_func('dummyuserwithnorepos')
-        self.assertEqual(len(result), 0, "The user 'dummyuserwithnorepos' should have zero repositories.")
+    def test_extraction_custom_regex(self, mock_get):
+        """Test extraction with a custom regex pattern."""
+        mocked_html_content = "<html><body>Email: unique@example.com, other@sample.com</body></html>"
+        mock_get.return_value.text = mocked_html_content
+        csv_path = os.path.join(self.test_dir, "custom_regex.csv")
+        task_func(csv_path=csv_path, regex=r"\b[A-Za-z0-9._%+-]+@example.com\b")
+        with open(csv_path, 'r') as file:
+            reader = csv.reader(file)
+            emails = [row for row in reader]
+        self.assertEqual(emails, [['Emails'], ['unique@example.com']])  # Only matching specific domain
     @patch('requests.get')
-    def test_case_4(self, mock_get):
-        # Test for a non-existent user
-        mock_get.return_value = Mock(status_code=404, text=self.mock_response_with_no_repos)
-        result = task_func('nonexistentuserxyz')
-        self.assertEqual(len(result), 0, "A non-existent user should have zero repositories.")
-    @patch('requests.get')
-    def test_case_5(self, mock_get):
-        # Test for a user with a single repository
-        mock_get.return_value = Mock(status_code=200, text=self.mock_response_with_single_repo)
-        result = task_func('userwithonerepo')
-        self.assertEqual(len(result), 1, "The user 'userwithonerepo' should have one repository.")
+    def test_with_headers_customization(self, mock_get):
+        """Test extraction with customized headers."""
+        mock_get.return_value.text = "<html><body>Email: info@test.com</body></html>"
+        csv_path = os.path.join(self.test_dir, "headers.csv")
+        task_func(csv_path=csv_path, headers={'User-Agent': 'Custom-Agent'})
+        self.assertTrue(os.path.exists(csv_path))

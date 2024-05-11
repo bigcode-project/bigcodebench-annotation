@@ -1,65 +1,49 @@
 import numpy as np
-import math
+from scipy.stats import iqr
 
 def task_func(L):
     """
-    Calculate the median of all elements in a nested list 'L'.
+    Calculate the interquartile range of all elements in a nested list 'L'.
     
     Parameters:
     - L (list): The nested list.
     
     Returns:
-    - median (float): The median.
+    - iqr_value (float): The interquartile range.
     
     Requirements:
     - numpy
-    - math
+    - scipy.stats
 
     Example:
     >>> task_func([[1,2,3],[4,5,6]])
-    3.5
+    2.5
     """
-    def flatten(lst):
-        flat_list = []
-        for item in lst:
-            if isinstance(item, list):
-                flat_list.extend(flatten(item))
-            else:
-                flat_list.append(item)
-        return flat_list
-    flattened = flatten(L)
-    if not flattened:
-        raise ValueError("List is empty")
-    sorted_flattened = np.sort(flattened)
-    n = len(sorted_flattened)
-    if n % 2 == 0:
-        median_index1 = math.ceil(n / 2) - 1
-        median_index2 = median_index1 + 1
-        median = (sorted_flattened[median_index1] + sorted_flattened[median_index2]) / 2.0
-    else:
-        median_index = math.ceil(n / 2) - 1
-        median = sorted_flattened[median_index]
-    return median
+    flattened = np.array(L).flatten()
+    iqr_value = iqr(flattened)
+    return iqr_value
 
 import unittest
-import numpy as np
 class TestCases(unittest.TestCase):
+    def test_1(self):
+        result = task_func([[1,2,3],[4,5,6]])
+        expected = 2.5
+        self.assertAlmostEqual(result, expected, places=2)
+    def test_2(self):
+        result = task_func([[1,1,1],[2,2,2]])
+        expected = 1.0
+        self.assertAlmostEqual(result, expected, places=2)
+    def test_3(self):
+        result = task_func([[1,5,3]])
+        expected = 2.0
+        self.assertAlmostEqual(result, expected, places=2)
     
-    def test_median_odd_elements(self):
-        result = task_func([[1, 2, 3], [4, 5, 6], [7]])
-        self.assertEqual(result, 4.0)
-    def test_median_even_elements(self):
-        result = task_func([[1, 2, 3], [4, 5, 6]])
-        self.assertEqual(result, 3.5)
-        
-    def test_median_single_element(self):
-        result = task_func([[5]])
-        self.assertEqual(result, 5.0)
-        
-    def test_median_deep_nesting(self):
-        result = task_func([1, [2, [3, 4, [5, 6], 7], 8], 9])
-        self.assertEqual(result, 5.0)
-        
-    def test_median_empty_list(self):
-        with self.assertRaises(ValueError):
-            task_func([])
+    def test_4(self):
+        result = task_func([[1],[2],[3],[4],[5]])
+        expected = 2.0
+        self.assertAlmostEqual(result, expected, places=2)
+    
+    def test_5(self):
+        result = task_func([[1,-2,3],[-4,5,6]])
+        expected = 5.75
+        self.assertAlmostEqual(result, expected, places=2)

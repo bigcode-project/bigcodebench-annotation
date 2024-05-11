@@ -1,84 +1,76 @@
-import random
-import string
+import time
+import threading
 
-# Constants
-LETTERS = string.ascii_letters
 
-def task_func(num_words, word_length):
-    """
-    Create a list of random words of a certain length.
+def task_func(delay_time: float = 1.0, num_threads: int = 5):
+    '''
+    Introduces a delay of 'delay_time' seconds in a specified number of separate threads and 
+    returns the thread completion messages.
 
     Parameters:
-    - num_words (int): The number of words to generate.
-    - word_length (int): The length of each word.
+    - delay_time (float): Amounf of delay time in seconds. Defalut is 1.
+    - num_threads (int): Number of threads in which the delay should be introduced. Default is 5.
 
     Returns:
-    - words (list): A list of random words.
+    - list: A list of strings containing the completion messages of the threads.
+            The completion message looks as follow:
+            'Delay in thread x completed'
 
     Requirements:
-    - random
-    - string
+    - time
+    - threading
 
     Example:
-    >>> task_func(5, 3)
-    ['Ohb', 'Vrp', 'oiV', 'gRV', 'IfL']
-    """
-    if num_words < 0 or word_length < 0:
-        raise ValueError("num_words and word_length must be non-negative")
-    random.seed(42)
-    words = [''.join(random.choice(LETTERS) for _ in range(word_length)) for _ in range(num_words)]
-    return words
+    >>> task_func(0.1, 3)
+    ['Delay in thread 0 completed', 'Delay in thread 1 completed', 'Delay in thread 2 completed']
+
+    >>> task_func(1, 10)
+    ['Delay in thread 0 completed', 'Delay in thread 1 completed', 'Delay in thread 2 completed', 'Delay in thread 3 completed', 'Delay in thread 4 completed', 'Delay in thread 5 completed', 'Delay in thread 6 completed', 'Delay in thread 7 completed', 'Delay in thread 8 completed', 'Delay in thread 9 completed']
+    '''
+    results = []
+    def delay():
+        time.sleep(delay_time)
+        results.append(f'Delay in thread {threading.current_thread().name} completed')
+    for i in range(num_threads):
+        t = threading.Thread(target=delay, name=str(i))
+        t.start()
+        t.join()  # Ensure that the thread completes before moving to the next
+    return results
 
 import unittest
+from faker import Faker
 class TestCases(unittest.TestCase):
-    def test_positive_scenario(self):
-        """
-        Test with positive num_words and word_length.
-        This test case checks if the function correctly generates a list of words where each word has the specified length.
-        It ensures that the length of the returned list and the length of each word in the list are correct.
-        """
-        result = task_func(5, 3)
-        self.assertEqual(len(result), 5, "The length of the returned list is incorrect.")
-        for word in result:
-            self.assertEqual(len(word), 3, "The length of a word in the list is incorrect.")
-    
-    def test_zero_words(self):
-        """
-        Test when num_words is 0.
-        This test case checks the function's behavior when no words are requested.
-        The function should return an empty list in this scenario.
-        """
-        result = task_func(0, 3)
-        self.assertEqual(result, [], "The function should return an empty list when num_words is 0.")
-    
-    def test_zero_length(self):
-        """
-        Test when word_length is 0.
-        This test case checks the function's behavior when the requested word length is 0.
-        The function should return a list of empty strings in this scenario.
-        """
-        result = task_func(5, 0)
-        self.assertEqual(result, [''] * 5, "The function should return a list of empty strings when word_length is 0.")
-    
-    def test_negative_values(self):
-        """
-        Test with negative num_words and word_length.
-        This test case checks the function's behavior when negative values are passed as input parameters.
-        The function should raise a ValueError in this scenario.
-        """
-        with self.assertRaises(ValueError):
-            task_func(5, -3)
-        with self.assertRaises(ValueError):
-            task_func(-5, -3)
-    
-    def test_non_integer_inputs(self):
-        """
-        Test with non-integer num_words and word_length.
-        This test case checks the function's behavior when non-integer values are passed as input parameters.
-        The function should raise a TypeError in this scenario.
-        """
-        with self.assertRaises(TypeError, msg="The function should raise a TypeError for non-integer values"):
-            task_func(5.5, 3)
-        
-        with self.assertRaises(TypeError, msg="The function should raise a TypeError for non-integer values"):
-            task_func(5, "3")
+    def test_case_1(self):
+        start = time.time()
+        result = task_func()
+        end = time.time()
+        exec_time = end - start
+        self.assertAlmostEqual(exec_time, 5, places=0)
+        self.assertEqual(len(result), 5)
+    def test_case_2(self):
+        start = time.time()
+        result = task_func(0.2, 1)
+        end = time.time()
+        exec_time = end - start
+        self.assertAlmostEqual(exec_time, 0.2, places=1)
+        self.assertEqual(len(result), 1)
+    def test_case_3(self):
+        delay = 0.1
+        threads = 10
+        start = time.time()
+        result = task_func(delay, threads)
+        end = time.time()
+        exec_time = end - start
+        self.assertAlmostEqual(exec_time, delay*threads, places=0)
+        self.assertEqual(len(result), 10)
+    def test_case_4(self):
+        result = task_func(num_threads=0)
+        self.assertEqual(len(result), 0)
+    def test_case_5(self):
+        'test for exact return string'
+        fake = Faker()
+        num_threads = fake.random_int(min=1, max=20)
+        result = task_func(num_threads=num_threads)
+        self.assertEqual(len(result), num_threads)
+        for i in range(num_threads):
+            self.assertIn(f'Delay in thread {i} completed', result)

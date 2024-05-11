@@ -1,103 +1,73 @@
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
-import matplotlib.pyplot as plt
+import itertools
+import math
+from pandas import Series
 
-# Constants
-COLUMNS = ['Date', 'Value']
 
-def task_func(df, plot=False):
-    '''
-    Splits a list in the 'Value' column of a DataFrame into several columns, scales these columns using StandardScaler, 
-    and optionally returned the scaled data using a bar chart. The 'Date' column is converted to datetime and used as 
-    the index in the plot.
+def task_func(elements, subset_size, top_n=2):
+    """
+    Generate all subsets of a given size from a tuple and calculate the product of the sums of the subsets. Additionally, 
+    return the top_n sums of the subsets. If the subset size is larger than the tuple length, return 1. If the subset size is 0,
+    return 1.
 
     Parameters:
-    df (DataFrame): A pandas DataFrame with a 'Date' column and a 'Value' column where 'Value' contains lists of numbers.
-    plot (bool): If True, a bar chart of the scaled values is displayed. Defaults to False.
+    - elements (tuple): A tuple of elements to create subsets from.
+    - subset_size (int): The size of the subsets to be generated.
+    - top_n (int, Optional): The number of top subsets to return. Defaults to None.
 
     Returns:
-    DataFrame: A pandas DataFrame with the 'Date' column and additional columns for each element in the original 'Value' list,
-               where these columns contain the scaled values.
-    Axes (optional): A matplotlib Axes object containing the bar chart, returned if 'plot' is True.
+    int: The product of the sums of the subsets.
+    list: The top_n sums of the subsets as a pandas Series.
 
-    Note:
-    - This function use "Scaled Values Over Time" for the plot title.
-    - This function use "Date" and "Scaled Value" as the xlabel and ylabel respectively.
-
-    Raises:
-    - This function will raise KeyError if the DataFrame does not have the 'Date' and 'Value' columns.
 
     Requirements:
-    - pandas
-    - sklearn.preprocessing.StandardScaler
-    - matplotlib.pyplot
-
+    - itertools
+    - math
+    
     Example:
-    >>> df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=COLUMNS)
-    >>> scaled_df, ax = task_func(df, plot=True)
-    >>> print(scaled_df.shape)
-    (2, 4)
-    >>> plt.close()
-    '''
-    df['Date'] = pd.to_datetime(df['Date'])
-    df = pd.concat([df['Date'], df['Value'].apply(pd.Series)], axis=1)
-    scaler = StandardScaler()
-    df.iloc[:,1:] = scaler.fit_transform(df.iloc[:,1:])
-    if plot:
-        plt.figure()
-        ax = df.set_index('Date').plot(kind='bar', stacked=True)
-        plt.title('Scaled Values Over Time')
-        plt.xlabel('Date')
-        plt.ylabel('Scaled Value')
-        return df, ax
-    return df
+    >>> prod, sums = task_func((1, 2, 3), 2)
+    >>> prod
+    60
+    >>> list(sums)
+    [5, 4]
+    """
+    if subset_size > len(elements) or subset_size <= 0:
+        return 1, []
+    combinations = list(itertools.combinations(elements, subset_size))
+    sums = [sum(combination) for combination in combinations if len(combination) != 0]
+    product = math.prod(sums)
+    top_sums = sorted(sums, reverse=True)[:top_n]
+    top_sums = Series(top_sums)
+    return product, top_sums
 
 import unittest
-import pandas as pd
+import doctest
 class TestCases(unittest.TestCase):
-    def test_normal_case(self):
-        # Normal case with valid DataFrame
-        df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        result= task_func(df)
-        self.assertEqual(result.shape, (2, 4))  # Checking if the DataFrame has the correct shape
-        plt.close()
-    def test_varying_length_lists(self):
-        # DataFrame where 'Value' contains lists of varying lengths
-        df = pd.DataFrame([['2021-01-01', [8, 10]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        result = task_func(df)
-        self.assertEqual(result.shape, (2, 4))  # The function should handle varying lengths
-        plt.close()
-    def test_varying_length_list_2(self):
-        df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        result = task_func(df)
-        self.assertEqual(result.empty, False)  
-        plt.close()
-    def test_missing_columns(self):
-        # DataFrame missing 'Value' column
-        df = pd.DataFrame([['2021-01-01'], ['2021-01-02']], columns=['Date'])
-        with self.assertRaises(KeyError):
-            task_func(df)  # Expecting a KeyError due to missing 'Value' column
-        plt.close()
-    def test_empty(self):
-        df = pd.DataFrame()
-        with self.assertRaises(KeyError):
-            task_func(df)  
-        plt.close()
-    def test_plot_attributes(self):
-        df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        _, ax = task_func(df, True)
-        self.assertEqual(ax.get_title(), 'Scaled Values Over Time')
-        self.assertEqual(ax.get_xlabel(), 'Date')
-        self.assertEqual(ax.get_ylabel(), 'Scaled Value')
-        plt.close()
-    def test_plot_point(self):
-        df = pd.DataFrame([['2021-01-01', [8, 10, 12]], ['2021-01-02', [7, 9, 11]]], columns=['Date', 'Value'])
-        result, ax = task_func(df, True)
-        list_result = []
-        for column in result:
-            if column != "Date":
-                columnSeriesObj = result[column]
-                list_result.extend(columnSeriesObj.values)
-        bar_heights = [rect.get_height() for rect in ax.patches]
-        self.assertListEqual(bar_heights, list_result)
-        plt.close()
+    def test_case_1(self):
+        # Default values
+        result, _ = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
+        expected = 2781259372192376861719959017613164544000000000
+        self.assertEqual(result, expected)
+    def test_case_2(self):
+        # Custom tuple and subset size
+        result, sums = task_func((1, 2, 3), 2)
+        expected = 60
+        self.assertEqual(result, expected)
+        # Test the top sums
+        self.assertEqual(list(sums), [5, 4])
+        # Test the type of the top sums
+        self.assertIsInstance(sums, Series)
+    def test_case_3(self):
+        # Larger subset size than tuple length
+        result, _ = task_func((1, 2, 3), 5)
+        expected = 1  # No subset of size 5 can be formed, so the product will be 1
+        self.assertEqual(result, expected)
+    def test_case_4(self):
+        # Subset size of 0
+        result, sums = task_func((1, 2, 3), 0)
+        expected = 1  # No subset of size 0 can be formed, so the product will be 1
+        self.assertEqual(result, expected)
+        self.assertEqual(list(sums), [])
+    def test_case_5(self):
+        # Larger tuple
+        result, _ = task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), 4)
+        self.assertIsInstance(result, int)  # Ensure the result is an integer

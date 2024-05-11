@@ -1,88 +1,75 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
+from scipy.optimize import curve_fit
 
 
 def task_func(x, y, labels):
-    """ 
-    Perform Principal Component Analysis (PCA) on "x" as x-values and "y" as y-values and record the results with labels.
+    """
+    Fit an exponential curve to given data points and plot the curves with labels.
+    It fits an exponential curve of the form: f(x) = a * exp(-b * x) + c
+    to the provided x and y data points for each set of data and plots the fitted curves
+    with the corresponding labels on a single matplotlib figure.
 
     Parameters:
-    x (list): List of numpy arrays representing the x-values of the data points.
-    y (list): List of numpy arrays representing the y-values of the data points.
-    labels (list): List of strings representing the labels for the chemical compounds.
+    - x (list of np.ndarray): List of numpy arrays, each representing the x-values of the data points for a dataset.
+    - y (list of np.ndarray): List of numpy arrays, each representing the y-values of the data points for a dataset.
+    - labels (list of str): List of strings, each representing the label for a dataset.
 
     Returns:
-    fig: Matplotlib figure object.
+    - matplotlib.figure.Figure: The figure object that contains the plotted curves.
 
     Requirements:
     - numpy
-    - matplotlib.pyplot
-    - sklearn.decomposition
+    - scipy.optimize
 
     Example:
-    >>> x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
-    >>> y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
-    >>> labels = ['H₂O', 'O₂', 'CO₂']
-    >>> fig = task_func(x, y, labels)
+    >>> x_data = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
+    >>> y_data = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
+    >>> labels = ['H2O', 'O2', 'CO2']
     """
-    pca = PCA(n_components=2)
+    if not x or not y or not labels:
+        raise ValueError("Empty data lists provided.")
+    def exponential_func(x, a, b, c):
+        """Exponential function model for curve fitting."""
+        return a * np.exp(-b * x) + c
     fig, ax = plt.subplots()
     for i in range(len(x)):
-        xy = np.vstack((x[i], y[i])).T
-        xy_transformed = pca.fit_transform(xy)
-        ax.plot(xy_transformed[:, 0], xy_transformed[:, 1], label=labels[i])
+        popt, _ = curve_fit(exponential_func, x[i], y[i])
+        ax.plot(x[i], exponential_func(x[i], *popt), label=labels[i])
     ax.legend()
     return fig
 
 import unittest
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Generate sample data for testing
-        self.x_data = [
-            np.array([1, 2, 3, 4]),
-            np.array([5, 6, 7, 8]),
-            np.array([9, 10, 11, 12]),
-            np.array([13, 14, 15, 16]),
-            np.array([17, 18, 19, 20])
-        ]
-        
-        self.y_data = [
-            np.array([21, 22, 23, 24]),
-            np.array([25, 26, 27, 28]),
-            np.array([29, 30, 31, 32]),
-            np.array([33, 34, 35, 36]),
-            np.array([37, 38, 39, 40])
-        ]
-        
-        self.labels = ['H₂O', 'O₂', 'CO₂', 'N₂', 'Ar']
-    def test_case_1(self):
-        fig = task_func(self.x_data, self.y_data, self.labels)
-        # Check if returned object is a matplotlib figure
-        self.assertIsInstance(fig, plt.Figure)
-    def test_case_2(self):
-        # Testing with different data lengths
-        x_data = [np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([7, 8, 9])]
-        y_data = [np.array([10, 11, 12]), np.array([13, 14, 15]), np.array([16, 17, 18])]
-        fig = task_func(x_data, y_data, self.labels[:3])
-        self.assertIsInstance(fig, plt.Figure)
-    def test_case_3(self):
-        # Testing with data of length 2 (to avoid PCA error)
-        x_data = [np.array([1, 2]), np.array([4, 5]), np.array([7, 8])]
-        y_data = [np.array([10, 11]), np.array([13, 14]), np.array([16, 17])]
-        fig = task_func(x_data, y_data, self.labels[:3])
-        self.assertIsInstance(fig, plt.Figure)
-        
-    def test_case_4(self):
-        # Testing with longer data
-        x_data = [np.array(range(10)), np.array(range(10, 20)), np.array(range(20, 30))]
-        y_data = [np.array(range(30, 40)), np.array(range(40, 50)), np.array(range(50, 60))]
-        fig = task_func(x_data, y_data, self.labels[:3])
-        self.assertIsInstance(fig, plt.Figure)
-        
-    def test_case_5(self):
-        # Testing with random data
-        x_data = [np.random.randn(10) for _ in range(3)]
-        y_data = [np.random.randn(10) for _ in range(3)]
-        fig = task_func(x_data, y_data, self.labels[:3])
-        self.assertIsInstance(fig, plt.Figure)
+        # Example data for all tests
+        self.x = [np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([1, 3, 5])]
+        self.y = [np.array([2, 3, 5]), np.array([5, 7, 10]), np.array([2.5, 3.5, 5.5])]
+        self.labels = ["Test 1", "Test 2", "Test 3"]
+    def test_plot_labels(self):
+        """Ensure the plot includes all specified labels."""
+        fig = task_func(self.x, self.y, self.labels)
+        ax = fig.gca()
+        legend_labels = [text.get_text() for text in ax.get_legend().get_texts()]
+        self.assertListEqual(legend_labels, self.labels, "Legend labels do not match input labels.")
+    def test_curve_fit_success(self):
+        """Verify that curve_fit successfully fits the data."""
+        for x_arr, y_arr in zip(self.x, self.y):
+            with self.subTest(x=x_arr, y=y_arr):
+                popt, _ = curve_fit(lambda x, a, b, c: a * np.exp(-b * x) + c, x_arr, y_arr)
+                self.assertTrue(len(popt) == 3, "Optimal parameters not found for the exponential fit.")
+    def test_output_type(self):
+        """Check the output type to be a matplotlib figure."""
+        fig = task_func(self.x, self.y, self.labels)
+        self.assertIsInstance(fig, plt.Figure, "Output is not a matplotlib figure.")
+    def test_no_data(self):
+        """Test the function with no data provided."""
+        with self.assertRaises(ValueError, msg="Empty data lists should raise a ValueError."):
+            task_func([], [], [])
+    def test_non_numeric_data(self):
+        """Ensure non-numeric data raises a ValueError during fitting."""
+        x = [np.array(["a", "b", "c"])]
+        y = [np.array(["d", "e", "f"])]
+        labels = ["Invalid Data"]
+        with self.assertRaises(ValueError, msg="Non-numeric data should raise a ValueError."):
+            task_func(x, y, labels)

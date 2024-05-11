@@ -1,66 +1,84 @@
-import pandas as pd
-import random
+import numpy as np
+from scipy.fft import fft
+from matplotlib import pyplot as plt
 
 
-# Constants
-N_DATA_POINTS = 10000
-MIN_VALUE = 0.0
-MAX_VALUE = 10.0
-
-def task_func(n_data_points=N_DATA_POINTS):
-    '''
-    Generate a random set of floating-point numbers, truncate each value to 3 decimal places, and return them in a DataFrame.
-    The number of data points to generate can be specified. If zero, returns an empty DataFrame.
+def task_func(original):
+    """
+    Create a numeric array from the "original" list, calculate Fast Fourier Transform (FFT) and record the 
+    original and FFT data. Additionally, plot the histogram of the magnitude of the FFT data and return the
+    axes object of the plot. For an empty list, return an empty array for the FFT data and None for the 
+    axes object.
 
     Parameters:
-    n_data_points (int): Number of data points to generate. Default is 10000.
+    original (list): The original list with (str, int) tuples to be unzipped into a numpy array.
 
     Returns:
-    DataFrame: A pandas DataFrame containing one column 'Value' with the generated data. Empty if n_data_points is 0.
-
-    Note:
-    - This function use 'Value' for the column name in returned DataFrame 
-
+    np.array: A numpy array for the original data.
+    np.array: FFT data.
+    plt.Axes: The axes object of the plot.
+    
     Requirements:
-    - pandas
-    - random
+    - numpy
+    - matplotlib.pyplot
+    - scipy.fft
 
     Example:
-    >>> random.seed(0)
-    >>> data = task_func(20)
-    >>> print(data.shape)
-    (20, 1)
-    >>> MIN_VALUE <= data.iloc[0]['Value'] <= MAX_VALUE
-    True
-    '''
-    if n_data_points == 0:
-        return pd.DataFrame(columns=['Value'])
-    data = [round(random.uniform(MIN_VALUE, MAX_VALUE), 3) for _ in range(n_data_points)]
-    data_df = pd.DataFrame(data, columns=['Value'])
-    return data_df
+    >>> original = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+    >>> arr, fft_data, ax  = task_func(original)
+    >>> print(arr)
+    [1 2 3 4]
+    >>> print(fft_data)
+    [10.-0.j -2.+2.j -2.-0.j -2.-2.j]
+    """
+    arr = np.array([b for (_, b) in original])
+    if arr.size == 0:
+        fft_data = np.array([])
+        return arr, fft_data, None
+    fft_data = fft(arr)
+    _, ax = plt.subplots()
+    ax.hist(np.abs(fft_data))
+    return arr, fft_data, ax
 
 import unittest
-import pandas as pd
+import doctest
 class TestCases(unittest.TestCase):
-    def test_return_type(self):
-        random.seed(0)
-        result = task_func()
-        self.assertIsInstance(result, pd.DataFrame)
-    def test_data_points_count(self):
-        random.seed(0)
-        result = task_func()
-        self.assertEqual(len(result), 10000)
-    def test_value_range(self):
-        random.seed(0)
-        result = task_func()
-        within_range = result['Value'].apply(lambda x: 0.0 <= x <= 10.0)
-        self.assertTrue(within_range.all())
-    def test_value_truncation(self):
-        random.seed(0)
-        result = task_func()
-        correctly_truncated = result['Value'].apply(lambda x: len(str(x).split('.')[1]) <= 3 if '.' in str(x) else True)
-        self.assertTrue(correctly_truncated.all())
-    def test_empty_data_frame(self):
-        random.seed(0)
-        result = task_func(n_data_points=0)
-        self.assertTrue(result.empty)
+    def test_case_1(self):
+        original = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+        arr, fft_data, _ = task_func(original)
+        self.assertTrue(np.array_equal(arr, np.array([1, 2, 3, 4])))
+        self.assertIsInstance(fft_data, np.ndarray)
+        self.assertEqual(fft_data.shape, (4,))
+    def test_case_2(self):
+        original = [('a', i) for i in range(1, 101)]
+        arr, fft_data, ax = task_func(original)
+        self.assertTrue(np.array_equal(arr, np.array(range(1, 101))))
+        self.assertIsInstance(fft_data, np.ndarray)
+        self.assertEqual(fft_data.shape, (100,))
+        # Test that the plot is created
+        self.assertIsInstance(ax, plt.Axes)
+        # Test the axis limits
+        self.assertEqual(ax.get_xlim(), (-200.0, 5300.0))
+    def test_case_3(self):
+        original = [('a', 5) for i in range(10)]
+        arr, fft_data, _ = task_func(original)
+        self.assertTrue(np.array_equal(arr, np.array([5]*10)))
+        self.assertIsInstance(fft_data, np.ndarray)
+        self.assertEqual(fft_data.shape, (10,))
+    def test_case_4(self):
+        original = [('a', i) for i in range(10)]
+        arr, fft_data, ax = task_func(original)
+        self.assertTrue(np.array_equal(arr, np.array(range(10))))
+        self.assertIsInstance(fft_data, np.ndarray)
+        self.assertEqual(fft_data.shape, (10,))
+        # Test the plot data array
+        self.assertEqual(len(ax.get_children()), 20)
+        # Test the plot limits
+        self.assertEqual(ax.get_xlim(), (3.0, 47.0))
+    def test_case_5(self):
+        original = []
+        arr, fft_data, ax = task_func(original)
+        self.assertTrue(np.array_equal(arr, np.array([])))
+        self.assertIsInstance(fft_data, np.ndarray)
+        self.assertEqual(fft_data.shape, (0,))
+        self.assertIsNone(ax)

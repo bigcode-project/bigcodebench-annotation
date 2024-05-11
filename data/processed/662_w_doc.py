@@ -1,14 +1,11 @@
-import pandas as pd
-import seaborn as sns
 import numpy as np
-
-# Constants
-LABELS = ['H\u2082O', 'O\u2082', 'CO\u2082', 'N\u2082', 'Ar']
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
 
 
 def task_func(x, y, labels):
-    """
-    Create a heatmap using the seaborn library for "x" as x-values and "y" as y-values with labels.
+    """ 
+    Perform Principal Component Analysis (PCA) on "x" as x-values and "y" as y-values and record the results with labels.
 
     Parameters:
     x (list): List of numpy arrays representing the x-values of the data points.
@@ -16,86 +13,76 @@ def task_func(x, y, labels):
     labels (list): List of strings representing the labels for the chemical compounds.
 
     Returns:
-    ax (Axes): A seaborn heatmap object.
-    df (DataFrame): The dataframe used to create the heatmap.
+    fig: Matplotlib figure object.
 
     Requirements:
     - numpy
-    - pandas
-    - seaborn
+    - matplotlib.pyplot
+    - sklearn.decomposition
 
     Example:
     >>> x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
     >>> y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
-    >>> labels = ['H\u2082O', 'O\u2082', 'CO\u2082']
-    >>> ax = task_func(x, y, labels)
+    >>> labels = ['H₂O', 'O₂', 'CO₂']
+    >>> fig = task_func(x, y, labels)
     """
-    data = []
+    pca = PCA(n_components=2)
+    fig, ax = plt.subplots()
     for i in range(len(x)):
-        data.append(np.concatenate((x[i], y[i])))
-    df = pd.DataFrame(data, index=labels)
-    ax = sns.heatmap(df, cmap='coolwarm')
-    return ax, df
+        xy = np.vstack((x[i], y[i])).T
+        xy_transformed = pca.fit_transform(xy)
+        ax.plot(xy_transformed[:, 0], xy_transformed[:, 1], label=labels[i])
+    ax.legend()
+    return fig
 
 import unittest
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        # Generate sample data for testing
+        self.x_data = [
+            np.array([1, 2, 3, 4]),
+            np.array([5, 6, 7, 8]),
+            np.array([9, 10, 11, 12]),
+            np.array([13, 14, 15, 16]),
+            np.array([17, 18, 19, 20])
+        ]
+        
+        self.y_data = [
+            np.array([21, 22, 23, 24]),
+            np.array([25, 26, 27, 28]),
+            np.array([29, 30, 31, 32]),
+            np.array([33, 34, 35, 36]),
+            np.array([37, 38, 39, 40])
+        ]
+        
+        self.labels = ['H₂O', 'O₂', 'CO₂', 'N₂', 'Ar']
     def test_case_1(self):
-        x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
-        y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
-        labels = ['H₂O', 'O₂', 'CO₂']
-        ax, df = task_func(x, y, labels)
-        
-        # Assert the shape of the dataframe
-        self.assertEqual(df.shape, (3, 6))
-        
-        # Assert the data values of the dataframe
-        expected_data = np.array([[1,2,3,4,5,6], [4,5,6,7,8,9], [7,8,9,10,11,12]])
-        np.testing.assert_array_equal(df.values, expected_data)
+        fig = task_func(self.x_data, self.y_data, self.labels)
+        # Check if returned object is a matplotlib figure
+        self.assertIsInstance(fig, plt.Figure)
     def test_case_2(self):
-        x = [np.array([1,1]), np.array([2,2])]
-        y = [np.array([3,3]), np.array([4,4])]
-        labels = ['H₂O', 'O₂']
-        ax, df = task_func(x, y, labels)
-        
-        # Assert the shape of the dataframe
-        self.assertEqual(df.shape, (2, 4))
-        
-        # Assert the data values of the dataframe
-        expected_data = np.array([[1,1,3,3], [2,2,4,4]])
-        np.testing.assert_array_equal(df.values, expected_data)
+        # Testing with different data lengths
+        x_data = [np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([7, 8, 9])]
+        y_data = [np.array([10, 11, 12]), np.array([13, 14, 15]), np.array([16, 17, 18])]
+        fig = task_func(x_data, y_data, self.labels[:3])
+        self.assertIsInstance(fig, plt.Figure)
     def test_case_3(self):
-        x = [np.array([10])]
-        y = [np.array([20])]
-        labels = ['H₂O']
-        ax, df = task_func(x, y, labels)
+        # Testing with data of length 2 (to avoid PCA error)
+        x_data = [np.array([1, 2]), np.array([4, 5]), np.array([7, 8])]
+        y_data = [np.array([10, 11]), np.array([13, 14]), np.array([16, 17])]
+        fig = task_func(x_data, y_data, self.labels[:3])
+        self.assertIsInstance(fig, plt.Figure)
         
-        # Assert the shape of the dataframe
-        self.assertEqual(df.shape, (1, 2))
-        
-        # Assert the data values of the dataframe
-        expected_data = np.array([[10, 20]])
-        np.testing.assert_array_equal(df.values, expected_data)
     def test_case_4(self):
-        x = [np.array([5,6,7]), np.array([8,9,10]), np.array([11,12,13])]
-        y = [np.array([15,16,17]), np.array([18,19,20]), np.array([21,22,23])]
-        labels = ['A', 'B', 'C']
-        ax, df = task_func(x, y, labels)
+        # Testing with longer data
+        x_data = [np.array(range(10)), np.array(range(10, 20)), np.array(range(20, 30))]
+        y_data = [np.array(range(30, 40)), np.array(range(40, 50)), np.array(range(50, 60))]
+        fig = task_func(x_data, y_data, self.labels[:3])
+        self.assertIsInstance(fig, plt.Figure)
         
-        # Assert the shape of the dataframe
-        self.assertEqual(df.shape, (3, 6))
-        
-        # Assert the data values of the dataframe
-        expected_data = np.array([[5,6,7,15,16,17], [8,9,10,18,19,20], [11,12,13,21,22,23]])
-        np.testing.assert_array_equal(df.values, expected_data)
     def test_case_5(self):
-        x = [np.array([2,3]), np.array([5,6])]
-        y = [np.array([8,9]), np.array([11,12])]
-        labels = ['X', 'Y']
-        ax, df = task_func(x, y, labels)
-        
-        # Assert the shape of the dataframe
-        self.assertEqual(df.shape, (2, 4))
-        
-        # Assert the data values of the dataframe
-        expected_data = np.array([[2,3,8,9], [5,6,11,12]])
-        np.testing.assert_array_equal(df.values, expected_data)
+        # Testing with random data
+        x_data = [np.random.randn(10) for _ in range(3)]
+        y_data = [np.random.randn(10) for _ in range(3)]
+        fig = task_func(x_data, y_data, self.labels[:3])
+        self.assertIsInstance(fig, plt.Figure)

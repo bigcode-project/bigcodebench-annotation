@@ -1,88 +1,89 @@
 from random import randint, seed
 import matplotlib.pyplot as plt
 import pandas as pd
+import re
 
-
-# Constants (they can be overridden with default parameters)
+# Constants
 TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
 PENALTY_COST = 1000  # in dollars
 
 
-def task_func(goals, penalties, teams=TEAMS, penalty_cost=PENALTY_COST, rng_seed=None):
+def task_func(goals, penalties, rng_seed=None, teams=TEAMS):
     """
-    Generate a Dataframe to show the football match results of teams 'Team' with random goals 'Goals' and
-    penalties 'Penalty Cost', and create a bar plot of the results. Penalties are converted into fines according to the
-    penalty costs.
+    Generate and analyze a Pandas DataFrame of football match results for multiple teams,
+    incorporating random goals and penalties, then visualize the analyzed data with colomns 'Team', 'Goals',
+    and 'Penalty Cost'. Penalties are converted into fines based on a predetermined penalty cost.
 
     Parameters:
     - goals (int): The maximum number of goals a team can score in a match.
     - penalties (int): The maximum number of penalties a team can receive in a match.
-    - teams (list of str, optional): A list of team names. Default is ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'].
-    - penalty_cost (int, optional): Cost of a penalty in dollars. Default is 1000.
-    - rng_seed (int, optional): Random seed for reproducibility. Default is None.
+    - rng_seed (int, optional): Seed for the random number generator to ensure reproducibility. Defaults to None.
+    - teams (list of str, optional): List of team names to assign players
 
     Returns:
-    - DataFrame: A pandas DataFrame containing columns for teams, their goals, and penalty costs.
-    - Axes: A matplotlib Axes object representing the bar plot of the results.
+    - DataFrame: A pandas DataFrame containing teams, their goals, and penalty costs, along with the original match results.
 
     Requirements:
     - pandas
     - matplotlib.pyplot
     - random
+    - re
 
     Example:
-    >>> seed(42)  # Setting seed for reproducibility
-    >>> df, ax = task_func(5, 3, rng_seed=42)
-    >>> isinstance(df, pd.DataFrame) and 'Team' in df.columns and 'Goals' in df.columns and 'Penalty Cost' in df.columns
-    True
-    >>> all(df['Goals'] <= 5) and all(df['Penalty Cost'] <= 3000)  # Goals and penalties are within expected range
-    True
+    >>> analyzed_data = task_func(5, 3, rng_seed=42)
+    >>> print(analyzed_data[['Team', 'Goals', 'Penalty Cost']])
+         Team  Goals  Penalty Cost
+    0  Team A      5             0
+    1  Team B      0          2000
+    2  Team C      1          1000
+    3  Team D      1             0
+    4  Team E      5             0
     """
     if rng_seed is not None:
         seed(rng_seed)
-    goals = abs(goals)
-    penalties = abs(penalties)
     match_results = []
     for team in teams:
         team_goals = randint(0, goals)
         team_penalties = randint(0, penalties)
-        team_penalty_cost = penalty_cost * team_penalties
-        match_results.append([team, team_goals, team_penalty_cost])
-    results_df = pd.DataFrame(match_results, columns=['Team', 'Goals', 'Penalty Cost'])
-    ax = results_df.plot(kind='bar', x='Team', y=['Goals', 'Penalty Cost'], stacked=True)
-    plt.ylabel('Results')
-    return results_df, ax
+        penalty_cost = PENALTY_COST * team_penalties
+        result_string = f"({team_goals} goals, ${penalty_cost})"
+        match_results.append([team, result_string])
+    results_df = pd.DataFrame(match_results, columns=['Team', 'Match Result'])
+    if not results_df.empty:
+        results_df['Goals'] = results_df['Match Result'].apply(lambda x: int(re.search(r'\((\d+) goals', x).group(1)))
+        results_df['Penalty Cost'] = results_df['Match Result'].apply(lambda x: int(re.search(r'\$(\d+)', x).group(1)))
+        ax = results_df.set_index('Team')[['Goals', 'Penalty Cost']].plot(kind='bar', stacked=True)
+        plt.ylabel('Counts')
+        plt.title('Football Match Results Analysis')
+        plt.tight_layout()
+        plt.show()
+    return results_df
 
 import unittest
 # Unit Tests
 class TestCases(unittest.TestCase):
-    def test_positive_outcomes(self):
-        """Test the function with positive goals and penalties."""
-        df, _ = task_func(5, 3, rng_seed=42)
-        # Check if the DataFrame is not empty and has the correct columns
-        self.assertFalse(df.empty)
-        self.assertListEqual(list(df.columns), ['Team', 'Goals', 'Penalty Cost'])
+    def setUp(self):
+        self.expected_columns = ['Team', 'Match Result', 'Goals', 'Penalty Cost']
+    def test_dataframe_structure(self):
+        """Test if the DataFrame contains the expected structure."""
+        df = task_func(4, 2, rng_seed=1)
+        self.assertListEqual(list(df.columns), self.expected_columns)
+    def test_randomness_control(self):
+        """Test if the rng_seed parameter controls randomness."""
+        df1 = task_func(4, 2, rng_seed=42)
+        df2 = task_func(4, 2, rng_seed=42)
+        pd.testing.assert_frame_equal(df1, df2)
+    def test_positive_goals_penalties(self):
+        """Test for positive goals and penalties input."""
+        df = task_func(5, 3, rng_seed=2)
+        self.assertTrue((df['Goals'] >= 0).all() and (df['Goals'] <= 5).all())
+        self.assertTrue((df['Penalty Cost'] % PENALTY_COST == 0).all())
     def test_zero_goals_penalties(self):
-        """Test the function with zero goals and penalties."""
-        df, _ = task_func(0, 0, teams=['Team A'], rng_seed=42)
-        # Check that goals and penalty costs are 0
+        """Test for zero goals and penalties."""
+        df = task_func(0, 0, rng_seed=3)
         self.assertTrue((df['Goals'] == 0).all())
         self.assertTrue((df['Penalty Cost'] == 0).all())
-    def test_negative_input(self):
-        """Ensure negative inputs are treated as positive."""
-        df, _ = task_func(-5, -3, rng_seed=42)
-        # Check for absence of negative values in results
-        self.assertFalse((df['Goals'] < 0).any())
-        self.assertFalse((df['Penalty Cost'] < 0).any())
-    def test_single_team(self):
-        """Test with a single team to ensure correct results."""
-        df, _ = task_func(10, 5, teams=['Solo Team'], rng_seed=42)
-        # Ensure only one row exists and contains 'Solo Team'
-        self.assertEqual(len(df), 1)
-        self.assertEqual(df.iloc[0]['Team'], 'Solo Team')
-    def test_custom_penalty_cost(self):
-        """Test the function with a custom penalty cost."""
-        custom_cost = 500
-        df, _ = task_func(5, 3, penalty_cost=custom_cost, rng_seed=42)
-        # Validate that the penalty cost calculation uses the custom cost
-        self.assertTrue((df['Penalty Cost'] % custom_cost == 0).all() or (df['Penalty Cost'] == 0).all())
+    def test_no_teams(self):
+        """Test function with no teams."""
+        df = task_func(5, 3, rng_seed=4, teams=[])
+        self.assertTrue(df.empty)

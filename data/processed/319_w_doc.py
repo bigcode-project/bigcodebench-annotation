@@ -1,78 +1,73 @@
-import random
-import math
+import re
 import matplotlib.pyplot as plt
+from nltk.probability import FreqDist
 
-def task_func(points_count=1000, radius=1):
+
+def task_func(example_str, top_n=30):
     """
-    Generate a specified (i.e., points_counts) number of random points within a circle of a given radius and plot them using a scatter plot.
+    Extract all texts that are not enclosed in square brackets from the given string and plot 
+    a frequency distribution of the words. Also return the top_n most common words in the frequency distribution
+    as a dictionary.
 
     Parameters:
-    - points_count (int): The number of random points to generate. Default is 1000.
-    - radius (float): The radius of the circle within which points are generated. Default is 1.
+    - example_str (str): The input string.
+    - top_n (int, Optional): The number of most common words to display in the frequency distribution plot. Default is 30.
 
     Returns:
-    - Axes: The matplotlib Axes object representing the scatter plot.
-
-    Note:
-    - All settings of the scatter plot are the default version.
-    - The aspect ratio of the plot is set to 'equal' to maintain proportions.
+    - Axes: A matplotlib Axes object representing the frequency distribution plot.
+    - dict: A dictionary containing the top_n most common words and their frequencies.
 
     Requirements:
-    - random
-    - math
+    - re
+    - nltk.probability.FreqDist
     - matplotlib.pyplot
 
     Example:
-    >>> import matplotlib.pyplot as plt
-    >>> random.seed(0)
-    >>> ax = task_func(500, 0.5)
-    >>> len(ax.collections[0].get_offsets())
-    500
-    >>> plt.close()
+    >>> ax, top_n_words = task_func("Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003] Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]")
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    points = [(radius * math.sqrt(random.random()) * math.cos(2 * math.pi * random.random()), 
-               radius * math.sqrt(random.random()) * math.sin(2 * math.pi * random.random())) 
-              for _ in range(points_count)]
-    fig, ax = plt.subplots()
-    ax.scatter(*zip(*points))
-    ax.set_aspect('equal', adjustable='box')
-    return ax
+    text = ' '.join(re.findall('(.*?)\\[.*?\\]', example_str))
+    words = text.split()
+    fdist = FreqDist(words)
+    if top_n > len(fdist):
+        top_n = len(fdist)
+    plt.figure()
+    ax = fdist.plot(top_n, cumulative=False, show=False)
+    plt.close()
+    top_n_words = dict(fdist.most_common(top_n))
+    return ax, top_n_words
 
 import unittest
-import matplotlib.pyplot as plt
-import random 
+import doctest
 class TestCases(unittest.TestCase):
-    def test_default_parameters(self):
-        random.seed(0)
-        ax = task_func()
-        self.assertEqual(len(ax.collections[0].get_offsets()), 1000, "Default parameter points count mismatch")
-        self.assertEqual(ax.get_aspect(), 1.0, "Aspect ratio mismatch in default parameters test")
-        plt.close()
-    def test_custom_parameters(self):
-        random.seed(0)
-        ax = task_func(500, 0.5)
-        self.assertEqual(len(ax.collections[0].get_offsets()), 500, "Custom parameter points count mismatch")
-        self.assertEqual(ax.get_aspect(), 1.0, "Aspect ratio mismatch in custom parameters test")
-        plt.close()
-    def test_radius_accuracy(self):
-        random.seed(0)
-        radius = 2
-        ax = task_func(100, radius)
-        points = ax.collections[0].get_offsets()
-        for point in points[:1]:
-            self.assertTrue(math.sqrt(point[0]**2 + point[1]**2) <= radius, "Point outside specified radius")
-        plt.close()
-    def test_plot_title(self):
-        random.seed(0)
-        ax = task_func()
-        ax.set_title("Test Plot")
-        self.assertEqual(ax.get_title(), "Test Plot", "Plot title mismatch")
-        plt.close()
-    def test_axes_labels(self):
-        random.seed(0)
-        ax = task_func()
-        ax.set_xlabel("X Axis")
-        ax.set_ylabel("Y Axis")
-        self.assertEqual(ax.get_xlabel(), "X Axis", "X-axis label mismatch")
-        self.assertEqual(ax.get_ylabel(), "Y Axis", "Y-axis label mismatch")
-        plt.close()
+    def test_case_1(self):
+        example_str = "Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003] Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]"
+        ax, top_n_words = task_func(example_str)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+        # Test the number of words in the plot
+        self.assertEqual(len(ax.get_xticklabels()), 4, "The number of words in the plot is not 30.")
+        # Test the top_n_words dictionary
+        self.assertEqual(top_n_words, {'Smith': 2, 'Josie': 1, 'Mugsy': 1, 'Dog': 1}, "The top_n_words dictionary is incorrect.")
+    def test_case_2(self):
+        example_str = "Hello [1234 STREET, CITY, STATE 12345] World [5678 LANE, TOWN, PROVINCE 67890]"
+        ax, _ = task_func(example_str)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+    def test_case_3(self):
+        example_str = "[IGNORE THIS] This is a simple test string [ANOTHER IGNORE]"
+        ax, top_n_words = task_func(example_str, top_n=5)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+        # Test the histogram data
+        #self.assertEqual(len(ax.patches), 5, "The number of words in the plot is not 5.")
+        # Test the top_n_words dictionary
+        self.assertEqual(top_n_words, {'This': 1, 'is': 1, 'a': 1, 'simple': 1, 'test': 1}, "The top_n_words dictionary is incorrect.")
+    
+    def test_case_4(self):
+        example_str = "[BEGIN] Testing the function with different [MIDDLE] types of input strings [END]"
+        ax, _ = task_func(example_str)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")
+    
+    def test_case_5(self):
+        example_str = "Example without any brackets so all words should be considered."
+        ax, _ = task_func(example_str)
+        self.assertIsInstance(ax, plt.Axes, "The returned object is not of type plt.Axes.")

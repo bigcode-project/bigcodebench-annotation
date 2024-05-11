@@ -1,85 +1,82 @@
-import pandas as pd
+import numpy as np
+import math
 import matplotlib.pyplot as plt
 
-def task_func(df, dct, columns=None, plot_histograms=False):
-    '''
-    Replace values in a DataFrame with a dictionary mapping and optionally record histograms for specified columns.
-    
-    Parameters:
-    df (DataFrame): The input DataFrame.
-    dct (dict): A dictionary for replacing values in df.
-    columns (list of str, optional): List of column names to plot histograms. If None, no histograms are plotted.
-    plot_histograms (bool): If True, plots histograms for specified columns.
+
+def task_func(range_start=0, range_end=10, step=0.1):
+    """
+    Create a generator object that generates a sequence of tuples.
+    Each tuple contains x and e^x values. Plot the exponential function using these values.
 
     Returns:
-    DataFrame: The DataFrame with replaced values. The columns are in the format of 'col1', 'col2', etc.
+    tuple: 
+        - A generator object that yields tuples of (x, e^x).
+        - The plotted Axes object of the exponential function.
 
     Requirements:
-    - pandas
+    - numpy
+    - math
     - matplotlib.pyplot
-    
-    Raises:
-    - The function will raise a ValueError is input df is not a DataFrame.
-    
-    Example:
-    >>> df = pd.DataFrame({'col1': [1, 2, 3, 4], 'col2': [5, 6, 7, 8], 'col3': [9, 10, 11, 12]})
-    >>> dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j', 11: 'k', 12: 'l'}
-    >>> modified_df = task_func(df, dct)
-    >>> modified_df
-      col1 col2 col3
-    0    a    e    i
-    1    b    f    j
-    2    c    g    k
-    3    d    h    l
-    '''
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("The input df is not a DataFrame")
-    df_replaced = df.replace(dct)
-    if plot_histograms and columns:
-        for column in columns:
-            if column in df_replaced:
-                df_replaced[column].plot.hist(bins=50)
-                plt.title(column)
-    return df_replaced
 
-import pandas as pd
+    Example:
+    >>> data, ax = task_func()
+    >>> print(next(data))
+    (0.0, 1.0)
+    >>> ax.get_title()  # Returns the title of the plot
+    'Exponential Function Plot'
+    """
+    x_values = np.arange(range_start, range_end, step)
+    data = ((x, math.exp(x)) for x in x_values)
+    _, ax = plt.subplots()
+    for x, exp_x in data:
+        ax.scatter(x, exp_x, color='b')
+    ax.set_title("Exponential Function Plot")
+    ax.set_xlabel("x")
+    ax.set_ylabel("e^x")
+    data = ((x, math.exp(x)) for x in x_values)
+    return data, ax
+
 import unittest
-import matplotlib.pyplot as plt
+import doctest
+from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
-    def test_basic_functionality(self):
-        df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
-        dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
-        expected_df = pd.DataFrame({'col1': ['a', 'b'], 'col2': ['c', 'd']})
-        result_df = task_func(df, dct)
-        pd.testing.assert_frame_equal(result_df, expected_df)
-        plt.close()
-    def test_complex_dataframe(self):
-        df = pd.DataFrame({'col1': [1, 2, 3, 4], 'col2': [5, 6, 7, 8], 'col3': [9, 10, 11, 12]})
-        dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j', 11: 'k', 12: 'l'}
-        expected_df = pd.DataFrame({'col1': ['a', 'b', 'c', 'd'], 'col2': ['e', 'f', 'g', 'h'], 'col3': ['i', 'j', 'k', 'l']})
-        result_df = task_func(df, dct)
-        pd.testing.assert_frame_equal(result_df, expected_df)
-        plt.close()
-    def test_empty_dataframe(self):
-        df = pd.DataFrame()
-        dct = {1: 'a', 2: 'b'}
-        result_df = task_func(df, dct)
-        pd.testing.assert_frame_equal(result_df, df)
-        plt.close()
-    def test_columns_not_in_dataframe(self):
-        df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
-        dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
-        result_df = task_func(df, dct, columns=['col3', 'col4'], plot_histograms=True)
-        pd.testing.assert_frame_equal(result_df, df.replace(dct))
-        plt.close()
-    def test_histogram_plotting(self):
-        df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
-        dct = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
-        result_df = task_func(df, dct, columns=['col3', 'col4'], plot_histograms=True)
-        # Since actual plot inspection is not feasible, assume histograms are correctly plotted if no errors are raised
-        pd.testing.assert_frame_equal(result_df, df.replace(dct))
-        plt.close()
-    def test_case_non_df(self):
-        with self.assertRaises(ValueError):
-            task_func("non_df", {})
-        plt.close()
+    
+    def test_case_1(self):
+        data, ax = task_func()
+        # Check the first data point
+        first_point = next(data)
+        self.assertEqual(first_point, (0.0, 1.0))
+        # Check plot title and labels
+        self.assertEqual(ax.get_title(), "Exponential Function Plot")
+        self.assertEqual(ax.get_xlabel(), "x")
+        self.assertEqual(ax.get_ylabel(), "e^x")
+        # Check if ax is an instance of Axes
+        self.assertIsInstance(ax, Axes)
+    # For brevity, similar test cases will be written for test_case_2 to test_case_5
+    # These will test various attributes of the plotted data and generator object.
+    def test_case_2(self):
+        data, ax = task_func(11.4, 17.9, 0.2)
+        self.assertIsInstance(ax, Axes)
+        # Check the first data point
+        first_point = next(data)
+        self.assertEqual(first_point, (11.4, math.exp(11.4)))
+    def test_case_3(self):
+        data, ax = task_func(9.6, 15.2, 0.3)
+        self.assertIsInstance(ax, Axes)
+        # Check the last data point
+        for point in data:
+            pass
+        self.assertAlmostEqual(point[0], 15.0, places=2)
+        self.assertAlmostEqual(point[1], math.exp(15.0), places=2)
+        
+    def test_case_4(self):
+        data, ax = task_func()
+        self.assertIsInstance(ax, Axes)
+        # Check the data in the axis object
+        for point in data:
+            ax.scatter(point[0], point[1], color='r')
+        self.assertEqual(len(ax.get_children()), 210)
+        
+    def test_case_5(self):
+        data, ax = task_func(89.0, 100.0, 0.1)
+        self.assertIsInstance(ax, Axes)

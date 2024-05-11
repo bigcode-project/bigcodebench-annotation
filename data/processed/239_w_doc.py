@@ -1,86 +1,88 @@
-import matplotlib
+import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
+from scipy import stats
 
-def task_func(df):
+
+def task_func(original):
     """
-    Standardize 'Age' and 'Score' columns in a pandas DataFrame, remove duplicate entries based on 'Name', and plot a scatter plot of these standardized values.
+    Given a list of tuples, extract numeric values, compute basic statistics, and 
+    generate a histogram with an overlaid probability density function (PDF).
 
     Parameters:
-    df (pandas.DataFrame): DataFrame containing 'Name', 'Age', and 'Score' columns.
+    original (list of tuples): Input list where each tuple's second element is a numeric value.
 
     Returns:
-    pandas.DataFrame: DataFrame with standardized 'Age' and 'Score', duplicates removed.
-    matplotlib.axes.Axes: Axes object of the scatter plot.
-
-    Note:
-    - The function use "Scatter Plot of Standardized Age and Score" for the plot title.
-    - The function use "Age (standardized)" and "Score (standardized)" as the xlabel and ylabel respectively.
+    np.array: A numpy array of the extracted numeric values.
+    dict: Basic statistics for the array including mean, standard deviation, minimum, and maximum.
+    Axes: A matplotlib Axes object showing the histogram with overlaid PDF. The histogram 
+          is plotted with density set to True, alpha as 0.6, and bins set to 'auto' for automatic bin selection.
 
     Requirements:
-    - pandas
     - numpy
     - matplotlib.pyplot
-    - sklearn.preprocessing
+    - scipy.stats
 
     Example:
-    >>> import pandas as pd
-    >>> data = pd.DataFrame([{'Name': 'James', 'Age': 30, 'Score': 85},{'Name': 'James', 'Age': 35, 'Score': 90},{'Name': 'Lily', 'Age': 28, 'Score': 92},{'Name': 'Sam', 'Age': 40, 'Score': 88},{'Name': 'Nick', 'Age': 50, 'Score': 80}])
-    >>> modified_df, plot_axes = task_func(data)
-    >>> modified_df.head()
-        Name       Age     Score
-    0  James -0.797724 -0.285365
-    2   Lily -1.025645  1.312679
-    3    Sam  0.341882  0.399511
-    4   Nick  1.481487 -1.426825
+    >>> original = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+    >>> arr, stats, ax = task_func(original)
+    >>> print(arr)
+    [1 2 3 4]
+    >>> print(stats)
+    {'mean': 2.5, 'std': 1.118033988749895, 'min': 1, 'max': 4}
     """
-    df = df.drop_duplicates(subset='Name')
-    scaler = StandardScaler()
-    df[['Age', 'Score']] = scaler.fit_transform(df[['Age', 'Score']])
-    plt.figure(figsize=(8, 6))
-    plt.scatter(df['Age'], df['Score'])
-    plt.xlabel('Age (standardized)')
-    plt.ylabel('Score (standardized)')
-    plt.title('Scatter Plot of Standardized Age and Score')
-    ax = plt.gca()  # Get current axes
-    return df, ax
+    arr = np.array([b for (a, b) in original])
+    computed_stats = {
+        'mean': np.mean(arr),
+        'std': np.std(arr),
+        'min': np.min(arr),
+        'max': np.max(arr)
+    }
+    fig, ax = plt.subplots()
+    ax.hist(arr, density=True, alpha=0.6, bins='auto', label='Histogram')
+    xmin, xmax = ax.get_xlim()
+    x = np.linspace(xmin, xmax, 100)
+    p = stats.norm.pdf(x, computed_stats['mean'], computed_stats['std'])
+    ax.plot(x, p, 'k', linewidth=2, label='PDF')
+    ax.set_title('Histogram with PDF')
+    ax.legend()
+    plt.close(fig)  # Close the plot to prevent display here
+    return arr, computed_stats, ax
 
 import unittest
-import pandas as pd
-from faker import Faker
-import matplotlib
+import doctest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Using Faker to create test data
-        fake = Faker()
-        self.test_data = pd.DataFrame([{'Name': fake.name(), 'Age': fake.random_int(min=18, max=100), 'Score': fake.random_int(min=0, max=100)} for _ in range(10)])
-    def test_duplicate_removal(self):
-        df, _ = task_func(self.test_data)
-        self.assertEqual(df['Name'].nunique(), df.shape[0])
-    def test_standardization(self):
-        df, _ = task_func(self.test_data)
-        self.assertAlmostEqual(df['Age'].mean(), 0, places=1)
-        self.assertAlmostEqual(int(df['Age'].std()), 1, places=1)
-        self.assertAlmostEqual(df['Score'].mean(), 0, places=1)
-        self.assertAlmostEqual(int(df['Score'].std()), 1, places=1)
-    def test_return_types(self):
-        data = pd.DataFrame([
-            {'Name': 'James', 'Age': 30, 'Score': 85},
-            {'Name': 'James', 'Age': 35, 'Score': 90},
-            {'Name': 'Lily', 'Age': 28, 'Score': 92},
-            {'Name': 'Sam', 'Age': 40, 'Score': 88},
-            {'Name': 'Nick', 'Age': 50, 'Score': 80}
-        ])
-        df, ax = task_func(data)
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-    def test_plot_contents(self):
-        _, ax = task_func(self.test_data)
-        self.assertEqual(ax.get_title(), 'Scatter Plot of Standardized Age and Score')
-        self.assertEqual(ax.get_xlabel(), 'Age (standardized)')
-        self.assertEqual(ax.get_ylabel(), 'Score (standardized)')
-    def test_plot_data_points(self):
-        df, ax = task_func(self.test_data)
-        scatter = [child for child in ax.get_children() if isinstance(child, matplotlib.collections.PathCollection)]
-        self.assertGreater(len(scatter), 0)
-        self.assertEqual(len(scatter[0].get_offsets()), len(df))
+    def test_case_1(self):
+        original = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+        arr, stats, ax = task_func(original)
+        self.assertTrue(isinstance(arr, np.ndarray))
+        self.assertEqual(list(arr), [1, 2, 3, 4])
+        self.assertEqual(stats, {'mean': 2.5, 'std': 1.118033988749895, 'min': 1, 'max': 4})
+        self.assertTrue(ax.get_title(), 'Histogram with PDF')
+    def test_case_2(self):
+        original = [('x', 10), ('y', 20)]
+        arr, stats, ax = task_func(original)
+        self.assertTrue(isinstance(arr, np.ndarray))
+        self.assertEqual(list(arr), [10, 20])
+        self.assertEqual(stats, {'mean': 15.0, 'std': 5.0, 'min': 10, 'max': 20})
+        self.assertTrue(ax.get_title(), 'Histogram with PDF')
+    def test_case_3(self):
+        original = [('p', -5), ('q', -10), ('r', -15)]
+        arr, stats, ax = task_func(original)
+        self.assertTrue(isinstance(arr, np.ndarray))
+        self.assertEqual(list(arr), [-5, -10, -15])
+        self.assertEqual(stats, {'mean': -10.0, 'std': 4.08248290463863, 'min': -15, 'max': -5})
+        self.assertTrue(ax.get_title(), 'Histogram with PDF')
+    def test_case_4(self):
+        original = [('m', 0), ('n', 0), ('o', 0)]
+        arr, stats, ax = task_func(original)
+        self.assertTrue(isinstance(arr, np.ndarray))
+        self.assertEqual(list(arr), [0, 0, 0])
+        self.assertEqual(stats, {'mean': 0.0, 'std': 0.0, 'min': 0, 'max': 0})
+        self.assertTrue(ax.get_title(), 'Histogram with PDF')
+    def test_case_5(self):
+        original = [('u', 5.5), ('v', 6.5), ('w', 7.5)]
+        arr, stats, ax = task_func(original)
+        self.assertTrue(isinstance(arr, np.ndarray))
+        self.assertEqual(list(arr), [5.5, 6.5, 7.5])
+        self.assertEqual(stats, {'mean': 6.5, 'std': 0.816496580927726, 'min': 5.5, 'max': 7.5})
+        self.assertTrue(ax.get_title(), 'Histogram with PDF')

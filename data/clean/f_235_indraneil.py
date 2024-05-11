@@ -12,7 +12,7 @@ def f_235(data):
     data (list of tuples): A list where each tuple contains two floats representing x and y coordinates.
     
     Returns:
-    matplotlib.axes.Axes: Axes object with the scatter plot.
+    matplotlib.axes.Axes: Axes object with the scatter plot, with the x-axis labeled 'x', the y-axis labeled 'y', and the title 'Points with Max Y Point Highlighted'.
     tuple: The point with the maximum y-value.
     
     Requirements:

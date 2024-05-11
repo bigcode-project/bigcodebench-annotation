@@ -1,146 +1,64 @@
-import numpy as np
-import pandas as pd
-from datetime import datetime
+import os
+import glob
 
-# Constants
-DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
-
-def task_func(result):
+def task_func(directory_path):
     """
-    Calculate the mean, median, min, max, and standard deviation of the "from_user" values in "result" 
-    and add the current date and time in the format YYYY-mm-dd HHL:MM:SS to the summary.
-    The global constant DATE_FORMAT is used to transform the currnet date and time into this format.
-
-
+    Reverse the order of words in all the filenames of a directory, where words are separated by periods.
+    
     Parameters:
-    result (list of dict): A list of dictionaries containing the key "from_user" whose numeric values are to be analyzed.
+    - directory_path (str): The path to the directory.
 
     Returns:
-    Series: A pandas Series with the statistical summary, including 'mean', 'median', 'min', 'max', 'std', and 'current_time'.
-            If the input contains no "from_user" values all statistical values are set to np.nan
-
-    Data Structures:
-    - Uses numpy arrays for efficient statistical computations.
-
-    Raises:
-    - ValueError: If the "from_user" values are not numeric.
+    - new_filenames (list[str]): A list of new filenames after renaming.
 
     Requirements:
-    - numpy
-    - pandas
-    - datetime
+    - os
+    - glob
 
     Example:
-    >>> result = [{"hi": 7, "bye": 4, "from_user": 0}, {"from_user": 0}, {"from_user": 1}]
-    >>> stats = task_func(result)
-    >>> print(stats['mean'], stats['median'], stats['min'], stats['max'], stats['std'])
-    0.3333333333333333 0.0 0 1 0.4714045207910317
-    >>> result = [{"test": 7, "hallo": 4, "from_user": 1.3},
-    ...           {"from_user": 2},
-    ...           {"from_user": 4.6},
-    ...           {"from_user": -2.3, "b": 1},
-    ...           {"a": "test", "from_user": 12.12},
-    ...          ]
-    >>> summary = task_func(result)
+    Given filenames in directory: ["hello.world.txt", "sample.data.csv"]
+    >>> task_func('/path/to/directory')
+    ["txt.world.hello", "csv.data.sample"]
     """
-    from_user_values = np.array([d['from_user'] for d in result if 'from_user' in d])
-    if len(from_user_values) == 0:
-        summary = {
-            'mean': np.nan,
-            'median': np.nan,
-            'min': np.nan,
-            'max': np.nan,
-            'std': np.nan,
-            'current_time': datetime.now().strftime(DATE_FORMAT)
-        }
-    elif not np.issubdtype(from_user_values.dtype, np.number):
-         raise ValueError("from_user values should be numeric only.")
-    else:
-        summary = {
-            'mean': np.mean(from_user_values),
-            'median': np.median(from_user_values),
-            'min': np.min(from_user_values),
-            'max': np.max(from_user_values),
-            'std': np.std(from_user_values),
-            'current_time': datetime.now().strftime(DATE_FORMAT)
-        }
-    summary_series = pd.Series(summary)
-    return summary_series
+    new_filenames = []
+    for filename in glob.glob(os.path.join(directory_path, '*')):
+        base_name = os.path.basename(filename)
+        new_base_name = '.'.join(base_name.split('.')[::-1])
+        os.rename(filename, os.path.join(directory_path, new_base_name))
+        new_filenames.append(new_base_name)
+    return new_filenames
 
 import unittest
-import numpy as np
+import shutil
+import tempfile
 class TestCases(unittest.TestCase):
-    def test_case_non_numeric(self):
-        result = [{'from_user': 'a'}, {'from_user': 1}]
-        self.assertRaises(Exception, task_func, result)
-    def test_case_1(self):
-        result = [{"hi": 7, "bye": 4, "from_user": 0}, {"from_user": 0}, {"from_user": 1}]
-        summary = task_func(result)
-        current_time = datetime.now().strftime(DATE_FORMAT)[:-3]
-        self.assertEqual(summary['current_time'][:-3], current_time)
-        self.assertAlmostEqual(summary['mean'], 0.333333, places=5)
-        self.assertEqual(summary['median'], 0.0)
-        self.assertEqual(summary['min'], 0.0)
-        self.assertEqual(summary['max'], 1.0)
-        self.assertAlmostEqual(summary['std'], 0.471405, places=5)
-    def test_case_2(self):
-        result = [{"from_user": 1}, {"from_user": 2}, {"from_user": 3}]
-        summary = task_func(result)
-        current_time = datetime.now().strftime(DATE_FORMAT)[:-3]
-        self.assertEqual(summary['current_time'][:-3], current_time)
-        self.assertEqual(summary['mean'], 2.0)
-        self.assertEqual(summary['median'], 2.0)
-        self.assertEqual(summary['min'], 1.0)
-        self.assertEqual(summary['max'], 3.0)
-        self.assertAlmostEqual(summary['std'], 0.816497, places=5)
-    def test_case_3(self):
-        result = [{"from_user": 5}]
-        summary = task_func(result)
-        current_time = datetime.now().strftime(DATE_FORMAT)[:-3]
-        self.assertEqual(summary['current_time'][:-3], current_time)
-        self.assertEqual(summary['mean'], 5.0)
-        self.assertEqual(summary['median'], 5.0)
-        self.assertEqual(summary['min'], 5.0)
-        self.assertEqual(summary['max'], 5.0)
-        self.assertEqual(summary['std'], 0.0)
-    def test_case_4(self):
-        result = [{"hello": 2}, {"world": 3}]
-        summary = task_func(result)
-        current_time = datetime.now().strftime(DATE_FORMAT)[:-3]
-        self.assertEqual(summary['current_time'][:-3], current_time)
-        self.assertTrue(np.isnan(summary['mean']))
-        self.assertTrue(np.isnan(summary['median']))
-        self.assertTrue(np.isnan(summary['min']))
-        self.assertTrue(np.isnan(summary['max']))
-        self.assertTrue(np.isnan(summary['std']))
-    def test_case_5(self):
-        'empty list'
-        result = []
-        summary = task_func(result)
-        current_time = datetime.now().strftime(DATE_FORMAT)[:-3]
-        self.assertEqual(summary['current_time'][:-3], current_time)
-        self.assertTrue(np.isnan(summary['mean']))
-        self.assertTrue(np.isnan(summary['median']))
-        self.assertTrue(np.isnan(summary['min']))
-        self.assertTrue(np.isnan(summary['max']))
-        self.assertTrue(np.isnan(summary['std']))
     
-    
-    def test_case_6(self):
-        'float'
-        result = [{"hi": 7, "bye": 4, "from_user": 0.3},
-                  {"from_user": 0.1},
-                  {"from_user": 15.6},
-                  {"from_user": -2.3},
-                  {"from_user": 12.12},
-                  {"from_user": -25.234},
-                  {"from_user": 124.2},
-                  ]
-        summary = task_func(result)
-        current_time = datetime.now().strftime(DATE_FORMAT)[:-3]
-        self.assertEqual(summary['current_time'][:-3], current_time)
-        self.assertAlmostEqual(summary['mean'], 17.826571, places=5)
-        self.assertEqual(summary['median'], 0.3)
-        self.assertEqual(summary['min'], -25.234)
-        self.assertEqual(summary['max'], 124.2)
-        self.assertAlmostEqual(summary['std'], 45.092813, places=5)
+    def setUp(self):
+        self.test_dir = tempfile.mkdtemp()
+    def tearDown(self):
+        shutil.rmtree(self.test_dir)
+    def test_single_file(self):
+        open(os.path.join(self.test_dir, "hello.world.txt"), 'a').close()
+        new_filenames = task_func(self.test_dir)
+        self.assertEqual(new_filenames, ["txt.world.hello"])
+    def test_multiple_files(self):
+        open(os.path.join(self.test_dir, "sample.data.csv"), 'a').close()
+        open(os.path.join(self.test_dir, "test.file.name.jpg"), 'a').close()
+        new_filenames = task_func(self.test_dir)
+        expected_filenames = ["csv.data.sample", "jpg.name.file.test"]
+        self.assertCountEqual(new_filenames, expected_filenames)
+    def test_empty_directory(self):
+        new_filenames = task_func(self.test_dir)
+        self.assertEqual(new_filenames, [])
+    def test_files_without_extension(self):
+        open(os.path.join(self.test_dir, "file1"), 'a').close()
+        open(os.path.join(self.test_dir, "file2.txt"), 'a').close()
+        new_filenames = task_func(self.test_dir)
+        expected_filenames = ["file1", "txt.file2"]
+        self.assertCountEqual(new_filenames, expected_filenames)
+    def test_files_with_multiple_extensions(self):
+        open(os.path.join(self.test_dir, "file.tar.gz"), 'a').close()
+        open(os.path.join(self.test_dir, "archive.zip.001"), 'a').close()
+        new_filenames = task_func(self.test_dir)
+        expected_filenames = ["gz.tar.file", "001.zip.archive"]
+        self.assertCountEqual(new_filenames, expected_filenames)

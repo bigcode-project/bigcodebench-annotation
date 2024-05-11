@@ -1,69 +1,77 @@
-from scipy.optimize import curve_fit
-import matplotlib.pyplot as plt
+from random import shuffle
+import pandas as pd
 import numpy as np
 
+# Constants
 
-def task_func(array_length=100, noise_level=0.2):
+
+
+def task_func(l, n_groups = 5):
     """
-    Create a noisy sine wave of a specified length and adjusts a curve using curve_fit from scipy.optimize to the data.
-    
+    Given a list `l`, this function shuffles the list, constructs a dataframe using the shuffled list,
+    and then for each row in the dataframe, moves the first n_groups elements to the end of the same row.
+
     Parameters:
-    - array_length (int): Length of the sine wave array. Defaults to 100.
-    - noise_level (float): Level of noise added to the sine wave. Defaults to 0.2.
+    - l (list): A list of elements.
+    - n_groups (int): number of groups. Default value is 5.
 
     Returns:
-    - Axes object: A plot showing the noisy sine wave and its adjusted curve.
+    - DataFrame: A modified DataFrame constructed from the shuffled list.
 
     Requirements:
+    - pandas
     - numpy
-    - scipy.optimize
-    - matplotlib.pyplot
+    - random
 
     Example:
-    >>> ax = task_func(100, 0.2)
+    >>> df = task_func(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'])
+    >>> df.shape == (5, 10)
+    True
+    >>> set(df.iloc[0]) == set(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'])
+    True
     """
-    x = np.linspace(0, 4*np.pi, array_length)
-    y = np.sin(x) + noise_level * np.random.rand(array_length)
-    def func(x, a, b):
-        return a * np.sin(b * x)
-    popt, pcov = curve_fit(func, x, y, p0=[1, 1])
-    fig, ax = plt.subplots()
-    ax.plot(x, y, 'b-', label='data')
-    ax.plot(x, func(x, *popt), 'r-', label='fit: a=%5.3f, b=%5.3f' % tuple(popt))
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.legend()
-    return ax
+    if not l:
+        return pd.DataFrame()
+    shuffle(l)
+    df = pd.DataFrame([l for _ in range(n_groups)])
+    df = df.apply(lambda row: np.roll(row, -n_groups), axis=1, result_type='expand')
+    return df
 
 import unittest
+ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+N_GROUPS = 5
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test with default parameters
-        ax = task_func()
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines), 2)
-        self.assertEqual(ax.get_xlabel(), 'x')
-        self.assertEqual(ax.get_ylabel(), 'y')
-        self.assertTrue(ax.get_legend() is not None)
-    def test_case_4(self):
-        # Test with custom array_length and noise_level
-        ax = task_func(array_length=150, noise_level=0.1)
-        self.assertIsInstance(ax, plt.Axes)
-        x_data, y_data = ax.lines[0].get_data()
-        self.assertEqual(len(x_data), 150)
-        self.assertTrue(np.max(np.abs(np.diff(y_data))) <= 0.1 + 1)  # considering max amplitude of sine wave
-    def test_case_5(self):
-        # Test with very high noise_level
-        ax = task_func(noise_level=2.0)
-        self.assertIsInstance(ax, plt.Axes)
-        _, y_data = ax.lines[0].get_data()
-        self.assertTrue(np.max(np.abs(np.diff(y_data))) <= 2.0 + 1)  # considering max amplitude of sine wave
-    def test_varying_noise_levels(self):
-        """Test the function with different noise levels."""
-        for noise in [0, 0.1, 0.5]:
-            ax = task_func(noise_level=noise)
-            self.assertIsInstance(ax, plt.Axes)
-    def test_plot_outputs(self):
-        """Check the output to confirm plot was created."""
-        ax = task_func()
-        self.assertTrue(hasattr(ax, 'figure'), "Plot does not have associated figure attribute")
+    def test_with_predefined_elements(self):
+        """Test function with the predefined ELEMENTS list."""
+        df = task_func(ELEMENTS.copy())  # Use a copy to prevent modification of the original list
+        self.assertEqual(df.shape, (N_GROUPS, len(ELEMENTS)))
+        # Ensure all original elements are present in each row
+        for row in df.itertuples(index=False):
+            self.assertTrue(set(ELEMENTS) == set(row))
+    def test_empty_list(self):
+        """Test function with an empty list."""
+        df = task_func([])
+        self.assertTrue(df.empty)
+    def test_single_element_list(self):
+        """Test function with a single-element list."""
+        single_element_list = ['X']
+        df = task_func(single_element_list)
+        self.assertEqual(df.shape, (N_GROUPS, 1))
+        # Ensure the single element is present in each row
+        for row in df.itertuples(index=False):
+            self.assertTrue(all([elem == 'X' for elem in row]))
+    def test_varying_data_types(self):
+        """Test function with a list containing varying data types."""
+        mixed_list = ['A', 1, 3.14, True, None]
+        df = task_func(mixed_list.copy())  # Use a copy to prevent modification of the original list
+        self.assertEqual(df.shape, (N_GROUPS, len(mixed_list)))
+        # Ensure all original elements are present in each row
+        for row in df.itertuples(index=False):
+            self.assertTrue(set(mixed_list) == set(row))
+    def test_shuffle_and_roll_operation(self):
+        """Test to ensure shuffle and roll operations change the list order."""
+        df_initial = pd.DataFrame([ELEMENTS for _ in range(N_GROUPS)])
+        df_modified = task_func(ELEMENTS.copy())
+        # Compare if any row differs from the initial order
+        diff = (df_initial != df_modified).any(axis=1).any()  # True if any row differs
+        self.assertTrue(diff, "Shuffled DataFrame rows should differ from initial order")

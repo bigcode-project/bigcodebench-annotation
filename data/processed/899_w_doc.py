@@ -1,58 +1,54 @@
-from collections import Counter
+import numpy as np
 import random
 
-LETTERS = ['a', 'b', 'c', 'd', 'e']
-
-def task_func(count, seed=0):
+def task_func(length=10000, seed=0):
     """
-    Generate a specific number of random letter pairs, each from a predefined list, and analyze the frequency of each pair.
+    Generates a random walk of a specified length. A random walk is a path that consists of a series of random steps
+    on some mathematical space. In this case, the steps are either +1 or -1, chosen with equal probability.
 
     Parameters:
-    - count (int): The number of letter pairs to generate.
-    - seed (int, optional): Seed for the random number generator to ensure reproducibility. Defaults to None.
-
-    Returns:
-    - Counter: A Counter object representing the frequency of each generated letter pair.
-
+    - length (int): The number of steps in the random walk. Must be a non-negative integer. Default is 10000.
+    - seed (int, optional): An optional seed value to initialize the random number generator. Use this for reproducible results.
+    
     Requirements:
-    - collections.Counter
+    - numpy
     - random
+    
+    Returns:
+    - np.array: A numpy array representing the positions of the walk at each step. Starts at 0.
 
-    Examples:
-    >>> task_func(5, seed=42)
-    Counter({('d', 'a'): 1, ('b', 'b'): 1, ('d', 'd'): 1, ('e', 'a'): 1, ('c', 'a'): 1})
-    >>> task_func(0, seed=42)
-    Counter()
+    Raises:
+    - ValueError: If `length` is negative.
+    
+    Example:
+    >>> random.seed(0)     # For reproducibility in doctest
+    >>> walk = task_func(5)
+    >>> walk.tolist()
+    [0, 1, 2, 1, 0, 1]
     """
+    if length < 0:
+        raise ValueError("length must be a non-negative integer")
     random.seed(seed)
-    pairs = [tuple(random.choices(LETTERS, k=2)) for _ in range(count)]
-    pair_frequency = Counter(pairs)
-    return pair_frequency
+    steps = [1 if random.random() > 0.5 else -1 for _ in range(length)]
+    walk = np.cumsum([0] + steps)  # Starts at 0
+    return walk
 
 import unittest
-from collections import Counter
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Initialize random seed for reproducibility in tests
-        random.seed(42)
-    def test_case_1(self):
-        # Test with count = 5
-        result = task_func(5, seed=42)
-        self.assertIsInstance(result, Counter)
-        self.assertEqual(result, Counter({('d', 'a'): 1, ('b', 'b'): 1, ('d', 'd'): 1, ('e', 'a'): 1, ('c', 'a'): 1}))
-    def test_case_2(self):
-        # Test with count = 0 (no pairs)
-        result = task_func(0, seed=4)
-        self.assertEqual(result, Counter())
-    def test_case_3(self):
-        # Test with count = 100 (larger number)
-        result = task_func(100, seed=2)
-        self.assertEqual(sum(result.values()), 100)
-    def test_case_4(self):
-        # Test with count = 10 and check if all pairs have letters from the defined LETTERS
-        result = task_func(10, seed=0)
-        self.assertEqual(result, Counter({('c', 'c'): 2, ('d', 'b'): 2, ('e', 'e'): 2, ('e', 'd'): 1, ('c', 'b'): 1, ('e', 'c'): 1, ('b', 'd'): 1}))
-    def test_case_5(self):
-        # Test with count = 5 and check if the total counts match the input count
-        result = task_func(5, seed=1)
-        self.assertEqual(result, Counter({('a', 'e'): 1, ('d', 'b'): 1, ('c', 'c'): 1, ('d', 'd'): 1, ('a', 'a'): 1}))
+        random.seed(42)  # Setting seed for reproducibility
+    def test_default_length(self):
+        walk = task_func(seed=42)
+        self.assertEqual(len(walk), 10001)  # Includes starting point
+    def test_custom_length(self):
+        walk = task_func(5000, seed=42)
+        self.assertEqual(len(walk), 5001)  # Includes starting point
+    def test_first_step_zero(self):
+        walk = task_func(1, seed=42)
+        self.assertEqual(walk[0], 0)  # First position should be 0
+    def test_negative_length(self):
+        with self.assertRaises(ValueError):
+            task_func(-1)
+    def test_output_type(self):
+        walk = task_func(5, seed=42)
+        self.assertEqual(walk.tolist(), [0, 1, 0, -1, -2, -1])

@@ -1,70 +1,78 @@
-import numpy as np
-import itertools
-import json
+import pandas as pd
+import matplotlib.pyplot as plt
 
-
-def task_func(data_list, json_file_name="mean_values.json"):
+def task_func(data):
     """
-    Calculate the mean of the numeric values for each position in the provided data list 
-    and return the results. Optionally, the results can be exported to a specified JSON file.
-    
-    Parameters:
-    - data_list (list of tuples): List of data tuples where each tuple contains a string followed by numeric values.
-    - json_file_name (str, optional): Name of the JSON file to export the results. Defaults to 'mean_values.json'.
+    Draw a pie chart that shows the job distribution in the given data and return the plot object.
 
-    Requirements:
-    - numpy
-    - itertools
-    - json
+    Parameters:
+    data (DataFrame): A pandas DataFrame where each row represents an individual's data, 
+                      with columns 'Name' (str), 'Date' (str in format 'dd/mm/yyyy'), and 'Job' (str).
 
     Returns:
-    - dict: A dictionary with keys in the format 'Position {i}' and values being the mean of the numeric values 
-            at position i in the provided data list.
+    matplotlib.figure.Figure: The Figure object containing the pie chart.
+
+    Raises:
+    - The function will raise ValueError if the input data is not a DataFrame.
+
+    Requirements:
+    - matplotlib.pyplot
+    - pandas
 
     Example:
-    >>> import tempfile
-    >>> json_file = tempfile.NamedTemporaryFile(delete=False)
-    >>> task_func([('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)], json_file.name)
-    {'Position 1': 3.0, 'Position 2': 4.0}
+    >>> data = pd.DataFrame({'Name': ['John', 'Jane', 'Joe'],
+    ...                      'Date': ['01/03/2012', '02/05/2013', '03/08/2014'],
+    ...                      'Job': ['Engineer', 'Doctor', 'Lawyer']})
+    >>> fig = task_func(data)
+    >>> type(fig)
+    <class 'matplotlib.figure.Figure'>
+    >>> len(fig.axes[0].patches) #check slices from pie chart
+    3
+    >>> plt.close()
     """
-    unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
-    mean_values = [np.nanmean(column) for column in unzipped_data[1:]]
-    results = {'Position {}'.format(i+1): mean_value for i, mean_value in enumerate(mean_values)}
-    with open(json_file_name, 'w') as f:
-        json.dump(results, f)
-    return results
+    if not isinstance(data, pd.DataFrame):
+        raise ValueError("Input df is not a DataFrame.")
+    job_count = data['Job'].value_counts()
+    labels = job_count.index.tolist()
+    sizes = job_count.values.tolist()
+    colors = [plt.cm.Spectral(i/float(len(labels))) for i in range(len(labels))]
+    fig, ax = plt.subplots()
+    ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+    ax.axis('equal')
+    return fig
 
 import unittest
-import doctest
-import tempfile
+import matplotlib.pyplot as plt
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.json_file = tempfile.NamedTemporaryFile(delete=False)
-    def tearDown(self):
-        self.json_file.close()
-    def test_case_1(self):
-        data_list = [('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)]
-        expected_output = {'Position 1': 3.0, 'Position 2': 4.0}
-        self.assertEqual(task_func(data_list, self.json_file.name), expected_output)
-    def test_case_2(self):
-        data_list = [('a', 10, 20), ('b', 20, 30), ('c', 30, 40)]
-        expected_output = {'Position 1': 20.0, 'Position 2': 30.0}
-        self.assertEqual(task_func(data_list, self.json_file.name), expected_output)
-    def test_case_3(self):
-        data_list = [('a', 5), ('b', 10), ('c', 15)]
-        expected_output = {'Position 1': 10.0}
-        self.assertEqual(task_func(data_list, self.json_file.name), expected_output)
-    def test_case_4(self):
-        data_list = [('a', 1, 2, 3), ('b', 4, 5, 6), ('c', 7, 8, 9)]
-        expected_output = {'Position 1': 4.0, 'Position 2': 5.0, 'Position 3': 6.0}
-        self.assertEqual(task_func(data_list, self.json_file.name), expected_output)
-        
-    def test_case_5(self):
-        # Test with JSON file export
-        data_list = [('a', 1, 2), ('b', 2, 3), ('c', 3, 4)]
-        expected_output = {'Position 1': 2.0, 'Position 2': 3.0}
-        result = task_func(data_list, json_file_name=self.json_file.name)
-        self.assertEqual(result, expected_output)
-        with open(self.json_file.name, "r") as f:
-            json_output = json.load(f)
-        self.assertEqual(json_output, expected_output)
+    def test_empty_data(self):
+        data = pd.DataFrame(columns=['Name', 'Date', 'Job'])
+        fig = task_func(data)
+        self.assertIsInstance(fig, plt.Figure)
+        plt.close()
+    def test_single_job(self):
+        data = pd.DataFrame({'Name': ['John'], 'Date': ['01/03/2012'], 'Job': ['Engineer']})
+        fig = task_func(data)
+        self.assertIsInstance(fig, plt.Figure)
+        # Check pie sizes
+        sizes = fig.axes[0].patches
+        self.assertEqual(len(sizes), 1)  # There should be only one slice
+        plt.close()
+    def test_multiple_jobs(self):
+        data = pd.DataFrame({'Name': ['John', 'Jane'], 'Date': ['01/03/2012', '02/05/2013'], 'Job': ['Engineer', 'Doctor']})
+        fig = task_func(data)
+        self.assertIsInstance(fig, plt.Figure)
+        # Check pie sizes
+        sizes = fig.axes[0].patches
+        self.assertEqual(len(sizes), 2)  # There should be two slices
+        plt.close()
+    def test_repeated_jobs(self):
+        data = pd.DataFrame({'Name': ['John', 'Jane', 'Joe'], 'Date': ['01/03/2012', '02/05/2013', '03/08/2014'], 'Job': ['Engineer', 'Engineer', 'Lawyer']})
+        fig = task_func(data)
+        self.assertIsInstance(fig, plt.Figure)
+        plt.close()
+    def test_large_dataset(self):
+        data = pd.DataFrame({'Name': ['Person' + str(i) for i in range(100)], 'Date': ['01/01/2020' for _ in range(100)], 'Job': ['Job' + str(i % 3) for i in range(100)]})
+        fig = task_func(data)
+        self.assertIsInstance(fig, plt.Figure)
+        plt.close()

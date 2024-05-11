@@ -1,79 +1,87 @@
-import pandas as pd
-import numpy as np
+from geopy.distance import geodesic
 import folium
 
-def task_func(dic={'Lon': (-180, 180), 'Lat': (-90, 90)}, cities=['New York', 'London', 'Beijing', 'Tokyo', 'Sydney']):
+def task_func(dic):
     """
-    Create a map with markers for a list of cities, where the coordinates are randomly generated within given ranges.
+    Generates a Folium map with markers for specified locations and calculates the geodesic
+    distances between each pair of locations.
 
     Parameters:
-    dic (dict): Dictionary with 'Lon' and 'Lat' keys, each a tuple (min, max) for coordinate range. 
-                Default: {'Lon': (-180, 180), 'Lat': (-90, 90)}
-    cities (list): List of city names. Default: ['New York', 'London', 'Beijing', 'Tokyo', 'Sydney']
+        dic (dict): A dictionary with location names as keys and their latitudes and longitudes
+                    as values (e.g., {'Location': {'Lat': latitude, 'Lon': longitude}}).
 
     Returns:
-    tuple: A tuple containing (folium.Map, pandas.DataFrame).
-           The DataFrame contains 'City', 'Longitude', and 'Latitude' columns.
+        tuple: A tuple containing a Folium map object and a dictionary with pairs of location
+               names as keys and their distances in kilometers as values.
 
     Raises:
-    ValueError: If 'Lon' or 'Lat' keys are missing in the dictionary, or if their values are not tuples.
+        ValueError: If the input dictionary is empty.
 
     Requirements:
-    - pandas
-    - numpy
+    - geopy.distance.geodesic
     - folium
 
-    Example:
-    >>> dic = {'Lon': (-180, 180), 'Lat': (-90, 90)}
-    >>> map_obj, city_data = task_func(dic)
+    Examples:
+    >>> result = task_func({'Place1': {'Lat': 0, 'Lon': 0}, 'Place2': {'Lat': 0, 'Lon': 1}})
+    >>> isinstance(result, tuple) and len(result) == 2
+    True
+    >>> isinstance(result[0], folium.folium.Map) and isinstance(result[1], dict)
+    True
     """
-    if 'Lon' not in dic or 'Lat' not in dic or not isinstance(dic['Lon'], tuple) or not isinstance(dic['Lat'], tuple):
-        raise ValueError("Dictionary must contain 'Lon' and 'Lat' keys with tuple values.")
-    lon_min, lon_max = dic['Lon']
-    lat_min, lat_max = dic['Lat']
-    data = {'City': [], 'Longitude': [], 'Latitude': []}
-    for city in cities:
-        data['City'].append(city)
-        data['Longitude'].append(np.random.uniform(lon_min, lon_max))
-        data['Latitude'].append(np.random.uniform(lat_min, lat_max))
-    df = pd.DataFrame(data)
-    m = folium.Map(location=[0, 0], zoom_start=2)
-    for _, row in df.iterrows():
-        folium.Marker([row['Latitude'], row['Longitude']], popup=row['City']).add_to(m)
-    return m, df
+    if not dic:
+        raise ValueError("Input dictionary is empty.")
+    locations = [(k, v['Lat'], v['Lon']) for k, v in dic.items()]
+    distances = {}
+    folium_map = folium.Map(location=[locations[0][1], locations[0][2]], zoom_start=4)
+    for i in range(len(locations)):
+        folium.Marker([locations[i][1], locations[i][2]], popup=locations[i][0]).add_to(folium_map)
+        for j in range(i + 1, len(locations)):
+            distance = geodesic((locations[i][1], locations[i][2]), (locations[j][1], locations[j][2])).kilometers
+            distances[(locations[i][0], locations[j][0])] = distance
+    return folium_map, distances
 
 import unittest
-import numpy as np
-import pandas as pd
-import folium
+from unittest.mock import patch
+import folium  # Assuming the function task_func and folium are imported or defined appropriately.
 class TestCases(unittest.TestCase):
-    def test_default_parameters(self):
-        np.random.seed(42)
-        map_obj, city_data = task_func()
-        self.assertEqual(len(city_data), 5)  # Default 5 cities
-        self.assertIsInstance(city_data, pd.DataFrame)
-        self.assertIn('New York', city_data['City'].values)
-        
-        df_list = city_data.apply(lambda row: ','.join(row.values.astype(str)), axis=1).tolist()
-        with open('df_contents.txt', 'w') as file:
-            file.write(str(df_list))
-            
-        expect = ['New York,-45.1655572149495,81.12857515378491', 'London,83.51781905210584,17.758527155466595', 'Beijing,-123.83328944072285,-61.92098633948352', 'Tokyo,-159.0898996194482,65.91170623948832', 'Sydney,36.40140422755516,37.45306400328819']
-        
-        self.assertEqual(df_list, expect, "DataFrame contents should match the expected output")
-    def test_custom_cities(self):
-        custom_cities = ['Paris', 'Berlin']
-        _, city_data = task_func(cities=custom_cities)
-        self.assertEqual(len(city_data), 2)
-        self.assertTrue(all(city in city_data['City'].values for city in custom_cities))
-    def test_invalid_dic(self):
+    def test_return_type(self):
+        """Test that the function returns a tuple with a map and a dictionary."""
+        result = task_func({'Loc1': {'Lat': 0, 'Lon': 0}, 'Loc2': {'Lat': 1, 'Lon': 1}})
+        self.assertIsInstance(result, tuple)
+        self.assertIsInstance(result[0], folium.folium.Map)
+        self.assertIsInstance(result[1], dict)
+    def test_distances_calculation(self):
+        """Test the accuracy of the distance calculation. Assumes the distance is reasonable for nearby points."""
+        _, distances = task_func({'Loc1': {'Lat': 0, 'Lon': 0}, 'Loc2': {'Lat': 0, 'Lon': 1}})
+        self.assertTrue(0 < distances[('Loc1', 'Loc2')] < 200)  # Rough check for distance in kilometers
+    def test_multiple_locations(self):
+        """Test functionality with multiple locations."""
+        _, distances = task_func({'Loc1': {'Lat': 0, 'Lon': 0}, 'Loc2': {'Lat': 0, 'Lon': 1}, 'Loc3': {'Lat': 1, 'Lon': 1}})
+        self.assertEqual(len(distances), 3)  # Expecting 3 pairs of locations
+    def test_marker_addition(self):
+        """Test that markers are correctly added to the map. Assumes 1 TileLayer present."""
+        folium_map, _ = task_func({'Loc1': {'Lat': 0, 'Lon': 0}})
+        self.assertEqual(len(folium_map._children), 2)  # One for TileLayer and one for Marker
+    @patch('geopy.distance.geodesic')
+    def test_distance_dict_structure(self, mock_geodesic):
+        """Ensure the distance dictionary has the correct key-value structure."""
+        mock_geodesic.return_value.kilometers = 100  # Mock distance as 100 km
+        _, distances = task_func({'Loc1': {'Lat': 0, 'Lon': 0}, 'Loc2': {'Lat': 0, 'Lon': 1}})
+        self.assertTrue(all(isinstance(key, tuple) and isinstance(value, float) for key, value in distances.items()))
+    def test_empty_input(self):
+        """Test function behavior with an empty dictionary input raises ValueError."""
         with self.assertRaises(ValueError):
-            task_func(dic={'Lon': 'invalid', 'Lat': (-90, 90)})
-    def test_coordinate_ranges(self):
-        _, city_data = task_func(dic={'Lon': (0, 10), 'Lat': (0, 10)})
-        self.assertTrue(all(0 <= lon <= 10 for lon in city_data['Longitude']))
-        self.assertTrue(all(0 <= lat <= 10 for lat in city_data['Latitude']))
-    def test_return_types(self):
-        map_obj, city_data = task_func()
-        self.assertIsInstance(map_obj, folium.Map)
-        self.assertIsInstance(city_data, pd.DataFrame)
+            task_func({})
+    def test_single_location(self):
+        """Test handling of a single location input."""
+        folium_map, distances = task_func({'Loc1': {'Lat': 0, 'Lon': 0}})
+        self.assertEqual(len(distances), 0)  # No distances calculated
+        self.assertEqual(len(folium_map._children), 2)  # One for TileLayer and one for Marker
+    def test_negative_lat_lon(self):
+        """Test handling of negative latitude and longitude values."""
+        _, distances = task_func({'Loc1': {'Lat': -34, 'Lon': -58}, 'Loc2': {'Lat': -33, 'Lon': -70}})
+        self.assertTrue(all(value >= 0 for value in distances.values()))  # Distance should be positive
+    def test_large_distance_calculation(self):
+        """Test accuracy for large distances, e.g., antipodal points."""
+        _, distances = task_func({'Loc1': {'Lat': 0, 'Lon': 0}, 'Loc2': {'Lat': 0, 'Lon': 180}})
+        self.assertTrue(distances[('Loc1', 'Loc2')] > 10000)  # Expecting a large distance

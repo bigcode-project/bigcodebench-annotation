@@ -1,90 +1,110 @@
-import string
-import matplotlib.pyplot as plt
+import pickle
+import os
 
 
-def task_func(s):
+def task_func(df, file_name="save.pkl"):
     """
-    Calculate the frequency of each letter in a string and return a bar chart of frequencies.
-    Results are case-insensitive. If non-string input is provided, function will throw an error.
+    Save the provided Pandas DataFrame "df" in a pickle file with the given name, read it
+    back for validation, and delete the intermediate file.
 
     Parameters:
-    s (str): The string to calculate letter frequencies.
+    df (DataFrame): The pandas DataFrame to be saved.
+    file_name (str, optional): Name of the file where the DataFrame will be saved. Defaults to 'save.pkl'.
 
     Returns:
-    tuple: A tuple containing:
-        - dict: A dictionary with the frequency of each letter.
-        - Axes: The bar subplot of 'Letter Frequencies' with 'Letters' on the x-axis and 'Frequency'
-                on the y-axis.
+    loaded_df (pd.DataFrame): The loaded DataFrame from the specified file.
 
     Requirements:
-    - string
-    - matplotlib.pyplot
+    - pickle
+    - os
 
     Example:
-    >>> s = 'This is a test string.'
-    >>> freqs, ax = task_func(s)
-    >>> freqs
-    {'a': 1, 'b': 0, 'c': 0, 'd': 0, 'e': 1, 'f': 0, 'g': 1, 'h': 1, 'i': 3, 'j': 0, 'k': 0, 'l': 0, 'm': 0, 'n': 1, 'o': 0, 'p': 0, 'q': 0, 'r': 1, 's': 4, 't': 4, 'u': 0, 'v': 0, 'w': 0, 'x': 0, 'y': 0, 'z': 0}
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> np.random.seed(0)
+    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
+    >>> loaded_df = task_func(df, 'test_file.pkl')
+    >>> assert df.equals(loaded_df)
+    >>> type(df), type(loaded_df)
+    (<class 'pandas.core.frame.DataFrame'>, <class 'pandas.core.frame.DataFrame'>)
+    >>> df.head(2)
+        A   B   C   D
+    0  44  47  64  67
+    1  67   9  83  21
     """
-    if not isinstance(s, str):
-        raise TypeError("Expected string input")
-    LETTERS = string.ascii_lowercase
-    s = s.lower()
-    letter_counts = {letter: s.count(letter) for letter in LETTERS}
-    fig, ax = plt.subplots()
-    ax.bar(letter_counts.keys(), letter_counts.values())
-    ax.set_xlabel("Letters")
-    ax.set_ylabel("Frequency")
-    ax.set_title("Letter Frequencies")
-    return letter_counts, ax
+    with open(file_name, "wb") as file:
+        pickle.dump(df, file)
+    with open(file_name, "rb") as file:
+        loaded_df = pickle.load(file)
+    os.remove(file_name)
+    return loaded_df
 
 import unittest
-import string
+import os
+import pandas as pd
+import numpy as np
+import tempfile
+from datetime import datetime
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test with a simple sentence
-        s = "This is a test string."
-        expected_output = {
-            letter: s.lower().count(letter) for letter in string.ascii_lowercase
-        }
-        result, ax = task_func(s)
-        self.assertEqual(result, expected_output)
-        self.assertEqual(ax.get_title(), "Letter Frequencies")
-        self.assertEqual(ax.get_xlabel(), "Letters")
-        self.assertEqual(ax.get_ylabel(), "Frequency")
-    def test_case_2(self):
-        # Test with a string having all alphabets
-        s = "abcdefghijklmnopqrstuvwxyz"
-        expected_output = {letter: 1 for letter in string.ascii_lowercase}
-        result, ax = task_func(s)
-        self.assertEqual(result, expected_output)
-        self.assertEqual(ax.get_title(), "Letter Frequencies")
-        self.assertEqual(ax.get_xlabel(), "Letters")
-        self.assertEqual(ax.get_ylabel(), "Frequency")
-    def test_case_3(self):
-        # Test with a string having no alphabets
-        s = "1234567890!@#$%^&*()"
-        expected_output = {letter: 0 for letter in string.ascii_lowercase}
-        result, ax = task_func(s)
-        self.assertEqual(result, expected_output)
-        self.assertEqual(ax.get_title(), "Letter Frequencies")
-        self.assertEqual(ax.get_xlabel(), "Letters")
-        self.assertEqual(ax.get_ylabel(), "Frequency")
-    def test_case_4(self):
-        # Test with an empty string
-        s = ""
-        expected_output = {letter: 0 for letter in string.ascii_lowercase}
-        result, ax = task_func(s)
-        self.assertEqual(result, expected_output)
-        self.assertEqual(ax.get_title(), "Letter Frequencies")
-        self.assertEqual(ax.get_xlabel(), "Letters")
-        self.assertEqual(ax.get_ylabel(), "Frequency")
-    def test_case_5(self):
-        # Test error handling
-        for invalid in [123, []]:
-            with self.assertRaises(Exception):
-                task_func(invalid)
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
     def tearDown(self):
-        plt.close("all")
+        self.temp_dir.cleanup()
+    def test_case_1(self):
+        # Test with random integers
+        df = pd.DataFrame(
+            np.random.randint(0, 100, size=(100, 4)), columns=list("ABCD")
+        )
+        file_path = os.path.join(self.temp_dir.name, "test.pkl")
+        loaded_df = task_func(df, file_path)
+        self.assertTrue(df.equals(loaded_df))
+        self.assertFalse(os.path.exists(file_path))
+    def test_case_2(self):
+        # Test with floats
+        df = pd.DataFrame(np.random.rand(50, 3), columns=list("XYZ"))
+        file_path = os.path.join(self.temp_dir.name, "floats.pkl")
+        loaded_df = task_func(df, file_path)
+        self.assertTrue(df.equals(loaded_df))
+        self.assertFalse(os.path.exists(file_path))
+    def test_case_3(self):
+        # Test with strings
+        df = pd.DataFrame({"A": ["foo", "bar", "baz"], "B": ["qux", "quux", "corge"]})
+        file_path = os.path.join(self.temp_dir.name, "strings.pkl")
+        loaded_df = task_func(df, file_path)
+        self.assertTrue(df.equals(loaded_df))
+        self.assertFalse(os.path.exists(file_path))
+    def test_case_4(self):
+        # Test with empty dataframe
+        df = pd.DataFrame()
+        file_path = os.path.join(self.temp_dir.name, "empty.pkl")
+        loaded_df = task_func(df, file_path)
+        self.assertTrue(df.equals(loaded_df))
+        self.assertFalse(os.path.exists(file_path))
+    def test_case_5(self):
+        # Test with datetime
+        df = pd.DataFrame(
+            {"Date": [datetime(2020, 1, 1), datetime(2020, 1, 2)], "Value": [10, 20]}
+        )
+        file_path = os.path.join(self.temp_dir.name, "datetime.pkl")
+        loaded_df = task_func(df, file_path)
+        self.assertTrue(df.equals(loaded_df))
+        self.assertFalse(os.path.exists(file_path))
+    def test_case_6(self):
+        # Test larger dataframe
+        df = pd.DataFrame(
+            np.random.randint(0, 100, size=(10000, 10)),
+            columns=[f"Col{i}" for i in range(10)],
+        )
+        file_path = os.path.join(self.temp_dir.name, "large.pkl")
+        loaded_df = task_func(df, file_path)
+        self.assertTrue(df.equals(loaded_df))
+        self.assertFalse(os.path.exists(file_path))
+    def test_case_7(self):
+        # Test single entry dataframe
+        df = pd.DataFrame({"Single": [42]})
+        file_path = os.path.join(self.temp_dir.name, "test_file_small.pkl")
+        loaded_df = task_func(df, file_path)
+        self.assertTrue(
+            df.equals(loaded_df), "Loaded DataFrame does not match the original."
+        )
+        self.assertFalse(os.path.exists(file_path))

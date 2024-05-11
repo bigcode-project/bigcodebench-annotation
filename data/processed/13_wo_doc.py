@@ -1,101 +1,111 @@
 import subprocess
+import ftplib
 import os
-import json
-from datetime import datetime
 
-
-def task_func(script_name='backup.sh', log_file='/home/user/backup_log.json'):
+def task_func(ftp_server='ftp.dlptest.com', ftp_user='dlpuser', ftp_password='rNrKYTX9g7z3RgJRmxWuGHbeu', ftp_dir='/ftp/test'):
     """
-    Runs the provided backup shell script and logs the start time, end time, and exit status 
-    in a specified JSON log file.
+    Download all files from a specific directory on an FTP server using wget in a subprocess.
     
-    Parameters:
-    - script_name (str): The name of the shell script to run. Default is 'backup.sh'.
-    - log_file (str): The path to the JSON log file where the execution details will be recorded. Default is '/home/user/backup_log.json'.
+    Args:
+    ftp_server (str): The FTP server address. Default is 'ftp.dlptest.com'.
+    ftp_user (str): The FTP server username. Default is 'dlpuser'.
+    ftp_password (str): The FTP server password. Default is 'rNrKYTX9g7z3RgJRmxWuGHbeu'.
+    ftp_dir (str): The directory path on the FTP server from which files need to be downloaded. Default is '/ftp/test'.
     
     Returns:
-    dict: A dictionary containing:
-        - 'start_time': The start time of the script execution in the format '%Y-%m-%d %H:%M:%S'.
-        - 'end_time': The end time of the script execution in the format '%Y-%m-%d %H:%M:%S'.
-        - 'exit_status': The exit status of the script execution (0 for success, other values indicate an error).
+    List[str]: A list of filenames that were attempted to be downloaded from the FTP server.
     
     Raises:
-    - FileNotFoundError: If the script file does not exist.
-    - RuntimeError: If there is an error executing the script.
-        
+    Exception: 
+        - If there is a failure in connecting to the FTP server. Outputs the message "Failed to connect to FTP server {ftp_server}: {str(e)}"
+        - If there is a failure in logging into the FTP server. Outputs the message "Failed to log into FTP server {ftp_server} with user {ftp_user}: {str(e)}"
+        - If there is a failure in changing to the specified directory. Outputs the message "Failed to change to directory {ftp_dir} on server {ftp_server}: {str(e)}"
+    
     Requirements:
     - subprocess
+    - ftplib
     - os
-    - datetime
-    - json
-    
+
     Example:
     >>> task_func()
-    {'start_time': '2023-09-19 14:30:00', 'end_time': '2023-09-19 14:35:00', 'exit_status': 0}
+    ['file1.txt', 'file2.jpg', ...]
     """
-    log_data = {}
-    if not os.path.isfile(script_name):
-        raise FileNotFoundError(f"Script {script_name} does not exist.")
-    start_time = datetime.now()
-    log_data['start_time'] = start_time.strftime('%Y-%m-%d %H:%M:%S')
     try:
-        exit_status = subprocess.call(['./' + script_name])
+        ftp_obj = ftplib.FTP(ftp_server)
     except Exception as e:
-        raise RuntimeError(f"Failed to run {script_name}: {str(e)}")
-    end_time = datetime.now()
-    log_data['end_time'] = end_time.strftime('%Y-%m-%d %H:%M:%S')
-    log_data['exit_status'] = exit_status
-    with open(log_file, 'w') as f:
-        json.dump(log_data, f)
-    return log_data
+        raise Exception(f'Failed to connect to FTP server {ftp_server}: {str(e)}')
+    try:
+        ftp_obj.login(ftp_user, ftp_password)
+    except Exception as e:
+        raise Exception(f'Failed to log into FTP server {ftp_server} with user {ftp_user}: {str(e)}')
+    try:
+        ftp_obj.cwd(ftp_dir)
+    except Exception as e:
+        raise Exception(f'Failed to change to directory {ftp_dir} on server {ftp_server}: {str(e)}')
+    download_dir = "downloaded_files"
+    if not os.path.exists(download_dir):
+        os.makedirs(download_dir)
+    downloaded_files = []
+    for filename in ftp_obj.nlst():
+        command = f'wget ftp://{ftp_user}:{ftp_password}@{ftp_server}{ftp_dir}/{filename} -P {download_dir}'
+        subprocess.call(command, shell=True)
+        downloaded_files.append(filename)
+    ftp_obj.quit()
+    return downloaded_files
 
 import unittest
-from unittest.mock import patch, mock_open
+from unittest.mock import patch
+import os
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        """Setup a clean test environment before each test."""
+        if not os.path.exists("downloaded_files"):
+            os.makedirs("downloaded_files")
     
-    @patch("os.path.isfile", return_value=True)
-    @patch("subprocess.call", return_value=0)
-    @patch("builtins.open", new_callable=mock_open, read_data="{}")
-    def test_default_values_successful_script(self, mock_file, mock_subprocess, mock_os):
-        """Test the function with default parameters and successful execution"""
-        result = task_func()
-        self.assertIn('start_time', result)
-        self.assertIn('end_time', result)
-        self.assertEqual(result['exit_status'], 0)
-    @patch("os.path.isfile", return_value=False)
-    def test_script_does_not_exist(self, mock_os):
-        """Test the function raising FileNotFoundError when the script file does not exist"""
-        with self.assertRaises(FileNotFoundError):
-            task_func()
-    @patch("os.path.isfile", return_value=True)
-    @patch("subprocess.call", side_effect=Exception("Script failed"))
-    def test_script_execution_failure(self, mock_subprocess, mock_os):
-        """Test the function raising RuntimeError on script execution failure"""
-        with self.assertRaises(RuntimeError):
-            task_func()
-    @patch("os.path.isfile", return_value=True)
-    @patch("subprocess.call", return_value=0)
-    @patch("builtins.open", new_callable=mock_open, read_data="{}")
-    def test_custom_values_successful_script(self, mock_file, mock_subprocess, mock_os):
-        """Test the function with custom script name and log file with successful execution"""
-        script_name = "custom_backup.sh"
-        log_file = "/home/user/custom_backup_log.json"
-        result = task_func(script_name, log_file)
-        self.assertIn('start_time', result)
-        self.assertIn('end_time', result)
-        self.assertEqual(result['exit_status'], 0)
-    @patch("os.path.isfile", return_value=True)
-    @patch("subprocess.call", return_value=0)
-    @patch("builtins.open", new_callable=mock_open, read_data="{}")
-    def test_log_data_format(self, mock_file, mock_subprocess, mock_os):
-        """Test that the timestamps are in the correct format"""
-        result = task_func()
-        self.assertTrue(result['start_time'].count(":") == 2)
-        self.assertTrue(result['end_time'].count(":") == 2)
-    @patch("os.path.isfile", return_value=True)
-    @patch("subprocess.call", return_value=1)
-    @patch("builtins.open", new_callable=mock_open, read_data="{}")
-    def test_non_zero_exit_status(self, mock_file, mock_subprocess, mock_os):
-        """Test the function with a non-zero exit status"""
-        result = task_func()
-        self.assertEqual(result['exit_status'], 1)
+    def tearDown(self):
+        """Cleanup after each test."""
+        for filename in os.listdir("downloaded_files"):
+            os.remove(os.path.join("downloaded_files", filename))
+        os.rmdir("downloaded_files")
+    @patch('ftplib.FTP')
+    @patch('subprocess.call')
+    def test_case_1(self, mock_subprocess_call, mock_ftp):
+        """Test with default parameters and successful download."""
+        mock_ftp.return_value.nlst.return_value = ['file1.txt', 'file2.jpg']
+        mock_subprocess_call.return_value = 0  # Simulating successful wget command execution
+        downloaded_files = task_func()
+        self.assertEqual(len(downloaded_files), 2)
+        self.assertIn('file1.txt', downloaded_files)
+        self.assertIn('file2.jpg', downloaded_files)
+    @patch('ftplib.FTP')
+    def test_case_2(self, mock_ftp):
+        """Test with an invalid FTP server by raising an exception on connect."""
+        error_message = "Failed to connect to FTP server"
+        mock_ftp.side_effect = Exception(error_message)
+        with self.assertRaises(Exception) as context:
+            task_func(ftp_server="invalid_server")
+        self.assertEqual(str(context.exception), f'Failed to connect to FTP server invalid_server: {error_message}')
+    @patch('ftplib.FTP')
+    def test_case_3(self, mock_ftp):
+        """Test with an invalid FTP user by raising an exception on login."""
+        error_message = "Failed to login"
+        mock_ftp.return_value.login.side_effect = Exception(error_message)
+        with self.assertRaises(Exception) as context:
+            task_func(ftp_user="invalid_user")
+        self.assertEqual(str(context.exception), f'Failed to log into FTP server ftp.dlptest.com with user invalid_user: {error_message}')
+    @patch('ftplib.FTP')
+    def test_case_4(self, mock_ftp):
+        """Test with an invalid FTP password by raising an exception on login."""
+        error_message = "Failed to login"
+        mock_ftp.return_value.login.side_effect = Exception(error_message)
+        with self.assertRaises(Exception) as context:
+            task_func(ftp_password="invalid_password")
+        self.assertEqual(str(context.exception), f'Failed to log into FTP server ftp.dlptest.com with user dlpuser: {error_message}')
+    @patch('ftplib.FTP')
+    def test_case_5(self, mock_ftp):
+        """Test with an invalid FTP directory by raising an exception on cwd."""
+        error_message = "Failed to change directory"
+        mock_ftp.return_value.cwd.side_effect = Exception(error_message)
+        with self.assertRaises(Exception) as context:
+            task_func(ftp_dir="/invalid_directory")
+        self.assertEqual(str(context.exception), f'Failed to change to directory /invalid_directory on server ftp.dlptest.com: {error_message}')

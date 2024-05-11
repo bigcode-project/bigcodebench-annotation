@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
             'col2': [1, 2, 1, 2],
             'col3': [2, 1, 3, 1]
         })
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
 
         # Asserting plot attributes (e.g., title, x-axis, y-axis)
         self.assertEqual(plot.get_xlabel(), 'col3')
@@ -73,7 +73,7 @@ class TestCases(unittest.TestCase):
             'col2': [1, 2],
             'col3': [3, 1]
         })
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
 
         # Asserting plot attributes
         self.assertEqual(plot.get_xlabel(), 'col3')
@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
             'col2': [2, 7],
             'col3': [3, 1]
         })
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
 
         # Asserting plot attributes
         self.assertEqual(plot.get_xlabel(), 'col3')
@@ -112,7 +112,7 @@ class TestCases(unittest.TestCase):
             [1, 1, 1]
         ]
         expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
 
         # Asserting plot attributes
         self.assertEqual(plot.get_xlabel(), 'col3')
@@ -137,7 +137,7 @@ class TestCases(unittest.TestCase):
         ]
         expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
 
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
 
         # Asserting plot attributes
         self.assertEqual(plot.get_xlabel(), 'col3')

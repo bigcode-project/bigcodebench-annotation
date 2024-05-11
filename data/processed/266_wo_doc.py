@@ -1,89 +1,108 @@
-import collections
-import json
 import os
+import os.path
+import csv
+import collections
 
 
-def task_func(data, json_file_name='data.json'):
+# Constants
+FILE_NAME = 'file_sizes.csv'
+
+def task_func(my_path):
     """
-    Add a new key "a" with the value 1 to the input dictionary, calculate the frequency of its values, and save the updated dictionary along with its frequency distribution to a JSON file.
+    Create a report on the file size in a directory and write it to a CSV file.
 
     Parameters:
-    data (dict): The input data as a dictionary.
-    json_file_name (str): The name of the JSON file to be saved.
+    my_path (str): The directory path.
 
     Returns:
-    str: The path of the JSON file.
+    str: The path of the CSV file.
 
     Requirements:
-    - collections
-    - re
-    - json
     - os
+    - os.path
+    - csv
+    - collections
 
     Example:
-    >>> import tempfile
-    >>> json_file = tempfile.NamedTemporaryFile(delete=False)
-    >>> data = {'key1': 'value1', 'key2': 'value2', 'key3': 'value1'}
-    >>> task_func(data, json_file.name) is not None
-    True
+    >>> task_func('/usr/my_directory')
     """
-    data['a'] = 1
-    freq = collections.Counter(data.values())
-    json_data = {'data': data, 'freq': dict(freq)}
-    json_file_path = os.path.join(os.getcwd(), json_file_name)
-    with open(json_file_path, 'w') as json_file:
-        json.dump(json_data, json_file)
-    return json_file_path
+    file_sizes = collections.defaultdict(int)
+    for dirpath, dirnames, filenames in os.walk(my_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            file_sizes[f] += os.path.getsize(fp)
+    with open(os.path.join(my_path, FILE_NAME), 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['File Name', 'Size'])
+        for row in file_sizes.items():
+            writer.writerow(row)
+    return os.path.join(my_path, FILE_NAME)
 
 import unittest
 import tempfile
-import doctest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.json_file = tempfile.NamedTemporaryFile(delete=False)
-    def tearDown(self):
-        os.unlink(self.json_file.name)
-    def test_case_1(self):
-        data = {'key1': 'value1', 'key2': 'value2', 'key3': 'value1'}
-        result_path = task_func(data, self.json_file.name)
-        self.assertTrue(os.path.exists(result_path), "JSON file doesn't exist.")
-        with open(result_path, 'r') as f:
-            json_data = json.load(f)
-            self.assertEqual(json_data['data']['a'], 1)
-            self.assertEqual(json_data['freq']['value1'], 2)
-    
-    def test_case_2(self):
-        data = {}
-        result_path = task_func(data, self.json_file.name)
-        self.assertTrue(os.path.exists(result_path), "JSON file doesn't exist.")
-        with open(result_path, 'r') as f:
-            json_data = json.load(f)
-            self.assertEqual(json_data['data']['a'], 1)
-            self.assertEqual(json_data['freq']['1'], 1)
-    
-    def test_case_3(self):
-        data = {'x': 'y', 'z': 'y'}
-        result_path = task_func(data, self.json_file.name)
-        self.assertTrue(os.path.exists(result_path), "JSON file doesn't exist.")
-        with open(result_path, 'r') as f:
-            json_data = json.load(f)
-            self.assertEqual(json_data['data']['a'], 1)
-            self.assertEqual(json_data['freq']['y'], 2)
+    def test_non_empty_directory(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create sample files
+            with open(os.path.join(temp_dir, 'file1.txt'), 'w') as f:
+                f.write('Hello')
+            with open(os.path.join(temp_dir, 'file2.txt'), 'w') as f:
+                f.write('World')
+            # Run the function
+            csv_path = task_func(temp_dir)
+            # Verify CSV file creation and contents
+            self.assertTrue(os.path.exists(csv_path), 'CSV file not created')
+            with open(csv_path, 'r') as csvfile:
+                reader = csv.reader(csvfile)
+                rows = list(reader)
+                self.assertEqual(len(rows), 3, 'Incorrect number of rows in CSV')
+                self.assertEqual(rows[1][1], '5', 'Incorrect file size for file1.txt')
+                self.assertEqual(rows[2][1], '5', 'Incorrect file size for file2.txt')
+    def test_empty_directory(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            csv_path = task_func(temp_dir)
+            self.assertTrue(os.path.exists(csv_path), 'CSV file not created in empty directory')
+            with open(csv_path, 'r') as csvfile:
+                reader = csv.reader(csvfile)
+                rows = list(reader)
+                self.assertEqual(len(rows), 1, 'CSV file should only contain headers in empty directory')
+    def test_nested_directories(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create sample files in nested directories
+            os.makedirs(os.path.join(temp_dir, 'subdir1'))
+            os.makedirs(os.path.join(temp_dir, 'subdir2'))
+            with open(os.path.join(temp_dir, 'subdir1', 'file1.txt'), 'w') as f:
+                f.write('Hello')
+            with open(os.path.join(temp_dir, 'subdir2', 'file2.txt'), 'w') as f:
+                f.write('World')
+            # Run the function
+            csv_path = task_func(temp_dir)
+            # Verify CSV file creation and contents
+            self.assertTrue(os.path.exists(csv_path), 'CSV file not created for nested directories')
+            with open(csv_path, 'r') as csvfile:
+                reader = csv.reader(csvfile)
+                rows = list(reader)
+                self.assertEqual(len(rows), 3, 'Incorrect number of rows in CSV for nested directories')
+                self.assertEqual(rows[1][1], '5', 'Incorrect file size for subdir1/file1.txt')
+                self.assertEqual(rows[2][1], '5', 'Incorrect file size for subdir2/file2.txt')
+        
+    def test_single_file(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create sample files
+            with open(os.path.join(temp_dir, 'file1.txt'), 'w') as f:
+                f.write('Hellooooooooooo')
+            csv_path = task_func(temp_dir)
+            self.assertTrue(os.path.exists(csv_path), 'CSV file not created')
+    def test_large_number_of_files(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create a large number of files
+            for i in range(100):
+                with open(os.path.join(temp_dir, f'file{i}.txt'), 'w') as f:
+                    f.write(str(i))
             
-    def test_case_4(self):
-        data = {'e': 'b', 'c': 'd'}
-        result_path = task_func(data, self.json_file.name)
-        self.assertTrue(os.path.exists(result_path), "JSON file doesn't exist.")
-        with open(result_path, 'r') as f:
-            json_data = json.load(f)
-            self.assertEqual(json_data['data']['a'], 1)
-            self.assertEqual(json_data['freq']['b'], 1)
-            
-    def test_case_5(self):
-        data = {'apple': 'fruit', 'carrot': 'vegetable'}
-        result_path = task_func(data, self.json_file.name)
-        self.assertTrue(os.path.exists(result_path), "JSON file doesn't exist.")
-        with open(result_path, 'r') as f:
-            json_data = json.load(f)
-            self.assertEqual(json_data['data']['a'], 1)
-            self.assertEqual(json_data['freq']['fruit'], 1)
+            csv_path = task_func(temp_dir)
+            self.assertTrue(os.path.exists(csv_path), 'CSV file not created for large number of files')
+            with open(csv_path, 'r') as csvfile:
+                reader = csv.reader(csvfile)
+                rows = list(reader)
+                self.assertEqual(len(rows), 101, 'Incorrect number of rows for large number of files')

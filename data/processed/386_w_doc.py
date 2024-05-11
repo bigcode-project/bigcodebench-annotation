@@ -1,64 +1,67 @@
-import matplotlib.pyplot as plt
-from collections import Counter
+import numpy as np
+import pandas as pd
 
+# Constants
+COLUMNS = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']
 
-FRUITS = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape', 'Honeydew', 'Indian Prune', 'Jackfruit']
-
-def task_func(fruit_dict):
+def task_func(length, min_value = 0, max_value = 100):
     """
-    Given a constant list of fruits in FRUITS, and a dictionary 'fruit_dict' with keys as people's names and values 
-    as their favorite fruit names, record the frequency of each fruits' occurence. Return a bar chart of the number 
-    of fruits for each fruit type and return the dictionary with fruit names as keys and their counts as values. 
+    Randomly generate a pandas DataFrame with specified ranges and length, and calculate the cumulative distribution function (CDF).
 
     Parameters:
-    fruit_dict (dict): The dictionary with keys as people's names and values as fruit names.
+    length (int): The length of the DataFrame to be generated.
+    min_value (int, optional): The minimum value for random data generation. Default is 0.
+    max_value (int, optional): The maximum value for random data generation. Default is 100.
 
     Returns:
-    dict: A dictionary with fruit names as keys and their counts as values.
-    matplotlib.axes.Axes: The axes object of the plot.
+    DataFrame: A pandas DataFrame with the calculated cumulative distribution function (CDF).
+
+    Note:
+    - DataFrame columns are defined by the COLUMNS constant.
 
     Requirements:
-    - collections
-    - random
-    - matplotlib
+    - numpy
+    - pandas
+    - matplotlib.pyplot
 
     Example:
-    >>> fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Cherry', 'Charlie': 'Date', 'David': 'Apple'}
-    >>> freq, ax = task_func(fruit_dict)
-    >>> dict(freq)
-    {'Apple': 2, 'Banana': 1, 'Cherry': 1, 'Date': 1}
+    >>> np.random.seed(0)
+    >>> cdf = task_func(100, 0, 1)
+    >>> print(len(cdf))
+    1
     """
-    fruit_list = [item for item in fruit_dict.values() if isinstance(item, str) and item in FRUITS]
-    fruit_counter = Counter(fruit_list)
-    plt.bar(fruit_counter.keys(), fruit_counter.values())
-    return Counter([item for item in fruit_dict.values() if isinstance(item, str)]), plt.gca()
+    data = np.random.randint(min_value, max_value, size=(length, len(COLUMNS)))
+    df = pd.DataFrame(data, columns=COLUMNS)
+    df = df.apply(lambda x: x.value_counts().sort_index().cumsum())
+    return df
 
 import unittest
-import matplotlib.axes
-import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Cherry'}
-        count_dict, ax = task_func(fruit_dict)
-        self.assertEqual(count_dict, {'Apple': 1, 'Banana': 1, 'Cherry': 1})
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        np.random.seed(0)
+        df = task_func(100, 0, 1)
+        self.assertEqual(df.shape[0], 1)
+        self.assertEqual(list(df.columns), ['Column1', 'Column2', 'Column3', 'Column4', 'Column5'])
     def test_case_2(self):
-        fruit_dict = {'John': 'Apple', 'Alice': 'Banana', 'Bob': 'Apple'}
-        count_dict, ax = task_func(fruit_dict)
-        self.assertEqual(count_dict, {'Apple': 2, 'Banana': 1})
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        np.random.seed(0)
+        min_value = 0
+        max_value = 1
+        length = 10
+        cdf = task_func(length, min_value, max_value)
+        self.assertEqual(cdf.iloc[0]['Column1'], 10)
     def test_case_3(self):
-        fruit_dict = {}
-        count_dict, ax = task_func(fruit_dict)
-        self.assertEqual(count_dict, {})
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        np.random.seed(0)
+        df = task_func(100)
+        #self.assertEqual(df.shape[0], 100)
+        self.assertEqual(list(df.columns), ['Column1', 'Column2', 'Column3', 'Column4', 'Column5'])
     def test_case_4(self):
-        fruit_dict = {'John': 'Apple'}
-        count_dict, ax = task_func(fruit_dict)
-        self.assertEqual(count_dict, {'Apple': 1})
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        np.random.seed(0)
+        df = task_func(100, 50, 100)
+        self.assertEqual(list(df.columns), ['Column1', 'Column2', 'Column3', 'Column4', 'Column5'])
+        for column in df.columns:
+            self.assertTrue(all(df[column].diff().dropna() >= 0))
     def test_case_5(self):
-        fruit_dict = {'John': 123, 'Alice': None, 'Bob': 'Apple'}
-        count_dict, ax = task_func(fruit_dict)
-        self.assertEqual(count_dict, {'Apple': 1})
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        np.random.seed(0)
+        df  = task_func(0)
+        self.assertEqual(df.shape[0], 0)
+        self.assertEqual(list(df.columns), ['Column1', 'Column2', 'Column3', 'Column4', 'Column5'])

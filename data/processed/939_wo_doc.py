@@ -1,72 +1,93 @@
 import re
-import pandas as pd
+import os
+import glob
 
-def task_func(input_df):
+def task_func(dir_path: str) -> list:
     """
-    Cleans the text in a pandas DataFrame column named 'text' by removing all special characters, punctuation marks, and spaces, then calculates the length of the cleaned text.
+    Rename all files in the specified directory by removing all special characters,
+    punctuation marks, and spaces, using regular expressions. The function keeps
+    alphanumeric characters and removes the rest.
 
     Requirements:
     - re
-    - pandas
+    - os
+    - glob
 
     Parameters:
-    - input_df (pandas.DataFrame): DataFrame with a column 'text' containing strings with alphanumeric and/or special characters.
+    dir_path (str): The path to the directory containing the files to be renamed.
 
     Returns:
-    - pandas.DataFrame: A DataFrame with two new columns 'clean_text' and 'text_length', where 'clean_text' is the cleaned text and 'text_length' is its length.
+    list[str]: A list containing the new names of all files after renaming.
 
-    Examples:
-    >>> df = pd.DataFrame({'text': ['Special $#! characters   spaces 888323']})
-    >>> print(task_func(df))
-                          clean_text  text_length
-    0  Specialcharactersspaces888323           29
-    >>> df = pd.DataFrame({'text': ['Hello, World!']})
-    >>> print(task_func(df))
-       clean_text  text_length
-    0  HelloWorld           10
+    Example:
+    >>> task_func('path/to/directory')
+    ['file1', 'file2', 'file3']
+    >>> task_func('another/directory/path')
+    ['anotherFile1', 'anotherFile2']
     """
-    def clean_text_and_calculate_length(row):
-        if pd.isnull(row['text']):
-            return pd.Series(['', 0], index=['clean_text', 'text_length'])
-        cleaned_text = re.sub('[^A-Za-z0-9]+', '', str(row['text']))
-        return pd.Series([cleaned_text, len(cleaned_text)], index=['clean_text', 'text_length'])
-    return input_df.apply(clean_text_and_calculate_length, axis=1)
+    new_names = []
+    for file_path in glob.glob(os.path.join(dir_path, '*')):
+        base_name = os.path.basename(file_path)
+        new_name = re.sub('[^A-Za-z0-9]+', '', base_name)
+        new_path = os.path.join(dir_path, new_name)
+        os.rename(file_path, new_path)
+        new_names.append(new_name)
+    return new_names
 
 import unittest
+from pathlib import Path
+import shutil
 class TestCases(unittest.TestCase):
+    
     def setUp(self):
-        self.df = pd.DataFrame({'text': ['hello', 'world', 'Special $#! characters   spaces 888323', 'Hello, World!', '', None]})
-    def test_clean_text_and_calculate_length(self):
-        result = task_func(self.df)
-        expected_clean_text = ['hello', 'world', 'Specialcharactersspaces888323', 'HelloWorld', '', '']
-        expected_text_length = [5, 5, 29, 10, 0, 0]
-        pd.testing.assert_series_equal(result['clean_text'], pd.Series(expected_clean_text, name='clean_text'), check_names=False)
-        pd.testing.assert_series_equal(result['text_length'], pd.Series(expected_text_length, name='text_length'), check_names=False)
-    def test_with_special_characters(self):
-        df = pd.DataFrame({'text': ['@@@hello***', '%%%world$$$']})
-        result = task_func(df)
-        self.assertEqual(result['clean_text'].iloc[0], 'hello')
-        self.assertEqual(result['clean_text'].iloc[1], 'world')
-        self.assertEqual(result['text_length'].iloc[0], 5)
-        self.assertEqual(result['text_length'].iloc[1], 5)
-    def test_with_numeric_strings(self):
-        df = pd.DataFrame({'text': ['123', '4567']})
-        result = task_func(df)
-        self.assertEqual(result['clean_text'].iloc[0], '123')
-        self.assertEqual(result['clean_text'].iloc[1], '4567')
-        self.assertEqual(result['text_length'].iloc[0], 3)
-        self.assertEqual(result['text_length'].iloc[1], 4)
-    def test_empty_and_none(self):
-        df = pd.DataFrame({'text': ['', None]})
-        result = task_func(df)
-        self.assertEqual(result['clean_text'].iloc[0], '')
-        self.assertEqual(result['clean_text'].iloc[1], '')
-        self.assertEqual(result['text_length'].iloc[0], 0)
-        self.assertEqual(result['text_length'].iloc[1], 0)
-    def test_mixed_cases(self):
-        df = pd.DataFrame({'text': ['HelloWorld', 'HELLOworld123']})
-        result = task_func(df)
-        self.assertEqual(result['clean_text'].iloc[0], 'HelloWorld')
-        self.assertEqual(result['clean_text'].iloc[1], 'HELLOworld123')
-        self.assertEqual(result['text_length'].iloc[0], 10)
-        self.assertEqual(result['text_length'].iloc[1], 13)
+        self.temp_dir = Path("temp_test_dir")
+        self.temp_dir.mkdir(parents=True, exist_ok=True)
+    
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir)
+    
+    def test_special_characters_removal(self):
+        test_files = ["file@1.txt", "file_#2.txt", "file$ 3.txt"]
+        for file_name in test_files:
+            (self.temp_dir / file_name).touch()
+        
+        expected_names = ["file1txt", "file2txt", "file3txt"]
+        new_file_names = task_func(str(self.temp_dir))
+        
+        self.assertListEqual(sorted(new_file_names), sorted(expected_names))
+    
+    def test_alphanumeric_names(self):
+        test_files = ["file1.txt", "file2.txt", "file3.txt"]
+        for file_name in test_files:
+            (self.temp_dir / file_name).touch()
+        
+        expected_names = ["file1txt", "file2txt", "file3txt"]
+        new_file_names = task_func(str(self.temp_dir))
+        
+        self.assertListEqual(sorted(new_file_names), sorted(expected_names))
+    
+    def test_empty_directory(self):
+        expected_names = []
+        new_file_names = task_func(str(self.temp_dir))
+        
+        self.assertListEqual(new_file_names, expected_names)
+    
+    def test_only_special_characters(self):
+        test_files = ["@@@.txt", "###.txt", "$$$ .txt"]
+        for file_name in test_files:
+            (self.temp_dir / file_name).touch()
+        
+        expected_names = ["txt", "txt", "txt"]
+        new_file_names = task_func(str(self.temp_dir))
+        
+        self.assertListEqual(sorted(new_file_names), sorted(expected_names))
+    
+    def test_mixed_characters(self):
+        test_files = ["f@ile_1.txt", "file# 2.txt", "fi$le 3.txt"]
+        for file_name in test_files:
+            (self.temp_dir / file_name).touch()
+        
+        expected_names = ["file1txt", "file2txt", "file3txt"]
+        new_file_names = task_func(str(self.temp_dir))
+        
+        self.assertListEqual(sorted(new_file_names), sorted(expected_names))

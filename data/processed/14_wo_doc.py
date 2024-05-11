@@ -1,111 +1,94 @@
-import subprocess
-import ftplib
+import configparser
 import os
+import shutil
 
-def task_func(ftp_server='ftp.dlptest.com', ftp_user='dlpuser', ftp_password='rNrKYTX9g7z3RgJRmxWuGHbeu', ftp_dir='/ftp/test'):
+
+def task_func(config_file_path, archieve_dir ='/home/user/archive'):
     """
-    Download all files from a specific directory on an FTP server using wget in a subprocess.
+    Archive a specified project directory into a ZIP file based on the configuration specified in a config file.
     
-    Args:
-    ftp_server (str): The FTP server address. Default is 'ftp.dlptest.com'.
-    ftp_user (str): The FTP server username. Default is 'dlpuser'.
-    ftp_password (str): The FTP server password. Default is 'rNrKYTX9g7z3RgJRmxWuGHbeu'.
-    ftp_dir (str): The directory path on the FTP server from which files need to be downloaded. Default is '/ftp/test'.
+    This function reads a configuration file to determine the project directory and archives this directory into a ZIP file.
+    The ZIP file's name will be the project directory's basename, stored in the specified archive directory.
+    
+    Configuration File Format:
+    [Project]
+    directory=path_to_project_directory
+    
+    Parameters:
+    - config_file_path (str): Path to the configuration file. The file must exist and be readable.
+    - archive_dir (str, optional): Path to the directory where the ZIP archive will be stored. Defaults to '/home/user/archive'.
     
     Returns:
-    List[str]: A list of filenames that were attempted to be downloaded from the FTP server.
-    
-    Raises:
-    Exception: 
-        - If there is a failure in connecting to the FTP server. Outputs the message "Failed to connect to FTP server {ftp_server}: {str(e)}"
-        - If there is a failure in logging into the FTP server. Outputs the message "Failed to log into FTP server {ftp_server} with user {ftp_user}: {str(e)}"
-        - If there is a failure in changing to the specified directory. Outputs the message "Failed to change to directory {ftp_dir} on server {ftp_server}: {str(e)}"
+    - bool: True if the ZIP archive is successfully created, otherwise an exception is raised.
     
     Requirements:
-    - subprocess
-    - ftplib
+    - configparse
     - os
+    - shutil
 
+    Raises:
+    - FileNotFoundError: If the `config_file_path` does not exist or the specified project directory does not exist.
+    - Exception: If the ZIP archive cannot be created.
+    
     Example:
-    >>> task_func()
-    ['file1.txt', 'file2.jpg', ...]
+    >>> task_func("/path/to/config.ini")
+    True
     """
-    try:
-        ftp_obj = ftplib.FTP(ftp_server)
-    except Exception as e:
-        raise Exception(f'Failed to connect to FTP server {ftp_server}: {str(e)}')
-    try:
-        ftp_obj.login(ftp_user, ftp_password)
-    except Exception as e:
-        raise Exception(f'Failed to log into FTP server {ftp_server} with user {ftp_user}: {str(e)}')
-    try:
-        ftp_obj.cwd(ftp_dir)
-    except Exception as e:
-        raise Exception(f'Failed to change to directory {ftp_dir} on server {ftp_server}: {str(e)}')
-    download_dir = "downloaded_files"
-    if not os.path.exists(download_dir):
-        os.makedirs(download_dir)
-    downloaded_files = []
-    for filename in ftp_obj.nlst():
-        command = f'wget ftp://{ftp_user}:{ftp_password}@{ftp_server}{ftp_dir}/{filename} -P {download_dir}'
-        subprocess.call(command, shell=True)
-        downloaded_files.append(filename)
-    ftp_obj.quit()
-    return downloaded_files
+    config = configparser.ConfigParser()
+    config.read(config_file_path)
+    project_dir = config.get('Project', 'directory')
+    if not os.path.isdir(project_dir):
+        raise FileNotFoundError(f'Directory {project_dir} does not exist.')
+    archive_file = f'{archieve_dir}/{os.path.basename(project_dir)}.zip'
+    shutil.make_archive(base_name=os.path.splitext(archive_file)[0], format='zip', root_dir=project_dir)
+    if not os.path.isfile(archive_file):
+        raise Exception(f"Failed to create archive {archive_file}")
+    return True
 
 import unittest
-from unittest.mock import patch
+import tempfile
+import shutil
 import os
+import configparser
 class TestCases(unittest.TestCase):
     def setUp(self):
-        """Setup a clean test environment before each test."""
-        if not os.path.exists("downloaded_files"):
-            os.makedirs("downloaded_files")
-    
+        # Setup a temporary directory for the configuration files and another for the archive output
+        self.test_data_dir = tempfile.mkdtemp()
+        self.archive_dir = tempfile.mkdtemp()
+        # Example valid configuration file setup
+        self.valid_config_path = os.path.join(self.test_data_dir, "valid_config.ini")
+        config = configparser.ConfigParser()
+        config['Project'] = {'directory': self.test_data_dir}
+        with open(self.valid_config_path, 'w') as configfile:
+            config.write(configfile)
+        # Invalid directory config
+        self.invalid_config_path = os.path.join(self.test_data_dir, "invalid_config.ini")
+        config['Project'] = {'directory': '/path/to/nonexistent/directory'}
+        with open(self.invalid_config_path, 'w') as configfile:
+            config.write(configfile)
     def tearDown(self):
-        """Cleanup after each test."""
-        for filename in os.listdir("downloaded_files"):
-            os.remove(os.path.join("downloaded_files", filename))
-        os.rmdir("downloaded_files")
-    @patch('ftplib.FTP')
-    @patch('subprocess.call')
-    def test_case_1(self, mock_subprocess_call, mock_ftp):
-        """Test with default parameters and successful download."""
-        mock_ftp.return_value.nlst.return_value = ['file1.txt', 'file2.jpg']
-        mock_subprocess_call.return_value = 0  # Simulating successful wget command execution
-        downloaded_files = task_func()
-        self.assertEqual(len(downloaded_files), 2)
-        self.assertIn('file1.txt', downloaded_files)
-        self.assertIn('file2.jpg', downloaded_files)
-    @patch('ftplib.FTP')
-    def test_case_2(self, mock_ftp):
-        """Test with an invalid FTP server by raising an exception on connect."""
-        error_message = "Failed to connect to FTP server"
-        mock_ftp.side_effect = Exception(error_message)
-        with self.assertRaises(Exception) as context:
-            task_func(ftp_server="invalid_server")
-        self.assertEqual(str(context.exception), f'Failed to connect to FTP server invalid_server: {error_message}')
-    @patch('ftplib.FTP')
-    def test_case_3(self, mock_ftp):
-        """Test with an invalid FTP user by raising an exception on login."""
-        error_message = "Failed to login"
-        mock_ftp.return_value.login.side_effect = Exception(error_message)
-        with self.assertRaises(Exception) as context:
-            task_func(ftp_user="invalid_user")
-        self.assertEqual(str(context.exception), f'Failed to log into FTP server ftp.dlptest.com with user invalid_user: {error_message}')
-    @patch('ftplib.FTP')
-    def test_case_4(self, mock_ftp):
-        """Test with an invalid FTP password by raising an exception on login."""
-        error_message = "Failed to login"
-        mock_ftp.return_value.login.side_effect = Exception(error_message)
-        with self.assertRaises(Exception) as context:
-            task_func(ftp_password="invalid_password")
-        self.assertEqual(str(context.exception), f'Failed to log into FTP server ftp.dlptest.com with user dlpuser: {error_message}')
-    @patch('ftplib.FTP')
-    def test_case_5(self, mock_ftp):
-        """Test with an invalid FTP directory by raising an exception on cwd."""
-        error_message = "Failed to change directory"
-        mock_ftp.return_value.cwd.side_effect = Exception(error_message)
-        with self.assertRaises(Exception) as context:
-            task_func(ftp_dir="/invalid_directory")
-        self.assertEqual(str(context.exception), f'Failed to change to directory /invalid_directory on server ftp.dlptest.com: {error_message}')
+        # Remove temporary directories after each test
+        shutil.rmtree(self.test_data_dir)
+        shutil.rmtree(self.archive_dir)
+    def test_valid_project_directory(self):
+        # Testing with a valid project directory
+        result = task_func(self.valid_config_path, self.archive_dir)
+        self.assertTrue(result)
+    def test_invalid_project_directory(self):
+        # Testing with a non-existent project directory
+        with self.assertRaises(FileNotFoundError):
+            task_func(self.invalid_config_path, self.archive_dir)
+    def test_archive_creation(self):
+        # Run the function to create the archive
+        task_func(self.valid_config_path, self.archive_dir)
+        archive_file = os.path.join(self.archive_dir, os.path.basename(self.test_data_dir) + '.zip')
+        self.assertTrue(os.path.isfile(archive_file))
+    def test_archive_content(self):
+        # Adding a sample file to the project directory to check archive contents later
+        sample_file_path = os.path.join(self.test_data_dir, "sample_file.txt")
+        with open(sample_file_path, 'w') as f:
+            f.write("Hello, world!")
+        task_func(self.valid_config_path, self.archive_dir)
+        archive_file = os.path.join(self.archive_dir, os.path.basename(self.test_data_dir) + '.zip')
+        content = os.popen(f"unzip -l {archive_file}").read()
+        self.assertIn("sample_file.txt", content)

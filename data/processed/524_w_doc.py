@@ -1,116 +1,153 @@
-import pandas as pd
+from collections import defaultdict
+import numpy as np
 import matplotlib.pyplot as plt
+
 
 def task_func(data):
     """
-    Combine a list of dictionaries with the same keys into a single dictionary, turn it into a
-    Pandas DataFrame and create a line plot of the data.
+    Calculate statistical measurements (mean and standard deviation) of the values associated with
+    each key in a list of dictionaries, and visualize mean and standard deviation with bar charts.
 
     Parameters:
-    data (list): A list of dictionaries. The keys are labels and the values are data points.
+    data (list): The list of dictionaries. Must not be empty. Each dictionary must have numeric values.
 
     Returns:
-    matplotlib.axes._axes.Axes or None: Axes object of the plot showing 'Data over Time',
-                                                   with 'Time' on the x-axis and 'Data Points' on the y-axis.
-                                                   If data is empty, return None.
+    tuple:
+        - dict: A dictionary with keys and their corresponding mean and standard deviation.
+        - list: A list of matplotlib Axes objects for each key's visualization.
 
     Requirements:
-    - pandas
+    - numpy
     - matplotlib.pyplot
-
+    - collections.defaultdict
+    
+    Raises:
+    - ValueError: If the input data is empty.
+    - TypeError: If the input is not a list of dictionaries or if any value in the dictionaries is not numeric.
+    
     Example:
-    >>> ax = task_func([{'A': 10, 'B': 15, 'C': 12},\
-                    {'A': 12, 'B': 20, 'C': 14},\
-                    {'A': 15, 'B': 18, 'C': 15},\
-                    {'A': 11, 'B': 17, 'C': 13}])
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> ax.get_title()
-    'Data over Time'
-    >>> len(ax.lines)
-    3
+    >>> stats, axes = task_func([{'cat': 1, 'dog': 3}, {'cat' : 2, 'dog': 5}, {'cat' : 3, 'dog': 7}])
+    >>> stats
+    {'cat': {'mean': 2.0, 'std': 0.816496580927726}, 'dog': {'mean': 5.0, 'std': 1.632993161855452}}
+    >>> axes
+    [<Axes: title={'center': 'Statistics of cat'}, ylabel='Value'>, <Axes: title={'center': 'Statistics of dog'}, ylabel='Value'>]
     """
     if not data:
-        return None
-    df = pd.DataFrame(data)
-    plt.figure()
-    for label in df.columns:
-        plt.plot(df[label], label=label)
-    plt.xlabel("Time")
-    plt.ylabel("Data Points")
-    plt.title("Data over Time")
-    return plt.gca()
+        raise ValueError("Input data is empty.")
+    if not isinstance(data, list) or not all(isinstance(d, dict) for d in data):
+        raise TypeError("Input must be a list of dictionaries.")
+    for d in data:
+        if not all(isinstance(value, (int, float)) for value in d.values()):
+            raise TypeError("All values in the dictionaries must be numeric.")
+    stats = defaultdict(list)
+    for d in data:
+        for key, value in d.items():
+            stats[key].append(value)
+    result = {k: {"mean": np.mean(v), "std": np.std(v)} for k, v in stats.items()}
+    axes = []
+    for key in result:
+        fig, ax = plt.subplots()
+        ax.bar(x=["mean", "std"], height=result[key].values())
+        ax.set_title(f"Statistics of {key}")
+        ax.set_ylabel("Value")
+        axes.append(ax)
+    return result, axes
 
 import unittest
-import matplotlib
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.data1 = [
-            {"A": 10, "B": 15, "C": 12},
-            {"A": 12, "B": 20, "C": 14},
-            {"A": 15, "B": 18, "C": 15},
-            {"A": 11, "B": 17, "C": 13},
-        ]
-        self.data2 = [
-            {"X": 5, "Y": 8},
-            {"X": 6, "Y": 7},
-            {"X": 7, "Y": 6},
-            {"X": 8, "Y": 5},
-        ]
-        self.data3 = [{"P": 3, "Q": 2, "R": 4, "S": 1}, {"P": 4, "Q": 3, "R": 2, "S": 3}]
-        self.data4 = [{"W": 7}, {"W": 8}, {"W": 9}, {"W": 6}]
-        self.data5 = [{"M": 1, "N": 3}, {"M": 3, "N": 1}]
     def test_case_1(self):
-        # Test for correct Axes instance and labels for a typical data set
-        ax = task_func(self.data1)
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertEqual(ax.get_title(), "Data over Time")
-        self.assertEqual(ax.get_xlabel(), "Time")
-        self.assertEqual(ax.get_ylabel(), "Data Points")
-        self.assertEqual(len(ax.lines), 3)
+        # Test basic case
+        data = [{"cat": 1, "dog": 3}, {"cat": 2, "dog": 5}, {"cat": 3, "dog": 7}]
+        stats, axes = task_func(data)
+        self.assertAlmostEqual(stats["cat"]["mean"], 2.0)
+        self.assertAlmostEqual(stats["cat"]["std"], 0.816496580927726)
+        self.assertAlmostEqual(stats["dog"]["mean"], 5.0)
+        self.assertAlmostEqual(stats["dog"]["std"], 1.632993161855452)
+        
+        self.assertEqual(axes[0].get_title(), "Statistics of cat")
+        self.assertEqual(axes[1].get_title(), "Statistics of dog")
+        for ax, key in zip(axes, stats):
+            heights = [rect.get_height() for rect in ax.patches]
+            self.assertListEqual(heights, list(stats[key].values()))
     def test_case_2(self):
-        # Test for different keys across dictionaries in data list
-        data = [{"A": 1, "B": 2}, {"B": 3, "C": 4}, {"A": 5, "C": 6}]
-        ax = task_func(data)
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertTrue(len(ax.lines) > 0)
+        # Test other keys (animals)
+        data = [{"bird": 5, "fish": 10}, {"bird": 6, "fish": 8}, {"bird": 7, "fish": 9}]
+        stats, axes = task_func(data)
+        self.assertAlmostEqual(stats["bird"]["mean"], 6.0)
+        self.assertAlmostEqual(stats["bird"]["std"], 0.816496580927726)
+        self.assertAlmostEqual(stats["fish"]["mean"], 9.0)
+        self.assertAlmostEqual(stats["fish"]["std"], 0.816496580927726)
+        self.assertEqual(axes[0].get_title(), "Statistics of bird")
+        self.assertEqual(axes[1].get_title(), "Statistics of fish")
+        for ax, key in zip(axes, stats):
+            heights = [rect.get_height() for rect in ax.patches]
+            self.assertListEqual(heights, list(stats[key].values()))
     def test_case_3(self):
-        # Test with empty data list
-        self.assertIsNone(task_func([]))
+        # Test handling negatives
+        data = [{"cat": -1, "dog": -3}, {"cat": -2, "dog": -5}, {"cat": -3, "dog": -7}]
+        stats, axes = task_func(data)
+        self.assertAlmostEqual(stats["cat"]["mean"], -2.0)
+        self.assertAlmostEqual(stats["cat"]["std"], 0.816496580927726)
+        self.assertAlmostEqual(stats["dog"]["mean"], -5.0)
+        self.assertAlmostEqual(stats["dog"]["std"], 1.632993161855452)
+        
+        self.assertEqual(axes[0].get_title(), "Statistics of cat")
+        self.assertEqual(axes[1].get_title(), "Statistics of dog")
+        for ax, key in zip(axes, stats):
+            heights = [rect.get_height() for rect in ax.patches]
+            self.assertListEqual(heights, list(stats[key].values()))
     def test_case_4(self):
-        # Test with data containing non-numeric values
-        data = [{"A": "text", "B": "more text"}, {"A": 1, "B": 2}]
-        with self.assertRaises(TypeError):
-            task_func(data)
+        # Test single input
+        data = [{"cat": 1}]
+        stats, axes = task_func(data)
+        self.assertEqual(stats, {"cat": {"mean": 1.0, "std": 0.0}})
+        self.assertEqual(axes[0].get_title(), "Statistics of cat")
+        for ax, key in zip(axes, stats):
+            heights = [rect.get_height() for rect in ax.patches]
+            self.assertListEqual(heights, list(stats[key].values()))
     def test_case_5(self):
-        # Test with a single entry in the data list
-        data = [{"A": 1, "B": 2}]
-        ax = task_func(data)
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertEqual(len(ax.lines), 2)
+        # Test handling zero
+        data = [{"cat": 0, "dog": 0}, {"cat": 0, "dog": 0}, {"cat": 0, "dog": 0}]
+        stats, axes = task_func(data)
+        self.assertEqual(
+            stats, {"cat": {"mean": 0.0, "std": 0.0}, "dog": {"mean": 0.0, "std": 0.0}}
+        )
+        self.assertEqual(axes[0].get_title(), "Statistics of cat")
+        self.assertEqual(axes[1].get_title(), "Statistics of dog")
+        for ax, key in zip(axes, stats):
+            heights = [rect.get_height() for rect in ax.patches]
+            self.assertListEqual(heights, list(stats[key].values()))
     def test_case_6(self):
-        # Test focusing on data processing correctness
+        # Test correct handling of empty input
+        with self.assertRaises(ValueError):
+            task_func([])
+    def test_case_7(self):
+        # Test correct handling of incorrect input types
+        with self.assertRaises(TypeError):
+            task_func("not a list")
+        with self.assertRaises(TypeError):
+            task_func([123])
+        with self.assertRaises(TypeError):
+            task_func([{"cat": "not numeric"}])
+    def test_case_8(self):
+        # Test with a mix of positive and negative integers
         data = [
-            {"A": 10, "B": 15, "C": 12},
-            {"A": 12, "B": 20, "C": 14},
-            {"A": 15, "B": 18, "C": 15},
-            {"A": 11, "B": 17, "C": 13},
+            {"apple": -2, "banana": 4},
+            {"apple": -4, "banana": 6},
+            {"apple": -6, "banana": 8},
         ]
-        ax = task_func(data)
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        # Convert input data to DataFrame for easy comparison
-        input_df = pd.DataFrame(data)
-        # Iterate through each line in the plot and check against the input data
-        for line in ax.lines:
-            label = line.get_label()
-            _, y_data = line.get_data()
-            expected_y_data = input_df[label].values
-            # Use numpy to compare the y_data from plot and expected data from input
-            np.testing.assert_array_equal(
-                y_data, expected_y_data, err_msg=f"Data mismatch for label {label}"
-            )
+        stats, _ = task_func(data)
+        self.assertAlmostEqual(stats["apple"]["mean"], -4.0)
+        self.assertAlmostEqual(stats["apple"]["std"], 1.632993161855452)
+        self.assertAlmostEqual(stats["banana"]["mean"], 6.0)
+        self.assertAlmostEqual(stats["banana"]["std"], 1.632993161855452)
+    def test_case_9(self):
+        # Test with floating point numbers
+        data = [{"x": 0.5, "y": 1.5}, {"x": 2.5, "y": 3.5}, {"x": 4.5, "y": 5.5}]
+        stats, _ = task_func(data)
+        self.assertAlmostEqual(stats["x"]["mean"], 2.5)
+        self.assertAlmostEqual(stats["x"]["std"], 1.632993161855452)
+        self.assertAlmostEqual(stats["y"]["mean"], 3.5)
+        self.assertAlmostEqual(stats["y"]["std"], 1.632993161855452)
     def tearDown(self):
         plt.close("all")

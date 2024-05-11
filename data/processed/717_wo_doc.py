@@ -1,88 +1,94 @@
 import sys
-import json
-from datetime import datetime
+from configparser import ConfigParser
 
 # Constants
 PATH_TO_APPEND = '/path/to/whatever'
-JSON_FILE = '/path/to/json_file.json'
+CONFIG_FILE = '/path/to/config.ini'
 
-def task_func(path_to_append=PATH_TO_APPEND, json_file=JSON_FILE):
+def task_func(path_to_append=PATH_TO_APPEND, config_file=CONFIG_FILE):
     """
-    Add a specific path to sys.path and update a JSON file with the current date and time.
-    This function appends a given path to Python's sys.path and updates a JSON file with the current date and time under the key 'last_updated'.
-    
+    Add a specific path to sys.path and update a configuration file with this path.
+
     Parameters:
     - path_to_append (str): The path to append to sys.path. Default is '/path/to/whatever'.
-    - json_file (str): The path to the JSON file to update. Default is '/path/to/json_file.json'. The file should exist before running the function.
+    - config_file (str): The path to the config file to update. Default is '/path/to/config.ini'.
 
     Returns:
-    - json_data (dict): The updated JSON data. The dictionary will contain a 'last_updated' key with the current datetime as its value.
+    - config (object): The object contains the updated configuration.
+    - config_file (str): The path to the configuration file that was just modified.
 
     Requirements:
     - sys
-    - json
-    - datetime.datetime
+    - configparser.ConfigParser
 
     Example:
-    >>> task_func('/path/to/new_directory', '/path/to/new_json_file.json')
-    {'last_updated': '2023-08-28 12:34:56'}
+    >>> config = task_func('/path/to/new_directory', '/path/to/new_config.ini')
+    >>> 'path_to_append' in config['DEFAULT']
+    True
     """
-    sys.path.append(path_to_append)
-    with open(json_file, 'r+') as file:
-        json_data = json.load(file)
-        json_data['last_updated'] = str(datetime.now())
-        file.seek(0)
-        json.dump(json_data, file, indent=4)
-        file.truncate()
-    return json_data
+    if isinstance(path_to_append, list):
+        for path in path_to_append:
+            sys.path.append(path)
+    else:
+        sys.path.append(path_to_append)
+    config = ConfigParser()
+    if not os.path.exists(config_file):
+        open(config_file, 'a').close()
+    config.read(config_file)
+    path_str = ','.join(path_to_append) if isinstance(path_to_append, list) else path_to_append
+    config.set('DEFAULT', 'path_to_append', path_str)
+    with open(config_file, 'w') as file:
+        config.write(file)
+    return config, config_file
 
 import unittest
-import json
 import os
-import tempfile
 import sys
-from datetime import datetime
-# Update this path if needed to point to an actual temporary directory
+import tempfile
+from configparser import ConfigParser
 class TestCases(unittest.TestCase):
-    
     def setUp(self):
-        # Create temporary JSON files for testing in text mode
-        self.test_json_file_1 = tempfile.NamedTemporaryFile(mode='w+', delete=False)
-        self.test_json_file_2 = tempfile.NamedTemporaryFile(mode='w+', delete=False)
-        json.dump({'key': 'value'}, self.test_json_file_1)
-        json.dump({'key': 'value'}, self.test_json_file_2)
-        self.test_json_file_1.close()
-        self.test_json_file_2.close()
-        self.tmp_file = tempfile.mktemp(suffix='.json')
-        with open(self.tmp_file, 'w') as f:
-            json.dump({'initial_key': 'initial_value'}, f)
+        # Create a temporary configuration file for testing
+        self.temp_config_file = tempfile.NamedTemporaryFile(delete=False, mode='w')
+        config = ConfigParser()
+        config['DEFAULT'] = {'setting1': 'value1', 'setting2': 'value2'}
+        config.write(self.temp_config_file)
+        self.temp_config_file.close()
     def tearDown(self):
-        # Remove temporary JSON files after testing
-        os.unlink(self.test_json_file_1.name)
-        os.unlink(self.test_json_file_2.name)
-        os.remove(self.tmp_file)
-        
-    def test_path_append(self):
-        # Test if the path is correctly appended to sys.path
-        new_path = '/new/test/path'
-        task_func(path_to_append=new_path, json_file=self.test_json_file_1.name)
+        os.remove(self.temp_config_file.name)
+    def test_append_path_and_update_config(self):
+        new_path = '/path/to/test/directory'
+        updated_config, config_file_path = task_func(new_path, self.temp_config_file.name)
         self.assertIn(new_path, sys.path)
-    def test_json_update_1(self):
-        # Test if the JSON file is correctly updated (test_json_file_1)
-        output = task_func(json_file=self.test_json_file_1.name)
-        self.assertIn('last_updated', output)
-        self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
-    def test_json_update_2(self):
-        # Test if the JSON file is correctly updated (test_json_file_2)
-        output = task_func(json_file=self.test_json_file_2.name)
-        self.assertIn('last_updated', output)
-        self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
-    def test_default_path(self):
-        # Test if the default path is correctly appended when no argument is passed
-        task_func(json_file=self.test_json_file_1.name)
-        self.assertIn('/path/to/whatever', sys.path)
-    def test_default_json(self):
-        # Test if the default JSON file is correctly updated when no argument is passed
-        output = task_func(json_file=self.tmp_file)
-        self.assertIn('last_updated', output)
-        self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
+        self.assertEqual(updated_config['DEFAULT']['path_to_append'], new_path)
+        self.assertEqual(config_file_path, self.temp_config_file.name)
+    def test_default_path_and_config(self):
+        updated_config, config_file_path = task_func(PATH_TO_APPEND, self.temp_config_file.name)
+        self.assertIn(PATH_TO_APPEND, sys.path)
+        self.assertEqual(updated_config['DEFAULT']['path_to_append'], PATH_TO_APPEND)
+        self.assertEqual(config_file_path, self.temp_config_file.name)
+    def test_invalid_config_file(self):
+        invalid_config_file = 'invalid_config.ini'
+        if os.path.exists(invalid_config_file):
+            os.remove(invalid_config_file)  # Ensure the file does not exist before the test
+        try:
+            updated_config, config_file_path = task_func(config_file=invalid_config_file)
+            self.assertTrue(os.path.exists(invalid_config_file), "The config file should be created.")
+        finally:
+            if os.path.exists(invalid_config_file):
+                os.remove(invalid_config_file)  # Clean up the created file
+    def test_config_file_creation(self):
+        new_config_file = 'new_config.ini'
+        if os.path.exists(new_config_file):
+            os.remove(new_config_file)  # Ensure the file does not exist before the test
+        updated_config, config_file_path = task_func(config_file=new_config_file)
+        self.assertTrue(os.path.exists(new_config_file))
+        os.remove(new_config_file)
+    def test_multiple_paths(self):
+        path1 = '/path/to/test/directory1'
+        path2 = '/path/to/test/directory2'
+        updated_config, config_file_path = task_func(path_to_append=[path1, path2], config_file=self.temp_config_file.name)
+        self.assertIn(path1, sys.path)
+        self.assertIn(path2, sys.path)
+        self.assertEqual(updated_config['DEFAULT']['path_to_append'], f"{path1},{path2}")
+        self.assertEqual(config_file_path, self.temp_config_file.name)

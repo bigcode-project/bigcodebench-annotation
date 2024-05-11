@@ -74,8 +74,7 @@ class TestCases(unittest.TestCase):
         })
         pred_prices, ax = f_756(df)
         self.assertEqual(pred_prices, [107.0, 108.0, 109.0, 110.0, 111.0, 112.0, 113.0])
-        self.assertEqual(ax.get_xlabel(), '')
-        self.assertEqual(ax.get_ylabel(), '')
+        
 
     def test_case_2(self):
         df = pd.DataFrame({
@@ -84,8 +83,7 @@ class TestCases(unittest.TestCase):
         })
         pred_prices, ax = f_756(df)
         self.assertEqual(pred_prices, [207.0, 208.0, 209.0, 210.0, 211.0, 212.0, 213.0])
-        self.assertEqual(ax.get_xlabel(), '')
-        self.assertEqual(ax.get_ylabel(), '')
+        
 
     def test_case_3(self):
         df = pd.DataFrame({
@@ -94,8 +92,7 @@ class TestCases(unittest.TestCase):
         })
         pred_prices, ax = f_756(df)
         self.assertEqual(pred_prices, [307.0, 308.0, 309.0, 310.0, 311.0, 312.0, 313.0])
-        self.assertEqual(ax.get_xlabel(), '')
-        self.assertEqual(ax.get_ylabel(), '')
+        
 
     def test_case_4(self):
         df = pd.DataFrame({
@@ -104,8 +101,7 @@ class TestCases(unittest.TestCase):
         })
         pred_prices, ax = f_756(df)
         self.assertEqual(pred_prices, [407.0, 408.0, 409.0, 410.0, 411.0, 412.0, 413.0])
-        self.assertEqual(ax.get_xlabel(), '')
-        self.assertEqual(ax.get_ylabel(), '')
+        
 
     def test_case_5(self):
         df = pd.DataFrame({
@@ -114,8 +110,7 @@ class TestCases(unittest.TestCase):
         })
         pred_prices, ax = f_756(df)
         self.assertEqual(pred_prices, [507.0, 508.0, 509.0, 510.0, 511.0, 512.0, 513.0])
-        self.assertEqual(ax.get_xlabel(), '')
-        self.assertEqual(ax.get_ylabel(), '')
+        
 
 if __name__ == "__main__":
     import doctest

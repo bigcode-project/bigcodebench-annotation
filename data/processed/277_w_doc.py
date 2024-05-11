@@ -1,85 +1,58 @@
-import numpy as np
-from scipy import stats
-import matplotlib.pyplot as plt
+import random
+from itertools import combinations
+import math
 
-
-def task_func(matrix):
+def task_func(n):
     """
-    Calculate the distribution of the maximum values of each row in the matrix, 
-    record the histogram and the estimate of the core density of the distribution, 
-    and return the skew, kurtosis, and the histogram plot of the distribution.
-    
+    Generate n random dots within a unit square (0 to 1 on both axes) in a 2D space 
+    and find the pair that comes closest to each other.
+
     Parameters:
-    matrix (list): A list of lists representing a matrix.
-    
+    n (int): The number of points to generate. If n is less than 2, the function returns None.
+
     Returns:
-    tuple: The skewness, the kurtosis of the distribution, and the histogram plot (matplotlib Axes object).
+    tuple or None: A tuple of the form ((x1, y1), (x2, y2)), which are the coordinates of the closest pair,
+                   or None if n is less than 2.
+    
+    Note:
+    - This function will return None if the input n less than 2.
     
     Requirements:
-    - numpy
-    - scipy.stats
-    - matplotlib.pyplot
-    
+    - random
+    - itertools.combinations
+    - math
+
     Example:
-    >>> skew, kurtosis, ax = task_func([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> round(skew, 2)
-    0.0
-    >>> round(kurtosis, 2)
-    -1.5
+    >>> random.seed(0)
+    >>> print(task_func(2))
+    ((0.8444218515250481, 0.7579544029403025), (0.420571580830845, 0.25891675029296335))
     """
-    max_values = [max(row) for row in matrix]
-    fig, ax = plt.subplots()
-    ax.hist(max_values, bins=10, density=True, alpha=0.6, color='g')
-    xmin, xmax = plt.xlim()
-    x = np.linspace(xmin, xmax, 100)
-    p = stats.norm.pdf(x, np.mean(max_values), np.std(max_values))
-    ax.plot(x, p, 'k', linewidth=2)
-    skewness = stats.skew(max_values)
-    kurtosis = stats.kurtosis(max_values)
-    return skewness, kurtosis, ax
+    if n < 2:
+        return None
+    points = [(random.random(), random.random()) for i in range(n)]
+    closest_pair = min(combinations(points, 2), key=lambda pair: math.hypot(pair[0][0] - pair[1][0], pair[0][1] - pair[1][1]))
+    return closest_pair
 
 import unittest
-import doctest
+import random
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test with a small matrix
-        matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-        skew, kurtosis, ax = task_func(matrix)
-        
-        self.assertEqual(skew, 0.0)
-        self.assertEqual(kurtosis, -1.5)
-        self.assertIsInstance(ax, plt.Axes)
-    def test_case_2(self):
-        # Test with negative values
-        matrix = [[-1, -2, -3], [-4, -5, -6], [-7, -8, -9]]
-        skew, kurtosis, ax = task_func(matrix)
-        
-        self.assertEqual(skew, 0.0)
-        self.assertEqual(kurtosis, -1.5)
-        self.assertIsInstance(ax, plt.Axes)
-    def test_case_3(self):
-        # Test with larger numbers
-        matrix = [[100, 200, 300], [400, 500, 600], [700, 800, 900]]
-        skew, kurtosis, ax = task_func(matrix)
-        
-        self.assertEqual(skew, 0.0)
-        self.assertEqual(kurtosis, -1.5)
-        self.assertIsInstance(ax, plt.Axes)
-    def test_case_4(self):
-        # Test with identical rows
-        matrix = [[5, 5, 5], [5, 5, 5], [5, 5, 5]]
-        skew, kurtosis, ax = task_func(matrix)
-        
-        self.assertFalse(np.isnan(skew))
-        self.assertFalse(np.isnan(kurtosis))
-        self.assertIsInstance(ax, plt.Axes)
-    def test_case_5(self):
-        # Test with a single row
-        matrix = [[1, 2, 3]]
-        skew, kurtosis, ax = task_func(matrix)
-        
-        self.assertFalse(np.isnan(skew))  # Skew is defined
-        self.assertFalse(np.isnan(kurtosis))  # Kurtosis is defined
-        self.assertIsInstance(ax, plt.Axes)
+    def test_typical_use_case(self):
+        random.seed(0)
+        result = task_func(5)
+        self.assertIsInstance(result, tuple, "Should return a tuple for 5 points")
+    def test_zero_points(self):
+        random.seed(0)
+        result = task_func(0)
+        self.assertIsNone(result, "Should return None for 0 points")
+    def test_one_point(self):
+        random.seed(0)
+        result = task_func(1)
+        self.assertIsNone(result, "Should return None for 1 point")
+    def test_large_number_of_points(self):
+        random.seed(0)
+        result = task_func(1000)
+        self.assertIsInstance(result, tuple, "Should return a tuple for 1000 points")
+    def test_minimum_points(self):
+        random.seed(0)
+        result = task_func(2)
+        self.assertIsInstance(result, tuple, "Should return a tuple for 2 points")

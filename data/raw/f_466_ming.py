@@ -10,7 +10,7 @@ def f_466(matrix):
     matrix (array): The 2D numpy array.
     
     Returns:
-    ax (matplotlib.axes._subplots.AxesSubplot): The Axes object with the heatmap.
+    ax (matplotlib.axes._subplots.AxesSubplot): The Axes object with the heatmap of th 'hot' colormap.
     
     Requirements:
     - pandas

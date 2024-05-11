@@ -1,106 +1,134 @@
-import requests
-from PIL import Image
-import io
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
-def task_func(url):
+def task_func(csv_file_path, col1_name="column1", col2_name="column2"):
     """
-    Fetches an image from a given URL and returns it as a PIL Image object.
+    Reads data from a CSV file and generates a bar plot based on grouped mean values.
+
+    The DataFrame is grouped by the column named 'col1_name',
+    and the mean for each group is calculated for the column 'col2_name'.
+    A bar plot is created using matplotlib. Each bar in the plot represents a group,
+    and its height corresponds to the mean value of 'col2_name' for that group.
+    The plot is then configured with a title and axis labels:
+       - The title is set as "Mean of [col2_name] Grouped by [col1_name]".
+       This format dynamically inserts the names of the columns being analyzed into the title.
+       - The xlabel (label for the x-axis) is set to the name of the column used for grouping (col1_name).
+       - The ylabel (label for the y-axis) is set as "Mean of [col2_name]",
+       indicating that the y-axis represents the mean values of the specified column.
 
     Parameters:
-    - url (str): The URL of the image to download. It should be a valid HTTP or
-      HTTPS URL pointing directly to an image file.
+    - csv_file_path (str): The file path to the CSV file.
+    This parameter is mandatory and specifies the location of the CSV file to be read.
+    - col1_name (str, optional): The name of the column used for grouping the data.
+    If not provided, defaults to 'column1'. This column should exist in the CSV file.
+    - col2_name (str, optional): The name of the column for which the mean is calculated for each group.
+    If not provided, defaults to 'column2'. This column should exist in the CSV file and contain numerical data.
 
     Returns:
-    - PIL.Image.Image: A PIL Image object representing the downloaded image. This
-      object can be manipulated or displayed using PIL's image processing
-      capabilities.
-
-    Raises:
-    - ValueError: This exception is raised in the following scenarios:
-        - The URL is invalid or cannot be reached within the timeout period (5 seconds).
-        - The response from the server is not a successful HTTP status code (i.e., not in the range 200-299).
-        - The content fetched from the URL is not a valid image format that can be handled by PIL.
+    - matplotlib.axes.Axes: The Axes object of the generated bar plot.
+    This object can be used to further customize the plot, like adding labels or changing styles.
 
     Requirements:
-    - requests
-    - PIL
-    - io
+    - pandas
+    - matplotlib
 
     Example:
-    >>> img = task_func('https://example.com/image.jpg')
-    >>> isinstance(img, Image.Image)
-    True
+    >>> ax = task_func("data.csv", "group_column", "value_column")
+    >>> ax.get_title()
+    'Mean of value_column Grouped by group_column'
 
     Note:
-    - The function uses a timeout of 5 seconds for the HTTP request to prevent
-      indefinite waiting in case of unresponsive URLs.
-    - The function will not handle redirections or authentication scenarios. It
-      expects a direct link to an image resource.
+    - Ensure that the CSV file exists at the specified path and has the required columns.
+    - The function does not handle missing data. Ensure that the CSV file has clean and complete data for accurate results.
+    - The bar plot is customizable using matplotlib's functionality after the function returns the Axes object.
     """
-    try:
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()
-        image = Image.open(io.BytesIO(response.content))
-        return image
-    except Exception as e:
-        raise ValueError(f"Failed to retrieve image from {url}: {e}") from e
+    df = pd.read_csv(csv_file_path)
+    groupby_data = df.groupby(col1_name)[col2_name].mean()
+    _, ax = plt.subplots(figsize=(10, 6))
+    ax.bar(groupby_data.index, groupby_data.values)
+    ax.set_title(f"Mean of {col2_name} Grouped by {col1_name}")
+    ax.set_xlabel(col1_name)
+    ax.set_ylabel(f"Mean of {col2_name}")
+    return ax
 
 import unittest
+import pandas as pd
 from unittest.mock import patch
-from PIL import Image
-from pathlib import Path
-import shutil
-import os
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    """Test cases for task_func function."""
-    directory = "mnt/data/f_852_data"
+    """Test cases for the function."""
     def setUp(self):
-        """Setup method to create a sample image inr test files."""
-        # Create directory if it doesn't exist
-        self.test_dir = Path(self.directory)
-        self.test_dir.mkdir(parents=True, exist_ok=True)
-        # Create and save a sample image
-        self.sample_image_path = Path(self.test_dir) / "sample_image.png"
-        sample_image = Image.new("RGBA", (100, 100), color="blue")
-        sample_image.save(self.sample_image_path)
-    @patch("requests.get")
-    def test_valid_image_url(self, mock_get):
-        """Test task_func function with a valid image URL."""
-        with open(self.sample_image_path, "rb") as image_file:
-            mock_get.return_value.content = image_file.read()
-        img = task_func("https://www.google.com/images/srpr/logo11w.png")
-        self.assertIsInstance(img, Image.Image, "Returned object is not a PIL Image")
-    @patch("requests.get")
-    def test_invalid_url(self, mock_get):
-        """Test task_func function with an invalid URL (not an image)."""
-        mock_get.side_effect = ValueError("Invalid URL")
-        with self.assertRaises(ValueError):
-            task_func("https://www.google.com")
-    @patch("requests.get")
-    def test_nonexistent_url(self, mock_get):
-        """Test task_func function with a nonexistent URL."""
-        mock_get.side_effect = ValueError("Nonexistent URL")
-        with self.assertRaises(ValueError):
-            task_func("https://example.com/nonexistent_image.jpg")
-    @patch("requests.get")
-    def test_image_properties(self, mock_get):
-        """Test task_func function with a known image and check its properties."""
-        with open(self.sample_image_path, "rb") as image_file:
-            mock_get.return_value.content = image_file.read()
-        img = task_func("https://www.google.com/images/srpr/logo11w.png")
-        self.assertEqual(img.format, "PNG", "Image format does not match expected")
-        self.assertEqual(img.size, (100, 100), "Image size does not match expected")
-    @patch("requests.get")
-    def test_image_mode(self, mock_get):
-        """Test task_func function with a known image and check its mode."""
-        with open(self.sample_image_path, "rb") as image_file:
-            mock_get.return_value.content = image_file.read()
-        img = task_func("https://www.google.com/images/srpr/logo11w.png")
-        self.assertEqual(img.mode, "RGBA", "Image mode does not match expected")
+        # Define mock data
+        self.data = {
+            "sample_data": pd.DataFrame(
+                {"column1": ["A", "A", "B", "B"], "column2": [1, 2, 3, 4]}
+            ),
+            "different_data": pd.DataFrame(
+                {"column1": ["C", "C", "D", "D"], "column2": [5, 6, 7, 8]}
+            ),
+            "missing_values": pd.DataFrame(
+                {"column1": ["A", "A", "B", "B"], "column2": [1, None, 3, None]}
+            ),
+            "different_columns": pd.DataFrame(
+                {"col1": ["E", "E", "F", "F"], "col2": [9, 10, 11, 12]}
+            ),
+            "single_group_data": pd.DataFrame(
+                {"column1": ["A", "A", "A"], "column2": [1, 2, 3]}
+            ),
+            "non_numeric_data": pd.DataFrame(
+                {"column1": ["A", "B", "C"], "column2": ["x", "y", "z"]}
+            ),
+        }
+    @patch("pandas.read_csv")
+    def test_bar_plot(self, mock_read_csv):
+        """Test standard bar plot generation with sample data."""
+        mock_read_csv.return_value = self.data["sample_data"]
+        ax = task_func("any_path.csv", "column1", "column2")
+        self.check_plot(ax, "sample_data", "column1", "column2")
+    @patch("pandas.read_csv")
+    def test_different_data(self, mock_read_csv):
+        """Test bar plot with different data set."""
+        mock_read_csv.return_value = self.data["different_data"]
+        ax = task_func("any_path.csv", "column1", "column2")
+        self.check_plot(ax, "different_data", "column1", "column2")
+    @patch("pandas.read_csv")
+    def test_missing_values(self, mock_read_csv):
+        """Test bar plot with missing values in data."""
+        mock_read_csv.return_value = self.data["missing_values"]
+        ax = task_func("any_path.csv", "column1", "column2")
+        self.check_plot(ax, "missing_values", "column1", "column2")
+    @patch("pandas.read_csv")
+    def test_different_column_names(self, mock_read_csv):
+        """Test bar plot with different column names."""
+        mock_read_csv.return_value = self.data["different_columns"]
+        ax = task_func("any_path.csv", "col1", "col2")
+        self.check_plot(ax, "different_columns", "col1", "col2")
+    @patch("pandas.read_csv")
+    def test_single_group_data(self, mock_read_csv):
+        """Test bar plot with data containing only a single group."""
+        mock_read_csv.return_value = self.data["single_group_data"]
+        ax = task_func("any_path.csv", "column1", "column2")
+        self.check_plot(ax, "single_group_data", "column1", "column2")
+    @patch("pandas.read_csv")
+    def test_non_numeric_aggregation_column(self, mock_read_csv):
+        """Test bar plot with non-numeric data in the aggregation column."""
+        mock_read_csv.return_value = self.data["non_numeric_data"]
+        with self.assertRaises(TypeError):
+            task_func("any_path.csv", "column1", "column2")
+    def check_plot(self, ax, data_key, col1, col2):
+        """Check the generated bar plot."""
+        # Use the correct DataFrame for expected calculations
+        df = self.data[data_key]
+        # Common assertions for checking plot
+        expected_title = f"Mean of {col2} Grouped by {col1}"
+        self.assertEqual(ax.get_title(), expected_title)
+        self.assertEqual(ax.get_xlabel(), col1)
+        self.assertEqual(ax.get_ylabel(), f"Mean of {col2}")
+        # Check the bars in the plot
+        bars = ax.patches
+        bar_heights = [bar.get_height() for bar in bars]
+        expected_means = df.groupby(col1)[col2].mean().values
+        self.assertListEqual(bar_heights, list(expected_means))
     def tearDown(self):
-        # Cleanup the test directories
-        dirs_to_remove = ["mnt/data", "mnt"]
-        for dir_path in dirs_to_remove:
-            if os.path.exists(dir_path):
-                shutil.rmtree(dir_path)
+        plt.close()

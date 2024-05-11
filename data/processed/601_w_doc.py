@@ -1,73 +1,81 @@
-import numpy as np
-import pandas as pd
-
+import seaborn as sns
+import time
 
 def task_func(df, letter):
     """
-    This function converts an input dictionary into a DataFrame, filters rows where 'Word' column values start with a
-    specified letter, calculates the lengths of these words, and returns basic statistics (mean, median, mode) of the
-    word lengths.
+    Filters rows in a DataFrame based on the starting letter of the values in the 'Word' column.
+    It then calculates the lengths of these words and returns a box plot representing the distribution
+    of these lengths.
 
     Parameters:
-    df (dict of list): A dictionary where the key 'Word' maps to a list of strings.
-    letter (str): The letter to filter the 'Word' column.
+    - df (pd.DataFrame): The input DataFrame containing a 'Word' column with string values.
+    - letter (str): A lowercase letter to filter words in the 'Word' column.
 
     Returns:
-    dict: A dictionary of mean, median, and mode of word lengths.
-    
+    - Axes: A box plot visualizing the distribution of the word lengths for words starting
+                   with the specified letter. If the DataFrame is empty or the 'Word' column is missing,
+                   returns None.
+
     Requirements:
-    - pandas
-    - numpy
+    - seaborn
+    - time
 
     Example:
-    >>> df = {'Word': ['apple', 'banana', 'apricot', 'blueberry', 'cherry', 'avocado']}
-    >>> stats = task_func(df, 'a')
-    >>> stats['mean'] > 0
-    True
-    >>> stats['median'] > 0
-    True
+    >>> import pandas as pd
+    >>> words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
+    >>> df = pd.DataFrame({'Word': words})
+    >>> _ = task_func(df, 'apple')
     """
-    df = pd.DataFrame(df)
-    regex = '^' + letter
-    filtered_df = df[df['Word'].str.contains(regex, regex=True)]
+    start_time = time.time()
+    if 'Word' not in df.columns:
+        raise ValueError("The DataFrame should contain a 'Word' column.")
+    if df.empty:
+        print("The DataFrame is empty.")
+        return None
+    regex = f'^{letter}'
+    filtered_df = df[df['Word'].str.match(regex)]
+    if filtered_df.empty:
+        print(f"No words start with the letter '{letter}'.")
+        return None
     word_lengths = filtered_df['Word'].str.len()
-    statistics = {'mean': np.mean(word_lengths), 'median': np.median(word_lengths), 'mode': word_lengths.mode().values[0]}
-    return statistics
+    ax = sns.boxplot(x=word_lengths)
+    ax.set_title(f"Word Lengths Distribution for Words Starting with '{letter}'")
+    end_time = time.time()  # End timing
+    cost = f"Operation completed in {end_time - start_time} seconds."
+    return ax
 
 import unittest
-import random
-from string import ascii_lowercase
+from unittest.mock import patch
+import matplotlib.pyplot as plt
+import pandas as pd
+# Check and set the backend
 class TestCases(unittest.TestCase):
     def setUp(self):
-        word_list = []
-        num = 1000
-        for _ in range(num):
-            length = random.randint(3, 10)
-            word = ''.join(random.choice(ascii_lowercase) for _ in range(length))
-            word_list.append(word)
-        self.df = {'Word': word_list}
-    def test_case_1(self):
-        result = task_func(self.df, 'a')
-        self.assertIn('mean', result)
-        self.assertIn('median', result)
-        self.assertIn('mode', result)
-    def test_case_2(self):
-        result = task_func(self.df, 'z')
-        self.assertIn('mean', result)
-        self.assertIn('median', result)
-        self.assertIn('mode', result)
-    def test_case_3(self):
-        result = task_func(self.df, 'm')
-        self.assertIn('mean', result)
-        self.assertIn('median', result)
-        self.assertIn('mode', result)
-    def test_case_4(self):
-        result = task_func(self.df, 'f')
-        self.assertIn('mean', result)
-        self.assertIn('median', result)
-        self.assertIn('mode', result)
-    def test_case_5(self):
-        result = task_func(self.df, 't')
-        self.assertIn('mean', result)
-        self.assertIn('median', result)
-        self.assertIn('mode', result)
+        self.words = ['apple', 'banana', 'cherry', 'date', 'apricot', 'blueberry', 'avocado']
+        self.df = pd.DataFrame({'Word': self.words})
+    @patch('seaborn.boxplot')
+    def test_word_filtering(self, mock_boxplot):
+        """Test if the function correctly filters words starting with a given letter."""
+        task_func(self.df, 'a')
+        filtered_words = ['apple', 'apricot', 'avocado']
+        self.assertTrue(all(word.startswith('a') for word in filtered_words), "Word filtering by letter 'a' failed.")
+    @patch('seaborn.boxplot')
+    def test_boxplot_called(self, mock_boxplot):
+        """Test if seaborn's boxplot is called when valid data is provided."""
+        task_func(self.df, 'a')
+        mock_boxplot.assert_called_once()
+    @patch('matplotlib.pyplot.show')
+    def test_return_type(self, mock_show):
+        """Test the return type is an Axes."""
+        ax = task_func(self.df, 'a')
+        self.assertIsInstance(ax, plt.Axes)
+    def test_empty_dataframe(self):
+        """Test handling of empty DataFrame."""
+        empty_df = pd.DataFrame({'Word': []})
+        result = task_func(empty_df, 'a')
+        self.assertIsNone(result, "Empty DataFrame should return None.")
+    def test_no_word_column(self):
+        """Test handling of DataFrame without 'Word' column."""
+        df_without_word = pd.DataFrame({'NoWord': self.words})
+        with self.assertRaises(ValueError):
+            task_func(df_without_word, 'a')

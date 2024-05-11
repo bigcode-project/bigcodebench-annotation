@@ -1,97 +1,116 @@
-import pandas as pd
 import os
+import pandas as pd
+import numpy as np
 
 
-def task_func(data_dir: str, csv_files: list) -> pd.DataFrame:
+def task_func(data_dir: str, csv_file: str) -> pd.DataFrame:
     """
-    Merge / Concatenate multiple CSV files from a specified directory into a single Pandas DataFrame.
+    Load a CSV file into a pandas DataFrame and replace the NaN values in
+    numeric columns with the mean of the corresponding column.
+    The resulting DataFrame is returned.
 
-    If an empty list of files is passed, an empty DataFrame is returned.
-    
+    If an empty csv is passed, an empty DataFrame is returned.
+
     Parameters:
-    data_dir (str): The directory path where the CSV files are located.
-    csv_files (list): A list of CSV file names to be merged.
-    
+    - data_dir (str): The path to the directory containing the CSV file.
+    - csv_file (str): The name of the CSV file to be processed.
+
     Returns:
-    pd.DataFrame: A pandas DataFrame with the merged data.
-    
+    pd.DataFrame: A pandas DataFrame with the processed data.
+
+    Raises:
+    FileNotFoundError: If csv_file does not exist.
+
     Requirements:
-    - pandas
     - os
+    - pandas
+    - numpy
     
     Example:
-    >>> df = task_func('/path/to/data/directory', ['file1.csv', 'file2.csv', 'file3.csv'])
-    >>> print(df.head())
-            Name  Age  Gender
-    0    Simon   5     Male
-    1    Bobby   32    Male
-    0    Elena   13  Female
-    1      Tom   23    Male
-    0   Franko   12    Male
+    >>> df = task_func("/path/to/data/directory", "file.csv")
+    >>> print(df)
+         Fruit     Taste     Cost
+    0    Apple      Good        1
+    1   Orange       NaN        2
+    2  Avocado       Bad        1.667
+    3  Coconut     Tasty        2
     """
-    merged_df = pd.DataFrame()
-    for file in csv_files:
-        file_path = os.path.join(data_dir, file)
+    file_path = os.path.join(data_dir, csv_file)
+    try:
         df = pd.read_csv(file_path)
-        merged_df = pd.concat([merged_df, df], ignore_index=True)
-    return merged_df
+    except pd.errors.EmptyDataError:
+        return pd.DataFrame()
+    for column in df.columns:
+        if np.issubdtype(df[column].dtype, np.number):  # checking for numeric columns
+            df[column].fillna(df[column].mean(), inplace=True)
+    return df
 
 import unittest
 import pandas as pd
+import numpy as np
 import os
-import shutil
 import tempfile
+import shutil
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Create a temporary directory to hold CSV files
+        self.folder_path = 'task_func_data'
+    def setUp(self):
+        # Create a temporary directory for test data
         self.test_dir = tempfile.mkdtemp()
-        self.files = {
-            'file1.csv': pd.DataFrame({
-                'Name': ['Alice', 'Bob'],
-                'Age': [25, 30]
-            }),
-            'file2.csv': pd.DataFrame({
-                'Name': ['Charlie'],
-                'Age': [35]
-            }),
-            'file3.csv': pd.DataFrame({
-                'Name': ['David', 'Eve'],
-                'Age': [45, 55],
-                'Gender': ['Male', 'Female']
-            }),
-            'file4.csv': pd.DataFrame({
-                'Name': ['Faythe'],
-                'Animal': ['Cat']
-            })
-        }
-        # Write files to disk
-        for filename, df in self.files.items():
-            df.to_csv(os.path.join(self.test_dir, filename), index=False)
     def tearDown(self):
-        # Clean up the temporary directory
+        # Remove the temporary directory after the test
         shutil.rmtree(self.test_dir)
-    def test_with_multiple_files(self):
-        # Test merging multiple files
-        result = task_func(self.test_dir, ['file1.csv', 'file2.csv'])
-        expected_df = pd.concat([self.files['file1.csv'], self.files['file2.csv']],
-                                ignore_index=True)
-        pd.testing.assert_frame_equal(result, expected_df)
-    def test_with_different_columns(self):
-        # Test files with different columns
-        result = task_func(self.test_dir, ['file1.csv', 'file3.csv', 'file4.csv'])
-        expected_df = pd.concat([self.files['file1.csv'], self.files['file3.csv'], self.files['file4.csv']],
-                                ignore_index=True)
-        pd.testing.assert_frame_equal(result, expected_df)
-    def test_with_empty_list(self):
-        # Test with an empty list of files
-        result = task_func(self.test_dir, [])
+    def create_csv(self, filename, data):
+        # Helper method to create a CSV file
+        filepath = os.path.join(self.test_dir, filename)
+        data.to_csv(filepath, index=False)
+        return filename
+    def test_empty_csv(self):
+        # Test with an empty CSV file
+        filename = self.create_csv('empty.csv', pd.DataFrame())
+        result = task_func(self.test_dir, filename)
         self.assertTrue(result.empty)
-    def test_with_nonexistent_file(self):
-        # Test referencing a non-existent file
+    def test_numeric_columns_nan_replacement(self):
+        data = pd.DataFrame({
+            'Age': [25, np.nan, 30],
+            'Salary': [50000, 60000, np.nan]
+        })
+        filename = self.create_csv('data.csv', data)
+        expected = pd.DataFrame({
+            'Age': [25.0, 27.5, 30.0],  # Ensure all ages are floats
+            'Salary': [50000.0, 60000.0, 55000.0]  # Ensure all salaries are floats
+        })
+        result = task_func(self.test_dir, filename)
+        pd.testing.assert_frame_equal(result, expected)
+    def test_mixed_columns(self):
+        data = pd.DataFrame({
+            'Name': ['Alice', 'Bob', 'Charlie'],
+            'Score': [np.nan, 88, 92]
+        })
+        filename = self.create_csv('mixed.csv', data)
+        expected = pd.DataFrame({
+            'Name': ['Alice', 'Bob', 'Charlie'],
+            'Score': [90.0, 88.0, 92.0]  # Ensure all scores are floats
+        })
+        result = task_func(self.test_dir, filename)
+        pd.testing.assert_frame_equal(result, expected)
+    def test_all_nan_column(self):
+        # Test with a column that is entirely NaN
+        data = pd.DataFrame({
+            'Empty': [np.nan, np.nan, np.nan]
+        })
+        filename = self.create_csv('all_nan.csv', data)
+        result = task_func(self.test_dir, filename)
+        self.assertTrue(result['Empty'].isnull().all())
+    def test_no_numeric_data(self):
+        # Test a CSV file with no numeric data
+        data = pd.DataFrame({
+            'City': ['New York', 'Los Angeles', 'Chicago']
+        })
+        filename = self.create_csv('cities.csv', data)
+        result = task_func(self.test_dir, filename)
+        pd.testing.assert_frame_equal(result, data)
+    def test_file_not_found(self):
+        # Test the FileNotFoundError
         with self.assertRaises(FileNotFoundError):
-            task_func(self.test_dir, ['nonexistent.csv'])
-    def test_single_file(self):
-        # Test with a single file
-        result = task_func(self.test_dir, ['file2.csv'])
-        expected_df = self.files['file2.csv']
-        pd.testing.assert_frame_equal(result, expected_df)
+            task_func(self.test_dir, "non_existent.csv")

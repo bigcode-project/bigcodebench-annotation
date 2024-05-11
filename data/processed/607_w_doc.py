@@ -1,72 +1,71 @@
 import pandas as pd
-from scipy import stats
+import matplotlib.pyplot as plt
+from random import sample
+
+# Constants for column names to use in plots
+COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
 
-def task_func(matrix):
-    """
-    Normalizes a 2D numeric array (matrix) using the Z score.
-    
+def task_func(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
+    '''
+    Remove rows from a dataframe based on column values and generate random scatter plots.
+
     Parameters:
-    matrix (array): The 2D numpy array.
-    
+    - df (pd.DataFrame): The input DataFrame to be modified.
+    - tuples (list): A list of tuples, each representing a row's values for removal.
+    - n_plots (int): Number of scatter plots to generate from random pairs of columns.
+
     Returns:
-    DataFrame: The normalized DataFrame.
+    - pd.DataFrame: The DataFrame after removal of specified rows.
+    - list: A list containing matplotlib Axes objects of the generated plots.
 
     Requirements:
     - pandas
-    - numpy
-    - scipy
+    - matplotlib.pyplot
+    - random
 
     Example:
-    >>> import numpy as np
-    >>> matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    >>> normalized_df = task_func(matrix)
-    >>> isinstance(normalized_df, pd.DataFrame)
-    True
-    >>> np.allclose(normalized_df.mean(), 0)
-    True
-    >>> np.allclose(normalized_df.std(ddof=0), 1)
-    True
-    """
-    df = pd.DataFrame(matrix)
-    normalized_df = df.apply(stats.zscore)
-    normalized_df = normalized_df.fillna(0.0)
-    return normalized_df
+    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=COLUMNS)
+    >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
+    >>> modified_df, plots = task_func(df, tuples, 3)
+    '''
+    df = df[~df.apply(tuple, axis=1).isin(tuples)]
+    plots = []
+    for _ in range(n_plots):
+        selected_columns = sample(COLUMNS, 2)
+        ax = df.plot(x=selected_columns[0], y=selected_columns[1], kind='scatter')
+        plots.append(ax)
+    plt.show()
+    return df, plots
 
 import unittest
+from unittest.mock import patch
 import numpy as np
 class TestCases(unittest.TestCase):
-    def test_extreme_values_shape(self):
-        """Test the function with extreme values to ensure output shape is correct."""
-        matrix = [[1, 2], [10000, 20000]]
-        result_df = task_func(matrix)
-        # Verify that the shape of the result is the same as the input
-        self.assertEqual(result_df.shape, (2, 2))
-    def test_case_2(self):
-        matrix = np.array([[2, 5], [5, 2]])
-        result = task_func(matrix)
-        expected_result = pd.DataFrame({
-            0: [-1.0, 1.0],
-            1: [1.0, -1.0]
-        })
-        pd.testing.assert_frame_equal(result, expected_result)
-    def test_case_3(self):
-        matrix = np.array([[5]])
-        result = task_func(matrix)
-        expected_result = pd.DataFrame({
-            0: [0.0]
-        })
-        pd.testing.assert_frame_equal(result, expected_result)
-    def test_uniform_data(self):
-        """Test a matrix where all elements are the same."""
-        matrix = [[1, 1], [1, 1]]
-        expected_result = pd.DataFrame({
-            0: [0.0, 0.0],
-            1: [0.0, 0.0]
-        })
-        pd.testing.assert_frame_equal(task_func(matrix), expected_result)
-    def test_non_numeric_data(self):
-        """Test the function with non-numeric data."""
-        matrix = [['a', 'b'], ['c', 'd']]
-        with self.assertRaises(TypeError):
-            task_func(matrix)
+    def setUp(self):
+        self.df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=COLUMNS)
+        self.tuples = [(self.df.iloc[0].values), (self.df.iloc[1].values)]
+    def test_no_plots_generated(self):
+        """Test case with zero plots requested."""
+        _, plots = task_func(self.df, [], 0)  # Request 0 plots.
+        self.assertEqual(len(plots), 0, "No plots should be generated when n_plots is 0.")
+    def test_plot_generation(self):
+        _, plots = task_func(self.df, [], 3)
+        self.assertEqual(len(plots), 3, "Should generate exactly 3 plots.")
+    @patch('matplotlib.pyplot.show')
+    def test_empty_dataframe(self, mock_show):
+        empty_df = pd.DataFrame(columns=COLUMNS)
+        modified_df, plots = task_func(empty_df, [], 2)
+        self.assertTrue(modified_df.empty, "DataFrame should be empty.")
+        self.assertEqual(len(plots), 2, "Should attempt to generate 2 plots even for an empty DataFrame.")
+    def test_no_row_removal(self):
+        modified_df, _ = task_func(self.df, [(999, 999, 999, 999, 999)], 0)
+        self.assertEqual(len(modified_df), len(self.df), "No rows should be removed.")
+    def test_random_plot_columns(self):
+        _, plots = task_func(self.df, [], 1)
+        # Assuming task_func generates at least one plot and adds it to the list,
+        # access the first plot for testing.
+        first_plot = plots[0]
+        plot_columns = [first_plot.get_xlabel(), first_plot.get_ylabel()]
+        self.assertIn(plot_columns[0], COLUMNS, "X-axis should be from COLUMNS.")
+        self.assertIn(plot_columns[1], COLUMNS, "Y-axis should be from COLUMNS.")

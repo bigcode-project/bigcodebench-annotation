@@ -1,82 +1,92 @@
 import os
+import pandas as pd
 import re
+import matplotlib.pyplot as plt
 
-def task_func(pattern: str, replacement: str, directory: str) -> bool:
+def task_func(directory: str, pattern: str) -> list:
     """
-    Renames all files in a directory that match a particular pattern with a given replacement string.
+    Searches a directory for CSV files matching a given regular expression pattern,
+    reads sales data from these files, and plots the sales data with month on the x-axis and sales on the y-axis.
     
+    Note:
+    - Each CSV file contains two columns: 'Month' and 'Sales'.
+
     Parameters:
-        - pattern (str): The pattern to search for in the filenames.
-        - replacement (str): The string to replace the pattern with.
-        - directory (str): The directory in which to search for files.
-        
-    Returns:
-    - Returns a boolean value. True if the operation was successful, otherwise False.
-    
-    Requirements:
-    - re
-    - os
+    - directory (str): The directory path where the CSV files are located.
+    - pattern (str): The regular expression pattern to match the filenames.
 
+    Returns:
+    - A list of matplotlib.axes._axes.Axes objects, each representing a plot of sales data from a matched CSV file.
+
+    Requirements:
+    - os
+    - pandas
+    - re
+    - matplotlib.pyplot
+    
     Examples:
-    >>> task_func('draft', 'final', '/home/user/documents')
-    True
-    >>> task_func('tmp', 'temp', '/home/user/downloads')
-    False
+    >>> axes = task_func('/path/to/data/', r'^sales_data_\d{4}.csv')
+    >>> len(axes)
+    2
+    >>> axes[0].get_title()
+    'sales_data_2021.csv'
     """
-    try:
-        for file in os.listdir(directory):
-            if re.search(pattern, file):
-                new_filename = re.sub(pattern, replacement, file)
-                os.rename(os.path.join(directory, file), os.path.join(directory, new_filename))
-        return True
-    except Exception as e:
-        return False
+    plots = []
+    for file in os.listdir(directory):
+        if re.match(pattern, file):
+            df = pd.read_csv(os.path.join(directory, file))
+            ax = df.plot(x='Month', y='Sales', title=file)
+            plots.append(ax)
+    plt.show()
+    return plots
 
 import unittest
-import tempfile
 import shutil
-from pathlib import Path
+import numpy as np
 class TestCases(unittest.TestCase):
-    
     def setUp(self):
-        self.test_dir = tempfile.mkdtemp()
-        
+        # Prepare test data
+        self.directory = "task_func_data/"
+        self.pattern = r"^sales_data_\d{4}.csv"
+        os.makedirs(self.directory, exist_ok=True)
+        data_2021 = pd.DataFrame({
+            'Month': ['January', 'February', 'March'],
+            'Sales': [100, 150, 200]
+        })
+        data_2022 = pd.DataFrame({
+            'Month': ['January', 'February', 'March'],
+            'Sales': [120, 130, 210]
+        })
+        data_2021.to_csv(self.directory + "sales_data_2021.csv", index=False)
+        data_2022.to_csv(self.directory + "sales_data_2022.csv", index=False)
     def tearDown(self):
-        shutil.rmtree(self.test_dir)
-    
-    def create_test_files(self, filenames):
-        for filename in filenames:
-            Path(f"{self.test_dir}/{filename}").touch()
-    
-    def test_renafiles(self):
-        self.create_test_files(["draft1.txt", "draft2.txt", "draft3.txt"])
-        result = task_func("draft", "final", self.test_dir)
-        self.assertTrue(result)
-        expected_files = sorted(["final1.txt", "final2.txt", "final3.txt"])
-        actual_files = sorted(os.listdir(self.test_dir))
-        self.assertEqual(expected_files, actual_files)
-        
-    def test_no_matching_files(self):
-        self.create_test_files(["file1.txt", "file2.txt", "file3.txt"])
-        result = task_func("draft", "final", self.test_dir)
-        self.assertTrue(result)
-        expected_files = sorted(["file1.txt", "file2.txt", "file3.txt"])
-        actual_files = sorted(os.listdir(self.test_dir))
-        self.assertEqual(expected_files, actual_files)
-        
-    def test_nonexistent_directory(self):
-        result = task_func("draft", "final", "/nonexistent/directory")
-        self.assertFalse(result)
-        
-    def test_empty_directory(self):
-        result = task_func("draft", "final", self.test_dir)
-        self.assertTrue(result)
-        self.assertEqual([], os.listdir(self.test_dir))
-        
-    def test_complex_pattern_renaming(self):
-        self.create_test_files(["draft_file1.txt", "file_draft2.txt", "draft3file.txt"])
-        result = task_func("draft", "final", self.test_dir)
-        self.assertTrue(result)
-        expected_files = sorted(["final_file1.txt", "file_final2.txt", "final3file.txt"])
-        actual_files = sorted(os.listdir(self.test_dir))
-        self.assertEqual(expected_files, actual_files)
+        # Clean up test data
+        shutil.rmtree(self.directory)
+    def test_plots_generated(self):
+        plots = task_func(self.directory, self.pattern)
+        self.assertEqual(len(plots), 2, "Should generate two plots for two CSV files")
+    def test_plot_titles(self):
+        plots = task_func(self.directory, self.pattern)
+        expected_titles = ['sales_data_2022.csv', 'sales_data_2021.csv']
+        plot_titles = [plot.get_title() for plot in plots]
+        self.assertEqual(set(plot_titles), set(expected_titles), "Plot titles should match the CSV filenames")
+    def test_no_files_matched(self):
+        plots = task_func(self.directory, r"^no_match_\d{4}.csv")
+        self.assertEqual(len(plots), 0, "Should return an empty list if no files match the pattern")
+    def test_invalid_directory(self):
+        with self.assertRaises(FileNotFoundError):
+            task_func("/invalid/directory/", self.pattern)
+    def test_plot_data_integrity(self):
+        plots = task_func(self.directory, self.pattern)
+        # Read the CSV files again to get expected data
+        expected_data = []
+        for file in os.listdir(self.directory):
+            if re.match(self.pattern, file):
+                df = pd.read_csv(os.path.join(self.directory, file))
+                expected_data.append(df['Sales'].to_list())
+        for plot, expected_sales in zip(plots, expected_data):
+            lines = plot.get_lines()
+            for line in lines:
+                y_data = line.get_ydata()
+                # Use np.isclose for floating point comparison, if necessary
+                self.assertTrue(any(np.array_equal(y_data, expected) for expected in expected_data), "Plotted data should match the CSV file content")

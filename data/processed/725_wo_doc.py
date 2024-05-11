@@ -1,90 +1,94 @@
+import codecs
 import os
-import json
+import glob
 
-def task_func(config_path: str) -> dict:
+# Constants
+DIRECTORY_PATH = './files/'
+
+def task_func(directory=DIRECTORY_PATH, from_encoding='cp1251', to_encoding='utf8'):
     """
-    Load a JSON configuration file and return the configuration dictionary.
+    Convert the encoding of all text files in a specified directory from one encoding to another. 
+    The function modifies the files in-place.
     
     Parameters:
-    - config_path (str): Path to the configuration file.
+    - directory (str): The directory where the text files are located. Default is './files/'.
+    - from_encoding (str): The original encoding of the text files. Default is 'cp1251'.
+    - to_encoding (str): The encoding to which the text files should be converted. Default is 'utf8'.
     
     Returns:
-    - config (dict): Configuration dictionary loaded from the file.
+    - None
     
     Requirements:
+    - codecs
     - os
-    - json
-    
-    Raises:
-    - FileNotFoundError: If the provided configuration file does not exist.
+    - glob
     
     Example:
-    >>> task_func("config.json")
-    {'key': 'value', 'setting': True}
+    >>> task_func('./files/', 'cp1251', 'utf8')  # Converts all .txt files in './files/' from 'cp1251' to 'utf8'
+    >>> task_func('./other_files/', 'utf8', 'ascii')  # Converts all .txt files in './other_files/' from 'utf8' to 'ascii'
     """
-    if not os.path.isfile(config_path):
-        raise FileNotFoundError(f"The configuration file {config_path} does not exist.")
-    with open(config_path) as f:
-        config = json.load(f)
-    return config
+    for filename in glob.glob(os.path.join(directory, '*.txt')):
+        with codecs.open(filename, 'r', from_encoding) as file:
+            content = file.read()
+        with codecs.open(filename, 'w', to_encoding) as file:
+            file.write(content)
 
 import unittest
-import json
-import tempfile
+from unittest.mock import patch
+import os
+import glob
+import codecs
+# Helper function to create a text file with specific encoding
+def create_text_file(filename, content, encoding):
+    with codecs.open(filename, 'w', encoding) as file:
+        file.write(content)
+import codecs
+import os
+import glob
+# Constants
+DIRECTORY_PATH = './files/'
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Create temporary configuration files for testing
-        self.valid_config_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        self.valid_config_file.write('{"database": "test_db", "logging": true}')
-        self.valid_config_file.close()
+        os.makedirs('./test_files/', exist_ok=True)
+        os.makedirs('./empty/', exist_ok=True)
         
-        self.empty_config_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        self.empty_config_file.write('{}')
-        self.empty_config_file.close()
-        
-        self.invalid_json_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        self.invalid_json_file.write('invalid json')
-        self.invalid_json_file.close()
-    
     def tearDown(self):
-        # Clean up temporary configuration files after testing
-        os.unlink(self.valid_config_file.name)
-        os.unlink(self.empty_config_file.name)
-        os.unlink(self.invalid_json_file.name)
-    
-    def test_valid_config(self):
-        # Test with a valid configuration file
-        config = task_func(self.valid_config_file.name)
-        self.assertIsInstance(config, dict)
-        self.assertIn("database", config)
-        self.assertIn("logging", config)
-    
-    def test_non_existent_config(self):
-        # Test with a non-existent configuration file
-        with self.assertRaises(FileNotFoundError):
-            task_func("test_data/non_existent_config.json")
-    
-    def test_invalid_json_format(self):
-        # Test with a configuration file containing invalid JSON
-        with self.assertRaises(json.JSONDecodeError):
-            task_func(self.invalid_json_file.name)
-    
-    def test_empty_config(self):
-        # Test with an empty configuration file
-        config = task_func(self.empty_config_file.name)
-        self.assertIsInstance(config, dict)
-        self.assertEqual(len(config), 0)
-    
-    def test_additional_config_fields(self):
-        # Test with a configuration file containing additional fields
-        extra_config_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        extra_config_file.write('{"database": "test_db", "logging": true, "extra_field": "value"}')
-        extra_config_file.close()
+        for filename in glob.glob('./test_files/*.txt'):
+            os.remove(filename)
+        os.rmdir('./test_files/')
+        os.rmdir('./empty/')
+    @patch('glob.glob')
+    def test_encoding_conversion(self, mock_glob):
+        mock_glob.return_value = ['./test_files/file1.txt', './test_files/file2.txt']
+        create_text_file('./test_files/file1.txt', 'Hello', 'utf8')
+        create_text_file('./test_files/file2.txt', 'World', 'utf8')
+        task_func(directory='./test_files/', from_encoding='utf8', to_encoding='ascii')
+        with codecs.open('./test_files/file1.txt', 'r', 'ascii') as file:
+            self.assertEqual(file.read(), 'Hello')
+        with codecs.open('./test_files/file2.txt', 'r', 'ascii') as file:
+            self.assertEqual(file.read(), 'World')
+            
+    @patch('glob.glob')
+    def test_empty_directory(self, mock_glob):
+        mock_glob.return_value = []
+        task_func(directory='./empty/', from_encoding='utf8', to_encoding='ascii')
         
-        config = task_func(extra_config_file.name)
-        self.assertIsInstance(config, dict)
-        self.assertIn("database", config)
-        self.assertIn("logging", config)
-        self.assertIn("extra_field", config)
-        
-        os.unlink(extra_config_file.name)
+    @patch('glob.glob')
+    def test_same_encoding(self, mock_glob):
+        mock_glob.return_value = ['./test_files/file3.txt']
+        create_text_file('./test_files/file3.txt', 'Same Encoding', 'utf8')
+        task_func(directory='./test_files/', from_encoding='utf8', to_encoding='utf8')
+        with codecs.open('./test_files/file3.txt', 'r', 'utf8') as file:
+            self.assertEqual(file.read(), 'Same Encoding')
+            
+    @patch('glob.glob')
+    def test_invalid_encoding(self, mock_glob):
+        mock_glob.return_value = ['./test_files/file4.txt']
+        create_text_file('./test_files/file4.txt', 'Invalid', 'utf8')
+        with self.assertRaises(LookupError):
+            task_func(directory='./test_files/', from_encoding='utf8', to_encoding='invalid_encoding')
+            
+    @patch('glob.glob')
+    def test_nonexistent_directory(self, mock_glob):
+        mock_glob.return_value = []
+        task_func(directory='./nonexistent/', from_encoding='utf8', to_encoding='ascii')

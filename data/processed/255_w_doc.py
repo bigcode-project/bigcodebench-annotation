@@ -1,54 +1,74 @@
-import json
-import math
+import matplotlib
+import numpy as np
 
+# Constants
+FUNCTIONS = [np.sin, np.cos, np.tan]
 
-def task_func(decimal_value, precision=2):
+def task_func(ax, func_index):
     """
-    Calculate the square root of the given decimal value to a certain precision and then encode the result as a JSON string.
-    
+    Draw a mathematical function (sine, cosine, or tangent) on a polar diagram 'ax'.
+    The radial ticks are placed at a position corresponding to the index of the function multiplied by 45 degrees.
+
     Parameters:
-    utc_datetime (datetime): The datetime in UTC.
-    precision (int, Optional): The number of decimal places to round the square root to. Defaults to 2.
-    
+    ax (matplotlib.axes._axes.Axes): The ax to plot on.
+    func_index (int): The index of the function in the FUNCTIONS list (0 for sine, 1 for cosine, 2 for tangent).
+
     Returns:
-    str: The square root of the decimal value encoded as a JSON string.
+    matplotlib.axes._axes.Axes: The modified ax with the plotted function.
+    
+    Raises:
+    - This function will raise a ValueError if the input ax is not and Axes.
     
     Requirements:
-    - json
-    - math
-    
+    - matplotlib
+    - numpy
+
     Example:
-    >>> from decimal import Decimal
-    >>> decimal_value = Decimal('3.9')
-    >>> json_str = task_func(decimal_value, decimal_value)
-    >>> print(json_str)
-    "1.97"
+    >>> import matplotlib.pyplot as plt
+    >>> fig = plt.figure()
+    >>> ax = fig.add_subplot(111, polar=True)
+    >>> ax_up = task_func(ax, 1)
+    <class 'matplotlib.projections.polar.PolarAxes'>
+    >>> ax_up.lines[0].get_ydata()[0]
+    1.0
+    >>> plt.close()
     """
-    square_root = round(math.sqrt(decimal_value), 2)
-    json_str = json.dumps(str(square_root))
-    return json_str
+    print(type(ax))
+    if not isinstance(ax, matplotlib.axes.Axes):
+        raise ValueError("The input is not an axes")
+    x = np.linspace(0, 2 * np.pi, 1000)
+    y = FUNCTIONS[func_index](x)
+    ax.plot(x, y)
+    ax.set_rlabel_position(func_index * 45)
+    return ax
 
 import unittest
-import doctest
-from decimal import Decimal
+import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        decimal_value = Decimal('4.0')
-        json_str = task_func(decimal_value)
-        self.assertEqual(json.loads(json_str), "2.0")
-    def test_case_2(self):
-        decimal_value = Decimal('0.0')
-        json_str = task_func(decimal_value)
-        self.assertEqual(json.loads(json_str), "0.0")
-    def test_case_3(self):
-        decimal_value = Decimal('0.0001')
-        json_str = task_func(decimal_value)
-        self.assertEqual(json.loads(json_str), "0.01")
-    def test_case_4(self):
-        decimal_value = Decimal('1000000.0')
-        json_str = task_func(decimal_value)
-        self.assertEqual(json.loads(json_str), "1000.0")
-    def test_case_5(self):
-        decimal_value = Decimal('-1.0')
+    def setUp(self):
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(111, polar=True)
+    def test_sine_function(self):
+        ax = task_func(self.ax, 0)
+        self.assertIsNotNone(ax, "Ax should not be None")
+        # Verify if the plotted function matches the sine function
+        x = np.linspace(0, 2 * np.pi, 1000)
+        y_expected = np.sin(x)
+        y_actual = ax.lines[0].get_ydata()
+        np.testing.assert_allclose(y_actual, y_expected, atol=1e-5)
+    def test_cosine_function(self):
+        ax = task_func(self.ax, 1)
+        self.assertIsNotNone(ax, "Ax should not be None")
+    def test_tangent_function(self):
+        ax = task_func(self.ax, 2)
+        self.assertIsNotNone(ax, "Ax should not be None")
+    def test_invalid_index(self):
+        with self.assertRaises(IndexError):
+            task_func(self.ax, 3)
+    def test_rlabel_position(self):
+        ax = task_func(self.ax, 1)
+        self.assertEqual(ax.get_rlabel_position(), 45, "Rlabel position should be 45 for index 1")
+    def test_case_non_ax(self):
         with self.assertRaises(ValueError):
-            task_func(decimal_value)
+            task_func("non_ax", 1)

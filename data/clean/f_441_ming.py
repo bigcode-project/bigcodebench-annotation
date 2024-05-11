@@ -12,7 +12,7 @@ def f_441(data):
     data (str): The data string in the format 'yyyy-mm-value'.
 
     Returns:
-    Axes object: A matplotlib.axes.Axes object representing the plot.
+    Axes object: A matplotlib.axes.Axes object representing the plot, with the title formatted as 'Monthly Data for yyyy', x label as 'Month', and y label as 'Value'.
 
     Requirements:
     - pandas

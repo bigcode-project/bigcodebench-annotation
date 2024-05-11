@@ -1,78 +1,66 @@
-import pandas as pd
-import numpy as np
-from sklearn.decomposition import PCA
-import seaborn as sns
+from scipy.stats import zscore
 import matplotlib.pyplot as plt
 
-def task_func(df: pd.DataFrame):
+
+def task_func(df):
     """
-    Perform PCA on a DataFrame (excluding non-numeric columns) and draw a scatter plot of the first two main components. The principal columns should be name 'Component 1' and 'Component 2'.
-    Missing values are replaced by column's average.
+    Calculate Z-scores for numeric columns in a DataFrame and draw a histogram for each column.
+    - Missing values are replaced by the column's average.
+    - The histograms are plotted with 10 bins.
 
     Parameters:
-    df (DataFrame): The pandas DataFrame.
+    - df (pandas.DataFrame): The input pandas DataFrame with numeric columns.
 
     Returns:
-    DataFrame: A pandas DataFrame with the first two principal components. The columns should be 'principal component 1' and 'principal component 2'.
-    Axes: A matplotlib Axes object representing the scatter plot. The xlabel should be 'principal component' and the ylabel 'principal component 2'.
+    - tuple:
+        1. pandas.DataFrame: A DataFrame with computed z-scores.
+        2. list: A list of Axes objects representing the histograms of the numeric columns.
 
     Requirements:
-    - pandas
-    - numpy
-    - sklearn.decomposition.PCA
-    - seaborn
-    - matplotlib
+    - pandas.
+    - numpy.
+    - scipy.stats.zscore.
+    - matplotlib.pyplot.
 
     Example:
-    >>> df = pd.DataFrame([[1,2,3],[4,5,6],[7.0,np.nan,9.0]], columns=["c1","c2","c3"])
-    >>> principalDf, ax = task_func(df)
-    >>> print(principalDf)
-       Component 1  Component 2
-    0     4.450915    -0.662840
-    1    -0.286236     1.472436
-    2    -4.164679    -0.809596
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> df_input = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7.0, np.nan, 9.0]], columns=["col1", "col2", "col3"])
+    >>> zscore_output, plots = task_func(df_input)
     """
-    df_numeric = df.select_dtypes(include=[np.number])
-    df_numeric = df_numeric.fillna(df_numeric.mean(axis=0))
-    pca = PCA(n_components=2)
-    principalComponents = pca.fit_transform(df_numeric)
-    principalDf = pd.DataFrame(
-        data=principalComponents,
-        columns=["Component 1", "Component 2"],
-    )
-    ax = sns.scatterplot(data=principalDf, x="Component 1", y="Component 2")
-    plt.show()
-    return principalDf, ax
+    df = df.fillna(df.mean(axis=0))
+    df = df.apply(zscore)
+    axes = df.hist(grid=False, bins=10, layout=(1, df.shape[1]))
+    plt.tight_layout()
+    return df, axes
 
 import unittest
+import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def test_case_1(self):
         df = pd.DataFrame(
-            [[1, 2, 3], [4, 5, 6], [7.0, np.nan, 9.0]], columns=["c1", "c2", "c3"]
+            {
+                "col1": [1, 7, 3],
+                "col2": [4, 5, 7],
+                "col3": [None, None, None],
+            }
         )
-        principalDf, ax = task_func(df)
-        self.assertTrue("Component 1" in principalDf.columns)
-        self.assertTrue("Component 2" in principalDf.columns)
-        self.assertEqual(principalDf.shape, (3, 2))
-        self.assertEqual(ax.get_xlabel(), "Component 1")
-        self.assertEqual(ax.get_ylabel(), "Component 2")
+        zscores, plots = task_func(df)
+        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
+        self.assertEqual(len(plots[0]), 3)
     def test_case_2(self):
         df = pd.DataFrame(
             {
-                "A": [1, 2.5, 3, 4.5, 5],
-                "B": [5, 4.5, np.nan, 2, 1.5],
-                "C": [2.5, 3, 4, 5.5, 6],
-                "categoral_1": ["A", "B", "B", "B", "A"],
-                "categoral_2": ["0", "1", "1", "0", "1"],
+                "col1": [None, None, 3],
+                "col2": [None, 5, 7],
+                "col3": [8, 6, 4],
             }
         )
-        principalDf, ax = task_func(df)
-        self.assertTrue("Component 1" in principalDf.columns)
-        self.assertTrue("Component 2" in principalDf.columns)
-        self.assertEqual(principalDf.shape, (5, 2))
-        self.assertEqual(ax.get_xlabel(), "Component 1")
-        self.assertEqual(ax.get_ylabel(), "Component 2")
+        zscores, plots = task_func(df)
+        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
+        self.assertEqual(len(plots[0]), 3)
     def test_case_3(self):
         df = pd.DataFrame(
             {
@@ -81,31 +69,54 @@ class TestCases(unittest.TestCase):
                 "col3": [7, 9, 3, 8],
             }
         )
-        principalDf, ax = task_func(df)
-        self.assertTrue("Component 1" in principalDf.columns)
-        self.assertTrue("Component 2" in principalDf.columns)
-        self.assertEqual(principalDf.shape, (4, 2))
-        self.assertEqual(ax.get_xlabel(), "Component 1")
-        self.assertEqual(ax.get_ylabel(), "Component 2")
+        # Expected solutions
+        expected_df = df.copy()
+        expected_df = expected_df.fillna(expected_df.mean(axis=0))
+        expected_df = expected_df.apply(zscore)
+        # Function execution
+        zscores, plots = task_func(df)
+        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
+        self.assertEqual(len(plots[0]), 3)
+        pd.testing.assert_frame_equal(zscores, expected_df)
     def test_case_4(self):
         df = pd.DataFrame(
             {
-                "c1": [np.nan] * 9 + [10],
-                "c2": [np.nan] * 8 + [20, 30],
-                "c3": [np.nan] * 7 + [40, 50, 60],
+                "col1": [1, 7, 3, None],
+                "col2": [4, 5, 7, 2],
             }
         )
-        principalDf, ax = task_func(df)
-        self.assertTrue("Component 1" in principalDf.columns)
-        self.assertTrue("Component 2" in principalDf.columns)
-        self.assertEqual(principalDf.shape, (10, 2))
-        self.assertEqual(ax.get_xlabel(), "Component 1")
-        self.assertEqual(ax.get_ylabel(), "Component 2")
+        zscores, plots = task_func(df)
+        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
+        self.assertEqual(len(plots[0]), 2)
     def test_case_5(self):
-        df = pd.DataFrame({"c1": [1] * 10, "c2": [2] * 10, "c3": [3] * 10})
-        principalDf, ax = task_func(df)
-        self.assertTrue("Component 1" in principalDf.columns)
-        self.assertTrue("Component 2" in principalDf.columns)
-        self.assertEqual(principalDf.shape, (10, 2))
-        self.assertEqual(ax.get_xlabel(), "Component 1")
-        self.assertEqual(ax.get_ylabel(), "Component 2")
+        df = pd.DataFrame(
+            {
+                "col1": [1, 2, 3, 4, 5],
+                "col2": [None, None, None, None, None],
+            }
+        )
+        zscores, plots = task_func(df)
+        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
+        self.assertEqual(len(plots[0]), 2)
+    def test_case_6(self):
+        df = pd.DataFrame(
+            {
+                "A": [np.nan, np.nan, np.nan],
+                "B": [np.nan, np.nan, np.nan],
+                "C": [np.nan, np.nan, np.nan],
+            }
+        )
+        zscores, plots = task_func(df)
+        self.assertTrue(zscores.isnull().all().all())
+        self.assertEqual(len(plots[0]), 3)
+    def test_case_7(self):
+        df = pd.DataFrame(
+            {
+                "A": [1, 2.5, 3, 4.5, 5],
+                "B": [5, 4.5, np.nan, 2, 1.5],
+                "C": [2.5, 3, 4, 5.5, 6],
+            }
+        )
+        zscores, plots = task_func(df)
+        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
+        self.assertEqual(len(plots[0]), 3)

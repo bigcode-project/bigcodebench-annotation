@@ -1,78 +1,85 @@
-import csv
+import subprocess
 from ipaddress import IPv4Network
 
-def task_func(ip_range, csv_path):
+def task_func(ip_range):
     """
-    Generates a CSV file listing all IP addresses in the specified IP range.
-    Each IP address is written as a row in the CSV file.
-
-    Requirements:
-    - csv
-    - ipaddress.IPv4Network
+    Scans the specified IP address range and pings each IP to check if it is active.
+    The function returns a dictionary with IP addresses as keys and a boolean value indicating
+    their active status (True if the ping is successful, False otherwise).
 
     Parameters:
-        ip_range (str): The IP range in CIDR notation (e.g., "192.168.0.0/16").
-        csv_path (str): The path where the CSV file will be saved.
+        ip_range (str): The IP range to scan, in CIDR notation (e.g., '192.168.0.0/24').
+
+    Requirements:
+    - ipaddress
+    - subprocess
 
     Returns:
-        str: The path to the generated CSV file.
+        dict: A dictionary mapping IP addresses to their active status.
+
+    Raises:
+        subprocess.CalledProcessError: If a ping command fails due to a subprocess error.
 
     Examples:
-    >>> csv_path = task_func('192.168.0.0/16', 'file.csv')
-    >>> isinstance(csv_path, str)
+    >>> result = task_func('192.168.1.0/24')
+    >>> isinstance(result, dict)
     True
-    >>> csv_path.endswith('.csv')
+    >>> all(isinstance(key, str) and isinstance(value, bool) for key, value in result.items())
     True
     """
-    with open(csv_path, 'w', newline='') as csvfile:
-        fieldnames = ['IP Address']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        for ip in IPv4Network(ip_range):
-            writer.writerow({'IP Address': str(ip)})
-    return csv_path
+    active_ips = {}
+    for ip in IPv4Network(ip_range):
+        try:
+            subprocess.check_output(f'ping -c 1 {ip}', shell=True)
+            active_ips[str(ip)] = True
+        except subprocess.CalledProcessError:
+            active_ips[str(ip)] = False
+    return active_ips
 
 import unittest
-from unittest.mock import patch, mock_open
-import os
-import ipaddress
+from unittest.mock import patch
+import subprocess
 class TestCases(unittest.TestCase):
-    IP_RANGE = '192.168.0.0/30'
-    CSV_PATH = 'test.csv'
-    def tearDown(self):
-        """Clean up after each test."""
-        if os.path.exists(self.CSV_PATH):
-            os.remove(self.CSV_PATH)
-    def test_return_type(self):
-        """Test that the function returns a string."""
-        result = task_func(self.IP_RANGE, self.CSV_PATH)
-        self.assertIsInstance(result, str)
-    def test_file_creation(self):
-        """Test that the CSV file is created."""
-        result = task_func(self.IP_RANGE, self.CSV_PATH)
-        self.assertTrue(os.path.exists(result))
-    @patch("builtins.open", new_callable=mock_open)
-    def test_csv_content(self, mock_file):
-        """Test the content of the CSV file."""
-        task_func(self.IP_RANGE, self.CSV_PATH)
-        mock_file.assert_called_with(self.CSV_PATH, 'w', newline='')
-    @patch("csv.DictWriter")
-    def test_csv_writer_usage(self, mock_writer):
-        """Test that csv.DictWriter is used correctly."""
-        task_func(self.IP_RANGE, self.CSV_PATH)
-        mock_writer.assert_called()
-    @patch('ipaddress.IPv4Network.__iter__', return_value=iter([
-        ipaddress.IPv4Address('192.168.0.1'),
-        ipaddress.IPv4Address('192.168.0.2')
-    ]))
-    @patch('csv.DictWriter')
-    @patch("builtins.open", new_callable=mock_open)
-    def test_csv_writing(self, mock_file, mock_csv_writer, mock_ipv4network_iter):
-        """Test that the CSV writer writes the expected number of rows."""
-        task_func(self.IP_RANGE, self.CSV_PATH)
-        # The mock csv writer instance is obtained from the mock_csv_writer class.
-        mock_writer_instance = mock_csv_writer.return_value
-        # Assert that writeheader was called once.
-        mock_writer_instance.writeheader.assert_called_once()
-        # Assert that writerow was called twice (once for each mocked IP address).
-        self.assertEqual(mock_writer_instance.writerow.call_count, 2)
+    @patch('subprocess.check_output')
+    def test_return_type(self, mock_check_output):
+        """
+        Test that task_func returns a dictionary.
+        """
+        mock_check_output.return_value = b''  # Simulate successful ping response as empty byte string
+        result = task_func('192.168.1.0/30')  # Using a smaller range for testing
+        self.assertIsInstance(result, dict, "The function should return a dictionary.")
+    @patch('subprocess.check_output')
+    def test_successful_ping(self, mock_check_output):
+        """
+        Test that a successful ping sets the IP status to True.
+        """
+        mock_check_output.return_value = b''  # Simulate successful ping response
+        result = task_func('192.168.1.0/30')
+        self.assertTrue(all(result.values()), "All IPs should have True status for a successful ping.")
+    @patch('subprocess.check_output', side_effect=subprocess.CalledProcessError(1, 'ping'))
+    def test_failed_ping(self, mock_check_output):
+        """
+        Test that a failed ping sets the IP status to False.
+        """
+        result = task_func('192.168.1.0/30')
+        self.assertTrue(all(not value for value in result.values()), "All IPs should have False status for a failed ping.")
+    @patch('subprocess.check_output')
+    def test_dict_key_value_types(self, mock_check_output):
+        """
+        Test that all keys and values in the dictionary returned by task_func are of the correct type.
+        """
+        mock_check_output.return_value = b''  # Simulate successful ping response
+        result = task_func('192.168.1.0/30')  # Using a smaller range for testing
+        for ip, status in result.items():
+            self.assertIsInstance(ip, str, "All keys in the dictionary should be strings representing IP addresses.")
+            self.assertIsInstance(status, bool, "All values in the dictionary should be boolean indicating the IP's active status.")
+    @patch('subprocess.check_output')
+    def test_ip_range_handling(self, mock_check_output):
+        """
+        Test that the function attempts to ping every IP in the specified range.
+        """
+        ip_range = '192.168.1.0/30'
+        expected_call_count = len(list(IPv4Network(ip_range)))
+        mock_check_output.return_value = b''  # Simulate successful ping response
+        task_func(ip_range)
+        self.assertEqual(mock_check_output.call_count, expected_call_count, f"Expected to attempt pinging {expected_call_count} IPs.")

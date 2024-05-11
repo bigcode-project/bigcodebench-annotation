@@ -1,52 +1,64 @@
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
+import numpy as np
+
+DEFAULT_COLUMNS = ['Element', 'Count']
 
 
-def task_func(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
+def task_func(elements, include_index=False):
     """
-    Encrypt the categorical data in a specific column of a DataFrame using LabelEncoder.
+    Constructs a DataFrame that enumerates the character counts of each string in a provided list of elements. This
+    function can optionally include an index column for each row in the DataFrame.
 
     Parameters:
-    df (pd.DataFrame): The DataFrame that contains the data.
-    column_name (str): The name of the column to encode.
+    elements (List[str]): A list of strings whose character counts are to be calculated.
+    include_index (bool): Flag to decide whether to add an index column in the resulting DataFrame.
 
-    Returns:
-    pd.DataFrame: The DataFrame with the encoded column.
+    Returns: DataFrame: Returns a pandas DataFrame with columns for elements and their respective character counts.
+    Includes an 'Index' column if requested.
 
     Requirements:
     - pandas
-    - sklearn
+    - numpy
+
+    Note:
+    The order of columns in the returned DataFrame will be ['Index', 'Element', 'Count'] if the index is included.
 
     Example:
-    >>> df = pd.DataFrame({'fruit': ['apple', 'banana', 'cherry', 'apple', 'banana']})
-    >>> encoded_df = task_func(df, 'fruit')
-    >>> encoded_df['fruit'].tolist()
-    [0, 1, 2, 0, 1]
+    >>> result = task_func(['abc', 'def'], include_index=True)
+    >>> print(result.to_string(index=False))
+     Index Element  Count
+         0     abc      3
+         1     def      3
     """
-    le = LabelEncoder()
-    df[column_name] = le.fit_transform(df[column_name])
-    return df
+    elements_series = pd.Series(elements)
+    count_series = elements_series.apply(lambda x: len(x))
+    data_dict = {'Element': elements_series, 'Count': count_series}
+    if include_index:
+        data_dict['Index'] = np.arange(len(elements))
+    count_df = pd.DataFrame(data_dict)
+    if include_index:
+        count_df = count_df[['Index', 'Element', 'Count']]  # Reordering columns to put 'Index' first
+    return count_df
 
 import unittest
-import pandas as pd
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = pd.DataFrame({'fruit': ['apple', 'banana', 'cherry', 'apple', 'banana']})
-        encoded_df = task_func(df, 'fruit')
-        self.assertEqual(encoded_df['fruit'].tolist(), [0, 1, 2, 0, 1])
+        result = task_func(['hello'])
+        expected = pd.DataFrame({'Element': ['hello'], 'Count': [5]})
+        pd.testing.assert_frame_equal(result, expected)
     def test_case_2(self):
-        df = pd.DataFrame({'animal': ['cat', 'dog', 'bird', 'cat', 'bird']})
-        encoded_df = task_func(df, 'animal')
-        self.assertEqual(encoded_df['animal'].tolist(), [1, 2, 0, 1, 0])
+        result = task_func(['a', 'bc', 'def'])
+        expected = pd.DataFrame({'Element': ['a', 'bc', 'def'], 'Count': [1, 2, 3]})
+        pd.testing.assert_frame_equal(result, expected)
     def test_case_3(self):
-        df = pd.DataFrame({'color': ['red', 'blue', 'green', 'red', 'green']})
-        encoded_df = task_func(df, 'color')
-        self.assertEqual(encoded_df['color'].tolist(), [2, 0, 1, 2, 1])
+        result = task_func(['zzz', 'zzz'])
+        expected = pd.DataFrame({'Element': ['zzz', 'zzz'], 'Count': [3, 3]})
+        pd.testing.assert_frame_equal(result, expected)
     def test_case_4(self):
-        df = pd.DataFrame({'vehicle': ['car', 'bus', 'train', 'car', 'train']})
-        encoded_df = task_func(df, 'vehicle')
-        self.assertEqual(encoded_df['vehicle'].tolist(), [1, 0, 2, 1, 2])
+        result = task_func(['hello world', 'open ai'])
+        expected = pd.DataFrame({'Element': ['hello world', 'open ai'], 'Count': [11, 7]})
+        pd.testing.assert_frame_equal(result, expected)
     def test_case_5(self):
-        df = pd.DataFrame({'city': ['NYC', 'LA', 'SF', 'NYC', 'SF']})
-        encoded_df = task_func(df, 'city')
-        self.assertEqual(encoded_df['city'].tolist(), [1, 0, 2, 1, 2])
+        result = task_func(['hello', 'world'], include_index=True)
+        expected = pd.DataFrame({'Index': np.array([0, 1], dtype='int64'), 'Element': ['hello', 'world'], 'Count': [5, 5]})
+        pd.testing.assert_frame_equal(result, expected)

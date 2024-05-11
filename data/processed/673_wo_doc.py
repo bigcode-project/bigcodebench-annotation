@@ -1,61 +1,66 @@
-import csv
-import sys
+import os
+import random
 
-def task_func(filename):
+def task_func(directory, n_files):
     """
-    Read a CSV file, inverse the order of the lines and write the inverted lines back into the file. Then reset the cursor to the beginning of the file.
-
+    Create n random txt files in a specific directory, write only a single digit random integer into each file, and then reset the cursor to the beginning of each file.
+    The file names start from 'file_1.txt' and increment by 1 for each file.
+    
     Parameters:
-    - filename (str): The name of the CSV file.
+    - directory (str): The directory in which to generate the files.
+    - n_files (int): The number of files to generate.
 
     Returns:
-    - filename (str): The name of the CSV file.
+    - n_files (int): The number of files generated.
 
     Requirements:
-    - csv
-    - sys
+    - os
+    - random
 
     Example:
-    >>> task_func('file.csv')
-    'file.csv'
+    >>> random.seed(2)
+    >>> task_func('/path/to/directory', 5)
+    5
     """
-    try:
-        with open(filename, 'r+') as file:
-            reader = csv.reader(file)
-            rows = list(reader)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    for i in range(n_files):
+        filename = os.path.join(directory, f"file_{i+1}.txt")
+        with open(filename, 'w') as file:
+            file.write(str(random.randint(0, 9)))
             file.seek(0)
-            file.truncate()
-            writer = csv.writer(file)
-            writer.writerows(reversed(rows))
-            file.seek(0)
-    except Exception as e:
-        print(f"An error occurred: {e}", file=sys.stderr)
-    return filename
+    return n_files
 
 import unittest
-import os
+import shutil
 class TestCases(unittest.TestCase):
-    def base(self, filename, contents, expected):
-        # Create file
-        with open(filename, 'w') as file:
-            file.write(contents)
+    def base(self, dir, n_files, contents):
+        random.seed(42)
+        # Create directory
+        if not os.path.exists(dir):
+            os.makedirs(dir)
         # Run function
-        task_func(filename)
-        # Check file
-        with open(filename, 'r') as file:
-            txt = file.read()
-            self.assertEqual(txt, expected)
-        # Remove file
-        os.remove(filename)
+        n = task_func(dir, n_files)
+        # Check files
+        self.assertEqual(n, n_files)
+        read_data = []
+        for f in sorted(os.listdir(dir)):
+            self.assertTrue(f.endswith('.txt'))
+            with open(os.path.join(dir, f), 'r') as file:
+                read_data.append(file.read())
+                file.seek(0)
+        self.assertEqual(read_data, contents)
+    def tearDown(self):
+        shutil.rmtree('./directory', ignore_errors=True)
+        shutil.rmtree('./dir', ignore_errors=True)
+        shutil.rmtree('./d', ignore_errors=True)
     def test_case_1(self):
-        self.base('file.csv', "a,b\nc,d\ne,f\ng,h\n", "g,h\ne,f\nc,d\na,b\n")
-    
+        self.base('./directory', 5, ['1', '0', '4', '3', '3'])
     def test_case_2(self):
-        self.base('file.csv', "a,b,c\nd,e,f\ng,h,i\n", "g,h,i\nd,e,f\na,b,c\n")
+        self.base('./dir', 10, ['1', '9', '0', '4', '3', '3', '2', '1', '8', '1'])
     def test_case_3(self):
-        self.base('file.csv', "a,b,c,d\ne,f,g,h\ni,j,k,l\n", "i,j,k,l\ne,f,g,h\na,b,c,d\n")
-    
+        self.base('./d', 15, ['1', '9', '6', '0', '0', '1', '3', '0', '4', '3', '3', '2', '1', '8', '1'])
     def test_case_4(self):
-        self.base('file.csv', "a,b,c,d,e\nf,g,h,i,j\nk,l,m,n,o\n", "k,l,m,n,o\nf,g,h,i,j\na,b,c,d,e\n")
+        self.base('./d', 20, ['1', '9', '6', '0', '0', '1', '3', '3', '8', '9', '0', '0', '8', '4', '3', '3', '2', '1', '8', '1'])
     def test_case_5(self):
-        self.base('file.csv', "a,b,c,d,e,f\ng,h,i,j,k,l\nm,n,o,p,q,r\n", "m,n,o,p,q,r\ng,h,i,j,k,l\na,b,c,d,e,f\n")
+        self.base('./directory', 25, ['1', '9', '6', '0', '0', '1', '3', '3', '8', '9', '0', '0', '8', '3', '8', '6', '3', '7', '4', '3', '3', '2', '1', '8', '1'])

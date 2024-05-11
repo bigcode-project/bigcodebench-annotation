@@ -1,83 +1,67 @@
-import numpy as np
-from scipy import stats
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+
+ROWS = 100
+COLUMNS = ['X', 'Y']
 
 def task_func(df):
     """
-    Given a Pandas DataFrame with random numeric values test if the data in each column is normally distributed using the Shapiro-Wilk test.
+    Given a Pandas DataFrame with random numeric values and columns X & Y, use sklearn's linear regression to match the data to a linear model.
 
     Parameters:
-    - df (DataFrame): A Pandas DataFrame with random numeric values.
-    
+    - df (DataFrame): The DataFrame to use.
+
     Returns:
-    - dict: A dictionary with p-values from the Shapiro-Wilk test for each column.
+    - model (LinearRegression): The fitted linear model.
 
     Requirements:
-    - numpy
-    - scipy
+    - pandas
+    - sklearn
 
     Example:
+    >>> import numpy as np
     >>> np.random.seed(42)
-    >>> df = pd.DataFrame(np.random.normal(size=(100, 5)))
-    >>> p_values = task_func(df)
-    >>> print(p_values)
-    {0: 0.3595593273639679, 1: 0.23594242334365845, 2: 0.7625704407691956, 3: 0.481273353099823, 4: 0.13771861791610718}
+    >>> df = pd.DataFrame(np.random.normal(size=(100, 2)), columns=['X', 'Y'])
+    >>> model = task_func(df)
+    >>> print(model)
+    LinearRegression()
     """
-    p_values = {}
-    for col in df.columns:
-        column_data = np.array(df[col])
-        test_stat, p_value = stats.shapiro(column_data)
-        p_values[col] = p_value
-    return p_values
+    X = pd.DataFrame(df[['X']])  # Extracting column 'X' as a DataFrame
+    y = pd.Series(df['Y'])       # Extracting column 'Y' as a Series
+    model = LinearRegression().fit(X, y)
+    return model
 
 import unittest
-import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        np.random.seed(42)
-    
     def test_case_1(self):
-        df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
-        p_values = task_func(df)
-        self.assertEqual(len(p_values), 2)
-        self.assertTrue('a' in p_values)
-        self.assertTrue('b' in p_values)
-        self.assertTrue(p_values['a'] > 0.05)
-        self.assertTrue(p_values['b'] > 0.05)
+        df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
+        model = task_func(df)
+        self.assertTrue(model is not None)
+    
     def test_case_2(self):
-        df = pd.DataFrame({'a': [-1, 0, 1], 'b': [4, 5, 6]})
-        p_values = task_func(df)
-        self.assertEqual(len(p_values), 2)
-        self.assertTrue('a' in p_values)
-        self.assertTrue('b' in p_values)
-        self.assertTrue(p_values['a'] > 0.05)
-        self.assertTrue(p_values['b'] > 0.05)
+        df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
+        model = task_func(df)
+        self.assertTrue(model is not None)
+        self.assertTrue(model.coef_ is not None)
     def test_case_3(self):
-        df = pd.DataFrame(np.random.normal(size=(100, 5)))
-        p_values = task_func(df)
-        self.assertEqual(len(p_values), 5)
-        for col in df.columns:
-            self.assertTrue(col in p_values)
-            self.assertTrue(p_values[col] > 0.05)
+        df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
+        model = task_func(df)
+        self.assertTrue(model is not None)
+        self.assertTrue(model.coef_ is not None)
+        self.assertTrue(model.intercept_ is not None)
     def test_case_4(self):
-        df = pd.DataFrame(np.random.normal(size=(100, 5)))
-        df['a'] = np.random.uniform(size=100)
-        p_values = task_func(df)
-        self.assertEqual(len(p_values), 6)
-        for col in df.columns:
-            self.assertTrue(col in p_values)
-            if col == 'a':
-                self.assertTrue(p_values[col] < 0.05)
-            else:
-                self.assertTrue(p_values[col] > 0.05)
+        df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
+        model = task_func(df)
+        self.assertTrue(model is not None)
+        self.assertTrue(model.coef_ is not None)
+        self.assertTrue(model.intercept_ is not None)
+        self.assertTrue(model.score(df[['X']], df['Y']) is not None)
     def test_case_5(self):
-        df = pd.DataFrame(np.random.normal(size=(100, 5)))
-        df['a'] = np.random.uniform(size=100)
-        df['b'] = np.random.uniform(size=100)
-        p_values = task_func(df)
-        self.assertEqual(len(p_values), 7)
-        for col in df.columns:
-            self.assertTrue(col in p_values)
-            if col in ['a', 'b']:
-                self.assertTrue(p_values[col] < 0.05)
-            else:
-                self.assertTrue(p_values[col] > 0.05)
+        df = pd.DataFrame(np.random.normal(size=(ROWS, len(COLUMNS))), columns=COLUMNS)
+        model = task_func(df)
+        self.assertTrue(model is not None)
+        self.assertTrue(model.coef_ is not None)
+        self.assertTrue(model.intercept_ is not None)
+        self.assertTrue(model.score(df[['X']], df['Y']) is not None)
+        self.assertTrue(model.score(df[['X']], df['Y']) >= 0)

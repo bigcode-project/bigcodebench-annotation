@@ -1,63 +1,78 @@
-import inspect
-import types
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
-def task_func(f):
+def task_func(data):
     """
-    Inspects a given function 'f' and returns its specifications, including the function's name,
-    whether it is a lambda function, its arguments, defaults, and annotations. This method
-    utilizes the inspect and types modules to introspect function properties.
+     This function draws a histogram to visualize the frequency distribution of numeric values provided in a string format,
+     with 'Value' on the x-axis, 'Frequency' on the y-axis and 'Histogram of Values' as the title.
+
 
     Parameters:
-    f (function): The function to inspect.
+    data (str): The data string in the format 'value-value-value-...'.
 
     Returns:
-    dict: A dictionary containing details about the function, such as its name, if it's a lambda function,
-          arguments, default values, and annotations.
+    ax (matplotlib.axes._axes.Axes): The Axes object of the created histogram.
 
     Requirements:
-    - inspect
-    - types
+    - pandas
+    - numpy
+    - matplotlib.pyplot
 
-    Examples:
-    >>> def sample_function(x, y=5): return x + y
-    >>> result = task_func(sample_function)
-    >>> 'sample_function' == result['function_name'] and len(result['args']) == 2
-    True
-    >>> lambda_func = lambda x: x * 2
-    >>> task_func(lambda_func)['is_lambda']
-    True
+    Notes:
+    - The histogram uses bins calculated as `np.arange(data.min(), data.max()+2) - 0.5`.
+
+    Example:
+    >>> data = '1-2-3-4-5-6-7-8-9-10'
+    >>> ax = task_func(data)
     """
-    spec = inspect.getfullargspec(f)
-    return {
-        'function_name': f.__name__,
-        'is_lambda': isinstance(f, types.LambdaType),
-        'args': spec.args,
-        'defaults': spec.defaults,
-        'annotations': spec.annotations
-    }
+    data = data.split('-')
+    data = [int(d) for d in data]
+    df = pd.DataFrame(data, columns=['Values'])
+    plt.figure(figsize=(10, 6))
+    ax = plt.gca()  # Get current Axes
+    ax.hist(df['Values'], bins=np.arange(df['Values'].min(), df['Values'].max()+2) - 0.5, edgecolor='black')
+    ax.set_xlabel('Value')
+    ax.set_ylabel('Frequency')
+    ax.set_title('Histogram of Values')
+    ax.set_xticks(sorted(list(set(data))))  # Set x-ticks based on unique data values
+    plt.show()
+    return ax
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_regular_function(self):
-        def test_func(a, b=1): pass
-        result = task_func(test_func)
-        self.assertEqual(result['function_name'], 'test_func')
-        self.assertListEqual(result['args'], ['a', 'b'])
-        self.assertTupleEqual(result['defaults'], (1,))
-    def test_lambda_function(self):
-        lambda_func = lambda x, y=2: x + y
-        result = task_func(lambda_func)
-        self.assertTrue(result['is_lambda'])
-    def test_no_arguments(self):
-        def test_func(): pass
-        result = task_func(test_func)
-        self.assertEqual(len(result['args']), 0)
-    def test_annotations(self):
-        def test_func(a: int, b: str = 'hello') -> int: pass
-        result = task_func(test_func)
-        self.assertIn('a', result['annotations'])
-        self.assertIn('return', result['annotations'])
-    def test_defaults_none(self):
-        def test_func(a, b=None): pass
-        result = task_func(test_func)
-        self.assertIsNone(result['defaults'][0])
+    def test_case_1(self):
+        data = '1-2-3-4-5'
+        ax = task_func(data)
+        self.assertEqual(ax.get_title(), 'Histogram of Values')
+        self.assertEqual(ax.get_xlabel(), 'Value')
+        self.assertEqual(ax.get_ylabel(), 'Frequency')
+        self.assertListEqual(list(ax.get_xticks()), [1, 2, 3, 4, 5])
+    def test_case_2(self):
+        data = '5-5-5-5-5'
+        ax = task_func(data)
+        self.assertEqual(ax.get_title(), 'Histogram of Values')
+        self.assertEqual(ax.get_xlabel(), 'Value')
+        self.assertEqual(ax.get_ylabel(), 'Frequency')
+        self.assertListEqual(list(ax.get_xticks()), [5])
+    def test_case_3(self):
+        data = '7'
+        ax = task_func(data)
+        self.assertEqual(ax.get_title(), 'Histogram of Values')
+        self.assertEqual(ax.get_xlabel(), 'Value')
+        self.assertEqual(ax.get_ylabel(), 'Frequency')
+        self.assertListEqual(list(ax.get_xticks()), [7])
+    def test_case_4(self):
+        data = '2-8-4-10-1'
+        ax = task_func(data)
+        self.assertEqual(ax.get_title(), 'Histogram of Values')
+        self.assertEqual(ax.get_xlabel(), 'Value')
+        self.assertEqual(ax.get_ylabel(), 'Frequency')
+        self.assertListEqual(sorted(list(ax.get_xticks())), [1, 2, 4, 8, 10])
+    def test_case_5(self):
+        data = '1-50-100-150'
+        ax = task_func(data)
+        self.assertEqual(ax.get_title(), 'Histogram of Values')
+        self.assertEqual(ax.get_xlabel(), 'Value')
+        self.assertEqual(ax.get_ylabel(), 'Frequency')
+        self.assertListEqual(sorted(list(ax.get_xticks())), [1, 50, 100, 150])

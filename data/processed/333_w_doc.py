@@ -1,60 +1,63 @@
-import re
-from collections import Counter
-from nltk.corpus import stopwords
+import heapq
+import random
 
-
-def task_func(text: str) -> dict:
+def task_func(k, list_length = 5, min_value = 0, max_value = 100):
     """
-    Count the number of non-stop words in a given text.
-    
+    Find the k smallest numbers in a randomly generated list using heapq.
+
     Parameters:
-    - text (str): The input text for word counting.
-    
+    k (int): The number of smallest elements to find.
+    list_length (int): The length of the randomly generated list of integers.
+    min_value (int): The minimum value for randomly generated integers.
+    max_value (int): The maximum value for randomly generated integers.
+
     Returns:
-    dict: A dictionary with the words (as keys) and their counts (as values).
-    
+    tuple: A tuple containing two lists: 
+        - list[int]: The randomly generated list of integers with the specified length.
+        - list[int]: The k smallest numbers found using heapq.
+
     Requirements:
-    - re
-    - collections.Counter
-    
+    - heapq
+    - random
+
     Example:
-    >>> count = task_func("This is a sample text. Some words are repeated.")
-    >>> print(count)
-    {'sample': 1, 'text': 1, 'words': 1, 'repeated': 1}
+    >>> random.seed(0)
+    >>> rand_list, least_k = task_func(3)
+    >>> least_k[0] in rand_list
+    True
+    >>> rand_list, least_k = task_func(3,5,100,100)
+    >>> print(least_k)
+    [100, 100, 100]
     """
-    words = re.findall(r'\b\w+\b', text)
-    non_stopwords = [word for word in words if word.lower() not in set(stopwords.words('english'))]
-    count = dict(Counter(non_stopwords))
-    return count
+    numbers = [random.randint(min_value, max_value) for _ in range(list_length)]
+    heapq.heapify(numbers)
+    smallest_numbers = heapq.nsmallest(k, numbers)
+    return numbers, smallest_numbers
 
 import unittest
-import doctest
+import random
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Simple sentence with some stopwords
-        input_text = "This is a simple test."
-        expected_output = {'simple': 1, 'test': 1}
-        self.assertDictEqual(task_func(input_text), expected_output)
-    def test_case_2(self):
-        # Longer sentence with repeated words
-        input_text = "Some words are repeated more than once. Repeated words are common."
-        expected_output = {'words': 2, 'repeated': 1, 'Repeated': 1, 'common': 1}
-        self.assertDictEqual(task_func(input_text), expected_output)
-        
-    def test_case_3(self):
-        # Text with no stopwords
-        input_text = "Python programming language."
-        expected_output = {'Python': 1, 'programming': 1, 'language': 1}
-        self.assertDictEqual(task_func(input_text), expected_output)
-        
-    def test_case_4(self):
-        # Text with all stopwords
-        input_text = "This is an and the with"
-        expected_output = {}
-        self.assertDictEqual(task_func(input_text), expected_output)
-        
-    def test_case_5(self):
-        # Empty text
-        input_text = ""
-        expected_output = {}
-        self.assertDictEqual(task_func(input_text), expected_output)
+    
+    def test_empty_list(self):
+        random.seed(0)
+        rand_list, least_k = task_func(0, 0)
+        self.assertEqual(rand_list, [])
+        self.assertEqual(least_k, [])
+    def test_k_larger_than_list_length(self):
+        random.seed(0)
+        rand_list, least_k = task_func(5, 10)
+        self.assertEqual(len(rand_list), 10)
+        self.assertEqual(len(least_k), 5)
+    def test_sorted_list(self):
+        random.seed(0)
+        rand_list, least_k = task_func(100, 3)
+        self.assertEqual(least_k, sorted(rand_list)[:3])
+    def test_least_k_sorted(self):
+        random.seed(0)
+        rand_list, least_k = task_func(100, 5, 100, 100)
+        self.assertEqual(least_k, sorted(least_k)[:5])
+    
+    def test_least_k_sorted_first(self):
+        random.seed(0)
+        rand_list, least_k = task_func(100, 5)
+        self.assertEqual(least_k[0], sorted(least_k)[0])

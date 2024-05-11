@@ -1,190 +1,65 @@
 import os
-import shutil
-import glob
+import re
 
-def task_func(source_dir, dest_dir, extension):
-    """
-    Move all files with a particular extension from one directory to another.
+def task_func(log_file_path: str, keywords: list):
+    '''
+    Check a log file and format the lines that contain certain keywords. This code reads the log file specified by log_file_path; searches for lines containing any of the keywords provided in the list;
+    and formats each line to display the keyword, the timestamp, and the message separated by 20 spaces.
     
     Parameters:
-    - source_dir (str): The source directory.
-    - dest_dir (str): The destination directory.
-    - extension (str): The file extension.
-
+    - log_file_path (str): The path to the log file to be checked.
+    - keywords (list): A list of keywords to be searched for in the log file.
+    
     Returns:
-    - result (int): The count of files that were moved. 
-
+    - formatted_lines (list): Returns a list of formatted strings containing the relevant information.
+    
     Requirements:
     - os
-    - shutil
-    - glob
-        
+    - re
+    
     Example:
-    >>> task_func('path_to_source_dir', 'path_to_dest_dir', '.txt')
-    10
-    """
-    files = glob.glob(os.path.join(source_dir, f'*.{extension}'))
-    for file in files:
-        shutil.move(file, dest_dir)
-    result = len(files)
-    return result
+    >>> task_func('/path/to/log_file.log', ['ERROR', 'WARNING'])
+    ['    ERROR :    11:30:10 : This is an error message', '    WARNING :    11:35:10 : This is a warning message']
+    '''
+    if not os.path.exists(log_file_path):
+        raise FileNotFoundError(f"Log file {log_file_path} does not exist.")
+    formatted_lines = []
+    with open(log_file_path, 'r') as log:
+        for line in log:
+            for keyword in keywords:
+                if keyword in line:
+                    parts = re.split(r'\s+', line.strip(), maxsplit=2)
+                    if len(parts) == 3:
+                        formatted_line = f"{keyword:>{20}} : {parts[1]:>{20}} : {parts[2]:>{20}}"
+                        formatted_lines.append(formatted_line)
+                    else:
+                        formatted_lines.append(f"Line format unexpected: {line.strip()}")
+    return formatted_lines
 
 import unittest
+import os
+import shutil
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        # Setup code to create a test log file
+        self.test_file_path = "test_log_file.log"
+        with open(self.test_file_path, 'w') as f:
+            f.write("ERROR 11:30:10 This is an error message\n")
+            f.write("WARNING 11:35:10 This is a warning message\n")
     def tearDown(self):
-        for d in ['./source', './destination', './src', './dst', './s', './d']:
-            if os.path.exists(d):
-                shutil.rmtree(d)
-    def test_case_1(self):
-        # Create source directory
-        if os.path.exists('./source'):
-            shutil.rmtree('./source')
-        os.mkdir('./source')
-        # Create destination directory
-        if os.path.exists('./destination'):
-            shutil.rmtree('./destination')
-        os.mkdir('./destination')
-        # Create files
-        for filename in ['a.txt', 'b.txt', 'c.docx', 'd.docx', 'e.txt', 'a.pdf', 'a.doc']:
-            with open(os.path.join('./source', filename), 'w') as f:
-                f.write('test')
-        # Run function
-        task_func('./source', './destination', 'txt')
-        # Check files
-        for d in ['./destination', './source']:
-            if d == './source':
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.pdf')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.doc')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'c.docx')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'd.docx')))  
-            else:
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.txt')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'b.txt')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'e.txt')))
-                self.assertFalse(os.path.exists(os.path.join(d, 'f.txt')))
-        # Remove files
-        shutil.rmtree('./source')
-        shutil.rmtree('./destination')
-    def test_case_2(self):
-        # Create source directory
-        if os.path.exists('./src'):
-            shutil.rmtree('./src')
-        os.mkdir('./src')
-        # Create destination directory
-        if os.path.exists('./dst'):
-            shutil.rmtree('./dst')
-        os.mkdir('./dst')
-        # Create files
-        for filename in ['a.txt', 'b.txt', 'c.docx', 'd.docx', 'e.txt', 'a.pdf', 'a.doc']:
-            with open(os.path.join('./src', filename), 'w') as f:
-                f.write('test')
-        # Run function
-        task_func('./src', './dst', 'txt')
-        # Check files
-        for d in ['./dst', './src']:
-            if d == './src':
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.pdf')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.doc')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'c.docx')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'd.docx')))  
-            else:
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.txt')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'b.txt')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'e.txt')))
-                self.assertFalse(os.path.exists(os.path.join(d, 'f.txt')))
-        # Remove files
-        shutil.rmtree('./src')
-        shutil.rmtree('./dst')
-    def test_case_3(self):
-        # Create source directory
-        if os.path.exists('./s'):
-            shutil.rmtree('./s')
-        os.mkdir('./s')
-        # Create destination directory
-        if os.path.exists('./d'):
-            shutil.rmtree('./d')
-        os.mkdir('./d')
-        # Create files
-        for filename in ['a.txt', 'b.txt', 'c.docx', 'd.docx', 'e.txt', 'a.pdf', 'a.doc']:
-            with open(os.path.join('./s', filename), 'w') as f:
-                f.write('test')
-        # Run function
-        task_func('./s', './d', 'txt')
-        # Check files
-        for d in ['./d', './s']:
-            if d == './s':
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.pdf')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.doc')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'c.docx')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'd.docx')))  
-            else:
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.txt')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'b.txt')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'e.txt')))
-                self.assertFalse(os.path.exists(os.path.join(d, 'f.txt')))
-        # Remove files
-        shutil.rmtree('./s')
-        shutil.rmtree('./d')
-    def test_case_4(self):
-        # Create source directory
-        if os.path.exists('./s'):
-            shutil.rmtree('./s')
-        os.mkdir('./s')
-        # Create destination directory
-        if os.path.exists('./destination'):
-            shutil.rmtree('./destination')
-        os.mkdir('./destination')
-        # Create files
-        for filename in ['bbb.txt', 'a.txt', 'b.txt', 'c.docx', 'd.docx', 'e.txt', 'a.pdf', 'a.doc']:
-            with open(os.path.join('./s', filename), 'w') as f:
-                f.write('test')
-        # Run function
-        task_func('./s', './destination', 'txt')
-        # Check files
-        for d in ['./destination', './s']:
-            if d == './s':
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.pdf')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.doc')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'c.docx')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'd.docx')))  
-            else:
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.txt')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'b.txt')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'e.txt')))
-                self.assertFalse(os.path.exists(os.path.join(d, 'f.txt')))
-        # Remove files
-        shutil.rmtree('./s')
-        shutil.rmtree('./destination')
-    def test_case_5(self):
-        # Create source directory
-        if os.path.exists('./source'):
-            shutil.rmtree('./source')
-        os.mkdir('./source')
-        # Create destination directory
-        if os.path.exists('./d'):
-            shutil.rmtree('./d')
-        os.mkdir('./d')
-        # Create files
-        for filename in ['a.txt', 'b.txt', 'c.docx', 'd.docx', 'e.txt', 'a.pdf', 'a.doc']:
-            with open(os.path.join('./source', filename), 'w') as f:
-                f.write('xxx')
-        # Run function
-        task_func('./source', './d', 'docx')
-        # Check files
-        for d in ['./d', './source']:
-            if d == './source':
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.pdf')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.doc')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'a.txt')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'b.txt')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'e.txt')))
-                self.assertFalse(os.path.exists(os.path.join(d, 'f.txt')))
-            else:
-                self.assertTrue(os.path.exists(os.path.join(d, 'c.docx')))
-                self.assertTrue(os.path.exists(os.path.join(d, 'd.docx')))
-                self.assertFalse(os.path.exists(os.path.join(d, 'a.pdf')))
-                self.assertFalse(os.path.exists(os.path.join(d, 'a.doc')))
-                self.assertFalse(os.path.exists(os.path.join(d, 'a.txt')))
-                self.assertFalse(os.path.exists(os.path.join(d, 'b.txt')))
-                self.assertFalse(os.path.exists(os.path.join(d, 'e.txt')))
-                self.assertFalse(os.path.exists(os.path.join(d, 'f.txt')))
+        # Cleanup the test log file
+        os.remove(self.test_file_path)
+    def test_nonexistent_file(self):
+        with self.assertRaises(FileNotFoundError):
+            task_func("/path/to/nonexistent/file.log", ['ERROR', 'WARNING'])
+    def test_empty_keywords(self):
+        self.assertEqual(task_func(self.test_file_path, []), [])
+    def test_single_keyword(self):
+        result = task_func(self.test_file_path, ['ERROR'])
+        self.assertTrue(all('ERROR' in line for line in result))
+    def test_multiple_keywords(self):
+        result = task_func(self.test_file_path, ['ERROR', 'WARNING'])
+        self.assertTrue(all(any(kw in line for kw in ['ERROR', 'WARNING']) for line in result))
+    def test_all_keywords(self):
+        result = task_func(self.test_file_path, ['ERROR', 'WARNING', 'INFO'])
+        self.assertTrue(len(result) >= 2)

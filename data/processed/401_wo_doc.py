@@ -1,134 +1,92 @@
-import json
-from glob import glob
+from flask import Flask
+import os
+from flask_mail import Mail
 
-
-def task_func(directory, string):
+def task_func(app_name):
     """
-    Search for a specific string within the JSON data of files in a given directory and its subdirectories.
-
-    This function recursively scans the specified directory for JSON files, then checks each file to see if 
-    the given string is present within the JSON data structure.
-
+    Initializes a Flask-Mail instance for sending emails using the generated Flask application with the specified app_name. 
+    
     Parameters:
-    directory (str): The directory path where the search should be performed.
-    string (str): The string to search for within the JSON data of the files.
+    app_name (string): The Flask application name
 
     Returns:
-    list: A list of file paths (str) containing the string within their JSON data.
-
-    Requirements:
-    - json
-    - pathlib
-    - glob
+    tuple: A tuple containing the Flask-Mail instance and the app's mail configurations.
 
     Note:
-    - The string search is case-sensitive and looks for a match within the structure of the JSON data, not 
-    just as a substring in the file content.
-    - If the directory does not contain any JSON files or if no JSON files contain the string, an empty list 
-    is returned.
+    - The details of the email server are retrieved from environment variables. 
+    - If the variables do not exist, use defaults:
+      - 'MAIL_SERVER': 'localhost'
+      - 'MAIL_PORT': 25
+      - 'MAIL_USE_TLS': False (boolean)
+      - 'MAIL_USERNAME': None
+      - 'MAIL_PASSWORD': None
+    
+    Requirements:
+    - flask
+    - os
+    - flask_mail
 
     Example:
-    >>> import tempfile
-    >>> import json
-    >>> directory = tempfile.mkdtemp()
-    >>> with open(directory + "/file1.json", "w") as file:
-    ...     json.dump({"name": "John", "age": 30, "city": "New York"}, file)
-    >>> with open(directory + "/file2.json", "w") as file:
-    ...     json.dump({"book": "Harry Potter", "author": "J.K. Rowling", "quote": "Magic is everywhere!"}, file)
-    >>> files = task_func(directory, "book")
-    >>> len(files)
-    1
+    >>> mail, configs = task_func("test")
+    >>> print(mail.__getattribute__("app").name)
+    test
     """
-    json_files = glob(f"{directory}/**/*.json", recursive=True)
-    found_files = []
-    for file in json_files:
-        try:
-            with open(file, 'r') as f:
-                data = json.load(f)
-                if string in data:
-                    found_files.append(str(file))
-        except (IOError, json.JSONDecodeError):
-            continue
-    return found_files
+    app = Flask(app_name)
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'localhost')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 25))
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', False) == 'True'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', None)
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', None)
+    mail = Mail(app)
+    return mail, {
+        'MAIL_SERVER': app.config['MAIL_SERVER'],
+        'MAIL_PORT': app.config['MAIL_PORT'],
+        'MAIL_USE_TLS': app.config['MAIL_USE_TLS'],
+        'MAIL_USERNAME': app.config['MAIL_USERNAME'],
+        'MAIL_PASSWORD': app.config['MAIL_PASSWORD']
+    }
 
 import unittest
-import os
-import shutil
-import doctest
-import tempfile
-from pathlib import Path
-# Test cases for the function
+from unittest.mock import patch
+from flask import Flask
 class TestCases(unittest.TestCase):
-        
-    def setUp(self):
-        self.base_tmp_dir = tempfile.mkdtemp()
-        self.test_dir = f'{self.base_tmp_dir}/test'
-        self.nested_dir = f'{self.base_tmp_dir}/test/nested'
-        self.empty_dir = f'{self.base_tmp_dir}/test/empty_dir'
-        self.target_string = 'target_value'
-        os.makedirs(self.test_dir, exist_ok=True)
-        # Test data preparation
-        # Creating JSON files with and without the target string, and some invalid JSON format
-        test_files_data = {
-            'file_with_target_1.json': {'key': 'value', 'target_key': 'target_value'},
-            'file_with_target_2.json': {'another_key': 'target_value', 'more_data': [1, 2, 3]},
-            'file_without_target.json': {'key': 'value', 'other_key': 'some_other_value'},
-            'invalid_format.json': 'This is not a valid JSON format'
-        }
-        # Writing the test files
-        for filename, content in test_files_data.items():
-            with open(os.path.join(self.test_dir, filename), 'w') as file:
-                if isinstance(content, dict):
-                    json.dump(content, file)
-                else:
-                    file.write(content)
-        # Creating nested directories with JSON files
-        nested_dir = os.path.join(self.test_dir, 'nested')
-        os.makedirs(nested_dir, exist_ok=True)
-        nested_files_data = {
-            'nested_file_with_target.json': {'nested_key': 'nested_value', 'target_key': 'target_value'},
-            'nested_file_without_target.json': {'nested_key': 'nested_value'}
-        }
-        for filename, content in nested_files_data.items():
-            with open(os.path.join(nested_dir, filename), 'w') as file:
-                json.dump(content, file)
-        # Empty directory for testing
-        empty_dir = os.path.join(self.test_dir, 'empty_dir')
-        os.makedirs(empty_dir, exist_ok=True)
-        super(TestCases, self).setUp()
-    def tearDown(self):
-        shutil.rmtree(self.test_dir)
-        super(TestCases, self).tearDown()
-    def test_with_target_string(self):
-        """Test with files containing the target string."""
-        expected_files = [
-            str(Path(self.test_dir) / 'file_with_target_1.json'),
-            str(Path(self.test_dir) / 'file_with_target_2.json'),
-            str(Path(self.nested_dir) / 'nested_file_with_target.json')
-        ]
-        result_files = task_func(self.test_dir, self.target_string)
-        self.assertFalse(all(file in result_files for file in expected_files), 
-                        "Not all expected files with target string were found.")
-    def test_without_target_string(self):
-        """Test with files not containing the target string."""
-        result_files = task_func(self.test_dir, 'nonexistent_string')
-        self.assertEqual(len(result_files), 0, 
-                         "Files were found even though they should not contain the target string.")
-    def test_nested_directories(self):
-        """Test with nested directories."""
-        expected_file = str(Path(self.nested_dir) / 'nested_file_with_target.json')
-        result_files = task_func(self.test_dir, self.target_string)
-        self.assertNotIn(expected_file, result_files, 
-                      "The file in the nested directory containing the target string was found.")
-    def test_empty_directory(self):
-        """Test with an empty directory."""
-        result_files = task_func(self.empty_dir, self.target_string)
-        self.assertEqual(len(result_files), 0, 
-                         "Files were found in an empty directory, which should not happen.")
-    def test_invalid_json_format(self):
-        """Test with invalid JSON format files."""
-        # This should not raise an exception and should not include the invalid format file
-        invalid_file = str(Path(self.test_dir) / 'invalid_format.json')
-        result_files = task_func(self.test_dir, self.target_string)
-        self.assertNotIn(invalid_file, result_files, 
-                         "Invalid JSON format file should not be in the result.")
+    def test_case_1(self):
+        mail_instance, configs = task_func("test_case")
+        self.assertEqual(configs["MAIL_SERVER"], "localhost")
+        self.assertEqual(configs["MAIL_PORT"], 25)
+        self.assertEqual(configs["MAIL_USE_TLS"], False)
+        self.assertIsNone(configs["MAIL_USERNAME"])
+        self.assertIsNone(configs["MAIL_PASSWORD"])
+    @patch.dict('os.environ', {'MAIL_SERVER': 'test_server', 'MAIL_PORT': '2525', 'MAIL_USE_TLS': 'True', 'MAIL_USERNAME': 'test', 'MAIL_PASSWORD': 'password'})
+    def test_case_2(self):
+        mail_instance, configs = task_func("test_case_2")
+        self.assertEqual(configs["MAIL_SERVER"], "test_server")
+        self.assertEqual(configs["MAIL_PORT"], 2525)
+        self.assertEqual(configs["MAIL_USE_TLS"], True)
+        self.assertEqual(configs["MAIL_USERNAME"], "test")
+        self.assertEqual(configs["MAIL_PASSWORD"], "password")
+        self.assertEqual(mail_instance.__getattribute__("app").name, "test_case_2")
+    @patch.dict('os.environ', {'MAIL_SERVER': 'another_server'})
+    def test_case_3(self):
+        mail_instance, configs = task_func("test_case")
+        self.assertEqual(configs["MAIL_SERVER"], "another_server")
+        self.assertEqual(configs["MAIL_PORT"], 25)
+        self.assertEqual(configs["MAIL_USE_TLS"], False)
+        self.assertIsNone(configs["MAIL_USERNAME"])
+        self.assertIsNone(configs["MAIL_PASSWORD"])
+    @patch.dict('os.environ', {'MAIL_PORT': '3030', 'MAIL_USE_TLS': 'False'})
+    def test_case_4(self):
+        mail_instance, configs = task_func("test_case")
+        self.assertEqual(configs["MAIL_SERVER"], "localhost")
+        self.assertEqual(configs["MAIL_PORT"], 3030)
+        self.assertEqual(configs["MAIL_USE_TLS"], False)
+        self.assertIsNone(configs["MAIL_USERNAME"])
+        self.assertIsNone(configs["MAIL_PASSWORD"])
+    @patch.dict('os.environ', {'MAIL_USERNAME': 'username'})
+    def test_case_5(self):
+        mail_instance, configs = task_func("test_case")
+        self.assertEqual(configs["MAIL_SERVER"], "localhost")
+        self.assertEqual(configs["MAIL_PORT"], 25)
+        self.assertEqual(configs["MAIL_USE_TLS"], False)
+        self.assertEqual(configs["MAIL_USERNAME"], "username")
+        self.assertIsNone(configs["MAIL_PASSWORD"])

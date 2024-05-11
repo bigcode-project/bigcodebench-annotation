@@ -1,72 +1,69 @@
+from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
 
-def task_func(array_length=100):
-    '''
-    Generate two arrays of random numbers of a given length, calculate their mean, median, and standard deviation,
-    then store these results in a Panda DataFrame 'statistics' with keys 'Array1' and 'Array2'.
-    Draw a bar chart to compare these statistics with indices 'Mean', 'Median', and 'Standard Deviation'.
-
+def task_func(array_length=100, noise_level=0.2):
+    """
+    Create a noisy sine wave of a specified length and adjusts a curve using curve_fit from scipy.optimize to the data.
+    
     Parameters:
-    - array_length (int, optional): The length of the arrays to be generated. Default is 100.
+    - array_length (int): Length of the sine wave array. Defaults to 100.
+    - noise_level (float): Level of noise added to the sine wave. Defaults to 0.2.
 
     Returns:
-    - DataFrame: A pandas DataFrame with the statistics of the arrays.
-    - Axes: The bar chart plot comparing the statistics.
+    - Axes object: A plot showing the noisy sine wave and its adjusted curve.
 
     Requirements:
     - numpy
-    - pandas
+    - scipy.optimize
+    - matplotlib.pyplot
 
     Example:
-    >>> df, ax = task_func(50)
-    '''
-    array1 = np.random.rand(array_length)
-    array2 = np.random.rand(array_length)
-    statistics = {
-        'Array1': [np.mean(array1), np.median(array1), np.std(array1)],
-        'Array2': [np.mean(array2), np.median(array2), np.std(array2)]
-    }
-    df = pd.DataFrame(statistics, index=['Mean', 'Median', 'Standard Deviation'])
-    ax = df.plot(kind='bar')
-    return df, ax
+    >>> ax = task_func(100, 0.2)
+    """
+    x = np.linspace(0, 4*np.pi, array_length)
+    y = np.sin(x) + noise_level * np.random.rand(array_length)
+    def func(x, a, b):
+        return a * np.sin(b * x)
+    popt, pcov = curve_fit(func, x, y, p0=[1, 1])
+    fig, ax = plt.subplots()
+    ax.plot(x, y, 'b-', label='data')
+    ax.plot(x, func(x, *popt), 'r-', label='fit: a=%5.3f, b=%5.3f' % tuple(popt))
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.legend()
+    return ax
 
 import unittest
-import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    
-    def test_default_length(self):
-        df, ax = task_func()
-        self.assertEqual(df.shape, (3, 2))
-        self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
-        self.assertTrue(all(df.columns == ['Array1', 'Array2']))
+    def test_case_1(self):
+        # Test with default parameters
+        ax = task_func()
         self.assertIsInstance(ax, plt.Axes)
-    
-    def test_custom_length(self):
-        df, ax = task_func(200)
-        self.assertEqual(df.shape, (3, 2))
-        self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
-        self.assertTrue(all(df.columns == ['Array1', 'Array2']))
+        self.assertEqual(len(ax.lines), 2)
+        self.assertEqual(ax.get_xlabel(), 'x')
+        self.assertEqual(ax.get_ylabel(), 'y')
+        self.assertTrue(ax.get_legend() is not None)
+    def test_case_4(self):
+        # Test with custom array_length and noise_level
+        ax = task_func(array_length=150, noise_level=0.1)
         self.assertIsInstance(ax, plt.Axes)
-    
-    def test_statistics_values(self):
-        np.random.seed(42)  # Setting seed for reproducibility
-        df, _ = task_func(1000)
-        self.assertAlmostEqual(df['Array1']['Mean'], 0.4903, places=3)
-        self.assertAlmostEqual(df['Array2']['Mean'], 0.5068, places=3)
-        self.assertAlmostEqual(df['Array1']['Median'], 0.4968, places=3)
-        self.assertAlmostEqual(df['Array2']['Median'], 0.5187, places=3)
-        self.assertAlmostEqual(df['Array1']['Standard Deviation'], 0.2920, places=3)
-        self.assertAlmostEqual(df['Array2']['Standard Deviation'], 0.2921, places=3)
-    
-    def test_negative_length(self):
-        with self.assertRaises(ValueError):
-            task_func(-50)
-    
-    def test_zero_length(self):
-        df, ax = task_func(0)
-        self.assertEqual(df.shape, (3, 2))
-        self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
-        self.assertTrue(all(df.columns == ['Array1', 'Array2']))
+        x_data, y_data = ax.lines[0].get_data()
+        self.assertEqual(len(x_data), 150)
+        self.assertTrue(np.max(np.abs(np.diff(y_data))) <= 0.1 + 1)  # considering max amplitude of sine wave
+    def test_case_5(self):
+        # Test with very high noise_level
+        ax = task_func(noise_level=2.0)
         self.assertIsInstance(ax, plt.Axes)
+        _, y_data = ax.lines[0].get_data()
+        self.assertTrue(np.max(np.abs(np.diff(y_data))) <= 2.0 + 1)  # considering max amplitude of sine wave
+    def test_varying_noise_levels(self):
+        """Test the function with different noise levels."""
+        for noise in [0, 0.1, 0.5]:
+            ax = task_func(noise_level=noise)
+            self.assertIsInstance(ax, plt.Axes)
+    def test_plot_outputs(self):
+        """Check the output to confirm plot was created."""
+        ax = task_func()
+        self.assertTrue(hasattr(ax, 'figure'), "Plot does not have associated figure attribute")

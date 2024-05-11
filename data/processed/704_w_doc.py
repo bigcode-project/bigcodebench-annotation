@@ -1,58 +1,50 @@
 import pandas as pd
-from sklearn.cluster import DBSCAN
+from itertools import combinations
 
-def task_func(data, cols):
+# Constants
+MIN_PERCENTAGE = 0.75
+
+def task_func(data, cols, percentage):
     """
-    Perform DBSCAN clustering on the data by transforming it into a DataFrame and recording the clusters in a new column named 'Cluster'.
-    Please choose the parameters eps=3 and min_samples=2.
-    
+    Find all combinations of columns from a given DataFrame so that the absolute correlation between them is greater than a certain threshold.
+
     Parameters:
     - data (list): List of lists with the data, where the length of the inner list equals the number of columns
     - cols (list): List of column names
-    
+    - percentage (float): The threshold for the absolute correlation.
+
     Returns:
-    - df (DataFrame): The DataFrame with a new 'Cluster' column.
+    - corr_combinations (list): A list of tuples where each tuple contains two column names.
 
     Requirements:
     - pandas
-    - sklearn
+    - itertools
 
     Example:
-    >>> data = [[5.1, 3.5], [4.9, 3.0], [4.7, 3.2]]
-    >>> cols = ['x', 'y']
-    >>> df = task_func(data, cols)
-    >>> print(df)
-         x    y  Cluster
-    0  5.1  3.5        0
-    1  4.9  3.0        0
-    2  4.7  3.2        0
+    >>> result = task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.9)
+    >>> print(result)
+    [('x', 'y')]
     """
+    if not 0 <= percentage <= 1:
+        raise ValueError('Percentage must be between 0 and 1')
     df = pd.DataFrame(data, columns=cols)
-    dbscan = DBSCAN(eps=3, min_samples=2)
-    df['Cluster'] = dbscan.fit_predict(df)
-    return df
+    corr_matrix = df.corr().abs()
+    columns = corr_matrix.columns
+    corr_combinations = []
+    for col1, col2 in combinations(columns, 2):
+        if corr_matrix.loc[col1, col2] > percentage:
+            corr_combinations.append((col1, col2))
+    return corr_combinations
 
 import unittest
-import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = task_func([[5.1, 3.5], [4.9, 3.0], [4.7, 3.2]], ['x', 'y'])
-        print(df)
-        self.assertTrue('Cluster' in df.columns)
-        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0])))
+        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.9), [('x', 'y')])
     def test_case_2(self):
-        df = task_func([[1, 2], [3, 4], [5, 6]], ['x', 'y'])
-        self.assertTrue('Cluster' in df.columns)
-        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0])))
+        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.5), [('x', 'y'), ('x', 'z'), ('y', 'z')])
     def test_case_3(self):
-        df = task_func([[1, 2], [2, 2], [2, 3], [8, 7], [8, 8], [25, 80]], ['x', 'y'])
-        self.assertTrue('Cluster' in df.columns)
-        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0, 1, 1, -1])))
+        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.1), [('x', 'y'), ('x', 'z'), ('y', 'z')])
     def test_case_4(self):
-        df = task_func([[1, 2, 3], [2, 2, 2], [2, 3, 4], [8, 7, 6], [8, 8, 8], [25, 80, 100]], ['x', 'y', 'z'])
-        self.assertTrue('Cluster' in df.columns)
-        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0, 1, 1, -1])))
+        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.0), [('x', 'y'), ('x', 'z'), ('y', 'z')])
     def test_case_5(self):
-        df = task_func([[-1, -2], [-2, -2], [-2, -3], [-8, -7], [-8, -8], [-25, -80]], ['x', 'y'])
-        self.assertTrue('Cluster' in df.columns)
-        self.assertTrue(np.array_equal(df['Cluster'], np.array([0, 0, 0, 1, 1, -1])))
+        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 1.0), [])

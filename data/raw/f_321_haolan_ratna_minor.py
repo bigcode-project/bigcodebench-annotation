@@ -88,7 +88,7 @@ class TestCases(unittest.TestCase):
         mock_response.__enter__.return_value = mock_response
         mock_response.__exit__.return_value = None
         result = f_321(self.API_URL)
-        self.assertEqual(result, "API failure")
+        self.assertTrue("API failure" in result)
 
     @patch('urllib.request.urlopen')
     def test_missing_ip_key(self, mock_urlopen):

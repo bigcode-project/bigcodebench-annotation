@@ -1,83 +1,87 @@
 import inspect
-import matplotlib.pyplot as plt
-import pandas as pd
+import types
+import math
 
-def task_func(f_list):
+def task_func(f):
     """
-    Analyzes a list of functions and draws a bar chart showing the number of arguments for each function.
-    The function names are listed along the x-axis, and the number of arguments are represented as bars.
-    This method showcases the integration of function introspection, data frame creation, and data visualization.
+    Analyzes a given function 'f' and returns a dictionary containing its name, the square root of
+    the number of arguments, and the count of lambda functions present in its default values.
+    This function demonstrates introspection of Python functions and the use of mathematical
+    operations on the introspected data.
 
     Parameters:
-    f_list (list): List of functions to inspect.
+    f (function): The function to inspect.
 
     Returns:
-    pandas.DataFrame: Returns a DataFrame containing the function names and their respective number of arguments.
-
-    Raises:
-    ValueError: if the input contains lambda function
+    dict: A dictionary containing the function's name, the square root of the number of arguments,
+          and the count of lambda functions in default values.
 
     Requirements:
     - inspect
-    - matplotlib.pyplot
-    - pandas
+    - types
+    - math
 
     Examples:
-    >>> def f(x): x*x
-    >>> def g(x, y=2): return x*y
-    >>> task_func([f, g])
-                   Number of Arguments
-    Function Name                     
-    f                                1
-    g                                2
+    >>> def sample_function(x, y=2): return x + y
+    >>> result = task_func(sample_function)
+    >>> 'sample_function' == result['function_name'] and result['sqrt_args'] == math.sqrt(2)
+    True
     >>> lambda_func = lambda x: x * 2
-    >>> task_func([f, lambda_func])
-    Traceback (most recent call last):
-    ...
-    ValueError: The function should not be a lambda function.
+    >>> task_func(lambda_func)['lambda_in_defaults'] == 0
+    True
     """
-    func_info = []
-    for f in f_list:
-        if f.__name__ == "<lambda>":
-            raise ValueError("The function should not be a lambda function.")
-        spec = inspect.getfullargspec(f)
-        func_info.append([f.__name__, len(spec.args)])
-    df = pd.DataFrame(func_info, columns=['Function Name', 'Number of Arguments'])
-    df.set_index('Function Name', inplace=True)
-    df.plot(kind='bar')  # Uncomment to visualize the bar chart
-    plt.show()  # Uncomment to display the plot
-    return df
+    spec = inspect.getfullargspec(f)
+    info = {
+        'function_name': f.__name__,
+        'sqrt_args': math.sqrt(len(spec.args)),
+    }
+    if spec.defaults:
+        info['lambda_in_defaults'] = sum(1 for d in spec.defaults if isinstance(d, types.LambdaType))
+    else:
+        info['lambda_in_defaults'] = 0
+    return info
 
 import unittest
-import pandas as pd
-import inspect
-from unittest.mock import patch
+import math
 class TestCases(unittest.TestCase):
-    def test_single_function(self):
-        def sample_function(x): pass
-        df = task_func([sample_function])
-        self.assertEqual(df.loc['sample_function', 'Number of Arguments'], 1)
-    def test_multiple_functions(self):
-        def f(x): pass
-        def g(x, y): pass
-        df = task_func([f, g])
-        self.assertEqual(df.loc['f', 'Number of Arguments'], 1)
-        self.assertEqual(df.loc['g', 'Number of Arguments'], 2)
-    def test_no_arguments_function(self):
+    def test_regular_function(self):
+        def sample_function(x, y, z=3): pass
+        result = task_func(sample_function)
+        self.assertEqual(result['function_name'], 'sample_function')
+        self.assertEqual(result['sqrt_args'], math.sqrt(3))
+    def test_lambda_in_defaults(self):
+        def func_with_lambda(x, y=lambda a: a+2): pass
+        result = task_func(func_with_lambda)
+        self.assertEqual(result['lambda_in_defaults'], 1)
+    def test_no_arguments(self):
         def no_arg_func(): pass
-        df = task_func([no_arg_func])
-        self.assertEqual(df.loc['no_arg_func', 'Number of Arguments'], 0)
-    def test_lambda_functions(self):
-        lambda_func = lambda x, y: x + y
-        with self.assertRaises(ValueError):
-            df = task_func([lambda_func])
+        result = task_func(no_arg_func)
+        self.assertEqual(result['sqrt_args'], 0)
+    def test_function_with_no_lambda_defaults(self):
+        def func_without_lambda(x, y=2): pass
+        result = task_func(func_without_lambda)
+        self.assertEqual(result['lambda_in_defaults'], 0)
+    def test_function_with_multiple_defaults(self):
+        def sample_function(x, y=2, z=lambda a: a+2, w=lambda b: b*2): pass
+        result = task_func(sample_function)
+        self.assertEqual(result['lambda_in_defaults'], 2)
+    def test_lambda_function(self):
+        lambda_func = lambda x, y=lambda a: a * 2: x + y(2)
+        result = task_func(lambda_func)
+        self.assertEqual(result['function_name'], '<lambda>')
+        self.assertEqual(result['sqrt_args'], math.sqrt(2), "Sqrt of args should be sqrt(2) for lambda_func with 2 args")
+        self.assertEqual(result['lambda_in_defaults'], 1, "There should be 1 lambda in defaults")
     
-    def test_function_with_defaults(self):
-        def func_with_defaults(x, y=2): pass
-        df = task_func([func_with_defaults])
-        self.assertEqual(df.loc['func_with_defaults', 'Number of Arguments'], 2)
-    @patch('matplotlib.pyplot.show')
-    def test_plot_called(self, mock_show):
-        def sample_function(x): pass
-        task_func([sample_function])
-        mock_show.assert_called_once()
+    def test_sqrt_args_correctness(self):
+        def test_func(a, b, c=3, d=lambda x: x + 1): pass
+        result = task_func(test_func)
+        self.assertEqual(result['sqrt_args'], math.sqrt(4), "Sqrt of args count should match expected value")
+    # Test for edge case or error handling
+    def test_non_function_input(self):
+        with self.assertRaises(TypeError):
+            task_func("This is not a function")
+    # Directly verifying the math operation
+    def test_math_operation_direct_check(self):
+        def test_func(a, b, c=3, d=lambda x: x + 1): pass
+        result = task_func(test_func)
+        self.assertAlmostEqual(result['sqrt_args'], math.sqrt(4), msg="sqrt_args should accurately represent the square root of the number of arguments.")

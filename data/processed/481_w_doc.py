@@ -1,23 +1,20 @@
-import re
-import random
 import pandas as pd
+import random
+import re
 
 
-def task_func(data_list, seed=None):
+def task_func(data_list, seed=42):
     """
-    Shuffle the substrings within each string in a given list.
-
-    This function takes a list of comma-separated strings and splits each into substrings.
-    It extracts substrings based on commas, removing leading and trailing whitespaces
-    from each. Then, it shuffles these processed substrings within each string, and
-    returns a pandas DataFrame with two columns: "Original String" and "Shuffled String".
+    Randomizes the order of comma-separated substrings within each string in a list,
+    normalizing spaces to ensure a single space follows each comma using regex, then
+    returns a DataFrame comparing original and randomized strings.
 
     Parameters:
-    data_list (list): The list of comma-separated strings.
-    seed (int, optional): Seed for the random number generator. Default is None.
+    data_list (list of str): List of strings with substrings to be randomized.
+    seed (int, optional): Seed for random number generator for reproducibility. Defaults to None.
 
     Returns:
-    DataFrame: A pandas DataFrame with columns 'Original String' and 'Shuffled String'.
+    pandas.DataFrame: A DataFrame with columns 'Original String' and 'Randomized String'.
 
     Requirements:
     - pandas
@@ -25,73 +22,129 @@ def task_func(data_list, seed=None):
     - re
 
     Example:
-    >>> task_func(['lamp, bag, mirror', 'table, chair'], seed=42)
-         Original String    Shuffled String
-    0  lamp, bag, mirror  bag, lamp, mirror
-    1       table, chair       chair, table
+    >>> df = task_func(['lamp, bag, mirror', 'table, chair, bag'], seed=42)
+    >>> df['Original String'][0]
+    'lamp, bag, mirror'
+    >>> df['Randomized String'][0]
+    'mirror, lamp, bag'
     """
-    if seed is not None:
-        random.seed(seed)
+    random.seed(seed)
     df = pd.DataFrame(data_list, columns=["Original String"])
-    shuffled_strings = []
+    randomized_strings = []
     for s in data_list:
         substrings = re.split("\s*,\s*", s)
-        random.shuffle(substrings)
-        shuffled_s = ", ".join(substrings)
-        shuffled_strings.append(shuffled_s)
-    df["Shuffled String"] = shuffled_strings
+        random_positions = random.sample(range(len(substrings)), len(substrings))
+        randomized_s = ", ".join([substrings[i] for i in random_positions])
+        randomized_strings.append(randomized_s)
+    df["Randomized String"] = randomized_strings
     return df
 
 import unittest
+import pandas as pd
+import re
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test basic case
-        input_data = ["lamp, bag, mirror", "table, chair"]
-        output_df = task_func(input_data)
-        self.assertEqual(output_df["Original String"].iloc[0], "lamp, bag, mirror")
-        self.assertEqual(output_df["Original String"].iloc[1], "table, chair")
-        self.assertEqual(len(output_df["Shuffled String"].iloc[0].split(", ")), 3)
-        self.assertEqual(len(output_df["Shuffled String"].iloc[1].split(", ")), 2)
+        # Test basic functionality with a reproducible seed
+        input_data = ["a, b", "c, d, e"]
+        df = task_func(input_data, seed=42)
+        self.assertEqual(len(df), 2)
+        self.assertListEqual(df["Original String"].tolist(), input_data)
+        self.assertNotEqual(
+            df["Original String"].tolist(), df["Randomized String"].tolist()
+        )
+        self.assertSetEqual(
+            set(df["Original String"].tolist()[0].split(", ")),
+            set(df["Randomized String"].tolist()[0].split(", ")),
+        )
     def test_case_2(self):
-        # Test single character substrings
-        input_data = ["A, B, C, D", "E, F, G"]
-        output_df = task_func(input_data)
-        self.assertEqual(output_df["Original String"].iloc[0], "A, B, C, D")
-        self.assertEqual(output_df["Original String"].iloc[1], "E, F, G")
-        self.assertEqual(len(output_df["Shuffled String"].iloc[0].split(", ")), 4)
-        self.assertEqual(len(output_df["Shuffled String"].iloc[1].split(", ")), 3)
+        # Test function's behavior with an empty input list
+        input_data = []
+        df = task_func(input_data)
+        self.assertEqual(len(df), 0)
     def test_case_3(self):
-        # Test single-item list
-        input_data = ["word1, word2"]
-        output_df = task_func(input_data)
-        self.assertEqual(output_df["Original String"].iloc[0], "word1, word2")
-        self.assertEqual(len(output_df["Shuffled String"].iloc[0].split(", ")), 2)
+        # Test with single items (no commas) to verify output matches input exactly
+        input_data = ["a", "b", "c"]
+        df = task_func(input_data)
+        self.assertListEqual(
+            df["Original String"].tolist(), df["Randomized String"].tolist()
+        )
     def test_case_4(self):
-        # Tests shuffling with an empty string
-        input_data = [""]
-        output_df = task_func(input_data)
-        self.assertEqual(output_df["Original String"].iloc[0], "")
-        self.assertEqual(output_df["Shuffled String"].iloc[0], "")
+        # Test with strings containing only commas
+        input_data = [",,,", ",,"]
+        expected_output = [", , , ", ", , "]
+        df = task_func(input_data)
+        self.assertTrue(
+            all(df["Randomized String"].apply(lambda x: x in expected_output))
+        )
     def test_case_5(self):
-        # Test shuffling single substring (no shuffling)
-        input_data = ["single"]
-        output_df = task_func(input_data)
-        self.assertEqual(output_df["Original String"].iloc[0], "single")
-        self.assertEqual(output_df["Shuffled String"].iloc[0], "single")
+        # Test strings with inconsistent use of spaces and delimiters
+        input_data = ["a,b,  c", "d ,e, f"]  # Inputs with inconsistent spacing
+        df = task_func(input_data, seed=24)
+        for i in range(len(input_data)):
+            original_substrings = set(re.split("\s*,\s*", input_data[i]))
+            randomized_substrings = set(df["Randomized String"].iloc[i].split(", "))
+            self.assertEqual(
+                original_substrings,
+                randomized_substrings,
+            )
     def test_case_6(self):
-        # Testing the effect of a specific random seed to ensure reproducibility
-        input_data = ["a, b, c, d"]
-        output_df1 = task_func(input_data, seed=42)
-        output_df2 = task_func(input_data, seed=42)
-        self.assertEqual(
-            output_df1["Shuffled String"].iloc[0], output_df2["Shuffled String"].iloc[0]
-        )
+        # Test with strings that include special characters
+        input_data = ["!@#, $%^", "&*(), )(_+"]
+        df = task_func(input_data, seed=99)
+        self.assertEqual(len(df), 2)
+        for orig, rand in zip(df["Original String"], df["Randomized String"]):
+            self.assertSetEqual(set(orig.split(", ")), set(rand.split(", ")))
     def test_case_7(self):
-        # Tests shuffling with varying spaces around commas
-        input_data = ["one,two, three"]
-        corrected_expected_shuffled = "two, one, three"
-        output_df = task_func(input_data, seed=42)
-        self.assertEqual(output_df["Original String"].iloc[0], "one,two, three")
-        self.assertEqual(
-            output_df["Shuffled String"].iloc[0], corrected_expected_shuffled
+        # Test random seed
+        input_data = ["lamp, bag, mirror", "table, chair, vase"]
+        df1 = task_func(input_data, seed=42)
+        df2 = task_func(input_data, seed=42)
+        self.assertListEqual(
+            df1["Randomized String"].tolist(), df2["Randomized String"].tolist()
         )
+    def test_case_8(self):
+        # Test the handling of non-standard separators
+        input_data = ["a;b;c", "d:e:f"]
+        df = task_func(input_data)
+        self.assertListEqual(
+            df["Original String"].tolist(), df["Randomized String"].tolist()
+        )
+    def test_case_9(self):
+        ## Test handling of strings with commas not followed by spaces
+        input_data = ["a,b,c", "d,e,f"]
+        df = task_func(input_data, seed=42)
+        for idx in range(len(input_data)):
+            original_substrings = set(re.split(",\s*", input_data[idx].strip()))
+            randomized_substrings = set(df["Randomized String"].iloc[idx].split(", "))
+            self.assertEqual(
+                original_substrings,
+                randomized_substrings,
+                "Substrings should be preserved and normalized after randomization.",
+            )
+    def test_case_10(self):
+        # Test handling of strings with leading or trailing spaces
+        input_data = [" a, b, c ", " d, e, f "]
+        df = task_func(input_data, seed=42)
+        for idx in range(len(input_data)):
+            original_substrings = set(
+                x.strip() for x in re.split(",\s*", input_data[idx].strip())
+            )
+            randomized_substrings = set(
+                x.strip() for x in df["Randomized String"].iloc[idx].split(", ")
+            )
+            self.assertEqual(
+                original_substrings,
+                randomized_substrings,
+                "Ensure substrings match after randomization, ignoring leading/trailing spaces.",
+            )
+    def test_case_11(self):
+        # Test handling of strings with multiple spaces after a comma
+        input_data = ["a,  b,   c", "d,    e, f"]
+        df = task_func(input_data, seed=42)
+        for rand_str in df["Randomized String"].tolist():
+            self.assertTrue(
+                ",  " not in rand_str
+                and ",   " not in rand_str
+                and ",    " not in rand_str,
+                "Multiple spaces after commas should not appear in output.",
+            )

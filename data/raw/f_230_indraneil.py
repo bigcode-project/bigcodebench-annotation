@@ -11,7 +11,7 @@ def f_230(L):
     L (list): Input list.
     
     Returns:
-    dict: A dictionary with the mean, median, mode, and standard deviation of 'L'.
+    dict: A dictionary with the 'mean', 'median', 'mode', 'std_dev' of 'L, and the 'plot' Axes object.
     
     Requirements:
     - numpy

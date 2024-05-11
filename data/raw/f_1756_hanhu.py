@@ -39,7 +39,7 @@ def f_1757():
 import unittest
 import numpy as np
 import matplotlib.pyplot as plt
-from unittest.mock import patch
+from unittest.mock import patch, ANY
 
 class TestCases(unittest.TestCase):
     def test_no_error(self):
@@ -62,12 +62,17 @@ class TestCases(unittest.TestCase):
     @patch('matplotlib.pyplot.plot')
     def test_plot_data(self, mock_plot, mock_linspace):
         """Test if the plot contains the correct data."""
+        # Set up the mock for linspace to return a specific range
         mock_linspace.return_value = np.linspace(-10, 10, 400)
         expected_X = np.linspace(-10, 10, 400)
         expected_Y = expected_X ** 2
+
+        # Execute the function under test
         with patch('matplotlib.pyplot.show'):
             f_1757()
-            mock_plot.assert_called_with(expected_X, expected_Y)
+
+            # Assert the plot was called correctly, allow additional arguments like labels
+            mock_plot.assert_called_with(expected_X, expected_Y, label=ANY)
 
     def test_grid_enabled(self):
         """Test if the grid is enabled in the plot."""

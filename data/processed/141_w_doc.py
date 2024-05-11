@@ -1,78 +1,98 @@
+import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+import statistics
 
-def task_func(df, cols):
+def task_func(rows, columns=['A', 'B', 'C', 'D', 'E', 'F'], seed=42):
     """
-    Standardize specified numeric columns in a dataframe.
+    Create a Pandas DataFrame with a specified number of rows and six columns (default A-F), 
+    each filled with random numbers between 1 and 100, using a specified seed for reproducibility. 
+    Additionally, calculate the mean and median for each column.
 
     Parameters:
-    df (DataFrame): The dataframe.
-    cols (list): The columns to standardize.
+        - rows (int): The number of rows in the DataFrame. Must be a positive integer greater than 0.
+        - columns (list, optional): Column names for the DataFrame. Defaults to ['A', 'B', 'C', 'D', 'E', 'F'].
+        - seed (int, optional): Seed for the random number generator. Defaults to 42.
 
     Returns:
-    DataFrame: The dataframe with standardized columns.
+        - DataFrame: A pandas DataFrame with the generated data.
+        - dict: A dictionary containing the calculated mean and median for each column. 
+                The dictionary format is:
+                {
+                    'ColumnName': {
+                        'mean': MeanValue,
+                        'median': MedianValue
+                    }, ...
+                }
+                where 'ColumnName' is each of the specified column names, 'MeanValue' is the calculated mean, 
+                and 'MedianValue' is the calculated median for that column.
 
     Raises:
-    ValueError: If 'df' is not a DataFrame, 'cols' is not a list, or columns in 'cols' don't exist in 'df'.
+        - ValueError: If 'rows' is not a positive integer greater than 0.
 
     Requirements:
-    - pandas
-    - sklearn.preprocessing.StandardScaler
+        - numpy
+        - pandas
+        - statistics
 
     Example:
-    >>> np.random.seed(0)
-    >>> df = pd.DataFrame({'A': np.random.normal(0, 1, 1000), 'B': np.random.exponential(1, 1000)})
-    >>> df = task_func(df, ['A', 'B'])
-    >>> print(df.describe())
-                      A             B
-    count  1.000000e+03  1.000000e+03
-    mean  -1.243450e-17 -1.865175e-16
-    std    1.000500e+00  1.000500e+00
-    min   -3.040310e+00 -1.024196e+00
-    25%   -6.617441e-01 -7.183075e-01
-    50%   -1.293911e-02 -2.894497e-01
-    75%    6.607755e-01  4.095312e-01
-    max    2.841457e+00  5.353738e+00
+        >>> df, stats = task_func(10)
+        >>> print(df)
+            A   B   C   D   E    F
+        0  52  93  15  72  61   21
+        1  83  87  75  75  88  100
+        2  24   3  22  53   2   88
+        3  30  38   2  64  60   21
+        4  33  76  58  22  89   49
+        5  91  59  42  92  60   80
+        6  15  62  62  47  62   51
+        7  55  64   3  51   7   21
+        8  73  39  18   4  89   60
+        9  14   9  90  53   2   84
+        >>> print(stats)
+        {'A': {'mean': 47, 'median': 42.5}, 'B': {'mean': 53, 'median': 60.5}, 'C': {'mean': 38.7, 'median': 32.0}, 'D': {'mean': 53.3, 'median': 53.0}, 'E': {'mean': 52, 'median': 60.5}, 'F': {'mean': 57.5, 'median': 55.5}}
     """
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("The input df must be a pandas DataFrame.")
-    if not isinstance(cols, list) or not all(isinstance(col, str) for col in cols):
-        raise ValueError("cols must be a list of column names.")
-    if not all(col in df.columns for col in cols):
-        raise ValueError("All columns in cols must exist in the dataframe.")
-    scaler = StandardScaler()
-    df[cols] = scaler.fit_transform(df[cols])
-    return df
+    if not isinstance(rows, int) or rows <= 0:
+        raise ValueError("rows must be a positive integer greater than 0.")
+    np.random.seed(seed)
+    data = np.random.randint(1, 101, size=(rows, len(columns)))
+    df = pd.DataFrame(data, columns=columns)
+    stats_dict = {}
+    for col in columns:
+        stats_dict[col] = {
+            'mean': statistics.mean(df[col]),
+            'median': statistics.median(df[col])
+        }
+    return df, stats_dict
 
 import unittest
-import numpy as np
-import pandas as pd 
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        np.random.seed(0)
-        self.df = pd.DataFrame({
-            'A': np.random.normal(0, 1, 1000), 
-            'B': np.random.exponential(1, 1000), 
-            'C': np.random.randint(0, 100, 1000)
-        })
-    def test_standardized_columns(self):
-        standardized_df = task_func(self.df, ['A', 'B'])
-        self.assertAlmostEqual(standardized_df['A'].mean(), 0, places=1)
-        self.assertAlmostEqual(standardized_df['A'].std(), 1, places=1)
-        self.assertAlmostEqual(standardized_df['B'].mean(), 0, places=1)
-        self.assertAlmostEqual(standardized_df['B'].std(), 1, places=1)
-        df_list = standardized_df.apply(lambda row: ','.join(row.values.astype(str)), axis=1).tolist()
-        with open('df_contents.txt', 'w') as file:
-            file.write(str(df_list))
-    def test_invalid_input_dataframe(self):
+    def test_dataframe_structure(self):
+        df, _ = task_func(10)
+        self.assertEqual(df.shape, (10, 6))  # 10 rows, 6 columns
+    def test_invalid_rows_input_negative(self):
         with self.assertRaises(ValueError):
-            task_func("not a dataframe", ['A', 'B'])
-    def test_invalid_input_cols(self):
+            task_func(-1)
+    def test_invalid_rows_input_zero(self):
         with self.assertRaises(ValueError):
-            task_func(self.df, 'A')
-    def test_nonexistent_column(self):
+            task_func(0)
+    def test_invalid_rows_type(self):
         with self.assertRaises(ValueError):
-            task_func(self.df, ['A', 'NonexistentColumn'])
-    def test_empty_dataframe(self):
-        with self.assertRaises(ValueError):
-            task_func(pd.DataFrame(), ['A', 'B'])
+            task_func("five")
+    def test_stats_calculation(self):
+        _, stats = task_func(10)
+        for col_stats in stats.values():
+            self.assertIn('mean', col_stats)
+            self.assertIn('median', col_stats)
+            
+    def test_specific_stats_values(self):
+        df, stats = task_func(10)
+        for col in df.columns:
+            expected_mean = df[col].mean()
+            expected_median = df[col].median()
+            self.assertAlmostEqual(stats[col]['mean'], expected_mean)
+            self.assertAlmostEqual(stats[col]['median'], expected_median)
+    def test_reproducibility_with_seed(self):
+        df1, _ = task_func(10, seed=123)
+        df2, _ = task_func(10, seed=123)
+        pd.testing.assert_frame_equal(df1, df2)

@@ -1,85 +1,87 @@
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
+import numpy as np
+from random import randint
+
+# Constants
+STUDENTS = ['Joe', 'Amy', 'Mark', 'Sara', 'John', 'Emily', 'Zoe', 'Matt']
+COURSES = ['Math', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Geography', 'Computer Science']
 
 
-def task_func(data_dict, data_keys):
+def task_func():
     """
-    Normalize data specified by keys in a dictionary using MinMax scaling and plot the results. This function is
-    useful for preprocessing data for machine learning models where data scaling can impact performance.
-
-    Parameters:
-    data_dict (dict): A dictionary where keys map to lists of numeric values.
-    data_keys (list): Keys within the dictionary whose corresponding values are to be normalized.
+    Generates a DataFrame containing random grades for a predefined list of students across a set of courses.
+    Each student will have one grade per course and an average grade calculated across all courses.
 
     Returns:
-    tuple: A tuple containing a DataFrame of normalized values and a matplotlib Axes object representing a plot of the
-    normalized data.
+    DataFrame: A pandas DataFrame with columns for each student's name, their grades for each course,
+               and their average grade across all courses.
 
     Requirements:
     - pandas
-    - sklearn
+    - numpy
+    - random
 
-    Raises:
-    ValueError: If no keys in `data_keys` are found in `data_dict`.
+    Note:
+    The grades are randomly generated for each course using a uniform distribution between 0 and 100.
 
     Example:
-    >>> data_dict = {'A': [1, 2, 3], 'B': [4, 5, 6]}
-    >>> data_keys = ['A', 'B']
-    >>> normalized_df, ax = task_func(data_dict, data_keys)
-    >>> print(normalized_df.to_string(index=False))
-      A   B
-    0.0 0.0
-    0.5 0.5
-    1.0 1.0
+    >>> random.seed(0)
+    >>> grades = task_func()
+    >>> print(grades[['Name', 'Average Grade']].to_string(index=False))
+     Name  Average Grade
+      Joe         51.875
+      Amy         53.250
+     Mark         53.750
+     Sara         47.125
+     John         55.250
+    Emily         48.625
+      Zoe         63.750
+     Matt         54.750
     """
-    data_for_keys = {key: data_dict[key] for key in data_keys if key in data_dict}
-    df = pd.DataFrame(data_for_keys)
-    if df.empty:
-        raise ValueError("No matching keys found in data dictionary, or keys list is empty.")
-    scaler = MinMaxScaler()
-    normalized_data = scaler.fit_transform(df)
-    normalized_df = pd.DataFrame(normalized_data, columns=data_keys)
-    ax = normalized_df.plot(kind='line')
-    ax.set_title('Normalized Data')
-    ax.set_ylabel('Normalized Value')
-    ax.set_xlabel('Index')
-    return normalized_df, ax
+    students_data = []
+    for student in STUDENTS:
+        grades = [randint(0, 100) for _ in COURSES]
+        average_grade = np.mean(grades)
+        students_data.append([student] + grades + [average_grade])
+    columns = ['Name'] + COURSES + ['Average Grade']
+    grades_df = pd.DataFrame(students_data, columns=columns)
+    return grades_df
 
 import unittest
-import matplotlib.pyplot as plt
+from unittest.mock import patch
+import random
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Sample data dictionary
-        self.data_dict = {
-            'A': [10, 20, 30, 40],
-            'B': [20, 30, 40, 50],
-            'C': [30, 40, 50, 60]
-        }
-    def test_normalization_single_key(self):
-        # Test normalization with a single key
-        data_keys = ['A']
-        normalized_df, ax = task_func(self.data_dict, data_keys)
-        self.assertTrue((normalized_df >= 0).all().all() and (normalized_df <= 1).all().all(),
-                        "Normalized data should be in the range [0, 1]")
-    def test_normalization_multiple_keys(self):
-        # Test normalization with multiple keys
-        data_keys = ['A', 'B']
-        normalized_df, ax = task_func(self.data_dict, data_keys)
-        self.assertEqual(len(normalized_df.columns), 2, "Normalized DataFrame should have 2 columns")
-        self.assertTrue({'A', 'B'}.issubset(normalized_df.columns), "DataFrame should contain specified keys")
-    def test_normalization_all_keys(self):
-        # Test normalization with all keys in the dictionary
-        data_keys = list(self.data_dict.keys())
-        normalized_df, ax = task_func(self.data_dict, data_keys)
-        self.assertEqual(len(normalized_df.columns), 3, "Normalized DataFrame should have 3 columns")
-        self.assertTrue({'A', 'B', 'C'}.issubset(normalized_df.columns), "DataFrame should contain all keys")
-    def test_empty_keys(self):
-        # Test with no keys specified
-        data_keys = []
-        with self.assertRaises(ValueError):
-            task_func(self.data_dict, data_keys)
-    def test_key_not_in_dict(self):
-        # Test with a key that's not in the dictionary
-        data_keys = ['D']  # Assuming 'D' is not in `data_dict`
-        with self.assertRaises(ValueError):
-            task_func(self.data_dict, data_keys)
+        random.seed(0)
+        # Correctly set up the mock within the test execution context
+        self.patcher = patch('random.randint', side_effect=[i % 100 for i in range(800)])  # Assuming 8 students and 100 course entries
+        self.mock_randint = self.patcher.start()
+        self.grades_df = task_func()
+        self.patcher.stop()
+    def test_dataframe_columns(self):
+        # Ensure the DataFrame contains the correct columns
+        expected_columns = ['Name'] + COURSES + ['Average Grade']
+        self.assertListEqual(list(self.grades_df.columns), expected_columns, "DataFrame should have specific columns")
+    def test_grade_range(self):
+        # Check that all grades are within the valid range (0 to 100)
+        course_columns = self.grades_df.columns[1:-1]  # Exclude 'Name' and 'Average Grade'
+        for course in course_columns:
+            self.assertTrue(self.grades_df[course].between(0, 100).all(),
+                            f"All grades in {course} should be between 0 and 100")
+    def test_average_grade_calculation(self):
+        # Verify that the average grade is correctly calculated
+        course_columns = self.grades_df.columns[1:-1]  # Exclude 'Name' and 'Average Grade'
+        calculated_avg = self.grades_df[course_columns].mean(axis=1)
+        np.testing.assert_array_almost_equal(self.grades_df['Average Grade'], calculated_avg, decimal=1,
+                                             err_msg="Average grades should be correctly calculated")
+    def test_all_students_included(self):
+        # Ensure that all predefined students are included in the DataFrame
+        self.assertTrue(set(STUDENTS).issubset(set(self.grades_df['Name'])),
+                        "All predefined students should be included in the DataFrame")
+    def test_deterministic_grades(self):
+        # Verify the grades are deterministic under mocked conditions
+        random.seed(0)
+        expected_first_row_grades = [randint(0, 100) for _ in COURSES]
+        actual_first_row_grades = self.grades_df.iloc[0, 1:-1].tolist()
+        self.assertListEqual(actual_first_row_grades, expected_first_row_grades,
+                             "The first row grades should be deterministic and match the expected pattern")

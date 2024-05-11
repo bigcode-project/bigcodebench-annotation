@@ -1,70 +1,51 @@
-from datetime import datetime
-import matplotlib.pyplot as plt
-import pandas as pd
+import pytz
+from dateutil import parser
 
-
-def task_func(data):
+def task_func(date_str, from_tz, to_tz):
     """
-    This function plots a bar chart of monthly data values for a single year, with 'month' on the x-axis and 'value'
-    on the y-axis.
+    Converts a date time from one timezone to another.
 
     Parameters:
-    data (str): The data string in the format 'yyyy-mm-value'.
+    date_str (str): The date string in "yyyy-mm-dd hh:mm:ss" format.
+    from_tz (str): The timezone of the given date string.
+    to_tz (str): The timezone to which the date should be converted.
 
     Returns:
-    Axes object: A matplotlib.axes.Axes object representing the plot.
+    str: The converted datetime string in "yyyy-mm-dd hh:mm:ss" format.
 
     Requirements:
-    - pandas
-    - datetime
-    - matplotlib.pyplot
+    - pytz
+    - dateutil.parser
 
     Example:
-    >>> data = '2022-01-100,2022-02-200,2022-03-150,2022-04-300,2022-05-250,2022-06-350,2022-07-400,2022-08-450,2022-09-500,2022-10-550,2022-11-600,2022-12-650'
-    >>> ax = task_func(data)
+    >>> task_func('2022-03-01 12:00:00', 'UTC', 'America/New_York')
+    '2022-03-01 07:00:00'
     """
-    if not data.strip():
-        raise ValueError("The provided data string is empty.")
-    data_entries = data.split(',')
-    months_data = [d.split('-')[1] for d in data_entries]
-    unique_years = {d.split('-')[0] for d in data_entries}
-    if len(unique_years) != 1:
-        raise ValueError("The provided data contains entries from multiple years.")
-    data = [d.rsplit('-', 1) for d in data_entries]
-    data = [(datetime.strptime(d[0], '%Y-%m').strftime('%B'), int(d[1])) for d in data]
-    df = pd.DataFrame(data, columns=['Month', 'Value'])
-    df = df.set_index('Month')
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.bar(df.index, df['Value'])
-    ax.set_xlabel('Month')
-    ax.set_ylabel('Value')
-    ax.set_title(f"Monthly Data for {list(unique_years)[0]}")
-    plt.xticks(rotation='vertical')
-    plt.close(fig)  # Close the figure to prevent it from being displayed here
-    return ax
+    from_tz = pytz.timezone(from_tz)
+    to_tz = pytz.timezone(to_tz)
+    date = parser.parse(date_str).replace(tzinfo=from_tz)
+    date = date.astimezone(to_tz)
+    return date.strftime('%Y-%m-%d %H:%M:%S')
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_basic_functionality(self):
-        data = '2022-01-100,2022-02-200,2022-03-150'
-        ax = task_func(data)
-        self.assertEqual(ax.get_xlabel(), "Month", "X-axis label is incorrect.")
-        self.assertEqual(ax.get_ylabel(), "Value", "Y-axis label is incorrect.")
-        self.assertEqual(ax.get_title(), "Monthly Data for 2022", "Title of the plot is incorrect.")
-        self.assertEqual(len(ax.patches), 3, "Number of bars plotted is incorrect.")
-    def test_full_year_data(self):
-        data = '2022-01-100,2022-02-200,2022-03-150,2022-04-300,2022-05-250,2022-06-350,2022-07-400,2022-08-450,2022-09-500,2022-10-550,2022-11-600,2022-12-650'
-        ax = task_func(data)
-        self.assertEqual(len(ax.patches), 12, "Number of bars plotted is incorrect.")
-    def test_partial_year_data(self):
-        data = '2022-01-100,2022-02-200,2022-03-150'
-        ax = task_func(data)
-        self.assertEqual(len(ax.patches), 3, "Number of bars plotted is incorrect.")
-    def test_incorrect_data_format(self):
-        data = '2022-01-100,2022-02-200,2023-03-150'
-        with self.assertRaises(ValueError, msg="Function should raise ValueError for data from multiple years."):
-            ax = task_func(data)
-    def test_empty_data(self):
-        data = ''
-        with self.assertRaises(ValueError, msg="Function should raise ValueError for empty data."):
-            ax = task_func(data)
+    def test_utc_to_new_york(self):
+        """Test conversion from UTC to America/New_York timezone."""
+        result = task_func('2022-03-01 12:00:00', 'UTC', 'America/New_York')
+        self.assertEqual(result, '2022-03-01 07:00:00')
+    def test_utc_to_los_angeles_summer_time(self):
+        """Test conversion from UTC to America/Los_Angeles with daylight saving."""
+        result = task_func('2022-06-01 12:00:00', 'UTC', 'America/Los_Angeles')
+        self.assertEqual(result, '2022-06-01 05:00:00')
+    def test_invalid_date_format(self):
+        """Test handling of invalid date format."""
+        with self.assertRaises(ValueError):
+            task_func('invalid-date', 'UTC', 'America/New_York')
+    def test_same_timezone_conversion(self):
+        """Test conversion where from_tz and to_tz are the same."""
+        result = task_func('2022-03-01 12:00:00', 'UTC', 'UTC')
+        self.assertEqual(result, '2022-03-01 12:00:00')
+    def test_utc_to_london_summer_time(self):
+        """Test conversion from UTC to Europe/London during summer (BST)."""
+        result = task_func('2022-06-01 12:00:00', 'UTC', 'Europe/London')
+        self.assertEqual(result, '2022-06-01 13:00:00')

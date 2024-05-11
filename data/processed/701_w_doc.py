@@ -1,55 +1,56 @@
 import pandas as pd
-import numpy as np
+from sklearn.linear_model import LinearRegression
 
-def task_func(data, cols):
+def task_func(df, target):
     """
-    Turn the provided data into a DataFrame and then calculate the correlation matrix of numeric columns.
+    Perform a linear regression analysis on a given DataFrame.
     
     Parameters:
-    - data (list): List of lists with the data, where the length of the inner list equals the number of columns
-    - cols (list): List of column names
+    - df (pd.DataFrame): The pandas DataFrame.
+    - target (str): The target variable.
     
     Returns:
-    - correlation_matrix (pd.DataFrame): The correlation matrix.
+    - score (float): The R-squared score of the model.
 
     Requirements:
     - pandas
-    - numpy
-    
+    - sklearn
+
     Example:
-    >>> correlation_matrix = task_func([[5.1, 3.5, 1.4], [4.9, 3.0, 1.4], [4.7, 3.2, 1.3]], ['x', 'y', 'z'])
-    >>> print(correlation_matrix)
-              x         y         z
-    x  1.000000  0.596040  0.866025
-    y  0.596040  1.000000  0.114708
-    z  0.866025  0.114708  1.000000
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> df = pd.DataFrame({'feature': np.random.rand(100), 'target': np.random.rand(100)})  # Explicitly using pd
+    >>> r_squared = task_func(df, 'target')
+    >>> print(r_squared)
+    0.0011582111228732872
     """
-    df = pd.DataFrame(data, columns=cols)
-    df_np = np.array(df)
-    df = pd.DataFrame(df_np, columns=cols)
-    correlation_matrix = df.corr()
-    return correlation_matrix
+    X = pd.DataFrame.drop(df, target, axis=1)  
+    y = pd.Series(df[target])  
+    model = LinearRegression()
+    model.fit(X, y)
+    return model.score(X, y)
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = pd.DataFrame([[5.1, 3.5, 1.4], [4.9, 3.0, 1.4], [4.7, 3.2, 1.3]], columns = ['x', 'y', 'z'])
-        correlation_matrix = task_func([[5.1, 3.5, 1.4], [4.9, 3.0, 1.4], [4.7, 3.2, 1.3]], ['x', 'y', 'z'])
-        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
+        df = pd.DataFrame([[0, 1, 2], [3, 4, 5], [6, 7, 8]], columns = ['x', 'y', 'z'])
+        r_squared = task_func(df, 'z')
+        self.assertEqual(r_squared, 1.0)
+        
     def test_case_2(self):
-        df = pd.DataFrame([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], columns = ['x', 'y', 'z'])
-        correlation_matrix = task_func([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], ['x', 'y', 'z'])
-        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
-    def test_case_3(self):
-        df = pd.DataFrame([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]], columns = ['x', 'y', 'z'])
-        correlation_matrix = task_func([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]], ['x', 'y', 'z'])
-        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
+        df = pd.DataFrame([[-1, 1, 2], [3, 4, 5], [6, 7, 8]], columns = ['x', 'y', 'z'])
+        r_squared = task_func(df, 'z')
+        self.assertEqual(r_squared, 1.0)
     
+    def test_case_3(self):
+        df = pd.DataFrame([[0, 0, 0], [1, 1, 1], [2, 2, 2]], columns = ['x', 'y', 'z'])
+        r_squared = task_func(df, 'z')
+        self.assertEqual(r_squared, 1.0)
     def test_case_4(self):
-        df = pd.DataFrame([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0]], columns = ['x', 'y', 'z'])
-        correlation_matrix = task_func([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0]], ['x', 'y', 'z'])
-        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
+        df = pd.DataFrame([[0, 0, 9], [1, 1, 35], [2, 2, 78]], columns = ['x', 'y', 'z'])
+        r_squared = task_func(df, 'z')
+        self.assertFalse(r_squared == 1.0)
     def test_case_5(self):
-        df = pd.DataFrame([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0], [-7.0, -8.0, -9.0]], columns = ['x', 'y', 'z'])
-        correlation_matrix = task_func([[-1.0, -2.0, -3.0], [-4.0, -5.0, -6.0], [-7.0, -8.0, -9.0]], ['x', 'y', 'z'])
-        self.assertTrue(np.allclose(correlation_matrix, df.corr()))
+        df = pd.DataFrame([[0, 0, 0, 0], [1, 1, 1, 1], [2, 2, 2, 2]], columns = ['x', 'y', 'z', 'w'])
+        r_squared = task_func(df, 'w')
+        self.assertEqual(r_squared, 1.0)

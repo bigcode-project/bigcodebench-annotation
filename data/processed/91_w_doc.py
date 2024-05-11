@@ -1,85 +1,74 @@
-import numpy as np
-import math
+from scipy.stats import linregress
+import matplotlib.pyplot as plt
 
-def task_func(data, target, k):
+def task_func(data, column1, column2):
     """
-    Calculate the 'k' nearest neighbors by geographic coordinates using a dataset 
-    and a target data point. The function returns a list of the 'k' nearest neighbors, 
-    sorted in ascending order of their distances from the target.
+    Perform a linear regression on two columns of a dataset and record the result.
+    Additionally, generates a plot representing the original data and the fitted line.
 
     Parameters:
-    data (DataFrame): The dataset containing geographical coordinates with columns ['Latitude', 'Longitude'].
-    target (list): The target data point as [Latitude, Longitude].
-    k (int): The number of nearest neighbors to return. Must be a non-negative integer.
+    data (DataFrame): The dataset.
+    column1 (str): The name of the first column.
+    column2 (str): The name of the second column.
 
     Returns:
-    list: List of the 'k' nearest neighbors as [Latitude, Longitude].
+    tuple: The slope, intercept, r-value, p-value, and standard error of the regression.
+    Axes: The matplotlib Axes object containing the plot.
 
     Raises:
-    ValueError: If 'k' is a negative integer or not an integer.
-
-    Constants:
-    radius of earth is 6371 km
+    ValueError: If the specified columns do not exist in the DataFrame.
 
     Requirements:
-    - numpy
-    - math
+    - scipy.stats
+    - matplotlib.pyplot
 
     Example:
-    >>> data = pd.DataFrame([[14, 25], [1, 22], [7, 8]], columns=['Latitude', 'Longitude'])
-    >>> target = [10, 15]
-    >>> k = 2
-    >>> task_func(data, target, k)
-    [[7, 8], [14, 25]]
+    >>> data = pd.DataFrame([[14, 25], [1, 22], [7, 8]], columns=['Column1', 'Column2'])
+    >>> result, ax = task_func(data, 'Column1', 'Column2')
     """
-    if not isinstance(k, int) or k < 0:
-        raise ValueError("'k' must be a non-negative integer")
-    RADIUS_EARTH_KM = 6371.0  # Radius of the Earth in kilometers
-    def calculate_distance(coord1, coord2):
-        lat1, lon1 = math.radians(coord1[0]), math.radians(coord1[1])
-        lat2, lon2 = math.radians(coord2[0]), math.radians(coord2[1])
-        dlat = lat2 - lat1
-        dlon = lon2 - lon1
-        a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        return RADIUS_EARTH_KM * c
-    distances = np.array([calculate_distance(target, coord) for coord in data.to_numpy()])
-    nearest_indices = distances.argsort()[:k]
-    nearest_neighbors = data.iloc[nearest_indices].values.tolist()
-    return nearest_neighbors
+    if column1 not in data.columns or column2 not in data.columns:
+        raise ValueError("Specified columns must exist in the DataFrame")
+    x = data[column1].values
+    y = data[column2].values
+    slope, intercept, r_value, p_value, std_err = linregress(x, y)
+    fig, ax = plt.subplots()
+    ax.plot(x, y, 'o', label='original data')
+    ax.plot(x, intercept + slope*x, 'r', label='fitted line')
+    ax.legend()
+    return (slope, intercept, r_value, p_value, std_err), ax
 
 import unittest
 import pandas as pd
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.data = pd.DataFrame([[14, 25], [1, 22], [7, 8], [10, 15]], columns=['Latitude', 'Longitude'])
-        self.target = [10, 15]
-    def test_correct_number_of_neighbors(self):
-        k = 2
-        result = task_func(self.data, self.target, k)
-        self.assertEqual(len(result), k)
-    def test_correct_neighbors(self):
-        result = task_func(self.data, self.target, 1)
-        self.assertEqual(result, [[10, 15]])
-    def test_invalid_k_value_negative(self):
+        self.data = pd.DataFrame({
+            'Column1': [14, 1, 7, 10, 5],
+            'Column2': [25, 22, 8, 15, 11]
+        })
+    def test_regression_results(self):
+        result, _ = task_func(self.data, 'Column1', 'Column2')
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 5)
+    def test_invalid_columns(self):
         with self.assertRaises(ValueError):
-            task_func(self.data, self.target, -1)
-    def test_invalid_k_value_not_integer(self):
+            task_func(self.data, 'Invalid1', 'Column2')
+    def test_plot_axes(self):
+        _, ax = task_func(self.data, 'Column1', 'Column2')
+        self.assertEqual(len(ax.lines), 2)  # Original data and fitted line
+    def test_empty_dataframe(self):
         with self.assertRaises(ValueError):
-            task_func(self.data, self.target, "two")
-    def test_large_k_value(self):
-        k = 100
-        result = task_func(self.data, self.target, k)
-        self.assertEqual(len(result), len(self.data))
-    def test_zero_k_value(self):
-        k = 0
-        result = task_func(self.data, self.target, k)
-        self.assertEqual(result, [])
-        
-    def test_large_k_value(self):
-        k = 100
-        result = task_func(self.data, self.target, k)
+            task_func(pd.DataFrame(), 'Column1', 'Column2')
+    def test_single_point_regression(self):
+        single_point_data = pd.DataFrame({'Column1': [1], 'Column2': [2]})
+        result, ax = task_func(single_point_data, 'Column1', 'Column2')
+        # self.assertEqual(result[0], np.nan)
+        self.assertEqual(result[2], 0)  # Slope should be 0 for single point
+    
+    def test_return_values(self):
+        result, ax = task_func(self.data, 'Column1', 'Column2')
+        # print(result)
         # with open('df_contents.txt', 'w') as file:
         #     file.write(str(result))
-        expect = [[10, 15], [7, 8], [14, 25], [1, 22]]
-        self.assertAlmostEqual(result, expect)
+        expect = (0.3456790123456789, 13.641975308641975, 0.23699046752221187, 0.7011032163730078, 0.8181438416490141)
+        for res, exp in zip(result, expect):
+            self.assertAlmostEqual(res, exp, places=7)

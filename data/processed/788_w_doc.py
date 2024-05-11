@@ -1,84 +1,126 @@
-import numpy as np
-from itertools import combinations
+import heapq
+from scipy import stats
 
-def task_func(array1, array2):
+def task_func(df, col1, col2, N=10):
     """
-    Calculate the maximum Euclidean distance between all possible pairs of points 
-    formed by combining elements from two input arrays.
-
-    Each point is formed by combining one element from the first array and one 
-    element from the second array. The function then calculates the Euclidean 
-    distance between each pair of points and returns the maximum distance found.
+    Find the N largest absolute differences between the corresponding elements
+    of two specified columns in a DataFrame, perform a t-Test on the elements
+    with these differences, and return the calculated p-value.
 
     Parameters:
-    - array1 (numpy.array): A one-dimensional numpy array.
-    - array2 (numpy.array): A one-dimensional numpy array. The length of array2 should be 
-                          the same as array1.
+    df (pandas.DataFrame): A DataFrame containing at least two numerical columns to compare.
+    col1, col2 (str): Names of the columns to compare.
+    N (int, optional): The number of largest differences to consider for the t-Test. Defaults to 10.
 
     Returns:
-    - max_distance (float): The maximum Euclidean distance between any two points formed by combining 
-           elements from array1 and array2. If the arrays are empty, the function
-           returns 0.
+    float: The p-value resulting from the t-Test on the elements with the N largest differences.
 
     Raises:
-    - ValueError: If the input arrays have different lengths.
+    ValueError: If specified columns are not in the provided DataFrame.
+    ValueError: If N is <= 1.
 
     Requirements:
-    - numpy
-    - itertools
+    - scipy.stats
+    - heapq
 
     Example:
-    >>> array1 = np.array([2, 3, 4])
-    >>> array2 = np.array([1, 5, 2])
-    >>> task_func(array1, array2)
-    4.123105625617661
+    >>> df = pd.DataFrame({
+    ...     'col1': [99, 86, 90, 70, 86, 95, 56, 98, 80, 81],
+    ...     'col2': [21, 11, 21, 1, 26, 40, 4, 50, 34, 37]
+    ... })
+    >>> p_value = task_func(df, 'col1', 'col2', N=5)
+    >>> print(p_value)    
+    4.676251508205865e-06
+
+    >>> df = pd.DataFrame({
+    ...    'col1': [1, 3, 4, 70],
+    ...    'col2': [2, 3, 5, 1]
+    ...     })
+    >>> p_value = task_func(df, 'col1', 'col2', N=5)
+    >>> print(p_value)
+    0.3590111759771484
+
+
     """
-    if len(array1) != len(array2):
-        raise ValueError("The input arrays must have the same length.")
-    if len(array1) == 0:
-        return 0
-    max_distance = 0
-    for comb in combinations(zip(array1, array2), 2):
-        distance = np.linalg.norm(np.array(comb[0]) - np.array(comb[1]))
-        if distance > max_distance:
-            max_distance = distance
-    return max_distance
+    if N <= 1:
+        raise ValueError(f"N should be greater than 1. Received N={N}.")
+    if col1 not in df.columns or col2 not in df.columns:
+        raise ValueError(f"Columns {col1} or {col2} not found in the DataFrame.")
+    l1 = df[col1].values
+    l2 = df[col2].values
+    largest_diff_indices = heapq.nlargest(N, range(len(l1)), key=lambda i: abs(l1[i] - l2[i]))
+    _, p_value = stats.ttest_ind(l1[largest_diff_indices], l2[largest_diff_indices])
+    return p_value
 
 import unittest
-import numpy as np
+from faker import Faker
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_non_empty_arrays(self):
-        # Test with non-empty arrays containing positive values
-        # Expected result is the maximum Euclidean distance between any two points
-        array1 = np.array([1, 2, 3])
-        array2 = np.array([4, 5, 6])
-        result = task_func(array1, array2)
-        self.assertAlmostEqual(result, 2.8284271247461903, places=6)
-    def test_empty_arrays(self):
-        # Test with empty arrays
-        # Expected result is 0 since there are no points to calculate the distance between
-        array1 = np.array([])
-        array2 = np.array([])
-        result = task_func(array1, array2)
-        self.assertEqual(result, 0)
-    def test_single_element_arrays(self):
-        # Test with arrays that each contain a single element
-        # Expected result is 0 since there is only one point
-        array1 = np.array([1])
-        array2 = np.array([2])
-        result = task_func(array1, array2)
-        self.assertEqual(result, 0)
-    def test_negative_values(self):
-        # Test with non-empty arrays containing negative values
-        # Expected result is the maximum Euclidean distance between any two points
-        array1 = np.array([-1, -2, -3])
-        array2 = np.array([-4, -5, -6])
-        result = task_func(array1, array2)
-        self.assertAlmostEqual(result, 2.8284271247461903, places=6)
-    def test_mixed_values(self):
-        # Test with non-empty arrays containing a mix of positive and negative values
-        # Expected result is the maximum Euclidean distance between any two points
-        array1 = np.array([1, -2, 3])
-        array2 = np.array([-4, 5, -6])
-        result = task_func(array1, array2)
-        self.assertAlmostEqual(result, 12.083045973594572, places=6)
+    def test_N(self):
+        # test with different values for N
+        data = {
+            'col1': [10, 20, 30, 40, 50],
+            'col2': [10, 20, 3000, 40, 50]  # Only one large difference
+        }
+        df = pd.DataFrame(data)
+        p_value = task_func(df, 'col1', 'col2', N=4)
+        self.assertGreater(p_value, 0.1)  # Expecting a high p-value as only one value differs significantly
+        self.assertRaises(Exception, task_func, df, 'col1', 'col2', N=1)
+    def test_wrong_columns(self):
+        # test with wrong columns
+        data = {
+            'col1': [1, 2, 3, 4, 5],
+            'col2': [2, 3, 4, 5, 6]
+        }
+        df = pd.DataFrame(data)
+        self.assertRaises(Exception, task_func, df, 'a', 'col2')
+        self.assertRaises(Exception, task_func, df, 'col1', 'a')
+        self.assertRaises(Exception, task_func, df, 'a', 'b')
+        
+            
+    def test_case_1(self):
+        # Test case with small numerical differences in columns
+        data = {
+            'col1': [1, 2, 3, 4, 5],
+            'col2': [2, 3, 4, 5, 6]
+        }
+        df = pd.DataFrame(data)
+        p_value = task_func(df, 'col1', 'col2')
+        self.assertGreater(p_value, 0.05)  # Expecting a high p-value due to small differences
+    def test_case_2(self):
+        # Test case with larger numerical differences in columns
+        data = {
+            'col1': [100, 200, 300, 400, 500],
+            'col2': [10, 20, 30, 40, 50]
+        }
+        df = pd.DataFrame(data)
+        p_value = task_func(df, 'col1', 'col2')
+        self.assertLess(p_value, 0.05)  # Expecting a low p-value due to large differences
+    def test_case_3(self):
+        # Test case with random data from Faker
+        fake = Faker()
+        data = {
+            'col1': [fake.random_int(min=0, max=1000) for _ in range(10)],
+            'col2': [fake.random_int(min=0, max=1000) for _ in range(10)]
+        }
+        df = pd.DataFrame(data)
+        p_value = task_func(df, 'col1', 'col2')
+        # No specific assertion for random data, just checking if function executes without errors
+    def test_case_4(self):
+        # Test case with identical columns (expecting a high p-value)
+        data = {
+            'col1': [10, 20, 30, 40, 50],
+            'col2': [10, 20, 30, 40, 50]
+        }
+        df = pd.DataFrame(data)
+        p_value = task_func(df, 'col1', 'col2')
+        self.assertAlmostEqual(p_value, 1., places=2)  # Expecting a high p-value as columns are identical
+    def test_case_5(self):
+        # Test case with only one differing value in columns
+        data = {
+            'col1': [10, 20, 30, 40, 50],
+            'col2': [10, 20, 3000, 40, 50]  # Only one large difference
+        }
+        df = pd.DataFrame(data)
+        p_value = task_func(df, 'col1', 'col2')
+        self.assertGreater(p_value, 0.1)  # Expecting a high p-value as only one value differs significantly

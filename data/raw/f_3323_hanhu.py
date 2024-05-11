@@ -23,7 +23,7 @@ def f_3325(X, Y):
     
     Notes:
     - The plot's x-axis is labeled 'Recall', and the y-axis is labeled 'Precision'.
-    - The title of the axes is set to 'Precision-Recall curve'.
+    - The title of the axes is set to 'Precision-Recall Curve'.
     - The axes object allows for further customization of the plot outside the function.
 
     Requirements:

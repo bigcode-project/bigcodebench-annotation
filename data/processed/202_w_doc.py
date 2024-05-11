@@ -1,72 +1,67 @@
-import bisect
-import statistics
+import re
+import json
+from collections import Counter
 
-def task_func(df, column, value):
+
+def task_func(json_str, top_n=10):
     """
-    Analyze a column of a pandas DataFrame, find the values that are larger than the average, and count the number of values that are larger than a given value.
+    Extract all URLs from a string-serialized JSON dict using a specific URL pattern and return a dict
+    with the URLs as keys and the number of times they appear as values.
 
     Parameters:
-    df (DataFrame): The pandas DataFrame.
-    column (str): The column to analyze.
-    value (float): The value to compare with the data in the column.
-    
-    Returns:
-    tuple: A tuple containing (numpy.ndarray, int, matplotlib.axes.Axes).
-           The numpy array contains values greater than the average.
-           The int is the number of values greater than the given value.
-           The Axes object is for the generated histogram plot.
+    json_str (str): The JSON string.
+    top_n (int, Optional): The number of URLs to return. Defaults to 10. 
 
-    Raises:
-    ValueError: If the column does not exist in the DataFrame or value is not a number.
+    Returns:
+    dict: A dict with URLs as keys and the number of times they appear as values.
 
     Requirements:
-    - bisect
-    - statistics
-    
+    - re
+    - json
+    - collections.Counter
+
     Example:
-    >>> df = pd.DataFrame({'A': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
-    >>> greater_avg, num_greater_value, ax = task_func(df, 'A', 5)
+    >>> task_func('{"name": "John", "website": "https://www.example.com"}')
+    {'https://www.example.com': 1}
     """
-    if column not in df.columns:
-        raise ValueError(f"Column '{column}' does not exist in DataFrame")
-    if not isinstance(value, (int, float)):
-        raise ValueError("Value must be a number")
-    data = df[column].values
-    avg = statistics.mean(data)
-    greater_avg = data[data > avg]
-    data.sort()
-    bpoint = bisect.bisect_right(data, value)
-    num_greater_value = len(data) - bpoint
-    ax = df.hist(column=column, bins=10)[0][0]
-    return greater_avg, num_greater_value, ax
+    pattern = r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})'
+    data = json.loads(json_str)
+    urls = []
+    def extract(dictionary):
+        for key, value in dictionary.items():
+            if isinstance(value, dict):
+                extract(value)
+            elif isinstance(value, str) and re.match(pattern, value):
+                urls.append(value)
+    extract(data)
+    if not urls:
+        return {}
+    elif len(urls) <= top_n:
+        return dict(Counter(urls))
+    return dict(Counter(urls).most_common(top_n))
 
 import unittest
-import pandas as pd
+import doctest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.df = pd.DataFrame({'A': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
-    def test_valid_input(self):
-        greater_avg, num_greater, ax = task_func(self.df, 'A', 5)
-        self.assertTrue(len(greater_avg) > 0)
-        self.assertTrue(num_greater >= 0)
-    def test_invalid_column(self):
-        with self.assertRaises(ValueError):
-            task_func(self.df, 'B', 5)
-    def test_invalid_value_type(self):
-        with self.assertRaises(ValueError):
-            task_func(self.df, 'A', 'five')
-    def test_empty_dataframe(self):
-        empty_df = pd.DataFrame()
-        with self.assertRaises(ValueError):
-            task_func(empty_df, 'A', 5)
-    def test_no_values_greater_than_average(self):
-        constant_df = pd.DataFrame({'A': [1, 1, 1, 1, 1]})
-        greater_avg, num_greater, ax = task_func(constant_df, 'A', 5)
-        self.assertEqual(len(greater_avg), 0)
-        self.assertEqual(num_greater, 0)
-    
-    def test_norma_value(self):
-        greater_avg, num_greater, ax = task_func(self.df, 'A', 5)
-        
-        self.assertEqual([6, 7, 8, 9, 10], list(greater_avg), "list contents should match the expected output")
-        self.assertEqual(num_greater, 5, "value should match the expected output")
+    def test_case_1(self):
+        json_str = '{"name": "John", "website": "qwerthttps://www.example.com"}'
+        result = task_func(json_str)
+        self.assertEqual(result, {})
+    def test_case_2(self):
+        json_str = '{"name": "John", "social": {"twitter": "https://twitter.com/john", "linkedin": "https://linkedin.com/in/john"}, "website": "https://linkedin.com/in/john"}'
+        result = task_func(json_str)
+        self.assertEqual(result, {'https://twitter.com/john': 1, 'https://linkedin.com/in/john': 2})
+        result = task_func(json_str, 1)
+        self.assertEqual(result, {'https://linkedin.com/in/john': 2})
+    def test_case_3(self):
+        json_str = 'This is an adversarial input 0061'
+        with self.assertRaises(json.decoder.JSONDecodeError):
+            result = task_func(json_str)
+    def test_case_4(self):
+        json_str = '{"name": "John", "age": 30}'
+        result = task_func(json_str)
+        self.assertEqual(result, {})
+    def test_case_5(self):
+        json_str = '{"name": "John", "website": "example.com", "blog": "www.johnblog.com"}'
+        result = task_func(json_str)
+        self.assertEqual(result, {'www.johnblog.com': 1})

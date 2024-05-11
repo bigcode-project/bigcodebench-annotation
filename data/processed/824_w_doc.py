@@ -1,82 +1,56 @@
-import time
-import numpy as np
+import re
+import string
 
+# Constants
+PUNCTUATION = string.punctuation
 
-def task_func(samples=10, delay=0.1):
+def task_func(text):
     """
-    Make a delay for a given amount of time for a specified number of samples,
-    measure the actual delay and calculate the statistical properties of the
-    delay times.
+    Count the number of words and punctuation marks in a string.
 
     Parameters:
-    - samples (int): Number of samples for which the delay is measured.
-                     Default is 10.
-    - delay (float): Amount of time (in seconds) for each delay.
-                     Default is 0.1 second.
+    - text (str): The input string.
 
     Returns:
-    tuple: The mean and standard deviation of the delay times.
+    - tuple: A tuple containing the number of words and punctuation marks.
 
     Requirements:
-    - time
-    - numpy
+    - re
+    - string
 
     Example:
-    >>> mean, std = task_func(samples=5, delay=0.05)
-    >>> print(f'Mean: %.3f, Std: %.1f' % (mean, std))
-    Mean: 0.050, Std: 0.0
-    >>> mean, std = task_func(100, 0.001)
-    >>> print(f'Mean: %.3f, Std: %.4f' % (mean, std))
-    Mean: 0.001, Std: 0.0000
+    >>> task_func("Hello, world! This is a test.")
+    (6, 3)
     """
-    delay_times = []
-    for _ in range(samples):
-        t1 = time.time()
-        time.sleep(delay)
-        t2 = time.time()
-        delay_times.append(t2 - t1)
-    delay_times = np.array(delay_times)
-    mean = np.mean(delay_times)
-    std = np.std(delay_times)
-    return mean, std
+    words = re.findall(r'\b\w+\b', text)
+    punctuation_marks = [char for char in text if char in PUNCTUATION]
+    return len(words), len(punctuation_marks)
 
 import unittest
-import numpy as np
 class TestCases(unittest.TestCase):
+    def test_basic_input(self):
+        """Test with basic input string"""
+        result = task_func("Hello, world! This is a test.")
+        self.assertEqual(result, (6, 3))
+    def test_no_punctuation(self):
+        """Test with a string that has words but no punctuation"""
+        result = task_func("No punctuation here just words")
+        self.assertEqual(result, (5, 0))
     
-    def test_case_1(self):
-        start = time.time()
-        mean, std = task_func(samples=100, delay=0.001)
-        end = time.time()
-        self.assertAlmostEqual(100 * 0.001, end-start, delta=3)
-        self.assertAlmostEqual(mean, 0.001, places=0)
-        self.assertTrue(0 <= std <= 0.01)
-        
-    def test_case_2(self):
-        start = time.time()
-        mean, std = task_func(samples=3, delay=0.1)
-        end = time.time()
-        self.assertAlmostEqual(3 * 0.1, end-start, places=1)
-        self.assertAlmostEqual(mean, 0.1, delta=0.2)
-        self.assertTrue(0 <= std <= 0.01)
-    def test_case_3(self):
-        start = time.time()
-        mean, std = task_func(samples=2, delay=0.2)
-        end = time.time()
-        self.assertAlmostEqual(2 * 0.2, end-start, places=1)
-        self.assertTrue(0.19 <= mean <= 0.21)
-        self.assertTrue(0 <= std <= 0.02)
-    def test_case_4(self):
-        start = time.time()
-        mean, std = task_func(samples=100, delay=0.05)
-        end = time.time()
-        self.assertTrue(3 <= end-start <= 7)
-        self.assertTrue(0.03 <= mean <= 0.07)
-        self.assertTrue(0 <= std <= 0.05)
-    def test_case_5(self):
-        start = time.time()
-        mean, std = task_func(samples=1, delay=1)
-        end = time.time()
-        self.assertAlmostEqual(1, end-start, places=0)
-        self.assertTrue(0.9 <= mean <= 1.1)
-        self.assertTrue(0 <= std <= 0.1)
+    def test_with_empty_string(self):
+        """Test with an empty string"""
+        result = task_func("")
+        self.assertEqual(result, (0, 0))
+    def test_with_multiple_spaces(self):
+        """Test with a string that has multiple spaces between words"""
+        result = task_func("This  is   a    test     with      multiple       spaces")
+        self.assertEqual(result, (7, 0))
+    def test_with_only_punctuation(self):
+        """Test with a string that consists only of punctuation marks"""
+        result = task_func("!!!")
+        self.assertEqual(result, (0, 3))
+    
+    def test_with_single_punctuation(self):
+        """Test with a string that is a single punctuation mark"""
+        result = task_func("!")
+        self.assertEqual(result, (0, 1))

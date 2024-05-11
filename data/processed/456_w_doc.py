@@ -1,85 +1,137 @@
-import numpy as np
-from scipy import stats
+import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
 
-def task_func(mean, std_dev, n):
+
+def task_func(data: pd.DataFrame) -> (pd.DataFrame, plt.Axes):
     """
-    Generates a set of samples from a normal distribution with a specified mean and standard deviation.
-    It also visualizes the generated samples by plotting their histogram and the probability density function.
+    Normalize the data and visualize it using a heatmap.
+
+    This function takes a pandas DataFrame, normalizes the data to a range [0, 1], and then visualizes this
+    normalized data using a seaborn heatmap.  The heatmap uses the "YlGnBu" colormap to represent normalized
+    values and includes a color bar labeled "Normalized Value" to indicate the range of data values.
+    It returns both the normalized data and the heatmap plot.
 
     Parameters:
-    mean (float): The mean (mu) of the normal distribution.
-    std_dev (float): The standard deviation (sigma) of the distribution.
-    n (int): The number of samples to generate.
+    - data (pd.DataFrame): The input data with multiple features in columns.
 
     Returns:
-    numpy.ndarray: An array of generated samples from the normal distribution.
+    - pd.DataFrame: Normalized data.
+    - plt.Axes: Heatmap plot of the normalized data.
 
     Requirements:
+    - pandas
     - numpy
-    - scipy.stats
     - matplotlib.pyplot
-
-    Examples:
-    Generate 1000 samples from a normal distribution with mean 0 and standard deviation 1.
-    >>> len(task_func(0, 1, 1000))
-    1000
-
-    Generate 500 samples from a normal distribution with mean 5 and standard deviation 2.
-    >>> len(task_func(5, 2, 500))
-    500
+    - seaborn
+    
+    Example:
+    >>> df = pd.DataFrame([[1,1,1], [2,2,2], [3,3,3]], columns=['Feature1', 'Feature2', 'Feature3'])
+    >>> normalized_df, _ = task_func(df)
+    >>> type(normalized_df)
+    <class 'pandas.core.frame.DataFrame'>
+    >>> normalized_df['Feature1'].iloc[0]  # Returns a normalized value between 0 and 1
+    0.0
     """
-    samples = np.random.normal(mean, std_dev, n)
-    plt.figure(figsize=(10, 6))
-    plt.hist(samples, bins=30, density=True, alpha=0.6, color='g')
-    xmin, xmax = plt.xlim()
-    x = np.linspace(xmin, xmax, 100)
-    p = stats.norm.pdf(x, mean, std_dev)
-    plt.plot(x, p, 'k', linewidth=2)
-    title = f'Normal Distribution: Mean = {mean}, Std Dev = {std_dev}'
-    plt.title(title)
-    plt.xlabel('Value')
-    plt.ylabel('Density')
-    plt.show()
-    return samples
+    scaler = MinMaxScaler()
+    normalized_data = pd.DataFrame(scaler.fit_transform(data), columns=data.columns)
+    plt.figure(figsize=(10, 8))
+    ax = sns.heatmap(
+        normalized_data, cmap="YlGnBu", cbar_kws={"label": "Normalized Value"}
+    )
+    return normalized_data, ax
 
 import unittest
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_sample_length(self):
-        # Test if the function returns the correct number of samples
-        samples = task_func(0, 1, 1000)
-        self.assertEqual(len(samples), 1000)
-    def test_sample_mean(self):
-        # Test if the mean of the samples is approximately equal to the specified mean
-        samples = task_func(0, 1, 100000)
-        self.assertAlmostEqual(np.mean(samples), 0, places=1)
-    def test_sample_std_dev(self):
-        # Test if the standard deviation of the samples is approximately equal to the specified standard deviation
-        samples = task_func(0, 1, 100000)
-        self.assertAlmostEqual(np.std(samples), 1, places=1)
-    def test_negative_std_dev(self):
-        # Test if a ValueError is raised for negative standard deviations
+    def setUp(self):
+        np.random.seed(0)
+        # default columns used for testing, but function is not limited to these options
+        self.expected_columns = [
+            "Feature1",
+            "Feature2",
+            "Feature3",
+            "Feature4",
+            "Feature5",
+        ]
+    def _check_data_structure(self, data, expected_columns):
+        self.assertIsInstance(data, pd.DataFrame)
+        for col in data.columns:
+            self.assertIn(col, expected_columns)
+    def _check_data_value(self, data):
+        # Check if values in normalized data are between 0 and 1
+        # (allowing a small margin for precision issues)
+        self.assertTrue(((data.values >= -1e-10) & (data.values <= 1.00000001)).all())
+    def _check_heatmap(self, ax):
+        # Test visualization
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.collections), 1)  # 1 heatmap
+        cbar = ax.collections[0].colorbar
+        self.assertTrue(cbar is not None)
+        self.assertTrue(cbar.ax.get_ylabel(), "Normalized Value")
+        self.assertEqual(ax.collections[0].cmap.name, "YlGnBu")
+    def test_case_1(self):
+        # Test with random data
+        data = pd.DataFrame(
+            np.random.rand(100, 5),
+            columns=self.expected_columns,
+        )
+        normalized_data, ax = task_func(data)
+        self._check_data_structure(normalized_data, self.expected_columns)
+        self._check_data_value(normalized_data)
+        self._check_heatmap(ax)
+    def test_case_2(self):
+        # Test with data having all zeros
+        data = pd.DataFrame(
+            np.zeros((100, 5)),
+            columns=self.expected_columns,
+        )
+        normalized_data, ax = task_func(data)
+        self._check_data_structure(normalized_data, self.expected_columns)
+        self._check_heatmap(ax)
+        # Check if all values in normalized data are zero
+        self.assertTrue((normalized_data.values == 0).all())
+    def test_case_3(self):
+        # Test with data having incremental values
+        data = pd.DataFrame(
+            np.arange(500).reshape(100, 5),
+            columns=self.expected_columns,
+        )
+        normalized_data, ax = task_func(data)
+        self._check_data_structure(normalized_data, self.expected_columns)
+        self._check_data_value(normalized_data)
+        self._check_heatmap(ax)
+    def test_case_4(self):
+        # Test with data having decremental values
+        data = pd.DataFrame(
+            np.arange(500, 0, -1).reshape(100, 5),
+            columns=self.expected_columns,
+        )
+        normalized_data, ax = task_func(data)
+        self._check_data_structure(normalized_data, self.expected_columns)
+        self._check_data_value(normalized_data)
+        self._check_heatmap(ax)
+    def test_case_5(self):
+        # Test single valid column
+        data = pd.DataFrame(np.random.rand(100, 1), columns=["Feature1"])
+        normalized_data, ax = task_func(data)
+        self._check_data_structure(normalized_data, ["Feature1"])
+        self._check_data_value(normalized_data)
+        self._check_heatmap(ax)
+    def test_case_6(self):
+        # Test should fail when inputs are invalid - string column
+        data = pd.DataFrame(
+            {"Feature1": np.random.rand(100), "Feature2": ["string"] * 100}
+        )
         with self.assertRaises(ValueError):
-            task_func(0, -1, 1000)
-    def test_zero_samples(self):
-        # Test if the function can handle a request for zero samples
-        samples = task_func(0, 1, 0)
-        self.assertEqual(len(samples), 0)
-    def test_return_type(self):
-        # Test if the function returns a numpy array
-        samples = task_func(0, 1, 100)
-        self.assertIsInstance(samples, np.ndarray)
-    def test_non_integer_samples(self):
-        # Test if the function raises a TypeError for non-integer n
-        with self.assertRaises(TypeError):
-            task_func(0, 1, '100')
-    def test_non_numeric_mean_or_std(self):
-        # Test if the function raises a TypeError for non-numeric mean or std_dev
-        with self.assertRaises(TypeError):
-            task_func('0', 1, 100)
-        with self.assertRaises(TypeError):
-            task_func(0, '1', 100)
-    def test_very_small_n(self):
-        # Test if the function behaves correctly for very small n
-        samples = task_func(0, 1, 1)
-        self.assertEqual(len(samples), 1)
+            task_func(data)
+    def test_case_7(self):
+        # Test should fail when inputs are invalid - empty dataframe
+        data = pd.DataFrame()
+        with self.assertRaises(ValueError):
+            task_func(data)
+    def tearDown(self):
+        plt.close("all")

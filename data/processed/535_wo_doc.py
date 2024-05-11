@@ -1,108 +1,148 @@
+import sqlite3
 import numpy as np
-import base64
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import padding
+from random import choice, seed
 
 
-def task_func(num, from_base, to_base, private_key, alphabet):
+def task_func(db_path, table_name, num_entries, random_seed=None):
     """
-    Converts a number from one base to another, signs it with a private RSA key,
-    and encodes the signed number in base64 using a custom alphabet.
+    Insert random data into an SQLite3 table that contains random names, ages, and heights.
+    If the table does not exist, it will be created.
+    This function uses the following constants:
+    - NAMES: List of possible names ['John', 'Jane', 'Steve', 'Emma', 'Liam', 'Olivia'].
+    - AGES: Range of possible ages from 18 to 64.
+    - HEIGHTS: Range of possible heights from 150cm to 199cm.
 
     Parameters:
-    - num (str): The number to be converted, represented as a string.
-    - from_base (int): The base of the number to be converted.
-    - to_base (int): The base to convert the number to.
-    - private_key (Any): The private RSA key for signing. The type hint is `Any` due to the dynamic nature of key objects.
-    - alphabet (str): A string representing the custom alphabet for base64 encoding.
+    db_path (str): The path to the SQLite3 database file.
+    table_name (str): The name of the table to insert data into.
+    num_entries (int): The number of entries to insert. Must not be negative.
+    random_seed (int, optional): Seed for random number generation. Defaults to None (no fixed seed).
 
     Returns:
-    - str: The base64-encoded signed number.
+    int: The number of rows inserted.
 
-    Example:
-    >>> from cryptography.hazmat.backends import default_backend
-    >>> from cryptography.hazmat.primitives.asymmetric import rsa
-    >>> private_key = rsa.generate_private_key( \
-            public_exponent=65537, \
-            key_size=2048, \
-            backend=default_backend() \
-        )
-    >>> alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/"
-    >>> encoded = task_func('A1', 16, 8, private_key, alphabet)
-    >>> print(encoded)
-        XMBRyV7pyHXbaojpPuA3iv42nL5AVNukWQjfG48OnojFHtklqZuEgYoOwUZiQAj/dUxXANzzHuKjGRoPcuN5An7J7Gs8pEfEnOmnJfJgGLeiBgAXUeBl5aUTDoMIzBt5exSJWnNC1h5KXp+dDCpB4Hz3qIqdHyqHGNBExXZcEDOW6bEvF+rQOoQpxUJ6Xh3M/46i0g+vSDVyxLxurZpfVNQjEkrV8IlQXXdHoy4ciUC4YrwM0FrdM1BIWdzrhL9k6NfJeI96rabT8xHLrnZDH57mJqWBhpywVFtB7BEnqND70T0fpauFKtuaiA3jc+IydFC+lvodTWe3LiqI2WBsQw==
-    >>> isinstance(encoded, str)
-    True
+    Raises:
+    ValueError: If num_entries is negative.
     
     Requirements:
+    - sqlite3
     - numpy
-    - cryptography.hazmat.primitives.hashes
-    - cryptography.hazmat.primitives.asymmetric.padding
-    - base64
+    - random.choice
+    - random.seed
 
-    Note:
-    - The function assumes that the provided number can be successfully converted from the specified source base to the target base.
-    - The RSA private key must be generated and provided to sign the converted number.
-    - The custom alphabet for base64 encoding allows for flexibility in encoding schemes.
+    Example:
+    >>> task_func('path_to_test.db', 'People', 100, random_seed=42)
+    100
     """
-    base64_table = np.array(list(alphabet))
-    n = int(num, from_base)
-    new_num = ''
-    while n > 0:
-        n, m = divmod(n, to_base)
-        new_num += base64_table[m]
-    num = new_num[::-1]
-    data = bytes(num, 'utf-8')
-    signed_num = private_key.sign(
-        data,
-        padding.PSS(
-            mgf=padding.MGF1(hashes.SHA256()),
-            salt_length=padding.PSS.MAX_LENGTH
-        ),
-        hashes.SHA256()
+    if random_seed is not None:
+        seed(random_seed)
+        np.random.seed(random_seed)
+    if num_entries < 0:
+        raise ValueError("num_entries cannot be negative.")
+    NAMES = ["John", "Jane", "Steve", "Emma", "Liam", "Olivia"]
+    AGES = list(range(18, 65))
+    HEIGHTS = list(range(150, 200))
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    table_creation_sql = (
+        "CREATE TABLE IF NOT EXISTS {} (name TEXT, age INTEGER, height INTEGER)".format(
+            table_name
+        )
     )
-    base64_encoded = base64.b64encode(signed_num)
-    return base64_encoded.decode()
+    cur.execute(table_creation_sql)
+    inserted_rows = 0
+    for _ in range(num_entries):
+        name = choice(NAMES)
+        age = choice(AGES)
+        height = choice(HEIGHTS)
+        insertion_sql = "INSERT INTO {} VALUES (?, ?, ?)".format(table_name)
+        cur.execute(insertion_sql, (name, age, height))
+        inserted_rows += cur.rowcount
+    conn.commit()
+    return inserted_rows
 
 import unittest
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa
-import base64
+import os
+import sqlite3
+import tempfile
 class TestCases(unittest.TestCase):
+    NAMES = ["John", "Jane", "Steve", "Emma", "Liam", "Olivia"]
+    AGES = range(18, 65)
+    HEIGHTS = range(150, 200)
     def setUp(self):
-        # Generate a test RSA private key
-        self.private_key = rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=2048,
-            backend=default_backend()
-        )
-        self.alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/"
-    def test_base_conversion_and_signing(self):
-        """Test base conversion and signing output is a base64 string"""
-        encoded = task_func('A1', 16, 8, self.private_key, self.alphabet)
-        self.assertIsInstance(encoded, str)
-    def test_different_numbers_produce_different_output(self):
-        """Test that different numbers produce different signed output"""
-        encoded1 = task_func('A1', 16, 8, self.private_key, self.alphabet)
-        encoded2 = task_func('FF', 16, 8, self.private_key, self.alphabet)
-        self.assertNotEqual(encoded1, encoded2)
-    def test_task_func_return_type(self):
-        """Ensure task_func returns a string."""
-        result = task_func('A1', 16, 8, self.private_key, self.alphabet)
-        self.assertIsInstance(result, str, "task_func should return a string")
-    def test_invalid_base_conversion_raises_value_error(self):
-        """Test that invalid base conversion raises a ValueError"""
-        with self.assertRaises(ValueError):
-            task_func('G', 16, 8, self.private_key, self.alphabet)
-    def test_output_is_base64_encoded(self):
-        """Test that the output is properly base64 encoded"""
-        encoded = task_func('1', 10, 2, self.private_key, self.alphabet)
-        self.assertTrue(self.is_base64(encoded), "Output should be valid base64.")
-    @staticmethod
-    def is_base64(s):
-        """Utility function to check if a string is base64 encoded."""
-        try:
-            base64.b64decode(s)
-            return True
-        except ValueError:
-            return False
+        # Setup a temporary directory before each test
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.db_path = os.path.join(self.temp_dir.name, "test.db")
+    def tearDown(self):
+        # Clean up the temporary directory after each test
+        self.temp_dir.cleanup()
+    def test_case_1(self):
+        # Test inserting 50 entries with a fixed seed
+        result = task_func(self.db_path, "SamplePeople", 50, random_seed=42)
+        self.assertEqual(result, 50)
+    def test_case_2(self):
+        # Test inserting 30 entries into a new table with a fixed seed
+        result = task_func(self.db_path, "NewPeople", 30, random_seed=42)
+        self.assertEqual(result, 30)
+    def test_case_3(self):
+        # Test inserting 20 entries, verifying smaller batch works as expected
+        result = task_func(self.db_path, "SamplePeople", 20, random_seed=42)
+        self.assertEqual(result, 20)
+    def test_case_4(self):
+        # Test inserting a large number of entries (200) with a fixed seed
+        result = task_func(self.db_path, "SamplePeople", 200, random_seed=42)
+        self.assertEqual(result, 200)
+    def test_case_5(self):
+        # Test inserting 0 entries to check handling of empty input
+        result = task_func(self.db_path, "SamplePeople", 0, random_seed=42)
+        self.assertEqual(result, 0)
+    def test_case_6(self):
+        # Test the content of the rows for correctness against expected values
+        task_func(self.db_path, "ContentCheck", 10, random_seed=42)
+        conn = sqlite3.connect(self.db_path)
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM ContentCheck")
+        rows = cur.fetchall()
+        for row in rows:
+            self.assertIn(row[0], self.NAMES)
+            self.assertIn(row[1], self.AGES)
+            self.assertIn(row[2], self.HEIGHTS)
+    def test_case_7(self):
+        # Test invalid db path
+        with self.assertRaises(sqlite3.OperationalError):
+            task_func("/invalid/path.db", "TestTable", 10)
+    def test_case_8(self):
+        # Test invalid table names (SQL keywords)
+        with self.assertRaises(sqlite3.OperationalError):
+            task_func(self.db_path, "Select", 10)
+    def test_case_9(self):
+        # Test handling invalid num_entries
+        with self.assertRaises(Exception):
+            task_func(self.db_path, "TestTable", -1)
+        with self.assertRaises(TypeError):
+            task_func(self.db_path, "TestTable", "ten")
+    def test_case_10(self):
+        # Test handling invalid random seed
+        with self.assertRaises(Exception):
+            task_func(self.db_path, "TestTable", 10, random_seed="invalid")
+    def test_case_11(self):
+        # Test different schema in existing table
+        conn = sqlite3.connect(self.db_path)
+        cur = conn.cursor()
+        cur.execute("CREATE TABLE TestTable (id INTEGER)")
+        conn.close()
+        with self.assertRaises(sqlite3.OperationalError):
+            task_func(self.db_path, "TestTable", 10)
+    def test_case_12(self):
+        # Insert a known set of data and verify its integrity
+        task_func(self.db_path, "IntegrityCheck", 1, random_seed=42)
+        conn = sqlite3.connect(self.db_path)
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM IntegrityCheck")
+        row = cur.fetchone()
+        self.assertIsNotNone(row)
+    def test_case_13(self):
+        # Test against SQL injection in table_name parameter
+        malicious_name = "Test; DROP TABLE IntegrityCheck;"
+        with self.assertRaises(sqlite3.OperationalError):
+            task_func(self.db_path, malicious_name, 1)

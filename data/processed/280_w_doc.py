@@ -1,87 +1,99 @@
-import random
-from collections import Counter
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.fft import fft
 
-# Constants
-CARDS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 
-def task_func(x=1):
+def task_func(signal, precision=2, seed=777):
     """
-    Draw x random 5-card poker hands from a 52-card pack (without suits) and return
-    the hands along with a counter of the drawn cards.
+    Calculate the one-dimensional discrete N-point Fourier Transform (DFT) for a real or complex sequence (signal) 
+    using the Fast Fourier Transform (FFT) algorithm. Plot the original signal and the transformed signal, rounding 
+    the transformed signal values to the specified accuracy. The title of the plots will be 'Original Signal' and 'Transformed Signal'.
 
     Parameters:
-    x (int, optional): Number of hands to draw. Default is 1.
+    - signal (array): An array representing the signal.
+    - precision (int, optional): The number of decimal places to which to round the transformed signal values. 
+                                 Defaults to 2.
+    - seed (int, optional): The seed for the random number generator. Defaults to 777.
 
     Returns:
-    tuple: A tuple containing two elements:
-        - list of list str: Each inner list contains 5 strings, representing a 5-card poker hand.
-        - Counter: A counter of the drawn cards.
-
-
-    The output is random; hence, the returned list will vary with each call.
+    - ndarray: A numpy array of transformed signal values (rounded to the specified precision).
+    - tuple: A tuple containing the Axes objects for the original signal and transformed signal plots.
 
     Requirements:
-    - random
-    - collections.Counter
+    - numpy
+    - matplotlib
+    - scipy
 
     Example:
-    >>> random.seed(0)
-    >>> result = task_func(1)
-    >>> len(result[0][0])
-    5
-    >>> result[0][0][0] in CARDS
-    True
+    >>> signal = np.array([0., 1., 0., -1.])
+    >>> transformed_signal, (ax1, ax2) = task_func(signal)
+    >>> print(transformed_signal)
+    [0.-0.j 0.-2.j 0.-0.j 0.+2.j]
     """
-    result = []
-    card_counts = Counter()
-    for i in range(x):
-        drawn = random.sample(CARDS, 5)
-        result.append(drawn)
-        card_counts.update(drawn)
-    return result, card_counts
+    np.random.seed(seed)
+    transformed_signal = fft(signal)
+    transformed_signal_rounded = np.round(transformed_signal, precision).tolist()
+    fig, ax = plt.subplots(2, 1)
+    ax[0].plot(signal)
+    ax[0].set_title('Original Signal')
+    ax[1].plot(transformed_signal_rounded)
+    ax[1].set_title('Transformed Signal')
+    plt.tight_layout()  # Adjust layout to avoid overlap
+    return np.array(transformed_signal_rounded), ax
 
 import unittest
-import random
+import doctest
 class TestCases(unittest.TestCase):
-    def test_hand_size(self):
-        """ Test if the hand contains exactly 5 cards. """
-        random.seed(0)
-        hand, _ = task_func()
-        self.assertEqual(len(hand[0]), 5)
+    def test_case_1(self):
+        # Test with a constant signal
+        signal = np.array([1.0, 1.0, 1.0, 1.0])
+        transformed_signal, (ax1, ax2) = task_func(signal)
+        
+        # Assert transformed signal
+        self.assertTrue(all(transformed_signal == np.array([4.0, 0.0, 0.0, 0.0])))
+        
+        # Assert plot titles
+        self.assertEqual(ax1.get_title(), 'Original Signal')
+        self.assertEqual(ax2.get_title(), 'Transformed Signal')
     
+    def test_case_2(self):
+        # Test with a sine wave signal
+        signal = np.sin(np.linspace(0, 2 * np.pi, 100))
+        transformed_signal, (ax1, ax2) = task_func(signal, precision=3)
+        
+        # Assert transformed signal values (checking just the first few)
+        self.assertTrue(np.isclose(transformed_signal[0], 0.0, atol=1e-3))
+        
+        # Assert plot titles
+        self.assertEqual(ax1.get_title(), 'Original Signal')
+        self.assertEqual(ax2.get_title(), 'Transformed Signal')
     
-    def test_drawn_size(self):
-        random.seed(0)
-        hand, _ = task_func(2)
-        self.assertEqual(len(hand[0]), 5)
-        self.assertEqual(len(hand), 2)
+    def test_case_3(self):
+        # Test with a random signal
+        signal = np.random.rand(50)
+        transformed_signal, (ax1, ax2) = task_func(signal, precision=4)
+        
+        # Assert plot titles
+        self.assertEqual(ax1.get_title(), 'Original Signal')
+        self.assertEqual(ax2.get_title(), 'Transformed Signal')
     
-    def test_counter(self):
-        random.seed(0)
-        hand, counter = task_func(1)
-        self.assertEqual(len(hand[0]), 5)
-        self.assertLessEqual(counter[hand[0][0]], 5)
-        self.assertGreaterEqual(counter[hand[0][0]], 1)
-    def test_card_uniqueness(self):
-        """ Test if all cards in the hand are unique. """
-        random.seed(0)
-        hand, _ = task_func()
-        self.assertEqual(len(hand[0]), len(set(hand[0])))
-    def test_valid_cards(self):
-        """ Test if all cards drawn are valid card values. """
-        random.seed(0)
-        hand, _ = task_func()
-        for card in hand[0]:
-            self.assertIn(card, ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'])
-    def test_randomness(self):
-        """ Test if multiple executions return different hands. """
-        random.seed(0)
-        hands = [task_func()[0][0] for _ in range(10)]
-        self.assertTrue(len(set(tuple(hand) for hand in hands[0])) > 1)
-    def test_card_distribution(self):
-        """ Test if all possible cards appear over multiple executions. """
-        random.seed(0)
-        all_cards = set()
-        for _ in range(1000):
-            all_cards.update(task_func()[0][0])
-        self.assertEqual(all_cards, set(['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']))
+    def test_case_4(self):
+        # Test with a short signal
+        signal = np.array([0., 1., 0., -1.])
+        transformed_signal, (ax1, ax2) = task_func(signal, precision=1)
+        
+        # Assert transformed signal
+        self.assertTrue(all(transformed_signal == np.array([-0.-0.j, 0.-2.j, 0.-0.j, 0.+2.j])))
+        
+        # Assert plot titles
+        self.assertEqual(ax1.get_title(), 'Original Signal')
+        self.assertEqual(ax2.get_title(), 'Transformed Signal')
+    
+    def test_case_5(self):
+        # Test with a complex signal
+        signal = np.array([1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j])
+        transformed_signal, (ax1, ax2) = task_func(signal, precision=2)
+        
+        # Assert plot titles
+        self.assertEqual(ax1.get_title(), 'Original Signal')
+        self.assertEqual(ax2.get_title(), 'Transformed Signal')

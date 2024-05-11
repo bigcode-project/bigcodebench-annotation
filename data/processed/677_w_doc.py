@@ -1,89 +1,76 @@
+import numpy as np
 import pandas as pd
-import random
+from scipy.stats import linregress
+
 
 def task_func(df):
     """
-    Generate a DataFrame that contains savegames for a number of games between different teams.
-    Each row of the input DataFrame represents a match, and contains two teams and their respective scores.
-    The function adds a 'winner' column to the DataFrame, which is the team with the highest score in each match.
-    If the scores are equal, the winner is should be randomly decided.
-    
-    Parameters:
-    - df (pandas.DataFrame): The input DataFrame with columns 'team1', 'team2', 'score1', 'score2'.
+    Analyze the relationship between two variables in a DataFrame.
+    The function performs a linear regression on the two variables and adds a 'predicted' column to the DataFrame.
 
-    Requirements:
-    - pandas
-    - random
+    Parameters:
+    - df (pandas.DataFrame): The input DataFrame with columns 'var1', 'var2'.
     
     Returns:
-    - df (pandas.DataFrame): The DataFrame with the added 'winner' column.
-    
+    - df (pandas.DataFrame): The DataFrame with the added 'predicted' column.
+
+    Requirements:
+    - numpy
+    - pandas
+    - scipy
+
     Example:
-    >>> import numpy as np
-    >>> import pandas as pd
-    >>> df = pd.DataFrame({'team1': np.random.choice(['Team A', 'Team B', 'Team C', 'Team D', 'Team E'], 20),
-    ...                    'team2': np.random.choice(['Team A', 'Team B', 'Team C', 'Team D', 'Team E'], 20),
-    ...                    'score1': np.random.randint(0, 10, 20),
-    ...                    'score2': np.random.randint(0, 10, 20)})
+    >>> df = pd.DataFrame({'var1': np.random.randn(10),
+    ...                    'var2': np.random.randn(10)})
     >>> df = task_func(df)
-    >>> assert 'winner' in df.columns
-    >>> assert df['winner'].dtype == object
-    >>> assert all(winner in ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'] for winner in df['winner'])
+    >>> assert 'predicted' in df.columns
+    >>> assert len(df) == 10
+    >>> assert len(df.columns) == 3
     """
-    def determine_winner(row):
-        if row['score1'] > row['score2']:
-            return row['team1']
-        elif row['score1'] < row['score2']:
-            return row['team2']
-        else:
-            return random.choice([row['team1'], row['team2']])
-    winner_series = pd.Series([determine_winner(row) for index, row in df.iterrows()], index=df.index)
-    df['winner'] = winner_series
+    regression = linregress(df['var1'], df['var2'])
+    predictions = np.array(regression.slope) * np.array(df['var1']) + np.array(regression.intercept)
+    df['predicted'] = pd.Series(predictions, index=df.index)
     return df
 
 import unittest
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        random.seed(42)
     def test_case_1(self):
-        df = pd.DataFrame({'team1': ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
-                           'team2': ['Team B', 'Team C', 'Team D', 'Team E', 'Team A'],
-                            'score1': [1, 2, 3, 4, 5],
-                            'score2': [2, 3, 4, 5, 6]})
+        df = pd.DataFrame({'var1': np.random.randn(10),
+                           'var2': np.random.randn(10)})
         df = task_func(df)
-        self.assertTrue('winner' in df.columns)
-        self.assertTrue(df['winner'].equals(pd.Series(['Team B', 'Team C', 'Team D', 'Team E', 'Team A'])))
+        self.assertTrue('predicted' in df.columns)
+        self.assertEqual(len(df), 10)
+        self.assertEqual(len(df.columns), 3)
     def test_case_2(self):
-        df = pd.DataFrame({'team1': ['Team C', 'Team D', 'Team E', 'Team A', 'Team B'],
-                           'team2': ['Team D', 'Team E', 'Team A', 'Team B', 'Team C'],
-                           'score1': [99, 99, 99, 99, 99],
-                           'score2': [99, 99, 99, 99, 99]})
+        df = pd.DataFrame({'var1': [1, 2, 3, 4, 5],
+                            'var2': [1, 2, 3, 4, 5]})
         df = task_func(df)
-        self.assertTrue('winner' in df.columns)
-        self.assertTrue(df['winner'].equals(pd.Series(['Team C', 'Team D', 'Team A', 'Team A', 'Team B'])))
+        self.assertTrue('predicted' in df.columns)
+        self.assertEqual(len(df), 5)
+        self.assertEqual(len(df.columns), 3)
+        self.assertTrue(np.all(df['predicted'] == df['var2']))
+    
     def test_case_3(self):
-        df = pd.DataFrame({'team1': ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
-                            'team2': ['Team B', 'Team C', 'Team D', 'Team E', 'Team A'],
-                             'score1': [0, 0, 0, 0, 0],
-                             'score2': [0, 0, 0, 0, 0]})
+        df = pd.DataFrame({'var1': [1, 2, 3, 4, 5],
+                            'var2': [5, 4, 3, 2, 1]})
         df = task_func(df)
-        self.assertTrue('winner' in df.columns)
-        self.assertTrue(df['winner'].equals(pd.Series(['Team A', 'Team B', 'Team D', 'Team D', 'Team E'])))
-    
+        self.assertTrue('predicted' in df.columns)
+        self.assertEqual(len(df), 5)
+        self.assertEqual(len(df.columns), 3)
+        self.assertTrue(np.all(df['predicted'] == df['var2']))
     def test_case_4(self):
-        df = pd.DataFrame({'team1': ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
-                            'team2': ['Team B', 'Team C', 'Team D', 'Team E', 'Team A'],
-                             'score1': [10, 9, 8, 7, 6],
-                             'score2': [9, 8, 7, 6, 5]})
+        df = pd.DataFrame({'var1': [1, 2, 3, 4, 5],
+                            'var2': [1, 1, 1, 1, 1]})
         df = task_func(df)
-        self.assertTrue('winner' in df.columns)
-        self.assertTrue(df['winner'].equals(pd.Series(['Team A', 'Team B', 'Team C', 'Team D', 'Team E'])))
-    
+        self.assertTrue('predicted' in df.columns)
+        self.assertEqual(len(df), 5)
+        self.assertEqual(len(df.columns), 3)
+        self.assertTrue(np.all(df['predicted'] == df['var2']))
     def test_case_5(self):
-        df = pd.DataFrame({'team1': ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
-                            'team2': ['Team B', 'Team C', 'Team D', 'Team E', 'Team A'],
-                             'score1': [10, 9, 8, 7, 6],
-                             'score2': [11, 12, 13, 14, 15]})
+        df = pd.DataFrame({'var1': [0, 1, 2, 3, 4, 5],
+                            'var2': [1, 1, 1, 1, 1, 1]})
         df = task_func(df)
-        self.assertTrue('winner' in df.columns)
-        self.assertTrue(df['winner'].equals(pd.Series(['Team B', 'Team C', 'Team D', 'Team E', 'Team A'])))
+        self.assertTrue('predicted' in df.columns)
+        self.assertEqual(len(df), 6)
+        self.assertEqual(len(df.columns), 3)
+        self.assertTrue(np.all(df['predicted'] == df['var2']))

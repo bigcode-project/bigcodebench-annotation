@@ -1,77 +1,110 @@
-from scipy import fftpack
-from matplotlib import pyplot as plt
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Constants
+NUM_SAMPLES = 100
+NUM_OUTLIERS = 5
 
 
-def task_func(arr):
+def task_func(num_samples=NUM_SAMPLES, num_outliers=NUM_OUTLIERS):
     """
-    Performs a Fast Fourier Transform (FFT) on the sum of each row in a 2D array and
-    plots the absolute values of the FFT coefficients.
+    Generate a dataset comprising both normal data and artificially introduced outliers,
+    and plot a histogram of the combined data. The function detects outliers in the dataset
+    using the Interquartile Range (IQR) method, but it only considers the normally distributed
+    portion of the data for outlier detection. The outliers detected and the artificially
+    introduced outliers might not always coincide.
 
     Parameters:
-    arr (numpy.ndarray): A 2D numpy array.
+    - num_samples (int): Number of samples to be drawn from a normal distribution. The default 
+      value is 100. If set to zero or a negative number, no normal data will be generated, 
+      and the dataset will only contain artificially introduced outliers.
+    - num_outliers (int): Number of outliers to be artificially introduced into the dataset. 
+      These outliers are uniformly distributed between -10 and 10. The default value is 5. 
+      If set to zero, no outliers will be artificially introduced.
+
 
     Returns:
-    matplotlib.axes.Axes: An Axes object displaying the plot of the absolute values of the FFT coefficients.
+    - data (numpy array): The combined dataset, including both normally distributed data and 
+      the artificially introduced outliers.
+    - outliers_detected (numpy array): The outliers detected using the IQR method. This 
+      detection is based solely on the normally distributed portion of the data.
+    - ax (matplotlib.axes._axes.Axes): The Axes object for the histogram 
+      plot of the combined dataset.
 
     Requirements:
-    - scipy.fftpack
-    - matplotlib.pyplot
+    - numpy
+    - matplotlib
+
+    Note:
+    - The artificially introduced outliers are not necessarily the same as the outliers
+    detected by the IQR method. The IQR method is applied only to the normally distributed
+    data, and thus some of the artificially introduced outliers may not be detected,
+    and some normal data points may be falsely identified as outliers.
 
     Example:
     >>> import numpy as np
-    >>> arr = np.array([[i + j for i in range(3)] for j in range(5)])
-    >>> ax = task_func(arr)
-    >>> ax.get_title()
-    'Absolute values of FFT coefficients'
+    >>> np.random.seed(0)
+    >>> data, outliers_detected, ax = task_func()
+    >>> print(outliers_detected)
+    [-9.61613603 -3.96850367  3.20347075]
     """
-    row_sums = arr.sum(axis=1)
-    fft_coefficients = fftpack.fft(row_sums)
+    normal_data = np.random.normal(size=num_samples)
+    outliers = np.random.uniform(low=-10, high=10, size=num_outliers)
+    data = np.concatenate([normal_data, outliers]) if num_samples > 0 else outliers
+    outliers_detected = np.array([])
+    if num_samples > 0:
+        q75, q25 = np.percentile(normal_data, [75, 25])
+        iqr = q75 - q25
+        lower_bound = q25 - (iqr * 1.5)
+        upper_bound = q75 + (iqr * 1.5)
+        outliers_detected = data[(data < lower_bound) | (data > upper_bound)]
     _, ax = plt.subplots()
-    ax.plot(np.abs(fft_coefficients))
-    ax.set_title("Absolute values of FFT coefficients")
-    return ax
+    ax.hist(data, bins=30)
+    return data, outliers_detected, ax
 
 import unittest
 import numpy as np
-from scipy import fftpack
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     """Test cases for the function task_func."""
-    def test_plot_title(self):
-        """Test that the plot title is correct."""
-        arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        ax = task_func(arr)
-        self.assertEqual(ax.get_title(), "Absolute values of FFT coefficients")
-    def test_plot_data(self):
-        """Test that the plot data is correct."""
-        arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        ax = task_func(arr)
-        y_data = ax.lines[0].get_ydata()
-        row_sums = arr.sum(axis=1)
-        fft_coefficients = fftpack.fft(row_sums)
-        expected_y_data = np.abs(fft_coefficients)
-        np.testing.assert_array_equal(y_data, expected_y_data)
-    def test_with_zeros(self):
-        """Test that the plot data is correct when the array is all zeros."""
-        arr = np.zeros((5, 3))
-        ax = task_func(arr)
-        y_data = ax.lines[0].get_ydata()
-        expected_y_data = np.zeros(5)
-        np.testing.assert_array_equal(y_data, expected_y_data)
-    def test_with_ones(self):
-        """Test that the plot data is correct when the array is all ones."""
-        arr = np.ones((5, 3))
-        ax = task_func(arr)
-        y_data = ax.lines[0].get_ydata()
-        expected_y_data = [15.0, 0.0, 0.0, 0.0, 0.0]
-        np.testing.assert_array_almost_equal(y_data, expected_y_data)
-    def test_with_large_numbers(self):
-        """Test that the plot data is correct when the array has large numbers."""
-        arr = np.array([[i * 100 + j * 1000 for i in range(3)] for j in range(5)])
-        ax = task_func(arr)
-        y_data = ax.lines[0].get_ydata()
-        row_sums = arr.sum(axis=1)
-        fft_coefficients = fftpack.fft(row_sums)
-        expected_y_data = np.abs(fft_coefficients)
-        np.testing.assert_array_equal(y_data, expected_y_data)
+    def test_default_values(self):
+        """Test the function with default values."""
+        np.random.seed(0)
+        data, _, _ = task_func()
+        self.assertEqual(len(data), 105)
+    def test_custom_values(self):
+        """Test the function with custom values."""
+        np.random.seed(1)
+        data, outliers_detected, _ = task_func(num_samples=50, num_outliers=10)
+        self.assertEqual(len(data), 60)
+        # Replicate the IQR calculation for testing
+        normal_data = data[:50]  # Assuming the first 50 are normal data
+        q75, q25 = np.percentile(normal_data, [75, 25])
+        iqr = q75 - q25
+        lower_bound = q25 - (iqr * 1.5)
+        upper_bound = q75 + (iqr * 1.5)
+        expected_outliers_count = len(
+            [o for o in data if o < lower_bound or o > upper_bound]
+        )
+        self.assertEqual(len(outliers_detected), expected_outliers_count)
+    def test_no_outliers(self):
+        """Test the function with no outliers."""
+        np.random.seed(2)
+        data, outliers_detected, ax = task_func(num_samples=100, num_outliers=0)
+        self.assertEqual(len(data), 100)
+        # Adjust the expectation to consider possible false positives
+        self.assertTrue(len(outliers_detected) <= 1)  # Allow for up to 1 false positive
+    def test_only_outliers(self):
+        """Test the function with only outliers."""
+        np.random.seed(3)
+        data, outliers_detected, _ = task_func(num_samples=0, num_outliers=100)
+        self.assertEqual(len(data), 100)
+        # Since no normal data is generated, IQR is not applied, and no outliers are detected.
+        self.assertEqual(len(outliers_detected), 0)
+    def test_negative_values(self):
+        """Test the function with negative values."""
+        np.random.seed(4)
+        with self.assertRaises(ValueError):
+            task_func(num_samples=-10, num_outliers=-5)
     def tearDown(self):
         plt.close()

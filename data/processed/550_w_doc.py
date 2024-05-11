@@ -1,62 +1,63 @@
-import base64
+from collections import Counter
 import pandas as pd
 
 
-def task_func(df):
+def task_func(list_of_menuitems):
     """
-    Encodes a dict of list as a Base64 string. The dict is first converted to a Pandas DataFrame.
-    Then convert the data franme to CSV format and encoded to bytes, finally encoded it to a Base64 string.
+    Given a nested list of menu items, this function flattens the list and returns a Pandas DataFrame
+    detailing the count of each individual menu item with index name 'MenuItem'.
 
     Parameters:
-        df (dict of list): A dictionary where the key 'Word' maps to a list of strings.
+        list_of_menuitems (list): A nested list of menu items.
 
     Returns:
-        str: The Base64 encoded string of the DataFrame's CSV representation.
+        DataFrame: A pandas DataFrame with menu items as indices and a 'Count' column showing the count of each menu item.
 
     Requirements:
-        - base64
+        - collections
         - pandas
 
     Example:
-        >>> df = {'A': [1, 2, 3], 'B': [4, 5, 6]}
-        >>> encoded_df = task_func(df)
-        >>> isinstance(encoded_df, str)
-        True
-        >>> len(encoded_df) > 0  # The actual encoded string will vary
-        True
+        >>> result = task_func([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
+        >>> result.loc['Pizza', 'Count']
+        2
+        >>> result.loc['Coke', 'Count']
+        2
     """
-    df = pd.DataFrame(df)
-    csv = df.to_csv(index=False)
-    csv_bytes = csv.encode('utf-8')
-    base64_bytes = base64.b64encode(csv_bytes)
-    base64_string = base64_bytes.decode('utf-8')
-    return base64_string
+    flat_list = [item for sublist in list_of_menuitems for item in sublist]
+    counter = Counter(flat_list)
+    df = pd.DataFrame.from_dict(counter, orient='index', columns=['Count'])
+    df.index.name = 'MenuItem'
+    return df
 
 import unittest
-from io import StringIO
 class TestCases(unittest.TestCase):
-    def test_encode_basic_dataframe(self):
-        df = {'A': [1, 2, 3], 'B': [4, 5, 6]}
-        encoded_df = task_func(df)
-        decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
-        pd.testing.assert_frame_equal(pd.DataFrame(df), decoded_csv)
-    def test_encode_with_different_columns(self):
-        df = {'Name': ['Alice', 'Bob'], 'Age': [25, 30]}
-        encoded_df = task_func(df)
-        decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
-        pd.testing.assert_frame_equal(pd.DataFrame(df), decoded_csv)
-    def test_encode_empty_dataframe(self):
-        df = {'X': [], 'Y': []}
-        encoded_df = task_func(df)
-        decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
-        pd.testing.assert_frame_equal(pd.DataFrame(df), decoded_csv, check_dtype=False, check_index_type=False)
-    def test_encode_with_specific_values(self):
-        df = {'ID': [101, 102, 103], 'Score': [85, 90, 88]}
-        encoded_df = task_func(df)
-        decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
-        pd.testing.assert_frame_equal(pd.DataFrame(df), decoded_csv)
-    def test_encode_with_string_values(self):
-        df = {'City': ['NY', 'LA'], 'Population': [8000000, 4000000]}
-        encoded_df = task_func(df)
-        decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
-        pd.testing.assert_frame_equal(pd.DataFrame(df), decoded_csv)
+    def test_normal_functionality(self):
+        """Test the function with typical nested lists."""
+        input_list = [['apple', 'banana'], ['apple'], ['banana', 'orange']]
+        expected_df = pd.DataFrame({'Count': [2, 2, 1]}, index=['apple', 'banana', 'orange'])
+        expected_df.index.name = 'MenuItem'
+        pd.testing.assert_frame_equal(task_func(input_list), expected_df)
+    def test_empty_list(self):
+        """Test the function with an empty list."""
+        expected_df = pd.DataFrame(columns=['Count'])
+        expected_df.index.name = 'MenuItem'
+        pd.testing.assert_frame_equal(task_func([]), expected_df)
+    def test_single_level_list(self):
+        """Test with a non-nested, single-level list."""
+        input_list = [['apple', 'banana', 'apple']]
+        expected_df = pd.DataFrame({'Count': [2, 1]}, index=['apple', 'banana'])
+        expected_df.index.name = 'MenuItem'
+        pd.testing.assert_frame_equal(task_func(input_list), expected_df)
+    def test_uniform_list(self):
+        """Test with a list where all sublists contain the same item."""
+        input_list = [['apple'], ['apple'], ['apple']]
+        expected_df = pd.DataFrame({'Count': [3]}, index=['apple'])
+        expected_df.index.name = 'MenuItem'
+        pd.testing.assert_frame_equal(task_func(input_list), expected_df)
+    def test_duplicate_items_across_sublists(self):
+        """Ensure items appearing in multiple sublists are counted correctly."""
+        input_list = [['apple', 'banana'], ['banana', 'banana', 'apple']]
+        expected_df = pd.DataFrame({'Count': [2, 3]}, index=['apple', 'banana'])
+        expected_df.index.name = 'MenuItem'
+        pd.testing.assert_frame_equal(task_func(input_list), expected_df)

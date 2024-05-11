@@ -1,104 +1,119 @@
-import os
-import csv
-from openpyxl import load_workbook
+import sqlite3
+import pandas as pd
 
-def task_func(file_name, excel_file_path, csv_file_path) -> str:
-    """
-    Converts an Excel file (.xls or .xlsx) to a CSV file by reading the contents of the Excel file
-    and writing them to a new CSV file with the same name but a different extension. Allows specifying
-    separate paths for the Excel file source and the CSV file destination.
+
+def task_func(db_file: str, query: str) -> pd.DataFrame:
+    """Query an SQLite database and return the results.
+
+    This function connects to a given SQLite database, executes a given SQL query,
+    and returns the results as a pandas DataFrame.
 
     Parameters:
-        file_name (str): The name of the Excel file to be converted.
-        excel_file_path (str): The directory path where the Excel file is located.
-        csv_file_path (str): The directory path where the CSV file should be saved.
+    - db_file (str): Path to the SQLite database file.
+    - query (str): SQL query to execute.
 
     Returns:
-        str: The name of the created CSV file.
+    - pd.DataFrame: A DataFrame containing the results of the executed query.
 
     Requirements:
-    - openpyxl.load_workbook
-    - os
-    - csv
+    - sqlite3
+    - pandas
 
     Example:
-    >>> task_func('test.xlsx', '/path/to/excel/files', '/path/to/csv/files')
-    'test.csv'
-    >>> task_func('nonexistent.xlsx', '/path/to/excel/files', '/path/to/csv/files')
-    Traceback (most recent call last):
-       ...
-    FileNotFoundError: [Errno 2] No such file or directory: '/path/to/excel/files/nonexistent.xlsx'
-
-    Note:
-    - This function assumes the active sheet is the one to be converted.
+    >>> db_file = 'sample_database.db'
+    >>> df = task_func(db_file, "SELECT * FROM users WHERE name = 'John Doe'")
+    pd.DataFrame:
+    id        name  age
+    --  ----------  ---
+    ..  John Doe   ..
+    >>> df = task_func(db_file, "SELECT age, COUNT(*) AS count FROM users GROUP BY age")
+    pd.DataFrame:
+    age  count
+    ---  -----
+    25   3
     """
-    excel_file = os.path.join(excel_file_path, file_name)
-    if not os.path.isfile(excel_file):
-        raise FileNotFoundError(f"[Errno 2] No such file or directory: '{excel_file}'")
-    workbook = load_workbook(filename=excel_file, read_only=True)
-    sheet = workbook.active
-    data = [[cell.value for cell in row] for row in sheet.iter_rows()]
-    csv_file_name = os.path.splitext(file_name)[0] + '.csv'
-    csv_file = os.path.join(csv_file_path, csv_file_name)
-    with open(csv_file, 'w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerows(data)
-    return csv_file_name
+    with sqlite3.connect(db_file) as conn:
+        return pd.read_sql_query(query, conn)
 
 import unittest
-from unittest.mock import patch
-import tempfile
-import shutil
-from pathlib import Path
-import openpyxl
+import sqlite3
+from faker import Faker
+import os
 class TestCases(unittest.TestCase):
+    
     def setUp(self):
-        # Create a temporary directory
-        self.test_dir = tempfile.mkdtemp()
-        self.mock_excel_path = Path(self.test_dir)
-        self.mock_csv_path = Path(self.test_dir)
+        """Set up test data before running tests."""
+        self.fake = Faker()
+        self.specific_names = [
+            "John Doe",
+            "Jane Smith",
+            "Alice Brown",
+            "Bob White",
+            "Charlie Green",
+        ]
+        self.specific_ages = [25, 30, 35, 40, 45]
+        self.db_file = self.generate_test_data_with_file()
+    def generate_test_data_with_file(self) -> str:
+        """Generate test data and save it to a temporary SQLite database file."""
+        db_file = "./temp_test_db.sqlite3"
+        if os.path.exists(db_file):
+            os.remove(db_file)
+        conn = sqlite3.connect(db_file)
+        create_table_query = """
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            age INTEGER NOT NULL
+        )
+        """
+        conn.execute(create_table_query)
+        for _ in range(100):
+            name = self.fake.name()
+            age = self.fake.random_int(min=20, max=70)
+            conn.execute("INSERT INTO users (name, age) VALUES (?, ?)", (name, age))
+        for name, age in zip(self.specific_names, self.specific_ages):
+            conn.execute("INSERT INTO users (name, age) VALUES (?, ?)", (name, age))
+        conn.commit()
+        conn.close()
+        return db_file
+    def test_case_1(self):
+        """Test fetching all users."""
+        df = task_func(self.db_file, "SELECT * FROM users")
+        self.assertEqual(len(df), 100 + len(self.specific_names))
+        for name in self.specific_names:
+            self.assertIn(name, df["name"].values)
+    def test_case_2(self):
+        """Test fetching specific users based on names."""
+        names_as_strings = "', '".join(self.specific_names)
+        df = task_func(
+            self.db_file,
+            f"SELECT name, age FROM users WHERE name IN ('{names_as_strings}')",
+        )
+        for name in self.specific_names:
+            self.assertIn(name, df["name"].values)
+        for age in self.specific_ages:
+            self.assertIn(age, df["age"].values)
+    def test_case_3(self):
+        """Test fetching users based on age condition."""
+        age_limit = self.fake.random_int(min=20, max=60)
+        df = task_func(self.db_file, f"SELECT * FROM users WHERE age > {age_limit}")
+        self.assertTrue(all(df["age"] > age_limit))
+    def test_case_4(self):
+        """Test fetching users and sorting by name."""
+        df = task_func(self.db_file, "SELECT * FROM users ORDER BY name")
+        sorted_names = sorted(df["name"].tolist())
+        self.assertListEqual(df["name"].tolist(), sorted_names)
+    def test_case_5(self):
+        """Test fetching users based on age and sorting by age."""
+        age_limit = self.fake.random_int(min=20, max=30)
+        df = task_func(
+            self.db_file,
+            f"SELECT * FROM users WHERE age < {age_limit} ORDER BY age DESC",
+        )
+        self.assertTrue(all(df["age"] < age_limit))
+        self.assertTrue(
+            all(df["age"].iloc[i] >= df["age"].iloc[i + 1] for i in range(len(df) - 1))
+        )
     def tearDown(self):
-        # Remove the directory after the test
-        shutil.rmtree(self.test_dir)
-    def create_temp_excel_file(self, file_name: str):
-        """Helper function to create a temporary Excel file for testing."""
-        workbook = openpyxl.Workbook()
-        worksheet = workbook.active
-        worksheet['A1'] = 'Hello'
-        worksheet['B1'] = 'World'
-        temp_file_path = self.mock_excel_path / file_name
-        workbook.save(filename=temp_file_path)
-        return temp_file_path
-    def test_successful_conversion(self):
-        """Test that an Excel file is successfully converted to a CSV file."""
-        excel_file_name = 'test.xlsx'
-        self.create_temp_excel_file(excel_file_name)
-        result = task_func(excel_file_name, str(self.mock_excel_path), str(self.mock_csv_path))
-        self.assertEqual(result, 'test.csv')
-    @patch('openpyxl.load_workbook')
-    def test_return_type(self, mock_load_workbook):
-        """Ensure the function returns a string indicating the CSV file name."""
-        excel_file_name = 'test.xlsx'
-        temp_file_path = self.create_temp_excel_file(excel_file_name)
-        mock_load_workbook.return_value.active.iter_rows.return_value = iter([])
-        result = task_func(excel_file_name, str(self.mock_excel_path), str(self.mock_csv_path))
-        self.assertIsInstance(result, str)
-    def test_file_not_found(self):
-        """Check that FileNotFoundError is raised when the Excel file does not exist."""
-        with self.assertRaises(FileNotFoundError):
-            task_func('nonexistent.xlsx', str(self.mock_excel_path), str(self.mock_csv_path))
-    def test_csv_file_creation(self):
-        """Test that a CSV file is created with the expected content from the Excel file."""
-        excel_file_name = 'test.xlsx'
-        self.create_temp_excel_file(excel_file_name)
-        # Call the function under test
-        csv_file_name = task_func(excel_file_name, str(self.mock_excel_path), str(self.mock_csv_path))
-        csv_file_path = self.mock_csv_path / csv_file_name
-        # Check if the CSV file was actually created
-        self.assertTrue(os.path.exists(csv_file_path), f"CSV file was not created: {csv_file_path}")
-        # Check the content of the created CSV file
-        expected_content = [['Hello', 'World']]  # Adjust this based on the actual content of your Excel file
-        with open(csv_file_path, newline='', encoding='utf-8') as csv_file:
-            reader = csv.reader(csv_file)
-            actual_content = list(reader)
-            self.assertEqual(actual_content, expected_content, "CSV file content does not match expected content.")
+        """Clean up test data after running tests."""
+        os.remove(self.db_file)

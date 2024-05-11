@@ -1,84 +1,70 @@
+import collections
+import seaborn as sns
 import matplotlib.pyplot as plt
-import numpy as np
 
 
-def task_func(ax, radius):
-    '''
-    Draw a circle with a given radius on the polar chart 'ax' and set radial ticks.
-    This function manipulates plot data using matplotlib.
+def task_func(dictionary, new_key, new_value):
+    """
+    Add a new key-value pair to the dictionary and plot the distribution of its values.
 
     Parameters:
-    ax (matplotlib.axes._axes.Axes): The ax to plot on. Must be a polar plot.
-    radius (float): The radius of the circle. Must be non-negative.
+    dictionary (dict): The dictionary to be updated.
+    new_key (str): The new key to be added to the dictionary.
+    new_value (str): The corresponding value for the new key.
 
     Returns:
-    matplotlib.axes._axes.Axes: The modified Axes object with the circle plotted.
-
-    Note:
-    - If the radius is negative this function will raise ValueError.
-    - If 'ax' is not a polar plot this function will raise TypeError.
+    dict: The updated dictionary.
+    matplotlib.axes.Axes: The axes object of the plotted bar graph.
 
     Requirements:
-    - matplotlib.pyplot
+    - collections
     - numpy
+    - seaborn
+    - matplotlib
 
     Example:
-    >>> import matplotlib.pyplot as plt
-    >>> fig = plt.figure()
-    >>> ax = fig.add_subplot(111, polar=True)
-    >>> result_ax = task_func(ax, 1.5)
-    >>> np.allclose(result_ax.get_lines()[0].get_ydata(), 1.5)
-    True
-    >>> plt.close()
-    '''
-    if radius < 0:
-        raise ValueError('Radius must be non-negative')
-    if not isinstance(ax, plt.PolarAxes):
-        raise TypeError('ax must be a polar plot')
-    theta = np.linspace(0, 2 * np.pi, 1000)
-    ax.plot(theta, radius * np.ones_like(theta))
-    ax.set_rlabel_position(radius * 45)
-    return ax
+    >>> updated_dict, plot_axes = task_func({'key1': 'value1', 'key2': 'value2'}, 'key3', 'value3')
+    >>> updated_dict
+    {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+    """
+    dictionary[new_key] = new_value
+    values_counts = collections.Counter(dictionary.values())
+    ax = sns.barplot(y=list(values_counts.keys()), x=list(values_counts.values()))
+    plt.title("Distribution of Dictionary Values")
+    plt.xlabel("Values")
+    plt.ylabel("Counts")
+    return dictionary, ax
 
 import unittest
-import matplotlib.pyplot as plt
+import doctest
 class TestCases(unittest.TestCase):
-    def test_polar_plot(self):
-        '''Test if the function plots on a polar plot.'''
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        result_ax = task_func(ax, 1.0)
-        self.assertIsInstance(result_ax, plt.PolarAxes)
-        plt.close()
-    def test_circle_radius(self):
-        '''Test if the circle is drawn with the correct radius.'''
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        radius = 2.0
-        result_ax = task_func(ax, radius)
-        for line in result_ax.get_lines():
-            self.assertTrue(np.allclose(line.get_ydata(), radius))
-        plt.close()
-    def test_negative_radius(self):
-        '''Test handling of negative radius.'''
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        with self.assertRaises(ValueError):
-            task_func(ax, -1.0)
-        plt.close()
-    def test_non_polar_plot(self):
-        '''Test handling of non-polar plot input.'''
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        with self.assertRaises(TypeError):
-            task_func(ax, 1.0)
-        plt.close()
-    def test_zero_radius(self):
-        '''Test handling of zero radius.'''
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        radius = 0.0
-        result_ax = task_func(ax, radius)
-        for line in result_ax.get_lines():
-            self.assertTrue(np.allclose(line.get_ydata(), radius))
-        plt.close()
+    def test_case_1(self):
+        dictionary = {'a': 'apple', 'b': 'banana'}
+        new_key = 'c'
+        new_value = 'cherry'
+        updated_dict, _ = task_func(dictionary, new_key, new_value)
+        self.assertEqual(updated_dict, {'a': 'apple', 'b': 'banana', 'c': 'cherry'})
+    def test_case_2(self):
+        dictionary = {}
+        new_key = 'd'
+        new_value = 'date'
+        updated_dict, _ = task_func(dictionary, new_key, new_value)
+        self.assertEqual(updated_dict, {'d': 'date'})
+    def test_case_3(self):
+        dictionary = {'a': 'apple', 'b': 'apple'}
+        new_key = 'c'
+        new_value = 'apple'
+        updated_dict, _ = task_func(dictionary, new_key, new_value)
+        self.assertEqual(updated_dict, {'a': 'apple', 'b': 'apple', 'c': 'apple'})
+    def test_case_4(self):
+        dictionary = {'e': 'eggplant', 'f': 'fig', 'g': 'grape'}
+        new_key = 'h'
+        new_value = 'honeydew'
+        updated_dict, _ = task_func(dictionary, new_key, new_value)
+        self.assertEqual(updated_dict, {'e': 'eggplant', 'f': 'fig', 'g': 'grape', 'h': 'honeydew'})
+    def test_case_5(self):
+        dictionary = {'i': 'ice cream'}
+        new_key = 'i'
+        new_value = 'icing'
+        updated_dict, _ = task_func(dictionary, new_key, new_value)
+        self.assertEqual(updated_dict, {'i': 'icing'})  # The value should be updated

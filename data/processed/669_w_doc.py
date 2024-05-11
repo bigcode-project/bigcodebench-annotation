@@ -3,13 +3,13 @@ import math
 
 def task_func(x):
     """
-    Find the sub-sequence of a dictionary, x, with the minimum total length, where the keys are letters and the values are their lengths.
+    Find the key pair in a dictionary, x, which has the highest sum of the cosine of each of its values.
 
     Parameters:
-    - x (dict): The dictionary of letter lengths.
+    - x (dict): The dictionary of key-value pairs.
 
     Returns:
-    - list: The subsequence with the minimum total length.
+    - tuple: The pair of keys with the highest sum of the cosine of their values.
 
     Requirements:
     - itertools
@@ -17,29 +17,27 @@ def task_func(x):
 
     Example:
     >>> task_func({'a': 1, 'b': 2, 'c': 3})
-    ['a']
-    >>> task_func({'a': 1, 'b': -2, 'c': -5, 'd': 4})
-    ['b', 'c']
+    ('a', 'b')
+    ('a', 'b')
+    >>> task_func({'a': 1, 'b': 2, 'c': 3, 'd': 4})
+    ('a', 'b')
+    ('a', 'b')
     """
-    min_length = math.inf
-    min_subseq = []
-    for r in range(1, len(x) + 1):
-        for subseq in itertools.combinations(x.items(), r):
-            length = sum(length for letter, length in subseq)
-            if length < min_length:
-                min_length = length
-                min_subseq = [letter for letter, length in subseq]
-    return min_subseq
+    pairs = list(itertools.combinations(x.keys(), 2))
+    max_pair = max(pairs, key=lambda pair: math.cos(x[pair[0]]) + math.cos(x[pair[1]]))
+    print(max_pair)
+    return max_pair
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        self.assertEqual(task_func({'a': 1, 'b': 2, 'c': 3}), ['a'])
+        self.assertEqual(sorted(task_func({'a': 1, 'b': 2, 'c': 3})), sorted(('a', 'b')))
+    
     def test_case_2(self):
-        self.assertEqual(sorted(task_func({'a': 1, 'b': -2, 'c': -5, 'd': 4})), sorted(['b', 'c']))
+        self.assertEqual(sorted(task_func({'a': 1, 'b': 2, 'c': 3, 'd': 4})), sorted(('a', 'b')))
     def test_case_3(self):
-        self.assertEqual(task_func({'a': 1, 'b': 2, 'c': 3, 'd': 4}), ['a'])
+        self.assertEqual( sorted(task_func({'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5})),  sorted(('e', 'a')))
     def test_case_4(self):
-        self.assertEqual(sorted(task_func({'a': -1, 'b': 2, 'c': 3, 'd': 4, 'e': -5})), sorted(['a', 'e']))
+        self.assertEqual( sorted(task_func({'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6})),  sorted(('f', 'a')))
     def test_case_5(self):
-        self.assertEqual(sorted(task_func({'a': -1, 'b': -2, 'c': -3, 'd': 4, 'e': 5})), sorted(['a', 'b', 'c']))
+        self.assertEqual( sorted(task_func({'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7})),  sorted(('g', 'f')))

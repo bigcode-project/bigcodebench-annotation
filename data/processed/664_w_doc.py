@@ -1,75 +1,91 @@
-import numpy as np
-from scipy.optimize import curve_fit
+import statistics
+import matplotlib.pyplot as plt
 
 
-def task_func(x, y, labels):
+def task_func(sales_data):
     """
-    Fit an exponential curve to given data points and plot the curves with labels.
-    It fits an exponential curve of the form: f(x) = a * exp(-b * x) + c
-    to the provided x and y data points for each set of data and plots the fitted curves
-    with the corresponding labels on a single matplotlib figure.
+    Plot sales trends for five products over a year, highlighting variability with standard deviation shading
+    with 'Month' on x-axis and 'Sales' on y-axis.
 
     Parameters:
-    - x (list of np.ndarray): List of numpy arrays, each representing the x-values of the data points for a dataset.
-    - y (list of np.ndarray): List of numpy arrays, each representing the y-values of the data points for a dataset.
-    - labels (list of str): List of strings, each representing the label for a dataset.
+    - sales_data (pd.DataFrame): DataFrame with sales data, expected columns: 'Month', 'Product A' to 'Product E'.
 
     Returns:
-    - matplotlib.figure.Figure: The figure object that contains the plotted curves.
+    - ax (matplotlib.axes.Axes): Axes object with the sales trends plot.
 
     Requirements:
-    - numpy
-    - scipy.optimize
+    - matplotlib.pyplot
+    - statistics
 
     Example:
-    >>> x_data = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
-    >>> y_data = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
-    >>> labels = ['H2O', 'O2', 'CO2']
+    >>> import pandas as pd, numpy as np
+    >>> sales_data = pd.DataFrame({
+    ...     'Month': range(1, 13),
+    ...     'Product A': np.random.randint(100, 200, size=12),
+    ...     'Product B': np.random.randint(150, 250, size=12),
+    ...     'Product C': np.random.randint(120, 220, size=12),
+    ...     'Product D': np.random.randint(130, 230, size=12),
+    ...     'Product E': np.random.randint(140, 240, size=12)
+    ... })
+    >>> ax = task_func(sales_data)
+    >>> plt.show()  # Displays the plot
     """
-    if not x or not y or not labels:
-        raise ValueError("Empty data lists provided.")
-    def exponential_func(x, a, b, c):
-        """Exponential function model for curve fitting."""
-        return a * np.exp(-b * x) + c
     fig, ax = plt.subplots()
-    for i in range(len(x)):
-        popt, _ = curve_fit(exponential_func, x[i], y[i])
-        ax.plot(x[i], exponential_func(x[i], *popt), label=labels[i])
+    for label in sales_data.columns[1:]:  # Skipping 'Month' column
+        monthly_sales = sales_data[label]
+        std_dev = statistics.stdev(monthly_sales)
+        ax.plot(sales_data['Month'], monthly_sales, label=label)
+        ax.fill_between(sales_data['Month'],
+                        monthly_sales - std_dev,
+                        monthly_sales + std_dev,
+                        alpha=0.2)
+    ax.set_xlabel('Month')
+    ax.set_ylabel('Sales')
+    ax.set_title('Monthly Sales Trends with Standard Deviation')
     ax.legend()
-    return fig
+    ax.set_xticks(sales_data['Month'])
+    return ax
 
 import unittest
-import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Example data for all tests
-        self.x = [np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([1, 3, 5])]
-        self.y = [np.array([2, 3, 5]), np.array([5, 7, 10]), np.array([2.5, 3.5, 5.5])]
-        self.labels = ["Test 1", "Test 2", "Test 3"]
+        # Generating a sample sales DataFrame
+        self.sales_data = pd.DataFrame({
+            'Month': range(1, 13),
+            'Product A': np.random.randint(100, 200, size=12),
+            'Product B': np.random.randint(150, 250, size=12),
+            'Product C': np.random.randint(120, 220, size=12),
+            'Product D': np.random.randint(130, 230, size=12),
+            'Product E': np.random.randint(140, 240, size=12)
+        })
     def test_plot_labels(self):
-        """Ensure the plot includes all specified labels."""
-        fig = task_func(self.x, self.y, self.labels)
-        ax = fig.gca()
+        """Ensure all product labels are present in the plot legend."""
+        ax = task_func(self.sales_data)
         legend_labels = [text.get_text() for text in ax.get_legend().get_texts()]
-        self.assertListEqual(legend_labels, self.labels, "Legend labels do not match input labels.")
-    def test_curve_fit_success(self):
-        """Verify that curve_fit successfully fits the data."""
-        for x_arr, y_arr in zip(self.x, self.y):
-            with self.subTest(x=x_arr, y=y_arr):
-                popt, _ = curve_fit(lambda x, a, b, c: a * np.exp(-b * x) + c, x_arr, y_arr)
-                self.assertTrue(len(popt) == 3, "Optimal parameters not found for the exponential fit.")
-    def test_output_type(self):
-        """Check the output type to be a matplotlib figure."""
-        fig = task_func(self.x, self.y, self.labels)
-        self.assertIsInstance(fig, plt.Figure, "Output is not a matplotlib figure.")
-    def test_no_data(self):
-        """Test the function with no data provided."""
-        with self.assertRaises(ValueError, msg="Empty data lists should raise a ValueError."):
-            task_func([], [], [])
-    def test_non_numeric_data(self):
-        """Ensure non-numeric data raises a ValueError during fitting."""
-        x = [np.array(["a", "b", "c"])]
-        y = [np.array(["d", "e", "f"])]
-        labels = ["Invalid Data"]
-        with self.assertRaises(ValueError, msg="Non-numeric data should raise a ValueError."):
-            task_func(x, y, labels)
+        self.assertEqual(set(legend_labels), set(self.sales_data.columns[1:]),
+                         "Not all product labels are present in the plot legend.")
+    def test_plot_lines(self):
+        """Check if the plot contains lines for each product."""
+        ax = task_func(self.sales_data)
+        self.assertEqual(len(ax.lines), len(self.sales_data.columns) - 1,
+                         "Plot does not contain the correct number of lines.")
+    def test_monthly_ticks(self):
+        """Verify that all months are correctly plotted as x-ticks."""
+        ax = task_func(self.sales_data)
+        # Convert x-ticks to integers for comparison
+        x_ticks = [int(tick) for tick in ax.get_xticks() if isinstance(tick, (int, np.integer))]
+        expected_ticks = self.sales_data['Month'].tolist()
+        self.assertListEqual(x_ticks, expected_ticks, "Not all months are correctly plotted as x-ticks.")
+    def test_positive_sales(self):
+        """Ensure all plotted sales values are positive."""
+        ax = task_func(self.sales_data)
+        for line in ax.lines:
+            self.assertTrue(all(y >= 0 for y in line.get_ydata()),
+                            "Plotted sales values should be positive.")
+    def test_std_dev_shading(self):
+        """Check for standard deviation shading around each product line."""
+        ax = task_func(self.sales_data)
+        self.assertGreaterEqual(len(ax.collections), len(self.sales_data.columns) - 1,
+                                "Missing standard deviation shading for one or more products.")

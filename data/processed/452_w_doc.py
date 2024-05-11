@@ -1,107 +1,150 @@
 import numpy as np
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
-import seaborn as sns
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 
 
-def task_func(n_components=2, N_SAMPLES=500, N_FEATURES=50, random_seed=None):
+def task_func(n_samples=100, n_features=10, random_seed=None):
     """
-    Generate a high-dimensional dataset, run PCA to reduce its dimensionality, and then draw a heatmap of
-    the covariance matrix of the transformed data.
+    Generate synthetic data using a simple regression model, fit a linear regression model to the data,
+    and return the predicted values along with the coefficients and intercept of the model.
 
     Parameters:
-    n_components (int, optional): The number of components for PCA. Defaults to 2.
-    N_SAMPLES (int, optional): Number of samples in the dataset. Defaults to 500.
-    N_FEATURES (int, optional): Number of features in the dataset. Defaults to 50.
-    random_seed (int, optional): Seed for the numpy and sklearn random number generator. Defaults to None.
+    - n_samples (int): The number of samples for the synthetic data. Default is 100.
+    - n_features (int): The number of features for the synthetic data. Default is 10.
+    - random_seed (int, optional): The seed for reproducibility. Default is None.
 
     Returns:
-    tuple:
-        transformed_data (ndarray): The transformed data of shape (N_SAMPLES, n_components).
-        heatmap_axes (Axes): The heatmap of the covariance matrix of the transformed data or None if n_components=1.
+    - tuple: A tuple containing:
+        - predictions (numpy.ndarray): The predicted values of the test set.
+        - coefficients (numpy.ndarray): Coefficients of the linear regression model.
+        - intercept (float): Intercept of the linear regression model.
+        - mse (float): Mean squared error of the model predictions.
 
     Requirements:
     - numpy
-    - sklearn.decomposition.PCA
-    - matplotlib.pyplot
-    - seaborn
-
+    - sklearn.datasets.make_regression
+    - sklearn.model_selection.train_test_split
+    - sklearn.linear_model.LinearRegression
+    
     Example:
-    >>> transformed, ax = task_func(n_components=2, random_seed=42)
-    >>> transformed.shape
-    (500, 2)
+    >>> predictions, coefficients, intercept, mse = task_func(100, 5, random_seed=42)
+    >>> predictions[:3]
+    array([ 180.79207843, -295.0210232 ,  118.23799221])
+    >>> round(mse, 4)
+    0.0113
     """
-    np.random.seed(random_seed)  # Ensuring reproducibility
-    X = np.random.rand(N_SAMPLES, N_FEATURES)
-    pca = PCA(n_components=n_components, random_state=random_seed)
-    X_transformed = pca.fit_transform(X)
-    if n_components == 1:
-        return X_transformed, None
-    fig, ax = plt.subplots(figsize=(10, 7))
-    sns.heatmap(np.cov(X_transformed.T), annot=True, fmt=".2f", ax=ax)
-    return X_transformed, ax
+    X, y = datasets.make_regression(
+        n_samples=n_samples, n_features=n_features, noise=0.1, random_state=random_seed
+    )
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=random_seed
+    )
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_test)
+    coefficients = model.coef_
+    intercept = model.intercept_
+    mse = np.mean((predictions - y_test) ** 2)
+    return predictions, coefficients, intercept, mse
 
 import unittest
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+from sklearn import datasets
+from numpy.testing import assert_array_equal
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.seed = 42
-        # default parameters
-        self.n_components = 2
-        self.N_SAMPLES = 500
-        self.N_FEATURES = 50
+    def generate_data(self, n_samples, n_features, random_seed=None):
+        # Generate data for testing
+        X, y = datasets.make_regression(
+            n_samples=n_samples,
+            n_features=n_features,
+            noise=0.1,
+            random_state=random_seed,
+        )
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=random_seed
+        )
+        return X_train, X_test, y_train, y_test
     def test_case_1(self):
-        # Test basic functionality - results
-        transformed_data, _ = task_func()
-        self.assertEqual(transformed_data.shape, (self.N_SAMPLES, self.n_components))
-        np.random.seed(self.seed)
-        X = np.random.rand(self.N_SAMPLES, self.N_FEATURES)
-        pca = PCA(n_components=self.n_components, random_state=self.seed)
-        pca.fit(X)
-        self.assertTrue(np.sum(pca.explained_variance_ratio_) <= 1)
+        # Basic test for different inputs
+        random_seed = 1
+        for n_samples, n_features in [
+            [100, 5],
+            [500, 8],
+            [1000, 10],
+            [5000, 15],
+            [10000, 20],
+        ]:
+            predictions, _, _, mse = task_func(n_samples, n_features, random_seed=random_seed)
+            _, _, _, y = self.generate_data(
+                n_samples, n_features, random_seed=random_seed
+            )
+            self.assertEqual(mse, mean_squared_error(y, predictions))
     def test_case_2(self):
-        # Test basic functionality - visualization
-        _, heatmap_axes = task_func()
-        self.assertIsNotNone(heatmap_axes)
-        self.assertIsInstance(heatmap_axes, plt.Axes)
-        self.assertEqual(len(heatmap_axes.get_xticklabels()), 2)
-        self.assertEqual(len(heatmap_axes.get_yticklabels()), 2)
+        # Test default parameters
+        predictions, coefficients, intercept, mse = task_func(random_seed=42)
+        self.assertEqual(
+            predictions.shape[0], 20
+        )  # Default split leaves 20% of 100 samples for testing
+        self.assertEqual(coefficients.shape[0], 10)  # Default number of features
+        self.assertIsInstance(intercept, float)
+        _, _, _, y = self.generate_data(
+                100, 10, 42
+            )
+        self.assertEqual(mse, mean_squared_error(y, predictions))
     def test_case_3(self):
-        # Test n_components
-        for n_components in [1, 10, self.N_FEATURES]:
-            transformed_data, _ = task_func(
-                n_components=n_components, N_FEATURES=self.N_FEATURES
-            )
-            self.assertEqual(transformed_data.shape, (self.N_SAMPLES, n_components))
-    def test_case_4(self):
-        # Test N_SAMPLES
-        for n_samples in [self.n_components, 10, 50, 100]:
-            transformed_data, _ = task_func(N_SAMPLES=n_samples)
-            self.assertEqual(transformed_data.shape, (n_samples, self.n_components))
-    def test_case_5(self):
-        # Test N_FEATURES
-        for n_features in [self.n_components, 10, 50, 100]:
-            transformed_data, _ = task_func(N_FEATURES=n_features)
-            self.assertEqual(
-                transformed_data.shape, (self.N_SAMPLES, self.n_components)
-            )
-    def test_case_6(self):
-        # Test random_seed
-        transformed_data1, _ = task_func(random_seed=self.seed)
-        transformed_data2, _ = task_func(random_seed=self.seed)
-        np.testing.assert_array_equal(transformed_data1, transformed_data2)
-        transformed_data2, _ = task_func(random_seed=0)
+        # Test different random seeds for reproducibility
+        _, coefficients_1, intercept_1, mse_1 = task_func(random_seed=1)
+        _, coefficients_2, intercept_2, mse_2 = task_func(random_seed=2)
         with self.assertRaises(AssertionError):
-            np.testing.assert_array_equal(transformed_data1, transformed_data2)
+            assert_array_equal(coefficients_1, coefficients_2)
+            self.assertEqual(intercept_1, intercept_2)
+            
+    def test_case_4(self):
+        # Test zero and negative samples and features
+        with self.assertRaises(ValueError):
+            task_func(n_samples=0, n_features=10)
+        with self.assertRaises(ValueError):
+            task_func(n_samples=100, n_features=0)
+        with self.assertRaises(ValueError):
+            task_func(n_samples=-100, n_features=10)
+        with self.assertRaises(ValueError):
+            task_func(n_samples=100, n_features=-10)
+    def test_case_5(self):
+        # Test extreme values for parameters
+        predictions, _, _, mse = task_func(n_samples=100000, n_features=100, random_seed=42)
+        self.assertEqual(
+            predictions.shape[0], 20000
+        )  # 20% of 100000 samples for testing
+        self.assertAlmostEqual(mse, 0.010142327812255192, places=4)
+        
+    def test_case_6(self):
+        # Test output shapes
+        predictions, coefficients, _, mse = task_func(
+            n_samples=100, n_features=5, random_seed=42
+        )
+        self.assertEqual(predictions.shape[0], 20)
+        self.assertEqual(coefficients.shape[0], 5)
     def test_case_7(self):
-        # Function should fail at invalid values
-        with self.assertRaises(ValueError):
-            # negative n_components
-            task_func(n_components=-1)
-        with self.assertRaises(ValueError):
-            # more components than features
-            task_func(n_components=self.N_FEATURES + 10, N_FEATURES=self.N_FEATURES)
-    def tearDown(self):
-        plt.close("all")
+        # Test output types
+        predictions, coefficients, intercept, mse = task_func()
+        self.assertIsInstance(predictions, np.ndarray)
+        self.assertIsInstance(coefficients, np.ndarray)
+        self.assertIsInstance(intercept, float)
+        self.assertIsInstance(mse, float)
+        
+    def test_case_8(self):
+        # Test determinism with the same random seed
+        predictions_1, _, _, mse_1 = task_func(random_seed=42)
+        predictions_2, _, _, mse_2 = task_func(random_seed=42)
+        assert_array_equal(predictions_1, predictions_2)
+        self.assertEqual(mse_1, mse_2)
+        
+    def test_case_9(self):
+        # Test without random seed (non-deterministic outcomes)
+        predictions_1, _, _, _ = task_func()
+        predictions_2, _, _, _ = task_func()
+        with self.assertRaises(AssertionError):
+            assert_array_equal(predictions_1, predictions_2)

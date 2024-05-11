@@ -1,103 +1,89 @@
 import numpy as np
 import itertools
 import random
-import statistics
 
-def task_func(T1, RANGE=100):
+
+def task_func(T1, max_value=100):
     """
-    Convert elements in 'T1' to integers and create a list of random integers.
-    The size of the list is the sum of the integers in `T1`. Calculate and 
-    return the mean, median, and mode of the list.
-    
+    Converts elements in 'T1', a tuple of tuples containing string representations 
+    of integers, to integers and creates a list of random integers. The size of the 
+    list equals the sum of these integers. Returns the 25th, 50th, and 75th percentiles 
+    of this list.
+
     Parameters:
-    T1 (tuple of tuples): Each tuple contains string representations of integers which are converted to integers.
-    RANGE (int, optional): The upper limit for generating random integers. Default is 100.
+    T1 (tuple of tuple of str): A tuple of tuples, each containing string representations of integers.
+    max_value (int): The upper bound for random number generation, exclusive. Default is 100.
     
     Returns:
-    tuple: A tuple containing the mean, median, and mode of the generated list of random integers.
-           The mean and median are floats, and the mode is an integer. The calculations use the generated
-           list whose size is determined by the sum of converted integers from `T1`.
-    
+    tuple: A tuple (p25, p50, p75) representing the 25th, 50th, and 75th percentiles of the list.
+
     Requirements:
     - numpy
     - itertools
     - random
-    - statistics
-
-    Raises:
-    statistics.StatisticsError if T1 is empty
     
     Example:
     >>> import random
     >>> random.seed(42)
     >>> T1 = (('13', '17', '18', '21', '32'), ('07', '11', '13', '14', '28'), ('01', '05', '06', '08', '15', '16'))
-    >>> stats = task_func(T1)
-    >>> print(stats)
-    (49.88, 48.0, 20)
-    >>> stats = task_func(T1, RANGE=50)
-    >>> print(stats)
-    (23.773333333333333, 25.0, 15)
+    >>> percentiles = task_func(T1)
+    >>> print(percentiles)
+    (24.0, 48.0, 77.0)
     """
-    if len(T1) <= 0:
-        raise statistics.StatisticsError
     int_list = [list(map(int, x)) for x in T1]
     flattened_list = list(itertools.chain(*int_list))
     total_nums = sum(flattened_list)
-    random_nums = [random.randint(0, RANGE) for _ in range(total_nums)]
-    mean = np.mean(random_nums)
-    median = np.median(random_nums)
-    mode = statistics.mode(random_nums)
-    return mean, median, mode
+    random_nums = [random.randint(0, max_value) for _ in range(total_nums)]
+    p25 = np.percentile(random_nums, 25)
+    p50 = np.percentile(random_nums, 50)
+    p75 = np.percentile(random_nums, 75)
+    return p25, p50, p75
 
 import unittest
-import numpy as np
-import statistics
 from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    @patch('random.randint', return_value=50)
+    @patch('random.randint')
     def test_case_1(self, mock_randint):
-        """Tests with small numbers and default range."""
-        T1 = (('1', '2'), ('2', '3'), ('3', '4'))
-        mean, median, mode = task_func(T1)
-        total_elements = sum(map(int, sum(T1, ())))
-        self.assertEqual(total_elements, 15)  # Check if the total_elements calculation is correct
-        self.assertTrue(isinstance(mean, float))
-        self.assertTrue(isinstance(median, float))
-        self.assertTrue(isinstance(mode, int))
-    @patch('random.randint', return_value=50)
+        """Test with diverse values and the default range to ensure percentile calculation."""
+        mock_randint.return_value = 50  # Mocking random.randint to always return 50
+        T1 = (('13', '17', '18', '21', '32'), ('07', '11', '13', '14', '28'), ('01', '05', '06', '08', '15', '16'))
+        p25, p50, p75 = task_func(T1)
+        self.assertEqual(p25, 50)
+        self.assertEqual(p50, 50)
+        self.assertEqual(p75, 50)
+    @patch('random.randint')
     def test_case_2(self, mock_randint):
-        """Tests with mid-range numbers and default range."""
-        T1 = (('1', '2', '3'), ('4', '5'), ('6', '7', '8', '9'))
-        mean, median, mode = task_func(T1)
-        self.assertEqual(mean, 50.0)
-        self.assertEqual(median, 50.0)
-        self.assertEqual(mode, 50)
-    @patch('random.randint', return_value=25)
+        """Check consistency when the total number of elements are small but repeated."""
+        mock_randint.return_value = 30  # Consistent lower value for a different perspective
+        T1 = (('10',), ('10', '10', '10'))
+        p25, p50, p75 = task_func(T1)
+        self.assertEqual(p25, 30)
+        self.assertEqual(p50, 30)
+        self.assertEqual(p75, 30)
+    @patch('random.randint')
     def test_case_3(self, mock_randint):
-        """Tests with adjusted range to 50, checks new bounds."""
-        T1 = (('1', '2', '3'), ('4', '5'), ('6', '7', '8', '9'))
-        mean, median, mode = task_func(T1, RANGE=50)
-        self.assertEqual(mean, 25.0)
-        self.assertEqual(median, 25.0)
-        self.assertEqual(mode, 25)
-    @patch('random.randint', return_value=75)
+        """Ensure that percentile calculations are consistent for mixed low and medium values."""
+        mock_randint.return_value = 75  # Higher consistent value
+        T1 = (('5', '5', '5', '5'), ('10', '15'), ('1', '2', '3', '4', '5'))
+        p25, p50, p75 = task_func(T1)
+        self.assertEqual(p25, 75)
+        self.assertEqual(p50, 75)
+        self.assertEqual(p75, 75)
+    @patch('random.randint')
     def test_case_4(self, mock_randint):
-        """Tests with minimal input of single-digit numbers."""
-        T1 = (('1',), ('2',), ('3',))
-        mean, median, mode = task_func(T1)
-        self.assertEqual(mean, 75.0)
-        self.assertEqual(median, 75.0)
-        self.assertEqual(mode, 75)
-    @patch('random.randint', return_value=10)
+        """Tests percentile values for a simple large-value case."""
+        mock_randint.return_value = 10  # Low consistent value to see impact on percentiles
+        T1 = (('50',), ('25', '25'))
+        p25, p50, p75 = task_func(T1)
+        self.assertEqual(p25, 10)
+        self.assertEqual(p50, 10)
+        self.assertEqual(p75, 10)
+    @patch('random.randint')
     def test_case_5(self, mock_randint):
-        """Tests with larger numbers, focusing on correct type checking."""
-        T1 = (('10', '20', '30'), ('40', '50'), ('60', '70', '80', '90'))
-        mean, median, mode = task_func(T1)
-        self.assertEqual(mean, 10.0)
-        self.assertEqual(median, 10.0)
-        self.assertEqual(mode, 10)
-    def test_empty_input(self):
-        """Tests behavior with an empty tuple input."""
-        T1 = ()
-        with self.assertRaises(statistics.StatisticsError):
-            mean, median, mode = task_func(T1)
+        """Test with an extreme case where all random numbers are the same, ensuring no variability."""
+        mock_randint.return_value = 90  # High consistent value
+        T1 = (('1', '1', '1', '1', '1', '1', '1', '1', '1', '1'), ('10', '10'))
+        p25, p50, p75 = task_func(T1)
+        self.assertEqual(p25, 90)
+        self.assertEqual(p50, 90)
+        self.assertEqual(p75, 90)

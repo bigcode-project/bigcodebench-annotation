@@ -1,151 +1,107 @@
-import pandas as pd
-from sklearn.feature_selection import SelectKBest, f_classif
-import seaborn as sns
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
 
 
-def task_func(df1, df2):
-    """Perform the feature selection with SelectKBest (k=2) and return a heatmap of the feature correlations.
+def task_func(df1, df2, column1="feature1", column2="feature2"):
+    """Merge datasets, perform KMeans clustering, then return cluster labels and scatterplot.
+
+    Each dataset is assumed to contain at least one id column and one feature column. The column to process
+    is specified for df1 and df2 via column1 and column2, respectively. KMeans clustering is applied
+    with k=2 and n_init=10. Resulting scatterplot shows column1 on the x-axis, column2 on the y-axis,
+    and predicted cluster as color.
 
     Parameters:
-    - df1 (pd.DataFrame): The dataframe containing features.
-    - df2 (pd.DataFrame): The dataframe containing the target variable. Must have an 'id' column corresponding to df1.
+    - df1 (pd.DataFrame): Dataframe with columns 'id' and feature columns including column1.
+    - df2 (pd.DataFrame): Dataframe with columns 'id' and feature columns including column2.
+    - column1 (str): Name of column containing features to model in df1. Defaults to "feature1".
+    - column2 (str): Name of column containing features to model in df2. Defaults to "feature2".
 
     Returns:
-    - tuple: A tuple containing:
-        - list: A list of the selected features.
-        - Axes: A heatmap showing the correlation between the selected features.
+    - labels (numpy.ndarray): Cluster labels for each data point (dtype=int32).
+    - ax (matplotlib.axes._axes.Axes): The plotted figure's Axes object.
 
     Requirements:
-    - pandas
-    - sklearn.feature_selection.SelectKBest
-    - sklearn.feature_selection.f_classif
-    - seaborn
+    - sklearn.cluster.KMeans
+    - matplotlib.pyplot
 
     Example:
-    >>> df1 = pd.DataFrame({'id': [1, 2, 3], 'feature1': [1.2, 3.4, 5.6], 'feature2': [2.3, 4.5, 6.7], 'feature3': [3.4, 5.6, 7.8]})
-    >>> df2 = pd.DataFrame({'id': [1, 2, 3], 'target': [4.5, 6.7, 8.9]})
-    >>> selected_features, heatmap = task_func(df1, df2)
-    >>> heatmap
-    <Axes: >
-    >>> selected_features
-    ['feature2', 'feature3']
+    >>> df1 = pd.DataFrame({'id': [1, 2, 3], 'feature1': [1.2, 3.4, 5.6]})
+    >>> df2 = pd.DataFrame({'id': [1, 2, 3], 'feature2': [2.3, 4.5, 6.7]})
+    >>> labels, ax = task_func(df1, df2)
+    >>> type(labels)
+    <class 'numpy.ndarray'>
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
     df = pd.merge(df1, df2, on="id")
-    features = df1.columns.drop("id")
-    X = df[features]
-    y = df["target"]
-    selector = SelectKBest(f_classif, k=2)
-    X_new = selector.fit_transform(X, y)
-    selected_features = [x for x, y in zip(features, selector.get_support()) if y]
-    heatmap = sns.heatmap(
-        pd.DataFrame(X_new, columns=selected_features).corr(), annot=True
-    )
-    return selected_features, heatmap
+    X = df[[column1, column2]]
+    kmeans = KMeans(n_clusters=2, n_init=10)
+    kmeans.fit(X)
+    labels = kmeans.labels_
+    _, ax = plt.subplots()
+    ax.scatter(X[column1], X[column2], c=kmeans.labels_)
+    ax.set_xlabel(column1)
+    ax.set_ylabel(column2)
+    return labels, ax
 
 import unittest
 import pandas as pd
-import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        # Sample dataframes for testing
+        self.df1_base = pd.DataFrame(
+            {"id": [1, 2, 3, 4, 5], "feature1": [1.2, 3.4, 5.6, 7.8, 9.0]}
+        )
+        self.df2_base = pd.DataFrame(
+            {"id": [1, 2, 3, 4, 5], "feature2": [2.3, 4.5, 6.7, 8.9, 10.1]}
+        )
     def tearDown(self):
         plt.close("all")
     def test_case_1(self):
-        # Dataset with clear distinction between features
-        df1 = pd.DataFrame(
-            {
-                "id": [1, 2, 3, 4, 5],
-                "feature1": [5.5, 6.7, 7.8, 8.9, 9.0],
-                "feature2": [1.1, 2.2, 3.3, 4.4, 5.5],
-                "feature3": [0.5, 1.5, 2.5, 3.5, 4.5],
-            }
-        )
-        df2 = pd.DataFrame({"id": [1, 2, 3, 4, 5], "target": [1, 0, 1, 0, 1]})
-        # Calling the function and asserting results
-        selected_features, ax = task_func(df1, df2)
-        self.assertListEqual(selected_features, ["feature1", "feature3"])
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertTrue(ax.has_data())
+        # Test scatterplot
+        _, ax = task_func(self.df1_base, self.df2_base)
+        self.assertIsInstance(ax, matplotlib.axes._axes.Axes)
+        self.assertEqual(ax.get_xlabel(), "feature1")
+        self.assertEqual(ax.get_ylabel(), "feature2")
     def test_case_2(self):
-        # Dataset with features having moderate correlation
-        df1 = pd.DataFrame(
-            {
-                "id": [1, 2, 3],
-                "feature1": [1.2, 3.4, 5.6],
-                "feature2": [2.3, 4.5, 6.7],
-                "feature3": [3.4, 5.6, 7.8],
-            }
-        )
-        df2 = pd.DataFrame({"id": [1, 2, 3], "target": [4.5, 6.7, 8.9]})
-        # Calling the function and asserting results
-        selected_features, ax = task_func(df1, df2)
-        self.assertListEqual(selected_features, ["feature2", "feature3"])
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertTrue(ax.has_data())
+        # Expect 2 clusters
+        labels, _ = task_func(self.df1_base, self.df2_base)
+        self.assertEqual(len(labels), 5)
+        self.assertEqual(len(np.unique(labels)), 2)
     def test_case_3(self):
-        # Dataset with balanced target values
-        df1 = pd.DataFrame(
-            {
-                "id": [1, 2, 3, 4],
-                "feature1": [2.5, 3.5, 4.5, 5.5],
-                "feature2": [6.6, 7.7, 8.8, 9.9],
-                "feature3": [10.1, 11.1, 12.1, 13.1],
-            }
-        )
-        df2 = pd.DataFrame({"id": [1, 2, 3, 4], "target": [0, 1, 0, 1]})
-        # Calling the function and asserting results
-        selected_features, ax = task_func(df1, df2)
-        self.assertListEqual(selected_features, ["feature2", "feature3"])
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertTrue(ax.has_data())
+        # Mixed valid data types
+        df1 = pd.DataFrame({"id": [1, 2, 3], "feature1": [1, 2, 3]})
+        df2 = pd.DataFrame({"id": [1, 2, 3], "feature2": [1.1, 2.2, 3.3]})
+        labels, _ = task_func(df1, df2)
+        self.assertEqual(len(labels), 3)
     def test_case_4(self):
-        # Smaller dataset
-        df1 = pd.DataFrame(
-            {
-                "id": [1, 2],
-                "feature1": [3.3, 4.4],
-                "feature2": [5.5, 6.6],
-                "feature3": [7.7, 8.8],
-            }
-        )
-        df2 = pd.DataFrame({"id": [1, 2], "target": [1, 0]})
-        # Calling the function and asserting results
-        selected_features, ax = task_func(df1, df2)
-        self.assertListEqual(selected_features, ["feature2", "feature3"])
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertTrue(ax.has_data())
+        # Partial matches
+        df1 = pd.DataFrame({"id": [1, 2, 3], "feature1": [1.2, 3.4, 5.6]})
+        df2 = pd.DataFrame({"id": [1, 2, 6], "feature2": [1.2, 3.1, 6.7]})
+        labels, _ = task_func(df1, df2)
+        self.assertEqual(len(labels), 2)
+        self.assertEqual(len(np.unique(labels)), 2)
     def test_case_5(self):
-        # Dataset with different feature correlations
-        df1 = pd.DataFrame(
-            {
-                "id": [1, 2, 3],
-                "feature1": [10, 20, 30],
-                "feature2": [40, 50, 60],
-                "feature3": [70, 80, 90],
-            }
-        )
-        df2 = pd.DataFrame({"id": [1, 2, 3], "target": [1, 0, 1]})
-        # Calling the function and asserting results
-        selected_features, ax = task_func(df1, df2)
-        self.assertListEqual(selected_features, ["feature2", "feature3"])
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertTrue(ax.has_data())
+        # Should fail when there's no matching id
+        df1 = pd.DataFrame({"id": [1, 2, 3], "feature1": [1.2, 3.4, 5.6]})
+        df2 = pd.DataFrame({"id": [4, 5, 6], "feature2": [2.3, 4.5, 6.7]})
+        with self.assertRaises(ValueError):
+            task_func(df1, df2)
     def test_case_6(self):
-        # Test handling errors - no "id"
-        df1 = pd.DataFrame(
-            {
-                "feature1": [10, 20, 30],
-            }
-        )
-        df2 = pd.DataFrame({"id": [1, 2, 3], "target": [1, 0, 1]})
-        with self.assertRaises(KeyError):
+        # Should fail on non-numeric columns
+        df1 = pd.DataFrame({"id": [1, 2, 3], "feature1": ["a", "b", "c"]})
+        df2 = pd.DataFrame({"id": [1, 2, 3], "feature2": [1.1, 2.2, 3.3]})
+        with self.assertRaises(Exception):
             task_func(df1, df2)
     def test_case_7(self):
-        # Test handling errors - wrong types
+        # Should fail on missing value
         df1 = pd.DataFrame(
-            {
-                "id": [1, 2, 3],
-                "feature1": ["a", "b", 3],
-            }
+            {"id": [1, 2, 3, 4, 5], "feature1": [1.2, np.nan, 5.6, 7.8, 9.0]}
         )
-        df2 = pd.DataFrame({"id": [1, 2, 3], "target": [1, 0, 1]})
+        df2 = pd.DataFrame(
+            {"id": [1, 2, 3, 4, 5], "feature2": [2.3, 4.5, np.nan, 8.9, 10.1]}
+        )
         with self.assertRaises(ValueError):
             task_func(df1, df2)

@@ -1,96 +1,52 @@
-from random import sample
-from typing import Tuple
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 
-
-def task_func(num_students):
+def task_func(num_teams=5, num_games=100):
     """
-    Generate a Pandas DataFrame that displays the grades of a randomly selected group of students in multiple courses.
-    Calculate the average grade in each course, the number of students with a passing grade (>= 60), 
-    and visualize this information using a bar plot with title 'Course-wise Average and Passing Grade Counts'.
+    Create a Pandas DataFrame that displays the random scores of different teams in multiple games.
+    The function generates random scores for each game played by each team and populates them in
+    a DataFrame with index=teams, columns=games.
 
     Parameters:
-    num_students (int): The number of students in the sample.
+    - num_teams (int, optional): The number of teams participating. Default is 5.
+    - num_games (int, optional): The number of games played. Default is 100.
 
     Returns:
-    Tuple[pd.DataFrame, plt.Axes]: A tuple containing the generated DataFrame and the bar plot's Axes object.
+    DataFrame: The generated DataFrame containing random scores for each team in each game.
 
     Requirements:
     - pandas
     - numpy
-    - matplotlib.pyplot
-    - random
-    - typing
 
     Example:
-    >>> df, ax = task_func(50)
-    >>> ax.get_title()
-    'Course-wise Average and Passing Grade Counts'
+    >>> df = task_func(num_teams=3, num_games=10)
+    >>> type(df)
+    <class 'pandas.core.frame.DataFrame'>
     """
-    STUDENTS = ['Student' + str(i) for i in range(1, 101)]
-    COURSES = ['Course' + str(i) for i in range(1, 6)]
-    students_sample = sample(STUDENTS, num_students)
-    grades = np.random.randint(40, 101, size=(num_students, len(COURSES)))
-    df = pd.DataFrame(grades, index=students_sample, columns=COURSES)
-    fig, ax = plt.subplots()
-    df.mean().plot(kind='bar', ax=ax, position=1, width=0.4, color='b', label='Average Grade')
-    df[df >= 60].count().plot(kind='bar', ax=ax, position=0, width=0.4, color='g', label='Passing Grade Counts')
-    ax.set_title('Course-wise Average and Passing Grade Counts')
-    ax.legend()
-    return df, ax
+    scores = np.random.randint(0, 101, size=(num_teams, num_games))
+    teams = ['Team' + str(i) for i in range(1, num_teams + 1)]
+    games = ['Game' + str(i) for i in range(1, num_games + 1)]
+    df = pd.DataFrame(scores, index=teams, columns=games)
+    return df
 
 import unittest
 class TestCases(unittest.TestCase):
-    
     def test_case_1(self):
-        # Test with 10 students
-        df, ax = task_func(10)
-        
-        # Check DataFrame dimensions
-        self.assertEqual(df.shape, (10, 5))
-        
-        # Check plot title
-        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
-    
+        df = task_func()
+        self.assertEqual(df.shape, (5, 100))
     def test_case_2(self):
-        # Test with 50 students
-        df, ax = task_func(50)
-        
-        # Check DataFrame dimensions
-        self.assertEqual(df.shape, (50, 5))
-        
-        # Check plot title
-        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
+        df = task_func(num_teams=3, num_games=10)
+        self.assertEqual(df.shape, (3, 10))
         
     def test_case_3(self):
-        # Test with 100 students
-        df, ax = task_func(100)
+        df = task_func(num_teams=4, num_games=20)
+        self.assertListEqual(list(df.index), ['Team1', 'Team2', 'Team3', 'Team4'])
         
-        # Check DataFrame dimensions
-        self.assertEqual(df.shape, (100, 5))
-        
-        # Check plot title
-        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
-    
     def test_case_4(self):
-        # Test with 1 student
-        df, ax = task_func(1)
-        
-        # Check DataFrame dimensions
-        self.assertEqual(df.shape, (1, 5))
-        
-        # Check plot title
-        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
+        df = task_func(num_teams=2, num_games=5)
+        self.assertListEqual(list(df.columns), ['Game1', 'Game2', 'Game3', 'Game4', 'Game5'])
         
     def test_case_5(self):
-        # Test with 5 students
-        df, ax = task_func(5)
-        
-        # Check DataFrame dimensions
-        self.assertEqual(df.shape, (5, 5))
-        
-        # Check plot title
-        self.assertEqual(ax.get_title(), 'Course-wise Average and Passing Grade Counts')
+        df = task_func(num_teams=2, num_games=5)
+        self.assertTrue((df.dtypes == 'int64').all())

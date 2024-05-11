@@ -1,82 +1,67 @@
-import os
-import pandas as pd
+import pytz
 from dateutil.parser import parse
-OUTPUT_DIR = './output'
 
-def task_func(csv_path=os.path.join(OUTPUT_DIR, 'data.csv'), date_column='date'):
+
+def task_func(date_str, from_tz, to_tz):
     """
-    Read a CSV file, convert a column of date strings into datetime objects,
-    and draw a histogram of the year distribution of these dates.
+    Convert a date string from one time zone to another and return the time difference in seconds to the current time
+    in the destination time zone.
 
     Parameters:
-    - csv_path (str): The path to the CSV file. Default is the 'data.csv' in the script's directory.
-    - date_column (str): The column in the CSV file with the date strings. Default is 'date'.
+    date_str (str): The date string in "yyyy-mm-dd hh:mm:ss" format.
+    from_tz (str): The timezone of the given date string.
+    to_tz (str): The timezone to which the date string should be converted.
 
     Returns:
-    - matplotlib.axes._axes.Axes: A histogram plot object showing the distribution of years.
+    int: The time difference in seconds.
 
     Requirements:
-    - pandas
+    - pytz
     - dateutil.parser
-    - os
-
     Example:
-    >>> import os
-    >>> from unittest.mock import patch
-    >>> with patch('os.path.exists', return_value=False):
-    ...     task_func('nonexistent.csv')
-    Traceback (most recent call last):
-        ...
-    FileNotFoundError: nonexistent.csv does not exist
+    >>> type(task_func('2022-10-22 11:59:59', 'UTC', 'America/Chicago'))
+    <class 'int'>
     """
-    if not os.path.isfile(csv_path):
-        raise FileNotFoundError(f"{csv_path} does not exist")
-    df = pd.read_csv(csv_path)
-    df[date_column] = df[date_column].apply(lambda x: parse(x))
-    return df[date_column].dt.year.hist()
+    from_tz_obj = pytz.timezone(from_tz)
+    to_tz_obj = pytz.timezone(to_tz)
+    given_date_naive = parse(date_str)
+    given_date = from_tz_obj.localize(given_date_naive)
+    given_date_in_to_tz = given_date.astimezone(to_tz_obj)
+    current_date_in_to_tz = datetime.now(pytz.utc).astimezone(to_tz_obj)
+    time_difference = current_date_in_to_tz - given_date_in_to_tz
+    return int(time_difference.total_seconds())
 
 import unittest
-import shutil
-import os
-import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.output_dir = OUTPUT_DIR
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
-        # Prepare CSV files for testing
-        self.valid_data_csv = os.path.join(self.output_dir, 'valid_data.csv')
-        with open(self.valid_data_csv, 'w') as f:
-            f.write("date\n2020-01-01\n2021-02-02")
-        self.empty_data_csv = os.path.join(self.output_dir, 'empty_data.csv')
-        open(self.empty_data_csv, 'w').close()  # Create an empty file
-        # No need to create an invalid data CSV because parsing errors are tested dynamically
-        self.different_column_data_csv = os.path.join(self.output_dir, 'different_column_data.csv')
-        with open(self.different_column_data_csv, 'w') as f:
-            f.write("different_date_column\n2020-01-01\n2021-02-02")
-    def tearDown(self):
-        shutil.rmtree(self.output_dir, ignore_errors=True)
-    def test_valid_data(self):
-        """Test with valid date data."""
-        histogram_plot = task_func(self.valid_data_csv, 'date')
-        self.assertIsInstance(histogram_plot, plt.Axes)
-    def test_empty_file(self):
-        """Test with an empty CSV file."""
-        with self.assertRaises(ValueError):  # Assuming pandas raises a ValueError for an empty CSV
-            task_func(self.empty_data_csv, 'date')
-    def test_nonexistent_file(self):
-        """Test with a nonexistent CSV file path."""
-        nonexistent_csv = os.path.join(self.output_dir, 'nonexistent.csv')
-        with self.assertRaises(FileNotFoundError):
-            task_func(nonexistent_csv, 'date')
-    def test_different_date_column(self):
-        """Test using a different date column name."""
-        histogram_plot = task_func(self.different_column_data_csv, 'different_date_column')
-        self.assertIsInstance(histogram_plot, plt.Axes)
-    def test_invalid_data(self):
-        """Dynamically test with invalid date strings; expecting the function to handle errors gracefully."""
-        invalid_data_csv = os.path.join(self.output_dir, 'invalid_data.csv')
-        with open(invalid_data_csv, 'w') as f:
-            f.write("date\nnot-a-date\n2021-13-01")
-        with self.assertRaises(ValueError):
-            task_func(invalid_data_csv, 'date')
+    def test_case_1(self):
+        # Test conversion from UTC to America/Chicago with a date in the past
+        result = task_func('2022-01-01 11:59:59', 'UTC', 'America/Chicago')
+        self.assertIsInstance(result, int)
+        self.assertGreater(result, 0)
+    def test_case_2(self):
+        # Test conversion from America/New_York to Asia/Kolkata with a date in the past
+        result = task_func('2022-01-01 11:59:59', 'America/New_York', 'Asia/Kolkata')
+        self.assertIsInstance(result, int)
+        self.assertGreater(result, 0)
+    def test_known_time_zone_offset_difference(self):
+        """Test the function with time zones having a known, static offset."""
+        known_date_utc = '2023-01-01 12:00:00'
+        utc_zone = 'UTC'
+        target_zone = 'Etc/GMT+2'
+        try:
+            result = task_func(known_date_utc, utc_zone, target_zone)
+            self.assertTrue(isinstance(result, int), "Result should be an integer representing seconds.")
+        except Exception as e:
+            self.fail(f"task_func raised an exception with known static offset time zones: {e}")
+    def test_case_4(self):
+        # Test conversion with a future date from UTC to America/Chicago
+        future_date = (datetime.utcnow() + timedelta(days=10)).strftime('%Y-%m-%d %H:%M:%S')
+        result = task_func(future_date, 'UTC', 'America/Chicago')
+        self.assertIsInstance(result, int)
+        self.assertLess(result, 0)
+    def test_case_5(self):
+        # Test conversion from Asia/Kolkata to America/Los_Angeles with a date in the past
+        result = task_func('2022-01-01 11:59:59', 'Asia/Kolkata', 'America/Los_Angeles')
+        self.assertIsInstance(result, int)
+        self.assertGreater(result, 0)

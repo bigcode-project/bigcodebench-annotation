@@ -1,69 +1,58 @@
-import numpy as np
-from scipy.stats import norm
-import matplotlib.pyplot as plt
+import itertools
+import json
 
-def task_func(x):
+
+def task_func(json_list, r):
     """
-    Draws a plot visualizing a complex distribution created from two Gaussian distributions.
-    The real part of the complex distribution is a Gaussian centered at 0 with a standard deviation of 1,
-    and the imaginary part is a Gaussian centered at 2 with a standard deviation of 2.
-
+    Generate all possible combinations of r elements from a given number list taken from JSON string input.
+    
     Parameters:
-        x (numpy.ndarray): The range of x values over which to plot the distribution.
+    json_list (str): JSON string containing the number list.
+    r (int): The number of elements in each combination.
 
     Returns:
-        numpy.ndarray: The complex distribution created from the two Gaussian distributions.
+    list: A list of tuples, each tuple representing a combination.
+
+    Note:
+    - The datetime to be extracted is located in the 'number_list' key in the JSON data.
 
     Raises:
-        TypeError: If `x` is not a numpy.ndarray.
+    - Raise an Exception if the json_list is an invalid JSON, empty, or does not have 'number_list' key.
     
     Requirements:
-    - numpy
-    - scipy.stats.norm
-    - matplotlib.pyplot
-
-    Examples:
-    >>> X = np.linspace(-10, 10, 1000)
-    >>> result = task_func(X)
-    >>> result[0]
-    (7.69459862670642e-23+3.037941424911643e-09j)
+    - itertools
+    - json
+    
+    Example:
+    >>> combinations = task_func('{"number_list": [1, 2, 3, 4, 5]}', 3)
+    >>> print(combinations)
+    [(1, 2, 3), (1, 2, 4), (1, 2, 5), (1, 3, 4), (1, 3, 5), (1, 4, 5), (2, 3, 4), (2, 3, 5), (2, 4, 5), (3, 4, 5)]
     """
-    if not isinstance(x, np.ndarray):
-        raise TypeError("x must be numpy.ndarray")
-    real_part = norm.pdf(x, 0, 1)
-    imag_part = norm.pdf(x, 2, 2)
-    complex_dist = real_part + 1j * imag_part
-    plt.plot(x, complex_dist.real, label='Real part')
-    plt.plot(x, complex_dist.imag, label='Imaginary part')
-    plt.legend()
-    plt.grid()
-    plt.show()
-    return complex_dist
+    try:
+        data = json.loads(json_list)
+        number_list = data['number_list']
+        return list(itertools.combinations(number_list, r))
+    except Exception as e:
+        raise e
 
 import unittest
-import numpy as np
 class TestCases(unittest.TestCase):
-    def test_return_type(self):
-        """ Test that the function returns None. """
-        result = task_func(np.linspace(-10, 10, 1000))
-        self.assertAlmostEquals(result[0], 7.69459863e-23+3.03794142e-09j)
-        self.assertAlmostEquals(result[1], 9.398202102189114e-23+3.2258293600449145e-09j)
-    def test_input_type(self):
-        """ Test the function with non-numpy array inputs. """
-        with self.assertRaises(TypeError):
-            task_func([1, 2, 3])
-    def test_empty_array(self):
-        """ Test function with empty numpy array. """
-        result = task_func(np.array([]))
-        self.assertEqual(result.size, 0)
-    def test_array_length(self):
-        """ Test function with arrays of different lengths. """
-        result = task_func(np.linspace(-5, 5, 500))
-        self.assertAlmostEquals(result[0], 1.4867195147342979e-06+0.0004363413475228801j)
-        self.assertAlmostEquals(result[-1], 1.4867195147342979e-06+0.06475879783294587j)
-    def test_special_values(self):
-        """ Test function with special values. """
-        result = task_func(np.linspace(-np.inf, np.inf, 1000))
-        # nan+nanj, should not use assertEqual
-        self.assertTrue(np.isnan(result[0].real))
-        self.assertTrue(np.isnan(result[0].imag))
+    def test_case_1(self):
+        result = task_func('{"number_list": [1, 2, 3, 4, 5]}', 3)
+        expected = [(1, 2, 3), (1, 2, 4), (1, 2, 5), (1, 3, 4), (1, 3, 5), (1, 4, 5), (2, 3, 4), (2, 3, 5), (2, 4, 5), (3, 4, 5)]
+        self.assertEqual(result, expected)
+    def test_case_2(self):
+        result = task_func('{"number_list": ["a", "b", "c"]}', 2)
+        expected = [('a', 'b'), ('a', 'c'), ('b', 'c')]
+        self.assertEqual(result, expected)
+    def test_case_3(self):
+        result = task_func('{"number_list": [1, 2, 3]}', 1)
+        expected = [(1,), (2,), (3,)]
+        self.assertEqual(result, expected)
+    def test_case_4(self):
+        with self.assertRaises(Exception):
+            result = task_func('[]', 1)
+    def test_case_5(self):
+        result = task_func('{"number_list": [1, 2]}', 3)
+        expected = []
+        self.assertEqual(result, expected)

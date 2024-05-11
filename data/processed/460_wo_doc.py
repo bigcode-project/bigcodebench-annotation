@@ -1,115 +1,176 @@
 import subprocess
-import os
-import time
-from datetime import datetime
+import pandas as pd
 
-
-def task_func(script_dir, scripts, delay):
+def task_func(script_path, output_file_path):
     """
-    Execute a list of bash scripts with a specified delay between each script.
+    Executes a script to produce a CSV, reads the CSV, and plots a bar graph from the data.
+
+    This function runs the provided script, which should generate a CSV file at the specified output path.
+    The CSV must have exactly two columns. It then reads this CSV into a DataFrame and plots a bar graph,
+    setting the first column as the x-axis labels and the second column as the bar heights.
+    It will raise ValueError if the script fails to execute, or if the produced CSV is not valid.
 
     Parameters:
-    script_dir (str): Path to the directory containing the scripts.
-    scripts (list): List of script filenames to be executed. Must not be empty.
-                    If a script is not found, the function raises a FileNotFoundError.
-    delay (int): The delay in seconds between each script execution. Must at least 0.
+    - script_path (str): Path to the script to be executed.
+    - output_file_path (str): Path where the script outputs the CSV.
 
     Returns:
-    list: A list of timestamps indicating the start time of each script execution.
+    - df (pd.DataFrame): DataFrame containing the data from the CSV.
+    - ax (matplotlib.axes._axes.Axes): Axes object of the plotted bar graph.
 
     Raises:
-    - ValueError: If the delay is negative or no scripts are provided.
+    - ValueError: If the script fails to execute, the CSV is invalid, or the CSV does not contain exactly 2 columns.
     
     Requirements:
+    - pandas
     - subprocess
-    - os
-    - time
-    - datetime.datetime
 
-    Example:
-    >>> task_func('/path/to/scripts/', ['script1.sh', 'script2.sh'], 5)
-    ['2023-09-09 10:10:10', '2023-09-09 10:10:15']
+    Examples:
+    >>> df, ax = task_func("generate_data.sh", "data.csv")
+    >>> type(df)
+    <class 'pandas.core.frame.DataFrame'>
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    if delay < 0:
-        raise ValueError("delay cannot be negative.")
-    if not scripts:
-        raise ValueError("No scripts provided.")
-    start_times = []
-    for script in scripts:
-        script_path = os.path.join(script_dir, script)
-        start_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        start_times.append(start_time)
-        result = subprocess.call(script_path, shell=True)
-        if result != 0:
-            raise FileNotFoundError(f"Script not found: {script_path}")
-        time.sleep(delay)
-    return start_times
+    try:
+        subprocess.run([script_path], check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        raise ValueError(
+            "Error occurred while executing the script or script not found"
+        )
+    df = pd.read_csv(output_file_path)
+    if len(df.columns) != 2:
+        raise ValueError("CSV file must contain exactly 2 columns")
+    ax = df.plot(kind="bar", x=df.columns[0], legend=False)
+    ax.set_xlabel(df.columns[0])
+    return df, ax
 
 import unittest
-import tempfile
 import os
-from datetime import datetime
+import tempfile
+# import matplotlib
+# Force matplotlib to not use any Xwindows backend.
+# matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Create a temporary directory to store scripts
         self.temp_dir = tempfile.TemporaryDirectory()
-        self.script_dir = self.temp_dir.name
+        self.script_path = os.path.join(self.temp_dir.name, "script.sh")
+        self.output_path = os.path.join(self.temp_dir.name, "output.csv")
+        self.valid_csv_content = [
+            f'echo "Name,Value" > {self.output_path}\n',
+            f'echo "A,1" >> {self.output_path}\n',
+            f'echo "B,2" >> {self.output_path}\n',
+            f'echo "C,3" >> {self.output_path}\n',
+        ]
     def tearDown(self):
-        # Clean up the temporary directory
         self.temp_dir.cleanup()
-    def create_temp_script(self, script_content):
-        # Helper function to create a temporary script file with the given content
-        fd, path = tempfile.mkstemp(dir=self.script_dir, suffix=".sh")
-        with os.fdopen(fd, "w") as f:
-            f.write("#!/bin/bash\n")
-            f.write(script_content)
-        os.chmod(path, 0o755)
-        return os.path.basename(path)
-    def test_case_1(self):
-        # Testing with a single script and delay of 1 second
-        script_name = self.create_temp_script("echo 'Test'")
-        scripts = [script_name]
-        delay = 1
-        start_times = task_func(self.script_dir, scripts, delay)
-        self.assertEqual(len(start_times), 1)
+        plt.close("all")
+    def _create_script(self, lines):
+        with open(self.script_path, "w") as file:
+            file.write("#!/bin/bash\n")
+            file.writelines(lines)
+        os.chmod(self.script_path, 0o755)
+    def _validate_y_tick_labels(self, ax, df):
+        plt.gcf().canvas.draw()  # In older versions, need to force matplotlib to render
+        y_tick_labels = [
+            float(label.get_text())
+            for label in ax.get_yticklabels()
+            if label.get_text()
+        ]
         self.assertTrue(
-            isinstance(datetime.strptime(start_times[0], "%Y-%m-%d %H:%M:%S"), datetime)
+            all(
+                y_tick_labels[i] <= y_tick_labels[i + 1]
+                for i in range(len(y_tick_labels) - 1)
+            ),
+            "Y-tick labels are not in increasing order",
         )
+        self.assertTrue(
+            min(y_tick_labels) <= df[df.columns[1]].min() <= max(y_tick_labels)
+            and min(y_tick_labels) <= df[df.columns[1]].max() <= max(y_tick_labels),
+            "Y-tick labels do not cover the range of the data",
+        )
+    def test_case_1(self):
+        # Test plot generation
+        self._create_script(self.valid_csv_content)
+        df, ax = task_func(self.script_path, self.output_path)
+        expected_labels = df.iloc[:, 0].tolist()
+        x_tick_labels = [tick.get_text() for tick in ax.get_xticklabels()]
+        # Expected return object type
+        self.assertIsInstance(ax, plt.Axes)
+        # Expected number of bars
+        self.assertEqual(len(ax.patches), df.shape[0])
+        # x-tick labels match the first column of the DataFrame
+        self.assertListEqual(x_tick_labels, expected_labels)
+        self._validate_y_tick_labels(ax, df)
     def test_case_2(self):
-        # Testing with multiple scripts and a longer delay
-        script_names = [
-            self.create_temp_script("echo 'Test'"),
-            self.create_temp_script("echo 'Test 2'"),
-        ]
-        delay = 2
-        start_times = task_func(self.script_dir, script_names, delay)
-        self.assertTrue(2 <= len(start_times) )
-        time_diff = datetime.strptime(
-            start_times[1], "%Y-%m-%d %H:%M:%S"
-        ) - datetime.strptime(start_times[0], "%Y-%m-%d %H:%M:%S")
-        self.assertTrue(2 <= time_diff.seconds<= 3)
+        # Test basic csv
+        expected_columns = ["Name", "Value"]
+        expected_data = {"Name": ["A", "B", "C"], "Value": [1, 2, 3]}
+        self._create_script(self.valid_csv_content)
+        df, ax = task_func(self.script_path, self.output_path)
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(df.shape, (3, 2))
+        self._validate_y_tick_labels(ax, df)
+        self.assertListEqual(df.columns.tolist(), expected_columns)
+        for column, expected_values in expected_data.items():
+            self.assertTrue(all(df[column] == expected_values))
     def test_case_3(self):
-        # Testing with an invalid script path
-        with self.assertRaises(FileNotFoundError):
-            task_func(self.script_dir, ["this-doesn't-exist"], 1)
+        # Test handling of script execution failure
+        self._create_script(["exit 1\n"])
+        with self.assertRaises(ValueError):
+            task_func(self.script_path, self.output_path)
     def test_case_4(self):
-        # Testing with no scripts (empty list)
-        with self.assertRaises(Exception):
-            task_func(self.script_dir, [], 1)
+        # Test handling of files with too many columns
+        content = [
+            f'echo "Name,Value,Extra" > {self.output_path}\n',
+            f'echo "A,1,Ignore" >> {self.output_path}\n',
+            f'echo "B,2,Ignore" >> {self.output_path}\n',
+        ]
+        self._create_script(content)
+        with self.assertRaises(ValueError):
+            task_func(self.script_path, self.output_path)
     def test_case_5(self):
-        # Testing with zero delay
-        script_names = [
-            self.create_temp_script("echo 'Test'"),
-            self.create_temp_script("echo 'Test 2'"),
+        # Test handling of files with too few columns
+        content = [
+            f'echo "Name" > {self.output_path}\n',
+            f'echo "A" >> {self.output_path}\n',
+            f'echo "B" >> {self.output_path}\n',
         ]
-        delay = 0
-        start_times = task_func(self.script_dir, script_names, delay)
-        self.assertEqual(len(start_times), 2)
+        self._create_script(content)
+        with self.assertRaises(ValueError):
+            task_func(self.script_path, self.output_path)
     def test_case_6(self):
-        # Test handling invalid delay
-        script_names = [
-            self.create_temp_script("echo 'Test'"),
-            self.create_temp_script("echo 'Test 2'"),
+        # Test handling of empty file
+        content = [f"> {self.output_path}\n"]
+        self._create_script(content)
+        with self.assertRaises(ValueError):
+            task_func(self.script_path, self.output_path)
+    def test_case_7(self):
+        # Test handling non-numeric values
+        content = [
+            f'echo "Name,Value" > {self.output_path}\n',
+            f'echo "A,NonNumeric" >> {self.output_path}\n',
+            f'echo "B,2" >> {self.output_path}\n',
         ]
-        with self.assertRaises(Exception):
-            task_func(self.script_dir, script_names, -1)
+        self._create_script(content)
+        with self.assertRaises(TypeError):
+            task_func(self.script_path, self.output_path)
+    def test_case_8(self):
+        # Test handling missing values
+        content = [
+            f'echo "Name,Value" > {self.output_path}\n',
+            f'echo "A," >> {self.output_path}\n',
+            f'echo "B,2" >> {self.output_path}\n',
+        ]
+        self._create_script(content)
+        df, _ = task_func(self.script_path, self.output_path)
+        self.assertTrue(df.isnull().values.any())
+        self.assertEqual(df.shape, (2, 2))
+    def test_case_9(self):
+        # Handle handling of non-exitent script
+        with self.assertRaises(ValueError):
+            task_func(
+                os.path.join(self.temp_dir.name, "invalid_script_nonexist.sh"),
+                self.output_path,
+            )

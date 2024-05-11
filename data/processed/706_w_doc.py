@@ -1,55 +1,90 @@
-import numpy as np
-from scipy import stats
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
 
-
-def task_func(df, column, alpha):
+def task_func(data, columns, target_column):
     """
-    Test the normality of a particular numeric column from a DataFrame with Shapiro-Wilk test, 
-    including an artificial step to explicitly use np.
-
+    Perform a logistic regression on a DataFrame to predict a specific target column.
+    
     Parameters:
-    - df (pd.DataFrame): The input DataFrame.
-    - column (str): The column name.
-    - alpha (float): The significance level.
+    - data (numpy.array): The input data as a NumPy array.
+    - columns (list): The list of column names.
+    - target_column (str): The target column name.
 
     Returns:
-    - bool: True if the column passes the normality test, False otherwise.
+    - accuracy (float): The accuracy of the logistic regression model.
 
     Requirements:
-    - numpy
-    - scipy.stats
+    - pandas
+    - sklearn
     
     Example:
-    >>> import pandas as pd
-    >>> np.random.seed(0)
-    >>> df = pd.DataFrame({'Value': np.random.normal(0, 1, 1000)})
-    >>> print(task_func(df, 'Value', 0.05))
-    True
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> data = np.random.randint(0, 100, size=(100, 4))  # Using np to generate random data
+    >>> columns = ['A', 'B', 'C', 'target']
+    >>> task_func(data, columns, 'target')
+    0.0
     """
-    mean_value = np.mean(df[column])
-    df[column] = df[column] - mean_value
-    if column not in df.columns:
-        raise ValueError('Column does not exist in DataFrame')
-    _, p = stats.shapiro(df[column])
-    return p > alpha
+    df = pd.DataFrame(data, columns=columns)
+    if target_column not in df.columns:
+        raise ValueError('Target column does not exist in DataFrame')
+    X = df.drop(columns=target_column)  # Operate directly on the DataFrame
+    y = df[target_column]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    model = LogisticRegression(max_iter=200)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    return accuracy
 
 import unittest
-import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        np.random.seed(0)
+    
     def test_case_1(self):
-        df = pd.DataFrame({'Value': np.random.normal(0, 1, 1000)})
-        self.assertTrue(task_func(df, 'Value', 0.05))
+        data = np.array([[1, 4, 0], [2, 5, 1], [3, 6, 0]])
+        columns = ['A', 'B', 'C']
+        self.assertEqual(task_func(data, columns, 'C'), 0.0)
     def test_case_2(self):
-        df = pd.DataFrame({'Value': np.random.uniform(0, 1, 1000)})
-        self.assertFalse(task_func(df, 'Value', 0.05))
+        data = np.array([[1, 2, 3, -10], [4, 5, 6, -10], [1, 1, 1, 0]])
+        columns = ['A', 'B', 'C', 'D']
+        self.assertEqual(task_func(data, columns, 'C'), 0.0)
     def test_case_3(self):
-        df = pd.DataFrame({'Value': np.random.exponential(1, 1000)})
-        self.assertFalse(task_func(df, 'Value', 0.05))
+        data = np.array([
+            [60, 45, 1],
+            [40, 55, 1],
+            [30, 71, 1],
+            [20, 82, 1],
+            [10, 95, 1],
+            [59, 40, 0],
+            [39, 60, 1],
+            [29, 70, 1],
+            [19, 80, 1],
+            [9,  89, 1]
+        ])
+        columns = ['A', 'B', 'C']
+        self.assertEqual(task_func(data, columns, 'C'), 1.0)
     def test_case_4(self):
-        df = pd.DataFrame({'Value': np.random.lognormal(0, 1, 1000)})
-        self.assertFalse(task_func(df, 'Value', 0.05))
+        data = np.array([
+            [-10, 2, 3, -10],
+            [-10, 5, 6, 10],
+            [-10, -2, -1, -10],
+            [-10, 1, 0, -10],
+            [-10, 8, 9, 10],
+            [-10, -5, -4, -10]
+        ])
+        columns = ['A', 'B', 'C', 'D']
+        self.assertEqual(task_func(data, columns, 'D'), 1.0)
     def test_case_5(self):
-        df = pd.DataFrame({'Value': np.random.chisquare(1, 1000)})
-        self.assertFalse(task_func(df, 'Value', 0.05))
+        data = np.array([
+            [-10, 2, 3, -10, 1],
+            [-10, 5, 6, 10, 1],
+            [-10, -2, -1, -10, 1],
+            [-10, 1, 0, -10, 1],
+            [-10, 8, 9, 10, 1],
+            [-10, -5, -4, -10, 1]
+        ])
+        columns = ['A', 'B', 'C', 'D', 'E']
+        self.assertEqual(task_func(data, columns, 'D'), 1.0)

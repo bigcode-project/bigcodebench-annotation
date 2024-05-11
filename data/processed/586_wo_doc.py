@@ -1,95 +1,85 @@
 import rsa
-import os
-import zipfile
+from cryptography.fernet import Fernet
 from base64 import b64encode
 
-def task_func(directory):
+def task_func(file_path):
     """
-    Generates RSA public and private keys, encrypts all files in the specified directory using the public key,
-    and saves the encrypted files into a zip file. It returns the public key and the name of the zip file.
+    Generates RSA public and private keys and uses Fernet symmetric encryption to encrypt the contents
+    of a specified file. The Fernet key is then encrypted with the public RSA key. The encrypted file
+    contents and the encrypted Fernet key are saved in separate files.
 
-    Note: This method directly encrypts file data with RSA, which is not recommended for large files or
-    production use. Typically, RSA is used to encrypt a symmetric key (like AES), which is then used to
-    encrypt the actual data.
+    This method demonstrates a hybrid encryption approach where symmetric encryption is used for the file
+    contents and asymmetric encryption for the encryption key.
 
     Parameters:
-    directory (str): The directory containing the files to be encrypted.
+    file_path (str): The path to the file to be encrypted.
 
     Returns:
-    rsa.PublicKey: The RSA public key.
-    str: The filename of the zip file containing the encrypted files.
+    PublicKey: The RSA public key.
+    str: The filename of the encrypted file.
+    str: The filename of the file containing the encrypted Fernet key.
 
     Requirements:
     - rsa
-    - os
-    - zipfile
+    - cryptography.fernet.Fernet
     - base64.b64encode
 
     Examples:
-    >>> pub_key, zipfile_name = task_func('./')
-    >>> isinstance(pub_key, rsa.PublicKey)
-    'True'
-    >>> isinstance(zipfile_name, str)
-    'True'
+    >>> pub_key, encrypted_file, encrypted_key_file = task_func('my_file.txt')
+    >>> len(pub_key.save_pkcs1()) > 100
+    True
+    >>> encrypted_file.endswith('.encrypted')
+    True
+    >>> encrypted_key_file.endswith('.encrypted')
+    True
     """
     (pub_key, priv_key) = rsa.newkeys(512)
-    zipfile_name = 'encrypted_files.zip'
-    with zipfile.ZipFile(zipfile_name, 'w') as zipf:
-        for filename in os.listdir(directory):
-            filepath = os.path.join(directory, filename)
-            if os.path.isfile(filepath):
-                with open(filepath, 'rb') as f:
-                    data = f.read()
-                    encrypted_data = rsa.encrypt(data, pub_key)
-                    zipf.writestr(filename, b64encode(encrypted_data).decode('utf-8'))
-    return pub_key, zipfile_name
+    fernet_key = Fernet.generate_key()
+    fernet = Fernet(fernet_key)
+    with open(file_path, 'rb') as f:
+        data = f.read()
+        encrypted_data = fernet.encrypt(data)
+    encrypted_file = file_path + '.encrypted'
+    with open(encrypted_file, 'wb') as f:
+        f.write(encrypted_data)
+    encrypted_fernet_key = rsa.encrypt(fernet_key, pub_key)
+    encrypted_key_file = 'fernet_key.encrypted'
+    with open(encrypted_key_file, 'wb') as f:
+        f.write(b64encode(encrypted_fernet_key))
+    return pub_key, encrypted_file, encrypted_key_file
 
-import rsa
-import os
-import zipfile
-from base64 import b64encode
 import unittest
-import tempfile
-import shutil
+from cryptography.fernet import Fernet
+import os
+import rsa
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Setup a temporary directory
-        self.test_dir = tempfile.mkdtemp()
-    def tearDown(self):
-        # Remove the directory after the test
-        shutil.rmtree(self.test_dir)
-        # Remove created zip file
-        if os.path.exists('encrypted_files.zip'):
-            os.remove('encrypted_files.zip')
-    def test_return_type(self):
-        # Creating test files
-        for i in range(2):
-            with open(os.path.join(self.test_dir, f"file{i}.txt"), 'w') as f:
-                f.write("Sample content")
-        pub_key, zipfile_name = task_func(self.test_dir)
+        # Setup a test file
+        self.test_file = 'test_file.txt'
+        with open(self.test_file, 'w') as f:
+            f.write("This is a test file.")
+    def test_file_encryption(self):
+        pub_key, encrypted_file, _ = task_func(self.test_file)
+        self.assertTrue(os.path.exists(encrypted_file))
+    def test_encrypted_key_file_creation(self):
+        pub_key, _, encrypted_key_file = task_func(self.test_file)
+        self.assertTrue(os.path.exists(encrypted_key_file))
+    def test_public_key_type(self):
+        pub_key, _, _ = task_func(self.test_file)
         self.assertIsInstance(pub_key, rsa.PublicKey)
-        self.assertIsInstance(zipfile_name, str)
-    def test_zipfile_creation(self):
-        # Creating test files
-        for i in range(2):
-            with open(os.path.join(self.test_dir, f"file{i}.txt"), 'w') as f:
-                f.write("Sample content")
-        _, zipfile_name = task_func(self.test_dir)
-        self.assertTrue(os.path.exists(zipfile_name))
-        with zipfile.ZipFile(zipfile_name, 'r') as zipf:
-            self.assertEqual(len(zipf.namelist()), 2)
-    def test_empty_directory(self):
-        # No files created in the setup for this test
-        _, zipfile_name = task_func(self.test_dir)
-        with zipfile.ZipFile(zipfile_name, 'r') as zipf:
-            self.assertEqual(len(zipf.namelist()), 0)
-    def test_file_encryption_contents(self):
-        # Creating a single test file
-        test_file_path = os.path.join(self.test_dir, "test_file.txt")
-        with open(test_file_path, 'w') as f:
-            f.write("Sample content")
-        pub_key, zipfile_name = task_func(self.test_dir)
-        with zipfile.ZipFile(zipfile_name, 'r') as zipf:
-            encrypted_content = zipf.read(os.path.basename(test_file_path))
-            # Read the content to ensure it is encrypted and not plain text
-            self.assertNotEqual(b64encode(b"Sample content").decode('utf-8'), encrypted_content)
+    def test_encrypted_file_size(self):
+        _, encrypted_file, _ = task_func(self.test_file)
+        original_size = os.path.getsize(self.test_file)
+        encrypted_size = os.path.getsize(encrypted_file)
+        self.assertTrue(encrypted_size > original_size)
+    def test_non_existent_file(self):
+        with self.assertRaises(FileNotFoundError):
+            task_func("non_existent_file.txt")
+    def tearDown(self):
+        # Clean up created files
+        os.remove(self.test_file)
+        encrypted_file = self.test_file + '.encrypted'
+        if os.path.exists(encrypted_file):
+            os.remove(encrypted_file)
+        if os.path.exists('fernet_key.encrypted'):
+            os.remove('fernet_key.encrypted')

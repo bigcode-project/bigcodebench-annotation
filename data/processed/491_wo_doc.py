@@ -1,100 +1,117 @@
-import xmltodict
-import json
+import random
+from datetime import datetime
+import matplotlib.pyplot as plt
 
-def task_func(s, file_path):
+def task_func(epoch_milliseconds, seed=None):
     """
-    Converts an XML string into a dictionary representation and saves it as a JSON file.
-    This is useful for easily accessing and persisting data stored in XML format.
+    Generate and draw a sales trend for different categories from a particular epoch milliseconds
+    to the current UTC time.
+
+    The function selects category from ['Electronics', 'Clothing', 'Home', 'Books', 'Sports'].
+    Each day's sales are randomly determined between 10 and 50 units for each category.
+    The plot's x-axis represents 'Days since (the start date)', and the y-axis represents 'Sales' units.
 
     Parameters:
-    s (str): The XML string to be converted.
-    file_path (str): The path where the JSON file will be saved.
+    - epoch_milliseconds (int): Start time. Must be positive and before current time.
+    - seed (int, optional): Seed for random number generation. Default is None (no seed).
 
     Returns:
-    dict: A dictionary representation of the XML string.
+    - sales_data (dict): Sales data for different categories over days.
+    - ax (plt.Axes): The plot depicting the sales trend.
 
+    Raises:
+    - ValueError: If the start time is negative or after the current time.
+    
     Requirements:
-    - xmltodict
-    - json
+    - random
+    - datetime.datetime
+    - matplotlib
 
-    Examples:
-    >>> result = task_func('<person><name>John</name><age>30</age></person>', "temp.json")
-    >>> result['person']['name'] + ', ' + result['person']['age']
-    'John, 30'
-    >>> result = task_func('<school><class><student>Emma</student></class></school>', "temp.json")
-    >>> result['school']['class']['student']
-    'Emma'
+    Example:
+    >>> random.seed(42)
+    >>> sales_data, ax = task_func(1236472051807, seed=42)
+    >>> type(sales_data)
+    <class 'dict'>
+    >>> list(sales_data['Electronics'])[:3]
+    [50, 24, 47]
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    my_dict = xmltodict.parse(s)
-    with open(file_path, 'w') as json_file:
-        json.dump(my_dict, json_file, indent=4)
-    return my_dict
+    CATEGORIES = ["Electronics", "Clothing", "Home", "Books", "Sports"]
+    if seed is not None:
+        random.seed(seed)
+    if epoch_milliseconds < 0:
+        raise ValueError("Start time cannot be negative.")
+    start_time = datetime.utcfromtimestamp(epoch_milliseconds / 1000.0)
+    current_time = datetime.utcnow()
+    days_diff = (current_time - start_time).days
+    if days_diff <= 0:
+        raise ValueError("Start date must be before current time.")
+    sales_data = {category: [0] * days_diff for category in CATEGORIES}
+    for i in range(days_diff):
+        for category in CATEGORIES:
+            sales = random.randint(10, 50)
+            sales_data[category][i] += sales
+    fig, ax = plt.subplots()
+    for category, sales in sales_data.items():
+        ax.plot(range(days_diff), sales, label=category)
+    ax.set_xlabel("Days since " + start_time.strftime("%Y-%m-%d %H:%M:%S"))
+    ax.set_ylabel("Sales")
+    ax.legend()
+    return sales_data, ax
 
 import unittest
-import json
-import os
-import tempfile
+import matplotlib.pyplot as plt
+from datetime import datetime
+from datetime import timedelta
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Create a temporary directory to use during tests
-        self.test_dir = tempfile.mkdtemp()
+    def _check_sales_data(self, sales_data, expected_days):
+        """Utility function to validate sales data."""
+        self.assertIsInstance(sales_data, dict)
+        self.assertEqual(
+            set(sales_data.keys()),
+            set(["Electronics", "Clothing", "Home", "Books", "Sports"]),
+        )
+        for category, sales in sales_data.items():
+            self.assertEqual(len(sales), expected_days)
+            for sale in sales:
+                self.assertGreaterEqual(sale, 10)
+                self.assertLessEqual(sale, 50)
+    def test_case_1(self):
+        # Basic test on manual example - Jan 1 2021
+        sales_data, ax = task_func(1609459200000, seed=1)
+        self.assertIsInstance(sales_data, dict)
+        self.assertIsInstance(ax, plt.Axes)
+        self._check_sales_data(
+            sales_data,
+            (datetime.now() - datetime.utcfromtimestamp(1609459200000 / 1000.0)).days,
+        )
+        self.assertEqual(ax.get_ylabel(), "Sales")
+    def test_case_2(self):
+        # Basic test on current date - should raise error
+        current_epoch = int(datetime.now().timestamp() * 1000)
+        with self.assertRaises(ValueError):
+            task_func(current_epoch, seed=2)
+    def test_case_3(self):
+        # Test random seed
+        t = 1609459200000
+        sales_data1, _ = task_func(t, seed=42)
+        sales_data2, _ = task_func(t, seed=42)
+        sales_data3, _ = task_func(t, seed=3)
+        self.assertEqual(sales_data1, sales_data2)
+        self.assertNotEqual(sales_data1, sales_data3)
+    def test_case_4(self):
+        # Test that future date raises ValueError
+        future_epoch = int((datetime.now() + timedelta(days=1)).timestamp() * 1000)
+        with self.assertRaises(ValueError):
+            task_func(future_epoch, seed=4)
+    def test_case_5(self):
+        # Test that negative epoch milliseconds raise an error
+        with self.assertRaises(ValueError):
+            task_func(-1609459200000, seed=5)
+    def test_case_6(self):
+        # Test that non-integer types for epoch milliseconds raise a TypeError
+        with self.assertRaises(TypeError):
+            task_func("1609459200000", seed=6)
     def tearDown(self):
-        # Remove files created in the temporary directory after each test
-        for filename in os.listdir(self.test_dir):
-            os.remove(os.path.join(self.test_dir, filename))
-        os.rmdir(self.test_dir)
-    def read_json(self, file_path):
-        """ Helper function to read a JSON file and return its content. """
-        with open(file_path, 'r') as file:
-            return json.load(file)
-    
-    def test_simple_xml(self):
-        xml_str = '<person><name>John</name><age>30</age></person>'
-        file_path = os.path.join(self.test_dir, 'test_simple.json')
-        result = task_func(xml_str, file_path)
-        self.assertEqual(result['person']['name'], 'John')
-        self.assertEqual(result['person']['age'], '30')
-    def test_nested_xml(self):
-        xml_str = '<school><class><student>Emma</student></class></school>'
-        file_path = os.path.join(self.test_dir, 'test_nested.json')
-        result = task_func(xml_str, file_path)
-        self.assertEqual(result['school']['class']['student'], 'Emma')
-    def test_empty_xml(self):
-        xml_str = '<empty></empty>'
-        file_path = os.path.join(self.test_dir, 'test_empty.json')
-        result = task_func(xml_str, file_path)
-        self.assertEqual(result.get('empty', None), None)
-    def test_attribute_xml(self):
-        xml_str = '<book id="123">Python Guide</book>'
-        file_path = os.path.join(self.test_dir, 'test_attribute.json')
-        result = task_func(xml_str, file_path)
-        self.assertEqual(result['book']['@id'], '123')
-        self.assertEqual(result['book']['#text'], 'Python Guide')
-    def test_complex_xml(self):
-        xml_str = '<family><person name="John"><age>30</age></person><person name="Jane"><age>28</age></person></family>'
-        file_path = os.path.join(self.test_dir, 'test_complex.json')
-        result = task_func(xml_str, file_path)
-        self.assertEqual(result['family']['person'][0]['@name'], 'John')
-        self.assertEqual(result['family']['person'][0]['age'], '30')
-        self.assertEqual(result['family']['person'][1]['@name'], 'Jane')
-        self.assertEqual(result['family']['person'][1]['age'], '28')
-    def test_file_creation_and_content(self):
-        xml_str = '<person><name>John</name><age>30</age></person>'
-        file_path = os.path.join(self.test_dir, 'test_output.json')
-        expected_dict = {'person': {'name': 'John', 'age': '30'}}
-        
-        result = task_func(xml_str, file_path)
-        
-        self.assertTrue(os.path.exists(file_path), "JSON file was not created.")
-        
-        with open(file_path, 'r') as file:
-            data = json.load(file)
-            self.assertEqual(data, expected_dict, "JSON file content does not match expected dictionary.")
-        
-        self.assertEqual(result, expected_dict, "Return value does not match expected dictionary.")
-    def test_invalid_xml(self):
-        xml_str = '<unclosed<tag>'
-        file_path = os.path.join(self.test_dir, 'test_invalid.json')
-        with self.assertRaises(Exception):
-            task_func(xml_str, file_path)
-        self.assertFalse(os.path.exists(file_path), "JSON file should not be created for invalid XML.")
+        plt.close("all")

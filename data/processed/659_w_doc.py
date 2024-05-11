@@ -1,77 +1,71 @@
-import re
-import nltk
-import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer
-
-# Make sure to download NLTK stopwords
-nltk.download('stopwords')
-
-# Define a regex pattern for matching all non-alphanumeric characters
-ALPHANUMERIC = re.compile('[\W_]+')
-
-# Load NLTK's list of English stop words
-STOPWORDS = nltk.corpus.stopwords.words('english')
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.stats as stats
 
 
-def task_func(texts):
+def task_func(x, y, labels):
     """
-    Creates a document-term matrix (DTM) from a list of text documents using CountVectorizer from Scikit-learn.
-    Texts are preprocessed by removing non-alphanumeric characters (excluding spaces),
-    converting to lowercase, and excluding English stop words defined in NLTK.
+    Draw normal distributions for multiple 'x' and 'y' arrays with labels.
+    Each pair (x, y) represents a different chemical compound in the 'labels' list.
 
     Parameters:
-    - texts (list of str): The list of text documents to convert into a DTM.
+    x (list): List of numpy arrays representing the x-values of the data points.
+    y (list): List of numpy arrays representing the y-values of the data points.
+    labels (list): List of strings representing the labels for the chemical compounds.
 
     Returns:
-    - pd.DataFrame: A DataFrame where rows represent documents and columns represent unique terms;
-                    cell values indicate the frequency of a term in a document.
+    fig: Matplotlib figure object.
 
     Requirements:
-    - re
-    - nltk
-    - pandas
-    - sklearn.feature_extraction.text
+    - numpy
+    - matplotlib.pyplot
+    - scipy.stats
 
     Example:
-    >>> texts = ["Hello, world!", "Machine learning is great.", "Python is my favorite programming language."]
-    >>> dtm = task_func(texts)
+    >>> x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
+    >>> y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
+    >>> labels = ['H₂O', 'O₂', 'CO₂']
+    >>> fig = task_func(x, y, labels)
     """
-    cleaned_texts = [ALPHANUMERIC.sub(' ', text).lower() for text in texts]
-    tokenized_texts = [' '.join(word for word in text.split() if word not in STOPWORDS) for text in cleaned_texts]
-    vectorizer = CountVectorizer()
-    dtm = vectorizer.fit_transform(tokenized_texts)
-    dtm_df = pd.DataFrame(dtm.toarray(), columns= vectorizer.get_feature_names_out() if hasattr(vectorizer,
-                                                                  'get_feature_names_out') else vectorizer.get_feature_names())
-    return dtm_df
+    fig, ax = plt.subplots()
+    for i in range(len(x)):
+        mu = np.mean(y[i])
+        sigma = np.std(y[i])
+        pdf = stats.norm.pdf(x[i], mu, sigma)
+        ax.plot(x[i], pdf, label=labels[i])
+    ax.legend()
+    return fig
 
 import unittest
+import matplotlib
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.texts = [
-            "Hello, world!",
-            "Data science is about the extraction of knowledge from data.",
-            "Machine learning is a fascinating field.",
-            "Python is a versatile programming language.",
-            "Stop words are filtered out in text preprocessing."
-        ]
-    def test_dtm_shape(self):
-        """Ensure the DTM has the correct shape."""
-        dtm = task_func(self.texts)
-        self.assertEqual(dtm.shape[0], len(self.texts), "DTM should have one row per document.")
-    def test_dtm_non_negative(self):
-        """Ensure all values in the DTM are non-negative."""
-        dtm = task_func(self.texts)
-        self.assertTrue((dtm >= 0).all().all(), "All DTM values should be non-negative.")
-    def test_stopwords_removal(self):
-        """Check if common stopwords are removed."""
-        dtm = task_func(["This is a test.", "Another test here."])
-        self.assertNotIn("is", dtm.columns, "Stopwords should be removed from DTM columns.")
-    def test_alphanumeric_filtering(self):
-        """Verify that non-alphanumeric characters are filtered out."""
-        dtm = task_func(["Example: test!", "#Another$% test."])
-        self.assertFalse(any(char in dtm.columns for char in ":!#$%"), "Non-alphanumeric characters should be filtered out.")
-    def test_lowercase_conversion(self):
-        """Test if all text is converted to lowercase."""
-        dtm = task_func(["LoWeR and UPPER"])
-        self.assertIn("lower", dtm.columns, "All text should be converted to lowercase.")
-        self.assertIn("upper", dtm.columns, "All text should be converted to lowercase.")
+    def test_case_1(self):
+        x = [np.array([1,2,3]), np.array([4,5,6]), np.array([7,8,9])]
+        y = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
+        labels = ['H₂O', 'O₂', 'CO₂']
+        fig = task_func(x, y, labels)
+        self.assertIsInstance(fig, matplotlib.figure.Figure)
+    def test_case_2(self):
+        x = [np.array([1,3,5]), np.array([2,4,6])]
+        y = [np.array([2,4,6]), np.array([1,3,5])]
+        labels = ['N₂', 'Ar']
+        fig = task_func(x, y, labels)
+        self.assertIsInstance(fig, matplotlib.figure.Figure)
+    def test_case_3(self):
+        x = [np.array([10,20,30])]
+        y = [np.array([15,25,35])]
+        labels = ['H₂O']
+        fig = task_func(x, y, labels)
+        self.assertIsInstance(fig, matplotlib.figure.Figure)
+    def test_case_4(self):
+        x = [np.array([5,15,25]), np.array([10,20,30]), np.array([15,25,35])]
+        y = [np.array([10,20,30]), np.array([15,25,35]), np.array([5,15,25])]
+        labels = ['H₂O', 'O₂', 'CO₂']
+        fig = task_func(x, y, labels)
+        self.assertIsInstance(fig, matplotlib.figure.Figure)
+    def test_case_5(self):
+        x = [np.array([2,4,8]), np.array([1,3,7])]
+        y = [np.array([1,3,7]), np.array([2,4,8])]
+        labels = ['N₂', 'Ar']
+        fig = task_func(x, y, labels)
+        self.assertIsInstance(fig, matplotlib.figure.Figure)

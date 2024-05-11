@@ -1,78 +1,84 @@
+import pandas as pd
 import os
-import time
 OUTPUT_DIR = './output'
 
 
-def task_func(dataset, filename, output_dir=OUTPUT_DIR):
+def task_func(df, filename, output_dir=OUTPUT_DIR):
     """
-    Writes multiple Pandas DataFrames to a single CSV file, separating each DataFrame by a line of hyphens ("------").
-
+    Save a Pandas DataFrame to a JSON file in a specified directory.
+    
     Parameters:
-    - dataset (list of pd.DataFrame): A list containing the DataFrames to be written to the file.
-    - filename (str): The name of the file (excluding the path) where the DataFrames will be written.
+    - df (DataFrame): A Pandas DataFrame to be saved.
+    - filename (str): The filename of the JSON file where the DataFrame will be saved.
     - output_dir (str, optional): the ouput directory.
-
+    
     Returns:
-    None: The function writes the DataFrames to a CSV file but does not return any value.
-
+    str: The full file path where the DataFrame is saved.
+    
     Requirements:
     - os
-    - time
+    - pandas
+
+    Note:
+    - The function manipulates a Pandas DataFrame and saves it as a JSON file.
 
     Example:
-    >>> import pandas as pd
-    >>> df1 = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
-    >>> df2 = pd.DataFrame({"D": [5, 6], "E": [7, 8]})
-    >>> task_func([df1, df2], 'sample.csv')
+    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    >>> 'data.json' in task_func(df, 'data.json')
+    True
     """
-    start_time = time.time()
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    filepath = os.path.join(output_dir, filename)
-    with open(filepath, 'w', newline='') as f:
-        for i, df in enumerate(dataset):
-            if i > 0:
-                f.write('------\n')
-            df.to_csv(f, index=False, header=True, mode='a')
-            if i < len(dataset) - 1:
-                f.write('\n')
-    end_time = time.time()  # End timing
-    cost = f"Operation completed in {end_time - start_time} seconds."
+    file_path = os.path.join(output_dir, filename)
+    df_clean = df.where(pd.notnull(df), None)
+    with open(file_path, 'w') as f:
+        df_clean.to_json(f, orient='records')
+    return file_path
 
 import unittest
+import json
 import shutil
-import pandas as pd
 class TestCases(unittest.TestCase):
     def setUp(self):
-        """Ensure the data directory exists before any tests are run."""
+        """Set up testing environment; ensure data directory exists."""
         if not os.path.exists(OUTPUT_DIR):
             os.makedirs(OUTPUT_DIR)
     def tearDown(self):
-        """Clean up by removing the data directory and its contents after all tests."""
+        """Clean up; remove the data directory and its contents after tests."""
         shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
-    def test_single_dataframe(self):
-        """Test with a single DataFrame."""
-        df = pd.DataFrame({"Column1": [1, 2], "Column2": [3, 4]})
-        task_func([df], 'single_dataframe.csv')
-        self.assertTrue(os.path.exists(os.path.join(OUTPUT_DIR, 'single_dataframe.csv')))
-    def test_multiple_dataframes(self):
-        """Test with multiple DataFrames."""
-        df1 = pd.DataFrame({"A": [5, 6], "B": [7, 8]})
-        df2 = pd.DataFrame({"C": [9, 10], "D": [11, 12]})
-        task_func([df1, df2], 'multiple_dataframes.csv')
-        self.assertTrue(os.path.exists(os.path.join(OUTPUT_DIR, 'multiple_dataframes.csv')))
+    def test_basic_dataframe(self):
+        """Test saving a simple DataFrame."""
+        df = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
+        filepath = task_func(df, 'basic.json')
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+        self.assertEqual(data, [{"A": 1, "B": 3}, {"A": 2, "B": 4}])
+    def test_nan_values(self):
+        """Test DataFrame with NaN values."""
+        df = pd.DataFrame({'A': [1, None], 'B': [None, 4]})
+        filepath = task_func(df, 'nan_values.json')
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+        self.assertEqual(data, [{"A": 1, "B": None}, {"A": None, "B": 4}])
+    def test_integer_conversion(self):
+        """Test converting float to int where applicable."""
+        df = pd.DataFrame({'A': [1.0, 2.5], 'B': [3.0, 4.5]})
+        filepath = task_func(df, 'int_conversion.json')
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+        self.assertEqual(data, [{"A": 1, "B": 3.0}, {"A": 2.5, "B": 4.5}])
     def test_empty_dataframe(self):
         """Test with an empty DataFrame."""
         df = pd.DataFrame()
-        task_func([df], 'empty_dataframe.csv')
-        self.assertTrue(os.path.exists(os.path.join(OUTPUT_DIR, 'empty_dataframe.csv')))
-    def test_varying_row_counts(self):
-        """Test with DataFrames having varying numbers of rows."""
-        df1 = pd.DataFrame({"E": [13], "F": [14]})
-        df2 = pd.DataFrame({"G": [15, 16, 17], "H": [18, 19, 20]})
-        task_func([df1, df2], 'varying_row_counts.csv')
-        self.assertTrue(os.path.exists(os.path.join(OUTPUT_DIR, 'varying_row_counts.csv')))
-    def test_no_dataframes(self):
-        """Test with no DataFrames provided."""
-        task_func([], 'no_dataframes.csv')
-        self.assertTrue(os.path.exists(os.path.join(OUTPUT_DIR, 'no_dataframes.csv')))
+        filepath = task_func(df, 'empty.json')
+        self.assertTrue(os.path.isfile(filepath))
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+        self.assertEqual(data, [])
+    def test_all_nan_dataframe(self):
+        """Test DataFrame with all NaN values."""
+        df = pd.DataFrame({'A': [None, None], 'B': [None, None]})
+        filepath = task_func(df, 'all_nan.json')
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+        self.assertEqual(data, [{"A": None, "B": None}, {"A": None, "B": None}])

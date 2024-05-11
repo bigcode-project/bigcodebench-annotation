@@ -1,85 +1,53 @@
 from datetime import datetime
-import os
-from pathlib import Path
+import pytz
 
 # Constants
 DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
-def task_func(file_path):
+
+def task_func(unix_timestamp, target_timezone):
     """
-    Determine the creation time of a file and convert it to a formatted string '% Y-% m-% d% H:% M:% S'.
-    
+    Converts a Unix timestamp to a formatted date and time string in a specified timezone.
+
     Parameters:
-    file_path (str): The path to the file.
-    
+    unix_timestamp (int): The Unix timestamp representing the number of seconds since the Unix Epoch (January 1, 1970, 00:00:00 UTC).
+    target_timezone (str): The string identifier of the target timezone (e.g., 'America/New_York').
+
     Returns:
-    str: The creation time of the file in the format '%Y-%m-%d %H:%M:%S'.
-    
+    str: A string representing the date and time in the target timezone, formatted as '%Y-%m-%d %H:%M:%S'.
+
     Requirements:
     - datetime.datetime
-    - os
-    - pathlib.Path
-    
+    - pytz
+
     Example:
-    
-    Example:
-    >>> task_func('/path/to/file.txt')
-    '2023-09-28 12:30:45'
+    >>> unix_timestamp = 1609459200
+    >>> target_timezone = 'America/New_York'
+    >>> task_func(unix_timestamp, target_timezone)
+    '2020-12-31 19:00:00'
     """
-    if not Path(file_path).exists():
-        raise FileNotFoundError(f"No such file or directory: '{file_path}'")
-    creation_time = os.path.getctime(file_path)
-    formatted_time = datetime.fromtimestamp(creation_time).strftime(DATE_FORMAT)
-    return formatted_time
+    datetime_utc = datetime.utcfromtimestamp(unix_timestamp).replace(tzinfo=pytz.utc)
+    datetime_in_target_timezone = datetime_utc.astimezone(pytz.timezone(target_timezone))
+    formatted_datetime = datetime_in_target_timezone.strftime(DATE_FORMAT)
+    return formatted_datetime
 
 import unittest
-from datetime import datetime
-import os
-from pathlib import Path
-import shutil
-def create_dummy_file(filename):
-    """Creates a dummy file and returns its creation time."""
-    with open(filename, 'w') as f:
-        f.write("This is a dummy file.")
-    return os.path.getctime(filename)
 class TestCases(unittest.TestCase):
-    
-    def setUp(self):
-        """Setup function to create dummy files for testing."""
-        self.file1 = "dummy_f954_1.txt"
-        self.file2 = "dummy_f954_2.txt"
-        self.file3 = "dummy_f954_3.txt"
-        self.creation_time1 = create_dummy_file(self.file1)
-        self.creation_time2 = create_dummy_file(self.file2)
-        self.creation_time3 = create_dummy_file(self.file3)
-        self.test_dir = 'testdir_task_func/'
-        os.makedirs(self.test_dir, exist_ok=True)
-    
-    def tearDown(self):
-        """Cleanup function to remove dummy files after testing."""
-        os.remove(self.file1)
-        os.remove(self.file2)
-        os.remove(self.file3)
-        shutil.rmtree(self.test_dir)
     def test_case_1(self):
-        expected_output = datetime.fromtimestamp(self.creation_time1).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(task_func(self.file1), expected_output)
-        
+        result = task_func(1347517370, 'America/New_York')
+        self.assertEqual(result, "2012-09-13 02:22:50")
     def test_case_2(self):
-        expected_output = datetime.fromtimestamp(self.creation_time2).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(task_func(self.file2), expected_output)
-        
+        result = task_func(0, 'UTC')
+        self.assertEqual(result, "1970-01-01 00:00:00")
     def test_case_3(self):
-        expected_output = datetime.fromtimestamp(self.creation_time3).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(task_func(self.file3), expected_output)
-        
+        result = task_func(1609459200, 'Asia/Tokyo')
+        self.assertEqual(result, "2021-01-01 09:00:00")
     def test_case_4(self):
-        # Test for non-existing file
-        with self.assertRaises(FileNotFoundError):
-            task_func("non_existing_file.txt")
-    
+        result = task_func(0, 'Asia/Kolkata')
+        self.assertEqual(result, "1970-01-01 05:30:00")
     def test_case_5(self):
-        # Test for a directory
-        dir_creation_time = os.path.getctime(self.test_dir)
-        expected_output = datetime.fromtimestamp(dir_creation_time).strftime('%Y-%m-%d %H:%M:%S')
-        self.assertEqual(task_func(self.test_dir), expected_output)
+        result = task_func(1672531199, 'Australia/Sydney')
+        self.assertEqual(result, "2023-01-01 10:59:59")
+    def test_case_6(self):
+        result = task_func(1609459200, 'America/New_York')
+        self.assertEqual(result, "2020-12-31 19:00:00")

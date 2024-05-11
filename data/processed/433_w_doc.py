@@ -1,88 +1,67 @@
-import seaborn as sns
-from scipy.stats import chi2_contingency
+import base64
+import hashlib
+import hmac
+import binascii
 
-
-def task_func(df1, df2, column1="feature1", column2="feature2"):
+def task_func(s, signature, secret_key):
     """
-    Merge two dataframes based on the 'id' column, perform a chi-square independence test on the merged dataframe,
-    and draw a heatmap of the contingency table created from the features in column1, column2.
+    Validates the HMAC SHA-1 signature of a base64-encoded message against a provided signature using a specified secret key.
+    This function first decodes the base64-encoded message, then computes its HMAC SHA-1 hash using the provided secret key,
+    and finally compares this computed hash with the provided signature.
 
     Parameters:
-    - df1 (DataFrame): Left dataframe to merge. Must contain columns 'id' and one matching column1.
-    - df2 (DataFrame): Right dataframe to merge from. Must contain columns 'id' and one matching column2.
-    - column1   (str): Name of column containing features in df1. Defaults to 'feature1'.
-    - column2   (str): Name of column containing features in df2. Defaults to 'feature2'.
+    s (str): The base64-encoded message to validate.
+    signature (str): The HMAC SHA-1 signature to compare against.
+    secret_key (str): The secret key used to compute the HMAC SHA-1 hash.
 
     Returns:
-    tuple: A tuple containing:
-        - p (float): The p-value of the Chi-Squared test.
-        - heatmap (matplotlib.pyplot.Axes): Seaborn heatmap of the contingency table.
+    bool: Returns True if the provided signature matches the computed signature, False otherwise.
 
     Requirements:
-    - seaborn
-    - scipy.stats.chi2_contingency
+    - base64
+    - hashlib
+    - hmac
+    - binascii
 
-    Example:
-    >>> import pandas as pd
-    >>> df1 = pd.DataFrame({'id': [1, 2, 3], 'feature1': ['A', 'B', 'A']})
-    >>> df2 = pd.DataFrame({'id': [1, 2, 3], 'feature2': ['X', 'Y', 'X']})
-    >>> p_value, heatmap = task_func(df1, df2)
-    >>> p_value
-    0.6650055421020291
-    >>> heatmap
-    <Axes: xlabel='feature2', ylabel='feature1'>
+    Examples:
+    >>> task_func('SGVsbG8gV29ybGQ=', 'c47c23299efca3c220f4c19a5f2e4ced14729322', 'my_secret_key')
+    True
+
+    >>> task_func('SGVsbG8gV29ybGQ=', 'incorrect_signature', 'my_secret_key')
+    False
     """
-    df = pd.merge(df1, df2, on="id")
-    contingency_table = pd.crosstab(df[column1], df[column2])
-    heatmap = sns.heatmap(contingency_table)
-    chi2, p, dof, expected = chi2_contingency(contingency_table)
-    return p, heatmap
+    decoded_msg = base64.b64decode(s).decode()
+    computed_signature = hmac.new(secret_key.encode(), decoded_msg.encode(), hashlib.sha1)
+    return binascii.hexlify(computed_signature.digest()).decode() == signature
 
 import unittest
-import pandas as pd
-import matplotlib.pyplot as plt
+import binascii
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Testing basic functionality with simple data
-        df1 = pd.DataFrame({"id": [1, 2, 3], "feature1": ["A", "B", "A"]})
-        df2 = pd.DataFrame({"id": [1, 2, 3], "feature2": ["X", "Y", "X"]})
-        p_value, heatmap = task_func(df1, df2)
-        # P-value should be between 0 and 1 inclusive
-        self.assertTrue(0.0 <= p_value <= 1.0)
-        self.assertEqual(len(heatmap.get_yticklabels()), 2)  # A and B
-        self.assertEqual(len(heatmap.get_xticklabels()), 2)  # X and Y
-    def test_case_2(self):
-        # Testing with distinct feature values across both dataframes
-        df1 = pd.DataFrame({"id": [1, 2, 3], "feature1": ["C", "D", "C"]})
-        df2 = pd.DataFrame({"id": [1, 2, 3], "feature2": ["W", "W", "Z"]})
-        p_value, heatmap = task_func(df1, df2)
-        self.assertTrue(0.0 <= p_value <= 1.0)
-        self.assertEqual(len(heatmap.get_yticklabels()), 2)  # C and D
-        self.assertEqual(len(heatmap.get_xticklabels()), 2)  # W and Z
-    def test_case_3(self):
-        # Test custom feature column names
-        df1 = pd.DataFrame({"id": [1, 2, 3], "foo": ["A", "B", "A"]})
-        df2 = pd.DataFrame({"id": [1, 2, 3], "bar": ["X", "Y", "X"]})
-        p_value, heatmap = task_func(df1, df2, column1="foo", column2="bar")
-        self.assertTrue(0.0 <= p_value <= 1.0)
-        self.assertEqual(len(heatmap.get_yticklabels()), 2)
-        self.assertEqual(len(heatmap.get_xticklabels()), 2)
-    def test_case_4(self):
-        # Testing a scenario where the p-value is expected to be close to 0
-        # This is because there's a strong association between feature1 and feature2
-        df1 = pd.DataFrame(
-            {"id": list(range(1, 21)), "feature1": ["A"] * 10 + ["B"] * 10}
-        )
-        df2 = pd.DataFrame(
-            {"id": list(range(1, 21)), "feature2": ["X"] * 10 + ["Y"] * 10}
-        )
-        p_value, _ = task_func(df1, df2)
-        self.assertTrue(0.0 <= p_value < 0.01)  # Expected p-value to be close to 0
-    def test_case_5(self):
-        # Test error handling - should fail when there is no 'id' column
-        df1 = pd.DataFrame({"foo": [1, 2], "bar": [3, 4]})
-        df2 = pd.DataFrame({"foo": [1, 2], "bar": [3, 4]})
-        with self.assertRaises(KeyError):
-            task_func(df1, df2)
-    def tearDown(self):
-        plt.close("all")
+    def test_valid_signature(self):
+        # Test that a correctly signed message returns True
+        self.assertTrue(task_func('SGVsbG8gV29ybGQ=', 'c47c23299efca3c220f4c19a5f2e4ced14729322', 'my_secret_key'))
+    def test_invalid_signature(self):
+        # Test that an incorrectly signed message returns False
+        self.assertFalse(task_func('SGVsbG8gV29ybGQ=', 'incorrect_signature', 'my_secret_key'))
+    def test_empty_message(self):
+        # Test that an empty message with its correct signature verifies successfully
+        self.assertTrue(task_func('', '4b4f493acb45332879e4812a98473fc98209fee6', 'my_secret_key'))
+    def test_empty_signature(self):
+        # Test that a non-empty message with an empty signature returns False
+        self.assertFalse(task_func('SGVsbG8gV29ybGQ=', '', 'my_secret_key'))
+    def test_invalid_base64(self):
+        # Test that invalid base64 input raises a binascii.Error
+        with self.assertRaises(binascii.Error):
+            task_func('Invalid base64', '2ef7bde608ce5404e97d5f042f95f89f1c232871', 'my_secret_key')
+    def test_non_ascii_characters(self):
+        # Test handling of base64-encoded non-ASCII characters
+        self.assertTrue(task_func('SGVsbG8sIOS4lueVjA==', '960b22b65fba025f6a7e75fb18be1acfb5babe90', 'my_secret_key'))
+    def test_long_message(self):
+        # Test with a longer base64-encoded message to ensure robust handling
+        long_message = "A"*100
+        # Expected signature will vary; this is a placeholder for the correct HMAC SHA-1 hash
+        expected_signature = 'b609cc34db26376fadbcb71ae371427cb4e2426d'
+        self.assertTrue(task_func(long_message, expected_signature, 'my_secret_key'))
+    def test_signature_case_sensitivity(self):
+        # Verify that signature comparison is case-sensitive
+        self.assertFalse(task_func('SGVsbG8gV29ybGQ=', 'c47c23299efca3c220f4c19a5f2e4ced14729322'.upper(), 'my_secret_key'))

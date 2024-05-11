@@ -15,7 +15,7 @@ def f_238(mu=0, sigma=1, sample_size=1000, seed=0):
     - sample_size (int): The size of the sample to generate. Default is 1000.
 
     Returns:
-    - ax (matplotlib.axes._subplots.AxesSubplot): Axes object with the plotted histogram and normal PDF.
+    - ax (matplotlib.axes._subplots.AxesSubplot): Axes object with the plotted histogram and normal PDF, with the title format of 'Normal Distribution with $\\mu = %0.2f, \\sigma = %0.2f$'.
     - float: The empirical mean of the sample.
     - float: The empirical standard deviation of the sample.
 

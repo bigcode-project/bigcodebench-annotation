@@ -1,91 +1,116 @@
+import zipfile
 import os
-import glob
-import csv
+import re
+import shutil
 
-def task_func(directory_path, file_extension='.csv'):
+def task_func(source_dir: str, target_dir: str, archive_name: str = 'archive.zip') -> str:
     """
-    Reads all files with a specified extension in a given directory and returns their data in a dictionary.
-    - Reads all files with the specified extension in the given directory.
-    - Uses the filename without the extension as a key in the output dictionary.
-    - The value for each key is a list of rows from the file, where each row is represented as a list of values.
+    Archives all processed files from a source directory to a target directory.
+    The function identifies processed files by the '_processed' suffix in the filename.
 
     Parameters:
-    - directory_path (str): The path to the directory containing the files.
-    - file_extension (str, optional): The file extension to look for. Default is '.csv'.
+        source_dir (str): The directory containing the files to be archived.
+        target_dir (str): The directory where the archive will be saved.
+        archive_name (str): The name of the archive file. Default is 'archive.zip'.
 
     Returns:
-    - Returns a dictionary where each key is the filename (without extension) and the value is a list of rows from the file.
+        str: The path to the created archive.
 
     Requirements:
     - os
-    - glob
-    - csv
+    - re
+    - shutil
+    - zipfile
 
     Example:
-    >>> data = task_func('/home/user/data')
-    >>> print(data['file1'])
-    [['header1', 'header2'], ['row1_col1', 'row1_col2'], ['row2_col1', 'row2_col2']]
-    
-    >>> data = task_func('/home/user/data', '.txt')
-    >>> print(data)
-    {}
+    >>> task_func('./data/', './data_processed/')
+    './data_processed/archive.zip'
+    >>> task_func('./data/', './data_processed/', 'my_archive.zip')
+    './data_processed/my_archive.zip'
     """
-    data = {}
-    for file in glob.glob(os.path.join(directory_path, '*' + file_extension)):
-        filename = os.path.splitext(os.path.basename(file))[0]
-        with open(file, 'r') as f:
-            reader = csv.reader(f)
-            data[filename] = list(reader)
-    return data
+    os.makedirs(source_dir, exist_ok=True)
+    os.makedirs(target_dir, exist_ok=True)
+    archive_path = os.path.join(target_dir, archive_name)
+    with zipfile.ZipFile(archive_path, 'w') as archive:
+        for file in os.listdir(source_dir):
+            if re.search(r'_processed$', os.path.splitext(file)[0]):
+                archive.write(os.path.join(source_dir, file), arcname=file)
+                shutil.move(os.path.join(source_dir, file), target_dir)
+    return archive_path
 
 import unittest
-import shutil
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # create a directory with test files
-        os.mkdir('test_1')
-        with open('test_1/file1.csv', 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerows([['header1', 'header2'], ['row1_col1', 'row1_col2'], ['row2_col1', 'row2_col2']])
-        os.mkdir('test_2')
-        with open('test_2/file2.csv', 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerows([['name', 'age'], ['Alice', '30'], ['Bob', '40']])
-        os.mkdir('test_5')
-        with open('test_5/file3.csv', 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerows([['subject', 'marks'], ['Math', '90'], ['Science', '85']])
+        # Setup test directories
+        self.source_dir = 'task_func_data/'
+        self.target_dir = 'task_func_data_target/'
+        
+        # Remove any existing test directories to start fresh
+        if os.path.exists(self.source_dir):
+            shutil.rmtree(self.source_dir)
+        if os.path.exists(self.target_dir):
+            shutil.rmtree(self.target_dir)
+        # Create new test directories
+        os.makedirs(self.source_dir)
+        os.makedirs(self.target_dir)
     def tearDown(self):
-        # remove the test directories
-        shutil.rmtree('test_1')
-        shutil.rmtree('test_2')
-        shutil.rmtree('test_5')
+        # Clean up test directories after each test case
+        if os.path.exists(self.source_dir):
+            shutil.rmtree(self.source_dir)
+        if os.path.exists(self.target_dir):
+            shutil.rmtree(self.target_dir)
     
     def test_case_1(self):
-        # This test assumes the existence of a directory named 'task_func_data' with a CSV file 'file1.csv'
-        data = task_func('test_1')
-        self.assertIsInstance(data, dict)
-        self.assertIn('file1', data)
-        self.assertEqual(data['file1'], [['header1', 'header2'], ['row1_col1', 'row1_col2'], ['row2_col1', 'row2_col2']])
+        # Create some test files in the source directory, some with '_processed' suffix
+        test_files = ['file1.txt', 'file2_processed.txt']
+        for file in test_files:
+            with open(os.path.join(self.source_dir, file), 'w') as f:
+                f.write(f"This is {file}")
+        
+        # Archive processed files
+        archive_path = task_func(self.source_dir, self.target_dir)
+        
+        # Check if the archive contains the correct file
+        with zipfile.ZipFile(archive_path, 'r') as archive:
+            self.assertIn('file2_processed.txt', archive.namelist())
+            
     def test_case_2(self):
-        # This test checks explicit file_extension input
-        data = task_func('test_2', '.csv')
-        self.assertIsInstance(data, dict)
-        self.assertIn('file2', data)
-        self.assertEqual(data['file2'], [['name', 'age'], ['Alice', '30'], ['Bob', '40']])
+        # Create some test files in the source directory without '_processed' suffix
+        test_files = ['file1.txt', 'file3.txt']
+        for file in test_files:
+            with open(os.path.join(self.source_dir, file), 'w') as f:
+                f.write(f"This is {file}")
+        
+        # Archive processed files
+        archive_path = task_func(self.source_dir, self.target_dir)
+        
+        # Check if the archive is empty
+        with zipfile.ZipFile(archive_path, 'r') as archive:
+            self.assertEqual(len(archive.namelist()), 0)
+            
     def test_case_3(self):
-        # This test checks for a non-existent file extension, expecting an empty dictionary
-        data = task_func('test_3', '.txt')
-        self.assertIsInstance(data, dict)
-        self.assertEqual(len(data), 0)
+        # Source directory is empty
+        archive_path = task_func(self.source_dir, self.target_dir)
+        
+        # Check if the archive is empty
+        with zipfile.ZipFile(archive_path, 'r') as archive:
+            self.assertEqual(len(archive.namelist()), 0)
     def test_case_4(self):
-        # This test checks for a non-existent directory, expecting an empty dictionary
-        data = task_func('/nonexistent/directory')
-        self.assertIsInstance(data, dict)
-        self.assertEqual(len(data), 0)
+        # Create some test files in the source directory, some with '_processed' suffix
+        test_files = ['file1.txt', 'file2_processed.txt']
+        for file in test_files:
+            with open(os.path.join(self.source_dir, file), 'w') as f:
+                f.write(f"This is {file}")
+                
+        # Archive processed files with a custom archive name
+        custom_archive_name = 'custom_archive.zip'
+        archive_path = task_func(self.source_dir, self.target_dir, custom_archive_name)
+        
+        # Check if the custom archive name is used
+        self.assertTrue(custom_archive_name in archive_path)
+        
     def test_case_5(self):
-        # This test checks another file's presence and content in the dictionary
-        data = task_func('test_5')
-        self.assertIsInstance(data, dict)
-        self.assertIn('file3', data)
-        self.assertEqual(data['file3'], [['subject', 'marks'], ['Math', '90'], ['Science', '85']])
+        # Check the return value for correct archive path
+        archive_path = task_func(self.source_dir, self.target_dir)
+        expected_path = os.path.join(self.target_dir, 'archive.zip')
+        self.assertEqual(archive_path, expected_path)

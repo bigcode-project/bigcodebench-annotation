@@ -1,72 +1,54 @@
-import pickle
-import os
-from sklearn.datasets import make_classification
+import re
+import string
+from nltk.stem import PorterStemmer
+from collections import Counter
 
-# Constants
-FILE_NAME = 'save.pkl'
-DATA, TARGET = make_classification(n_samples=100, n_features=20, n_informative=2, n_redundant=10, n_classes=2, random_state=1)
+STEMMER = PorterStemmer()
 
-def task_func(data, target):
+def task_func(content):
     """
-    Save the Sklearn dataset ("Data" and "Destination") in the pickle file "save.pkl" and then read it back for validation.
+    Stem every word in a sentence, except the last, and count the frequency of each stem.
 
     Parameters:
-    - data (numpy array): The data part of the sklearn dataset.
-    - target (numpy array): The target part of the sklearn dataset.
+    content (str): The sentence to stem and count.
 
     Returns:
-    tuple: The loaded tuple (data, target) from 'save.pkl'.
+    dict: A dictionary with stemmed words as keys and their frequency as values.
 
     Requirements:
-    - pickle
-    - os
-    - sklearn.datasets
+    - re
+    - string
+    - nltk.stem
+    - collections.Counter
 
     Example:
-    >>> data, target = make_classification(n_samples=100, n_features=20, n_informative=2, n_redundant=10, n_classes=2, random_state=1)
-    >>> loaded_data, loaded_target = task_func(data, target)
-    >>> assert np.array_equal(data, loaded_data) and np.array_equal(target, loaded_target)
+    >>> task_func('running runner run')
+    {'run': 1, 'runner': 1}
     """
-    with open(FILE_NAME, 'wb') as file:
-        pickle.dump((data, target), file)
-    with open(FILE_NAME, 'rb') as file:
-        loaded_data, loaded_target = pickle.load(file)
-    os.remove(FILE_NAME)
-    return loaded_data, loaded_target
+    content = content.split(' ')[:-1]
+    words = [word.strip(string.punctuation).lower() for word in re.split('\W+', ' '.join(content))]
+    stemmed_words = [STEMMER.stem(word) for word in words]
+    word_counts = Counter(stemmed_words)
+    return dict(word_counts)
 
-from sklearn.datasets import make_classification
-import numpy as np
 import unittest
-import sys
-sys.path.append("/mnt/data")
-# Defining the test function
 class TestCases(unittest.TestCase):
-    def test_save_and_load_data(self):
-        data, target = make_classification(n_samples=100, n_features=20, n_informative=2, n_redundant=10, n_classes=2, random_state=1)
-        loaded_data, loaded_target = task_func(data, target)
-        self.assertTrue(np.array_equal(data, loaded_data))
-        self.assertTrue(np.array_equal(target, loaded_target))
+    def test_case_1(self):
+        result = task_func('running runner run')
+        self.assertEqual(result, {'run': 1, 'runner': 1})
     
-    def test_save_and_load_empty_data(self):
-        data, target = np.array([]), np.array([])
-        loaded_data, loaded_target = task_func(data, target)
-        self.assertTrue(np.array_equal(data, loaded_data))
-        self.assertTrue(np.array_equal(target, loaded_target))
-    
-    def test_save_and_load_single_element_data(self):
-        data, target = np.array([5]), np.array([1])
-        loaded_data, loaded_target = task_func(data, target)
-        self.assertTrue(np.array_equal(data, loaded_data))
-        self.assertTrue(np.array_equal(target, loaded_target))
-    
-    def test_save_and_load_large_data(self):
-        data, target = make_classification(n_samples=1000, n_features=50, n_informative=5, n_redundant=25, n_classes=3, random_state=2)
-        loaded_data, loaded_target = task_func(data, target)
-        self.assertTrue(np.array_equal(data, loaded_data))
-        self.assertTrue(np.array_equal(target, loaded_target))
-    
-    def test_save_and_load_random_data(self):
-        data, target = np.random.rand(50, 5), np.random.randint(0, 2, 50)
-        loaded_data, loaded_target = task_func(data, target)
-        self.assertTrue(np.array_equal(data, loaded_data))
-        self.assertTrue(np.array_equal(target, loaded_target))
+    def test_case_2(self):
+        result = task_func('dancing dancer danced')
+        self.assertEqual(result, {'danc': 1, 'dancer': 1})
+        
+    def test_case_3(self):
+        result = task_func('loving lover love')
+        self.assertEqual(result, {'love': 1, 'lover': 1})
+        
+    def test_case_4(self):
+        result = task_func('computing computer compute')
+        self.assertEqual(result, {'comput': 2})
+        
+    def test_case_5(self):
+        result = task_func('swimming swimmer swim')
+        self.assertEqual(result, {'swim': 1, 'swimmer': 1})

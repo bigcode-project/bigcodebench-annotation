@@ -1,72 +1,82 @@
-import numpy as np
+import string
 import random
 
-# Constants
-ELEMENTS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
-def task_func(l=None):
+
+def task_func(length, random_seed=None):
     """
-    Create a numeric array from a list "l" and move the first 3 elements to the end of the array.
+    Generate a random string of a given length, with each character being either
+    a parenthesis (from the set "(){}[]") 
+    or a lowercase English character.
+    For function uses a optional random_seed when sampling characters.
 
     Parameters:
-    - l (list): A list of elements to be processed.
+    length (int): The length of the string to generate.
+    random_seed (int): Random seed for rng. Used in picking random characters.
+                       Defaults to None.
 
     Returns:
-    - arr (numpy.ndarray): The processed array with the first three elements moved to the end.
+    str: The generated string.
 
     Requirements:
-    - numpy
+    - string
     - random
 
+    Note: The function uses the internal string constant BRACKETS for 
+          definition of the bracket set.
+
     Example:
-    >>> random.seed(42)
-    >>> task_func()
-    array(['I', 'F', 'G', 'J', 'E', 'A', 'B', 'H', 'D', 'C'], dtype='<U1')
+    >>> string = task_func(10, random_seed=1)
+    >>> print(string)
+    ieqh]{[yng
+    
+    >>> string = task_func(34, random_seed=42)
+    >>> print(string)
+    hbrpoigf)cbfnobm(o{rak)vrjnvgfygww
+
+    >>> string = task_func(23, random_seed=1)
+    >>> print(string)
+    ieqh]{[yng]by)a{rogubbb
     """
-    if l is None:
-        l = ELEMENTS.copy()  # Use a copy to avoid modifying the original list
-    random.shuffle(l)
-    arr = np.array(l)
-    arr = np.concatenate((arr[3:], arr[:3]))
-    return arr
+    random.seed(random_seed)
+    BRACKETS = "(){}[]"
+    return ''.join(random.choice(string.ascii_lowercase + BRACKETS) for _ in range(length))
 
 import unittest
-import numpy as np
+import string
 class TestCases(unittest.TestCase):
     def setUp(self):
-        random.seed(42)  # Set the seed for reproducibility
-    def test_default_input(self):
-        # Test Case 1: Default Input
-        # Description: This test case checks the function's behavior with its default settings.
-        # The random seed is set to ensure reproducibility.
-        result = task_func()
-        expected_output = ['I', 'F', 'G', 'J', 'E', 'A', 'B', 'H', 'D', 'C']
-        self.assertEqual(result.tolist(), expected_output)
-    def test_custom_list_input(self):
-        # Test Case 2: Custom List Input
-        # Description: This test case checks the function's behavior with a custom list of elements.
-        # The random seed is set to ensure reproducibility.
-        input_list = ['X', 'Y', 'Z', 'W', 'V', 'U']
-        result = task_func(input_list)
-        expected_output = ['V', 'X', 'U', 'W', 'Y', 'Z']  # Corrected based on actual shuffle and cycle
-        self.assertEqual(result.tolist(), expected_output)
-    def test_empty_list(self):
-        # Test Case 3: Empty List
-        # Description: This test case checks the function's behavior when an empty list is provided as input.
-        # The random seed is set to ensure reproducibility, though it doesn't affect the outcome in this case.
-        result = task_func([])
+        self.BRACKETS = "(){}[]"
+        return 
+    def test_rng(self):
+        # rng reproducability
+        res1 = task_func(100, random_seed=42)
+        res2 = task_func(100, random_seed=42)
+        self.assertEqual(res1, res2)
+    def test_case_1(self):
+        # Testing with length = 5
+        result = task_func(5, random_seed=1)
+        self.assertEqual(len(result), 5)
+        for char in result:
+            self.assertIn(char, string.ascii_lowercase + self.BRACKETS)
+    def test_case_2(self):
+        # Testing with length = 0 (edge case)
+        result = task_func(0, random_seed=2)
         self.assertEqual(len(result), 0)
-    def test_single_element_list(self):
-        # Test Case 4: Single Element List
-        # Description: This test case checks the function's behavior with a single element list.
-        # The random seed is set to ensure reproducibility.
-        result = task_func(['X'])
-        expected_output = ['X']
-        self.assertEqual(result.tolist(), expected_output)
-    def test_three_elements_list(self):
-        # Test Case 5: Three Elements List
-        # Description: This test case checks the function's behavior with a three element list.
-        # The random seed is set to ensure reproducibility.
-        result = task_func(['Y', 'X', 'Z'])
-        expected_output = ['X', 'Y', 'Z']  # Corrected based on actual shuffle and cycle
-        self.assertEqual(result.tolist(), expected_output)
+    def test_case_3(self):
+        # Testing with length = 10
+        result = task_func(10, random_seed=3)
+        self.assertEqual(len(result), 10)
+        for char in result:
+            self.assertIn(char, string.ascii_lowercase + self.BRACKETS)
+    def test_case_4(self):
+        # Testing with length = 1 (edge case)
+        result = task_func(1, random_seed=34)
+        self.assertEqual(len(result), 1)
+        self.assertIn(result, string.ascii_lowercase + self.BRACKETS)
+    def test_case_5(self):
+        # Testing with length = 50
+        result = task_func(50, random_seed=777)
+        self.assertEqual(len(result), 50)
+        for char in result:
+            self.assertIn(char, string.ascii_lowercase + self.BRACKETS)

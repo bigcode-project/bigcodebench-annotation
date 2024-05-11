@@ -1,100 +1,86 @@
+import csv
+import os
 from datetime import datetime
 from random import randint
-import matplotlib.pyplot as plt
-import pandas as pd
 
+# Constants
+SENSORS = ['Temperature', 'Humidity', 'Pressure']
+OUTPUT_DIR = './output'
 
-TEMP_CATEGORIES = ['Cold', 'Normal', 'Hot']
-FILE_PATH = 'custom_data.csv'
-
-
-def task_func(hours, file_path=FILE_PATH):
+def task_func(hours, output_dir=OUTPUT_DIR):
     """
-    Generate temperature data for the specified number of hours, save it in a CSV file, 
-    and plot the data using matplotlib.
-    
+    Create sensor data for the specified number of hours and save it in a CSV file
+    with coloumns 'Time', 'Temperature', 'Humidity' and 'Pressure'.
+
     Parameters:
-    hours (int): The number of hours for which temperature data is to be generated.
-    file_path (str, optional): Path where the CSV file will be saved. Defaults to 'temp_data.csv'.
-    
+    - hours (int): The number of hours for which sensor data is to be generated.
+    - output_dir (str, optional): The output file path
+
     Returns:
-    tuple: 
-        - str: The path of the generated CSV file.
-        - Axes: The plot object for further manipulation or saving.
-    
+    - hours (int): Number of hours to generate data for.
+
+
     Requirements:
-    - pandas
     - datetime
+    - os
     - random
-    - matplotlib.pyplot
-    
-    Data Structure:
-    The function uses a dictionary to manage the generated temperature data with keys: 'Time', 'Temperature', and 'Category'.
-    
+    - csv
+
     Example:
-    >>> file_path, ax = task_func(24)
-    >>> isinstance(file_path, str)
+    >>> file_path = task_func(1)  # Generate data for 1 hour
+    >>> os.path.exists(file_path)  # Check if the file was actually created
     True
-    >>> 'custom_data.csv' in file_path
+    >>> isinstance(file_path, str)  # Validate that the return type is a string
+    True
+    >>> 'sensor_data.csv' in file_path  # Ensure the filename is correct
     True
     """
-    data = {'Time': [], 'Temperature': [], 'Category': []}
+    FILE_PATH = os.path.join(output_dir, 'sensor_data.csv')
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    data = [['Time'] + SENSORS]
     for i in range(hours):
-        temp = randint(-10, 40)  # random temperature between -10 and 40
-        data['Time'].append(datetime.now().strftime('%H:%M:%S.%f'))
-        data['Temperature'].append(temp)
-        if temp < 0:
-            data['Category'].append(TEMP_CATEGORIES[0])
-        elif temp > 25:
-            data['Category'].append(TEMP_CATEGORIES[2])
-        else:
-            data['Category'].append(TEMP_CATEGORIES[1])
-    df = pd.DataFrame(data)
-    df.to_csv(file_path, index=False)
-    ax = df.plot(x = 'Time', y = 'Temperature', kind = 'line', title="Temperature Data Over Time")
-    plt.show()
-    return file_path, ax
+        row = [datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')] + [randint(0, 100) for _ in SENSORS]
+        data.append(row)
+    with open(FILE_PATH, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(data)
+    return FILE_PATH
 
 import unittest
 import os
+import shutil
+FILE_PATH = os.path.join(OUTPUT_DIR, 'sensor_data.csv')
 class TestCases(unittest.TestCase):
     def tearDown(self):
         """Clean up any files created during the tests."""
         # Check and remove the expected file if it exists
-        if os.path.exists(FILE_PATH):
-            os.remove(FILE_PATH)
-    def test_case_1(self):
-        # Testing with 1 hour
-        file_path, ax = task_func(1)
-        self.assertEqual(file_path, FILE_PATH)
-        self.assertTrue(os.path.exists(file_path))
-        df = pd.read_csv(file_path)
-        self.assertEqual(len(df), 1)
-    def test_case_2(self):
-        # Testing with 24 hours
-        file_path, ax = task_func(24)
-        self.assertEqual(file_path, FILE_PATH)
-        self.assertTrue(os.path.exists(file_path))
-        df = pd.read_csv(file_path)
-        self.assertEqual(len(df), 24)
-    def test_case_3(self):
-        # Testing with 120 hours
-        file_path, ax = task_func(120)
-        self.assertEqual(file_path, FILE_PATH)
-        self.assertTrue(os.path.exists(file_path))
-        df = pd.read_csv(file_path)
-        self.assertEqual(len(df), 120)
-    def test_case_4(self):
-        # Testing with a custom file path
-        file_path, ax = task_func(24, FILE_PATH)
-        self.assertEqual(file_path, FILE_PATH)
+        # if os.path.exists(FILE_PATH):
+        #     os.remove(FILE_PATH)
+        if os.path.exists(OUTPUT_DIR):
+            shutil.rmtree(OUTPUT_DIR)
+    def test_csv_file_creation(self):
+        """Test if the CSV file is successfully created."""
+        task_func(1)
         self.assertTrue(os.path.exists(FILE_PATH))
-        df = pd.read_csv(file_path)
-        self.assertEqual(len(df), 24)
-    def test_case_5(self):
-        # Testing the categories in the generated CSV file
-        file_path, ax = task_func(24, FILE_PATH)
-        df = pd.read_csv(file_path)
-        categories = df['Category'].unique().tolist()
-        for cat in categories:
-            self.assertIn(cat, ['Cold', 'Normal', 'Hot'])
+    def test_csv_file_rows(self):
+        """Test if the CSV file contains the correct number of rows for 24 hours."""
+        task_func(24)
+        with open(FILE_PATH, 'r') as f:
+            self.assertEqual(len(f.readlines()), 25)  # Including header
+    def test_csv_file_header(self):
+        """Test if the CSV file header matches the expected sensors."""
+        task_func(0)
+        with open(FILE_PATH, 'r') as f:
+            reader = csv.reader(f)
+            header = next(reader)
+            self.assertEqual(header, ['Time', 'Temperature', 'Humidity', 'Pressure'])
+    def test_file_path_return(self):
+        """Test if the correct file path is returned."""
+        file_path = task_func(1)
+        self.assertEqual(file_path, FILE_PATH)
+    def test_no_hours_data(self):
+        """Test sensor data generation with 0 hours."""
+        task_func(0)
+        with open(FILE_PATH, 'r') as f:
+            self.assertEqual(len(f.readlines()), 1)  # Only header row expected

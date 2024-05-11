@@ -1,167 +1,70 @@
 import pandas as pd
-import numpy as np
+import codecs
 
-
-def task_func(data, column="c"):
+def task_func(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
-    Remove a column from a data dictionary if it exists, and then plot the remaining data
-    if it contains numeric data.
+    Decodes all Unicode escape strings in a particular column ("UnicodeString") in a given Pandas DataFrame.
 
     Parameters:
-    - data (dict): The input data dictionary.
-    - column (str): Name of column to remove. Defaults to "c".
+    dataframe (pd.DataFrame): The pandas DataFrame which must contain the column "UnicodeString".
 
     Returns:
-    - df (pd.DataFrame): The modified DataFrame after removing the specified column.
-    - ax (matplotlib.axes._axes.Axes or None): The plot of the modified DataFrame if there's
-      numeric data to plot, otherwise None.
+    pd.DataFrame: The DataFrame with decoded strings in the "UnicodeString" column.
+
+    Raises:
+    KeyError: If the column "UnicodeString" does not exist in the DataFrame.
+    TypeError: If the input is not a Pandas DataFrame.
+
+    Example:
+    >>> df = pd.DataFrame({
+    ...     'Name': ['John', 'Anna', 'Peter'],
+    ...     'Age': [27, 23, 29],
+    ...     'Salary': [50000, 60000, 70000],
+    ...     'UnicodeString': ['\u004A\u006F\u0068\u006E', '\u0041\u006E\u006E\u0061', '\u0050\u0065\u0074\u0065\u0072']
+    ... })
+    >>> task_func(df)
+        Name  Age  Salary UnicodeString
+    0   John   27   50000          John
+    1   Anna   23   60000          Anna
+    2  Peter   29   70000         Peter
 
     Requirements:
     - pandas
-    - numpy
-
-    Example:
-    >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]}
-    >>> modified_df, ax = task_func(data)
-    >>> ax
-    <Axes: >
-    >>> modified_df
-       a  b
-    0  1  4
-    1  2  5
-    2  3  6
+    - codecs
     """
-    df = pd.DataFrame(data)
-    if column in df.columns:
-        df = df.drop(columns=column)
-    if df.empty or not np.any(df.dtypes.apply(pd.api.types.is_numeric_dtype)):
-        return df, None
-    ax = df.plot()
-    return df, ax
+    if not isinstance(dataframe, pd.DataFrame):
+        raise TypeError("The input must be a pandas DataFrame.")
+    if 'UnicodeString' not in dataframe.columns:
+        raise KeyError("'UnicodeString' column not found in the DataFrame.")
+    dataframe['UnicodeString'] = dataframe['UnicodeString'].apply(lambda x: codecs.decode(x, 'unicode_escape'))
+    return dataframe
 
 import unittest
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Scenario: DataFrame with columns 'a', 'b', and 'c'.
-        np.random.seed(0)
-        data = {
-                "a": np.random.randn(10),
-                "b": np.random.randn(10),
-                "c": np.random.randn(10),
-            }
-        df = pd.DataFrame(
-            data
-        )
-        modified_df, ax = task_func(data)  # Remove default column 'c'.
-        # Assert column 'c' removal and plot data verification.
-        self.assertNotIn("c", modified_df.columns)
-        plotted_data = [line.get_ydata() for line in ax.get_lines()]
-        self.assertTrue(
-            all(
-                [
-                    np.array_equal(data, modified_df[col].values)
-                    for data, col in zip(plotted_data, modified_df.columns)
-                ]
-            )
-        )
-    def test_case_2(self):
-        # Scenario: DataFrame with columns 'a' and 'b' (no 'c').
-        np.random.seed(0)
-        data = {"a": np.random.randn(10), "b": np.random.randn(10)}
-        df = pd.DataFrame(data)
-        modified_df, ax = task_func(data)
-        # Assert that the modified DataFrame remains unchanged and plot is generated.
-        self.assertEqual(list(df.columns), list(modified_df.columns))
-        self.assertIsNotNone(ax)
-    def test_case_3(self):
-        # Scenario: Empty DataFrame
-        data = {}
-        df = pd.DataFrame(data)
-        modified_df, ax = task_func(data)
-        # Assert empty DataFrame and no plot.
-        self.assertTrue(modified_df.empty)
-        self.assertIsNone(ax)
-    def test_case_4(self):
-        # Scenario: DataFrame with single non-numeric column 'c'.
-        data = {"c": ["apple", "banana", "cherry"]}
-        df = pd.DataFrame(data)
-        modified_df, ax = task_func(data)
-        # Assert empty DataFrame after 'c' removal and no plot.
-        self.assertTrue(modified_df.empty)
-        self.assertIsNone(ax)
-    def test_case_5(self):
-        np.random.seed(0)
-        # Scenario: DataFrame with columns 'a', 'b', 'c', and non-numeric column 'd'.
-        data = {
-                "a": np.random.randn(10),
-                "b": np.random.randn(10),
-                "c": np.random.randn(10),
-                "d": [
-                    "apple",
-                    "banana",
-                    "cherry",
-                    "date",
-                    "fig",
-                    "grape",
-                    "honeydew",
-                    "kiwi",
-                    "lime",
-                    "mango",
-                ],
-            }
-        df = pd.DataFrame(
-            data
-        )
-        modified_df, ax = task_func(data)
-        # Assert column 'c' removal and plot data verification excluding non-numeric column 'd'.
-        self.assertNotIn("c", modified_df.columns)
-        plotted_data = [line.get_ydata() for line in ax.get_lines()]
-        self.assertTrue(
-            all(
-                [
-                    np.array_equal(data, modified_df[col].values)
-                    for data, col in zip(plotted_data, modified_df.columns)
-                    if col != "d"
-                ]
-            )
-        )
-    def test_case_6(self):
-        # Scenario: Remove specified column.
-        np.random.seed(0)
-        data = {
-                "a": np.random.randn(10),
-                "b": np.random.randn(10),
-            }
-        df = pd.DataFrame(
-            data
-        )
-        modified_df, ax = task_func(df, column="a")
-        self.assertNotIn("a", modified_df.columns)
-        plotted_data = [line.get_ydata() for line in ax.get_lines()]
-        self.assertTrue(
-            all(
-                [
-                    np.array_equal(data, modified_df[col].values)
-                    for data, col in zip(plotted_data, modified_df.columns)
-                ]
-            )
-        )
-    def test_case_7(self):
-        # Scenario: Only non-numeric columns.
-        data = {
-                "a": ["apple", "banana"],
-                "b": ["cherry", "date"],
-                "c": ["fig", "grape"],
-            }
-        df = pd.DataFrame(
-            data
-        )
-        modified_df, ax = task_func(data)
-        self.assertNotIn("c", modified_df.columns)
-        pd.testing.assert_frame_equal(df[["a", "b"]], modified_df)
-        self.assertEqual(ax, None)
-    def tearDown(self):
-        plt.close("all")
+    
+    def setUp(self):
+        self.test_data = pd.DataFrame({
+            'Name': ['John', 'Anna', 'Peter'],
+            'Age': [27, 23, 29],
+            'Salary': [50000, 60000, 70000],
+            'UnicodeString': ['\u004A\u006F\u0068\u006E', '\u0041\u006E\u006E\u0061', '\u0050\u0065\u0074\u0065\u0072']
+        })
+    def test_unicode_decoding(self):
+        decoded_df = task_func(self.test_data)
+        expected_strings = ['John', 'Anna', 'Peter']
+        self.assertListEqual(list(decoded_df['UnicodeString']), expected_strings)
+    def test_missing_column(self):
+        with self.assertRaises(KeyError):
+            task_func(pd.DataFrame({'Name': ['John']}))
+    def test_non_dataframe_input(self):
+        with self.assertRaises(TypeError):
+            task_func("Not a DataFrame")
+    def test_empty_dataframe(self):
+        empty_df = pd.DataFrame({'UnicodeString': []})
+        result_df = task_func(empty_df)
+        self.assertTrue(result_df['UnicodeString'].empty)
+    def test_non_string_unicode_values(self):
+        df_with_non_string = pd.DataFrame({'UnicodeString': [123, 456]})
+        with self.assertRaises(Exception):
+            task_func(df_with_non_string)

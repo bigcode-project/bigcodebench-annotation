@@ -1,58 +1,64 @@
-import codecs
-import random
-import struct
+from collections import OrderedDict
+from prettytable import PrettyTable
 
-KEYS = ['470FC614', '4A0FC614', '4B9FC614', '4C8FC614', '4D7FC614']
 
-def task_func(hex_keys=KEYS):
+def task_func(my_dict):
     """
-    Generate a random float number from a list of hex strings and then encode the float number in utf-8.
+    Sorts a given dictionary by its keys in ascending order and returns a PrettyTable object displaying the sorted items with the names 'Key' and 'Value'.
 
     Parameters:
-    hex_keys (list of str): A list of hexadecimal strings to choose from.
-    
+    my_dict (dict): The dictionary to be sorted and displayed.
+
     Returns:
-    bytes: The utf-8 encoded float number.
+    PrettyTable: A PrettyTable object representing the sorted dictionary.
 
     Requirements:
-    - struct
-    - codecs
-    - random
+    - collections.OrderedDict
+    - prettytable.PrettyTable
 
-    Example:
-    >>> random.seed(42)
-    >>> task_func()
-    b'36806.078125'
+    Examples:
+    Display a simple dictionary in a sorted table format.
+    >>> table = task_func({3: 'apple', 1: 'banana', 2: 'cherry'})
+    >>> str(table).startswith('+') and 'banana' in str(table)
+    True
+
+    Display an empty dictionary.
+    >>> str(task_func({})).startswith('+')
+    True
     """
-    hex_key = random.choice(hex_keys)
-    float_num = struct.unpack('!f', bytes.fromhex(hex_key))[0]
-    encoded_float = codecs.encode(str(float_num), 'utf-8')
-    return encoded_float
+    ordered_dict = OrderedDict(sorted(my_dict.items(), key=lambda t: t[0]))
+    table = PrettyTable(['Key', 'Value'])
+    for key, value in ordered_dict.items():
+        table.add_row([key, value])
+    return table
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_default_functionality(self):
-        """Test the function with default parameters."""
-        result = task_func()
-        self.assertIsInstance(result, bytes)  # Check if output is correctly encoded in UTF-8
-    def test_custom_hex_keys(self):
-        """Test the function with a custom list of hexadecimal keys."""
-        custom_keys = ['1A2FC614', '1B0FC614', '1C9FC614']
-        result = task_func(hex_keys=custom_keys)
-        self.assertIsInstance(result, bytes)
-    def test_empty_list(self):
-        """Test the function with an empty list."""
-        with self.assertRaises(IndexError):  # Assuming random.choice will raise IndexError on empty list
-            task_func(hex_keys=[])
-    def test_consistency_of_output(self):
-        """Ensure that the output is consistent with a fixed seed."""
-        random.seed(42)  # Set the seed for predictability
-        first_result = task_func()
-        random.seed(42)  # Reset seed to ensure same choice is made
-        second_result = task_func()
-        self.assertEqual(first_result, second_result)
-    def test_invalid_hex_key(self):
-        """Test with an invalid hex key."""
-        invalid_keys = ['ZZZZZZZZ', 'XXXX']
-        with self.assertRaises(ValueError):
-            task_func(hex_keys=invalid_keys)
+    def test_sort_and_display_dict(self):
+        my_dict = {3: 'apple', 1: 'banana', 2: 'cherry'}
+        table = task_func(my_dict)
+        expected_header = '+-----+--------+'
+        self.assertIn(expected_header, str(table))
+        self.assertIn('banana', str(table))
+    def test_empty_dict(self):
+        table = task_func({})
+        expected_header = '+-----+-------+'
+        self.assertIn(expected_header, str(table))
+    def test_single_element_dict(self):
+        my_dict = {1: 'single'}
+        table = task_func(my_dict)
+        self.assertIn('single', str(table))
+    def test_non_string_values(self):
+        my_dict = {1: 100, 2: 200.5}
+        table = task_func(my_dict)
+        self.assertIn('100', str(table))
+        self.assertIn('200.5', str(table))
+    def test_string_keys(self):
+        my_dict = {'a': 'apple', 'b': 'banana'}
+        table = task_func(my_dict)
+        self.assertIn('apple', str(table))
+        self.assertIn('banana', str(table))
+    def test_large_dict(self):
+        my_dict = {i: str(i) for i in range(1000)}
+        table = task_func(my_dict)
+        self.assertEqual(len(table._rows), 1000)

@@ -1,61 +1,97 @@
-from sklearn.preprocessing import MinMaxScaler
-import pandas as pd
+import re
+import glob
+from docx import Document
 
-def task_func(l):
+
+def task_func(directory_path: str) -> int:
     """
-    Scale the input field to the range [0, 1] and display it as a DataFrame.
-
+    Processes all Word (.docx) files in the provided directory, searching for double quotes in the text 
+    and adding a backslash before each double quote to "protect" it.
+    
     Parameters:
-    l (numpy array): The input array.
-
+    - directory_path (str): Path to the directory containing .docx files to be processed.
+    
     Returns:
-    DataFrame: A pandas DataFrame of the scaled array.
+    - int: Number of .docx files processed.
 
     Requirements:
-    - numpy
-    - sklearn.preprocessing
-    - pandas
-
-    Note:
-    - The return DataFrame use 'Scaled Values' as the column name.
+    - re
+    - docx
+    - glob
 
     Example:
-    >>> import numpy as np
-    >>> l = np.array([10, 20, 30, 40, 50])
-    >>> df = task_func(l)
-    >>> print(int(df.iloc[0]['Scaled Values']))
-    0
+    >>> import tempfile
+    >>> temp_dir = tempfile.mkdtemp()
+    >>> doc = Document()
+    >>> _ = doc.add_paragraph("This is a sample text with double quotes.")
+    >>> doc.save(temp_dir + '/sample.docx')
+    >>> task_func(temp_dir)
+    1
     """
-    scaler = MinMaxScaler()
-    l_scaled = scaler.fit_transform(l.reshape(-1, 1))
-    df = pd.DataFrame(l_scaled, columns=['Scaled Values'])
-    return df
+    docx_files = glob.glob(directory_path + '/*.docx')
+    processed_files = 0
+    for docx_file in docx_files:
+        document = Document(docx_file)
+        for paragraph in document.paragraphs:
+            paragraph.text = re.sub(r'(?<!\\)"', r'\"', paragraph.text)
+        document.save(docx_file)
+        processed_files += 1
+    return processed_files
 
 import unittest
-import numpy as np
-import pandas as pd
+import shutil
+import os
+import doctest
+import tempfile
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.base_tmp_dir = tempfile.mkdtemp()
+        self.test_directory = f"{self.base_tmp_dir}/test/"
+        if not os.path.exists(self.test_directory):
+            os.makedirs(self.test_directory)
+        test_data = {
+            "file_1.docx": "This is a sample text without any double quotes.",
+            "file_2.docx": "This is a \"sample\" text with double quotes.",
+            "file_3.docx": r'This is a \"sample\" text with double quotes already protected.',
+            "file_4.docx": "Hello \"world\"! How are you \"today\"?",
+            "file_5.docx": "Testing \"multiple\" paragraphs.\n\nAnother paragraph with \"quotes\"."
+        }
+        # Create .docx files for each scenario
+        for file_name, content in test_data.items():
+            doc = Document()
+            for paragraph in content.split("\n"):
+                doc.add_paragraph(paragraph)
+            doc.save(self.test_directory + file_name)
+        super(TestCases, self).setUp()
+    def tearDown(self):
+        shutil.rmtree(self.test_directory)
+        super(TestCases, self).tearDown()
+    def read_docx_content(self, file_path):
+        doc = Document(file_path)
+        return "\n".join([para.text for para in doc.paragraphs])
+    
     def test_case_1(self):
-        l1 = np.array([10, 20, 30, 40, 50])
-        expected_df1 = pd.DataFrame({'Scaled Values': [0.0, 0.25, 0.5, 0.75, 1.0]})
-        self.assertTrue(task_func(l1).equals(expected_df1))
-    
+        result = task_func(self.test_directory)
+        self.assertEqual(result, 5)
+        content = self.read_docx_content(self.test_directory + "file_1.docx")
+        self.assertEqual(content, "This is a sample text without any double quotes.")
     def test_case_2(self):
-        l2 = np.array([-10, 0, 10])
-        expected_df2 = pd.DataFrame({'Scaled Values': [0.0, 0.5, 1.0]})
-        self.assertTrue(task_func(l2).equals(expected_df2))
-    
+        result = task_func(self.test_directory)
+        self.assertEqual(result, 5)
+        content = self.read_docx_content(self.test_directory + "file_2.docx")
+        self.assertEqual(content, r'This is a \"sample\" text with double quotes.')
     def test_case_3(self):
-        l3 = np.array([5, 5, 5])
-        expected_df3 = pd.DataFrame({'Scaled Values': [0.0, 0.0, 0.0]})
-        self.assertTrue(task_func(l3).equals(expected_df3))
-        
+        result = task_func(self.test_directory)
+        self.assertEqual(result, 5)
+        content = self.read_docx_content(self.test_directory + "file_3.docx")
+        self.assertEqual(content, r'This is a \"sample\" text with double quotes already protected.')
     def test_case_4(self):
-        l4 = np.array([100])
-        expected_df4 = pd.DataFrame({'Scaled Values': [0.0]})
-        self.assertTrue(task_func(l4).equals(expected_df4))
-    
+        result = task_func(self.test_directory)
+        self.assertEqual(result, 5)
+        content = self.read_docx_content(self.test_directory + "file_4.docx")
+        self.assertEqual(content, r'Hello \"world\"! How are you \"today\"?')
     def test_case_5(self):
-        l5 = np.array([10, 50, 30, 40, 20])
-        expected_df5 = pd.DataFrame({'Scaled Values': [0.0, 1.0, 0.5, 0.75, 0.25]})
-        self.assertTrue(task_func(l5).equals(expected_df5))
+        result = task_func(self.test_directory)
+        self.assertEqual(result, 5)
+        content = self.read_docx_content(self.test_directory + "file_5.docx")
+        self.assertEqual(content, 'Testing \\"multiple\\" paragraphs.\n\nAnother paragraph with \\"quotes\\".')

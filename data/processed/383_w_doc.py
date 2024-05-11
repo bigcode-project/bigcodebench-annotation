@@ -1,84 +1,77 @@
-import numpy as np
-from scipy.stats import norm
-import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from collections import Counter
+from textblob import TextBlob
+from matplotlib import pyplot as plt
 
-def task_func(length):
+
+def task_func(text, n, top_k):
     """
-    Create a normal distribution with a given length, plot its histogram alongside the 
-    probability density function, and return the distribution and the plot.
-    
+    Visualize the uppermost K n-grams in a given text string.
+
     Parameters:
-    - length (int): The length of the distribution to be generated.
-    
+    text (str): The text string.
+    n (int): The value of n for the n-grams.
+    top_k (int): The number of top n-grams to visualize.
+
     Returns:
-    - tuple: A tuple containing:
-        1. numpy array with the normal distribution.
-        2. matplotlib Axes object representing the plot.
-    
+    None
+
     Requirements:
-    - numpy
-    - scipy.stats.norm
-    - matplotlib.pyplot
-    
-    Note:
-    - This function use this constant MU (mean): 0, SIGMA (standard deviation): 1
-    
+    - re
+    - pandas
+    - seaborn
+    - textblob
+    - matplotlib
+
     Example:
-    >>> np.random.seed(0)
-    >>> distribution, ax = task_func(1000)
-    >>> print(type(distribution))
-    <class 'numpy.ndarray'>
-    >>> len(ax.get_lines())
-    1
-    >>> plt.close()
+    >>> type(task_func('This is a sample text for testing.', 2, 5))
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    MU = 0
-    SIGMA = 1
-    distribution = np.random.normal(MU, SIGMA, length)
-    fig, ax = plt.subplots()
-    ax.hist(distribution, 30, density=True, label='Histogram')
-    ax.plot(np.sort(distribution), norm.pdf(np.sort(distribution), MU, SIGMA), 
-            linewidth=2, color='r', label='PDF')
-    ax.legend()
-    return distribution, ax
+    blob = TextBlob(text.lower())
+    words_freq = Counter([' '.join(list(span)) for span in blob.ngrams(n=n)])  # Get n-grams and count frequency
+    words_freq_filtered = words_freq.most_common(top_k)  # Get top k n-grams
+    top_df = pd.DataFrame(words_freq_filtered, columns=['n-gram', 'Frequency'])
+    plt.figure()
+    return sns.barplot(x='n-gram', y='Frequency', data=top_df)
 
 import unittest
-import numpy as np
 import matplotlib.pyplot as plt
+import doctest
 class TestCases(unittest.TestCase):
+    def tearDown(self) -> None:
+        plt.close('all')
+        return super().tearDown()
     def test_case_1(self):
-        np.random.seed(0)
-        distribution, ax = task_func(1000)
-        self.assertIsInstance(distribution, np.ndarray, "Expected distribution to be a numpy array")
-        self.assertIsInstance(ax, plt.Axes, "Expected ax to be a matplotlib Axes object")
-        plt.close()
+        # Test with a simple text, bigram (n=2) and top 2 n-grams
+        ax = task_func('This is a sample text for testing.', 2, 2)
+        ngrams = [label.get_text() for label in ax.get_xticklabels()]
+        self.assertNotIn('sample text', ngrams)
+        self.assertIn('is a', ngrams)
     def test_case_2(self):
-        np.random.seed(0)
-        length = 500
-        distribution, _ = task_func(length)
-        self.assertEqual(len(distribution), length, f"Expected distribution length to be {length}")
-        plt.close()
-    
+        # Test with a longer text, trigram (n=3) and top 3 n-grams
+        text = 'The sun shines bright in the clear blue sky. The sky is blue and beautiful.'
+        ax = task_func(text, 3, 3)
+        ngrams = [label.get_text() for label in ax.get_xticklabels()]
+        self.assertNotIn('the clear blue', ngrams)
+        self.assertNotIn('sky the sky', ngrams)
+        self.assertIn('the sun shines', ngrams)
     def test_case_3(self):
-        np.random.seed(0)
-        distribution, _ = task_func(1000)
-        mean = distribution.mean()
-        std_dev = distribution.std()
-        self.assertAlmostEqual(mean, 0, delta=0.1, msg=f"Expected mean to be close to 0, got {mean}")
-        self.assertAlmostEqual(std_dev, 1, delta=0.1, msg=f"Expected std_dev to be close to 1, got {std_dev}")
-        plt.close()
-    
+        # Test with no repeating n-grams, unigram (n=1) and top 3 n-grams
+        text = 'Each word is unique.'
+        ax = task_func(text, 1, 3)
+        ngrams = [label.get_text() for label in ax.get_xticklabels()]
+        self.assertEqual(len(ngrams), 3)  # Only 4 unique words bu top 3 n-grams
     def test_case_4(self):
-        np.random.seed(0)
-        distribution, ax = task_func(1000)
-        lines = ax.get_lines()
-        self.assertEqual(len(lines), 1, "Expected one line representing PDF in the plot")
-        bars = [rect for rect in ax.get_children() if isinstance(rect, plt.Rectangle)]
-        self.assertGreater(len(bars), 1, "Expected multiple bars representing histogram in the plot")
-        plt.close()
-    
+        # Test with a repeated word, bigram (n=2) and top 1 n-grams
+        text = 'Repeat repeat repeat again.'
+        ax = task_func(text, 2, 1)
+        ngrams = [label.get_text() for label in ax.get_xticklabels()]
+        self.assertIn('repeat repeat', ngrams)
     def test_case_5(self):
-        np.random.seed(0)
-        distribution, _ = task_func(2000)
-        self.assertEqual(distribution.shape, (2000,), "Expected shape of distribution to match input length")
-        plt.close()
+        # Test with punctuation in text, bigram (n=2) and top 3 n-grams
+        text = 'Hello, world! How are you, world?'
+        ax = task_func(text, 2, 3)
+        ngrams = [label.get_text() for label in ax.get_xticklabels()]
+        self.assertIn('hello world', ngrams)
+        self.assertNotIn('you world', ngrams)

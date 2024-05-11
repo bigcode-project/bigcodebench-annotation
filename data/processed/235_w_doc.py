@@ -1,102 +1,96 @@
-import pandas as pd
-from scipy import stats
+import numpy as np
 import matplotlib.pyplot as plt
+from statsmodels.formula.api import ols
 
-def task_func(df):
-    """
-    Perform a linear regression between "age" and "score" in the DataFrame, excluding rows with duplicate names.
-    Plot the regression line and the scatter plot of the data.
 
+def task_func(mu, sigma, seed=0, num_samples=1000, num_bins=30):
+    '''
+    Create a histogram of a normal distribution with a given mean and standard deviation, and overlay the 
+    probability density function (PDF) of the normal distribution on the histogram. Additionally, overlay a 
+    second order polynomial function on the histogram fitted bin-wise using ordinary least squares (OLS) 
+    regression. The random seed is set for reproducibility. The color of the PDF line is red, and the color of the OLS line is green.
+    
     Parameters:
-    df (DataFrame): The pandas DataFrame containing the data.
-
+    - mu (float): The mean of the distribution.
+    - sigma (float): The standard deviation of the distribution.
+    - seed (int, Optional): The random seed for reproducibility. Defaults to 0.
+    - num_samples (int, Optional): The number of samples to generate from the distribution. Defaults to 1000.
+    - num_bins (int, Optional): The number of bins to use in the histogram. Defaults to 30.
+    
     Returns:
-    tuple: A tuple containing the matplotlib.pyplot object and the axes object.
-
-    Raises:
-    - The function will raise a ValueError is input df is not a DataFrame.
-
-    Note:
-    - The function use "Linear Regression" for the plot title.
-    - The function use "Age" and "Score" as the xlabel and ylabel respectively.
-
+    - matplotlib.axes.Axes: The Axes object with the histogram and overlaid PDF.
+    
     Requirements:
-    - pandas
-    - scipy.stats
+    - numpy
     - matplotlib.pyplot
-
+    - statsmodels.formula.api
+    
     Example:
-    >>> data = pd.DataFrame([{'Name': 'Alice', 'Age': 20, 'Score': 70}, {'Name': 'Bob', 'Age': 25, 'Score': 75}, {'Name': 'Eve', 'Age': 30, 'Score': 80}])
-    >>> plt, ax = task_func(data)
-    >>> ax.lines[0].get_xdata()[0]
-    20
-    """
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("The input df is not a DataFrame")
-    df = df.drop_duplicates(subset='Name')
-    slope, intercept, r_value, _, _ = stats.linregress(df['Age'], df['Score'])
-    df['Age_up'] = intercept + slope * df['Age']
-    fig = plt.figure(figsize=(8, 6))
-    ax = fig.add_subplot(111)
-    plt.scatter(df['Age'], df['Score'], label='Data')
-    plt.plot(df['Age'].values, df['Age_up'].values, 'r', label='Fitted line')
-    plt.xlabel('Age')
-    plt.ylabel('Score')
-    plt.title('Linear Regression')
-    plt.legend()
-    return plt, ax
+    >>> ax = task_func(0, 1)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    '''
+    np.random.seed(seed)
+    samples = np.random.normal(mu, sigma, num_samples)
+    fig, ax = plt.subplots()
+    count, bins, ignored = ax.hist(samples, num_bins, density=True)
+    ax.plot(
+        bins, 
+        1/(sigma * np.sqrt(2 * np.pi)) * \
+        np.exp( - (bins - mu)**2 / (2 * sigma**2) ), linewidth=2, color='r'
+    )
+    bins = (bins[:-1] + bins[1:]) / 2
+    model = ols('count ~ bins + np.power(bins, 2)', data={'count': count, 'bins': bins}).fit()
+    ax.plot(
+        bins, 
+        model.params['Intercept'] + model.params['bins'] * bins + \
+        model.params['np.power(bins, 2)'] * np.power(bins, 2), linewidth=2, color='g'
+    )
+    return ax
 
 import unittest
-import pandas as pd
-import matplotlib.pyplot as plt
+import doctest
 class TestCases(unittest.TestCase):
-    def test_correct_data_handling(self):
-        data = pd.DataFrame([
-            {'Name': 'Alice', 'Age': 25, 'Score': 80},
-            {'Name': 'Bob', 'Age': 30, 'Score': 85},
-            {'Name': 'Alice', 'Age': 25, 'Score': 80},
-            {'Name': 'Eve', 'Age': 35, 'Score': 90}
-        ])
-        plt, ax = task_func(data)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines), 1)  # Only one line for the regression
-        self.assertEqual(len(ax.collections), 1)  # Only one collection for scatter plot
-    def test_linear_regression(self):
-        data = pd.DataFrame([
-            {'Name': 'Alice', 'Age': 20, 'Score': 70},
-            {'Name': 'Bob', 'Age': 25, 'Score': 75},
-            {'Name': 'Eve', 'Age': 30, 'Score': 80}
-        ])
-        plt, ax = task_func(data)
-        line = ax.lines[0]
-        x_data, y_data = line.get_xdata(), line.get_ydata()
-        self.assertTrue((y_data[1] - y_data[0]) / (x_data[1] - x_data[0]) > 0)  # Positive slope
-    def test_plotting_elements(self):
-        data = pd.DataFrame([
-            {'Name': 'Alice', 'Age': 20, 'Score': 70},
-            {'Name': 'Bob', 'Age': 25, 'Score': 75}
-        ])
-        plt, ax= task_func(data)
-        self.assertEqual(ax.get_xlabel(), 'Age')
-        self.assertEqual(ax.get_ylabel(), 'Score')
-        self.assertEqual(ax.get_title(), 'Linear Regression')
-    def test_empty_dataframe(self):
-        data = pd.DataFrame([
-            {'Name': 'Alice', 'Age': 20, 'Score': 70},
-            {'Name': 'Bob', 'Age': 25, 'Score': 75}
-        ])
-        plt, ax = task_func(data)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines), 1)  # No line for regression
-        self.assertGreater(len(ax.collections), 0)
-    def test_missing_columns(self):
-        data = pd.DataFrame([
-            {'Name': 'Alice', 'Age': 20},
-            {'Name': 'Bob', 'Age': 25}
-        ])
-        with self.assertRaises(KeyError):
-            task_func(data)
-    
-    def test_non_df(self):
-        with self.assertRaises(ValueError):
-            task_func("non_df")
+    def test_case_1(self):
+        ax = task_func(0, 1)
+        self.assertTrue(hasattr(ax, 'lines'), "The plot should have lines representing the PDF.")
+        self.assertTrue(hasattr(ax, 'patches'), "The plot should have bars representing the histogram.")
+        self.assertEqual(ax.lines[0].get_color(), 'r', "The PDF line color should be red.")
+        # Check if the OLS line is plotted
+        self.assertEqual(ax.lines[1].get_color(), 'g', "The OLS line color should be green.")
+        
+    def test_case_2(self):
+        ax = task_func(2, 2, 555, 1000, 50)
+        self.assertTrue(hasattr(ax, 'lines'), "The plot should have lines representing the PDF.")
+        self.assertTrue(hasattr(ax, 'patches'), "The plot should have bars representing the histogram.")
+        self.assertEqual(ax.lines[0].get_color(), 'r', "The PDF line color should be red.")
+        # Check if the OLS line is plotted
+        self.assertEqual(ax.lines[1].get_color(), 'g', "The OLS line color should be green.")
+        # Check the axis data
+        self.assertAlmostEquals(ax.get_xlim()[0], -5.66, msg="The x-axis limits are incorrect.", places=2)
+        self.assertAlmostEquals(ax.get_xlim()[1], 8.54, msg="The x-axis limits are incorrect.", places=2)
+        
+    def test_case_3(self):
+        ax = task_func(-2, 0.5, 77, 50000)
+        self.assertTrue(hasattr(ax, 'lines'), "The plot should have lines representing the PDF.")
+        self.assertTrue(hasattr(ax, 'patches'), "The plot should have bars representing the histogram.")
+        self.assertEqual(ax.lines[0].get_color(), 'r', "The PDF line color should be red.")
+        # Check the axis data
+        self.assertAlmostEquals(ax.get_ylim()[0], -0.28, msg="The y-axis limits are incorrect.", places=2)
+        self.assertAlmostEquals(ax.get_ylim()[1], 0.84, msg="The y-axis limits are incorrect.", places=2)
+        # Check the histogram data
+        self.assertEqual(len(ax.patches), 30, "The number of histogram bars is incorrect.")
+        
+    def test_case_4(self):
+        ax = task_func(5, 3)
+        self.assertTrue(hasattr(ax, 'lines'), "The plot should have lines representing the PDF.")
+        self.assertTrue(hasattr(ax, 'patches'), "The plot should have bars representing the histogram.")
+        self.assertEqual(ax.lines[0].get_color(), 'r', "The PDF line color should be red.")
+        # Test the plot array
+        self.assertEqual(len(ax.lines), 2, "The plot should have two lines.")
+        
+    def test_case_5(self):
+        ax = task_func(-5, 1.5)
+        self.assertTrue(hasattr(ax, 'lines'), "The plot should have lines representing the PDF.")
+        self.assertTrue(hasattr(ax, 'patches'), "The plot should have bars representing the histogram.")
+        self.assertEqual(ax.lines[0].get_color(), 'r', "The PDF line color should be red.")

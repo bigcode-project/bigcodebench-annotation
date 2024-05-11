@@ -1,76 +1,62 @@
-import numpy as np
-import matplotlib.pyplot as plt
+from collections import Counter
+import random
+import itertools
 
-# Constants
-ARRAY_SIZE = 10000
-
-def task_func():
+def task_func(length, count, seed=0):
     """
-    Create a numeric array of random integers, calculate the mean and standard deviation, and draw a histogram of the distribution.
-
-    Returns:
-    Tuple: A tuple containing the array, mean, standard deviation, and the histogram plot (Axes).
-
-    Note:
-        The random integers are generated between 1 and 100. The title of the histogram is "Histogram of Random Values". 
-        The x-axis is labeled "Val" and the y-axis is labeled "Freq". 
-        The mean is plotted as a red dashed line, and the standard deviation is plotted as purple dashed lines.
-        
+    Generate a number of random strings with a specified length from a fixed set of letters ('a', 'b', 'c', 'd', 'e'),
+    and analyze the frequency of each letter in the generated strings.
+    
+    Parameters:
+    - length (int): The length of each string to be generated. Should be a non-negative integer.
+    - count (int): The number of random strings to generate. Should be a non-negative integer.
+    - seed (int, optional): A seed for the random number generator to ensure reproducibility.
+    
     Requirements:
-    - numpy
-    - matplotlib.pyplot
+    - collections.Counter
+    - random
+    - itertools
+    
+    Returns:
+    - Counter: A collections.Counter object containing the frequency of each letter in the generated strings.
     
     Example:
-    >>> import numpy as np
-    >>> np.random.seed(0)
-    >>> array, mean, std, ax = task_func()
-    >>> print(mean, std)
-    250.7154 142.85617453522966
-    >>> plt.show()
+    >>> task_func(5, 2, seed=1)
+    Counter({'a': 3, 'd': 3, 'c': 2, 'e': 1, 'b': 1})
+    >>> task_func(0, 100, seed=2)
+    Counter()
     """
-    array = np.random.randint(1, 500, size=ARRAY_SIZE)
-    mean = np.mean(array)
-    std = np.std(array)
-    fig, ax = plt.subplots()
-    ax.hist(array, bins='auto')
-    ax.set_title('Histogram of Random Values')
-    ax.set_xlabel('Val')
-    ax.set_ylabel('Freq')
-    return array, mean, std, ax
+    random.seed(seed)
+    strings = [''.join(random.choices(['a', 'b', 'c', 'd', 'e'], k=length)) for _ in range(count)]
+    letter_frequency = Counter(itertools.chain(*strings))
+    return letter_frequency
 
 import unittest
-import numpy as np
+from collections import Counter
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        np.random.seed(0)
-        array, mean, std, ax = task_func()
-        self.assertEqual(array.size, ARRAY_SIZE)
-        self.assertEqual(mean, 250.7154)
-        self.assertEqual(std, 142.85617453522966)
-        self.assertEqual(ax.get_title(), 'Histogram of Random Values')
-    def test_case_2(self):
-        array, mean, std, ax = task_func()
-        self.assertEqual(ax.get_xlabel(), 'Val')
-        self.assertEqual(ax.get_ylabel(), 'Freq')
-    def test_case_3(self):
-        np.random.seed(42)
-        array, mean, std, ax = task_func()
-        self.assertEqual(array[0], 103)
-        self.assertEqual(array[-1], 474)
-        self.assertEqual(mean, 250.171)
-        self.assertEqual(std, 144.01374920124815)
+    def test_length_one_count_ten(self):
+        result = task_func(1, 10, seed=0)
+        self.assertIsInstance(result, Counter)
+        self.assertEqual(sum(result.values()), 10, "The total count of letters should be 10.")
         
-    def test_case_4(self):
-        np.random.seed(142)
-        array, mean, std, ax = task_func()
-        self.assertEqual(array[0], 278)
-        self.assertEqual(array[-1], 113)
-        self.assertEqual(mean, 251.1245)
-        self.assertEqual(std, 144.49066405740547)
-    def test_case_5(self):
-        np.random.seed(250)
-        array, mean, std, ax = task_func()
-        self.assertEqual(array[0], 367)
-        self.assertEqual(array[-1], 190)
-        self.assertEqual(mean, 249.037)
-        self.assertEqual(std, 144.32681882103546)
+    def test_length_five_count_hundred(self):
+        result = task_func(5, 100, seed=1)
+        self.assertIsInstance(result, Counter)
+        self.assertEqual(sum(result.values()), 500, "The total count of letters should be 500.")
+        
+    def test_zero_length(self):
+        result = task_func(0, 100, seed=2)
+        self.assertIsInstance(result, Counter)
+        self.assertEqual(sum(result.values()), 0, "With length 0, there should be no letters.")
+        
+    def test_zero_count(self):
+        result = task_func(5, 0, seed=3)
+        self.assertIsInstance(result, Counter)
+        self.assertEqual(sum(result.values()), 0, "With count 0, there should be no letters.")
+        
+    def test_specific_distribution(self):
+        # Assuming the seed value of 4 leads to a specific, known distribution
+        result = task_func(5, 2, seed=4)
+        # Correct the expected distribution based on actual output
+        correct_expected_distribution = Counter({'b': 3, 'a': 3, 'e': 2, 'c': 1, 'd': 1})
+        self.assertEqual(result, correct_expected_distribution, "The letter distribution should match the expected distribution.")

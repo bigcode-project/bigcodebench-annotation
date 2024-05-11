@@ -7,7 +7,7 @@ def f_267(signal, precision=2, seed=777):
     """
     Calculate the one-dimensional discrete N-point Fourier Transform (DFT) for a real or complex sequence (signal) 
     using the Fast Fourier Transform (FFT) algorithm. Plot the original signal and the transformed signal, rounding 
-    the transformed signal values to the specified accuracy.
+    the transformed signal values to the specified accuracy. The title of the plots will be 'Original Signal' and 'Transformed Signal'.
 
     Parameters:
     - signal (array): An array representing the signal.

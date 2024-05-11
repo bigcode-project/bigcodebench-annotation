@@ -1,121 +1,80 @@
-from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
+import pandas as pd
+import regex as re
+
+# Constants
+STOPWORDS = ["a", "an", "the", "in", "is", "are"]
 
 
-def task_func(df, age: int, height: int):
+def task_func(text):
     """
-    Filters the input DataFrame based on specified 'Age' and 'Height' conditions and applies KMeans clustering.
-    - If the filtered dataframe has less than 3  columns, add to it a column 'Cluster' with 0 for each row.
-    - Otherwise, do a KMeans clustering (by Age and Height) with 3 clusters and add a column 'Cluster' to the dataframe which corresponds to the cluster
-    index of the cluster to which each row belongs to.
-    - Plot a scatter plot of the 'Age' and 'height' and colored by the cluster indices.
-    - the xlabel should be 'Age', the ylabel 'Height' and the title 'KMeans Clustering based on Age and Height'.
+    Count the frequency of each word in a text after removing specific stopwords.
 
     Parameters:
-    df (DataFrame): The text to analyze.
-    age (int): Filter out the rows of the dataframe which 'Age' value is less than or equal to this value.
-    height (int): Filter out the rows of the dataframe which 'Height' value is greater than or equal to this value.
+    text (str): The text to analyze.
 
     Returns:
-    DataFrame: The filtered dataframe with the new column.
-    matplotlib.axes.Axes: The Axes object of the plotted data. If no KMeans was done, returns None.
+    Series: A pandas Series with word frequencies excluding the words in STOPWORDS list.
 
     Requirements:
-    - sklearn
-    - matplotlib
+    - pandas
+    - regex
 
     Example:
-    >>> import pandas as pd
-    >>> df = pd.DataFrame({
-    ...     'Age': [30, 45, 60, 75],
-    ...     'Height': [160, 170, 165, 190],
-    ...     'Weight': [55, 65, 75, 85]
-    ... })
-    >>> selected_df, ax = task_func(df, 50, 180)
-    >>> print(selected_df)
-       Age  Height  Weight  Cluster
-    2   60     165      75        0
+    >>> text = "This is a sample text. This text contains sample words."
+    >>> word_counts = task_func(text)
+    >>> print(word_counts)
+    this        2
+    sample      2
+    text        2
+    contains    1
+    words       1
+    dtype: int64
     """
-    selected_df = df[(df["Age"] > age) & (df["Height"] < height)].copy()
-    if len(selected_df) >= 3:
-        kmeans = KMeans(n_clusters=3)
-        selected_df["Cluster"] = kmeans.fit_predict(selected_df[["Age", "Height"]])
-        plt.figure(figsize=(10, 5))
-        plt.scatter(selected_df["Age"], selected_df["Height"], c=selected_df["Cluster"])
-        plt.xlabel("Age")
-        plt.ylabel("Height")
-        plt.title("KMeans Clustering based on Age and Height")
-        ax = plt.gca()
-        return selected_df, ax
-    else:
-        selected_df["Cluster"] = 0
-        return selected_df, None
+    text = text.lower()
+    words = re.findall(r'\b\p{L}+\b', text)
+    filtered_words = [word for word in words if word not in STOPWORDS]
+    word_counts = pd.Series(filtered_words).value_counts()
+    return word_counts
 
 import unittest
-import pandas as pd
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def test_case_1(self):
-        data = {
-            "Age": [25, 30, 35, 40, 45],
-            "Height": [160, 155, 170, 165, 150],
-            "Weight": [60, 65, 70, 75, 80],
-        }
-        df = pd.DataFrame(data)
-        result, ax = task_func(df, 28, 165)
-        self.assertTrue(isinstance(result, pd.DataFrame))
-        self.assertTrue("Cluster" in result.columns)
-        self.assertListEqual(result["Cluster"].tolist(), [0, 0])
-        self.assertTrue(max(result.loc[:, "Cluster"]) < 3)
-        self.assertEqual(len(result), 2)
-        self.assertIsNone(ax)
+        text = "This is a sample text This text contains sample words"
+        word_counts = task_func(text).to_dict()
+        expected_counts = {"this": 2, "sample": 2, "text": 2, "contains": 1, "words": 1}
+        self.assertDictEqual(word_counts, expected_counts)
     def test_case_2(self):
-        data = {
-            "Age": [20, 25, 30, 35, 40],
-            "Height": [150, 155, 160, 165, 170],
-            "Weight": [55, 60, 65, 70, 75],
-        }
-        df = pd.DataFrame(data)
-        result, ax = task_func(df, 30, 160)
-        self.assertTrue(isinstance(result, pd.DataFrame))
-        self.assertTrue("Cluster" in result.columns or len(result) < 3)
-        self.assertEqual(len(result), 0)
-        self.assertIsNone(ax)
+        text = "Hello world Hello everyone"
+        word_counts = task_func(text).to_dict()
+        expected_counts = {"hello": 2, "world": 1, "everyone": 1}
+        self.assertDictEqual(word_counts, expected_counts)
     def test_case_3(self):
-        data = {
-            "Age": [29, 30, 35, 40, 75],
-            "Height": [140, 155, 170, 165, 210],
-            "Weight": [60, 65, 70, 75, 70],
-        }
-        df = pd.DataFrame(data)
-        result, ax = task_func(df, 28, 220)
-        self.assertTrue(isinstance(result, pd.DataFrame))
-        self.assertTrue("Cluster" in result.columns or len(result) < 3)
-        self.assertEqual(len(result), 5)
-        self.assertEqual(ax.get_xlabel(), "Age")
-        self.assertEqual(ax.get_ylabel(), "Height")
-        self.assertEqual(ax.get_title(), "KMeans Clustering based on Age and Height")
+        text = "a an the in is are"
+        word_counts = task_func(text).to_dict()
+        expected_counts = {}
+        self.assertDictEqual(word_counts, expected_counts)
     def test_case_4(self):
-        data = {
-            "Age": [25, 30, 35, 40, 45],
-            "Height": [160, 155, 170, 165, 150],
-            "Weight": [60, 65, 70, 75, 80],
-        }
-        df = pd.DataFrame(data)
-        result, ax = task_func(df, 28, 180)
-        self.assertTrue(isinstance(result, pd.DataFrame))
-        self.assertTrue("Cluster" in result.columns)
-        self.assertTrue(max(result.loc[:, "Cluster"]) < 3)
-        self.assertEqual(len(result), 4)
+        text = "This is a test sentence which has a bunch of words and no period"
+        word_counts = task_func(text).to_dict()
+        expected_counts = {
+                "this": 1,
+                "test": 1,
+                "sentence": 1,
+                "which": 1,
+                "has": 1,
+                "bunch": 1,
+                "of": 1,
+                "words": 1,
+                "and": 1,
+                "no": 1,
+                "period": 1,
+            }
+        self.assertDictEqual(word_counts, expected_counts)
     def test_case_5(self):
-        data = {
-            "Age": [25, 30, 35, 40, 45],
-            "Height": [160, 155, 170, 165, 150],
-            "Weight": [60, 65, 70, 75, 80],
-        }
-        df = pd.DataFrame(data)
-        result, ax = task_func(df, 24, 165)
-        self.assertTrue(isinstance(result, pd.DataFrame))
-        self.assertTrue("Cluster" in result.columns)
-        self.assertTrue(max(result.loc[:, "Cluster"]) < 3)
-        self.assertEqual(len(result), 3)
+        text = (
+            "I I I want want to to to to to go to to to the olympics olympics this year"
+        )
+        word_counts = task_func(text).to_dict()
+        expected_counts = {"i": 3, "want": 2, "to": 8, "go": 1, "olympics": 2, "this": 1, "year": 1}
+        self.assertDictEqual(word_counts, expected_counts)

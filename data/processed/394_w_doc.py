@@ -1,94 +1,65 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy import stats
+import collections
+import string
+import random
 
 
-def task_func(mu, sigma, num_samples=1000, seed=77):
+def task_func(length, seed=0):
     """
-    Generate a normal distribution with the given mean and standard deviation. 
-    Creates a figure containing a histogram and a Q-Q plot of the generated samples.
+    Generate a random string of a given length using ASCII letters and calculate the frequency of each character.​
 
     Parameters:
-    mu (float): The mean of the normal distribution.
-    sigma (float): The standard deviation of the normal distribution.
-    num_samples (int, Optional): The number of samples to generate. Default is 1000.
-    seed (int, Optional): The seed for the random number generator. Default is 77.
+    length (int): The length of the random string to be generated.
+    seed (int, Optional): The seed to be used for the random number generator. Default is 0.
 
     Returns:
-    matplotlib.figure.Figure: A matplotlib figure containing the histogram and Q-Q plot.
+    dict: A dictionary with the frequency of each character in the generated string.
 
     Requirements:
-    - numpy for generating the samples.
-    - matplotlib.pyplot for plotting.
-    - scipy.stats for the Q-Q plot.
+    - The function uses the 'collections', 'string', and 'random' modules from the Python standard library.
+    - The generated string consists only of ASCII letters.
 
     Example:
-    >>> fig = task_func(0, 1)
-    >>> type(fig)
-    <class 'matplotlib.figure.Figure'>
+    >>> result = task_func(4)
+    >>> isinstance(result, dict)  # The result should be a dictionary
+    True
+    >>> all(key in string.ascii_letters for key in result.keys())  # All keys should be ASCII letters
+    True
+    >>> task_func(5, 0)  # The result should be deterministic for a given seed
+    {'y': 1, 'W': 1, 'A': 1, 'c': 1, 'q': 1}
     """
-    np.random.seed(seed)
-    samples = np.random.normal(mu, sigma, num_samples)
-    fig = plt.figure(figsize=(12, 6))
-    plt.subplot(1, 2, 1)
-    plt.hist(samples, bins=30, density=True, alpha=0.6, color='g')
-    plt.subplot(1, 2, 2)
-    stats.probplot(samples, dist="norm", plot=plt)
-    return fig
+    random.seed(seed)
+    random_string = ''.join(random.choice(string.ascii_letters) for _ in range(length))
+    char_freq = collections.Counter(random_string)
+    return dict(char_freq)
 
 import unittest
-from matplotlib import colors as mcolors
-from matplotlib.figure import Figure
 import doctest
 class TestCases(unittest.TestCase):
-    def test_standard_normal_distribution(self):
-        """Test with standard normal distribution parameters (mu=0, sigma=1)."""
-        fig = task_func(0, 1)
-        self.assertIsInstance(fig, Figure)
-        self.assertEqual(len(fig.axes), 2)  # Should contain two subplots
-        self._test_histogram_attributes(fig.axes[0], expected_bins=30, color='g')
-        self._test_qq_plot_attributes(fig.axes[1])
-    def test_nonzero_mean(self):
-        """Test with a nonzero mean."""
-        mu = 5
-        sigma = 1
-        fig = task_func(mu, sigma)
-        self.assertIsInstance(fig, Figure)
-        self.assertEqual(len(fig.axes), 2)
-        self._test_histogram_attributes(fig.axes[0], expected_bins=30, color='g')
-        self._test_qq_plot_attributes(fig.axes[1])
-    def test_different_standard_deviation(self):
-        """Test with a different standard deviation."""
-        mu = 0
-        sigma = 2
-        fig = task_func(mu, sigma)
-        self.assertIsInstance(fig, Figure)
-        self.assertEqual(len(fig.axes), 2)
-        self._test_histogram_attributes(fig.axes[0], expected_bins=30, color='g')
-        self._test_qq_plot_attributes(fig.axes[1])
-    def test_negative_mean(self):
-        """Test with a negative mean."""
-        mu = -5
-        sigma = 1
-        fig = task_func(mu, sigma)
-        self.assertIsInstance(fig, Figure)
-        self.assertEqual(len(fig.axes), 2)
-        self._test_histogram_attributes(fig.axes[0], expected_bins=30, color='g')
-        self._test_qq_plot_attributes(fig.axes[1])
-    def test_large_standard_deviation(self):
-        """Test with a large standard deviation."""
-        mu = 0
-        sigma = 5
-        fig = task_func(mu, sigma)
-        self.assertIsInstance(fig, Figure)
-        self.assertEqual(len(fig.axes), 2)
-        self._test_histogram_attributes(fig.axes[0], expected_bins=30, color='g')
-        self._test_qq_plot_attributes(fig.axes[1])
-    def _test_histogram_attributes(self, ax, expected_bins, color):
-        """Helper function to test histogram attributes."""
-        n, bins, patches = ax.hist([], bins=expected_bins, color=color)  # Dummy histogram to get attributes
-        self.assertEqual(expected_bins, len(patches))  # The number of bars should match the number of bins
-        self.assertEqual(patches[0].get_facecolor(), mcolors.to_rgba(color))  # Checking the color of the bars
-    def _test_qq_plot_attributes(self, ax):
-        """Helper function to test Q-Q plot attributes."""
-        self.assertTrue(len(ax.get_lines()) > 0)  # Check if there are lines in the Q-Q plot
+    def test_case_1(self):
+        result = task_func(0, 77)
+        self.assertEquals(result, {})
+        self.assertIsInstance(result, dict)
+        self.assertEqual(len(result), 0)
+    def test_case_2(self):
+        result = task_func(1)
+        self.assertIsInstance(result, dict)
+        self.assertEqual(sum(result.values()), 1)
+        self.assertEqual(len(result), 1)
+    def test_case_3(self):
+        length = 10000
+        result = task_func(length, 34)
+        self.assertIsInstance(result, dict)
+        self.assertEqual(sum(result.values()), length)
+        self.assertTrue(all(char in string.ascii_letters for char in result))
+    def test_case_4(self):
+        length = 10
+        result = task_func(length, 77)
+        self.assertIsInstance(result, dict)
+        self.assertEqual(result, {'Z': 1, 'q': 1, 'u': 1, 'm': 2, 'p': 1, 'h': 1, 's': 1, 'E': 1, 'J': 1})
+        self.assertTrue(all(char in string.ascii_letters for char in result))
+    def test_case_5(self):
+        length = random.randint(1, 1000)
+        result = task_func(length)
+        self.assertIsInstance(result, dict)
+        self.assertEqual(sum(result.values()), length)
+        self.assertTrue(all(char in string.ascii_letters for char in result))

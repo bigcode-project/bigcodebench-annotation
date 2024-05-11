@@ -1,70 +1,77 @@
 import matplotlib.pyplot as plt
-import pandas as pd
 import seaborn as sns
-import numpy as np
+import pandas as pd
+from sklearn.datasets import load_diabetes
 
-def task_func(seed=42):
+def task_func():
     """
-    Draw the correlation heatmap of the Boston Housing dataset using Seaborn, with an option to save it to a specified file.
-
-    Parameters:
-        seed (int, optional): Random seed for reproducibility. Defaults to 42.
-    The font should be in the family of sans-serif and Arial.
-
-    Returns:
-        matplotlib.axes.Axes: The Axes object containing the heatmap plot.
-
-    Raises:
-        ValueError: If an error occurs in generating or saving the plot.
+    Draws a seaborn pairplot for the diabetes dataset obtained from sklearn.datasets. 
+    This function sets the font to Arial. It then loads the diabetes dataset into a
+    DataFrame and creates a pairplot using seaborn, which is useful for visual exploration 
+    of relationships between different features in the dataset.
 
     Requirements:
-        - matplotlib
-        - os
-        - pandas
-        - seaborn
-        - numpy 
+    - matplotlib.pyplot
+    - seaborn
+    - sklearn.datasets.load_diabetes
+    - pandas
 
-    Example:
-        >>> ax = task_func()
-        >>> type(ax)
-        <class 'matplotlib.axes._axes.Axes'>
+    Returns:
+        matplotlib.figure.Figure: A matplotlib Figure instance representing the created pairplot.
+        pd.DataFrame: a DataFrame representation of the diabetes dataset
+
+    Examples:
+    >>> fig, df = task_func()
+    >>> isinstance(fig, plt.Figure)
+    True
+    >>> isinstance(df, pd.DataFrame)
+    True
+    >>> type(fig).__name__
+    'Figure'
     """
-    try:
-        font = {'sans-serif': 'Arial', 'family': 'sans-serif'}
-        plt.rc('font', **font)
-        data_url = "http://lib.stat.cmu.edu/datasets/boston"
-        raw_df = pd.read_csv(data_url, sep="\s+", skiprows=22, header=None)
-        data = np.hstack([raw_df.values[::2, :], raw_df.values[1::2, :2]])
-        target = raw_df.values[1::2, 2]
-        columns = ['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 'RAD', 'TAX', 'PTRATIO', 'B', 'LSTAT']
-        boston_df = pd.DataFrame(data=data, columns=columns)
-        corr = boston_df.corr()
-        sns.set_theme(style="white")  # Optional: for better aesthetics
-        plt.figure(figsize=(10, 8))  # Optional: adjust the size of the heatmap
-        ax = sns.heatmap(corr, annot=True)  # 'annot=True' to display correlation values
-        return ax
-    except Exception as e:
-        raise ValueError(f"An error occurred: {e}")
+    font = {'family': 'Arial'}
+    plt.rc('font', **font)  # Set the global font to Arial.
+    DIABETES = load_diabetes()
+    diabetes_df = pd.DataFrame(data=DIABETES.data, columns=DIABETES.feature_names)
+    pair_plot = sns.pairplot(diabetes_df)
+    return pair_plot.fig, diabetes_df
 
 import unittest
 import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+from unittest.mock import patch
+from sklearn.datasets import load_diabetes
 class TestCases(unittest.TestCase):
-    def test_basic_functionality(self):
-        ax = task_func()
-        self.assertIsInstance(ax, plt.Axes)
-    def test_heatmap_features(self):
-        ax = task_func()
-        heatmap_data = ax.get_children()[0].get_array().data
-        self.assertEqual(heatmap_data.shape, (169,))  # Assuming Boston dataset has 13 features
-    
-    def test_heatmap_values(self):
-        ax = task_func()
-        heatmap_data = ax.get_children()[0].get_array().data
-        
-        expect = [1.0, -0.20046921966254744, 0.4065834114062594, -0.05589158222224156, 0.4209717113924554, -0.21924670286251308, 0.3527342509013634, -0.37967008695102467, 0.6255051452626024, 0.5827643120325854, 0.2899455792795226, -0.3850639419942239, 0.4556214794479463, -0.20046921966254744, 1.0, -0.5338281863044696, -0.04269671929612169, -0.5166037078279843, 0.31199058737409047, -0.5695373420992109, 0.6644082227621105, -0.3119478260185367, -0.3145633246775997, -0.3916785479362161, 0.1755203173828273, -0.41299457452700283, 0.4065834114062594, -0.5338281863044696, 1.0, 0.06293802748966515, 0.7636514469209139, -0.39167585265684274, 0.6447785113552554, -0.7080269887427675, 0.5951292746038485, 0.7207601799515422, 0.38324755642888936, -0.3569765351041928, 0.603799716476621, -0.05589158222224156, -0.04269671929612169, 0.06293802748966515, 1.0, 0.09120280684249558, 0.09125122504345677, 0.08651777425454328, -0.09917578017472799, -0.00736824088607757, -0.03558651758591146, -0.12151517365806228, 0.048788484955166495, -0.05392929837569424, 0.4209717113924554, -0.5166037078279843, 0.7636514469209139, 0.09120280684249558, 1.0, -0.3021881878495924, 0.7314701037859592, -0.7692301132258282, 0.6114405634855762, 0.6680232004030217, 0.18893267711276884, -0.3800506377924, 0.5908789208808451, -0.21924670286251308, 0.31199058737409047, -0.39167585265684274, 0.09125122504345677, -0.3021881878495924, 1.0, -0.24026493104775065, 0.20524621293005416, -0.20984666776610833, -0.2920478326232189, -0.35550149455908525, 0.1280686350925421, -0.6138082718663955, 0.3527342509013634, -0.5695373420992109, 0.6447785113552554, 0.08651777425454328, 0.7314701037859592, -0.24026493104775065, 1.0, -0.747880540868632, 0.4560224517516137, 0.5064555935507051, 0.2615150116719584, -0.273533976638513, 0.6023385287262395, -0.37967008695102467, 0.6644082227621105, -0.7080269887427675, -0.09917578017472799, -0.7692301132258282, 0.20524621293005416, -0.747880540868632, 1.0, -0.4945879296720758, -0.5344315844084577, -0.23247054240825826, 0.2915116731330399, -0.4969958308636848, 0.6255051452626024, -0.3119478260185367, 0.5951292746038485, -0.00736824088607757, 0.6114405634855762, -0.20984666776610833, 0.4560224517516137, -0.4945879296720758, 1.0, 0.9102281885331865, 0.46474117850306057, -0.44441281557512585, 0.4886763349750666, 0.5827643120325854, -0.3145633246775997, 0.7207601799515422, -0.03558651758591146, 0.6680232004030217, -0.2920478326232189, 0.5064555935507051, -0.5344315844084577, 0.9102281885331865, 1.0, 0.4608530350656702, -0.44180800672281423, 0.5439934120015698, 0.2899455792795226, -0.3916785479362161, 0.38324755642888936, -0.12151517365806228, 0.18893267711276884, -0.35550149455908525, 0.2615150116719584, -0.23247054240825826, 0.46474117850306057, 0.4608530350656702, 1.0, -0.1773833023052333, 0.3740443167146772, -0.3850639419942239, 0.1755203173828273, -0.3569765351041928, 0.048788484955166495, -0.3800506377924, 0.1280686350925421, -0.273533976638513, 0.2915116731330399, -0.44441281557512585, -0.44180800672281423, -0.1773833023052333, 1.0, -0.36608690169159663, 0.4556214794479463, -0.41299457452700283, 0.603799716476621, -0.05392929837569424, 0.5908789208808451, -0.6138082718663955, 0.6023385287262395, -0.4969958308636848, 0.4886763349750666, 0.5439934120015698, 0.3740443167146772, -0.36608690169159663, 1.0]
-        self.assertAlmostEqual(heatmap_data.tolist(), expect, "DataFrame contents should match the expected output")
-    def test_plot_appearance(self):
-        ax = task_func()
-        self.assertEqual(ax.get_xlabel(), "")
-        self.assertEqual(ax.get_ylabel(), "")
-        self.assertEqual(ax.get_title(), "")
+    def setUp(self):
+        # Load the dataset only once for use in multiple tests to improve performance
+        self.diabetes_data = load_diabetes()
+        self.diabetes_df = pd.DataFrame(data=self.diabetes_data.data, columns=self.diabetes_data.feature_names)
+    def test_return_type(self):
+        """Test that the function returns a matplotlib Figure instance."""
+        fig, diabetes_df = task_func()
+        self.assertIsInstance(fig, plt.Figure)
+        self.assertIsInstance(diabetes_df, pd.DataFrame)
+    def test_dataframe_values_equal(self):
+        fig, diabetes_df = task_func()
+        # Check if all values in each column are equal
+        for col in self.diabetes_df.columns:
+            self.assertTrue(all(self.diabetes_df[col] == diabetes_df[col]))
+    def test_font_setting(self):
+        """Test if the font setting is correctly applied to the figure."""
+        task_func()
+        # Checking matplotlib's default font settings
+        current_font = plt.rcParams['font.family']
+        self.assertIn('Arial', current_font)
+    @patch('seaborn.pairplot')
+    def test_seaborn_pairplot_called(self, mock_pairplot):
+        """Test if seaborn's pairplot function is called in task_func."""
+        mock_pairplot.return_value = sns.pairplot(self.diabetes_df)  # Mocking pairplot to return a valid pairplot
+        task_func()
+        mock_pairplot.assert_called()
+    def test_dataframe_col_equal(self):
+        """Test specific configurations of the seaborn pairplot."""
+        fig, diabetes_df = task_func()
+        # Check if all columns in self.diabetes_df are the same as in diabetes_df
+        self.assertTrue(all(col in diabetes_df.columns for col in self.diabetes_df.columns))
+        self.assertTrue(all(col in self.diabetes_df.columns for col in diabetes_df.columns))

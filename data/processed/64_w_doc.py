@@ -1,134 +1,134 @@
 import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 
-def task_func(car_dict):
+# Constants
+COLUMNS = ['col1', 'col2', 'col3']
+
+def task_func(data):
     """
-    With a dictionary of cars as keys and their colors as values, create a DataFrame and visualize the distribution of vehicle colors in a bar chart.
-    - The columns of the dataframe should be 'Car' and 'Color'.
-    - The plot title should be 'Distribution of Vehicle Colors'.
+    You are given a list of elements. Each element is a list with the same length as COLUMNS, representing one row a dataframe df to create. Visualize the distribution of different values in a column "col3" of a pandas DataFrame df, grouped by "col1" and "col2," using a heatmap.
 
     Parameters:
-    car_dict (dict): The dictionary with car brands as keys and their colors as values.
+    - data (list): A list of elements. Each element is a list with the same length as COLUMNS, representing one row of the dataframe to build.
 
     Returns:
-    tuple: A tuple containing:
-        - DataFrame: A pandas DataFrame with car brands and their colors.
-        - Axes: The Axes object of the bar chart visualizing the distribution of vehicle colors.
+    - tuple:
+        pandas.DataFrame: The DataFrame of the analyzed data.
+        plt.Axes: The heatmap visualization.
 
     Requirements:
     - pandas
+    - seaborn
     - matplotlib
 
     Example:
-    >>> car_dict = {'Ford': 'Red', 'Toyota': 'Blue', 'Mercedes': 'Black', 'Tesla': 'White', 'BMW': 'Silver'}
-    >>> df, ax = task_func(car_dict)
-    >>> print(df)
-            Car   Color
-    0      Ford     Red
-    1    Toyota    Blue
-    2  Mercedes   Black
-    3     Tesla   White
-    4       BMW  Silver
+    >>> data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
+    >>> analyzed_df, ax = task_func(data)
+    >>> print(analyzed_df)
+    col2  1  2
+    col1      
+    1     2  1
+    2     3  1
     """
-    car_data = list(car_dict.items())
-    df = pd.DataFrame(car_data, columns=['Car', 'Color'])
-    color_counts = df["Color"].value_counts()
-    figure = plt.figure()
-    plt.bar(color_counts.keys(), color_counts.values, color="maroon", width=0.4)
-    plt.xlabel("Color")
-    plt.ylabel("Frequency")
-    plt.title("Distribution of Vehicle Colors")
+    df = pd.DataFrame(data, columns=COLUMNS)
+    analyzed_df = df.groupby(COLUMNS[:-1])[COLUMNS[-1]].nunique().reset_index()
+    analyzed_df = analyzed_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
+    ax = sns.heatmap(analyzed_df, annot=True)
     plt.show()
-    ax = plt.gca()
-    return df, ax
+    return analyzed_df, ax
 
 import unittest
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
-    @staticmethod
-    def is_barplot(ax, expected_values, expected_categories):
-        extracted_values = [bar.get_height() for bar in ax.patches] # extract bar height
-        extracted_categories = [tick.get_text() for tick in ax.get_xticklabels()] # extract category label
-        for actual_value, expected_value in zip(extracted_values, expected_values):
-            assert actual_value == expected_value, f"Expected value '{expected_value}', but got '{actual_value}'"
-        for actual_category, expected_category in zip(extracted_categories, expected_categories):
-            assert actual_category == expected_category, f"Expected category '{expected_category}', but got '{actual_category}'"
     def test_case_1(self):
-        car_dict = {
-            "Ford": "Red",
-            "Toyota": "Blue",
-            "Mercedes": "Black",
-            "Tesla": "White",
-            "BMW": "Silver",
-        }
-        df, ax = task_func(car_dict)
-        self.is_barplot(
-            ax,
-            expected_values=[1, 1, 1, 1, 1],
-            expected_categories=['Red', 'Blue', 'Black', 'White', 'Silver']
-        )
+        data = [[1, 1, 1], [1, 1, 1], [1, 1, 2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 1, 1], [2, 1, 2], [2, 1, 3], [2, 2, 3], [2, 2, 3], [2, 2, 3]]
+        df = pd.DataFrame(data, columns=COLUMNS)
+        analyzed_df, ax = task_func(df)
+        expected_data = [[1, 1, 2], [1, 2, 1], [2, 1, 3], [2, 2, 1]]
+        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
+        expected_df = expected_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
         # Assertions
-        self.assertListEqual(list(df.columns), ['Car', 'Color'])
-        self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
-        self.assertSetEqual(set(df['Color']), set(car_dict.values()))
-        self.assertEqual(ax.get_title(), 'Distribution of Vehicle Colors')
-        self.assertEqual(ax.get_xlabel(), "Color")
-        self.assertEqual(ax.get_ylabel(), "Frequency")
+        self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
+        self.assertTrue(isinstance(ax, plt.Axes))
     def test_case_2(self):
-        car_dict = {
-            "Ford": "Blue",
-            "Toyota": "Red",
-            "Fiat": "Silver",
-            "Tesla": "Silver",
-            "BMW": "White",
-        }
-        df, ax = task_func(car_dict)
+        data = [
+            [1, 1, 2],
+            [1, 1, 3],
+            [1, 2, 4],
+            [1, 1, 5],
+            [1, 3, 7]
+        ]
+        analyzed_df, ax = task_func(data)
+        expected_data = [
+            [1, 1, 3],
+            [1, 2, 1],
+            [1, 3, 1]
+        ]
+        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
+        expected_df = expected_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
         # Assertions
-        self.assertListEqual(list(df.columns), ['Car', 'Color'])
-        self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
-        self.assertSetEqual(set(df['Color']), set(car_dict.values()))
-        self.assertEqual(ax.get_title(), 'Distribution of Vehicle Colors')
+        self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
+        self.assertTrue(isinstance(ax, plt.Axes))
     def test_case_3(self):
-        car_dict = {
-            "Ford": "Red",
-            "Toyota": "Blue",
-            "Mercedes": "Black",
-            "Tesla": "White",
-            "BMW": "Silver",
-            "Lamborghini": "Black",
-            "Peugeot": "Black",
-        }
-        df, ax = task_func(car_dict)
+        data = [
+            [1, 1, 1],
+            [1, 2, 3],
+            [2, 1, 4],
+            [2, 2, 5]
+        ]
+        analyzed_df, ax = task_func(data)
+        expected_data = [
+            [1, 1, 1],
+            [1, 2, 1],
+            [2, 1, 1],
+            [2, 2, 1]
+        ]
+        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
+        expected_df = expected_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
         # Assertions
-        self.assertListEqual(list(df.columns), ['Car', 'Color'])
-        self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
-        self.assertSetEqual(set(df['Color']), set(car_dict.values()))
-        self.assertEqual(ax.get_title(), 'Distribution of Vehicle Colors')
+        self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
+        self.assertTrue(isinstance(ax, plt.Axes))
     def test_case_4(self):
-        car_dict = {
-            "Ford": "Red",
-            "Toyota": "Blue",
-            "Mercedes": "Black",
-            "Tesla": "White",
-            "BMW": "Silver",
-        }
-        df, ax = task_func(car_dict)
+        data = [
+            [1, 1, 1],
+            [1, 1, 1],
+            [1, 1, 1]
+        ]
+        analyzed_df, ax = task_func(data)
+        expected_data = [
+            [1, 1, 1],
+        ]
+        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
+        expected_df = expected_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
         # Assertions
-        self.assertListEqual(list(df.columns), ['Car', 'Color'])
-        self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
-        self.assertSetEqual(set(df['Color']), set(car_dict.values()))
-        self.assertEqual(ax.get_title(), 'Distribution of Vehicle Colors')
+        self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
+        self.assertTrue(isinstance(ax, plt.Axes))
     def test_case_5(self):
-        car_dict = {
-            "Ford": "Red",
-            "Toyota": "Red",
-            "Mercedes": "Red",
-            "Tesla": "White",
-            "BMW": "Silver",
-        }
-        df, ax = task_func(car_dict)
+        data = [
+            [0, 0, 0],
+            [0, 1, 0],
+            [1, 0, 0],
+            [1, 1, 0],
+            [0, 0, 1],
+            [0, 1, 1],
+            [1, 0, 1],
+            [1, 1, 1],
+        ]
+        analyzed_df, ax = task_func(data)
+        expected_data = [
+            [0, 0, 2],
+            [0, 1, 2],
+            [1, 0, 2],
+            [1, 1, 2]
+        ]
+        expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
+        expected_df = expected_df.pivot(index=COLUMNS[0], columns=COLUMNS[1], values=COLUMNS[2])
         # Assertions
-        self.assertListEqual(list(df.columns), ['Car', 'Color'])
-        self.assertSetEqual(set(df['Car']), set(car_dict.keys()))
-        self.assertSetEqual(set(df['Color']), set(car_dict.values()))
-        self.assertEqual(ax.get_title(), 'Distribution of Vehicle Colors')
+        self.assertTrue(isinstance(analyzed_df, pd.DataFrame))
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
+        self.assertTrue(isinstance(ax, plt.Axes))

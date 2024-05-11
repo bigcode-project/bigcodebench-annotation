@@ -1,72 +1,87 @@
-import numpy as np
-from sympy import symbols, solve
+import random
+from collections import Counter
 
+# Constants
+CARDS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 
-def task_func(precision=2, seed=0):
+def task_func(x=1):
     """
-    Solve a quadratic equation in the form of ax ^ 2 + bx + c = 0, where a, b, and c randomly generated numbers are between -10 and 10. The solutions are complex numbers rounded to the specified accuracy.
+    Draw x random 5-card poker hands from a 52-card pack (without suits) and return
+    the hands along with a counter of the drawn cards.
 
     Parameters:
-    precision (int): The number of decimal places to which to round the solutions.
-    seed (int, Optional): The seed for the random number generator.
+    x (int, optional): Number of hands to draw. Default is 1.
 
     Returns:
-    tuple: A tuple of two solutions formatted as complex numbers (rounded to the specified precision).
+    tuple: A tuple containing two elements:
+        - list of list str: Each inner list contains 5 strings, representing a 5-card poker hand.
+        - Counter: A counter of the drawn cards.
+
+
+    The output is random; hence, the returned list will vary with each call.
 
     Requirements:
-    - numpy
-    - math
-    - sympy
+    - random
+    - collections.Counter
 
     Example:
-    >>> result = task_func()
-    >>> len(result)
-    2
-    >>> result
-    ((-3.86+0j), (-0.54+0j))
+    >>> random.seed(0)
+    >>> result = task_func(1)
+    >>> len(result[0][0])
+    5
+    >>> result[0][0][0] in CARDS
+    True
     """
-    np.random.seed(seed)
-    a = np.random.uniform(-10, 10)
-    b = np.random.uniform(-10, 10)
-    c = np.random.uniform(-10, 10)
-    x = symbols('x')
-    equation = a * x**2 + b * x + c
-    solutions = solve(equation, x)
-    solutions = [complex(round(complex(solution).real, precision), round(complex(solution).imag, precision)) for solution in solutions]
-    return tuple(solutions)
+    result = []
+    card_counts = Counter()
+    for i in range(x):
+        drawn = random.sample(CARDS, 5)
+        result.append(drawn)
+        card_counts.update(drawn)
+    return result, card_counts
 
 import unittest
-import doctest
+import random
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        result = task_func(seed=1789)
-        self.assertIsInstance(result, tuple, "The result should be a tuple.")
-        self.assertEqual(len(result), 2, "The tuple should have two values.")
-        for value in result:
-            self.assertEqual(value.real, round(value.real, 2), "The value should be rounded to 2 decimal places.")
-            self.assertEqual(value.imag, round(value.imag, 2), "The value should be rounded to 2 decimal places.")
-        # Test the output
-        self.assertEqual(result, ((-5.15+0j), (0.41+0j)))
-        
-    def test_case_2(self):
-        result = task_func(precision=3)
-        for value in result:
-            self.assertEqual(value.real, round(value.real, 3), "The value should be rounded to 3 decimal places.")
-            self.assertEqual(value.imag, round(value.imag, 3), "The value should be rounded to 3 decimal places.")
-    def test_case_3(self):
-        result = task_func(precision=0)
-        for value in result:
-            self.assertEqual(value.real, round(value.real), "The value should be an integer.")
-            self.assertEqual(value.imag, round(value.imag), "The value should be an integer.")
-    def test_case_4(self):
-        result = task_func(precision=4)
-        for value in result:
-            self.assertEqual(value.real, round(value.real, 4), "The value should be rounded to 4 decimal places.")
-            self.assertEqual(value.imag, round(value.imag, 4), "The value should be rounded to 4 decimal places.")
-    def test_case_5(self):
-        result = task_func(precision=5, seed=1234)
-        for value in result:
-            self.assertEqual(value.real, round(value.real, 5), "The value should be rounded to 5 decimal places.")
-            self.assertEqual(value.imag, round(value.imag, 5), "The value should be rounded to 5 decimal places.")
-        # Test the output
-        self.assertEqual(result, ((0.19792-0.40336j), (0.19792+0.40336j)))
+    def test_hand_size(self):
+        """ Test if the hand contains exactly 5 cards. """
+        random.seed(0)
+        hand, _ = task_func()
+        self.assertEqual(len(hand[0]), 5)
+    
+    
+    def test_drawn_size(self):
+        random.seed(0)
+        hand, _ = task_func(2)
+        self.assertEqual(len(hand[0]), 5)
+        self.assertEqual(len(hand), 2)
+    
+    def test_counter(self):
+        random.seed(0)
+        hand, counter = task_func(1)
+        self.assertEqual(len(hand[0]), 5)
+        self.assertLessEqual(counter[hand[0][0]], 5)
+        self.assertGreaterEqual(counter[hand[0][0]], 1)
+    def test_card_uniqueness(self):
+        """ Test if all cards in the hand are unique. """
+        random.seed(0)
+        hand, _ = task_func()
+        self.assertEqual(len(hand[0]), len(set(hand[0])))
+    def test_valid_cards(self):
+        """ Test if all cards drawn are valid card values. """
+        random.seed(0)
+        hand, _ = task_func()
+        for card in hand[0]:
+            self.assertIn(card, ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'])
+    def test_randomness(self):
+        """ Test if multiple executions return different hands. """
+        random.seed(0)
+        hands = [task_func()[0][0] for _ in range(10)]
+        self.assertTrue(len(set(tuple(hand) for hand in hands[0])) > 1)
+    def test_card_distribution(self):
+        """ Test if all possible cards appear over multiple executions. """
+        random.seed(0)
+        all_cards = set()
+        for _ in range(1000):
+            all_cards.update(task_func()[0][0])
+        self.assertEqual(all_cards, set(['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']))

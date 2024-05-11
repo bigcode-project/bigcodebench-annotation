@@ -1,54 +1,62 @@
-import random
-import string
 import base64
-import zlib
-def task_func(string_length=100):
+import pandas as pd
+
+
+def task_func(df):
     """
-    Create a random string of a specified length with uppercase letters and digits, compress it with zlib, 
-    and then encode the compressed string in base64.
+    Encodes a dict of list as a Base64 string. The dict is first converted to a Pandas DataFrame.
+    Then convert the data franme to CSV format and encoded to bytes, finally encoded it to a Base64 string.
 
     Parameters:
-    - string_length (int, optional): The length of the random string to be generated. Default is 100.
+        df (dict of list): A dictionary where the key 'Word' maps to a list of strings.
 
     Returns:
-    str: The compressed string in base64.
+        str: The Base64 encoded string of the DataFrame's CSV representation.
 
     Requirements:
-    - base64
-    - zlib
-    - random
-    - string
+        - base64
+        - pandas
 
     Example:
-    >>> random.seed(1)
-    >>> compressed_string = task_func(50)
-    >>> print(compressed_string)
-    eJxzNTH0CgqMMHJxMgkwdAyM8rQwc3IMMffzCHDyCAjy9PQI9HY0CY1wtzRx9YmKMg8wjgQAWN0NxA==
+        >>> df = {'A': [1, 2, 3], 'B': [4, 5, 6]}
+        >>> encoded_df = task_func(df)
+        >>> isinstance(encoded_df, str)
+        True
+        >>> len(encoded_df) > 0  # The actual encoded string will vary
+        True
     """
-    random_string = ''.join(random.choices(string.ascii_uppercase + string.digits, k=string_length))
-    compressed_string = zlib.compress(random_string.encode('utf-8'))
-    encoded_compressed_string = base64.b64encode(compressed_string)
-    return encoded_compressed_string.decode('utf-8')
+    df = pd.DataFrame(df)
+    csv = df.to_csv(index=False)
+    csv_bytes = csv.encode('utf-8')
+    base64_bytes = base64.b64encode(csv_bytes)
+    base64_string = base64_bytes.decode('utf-8')
+    return base64_string
 
 import unittest
+from io import StringIO
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        random.seed(1)
-        result = task_func()
-        self.assertEqual(result, 'eJwFwUEOhCAMAMAvLVBXONJooGqkUCDa/z/EmR3M0epjNwQ2sSr5P8a+3pkxcyPK9YwwnhRgv1RXdu85F5CJZEvq+t4sVkpD1DBLkmA6kPhRj+6jdcvPyeAPdLQbtg==')
-    def test_case_2(self):
-        random.seed(0)
-        result = task_func(50)
-        self.assertEqual(result, 'eJwzMQzwCvY38g4KMwv2Ngz3MrM0NvMxMIsMdAkIM7MIMvUyCnGM8jeOdAwy9fQxdQ/1tAAAVX8NdQ==')
-    def test_case_3(self):
-        random.seed(42)
-        result = task_func(200)
-        self.assertEqual(result, 'eJwFwVkCQCAQANArRZs+WzCTJIyU+x/Ee81GZF2F4uC20Agqt/zbl2kPQVTOyGTir3w+h5vHsL05Q9StrmzJpj1dDOhSBC1TO9QZ8YlVHWDu4MI7Fp8NTcJ+nWKbyznJeK9Kbq0uA41kk9WSJy+ncPlhmC+KsgAxSKaVe8a9IvgXlfDYYdbPNfI1lHKybsKxS1zPsqEukpwRP8dcNyU=')
-    def test_case_4(self):
-        random.seed(10)
-        result = task_func(10)
-        self.assertEqual(result, 'eJwLDQj1MDaOcAv2AQAQIQLm')
-    def test_case_5(self):
-        random.seed(1)
-        result = task_func(1)
-        self.assertEqual(result, 'eJxzBQAARgBG')
+    def test_encode_basic_dataframe(self):
+        df = {'A': [1, 2, 3], 'B': [4, 5, 6]}
+        encoded_df = task_func(df)
+        decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
+        pd.testing.assert_frame_equal(pd.DataFrame(df), decoded_csv)
+    def test_encode_with_different_columns(self):
+        df = {'Name': ['Alice', 'Bob'], 'Age': [25, 30]}
+        encoded_df = task_func(df)
+        decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
+        pd.testing.assert_frame_equal(pd.DataFrame(df), decoded_csv)
+    def test_encode_empty_dataframe(self):
+        df = {'X': [], 'Y': []}
+        encoded_df = task_func(df)
+        decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
+        pd.testing.assert_frame_equal(pd.DataFrame(df), decoded_csv, check_dtype=False, check_index_type=False)
+    def test_encode_with_specific_values(self):
+        df = {'ID': [101, 102, 103], 'Score': [85, 90, 88]}
+        encoded_df = task_func(df)
+        decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
+        pd.testing.assert_frame_equal(pd.DataFrame(df), decoded_csv)
+    def test_encode_with_string_values(self):
+        df = {'City': ['NY', 'LA'], 'Population': [8000000, 4000000]}
+        encoded_df = task_func(df)
+        decoded_csv = pd.read_csv(StringIO(base64.b64decode(encoded_df.encode('utf-8')).decode('utf-8')))
+        pd.testing.assert_frame_equal(pd.DataFrame(df), decoded_csv)

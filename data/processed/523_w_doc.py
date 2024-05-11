@@ -1,185 +1,116 @@
-import collections
+import pandas as pd
 import matplotlib.pyplot as plt
-
 
 def task_func(data):
     """
-    Combine a list of dictionaries with possibly differing keys (student names) into a single dictionary,
-    calculate the average score for each student, and return a bar chart of average student scores with
-    student on the x-axis and average score on the y-axis.
-
-    This function handles data with varying dictionary lengths and missing keys by averaging available scores,
-    ignoring None. If there is any negative score, the function raises ValueError.
-    Bar colors can be: 'red', 'yellow', 'green', 'blue', 'purple'.
+    Combine a list of dictionaries with the same keys into a single dictionary, turn it into a
+    Pandas DataFrame and create a line plot of the data.
 
     Parameters:
-    data (list): A list of dictionaries. The keys are student names and the values are scores.
+    data (list): A list of dictionaries. The keys are labels and the values are data points.
 
     Returns:
-    ax (matplotlib.axes._axes.Axes or None): A bar chart showing the 'Average Student Scores', with
-                                             'Student' on the x-axis and 'Average Score' on the y-axis.
-                                             If data is empty, return None.
+    matplotlib.axes._axes.Axes or None: Axes object of the plot showing 'Data over Time',
+                                                   with 'Time' on the x-axis and 'Data Points' on the y-axis.
+                                                   If data is empty, return None.
 
     Requirements:
-    - collections
+    - pandas
     - matplotlib.pyplot
 
     Example:
-    >>> data = [{'John': 5, 'Jane': 10, 'Joe': 7},\
-                {'John': 6, 'Jane': 8, 'Joe': 10},\
-                {'John': 5, 'Jane': 9, 'Joe': 8},\
-                {'John': 7, 'Jane': 10, 'Joe': 9}]
-    >>> ax = task_func(data)
+    >>> ax = task_func([{'A': 10, 'B': 15, 'C': 12},\
+                    {'A': 12, 'B': 20, 'C': 14},\
+                    {'A': 15, 'B': 18, 'C': 15},\
+                    {'A': 11, 'B': 17, 'C': 13}])
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
-    >>> ax.get_xticklabels()
-    [Text(0, 0, 'Jane'), Text(1, 0, 'Joe'), Text(2, 0, 'John')]
+    >>> ax.get_title()
+    'Data over Time'
+    >>> len(ax.lines)
+    3
     """
     if not data:
         return None
-    combined_dict = {}
-    for d in data:
-        for k, v in d.items():
-            if v is None:
-                continue
-            elif v < 0:
-                raise ValueError("Scores must be non-negative.")
-            if k in combined_dict:
-                combined_dict[k].append(v)
-            else:
-                combined_dict[k] = [v]
-    avg_scores = {k: sum(v) / len(v) for k, v in combined_dict.items()}
-    avg_scores = collections.OrderedDict(sorted(avg_scores.items()))
-    labels, values = zip(*avg_scores.items())
-    fig, ax = plt.subplots()
-    ax.bar(labels, values, color=["red", "yellow", "green", "blue", "purple"])
-    ax.set_title("Average Student Scores")
-    ax.set_xlabel("Student")
-    ax.set_ylabel("Average Score")
-    return ax
+    df = pd.DataFrame(data)
+    plt.figure()
+    for label in df.columns:
+        plt.plot(df[label], label=label)
+    plt.xlabel("Time")
+    plt.ylabel("Data Points")
+    plt.title("Data over Time")
+    return plt.gca()
 
 import unittest
+import matplotlib
 import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
-    def _check_plot_structure(self, ax):
-        # Assert type of returned object
-        self.assertIsInstance(ax, plt.Axes)
-        # Check plot title, x-label, y-label
-        self.assertEqual(ax.get_title(), "Average Student Scores")
-        self.assertEqual(ax.get_xlabel(), "Student")
-        self.assertEqual(ax.get_ylabel(), "Average Score")
+    def setUp(self):
+        self.data1 = [
+            {"A": 10, "B": 15, "C": 12},
+            {"A": 12, "B": 20, "C": 14},
+            {"A": 15, "B": 18, "C": 15},
+            {"A": 11, "B": 17, "C": 13},
+        ]
+        self.data2 = [
+            {"X": 5, "Y": 8},
+            {"X": 6, "Y": 7},
+            {"X": 7, "Y": 6},
+            {"X": 8, "Y": 5},
+        ]
+        self.data3 = [{"P": 3, "Q": 2, "R": 4, "S": 1}, {"P": 4, "Q": 3, "R": 2, "S": 3}]
+        self.data4 = [{"W": 7}, {"W": 8}, {"W": 9}, {"W": 6}]
+        self.data5 = [{"M": 1, "N": 3}, {"M": 3, "N": 1}]
     def test_case_1(self):
-        # Test multiple users multiple data points
-        data = [
-            {"John": 5, "Jane": 10, "Joe": 7},
-            {"John": 6, "Jane": 8, "Joe": 10},
-            {"John": 5, "Jane": 9, "Joe": 8},
-            {"John": 7, "Jane": 10, "Joe": 9},
-        ]
-        ax = task_func(data)
-        self._check_plot_structure(ax)
-        # Check bar heights (average scores)
-        for bar, label in zip(ax.containers[0], ["Jane", "Joe", "John"]):
-            if label == "Jane":
-                self.assertEqual(bar.get_height(), 9.25)
-            elif label == "Joe":
-                self.assertEqual(bar.get_height(), 8.5)
-            elif label == "John":
-                self.assertEqual(bar.get_height(), 5.75)
+        # Test for correct Axes instance and labels for a typical data set
+        ax = task_func(self.data1)
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        self.assertEqual(ax.get_title(), "Data over Time")
+        self.assertEqual(ax.get_xlabel(), "Time")
+        self.assertEqual(ax.get_ylabel(), "Data Points")
+        self.assertEqual(len(ax.lines), 3)
     def test_case_2(self):
-        # Test same user multiple data points
-        data = [{"John": 5}, {"John": 6}, {"John": 7}, {"John": 8}]
+        # Test for different keys across dictionaries in data list
+        data = [{"A": 1, "B": 2}, {"B": 3, "C": 4}, {"A": 5, "C": 6}]
         ax = task_func(data)
-        self._check_plot_structure(ax)
-        # Check bar heights (average scores)
-        for bar, _ in zip(ax.containers[0], ["John"]):
-            self.assertEqual(bar.get_height(), 6.5)
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        self.assertTrue(len(ax.lines) > 0)
     def test_case_3(self):
-        # Test with multiple students and one data point each
-        data = [{"John": 10}, {"Jane": 15}, {"Joe": 20}]
-        ax = task_func(data)
-        self._check_plot_structure(ax)
-        # Check bar heights match the single data point for each student
-        expected_scores = {"Jane": 15, "Joe": 20, "John": 10}
-        for bar, label in zip(ax.containers[0], expected_scores.keys()):
-            self.assertEqual(bar.get_height(), expected_scores[label])
+        # Test with empty data list
+        self.assertIsNone(task_func([]))
     def test_case_4(self):
-        # Test multiple users multiple data points different lengths
-        data = [{"Jane": 10, "Joe": 7}, {"Joe": 10}, {"Jane": 9, "John": 8}]
-        ax = task_func(data)
-        self._check_plot_structure(ax)
-        # Check bar heights (average scores)
-        for bar, label in zip(ax.containers[0], ["Jane", "Joe"]):
-            if label == "Jane":
-                self.assertAlmostEqual(bar.get_height(), 9.5, places=2)
-            elif label == "Joe":
-                self.assertAlmostEqual(bar.get_height(), 8.5, places=2)
+        # Test with data containing non-numeric values
+        data = [{"A": "text", "B": "more text"}, {"A": 1, "B": 2}]
+        with self.assertRaises(TypeError):
+            task_func(data)
     def test_case_5(self):
-        # Test handling None
+        # Test with a single entry in the data list
+        data = [{"A": 1, "B": 2}]
+        ax = task_func(data)
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        self.assertEqual(len(ax.lines), 2)
+    def test_case_6(self):
+        # Test focusing on data processing correctness
         data = [
-            {"Jane": 10, "Joe": 7},
-            {"Joe": 10, "Jane": None, "John": None},
-            {"Jane": 9, "John": 8},
-            {"Joe": None},
+            {"A": 10, "B": 15, "C": 12},
+            {"A": 12, "B": 20, "C": 14},
+            {"A": 15, "B": 18, "C": 15},
+            {"A": 11, "B": 17, "C": 13},
         ]
         ax = task_func(data)
-        self._check_plot_structure(ax)  # Results should be same as test_case_4
-        for bar, label in zip(ax.containers[0], ["Jane", "Joe"]):
-            if label == "Jane":
-                self.assertAlmostEqual(bar.get_height(), 9.5, places=2)
-            elif label == "Joe":
-                self.assertAlmostEqual(bar.get_height(), 8.5, places=2)
-    def test_case_6(self):
-        # Test only one data point with multiple students
-        data = [{"John": 5, "Jane": 10}]
-        ax = task_func(data)
-        self._check_plot_structure(ax)
-        # Check bar heights (average scores)
-        for bar, label in zip(ax.containers[0], ["Jane", "John"]):
-            if label == "Jane":
-                self.assertEqual(bar.get_height(), 10)
-            elif label == "John":
-                self.assertEqual(bar.get_height(), 5)
-    def test_case_7(self):
-        # Test empty input
-        data = []
-        ax = task_func(data)
-        self.assertIsNone(ax)
-    def test_case_8(self):
-        # Test with data containing negative scores
-        data = [{"John": -2, "Jane": 3}, {"John": -4, "Jane": 5}]
-        with self.assertRaises(ValueError):
-            task_func(data)
-    def test_case_9(self):
-        # Test with a larger dataset
-        data = [{"John": i} for i in range(1000)]
-        ax = task_func(data)
-        self._check_plot_structure(ax)
-        # Check bar height for the large dataset (average should be close to 499.5)
-        self.assertAlmostEqual(
-            next(iter(ax.containers[0])).get_height(), 499.5, places=2
-        )
-    def test_case_10(self):
-        # Test with some negative scores mixed with positive ones
-        data = [{"John": 5, "Jane": -1}, {"John": -2, "Jane": 2}]
-        with self.assertRaises(ValueError):
-            task_func(data)
-    def test_case_11(self):
-        # Test with all scores as 0
-        data = [{"John": 0, "Jane": 0}, {"John": 0, "Jane": 0}]
-        ax = task_func(data)
-        self._check_plot_structure(ax)
-        # Check bar heights are 0 for all students
-        for bar, label in zip(ax.containers[0], ["Jane", "John"]):
-            self.assertEqual(bar.get_height(), 0)
-    def test_case_12(self):
-        # Test with some dictionaries being empty
-        data = [{"John": 5}, {}, {"Jane": 10}]
-        ax = task_func(data)
-        self._check_plot_structure(ax)
-        # Check that the empty dictionary does not affect the output
-        expected_scores = {"Jane": 10, "John": 5}
-        for bar, label in zip(ax.containers[0], expected_scores.keys()):
-            self.assertEqual(bar.get_height(), expected_scores[label])
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        # Convert input data to DataFrame for easy comparison
+        input_df = pd.DataFrame(data)
+        # Iterate through each line in the plot and check against the input data
+        for line in ax.lines:
+            label = line.get_label()
+            _, y_data = line.get_data()
+            expected_y_data = input_df[label].values
+            # Use numpy to compare the y_data from plot and expected data from input
+            np.testing.assert_array_equal(
+                y_data, expected_y_data, err_msg=f"Data mismatch for label {label}"
+            )
     def tearDown(self):
         plt.close("all")

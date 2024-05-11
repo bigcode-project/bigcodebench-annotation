@@ -1,57 +1,76 @@
-import pandas as pd
 import os
+import random
 
-def task_func(filename):
+def task_func(directory, n_files):
     """
-    Read a CSV file of pandas, reverse the order of the lines and write the inverted lines back into the file. Then move the cursor back to the beginning of the file. 
-    The header should not be inverted and the file may be empty.
+    Create n random text files in a specific directory, write a random string to each file, and then reset the cursor to the beginning of each file.
 
     Parameters:
-    - filename (str): The name of the CSV file.
+    - directory (str): The directory in which to generate the files.
+    - n_files (int): The number of files to generate.
 
     Returns:
-    - filename (str): The name of the CSV file.
+    - directory (str): The directory in which the files were generated.
 
     Requirements:
     - os
-    - pandas
+    - random
 
     Example:
-    >>> task_func('file.csv')
-    'file.csv'
+    >>> task_func('/path/to/directory', 5)
+    '/path/to/directory'
     """
-    if not os.path.exists(filename):
-        return filename
-    with open(filename, 'r') as file:
-        if not file.read(1):
-            return filename
-    df = pd.read_csv(filename)
-    df = df.iloc[::-1]
-    df.to_csv(filename, index=False)
-    with open(filename, 'r+') as file:
-        file.seek(0)
-    return filename
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    for i in range(n_files):
+        filename = os.path.join(directory, f"file_{i+1}.txt")
+        with open(filename, 'w') as file:
+            file.write(str(random.randint(1, 100)))
+            file.seek(0)
+    return directory
 
 import unittest
+import shutil
 class TestCases(unittest.TestCase):
-    def base(self, filename, contents, expected):
-        # Create file
-        with open(filename, 'w') as f:
-            f.write(contents)
-        # Run function
-        task_func(filename)
-        # Check file
-        with open(filename, 'r') as f:
-            self.assertEqual(f.read().strip(), expected.strip())
-        # Remove file
-        os.remove(filename)
+    def setUp(self):
+        random.seed(42)
+        
+    def tearDown(self):
+        shutil.rmtree('./source', ignore_errors=True)
+        shutil.rmtree('./src', ignore_errors=True)
+        shutil.rmtree('./s', ignore_errors=True)
+    
     def test_case_1(self):
-        self.base('file.csv', 'a,b,c\n1,2,3\n4,5,6\n7,8,9', 'a,b,c\n7,8,9\n4,5,6\n1,2,3')
+        directory = task_func('./source', 10)
+        self.assertTrue(os.path.exists(directory))
+        self.assertEqual(len(os.listdir(directory)), 10)
+        for file in os.listdir(directory):
+            self.assertEqual(file.split('.')[-1], 'txt')
+        
     def test_case_2(self):
-        self.base('file.csv', 'a,b,c\n1,2,3\n4,5,6', 'a,b,c\n4,5,6\n1,2,3')
+        directory = task_func('./src', 1)
+        self.assertTrue(os.path.exists(directory))
+        self.assertEqual(len(os.listdir(directory)), 1)
+        for file in os.listdir(directory):
+            self.assertEqual(file.split('.')[-1], 'txt')        
+        
     def test_case_3(self):
-        self.base('file.csv', 'a,b,c\n1,2,3', 'a,b,c\n1,2,3')
+        directory = task_func('./s', 100)
+        self.assertTrue(os.path.exists(directory))
+        self.assertEqual(len(os.listdir(directory)), 100)
+        for file in os.listdir(directory):
+            self.assertEqual(file.split('.')[-1], 'txt')        
+        
     def test_case_4(self):
-        self.base('file.csv', 'a,b,c', 'a,b,c')
+        directory = task_func('./s', 0)
+        self.assertTrue(os.path.exists(directory))
+        self.assertEqual(len(os.listdir(directory)), 0)
+        for file in os.listdir(directory):
+            self.assertEqual(file.split('.')[-1], 'txt')        
+        
     def test_case_5(self):
-        self.base('file.csv', '', '')
+        directory = task_func('./source', 1)
+        self.assertTrue(os.path.exists(directory))
+        self.assertEqual(len(os.listdir(directory)), 1)
+        for file in os.listdir(directory):
+            self.assertEqual(file.split('.')[-1], 'txt')

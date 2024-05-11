@@ -1,92 +1,87 @@
 from datetime import datetime, timedelta
-import numpy as np
-import matplotlib.pyplot as plt
+import pytz
+import calendar
 
-def task_func(days_in_past=7, random_seed=0):
+
+def task_func(days_in_past=7):
     """
-    Draw a graph of temperature trends over the past week using randomly generated data.
+    Get the weekday of the date 'days_in_past' days ago from today.
 
-    This function generates random integer temperatures in Celcius with a low of 15 and high of 35.
-    To show temperature trend, it plots date on the x-axis and temperature on the y-axis.
+    This function computes the date that is 'days_in_past' number of days ago from the current
+    system time's date in UTC. It then determines the weekday of this target date using calendar
+    and returns its name as a string.
 
     Parameters:
-    days_in_past (int, optional): The number of days in the past for which to generate the graph.
-                                  Defaults to 7 days.
-    random_seed (int, optional): Seed for random number generation. Defaults to 0.
+    days_in_past (int): The number of days to go back from the current date to find the weekday.
+                        Defaults to 7 (one week ago). Must be a non-negative integer.
 
     Returns:
-    ax (matplotlib.axes._axes.Axes): Generated plot showing 'Temperature Trends Over the Past Week',
-                                     with 'Date' on the a-xis and 'Temperature (°C)' on the y-axis.
-
+    weekday (str)     : The name of the weekday (e.g., 'Monday', 'Tuesday') for the computed date.
 
     Raises:
-    ValueError: If days_in_past is less than 1.
+    ValueError: If 'days_in_past' is negative.
     
     Requirements:
     - datetime.datetime
     - datetime.timedelta
-    - numpy
-    - matplotlib.pyplot
+    - pytz
+    - calendar
 
     Example:
-    >>> ax = task_func(random_seed=42)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> ax.get_xticklabels()
-    [Text(19810.0, 0, '2024-03-28'), Text(19811.0, 0, '2024-03-29'), Text(19812.0, 0, '2024-03-30'), Text(19813.0, 0, '2024-03-31'), Text(19814.0, 0, '2024-04-01'), Text(19815.0, 0, '2024-04-02'), Text(19816.0, 0, '2024-04-03')]
+    >>> task_func()
+    'Monday'
+    >>> task_func(3)
+    'Friday'
     """
-    np.random.seed(random_seed)
-    if days_in_past < 1:
-        raise ValueError("days_in_past must be in the past")
-    dates = [datetime.now().date() - timedelta(days=i) for i in range(days_in_past)]
-    temperatures = np.random.randint(low=15, high=35, size=days_in_past)
-    fig, ax = plt.subplots()
-    ax.plot(dates, temperatures)
-    ax.set_xlabel("Date")
-    ax.set_ylabel("Temperature (°C)")
-    ax.set_title("Temperature Trend")
-    return ax
+    if days_in_past < 0:
+        raise ValueError("Days in the past cannot be negative")
+    date = datetime.now(pytz.UTC) - timedelta(days=days_in_past)
+    weekday = calendar.day_name[date.weekday()]
+    return weekday
 
 import unittest
-import matplotlib.pyplot as plt
-import numpy as np
+from datetime import datetime, timedelta
+import pytz
+import calendar
 class TestCases(unittest.TestCase):
-    def _test_plot(self, ax):
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_xlabel(), "Date")
-        self.assertEqual(ax.get_ylabel(), "Temperature (°C)")
-        self.assertEqual(ax.get_title(), "Temperature Trend")
     def test_case_1(self):
-        # Test default parameters
-        ax = task_func()
-        self._test_plot(ax)
+        # Input 1: Default input
+        result = task_func()
+        self.assertIsInstance(result, str)
+        self.assertIn(result, list(calendar.day_name))
+        # Ensure the result matches the expected output for 7 days ago
+        expected_date = datetime.now(pytz.UTC) - timedelta(days=7)
+        expected_weekday = calendar.day_name[expected_date.weekday()]
+        self.assertEqual(result, expected_weekday)
     def test_case_2(self):
-        # Test days in the past
-        for n_days in [1, 5, 50, 100]:
-            ax = task_func(n_days, random_seed=2)
-            self._test_plot(ax)
-            self.assertEqual(len(ax.lines[0].get_ydata()), n_days)
+        # Input 2: Test with 3 days in the past
+        result = task_func(3)
+        self.assertIsInstance(result, str)
+        self.assertIn(result, list(calendar.day_name))
+        # Ensure the result matches the expected output for 3 days ago
+        expected_date = datetime.now(pytz.UTC) - timedelta(days=3)
+        expected_weekday = calendar.day_name[expected_date.weekday()]
+        self.assertEqual(result, expected_weekday)
     def test_case_3(self):
-        # Test handling invalid days in the past
-        with self.assertRaises(Exception):
-            task_func(0, random_seed=4)
+        # Input 3: Test with 0 days in the past (today)
+        result = task_func(0)
+        self.assertIsInstance(result, str)
+        self.assertIn(result, list(calendar.day_name))
+        # Ensure the result matches the expected output for today
+        expected_date = datetime.now(pytz.UTC)
+        expected_weekday = calendar.day_name[expected_date.weekday()]
+        self.assertEqual(result, expected_weekday)
     def test_case_4(self):
-        # Test handling invalid days in the past
-        with self.assertRaises(Exception):
-            task_func(-1, random_seed=4)
+        # Input 4: Test with 30 days in the past (approximately a month ago)
+        result = task_func(30)
+        self.assertIsInstance(result, str)
+        self.assertIn(result, list(calendar.day_name))
+        # Ensure the result matches the expected output for 30 days ago
+        expected_date = datetime.now(pytz.UTC) - timedelta(days=30)
+        expected_weekday = calendar.day_name[expected_date.weekday()]
+        self.assertEqual(result, expected_weekday)
     def test_case_5(self):
-        # Test random seed reproducibility
-        ax1 = task_func(5, random_seed=42)
-        ax2 = task_func(5, random_seed=42)
-        self.assertTrue(
-            np.array_equal(ax1.lines[0].get_ydata(), ax2.lines[0].get_ydata())
-        )
-    def test_case_6(self):
-        # Test random seed difference
-        ax1 = task_func(5, random_seed=0)
-        ax2 = task_func(5, random_seed=42)
-        self.assertFalse(
-            np.array_equal(ax1.lines[0].get_ydata(), ax2.lines[0].get_ydata())
-        )
-    def tearDown(self):
-        plt.close("all")
+        # Input 5: Test handling invalid days_in_the_past
+        for invalid in [-1, "1"]:
+            with self.assertRaises(Exception):
+                task_func(invalid)

@@ -1,73 +1,81 @@
-from collections import Counter
+import collections
+import itertools
 import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
+
+# Constants
+ITEMS = ['apple', 'banana']
 
 
-def task_func(list_of_menuitems):
+def task_func(a, b, items=ITEMS):
     """
-    Given a nested list of menu items, this function flattens the list and visualizes the frequency
-    of each menu item using a seaborn barplot.
+    Combine two lists and record the frequency of predefined items in the combined list.
 
     Parameters:
-        list_of_menuitems (list): A nested list of menu items.
+    a (list): A list of items.
+    b (list): Another list of items.
+    items (list, optional): a list of predefined items
 
     Returns:
-        matplotlib.axes.Axes: An Axes object representing the visualization, or None if there are no items to plot.
+    matplotlib.axes.Axes: A bar chart showing the frequency of predefined items in the combined list.
 
     Requirements:
-        - collections
-        - seaborn
-        - pandas
-        - matplotlib
+    - collections
+    - itertools
+    - matplotlib.pyplot
 
     Example:
-        >>> ax = task_func([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
-        >>> isinstance(ax, matplotlib.axes.Axes)
-        True
+    >>> ax = task_func(['apple', 'banana', 'cherry'], ['date', 'elderberry', 'apple', 'banana', 'cherry'])
+    >>> isinstance(ax, matplotlib.axes.Axes)
+    True
     """
-    if not list_of_menuitems or not any(list_of_menuitems):
-        print("No items to plot.")
-        return None
-    flat_list = [item for sublist in list_of_menuitems for item in sublist]
-    if not flat_list:
-        print("No items to plot.")
-        return None
-    counter = Counter(flat_list)
-    df = pd.DataFrame(counter.items(), columns=['Item', 'Count'])
-    if df.empty:
-        print("No items to plot.")
-        return None
-    sns.set(style="whitegrid")
-    ax = sns.barplot(x="Count", y="Item", data=df, palette="viridis")
-    plt.tight_layout()  # Adjust the layout to make room for the item labels
+    combined = list(itertools.chain(a, b))
+    counter = collections.Counter(combined)
+    item_counts = [counter.get(item, 0) for item in items]
+    fig, ax = plt.subplots()
+    ax.bar(items, item_counts, color='skyblue')
+    ax.set_xlabel('Items')
+    ax.set_ylabel('Frequency')
+    ax.set_title('Item Frequency in Combined List')
+    plt.xticks(rotation=45)
+    plt.tight_layout()  # Adjust layout to make room for item labels
     return ax
 
 import unittest
 import matplotlib
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Set up any repeated data here
-        self.menu_items = [['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']]
-    def test_return_type(self):
-        """Test that the function returns a matplotlib Axes object."""
-        ax = task_func(self.menu_items)
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
-    def test_empty_list(self):
-        """Test the function with an empty list, expecting None as there's nothing to plot."""
-        ax = task_func([])
-        self.assertIsNone(ax)
-    def test_single_item_list(self):
-        """Test the function with a list containing a single menu item."""
-        ax = task_func([['Pizza']])
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
-        # Checks for correct item count can be added if needed
-    def test_identical_items_list(self):
-        """Test the function with a list where all items are identical."""
-        ax = task_func([['Burger'], ['Burger'], ['Burger']])
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
-        # Could verify that 'Burger' is the only item and its count is correct
-    def test_multiple_items_same_count(self):
-        """Test the function with a list where multiple items have the same count."""
-        ax = task_func([['Soda', 'Water'], ['Soda', 'Water']])
-        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
+    def test_standard_functionality(self):
+        """Test with typical list inputs."""
+        a = ['apple', 'banana', 'cherry']
+        b = ['banana', 'apple', 'apple', 'dragonfruit']
+        ax = task_func(a, b)
+        self.assertIsInstance(ax, plt.Axes)
+    def test_empty_lists(self):
+        """Test with both lists empty."""
+        a = []
+        b = []
+        ax = task_func(a, b)
+        self.assertIsInstance(ax, plt.Axes)
+    def test_one_empty_list(self):
+        """Test with one list empty."""
+        a = ['apple', 'apple']
+        b = []
+        ax = task_func(a, b)
+        self.assertIsInstance(ax, plt.Axes)
+    def test_non_predefined_items_only(self):
+        """Test with lists containing non-predefined items."""
+        a = ['cherry', 'dragonfruit']
+        b = ['cherry', 'mango']
+        ax = task_func(a, b)
+        self.assertIsInstance(ax, plt.Axes)
+    def test_all_predefined_items(self):
+        """Test with lists containing only predefined items."""
+        a = ['apple', 'apple']
+        b = ['banana']
+        ax = task_func(a, b)
+        self.assertIsInstance(ax, plt.Axes)
+    def test_duplicate_items(self):
+        """Test with lists containing duplicate items."""
+        a = ['apple', 'apple']
+        b = ['apple', 'banana', 'banana']
+        ax = task_func(a, b)
+        self.assertIsInstance(ax, plt.Axes)

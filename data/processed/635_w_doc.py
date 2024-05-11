@@ -1,70 +1,97 @@
-import itertools
-from typing import Any
-from scipy import stats
+# Importing the required libraries
+import re
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from nltk.corpus import stopwords
 
 
-def task_func(input_list: list, repetitions: int) -> Any:
+def task_func(text, n=2):
     """
-    Calculate the mode of a list of elements with multiple repetitions of the original list.
-    
-    Functionality: 
-    - Takes a list and a repetition count as input.
-    - Flattens the list with multiple repetitions.
-    - Calculates the mode of the flattened list.
-    
-    Parameters:
-    - input_list (list): A list containing elements (can be of any hashable type).
-    - repetitions (int): The number of times the original list should be repeated.
+    Analyzes a text string, removing duplicate consecutive words and stopwords defined by nltk.corpus,
+    generates a square co-occurrence matrix of words, and plots this matrix.
 
-    Requirements:
-    - typing
-    - itertools
-    - scipy
+    Parameters:
+    - text (str): Input text to be analyzed.
+    - n (int, optional): Size of n-grams for the co-occurrence matrix. Defaults to 2.
 
     Returns:
-    - scipy.stats.ModeResult: An object containing the mode(s) and count(s) of the most frequently occurring element(s) in the flattened list.
-    
-    Examples:
-    >>> task_func(['A', 'B', 'C'], 10)
-    ModeResult(mode=array(['A'], dtype='<U1'), count=array([10]))
-    
-    >>> task_func([1, 2, 3], 5)
-    ModeResult(mode=array([1]), count=array([5]))
+    - tuple:
+        - pd.DataFrame: Square co-occurrence matrix of words.
+        - matplotlib.axes.Axes: Plot object of the co-occurrence matrix.
+
+    Requirements:
+        - re
+        - pandas
+        - matplotlib.pyplot
+        - numpy
+        - sklearn.feature_extraction.text
+        - nltk.corpus
+
+    Example:
+    >>> import matplotlib
+    >>> text = "hello hello world world"
+    >>> df, ax = task_func(text, n=2)
+    >>> df.columns.tolist()
+    ['hello world']
+    >>> df.index.tolist()
+    ['hello world']
+    >>> df.iloc[0, 0]
+    0
+    >>> isinstance(ax, matplotlib.axes.Axes)
+    True
     """
-    flattened_list = np.array(list(itertools.chain(*[input_list for _ in range(repetitions)])))
-    mode = stats.mode(flattened_list)
-    return mode
+    text = re.sub(r'\b(\w+)( \1\b)+', r'\1', text)
+    stop_words = set(stopwords.words('english'))
+    words_filtered = ' '.join([word for word in text.lower().split() if word not in stop_words])
+    if not words_filtered.strip():
+        empty_df = pd.DataFrame()
+        fig, ax = plt.subplots()
+        return empty_df, ax
+    vectorizer = CountVectorizer(ngram_range=(n, n))
+    X = vectorizer.fit_transform([words_filtered])  # Ensure input is treated as a single document
+    matrix = (X.T * X).todense()
+    np.fill_diagonal(matrix, 0)
+    feature_names = vectorizer.get_feature_names_out() if hasattr(vectorizer,
+                                                                  'get_feature_names_out') else vectorizer.get_feature_names()
+    matrix_df = pd.DataFrame(matrix, index=feature_names, columns=feature_names)
+    fig, ax = plt.subplots()
+    cax = ax.matshow(matrix_df, cmap='hot')
+    fig.colorbar(cax)
+    ax.set_xticks(np.arange(len(matrix_df.columns)))
+    ax.set_yticks(np.arange(len(matrix_df.index)))
+    ax.set_xticklabels(matrix_df.columns, rotation=90)
+    ax.set_yticklabels(matrix_df.index)
+    return matrix_df, ax
 
 import unittest
-import numpy as np
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
-        # Test with list of integers
-        result = task_func([1, 2, 3], 5)
-        self.assertEqual(result.mode.tolist(), [1])
-        self.assertEqual(result.count.tolist(), [5])
-        
-    def test_case_2(self):
-        # Test with list of strings
-        result = task_func(['A', 'B', 'C'], 10)
-        self.assertEqual(result.mode.tolist(), ['A'])
-        self.assertEqual(result.count.tolist(), [10])
-        
-    def test_case_3(self):
-        # Test with list of floating-point numbers
-        result = task_func([1.5, 2.5, 3.5], 4)
-        self.assertEqual(result.mode.tolist(), [1.5])
-        self.assertEqual(result.count.tolist(), [4])
-        
-    def test_case_4(self):
-        # Test with empty list
-        result = task_func([], 10)
-        self.assertEqual(result.mode.shape, (0,))
-        self.assertEqual(result.count.shape, (0,))
-        
-    def test_case_5(self):
-        # Test with mixed type list
-        result = task_func([1, 'A', 1.5], 3)
-        self.assertEqual(result.mode.tolist(), ['1'])
-        self.assertEqual(result.count.tolist(), [3])
+    def test_simple_text(self):
+        """Test with a simple text."""
+        text = "hello world"
+        matrix, _ = task_func(text)
+        self.assertEqual(matrix.shape, (1, 1), "Matrix shape should be (1, 1) for unique words 'hello' and 'world'.")
+    def test_text_with_stopwords(self):
+        """Test text with stopwords removed."""
+        text = "this is a"
+        matrix, _ = task_func(text)
+        self.assertTrue(matrix.empty, "Matrix should be empty after removing stopwords.")
+    def test_duplicate_words(self):
+        """Test text with duplicate consecutive words."""
+        text = "happy happy joy joy"
+        matrix, _ = task_func(text)
+        self.assertIn('happy joy', matrix.columns, "Matrix should contain 'happy joy' after duplicates are removed.")
+    def test_ngram_range(self):
+        """Test with a specific n-gram range."""
+        text = "jump high and run fast"
+        # Assuming no preprocessing that removes words, we expect 3 unique tri-grams.
+        matrix, _ = task_func(text, n=3)
+        # Expecting a 3x3 matrix since there are 3 unique tri-grams with no overlap in this simple case.
+        self.assertEqual(matrix.shape, (2, 2),
+                         "Matrix shape should be (3, 3) for a tri-gram analysis without word removal.")
+    def test_empty_text(self):
+        """Test with an empty string."""
+        text = ""
+        matrix, _ = task_func(text)
+        self.assertTrue(matrix.empty, "Matrix should be empty for an empty string.")

@@ -1,68 +1,59 @@
-import re
-import string
+import nltk
+
+# Download necessary NLTK data (if not already present)
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+from collections import Counter
 
 def task_func(content):
-    """Count the non-stop words in a sentence without the last word.
+    """
+    Count the Part-of-Speech (POS) tags in a sentence without the last word.
 
     Parameters:
-    - content (str): The sentence to count non-stopwords from.
+    - content (str): The sentence to count POS tags from.
 
     Returns:
-    - count (int): The count of non-stopwords.
+    - dict: A dictionary with POS tags as keys and their count as values.
 
     Requirements:
-    - re
-    - string
+    - nltk
+    - collections.Counter
 
     Example:
     >>> task_func('this is an example content')
-    1
+    {'DT': 2, 'VBZ': 1, 'NN': 1}
     """
-    STOPWORDS = set([
-        "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", 
-        "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", 
-        "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", 
-        "theirs", "themselves", "what", "which", "who", "whom", "this", "that", 
-        "these", "those", "is", "are", "was", "were", "be", "been", "being", "have", 
-        "has", "had", "having", "do", "does", "did", "doing", "an", "the", "and", 
-        "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", 
-        "for", "with", "about", "against", "between", "into", "through", "during", 
-        "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", 
-        "on", "off", "over", "under", "again", "further", "then", "once"
-    ])
-    content = content.split(' ')
-    if len(content) > 1:
-        content = content[:-1]
-    else:
-        content = []
-    words = [word.strip(string.punctuation).lower() for word in re.split(r'\W+', ' '.join(content)) if word]
-    non_stopwords = [word for word in words if word not in STOPWORDS]
-    count = len(non_stopwords)
-    return count
+    words = content.split()[:-1]  # Split and remove the last word
+    pos_tags = nltk.pos_tag(words)  # Tokenization is built into pos_tag for simple whitespace tokenization
+    pos_counts = Counter(tag for _, tag in pos_tags)
+    return dict(pos_counts)
 
 import unittest
+import re
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test with a mix of stopwords and non-stopwords
-        self.assertEqual(task_func('this is an example content'), 1)
+        sentence = "this is an example content"
+        # Expected output after removing "content"
+        expected_output = {'DT': 2, 'NN': 1, 'VBZ': 1}
+        self.assertEqual(task_func(sentence), expected_output)
     def test_case_2(self):
-        # Test with all stopwords except the last word
-        self.assertEqual(task_func('this is an the of'), 0)
+        sentence = "The quick brown fox jumps"
+        # "jumps" is removed; expect {'DT': 1, 'JJ': 1, 'NN': 1} for "The quick brown fox"
+        expected_output = {'DT': 1, 'JJ': 1, 'NN': 2}
+        self.assertEqual(task_func(sentence), expected_output)
     def test_case_3(self):
-        # Test with no stopwords
-        self.assertEqual(task_func('example content programming'), 2)
+        sentence = "Over the lazy dog"
+        # "dog" is removed; expect {'IN': 1, 'DT': 1, 'JJ': 1} for "Over the lazy"
+        expected_output = {'DT': 1, 'IN': 1, 'NN': 1}
+        self.assertEqual(task_func(sentence), expected_output)
     def test_case_4(self):
-        # Test with punctuation
-        self.assertEqual(task_func('example, content; programming, python.'), 3)
+        sentence = "Hello world"
+        # "world" is removed; expect {} for "Hello"
+        expected_output = {'NN': 1}  # "Hello" might be tagged as interjection 'UH' if not considered a proper noun
+        self.assertEqual(task_func(sentence), expected_output)
     def test_case_5(self):
-        # Test with an empty string
-        self.assertEqual(task_func(''), 0)
-    def test_case_6(self):
-        # Test with a single non-stopword
-        self.assertEqual(task_func('content'), 0)
-    def test_case_7(self):
-        # Test with a single stopword
-        self.assertEqual(task_func('the'), 0)
-    def test_case_8(self):
-        # Test with a mix and uppercase letters
-        self.assertEqual(task_func('This IS an Example Content'), 1)
+        sentence = "This is a longer sentence with various parts of speech"
+        # After removing "speech", adjust expectation
+        expected_output = {'DT': 2, 'IN': 2, 'JJ': 1, 'NN': 1, 'NNS': 1, 'RBR': 1, 'VBZ': 1}
+        self.assertEqual(task_func(sentence), expected_output)

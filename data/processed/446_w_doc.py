@@ -1,90 +1,97 @@
-import numpy as np
-from scipy.spatial import Voronoi, voronoi_plot_2d
 import matplotlib.pyplot as plt
+from sklearn.datasets import make_blobs
 
 
-def task_func(points, seed=0):
+def task_func(n_samples=100, centers=3, n_features=2, random_seed=42):
     """
-    Calculate the Voronoi diagram for a number of points in 2D and plot it.
-    Note: this function will raise errors when input is invalid, for example wrong type or shape.
-    Jittering is applied prior to plotting.
+    Create isotropic Gaussian blobs to form clusters and visualize them.
 
     Parameters:
-    - points (np.ndarray): A numpy ndarray of shape (n_points, 2) with the coordinates of the points.
-    - seed (int): Random seed for reproducibility. Defaults to 0.
+    - n_samples (int): The total number of points divided among clusters.
+    - centers (int): The number of centers to generate.
+    - n_features (int): The number of features for each sample.
+    - random_seed (int): The seed for the random number generator.
 
     Returns:
-    tuple (vor, ax): A tuple containing:
-        - vor (Voronoi): A Voronoi object representing the Voronoi diagram of the points.
-        - ax (Axes): The axes of the plotted Voronoi diagram.
+    tuple: A tuple containing:
+        - X (numpy.ndarray): The matrix of blob points.
+        - y (numpy.ndarray): The vector of blob labels.
+        - ax (matplotlib.axes.Axes): The Axes object with the scatter plot.
 
     Requirements:
-    - numpy
-    - scipy
     - matplotlib.pyplot
+    - sklearn
 
     Example:
-    >>> points = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-    >>> vor, ax = task_func(points)
-    >>> type(vor)
-    <class 'scipy.spatial.qhull.Voronoi'>
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> X, y, ax = task_func(n_samples=500, centers=5, random_seed=0)
+    >>> type(X), type(y), type(ax)
+    (<class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'matplotlib.axes._axes.Axes'>)
+    >>> ax
+    <Axes: >
     """
-    if not isinstance(points, np.ndarray):
-        raise TypeError("Expected Numpy array")
-    if len(points) < 3:
-        raise ValueError("Voronoi diagram needs at least 3 points")
-    if points.shape[-1] != 2:
-        raise ValueError("Expected array of 2D points")
-    np.random.seed(seed)
-    jittered_points = points + np.random.normal(0, 1e-10, points.shape)
-    vor = Voronoi(jittered_points)
+    X, y = make_blobs(
+        n_samples=n_samples,
+        centers=centers,
+        n_features=n_features,
+        random_state=random_seed,
+    )
     fig, ax = plt.subplots()
-    voronoi_plot_2d(vor, ax=ax)
-    return vor, ax
+    ax.scatter(X[:, 0], X[:, 1], c=y)
+    return X, y, ax
 
 import unittest
-import numpy as np
-from scipy.spatial import Voronoi
+import matplotlib
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.points = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     def test_case_1(self):
-        # Standard tests
-        vor, ax = task_func(self.points)
-        self._run_test(self.points, vor, ax)
+        # Test default case
+        n_samples, n_features, centers = 100, 2, 3
+        X, y, ax = task_func()
+        self.assertEqual(X.shape, (n_samples, n_features))
+        self.assertEqual(y.shape, (n_samples,))
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        self.assertEqual(len(set(y)), centers)
     def test_case_2(self):
-        # Test random seed
-        vor, _ = task_func(self.points, seed=0)
-        vor1, _ = task_func(self.points, seed=0)
-        vor2, _ = task_func(self.points, seed=1)
-        self.assertTrue((vor.ridge_points == vor1.ridge_points).all())
-        self.assertFalse((vor1.ridge_points == vor2.ridge_points).all())
+        # Test n_samples
+        for n_samples in [1, 50, 100]:
+            X, y, _ = task_func(n_samples=n_samples)
+            self.assertEqual(X.shape[0], n_samples)
+            self.assertEqual(y.shape[0], n_samples)
     def test_case_3(self):
-        # Test with points that are extremely close to each other
-        points = np.array([[0, 0], [0, 1e-12], [1, 0]])
-        vor, ax = task_func(points)
-        self._run_test(points, vor, ax)
+        # Test centers
+        for centers in [1, 50, 100]:
+            _, y, _ = task_func(centers=centers)
+        self.assertEqual(len(set(y)), centers)
     def test_case_4(self):
-        # Test with fewer than three points, which is the minimum to form a Voronoi diagram.
-        points = np.array([[0, 0], [1, 1]])
-        with self.assertRaises(Exception):
-            task_func(points)
+        # Test n_features
+        for n_features in [2, 50, 100]:
+            X, y, _ = task_func(n_features=n_features)
+            self.assertEqual(X.shape[1], n_features)
     def test_case_5(self):
-        # Test with invalid input shapes, such as one-dimensional array.
-        points = np.array([1, 2, 3])
-        with self.assertRaises(Exception):
-            task_func(points)
+        # Test random seed
+        X1, y1, _ = task_func(n_samples=100, centers=3, n_features=2, random_seed=42)
+        X2, y2, _ = task_func(n_samples=100, centers=3, n_features=2, random_seed=42)
+        self.assertTrue((X1 == X2).all())
+        self.assertTrue((y1 == y2).all())
     def test_case_6(self):
-        # Test with invalid input types
+        # Test with the minimum possible values that are still valid
+        n_samples, n_features, centers = 1, 2, 1
+        X, y, ax = task_func(
+            n_samples=1, centers=centers, n_features=n_features, random_seed=0
+        )
+        self.assertEqual(X.shape, (n_samples, n_features))
+        self.assertEqual(y.shape, (n_samples,))
+        self.assertEqual(len(set(y)), centers)
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+    def test_case_7(self):
+        # Example of handling an expected failure due to invalid input
+        with self.assertRaises(ValueError):
+            task_func(n_samples=-100)
+        with self.assertRaises(ValueError):
+            task_func(centers=-10)
         with self.assertRaises(Exception):
-            task_func("Not valid points")
-    def _run_test(self, points, vor, ax):
-        # Check the point_region attribute of Voronoi object
-        self.assertIsInstance(vor, Voronoi)
-        self.assertEqual(len(vor.point_region), len(points))
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertTrue(len(ax.get_children()) > 0, "The plot should have elements.")
+            task_func(n_features=0)
+        with self.assertRaises(ValueError):
+            task_func(random_seed="invalid")
     def tearDown(self):
         plt.close("all")

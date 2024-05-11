@@ -1,116 +1,85 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix
-import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def task_func(feature: pd.Series, target: pd.Series) -> (np.ndarray, plt.Axes):
+def task_func(s1, s2):
     """
-    Train a logistic regression model on one feature and evaluate its performance using a confusion matrix plot.
-    The function takes a feature and a target series, splits them into training and testing sets, trains the logistic
-    regression model, predicts the target for the test set, and plots the confusion matrix.
+    Visualize two Series using a swarm plot with a highlight on their intersecting data points.
+
+    This function creates a swarm plot to visually compare two pandas Series. 
+    It highlights the intersection points between these two series by drawing red dashed lines at the intersecting data points.
 
     Parameters:
-    feature (pd.Series): Series representing the single feature for the logistic regression model.
-    target (pd.Series): Series representing the target variable.
+    - s1 (pd.Series): The first series of data. This series must have a unique name that identifies it in the plot.
+    - s2 (pd.Series): The second series of data. Similar to s1, this series must also have a unique name.
 
     Returns:
-    (np.ndarray, plt.Axes): A tuple containing the confusion matrix and the matplotlib Axes object of the confusion matrix plot.
+    - ax (matplotlib.Axes): The Axes object of the plotted swarm chart. This object can be used for further customization of the plot if required.
+    intersection_count (int): The number of unique intersecting data points between s1 and s2. 
+    This count gives a quick numerical summary of the overlap between the two series.
 
     Requirements:
     - pandas
-    - sklearn.model_selection.train_test_split
-    - sklearn.linear_model.LogisticRegression
-    - sklearn.metrics.confusion_matrix
-    - numpy
-    - matplotlib.pyplot
+    - seaborn
+    - matplotlib
 
     Example:
-    >>> feature = pd.Series(np.random.rand(1000)) # Feature data
-    >>> target = pd.Series(np.random.randint(0, 2, size=1000)) # Target data (binary)
-    >>> cm, ax = task_func(feature, target)
+    >>> s1 = pd.Series([1, 2, 3, 4, 5], name='Series1')
+    >>> s2 = pd.Series([4, 5, 6, 7, 8], name='Series2')
+    >>> ax, count = task_func(s1, s2)
     >>> ax.get_title()
-    'Confusion Matrix'
+    'Overlap Between Series1 and Series2'
     """
-    df = pd.DataFrame({"Feature": feature, "Target": target})
-    X_train, X_test, y_train, y_test = train_test_split(
-        df["Feature"], df["Target"], test_size=0.2, random_state=42
-    )
-    model = LogisticRegression()
-    model.fit(X_train.values.reshape(-1, 1), y_train)
-    y_pred = model.predict(X_test.values.reshape(-1, 1))
-    cm = confusion_matrix(y_test, y_pred)
-    _, ax = plt.subplots()
-    cax = ax.matshow(cm, cmap="Blues")
-    plt.title("Confusion Matrix")
-    plt.xlabel("Predicted")
-    plt.ylabel("Actual")
-    plt.colorbar(cax)
-    ax.set_xticks([0, 1])
-    ax.set_yticks([0, 1])
-    ax.set_xticklabels(["No", "Yes"])
-    ax.set_yticklabels(["No", "Yes"])
-    return cm, ax
+    intersection = set(s1).intersection(set(s2))
+    df1 = pd.DataFrame({s1.name: s1, "Type": "Series1"})
+    df2 = pd.DataFrame({s2.name: s2, "Type": "Series2"})
+    df = pd.concat([df1, df2], axis=0, ignore_index=True)
+    _, ax = plt.subplots(figsize=(10, 6))
+    sns.swarmplot(x=df.columns[0], y="Type", data=df, ax=ax)
+    for point in intersection:
+        ax.axvline(x=point, color="red", linestyle="--")
+    ax.set_title(f"Overlap Between {s1.name} and {s2.name}")
+    return ax, len(intersection)
 
-import unittest
 import pandas as pd
-import numpy as np
-from matplotlib.axes import Axes
+import unittest
 class TestCases(unittest.TestCase):
-    """Test cases for the function task_func."""
-    def test_with_random_data(self):
-        """
-        Test the function with random data to ensure normal functionality.
-        """
-        np.random.seed(42)
-        feature = pd.Series(np.random.rand(100))
-        np.random.seed(42)
-        target = pd.Series(np.random.randint(0, 2, size=100))
-        cm, ax = task_func(feature, target)
-        self.assertIsInstance(cm, np.ndarray)
-        self.assertIsInstance(ax, Axes)
-    def test_with_all_zeroes(self):
-        """
-        Test the function with all zeroes in the feature set.
-        """
-        feature = pd.Series(np.zeros(100))
-        np.random.seed(123)
-        target = pd.Series(np.random.randint(0, 2, size=100))
-        cm, ax = task_func(feature, target)
-        self.assertIsInstance(cm, np.ndarray)
-        self.assertIsInstance(ax, Axes)
-    def test_with_all_ones(self):
-        """
-        Test the function with all ones in the feature set.
-        """
-        feature = pd.Series(np.ones(100))
-        np.random.seed(42)
-        target = pd.Series(np.random.randint(0, 2, size=100))
-        cm, ax = task_func(feature, target)
-        self.assertIsInstance(cm, np.ndarray)
-        self.assertIsInstance(ax, Axes)
-    def test_with_perfect_correlation(self):
-        """
-        Test the function when the feature perfectly predicts the target.
-        """
-        np.random.seed(123)
-        feature = pd.Series(np.random.rand(100))
-        target = feature.round()
-        cm, ax = task_func(feature, target)
-        self.assertIsInstance(cm, np.ndarray)
-        self.assertIsInstance(ax, Axes)
-    def test_with_no_correlation(self):
-        """
-        Test the function when there is no correlation between feature and target.
-        """
-        np.random.seed(42)
-        feature = pd.Series(np.random.rand(100))
-        np.random.seed(42)
-        target = pd.Series(np.random.choice([0, 1], size=100))
-        cm, ax = task_func(feature, target)
-        self.assertIsInstance(cm, np.ndarray)
-        self.assertIsInstance(ax, Axes)
+    """Tests for the function task_func."""
+    def test_intersection_exists(self):
+        """Test that the function works when the two series have an intersection."""
+        s1 = pd.Series([1, 2, 3, 4, 5], name="Series1")
+        s2 = pd.Series([4, 5, 6, 7, 8], name="Series2")
+        ax, intersection_count = task_func(s1, s2)
+        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
+        self.assertEqual(intersection_count, 2)
+    def test_no_intersection(self):
+        """Test that the function works when the two series have no intersection."""
+        s1 = pd.Series([1, 2, 3], name="Series1")
+        s2 = pd.Series([4, 5, 6], name="Series2")
+        ax, intersection_count = task_func(s1, s2)
+        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
+        self.assertEqual(intersection_count, 0)
+    def test_empty_series(self):
+        """Test that the function works when one of the series is empty."""
+        s1 = pd.Series([], name="Series1")
+        s2 = pd.Series([], name="Series2")
+        ax, intersection_count = task_func(s1, s2)
+        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
+        self.assertEqual(intersection_count, 0)
+    def test_partial_intersection(self):
+        """Test that the function works when the two series have a partial intersection."""
+        s1 = pd.Series([1, 2], name="Series1")
+        s2 = pd.Series([2, 3], name="Series2")
+        ax, intersection_count = task_func(s1, s2)
+        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
+        self.assertEqual(intersection_count, 1)
+    def test_identical_series(self):
+        """Test that the function works when the two series are identical."""
+        s1 = pd.Series([1, 2, 3], name="Series1")
+        s2 = pd.Series([1, 2, 3], name="Series2")
+        ax, intersection_count = task_func(s1, s2)
+        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
+        self.assertEqual(intersection_count, 3)
     def tearDown(self):
-        plt.close()
+        plt.clf()

@@ -1,100 +1,106 @@
+import collections
 import random
-import statistics
+import json
 
 # Constants
-AGE_RANGE = (22, 60)
+PREFICES = ['EMP$$', 'MAN$$', 'DEV$$', 'HR$$']
+LEVELS = ['Junior', 'Mid', 'Senior']
 
-def task_func(dict1):
+def task_func(department_data):
     """
-    Calculate the mean, the median, and the mode(s) of the age of the employees in the department "EMP$$." 
-    Generate random ages for each employee within the range [22, 60].
+    Generate a JSON object from employee data based on given department codes and their employee counts.
+
+    Note:
+    - The keys are department codes (from the list: ['EMP$$', 'MAN$$', 'DEV$$', 'HR$$']) and the values are lists of 
+    employee levels ('Junior', 'Mid', 'Senior') in that department.
 
     Parameters:
-    dict1 (dict): A dictionary with department codes as keys and number of employees 
-                  as values.
+    department_data (dict): A dictionary with department codes as keys and number of employees as values.
 
     Returns:
-    tuple: A tuple of mean, median, and a list of mode(s) of employee ages.
+    str: A JSON object representing employee levels for each department.
 
     Requirements:
+    - collections
     - random
-    - statistics
+    - json
 
     Example:
     >>> random.seed(0)
-    >>> d = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
-    >>> stats = task_func(d)
-    >>> print(stats)
-    (44.7, 46.5, [46, 48, 24, 38, 54, 53, 47, 41, 52, 44])
+    >>> department_info = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
+    >>> level_data_json = task_func(department_info)
+    >>> print(level_data_json)
+    {"EMP$$": ["Mid", "Mid", "Junior", "Mid", "Senior", "Mid", "Mid", "Mid", "Mid", "Mid"], "MAN$$": ["Senior", "Junior", "Senior", "Junior", "Mid"], "DEV$$": ["Junior", "Junior", "Senior", "Mid", "Senior", "Senior", "Senior", "Junior"], "HR$$": ["Mid", "Junior", "Senior", "Junior", "Senior", "Mid", "Mid"]}
     """
-    emp_ages = []
-    for prefix, num_employees in dict1.items():
-        if not prefix.startswith('EMP$$'):
+    level_data = collections.defaultdict(list)
+    for prefix, num_employees in department_data.items():
+        if prefix not in PREFICES:
             continue
         for _ in range(num_employees):
-            age = random.randint(*AGE_RANGE)
-            emp_ages.append(age)
-    if not emp_ages:
-        return 0, 0, []
-    mean_age = statistics.mean(emp_ages)
-    median_age = statistics.median(emp_ages)
-    mode_age = statistics.multimode(emp_ages)
-    return mean_age, median_age, mode_age
+            level = random.choice(LEVELS)
+            level_data[prefix].append(level)
+    return json.dumps(level_data)
 
 import unittest
+import collections
+import random
+import json
+# Constants
+PREFICES = ['EMP$$', 'MAN$$', 'DEV$$', 'HR$$']
+LEVELS = ['Junior', 'Mid', 'Senior']
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
         random.seed(0)
-        # Input: 10 employees in "EMP$$" department
-        d = {'EMP$$': 10}
-        mean_age, median_age, mode_age = task_func(d)
+        input_data = {'EMP$$': 5, 'MAN$$': 3, 'DEV$$': 4, 'HR$$': 2}
+        output_data = task_func(input_data)
+        parsed_output = json.loads(output_data)
         
-        # Checks
-        self.assertTrue(22 <= mean_age <= 60)
-        self.assertTrue(22 <= median_age <= 60)
-        self.assertTrue(all(22 <= age <= 60 for age in mode_age))
+        for key, value in input_data.items():
+            self.assertIn(key, parsed_output)
+            self.assertEqual(len(parsed_output[key]), value)
+            for level in parsed_output[key]:
+                self.assertIn(level, LEVELS)
     
     def test_case_2(self):
         random.seed(0)
-        # Input: Different number of employees in multiple departments
-        d = {'EMP$$': 10, 'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
-        mean_age, median_age, mode_age = task_func(d)
+        input_data = {'EMP$$': 10}
+        output_data = task_func(input_data)
+        parsed_output = json.loads(output_data)
         
-        # Checks
-        self.assertTrue(22 <= mean_age <= 60)
-        self.assertTrue(22 <= median_age <= 60)
-        self.assertTrue(all(22 <= age <= 60 for age in mode_age))
+        self.assertEqual(len(parsed_output), 1)
+        self.assertEqual(len(parsed_output['EMP$$']), 10)
+        for level in parsed_output['EMP$$']:
+            self.assertIn(level, LEVELS)
     
     def test_case_3(self):
         random.seed(0)
-        # Input: No employees in "EMP$$" department
-        d = {'MAN$$': 5, 'DEV$$': 8, 'HR$$': 7}
-        mean_age, median_age, mode_age = task_func(d)
+        input_data = {'MAN$$': 6, 'DEV$$': 7}
+        output_data = task_func(input_data)
+        parsed_output = json.loads(output_data)
         
-        # Checks
-        self.assertEqual(mean_age, 0)
-        self.assertEqual(median_age, 0)
-        self.assertEqual(mode_age, [])
+        self.assertEqual(len(parsed_output), 2)
+        self.assertEqual(len(parsed_output['MAN$$']), 6)
+        self.assertEqual(len(parsed_output['DEV$$']), 7)
+        for level in parsed_output['MAN$$']:
+            self.assertIn(level, LEVELS)
+        for level in parsed_output['DEV$$']:
+            self.assertIn(level, LEVELS)
     
     def test_case_4(self):
         random.seed(0)
-        # Input: Large number of employees in "EMP$$" department to increase likelihood of multiple modes
-        d = {'EMP$$': 1000}
-        mean_age, median_age, mode_age = task_func(d)
+        input_data = {'HR$$': 3}
+        output_data = task_func(input_data)
+        parsed_output = json.loads(output_data)
         
-        # Checks
-        self.assertTrue(22 <= mean_age <= 60)
-        self.assertTrue(22 <= median_age <= 60)
-        self.assertTrue(all(22 <= age <= 60 for age in mode_age))
+        self.assertEqual(len(parsed_output), 1)
+        self.assertEqual(len(parsed_output['HR$$']), 3)
+        for level in parsed_output['HR$$']:
+            self.assertIn(level, LEVELS)
     
     def test_case_5(self):
         random.seed(0)
-        # Input: Only one employee in "EMP$$" department
-        d = {'EMP$$': 1}
-        mean_age, median_age, mode_age = task_func(d)
-        
-        # Checks
-        self.assertTrue(22 <= mean_age <= 60)
-        self.assertEqual(mean_age, median_age)
-        self.assertEqual([mean_age], mode_age)
+        input_data = {}
+        output_data = task_func(input_data)
+        parsed_output = json.loads(output_data)
+        self.assertEqual(len(parsed_output), 0)

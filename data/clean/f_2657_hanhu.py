@@ -18,6 +18,7 @@ def f_2658():
     to be in JSON format with a key 'data'. The handler responds with a 200 success message
     if the data is valid, or an error message otherwise. 
     The type of the response can be retrieved as 'content-type' and the length of the response as 'content-length'.
+    There are two types of error messages: 'Content-Type header is not application/json' and 'No data key in request'.
 
     Returns:
         function: A class that handles HTTP POST requests and validates incoming data.

@@ -1,90 +1,85 @@
-import numpy as np
-import scipy.stats as stats
-import matplotlib.pyplot as plt
-import random
-from matplotlib.axes import Axes
+import pandas as pd
+import collections
 
+def task_func(df):
+    """
+    Generate a sales report from a DataFrame, excluding duplicate customer names. 
+    The report includes total sales and the most popular sales category.
 
-class ValueObject:
-    value = 0
-
-    def __init__(self, mu=0, std=1, seed=77):
-        random.seed(seed)
-        self.value = random.gauss(mu, std)
-
-
-def task_func(obj_list) -> Axes:
-    '''
-    Draw the histogram and the custom normal distribution curve from the mean and standard deviation
-    derived from the values of a list of ValueObjects and return the plotted Axes. For an empty list,
-    the mean and the standard deviation is 0.
-    
     Parameters:
-    obj_list (list): The list of objects.
-    attr (str): The attribute to plot.
+    df (DataFrame): A pandas DataFrame with columns 'Customer', 'Category', and 'Sales'.
 
     Returns:
-    Axes: The plotted Axes.
+    dict: A dictionary with keys 'Total Sales' (sum of sales) and 'Most Popular Category' (most frequent category).
 
     Requirements:
-    - numpy
-    - scipy.stats
-    - matplotlib
-    - random
+    - pandas
+    - collections
+
+    Raises:
+    - The function will raise a ValueError is input df is not a DataFrame.
+
+    Note:
+    - The function would return the first category in alphabetical order for "Most Popular Category' in the case of tie
 
     Example:
-    >>> obj_list = [ValueObject(mu=23, std=77), ValueObject(mu=23, std=77, seed=222), ValueObject(mu=23, std=77, seed=333)]
-    >>> ax = task_func(obj_list)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    '''
-    if len(obj_list) == 0:
-        values = [0]
-    else:
-        values = [obj.value for obj in obj_list]
-    fig, ax = plt.subplots()
-    ax.hist(values, bins=30, density=True, alpha=0.6, color='g')
-    mean = np.mean(values)
-    std = np.std(values)
-    xmin, xmax = plt.xlim()
-    x = np.linspace(xmin, xmax, 100)
-    p = stats.norm.pdf(x, mean, std)
-    ax.plot(x, p, 'k', linewidth=2)
-    title = "Fit results: mu = %.2f,  std = %.2f" % (mean, std)
-    ax.set_title(title)
-    plt.close(fig)  # Close the figure to avoid display during function execution
-    return ax
+    >>> data = pd.DataFrame([{'Customer': 'John', 'Category': 'Electronics', 'Sales': 500}, {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}])
+    >>> report = task_func(data)
+    >>> print(report)
+    {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
+    """
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
+    df = df.drop_duplicates(subset='Customer')
+    total_sales = df['Sales'].sum()
+    popular_category = collections.Counter(df['Category']).most_common(1)[0][0]
+    return {'Total Sales': total_sales, 'Most Popular Category': popular_category}
 
 import unittest
-import doctest
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Testing with a small number of objects
-        obj_list = [ValueObject(mu=23, std=77), ValueObject(mu=23, std=77, seed=222), ValueObject(mu=23, std=77, seed=333)]
-        ax = task_func(obj_list)
-        self.assertIsInstance(ax, Axes)
-        self.assertEqual(ax.get_title(), "Fit results: mu = 10.76,  std = 39.42")
-    def test_case_2(self):
-        # Testing with a larger number of objects
-        obj_list = [ValueObject(mu=23, std=65) for _ in range(1000)]
-        ax = task_func(obj_list)
-        self.assertIsInstance(ax, Axes)
-        self.assertEqual(ax.get_title(), "Fit results: mu = 40.53,  std = 0.00")
-    def test_case_3(self):
-        # Testing with an even larger number of objects
-        obj_list = [ValueObject(mu=23, std=77, seed=88), ValueObject(mu=11, std=99), ValueObject(mu=41, std=77)]
-        ax = task_func(obj_list)
-        self.assertIsInstance(ax, Axes)
-        self.assertEqual(ax.get_title(), "Fit results: mu = 27.52,  std = 32.92")
-    def test_case_4(self):
-        # Testing with an empty list of objects
-        obj_list = []
-        ax = task_func(obj_list)
-        self.assertIsInstance(ax, Axes)
-        self.assertEqual(ax.get_title(), "Fit results: mu = 0.00,  std = 0.00")
-    def test_case_5(self):
-        # Testing with a single object
-        obj_list = [ValueObject(mu=23, std=77, seed=12)]
-        ax = task_func(obj_list)
-        self.assertIsInstance(ax, Axes)
-        self.assertEqual(ax.get_title(), "Fit results: mu = -88.28,  std = 0.00")
+    def test_case_regular(self):
+        data = pd.DataFrame([
+            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
+            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300},
+            {'Customer': 'Peter', 'Category': 'Beauty', 'Sales': 400},
+            {'Customer': 'Nick', 'Category': 'Sports', 'Sales': 600}
+        ])
+        expected_output = {'Total Sales': 1800, 'Most Popular Category': 'Electronics'}
+        self.assertEqual(task_func(data), expected_output)
+    def test_case_with_duplicates(self):
+        data = pd.DataFrame([
+            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
+            {'Customer': 'John', 'Category': 'Fashion', 'Sales': 200},
+            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300},
+            {'Customer': 'Peter', 'Category': 'Beauty', 'Sales': 400}
+        ])
+        expected_output = {'Total Sales': 1200, 'Most Popular Category': 'Electronics'}
+        self.assertEqual(task_func(data), expected_output)
+    def test_case_empty(self):
+        data = pd.DataFrame([
+            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
+            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}
+        ])
+        expected_output = {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
+        self.assertEqual(task_func(data), expected_output)
+    def test_case_unique_customers(self):
+        data = pd.DataFrame([
+            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
+            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}
+        ])
+        expected_output = {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
+        self.assertEqual(task_func(data), expected_output)
+    def test_case_tie_categories(self):
+        data = pd.DataFrame([
+            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
+            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300},
+            {'Customer': 'Nick', 'Category': 'Home', 'Sales': 200},
+            {'Customer': 'Alice', 'Category': 'Electronics', 'Sales': 300}
+        ])
+        # In case of a tie, the first category in alphabetical order will be chosen
+        expected_output = {'Total Sales': 1300, 'Most Popular Category': 'Electronics'}
+        self.assertEqual(task_func(data), expected_output)
+    def test_case_6(self):
+        with self.assertRaises(ValueError):
+            task_func("non_df")

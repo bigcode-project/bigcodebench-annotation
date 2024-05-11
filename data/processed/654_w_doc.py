@@ -1,67 +1,79 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
+import scipy.optimize as optimize
+import numpy as np
 
 
-def task_func(dataframe, target_value='332'):
+def task_func(array, target_value):
     """
-    Searches a given DataFrame for occurrences of a specified target value and visualizes these occurrences using a heatmap.
+    Fit an exponential decay function to the indices in the array where the first column matches the target value.
 
     Parameters:
-    - dataframe (pd.DataFrame): The input DataFrame to search.
-    - target_value (str, optional): The value to search for in the DataFrame. Defaults to '332'.
+    - array (np.ndarray): A numpy array where the first column will be searched for the target value.
+    - target_value (float or int): The value in the first column to filter the data for fitting.
 
     Returns:
-    - tuple: A tuple containing:
-        - pd.DataFrame: A DataFrame with Boolean values indicating the presence of the target value in the input DataFrame.
-        - matplotlib.axes._axes.Axes: The Axes object of the heatmap.
+    - tuple: Containing the optimized parameters of the fitting function (popt) and the matplotlib Axes object.
 
     Requirements:
+    - numpy
+    - scipy.optimize
     - matplotlib.pyplot
-    - seaborn
 
     Example:
-    >>> import pandas as pd
-    >>> df = pd.DataFrame({
-    ...     'Column1': ['0', 'a', '332', '33'],
-    ...     'Column2': ['1', 'bb', '33', '22'],
-    ...     'Column3': ['2', 'ccc', '2', '332']
-    ... })
-    >>> mask, ax = task_func(df, '332')
+    >>> import numpy as np
+    >>> array = np.array([[1, 2], [1, 3], [1, 4], [2, 5], [2, 6]])
+    >>> target = 1
+    >>> params, ax = task_func(array, target)
+    >>> len(params)
+    3
     """
-    mask = dataframe.applymap(lambda x: x == target_value)
-    plt.figure(figsize=(8, 6))
-    ax = sns.heatmap(mask, cmap='Blues', cbar=False)  # Adjusted to not display color bar for clarity in Boolean visualization
+    def func(x, a, b, c):
+        return a * np.exp(-b * x) + c
+    indices = np.where(array[:, 0] == target_value)[0]
+    if indices.size < 3:
+        raise ValueError("Not enough points to perform the fitting.")
+    x_data = np.arange(len(indices))
+    y_data = indices
+    initial_guess = [1, 0.1, min(y_data)]
+    popt, _ = optimize.curve_fit(func, x_data, y_data, p0=initial_guess, maxfev=10000)
+    x_fit = np.linspace(min(x_data), max(x_data), 500)
+    plt.figure()
+    plt.plot(x_data, y_data, 'bo', label='Data')
+    plt.plot(x_fit, func(x_fit, *popt), 'r-', label='Fit')
+    plt.legend()
     plt.show()
-    return mask, ax
+    return popt, plt.gca()
 
 import unittest
-import pandas as pd
 class TestCases(unittest.TestCase):
     def setUp(self):
-        """Create a sample DataFrame for testing."""
-        self.df = pd.DataFrame({
-            'Column1': ['0', 'a', '332', '33'],
-            'Column2': ['1', 'bb', '33', '22'],
-            'Column3': ['2', 'ccc', '2', '332']
-        })
-    def test_target_value_occurrence(self):
-        """Test if the function correctly identifies the target value."""
-        mask, _ = task_func(self.df, '332')
-        self.assertTrue(mask.iloc[2, 0], "Mask should be True where target value '332' exists.")
-    def test_target_value_absence(self):
-        """Test if the function correctly identifies absence of the target value."""
-        mask, _ = task_func(self.df, '332')
-        self.assertFalse(mask.iloc[0, 0], "Mask should be False where target value '332' does not exist.")
-    def test_return_type(self):
-        """Test the return type of the function."""
-        mask, ax = task_func(self.df, '332')
-        self.assertIsInstance(mask, pd.DataFrame, "First return value should be a DataFrame.")
-        self.assertTrue(hasattr(ax, 'get_figure'), "Second return value should be an Axes object with a 'get_figure' method.")
-    def test_default_target_value(self):
-        """Test the function with the default target value."""
-        mask, _ = task_func(self.df)
-        self.assertEqual(mask.sum().sum(), 2, "There should be exactly 2 occurrences of the default target value '332'.")
-    def test_custom_target_value(self):
-        """Test the function with a custom target value."""
-        mask, _ = task_func(self.df, 'a')
-        self.assertEqual(mask.sum().sum(), 1, "There should be exactly 1 occurrence of the custom target value 'a'.")
+        """Create a sample numpy array for testing."""
+        self.array = np.array([
+            ['332', '1', '2'],
+            ['a', 'bb', 'ccc'],
+            ['332', '33', '2'],
+            ['b', '22', '3'],
+            ['332', '44', '5']  # Adding more rows with '332' to ensure fitting can occur
+        ])
+    def test_return_types(self):
+        """Test the return types of the function."""
+        coeffs, ax = task_func(self.array, '332')
+        self.assertIsInstance(coeffs, np.ndarray, "Coefficients should be a numpy array.")
+        self.assertTrue(hasattr(ax, 'plot'), "The second return value should be an Axes object.")
+    def test_target_value_found(self):
+        """Test when the target value is found."""
+        coeffs, _ = task_func(self.array, '332')
+        self.assertGreater(coeffs.size, 0, "Should return coefficients when target value is found.")
+    def test_target_value_not_found(self):
+        """Test when the target value is not found."""
+        with self.assertRaises(ValueError):
+            task_func(self.array, '999')
+    def test_not_enough_points(self):
+        """Test with not enough points for fitting."""
+        small_array = np.array([['332'], ['a'], ['b']])
+        with self.assertRaises(ValueError):
+            task_func(small_array, '332')
+    def test_functionality(self):
+        """Test the overall functionality."""
+        coeffs, _ = task_func(self.array, '332')
+        self.assertEqual(coeffs.shape, (3,), "Should return three coefficients.")

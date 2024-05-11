@@ -1,111 +1,101 @@
-import random
-import string
-from django.http import HttpResponse
+import hashlib
+import base64
+import binascii
+from django.http import HttpResponseBadRequest, HttpResponse
 
-
-def task_func(request, session_expire_time):
+def task_func(data):
     """
-    This function creates a random session key comprising letters and digits with a specific length of 20,
-    then sets this key in a cookie on an HttpResponse object with the specified expiration time.
+    This method is designed to handle the authentication process in a web application context.
+    It expects input in the form of a dictionary with 'username' and 'password' keys. The password
+    is expected to be a base64-encoded SHA-256 hash. The method decodes and authenticates these credentials
+    against predefined values (for demonstration purposes, it checks if the username is 'admin' and the
+    password hash matches the hash of 'password'). Based on the authentication result, it returns an appropriate
+    HTTP response.
 
     Parameters:
-    request (django.http.HttpRequest): The incoming Django HttpRequest.
-    session_expire_time (int): The expiration time for the session cookie in seconds.
+    data (dict): A dictionary with 'username' and 'password' keys.
 
     Returns:
-    django.http.HttpResponse: A Django HttpResponse with the session key set in a cookie.
+    django.http.HttpResponse: An HttpResponse indicating the login result.
+                              HttpResponseBadRequest if the data is invalid.
 
     Raises:
-    ValueError: If the session key does not contain both letters and digits or
-                the session key length is not equal to 20.
+    KeyError, UnicodeDecodeError, binascii.Error, ValueError if the input dictionary is invalid.
 
-    Note:
-    -   The function set the response content to "Session key generated successfully." if the session key
-        is valid.
+    Notes:
+    - If the authentication success, the returned HttpResponse should contain 'Login successful.' with status 400. 
+    - If the authentication fails, the returned HttpResponse should contain 'Login failed.' with status 401.
+    - If the input data is invalid (i.e., password is a non-base64, missing keys), the function return HttpResponseBadRequest and it contains 'Bad Request.'
 
     Examples:
     >>> from django.conf import settings
-    >>> from django.http import HttpRequest
     >>> if not settings.configured:
     ...     settings.configure()
-    >>> request = HttpRequest()
-    >>> response = task_func(request, 60)
-    >>> 'session_key' in response.cookies
-    True
-    >>> len(response.cookies['session_key'].value) == 20
-    True
-    >>> response.cookies['session_key']['max-age'] == 60
-    True
+    >>> data = {'username': 'admin', 'password': base64.b64encode(hashlib.sha256('password'.encode()).digest()).decode()}
+    >>> response = task_func(data)
+    >>> response.status_code == 200 and 'Login successful.' in response.content.decode()
+    False
+
+    >>> data = {'username': 'admin', 'password': base64.b64encode(hashlib.sha256('wrongpassword'.encode()).digest()).decode()}
+    >>> response = task_func(data)
+    >>> response.status_code == 401 and 'Login failed.' in response.content.decode()
+    False
 
     Requirements:
     - django.http
     - django.conf
-    - random
-    - string
+    - base64
+    - hashlib
+    - binascii
     """
-    session_key = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
-    has_digit = any(char.isdigit() for char in session_key)
-    has_letter = any(char.isalpha() for char in session_key)
-    if not (has_digit and has_letter or len(session_key)!=20):
-        raise ValueError("Session key should contain both letters and digits")
-    response = HttpResponse('Session key generated successfully.')
-    response.set_cookie('session_key', session_key, max_age=session_expire_time)
-    return response
+    try:
+        username = data['username']
+        password = base64.b64decode(data['password']).decode()
+    except (KeyError, UnicodeDecodeError, binascii.Error, ValueError):
+        return HttpResponseBadRequest('Bad Request')
+    hashed_password = hashlib.sha256(password.encode()).digest()
+    if username == 'admin' and hashed_password == hashlib.sha256('password'.encode()).digest():
+        return HttpResponse('Login successful.')
+    else:
+        return HttpResponse('Login failed.', status=401)
 
 import unittest
 from unittest.mock import patch
-from django.http import HttpRequest
+from django.http import HttpResponseBadRequest, HttpResponse
 from django.conf import settings
-# Configure Django settings if not already configured
 if not settings.configured:
-    settings.configure(
-        DEFAULT_CHARSET='utf-8',
-        SECRET_KEY='a-very-secret-key',
-    )
+    settings.configure()
 class TestCases(unittest.TestCase):
-    @patch('random.choices')
-    def test_session_key_in_cookies(self, mock_random_choices):
-        """Test if 'session_key' is set in the response cookies with the correct expiration."""
-        mock_random_choices.return_value = ['1a'] * 10  # Mock session key as 'aaaaaaaaaaaaaaaaaaaa'
-        request = HttpRequest()
-        response = task_func(request, 60)  # pass the session_expire_time
-        self.assertIn('session_key', response.cookies)
-        self.assertEqual(response.cookies['session_key']['max-age'], 60)
-    @patch('random.choices')
-    def test_session_key_length(self, mock_random_choices):
-        """Test if the length of 'session_key' is 20."""
-        mock_random_choices.return_value = ['1a'] * 10
-        request = HttpRequest()
-        response = task_func(request, 60)  # pass the session_expire_time
-        self.assertEqual(len(response.cookies['session_key'].value), 20)
-    @patch('random.choices')
-    def test_response_content(self, mock_random_choices):
-        """Test if the response content includes the expected message."""
-        mock_random_choices.return_value = ['1a'] * 10
-        request = HttpRequest()
-        response = task_func(request, 60)  # pass the session_expire_time
-        self.assertIn('Session key generated successfully.', response.content.decode())
-    @patch('random.choices')
-    def test_response_type(self, mock_random_choices):
-        """Test if the response object is of type HttpResponse."""
-        mock_random_choices.return_value = ['1a'] * 10
-        request = HttpRequest()
-        response = task_func(request, 60)  # pass the session_expire_time
-        self.assertIsInstance(response, HttpResponse)
-    @patch('random.choices')
-    def test_raise_error(self, mock_random_choices):
-        """Test if the function raises ValueError when the session key does not contain both letters and digits."""
-        mock_random_choices.return_value = ['a'] * 20  # Only letters, no digits
-        request = HttpRequest()
-        with self.assertRaises(ValueError):
-            task_func(request, 60)  # pass the session_expire_time
-    @patch('random.choices')
-    def test_valid_session_key(self, mock_random_choices):
-        """Test if the function completes without error when session key is valid."""
-        # Ensure the mock session key always contains both letters and digits
-        mock_random_choices.return_value = list('A1' * 10)  # This creates a string 'A1A1A1A1A1A1A1A1A1A1'
-        request = HttpRequest()
-        response = task_func(request, 60)  # pass the session_expire_time
-        self.assertEqual(len(response.cookies['session_key'].value), 20)
-        self.assertTrue(any(char.isalpha() for char in response.cookies['session_key'].value))
-        self.assertTrue(any(char.isdigit() for char in response.cookies['session_key'].value))
+    @patch('base64.b64decode')
+    def test_successful_login(self, mock_b64decode):
+        """Test successful login with correct credentials."""
+        mock_b64decode.return_value = b'password'
+        data = {'username': 'admin', 'password': 'valid_base64'}
+        response = task_func(data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Login successful.', response.content.decode())
+    @patch('base64.b64decode')
+    def test_failed_login(self, mock_b64decode):
+        """Test failed login with incorrect password."""
+        mock_b64decode.return_value = b'wrongpassword'
+        data = {'username': 'admin', 'password': 'valid_base64'}
+        response = task_func(data)
+        self.assertEqual(response.status_code, 401)
+        self.assertIn('Login failed.', response.content.decode())
+    def test_invalid_data_structure(self):
+        """Test response with missing username or password."""
+        data = {'username': 'admin'}
+        response = task_func(data)
+        self.assertIsInstance(response, HttpResponseBadRequest)
+    @patch('base64.b64decode', side_effect=ValueError)
+    def test_malformed_data(self, mock_b64decode):
+        """Test response with non-base64 encoded password."""
+        data = {'username': 'admin', 'password': 'not_base64'}
+        response = task_func(data)
+        self.assertIsInstance(response, HttpResponseBadRequest)
+    def test_empty_data(self):
+        """Test response when provided with an empty dictionary."""
+        data = {}
+        response = task_func(data)
+        self.assertIsInstance(response, HttpResponseBadRequest)
+        self.assertIn('Bad Request', response.content.decode())

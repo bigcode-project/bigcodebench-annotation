@@ -1,87 +1,76 @@
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
-import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def task_func(data):
     """
-    Normalizes a given dataset using MinMax scaling and calculates the average of each row. This average is then
-    added as a new column 'Average' to the resulting DataFrame. The function also visualizes these averages in a plot.
+    Analyze a dataset by calculating the average of values across each row and visualizing the correlation matrix as a
+    heatmap.
 
     Parameters:
-    data (numpy.array): A 2D array where each row represents a sample and each column a feature, with a
-    shape of (n_samples, 8).
+    data (numpy.array): 2D array where each row represents a record and each column represents a feature
 
     Returns:
-    DataFrame: A pandas DataFrame where data is normalized, with an additional column 'Average' representing the
-    mean of each row.
-    Axes: A matplotlib Axes object showing a bar subplot of the average values across the dataset.
+    tuple: A tuple containing:
+        - DataFrame: A pandas DataFrame enhanced with an 'Average' column that represents the mean across each row.
+        - Axes: The matplotlib Axes object showing the heatmap of the correlations.
 
     Requirements:
     - pandas
-    - sklearn
-    - matplotlib
+    - numpy
+    - seaborn
+
+    Raises:
+    ValueError: If the input data is not a 2D array or if it contains non-numeric data.
 
     Example:
-    >>> import numpy as np
-    >>> data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])
+    >>> data = np.array([[1, 2, 3, 4, 5, 6, 7, 8], [8, 7, 6, 5, 4, 3, 2, 1]])
     >>> df, ax = task_func(data)
-    >>> print(df.round(2))
-         A    B    C    D    E    F    G    H  Average
-    0  0.0  0.0  0.0  0.0  1.0  0.0  1.0  0.0     0.25
-    1  1.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0     0.25
+    >>> print(df['Average'].to_string(index=False))
+    4.5
+    4.5
     """
-    COLUMN_NAMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    scaler = MinMaxScaler()
-    normalized_data = scaler.fit_transform(data)
-    df = pd.DataFrame(normalized_data, columns=COLUMN_NAMES)
+    if not isinstance(data, np.ndarray) or data.ndim != 2:
+        raise ValueError("Input data must be a 2D numpy array.")
+    df = pd.DataFrame(data)
+    correlation = df.corr()
+    ax = sns.heatmap(correlation, annot=True, cmap='coolwarm')
     df['Average'] = df.mean(axis=1)
-    fig, ax = plt.subplots()
-    df['Average'].plot(ax=ax)
     return df, ax
 
 import unittest
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])
-        df, ax = task_func(data)
-        self.assertEqual(df.shape, (2, 9))
-        self.assertTrue('Average' in df.columns)
-        lines = ax.get_lines()
-        self.assertEqual(len(lines), 1)
-        self.assertListEqual(list(lines[0].get_ydata()), list(df['Average']))
-    def test_case_2(self):
-        data = np.array([[5, 5, 5, 5, 5, 5, 5, 5]])
-        df, ax = task_func(data)
-        self.assertEqual(df.shape, (1, 9))
-        self.assertTrue('Average' in df.columns)
-        lines = ax.get_lines()
-        self.assertEqual(len(lines), 1)
-        self.assertListEqual(list(lines[0].get_ydata()), list(df['Average']))
-    def test_case_3(self):
-        data = np.array([[0, 0, 0, 0, 0, 0, 0, 0], [10, 10, 10, 10, 10, 10, 10, 10]])
-        df, ax = task_func(data)
-        self.assertEqual(df.shape, (2, 9))
-        self.assertTrue('Average' in df.columns)
-        lines = ax.get_lines()
-        self.assertEqual(len(lines), 1)
-        self.assertListEqual(list(lines[0].get_ydata()), list(df['Average']))
-    def test_case_4(self):
-        data = np.array([[1, 2, 3, 4, 5, 6, 7, 8]])
-        df, ax = task_func(data)
-        self.assertEqual(df.shape, (1, 9))
-        self.assertTrue('Average' in df.columns)
-        lines = ax.get_lines()
-        self.assertEqual(len(lines), 1)
-        self.assertListEqual(list(lines[0].get_ydata()), list(df['Average']))
-    def test_case_5(self):
-        data = np.array([[8, 7, 6, 5, 4, 3, 2, 1]])
-        df, ax = task_func(data)
-        self.assertEqual(df.shape, (1, 9))
-        self.assertTrue('Average' in df.columns)
-        lines = ax.get_lines()
-        self.assertEqual(len(lines), 1)
-        self.assertListEqual(list(lines[0].get_ydata()), list(df['Average']))
+    def setUp(self):
+        # Create a sample data set
+        self.data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])
+    def tearDown(self):
+        # Remove any files or handle other cleanup actions
+        plt.close('all')
+    def test_dataframe_structure(self):
+        df, _ = task_func(self.data)
+        self.assertIn('Average', df.columns, "DataFrame should contain an 'Average' column")
+    def test_average_calculation(self):
+        df, _ = task_func(self.data)
+        expected_averages = [3.125, 3.375]  # The average of rows
+        pd.testing.assert_series_equal(df['Average'], pd.Series(expected_averages, name='Average'), check_dtype=True)
+    def test_heatmap_plot_returned(self):
+        _, ax = task_func(self.data)
+        self.assertIsInstance(ax, plt.Axes,
+                              "The returned object should be a plt.Axes instance indicating a plot was created")
+    def test_correlation_calculation(self):
+        # Test to ensure that the correlation matrix is calculated correctly
+        df, _ = task_func(self.data)
+        expected_correlation = pd.DataFrame(self.data).corr()
+        actual_correlation = \
+            sns.heatmap(pd.DataFrame(self.data).corr(), annot=True, cmap='coolwarm').get_figure().axes[0].collections[
+                0].get_array()
+        np.testing.assert_array_almost_equal(actual_correlation, expected_correlation.to_numpy().ravel())
+    def test_input_validation(self):
+        # Test to ensure that non-2D arrays are handled properly
+        with self.assertRaises(ValueError):
+            task_func(np.array([1, 2, 3]))  # Not a 2D array

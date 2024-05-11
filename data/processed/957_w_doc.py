@@ -1,142 +1,74 @@
-import re
 import string
-import random
+import re
 
 
-def task_func(text: str, seed=None) -> str:
+def task_func(text: str) -> tuple:
     """
-    Transforms a given string by removing special characters, normalizing whitespace,
-    and randomizing character casing.
+    Counts the number of words, characters, and unique characters in a given text.
 
     Parameters:
-    - text (str): The text string to be preprocessed.
-    - seed (int, optional): Random seed for reproducibility. Defaults to None (not set).
+    - text (str): The input text to be analyzed.
 
     Returns:
-    - str: The preprocessed text string.
+    - tuple: A tuple containing three integers: the number of words,
+                                                the number of characters,
+                                                the number of unique characters.
 
     Requirements:
-    - re
     - string
-    - random
+    - re
 
     Note:
-    - This function considers special characters to be string punctuations.
-    - Spaces, tabs, and newlines are replaced with with '_', '__', and '___' respectively.
-    - To randomize casing, this function converts characters to uppercase with a 50% probability.
+    - This function considers whitespace-separated substrings as words.
+    - When counting characters, this function excludes whitespace and special
+      characters (i.e. string.punctuation).
 
     Example:
-    >>> task_func('Hello   World!', 0)
-    'HeLlo___WORlD'
-    >>> task_func('attention is all you need', 42)
-    'ATtENTIOn_IS_ALL_You_Need'
+    >>> task_func('Hello, world!')
+    (2, 10, 7)
+    >>> task_func('Python is  awesome!  ')
+    (3, 15, 12)
     """
-    if seed is not None:
-        random.seed(seed)
-    text = re.sub("[%s]" % re.escape(string.punctuation), "", text)
-    REPLACEMENTS = {" ": "_", "\t": "__", "\n": "___"}
-    for k, v in REPLACEMENTS.items():
-        text = text.replace(k, v)
-    text = "".join(random.choice([k.upper(), k]) for k in text)
-    return text
+    words = text.split()
+    chars = re.sub("\s", "", re.sub(f"[{string.punctuation}]", "", text))
+    return len(words), len(chars), len(set(chars))
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = task_func("Hello   World!", seed=1)
-        self.assertNotIn(" ", result, "Spaces should be replaced.")
-        self.assertNotIn("!", result, "Special characters should be removed.")
-        self.assertEqual(
-            len(result), len("Hello___World"), "Length should match processed input."
-        )
+        # Test simple text without any punctuation.
+        result = task_func("Hello world")
+        self.assertEqual(result, (2, 10, 7))
     def test_case_2(self):
-        result = task_func("Python!", seed=2)
-        self.assertNotIn("!", result, "Special characters should be removed.")
-        self.assertEqual(
-            len(result), len("Python"), "Length should match processed input."
-        )
+        # Test simple text that includes punctuation.
+        result = task_func("Hello, world!")
+        self.assertEqual(result, (2, 10, 7))
     def test_case_3(self):
-        result = task_func("  ", seed=3)
-        self.assertEqual(result, "__", "Spaces should be replaced with underscores.")
+        # Test single word and no punctuation.
+        result = task_func("Hello")
+        self.assertEqual(result, (1, 5, 4))
     def test_case_4(self):
-        result = task_func("\t\n", seed=4)
-        self.assertEqual(
-            result, "_____", "Tab and newline should be replaced with underscores."
-        )
+        # Test single word that includes punctuation.
+        result = task_func("Hello!")
+        self.assertEqual(result, (1, 5, 4))
     def test_case_5(self):
-        result = task_func("a!b@c#", seed=5)
-        self.assertTrue(result.isalpha(), "Output should only contain alphabets.")
-        self.assertEqual(
-            len(result), len("abc"), "Length should match processed input."
-        )
+        # Test empty string.
+        result = task_func("")
+        self.assertEqual(result, (0, 0, 0))
     def test_case_6(self):
-        # Test with all types of whitespace characters
-        result = task_func("a b\tc\nd", seed=6)
-        self.assertEqual(
-            result.lower(),
-            "a_b__c___d",
-            "Should replace all types of whitespaces correctly.",
-        )
+        # Test text with numbers and punctuation.
+        result = task_func("There are 4 numbers here: 1, 2, 3, and 4.")
+        self.assertEqual(result, (10, 27, 15))
     def test_case_7(self):
-        # Test with a mix of alphanumeric and special characters
-        result = task_func("a1! b2@ c3#", seed=7)
-        self.assertTrue(
-            all(char.isalnum() or char == "_" for char in result),
-            "Should only contain alphanumeric characters and underscores.",
-        )
+        # Test text with only whitespace and punctuation.
+        result = task_func("     , , !")
+        self.assertEqual(result, (3, 0, 0))
     def test_case_8(self):
-        # Test with an empty string
-        result = task_func("", seed=8)
-        self.assertEqual(result, "", "Should handle empty string correctly.")
+        # Test text with multiple spaces between words.
+        result = task_func("Multiple    spaces    here")
+        self.assertEqual(result, (3, 18, 12))
     def test_case_9(self):
-        # Test with a string that contains no special characters or whitespaces
-        result = task_func("abcdefg", seed=9)
-        self.assertTrue(result.isalpha(), "Should contain only letters.")
-        self.assertEqual(len(result), 7, "Length should match the input.")
-    def test_case_10(self):
-        # Test with a long string of repeated characters
-        result = task_func("a" * 50, seed=10)
-        self.assertTrue(
-            all(char.lower() == "a" for char in result),
-            "All characters should be 'a' or 'A'.",
-        )
-        self.assertEqual(len(result), 50, "Length should match the input.")
-    def test_case_11(self):
-        # Test with only special characters
-        result = task_func("!@#$%^&*", seed=11)
-        self.assertEqual(
-            result, "", "Should return an empty string for only special characters."
-        )
-    def test_case_12(self):
-        # Test with numeric characters
-        result = task_func("12345", seed=13)
-        self.assertTrue(result.isdigit(), "Should contain only digits.")
-        self.assertEqual(len(result), 5, "Length should match the input.")
-    def test_case_13(self):
-        # Test with a string containing only whitespace characters
-        result = task_func(" \t\n", seed=14)
-        self.assertEqual(
-            result,
-            "______",
-            "Should replace all types of whitespaces correctly, with two underscores for tab and three for newline.",
-        )
-    def test_case_14(self):
-        # Test the randomness of uppercase conversion with a long string
-        result = task_func("a" * 100, seed=15)
-        self.assertTrue(
-            all(char.lower() == "a" for char in result),
-            "All characters should be 'a' or 'A'.",
-        )
-        self.assertNotEqual(
-            result, "a" * 100, "Should have some uppercase transformations."
-        )
-        self.assertNotEqual(
-            result, "A" * 100, "Should have some lowercase transformations."
-        )
-    def test_case_15(self):
-        # Test random seed impact
-        result1 = task_func("test seed impact", seed=42)
-        result2 = task_func("test seed impact", seed=42)
-        self.assertEqual(
-            result1, result2, "Results with the same seed should be identical."
-        )
+        # Test a long text.
+        long_text = "This is a longer text designed to test the function's ability to handle more complex input, including a variety of characters and spaces."
+        result = task_func(long_text)
+        self.assertEqual(result, (23, 112, 22))

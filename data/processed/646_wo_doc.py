@@ -1,23 +1,24 @@
 import os
 import pandas as pd
+from dateutil.parser import parse
+OUTPUT_DIR = './output'
 
-
-def task_func(filename: str) -> pd.DataFrame:
+def task_func(csv_path=os.path.join(OUTPUT_DIR, 'data.csv'), date_column='date'):
     """
-    Read a CSV file into a Pandas DataFrame and then delete the entire contents of the original file.
+    Read a CSV file, convert a column of date strings into datetime objects,
+    and draw a histogram of the year distribution of these dates.
 
     Parameters:
-    - filename (str): The name of the CSV file to read and erase.
+    - csv_path (str): The path to the CSV file. Default is the 'data.csv' in the script's directory.
+    - date_column (str): The column in the CSV file with the date strings. Default is 'date'.
 
     Returns:
-    - DataFrame: The contents of the CSV file as a pandas DataFrame.
-
-    Raises:
-    - FileNotFoundError: If the CSV file does not exist.
+    - matplotlib.axes._axes.Axes: A histogram plot object showing the distribution of years.
 
     Requirements:
-    - os
     - pandas
+    - dateutil.parser
+    - os
 
     Example:
     >>> import os
@@ -26,57 +27,56 @@ def task_func(filename: str) -> pd.DataFrame:
     ...     task_func('nonexistent.csv')
     Traceback (most recent call last):
         ...
-    FileNotFoundError: No such file: 'nonexistent.csv'
+    FileNotFoundError: nonexistent.csv does not exist
     """
-    if not os.path.exists(filename):
-        raise FileNotFoundError(f"No such file: '{filename}'")
-    if os.stat(filename).st_size == 0:
-        return pd.DataFrame()
-    df = pd.read_csv(filename)
-    with open(filename, 'w') as file:
-        file.truncate()
-    return df
+    if not os.path.isfile(csv_path):
+        raise FileNotFoundError(f"{csv_path} does not exist")
+    df = pd.read_csv(csv_path)
+    df[date_column] = df[date_column].apply(lambda x: parse(x))
+    return df[date_column].dt.year.hist()
 
 import unittest
 import shutil
-OUTPUT_DIR = r'./output'
+import os
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def setUp(self):
         self.output_dir = OUTPUT_DIR
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
-        self.test_file = os.path.join(self.output_dir, 'test.csv')
-        with open(self.test_file, 'w') as f:
-            f.write("col1,col2\n1,2\n3,4")
-        # Debugging: Verify file content immediately after writing
-        with open(self.test_file, 'r') as f:
-            content = f.read()
-        print(f"Debug: Content written to {self.test_file}: {content}")
+        # Prepare CSV files for testing
+        self.valid_data_csv = os.path.join(self.output_dir, 'valid_data.csv')
+        with open(self.valid_data_csv, 'w') as f:
+            f.write("date\n2020-01-01\n2021-02-02")
+        self.empty_data_csv = os.path.join(self.output_dir, 'empty_data.csv')
+        open(self.empty_data_csv, 'w').close()  # Create an empty file
+        # No need to create an invalid data CSV because parsing errors are tested dynamically
+        self.different_column_data_csv = os.path.join(self.output_dir, 'different_column_data.csv')
+        with open(self.different_column_data_csv, 'w') as f:
+            f.write("different_date_column\n2020-01-01\n2021-02-02")
     def tearDown(self):
-        # Clean up by removing the test file and the test_data directory
         shutil.rmtree(self.output_dir, ignore_errors=True)
-    def test_file_not_found(self):
-        """Test the function with a filename that does not exist."""
+    def test_valid_data(self):
+        """Test with valid date data."""
+        histogram_plot = task_func(self.valid_data_csv, 'date')
+        self.assertIsInstance(histogram_plot, plt.Axes)
+    def test_empty_file(self):
+        """Test with an empty CSV file."""
+        with self.assertRaises(ValueError):  # Assuming pandas raises a ValueError for an empty CSV
+            task_func(self.empty_data_csv, 'date')
+    def test_nonexistent_file(self):
+        """Test with a nonexistent CSV file path."""
+        nonexistent_csv = os.path.join(self.output_dir, 'nonexistent.csv')
         with self.assertRaises(FileNotFoundError):
-            task_func('nonexistent.csv')
-    def test_file_removal(self):
-        """Ensure the function does not remove the file, only erases contents."""
-        task_func(self.test_file)
-        self.assertTrue(os.path.exists(self.test_file))
-    def test_empty_csv(self):
-        """Test reading an empty CSV file."""
-        open(self.test_file, 'w').close()  # Ensure the file is empty
-        df = task_func(self.test_file)
-        self.assertTrue(df.empty, "DataFrame should be empty for an empty CSV file.")
-        self.assertEqual(os.path.getsize(self.test_file), 0, "The file should still be erased.")
-    def test_file_is_erased_after_reading(self):
-        """Ensure the CSV file is erased after its content is read into a DataFrame."""
-        _ = task_func(self.test_file)
-        # Check that the file exists but its content is erased
-        self.assertTrue(os.path.exists(self.test_file), "The file should still exist.")
-        self.assertEqual(os.path.getsize(self.test_file), 0, "The file's content should be erased.")
-    def test_handling_non_existent_file(self):
-        """Test the function's response to being given a non-existent file path."""
-        non_existent_file = os.path.join(self.output_dir, 'non_existent.csv')
-        with self.assertRaises(FileNotFoundError, msg="Expected FileNotFoundError for non-existent file."):
-            _ = task_func(non_existent_file)
+            task_func(nonexistent_csv, 'date')
+    def test_different_date_column(self):
+        """Test using a different date column name."""
+        histogram_plot = task_func(self.different_column_data_csv, 'different_date_column')
+        self.assertIsInstance(histogram_plot, plt.Axes)
+    def test_invalid_data(self):
+        """Dynamically test with invalid date strings; expecting the function to handle errors gracefully."""
+        invalid_data_csv = os.path.join(self.output_dir, 'invalid_data.csv')
+        with open(invalid_data_csv, 'w') as f:
+            f.write("date\nnot-a-date\n2021-13-01")
+        with self.assertRaises(ValueError):
+            task_func(invalid_data_csv, 'date')

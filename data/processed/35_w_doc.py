@@ -1,71 +1,78 @@
-import re
-from wordcloud import WordCloud
+import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def task_func(text):
+def task_func(df, target_values=[1, 3, 4]):
     """
-    Create a word cloud from text after removing URLs and plot it.
+    Replace all elements in DataFrame columns that do not exist in the target_values array with zeros, and then output the distribution of each column after replacing.
+    - label each plot as the name of the column it corresponds to.
 
     Parameters:
-    - text (str): The text to analyze.
+    - df (DataFrame): The input pandas DataFrame.
+    - target_values (list) : Array of values not to replace by zero.
 
     Returns:
-    WordCloud object: The generated word cloud.
-    Raises:
-    ValueError("No words available to generate a word cloud after removing URLs."): If there are no words available to generate a word cloud after removing URLs.
+    - matplotlib.axes.Axes: The Axes object of the plotted data.
 
     Requirements:
-    - re
-    - wordcloud.WordCloud
+    - seaborn
     - matplotlib.pyplot
 
     Example:
-    >>> print(task_func('Visit https://www.python.org for more info. Python is great. I love Python.').words_)
-    {'Python': 1.0, 'Visit': 0.5, 'info': 0.5, 'great': 0.5, 'love': 0.5}
-    >>> print(task_func('Check out this link: http://www.example.com. Machine learning is fascinating.').words_)
-    {'Check': 1.0, 'link': 1.0, 'Machine': 1.0, 'learning': 1.0, 'fascinating': 1.0}
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> df = pd.DataFrame(np.random.randint(0,10,size=(100, 5)), columns=list('ABCDE'))
+    >>> print(df.head(2))
+       A  B  C  D  E
+    0  6  3  7  4  6
+    1  9  2  6  7  4
+    >>> df1, ax = task_func(df)
+    >>> print(ax)
+    Axes(0.125,0.11;0.775x0.77)
     """
-    text = re.sub(r"http[s]?://\S+", "", text)
-    if not text.strip():  # Check if text is not empty after URL removal
-        raise ValueError(
-            "No words available to generate a word cloud after removing URLs."
-        )
-    wordcloud = WordCloud().generate(text)
+    df = df.applymap(lambda x: x if x in target_values else 0)
     plt.figure(figsize=(10, 5))
-    plt.imshow(wordcloud)
-    plt.axis("off")  # Do not show axis to make it visually appealing
-    return wordcloud
+    for column in df.columns:
+        sns.kdeplot(df[column], label=column, warn_singular=False)
+    plt.legend()
+    return df, plt.gca()
 
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def test_case_1(self):
-        text = (
-            f"Visit https://www.example1.com for more info. This is the first sentence."
-        )
-        result = task_func(text)
-        self.assertIsInstance(result, WordCloud)
-        self.assertNotIn("https://www.example1.com", result.words_)
+        df = pd.DataFrame({"A": [1, 4, 7, 6, 7, 3, 4, 4]})
+        df1, ax = task_func(df)
+        self.assertIsInstance(ax, plt.Axes)
     def test_case_2(self):
-        text = f"Check out this link: https://www.example2.com. This is the second sentence."
-        result = task_func(text)
-        self.assertIsInstance(result, WordCloud)
-        self.assertNotIn("https://www.example2.com", result.words_)
+        df = pd.DataFrame({"A": [1, 2, 3, 4, 5], "B": [7, 4, 3, 3, 1]})
+        df1, ax = task_func(df)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines), 2)
     def test_case_3(self):
-        text = "There is no url in this sentence."
-        result = task_func(text)
-        self.assertIsInstance(result, WordCloud)
+        df = pd.DataFrame({"A": [5, 6, 2, 9, 7, 3, 2, 2, 8, 1]})
+        target_values = [1, 2, 3, 4, 5]
+        df1, ax = task_func(df, target_values=target_values)
+        mask = df1.isin(target_values) | (df1 == 0)
+        self.assertTrue(mask.all().all())
+        self.assertIsInstance(ax, plt.Axes)
     def test_case_4(self):
-        text = "https://www.example4.com"
-        with self.assertRaises(ValueError) as context:
-            task_func(text)
-        self.assertEqual(
-            str(context.exception),
-            "No words available to generate a word cloud after removing URLs.",
-        )
+        df = pd.DataFrame({"A": [10, 20, 30, 40, 50], "B": [50, 40, 10, 10, 30]})
+        target_values = [10, 20, 30]
+        df1, ax = task_func(df, target_values=target_values)
+        mask = df1.isin(target_values) | (df1 == 0)
+        self.assertTrue(mask.all().all())
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines), 2)
     def test_case_5(self):
-        text = f"Check https://www.example51.com and also visit https://www.example52.com for more details. This is the fifth sentence."
-        result = task_func(text)
-        self.assertIsInstance(result, WordCloud)
-        self.assertNotIn("https://www.example51.com", result.words_)
+        df = pd.DataFrame({"A": [5, 6, 2, 9, 7, 3, 2, 2, 8, 1]})
+        df1, ax = task_func(df, target_values=[])
+        self.assertTrue(df1.eq(0).all().all())
+        self.assertIsInstance(ax, plt.Axes)
+    def test_case_7(self):
+        df = pd.DataFrame({"A": [5, 6, 2, 9, 7, 3, 2, 2, 8, 1]})
+        df1, ax = task_func(df, target_values=[5, 6, 2, 9, 7, 3, 8, 1])
+        self.assertTrue(df1.equals(df))
+        self.assertIsInstance(ax, plt.Axes)

@@ -1,58 +1,71 @@
 import numpy as np
-import math
-import random
-from random import uniform
+from sklearn.linear_model import LinearRegression
 
-
-def task_func(radius, num_points):
+def task_func(df):
     """
-    Create a tuple with a list of random points within a circle of a given radius.
-    
+    Use a linear regression model to predict the "value" of "feature" in the given dataframe and return the coefficients and intercept.
+
     Parameters:
-    - radius (int): The radius of the circle.
-    - num_points (int): The number of points to be generated.
+    - df (pd.DataFrame): pandas DataFrame that contains columns named 'feature' and 'value'.
 
     Returns:
-    - out (list): A list of points within a circle.
+    - result (dict): A dictionary with the coefficients and the intercept of the fitted linear regression model.
 
     Requirements:
     - numpy
-    - math
-    - random
+    - sklearn
 
     Example:
-    >>> random.seed(42)
-    >>> task_func(1, 3)
-    [(-0.10124546928297637, -0.12149119380571095), (-0.07399370924760951, 0.46662154808860146), (-0.06984148700093858, -0.8196472742078809)]
+    >>> import pandas as pd
+    >>> np.random.seed(42)
+    >>> df = pd.DataFrame({'feature': np.random.rand(100), 'value': np.random.rand(100)})
+    >>> coefficients = task_func(df)
+    >>> print(coefficients)
+    {'coefficients': [[-0.03353164387961974]], 'intercept': [0.5135976564010359]}
     """
-    out = []
-    for _ in range(num_points):
-        theta = uniform(0, 2*np.pi)
-        r = radius * math.sqrt(uniform(0, 1))
-        x = r * math.cos(theta)
-        y = r * math.sin(theta)
-        out.append((x, y))
-    return out
+    X = np.array(df['feature']).reshape(-1,1)  # Explicitly converting to numpy array and reshaping
+    y = np.array(df['value']).reshape(-1,1)    # Explicitly converting to numpy array and reshaping
+    model = LinearRegression().fit(X, y)
+    return {'coefficients': model.coef_.tolist(), 'intercept': model.intercept_.tolist()}
 
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        points = task_func(1, 3)
-        for x, y in points:
-            self.assertTrue(x**2 + y**2 <= 1)
+        df = pd.DataFrame({'feature': np.random.rand(100), 'value': np.random.rand(100)})
+        coefficients = task_func(df)
+        self.assertEqual(len(coefficients['coefficients']), 1)
+        self.assertEqual(len(coefficients['coefficients'][0]), 1)
+        self.assertEqual(len(coefficients['intercept']), 1)
     def test_case_2(self):
-        points = task_func(2, 3)
-        for x, y in points:
-            self.assertTrue(x**2 + y**2 <= 4)
+        df = pd.DataFrame({'feature': [1, 2, 3, 4, 5], 'value': [1, 2, 3, 4, 5]})
+        coefficients = task_func(df)
+        self.assertEqual(len(coefficients['coefficients']), 1)
+        self.assertEqual(len(coefficients['coefficients'][0]), 1)
+        self.assertEqual(len(coefficients['intercept']), 1)
+        self.assertAlmostEqual(coefficients['coefficients'][0][0], 1.0)
+        self.assertAlmostEqual(coefficients['intercept'][0], 0.0)
     def test_case_3(self):
-        points = task_func(3, 3)
-        for x, y in points:
-            self.assertTrue(x**2 + y**2 <= 9)
+        df = pd.DataFrame({'feature': [1, 2, 3, 4, 5], 'value': [2, 4, 6, 8, 10]})
+        coefficients = task_func(df)
+        self.assertEqual(len(coefficients['coefficients']), 1)
+        self.assertEqual(len(coefficients['coefficients'][0]), 1)
+        self.assertEqual(len(coefficients['intercept']), 1)
+        self.assertAlmostEqual(coefficients['coefficients'][0][0], 2.0)
+        self.assertAlmostEqual(coefficients['intercept'][0], 0.0)
     def test_case_4(self):
-        points = task_func(4, 3)
-        for x, y in points:
-            self.assertTrue(x**2 + y**2 <= 16)
+        df = pd.DataFrame({'feature': [0, 0, 0, 0, 0], 'value': [1, 2, 3, 4, 5]})
+        coefficients = task_func(df)
+        self.assertEqual(len(coefficients['coefficients']), 1)
+        self.assertEqual(len(coefficients['coefficients'][0]), 1)
+        self.assertEqual(len(coefficients['intercept']), 1)
+        self.assertAlmostEqual(coefficients['coefficients'][0][0], 0.0)
+        self.assertAlmostEqual(coefficients['intercept'][0], 3.0)
     def test_case_5(self):
-        points = task_func(5, 3)
-        for x, y in points:
-            self.assertTrue(x**2 + y**2 <= 25)
+        df = pd.DataFrame({'feature': [1, 2, 3, 4, 5], 'value': [0, 0, 0, 0, 0]})
+        coefficients = task_func(df)
+        self.assertEqual(len(coefficients['coefficients']), 1)
+        self.assertEqual(len(coefficients['coefficients'][0]), 1)
+        self.assertEqual(len(coefficients['intercept']), 1)
+        self.assertAlmostEqual(coefficients['coefficients'][0][0], 0.0)
+        self.assertAlmostEqual(coefficients['intercept'][0], 0.0)

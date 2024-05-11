@@ -1,178 +1,151 @@
 import pandas as pd
-from scipy.stats import chi2_contingency
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 
-def task_func(df, columns=['A', 'B', 'C'], larger=50, equal=900):
+def task_func(df, col_a='A', col_b='B', col_c='C', seed=None):
     """
-    Filters a pandas DataFrame based on the values of specific rows, and performs
-    a chi-square independence test on the first two columns.
-
-    The function filters rows based on the following criteria:
-        Keep only rows where:
-            The value of the second column: df['second'] > larger
-            and
-            The value of the third column: df['third'] == equal
+    This function filters rows from the input DataFrame 'df' based on conditions in columns 'B' and 'C', 
+    then uses linear regression to predict values in column 'B' using data from column 'A'. 
+    Specifically, it selects rows where column 'B' values are greater than 50 and column 'C' values equal 900.
     
-    After filtering a conigency table of the first two columns is computed,
-    which is then used in the chi2 independence test. The p_value of the test
-    is returned.        
+    A train test split of the remaining data is performed, where the test_size = 0.2
+    and col_a is used as X value and col_b is used as Y values / target.
+
+    This data is used to train a LinearRegression model. 
+
+    The test split is used to generate predictions for col_b. These predictions
+    are returned as well as the trained model.
+
+    If df is empty or empty after the filtering, None is returned.
+    If df does contain non numeric data None is returned.
+    If the specified columns are not contained in df, None is returned.
 
     Parameters:
-    df (pd.DataFrame): A DataFrame containing at least the columns specified in the 'columns' parameter.
-    columns (list): A list of column names to consider for the operation, defaulting to ['A', 'B', 'C'].
-                    The first column should contain categorical data, the second numerical data (used for filtering with values > 'larger'),
-                    and the third numerical data (used for filtering with a fixed value of 'equal').
-    larger (float, optional): Used for filtering rows against the second column where values > 'larger'.
-                              Defaults to 50.
-    equal (float, optional): Used for filtering rows against the third column where values == equal.
-                             Defaults to 900.
+    df (DataFrame): The input pandas DataFrame with numeric data.
+    col_a (str): The name of the first column to use for prediction (default is 'A').
+    col_b (str): The name of the second column, the values of which are to be predicted (default is 'B').
+    col_c (str): The name of the third column to use for row selection (default is 'C').
+    seed (int, optional): random seed for the train test split. Default is None.
 
     Returns:
-    float: The p-value from the chi-square independence test, indicating the statistical significance.
-           
-    Raises:
-    ValueError: If there's insufficient data for the test (no rows meeting the criteria).
-    ValueError: If the number of specified columns is not 3.
-    ValueError: If the specified columns are not contained in df.
+    ndarray: The predicted values for the filtered rows in column 'B', or None if input is invalid.
+    LinearRegression: The trained linear regression model is returned, if 
     
-
     Requirements:
     - pandas
-    - scipy.stats
+    - sklearn.model_selection
+    - sklearn.linear_model
 
     Example:
-    >>> df = pd.DataFrame({
-    ...     'A': ['Yes', 'No', 'Yes', 'No'],
-    ...     'B': [55, 70, 40, 85],
-    ...     'C': [900, 900, 800, 900]
-    ... })
-    >>> task_func(df)
-    0.22313016014842973
+    >>> np.random.seed(32)
+    >>> df = pd.DataFrame({'A': np.random.randint(0, 100, 1000),
+    ...                    'B': np.random.randint(0, 100, 1000),
+    ...                    'C': np.random.choice([900, 800, 700, 600], 1000)})
+    >>> predictions, model = task_func(df, seed=1)
+    >>> print(predictions)
+    [77.21974339 76.26960987 76.34878767 77.16695819 76.53353585 76.86344332
+     76.86344332 77.19335079 76.81065812 76.77106923 76.79746183 77.0481915
+     76.23002098 76.63910624 77.114173   76.04527279 77.0217989  76.0188802
+     77.18015449 76.91622851 76.62590994 76.90303222 76.75787293 77.29892118
+     77.18015449 76.07166539 76.04527279 76.88983592]
+    >>> print(model)
+    LinearRegression()
 
-    >>> df = pd.DataFrame({
-    ...     'test': ['A', 'b', 'b', 'a', 'c', 'd'],
-    ...     'hi': [45, 2, 2, 3, 4, 4],
-    ...     'column3': [50, 50, 50, 50, 50, 50, ]
-    ... })
-    >>> task_func(df, ['test', 'hi', 'column3'], larger=2, equal=50)
-    0.23810330555354436
+    >>> df = pd.DataFrame({'A': [1, 2, 3, 4, 5],
+    ...                    'B': [10, 80, 80, 80, 80],
+    ...                    'C': [900, 900, 900, 900, 900]})
+    >>> predictions, model = task_func(df, seed=12)
+    >>> print(predictions) 
+    [80.]
+    >>> print(model)
+    LinearRegression()
     """
-    if len(columns) != 3:
-        raise ValueError("Exactly three columns should be specified.")
-    for column in columns:
-        if column not in df.columns:
-            raise ValueError('The specified columns should exist in the DataFrame.')
-    col_categorical, col_numerical, col_filter = columns
-    selected = df[(df[col_numerical] > larger) & (df[col_filter] == equal)][[col_categorical, col_numerical]]
-    contingency_table = pd.crosstab(selected[col_categorical], selected[col_numerical])
-    if contingency_table.size == 0:
-        raise ValueError("Insufficient data - no matching data for the applied conditions.")
-    _, p_value, _, _ = chi2_contingency(contingency_table)
-    return p_value
+    if df.empty or not all(col in df for col in [col_a, col_b, col_c]):
+        return None  # Invalid input scenario
+    try:
+        df[[col_a, col_b, col_c]] = df[[col_a, col_b, col_c]].apply(pd.to_numeric, errors='raise')
+    except ValueError:
+        return None  # Non-numeric data encountered
+    selected = df[(df[col_b] > 50) & (df[col_c] == 900)][[col_a, col_b]]
+    if selected.empty:
+        return None
+    X_train, X_test, y_train, _ = train_test_split(selected[col_a].values.reshape(-1, 1),
+                                                   selected[col_b].values,
+                                                   test_size=0.2,
+                                                   random_state=seed)
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_test)
+    return predictions, model
 
 import unittest
 import pandas as pd
-import faker
+import numpy as np
+from sklearn.metrics import mean_squared_error
+from sklearn.linear_model import LinearRegression
 class TestCases(unittest.TestCase):
-    def test_column_not_in_df(self):
-        fake = faker.Faker()
-        fake.seed_instance(42)
-        rows = 10
-        data = pd.DataFrame(
-            {
-                'A': [fake.name() for i in range(rows)],
-                'B': [81 for i in range(rows)],
-                'D': [900 for i in range(rows)] 
-            }
-        )
-        self.assertRaises(Exception, task_func, data)
-    def test_column_number(self):
-        fake = faker.Faker()
-        fake.seed_instance(42)
-        rows = 10
-        data = pd.DataFrame(
-            {
-                'A': [fake.name() for i in range(rows)],
-                'B': [81 for i in range(rows)],
-                'C': [900 for i in range(rows)] 
-            }
-        )
-        self.assertRaises(Exception, task_func, data, ['A'])
-        self.assertRaises(Exception, task_func, data, ['A', 'B', 'C', 'D'])
-    def test_no_data_after_filer(self):
-        fake = faker.Faker()
-        fake.seed_instance(42)
-        rows = 10
-        data = pd.DataFrame(
-            {
-                'A': [fake.name() for i in range(rows)],
-                'B': [20 for i in range(rows)],
-                'C': [901 for i in range(rows)] 
-            }
-        )
-        self.assertRaises(Exception, task_func, data)
-    def test_medium_dataframe(self):
-        # Test with a medium-sized dataframe (50 rows)
-        fake = faker.Faker()
-        fake.seed_instance(12)
-        rows = 50
-        data = pd.DataFrame(
-            {
-                'A': [fake.name() for i in range(rows)],
-                'B': [fake.random_int(0, 100) for i in range(rows)],
-                'C': [fake.random_int(899, 901) for i in range(rows)] 
-            }
-        )        
-        p_value = task_func(data)
-        self.assertAlmostEqual(p_value, 0.23, places=1)
-    def test_large_dataframe(self):
-        # Test with a large dataframe (1000 rows)
-        fake = faker.Faker()
-        fake.seed_instance(21)
-        rows = 1000
-        data = pd.DataFrame(
-            {
-                'A': [fake.name() for i in range(rows)],
-                'B': [fake.random_int(0, 100) for i in range(rows)],
-                'C': [fake.random_int(800, 950) for i in range(rows)] 
-            }
-        )        
-        p_value = task_func(data)
-        self.assertAlmostEqual(p_value, 0.22, places=1)
-    def test_very_large_dataframe(self):
-        data = pd.DataFrame(
-            {
-                'A': ['a', 'a', 'a', 'a', 'a'],
-                'B': [70, 70, 70, 70, 70],
-                'C': [900, 900, 900, 900, 900] 
-            }
-        )
-        p_value = task_func(data)
-        self.assertAlmostEqual(p_value, 1.0, places=1)
-    def test_huge_dataframe(self):
-        # different column names
-        fake = faker.Faker()
-        fake.seed_instance(21)
-        rows = 1000
-        data = pd.DataFrame(
-            {
-                'test': [fake.name() for i in range(rows)],
-                'five': [fake.random_int(21, 150) for i in range(rows)],
-                '1': [fake.random_int(821, 950) for i in range(rows)] 
-            }
-        )        
-        p_value = task_func(data, columns=['test', 'five', '1'])
-        self.assertAlmostEqual(p_value, 0.22, places=1)
-    def test_diff_filter(self):
-        # different filter values
-        fake = faker.Faker()
-        fake.seed_instance(21)
-        rows = 1000
-        data = pd.DataFrame(
-            {
-                'test': [fake.name() for i in range(rows)],
-                'five': [fake.random_int(21, 150) for i in range(rows)],
-                '1': [fake.random_int(19, 21) for i in range(rows)] 
-            }
-        )        
-        p_value = task_func(data, columns=['test', 'five', '1'], larger=100, equal=20)
-        self.assertAlmostEqual(p_value, 0.35, places=1)
+    def setUp(self):
+        np.random.seed(0)  # Set a seed for reproducibility
+    def test_normal_case(self):
+        # Test with a normal DataFrame
+        df = pd.DataFrame({'A': np.random.randint(0, 100, 100),
+                           'B': np.random.randint(0, 100, 100),
+                           'C': np.random.choice([900, 800], 100)})
+        predictions, model = task_func(df, seed=12)
+        self.assertIsInstance(model, LinearRegression)
+        np.testing.assert_almost_equal(predictions, np.array([73.84, 73.74, 73.02, 73.32, 72.66]), decimal=2)
+    def test_empty_dataframe(self):
+        # Test with an empty DataFrame
+        df = pd.DataFrame()
+        predictions = task_func(df)
+        self.assertIsNone(predictions)
+    def test_missing_columns(self):
+        # Test with a DataFrame missing one or more columns
+        df = pd.DataFrame({'A': np.random.randint(0, 100, 100),
+                           'C': np.random.choice([900, 800], 100)})
+        predictions = task_func(df)
+        self.assertIsNone(predictions)
+    def test_non_numeric_data(self):
+        # Test with non-numeric data
+        df = pd.DataFrame({'A': ['a', 'b', 'c'],
+                           'B': [1, 2, 3],
+                           'C': [900, 900, 900]})
+        predictions = task_func(df)
+        self.assertIsNone(predictions)
+    def test_no_rows_matching_criteria(self):
+        # Test with no rows matching the criteria
+        df = pd.DataFrame({'A': np.random.randint(0, 100, 100),
+                           'B': np.random.randint(0, 50, 100),  # B values are always < 50
+                           'C': np.random.choice([800, 700], 100)})  # C values are never 900
+        predictions = task_func(df)
+        self.assertIsNone(predictions)
+    def test_large_dataset_performance(self):
+        # Test with a very large DataFrame (performance test)
+        df = pd.DataFrame({'test': np.random.randint(0, 100, 10000),
+                           'hi': np.random.randint(0, 100, 10000),
+                           'hello': np.random.choice([900, 800], 10000)})
+        predictions, model = task_func(df, col_a='test', col_b='hi', col_c='hello')
+        self.assertIsInstance(model, LinearRegression)
+        self.assertIsNotNone(predictions)
+        self.assertEqual(len(predictions), 500)
+    def test_single_value_column(self):
+        # Test with a DataFrame where one column has the same value
+        df = pd.DataFrame({'A': [50] * 100,
+                           'B': np.random.randint(50, 100, 100),
+                           'C': [900] * 100})
+        predictions, model = task_func(df, seed=1)
+        self.assertIsInstance(model, LinearRegression)
+        np.testing.assert_almost_equal(
+            predictions,
+            np.array([73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61, 73.61]),
+            decimal=2
+            )
+    def test_specific_return_values(self):
+        # Test with known data to check specific return values
+        df = pd.DataFrame({'A': [10, 20, 30, 40, 50],
+                           'B': [60, 70, 80, 90, 100],
+                           'C': [900, 900, 900, 900, 900]})
+        predictions, model = task_func(df, seed=100)
+        # Since the data is linear and simple, the model should predict close to the actual values
+        expected_predictions = np.array([70])  # Assuming a perfect model
+        np.testing.assert_almost_equal(predictions, expected_predictions)

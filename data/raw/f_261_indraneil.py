@@ -5,7 +5,7 @@ import os
 
 def f_261(data, json_file_name='data.json'):
     """
-    Add a new key "a" with the value 1 to the input dictionary, calculate the frequency of its values, and save the updated dictionary along with its frequency distribution to a JSON file.
+    Add a new key "a" with the value 1 to the input dictionary, calculate the frequency of its values, and save the updated dictionary along with its frequency distribution to a JSON file. The dictionary is saved under the key 'data' and the frequency distribution under the key 'freq'.
 
     Parameters:
     data (dict): The input data as a dictionary.

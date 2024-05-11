@@ -1,90 +1,95 @@
+import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
+import itertools
 
-
-def task_func(myList, n_clusters):
+def task_func(n_walks, n_steps, seed=None):
     """
-    Cluster a list of 2D points using KMeans and visualize the clusters.
+    Create and plot `n_walks` number of random walks, each with `n_steps` steps.
 
-    Note: This function raises ValueError if it encounters invalid inputs.
-    KMeans is performed with random_state = 42 and n_init = 10. Scatterplot
-    uses red 'x' markers for cluster centers.
+    The function checks for valid n_walks and n_steps, then generates walks via numpy.
+    Each walk is plotted in a different color cycling through a predefined set of colors:
+    ['b', 'g', 'r', 'c', 'm', 'y', 'k'].
 
     Parameters:
-    - myList (list): List of 2D points.
-    - n_clusters (int): Number of clusters to form.
+    - n_walks (int): The number of random walks to be generated and plotted.
+    - n_steps (int): The number of steps in each random walk.
+    - seed (int, optional): Seed for random number generation. Default is None.
 
     Returns:
-    - matplotlib.axes._axes.Axes: Axes object with the plotted clusters.
+    - ax (plt.Axes): A Matplotlib Axes containing the plotted random walks.
 
     Requirements:
-    - matplotlib.pyplot
-    - sklearn.cluster.KMeans
+    - numpy
+    - matplotlib
+    - itertools
 
     Example:
-    >>> myList = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]
-    >>> ax = task_func(myList, 2)
+    >>> ax = task_func(5, 100, seed=42)
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     >>> ax.get_xticklabels()
-    [Text(0.0, 0, '0'), Text(1.0, 0, '1'), Text(2.0, 0, '2'), Text(3.0, 0, '3'), Text(4.0, 0, '4'), Text(5.0, 0, '5'), Text(6.0, 0, '6'), Text(7.0, 0, '7'), Text(8.0, 0, '8'), Text(9.0, 0, '9'), Text(10.0, 0, '10')]
+    [Text(-20.0, 0, '−20'), Text(0.0, 0, '0'), Text(20.0, 0, '20'), Text(40.0, 0, '40'), Text(60.0, 0, '60'), Text(80.0, 0, '80'), Text(100.0, 0, '100'), Text(120.0, 0, '120')]
     """
-    if not myList or n_clusters <= 0:
-        raise ValueError("Invalid inputs")
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
-    kmeans.fit(myList)
+    if n_walks < 0 or n_steps < 0:
+        raise ValueError("Walks and steps cannot be negative.")
+    np.random.seed(seed)
+    COLORS = ["b", "g", "r", "c", "m", "y", "k"]
+    color_cycle = itertools.cycle(COLORS)
     fig, ax = plt.subplots()
-    ax.scatter(*zip(*myList), c=kmeans.labels_)
-    ax.scatter(*zip(*kmeans.cluster_centers_), marker="x", color="red")
+    for _ in range(n_walks):
+        walk = np.random.choice([-1, 1], size=n_steps)
+        walk = np.cumsum(walk)
+        ax.plot(walk, next(color_cycle))
     return ax
 
 import unittest
 import numpy as np
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.test_list = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]
     def test_case_1(self):
-        # Test single cluster
-        myList = [[1, 1], [1, 1], [1, 1], [1, 1]]
-        ax = task_func(myList, 1)
-        self.assertEqual(len(set(ax.collections[0].get_array())), 1)
+        # Test basic setup
+        ax = task_func(5, 100, seed=42)
+        self.assertIsInstance(ax, plt.Axes)
     def test_case_2(self):
-        # Test arbitrary number of clusters
-        myList = self.test_list
-        for n in range(1, 6):
-            ax = task_func(myList, n)
-            self.assertEqual(len(set(ax.collections[0].get_array())), n)
+        # Test number of walks
+        for n_walk in [0, 1, 2, 10, 50]:
+            ax = task_func(n_walk, 10, seed=42)
+            lines = ax.get_lines()
+            self.assertEqual(len(lines), n_walk)
     def test_case_3(self):
-        # Test visualization
-        myList = self.test_list
-        ax = task_func(myList, 2)
-        red_collection = next(
-            coll
-            for coll in ax.collections
-            if (
-                coll.get_facecolor()[0][0] == 1.0
-                and coll.get_facecolor()[0][1] == 0.0
-                and coll.get_facecolor()[0][2] == 0.0
+        # Test number of steps
+        for n_steps in [0, 1, 10, 100, 500]:
+            ax = task_func(2, n_steps, seed=42)
+            lines = ax.get_lines()
+            self.assertEqual(len(lines[0].get_ydata()), n_steps)
+    def test_case_4(self):
+        # Test random seed
+        ax1 = task_func(5, 100, seed=42)
+        ax2 = task_func(5, 100, seed=42)
+        ax3 = task_func(5, 100, seed=0)
+        lines1 = ax1.get_lines()
+        lines2 = ax2.get_lines()
+        lines3 = ax3.get_lines()
+        self.assertTrue(
+            all(
+                np.array_equal(line1.get_ydata(), line2.get_ydata())
+                for line1, line2 in zip(lines1, lines2)
             )
         )
-        red_x_markers_count = len(red_collection.get_offsets())
-        self.assertEqual(red_x_markers_count, 2)
-    def test_case_4(self):
-        # Test handling invalid inputs
-        with self.assertRaises(ValueError):
-            task_func([], 1)
-        with self.assertRaises(ValueError):
-            task_func([[1, 1], [2, 2]], 0)
-        with self.assertRaises(ValueError):
-            task_func(self.test_list, len(self.test_list) + 1)
+        self.assertFalse(
+            all(
+                np.array_equal(line1.get_ydata(), line3.get_ydata())
+                for line1, line3 in zip(lines1, lines3)
+            ),
+            "Random walks are not reproducible using the same seed.",
+        )
     def test_case_5(self):
-        # Test consistency across runs with built-in random seed
-        myList = self.test_list
-        ax1 = task_func(myList, 2)
-        ax2 = task_func(myList, 2)
-        colors1 = ax1.collections[0].get_array()
-        colors2 = ax2.collections[0].get_array()
-        self.assertTrue(all(c1 == c2 for c1, c2 in zip(colors1, colors2)))
+        # Test invalid n_walks
+        with self.assertRaises(ValueError):
+            task_func(-1, 100, seed=42)
+    def test_case_6(self):
+        # Test negative n_steps
+        with self.assertRaises(ValueError):
+            task_func(1, -100, seed=42)
     def tearDown(self):
         plt.close("all")

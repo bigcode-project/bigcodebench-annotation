@@ -1,71 +1,83 @@
-import numpy as np
-from sklearn.linear_model import LinearRegression
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
 
 def task_func(df):
     """
-    Use a linear regression model to predict the "value" of "feature" in the given dataframe and return the coefficients and intercept.
+    Divide the given DataFrame into a training set and a test set (70%: 30% split), separate the "target" column and return the four resulting DataFrames.
 
     Parameters:
-    - df (pd.DataFrame): pandas DataFrame that contains columns named 'feature' and 'value'.
+    - df (pd.DataFrame): pandas DataFrame that contains a column named 'target'.
 
     Returns:
-    - result (dict): A dictionary with the coefficients and the intercept of the fitted linear regression model.
+    - tuple: A tuple containing four DataFrames: X_train, X_test, y_train, y_test.
 
     Requirements:
-    - numpy
+    - pandas
     - sklearn
-
+    
     Example:
-    >>> import pandas as pd
-    >>> np.random.seed(42)
-    >>> df = pd.DataFrame({'feature': np.random.rand(100), 'value': np.random.rand(100)})
-    >>> coefficients = task_func(df)
-    >>> print(coefficients)
-    {'coefficients': [[-0.03353164387961974]], 'intercept': [0.5135976564010359]}
+    >>> np.random.seed(42)  # Ensure reproducibility
+    >>> df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=list('ABCDE'))  # Explicitly using np and pd
+    >>> df['target'] = np.random.randint(0, 2, size=100)  # Adding 'target' column using np
+    >>> X_train, X_test, y_train, y_test = task_func(df)
+    >>> print(X_train.shape)  # Expected shape of training data
+    (70, 5)
     """
-    X = np.array(df['feature']).reshape(-1,1)  # Explicitly converting to numpy array and reshaping
-    y = np.array(df['value']).reshape(-1,1)    # Explicitly converting to numpy array and reshaping
-    model = LinearRegression().fit(X, y)
-    return {'coefficients': model.coef_.tolist(), 'intercept': model.intercept_.tolist()}
+    X = pd.DataFrame.drop(df, 'target', axis=1)
+    y = pd.DataFrame(df['target'])
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    return X_train, X_test, y_train, y_test
 
 import unittest
-import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = pd.DataFrame({'feature': np.random.rand(100), 'value': np.random.rand(100)})
-        coefficients = task_func(df)
-        self.assertEqual(len(coefficients['coefficients']), 1)
-        self.assertEqual(len(coefficients['coefficients'][0]), 1)
-        self.assertEqual(len(coefficients['intercept']), 1)
+        df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=list('ABCDE'))
+        df['target'] = np.random.randint(0, 2, size=100)
+        X_train, X_test, y_train, y_test = task_func(df)
+        self.assertEqual(X_train.shape, (70, 5))
+        self.assertEqual(X_test.shape, (30, 5))
+        self.assertEqual(y_train.shape[0], 70)
+        self.assertEqual(y_test.shape[0], 30)
     def test_case_2(self):
-        df = pd.DataFrame({'feature': [1, 2, 3, 4, 5], 'value': [1, 2, 3, 4, 5]})
-        coefficients = task_func(df)
-        self.assertEqual(len(coefficients['coefficients']), 1)
-        self.assertEqual(len(coefficients['coefficients'][0]), 1)
-        self.assertEqual(len(coefficients['intercept']), 1)
-        self.assertAlmostEqual(coefficients['coefficients'][0][0], 1.0)
-        self.assertAlmostEqual(coefficients['intercept'][0], 0.0)
+        df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'target': [0, 1, 0]})
+        X_train, X_test, y_train, y_test = task_func(df)
+        self.assertEqual(X_train.shape, (2, 2))
+        self.assertEqual(X_test.shape, (1, 2))
+        self.assertEqual(y_train.shape[0], 2)
+        self.assertEqual(y_test.shape[0], 1)
     def test_case_3(self):
-        df = pd.DataFrame({'feature': [1, 2, 3, 4, 5], 'value': [2, 4, 6, 8, 10]})
-        coefficients = task_func(df)
-        self.assertEqual(len(coefficients['coefficients']), 1)
-        self.assertEqual(len(coefficients['coefficients'][0]), 1)
-        self.assertEqual(len(coefficients['intercept']), 1)
-        self.assertAlmostEqual(coefficients['coefficients'][0][0], 2.0)
-        self.assertAlmostEqual(coefficients['intercept'][0], 0.0)
+        df = pd.DataFrame({'A': [0, 0, 0], 'B': [0, 0, 0], 'target': [0, 0, 0]})
+        X_train, X_test, y_train, y_test = task_func(df)
+        self.assertEqual(X_train.shape, (2, 2))
+        self.assertEqual(X_test.shape, (1, 2))
+        self.assertEqual(y_train.shape[0], 2)
+        self.assertEqual(y_test.shape[0], 1)
+        self.assertEqual(X_train.iloc[0, 0], 0)
+        self.assertEqual(X_train.iloc[0, 1], 0)
+        self.assertEqual(X_train.iloc[1, 0], 0)
+        self.assertEqual(X_train.iloc[1, 1], 0)
+        self.assertEqual(X_test.iloc[0, 0], 0)
+        self.assertEqual(X_test.iloc[0, 1], 0)
+        if isinstance(y_train, pd.DataFrame):
+            self.assertEqual(y_train.iloc[0, 0], 0)
+            self.assertEqual(y_train.iloc[1, 0], 0)
+        else:
+            self.assertEqual(y_train.iloc[1], [0])
+            self.assertEqual(y_test.iloc[0], [0])
     def test_case_4(self):
-        df = pd.DataFrame({'feature': [0, 0, 0, 0, 0], 'value': [1, 2, 3, 4, 5]})
-        coefficients = task_func(df)
-        self.assertEqual(len(coefficients['coefficients']), 1)
-        self.assertEqual(len(coefficients['coefficients'][0]), 1)
-        self.assertEqual(len(coefficients['intercept']), 1)
-        self.assertAlmostEqual(coefficients['coefficients'][0][0], 0.0)
-        self.assertAlmostEqual(coefficients['intercept'][0], 3.0)
+        df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'target': [1, 1, 1]})
+        X_train, X_test, y_train, y_test = task_func(df)
+        self.assertEqual(X_train.shape, (2, 2))
+        self.assertEqual(X_test.shape, (1, 2))
+        self.assertEqual(y_train.shape[0], 2)
+        self.assertEqual(y_test.shape[0], 1)
+    
     def test_case_5(self):
-        df = pd.DataFrame({'feature': [1, 2, 3, 4, 5], 'value': [0, 0, 0, 0, 0]})
-        coefficients = task_func(df)
-        self.assertEqual(len(coefficients['coefficients']), 1)
-        self.assertEqual(len(coefficients['coefficients'][0]), 1)
-        self.assertEqual(len(coefficients['intercept']), 1)
-        self.assertAlmostEqual(coefficients['coefficients'][0][0], 0.0)
-        self.assertAlmostEqual(coefficients['intercept'][0], 0.0)
+        df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'target': [0, 0, 0]})
+        X_train, X_test, y_train, y_test = task_func(df)
+        self.assertEqual(X_train.shape, (2, 2))
+        self.assertEqual(X_test.shape, (1, 2))
+        self.assertEqual(y_train.shape[0], 2)
+        self.assertEqual(y_test.shape[0], 1)

@@ -11,7 +11,7 @@ def f_1778(df, letters=list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')):
     letters (list, optional): List of English uppercase letters. Defaults to A-Z.
 
     Returns:
-    Axes: A Matplotlib Axes object representing the bar graph of letter frequency.
+    Axes: A Matplotlib Axes object representing the bar graph of letter frequency, with the x-axis labeled 'Letters', the y-axis labeled 'Frequency', and the title 'Letter Frequency'.
 
     Raises:
     ValueError: If 'df' is not a DataFrame or lacks the 'Letters' column.

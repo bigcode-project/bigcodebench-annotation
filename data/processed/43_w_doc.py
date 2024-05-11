@@ -1,94 +1,111 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
+import numpy as np
+import seaborn as sns
 
-
-def task_func(data_matrix, n_components=2):
+def task_func(df):
     """
-    Apply PCA with n_components components to a 2D data matrix, calculate the mean value of each component, and then return the cumulative explained variance of the components in a plot.
-    - The function returns a dataframe with columns 'Component 1', 'Component 2', ... etc.
-    - Each row of the dataframe correspond to a row of the original matrix mapped in the PCA space.
-    - The dataframe should also include a column 'Mean' which is the average value of each component value per row
-    - Create a plot of the cumulative explained variance.
-        - the xlabel should be 'Number of Components' and the ylabel 'Cumulative Explained Variance'
+    Describe a dataframe and draw a distribution chart for each numeric column after replacing the NaN values with the average of the column.
 
     Parameters:
-    data_matrix (numpy.array): The 2D data matrix.
+    df (DataFrame): The pandas DataFrame.
 
     Returns:
-    tuple:
-        - pandas.DataFrame: A DataFrame containing the PCA transformed data and the mean of each component.
-        - matplotlib.axes._axes.Axes: A plot showing the cumulative explained variance of the components.
+    tuple: A tuple containing:
+        - DataFrame: A pandas DataFrame with statistics. This includes count, mean, standard deviation (std), min, 25%, 50%, 75%, and max values for each numeric column.
+        - List[Axes]: A list of matplotlib Axes objects representing the distribution plots for each numeric column.
+                    Each plot visualizes the distribution of data in the respective column with 10 bins.
 
     Requirements:
-    - pandas
-    - matplotlib.pyplot
-    - sklearn.decomposition
+    - numpy
+    - seaborn
 
     Example:
+    >>> import pandas as pd
     >>> import numpy as np
-    >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
-    >>> df, ax = task_func(data)
-    >>> print(df["Mean"])
-    0    2.850439
-    1   -2.850439
-    Name: Mean, dtype: float64
+    >>> df = pd.DataFrame([[1,2,3],[4,5,6],[7.0,np.nan,9.0]], columns=["c1","c2","c3"])
+    >>> description, plots = task_func(df)
+    >>> print(description)
+            c1    c2   c3
+    count  3.0  3.00  3.0
+    mean   4.0  3.50  6.0
+    std    3.0  1.50  3.0
+    min    1.0  2.00  3.0
+    25%    2.5  2.75  4.5
+    50%    4.0  3.50  6.0
+    75%    5.5  4.25  7.5
+    max    7.0  5.00  9.0
     """
-    pca = PCA(n_components=n_components)
-    transformed_data = pca.fit_transform(data_matrix)
-    df = pd.DataFrame(
-        transformed_data,
-        columns=[f"Component {i+1}" for i in range(transformed_data.shape[1])],
-    )
-    df["Mean"] = df.mean(axis=1)
-    fig, ax = plt.subplots()
-    ax.plot(np.cumsum(pca.explained_variance_ratio_))
-    ax.set_xlabel("Number of Components")
-    ax.set_ylabel("Cumulative Explained Variance")
-    return df, ax
+    df = df.fillna(df.mean(axis=0))
+    description = df.describe()
+    plots = []
+    for col in df.select_dtypes(include=[np.number]).columns:
+        plot = sns.displot(df[col], bins=10)
+        plots.append(plot.ax)
+    return description, plots
 
 import unittest
-import numpy as np
+import pandas as pd
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
+    """Test cases for the f_112 function."""
+    def setUp(self):
+        # Generating more complex data for testing
+        self.df1 = pd.DataFrame(
+            {"A": [1, 2, 3, 4, 5], "B": [6, 7, 8, 9, 10], "C": [11, 12, 13, 14, 15]}
+        )
+        self.df2 = pd.DataFrame({"X": [1, None, 9, 13], "Y": [None, 3, 4, 8]})
+        self.df3 = pd.DataFrame(
+            {"M": [7, 13, 21, 11, 22, 8, None, 17], "N": [None, 2, 3, 4, 10, 0, 27, 12]}
+        )
+        self.df4 = pd.DataFrame(
+            {"P": [None, None, 4], "Q": [7, None, 3], "R": [2, None, 6]}
+        )
+        self.df5 = pd.DataFrame({"W": [1, 2], "Z": [2, 1]})
+        self.df6 = pd.DataFrame(
+            {
+                "A": [1, 2, 3, 4, 5, 6],
+                "B": [None, 8, 9, 10, 11, None],
+                "C": [13, None, None, None, None, 18],
+                "D": [19, None, 21, None, 23, None],
+            }
+        )
     def test_case_1(self):
-        data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
-        df, ax = task_func(data)
-        self.assertEqual(df.shape, (2, 3))
-        self.assertTrue("Mean" in df.columns)
-        self.assertEqual(ax.get_xlabel(), "Number of Components")
-        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
+        description, plots = task_func(self.df1)
+        self.assertFalse(description.isna().any().any())
+        self.assertIsInstance(description, pd.DataFrame)
+        self.assertListEqual(list(description.columns), ["A", "B", "C"])
+        self.assertEqual(len(plots), 3)
     def test_case_2(self):
-        data = np.array([[1, 2], [3, 4], [5, 6]])
-        df, ax = task_func(data)
-        self.assertEqual(df.shape, (3, 3))
-        self.assertTrue("Mean" in df.columns)
-        self.assertEqual(ax.get_xlabel(), "Number of Components")
-        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
-    # Additional test cases
+        description, plots = task_func(self.df2)
+        self.assertFalse(description.isna().any().any())
+        self.assertIsInstance(description, pd.DataFrame)
+        self.assertListEqual(list(description.columns), ["X", "Y"])
+        self.assertEqual(len(plots), 2)
     def test_case_3(self):
-        data = np.array([[1, 2], [3, 4], [5, 6]])
-        df, ax = task_func(data)
-        expected_columns = min(data.shape) + 1
-        self.assertEqual(df.shape[1], expected_columns)
-        self.assertTrue("Mean" in df.columns)
-        self.assertEqual(ax.get_xlabel(), "Number of Components")
-        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
+        description, plots = task_func(self.df3)
+        self.assertFalse(description.isna().any().any())
+        self.assertIsInstance(description, pd.DataFrame)
+        self.assertListEqual(list(description.columns), ["M", "N"])
+        self.assertEqual(len(plots), 2)
     def test_case_4(self):
-        data = np.array([[1, 2], [3, 4], [5, 6]])
-        df, ax = task_func(data)
-        expected_columns = min(data.shape) + 1
-        self.assertEqual(df.shape[1], expected_columns)
-        self.assertTrue("Mean" in df.columns)
-        self.assertEqual(ax.get_xlabel(), "Number of Components")
-        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
+        description, plots = task_func(self.df4)
+        self.assertFalse(description.isna().any().any())
+        self.assertIsInstance(description, pd.DataFrame)
+        self.assertListEqual(list(description.columns), ["P", "Q", "R"])
+        self.assertEqual(len(plots), 3)
     def test_case_5(self):
-        data = np.array([[1, 2], [3, 4], [5, 6]])
-        df, ax = task_func(data)
-        expected_columns = min(data.shape) + 1
-        self.assertEqual(df.shape[1], expected_columns)
-        self.assertTrue("Mean" in df.columns)
-        self.assertTrue("Component 1" in df.columns)
-        self.assertTrue("Component 2" in df.columns)
-        self.assertEqual(ax.get_xlabel(), "Number of Components")
-        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
+        description, plots = task_func(self.df5)
+        self.assertFalse(description.isna().any().any())
+        self.assertIsInstance(description, pd.DataFrame)
+        self.assertListEqual(list(description.columns), ["W", "Z"])
+        self.assertEqual(len(plots), 2)
+    def test_case_6(self):
+        description, plots = task_func(self.df6)
+        self.assertFalse(description.isna().any().any())
+        self.assertIsInstance(description, pd.DataFrame)
+        self.assertListEqual(list(description.columns), ["A", "B", "C", "D"])
+        self.assertEqual(len(plots), 4)
+        self.assertEqual(description.loc["mean", "A"], 3.5)
+        self.assertEqual(description.loc["std", "B"], 1.0)
+        self.assertEqual(description.loc["25%", "A"], 2.25)
+        self.assertEqual(description.loc["50%", "C"], 15.5)
+        self.assertEqual(description.loc["75%", "A"], 4.75)
+        self.assertEqual(description.loc["max", "D"], 23.0)

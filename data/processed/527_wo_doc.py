@@ -1,156 +1,122 @@
 import json
+import seaborn as sns
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from collections import defaultdict
 
 
-def task_func(input_file="data.json"):
+def task_func(input_file: str) -> plt.Axes:
     """
-    Read a list of dictionaries from a JSON file, calculate the mean and median for each key
-    (ignoring non-numeric or missing values), and convert the results into a Pandas DataFrame.
+    Read a list of dictionaries from a JSON file, calculate the results (mean and median for each key)
+    via numpy, convert the input data into a pandas DataFrame with the keys as "X" and values as "Y"
+    for visualization with a seaborn box plot, then return the results and box plot.
 
     Parameters:
-    - input_file (str, optional): The input JSON file name. Defaults to 'data.json'.
-                                  The file should contain a list of dictionaries. If a key is
-                                  missing in a dictionary, it is treated as NaN for that record.
-                                  Non-numeric values are ignored for the calculation of mean
-                                  and median. If all values for a key are non-numeric or missing,
-                                  the statistics for that key will be NaN.
+    - input_file (str): The input JSON file name with absolute path.
 
     Returns:
-    - df (pd.DataFrame): A DataFrame indexed and sorted by the variable names (keys) from the
-                         input data, containing columns 'mean' and 'median'.
+    - results (dict): Dictionary where each key is a unique key from the original input, and each
+                      value is a corresponding dict, with keys 'mean' and 'median' and the statistics
+                      as values.
+    - ax (plt.Axes): The box plot of aggregated 'Values for Each Key' in the input data.
 
     Requirements:
-    - numpy
-    - collections
     - json
+    - seaborn
+    - matplotlib.pyplot
     - pandas
+    - numpy
+    - collections.defaultdict
 
     Example:
-    >>> df = task_func('data_1.json')
-    a        mean  median
-    b        mean  median
-    c        mean  median
+    >>> results, ax = task_func("/path/to/data.json")
+    >>> ax
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> results
+    {'a': {'mean': 3.0, 'median': 3.0}, 'b': {'mean': 2.0, 'median': 3.0}}
     """
     with open(input_file, "r") as f:
         data = json.load(f)
-    all_keys = set().union(*(d.keys() for d in data))
     stats = defaultdict(list)
     for d in data:
-        for key in all_keys:
-            value = d.get(key, np.nan)
-            if isinstance(value, (int, float)):
-                stats[key].append(value)
-            else:
-                stats[key].append(np.nan)
-    result = {
-        k: {"mean": np.nanmean(v), "median": np.nanmedian(v)} for k, v in stats.items()
+        for key, value in d.items():
+            stats[key].append(value)
+    results = {
+        k: {"mean": np.mean(v), "median": np.median(v)} for k, v in stats.items()
     }
-    df = pd.DataFrame(result).transpose().sort_index()
-    return df
+    data = pd.DataFrame(data).melt(var_name="X", value_name="Y")
+    ax = sns.boxplot(data=data, x="X", y="Y")
+    ax.set_title("Boxplot of Values for Each Key")
+    return results, ax
 
 import unittest
-import numpy as np
+import os
 import tempfile
+import matplotlib.pyplot as plt
 import json
 class TestCases(unittest.TestCase):
     def setUp(self):
+        # Setup a temporary directory and write sample JSON data to a temp file
         self.temp_dir = tempfile.TemporaryDirectory()
-        self.test_data_paths = []
-        test_data = [
-            [{"a": 2, "b": 3, "c": 4}],  # Test data for test_case_1
-            [{"a": 1}],  # Test data for test_case_2
-            [{"a": 1.5}, {"b": None}],  # Test data for test_case_3
-            [],  # Test data for test_case_4
-            [{"a": 1.5, "c": 4}, {"b": None}],  # Test data for test_case_5
+        self.sample_data_file = os.path.join(self.temp_dir.name, "sample_data.json")
+        self.sample_data = [
+            {"A": 10, "B": 20, "C": 30},
+            {"A": 15, "B": 25, "C": 35},
+            {"A": 20, "B": 30, "C": 40},
         ]
-        for idx, data in enumerate(test_data, start=1):
-            path = self.temp_dir.name + f"/test_data_{idx}.json"
-            with open(path, "w") as f:
-                json.dump(data, f)
-            self.test_data_paths.append(path)
-    def test_case_1(self):
-        # Basic test
-        df = task_func(self.test_data_paths[0])
-        self.assertListEqual(df.index.tolist(), ["a", "b", "c"])
-        self.assertAlmostEqual(df.loc["a", "mean"], 2.0)
-        self.assertAlmostEqual(df.loc["a", "median"], 2.0)
-    def test_case_2(self):
-        # Test with a single key
-        df = task_func(self.test_data_paths[1])
-        self.assertListEqual(df.index.tolist(), ["a"])
-        self.assertAlmostEqual(df.loc["a", "mean"], 1.0)
-        self.assertAlmostEqual(df.loc["a", "median"], 1.0)
-    def test_case_3(self):
-        # Test with missing values to ensure handling of NaN
-        df = task_func(self.test_data_paths[2])
-        self.assertListEqual(df.index.tolist(), ["a", "b"])
-        self.assertAlmostEqual(df.loc["a", "mean"], 1.5)
-        self.assertAlmostEqual(df.loc["a", "median"], 1.5)
-        self.assertTrue(np.isnan(df.loc["b", "mean"]))
-        self.assertTrue(np.isnan(df.loc["b", "median"]))
-    def test_case_4(self):
-        # Test empty dataframe creation from an empty input file
-        df = task_func(self.test_data_paths[3])
-        self.assertEqual(df.shape[0], 0)
-    def test_case_5(self):
-        # Test handling of mixed data, including valid values and NaN
-        df = task_func(self.test_data_paths[4])
-        self.assertListEqual(df.index.tolist(), ["a", "b", "c"])
-        self.assertAlmostEqual(df.loc["a", "mean"], 1.5)
-        self.assertAlmostEqual(df.loc["a", "median"], 1.5)
-        self.assertTrue(np.isnan(df.loc["b", "mean"]))
-        self.assertTrue(np.isnan(df.loc["b", "median"]))
-        self.assertAlmostEqual(df.loc["c", "mean"], 4.0)
-        self.assertAlmostEqual(df.loc["c", "median"], 4.0)
-    def test_case_6(self):
-        # Test with mixed types in values
-        data = [{"a": 5, "b": "text", "c": 7}, {"a": "more text", "b": 4, "c": None}]
-        path = self.temp_dir.name + "/test_data_6.json"
-        with open(path, "w") as f:
-            json.dump(data, f)
-        df = task_func(path)
-        self.assertListEqual(df.index.tolist(), ["a", "b", "c"])
-        self.assertAlmostEqual(df.loc["a", "mean"], 5.0)
-        self.assertAlmostEqual(df.loc["c", "mean"], 7.0)
-        self.assertAlmostEqual(df.loc["b", "mean"], 4.0)
-    def test_case_7(self):
-        # Test a larger dataset with missing values
-        data = [{"a": i, "b": i * 2 if i % 2 == 0 else None} for i in range(1, 101)]
-        path = self.temp_dir.name + "/test_data_7.json"
-        with open(path, "w") as f:
-            json.dump(data, f)
-        df = task_func(path)
-        self.assertAlmostEqual(df.loc["a", "mean"], 50.5)
-        self.assertAlmostEqual(
-            df.loc["b", "mean"], np.mean([2 * i for i in range(2, 101, 2)])
-        )
-    def test_case_8(self):
-        # Test with all non-numeric values for a key
-        data = [
-            {"a": "text", "b": "more text"},
-            {"a": "even more text", "b": "still more text"},
-        ]
-        path = self.temp_dir.name + "/test_data_8.json"
-        with open(path, "w") as f:
-            json.dump(data, f)
-        df = task_func(path)
-        self.assertTrue(np.isnan(df.loc["a", "mean"]))
-        self.assertTrue(np.isnan(df.loc["b", "mean"]))
-    def test_case_9(self):
-        # Test varying numbers of missing and non-numeric values
-        data = [
-            {"a": 10, "b": 20, "c": "ignore"},
-            {"a": None, "b": 25, "c": 30},
-            {"a": 5, "b": "ignore", "c": "ignore"},
-        ]
-        path = self.temp_dir.name + "/test_data_9.json"
-        with open(path, "w") as f:
-            json.dump(data, f)
-        df = task_func(path)
-        self.assertAlmostEqual(df.loc["a", "mean"], 7.5)
-        self.assertAlmostEqual(df.loc["b", "mean"], 22.5)
-        self.assertAlmostEqual(df.loc["c", "mean"], 30.0)
+        with open(self.sample_data_file, "w") as f:
+            json.dump(self.sample_data, f)
+        # Create an invalid JSON file for testing
+        self.invalid_json_file = os.path.join(self.temp_dir.name, "invalid.json")
+        with open(self.invalid_json_file, "w") as f:
+            f.write("invalid content")
     def tearDown(self):
         self.temp_dir.cleanup()
+        plt.close("all")
+    def test_case_1(self):
+        # Test if the function can read the JSON data file and return a plot
+        _, ax = task_func(self.sample_data_file)
+        self.assertIsInstance(ax, plt.Axes, "The function should return a plot (Axes).")
+        self.assertTrue(len(ax.get_xticks()) > 0, "The plot should have x-axis ticks.")
+        self.assertTrue(len(ax.get_yticks()) > 0, "The plot should have y-axis ticks.")
+        self.assertTrue(ax.get_title(), "Boxplot of Values for Each Key")
+    def test_case_2(self):
+        # Check result correctness
+        results, _ = task_func(self.sample_data_file)
+        self.assertIn("A", results)
+        self.assertIn("B", results)
+        self.assertIn("C", results)
+        self.assertEqual(results["A"]["mean"], 15.0)
+        self.assertEqual(results["A"]["median"], 15.0)
+        self.assertEqual(results["B"]["mean"], 25.0)
+        self.assertEqual(results["B"]["median"], 25.0)
+        self.assertEqual(results["C"]["mean"], 35.0)
+        self.assertEqual(results["C"]["median"], 35.0)
+    def test_case_3(self):
+        # Test the correctness of the x-axis labels
+        _, ax = task_func(self.sample_data_file)
+        x_labels = [label.get_text() for label in ax.get_xticklabels()]
+        expected_x_labels = ["A", "B", "C"]
+        self.assertListEqual(
+            x_labels, expected_x_labels, "The x-axis labels are not as expected."
+        )
+    def test_case_4(self):
+        # Test the correctness of the y-axis data points
+        _, ax = task_func(self.sample_data_file)
+        # Correctly extract the height of the boxes in the box plot
+        boxes = [
+            box.get_height() for box in ax.containers if hasattr(box, "get_height")
+        ]
+        self.assertTrue(
+            all(height > 0 for height in boxes),
+            "Each box plot should have y-data points.",
+        )
+    def test_case_5(self):
+        # Test if the function raises an error for non-existent file
+        with self.assertRaises(FileNotFoundError):
+            task_func(os.path.join(self.temp_dir.name, "non_existent.json"))
+    def test_case_6(self):
+        # Test if the function raises an error for invalid JSON format
+        with self.assertRaises(json.JSONDecodeError):
+            task_func(os.path.join(self.temp_dir.name, "invalid.json"))

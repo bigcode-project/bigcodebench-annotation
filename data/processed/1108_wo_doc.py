@@ -1,53 +1,60 @@
-from datetime import datetime
-import pytz
+from collections import Counter
+import re
 
-# Constants
-DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
-
-
-def task_func(unix_timestamp, target_timezone):
+def task_func(result):
     """
-    Converts a Unix timestamp to a formatted date and time string in a specified timezone.
+    Get the most common values associated with the url key in the dictionary list "result."
 
     Parameters:
-    unix_timestamp (int): The Unix timestamp representing the number of seconds since the Unix Epoch (January 1, 1970, 00:00:00 UTC).
-    target_timezone (str): The string identifier of the target timezone (e.g., 'America/New_York').
+    result (list): A list of dictionaries.
 
     Returns:
-    str: A string representing the date and time in the target timezone, formatted as '%Y-%m-%d %H:%M:%S'.
+    dict: A dictionary with the most common values and their counts.
 
     Requirements:
-    - datetime.datetime
-    - pytz
+    - collections
+    - re
 
     Example:
-    >>> unix_timestamp = 1609459200
-    >>> target_timezone = 'America/New_York'
-    >>> task_func(unix_timestamp, target_timezone)
-    '2020-12-31 19:00:00'
+    >>> result = [{"hi": 7, "http://google.com": 0}, {"https://google.com": 0}, {"http://www.cwi.nl": 1}]
+    >>> task_func(result)
+    {0: 2}
     """
-    datetime_utc = datetime.utcfromtimestamp(unix_timestamp).replace(tzinfo=pytz.utc)
-    datetime_in_target_timezone = datetime_utc.astimezone(pytz.timezone(target_timezone))
-    formatted_datetime = datetime_in_target_timezone.strftime(DATE_FORMAT)
-    return formatted_datetime
+    regex = re.compile(
+        r'^(?:http|ftp)s?://' # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+        r'localhost|' #localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+        r'(?::\d+)?' # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    from_user_values = []
+    for l_res in result:
+        for j in l_res:
+            if re.match(regex, j):
+                from_user_values.append(l_res[j])
+    counter = Counter(from_user_values)
+    most_common = dict(counter.most_common(1))
+    return most_common
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = task_func(1347517370, 'America/New_York')
-        self.assertEqual(result, "2012-09-13 02:22:50")
+        result = [{"hi": 7, "bye": 4, "http://google.com": 0}, {"https://google.com": 0}, {"http://www.cwi.nl": 1}]
+        expected_output = {0: 2}
+        self.assertEqual(task_func(result), expected_output)
     def test_case_2(self):
-        result = task_func(0, 'UTC')
-        self.assertEqual(result, "1970-01-01 00:00:00")
+        result = [{"http://google.com": 2}, {"http://www.cwi.nl": 2}, {"http://google.com": 3}]
+        expected_output = {2: 2}
+        self.assertEqual(task_func(result), expected_output)
     def test_case_3(self):
-        result = task_func(1609459200, 'Asia/Tokyo')
-        self.assertEqual(result, "2021-01-01 09:00:00")
+        result = [{"http://google.com": 5}]
+        expected_output = {5: 1}
+        self.assertEqual(task_func(result), expected_output)
     def test_case_4(self):
-        result = task_func(0, 'Asia/Kolkata')
-        self.assertEqual(result, "1970-01-01 05:30:00")
+        result = []
+        expected_output = {}
+        self.assertEqual(task_func(result), expected_output)
     def test_case_5(self):
-        result = task_func(1672531199, 'Australia/Sydney')
-        self.assertEqual(result, "2023-01-01 10:59:59")
-    def test_case_6(self):
-        result = task_func(1609459200, 'America/New_York')
-        self.assertEqual(result, "2020-12-31 19:00:00")
+        result = [{"hi": 7, "bye": 4}, {"hello": "world"}]
+        expected_output = {}
+        self.assertEqual(task_func(result), expected_output)

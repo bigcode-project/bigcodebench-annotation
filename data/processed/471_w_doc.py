@@ -1,89 +1,93 @@
-import matplotlib.pyplot as plt
-import numpy as np
+from collections import Counter
+import pandas as pd
 
 
 def task_func(myList):
     """
-    Draws a histogram of the values in a list and returns the plot's Axes.
-
-    For visualization:
-      - Bin edges are adjusted to align with integer values in `myList`.
-      - Histogram bars are outlined in black.
-      - X-axis label: 'Value'
-      - Y-axis label: 'Frequency'
-      - Plot title: 'Histogram of Values'
+    Count the frequency of each word in a list and return a DataFrame of words and their number.
 
     Parameters:
-    - myList (list): List of numerical values to plot.
+    myList (list): List of strings. Each string is considered a word regardless of its content,
+                                    however the function is case insensitive, and it removes
+                                    leading and trailing whitespaces. If empty, function returns
+                                    a DataFrame with a Count column that is otherwise empty.
 
     Returns:
-    - ax (matplotlib.axes._axes.Axes): Axes object of the histogram plot.
+    DataFrame: A pandas DataFrame with words and their counts.
 
     Requirements:
-    - matplotlib.pyplot
-    - numpy
+    - collections.Counter
+    - pandas
 
     Example:
-    >>> myList = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
-    >>> ax = task_func(myList)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> ax.get_xticklabels()
-    [Text(0.0, 0, '0.0'), Text(0.5, 0, '0.5'), Text(1.0, 0, '1.0'), Text(1.5, 0, '1.5'), Text(2.0, 0, '2.0'), Text(2.5, 0, '2.5'), Text(3.0, 0, '3.0'), Text(3.5, 0, '3.5'), Text(4.0, 0, '4.0'), Text(4.5, 0, '4.5'), Text(5.0, 0, '5.0')]
+    >>> myList = ['apple', 'banana', 'apple', 'cherry', 'banana', 'banana']
+    >>> task_func(myList)
+            Count
+    apple       2
+    banana      3
+    cherry      1
     """
-    _, ax = plt.subplots()
-    ax.hist(
-        myList, bins=np.arange(min(myList), max(myList) + 2) - 0.5, edgecolor="black"
-    )
-    ax.set_xlabel("Value")
-    ax.set_ylabel("Frequency")
-    ax.set_title("Histogram of Values")
-    return ax
+    words = [w.lower().strip() for w in myList]
+    word_counts = dict(Counter(words))
+    report_df = pd.DataFrame.from_dict(word_counts, orient="index", columns=["Count"])
+    return report_df
 
 import unittest
-import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Test basic case
-        myList = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
-        ax = task_func(myList)
-        heights, _, _ = ax.hist(
-            myList,
-            bins=np.arange(min(myList), max(myList) + 2) - 0.5,
-            edgecolor="black",
+        input_data = ["apple", "banana", "apple", "cherry", "banana", "banana"]
+        expected_output = pd.DataFrame(
+            {"Count": [2, 3, 1]}, index=["apple", "banana", "cherry"]
         )
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertListEqual(list(heights), [1, 2, 3, 4])
-        self.assertEqual(ax.get_title(), "Histogram of Values")
-        self.assertEqual(ax.get_xlabel(), "Value")
-        self.assertEqual(ax.get_ylabel(), "Frequency")
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
     def test_case_2(self):
-        # Test with empty list
-        with self.assertRaises(ValueError):
-            task_func([])
+        # Test repeated value
+        input_data = ["apple", "apple", "apple"]
+        expected_output = pd.DataFrame({"Count": [3]}, index=["apple"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
     def test_case_3(self):
-        # Test with single element
-        myList = [100]
-        ax = task_func(myList)
-        heights, _, _ = ax.hist(myList)
-        self.assertEqual(heights.max(), 1)
+        # Test empty list
+        input_data = []
+        expected_output = pd.DataFrame(columns=["Count"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
     def test_case_4(self):
-        # Test with negative values
-        myList = [-5, -4, -3, -3, -2, -2, -2, -1]
-        ax = task_func(myList)
-        heights, _, _ = ax.hist(myList)
-        self.assertGreaterEqual(len(heights), 1)
+        # Test single entry
+        input_data = ["kiwi"]
+        expected_output = pd.DataFrame({"Count": [1]}, index=["kiwi"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
     def test_case_5(self):
-        # Test with floats
-        myList = [1.1, 1.2, 2.5, 2.5, 3.75, 4.25]
-        ax = task_func(myList)
-        heights, _, _ = ax.hist(myList)
-        self.assertGreaterEqual(len(heights), 1)
+        # Tests the function's ability to handle mixed case words correctly.
+        input_data = ["Apple", "apple", "APPLE"]
+        expected_output = pd.DataFrame({"Count": [3]}, index=["apple"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
     def test_case_6(self):
-        # Test handling non-numeric values
-        myList = ["a", "b", "c"]
-        with self.assertRaises(TypeError):
-            task_func(myList)
-    def tearDown(self):
-        plt.close("all")
+        # Tests the function's ability to handle words with leading/trailing spaces.
+        input_data = ["banana ", " banana", "  banana"]
+        expected_output = pd.DataFrame({"Count": [3]}, index=["banana"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_7(self):
+        # Tests the function's ability to handle words with special characters.
+        input_data = ["kiwi!", "!kiwi", "kiwi"]
+        expected_output = pd.DataFrame(
+            {"Count": [1, 1, 1]}, index=["kiwi!", "!kiwi", "kiwi"]
+        )
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_8(self):
+        # Tests the function's handling of numeric strings as words.
+        input_data = ["123", "456", "123", "456", "789"]
+        expected_output = pd.DataFrame(
+            {"Count": [2, 2, 1]}, index=["123", "456", "789"]
+        )
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_9(self):
+        # Tests the function's handling of empty strings and strings with only spaces.
+        input_data = [" ", "  ", "", "apple", "apple "]
+        expected_output = pd.DataFrame({"Count": [3, 2]}, index=["", "apple"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+    def test_case_10(self):
+        # Tests handling of strings that become duplicates after strip() is applied.
+        input_data = ["banana", "banana ", " banana", "banana"]
+        expected_output = pd.DataFrame({"Count": [4]}, index=["banana"])
+        pd.testing.assert_frame_equal(task_func(input_data), expected_output)

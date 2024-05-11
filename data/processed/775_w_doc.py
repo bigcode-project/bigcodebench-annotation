@@ -1,79 +1,59 @@
-import numpy as np
-from sklearn.model_selection import cross_val_score
-from sklearn.ensemble import RandomForestRegressor
+from string import ascii_lowercase
+import re
+from collections import Counter
 
-def task_func(num_samples=100, n_estimators=100, random_seed=None, cv=5):
-    '''
-    Generate a dataset with five features sampled from the standard normal
-    distribution and a target variable.
-    The target value is created by computing the sum of the features and adding
-    random numbers sampled from the standard normal distribution.
-    Then cross-validate the dataset using a RandomForestRegressor model and
-    return the mean cross-validation score.
+# Constants
+LETTERS_PATTERN = re.compile(r'^(.*?)-[a-z]$')
+LETTERS = ascii_lowercase
 
+def task_func(string):
+    """
+    If a string occurs, divide it the last time "-" occurs and count the frequency of each lowercase letter in the prefix of the string.
+    
     Parameters:
-    - num_samples (int): Number of samples in the generated dataset. Default is 100.
-    - n_estimators (int): Number of trees in RandomForestRegressor. Default is 100.
-    - random_seed (int): Seed for random number generation. Default is None.
-    - cv (int): Number of cross-validation folds. Default is 5.
-
-    Returns:
-    float: The mean cross-validation score.
-    model: the trained model
-
-    Raises:
-    - ValueError: If num_samples / cv < 2
+    - string (str): The input string.
 
     Requirements:
-    - numpy
-    - sklearn.model_selection.cross_val_score
-    - sklearn.ensemble.RandomForestRegressor
+    - string
+    - re
+    - collections
+
+    Returns:
+    - dict: A dictionary with the frequency of each lowercase letter.
 
     Example:
-    >>> res = task_func(random_seed=21, cv=3, n_estimators=90, num_samples=28)
-    >>> print(res)
-    (-0.7631373607354236, RandomForestRegressor(n_estimators=90, random_state=21))
-
-    >>> results = task_func(random_seed=1)
-    >>> print(results)
-    (0.47332912782858, RandomForestRegressor(random_state=1))
-    '''
-    if num_samples / cv < 2:
-        raise ValueError("num_samples / cv should be greater than or equal to 2.")
-    np.random.seed(random_seed)
-    X = np.random.randn(num_samples, 5)
-    y = np.sum(X, axis=1) + np.random.randn(num_samples)
-    model = RandomForestRegressor(n_estimators=n_estimators,
-                                  random_state=random_seed
-                                  )
-    cv_scores = cross_val_score(model, X, y, cv=cv)
-    return np.mean(cv_scores), model
+    >>> task_func('abc-def-ghij')
+    {'a': 1, 'b': 1, 'c': 1, 'd': 1, 'e': 1, 'f': 1, 'g': 0, 'h': 0, 'i': 0, 'j': 0, 'k': 0, 'l': 0, 'm': 0, 'n': 0, 'o': 0, 'p': 0, 'q': 0, 'r': 0, 's': 0, 't': 0, 'u': 0, 'v': 0, 'w': 0, 'x': 0, 'y': 0, 'z': 0}
+    """
+    match = re.search(r'^(.*)-', string)
+    if match:
+        prefix = match.group(1)
+    else:
+        prefix = string if string.isalpha() else ""
+    letter_counts = Counter(prefix)
+    result = {letter: 0 for letter in ascii_lowercase}
+    result.update({letter: letter_counts.get(letter, 0) for letter in letter_counts if letter in result})
+    return result
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_case_rng(self):
-        'rng reproducability'
-        result1, _ = task_func(random_seed=42)
-        result2, _ = task_func(random_seed=42)
-        self.assertAlmostEqual(result1, result2)
     def test_case_1(self):
-        'default params'
-        result, model = task_func(random_seed=1)
-        self.assertAlmostEqual(result, 0.47332912782858)
-        self.assertTrue(isinstance(model, RandomForestRegressor))
+        result = task_func('abc-def-ghij')
+        expected = {letter: 1 if letter in 'abcdef' else 0 for letter in ascii_lowercase}
+        self.assertEqual(result, expected)
     def test_case_2(self):
-        'random outcome with distinct seeds'
-        result1, _ = task_func(random_seed=2)
-        result2, _ = task_func(random_seed=3)
-        self.assertFalse(result1 == result2)
+        result = task_func('abcdefghij')
+        expected = {letter: 1 if letter in 'abcdefghij' else 0 for letter in ascii_lowercase}
+        self.assertEqual(result, expected)
     def test_case_3(self):
-        result, model = task_func(random_seed=2, cv=2, n_estimators=2)
-        self.assertAlmostEqual(result, 0.2316988319594362)
-        self.assertTrue(isinstance(model, RandomForestRegressor))
+        result = task_func('aabbcc-def')
+        expected = {letter: 2 if letter in 'aabbcc' else 0 for letter in ascii_lowercase}
+        self.assertEqual(result, expected)
     def test_case_4(self):
-        'test exception'
-        self.assertRaises(Exception,
-                          task_func,
-                          {'random_seed': 223, 'cv': 3,
-                           'n_estimators': 100, 'num_samples': 4}
-                          )
+        result = task_func('')
+        expected = {letter: 0 for letter in ascii_lowercase}
+        self.assertEqual(result, expected)
+    def test_case_5(self):
+        result = task_func('xyz-abc')
+        expected = {letter: 1 if letter in 'xyz' else 0 for letter in ascii_lowercase}
+        self.assertEqual(result, expected)

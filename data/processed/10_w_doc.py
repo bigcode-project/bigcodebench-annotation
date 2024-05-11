@@ -1,263 +1,103 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+import numpy as np
+import itertools
+import random
+import statistics
 
-
-def task_func(list_of_pairs):
+def task_func(T1, RANGE=100):
     """
-    Create a Pandas DataFrame from a list of pairs and visualize the data using a bar chart.
-    - The title of the barplot should be set to 'Category vs Value'`.
-
+    Convert elements in 'T1' to integers and create a list of random integers.
+    The size of the list is the sum of the integers in `T1`. Calculate and 
+    return the mean, median, and mode of the list.
+    
     Parameters:
-    list_of_pairs (list of tuple): Each tuple contains:
-        - str: Category name.
-        - int: Associated value.
-
+    T1 (tuple of tuples): Each tuple contains string representations of integers which are converted to integers.
+    RANGE (int, optional): The upper limit for generating random integers. Default is 100.
+    
     Returns:
-    tuple:
-        - DataFrame: A pandas DataFrame with columns 'Category' and 'Value'.
-        - Axes: A matplotlib Axes displaying a bar chart of categories vs. values.
-
+    tuple: A tuple containing the mean, median, and mode of the generated list of random integers.
+           The mean and median are floats, and the mode is an integer. The calculations use the generated
+           list whose size is determined by the sum of converted integers from `T1`.
+    
     Requirements:
-    - pandas
-    - matplotlib.pyplot
-    - seaborn
+    - numpy
+    - itertools
+    - random
+    - statistics
 
+    Raises:
+    statistics.StatisticsError if T1 is empty
+    
     Example:
-    >>> list_of_pairs = [('Fruits', 5), ('Vegetables', 9)]
-    >>> df, ax = task_func(list_of_pairs)
-    >>> print(df)
-         Category  Value
-    0      Fruits      5
-    1  Vegetables      9
+    >>> import random
+    >>> random.seed(42)
+    >>> T1 = (('13', '17', '18', '21', '32'), ('07', '11', '13', '14', '28'), ('01', '05', '06', '08', '15', '16'))
+    >>> stats = task_func(T1)
+    >>> print(stats)
+    (49.88, 48.0, 20)
+    >>> stats = task_func(T1, RANGE=50)
+    >>> print(stats)
+    (23.773333333333333, 25.0, 15)
     """
-    df = pd.DataFrame(list_of_pairs, columns=["Category", "Value"])
-    plt.figure(figsize=(10, 5))
-    sns.barplot(x="Category", y="Value", data=df)
-    plt.title("Category vs Value")
-    ax = plt.gca()
-    return df, ax
+    if len(T1) <= 0:
+        raise statistics.StatisticsError
+    int_list = [list(map(int, x)) for x in T1]
+    flattened_list = list(itertools.chain(*int_list))
+    total_nums = sum(flattened_list)
+    random_nums = [random.randint(0, RANGE) for _ in range(total_nums)]
+    mean = np.mean(random_nums)
+    median = np.median(random_nums)
+    mode = statistics.mode(random_nums)
+    return mean, median, mode
 
 import unittest
+import numpy as np
+import statistics
+from unittest.mock import patch
 class TestCases(unittest.TestCase):
-    """Test cases for the task_func function."""
-    @staticmethod
-    def is_bar(ax, expected_values, expected_categories):
-        extracted_values = [
-            bar.get_height() for bar in ax.patches
-        ]  # extract bar height
-        extracted_categories = [
-            tick.get_text() for tick in ax.get_xticklabels()
-        ]  # extract category label
-        for actual_value, expected_value in zip(extracted_values, expected_values):
-            assert (
-                actual_value == expected_value
-            ), f"Expected value '{expected_value}', but got '{actual_value}'"
-        for actual_category, expected_category in zip(
-            extracted_categories, expected_categories
-        ):
-            assert (
-                actual_category == expected_category
-            ), f"Expected category '{expected_category}', but got '{actual_category}'"
-    def test_case_1(self):
-        df, ax = task_func(
-            [
-                ("Allison", 49),
-                ("Cassidy", 72),
-                ("Jamie", -74),
-                ("Randy", -25),
-                ("Joshua", -85),
-            ]
-        )
-        # Testing the DataFrame
-        self.assertEqual(
-            df["Category"].tolist(), ["Allison", "Cassidy", "Jamie", "Randy", "Joshua"]
-        )
-        self.assertEqual(df["Value"].tolist(), [49, 72, -74, -25, -85])
-        # Testing the plot title
-        self.assertEqual(ax.get_title(), "Category vs Value")
-        self.is_bar(
-            ax=ax,
-            expected_categories=["Allison", "Cassidy", "Jamie", "Randy", "Joshua"],
-            expected_values=[49, 72, -74, -25, -85],
-        )
-    def test_case_2(self):
-        df, ax = task_func(
-            [
-                ("Jonathan", 36),
-                ("Maureen", 47),
-                ("Zachary", -32),
-                ("Kristen", 39),
-                ("Donna", -23),
-            ]
-        )
-        # Testing the DataFrame
-        self.assertEqual(
-            df["Category"].tolist(),
-            ["Jonathan", "Maureen", "Zachary", "Kristen", "Donna"],
-        )
-        self.assertEqual(df["Value"].tolist(), [36, 47, -32, 39, -23])
-        # Testing the plot title
-        self.assertEqual(ax.get_title(), "Category vs Value")
-    def test_case_3(self):
-        df, ax = task_func(
-            [
-                ("Eric", -91),
-                ("Jennifer", 52),
-                ("James", -79),
-                ("Matthew", 25),
-                ("Veronica", 2),
-            ]
-        )
-        # Testing the DataFrame
-        self.assertEqual(
-            df["Category"].tolist(),
-            ["Eric", "Jennifer", "James", "Matthew", "Veronica"],
-        )
-        self.assertEqual(df["Value"].tolist(), [-91, 52, -79, 25, 2])
-        # Testing the plot title
-        self.assertEqual(ax.get_title(), "Category vs Value")
-    def test_case_4(self):
-        df, ax = task_func(
-            [
-                ("Caitlin", -82),
-                ("Austin", 64),
-                ("Scott", -11),
-                ("Brian", -16),
-                ("Amy", 100),
-            ]
-        )
-        # Testing the DataFrame
-        self.assertEqual(
-            df["Category"].tolist(), ["Caitlin", "Austin", "Scott", "Brian", "Amy"]
-        )
-        self.assertEqual(df["Value"].tolist(), [-82, 64, -11, -16, 100])
-        # Testing the plot title
-        self.assertEqual(ax.get_title(), "Category vs Value")
-    def test_case_5(self):
-        df, ax = task_func(
-            [
-                ("Justin", 96),
-                ("Ashley", 33),
-                ("Daniel", 41),
-                ("Connie", 26),
-                ("Tracy", 10),
-            ]
-        )
-        # Testing the DataFrame
-        self.assertEqual(
-            df["Category"].tolist(), ["Justin", "Ashley", "Daniel", "Connie", "Tracy"]
-        )
-        self.assertEqual(df["Value"].tolist(), [96, 33, 41, 26, 10])
-        # Testing the plot title
-        self.assertEqual(ax.get_title(), "Category vs Value")
-    def test_case_6(self):
-        df, ax = task_func(
-            [
-                ("Vanessa", -115),
-                ("Roberto", -267),
-                ("Barbara", 592),
-                ("Amanda", 472),
-                ("Rita", -727),
-                ("Christopher", 789),
-                ("Brandon", 457),
-                ("Kylie", -575),
-                ("Christina", 405),
-                ("Dylan", 265),
-            ]
-        )
-        # Testing the DataFrame
-        self.assertEqual(
-            df["Category"].tolist(),
-            [
-                "Vanessa",
-                "Roberto",
-                "Barbara",
-                "Amanda",
-                "Rita",
-                "Christopher",
-                "Brandon",
-                "Kylie",
-                "Christina",
-                "Dylan",
-            ],
-        )
-        self.assertEqual(
-            df["Value"].tolist(), [-115, -267, 592, 472, -727, 789, 457, -575, 405, 265]
-        )
-        # Testing the plot title
-        self.assertEqual(ax.get_title(), "Category vs Value")
-    def test_case_7(self):
-        df, ax = task_func(
-            [
-                ("Kevin", -896),
-                ("Kirk", 718),
-                ("Cathy", -328),
-                ("Ryan", -605),
-                ("Peter", -958),
-                ("Brenda", -266),
-                ("Laura", 117),
-                ("Todd", 807),
-                ("Ann", 981),
-                ("Kimberly", -70),
-            ]
-        )
-        # Testing the DataFrame
-        self.assertEqual(
-            df["Category"].tolist(),
-            [
-                "Kevin",
-                "Kirk",
-                "Cathy",
-                "Ryan",
-                "Peter",
-                "Brenda",
-                "Laura",
-                "Todd",
-                "Ann",
-                "Kimberly",
-            ],
-        )
-        self.assertEqual(
-            df["Value"].tolist(),
-            [-896, 718, -328, -605, -958, -266, 117, 807, 981, -70],
-        )
-        # Testing the plot title
-        self.assertEqual(ax.get_title(), "Category vs Value")
-    def test_case_8(self):
-        df, ax = task_func(
-            [
-                ("Samuel", -366),
-                ("Kathy", -267),
-                ("Michael", -379),
-                ("Teresa", 926),
-                ("Stephanie", -73),
-                ("Joy", -892),
-                ("Robert", 988),
-                ("Jenna", -362),
-                ("Jodi", 816),
-                ("Carlos", 981),
-            ]
-        )
-        # Testing the DataFrame
-        self.assertEqual(
-            df["Category"].tolist(),
-            [
-                "Samuel",
-                "Kathy",
-                "Michael",
-                "Teresa",
-                "Stephanie",
-                "Joy",
-                "Robert",
-                "Jenna",
-                "Jodi",
-                "Carlos",
-            ],
-        )
-        self.assertEqual(
-            df["Value"].tolist(),
-            [-366, -267, -379, 926, -73, -892, 988, -362, 816, 981],
-        )
-        # Testing the plot title
-        self.assertEqual(ax.get_title(), "Category vs Value")
+    @patch('random.randint', return_value=50)
+    def test_case_1(self, mock_randint):
+        """Tests with small numbers and default range."""
+        T1 = (('1', '2'), ('2', '3'), ('3', '4'))
+        mean, median, mode = task_func(T1)
+        total_elements = sum(map(int, sum(T1, ())))
+        self.assertEqual(total_elements, 15)  # Check if the total_elements calculation is correct
+        self.assertTrue(isinstance(mean, float))
+        self.assertTrue(isinstance(median, float))
+        self.assertTrue(isinstance(mode, int))
+    @patch('random.randint', return_value=50)
+    def test_case_2(self, mock_randint):
+        """Tests with mid-range numbers and default range."""
+        T1 = (('1', '2', '3'), ('4', '5'), ('6', '7', '8', '9'))
+        mean, median, mode = task_func(T1)
+        self.assertEqual(mean, 50.0)
+        self.assertEqual(median, 50.0)
+        self.assertEqual(mode, 50)
+    @patch('random.randint', return_value=25)
+    def test_case_3(self, mock_randint):
+        """Tests with adjusted range to 50, checks new bounds."""
+        T1 = (('1', '2', '3'), ('4', '5'), ('6', '7', '8', '9'))
+        mean, median, mode = task_func(T1, RANGE=50)
+        self.assertEqual(mean, 25.0)
+        self.assertEqual(median, 25.0)
+        self.assertEqual(mode, 25)
+    @patch('random.randint', return_value=75)
+    def test_case_4(self, mock_randint):
+        """Tests with minimal input of single-digit numbers."""
+        T1 = (('1',), ('2',), ('3',))
+        mean, median, mode = task_func(T1)
+        self.assertEqual(mean, 75.0)
+        self.assertEqual(median, 75.0)
+        self.assertEqual(mode, 75)
+    @patch('random.randint', return_value=10)
+    def test_case_5(self, mock_randint):
+        """Tests with larger numbers, focusing on correct type checking."""
+        T1 = (('10', '20', '30'), ('40', '50'), ('60', '70', '80', '90'))
+        mean, median, mode = task_func(T1)
+        self.assertEqual(mean, 10.0)
+        self.assertEqual(median, 10.0)
+        self.assertEqual(mode, 10)
+    def test_empty_input(self):
+        """Tests behavior with an empty tuple input."""
+        T1 = ()
+        with self.assertRaises(statistics.StatisticsError):
+            mean, median, mode = task_func(T1)

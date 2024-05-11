@@ -1,60 +1,72 @@
-from random import randint
-import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 
 def task_func(array_length=100):
-    """
-    Generate two arrays of random integers and draw a line diagram with the 
-    maximum values of the respective elements of the two arrays. Set 'Maximum Values' on its y-axis.
+    '''
+    Generate two arrays of random numbers of a given length, calculate their mean, median, and standard deviation,
+    then store these results in a Panda DataFrame 'statistics' with keys 'Array1' and 'Array2'.
+    Draw a bar chart to compare these statistics with indices 'Mean', 'Median', and 'Standard Deviation'.
 
     Parameters:
-    - array_length (int): Length of the random arrays to be generated. Default is 100.
+    - array_length (int, optional): The length of the arrays to be generated. Default is 100.
 
     Returns:
-    - matplotlib.axes.Axes: Axes object with the plot.
+    - DataFrame: A pandas DataFrame with the statistics of the arrays.
+    - Axes: The bar chart plot comparing the statistics.
 
     Requirements:
     - numpy
-    - matplotlib.pyplot
-    - random
+    - pandas
 
     Example:
-    >>> ax = task_func(100)
-    """
-    array1 = np.array([randint(1, 100) for _ in range(array_length)])
-    array2 = np.array([randint(1, 100) for _ in range(array_length)])
-    max_values = np.maximum(array1, array2)
-    fig, ax = plt.subplots()
-    ax.plot(max_values)
-    ax.set_ylabel('Maximum Values')
-    return ax
+    >>> df, ax = task_func(50)
+    '''
+    array1 = np.random.rand(array_length)
+    array2 = np.random.rand(array_length)
+    statistics = {
+        'Array1': [np.mean(array1), np.median(array1), np.std(array1)],
+        'Array2': [np.mean(array2), np.median(array2), np.std(array2)]
+    }
+    df = pd.DataFrame(statistics, index=['Mean', 'Median', 'Standard Deviation'])
+    ax = df.plot(kind='bar')
+    return df, ax
 
 import unittest
-from matplotlib.axes import Axes
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     
-    def test_case_1(self):
-        ax = task_func(50)
-        self.assertIsInstance(ax, Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 50)
-    def test_standard_functionality(self):
-        """Test the function with default array length."""
-        ax = task_func()
+    def test_default_length(self):
+        df, ax = task_func()
+        self.assertEqual(df.shape, (3, 2))
+        self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
+        self.assertTrue(all(df.columns == ['Array1', 'Array2']))
         self.assertIsInstance(ax, plt.Axes)
-    def test_zero_length_array(self):
-        """Test the function with zero array length."""
-        ax = task_func(0)
+    
+    def test_custom_length(self):
+        df, ax = task_func(200)
+        self.assertEqual(df.shape, (3, 2))
+        self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
+        self.assertTrue(all(df.columns == ['Array1', 'Array2']))
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 0)  # Expect no data points in the plot
-    def test_non_default_length_array(self):
-        """Test the function with non-default array lengths."""
-        lengths = [50, 200]
-        for length in lengths:
-            ax = task_func(length)
-            self.assertIsInstance(ax, plt.Axes)
-            self.assertEqual(len(ax.lines[0].get_ydata()), length)
-    def test_plot_output(self):
-        """Verify the plot is generated and is of correct type."""
-        ax = task_func()
-        self.assertTrue(hasattr(ax, 'figure'), "Plot does not have associated figure attribute")
+    
+    def test_statistics_values(self):
+        np.random.seed(42)  # Setting seed for reproducibility
+        df, _ = task_func(1000)
+        self.assertAlmostEqual(df['Array1']['Mean'], 0.4903, places=3)
+        self.assertAlmostEqual(df['Array2']['Mean'], 0.5068, places=3)
+        self.assertAlmostEqual(df['Array1']['Median'], 0.4968, places=3)
+        self.assertAlmostEqual(df['Array2']['Median'], 0.5187, places=3)
+        self.assertAlmostEqual(df['Array1']['Standard Deviation'], 0.2920, places=3)
+        self.assertAlmostEqual(df['Array2']['Standard Deviation'], 0.2921, places=3)
+    
+    def test_negative_length(self):
+        with self.assertRaises(ValueError):
+            task_func(-50)
+    
+    def test_zero_length(self):
+        df, ax = task_func(0)
+        self.assertEqual(df.shape, (3, 2))
+        self.assertTrue(all(df.index == ['Mean', 'Median', 'Standard Deviation']))
+        self.assertTrue(all(df.columns == ['Array1', 'Array2']))
+        self.assertIsInstance(ax, plt.Axes)

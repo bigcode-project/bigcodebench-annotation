@@ -1,70 +1,72 @@
 import pickle
 import os
+from sklearn.datasets import make_classification
 
 # Constants
 FILE_NAME = 'save.pkl'
+DATA, TARGET = make_classification(n_samples=100, n_features=20, n_informative=2, n_redundant=10, n_classes=2, random_state=1)
 
-def task_func(dt):
+def task_func(data, target):
     """
-    Save the date time object "dt" in the pickle file "save.pkl" and then read it back for validation.
+    Save the Sklearn dataset ("Data" and "Destination") in the pickle file "save.pkl" and then read it back for validation.
 
     Parameters:
-    - dt (datetime): The datetime object to be saved.
+    - data (numpy array): The data part of the sklearn dataset.
+    - target (numpy array): The target part of the sklearn dataset.
 
     Returns:
-    - loaded_dt (datetime): The loaded datetime object from 'save.pkl'.
+    tuple: The loaded tuple (data, target) from 'save.pkl'.
 
     Requirements:
     - pickle
     - os
+    - sklearn.datasets
 
     Example:
-    >>> dt = datetime.now(pytz.UTC)
-    >>> loaded_dt = task_func(dt)
-    >>> assert dt == loaded_dt
+    >>> data, target = make_classification(n_samples=100, n_features=20, n_informative=2, n_redundant=10, n_classes=2, random_state=1)
+    >>> loaded_data, loaded_target = task_func(data, target)
+    >>> assert np.array_equal(data, loaded_data) and np.array_equal(target, loaded_target)
     """
     with open(FILE_NAME, 'wb') as file:
-        pickle.dump(dt, file)
+        pickle.dump((data, target), file)
     with open(FILE_NAME, 'rb') as file:
-        loaded_dt = pickle.load(file)
+        loaded_data, loaded_target = pickle.load(file)
     os.remove(FILE_NAME)
-    return loaded_dt
+    return loaded_data, loaded_target
 
+from sklearn.datasets import make_classification
+import numpy as np
 import unittest
-from datetime import datetime
-import pytz
+import sys
+sys.path.append("/mnt/data")
+# Defining the test function
 class TestCases(unittest.TestCase):
-    def test_datetime_saving_and_loading(self):
-        # Test saving and loading the current datetime with UTC timezone
-        dt = datetime.now(pytz.UTC)
-        loaded_dt = task_func(dt)
-        self.assertEqual(dt, loaded_dt, "The loaded datetime object should match the original")
-    def test_timezone_awareness(self):
-        # Test saving and loading a timezone-aware datetime object
-        tz = pytz.timezone('Asia/Tokyo')
-        dt = datetime.now(tz)
-        loaded_dt = task_func(dt)
-        self.assertEqual(dt, loaded_dt, "The loaded datetime object should be timezone aware and match the original")
-    def test_file_cleanup(self):
-        # Test whether the pickle file is properly cleaned up
-        dt = datetime.now(pytz.UTC)
-        task_func(dt)
-        self.assertFalse(os.path.exists(FILE_NAME), "The pickle file should be cleaned up after loading")
-    def test_naive_datetime(self):
-        # Test saving and loading a naive datetime object
-        dt = datetime.now()
-        loaded_dt = task_func(dt)
-        self.assertEqual(dt, loaded_dt, "The loaded datetime object should match the original naive datetime")
-        self.assertIsNone(loaded_dt.tzinfo, "The loaded datetime object should be naive (no timezone)")
-    def test_different_timezones(self):
-        # Test saving and loading datetime objects with different timezones
-        tz1 = pytz.timezone('US/Eastern')
-        tz2 = pytz.timezone('Europe/London')
-        dt1 = datetime.now(tz1)
-        dt2 = datetime.now(tz2)
-        loaded_dt1 = task_func(dt1)
-        loaded_dt2 = task_func(dt2)
-        self.assertEqual(dt1, loaded_dt1, "The loaded datetime object should match the original (US/Eastern)")
-        self.assertEqual(dt2, loaded_dt2, "The loaded datetime object should match the original (Europe/London)")
-        self.assertEqual(dt1.tzinfo, loaded_dt1.tzinfo, "The loaded datetime object should have the same timezone (US/Eastern)")
-        self.assertEqual(dt2.tzinfo, loaded_dt2.tzinfo, "The loaded datetime object should have the same timezone (Europe/London)")
+    def test_save_and_load_data(self):
+        data, target = make_classification(n_samples=100, n_features=20, n_informative=2, n_redundant=10, n_classes=2, random_state=1)
+        loaded_data, loaded_target = task_func(data, target)
+        self.assertTrue(np.array_equal(data, loaded_data))
+        self.assertTrue(np.array_equal(target, loaded_target))
+    
+    def test_save_and_load_empty_data(self):
+        data, target = np.array([]), np.array([])
+        loaded_data, loaded_target = task_func(data, target)
+        self.assertTrue(np.array_equal(data, loaded_data))
+        self.assertTrue(np.array_equal(target, loaded_target))
+    
+    def test_save_and_load_single_element_data(self):
+        data, target = np.array([5]), np.array([1])
+        loaded_data, loaded_target = task_func(data, target)
+        self.assertTrue(np.array_equal(data, loaded_data))
+        self.assertTrue(np.array_equal(target, loaded_target))
+    
+    def test_save_and_load_large_data(self):
+        data, target = make_classification(n_samples=1000, n_features=50, n_informative=5, n_redundant=25, n_classes=3, random_state=2)
+        loaded_data, loaded_target = task_func(data, target)
+        self.assertTrue(np.array_equal(data, loaded_data))
+        self.assertTrue(np.array_equal(target, loaded_target))
+    
+    def test_save_and_load_random_data(self):
+        data, target = np.random.rand(50, 5), np.random.randint(0, 2, 50)
+        loaded_data, loaded_target = task_func(data, target)
+        self.assertTrue(np.array_equal(data, loaded_data))
+        self.assertTrue(np.array_equal(target, loaded_target))

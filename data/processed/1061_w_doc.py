@@ -1,104 +1,99 @@
-import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import norm
 
 
-def task_func(df: pd.DataFrame, column_name: str) -> (str, plt.Axes):
+def task_func(arr: np.ndarray) -> (plt.Axes, np.ndarray):
     """
-    This function assesses whether the distribution of values in a specified column of a DataFrame is
-    uniform and visualizes this distribution using a histogram.
+    Plots a histogram of normalized data from an input 2D numpy array alongside the probability density function (PDF)
+    of a standard normal distribution.
+
+    Note:
+    - Takes in a 2D numpy array as input.
+    - Calculates the sum of elements in each row of the array.
+    - Normalizes these row sums to have a mean of 0 and a standard deviation of 1.
+      - Normalization is achieved by first calculating the mean and standard deviation of the row sums.
+      - Each row sum is then transformed by subtracting the mean and dividing by the standard deviation.
+      - If the standard deviation is 0 (indicating all row sums are equal), normalization results in an array of zeros with the same shape.
+    - Plots a histogram of the normalized data.
+      - Uses 30 bins for the histogram.
+      - The histogram is density-based, meaning it represents the probability density rather than raw frequencies.
+      - The bars of the histogram are semi-transparent (60% opacity) and green in color.
+    - Overlays the PDF of a standard normal distribution on the histogram for comparison.
+      - The PDF curve is plotted in red with a line width of 2.
+      - The range of the PDF curve is set to cover 99% of a standard normal distribution.
+    - Sets the title of the plot to "Histogram of Normalized Data with Standard Normal PDF".
 
     Parameters:
-    - df (pd.DataFrame): The DataFrame containing the data.
-    - column_name (str): The name of the column to be evaluated.
+    - arr: A 2D numpy array. The array should contain numerical data.
 
     Returns:
-    - str: A message indicating whether the distribution in the column is uniform or not. The message is one of the following:
-        - "The distribution of values is uniform."
-        - "The distribution of values is not uniform."
-    - plt.Axes: An Axes object displaying the histogram of the value distribution in the specified column.
-
-    The function handles the following cases:
-    - If the DataFrame is empty, the specified column does not exist in the DataFrame, or
-        if the specified column contains only null values, the function returns a message
-        "The DataFrame is empty or the specified column has no data."
-        In this case, a blank histogram with a title "Distribution of values in [column_name] (No Data)" is generated.
-    - If the DataFrame and column are valid, the function calculates if the distribution of values is uniform.
-        It returns a message stating whether the distribution is uniform or not.
-        A histogram is generated to visualize the distribution of values in the specified column.
-        This histogram displays the frequency of each value, with the number of bins set to the number
-        of unique values in the column, an edge color of black, and a transparency alpha value of 0.7.
-        The x-axis is labeled "Values", the y-axis is labeled "Frequency", and
-        the title of the plot is "Distribution of values in [column_name]".
+    - A tuple containing:
+      - A matplotlib Axes object with the histogram of the normalized data and the overlaid standard normal PDF.
+      - The normalized data as a 1D numpy array.
 
     Requirements:
-    - pandas
+    - numpy
+    - scipy
     - matplotlib
 
     Example:
-    >>> df = pd.DataFrame({'Category': ['A', 'A', 'B', 'B', 'B', 'C', 'C', 'C', 'C', 'D', 'E', 'E']})
-    >>> message, ax = task_func(df, 'Category')
-    >>> print(message)
-    The distribution of values is not uniform.
+    >>> ax, normalized_data = task_func(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> print(normalized_data)
+    [-1.22474487  0.          1.22474487]
     """
-    if df.empty or column_name not in df.columns or df[column_name].isnull().all():
-        message = "The DataFrame is empty or the specified column has no data."
-        _, ax = plt.subplots()
-        ax.set_title(f"Distribution of values in {column_name} (No Data)")
-        return message, ax
-    unique_values_count = df[column_name].nunique()
-    total_values = len(df[column_name])
-    is_uniform = total_values % unique_values_count == 0 and all(
-        df[column_name].value_counts() == total_values / unique_values_count
-    )
-    message = (
-        "The distribution of values is uniform."
-        if is_uniform
-        else "The distribution of values is not uniform."
+    row_sums = arr.sum(axis=1)
+    mean = np.mean(row_sums)
+    std_dev = np.std(row_sums)
+    normalized_data = (
+        (row_sums - mean) / std_dev if std_dev != 0 else np.zeros_like(row_sums)
     )
     _, ax = plt.subplots()
-    ax.hist(df[column_name], bins=unique_values_count, edgecolor="black", alpha=0.7)
-    ax.set_xticks(range(unique_values_count))
-    ax.set_xlabel("Values")
-    ax.set_ylabel("Frequency")
-    ax.set_title(f"Distribution of values in {column_name}")
-    return message, ax
+    ax.hist(normalized_data, bins=30, density=True, alpha=0.6, color="g")
+    x = np.linspace(norm.ppf(0.01), norm.ppf(0.99), 100)
+    ax.plot(x, norm.pdf(x), "r-", lw=2)
+    ax.set_title("Histogram of Normalized Data with Standard Normal PDF")
+    return ax, normalized_data
 
 import unittest
-import pandas as pd
-import matplotlib.pyplot as plt
+import numpy as np
 class TestCases(unittest.TestCase):
     """Tests for `task_func`."""
-    def test_uniform_distribution(self):
-        """Test the distribution of values in a column with a uniform distribution."""
-        df = pd.DataFrame({"Category": ["A", "A", "B", "B", "C", "C"]})
-        message, _ = task_func(df, "Category")
-        self.assertEqual(message, "The distribution of values is uniform.")
-    def test_non_uniform_distribution(self):
-        """Test the distribution of values in a column with a non-uniform distribution."""
-        df = pd.DataFrame({"Category": ["A", "A", "B", "B", "B", "C", "C", "C", "C"]})
-        message, _ = task_func(df, "Category")
-        self.assertEqual(message, "The distribution of values is not uniform.")
-    def test_single_value(self):
-        """Test the distribution of values in a column with a single value."""
-        df = pd.DataFrame({"Category": ["A", "A", "A", "A", "A", "A"]})
-        message, _ = task_func(df, "Category")
-        self.assertEqual(message, "The distribution of values is uniform.")
-    def test_multi_column(self):
-        """Test the distribution of values in a column with a multi-column DataFrame."""
-        df = pd.DataFrame(
-            {
-                "Category": ["A", "A", "B", "B", "C", "C"],
-                "Type": ["X", "X", "Y", "Y", "Z", "Z"],
-            }
-        )
-        message, _ = task_func(df, "Type")
-        self.assertEqual(message, "The distribution of values is uniform.")
-    def test_empty_dataframe(self):
-        """Test the distribution of values in a column with an empty DataFrame."""
-        df = pd.DataFrame({"Category": []})
-        message, _ = task_func(df, "Category")
+    def test_histogram_and_pdf(self):
+        """Test that the histogram and PDF are plotted."""
+        arr = np.array([[i + j for i in range(3)] for j in range(5)])
+        ax, _ = task_func(arr)
         self.assertEqual(
-            message, "The DataFrame is empty or the specified column has no data."
+            ax.get_title(),
+            "Histogram of Normalized Data with Standard Normal PDF",
         )
-    def tearDown(self):
-        plt.close()
+        self.assertEqual(len(ax.lines), 1)
+        self.assertEqual(len(ax.patches), 30)
+    def test_normalized_data(self):
+        """Test that the normalized data is correct."""
+        arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        _, normalized_data = task_func(arr)
+        expected_data = [-1.22474487, 0.0, 1.22474487]
+        for i in range(len(expected_data)):
+            self.assertTrue(np.isclose(normalized_data[i], expected_data[i]))
+    def test_empty_array(self):
+        """Test empty array."""
+        arr = np.array([[], [], []])
+        _, normalized_data = task_func(arr)
+        for value in normalized_data:
+            self.assertTrue(np.isclose(value, 0))
+    def test_single_value_array(self):
+        """Test single value array."""
+        arr = np.array([[5], [5], [5]])
+        _, normalized_data = task_func(arr)
+        for value in normalized_data:
+            self.assertTrue(np.isclose(value, 0))
+    def test_large_values(self):
+        """Test large values."""
+        arr = np.array([[1e6, 2e6, 3e6], [4e6, 5e6, 6e6], [7e6, 8e6, 9e6]])
+        _, normalized_data = task_func(arr)
+        expected_data = [-1.22474487, 0.0, 1.22474487]
+        for i in range(len(expected_data)):
+            self.assertTrue(np.isclose(normalized_data[i], expected_data[i]))

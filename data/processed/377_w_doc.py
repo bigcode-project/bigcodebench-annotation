@@ -1,62 +1,76 @@
-import nltk
-import re
-from collections import Counter
+from texttable import Texttable
+import os
+import psutil
 
-
-# Constants
-STOPWORDS = nltk.corpus.stopwords.words('english')
-
-def task_func(text):
+def task_func():
     """
-    Calculate the frequency of continuous words in a text string. The function splits the text into words, 
-    converts them to lowercase, removes punctuation marks and common stopwords (provided as a constant), 
-    and then calculates the frequency of each word.
-
-    Parameters:
-    text (str): The input text string.
+    Generates a table displaying the system's CPU usage, memory usage, and disk usage.
 
     Returns:
-    dict: A dictionary with words as keys and their frequencies as values.
+        A string representation of a table with the columns of 'Item' and 'Value',
+        and the following system information:
+        - CPU Usage (%)
+        - Memory Usage (%)
+        - Disk Usage (%)
 
     Requirements:
-    - nltk for stopwords (ensure the stopwords dataset is downloaded using nltk.download('stopwords'))
-    - re for regular expressions
-    - collections.Counter for counting occurrences
+    - texttable.Texttable
+    - os
+    - psutil
 
-    Example:
-    >>> task_func('This is a sample text. This text is for testing.')
-    {'sample': 1, 'text': 2, 'testing': 1}
+    Examples:
+    >>> table_str = task_func()
+    >>> isinstance(table_str, str)
+    True
+    >>> 'CPU Usage (%)' in table_str and 'Memory Usage (%)' in table_str
+    True
     """
-    words = re.split(r'\W+', text.lower())
-    words = [word for word in words if word not in STOPWORDS and word != '']
-    word_freq = dict(Counter(words))
-    return word_freq
+    cpu_usage = psutil.cpu_percent(interval=1)
+    memory_info = psutil.virtual_memory()
+    disk_usage = psutil.disk_usage(os.sep)
+    table = Texttable()
+    table.add_rows([
+        ['Item', 'Value'],
+        ['CPU Usage (%)', cpu_usage],
+        ['Memory Usage (%)', memory_info.percent],
+        ['Disk Usage (%)', disk_usage.percent]
+    ])
+    return table.draw()
 
 import unittest
-import doctest
+import re  # Import the regular expressions library
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Basic test
-        text = 'This is a sample text. This text is for testing.'
-        expected_output = {'sample': 1, 'text': 2, 'testing': 1}
-        self.assertEqual(task_func(text), expected_output)
-    def test_case_2(self):
-        # Test with stopwords
-        text = 'The quick brown fox jumped over the lazy dog.'
-        expected_output = {'quick': 1, 'brown': 1, 'fox': 1, 'jumped': 1, 'lazy': 1, 'dog': 1}
-        self.assertEqual(task_func(text), expected_output)
-    def test_case_3(self):
-        # Test with punctuation
-        text = 'Hello, world! How are you today?'
-        expected_output = {'hello': 1, 'world': 1, 'today': 1}
-        self.assertEqual(task_func(text), expected_output)
-    def test_case_4(self):
-        # Test with empty string
-        text = ''
-        expected_output = {}
-        self.assertEqual(task_func(text), expected_output)
-    def test_case_5(self):
-        # Test with numeric values and special characters
-        text = 'Python3 is better than Python2. I love Python3.5!'
-        expected_output = {'python3': 2, 'better': 1, 'python2': 1, 'love': 1, '5': 1}
-        self.assertEqual(task_func(text), expected_output)
+    def setUp(self):
+        self.result = task_func()
+    def test_return_type(self):
+        """Test that the function returns a string."""
+        self.assertIsInstance(self.result, str)
+    def test_table_headers(self):
+        """Test the presence of correct headers in the table."""
+        for header in ['CPU Usage (%)', 'Memory Usage (%)', 'Disk Usage (%)']:
+            with self.subTest(header=header):
+                self.assertIn(header, self.result)
+    def test_proper_values(self):
+        """Test that the table's values are not empty or zero."""
+        # Extract numeric values using a regular expression
+        values = re.findall(r'\|\s*[\d.]+\s*\|', self.result)
+        # Convert extracted strings to float and test they are greater than 0
+        for value_str in values:
+            value = float(value_str.strip('| ').strip())
+            with self.subTest(value=value):
+                self.assertTrue(0 <= value <= 100)
+    def test_value_ranges(self):
+        """Test that CPU and memory usage percentages are within 0-100%."""
+        values = re.findall(r'\|\s*[\d.]+\s*\|', self.result)
+        for value_str in values:
+            value = float(value_str.strip('| ').strip())
+            with self.subTest(value=value):
+                self.assertTrue(0 <= value <= 100)
+    def test_table_structure(self):
+        """Test that the table's structure is as expected."""
+        # Split the table into rows based on the unique row separator pattern
+        parts = self.result.split('+------------------+--------+')
+        # Filter out empty parts that might occur due to the split operation
+        non_empty_parts = [part for part in parts if part.strip()]
+        # Expect 4 non-empty parts: 1 header row + 3 data rows
+        self.assertEqual(len(non_empty_parts), 3)

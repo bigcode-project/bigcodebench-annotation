@@ -1,39 +1,57 @@
-import numpy as np
-from scipy.stats import mode
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
-def task_func(list_of_lists):
+def task_func(df):
     """
-    Merges a predefined set of lists into a list and finds the mode of the elements in the list.
+    Given a Pandas DataFrame with random numeric values, standardize it with the standard scaler from sklearn.
 
     Parameters:
-    - list_of_lists (list): The list to be processed.
-
+    - df (DataFrame): The DataFrame to be standardized.
+    
     Returns:
-    - tuple: The mode and count of the mode in the merged list.
-        - mode_value (np.array): The value that appears most frequently in the merged array.
-        - mode_count (int): The frequency count of the mode_value within the merged array.
+    - df_standardized (DataFrame): The standardized DataFrame.
 
     Requirements:
-    - numpy
-    - scipy
-    
+    - pandas
+    - sklearn
+
     Example:
-    >>> task_func([[1, 1, 3], [4, 5, 6], [7, 8, 9]])
-    (array([1]), array([2]))
+    >>> df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
+    >>> task_func(df)
+              a         b
+    0 -1.224745 -1.224745
+    1  0.000000  0.000000
+    2  1.224745  1.224745
     """
-    merged_list = np.array([item for sublist in list_of_lists for item in sublist])
-    mode_value, mode_count = mode(merged_list)
-    return mode_value, mode_count
+    scaler = StandardScaler()
+    df_standardized = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
+    return df_standardized
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        self.assertEqual(task_func([[1, 1, 3], [4, 5, 6], [7, 8, 9]]), (1, 2))
+        df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
+        df_standardized = task_func(df)
+        self.assertAlmostEqual(df_standardized['a'].mean(), 0)
+        self.assertAlmostEqual(df_standardized['a'].std(), 1.224744871391589)
     def test_case_2(self):
-        self.assertEqual(task_func([[1, 1, 3], [4, 5, 6], [7, 8, 9], [1, 1, 1]]), (1, 5))
+        df = pd.DataFrame({'a': [1, 1, 1], 'b': [1, 1, 1]})
+        df_standardized = task_func(df)
+        self.assertAlmostEqual(df_standardized['a'].mean(), 0)
+        self.assertAlmostEqual(df_standardized['a'].std(), 0)
     def test_case_3(self):
-        self.assertEqual(task_func([[1, 1, 3], [4, 5, 6], [7, 8, 9], [1, 1, 1], [2, 2, 2]]), (1, 5))
+        df = pd.DataFrame({'a': [1, 0, -1], 'b': [0, 1, 0]})
+        df_standardized = task_func(df)
+        print(df_standardized)
+        self.assertAlmostEqual(df_standardized['a'].mean(), 0)
+        self.assertAlmostEqual(df_standardized['a'].std(), 1.224744871391589)
     def test_case_4(self):
-        self.assertEqual(task_func([[1, 1, 3], [4, 5, 6], [7, 8, 9], [1, 1, 1], [2, 2, 2], [3, 3, 3]]), (1, 5))
+        df = pd.DataFrame({'z': [1, 2, 3], 'y': [4, 5, 6]})
+        df_standardized = task_func(df)
+        self.assertAlmostEqual(df_standardized['z'].mean(), 0)
+        self.assertAlmostEqual(df_standardized['z'].std(), 1.224744871391589)
     def test_case_5(self):
-        self.assertEqual(task_func([[1, 1, 3], [4, 5, 6], [7, 8, 9], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4]]), (1, 5))
+        df = pd.DataFrame({'z': [1, 2, 3], 'y': [4, 5, 6]})
+        df_standardized = task_func(df)
+        self.assertAlmostEqual(df_standardized['y'].mean(), 0)
+        self.assertAlmostEqual(df_standardized['y'].std(), 1.224744871391589)

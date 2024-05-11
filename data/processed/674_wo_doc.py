@@ -1,66 +1,57 @@
+import pandas as pd
 import os
-import random
 
-def task_func(directory, n_files):
+def task_func(filename):
     """
-    Create n random txt files in a specific directory, write only a single digit random integer into each file, and then reset the cursor to the beginning of each file.
-    The file names start from 'file_1.txt' and increment by 1 for each file.
-    
+    Read a CSV file of pandas, reverse the order of the lines and write the inverted lines back into the file. Then move the cursor back to the beginning of the file. 
+    The header should not be inverted and the file may be empty.
+
     Parameters:
-    - directory (str): The directory in which to generate the files.
-    - n_files (int): The number of files to generate.
+    - filename (str): The name of the CSV file.
 
     Returns:
-    - n_files (int): The number of files generated.
+    - filename (str): The name of the CSV file.
 
     Requirements:
     - os
-    - random
+    - pandas
 
     Example:
-    >>> random.seed(2)
-    >>> task_func('/path/to/directory', 5)
-    5
+    >>> task_func('file.csv')
+    'file.csv'
     """
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    for i in range(n_files):
-        filename = os.path.join(directory, f"file_{i+1}.txt")
-        with open(filename, 'w') as file:
-            file.write(str(random.randint(0, 9)))
-            file.seek(0)
-    return n_files
+    if not os.path.exists(filename):
+        return filename
+    with open(filename, 'r') as file:
+        if not file.read(1):
+            return filename
+    df = pd.read_csv(filename)
+    df = df.iloc[::-1]
+    df.to_csv(filename, index=False)
+    with open(filename, 'r+') as file:
+        file.seek(0)
+    return filename
 
 import unittest
-import shutil
 class TestCases(unittest.TestCase):
-    def base(self, dir, n_files, contents):
-        random.seed(42)
-        # Create directory
-        if not os.path.exists(dir):
-            os.makedirs(dir)
+    def base(self, filename, contents, expected):
+        # Create file
+        with open(filename, 'w') as f:
+            f.write(contents)
         # Run function
-        n = task_func(dir, n_files)
-        # Check files
-        self.assertEqual(n, n_files)
-        read_data = []
-        for f in sorted(os.listdir(dir)):
-            self.assertTrue(f.endswith('.txt'))
-            with open(os.path.join(dir, f), 'r') as file:
-                read_data.append(file.read())
-                file.seek(0)
-        self.assertEqual(read_data, contents)
-    def tearDown(self):
-        shutil.rmtree('./directory', ignore_errors=True)
-        shutil.rmtree('./dir', ignore_errors=True)
-        shutil.rmtree('./d', ignore_errors=True)
+        task_func(filename)
+        # Check file
+        with open(filename, 'r') as f:
+            self.assertEqual(f.read().strip(), expected.strip())
+        # Remove file
+        os.remove(filename)
     def test_case_1(self):
-        self.base('./directory', 5, ['1', '0', '4', '3', '3'])
+        self.base('file.csv', 'a,b,c\n1,2,3\n4,5,6\n7,8,9', 'a,b,c\n7,8,9\n4,5,6\n1,2,3')
     def test_case_2(self):
-        self.base('./dir', 10, ['1', '9', '0', '4', '3', '3', '2', '1', '8', '1'])
+        self.base('file.csv', 'a,b,c\n1,2,3\n4,5,6', 'a,b,c\n4,5,6\n1,2,3')
     def test_case_3(self):
-        self.base('./d', 15, ['1', '9', '6', '0', '0', '1', '3', '0', '4', '3', '3', '2', '1', '8', '1'])
+        self.base('file.csv', 'a,b,c\n1,2,3', 'a,b,c\n1,2,3')
     def test_case_4(self):
-        self.base('./d', 20, ['1', '9', '6', '0', '0', '1', '3', '3', '8', '9', '0', '0', '8', '4', '3', '3', '2', '1', '8', '1'])
+        self.base('file.csv', 'a,b,c', 'a,b,c')
     def test_case_5(self):
-        self.base('./directory', 25, ['1', '9', '6', '0', '0', '1', '3', '3', '8', '9', '0', '0', '8', '3', '8', '6', '3', '7', '4', '3', '3', '2', '1', '8', '1'])
+        self.base('file.csv', '', '')

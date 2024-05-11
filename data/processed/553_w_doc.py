@@ -1,81 +1,66 @@
-import collections
-import itertools
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 # Constants
-ITEMS = ['apple', 'banana']
+COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
 
-def task_func(a, b, items=ITEMS):
+def task_func(a, b):
     """
-    Combine two lists and record the frequency of predefined items in the combined list.
+    Generate a pandas DataFrame with random values based on lists 'a' and 'b', and plot it as a bar chart.
+    List 'a' sets the DataFrame's row indices, while the length of list 'b' determines the number of columns
+    using predefined names from the 'COLUMNS = ['A', 'B', 'C', 'D', 'E']' list.
 
     Parameters:
-    a (list): A list of items.
-    b (list): Another list of items.
-    items (list, optional): a list of predefined items
+    - a (list): A list used to define the number of rows in the DataFrame.
+    - b (list): Another list used to define the number of columns in the DataFrame. The actual column names are predefined.
 
     Returns:
-    matplotlib.axes.Axes: A bar chart showing the frequency of predefined items in the combined list.
+    - matplotlib.axes.Axes: The Axes object of the plotted bar chart.
 
     Requirements:
-    - collections
-    - itertools
-    - matplotlib.pyplot
+    - numpy
+    - pandas
+    - matplotlib
+
+    Data Structure:
+    - Uses pandas DataFrame to structure the data.
 
     Example:
-    >>> ax = task_func(['apple', 'banana', 'cherry'], ['date', 'elderberry', 'apple', 'banana', 'cherry'])
-    >>> isinstance(ax, matplotlib.axes.Axes)
-    True
+    >>> ax = task_func([1, 2, 3], ['A', 'B', 'C', 'D', 'E'])
     """
-    combined = list(itertools.chain(a, b))
-    counter = collections.Counter(combined)
-    item_counts = [counter.get(item, 0) for item in items]
-    fig, ax = plt.subplots()
-    ax.bar(items, item_counts, color='skyblue')
-    ax.set_xlabel('Items')
-    ax.set_ylabel('Frequency')
-    ax.set_title('Item Frequency in Combined List')
-    plt.xticks(rotation=45)
-    plt.tight_layout()  # Adjust layout to make room for item labels
+    if not a or not b:  # Check if either list is empty
+        fig, ax = plt.subplots()  # Creates a blank plot
+        plt.close(fig)  # Close the plot window to prevent it from showing empty plots
+        return ax
+    np.random.seed(0)
+    selected_columns = COLUMNS[:len(b)]
+    df = pd.DataFrame(np.random.randn(len(a), len(b)), index=a, columns=selected_columns)
+    ax = df.plot(kind='bar')
+    plt.show()
     return ax
 
 import unittest
 import matplotlib
 class TestCases(unittest.TestCase):
-    def test_standard_functionality(self):
-        """Test with typical list inputs."""
-        a = ['apple', 'banana', 'cherry']
-        b = ['banana', 'apple', 'apple', 'dragonfruit']
-        ax = task_func(a, b)
-        self.assertIsInstance(ax, plt.Axes)
-    def test_empty_lists(self):
-        """Test with both lists empty."""
-        a = []
-        b = []
-        ax = task_func(a, b)
-        self.assertIsInstance(ax, plt.Axes)
-    def test_one_empty_list(self):
-        """Test with one list empty."""
-        a = ['apple', 'apple']
-        b = []
-        ax = task_func(a, b)
-        self.assertIsInstance(ax, plt.Axes)
-    def test_non_predefined_items_only(self):
-        """Test with lists containing non-predefined items."""
-        a = ['cherry', 'dragonfruit']
-        b = ['cherry', 'mango']
-        ax = task_func(a, b)
-        self.assertIsInstance(ax, plt.Axes)
-    def test_all_predefined_items(self):
-        """Test with lists containing only predefined items."""
-        a = ['apple', 'apple']
-        b = ['banana']
-        ax = task_func(a, b)
-        self.assertIsInstance(ax, plt.Axes)
-    def test_duplicate_items(self):
-        """Test with lists containing duplicate items."""
-        a = ['apple', 'apple']
-        b = ['apple', 'banana', 'banana']
-        ax = task_func(a, b)
-        self.assertIsInstance(ax, plt.Axes)
+    def test_non_empty_lists(self):
+        """Test with valid non-empty lists."""
+        ax = task_func([1, 2, 3], ['A', 'B', 'C'])
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+    def test_empty_a_list(self):
+        """Test with an empty 'a' list."""
+        ax = task_func([], ['A', 'B', 'C'])
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+    def test_empty_b_list(self):
+        """Test with an empty 'b' list."""
+        ax = task_func([1, 2, 3], [])
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+    def test_both_lists_empty(self):
+        """Test with both 'a' and 'b' lists empty."""
+        ax = task_func([], [])
+        self.assertIsInstance(ax, matplotlib.axes.Axes)
+    def test_a_list_longer_than_columns(self):
+        """Test with 'a' list having more elements than predefined columns."""
+        ax = task_func([1, 2, 3, 4, 5, 6], ['A', 'B'])
+        self.assertIsInstance(ax, matplotlib.axes.Axes)

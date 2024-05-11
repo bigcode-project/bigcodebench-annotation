@@ -1,90 +1,80 @@
-import csv
+import zipfile
 import io
-from django.http import HttpRequest, FileResponse
+from django.http import FileResponse, HttpRequest
+from django.conf import settings
 
-def task_func(request, header, csv_data):
+def task_func(request, file_paths):
     """
-    This function generates a CSV file response from a Django HttpRequest. It constructs a CSV
-    file using the provided header and CSV data, and sends it back as a Django FileResponse.
-    This function is particularly useful in scenarios where you need to provide a downloadable
-    CSV file in response to a user request on a Django web application.
+    Generates a ZIP file response for a Django HttpRequest, zipping the specified files. This function is useful 
+    for scenarios where multiple file downloads are required in response to a web request. The actual HttpRequest 
+    is not utilized within the function but is required for compatibility with Django view structures.
 
     Parameters:
-    request (HttpRequest): The incoming Django HttpRequest.
-    header (list of str): List of strings representing the header of the CSV file.
-    csv_data (list of list of str): List of rows, with each row being a list of strings, to be written into the CSV file.
+    - request (HttpRequest): The incoming Django HttpRequest, not used within the function.
+    - file_paths (list of str): A list of file paths or file contents to be included in the zip.
 
     Returns:
-    FileResponse: A Django FileResponse object containing the CSV data as an attachment.
+    - FileResponse: A Django FileResponse object containing the ZIP file as an attachment.
 
     Requirements:
     - django.http
     - django.conf
-    - csv
+    - zipfile
     - io
 
     Examples:
     >>> from django.conf import settings
     >>> if not settings.configured:
-    ...     settings.configure()
+    ...     settings.configure()  # Add minimal necessary settings
+    >>> from django.http import HttpRequest
     >>> request = HttpRequest()
-    >>> header = ['id', 'name', 'email']
-    >>> csv_data = [['1', 'John Doe', 'john@example.com'], ['2', 'Jane Doe', 'jane@example.com']]
-    >>> response = task_func(request, header, csv_data)
+    >>> response = task_func(request)
     >>> response['Content-Type']
-    'text/csv'
+    'application/zip'
+    >>> request = HttpRequest()
+    >>> response = task_func(request)
     >>> response['Content-Disposition']
-    'attachment; filename="data.csv"'
+    'attachment; filename="files.zip"'
     """
-    csv_io = io.StringIO()
-    writer = csv.writer(csv_io)
-    writer.writerow(header)
-    writer.writerows(csv_data)
-    csv_io.seek(0)
-    response = FileResponse(csv_io, as_attachment=True, filename='data.csv')
-    response['Content-Type'] = 'text/csv'
+    zip_io = io.BytesIO()
+    with zipfile.ZipFile(zip_io, 'w') as zip_file:
+        for file_path in file_paths:
+            zip_file.writestr(file_path, 'This is the content of {}.'.format(file_path))
+    zip_io.seek(0)  # Reset the file pointer to the start of the stream
+    response = FileResponse(zip_io, as_attachment=True, filename='files.zip')
+    response['Content-Type'] = 'application/zip'
     return response
 
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from django.http import HttpRequest, FileResponse
-from django.conf import settings
 if not settings.configured:
     settings.configure()
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Prepare test data
         self.request = HttpRequest()
-        self.header = ['id', 'name', 'email']
-        self.csv_data = [['1', 'John Doe', 'john@example.com'], ['2', 'Jane Doe', 'jane@example.com']]
-    @patch('csv.writer')
-    @patch('io.StringIO')
-    def test_response_type(self, mock_string_io, mock_csv_writer):
-        # Test if the response is of type FileResponse
-        response = task_func(self.request, self.header, self.csv_data)
+        self.file_paths = ['file1.gz', 'file2.gz']  # Example file paths for testing
+    def test_response_type(self):
+        """Ensure the response is an instance of FileResponse."""
+        response = task_func(self.request, self.file_paths)
         self.assertIsInstance(response, FileResponse)
-    @patch('csv.writer')
-    @patch('io.StringIO')
-    def test_response_status_code(self, mock_string_io, mock_csv_writer):
-        # Test if the response has status code 200
-        response = task_func(self.request, self.header, self.csv_data)
+    def test_response_status_code(self):
+        """Response should have a status code of 200."""
+        response = task_func(self.request, self.file_paths)
         self.assertEqual(response.status_code, 200)
-    @patch('csv.writer')
-    @patch('io.StringIO')
-    def test_content_type(self, mock_string_io, mock_csv_writer):
-        # Test if the Content-Type header is set to 'text/csv'
-        response = task_func(self.request, self.header, self.csv_data)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-    @patch('csv.writer')
-    @patch('io.StringIO')
-    def test_attachment_filename(self, mock_string_io, mock_csv_writer):
-        # Test if the Content-Disposition is set correctly for file download
-        response = task_func(self.request, self.header, self.csv_data)
-        self.assertIn('attachment; filename="data.csv"', response['Content-Disposition'])
-    @patch('csv.writer')
-    @patch('io.StringIO')
-    def test_csv_file_content(self, mock_string_io, mock_csv_writer):
-        # Test if csv.writer methods are called to write the header and rows correctly
-        response = task_func(self.request, self.header, self.csv_data)
-        mock_csv_writer.return_value.writerow.assert_called_with(self.header)
-        mock_csv_writer.return_value.writerows.assert_called_with(self.csv_data)
+    def test_content_type(self):
+        """Content type of the response should be set to 'application/zip'."""
+        response = task_func(self.request, self.file_paths)
+        self.assertEqual(response['Content-Type'], 'application/zip')
+    def test_attachment_filename(self):
+        """The Content-Disposition should correctly specify the attachment filename."""
+        response = task_func(self.request, self.file_paths)
+        self.assertEqual(response['Content-Disposition'], 'attachment; filename="files.zip"')
+    @patch('zipfile.ZipFile')
+    def test_zip_file_content(self, mock_zip_file):
+        """Zip file should contain the specified files with correct content."""
+        mock_zip = MagicMock()
+        mock_zip_file.return_value.__enter__.return_value = mock_zip
+        task_func(self.request, self.file_paths)
+        mock_zip.writestr.assert_any_call('file1.gz', 'This is the content of file1.gz.')
+        mock_zip.writestr.assert_any_call('file2.gz', 'This is the content of file2.gz.')

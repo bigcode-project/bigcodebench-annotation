@@ -1,72 +1,77 @@
 import re
 import nltk
-from gensim.models import Word2Vec
-# Constants
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+
+# Make sure to download NLTK stopwords
+nltk.download('stopwords')
+
+# Define a regex pattern for matching all non-alphanumeric characters
 ALPHANUMERIC = re.compile('[\W_]+')
 
+# Load NLTK's list of English stop words
+STOPWORDS = nltk.corpus.stopwords.words('english')
 
-def task_func(texts, stopwords=None):
+
+def task_func(texts):
     """
-    Generate word vectors from a list of texts using the gensim Word2Vec model and nltk.corpus.stopwords.
-    The texts are first cleaned by removing all non-alphanumeric characters except space,
-    lowercased, and stop words are removed.
+    Creates a document-term matrix (DTM) from a list of text documents using CountVectorizer from Scikit-learn.
+    Texts are preprocessed by removing non-alphanumeric characters (excluding spaces),
+    converting to lowercase, and excluding English stop words defined in NLTK.
 
     Parameters:
-    texts (list): A list of strings.
-    stopwords (list, optional): A list of stopwords to be removed. If not provided, nltk's stopwords will be used.
+    - texts (list of str): The list of text documents to convert into a DTM.
 
     Returns:
-    Word2Vec: A trained Word2Vec model.
+    - pd.DataFrame: A DataFrame where rows represent documents and columns represent unique terms;
+                    cell values indicate the frequency of a term in a document.
 
     Requirements:
     - re
     - nltk
-    - gensim
+    - pandas
+    - sklearn.feature_extraction.text
 
     Example:
-    >>> texts = ["Hello, World!", "Machine Learning is great", "Python is my favorite programming language"]
-    >>> model = task_func(texts)
-    >>> vector = model.wv['python']
+    >>> texts = ["Hello, world!", "Machine learning is great.", "Python is my favorite programming language."]
+    >>> dtm = task_func(texts)
     """
-    if stopwords is None:
-        stopwords = nltk.corpus.stopwords.words('english')
     cleaned_texts = [ALPHANUMERIC.sub(' ', text).lower() for text in texts]
-    tokenized_texts = [[word for word in text.split() if word not in stopwords] for text in cleaned_texts]
-    if not tokenized_texts:
-        return Word2Vec(vector_size=100)
-    model = Word2Vec(sentences=tokenized_texts, vector_size=100, window=5, min_count=1, workers=4)
-    return model
+    tokenized_texts = [' '.join(word for word in text.split() if word not in STOPWORDS) for text in cleaned_texts]
+    vectorizer = CountVectorizer()
+    dtm = vectorizer.fit_transform(tokenized_texts)
+    dtm_df = pd.DataFrame(dtm.toarray(), columns= vectorizer.get_feature_names_out() if hasattr(vectorizer,
+                                                                  'get_feature_names_out') else vectorizer.get_feature_names())
+    return dtm_df
 
 import unittest
-stopwords_mock = ["is", "my", "a", "with", "and", "it", "to", "the", "of", "in"]
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
-        texts = ["Hello, World!", "Machine Learning is great", "Python is my favorite programming language"]
-        model = task_func(texts, stopwords=stopwords_mock)
-        self.assertIsInstance(model, Word2Vec)
-        self.assertIn('python', model.wv.key_to_index)
-        
-    def test_case_2(self):
-        texts = ["Hello!!!", "@Machine Learning", "Python###"]
-        model = task_func(texts, stopwords=stopwords_mock)
-        self.assertIsInstance(model, Word2Vec)
-        self.assertIn('python', model.wv.key_to_index)
-        
-    def test_case_3(self):
-        texts = []
-        model = task_func(texts, stopwords=stopwords_mock)
-        self.assertIsInstance(model, Word2Vec)
-        
-    def test_case_4(self):
-        texts = ["This is a long sentence with many words, and it should still work!", 
-                 "Another long sentence to check the function's capability."]
-        model = task_func(texts, stopwords=stopwords_mock)
-        self.assertIsInstance(model, Word2Vec)
-        self.assertIn('long', model.wv.key_to_index)
-        
-    def test_case_5(self):
-        texts = ["Bonjour", "Hola", "Ciao"]
-        model = task_func(texts, stopwords=stopwords_mock)
-        self.assertIsInstance(model, Word2Vec)
-        self.assertIn('bonjour', model.wv.key_to_index)
+    def setUp(self):
+        self.texts = [
+            "Hello, world!",
+            "Data science is about the extraction of knowledge from data.",
+            "Machine learning is a fascinating field.",
+            "Python is a versatile programming language.",
+            "Stop words are filtered out in text preprocessing."
+        ]
+    def test_dtm_shape(self):
+        """Ensure the DTM has the correct shape."""
+        dtm = task_func(self.texts)
+        self.assertEqual(dtm.shape[0], len(self.texts), "DTM should have one row per document.")
+    def test_dtm_non_negative(self):
+        """Ensure all values in the DTM are non-negative."""
+        dtm = task_func(self.texts)
+        self.assertTrue((dtm >= 0).all().all(), "All DTM values should be non-negative.")
+    def test_stopwords_removal(self):
+        """Check if common stopwords are removed."""
+        dtm = task_func(["This is a test.", "Another test here."])
+        self.assertNotIn("is", dtm.columns, "Stopwords should be removed from DTM columns.")
+    def test_alphanumeric_filtering(self):
+        """Verify that non-alphanumeric characters are filtered out."""
+        dtm = task_func(["Example: test!", "#Another$% test."])
+        self.assertFalse(any(char in dtm.columns for char in ":!#$%"), "Non-alphanumeric characters should be filtered out.")
+    def test_lowercase_conversion(self):
+        """Test if all text is converted to lowercase."""
+        dtm = task_func(["LoWeR and UPPER"])
+        self.assertIn("lower", dtm.columns, "All text should be converted to lowercase.")
+        self.assertIn("upper", dtm.columns, "All text should be converted to lowercase.")

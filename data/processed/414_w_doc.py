@@ -1,87 +1,167 @@
-import os
-from flask_mail import Mail
+import pandas as pd
+import numpy as np
 
-def task_func(app):
+
+def task_func(data, column="c"):
     """
-    Initialize a Flask application with Flask-Mail. 
+    Remove a column from a data dictionary if it exists, and then plot the remaining data
+    if it contains numeric data.
 
     Parameters:
-    app (Flask): The Flask application to configure.
+    - data (dict): The input data dictionary.
+    - column (str): Name of column to remove. Defaults to "c".
 
     Returns:
-    tuple: A tuple containing the Flask-Mail instance and the app's mail configurations.
+    - df (pd.DataFrame): The modified DataFrame after removing the specified column.
+    - ax (matplotlib.axes._axes.Axes or None): The plot of the modified DataFrame if there's
+      numeric data to plot, otherwise None.
 
-    Note:
-    - The details of the email server are retrieved from environment variables. 
-    - If the variables do not exist, use defaults.
-    
     Requirements:
-    - os
-    - flask_mail
+    - pandas
+    - numpy
 
     Example:
-    >>> from flask import Flask
-    >>> app = Flask("test")
-    >>> mail, configs = task_func(app)
-    >>> 'MAIL_SERVER' in configs
-    True
+    >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6], 'c': [7, 8, 9]}
+    >>> modified_df, ax = task_func(data)
+    >>> ax
+    <Axes: >
+    >>> modified_df
+       a  b
+    0  1  4
+    1  2  5
+    2  3  6
     """
-    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'localhost')
-    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 25))
-    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', False) == 'True'
-    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', None)
-    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', None)
-    mail = Mail(app)
-    return mail, {
-        'MAIL_SERVER': app.config['MAIL_SERVER'],
-        'MAIL_PORT': app.config['MAIL_PORT'],
-        'MAIL_USE_TLS': app.config['MAIL_USE_TLS'],
-        'MAIL_USERNAME': app.config['MAIL_USERNAME'],
-        'MAIL_PASSWORD': app.config['MAIL_PASSWORD']
-    }
+    df = pd.DataFrame(data)
+    if column in df.columns:
+        df = df.drop(columns=column)
+    if df.empty or not np.any(df.dtypes.apply(pd.api.types.is_numeric_dtype)):
+        return df, None
+    ax = df.plot()
+    return df, ax
 
 import unittest
-from unittest.mock import patch
-from flask import Flask
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.app = Flask("test")
     def test_case_1(self):
-        mail_instance, configs = task_func(self.app)
-        self.assertEqual(configs["MAIL_SERVER"], "localhost")
-        self.assertEqual(configs["MAIL_PORT"], 25)
-        self.assertEqual(configs["MAIL_USE_TLS"], False)
-        self.assertIsNone(configs["MAIL_USERNAME"])
-        self.assertIsNone(configs["MAIL_PASSWORD"])
-    @patch.dict('os.environ', {'MAIL_SERVER': 'test_server', 'MAIL_PORT': '2525', 'MAIL_USE_TLS': 'True', 'MAIL_USERNAME': 'test', 'MAIL_PASSWORD': 'password'})
+        # Scenario: DataFrame with columns 'a', 'b', and 'c'.
+        np.random.seed(0)
+        data = {
+                "a": np.random.randn(10),
+                "b": np.random.randn(10),
+                "c": np.random.randn(10),
+            }
+        df = pd.DataFrame(
+            data
+        )
+        modified_df, ax = task_func(data)  # Remove default column 'c'.
+        # Assert column 'c' removal and plot data verification.
+        self.assertNotIn("c", modified_df.columns)
+        plotted_data = [line.get_ydata() for line in ax.get_lines()]
+        self.assertTrue(
+            all(
+                [
+                    np.array_equal(data, modified_df[col].values)
+                    for data, col in zip(plotted_data, modified_df.columns)
+                ]
+            )
+        )
     def test_case_2(self):
-        mail_instance, configs = task_func(self.app)
-        self.assertEqual(configs["MAIL_SERVER"], "test_server")
-        self.assertEqual(configs["MAIL_PORT"], 2525)
-        self.assertEqual(configs["MAIL_USE_TLS"], True)
-        self.assertEqual(configs["MAIL_USERNAME"], "test")
-        self.assertEqual(configs["MAIL_PASSWORD"], "password")
-    @patch.dict('os.environ', {'MAIL_SERVER': 'another_server'})
+        # Scenario: DataFrame with columns 'a' and 'b' (no 'c').
+        np.random.seed(0)
+        data = {"a": np.random.randn(10), "b": np.random.randn(10)}
+        df = pd.DataFrame(data)
+        modified_df, ax = task_func(data)
+        # Assert that the modified DataFrame remains unchanged and plot is generated.
+        self.assertEqual(list(df.columns), list(modified_df.columns))
+        self.assertIsNotNone(ax)
     def test_case_3(self):
-        mail_instance, configs = task_func(self.app)
-        self.assertEqual(configs["MAIL_SERVER"], "another_server")
-        self.assertEqual(configs["MAIL_PORT"], 25)
-        self.assertEqual(configs["MAIL_USE_TLS"], False)
-        self.assertIsNone(configs["MAIL_USERNAME"])
-        self.assertIsNone(configs["MAIL_PASSWORD"])
-    @patch.dict('os.environ', {'MAIL_PORT': '3030', 'MAIL_USE_TLS': 'False'})
+        # Scenario: Empty DataFrame
+        data = {}
+        df = pd.DataFrame(data)
+        modified_df, ax = task_func(data)
+        # Assert empty DataFrame and no plot.
+        self.assertTrue(modified_df.empty)
+        self.assertIsNone(ax)
     def test_case_4(self):
-        mail_instance, configs = task_func(self.app)
-        self.assertEqual(configs["MAIL_SERVER"], "localhost")
-        self.assertEqual(configs["MAIL_PORT"], 3030)
-        self.assertEqual(configs["MAIL_USE_TLS"], False)
-        self.assertIsNone(configs["MAIL_USERNAME"])
-        self.assertIsNone(configs["MAIL_PASSWORD"])
-    @patch.dict('os.environ', {'MAIL_USERNAME': 'username'})
+        # Scenario: DataFrame with single non-numeric column 'c'.
+        data = {"c": ["apple", "banana", "cherry"]}
+        df = pd.DataFrame(data)
+        modified_df, ax = task_func(data)
+        # Assert empty DataFrame after 'c' removal and no plot.
+        self.assertTrue(modified_df.empty)
+        self.assertIsNone(ax)
     def test_case_5(self):
-        mail_instance, configs = task_func(self.app)
-        self.assertEqual(configs["MAIL_SERVER"], "localhost")
-        self.assertEqual(configs["MAIL_PORT"], 25)
-        self.assertEqual(configs["MAIL_USE_TLS"], False)
-        self.assertEqual(configs["MAIL_USERNAME"], "username")
-        self.assertIsNone(configs["MAIL_PASSWORD"])
+        np.random.seed(0)
+        # Scenario: DataFrame with columns 'a', 'b', 'c', and non-numeric column 'd'.
+        data = {
+                "a": np.random.randn(10),
+                "b": np.random.randn(10),
+                "c": np.random.randn(10),
+                "d": [
+                    "apple",
+                    "banana",
+                    "cherry",
+                    "date",
+                    "fig",
+                    "grape",
+                    "honeydew",
+                    "kiwi",
+                    "lime",
+                    "mango",
+                ],
+            }
+        df = pd.DataFrame(
+            data
+        )
+        modified_df, ax = task_func(data)
+        # Assert column 'c' removal and plot data verification excluding non-numeric column 'd'.
+        self.assertNotIn("c", modified_df.columns)
+        plotted_data = [line.get_ydata() for line in ax.get_lines()]
+        self.assertTrue(
+            all(
+                [
+                    np.array_equal(data, modified_df[col].values)
+                    for data, col in zip(plotted_data, modified_df.columns)
+                    if col != "d"
+                ]
+            )
+        )
+    def test_case_6(self):
+        # Scenario: Remove specified column.
+        np.random.seed(0)
+        data = {
+                "a": np.random.randn(10),
+                "b": np.random.randn(10),
+            }
+        df = pd.DataFrame(
+            data
+        )
+        modified_df, ax = task_func(df, column="a")
+        self.assertNotIn("a", modified_df.columns)
+        plotted_data = [line.get_ydata() for line in ax.get_lines()]
+        self.assertTrue(
+            all(
+                [
+                    np.array_equal(data, modified_df[col].values)
+                    for data, col in zip(plotted_data, modified_df.columns)
+                ]
+            )
+        )
+    def test_case_7(self):
+        # Scenario: Only non-numeric columns.
+        data = {
+                "a": ["apple", "banana"],
+                "b": ["cherry", "date"],
+                "c": ["fig", "grape"],
+            }
+        df = pd.DataFrame(
+            data
+        )
+        modified_df, ax = task_func(data)
+        self.assertNotIn("c", modified_df.columns)
+        pd.testing.assert_frame_equal(df[["a", "b"]], modified_df)
+        self.assertEqual(ax, None)
+    def tearDown(self):
+        plt.close("all")

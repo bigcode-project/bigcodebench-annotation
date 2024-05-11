@@ -1,83 +1,80 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.cluster import KMeans
 
-
-def task_func(df):
+def task_func(x_list, y_list):
     """
-    Divide the given DataFrame into a training set and a test set (70%: 30% split), separate the "target" column and return the four resulting DataFrames.
+    Perform K-Means clustering on the given data by first turning it into a DataFrame with two columns "x" and "y" and then return the labels and centroids.
 
     Parameters:
-    - df (pd.DataFrame): pandas DataFrame that contains a column named 'target'.
+    - x_list (list): List of data corresponding to 'x'
+    - y_list (list): List of data corresponding to 'y'
 
     Returns:
-    - tuple: A tuple containing four DataFrames: X_train, X_test, y_train, y_test.
+    tuple: The labels and centroids as numpy arrays.
+        - kmeans.labels_: A NumPy array where each element is the cluster label assigned to each data point. 
+        - kmeans.cluster_centers_: A NumPy array containing the coordinates of the cluster centers.
 
     Requirements:
     - pandas
     - sklearn
-    
+
     Example:
-    >>> np.random.seed(42)  # Ensure reproducibility
-    >>> df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=list('ABCDE'))  # Explicitly using np and pd
-    >>> df['target'] = np.random.randint(0, 2, size=100)  # Adding 'target' column using np
-    >>> X_train, X_test, y_train, y_test = task_func(df)
-    >>> print(X_train.shape)  # Expected shape of training data
-    (70, 5)
+    >>> df = pd.DataFrame({'x': [1, 2, 3, 4, 5, 6], 'y': [2, 3, 4, 5, 6, 7]})
+    >>> labels, centroids = task_func([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
     """
-    X = pd.DataFrame.drop(df, 'target', axis=1)
-    y = pd.DataFrame(df['target'])
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-    return X_train, X_test, y_train, y_test
+    df = pd.DataFrame({'x': x_list, 'y': y_list})
+    kmeans = KMeans(n_clusters=2, random_state=0).fit(df)
+    return kmeans.labels_, kmeans.cluster_centers_
 
 import unittest
-import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=list('ABCDE'))
-        df['target'] = np.random.randint(0, 2, size=100)
-        X_train, X_test, y_train, y_test = task_func(df)
-        self.assertEqual(X_train.shape, (70, 5))
-        self.assertEqual(X_test.shape, (30, 5))
-        self.assertEqual(y_train.shape[0], 70)
-        self.assertEqual(y_test.shape[0], 30)
+        labels, centroids = task_func([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
+        self.assertEqual(labels[0], 0)
+        self.assertEqual(labels[1], 0)
+        self.assertEqual(labels[2], 0)
+        self.assertEqual(labels[3], 1)
+        self.assertEqual(labels[4], 1)
+        self.assertEqual(labels[5], 1)
+        self.assertEqual(centroids[0][0], 2.)
+        self.assertEqual(centroids[0][1], 3.)
+        self.assertEqual(centroids[1][0], 5.)
+        self.assertEqual(centroids[1][1], 6.)
     def test_case_2(self):
-        df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'target': [0, 1, 0]})
-        X_train, X_test, y_train, y_test = task_func(df)
-        self.assertEqual(X_train.shape, (2, 2))
-        self.assertEqual(X_test.shape, (1, 2))
-        self.assertEqual(y_train.shape[0], 2)
-        self.assertEqual(y_test.shape[0], 1)
+        labels, centroids = task_func([1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2])
+        self.assertEqual(labels[0], 0)
+        self.assertEqual(labels[1], 0)
+        self.assertEqual(labels[2], 0)
+        self.assertEqual(labels[3], 0)
+        self.assertEqual(labels[4], 0)
+        self.assertEqual(labels[5], 0)
+        self.assertEqual(centroids[0][0], 1.)
+        self.assertEqual(centroids[0][1], 2.)
     def test_case_3(self):
-        df = pd.DataFrame({'A': [0, 0, 0], 'B': [0, 0, 0], 'target': [0, 0, 0]})
-        X_train, X_test, y_train, y_test = task_func(df)
-        self.assertEqual(X_train.shape, (2, 2))
-        self.assertEqual(X_test.shape, (1, 2))
-        self.assertEqual(y_train.shape[0], 2)
-        self.assertEqual(y_test.shape[0], 1)
-        self.assertEqual(X_train.iloc[0, 0], 0)
-        self.assertEqual(X_train.iloc[0, 1], 0)
-        self.assertEqual(X_train.iloc[1, 0], 0)
-        self.assertEqual(X_train.iloc[1, 1], 0)
-        self.assertEqual(X_test.iloc[0, 0], 0)
-        self.assertEqual(X_test.iloc[0, 1], 0)
-        if isinstance(y_train, pd.DataFrame):
-            self.assertEqual(y_train.iloc[0, 0], 0)
-            self.assertEqual(y_train.iloc[1, 0], 0)
-        else:
-            self.assertEqual(y_train.iloc[1], [0])
-            self.assertEqual(y_test.iloc[0], [0])
+        labels, centroids = task_func([1, 2, 3, 4, 5, 6], [2, 2, 2, 2, 2, 2])
+        self.assertEqual(labels[0], 0)
+        self.assertEqual(labels[1], 0)
+        self.assertEqual(labels[2], 0)
+        self.assertEqual(labels[3], 1)
+        self.assertEqual(labels[4], 1)
+        self.assertEqual(labels[5], 1)
+        self.assertEqual(centroids[0][0], 2.)
+        self.assertEqual(centroids[0][1], 2.)
+        self.assertEqual(centroids[1][0], 5.)
+        self.assertEqual(centroids[1][1], 2.)
     def test_case_4(self):
-        df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'target': [1, 1, 1]})
-        X_train, X_test, y_train, y_test = task_func(df)
-        self.assertEqual(X_train.shape, (2, 2))
-        self.assertEqual(X_test.shape, (1, 2))
-        self.assertEqual(y_train.shape[0], 2)
-        self.assertEqual(y_test.shape[0], 1)
-    
+        labels, centroids = task_func([0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0])
+        self.assertEqual(labels[0], 0)
+        self.assertEqual(labels[1], 0)
     def test_case_5(self):
-        df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'target': [0, 0, 0]})
-        X_train, X_test, y_train, y_test = task_func(df)
-        self.assertEqual(X_train.shape, (2, 2))
-        self.assertEqual(X_test.shape, (1, 2))
-        self.assertEqual(y_train.shape[0], 2)
-        self.assertEqual(y_test.shape[0], 1)
+        labels, centroids = task_func([1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6])
+        self.assertEqual(labels[0], 0)
+        self.assertEqual(labels[1], 0)
+        self.assertEqual(labels[2], 0)
+        self.assertEqual(labels[3], 1)
+        self.assertEqual(labels[4], 1)
+        self.assertEqual(labels[5], 1)
+        self.assertEqual(centroids[0][0], 2.)
+        self.assertEqual(centroids[0][1], 2.)
+        self.assertEqual(centroids[1][0], 5.)
+        self.assertEqual(centroids[1][1], 5.)

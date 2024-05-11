@@ -1,82 +1,72 @@
-from PIL import Image
-import numpy as np
-from skimage.transform import resize
-import matplotlib.pyplot as plt
-import os
+from django.http import HttpResponse
+from django.conf import settings
+import random
+import time
 
-def task_func(img_path, scale_factors=[0.5, 0.75, 1.5, 2.0]):
+def task_func(data, min_delay, max_delay):
     """
-    Open an image file and scale it by different scaling factors.
-    Display each scaled image using matplotlib and return the scaled images with their Axes.
-
+    After a random delay, generate a Django HttpResponse with JSON data to simulate the latency of the network.
+    
     Parameters:
-    img_path (str): Path to the image file.
-    scale_factors (list): List of scaling factors to apply. Default is [0.5, 0.75, 1.5, 2.0].
-
+    data (str): The data to be included in the response body.
+    min_delay (int): The minimum delay in seconds.
+    max_delay (int): The maximum delay in seconds.
+    
     Returns:
-    list of tuples: Each tuple contains (matplotlib.axes.Axes, numpy.ndarray) representing the Axes and the pixel values of the scaled image.
-
-    Raises:
-    FileNotFoundError: If the image file cannot be found.
-
+    HttpResponse: A Django HttpResponse with JSON data.
+    
     Requirements:
-    - PIL
-    - numpy
-    - scikit-image
-    - matplotlib.pyplot
-    - os
+    - django
+    - random
+    - time
 
     Example:
-    >>> dummy_img_path = "sample.png"
-    >>> Image.fromarray(np.random.randint(0, 255, (20, 20, 3), dtype=np.uint8)).save(dummy_img_path)
-    >>> result = task_func('sample.png')
-    >>> os.remove(dummy_img_path)
-    >>> for ax, img in result:
-    ...     print(ax.get_title(), img.shape)
-    Scale factor: 0.5 (10, 10, 3)
-    Scale factor: 0.75 (15, 15, 3)
-    Scale factor: 1.5 (30, 30, 3)
-    Scale factor: 2.0 (40, 40, 3)
+    >>> import json
+    >>> random.seed(0)
+    >>> response = task_func(json.dumps({"Sample-Key": "Sample-Value"}), 1, 5)
+    >>> response.status_code
+    200
+    >>> json.loads(response.content)
+    {"Sample-Key": "Sample-Value"}
     """
-    if not os.path.exists(img_path):
-        raise FileNotFoundError(f"No file found at {img_path}")
-    im = Image.open(img_path)
-    img_arr = np.array(im)
-    results = []
-    for scale_factor in scale_factors:
-        scaled_img_arr = resize(img_arr, (int(im.height * scale_factor), int(im.width * scale_factor)),
-                                mode='reflect', anti_aliasing=True)
-        fig, ax = plt.subplots()
-        ax.imshow(scaled_img_arr)
-        ax.set_title(f'Scale factor: {scale_factor}')
-        results.append((ax, scaled_img_arr))
-    return results
+    delay = random.uniform(min_delay, max_delay)
+    time.sleep(delay)
+    response = HttpResponse(data, content_type='application/json')
+    return response
 
 import unittest
-from PIL import Image
-import numpy as np
+import json
+import random
+if not settings.configured:
+    settings.configure(DEBUG=True)
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Create a dummy image for testing
-        self.dummy_img_path = "test_image.png"
-        Image.fromarray(np.random.randint(0, 255, (20, 20, 3), dtype=np.uint8)).save(self.dummy_img_path)
-    def tearDown(self):
-        # Cleanup the dummy image
-        os.remove(self.dummy_img_path)
-    def test_scale_factors(self):
-        results = task_func(self.dummy_img_path)
-        self.assertEqual(len(results), 4)  # Check for 4 scale factors
-    def test_return_type(self):
-        results = task_func(self.dummy_img_path)
-        for ax, img in results:
-            self.assertIsInstance(ax, plt.Axes)
-            self.assertIsInstance(img, np.ndarray)
-    def test_scale_factor_effect(self):
-        original_image = Image.open(self.dummy_img_path)
-        original_size = original_image.size
-        results = task_func(self.dummy_img_path)
-        for _, img in results:
-            self.assertNotEqual(img.shape[:2], original_size)  # Scaled image should differ in size
-    def test_invalid_path(self):
-        with self.assertRaises(FileNotFoundError):
-            task_func("nonexistent.png")
+    def test_case_1(self):
+        random.seed(0)
+        data = json.dumps({"key": "value"})
+        response = task_func(data, 1, 2)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {"key": "value"})
+    def test_case_2(self):
+        random.seed(0)
+        data = json.dumps({"test": "data", "sample": "value"})
+        response = task_func(data, 0, 1)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {"test": "data", "sample": "value"})
+    def test_case_3(self):
+        random.seed(0)
+        data = json.dumps({"hello": "world"})
+        response = task_func(data, 1, 3)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {"hello": "world"})
+    def test_case_4(self):
+        random.seed(0)
+        data = json.dumps({})
+        response = task_func(data, 0, 0)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {})
+    def test_case_5(self):
+        random.seed(0)
+        data = json.dumps({"a": 1, "b": 2, "c": 3})
+        response = task_func(data, 2, 4)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {"a": 1, "b": 2, "c": 3})

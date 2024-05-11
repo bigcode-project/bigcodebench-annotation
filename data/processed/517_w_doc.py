@@ -1,115 +1,119 @@
 import pandas as pd
 import numpy as np
-import statsmodels.api as sm
+from sklearn.decomposition import PCA
 
 
-def task_func(
-    array: list, random_seed: int = 0
-) -> (pd.DataFrame, sm.regression.linear_model.RegressionResultsWrapper):
+def task_func(array: list, random_seed: int = 42) -> (pd.DataFrame, np.ndarray):
     """
-    Generate a Pandas DataFrame from a 2D list and perform a multiple linear regression.
+    Converts a 2D list into a pandas DataFrame and applies PCA for dimensionality reduction.
 
-    The function first validates the input list, creates a DataFrame, separates independent and dependent variables,
-    adds a constant to the model, and fits a linear regression using statsmodels.
+    This function creates a DataFrame from the provided 2D list and then applies PCA to reduce the dataset
+    to its two main components. The function uses a fixed random seed to ensure reproducibility.
 
     Parameters:
-    - array (list of list of int): A 2D list where each sub-list represents a row of data.
-                                   Each sub-list should have exactly 5 elements, where the first 4 elements are
-                                   treated as independent variables ('A', 'B', 'C', 'D') and the last element is
-                                   the dependent (Response) variable.
-
-    - random_seed (int): A seed for reproducibility in numpy for statsmodels. Defaults to 0.
+    - array (list of list of int): A 2D list representing data rows and columns.
+    - random_seed (int, optional): The seed for the random number generator. Default is 42.
 
     Returns:
-    - df (pd.DataFrame): DataFrame with columns 'A', 'B', 'C', 'D', 'Response'.
-    - results (statsmodels.RegressionResults): Results of the linear regression.
+    - pd.DataFrame: The original data in DataFrame format.
+    - np.ndarray: The data after PCA transformation.
 
     Requirements:
     - pandas
     - numpy
-    - statsmodels.api.sm
+    - sklearn.decomposition.PCA
 
-    Example:
-    >>> df, results = task_func([[1,2,3,4,5], [6,7,8,9,10]])
+    Examples:
+    >>> data = [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
+    >>> df, transformed = task_func(data)
     >>> print(df)
-       A  B  C  D  Response
-    0  1  2  3  4         5
-    1  6  7  8  9        10
+        0   1   2   3   4
+    0   1   2   3   4   5
+    1   6   7   8   9  10
+    2  11  12  13  14  15
+    >>> print(transformed[:, 0])
+    [ 11.18033989  -0.         -11.18033989]
     """
-    COLUMNS = ["A", "B", "C", "D", "Response"]
-    np.random.seed(random_seed)
-    if not all(len(row) == len(COLUMNS) for row in array):
-        raise ValueError(
-            "Each sub-list in the input 2D list must have exactly 5 elements."
-        )
-    df = pd.DataFrame(array, columns=COLUMNS)
-    X = df[COLUMNS[:-1]]
-    y = df["Response"]
-    X = sm.add_constant(X)
-    model = sm.OLS(y, X)
-    results = model.fit()
-    return df, results
+    df = pd.DataFrame(array)
+    pca = PCA(n_components=2, random_state=random_seed)
+    transformed_data = pca.fit_transform(df)
+    return df, transformed_data
 
 import unittest
 import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Testing dataframe creation, model accuracy, and parameters with various numeric data types
-        test_data = [
-            ([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]], 42, 1.0),  # Positive values
-            ([[-1, -2, -3, -4, -5], [-6, -7, -8, -9, -10]], 42, 1.0),  # Negative values
-            (
-                [[100, 200, 300, 400, 500], [600, 700, 800, 900, 1000]],
-                42,
-                1.0,
-            ),  # Large values
-        ]
-        for array, random_seed, expected_r2 in test_data:
-            with self.subTest(array=array):
-                df, results = task_func(array, random_seed=random_seed)
-                expected_df = pd.DataFrame(
-                    array, columns=["A", "B", "C", "D", "Response"]
-                )
-                self.assertTrue(df.equals(expected_df))
-                self.assertAlmostEqual(results.rsquared, expected_r2, places=2)
-                for param in results.params:
-                    self.assertNotEqual(param, 0)
-    def test_case_2(self):
-        # Testing with more rows in the 2D list to ensure model scalability and consistency
-        random_seed = 42
-        array = [
-            [1, 2, 3, 4, 5],
-            [6, 7, 8, 9, 10],
-            [11, 12, 13, 14, 15],
-            [16, 17, 18, 19, 20],
-        ]
-        df, results = task_func(array, random_seed=random_seed)
-        expected_df = pd.DataFrame(array, columns=["A", "B", "C", "D", "Response"])
+        # Test basic 2-row dataset
+        data = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
         self.assertTrue(df.equals(expected_df))
-        self.assertAlmostEqual(results.rsquared, 1.0, places=2)
-        for param in results.params:
-            self.assertNotEqual(param, 0)
+        self.assertEqual(transformed_data.shape, (2, 2))
+    def test_case_2(self):
+        # Test basic 3-row dataset
+        data = [[10, 20, 30, 40, 50], [60, 70, 80, 90, 100], [110, 120, 130, 140, 150]]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (3, 2))
     def test_case_3(self):
-        # Testing input validation for incorrect number of columns in a row
-        array = [[1, 2, 3, 4], [5, 6, 7, 8]]  # Missing dependent variable
-        with self.assertRaises(ValueError):
-            task_func(array)
+        # Test mix of positive, negative, zero values
+        data = [[-1, -2, -3, -4, -5], [5, 6, 7, 8, 9], [0, 0, 0, 0, 0]]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (3, 2))
     def test_case_4(self):
-        # Testing handling of non-numeric values to ensure type safety
-        array = [["a", "b", "c", "d", "e"]]  # All elements as strings
-        with self.assertRaises(ValueError):
-            df, results = task_func(array)
-            # This assumes the function is modified to catch and raise ValueError for non-numeric inputs
+        # Test 4-row dataset with incremental pattern
+        data = [
+            [5, 15, 25, 35, 45],
+            [55, 65, 75, 85, 95],
+            [105, 115, 125, 135, 145],
+            [155, 165, 175, 185, 195],
+        ]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (4, 2))
     def test_case_5(self):
-        # Testing reproducibility by using the same random_seed
-        array = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
-        random_seed = 123
-        df1, results1 = task_func(array, random_seed=random_seed)
-        df2, results2 = task_func(array, random_seed=random_seed)
-        self.assertTrue(df1.equals(df2))
-        self.assertEqual(results1.params.tolist(), results2.params.tolist())
+        # Test uniform rows
+        data = [[10, 10, 10, 10, 10], [20, 20, 20, 20, 20], [30, 30, 30, 30, 30]]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (3, 2))
     def test_case_6(self):
-        # Testing with an empty array to check function's handling of no input data
-        array = []
+        # Test single row (should fail since it's < n_components)
         with self.assertRaises(ValueError):
-            task_func(array)
+            data = [[1, 2, 3, 4, 5]]
+            task_func(data)
+    def test_case_7(self):
+        # Test large numbers
+        data = [[1000000000, 2000000000], [-1000000000, -2000000000]]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (2, 2))
+    def test_case_8(self):
+        # Test correctness of PCA
+        data = [[2, 3], [3, 4], [5, 6]]
+        _, transformed_data = task_func(data)
+        # Using the sklearn PCA output as the expected transformation
+        expected_transformation = np.array(
+            [
+                [-1.88561808e00, 1.93816421e-16],
+                [-4.71404521e-01, 3.32511118e-16],
+                [2.35702260e00, 2.21555360e-16],
+            ]
+        )
+        np.testing.assert_almost_equal(
+            transformed_data, expected_transformation, decimal=5
+        )
+    def test_case_9(self):
+        # Test floats
+        data = [[1.5, 2.5], [3.5, 4.5], [5.5, 6.5]]
+        df, transformed_data = task_func(data)
+        expected_df = pd.DataFrame(data)
+        self.assertTrue(df.equals(expected_df))
+        self.assertEqual(transformed_data.shape, (3, 2))

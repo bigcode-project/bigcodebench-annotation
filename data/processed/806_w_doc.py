@@ -1,98 +1,92 @@
-import pandas as pd
-import random
+import re
+import nltk
+nltk.download('stopwords')
 
+from nltk.corpus import stopwords
 
-def task_func(dictionary, item, seed):
+from collections import Counter
+
+# Constants
+STOPWORDS = set(stopwords.words('english'))
+
+def task_func(text, n=2):
     """
-    Converts a dictionary to a pandas DataFrame and find the locations of a particular item in the resulting DataFrame.
-    Counts the number of occurences and adds a random integer x, where 0 <=x < 10, to it.
+    Remove duplicate and stopwords from a string "text."
+    Then, generate a count of n-grams (default is bigrams) in the text.
 
     Parameters:
-    dict (dictionary): The dictionary to search.
-    item (str): The item to find.
-    seed(int): seed for random number generation.
+    - text (str): The text string to analyze.
+    - n (int): The size of the n-grams.
 
     Returns:
-    list: A list of tuples. Each tuple contains the row-index and column-name where the item is found.
-    int: The number of occurences with the added random number.
-    DataFrame: The converted dictionary.
+    - dict: The count of the n-grams in the text.
 
     Requirements:
-    - pandas
-    - random
+    - re
+    - nltk.corpus.stopwords
+    - collections.Counter
 
     Example:
-    >>> dict = {'A': ['apple', 'banana'], 'B': ['orange', 'apple']}
-    >>> task_func(dict, 'apple', seed=12)
-    ([(0, 'A'), (1, 'B')], 9,         A       B
-    0   apple  orange
-    1  banana   apple)
-    
-    >>> dict = {'A': ['a', 'b', 'e'], 'B': ['c', 'd', 'd'], '2': ['asdf', 'ddd', 'aaaa'], '12': ['e', 'e', 'd']}
-    >>> task_func(dict, 'e', seed=2)
-    ([(2, 'A'), (0, '12'), (1, '12')], 3,    A  B     2 12
-    0  a  c  asdf  e
-    1  b  d   ddd  e
-    2  e  d  aaaa  d)
+    >>> text = "The quick brown fox jumps over the lazy dog and the dog was not that quick to respond."
+    >>> ngrams = task_func(text)
+    >>> print(ngrams)
+    Counter({('quick', 'brown'): 1, ('brown', 'fox'): 1, ('fox', 'jumps'): 1, ('jumps', 'lazy'): 1, ('lazy', 'dog'): 1, ('dog', 'dog'): 1, ('dog', 'quick'): 1, ('quick', 'respond'): 1})
     """
-    random.seed(seed)
-    random_int = random.randint(0, 9)
-    df = pd.DataFrame(dictionary)
-    positions = [(index, col) for col in df for index, val in enumerate(df[col]) if val == item]
-    return positions, len(positions) + random_int , df
+    text = re.sub(r'[^\w\s]', '', text)  # Remove all punctuation
+    text = re.sub(r'\s+', ' ', text)  # Normalize whitespace
+    words = [word.lower() for word in text.split() if word.lower() not in STOPWORDS]
+    ngrams = zip(*[words[i:] for i in range(n)])
+    return Counter(ngrams)
 
 import unittest
-import pandas as pd
-from faker import Faker
-fake = Faker()
+from collections import Counter
+import string
 class TestCases(unittest.TestCase):
-    
     def test_case_1(self):
-        # Simple dict
-        dictionary = {'A': ['apple', 'banana'], 'B': ['orange', 'apple']}
-        result, count, df = task_func(dictionary, 'apple', 2222)
-        expected_result = [(0, 'A'), (1, 'B')]
-        self.assertCountEqual(result, expected_result)
-        self.assertEqual(count, 5)
-        pd.testing.assert_frame_equal(pd.DataFrame(dictionary), df)
+        """
+        Test Case 1: Simple Text
+        - Input: A simple text string with no duplicated words or stopwords
+        - Expected Output: A Counter object with the count of each bigram
+        """
+        text = "The quick brown fox jumps over the lazy dog."
+        result = task_func(text)
+        expected = Counter({('quick', 'brown'): 1, ('brown', 'fox'): 1, ('fox', 'jumps'): 1, ('jumps', 'lazy'): 1, ('lazy', 'dog'): 1})
+        self.assertEqual(result, expected)
     def test_case_2(self):
-        # No occurrence of the item
-        dictionary = {'A': ['orange', 'banana'], 'B': ['orange', 'banana']}
-        result, count, df = task_func(dictionary, 'apple', seed=12)
-        expected_result = []
-        self.assertCountEqual(result, expected_result)
-        self.assertEqual(count, 7)
-        pd.testing.assert_frame_equal(pd.DataFrame(dictionary), df)
+        """
+        Test Case 2: Text with Duplicated Words
+        - Input: A text string with duplicated consecutive words
+        - Expected Output: A Counter object with the count of each bigram, excluding duplicated words
+        """
+        text = "This is is a simple simple test test."
+        result = task_func(text)
+        expected = Counter({('simple', 'simple'): 1, ('simple', 'test'): 1, ('test', 'test'): 1})
+        self.assertEqual(result, expected)
     def test_case_3(self):
-        # Larger dict
-        fake.random.seed(111)
-        dictionary = {
-            'A': [fake.random_element(elements=('apple', 'banana', 'orange')) for _ in range(10)],
-            'B': [fake.random_element(elements=('apple', 'banana', 'orange')) for _ in range(10)],
-            'C': [fake.random_element(elements=('apple', 'banana', 'orange')) for _ in range(10)]
-        }
-        result, count, df = task_func(dictionary, 'apple', seed=22)
-        expected_result = [(index, col) for col in df for index, val in enumerate(df[col]) if val == 'apple']
-        self.assertCountEqual(result, expected_result)
-        self.assertEqual(count, 10)
-        pd.testing.assert_frame_equal(pd.DataFrame(dictionary), df)
-    
+        """
+        Test Case 3: Text with Stopwords
+        - Input: A text string with common English stopwords
+        - Expected Output: A Counter object with the count of each bigram, excluding stopwords
+        """
+        text = "This is a test of the function."
+        result = task_func(text)
+        expected = Counter({('test', 'function'): 1})
+        self.assertEqual(result, expected)
     def test_case_4(self):
-        # Empty dict
-        dictionary = {}
-        result, count, df = task_func(dictionary, 'apple', seed=112)
-        expected_result = []
-        self.assertCountEqual(result, expected_result)
-        self.assertEqual(count, 7)
-        pd.testing.assert_frame_equal(pd.DataFrame(dictionary), df)
+        # This test involves punctuation; ensure punctuation handling is consistent with function logic
+        text = "Hello, world!"
+        result = task_func(text)
+        expected = Counter({
+            ('hello', 'world'): 1
+        })
+        self.assertEqual(result, expected)
     def test_case_5(self):
-        # dict with non-string values
-        dictionary = {
-            'A': [1, 2, 3, 4, 5],
-            'B': [2, 3, 4, 5, 6]
-        }
-        result, count, df = task_func(dictionary, 3, seed=32)
-        expected_result = [(2, 'A'), (1, 'B')]
-        self.assertCountEqual(result, expected_result)
-        self.assertEqual(count, 3)
-        pd.testing.assert_frame_equal(pd.DataFrame(dictionary), df)
+        """
+        Test Case 5: Empty Text
+        - Input: An empty text string
+        - Expected Output: An empty Counter object
+        """
+        text = ""
+        result = task_func(text)
+        expected = Counter()
+        self.assertEqual(result, expected)

@@ -1,92 +1,112 @@
-from flask import Flask
-import os
-from flask_mail import Mail
+import re
+import requests
+import json
+import csv
+import os  
 
-def task_func(app_name):
+# Constants
+API_URL = 'https://api.example.com/data'
+
+def task_func(pattern):
     """
-    Initializes a Flask-Mail instance for sending emails using the generated Flask application with the specified app_name. 
-    
+    Make a GET request to an API, extract data that matches a RegEx pattern, and write it to a CSV file.
+
     Parameters:
-    app_name (string): The Flask application name
+    pattern (str): The regex pattern to match.
 
     Returns:
-    tuple: A tuple containing the Flask-Mail instance and the app's mail configurations.
+    str: The absolute path to the CSV file containing matched data. If no data is matched, the file will be empty.
 
     Note:
-    - The details of the email server are retrieved from environment variables. 
-    - If the variables do not exist, use defaults:
-      - 'MAIL_SERVER': 'localhost'
-      - 'MAIL_PORT': 25
-      - 'MAIL_USE_TLS': False (boolean)
-      - 'MAIL_USERNAME': None
-      - 'MAIL_PASSWORD': None
-    
+    - The CSV file generated name is "matched_data.csv"
+    - The JSON response from the GET request in the API contains a key named "data", from which the data is extracted.
+
     Requirements:
-    - flask
+    - requests
+    - json
+    - csv
+    - re
     - os
-    - flask_mail
 
     Example:
-    >>> mail, configs = task_func("test")
-    >>> print(mail.__getattribute__("app").name)
-    test
+    >>> task_func(r'\\\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,}\\\\b')
+    '/absolute/path/to/matched_data.csv'
+    >>> task_func(r'\\\\d{3}-\\\\d{2}-\\\\d{4}')  # For matching SSN format
+    '/absolute/path/to/matched_data.csv'
     """
-    app = Flask(app_name)
-    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'localhost')
-    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 25))
-    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', False) == 'True'
-    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', None)
-    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', None)
-    mail = Mail(app)
-    return mail, {
-        'MAIL_SERVER': app.config['MAIL_SERVER'],
-        'MAIL_PORT': app.config['MAIL_PORT'],
-        'MAIL_USE_TLS': app.config['MAIL_USE_TLS'],
-        'MAIL_USERNAME': app.config['MAIL_USERNAME'],
-        'MAIL_PASSWORD': app.config['MAIL_PASSWORD']
-    }
+    response = requests.get(API_URL)
+    data = json.loads(response.text)
+    matched_data = [re.findall(pattern, str(item)) for item in data['data']]
+    with open('matched_data.csv', 'w') as f:
+        writer = csv.writer(f)
+        writer.writerows(matched_data)
+    return os.path.abspath('matched_data.csv')
 
 import unittest
-from unittest.mock import patch
-from flask import Flask
+from unittest.mock import patch, Mock
+import os
+def mock_requests_get(*args, **kwargs):
+    class MockResponse:
+        def __init__(self, json_data):
+            self.json_data = json_data
+            self.text = json.dumps(json_data)
+        
+        def json(self):
+            return self.json_data
+    if args[0] == 'https://api.example.com/data':
+        return MockResponse(MOCK_API_RESPONSES.pop(0))
+    return MockResponse(None)
+MOCK_API_RESPONSES = [
+    {"data": ["john.doe@example.com", "jane.smith@domain.org"]},
+    {"data": ["123-45-6789", "987-65-4321"]},
+    {"data": ["apple", "banana", "cherry"]},
+    {"data": []},
+    {"data": ["test1@example.com", "test2@domain.org", "123-45-6789", "apple"]}
+]
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        mail_instance, configs = task_func("test_case")
-        self.assertEqual(configs["MAIL_SERVER"], "localhost")
-        self.assertEqual(configs["MAIL_PORT"], 25)
-        self.assertEqual(configs["MAIL_USE_TLS"], False)
-        self.assertIsNone(configs["MAIL_USERNAME"])
-        self.assertIsNone(configs["MAIL_PASSWORD"])
-    @patch.dict('os.environ', {'MAIL_SERVER': 'test_server', 'MAIL_PORT': '2525', 'MAIL_USE_TLS': 'True', 'MAIL_USERNAME': 'test', 'MAIL_PASSWORD': 'password'})
-    def test_case_2(self):
-        mail_instance, configs = task_func("test_case_2")
-        self.assertEqual(configs["MAIL_SERVER"], "test_server")
-        self.assertEqual(configs["MAIL_PORT"], 2525)
-        self.assertEqual(configs["MAIL_USE_TLS"], True)
-        self.assertEqual(configs["MAIL_USERNAME"], "test")
-        self.assertEqual(configs["MAIL_PASSWORD"], "password")
-        self.assertEqual(mail_instance.__getattribute__("app").name, "test_case_2")
-    @patch.dict('os.environ', {'MAIL_SERVER': 'another_server'})
-    def test_case_3(self):
-        mail_instance, configs = task_func("test_case")
-        self.assertEqual(configs["MAIL_SERVER"], "another_server")
-        self.assertEqual(configs["MAIL_PORT"], 25)
-        self.assertEqual(configs["MAIL_USE_TLS"], False)
-        self.assertIsNone(configs["MAIL_USERNAME"])
-        self.assertIsNone(configs["MAIL_PASSWORD"])
-    @patch.dict('os.environ', {'MAIL_PORT': '3030', 'MAIL_USE_TLS': 'False'})
-    def test_case_4(self):
-        mail_instance, configs = task_func("test_case")
-        self.assertEqual(configs["MAIL_SERVER"], "localhost")
-        self.assertEqual(configs["MAIL_PORT"], 3030)
-        self.assertEqual(configs["MAIL_USE_TLS"], False)
-        self.assertIsNone(configs["MAIL_USERNAME"])
-        self.assertIsNone(configs["MAIL_PASSWORD"])
-    @patch.dict('os.environ', {'MAIL_USERNAME': 'username'})
-    def test_case_5(self):
-        mail_instance, configs = task_func("test_case")
-        self.assertEqual(configs["MAIL_SERVER"], "localhost")
-        self.assertEqual(configs["MAIL_PORT"], 25)
-        self.assertEqual(configs["MAIL_USE_TLS"], False)
-        self.assertEqual(configs["MAIL_USERNAME"], "username")
-        self.assertIsNone(configs["MAIL_PASSWORD"])
+    def setUp(self):
+        if os.path.exists("matched_data.csv"):
+            os.remove("matched_data.csv")
+    def tearDown(self):
+        if os.path.exists("matched_data.csv"):
+            os.remove("matched_data.csv")
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_1(self, mock_get):
+        result = task_func(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b')
+        self.assertTrue(os.path.exists(result))
+        with open("matched_data.csv", "r") as file:
+            content = file.read()
+            self.assertIn("john.doe@example.com", content)
+            self.assertIn("jane.smith@domain.org", content)
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_2(self, mock_get):
+        result = task_func('\d{3}-\d{2}-\d{4}')
+        self.assertTrue(os.path.exists(result))
+        with open("matched_data.csv", "r") as file:
+            content = file.read()
+            self.assertIn("123-45-6789", content)
+            self.assertIn("987-65-4321", content)
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_3(self, mock_get):
+        result = task_func(r'apple')
+        self.assertTrue(os.path.exists(result))
+        with open("matched_data.csv", "r") as file:
+            content = file.read()
+            self.assertIn("apple", content)
+            self.assertNotIn("banana", content)
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_4(self, mock_get):
+        result = task_func(r'no_match')
+        self.assertTrue(os.path.exists(result))
+        with open("matched_data.csv", "r") as file:
+            content = file.read()
+            self.assertEqual(content, "")
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_case_5(self, mock_get):
+        result = task_func(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b')
+        self.assertTrue(os.path.exists(result))
+        with open("matched_data.csv", "r") as file:
+            content = file.read()
+            self.assertNotIn("john.doe@example.com", content)
+            self.assertNotIn("jane.smith@domain.org", content)
+            self.assertIn("test1@example.com", content)

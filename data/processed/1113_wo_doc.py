@@ -1,103 +1,98 @@
 import csv
-import random
+import collections
 
-# Constants
-DATA = ['Temperature', 'Humidity', 'Pressure']
-RANGE = {
-    'Temperature': (-50, 50),
-    'Humidity': (0, 100),
-    'Pressure': (980, 1040)
-}
-
-def task_func(file_name="data.csv"):
+def task_func(csv_file, emp_prefix='EMP$$'):
     """
-    Generate a CSV file with weather data for each hour of the current day.
-
+    Count the number of records for each employee in a CSV file.
+    
     Parameters:
-    file_name (str): The path to the CSV file to be created.
+    csv_file (str): The path to the CSV file. This parameter is mandatory.
+    emp_prefix (str): The prefix of the employee IDs. Default is 'EMP$$'.
     
     Returns:
-    str: The path to the created file.
-
-    Note:
-    - The row names for the csv are 'Temperature', 'Humidity', and 'Pressure' 
-    - Temperature ranged rom -50 to 50
-    - Humidity ranged rom 0 to 100
-    - Pressure ranged rom 980 to 1040
-
+    dict: A dictionary with the count of records for each employee.
+    
     Requirements:
-    - os
-    - datetime
     - csv
-    - random
-
+    - collections
+    
     Example:
-    >>> task_func("data.csv")
-    'path/to/data.csv'
+    >>> counts = task_func('/path/to/file.csv')
+    >>> print(counts)
+    {'EMP$$001': 5, 'EMP$$002': 3}
     """
-    with open(file_name, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Time'] + DATA)
-        for hour in range(24):
-            row = [f'{hour}:00']
-            for data_type in DATA:
-                min_val, max_val = RANGE[data_type]
-                row.append(random.uniform(min_val, max_val))
-            writer.writerow(row)
-    return file_name
+    counter = collections.Counter()
+    try:
+        with open(csv_file, 'r') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if row[0].startswith(emp_prefix):
+                    counter[row[0]] += 1
+    except FileNotFoundError:
+        return {"error": f"The file {csv_file} was not found."}
+    except Exception as e:
+        return {"error": str(e)}
+    return dict(counter)
 
 import unittest
 import os
-import csv
-import random
 class TestCases(unittest.TestCase):
+    
     def setUp(self):
-        # Setup for the test cases, creating a mock file name
-        self.mock_file_name = "test_task_func_data.csv"
+        # Preparing test data
+        self.test_csv_content1 = """EMP$$001,John Doe,Developer
+EMP$$002,Jane Smith,Manager
+EMP$$001,John Doe,Developer
+EMP$$001,John Doe,Developer
+EMP$$003,James Bond,Agent
+EMP$$001,John Doe,Developer
+EMP$$002,Jane Smith,Manager
+EMP$$001,John Doe,Developer
+EMP$$002,Jane Smith,Manager
+"""
+        self.test_csv_content2 = """EMP$$004,Mary Jane,Designer
+EMP$$005,Clark Kent,Reporter
+EMP$$004,Mary Jane,Designer
+EMP$$006,Bruce Wayne,Entrepreneur
+"""
+        # Writing the content to temporary CSV files for testing
+        self.test_csv_path1 = "task_func_test_csv1.csv"
+        self.test_csv_path2 = "task_func_test_csv2.csv"
+        with open(self.test_csv_path1, "w") as file:
+            file.write(self.test_csv_content1)
+        with open(self.test_csv_path2, "w") as file:
+            file.write(self.test_csv_content2)
         
+        self.empty_csv_path = "task_func_empty_csv.csv"
+        with open(self.empty_csv_path, "w") as file:
+            file.write("")
     def tearDown(self):
-        # Cleanup after each test, removing the generated file if it exists
-        if os.path.exists(self.mock_file_name):
-            os.remove(self.mock_file_name)
+        os.remove(self.test_csv_path1)
+        os.remove(self.test_csv_path2)
+        os.remove(self.empty_csv_path)
     def test_case_1(self):
-        # Testing default file name
-        random.seed(0)
-        returned_file = task_func(self.mock_file_name)
-        self.assertTrue(os.path.exists(returned_file))
-        
+        # Testing with the first CSV content
+        result = task_func(self.test_csv_path1)
+        expected = {'EMP$$001': 5, 'EMP$$002': 3, 'EMP$$003': 1}
+        self.assertEqual(result, expected)
     def test_case_2(self):
-        # Testing custom file name
-        random.seed(0)
-        returned_file = task_func(self.mock_file_name)
-        self.assertTrue(os.path.exists(returned_file))
-        
+        # Testing with the second CSV content
+        result = task_func(self.test_csv_path2)
+        expected = {'EMP$$004': 2, 'EMP$$005': 1, 'EMP$$006': 1}
+        self.assertEqual(result, expected)
     def test_case_3(self):
-        # Testing content structure of the CSV file
-        random.seed(0)
-        task_func(self.mock_file_name)
-        with open(self.mock_file_name, 'r') as file:
-            reader = csv.reader(file)
-            header = next(reader)
-            self.assertEqual(header, ['Time', 'Temperature', 'Humidity', 'Pressure'])
-            
+        # Testing with a non-existent file path
+        result = task_func('/path/to/non_existent_file.csv')
+        expected = {'error': 'The file /path/to/non_existent_file.csv was not found.'}
+        self.assertEqual(result, expected)
     def test_case_4(self):
-        # Testing content data ranges of the CSV file
-        random.seed(0)
-        task_func(self.mock_file_name)
-        with open(self.mock_file_name, 'r') as file:
-            reader = csv.reader(file)
-            next(reader)  # Skip header
-            for row in reader:
-                temp, humidity, pressure = float(row[1]), float(row[2]), float(row[3])
-                self.assertTrue(-50 <= temp <= 50)
-                self.assertTrue(0 <= humidity <= 100)
-                self.assertTrue(980 <= pressure <= 1040)
-                
+        # Testing with a different prefix
+        result = task_func(self.test_csv_path1, emp_prefix="EMP$$003")
+        expected = {'EMP$$003': 1}
+        self.assertEqual(result, expected)
+        
     def test_case_5(self):
-        # Testing number of rows (24 hours + header)
-        random.seed(0)
-        task_func(self.mock_file_name)
-        with open(self.mock_file_name, 'r') as file:
-            reader = csv.reader(file)
-            rows = list(reader)
-            self.assertEqual(len(rows), 25)
+        # Testing with an empty CSV content
+        result = task_func(self.empty_csv_path)
+        expected = {}
+        self.assertEqual(result, expected)

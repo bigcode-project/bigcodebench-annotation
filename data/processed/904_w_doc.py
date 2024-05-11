@@ -1,67 +1,73 @@
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
 
-def task_func(d, target='z'):
+def task_func(d, keys=['x', 'y', 'z']):
     """
-    Perform linear regression to "x," "y," against "z" from a list of dictionaries "d."
-
+    Plot values from a list of dictionaries based on specified keys and return the plot as a Matplotlib Axes object.
+    
     Parameters:
-    d (list): A list of dictionaries.
-    target (str): The target variable for the regression.
+    d (list): A list of dictionaries containing numerical data.
+    keys (list, optional): A list of string keys to plot. Defaults to ['x', 'y', 'z'].
 
     Returns:
-    LinearRegression: A LinearRegression model.
+    Matplotlib Axes object: The plot showing the values of specified keys from the input list of dictionaries.
 
     Requirements:
     - pandas
-    - sklearn.linear_model.LinearRegression
+    - matplotlib.pyplot
 
-    Examples:
+    Example:
     >>> data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
-    >>> model = task_func(data)
-    >>> isinstance(model, LinearRegression)
-    True
+    >>> ax = task_func(data)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
 
-    >>> data = [{'x': 4, 'y': 20, 'z': 10}, {'x': 5, 'y': 25, 'z': 15}, {'x': 6, 'y': 5, 'z': 20}]
-    >>> model = task_func(data, target='y')
-    >>> isinstance(model, LinearRegression)
-    True
+    >>> ax = task_func(data, keys=['x', 'y'])
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
     df = pd.DataFrame(d)
-    predictors = [k for k in df.columns if k != target]
-    X = df[predictors]
-    y = df[target]
-    model = LinearRegression().fit(X, y)
-    return model
+    fig, ax = plt.subplots()
+    plotted_keys = []
+    for key in keys:
+        if key in df.columns:
+            ax.plot(df[key], label=key)
+            plotted_keys.append(key)
+    if plotted_keys:
+        ax.legend()
+    return ax
 
 import unittest
+from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
     
-    def test_basic_regression(self):
+    def test_basic_input(self):
         data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
-        model = task_func(data)
-        self.assertIsInstance(model, LinearRegression)
-        self.assertEqual(len(model.coef_), 2)
-    def test_negative_values(self):
-        data = [{'x': -1, 'y': -10, 'z': -5}, {'x': -3, 'y': -15, 'z': -6}, {'x': -2, 'y': -1, 'z': -7}]
-        model = task_func(data)
-        self.assertIsInstance(model, LinearRegression)
-        self.assertEqual(len(model.coef_), 2)
-    
-    def test_zero_values(self):
-        data = [{'x': 0, 'y': 0, 'z': 0}, {'x': 0, 'y': 0, 'z': 0}, {'x': 0, 'y': 0, 'z': 0}]
-        model = task_func(data)
-        self.assertIsInstance(model, LinearRegression)
-        self.assertEqual(len(model.coef_), 2)
-    
-    def test_different_target(self):
-        data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
-        model = task_func(data, target='y')
-        self.assertIsInstance(model, LinearRegression)
-        self.assertEqual(len(model.coef_), 2)
-    
-    def test_single_predictor(self):
-        data = [{'x': 1, 'z': 5}, {'x': 3, 'z': 6}, {'x': 2, 'z': 7}]
-        model = task_func(data, target='z')
-        self.assertIsInstance(model, LinearRegression)
-        self.assertEqual(len(model.coef_), 1)
+        ax = task_func(data)
+        self.assertIsInstance(ax, Axes)
+        self.assertEqual(set([text.get_text() for text in ax.legend_.texts]), {'x', 'y', 'z'})
+        self.assertEqual(len(ax.lines), 3)
+    def test_missing_keys_in_data(self):
+        data = [{'x': 1, 'y': 10}, {'y': 15, 'z': 6}, {'x': 2, 'z': 7}]
+        ax = task_func(data)
+        self.assertIsInstance(ax, Axes)
+        self.assertEqual(set([text.get_text() for text in ax.legend_.texts]), {'x', 'y', 'z'})
+        self.assertEqual(len(ax.lines), 3)
+    def test_custom_keys(self):
+        data = [{'a': 1, 'b': 10}, {'b': 15, 'c': 6}, {'a': 2, 'c': 7}]
+        ax = task_func(data, keys=['a', 'b', 'c'])
+        self.assertIsInstance(ax, Axes)
+        self.assertEqual(set([text.get_text() for text in ax.legend_.texts]), {'a', 'b', 'c'})
+        self.assertEqual(len(ax.lines), 3)
+    def test_empty_data_list(self):
+        data = []
+        ax = task_func(data)
+        self.assertIsInstance(ax, Axes)
+        self.assertEqual(len(ax.lines), 0)
+        self.assertIsNone(ax.legend_)
+    def test_single_key_data(self):
+        data = [{'x': 1}, {'x': 2}, {'x': 3}]
+        ax = task_func(data)
+        self.assertIsInstance(ax, Axes)
+        self.assertEqual(set([text.get_text() for text in ax.legend_.texts]), {'x'})
+        self.assertEqual(len(ax.lines), 1)

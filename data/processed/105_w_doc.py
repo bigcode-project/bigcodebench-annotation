@@ -1,73 +1,89 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from itertools import cycle
+import seaborn as sns
 
-def task_func(df, groups=['A', 'B', 'C', 'D', 'E']):
+def task_func(df):
     """
-    Analyzes the groups in a DataFrame by plotting a scatter plot of the ordinals against the values for each group.
+    Perform exploratory data analysis on a dataframe. This function converts the 'date' column to an ordinal format,
+    creates a correlation matrix, and generates a pair plot of the dataframe.
 
     Parameters:
-    df (DataFrame): The DataFrame with columns 'group', 'date', and 'value'.
-    groups (list, optional): List of group identifiers. Defaults to ['A', 'B', 'C', 'D', 'E'].
+        df (pandas.DataFrame): A dataframe with columns 'group', 'date', and 'value'. The 'date' column should be in datetime format.
 
     Returns:
-    matplotlib.axes.Axes: The Axes object with the scatter plot.
-    The Axes object will have a title 'Scatterplot of Values for Each Group Over Time', 
-               x-axis labeled as 'Date (ordinal)', and y-axis labeled as 'Value'.
+        matplotlib.figure.Figure: The figure object for the correlation matrix heatmap.
+        seaborn.axisgrid.PairGrid: The PairGrid object for the pair plot.
 
-
+        The title of the plot is 'Correlation Matrix'. 
     Raises:
-    ValueError: If 'df' is not a DataFrame or lacks required columns.
+        ValueError: If the dataframe is empty, if required columns are missing, or if 'date' column is not in datetime format.
 
     Requirements:
-    - pandas
-    - matplotlib.pyplot
-    - itertools
+        - pandas
+        - matplotlib.pyplot
+        - seaborn
 
     Example:
-    >>> df = pd.DataFrame({
-    ...     "group": ["A", "A", "A", "B", "B"],
-    ...     "date": pd.to_datetime(["2022-01-02", "2022-01-13", "2022-02-01", "2022-02-23", "2022-03-05"]),
-    ...     "value": [10, 20, 16, 31, 56],
-    ...     })
-    >>> ax = task_func(df)
-    >>> ax.figure.show()  # This will display the plot
+        >>> df = pd.DataFrame({
+        ...     "group": ["A", "A", "A", "B", "B"],
+        ...     "date": pd.to_datetime(["2022-01-02", "2022-01-13", "2022-02-01", "2022-02-23", "2022-03-05"]),
+        ...     "value": [10, 20, 16, 31, 56],
+        ... })
+        >>> heatmap_fig, pairplot_grid = task_func(df)
     """
-    if not isinstance(df, pd.DataFrame) or not all(col in df.columns for col in ['group', 'date', 'value']):
-        raise ValueError("Invalid 'df': must be a DataFrame with 'group', 'date', and 'value' columns.")
-    color_cycle = cycle('bgrcmk')
-    fig, ax = plt.subplots(figsize=(10, 6))
-    for group in groups:
-        group_df = df[df['group'] == group].copy()
-        group_df['date'] = group_df['date'].apply(lambda x: x.toordinal())
-        ax.scatter(group_df['date'], group_df['value'], color=next(color_cycle))
-    ax.set_xlabel('Date (ordinal)')
-    ax.set_ylabel('Value')
-    ax.set_title('Scatterplot of Values for Each Group Over Time')
-    return ax
+    if df.empty or not all(col in df.columns for col in ['group', 'date', 'value']):
+        raise ValueError("DataFrame must be non-empty and contain 'group', 'date', and 'value' columns.")
+    if not pd.api.types.is_datetime64_any_dtype(df['date']):
+        raise ValueError("'date' column must be in datetime format.")
+    try:
+        df['date'] = df['date'].apply(lambda x: x.toordinal())
+        df_numeric = df.drop(columns=['group'])
+        correlation_matrix = df_numeric.corr()
+        heatmap_fig = plt.figure(figsize=(8, 6))
+        sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+        plt.title('Correlation Matrix')
+        pairplot_grid = sns.pairplot(df)
+        return heatmap_fig, pairplot_grid
+    except Exception as e:
+        raise ValueError(f"An error occurred: {e}")
 
 import unittest
+import numpy as np 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.df = pd.DataFrame({
+        self.valid_df = pd.DataFrame({
             "group": ["A", "A", "A", "B", "B"],
             "date": pd.to_datetime(["2022-01-02", "2022-01-13", "2022-02-01", "2022-02-23", "2022-03-05"]),
             "value": [10, 20, 16, 31, 56],
         })
-    def test_return_type(self):
-        ax = task_func(self.df)
-        self.assertIsInstance(ax, plt.Axes)
-    def test_invalid_dataframe(self):
+    def test_valid_input(self):
+        heatmap_fig, pairplot_grid = task_func(self.valid_df)
+        self.assertIsInstance(heatmap_fig, plt.Figure)
+        self.assertIsInstance(pairplot_grid, sns.axisgrid.PairGrid)
+    def test_empty_dataframe(self):
         with self.assertRaises(ValueError):
-            task_func(pd.DataFrame({'a': [1, 2], 'b': [3, 4]}))
-    def test_custom_groups(self):
-        custom_groups = ['A', 'B']
-        ax = task_func(self.df, groups=custom_groups)
-        # Check if only the custom groups are plotted
-        plotted_groups = set(self.df[self.df['group'].isin(custom_groups)]['group'].unique())
-        self.assertEqual(len(plotted_groups), len(custom_groups))
-    def test_plot_labels(self):
-        ax = task_func(self.df)
-        self.assertEqual(ax.get_xlabel(), 'Date (ordinal)')
-        self.assertEqual(ax.get_ylabel(), 'Value')
-        self.assertEqual(ax.get_title(), 'Scatterplot of Values for Each Group Over Time')
+            task_func(pd.DataFrame())
+    def test_missing_columns(self):
+        incomplete_df = self.valid_df.drop(columns=['date'])
+        with self.assertRaises(ValueError):
+            task_func(incomplete_df)
+    def test_invalid_date_column(self):
+        invalid_df = self.valid_df.copy()
+        invalid_df['date'] = "not a date"
+        with self.assertRaises(ValueError):
+            task_func(invalid_df)
+    def test_plot_titles(self):
+        heatmap_fig, pairplot_grid = task_func(self.valid_df)
+        self.assertEqual(heatmap_fig.axes[0].get_title(), 'Correlation Matrix')
+    
+    def test_value_consistency(self):
+        df = self.valid_df.copy()
+        df['date'] = df['date'].apply(lambda x: x.toordinal())
+        df_numeric = df.drop(columns=['group'])
+        heatmap_fig, _ = task_func(self.valid_df)
+        # Retrieve the correlation matrix data from the heatmap and reshape it
+        heatmap_data = heatmap_fig.axes[0].collections[0].get_array().data
+        heatmap_data_reshaped = heatmap_data.reshape(df_numeric.corr().shape)
+        expected_corr_matrix = df_numeric.corr().values
+        # Compare the reshaped data in the heatmap with the expected correlation matrix
+        np.testing.assert_array_almost_equal(heatmap_data_reshaped, expected_corr_matrix)

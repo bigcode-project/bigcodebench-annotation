@@ -1,98 +1,141 @@
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import precision_recall_curve
-from tensorflow import keras
-import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
-def task_func(X, Y):
-    """
-    This function should:
-    - Splits the input data into training (70%) and test (30%) sets.
-    - Constructs a Keras Sequential model with one hidden dense layer and sigmoid activation.
-      The input dimension is determined based on the first feature set of X.
-    - Compiles the model using binary cross-entropy loss and SGD optimizer.
-    - Fits the model to the training data in a non-verbose mode.
-    - Plots the Precision-Recall curve for the model based on the test set data.
 
-    Parameters:
-    X (np.ndarray): Input data for the model. Must have at least one feature.
-    Y (np.ndarray): Target labels for the model.
+def task_func(data):
+    """Scales numeric columns of a data dictionary using the StandardScaler.
 
-    Returns:
-    - keras.models.Sequential: The trained Keras model.
-    - matplotlib.axes._axes.Axes: The matplotlib Axes object for the Precision-Recall curve plot.
-    
-    Notes:
-    - The plot's x-axis is labeled 'Recall', and the y-axis is labeled 'Precision'.
-    - The title of the axes is set to 'Precision-Recall curve'.
-    - The axes object allows for further customization of the plot outside the function.
+    This function scales the numeric columns of a dataframe using the StandardScaler from scikit-learn.
+    Non-numeric columns remain unchanged. If a column contains mixed data types, it tries to convert the entire column
+    to float. If any value in the column cannot be converted to float, the entire column is left unchanged.
 
     Requirements:
-    - tensorflow.keras
-    - sklearn.model_selection.train_test_split
-    - sklearn.metrics.precision_recall_curve
-    - matplotlib.pyplot
+    - pandas
+    - sklearn.preprocessing.StandardScaler
+    
+    Parameters:
+    - data (dict): Input data.
 
-    Examples:
-    >>> X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-    >>> Y = np.array([[0], [1], [1], [0]])
-    >>> model, ax = task_func(X, Y)
-    >>> isinstance(model, Sequential)
-    True
-    >>> isinstance(ax, plt.Axes)
-    True
+    Returns:
+    - pd.DataFrame: Dataframe with scaled numeric columns.
+
+    Example:
+    >>> result = task_func({'x': [10, 20, 30, 40]})
+    >>> result
+              x
+    0 -1.341641
+    1 -0.447214
+    2  0.447214
+    3  1.341641
+    >>> result2 = task_func({'a': [10.5, 23.4, 15.6, 78.9],'b': [45.6, 67.8, 89.0, 12.3],'c': ['apple', 'banana', 'cherry', 'date']})
+    >>> result2
+              a         b       c
+    0 -0.788098 -0.284409   apple
+    1 -0.317428  0.497496  banana
+    2 -0.602019  1.244180  cherry
+    3  1.707546 -1.457267    date
     """
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
-    input_dim = X.shape[1]  # Dynamically set input dimension
-    model = keras.models.Sequential([keras.layers.Dense(units=1, input_dim=input_dim, activation='sigmoid')])
-    model.compile(loss='binary_crossentropy', optimizer=keras.optimizers.SGD(learning_rate=0.1))
-    model.fit(X_train, Y_train, epochs=200, batch_size=1, verbose=0)
-    Y_pred = model.predict(X_test, verbose=0).ravel()
-    precision, recall, thresholds = precision_recall_curve(Y_test, Y_pred)
-    fig, ax = plt.subplots()  # Modify here to return Axes object
-    ax.plot(recall, precision, label='Precision-Recall curve')
-    ax.set_xlabel('Recall')
-    ax.set_ylabel('Precision')
-    ax.set_title('Precision-Recall Curve')
-    ax.legend(loc='best')
-    return model, ax  # Return both the model and the axes object
+    dataframe = pd.DataFrame(data)
+    scaler = StandardScaler()
+    for column in dataframe.columns:
+        if dataframe[column].dtype in ["float64", "int64"]:
+            dataframe[column] = scaler.fit_transform(
+                dataframe[column].values.reshape(-1, 1)
+            )
+        else:
+            converted_column = dataframe[column].apply(pd.to_numeric, errors="coerce")
+            if (
+                not converted_column.isna().all()
+            ):  # If all values are convertible to float
+                dataframe[column] = scaler.fit_transform(
+                    converted_column.values.reshape(-1, 1)
+                )
+    return dataframe
 
 import unittest
 import numpy as np
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.optimizers import SGD
-from matplotlib.axes import Axes
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Initialize common test data used in multiple test cases.
-        self.X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-        self.Y = np.array([0, 1, 1, 0])
-    def test_model_and_axes_types(self):
-        # Verify if the returned objects include a Keras Sequential model and a matplotlib Axes.
-        model, ax = task_func(self.X, self.Y)
-        self.assertIsInstance(model, Sequential, "The function should return a Sequential model.")
-        self.assertIsInstance(ax, Axes, "The function should return a matplotlib Axes object.")
-    def test_model_output_shape(self):
-        # Ensure the model's output shape is correct based on the input data.
-        model, _ = task_func(self.X, self.Y)
-        self.assertEqual(model.output_shape, (None, 1), "The model's output shape should have one dimension for binary classification.")
-    def test_model_loss(self):
-        # Confirm that the model uses binary cross-entropy as its loss function.
-        model, _ = task_func(self.X, self.Y)
-        self.assertEqual(model.loss, 'binary_crossentropy', "Binary cross-entropy should be the loss function for the model.")
-    def test_model_optimizer(self):
-        # Check if the model's optimizer is an instance of SGD.
-        model, _ = task_func(self.X, self.Y)
-        self.assertIsNotNone(model.optimizer)
-        self.assertIsInstance(model.optimizer, SGD, "The optimizer for the model should be SGD.")
-    def test_input_dimension_flexibility(self):
-        # Test the model's ability to handle inputs with varying feature dimensions.
-        X_varied = np.array([[0], [1], [2], [3]])
-        Y_varied = np.array([0, 1, 0, 1])
-        model, _ = task_func(X_varied, Y_varied)
-        self.assertEqual(model.input_shape[1], X_varied.shape[1], "The model should dynamically adapt to the input feature size.")
-    def test_axes_labels_and_title(self):
-        # Test if the Axes object has the correct title and labels as specified.
-        _, ax = task_func(self.X, self.Y)
-        self.assertEqual(ax.get_title(), 'Precision-Recall Curve', "The plot's title should be 'Precision-Recall Curve'.")
-        self.assertEqual(ax.get_xlabel(), 'Recall', "The plot's x-axis label should be 'Recall'.")
-        self.assertEqual(ax.get_ylabel(), 'Precision', "The plot's y-axis label should be 'Precision'.")
+    def test_case_1(self):
+        """Test the correctness of the scaling applied by the function."""
+        # Creating a sample dataframe with three numeric columns
+        data = {
+                "a": [10.5, 23.4, 15.6, 78.9],
+                "b": [45.6, 67.8, 89.0, 12.3],
+                "c": [12.3, 45.6, 78.9, 0.1],
+            }
+        df = pd.DataFrame(
+            data
+        )
+        result = task_func(data)
+        # Checking if the mean of scaled columns is approximately 0 and standard deviation is approximately 1
+        self.assertTrue(np.isclose(result["a"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(result["b"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(np.std(result["a"]), 1, atol=1e-2))
+        self.assertTrue(np.isclose(np.std(result["b"]), 1, atol=1e-2))
+    def test_case_2(self):
+        """Test with an empty DataFrame."""
+        # Creating an empty dataframe
+        data = {}
+        df = pd.DataFrame(data)
+        result = task_func(data)
+        # Ensuring the result is also an empty dataframe
+        self.assertTrue(result.empty)
+    def test_case_3(self):
+        """Test with a DataFrame that doesn't have any columns to scale."""
+        # Creating a dataframe with a single non-numeric column
+        data = {"c": ["foo", "bar"]}
+        df = pd.DataFrame(data)
+        result = task_func(data)
+        # Ensuring the output dataframe is unchanged
+        pd.testing.assert_frame_equal(result, df, check_dtype=False)
+    def test_case_4(self):
+        """Test with a DataFrame where all columns are to be scaled."""
+        # Creating a dataframe with two numeric columns
+        data = {"a": [10.5, 23.4, 15.6, 78.9], "b": [45.6, 67.8, 89.0, 12.3]}
+        df = pd.DataFrame(
+            data
+        )
+        result = task_func(data)
+        # Checking if the mean of scaled columns is approximately 0 and standard deviation is approximately 1
+        self.assertTrue(np.isclose(result["a"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(result["b"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(np.std(result["a"]), 1, atol=1e-2))
+        self.assertTrue(np.isclose(np.std(result["b"]), 1, atol=1e-2))
+    def test_case_5(self):
+        """Test with a DataFrame with single rows."""
+        # Creating a dataframe with a single row and three columns
+        data = {"a": [5.5], "b": [8.6], "c": [7.7]}
+        df = pd.DataFrame(data)
+        result = task_func(data)
+        self.assertDictEqual(result.to_dict(), {'a': {0: 0.0}, 'b': {0: 0.0}, 'c': {0: 0.0}})
+    def test_case_6(self):
+        """Test with a DataFrame with mixed datatypes."""
+        # Creating a dataframe with mixed data types (both floats and strings) in columns
+        data = {
+                "a": [10.5, 23.4, 15.6, "78.9"],
+                "b": [45.6, "67.8", 89.0, 12.3],
+                "c": [12.3, 45.6, 78.9, "0.1"],
+            }
+        df = pd.DataFrame(
+            data
+        )
+        result = task_func(data)
+        # Checking if the mean of scaled columns is approximately 0 and standard deviation is approximately 1
+        self.assertTrue(np.isclose(result["a"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(result["b"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(np.std(result["a"]), 1, atol=1e-2))
+        self.assertTrue(np.isclose(np.std(result["b"]), 1, atol=1e-2))
+    def test_case_7(self):
+        """Test with a DataFrame with negative values."""
+        # Creating a dataframe with negative values in columns
+        data = {"a": [-1, -2, -3, -4], "b": [-4, -5, -6, -7], "c": [-7, -8, -9, -10]}
+        df = pd.DataFrame(
+            data
+        )
+        result = task_func(data)
+        # Checking if the mean of scaled columns is approximately 0 and standard deviation is approximately 1
+        self.assertTrue(np.isclose(result["a"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(result["b"].mean(), 0, atol=1e-7))
+        self.assertTrue(np.isclose(np.std(result["a"]), 1, atol=1e-2))
+        self.assertTrue(np.isclose(np.std(result["b"]), 1, atol=1e-2))

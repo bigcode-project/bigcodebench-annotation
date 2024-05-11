@@ -1,86 +1,99 @@
-import numpy as np
-from scipy.stats import ttest_1samp
-import matplotlib.pyplot as plt
-
-# Constants
-ALPHA = 0.05
+import pandas as pd
+import seaborn as sns
+from scipy.stats import zscore
 
 
 def task_func(data_matrix):
     """
-    Calculate the mean value of each row in a 2D data matrix, run a t-test from a sample against the population value, and record the mean values that differ significantly.
-    - Create a lineplot with the mean of rows in red. Its label is 'Means'.
-    - Create a line plot with the significant_indices (those with a pvalue less than ALPHA) on the x-axis and the corresponding means on the y-axis. This plot should be blue. Its label is 'Significant Means'.
-    - Create an horizontal line which represent the mean computed on the whole 2D matrix. It should be in green. Its label is 'Population Mean'.
+    Calculate the Z-values of a 2D data matrix, calculate the mean value of each row and then visualize the correlation matrix of the Z-values with a heatmap.
 
     Parameters:
-    data_matrix (numpy.array): The 2D data matrix.
+    data_matrix (numpy.array): The 2D data matrix of shape (m, n) where m is the number of rows and n is the number of columns.
 
     Returns:
     tuple: A tuple containing:
-        - list: A list of indices of the means that are significantly different from the population mean.
-        - Axes: The plot showing the means and significant means.
+      - pandas.DataFrame: A DataFrame with columns 'Feature 1', 'Feature 2', ..., 'Feature n' containing the Z-scores (per matrix row).
+                      There is also an additional column 'Mean' the mean of z-score per row.
+      - matplotlib.axes.Axes: The Axes object of the plotted heatmap.
 
     Requirements:
-    - numpy
-    - scipy.stats.ttest_1samp
-    - matplotlib.pyplot
+    - pandas
+    - seaborn
+    - scipy.stats.zscore
 
     Example:
+    >>> import numpy as np
     >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
-    >>> indices, ax = task_func(data)
-    >>> print(indices)
-    []
-
-    Example 2:
-    >>> data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    >>> indices, ax = task_func(data)
-    >>> print(indices)
-    []
+    >>> df, ax = task_func(data)
+    >>> print(df)
+       Feature 1  Feature 2  Feature 3  Feature 4  Feature 5          Mean
+    0   0.662085   1.489691  -1.406930  -0.579324  -0.165521 -2.053913e-16
+    1  -1.207020  -0.742781   0.649934   1.578410  -0.278543 -3.330669e-17
     """
-    means = np.mean(data_matrix, axis=1)
-    population_mean = np.mean(data_matrix)
-    _, p_value = ttest_1samp(means, population_mean)
-    significant_indices = np.where(p_value < ALPHA)[0]
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(means, "ro", label="Means")
-    ax.plot(
-        significant_indices, means[significant_indices], "bo", label="Significant Means"
-    )
-    ax.axhline(y=population_mean, color="g", linestyle="-", label="Population Mean")
-    ax.legend()
-    return significant_indices.tolist(), ax
+    z_scores = zscore(data_matrix, axis=1)
+    feature_columns = ["Feature " + str(i + 1) for i in range(data_matrix.shape[1])]
+    df = pd.DataFrame(z_scores, columns=feature_columns)
+    df["Mean"] = df.mean(axis=1)
+    correlation_matrix = df.corr()
+    ax = sns.heatmap(correlation_matrix, annot=True, fmt=".2f")
+    return df, ax
 
 import unittest
+import numpy as np
+import matplotlib
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def test_case_1(self):
         data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-        self._validate_function(data)
+        df, ax = task_func(data)
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
+        np.testing.assert_array_equal(
+            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
+            zscore(data, axis=1),
+        )
+        self.assertTrue("Mean" in df.columns)
     def test_case_2(self):
         data = np.array([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
-        self._validate_function(data)
+        df, ax = task_func(data)
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
+        np.testing.assert_array_equal(
+            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
+            zscore(data, axis=1),
+        )
+        self.assertTrue("Mean" in df.columns)
     def test_case_3(self):
-        data = np.array([[3, 5, 7, 1000], [200, 5, 7, 1], [1, 9, 14, 700]])
-        self._validate_function(data)
+        data = np.array([[3, 5, 7, 1000], [200, 5, 7, 1], [1, -9, 14, 700]])
+        df, ax = task_func(data)
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
+        np.testing.assert_array_equal(
+            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
+            zscore(data, axis=1),
+        )
+        self.assertTrue("Mean" in df.columns)
     def test_case_4(self):
         data = np.array(
             [
                 [1, 2, 3, 4, 5, 4, 3, 2, 1],
             ]
         )
-        self._validate_function(data)
+        df, ax = task_func(data)
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
+        np.testing.assert_array_equal(
+            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
+            zscore(data, axis=1),
+        )
+        self.assertTrue("Mean" in df.columns)
     def test_case_5(self):
         data = np.array([[1], [1], [1]])
-        self._validate_function(data)
-    def _validate_function(self, data):
-        indices, ax = task_func(data)
-        self.assertIsInstance(indices, list)
-        lines = ax.get_lines()
-        self.assertEqual(len(lines), 3)
-        self.assertEqual(lines[0].get_color(), "r")
-        self.assertEqual(lines[0].get_label(), "Means")
-        self.assertEqual(lines[1].get_color(), "b")
-        self.assertEqual(lines[1].get_label(), "Significant Means")
-        self.assertEqual(lines[2].get_color(), "g")
-        self.assertEqual(lines[2].get_label(), "Population Mean")
+        df, ax = task_func(data)
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertTrue(isinstance(ax, matplotlib.axes.Axes))
+        np.testing.assert_array_equal(
+            df.loc[:, [col for col in df.columns if col.startswith("Feature")]].values,
+            zscore(data, axis=1),
+        )
+        self.assertTrue("Mean" in df.columns)

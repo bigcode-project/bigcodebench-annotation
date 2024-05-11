@@ -1,106 +1,85 @@
-import subprocess
+from datetime import datetime
 import os
-import time
-import glob
+from pathlib import Path
 
-def task_func(r_script_path: str, output_path: str, duration: int) -> (bool, str):
+# Constants
+DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+def task_func(file_path):
     """
-    This function executes an R script and verifies if the output file is generated within a given duration.
+    Determine the creation time of a file and convert it to a formatted string '% Y-% m-% d% H:% M:% S'.
     
     Parameters:
-    - r_script_path (str): The absolute path to the R script to be executed.
-    - output_path (str): The absolute path where the output CSV file is expected to be generated.
-    - duration (int): The time, in seconds, within which the output file should be generated.
+    file_path (str): The path to the file.
     
     Returns:
-    - tuple containing:
-      - bool: True if the output file is generated within the specified duration, False otherwise.
-      - str: A message indicating whether the file was generated successfully or not.
+    str: The creation time of the file in the format '%Y-%m-%d %H:%M:%S'.
     
     Requirements:
-    - subprocess
+    - datetime.datetime
     - os
-    - time
-    - glob
+    - pathlib.Path
     
     Example:
-    >>> task_func('/path_to_script/MyrScript.r', '/path_to_output/', 10)
-    (True, 'File generated successfully within the specified duration.')
-    >>> task_func('/path_to_script/InvalidScript.r', '/path_to_output/', 5)
-    (False, 'File not generated within the specified duration.')
+    
+    Example:
+    >>> task_func('/path/to/file.txt')
+    '2023-09-28 12:30:45'
     """
-    command = f'/usr/bin/Rscript --vanilla {r_script_path}'
-    subprocess.call(command, shell=True)
-    start_time = time.time()
-    search_pattern = os.path.join(output_path, '*.csv')
-    while time.time() - start_time < duration:
-        if glob.glob(search_pattern):
-            return True, 'File generated successfully within the specified duration.'
-        time.sleep(0.1)
-    return False, 'File not generated within the specified duration.'
+    if not Path(file_path).exists():
+        raise FileNotFoundError(f"No such file or directory: '{file_path}'")
+    creation_time = os.path.getctime(file_path)
+    formatted_time = datetime.fromtimestamp(creation_time).strftime(DATE_FORMAT)
+    return formatted_time
 
 import unittest
+from datetime import datetime
 import os
+from pathlib import Path
 import shutil
-import time
-from unittest.mock import patch
+def create_dummy_file(filename):
+    """Creates a dummy file and returns its creation time."""
+    with open(filename, 'w') as f:
+        f.write("This is a dummy file.")
+    return os.path.getctime(filename)
 class TestCases(unittest.TestCase):
+    
     def setUp(self):
-        # Create a temporary directory to store the mock R script and the output files
-        self.temp_dir = 'task_func_test_dir'
-        os.makedirs(self.temp_dir, exist_ok=True)
-        
-        # Create a mock R script file
-        self.r_script_path = os.path.join(self.temp_dir, 'mock_script.r')
-        with open(self.r_script_path, 'w') as file:
-            file.write('write.csv(data.frame(x=1:10, y=11:20), \"{}/output.csv\")')
-        
-        # Define the output path
-        self.output_path = self.temp_dir
+        """Setup function to create dummy files for testing."""
+        self.file1 = "dummy_f954_1.txt"
+        self.file2 = "dummy_f954_2.txt"
+        self.file3 = "dummy_f954_3.txt"
+        self.creation_time1 = create_dummy_file(self.file1)
+        self.creation_time2 = create_dummy_file(self.file2)
+        self.creation_time3 = create_dummy_file(self.file3)
+        self.test_dir = 'testdir_task_func/'
+        os.makedirs(self.test_dir, exist_ok=True)
+    
     def tearDown(self):
-        # Remove the temporary directory and its contents after each test case
-        shutil.rmtree(self.temp_dir)
-    
-    @patch('subprocess.call', return_value=None)  # Mock the subprocess.call to avoid actual execution of R script
-    def test_case_1(self, mock_subprocess_call):
-        # Manually create the expected output file to simulate the behavior of a successfully executed R script
-        with open(os.path.join(self.output_path, 'output.csv'), 'w') as file:
-            file.write('x,y\n1,11\n2,12\n3,13\n4,14\n5,15\n6,16\n7,17\n8,18\n9,19\n10,20')
-        # Case where the output file is expected to be generated within the specified duration
-        result, message = task_func(self.r_script_path, self.output_path, 5)
-        self.assertTrue(result)
-        self.assertEqual(message, 'File generated successfully within the specified duration.')
+        """Cleanup function to remove dummy files after testing."""
+        os.remove(self.file1)
+        os.remove(self.file2)
+        os.remove(self.file3)
+        shutil.rmtree(self.test_dir)
+    def test_case_1(self):
+        expected_output = datetime.fromtimestamp(self.creation_time1).strftime('%Y-%m-%d %H:%M:%S')
+        self.assertEqual(task_func(self.file1), expected_output)
         
-    @patch('subprocess.call', return_value=None)
-    def test_case_2(self, mock_subprocess_call):
-        # Case where the output file is not expected to be generated within the specified duration
-        result, message = task_func(self.r_script_path, self.output_path, 0)
-        self.assertFalse(result)
-        self.assertEqual(message, 'File not generated within the specified duration.')
+    def test_case_2(self):
+        expected_output = datetime.fromtimestamp(self.creation_time2).strftime('%Y-%m-%d %H:%M:%S')
+        self.assertEqual(task_func(self.file2), expected_output)
+        
+    def test_case_3(self):
+        expected_output = datetime.fromtimestamp(self.creation_time3).strftime('%Y-%m-%d %H:%M:%S')
+        self.assertEqual(task_func(self.file3), expected_output)
+        
+    def test_case_4(self):
+        # Test for non-existing file
+        with self.assertRaises(FileNotFoundError):
+            task_func("non_existing_file.txt")
     
-    @patch('subprocess.call', return_value=None)
-    def test_case_3(self, mock_subprocess_call):
-        # Case where an invalid R script path is provided
-        invalid_path = 'invalid/path/mock_script.r'
-        result, message = task_func(invalid_path, self.output_path, 5)
-        self.assertFalse(result)
-        self.assertEqual(message, 'File not generated within the specified duration.')
-    
-    @patch('subprocess.call', return_value=None)
-    def test_case_4(self, mock_subprocess_call):
-        # Manually create the expected output file to simulate the behavior of a successfully executed R script
-        with open(os.path.join(self.output_path, 'output.csv'), 'w') as file:
-            file.write('x,y\n1,11\n2,12\n3,13\n4,14\n5,15\n6,16\n7,17\n8,18\n9,19\n10,20')
-        # Case where a longer duration is provided
-        time.sleep(2)  # Wait for 2 seconds before running the test to simulate different start times
-        result, message = task_func(self.r_script_path, self.output_path, 10)
-        self.assertTrue(result)
-        self.assertEqual(message, 'File generated successfully within the specified duration.')
-    
-    @patch('subprocess.call', return_value=None)
-    def test_case_5(self, mock_subprocess_call):
-        # Case where the output path is invalid
-        invalid_output_path = 'invalid/path/'
-        result, message = task_func(self.r_script_path, invalid_output_path, 5)
-        self.assertFalse(result)
-        self.assertEqual(message, 'File not generated within the specified duration.')
+    def test_case_5(self):
+        # Test for a directory
+        dir_creation_time = os.path.getctime(self.test_dir)
+        expected_output = datetime.fromtimestamp(dir_creation_time).strftime('%Y-%m-%d %H:%M:%S')
+        self.assertEqual(task_func(self.test_dir), expected_output)

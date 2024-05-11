@@ -1,101 +1,114 @@
-from bs4 import BeautifulSoup
-import requests
-
-# Constants
-URL = "http://example.com"
+from PIL import Image
+import codecs
+import pytesseract
 
 
-def task_func(url=URL, from_encoding="cp1251", use_lxml=False):
+IMAGE_PATH = "image.png"
+
+
+def task_func(filename=IMAGE_PATH, from_encoding="cp1251", to_encoding="utf8"):
     """
-    Fetches a web page from a given URL, decodes its content from a specified encoding,
-    and returns the parsed HTML using BeautifulSoup. If specified, 'lxml' is used as
-    the parser for improved performance. In case of any failure (like network issues,
-    invalid URL, or decoding errors), the function returns None.
+    Opens an image file, extracts text using OCR, and converts the text encoding, with a fallback to image comment processing.
+
+    Raises:
+    - ValueError: UnicodeDecodeError or LookupError occurs during conversion
 
     Parameters:
-    - url (str): The URL of the webpage to fetch. Defaults to the constant URL.
-    - from_encoding (str): The original encoding of the webpage content. Defaults to 'cp1251'.
-    - use_lxml (bool): Flag to use 'lxml' as the parser for BeautifulSoup. If False, the default 'html.parser' is used. Defaults to False.
+    - filename (str): The path to the image file. Defaults to a global variable 'IMAGE_PATH'.
+    - from_encoding (str): The original encoding of the extracted text or image comment. Default is 'cp1251'.
+    - to_encoding (str): The target encoding for the converted text or comment. Default is 'utf8'.
 
     Returns:
-    - BeautifulSoup object if the fetch and parse are successful.
-    - None if the URL is invalid, the request fails, or parsing fails.
+    - comment (str): The text extracted from the image or the image comment, converted to the target encoding.
+    If OCR extraction and comment processing both fail, returns an empty string.
+
+    Raises:
+    - ValueError: If incorrect encodings are provided for the text or comment conversion.
 
     Requirements:
-    - bs4
-    - requests
+    - codecs
+    - PIL
+    - pytesseract
 
     Example:
-    >>> html = task_func('http://example.com', 'cp1251', True)
-    >>> print(html.prettify()) if html else print("Error fetching or parsing the webpage.")
-
-    Notes:
-    - The function returns None if the URL is empty or None.
-    - Network errors, HTTP errors, and decoding issues are caught and result in None being returned.
-    - If the HTTP response status code is 200 (indicating success), the content is decoded using the specified encoding
-    - If the response status code is not 200, it implies an unsuccessful HTTP request (e.g., 404 Not Found, 403 Forbidden).
-      In such cases, the function returns None, indicating that the webpage could not be successfully retrieved or was not available.
-      
+    # Assuming 'image.png' contains the text 'Привет мир' in Russian (encoded in cp1251),
+    # and this text is successfully extracted by the OCR.
+    >>> text = task_func('image.png', 'cp1251', 'utf8')
+    >>> print(text)
+    'Привет мир'  # This output is the utf-8 encoded version of the extracted text.
     """
-    if not url:
-        return None
-    try:
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()
-        if response.status_code == 200:
-            decoded_content = response.content.decode(from_encoding)
-            parser = "lxml" if use_lxml else "html.parser"
-            soup = BeautifulSoup(decoded_content, parser)
-            return soup
-        else:
-            return None
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
+    with Image.open(filename) as image:
+        try:
+            extracted_text = pytesseract.image_to_string(image)
+            if extracted_text:
+                try:
+                    return extracted_text.encode(from_encoding).decode(to_encoding)
+                except (UnicodeDecodeError, LookupError) as exc:
+                    raise ValueError("Incorrect encoding provided.") from exc
+        except Exception:
+            pass
+        comment = image.info.get("comment", "")
+        if isinstance(comment, bytes):
+            try:
+                return (
+                    codecs.decode(comment, from_encoding)
+                    .encode(to_encoding)
+                    .decode(to_encoding)
+                )
+            except (UnicodeDecodeError, LookupError) as exc:
+                raise ValueError("Incorrect encoding provided.") from exc
+        return comment
 
-from bs4 import BeautifulSoup
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, Mock
+from PIL import Image
 class TestCases(unittest.TestCase):
-    """Test cases for task_func."""
-    @patch("requests.get")
-    def test_successful_fetch_and_parse_html_parser(self, mock_get):
-        """Test if the function correctly fetches and parses a webpage with valid encoding using html.parser."""
-        mock_get.return_value = MagicMock(
-            status_code=200, content=b"Valid HTML content"
+    """Test cases for the task_func function."""
+    def setUp(self):
+        self.mock_image = Mock()
+        self.mock_image.info.get.return_value = b"Mocked Comment in cp1251"
+    @patch("PIL.Image.open")
+    @patch("pytesseract.image_to_string")
+    def test_successful_ocr_extraction_and_encoding(self, mock_ocr, mock_open):
+        """Test with successful OCR text extraction and encoding conversion."""
+        mock_open.return_value.__enter__.return_value = self.mock_image
+        mock_ocr.return_value = "Extracted Text in cp1251"
+        result = task_func("dummy_path", "cp1251", "utf8")
+        self.assertEqual(result, "Extracted Text in cp1251")
+    @patch("PIL.Image.open")
+    @patch("pytesseract.image_to_string", side_effect=Exception)
+    def test_ocr_fails_comment_extraction_succeeds(self, mock_ocr, mock_open):
+        """Test OCR fails, but comment extraction and encoding conversion succeed."""
+        mock_open.return_value.__enter__.return_value = self.mock_image
+        # Mocked comment in cp1251 encoding
+        self.mock_image.info.get.return_value = "Mocked Comment in cp1251".encode(
+            "cp1251"
         )
-        result = task_func("http://example.com", "utf8")
-        self.assertIsInstance(result, BeautifulSoup)
-    @patch("requests.get")
-    def test_successful_fetch_and_parse_lxml_parser(self, mock_get):
-        """Test if the function correctly fetches and parses a webpage with valid encoding using lxml."""
-        mock_get.return_value = MagicMock(
-            status_code=200, content=b"Valid HTML content"
-        )
-        result = task_func("http://example.com", "utf8", use_lxml=True)
-        self.assertIsInstance(result, BeautifulSoup)
-    @patch("requests.get")
-    def test_connection_error_handling(self, mock_get):
-        """Test how the function handles connection errors."""
-        mock_get.side_effect = requests.exceptions.ConnectionError()
-        result = task_func("http://example.com", "utf8")
-        self.assertIsNone(result)
-    @patch("requests.get")
-    def test_incorrect_encoding_handling(self, mock_get):
-        """Test how the function handles incorrect or unsupported encodings."""
-        mock_get.return_value = MagicMock(
-            status_code=200, content=b"Valid HTML content"
-        )
-        result = task_func("http://example.com", "invalid_encoding")
-        self.assertIsNone(result)
-    @patch("requests.get")
-    def test_status_code_handling(self, mock_get):
-        """Test if the function handles non-200 status code responses correctly."""
-        mock_get.return_value = MagicMock(status_code=404)
-        result = task_func("http://example.com", "utf8")
-        self.assertIsNone(result)
-    @patch("requests.get")
-    def test_empty_url_handling(self, mock_get):
-        """Test how the function handles an empty URL."""
-        result = task_func("", "utf8")
-        self.assertIsNone(result)
+        result = task_func("dummy_path", "cp1251", "utf8")
+        # Expected result after converting the mocked comment from cp1251 to utf8
+        expected_result = "Mocked Comment in cp1251".encode("cp1251").decode("utf8")
+        self.assertEqual(result, expected_result)
+    @patch("PIL.Image.open")
+    @patch("pytesseract.image_to_string")
+    def test_ocr_succeeds_encoding_fails(self, mock_ocr, mock_open):
+        """Test OCR text extraction succeeds, but encoding conversion fails."""
+        mock_open.return_value.__enter__.return_value = self.mock_image
+        mock_ocr.return_value = "Extracted Text in wrong encoding"
+        with self.assertRaises(ValueError):
+            task_func("dummy_path", "invalid_encoding", "utf8")
+    @patch("PIL.Image.open")
+    @patch("pytesseract.image_to_string", side_effect=Exception)
+    def test_ocr_and_comment_extraction_fail(self, mock_ocr, mock_open):
+        """Test both OCR and comment extraction fail."""
+        mock_open.return_value.__enter__.return_value = self.mock_image
+        self.mock_image.info.get.return_value = ""  # No comment in metadata
+        result = task_func("dummy_path")
+        self.assertEqual(result, "")
+    @patch("PIL.Image.open")
+    @patch("pytesseract.image_to_string")
+    def test_ocr_extraction_succeeds_no_encoding_needed(self, mock_ocr, mock_open):
+        """Test OCR extraction succeeds, no encoding conversion needed."""
+        mock_open.return_value.__enter__.return_value = self.mock_image
+        mock_ocr.return_value = "Extracted Text already in utf8"
+        result = task_func("dummy_path", "utf8", "utf8")
+        self.assertEqual(result, "Extracted Text already in utf8")

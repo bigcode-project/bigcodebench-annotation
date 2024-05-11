@@ -20,6 +20,9 @@ def f_403(array):
     - pandas
     - seaborn
 
+    Raises:
+    - ValueError: If the input array is empty or contains sublists of varying lengths.
+    
     Example:
     >>> df, ax = f_403([[1, 2, 3, 4, 5], [5, 4, 3, 2, 1]])
     >>> df

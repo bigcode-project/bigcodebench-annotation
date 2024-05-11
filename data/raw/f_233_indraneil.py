@@ -11,7 +11,7 @@ def f_233(data):
     data (list of tuple): A list of tuples where each tuple contains two integers.
     
     Returns:
-    matplotlib.axes.Axes: The Axes object of the plot for further manipulation and testing.
+    matplotlib.axes.Axes: The Axes object of the plot for further manipulation and testing, with the title 'Max Tuple Highlighted', x-axis labeled 'x', y-axis labeled 'y', and a legend.
     
     Requirements:
     - numpy

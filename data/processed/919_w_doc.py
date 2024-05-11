@@ -1,71 +1,71 @@
 import pandas as pd
-import re
+import matplotlib.pyplot as plt
 
-# Function to replace acronyms in DataFrame
-def task_func(data, mapping):
+def task_func(data, column):
     """
-    Replace all acronyms in a DataFrame with their full words according to a provided dictionary.
+    Draw and return a bar chart that shows the distribution of categories in a specific column of a dictionary.
+    
+    Note:
+    The categories are defined by the constant CATEGORIES, 
+    which is a list containing ['A', 'B', 'C', 'D', 'E']. If some categories are missing in the DataFrame, 
+    they will be included in the plot with a count of zero.
+    The x label of the plot is set to 'Category', the y label is set to 'Count', and the title is set to 'Distribution of {column}'.
+    
+    Parameters:
+    - data (dict): A dictionary where the keys are the column names and the values are the column values.
+    - column (str): The name of the column in the DataFrame that contains the categories.
+    
+    Returns:
+    - matplotlib.axes._axes.Axes: The Axes object for the generated plot.
     
     Requirements:
     - pandas
-    - re
-
-    Parameters:
-    - data (dict): A dictionary where keys are column names and values are lists of strings.
-    - mapping (dict): A dictionary where keys are acronyms and values are the full words.
+    - numpy
+    - matplotlib.pyplot
     
-    Returns:
-    - pd.DataFrame: A DataFrame where all acronyms in string cells have been replaced with their full words.
-    
-    Examples:
-    >>> data = {'text': ['NASA is great', 'I live in the USA']}
-    >>> mapping = {'NASA': 'National Aeronautics and Space Administration', 'USA': 'United States of America'}
-    >>> print(task_func(data, mapping))
-                                                    text
-    0  National Aeronautics and Space Administration ...
-    1             I live in the United States of America
+    Example:
+    >>> data = {'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']}
+    >>> ax = task_func(data, 'Category')    
+    >>> data = {'Type': ['A', 'A', 'C', 'E', 'D', 'E', 'D']}
+    >>> ax = task_func(data, 'Type')
     """
     df = pd.DataFrame(data)
-    pattern = re.compile(r'\b[A-Z]+\b')
-    def replace_match(match):
-        return mapping.get(match.group(0), match.group(0))
-    df = df.applymap(lambda x: pattern.sub(replace_match, x) if isinstance(x, str) else x)
-    return df
+    CATEGORIES = ['A', 'B', 'C', 'D', 'E']
+    counts = df[column].value_counts()
+    missing_categories = list(set(CATEGORIES) - set(counts.index))
+    for category in missing_categories:
+        counts[category] = 0
+    counts = counts.reindex(CATEGORIES)
+    ax = counts.plot(kind='bar')
+    ax.set_xlabel('Category')
+    ax.set_ylabel('Count')
+    ax.set_title(f'Distribution of {column}')
+    plt.show()
+    return ax
 
 import unittest
-# Unit tests for the task_func function
+import pandas as pd
+from matplotlib import pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_acronyms_single_column(self):
-        data = {'text': ['NASA rocks', 'Visit the USA']}
-        mapping = {'NASA': 'National Aeronautics and Space Administration', 'USA': 'United States of America'}
-        expected = pd.DataFrame({'text': ['National Aeronautics and Space Administration rocks', 'Visit the United States of America']})
-        result = task_func(data, mapping)
-        pd.testing.assert_frame_equal(result, expected)
     
-    def test_acronyms_multiple_columns(self):
-        data = {'col1': ['NASA exploration'], 'col2': ['Made in USA']}
-        mapping = {'NASA': 'National Aeronautics and Space Administration', 'USA': 'United States of America'}
-        expected = pd.DataFrame({'col1': ['National Aeronautics and Space Administration exploration'], 'col2': ['Made in United States of America']})
-        result = task_func(data, mapping)
-        pd.testing.assert_frame_equal(result, expected)
-    
-    def test_no_acronyms(self):
-        data = {'text': ['A sunny day', 'A rainy night']}
-        mapping = {'NASA': 'National Aeronautics and Space Administration'}
-        expected = pd.DataFrame({'text': ['A sunny day', 'A rainy night']})
-        result = task_func(data, mapping)
-        pd.testing.assert_frame_equal(result, expected)
-    
-    def test_non_string_types(self):
-        data = {'text': ['NASA mission', 2020, None]}
-        mapping = {'NASA': 'National Aeronautics and Space Administration'}
-        expected = pd.DataFrame({'text': ['National Aeronautics and Space Administration mission', 2020, None]})
-        result = task_func(data, mapping)
-        pd.testing.assert_frame_equal(result, expected)
-    
-    def test_empty_dataframe(self):
-        data = {'text': []}
-        mapping = {'NASA': 'National Aeronautics and Space Administration'}
-        expected = pd.DataFrame({'text': []})
-        result = task_func(data, mapping)
-        pd.testing.assert_frame_equal(result, expected)
+    def test_with_all_categories(self):
+        """Test with all categories present."""
+        data = {'Category': ['A', 'B', 'B', 'C', 'A', 'D', 'E', 'E', 'D']}
+        ax = task_func(data, 'Category')
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_xlabel(), 'Category')
+        self.assertEqual(ax.get_ylabel(), 'Count')
+        self.assertEqual(ax.get_title(), 'Distribution of Category')
+        self.assertEqual(len(ax.get_xticks()), 5)  # Check the number of x-axis ticks instead
+    def test_with_missing_categories(self):
+        """Test with some categories missing."""
+        data = {'Category': ['A', 'A', 'B', 'C']}
+        ax = task_func(data, 'Category')
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticks()), 5)  # Ensure all categories are accounted for, including missing ones
+    def test_with_unexpected_category(self):
+        """Test with a category not in predefined list."""
+        data = {'Category': ['F', 'A', 'B']}  # 'F' is not a predefined category
+        ax = task_func(data, 'Category')
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticks()), 5)  # 'F' is ignored, only predefined categories are considered

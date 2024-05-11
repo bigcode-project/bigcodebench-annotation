@@ -14,13 +14,16 @@ def f_423(db_name="test.db", table_name="People"):
 
     Returns:
     matplotlib.axes._subplots.AxesSubplot: Axes object representing the age distribution plot,
-                                           with x-axis showing age and a default of bins=30, kde=True.
+                                           with x-axis showing 'age' and a default of bins of 30, and kde set to True.
 
     Requirements:
     - sqlite3
     - pandas
     - seaborn
 
+    Raises:
+    ValueError: If the data contains negative age values.
+    
     Examples:
     >>> ax = f_423('path/to/test.db', 'People')
     >>> type(ax)

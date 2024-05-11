@@ -1,124 +1,105 @@
-import subprocess
-import csv
-import glob
-import random
 import os
+import glob
+import zipfile
 
-def task_func(file):
+def task_func(directory):
     """
-    Divide a CSV file into several smaller files and shuffle the lines in each file.
+    Zips all files (not including subdirectories) located in the specified directory and returns the path to the created zip file.
     
-    This function takes a CSV file path as input, divides it into smaller files using 
-    the shell 'split' command, and shuffles the rows in each of the resulting files.
-    The output files are named with a 'split_' prefix.
-
     Parameters:
-    - file (str): The path to the CSV file.
-
-    Returns:
-    - list: The paths to the split files. Returns an empty list if the file does not exist, is not a CSV file, or if an error occurs during processing.
+    directory (str): The directory path containing the files to be zipped.
     
+    Returns:
+    str: The path to the generated zip file. Returns None if the directory does not contain any files.
+    
+    Raises:
+    FileNotFoundError: if the specified directory does not exist
+
     Requirements:
-    - subprocess
-    - csv
-    - glob
-    - random
     - os
+    - glob
+    - zipfile
+    
+    Notes:
+    - The zip name is always 'files.zip'
 
     Example:
-    >>> task_func('/path/to/file.csv')
-    ['/path/to/split_00', '/path/to/split_01', ...]
+    >>> path = task_func('/path/to/files')
+    >>> isinstance(path, str)
+    True
     """
-    if not os.path.exists(file):
-        print("Provided file does not exist.")
-        return []
-    if not file.endswith('.csv'):
-        print("Provided file is not a CSV.")
-        return []
-    try:
-        subprocess.call(['split', '-n', '5', '-d', file, 'split_'])
-        split_files = glob.glob('split_*')
-        for split_file in split_files:
-            with open(split_file, 'r') as f:
-                reader = csv.reader(f)
-                rows = list(reader)
-            random.shuffle(rows)
-            with open(split_file, 'w') as f:
-                writer = csv.writer(f)
-                writer.writerows(rows)
-        return split_files
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return []
+    if not os.path.exists(directory):
+        raise FileNotFoundError(f"Directory '{directory}' not found.")
+    files = [f for f in glob.glob(os.path.join(directory, '*')) if os.path.isfile(f)]
+    if not files:
+        return None
+    zip_file_path = os.path.join(directory, 'files.zip')
+    with zipfile.ZipFile(zip_file_path, 'w') as zipf:
+        for file in files:
+            zipf.write(file, os.path.basename(file))
+    return zip_file_path
 
 import unittest
-import csv
 import os
 import tempfile
+import zipfile
 class TestCases(unittest.TestCase):
+    
     def setUp(self):
-        # Create a temporary directory to hold the files
+        """Setup a temporary directory before each test."""
         self.test_dir = tempfile.mkdtemp()
-        self.small_csv_path = os.path.join(self.test_dir, "small.csv")
-        self.medium_csv_path = os.path.join(self.test_dir, "medium.csv")
-        self.large_csv_path = os.path.join(self.test_dir, "large.csv")
-        self.non_csv_path = os.path.join(self.test_dir, "test.txt")
-        
-        # Create dummy CSV files of different sizes
-        with open(self.small_csv_path, "w", newline="") as file:
-            writer = csv.writer(file)
-            for i in range(10):  # Small CSV
-                writer.writerow([f"row{i}", f"value{i}"])
-        
-        with open(self.medium_csv_path, "w", newline="") as file:
-            writer = csv.writer(file)
-            for i in range(100):  # Medium CSV
-                writer.writerow([f"row{i}", f"value{i}"])
-        
-        with open(self.large_csv_path, "w", newline="") as file:
-            writer = csv.writer(file)
-            for i in range(1000):  # Large CSV
-                writer.writerow([f"row{i}", f"value{i}"])
-        
-        # Create a non-CSV file
-        with open(self.non_csv_path, "w") as file:
-            file.write("This is a test text file.")
+    
     def tearDown(self):
-        # Remove all files created in the directory
-        for filename in os.listdir(self.test_dir):
-            file_path = os.path.join(self.test_dir, filename)
-            os.remove(file_path)  # Remove each file
-    def test_small_csv(self):
-        """Test splitting and shuffling a small CSV file."""
-        split_files = task_func(self.small_csv_path)
-        self.assertTrue(len(split_files) > 0, "No files were split.")
-        self.assertNotEqual(self._read_csv(self.small_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
-        for filename in split_files:
-            os.remove(filename)
-    def test_medium_csv(self):
-        """Test splitting and shuffling a medium CSV file."""
-        split_files = task_func(self.medium_csv_path)
-        self.assertTrue(len(split_files) > 0, "No files were split.")
-        self.assertNotEqual(self._read_csv(self.medium_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
-        for filename in split_files:
-            os.remove(filename)
-    def test_large_csv(self):
-        """Test splitting and shuffling a large CSV file."""
-        split_files = task_func(self.large_csv_path)
-        self.assertTrue(len(split_files) > 0, "No files were split.")
-        self.assertNotEqual(self._read_csv(self.large_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
-        for filename in split_files:
-            os.remove(filename)
-    def test_invalid_file(self):
-        """Test behavior with a non-existent file path."""
-        split_files = task_func("/path/that/does/not/exist.csv")
-        self.assertEqual(split_files, [], "Expected an empty list for an invalid file path.")
-    def test_non_csv_file(self):
-        """Test behavior with a non-CSV file."""
-        split_files = task_func(self.non_csv_path)
-        self.assertEqual(split_files, [], "Expected an empty list for a non-CSV file.")
-    def _read_csv(self, filepath):
-        """Helper method to read CSV file and return content."""
-        with open(filepath, "r") as f:
-            reader = csv.reader(f)
-            return list(reader)
+        """Clean up the temporary directory after each test."""
+        for root, dirs, files in os.walk(self.test_dir, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                os.rmdir(os.path.join(root, name))
+        os.rmdir(self.test_dir)
+    
+    def test_single_file_zip(self):
+        """Test zipping a directory with one file."""
+        with open(os.path.join(self.test_dir, "testfile1.txt"), "w") as f:
+            f.write("This is a test file.")
+        zip_path = task_func(self.test_dir)
+        self.assertTrue(os.path.exists(zip_path))
+    
+    def test_multiple_files_zip(self):
+        """Test zipping a directory with multiple files."""
+        for i in range(5):
+            with open(os.path.join(self.test_dir, f"testfile{i}.txt"), "w") as f:
+                f.write(f"This is test file {i}.")
+        zip_path = task_func(self.test_dir)
+        self.assertTrue(os.path.exists(zip_path))
+    
+    def test_empty_directory(self):
+        """Test zipping an empty directory should return None."""
+        zip_path = task_func(self.test_dir)
+        self.assertIsNone(zip_path)
+    
+    def test_non_existent_directory(self):
+        """Test behavior when the specified directory does not exist."""
+        with self.assertRaises(FileNotFoundError):
+            task_func("/non/existent/directory")
+    
+    def test_exclusion_of_subdirectories(self):
+        """Ensure that subdirectories within the specified directory are not included in the zip."""
+        os.makedirs(os.path.join(self.test_dir, "subdir"))
+        with open(os.path.join(self.test_dir, "testfile.txt"), "w") as f:
+            f.write("This is a test file.")
+        with open(os.path.join(self.test_dir, "subdir", "nestedfile.txt"), "w") as f:
+            f.write("This is a nested file.")
+        zip_path = task_func(self.test_dir)
+        with zipfile.ZipFile(zip_path, 'r') as zipf:
+            self.assertEqual(len(zipf.namelist()), 1)  # Only testfile.txt should be included
+    def test_file_integrity_in_zip(self):
+        """Check that files zipped are intact and readable."""
+        filename = "testfile.txt"
+        content = "This is a test file."
+        with open(os.path.join(self.test_dir, filename), "w") as f:
+            f.write(content)
+        zip_path = task_func(self.test_dir)
+        with zipfile.ZipFile(zip_path, 'r') as zipf:
+            with zipf.open(filename) as file:
+                self.assertEqual(file.read().decode(), content)

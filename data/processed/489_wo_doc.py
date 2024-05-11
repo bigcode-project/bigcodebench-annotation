@@ -1,123 +1,134 @@
-from datetime import datetime
 import pandas as pd
-import numpy as np
+from datetime import datetime, timedelta
+import random
 
 
-def task_func(start_time, end_time, step, amplitude, period, seed=0):
+def task_func(epoch_milliseconds, seed=0):
     """
-    Generate a time series with a given seasonality from the start UTC time to the end UTC time
-    with a given step, and plot the time series with the seasonality.
+    Generate user activity logs from a given epoch time to the current time.
+
+    This function iterates from the starting epoch time to the current system
+    time, incrementally increasing the time by a random number of seconds (an
+    integer in [1, 10]) between each log entry. Each log entry records a user
+    performing an activity at a specific time.
 
     Parameters:
-    - start_time (int): The start epoch time in milliseconds.
-    = end_time (int): The end epoch time in milliseconds.
-    - step (int): The step in milliseconds between each data point. Must be at least 1.
-    - amplitude (float): The amplitude of the seasonality.
-    - period (int): The period of the seasonality in milliseconds. Must be at least 0.
-    - seed (int): Random seed for reproducibility. Defaults to 0.
+    - epoch_milliseconds (int): Starting epoch time in milliseconds. Must be in
+                                the past compared to current system time.
+    - seed (int): random seed for reproducibility. Defaults to 0.
 
     Returns:
-    matplotlib.pyplot.Axes: A plot of the generated 'Time Series with Seasonality',
-              with 'Timestamp' on x-axis and 'Value' on y-axis.
+    - pd.DataFrame: A DataFrame containing logs of user activities, with columns:
+        - 'User':   User names, randomly chosen from a predefined list of users,
+                    ['user1', 'user2', 'user3', 'user4', 'user5'].
+        - 'Activity': Activities performed by the users, randomly chosen from a
+                      predefined list of activities, ['login', 'logout', 'browse',
+                      'search', 'purchase'].
+        - 'Time': The timestamp of when the activity occurred, incrementally
+                  increasing from the starting epoch time to the current time.
 
+    Raises:
+    - ValueError: If the start time is after the current system time.
+    
     Requirements:
-    - datetime.datetime
     - pandas
-    - numpy
+    - datetime.datetime.fromtimestamp
+    - datetime.timedelta
+    - random
 
     Example:
-    >>> ax = task_func(0, 10000, 100, 1, 1000)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> ax.get_xticklabels()
-    [Text(-20.0, 0, '1970-01-01 10:00:08.000000'), Text(0.0, 0, '1970-01-01 10:00:00.000000'), Text(20.0, 0, '1970-01-01 10:00:02.000000'), Text(40.0, 0, '1970-01-01 10:00:04.000000'), Text(60.0, 0, '1970-01-01 10:00:06.000000'), Text(80.0, 0, '1970-01-01 10:00:08.000000'), Text(100.0, 0, ''), Text(120.0, 0, '')]
+    >>> log = task_func(1615168051807)
+    >>> type(log)
+    <class 'pandas.core.frame.DataFrame'>
+    >>> log.iloc[0]
+    User                             user4
+    Activity                        search
+    Time        2021-03-08 12:47:31.807000
+    Name: 0, dtype: object
     """
-    np.random.seed(seed)
-    if period <= 0 or step < 1:
-        raise ValueError("Invalid input values")
-    COLUMNS = ["Timestamp", "Value"]
-    timestamps = np.arange(start_time, end_time, step)
-    df = pd.DataFrame(columns=COLUMNS)
-    if amplitude == 0:
-        values = [0] * len(timestamps)
-    else:
-        values = np.random.normal(size=len(timestamps))
-    data = []
-    for i, ts in enumerate(timestamps):
-        dt = datetime.utcfromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M:%S.%f")
-        value = values[i] + amplitude * np.sin(2 * np.pi * ts / period)
-        data.append([dt, value])
-    df = pd.DataFrame(data, columns=COLUMNS)
-    ax = df.plot(x="Timestamp", y="Value", title="Time Series with Seasonality")
-    ax.set_ylabel("Value")
-    return ax
+    random.seed(seed)
+    USERS = ["user1", "user2", "user3", "user4", "user5"]
+    ACTIVITIES = ["login", "logout", "browse", "search", "purchase"]
+    start_time = datetime.fromtimestamp(epoch_milliseconds / 1000.0)
+    end_time = datetime.now()
+    if start_time >= end_time:
+        raise ValueError("Start time must be before current system time")
+    logs = []
+    current_time = start_time
+    while current_time <= end_time:
+        user = random.choice(USERS)
+        activity = random.choice(ACTIVITIES)
+        logs.append([user, activity, current_time])
+        current_time += timedelta(seconds=random.randint(1, 10))
+    log_df = pd.DataFrame(logs, columns=["User", "Activity", "Time"])
+    return log_df
 
 import unittest
-import matplotlib.pyplot as plt
+import pandas as pd
+from datetime import datetime, timedelta
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test basic properties
-        test_cases = [
-            (0, 10000, 100, 1, 1000),
-            (0, 100000, 1000, 2, 5000),
-            (0, 10000, 100, 0.5, 1000),
-            (0, 10000, 100, 1, 500),
-            (0, 10000, 500, 1, 1000),
-        ]
-        for start_time, end_time, step, amplitude, period in test_cases:
-            with self.subTest(
-                start_time=start_time,
-                end_time=end_time,
-                step=step,
-                amplitude=amplitude,
-                period=period,
-            ):
-                ax = task_func(start_time, end_time, step, amplitude, period)
-                self.assertIsInstance(ax, plt.Axes)
-                self.assertEqual(ax.get_title(), "Time Series with Seasonality")
-                self.assertEqual(ax.get_xlabel(), "Timestamp")
-                self.assertEqual(ax.get_ylabel(), "Value")
+        # Test basic functionality - 1 day ago
+        epoch_milliseconds = int(
+            (datetime.now() - timedelta(days=1)).timestamp() * 1000
+        )
+        log = task_func(epoch_milliseconds)
+        self.assertTrue(isinstance(log, pd.DataFrame))
+        self.assertTrue("User" in log.columns)
+        self.assertTrue("Activity" in log.columns)
+        self.assertTrue("Time" in log.columns)
+        start_time = datetime.fromtimestamp(epoch_milliseconds / 1000.0)
+        self.assertEqual(log.iloc[0]["Time"], start_time)
     def test_case_2(self):
-        # Test large step
-        # Plot should still behave as expected even when step > (end_time - start_time)
-        ax = task_func(0, 10000, 200000, 1, 1000)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_title(), "Time Series with Seasonality")
-        self.assertEqual(ax.get_xlabel(), "Timestamp")
-        self.assertEqual(ax.get_ylabel(), "Value")
-    def test_case_3(self):
-        # Test handling invalid input types - period
-        with self.assertRaises(ValueError):
-            task_func(0, 10000, 100, 1, 0)
-        with self.assertRaises(ValueError):
-            task_func(0, 10000, 100, 1, -1)
-    def test_case_4(self):
-        # Test handling invalid input types - step
-        with self.assertRaises(ValueError):
-            task_func(0, 10000, -100, 1, 1000)
-        with self.assertRaises(ValueError):
-            task_func(0, 10000, 0, 1, 1000)
-    def test_case_5(self):
-        # Test plot data integrity
-        ax = task_func(0, 10000, 100, 1, 1000)
-        xy_data = ax.get_lines()[0].get_xydata()
-        expected_length = (10000 - 0) // 100
-        self.assertEqual(len(xy_data), expected_length)
-    def test_case_6(self):
-        # Test random seed
-        ax1 = task_func(0, 10000, 100, 1, 1000, seed=42)
-        xy_data1 = ax1.get_lines()[0].get_xydata()
-        ax2 = task_func(0, 10000, 100, 1, 1000, seed=42)
-        xy_data2 = ax2.get_lines()[0].get_xydata()
-        ax3 = task_func(0, 10000, 100, 1, 1000, seed=43)
-        xy_data3 = ax3.get_lines()[0].get_xydata()
+        # Test with a short time frame - 1 minutes ago
+        epoch_milliseconds = int(
+            (datetime.now() - timedelta(minutes=1)).timestamp() * 1000
+        )
+        log = task_func(epoch_milliseconds)
+        self.assertTrue(len(log) > 0)  # Should have at least one entry
         self.assertTrue(
-            np.array_equal(xy_data1, xy_data2),
-            "Results should be the same with the same seed",
+            log["Time"].min() >= datetime.fromtimestamp(epoch_milliseconds / 1000.0)
         )
-        self.assertFalse(
-            np.array_equal(xy_data1, xy_data3),
-            "Results should be different with different seeds",
+    def test_case_3(self):
+        # Test with a specific seed
+        epoch_milliseconds = int(
+            (datetime.now() - timedelta(days=1)).timestamp() * 1000
         )
-    def tearDown(self):
-        plt.close("all")
+        seed = 42
+        log = task_func(epoch_milliseconds, seed=seed)
+        first_row = log.iloc[0]
+        expected_user = "user1"
+        expected_activity = "login"
+        self.assertEqual(first_row["User"], expected_user)
+        self.assertEqual(first_row["Activity"], expected_activity)
+    def test_case_4(self):
+        # Test functionality over a longer period - 1 month ago
+        epoch_milliseconds = int(
+            (datetime.now() - timedelta(days=30)).timestamp() * 1000
+        )
+        log = task_func(epoch_milliseconds)
+        # Ensure that log timestamps are properly incrementing
+        time_diffs = log["Time"].diff().dropna()
+        self.assertTrue(all(time_diffs > timedelta(seconds=0)))
+        seconds_in_a_month = (
+            30 * 24 * 60 * 60
+        )  # Approximate number of seconds in a month
+        max_possible_entries = (
+            seconds_in_a_month  # Assuming a minimum of 1-second increments
+        )
+        min_possible_entries = (
+            seconds_in_a_month // 10
+        )  # Assuming a maximum of 10-second increments
+        # Verify that the log has a reasonable number of entries given the time frame
+        self.assertTrue(min_possible_entries <= len(log) <= max_possible_entries)
+        self.assertTrue(
+            log["Time"].min() >= datetime.fromtimestamp(epoch_milliseconds / 1000.0)
+        )
+        self.assertTrue(log["Time"].max() <= datetime.now())
+    def test_case_5(self):
+        # Test invalid start time (future)
+        epoch_milliseconds = int(
+            (datetime.now() + timedelta(days=1)).timestamp() * 1000
+        )
+        with self.assertRaises(Exception):
+            task_func(epoch_milliseconds)

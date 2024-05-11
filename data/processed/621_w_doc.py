@@ -1,59 +1,56 @@
+from itertools import chain
 import numpy as np
-import pandas as pd
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
 
-# Constants
-RANGE = (1, 100)
 
 def task_func(L):
     '''
-    Generates a DataFrame filled with random integers. The dimensions of the DataFrame (number of rows and columns)
-    are determined by multiplying pairs of integers from nested lists within the input list of lists 'L'.
-    
-    Requirements:
-    - numpy
-    - pandas
+    Convert a list of lists 'L' into a single list of integers, standardize the integers, and plot the standardized values.
 
     Parameters:
-    L (list of lists): A list of lists where each sublist contains two integers.
+    L (list of lists): A list of lists where each sublist contains integers.
     
     Returns:
-    DataFrame: A pandas DataFrame with random integers.
-    
-    Example:
-    >>> df = task_func([[2, 3], [5, 6]])
-    >>> type(df)
-    <class 'pandas.core.frame.DataFrame'>
+    matplotlib.axes._axes.Axes: A plot displaying the standardized values.
+
+    Requirements:
+    - numpy
+    - itertools
+    - sklearn.preprocessing
+    - matplotlib.pyplot
+
+    Examples:
+    >>> ax = task_func([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     '''
-    rows, columns = L[0][0] * L[0][1], L[1][0] * L[1][1]
-    random_array = np.random.randint(RANGE[0], RANGE[1], size=(rows, columns))
-    df = pd.DataFrame(random_array)
-    return df
+    data = list(chain(*L))
+    data = np.array(data).reshape(-1, 1)
+    scaler = StandardScaler()
+    standardized_data = scaler.fit_transform(data)
+    fig, ax = plt.subplots()
+    ax.plot(standardized_data)
+    plt.close(fig)
+    return ax
 
 import unittest
 class TestCases(unittest.TestCase):
-    
     def test_case_1(self):
-        result = task_func([[2, 3], [5, 6]])
-        self.assertEqual(result.shape, (2*3, 5*6))
-        self.assertTrue((result.values >= 1).all())
-        self.assertTrue((result.values <= 100).all())
+        ax = task_func([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines[0].get_ydata()), 9)
     def test_case_2(self):
-        result = task_func([[1, 1], [1, 1]])
-        self.assertEqual(result.shape, (1*1, 1*1))
-        self.assertTrue((result.values >= 1).all())
-        self.assertTrue((result.values <= 100).all())
+        ax = task_func([[-1, -2, -3], [-4, -5, -6], [-7, -8, -9]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines[0].get_ydata()), 9)
     def test_case_3(self):
-        result = task_func([[4, 5], [2, 3]])
-        self.assertEqual(result.shape, (4*5, 2*3))
-        self.assertTrue((result.values >= 1).all())
-        self.assertTrue((result.values <= 100).all())
+        ax = task_func([[1, -2, 3], [-4, 5, -6], [7, -8, 9]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines[0].get_ydata()), 9)
     def test_case_4(self):
-        result = task_func([[3, 2], [6, 5]])
-        self.assertEqual(result.shape, (3*2, 6*5))
-        self.assertTrue((result.values >= 1).all())
-        self.assertTrue((result.values <= 100).all())
+        ax = task_func([[1, 2, 3, 4, 5]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines[0].get_ydata()), 5)
     def test_case_5(self):
-        result = task_func([[7, 8], [1, 2]])
-        self.assertEqual(result.shape, (7*8, 1*2))
-        self.assertTrue((result.values >= 1).all())
-        self.assertTrue((result.values <= 100).all())
+        ax = task_func([[1, 2], [3, 4, 5, 6], [7]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines[0].get_ydata()), 7)

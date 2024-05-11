@@ -1,84 +1,78 @@
-import os
-import glob
 import subprocess
+import psutil
+import time
 
-def task_func(directory, backup_dir='/path/to/backup'):
-    """
-    Backup all '.log' files in a specified directory to a tar.gz file and delete the original files after backup.
-    The backup file is named 'logs_backup.tar.gz' and placed in the specified backup directory.
-    
+def task_func(process_name: str) -> str:
+    '''
+    Check if a particular process is running based on its name. If it is not running, start it using the process name as a command. 
+    If it is running, terminate the process and restart it by executing the process name as a command.
+
     Parameters:
-    - directory (str): The directory that contains the log files to be backed up.
-    - backup_dir (str, optional): The directory where the backup file will be saved.
-                                  Default is '/path/to/backup'.
-    
+    - process_name (str): The name of the process to check and manage. This should be executable as a command.
+
     Returns:
-    - str: The path to the backup file if logs are found, otherwise returns a message stating no logs were found.
-    
-    Raises:
-    - FileNotFoundError: If the specified directory does not exist.
-    
+    - str: A message indicating the action taken:
+        - "Process not found. Starting <process_name>."
+        - "Process found. Restarting <process_name>."
+
     Requirements:
     - subprocess
-    - glob
-    - os
-    
+    - psutil
+    - time
+
     Example:
-    >>> task_func('/path/to/logs')
-    '/path/to/backup/logs_backup.tar.gz'
-    >>> task_func('/path/to/logs', '/alternative/backup/dir')
-    '/alternative/backup/dir/logs_backup.tar.gz'
-    """
-    if not os.path.exists(directory):
-        raise FileNotFoundError(f"Directory '{directory}' not found.")
-    log_files = glob.glob(os.path.join(directory, '*.log'))
-    if not log_files:
-        return "No logs found to backup."
-    if not os.path.exists(backup_dir):
-        os.makedirs(backup_dir)
-    backup_file = os.path.join(backup_dir, 'logs_backup.tar.gz')
-    subprocess.call(['tar', '-czvf', backup_file] + log_files)
-    for file in log_files:
-        os.remove(file)
-    return backup_file
+    >>> task_func('notepad')
+    "Process not found. Starting notepad."
+    OR
+    >>> task_func('notepad')
+    "Process found. Restarting notepad."
+    '''
+    is_running = any([proc for proc in psutil.process_iter() if proc.name() == process_name])
+    if is_running:
+        for proc in psutil.process_iter():
+            if proc.name() == process_name:
+                proc.terminate()
+                time.sleep(5)
+        subprocess.Popen(process_name)
+        return f"Process found. Restarting {process_name}."
+    else:
+        subprocess.Popen(process_name)
+        return f"Process not found. Starting {process_name}."
 
 import unittest
-import tempfile
-import os
-import subprocess
-import glob
-import shutil
+from unittest.mock import patch, MagicMock
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.temp_dir = tempfile.mkdtemp()
-        self.temp_backup_dir = tempfile.mkdtemp()
-        
-        # Create some log files and some non-log files
-        for i in range(5):
-            with open(os.path.join(self.temp_dir, f"file_{i}.log"), "w") as f:
-                f.write(f"Mock log content for file_{i}")
-            with open(os.path.join(self.temp_dir, f"file_{i}.txt"), "w") as f:
-                f.write(f"Mock content for file_{i}.txt")
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir)
-        shutil.rmtree(self.temp_backup_dir)
-    def test_backup_creation_and_log_file_deletion(self):
-        # Test the creation of the backup file and deletion of original log files.
-        backup_path = task_func(self.temp_dir, self.temp_backup_dir)
-        self.assertTrue(os.path.exists(backup_path))
-        self.assertEqual(backup_path, os.path.join(self.temp_backup_dir, 'logs_backup.tar.gz'))
-        self.assertFalse(any(file.endswith('.log') for file in os.listdir(self.temp_dir)))
-    def test_no_log_files_to_backup(self):
-        # Test behavior when no log files are present in the directory.
-        empty_dir = tempfile.mkdtemp()
-        result = task_func(empty_dir, self.temp_backup_dir)
-        self.assertEqual(result, "No logs found to backup.")
-        shutil.rmtree(empty_dir)
-    def test_non_log_files_remain(self):
-        # Ensure that non-log files are not deleted or included in the backup.
-        backup_path = task_func(self.temp_dir, self.temp_backup_dir)
-        self.assertEqual(len(glob.glob(os.path.join(self.temp_dir, '*.txt'))), 5)  # Check only non-log files remain
-    def test_handle_non_existing_directory(self):
-        # Verify that a FileNotFoundError is raised for a non-existing source directory.
-        with self.assertRaises(FileNotFoundError):
-            task_func('/non/existing/directory', self.temp_backup_dir)
+    @patch('psutil.process_iter')
+    @patch('subprocess.Popen')
+    def test_process_not_found_starts_process(self, mock_popen, mock_process_iter):
+        # Simulating no running process
+        mock_process_iter.return_value = []
+        result = task_func('random_non_existent_process')
+        self.assertEqual(result, "Process not found. Starting random_non_existent_process.")
+        mock_popen.assert_called_once_with('random_non_existent_process')
+    @patch('psutil.process_iter')
+    @patch('subprocess.Popen')
+    def test_process_found_restarts_process(self, mock_popen, mock_process_iter):
+        # Simulating a running process
+        process = MagicMock()
+        process.name.return_value = 'notepad'
+        mock_process_iter.return_value = [process]
+        result = task_func('notepad')
+        self.assertEqual(result, "Process found. Restarting notepad.")
+        # Expecting terminate called on the process and then restarted
+        process.terminate.assert_called_once()
+        mock_popen.assert_called_once_with('notepad')
+    @patch('psutil.process_iter')
+    @patch('subprocess.Popen')
+    def test_process_terminates_and_restarts_multiple_instances(self, mock_popen, mock_process_iter):
+        # Simulating multiple instances of a running process
+        process1 = MagicMock()
+        process2 = MagicMock()
+        process1.name.return_value = 'multi_instance'
+        process2.name.return_value = 'multi_instance'
+        mock_process_iter.return_value = [process1, process2]
+        result = task_func('multi_instance')
+        self.assertEqual(result, "Process found. Restarting multi_instance.")
+        process1.terminate.assert_called_once()
+        process2.terminate.assert_called_once()
+        mock_popen.assert_called_once_with('multi_instance')

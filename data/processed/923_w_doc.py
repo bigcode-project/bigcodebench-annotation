@@ -1,76 +1,82 @@
 import pandas as pd
+import random
 import re
 
-# Constants
-STOPWORDS = set([
-    "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself",
-    "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself",
-    "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that",
-    "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had",
-    "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because",
-    "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into",
-    "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out",
-    "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where",
-    "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no",
-    "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just",
-    "don", "should", "now"
-])
-
-def task_func(data, column):
+def task_func(person_names, email_domains, num_records=5):
     """
-    Removes English stopwords from a text column in a DataFrame and returns the modified DataFrame.
+    Generate a DataFrame with a specified number of records containing personal names and emails. 
+    The emails are cleaned by replacing all occurrences of "@" with "[at]".
     
     Parameters:
-    df (pandas.DataFrame): The DataFrame containing the text column to be processed.
-    column (str): The name of the text column from which stopwords should be removed.
+    - person_names (list of str): A list of person names to use in the records.
+    - email_domains (list of str): A list of email domains to use in the records.
+    - num_records (int, optional): The number of records to generate. Default is 5.
     
     Returns:
-    pandas.DataFrame: A DataFrame with the stopwords removed from the specified column.
+    - DataFrame: A pandas DataFrame with columns 'Name' and 'Email' containing the person names and cleaned emails.
     
     Requirements:
-    - pandas
-    - re
+    - pandas for DataFrame manipulation
+    - random for random selection
+    - re for regular expression operations
     
-    Constants:
-    - STOPWORDS: A set containing common English stopwords.
+    Raises:
+    - ValueError: If the number of names provided is less than the number of records requested or if no email domains are provided.
     
     Example:
-    >>> data = {'text': ['This is a sample sentence.', 'Another example here.']}
-    >>> print(task_func(data, 'text'))
-                  text
-    0  sample sentence
-    1  Another example
+    >>> random.seed(0)  # Initialize random seed
+    >>> task_func(['John Doe', 'Jane Smith'], ['gmail.com', 'yahoo.com'], 2)
+             Name              Email
+    0  Jane Smith  jane[at]gmail.com
+    1    John Doe  john[at]yahoo.com
+    >>> task_func(['Alice'], ['outlook.com'], 1)
+        Name                 Email
+    0  Alice  alice[at]outlook.com
     """
-    df = pd.DataFrame(data)
-    df[column] = df[column].apply(lambda x: ' '.join([word for word in re.findall(r'\b\w+\b', x) if word.lower() not in STOPWORDS]))
+    if len(person_names) < num_records or len(email_domains) == 0:
+        raise ValueError("Insufficient number of names or domains provided.")
+    data = []
+    selected_names = random.sample(person_names, num_records)
+    for name in selected_names:
+        email = re.sub('@', '[at]', '{}@{}'.format(name.split()[0].lower(), random.choice(email_domains)))
+        data.append([name, email])
+    df = pd.DataFrame(data, columns=['Name', 'Email'])
     return df
 
 import unittest
 import pandas as pd
-# Import the refined function
 class TestCases(unittest.TestCase):
+    
     def test_case_1(self):
-        data = {'text': ['This is a sample sentence.', 'Another example here.']}
-        expected_df = pd.DataFrame({'text': ['sample sentence', 'Another example']})
-        result_df = task_func(data, 'text')
-        pd.testing.assert_frame_equal(result_df, expected_df)
+        random.seed(0)  # Initialize random seed
+        result_df = task_func(['John Doe', 'Jane Smith'], ['gmail.com', 'yahoo.com'], 2)
+        self.assertTrue(isinstance(result_df, pd.DataFrame))
+        self.assertEqual(len(result_df), 2)
+        self.assertTrue(set(result_df.columns) == {'Name', 'Email'})
+        self.assertTrue(all(result_df['Email'].str.contains('[at]')))
+        
     def test_case_2(self):
-        data = {'content': ['Stopwords should be removed.', 'Testing this function.']}
-        expected_df = pd.DataFrame({'content': ['Stopwords removed', 'Testing function']})
-        result_df = task_func(data, 'content')
-        pd.testing.assert_frame_equal(result_df, expected_df)
+        random.seed(0)  # Initialize random seed
+        result_df = task_func(['Alice'], ['outlook.com'], 1)
+        self.assertTrue(isinstance(result_df, pd.DataFrame))
+        self.assertEqual(len(result_df), 1)
+        self.assertTrue(set(result_df.columns) == {'Name', 'Email'})
+        self.assertTrue(all(result_df['Email'].str.contains('[at]')))
+        
     def test_case_3(self):
-        data = {'sentence': ['Hello world!', 'Good morning.']}
-        expected_df = pd.DataFrame({'sentence': ['Hello world', 'Good morning']})
-        result_df = task_func(data, 'sentence')
-        pd.testing.assert_frame_equal(result_df, expected_df)
+        random.seed(0)  # Initialize random seed
+        with self.assertRaises(ValueError):
+            task_func(['John Doe'], ['gmail.com'], 2)
+            
     def test_case_4(self):
-        data = {'text': ['This is a single sentence.'] * 100}
-        expected_df = pd.DataFrame({'text': ['single sentence'] * 100})
-        result_df = task_func(data, 'text')
-        pd.testing.assert_frame_equal(result_df, expected_df)
+        random.seed(0)  # Initialize random seed
+        with self.assertRaises(ValueError):
+            task_func(['John Doe', 'Jane Smith'], [], 2)
+            
     def test_case_5(self):
-        data = {'line': [''] * 50}
-        expected_df = pd.DataFrame({'line': [''] * 50})
-        result_df = task_func(data, 'line')
-        pd.testing.assert_frame_equal(result_df, expected_df)
+        random.seed(0)  # Initialize random seed
+        result_df = task_func(['John Doe', 'Jane Smith', 'Bob'], ['gmail.com', 'yahoo.com'], 3)
+        self.assertTrue(isinstance(result_df, pd.DataFrame))
+        self.assertEqual(len(result_df), 3)
+        self.assertTrue(set(result_df.columns) == {'Name', 'Email'})
+        self.assertTrue(all(result_df['Email'].str.contains('[at]')))

@@ -1,54 +1,68 @@
 import re
 import string
-from nltk.stem import PorterStemmer
-from collections import Counter
-
-STEMMER = PorterStemmer()
 
 def task_func(content):
-    """
-    Stem every word in a sentence, except the last, and count the frequency of each stem.
+    """Count the non-stop words in a sentence without the last word.
 
     Parameters:
-    content (str): The sentence to stem and count.
+    - content (str): The sentence to count non-stopwords from.
 
     Returns:
-    dict: A dictionary with stemmed words as keys and their frequency as values.
+    - count (int): The count of non-stopwords.
 
     Requirements:
     - re
     - string
-    - nltk.stem
-    - collections.Counter
 
     Example:
-    >>> task_func('running runner run')
-    {'run': 1, 'runner': 1}
+    >>> task_func('this is an example content')
+    1
     """
-    content = content.split(' ')[:-1]
-    words = [word.strip(string.punctuation).lower() for word in re.split('\W+', ' '.join(content))]
-    stemmed_words = [STEMMER.stem(word) for word in words]
-    word_counts = Counter(stemmed_words)
-    return dict(word_counts)
+    STOPWORDS = set([
+        "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", 
+        "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", 
+        "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", 
+        "theirs", "themselves", "what", "which", "who", "whom", "this", "that", 
+        "these", "those", "is", "are", "was", "were", "be", "been", "being", "have", 
+        "has", "had", "having", "do", "does", "did", "doing", "an", "the", "and", 
+        "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", 
+        "for", "with", "about", "against", "between", "into", "through", "during", 
+        "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", 
+        "on", "off", "over", "under", "again", "further", "then", "once"
+    ])
+    content = content.split(' ')
+    if len(content) > 1:
+        content = content[:-1]
+    else:
+        content = []
+    words = [word.strip(string.punctuation).lower() for word in re.split(r'\W+', ' '.join(content)) if word]
+    non_stopwords = [word for word in words if word not in STOPWORDS]
+    count = len(non_stopwords)
+    return count
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = task_func('running runner run')
-        self.assertEqual(result, {'run': 1, 'runner': 1})
-    
+        # Test with a mix of stopwords and non-stopwords
+        self.assertEqual(task_func('this is an example content'), 1)
     def test_case_2(self):
-        result = task_func('dancing dancer danced')
-        self.assertEqual(result, {'danc': 1, 'dancer': 1})
-        
+        # Test with all stopwords except the last word
+        self.assertEqual(task_func('this is an the of'), 0)
     def test_case_3(self):
-        result = task_func('loving lover love')
-        self.assertEqual(result, {'love': 1, 'lover': 1})
-        
+        # Test with no stopwords
+        self.assertEqual(task_func('example content programming'), 2)
     def test_case_4(self):
-        result = task_func('computing computer compute')
-        self.assertEqual(result, {'comput': 2})
-        
+        # Test with punctuation
+        self.assertEqual(task_func('example, content; programming, python.'), 3)
     def test_case_5(self):
-        result = task_func('swimming swimmer swim')
-        self.assertEqual(result, {'swim': 1, 'swimmer': 1})
+        # Test with an empty string
+        self.assertEqual(task_func(''), 0)
+    def test_case_6(self):
+        # Test with a single non-stopword
+        self.assertEqual(task_func('content'), 0)
+    def test_case_7(self):
+        # Test with a single stopword
+        self.assertEqual(task_func('the'), 0)
+    def test_case_8(self):
+        # Test with a mix and uppercase letters
+        self.assertEqual(task_func('This IS an Example Content'), 1)

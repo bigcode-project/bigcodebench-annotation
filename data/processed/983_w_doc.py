@@ -1,122 +1,81 @@
+import seaborn as sns
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy.stats import norm
 
 
-def task_func(df, column, bins=30, density=True, alpha=0.6, color="g", seed=None):
+def task_func(df):
     """
-    Plots a histogram for a specified column of a pandas DataFrame and overlays
-    it with a fitted normal distribution curve.
+    Generates a pair plot from a numeric DataFrame and calculates its covariance matrix.
 
     Parameters:
-    - df (pandas.DataFrame): The input DataFrame.
-    - column (str): The column name for which the histogram is plotted.
-    - bins (int, optional): Number of bins for the histogram. Defaults to 30.
-    - density (bool, optional): If True, the histogram is normalized to form a
-                                probability density. Defaults to True.
-    - alpha (float, optional): Transparency level for the histogram bars.
-                               Defaults to 0.6.
-    - color (str, optional): Color of the histogram bars. Defaults to 'g'.
-    - seed (int, optional): Seed for the random number generator.
-                            Defaults to None (not set).
+    - df (pandas.DataFrame): A pandas DataFrame with only numeric columns.
 
     Returns:
-    - matplotlib.axes._axes.Axes: The matplotlib Axes object with the plot.
+    - tuple:
+        - covariance_df (pandas.DataFrame): The covariance matrix of the input DataFrame.
+        - pair_plot (sns.axisgrid.PairGrid): Pair plot of the input DataFrame.
+
+    Raises:
+    - ValueError: If the DataFrame is empty.
+    - TypeError: If the DataFrame contains non-numeric data types.
 
     Requirements:
     - numpy
-    - matplotlib
-    - scipy
+    - seaborn
 
-    Example:
-    >>> np.random.seed(0)
-    >>> df = pd.DataFrame({'A': np.random.normal(0, 1, 1000)})
-    >>> ax = task_func(df, 'A')
-    >>> ax.get_title()
-    "Normal Fit for 'A'"
+    Examples:
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'C': [7, 8, 9]})
+    >>> covariance_df, ax = task_func(df)
+    >>> type(ax)
+    <class 'seaborn.axisgrid.PairGrid'>
+    >>> covariance_df
+         A    B    C
+    A  1.0  1.0  1.0
+    B  1.0  1.0  1.0
+    C  1.0  1.0  1.0
     """
-    if seed is not None:
-        np.random.seed(seed)
-    data = df[column]
-    mu, std = norm.fit(data)
-    fig, ax = plt.subplots()
-    ax.hist(data, bins=bins, density=density, alpha=alpha, color=color)
-    xmin, xmax = plt.xlim()
-    x = np.linspace(xmin, xmax, 100)
-    p = norm.pdf(x, mu, std)
-    ax.plot(x, p, "k", linewidth=2)
-    title = f"Normal Fit for '{column}'"
-    ax.set_title(title)
-    ax.set_ylabel("Density")
-    ax.set_xlabel(column)
-    return ax
+    if df.empty:
+        raise ValueError("DataFrame is empty. Non-empty DataFrame required.")
+    if not all(df.dtypes.apply(lambda x: np.issubdtype(x, np.number))):
+        raise TypeError(
+            "DataFrame contains non-numeric data. Only numeric data types are supported."
+        )
+    covariance_df = df.cov()
+    pair_plot = sns.pairplot(df)
+    return covariance_df, pair_plot
 
 import unittest
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import colors
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        np.random.seed(42)
-    def test_data_correctness(self):
-        """Tests if the normal distribution parameters accurately represent the data's distribution."""
-        mean, std_dev = 0, 1
-        df = pd.DataFrame({"F": np.random.normal(mean, std_dev, 5000)})
-        ax = task_func(df, "F")
-        line = ax.lines[
-            0
-        ]  # Assuming the normal distribution line is the first line object in the plot
-        x_data = line.get_xdata()
-        y_data = line.get_ydata()
-        # The peak of the normal distribution curve should be at the mean
-        estimated_mean = x_data[np.argmax(y_data)]
-        self.assertAlmostEqual(
-            estimated_mean,
-            mean,
-            places=1,
-            msg="The calculated mean does not match the expected mean.",
-        )
-    def test_bins_parameter(self):
-        """Verifies that changing the number of bins affects the plot."""
-        df = pd.DataFrame({"B": np.random.normal(0, 1, 100)})
-        ax_default_bins = task_func(df, "B")
-        ax_more_bins = task_func(df, "B", bins=50)
-        self.assertNotEqual(
-            ax_default_bins.patches,
-            ax_more_bins.patches,
-            "Different 'bins' parameters should result in different histograms.",
-        )
-    def test_alpha_parameter(self):
-        """Checks if the alpha parameter correctly sets the transparency."""
-        df = pd.DataFrame({"C": np.random.normal(0, 1, 100)})
-        ax = task_func(df, "C", alpha=0.1)
-        self.assertLess(
-            ax.patches[0].get_alpha(),
-            0.5,
-            "The alpha parameter should control the transparency of histogram bars.",
-        )
-    def test_density_parameter(self):
-        """Ensures the density parameter properly normalizes the histogram."""
-        df = pd.DataFrame({"D": np.random.normal(0, 1, 100)})
-        ax = task_func(df, "D", density=False)
-        total_bar_area = sum((p.get_width() * p.get_height() for p in ax.patches))
-        self.assertNotEqual(
-            total_bar_area,
-            1,
-            "With 'density=False', the histogram should not be normalized to form a probability density.",
-        )
-    def test_color_parameter(self):
-        """Validates that the histogram bars use the specified color."""
-        df = pd.DataFrame({"E": np.random.normal(0, 1, 100)})
-        ax = task_func(
-            df, "E", color="blue", alpha=0.6
-        )  # Match alpha value with the function's default or specified value
-        for patch in ax.patches:
-            self.assertEqual(
-                patch.get_facecolor(),
-                colors.to_rgba("blue", alpha=0.6),
-                "The bars should match the specified color.",
-            )
-    def tearDown(self):
-        plt.close("all")
+    def test_covariance_one(self):
+        """Test basic case with expected covariance of 1.0"""
+        df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6], "C": [7, 8, 9]})
+        covariance_df, _ = task_func(df)
+        self.assertTrue((covariance_df == 1).all().all())
+    def test_identical_values_dataframe(self):
+        """Test DataFrame where all rows have identical values."""
+        df = pd.DataFrame({"A": [1, 1, 1], "B": [2, 2, 2]})
+        covariance_df, _ = task_func(df)
+        self.assertTrue((covariance_df == 0).all().all())
+    def test_with_empty_dataframe(self):
+        """Test handling empty input (should raise error)."""
+        df = pd.DataFrame()
+        with self.assertRaises(ValueError):
+            task_func(df)
+    def test_with_non_numeric_dataframe(self):
+        """Test handling unsupported data types."""
+        df = pd.DataFrame({"A": ["a", "b", "c"], "B": ["d", "e", "f"]})
+        with self.assertRaises(TypeError):
+            task_func(df)
+    def test_plot_attributes(self):
+        """Test plot attributes."""
+        df = pd.DataFrame({"X": [10, 20, 30], "Y": [15, 25, 35]})
+        _, pair_plot = task_func(df)
+        self.assertIsInstance(pair_plot, sns.axisgrid.PairGrid)
+        self.assertEqual(len(pair_plot.axes), 2)  # Should have 2x2 grid for pair plot
+    def test_single_column_dataframe(self):
+        """Test handling of DataFrame with a single numeric column."""
+        df = pd.DataFrame({"A": [1, 2, 3]})
+        covariance_df, _ = task_func(df)
+        self.assertEqual(covariance_df.loc["A"].item(), 1.0)
+        self.assertEqual(covariance_df.shape, (1, 1))

@@ -1,64 +1,70 @@
-import re
-from nltk.corpus import stopwords
+import itertools
+from typing import Any
+from scipy import stats
 
 
-def task_func(text: str) -> dict:
+def task_func(input_list: list, repetitions: int) -> Any:
     """
-    Analyzes a given text string by removing duplicate words and stopwords defined by nltk.corpus ,
-    and then returns a frequency distribution of the remaining words.
-
+    Calculate the mode of a list of elements with multiple repetitions of the original list.
+    
+    Functionality: 
+    - Takes a list and a repetition count as input.
+    - Flattens the list with multiple repetitions.
+    - Calculates the mode of the flattened list.
+    
     Parameters:
-    - text (str): The text string to analyze.
-
-    Returns:
-    - dict: The frequency distribution of the words in the text after filtering.
+    - input_list (list): A list containing elements (can be of any hashable type).
+    - repetitions (int): The number of times the original list should be repeated.
 
     Requirements:
-    - re
-    - nltk.corpus
+    - typing
+    - itertools
+    - scipy
 
-    Note:
-    - A manually defined set of common English stopwords is used for filtering.
-
+    Returns:
+    - scipy.stats.ModeResult: An object containing the mode(s) and count(s) of the most frequently occurring element(s) in the flattened list.
+    
     Examples:
-    >>> task_func("The quick brown fox jumps over the lazy dog and the dog was not that quick to respond.")
-    {'quick': 1, 'brown': 1, 'fox': 1, 'jumps': 1, 'lazy': 1, 'dog': 1, 'respond': 1}
-
-    >>> task_func("hello hello world")
-    {'hello': 1, 'world': 1}
+    >>> task_func(['A', 'B', 'C'], 10)
+    ModeResult(mode=array(['A'], dtype='<U1'), count=array([10]))
+    
+    >>> task_func([1, 2, 3], 5)
+    ModeResult(mode=array([1]), count=array([5]))
     """
-    stop_words = set(stopwords.words('english'))
-    text = ' '.join(sorted(set(text.split()), key=text.index))
-    words = [word for word in re.findall(r'\b\w+\b', text.lower()) if word not in stop_words]
-    freq_dist = {}
-    for word in words:
-        freq_dist[word] = freq_dist.get(word, 0) + 1
-    return freq_dist
+    flattened_list = np.array(list(itertools.chain(*[input_list for _ in range(repetitions)])))
+    mode = stats.mode(flattened_list)
+    return mode
 
 import unittest
+import numpy as np
 class TestCases(unittest.TestCase):
+    
     def test_case_1(self):
-        input_text = "The quick brown fox jumps over the lazy dog and the dog was not that quick to respond."
-        output = task_func(input_text)
-        expected_output = {'quick': 1, 'brown': 1, 'fox': 1, 'jumps': 1, 'lazy': 1, 'dog': 1, 'respond': 1}
-        self.assertEqual(output, expected_output)
+        # Test with list of integers
+        result = task_func([1, 2, 3], 5)
+        self.assertEqual(result.mode.tolist(), [1])
+        self.assertEqual(result.count.tolist(), [5])
+        
     def test_case_2(self):
-        input_text = "hello hello world"
-        output = task_func(input_text)
-        expected_output = {'hello': 1, 'world': 1}
-        self.assertEqual(output, expected_output)
+        # Test with list of strings
+        result = task_func(['A', 'B', 'C'], 10)
+        self.assertEqual(result.mode.tolist(), ['A'])
+        self.assertEqual(result.count.tolist(), [10])
+        
     def test_case_3(self):
-        input_text = "the and is"
-        output = task_func(input_text)
-        expected_output = {}
-        self.assertEqual(output, expected_output)
+        # Test with list of floating-point numbers
+        result = task_func([1.5, 2.5, 3.5], 4)
+        self.assertEqual(result.mode.tolist(), [1.5])
+        self.assertEqual(result.count.tolist(), [4])
+        
     def test_case_4(self):
-        input_text = ""
-        output = task_func(input_text)
-        expected_output = {}
-        self.assertEqual(output, expected_output)
+        # Test with empty list
+        result = task_func([], 10)
+        self.assertEqual(result.mode.shape, (0,))
+        self.assertEqual(result.count.shape, (0,))
+        
     def test_case_5(self):
-        input_text = "hello1 hello2 hello1"
-        output = task_func(input_text)
-        expected_output = {'hello1': 1, 'hello2': 1}
-        self.assertEqual(output, expected_output)
+        # Test with mixed type list
+        result = task_func([1, 'A', 1.5], 3)
+        self.assertEqual(result.mode.tolist(), ['1'])
+        self.assertEqual(result.count.tolist(), [3])

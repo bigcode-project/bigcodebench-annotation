@@ -1,96 +1,122 @@
 from datetime import datetime
 import pandas as pd
+import pytz
 import matplotlib.pyplot as plt
 
 # Constants
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+TIMEZONES = [
+    "America/New_York",
+    "Europe/London",
+    "Asia/Shanghai",
+    "Asia/Tokyo",
+    "Australia/Sydney",
+]
 
 
-def task_func(timestamps):
+def task_func(timestamp):
     """
-    Convert a list of Unix timestamps to date objects, create a Pandas DataFrame, and draw a histogram.
+    Convert a Unix timestamp to date objects in different time zones, create a Pandas DataFrame, and draw a bar chart.
+    - You should use the time zones mentionned in the constant TIMEZONES.
     - The date format should be as DATE_FORMAT.
-    - The DataFrame should have 'Timestamp' and 'Datetime' as column names.
-    - If the list of timestamps is empty, raise a ValueError with the message "Input list of timestamps is empty".
+    - The DataFrame should have 'Timezone' and 'Datetime' as column names.
+    - The x-label of the bar plot should be set to 'Timezone' while the y-label should be set to 'Datetime'.
+    - The plot title should be "Datetime = f(Timezone)"
 
     Parameters:
-    - timestamps (list): The list of Unix timestamps.
+    timestamp (int): The Unix timestamp.
 
     Returns:
-    - pandas.DataFrame: A pandas DataFrame containing the original Unix timestamps and the converted datetime objects.
-    - Axes: The Axes object of the histogram plot. The histogram will have 10 bins by default, representing the distribution of the datetime objects.
-
-    Raises:
-    - ValueError("Input list of timestamps is empty"): If the list of timestamps is empty.
+    tuple: A tuple containing:
+        - DataFrame: A pandas DataFrame containing the datetime in different timezones.
+        - Axes: A matplotlib Axes object for the generated bar chart.
 
     Requirements:
     - datetime
     - pandas
+    - pytz
     - matplotlib.pyplot
 
-    Examples:
-    >>> df, ax = task_func([1347517370, 1475153730, 1602737300])
+    Example:
+    >>> df, ax = task_func(1347517370)
     >>> print(df)
-        Timestamp             Datetime
-    0  1347517370  2012-09-13 02:22:50
-    1  1475153730  2016-09-29 08:55:30
-    2  1602737300  2020-10-15 00:48:20
+               Timezone            Datetime
+    0  America/New_York 2012-09-13 02:22:50
+    1     Europe/London 2012-09-13 07:22:50
+    2     Asia/Shanghai 2012-09-13 14:22:50
+    3        Asia/Tokyo 2012-09-13 15:22:50
+    4  Australia/Sydney 2012-09-13 16:22:50
     """
-    if not timestamps:
-        raise ValueError("Input list of timestamps is empty.")
-    datetimes = [datetime.fromtimestamp(t).strftime(DATE_FORMAT) for t in timestamps]
-    df = pd.DataFrame({"Timestamp": timestamps, "Datetime": datetimes})
-    ax = plt.hist(pd.to_datetime(df["Datetime"]))
+    datetimes = [
+        datetime.fromtimestamp(timestamp, pytz.timezone(tz)).strftime(DATE_FORMAT)
+        for tz in TIMEZONES
+    ]
+    df = pd.DataFrame({"Timezone": TIMEZONES, "Datetime": datetimes})
+    df["Datetime"] = pd.to_datetime(df["Datetime"])
+    ax = df.plot.bar(x="Timezone", y="Datetime", legend=False)
+    plt.ylabel("Timezone")
+    plt.ylabel("Datetime")
+    plt.title("Datetime = f(Timezone)")
     plt.close()
     return df, ax
 
 import unittest
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
-    def setUp(self):
-        self.test_data = [
-            [1318935276, 1342905276, 23074268],
-            [4235087541, 1234653346, 19862358],
-            [],
-            [1156829289],
-            [1000000000, 2000000000, 3000000000],
-        ]
     def test_case_1(self):
-        input_timestamps = self.test_data[0]
-        self.assert_function_output(input_timestamps)
+        df, ax = task_func(398024852)
+        self.validate_output(df, ax)
     def test_case_2(self):
-        input_timestamps = self.test_data[1]
-        self.assert_function_output(input_timestamps)
+        df, ax = task_func(229981844)
+        self.validate_output(df, ax)
     def test_case_3(self):
-        input_timestamps = self.test_data[2]
-        with self.assertRaises(ValueError) as context:
-            task_func(input_timestamps)
-        self.assertEqual(
-            str(context.exception),
-            "Input list of timestamps is empty.",
-        )
+        df, ax = task_func(163757150)
+        self.validate_output(df, ax)
     def test_case_4(self):
-        input_timestamps = self.test_data[3]
-        self.assert_function_output(input_timestamps)
+        df, ax = task_func(136821030)
+        self.validate_output(df, ax)
     def test_case_5(self):
-        input_timestamps = self.test_data[4]
-        self.assert_function_output(input_timestamps)
-        df, ax = task_func(input_timestamps)
-        expected_df = pd.DataFrame(
+        df, ax = task_func(1318935276)
+        self.validate_output(df, ax)
+    def test_case_6(self):
+        df, ax = task_func(2078245012)
+        edf = pd.DataFrame(
             {
-                "Timestamp": [1000000000, 2000000000, 3000000000],
+                "Timezone": [
+                    "America/New_York",
+                    "Europe/London",
+                    "Asia/Shanghai",
+                    "Asia/Tokyo",
+                    "Australia/Sydney",
+                ],
                 "Datetime": [
-                    "2001-09-09 01:46:40",
-                    "2033-05-18 03:33:20",
-                    "2065-01-24 05:20:00",
+                    "2035-11-09 13:16:52",
+                    "2035-11-09 18:16:52",
+                    "2035-11-10 02:16:52",
+                    "2035-11-10 03:16:52",
+                    "2035-11-10 05:16:52",
                 ],
             }
         )
-        
-        pd.testing.assert_frame_equal(df, expected_df)
-    def assert_function_output(self, input_timestamps):
-        df, ax = task_func(input_timestamps)
-        # Assert that the DataFrame contains the correct timestamps
-        self.assertEqual(df["Timestamp"].tolist(), input_timestamps)
-        # Assert the histogram attributes (e.g., number of bins)
-        self.assertEqual(len(ax[0]), 10)  # There should be 10 bars in the histogram
+        edf = edf.astype({"Timezone": "object", "Datetime": "datetime64[ns]"})
+        pd.testing.assert_frame_equal(df, edf)
+        self.validate_output(df, ax)
+    def validate_output(self, df, ax):
+        # Test the shape of the returned DataFrame
+        self.assertEqual(df.shape, (5, 2))
+        # Test if the Timezones in DataFrame are correct
+        expected_timezones = [
+            "America/New_York",
+            "Europe/London",
+            "Asia/Shanghai",
+            "Asia/Tokyo",
+            "Australia/Sydney",
+        ]
+        self.assertListEqual(df["Timezone"].tolist(), expected_timezones)
+        # Test if the Datetime column in DataFrame is of datetime64 type
+        self.assertEqual(df["Datetime"].dtype, "datetime64[ns]")
+        # Test the title of the plot
+        self.assertEqual(ax.get_title(), "Datetime = f(Timezone)")
+        # Test the x and y axis labels of the plot
+        self.assertEqual(ax.get_xlabel(), "Timezone")
+        self.assertEqual(ax.get_ylabel(), "Datetime")

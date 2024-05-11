@@ -1,226 +1,147 @@
 import pandas as pd
-import os
+import sqlite3
 import numpy as np
+import matplotlib.pyplot as plt
 import ast
 
-def task_func(directory):
+def task_func(db_file):
     """
-    Traverse a directory for CSV files a get the file with the longest filename. From that CSV file, load e-mail data, convert it into a Pandas DataFrame, calculate the sum, mean and median of the list associated with each e-mail, and then draw a histogram of the median.
-    - The column names of each CSV files are 'email' and 'list'.
-    - The column 'list' contains a string representation of a list. It should be converted before usage.
-    - If there is not csv file in the directory, return an empty dataframe with the columns expected.
-    - If there is not csv file in the directory, return None instead of an empty plot.
+    Load e-mail data from an SQLite database and convert it into a Pandas DataFrame. 
+    Calculate the sum, mean, and variance of the list associated with each e-mail and then record these values.
+
+    - The function expects the SQLite database to have a table named "EmailData" with columns 'email' and 'list'.
+    - The column 'list' contains a string representation of the list. It should be converted before usage.
+    - The function will return a DataFrame with additional columns 'sum', 'mean', and 'var' representing the calculated sum, mean, and variance respectively for each e-mail.
 
     Parameters:
-    - directory (str): The path to the directory.
+    - db_file (str): The path to the SQLite database file.
 
     Returns:
-    - pandas.DataFrame : DataFrame containing the data from the CSV file with the longest filename augmented with the columns 'sum', 'mean' and 'median'.
-    - matplotlib.axes._axes.Axes : Histogram of the median. None if there is no data to plot.
+    - tuple: A tuple containing:
+      - DataFrame: A pandas DataFrame with email data including the calculated sum, mean, and variance.
+      - Axes: A matplotlib Axes object representing the plotted bar chart of sum, mean, and variance.
 
     Requirements:
     - pandas
-    - os
+    - sqlite3
     - numpy
+    - matplotlib.pyplot
     - ast
 
     Example:
-    >>> task_func('data_directory')
+    >>> df, ax = task_func('data/task_func/db_1.db')
+    >>> print(df)
     """
-    name = None
-    for filename in os.listdir(directory):
-        if filename.endswith('.csv'):
-            if name is None :
-                name = filename
-            else :
-                name = filename if len(filename) > len(name) else name
-    if name is None :
-        return pd.DataFrame({}, columns = ['email', 'list'] + ['sum', 'mean', 'median']), None
-    df = pd.read_csv(os.path.join(directory, name))
+    conn = sqlite3.connect(db_file)
+    df = pd.read_sql_query("SELECT * FROM EmailData", conn)
     df["list"] = df["list"].map(ast.literal_eval)
-    df['sum'] = df['list'].apply(sum)
+    df['sum'] = df['list'].apply(np.sum)
     df['mean'] = df['list'].apply(np.mean)
-    df['median'] = df['list'].apply(np.median)
-    return df, df["median"].hist()
+    df['var'] = df['list'].apply(np.var)
+    ax = df[['sum', 'mean', 'var']].plot(kind='bar')
+    plt.show()
+    return df, ax
 
-import unittest
+import os
 import shutil
-import pandas as pd
-import matplotlib.pyplot as plt
+from pathlib import Path
+import unittest
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def setUp(self):
         self.test_dir = "data/task_func"
         os.makedirs(self.test_dir, exist_ok=True)
-        self.dir_1 = os.path.join(self.test_dir, "dir_1")
-        os.makedirs(self.dir_1, exist_ok=True)
-        df = pd.DataFrame(
-            {
-                "email" : ["first@example.com", "second@example.com", "third@example.com"],
-                "list" : [[12, 17, 29, 45, 7, 3], [1, 1, 3, 73, 21, 19, 12], [91, 23, 7, 14, 66]]
-            }
-        )
-        df.to_csv(os.path.join(self.dir_1, "csv.csv"), index=False)
-        self.dir_2 = os.path.join(self.test_dir, "dir_2")
-        os.makedirs(self.dir_2, exist_ok=True)
-        df = pd.DataFrame(
-            {
-                "email" : ["fourth@example.com", "fifth@example.com", "sixth@example.com", "seventh@example.com"],
-                "list" : [[12, 21, 35, 2, 1], [13, 4, 10, 20], [82, 23, 7, 14, 66], [111, 23, 4]]
-            }
-        )
-        df.to_csv(os.path.join(self.dir_2, "csv.csv"), index=False)
-        self.dir_3 = os.path.join(self.test_dir, "dir_3")
-        os.makedirs(self.dir_3, exist_ok=True)
-        df = pd.DataFrame(
-            {
-                "email" : ["eight@example.com", "ninth@example.com"],
-                "list" : [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
-            }
-        )
-        df.to_csv(os.path.join(self.dir_3, "csv.csv"), index=False)
-        df = pd.DataFrame(
-            {
-                "email" : ["tenth@example.com", "eleventh@example.com"],
-                "list" : [[11, 12, 13, 14, 15], [16, 17, 18, 19, 20]]
-            }
-        )
-        df.to_csv(os.path.join(self.dir_3, "long_csv.csv"), index=False)
-        self.dir_4 = os.path.join(self.test_dir, "dir_4")
-        os.makedirs(self.dir_4, exist_ok=True)
-        self.dir_5 = os.path.join(self.test_dir, "dir_5")
-        os.makedirs(self.dir_5, exist_ok=True)
-        df = pd.DataFrame(
-            {
-                "email": [
-                    "first@example.com",
-                ],
-                "list": [
-                    [12],
-                ],
-            }
-        )
-        df.to_csv(os.path.join(self.dir_5, "csv.csv"), index=False)
+        self.db_1 = os.path.join(self.test_dir, "db_1.db")
+        if not os.path.exists(self.db_1) :
+            Path(self.db_1).touch()
+            conn = sqlite3.connect(self.db_1)
+            c = conn.cursor()
+            c.execute('''CREATE TABLE EmailData (email text, list text)''')
+            df = pd.DataFrame(
+                {
+                    "email" : ["first@example.com", "second@example.com", "third@example.com"],
+                    "list" : ["[12, 17, 29, 45, 7, 3]", "[1, 1, 3, 73, 21, 19, 12]", "[91, 23, 7, 14, 66]"]
+                }
+            )
+            df.to_sql('EmailData', conn, if_exists='append', index = False)
+        self.db_2 = os.path.join(self.test_dir, "db_2.db")
+        if not os.path.exists(self.db_2) :
+            Path(self.db_2).touch()
+            conn = sqlite3.connect(self.db_2)
+            c = conn.cursor()
+            c.execute('''CREATE TABLE EmailData (email text, list text)''')
+            df = pd.DataFrame(
+                {
+                    "email" : ["fourth@example.com", "fifth@example.com", "seventh@example.com", "eight@example.com"],
+                    "list" : ["[12, 21, 35, 2, 1]", "[13, 4, 10, 20]", "[82, 23, 7, 14, 66]", "[111, 23, 4]"]
+                }
+            )
+            df.to_sql('EmailData', conn, if_exists='append', index = False)
+    
+        self.db_3 = os.path.join(self.test_dir, "db_3.db")
+        if not os.path.exists(self.db_3) :
+            Path(self.db_3).touch()
+            conn = sqlite3.connect(self.db_3)
+            c = conn.cursor()
+            c.execute('''CREATE TABLE EmailData (email text, list text)''')
+            df = pd.DataFrame(
+                {
+                    "email" : ["ninth@example.com", "tenth@example.com"],
+                    "list" : ["[1, 2, 3, 4, 5]", "[6, 7, 8, 9, 10]"]
+                }
+            )
+            df.to_sql('EmailData', conn, if_exists='append', index = False)
+    
     def tearDown(self):
         if os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir)
+    
     def test_case_1(self):
-        # Test if the function correctly processes the CSV files and returns the appropriate DataFrame and histogram
-        df, ax = task_func(self.dir_1)
-        try:
-            fig = ax.get_figure()
-            plt.close(fig)
-        except:
-            pass
-        # Check DataFrame structure and content
-        self.assertTrue(
-            all(
-                [
-                    col in df.columns
-                    for col in ["email", "list", "sum", "mean", "median"]
-                ]
-            )
-        )
-        # Check specific values in the DataFrame
+        df, ax = task_func(self.db_1)
+        
+        # Test the DataFrame's shape and columns
+        self.assertEqual(df.shape, (3, 5))
+        self.assertListEqual(list(df.columns), ['email', 'list', 'sum', 'mean', 'var'])
+        
+        # Test a few values
         self.assertEqual(df.loc[0, 'email'], 'first@example.com')
-        self.assertEqual(df.loc[1, 'email'], 'second@example.com')
-        self.assertEqual(df.loc[2, 'email'], 'third@example.com')
-        self.assertEqual(df.loc[1, 'sum'], 130)
-        self.assertEqual(df.loc[1, 'mean'], 130.0/7.0)
-        self.assertEqual(df.loc[1, 'median'], 12.0)
-        # Check attributes of the histogram
-        self.assertTrue(hasattr(ax, 'figure'))
+        self.assertEqual(df.loc[0, 'sum'], 113)
+        self.assertAlmostEqual(df.loc[1, 'mean'], 18.571429, places=6)
+        self.assertAlmostEqual(df.loc[2, 'var'], 1066.160000, places=6)
+        
+        # Test if the plot has the correct data
+        extracted_values = [bar.get_height() for bar in ax.patches] # extract bar height
+        self.assertEqual(len(extracted_values), 3*3)
+    
     def test_case_2(self):
-        # Test if the function correctly processes the CSV files and returns the appropriate DataFrame and histogram
-        df, ax = task_func(self.dir_2)
-        try:
-            fig = ax.get_figure()
-            plt.close(fig)
-        except:
-            pass
-        # Check DataFrame structure and content
-        self.assertTrue(
-            all(
-                [
-                    col in df.columns
-                    for col in ["email", "list", "sum", "mean", "median"]
-                ]
-            )
-        )
-        # Check specific values in the DataFrame
-        self.assertEqual(df.loc[1, 'email'], 'fifth@example.com')
-        self.assertEqual(df.loc[1, 'sum'], 47)
-        self.assertEqual(df.loc[1, 'mean'], 11.75)
-        self.assertEqual(df.loc[2, 'median'], 23.0)
-        # Check attributes of the histogram
-        self.assertTrue(hasattr(ax, 'figure'))
+        df, ax = task_func(self.db_2)
+        
+        # Test the DataFrame's shape and columns
+        self.assertEqual(df.shape, (4, 5))
+        self.assertListEqual(list(df.columns), ['email', 'list', 'sum', 'mean', 'var'])
+        
+        # Test a few values
+        self.assertEqual(df.loc[0, 'email'], 'fourth@example.com')
+        self.assertEqual(df.loc[0, 'sum'], 71)
+        self.assertAlmostEqual(df.loc[1, 'mean'], 11.75, places=6)
+        self.assertAlmostEqual(df.loc[2, 'var'], 896.240000, places=6)
+        self.assertEqual(df.loc[3, 'sum'], 138)
+        # Test if the plot has the correct data
+        extracted_values = [bar.get_height() for bar in ax.patches] # extract bar height
+        self.assertEqual(len(extracted_values), 4*3)
     def test_case_3(self):
-        # Test if the function correctly processes the CSV files and returns the appropriate DataFrame and histogram
-        df, ax = task_func(self.dir_3)
-        try:
-            fig = ax.get_figure()
-            plt.close(fig)
-        except:
-            pass
-        # Check DataFrame structure and content
-        self.assertTrue(
-            all(
-                [
-                    col in df.columns
-                    for col in ["email", "list", "sum", "mean", "median"]
-                ]
-            )
-        )
-        # Check specific values in the DataFrame
-        self.assertEqual(df.loc[1, 'email'], 'eleventh@example.com')
-        self.assertEqual(df.loc[0, 'sum'], 65)
-        self.assertEqual(df.loc[1, 'sum'], 90)
-        self.assertEqual(df.loc[0, 'mean'], 13.0)
-        self.assertEqual(df.loc[1, 'mean'], 18.0)
-        self.assertEqual(df.loc[0, 'median'], 13.0)
-        self.assertEqual(df.loc[1, 'median'], 18.0)
-        # Check attributes of the histogram
-        self.assertTrue(hasattr(ax, 'figure'))
-    def test_case_4(self):
-        # Test with a directory without csv files
-        df, ax = task_func(self.dir_4)
-        try:
-            fig = ax.get_figure()
-            plt.close(fig)
-        except:
-            pass
-        # Check DataFrame structure and content
-        self.assertTrue(
-            all(
-                [
-                    col in df.columns
-                    for col in ["email", "list", "sum", "mean", "median"]
-                ]
-            )
-        )
-        self.assertIsNone(ax)
-    def test_case_5(self):
-        # Test if the function correctly processes the CSV files and returns the appropriate DataFrame and histogram
-        df, ax = task_func(self.dir_5)
-        try:
-            fig = ax.get_figure()
-            plt.close(fig)
-        except:
-            pass
-        # Check DataFrame structure and content
-        self.assertTrue(
-            all(
-                [
-                    col in df.columns
-                    for col in ["email", "list", "sum", "mean", "median"]
-                ]
-            )
-        )
-        # Check specific values in the DataFrame
-        print(df)
-        self.assertEqual(df.loc[0, "email"], "first@example.com")
-        self.assertEqual(df.loc[0, "sum"], 12)
-        self.assertEqual(df.loc[0, "mean"], 12.0)
-        self.assertEqual(df.loc[0, "median"], 12.0)
-        # Check attributes of the histogram
-        self.assertTrue(hasattr(ax, "figure"))
+        df, ax = task_func(self.db_3)
+        
+        # Test the DataFrame's shape and columns
+        self.assertEqual(df.shape, (2, 5))
+        self.assertListEqual(list(df.columns), ['email', 'list', 'sum', 'mean', 'var'])
+        
+        # Test a few values
+        self.assertEqual(df.loc[0, 'email'], 'ninth@example.com')
+        self.assertEqual(df.loc[0, 'sum'], 15.0)
+        self.assertAlmostEqual(df.loc[1, 'mean'], 8.0, places=6)
+        self.assertAlmostEqual(df.loc[1, 'var'], 2.0, places=6)
+        
+        # Test if the plot has the correct data
+        extracted_values = [bar.get_height() for bar in ax.patches] # extract bar height
+        self.assertEqual(len(extracted_values), 2*3)

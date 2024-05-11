@@ -4,7 +4,7 @@ from datetime import datetime
 
 def f_946(script_path: str) -> dict:
     '''
-    Run an R script and return the start time, end time, stdout, and stderr as a dictionary.
+    Run an R script and return the start time, end time, decoded stdout, and decoded stderr as a dictionary.
     
     Requirements:
     - subprocess

@@ -1,85 +1,117 @@
-import pandas as pd
-import collections
+import random
+import matplotlib.pyplot as plt
 
-def task_func(df):
+
+# Sample data
+class Object:
+    value = 0
+
+    def __init__(self, value=None):
+        if value is None:
+            self.value = random.gauss(0, 1)
+        else:
+            self.value = value
+
+
+def task_func(obj_list, attr, num_bins=30, seed=0):
     """
-    Generate a sales report from a DataFrame, excluding duplicate customer names. 
-    The report includes total sales and the most popular sales category.
+    Create a histogram of the specified attribute from a list of objects and return the histogram plot.
 
     Parameters:
-    df (DataFrame): A pandas DataFrame with columns 'Customer', 'Category', and 'Sales'.
+    obj_list (list): The list of objects containing the attribute.
+    attr (str): The attribute to generate a histogram for.
+    num_bins (int, Optional): The number of bins to use in the histogram. Defaults to 30.
+    seed (int, Optional): The seed for the random number generator. Defaults to 0.
 
     Returns:
-    dict: A dictionary with keys 'Total Sales' (sum of sales) and 'Most Popular Category' (most frequent category).
+    matplotlib.axes._axes.Axes: The histogram plot of the attribute values, with the title 'Histogram of attribute values', x-axis labeled 'Attribute Value', and y-axis labeled 'Count'.
 
     Requirements:
-    - pandas
-    - collections
+    - random (used for default object generation)
+    - numpy (used for numerical computations)
+    - matplotlib (used for plotting)
 
-    Raises:
-    - The function will raise a ValueError is input df is not a DataFrame.
-
-    Note:
-    - The function would return the first category in alphabetical order for "Most Popular Category' in the case of tie
+    Constants:
+    - NUM_BINS (int): Number of bins to use in the histogram, set to 30 by default.
 
     Example:
-    >>> data = pd.DataFrame([{'Customer': 'John', 'Category': 'Electronics', 'Sales': 500}, {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}])
-    >>> report = task_func(data)
-    >>> print(report)
-    {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
+    >>> obj_list = [Object(value=i) for i in range(10)]
+    >>> ax = task_func(obj_list, 'value')
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("The input df is not a DataFrame")
-    df = df.drop_duplicates(subset='Customer')
-    total_sales = df['Sales'].sum()
-    popular_category = collections.Counter(df['Category']).most_common(1)[0][0]
-    return {'Total Sales': total_sales, 'Most Popular Category': popular_category}
+    random.seed(seed)
+    attr_values = [getattr(obj, attr) for obj in obj_list]
+    fig, ax = plt.subplots()
+    ax.hist(attr_values, bins=num_bins, alpha=0.5)
+    ax.set_title('Histogram of attribute values')
+    ax.set_xlabel('Attribute Value')
+    ax.set_ylabel('Count')
+    return ax
 
 import unittest
-import pandas as pd
+import doctest
 class TestCases(unittest.TestCase):
-    def test_case_regular(self):
-        data = pd.DataFrame([
-            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
-            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300},
-            {'Customer': 'Peter', 'Category': 'Beauty', 'Sales': 400},
-            {'Customer': 'Nick', 'Category': 'Sports', 'Sales': 600}
-        ])
-        expected_output = {'Total Sales': 1800, 'Most Popular Category': 'Electronics'}
-        self.assertEqual(task_func(data), expected_output)
-    def test_case_with_duplicates(self):
-        data = pd.DataFrame([
-            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
-            {'Customer': 'John', 'Category': 'Fashion', 'Sales': 200},
-            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300},
-            {'Customer': 'Peter', 'Category': 'Beauty', 'Sales': 400}
-        ])
-        expected_output = {'Total Sales': 1200, 'Most Popular Category': 'Electronics'}
-        self.assertEqual(task_func(data), expected_output)
-    def test_case_empty(self):
-        data = pd.DataFrame([
-            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
-            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}
-        ])
-        expected_output = {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
-        self.assertEqual(task_func(data), expected_output)
-    def test_case_unique_customers(self):
-        data = pd.DataFrame([
-            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
-            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300}
-        ])
-        expected_output = {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
-        self.assertEqual(task_func(data), expected_output)
-    def test_case_tie_categories(self):
-        data = pd.DataFrame([
-            {'Customer': 'John', 'Category': 'Electronics', 'Sales': 500},
-            {'Customer': 'Mary', 'Category': 'Home', 'Sales': 300},
-            {'Customer': 'Nick', 'Category': 'Home', 'Sales': 200},
-            {'Customer': 'Alice', 'Category': 'Electronics', 'Sales': 300}
-        ])
-        # In case of a tie, the first category in alphabetical order will be chosen
-        expected_output = {'Total Sales': 1300, 'Most Popular Category': 'Electronics'}
-        self.assertEqual(task_func(data), expected_output)
-    def test_case_6(self):
-        with self.assertRaises(ValueError):
-            task_func("non_df")
+    def test_case_1(self):
+        # Input 1: Simple list of objects with integer values from 0 to 9
+        obj_list = [Object(value=i) for i in range(10)]
+        ax = task_func(obj_list, 'value')
+        
+        # Assertions
+        self.assertIsInstance(ax, plt.Axes, "Returned object is not a valid Axes object.")
+        self.assertEqual(ax.get_title(), 'Histogram of attribute values', "Histogram title is incorrect.")
+        self.assertEqual(ax.get_xlabel(), 'Attribute Value', "X-axis label is incorrect.")
+        self.assertEqual(ax.get_ylabel(), 'Count', "Y-axis label is incorrect.")
+        self.assertEqual(sum([p.get_height() for p in ax.patches]), len(obj_list), "Histogram data points do not match input list size.")
+    def test_case_2(self):
+        # Input 2: List of objects with random Gaussian values
+        obj_list = [Object() for _ in range(100)]
+        ax = task_func(obj_list, 'value', seed=77)
+        
+        # Assertions
+        self.assertIsInstance(ax, plt.Axes, "Returned object is not a valid Axes object.")
+        self.assertEqual(ax.get_title(), 'Histogram of attribute values', "Histogram title is incorrect.")
+        self.assertEqual(ax.get_xlabel(), 'Attribute Value', "X-axis label is incorrect.")
+        self.assertEqual(ax.get_ylabel(), 'Count', "Y-axis label is incorrect.")
+        self.assertEqual(sum([p.get_height() for p in ax.patches]), len(obj_list), "Histogram data points do not match input list size.")
+        # Check axis data
+        self.assertAlmostEqual(ax.get_xlim()[0], -2.57, delta=0.1, msg="X-axis lower limit is incorrect.")
+        
+    def test_case_3(self):
+        # Input 3: List of objects with fixed value
+        obj_list = [Object(value=5) for _ in range(50)]
+        ax = task_func(obj_list, 'value', seed=4)
+        
+        # Assertions
+        self.assertIsInstance(ax, plt.Axes, "Returned object is not a valid Axes object.")
+        self.assertEqual(ax.get_title(), 'Histogram of attribute values', "Histogram title is incorrect.")
+        self.assertEqual(ax.get_xlabel(), 'Attribute Value', "X-axis label is incorrect.")
+        self.assertEqual(ax.get_ylabel(), 'Count', "Y-axis label is incorrect.")
+        self.assertEqual(sum([p.get_height() for p in ax.patches]), len(obj_list), "Histogram data points do not match input list size.")
+    def test_case_4(self):
+        # Input 4: Empty list
+        obj_list = []
+        ax = task_func(obj_list, 'value')
+        
+        # Assertions
+        self.assertIsInstance(ax, plt.Axes, "Returned object is not a valid Axes object.")
+        self.assertEqual(ax.get_title(), 'Histogram of attribute values', "Histogram title is incorrect.")
+        self.assertEqual(ax.get_xlabel(), 'Attribute Value', "X-axis label is incorrect.")
+        self.assertEqual(ax.get_ylabel(), 'Count', "Y-axis label is incorrect.")
+        self.assertEqual(sum([p.get_height() for p in ax.patches]), 0, "Histogram data points do not match input list size.")
+        # Check axis data
+        self.assertAlmostEqual(ax.get_xlim()[0], -0.05, msg="X-axis limits are incorrect.", delta=0.01)
+        self.assertAlmostEqual(ax.get_xlim()[1], 1.05, msg="X-axis limits are incorrect.", delta=0.01)
+        self.assertAlmostEqual(ax.get_ylim()[0], -0.05, msg="Y-axis limits are incorrect.", delta=0.01)
+        self.assertAlmostEqual(ax.get_ylim()[1], 0.05, msg="Y-axis limits are incorrect.", delta=0.01)
+    def test_case_5(self):
+        # Input 5: Large list of objects
+        obj_list = [Object(value=random.gauss(0, 5)) for _ in range(1000)]
+        ax = task_func(obj_list, 'value')
+        
+        # Assertions
+        self.assertIsInstance(ax, plt.Axes, "Returned object is not a valid Axes object.")
+        self.assertEqual(ax.get_title(), 'Histogram of attribute values', "Histogram title is incorrect.")
+        self.assertEqual(ax.get_xlabel(), 'Attribute Value', "X-axis label is incorrect.")
+        self.assertEqual(ax.get_ylabel(), 'Count', "Y-axis label is incorrect.")
+        self.assertEqual(sum([p.get_height() for p in ax.patches]), len(obj_list), "Histogram data points do not match input list size.")

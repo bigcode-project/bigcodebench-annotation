@@ -1,90 +1,69 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import random
-from datetime import datetime
+import seaborn as sns
+import numpy as np
 
-def task_func(seed=42):
+def task_func(data_url="http://lib.stat.cmu.edu/datasets/boston", seed=42):
     """
-    Generates a plot of random time series data for the past 30 days with reproducibility 
-    controlled by an optional seed parameter.
-
-    The plot is styled with Arial font for better readability.
+    Draw the correlation heatmap of the Boston Housing dataset using Seaborn, with an option to save it to a specified file.
 
     Parameters:
-        seed (int, optional): Seed for the random number generator to ensure reproducibility. Defaults to 42.
+        seed (int, optional): Random seed for reproducibility. Defaults to 42.
+    The font should be in the family of sans-serif and Arial.
 
     Returns:
-        matplotlib.axes.Axes: The Axes object containing a line plot of the time series data. 
-                              The plot will have 'Date' as the x-axis label, 'Value' as the y-axis label, 
-                              and 'Random Time Series Data' as the title.
+        matplotlib.axes.Axes: The Axes object containing the heatmap plot.
 
     Raises:
-        ValueError: If there is an issue generating the data or plot.
+        ValueError: If an error occurs in generating or saving the plot.
 
     Requirements:
-        - matplotlib.pyplot
+        - matplotlib
+        - os
         - pandas
-        - random
-        - datetime
+        - seaborn
+        - numpy 
 
     Example:
         >>> ax = task_func()
-        >>> ax.get_title()
-        'Random Time Series Data'
-        >>> ax.get_xlabel()
-        'Date'
-        >>> ax.get_ylabel()
-        'Value'
+        >>> type(ax)
+        <class 'matplotlib.axes._axes.Axes'>
     """
     try:
-        plt.rc('font', family='Arial')
-        random.seed(seed)
-        dates = pd.date_range(end=datetime.now(), periods=30)
-        values = [random.randint(0, 100) for _ in range(30)]
-        fig, ax = plt.subplots()
-        ax.plot(dates, values, label='Value over Time')
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Value')
-        ax.set_title('Random Time Series Data')
-        ax.legend()
+        font = {'sans-serif': 'Arial', 'family': 'sans-serif'}
+        plt.rc('font', **font)
+        raw_df = pd.read_csv(data_url, sep="\s+", skiprows=22, header=None)
+        data = np.hstack([raw_df.values[::2, :], raw_df.values[1::2, :2]])
+        target = raw_df.values[1::2, 2]
+        columns = ['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 'RAD', 'TAX', 'PTRATIO', 'B', 'LSTAT']
+        boston_df = pd.DataFrame(data=data, columns=columns)
+        corr = boston_df.corr()
+        sns.set_theme(style="white")  # Optional: for better aesthetics
+        plt.figure(figsize=(10, 8))  # Optional: adjust the size of the heatmap
+        ax = sns.heatmap(corr, annot=True)  # 'annot=True' to display correlation values
         return ax
     except Exception as e:
-        raise ValueError(f"Error generating the plot: {e}")
+        raise ValueError(f"An error occurred: {e}")
 
 import unittest
-import pandas as pd 
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_plot_attributes(self):
+    def test_basic_functionality(self):
         ax = task_func()
-        self.assertEqual(ax.get_title(), 'Random Time Series Data', "The plot title does not match.")
-        self.assertEqual(ax.get_xlabel(), 'Date', "The x-axis label does not match.")
-        self.assertEqual(ax.get_ylabel(), 'Value', "The y-axis label does not match.")
-    def test_reproducibility(self):
-        ax1 = task_func(42)
-        ax2 = task_func(42)
-        self.assertEqual(ax1.get_lines()[0].get_ydata().tolist(), ax2.get_lines()[0].get_ydata().tolist(),
-                         "Data generated with the same seed should match.")
-    def test_random_seed_effect(self):
-        ax1 = task_func(42)
-        ax2 = task_func(43)
-        self.assertNotEqual(ax1.get_lines()[0].get_ydata().tolist(), ax2.get_lines()[0].get_ydata().tolist(),
-                            "Data generated with different seeds should not match.")
-    def test_data_range(self):
+        self.assertIsInstance(ax, plt.Axes)
+    def test_heatmap_features(self):
         ax = task_func()
-        lines = ax.get_lines()[0]
-        x_data = lines.get_xdata()
-        self.assertTrue((max(pd.to_datetime(x_data)) - min(pd.to_datetime(x_data))).days <= 29,
-                        "The range of dates should cover up to 29 days.")
-    def test_value_range(self):
+        heatmap_data = ax.get_children()[0].get_array().data
+        self.assertEqual(heatmap_data.shape, (169,))  # Assuming Boston dataset has 13 features
+    
+    def test_heatmap_values(self):
         ax = task_func()
-        y_data = ax.get_lines()[0].get_ydata()
-        all_values_in_range = all(0 <= v <= 100 for v in y_data)
-        self.assertTrue(all_values_in_range, "All values should be within the range 0 to 100.")
+        heatmap_data = ax.get_children()[0].get_array().data
         
-    def test_value(self):
+        expect = [1.0, -0.20046921966254744, 0.4065834114062594, -0.05589158222224156, 0.4209717113924554, -0.21924670286251308, 0.3527342509013634, -0.37967008695102467, 0.6255051452626024, 0.5827643120325854, 0.2899455792795226, -0.3850639419942239, 0.4556214794479463, -0.20046921966254744, 1.0, -0.5338281863044696, -0.04269671929612169, -0.5166037078279843, 0.31199058737409047, -0.5695373420992109, 0.6644082227621105, -0.3119478260185367, -0.3145633246775997, -0.3916785479362161, 0.1755203173828273, -0.41299457452700283, 0.4065834114062594, -0.5338281863044696, 1.0, 0.06293802748966515, 0.7636514469209139, -0.39167585265684274, 0.6447785113552554, -0.7080269887427675, 0.5951292746038485, 0.7207601799515422, 0.38324755642888936, -0.3569765351041928, 0.603799716476621, -0.05589158222224156, -0.04269671929612169, 0.06293802748966515, 1.0, 0.09120280684249558, 0.09125122504345677, 0.08651777425454328, -0.09917578017472799, -0.00736824088607757, -0.03558651758591146, -0.12151517365806228, 0.048788484955166495, -0.05392929837569424, 0.4209717113924554, -0.5166037078279843, 0.7636514469209139, 0.09120280684249558, 1.0, -0.3021881878495924, 0.7314701037859592, -0.7692301132258282, 0.6114405634855762, 0.6680232004030217, 0.18893267711276884, -0.3800506377924, 0.5908789208808451, -0.21924670286251308, 0.31199058737409047, -0.39167585265684274, 0.09125122504345677, -0.3021881878495924, 1.0, -0.24026493104775065, 0.20524621293005416, -0.20984666776610833, -0.2920478326232189, -0.35550149455908525, 0.1280686350925421, -0.6138082718663955, 0.3527342509013634, -0.5695373420992109, 0.6447785113552554, 0.08651777425454328, 0.7314701037859592, -0.24026493104775065, 1.0, -0.747880540868632, 0.4560224517516137, 0.5064555935507051, 0.2615150116719584, -0.273533976638513, 0.6023385287262395, -0.37967008695102467, 0.6644082227621105, -0.7080269887427675, -0.09917578017472799, -0.7692301132258282, 0.20524621293005416, -0.747880540868632, 1.0, -0.4945879296720758, -0.5344315844084577, -0.23247054240825826, 0.2915116731330399, -0.4969958308636848, 0.6255051452626024, -0.3119478260185367, 0.5951292746038485, -0.00736824088607757, 0.6114405634855762, -0.20984666776610833, 0.4560224517516137, -0.4945879296720758, 1.0, 0.9102281885331865, 0.46474117850306057, -0.44441281557512585, 0.4886763349750666, 0.5827643120325854, -0.3145633246775997, 0.7207601799515422, -0.03558651758591146, 0.6680232004030217, -0.2920478326232189, 0.5064555935507051, -0.5344315844084577, 0.9102281885331865, 1.0, 0.4608530350656702, -0.44180800672281423, 0.5439934120015698, 0.2899455792795226, -0.3916785479362161, 0.38324755642888936, -0.12151517365806228, 0.18893267711276884, -0.35550149455908525, 0.2615150116719584, -0.23247054240825826, 0.46474117850306057, 0.4608530350656702, 1.0, -0.1773833023052333, 0.3740443167146772, -0.3850639419942239, 0.1755203173828273, -0.3569765351041928, 0.048788484955166495, -0.3800506377924, 0.1280686350925421, -0.273533976638513, 0.2915116731330399, -0.44441281557512585, -0.44180800672281423, -0.1773833023052333, 1.0, -0.36608690169159663, 0.4556214794479463, -0.41299457452700283, 0.603799716476621, -0.05392929837569424, 0.5908789208808451, -0.6138082718663955, 0.6023385287262395, -0.4969958308636848, 0.4886763349750666, 0.5439934120015698, 0.3740443167146772, -0.36608690169159663, 1.0]
+        self.assertAlmostEqual(heatmap_data.tolist(), expect, "DataFrame contents should match the expected output")
+    def test_plot_appearance(self):
         ax = task_func()
-        y_data = ax.get_lines()[0].get_ydata()
-        # with open('df_contents.txt', 'w') as file:
-        #     file.write(str(y_data.tolist()))
-        expect = [81, 14, 3, 94, 35, 31, 28, 17, 94, 13, 86, 94, 69, 11, 75, 54, 4, 3, 11, 27, 29, 64, 77, 3, 71, 25, 91, 83, 89, 69]
-        self.assertEqual(expect, y_data.tolist(), "DataFrame contents should match the expected output")
+        self.assertEqual(ax.get_xlabel(), "")
+        self.assertEqual(ax.get_ylabel(), "")
+        self.assertEqual(ax.get_title(), "")

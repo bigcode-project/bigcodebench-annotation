@@ -1,58 +1,75 @@
-import itertools
-import json
+from scipy import stats
+import matplotlib.pyplot as plt
 
 
-def task_func(json_list, r):
+def task_func(data_dict, data_keys):
     """
-    Generate all possible combinations of r elements from a given number list taken from JSON string input.
+    Calculate the correlation between two data series and return a scatter plot along with the correlation coefficient.
     
     Parameters:
-    json_list (str): JSON string containing the number list.
-    r (int): The number of elements in each combination.
-
+    data_dict (dict): The dictionary containing data. Keys should match those provided in data_keys.
+    data_keys (list): The list of keys (length of 2) used to access data in data_dict for correlation.
+    
     Returns:
-    list: A list of tuples, each tuple representing a combination.
-
-    Note:
-    - The datetime to be extracted is located in the 'number_list' key in the JSON data.
-
-    Raises:
-    - Raise an Exception if the json_list is an invalid JSON, empty, or does not have 'number_list' key.
+    tuple: 
+        - float: The correlation coefficient.
+        - Axes: The scatter plot of the two data series.
     
     Requirements:
-    - itertools
-    - json
+    - scipy
+    - matplotlib.pyplot
     
     Example:
-    >>> combinations = task_func('{"number_list": [1, 2, 3, 4, 5]}', 3)
-    >>> print(combinations)
-    [(1, 2, 3), (1, 2, 4), (1, 2, 5), (1, 3, 4), (1, 3, 5), (1, 4, 5), (2, 3, 4), (2, 3, 5), (2, 4, 5), (3, 4, 5)]
+    >>> data_dict = {'X': [1, 2, 3, 4, 5], 'Y': [2, 3, 5, 7, 8]}
+    >>> data_keys = ['X', 'Y']
+    >>> correlation, plot = task_func(data_dict, data_keys)
+    >>> round(correlation, 4)
+    0.9923
+    >>> isinstance(plot, plt.Axes)
+    True
     """
-    try:
-        data = json.loads(json_list)
-        number_list = data['number_list']
-        return list(itertools.combinations(number_list, r))
-    except Exception as e:
-        raise e
+    x = data_dict[data_keys[0]]
+    y = data_dict[data_keys[1]]
+    correlation, _ = stats.pearsonr(x, y)
+    fig, ax = plt.subplots()
+    ax.scatter(x, y)
+    return correlation, ax
 
 import unittest
+import numpy as np
+import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        result = task_func('{"number_list": [1, 2, 3, 4, 5]}', 3)
-        expected = [(1, 2, 3), (1, 2, 4), (1, 2, 5), (1, 3, 4), (1, 3, 5), (1, 4, 5), (2, 3, 4), (2, 3, 5), (2, 4, 5), (3, 4, 5)]
-        self.assertEqual(result, expected)
+        data_dict = {'X': [1, 2, 3, 4, 5], 'Y': [2, 3, 5, 7, 8]}
+        data_keys = ['X', 'Y']
+        correlation, plot = task_func(data_dict, data_keys)
+        self.assertAlmostEqual(correlation, 0.9923, places=4)
+        self.assertTrue(isinstance(plot, plt.Axes))
+        
     def test_case_2(self):
-        result = task_func('{"number_list": ["a", "b", "c"]}', 2)
-        expected = [('a', 'b'), ('a', 'c'), ('b', 'c')]
-        self.assertEqual(result, expected)
+        data_dict = {'A': [5, 4, 3, 2, 1], 'B': [1, 2, 3, 4, 5]}
+        data_keys = ['A', 'B']
+        correlation, plot = task_func(data_dict, data_keys)
+        self.assertAlmostEqual(correlation, -1.0, places=4)
+        self.assertTrue(isinstance(plot, plt.Axes))
+        
     def test_case_3(self):
-        result = task_func('{"number_list": [1, 2, 3]}', 1)
-        expected = [(1,), (2,), (3,)]
-        self.assertEqual(result, expected)
+        data_dict = {'X': [1, 1, 1, 1, 1], 'Y': [1, 1, 1, 1, 1]}
+        data_keys = ['X', 'Y']
+        correlation, plot = task_func(data_dict, data_keys)
+        self.assertTrue(np.isnan(correlation))
+        self.assertTrue(isinstance(plot, plt.Axes))
+        
     def test_case_4(self):
-        with self.assertRaises(Exception):
-            result = task_func('[]', 1)
+        data_dict = {'X': [1, 2, 3, 4, 5], 'Y': [1, 4, 9, 16, 25]}
+        data_keys = ['X', 'Y']
+        correlation, plot = task_func(data_dict, data_keys)
+        self.assertAlmostEqual(correlation, 0.9811, places=4)
+        self.assertTrue(isinstance(plot, plt.Axes))
+        
     def test_case_5(self):
-        result = task_func('{"number_list": [1, 2]}', 3)
-        expected = []
-        self.assertEqual(result, expected)
+        data_dict = {'X': [1, 3, 5, 7, 9], 'Y': [2, 6, 10, 14, 18]}
+        data_keys = ['X', 'Y']
+        correlation, plot = task_func(data_dict, data_keys)
+        self.assertAlmostEqual(correlation, 1.0, places=4)
+        self.assertTrue(isinstance(plot, plt.Axes))

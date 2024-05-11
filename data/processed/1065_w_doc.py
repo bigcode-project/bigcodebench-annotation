@@ -1,84 +1,77 @@
-import numpy as np
-import seaborn as sns
+from scipy import fftpack
+from matplotlib import pyplot as plt
 
 
 def task_func(arr):
     """
-    Plots a heatmap of a given 2D numerical array and prints the sum of each row.
-    The heatmap's color range is set based on the minimum and maximum values in the array.
+    Performs a Fast Fourier Transform (FFT) on the sum of each row in a 2D array and
+    plots the absolute values of the FFT coefficients.
 
     Parameters:
-    arr (numpy.array): A 2D numpy array of numerical values.
+    arr (numpy.ndarray): A 2D numpy array.
 
     Returns:
-    ax (matplotlib.axes.Axes): The Axes object with the plotted heatmap.
+    matplotlib.axes.Axes: An Axes object displaying the plot of the absolute values of the FFT coefficients.
 
     Requirements:
-    - numpy
-    - seaborn
-
-    Note:
-    The function calculates the sum of each row and prints these values.
-    The heatmap is plotted based on the original array with its color range set from the minimum to the maximum value in the array.
+    - scipy.fftpack
+    - matplotlib.pyplot
 
     Example:
+    >>> import numpy as np
     >>> arr = np.array([[i + j for i in range(3)] for j in range(5)])
     >>> ax = task_func(arr)
     >>> ax.get_title()
-    'Heatmap of the 2D Array'
+    'Absolute values of FFT coefficients'
     """
     row_sums = arr.sum(axis=1)
-    vmax = np.max(arr)  # Set vmax to the maximum value in the array
-    vmin = np.min(arr)  # Set vmin to the minimum value in the array
-    ax = sns.heatmap(
-        arr, annot=True, vmax=vmax, vmin=vmin
-    )  # Include both vmin and vmax in the heatmap call
-    ax.set_title("Heatmap of the 2D Array")
+    fft_coefficients = fftpack.fft(row_sums)
+    _, ax = plt.subplots()
+    ax.plot(np.abs(fft_coefficients))
+    ax.set_title("Absolute values of FFT coefficients")
     return ax
 
 import unittest
 import numpy as np
-import matplotlib.pyplot as plt
+from scipy import fftpack
 class TestCases(unittest.TestCase):
     """Test cases for the function task_func."""
-    def tearDown(self):
-        plt.clf()
-    def test_scenario_1(self):
-        """Scenario 1: Testing with a 2D array created by adding row and column indices."""
+    def test_plot_title(self):
+        """Test that the plot title is correct."""
         arr = np.array([[i + j for i in range(3)] for j in range(5)])
-        expected_vmax = np.max(arr)  # Calculate the expected vmax
         ax = task_func(arr)
-        self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
-        self.assertEqual(ax.collections[0].colorbar.vmax, expected_vmax)
-    def test_scenario_2(self):
-        """Scenario 2: Testing with a 2D array where each column has identical values based on the column index."""
-        arr = np.array([[i for i in range(3)] for j in range(5)])
-        expected_vmax = np.max(arr)  # Calculate the expected vmax
+        self.assertEqual(ax.get_title(), "Absolute values of FFT coefficients")
+    def test_plot_data(self):
+        """Test that the plot data is correct."""
+        arr = np.array([[i + j for i in range(3)] for j in range(5)])
         ax = task_func(arr)
-        self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
-        self.assertEqual(ax.collections[0].colorbar.vmax, expected_vmax)
-    def test_scenario_3(self):
-        """Scenario 3: Testing with a 2D array where each row has identical values based on the row index."""
-        arr = np.array([[j for i in range(3)] for j in range(5)])
-        expected_vmax = np.max(arr)  # Calculate the expected vmax
-        ax = task_func(arr)
-        self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
-        self.assertEqual(ax.collections[0].colorbar.vmax, expected_vmax)
-    def test_scenario_4(self):
-        """Scenario 4: Testing with a 2D array of zeros."""
+        y_data = ax.lines[0].get_ydata()
+        row_sums = arr.sum(axis=1)
+        fft_coefficients = fftpack.fft(row_sums)
+        expected_y_data = np.abs(fft_coefficients)
+        np.testing.assert_array_equal(y_data, expected_y_data)
+    def test_with_zeros(self):
+        """Test that the plot data is correct when the array is all zeros."""
         arr = np.zeros((5, 3))
-        expected_vmax = np.max(arr)  # Calculate the expected vmax
         ax = task_func(arr)
-        self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
-        self.assertAlmostEqual(
-            ax.collections[0].colorbar.vmax, expected_vmax, delta=0.2
-        )
-    def test_scenario_5(self):
-        """Scenario 5: Testing with a 2D array of ones."""
+        y_data = ax.lines[0].get_ydata()
+        expected_y_data = np.zeros(5)
+        np.testing.assert_array_equal(y_data, expected_y_data)
+    def test_with_ones(self):
+        """Test that the plot data is correct when the array is all ones."""
         arr = np.ones((5, 3))
-        expected_vmax = np.max(arr)  # Calculate the expected vmax
         ax = task_func(arr)
-        self.assertEqual(ax.get_title(), "Heatmap of the 2D Array")
-        self.assertAlmostEqual(
-            ax.collections[0].colorbar.vmax, expected_vmax, delta=0.2
-        )
+        y_data = ax.lines[0].get_ydata()
+        expected_y_data = [15.0, 0.0, 0.0, 0.0, 0.0]
+        np.testing.assert_array_almost_equal(y_data, expected_y_data)
+    def test_with_large_numbers(self):
+        """Test that the plot data is correct when the array has large numbers."""
+        arr = np.array([[i * 100 + j * 1000 for i in range(3)] for j in range(5)])
+        ax = task_func(arr)
+        y_data = ax.lines[0].get_ydata()
+        row_sums = arr.sum(axis=1)
+        fft_coefficients = fftpack.fft(row_sums)
+        expected_y_data = np.abs(fft_coefficients)
+        np.testing.assert_array_equal(y_data, expected_y_data)
+    def tearDown(self):
+        plt.close()

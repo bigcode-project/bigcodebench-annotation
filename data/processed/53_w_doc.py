@@ -1,87 +1,102 @@
 import pandas as pd
 import regex as re
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-# Constants
-STOPWORDS = ["a", "an", "the", "in", "is", "are"]
+COLUMN_NAMES = ["Name", "Email", "Age", "Country"]
 
 
 def task_func(text):
     """
-    Count the frequency of each word in a text after removing specific stopwords.
+    Extract data from a text and create a Pandas DataFrame.
+    The text contains several lines, each formatted as 'Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA'.
+    Plot the age distribution using seaborn.
+
+    The data is extracted using the regular expression pattern:
+    "Name: (.*?), Email: (.*?), Age: (.*?), Country: (.*?)($|\n)"
+    and the resulting DataFrame has columns: ['Name', 'Email', 'Age', 'Country']
 
     Parameters:
     text (str): The text to analyze.
 
     Returns:
-    Series: A pandas Series with word frequencies excluding the words in STOPWORDS list.
+    DataFrame: A pandas DataFrame with extracted data.
 
     Requirements:
     - pandas
     - regex
+    - seaborn
+    - matplotlib.pyplot
 
     Example:
-    >>> text = "This is a sample text. This text contains sample words."
-    >>> word_counts = task_func(text)
-    >>> print(word_counts)
-    this        2
-    sample      2
-    text        2
-    contains    1
-    words       1
-    dtype: int64
+    >>> text = 'Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA\\nName: Jane Doe, Email: jane.doe@example.com, Age: 25, Country: UK'
+    >>> df = task_func(text)
+    >>> print(df)
+           Name                 Email  Age Country
+    0  John Doe  john.doe@example.com   30     USA
+    1  Jane Doe  jane.doe@example.com   25      UK
     """
-    words = re.findall(r"\b\w+\b", text.lower())
-    words = [word for word in words if word not in STOPWORDS]
-    word_counts = pd.Series(words).value_counts().rename(None)
-    return word_counts
+    pattern = r"Name: (.*?), Email: (.*?), Age: (.*?), Country: (.*?)($|\n)"
+    matches = re.findall(pattern, text)
+    data = []
+    for match in matches:
+        data.append(match[:-1])
+    df = pd.DataFrame(data, columns=COLUMN_NAMES)
+    df["Age"] = df["Age"].astype(int)
+    sns.histplot(data=df, x="Age")
+    plt.show()
+    return df
 
 import unittest
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def test_case_1(self):
-        text = "This is a sample text This text contains sample words"
-        word_counts = task_func(text)
-        expected_counts = pd.Series(
-            {"this": 2, "sample": 2, "text": 2, "contains": 1, "words": 1}
+        input_text = "Name: John Doe, Email: john.doe@example.com, Age: 30, Country: USA\nName: Jane Doe, Email: jane.doe@example.com, Age: 25, Country: UK"
+        df = task_func(input_text)
+        self.assertEqual(df.shape, (2, 4))
+        self.assertListEqual(list(df.columns), ["Name", "Email", "Age", "Country"])
+        self.assertListEqual(
+            df.iloc[0].tolist(), ["John Doe", "john.doe@example.com", 30, "USA"]
         )
-        pd.testing.assert_series_equal(word_counts, expected_counts)
+        self.assertListEqual(
+            df.iloc[1].tolist(), ["Jane Doe", "jane.doe@example.com", 25, "UK"]
+        )
     def test_case_2(self):
-        text = "Hello world Hello everyone"
-        word_counts = task_func(text)
-        expected_counts = pd.Series({"hello": 2, "world": 1, "everyone": 1})
-        pd.testing.assert_series_equal(word_counts, expected_counts)
+        input_text = (
+            "Name: Alex Smith, Email: alex.smith@example.com, Age: 35, Country: Canada"
+        )
+        df = task_func(input_text)
+        self.assertEqual(df.shape, (1, 4))
+        self.assertListEqual(
+            df.iloc[0].tolist(), ["Alex Smith", "alex.smith@example.com", 35, "Canada"]
+        )
     def test_case_3(self):
-        text = "a an the in is are"
-        word_counts = task_func(text)
-        expected_counts = pd.Series(dtype="int64")
-        pd.testing.assert_series_equal(
-            word_counts.reset_index(drop=True), expected_counts.reset_index(drop=True)
-        )
+        input_text = ""
+        df = task_func(input_text)
+        self.assertTrue(df.empty)
     def test_case_4(self):
-        text = "This is a test sentence which has a bunch of words and no period"
-        word_counts = task_func(text)
-        expected_counts = pd.Series(
-            {
-                "this": 1,
-                "test": 1,
-                "sentence": 1,
-                "which": 1,
-                "has": 1,
-                "bunch": 1,
-                "of": 1,
-                "words": 1,
-                "and": 1,
-                "no": 1,
-                "period": 1,
-            }
+        input_text = (
+            "Name: Alex Smith, Email: alex.smith@example.com, Age: 35, Country: Canada"
         )
-        pd.testing.assert_series_equal(word_counts, expected_counts)
+        df = task_func(input_text)
+        self.assertEqual(df.shape, (1, 4))
+        self.assertListEqual(
+            df.iloc[0].tolist(), ["Alex Smith", "alex.smith@example.com", 35, "Canada"]
+        )
     def test_case_5(self):
-        text = (
-            "I I I want want to to to to to go to to to the olympics olympics this year"
+        input_text = """Name: Alex Smith, Email: alex.smith@example.com, Age: 35, Country: Canada
+        Name: Bob Miller, Email: bob.miller@example.com, Age: 25, Country: USA
+        Name: Anna Karin, Email: anna.karin@example.com, Age: 47, Country: Finland
+        """
+        df = task_func(input_text)
+        self.assertEqual(df.shape, (3, 4))
+        self.assertListEqual(list(df.columns), ["Name", "Email", "Age", "Country"])
+        self.assertListEqual(
+            df.iloc[0].tolist(), ["Alex Smith", "alex.smith@example.com", 35, "Canada"]
         )
-        word_counts = task_func(text)
-        expected_counts = pd.Series(
-            {"i": 3, "want": 2, "to": 8, "go": 1, "olympics": 2, "this": 1, "year": 1}
-        ).sort_values(ascending=False)
-        pd.testing.assert_series_equal(word_counts, expected_counts)
+        self.assertListEqual(
+            df.iloc[1].tolist(), ["Bob Miller", "bob.miller@example.com", 25, "USA"]
+        )
+        self.assertListEqual(
+            df.iloc[2].tolist(), ["Anna Karin", "anna.karin@example.com", 47, "Finland"]
+        )

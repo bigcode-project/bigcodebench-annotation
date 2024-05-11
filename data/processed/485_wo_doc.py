@@ -1,146 +1,109 @@
-import math
+from datetime import datetime, timedelta
+import pytz
 import numpy as np
-from datetime import datetime
-import pandas as pd
+import matplotlib.pyplot as plt
 
 
-def task_func(
-    start_time,
-    end_time,
-    step,
-    columns=["Timestamp", "Sensor1", "Sensor2", "Sensor3", "SensorStatus"],
-    sensor_statuses=["OK", "MAINTENANCE_REQUIRED", "ERROR"],
-    random_seed=42,
-):
+def task_func(start_time, end_time):
     """
-    Generate a DataFrame with detailed artificial sensor readings for specified timestamps
-    and sensor statuses from a predefined list.
+    Plots the hourly difference between UTC and specified global time zones across a date range.
 
-    The function generates sensor readings for Sensor1, Sensor2, and Sensor3 (or their
-    corresponding named columns in the supplied column list) using sine, cosine, and tan
-    functions, respectively, of the timestamp (converted to seconds), with a small random
-    noise added to simulate real sensor data variability.
-    SensorStatus is randomly chosen from the provided statuses for each timestamp.
+    This function visualizes the time difference in hours between UTC and predefined time zones for each day
+    within the specified date range. Predefined time zones include UTC, America/Los_Angeles, Europe/Paris,
+    Asia/Kolkata, and Australia/Sydney. The differences are plotted on a graph, using a distinct color for
+    each time zone's time difference curve, selecting from ["b", "g", "r", "c", "m", "y", "k"].
 
     Parameters:
-    - start_time (int): Start time in milliseconds since epoch.
-    - end_time (int): End time in milliseconds since epoch. Must not be before start_time.
-    - step (int): The interval in milliseconds between each generated data point. Must be positive.
-                  This step defines the frequency at which data points are generated. If the step
-                  does not neatly divide the interval between start_time and end_time into
-                  equal-sized portions, the last timestamp may be excluded.
-    - columns (list of str, optional): Names of the DataFrame columns to be included in the output.
-                                       Defaults to: ['Timestamp', 'Sensor1', 'Sensor2', 'Sensor3', 'SensorStatus'].
-                                       Regardless of naming, the function will populate the first column with
-                                       timestamp, the middle columns with sensor data, and the final with status.
-    - sensor_statuses (list of str, optional): Possible statuses for the sensors to randomly assign in the dataset.
-                                               Defaults to: ['OK', 'MAINTENANCE_REQUIRED', 'ERROR'].
-    - random_seed (int, optional): Seed for the random number generator to ensure reproducible results.
-                                   Defaults to 42.
+    - start_time (str): The start date in the format "yyyy-mm-dd".
+    - end_time (str): The end date in the format "yyyy-mm-dd".
 
     Returns:
-    - pd.DataFrame: Generated sensor readings for the given timestamps.
+    - matplotlib.axes.Axes: The Axes object with the plotted time differences in hours between UTC and 
+                            other time zones.
 
     Requirements:
-    - math
-    - datetime
+    - datetime.datetime
+    - datetime.timedelta
+    - pytz
     - numpy
-    - pandas
+    - matplotlib.pyplot
 
     Example:
-    >>> df = task_func(0, 5000, 1000)
-    >>> type(df)
-    <class 'pandas.core.frame.DataFrame'>
-    >>> df.head(1)
-                        Timestamp   Sensor1   Sensor2   Sensor3 SensorStatus
-    0  1970-01-01 00:00:00.000000  0.049671  0.986174  0.064769        ERROR
+    >>> ax = task_func('2021-01-01', '2021-01-10')
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax.get_xticklabels()
+    [Text(18628.0, 0, '2021-01-01'), Text(18629.0, 0, '2021-01-02'), Text(18630.0, 0, '2021-01-03'), Text(18631.0, 0, '2021-01-04'), Text(18632.0, 0, '2021-01-05'), Text(18633.0, 0, '2021-01-06'), Text(18634.0, 0, '2021-01-07'), Text(18635.0, 0, '2021-01-08'), Text(18636.0, 0, '2021-01-09')]
     """
-    np.random.seed(random_seed)
-    if start_time > end_time:
-        raise ValueError("start_time cannot be after end_time")
-    if step < 0:
-        raise ValueError("step must be positive")
-    timestamps = list(range(start_time, end_time, step))
-    data = []
-    for ts in timestamps:
-        dt = datetime.utcfromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M:%S.%f")
-        sensor1 = math.sin(ts / 1000) + np.random.normal(0, 0.1)
-        sensor2 = math.cos(ts / 1000) + np.random.normal(0, 0.1)
-        sensor3 = math.tan(ts / 1000) + np.random.normal(0, 0.1)
-        status = np.random.choice(sensor_statuses)
-        row = [dt, sensor1, sensor2, sensor3, status]
-        data.append(row)
-    return pd.DataFrame(data, columns=columns)
+    TIMEZONES = [
+        "UTC",
+        "America/Los_Angeles",
+        "Europe/Paris",
+        "Asia/Kolkata",
+        "Australia/Sydney",
+    ]
+    COLORS = ["b", "g", "r", "c", "m", "y", "k"]
+    start_date = datetime.strptime(start_time, "%Y-%m-%d")
+    end_date = datetime.strptime(end_time, "%Y-%m-%d")
+    current_tz = pytz.timezone("UTC")
+    dates = np.arange(start_date, end_date, timedelta(days=1)).astype(datetime)
+    differences = []
+    for tz in TIMEZONES:
+        other_tz = pytz.timezone(tz)
+        difference = [
+            (other_tz.localize(dt) - current_tz.localize(dt)).total_seconds() / 3600
+            for dt in dates
+        ]
+        differences.append(difference)
+    fig, ax = plt.subplots()
+    for i, difference in enumerate(differences):
+        ax.plot(dates, difference, color=COLORS[i % len(COLORS)], label=TIMEZONES[i])
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Time difference (hours)")
+    ax.legend()
+    return ax
 
 import unittest
-import pandas as pd
-import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test basic case
-        df = task_func(0, 10000, 100, random_seed=42)
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(
-            list(df.columns),
-            ["Timestamp", "Sensor1", "Sensor2", "Sensor3", "SensorStatus"],
-        )
-        self.assertTrue(
-            (df["SensorStatus"].isin(["OK", "MAINTENANCE_REQUIRED", "ERROR"])).all()
-        )
+        # Test basic functionality
+        ax = task_func("2021-01-01", "2021-01-10")
+        self._common_assertions(ax)
     def test_case_2(self):
-        # Test custom columns
-        columns = ["Time", "Sensor_A", "Sensor_B", "Sensor_C", "Status"]
-        statuses = ["WORKING", "NEEDS_CHECK", "FAILED"]
-        df = task_func(
-            1500, 3000, 50, columns=columns, sensor_statuses=statuses, random_seed=42
-        )
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(list(df.columns), columns)
-        self.assertTrue((df["Status"].isin(statuses)).all())
+        # Test single day range
+        ax = task_func("2021-01-01", "2021-01-01")
+        self._common_assertions(ax)
     def test_case_3(self):
-        # Test generated data integrity by comparing with expected results
-        np.random.seed(42)
-        ts = 0  # Using the starting timestamp for simplicity
-        expected_sensor1 = math.sin(ts / 1000) + np.random.normal(0, 0.1, 1)[0]
-        expected_sensor2 = math.cos(ts / 1000) + np.random.normal(0, 0.1, 1)[0]
-        expected_sensor3 = math.tan(ts / 1000) + np.random.normal(0, 0.1, 1)[0]
-        df = task_func(0, 100, 100, random_seed=42)
-        self.assertAlmostEqual(df.iloc[0]["Sensor1"], expected_sensor1, places=5)
-        self.assertAlmostEqual(df.iloc[0]["Sensor2"], expected_sensor2, places=5)
-        self.assertAlmostEqual(df.iloc[0]["Sensor3"], expected_sensor3, places=5)
+        # Test leap year
+        ax = task_func("2020-02-28", "2020-03-01")
+        self._common_assertions(ax)
     def test_case_4(self):
-        # Test handling invalid start times
-        with self.assertRaises(ValueError):
-            task_func(10000, 0, 100)
+        # Test DST transition
+        ax = task_func("2021-03-27", "2021-03-29")
+        self._common_assertions(ax)
     def test_case_5(self):
-        # Test handling incorrect end times
-        with self.assertRaises(ValueError):
-            task_func(1000, 900, 100)
+        # Test plotting consistency
+        ax = task_func("2021-01-01", "2021-01-10")
+        colors = [line.get_color() for line in ax.get_lines()]
+        self.assertEqual(len(set(colors)), len(colors))  # Check if colors are unique
     def test_case_6(self):
-        # Test column handling
-        columns = ["Time", "Value1", "Value2", "Value3", "MachineStatus"]
-        df = task_func(0, 500, 100, columns=columns)
-        self.assertEqual(list(df.columns), columns)
-        # Too few/too many columns
+        # Testing input validation via invalid date format
         with self.assertRaises(ValueError):
-            task_func(0, 500, 100, columns[:-1])
-        with self.assertRaises(ValueError):
-            task_func(0, 500, 100, columns + ["foo", "bar"])
-    def test_case_7(self):
-        # Test sensor status handling
-        with self.assertRaises(ValueError):
-            task_func(0, 500, 100, [])
-        statuses = ["RUNNING", "SHUTDOWN", "ERROR"]
-        df = task_func(0, 500, 100, sensor_statuses=statuses)
-        self.assertTrue((df["SensorStatus"].isin(statuses)).all())
-    def test_case_8(self):
-        # Test random seed
-        df1 = task_func(0, 500, 100, random_seed=42)
-        df2 = task_func(0, 500, 100, random_seed=42)
-        pd.testing.assert_frame_equal(df1, df2)
-    def test_case_9(self):
-        # Test invalid steps handling
-        with self.assertRaises(ValueError):
-            task_func(0, 1000, -100)  # Step is negative
-        with self.assertRaises(ValueError):
-            task_func(0, 1000, 0)  # Step is zero
+            task_func("01-01-2021", "10-01-2021")
+    def _common_assertions(self, ax):
+        """Common assertions for all test cases"""
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(ax.get_xlabel(), "Date")
+        self.assertEqual(ax.get_ylabel().lower(), "time difference (hours)".lower())
+        legend_labels = [text.get_text() for text in ax.get_legend().get_texts()]
+        expected_timezones = [
+            "UTC",
+            "America/Los_Angeles",
+            "Europe/Paris",
+            "Asia/Kolkata",
+            "Australia/Sydney",
+        ]
+        self.assertListEqual(legend_labels, expected_timezones)
+    def tearDown(self):
+        plt.close("all")

@@ -1,99 +1,63 @@
-import ctypes
-import hashlib
-import binascii
+import inspect
+import types
 
-def task_func(filepath):
+def task_func(f):
     """
-    Loads a DLL file from a given filepath, calculates its MD5 and SHA256 hashes,
-    and prints these hashes in hexadecimal format. This function is a demonstration
-    of file handling, usage of the hashlib library for hash calculations, and binascii
-    for hexadecimal conversion. Note that the actual operations performed on the loaded
-    DLL are limited to hash calculation.
+    Inspects a given function 'f' and returns its specifications, including the function's name,
+    whether it is a lambda function, its arguments, defaults, and annotations. This method
+    utilizes the inspect and types modules to introspect function properties.
 
     Parameters:
-    filepath (str): The path of the DLL file.
+    f (function): The function to inspect.
 
     Returns:
-    str: The actual name of the loaded DLL file.
+    dict: A dictionary containing details about the function, such as its name, if it's a lambda function,
+          arguments, default values, and annotations.
 
     Requirements:
-    - ctypes
-    - hashlib
-    - binascii
+    - inspect
+    - types
 
     Examples:
-    >>> with open('libc.so.6', 'w') as f:
-    ...     _ = f.write("")
-    >>> result = task_func('libc.so.6')
-    MD5 Hash: d41d8cd98f00b204e9800998ecf8427e
-    SHA256 Hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-    >>> isinstance(result, str) 
+    >>> def sample_function(x, y=5): return x + y
+    >>> result = task_func(sample_function)
+    >>> 'sample_function' == result['function_name'] and len(result['args']) == 2
     True
-    >>> 'libc.so.6' in result
+    >>> lambda_func = lambda x: x * 2
+    >>> task_func(lambda_func)['is_lambda']
     True
     """
-    lib = ctypes.CDLL(filepath)
-    with open(filepath, 'rb') as f:
-        data = f.read()
-    md5_hash = hashlib.md5(data).digest()
-    print(f'MD5 Hash: {binascii.hexlify(md5_hash).decode()}')
-    sha256_hash = hashlib.sha256(data).digest()
-    print(f'SHA256 Hash: {binascii.hexlify(sha256_hash).decode()}')
-    return lib._name
+    spec = inspect.getfullargspec(f)
+    return {
+        'function_name': f.__name__,
+        'is_lambda': isinstance(f, types.LambdaType),
+        'args': spec.args,
+        'defaults': spec.defaults,
+        'annotations': spec.annotations
+    }
 
 import unittest
-from unittest.mock import patch
-import tempfile
-import os
-import sys
-from io import StringIO
-import binascii
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Create a temporary DLL file
-        self.temp_file = tempfile.NamedTemporaryFile(suffix='.dll', delete=False)
-        self.filepath = self.temp_file.name
-        # Redirect stdout to capture print statements
-        self.original_stdout = sys.stdout
-        sys.stdout = StringIO()
-    def test_file_existence(self):
-        self.assertTrue(os.path.exists(self.filepath))
-    def test_invalid_file_path(self):
-        with self.assertRaises(OSError):
-            task_func('invalid_path.dll')
-    @patch('ctypes.CDLL')
-    @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data=b'test data')
-    @patch('hashlib.md5')
-    @patch('hashlib.sha256')
-    def test_dll_name_returned(self, mock_sha256, mock_md5, mock_open, mock_cdll):
-        """Test if the function returns the name of the loaded DLL file."""
-        mock_md5.return_value.digest.return_value = b'\x93\x15\x98\x3f\xcd\xb4\xcc\xcb\x28\x7b\xcc\xdb\xdd\x4e\x8a\x45'  # Mock MD5 digest
-        mock_sha256.return_value.digest.return_value = b'\xd7\xa8\xfb\x48\xd2\x8d\x1d\x73\xa0\x34\x6b\xbf\x40\x41\xdf\x98\xc2\x50\x1d\x4a\xe4\x88\x9b\x93\x4f\xaa\x63\xf7\xaf\x67\xe9\xb1'  # Mock SHA256 digest
-        mock_cdll.return_value._name = 'test.dll'
-        dll_name = task_func(self.filepath)  # Replace 'task_func_module.task_func' with the actual path to your task_func function
-        self.assertEqual(dll_name, 'test.dll')
-    @patch('ctypes.CDLL')
-    @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data=b'test data')
-    @patch('hashlib.md5')
-    def test_md5_hash_printed(self, mock_md5, mock_open, mock_cdll):
-        """Test if the MD5 hash is correctly calculated and printed."""
-        expected_hash = b'\x93\x15\x98\x3f\xcd\xb4\xcc\xcb\x28\x7b\xcc\xdb\xdd\x4e\x8a\x45'
-        mock_md5.return_value.digest.return_value = expected_hash
-        with patch('builtins.print') as mock_print:
-            task_func('path/to/test.dll')
-            expected_md5_output = f'MD5 Hash: {binascii.hexlify(expected_hash).decode()}'
-            mock_print.assert_any_call(expected_md5_output)
-    @patch('ctypes.CDLL')
-    @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data=b'test data')
-    @patch('hashlib.sha256')
-    def test_sha256_hash_printed(self, mock_sha256, mock_open, mock_cdll):
-        """Test if the SHA256 hash is correctly calculated and printed."""
-        expected_hash = b'\xd7\xa8\xfb\x48\xd2\x8d\x1d\x73\xa0\x34\x6b\xbf\x40\x41\xdf\x98\xc2\x50\x1d\x4a\xe4\x88\x9b\x93\x4f\xaa\x63\xf7\xaf\x67\xe9\xb1'
-        mock_sha256.return_value.digest.return_value = expected_hash
-        with patch('builtins.print') as mock_print:
-            task_func('path/to/test.dll')
-            expected_sha256_output = f'SHA256 Hash: {binascii.hexlify(expected_hash).decode()}'
-            mock_print.assert_any_call(expected_sha256_output)
-    def tearDown(self):
-        os.remove(self.filepath)
-        sys.stdout = self.original_stdout
+    def test_regular_function(self):
+        def test_func(a, b=1): pass
+        result = task_func(test_func)
+        self.assertEqual(result['function_name'], 'test_func')
+        self.assertListEqual(result['args'], ['a', 'b'])
+        self.assertTupleEqual(result['defaults'], (1,))
+    def test_lambda_function(self):
+        lambda_func = lambda x, y=2: x + y
+        result = task_func(lambda_func)
+        self.assertTrue(result['is_lambda'])
+    def test_no_arguments(self):
+        def test_func(): pass
+        result = task_func(test_func)
+        self.assertEqual(len(result['args']), 0)
+    def test_annotations(self):
+        def test_func(a: int, b: str = 'hello') -> int: pass
+        result = task_func(test_func)
+        self.assertIn('a', result['annotations'])
+        self.assertIn('return', result['annotations'])
+    def test_defaults_none(self):
+        def test_func(a, b=None): pass
+        result = task_func(test_func)
+        self.assertIsNone(result['defaults'][0])

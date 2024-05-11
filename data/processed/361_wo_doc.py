@@ -1,109 +1,92 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import os
+import logging
 
-def task_func(file_location, sheet_name):
+# Set up basic configuration for logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def task_func(sheet_name, excel_file_location="test.xlsx", csv_file_location="test.csv"):
     """
-    Load data from an Excel spreadsheet (.xlsx), calculate the mean and standard deviation of each column, 
-    and draw a bar chart. The bar chart will be returned as a matplotlib figure object.
+    Reads data from an Excel spreadsheet, converts it to a CSV file, then calculates the sum of each column in the CSV file.
 
     Parameters:
-    - file_location (str): The path to the Excel file.
     - sheet_name (str): The name of the sheet to load data from.
+    - excel_file_location (str): The path to the Excel file. Default is 'test.xlsx'.
+    - csv_file_location (str): The path where the CSV file will be saved. Default is 'test.csv'.
 
     Returns:
-    - dict: A dictionary with mean and standard deviation of each column.
-    - matplotlib.figure.Figure: The figure object containing the bar chart. The figure is titled 'Mean and Standard Deviation', the X-axis is labeled 'Columns', and the Y-axis is labeled 'Values'.
+    - dict: A dictionary with the sum of each column.
 
     Raises:
     - FileNotFoundError: If the Excel file does not exist at the specified path.
-    - ValueError: If the specified sheet does not exist in the workbook.
+    - ValueError: If the specified sheet name is not found in the Excel file.
 
     Requirements:
     - pandas
-    - numpy
-    - matplotlib.pyplot
-    - os
-    - openpyxl
+    - logging
 
     Example:
-    >>> file_path='test.xlsx'
-    >>> create_dummy_excel(file_path)
-    >>> result, fig = task_func(file_path, 'TestSheet')
-    >>> os.remove(file_path)
-    >>> fig.axes[0].get_title()
-    'Mean and Standard Deviation'
+    >>> test_excel_file = 'dummy_test.xlsx'
+    >>> test_csv_file = 'dummy_test.csv'
+    >>> test_sheet_name = 'TestSheet'
+    >>> data = {'A': [10, 20, 30], 'B': [40, 50, 60]}
+    >>> df = pd.DataFrame(data)
+    >>> df.to_excel(test_excel_file, sheet_name=test_sheet_name, index=False)
+    >>> task_func(sheet_name='TestSheet', excel_file_location=test_excel_file, csv_file_location=test_csv_file) # {'Column1': sum_value1, 'Column2': sum_value2, ...}
+    {'A': 60, 'B': 150}
+    >>> os.remove(test_excel_file)
+    >>> os.remove(test_csv_file)
+    
+    Note:
+    - Ensure the Excel file contains only numerical data for accurate sum calculations.
     """
-    if not os.path.exists(file_location):
-        raise FileNotFoundError(f"No file found at {file_location}")
     try:
-        df = pd.read_excel(file_location, sheet_name=sheet_name)
+        logging.info('Reading the Excel file.')
+        df = pd.read_excel(excel_file_location, sheet_name=sheet_name)
+        logging.info('Converting to CSV.')
+        df.to_csv(csv_file_location, index=False)
+        column_sum = df.sum(numeric_only=True)
+    except FileNotFoundError:
+        logging.error(f"Excel file not found at {excel_file_location}")
+        raise FileNotFoundError(f"Excel file not found at {excel_file_location}")
     except ValueError as e:
-        raise ValueError(f"Error reading sheet: {e}")
-    result = {}
-    fig, ax = plt.subplots()
-    for column in df.columns:
-        mean = np.mean(df[column])
-        std = np.std(df[column])
-        result[column] = {"mean": mean, "std": std}
-        ax.bar(column, mean, yerr=std)
-    ax.set_title('Mean and Standard Deviation')
-    ax.set_xlabel('Columns')
-    ax.set_ylabel('Values')
-    return result, fig
+        logging.error(f"Error in processing Excel file: {e}")
+        raise ValueError(f"Error in processing Excel file: {e}")
+    return column_sum.to_dict()
 
 import unittest
-import os
 import pandas as pd
-import matplotlib
-def create_dummy_excel(file_path='test.xlsx'):
-    """
-    Creates a dummy Excel file for testing.
-    The file contains a single sheet named 'TestSheet' with sample data.
-    """
-    df = pd.DataFrame({'A': [10, 30], 'B': [20, 40]})
-    df.to_excel(file_path, index=False, sheet_name='TestSheet')
-def extract_means_from_fig(fig):
-         # Assuming there's only one Axes object in the Figure
-        ax = fig.get_axes()[0]
-        # Extracting the bars (Rectangles) from the Axes
-        bars = [rect for rect in ax.get_children() if isinstance(rect, matplotlib.patches.Rectangle)]
-        # Filtering out any non-data bars (like legends, etc.)
-        data_bars = bars[:-1]  # The last bar is usually an extra one added by Matplotlib
-        # Getting the height of each bar
-        mean_values = [bar.get_height() for bar in data_bars]
-        return mean_values
-        
+import os
 class TestCases(unittest.TestCase):
     def setUp(self):
-        create_dummy_excel()
+        # Creating a dummy Excel file for testing
+        self.test_excel_file = 'dummy_test.xlsx'
+        self.test_csv_file = 'dummy_test.csv'
+        self.test_sheet_name = 'TestSheet'
+        data = {'A': [10, 20, 30], 'B': [40, 50, 60]}
+        df = pd.DataFrame(data)
+        df.to_excel(self.test_excel_file, sheet_name=self.test_sheet_name, index=False)
     def tearDown(self):
-        os.remove('test.xlsx')
+        os.remove(self.test_excel_file)
+        if os.path.exists(self.test_csv_file):
+            os.remove(self.test_csv_file)
     def test_normal_functionality(self):
-        result, fig = task_func('test.xlsx', 'TestSheet')
-        self.assertIsInstance(result, dict)
-        self.assertIsInstance(fig, plt.Figure)
-        self.assertEqual(fig.axes[0].get_title(), 'Mean and Standard Deviation')
-    def test_non_existent_file(self):
+        result = task_func(self.test_sheet_name, self.test_excel_file, self.test_csv_file)
+        self.assertEqual(result, {'A': 60, 'B': 150})
+    def test_file_not_found(self):
         with self.assertRaises(FileNotFoundError):
-            task_func('non_existent.xlsx', 'Sheet1')
-    def test_invalid_sheet_name(self):
+            task_func(self.test_sheet_name, 'nonexistent.xlsx', self.test_csv_file)
+    def test_sheet_not_found(self):
         with self.assertRaises(ValueError):
-            task_func('test.xlsx', 'NonExistentSheet')
-    def test_correct_mean_and_std_values(self):
-        result, _ = task_func('test.xlsx', 'TestSheet')
-        expected = {'A': {'mean': 20.0, 'std': 10.0}, 'B': {'mean': 30.0, 'std': 10.0}}
-        self.assertEqual(result, expected)
-    def test_bar_chart_labels(self):
-        _, fig = task_func('test.xlsx', 'TestSheet')
-        ax = fig.axes[0]
-        self.assertEqual(ax.get_xlabel(), 'Columns')
-        self.assertEqual(ax.get_ylabel(), 'Values')
-    
-    def test_value(self):
-        result, fig = task_func('test.xlsx', 'TestSheet')
-        expect = {'A': {'mean': 20.0, 'std': 10.0}, 'B': {'mean': 30.0, 'std': 10.0}}
-        self.assertEqual(expect, result)
-        mean_values = extract_means_from_fig(fig)
-        self.assertEqual(mean_values, [20,30])
+            task_func('NonexistentSheet', self.test_excel_file, self.test_csv_file)
+    def test_empty_excel_file(self):
+        empty_excel_file = 'empty_test.xlsx'
+        pd.DataFrame().to_excel(empty_excel_file, index=False)
+        with self.assertRaises(ValueError):
+            task_func(self.test_sheet_name, empty_excel_file, self.test_csv_file)
+        os.remove(empty_excel_file)
+    def test_overwrite_existing_csv(self):
+        with open(self.test_csv_file, 'w') as file:
+            file.write('Old Data')
+        task_func(self.test_sheet_name, self.test_excel_file, self.test_csv_file)
+        with open(self.test_csv_file, 'r') as file:
+            self.assertNotIn('Old Data', file.read())

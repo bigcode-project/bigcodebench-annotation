@@ -1,102 +1,144 @@
 import requests
+from bs4 import BeautifulSoup
 import pandas as pd
+from io import StringIO
 
 
-def task_func(url: str) -> pd.DataFrame:
+def task_func(url, table_id):
     """
-    This function fetches JSON data from a specified URL and converts it into a Pandas DataFrame.
-    It expects the JSON to be in a format that is directly convertible to a DataFrame, typically
-    a list of dictionaries. The function handles various scenarios including successful data
-    retrieval and conversion, network issues, and invalid JSON format.
+    Extracts and converts data from a specified HTML table based on the given 'table_id' on a webpage into a Pandas DataFrame.
+    If the table is present but contains no data rows (i.e., no <tr> tags),
+    the function returns an empty DataFrame.
 
     Parameters:
-    - url (str): The URL where the JSON file is located.
+    - url (str): The URL of the webpage from which to extract the table.
+    - table_id (str): The 'id' attribute of the HTML table to be extracted.
 
     Returns:
-    - pd.DataFrame: A DataFrame constructed from the JSON data fetched from the URL.
+    - df (pd.DataFrame): A DataFrame containing the data extracted from the specified HTML table.
+                  If the table is found but has no rows (<tr> elements), an empty DataFrame is returned.
 
     Raises:
-    - SystemError: If there is a network-related issue such as a connection error, timeout,
-      or if the server responded with an unsuccessful status code (like 404 or 500). This is a
-      re-raised exception from requests.RequestException to provide a more specific error message.
-    - ValueError: If the fetched data is not in a valid JSON format that can be converted into
-      a DataFrame. This could occur if the data structure does not match the expected format (e.g.,
-      not a list of dictionaries).
+    - requests.exceptions.HTTPError: If the HTTP request fails (e.g., due to connection issues or
+                                   a non-successful status code like 404 or 500).
+    - ValueError: If no table with the specified 'table_id' is found on the webpage. The error message will be
+                "Table with the specified ID not found."
 
     Requirements:
     - requests
+    - bs4.BeautifulSoup
     - pandas
+    - io
+    
+    Notes:
+    - The function raises an HTTPError for unsuccessful HTTP requests, which includes scenarios like
+      network problems or non-2xx HTTP responses.
+    - A ValueError is raised specifically when the HTML table with the specified ID is not present
+      in the webpage's content, indicating either an incorrect ID or the absence of the table.
+    - If the located table has no rows, indicated by the absence of <tr> tags, an empty DataFrame is returned.
+      This is useful for handling tables that are structurally present in the HTML but are devoid of data.
 
     Example:
-    >>> task_func('https://example.com/data.json')
+    >>> task_func('https://example.com/data.html', 'table1')
     DataFrame:
-       A  B
+       Name  Age
+    0  Alice  25
+    1  Bob    30
 
-    Notes:
-    - The function uses a timeout of 5 seconds for the network request to avoid hanging indefinitely.
-    - It checks the HTTP response status and raises an HTTPError for unsuccessful status codes.
-    - Directly converts the HTTP response to JSON and then to a DataFrame, without intermediate processing.
+    Example of ValueError:
+    >>> task_func('https://example.com/data.html', 'nonexistent_table')
+    ValueError: Table with the specified ID not found.
+
+    Example of empty table:
+    >>> task_func('https://example.com/emptytable.html', 'empty_table')
+    DataFrame:
+    Empty DataFrame
+    Columns: []
+    Index: []
     """
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
-        data = response.json()  # Directly converts the response content to JSON
-        df = pd.DataFrame(data)
-        return df
-    except requests.RequestException as e:
-        raise SystemError(f"Network error occurred: {e}") from e
-    except ValueError as exc:
-        raise ValueError("Invalid JSON format for DataFrame conversion") from exc
+    except requests.exceptions.HTTPError as e:
+        raise e
+    soup = BeautifulSoup(response.text, "html.parser")
+    table = soup.find("table", {"id": table_id})
+    if table is None:
+        raise ValueError("Table with the specified ID not found.")
+    if not table.find_all("tr"):
+        return pd.DataFrame()
+    df = pd.read_html(StringIO(str(table)))[0]
+    return df
 
 import unittest
-import requests
+from unittest.mock import patch, MagicMock
 import pandas as pd
-from unittest.mock import patch
 class TestCases(unittest.TestCase):
     """Test cases for task_func."""
     @patch("requests.get")
-    def test_valid_json(self, mock_get):
-        """Test a valid JSON."""
-        mock_get.return_value.json.return_value = [{"A": 1, "B": 3}, {"A": 2, "B": 4}]
-        mock_get.return_value.status_code = 200
-        df = task_func("https://example.com/data.json")
-        self.assertTrue(isinstance(df, pd.DataFrame))
-        self.assertListEqual(df.columns.tolist(), ["A", "B"])
-        self.assertListEqual(df["A"].tolist(), [1, 2])
-        self.assertListEqual(df["B"].tolist(), [3, 4])
+    def test_successful_scrape(self, mock_get):
+        """Test a successful scrape."""
+        mock_html_content = """
+            <html>
+            <body>
+                <table id="table0">
+                    <tr><th>Name</th><th>Age</th></tr>
+                    <tr><td>Alice</td><td>25</td></tr>
+                    <tr><td>Bob</td><td>30</td></tr>
+                </table>
+            </body>
+            </html>
+        """
+        # Mock the response
+        mock_response = MagicMock()
+        mock_response.text = mock_html_content
+        mock_get.return_value = mock_response
+        # Test
+        df = task_func("http://example.com", "table0")
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertGreater(len(df), 0)
+        self.assertIn("Name", df.columns)
+        self.assertIn("Age", df.columns)
     @patch("requests.get")
-    def test_empty_json(self, mock_get):
-        """Test an empty JSON."""
-        mock_get.return_value.json.return_value = []
-        mock_get.return_value.status_code = 200
-        df = task_func("https://example.com/empty.json")
-        self.assertTrue(isinstance(df, pd.DataFrame))
-        self.assertEqual(len(df), 0)
-    @patch("requests.get")
-    def test_invalid_json(self, mock_get):
-        """Test an invalid JSON."""
-        mock_get.return_value.json.side_effect = ValueError()
+    def test_table_not_found(self, mock_get):
+        """Test table not found."""
+        mock_html_content = "<html><body></body></html>"
+        mock_response = MagicMock()
+        mock_response.text = mock_html_content
+        mock_get.return_value = mock_response
+        # Test
         with self.assertRaises(ValueError):
-            task_func("https://example.com/invalid.json")
+            task_func("http://example.com", "non_existent_table")
     @patch("requests.get")
-    def test_large_json(self, mock_get):
-        """Test a large JSON."""
-        mock_get.return_value.json.return_value = [{"X": i} for i in range(1000)]
-        mock_get.return_value.status_code = 200
-        df = task_func("https://example.com/large.json")
-        self.assertTrue(isinstance(df, pd.DataFrame))
-        self.assertListEqual(df["X"].tolist(), list(range(1000)))
+    def test_network_error(self, mock_get):
+        """Test network error."""
+        mock_get.side_effect = requests.exceptions.ConnectionError
+        with self.assertRaises(requests.exceptions.ConnectionError):
+            task_func("http://example.com", "table0")
     @patch("requests.get")
-    def test_null_json(self, mock_get):
-        """Test a JSON that is null."""
-        mock_get.return_value.json.return_value = None
-        mock_get.return_value.status_code = 200
-        df = task_func("https://example.com/null.json")
-        self.assertTrue(isinstance(df, pd.DataFrame))
+    def test_http_error(self, mock_get):
+        """Test HTTP error."""
+        mock_get.return_value.raise_for_status.side_effect = (
+            requests.exceptions.HTTPError
+        )
+        # Test
+        with self.assertRaises(requests.exceptions.HTTPError):
+            task_func("http://example.com", "table0")
+    @patch("requests.get")
+    def test_empty_table(self, mock_get):
+        # Mock HTML content with an empty table
+        mock_html_content = """
+            <html>
+            <body>
+                <table id="table0"></table>
+            </body>
+            </html>
+        """
+        # Mock the response
+        mock_response = MagicMock()
+        mock_response.text = mock_html_content
+        mock_get.return_value = mock_response
+        # Test
+        df = task_func("http://example.com", "table0")
+        self.assertIsInstance(df, pd.DataFrame)
         self.assertEqual(len(df), 0)
-    @patch("requests.get")
-    def test_system_error(self, mock_get):
-        """Test a general error."""
-        mock_get.side_effect = requests.RequestException
-        with self.assertRaises(SystemError):
-            task_func("https://example.com/data.json")

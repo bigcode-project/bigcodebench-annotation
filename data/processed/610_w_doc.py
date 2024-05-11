@@ -1,65 +1,88 @@
-from itertools import combinations
 from random import sample
+import seaborn as sns
+import pandas as pd
 
+# Constants
+COLUMNS = ['A', 'B', 'C', 'D', 'E']
 
-def task_func(df, tuples, n_plots):
-    """
-    Removes rows from a DataFrame based on a list of tuples, each representing row values to match and remove.
-    Generates up to 'n_plots' scatter plots for random combinations of two columns from the remaining DataFrame.
-
+def task_func(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, list):
+    '''
+    Remove rows from a dataframe based on values of multiple columns, 
+    and then create n random joint plots of two columns against each other if the DataFrame is not empty.
+    
     Parameters:
-    - df (pd.DataFrame): The input DataFrame.
-    - tuples (list): A list of tuples, where each tuple contains values that, if matched, should result in the row being removed.
-    - n_plots (int): The maximum number of scatter plots to generate from the remaining data.
-
+    df (DataFrame): The pandas DataFrame.
+    tuples (list): A list of tuples, where each tuple represents a row to be removed.
+    n_plots (int): The number of jointplots to be generated.
+    
     Returns:
-    - pd.DataFrame: The DataFrame after specified rows have been removed.
-    - list: A list of tuples, each containing a pair of column names used for the plot and the corresponding plot object.
-
+    tuple: A tuple containing:
+        - DataFrame: The modified DataFrame.
+        - list: A list of generated joint plots (sns.JointGrid objects) if the DataFrame is not empty, otherwise an empty list.
+    
     Requirements:
+    - pandas
+    - seaborn
     - random
-    - itertools
-
+    
     Example:
-    >>> import numpy as np, pandas as pd
-    >>> df = pd.DataFrame(np.random.rand(10, 5), columns=['A', 'B', 'C', 'D', 'E'])
-    >>> tuples = [(0.1, 0.2, 0.3, 0.4, 0.5)]
+    >>> import numpy as np
+    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
+    >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
     >>> modified_df, plots = task_func(df, tuples, 3)
-    """
-    COLUMNS = ['A', 'B', 'C', 'D', 'E']
+    '''
     df = df.set_index(list('ABCDE')).drop(tuples, errors='ignore').reset_index()
     plots = []
-    possible_combinations = list(combinations(COLUMNS, 2))
-    for _ in range(min(n_plots, len(possible_combinations))):
-        selected_columns = sample(possible_combinations, 1)[0]
-        possible_combinations.remove(selected_columns)
-        ax = df.plot.scatter(x=selected_columns[0], y=selected_columns[1])
-        plots.append((selected_columns, ax))
+    if not df.empty:
+        for _ in range(n_plots):
+            selected_columns = sample(COLUMNS, 2)
+            plot = sns.jointplot(data=df, x=selected_columns[0], y=selected_columns[1])
+            plots.append(plot)
     return df, plots
 
 import unittest
-import pandas as pd
 import numpy as np
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
     def test_case_1(self):
+        df = pd.DataFrame(np.random.randint(0, 100, size=(100, 5)), columns=list('ABCDE'))
         tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
-        modified_df, _ = task_func(self.df, tuples, 3)
-        self.assertFalse(any(modified_df.apply(tuple, axis=1).isin(tuples)))
+        modified_df, plots = task_func(df, tuples, 3)
+        # Convert tuples to DataFrame for compatibility
+        tuples_df = pd.DataFrame([t for t in tuples], columns=list('ABCDE'))
+        # Check each tuple to ensure it's not in modified_df
+        for _, row in tuples_df.iterrows():
+            # Use merge to find matching rows, which is empty if no match exists
+            merged_df = pd.merge(modified_df, pd.DataFrame([row]), on=list('ABCDE'))
+            self.assertTrue(merged_df.empty, f"Tuple {tuple(row)} found in modified DataFrame.")
     def test_case_2(self):
-        n_plots = 4
-        _, plots = task_func(self.df, [], n_plots)
-        self.assertEqual(len(plots), n_plots)
+        df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
+        tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
+        modified_df, plots = task_func(df, tuples, 2)
+        
+        for plot in plots:
+            self.assertTrue(plot.x.name in df.columns)
+            self.assertTrue(plot.y.name in df.columns)
+    
     def test_case_3(self):
-        _, plots = task_func(self.df, [], 5)
-        selected_columns = [plot[0] for plot in plots]
-        self.assertTrue(len(selected_columns) == len(set(tuple(item) for item in selected_columns)))
+        df = pd.DataFrame(columns=list('ABCDE'))
+        tuples = [(10, 20, 30, 40, 50)]
+        modified_df, plots = task_func(df, tuples, 2)
+        
+        self.assertTrue(modified_df.empty)
+        self.assertEqual(len(plots), 0)
+    
     def test_case_4(self):
-        modified_df, plots = task_func(self.df, [], 2)
-        self.assertEqual(len(modified_df), len(self.df))
-        self.assertEqual(len(plots), 2)
+        df = pd.DataFrame([(10, 20, 30, 40, 50), (10, 20, 30, 40, 50)], columns=list('ABCDE'))
+        tuples = [(10, 20, 30, 40, 50)]
+        modified_df, plots = task_func(df, tuples, 2)
+        
+        self.assertTrue(modified_df.empty)
+        self.assertEqual(len(plots), 0)
+    
     def test_case_5(self):
-        tuples = [(101, 202, 303, 404, 505), (606, 707, 808, 909, 1000)]
-        modified_df, _ = task_func(self.df, tuples, 3)
-        self.assertEqual(len(modified_df), len(self.df))
+        df = pd.DataFrame(np.random.randint(0,100,size=(100, 5)), columns=list('ABCDE'))
+        tuples = []
+        modified_df, plots = task_func(df, tuples, 2)
+        
+        pd.testing.assert_frame_equal(modified_df, df)
+        self.assertEqual(len(plots), 2)

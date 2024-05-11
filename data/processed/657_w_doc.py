@@ -1,77 +1,72 @@
 import re
-import string
 import nltk
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
-
-nltk.download('vader_lexicon')
+from gensim.models import Word2Vec
 # Constants
 ALPHANUMERIC = re.compile('[\W_]+')
-PUNCTUATIONS = string.punctuation
 
 
-def task_func(text: str, sia: SentimentIntensityAnalyzer) -> dict:
-    """Analyze the sentiment of a text using the provided SentimentIntensityAnalyzer.
-    The text is first cleaned by:
-    - Removing all non-alphanumeric characters except spaces.
-    - Converting to lowercase.
-    - Removing punctuation.
-    
+def task_func(texts, stopwords=None):
+    """
+    Generate word vectors from a list of texts using the gensim Word2Vec model and nltk.corpus.stopwords.
+    The texts are first cleaned by removing all non-alphanumeric characters except space,
+    lowercased, and stop words are removed.
+
     Parameters:
-    text (str): The string to analyze.
-    sia (SentimentIntensityAnalyzer): An instance of the SentimentIntensityAnalyzer for sentiment analysis.
-    
+    texts (list): A list of strings.
+    stopwords (list, optional): A list of stopwords to be removed. If not provided, nltk's stopwords will be used.
+
     Returns:
-    dict: A dictionary with sentiment scores. The dictionary contains four scores:
-          - 'compound': The overall sentiment score.
-          - 'neg': Negative sentiment score.
-          - 'neu': Neutral sentiment score.
-          - 'pos': Positive sentiment score.
-    
+    Word2Vec: A trained Word2Vec model.
+
     Requirements:
     - re
-    - string
     - nltk
-    - nltk.sentiment.vader
-    
+    - gensim
+
     Example:
-    >>> from nltk.sentiment import SentimentIntensityAnalyzer
-    >>> sia = SentimentIntensityAnalyzer()
-    >>> task_func("I love Python!", sia)
-    {'neg': 0.0, 'neu': 0.192, 'pos': 0.808, 'compound': 0.6369}
+    >>> texts = ["Hello, World!", "Machine Learning is great", "Python is my favorite programming language"]
+    >>> model = task_func(texts)
+    >>> vector = model.wv['python']
     """
-    text = ALPHANUMERIC.sub(' ', text).lower()
-    text = text.translate(str.maketrans('', '', PUNCTUATIONS))
-    sentiment_scores = sia.polarity_scores(text)
-    return sentiment_scores
+    if stopwords is None:
+        stopwords = nltk.corpus.stopwords.words('english')
+    cleaned_texts = [ALPHANUMERIC.sub(' ', text).lower() for text in texts]
+    tokenized_texts = [[word for word in text.split() if word not in stopwords] for text in cleaned_texts]
+    if not tokenized_texts:
+        return Word2Vec(vector_size=100)
+    model = Word2Vec(sentences=tokenized_texts, vector_size=100, window=5, min_count=1, workers=4)
+    return model
 
 import unittest
-# Mock the SentimentIntensityAnalyzer for our tests
-class MockedSentimentIntensityAnalyzer:
-    def polarity_scores(self, text):
-        return {'compound': 0.5, 'neg': 0.25, 'neu': 0.25, 'pos': 0.5}
+stopwords_mock = ["is", "my", "a", "with", "and", "it", "to", "the", "of", "in"]
 class TestCases(unittest.TestCase):
+    
     def test_case_1(self):
-        sia = MockedSentimentIntensityAnalyzer()
-        result = task_func("I love Python!", sia)
-        expected = {'compound': 0.5, 'neg': 0.25, 'neu': 0.25, 'pos': 0.5}
-        self.assertEqual(result, expected)
-    
+        texts = ["Hello, World!", "Machine Learning is great", "Python is my favorite programming language"]
+        model = task_func(texts, stopwords=stopwords_mock)
+        self.assertIsInstance(model, Word2Vec)
+        self.assertIn('python', model.wv.key_to_index)
+        
     def test_case_2(self):
-        sia = MockedSentimentIntensityAnalyzer()
-        result = task_func("I hate rainy days.", sia)
-        self.assertEqual(result['neg'], 0.25)
-    
+        texts = ["Hello!!!", "@Machine Learning", "Python###"]
+        model = task_func(texts, stopwords=stopwords_mock)
+        self.assertIsInstance(model, Word2Vec)
+        self.assertIn('python', model.wv.key_to_index)
+        
     def test_case_3(self):
-        sia = MockedSentimentIntensityAnalyzer()
-        result = task_func("The weather is neutral today.", sia)
-        self.assertEqual(result['neu'], 0.25)
-    
+        texts = []
+        model = task_func(texts, stopwords=stopwords_mock)
+        self.assertIsInstance(model, Word2Vec)
+        
     def test_case_4(self):
-        sia = MockedSentimentIntensityAnalyzer()
-        result = task_func("Absolutely fantastic!", sia)
-        self.assertEqual(result['pos'], 0.5)
-    
+        texts = ["This is a long sentence with many words, and it should still work!", 
+                 "Another long sentence to check the function's capability."]
+        model = task_func(texts, stopwords=stopwords_mock)
+        self.assertIsInstance(model, Word2Vec)
+        self.assertIn('long', model.wv.key_to_index)
+        
     def test_case_5(self):
-        sia = MockedSentimentIntensityAnalyzer()
-        result = task_func("This is a bad idea!", sia)
-        self.assertEqual(result['neg'], 0.25)
+        texts = ["Bonjour", "Hola", "Ciao"]
+        model = task_func(texts, stopwords=stopwords_mock)
+        self.assertIsInstance(model, Word2Vec)
+        self.assertIn('bonjour', model.wv.key_to_index)

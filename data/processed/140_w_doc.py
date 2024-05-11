@@ -1,93 +1,78 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 
-def task_func(df):
+def task_func(df, cols):
     """
-    Draw histograms of numeric columns in a DataFrame and return the plots.
-
-    Each histogram represents the distribution of values in one numeric column,
-    with the column name as the plot title, 'Value' as the x-axis label, and 'Frequency' as the y-axis label.
+    Standardize specified numeric columns in a dataframe.
 
     Parameters:
-    - df (DataFrame): The DataFrame containing the data.
+    df (DataFrame): The dataframe.
+    cols (list): The columns to standardize.
 
     Returns:
-    - list: A list of Matplotlib Axes objects, each representing a histogram for a numeric column.
+    DataFrame: The dataframe with standardized columns.
 
     Raises:
-    - ValueError: If the input is not a non-empty DataFrame or if there are no numeric columns in the DataFrame.
+    ValueError: If 'df' is not a DataFrame, 'cols' is not a list, or columns in 'cols' don't exist in 'df'.
 
     Requirements:
     - pandas
-    - numpy
-    - matplotlib.pyplot
+    - sklearn.preprocessing.StandardScaler
 
     Example:
-    >>> df = pd.DataFrame({'A': np.random.normal(0, 1, 100), 'B': np.random.exponential(1, 100)})
-    >>> axes = task_func(df)
-    >>> for ax in axes:
-    ...     plt.show()
+    >>> np.random.seed(0)
+    >>> df = pd.DataFrame({'A': np.random.normal(0, 1, 1000), 'B': np.random.exponential(1, 1000)})
+    >>> df = task_func(df, ['A', 'B'])
+    >>> print(df.describe())
+                      A             B
+    count  1.000000e+03  1.000000e+03
+    mean  -1.243450e-17 -1.865175e-16
+    std    1.000500e+00  1.000500e+00
+    min   -3.040310e+00 -1.024196e+00
+    25%   -6.617441e-01 -7.183075e-01
+    50%   -1.293911e-02 -2.894497e-01
+    75%    6.607755e-01  4.095312e-01
+    max    2.841457e+00  5.353738e+00
     """
-    if not isinstance(df, pd.DataFrame) or df.empty:
-        raise ValueError("The input must be a non-empty pandas DataFrame.")
-    numeric_cols = df.select_dtypes(include=np.number).columns
-    if not numeric_cols.size:
-        raise ValueError("DataFrame contains no numeric columns.")
-    axes = []
-    for col in numeric_cols:
-        fig, ax = plt.subplots()
-        df[col].plot(kind='hist', title=col, ax=ax)
-        ax.set_xlabel('Value')
-        ax.set_ylabel('Frequency')
-        axes.append(ax)
-    return axes
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df must be a pandas DataFrame.")
+    if not isinstance(cols, list) or not all(isinstance(col, str) for col in cols):
+        raise ValueError("cols must be a list of column names.")
+    if not all(col in df.columns for col in cols):
+        raise ValueError("All columns in cols must exist in the dataframe.")
+    scaler = StandardScaler()
+    df[cols] = scaler.fit_transform(df[cols])
+    return df
 
 import unittest
-import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd 
 class TestCases(unittest.TestCase):
     def setUp(self):
-        np.random.seed(42)  # Set seed for reproducibility
+        np.random.seed(0)
         self.df = pd.DataFrame({
-            'A': np.random.normal(0, 1, 1000),
-            'B': np.random.exponential(1, 1000),
-            'C': ['text'] * 1000  # Non-numeric column
+            'A': np.random.normal(0, 1, 1000), 
+            'B': np.random.exponential(1, 1000), 
+            'C': np.random.randint(0, 100, 1000)
         })
-    def test_return_type(self):
-        axes = task_func(self.df)
-        for ax in axes:
-            self.assertIsInstance(ax, plt.Axes)
-    def test_invalid_input_empty_dataframe(self):
+    def test_standardized_columns(self):
+        standardized_df = task_func(self.df, ['A', 'B'])
+        self.assertAlmostEqual(standardized_df['A'].mean(), 0, places=1)
+        self.assertAlmostEqual(standardized_df['A'].std(), 1, places=1)
+        self.assertAlmostEqual(standardized_df['B'].mean(), 0, places=1)
+        self.assertAlmostEqual(standardized_df['B'].std(), 1, places=1)
+        df_list = standardized_df.apply(lambda row: ','.join(row.values.astype(str)), axis=1).tolist()
+        with open('df_contents.txt', 'w') as file:
+            file.write(str(df_list))
+    def test_invalid_input_dataframe(self):
         with self.assertRaises(ValueError):
-            task_func(pd.DataFrame())
-    def test_invalid_input_type(self):
+            task_func("not a dataframe", ['A', 'B'])
+    def test_invalid_input_cols(self):
         with self.assertRaises(ValueError):
-            task_func("not a dataframe")
-    def test_no_numeric_columns(self):
-        df = pd.DataFrame({'C': ['text'] * 1000})
+            task_func(self.df, 'A')
+    def test_nonexistent_column(self):
         with self.assertRaises(ValueError):
-            task_func(df)
-    def test_histograms_count(self):
-        axes = task_func(self.df)
-        self.assertEqual(len(axes), 2)  # 'A' and 'B' are numeric
-    def test_plot_labels(self):
-        axes = task_func(self.df)
-        for ax in axes:
-            self.assertIn('Value', ax.get_xlabel())
-            self.assertIn('Frequency', ax.get_ylabel())
-            
-    def test_correctness_of_histogram_lines(self):
-        """Verify that the histogram reflects the data distribution accurately."""
-        axes = task_func(self.df)
-        for ax in axes:
-            column_name = ax.get_title()
-            column_data = self.df[column_name]
-            
-            # Correcting the calculation of hist_max to ensure the lambda function correctly references its parameter
-            hist_min = min(ax.patches, key=lambda patch: patch.get_x()).get_x()
-            hist_max = max(ax.patches, key=lambda patch: patch.get_x() + patch.get_width()).get_x() + max(ax.patches, key=lambda patch: patch.get_x() + patch.get_width()).get_width()
-            data_min, data_max = column_data.min(), column_data.max()
-            self.assertAlmostEqual(hist_min, data_min, delta=0.01, msg=f"Histogram min for {column_name} does not match")
-            self.assertAlmostEqual(hist_max, data_max, delta=0.01, msg=f"Histogram max for {column_name} does not match")
+            task_func(self.df, ['A', 'NonexistentColumn'])
+    def test_empty_dataframe(self):
+        with self.assertRaises(ValueError):
+            task_func(pd.DataFrame(), ['A', 'B'])

@@ -1,170 +1,92 @@
-import csv
-import random
+import os
+from pathlib import Path
+import shutil
 
-
-def task_func(csv_file='names.csv', 
-          latin_names=['Sopetón', 'Méndez', 'Gómez', 'Pérez', 'Muñoz'],
-          names=['Smith', 'Johnson', 'Williams', 'Brown', 'Jones'],
-          encoding='latin-1', rng_seed=None):
+def task_func(kwargs, target_dir="non_none_files"):
     """
-    Create a CSV file with 100 lines. Each line contains a name and an age (randomly generated between 20 and 50).
-    Half of the names are randomly selected from a list of Latin names (default: ['Sopetón', 'Méndez', 'Gómez', 'Pérez', 'Muñoz']), 
-    the other half from a list of English names (default: ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones']).
-    All names are encoded using the specified encoding.
-    If empty name arrays are passed, a csv with headers but no entries is generated.
-
-    Args:
-    - csv_file (str, optional): Name of the CSV file to be created. Defaults to 'names.csv'.
-    - latin_names (list, optional): List of Latin names. Defaults to ['Sopetón', 'Méndez', 'Gómez', 'Pérez', 'Muñoz'].
-    - names (list, optional): List of English names. Defaults to ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones'].
-    - encoding (str, optional): The encoding used for writing the names. Defaults to 'latin-1'
-    - rng_seed (int, optional): The seed for the rng. Defaults to None.
+    Process files from a dictionary by checking if the file exists, and if it has content, then copies it to a target directory.
+    
+    Parameters:
+    - kwargs (dict): A dictionary where keys are full file paths and values are the file content.
+    - target_dir (str, optional): The directory where the files will be copied to. Defaults to 'non_none_files'.
 
     Returns:
-    - str: The CSV file name.
-
-    Raises:
-    - TypeError: If csv_file is not a string.
-    - TypeError: If latin_names is not an array.
-    - TypeError: If names is not an array.
+    - copied_files (list): A list of full file paths that were copied.
 
     Requirements:
-    - csv
-    - random
+    - os
+    - pathlib.Path
+    - shutil
 
     Example:
-    >>> file_name = task_func()
-    >>> print(file_name)
-    names.csv
-
-    >>> file_name = task_func(csv_file='test.csv', names=['simon', 'alex'], rng_seed=1)
-    >>> with open(file_name, 'r', newline='', encoding='latin-1') as csvfile:
-    ...     reader = csv.reader(csvfile)
-    ...     rows = list(reader)
-    ...     print(rows)
-    [['Name', 'Age'], ['Méndez', '38'], ['simon', '28'], ['Sopetón', '35'], ['alex', '35'], ['Pérez', '45'], ['simon', '23'], ['Pérez', '20'], ['alex', '33'], ['Muñoz', '44'], ['simon', '42'], ['Pérez', '28'], ['simon', '38'], ['Sopetón', '48'], ['alex', '20'], ['Sopetón', '20'], ['simon', '50'], ['Pérez', '41'], ['simon', '33'], ['Sopetón', '36'], ['simon', '44'], ['Pérez', '50'], ['alex', '37'], ['Méndez', '31'], ['simon', '41'], ['Méndez', '44'], ['alex', '50'], ['Gómez', '49'], ['simon', '33'], ['Muñoz', '49'], ['simon', '25'], ['Gómez', '23'], ['alex', '48'], ['Muñoz', '49'], ['alex', '36'], ['Méndez', '29'], ['alex', '38'], ['Pérez', '47'], ['alex', '38'], ['Sopetón', '35'], ['simon', '43'], ['Pérez', '33'], ['simon', '31'], ['Muñoz', '48'], ['alex', '22'], ['Pérez', '41'], ['simon', '44'], ['Méndez', '36'], ['alex', '31'], ['Pérez', '43'], ['simon', '35'], ['Sopetón', '29'], ['alex', '40'], ['Méndez', '25'], ['simon', '20'], ['Méndez', '37'], ['simon', '32'], ['Muñoz', '31'], ['alex', '34'], ['Gómez', '41'], ['simon', '32'], ['Muñoz', '45'], ['simon', '36'], ['Muñoz', '26'], ['alex', '50'], ['Sopetón', '35'], ['alex', '38'], ['Muñoz', '26'], ['alex', '35'], ['Gómez', '33'], ['alex', '20'], ['Muñoz', '37'], ['alex', '34'], ['Muñoz', '20'], ['simon', '40'], ['Méndez', '37'], ['simon', '47'], ['Sopetón', '45'], ['alex', '21'], ['Sopetón', '22'], ['simon', '34'], ['Sopetón', '44'], ['alex', '27'], ['Gómez', '23'], ['simon', '31'], ['Gómez', '22'], ['simon', '25'], ['Gómez', '36'], ['simon', '41'], ['Gómez', '40'], ['alex', '34'], ['Gómez', '35'], ['alex', '23'], ['Sopetón', '29'], ['alex', '30'], ['Pérez', '45'], ['simon', '28'], ['Sopetón', '28'], ['simon', '50'], ['Muñoz', '33'], ['simon', '27']]
+    >>> files = {'/path/to/file1.txt': 'Hello', '/path/to/file2.txt': None, '/path/to/file3.txt': 'World'}
+    >>> task_func(files)
+    >>> files = {'/path/to/file4.txt': 'Another', '/path/to/file5.txt': 'Example'}
+    >>> task_func(files, target_dir="another_directory")
     """
-    if not isinstance(csv_file, str):
-        raise TypeError("csv_file should be a string.")
-    if not isinstance(names, list):
-        raise TypeError("names should be a list.")
-    if not isinstance(latin_names, list):
-        raise TypeError("latin_names should be a list.")
-    if rng_seed is not None:
-        random.seed(rng_seed)
-    with open(csv_file, 'w', newline='', encoding=encoding) as csvfile:
-        fieldnames = ['Name', 'Age']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        for _ in range(50):
-            if latin_names:
-                writer.writerow({'Name': random.choice(latin_names), 'Age': random.randint(20, 50)})
-            if names:
-                writer.writerow({'Name': random.choice(names), 'Age': random.randint(20, 50)})
-    return csv_file
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+    copied_files = []
+    for file, content in kwargs.items():
+        if content is not None and os.path.isfile(file):
+            target_file = Path(target_dir) / Path(file).name
+            shutil.copyfile(file, target_file)
+            copied_files.append(str(target_file))
+    return copied_files
 
-import unittest
 import os
-import csv
-from faker import Faker
-from pathlib import Path
+import shutil
+import unittest
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        'default params'
-        latin_names = ['Sopetón', 'Méndez', 'Gómez', 'Pérez', 'Muñoz']
-        names = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones']
-        file_name = task_func(rng_seed=1)
-        self.assertEqual(file_name, 'names.csv')
-        self.assertTrue(os.path.isfile(file_name))
-        with open(file_name, 'r', newline='', encoding='latin-1') as csvfile:
-            reader = csv.reader(csvfile)
-            rows = list(reader)
-            self.assertEqual(len(rows), 101)
-            self.assertEqual(rows[0], ['Name', 'Age'])
-            csv_names = [row[0] for row in rows[1:]]
-            for name in csv_names:
-                self.assertIn(name, latin_names+names)
-            ages = [int(row[1]) for row in rows[1:]]
-            for age in ages:
-                self.assertTrue(20 <= age <= 50)
-        # remove file
-        Path(file_name).unlink()
-    def test_rng(self):
-        'test rng reproducability'
-        file_name1 = task_func(csv_file='test1.csv', rng_seed=12)
-        file_name2 = task_func(csv_file='test2.csv', rng_seed=12)
-        self.assertEqual(file_name1, 'test1.csv')
-        self.assertEqual(file_name2, 'test2.csv')
-        self.assertTrue(os.path.isfile(file_name1))
-        self.assertTrue(os.path.isfile(file_name2))
-        with open(file_name1, 'r', newline='', encoding='latin-1') as file1:
-            with open(file_name2, 'r', newline='', encoding='latin-1') as file2:
-                reader1 = csv.reader(file1)
-                rows1 = list(reader1)
-                reader2 = csv.reader(file2)
-                rows2 = list(reader2)
-                self.assertEqual(rows1, rows2)
-        # remove files
-        Path(file_name1).unlink()
-        Path(file_name2).unlink()
-    def test_case_2(self):
-        'different encoding'
-        custom_file = 'custom_names.csv'
-        latin_names = ['Méndez']
-        names = ['Simon']
-        file_name = task_func(csv_file=custom_file, names=names, encoding='utf-8',
-                          latin_names=latin_names, rng_seed=1)
-        self.assertEqual(file_name, custom_file)
-        self.assertTrue(os.path.isfile(custom_file))
-        with open(file_name, 'r', newline='', encoding='utf-8') as csvfile:
-            reader = csv.reader(csvfile)
-            rows = list(reader)
-            self.assertEqual(len(rows), 101)
-            self.assertEqual(rows[0], ['Name', 'Age'])
-            csv_names = [row[0] for row in rows[1:]]
-            for name in csv_names:
-                self.assertIn(name, latin_names+names)
-            ages = [int(row[1]) for row in rows[1:]]
-            for age in ages:
-                self.assertTrue(20 <= age <= 50)
-        # remove file
-        Path(file_name).unlink()
-    def test_case_3(self):
-        latin_names = [Faker().first_name() for _ in range(5)]
-        names = [Faker().first_name() for _ in range(5)]
-        file_name = task_func(latin_names=latin_names, names=names, rng_seed=1)
-        self.assertEqual(file_name, file_name)
-        self.assertTrue(os.path.isfile(file_name))
-        with open(file_name, 'r', newline='', encoding='latin-1') as csvfile:
-            reader = csv.reader(csvfile)
-            rows = list(reader)
-            self.assertEqual(len(rows), 101)
-            self.assertEqual(rows[0], ['Name', 'Age'])
-            csv_names = [row[0] for row in rows[1:]]
-            for name in csv_names:
-                self.assertIn(name, latin_names+names)
-            ages = [int(row[1]) for row in rows[1:]]
-            for age in ages:
-                self.assertTrue(20 <= age <= 50)
-        # remove file
-        Path(file_name).unlink()
-    def test_case_4(self):
-        'emtpy name lists'
-        file_name = task_func(latin_names=[], names=[], rng_seed=1)
-        self.assertEqual(file_name, file_name)
-        self.assertTrue(os.path.isfile(file_name))
-        with open(file_name, 'r', newline='', encoding='latin-1') as csvfile:
-            reader = csv.reader(csvfile)
-            rows = list(reader)
-            self.assertEqual(len(rows), 1)
-            self.assertEqual(rows[0], ['Name', 'Age'])
-        # remove file
-        Path(file_name).unlink()
-    def test_case_5(self):
-        'edge cases'
-        self.assertRaises(Exception, task_func, {'csv_file': 1, 'rng_seed': 12})
-        self.assertRaises(Exception, task_func, {'latin_names': 'test', 'rng_seed': 12})
-        self.assertRaises(Exception, task_func, {'names': 24, 'rng_seed': 12})
-        # remove file if generated
-        if os.path.isfile('names.csv'):
-            Path('names.csv').unlink()
+    def setUp(self):
+        self.test_dir = 'test_dir'
+        self.target_dir = 'target_dir'
+        os.makedirs(self.test_dir, exist_ok=True)
+        os.makedirs(self.target_dir, exist_ok=True)
+    def tearDown(self):
+        shutil.rmtree(self.test_dir)
+        shutil.rmtree(self.target_dir)
+    def test_files_with_content(self):
+        test_files = {'file1.txt': 'Hello', 'file2.txt': 'World'}
+        for file, content in test_files.items():
+            with open(os.path.join(self.test_dir, file), 'w') as f:
+                f.write(content)
+        
+        full_paths = {os.path.join(self.test_dir, k): v for k, v in test_files.items()}
+        copied_files = task_func(full_paths, self.target_dir)
+        
+        self.assertEqual(len(copied_files), 2)
+        for copied in copied_files:
+            self.assertTrue(os.path.isfile(copied))
+            self.assertTrue(copied.startswith(self.target_dir))
+    def test_files_with_no_content(self):
+        test_files = {'file1.txt': 'Hello', 'file2.txt': None}
+        for file, content in test_files.items():
+            with open(os.path.join(self.test_dir, file), 'w') as f:
+                if content:
+                    f.write(content)
+        full_paths = {os.path.join(self.test_dir, k): v for k, v in test_files.items()}
+        copied_files = task_func(full_paths, self.target_dir)
+        self.assertEqual(len(copied_files), 1)
+        self.assertTrue(os.path.isfile(copied_files[0]))
+        self.assertTrue(copied_files[0].startswith(self.target_dir))
+    def test_files_do_not_exist(self):
+        test_files = {'file1.txt': 'Hello', 'file2.txt': 'World'}
+        full_paths = {os.path.join(self.test_dir, k): v for k, v in test_files.items()}
+        copied_files = task_func(full_paths, self.target_dir)
+        self.assertEqual(len(copied_files), 0)
+    def test_mixed_case(self):
+        test_files = {'file1.txt': 'Hello', 'file2.txt': None, 'file3.txt': 'World'}
+        for file, content in test_files.items():
+            with open(os.path.join(self.test_dir, file), 'w') as f:
+                if content:
+                    f.write(content)
+        full_paths = {os.path.join(self.test_dir, k): v for k, v in test_files.items()}
+        copied_files = task_func(full_paths, self.target_dir)
+        self.assertEqual(len(copied_files), 2)
+        for copied in copied_files:
+            self.assertTrue(os.path.isfile(copied))
+            self.assertTrue(copied.startswith(self.target_dir))
+    def test_empty_dict(self):
+        copied_files = task_func({}, self.target_dir)
+        self.assertEqual(len(copied_files), 0)

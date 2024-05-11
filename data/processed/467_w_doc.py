@@ -1,78 +1,86 @@
-import json
-from enum import Enum
-
-class Color(Enum):
-    RED = 1
-    GREEN = 2
-    BLUE = 3
+import matplotlib.pyplot as plt
+import numpy as np
 
 
-def task_func(my_obj):
+def task_func(n, seed=0):
     """
-    Serializes an object into a JSON string with support for complex data types like Enum.
-    The function uses a custom JSONEncoder to handle Enum types by converting them to their names or values.
+    Generates a simple scatter plot with 'n' points.
 
     Parameters:
-    my_obj (object): The object to be serialized. Can be a dictionary, list, etc.
+    - n (int): The number of points to be plotted.
+    - seed (int, optional): The seed for the random number generator. Defaults to None.
 
     Returns:
-    str: The serialized JSON string of the object.
+    - plot (matplotlib.figure.Figure): The generated plot titled "Scatter plot of random points", with x-axis labeled "X" and y-axis labeled "Y".
+    - points (list of tuples): List containing the (x, y) coordinates of the plotted points.
 
     Requirements:
-    - json
-    - enum
-
-    Examples:
-    Serialize a dictionary containing Enum.
-    >>> result = task_func({'color': Color.RED})
-    >>> 'RED' in result
-    True
-
-    Serialize a simple dictionary.
-    >>> task_func({'name': 'Alice', 'age': 30})
-    '{"name": "Alice", "age": 30}'
+    - numpy
+    - matplotlib.pyplot
+    
+    Example:
+    >>> task_func(5)
+    (<Figure size 640x480 with 1 Axes>, [(0.5488135039273248, 0.6458941130666561), (0.7151893663724195, 0.4375872112626925), (0.6027633760716439, 0.8917730007820798), (0.5448831829968969, 0.9636627605010293), (0.4236547993389047, 0.3834415188257777)])
     """
-    class EnumEncoder(json.JSONEncoder):
-        def default(self, obj):
-            if isinstance(obj, Enum):
-                return obj.name  # or obj.value, depending on the requirement
-            return json.JSONEncoder.default(self, obj)
-    return json.dumps(my_obj, cls=EnumEncoder)
+    np.random.seed(seed)
+    x = np.random.rand(n)
+    y = np.random.rand(n)
+    fig, ax = plt.subplots()
+    ax.scatter(x, y)
+    ax.set_title("Scatter plot of random points")
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    return fig, list(zip(x, y))
 
 import unittest
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_enum_serialization(self):
-        # Test serialization of a dictionary containing an Enum to check if the Enum is properly converted to its name.
-        obj = {'color': Color.RED}
-        result = task_func(obj)
-        self.assertIn('"color": "RED"', result)
-    def test_multiple_enum_serialization(self):
-        # Test serialization of a dictionary with a list of Enums to verify if all Enums are correctly serialized by their names.
-        obj = {'colors': [Color.RED, Color.GREEN, Color.BLUE]}
-        result = task_func(obj)
-        self.assertIn('"colors": ["RED", "GREEN", "BLUE"]', result)
-    def test_no_enum_serialization(self):
-        # Test serialization of a simple dictionary without Enums to ensure basic JSON serialization functionality is unaffected.
-        obj = {'name': 'Bob', 'age': 25}
-        result = task_func(obj)
-        self.assertEqual(result, '{"name": "Bob", "age": 25}')
-    def test_nested_enum_serialization(self):
-        # Test serialization of a nested dictionary containing an Enum to ensure deep serialization handles Enums correctly.
-        obj = {'person': {'name': 'Alice', 'favorite_color': Color.BLUE}}
-        result = task_func(obj)
-        self.assertIn('"favorite_color": "BLUE"', result)
-    def test_empty_object_serialization(self):
-        # Test serialization of an empty dictionary to verify the encoder handles empty objects correctly.
-        obj = {}
-        result = task_func(obj)
-        self.assertEqual(result, '{}')
-    def test_direct_enum_serialization(self):
-        # Test direct serialization of an Enum instance
-        result = task_func(Color.GREEN)
-        self.assertEqual(result, '"GREEN"')
-    def test_complex_nested_structures(self):
-        # Test serialization of complex nested structures including Enum
-        obj = {'people': [{'name': 'Alice', 'favorite_color': Color.BLUE}, {'name': 'Bob', 'favorite_color': Color.RED}]}
-        result = task_func(obj)
-        self.assertIn('"favorite_color": "BLUE"', result)
-        self.assertIn('"favorite_color": "RED"', result)
+    def test_case_1(self):
+        # Test basic point type and structure
+        _, points = task_func(5)
+        self.assertTrue(
+            all(
+                isinstance(point, tuple)
+                and len(point) == 2
+                and all(isinstance(coord, float) for coord in point)
+                for point in points
+            ),
+            "Points should be a list of tuples with float coordinates",
+        )
+    def test_case_2(self):
+        # Test parameter 'n'
+        for n in [0, 1, 5, 100]:
+            plot, points = task_func(n)
+            self.assertEqual(len(points), n)
+            self.assertTrue(isinstance(plot, type(plt.figure())))
+    def test_case_3(self):
+        # Test random seed - reproduction
+        _, points1 = task_func(5, seed=1)
+        _, points2 = task_func(5, seed=1)
+        self.assertEqual(
+            points1, points2, "Points generated with the same seed should match exactly"
+        )
+    def test_case_4(self):
+        # Test random seed - differences
+        _, points1 = task_func(5, seed=1)
+        _, points2 = task_func(5, seed=10)
+        self.assertNotEqual(
+            points1, points2, "Points generated with the same seed should match exactly"
+        )
+    def test_case_5(self):
+        # Test invalid inputs
+        with self.assertRaises(ValueError):
+            task_func(-5)
+        with self.assertRaises(TypeError):
+            task_func(5.5)
+        with self.assertRaises(TypeError):
+            task_func("5")
+    def test_case_6(self):
+        # Test visualization
+        fig, _ = task_func(1)
+        ax = fig.axes[0]
+        self.assertEqual(ax.get_title(), "Scatter plot of random points")
+        self.assertEqual(ax.get_xlabel(), "X")
+        self.assertEqual(ax.get_ylabel(), "Y")
+    def tearDown(self):
+        plt.close("all")

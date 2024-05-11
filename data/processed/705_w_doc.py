@@ -1,50 +1,55 @@
-import pandas as pd
-from itertools import combinations
+import numpy as np
+from scipy import stats
 
-# Constants
-MIN_PERCENTAGE = 0.75
 
-def task_func(data, cols, percentage):
+def task_func(df, column, alpha):
     """
-    Find all combinations of columns from a given DataFrame so that the absolute correlation between them is greater than a certain threshold.
+    Test the normality of a particular numeric column from a DataFrame with Shapiro-Wilk test, 
+    including an artificial step to explicitly use np.
 
     Parameters:
-    - data (list): List of lists with the data, where the length of the inner list equals the number of columns
-    - cols (list): List of column names
-    - percentage (float): The threshold for the absolute correlation.
+    - df (pd.DataFrame): The input DataFrame.
+    - column (str): The column name.
+    - alpha (float): The significance level.
 
     Returns:
-    - corr_combinations (list): A list of tuples where each tuple contains two column names.
+    - bool: True if the column passes the normality test, False otherwise.
 
     Requirements:
-    - pandas
-    - itertools
-
+    - numpy
+    - scipy.stats
+    
     Example:
-    >>> result = task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.9)
-    >>> print(result)
-    [('x', 'y')]
+    >>> import pandas as pd
+    >>> np.random.seed(0)
+    >>> df = pd.DataFrame({'Value': np.random.normal(0, 1, 1000)})
+    >>> print(task_func(df, 'Value', 0.05))
+    True
     """
-    if not 0 <= percentage <= 1:
-        raise ValueError('Percentage must be between 0 and 1')
-    df = pd.DataFrame(data, columns=cols)
-    corr_matrix = df.corr().abs()
-    columns = corr_matrix.columns
-    corr_combinations = []
-    for col1, col2 in combinations(columns, 2):
-        if corr_matrix.loc[col1, col2] > percentage:
-            corr_combinations.append((col1, col2))
-    return corr_combinations
+    mean_value = np.mean(df[column])
+    df[column] = df[column] - mean_value
+    if column not in df.columns:
+        raise ValueError('Column does not exist in DataFrame')
+    _, p = stats.shapiro(df[column])
+    return p > alpha
 
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        np.random.seed(0)
     def test_case_1(self):
-        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.9), [('x', 'y')])
+        df = pd.DataFrame({'Value': np.random.normal(0, 1, 1000)})
+        self.assertTrue(task_func(df, 'Value', 0.05))
     def test_case_2(self):
-        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.5), [('x', 'y'), ('x', 'z'), ('y', 'z')])
+        df = pd.DataFrame({'Value': np.random.uniform(0, 1, 1000)})
+        self.assertFalse(task_func(df, 'Value', 0.05))
     def test_case_3(self):
-        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.1), [('x', 'y'), ('x', 'z'), ('y', 'z')])
+        df = pd.DataFrame({'Value': np.random.exponential(1, 1000)})
+        self.assertFalse(task_func(df, 'Value', 0.05))
     def test_case_4(self):
-        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 0.0), [('x', 'y'), ('x', 'z'), ('y', 'z')])
+        df = pd.DataFrame({'Value': np.random.lognormal(0, 1, 1000)})
+        self.assertFalse(task_func(df, 'Value', 0.05))
     def test_case_5(self):
-        self.assertEqual(task_func([[5.1, 5.0, 1.4], [4.9, 4.8, 1.4], [4.7, 4.6, 2.0]], ['x', 'y', 'z'], 1.0), [])
+        df = pd.DataFrame({'Value': np.random.chisquare(1, 1000)})
+        self.assertFalse(task_func(df, 'Value', 0.05))

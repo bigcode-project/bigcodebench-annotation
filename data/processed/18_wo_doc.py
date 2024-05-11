@@ -1,78 +1,124 @@
 import subprocess
-import psutil
-import time
+import csv
+import glob
+import random
+import os
 
-def task_func(process_name: str) -> str:
-    '''
-    Check if a particular process is running based on its name. If it is not running, start it using the process name as a command. 
-    If it is running, terminate the process and restart it by executing the process name as a command.
+def task_func(file):
+    """
+    Divide a CSV file into several smaller files and shuffle the lines in each file.
+    
+    This function takes a CSV file path as input, divides it into smaller files using 
+    the shell 'split' command, and shuffles the rows in each of the resulting files.
+    The output files are named with a 'split_' prefix.
 
     Parameters:
-    - process_name (str): The name of the process to check and manage. This should be executable as a command.
+    - file (str): The path to the CSV file.
 
     Returns:
-    - str: A message indicating the action taken:
-        - "Process not found. Starting <process_name>."
-        - "Process found. Restarting <process_name>."
-
+    - list: The paths to the split files. Returns an empty list if the file does not exist, is not a CSV file, or if an error occurs during processing.
+    
     Requirements:
     - subprocess
-    - psutil
-    - time
+    - csv
+    - glob
+    - random
+    - os
 
     Example:
-    >>> task_func('notepad')
-    "Process not found. Starting notepad."
-    OR
-    >>> task_func('notepad')
-    "Process found. Restarting notepad."
-    '''
-    is_running = any([proc for proc in psutil.process_iter() if proc.name() == process_name])
-    if is_running:
-        for proc in psutil.process_iter():
-            if proc.name() == process_name:
-                proc.terminate()
-                time.sleep(5)
-        subprocess.Popen(process_name)
-        return f"Process found. Restarting {process_name}."
-    else:
-        subprocess.Popen(process_name)
-        return f"Process not found. Starting {process_name}."
+    >>> task_func('/path/to/file.csv')
+    ['/path/to/split_00', '/path/to/split_01', ...]
+    """
+    if not os.path.exists(file):
+        print("Provided file does not exist.")
+        return []
+    if not file.endswith('.csv'):
+        print("Provided file is not a CSV.")
+        return []
+    try:
+        subprocess.call(['split', '-n', '5', '-d', file, 'split_'])
+        split_files = glob.glob('split_*')
+        for split_file in split_files:
+            with open(split_file, 'r') as f:
+                reader = csv.reader(f)
+                rows = list(reader)
+            random.shuffle(rows)
+            with open(split_file, 'w') as f:
+                writer = csv.writer(f)
+                writer.writerows(rows)
+        return split_files
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return []
 
 import unittest
-from unittest.mock import patch, MagicMock
+import csv
+import os
+import tempfile
 class TestCases(unittest.TestCase):
-    @patch('psutil.process_iter')
-    @patch('subprocess.Popen')
-    def test_process_not_found_starts_process(self, mock_popen, mock_process_iter):
-        # Simulating no running process
-        mock_process_iter.return_value = []
-        result = task_func('random_non_existent_process')
-        self.assertEqual(result, "Process not found. Starting random_non_existent_process.")
-        mock_popen.assert_called_once_with('random_non_existent_process')
-    @patch('psutil.process_iter')
-    @patch('subprocess.Popen')
-    def test_process_found_restarts_process(self, mock_popen, mock_process_iter):
-        # Simulating a running process
-        process = MagicMock()
-        process.name.return_value = 'notepad'
-        mock_process_iter.return_value = [process]
-        result = task_func('notepad')
-        self.assertEqual(result, "Process found. Restarting notepad.")
-        # Expecting terminate called on the process and then restarted
-        process.terminate.assert_called_once()
-        mock_popen.assert_called_once_with('notepad')
-    @patch('psutil.process_iter')
-    @patch('subprocess.Popen')
-    def test_process_terminates_and_restarts_multiple_instances(self, mock_popen, mock_process_iter):
-        # Simulating multiple instances of a running process
-        process1 = MagicMock()
-        process2 = MagicMock()
-        process1.name.return_value = 'multi_instance'
-        process2.name.return_value = 'multi_instance'
-        mock_process_iter.return_value = [process1, process2]
-        result = task_func('multi_instance')
-        self.assertEqual(result, "Process found. Restarting multi_instance.")
-        process1.terminate.assert_called_once()
-        process2.terminate.assert_called_once()
-        mock_popen.assert_called_once_with('multi_instance')
+    def setUp(self):
+        # Create a temporary directory to hold the files
+        self.test_dir = tempfile.mkdtemp()
+        self.small_csv_path = os.path.join(self.test_dir, "small.csv")
+        self.medium_csv_path = os.path.join(self.test_dir, "medium.csv")
+        self.large_csv_path = os.path.join(self.test_dir, "large.csv")
+        self.non_csv_path = os.path.join(self.test_dir, "test.txt")
+        
+        # Create dummy CSV files of different sizes
+        with open(self.small_csv_path, "w", newline="") as file:
+            writer = csv.writer(file)
+            for i in range(10):  # Small CSV
+                writer.writerow([f"row{i}", f"value{i}"])
+        
+        with open(self.medium_csv_path, "w", newline="") as file:
+            writer = csv.writer(file)
+            for i in range(100):  # Medium CSV
+                writer.writerow([f"row{i}", f"value{i}"])
+        
+        with open(self.large_csv_path, "w", newline="") as file:
+            writer = csv.writer(file)
+            for i in range(1000):  # Large CSV
+                writer.writerow([f"row{i}", f"value{i}"])
+        
+        # Create a non-CSV file
+        with open(self.non_csv_path, "w") as file:
+            file.write("This is a test text file.")
+    def tearDown(self):
+        # Remove all files created in the directory
+        for filename in os.listdir(self.test_dir):
+            file_path = os.path.join(self.test_dir, filename)
+            os.remove(file_path)  # Remove each file
+    def test_small_csv(self):
+        """Test splitting and shuffling a small CSV file."""
+        split_files = task_func(self.small_csv_path)
+        self.assertTrue(len(split_files) > 0, "No files were split.")
+        self.assertNotEqual(self._read_csv(self.small_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
+        for filename in split_files:
+            os.remove(filename)
+    def test_medium_csv(self):
+        """Test splitting and shuffling a medium CSV file."""
+        split_files = task_func(self.medium_csv_path)
+        self.assertTrue(len(split_files) > 0, "No files were split.")
+        self.assertNotEqual(self._read_csv(self.medium_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
+        for filename in split_files:
+            os.remove(filename)
+    def test_large_csv(self):
+        """Test splitting and shuffling a large CSV file."""
+        split_files = task_func(self.large_csv_path)
+        self.assertTrue(len(split_files) > 0, "No files were split.")
+        self.assertNotEqual(self._read_csv(self.large_csv_path), self._read_csv(split_files[0]), "Rows are not shuffled.")
+        for filename in split_files:
+            os.remove(filename)
+    def test_invalid_file(self):
+        """Test behavior with a non-existent file path."""
+        split_files = task_func("/path/that/does/not/exist.csv")
+        self.assertEqual(split_files, [], "Expected an empty list for an invalid file path.")
+    def test_non_csv_file(self):
+        """Test behavior with a non-CSV file."""
+        split_files = task_func(self.non_csv_path)
+        self.assertEqual(split_files, [], "Expected an empty list for a non-CSV file.")
+    def _read_csv(self, filepath):
+        """Helper method to read CSV file and return content."""
+        with open(filepath, "r") as f:
+            reader = csv.reader(f)
+            return list(reader)

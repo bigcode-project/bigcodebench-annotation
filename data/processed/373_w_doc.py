@@ -1,97 +1,79 @@
-import re
-import glob
-from docx import Document
+from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
 
-
-def task_func(directory_path: str) -> int:
+def task_func(l, x_data, plot=False):
     """
-    Processes all Word (.docx) files in the provided directory, searching for double quotes in the text 
-    and adding a backslash before each double quote to "protect" it.
+    Adjust a quadratic curve to the specified data and return the parameters and fitted values.
     
     Parameters:
-    - directory_path (str): Path to the directory containing .docx files to be processed.
+    l (numpy array): The input y-values.
+    x_data (numpy array): The x-values corresponding to l.
+    plot (bool, optional): If True, a plot will be returned. Default is False.
     
     Returns:
-    - int: Number of .docx files processed.
+    tuple: A tuple containing the following:
+        - params (numpy array): Parameters of the fitted curve.
+        - fitted_values (numpy array): Fitted y-values for the provided x_data.
+        - ax (matplotlib.axes._axes.Axes, optional): Axes object of the plot if plot=True.
 
     Requirements:
-    - re
-    - docx
-    - glob
+    - scipy.optimize.curve_fit
+    - matplotlib.pyplot
 
     Example:
-    >>> import tempfile
-    >>> temp_dir = tempfile.mkdtemp()
-    >>> doc = Document()
-    >>> _ = doc.add_paragraph("This is a sample text with double quotes.")
-    >>> doc.save(temp_dir + '/sample.docx')
-    >>> task_func(temp_dir)
-    1
+    >>> import numpy as np
+    >>> l = np.array([1, 4, 9, 16, 25])
+    >>> x_data = np.array([1, 2, 3, 4, 5])
+    >>> params, fitted_values = task_func(l, x_data)
+    >>> print(fitted_values)
+    [ 1.  4.  9. 16. 25.]
     """
-    docx_files = glob.glob(directory_path + '/*.docx')
-    processed_files = 0
-    for docx_file in docx_files:
-        document = Document(docx_file)
-        for paragraph in document.paragraphs:
-            paragraph.text = re.sub(r'(?<!\\)"', r'\"', paragraph.text)
-        document.save(docx_file)
-        processed_files += 1
-    return processed_files
+    def func(x, a, b):
+        return a * x**2 + b
+    params, _ = curve_fit(func, x_data, l)
+    fitted_values = func(x_data, *params)
+    if plot:
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax.scatter(x_data, l, label='Data')
+        ax.plot(x_data, fitted_values, label='Fitted function')
+        ax.legend(loc='best')
+        return params, fitted_values, ax
+    return params, fitted_values
 
 import unittest
-import shutil
-import os
-import doctest
-import tempfile
+import numpy as np
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.base_tmp_dir = tempfile.mkdtemp()
-        self.test_directory = f"{self.base_tmp_dir}/test/"
-        if not os.path.exists(self.test_directory):
-            os.makedirs(self.test_directory)
-        test_data = {
-            "file_1.docx": "This is a sample text without any double quotes.",
-            "file_2.docx": "This is a \"sample\" text with double quotes.",
-            "file_3.docx": r'This is a \"sample\" text with double quotes already protected.',
-            "file_4.docx": "Hello \"world\"! How are you \"today\"?",
-            "file_5.docx": "Testing \"multiple\" paragraphs.\n\nAnother paragraph with \"quotes\"."
-        }
-        # Create .docx files for each scenario
-        for file_name, content in test_data.items():
-            doc = Document()
-            for paragraph in content.split("\n"):
-                doc.add_paragraph(paragraph)
-            doc.save(self.test_directory + file_name)
-        super(TestCases, self).setUp()
-    def tearDown(self):
-        shutil.rmtree(self.test_directory)
-        super(TestCases, self).tearDown()
-    def read_docx_content(self, file_path):
-        doc = Document(file_path)
-        return "\n".join([para.text for para in doc.paragraphs])
-    
     def test_case_1(self):
-        result = task_func(self.test_directory)
-        self.assertEqual(result, 5)
-        content = self.read_docx_content(self.test_directory + "file_1.docx")
-        self.assertEqual(content, "This is a sample text without any double quotes.")
+        l = np.array([1, 4, 9, 16, 25])
+        x_data = np.array([1, 2, 3, 4, 5])
+        params, fitted_values = task_func(l, x_data)
+        # Check the correctness of the fitted parameters
+        self.assertAlmostEqual(params[0], 1.0, places=5)
+        self.assertAlmostEqual(params[1], 0, places=5)
+        # Check the correctness of the fitted values
+        np.testing.assert_array_almost_equal(fitted_values, l, decimal=5)
     def test_case_2(self):
-        result = task_func(self.test_directory)
-        self.assertEqual(result, 5)
-        content = self.read_docx_content(self.test_directory + "file_2.docx")
-        self.assertEqual(content, r'This is a \"sample\" text with double quotes.')
+        l = np.array([2, 5, 10, 17, 26])
+        x_data = np.array([1, 2, 3, 4, 5])
+        params, fitted_values = task_func(l, x_data)
+        # Check the correctness of the fitted values
+        np.testing.assert_array_almost_equal(fitted_values, l, decimal=5)
     def test_case_3(self):
-        result = task_func(self.test_directory)
-        self.assertEqual(result, 5)
-        content = self.read_docx_content(self.test_directory + "file_3.docx")
-        self.assertEqual(content, r'This is a \"sample\" text with double quotes already protected.')
+        l = np.array([0, 3, 8, 15, 24])
+        x_data = np.array([1, 2, 3, 4, 5])
+        params, fitted_values, ax = task_func(l, x_data, plot=True)
+        # Ensure the fitted values are correct
+        np.testing.assert_array_almost_equal(fitted_values, l, decimal=5)
+        # Ensure a plot is returned by checking the type of ax
+        self.assertIsInstance(ax, plt.Axes)
     def test_case_4(self):
-        result = task_func(self.test_directory)
-        self.assertEqual(result, 5)
-        content = self.read_docx_content(self.test_directory + "file_4.docx")
-        self.assertEqual(content, r'Hello \"world\"! How are you \"today\"?')
+        x_data = np.array([1, 2, 3, 4, 5])
+        l = x_data ** 2
+        params, fitted_values, ax = task_func(l, x_data, plot=True)
+        line = ax.lines[0].get_xydata()
+        self.assertTrue(np.allclose(line[:, 1], l))  # The plotted curve should match the fitted values
     def test_case_5(self):
-        result = task_func(self.test_directory)
-        self.assertEqual(result, 5)
-        content = self.read_docx_content(self.test_directory + "file_5.docx")
-        self.assertEqual(content, 'Testing \\"multiple\\" paragraphs.\n\nAnother paragraph with \\"quotes\\".')
+        x_data = np.array([1, 2, 3, 4, 5])
+        l = x_data ** 2
+        
+        self.assertEqual(len(task_func(l, x_data, plot=False)), 2)  # If plot=False, no Axes object should be returned

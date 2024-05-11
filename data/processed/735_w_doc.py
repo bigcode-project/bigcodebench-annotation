@@ -1,59 +1,71 @@
-import nltk
+import numpy as np
+from itertools import chain
 
-# Download necessary NLTK data (if not already present)
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-
-from collections import Counter
-
-def task_func(content):
+def task_func(L):
     """
-    Count the Part-of-Speech (POS) tags in a sentence without the last word.
-
+    Calculate the mean and variance of all elements in a nested list 'L'.
+    
     Parameters:
-    - content (str): The sentence to count POS tags from.
-
+    - L (list): The nested list.
+    
     Returns:
-    - dict: A dictionary with POS tags as keys and their count as values.
-
+    - dict: A dictionary containing the mean and variance.
+    
     Requirements:
-    - nltk
-    - collections.Counter
+    - numpy
+    - itertools.chain
 
     Example:
-    >>> task_func('this is an example content')
-    {'DT': 2, 'VBZ': 1, 'NN': 1}
+    >>> task_func([[1,2,3],[4,5,6]])
+    {'mean': 3.5, 'variance': 2.9166666666666665}
     """
-    words = content.split()[:-1]  # Split and remove the last word
-    pos_tags = nltk.pos_tag(words)  # Tokenization is built into pos_tag for simple whitespace tokenization
-    pos_counts = Counter(tag for _, tag in pos_tags)
-    return dict(pos_counts)
+    flattened = list(chain.from_iterable(L))
+    mean = np.mean(flattened)
+    variance = np.var(flattened)
+    return {'mean': mean, 'variance': variance}
 
 import unittest
-import re
+import numpy as np
+from itertools import chain
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        sentence = "this is an example content"
-        # Expected output after removing "content"
-        expected_output = {'DT': 2, 'NN': 1, 'VBZ': 1}
-        self.assertEqual(task_func(sentence), expected_output)
-    def test_case_2(self):
-        sentence = "The quick brown fox jumps"
-        # "jumps" is removed; expect {'DT': 1, 'JJ': 1, 'NN': 1} for "The quick brown fox"
-        expected_output = {'DT': 1, 'JJ': 1, 'NN': 2}
-        self.assertEqual(task_func(sentence), expected_output)
-    def test_case_3(self):
-        sentence = "Over the lazy dog"
-        # "dog" is removed; expect {'IN': 1, 'DT': 1, 'JJ': 1} for "Over the lazy"
-        expected_output = {'DT': 1, 'IN': 1, 'NN': 1}
-        self.assertEqual(task_func(sentence), expected_output)
-    def test_case_4(self):
-        sentence = "Hello world"
-        # "world" is removed; expect {} for "Hello"
-        expected_output = {'NN': 1}  # "Hello" might be tagged as interjection 'UH' if not considered a proper noun
-        self.assertEqual(task_func(sentence), expected_output)
-    def test_case_5(self):
-        sentence = "This is a longer sentence with various parts of speech"
-        # After removing "speech", adjust expectation
-        expected_output = {'DT': 2, 'IN': 2, 'JJ': 1, 'NN': 1, 'NNS': 1, 'RBR': 1, 'VBZ': 1}
-        self.assertEqual(task_func(sentence), expected_output)
+    
+    def test_1(self):
+        L = [[1, 2, 3], [4, 5, 6]]
+        result = task_func(L)
+        flattened = list(chain.from_iterable(L))
+        expected_mean = np.mean(flattened)
+        expected_variance = np.var(flattened)
+        self.assertEqual(result['mean'], expected_mean)
+        self.assertEqual(result['variance'], expected_variance)
+    def test_2(self):
+        L = [[10, 20], [30, 40], [50, 60]]
+        result = task_func(L)
+        flattened = list(chain.from_iterable(L))
+        expected_mean = np.mean(flattened)
+        expected_variance = np.var(flattened)
+        self.assertEqual(result['mean'], expected_mean)
+        self.assertEqual(result['variance'], expected_variance)
+    def test_3(self):
+        L = [[5]]
+        result = task_func(L)
+        flattened = list(chain.from_iterable(L))
+        expected_mean = np.mean(flattened)
+        expected_variance = np.var(flattened)
+        self.assertEqual(result['mean'], expected_mean)
+        self.assertEqual(result['variance'], expected_variance)
+    def test_4(self):
+        L = [[1, 2, 3], [3, 2, 1], [4, 5, 6], [6, 5, 4]]
+        result = task_func(L)
+        flattened = list(chain.from_iterable(L))
+        expected_mean = np.mean(flattened)
+        expected_variance = np.var(flattened)
+        self.assertEqual(result['mean'], expected_mean)
+        self.assertEqual(result['variance'], expected_variance)
+    def test_5(self):
+        L = [[10, 11, 12], [13, 14, 15], [16, 17, 18], [19, 20, 21]]
+        result = task_func(L)
+        flattened = list(chain.from_iterable(L))
+        expected_mean = np.mean(flattened)
+        expected_variance = np.var(flattened)
+        self.assertEqual(result['mean'], expected_mean)
+        self.assertEqual(result['variance'], expected_variance)

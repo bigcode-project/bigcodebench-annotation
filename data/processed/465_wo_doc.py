@@ -1,86 +1,87 @@
 import json
 from datetime import datetime
+import numpy as np
 from decimal import Decimal
 
 def task_func(my_obj):
     """
-    Serializes an object to a JSON string, adding support for datetime and Decimal data types.
-    
-    Handle complex data types not natively supported by the json module's default encoder. The `My_class` parameter is reserved for future use and does 
-    not affect the current implementation.
-    
+    Serializes an object to a JSON string, handling complex data types through a custom JSONEncoder.
+    This function is capable of serializing data types such as datetime, numpy.ndarray, and Decimal
+    which are not natively supported by the default JSON serialization mechanisms.
+
     Parameters:
-    - my_obj (object): The object to serialize, can include complex types such as datetime and Decimal.
-    
+    my_obj (object):  The object to serialize. This could be any Python object, typically a dictionary or a list containing complex data types.
+
     Returns:
-    - str: A JSON-formatted string representing `my_obj`, with datetime and Decimal objects properly serialized.
-        
+    str: The serialized JSON string of the object.
+
+    Raises:
+    TypeError: If an object of an unsupported type is encountered that cannot be serialized by both the custom and default JSON encoders. This ensures that users are made aware of serialization limitations for types not explicitly handled.
+
     Requirements:
     - json
     - datetime.datetime
+    - numpy
     - decimal.Decimal
-    
+
     Examples:
-    Serialize a dictionary containing datetime and Decimal:
-    >>> result = task_func({'time': datetime(2023, 4, 1, 12, 0), 'amount': Decimal('10.99')})
-    >>> '2023-04-01T12:00:00' in result and '10.99' in result
+    Serialize a dictionary containing datetime, numpy array, and Decimal.
+    >>> result = task_func({'time': datetime(2023, 4, 1, 12, 0, tzinfo=pytz.utc), 'array': np.array([1, 2, 3]), 'amount': Decimal('10.99')})
+    >>> '2023-04-01T12:00:00+00:00' in result and '[1, 2, 3]' in result and '10.99' in result
     True
 
-    Serialize a simple dictionary:
+    Serialize a simple dictionary.
     >>> task_func({'name': 'Alice', 'age': 30})
     '{"name": "Alice", "age": 30}'
     """
-    class DateTimeEncoder(json.JSONEncoder):
+    class ComplexEncoder(json.JSONEncoder):
         def default(self, obj):
             if isinstance(obj, datetime):
                 return obj.isoformat()
-            if isinstance(obj, Decimal):
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, Decimal):
                 return str(obj)
             return json.JSONEncoder.default(self, obj)
-    return json.dumps(my_obj, cls=DateTimeEncoder)
+    return json.dumps(my_obj, cls=ComplexEncoder)
 
 import unittest
 from datetime import datetime
 from decimal import Decimal
-import pytz  # Assuming pytz is used for timezone information in datetime objects
+import numpy as np
+import pytz
 class TestCases(unittest.TestCase):
     def test_datetime_serialization(self):
-        """Ensure datetime objects are serialized to an ISO 8601 string."""
+        """Test serialization of datetime objects."""
         obj = {'time': datetime(2023, 1, 1, 12, 0, tzinfo=pytz.utc)}
         result = task_func(obj)
         self.assertIn('2023-01-01T12:00:00+00:00', result)
     def test_decimal_serialization(self):
-        """Verify Decimal objects are serialized to their string representation."""
+        """Test serialization of Decimal objects."""
         obj = {'price': Decimal('99.99')}
         result = task_func(obj)
         self.assertIn('99.99', result)
+    def test_numpy_array_serialization(self):
+        """Test serialization of numpy arrays."""
+        obj = {'data': np.array([1, 2, 3])}
+        result = task_func(obj)
+        self.assertIn('[1, 2, 3]', result)
     def test_combined_serialization(self):
-        """Test serialization of a complex object containing both datetime and Decimal."""
-        obj = {'time': datetime(2023, 1, 1, 12, 0, tzinfo=pytz.utc), 'price': Decimal('99.99')}
+        """Test combined serialization of datetime, numpy array, and Decimal."""
+        obj = {'time': datetime(2023, 1, 1, 12, 0, tzinfo=pytz.utc), 'data': np.array([1, 2, 3]), 'price': Decimal('99.99')}
         result = task_func(obj)
         self.assertIn('2023-01-01T12:00:00+00:00', result)
+        self.assertIn('[1, 2, 3]', result)
         self.assertIn('99.99', result)
     def test_simple_object_serialization(self):
-        """Check serialization of simple key-value pairs."""
+        """Test serialization of simple objects (e.g., string, int)."""
         obj = {'name': 'Alice', 'age': 30}
         result = task_func(obj)
         self.assertEqual(result, '{"name": "Alice", "age": 30}')
-    def test_null_serialization(self):
-        """Ensure that `None` is correctly serialized as `null`."""
-        obj = {'value': None}
-        result = task_func(obj)
-        self.assertEqual(result, '{"value": null}')
-    def test_list_serialization(self):
-        """Test serialization of a list containing mixed data types."""
-        obj = {'list': [datetime(2023, 1, 1, 12, 0, tzinfo=pytz.utc), Decimal('99.99'), None]}
-        result = task_func(obj)
-        self.assertIn('"2023-01-01T12:00:00+00:00"', result)
-        self.assertIn('99.99', result)
-        self.assertIn('null', result)
-    def test_unsupported_type(self):
-        """Test that attempting to serialize an unsupported type raises an error."""
-        class CustomObject:
+    def test_unsupported_type_fallback(self):
+        """Test that unsupported types fall back to the default encoder."""
+        class UnsupportedType:
             pass
-        obj = {'custom': CustomObject()}
+        obj = {'unsupported': UnsupportedType()}
         with self.assertRaises(TypeError):
             task_func(obj)

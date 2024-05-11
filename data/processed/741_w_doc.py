@@ -1,70 +1,60 @@
-from collections import Counter
-import heapq
+from itertools import groupby
+from operator import itemgetter
 
 # Constants
-LETTERS = list('abcdefghijklmnopqrstuvwxyz')
+KEY_FUNC = itemgetter(0)
 
 def task_func(my_dict):
     """
-    Create a dictionary in which the keys are letters and the values are random integers.
-    Find the 3 most common letters in the dictionary.
+    Group the dictionary entries after the first character of the key and add the values for each group.
 
     Parameters:
     - my_dict (dict): The dictionary to process.
 
     Returns:
-    - most_common_letters (list): The 3 most common letters.
+    - aggregated_dict (dict): The aggregated dictionary.
 
     Requirements:
-    - collections
-    - heapq
-
+    - itertools
+    - operator
+    
     Example:
-    >>> random.seed(43)
-    >>> my_dict = {letter: random.randint(1, 100) for letter in LETTERS}
-    >>> most_common_letters = task_func(my_dict)
-    >>> print(most_common_letters)
-    ['d', 'v', 'c']
+    >>> my_dict = {'apple': 1, 'banana': 2, 'avocado': 3, 'blueberry': 4, 'blackberry': 5}
+    >>> aggregated_dict = task_func(my_dict)
+    >>> print(aggregated_dict)
+    {'a': 4, 'b': 11}
     """
-    letter_counter = Counter(my_dict)
-    most_common_letters = heapq.nlargest(3, letter_counter, key=letter_counter.get)
-    return most_common_letters
+    sorted_items = sorted(my_dict.items(), key=lambda item: item[0][0])
+    aggregated_dict = {k: sum(item[1] for item in g) for k, g in groupby(sorted_items, key=lambda item: item[0][0])}
+    return aggregated_dict
 
 import unittest
-import random
-LETTERS = list('abcdefghijklmnopqrstuvwxyz')
-def generate_random_dict(size=26, min_val=1, max_val=100):
-    """Generate a random dictionary with letters as keys and random integers as values."""
-    letters = random.sample(LETTERS, size)
-    return {letter: random.randint(min_val, max_val) for letter in letters}
+# Import the function from the provided file
 class TestCases(unittest.TestCase):
-    def test_basic(self):
-        # Basic Test
-        test_dict = generate_random_dict()
-        result = task_func(test_dict)
-        self.assertIsInstance(result, list)
-        self.assertEqual(len(result), 3)
-        self.assertTrue(all(isinstance(letter, str) for letter in result))
-    def test_few_letters(self):
-        # Edge Case: Fewer than 3 letters
-        test_dict = {'a': 10, 'b': 20}
-        result = task_func(test_dict)
-        self.assertEqual(result, ['b', 'a'])
-    def test_empty_dict(self):
-        # Edge Case: Empty dictionary
-        test_dict = {}
-        result = task_func(test_dict)
-        self.assertEqual(result, [])
-    def test_specific_letters(self):
-        # Specific Test: Known output
-        test_dict = {'a': 100, 'b': 90, 'c': 80, 'd': 70}
-        result = task_func(test_dict)
-        self.assertEqual(result, ['a', 'b', 'c'])
-    def test_general(self):
-        # General Test: Check top 3 values
-        test_dict = generate_random_dict()
-        result = task_func(test_dict)
-        sorted_values = sorted(test_dict.values(), reverse=True)[:3]
-        sorted_keys = [k for k, v in sorted(test_dict.items(), key=lambda item: item[1], reverse=True)][:3]
-        self.assertEqual(result, sorted_keys)
-        self.assertEqual([test_dict[key] for key in result], sorted_values)
+    
+    def test_1(self):
+        my_dict = {'apple': 1, 'banana': 2, 'avocado': 3, 'blueberry': 4, 'blackberry': 5}
+        result = task_func(my_dict)
+        expected = {'a': 4, 'b': 11}
+        self.assertEqual(result, expected)
+        
+    def test_2(self):
+        my_dict = {'apple': 10, 'apricot': 10, 'banana': 10, 'blueberry': 10}
+        result = task_func(my_dict)
+        expected = {'a': 20, 'b': 20}
+        self.assertEqual(result, expected)
+    def test_3(self):
+        my_dict = {}
+        result = task_func(my_dict)
+        expected = {}
+        self.assertEqual(result, expected)
+    def test_4(self):
+        my_dict = {'apple': 1, 'orange': 2, 'cherry': 3, 'blueberry': 4}
+        result = task_func(my_dict)
+        expected = {'a': 1, 'o': 2, 'c': 3, 'b': 4}
+        self.assertEqual(result, expected)
+    def test_5(self):
+        my_dict = {'apple': 1, 'apricot': 2, 'banana': 3, 'blueberry': 4, 'cherry': 5, 'date': 6}
+        result = task_func(my_dict)
+        expected = {'a': 3, 'b': 7, 'c': 5, 'd': 6}
+        self.assertEqual(result, expected)

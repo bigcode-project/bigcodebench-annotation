@@ -1,53 +1,70 @@
-from collections import Counter
-import hashlib
+import pandas as pd
+import string
 
-def task_func(word: str) -> dict:
+def task_func(word):
     """
-    Count the occurrence of each adjacent pair of letters from left to right in a word and encode the result as an MD5 hash.
-
-    Parameters:
-    - word (str): The word in which to count the adjacent letter pairs.
-
-    Returns:
-    - dict: A dictionary where keys are adjacent letter pairs and values are their counts.
+    Creates a Pandas DataFrame from a single word, where each row contains a letter from the word 
+    and its 1-based position in the alphabet.
 
     Requirements:
-    - collections.Counter
-
+    - pandas
+    - string
+    
+    Parameters:
+    - word (str): The word to create the DataFrame from. The word should be in lowercase and consist of alphabetic characters only.
+    
+    Returns:
+    - pandas.DataFrame: A DataFrame with two columns: 'Letter' and 'Position', 
+      where 'Position' is the letter's position in the English alphabet.
+    
     Examples:
-    >>> task_func('abracadabra')
-    'bc9af285d87b312e61ab3661e66b741b'
-    >>> task_func('hello')
-    'dd5dec1a853625e2dc48f3d42665c337'
+    >>> task_func('abc')
+      Letter  Position
+    0      a         1
+    1      b         2
+    2      c         3
+
+    >>> task_func('zoo')
+      Letter  Position
+    0      z        26
+    1      o        15
+    2      o        15
+    
+    Raises:
+    - ValueError: If the input word is not in lowercase or contains non-alphabetic characters.
     """
-    pairs = list(map(''.join, zip(word[:-1], word[1:])))
-    pairs_count = dict(Counter(pairs))
-    return hashlib.md5(str(pairs_count).encode()).hexdigest()
+    if not word:  # Check if the input word is empty and return an empty DataFrame
+        return pd.DataFrame({'Letter': [], 'Position': []})
+    elif not word.isalpha() or not word.islower():
+        raise ValueError("Input word must be in lowercase alphabetic characters only.")
+    alphabet = string.ascii_lowercase
+    positions = [alphabet.index(char) + 1 for char in word]
+    df = pd.DataFrame({'Letter': list(word), 'Position': positions})
+    return df
 
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Test with the word 'abracadabra'
-        result = task_func('abracadabra')
-        expected = 'bc9af285d87b312e61ab3661e66b741b'
-        self.assertEqual(result, expected)
-    def test_case_2(self):
-        # Test with the word 'hello'
-        result = task_func('hello')
-        expected = 'dd5dec1a853625e2dc48f3d42665c337'
-        self.assertEqual(result, expected)
-    def test_case_3(self):
-        # Test with the word 'python'
-        result = task_func('python')
-        expected = '2ef1af06ae4aa496eaa8e963bde5514e'
-        self.assertEqual(result, expected)
-    def test_case_4(self):
-        # Test with an empty string
+    def test_abc(self):
+        """Test with the word 'abc'."""
+        result = task_func('abc')
+        expected = pd.DataFrame({'Letter': ['a', 'b', 'c'], 'Position': [1, 2, 3]})
+        pd.testing.assert_frame_equal(result, expected)
+    def test_xyz(self):
+        """Test with the word 'xyz'."""
+        result = task_func('xyz')
+        expected = pd.DataFrame({'Letter': ['x', 'y', 'z'], 'Position': [24, 25, 26]})
+        pd.testing.assert_frame_equal(result, expected)
+    def test_mixed_case_error(self):
+        """Test with a mixed case word, expecting a ValueError."""
+        with self.assertRaises(ValueError):
+            task_func('AbC')
+    def test_non_alpha_error(self):
+        """Test with a non-alphabetic word, expecting a ValueError."""
+        with self.assertRaises(ValueError):
+            task_func('123')
+    def test_empty_string(self):
+        """Test with an empty string, expecting an empty DataFrame."""
         result = task_func('')
-        expected = '99914b932bd37a50b983c5e7c90ae93b'
-        self.assertEqual(result, expected)
-    def test_case_5(self):
-        # Test with a single character string
-        result = task_func('a')
-        expected = '99914b932bd37a50b983c5e7c90ae93b'
-        self.assertEqual(result, expected)
+        expected = pd.DataFrame({'Letter': [], 'Position': []})
+        pd.testing.assert_frame_equal(result, expected)

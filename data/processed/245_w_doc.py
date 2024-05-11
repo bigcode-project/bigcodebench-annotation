@@ -1,84 +1,71 @@
-import numpy as np
-from scipy.fft import fft
-from matplotlib import pyplot as plt
+import pandas as pd
+import random
+from scipy import stats
 
-
-def task_func(original):
+def task_func(n_data_points=5000, min_value=0.0, max_value=10.0):
     """
-    Create a numeric array from the "original" list, calculate Fast Fourier Transform (FFT) and record the 
-    original and FFT data. Additionally, plot the histogram of the magnitude of the FFT data and return the
-    axes object of the plot. For an empty list, return an empty array for the FFT data and None for the 
-    axes object.
-
+    Generate a random dataset of floating-point numbers within a specified range, 
+    truncate each value to 3 decimal places, and calculate statistical measures (mean, median, mode) of the data.
+    
     Parameters:
-    original (list): The original list with (str, int) tuples to be unzipped into a numpy array.
+    n_data_points (int): Number of data points to generate. Default is 5000.
+    min_value (float): Minimum value range for data points. Default is 0.0.
+    max_value (float): Maximum value range for data points. Default is 10.0.
 
     Returns:
-    np.array: A numpy array for the original data.
-    np.array: FFT data.
-    plt.Axes: The axes object of the plot.
+    dict: A dictionary with keys 'mean', 'median', 'mode' and their corresponding calculated values.
     
     Requirements:
-    - numpy
-    - matplotlib.pyplot
-    - scipy.fft
+    - pandas
+    - random
+    - scipy.stats
 
     Example:
-    >>> original = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
-    >>> arr, fft_data, ax  = task_func(original)
-    >>> print(arr)
-    [1 2 3 4]
-    >>> print(fft_data)
-    [10.-0.j -2.+2.j -2.-0.j -2.-2.j]
+    >>> random.seed(0)
+    >>> stats = task_func(1000, 5.0, 5.0)
+    >>> print(stats)
+    {'mean': 5.0, 'median': 5.0, 'mode': 5.0}
     """
-    arr = np.array([b for (_, b) in original])
-    if arr.size == 0:
-        fft_data = np.array([])
-        return arr, fft_data, None
-    fft_data = fft(arr)
-    _, ax = plt.subplots()
-    ax.hist(np.abs(fft_data))
-    return arr, fft_data, ax
+    data = [round(random.uniform(min_value, max_value), 3) for _ in range(n_data_points)]
+    data_df = pd.DataFrame(data, columns=['Value'])
+    mean = data_df['Value'].mean()
+    median = data_df['Value'].median()
+    mode = stats.mode(data_df['Value'].values)[0][0]
+    return {'mean': mean, 'median': median, 'mode': mode}
 
 import unittest
-import doctest
+import random
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        original = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
-        arr, fft_data, _ = task_func(original)
-        self.assertTrue(np.array_equal(arr, np.array([1, 2, 3, 4])))
-        self.assertIsInstance(fft_data, np.ndarray)
-        self.assertEqual(fft_data.shape, (4,))
-    def test_case_2(self):
-        original = [('a', i) for i in range(1, 101)]
-        arr, fft_data, ax = task_func(original)
-        self.assertTrue(np.array_equal(arr, np.array(range(1, 101))))
-        self.assertIsInstance(fft_data, np.ndarray)
-        self.assertEqual(fft_data.shape, (100,))
-        # Test that the plot is created
-        self.assertIsInstance(ax, plt.Axes)
-        # Test the axis limits
-        self.assertEqual(ax.get_xlim(), (-200.0, 5300.0))
-    def test_case_3(self):
-        original = [('a', 5) for i in range(10)]
-        arr, fft_data, _ = task_func(original)
-        self.assertTrue(np.array_equal(arr, np.array([5]*10)))
-        self.assertIsInstance(fft_data, np.ndarray)
-        self.assertEqual(fft_data.shape, (10,))
-    def test_case_4(self):
-        original = [('a', i) for i in range(10)]
-        arr, fft_data, ax = task_func(original)
-        self.assertTrue(np.array_equal(arr, np.array(range(10))))
-        self.assertIsInstance(fft_data, np.ndarray)
-        self.assertEqual(fft_data.shape, (10,))
-        # Test the plot data array
-        self.assertEqual(len(ax.get_children()), 20)
-        # Test the plot limits
-        self.assertEqual(ax.get_xlim(), (3.0, 47.0))
-    def test_case_5(self):
-        original = []
-        arr, fft_data, ax = task_func(original)
-        self.assertTrue(np.array_equal(arr, np.array([])))
-        self.assertIsInstance(fft_data, np.ndarray)
-        self.assertEqual(fft_data.shape, (0,))
-        self.assertIsNone(ax)
+    def test_default_parameters(self):
+        random.seed(0)
+        result = task_func()
+        self.assertIn('mean', result)
+        self.assertIn('median', result)
+        self.assertIn('mode', result)
+    def test_custom_range(self):
+        random.seed(0)
+        result = task_func(1000, 1.0, 5.0)
+        self.assertGreaterEqual(result['mean'], 1.0)
+        self.assertLessEqual(result['mean'], 5.0)
+        self.assertGreaterEqual(result['median'], 1.0)
+        self.assertLessEqual(result['median'], 5.0)
+        self.assertGreaterEqual(result['mode'], 1.0)
+        self.assertLessEqual(result['mode'], 5.0)
+    def test_small_dataset(self):
+        random.seed(0)
+        result = task_func(10, 2.0, 2.0)
+        self.assertEqual(result['mean'], 2.0)
+        self.assertEqual(result['median'], 2.0)
+        self.assertEqual(result['mode'], 2.0)
+    def test_large_dataset(self):
+        random.seed(0)
+        result = task_func(10000, 0.0, 100.0)
+        self.assertTrue(0.0 <= result['mean'] <= 100.0)
+        self.assertTrue(0.0 <= result['median'] <= 100.0)
+        self.assertTrue(0.0 <= result['mode'] <= 100.0)
+    def test_single_value_range(self):
+        random.seed(0)
+        result = task_func(100, 5.0, 5.0)
+        self.assertEqual(result['mean'], 5.0)
+        self.assertEqual(result['median'], 5.0)
+        self.assertEqual(result['mode'], 5.0)

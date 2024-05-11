@@ -1,80 +1,101 @@
-import zipfile
-import io
-from django.http import FileResponse, HttpRequest
-from django.conf import settings
+from flask import Flask, render_template, request
+import json
+import logging
 
-def task_func(request, file_paths):
+logging.basicConfig(filename="out.log", level=logging.INFO)
+
+def task_func(template_folder):
     """
-    Generates a ZIP file response for a Django HttpRequest, zipping the specified files. This function is useful 
-    for scenarios where multiple file downloads are required in response to a web request. The actual HttpRequest 
-    is not utilized within the function but is required for compatibility with Django view structures.
+    Creates a Flask application with a specified templates folder. It defines a route at the root ('/')
+    which handles POST requests, logs the information request data as a JSON, and renders an 'index.html' template using
+    the data provided in POST requests.
 
     Parameters:
-    - request (HttpRequest): The incoming Django HttpRequest, not used within the function.
-    - file_paths (list of str): A list of file paths or file contents to be included in the zip.
+    template_folder (str): The folder containing the Flask application's templates.
 
     Returns:
-    - FileResponse: A Django FileResponse object containing the ZIP file as an attachment.
+    flask.app.Flask: A Flask application instance configured with a root route that handles POST requests.
+    The route logs incoming request data as JSON and serves the 'index.html' template with the provided data.
 
     Requirements:
-    - django.http
-    - django.conf
-    - zipfile
-    - io
+    - flask.Flask
+    - flask.render_template
+    - flask.request
+    - json
+    - logging
 
-    Examples:
-    >>> from django.conf import settings
-    >>> if not settings.configured:
-    ...     settings.configure()  # Add minimal necessary settings
-    >>> from django.http import HttpRequest
-    >>> request = HttpRequest()
-    >>> response = task_func(request)
-    >>> response['Content-Type']
-    'application/zip'
-    >>> request = HttpRequest()
-    >>> response = task_func(request)
-    >>> response['Content-Disposition']
-    'attachment; filename="files.zip"'
+    Example:
+    >>> app = task_func('my_templates')
+    >>> isinstance(app, Flask)
+    True
+    >>> 'POST' in app.url_map.bind('').match('/', method='POST')
+    False
     """
-    zip_io = io.BytesIO()
-    with zipfile.ZipFile(zip_io, 'w') as zip_file:
-        for file_path in file_paths:
-            zip_file.writestr(file_path, 'This is the content of {}.'.format(file_path))
-    zip_io.seek(0)  # Reset the file pointer to the start of the stream
-    response = FileResponse(zip_io, as_attachment=True, filename='files.zip')
-    response['Content-Type'] = 'application/zip'
-    return response
+    app = Flask(__name__, template_folder=template_folder)
+    @app.route('/', methods=['POST'])
+    def handle_post():
+        data = request.get_json()
+        logging.info(json.dumps(data))
+        return render_template('index.html', data=data)
+    return app
 
 import unittest
-from unittest.mock import MagicMock, patch
-from django.http import HttpRequest, FileResponse
-if not settings.configured:
-    settings.configure()
+from unittest.mock import patch
+from flask import Flask, request
+import logging
+import os
+import tempfile
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.request = HttpRequest()
-        self.file_paths = ['file1.gz', 'file2.gz']  # Example file paths for testing
-    def test_response_type(self):
-        """Ensure the response is an instance of FileResponse."""
-        response = task_func(self.request, self.file_paths)
-        self.assertIsInstance(response, FileResponse)
-    def test_response_status_code(self):
-        """Response should have a status code of 200."""
-        response = task_func(self.request, self.file_paths)
-        self.assertEqual(response.status_code, 200)
-    def test_content_type(self):
-        """Content type of the response should be set to 'application/zip'."""
-        response = task_func(self.request, self.file_paths)
-        self.assertEqual(response['Content-Type'], 'application/zip')
-    def test_attachment_filename(self):
-        """The Content-Disposition should correctly specify the attachment filename."""
-        response = task_func(self.request, self.file_paths)
-        self.assertEqual(response['Content-Disposition'], 'attachment; filename="files.zip"')
-    @patch('zipfile.ZipFile')
-    def test_zip_file_content(self, mock_zip_file):
-        """Zip file should contain the specified files with correct content."""
-        mock_zip = MagicMock()
-        mock_zip_file.return_value.__enter__.return_value = mock_zip
-        task_func(self.request, self.file_paths)
-        mock_zip.writestr.assert_any_call('file1.gz', 'This is the content of file1.gz.')
-        mock_zip.writestr.assert_any_call('file2.gz', 'This is the content of file2.gz.')
+        self.template_folder = tempfile.mkdtemp()
+        self.index_html_path = os.path.join(self.template_folder, 'index.html')
+        with open(self.index_html_path, 'w') as f:
+            f.write('<html><body>{{ data }}</body></html>')
+                    
+    def tearDown(self):
+        os.remove(self.index_html_path)
+        os.rmdir(self.template_folder)
+    def test_app_creation(self):
+        """Test if the function properly creates an app with given parameters."""
+        app = task_func(self.template_folder)
+        app.config['TESTING'] = True
+        self.assertIsInstance(app, Flask, "The function should return a Flask app instance.")
+        self.assertEqual(app.template_folder, self.template_folder, "The template folder should be set correctly.")
+    def test_app_instance(self):
+        """Test if the function returns a Flask app instance."""
+        app = task_func(self.template_folder)
+        app.config['TESTING'] = True
+        self.assertIsInstance(app, Flask)
+    def test_template_folder_configuration(self):
+        """Test if the template folder is correctly configured."""
+        app = task_func(self.template_folder)
+        app.config['TESTING'] = True
+        self.assertEqual(app.template_folder, self.template_folder, "The template folder should be set correctly.")
+    def test_logging_info_called_with_correct_arguments(self):
+            """Test if logging.info is called with the correct JSON data."""
+            template_folder = 'path_to_templates'
+            app = task_func(self.template_folder)
+            app.config['TESTING'] = True
+            test_data = {"test": "data"}
+            with app.test_client() as client:
+                with patch('logging.info') as mock_logging_info:
+                    client.post('/', json=test_data)
+                    mock_logging_info.assert_called_once_with(json.dumps(test_data))
+    @patch('logging.info')
+    def test_logging_request_data(self, mock_logging):
+        """Test if logging correctly logs POST request data."""
+        app = task_func(self.template_folder)
+        app.config['TESTING'] = True
+        test_data = {"test": "data"}
+        client =app.test_client()
+        client.post('/', json=test_data)
+        # Ensure that logging.info was called with the JSON-dumped test data
+        mock_logging.assert_called_once_with(json.dumps(test_data))
+    @patch('flask.Flask.url_for')
+    def test_home_route(self, mock_url_for):
+        """Test if the '/' route is defined correctly."""
+        app = task_func(self.template_folder)
+        app.config['TESTING'] = True
+        with app.test_request_context('/'):
+            mock_url_for.return_value = '/'
+            self.assertEqual(request.path, mock_url_for('home'))

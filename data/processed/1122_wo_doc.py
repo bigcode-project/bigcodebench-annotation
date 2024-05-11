@@ -1,108 +1,73 @@
 import re
+import socket
 import urllib.parse
-import requests
-import json
 
-def task_func(myString, API_KEY):
+def task_func(myString):
     """
-    Extracts all URLs from the provided string, analyzes each URL to extract the domain, and uses the IP API to get the geolocation data for each domain.
+    Extracts all URLs from a given string, analyzes each URL to extract the domain, and retrieves the IP address of each domain.
     
     Parameters:
-    myString (str): The string from which URLs are to be extracted.
-    API_KEY (str): The API key for accessing the IP API service which provides geolocation data.
+    myString (str): The string from which URLs are extracted. The string should contain valid URLs starting with http or https.
     
     Returns:
-    dict: A dictionary mapping domains to their geolocation data as returned by the IP API. Each entry contains fields like 'status', 'country', 'region', 'city', etc. If an API request fails, the corresponding value will be None.
-    
+    dict: A dictionary with domains as keys and their respective IP addresses (IPv4) as values. If a domain cannot be resolved, the IP address will be None.
+
     Requirements:
     - re
     - urllib.parse
-    - requests
-    - json
+    - socket
+
+    Raises:
+    socket.gaierror if the domain cannot be resolved
     
     Example:
     >>> task_func("Check these links: http://www.google.com, https://www.python.org")
-    {'www.google.com': {'status': 'success', 'country': 'United States', 'countryCode': 'US', 'region': 'CA', 'regionName': 'California', 'city': 'Mountain View', 'zip': '94043', 'lat': '37.4192', 'lon': '-122.0574', 'timezone': 'America/Los_Angeles', 'isp': 'Google LLC', 'org': 'Google LLC', 'as': 'AS15169 Google LLC', 'query': '172.217.12.142'}, 'www.python.org': {'status': 'success', 'country': 'United States', 'countryCode': 'US', 'region': 'OR', 'regionName': 'Oregon', 'city': 'Boardman', 'zip': '97818', 'lat': '45.8696', 'lon': '-119.688', 'timezone': 'America/Los_Angeles', 'isp': 'Amazon.com, Inc.', 'org': 'Amazon Data Services NoVa', 'as': 'AS16509 Amazon.com, Inc.', 'query': '151.101.193.223'}}
+    {'www.google.com': '172.217.12.142', 'www.python.org': '151.101.193.223'}
     """
-    urls = re.findall(r'(https?://[^\s,]+)', myString)
-    geo_data = {}
+    urls = re.findall(r'https?://[^\s,]+', myString)
+    ip_addresses = {}
     for url in urls:
         domain = urllib.parse.urlparse(url).netloc
-        response = requests.get(f"http://ip-api.com/json/{domain}?access_key={API_KEY}")
-        geo_data[domain] = json.loads(response.text)
-    return geo_data
+        try:
+            ip_addresses[domain] = socket.gethostbyname(domain)
+        except socket.gaierror:
+            ip_addresses[domain] = None  # Handle domains that cannot be resolved
+    return ip_addresses
 
 import unittest
 from unittest.mock import patch
-import json
-class MockResponse:
-    def __init__(self, json_data, status_code):
-        self.json_data = json_data
-        self.status_code = status_code
-        self.text = json.dumps(json_data)
-    def json(self):
-        return self.json_data
-def mocked_requests_get(*args, **kwargs):
-    if 'google.com' in args[0]:
-        return MockResponse({
-            'status': 'success',
-            'country': 'United States',
-            'countryCode': 'US',
-            'region': 'CA',
-            'regionName': 'California',
-            'city': 'Mountain View',
-            'zip': '94043',
-            'lat': '37.4192',
-            'lon': '-122.0574',
-            'timezone': 'America/Los_Angeles',
-            'isp': 'Google LLC',
-            'org': 'Google LLC',
-            'as': 'AS15169 Google LLC',
-            'query': '172.217.12.142'
-        }, 200)
-    elif 'python.org' in args[0]:
-        return MockResponse({
-            'status': 'success',
-            'country': 'United States',
-            'countryCode': 'US',
-            'region': 'OR',
-            'regionName': 'Oregon',
-            'city': 'Boardman',
-            'zip': '97818',
-            'lat': '45.8696',
-            'lon': '-119.688',
-            'timezone': 'America/Los_Angeles',
-            'isp': 'Amazon.com, Inc.',
-            'org': 'Amazon Data Services NoVa',
-            'as': 'AS16509 Amazon.com, Inc.',
-            'query': '151.101.193.223'
-        }, 200)
-    else:
-        raise Exception("API failure")
 class TestCases(unittest.TestCase):
-    @patch('requests.get', side_effect=mocked_requests_get)
-    def test_single_valid_url(self, mock_get):
-        result = task_func("http://www.google.com", "TEST_API_KEY")
-        self.assertEqual(result['www.google.com']['city'], 'Mountain View')
-    @patch('requests.get', side_effect=mocked_requests_get)
-    def test_multiple_valid_urls(self, mock_get):
-        result = task_func("http://www.google.com, https://www.python.org", "TEST_API_KEY")
-        self.assertIn('www.python.org', result)
-        self.assertEqual(result['www.python.org']['regionName'], 'Oregon')
-    @patch('requests.get', side_effect=mocked_requests_get)
-    def test_no_urls(self, mock_get):
-        result = task_func("This is a test without URLs.", "TEST_API_KEY")
+    def test_case_1(self):
+        # Test with a single valid URL
+        input_str = "Visit http://www.google.com for more details."
+        with patch('socket.gethostbyname', return_value='192.0.2.1'):
+            result = task_func(input_str)
+            self.assertEqual(result, {'www.google.com': '192.0.2.1'})
+    def test_case_2(self):
+        # Test with multiple valid URLs
+        input_str = "Check these links: http://www.google.com, https://www.python.org"
+        with patch('socket.gethostbyname', side_effect=['192.0.2.1', '192.0.2.2']):
+            result = task_func(input_str)
+            self.assertEqual(result, {'www.google.com': '192.0.2.1', 'www.python.org': '192.0.2.2'})
+    def test_case_3(self):
+        # Test with a string that doesn't contain any URLs
+        input_str = "Hello, World!"
+        result = task_func(input_str)
         self.assertEqual(result, {})
-    @patch('requests.get', side_effect=mocked_requests_get)
-    def test_invalid_url_scheme(self, mock_get):
-        result = task_func("This is not a link: abc://test.link", "TEST_API_KEY")
+    def test_case_4(self):
+        # Test with a string containing invalid URLs
+        input_str = "Check these: randomtext, another:randomtext"
+        result = task_func(input_str)
         self.assertEqual(result, {})
-    @patch('requests.get', side_effect=mocked_requests_get)
-    def test_repeated_urls(self, mock_get):
-        result = task_func("http://www.google.com, http://www.google.com", "TEST_API_KEY")
-        self.assertEqual(len(result), 1)  # Should only query once
-    @patch('requests.get', side_effect=mocked_requests_get)
-    def test_api_failure_handling(self, mock_get):
-        with self.assertRaises(Exception):
-            result = task_func("http://nonexistent.domain.com", "TEST_API_KEY")
-            self.assertIsNone(result.get('nonexistent.domain.com'))
+    def test_case_5(self):
+        # Test with a string containing valid and invalid URLs
+        input_str = "Valid: http://www.google.com, Invalid: randomtext"
+        with patch('socket.gethostbyname', return_value='192.0.2.1'):
+            result = task_func(input_str)
+            self.assertEqual(result, {'www.google.com': '192.0.2.1'})
+    def test_case_6(self):
+        # Test with a domain that cannot be resolved
+        input_str = "Visit http://nonexistent.domain.com"
+        with patch('socket.gethostbyname', side_effect=socket.gaierror):
+            result = task_func(input_str)
+            self.assertEqual(result, {'nonexistent.domain.com': None})

@@ -1,159 +1,77 @@
-import pandas as pd
-import numpy as np
+from collections import Counter
+import random
 
+# Constants
+HAND_RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+SUITS = ['H', 'D', 'C', 'S']
 
-def task_func(test_scores, student):
+def task_func():
     """
-    Convert a dictionary of test results into a pandas DataFrame and
-    Calculate the average test score and the standard deviation for a particular student from this DataFrame.
-    
+    Generate a random poker hand consisting of five cards, and count the frequency of each card rank.
+
+    The function creates a list of five cards where each card is a string made up of a rank and a suit (e.g., "10H" for Ten of Hearts).
+    It then counts the frequency of each card rank in the hand using a Counter dictionary.
+
     Parameters:
-    test_scores (dictionary): The dictionary containing keys 'Student' and 'Score'.
-        The Student values are of dtype int and contain student IDs. The Score 
-        values are of dtype float.
-    student (int): The specific student ID for which the average score needs to be calculated.
-    
+    - None
+
     Returns:
-    np.array([float, float]): A numpy array containing the average score and the standard deviation for the student.
-    DataFrame: the converted dictionary.
+    tuple: A tuple containing two elements:
+        - hand (list): A list of five cards.
+        - rank_count (counter): A Counter dictionary of card ranks with their frequencies in the hand.
 
-    Raises:
-    ValueError: student is not present in the test_scores dataframe
-                
     Requirements:
-    - pandas
-    - numpy
-    
-    Example:
-    >>> STUDENTS = range(1, 101)
-    >>> np.random.seed(10)
-    >>> scores = {'Student': list(np.random.choice(STUDENTS, 50, replace=True)), 
-    ...                        'Score': np.random.randint(50, 101, size=50)}
-    >>> task_func(scores, 10)
-    (array([70.        ,  7.07106781]),     Student  Score
-    0        10     65
-    1        16     68
-    2        65     66
-    3        29     57
-    4        90     74
-    5        94     61
-    6        30     67
-    7         9     96
-    8        74     57
-    9         1     61
-    10       41     78
-    11       37     83
-    12       17     70
-    13       12     82
-    14       55     74
-    15       89     94
-    16       63     55
-    17       34     54
-    18       73     57
-    19       79     74
-    20       50     74
-    21       52    100
-    22       55     94
-    23       78     84
-    24       70     90
-    25       14     65
-    26       26     63
-    27       14     74
-    28       93     65
-    29       87     56
-    30       31     71
-    31       31     92
-    32       90     72
-    33       13     61
-    34       66     98
-    35       32     62
-    36       58     78
-    37       37     82
-    38       28     99
-    39       19     65
-    40       94     94
-    41       78     90
-    42       23     92
-    43       24     95
-    44       95     93
-    45       12     83
-    46       29    100
-    47       75     95
-    48       89     90
-    49       10     75)
+    - collections
+    - random
 
-    >>> scores = {'Student': [1, 2, 1, 1], 'Score': [10, 1, 1, 1]}
-    >>> task_func(scores, 1)
-    (array([4.        , 5.19615242]),    Student  Score
-    0        1     10
-    1        2      1
-    2        1      1
-    3        1      1)
+    Example:
+        >>> hand, rank_counts = task_func()
+        >>> print(hand)  
+        ['QH', '2C', '5D', '4H', 'QH']
+        >>> print(rank_counts)  
+        Counter({'Q': 2, '2': 1, '5': 1, '4': 1})
     """
-    test_scores = pd.DataFrame(test_scores)
-    if student not in test_scores['Student'].values:
-        raise ValueError(f"The student with ID {student} is not present in the test scores DataFrame.")
-    student_scores = test_scores[test_scores['Student'] == student]['Score']
-    average_score = student_scores.mean()
-    std = student_scores.std()
-    return np.array([average_score, std]), test_scores
+    random.seed(42)
+    hand = []
+    for _ in range(5):
+        rank = random.choice(HAND_RANKS)
+        suit = random.choice(SUITS)
+        card = f'{rank}{suit}'
+        hand.append(card)
+    rank_counts = Counter([card[:-1] for card in hand])
+    return hand, rank_counts
 
 import unittest
-from faker import Faker
-import numpy as np
-import pandas as pd
-fake = Faker()
+from collections import Counter
+HAND_RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+SUITS = ['H', 'D', 'C', 'S']
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.student_ids = range(1, 6)
-        self.students_sample = list(np.random.choice(self.student_ids, 50, replace=True))
-        self.scores = {
-            'Student': self.students_sample, 
-            'Score': list(np.random.randint(50, 101, size=50))
-        }
-    def test_case_1(self):
-        student_id = self.students_sample[0]
-        scores_df = pd.DataFrame(self.scores)
-        expected_avg = scores_df[scores_df['Student'] == student_id]['Score'].mean()
-        expected_std = scores_df[scores_df['Student'] == student_id]['Score'].std()
-        res, df = task_func(self.scores, student_id)
-        avg, std = res
-        self.assertIsInstance(res, np.ndarray)
-        self.assertAlmostEqual(expected_avg, avg, places=2)
-        self.assertAlmostEqual(expected_std, std, places=2)
-        pd.testing.assert_frame_equal(pd.DataFrame(self.scores), df)
-    def test_case_2(self):
-        student_id = max(self.student_ids) + 1
-        with self.assertRaises(ValueError):
-            task_func(self.scores, student_id)
-    def test_case_3(self):
-        empty_df = dict.fromkeys(['Student', 'Score'])
-        student_id = fake.random_int(min=1, max=100)
-        with self.assertRaises(ValueError):
-            task_func(empty_df, student_id)
-    def test_case_4(self):
-        scores = {
-            'Student': list(self.student_ids), 
-            'Score': [100] * len(self.student_ids)
-        }
-        student_id = self.student_ids[3]
-        res, df = task_func(scores, student_id)
-        avg, std = res
-        self.assertIsInstance(res, np.ndarray)
-        self.assertEqual(avg, 100.0)
-        self.assertTrue(np.isnan(std))
-        pd.testing.assert_frame_equal(pd.DataFrame(scores), df)
-    def test_case_5(self):
-        scores = {
-            'Student': list(self.student_ids) * 10, 
-            'Score': list(np.random.randint(50, 101, size=len(self.student_ids)*10))
-        }
-        student_id = self.student_ids[4]
-        scores_df = pd.DataFrame(scores)
-        expected_avg = scores_df[scores_df['Student'] == student_id]['Score'].mean()
-        expected_std = scores_df[scores_df['Student'] == student_id]['Score'].std()
-        res, df = task_func(scores, student_id)
-        avg, std = res
-        self.assertAlmostEqual(expected_avg, avg, places=2)
-        self.assertAlmostEqual(expected_std, std, places=2)
-        pd.testing.assert_frame_equal(pd.DataFrame(scores), df)
+    def test_poker_hand_length(self):
+        """Test if the poker hand has 5 cards."""
+        hand, rank_counts = task_func()
+        self.assertEqual(len(hand), 5, "The poker hand should contain 5 cards.")
+    
+    def test_card_format(self):
+        """Test if each card in the hand is formatted correctly."""
+        hand, rank_counts = task_func()
+        for card in hand:
+            self.assertIn(len(card), [2, 3], "Each card should be a string of length 2 or 3.")
+            self.assertIn(card[:-1], HAND_RANKS, "The rank of each card should be valid.")
+            self.assertIn(card[-1], SUITS, "The suit of each card should be valid.")
+    
+    def test_rank_counts_type(self):
+        """Test if rank_counts is of type Counter."""
+        hand, rank_counts = task_func()
+        self.assertIsInstance(rank_counts, Counter, "rank_counts should be a Counter dictionary.")
+    
+    def test_rank_counts_keys(self):
+        """Test if the keys of rank_counts are valid ranks."""
+        hand, rank_counts = task_func()
+        for rank in rank_counts.keys():
+            self.assertIn(rank, HAND_RANKS, "The ranks in rank_counts should be valid.")
+    
+    def test_rank_counts_values(self):
+        """Test if the values of rank_counts are integers."""
+        hand, rank_counts = task_func()
+        for count in rank_counts.values():
+            self.assertIsInstance(count, int, "The counts in rank_counts should be integers.")

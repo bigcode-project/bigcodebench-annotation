@@ -1,79 +1,76 @@
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
+import re
 
-def task_func(data, columns):
+# Constants
+STOPWORDS = set([
+    "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself",
+    "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself",
+    "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that",
+    "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had",
+    "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because",
+    "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into",
+    "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out",
+    "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where",
+    "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no",
+    "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just",
+    "don", "should", "now"
+])
+
+def task_func(data, column):
     """
-    Normalizes specified columns of a DataFrame using min-max scaling.
-
+    Removes English stopwords from a text column in a DataFrame and returns the modified DataFrame.
+    
     Parameters:
-    data (dict): A dictionary where keys are column names and values are lists of values.
-    columns (list of str): A list of column names to be normalized.
-
+    df (pandas.DataFrame): The DataFrame containing the text column to be processed.
+    column (str): The name of the text column from which stopwords should be removed.
+    
     Returns:
-    pandas.DataFrame: A new DataFrame with the specified columns normalized between 0 and 1.
-
+    pandas.DataFrame: A DataFrame with the stopwords removed from the specified column.
+    
     Requirements:
     - pandas
-    - sklearn.preprocessing
-
+    - re
+    
     Constants:
-    - A MinMaxScaler object from sklearn.preprocessing is used internally for scaling.
-
+    - STOPWORDS: A set containing common English stopwords.
+    
     Example:
-    >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6]}
-    >>> normalized_df = task_func(data, ['a', 'b'])
-    >>> print(normalized_df)
-         a    b
-    0  0.0  0.0
-    1  0.5  0.5
-    2  1.0  1.0
+    >>> data = {'text': ['This is a sample sentence.', 'Another example here.']}
+    >>> print(task_func(data, 'text'))
+                  text
+    0  sample sentence
+    1  Another example
     """
     df = pd.DataFrame(data)
-    scaler = MinMaxScaler()
-    df_copy = df.copy()
-    df_copy[columns] = scaler.fit_transform(df_copy[columns])
-    return df_copy
+    df[column] = df[column].apply(lambda x: ' '.join([word for word in re.findall(r'\b\w+\b', x) if word.lower() not in STOPWORDS]))
+    return df
 
 import unittest
 import pandas as pd
-from pandas.testing import assert_frame_equal
-from sklearn.preprocessing import MinMaxScaler
-import sys
-# Import the function task_func from the refined_function.py file
-sys.path.append('/mnt/data/')
+# Import the refined function
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Input: DataFrame with two columns 'a' and 'b' with integer values
-        # Output: DataFrame with 'a' and 'b' normalized
-        data = {'a': [1, 2, 3], 'b': [4, 5, 6]}
-        expected_df = pd.DataFrame({'a': [0.0, 0.5, 1.0], 'b': [0.0, 0.5, 1.0]})
-        result_df = task_func(data, ['a', 'b'])
-        assert_frame_equal(expected_df, result_df)
+        data = {'text': ['This is a sample sentence.', 'Another example here.']}
+        expected_df = pd.DataFrame({'text': ['sample sentence', 'Another example']})
+        result_df = task_func(data, 'text')
+        pd.testing.assert_frame_equal(result_df, expected_df)
     def test_case_2(self):
-        # Input: DataFrame with one column 'x' with float values
-        # Output: DataFrame with 'x' normalized
-        data = {'x': [1.1, 2.2, 3.3]}
-        expected_df = pd.DataFrame({'x': [0.0, 0.5, 1.0]})
-        result_df = task_func(data, ['x'])
-        assert_frame_equal(expected_df, result_df)
+        data = {'content': ['Stopwords should be removed.', 'Testing this function.']}
+        expected_df = pd.DataFrame({'content': ['Stopwords removed', 'Testing function']})
+        result_df = task_func(data, 'content')
+        pd.testing.assert_frame_equal(result_df, expected_df)
     def test_case_3(self):
-        # Input: DataFrame with multiple columns, but only one column 'y' to normalize
-        # Output: DataFrame with 'y' normalized, other columns unchanged
-        data = {'y': [10, 20, 30], 'z': [1, 2, 3]}
-        expected_df = pd.DataFrame({'y': [0.0, 0.5, 1.0], 'z': [1, 2, 3]})
-        result_df = task_func(data, ['y'])
-        assert_frame_equal(expected_df, result_df)
+        data = {'sentence': ['Hello world!', 'Good morning.']}
+        expected_df = pd.DataFrame({'sentence': ['Hello world', 'Good morning']})
+        result_df = task_func(data, 'sentence')
+        pd.testing.assert_frame_equal(result_df, expected_df)
     def test_case_4(self):
-        # Input: DataFrame with negative numbers in column 'm'
-        # Output: DataFrame with 'm' normalized
-        data = {'m': [-1, 0, 1]}
-        expected_df = pd.DataFrame({'m': [0.0, 0.5, 1.0]})
-        result_df = task_func(data, ['m'])
-        assert_frame_equal(expected_df, result_df)
+        data = {'text': ['This is a single sentence.'] * 100}
+        expected_df = pd.DataFrame({'text': ['single sentence'] * 100})
+        result_df = task_func(data, 'text')
+        pd.testing.assert_frame_equal(result_df, expected_df)
     def test_case_5(self):
-        # Input: DataFrame with all zeros in column 'n'
-        # Output: DataFrame with 'n' normalized (all zeros)
-        data = {'n': [0, 0, 0]}
-        expected_df = pd.DataFrame({'n': [0.0, 0.0, 0.0]})
-        result_df = task_func(data, ['n'])
-        assert_frame_equal(expected_df, result_df)
+        data = {'line': [''] * 50}
+        expected_df = pd.DataFrame({'line': [''] * 50})
+        result_df = task_func(data, 'line')
+        pd.testing.assert_frame_equal(result_df, expected_df)

@@ -1,79 +1,78 @@
-import re
-import nltk
-nltk.download('stopwords')
+import numpy as np
+from sklearn.cluster import KMeans
 
-from nltk.corpus import stopwords
-from textblob import TextBlob
 
-# Constants
-STOPWORDS = set(stopwords.words('english'))
-
-def task_func(text):
+def task_func(data, n_clusters):
     """
-    Remove duplicate and stopwords from a string "text."
-    Then, analyze the sentiment of the text using TextBlob.
+    Apply KMeans clustering to a 2D numeric array and find the indices of the data points in each cluster.
 
     Parameters:
-    - text (str): The text string to analyze.
+    data (numpy array): The 2D numpy array for clustering.
+    n_clusters (int): The number of clusters to form.
 
     Returns:
-    - Sentiment: The sentiment of the text.
+    dict: A dictionary where keys are cluster labels and values are lists of indices for data points in the cluster.
 
     Requirements:
-    - re
-    - nltk.corpus.stopwords
-    - textblob.TextBlob
+    - numpy
+    - sklearn.cluster
 
     Example:
-    >>> text = "The quick brown fox jumps over the lazy dog and the dog was not that quick to respond."
-    >>> sentiment = task_func(text)
-    >>> print(sentiment)
-    Sentiment(polarity=0.13888888888888887, subjectivity=0.6666666666666666)
+    >>> data = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+    >>> cluster = task_func(data, 2)
+    >>> cluster_list = list(cluster.values())
+    >>> cluster_list.sort(key=lambda x: x[0])
+    >>> print(cluster_list)
+    [array([0, 1]), array([2, 3])]
+
+    >>> data = np.array([[1, 1], [2, 2]])
+    >>> cluster = task_func(data, 2)
+    >>> cluster_list = list(cluster.values())
+    >>> cluster_list.sort(key=lambda x: x[0])
+    >>> print(cluster_list)
+    [array([0]), array([1])]
     """
-    text = re.sub(r'\b(\w+)( \1\b)+', r'\1', text)
-    words = [word for word in re.findall(r'\b\w+\b', text.lower()) if word not in STOPWORDS]
-    text = ' '.join(words)
-    blob = TextBlob(text)
-    return blob.sentiment
+    kmeans = KMeans(n_clusters=n_clusters).fit(data)
+    labels = kmeans.labels_
+    clusters = {i: np.where(labels == i)[0] for i in range(n_clusters)}
+    return clusters
 
 import unittest
+import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test Case 1: Regular Sentence
-        # Description: This test case checks the function's behavior with a regular sentence containing duplicate words
-        # and stopwords. The function should remove the duplicate words and stopwords, and return the sentiment analysis
-        # result as a tuple of two float values.
-        text = "The quick brown fox jumps over the lazy dog and the dog was not quick."
-        sentiment = task_func(text)
-        self.assertIsInstance(sentiment, tuple, "The function should return a tuple")
-        self.assertEqual(len(sentiment), 2, "The tuple should contain two elements")
-        self.assertIsInstance(sentiment[0], float, "The polarity should be a float")
-        self.assertIsInstance(sentiment[1], float, "The subjectivity should be a float")
+        data = np.array([[1, 1], [1.1, 1.1], [5, 5], [5.1, 5.1]])
+        result = task_func(data, 2)
+        self.assertEqual(len(result), 2)
+        self.assertTrue(isinstance(result[0], np.ndarray))
+        self.assertTrue(isinstance(result[1], np.ndarray))
+        result_list = [x.tolist() for x in result.values()]
+        self.assertCountEqual(result_list, [[0, 1], [2, 3]])
     def test_case_2(self):
-        # Test Case 2: Empty String
-        # Description: This test case checks the function's behavior with an empty string. The function should return
-        # (0.0, 0.0) as the sentiment of an empty string is neutral.
-        text = ""
-        sentiment = task_func(text)
-        self.assertEqual(sentiment, (0.0, 0.0), "The sentiment of an empty string should be (0.0, 0.0)")
+        data = np.array([[1, 2], [1, 3],[1, 4], [1, 5], [200, 1], [200, 2], [200, 3], [3000, 1], [3000, 3]])
+        result = task_func(data, 3)
+        self.assertEqual(len(result), 3)
+        self.assertTrue(isinstance(result[0], np.ndarray))
+        self.assertTrue(isinstance(result[1], np.ndarray))
+        result_list = [x.tolist() for x in result.values()]
+        self.assertCountEqual(result_list, [[0, 1, 2, 3], [4, 5, 6], [7, 8]])
     def test_case_3(self):
-        # Test Case 3: Positive Sentiment
-        # Description: This test case checks the function's behavior with a sentence that has a positive sentiment.
-        # The function should return a positive polarity value.
-        text = "I absolutely love this! It's amazing."
-        sentiment = task_func(text)
-        self.assertGreater(sentiment[0], 0, "The polarity of a positive sentiment sentence should be greater than 0")
+        data = np.array([[1, 2]])
+        result = task_func(data, 1)
+        self.assertEqual(len(result), 1)
+        self.assertTrue(isinstance(result[0], np.ndarray))
+        self.assertCountEqual(list(result.values()), [0])
     def test_case_4(self):
-        # Test Case 4: Negative Sentiment
-        # Description: This test case checks the function's behavior with a sentence that has a negative sentiment.
-        # The function should return a negative polarity value.
-        text = "This is really bad. I hate it."
-        sentiment = task_func(text)
-        self.assertLess(sentiment[0], 0, "The polarity of a negative sentiment sentence should be less than 0")
+        '''wrong input'''
+        self.assertRaises(Exception, task_func, [])
+        self.assertRaises(Exception, task_func, 2)
+        self.assertRaises(Exception, task_func, [['asv', 1]])
+        self.assertRaises(Exception, task_func, {})
     def test_case_5(self):
-        # Test Case 5: Neutral Sentiment
-        # Description: This test case checks the function's behavior with a sentence that has a neutral sentiment.
-        # The function should return a zero polarity value.
-        text = "This is a pen."
-        sentiment = task_func(text)
-        self.assertEqual(sentiment[0], 0, "The polarity of a neutral sentiment sentence should be 0")
+        data = np.array([[1, 1], [2, 2], [3, 3], [4, 4], [5, 5]])
+        result = task_func(data, 5)
+        self.assertEqual(len(result), 5)
+        for i in range(5):
+            self.assertTrue(isinstance(result[i], np.ndarray))
+        result_list = [x.tolist() for x in result.values()]
+        self.assertCountEqual(result_list, [[0], [1], [2], [3], [4]])

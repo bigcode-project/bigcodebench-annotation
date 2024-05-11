@@ -1,69 +1,70 @@
 import pickle
 import os
-import random
-import string
 
-def task_func(strings, filename=None):
-    
+# Constants
+FILE_NAME = 'save.pkl'
+
+def task_func(dt):
     """
-    Save the list of random strings "Strings" in a pickle file and then read it back for validation.
-    If a filename is not provided, a unique filename is generated.
+    Save the date time object "dt" in the pickle file "save.pkl" and then read it back for validation.
 
     Parameters:
-    - strings (list): The list of random strings to be saved.
-    - filename (str, optional): The filename for saving the pickle file. Defaults to a unique generated name.
+    - dt (datetime): The datetime object to be saved.
 
     Returns:
-    - loaded_strings (list): The loaded list of strings from the pickle file.
+    - loaded_dt (datetime): The loaded datetime object from 'save.pkl'.
 
     Requirements:
     - pickle
     - os
-    - random
-    - string
 
     Example:
-    >>> strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)) for _ in range(10)]
-    >>> loaded_strings = task_func(strings)
-    >>> assert strings == loaded_strings
+    >>> dt = datetime.now(pytz.UTC)
+    >>> loaded_dt = task_func(dt)
+    >>> assert dt == loaded_dt
     """
-    if filename is None:
-        filename = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)) + ".pkl"
-    with open(filename, 'wb') as file:
-        pickle.dump(strings, file)
-    with open(filename, 'rb') as file:
-        loaded_strings = pickle.load(file)
-    os.remove(filename)
-    return loaded_strings
+    with open(FILE_NAME, 'wb') as file:
+        pickle.dump(dt, file)
+    with open(FILE_NAME, 'rb') as file:
+        loaded_dt = pickle.load(file)
+    os.remove(FILE_NAME)
+    return loaded_dt
 
 import unittest
-import string
-import random
-# Import the refined function
+from datetime import datetime
+import pytz
 class TestCases(unittest.TestCase):
-    def test_default_filename(self):
-        # Test with default filename generation
-        strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)) for _ in range(10)]
-        loaded_strings = task_func(strings)
-        self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
-    def test_custom_filename(self):
-        # Test with a custom filename
-        strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5)) for _ in range(5)]
-        filename = "custom_filename.pkl"
-        loaded_strings = task_func(strings, filename)
-        self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
-    def test_empty_list(self):
-        # Test with an empty list of strings
-        strings = []
-        loaded_strings = task_func(strings)
-        self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
-    def test_large_list(self):
-        # Test with a large list of strings
-        strings = [''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(100)) for _ in range(1000)]
-        loaded_strings = task_func(strings)
-        self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
-    def test_special_characters(self):
-        # Test with strings containing special characters
-        strings = [''.join(random.choice(string.ascii_uppercase + string.digits + string.punctuation) for _ in range(15)) for _ in range(15)]
-        loaded_strings = task_func(strings)
-        self.assertEqual(strings, loaded_strings, "The loaded strings should match the input strings.")
+    def test_datetime_saving_and_loading(self):
+        # Test saving and loading the current datetime with UTC timezone
+        dt = datetime.now(pytz.UTC)
+        loaded_dt = task_func(dt)
+        self.assertEqual(dt, loaded_dt, "The loaded datetime object should match the original")
+    def test_timezone_awareness(self):
+        # Test saving and loading a timezone-aware datetime object
+        tz = pytz.timezone('Asia/Tokyo')
+        dt = datetime.now(tz)
+        loaded_dt = task_func(dt)
+        self.assertEqual(dt, loaded_dt, "The loaded datetime object should be timezone aware and match the original")
+    def test_file_cleanup(self):
+        # Test whether the pickle file is properly cleaned up
+        dt = datetime.now(pytz.UTC)
+        task_func(dt)
+        self.assertFalse(os.path.exists(FILE_NAME), "The pickle file should be cleaned up after loading")
+    def test_naive_datetime(self):
+        # Test saving and loading a naive datetime object
+        dt = datetime.now()
+        loaded_dt = task_func(dt)
+        self.assertEqual(dt, loaded_dt, "The loaded datetime object should match the original naive datetime")
+        self.assertIsNone(loaded_dt.tzinfo, "The loaded datetime object should be naive (no timezone)")
+    def test_different_timezones(self):
+        # Test saving and loading datetime objects with different timezones
+        tz1 = pytz.timezone('US/Eastern')
+        tz2 = pytz.timezone('Europe/London')
+        dt1 = datetime.now(tz1)
+        dt2 = datetime.now(tz2)
+        loaded_dt1 = task_func(dt1)
+        loaded_dt2 = task_func(dt2)
+        self.assertEqual(dt1, loaded_dt1, "The loaded datetime object should match the original (US/Eastern)")
+        self.assertEqual(dt2, loaded_dt2, "The loaded datetime object should match the original (Europe/London)")
+        self.assertEqual(dt1.tzinfo, loaded_dt1.tzinfo, "The loaded datetime object should have the same timezone (US/Eastern)")
+        self.assertEqual(dt2.tzinfo, loaded_dt2.tzinfo, "The loaded datetime object should have the same timezone (Europe/London)")

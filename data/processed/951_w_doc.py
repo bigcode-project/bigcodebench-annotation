@@ -1,79 +1,83 @@
+import pandas as pd
 import numpy as np
-from scipy.linalg import svd
+import random
+from random import randint, seed
 
-def task_func(rows=3, columns=2, seed=0):
+# Constants
+CATEGORIES = ['Electronics', 'Clothing', 'Home & Kitchen', 'Books', 'Toys & Games']
+
+def task_func(mystrings, n_products, seed=0):
     """
-    Generate a matrix of random values with specified dimensions and perform Singular Value Decomposition (SVD) on it.
-
-    Requirements:
-    - numpy
-    - scipy.linalg.svd
-
+    Create a product catalog DataFrame where each row represents a product with the following columns:
+    - 'Product Name': The name of the product with spaces replaced by underscores.
+    - 'Category': The category to which the product belongs.
+    - 'Price': The price of the product, generated randomly based on a normal distribution with a mean of 50 and a standard deviation of 10.
+    
     Parameters:
-    - rows (int): Number of rows for the random matrix. Default is 3.
-    - columns (int): Number of columns for the random matrix. Default is 2.
-    - seed (int, optional): Seed for the random number generator to ensure reproducibility. Default is None.
+    mystrings (list of str): List of product names.
+    n_products (int): Number of products to generate in the catalog.
 
     Returns:
-    tuple: A tuple containing three elements:
-        - U (ndarray): The unitary matrix U.
-        - s (ndarray): The singular values, sorted in descending order.
-        - Vh (ndarray): The conjugate transpose of the unitary matrix V.
+    pd.DataFrame: A pandas DataFrame containing the product catalog information.
 
-    Example:
-    >>> U, s, Vh = task_func(3, 2, seed=42)
-    >>> print('U shape:', U.shape)
-    U shape: (3, 3)
-    >>> print('s shape:', s.shape)
-    s shape: (2,)
-    >>> print('Vh shape:', Vh.shape)
-    Vh shape: (2, 2)
+    Requirements:
+    - pandas
+    - numpy
+    - random.randint
+    - random.seed
+
+    Constants:
+    - CATEGORIES: A list of categories used to randomly assign a category to each product.
+
+    Examples:
+    >>> task_func(['Mobile Phone', 'T Shirt', 'Coffee Maker', 'Python Book', 'Toy Car'], 2)
+       Product Name        Category  Price
+    0   Python_Book           Books  67.64
+    1  Mobile_Phone  Home & Kitchen  54.00
+    >>> task_func(['Laptop', 'Sweater'], 1)
+      Product Name Category  Price
+    0      Sweater    Books  67.64
     """
+    catalogue_data = []
+    random.seed(seed)
     np.random.seed(seed)
-    matrix = np.random.rand(rows, columns)
-    U, s, Vh = svd(matrix)
-    return U, s, Vh
+    for _ in range(n_products):
+        product_name = mystrings[randint(0, len(mystrings) - 1)].replace(' ', '_')
+        category = CATEGORIES[randint(0, len(CATEGORIES) - 1)]
+        price = round(np.random.normal(50, 10), 2)
+        catalogue_data.append([product_name, category, price])
+    catalogue_df = pd.DataFrame(catalogue_data, columns=['Product Name', 'Category', 'Price'])
+    return catalogue_df
 
 import unittest
-import numpy as np
+from pandas.testing import assert_frame_equal
 class TestCases(unittest.TestCase):
     
     def test_case_1(self):
-        # Test with default 3x2 matrix
-        U, s, Vh = task_func(seed=3)
-        self.assertEqual(U.shape, (3, 3))
-        self.assertEqual(s.shape, (2,))
-        self.assertEqual(Vh.shape, (2, 2))
-        self.assertTrue(np.all(s >= 0))
+        
+        result = task_func(['Mobile Phone', 'T Shirt', 'Coffee Maker', 'Python Book', 'Toy Car'], 2, 42)
+        # assert the value of the DataFrame
+        self.assertEqual(result['Product Name'].tolist(), ['Mobile_Phone', 'Coffee_Maker'])
+        self.assertEqual(result['Category'].tolist(), ['Electronics', 'Clothing'])
+        self.assertEqual(result['Price'].tolist(), [54.97, 48.62])
         
     def test_case_2(self):
-        # Test with a 5x5 square matrix
-        U, s, Vh = task_func(5, 5, seed=42)
-        self.assertEqual(U.shape, (5, 5))
-        self.assertEqual(s.shape, (5,))
-        self.assertEqual(Vh.shape, (5, 5))
-        self.assertTrue(np.all(s >= 0))
-    
+        result = task_func(['Laptop', 'Sweater'], 1)
+        self.assertEqual(result['Product Name'].tolist(), ['Sweater'])
+        self.assertEqual(result['Category'].tolist(), ['Books'])
+        self.assertEqual(result['Price'].tolist(), [67.64])
+        
     def test_case_3(self):
-        # Test with a 2x3 matrix (more columns than rows)
-        U, s, Vh = task_func(2, 3, seed=12)
-        self.assertEqual(U.shape, (2, 2))
-        self.assertEqual(s.shape, (2,))
-        self.assertEqual(Vh.shape, (3, 3))
-        self.assertTrue(np.all(s >= 0))
+        result = task_func(['Book', 'Pen', 'Bag'], 3)
+        self.assertEqual(result['Product Name'].tolist(), ['Pen', 'Book', 'Bag'])
+        self.assertEqual(result['Category'].tolist(), ['Books', 'Home & Kitchen', 'Books'])
+        self.assertEqual(result['Price'].tolist(), [67.64, 54.00, 59.79])
         
     def test_case_4(self):
-        # Test with a 1x1 matrix (a scalar)
-        U, s, Vh = task_func(1, 1, seed=0)
-        self.assertEqual(U.shape, (1, 1))
-        self.assertEqual(s.shape, (1,))
-        self.assertEqual(Vh.shape, (1, 1))
-        self.assertTrue(np.all(s >= 0))
-        
+        result = task_func(['Watch'], 2)
+        self.assertEqual(result['Product Name'].tolist(), ['Watch', 'Watch'])
+        self.assertEqual(result['Category'].tolist(), ['Books', 'Home & Kitchen'])
+        self.assertEqual(result['Price'].tolist(), [67.64, 54.00])
     def test_case_5(self):
-        # Test with a 4x3 matrix
-        U, s, Vh = task_func(4, 3, seed=1)
-        self.assertEqual(U.shape, (4, 4))
-        self.assertEqual(s.shape, (3,))
-        self.assertEqual(Vh.shape, (3, 3))
-        self.assertTrue(np.all(s >= 0))
+        result = task_func(['TV', 'Fridge', 'Sofa', 'Table'], 0)
+        self.assertEqual(result.empty, True)

@@ -1,88 +1,109 @@
 import pandas as pd
-from collections import Counter
+import random
 
 
-def task_func(text_dict, word_keys, top_k=2):
+def task_func(product_list, categories, min_value = 10, max_value = 100):
     """
-    Calculate the frequency of certain words in a text dictionary and return a bar chart's Axes object and a dictionary
-    containing the frequencies of the top_k most common words in text_dict. 
-    
-    The function takes a dictionary containing word frequencies and a list of words. It calculates the frequency 
-    of the provided words in the dictionary and returns the Axes object of the bar chart displaying the frequencies
-    along with the top_k most common words and their frequencies as a dictionary. If a word in word_keys is not present 
-    in text_dict, its frequency is considered to be 0.
+    Create a sales report for a list of products in different categories.
+    The report includes the quantity sold, revenue for 1 product, and total revenue generated for each product.
     
     Parameters:
-    - text_dict (dict): The dictionary containing word frequencies. Key is the word and value is its frequency.
-    - word_keys (list of str): The list of words to consider.
-    - top_k (int, Optional): A positive integer denoting the number of most common words to return. Default is 2.
+    product_list (list): The list of products.
+    categories (list): A list of categories for the products.
+    min_value (int): The minimum value for quantity sold and revenue.
+    max_value (int): The maximum value for quantity sold and revenue.
     
     Returns:
-    - matplotlib.axes._axes.Axes: Axes object of the bar chart displaying the frequencies.
-    - dict: Dictionary containing the frequencies of the top_k most common words. Key is the word and value is 
-    its frequency.
+    DataFrame: A pandas DataFrame with sales data for the products.
     
+    Note:
+    - The column names uses are 'Product', 'Category', 'Quantity Sold', 'Revenue' , and 'Total Revenue'.
+
     Requirements:
     - pandas
-    - collections.Counter
-
-    Raises:
-    - ValueError: If top_k is a negative integer.
+    - random
     
     Example:
-    >>> import collections
-    >>> text_dict = collections.Counter(['the', 'be', 'to', 'the', 'that', 'and', 'a', 'in', 'the', 'that', 'have', 'I'])
-    >>> word_keys = ['the', 'and', 'I']
-    >>> ax, frequencies = task_func(text_dict, word_keys, 3)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> frequencies
-    {'the': 3, 'that': 2, 'be': 1}
+    >>> random.seed(0)
+    >>> report = task_func(['Product 1'], ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports'], 100, 100)
+    >>> report.iloc[0]['Category'] in ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
+    True
+    >>> report.iloc[0]['Quantity Sold']
+    100
     """
-    if top_k < 0:
-        raise ValueError('top_k must be a positive integer.')
-    elif top_k >= len(text_dict):
-        top_k = len(text_dict)
-    frequencies = [text_dict.get(word, 0) for word in word_keys]
-    freq_dict = Counter(text_dict)
-    top_k_words = freq_dict.most_common(top_k)
-    word_series = pd.Series(frequencies, index=word_keys)
-    ax = word_series.plot(kind='bar')
-    return ax, dict(top_k_words)
+    report_data = []
+    for product in product_list:
+        category = categories[random.randint(0, len(categories)-1)]
+        quantity_sold = random.randint(min_value, max_value)
+        revenue = random.randint(min_value, max_value)
+        total_revenue = quantity_sold * revenue
+        report_data.append([product, category, quantity_sold, revenue, total_revenue])
+    report_df = pd.DataFrame(report_data, columns=['Product', 'Category', 'Quantity Sold', 'Revenue', 'Total Revenue'])
+    return report_df
 
 import unittest
-import doctest
+import pandas as pd
+import random
 class TestCases(unittest.TestCase):
+    
+    categories = ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
+    products = ['Product ' + str(i) for i in range(1, 101)]
+    
     def test_case_1(self):
-        text_dict = Counter(['the', 'be', 'to', 'the', 'and', 'that', 'a', 'in', 'the', 'that', 'have', 'I'])
-        word_keys = ['the', 'and', 'I']
-        ax, top_k_dict = task_func(text_dict, word_keys, 3)
-        self.assertDictContainsSubset(top_k_dict, {'the': 3, 'that': 2, 'be': 1})
-        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
-        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        random.seed(0)
+        report = task_func(self.products[:5], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 5)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_2(self):
-        text_dict = Counter(['apple', 'banana', 'apple', 'orange', 'grape', 'apple', 'banana'])
-        word_keys = ['apple', 'banana', 'cherry']
-        ax, top_k_dict = task_func(text_dict, word_keys)
-        self.assertDictContainsSubset(top_k_dict, {'apple': 3, 'banana': 2})
-        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
-        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        random.seed(0)
+        report = task_func(self.products[5:10], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 5)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_3(self):
-        text_dict = Counter([])
-        word_keys = ['apple', 'banana', 'cherry']
-        ax, top_k_dict = task_func(text_dict, word_keys)
-        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
-        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        random.seed(0)
+        report = task_func([self.products[10]], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 1)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_4(self):
-        text_dict = Counter(['a', 'a', 'b', 'b', 'b', 'c', 'c'])
-        word_keys = ['a', 'b', 'c', 'd']
-        ax, top_k_dict = task_func(text_dict, word_keys)
-        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
-        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        random.seed(0)
+        report = task_func(self.products[10:20], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 10)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        
     def test_case_5(self):
-        text_dict = Counter(['cat', 'dog', 'cat', 'fish', 'fish', 'fish', 'bird'])
-        word_keys = ['cat', 'dog', 'bird', 'elephant']
-        ax, top_k_dict = task_func(text_dict, word_keys,9)
-        self.assertDictContainsSubset(top_k_dict, {'fish': 3, 'cat': 2, 'dog': 1, 'bird': 1})
-        self.assertEqual(ax.get_xticks().tolist(), list(range(len(word_keys))))
-        self.assertEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        random.seed(0)
+        report = task_func(self.products[20:40], self.categories)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 20)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+    
+    def test_case_6(self):
+        random.seed(0)
+        report = task_func([self.products[0]], self.categories, 10, 10)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 1)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        self.assertEqual(report.iloc[0]['Quantity Sold'], 10)
+        self.assertEqual(report.iloc[0]['Total Revenue'], 100)
+    
+    def test_case_7(self):
+        random.seed(0)
+        report = task_func([self.products[0]], self.categories, 10, 100)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 1)
+        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        self.assertEqual(report.iloc[0]['Total Revenue'], report.iloc[0]['Quantity Sold']*report.iloc[0]['Revenue'])
+    def test_case_8(self):
+        random.seed(0)
+        report = task_func(self.products[40:60], self.categories, 100, 200)
+        self.assertTrue(isinstance(report, pd.DataFrame))
+        self.assertEqual(len(report), 20)
+        for index, row in report.iterrows():
+            self.assertEqual(row['Total Revenue'], row['Quantity Sold']*row['Revenue'])

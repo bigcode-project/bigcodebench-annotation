@@ -1,79 +1,70 @@
 from datetime import datetime
-import random
+import numpy as np
 import matplotlib.pyplot as plt
 
 
 def task_func(date_str):
     """
-    Generates a list of random integers, where the count of integers equals the day of the month in the
-    provided date, then generates a line plot of these integers and returns the Axes object of the plot.
+    Plot a sine wave whose frequency is determined by the day of the month from the given date.
 
     Parameters:
-    - date_str (str): The date string in "yyyy-mm-dd" format.
+    date_str (str): A date in "yyyy-mm-dd" format, used to determine the frequency of the sine wave.
 
     Returns:
-    - matplotlib.axes.Axes: The Axes object containing the plot.
+    matplotlib.axes.Axes: An Axes object containing the plotted sine wave.
 
     Requirements:
     - datetime.datetime
-    - random
+    - numpy
     - matplotlib.pyplot
 
     Example:
     >>> ax = task_func('2023-06-15')
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> print(ax.get_title())
+    Sine Wave for 2023-06-15 (Frequency: 15)
     """
     date = datetime.strptime(date_str, "%Y-%m-%d")
-    num_of_values = date.day
-    random_values = [random.randint(1, 100) for _ in range(num_of_values)]
+    x = np.linspace(0, 2 * np.pi, 1000)
+    frequency = date.day
+    y = np.sin(frequency * x)
     _, ax = plt.subplots()
-    ax.plot(random_values)
+    ax.plot(x, y)
+    ax.set_title(f"Sine Wave for {date_str} (Frequency: {frequency})")
     return ax
 
 import unittest
-import matplotlib.axes
-from datetime import datetime
+import matplotlib
 class TestCases(unittest.TestCase):
-    """Test cases for task_func."""
-    def test_mid_month(self):
+    """Test cases for the function task_func."""
+    def test_valid_date(self):
         """
-        Test the function with a mid-month date.
-        Checks if the generated plot has 15 data points for a date like '2023-06-15'.
+        Test with a valid date string to ensure the function returns a matplotlib Axes object.
         """
-        ax = task_func("2023-06-15")
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 15)
+        result = task_func("2023-06-15")
+        self.assertIsInstance(result, matplotlib.axes.Axes)
+    def test_leap_year_date(self):
+        """
+        Test with a date from a leap year to check the function's handling of leap years.
+        """
+        result = task_func("2024-02-29")
+        self.assertIsInstance(result, matplotlib.axes.Axes)
     def test_beginning_of_month(self):
         """
-        Test the function with a date at the beginning of the month.
-        Checks if the plot has 1 data point for a date like '2023-06-01'.
+        Test with a date at the beginning of the month (low-frequency wave).
         """
-        ax = task_func("2023-06-01")
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 1)
+        result = task_func("2023-01-01")
+        self.assertIsInstance(result, matplotlib.axes.Axes)
     def test_end_of_month(self):
         """
-        Test the function with a date at the end of the month.
-        Checks if the plot has 31 data points for a date like '2023-07-31'.
+        Test with a date towards the end of the month (high-frequency wave).
         """
-        ax = task_func("2023-07-31")
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 31)
-    def test_leap_year(self):
+        result = task_func("2023-01-31")
+        self.assertIsInstance(result, matplotlib.axes.Axes)
+    def test_invalid_date_format(self):
         """
-        Test the function with a leap year date.
-        Checks if the plot has 29 data points for a leap year date like '2024-02-29'.
-        """
-        ax = task_func("2024-02-29")
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 29)
-    def test_invalid_date(self):
-        """
-        Test the function with an invalid date format.
-        Expects a ValueError to be raised for an incorrectly formatted date.
+        Test with an invalid date format to check if the function raises a ValueError.
         """
         with self.assertRaises(ValueError):
-            task_func("2023/06/15")
+            task_func("15-06-2023")
     def tearDown(self):
-        plt.clf()
+        plt.close()

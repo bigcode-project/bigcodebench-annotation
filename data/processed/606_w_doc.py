@@ -1,65 +1,72 @@
 import pandas as pd
-import matplotlib.pyplot as plt
+from scipy import stats
+
 
 def task_func(matrix):
     """
-    Visualize a 2D numeric array (matrix) as a heatmap using matplotlib, specifying a cmap for the color mapping
-    and interpolation to control the pixel rendering.
+    Normalizes a 2D numeric array (matrix) using the Z score.
     
     Parameters:
     matrix (array): The 2D numpy array.
     
     Returns:
-    ax (matplotlib.axes._axes.Axes): The Axes object with the heatmap.
-    
+    DataFrame: The normalized DataFrame.
+
     Requirements:
     - pandas
-    - matplotlib.pyplot
-    
+    - numpy
+    - scipy
+
     Example:
     >>> import numpy as np
     >>> matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    >>> ax = task_func(matrix)
+    >>> normalized_df = task_func(matrix)
+    >>> isinstance(normalized_df, pd.DataFrame)
+    True
+    >>> np.allclose(normalized_df.mean(), 0)
+    True
+    >>> np.allclose(normalized_df.std(ddof=0), 1)
+    True
     """
     df = pd.DataFrame(matrix)
-    fig, ax = plt.subplots()
-    ax.imshow(df, cmap='hot', interpolation='nearest')
-    return ax
+    normalized_df = df.apply(stats.zscore)
+    normalized_df = normalized_df.fillna(0.0)
+    return normalized_df
 
 import unittest
 import numpy as np
-import matplotlib
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-        ax = task_func(matrix)
-        
-        # Asserting the return type
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        
-        # Asserting the colormap used
-        self.assertEqual(ax.images[0].get_cmap().name, 'hot')
+    def test_extreme_values_shape(self):
+        """Test the function with extreme values to ensure output shape is correct."""
+        matrix = [[1, 2], [10000, 20000]]
+        result_df = task_func(matrix)
+        # Verify that the shape of the result is the same as the input
+        self.assertEqual(result_df.shape, (2, 2))
     def test_case_2(self):
-        matrix = np.array([[10, 20], [30, 40]])
-        ax = task_func(matrix)
-        
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertEqual(ax.images[0].get_cmap().name, 'hot')
+        matrix = np.array([[2, 5], [5, 2]])
+        result = task_func(matrix)
+        expected_result = pd.DataFrame({
+            0: [-1.0, 1.0],
+            1: [1.0, -1.0]
+        })
+        pd.testing.assert_frame_equal(result, expected_result)
     def test_case_3(self):
-        matrix = np.array([[1, 1], [1, 1], [1, 1]])
-        ax = task_func(matrix)
-        
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertEqual(ax.images[0].get_cmap().name, 'hot')
-    def test_case_4(self):
-        matrix = np.array([[1]])
-        ax = task_func(matrix)
-        
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertEqual(ax.images[0].get_cmap().name, 'hot')
-    def test_case_5(self):
-        matrix = np.random.rand(5, 5)  # Random 5x5 matrix
-        ax = task_func(matrix)
-        
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertEqual(ax.images[0].get_cmap().name, 'hot')
+        matrix = np.array([[5]])
+        result = task_func(matrix)
+        expected_result = pd.DataFrame({
+            0: [0.0]
+        })
+        pd.testing.assert_frame_equal(result, expected_result)
+    def test_uniform_data(self):
+        """Test a matrix where all elements are the same."""
+        matrix = [[1, 1], [1, 1]]
+        expected_result = pd.DataFrame({
+            0: [0.0, 0.0],
+            1: [0.0, 0.0]
+        })
+        pd.testing.assert_frame_equal(task_func(matrix), expected_result)
+    def test_non_numeric_data(self):
+        """Test the function with non-numeric data."""
+        matrix = [['a', 'b'], ['c', 'd']]
+        with self.assertRaises(TypeError):
+            task_func(matrix)

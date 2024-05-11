@@ -1,117 +1,102 @@
-import random
+import pandas as pd
+from scipy import stats
 import matplotlib.pyplot as plt
 
-
-# Sample data
-class Object:
-    value = 0
-
-    def __init__(self, value=None):
-        if value is None:
-            self.value = random.gauss(0, 1)
-        else:
-            self.value = value
-
-
-def task_func(obj_list, attr, num_bins=30, seed=0):
+def task_func(df):
     """
-    Create a histogram of the specified attribute from a list of objects and return the histogram plot.
+    Perform a linear regression between "age" and "score" in the DataFrame, excluding rows with duplicate names.
+    Plot the regression line and the scatter plot of the data.
 
     Parameters:
-    obj_list (list): The list of objects containing the attribute.
-    attr (str): The attribute to generate a histogram for.
-    num_bins (int, Optional): The number of bins to use in the histogram. Defaults to 30.
-    seed (int, Optional): The seed for the random number generator. Defaults to 0.
+    df (DataFrame): The pandas DataFrame containing the data.
 
     Returns:
-    matplotlib.axes._axes.Axes: The histogram plot of the attribute values.
+    tuple: A tuple containing the matplotlib.pyplot object and the axes object.
+
+    Raises:
+    - The function will raise a ValueError is input df is not a DataFrame.
+
+    Note:
+    - The function use "Linear Regression" for the plot title.
+    - The function use "Age" and "Score" as the xlabel and ylabel respectively.
 
     Requirements:
-    - random (used for default object generation)
-    - numpy (used for numerical computations)
-    - matplotlib (used for plotting)
-
-    Constants:
-    - NUM_BINS (int): Number of bins to use in the histogram, set to 30 by default.
+    - pandas
+    - scipy.stats
+    - matplotlib.pyplot
 
     Example:
-    >>> obj_list = [Object(value=i) for i in range(10)]
-    >>> ax = task_func(obj_list, 'value')
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
+    >>> data = pd.DataFrame([{'Name': 'Alice', 'Age': 20, 'Score': 70}, {'Name': 'Bob', 'Age': 25, 'Score': 75}, {'Name': 'Eve', 'Age': 30, 'Score': 80}])
+    >>> plt, ax = task_func(data)
+    >>> ax.lines[0].get_xdata()[0]
+    20
     """
-    random.seed(seed)
-    attr_values = [getattr(obj, attr) for obj in obj_list]
-    fig, ax = plt.subplots()
-    ax.hist(attr_values, bins=num_bins, alpha=0.5)
-    ax.set_title('Histogram of attribute values')
-    ax.set_xlabel('Attribute Value')
-    ax.set_ylabel('Count')
-    return ax
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
+    df = df.drop_duplicates(subset='Name')
+    slope, intercept, r_value, _, _ = stats.linregress(df['Age'], df['Score'])
+    df['Age_up'] = intercept + slope * df['Age']
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111)
+    plt.scatter(df['Age'], df['Score'], label='Data')
+    plt.plot(df['Age'].values, df['Age_up'].values, 'r', label='Fitted line')
+    plt.xlabel('Age')
+    plt.ylabel('Score')
+    plt.title('Linear Regression')
+    plt.legend()
+    return plt, ax
 
 import unittest
-import doctest
+import pandas as pd
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Input 1: Simple list of objects with integer values from 0 to 9
-        obj_list = [Object(value=i) for i in range(10)]
-        ax = task_func(obj_list, 'value')
-        
-        # Assertions
-        self.assertIsInstance(ax, plt.Axes, "Returned object is not a valid Axes object.")
-        self.assertEqual(ax.get_title(), 'Histogram of attribute values', "Histogram title is incorrect.")
-        self.assertEqual(ax.get_xlabel(), 'Attribute Value', "X-axis label is incorrect.")
-        self.assertEqual(ax.get_ylabel(), 'Count', "Y-axis label is incorrect.")
-        self.assertEqual(sum([p.get_height() for p in ax.patches]), len(obj_list), "Histogram data points do not match input list size.")
-    def test_case_2(self):
-        # Input 2: List of objects with random Gaussian values
-        obj_list = [Object() for _ in range(100)]
-        ax = task_func(obj_list, 'value', seed=77)
-        
-        # Assertions
-        self.assertIsInstance(ax, plt.Axes, "Returned object is not a valid Axes object.")
-        self.assertEqual(ax.get_title(), 'Histogram of attribute values', "Histogram title is incorrect.")
-        self.assertEqual(ax.get_xlabel(), 'Attribute Value', "X-axis label is incorrect.")
-        self.assertEqual(ax.get_ylabel(), 'Count', "Y-axis label is incorrect.")
-        self.assertEqual(sum([p.get_height() for p in ax.patches]), len(obj_list), "Histogram data points do not match input list size.")
-        # Check axis data
-        self.assertAlmostEqual(ax.get_xlim()[0], -2.57, delta=0.1, msg="X-axis lower limit is incorrect.")
-        
-    def test_case_3(self):
-        # Input 3: List of objects with fixed value
-        obj_list = [Object(value=5) for _ in range(50)]
-        ax = task_func(obj_list, 'value', seed=4)
-        
-        # Assertions
-        self.assertIsInstance(ax, plt.Axes, "Returned object is not a valid Axes object.")
-        self.assertEqual(ax.get_title(), 'Histogram of attribute values', "Histogram title is incorrect.")
-        self.assertEqual(ax.get_xlabel(), 'Attribute Value', "X-axis label is incorrect.")
-        self.assertEqual(ax.get_ylabel(), 'Count', "Y-axis label is incorrect.")
-        self.assertEqual(sum([p.get_height() for p in ax.patches]), len(obj_list), "Histogram data points do not match input list size.")
-    def test_case_4(self):
-        # Input 4: Empty list
-        obj_list = []
-        ax = task_func(obj_list, 'value')
-        
-        # Assertions
-        self.assertIsInstance(ax, plt.Axes, "Returned object is not a valid Axes object.")
-        self.assertEqual(ax.get_title(), 'Histogram of attribute values', "Histogram title is incorrect.")
-        self.assertEqual(ax.get_xlabel(), 'Attribute Value', "X-axis label is incorrect.")
-        self.assertEqual(ax.get_ylabel(), 'Count', "Y-axis label is incorrect.")
-        self.assertEqual(sum([p.get_height() for p in ax.patches]), 0, "Histogram data points do not match input list size.")
-        # Check axis data
-        self.assertAlmostEqual(ax.get_xlim()[0], -0.05, msg="X-axis limits are incorrect.", delta=0.01)
-        self.assertAlmostEqual(ax.get_xlim()[1], 1.05, msg="X-axis limits are incorrect.", delta=0.01)
-        self.assertAlmostEqual(ax.get_ylim()[0], -0.05, msg="Y-axis limits are incorrect.", delta=0.01)
-        self.assertAlmostEqual(ax.get_ylim()[1], 0.05, msg="Y-axis limits are incorrect.", delta=0.01)
-    def test_case_5(self):
-        # Input 5: Large list of objects
-        obj_list = [Object(value=random.gauss(0, 5)) for _ in range(1000)]
-        ax = task_func(obj_list, 'value')
-        
-        # Assertions
-        self.assertIsInstance(ax, plt.Axes, "Returned object is not a valid Axes object.")
-        self.assertEqual(ax.get_title(), 'Histogram of attribute values', "Histogram title is incorrect.")
-        self.assertEqual(ax.get_xlabel(), 'Attribute Value', "X-axis label is incorrect.")
-        self.assertEqual(ax.get_ylabel(), 'Count', "Y-axis label is incorrect.")
-        self.assertEqual(sum([p.get_height() for p in ax.patches]), len(obj_list), "Histogram data points do not match input list size.")
+    def test_correct_data_handling(self):
+        data = pd.DataFrame([
+            {'Name': 'Alice', 'Age': 25, 'Score': 80},
+            {'Name': 'Bob', 'Age': 30, 'Score': 85},
+            {'Name': 'Alice', 'Age': 25, 'Score': 80},
+            {'Name': 'Eve', 'Age': 35, 'Score': 90}
+        ])
+        plt, ax = task_func(data)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines), 1)  # Only one line for the regression
+        self.assertEqual(len(ax.collections), 1)  # Only one collection for scatter plot
+    def test_linear_regression(self):
+        data = pd.DataFrame([
+            {'Name': 'Alice', 'Age': 20, 'Score': 70},
+            {'Name': 'Bob', 'Age': 25, 'Score': 75},
+            {'Name': 'Eve', 'Age': 30, 'Score': 80}
+        ])
+        plt, ax = task_func(data)
+        line = ax.lines[0]
+        x_data, y_data = line.get_xdata(), line.get_ydata()
+        self.assertTrue((y_data[1] - y_data[0]) / (x_data[1] - x_data[0]) > 0)  # Positive slope
+    def test_plotting_elements(self):
+        data = pd.DataFrame([
+            {'Name': 'Alice', 'Age': 20, 'Score': 70},
+            {'Name': 'Bob', 'Age': 25, 'Score': 75}
+        ])
+        plt, ax= task_func(data)
+        self.assertEqual(ax.get_xlabel(), 'Age')
+        self.assertEqual(ax.get_ylabel(), 'Score')
+        self.assertEqual(ax.get_title(), 'Linear Regression')
+    def test_empty_dataframe(self):
+        data = pd.DataFrame([
+            {'Name': 'Alice', 'Age': 20, 'Score': 70},
+            {'Name': 'Bob', 'Age': 25, 'Score': 75}
+        ])
+        plt, ax = task_func(data)
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.lines), 1)  # No line for regression
+        self.assertGreater(len(ax.collections), 0)
+    def test_missing_columns(self):
+        data = pd.DataFrame([
+            {'Name': 'Alice', 'Age': 20},
+            {'Name': 'Bob', 'Age': 25}
+        ])
+        with self.assertRaises(KeyError):
+            task_func(data)
+    
+    def test_non_df(self):
+        with self.assertRaises(ValueError):
+            task_func("non_df")

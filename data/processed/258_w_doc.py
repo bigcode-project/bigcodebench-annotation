@@ -1,60 +1,125 @@
-import numpy as np
-import math
+import json
+import random
 
-def task_func(ax, num_turns):
+
+# Constants
+DATA = [
+    {'name': 'John', 'age': 30, 'city': 'New York'},
+    {'name': 'Peter', 'age': 35, 'city': 'London'},
+    {'name': 'Susan', 'age': 25, 'city': 'Sydney'},
+    {'name': 'Alice', 'age': 28, 'city': 'Paris'},
+    {'name': 'Bob', 'age': 40, 'city': 'Tokyo'},
+    {'name': 'Charlie', 'age': 22, 'city': 'Beijing'},
+    {'name': 'David', 'age': 33, 'city': 'Mumbai'},
+    {'name': 'Eve', 'age': 27, 'city': 'Berlin'},
+    {'name': 'Frank', 'age': 32, 'city': 'Moscow'},
+    {'name': 'Grace', 'age': 29, 'city': 'Rome'}
+]
+
+def task_func(utc_datetime, seed=0):
     """
-    Draws a spiral on the polar diagram 'ax' with the specified number of turns 'num_turns'.
-    The spiral starts at the center and expands outward with each turn.
-    The radial ticks on the plot are positioned at intervals corresponding to the number of turns multiplied by 45 degrees.
-
+    Select a random person from a dataset of people and their attributes (name, age, city) provided as a global 
+    variable DATA. Add a UTC timestamp to the person's data which is passed as an argument utc_datetime 'timestamp'. Finally, 
+    encode that person's data as a JSON string.
+    
     Parameters:
-    ax (matplotlib.axes._axes.Axes): The Axes object for plotting the spiral.
-    num_turns (int): The number of turns for the spiral.
-
+    utc_datetime (datetime): The datetime in UTC.
+    seed (int, optional): The seed for the random number generator. Defaults to 0.
+    
     Returns:
-    matplotlib.axes._axes.Axes: The modified Axes object with the spiral plot.
-
+    str: The person's data encoded as a JSON string.
+    
     Requirements:
-    - numpy
-    - math
-
+    - json
+    - datetime
+    - random
+    
     Example:
-    >>> import matplotlib.pyplot as plt
-    >>> fig, ax = plt.subplots(subplot_kw={'polar': True})
-    >>> ax = task_func(ax, 3)
-    >>> ax.get_rlabel_position()
-    135.0
+    >>> from datetime import datetime
+    >>> utc_time = datetime(2023, 6, 15, 12, 0, 0, tzinfo=pytz.UTC)
+    >>> person_json_str = task_func(utc_time)
+    >>> json_data = json.loads(person_json_str)
+    >>> print(json_data["name"])
+    David
+    >>> print(json_data["age"])
+    33
     """
-    r = np.linspace(0, num_turns * 2 * math.pi, 1000)
-    theta = r
-    ax.plot(theta, r)
-    ax.set_rlabel_position(num_turns * 45)
-    return ax
+    random.seed(seed)
+    person = random.choice(DATA)
+    person['timestamp'] = utc_datetime.isoformat()
+    person_json_str = json.dumps(person)
+    return person_json_str
 
 import unittest
-import matplotlib.pyplot as plt
+import pytz
+import doctest
+from datetime import datetime
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.fig, self.ax = plt.subplots(subplot_kw={'polar': True})
-    def test_positive_turns(self):
-        """ Test the function with positive number of turns """
-        num_turns = 3
-        ax_modified = task_func(self.ax, num_turns)
-        self.assertEqual(len(ax_modified.lines), 1)  # Checking if a spiral is plotted
-        self.assertEqual(ax_modified.get_rlabel_position(), num_turns * 45)  # Radial label position
-    def test_zero_turns(self):
-        """ Test the function with zero turns """
-        ax_modified = task_func(self.ax, 0)
-        self.assertEqual(len(ax_modified.lines), 1)  # A line should still be plotted
-    def test_negative_turns(self):
-        """ Test the function with negative number of turns """
-        ax_modified = task_func(self.ax, -3)
-        self.assertEqual(len(ax_modified.lines), 1)  # A line should still be plotted
-    def test_large_number_of_turns(self):
-        """ Test the function with a large number of turns """
-        ax_modified = task_func(self.ax, 100)
-        self.assertEqual(len(ax_modified.lines), 1)  # A line should still be plotted
-    def test_fractional_turns(self):
-        """ Test the function with fractional number of turns """
-        ax_modified = task_func(self.ax, 2.5)
-        self.assertEqual(len(ax_modified.lines), 1)  # A line should still be plotted
+    
+    def test_case_1(self):
+        utc_time = datetime(2023, 6, 15, 12, 0, 0, tzinfo=pytz.UTC)
+        person_json_str = task_func(utc_time)
+        person_data = json.loads(person_json_str)
+        
+        # Assert that the returned data has the expected fields and timestamp
+        self.assertIn('name', person_data)
+        self.assertIn('age', person_data)
+        self.assertIn('city', person_data)
+        self.assertIn('timestamp', person_data)
+        self.assertEqual(person_data['timestamp'], '2023-06-15T12:00:00+00:00')
+        
+    def test_case_2(self):
+        utc_time = datetime(2022, 5, 10, 10, 30, 0, tzinfo=pytz.UTC)
+        person_json_str = task_func(utc_time)
+        person_data = json.loads(person_json_str)
+        
+        # Assert that the returned data has the expected fields and timestamp
+        self.assertIn('name', person_data)
+        self.assertIn('age', person_data)
+        self.assertIn('city', person_data)
+        self.assertIn('timestamp', person_data)
+        self.assertEqual(person_data['timestamp'], '2022-05-10T10:30:00+00:00')
+        # Test with seed
+        self.assertEqual(person_data['name'], 'David')
+        self.assertEqual(person_data['age'], 33)
+        self.assertEqual(person_data['city'], 'Mumbai')
+        
+    def test_case_3(self):
+        # Test with current UTC time
+        utc_time = datetime.utcnow().replace(tzinfo=pytz.UTC)
+        person_json_str = task_func(utc_time)
+        person_data = json.loads(person_json_str)
+        
+        # Assert that the returned data has the expected fields and current timestamp
+        self.assertIn('name', person_data)
+        self.assertIn('age', person_data)
+        self.assertIn('city', person_data)
+        self.assertIn('timestamp', person_data)
+        
+    def test_case_4(self):
+        utc_time = datetime(2021, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)
+        person_json_str = task_func(utc_time, seed=101)
+        person_data = json.loads(person_json_str)
+        
+        # Assert that the returned data has the expected fields and timestamp
+        self.assertIn('name', person_data)
+        self.assertIn('age', person_data)
+        self.assertIn('city', person_data)
+        self.assertIn('timestamp', person_data)
+        self.assertEqual(person_data['timestamp'], '2021-01-01T00:00:00+00:00')
+        # Test with seed
+        self.assertEqual(person_data['name'], 'Grace')
+        self.assertEqual(person_data['age'], 29)
+        self.assertEqual(person_data['city'], 'Rome')
+        
+    def test_case_5(self):
+        utc_time = datetime(2020, 2, 29, 15, 45, 0, tzinfo=pytz.UTC)  # Leap year date
+        person_json_str = task_func(utc_time)
+        person_data = json.loads(person_json_str)
+        
+        # Assert that the returned data has the expected fields and timestamp
+        self.assertIn('name', person_data)
+        self.assertIn('age', person_data)
+        self.assertIn('city', person_data)
+        self.assertIn('timestamp', person_data)
+        self.assertEqual(person_data['timestamp'], '2020-02-29T15:45:00+00:00')

@@ -1,71 +1,100 @@
-import math
-import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 
-
-def task_func(list_input):
+def task_func(df, dct, columns=None):
     """
-    Sort the given list in ascending order based on the degree value of its elements, calculate the cumulative sum of 
-    the sorted list, and draw a line chart of the cumulative sum.
+    This function preprocesses a pandas DataFrame by replacing specified values, encoding categorical attributes, 
+    and standardizing numerical attributes. It's designed to be flexible for data preprocessing in machine learning tasks.
 
     Parameters:
-    list_input (list): The list to be sorted.
+    - df (DataFrame): The input DataFrame to be preprocessed.
+    - dct (dict): A dictionary for replacing values in the DataFrame. Keys are existing values, and values are new values.
+    - columns (list of str, optional): Specific column names to be encoded. If None, all object-type columns in the DataFrame are encoded.
 
     Returns:
-    tuple: A tuple containing:
-           - numpy array: The cumulative sum of the sorted list.
-           - matplotlib.axes._axes.Axes: The Axes object of the plotted line chart.
+    - DataFrame: The preprocessed DataFrame with encoded categorical attributes and standardized numerical attributes.
 
     Requirements:
-    - math
-    - numpy
-    - matplotlib.pyplot
+    - pandas
+    - sklearn.preprocessing.LabelEncoder
 
     Example:
-    >>> cumsum, ax = task_func([10, 20, 30])
-    >>> print(cumsum)
-    [10 30 60]
-    >>> ax.get_title()
-    'Cumulative Sum Plot'
+    >>> df = pd.DataFrame({'col1': ['a', 'b', 'c'], 'col2': [1, 2, 3]})
+    >>> dct = {'a': 'x', 'b': 'y'}
+    >>> result = task_func(df, dct)
+    >>> result.shape == df.shape
+    True
+    >>> result['col1'].mean() == 0.0
+    True
+
+    Note:
+    - The function assumes that the DataFrame and the dictionary are well-formed and relevant to each other.
+    - The encoding of categorical columns is done using LabelEncoder, which encodes labels with value between 0 and n_classes-1.
+    - Numerical standardization is performed by subtracting the mean and dividing by the standard deviation of each column.
+
+    Raises:
+    - The function will raise a ValueError is input df is not a DataFrame.
     """
-    sorted_list = sorted(list_input, key=lambda x: (math.degrees(x), x))
-    cumsum = np.cumsum(sorted_list)
-    ax = plt.plot(cumsum)[0].axes
-    ax.set_title("Cumulative Sum Plot")
-    ax.set_xlabel("Index")
-    ax.set_ylabel("Cumulative Sum")
-    return cumsum, ax
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("The input df is not a DataFrame")
+    df = df.replace(dct)
+    if columns is None:
+        columns = df.select_dtypes(include=['object']).columns.tolist()
+    for column in columns:
+        if df[column].dtype == 'object':
+            le = LabelEncoder()
+            df[column] = le.fit_transform(df[column])
+    df = (df - df.mean()) / df.std()
+    return df
 
 import unittest
-import doctest
+import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        cumsum, ax = task_func([10, 20, 30])
-        self.assertListEqual(list(cumsum), [10, 30, 60])
-        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
-        self.assertEqual(ax.get_xlabel(), 'Index')
-        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
+        # Testing with a mix of categorical and numerical columns
+        df = pd.DataFrame({'cat': ['a', 'b', 'c'], 'num': [1, 2, 3]})
+        dct = {'a': 'x', 'b': 'y', 'c': 'z'}
+        result = task_func(df, dct)
+        # Assertions
+        self.assertEqual(result.shape, df.shape)
+        self.assertTrue('cat' in result.columns)
+        self.assertTrue('num' in result.columns)
     def test_case_2(self):
-        cumsum, ax = task_func([5, 15, 25])
-        self.assertListEqual(list(cumsum), [5, 20, 45])
-        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
-        self.assertEqual(ax.get_xlabel(), 'Index')
-        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
+        # Testing with only numerical columns
+        df = pd.DataFrame({'num1': [10, 20, 30], 'num2': [40, 50, 60]})
+        dct = {}
+        result = task_func(df, dct)
+        # Assertions
+        self.assertEqual(result.shape, df.shape)
+        self.assertAlmostEqual(result['num1'].mean(), 0, places=5)
+        self.assertAlmostEqual(result['num2'].mean(), 0, places=5)
     def test_case_3(self):
-        cumsum, ax = task_func([])
-        self.assertListEqual(list(cumsum), [])
-        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
-        self.assertEqual(ax.get_xlabel(), 'Index')
-        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
+        # Testing with only categorical columns
+        df = pd.DataFrame({'cat1': ['u', 'v', 'w'], 'cat2': ['x', 'y', 'z']})
+        dct = {'u': 'a', 'v': 'b', 'w': 'c', 'x': 'd', 'y': 'e', 'z': 'f'}
+        result = task_func(df, dct)
+        # Assertions
+        self.assertEqual(result.shape, df.shape)
+        self.assertIn(result['cat1'].dtype, [np.float64])
+        self.assertIn(result['cat2'].dtype, [np.float64])
     def test_case_4(self):
-        cumsum, ax = task_func([1, 2, 3, 4, 5])
-        self.assertListEqual(list(cumsum), [1, 3, 6, 10, 15])
-        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
-        self.assertEqual(ax.get_xlabel(), 'Index')
-        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
+        # Testing with an empty DataFrame
+        df = pd.DataFrame({})
+        dct = {}
+        result = task_func(df, dct)
+        # Assertions
+        self.assertEqual(result.empty, True)
     def test_case_5(self):
-        cumsum, ax = task_func([5])
-        self.assertListEqual(list(cumsum), [5])
-        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
-        self.assertEqual(ax.get_xlabel(), 'Index')
-        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
+        # Testing with complex DataFrame and no changes through dictionary
+        df = pd.DataFrame({'num': [100, 200, 300], 'cat': ['alpha', 'beta', 'gamma']})
+        dct = {'delta': 400}
+        result = task_func(df, dct)
+        # Assertions
+        self.assertEqual(result.shape, df.shape)
+        self.assertAlmostEqual(result['num'].std(), 1, places=5)
+        self.assertIn(result['cat'].dtype, [np.float64])
+    
+    def test_case_6(self):
+        with self.assertRaises(ValueError):
+            task_func("non_df", {})

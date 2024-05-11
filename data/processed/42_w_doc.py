@@ -1,85 +1,94 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.stats import skew
+from sklearn.decomposition import PCA
 
 
-def task_func(data_matrix):
+def task_func(data_matrix, n_components=2):
     """
-    Calculate the skew of each row in a 2D data matrix and plot the distribution.
+    Apply PCA with n_components components to a 2D data matrix, calculate the mean value of each component, and then return the cumulative explained variance of the components in a plot.
+    - The function returns a dataframe with columns 'Component 1', 'Component 2', ... etc.
+    - Each row of the dataframe correspond to a row of the original matrix mapped in the PCA space.
+    - The dataframe should also include a column 'Mean' which is the average value of each component value per row
+    - Create a plot of the cumulative explained variance.
+        - the xlabel should be 'Number of Components' and the ylabel 'Cumulative Explained Variance'
 
     Parameters:
-    - data_matrix (numpy.array): The 2D data matrix.
+    data_matrix (numpy.array): The 2D data matrix.
 
     Returns:
-    pandas.DataFrame: A DataFrame containing the skewness of each row. The skweness is stored in a new column which name is 'Skewness'.
-    matplotlib.axes.Axes: The Axes object of the plotted distribution.
+    tuple:
+        - pandas.DataFrame: A DataFrame containing the PCA transformed data and the mean of each component.
+        - matplotlib.axes._axes.Axes: A plot showing the cumulative explained variance of the components.
 
     Requirements:
     - pandas
     - matplotlib.pyplot
-    - scipy.stats.skew
+    - sklearn.decomposition
 
     Example:
     >>> import numpy as np
     >>> data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
     >>> df, ax = task_func(data)
-    >>> print(df)
-       Skewness
-    0  0.122440
-    1  0.403407
+    >>> print(df["Mean"])
+    0    2.850439
+    1   -2.850439
+    Name: Mean, dtype: float64
     """
-    skewness = skew(data_matrix, axis=1)
-    df = pd.DataFrame(skewness, columns=["Skewness"])
-    plt.figure(figsize=(10, 5))
-    df["Skewness"].plot(kind="hist", title="Distribution of Skewness")
-    return df, plt.gca()
+    pca = PCA(n_components=n_components)
+    transformed_data = pca.fit_transform(data_matrix)
+    df = pd.DataFrame(
+        transformed_data,
+        columns=[f"Component {i+1}" for i in range(transformed_data.shape[1])],
+    )
+    df["Mean"] = df.mean(axis=1)
+    fig, ax = plt.subplots()
+    ax.plot(np.cumsum(pca.explained_variance_ratio_))
+    ax.set_xlabel("Number of Components")
+    ax.set_ylabel("Cumulative Explained Variance")
+    return df, ax
 
 import unittest
-import os
 import numpy as np
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
-    def setUp(self):
-        self.test_dir = "data/task_func"
-        os.makedirs(self.test_dir, exist_ok=True)
     def test_case_1(self):
-        data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        data = np.array([[6, 8, 1, 3, 4], [-1, 0, 3, 5, 1]])
         df, ax = task_func(data)
-        self.verify_output(df, ax, data.shape[0], data)
+        self.assertEqual(df.shape, (2, 3))
+        self.assertTrue("Mean" in df.columns)
+        self.assertEqual(ax.get_xlabel(), "Number of Components")
+        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
     def test_case_2(self):
-        data = np.array([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
+        data = np.array([[1, 2], [3, 4], [5, 6]])
         df, ax = task_func(data)
-        self.verify_output(df, ax, data.shape[0], data)
+        self.assertEqual(df.shape, (3, 3))
+        self.assertTrue("Mean" in df.columns)
+        self.assertEqual(ax.get_xlabel(), "Number of Components")
+        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
+    # Additional test cases
     def test_case_3(self):
-        data = np.array([[3, 5, 7, 1000], [200, 5, 7, 1], [1, -9, 14, 700]])
+        data = np.array([[1, 2], [3, 4], [5, 6]])
         df, ax = task_func(data)
-        self.verify_output(df, ax, data.shape[0], data)
+        expected_columns = min(data.shape) + 1
+        self.assertEqual(df.shape[1], expected_columns)
+        self.assertTrue("Mean" in df.columns)
+        self.assertEqual(ax.get_xlabel(), "Number of Components")
+        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
     def test_case_4(self):
-        data = np.array(
-            [
-                [1, 2, 3, 4, 5, 4, 3, 2, 1],
-            ]
-        )
+        data = np.array([[1, 2], [3, 4], [5, 6]])
         df, ax = task_func(data)
-        self.verify_output(df, ax, data.shape[0], data)
+        expected_columns = min(data.shape) + 1
+        self.assertEqual(df.shape[1], expected_columns)
+        self.assertTrue("Mean" in df.columns)
+        self.assertEqual(ax.get_xlabel(), "Number of Components")
+        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")
     def test_case_5(self):
-        data = np.array([[1, 1], [1, 1], [1, 1]])
+        data = np.array([[1, 2], [3, 4], [5, 6]])
         df, ax = task_func(data)
-        # Check if DataFrame is returned with correct values
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(df.shape, (3, 1))
-        self.assertIn("Skewness", df.columns)
-        # Check if Axes object is returned for the plot
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_title(), "Distribution of Skewness")
-    def verify_output(self, df, ax, expected_rows, data):
-        # Check if DataFrame is returned with correct values
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(df.shape, (expected_rows, 1))
-        self.assertIn("Skewness", df.columns)
-        # Check if Axes object is returned for the plot
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_title(), "Distribution of Skewness")
-        # Check skewness values
-        skewness = skew(data, axis=1)
-        self.assertListEqual(df["Skewness"].tolist(), list(skewness))
+        expected_columns = min(data.shape) + 1
+        self.assertEqual(df.shape[1], expected_columns)
+        self.assertTrue("Mean" in df.columns)
+        self.assertTrue("Component 1" in df.columns)
+        self.assertTrue("Component 2" in df.columns)
+        self.assertEqual(ax.get_xlabel(), "Number of Components")
+        self.assertEqual(ax.get_ylabel(), "Cumulative Explained Variance")

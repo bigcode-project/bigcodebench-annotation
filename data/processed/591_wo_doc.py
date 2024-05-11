@@ -1,113 +1,100 @@
-import urllib.request
-from pyquery import PyQuery as pq
 from datetime import datetime
+from random import randint
+import matplotlib.pyplot as plt
 import pandas as pd
 
-def task_func(url):
-    """
-    Extracts the text and href attributes of all anchor tags from a given URL's HTML content, 
-    and returns this data in a pandas DataFrame along with the time of data extraction.
 
+TEMP_CATEGORIES = ['Cold', 'Normal', 'Hot']
+FILE_PATH = 'custom_data.csv'
+
+
+def task_func(hours, file_path=FILE_PATH):
+    """
+    Generate temperature data for the specified number of hours, save it in a CSV file, 
+    and plot the data using matplotlib.
+    
     Parameters:
-    url (str): The URL from which to fetch the HTML content.
-
+    hours (int): The number of hours for which temperature data is to be generated.
+    file_path (str, optional): Path where the CSV file will be saved. Defaults to 'temp_data.csv'.
+    
     Returns:
-    pandas.DataFrame: A DataFrame with columns 'text', 'href', and 'fetch_time'. Each row 
-                      corresponds to an anchor tag in the HTML, with 'text' and 'href' containing 
-                      the text and the hyperlink reference of the anchor tag, respectively. 
-                      'fetch_time' contains the timestamp of when the data was fetched in the format
-                        'YYYY-MM-DD HH:MM:SS'.
-
-    Raises:
-    ValueError: If the provided URL is invalid or empty.
-    URLError: If there is an issue with network connectivity or the server.
-
+    tuple: 
+        - str: The path of the generated CSV file.
+        - Axes: The plot object for further manipulation or saving.
+    
     Requirements:
-    - urllib.request
-    - pyquery
-    - datime
     - pandas
-    - urllib.error
-
+    - datetime
+    - random
+    - matplotlib.pyplot
+    
+    Data Structure:
+    The function uses a dictionary to manage the generated temperature data with keys: 'Time', 'Temperature', and 'Category'.
+    
     Example:
-    >>> df = task_func('https://en.wikibooks.org/wiki/Main_Page')
-
-    Note:
-    The function requires internet connectivity to fetch HTML content.
+    >>> file_path, ax = task_func(24)
+    >>> isinstance(file_path, str)
+    True
+    >>> 'custom_data.csv' in file_path
+    True
     """
-    if not url:
-        raise ValueError("URL must not be empty.")
-    try:
-        with urllib.request.urlopen(url) as res:
-            html = res.read().decode()
-    except urllib.error.URLError as e:
-        raise urllib.error.URLError(f"Error fetching URL {url}: {e}")
-    d = pq(html)
-    anchors = [(a.text, a.get('href')) for a in d('a')]
-    fetch_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    df = pd.DataFrame(anchors, columns=['text', 'href'])
-    df['fetch_time'] = fetch_time
-    return df
+    data = {'Time': [], 'Temperature': [], 'Category': []}
+    for i in range(hours):
+        temp = randint(-10, 40)  # random temperature between -10 and 40
+        data['Time'].append(datetime.now().strftime('%H:%M:%S.%f'))
+        data['Temperature'].append(temp)
+        if temp < 0:
+            data['Category'].append(TEMP_CATEGORIES[0])
+        elif temp > 25:
+            data['Category'].append(TEMP_CATEGORIES[2])
+        else:
+            data['Category'].append(TEMP_CATEGORIES[1])
+    df = pd.DataFrame(data)
+    df.to_csv(file_path, index=False)
+    ax = df.plot(x = 'Time', y = 'Temperature', kind = 'line', title="Temperature Data Over Time")
+    plt.show()
+    return file_path, ax
 
 import unittest
-from unittest.mock import patch
-import urllib.error
+import os
 class TestCases(unittest.TestCase):
-    def test_valid_url(self):
-        """ Test with a valid URL. """
-        url = 'https://en.wikibooks.org/wiki/Main_Page'
-        df = task_func(url)
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertTrue(all(x in df.columns for x in ['text', 'href', 'fetch_time']))
-    def test_invalid_url(self):
-        """ Test with an invalid URL. """
-        with self.assertRaises(urllib.error.URLError):
-            task_func('https://www.invalid_example.org')
-    @patch('urllib.request.urlopen', side_effect=urllib.error.URLError('Test Error'))
-    def test_network_error(self, mock_urlopen):
-        """ Simulate a network error. """
-        with self.assertRaises(urllib.error.URLError):
-            task_func('https://en.wikibooks.org/wiki/Main_Page')
-    def test_empty_url(self):
-        """ Test with an empty URL. """
-        with self.assertRaises(ValueError):
-            task_func('')
-    
-    def fetch_and_parse_url(self, url):
-        """Dynamically fetch and parse content from URL, mimicking the task_func function."""
-        with urllib.request.urlopen(url) as response:
-            html = response.read().decode()
-        d = pq(html)
-        
-        anchors = [(a.text, a.get('href')) for a in d('a')]
-        df = pd.DataFrame(anchors, columns=['text', 'href'])
-        fetch_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        df['fetch_time'] = fetch_time
-        return df
-    def test_dynamic_comparison(self):
-        """Compare task_func function output with dynamically fetched content."""
-        test_url = 'https://en.wikibooks.org/wiki/Main_Page'
-        expected_df = self.fetch_and_parse_url(test_url)
-        actual_df = task_func(test_url)
-                
-        # Comparing 'text' and 'href' columns
-        pd.testing.assert_frame_equal(actual_df.drop(columns=['fetch_time']), expected_df.drop(columns=['fetch_time']), check_like=True)
-        
-        # Optionally, check that fetch times are close enough (e.g., within a few seconds of each other)
-        actual_times = pd.to_datetime(actual_df['fetch_time'])
-        expected_times = pd.to_datetime(expected_df['fetch_time'])
-        time_difference = (actual_times - expected_times).abs()
-        max_allowed_difference = pd.Timedelta(seconds=10)  # Allow up to 5 seconds difference
-        self.assertTrue(time_difference.lt(max_allowed_difference).all(), "Fetch times differ too much")
-        
-    def test_fetch_time_format(self):
-        """Verify that the 'fetch_time' column is in the correct format."""
-        test_url = 'https://en.wikibooks.org/wiki/Main_Page'
-        df = task_func(test_url)
-        fetch_time_format = '%Y-%m-%d %H:%M:%S'
-        try:
-            # Verify each timestamp in 'fetch_time' column matches the expected format.
-            valid_format = all(datetime.strptime(time, fetch_time_format) for time in df['fetch_time'])
-            self.assertTrue(valid_format, "All fetch_time values should match the format 'YYYY-MM-DD HH:MM:SS'.")
-        except ValueError:
-            self.fail("The fetch_time column contains values not matching the format 'YYYY-MM-DD HH:MM:SS'.")
+    def tearDown(self):
+        """Clean up any files created during the tests."""
+        # Check and remove the expected file if it exists
+        if os.path.exists(FILE_PATH):
+            os.remove(FILE_PATH)
+    def test_case_1(self):
+        # Testing with 1 hour
+        file_path, ax = task_func(1)
+        self.assertEqual(file_path, FILE_PATH)
+        self.assertTrue(os.path.exists(file_path))
+        df = pd.read_csv(file_path)
+        self.assertEqual(len(df), 1)
+    def test_case_2(self):
+        # Testing with 24 hours
+        file_path, ax = task_func(24)
+        self.assertEqual(file_path, FILE_PATH)
+        self.assertTrue(os.path.exists(file_path))
+        df = pd.read_csv(file_path)
+        self.assertEqual(len(df), 24)
+    def test_case_3(self):
+        # Testing with 120 hours
+        file_path, ax = task_func(120)
+        self.assertEqual(file_path, FILE_PATH)
+        self.assertTrue(os.path.exists(file_path))
+        df = pd.read_csv(file_path)
+        self.assertEqual(len(df), 120)
+    def test_case_4(self):
+        # Testing with a custom file path
+        file_path, ax = task_func(24, FILE_PATH)
+        self.assertEqual(file_path, FILE_PATH)
+        self.assertTrue(os.path.exists(FILE_PATH))
+        df = pd.read_csv(file_path)
+        self.assertEqual(len(df), 24)
+    def test_case_5(self):
+        # Testing the categories in the generated CSV file
+        file_path, ax = task_func(24, FILE_PATH)
+        df = pd.read_csv(file_path)
+        categories = df['Category'].unique().tolist()
+        for cat in categories:
+            self.assertIn(cat, ['Cold', 'Normal', 'Hot'])

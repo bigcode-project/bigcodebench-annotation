@@ -11,7 +11,7 @@ def f_948(script_path: str, timeout: int = 60) -> str:
     - timeout (int): The maximum allowed time (in seconds) for the script execution. Default is 60 seconds.
 
     Returns:
-    - str: A message indicating if the code was terminated due to timeout or executed successfully.
+    - str: A message indicating if the code was terminated due to timeout or executed successfully. The message is either "Script executed successfully." or "Terminating process due to timeout."
 
     Requirements:
     - subprocess

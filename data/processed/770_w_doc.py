@@ -1,58 +1,84 @@
-from collections import Counter
-import itertools
-import operator
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 
-def task_func(list_of_menuitems):
+
+def task_func(num_samples=500, noise_strength=1, random_seed=None, test_size=0.2):
     """
-    Faced with a nested list of menu items, flatten the list and return the most common menu item.
+    Generate a dataset with a single feature and a target variable. The target
+    is computed from the feature using a linear relation.
+    In addition some gaussian noise (random samples from normal distributioin), scaled by
+    noise_strength, is added to the target. The dataset is split into training
+    and test sets. Then a linear regression model is adjusted to the training
+    set and the R-squared score is calculated on the test set.
 
     Parameters:
-    - list_of_menuitems (list): A nested list of menu items.
+    - num_samples (int): The number of samples to generate for the dataset.
+                   Defaults to 500
+    - noise_strength (float): The strength (magnitude) of the noise that is
+                              added to the dataset. Defaults to 1
+    - random_seed (int): The seed used in generating the dataset, in performing
+                   the train test split and in generating the random noise.
+                   Defaults to None
+    - test_size (float): The fraction of the test split. Defaults to 0.2
 
     Returns:
-    - str: The most common menu item.
+    float: The R-squared score of the fitted model on the test set.
+    LinearRegression: The trained linear regression model.
+
+    Raises:
+    - ValueError: If test set size is smaller than 2.
 
     Requirements:
-    - collections
-    - itertools
-    - operator
+    - numpy
+    - pandas
+    - sklearn.model_selection.train_test_split
+    - sklearn.linear_model.LinearRegression
 
     Example:
-    >>> task_func([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
-    'Pizza'
+    >>> task_func(num_samples=10, noise_strength=23.5, random_seed=24, test_size=0.3)
+    (-0.4892453918038726, LinearRegression())
+    >>> task_func(noise_strength=0.1)
+    (0.9658328575162494, LinearRegression())
     """
-    flat_list = list(itertools.chain(*list_of_menuitems))
-    counter = Counter(flat_list)
-    return max(counter.items(), key=operator.itemgetter(1))[0]
+    if num_samples * test_size < 2:
+        raise ValueError("Test set should contain at least 2 samples. num_samples * testsize >=2")
+    if random_seed is not None:
+        np.random.seed(random_seed)
+    X = np.random.rand(num_samples, 1)
+    y = 2*X.squeeze() + 1 + np.random.randn(num_samples) * noise_strength
+    X_train, X_test, y_train, y_test = train_test_split(
+                                            X, y,
+                                            test_size=test_size,
+                                            random_state=random_seed
+                                            )
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+    r_squared = model.score(X_test, y_test)
+    return r_squared, model
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Description: Testing with a list where 'Pizza' appears more frequently than other items.
-        input_data = [['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']]
-        output = task_func(input_data)
-        self.assertEqual(output, 'Pizza')
-    
+        'rng reproducability'
+        r_squared1, _ = task_func(random_seed=42)
+        r_squared2, _ = task_func(random_seed=42)
+        self.assertEqual(r_squared1, r_squared2)
     def test_case_2(self):
-        # Description: Testing with a list where 'Burger' appears more frequently than other items.
-        input_data = [['Burger', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']]
-        output = task_func(input_data)
-        self.assertEqual(output, 'Burger')
-    
+        'default params'
+        r_squared, model = task_func(num_samples=1000)
+        self.assertTrue(0 <= r_squared <= 1)
+        self.assertTrue(isinstance(model, LinearRegression))
+        
     def test_case_3(self):
-        # Description: Testing with a list where 'Pasta' appears more frequently than other items.
-        input_data = [['Pasta', 'Pasta'], ['Pasta', 'Coke'], ['Pizza', 'Coke']]
-        output = task_func(input_data)
-        self.assertEqual(output, 'Pasta')
-    
+        'noise strength'
+        r_squared, model = task_func(noise_strength=0, random_seed=24)
+        self.assertAlmostEqual(r_squared, 1)
+        self.assertTrue(isinstance(model, LinearRegression))
     def test_case_4(self):
-        # Description: Testing with a list where 'Sushi' appears more frequently than other items.
-        input_data = [['Sushi'], ['Sushi', 'Coke'], ['Pizza', 'Coke']]
-        output = task_func(input_data)
-        self.assertEqual(output, 'Sushi')
-    
+        'test set too small'
+        self.assertRaises(Exception, task_func, {'num_samples': 10, 'test_size': 0.1})
     def test_case_5(self):
-        # Description: Testing with a list where 'Salad' appears more frequently than other items.
-        input_data = [['Salad'], ['Salad', 'Coke'], ['Pizza', 'Coke'], ['Salad', 'Burger']]
-        output = task_func(input_data)
-        self.assertEqual(output, 'Salad')
+        r_squared, model = task_func(num_samples=1000, noise_strength=1000, random_seed=24, test_size=0.3)
+        self.assertTrue(r_squared < 0.2)
+        self.assertTrue(isinstance(model, LinearRegression))

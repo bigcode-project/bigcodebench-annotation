@@ -1,88 +1,74 @@
+import re
 import pandas as pd
-import regex as re
-from sklearn.feature_extraction.text import CountVectorizer
+
+STOPWORDS = ["Those", "are", "the", "words", "to", "ignore"]
 
 
 def task_func(text):
     """
-    Analyze a text by creating a document term matrix with CountVectorizer. The text contains several sentences, each separated by a period.
-    Ignore empty sentences.
+    Given a text as input, the function should split it into multiple sentences and build a dictionary where each key is associated with a sentence and the corresponding value is the number of words in the sentence. The function returns a pandas Series built from the dictionary.
+    - The keys of the dictionary (which correspond to the Index of the pandas Series) should be named "Sentence 1", "Sentence 2" etc.
+    - When counting the words in a sentence, do not consider those included in the constant STOPWORDS.
+    - Do not consider empty sentences.
 
     Parameters:
     text (str): The text to analyze.
 
     Returns:
-    DataFrame: A pandas DataFrame with the document-term matrix. Its column names should be adapted from the vectorizer feature names.
+    pandas.core.series.Series: A pandas Series each sentence and its number of words that are not in STOPWORDS.
 
     Requirements:
     - pandas
     - regex
-    - sklearn.feature_extraction.text.CountVectorizer
 
     Example:
     >>> text = "This is a sample sentence. This sentence contains sample words."
-    >>> dtm = task_func(text)
-    >>> print(dtm)
-       contains  is  sample  sentence  this  words
-    0         0   1       1         1     1      0
-    1         1   0       1         1     1      1
+    >>> df = task_func("I am good at programming. I learned it in college.")
+    >>> print(df)
+    Sentence 1    5
+    Sentence 2    5
+    dtype: int64
     """
     sentences = re.split(r"\.\s*", text)
-    sentences = [sentence for sentence in sentences if len(sentence.strip()) != 0]
-    vectorizer = CountVectorizer()
-    dtm = vectorizer.fit_transform(sentences)
-    df = pd.DataFrame(dtm.toarray(), columns=vectorizer.get_feature_names_out())
-    return df
+    sentence_counts = {}
+    for i, sentence in enumerate(sentences):
+        if sentence.strip() == "":
+            continue
+        words = re.split(r"\s+", sentence.lower())
+        words = [word for word in words if word not in STOPWORDS]
+        sentence_counts[f"Sentence {i+1}"] = len(words)
+    sentence_counts = pd.Series(sentence_counts)
+    return sentence_counts
 
 import unittest
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def test_case_1(self):
-        # Test with a basic input
         text = "This is a sample sentence. This sentence contains sample words."
-        dtm = task_func(text)
-        # Assertions
-        self.assertEqual(
-            dtm.shape, (2, 6)
-        )  # Expected 2 rows (sentences) and 6 unique words
-        self.assertEqual(dtm["sample"].tolist(), [1, 1])
-        self.assertEqual(dtm["this"].tolist(), [1, 1])
+        expected_output = pd.Series({"Sentence 1": 5, "Sentence 2": 4})
+        result = task_func(text)
+        pd.testing.assert_series_equal(result, expected_output)
     def test_case_2(self):
-        # Test with a single sentence (with a trailing period)
-        text = "A single sentence."
-        dtm = task_func(text)
-        # Assertions
-        self.assertEqual(
-            dtm.shape, (1, 2)
-        )  # Expected 1 rows (sentences) and 2 unique words
-        self.assertEqual(dtm["single"].tolist(), [1])
+        text = "Hello. My name is Marc. I'm here to help. How can I assist you today?"
+        expected_output = pd.Series(
+            {"Sentence 1": 1, "Sentence 2": 4, "Sentence 3": 3, "Sentence 4": 6}
+        )
+        result = task_func(text)
+        pd.testing.assert_series_equal(result, expected_output)
     def test_case_3(self):
-        # Test with no periods (still should consider it as one sentence)
-        text = "No periods in this text"
-        dtm = task_func(text)
-        # Assertions
-        self.assertEqual(
-            dtm.shape, (1, 5)
-        )  # Expected 1 row (sentence) and 5 unique words
-        self.assertEqual(dtm["text"].tolist(), [1])
+        text = "This is a test. Stopwords are words which do not contain important meaning."
+        expected_output = pd.Series({"Sentence 1": 4, "Sentence 2": 7})
+        result = task_func(text)
+        pd.testing.assert_series_equal(result, expected_output)
     def test_case_4(self):
-        # Test with a single sentence (with same word multiple times)
-        text = ("test test test test test test test test test test test " * 3).strip()
-        dtm = task_func(text)
-        # Assertions
-        self.assertEqual(
-            dtm.shape, (1, 1)
-        )  # Expected 1 row (sentence) and 1 unique words
-        self.assertEqual(dtm["test"].tolist(), [33])
+        text = "Hello! How are you? I'm fine, thanks."
+        expected_output = pd.Series(
+            {"Sentence 1": 6}
+        )  # Only the last sentence is split by a period
+        result = task_func(text)
+        pd.testing.assert_series_equal(result, expected_output)
     def test_case_5(self):
-        # Test with no periods (still should consider it as one sentence)
-        text = "This is the first sentence. This is the second sentence. This is the third sentence. This is the fourth sentence. This is the fith and last sentence."
-        dtm = task_func(text)
-        # Assertions
-        self.assertEqual(
-            dtm.shape, (5, 11)
-        )  # Expected 5 rows (sentence) and 11 unique words
-        self.assertEqual(dtm["this"].tolist(), [1, 1, 1, 1, 1])
-        self.assertEqual(dtm["is"].tolist(), [1, 1, 1, 1, 1])
-        self.assertEqual(dtm["the"].tolist(), [1, 1, 1, 1, 1])
-        self.assertEqual(dtm["sentence"].tolist(), [1, 1, 1, 1, 1])
+        text = ""
+        expected_output = pd.Series()
+        result = task_func(text)
+        pd.testing.assert_series_equal(result, expected_output)

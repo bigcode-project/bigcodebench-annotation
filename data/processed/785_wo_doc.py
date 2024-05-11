@@ -1,136 +1,95 @@
-import pandas as pd
-import random
-import csv
+import subprocess
+import os
+import glob
 
-def task_func(n, 
-           categories=['Sports', 'Technology', 'Business', 'Politics', 'Entertainment'],
-           news_sites=['New York Times', 'USA Today', 'Apple News', 'CNN', 'BBC'],
-           likert_scale=['Strongly Disagree', 'Disagree', 'Neither Agree nor Disagree', 'Agree', 'Strongly Agree'],
-           file_path='news_survey_data.csv',
-           random_seed=None):
+# Constants
+ARCHIVE_DIR = '/tmp/archive'
+
+def task_func(pattern):
     """
-    Generate a DataFrame with random survey data based on given categories, 
-    news sites, and Likert scale responses. The function writes the generated
-    data to a CSV file and then reads it into a Pandas DataFrame.
+    Archive all files that match a particular pattern and then delete the original files.
     
     Parameters:
-    n (int): The number of survey responses to generate.
-    categories (list, optional): Categories of news to choose from. Defaults to ['Sports', 'Technology', 'Business', 'Politics', 'Entertainment'].
-    news_sites (list, optional): News sites to choose from. Defaults to ['New York Times', 'USA Today', 'Apple News', 'CNN', 'BBC'].
-    likert_scale (list, optional): Likert scale responses to choose from. Defaults to ['Strongly Disagree', 'Disagree', 'Neither Agree nor Disagree', 'Agree', 'Strongly Agree'].
-    file_path (str, optional): Path to save the generated CSV file. Defaults to 'news_survey_data.csv'.
-    random_seed (int): Seed for rng. Used for generating datapoints. Defaults to None.
-
+    - pattern (str): The pattern to match files.
+    
     Returns:
-    DataFrame: A pandas DataFrame with columns ['Site', 'Category', 'Response', 'Value']. 
-               The 'Value' column assigns a numerical value to the Likert scale response (starting from 1).
+    - archive_file (str): The archive file path.
     
     Requirements:
-    - pandas
-    - random
-    - csv
+    - subprocess
+    - os
+    - glob
     
     Example:
-    >>> df = task_func(5, random_seed=1)
-    >>> print(df)
-                 Site       Category           Response  Value
-    0       USA Today  Entertainment  Strongly Disagree      1
-    1      Apple News         Sports              Agree      4
-    2             CNN       Politics              Agree      4
-    3       USA Today         Sports              Agree      4
-    4  New York Times       Politics              Agree      4
+    >>> task_func('*.txt')
     
-    >>> df = task_func(8, ['test', 'fun'], likert_scale=['true', 'false'], news_sites=['cat', 'dog'], random_seed=12)
-    >>> print(df)
-      Site Category  Response  Value
-    0  dog      fun     False      2
-    1  cat      fun      True      1
-    2  dog      fun     False      2
-    3  dog     test      True      1
-    4  cat      fun     False      2
-    5  cat      fun      True      1
-    6  cat     test      True      1
-    7  dog      fun      True      1
+    Note: This function will return the archive file path.
     """
-    survey_data = []
-    random.seed(random_seed)
-    for _ in range(n):
-        site = random.choice(news_sites)
-        category = random.choice(categories)
-        response = random.choice(likert_scale)
-        value = likert_scale.index(response) + 1  # Assign a numerical value to the response
-        survey_data.append({'Site': site, 'Category': category, 'Response': response, 'Value': value})
-    with open(file_path, 'w', newline='') as csvfile:
-        fieldnames = ['Site', 'Category', 'Response', 'Value']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(survey_data)
-    df = pd.read_csv(file_path)
-    return df
+    if not os.path.exists(ARCHIVE_DIR):
+        os.makedirs(ARCHIVE_DIR)
+    file_list = glob.glob(pattern)
+    if not file_list:
+        return "No files found matching the pattern."
+    archive_file_base = os.path.join(ARCHIVE_DIR, 'archive')
+    archive_file = archive_file_base + '.tar.gz'
+    counter = 1
+    while os.path.exists(archive_file):
+        archive_file = archive_file_base + f"_{counter}.tar.gz"
+        counter += 1
+    subprocess.run(['tar', '-czf', archive_file] + file_list)
+    for file in file_list:
+        os.remove(file)
+    return archive_file
 
 import unittest
+import tarfile
 import os
+import glob
+import unittest
+import shutil
+from unittest.mock import patch, MagicMock
+# Constants for test
+TEST_FILES_DIR = './test_files'
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Setting up a temporary directory to save CSV files during tests
-        self.temp_dir = "temp_test_dir"
-        os.makedirs(self.temp_dir, exist_ok=True)
-        
-    def test_rng(self):
-        'test rng reproducability'
-        df1 = task_func(300, file_path=os.path.join(self.temp_dir, "test1.csv"), random_seed=42)
-        df1_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test1.csv"))
-        df2 = task_func(300, file_path=os.path.join(self.temp_dir, "test2.csv"), random_seed=42)
-        df2_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test2.csv"))
-        self.assertTrue(pd.testing.assert_frame_equal(df1, df2) is None)
-        self.assertTrue(pd.testing.assert_frame_equal(df1_from_csv, df1) is None)
-        self.assertTrue(pd.testing.assert_frame_equal(df2_from_csv, df2) is None)
-    def test_case_1(self):
-        # Test with default values for categories, news_sites, and likert_scale
-        n = 100
-        df = task_func(n, file_path=os.path.join(self.temp_dir, "test1.csv"), random_seed=1)
-        df_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test1.csv"))
-        self.assertTrue(pd.testing.assert_frame_equal(df_from_csv, df) is None)
-        self.assertEqual(len(df), n)
-        self.assertTrue(set(df['Site'].unique()).issubset(set(['New York Times', 'USA Today', 'Apple News', 'CNN', 'BBC'])))
-        self.assertTrue(set(df['Category'].unique()).issubset(set(['Sports', 'Technology', 'Business', 'Politics', 'Entertainment'])))
-        self.assertTrue(set(df['Response'].unique()).issubset(set(['Strongly Disagree', 'Disagree', 'Neither Agree nor Disagree', 'Agree', 'Strongly Agree'])))
-        self.assertTrue(set(df['Value'].unique()).issubset(set(range(1, 6))))
-    def test_case_2(self):
-        # Test with custom values for categories and default values for others
-        n = 500
-        categories = ['Science', 'Math']
-        df = task_func(n, categories=categories, file_path=os.path.join(self.temp_dir, "test2.csv"), random_seed=12)
-        df_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test2.csv"))
-        self.assertTrue(pd.testing.assert_frame_equal(df_from_csv, df) is None)
-        self.assertEqual(len(df), n)
-        self.assertTrue(set(df['Category'].unique()).issubset(set(categories)))
-    def test_case_3(self):
-        # Test with custom values for news_sites and default values for others
-        n = 775
-        news_sites = ['ABC', 'NBC']
-        df = task_func(n, news_sites=news_sites, file_path=os.path.join(self.temp_dir, "test3.csv"), random_seed=11)
-        df_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test3.csv"))
-        self.assertTrue(pd.testing.assert_frame_equal(df_from_csv, df) is None)
-        self.assertEqual(len(df), n)
-        self.assertTrue(set(df['Site'].unique()).issubset(set(news_sites)))
-    def test_case_4(self):
-        # Test with custom values for likert_scale and default values for others
-        n = 20
-        likert_scale = ['Yes', 'No']
-        df = task_func(n, likert_scale=likert_scale, file_path=os.path.join(self.temp_dir, "test4.csv"), random_seed=18)
-        df_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test4.csv"))
-        self.assertTrue(pd.testing.assert_frame_equal(df_from_csv, df) is None)
-        self.assertEqual(len(df), n)
-        self.assertTrue(set(df['Response'].unique()).issubset(set(likert_scale)))
-        self.assertTrue(set(df['Value'].unique()).issubset(set(range(1, 3))))
-    def test_case_5(self):
-        # Test for empty df
-        n = 0
-        df = task_func(n, file_path=os.path.join(self.temp_dir, "test5.csv"))
-        self.assertEqual(len(df), n)
+        # Create a directory for test files if it doesn't exist
+        os.makedirs(TEST_FILES_DIR, exist_ok=True)
+        # Create some sample files
+        self.sample_files = ['test1.txt', 'test2.txt', 'image1.jpg', 'image2.jpg']
+        for file in self.sample_files:
+            with open(os.path.join(TEST_FILES_DIR, file), 'w') as f:
+                f.write("Sample content for " + file)
     def tearDown(self):
-        # Cleanup temporary directory after tests
-        for file in os.listdir(self.temp_dir):
-            os.remove(os.path.join(self.temp_dir, file))
-        os.rmdir(self.temp_dir)
+        # Remove the test directory after tests
+        shutil.rmtree(TEST_FILES_DIR)
+        shutil.rmtree(ARCHIVE_DIR)
+    def test_archive_txt_files(self):
+        # Archive txt files and verify
+        archive_path = task_func(os.path.join(TEST_FILES_DIR, '*.txt'))
+        self.assertTrue(os.path.isfile(archive_path))
+        # Ensure original files are deleted
+        for filename in glob.glob(os.path.join(TEST_FILES_DIR, '*.txt')):
+            self.assertFalse(os.path.exists(filename))
+    def test_archive_image_files(self):
+        # Archive image files and verify
+        archive_path = task_func(os.path.join(TEST_FILES_DIR, '*.jpg'))
+        self.assertTrue(os.path.isfile(archive_path))
+        # Check original files are deleted
+        for filename in glob.glob(os.path.join(TEST_FILES_DIR, '*.jpg')):
+            self.assertFalse(os.path.exists(filename))
+    def test_no_matching_files(self):
+        # Test with no matching files
+        result = task_func(os.path.join(TEST_FILES_DIR, '*.pdf'))
+        self.assertEqual(result, "No files found matching the pattern.")
+    def test_multiple_archiving_unique_naming(self):
+        # Test that multiple archives are named uniquely
+        task_func(os.path.join(TEST_FILES_DIR, '*.txt'))
+        archive_path1 = task_func(os.path.join(TEST_FILES_DIR, '*.txt'))
+        archive_path2 = task_func(os.path.join(TEST_FILES_DIR, '*.txt'))
+        self.assertEqual(archive_path1, archive_path2)
+    def test_archiving_in_nonexistent_directory(self):
+        # Test archiving when the archive directory does not initially exist
+        if os.path.exists(ARCHIVE_DIR):
+            shutil.rmtree(ARCHIVE_DIR)
+        archive_path = task_func(os.path.join(ARCHIVE_DIR, '*.txt'))
+        self.assertFalse(os.path.isfile(archive_path))

@@ -1,72 +1,136 @@
-import os
-import shutil
+import pandas as pd
+import random
+import csv
 
-def task_func(src_dir, dest_dir, extension):
+def task_func(n, 
+           categories=['Sports', 'Technology', 'Business', 'Politics', 'Entertainment'],
+           news_sites=['New York Times', 'USA Today', 'Apple News', 'CNN', 'BBC'],
+           likert_scale=['Strongly Disagree', 'Disagree', 'Neither Agree nor Disagree', 'Agree', 'Strongly Agree'],
+           file_path='news_survey_data.csv',
+           random_seed=None):
     """
-    Move all files with a particular extension from one directory to another.
-
+    Generate a DataFrame with random survey data based on given categories, 
+    news sites, and Likert scale responses. The function writes the generated
+    data to a CSV file and then reads it into a Pandas DataFrame.
+    
     Parameters:
-    - src_dir (str): The source directory.
-    - dest_dir (str): The destination directory.
-    - extension (str): The file extension.
+    n (int): The number of survey responses to generate.
+    categories (list, optional): Categories of news to choose from. Defaults to ['Sports', 'Technology', 'Business', 'Politics', 'Entertainment'].
+    news_sites (list, optional): News sites to choose from. Defaults to ['New York Times', 'USA Today', 'Apple News', 'CNN', 'BBC'].
+    likert_scale (list, optional): Likert scale responses to choose from. Defaults to ['Strongly Disagree', 'Disagree', 'Neither Agree nor Disagree', 'Agree', 'Strongly Agree'].
+    file_path (str, optional): Path to save the generated CSV file. Defaults to 'news_survey_data.csv'.
+    random_seed (int): Seed for rng. Used for generating datapoints. Defaults to None.
 
     Returns:
-    - files_moved (int): The number of files moved.
-
+    DataFrame: A pandas DataFrame with columns ['Site', 'Category', 'Response', 'Value']. 
+               The 'Value' column assigns a numerical value to the Likert scale response (starting from 1).
+    
     Requirements:
-    - os
-    - shutil
-
+    - pandas
+    - random
+    - csv
+    
     Example:
-    >>> task_func('/path/to/src', '/path/to/dest', '.txt')
+    >>> df = task_func(5, random_seed=1)
+    >>> print(df)
+                 Site       Category           Response  Value
+    0       USA Today  Entertainment  Strongly Disagree      1
+    1      Apple News         Sports              Agree      4
+    2             CNN       Politics              Agree      4
+    3       USA Today         Sports              Agree      4
+    4  New York Times       Politics              Agree      4
+    
+    >>> df = task_func(8, ['test', 'fun'], likert_scale=['true', 'false'], news_sites=['cat', 'dog'], random_seed=12)
+    >>> print(df)
+      Site Category  Response  Value
+    0  dog      fun     False      2
+    1  cat      fun      True      1
+    2  dog      fun     False      2
+    3  dog     test      True      1
+    4  cat      fun     False      2
+    5  cat      fun      True      1
+    6  cat     test      True      1
+    7  dog      fun      True      1
     """
-    files_moved = 0
-    for file_name in os.listdir(src_dir):
-        if file_name.endswith(extension):
-            shutil.move(os.path.join(src_dir, file_name), os.path.join(dest_dir, file_name))
-            files_moved += 1
-    return files_moved
+    survey_data = []
+    random.seed(random_seed)
+    for _ in range(n):
+        site = random.choice(news_sites)
+        category = random.choice(categories)
+        response = random.choice(likert_scale)
+        value = likert_scale.index(response) + 1  # Assign a numerical value to the response
+        survey_data.append({'Site': site, 'Category': category, 'Response': response, 'Value': value})
+    with open(file_path, 'w', newline='') as csvfile:
+        fieldnames = ['Site', 'Category', 'Response', 'Value']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(survey_data)
+    df = pd.read_csv(file_path)
+    return df
 
-import os
-import shutil
-import tempfile
 import unittest
+import os
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.src_dir = tempfile.mkdtemp()
-        self.dest_dir = tempfile.mkdtemp()
-    def tearDown(self):
-        shutil.rmtree(self.src_dir)
-        shutil.rmtree(self.dest_dir)
+        # Setting up a temporary directory to save CSV files during tests
+        self.temp_dir = "temp_test_dir"
+        os.makedirs(self.temp_dir, exist_ok=True)
+        
+    def test_rng(self):
+        'test rng reproducability'
+        df1 = task_func(300, file_path=os.path.join(self.temp_dir, "test1.csv"), random_seed=42)
+        df1_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test1.csv"))
+        df2 = task_func(300, file_path=os.path.join(self.temp_dir, "test2.csv"), random_seed=42)
+        df2_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test2.csv"))
+        self.assertTrue(pd.testing.assert_frame_equal(df1, df2) is None)
+        self.assertTrue(pd.testing.assert_frame_equal(df1_from_csv, df1) is None)
+        self.assertTrue(pd.testing.assert_frame_equal(df2_from_csv, df2) is None)
     def test_case_1(self):
-        # Testing with .txt files to ensure correct number of .txt files are moved
-        file_names = ["file1.txt", "file2.txt", "file3.doc", "file4.txt", "file5.png"]
-        for fname in file_names:
-            open(os.path.join(self.src_dir, fname), 'a').close()
-        moved_files_count = task_func(self.src_dir, self.dest_dir, ".txt")
-        self.assertEqual(moved_files_count, 3)
+        # Test with default values for categories, news_sites, and likert_scale
+        n = 100
+        df = task_func(n, file_path=os.path.join(self.temp_dir, "test1.csv"), random_seed=1)
+        df_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test1.csv"))
+        self.assertTrue(pd.testing.assert_frame_equal(df_from_csv, df) is None)
+        self.assertEqual(len(df), n)
+        self.assertTrue(set(df['Site'].unique()).issubset(set(['New York Times', 'USA Today', 'Apple News', 'CNN', 'BBC'])))
+        self.assertTrue(set(df['Category'].unique()).issubset(set(['Sports', 'Technology', 'Business', 'Politics', 'Entertainment'])))
+        self.assertTrue(set(df['Response'].unique()).issubset(set(['Strongly Disagree', 'Disagree', 'Neither Agree nor Disagree', 'Agree', 'Strongly Agree'])))
+        self.assertTrue(set(df['Value'].unique()).issubset(set(range(1, 6))))
     def test_case_2(self):
-        # Testing with .doc files to ensure correct number of .doc files are moved
-        file_names = ["file1.doc", "file2.doc", "file3.doc", "file4.doc"]
-        for fname in file_names:
-            open(os.path.join(self.src_dir, fname), 'a').close()
-        moved_files_count = task_func(self.src_dir, self.dest_dir, ".doc")
-        self.assertEqual(moved_files_count, 4)
+        # Test with custom values for categories and default values for others
+        n = 500
+        categories = ['Science', 'Math']
+        df = task_func(n, categories=categories, file_path=os.path.join(self.temp_dir, "test2.csv"), random_seed=12)
+        df_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test2.csv"))
+        self.assertTrue(pd.testing.assert_frame_equal(df_from_csv, df) is None)
+        self.assertEqual(len(df), n)
+        self.assertTrue(set(df['Category'].unique()).issubset(set(categories)))
     def test_case_3(self):
-        # Testing with no matching files to ensure zero files are moved
-        file_names = ["file1.png", "file2.jpg", "file3.jpeg"]
-        for fname in file_names:
-            open(os.path.join(self.src_dir, fname), 'a').close()
-        moved_files_count = task_func(self.src_dir, self.dest_dir, ".txt")
-        self.assertEqual(moved_files_count, 0)
+        # Test with custom values for news_sites and default values for others
+        n = 775
+        news_sites = ['ABC', 'NBC']
+        df = task_func(n, news_sites=news_sites, file_path=os.path.join(self.temp_dir, "test3.csv"), random_seed=11)
+        df_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test3.csv"))
+        self.assertTrue(pd.testing.assert_frame_equal(df_from_csv, df) is None)
+        self.assertEqual(len(df), n)
+        self.assertTrue(set(df['Site'].unique()).issubset(set(news_sites)))
     def test_case_4(self):
-        # Testing with empty source directory to ensure zero files are moved
-        moved_files_count = task_func(self.src_dir, self.dest_dir, ".txt")
-        self.assertEqual(moved_files_count, 0)
+        # Test with custom values for likert_scale and default values for others
+        n = 20
+        likert_scale = ['Yes', 'No']
+        df = task_func(n, likert_scale=likert_scale, file_path=os.path.join(self.temp_dir, "test4.csv"), random_seed=18)
+        df_from_csv = pd.read_csv(os.path.join(self.temp_dir, "test4.csv"))
+        self.assertTrue(pd.testing.assert_frame_equal(df_from_csv, df) is None)
+        self.assertEqual(len(df), n)
+        self.assertTrue(set(df['Response'].unique()).issubset(set(likert_scale)))
+        self.assertTrue(set(df['Value'].unique()).issubset(set(range(1, 3))))
     def test_case_5(self):
-        # Testing with mixed file extensions to ensure correct number of .txt files are moved
-        file_names = ["file1.txt", "file2.txt", "file3.doc", "file4.jpeg", "file5.txt", "file6.png"]
-        for fname in file_names:
-            open(os.path.join(self.src_dir, fname), 'a').close()
-        moved_files_count = task_func(self.src_dir, self.dest_dir, ".txt")
-        self.assertEqual(moved_files_count, 3)
+        # Test for empty df
+        n = 0
+        df = task_func(n, file_path=os.path.join(self.temp_dir, "test5.csv"))
+        self.assertEqual(len(df), n)
+    def tearDown(self):
+        # Cleanup temporary directory after tests
+        for file in os.listdir(self.temp_dir):
+            os.remove(os.path.join(self.temp_dir, file))
+        os.rmdir(self.temp_dir)

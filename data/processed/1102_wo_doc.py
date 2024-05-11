@@ -1,106 +1,107 @@
 import subprocess
-import os
-import glob
-import time
+import shlex
+from datetime import datetime
 
-
-def task_func(test_dir):
-    """
-    Run all Python codes in a specific directory and return their execution times.
-
-    Parameters:
-    - script_path (str): Path to the directory for Python code(s) to be executed.
+def task_func(script_path: str) -> dict:
+    '''
+    Run an R script and return the start time, end time, decoded stdout, and decoded stderr as a dictionary.
     
-    Returns:
-    dict: A dictionary with the script names as keys and their execution times as values.
-
     Requirements:
     - subprocess
-    - os
-    - glob
-    - time
-
+    - shlex
+    - datetime
+    
+    Parameters:
+    - script_path (str): Path to the R script to be executed.
+    
+    Returns:
+    - dict: A dictionary containing the start time, end time, stdout, and stderr of the script run.
+    
     Example:
-    >>> task_func("/mnt/data/mix_files/")
-    {'script1.py': 0.04103803634643555, "script2.py": 5}
-    """
-    execution_times = {}
-    py_scripts = glob.glob(os.path.join(test_dir, '*.py'))
-    for py_script in py_scripts:
-        start_time = time.time()
-        subprocess.call(['python', py_script])
-        end_time = time.time()
-        execution_times[os.path.basename(py_script)] = end_time - start_time
-    return execution_times
+    >>> task_func("/path/to/script.r")
+    {
+        'Start Time': '2023-09-26 14:30:00',
+        'End Time': '2023-09-26 14:32:00',
+        'Stdout': 'Script output here...',
+        'Stderr': 'Any errors here...'
+    }
+    '''
+    start_time = datetime.now()
+    process = subprocess.Popen(shlex.split(f"/usr/bin/Rscript --vanilla {script_path}"),
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    end_time = datetime.now()
+    log_details = {
+        'Start Time': str(start_time),
+        'End Time': str(end_time),
+        'Stdout': stdout.decode('utf-8'),
+        'Stderr': stderr.decode('utf-8')
+    }
+    return log_details
 
 import unittest
-import os
-import glob
-import time
-import shutil
+from unittest.mock import patch, Mock
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.test_dir = 'testdir_task_func/'
-        os.makedirs(self.test_dir, exist_ok=True)
-        self.sample_directory = 'testdir_task_func/sample_directory'
-        os.makedirs(self.sample_directory, exist_ok=True)
-        f = open(self.sample_directory+"/script1.py","w")
-        f.write("a <- 42/nA <- a * 2/nprint(a)")
-        f.close()
-        f = open(self.sample_directory+"/script2.py","w")
-        f.write("a <- 42/nA <- a * 2/nprint(a)/nprint(A)")
-        f.close()
-        f = open(self.sample_directory+"/script3.py","w")
-        f.write("a <- 42/nA <- a * 2/nprint(A)")
-        f.close()
-        self.empty_directory = "testdir_task_func/empty_directory"
-        os.makedirs(self.empty_directory, exist_ok=True)
-        self.mixed_directory = "testdir_task_func/mixed_directory"
-        os.makedirs(self.mixed_directory, exist_ok=True)
-        f = open(self.mixed_directory+"/1.txt","w")
-        f.write("invalid")
-        f.close()
-        f = open(self.mixed_directory+"/script4.py","w")
-        f.write("print('Hello from script4')")
-        f.close()
-        self.invalid_directory = "testdir_task_func/invalid_directory"
-        os.makedirs(self.invalid_directory, exist_ok=True)
-        f = open(self.invalid_directory+"/1.txt","w")
-        f.write("invalid")
-        f.close()
+    @patch('subprocess.Popen')
+    def test_case_1(self, mock_subprocess):
+        mock_process = Mock()
+        mock_process.communicate.return_value = (b"Script output here...", b"Any errors here...")
+        mock_subprocess.return_value = mock_process
         
-    def tearDown(self):
-        # Clean up the test directory
-        shutil.rmtree(self.test_dir)
-    def test_case_1(self):
-        # Testing with the created R scripts directory
-        result = task_func(self.sample_directory)
-        self.assertEqual(len(result), 3)  # There are 3 R scripts
-        self.assertTrue("script1.py" in result)
-        self.assertTrue("script2.py" in result)
-        self.assertTrue("script3.py" in result)
-        for time_taken in result.values():
-            self.assertTrue(time_taken >= 0)  # Execution time should be non-negative
-    def test_case_2(self):
-        # Testing with a non-existent directory (should return an empty dictionary)
-        result = task_func("/non/existent/path/")
-        self.assertEqual(result, {})
-    def test_case_3(self):
-        # Testing with a directory that has no Python scripts (should return an empty dictionary)
-        empty_dir = self.empty_directory
-        os.makedirs(empty_dir, exist_ok=True)
-        result = task_func(empty_dir)
-        self.assertEqual(result, {})
-    def test_case_4(self):
-        # Testing with a directory containing other types of files (should return an empty dictionary)
-        other_files_dir = self.invalid_directory
-        result = task_func(other_files_dir)
-        self.assertEqual(result, {})
-    def test_case_5(self):
-        # Testing with a directory containing a mix of Python scripts and other files
-        mix_files_dir = self.mixed_directory
-        result = task_func(mix_files_dir)
-        self.assertEqual(len(result), 1)  # Only 1 Python script
-        self.assertTrue("script4.py" in result)
-        for time_taken in result.values():
-            self.assertTrue(time_taken >= 0)  # Execution time should be non-negative
+        result = task_func("/path/to/script.r")
+        
+        self.assertIn('Start Time', result)
+        self.assertIn('End Time', result)
+        self.assertEqual(result['Stdout'], "Script output here...")
+        self.assertEqual(result['Stderr'], "Any errors here...")
+    
+    @patch('subprocess.Popen')
+    def test_case_2(self, mock_subprocess):
+        mock_process = Mock()
+        mock_process.communicate.return_value = (b"Another output...", b"")
+        mock_subprocess.return_value = mock_process
+        
+        result = task_func("/path/to/different_script.r")
+        
+        self.assertIn('Start Time', result)
+        self.assertIn('End Time', result)
+        self.assertEqual(result['Stdout'], "Another output...")
+        self.assertEqual(result['Stderr'], "")
+    
+    @patch('subprocess.Popen')
+    def test_case_3(self, mock_subprocess):
+        mock_process = Mock()
+        mock_process.communicate.return_value = (b"", b"An error occurred...")
+        mock_subprocess.return_value = mock_process
+        
+        result = task_func("/path/to/erroneous_script.r")
+        
+        self.assertIn('Start Time', result)
+        self.assertIn('End Time', result)
+        self.assertEqual(result['Stdout'], "")
+        self.assertEqual(result['Stderr'], "An error occurred...")
+    @patch('subprocess.Popen')
+    def test_case_4(self, mock_subprocess):
+        mock_process = Mock()
+        mock_process.communicate.return_value = (b"Script output for case 4...", b"")
+        mock_subprocess.return_value = mock_process
+        
+        result = task_func("/path/to/script_4.r")
+        
+        self.assertIn('Start Time', result)
+        self.assertIn('End Time', result)
+        self.assertEqual(result['Stdout'], "Script output for case 4...")
+        self.assertEqual(result['Stderr'], "")
+    
+    @patch('subprocess.Popen')
+    def test_case_5(self, mock_subprocess):
+        mock_process = Mock()
+        mock_process.communicate.return_value = (b"", b"Error for case 5...")
+        mock_subprocess.return_value = mock_process
+        
+        result = task_func("/path/to/erroneous_script_5.r")
+        
+        self.assertIn('Start Time', result)
+        self.assertIn('End Time', result)
+        self.assertEqual(result['Stdout'], "")
+        self.assertEqual(result['Stderr'], "Error for case 5...")

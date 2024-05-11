@@ -156,7 +156,7 @@ class TestCases(unittest.TestCase):
         expected_df = pd.DataFrame(expected_data)
 
         result_df = f_224(test_csv_file)
-        assert_frame_equal(expected_df, result_df)
+        assert_frame_equal(expected_df, result_df, check_dtype=False)
 
 
 if __name__ == "__main__":

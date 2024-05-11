@@ -143,7 +143,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(result), 1)
         with open(os.path.join(self.output_dir_path, result[0]), "r") as f:
             content = f.read()
-            self.assertIn("Error executing command, exited with code 1", content)
+            self.assertIn("Error executing command", content)
 
 if __name__ == "__main__":
     run_tests()

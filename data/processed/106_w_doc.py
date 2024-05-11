@@ -1,27 +1,27 @@
 import pandas as pd
+from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 def task_func(df):
     """
-    Perform exploratory data analysis on a dataframe. This function converts the 'date' column to an ordinal format,
-    creates a correlation matrix, and generates a pair plot of the dataframe.
+    Performs linear regression on a DataFrame using 'date' (converted to ordinal) as the predictor for 'value'. It plots both the original and 
+    predicted values, showcasing the linear relationship.
 
     Parameters:
-        df (pandas.DataFrame): A dataframe with columns 'group', 'date', and 'value'. The 'date' column should be in datetime format.
+        df (DataFrame): DataFrame containing 'group', 'date' (in datetime format), and 'value' columns.
 
     Returns:
-        matplotlib.figure.Figure: The figure object for the correlation matrix heatmap.
-        seaborn.axisgrid.PairGrid: The PairGrid object for the pair plot.
+        tuple: Consists of the LinearRegression model, the predictions array, and the matplotlib Axes object of the plot.
+               The Axes object will have a title 'Value vs Date (Linear Regression Prediction)', 
+               x-axis labeled as 'Date (ordinal)', and y-axis labeled as 'Value'.
 
-        The title of the plot is 'Correlation Matrix'. 
     Raises:
-        ValueError: If the dataframe is empty, if required columns are missing, or if 'date' column is not in datetime format.
+        ValueError: If 'df' is not a valid DataFrame, lacks the required columns, or if 'date' column is not in datetime format.
 
     Requirements:
         - pandas
-        - matplotlib.pyplot
-        - seaborn
+        - sklearn
+        - matplotlib
 
     Example:
         >>> df = pd.DataFrame({
@@ -29,61 +29,49 @@ def task_func(df):
         ...     "date": pd.to_datetime(["2022-01-02", "2022-01-13", "2022-02-01", "2022-02-23", "2022-03-05"]),
         ...     "value": [10, 20, 16, 31, 56],
         ... })
-        >>> heatmap_fig, pairplot_grid = task_func(df)
+        >>> model, predictions, ax = task_func(df)
+        >>> plt.show()  # Displays the plot with original and predicted values
     """
-    if df.empty or not all(col in df.columns for col in ['group', 'date', 'value']):
-        raise ValueError("DataFrame must be non-empty and contain 'group', 'date', and 'value' columns.")
-    if not pd.api.types.is_datetime64_any_dtype(df['date']):
-        raise ValueError("'date' column must be in datetime format.")
-    try:
-        df['date'] = df['date'].apply(lambda x: x.toordinal())
-        df_numeric = df.drop(columns=['group'])
-        correlation_matrix = df_numeric.corr()
-        heatmap_fig = plt.figure(figsize=(8, 6))
-        sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
-        plt.title('Correlation Matrix')
-        pairplot_grid = sns.pairplot(df)
-        return heatmap_fig, pairplot_grid
-    except Exception as e:
-        raise ValueError(f"An error occurred: {e}")
+    if not isinstance(df, pd.DataFrame) or not all(col in df.columns for col in ['group', 'date', 'value']):
+        raise ValueError("Invalid 'df': must be a DataFrame with 'group', 'date', and 'value' columns.")
+    df['date'] = df['date'].apply(lambda x: x.toordinal())
+    X = df[['date']]
+    y = df['value']
+    model = LinearRegression()
+    model.fit(X, y)
+    y_pred = model.predict(X)
+    fig, ax = plt.subplots()
+    ax.scatter(X, y, color='red')
+    ax.plot(X, y_pred, color='blue')
+    ax.set_title('Value vs Date (Linear Regression Prediction)')
+    ax.set_xlabel('Date (ordinal)')
+    ax.set_ylabel('Value')
+    return model, y_pred, ax
 
 import unittest
-import numpy as np 
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.valid_df = pd.DataFrame({
+        self.df = pd.DataFrame({
             "group": ["A", "A", "A", "B", "B"],
             "date": pd.to_datetime(["2022-01-02", "2022-01-13", "2022-02-01", "2022-02-23", "2022-03-05"]),
             "value": [10, 20, 16, 31, 56],
         })
-    def test_valid_input(self):
-        heatmap_fig, pairplot_grid = task_func(self.valid_df)
-        self.assertIsInstance(heatmap_fig, plt.Figure)
-        self.assertIsInstance(pairplot_grid, sns.axisgrid.PairGrid)
+    def test_return_types(self):
+        model, predictions, ax = task_func(self.df)
+        self.assertIsInstance(model, LinearRegression)
+        self.assertIsInstance(predictions, np.ndarray)
+        self.assertEqual(predictions.shape, (self.df.shape[0],))
+        self.assertEqual(ax.get_title(), 'Value vs Date (Linear Regression Prediction)')
+    def test_invalid_input(self):
+        with self.assertRaises(ValueError):
+            task_func(pd.DataFrame({'a': [1, 2], 'b': [3, 4]}))
+    def test_plot_labels(self):
+        _, _, ax = task_func(self.df)
+        self.assertEqual(ax.get_xlabel(), 'Date (ordinal)')
+        self.assertEqual(ax.get_ylabel(), 'Value')
     def test_empty_dataframe(self):
         with self.assertRaises(ValueError):
             task_func(pd.DataFrame())
-    def test_missing_columns(self):
-        incomplete_df = self.valid_df.drop(columns=['date'])
-        with self.assertRaises(ValueError):
-            task_func(incomplete_df)
-    def test_invalid_date_column(self):
-        invalid_df = self.valid_df.copy()
-        invalid_df['date'] = "not a date"
-        with self.assertRaises(ValueError):
-            task_func(invalid_df)
-    def test_plot_titles(self):
-        heatmap_fig, pairplot_grid = task_func(self.valid_df)
-        self.assertEqual(heatmap_fig.axes[0].get_title(), 'Correlation Matrix')
-    
-    def test_value_consistency(self):
-        df = self.valid_df.copy()
-        df['date'] = df['date'].apply(lambda x: x.toordinal())
-        df_numeric = df.drop(columns=['group'])
-        heatmap_fig, _ = task_func(self.valid_df)
-        # Retrieve the correlation matrix data from the heatmap and reshape it
-        heatmap_data = heatmap_fig.axes[0].collections[0].get_array().data
-        heatmap_data_reshaped = heatmap_data.reshape(df_numeric.corr().shape)
-        expected_corr_matrix = df_numeric.corr().values
-        # Compare the reshaped data in the heatmap with the expected correlation matrix
-        np.testing.assert_array_almost_equal(heatmap_data_reshaped, expected_corr_matrix)

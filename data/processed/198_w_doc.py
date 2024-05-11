@@ -1,69 +1,94 @@
-import heapq
-import math
+import numpy as np
+import bisect
+import statistics
 import matplotlib.pyplot as plt
 
 
-def task_func(l1, l2, N=10):
-    """ 
-    Find the N biggest differences between the respective elements of the list 'l1' and list 'l2', 
-    square the differences, take the square root and return the plotted values as a matplotlib Axes object.
+def task_func(data, value):
+    """
+    Analyzes a list of numerical data, identifies values greater than the average,
+    and counts how many values are greater than a specified value. Additionally, plots the
+    histogram of the sorted numbers.
 
     Parameters:
-    l1 (list): A list of numbers.
-    l2 (list): A list of numbers.
-    N (int): Number of largest differences to consider. Default is 10.
+        data (list): A list of numerical data.
+        value (float): A value to compare against the data.
 
     Returns:
-    matplotlib.axes._axes.Axes: A matplotlib Axes object with the plotted differences.
+        numpy.ndarray: An array of values from the data that are greater than the average.
+        int: The number of values in the data that are greater than the given value.
 
     Requirements:
-    - heapq
-    - math
+    - numpy
+    - bisect
+    - statistics
     - matplotlib.pyplot
 
-    Example:
-    >>> l1 = [99, 86, 90, 70, 86, 95, 56, 98, 80, 81]
-    >>> l2 = [21, 11, 21, 1, 26, 40, 4, 50, 34, 37]
-    >>> ax = task_func(l1, l2)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
+    Note:
+    - If the data list is empty, the function returns an empty numpy.ndarray and a count of 0. This ensures
+      the function's output remains consistent and predictable even with no input data.
+
+    Examples:
+    >>> greater_avg, count = task_func([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 5)
+    >>> greater_avg.tolist()
+    [6, 7, 8, 9, 10]
+    >>> count
+    5
     """
-    largest_diff_indices = heapq.nlargest(N, range(len(l1)), key=lambda i: abs(l1[i] - l2[i]))
-    largest_diffs = [math.sqrt((l1[i] - l2[i])**2) for i in largest_diff_indices]
-    fig, ax = plt.subplots()
-    ax.plot(largest_diffs)
-    return ax
+    if not data:  # Handle empty data list
+        return np.array([]), 0
+    data = np.array(data)
+    avg = statistics.mean(data)
+    greater_avg = data[data > avg]
+    data.sort()
+    bpoint = bisect.bisect_right(data, value)
+    num_greater_value = len(data) - bpoint
+    plt.hist(data, bins=10)
+    plt.show()
+    return greater_avg, num_greater_value
 
 import unittest
-import doctest
+from unittest.mock import patch
+import numpy as np
+import statistics
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        l1 = [99, 86, 90, 70, 86, 95, 56, 98, 80, 81]
-        l2 = [21, 11, 21, 1, 26, 40, 4, 50, 34, 37]
-        ax = task_func(l1, l2)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 10)
-    def test_case_2(self):
-        l1 = [10, 20, 30, 40, 50]
-        l2 = [1, 2, 3, 4, 5]
-        ax = task_func(l1, l2, 3)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 3)
-    def test_case_3(self):
-        l1 = [0, 10, 20, 30, 40, 50]
-        l2 = [0, 0, 0, 0, 0, 0]
-        ax = task_func(l1, l2)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 6)
-    def test_case_4(self):
-        l1 = [1, 2, 3, 4, 5]
-        l2 = [5, 4, 3, 2, 1]
-        ax = task_func(l1, l2)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 5)
-    def test_case_5(self):
-        l1 = [0, 0, 0, 0, 0]
-        l2 = [0, 0, 0, 0, 0]
-        ax = task_func(l1, l2)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 5)
+    def test_return_types(self):
+        """Ensure the function returns a numpy.ndarray and an integer."""
+        data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        result = task_func(data, 5)
+        self.assertIsInstance(result[0], np.ndarray, "First return value should be an ndarray")
+        self.assertIsInstance(result[1], int, "Second return value should be an int")
+    def test_greater_than_average(self):
+        """Verify the returned array contains only values greater than the average of the data list."""
+        data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        result = task_func(data, 5)
+        self.assertTrue(all(val > statistics.mean(data) for val in result[0]), "All returned values should be greater than the data's average")
+    def test_count_greater_than_value(self):
+        """Check if the function correctly counts the number of values greater than the specified value."""
+        data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        _, count = task_func(data, 5)
+        self.assertEqual(count, 5, "The count of values greater than 5 should be 5")
+    def test_empty_data(self):
+        """Ensure the function handles an empty data list correctly."""
+        data = []
+        result = task_func(data, 5)
+        self.assertEqual(len(result[0]), 0, "The returned array should be empty for empty input data")
+        self.assertEqual(result[1], 0, "The count should be 0 for empty input data")
+    def test_small_data_set(self):
+        """Test functionality with a small data set."""
+        data = [2, 3, 4]
+        result = task_func(data, 3)
+        self.assertTrue(all(val > statistics.mean(data) for val in result[0]), "All returned values should be greater than the average in a small data set")
+        self.assertEqual(result[1], 1, "The count of values greater than 3 should be 1 in a small data set")
+    @patch('matplotlib.pyplot.show')
+    def test_plotting_mocked(self, mock_show):
+        """Ensure the function triggers a plot display."""
+        data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        _ = task_func(data, 5)
+        mock_show.assert_called_once()
+    def test_with_floats_and_boundary_value(self):
+        """Test function with floating point numbers and a boundary value exactly equal to one of the data points."""
+        data = [1.5, 2.5, 3.5, 4.5, 5.5]
+        greater_avg, count = task_func(data, 3.5)
+        self.assertTrue(all(val > statistics.mean(data) for val in greater_avg), "All returned values should be greater than the average with floats")
+        self.assertEqual(count, 2, "The count of values greater than 3.5 should be 2, including boundary conditions")

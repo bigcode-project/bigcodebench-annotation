@@ -1,95 +1,94 @@
 import json
-import numpy as np
+import csv
+import os
+import base64
 
-def task_func(df):
+def task_func(raw_string, filename, output_dir):
     """
-    Given a DataFrame with random values and an 'IntCol' column, transform the 'IntCol' column by a logarithm (base 10) and write it to a `IntCol.json` file as a list. Also return the DataFrame.
+    Processes a base64-encoded JSON string, stores the data in a CSV file, and returns the path of the file.
 
     Parameters:
-    - df (DataFrame): A pandas DataFrame with a 'IntCol' column.
+    - raw_string (str): The base64 encoded JSON string.
+    - filename (str): The name of the file to which the data should be saved (without extension).
+    - output_dir (str): The path of the directory in which the file should be saved.
 
     Returns:
-    - df (DataFrame): A pandas DataFrame to describe the transformed data.
+    - file_path (str): The path of the file.
 
     Requirements:
     - json
-    - pandas
-    - numpy
+    - csv
     - os
+    - base64
 
     Example:
-    >>> df = pd.DataFrame({'IntCol': [10, 100, 1000, 10000, 100000]})
-    >>> df_transformed = task_func(df)
-    >>> print(df_transformed)
-       IntCol
-    0     1.0
-    1     2.0
-    2     3.0
-    3     4.0
-    4     5.0
-
+    >>> task_func('eyJrZXkiOiAiVmFsdWUifQ==', 'data', './output')
+    './output/data.csv'
     """
-    df['IntCol'] = np.log10(df['IntCol'])
-    int_col_list = df['IntCol'].tolist()
-    with open('IntCol.json', 'w') as json_file:
-        json.dump(int_col_list, json_file)
-    return df
+    decoded_string = base64.b64decode(raw_string).decode('utf-8')
+    data = json.loads(decoded_string)
+    os.makedirs(output_dir, exist_ok=True)
+    file_path = os.path.join(output_dir, f'{filename}.csv')
+    with open(file_path, 'w', newline='') as f:
+        writer = csv.writer(f)
+        for key, value in data.items():
+            writer.writerow([key, value])
+    return file_path
 
 import unittest
-import os
-import pandas as pd
+import shutil
 class TestCases(unittest.TestCase):
     def tearDown(self):
-        if os.path.exists('IntCol.json'):
-            os.remove('IntCol.json')
+        if os.path.exists('./output'):
+            shutil.rmtree('./output')
     
     def test_case_1(self):
-        df = pd.DataFrame({'IntCol': [10, 100, 1000, 10000, 100000]})
-        df_transformed = task_func(df)
-        self.assertTrue(np.allclose(df_transformed['IntCol'], [1, 2, 3, 4, 5]))
-        # Check if JSON file exists
-        self.assertTrue(os.path.exists('IntCol.json'))
-        # Check the contents of the JSON file
-        with open('IntCol.json', 'r') as json_file:
-            int_col_data = json.load(json_file)
-        self.assertTrue(np.allclose(int_col_data, [1, 2, 3, 4, 5]))
+        raw_string = 'eyJrZXkiOiAiVmFsdWUifQ=='
+        filename = 'data'
+        output_dir = './output'
+        expected = './output/data.csv'
+        self.assertEqual(task_func(raw_string, filename, output_dir), expected)
+        with open(expected, 'r') as f:
+            self.assertEqual(f.read(), 'key,Value\n')
+        os.remove(expected)
+    
     def test_case_2(self):
-        df = pd.DataFrame({'IntCol': [10000000, 100000000, 1000000000, 10000000000, 100000000000]})
-        df_transformed = task_func(df)
-        self.assertTrue(np.allclose(df_transformed['IntCol'], [7, 8, 9, 10, 11]))
-        # Check if JSON file exists
-        self.assertTrue(os.path.exists('IntCol.json'))
-        # Check the contents of the JSON file
-        with open('IntCol.json', 'r') as json_file:
-            int_col_data = json.load(json_file)
-        self.assertTrue(np.allclose(int_col_data, [7, 8, 9, 10, 11]))
+        string_before = """{"key": "hello"}"""
+        raw_string = base64.b64encode(string_before.encode('utf-8')).decode('utf-8')
+        filename = 'data'
+        output_dir = './output'
+        expected = './output/data.csv'
+        self.assertEqual(task_func(raw_string, filename, output_dir), expected)
+        with open(expected, 'r') as f:
+            self.assertEqual(f.read(), 'key,hello\n')
+        os.remove(expected)
     def test_case_3(self):
-        df = pd.DataFrame({'IntCol': [0, 0, 0, 0, 0]})
-        df_transformed = task_func(df)
-        self.assertTrue(np.allclose(df_transformed['IntCol'], [-np.inf, -np.inf, -np.inf, -np.inf, -np.inf]))
-        # Check if JSON file exists
-        self.assertTrue(os.path.exists('IntCol.json'))
-        # Check the contents of the JSON file
-        with open('IntCol.json', 'r') as json_file:
-            int_col_data = json.load(json_file)
-        self.assertTrue(np.allclose(int_col_data, [-np.inf, -np.inf, -np.inf, -np.inf, -np.inf]))
+        string_before = """{"key": "hello", "key2": "world"}"""
+        raw_string = base64.b64encode(string_before.encode('utf-8')).decode('utf-8')
+        filename = 'data'
+        output_dir = './output'
+        expected = './output/data.csv'
+        self.assertEqual(task_func(raw_string, filename, output_dir), expected)
+        with open(expected, 'r') as f:
+            self.assertEqual(f.read(), 'key,hello\nkey2,world\n')
+        os.remove(expected)
     def test_case_4(self):
-        df = pd.DataFrame({'IntCol': [10000000]})
-        df_transformed = task_func(df)
-        self.assertTrue(np.allclose(df_transformed['IntCol'], [7]))
-        # Check if JSON file exists
-        self.assertTrue(os.path.exists('IntCol.json'))
-        # Check the contents of the JSON file
-        with open('IntCol.json', 'r') as json_file:
-            int_col_data = json.load(json_file)
-        self.assertTrue(np.allclose(int_col_data, [7]))
+        string_before = """{"key": "hello", "key2": "world", "key3": "!"}"""
+        raw_string = base64.b64encode(string_before.encode('utf-8')).decode('utf-8')
+        filename = 'data'
+        output_dir = './output'
+        expected = './output/data.csv'
+        self.assertEqual(task_func(raw_string, filename, output_dir), expected)
+        with open(expected, 'r') as f:
+            self.assertEqual(f.read(), 'key,hello\nkey2,world\nkey3,!\n')
+        os.remove(expected)
     def test_case_5(self):
-        df = pd.DataFrame({'IntCol': [1, 10, 100, 1000, 10000, 100000]})
-        df_transformed = task_func(df)
-        self.assertTrue(np.allclose(df_transformed['IntCol'], [0, 1, 2, 3, 4, 5]))
-        # Check if JSON file exists
-        self.assertTrue(os.path.exists('IntCol.json'))
-        # Check the contents of the JSON file
-        with open('IntCol.json', 'r') as json_file:
-            int_col_data = json.load(json_file)
-        self.assertTrue(np.allclose(int_col_data, [0, 1, 2, 3, 4, 5]))
+        string_before = """{"key": "hello", "key2": "world", "key3": "!", "key4": "test"}"""
+        raw_string = base64.b64encode(string_before.encode('utf-8')).decode('utf-8')
+        filename = 'data'
+        output_dir = './output'
+        expected = './output/data.csv'
+        self.assertEqual(task_func(raw_string, filename, output_dir), expected)
+        with open(expected, 'r') as f:
+            self.assertEqual(f.read(), 'key,hello\nkey2,world\nkey3,!\nkey4,test\n')
+        os.remove(expected)

@@ -1,71 +1,77 @@
-import numpy as np
 import pandas as pd
+from random import choices, seed
 
-def task_func(students=["Alice", "Bob", "Charlie", "David", "Eve"], seed=42):
+def task_func(products, ratings, weights, random_seed=42):
     """
-    Generate random scores for a given list of students, sort these scores in ascending order,
-    and return both the scores and a bar plot of these scores.
+    Generates a DataFrame containing ratings for a given list of products. Ratings are generated randomly based on the provided weights. 
+    The DataFrame is sorted by ratings in descending order.
 
     Parameters:
-    students (list of str): List of student names.
-    seed (int): Seed for the random number generator. Default is 42.
+    products (list): List of product names.
+    ratings (list): List of possible ratings.
+    weights (list): List of weights corresponding to each rating for weighted random selection.
+    random_seed (int, optional): Seed for random number generation for reproducibility. Defaults to 42.
 
     Returns:
-    DataFrame: A pandas DataFrame with columns 'Student' and 'Score', sorted by 'Score'.
-    Axes: A matplotlib Axes object containing the bar plot of scores.
-
-    use np.random.randint(0, 100) to generate the scores of the students
+    pandas.DataFrame: A DataFrame with two columns: 'Product' and 'Rating', sorted by 'Rating' in descending order.
 
     Requirements:
-    - numpy
     - pandas
+    - random
 
     Example:
-    >>> scores, plot = task_func()
-    >>> print(scores)
-       Student  Score
-    2  Charlie     14
-    0    Alice     51
-    4      Eve     60
-    3    David     71
-    1      Bob     92
+    >>> products = ["iPhone", "iPad", "Macbook", "Airpods", "Apple Watch"]
+    >>> ratings = [1, 2, 3, 4, 5]
+    >>> weights = [0.05, 0.1, 0.2, 0.3, 0.35]
+    >>> df = task_func(products, ratings, weights, 42)
+    >>> print(df.head()) # Expected output is a DataFrame sorted by 'Rating', which may vary due to randomness.
+           Product  Rating
+    4  Apple Watch       5
+    0       iPhone       4
+    2      Macbook       3
+    3      Airpods       3
+    1         iPad       1
     """
-    np.random.seed(seed)
-    scores_data = [(student, np.random.randint(0, 100)) for student in students]
-    df = pd.DataFrame(scores_data, columns=["Student", "Score"])
-    df.sort_values("Score", inplace=True)
-    ax = df.plot(x='Student', y='Score', kind='bar', legend=False)
-    ax.set_ylabel("Score")
-    return df, ax
+    seed(random_seed)  # Setting the seed for reproducibility
+    product_ratings = []
+    for product in products:
+        rating = choices(ratings, weights, k=1)[0]
+        product_ratings.append([product, rating])
+    df = pd.DataFrame(product_ratings, columns=["Product", "Rating"])
+    df.sort_values("Rating", ascending=False, inplace=True)
+    return df
 
 import unittest
 import pandas as pd
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.students = ["Alice", "Bob", "Charlie", "David", "Eve"]
+        self.products = ["iPhone", "iPad", "Macbook", "Airpods", "Apple Watch"]
+        self.ratings = [1, 2, 3, 4, 5]
+        self.weights = [0.05, 0.1, 0.2, 0.3, 0.35]
     def test_random_reproducibility(self):
-        df1, _ = task_func(self.students, 42)
-        df2, _ = task_func(self.students, 42)
+        df1 = task_func(self.products, self.ratings, self.weights, 42)
+        df2 = task_func(self.products, self.ratings, self.weights, 42)
         pd.testing.assert_frame_equal(df1, df2)
-    def test_dataframe_columns(self):
-        df, _ = task_func(self.students)
-        self.assertListEqual(list(df.columns), ["Student", "Score"])
-    def test_scores_within_range(self):
-        df, _ = task_func(self.students)
-        self.assertTrue(df["Score"].between(0, 100).all())
-    def test_plot_labels(self):
-        _, ax = task_func(self.students)
-        self.assertEqual(ax.get_ylabel(), "Score")
-        self.assertEqual(ax.get_xlabel(), "Student")
-    def test_different_seeds_produce_different_scores(self):
-        df1, _ = task_func(self.students, 42)
-        df2, _ = task_func(self.students, 43)
-        self.assertFalse(df1.equals(df2))
+    def test_dataframe_structure(self):
+        df = task_func(self.products, self.ratings, self.weights)
+        self.assertEqual(list(df.columns), ['Product', 'Rating'])
+        self.assertEqual(len(df), len(self.products))
+    def test_rating_range(self):
+        df = task_func(self.products, self.ratings, self.weights)
+        self.assertTrue(df['Rating'].isin(self.ratings).all())
+    def test_sort_order(self):
+        df = task_func(self.products, self.ratings, self.weights)
+        sorted_df = df.sort_values('Rating', ascending=False)
+        pd.testing.assert_frame_equal(df, sorted_df)
+    def test_different_seeds(self):
+        df1 = task_func(self.products, self.ratings, self.weights, 42)
+        df2 = task_func(self.products, self.ratings, self.weights, 24)
+        with self.assertRaises(AssertionError):
+            pd.testing.assert_frame_equal(df1, df2)
     
-    def test_dataframe_value(self):
-        df, _ = task_func(self.students)                
-        df_list = df.apply(lambda row: ','.join(row.values.astype(str)), axis=1).tolist()
-        expect = ['Charlie,14', 'Alice,51', 'Eve,60', 'David,71', 'Bob,92']
-        # with open('df_contents.txt', 'w') as file:
-        #     file.write(str(df_list))
+    def test_values(self):
+        df1 = task_func(self.products, self.ratings, self.weights, 42)
+        df_list = df1.apply(lambda row: ','.join(row.values.astype(str)), axis=1).tolist()
+        expect = ['Apple Watch,5', 'iPhone,4', 'Macbook,3', 'Airpods,3', 'iPad,1']
+   
         self.assertEqual(df_list, expect, "DataFrame contents should match the expected output")

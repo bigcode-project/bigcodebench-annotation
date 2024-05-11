@@ -1,87 +1,92 @@
-from datetime import datetime, timedelta
-import pytz
-import calendar
+import xmltodict
+import json
 
+def task_func(s, save_json, json_file_path):
+    """ 
+    Converts an XML string into a dictionary representation and optionally saves it as a JSON file.
 
-def task_func(days_in_past=7):
-    """
-    Get the weekday of the date 'days_in_past' days ago from today.
-
-    This function computes the date that is 'days_in_past' number of days ago from the current
-    system time's date in UTC. It then determines the weekday of this target date using calendar
-    and returns its name as a string.
+    This function is useful for easily accessing data stored in XML format and saving it for future use.
 
     Parameters:
-    days_in_past (int): The number of days to go back from the current date to find the weekday.
-                        Defaults to 7 (one week ago). Must be a non-negative integer.
+    s (str): The XML string to be converted.
+    save_json (bool): Whether to save the parsed XML as a JSON file.
+    json_file_path (str): The file path to save the JSON file. Required if save_json is True.
 
     Returns:
-    weekday (str)     : The name of the weekday (e.g., 'Monday', 'Tuesday') for the computed date.
+    dict: A dictionary representation of the XML string.
 
     Raises:
-    ValueError: If 'days_in_past' is negative.
-    
-    Requirements:
-    - datetime.datetime
-    - datetime.timedelta
-    - pytz
-    - calendar
+    ValueError: If the input XML string is empty or contains only whitespace.
 
-    Example:
-    >>> task_func()
-    'Monday'
-    >>> task_func(3)
-    'Friday'
+    Requirements:
+    - xmltodict
+    - json
+
+    Examples:
+    Convert a simple XML string to a dictionary.
+    >>> result = task_func('<person><name>John</name><age>30</age></person>')
+    >>> result['person']['name'] + ', ' + result['person']['age']
+    'John, 30'
+
+    Convert an XML string with nested elements.
+    >>> result = task_func('<school><class><student>Emma</student></class></school>')
+    >>> result['school']['class']['student']
+    'Emma'
+
+    Save the parsed XML as a JSON file.
+    >>> task_func('<data><item>1</item><item>2</item></data>', save_json=True, json_file_path='data.json')
+    # A JSON file 'data.json' will be created with the parsed XML data.
     """
-    if days_in_past < 0:
-        raise ValueError("Days in the past cannot be negative")
-    date = datetime.now(pytz.UTC) - timedelta(days=days_in_past)
-    weekday = calendar.day_name[date.weekday()]
-    return weekday
+    if not s.strip():  # Check for empty or whitespace-only string
+        raise ValueError("The input XML string is empty or contains only whitespace.")
+    my_dict = xmltodict.parse(s)
+    if save_json and json_file_path:
+        with open(json_file_path, 'w') as json_file:
+            json.dump(my_dict, json_file, indent=4)
+    return my_dict
 
 import unittest
-from datetime import datetime, timedelta
-import pytz
-import calendar
+import os
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Input 1: Default input
-        result = task_func()
-        self.assertIsInstance(result, str)
-        self.assertIn(result, list(calendar.day_name))
-        # Ensure the result matches the expected output for 7 days ago
-        expected_date = datetime.now(pytz.UTC) - timedelta(days=7)
-        expected_weekday = calendar.day_name[expected_date.weekday()]
-        self.assertEqual(result, expected_weekday)
-    def test_case_2(self):
-        # Input 2: Test with 3 days in the past
-        result = task_func(3)
-        self.assertIsInstance(result, str)
-        self.assertIn(result, list(calendar.day_name))
-        # Ensure the result matches the expected output for 3 days ago
-        expected_date = datetime.now(pytz.UTC) - timedelta(days=3)
-        expected_weekday = calendar.day_name[expected_date.weekday()]
-        self.assertEqual(result, expected_weekday)
-    def test_case_3(self):
-        # Input 3: Test with 0 days in the past (today)
-        result = task_func(0)
-        self.assertIsInstance(result, str)
-        self.assertIn(result, list(calendar.day_name))
-        # Ensure the result matches the expected output for today
-        expected_date = datetime.now(pytz.UTC)
-        expected_weekday = calendar.day_name[expected_date.weekday()]
-        self.assertEqual(result, expected_weekday)
-    def test_case_4(self):
-        # Input 4: Test with 30 days in the past (approximately a month ago)
-        result = task_func(30)
-        self.assertIsInstance(result, str)
-        self.assertIn(result, list(calendar.day_name))
-        # Ensure the result matches the expected output for 30 days ago
-        expected_date = datetime.now(pytz.UTC) - timedelta(days=30)
-        expected_weekday = calendar.day_name[expected_date.weekday()]
-        self.assertEqual(result, expected_weekday)
-    def test_case_5(self):
-        # Input 5: Test handling invalid days_in_the_past
-        for invalid in [-1, "1"]:
-            with self.assertRaises(Exception):
-                task_func(invalid)
+    def setUp(self):
+        self.json_file_path = 'test_output.json'
+    
+    def tearDown(self):
+        if os.path.exists(self.json_file_path):
+            os.remove(self.json_file_path)
+    def test_simple_xml_to_dict(self):
+        xml_str = '<person><name>John</name><age>30</age></person>'
+        result = task_func(xml_str, False, '')
+        self.assertEqual(result['person']['name'], 'John')
+        self.assertEqual(result['person']['age'], '30')
+    def test_nested_xml_to_dict(self):
+        xml_str = '<school><class><student>Emma</student></class></school>'
+        result = task_func(xml_str, False, '',)
+        self.assertEqual(result['school']['class']['student'], 'Emma')
+    def test_empty_xml_to_dict(self):
+        xml_str = '<empty></empty>'
+        result = task_func(xml_str, False, '')
+        self.assertTrue('empty' in result and result['empty'] is None or result['empty'] == '')
+    def test_attribute_xml_to_dict(self):
+        xml_str = '<book id="123">Python Guide</book>'
+        result = task_func(xml_str, False, '')
+        self.assertEqual(result['book']['@id'], '123')
+        self.assertEqual(result['book']['#text'], 'Python Guide')
+    def test_complex_xml_to_dict(self):
+        xml_str = '<family><person name="John"><age>30</age></person><person name="Jane"><age>28</age></person></family>'
+        result = task_func(xml_str, False, '')
+        self.assertEqual(result['family']['person'][0]['@name'], 'John')
+        self.assertEqual(result['family']['person'][0]['age'], '30')
+        self.assertEqual(result['family']['person'][1]['@name'], 'Jane')
+        self.assertEqual(result['family']['person'][1]['age'], '28')
+    def test_save_xml_to_json(self):
+        xml_str = '<data><item>1</item></data>'
+        task_func(xml_str, True, self.json_file_path,)
+        self.assertTrue(os.path.exists(self.json_file_path))
+        with open(self.json_file_path, 'r') as file:
+            data = file.read()
+            self.assertIn('1', data)
+    def test_empty_string_input(self):
+        xml_str = ''
+        with self.assertRaises(ValueError):
+            task_func(xml_str, False, '')

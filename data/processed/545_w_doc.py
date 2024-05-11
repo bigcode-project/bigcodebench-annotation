@@ -1,55 +1,58 @@
+import codecs
+import random
 import struct
-import zlib
 
-# Constants
-KEY = '470FC614'
+KEYS = ['470FC614', '4A0FC614', '4B9FC614', '4C8FC614', '4D7FC614']
 
-def task_func(hex_string=KEY):
+def task_func(hex_keys=KEYS):
     """
-    Converts a given hex string to a float number and then compresses the binary32 float number.
+    Generate a random float number from a list of hex strings and then encode the float number in utf-8.
 
     Parameters:
-    hex_string (str, optional): The hex string to be converted. Defaults to 470FC614.
-
+    hex_keys (list of str): A list of hexadecimal strings to choose from.
+    
     Returns:
-    bytes: The compressed float number.
+    bytes: The utf-8 encoded float number.
 
     Requirements:
     - struct
-    - zlib
+    - codecs
+    - random
 
     Example:
-    >>> task_func("470FC614")
-    b'x\\x9c\\xf3\\xeb\\x93\\xef\\x01\\x00\\x03\\xb0\\x01\\x88'
-    >>> task_func("ABCD1234")
-    b'x\\x9c\\xf3\\xd7>+\\x04\\x00\\x03m\\x01Z'
+    >>> random.seed(42)
+    >>> task_func()
+    b'36806.078125'
     """
-    binary_float = struct.pack('!f', int(hex_string, 16))
-    compressed_data = zlib.compress(binary_float)
-    return compressed_data
+    hex_key = random.choice(hex_keys)
+    float_num = struct.unpack('!f', bytes.fromhex(hex_key))[0]
+    encoded_float = codecs.encode(str(float_num), 'utf-8')
+    return encoded_float
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_default_functionality(self):
         """Test the function with default parameters."""
         result = task_func()
+        self.assertIsInstance(result, bytes)  # Check if output is correctly encoded in UTF-8
+    def test_custom_hex_keys(self):
+        """Test the function with a custom list of hexadecimal keys."""
+        custom_keys = ['1A2FC614', '1B0FC614', '1C9FC614']
+        result = task_func(hex_keys=custom_keys)
         self.assertIsInstance(result, bytes)
-    def test_valid_custom_hex_string(self):
-        """Test the function with a valid custom hexadecimal string."""
-        hex_string = '1A2FC614'  # Example hex string
-        result = task_func(hex_string)
-        self.assertIsInstance(result, bytes)
-    def test_invalid_hex_string(self):
-        """Test the function with an invalid hexadecimal string."""
+    def test_empty_list(self):
+        """Test the function with an empty list."""
+        with self.assertRaises(IndexError):  # Assuming random.choice will raise IndexError on empty list
+            task_func(hex_keys=[])
+    def test_consistency_of_output(self):
+        """Ensure that the output is consistent with a fixed seed."""
+        random.seed(42)  # Set the seed for predictability
+        first_result = task_func()
+        random.seed(42)  # Reset seed to ensure same choice is made
+        second_result = task_func()
+        self.assertEqual(first_result, second_result)
+    def test_invalid_hex_key(self):
+        """Test with an invalid hex key."""
+        invalid_keys = ['ZZZZZZZZ', 'XXXX']
         with self.assertRaises(ValueError):
-            task_func(hex_string='ZZZZZZZZ')
-    def test_boundary_hex_value(self):
-        """Test the function with a large boundary hexadecimal value."""
-        boundary_hex = 'FFFFFFFF'  # Maximum float value before overflow in some contexts
-        result = task_func(boundary_hex)
-        self.assertIsInstance(result, bytes)
-    def test_zero_value(self):
-        """Test the function with a hex string representing zero."""
-        zero_hex = '00000000'
-        result = task_func(zero_hex)
-        self.assertIsInstance(result, bytes)
+            task_func(hex_keys=invalid_keys)

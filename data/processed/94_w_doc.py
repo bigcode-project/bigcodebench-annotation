@@ -1,76 +1,99 @@
 import numpy as np
-import pandas as pd
+from scipy.stats import norm
 import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
 
-def task_func(data, n_components=2):
+def task_func(mean, std_dev, num_samples):
     """
-    Perform Principal Component Analysis (PCA) on a dataset and record the result.
-    Also, generates a scatter plot of the transformed data.
+    Generates a histogram of samples drawn from a normal distribution and overlays
+    the probability density function (PDF) of the normal distribution. The plot is titled
+    with the fit results, showing the mean and standard deviation used in the generation.
+    The function returns both the plot and the samples generated.
 
     Parameters:
-    data (DataFrame): The dataset.
-    n_components (int): The number of principal components to calculate. Default is 2.
-
-    Returns:
-    DataFrame: The transformed data with principal components.
-    Axes: The matplotlib Axes object containing the scatter plot.
-
-    Raises:
-    ValueError: If n_components is not a positive integer.
+        mean (float): The mean of the normal distribution.
+        std_dev (float): The standard deviation of the normal distribution.
+        num_samples (int): The number of samples to draw from the distribution.
 
     Requirements:
     - numpy
-    - pandas
+    - scipy.stats.norm
     - matplotlib.pyplot
-    - sklearn.decomposition
 
-    Example:
-    >>> data = pd.DataFrame([[14, 25], [1, 22], [7, 8]], columns=['Column1', 'Column2'])
-    >>> transformed_data, plot = task_func(data)
+    Notes:
+    - The plot title is "Fit results: mean = %.2f, std = %.2f". This title format on the plot displays the mean and standard deviation
+        of the normal distribution used to generate the histogram. The values are presented in a format where %.2f
+        is replaced by the floating-point numbers corresponding to `mean` and `std_dev` respectively, rounded to two decimal places.
+    - The number of bins is set to 30
+
+    Returns:
+        tuple: A tuple containing:
+            - matplotlib.figure.Figure: The figure object for the plot.
+            - numpy.ndarray: An array of samples drawn from the normal distribution.
+
+    Examples:
+    >>> import matplotlib
+    >>> samples, fig = task_func(0, 1, 1000)
+    >>> len(samples)
+    1000
+    >>> type(samples)
+    <class 'numpy.ndarray'>
+    >>> isinstance(fig, matplotlib.figure.Figure)
+    True
+
+    Note: The actual values in the array depend on the random seed and will vary each time the function is called.
     """
-    np.random.seed(42)
-    if not isinstance(n_components, int) or n_components <= 0:
-        raise ValueError("n_components must be a positive integer")
-    pca = PCA(n_components=n_components)
-    transformed_data = pca.fit_transform(data)
+    samples = np.random.normal(mean, std_dev, num_samples)
     fig, ax = plt.subplots()
-    ax.scatter(transformed_data[:, 0], transformed_data[:, 1])
-    return pd.DataFrame(transformed_data, columns=[f'PC{i+1}' for i in range(n_components)]), ax
+    ax.hist(samples, bins=30, density=True, alpha=0.6, color='g')
+    xmin, xmax = ax.get_xlim()
+    x = np.linspace(xmin, xmax, 100)
+    p = norm.pdf(x, mean, std_dev)
+    ax.plot(x, p, 'k', linewidth=2)
+    title = "Fit results: mean = %.2f,  std = %.2f" % (mean, std_dev)
+    ax.set_title(title)
+    return samples, fig
 
 import unittest
-import pandas as pd
 import numpy as np
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.data = pd.DataFrame({
-            'Column1': np.random.rand(10),
-            'Column2': np.random.rand(10)
-        })
-    def test_transformed_data_shape(self):
-        transformed_data, _ = task_func(self.data, 2)
-        self.assertEqual(transformed_data.shape, (10, 2))
-    def test_invalid_n_components(self):
-        with self.assertRaises(ValueError):
-            task_func(self.data, 0)
-    def test_invalid_n_components_type(self):
-        with self.assertRaises(ValueError):
-            task_func(self.data, "two")
-    def test_plot_axes(self):
-        _, ax = task_func(self.data, 2)
-        self.assertEqual(len(ax.collections), 1)  # One scatter plot
-    def test_values(self):
-        np.random.seed(42)
-        transformed_data, _ = task_func(self.data, 2)
-        df_list = transformed_data.apply(lambda row: ','.join(row.values.astype(str)), axis=1).tolist()
-        # with open('df_contents.txt', 'w') as file:
-        #     file.write(str(df_list))
-        # Convert string pairs to list of tuples of floats
-        expect = ['-0.36270132751314693,-0.17330242962071069', '0.7073025303719391,0.12382897836601565', '0.45378164000836924,0.1734575007991456', '-0.06806713223200053,-0.18707071063291186', '-0.41150042971259093,0.09384691859758798', '-0.4104362188060755,0.09501439103733277', '-0.3990216926714853,0.2501208456858351', '0.34082913981297874,-0.14263963596803247', '0.08412503285413396,-0.028734567486117184', '0.06568845788787812,-0.20452129077814485']
-        # self.assertEqual(df_list, expect, "DataFrame contents should match the expected output")
-        df_tuples = [tuple(map(float, item.split(','))) for item in df_list]
-        expect_tuples = [tuple(map(float, item.split(','))) for item in expect]
-        # Assert each pair of tuples is approximately equal
-        for actual, expected in zip(df_tuples, expect_tuples):
-            self.assertAlmostEqual(actual[0], expected[0], places=7, msg="DataFrame contents should match the expected output")
-            self.assertAlmostEqual(actual[1], expected[1], places=7, msg="DataFrame contents should match the expected output")
+        """ Set up for each test, fixing the random seed for reproducibility. """
+        np.random.seed(0)
+    def test_samples_length(self):
+        """ Test if the number of generated samples is correct. """
+        samples, _ = task_func(0, 1, 1000)
+        self.assertEqual(len(samples), 1000)
+    def test_samples_type(self):
+        """ Test the type of the samples. """
+        samples, _ = task_func(0, 1, 1000)
+        self.assertIsInstance(samples, np.ndarray)
+    def test_mean_approximation(self):
+        """ Test if the mean of the samples is approximately equal to the specified mean. """
+        samples, _ = task_func(0, 1, 1000)
+        self.assertAlmostEqual(np.mean(samples), 0, places=1)
+    def test_std_dev_approximation(self):
+        """ Test if the standard deviation of the samples is approximately equal to the specified standard deviation. """
+        samples, _ = task_func(0, 1, 1000)
+        self.assertAlmostEqual(np.std(samples), 1, places=1)
+    def test_plot_title(self):
+        """ Test if the plot title correctly reflects the mean and standard deviation. """
+        _, fig = task_func(0, 1, 1000)
+        self.assertIn("mean = 0.00,  std = 1.00", fig.axes[0].get_title())
+    def test_histogram_bins(self):
+        """ Test if the histogram displays the correct number of bins. """
+        _, fig = task_func(0, 1, 1000)
+        self.assertEqual(len(fig.axes[0].patches), 30)  # Check for 30 bins, as defined in the function
+    def test_pdf_overlay(self):
+        """ Test if the probability density function (PDF) is correctly overlayed on the histogram. """
+        _, fig = task_func(0, 1, 1000)
+        lines = fig.axes[0].get_lines()
+        self.assertGreater(len(lines), 0)  # Ensure that at l
+    def test_pdf_overlay_accuracy(self):
+        """ Test if the PDF overlay accurately represents the normal distribution. """
+        mean, std_dev, num_samples = 0, 1, 1000
+        _, fig = task_func(mean, std_dev, num_samples)
+        ax = fig.axes[0]
+        line = ax.get_lines()[0]  # Assuming the first line is the PDF
+        x, y = line.get_data()
+        expected_y = norm.pdf(x, mean, std_dev)
+        np.testing.assert_array_almost_equal(y, expected_y, decimal=2)

@@ -1,62 +1,84 @@
-import pandas as pd
-import random
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+import re
 
-# Constants
-CATEGORIES = ['A', 'B', 'C', 'D', 'E']
 
-def task_func(value_range=(0, 100)):
+def task_func(example_str):
     """
-    Generate a category distribution within a specified range and return as a DataFrame.
+    Extract all texts not enclosed in square brackets into a string and calculate the TF-IDF values
+    which are returned as a dictionary.
 
     Parameters:
-    value_range (tuple): A tuple specifying the range (min, max) for generating random values for categories.
-    
+    example_str (str): The input string.
+
     Returns:
-    DataFrame: A pandas DataFrame that has two columns: 'Category' (category names) and 'Count' (count of each category). 
+    dict: A dictionary with words as keys and TF-IDF scores as values.
 
     Requirements:
-    - pandas
-    - random
+    - sklearn.feature_extraction.text.TfidfVectorizer
+    - numpy
+    - re
 
     Example:
-    >>> random.seed(0)
-    >>> df = task_func()
-    >>> df['Count'][0] >= 0
-    True
+    >>> tfidf_scores = task_func("Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003] Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]")
+    >>> print(tfidf_scores)
+    {'dog': 0.3779644730092272, 'josie': 0.3779644730092272, 'mugsy': 0.3779644730092272, 'smith': 0.7559289460184544}
     """
-    distribution = {category: random.randint(*value_range) for category in CATEGORIES}
-    df = pd.DataFrame(list(distribution.items()), columns=['Category', 'Count'])
-    return df
+    pattern = r'\[.*?\]'
+    text = re.sub(pattern, '', example_str)
+    if not text.strip():
+        return {}
+    tfidf_vectorizer = TfidfVectorizer()
+    tfidf_matrix = tfidf_vectorizer.fit_transform([text])
+    feature_names = tfidf_vectorizer.get_feature_names_out()
+    tfidf_scores = dict(zip(feature_names, np.squeeze(tfidf_matrix.toarray())))
+    return tfidf_scores
 
 import unittest
-import pandas as pd
-import random
+import doctest
 class TestCases(unittest.TestCase):
-    def test_return_type(self):
-        """Test if the function returns a DataFrame."""
-        random.seed(0)
-        result = task_func()
-        self.assertIsInstance(result, pd.DataFrame)
-    def test_columns(self):
-        """Test if the DataFrame has the correct columns."""
-        random.seed(0)
-        result = task_func()
-        self.assertListEqual(list(result.columns), ['Category', 'Count'])
-    def test_value_range_default(self):
-        """Test if the 'Count' values are within the default range."""
-        random.seed(0)
-        result = task_func()
-        for count in result['Count']:
-            self.assertTrue(0 <= count <= 100)
-    def test_value_range_custom(self):
-        """Test if the 'Count' values are within a custom range."""
-        random.seed(0)
-        test_range = (10, 50)
-        result = task_func(value_range=test_range)
-        for count in result['Count']:
-            self.assertTrue(test_range[0] <= count <= test_range[1])
-    def test_number_of_rows(self):
-        """Test if the DataFrame contains the expected number of rows."""
-        random.seed(0)
-        result = task_func()
-        self.assertEqual(len(result), len(CATEGORIES))
+    def test_case_1(self):
+        input_str = "Adversarial ] input ][[][ i[s []] a [ problem ] in [ machine learning ]"
+        output = task_func(input_str)
+        expected_output = {
+            'adversarial': 0.5773502691896258, 
+            'in': 0.5773502691896258, 
+            'input': 0.5773502691896258
+        }
+        self.assertDictEqual(output, expected_output)
+    def test_case_2(self):
+        input_str = "Alice [1234 Street, City, State] Bob Charlie [5678 Street, AnotherCity, State]"
+        output = task_func(input_str)
+        expected_output = {
+            'alice': 0.5773502691896258, 
+            'bob': 0.5773502691896258, 
+            'charlie': 0.5773502691896258
+        }
+        self.assertDictEqual(output, expected_output)
+    def test_case_3(self):
+        input_str = "No brackets here at all"
+        output = task_func(input_str)
+        expected_output = {
+            'all': 0.4472135954999579, 
+            'at': 0.4472135954999579, 
+            'brackets': 0.4472135954999579, 
+            'here': 0.4472135954999579, 
+            'no': 0.4472135954999579
+        }
+        self.assertDictEqual(output, expected_output)
+    def test_case_4(self):
+        input_str = "Mix [bracketed content] (and non-bracketed) content"
+        output = task_func(input_str)
+        expected_output = {
+            'and': 0.4472135954999579, 
+            'bracketed': 0.4472135954999579, 
+            'content': 0.4472135954999579, 
+            'mix': 0.4472135954999579, 
+            'non': 0.4472135954999579
+        }
+        self.assertDictEqual(output, expected_output)
+    def test_case_5(self):
+        input_str = "[Only bracketed content]"
+        output = task_func(input_str)
+        expected_output = {}
+        self.assertDictEqual(output, expected_output)

@@ -1,144 +1,130 @@
-import requests
-from bs4 import BeautifulSoup
-import pandas as pd
-from io import StringIO
+import xml.etree.ElementTree as ET
+import csv
 
 
-def task_func(url, table_id):
+def task_func(xml_content, output_csv_path):
     """
-    Extracts and converts data from a specified HTML table based on the given 'table_id' on a webpage into a Pandas DataFrame.
-    If the table is present but contains no data rows (i.e., no <tr> tags),
-    the function returns an empty DataFrame.
+    Parses XML content from a string and converts it into a CSV format.
 
     Parameters:
-    - url (str): The URL of the webpage from which to extract the table.
-    - table_id (str): The 'id' attribute of the HTML table to be extracted.
+    - xml_content (str): A string containing the XML content to be parsed. It should
+                       be well-formed XML.
+    - output_csv_path (str): The file path where the resulting CSV file will be saved.
+                           This path must be valid and accessible for writing.
 
     Returns:
-    - df (pd.DataFrame): A DataFrame containing the data extracted from the specified HTML table.
-                  If the table is found but has no rows (<tr> elements), an empty DataFrame is returned.
+    - None: The function does not return any value. Instead, it writes the output to
+          a CSV file at the specified path.
 
     Raises:
-    - requests.exceptions.HTTPError: If the HTTP request fails (e.g., due to connection issues or
-                                   a non-successful status code like 404 or 500).
-    - ValueError: If no table with the specified 'table_id' is found on the webpage. The error message will be
-                "Table with the specified ID not found."
+    - ET.ParseError: This exception is raised if the input XML content is malformed or
+                   cannot be successfully parsed. The exception message includes
+                   details about the parsing error.
+    - IOError: Raised if there is an issue with writing to the specified CSV file path.
+             This can happen due to reasons like invalid file path, full disk space,
+             lack of write permissions, etc. The exception message provides details
+             about the IO error.
+
 
     Requirements:
-    - requests
-    - bs4.BeautifulSoup
-    - pandas
-    - io
-    
-    Notes:
-    - The function raises an HTTPError for unsuccessful HTTP requests, which includes scenarios like
-      network problems or non-2xx HTTP responses.
-    - A ValueError is raised specifically when the HTML table with the specified ID is not present
-      in the webpage's content, indicating either an incorrect ID or the absence of the table.
-    - If the located table has no rows, indicated by the absence of <tr> tags, an empty DataFrame is returned.
-      This is useful for handling tables that are structurally present in the HTML but are devoid of data.
+    - xml
+    - csv
 
     Example:
-    >>> task_func('https://example.com/data.html', 'table1')
-    DataFrame:
-       Name  Age
-    0  Alice  25
-    1  Bob    30
+    >>> task_func('<root><element>data</element></root>', 'path/to/output.csv')
+    >>> with open('path/to/output.csv', 'r') as f:
+    ...     print(f.read())
+    element,data
 
-    Example of ValueError:
-    >>> task_func('https://example.com/data.html', 'nonexistent_table')
-    ValueError: Table with the specified ID not found.
-
-    Example of empty table:
-    >>> task_func('https://example.com/emptytable.html', 'empty_table')
-    DataFrame:
-    Empty DataFrame
-    Columns: []
-    Index: []
+    Note:
+    - Ensure that the XML content passed to the function is well-formed.
+    - The output CSV path should be a valid file path where the user has write
+      permissions, to prevent IOError.
     """
     try:
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
-    except requests.exceptions.HTTPError as e:
-        raise e
-    soup = BeautifulSoup(response.text, "html.parser")
-    table = soup.find("table", {"id": table_id})
-    if table is None:
-        raise ValueError("Table with the specified ID not found.")
-    if not table.find_all("tr"):
-        return pd.DataFrame()
-    df = pd.read_html(StringIO(str(table)))[0]
-    return df
+        root = ET.fromstring(xml_content)
+        data = [[elem.tag, elem.text] for elem in root.iter()]
+        with open(output_csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerows(data)
+    except ET.ParseError as e:
+        raise ET.ParseError(f"Error parsing XML: {e}") from e
+    except IOError as e:
+        raise IOError(f"Error writing CSV file: {e}") from e
 
 import unittest
-from unittest.mock import patch, MagicMock
-import pandas as pd
+import xml.etree.ElementTree as ET
+import csv
+import shutil
+from pathlib import Path
+import os
 class TestCases(unittest.TestCase):
     """Test cases for task_func."""
-    @patch("requests.get")
-    def test_successful_scrape(self, mock_get):
-        """Test a successful scrape."""
-        mock_html_content = """
-            <html>
-            <body>
-                <table id="table0">
-                    <tr><th>Name</th><th>Age</th></tr>
-                    <tr><td>Alice</td><td>25</td></tr>
-                    <tr><td>Bob</td><td>30</td></tr>
-                </table>
-            </body>
-            </html>
-        """
-        # Mock the response
-        mock_response = MagicMock()
-        mock_response.text = mock_html_content
-        mock_get.return_value = mock_response
-        # Test
-        df = task_func("http://example.com", "table0")
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertGreater(len(df), 0)
-        self.assertIn("Name", df.columns)
-        self.assertIn("Age", df.columns)
-    @patch("requests.get")
-    def test_table_not_found(self, mock_get):
-        """Test table not found."""
-        mock_html_content = "<html><body></body></html>"
-        mock_response = MagicMock()
-        mock_response.text = mock_html_content
-        mock_get.return_value = mock_response
-        # Test
-        with self.assertRaises(ValueError):
-            task_func("http://example.com", "non_existent_table")
-    @patch("requests.get")
-    def test_network_error(self, mock_get):
-        """Test network error."""
-        mock_get.side_effect = requests.exceptions.ConnectionError
-        with self.assertRaises(requests.exceptions.ConnectionError):
-            task_func("http://example.com", "table0")
-    @patch("requests.get")
-    def test_http_error(self, mock_get):
-        """Test HTTP error."""
-        mock_get.return_value.raise_for_status.side_effect = (
-            requests.exceptions.HTTPError
+    test_data_dir = "mnt/data/task_func_data"
+    def setUp(self):
+        """Set up method to create a directory for test files."""
+        self.test_dir = Path(self.test_data_dir)
+        self.test_dir.mkdir(parents=True, exist_ok=True)
+    def check_csv_content(self, xml_content, csv_path):
+        """Helper function to check if the CSV content matches the XML content."""
+        root = ET.fromstring(xml_content)
+        expected_data = [
+            [elem.tag, elem.text if elem.text is not None else ""]
+            for elem in root.iter()
+        ]
+        with open(csv_path, "r", encoding="utf-8") as file:
+            reader = csv.reader(file)
+            csv_data = list(reader)
+        self.assertEqual(expected_data, csv_data)
+    def test_simple_xml(self):
+        """Test with simple XML content."""
+        xml_content = "<root><element>data</element></root>"
+        csv_output = self.test_dir / "output_scenario_0.csv"
+        task_func(xml_content, csv_output)
+        self.check_csv_content(xml_content, csv_output)
+    def test_nested_xml(self):
+        """Test with nested XML content."""
+        xml_content = "<root><parent><child>data</child></parent></root>"
+        csv_output = self.test_dir / "output_scenario_1.csv"
+        task_func(xml_content, csv_output)
+        self.check_csv_content(xml_content, csv_output)
+    def test_empty_xml(self):
+        """Test with an empty XML."""
+        xml_content = "<root></root>"
+        csv_output = self.test_dir / "output_scenario_2.csv"
+        task_func(xml_content, csv_output)
+        self.check_csv_content(xml_content, csv_output)
+    def test_xml_with_attributes(self):
+        """Test with an XML that contains elements with attributes."""
+        xml_content = '<root><element attr="value">data</element></root>'
+        csv_output = self.test_dir / "output_scenario_3.csv"
+        task_func(xml_content, csv_output)
+        self.check_csv_content(xml_content, csv_output)
+    def test_large_xml(self):
+        """Test with a larger XML file."""
+        xml_content = (
+            "<root>"
+            + "".join([f"<element>{i}</element>" for i in range(100)])
+            + "</root>"
         )
-        # Test
-        with self.assertRaises(requests.exceptions.HTTPError):
-            task_func("http://example.com", "table0")
-    @patch("requests.get")
-    def test_empty_table(self, mock_get):
-        # Mock HTML content with an empty table
-        mock_html_content = """
-            <html>
-            <body>
-                <table id="table0"></table>
-            </body>
-            </html>
-        """
-        # Mock the response
-        mock_response = MagicMock()
-        mock_response.text = mock_html_content
-        mock_get.return_value = mock_response
-        # Test
-        df = task_func("http://example.com", "table0")
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(len(df), 0)
+        csv_output = self.test_dir / "output_scenario_4.csv"
+        task_func(xml_content, csv_output)
+        self.check_csv_content(xml_content, csv_output)
+    def test_invalid_xml_content(self):
+        """Test with invalid XML content to trigger ET.ParseError."""
+        xml_content = "<root><element>data</element"  # Malformed XML
+        csv_output = self.test_dir / "output_invalid_xml.csv"
+        with self.assertRaises(ET.ParseError):
+            task_func(xml_content, csv_output)
+    def test_unwritable_csv_path(self):
+        """Test with an unwritable CSV path to trigger IOError."""
+        xml_content = "<root><element>data</element></root>"
+        csv_output = self.test_dir / "non_existent_directory" / "output.csv"
+        with self.assertRaises(IOError):
+            task_func(xml_content, csv_output)
+    def tearDown(self):
+        # Cleanup the test directories
+        dirs_to_remove = ["mnt/data", "mnt"]
+        for dir_path in dirs_to_remove:
+            if os.path.exists(dir_path):
+                shutil.rmtree(dir_path)

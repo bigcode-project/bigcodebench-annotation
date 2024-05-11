@@ -1,88 +1,92 @@
-import numpy as np
-from scipy import integrate
-import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
 
-
-def task_func(func, x_range=(-2, 2), num_points=1000):
+def task_func(data):
     """
-    Calculates and plots both a given function and its cumulative integral over a specified range,
-    using a linearly spaced range of x-values.
+    Creates and return a heatmap of the cumulative sum of each column in a dictionary.
 
     Parameters:
-    func (function): A function of a single variable to integrate and plot.
-    x_range (tuple, optional): The range (start, end) over which to evaluate `func`. Defaults to (-2, 2).
-    num_points (int, optional): Number of points to generate in `x_range`. Defaults to 1000.
+    - data (dict): A dictionary where the keys are the column names and the values are the column values.
 
     Returns:
-    matplotlib.axes.Axes: The Axes object containing the plots of the function and its integral.
+    - matplotlib.axes._axes.Axes: The Axes object of the Seaborn heatmap.
+
+    Raises:
+    - ValueError: If the DataFrame is empty or if no numeric columns are present.
 
     Requirements:
-    - numpy
-    - scipy
-    - matplotlib
+    - pandas
+    - seaborn
 
-    Note:
-    - The plot includes a legend and labels for the x and y axes that include the function's name.
+    Notes:
+    - Only numeric columns are considered for the heatmap. Non-numeric columns are ignored.
 
     Example:
-    >>> ax = task_func(np.sin)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> ax.get_legend_handles_labels()[-1]
-    ['sin(x)', 'Integral of sin(x)']
+    >>> data = {'A': [1, 2, 3], 'B': [4, 5, 6]}
+    >>> ax = task_func(data)
     """
-    X = np.linspace(x_range[0], x_range[1], num_points)
-    y = func(X)
-    y_int = integrate.cumulative_trapezoid(y, X, initial=0)
-    fig, ax = plt.subplots()
-    ax.plot(X, y, label=f"{func.__name__}(x)")
-    ax.plot(X, y_int, label=f"Integral of {func.__name__}(x)")
-    ax.legend()
+    df = pd.DataFrame(data)
+    numeric_df = df.select_dtypes(include=["number"])
+    if numeric_df.empty:
+        raise ValueError("No numeric columns present")
+    df_cumsum = numeric_df.cumsum()
+    ax = sns.heatmap(df_cumsum)
     return ax
 
 import unittest
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
     def tearDown(self):
         plt.close("all")
-    def helper_assert_plot_attributes(self, func):
-        # Test plot attributes are as expected
-        ax = task_func(func)
-        function_name = func.__name__
-        legend_labels = ax.get_legend_handles_labels()[-1]
-        self.assertIsInstance(ax, Axes)
-        self.assertIn(function_name, legend_labels[0])
-        self.assertIn(function_name, legend_labels[1])
-    def test_case_1(self):
-        # Test basic case in docstring
-        ax = task_func(np.sin)
-        self.helper_assert_plot_attributes(np.sin)
-    def test_case_2(self):
-        # Test other functions - numpy
-        for func in [np.cos, np.exp]:
-            ax = task_func(func)
-            self.helper_assert_plot_attributes(func)
-    def test_case_3(self):
-        # Test other functions - lambda
-        func = lambda x: x ** 2
-        ax = task_func(func)
-        self.helper_assert_plot_attributes(func)
-    def test_case_4(self):
-        # Test custom range and points
-        ax = task_func(np.cos, x_range=(0, np.pi), num_points=500)
-        self.assertEqual(len(ax.lines[0].get_xdata()), 500)
-        self.assertEqual(ax.lines[0].get_xdata()[0], 0)
-        self.assertEqual(ax.lines[0].get_xdata()[-1], np.pi)
-    def test_case_5(self):
-        # Test correct integral calculation
-        # Test integral of x^2 in the range [0,1], should be close to 1/3
-        func = lambda x: x ** 2
-        X = np.linspace(0, 1, 1000)
-        expected_integral = 1 / 3 * X ** 3  # Analytical integral of x^2
-        ax = task_func(func, x_range=(0, 1), num_points=1000)
-        computed_integral = ax.lines[1].get_ydata()[
-            -1
-        ]  # Last value of the computed integral
-        self.assertAlmostEqual(computed_integral, expected_integral[-1], places=4)
+    def test_cumsum_correctness(self):
+        data = {"A": [1, 2, 3], "B": [4, 5, 6]}
+        df = pd.DataFrame(data)
+        ax = task_func(data)
+        result_cumsum = df.cumsum().values.flatten()
+        heatmap_data = ax.collections[0].get_array().data.flatten()
+        np.testing.assert_array_equal(
+            result_cumsum, heatmap_data, "Cumulative sum calculation is incorrect"
+        )
+    def test_non_numeric_columns_ignored(self):
+        data = {"A": [1, 2, 3], "B": ["one", "two", "three"]}
+        ax = task_func(data)
+        self.assertIsInstance(
+            ax, plt.Axes, "The result should be a matplotlib Axes object"
+        )
+        self.assertEqual(
+            len(ax.get_xticklabels()), 1, "Non-numeric columns should be ignored"
+        )
+    def test_with_positive_numbers(self):
+        data = {"A": [1, 2, 3], "B": [4, 5, 6]}
+        result = task_func(data)
+        self.assertIsInstance(
+            result, plt.Axes, "The result should be a matplotlib Axes object"
+        )
+    def test_with_negative_numbers(self):
+        data = {"A": [-1, -2, -3], "B": [-4, -5, -6]}
+        result = task_func(data)
+        self.assertIsInstance(
+            result, plt.Axes, "The result should be a matplotlib Axes object"
+        )
+    def test_with_mixed_numbers(self):
+        data = {"A": [1, -2, 3], "B": [-4, 5, -6]}
+        result = task_func(data)
+        self.assertIsInstance(
+            result, plt.Axes, "The result should be a matplotlib Axes object"
+        )
+    def test_with_zeroes(self):
+        data = {"A": [0, 0, 0], "B": [0, 0, 0]}
+        result = task_func(data)
+        self.assertIsInstance(
+            result, plt.Axes, "The result should be a matplotlib Axes object"
+        )
+    def test_with_empty_dataframe(self):
+        data = {"A": [], "B": []}
+        with self.assertRaises(ValueError):
+            task_func(data)
+    def test_no_numeric_columns(self):
+        data = {"A": ["one", "two", "three"], "B": ["four", "five", "six"]}
+        with self.assertRaises(ValueError):
+            task_func(data)

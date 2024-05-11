@@ -1,71 +1,64 @@
 import base64
-import json
-import zlib
+from cryptography.fernet import Fernet
 
-def task_func(data_dict):
+def task_func(message, encryption_key):
     """
-    Serializes a dictionary to a JSON string, compresses it using zlib, and then encodes the compressed
-    data with base64.
+    Encrypts a message with a symmetric encryption key using Fernet encryption, and then encode the 
+    encrypted message using base64.
 
     Parameters:
-    data_dict (dict): The dictionary to be compressed and encoded. The dictionary should only contain
-                      data that can be serialized to JSON.
+    message (str): The message to be encrypted and encoded.
+    encryption_key (str): The key used for symmetric encryption. It should be a string, which will 
+                          be encoded to bytes, then URL-safe base64 encoded to conform to the requirements 
+                          for Fernet (32 bytes after encoding).
 
     Returns:
-    str: A base64 encoded string that represents the zlib-compressed JSON string of the dictionary.
+    str: The base64 encoded encrypted message. The message is first encrypted using Fernet encryption, 
+         then the result is base64 encoded.
 
     Requirements:
     - base64
-    - zlib
-    - json
-    
+    - cryptography.fernet
+
     Example:
-    >>> data = {'key1': 'value1', 'key2': 'value2'}
-    >>> encoded_data = task_func(data)
-    >>> print(encoded_data)
-    eJyrVspOrTRUslJQKkvMKU01VNJRAIkYwUWMlGoBw5sKmw==
+    >>> encrypted_message = task_func('Hello, World!', '01234567890123456789012345678901')
+    >>> isinstance(encrypted_message, str)
+    True
     """
-    json_str = json.dumps(data_dict)
-    compressed = zlib.compress(json_str.encode())
-    return base64.b64encode(compressed).decode()
+    fernet = Fernet(base64.urlsafe_b64encode(encryption_key.encode()))
+    encrypted_message = fernet.encrypt(message.encode())
+    return base64.b64encode(encrypted_message).decode()
 
 import unittest
-import json
-import zlib
 import base64
+from cryptography.fernet import Fernet
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test with a simple dictionary containing string values.
-        data = {'key1': 'value1', 'key2': 'value2'}
-        result = task_func(data)
+        # Test with a basic message and a valid encryption key.
+        result = task_func('Hello, World!', '01234567890123456789012345678901')
         self.assertIsInstance(result, str)
-        decompressed_data = json.loads(zlib.decompress(base64.b64decode(result)).decode())
-        self.assertEqual(decompressed_data, data)
+        self.assertNotEqual(result, 'Hello, World!')
     def test_case_2(self):
-        # Test with an empty dictionary.
-        data = {}
-        result = task_func(data)
+        # Test with an empty message and a valid encryption key.
+        result = task_func('', '01234567890123456789012345678901')
         self.assertIsInstance(result, str)
-        decompressed_data = json.loads(zlib.decompress(base64.b64decode(result)).decode())
-        self.assertEqual(decompressed_data, data)
+        self.assertNotEqual(result, '')
     def test_case_3(self):
-        # Test with a dictionary containing mixed types (string and integers).
-        data = {'name': 'John', 'age': 30, 'city': 'New York'}
-        result = task_func(data)
+        # Test with a numeric message and a valid encryption key.
+        result = task_func('1234567890', '01234567890123456789012345678901')
         self.assertIsInstance(result, str)
-        decompressed_data = json.loads(zlib.decompress(base64.b64decode(result)).decode())
-        self.assertEqual(decompressed_data, data)
+        self.assertNotEqual(result, '1234567890')
     def test_case_4(self):
-        # Test with a nested dictionary containing lists of dictionaries.
-        data = {'users': [{'id': 1, 'name': 'Alice'}, {'id': 2, 'name': 'Bob'}]}
-        result = task_func(data)
+        # Test with a long message and a valid encryption key.
+        long_message = 'A' * 500
+        result = task_func(long_message, '01234567890123456789012345678901')
         self.assertIsInstance(result, str)
-        decompressed_data = json.loads(zlib.decompress(base64.b64decode(result)).decode())
-        self.assertEqual(decompressed_data, data)
+        self.assertNotEqual(result, long_message)
     def test_case_5(self):
-        # Test with a dictionary containing multiple integer values.
-        data = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5}
-        result = task_func(data)
-        self.assertIsInstance(result, str)
-        decompressed_data = json.loads(zlib.decompress(base64.b64decode(result)).decode())
-        self.assertEqual(decompressed_data, data)
+        # Test with a basic message and an incorrectly formatted encryption key.
+        with self.assertRaises(ValueError):
+            task_func('Hello, World!', '0123456789')
+    def test_case_6(self):
+        # Test with a non-base64 but correct length key.
+        with self.assertRaises(Exception):
+            task_func('Hello, World!', '01234567890123456789012345678901'*2)  # Not base64-encoded

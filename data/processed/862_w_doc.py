@@ -1,71 +1,80 @@
-from collections import Counter
-from random import choice, seed
+import random
+import string
+from collections import defaultdict
 
-# Constants
-POSSIBLE_ITEMS = ['apple', 'banana', 'cherry', 'date', 'elderberry']
 
-def task_func(list_of_lists):
+def task_func(n, seed=None):
     """
-    Create a "shopping cart" (Counter object) for each list in list_of_lists. 
-    The items in the cart are randomly selected from a predefined list of possible items (POSSIBLE_ITEMS).
-    The frequency of each item in the cart corresponds to the length of the list.
+    Generate a dictionary with lists of random lowercase english letters. 
+    
+    Each key in the dictionary  represents a unique letter from the alphabet,
+    and the associated value is a list, containing randomly generated instances
+    of that letter based on a seed.
+
+    The function randomly selects 'n' letters from the alphabet (a-z) and places each 
+    occurrence in the corresponding list within the dictionary. The randomness is based
+    on the provided seed value; the same seed will produce the same distribution of letters.
+
+    The dictionary has only those keys for which a letter was generated.
 
     Parameters:
-    - list_of_lists (list): A list of lists, each representing a 'basket'.
+    n (int): The number of random letters to generate.
+    seed (int, optional): A seed value for the random number generator. If None, the randomness
+                          is based on system time or the OS's randomness source.
 
     Returns:
-    - baskets (list): A list of Counters, each representing a 'shopping cart'.
+    defaultdict: A dictionary where the keys are characters ('a' to 'z') and the values 
+                 are lists of randomly generated letters. Each list may have 0 to 'n' occurrences of 
+                 its associated letter, depending on the randomness and seed.
 
     Requirements:
-    - collections
+    - collections.defaultdict
     - random
+    - string
 
     Example:
-    >>> baskets = task_func([[1, 2, 3], [4, 5]])
-    >>> all(isinstance(basket, Counter) for basket in baskets) # Illustrative, actual items will vary due to randomness
-    True
-    >>> sum(len(basket) for basket in baskets) # The sum of lengths of all baskets; illustrative example
-    3
+    >>> task_func(5, seed=123)
+    defaultdict(<class 'list'>, {'b': ['b'], 'i': ['i'], 'c': ['c'], 'y': ['y'], 'n': ['n']})
+
+    >>> task_func(30, seed=1)
+    defaultdict(<class 'list'>, {'e': ['e'], 's': ['s'], 'z': ['z', 'z', 'z'], 'y': ['y', 'y', 'y', 'y'], 'c': ['c'], 'i': ['i', 'i'], 'd': ['d', 'd'], 'p': ['p', 'p', 'p'], 'o': ['o', 'o'], 'u': ['u'], 'm': ['m', 'm'], 'g': ['g'], 'a': ['a', 'a'], 'n': ['n'], 't': ['t'], 'w': ['w'], 'x': ['x'], 'h': ['h']})
     """
-    seed(42)  # Set the seed for reproducibility
-    baskets = []
-    for list_ in list_of_lists:
-        basket = Counter()
-        for _ in list_:
-            basket[choice(POSSIBLE_ITEMS)] += 1
-        baskets.append(basket)
-    return baskets
+    LETTERS = string.ascii_lowercase
+    random.seed(seed)
+    letter_dict = defaultdict(list)
+    for _ in range(n):
+        letter = random.choice(LETTERS)
+        letter_dict[letter].append(letter)
+    return letter_dict
 
 import unittest
-from collections import Counter
+from collections import defaultdict
+import string
+import random
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        # Testing with empty list
-        result = task_func([])
-        self.assertEqual(result, [])
-    def test_case_2(self):
-        # Testing with empty sublists
-        result = task_func([[], [], []])
-        for basket in result:
-            self.assertEqual(basket, Counter())
-        
-    def test_case_3(self):
-        # Testing with sublists of different lengths
-        result = task_func([[1], [1, 2], [1, 2, 3]])
-        self.assertEqual(len(result), 3)
-        self.assertEqual(sum(result[0].values()), 1)
-        self.assertEqual(sum(result[1].values()), 2)
-        self.assertEqual(sum(result[2].values()), 3)
-    def test_case_4(self):
-        # Testing with sublists containing the same element
-        result = task_func([[1, 1, 1], [2, 2, 2, 2]])
-        self.assertEqual(len(result), 2)
-        self.assertEqual(sum(result[0].values()), 3)
-        self.assertEqual(sum(result[1].values()), 4)
-        
-    def test_case_5(self):
-        # Testing with large sublists
-        result = task_func([[1]*100, [2]*200])
-        self.assertEqual(len(result), 2)
-        self.assertEqual(sum(result[0].values()), 100)
-        self.assertEqual(sum(result[1].values()), 200)
+    def test_return_type(self):
+        result = task_func(10, seed=1)
+        self.assertIsInstance(result, defaultdict)
+        for key, value in result.items():
+            self.assertIsInstance(value, list)
+    def test_dictionary_keys(self):
+        result = task_func(100, seed=2)
+        for key in result.keys():
+            self.assertTrue('a' <= key <= 'z')
+    def test_random_seed_effect(self):
+        result1 = task_func(50, seed=3)
+        result2 = task_func(50, seed=3)
+        self.assertEqual(result1, result2)
+    def test_letters_distribution(self):
+        n = 60
+        result = task_func(n, seed=4)
+        total_letters = sum(len(lst) for lst in result.values())
+        self.assertEqual(total_letters, n)
+    def test_edge_cases(self):
+        result = task_func(0, seed=5)
+        for lst in result.values():
+            self.assertEqual(len(lst), 0)
+        large_n = 10000
+        result = task_func(large_n, seed=6)
+        total_letters = sum(len(lst) for lst in result.values())
+        self.assertEqual(total_letters, large_n)

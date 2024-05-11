@@ -1,133 +1,71 @@
+import math
 import numpy as np
-from scipy import stats
+import matplotlib.pyplot as plt
 
-# Constants
-FEATURES = ['feature1', 'feature2', 'feature3', 'feature4', 'feature5']
 
-def task_func(df, dct):
+def task_func(list_input):
     """
-    This function calculates and returns the mean, median, mode, and variance for specified features in a DataFrame. 
-    It replaces certain values in the DataFrame based on a provided dictionary mapping before performing the calculations.
-    
+    Sort the given list in ascending order based on the degree value of its elements, calculate the cumulative sum of 
+    the sorted list, and draw a line chart of the cumulative sum.
+
     Parameters:
-    df (DataFrame): The input DataFrame.
-    dct (dict): A dictionary for replacing values in df.
-    
-    Returns:
-    dict: A dictionary containing statistics (mean, median, mode, variance) for each feature defined in the 'FEATURES' constant.
-    
-    Requirements:
-    - numpy
-    - scipy.stats
+    list_input (list): The list to be sorted.
 
-    Note:
-    - The function would return "Invalid input" string if the input is invalid (e.g., does not contain the required 'feature1' key) or if there is an error in the calculation.
-    
+    Returns:
+    tuple: A tuple containing:
+           - numpy array: The cumulative sum of the sorted list.
+           - matplotlib.axes._axes.Axes: The Axes object of the plotted line chart.
+
+    Requirements:
+    - math
+    - numpy
+    - matplotlib.pyplot
+
     Example:
-    >>> df = pd.DataFrame({'feature1': [1, 2, 3, 4, 5], 'feature2': [5, 4, 3, 2, 1], 'feature3': [2, 2, 2, 2, 2], 'feature4': [1, 1, 3, 3, 5], 'feature5': [0, 1, 1, 1, 1]})
-    >>> dct = {}
-    >>> task_func(df, dct)
-    {'feature1': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 'feature2': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 'feature3': {'mean': 2.0, 'median': 2.0, 'mode': 2, 'variance': 0.0}, 'feature4': {'mean': 2.6, 'median': 3.0, 'mode': 1, 'variance': 2.24}, 'feature5': {'mean': 0.8, 'median': 1.0, 'mode': 1, 'variance': 0.16000000000000006}}
+    >>> cumsum, ax = task_func([10, 20, 30])
+    >>> print(cumsum)
+    [10 30 60]
+    >>> ax.get_title()
+    'Cumulative Sum Plot'
     """
-    df = df.replace(dct)
-    statistics = {}
-    try:
-        for feature in FEATURES:
-            mean = np.mean(df[feature])
-            median = np.median(df[feature])
-            mode = stats.mode(df[feature])[0][0]
-            variance = np.var(df[feature])
-            statistics[feature] = {'mean': mean, 'median': median, 'mode': mode, 'variance': variance}
-    except Exception as e:
-        return "Invalid input"        
-    return statistics
+    sorted_list = sorted(list_input, key=lambda x: (math.degrees(x), x))
+    cumsum = np.cumsum(sorted_list)
+    ax = plt.plot(cumsum)[0].axes
+    ax.set_title("Cumulative Sum Plot")
+    ax.set_xlabel("Index")
+    ax.set_ylabel("Cumulative Sum")
+    return cumsum, ax
 
 import unittest
-import pandas as pd
-import numpy as np
+import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test with simple numeric values
-        df = pd.DataFrame({
-            'feature1': [1, 2, 3, 4, 5],
-            'feature2': [5, 4, 3, 2, 1],
-            'feature3': [2, 2, 2, 2, 2],
-            'feature4': [1, 1, 3, 3, 5],
-            'feature5': [0, 1, 1, 1, 1]
-        })
-        dct = {}
-        
-        expected_result = {
-            'feature1': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 
-            'feature2': {'mean': 3.0, 'median': 3.0, 'mode': 1, 'variance': 2.0}, 
-            'feature3': {'mean': 2.0, 'median': 2.0, 'mode': 2, 'variance': 0.0}, 
-            'feature4': {'mean': 2.6, 'median': 3.0, 'mode': 1, 'variance': 2.24}, 
-            'feature5': {'mean': 0.8, 'median': 1.0, 'mode': 1, 'variance': 0.16000000000000006},
-        }
-        result = task_func(df, dct)
-        self.assertEqual(result, expected_result)
+        cumsum, ax = task_func([10, 20, 30])
+        self.assertListEqual(list(cumsum), [10, 30, 60])
+        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
+        self.assertEqual(ax.get_xlabel(), 'Index')
+        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
     def test_case_2(self):
-        # Test with string replacements
-        df = pd.DataFrame({
-            'feature1': ['a', 'b', 'a', 'a', 'c'],
-            'feature2': ['d', 'e', 'd', 'f', 'g'],
-            'feature3': ['h', 'i', 'j', 'k', 'l'],
-            'feature4': ['m', 'n', 'o', 'p', 'q'],
-            'feature5': ['r', 's', 't', 'u', 'v']
-        })
-        dct = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9, 'j': 10, 'k': 11, 'l': 12, 'm': 13, 'n': 14, 'o': 15, 'p': 16, 'q': 17, 'r': 18, 's': 19, 't': 20, 'u': 21, 'v': 22}
-        
-        expected_result = {
-            'feature1': {'mean': 1.6, 'median': 1.0, 'mode': 1, 'variance': 0.64}, 
-            'feature2': {'mean': 5.2, 'median': 5.0, 'mode': 4, 'variance': 1.3599999999999999},
-            'feature3': {'mean': 10.0, 'median': 10.0, 'mode': 8, 'variance': 2.0}, 
-            'feature4': {'mean': 15.0, 'median': 15.0, 'mode': 13, 'variance': 2.0}, 
-            'feature5': {'mean': 20.0, 'median': 20.0, 'mode': 18, 'variance': 2.0}
-        }
-        result = task_func(df, dct)
-        self.assertEqual(result, expected_result)
+        cumsum, ax = task_func([5, 15, 25])
+        self.assertListEqual(list(cumsum), [5, 20, 45])
+        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
+        self.assertEqual(ax.get_xlabel(), 'Index')
+        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
     def test_case_3(self):
-        # Test with missing features in DataFrame
-        df = pd.DataFrame({
-            'feature1': [1, 2, 3],
-            'feature2': [2, 3, 1],
-            'feature3': [4, 5, 6],
-            'feature4': [5, 6, 7],
-            'feature5': [7, 8, 9]
-        })
-        dct = {}
-        expected_result = {
-            'feature1': {'mean': 2.0, 'median': 2.0, 'mode': 1, 'variance': 0.6666666666666666}, 
-            'feature2': {'mean': 2.0, 'median': 2.0, 'mode': 1, 'variance': 0.6666666666666666}, 
-            'feature3': {'mean': 5.0, 'median': 5.0, 'mode': 4, 'variance': 0.6666666666666666}, 
-            'feature4': {'mean': 6.0, 'median': 6.0, 'mode': 5, 'variance': 0.6666666666666666}, 
-            'feature5': {'mean': 8.0, 'median': 8.0, 'mode': 7, 'variance': 0.6666666666666666}
-        }
-        result = task_func(df, dct)
-        self.assertEqual(result, expected_result)
+        cumsum, ax = task_func([])
+        self.assertListEqual(list(cumsum), [])
+        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
+        self.assertEqual(ax.get_xlabel(), 'Index')
+        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
     def test_case_4(self):
-        # Test with string replacements
-        df = pd.DataFrame({
-            'feature1': ['a', 'b', 'c'],
-            'feature2': ['d', 'e', 'f'],
-            'feature3': ['h', 'i', 'j'],
-            'feature4': ['m', 'n', 'o'],
-            'feature5': ['r', 's', 't']
-        })
-        dct = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9, 'j': 10, 'k': 11, 'l': 12, 'm': 13, 'n': 14, 'o': 15, 'p': 16, 'q': 17, 'r': 18, 's': 19, 't': 20, 'u': 21, 'v': 22}
-        
-        expected_result = {
-            'feature1': {'mean': 2.0, 'median': 2.0, 'mode': 1, 'variance': 0.6666666666666666}, 
-            'feature2': {'mean': 5.0, 'median': 5.0, 'mode': 4, 'variance': 0.6666666666666666}, 
-            'feature3': {'mean': 9.0, 'median': 9.0, 'mode': 8, 'variance': 0.6666666666666666}, 
-            'feature4': {'mean': 14.0, 'median': 14.0, 'mode': 13, 'variance': 0.6666666666666666}, 
-            'feature5': {'mean': 19.0, 'median': 19.0, 'mode': 18, 'variance': 0.6666666666666666}
-        }
-        result = task_func(df, dct)
-        self.assertEqual(result, expected_result)
-    
+        cumsum, ax = task_func([1, 2, 3, 4, 5])
+        self.assertListEqual(list(cumsum), [1, 3, 6, 10, 15])
+        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
+        self.assertEqual(ax.get_xlabel(), 'Index')
+        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')
     def test_case_5(self):
-        # Test with invalid input
-        df = pd.DataFrame({})
-        result = task_func(df, {})
-        self.assertEqual(result, "Invalid input")
+        cumsum, ax = task_func([5])
+        self.assertListEqual(list(cumsum), [5])
+        self.assertEqual(ax.get_title(), 'Cumulative Sum Plot')
+        self.assertEqual(ax.get_xlabel(), 'Index')
+        self.assertEqual(ax.get_ylabel(), 'Cumulative Sum')

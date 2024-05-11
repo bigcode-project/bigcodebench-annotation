@@ -1,92 +1,85 @@
+import requests
 import json
 import base64
-from datetime import datetime
 
-def task_func(data: dict, DATE_FORMAT = "%Y-%m-%d %H:%M:%S") -> str:
+def task_func(data, url="http://your-api-url.com"):
     """
-    Takes a Python dictionary, adds a current timestamp to it, serializes the modified dictionary
-    to a JSON-formatted string, and then encodes this string using base64 encoding with ASCII character encoding.
+    Convert a Python dictionary into a JSON-formatted string, encode this string in base64 format,
+    and send it as a 'payload' in a POST request to an API endpoint.
     
     Parameters:
-    data (dict): The Python dictionary to encode. The dictionary should not contain a key named 'timestamp',
-                 as this key is used to insert the current timestamp by the function. The input dictionary
-                 is modified in-place by adding the 'timestamp' key.
+    data (dict): The Python dictionary to encode and send.
+    url (str, optional): The API endpoint URL. Defaults to "http://your-api-url.com".
     
     Returns:
-    str: A base64 encoded string that represents the input dictionary with an added timestamp,
-         encoded in ASCII. The timestamp is added with the key 'timestamp'.
-    DATE_FORMAT: The timestamp format. Default to 'YYYY-MM-DD HH:MM:SS'.
-         
+    requests.Response: The response object received from the API endpoint after the POST request.
+    
     Requirements:
+    - requests
     - json
     - base64
-    - datetime.datetime
     
     Example:
     >>> data = {'name': 'John', 'age': 30, 'city': 'New York'}
-    >>> encoded_data = task_func(data)
-    >>> isinstance(encoded_data, str)
-    True
+    >>> response = task_func(data, url="http://example-api-url.com")
+    >>> print(response.status_code)
+    200
     """
-    data['timestamp'] = datetime.now().strftime(DATE_FORMAT)
     json_data = json.dumps(data)
     encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')
-    return encoded_data
+    response = requests.post(url, json={"payload": encoded_data})
+    return response
 
 import unittest
+from unittest.mock import patch, Mock
+import requests
 import json
-import base64
-from datetime import datetime
+# Mocking the requests.post method
+def mock_post(*args, **kwargs):
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.text = "OK"
+    return mock_response
 class TestCases(unittest.TestCase):
-    
-    def test_task_func_basic(self):
-        """Test the task_func function with a basic dictionary."""
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_1(self, mock_post_method):
         data = {'name': 'John', 'age': 30, 'city': 'New York'}
-        encoded_data = task_func(data)
-        decoded_data = json.loads(base64.b64decode(encoded_data).decode('ascii'))
-        self.assertEqual(data['name'], decoded_data['name'])
-        self.assertEqual(data['age'], decoded_data['age'])
-        self.assertEqual(data['city'], decoded_data['city'])
-        self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], "%Y-%m-%d %H:%M:%S"), datetime)
-        
-    def test_task_func_empty(self):
-        """Test the task_func function with an empty dictionary."""
+        response = task_func(data, url="http://mock-api-url.com")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, "OK")
+    
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_2(self, mock_post_method):
+        data = {'task': 'Write code', 'status': 'completed'}
+        response = task_func(data, url="http://mock-api-url.com")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, "OK")
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_3(self, mock_post_method):
         data = {}
-        encoded_data = task_func(data)
-        decoded_data = json.loads(base64.b64decode(encoded_data).decode('ascii'))
-        self.assertEqual(len(decoded_data), 1)
-        self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], "%Y-%m-%d %H:%M:%S"), datetime)
-        
-    def test_task_func_nested(self):
-        """Test the task_func function with a nested dictionary."""
-        data = {'user': {'name': 'John', 'age': 30}, 'location': {'city': 'New York', 'country': 'USA'}}
-        encoded_data = task_func(data)
-        decoded_data = json.loads(base64.b64decode(encoded_data).decode('ascii'))
-        self.assertEqual(data['user'], decoded_data['user'])
-        self.assertEqual(data['location'], decoded_data['location'])
-        self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], "%Y-%m-%d %H:%M:%S"), datetime)
-        
-    def test_task_func_numeric(self):
-        """Test the task_func function with a dictionary containing numeric keys."""
-        data = {1: 10, 2: 20, 3: 30}
-        encoded_data = task_func(data)
-        decoded_data = json.loads(base64.b64decode(encoded_data).decode('ascii'))
-        data_str_keys = {str(k): v for k, v in data.items()}
-        for k, v in data_str_keys.items():
-            self.assertEqual(v, decoded_data[k])
-        self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], "%Y-%m-%d %H:%M:%S"), datetime)
-        
-    def test_task_func_mixed(self):
-        """Test the task_func function with a dictionary containing mixed types of keys and values."""
-        data = {'name': 'John', 1: 30, 'nested': {'key': 'value'}, 'list': [1, 2, 3]}
-        encoded_data = task_func(data)
-        decoded_data = json.loads(base64.b64decode(encoded_data).decode('ascii'))
-        data_str_keys = {str(k): v for k, v in data.items()}
-        for k, v in data_str_keys.items():
-            self.assertEqual(v, decoded_data[k])
-        self.assertIn('timestamp', decoded_data)
-        self.assertIsInstance(datetime.strptime(decoded_data['timestamp'], "%Y-%m-%d %H:%M:%S"), datetime)
+        response = task_func(data, url="http://mock-api-url.com")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, "OK")
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_4(self, mock_post_method):
+        data = {'fruit': 'apple', 'color': 'red', 'taste': 'sweet'}
+        response = task_func(data, url="http://mock-api-url.com")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, "OK")
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_5(self, mock_post_method):
+        data = {'country': 'USA', 'capital': 'Washington, D.C.'}
+        response = task_func(data, url="http://mock-api-url.com")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, "OK")
+    @patch('requests.post', side_effect=mock_post)
+    def test_case_6(self, mock_post_method):
+        # Test to verify that the POST request is made with the correct parameters
+        data = {'name': 'John', 'age': 30, 'city': 'New York'}
+        json_data = json.dumps(data)
+        encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')
+        task_func(data, url="http://mock-api-url.com")
+        try:
+            mock_post_method.assert_called_once_with("http://mock-api-url.com", data={"payload": encoded_data})
+        except:
+            mock_post_method.assert_called_once_with("http://mock-api-url.com", json={"payload": encoded_data})

@@ -1,78 +1,81 @@
-import pandas as pd
 import matplotlib.pyplot as plt
+from itertools import zip_longest
 
-def task_func(data):
-    """
-    Draw a pie chart that shows the job distribution in the given data and return the plot object.
 
+# Constants
+COLORS = ['red', 'green', 'blue', 'yellow', 'purple']
+
+def task_func(data, labels):
+    """    
+    Plot a list of data with different colors. If there are more data series than the predefined colors, 
+    the function cycles through the colors. In case of even more series than colors + labels, 'black' is used.
+    
     Parameters:
-    data (DataFrame): A pandas DataFrame where each row represents an individual's data, 
-                      with columns 'Name' (str), 'Date' (str in format 'dd/mm/yyyy'), and 'Job' (str).
-
+    data (list): A list of lists, each representing a series of data.
+    labels (list): A list of labels for the data series.
+    
     Returns:
-    matplotlib.figure.Figure: The Figure object containing the pie chart.
-
-    Raises:
-    - The function will raise ValueError if the input data is not a DataFrame.
-
+    matplotlib.axes.Axes: The Axes object of the plot.
+    
     Requirements:
     - matplotlib.pyplot
-    - pandas
-
+    - itertools.zip_longest
+    - Predefined colors are ['red', 'green', 'blue', 'yellow', 'purple'].
+    
     Example:
-    >>> data = pd.DataFrame({'Name': ['John', 'Jane', 'Joe'],
-    ...                      'Date': ['01/03/2012', '02/05/2013', '03/08/2014'],
-    ...                      'Job': ['Engineer', 'Doctor', 'Lawyer']})
-    >>> fig = task_func(data)
-    >>> type(fig)
-    <class 'matplotlib.figure.Figure'>
-    >>> len(fig.axes[0].patches) #check slices from pie chart
-    3
-    >>> plt.close()
+    >>> data = [[1, 2, 3, 4, 5], [2, 3, 4, 5, 6], [3, 4, 5, 6, 7]]
+    >>> labels = ['Series 1', 'Series 2', 'Series 3']
+    >>> ax = task_func(data, labels)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    if not isinstance(data, pd.DataFrame):
-        raise ValueError("Input df is not a DataFrame.")
-    job_count = data['Job'].value_counts()
-    labels = job_count.index.tolist()
-    sizes = job_count.values.tolist()
-    colors = [plt.cm.Spectral(i/float(len(labels))) for i in range(len(labels))]
     fig, ax = plt.subplots()
-    ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
-    ax.axis('equal')
-    return fig
+    for series, label, color in zip_longest(data, labels, COLORS, fillvalue='black'):
+        ax.plot(series, label=label, color=color)
+    ax.legend()
+    return ax
 
 import unittest
-import matplotlib.pyplot as plt
-import pandas as pd
+import doctest
 class TestCases(unittest.TestCase):
-    def test_empty_data(self):
-        data = pd.DataFrame(columns=['Name', 'Date', 'Job'])
-        fig = task_func(data)
-        self.assertIsInstance(fig, plt.Figure)
-        plt.close()
-    def test_single_job(self):
-        data = pd.DataFrame({'Name': ['John'], 'Date': ['01/03/2012'], 'Job': ['Engineer']})
-        fig = task_func(data)
-        self.assertIsInstance(fig, plt.Figure)
-        # Check pie sizes
-        sizes = fig.axes[0].patches
-        self.assertEqual(len(sizes), 1)  # There should be only one slice
-        plt.close()
-    def test_multiple_jobs(self):
-        data = pd.DataFrame({'Name': ['John', 'Jane'], 'Date': ['01/03/2012', '02/05/2013'], 'Job': ['Engineer', 'Doctor']})
-        fig = task_func(data)
-        self.assertIsInstance(fig, plt.Figure)
-        # Check pie sizes
-        sizes = fig.axes[0].patches
-        self.assertEqual(len(sizes), 2)  # There should be two slices
-        plt.close()
-    def test_repeated_jobs(self):
-        data = pd.DataFrame({'Name': ['John', 'Jane', 'Joe'], 'Date': ['01/03/2012', '02/05/2013', '03/08/2014'], 'Job': ['Engineer', 'Engineer', 'Lawyer']})
-        fig = task_func(data)
-        self.assertIsInstance(fig, plt.Figure)
-        plt.close()
-    def test_large_dataset(self):
-        data = pd.DataFrame({'Name': ['Person' + str(i) for i in range(100)], 'Date': ['01/01/2020' for _ in range(100)], 'Job': ['Job' + str(i % 3) for i in range(100)]})
-        fig = task_func(data)
-        self.assertIsInstance(fig, plt.Figure)
-        plt.close()
+    
+    def test_case_1(self):
+        data = [[1, 2, 3, 4, 5], [2, 3, 4, 5, 6], [3, 4, 5, 6, 7]]
+        labels = ['Series 1', 'Series 2', 'Series 3']
+        ax = task_func(data, labels)
+        self.assertIsInstance(ax, plt.Axes)
+        lines = ax.get_lines()
+        self.assertEqual(lines[0].get_color(), 'red')
+        self.assertEqual(lines[1].get_color(), 'green')
+        self.assertEqual(lines[2].get_color(), 'blue')
+    def test_case_2(self):
+        data = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]
+        labels = ['A', 'B', 'C', 'D']
+        ax = task_func(data, labels)
+        self.assertIsInstance(ax, plt.Axes)
+        lines = ax.get_lines()
+        self.assertEqual(lines[3].get_color(), 'yellow')
+    def test_case_3(self):
+        data = [[1, 2], [3, 4]]
+        labels = ['X', 'Y']
+        ax = task_func(data, labels)
+        self.assertIsInstance(ax, plt.Axes)
+        lines = ax.get_lines()
+        self.assertEqual(lines[0].get_color(), 'red')
+        self.assertEqual(lines[1].get_color(), 'green')
+    def test_case_4(self):
+        data = [[1, 2, 3, 4, 5], [2, 3, 4, 5, 6], [3, 4, 5, 6, 7], [1, 2, 3, 4, 5], [2, 3, 4, 5, 6], [3, 4, 5, 6, 7]]
+        labels = ['Series 1', 'Series 2', 'Series 3', 'Series 4', 'Series 5', 'Series 6']
+        ax = task_func(data, labels)
+        self.assertIsInstance(ax, plt.Axes)
+        lines = ax.get_lines()
+        self.assertEqual(lines[5].get_color(), 'black')
+        
+    def test_case_5(self):
+        data = [[1, 2, 3], [4, 5, 6]]
+        labels = []
+        ax = task_func(data, labels)
+        self.assertIsInstance(ax, plt.Axes)
+        lines = ax.get_lines()
+        self.assertEqual(lines[0].get_color(), 'red')
+        self.assertEqual(lines[1].get_color(), 'green')

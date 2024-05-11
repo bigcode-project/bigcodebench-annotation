@@ -1,56 +1,63 @@
-from itertools import chain
-import numpy as np
-from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import norm
+from itertools import chain
 
 
 def task_func(L):
     '''
-    Convert a list of lists 'L' into a single list of integers, standardize the integers, and plot the standardized values.
-
-    Parameters:
-    L (list of lists): A list of lists where each sublist contains integers.
-    
-    Returns:
-    matplotlib.axes._axes.Axes: A plot displaying the standardized values.
+    Convert a list of lists 'L' into a flattened list of integers, then fit a normal distribution to the data 
+    and plot a histogram with the fitted normal distribution overlay.
 
     Requirements:
     - numpy
-    - itertools
-    - sklearn.preprocessing
+    - itertools.chain
+    - scipy.stats.norm
     - matplotlib.pyplot
 
-    Examples:
+    Parameters:
+    L (list of lists): A nested list where each inner list contains integers.
+
+    Returns:
+    matplotlib.axes._axes.Axes: Axes object with the plotted histogram and normal distribution overlay.
+
+    Example:
     >>> ax = task_func([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     '''
     data = list(chain(*L))
-    data = np.array(data).reshape(-1, 1)
-    scaler = StandardScaler()
-    standardized_data = scaler.fit_transform(data)
+    mu, std = norm.fit(data)
     fig, ax = plt.subplots()
-    ax.plot(standardized_data)
-    plt.close(fig)
+    ax.hist(data, bins=30, density=True, alpha=0.6, color='g')
+    xmin, xmax = plt.xlim()
+    x = np.linspace(xmin, xmax, 100)
+    p = norm.pdf(x, mu, std)
+    ax.plot(x, p, 'k', linewidth=2)
+    title = "Fit results: mu = %.2f,  std = %.2f" % (mu, std)
+    ax.set_title(title)
     return ax
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        ax = task_func([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        L = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        ax = task_func(L)
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 9)
     def test_case_2(self):
-        ax = task_func([[-1, -2, -3], [-4, -5, -6], [-7, -8, -9]])
+        L = [[10, 20, 30], [40, 50, 60], [70, 80, 90]]
+        ax = task_func(L)
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 9)
+        # self.assertIn("Fit results:", ax.get_title())
     def test_case_3(self):
-        ax = task_func([[1, -2, 3], [-4, 5, -6], [7, -8, 9]])
+        L = [[-1, -2, -3], [-4, -5, -6], [-7, -8, -9]]
+        ax = task_func(L)
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 9)
+        # self.assertIn("Fit results:", ax.get_title())
     def test_case_4(self):
-        ax = task_func([[1, 2, 3, 4, 5]])
+        L = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        ax = task_func(L)
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 5)
+        # self.assertIn("Fit results:", ax.get_title())
     def test_case_5(self):
-        ax = task_func([[1, 2], [3, 4, 5, 6], [7]])
+        L = [[5, 15, 25], [35, 45, 55], [65, 75, 85]]
+        ax = task_func(L)
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.lines[0].get_ydata()), 7)

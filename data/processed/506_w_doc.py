@@ -1,49 +1,116 @@
-import hashlib
-import hmac
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
-def task_func(secret, message):
+def task_func(column, data):
     """
-    Generates an HMAC (Hash-based Message Authentication Code) signature for a given message using a secret key.
-    The function uses SHA-256 as the hash function to create the HMAC signature.
+    Analyze and visualize statistical properties of a specified weather data column.
+
+    This function calculates the sum, mean, minimum, and maximum values of a specified column in the given data.
+    It also generates a histogram plot of the data in the column. The dataset is expected to be a list of weather
+    observations, where each observation includes date, temperature, humidity, wind speed, and precipitation values.
+    If the provided data list is empty, resulting in an empty DataFrame, the function handles it by setting:
+    - The 'mean' value to np.nan.
+    - The 'min' value to np.inf.
+    - The 'max' value to -np.inf.
 
     Parameters:
-    secret (str): The secret key used for HMAC generation.
-    message (str): The message for which the HMAC signature is to be generated.
+    column (str): The column to analyze. Valid columns include 'Temperature', 'Humidity', 'Wind Speed', and 'Precipitation'.
+    data (list of lists): The weather data where each inner list contains the following format:
+                          [Date (datetime object), Temperature (int), Humidity (int), Wind Speed (int), Precipitation (float)]
 
     Returns:
-    str: The HMAC signature of the message, returned as a hexadecimal string.
+    - result (dict): A dictionary containing:
+        - 'sum': Sum of the values in the specified column.
+        - 'mean': Mean of the values in the specified column.
+        - 'min': Minimum value in the specified column.
+        - 'max': Maximum value in the specified column.
+        - 'plot': A matplotlib BarContainer object of the histogram plot for the specified column.
 
     Requirements:
-    - hashlib
-    - hmac
+    - pandas
+    - numpy
+    - matplotlib.pyplot
 
-    Examples:
-    Generate an HMAC signature for a message.
-    >>> len(task_func('mysecretkey', 'Hello, world!')) == 64
-    True
-
-    Generate an HMAC for a different message with the same key.
-    >>> len(task_func('mysecretkey', 'Goodbye, world!')) == 64
-    True
+    Example:
+    >>> data = [[datetime(2022, 1, 1), -5, 80, 10, 0], [datetime(2022, 1, 3), -2, 83, 15, 0]]
+    >>> result = task_func('Temperature', data)
+    >>> result['sum']
+    -7
+    >>> type(result['plot'])
+    <class 'matplotlib.container.BarContainer'>
     """
-    return hmac.new(secret.encode(), message.encode(), hashlib.sha256).hexdigest()
+    COLUMNS = ["Date", "Temperature", "Humidity", "Wind Speed", "Precipitation"]
+    df = pd.DataFrame(data, columns=COLUMNS)
+    column_data = df[column]
+    result = {
+        "sum": np.sum(column_data),
+        "mean": np.nan if df.empty else np.mean(column_data),
+        "min": np.inf if df.empty else np.min(column_data),
+        "max": -np.inf if df.empty else np.max(column_data),
+    }
+    _, _, ax = plt.hist(column_data)
+    plt.title(f"Histogram of {column}")
+    result["plot"] = ax
+    return result
 
 import unittest
+import matplotlib
+import matplotlib.pyplot as plt
+from datetime import datetime
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_hmac_signature_length(self):
-        signature = task_func('secretkey', 'Hello, world!')
-        self.assertEqual(len(signature), 64)
-    def test_hmac_signature_different_messages(self):
-        sig1 = task_func('secretkey', 'Hello, world!')
-        sig2 = task_func('secretkey', 'Goodbye, world!')
-        self.assertNotEqual(sig1, sig2)
-    def test_hmac_signature_same_message_different_keys(self):
-        sig1 = task_func('key1', 'Hello, world!')
-        sig2 = task_func('key2', 'Hello, world!')
-        self.assertNotEqual(sig1, sig2)
-    def test_hmac_signature_empty_message(self):
-        signature = task_func('secretkey', '')
-        self.assertEqual(len(signature), 64)
-    def test_hmac_signature_empty_key(self):
-        signature = task_func('', 'Hello, world!')
-        self.assertEqual(len(signature), 64)
+    def setUp(self):
+        self.data = [
+            [datetime(2022, 1, 1), -5, 80, 10, 0],
+            [datetime(2022, 1, 2), -3, 85, 12, 0.5],
+            [datetime(2022, 1, 3), -2, 83, 15, 0],
+            [datetime(2022, 1, 4), -1, 82, 13, 0.2],
+            [datetime(2022, 1, 5), 0, 80, 11, 0.1],
+        ]
+    def test_case_1(self):
+        # Testing the 'Temperature' column
+        result = task_func("Temperature", self.data)
+        self.assertEqual(result["sum"], -11)
+        self.assertEqual(result["mean"], -2.2)
+        self.assertEqual(result["min"], -5)
+        self.assertEqual(result["max"], 0)
+        self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
+    def test_case_2(self):
+        # Testing the 'Humidity' column
+        result = task_func("Humidity", self.data)
+        self.assertEqual(result["sum"], 410)
+        self.assertEqual(result["mean"], 82)
+        self.assertEqual(result["min"], 80)
+        self.assertEqual(result["max"], 85)
+        self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
+    def test_case_3(self):
+        # Testing the 'Wind Speed' column
+        result = task_func("Wind Speed", self.data)
+        self.assertEqual(result["sum"], 61)
+        self.assertEqual(result["mean"], 12.2)
+        self.assertEqual(result["min"], 10)
+        self.assertEqual(result["max"], 15)
+        self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
+    def test_case_4(self):
+        # Testing the 'Precipitation' column
+        result = task_func("Precipitation", self.data)
+        self.assertAlmostEqual(result["sum"], 0.8, places=6)
+        self.assertAlmostEqual(result["mean"], 0.16, places=6)
+        self.assertAlmostEqual(result["min"], 0, places=6)
+        self.assertAlmostEqual(result["max"], 0.5, places=6)
+        self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
+    def test_case_5(self):
+        # Testing with empty data
+        result = task_func("Temperature", [])
+        self.assertTrue(np.isnan(result["mean"]))
+        self.assertEqual(result["sum"], 0)
+        self.assertTrue(
+            np.isinf(result["min"]) and result["min"] > 0
+        )  # Checking for positive infinity for min
+        self.assertTrue(
+            np.isinf(result["max"]) and result["max"] < 0
+        )  # Checking for negative infinity for max
+        self.assertIsInstance(result["plot"], matplotlib.container.BarContainer)
+    def tearDown(self):
+        plt.close("all")

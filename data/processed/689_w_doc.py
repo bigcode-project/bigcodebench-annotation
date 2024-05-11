@@ -1,57 +1,83 @@
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
+import numpy as np
+from scipy import stats
 
 def task_func(df):
     """
-    Given a Pandas DataFrame with random numeric values, standardize it with the standard scaler from sklearn.
+    Given a Pandas DataFrame with random numeric values test if the data in each column is normally distributed using the Shapiro-Wilk test.
 
     Parameters:
-    - df (DataFrame): The DataFrame to be standardized.
+    - df (DataFrame): A Pandas DataFrame with random numeric values.
     
     Returns:
-    - df_standardized (DataFrame): The standardized DataFrame.
+    - dict: A dictionary with p-values from the Shapiro-Wilk test for each column.
 
     Requirements:
-    - pandas
-    - sklearn
+    - numpy
+    - scipy
 
     Example:
-    >>> df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
-    >>> task_func(df)
-              a         b
-    0 -1.224745 -1.224745
-    1  0.000000  0.000000
-    2  1.224745  1.224745
+    >>> np.random.seed(42)
+    >>> df = pd.DataFrame(np.random.normal(size=(100, 5)))
+    >>> p_values = task_func(df)
+    >>> print(p_values)
+    {0: 0.3595593273639679, 1: 0.23594242334365845, 2: 0.7625704407691956, 3: 0.481273353099823, 4: 0.13771861791610718}
     """
-    scaler = StandardScaler()
-    df_standardized = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
-    return df_standardized
+    p_values = {}
+    for col in df.columns:
+        column_data = np.array(df[col])
+        test_stat, p_value = stats.shapiro(column_data)
+        p_values[col] = p_value
+    return p_values
 
 import unittest
+import pandas as pd
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        np.random.seed(42)
+    
     def test_case_1(self):
         df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
-        df_standardized = task_func(df)
-        self.assertAlmostEqual(df_standardized['a'].mean(), 0)
-        self.assertAlmostEqual(df_standardized['a'].std(), 1.224744871391589)
+        p_values = task_func(df)
+        self.assertEqual(len(p_values), 2)
+        self.assertTrue('a' in p_values)
+        self.assertTrue('b' in p_values)
+        self.assertTrue(p_values['a'] > 0.05)
+        self.assertTrue(p_values['b'] > 0.05)
     def test_case_2(self):
-        df = pd.DataFrame({'a': [1, 1, 1], 'b': [1, 1, 1]})
-        df_standardized = task_func(df)
-        self.assertAlmostEqual(df_standardized['a'].mean(), 0)
-        self.assertAlmostEqual(df_standardized['a'].std(), 0)
+        df = pd.DataFrame({'a': [-1, 0, 1], 'b': [4, 5, 6]})
+        p_values = task_func(df)
+        self.assertEqual(len(p_values), 2)
+        self.assertTrue('a' in p_values)
+        self.assertTrue('b' in p_values)
+        self.assertTrue(p_values['a'] > 0.05)
+        self.assertTrue(p_values['b'] > 0.05)
     def test_case_3(self):
-        df = pd.DataFrame({'a': [1, 0, -1], 'b': [0, 1, 0]})
-        df_standardized = task_func(df)
-        print(df_standardized)
-        self.assertAlmostEqual(df_standardized['a'].mean(), 0)
-        self.assertAlmostEqual(df_standardized['a'].std(), 1.224744871391589)
+        df = pd.DataFrame(np.random.normal(size=(100, 5)))
+        p_values = task_func(df)
+        self.assertEqual(len(p_values), 5)
+        for col in df.columns:
+            self.assertTrue(col in p_values)
+            self.assertTrue(p_values[col] > 0.05)
     def test_case_4(self):
-        df = pd.DataFrame({'z': [1, 2, 3], 'y': [4, 5, 6]})
-        df_standardized = task_func(df)
-        self.assertAlmostEqual(df_standardized['z'].mean(), 0)
-        self.assertAlmostEqual(df_standardized['z'].std(), 1.224744871391589)
+        df = pd.DataFrame(np.random.normal(size=(100, 5)))
+        df['a'] = np.random.uniform(size=100)
+        p_values = task_func(df)
+        self.assertEqual(len(p_values), 6)
+        for col in df.columns:
+            self.assertTrue(col in p_values)
+            if col == 'a':
+                self.assertTrue(p_values[col] < 0.05)
+            else:
+                self.assertTrue(p_values[col] > 0.05)
     def test_case_5(self):
-        df = pd.DataFrame({'z': [1, 2, 3], 'y': [4, 5, 6]})
-        df_standardized = task_func(df)
-        self.assertAlmostEqual(df_standardized['y'].mean(), 0)
-        self.assertAlmostEqual(df_standardized['y'].std(), 1.224744871391589)
+        df = pd.DataFrame(np.random.normal(size=(100, 5)))
+        df['a'] = np.random.uniform(size=100)
+        df['b'] = np.random.uniform(size=100)
+        p_values = task_func(df)
+        self.assertEqual(len(p_values), 7)
+        for col in df.columns:
+            self.assertTrue(col in p_values)
+            if col in ['a', 'b']:
+                self.assertTrue(p_values[col] < 0.05)
+            else:
+                self.assertTrue(p_values[col] > 0.05)

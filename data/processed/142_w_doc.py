@@ -1,98 +1,67 @@
 import numpy as np
-import pandas as pd
-import statistics
+import matplotlib.pyplot as plt
 
-def task_func(rows, columns=['A', 'B', 'C', 'D', 'E', 'F'], seed=42):
+def task_func():
     """
-    Create a Pandas DataFrame with a specified number of rows and six columns (default A-F), 
-    each filled with random numbers between 1 and 100, using a specified seed for reproducibility. 
-    Additionally, calculate the mean and median for each column.
+    Generate diagrams for the sine and cosine functions over the interval [0, 2π].
 
-    Parameters:
-        - rows (int): The number of rows in the DataFrame. Must be a positive integer greater than 0.
-        - columns (list, optional): Column names for the DataFrame. Defaults to ['A', 'B', 'C', 'D', 'E', 'F'].
-        - seed (int, optional): Seed for the random number generator. Defaults to 42.
+    This function plots the sine and cosine functions, setting appropriate titles and axis labels.
 
     Returns:
-        - DataFrame: A pandas DataFrame with the generated data.
-        - dict: A dictionary containing the calculated mean and median for each column. 
-                The dictionary format is:
-                {
-                    'ColumnName': {
-                        'mean': MeanValue,
-                        'median': MedianValue
-                    }, ...
-                }
-                where 'ColumnName' is each of the specified column names, 'MeanValue' is the calculated mean, 
-                and 'MedianValue' is the calculated median for that column.
+        Figure: A Matplotlib Figure object containing the plots.
+        ndarray: An array of Matplotlib Axes objects for the subplots, where:
+                 - The first Axes object contains the sine function plot.
+                 - The second Axes object contains the cosine function plot.
 
-    Raises:
-        - ValueError: If 'rows' is not a positive integer greater than 0.
+    The sine function plot is labeled 'Sine function', with x-axis labeled 'x' and y-axis labeled 'sin(x)'.
+    The cosine function plot is labeled 'Cosine function', with x-axis labeled 'x' and y-axis labeled 'cos(x)'.
 
     Requirements:
         - numpy
-        - pandas
-        - statistics
+        - matplotlib.pyplot
 
     Example:
-        >>> df, stats = task_func(10)
-        >>> print(df)
-            A   B   C   D   E    F
-        0  52  93  15  72  61   21
-        1  83  87  75  75  88  100
-        2  24   3  22  53   2   88
-        3  30  38   2  64  60   21
-        4  33  76  58  22  89   49
-        5  91  59  42  92  60   80
-        6  15  62  62  47  62   51
-        7  55  64   3  51   7   21
-        8  73  39  18   4  89   60
-        9  14   9  90  53   2   84
-        >>> print(stats)
-        {'A': {'mean': 47, 'median': 42.5}, 'B': {'mean': 53, 'median': 60.5}, 'C': {'mean': 38.7, 'median': 32.0}, 'D': {'mean': 53.3, 'median': 53.0}, 'E': {'mean': 52, 'median': 60.5}, 'F': {'mean': 57.5, 'median': 55.5}}
+        >>> fig, axs = task_func()
+        >>> plt.show()
     """
-    if not isinstance(rows, int) or rows <= 0:
-        raise ValueError("rows must be a positive integer greater than 0.")
-    np.random.seed(seed)
-    data = np.random.randint(1, 101, size=(rows, len(columns)))
-    df = pd.DataFrame(data, columns=columns)
-    stats_dict = {}
-    for col in columns:
-        stats_dict[col] = {
-            'mean': statistics.mean(df[col]),
-            'median': statistics.median(df[col])
-        }
-    return df, stats_dict
+    x_values = np.linspace(0, 2 * np.pi, 400)
+    fig, axs = plt.subplots(2)
+    axs[0].plot(x_values, np.sin(x_values))
+    axs[0].set_title('Sine function')
+    axs[0].set_xlabel('x')
+    axs[0].set_ylabel('sin(x)')
+    axs[1].plot(x_values, np.cos(x_values))
+    axs[1].set_title('Cosine function')
+    axs[1].set_xlabel('x')
+    axs[1].set_ylabel('cos(x)')
+    plt.tight_layout()
+    return fig, axs
 
 import unittest
-import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_dataframe_structure(self):
-        df, _ = task_func(10)
-        self.assertEqual(df.shape, (10, 6))  # 10 rows, 6 columns
-    def test_invalid_rows_input_negative(self):
-        with self.assertRaises(ValueError):
-            task_func(-1)
-    def test_invalid_rows_input_zero(self):
-        with self.assertRaises(ValueError):
-            task_func(0)
-    def test_invalid_rows_type(self):
-        with self.assertRaises(ValueError):
-            task_func("five")
-    def test_stats_calculation(self):
-        _, stats = task_func(10)
-        for col_stats in stats.values():
-            self.assertIn('mean', col_stats)
-            self.assertIn('median', col_stats)
-            
-    def test_specific_stats_values(self):
-        df, stats = task_func(10)
-        for col in df.columns:
-            expected_mean = df[col].mean()
-            expected_median = df[col].median()
-            self.assertAlmostEqual(stats[col]['mean'], expected_mean)
-            self.assertAlmostEqual(stats[col]['median'], expected_median)
-    def test_reproducibility_with_seed(self):
-        df1, _ = task_func(10, seed=123)
-        df2, _ = task_func(10, seed=123)
-        pd.testing.assert_frame_equal(df1, df2)
+    def setUp(self):
+        self.fig, self.axs = task_func()
+    def test_return_types(self):
+        self.assertIsInstance(self.fig, plt.Figure)
+        self.assertEqual(len(self.axs), 2)
+        for ax in self.axs:
+            self.assertIsInstance(ax, plt.Axes)
+    def test_plot_titles(self):
+        self.assertEqual(self.axs[0].get_title(), 'Sine function')
+        self.assertEqual(self.axs[1].get_title(), 'Cosine function')
+    def test_axes_labels(self):
+        self.assertEqual(self.axs[0].get_xlabel(), 'x')
+        self.assertEqual(self.axs[0].get_ylabel(), 'sin(x)')
+        self.assertEqual(self.axs[1].get_xlabel(), 'x')
+        self.assertEqual(self.axs[1].get_ylabel(), 'cos(x)')
+    def test_plot_contents(self):
+        sine_line = self.axs[0].lines[0]
+        cosine_line = self.axs[1].lines[0]
+        np.testing.assert_array_almost_equal(sine_line.get_ydata(), np.sin(sine_line.get_xdata()), decimal=5)
+        np.testing.assert_array_almost_equal(cosine_line.get_ydata(), np.cos(cosine_line.get_xdata()), decimal=5)
+    def test_x_values_range(self):
+        for ax in self.axs:
+            line = ax.lines[0]
+            self.assertTrue(np.all(line.get_xdata() >= 0) and np.all(line.get_xdata() <= 2 * np.pi))

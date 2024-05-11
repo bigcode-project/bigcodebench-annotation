@@ -1,128 +1,97 @@
-import pandas as pd
-import requests
-from io import StringIO
+import os
+import glob
+import shutil
 
-def task_func(csv_url_dict, sort_by_column="title"):
+def task_func(directory, archive_dir='archive'):
     """
-    Fetches data from a given dictionary that includes a CSV URL and returns a pandas DataFrame sorted based on two specified columns.
-    
+    Archive all JSON files in a given directory by moving them to a specified archive directory.
+
     Parameters:
-    - csv_url_dict (dict): The dictionary with the key "URL" to fetch the CSV data from.
-    - sort_by_column (str): The column name based on which the data needs to be sorted. Default is "title".
-    
+    directory (str): The directory where the JSON files are located.
+    archive_dir (str): The directory to which the JSON files will be archived. Defaults to 'archive'.
+
     Returns:
-    DataFrame: The pandas DataFrame sorted based on the specified column.
-    
-    Raises:
-    - This function will raise a ValueError if the dictionary is empty or the key "URL" does not exist in the dictionary.
+    tuple: A tuple containing a boolean value and a list of error messages.
+           The boolean is True if all files are successfully moved, and False otherwise.
+           The list contains error messages for each file that failed to move.
 
     Requirements:
-    - pandas
-    - requests
-    - io.StringIO
-    
-    Example:
-    >>> task_func({"URL": "http://example.com/data.csv"}, "title")
-       id   title  price
-    0   1   Apple    0.3
-    1   2  Banana    0.5
-    2   3  Cherry    0.2
+    - os
+    - glob
+    - shutil
 
-    >>> task_func({"URL": "http://example.com/test.csv"}, "price")
-       id   title  price
-    2   3  Cherry    0.2
-    0   1   Apple    0.3
-    1   2  Banana    0.5
+    Example:
+    >>> import tempfile
+    >>> temp_dir = tempfile.mkdtemp()
+    >>> files = ['file1.json', 'file2.json', 'file3.json']
+    >>> for file in files:
+    ...     with open(os.path.join(temp_dir, file), 'w') as f:
+    ...         _ = f.write("Dummy content for testing.")
+    >>> backup_dir = tempfile.mkdtemp()
+    >>> task_func(temp_dir, backup_dir)
+    (True, [])
     """
-    if "URL" not in csv_url_dict or not csv_url_dict:
-        raise ValueError("The dictionary must contain a 'URL' key.")
-    response = requests.get(csv_url_dict["URL"])
-    response.raise_for_status()  # Raise an exception for invalid responses
-    csv_data = response.text
-    df = pd.read_csv(StringIO(csv_data))
-    sorted_df = df.sort_values(by=sort_by_column)
-    return sorted_df
+    if not os.path.exists(archive_dir):
+        os.makedirs(archive_dir)
+    json_files = glob.glob(os.path.join(directory, '*.json'))
+    error_messages = []
+    for json_file in json_files:
+        try:
+            shutil.move(json_file, archive_dir)
+        except Exception as e:
+            error_message = f'Unable to move {json_file} due to {str(e)}'
+            error_messages.append(error_message)
+    return (len(error_messages) == 0, error_messages)
 
 import unittest
-from unittest.mock import patch
-from io import StringIO
-import pandas as pd
-import requests
+import doctest
 class TestCases(unittest.TestCase):
-    @patch('requests.get')
-    def test_case_1(self, mock_get):
-        mock_csv_content = "id,title,price\n2,Banana,0.5\n1,Apple,0.3\n3,Cherry,0.2\n"
-        mock_response = requests.models.Response()
-        mock_response.status_code = 200
-        mock_response.headers['content-type'] = 'text/csv'
-        mock_response._content = mock_csv_content.encode('utf-8')
-        mock_get.return_value = mock_response
-        
-        result = task_func({"URL": "http://example.com/data.csv"}, 'title')
-        expected_titles = ["Apple", "Banana", "Cherry"]
-        actual_titles = result['title'].tolist()
-        self.assertEqual(actual_titles, expected_titles)
-    @patch('requests.get')
-    def test_case_2(self, mock_get):
-        mock_csv_content = "id,title,price\n2,Banana,0.5\n1,Apple,0.3\n3,Cherry,0.2\n"
-        
-        mock_response = requests.models.Response()
-        mock_response.status_code = 200
-        mock_response.headers['content-type'] = 'text/csv'
-        mock_response._content = mock_csv_content.encode('utf-8')
-        mock_get.return_value = mock_response
-        
-        result = task_func({"URL": "http://example.com/tst.csv"}, 'price')
-        self.assertEqual(result.iloc[0]['price'], 0.2)
-        self.assertEqual(result.iloc[1]['price'], 0.3)
-        self.assertEqual(result.iloc[2]['price'], 0.5)
-    @patch('requests.get')
-    def test_case_3(self, mock_get):
-        mock_csv_content = "id,title,price\n2,Banana,0.5\n1,Apple,0.3\n3,Cherry,0.2\n"
-        
-        
-        mock_response = requests.models.Response()
-        mock_response.status_code = 200
-        mock_response.headers['content-type'] = 'text/csv'
-        mock_response._content = mock_csv_content.encode('utf-8')
-        mock_get.return_value = mock_response
-        
-        result = task_func({"URL": "http://example.com/tst.csv"})
-        self.assertEqual(result.iloc[0]['title'], "Apple")
-        self.assertEqual(result.iloc[1]['title'], "Banana")
-        self.assertEqual(result.iloc[2]['title'], "Cherry")
-    @patch('requests.get')
-    def test_case_4(self, mock_get):
-        mock_csv_content =  "id,title,price\n"
-        mock_response = requests.models.Response()
-        mock_response.status_code = 200
-        mock_response.headers['content-type'] = 'text/csv'
-        mock_response._content = mock_csv_content.encode('utf-8')
-        mock_get.return_value = mock_response
-        
-        result = task_func({"URL": "http://example.com/empty.csv"})
-        self.assertTrue(result.empty)
-    @patch('requests.get')
-    def test_case_5(self, mock_get):
-        mock_csv_content = "id,name,age\n2,John,25\n1,Alice,30\n3,Bob,20\n"
-        mock_response = requests.models.Response()
-        mock_response.status_code = 200
-        mock_response.headers['content-type'] = 'text/csv'
-        mock_response._content = mock_csv_content.encode('utf-8')
-        mock_get.return_value = mock_response
-        
-        result = task_func({"URL": "http://example.com/test_2.csv"}, "age")
-        self.assertEqual(result.iloc[0]['name'], "Bob")
-        self.assertEqual(result.iloc[1]['name'], "John")
-        self.assertEqual(result.iloc[2]['name'], "Alice")
-    
-    @patch('requests.get')
-    def test_case_6(self, mock_get):
-        mock_csv_content =  "id,title,price\n"
-        mock_response = requests.models.Response()
-        mock_response.status_code = 400
-        mock_response.headers['content-type'] = 'text/csv'
-        mock_response._content = mock_csv_content.encode('utf-8')
-        mock_get.return_value = mock_response
-        with self.assertRaises(ValueError):
-            result = task_func({"link": "http://example.com/error.csv"})
+    def setUp(self):
+        # Create a test directory with some JSON files and some other file types
+        os.makedirs('test_data', exist_ok=True)
+        with open('test_data/test1.json', 'w') as f:
+            f.write('{}')
+        with open('test_data/test2.json', 'w') as f:
+            f.write('{}')
+        with open('test_data/test.txt', 'w') as f:
+            f.write('Hello')
+        # Create a different archive directory for one of the tests
+        os.makedirs('custom_archive', exist_ok=True)
+        os.makedirs('archive', exist_ok=True)
+    def tearDown(self):
+        # Clean up test directories and files
+        shutil.rmtree('test_data')
+        shutil.rmtree('archive')
+        shutil.rmtree('custom_archive')
+    def test_case_1(self):
+        """Test archiving JSON files with the default archive directory."""
+        success, errors = task_func('test_data')
+        self.assertTrue(success)
+        self.assertEqual(len(errors), 0)
+        self.assertTrue(os.path.exists('archive/test1.json'))
+        self.assertTrue(os.path.exists('archive/test2.json'))
+    def test_case_2(self):
+        """Test archiving with a custom archive directory."""
+        success, errors = task_func('test_data', 'custom_archive')
+        self.assertTrue(success)
+        self.assertEqual(len(errors), 0)
+        self.assertTrue(os.path.exists('custom_archive/test1.json'))
+        self.assertTrue(os.path.exists('custom_archive/test2.json'))
+    def test_case_3(self):
+        """Test with a nonexistent source directory."""
+        success, errors = task_func('nonexistent_directory')
+        self.assertTrue(success)
+        self.assertEqual(len(errors), 0)
+    def test_case_4(self):
+        """Test with an empty directory."""
+        os.makedirs('empty_directory', exist_ok=True)
+        success, errors = task_func('empty_directory')
+        self.assertTrue(success)
+        self.assertEqual(len(errors), 0)
+        shutil.rmtree('empty_directory')
+    def test_case_5(self):
+        """Test that non-JSON files are not archived."""
+        success, errors = task_func('test_data')
+        self.assertTrue(success)
+        self.assertEqual(len(errors), 0)
+        self.assertFalse(os.path.exists('archive/test.txt'))

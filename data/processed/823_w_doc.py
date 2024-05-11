@@ -1,87 +1,82 @@
-import random
-import string
+import time
+import numpy as np
 
-# Constants
-LETTERS = string.ascii_letters
-DIGITS = string.digits
 
-def task_func(length, num_digits):
+def task_func(samples=10, delay=0.1):
     """
-    Generate a random password with a specified length and number of digits.
-
-    The function creates a random password consisting of letters and digits. The total length of the password
-    and the number of digits in it are specified by the user. The characters in the password are randomly
-    shuffled to ensure variability.
+    Make a delay for a given amount of time for a specified number of samples,
+    measure the actual delay and calculate the statistical properties of the
+    delay times.
 
     Parameters:
-    - length (int): The total length of the password. Must be a positive integer.
-    - num_digits (int): The number of digits to be included in the password. Must be a non-negative integer and
-                      less than or equal to the total length of the password.
+    - samples (int): Number of samples for which the delay is measured.
+                     Default is 10.
+    - delay (float): Amount of time (in seconds) for each delay.
+                     Default is 0.1 second.
 
     Returns:
-    - str: A string representing the randomly generated password.
+    tuple: The mean and standard deviation of the delay times.
 
     Requirements:
-    - random
-    - string
+    - time
+    - numpy
 
-    Examples:
-    >>> task_func(10, 3)
-    'Vpbr812Ooh'
-    >>> task_func(5, 2)
-    '4Ob3h'
+    Example:
+    >>> mean, std = task_func(samples=5, delay=0.05)
+    >>> print(f'Mean: %.3f, Std: %.1f' % (mean, std))
+    Mean: 0.050, Std: 0.0
+    >>> mean, std = task_func(100, 0.001)
+    >>> print(f'Mean: %.3f, Std: %.4f' % (mean, std))
+    Mean: 0.001, Std: 0.0000
     """
-    random.seed(42)
-    if length <= 0:
-        raise ValueError("Length must be a positive integer.")
-    if not (0 <= num_digits <= length):
-        raise ValueError("num_digits must be a non-negative integer and less than or equal to length.")
-    password = []
-    for _ in range(length - num_digits):
-        password.append(random.choice(LETTERS))
-    for _ in range(num_digits):
-        password.append(random.choice(DIGITS))
-    random.shuffle(password)
-    return ''.join(password)
+    delay_times = []
+    for _ in range(samples):
+        t1 = time.time()
+        time.sleep(delay)
+        t2 = time.time()
+        delay_times.append(t2 - t1)
+    delay_times = np.array(delay_times)
+    mean = np.mean(delay_times)
+    std = np.std(delay_times)
+    return mean, std
 
 import unittest
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_valid_input(self):
-        """
-        Test Case 1: Valid Input
-        - Verify that the function returns a password of the correct length.
-        - Verify that the function returns a password with the correct number of digits.
-        - Verify that the function returns a password with the correct number of letters.
-        """
-        password = task_func(10, 3)
-        self.assertEqual(len(password), 10, "Password length should be 10")
-        self.assertEqual(sum(c.isdigit() for c in password), 3, "Password should have 3 digits")
-        self.assertEqual(sum(c.isalpha() for c in password), 7, "Password should have 7 letters")
-    def test_length_zero(self):
-        """
-        Test Case 2: Length Zero
-        - Verify that the function raises a ValueError when the length is zero.
-        """
-        with self.assertRaises(ValueError, msg="Should raise ValueError for length 0"):
-            task_func(0, 3)
-    def test_negative_length(self):
-        """
-        Test Case 3: Negative Length
-        - Verify that the function raises a ValueError when the length is negative.
-        """
-        with self.assertRaises(ValueError, msg="Should raise ValueError for negative length"):
-            task_func(-5, 3)
-    def test_negative_num_digits(self):
-        """
-        Test Case 4: Negative Number of Digits
-        - Verify that the function raises a ValueError when the number of digits is negative.
-        """
-        with self.assertRaises(ValueError, msg="Should raise ValueError for negative num_digits"):
-            task_func(10, -3)
-    def test_num_digits_greater_than_length(self):
-        """
-        Test Case 5: Number of Digits Greater than Length
-        - Verify that the function raises a ValueError when the number of digits is greater than the length.
-        """
-        with self.assertRaises(ValueError, msg="Should raise ValueError when num_digits > length"):
-            task_func(5, 10)
+    
+    def test_case_1(self):
+        start = time.time()
+        mean, std = task_func(samples=100, delay=0.001)
+        end = time.time()
+        self.assertAlmostEqual(100 * 0.001, end-start, delta=3)
+        self.assertAlmostEqual(mean, 0.001, places=0)
+        self.assertTrue(0 <= std <= 0.01)
+        
+    def test_case_2(self):
+        start = time.time()
+        mean, std = task_func(samples=3, delay=0.1)
+        end = time.time()
+        self.assertAlmostEqual(3 * 0.1, end-start, places=1)
+        self.assertAlmostEqual(mean, 0.1, delta=0.2)
+        self.assertTrue(0 <= std <= 0.01)
+    def test_case_3(self):
+        start = time.time()
+        mean, std = task_func(samples=2, delay=0.2)
+        end = time.time()
+        self.assertAlmostEqual(2 * 0.2, end-start, places=1)
+        self.assertTrue(0.19 <= mean <= 0.21)
+        self.assertTrue(0 <= std <= 0.02)
+    def test_case_4(self):
+        start = time.time()
+        mean, std = task_func(samples=100, delay=0.05)
+        end = time.time()
+        self.assertTrue(3 <= end-start <= 7)
+        self.assertTrue(0.03 <= mean <= 0.07)
+        self.assertTrue(0 <= std <= 0.05)
+    def test_case_5(self):
+        start = time.time()
+        mean, std = task_func(samples=1, delay=1)
+        end = time.time()
+        self.assertAlmostEqual(1, end-start, places=0)
+        self.assertTrue(0.9 <= mean <= 1.1)
+        self.assertTrue(0 <= std <= 0.1)

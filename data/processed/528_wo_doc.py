@@ -1,122 +1,97 @@
-import json
-import seaborn as sns
-import matplotlib.pyplot as plt
+import csv
+from collections import Counter
 import pandas as pd
-import numpy as np
-from collections import defaultdict
+import matplotlib.pyplot as plt
 
 
-def task_func(input_file: str) -> plt.Axes:
+def task_func(file_path):
     """
-    Read a list of dictionaries from a JSON file, calculate the results (mean and median for each key)
-    via numpy, convert the input data into a pandas DataFrame with the keys as "X" and values as "Y"
-    for visualization with a seaborn box plot, then return the results and box plot.
+    Identifies duplicate rows from a CSV file using the csv library, convert duplicated rows
+    into a pandas DataFrame, then plot using matplotlib.
 
     Parameters:
-    - input_file (str): The input JSON file name with absolute path.
+    - file_path (str): The path to the CSV file.
 
     Returns:
-    - results (dict): Dictionary where each key is a unique key from the original input, and each
-                      value is a corresponding dict, with keys 'mean' and 'median' and the statistics
-                      as values.
-    - ax (plt.Axes): The box plot of aggregated 'Values for Each Key' in the input data.
+    - dict: A dictionary with duplicate rows as keys and their counts as values.
+    - Axes: A matplotlib Axes object with the bar chart of duplicate rows.
 
     Requirements:
-    - json
-    - seaborn
-    - matplotlib.pyplot
+    - csv
+    - collections.Counter
     - pandas
-    - numpy
-    - collections.defaultdict
+    - matplotlib.pyplot
 
     Example:
-    >>> results, ax = task_func("/path/to/data.json")
-    >>> ax
+    >>> duplicates, ax = task_func("sample_data.csv")
+    >>> duplicates
+    {('Alice', '25', 'New York'): 3, ('Bob', '30', 'London'): 2}
+    >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
-    >>> results
-    {'a': {'mean': 3.0, 'median': 3.0}, 'b': {'mean': 2.0, 'median': 3.0}}
+
+    Note: Ensure the CSV file is in proper format and has a .csv extension. Other file formats will raise a ValueError.
     """
-    with open(input_file, "r") as f:
-        data = json.load(f)
-    stats = defaultdict(list)
-    for d in data:
-        for key, value in d.items():
-            stats[key].append(value)
-    results = {
-        k: {"mean": np.mean(v), "median": np.median(v)} for k, v in stats.items()
-    }
-    data = pd.DataFrame(data).melt(var_name="X", value_name="Y")
-    ax = sns.boxplot(data=data, x="X", y="Y")
-    ax.set_title("Boxplot of Values for Each Key")
-    return results, ax
+    file_path = file_path.strip()
+    if not file_path.lower().endswith(".csv"):
+        raise ValueError("Invalid file format. Only .csv files are accepted.")
+    with open(file_path, "r") as f:
+        reader = csv.reader(f)
+        rows = list(reader)
+    duplicates = Counter(tuple(row) for row in rows if rows.count(row) > 1)
+    ax = None
+    if duplicates:
+        df = pd.DataFrame(duplicates.values(), duplicates.keys())
+        ax = df.plot(kind="bar", legend=False, title="Duplicate Entries")
+        ax.set_ylabel("Count")
+        plt.tight_layout()
+    return duplicates, ax
 
 import unittest
-import os
 import tempfile
-import matplotlib.pyplot as plt
-import json
+import os
+import matplotlib
+from collections import Counter
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Setup a temporary directory and write sample JSON data to a temp file
         self.temp_dir = tempfile.TemporaryDirectory()
-        self.sample_data_file = os.path.join(self.temp_dir.name, "sample_data.json")
-        self.sample_data = [
-            {"A": 10, "B": 20, "C": 30},
-            {"A": 15, "B": 25, "C": 35},
-            {"A": 20, "B": 30, "C": 40},
-        ]
-        with open(self.sample_data_file, "w") as f:
-            json.dump(self.sample_data, f)
-        # Create an invalid JSON file for testing
-        self.invalid_json_file = os.path.join(self.temp_dir.name, "invalid.json")
-        with open(self.invalid_json_file, "w") as f:
-            f.write("invalid content")
+        self.addCleanup(self.temp_dir.cleanup)
     def tearDown(self):
-        self.temp_dir.cleanup()
         plt.close("all")
+    def create_temp_csv_file(self, content):
+        # Create a temporary CSV file within the temp directory
+        temp_file_path = os.path.join(self.temp_dir.name, "temp_file.csv")
+        with open(temp_file_path, "w", newline="") as temp_file:
+            temp_file.write(content)
+        return temp_file_path
     def test_case_1(self):
-        # Test if the function can read the JSON data file and return a plot
-        _, ax = task_func(self.sample_data_file)
-        self.assertIsInstance(ax, plt.Axes, "The function should return a plot (Axes).")
-        self.assertTrue(len(ax.get_xticks()) > 0, "The plot should have x-axis ticks.")
-        self.assertTrue(len(ax.get_yticks()) > 0, "The plot should have y-axis ticks.")
-        self.assertTrue(ax.get_title(), "Boxplot of Values for Each Key")
+        # With duplicates - test results
+        content = "Name,Age,City\nAlice,25,New York\nAlice,25,New York\nBob,30,London\nAlice,25,New York\nBob,30,London"
+        file_path = self.create_temp_csv_file(content)
+        duplicates, _ = task_func(file_path)
+        self.assertEqual(
+            duplicates,
+            Counter({("Alice", "25", "New York"): 3, ("Bob", "30", "London"): 2}),
+        )
     def test_case_2(self):
-        # Check result correctness
-        results, _ = task_func(self.sample_data_file)
-        self.assertIn("A", results)
-        self.assertIn("B", results)
-        self.assertIn("C", results)
-        self.assertEqual(results["A"]["mean"], 15.0)
-        self.assertEqual(results["A"]["median"], 15.0)
-        self.assertEqual(results["B"]["mean"], 25.0)
-        self.assertEqual(results["B"]["median"], 25.0)
-        self.assertEqual(results["C"]["mean"], 35.0)
-        self.assertEqual(results["C"]["median"], 35.0)
+        # With duplicates - test plot
+        content = "Name,Age,City\nAlice,25,New York\nAlice,25,New York\nBob,30,London\nAlice,25,New York\nBob,30,London"
+        file_path = self.create_temp_csv_file(content)
+        _, ax = task_func(file_path)
+        # Test plot
+        self.assertIsNotNone(ax)
+        self.assertIsInstance(ax, matplotlib.axes._axes.Axes)
+        self.assertEqual(ax.get_title(), "Duplicate Entries")
+        self.assertEqual(ax.get_ylabel(), "Count")
     def test_case_3(self):
-        # Test the correctness of the x-axis labels
-        _, ax = task_func(self.sample_data_file)
-        x_labels = [label.get_text() for label in ax.get_xticklabels()]
-        expected_x_labels = ["A", "B", "C"]
-        self.assertListEqual(
-            x_labels, expected_x_labels, "The x-axis labels are not as expected."
-        )
+        # Without duplicates
+        content = "Name,Age,City\nEve,28,Paris\nAdam,32,Berlin"
+        file_path = self.create_temp_csv_file(content)
+        duplicates, ax = task_func(file_path)
+        self.assertEqual(duplicates, Counter())
+        self.assertIsNone(ax)
     def test_case_4(self):
-        # Test the correctness of the y-axis data points
-        _, ax = task_func(self.sample_data_file)
-        # Correctly extract the height of the boxes in the box plot
-        boxes = [
-            box.get_height() for box in ax.containers if hasattr(box, "get_height")
-        ]
-        self.assertTrue(
-            all(height > 0 for height in boxes),
-            "Each box plot should have y-data points.",
-        )
+        with self.assertRaises(ValueError):
+            task_func("sample_data.txt")
     def test_case_5(self):
-        # Test if the function raises an error for non-existent file
         with self.assertRaises(FileNotFoundError):
-            task_func(os.path.join(self.temp_dir.name, "non_existent.json"))
-    def test_case_6(self):
-        # Test if the function raises an error for invalid JSON format
-        with self.assertRaises(json.JSONDecodeError):
-            task_func(os.path.join(self.temp_dir.name, "invalid.json"))
+            task_func(os.path.join(self.temp_dir.name, "non_existent_file.csv"))

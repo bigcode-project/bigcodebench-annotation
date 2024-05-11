@@ -3,7 +3,8 @@ import json
 
 
 def f_329(data: dict, output_path: str = "./default_data_output.json") -> str:
-    """Converts the given DataFrame to a dictionary, dropping the column named 'c'
+    """
+    Converts the given DataFrame to a dictionary, dropping the column named 'c'
     if it exists, and then saves it as a JSON file.
 
     Parameters:
@@ -20,8 +21,12 @@ def f_329(data: dict, output_path: str = "./default_data_output.json") -> str:
     Example:
     >>> f_329({'a': [1,2], 'b': [3,4], 'c': [5,6]})
     './default_data_output.json'
+    >>> print(json.load(open(f_329({'a': [1,2], 'b': [3,4], 'c': [5,6]})))
+    {'a': {'0': 1, '1': 2}, 'b': {'0': 3, '1': 4}}
     >>> f_329({'a': [1,2], 'b': [3,4], 'c': [5,6]}, 'custom/path/results.json')
     'custom/path/results.json'
+    >>> print(json.load(open(f_329({'a': [1,2], 'b': [3,4], 'c': [5,6]}, 'custom/path/results.json')))
+    {'a': {'0': 1, '1': 2}, 'b': {'0': 3, '1': 4}}
     """
     df = pd.DataFrame(data)
     # Drop column named 'c' if it exists

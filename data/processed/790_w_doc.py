@@ -1,68 +1,140 @@
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
+import heapq
+from sklearn.preprocessing import StandardScaler
 
-# Constants
-ARRAY_LENGTH = 10
-
-def task_func():
+def task_func(df, col1, col2, N=10):
     """
-    Generate a random array and apply min-max normalization (scaling) to transform the array values into a range between 0 and 1.
-
+    Standardize two columns ('col1' and 'col2') in the DataFrame, find the biggest differences between the individual 
+    elements of the standardized columns, and return the indices of the N largest differences.
+    
     Parameters:
-    - None
-
+    df (pandas.DataFrame): A DataFrame with at least two numerical columns.
+    col1, col2 (str): Names of the columns to compare.
+    N (int, optional): Number of indices to return. Default is 10.
+    
     Returns:
-    - scaled_array (numpy.ndarray): The normalized array.
+    list[int]: The indices of the N largest differences.
+    
+    Raises:
+    ValueError: If specified columns are not in the provided DataFrame.
 
     Requirements:
-    - numpy
-    - sklearn
-
+    - heapq
+    - sklearn.preprocessing
+    
     Example:
-    >>> task_func()
-    array([[0.57142857],
-           [0.14285714],
-           [0.71428571],
-           [0.28571429],
-           [0.57142857],
-           [1.        ],
-           [0.        ],
-           [0.57142857],
-           [0.71428571],
-           [0.28571429]])
+    >>> df = pd.DataFrame({
+    ...     'col1': [99, 86, 90, 70, 86, 95, 56, 98, 80, 81, 1, 2],
+    ...     'col2': [21, 11, 21, 1, 26, 40, 4, 50, 34, 37, 3, 4]
+    ... })
+    >>> indices = task_func(df, 'col1', 'col2', N=6)
+    >>> print(indices)     
+    [3, 1, 11, 10, 7, 0]
+
+    >>> df = pd.DataFrame({
+    ...     'a': [1, 2, 3, 4],
+    ...     'b': [1, 2, 3, 5]
+    ... })
+    >>> indices = task_func(df, 'a', 'b')
+    >>> print(indices)   
+    [2, 3, 0, 1]
     """
-    np.random.seed(42)  # For reproducibility, as shown in your example
-    array = np.random.randint(0, 10, ARRAY_LENGTH).reshape(-1, 1)
-    scaler = MinMaxScaler()
-    scaled_array = scaler.fit_transform(array)
-    return scaled_array
+    if col1 not in df.columns or col2 not in df.columns:
+        raise ValueError(f"Columns {col1} or {col2} not found in the DataFrame.")
+    scaler = StandardScaler()
+    df[[col1, col2]] = scaler.fit_transform(df[[col1, col2]])
+    l1 = df[col1].values
+    l2 = df[col2].values
+    largest_diff_indices = heapq.nlargest(N, range(len(l1)), key=lambda i: abs(l1[i] - l2[i]))
+    return largest_diff_indices
 
 import unittest
-import numpy as np
+from faker import Faker
+import pandas as pd
 class TestCases(unittest.TestCase):
+    
     def setUp(self):
-        self.result = task_func()  # Call the function once to use in multiple tests if needed
-    def test_normal_functionality(self):
-        """Testing the basic functionality and shape of the output array."""
-        self.assertEqual(self.result.shape, (10, 1), "Array shape should be (10, 1)")
-        self.assertTrue((self.result >= 0).all() and (self.result <= 1).all(), "Array values should be in the range [0, 1]")
-    def test_output_values(self):
-        """ Ensuring that the scaling works as expected. """
-        expected_min = 0
-        expected_max = 1
-        actual_min = np.min(self.result)
-        actual_max = np.max(self.result)
-        self.assertEqual(actual_min, expected_min, "The minimum of the scaled array should be 0")
-        self.assertAlmostEqual(actual_max, expected_max, places=15, msg="The maximum of the scaled array should be very close to 1")
-    def test_no_arguments(self):
-        """Ensure that no arguments are passed to the function."""
-        with self.assertRaises(TypeError):
-            task_func(10)  # This should fail since the function expects no arguments
-    def test_unchanging_output(self):
-        """Test if multiple calls to the function give the same result due to seed setting."""
-        second_result = task_func()
-        np.testing.assert_array_equal(self.result, second_result, "Results should be the same on every call due to fixed seed.")
-    def test_distribution_of_values(self):
-        """Test that the distribution of scaled values is neither constant nor degenerate (not all values the same)."""
-        unique_values = np.unique(self.result)
-        self.assertTrue(len(unique_values) > 1, "There should be more than one unique scaled value to confirm distribution.")
+        fake = Faker()
+        self.df1 = pd.DataFrame({
+            'col1': [fake.random_int(min=10, max=100) for _ in range(10)],
+            'col2': [fake.random_int(min=10, max=100) for _ in range(10)]
+        })
+        self.df2 = pd.DataFrame({
+            'col1': [fake.random_int(min=-100, max=-10) for _ in range(10)],
+            'col2': [fake.random_int(min=10, max=100) for _ in range(10)]
+        })
+        self.df3 = pd.DataFrame({
+            'col1': [fake.random_int(min=-100, max=100) for _ in range(10)],
+            'col2': [fake.random_int(min=-100, max=100) for _ in range(10)]
+        })
+        self.df4 = pd.DataFrame({
+            'col1': [fake.random_int(min=0, max=10) for _ in range(10)],
+            'col2': [fake.random_int(min=90, max=100) for _ in range(10)]
+        })
+        self.df5 = pd.DataFrame({
+            'col1': [fake.random_int(min=10, max=20) for _ in range(10)],
+            'col2': [fake.random_int(min=10, max=20) for _ in range(10)]
+        })
+    
+    def test_wrong_columns(self):
+        # test with wrong columns
+        data = {
+            'col1': [1, 2, 3, 4, 5],
+            'col2': [2, 3, 4, 5, 6]
+        }
+        df = pd.DataFrame(data)
+        self.assertRaises(Exception, task_func, df, 'a', 'col2')
+        self.assertRaises(Exception, task_func, df, 'col1', 'a')
+        self.assertRaises(Exception, task_func, df, 'a', 'b')
+    # Original test cases
+    def test_case_1(self):
+        result = task_func(self.df1, 'col1', 'col2')
+        self.assertTrue(isinstance(result, list))
+        self.assertEqual(len(result), 10)
+        
+    def test_case_2(self):
+        result = task_func(self.df2, 'col1', 'col2', 5)
+        self.assertTrue(isinstance(result, list))
+        self.assertEqual(len(result), 5)
+        
+    def test_case_3(self):
+        result = task_func(self.df3, 'col1', 'col2', 7)
+        self.assertTrue(isinstance(result, list))
+        self.assertEqual(len(result), 7)
+        
+    def test_case_4(self):
+        result = task_func(self.df4, 'col1', 'col2', 8)
+        self.assertTrue(isinstance(result, list))
+        self.assertEqual(len(result), 8)
+        
+    def test_case_5(self):
+        result = task_func(self.df5, 'col1', 'col2', 6)
+        self.assertTrue(isinstance(result, list))
+        self.assertEqual(len(result), 6)
+class CorrectedDeterministicTestCases(unittest.TestCase):
+    # Corrected deterministic test cases
+    def test_deterministic_case_1(self):
+        df = pd.DataFrame({
+            'col1': [1, 2, 3, 4, 5],
+            'col2': [5, 4, 3, 2, 1]
+        })
+        expected_result = [0, 4, 1, 3, 2]
+        result = task_func(df, 'col1', 'col2')
+        self.assertListEqual(sorted(result), sorted(expected_result))
+        
+    def test_deterministic_case_2(self):
+        df = pd.DataFrame({
+            'col1': [10, 20, 30, 40, 50],
+            'col2': [10, 20, 30, 40, 50]
+        })
+        expected_result = [0, 1, 2, 3, 4]
+        result = task_func(df, 'col1', 'col2')
+        self.assertListEqual(sorted(result), sorted(expected_result))
+        
+    def test_deterministic_case_3(self):
+        df = pd.DataFrame({
+            'col1': [1, 1, 1, 1, 1],
+            'col2': [2, 2, 2, 2, 2]
+        })
+        expected_result = [0, 1, 2, 3, 4]
+        result = task_func(df, 'col1', 'col2')
+        self.assertListEqual(sorted(result), sorted(expected_result))

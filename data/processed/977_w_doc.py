@@ -1,100 +1,97 @@
 import numpy as np
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
-def task_func(records: np.ndarray, random_seed: int = 0) -> pd.DataFrame:
+def task_func(array, features=None, seed=None):
     """
-    Randomly shuffle the given array's features, normalize its values, then convert to a DataFrame
-    with shuffled feature names.
+    Shuffles the columns of a given 2D numpy array and visualizes it as a heatmap.
 
     Parameters:
-    - records (np.ndarray): A 2D numpy array with each row as a record and each column as a feature.
-    - random_seed (int, optional): Seed for random operations to ensure reproducibility.
+    - array (ndarray): The 2D numpy array to shuffle and plot. It must not be empty.
+    - features (list of str, optional): Custom labels for the columns after shuffling.
+                                        If not specified, default numerical labels are used.
+                                        The list must match the number of columns in 'array'.
+    - seed (int, optional): Seed for the random number generator to ensure reproducibility of the shuffle.
 
     Returns:
-    - pd.DataFrame: A pandas DataFrame containing the preprocessed data, with shuffled feature names.
+    - Axes: The matplotlib Axes object containing the heatmap.
 
     Raises:
-    - ValueError: If records is not 2D.
+    - ValueError: If 'features' is provided and does not match the number of columns in 'array'; and
+                  if 'array' is empty or not 2-dimensional.
 
     Requirements:
     - numpy
-    - pandas
-    - sklearn
+    - matplotlib.pyplot
+    - seaborn
 
     Notes:
-    - This function normalizes data by subtracting the mean and scaling to unit variance.
-    - Feature names are of format f{n}; for example, if the records have 5 features, feature
-      names will be ["f1", "f2", "f3", "f4", "f5"] shuffled.
+    - This function uses the features list as labels for the heatmap's x-axis if features is provided;
+      otherwise, it defaults to strings of the numerical labels starting from 1 up to the number of
+      columns in the array.
 
-    Examples:
-    >>> data = np.array([[1, 2, 3], [4, 5, 6]])
-    >>> df = task_func(data, random_seed=42)
-    >>> df.shape
-    (2, 3)
-    >>> df.columns
-    Index(['f2', 'f3', 'f1'], dtype='object')
-    >>> data = np.array([[-1, -2, -3, -4, -5], [0, 0, 0, 0, 0], [1, 2, 3, 4, 5]])
-    >>> df = task_func(data, random_seed=24)
-    >>> df
-             f3        f1        f4        f5        f2
-    0 -1.224745 -1.224745 -1.224745 -1.224745 -1.224745
-    1  0.000000  0.000000  0.000000  0.000000  0.000000
-    2  1.224745  1.224745  1.224745  1.224745  1.224745
+    Example:
+    >>> np.random.seed(0)
+    >>> array = np.random.rand(2, 5)
+    >>> ax = task_func(array, features=['A', 'B', 'C', 'D', 'E'], seed=1)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax.collections[0].get_array().data.flatten()
+    array([0.60276338, 0.71518937, 0.4236548 , 0.5488135 , 0.54488318,
+           0.891773  , 0.43758721, 0.38344152, 0.64589411, 0.96366276])
     """
-    if random_seed is not None:
-        np.random.seed(random_seed)
-    if not (records.ndim == 2):
-        raise ValueError("Input must be a 2D numpy array.")
-    records_copy = records.copy()
-    np.random.shuffle(records_copy.T)
-    scaler = StandardScaler()
-    normalized_records = scaler.fit_transform(records_copy)
-    features = [f"f{i+1}" for i in range(records[0].shape[0])]
-    np.random.shuffle(features)
-    df = pd.DataFrame(normalized_records, columns=features)
-    return df
+    if seed is not None:
+        np.random.seed(seed)
+    if array.size == 0 or len(array.shape) != 2:
+        raise ValueError("Input array must be 2-dimensional and non-empty.")
+    if features is not None and len(features) != array.shape[1]:
+        raise ValueError("Features list must match the number of columns in the array.")
+    shuffled_array = np.random.permutation(array.T).T
+    fig, ax = plt.subplots()
+    sns.heatmap(
+        shuffled_array,
+        xticklabels=features if features is not None else np.arange(array.shape[1]) + 1,
+        ax=ax,
+    )
+    return ax
 
 import unittest
 import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def setUp(self):
-        self.data = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-        self.expected_shape = (2, 5)
-    def test_case_1(self):
-        # Test basic shape and columns
-        df = task_func(self.data, random_seed=1)
-        self.assertEqual(df.shape, self.expected_shape)
-        self.assertTrue(set(df.columns) == set(["f1", "f2", "f3", "f4", "f5"]))
-        # assert last row values
-        self.assertEqual(df.iloc[-1].tolist(), [1.0, 1.0, 1.0, 1.0, 1.0])
-        self.assertEqual(df.iloc[0].tolist(), [-1.0, -1.0, -1.0, -1.0, -1.0])
-        
-    def test_case_2(self):
-        # Test normalization
-        df = task_func(self.data, random_seed=2)
-        np.testing.assert_array_almost_equal(
-            df.mean(axis=0), np.zeros(self.expected_shape[1]), decimal=5
-        )
-        np.testing.assert_array_almost_equal(
-            df.std(axis=0, ddof=0), np.ones(self.expected_shape[1]), decimal=5
-        )
-        
-    def test_case_3(self):
-        # Test random seed effect
-        df1 = task_func(self.data, random_seed=3)
-        df2 = task_func(self.data, random_seed=3)
-        pd.testing.assert_frame_equal(df1, df2)
-    def test_case_4(self):
-        # Test handling invalid inputs
+        np.random.seed(0)
+        self.array = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+        self.expected_labels = ["1", "2", "3", "4", "5"]
+    def test_default_features(self):
+        """Test heatmap with default features."""
+        ax = task_func(self.array)
+        xticklabels = [tick.get_text() for tick in ax.get_xticklabels()]
+        self.assertEqual(xticklabels, self.expected_labels)
+        self.assertTrue(len(ax.collections), 1)
+    def test_custom_features(self):
+        """Test heatmap with custom features."""
+        custom_labels = ["A", "B", "C", "D", "E"]
+        ax = task_func(self.array, features=custom_labels)
+        xticklabels = [tick.get_text() for tick in ax.get_xticklabels()]
+        self.assertEqual(xticklabels, custom_labels)
+        self.assertTrue(len(ax.collections), 1)
+    def test_features_mismatch(self):
+        """Test for error when features list does not match array dimensions."""
         with self.assertRaises(ValueError):
-            task_func(np.array([1, 2, 3]), random_seed=4)
+            task_func(self.array, features=["A", "B"])
+    def test_seed_reproducibility(self):
+        """Test if seeding makes shuffling reproducible."""
+        ax1 = task_func(self.array, seed=42)
+        ax2 = task_func(self.array, seed=42)
+        heatmap_data1 = ax1.collections[0].get_array().data
+        heatmap_data2 = ax2.collections[0].get_array().data
+        np.testing.assert_array_equal(heatmap_data1, heatmap_data2)
+    def test_empty_array(self):
+        """Test for handling an empty array."""
         with self.assertRaises(ValueError):
-            task_func(np.array([[1, 2, 3], [4, 5]], dtype=object), random_seed=4)
-    def test_case_5(self):
-        # Test handling zero variance
-        data = np.array([[1, 1, 1, 1, 1], [1, 1, 1, 1, 1]])
-        df = task_func(data, random_seed=42)
-        # In cases of zero variance, StandardScaler will set values to 0
-        np.testing.assert_array_equal(df.values, np.zeros(data.shape))
+            task_func(np.array([]))
+    def tearDown(self):
+        """Cleanup plot figures after each test."""
+        plt.close("all")

@@ -1,119 +1,136 @@
 import pandas as pd
-import numpy as np
-from sklearn.decomposition import PCA
+from scipy.spatial.distance import pdist, squareform
 
 
-def task_func(array: list, random_seed: int = 42) -> (pd.DataFrame, np.ndarray):
+def task_func(array):
     """
-    Converts a 2D list into a pandas DataFrame and applies PCA for dimensionality reduction.
+    Generate a Pandas DataFrame from a 2D list and calculate a distance matrix.
 
-    This function creates a DataFrame from the provided 2D list and then applies PCA to reduce the dataset
-    to its two main components. The function uses a fixed random seed to ensure reproducibility.
+    This function converts a 2D list into a DataFrame, with columns named alphabetically starting from 'A'.
+    It uses the `chr()` function, which converts an integer to its corresponding Unicode character,
+    to dynamically assign alphabetical labels to each column based on their index. The function then
+    computes the Euclidean distance matrix between rows.
 
     Parameters:
-    - array (list of list of int): A 2D list representing data rows and columns.
-    - random_seed (int, optional): The seed for the random number generator. Default is 42.
+    array (list of list of int): The 2D list representing the data.
+                                 Each sublist must contain only integers or floats. If the input does not
+                                 conform to this structure, a TypeError is raised.
 
     Returns:
-    - pd.DataFrame: The original data in DataFrame format.
-    - np.ndarray: The data after PCA transformation.
+    - df (pd.DataFrame): data converted from 2D list.
+    - distance_matrix (pd.DataFrame): output distance matrix.
 
     Requirements:
     - pandas
-    - numpy
-    - sklearn.decomposition.PCA
+    - scipy.spatial.distance.pdist
+    - scipy.spatial.distance.squareform
 
-    Examples:
-    >>> data = [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
-    >>> df, transformed = task_func(data)
+    Example:
+    >>> df, distance_matrix = task_func([[1,2,3,4,5], [6,7,8,9,10]])
     >>> print(df)
-        0   1   2   3   4
-    0   1   2   3   4   5
-    1   6   7   8   9  10
-    2  11  12  13  14  15
-    >>> print(transformed[:, 0])
-    [ 11.18033989  -0.         -11.18033989]
+       A  B  C  D   E
+    0  1  2  3  4   5
+    1  6  7  8  9  10
+    >>> print(distance_matrix)
+              0         1
+    0   0.00000  11.18034
+    1  11.18034   0.00000
     """
-    df = pd.DataFrame(array)
-    pca = PCA(n_components=2, random_state=random_seed)
-    transformed_data = pca.fit_transform(df)
-    return df, transformed_data
+    if not isinstance(array, list):
+        raise TypeError("Input must be a list.")
+    if not all(isinstance(sublist, list) for sublist in array):
+        raise TypeError("Input must be a list of lists.")
+    for sublist in array:
+        if not all(isinstance(item, (int, float)) for item in sublist):
+            raise TypeError("All elements in the sublists must be int or float.")
+    columns = [chr(65 + i) for i in range(len(array[0]))]
+    df = pd.DataFrame(array, columns=columns)
+    distances = pdist(df.values, metric="euclidean")
+    distance_matrix = pd.DataFrame(
+        squareform(distances), index=df.index, columns=df.index
+    )
+    return df, distance_matrix
 
 import unittest
-import pandas as pd
-import numpy as np
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test basic 2-row dataset
-        data = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
-        df, transformed_data = task_func(data)
-        expected_df = pd.DataFrame(data)
-        self.assertTrue(df.equals(expected_df))
-        self.assertEqual(transformed_data.shape, (2, 2))
+        # Teset basic case
+        input_data = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
+        df, distance_matrix = task_func(input_data)
+        self.assertEqual(df.shape, (2, 5))
+        self.assertTrue((df.columns == ["A", "B", "C", "D", "E"]).all())
+        self.assertEqual(distance_matrix.shape, (2, 2))
+        self.assertAlmostEqual(distance_matrix.iloc[0, 1], 11.18034, places=5)
+        self.assertAlmostEqual(distance_matrix.iloc[1, 0], 11.18034, places=5)
     def test_case_2(self):
-        # Test basic 3-row dataset
-        data = [[10, 20, 30, 40, 50], [60, 70, 80, 90, 100], [110, 120, 130, 140, 150]]
-        df, transformed_data = task_func(data)
-        expected_df = pd.DataFrame(data)
-        self.assertTrue(df.equals(expected_df))
-        self.assertEqual(transformed_data.shape, (3, 2))
+        # Test negatives and zero
+        input_data = [[-5, -4, -3, -2, -1], [0, 0, 0, 0, 0], [1, 2, 3, 4, 5]]
+        df, distance_matrix = task_func(input_data)
+        self.assertEqual(df.shape, (3, 5))
+        self.assertEqual(distance_matrix.shape, (3, 3))
+        self.assertAlmostEqual(distance_matrix.iloc[0, 1], 7.41620, places=5)
+        self.assertAlmostEqual(distance_matrix.iloc[1, 2], 7.41620, places=5)
     def test_case_3(self):
-        # Test mix of positive, negative, zero values
-        data = [[-1, -2, -3, -4, -5], [5, 6, 7, 8, 9], [0, 0, 0, 0, 0]]
-        df, transformed_data = task_func(data)
-        expected_df = pd.DataFrame(data)
-        self.assertTrue(df.equals(expected_df))
-        self.assertEqual(transformed_data.shape, (3, 2))
+        # Test small lists
+        input_data = [[1, 2], [3, 4]]
+        df, distance_matrix = task_func(input_data)
+        self.assertEqual(df.shape, (2, 2))
+        self.assertEqual(distance_matrix.shape, (2, 2))
+        self.assertAlmostEqual(distance_matrix.iloc[0, 1], 2.82843, places=5)
     def test_case_4(self):
-        # Test 4-row dataset with incremental pattern
-        data = [
-            [5, 15, 25, 35, 45],
-            [55, 65, 75, 85, 95],
-            [105, 115, 125, 135, 145],
-            [155, 165, 175, 185, 195],
-        ]
-        df, transformed_data = task_func(data)
-        expected_df = pd.DataFrame(data)
-        self.assertTrue(df.equals(expected_df))
-        self.assertEqual(transformed_data.shape, (4, 2))
+        # Test repeated single element
+        input_data = [[5, 5, 5], [5, 5, 5], [5, 5, 5]]
+        df, distance_matrix = task_func(input_data)
+        self.assertEqual(df.shape, (3, 3))
+        self.assertEqual(distance_matrix.shape, (3, 3))
+        self.assertEqual(distance_matrix.iloc[0, 1], 0)
+        self.assertEqual(distance_matrix.iloc[1, 2], 0)
     def test_case_5(self):
-        # Test uniform rows
-        data = [[10, 10, 10, 10, 10], [20, 20, 20, 20, 20], [30, 30, 30, 30, 30]]
-        df, transformed_data = task_func(data)
-        expected_df = pd.DataFrame(data)
-        self.assertTrue(df.equals(expected_df))
-        self.assertEqual(transformed_data.shape, (3, 2))
+        # Test single list
+        input_data = [[1, 2, 3, 4, 5]]
+        df, distance_matrix = task_func(input_data)
+        self.assertEqual(df.shape, (1, 5))
+        self.assertEqual(distance_matrix.shape, (1, 1))
+        self.assertEqual(distance_matrix.iloc[0, 0], 0)
     def test_case_6(self):
-        # Test single row (should fail since it's < n_components)
-        with self.assertRaises(ValueError):
-            data = [[1, 2, 3, 4, 5]]
-            task_func(data)
+        # Test empty list
+        input_data = []
+        with self.assertRaises(IndexError):
+            task_func(input_data)
     def test_case_7(self):
-        # Test large numbers
-        data = [[1000000000, 2000000000], [-1000000000, -2000000000]]
-        df, transformed_data = task_func(data)
-        expected_df = pd.DataFrame(data)
-        self.assertTrue(df.equals(expected_df))
-        self.assertEqual(transformed_data.shape, (2, 2))
+        # Test larger dataset
+        input_data = [list(range(100)) for _ in range(50)]
+        df, distance_matrix = task_func(input_data)
+        self.assertEqual(df.shape, (50, 100))
+        self.assertEqual(distance_matrix.shape, (50, 50))
+        # No specific values check due to complexity
     def test_case_8(self):
-        # Test correctness of PCA
-        data = [[2, 3], [3, 4], [5, 6]]
-        _, transformed_data = task_func(data)
-        # Using the sklearn PCA output as the expected transformation
-        expected_transformation = np.array(
-            [
-                [-1.88561808e00, 1.93816421e-16],
-                [-4.71404521e-01, 3.32511118e-16],
-                [2.35702260e00, 2.21555360e-16],
-            ]
-        )
-        np.testing.assert_almost_equal(
-            transformed_data, expected_transformation, decimal=5
-        )
+        # Test single element list
+        input_data = [[1]]
+        df, distance_matrix = task_func(input_data)
+        self.assertEqual(df.shape, (1, 1))
+        self.assertEqual(distance_matrix.shape, (1, 1))
+        self.assertEqual(distance_matrix.iloc[0, 0], 0)
     def test_case_9(self):
-        # Test floats
-        data = [[1.5, 2.5], [3.5, 4.5], [5.5, 6.5]]
-        df, transformed_data = task_func(data)
-        expected_df = pd.DataFrame(data)
-        self.assertTrue(df.equals(expected_df))
-        self.assertEqual(transformed_data.shape, (3, 2))
+        # Test with different types in list
+        input_data = [[1, 2, 3], ["a", "b", "c"]]
+        with self.assertRaises(TypeError):
+            task_func(input_data)
+    def test_case_10(self):
+        # Test with a more complex numerical list (including floats and negatives)
+        input_data = [[-1.5, 2.3, 4.5], [0, 0, 0], [5.5, -2.3, 3.1]]
+        df, distance_matrix = task_func(input_data)
+        self.assertEqual(df.shape, (3, 3))
+        self.assertEqual(distance_matrix.shape, (3, 3))
+        # Define expected distances based on manual or precise calculation
+        expected_distances = [
+            [0.0, 5.27162, 8.49235],
+            [5.27162, 0.0, 6.71937],
+            [8.49235, 6.71937, 0.0],
+        ]
+        # Assert each calculated distance matches the expected value
+        for i in range(len(expected_distances)):
+            for j in range(len(expected_distances[i])):
+                self.assertAlmostEqual(
+                    distance_matrix.iloc[i, j], expected_distances[i][j], places=5
+                )

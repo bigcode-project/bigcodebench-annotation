@@ -15,7 +15,7 @@ def f_393(days_in_past=7, random_seed=0):
     random_seed (int, optional): Seed for random number generation. Defaults to 0.
 
     Returns:
-    ax (matplotlib.axes._axes.Axes): Generated plot showing 'Temperature Trends Over the Past Week',
+    ax (matplotlib.axes._axes.Axes): Generated plot showing 'Temperature Trend'
                                      with 'Date' on the a-xis and 'Temperature (°C)' on the y-axis.
 
 

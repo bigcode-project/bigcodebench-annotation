@@ -1,62 +1,69 @@
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
+import pandas as pd
 
-def task_func(rows=3, columns=2, seed=42):
+def task_func(rows, columns, seed=None):
     """
-    Generate a matrix of random values with specified dimensions and scale it between 0 and 1.
+    Generate a DataFrame with random values within a specified range.
+    
+    This function creates a matrix of given dimensions filled with random values between 0 and 1 and returns it as a Pandas DataFrame. Users have the option to set a random seed for reproducible results.
     
     Parameters:
-    rows (int): The number of rows for the matrix. Default is 3.
-    columns (int): The number of columns for the matrix. Default is 2.
+    - rows (int): The number of rows for the matrix.
+    - columns (int): The number of columns for the matrix.
+    - seed (int, optional): The seed for the random number generator. Default is None.
     
     Returns:
-    ndarray: A numpy ndarray with scaled values between 0 and 1.
+    - DataFrame: A Pandas DataFrame containing the generated random values.
     
     Requirements:
     - numpy
-    - sklearn.preprocessing.MinMaxScaler
+    - pandas
     
-    Example:
-    >>> task_func(3, 2)
-    array([[0.37939383, 1.        ],
-           [1.        , 0.55700635],
-           [0.        , 0.        ]])
-    
-    >>> task_func(2, 2)
-    array([[0., 1.],
-           [1., 0.]])
+    Examples:
+    >>> df = task_func(3, 2, seed=42)
+    >>> print(df.shape)
+    (3, 2)
+    >>> df = task_func(1, 1, seed=24)
+    >>> print(df.shape)
+    (1, 1)
     """
-    np.random.seed(seed) # Ensure reproducibility for consistent outputs across different runs
+    if seed is not None:
+        np.random.seed(seed)
     matrix = np.random.rand(rows, columns)
-    scaler = MinMaxScaler()
-    scaled_matrix = scaler.fit_transform(matrix)
-    return scaled_matrix
+    df = pd.DataFrame(matrix)
+    return df
 
 import unittest
-import numpy as np
 class TestCases(unittest.TestCase):
     
+    def setUp(self):
+        self.seed = 42
     def test_case_1(self):
-        result = task_func()
-        self.assertEqual(result.shape, (3, 2))
-        self.assertTrue(np.all(result >= 0))
-    
+        df = task_func(3, 2, seed=self.seed)
+        self.assertEqual(df.shape, (3, 2))
+        self.assertTrue((df >= 0).all().all())
+        self.assertTrue((df <= 1).all().all())
+        
     def test_case_2(self):
-        result = task_func(2, 2)
-        self.assertEqual(result.shape, (2, 2))
-        self.assertTrue(np.all(result >= 0) and np.all(result <= 1))
+        df = task_func(5, 5, seed=self.seed)
+        self.assertEqual(df.shape, (5, 5))
+        self.assertTrue((df >= 0).all().all())
+        self.assertTrue((df <= 1).all().all())
         
     def test_case_3(self):
-        result = task_func(4, 3)
-        self.assertEqual(result.shape, (4, 3))
-        self.assertTrue(np.all(result >= 0) and np.all(result <= 1))
-    
+        df = task_func(1, 1, seed=self.seed)
+        self.assertEqual(df.shape, (1, 1))
+        self.assertTrue((df >= 0).all().all())
+        self.assertTrue((df <= 1).all().all())
+        
     def test_case_4(self):
-        result = task_func(5, 1)
-        self.assertEqual(result.shape, (5, 1))
-        self.assertTrue(np.all(result >= 0))
+        df = task_func(4, 3, seed=self.seed)
+        self.assertEqual(df.shape, (4, 3))
+        self.assertTrue((df >= 0).all().all())
+        self.assertTrue((df <= 1).all().all())
         
     def test_case_5(self):
-        result = task_func(1, 5)
-        self.assertEqual(result.shape, (1, 5))
-        self.assertTrue(np.all(result >= 0) and np.all(result <= 1))
+        df = task_func(2, 2, seed=self.seed)
+        self.assertEqual(df.shape, (2, 2))
+        self.assertTrue((df >= 0).all().all())
+        self.assertTrue((df <= 1).all().all())

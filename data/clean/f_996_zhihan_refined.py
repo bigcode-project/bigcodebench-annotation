@@ -46,7 +46,7 @@ def f_996(url="http://example.com", csv_path="emails.csv",
     return csv_path
 
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, ANY
 import os
 import csv
 import tempfile
@@ -77,7 +77,13 @@ class TestCases(unittest.TestCase):
         csv_path = os.path.join(self.test_dir, "emails.csv")
         with patch('builtins.open', unittest.mock.mock_open()) as mocked_file:
             f_996(csv_path=csv_path)
-            mocked_file.assert_called_once_with(csv_path, 'w', newline='')
+            args, kwargs = mocked_file.call_args
+            self.assertEqual(args[0], csv_path)  # Assert the first argument is the file path
+            try:
+                self.assertEqual(kwargs['mode'], 'w')  # Assert the file is opened in write mode
+            except:
+                self.assertEqual(args[1], 'w')
+            self.assertEqual(kwargs['newline'], '')  # Assert newline handling
 
     @patch('requests.get')
     def test_extraction_custom_url(self, mock_get):

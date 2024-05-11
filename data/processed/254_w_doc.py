@@ -1,79 +1,54 @@
-import numpy as np
-import random
+import json
+import math
 
-# Constants
-COLORS = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
 
-def task_func(ax):
+def task_func(decimal_value, precision=2):
     """
-    Generate a random sine wave function and draw it on a provided matplotlib polar subplot 'ax'. 
-    The function randomly selects a color from a predefined list and sets a random position for radial labels.
-
+    Calculate the square root of the given decimal value to a certain precision and then encode the result as a JSON string.
+    
     Parameters:
-    ax (matplotlib.axes._axes.Axes): The ax to plot on.
-
+    utc_datetime (datetime): The datetime in UTC.
+    precision (int, Optional): The number of decimal places to round the square root to. Defaults to 2.
+    
     Returns:
-    str: The color code (as a string) of the plotted function.
-
+    str: The square root of the decimal value encoded as a JSON string.
+    
     Requirements:
-    - numpy
-    - random
-
+    - json
+    - math
+    
     Example:
-    >>> import matplotlib.pyplot as plt
-    >>> random.seed(0)
-    >>> fig = plt.figure()
-    >>> ax = fig.add_subplot(111, polar=True)
-    >>> color = task_func(ax)
-    >>> color in COLORS
-    True
-    >>> plt.close()
+    >>> from decimal import Decimal
+    >>> decimal_value = Decimal('3.9')
+    >>> json_str = task_func(decimal_value, decimal_value)
+    >>> print(json_str)
+    "1.97"
     """
-    x = np.linspace(0, 2 * np.pi, 1000)
-    y = np.sin(random.randint(1, 10)*x)
-    color = random.choice(COLORS)
-    ax.plot(x, y, color=color)
-    ax.set_rlabel_position(random.randint(0, 180))
-    return color
+    square_root = round(math.sqrt(decimal_value), 2)
+    json_str = json.dumps(str(square_root))
+    return json_str
 
-import matplotlib.pyplot as plt
 import unittest
-import random
+import doctest
+from decimal import Decimal
 class TestCases(unittest.TestCase):
-    def test_color_returned(self):
-        random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        color = task_func(ax)
-        self.assertIn(color, ['b', 'g', 'r', 'c', 'm', 'y', 'k'])
-        plt.close()
-    def test_random_color(self):
-        random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        colors = set(task_func(ax) for _ in range(10))
-        self.assertTrue(len(colors) > 1)
-        plt.close()
-    def test_plot_exists(self):
-        random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        task_func(ax)
-        self.assertTrue(len(ax.lines) > 0)
-        plt.close()
-    def test_plot_properties(self):
-        random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        color = task_func(ax)
-        line = ax.lines[0]
-        self.assertEqual(line.get_color(), color)
-        plt.close()
-    def test_label_position(self):
-        random.seed(0)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, polar=True)
-        task_func(ax)
-        position = ax.get_rlabel_position()
-        self.assertTrue(position>1.0)
-        plt.close()
+    def test_case_1(self):
+        decimal_value = Decimal('4.0')
+        json_str = task_func(decimal_value)
+        self.assertEqual(json.loads(json_str), "2.0")
+    def test_case_2(self):
+        decimal_value = Decimal('0.0')
+        json_str = task_func(decimal_value)
+        self.assertEqual(json.loads(json_str), "0.0")
+    def test_case_3(self):
+        decimal_value = Decimal('0.0001')
+        json_str = task_func(decimal_value)
+        self.assertEqual(json.loads(json_str), "0.01")
+    def test_case_4(self):
+        decimal_value = Decimal('1000000.0')
+        json_str = task_func(decimal_value)
+        self.assertEqual(json.loads(json_str), "1000.0")
+    def test_case_5(self):
+        decimal_value = Decimal('-1.0')
+        with self.assertRaises(ValueError):
+            task_func(decimal_value)

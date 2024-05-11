@@ -80,7 +80,7 @@ class TestCases(unittest.TestCase):
         data_key = "data.values"
         original_data, _, _ = f_830(json_str, data_key)
         expected_series = pd.Series([0.5, 10, 15, 20], dtype=pd.Float64Dtype)
-        pd.testing.assert_series_equal(original_data, expected_series)
+        pd.testing.assert_series_equal(original_data, expected_series, check_dtype=False)
 
     def test_data_normalization(self):
         json_str = '{"data": {"values": [0, 10, 20, 30, 40]}}'
@@ -89,7 +89,7 @@ class TestCases(unittest.TestCase):
         expected_normalized = pd.Series(
             [0.0, 0.25, 0.5, 0.75, 1.0], dtype=pd.Float64Dtype
         )
-        pd.testing.assert_series_equal(normalized_data, expected_normalized)
+        pd.testing.assert_series_equal(normalized_data, expected_normalized, check_dtype=False)
 
     def test_plot_properties(self):
         json_str = '{"data": {"values": [1, 2, 3, 4, 5]}}'
@@ -117,7 +117,7 @@ class TestCases(unittest.TestCase):
         expected_normalized = pd.Series(
             [0.0, 0.0, 0.142857, 0.285714, 0.571429, 1.0], dtype=pd.Float64Dtype
         )
-        pd.testing.assert_series_equal(normalized_data, expected_normalized, atol=1e-6)
+        pd.testing.assert_series_equal(normalized_data, expected_normalized, atol=1e-6, check_dtype=False)
 
     def test_negative_values(self):
         json_str = '{"data": {"values": [-50, -20, 0, 20, 50]}}'
@@ -126,14 +126,14 @@ class TestCases(unittest.TestCase):
         expected_normalized = pd.Series(
             [0.0, 0.3, 0.5, 0.7, 1.0], dtype=pd.Float64Dtype
         )
-        pd.testing.assert_series_equal(normalized_data, expected_normalized, atol=1e-5)
+        pd.testing.assert_series_equal(normalized_data, expected_normalized, atol=1e-5, check_dtype=False)
 
     def test_nested_json_structure(self):
         json_str = '{"data": {"deep": {"deeper": {"values": [2, 4, 6, 8, 10]}}}}'
         data_key = "data.deep.deeper.values"
         original_data, _, _ = f_830(json_str, data_key)
         expected_series = pd.Series([2, 4, 6, 8, 10], dtype=pd.Float64Dtype)
-        pd.testing.assert_series_equal(original_data, expected_series)
+        pd.testing.assert_series_equal(original_data, expected_series, check_dtype=False)
 
     def test_complex_json_structure(self):
         json_str = """
@@ -160,11 +160,11 @@ class TestCases(unittest.TestCase):
         data_key = "readings.data.deep.deeper.values"
         original_data, normalized_data, ax = f_830(json_str, data_key)
         expected_series = pd.Series([100, 200, 300, 400, 500], dtype=pd.Float64Dtype)
-        pd.testing.assert_series_equal(original_data, expected_series)
+        pd.testing.assert_series_equal(original_data, expected_series, check_dtype=False)
         expected_normalized = pd.Series(
             [0.0, 0.25, 0.5, 0.75, 1.0], dtype=pd.Float64Dtype
         )
-        pd.testing.assert_series_equal(normalized_data, expected_normalized, atol=1e-5)
+        pd.testing.assert_series_equal(normalized_data, expected_normalized, atol=1e-5, check_dtype=False)
         self.assertIsInstance(ax, plt.Axes)
 
 

@@ -1,44 +1,51 @@
-import itertools
-import random
+import numpy as np
+from sklearn.decomposition import PCA
 
-def task_func(t, n):
+def task_func(tuples_list, n_components):
     """
-    Generate all combinations from a tuple with length n and return a random combination of length n.
+    Perform Principal Component Analysis (PCA) on a list of tuples.
     
     Parameters:
-    - t (tuple): The tuple.
-    - n (int): The length of the combinations.
+    - tuples_list (list): The list of tuples.
     
     Returns:
-    - tuple: A combination of the input tuple.
+    - transformed_data (ndarray): The transformed data.
 
     Requirements:
-    - itertools
-    - random
+    - numpy
+    - sklearn
     
     Example:
-    >>> random.seed(42)
-    >>> task_func((1, 2, 3, 4), 2)
-    (3, 4)
+    >>> data = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)], 2)
+    >>> print(data)
+    [[ 8.00000000e+00  3.84592537e-16]
+     [ 0.00000000e+00  0.00000000e+00]
+     [-8.00000000e+00  3.84592537e-16]]
     """
-    combinations = list(itertools.combinations(t, n))
-    selected_combination = random.choice(combinations)
-    return selected_combination
+    data = np.array(tuples_list)
+    pca = PCA(n_components=n_components)
+    transformed_data = pca.fit_transform(data)
+    return transformed_data
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        combination = task_func((1, 2, 3, 4), 2)
-        self.assertTrue(tuple(sorted(combination)) in [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)])
+        transformed_data = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)], 2)
+        self.assertEqual(transformed_data.shape, (3, 2))
     def test_case_2(self):
-        combination = task_func((1, 2, 3, 4), 3)
-        self.assertTrue(tuple(sorted(combination)) in [(1, 2, 3), (1, 2, 4), (1, 3, 4), (2, 3, 4)])
+        transformed_data = task_func([(0, 0, 0, 0), (0, 0, 0, 0), (0, 0, 0, 0)], 2)
+        self.assertEqual(transformed_data.shape, (3, 2))
+        self.assertTrue(np.all(transformed_data == 0))
     def test_case_3(self):
-        combination = task_func((1, 2, 3, 4), 4)
-        self.assertTrue(tuple(sorted(combination)) in [(1, 2, 3, 4)])
+        transformed_data = task_func([(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)], 3)
+        self.assertEqual(transformed_data.shape, (3, 3))
     def test_case_4(self):
-        combination = task_func((1, 2, 3, 4), 1)
-        self.assertTrue(tuple(sorted(combination)) in [(1,), (2,), (3,), (4,)])
+        transformed_data = task_func([(0, 1)], 1)
+        self.assertEqual(transformed_data.shape, (1, 1))
+        self.assertTrue(np.all(transformed_data == 0))
     def test_case_5(self):
-        combination = task_func((1, 2, 3, 4), 0)
-        self.assertTrue(tuple(sorted(combination)) in [()])
+        transformed_data = task_func([(-1, -1, -1), (0, 0, 0), (1, 1, 1)], 1)
+        self.assertEqual(transformed_data.shape, (3, 1))
+        self.assertTrue(transformed_data[0][0] < 0)
+        self.assertTrue(transformed_data[1][0] == 0)
+        self.assertTrue(transformed_data[2][0] > 0)

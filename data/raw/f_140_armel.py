@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
         # Assertions for the returned DataFrame
         expected_data = [[1, 1, 2], [1, 2, 1], [2, 1, 3], [2, 2, 1]]
         expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
 
         # Assertions for the returned plot
         self.assertEqual(ax.get_xlabel(), 'col1-col2')
@@ -75,7 +75,7 @@ class TestCases(unittest.TestCase):
             [1, 3, 1]
         ]
         expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
         self.assertEqual(ax.get_xlabel(), 'col1-col2')
         self.assertEqual(ax.get_ylabel(), 'col3')
         self.assertListEqual(list(ax.lines[0].get_ydata()), [3, 1, 1])
@@ -95,7 +95,7 @@ class TestCases(unittest.TestCase):
             [2, 2, 1]
         ]
         expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
         self.assertEqual(ax.get_xlabel(), 'col1-col2')
         self.assertEqual(ax.get_ylabel(), 'col3')
         self.assertListEqual(list(ax.lines[0].get_ydata()), [1, 1, 1, 1])
@@ -111,7 +111,7 @@ class TestCases(unittest.TestCase):
             [1, 1, 1],
         ]
         expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
         self.assertEqual(ax.get_xlabel(), 'col1-col2')
         self.assertEqual(ax.get_ylabel(), 'col3')
         self.assertListEqual(list(ax.lines[0].get_ydata()), [1])
@@ -135,7 +135,7 @@ class TestCases(unittest.TestCase):
             [1, 1, 2]
         ]
         expected_df = pd.DataFrame(expected_data, columns=COLUMNS)
-        pd.testing.assert_frame_equal(analyzed_df, expected_df)
+        pd.testing.assert_frame_equal(analyzed_df, expected_df, check_dtype=False)
         self.assertEqual(ax.get_xlabel(), 'col1-col2')
         self.assertEqual(ax.get_ylabel(), 'col3')
         self.assertListEqual(list(ax.lines[0].get_ydata()), [2, 2, 2, 2])

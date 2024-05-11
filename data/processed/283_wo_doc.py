@@ -1,83 +1,120 @@
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import numpy as np
-import cv2
 import os
+import json
+from collections import Counter
 
-def task_func(file_path, onpick):
+
+def task_func(json_files_path='./json_files/', key='name'):
     """
-    Draw the color histogram of an image in 3D and call a function when a data point is selected.
-
+    Count the occurrence of a particular key in all json files in a specified directory 
+    and return a dictionary with the values of the specified key and their counts.
+    
     Parameters:
-    file_path (str): The path to the image file.
-    onpick (function): The function to be called when a data point is picked.
-
+    - json_files_path (str): The path to the directory containing the JSON files. Default is './json_files/'.
+    - key (str): The key in the JSON files whose values need to be counted. Default is 'name'.
+    
     Returns:
-    matplotlib.axes.Axes: The Axes object of the 3D plot.
-
-    Raises:
-    FileNotFoundError: If the image file does not exist.
+    dict: A dictionary with values of the key as keys and their counts as values.
     
     Requirements:
-    - matplotlib
-    - mpl_toolkits.mplot3d
-    - numpy
-    - cv2
     - os
-    - tempfile
+    - json
+    - collections.Counter
     
     Example:
-    >>> def onpick(event):
-    ...     ind = event.ind
-    ...     print(f'You picked data point(s) {ind}')
-    >>> np.random.seed(42)
-    >>> dummy_img_path = 'image.jpg'
-    >>> dummy_img = np.random.randint(0, 255, (20, 20, 3), dtype=np.uint8)
-    >>> cv2.imwrite(dummy_img_path, dummy_img)
-    True
-    >>> ax = task_func('image.jpg', onpick)
-    >>> os.remove(dummy_img_path)
+    >>> import tempfile
+    >>> import json
+    >>> directory = tempfile.mkdtemp()
+    >>> data = [{'product': 'apple', 'quantity': 5}, {'product': 'banana', 'quantity': 3}]
+    >>> for i, d in enumerate(data):
+    ...     with open(f"{directory}/{i}.json", 'w') as file:
+    ...         json.dump(d, file)
+
+    >>> task_func(json_files_path=directory, key='product')
+    {'apple': 1, 'banana': 1}
     """
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"No file found at {file_path}")
-    img = cv2.imread(file_path)
-    color = ('b', 'g', 'r')
-    fig = plt.figure()
-    ax = Axes3D(fig)
-    for i, col in enumerate(color):
-        hist = cv2.calcHist([img], [i], None, [256], [0, 256])
-        ax.plot(np.arange(256), hist, color=col)
-    fig.canvas.mpl_connect('pick_event', onpick)
-    return ax
+    key_values = []
+    for filename in os.listdir(json_files_path):
+        if filename.endswith('.json'):
+            file_path = os.path.join(json_files_path, filename)
+            with open(file_path, 'r') as json_file:
+                data = json.load(json_file)
+                if key in data:
+                    key_values.append(data[key])
+    return dict(Counter(key_values))
 
 import unittest
-import numpy as np
-import cv2
-import os
+import doctest
 import tempfile
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Create a dummy image for testing
-        np.random.seed(42)
-        self.dummy_img_path = os.path.join(tempfile.gettempdir(), 'test_image.jpg')
-        dummy_img = np.random.randint(0, 255, (20, 20, 3), dtype=np.uint8)
-        cv2.imwrite(self.dummy_img_path, dummy_img)
-    def tearDown(self):
-        # Cleanup the dummy image
-        os.remove(self.dummy_img_path)
-    def test_valid_input(self):
-        def dummy_onpick(event):
-            pass
-        ax = task_func(self.dummy_img_path, dummy_onpick)
-        self.assertIsInstance(ax, Axes3D)
-    def test_invalid_file_path(self):
-        def dummy_onpick(event):
-            pass
+        self.mock_data_directory = tempfile.mkdtemp()
+        
+        # Create mock data
+        mock_data = [
+            {'name': 'John', 'city': 'New York'},
+            {'name': 'Jane', 'city': 'Los Angeles'},
+            {'name': 'John', 'city': 'New York'},
+            {'name': 'Alice', 'city': 'Chicago'},
+            {'name': 'Bob', 'city': 'New York'},
+            {'name': 'Alice', 'city': 'Chicago'},
+            {'name': 'Alice', 'city': 'Chicago'},
+            {'city': 'Los Angeles'},
+            {'city': 'Chicago'},
+            {'city': 'New York'},
+            {'city': 'New York'},
+            {'city': 'New York'},
+        ]
+        
+        for i, data in enumerate(mock_data):
+            with open(f"{self.mock_data_directory}/{i}.json", 'w') as file:
+                json.dump(data, file)
+    
+    def test_case_1(self):
+        # Test with mock data directory and 'name' key
+        result = task_func(self.mock_data_directory, 'name')
+        
+        # To verify the result, we need to read all JSON files and count the occurrences of the 'name' key values
+        expected_counts = []
+        for filename in os.listdir(self.mock_data_directory):
+            if filename.endswith('.json'):
+                with open(os.path.join(self.mock_data_directory, filename), 'r') as file:
+                    data = json.load(file)
+                    if 'name' in data:
+                        expected_counts.append(data['name'])
+                        
+        expected_result = dict(Counter(expected_counts))
+        
+        self.assertDictEqual(result, expected_result)
+    def test_case_2(self):
+        # Test with a non-existent key
+        result = task_func(self.mock_data_directory, 'non_existent_key')
+        self.assertDictEqual(result, {})
+    def test_case_3(self):
+        # Test with another key present in our mock data ('city' in this case)
+        result = task_func(self.mock_data_directory, 'city')
+        
+        # To verify the result, we need to read all JSON files and count the occurrences of the 'city' key values
+        expected_counts = []
+        for filename in os.listdir(self.mock_data_directory):
+            if filename.endswith('.json'):
+                with open(os.path.join(self.mock_data_directory, filename), 'r') as file:
+                    data = json.load(file)
+                    if 'city' in data:
+                        expected_counts.append(data['city'])
+                        
+        expected_result = dict(Counter(expected_counts))
+        
+        self.assertDictEqual(result, expected_result)
+    def test_case_4(self):
+        # Test with a directory that doesn't contain any JSON files
+        empty_directory = f"{self.mock_data_directory}/empty_directory/"
+        os.makedirs(empty_directory, exist_ok=True)
+        
+        result = task_func(empty_directory, 'name')
+        self.assertDictEqual(result, {})
+    def test_case_5(self):
+        # Test with a directory that doesn't exist
+        non_existent_directory = f"{self.mock_data_directory}/non_existent_directory/"
+        
         with self.assertRaises(FileNotFoundError):
-            task_func('nonexistent.jpg', dummy_onpick)
-    def test_onpick_function(self):
-        # This test requires manual verification of onpick functionality
-        def dummy_onpick(event):
-            print(f"Dummy onpick called with event: {event}")
-        ax = task_func(self.dummy_img_path, dummy_onpick)
-        self.assertIsInstance(ax, Axes3D)
+            task_func(non_existent_directory, 'name')

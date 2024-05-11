@@ -1,109 +1,113 @@
+import collections
+import matplotlib.pyplot as plt
 import pandas as pd
-import random
 
 
-def task_func(product_list, categories, min_value = 10, max_value = 100):
+# Constants
+WORDS = ['the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'I']
+
+def task_func(sentences_dict, word_keys):
     """
-    Create a sales report for a list of products in different categories.
-    The report includes the quantity sold, revenue for 1 product, and total revenue generated for each product.
-    
+    Calculate the occurrence of certain words in a collection of sentences and return a bar chart.
+
     Parameters:
-    product_list (list): The list of products.
-    categories (list): A list of categories for the products.
-    min_value (int): The minimum value for quantity sold and revenue.
-    max_value (int): The maximum value for quantity sold and revenue.
-    
+    sentences_dict (dict): The dictionary containing sentences.
+    word_keys (list): The list of words.
+
     Returns:
-    DataFrame: A pandas DataFrame with sales data for the products.
-    
-    Note:
-    - The column names uses are 'Product', 'Category', 'Quantity Sold', 'Revenue' , and 'Total Revenue'.
+    - matplotlib.axes._axes.Axes: Axes object of the bar chart displaying the frequencies.
 
     Requirements:
+    - collections
+    - matplotlib.pyplot
     - pandas
-    - random
-    
+
     Example:
-    >>> random.seed(0)
-    >>> report = task_func(['Product 1'], ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports'], 100, 100)
-    >>> report.iloc[0]['Category'] in ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
-    True
-    >>> report.iloc[0]['Quantity Sold']
-    100
+    >>> sentences_dict = {'Sentence1': 'the quick brown fox', 'Sentence2': 'jumps over the lazy dog', 'Sentence3': 'the dog is brown'}
+    >>> word_keys = ['the', 'dog']
+    >>> type(task_func(sentences_dict, word_keys))
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    report_data = []
-    for product in product_list:
-        category = categories[random.randint(0, len(categories)-1)]
-        quantity_sold = random.randint(min_value, max_value)
-        revenue = random.randint(min_value, max_value)
-        total_revenue = quantity_sold * revenue
-        report_data.append([product, category, quantity_sold, revenue, total_revenue])
-    report_df = pd.DataFrame(report_data, columns=['Product', 'Category', 'Quantity Sold', 'Revenue', 'Total Revenue'])
-    return report_df
+    word_counts = collections.Counter(' '.join(sentences_dict.values()).split())
+    frequencies = [word_counts[word] for word in word_keys]
+    word_series = pd.Series(frequencies, index=word_keys)
+    plt.figure()
+    word_series.plot(kind='bar')
+    return word_series.plot(kind='bar')
 
 import unittest
-import pandas as pd
-import random
+import doctest
 class TestCases(unittest.TestCase):
     
-    categories = ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
-    products = ['Product ' + str(i) for i in range(1, 101)]
-    
     def test_case_1(self):
-        random.seed(0)
-        report = task_func(self.products[:5], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 5)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        sentences_dict = {
+            'Sentence1': 'the quick brown fox',
+            'Sentence2': 'jumps over the lazy dog',
+            'Sentence3': 'the dog is brown'
+        }
+        word_keys = ['the', 'dog']
+        ax = task_func(sentences_dict, word_keys)
+        
+        # Check the x-tick labels
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        
+        # Check the bar heights
+        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 2, 3, 2])
         
     def test_case_2(self):
-        random.seed(0)
-        report = task_func(self.products[5:10], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 5)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        sentences_dict = {
+            'Sentence1': 'apple orange banana',
+            'Sentence2': 'apple apple',
+            'Sentence3': 'banana orange orange'
+        }
+        word_keys = ['apple', 'orange', 'banana']
+        ax = task_func(sentences_dict, word_keys)
+        
+        # Check the x-tick labels
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        
+        # Check the bar heights
+        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 3, 2, 3, 3, 2])
         
     def test_case_3(self):
-        random.seed(0)
-        report = task_func([self.products[10]], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 1)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        sentences_dict = {
+            'Sentence1': 'cat mouse',
+            'Sentence2': 'dog cat',
+            'Sentence3': 'mouse mouse cat'
+        }
+        word_keys = ['cat', 'mouse', 'dog']
+        ax = task_func(sentences_dict, word_keys)
         
+        # Check the x-tick labels
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        
+        # Check the bar heights
+        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 3, 1, 3, 3, 1])
     def test_case_4(self):
-        random.seed(0)
-        report = task_func(self.products[10:20], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 10)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
+        sentences_dict = {
+            'Sentence1': 'sun moon stars',
+            'Sentence2': 'sun sun',
+            'Sentence3': 'moon stars stars'
+        }
+        word_keys = ['sun', 'stars', 'moon']
+        ax = task_func(sentences_dict, word_keys)
         
+        # Check the x-tick labels
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        
+        # Check the bar heights
+        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 3, 2, 3, 3, 2])
     def test_case_5(self):
-        random.seed(0)
-        report = task_func(self.products[20:40], self.categories)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 20)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
-    
-    def test_case_6(self):
-        random.seed(0)
-        report = task_func([self.products[0]], self.categories, 10, 10)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 1)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
-        self.assertEqual(report.iloc[0]['Quantity Sold'], 10)
-        self.assertEqual(report.iloc[0]['Total Revenue'], 100)
-    
-    def test_case_7(self):
-        random.seed(0)
-        report = task_func([self.products[0]], self.categories, 10, 100)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 1)
-        self.assertEqual(set(report['Category'].unique()).issubset(self.categories), True)
-        self.assertEqual(report.iloc[0]['Total Revenue'], report.iloc[0]['Quantity Sold']*report.iloc[0]['Revenue'])
-    def test_case_8(self):
-        random.seed(0)
-        report = task_func(self.products[40:60], self.categories, 100, 200)
-        self.assertTrue(isinstance(report, pd.DataFrame))
-        self.assertEqual(len(report), 20)
-        for index, row in report.iterrows():
-            self.assertEqual(row['Total Revenue'], row['Quantity Sold']*row['Revenue'])
+        sentences_dict = {
+            'Sentence1': 'car bus bike',
+            'Sentence2': 'bus bus bike',
+            'Sentence3': 'car car bus'
+        }
+        word_keys = ['car', 'bus', 'bike']
+        ax = task_func(sentences_dict, word_keys)
+        
+        # Check the x-tick labels
+        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], word_keys)
+        
+        # Check the bar heights
+        self.assertListEqual([rect.get_height() for rect in ax.patches], [3, 4, 2, 3, 4, 2])

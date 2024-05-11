@@ -1,121 +1,116 @@
+import numpy as np
 import pandas as pd
-import random
 
 
-def task_func(num_rows=100, categories=["a", "b", "c", "d", "e"], random_seed=42):
+def task_func(data_str, separator=",", bins=20):
     """
-    Create a Pandas DataFrame with specified number of rows. Each row contains a randomly
-    selected category from the provided categories list and a random integer between 1 and 100.
+    Convert a string of numerical values separated by a specified separator into a pandas
+    numerical series with int64, and then draw a histogram of the data.
 
-    The function also generates a bar chart visualizing the counts of each category in the DataFrame
-    and returns both the DataFrame and the bar chart.
+    The function raises a ValueError if data is empty or it fails to convert the data.
+    It plots the histogram with the following attributes:
+    - grid: True
+    - rwidth: 0.9
+    - color: '#607c8e'
 
     Parameters:
-    - num_rows (int): Number of rows in the DataFrame. Default is 100. Must be at least 1.
-    - categories (list): List of categories to choose from. Default is ['a', 'b', 'c', 'd', 'e'].
-    - random_seed (int): Seed for random number generation to ensure reproducibility. Default is 42.
+    - data_str (str): The string of numbers separated by the specified separator.
+    - separator (str, optional): The separator used in the data string. Default is ','.
+    - bins (int, optional): Number of histogram bins. Default is 20.
 
     Returns:
-    - pd.DataFrame: A pandas DataFrame with randomly generated category data.
-    - matplotlib.pyplot.Axes: A bar chart visualizing the category counts, with the title 'Category Counts'.
+    - tuple: A tuple containing:
+        1. Series: A pandas Series of the data coonverted into integers.
+        2. Axes: The Axes object of the plotted histogram.
 
-    Raises:
-    - ValueError: If num_rows is less than 1.
-    
     Requirements:
+    - numpy
     - pandas
-    - random
 
     Example:
-    >>> df, ax = task_func(num_rows=5)
-    >>> df
-      Category  Value
-    0        a     18
-    1        a     95
-    2        c     14
-    3        b     87
-    4        b     95
+    >>> series, ax = task_func('1,2,3,4,5,5,5,4,3,2,1')
+    >>> print(type(series), series.tolist())
+    <class 'pandas.core.series.Series'> [1, 2, 3, 4, 5, 5, 5, 4, 3, 2, 1]
+    >>> print(type(ax))
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    if num_rows <= 0:
-        raise ValueError("num_rows must not be negative")
-    random.seed(random_seed)
-    df = pd.DataFrame(
-        {
-            "Category": [
-                categories[random.randint(0, len(categories) - 1)]
-                for _ in range(num_rows)
-            ],
-            "Value": [random.randint(1, 100) for _ in range(num_rows)],
-        }
-    )
-    ax = (
-        df["Category"]
-        .value_counts()
-        .plot(kind="bar", title="Category Counts", figsize=(10, 6))
-    )
-    return df, ax
+    data = np.fromstring(data_str, sep=separator)
+    if data.size == 0:
+        raise ValueError("Failed to find valid data")
+    data = pd.Series(data, dtype='int64')
+    ax = data.plot.hist(grid=True, bins=bins, rwidth=0.9, color="#607c8e")
+    return data, ax
 
 import unittest
-import matplotlib.pyplot as plt
+import pandas as pd
+import matplotlib
+from matplotlib import pyplot as plt
 class TestCases(unittest.TestCase):
+    def setUp(self) -> None:
+        self.default_str = "1,2,3,4,5,5,5,4,3,2,1"
+        self.default_expected = pd.Series([1, 2, 3, 4, 5, 5, 5, 4, 3, 2, 1])
+    def assertHistogramAttributes(self, series, ax):
+        # Check that the y-axis gridlines are set to True
+        self.assertTrue(ax.yaxis.grid)
+        # Ensure the histogram bars have the correct color
+        self.assertEqual(matplotlib.colors.to_hex(ax.patches[0].get_fc()), "#607c8e")
+        # Validate the heights of the histogram bars
+        for patch in ax.patches:
+            if (
+                round(patch.get_x()) in series.values
+                or round(patch.get_x() + patch.get_width()) in series.values
+            ):
+                self.assertTrue(patch.get_height() >= 0)
     def test_case_1(self):
-        # Test with default parameters
-        df, ax = task_func()
-        self.assertEqual(len(df), 100)
-        self.assertTrue(
-            set(df["Category"].unique()).issubset(set(["a", "b", "c", "d", "e"]))
-        )
-        self.assertTrue(df["Value"].min() >= 1)
-        self.assertTrue(df["Value"].max() <= 100)
-        self.assertEqual(ax.get_title(), "Category Counts")
+        # Test default case
+        series, ax = task_func(self.default_str)
+        self.assertIsInstance(series, pd.Series)
+        self.assertHistogramAttributes(series, ax)
+        pd.testing.assert_series_equal(series, self.default_expected)
     def test_case_2(self):
-        # Test num_rows
-        for num_rows in [10, 50, 100]:
-            df, _ = task_func(num_rows=num_rows)
-            self.assertEqual(len(df), num_rows)
+        # Test function works on different bin sizes
+        for bins in [5, 10, 15, 30, 100]:
+            with self.subTest(bins=bins):
+                series, ax = task_func(self.default_str, bins=bins)
+                self.assertIsInstance(series, pd.Series)
+                self.assertHistogramAttributes(series, ax)
+                pd.testing.assert_series_equal(series, self.default_expected)
     def test_case_3(self):
-        # Test edge case - 0 rows
-        with self.assertRaises(Exception):
-            task_func(num_rows=0)
+        # Test custom separators
+        data_str = "1|2|3|4|5"
+        series, ax = task_func(data_str, separator="|")
+        self.assertIsInstance(series, pd.Series)
+        self.assertHistogramAttributes(series, ax)
+        pd.testing.assert_series_equal(series, pd.Series([1, 2, 3, 4, 5]))
     def test_case_4(self):
-        # Test edge case - invalid num_rows
-        with self.assertRaises(Exception):
-            task_func(num_rows=-1)
+        # Test negative and zero
+        data_str = "-5,-4,-3,-2,-1,0"
+        series, ax = task_func(data_str)
+        self.assertIsInstance(series, pd.Series)
+        self.assertHistogramAttributes(series, ax)
+        pd.testing.assert_series_equal(series, pd.Series([-5, -4, -3, -2, -1, 0]))
     def test_case_5(self):
-        # Test categories
-        df, _ = task_func(categories=["x", "y", "z"])
-        self.assertTrue(set(df["Category"].unique()).issubset(set(["x", "y", "z"])))
+        # Test single item
+        data_str = "1"
+        series, ax = task_func(data_str)
+        self.assertIsInstance(series, pd.Series)
+        self.assertHistogramAttributes(series, ax)
+        pd.testing.assert_series_equal(series, pd.Series([1]))
     def test_case_6(self):
-        # Test edge case - single category
-        df, _ = task_func(categories=["unique"])
-        self.assertTrue(
-            set(["unique"]).issubset(df["Category"].unique()),
-            "Should work with a single category",
-        )
+        # Test with float
+        series, ax = task_func("1.0,2.0,3.0,4.0,5.0,5.0,5.0,4.0,3.0,2.0,1.0")
+        self.assertIsInstance(series, pd.Series)
+        self.assertHistogramAttributes(series, ax)
+        pd.testing.assert_series_equal(series, self.default_expected)
     def test_case_7(self):
-        # Test edge case - empty categories
-        with self.assertRaises(Exception):
-            task_func(categories=[])
+        # Test with empty string
+        data_str = ""
+        with self.assertRaises(ValueError):
+            task_func(data_str)
     def test_case_8(self):
-        # Test random seed
-        df1, _ = task_func(random_seed=123)
-        df2, _ = task_func(random_seed=123)
-        df3, _ = task_func(random_seed=124)
-        self.assertTrue(
-            df1.equals(df2), "DataFrames should be identical with the same seed"
-        )
-        self.assertFalse(
-            df1.equals(df3), "DataFrames should differ with different seeds"
-        )
-    def test_case_9(self):
-        # Test visualization
-        categories = ["x", "y", "z"]
-        _, ax = task_func(num_rows=100, categories=categories, random_seed=42)
-        ax_categories = [tick.get_text() for tick in ax.get_xticklabels()]
-        self.assertListEqual(
-            sorted(categories),
-            sorted(ax_categories),
-            "X-axis categories should match input categories",
-        )
+        # Test with invalid data (contains string)
+        data_str = "a,b,c, 1"
+        with self.assertRaises(ValueError):
+            task_func(data_str)
     def tearDown(self):
         plt.close("all")

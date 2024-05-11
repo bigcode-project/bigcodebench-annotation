@@ -1,126 +1,68 @@
-import heapq
-from scipy import stats
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 
-def task_func(df, col1, col2, N=10):
+# Constants
+ARRAY_LENGTH = 10
+
+def task_func():
     """
-    Find the N largest absolute differences between the corresponding elements
-    of two specified columns in a DataFrame, perform a t-Test on the elements
-    with these differences, and return the calculated p-value.
+    Generate a random array and apply min-max normalization (scaling) to transform the array values into a range between 0 and 1.
 
     Parameters:
-    df (pandas.DataFrame): A DataFrame containing at least two numerical columns to compare.
-    col1, col2 (str): Names of the columns to compare.
-    N (int, optional): The number of largest differences to consider for the t-Test. Defaults to 10.
+    - None
 
     Returns:
-    float: The p-value resulting from the t-Test on the elements with the N largest differences.
-
-    Raises:
-    ValueError: If specified columns are not in the provided DataFrame.
-    ValueError: If N is <= 1.
+    - scaled_array (numpy.ndarray): The normalized array.
 
     Requirements:
-    - scipy.stats
-    - heapq
+    - numpy
+    - sklearn
 
     Example:
-    >>> df = pd.DataFrame({
-    ...     'col1': [99, 86, 90, 70, 86, 95, 56, 98, 80, 81],
-    ...     'col2': [21, 11, 21, 1, 26, 40, 4, 50, 34, 37]
-    ... })
-    >>> p_value = task_func(df, 'col1', 'col2', N=5)
-    >>> print(p_value)    
-    4.676251508205865e-06
-
-    >>> df = pd.DataFrame({
-    ...    'col1': [1, 3, 4, 70],
-    ...    'col2': [2, 3, 5, 1]
-    ...     })
-    >>> p_value = task_func(df, 'col1', 'col2', N=5)
-    >>> print(p_value)
-    0.3590111759771484
-
-
+    >>> task_func()
+    array([[0.57142857],
+           [0.14285714],
+           [0.71428571],
+           [0.28571429],
+           [0.57142857],
+           [1.        ],
+           [0.        ],
+           [0.57142857],
+           [0.71428571],
+           [0.28571429]])
     """
-    if N <= 1:
-        raise ValueError(f"N should be greater than 1. Received N={N}.")
-    if col1 not in df.columns or col2 not in df.columns:
-        raise ValueError(f"Columns {col1} or {col2} not found in the DataFrame.")
-    l1 = df[col1].values
-    l2 = df[col2].values
-    largest_diff_indices = heapq.nlargest(N, range(len(l1)), key=lambda i: abs(l1[i] - l2[i]))
-    _, p_value = stats.ttest_ind(l1[largest_diff_indices], l2[largest_diff_indices])
-    return p_value
+    np.random.seed(42)  # For reproducibility, as shown in your example
+    array = np.random.randint(0, 10, ARRAY_LENGTH).reshape(-1, 1)
+    scaler = MinMaxScaler()
+    scaled_array = scaler.fit_transform(array)
+    return scaled_array
 
 import unittest
-from faker import Faker
-import pandas as pd
+import numpy as np
 class TestCases(unittest.TestCase):
-    def test_N(self):
-        # test with different values for N
-        data = {
-            'col1': [10, 20, 30, 40, 50],
-            'col2': [10, 20, 3000, 40, 50]  # Only one large difference
-        }
-        df = pd.DataFrame(data)
-        p_value = task_func(df, 'col1', 'col2', N=4)
-        self.assertGreater(p_value, 0.1)  # Expecting a high p-value as only one value differs significantly
-        self.assertRaises(Exception, task_func, df, 'col1', 'col2', N=1)
-    def test_wrong_columns(self):
-        # test with wrong columns
-        data = {
-            'col1': [1, 2, 3, 4, 5],
-            'col2': [2, 3, 4, 5, 6]
-        }
-        df = pd.DataFrame(data)
-        self.assertRaises(Exception, task_func, df, 'a', 'col2')
-        self.assertRaises(Exception, task_func, df, 'col1', 'a')
-        self.assertRaises(Exception, task_func, df, 'a', 'b')
-        
-            
-    def test_case_1(self):
-        # Test case with small numerical differences in columns
-        data = {
-            'col1': [1, 2, 3, 4, 5],
-            'col2': [2, 3, 4, 5, 6]
-        }
-        df = pd.DataFrame(data)
-        p_value = task_func(df, 'col1', 'col2')
-        self.assertGreater(p_value, 0.05)  # Expecting a high p-value due to small differences
-    def test_case_2(self):
-        # Test case with larger numerical differences in columns
-        data = {
-            'col1': [100, 200, 300, 400, 500],
-            'col2': [10, 20, 30, 40, 50]
-        }
-        df = pd.DataFrame(data)
-        p_value = task_func(df, 'col1', 'col2')
-        self.assertLess(p_value, 0.05)  # Expecting a low p-value due to large differences
-    def test_case_3(self):
-        # Test case with random data from Faker
-        fake = Faker()
-        data = {
-            'col1': [fake.random_int(min=0, max=1000) for _ in range(10)],
-            'col2': [fake.random_int(min=0, max=1000) for _ in range(10)]
-        }
-        df = pd.DataFrame(data)
-        p_value = task_func(df, 'col1', 'col2')
-        # No specific assertion for random data, just checking if function executes without errors
-    def test_case_4(self):
-        # Test case with identical columns (expecting a high p-value)
-        data = {
-            'col1': [10, 20, 30, 40, 50],
-            'col2': [10, 20, 30, 40, 50]
-        }
-        df = pd.DataFrame(data)
-        p_value = task_func(df, 'col1', 'col2')
-        self.assertAlmostEqual(p_value, 1., places=2)  # Expecting a high p-value as columns are identical
-    def test_case_5(self):
-        # Test case with only one differing value in columns
-        data = {
-            'col1': [10, 20, 30, 40, 50],
-            'col2': [10, 20, 3000, 40, 50]  # Only one large difference
-        }
-        df = pd.DataFrame(data)
-        p_value = task_func(df, 'col1', 'col2')
-        self.assertGreater(p_value, 0.1)  # Expecting a high p-value as only one value differs significantly
+    def setUp(self):
+        self.result = task_func()  # Call the function once to use in multiple tests if needed
+    def test_normal_functionality(self):
+        """Testing the basic functionality and shape of the output array."""
+        self.assertEqual(self.result.shape, (10, 1), "Array shape should be (10, 1)")
+        self.assertTrue((self.result >= 0).all() and (self.result <= 1).all(), "Array values should be in the range [0, 1]")
+    def test_output_values(self):
+        """ Ensuring that the scaling works as expected. """
+        expected_min = 0
+        expected_max = 1
+        actual_min = np.min(self.result)
+        actual_max = np.max(self.result)
+        self.assertEqual(actual_min, expected_min, "The minimum of the scaled array should be 0")
+        self.assertAlmostEqual(actual_max, expected_max, places=15, msg="The maximum of the scaled array should be very close to 1")
+    def test_no_arguments(self):
+        """Ensure that no arguments are passed to the function."""
+        with self.assertRaises(TypeError):
+            task_func(10)  # This should fail since the function expects no arguments
+    def test_unchanging_output(self):
+        """Test if multiple calls to the function give the same result due to seed setting."""
+        second_result = task_func()
+        np.testing.assert_array_equal(self.result, second_result, "Results should be the same on every call due to fixed seed.")
+    def test_distribution_of_values(self):
+        """Test that the distribution of scaled values is neither constant nor degenerate (not all values the same)."""
+        unique_values = np.unique(self.result)
+        self.assertTrue(len(unique_values) > 1, "There should be more than one unique scaled value to confirm distribution.")

@@ -1,93 +1,90 @@
-from collections import Counter
-import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
 
 
-def task_func(myList):
+def task_func(myList, n_clusters):
     """
-    Count the frequency of each word in a list and return a DataFrame of words and their number.
+    Cluster a list of 2D points using KMeans and visualize the clusters.
+
+    Note: This function raises ValueError if it encounters invalid inputs.
+    KMeans is performed with random_state = 42 and n_init = 10. Scatterplot
+    uses red 'x' markers for cluster centers.
 
     Parameters:
-    myList (list): List of strings. Each string is considered a word regardless of its content,
-                                    however the function is case insensitive, and it removes
-                                    leading and trailing whitespaces. If empty, function returns
-                                    a DataFrame with a Count column that is otherwise empty.
+    - myList (list): List of 2D points.
+    - n_clusters (int): Number of clusters to form.
 
     Returns:
-    DataFrame: A pandas DataFrame with words and their counts.
+    - matplotlib.axes._axes.Axes: Axes object with the plotted clusters.
 
     Requirements:
-    - collections.Counter
-    - pandas
+    - matplotlib.pyplot
+    - sklearn.cluster.KMeans
 
     Example:
-    >>> myList = ['apple', 'banana', 'apple', 'cherry', 'banana', 'banana']
-    >>> task_func(myList)
-            Count
-    apple       2
-    banana      3
-    cherry      1
+    >>> myList = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]
+    >>> ax = task_func(myList, 2)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax.get_xticklabels()
+    [Text(0.0, 0, '0'), Text(1.0, 0, '1'), Text(2.0, 0, '2'), Text(3.0, 0, '3'), Text(4.0, 0, '4'), Text(5.0, 0, '5'), Text(6.0, 0, '6'), Text(7.0, 0, '7'), Text(8.0, 0, '8'), Text(9.0, 0, '9'), Text(10.0, 0, '10')]
     """
-    words = [w.lower().strip() for w in myList]
-    word_counts = dict(Counter(words))
-    report_df = pd.DataFrame.from_dict(word_counts, orient="index", columns=["Count"])
-    return report_df
+    if not myList or n_clusters <= 0:
+        raise ValueError("Invalid inputs")
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+    kmeans.fit(myList)
+    fig, ax = plt.subplots()
+    ax.scatter(*zip(*myList), c=kmeans.labels_)
+    ax.scatter(*zip(*kmeans.cluster_centers_), marker="x", color="red")
+    return ax
 
 import unittest
-import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.test_list = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]
     def test_case_1(self):
-        # Test basic case
-        input_data = ["apple", "banana", "apple", "cherry", "banana", "banana"]
-        expected_output = pd.DataFrame(
-            {"Count": [2, 3, 1]}, index=["apple", "banana", "cherry"]
-        )
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+        # Test single cluster
+        myList = [[1, 1], [1, 1], [1, 1], [1, 1]]
+        ax = task_func(myList, 1)
+        self.assertEqual(len(set(ax.collections[0].get_array())), 1)
     def test_case_2(self):
-        # Test repeated value
-        input_data = ["apple", "apple", "apple"]
-        expected_output = pd.DataFrame({"Count": [3]}, index=["apple"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+        # Test arbitrary number of clusters
+        myList = self.test_list
+        for n in range(1, 6):
+            ax = task_func(myList, n)
+            self.assertEqual(len(set(ax.collections[0].get_array())), n)
     def test_case_3(self):
-        # Test empty list
-        input_data = []
-        expected_output = pd.DataFrame(columns=["Count"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+        # Test visualization
+        myList = self.test_list
+        ax = task_func(myList, 2)
+        red_collection = next(
+            coll
+            for coll in ax.collections
+            if (
+                coll.get_facecolor()[0][0] == 1.0
+                and coll.get_facecolor()[0][1] == 0.0
+                and coll.get_facecolor()[0][2] == 0.0
+            )
+        )
+        red_x_markers_count = len(red_collection.get_offsets())
+        self.assertEqual(red_x_markers_count, 2)
     def test_case_4(self):
-        # Test single entry
-        input_data = ["kiwi"]
-        expected_output = pd.DataFrame({"Count": [1]}, index=["kiwi"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+        # Test handling invalid inputs
+        with self.assertRaises(ValueError):
+            task_func([], 1)
+        with self.assertRaises(ValueError):
+            task_func([[1, 1], [2, 2]], 0)
+        with self.assertRaises(ValueError):
+            task_func(self.test_list, len(self.test_list) + 1)
     def test_case_5(self):
-        # Tests the function's ability to handle mixed case words correctly.
-        input_data = ["Apple", "apple", "APPLE"]
-        expected_output = pd.DataFrame({"Count": [3]}, index=["apple"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
-    def test_case_6(self):
-        # Tests the function's ability to handle words with leading/trailing spaces.
-        input_data = ["banana ", " banana", "  banana"]
-        expected_output = pd.DataFrame({"Count": [3]}, index=["banana"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
-    def test_case_7(self):
-        # Tests the function's ability to handle words with special characters.
-        input_data = ["kiwi!", "!kiwi", "kiwi"]
-        expected_output = pd.DataFrame(
-            {"Count": [1, 1, 1]}, index=["kiwi!", "!kiwi", "kiwi"]
-        )
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
-    def test_case_8(self):
-        # Tests the function's handling of numeric strings as words.
-        input_data = ["123", "456", "123", "456", "789"]
-        expected_output = pd.DataFrame(
-            {"Count": [2, 2, 1]}, index=["123", "456", "789"]
-        )
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
-    def test_case_9(self):
-        # Tests the function's handling of empty strings and strings with only spaces.
-        input_data = [" ", "  ", "", "apple", "apple "]
-        expected_output = pd.DataFrame({"Count": [3, 2]}, index=["", "apple"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
-    def test_case_10(self):
-        # Tests handling of strings that become duplicates after strip() is applied.
-        input_data = ["banana", "banana ", " banana", "banana"]
-        expected_output = pd.DataFrame({"Count": [4]}, index=["banana"])
-        pd.testing.assert_frame_equal(task_func(input_data), expected_output)
+        # Test consistency across runs with built-in random seed
+        myList = self.test_list
+        ax1 = task_func(myList, 2)
+        ax2 = task_func(myList, 2)
+        colors1 = ax1.collections[0].get_array()
+        colors2 = ax2.collections[0].get_array()
+        self.assertTrue(all(c1 == c2 for c1, c2 in zip(colors1, colors2)))
+    def tearDown(self):
+        plt.close("all")

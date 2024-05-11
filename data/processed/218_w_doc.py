@@ -1,74 +1,118 @@
-import numpy as np
-from scipy import stats
-import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
 
-def task_func(mu=0, sigma=1, sample_size=1000, seed=0):
+
+# Constants
+FEATURES = ['feature1', 'feature2', 'feature3', 'feature4', 'feature5']
+TARGET = 'target'
+
+def task_func(df, dict_mapping, plot_histogram=False):
     """
-    Generate a sample from a normal distribution with a given mean and a standard deviation and plot the histogram 
-    together with the probability density function. Returns the Axes object representing the plot and the empirical
-    mean and standard deviation of the sample.
+    Pre-processes a DataFrame by replacing values according to a dictionary mapping, standardizing specified features, 
+    and optionally drawing a histogram of the target variable.
 
     Parameters:
-    - mu (float): The mean of the normal distribution. Default is 0.
-    - sigma (float): The standard deviation of the normal distribution. Default is 1.
-    - sample_size (int): The size of the sample to generate. Default is 1000.
+    - df (DataFrame): The input DataFrame to be preprocessed. It should contain columns named as in FEATURES and TARGET.
+    - dict_mapping (dict): A dictionary for replacing values in df. The keys should correspond to existing values in df.
+    - plot_histogram (bool, optional): If True, a histogram of the target variable is displayed. Default is False.
 
     Returns:
-    - ax (matplotlib.axes._axes.Axes): Axes object with the plotted histogram and normal PDF.
-    - float: The empirical mean of the sample.
-    - float: The empirical standard deviation of the sample.
+    - DataFrame: The preprocessed DataFrame with standardized features and values replaced as per dict_mapping.
+    - Axes: The histogram of the target variable if plot_histogram is True, otherwise None.
+
+    Raises:
+    - The function will raise ValueError if the FEATURES and TARGET columns not in the input DataFrame.
+    - The function will raise ValueError if the input df is not a DataFrame.
 
     Requirements:
-    - numpy for data generation.
-    - scipy.stats for statistical functions.
-    - matplotlib.pyplot for plotting.
+    - pandas
+    - sklearn.preprocessing.StandardScaler
 
     Example:
-    >>> ax, mean, std = task_func(0, 1, 1000)
-    >>> type(ax)
-    <class 'matplotlib.axes._axes.Axes'>
-    >>> print(round(mean, 3))
-    -0.045
-    >>> print(round(std, 3))
-    0.987
+    >>> df = pd.DataFrame({'feature1': [1, 2, 3], 'feature2': [4, 5, 6], 'feature3': [7, 8, 9],'feature4': [10, 11, 12], 'feature5': [13, 14, 15], 'target': [0, 1, 1]})
+    >>> dict_mapping = {1: 11, 0: 22}
+    >>> isinstance(task_func(df, dict_mapping, plot_histogram=True)[1], plt.Axes)
+    True
+    >>> plt.close()
     """
-    np.random.seed(seed)
-    sample = np.random.normal(mu, sigma, sample_size)
-    fig, ax = plt.subplots()
-    ax.hist(sample, bins=30, density=True, alpha=0.5, label='Sample Histogram')
-    xmin, xmax = ax.get_xlim()
-    x = np.linspace(xmin, xmax, 100)
-    p = stats.norm.pdf(x, mu, sigma)
-    ax.plot(x, p, 'k', linewidth=2, label='Normal PDF')
-    ax.set_title("Normal Distribution with $\\mu = %0.2f, \\sigma = %0.2f$" % (mu, sigma))
-    ax.legend()    
-    return ax, np.mean(sample), np.std(sample)
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("Input df is not a DataFrame.")
+    required_columns = FEATURES + [TARGET]
+    missing_columns = [col for col in required_columns if col not in df.columns]
+    if missing_columns:
+        raise ValueError(f"Missing columns in DataFrame: {missing_columns}")
+    df = df.replace(dict_mapping)
+    scaler = StandardScaler()
+    df[FEATURES] = scaler.fit_transform(df[FEATURES])
+    if plot_histogram:
+        ax = df[TARGET].plot.hist(bins=50)
+        return df, ax
+    else:
+        return df, None
 
 import unittest
-import doctest
+import pandas as pd
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_case_1(self):
-        ax, _, _ = task_func()
+    def test_value_replacement(self):
+        df = pd.DataFrame({
+            'feature1': [1, 2, 3],
+            'feature2': [4, 5, 6],
+            'feature3': [7, 8, 9],
+            'feature4': [10, 11, 12],
+            'feature5': [13, 14, 15],
+            'target': [0, 1, 1]
+        })
+        dict_mapping = {1: 11, 0: 22}
+        result_df, _ = task_func(df, dict_mapping)
+        self.assertTrue(11 in result_df.values)
+        self.assertTrue(22 in result_df.values)
+    def test_feature_standardization(self):
+        df = pd.DataFrame({
+            'feature1': [1, 2, 3],
+            'feature2': [4, 5, 6],
+            'feature3': [7, 8, 9],
+            'feature4': [10, 11, 12],
+            'feature5': [13, 14, 15],
+            'target': [0, 1, 1]
+        })
+        result_df, _ = task_func(df, {})
+        for feature in ['feature1', 'feature2', 'feature3', 'feature4', 'feature5']:
+            self.assertAlmostEqual(result_df[feature].mean(), 0, places=1)
+            self.assertAlmostEqual(int(result_df[feature].std()), 1, places=1)
+    def test_no_histogram_plotting(self):
+        df = pd.DataFrame({
+            'feature1': [1, 2, 3],
+            'feature2': [4, 5, 6],
+            'feature3': [7, 8, 9],
+            'feature4': [10, 11, 12],
+            'feature5': [13, 14, 15],
+            'target': [0, 1, 1]
+        })
+        result, _ = task_func(df, {}, plot_histogram=False)
+        self.assertIsInstance(result, pd.DataFrame)
+    def test_missing_features_handling(self):
+        df = pd.DataFrame({
+            'feature1': [1, 2, 3],
+            'target': [0, 1, 1]
+        })
+        with self.assertRaises(ValueError):
+            task_func(df, {})
+    def test_histogram_plotting(self):
+        df = pd.DataFrame({
+            'feature1': [1, 2, 3],
+            'feature2': [4, 5, 6],
+            'feature3': [7, 8, 9],
+            'feature4': [10, 11, 12],
+            'feature5': [13, 14, 15],
+            'target': [0, 1, 1]
+        })
+        result_df, ax = task_func(df, {}, plot_histogram=True)
+        self.assertTrue(hasattr(ax, 'hist'))
         self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = 0.00, \\sigma = 1.00$")
-    def test_case_2(self):
-        ax, mean, std = task_func(mu=5, sigma=2, sample_size=500, seed=42)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = 5.00, \\sigma = 2.00$")
-        self.assertAlmostEqual(mean, 5.0136, places=3)
-    def test_case_3(self):
-        ax, mean, std = task_func(mu=-3, sigma=5, sample_size=2000, seed=23)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = -3.00, \\sigma = 5.00$")
-        self.assertAlmostEqual(std, 4.978, places=3)
-    def test_case_4(self):
-        ax, _, _ = task_func(mu=1, sigma=0.5, sample_size=100)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = 1.00, \\sigma = 0.50$")
-    def test_case_5(self):
-        ax, mean, std = task_func(mu=10, sigma=0.1, sample_size=1500)
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(ax.get_title(), "Normal Distribution with $\\mu = 10.00, \\sigma = 0.10$")
-        self.assertAlmostEqual(mean, 9.998, places=3)
-        self.assertAlmostEqual(std, 0.09804, places=3)
+        plt.close()
+    
+    def test_non_df(self):
+        with self.assertRaises(ValueError):
+            task_func("non_df", {})

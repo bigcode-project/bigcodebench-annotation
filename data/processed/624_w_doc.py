@@ -1,50 +1,67 @@
-from itertools import chain
+from sklearn.decomposition import PCA
 import numpy as np
-from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+# Constants
+N_COMPONENTS = 2
 
 
 def task_func(L):
     """
-    Convert a list of lists into a list of integers, apply the KMeans clustering, 
-    and return a scatter plot 'matplotlib.axes.Axes' with data points color-coded by their cluster.
-
+    Convert a list of lists 'L' into a 2D numeric array, apply PCA to it and return the PCA result and scatter plot.
+    
     Requirements:
-    - itertools.chain
     - numpy
-    - sklearn.cluster
+    - sklearn.decomposition
+    - matplotlib.pyplot
 
     Parameters:
     L (list of lists): A list of lists where each sublist contains integers.
-
+    
     Returns:
-    matplotlib.axes.Axes: An Axes object representing the scatter plot.
+    tuple: A tuple containing the PCA result (numpy array) and the scatter plot (matplotlib Axes object).
 
     Example:
-    >>> ax = task_func([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
+    >>> pca_result, plot = task_func([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    >>> type(pca_result)
+    <class 'numpy.ndarray'>
     """
-    N_CLUSTERS = 3
-    data = list(chain(*L))
-    data = np.array(data).reshape(-1, 1)
-    kmeans = KMeans(n_clusters=N_CLUSTERS).fit(data)
+    data = np.array(L)
+    pca = PCA(n_components=N_COMPONENTS)
+    pca_result = pca.fit_transform(data)
     fig, ax = plt.subplots()
-    ax.scatter(data, [0]*len(data), c=kmeans.labels_.astype(float))
-    return ax
+    ax.scatter(pca_result[:,0], pca_result[:,1])
+    return pca_result, ax
 
 import unittest
-import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        ax = task_func([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
-        self.assertIsInstance(ax, plt.Axes)
+        test_input = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        pca_result, plot = task_func(test_input)
+        self.assertIsInstance(pca_result, np.ndarray)
+        self.assertIsInstance(plot, plt.Axes)
+        self.assertEqual(pca_result.shape, (3, 2))
     def test_case_2(self):
-        ax = task_func([[1, 5], [2, 6], [3, 7]])
-        self.assertIsInstance(ax, plt.Axes)
+        test_input = [[1, 1], [1, 1], [1, 1]]
+        pca_result, plot = task_func(test_input)
+        self.assertIsInstance(pca_result, np.ndarray)
+        self.assertIsInstance(plot, plt.Axes)
+        self.assertEqual(pca_result.shape, (3, 2))
     def test_case_3(self):
-        ax = task_func([[10, 20, 30, 40], [15, 25, 35, 45]])
-        self.assertIsInstance(ax, plt.Axes)
+        test_input = [[1, 2], [3, 4], [5, 6], [7, 8]]
+        pca_result, plot = task_func(test_input)
+        self.assertIsInstance(pca_result, np.ndarray)
+        self.assertIsInstance(plot, plt.Axes)
+        self.assertEqual(pca_result.shape, (4, 2))
     def test_case_4(self):
-        ax = task_func([[1000, 2000], [3000, 4000], [5000, 6000]])
-        self.assertIsInstance(ax, plt.Axes)
+        test_input = [[-1, -2], [-3, -4], [-5, -6]]
+        pca_result, plot = task_func(test_input)
+        self.assertIsInstance(pca_result, np.ndarray)
+        self.assertIsInstance(plot, plt.Axes)
+        self.assertEqual(pca_result.shape, (3, 2))
     def test_case_5(self):
-        ax = task_func([[-1, -2, -3], [-50, -60, -70], [-100, -110, -120]])
-        self.assertIsInstance(ax, plt.Axes)
+        test_input = [[-1, 2], [3, -4], [5, -6]]
+        pca_result, plot = task_func(test_input)
+        self.assertIsInstance(pca_result, np.ndarray)
+        self.assertIsInstance(plot, plt.Axes)
+        self.assertEqual(pca_result.shape, (3, 2))

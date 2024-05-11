@@ -1,90 +1,114 @@
+from random import randint, seed
 import pandas as pd
-import seaborn as sns
 
 
-def task_func(goals, penalties):
+# Method
+def task_func(goals, penalties, rng_seed=None):
     """
-    Visualize the distribution of goals and penalties for a number of teams and return the data as a
-    DataFrame with colomns 'Team', 'Goals' and 'Penalties'.
+    Generate a Pandas DataFrame with colomns 'Team' and 'Match Result' of the results of football matches for multiple
+    teams, incorporating random goals and penalties. Penalties are converted into fines using a predefined cost.
 
     Parameters:
-    - goals (dict): A dictionary where keys are team names and values are numbers of goals scored.
-    - penalties (dict): A dictionary where keys are team names and values are numbers of penalties incurred.
+    - goals (int): The maximum number of goals a team can score in a match. Must be non-negative.
+    - penalties (int): The maximum number of penalties a team can receive in a match. Must be non-negative.
+    - rng_seed (int, optional): Seed for the random number generator to ensure reproducible results. Defaults to None.
 
     Returns:
-    tuple: A tuple containing:
-        - DataFrame: A pandas DataFrame with the goals and penalties for the teams.
-        - Axes: A seaborn pairplot visualization of goals and penalties distribution for the teams.
+    - pd.DataFrame: A pandas DataFrame with columns ['Team', 'Match Result'], detailing each team's goals and accumulated fines.
 
     Requirements:
     - pandas
-    - seaborn
+    - random
 
     Example:
-    >>> goals = {'Team A': 3, 'Team B': 2, 'Team C': 1, 'Team D': 0, 'Team E': 2}
-    >>> penalties = {'Team A': 1, 'Team B': 0, 'Team C': 2, 'Team D': 3, 'Team E': 1}
-    >>> df, plot = task_func(goals, penalties)
-    >>> print(df)
-         Team  Goals  Penalties
-    0  Team A      3          1
-    1  Team B      2          0
-    2  Team C      1          2
-    3  Team D      0          3
-    4  Team E      2          1
+    >>> seed(42)  # Setting seed for reproducibility in this example
+    >>> results = task_func(5, 3, 42)
+    >>> print(results)
+         Team      Match Result
+    0  Team A     (5 goals, $0)
+    1  Team B  (0 goals, $2000)
+    2  Team C  (1 goals, $1000)
+    3  Team D     (1 goals, $0)
+    4  Team E     (5 goals, $0)
     """
     TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
-    data = []
+    PENALTY_COST = 1000  # in dollars
+    if rng_seed is not None:
+        seed(rng_seed)  # Set seed for reproducibility
+    match_results = []
     for team in TEAMS:
-        team_goals = goals.get(team, 0)
-        team_penalties = penalties.get(team, 0)
-        data.append([team, team_goals, team_penalties])
-    df = pd.DataFrame(data, columns=['Team', 'Goals', 'Penalties'])
-    plot = sns.pairplot(df, hue='Team')
-    return df, plot
+        team_goals = randint(0, abs(goals))
+        team_penalties = randint(0, abs(penalties))
+        penalty_cost = PENALTY_COST * team_penalties
+        result_string = f"({team_goals} goals, ${penalty_cost})"
+        match_results.append([team, result_string])
+    results_df = pd.DataFrame(match_results, columns=['Team', 'Match Result'])
+    return results_df
 
 import unittest
-from unittest.mock import patch
-# Unit tests for the function task_func
+# Test Suite
 class TestCases(unittest.TestCase):
-    @patch('matplotlib.pyplot.show')
-    def test_visualization_output(self, mock_show):
-        goals = {'Team A': 3, 'Team B': 2, 'Team C': 0}
-        penalties = {'Team A': 1, 'Team B': 0, 'Team C': 2}
-        df, _ = task_func(goals, penalties)
-        self.assertEqual(list(df.columns), ['Team', 'Goals', 'Penalties'])
-        self.assertEqual(df['Goals'].sum(), 5)
-        self.assertEqual(df['Penalties'].sum(), 3)
-    def test_empty_input(self):
-        goals = {}
-        penalties = {}
-        df, _ = task_func(goals, penalties)
-        # The dataframe should have the teams but with 0 goals and penalties.
-        expected_data = {
-            'Team': ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
-            'Goals': [0, 0, 0, 0, 0],
-            'Penalties': [0, 0, 0, 0, 0]
-        }
-        expected_df = pd.DataFrame(expected_data)
-        pd.testing.assert_frame_equal(df, expected_df)
-    def test_plot_type(self):
-        goals = {'Team A': 1}
-        penalties = {'Team A': 1}
-        _, plot = task_func(goals, penalties)
-        self.assertIsInstance(plot, sns.axisgrid.PairGrid)
-    def test_invalid_keys(self):
-        goals = {'Team Z': 1}
-        penalties = {'Team Z': 1}
-        df, _ = task_func(goals, penalties)
-        self.assertFalse('Team Z' in df['Team'].values)
-    @patch('matplotlib.pyplot.show')
-    def test_data_integrity(self, mock_show):
-        goals = {'Team A': 3, 'Team B': 2, 'Team C': 1}
-        penalties = {'Team A': 1, 'Team B': 2, 'Team C': 3}
-        df, _ = task_func(goals, penalties)
-        expected_data = {
-            'Team': ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
-            'Goals': [3, 2, 1, 0, 0],
-            'Penalties': [1, 2, 3, 0, 0]
-        }
-        expected_df = pd.DataFrame(expected_data)
-        pd.testing.assert_frame_equal(df, expected_df, check_like=True)
+    def setUp(self):
+        self.teams = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
+        self.penalty_cost = 1000  # Match the PENALTY_COST used in task_func
+    def test_goals_and_penalties_within_range(self):
+        """Test that goals and penalties fall within specified ranges."""
+        max_goals = 5
+        max_penalties = 3
+        df = task_func(max_goals, max_penalties)
+        for _, row in df.iterrows():
+            # Correctly extract goals and penalty cost from the 'Match Result' string
+            match_result = row['Match Result']
+            goals = int(match_result.split(' ')[0][1:])
+            penalty_cost = int(match_result.split('$')[-1][:-1])
+            # Check if goals are within the expected range
+            self.assertTrue(0 <= goals <= max_goals, f"Goals {goals} not within range 0 to {max_goals}")
+            # Calculate the maximum possible penalty cost and check it
+            max_penalty_cost = max_penalties * self.penalty_cost
+            self.assertTrue(0 <= penalty_cost <= max_penalty_cost,
+                            f"Penalty cost {penalty_cost} not within range 0 to {max_penalty_cost}")
+    def test_negative_input_handling(self):
+        """Test that negative inputs are handled correctly."""
+        max_goals = -5
+        max_penalties = -3
+        df = task_func(max_goals, max_penalties)
+        for _, row in df.iterrows():
+            # Correctly extract and check values as before, ensuring no negative values are produced
+            match_result = row['Match Result']
+            goals = int(match_result.split(' ')[0][1:])
+            penalty_cost = int(match_result.split('$')[-1][:-1])
+            self.assertTrue(0 <= goals, "Goals are negative which is not expected")
+            self.assertTrue(0 <= penalty_cost, "Penalty cost is negative which is not expected")
+    def test_zero_goals_and_penalties(self):
+        """Test that the function handles 0 goals and 0 penalties correctly."""
+        df = task_func(0, 0)
+        for _, row in df.iterrows():
+            match_result = row['Match Result']
+            goals = int(match_result.split(' ')[0][1:])
+            penalty_cost = int(match_result.split('$')[-1][:-1])
+            self.assertEqual(goals, 0, "Goals should be 0 when max_goals is set to 0")
+            self.assertEqual(penalty_cost, 0, "Penalty cost should be 0 when max_penalties is set to 0")
+    def test_extremely_high_values(self):
+        """Test the function with extremely high values for goals and penalties."""
+        max_goals = 1000
+        max_penalties = 500
+        df = task_func(max_goals, max_penalties)
+        for _, row in df.iterrows():
+            match_result = row['Match Result']
+            goals = int(match_result.split(' ')[0][1:])
+            penalty_cost = int(match_result.split('$')[-1][:-1])
+            self.assertTrue(0 <= goals <= max_goals, f"Goals {goals} not within range 0 to {max_goals}")
+            max_penalty_cost = max_penalties * self.penalty_cost
+            self.assertTrue(0 <= penalty_cost <= max_penalty_cost, f"Penalty cost {penalty_cost} not within range 0 to {max_penalty_cost}")
+    def test_mixed_values(self):
+        """Test the function with a mix of low and high values for goals and penalties."""
+        max_goals = 10
+        max_penalties = 1
+        df = task_func(max_goals, max_penalties)
+        for _, row in df.iterrows():
+            match_result = row['Match Result']
+            goals = int(match_result.split(' ')[0][1:])
+            penalty_cost = int(match_result.split('$')[-1][:-1])
+            self.assertTrue(0 <= goals <= max_goals, f"Goals {goals} not within range 0 to {max_goals}")
+            max_penalty_cost = max_penalties * self.penalty_cost
+            self.assertTrue(0 <= penalty_cost <= max_penalty_cost, f"Penalty cost {penalty_cost} not within range 0 to {max_penalty_cost}")

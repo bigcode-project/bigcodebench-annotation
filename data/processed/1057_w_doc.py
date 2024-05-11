@@ -1,114 +1,133 @@
+import pandas as pd
+import itertools
 import numpy as np
-import random
-import matplotlib.pyplot as plt
-
-# Constants
-LETTERS = list("abcdefghijklmnopqrstuvwxyz")
-NUMBERS = list(range(1, 27))
 
 
-def task_func(n_pairs=26):
+def task_func(animals=None, foods=None):
     """
-    This function generates and displays a bar chart representing random letter-number pairs.
-    Each bar corresponds to a unique pair, formed by combining a letter from 'a' to 'z' with a number
-    from 1 to 26. The function randomly shuffles these pairs and assigns a random count to each.
+    Create a DataFrame with combinations of animals and foods in a 'animal:food' format.
 
     Parameters:
-    - n_pairs (int, optional): The number of letter-number pairs to display in the bar chart.
-      The value must be an integer between 1 and 26, inclusive. The default value is 26, which
-      includes one pair for each letter in the alphabet.
+    - animals (list of str, optional): A list of animal names. If not provided, 
+    defaults to a predefined list of common animals including 'Dog', 'Cat', 'Elephant', 'Tiger', 'Lion', 'Zebra', 'Giraffe', 'Bear', 'Monkey', 'Kangaroo'.
+    - foods (list of str, optional): A list of food names. If not provided, 
+    defaults to a predefined list of common foods including 'Meat', 'Fish', 'Grass', 'Fruits', 'Insects', 'Seeds', 'Leaves'.
 
     Returns:
-    - matplotlib.container.BarContainer: This object represents the bar chart created by the function.
-      Each bar in the chart is labeled with its corresponding letter-number pair (e.g., 'a:1', 'b:2').
-      The title of the chart is "Random Letter:Number Pairs Chart", the x-axis label is "Letter:Number Pairs",
-      and the y-axis label is "Counts".
+    - df (pandas.DataFrame): A DataFrame where each row represents a unique animal from the 'animals' 
+    list and each column represents a food item from the 'foods' list. Each cell contains a string in the format 'animal:food'.
 
-    Raises:
-    - ValueError: If 'n_pairs' is outside the range of 1 to 26, inclusive. This ensures that the function
-      operates within the bounds of the predefined letters ('a' to 'z') and numbers (1 to 26).
+    Handling of Special Cases:
+    - If both 'animals' and 'foods' lists are empty or not provided, the function returns an empty DataFrame.
+    - If either 'animals' or 'foods' list is empty or not provided, the function uses its predefined list for the missing parameter.
 
     Requirements:
+    - pandas
     - numpy
-    - matplotlib
-    - random
-
-    Notes:
-    - Each call to this function will likely produce a different chart because it shuffles the order
-      of the pairs and assigns random counts to them.
-    - The random counts assigned to each pair range from 1 to 9.
+    - itertools
 
     Example:
-    >>> ax = task_func(5)
-    >>> [bar.get_label() for bar in ax]
-    ['d:4', 'b:2', 'c:3', 'e:5', 'a:1']
+    >>> animal_food_pairs = task_func(['Dog', 'Cat'], ['Meat', 'Fish'])
+    >>> print(animal_food_pairs)
+           Meat      Fish
+    0  Dog:Meat  Dog:Fish
+    1  Cat:Meat  Cat:Fish
+
+    Note:
+    - The function generates all possible combinations of the provided 'animals' and 'foods' using itertools.product.
+    - The resulting pairs are shuffled randomly to ensure variety in the DataFrame layout.
     """
-    if n_pairs > 26 or n_pairs < 1:
-        raise ValueError("n_pairs should be between 1 and 26")
-    pairs = [f"{letter}:{number}" for letter, number in zip(LETTERS, NUMBERS)][:n_pairs]
-    random.seed(42)
-    random.shuffle(pairs)
-    counts = np.random.randint(1, 10, size=n_pairs)
-    bars = plt.bar(pairs, counts)
-    for bar, pair in zip(bars, pairs):
-        bar.set_label(pair)
-    plt.xlabel("Letter:Number Pairs")
-    plt.ylabel("Counts")
-    plt.title("Random Letter:Number Pairs Chart")
-    return bars
+    if animals is None:
+        animals = [
+            "Dog",
+            "Cat",
+            "Elephant",
+            "Tiger",
+            "Lion",
+            "Zebra",
+            "Giraffe",
+            "Bear",
+            "Monkey",
+            "Kangaroo",
+        ]
+    if foods is None:
+        foods = ["Meat", "Fish", "Grass", "Fruits", "Insects", "Seeds", "Leaves"]
+    if not animals or not foods:
+        return pd.DataFrame()
+    pairs = [f"{a}:{f}" for a, f in itertools.product(animals, foods)]
+    data = np.array(pairs).reshape(-1, len(foods))
+    df = pd.DataFrame(data, columns=foods)
+    return df
 
 import unittest
-import matplotlib.pyplot as plt
-from matplotlib.container import BarContainer
 import random
 class TestCases(unittest.TestCase):
     """Tests for the function task_func."""
-    def test_return_type(self):
-        """Verify the returned type of the function."""
+    def test_default_input(self):
+        """Test with default inputs for animals and foods."""
         random.seed(0)
-        ax = task_func(5)
-        self.assertIsInstance(
-            ax, BarContainer, "The returned object is not of the expected type."
+        # Scenario: Testing with default inputs for animals and foods
+        result = task_func()
+        # Check the shape of the returned DataFrame
+        self.assertEqual(
+            result.shape,
+            (10, 7),
+            "The shape of the DataFrame with default inputs is not as expected.",
         )
-    def test_number_of_bars(self):
-        """Verify the number of bars plotted for different `n_pairs` values."""
+    def test_custom_input(self):
+        """Test with custom inputs for animals and foods."""
         random.seed(1)
-        for i in [5, 10, 20]:
-            ax = task_func(i)
-            self.assertEqual(
-                len(ax.patches),
-                i,
-                f"Expected {i} bars, but got {len(ax.patches)} bars.",
-            )
-    def test_labels_and_title(self):
-        """Verify the labels and the title of the plotted bar chart."""
+        # Scenario: Testing with custom lists of animals and foods
+        animals = ["Dog", "Cat", "Elephant"]
+        foods = ["Meat", "Fish", "Grass", "Fruits"]
+        result = task_func(animals, foods)
+        # Check the shape of the returned DataFrame
+        self.assertEqual(
+            result.shape,
+            (3, 4),
+            "The shape of the DataFrame with custom inputs is not as expected.",
+        )
+    def test_empty_input(self):
+        """Test with empty lists for animals and foods."""
         random.seed(2)
-        _ = task_func(15)
-        fig = plt.gcf()
-        axes = fig.gca()
+        # Scenario: Testing with empty lists for animals and foods
+        animals = []
+        foods = []
+        result = task_func(animals, foods)
+        # Check the shape of the returned DataFrame
         self.assertEqual(
-            axes.get_xlabel(), "Letter:Number Pairs", "X label is incorrect."
+            result.shape,
+            (0, 0),
+            "The shape of the DataFrame with empty inputs is not as expected.",
         )
-        self.assertEqual(axes.get_ylabel(), "Counts", "Y label is incorrect.")
-        self.assertEqual(
-            axes.get_title(), "Random Letter:Number Pairs Chart", "Title is incorrect."
-        )
-    def test_invalid_n_pairs(self):
-        """Test the function with invalid `n_pairs` values."""
+    def test_single_input(self):
+        """Test with a single animal and a single food."""
         random.seed(3)
-        with self.assertRaises(ValueError):
-            task_func(27)
-        with self.assertRaises(ValueError):
-            task_func(0)
-    def test_valid_pairs(self):
-        """Verify that the pairs generated are valid and correspond to the expected letter:number format."""
+        # Scenario: Testing with a single animal and a single food
+        animals = ["Dog"]
+        foods = ["Meat"]
+        result = task_func(animals, foods)
+        # Check the shape of the returned DataFrame
+        self.assertEqual(
+            result.shape,
+            (1, 1),
+            "The shape of the DataFrame with a single input is not as expected.",
+        )
+        # Check if the pairs are correct
+        self.assertIn(
+            "Dog:Meat",
+            result.values,
+            "The expected pair 'Dog:Meat' was not found in the resulting DataFrame.",
+        )
+    def test_partial_default(self):
+        """Test with a custom list of animals and default list of foods."""
         random.seed(4)
-        ax = task_func(5)
-        expected_pairs = ["a:1", "b:2", "c:3", "d:4", "e:5"]
-        generated_pairs = [bar.get_label() for bar in ax]
-        for expected_pair in expected_pairs:
-            self.assertIn(
-                expected_pair,
-                generated_pairs,
-                f"Expected pair {expected_pair} not found in plotted pairs.",
-            )
+        # Scenario: Testing with a custom list of animals and default list of foods
+        animals = ["Dog", "Cat", "Elephant"]
+        result = task_func(animals)
+        # Check the shape of the returned DataFrame
+        self.assertEqual(
+            result.shape,
+            (3, 7),
+            "The shape of the DataFrame with partial default inputs is not as expected.",
+        )

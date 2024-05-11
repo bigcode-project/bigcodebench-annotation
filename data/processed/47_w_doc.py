@@ -1,122 +1,91 @@
-from scipy.stats import zscore
+from sklearn.preprocessing import StandardScaler
+import seaborn as sns
 import matplotlib.pyplot as plt
 
 
 def task_func(df):
     """
-    Calculate Z-scores for numeric columns in a DataFrame and draw a histogram for each column.
-    - Missing values are replaced by the column's average.
-    - The histograms are plotted with 10 bins.
+    Standardize numeric columns in a DataFrame and return the heatmap of the correlation matrix. Missing values are replaced by the column's average.
 
     Parameters:
-    - df (pandas.DataFrame): The input pandas DataFrame with numeric columns.
+    - df (pandas.DataFrame): The pandas DataFrame to be standardized.
 
     Returns:
-    - tuple:
-        1. pandas.DataFrame: A DataFrame with computed z-scores.
-        2. list: A list of Axes objects representing the histograms of the numeric columns.
+    - DataFrame: The pandas DataFrame after standardization.
+    - Axes: A heatmap of the correlation matrix.
 
     Requirements:
-    - pandas.
-    - numpy.
-    - scipy.stats.zscore.
-    - matplotlib.pyplot.
+    - sklearn.preprocessing.StandardScaler
+    - seaborn
+    - matplotlib.pyplot
 
     Example:
     >>> import pandas as pd
     >>> import numpy as np
-    >>> df_input = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7.0, np.nan, 9.0]], columns=["col1", "col2", "col3"])
-    >>> zscore_output, plots = task_func(df_input)
+    >>> df = pd.DataFrame([[1,2,3],[4,5,6],[7.0,np.nan,9.0]], columns=["c1","c2","c3"])
+    >>> standardized_df, heatmap = task_func(df)
+    >>> print(standardized_df)
+             c1        c2        c3
+    0 -1.224745 -1.224745 -1.224745
+    1  0.000000  1.224745  0.000000
+    2  1.224745  0.000000  1.224745
     """
     df = df.fillna(df.mean(axis=0))
-    df = df.apply(zscore)
-    axes = df.hist(grid=False, bins=10, layout=(1, df.shape[1]))
-    plt.tight_layout()
-    return df, axes
+    scaler = StandardScaler()
+    df[df.columns] = scaler.fit_transform(df[df.columns])
+    plt.figure(figsize=(10, 5))
+    heatmap = sns.heatmap(df.corr(), annot=True, cmap="coolwarm")
+    return df, heatmap
 
 import unittest
 import pandas as pd
-import numpy as np
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def test_case_1(self):
         df = pd.DataFrame(
-            {
-                "col1": [1, 7, 3],
-                "col2": [4, 5, 7],
-                "col3": [None, None, None],
-            }
+            [[1, 2, 3], [4, 5, 6], [7, None, 9]], columns=["c1", "c2", "c3"]
         )
-        zscores, plots = task_func(df)
-        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
-        self.assertEqual(len(plots[0]), 3)
-    def test_case_2(self):
-        df = pd.DataFrame(
-            {
-                "col1": [None, None, 3],
-                "col2": [None, 5, 7],
-                "col3": [8, 6, 4],
-            }
-        )
-        zscores, plots = task_func(df)
-        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
-        self.assertEqual(len(plots[0]), 3)
-    def test_case_3(self):
-        df = pd.DataFrame(
-            {
-                "col1": [None, 17, 11, None],
-                "col2": [0, 4, 15, 27],
-                "col3": [7, 9, 3, 8],
-            }
-        )
-        # Expected solutions
+        # Expected output
         expected_df = df.copy()
-        expected_df = expected_df.fillna(expected_df.mean(axis=0))
-        expected_df = expected_df.apply(zscore)
-        # Function execution
-        zscores, plots = task_func(df)
-        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
-        self.assertEqual(len(plots[0]), 3)
-        pd.testing.assert_frame_equal(zscores, expected_df)
-    def test_case_4(self):
-        df = pd.DataFrame(
-            {
-                "col1": [1, 7, 3, None],
-                "col2": [4, 5, 7, 2],
-            }
+        expected_df = expected_df.fillna(df.mean(axis=0))
+        scaler = StandardScaler()
+        expected_df[expected_df.columns] = scaler.fit_transform(
+            expected_df[expected_df.columns]
         )
-        zscores, plots = task_func(df)
-        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
-        self.assertEqual(len(plots[0]), 2)
+        # Function execution
+        standardized_df, heatmap = task_func(df)
+        pd.testing.assert_frame_equal(standardized_df, expected_df)
+        # Asserting the output DataFrame
+        self.assertEqual(standardized_df.shape, df.shape)
+        # Asserting the heatmap
+        self.assertIsInstance(heatmap, plt.Axes)
+    def test_case_2(self):
+        df = pd.DataFrame([[3, 7, 9], [4, 1, 8], [2, 6, 5]], columns=["c1", "c2", "c3"])
+        standardized_df, heatmap = task_func(df)
+        # Asserting the output DataFrame
+        self.assertEqual(standardized_df.shape, df.shape)
+        # Asserting the heatmap
+        self.assertIsInstance(heatmap, plt.Axes)
+    def test_case_3(self):
+        df = pd.DataFrame([[4, 6, 8], [9, 5, 2], [3, 1, 7]], columns=["c1", "c2", "c3"])
+        standardized_df, heatmap = task_func(df)
+        # Asserting the output DataFrame
+        self.assertEqual(standardized_df.shape, df.shape)
+        # Asserting the heatmap
+        self.assertIsInstance(heatmap, plt.Axes)
+    def test_case_4(self):
+        df = pd.DataFrame([[9, 1, 2], [3, 4, 5], [7, 8, 6]], columns=["c1", "c2", "c3"])
+        standardized_df, heatmap = task_func(df)
+        # Asserting the output DataFrame
+        self.assertEqual(standardized_df.shape, df.shape)
+        # Asserting the heatmap
+        self.assertIsInstance(heatmap, plt.Axes)
     def test_case_5(self):
         df = pd.DataFrame(
-            {
-                "col1": [1, 2, 3, 4, 5],
-                "col2": [None, None, None, None, None],
-            }
+            [[None, 17, 13], [None, None, 29], [42, 3, 100]], columns=["c1", "c2", "c3"]
         )
-        zscores, plots = task_func(df)
-        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
-        self.assertEqual(len(plots[0]), 2)
-    def test_case_6(self):
-        df = pd.DataFrame(
-            {
-                "A": [np.nan, np.nan, np.nan],
-                "B": [np.nan, np.nan, np.nan],
-                "C": [np.nan, np.nan, np.nan],
-            }
-        )
-        zscores, plots = task_func(df)
-        self.assertTrue(zscores.isnull().all().all())
-        self.assertEqual(len(plots[0]), 3)
-    def test_case_7(self):
-        df = pd.DataFrame(
-            {
-                "A": [1, 2.5, 3, 4.5, 5],
-                "B": [5, 4.5, np.nan, 2, 1.5],
-                "C": [2.5, 3, 4, 5.5, 6],
-            }
-        )
-        zscores, plots = task_func(df)
-        self.assertAlmostEqual(zscores.mean().mean(), 0.0, places=6)
-        self.assertEqual(len(plots[0]), 3)
+        standardized_df, heatmap = task_func(df)
+        # Asserting the output DataFrame
+        self.assertEqual(standardized_df.shape, df.shape)
+        # Asserting the heatmap
+        self.assertIsInstance(heatmap, plt.Axes)

@@ -23,6 +23,10 @@ def f_298(script_path, wait=True, *args):
     - sys
     - time
 
+    Raise:
+    - ValueError: If the script does not exist.
+    - subprocess.CalledProcessError: If the script raises an exception.
+    
     Example:
     >>> import tempfile
     >>> script_path = tempfile.NamedTemporaryFile(suffix='.py').name

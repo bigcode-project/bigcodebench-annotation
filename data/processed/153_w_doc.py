@@ -1,87 +1,72 @@
 import pandas as pd
-import numpy as np
-from random import randint
-
-# Constants
-STUDENTS = ['Joe', 'Amy', 'Mark', 'Sara', 'John', 'Emily', 'Zoe', 'Matt']
-COURSES = ['Math', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Geography', 'Computer Science']
+from sklearn.preprocessing import LabelEncoder
 
 
-def task_func():
+def task_func(data):
     """
-    Generates a DataFrame containing random grades for a predefined list of students across a set of courses.
-    Each student will have one grade per course and an average grade calculated across all courses.
+    Transforms categorical data into a numerical format suitable for machine learning algorithms using sklearn's
+    LabelEncoder. This function generates a DataFrame that pairs original categorical values with their numerical
+    encodings.
+
+    Parameters:
+    data (list): List of categorical data to be encoded.
 
     Returns:
-    DataFrame: A pandas DataFrame with columns for each student's name, their grades for each course,
-               and their average grade across all courses.
+    DataFrame: A DataFrame with columns 'Category' and 'Encoded', where 'Category' is the original data and 'Encoded'
+    is the numerical representation.
 
     Requirements:
     - pandas
-    - numpy
-    - random
-
-    Note:
-    The grades are randomly generated for each course using a uniform distribution between 0 and 100.
+    - sklearn
 
     Example:
-    >>> random.seed(0)
-    >>> grades = task_func()
-    >>> print(grades[['Name', 'Average Grade']].to_string(index=False))
-     Name  Average Grade
-      Joe         51.875
-      Amy         53.250
-     Mark         53.750
-     Sara         47.125
-     John         55.250
-    Emily         48.625
-      Zoe         63.750
-     Matt         54.750
+    >>> df = task_func(['A', 'B', 'C', 'A', 'D', 'E', 'B', 'C'])
+    >>> print(df.to_string(index=False))
+    Category  Encoded
+           A        0
+           B        1
+           C        2
+           A        0
+           D        3
+           E        4
+           B        1
+           C        2
     """
-    students_data = []
-    for student in STUDENTS:
-        grades = [randint(0, 100) for _ in COURSES]
-        average_grade = np.mean(grades)
-        students_data.append([student] + grades + [average_grade])
-    columns = ['Name'] + COURSES + ['Average Grade']
-    grades_df = pd.DataFrame(students_data, columns=columns)
-    return grades_df
+    le = LabelEncoder()
+    encoded = le.fit_transform(data)
+    df = pd.DataFrame({'Category': data, 'Encoded': encoded})
+    return df
 
 import unittest
-from unittest.mock import patch
-import random
+import pandas as pd
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        random.seed(0)
-        # Correctly set up the mock within the test execution context
-        self.patcher = patch('random.randint', side_effect=[i % 100 for i in range(800)])  # Assuming 8 students and 100 course entries
-        self.mock_randint = self.patcher.start()
-        self.grades_df = task_func()
-        self.patcher.stop()
-    def test_dataframe_columns(self):
-        # Ensure the DataFrame contains the correct columns
-        expected_columns = ['Name'] + COURSES + ['Average Grade']
-        self.assertListEqual(list(self.grades_df.columns), expected_columns, "DataFrame should have specific columns")
-    def test_grade_range(self):
-        # Check that all grades are within the valid range (0 to 100)
-        course_columns = self.grades_df.columns[1:-1]  # Exclude 'Name' and 'Average Grade'
-        for course in course_columns:
-            self.assertTrue(self.grades_df[course].between(0, 100).all(),
-                            f"All grades in {course} should be between 0 and 100")
-    def test_average_grade_calculation(self):
-        # Verify that the average grade is correctly calculated
-        course_columns = self.grades_df.columns[1:-1]  # Exclude 'Name' and 'Average Grade'
-        calculated_avg = self.grades_df[course_columns].mean(axis=1)
-        np.testing.assert_array_almost_equal(self.grades_df['Average Grade'], calculated_avg, decimal=1,
-                                             err_msg="Average grades should be correctly calculated")
-    def test_all_students_included(self):
-        # Ensure that all predefined students are included in the DataFrame
-        self.assertTrue(set(STUDENTS).issubset(set(self.grades_df['Name'])),
-                        "All predefined students should be included in the DataFrame")
-    def test_deterministic_grades(self):
-        # Verify the grades are deterministic under mocked conditions
-        random.seed(0)
-        expected_first_row_grades = [randint(0, 100) for _ in COURSES]
-        actual_first_row_grades = self.grades_df.iloc[0, 1:-1].tolist()
-        self.assertListEqual(actual_first_row_grades, expected_first_row_grades,
-                             "The first row grades should be deterministic and match the expected pattern")
+    def test_case_1(self):
+        # Testing basic functionality
+        result = task_func(['A', 'B', 'C', 'A', 'D', 'E', 'B', 'C'])
+        expected = pd.DataFrame({'Category': ['A', 'B', 'C', 'A', 'D', 'E', 'B', 'C'],
+                                 'Encoded': [0, 1, 2, 0, 3, 4, 1, 2]})
+        pd.testing.assert_frame_equal(result, expected)
+    def test_case_2(self):
+        # Testing with a single unique category
+        result = task_func(['A', 'A', 'A'])
+        expected = pd.DataFrame({'Category': ['A', 'A', 'A'],
+                                 'Encoded': [0, 0, 0]})
+        pd.testing.assert_frame_equal(result, expected)
+    def test_case_3(self):
+        # Testing with an empty list
+        result = task_func([])
+        expected = pd.DataFrame({'Category': [],
+                                 'Encoded': []})
+        pd.testing.assert_frame_equal(result, expected, check_dtype=False)
+    def test_case_4(self):
+        # Testing with multiple unique categories but in a different order
+        result = task_func(['E', 'D', 'C', 'B', 'A'])
+        expected = pd.DataFrame({'Category': ['E', 'D', 'C', 'B', 'A'],
+                                 'Encoded': [4, 3, 2, 1, 0]})
+        pd.testing.assert_frame_equal(result, expected)
+    def test_case_5(self):
+        # Testing with a list containing a single different category
+        result = task_func(['Z'])
+        expected = pd.DataFrame({'Category': ['Z'],
+                                 'Encoded': [0]})
+        pd.testing.assert_frame_equal(result, expected)

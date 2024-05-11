@@ -1,74 +1,68 @@
+import math
 from random import randint
-from statistics import mean
-import pandas as pd
+import matplotlib.pyplot as plt
 
 
-def task_func(products_list):
+def task_func():
     """
-    This function takes in a list of product names and generates random sales data for each product over a period of
-    12 months. It then calculates the average sales for each product and returns the results as a pandas DataFrame with
-    columns: 'Product', 'Month 1', 'Month 2', ..., 'Month 12', 'Average Sales'..
-    
+    Create and draw a sine wave with random frequency, amplitude and phase shift. The return ax object
+    has 'Random Sine Wave' title, 'Time' on the x axis and 'Amplitude' on the y axis.
+
     Parameters:
-    products_list (list): A list of product names.
-    
+    None
+
     Returns:
-    DataFrame: A pandas DataFrame with columns: 'Product', 'Month 1', 'Month 2', ..., 'Month 12', 'Average Sales'.
-    
+    ax (matplotlib.axes._axes.Axes): The axis object of the generated sine wave plot.
+
     Requirements:
-    - pandas
+    - math
     - random
-    - statistics
-    
+    - matplotlib.pyplot
+
     Example:
-    >>> products = ['Apples', 'Bananas', 'Grapes', 'Oranges', 'Pineapples']
-    >>> sales_data = task_func(products)
-    >>> type(sales_data)
-    <class 'pandas.core.frame.DataFrame'>
+    >>> ax = task_func()
     """
-    sales_data = []
-    for product in products_list:
-        sales = [randint(100, 500) for _ in range(12)]
-        avg_sales = mean(sales)
-        sales.append(avg_sales)
-        sales_data.append([product] + sales)
-    sales_df = pd.DataFrame(sales_data, columns=['Product'] + [f'Month {i+1}' for i in range(12)] + ['Average Sales'])
-    return sales_df
+    x = [i/100 for i in range(1000)]
+    frequency = randint(1, 5)
+    amplitude = randint(1, 5)
+    phase_shift = randint(0, 360)
+    y = [amplitude * math.sin(2 * math.pi * frequency * (xi + phase_shift)) for xi in x]
+    fig, ax = plt.subplots()
+    ax.plot(x, y)
+    ax.set_title('Random Sine Wave')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Amplitude')
+    ax.grid(True)
+    return ax  # Return the axis object for testing
 
 import unittest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        # Test with a single product
-        products = ["Apples"]
-        sales_data = task_func(products)
+        ax = task_func()
+        self.assertEqual(ax.get_title(), 'Random Sine Wave')
+        self.assertEqual(ax.get_xlabel(), 'Time')
+        self.assertEqual(ax.get_ylabel(), 'Amplitude')
         
-        # Checking if returned DataFrame has the correct structure
-        expected_columns = ['Product'] + [f'Month {i+1}' for i in range(12)] + ['Average Sales']
-        self.assertEqual(list(sales_data.columns), expected_columns)
-        
-        # Checking the correctness of average sales
-        avg_sales = sales_data['Average Sales'].iloc[0]
-        self.assertAlmostEqual(avg_sales, sales_data.iloc[0, 1:13].mean(), places=2)
-        
-        # Checking if sales values are within the expected range
-        self.assertTrue((sales_data.iloc[0, 1:13] >= 100).all() and (sales_data.iloc[0, 1:13] <= 500).all())
     def test_case_2(self):
-        # Test with multiple products
-        products = ["Apples", "Bananas", "Grapes"]
-        sales_data = task_func(products)
-        self.assertEqual(len(sales_data), 3)
+        ax = task_func()
+        self.assertEqual(ax.get_title(), 'Random Sine Wave')
+        self.assertEqual(ax.get_xlabel(), 'Time')
+        self.assertEqual(ax.get_ylabel(), 'Amplitude')
+        
     def test_case_3(self):
-        # Test with no products
-        products = []
-        sales_data = task_func(products)
-        self.assertEqual(len(sales_data), 0)
+        ax = task_func()
+        self.assertEqual(ax.get_title(), 'Random Sine Wave')
+        self.assertEqual(ax.get_xlabel(), 'Time')
+        self.assertEqual(ax.get_ylabel(), 'Amplitude')
+        
     def test_case_4(self):
-        # Test with a long product name
-        products = ["A" * 100]
-        sales_data = task_func(products)
-        self.assertEqual(sales_data['Product'].iloc[0], "A" * 100)
+        ax = task_func()
+        self.assertEqual(ax.get_title(), 'Random Sine Wave')
+        self.assertEqual(ax.get_xlabel(), 'Time')
+        self.assertEqual(ax.get_ylabel(), 'Amplitude')
+        
     def test_case_5(self):
-        # Test with products having special characters
-        products = ["@pples", "!Bananas", "#Grapes"]
-        sales_data = task_func(products)
-        self.assertTrue(all(item in sales_data['Product'].tolist() for item in products))
+        ax = task_func()
+        self.assertEqual(ax.get_title(), 'Random Sine Wave')
+        self.assertEqual(ax.get_xlabel(), 'Time')
+        self.assertEqual(ax.get_ylabel(), 'Amplitude')

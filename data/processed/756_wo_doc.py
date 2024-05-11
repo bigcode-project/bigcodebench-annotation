@@ -1,64 +1,110 @@
-import os
-import glob
+import shutil
+from pathlib import Path
+from typing import List
 
-def task_func(directory_path):
-    """
-    Reverse the order of words in all the filenames of a directory, where words are separated by periods.
-    
+def task_func(source_dir: str, target_dir: str, extensions: List[str]) -> int:
+    '''
+    Move all files with certain extensions from one directory to another.
+
     Parameters:
-    - directory_path (str): The path to the directory.
+    - source_dir (str): The directory containing the source files.
+    - target_dir (str): The directory to which the files should be moved.
+    - extensions (List[str]): The list of file extensions to be moved.
 
     Returns:
-    - new_filenames (list[str]): A list of new filenames after renaming.
+    int: The number of moved files.
+
+    Raises:
+    - ValueError: If source_dir or target_dir does not exist.
 
     Requirements:
-    - os
-    - glob
+    - shutil
+    - pathlib.Path
 
     Example:
-    Given filenames in directory: ["hello.world.txt", "sample.data.csv"]
-    >>> task_func('/path/to/directory')
-    ["txt.world.hello", "csv.data.sample"]
-    """
-    new_filenames = []
-    for filename in glob.glob(os.path.join(directory_path, '*')):
-        base_name = os.path.basename(filename)
-        new_base_name = '.'.join(base_name.split('.')[::-1])
-        os.rename(filename, os.path.join(directory_path, new_base_name))
-        new_filenames.append(new_base_name)
-    return new_filenames
+    >>> task_func('path/to/source/', 'path/to/target/', ['.jpg', '.png', '.gif'])
+    15
+    >>> task_func('path/to/source/', 'path/to/target/', ['.txt'])
+    1
+    '''
+    if Path(source_dir).is_dir() == False:
+        raise ValueError("source_dir does not exist.")
+    if Path(target_dir).is_dir() == False:
+        raise ValueError("target_dir does not exist.")
+    count = 0
+    for extension in extensions:
+        for file_name in Path(source_dir).glob(f'*{extension}'):
+            shutil.move(str(file_name), target_dir)
+            count += 1
+    return count
 
 import unittest
-import shutil
 import tempfile
+import os
+import shutil
+def setup_test_environment(extensions, num_files_per_extension):
+    # Create temporary directories
+    source_dir = tempfile.mkdtemp()
+    target_dir = tempfile.mkdtemp()
+    file_list = []
+    # Populate source_dir with files
+    for ext in extensions:
+        for i in range(num_files_per_extension):
+            with open(os.path.join(source_dir, f"file_{i}{ext}"), "w") as f:
+                f.write(f"This is a sample {ext} file.")
+                file_list.append(f"file_{i}{ext}")
+    return source_dir, target_dir, file_list
+# Cleanup function to remove temporary directories after test
+def cleanup_test_environment(source_dir, target_dir):
+    shutil.rmtree(source_dir)
+    shutil.rmtree(target_dir)
+# Define the test cases
 class TestCases(unittest.TestCase):
+    def test_case_dir(self):
+        source_dir, target_dir, file_list = setup_test_environment(['.jpg', '.png', '.gif'], 3)
+        self.assertRaises(Exception, task_func, 'non_existent', target_dir, ['.test'])
+        self.assertRaises(Exception, task_func, source_dir, 'non_existent', ['.test'])
     
-    def setUp(self):
-        self.test_dir = tempfile.mkdtemp()
-    def tearDown(self):
-        shutil.rmtree(self.test_dir)
-    def test_single_file(self):
-        open(os.path.join(self.test_dir, "hello.world.txt"), 'a').close()
-        new_filenames = task_func(self.test_dir)
-        self.assertEqual(new_filenames, ["txt.world.hello"])
-    def test_multiple_files(self):
-        open(os.path.join(self.test_dir, "sample.data.csv"), 'a').close()
-        open(os.path.join(self.test_dir, "test.file.name.jpg"), 'a').close()
-        new_filenames = task_func(self.test_dir)
-        expected_filenames = ["csv.data.sample", "jpg.name.file.test"]
-        self.assertCountEqual(new_filenames, expected_filenames)
-    def test_empty_directory(self):
-        new_filenames = task_func(self.test_dir)
-        self.assertEqual(new_filenames, [])
-    def test_files_without_extension(self):
-        open(os.path.join(self.test_dir, "file1"), 'a').close()
-        open(os.path.join(self.test_dir, "file2.txt"), 'a').close()
-        new_filenames = task_func(self.test_dir)
-        expected_filenames = ["file1", "txt.file2"]
-        self.assertCountEqual(new_filenames, expected_filenames)
-    def test_files_with_multiple_extensions(self):
-        open(os.path.join(self.test_dir, "file.tar.gz"), 'a').close()
-        open(os.path.join(self.test_dir, "archive.zip.001"), 'a').close()
-        new_filenames = task_func(self.test_dir)
-        expected_filenames = ["gz.tar.file", "001.zip.archive"]
-        self.assertCountEqual(new_filenames, expected_filenames)
+    def test_case_1(self):
+        # Test basic functionality with jpg, png, and gif extensions
+        source_dir, target_dir, file_list = setup_test_environment(['.jpg', '.png', '.gif'], 3)
+        result = task_func(source_dir, target_dir, ['.jpg', '.png', '.gif'])
+        self.assertEqual(result, 9)  # 3 files for each of the 3 extensions
+        self.assertEqual(len(os.listdir(target_dir)), 9)
+        self.assertCountEqual(file_list, os.listdir(target_dir))
+        cleanup_test_environment(source_dir, target_dir)
+    def test_case_2(self):
+        # Test only one extension
+        source_dir, target_dir, file_list = setup_test_environment(['.jpg', '.png', '.gif', '.txt'], 12)
+        result = task_func(source_dir, target_dir, ['.jpg'])
+        file_list = [file for file in file_list if file[-4:] == '.jpg']
+        self.assertEqual(result, 12)  # Only jpg files should be moved
+        self.assertEqual(len(os.listdir(target_dir)), 12)
+        self.assertCountEqual(file_list, os.listdir(target_dir))
+        cleanup_test_environment(source_dir, target_dir)
+    def test_case_3(self):
+        # Test with no files to move
+        source_dir, target_dir, file_list = setup_test_environment(['.jpg'], 8)
+        result = task_func(source_dir, target_dir, ['.png'])
+        self.assertEqual(result, 0)  # No png files in source
+        self.assertEqual(len(os.listdir(target_dir)), 0)
+        self.assertCountEqual([], os.listdir(target_dir))
+        cleanup_test_environment(source_dir, target_dir)
+    def test_case_4(self):
+        # Test with empty source directory
+        source_dir = tempfile.mkdtemp()
+        target_dir = tempfile.mkdtemp()
+        result = task_func(source_dir, target_dir, ['.jpg', '.png', '.gif'])
+        self.assertEqual(result, 0)  # No files to move
+        self.assertEqual(len(os.listdir(target_dir)), 0)
+        self.assertCountEqual([], os.listdir(target_dir))
+        cleanup_test_environment(source_dir, target_dir)
+    def test_case_5(self):
+        # Test moving multiple extensions but not all
+        source_dir, target_dir, file_list = setup_test_environment(['.jpg', '.txt', '.doc', 'png'], 5)
+        result = task_func(source_dir, target_dir, ['.jpg', '.txt', '.doc'])
+        file_list = [file for file in file_list if file[-4:] in ['.jpg', '.txt', '.doc']]
+        self.assertEqual(result, 15)  # All files should be moved
+        self.assertEqual(len(os.listdir(target_dir)), 15)
+        self.assertCountEqual(file_list, os.listdir(target_dir))
+        cleanup_test_environment(source_dir, target_dir)

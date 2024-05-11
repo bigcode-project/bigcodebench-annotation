@@ -1,156 +1,126 @@
 import pandas as pd
-import re
-import random
+from random import randint
 
 
-def task_func(s: str, seed: int = 0) -> pd.DataFrame:
+def task_func(name: str, age: int, code: str, salary: float, bio: str) -> pd.DataFrame:
     """
-    Generate a Pandas DataFrame of products with their ID, quantity, code, price, product, and description
-    based on a specified string of product data.
-
-    The input string is expected to be divided into segments by newlines. Each segment is expected to
-    be further split into parts by whitespace: ID, quantity, code, price, and a product description.
-    The function will remove trailing whitespaces in each field and assign a product name per unique code.
-    Product name is randomly sampled from: ['Apple', 'Banana', 'Orange', 'Pear', 'Grape'].
-    The same product name will be assigned to each code for each input s, however different codes can be
-    mapped to the same name.
+    Generate a Pandas DataFrame of employees with their details based on the input provided.
 
     Parameters:
-    - s    (str): Product data string split by newline, then whitespace.
-                  Expected format per segment: '<ID> <Quantity> <Code> <Price> <Description>'
-                  If incomplete, this function raises ValueError.
-    - seed (int): Random seed for reproducibility. Defaults to 0.
+    - name (str): Name of the employee. This is case-sensitive. Must be one of the predefined
+                  names: 'John', 'Alice', 'Bob', 'Charlie', 'David', otherwise the function raises
+                  ValueError.
+    - age (int): Age of the employee.
+    - code (str): Code of the employee.
+    - salary (float): Salary of the employee.
+    - bio (str): Biography of the employee.
 
     Returns:
-    - data_df (pd.DataFrame): DataFrame with columns: ['ID', 'Quantity', 'Code', 'Price', 'Product', 'Description'].
-                              Quantity and Price are expected to be integers.
+    data_df (pd.DataFrame): dataframe with columns: 'Name', 'Age', 'Code', 'Salary', 'Bio', 'Job Title'.
+               The 'Job Title' is randomly assigned from the predefined job titles:
+               'Engineer', 'Manager', 'Analyst', 'Developer', 'Tester'.
 
     Requirements:
     - pandas
-    - re
-    - random
+    - random.randint
 
-    Examples:
-    >>> s = '1 10 A10B 100 This is a description with spaces'
-    >>> df = task_func(s)
-    >>> df
-      ID  Quantity  Code  Price Product                        Description
-    0  1        10  A10B    100    Pear  This is a description with spaces
-
-    >>> s = '1 10 A10B 100 This is a description with spaces\\n2 20 B20C 200 Another description example'
-    >>> df = task_func(s)
-    >>> df
-      ID  Quantity  Code  Price Product                        Description
-    0  1        10  A10B    100    Pear  This is a description with spaces
-    1  2        20  B20C    200    Pear        Another description example
+    Example:
+    >>> random.seed(0)
+    >>> df = task_func("John", 30, "A10B", 5000.0, "This is a bio with spaces")
+    >>> print(df)
+       Name  Age  Code  Salary                        Bio  Job Title
+    0  John   30  A10B  5000.0  This is a bio with spaces  Developer
     """
-    if not s:
-        raise ValueError("Incomplete data provided.")
-    random.seed(seed)
-    products = ["Apple", "Banana", "Orange", "Pear", "Grape"]
-    code_to_product = dict()
-    data_list = []
-    segments = [segment.strip() for segment in s.split("\n")]
-    for segment in segments:
-        if segment:
-            elements = re.split(r"\s+", segment.strip(), 4)
-            if len(elements) < 5:
-                raise ValueError("Incomplete data provided.")
-            id, quantity, code, price, description = elements
-            product = code_to_product.get(code, random.choice(products))
-            data_list.append([id, quantity, code, price, product, description])
-    df = pd.DataFrame(
-        data_list, columns=["ID", "Quantity", "Code", "Price", "Product", "Description"]
+    EMPLOYEES = ["John", "Alice", "Bob", "Charlie", "David"]
+    JOBS = ["Engineer", "Manager", "Analyst", "Developer", "Tester"]
+    if name not in EMPLOYEES:
+        raise ValueError(f"Invalid employee name. Must be one of {EMPLOYEES}")
+    job = JOBS[randint(0, len(JOBS) - 1)]
+    data_df = pd.DataFrame(
+        [[name, age, code, salary, bio, job]],
+        columns=["Name", "Age", "Code", "Salary", "Bio", "Job Title"],
     )
-    df["Quantity"] = df["Quantity"].astype(int)
-    df["Price"] = df["Price"].astype(int)
-    return df
+    return data_df
 
 import unittest
 import pandas as pd
+import random
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.df1 = pd.DataFrame(
-            {
-                "ID": ["1"],
-                "Quantity": ["10"],
-                "Code": ["A10B"],
-                "Price": ["100"],
-                "Description": ["This is a description with spaces"],
-            }
-        )
-        self.df2 = pd.DataFrame(
-            {
-                "ID": ["2"],
-                "Quantity": ["15"],
-                "Code": ["B20C"],
-                "Price": ["200"],
-                "Description": ["Another description with spaces"],
-            }
-        )
-        self.df_multiple = pd.concat([self.df1, self.df2]).reset_index(drop=True)
-        for col in ["Quantity", "Price"]:
-            self.df1[col] = self.df1[col].astype(int)
-            self.df2[col] = self.df2[col].astype(int)
-            self.df_multiple[col] = self.df_multiple[col].astype(int)
-    def _test_most_columns(self, df1, df2):
-        columns_to_test = ["ID", "Quantity", "Code", "Price", "Description"]
-        for col in columns_to_test:
-            pd.testing.assert_series_equal(df1[col], df2[col])
     def test_case_1(self):
-        # Test basic structure and data correctness
-        input_str = "1 10 A10B 100 This is a description with spaces"
-        result = task_func(input_str)
-        self.assertIsInstance(result, pd.DataFrame)
-        self._test_most_columns(result, self.df1)
+        # Test the DataFrame structure for a known input
+        df = task_func("John", 30, "A10B", 5000.0, "Sample bio")
+        expected_columns = ["Name", "Age", "Code", "Salary", "Bio", "Job Title"]
+        self.assertListEqual(
+            list(df.columns), expected_columns, "DataFrame columns mismatch"
+        )
+        for col, dtype in zip(
+            df.columns, ["object", "int64", "object", "float64", "object", "object"]
+        ):
+            self.assertTrue(
+                df[col].dtype == dtype,
+                f"Column {col} has incorrect type {df[col].dtype}",
+            )
     def test_case_2(self):
-        # Test multiline basic structure and correctness
-        input_str = "\n".join(
-            [
-                "1 10 A10B 100 This is a description with spaces",
-                "2 15 B20C 200 Another description with spaces",
-            ]
-        )
-        result = task_func(input_str)
-        self._test_most_columns(result, self.df_multiple)
+        # Test minimum and maximum valid ages and salary, including edge cases
+        df_min_age = task_func("Alice", 18, "X10Y", 0.0, "Minimum age and salary")
+        self.assertEqual(df_min_age["Age"][0], 18)
+        self.assertEqual(df_min_age["Salary"][0], 0.0)
+        df_max_age = task_func("Bob", 65, "Z99W", 1000000.0, "Maximum age and high salary")
+        self.assertEqual(df_max_age["Age"][0], 65)
+        self.assertEqual(df_max_age["Salary"][0], 1000000.0)
     def test_case_3(self):
-        # Test multiline with trailing whitespaces
-        input_str = "\n".join(
-            [
-                "1 10 A10B 100 This is a description with spaces         ",
-                "2 15 B20C 200 Another description with spaces     ",
-            ]
-        )
-        result = task_func(input_str)
-        self._test_most_columns(result, self.df_multiple)
+        # Test bio with special characters, very long string, and empty string
+        df_special_bio = task_func("Charlie", 30, "C30D", 5300.0, "!@#$%^&*()_+|")
+        self.assertEqual(df_special_bio["Bio"][0], "!@#$%^&*()_+|")
+        df_long_bio = task_func("David", 30, "D40E", 5400.5, "a" * 1000)
+        self.assertEqual(len(df_long_bio["Bio"][0]), 1000)
+        df_empty_bio = task_func("John", 30, "E50F", 5500.0, "")
+        self.assertEqual(df_empty_bio["Bio"][0], "")
     def test_case_4(self):
-        # Test behavior with extra spaces in the input string
-        input_str = "\n".join(
-            [
-                "1   10 A10B 100       This is a description with spaces",
-                "2  15   B20C   200 Another description with spaces     ",
-            ]
+        # Test code with different formats
+        df_code_special_chars = task_func(
+            "Alice", 25, "!@#$", 5500.5, "Bio with special char code"
         )
-        result = task_func(input_str)
-        self._test_most_columns(result, self.df_multiple)
+        self.assertEqual(df_code_special_chars["Code"][0], "!@#$")
     def test_case_5(self):
-        # Test code to product mapping when there are duplicates
-        input_str = "\n".join(
-            [
-                "1 10 A10B 100 This is a description with spaces",
-                "2 15 A10B 200 Another description with spaces",
-            ]
-        )
-        result = task_func(input_str)
-        product_names = result["Product"]
-        self.assertEqual(product_names.iloc[0], product_names.iloc[1])
+        # Test for case sensitivity
+        with self.assertRaises(ValueError):
+            task_func("john", 30, "J01K", 5000.0, "Case sensitive name test")
     def test_case_6(self):
-        # Test behavior with empty input string
-        input_str = ""
-        with self.assertRaises(ValueError):
-            task_func(input_str)
+        # Test each predefined name
+        for name in ["John", "Alice", "Bob", "Charlie", "David"]:
+            df = task_func(name, 30, "A10B", 5000.0, f"{name}'s bio")
+            self.assertEqual(
+                df["Name"][0], name, f"Valid name {name} failed to create a DataFrame"
+            )
     def test_case_7(self):
-        # Test behavior with incomplete input string
-        input_str = "1 10"
+        # Test randomness in job assignment
+        job_titles_first_run = []
+        job_titles_second_run = []
+        job_titles_third_run = []
+        n_iter = 15
+        name, age, code, salary, bio = (
+            "Bob",
+            30,
+            "B20C",
+            5000.0,
+            "Testing randomness in job titles",
+        )
+        random.seed(42)  # Set the seed for the first run
+        for _ in range(n_iter):
+            df = task_func(name, age, code, salary, bio)
+            job_titles_first_run.append(df["Job Title"][0])
+        random.seed(42)  # Reset the seed to ensure reproducibility for the second run
+        for _ in range(n_iter):
+            df = task_func(name, age, code, salary, bio)
+            job_titles_second_run.append(df["Job Title"][0])
+        random.seed(0)  # Repeat for third run with different seed
+        for _ in range(n_iter):
+            df = task_func(name, age, code, salary, bio)
+            job_titles_third_run.append(df["Job Title"][0])
+        self.assertEqual(job_titles_first_run, job_titles_second_run)
+        self.assertNotEqual(job_titles_first_run, job_titles_third_run)
+    def test_case_8(self):
+        # Test invalid name
         with self.assertRaises(ValueError):
-            task_func(input_str)
+            task_func("InvalidName", 28, "C30D", 5300.0, "Bio of InvalidName")

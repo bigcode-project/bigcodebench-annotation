@@ -1,98 +1,97 @@
 import bs4
 import requests
 import re
-import csv
+import json
 
-def task_func(url="http://example.com", csv_path="emails.csv", 
-          regex=r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b", 
-          headers={'User-Agent': 'Mozilla/5.0'}):
+def task_func(url: str, output_path: str) -> list:
     """
-    Scrapes a web page to extract all email addresses using a specified regular expression pattern and writes them to a CSV file. The csv file is
-    always created eventhough no email is found in the url. The header of the csv should be "Emails".
+    Extracts phone numbers from a given URL or local file and saves them to a specified file in JSON format.
 
     Parameters:
-    - url (str): The URL of the web page to scrape. Default is "http://example.com".
-    - csv_path (str): The filesystem path where the CSV file should be saved. Default is "emails.csv".
-    - regex (str): The regular expression pattern used to identify email addresses. Default is a pattern that matches common email formats.
-    - headers (dict): The HTTP headers to use for the request. Default includes a User-Agent header.
+    - url (str): The URL of the webpage to scrape or the local file path prefixed with 'file://'.
+    - output_path (str): The path where the extracted phone numbers should be saved in JSON format.
 
     Returns:
-    - str: The path to the CSV file where the extracted email addresses have been saved.
+    - list: A list of strings, each representing a found phone number.
 
     Requirements:
     - bs4
     - requests
     - re
-    - csv
-    
-    Examples:
-    >>> task_func()
-    'emails.csv'
-    >>> task_func(url="http://another-example.com", csv_path="another_emails.csv")
-    'another_emails.csv'
+    - json
+
+    Example:
+    >>> task_func('file:///path/to/local/file.txt', 'output.json')
+    ['+1 (234) 567 8901', '+44 1234 567890']
     """
-    response = requests.get(url, headers=headers)
-    soup = bs4.BeautifulSoup(response.text, 'html.parser')
-    text = soup.get_text()
-    emails = re.findall(regex, text)
-    with open(csv_path, 'w', newline='') as f:
-        write = csv.writer(f)
-        write.writerow(['Emails'])
-        for email in emails:
-            write.writerow([email])
-    return csv_path
+    HEADERS = {'User-Agent': 'Mozilla/5.0'}
+    PHONE_REGEX = r"\+\d{1,3}?\s?\(?\d{1,4}?\)?\s?\d{1,4}?\s?\d{1,9}"
+    if url.startswith("file://"):
+        with open(url[7:], 'r') as file:
+            text = file.read()
+    else:
+        response = requests.get(url, headers=HEADERS)
+        soup = bs4.BeautifulSoup(response.text, 'html.parser')
+        text = soup.get_text()
+    phone_numbers = re.findall(PHONE_REGEX, text)
+    with open(output_path, 'w') as f:
+        json.dump(phone_numbers, f)
+    return phone_numbers
 
 import unittest
-from unittest.mock import patch
+import json
 import os
-import csv
 import tempfile
+from shutil import rmtree
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Create a temporary directory to hold any output files
+        # Create a temporary directory to store the HTML files and output
         self.test_dir = tempfile.mkdtemp()
-        self.addCleanup(lambda: os.rmdir(self.test_dir))
+        self.test_files = {
+            'test_page_1.html': "<html><body>Phone: +1234567890</body></html>",
+            'test_page_2.html': "<html><body>Call us: +9876543210 or +1122334455</body></html>",
+            'test_page_3.html': "<html><body>No phone number here!</body></html>",
+            'test_page_4.html': "<html><body>Contact: +919876543210</body></html>",
+            'test_page_5.html': "<html><body>Numbers: +14151234567, +13171234567</body></html>",
+        }
+        # Write test content to files in the temporary directory
+        for filename, content in self.test_files.items():
+            with open(os.path.join(self.test_dir, filename), 'w') as f:
+                f.write(content)
     def tearDown(self):
-        # Clean up all files created during the tests
-        for filename in os.listdir(self.test_dir):
-            os.remove(os.path.join(self.test_dir, filename))
-    @patch('requests.get')
-    def test_extraction_and_saving_default(self, mock_get):
-        """Test extracting emails using default parameters and saving to default path."""
-        mocked_html_content = """<html><body>Emails: test1@example.com, test2@domain.com</body></html>"""
-        mock_get.return_value.text = mocked_html_content
-        
-        csv_path = os.path.join(self.test_dir, "emails.csv")
-        with patch('builtins.open', unittest.mock.mock_open()) as mocked_file:
-            task_func(csv_path=csv_path)
-            mocked_file.assert_called_once_with(csv_path, 'w', newline='')
-    @patch('requests.get')
-    def test_extraction_custom_url(self, mock_get):
-        """Test the email extraction from a custom URL and ensure file creation even if no emails are found."""
-        mock_get.return_value.text = "<html><body>No email here</body></html>"
-        csv_path = os.path.join(self.test_dir, "output.csv")
-        result = task_func(url="http://mocked-url.com", csv_path=csv_path)
-        self.assertEqual(result, csv_path)
-        self.assertTrue(os.path.exists(csv_path))  # Ensuring file is created
-        with open(csv_path, 'r') as f:
-            reader = csv.reader(f)
-            data = list(reader)
-        self.assertEqual(data, [['Emails']])
-    @patch('requests.get')
-    def test_extraction_custom_regex(self, mock_get):
-        """Test extraction with a custom regex pattern."""
-        mocked_html_content = "<html><body>Email: unique@example.com, other@sample.com</body></html>"
-        mock_get.return_value.text = mocked_html_content
-        csv_path = os.path.join(self.test_dir, "custom_regex.csv")
-        task_func(csv_path=csv_path, regex=r"\b[A-Za-z0-9._%+-]+@example.com\b")
-        with open(csv_path, 'r') as file:
-            reader = csv.reader(file)
-            emails = [row for row in reader]
-        self.assertEqual(emails, [['Emails'], ['unique@example.com']])  # Only matching specific domain
-    @patch('requests.get')
-    def test_with_headers_customization(self, mock_get):
-        """Test extraction with customized headers."""
-        mock_get.return_value.text = "<html><body>Email: info@test.com</body></html>"
-        csv_path = os.path.join(self.test_dir, "headers.csv")
-        task_func(csv_path=csv_path, headers={'User-Agent': 'Custom-Agent'})
-        self.assertTrue(os.path.exists(csv_path))
+        # Remove the temporary directory and all its contents
+        rmtree(self.test_dir)
+    def test_phone_numbers_page_1(self):
+        """ Test extraction from test_page_1 with a single phone number """
+        filename = 'test_page_1.html'
+        expected_numbers = ["+1234567890"]
+        self.run_test_case(filename, expected_numbers)
+    def test_phone_numbers_page_2(self):
+        """ Test extraction from test_page_2 with multiple phone numbers """
+        filename = 'test_page_2.html'
+        expected_numbers = ["+9876543210", "+1122334455"]
+        self.run_test_case(filename, expected_numbers)
+    def test_phone_numbers_page_3(self):
+        """ Test extraction from test_page_3 where no phone numbers are present """
+        filename = 'test_page_3.html'
+        expected_numbers = []
+        self.run_test_case(filename, expected_numbers)
+    def test_phone_numbers_page_4(self):
+        """ Test extraction from test_page_4 with one phone number """
+        filename = 'test_page_4.html'
+        expected_numbers = ["+919876543210"]
+        self.run_test_case(filename, expected_numbers)
+    def test_phone_numbers_page_5(self):
+        """ Test extraction from test_page_5 with multiple phone numbers """
+        filename = 'test_page_5.html'
+        expected_numbers = ["+14151234567", "+13171234567"]
+        self.run_test_case(filename, expected_numbers)
+    def run_test_case(self, filename, expected_numbers):
+        """ Helper method to run individual test cases """
+        url = f"file://{os.path.join(self.test_dir, filename)}"
+        output_path = os.path.join(self.test_dir, f'output_{filename}')
+        result = task_func(url, output_path)
+        self.assertEqual(result, expected_numbers)
+        with open(output_path, 'r') as f:
+            saved_numbers = json.load(f)
+        self.assertEqual(saved_numbers, expected_numbers)

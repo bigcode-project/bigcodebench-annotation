@@ -1,55 +1,70 @@
-import struct
-import random
+from collections import Counter
+import heapq
 
 # Constants
-KEYS = ['470FC614', '4A0FC614', '4B9FC614', '4C8FC614', '4D7FC614']
+LETTERS = list('abcdefghijklmnopqrstuvwxyz')
 
-def task_func(hex_key=None):
+def task_func(my_dict):
     """
-    Generate a random float number from a list of hexadecimal strings and then round the float number to 2 decimal places.
+    Create a dictionary in which the keys are letters and the values are random integers.
+    Find the 3 most common letters in the dictionary.
 
     Parameters:
-    - None
+    - my_dict (dict): The dictionary to process.
 
     Returns:
-    - rounded_float (float): The rounded float number.
+    - most_common_letters (list): The 3 most common letters.
 
     Requirements:
-    - struct
-    - random
+    - collections
+    - heapq
 
     Example:
-    >>> random.seed(42)
-    >>> print(repr(f"{task_func():.1f}"))
-    '36806.1'
-
+    >>> random.seed(43)
+    >>> my_dict = {letter: random.randint(1, 100) for letter in LETTERS}
+    >>> most_common_letters = task_func(my_dict)
+    >>> print(most_common_letters)
+    ['d', 'v', 'c']
     """
-    if hex_key is None:
-        hex_key = random.choice(KEYS)
-    float_num = struct.unpack('!f', bytes.fromhex(hex_key))[0]
-    rounded_float = round(float_num, 2)
-    return rounded_float
+    letter_counter = Counter(my_dict)
+    most_common_letters = heapq.nlargest(3, letter_counter, key=letter_counter.get)
+    return most_common_letters
 
 import unittest
+import random
+LETTERS = list('abcdefghijklmnopqrstuvwxyz')
+def generate_random_dict(size=26, min_val=1, max_val=100):
+    """Generate a random dictionary with letters as keys and random integers as values."""
+    letters = random.sample(LETTERS, size)
+    return {letter: random.randint(min_val, max_val) for letter in letters}
 class TestCases(unittest.TestCase):
-    
-    def test_return_type(self):
-        result = task_func()
-        self.assertIsInstance(result, float)
-    def test_rounded_two_decimal(self):
-        result = task_func()
-        decimal_part = str(result).split('.')[1]
-        self.assertTrue(len(decimal_part) <= 2)
-    def test_randomness(self):
-        random.seed()  # Reset the seed to ensure randomness
-        results = {task_func() for _ in range(100)}
-        self.assertTrue(len(results) > 1)
-    def test_specific_hex_keys(self):
-        for hex_key in KEYS:
-            expected_result = round(struct.unpack('!f', bytes.fromhex(hex_key))[0], 2)
-            result = task_func(hex_key)
-            self.assertEqual(result, expected_result)
-    def test_no_seed(self):
-        random.seed()  # Reset the random seed
-        results = {task_func() for _ in range(100)}
-        self.assertTrue(len(results) > 1)
+    def test_basic(self):
+        # Basic Test
+        test_dict = generate_random_dict()
+        result = task_func(test_dict)
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 3)
+        self.assertTrue(all(isinstance(letter, str) for letter in result))
+    def test_few_letters(self):
+        # Edge Case: Fewer than 3 letters
+        test_dict = {'a': 10, 'b': 20}
+        result = task_func(test_dict)
+        self.assertEqual(result, ['b', 'a'])
+    def test_empty_dict(self):
+        # Edge Case: Empty dictionary
+        test_dict = {}
+        result = task_func(test_dict)
+        self.assertEqual(result, [])
+    def test_specific_letters(self):
+        # Specific Test: Known output
+        test_dict = {'a': 100, 'b': 90, 'c': 80, 'd': 70}
+        result = task_func(test_dict)
+        self.assertEqual(result, ['a', 'b', 'c'])
+    def test_general(self):
+        # General Test: Check top 3 values
+        test_dict = generate_random_dict()
+        result = task_func(test_dict)
+        sorted_values = sorted(test_dict.values(), reverse=True)[:3]
+        sorted_keys = [k for k, v in sorted(test_dict.items(), key=lambda item: item[1], reverse=True)][:3]
+        self.assertEqual(result, sorted_keys)
+        self.assertEqual([test_dict[key] for key in result], sorted_values)

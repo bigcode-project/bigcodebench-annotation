@@ -5,8 +5,8 @@ from bs4 import BeautifulSoup
 
 def f_839(url: str, file_name: str = "Output.txt") -> str:
     """
-    Scrape the title from a specified web page, save it in JSON format to a given file, 
-    and append to the file if it exists.
+    Scrape the 'title' from a specified web page, save it in JSON format to a given file, 
+    and append to the file if it exists.`
 
     Parameters:
     - url (str): The URL of the web page from which the title is to be scraped.

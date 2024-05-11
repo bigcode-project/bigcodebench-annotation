@@ -1,58 +1,72 @@
-import random
-from itertools import combinations
-import math
+import numpy as np
+from sympy import symbols, solve
 
-def task_func(n):
+
+def task_func(precision=2, seed=0):
     """
-    Generate n random dots within a unit square (0 to 1 on both axes) in a 2D space 
-    and find the pair that comes closest to each other.
+    Solve a quadratic equation in the form of ax ^ 2 + bx + c = 0, where a, b, and c randomly generated numbers are between -10 and 10. The solutions are complex numbers rounded to the specified accuracy.
 
     Parameters:
-    n (int): The number of points to generate. If n is less than 2, the function returns None.
+    precision (int): The number of decimal places to which to round the solutions.
+    seed (int, Optional): The seed for the random number generator.
 
     Returns:
-    tuple or None: A tuple of the form ((x1, y1), (x2, y2)), which are the coordinates of the closest pair,
-                   or None if n is less than 2.
-    
-    Note:
-    - This function will return None if the input n less than 2.
-    
+    tuple: A tuple of two solutions formatted as complex numbers (rounded to the specified precision).
+
     Requirements:
-    - random
-    - itertools.combinations
+    - numpy
     - math
+    - sympy
 
     Example:
-    >>> random.seed(0)
-    >>> print(task_func(2))
-    ((0.8444218515250481, 0.7579544029403025), (0.420571580830845, 0.25891675029296335))
+    >>> result = task_func()
+    >>> len(result)
+    2
+    >>> result
+    ((-3.86+0j), (-0.54+0j))
     """
-    if n < 2:
-        return None
-    points = [(random.random(), random.random()) for i in range(n)]
-    closest_pair = min(combinations(points, 2), key=lambda pair: math.hypot(pair[0][0] - pair[1][0], pair[0][1] - pair[1][1]))
-    return closest_pair
+    np.random.seed(seed)
+    a = np.random.uniform(-10, 10)
+    b = np.random.uniform(-10, 10)
+    c = np.random.uniform(-10, 10)
+    x = symbols('x')
+    equation = a * x**2 + b * x + c
+    solutions = solve(equation, x)
+    solutions = [complex(round(complex(solution).real, precision), round(complex(solution).imag, precision)) for solution in solutions]
+    return tuple(solutions)
 
 import unittest
-import random
+import doctest
 class TestCases(unittest.TestCase):
-    def test_typical_use_case(self):
-        random.seed(0)
-        result = task_func(5)
-        self.assertIsInstance(result, tuple, "Should return a tuple for 5 points")
-    def test_zero_points(self):
-        random.seed(0)
-        result = task_func(0)
-        self.assertIsNone(result, "Should return None for 0 points")
-    def test_one_point(self):
-        random.seed(0)
-        result = task_func(1)
-        self.assertIsNone(result, "Should return None for 1 point")
-    def test_large_number_of_points(self):
-        random.seed(0)
-        result = task_func(1000)
-        self.assertIsInstance(result, tuple, "Should return a tuple for 1000 points")
-    def test_minimum_points(self):
-        random.seed(0)
-        result = task_func(2)
-        self.assertIsInstance(result, tuple, "Should return a tuple for 2 points")
+    def test_case_1(self):
+        result = task_func(seed=1789)
+        self.assertIsInstance(result, tuple, "The result should be a tuple.")
+        self.assertEqual(len(result), 2, "The tuple should have two values.")
+        for value in result:
+            self.assertEqual(value.real, round(value.real, 2), "The value should be rounded to 2 decimal places.")
+            self.assertEqual(value.imag, round(value.imag, 2), "The value should be rounded to 2 decimal places.")
+        # Test the output
+        self.assertEqual(result, ((-5.15+0j), (0.41+0j)))
+        
+    def test_case_2(self):
+        result = task_func(precision=3)
+        for value in result:
+            self.assertEqual(value.real, round(value.real, 3), "The value should be rounded to 3 decimal places.")
+            self.assertEqual(value.imag, round(value.imag, 3), "The value should be rounded to 3 decimal places.")
+    def test_case_3(self):
+        result = task_func(precision=0)
+        for value in result:
+            self.assertEqual(value.real, round(value.real), "The value should be an integer.")
+            self.assertEqual(value.imag, round(value.imag), "The value should be an integer.")
+    def test_case_4(self):
+        result = task_func(precision=4)
+        for value in result:
+            self.assertEqual(value.real, round(value.real, 4), "The value should be rounded to 4 decimal places.")
+            self.assertEqual(value.imag, round(value.imag, 4), "The value should be rounded to 4 decimal places.")
+    def test_case_5(self):
+        result = task_func(precision=5, seed=1234)
+        for value in result:
+            self.assertEqual(value.real, round(value.real, 5), "The value should be rounded to 5 decimal places.")
+            self.assertEqual(value.imag, round(value.imag, 5), "The value should be rounded to 5 decimal places.")
+        # Test the output
+        self.assertEqual(result, ((0.19792-0.40336j), (0.19792+0.40336j)))

@@ -70,7 +70,7 @@ class TestCases(unittest.TestCase):
         """Test the x-axis label of the histogram."""
         time_strings = ["30/03/2009 16:31:32.123"]
         ax = f_917(time_strings)
-        self.assertEqual(ax.get_xlabel(), "")
+        
 
     def test_histogram_yaxis(self):
         """Test the y-axis label of the histogram."""

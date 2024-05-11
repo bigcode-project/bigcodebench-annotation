@@ -1,49 +1,55 @@
-import numpy as np
-from scipy.stats import iqr
+import struct
+import random
 
-def task_func(L):
+# Constants
+KEYS = ['470FC614', '4A0FC614', '4B9FC614', '4C8FC614', '4D7FC614']
+
+def task_func(hex_key=None):
     """
-    Calculate the interquartile range of all elements in a nested list 'L'.
-    
+    Generate a random float number from a list of hexadecimal strings and then round the float number to 2 decimal places.
+
     Parameters:
-    - L (list): The nested list.
-    
+    - None
+
     Returns:
-    - iqr_value (float): The interquartile range.
-    
+    - rounded_float (float): The rounded float number.
+
     Requirements:
-    - numpy
-    - scipy.stats
+    - struct
+    - random
 
     Example:
-    >>> task_func([[1,2,3],[4,5,6]])
-    2.5
+    >>> random.seed(42)
+    >>> print(repr(f"{task_func():.1f}"))
+    '36806.1'
+
     """
-    flattened = np.array(L).flatten()
-    iqr_value = iqr(flattened)
-    return iqr_value
+    if hex_key is None:
+        hex_key = random.choice(KEYS)
+    float_num = struct.unpack('!f', bytes.fromhex(hex_key))[0]
+    rounded_float = round(float_num, 2)
+    return rounded_float
 
 import unittest
 class TestCases(unittest.TestCase):
-    def test_1(self):
-        result = task_func([[1,2,3],[4,5,6]])
-        expected = 2.5
-        self.assertAlmostEqual(result, expected, places=2)
-    def test_2(self):
-        result = task_func([[1,1,1],[2,2,2]])
-        expected = 1.0
-        self.assertAlmostEqual(result, expected, places=2)
-    def test_3(self):
-        result = task_func([[1,5,3]])
-        expected = 2.0
-        self.assertAlmostEqual(result, expected, places=2)
     
-    def test_4(self):
-        result = task_func([[1],[2],[3],[4],[5]])
-        expected = 2.0
-        self.assertAlmostEqual(result, expected, places=2)
-    
-    def test_5(self):
-        result = task_func([[1,-2,3],[-4,5,6]])
-        expected = 5.75
-        self.assertAlmostEqual(result, expected, places=2)
+    def test_return_type(self):
+        result = task_func()
+        self.assertIsInstance(result, float)
+    def test_rounded_two_decimal(self):
+        result = task_func()
+        decimal_part = str(result).split('.')[1]
+        self.assertTrue(len(decimal_part) <= 2)
+    def test_randomness(self):
+        random.seed()  # Reset the seed to ensure randomness
+        results = {task_func() for _ in range(100)}
+        self.assertTrue(len(results) > 1)
+    def test_specific_hex_keys(self):
+        for hex_key in KEYS:
+            expected_result = round(struct.unpack('!f', bytes.fromhex(hex_key))[0], 2)
+            result = task_func(hex_key)
+            self.assertEqual(result, expected_result)
+    def test_no_seed(self):
+        random.seed()  # Reset the random seed
+        results = {task_func() for _ in range(100)}
+        self.assertTrue(len(results) > 1)

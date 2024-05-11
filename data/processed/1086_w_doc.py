@@ -1,76 +1,95 @@
-import re
-from collections import Counter
-import matplotlib.pyplot as plt
+import string
+import random
+import pandas as pd
+import numpy as np
+
+# Constants
+NUM_SAMPLES = 1000  # Number of samples
 
 
-def task_func(text):
+def task_func():
     """
-    Analyzes the frequency of words in a given text after lowercasing, removing punctuation, splitting into words,
-    and plots the top 10 most common words.
+    Generates a DataFrame with two columns: a string field and a float field.
+    The string field contains randomly generated strings of 10 ASCII letters.
+    The float field contains randomly generated numbers between 0 and 10000,
+    formatted with two decimal places and a comma as the thousands separator.
 
     Parameters:
-    - text (str): The input text to be analyzed.
+    - None
 
     Returns:
-    - list: A list of tuples containing the 10 most common words and their counts.
-    - Axes: The matplotlib Axes object of the bar chart.
+        DataFrame: A pandas DataFrame with NUM_SAMPLES rows. Each row contains a
+        random string in the 'String Field' column and a formatted float in the
+        'Float Field' column.
 
     Requirements:
-    - re
-    - collections.Counter
-    - matplotlib.pyplot
+    - string
+    - random
+    - pandas
+    - numpy
 
     Example:
-    >>> common_words, ax = task_func("This is a sample text. This text contains sample words like 'text', 'sample', and 'words'.")
-    >>> print(common_words)
-    [('sample', 3), ('text', 3), ('this', 2), ('words', 2), ('is', 1), ('a', 1), ('contains', 1), ('like', 1), ('and', 1)]
+    >>> random.seed(0)
+    >>> np.random.seed(0)
+    >>> dataset = task_func()
+    >>> print(dataset.head(1))
+      String Field Float Field
+    0   RNvnAvOpyE    5,488.14
+
+    Note: The exact values in the dataset will vary as they are randomly generated.
     """
-    cleaned_text = re.sub(f"[{punctuation}]", "", text).lower()
-    words = cleaned_text.split()
-    word_counts = Counter(words)
-    most_common_words = word_counts.most_common(10)
-    _, ax = plt.subplots()
-    if most_common_words:  # Check if the list is not empty
-        ax.bar(*zip(*most_common_words))
-    else:  # Handle empty case
-        ax.bar([], [])
-    return most_common_words, ax
+    data = {
+        "String Field": [
+            "".join(random.choices(string.ascii_letters, k=10))
+            for _ in range(NUM_SAMPLES)
+        ],
+        "Float Field": [f"{x:,.2f}" for x in np.random.uniform(0, 10000, NUM_SAMPLES)],
+    }
+    df = pd.DataFrame(data)
+    return df
 
 import unittest
-from string import punctuation
+import pandas as pd
+import random
 class TestCases(unittest.TestCase):
     """Test cases for task_func."""
-    def test_empty_text(self):
+    def test_dataframe_creation(self):
         """
-        Test the function with an empty string. Expect an empty list and a chart with no bars.
+        Test if the function returns a pandas DataFrame.
         """
-        common_words, _ = task_func("")
-        self.assertEqual(common_words, [])
-    def test_single_word(self):
+        random.seed(1)
+        result = task_func()
+        self.assertIsInstance(result, pd.DataFrame)
+    def test_row_count(self):
         """
-        Test the function with a text containing a single word repeated. Expect the word with its count.
+        Test if the DataFrame contains the correct number of rows.
         """
-        common_words, _ = task_func("test test test")
-        self.assertEqual(common_words, [("test", 3)])
-    def test_punctuation(self):
+        random.seed(2)
+        result = task_func()
+        self.assertEqual(len(result), NUM_SAMPLES)
+    def test_column_count(self):
         """
-        Test the function with a text containing punctuations. Expect punctuations to be removed.
+        Test if the DataFrame contains exactly two columns.
         """
-        common_words, _ = task_func("hello! hello, world.")
-        self.assertEqual(common_words, [("hello", 2), ("world", 1)])
-    def test_case_sensitivity(self):
+        random.seed(3)
+        result = task_func()
+        self.assertEqual(len(result.columns), 2)
+    def test_string_field_format(self):
         """
-        Test the function with a text containing the same word in different cases. Expect case insensitivity.
+        Test if the 'String Field' contains strings of 10 ASCII letters.
         """
-        common_words, _ = task_func("Hello hello HeLLo")
-        self.assertEqual(common_words, [("hello", 3)])
-    def test_common_scenario(self):
+        random.seed(4)
+        result = task_func()
+        all_strings = all(result["String Field"].str.match("^[A-Za-z]{10}$"))
+        self.assertTrue(all_strings)
+    def test_float_field_format(self):
         """
-        Test the function with a standard sentence. Expect a correct count and ordering of words.
+        Test if the 'Float Field' contains formatted float strings.
         """
-        text = "This is a test. This is only a test."
-        common_words, _ = task_func(text)
-        expected = [("this", 2), ("is", 2), ("a", 2), ("test", 2), ("only", 1)]
-        self.assertEqual(common_words, expected)
-    def tearDown(self):
-        plt.close()
+        random.seed(5)
+        result = task_func()
+        all_floats = all(
+            isinstance(float(val.replace(",", "")), float)
+            for val in result["Float Field"]
+        )
+        self.assertTrue(all_floats)

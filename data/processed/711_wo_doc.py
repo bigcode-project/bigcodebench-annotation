@@ -1,116 +1,106 @@
-import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
+import json
+import csv
 
-def task_func(data_path):
+def task_func(json_file, csv_file):
     """
-    Normalizes a dataset from a .csv file.
+    Convert a JSON file to CSV.
     
     Parameters:
-    - data_path (str): The path to the csv data file.
+    - json_file (str): The path to the JSON file.
+    - csv_file (str): The path to the CSV file.
 
     Returns:
-    - df (DataFrame): The normalized dataset.
+    - csv_file: The function returns the path to the CSV file that was written.
 
     Requirements:
-    - pandas
-    - sklearn
-    
+    - json
+    - csv
+        
     Example:
-    >>> df = task_func('path_to_data_file.csv')
+    >>> task_func('path_to_json_file.json', 'path_to_csv_file.csv')
+    'path_to_csv_file.csv'
     """
-    df = pd.read_csv(data_path)
-    data = df.to_numpy()
-    scaler = MinMaxScaler()
-    data = scaler.fit_transform(data)
-    df = pd.DataFrame(data, columns=df.columns)
-    return df
+    with open(json_file, 'r') as f:
+        data = json.load(f)
+    with open(csv_file, 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(data.keys())
+        writer.writerow(data.values())
+    return csv_file
 
 import unittest
 import os
-import numpy as np
 class TestCases(unittest.TestCase):
+    def tearDown(self):
+        for file in ['./test.json', './test.csv', './testx.json', './testx.csv', './testy.json', './testy.csv', './testz.json', './testz.csv']:
+            if os.path.exists(file):
+                os.remove(file)
     def test_case_1(self):
-        # Create data
-        data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-        df = pd.DataFrame(data, columns=['a', 'b', 'c'])
-        df.to_csv('data.csv', index=False)
+        # Create json file
+        json_file = './test.json'
+        with open(json_file, 'w') as f:
+            json.dump({'a': 1, 'b': 2, 'c': 3}, f)
         # Run function
-        df = task_func('data.csv')
-        # Check result
-        self.assertEqual(df.shape, (3, 3))
-        self.assertAlmostEqual(df['a'].min(), 0)
-        self.assertAlmostEqual(df['a'].max(), 1)
-        self.assertAlmostEqual(df['b'].min(), 0)
-        self.assertAlmostEqual(df['b'].max(), 1)
-        self.assertAlmostEqual(df['c'].min(), 0)
-        self.assertAlmostEqual(df['c'].max(), 1)
-        # Remove data
-        os.remove('data.csv')
+        csv_file = task_func(json_file, './test.csv')
+        # Check file
+        self.assertTrue(os.path.exists(csv_file))
+        with open(csv_file, 'r') as f:
+            reader = csv.reader(f)
+            csv_data = list(reader)
+        self.assertEqual(csv_data, [['a', 'b', 'c'], ['1', '2', '3']])
+        
     def test_case_2(self):
-        # Create data
-        data = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
-        df = pd.DataFrame(data, columns=['a', 'b', 'c'])
-        df.to_csv('data.csv', index=False)
+        # Create json file
+        json_file = './test.json'
+        with open(json_file, 'w') as f:
+            json.dump({'z': 1, 'y': 2, 'x': 3}, f)
         # Run function
-        df = task_func('data.csv')
-        # Check result
-        self.assertEqual(df.shape, (3, 3))
-        self.assertAlmostEqual(df['a'].min(), 0)
-        self.assertAlmostEqual(df['a'].max(), 0)
-        self.assertAlmostEqual(df['b'].min(), 0)
-        self.assertAlmostEqual(df['b'].max(), 0)
-        self.assertAlmostEqual(df['c'].min(), 0)
-        self.assertAlmostEqual(df['c'].max(), 0)
-        # Remove data
-        os.remove('data.csv')
+        csv_file = task_func(json_file, './test.csv')
+        # Check file
+        self.assertTrue(os.path.exists(csv_file))
+        with open(csv_file, 'r') as f:
+            reader = csv.reader(f)
+            csv_data = list(reader)
+        self.assertEqual(csv_data, [['z', 'y', 'x'], ['1', '2', '3']])
+        
     def test_case_3(self):
-        # Create data
-        data = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]])
-        df = pd.DataFrame(data, columns=['a', 'b', 'c'])
-        df.to_csv('data.csv', index=False)
+        # Create json file
+        json_file = './testx.json'
+        with open(json_file, 'w') as f:
+            json.dump({'xxx': 99}, f)
         # Run function
-        df = task_func('data.csv')
-        # Check result
-        self.assertEqual(df.shape, (3, 3))
-        self.assertAlmostEqual(df['a'].min(), 0)
-        self.assertAlmostEqual(df['a'].max(), 0)
-        self.assertAlmostEqual(df['b'].min(), 0)
-        self.assertAlmostEqual(df['b'].max(), 0)
-        self.assertAlmostEqual(df['c'].min(), 0)
-        self.assertAlmostEqual(df['c'].max(), 0)
-        # Remove data
-        os.remove('data.csv')
+        csv_file = task_func(json_file, './testx.csv')
+        # Check file
+        self.assertTrue(os.path.exists(csv_file))
+        with open(csv_file, 'r') as f:
+            reader = csv.reader(f)
+            csv_data = list(reader)
+        self.assertEqual(csv_data, [['xxx'], ['99']])
+        
     def test_case_4(self):
-        # Create data
-        data = np.array([[3, 2, 1], [6, 5, 4], [9, 8, 7]])
-        df = pd.DataFrame(data, columns=['a', 'b', 'c'])
-        df.to_csv('data.csv', index=False)
+        # Create json file
+        json_file = './testy.json'
+        with open(json_file, 'w') as f:
+            json.dump({'yyy': 99}, f)
         # Run function
-        df = task_func('data.csv')
-        # Check result
-        self.assertEqual(df.shape, (3, 3))
-        self.assertAlmostEqual(df['a'].min(), 0)
-        self.assertAlmostEqual(df['a'].max(), 1)
-        self.assertAlmostEqual(df['b'].min(), 0)
-        self.assertAlmostEqual(df['b'].max(), 1)
-        self.assertAlmostEqual(df['c'].min(), 0)
-        self.assertAlmostEqual(df['c'].max(), 1)
-        # Remove data
-        os.remove('data.csv')
+        csv_file = task_func(json_file, './testy.csv')
+        # Check file
+        self.assertTrue(os.path.exists(csv_file))
+        with open(csv_file, 'r') as f:
+            reader = csv.reader(f)
+            csv_data = list(reader)
+        self.assertEqual(csv_data, [['yyy'], ['99']])
+        
     def test_case_5(self):
-        # Create data
-        data = np.array([[1, 2, 3], [4, 5, 6]])
-        df = pd.DataFrame(data, columns=['a', 'b', 'c'])
-        df.to_csv('data.csv', index=False)
+        # Create json file
+        json_file = './testz.json'
+        with open(json_file, 'w') as f:
+            json.dump({'zzz': 99}, f)
         # Run function
-        df = task_func('data.csv')
-        # Check result
-        self.assertEqual(df.shape, (2, 3))
-        self.assertAlmostEqual(df['a'].min(), 0)
-        self.assertAlmostEqual(df['a'].max(), 1)
-        self.assertAlmostEqual(df['b'].min(), 0)
-        self.assertAlmostEqual(df['b'].max(), 1)
-        self.assertAlmostEqual(df['c'].min(), 0)
-        self.assertAlmostEqual(df['c'].max(), 1)
-        # Remove data
-        os.remove('data.csv')
+        csv_file = task_func(json_file, './testz.csv')
+        # Check file
+        self.assertTrue(os.path.exists(csv_file))
+        with open(csv_file, 'r') as f:
+            reader = csv.reader(f)
+            csv_data = list(reader)
+        self.assertEqual(csv_data, [['zzz'], ['99']])

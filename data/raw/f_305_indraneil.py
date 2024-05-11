@@ -12,7 +12,7 @@ def f_305(activities):
     - activities (list of datetime objects): A list of datetime objects representing when each activity occurred.
 
     Returns:
-    - matplotlib.axes.Axes: Axes object representing the bar chart.
+    - matplotlib.axes.Axes: Axes object representing the bar chart, with the x-axis labeled 'Day of the Week', the y-axis labeled 'Number of Activities', and the title 'Weekly Activity'.
 
     Requirements:
     - datetime

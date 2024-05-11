@@ -1,106 +1,88 @@
-import pandas as pd
+import numpy as np
+from scipy import integrate
 import matplotlib.pyplot as plt
 
 
-def task_func(df: pd.DataFrame) -> pd.DataFrame:
+def task_func(func, x_range=(-2, 2), num_points=1000):
     """
-    Calculate the cumulative sum for each column in a given DataFrame and plot
-    the results in a bar chart.
+    Calculates and plots both a given function and its cumulative integral over a specified range,
+    using a linearly spaced range of x-values.
 
     Parameters:
-    df (pd.DataFrame): The input DataFrame with numerical values.
-                       Must not be empty and must contain numeric data to plot.
-    Returns:
-    - tuple: A tuple containing:
-             (1) A DataFrame with cumulative sums for each column.
-             (2) A matplotlib bar chart Figure of these cumulative sums.
+    func (function): A function of a single variable to integrate and plot.
+    x_range (tuple, optional): The range (start, end) over which to evaluate `func`. Defaults to (-2, 2).
+    num_points (int, optional): Number of points to generate in `x_range`. Defaults to 1000.
 
-    Raises:
-    - ValueError: If the DataFrame is empty or contains non-numeric data.
+    Returns:
+    matplotlib.axes.Axes: The Axes object containing the plots of the function and its integral.
 
     Requirements:
-    - pandas
+    - numpy
+    - scipy
     - matplotlib
 
     Note:
-    - NaN values are ignored in the cumulative sum calculation, i.e. treated as
-      zero for the purpose of the sum without changing existing values to NaN.
-    - The plot title is set to 'Cumulative Sum per Column'.
-    - X-axis label is 'Index' and Y-axis label is 'Cumulative Sum'.
-    - A legend is included in the plot.
+    - The plot includes a legend and labels for the x and y axes that include the function's name.
 
     Example:
-    >>> input_df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    >>> output_df, fig = task_func(input_df)
-    >>> output_df
-       A   B
-    0  1   4
-    1  3   9
-    2  6  15
-    >>> fig
-    <Figure size 640x480 with 1 Axes>
+    >>> ax = task_func(np.sin)
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax.get_legend_handles_labels()[-1]
+    ['sin(x)', 'Integral of sin(x)']
     """
-    cumsum_df = df.cumsum()
+    X = np.linspace(x_range[0], x_range[1], num_points)
+    y = func(X)
+    y_int = integrate.cumulative_trapezoid(y, X, initial=0)
     fig, ax = plt.subplots()
-    cumsum_df.plot(kind="bar", ax=ax)
-    ax.set_title("Cumulative Sum per Column")
-    ax.set_xlabel("Index")
-    ax.set_ylabel("Cumulative Sum")
+    ax.plot(X, y, label=f"{func.__name__}(x)")
+    ax.plot(X, y_int, label=f"Integral of {func.__name__}(x)")
     ax.legend()
-    return cumsum_df, fig
+    return ax
 
-import numpy as np
-import pandas as pd
 import unittest
+import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        # Setup common for all tests
-        self.input_df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
-        self.expected_df = pd.DataFrame({"A": [1, 3, 6], "B": [4, 9, 15]})
+    def tearDown(self):
+        plt.close("all")
+    def helper_assert_plot_attributes(self, func):
+        # Test plot attributes are as expected
+        ax = task_func(func)
+        function_name = func.__name__
+        legend_labels = ax.get_legend_handles_labels()[-1]
+        self.assertIsInstance(ax, Axes)
+        self.assertIn(function_name, legend_labels[0])
+        self.assertIn(function_name, legend_labels[1])
     def test_case_1(self):
-        # Test basic case
-        output_df, _ = task_func(self.input_df)
-        pd.testing.assert_frame_equal(output_df, self.expected_df)
+        # Test basic case in docstring
+        ax = task_func(np.sin)
+        self.helper_assert_plot_attributes(np.sin)
     def test_case_2(self):
-        # Test cumulative sum correctness for a case with negative values
-        input_df_neg = pd.DataFrame({"A": [1, -2, 3], "B": [-4, 5, -6]})
-        expected_df_neg = pd.DataFrame({"A": [1, -1, 2], "B": [-4, 1, -5]})
-        output_df_neg, _ = task_func(input_df_neg)
-        pd.testing.assert_frame_equal(output_df_neg, expected_df_neg)
+        # Test other functions - numpy
+        for func in [np.cos, np.exp]:
+            ax = task_func(func)
+            self.helper_assert_plot_attributes(func)
     def test_case_3(self):
-        # Test bar chart properties
-        _, fig = task_func(self.input_df)
-        self.assertIsInstance(fig, plt.Figure)
-        ax = fig.axes[0]  # Get the Axes object from the figure
-        # Verify the title, x-label, and y-label
-        self.assertEqual(ax.get_title(), "Cumulative Sum per Column")
-        self.assertEqual(ax.get_xlabel(), "Index")
-        self.assertEqual(ax.get_ylabel(), "Cumulative Sum")
-        # Ensure that a legend is present and contains the correct labels
-        legend_labels = [text.get_text() for text in ax.get_legend().get_texts()]
-        expected_labels = self.input_df.columns.tolist()
-        self.assertEqual(legend_labels, expected_labels)
+        # Test other functions - lambda
+        func = lambda x: x ** 2
+        ax = task_func(func)
+        self.helper_assert_plot_attributes(func)
     def test_case_4(self):
-        # Test with an empty DataFrame
-        empty_df = pd.DataFrame()
-        with self.assertRaises(Exception):
-            task_func(empty_df)
+        # Test custom range and points
+        ax = task_func(np.cos, x_range=(0, np.pi), num_points=500)
+        self.assertEqual(len(ax.lines[0].get_xdata()), 500)
+        self.assertEqual(ax.lines[0].get_xdata()[0], 0)
+        self.assertEqual(ax.lines[0].get_xdata()[-1], np.pi)
     def test_case_5(self):
-        # Test with DataFrame containing NaN values
-        nan_df = pd.DataFrame({"A": [1, np.nan, 3], "B": [4, 5, np.nan]})
-        nan_df_cumsum = nan_df.cumsum()
-        output_nan_df, _ = task_func(nan_df)
-        pd.testing.assert_frame_equal(output_nan_df, nan_df_cumsum)
-    def test_case_6(self):
-        # Test with DataFrame containing all zeros
-        zeros_df = pd.DataFrame({"A": [0, 0, 0], "B": [0, 0, 0]})
-        expected_zeros_df = pd.DataFrame({"A": [0, 0, 0], "B": [0, 0, 0]})
-        output_zeros_df, _ = task_func(zeros_df)
-        pd.testing.assert_frame_equal(output_zeros_df, expected_zeros_df)
-    def test_case_7(self):
-        # Test with a DataFrame containing only one row
-        one_row_df = pd.DataFrame({"A": [1], "B": [2]})
-        expected_one_row_df = pd.DataFrame({"A": [1], "B": [2]})
-        output_one_row_df, _ = task_func(one_row_df)
-        pd.testing.assert_frame_equal(output_one_row_df, expected_one_row_df)
+        # Test correct integral calculation
+        # Test integral of x^2 in the range [0,1], should be close to 1/3
+        func = lambda x: x ** 2
+        X = np.linspace(0, 1, 1000)
+        expected_integral = 1 / 3 * X ** 3  # Analytical integral of x^2
+        ax = task_func(func, x_range=(0, 1), num_points=1000)
+        computed_integral = ax.lines[1].get_ydata()[
+            -1
+        ]  # Last value of the computed integral
+        self.assertAlmostEqual(computed_integral, expected_integral[-1], places=4)

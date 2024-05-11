@@ -1,72 +1,54 @@
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
+from collections import Counter
 
-# Updated function to handle empty input list
 def task_func(d):
     """
-    Scale all values with the keys "x," "y" and "z" from a list of dictionaries "d" with MinMaxScaler.
+    Count the occurrence of values with the keys "x," "y" and "z" from a list of dictionaries "d."
 
     Parameters:
     d (list): A list of dictionaries.
 
     Returns:
-    DataFrame: A pandas DataFrame with scaled values.
+    dict: A dictionary with keys as 'x', 'y', and 'z' and values as Counter objects.
 
     Requirements:
     - pandas
-    - sklearn.preprocessing.MinMaxScaler
+    - collections.Counter
 
-    Examples:
-    >>> data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
+    Example:
+    >>> data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 5}, {'x': 2, 'y': 1, 'z': 7}]
     >>> print(task_func(data))
-         x         y    z
-    0  0.0  0.642857  0.0
-    1  1.0  1.000000  0.5
-    2  0.5  0.000000  1.0
-
-    >>> data = [{'x': -1, 'y': 0, 'z': 5}, {'x': 3, 'y': -15, 'z': 0}, {'x': 0, 'y': 1, 'z': -7}]
+    {'x': Counter({1: 1, 3: 1, 2: 1}), 'y': Counter({10: 1, 15: 1, 1: 1}), 'z': Counter({5: 2, 7: 1})}
+    >>> data = [{'x': 2, 'y': 10}, {'y': 15, 'z': 5}, {'x': 2, 'z': 7}]
     >>> print(task_func(data))
-          x       y         z
-    0  0.00  0.9375  1.000000
-    1  1.00  0.0000  0.583333
-    2  0.25  1.0000  0.000000
+    {'x': Counter({2.0: 2}), 'y': Counter({10.0: 1, 15.0: 1}), 'z': Counter({5.0: 1, 7.0: 1})}
     """
-    if not d:  # Check if the input list is empty
-        return pd.DataFrame(columns=['x', 'y', 'z'])  # Return an empty DataFrame with specified columns
     df = pd.DataFrame(d)
-    scaler = MinMaxScaler()
-    scaled_df = pd.DataFrame(scaler.fit_transform(df[['x', 'y', 'z']]), columns=['x', 'y', 'z'])
-    return scaled_df
+    counts = {}
+    for key in ['x', 'y', 'z']:
+        if key in df.columns:
+            counts[key] = Counter(df[key].dropna().tolist())
+        else:
+            counts[key] = Counter()
+    return counts
 
 import unittest
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
-        data = [{'x': 1, 'y': 10, 'z': 5}, {'x': 3, 'y': 15, 'z': 6}, {'x': 2, 'y': 1, 'z': 7}]
-        result = task_func(data)
-        expected_df = pd.DataFrame({'x': [0.0, 1.0, 0.5], 'y': [0.642857, 1.0, 0.0], 'z': [0.0, 0.5, 1.0]})
-        pd.testing.assert_frame_equal(result, expected_df)
-    
-    def test_case_2(self):
-        data = [{'x': -1, 'y': 0, 'z': 5}, {'x': 3, 'y': -15, 'z': 0}, {'x': 0, 'y': 1, 'z': -7}]
-        result = task_func(data)
-        expected_df = pd.DataFrame({'x': [0.0, 1.0, 0.25], 'y': [0.9375, 0.0, 1.0], 'z': [1.0, 0.583333, 0.0]})
-        pd.testing.assert_frame_equal(result, expected_df)
-        
-    def test_case_3(self):
-        data = []
-        result = task_func(data)
-        expected_df = pd.DataFrame(columns=['x', 'y', 'z'])
-        pd.testing.assert_frame_equal(result, expected_df)
-    
-    def test_case_4(self):
+    def test_empty_list(self):
+        self.assertEqual(task_func([]), {'x': Counter(), 'y': Counter(), 'z': Counter()})
+    def test_all_keys_present(self):
+        data = [{'x': 1, 'y': 2, 'z': 3}, {'x': 1, 'y': 3, 'z': 2}]
+        expected = {'x': Counter({1: 2}), 'y': Counter({2: 1, 3: 1}), 'z': Counter({3: 1, 2: 1})}
+        self.assertEqual(task_func(data), expected)
+    def test_missing_keys(self):
         data = [{'x': 1}, {'y': 2}, {'z': 3}]
-        result = task_func(data)
-        expected_df = pd.DataFrame({'x': [0.0, None, None], 'y': [None, 0.0, None], 'z': [None, None, 0.0]})
-        pd.testing.assert_frame_equal(result, expected_df)
-       
-    def test_case_5(self):
-        data = [{'x': 1, 'y': 2}, {'x': 3, 'z': 4}]
-        result = task_func(data)
-        expected_df = pd.DataFrame({'x': [0.0, 1.0], 'y': [0.0, None], 'z': [None, 0.0]})
-        pd.testing.assert_frame_equal(result, expected_df)
+        expected = {'x': Counter({1: 1}), 'y': Counter({2: 1}), 'z': Counter({3: 1})}
+        self.assertEqual(task_func(data), expected)
+    def test_duplicate_values(self):
+        data = [{'x': 1, 'y': 2, 'z': 3}, {'x': 1, 'y': 2, 'z': 3}, {'x': 1, 'y': 2}]
+        expected = {'x': Counter({1: 3}), 'y': Counter({2: 3}), 'z': Counter({3: 2})}
+        self.assertEqual(task_func(data), expected)
+    def test_mixed_data_types(self):
+        data = [{'x': 1, 'y': 'a', 'z': 3.5}, {'x': '1', 'y': 'a', 'z': 3.5}]
+        expected = {'x': Counter({1: 1, '1': 1}), 'y': Counter({'a': 2}), 'z': Counter({3.5: 2})}
+        self.assertEqual(task_func(data), expected)

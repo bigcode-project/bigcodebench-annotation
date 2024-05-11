@@ -1,74 +1,76 @@
-import re
 import pandas as pd
-
-STOPWORDS = ["Those", "are", "the", "words", "to", "ignore"]
-
+import regex as re
 
 def task_func(text):
     """
-    Given a text as input, the function should split it into multiple sentences and build a dictionary where each key is associated with a sentence and the corresponding value is the number of words in the sentence. The function returns a pandas Series built from the dictionary.
-    - The keys of the dictionary (which correspond to the Index of the pandas Series) should be named "Sentence 1", "Sentence 2" etc.
-    - When counting the words in a sentence, do not consider those included in the constant STOPWORDS.
-    - Do not consider empty sentences.
+    Extract data from a text and create a Pandas DataFrame. The text contains several lines, each formatted as 'Score: 85, Category: Math'. Make sure to convert the scores in integer.
 
     Parameters:
     text (str): The text to analyze.
 
     Returns:
-    pandas.core.series.Series: A pandas Series each sentence and its number of words that are not in STOPWORDS.
+    DataFrame: A pandas DataFrame with extracted data.
 
     Requirements:
     - pandas
     - regex
 
     Example:
-    >>> text = "This is a sample sentence. This sentence contains sample words."
-    >>> df = task_func("I am good at programming. I learned it in college.")
+    >>> text = "Score: 85, Category: Math\\nScore: 90, Category: Science\\nScore: 80, Category: Math"
+    >>> df = task_func(text)
     >>> print(df)
-    Sentence 1    5
-    Sentence 2    5
-    dtype: int64
+       Score Category
+    0     85     Math
+    1     90  Science
+    2     80     Math
     """
-    sentences = re.split(r"\.\s*", text)
-    sentence_counts = {}
-    for i, sentence in enumerate(sentences):
-        if sentence.strip() == "":
-            continue
-        words = re.split(r"\s+", sentence.lower())
-        words = [word for word in words if word not in STOPWORDS]
-        sentence_counts[f"Sentence {i+1}"] = len(words)
-    sentence_counts = pd.Series(sentence_counts)
-    return sentence_counts
+    pattern = r"Score: (.*?), Category: (.*?)(\n|$)"
+    matches = re.findall(pattern, text)
+    data = [
+        match[:2] for match in matches
+    ]  # Extracting only the score and category from each match
+    df = pd.DataFrame(data, columns=["Score", "Category"])
+    df["Score"] = df["Score"].astype(int)
+    return df
 
 import unittest
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def test_case_1(self):
-        text = "This is a sample sentence. This sentence contains sample words."
-        expected_output = pd.Series({"Sentence 1": 5, "Sentence 2": 4})
-        result = task_func(text)
-        pd.testing.assert_series_equal(result, expected_output)
+        text = "Score: 85, Category: Math\nScore: 90, Category: Science\nScore: 80, Category: Math"
+        df = task_func(text)
+        self.assertEqual(len(df), 3)
+        self.assertEqual(df["Score"].iloc[0], 85)
+        self.assertEqual(df["Category"].iloc[0], "Math")
+        self.assertEqual(df["Score"].iloc[1], 90)
+        self.assertEqual(df["Category"].iloc[1], "Science")
+        self.assertEqual(df["Score"].iloc[2], 80)
+        self.assertEqual(df["Category"].iloc[2], "Math")
     def test_case_2(self):
-        text = "Hello. My name is Marc. I'm here to help. How can I assist you today?"
-        expected_output = pd.Series(
-            {"Sentence 1": 1, "Sentence 2": 4, "Sentence 3": 3, "Sentence 4": 6}
-        )
-        result = task_func(text)
-        pd.testing.assert_series_equal(result, expected_output)
+        text = "Score: 70, Category: History"
+        df = task_func(text)
+        self.assertEqual(len(df), 1)
+        self.assertEqual(df["Score"].iloc[0], 70)
+        self.assertEqual(df["Category"].iloc[0], "History")
     def test_case_3(self):
-        text = "This is a test. Stopwords are words which do not contain important meaning."
-        expected_output = pd.Series({"Sentence 1": 4, "Sentence 2": 7})
-        result = task_func(text)
-        pd.testing.assert_series_equal(result, expected_output)
+        text = ""  # Empty string
+        df = task_func(text)
+        self.assertEqual(len(df), 0)  # Expecting an empty DataFrame
     def test_case_4(self):
-        text = "Hello! How are you? I'm fine, thanks."
-        expected_output = pd.Series(
-            {"Sentence 1": 6}
-        )  # Only the last sentence is split by a period
-        result = task_func(text)
-        pd.testing.assert_series_equal(result, expected_output)
+        text = "Score: 70, Category: Chemistry"
+        df = task_func(text)
+        self.assertEqual(len(df), 1)
+        self.assertEqual(df["Score"].iloc[0], 70)
+        self.assertEqual(df["Category"].iloc[0], "Chemistry")
     def test_case_5(self):
-        text = ""
-        expected_output = pd.Series()
-        result = task_func(text)
-        pd.testing.assert_series_equal(result, expected_output)
+        text = "Score: 70, Category: Literature\nScore: 37, Category: Mathematics\nScore: 90, Category: Japanese\nScore: 58, Category: Machine Learning"
+        df = task_func(text)
+        self.assertEqual(len(df), 4)
+        self.assertEqual(df["Score"].iloc[0], 70)
+        self.assertEqual(df["Category"].iloc[0], "Literature")
+        self.assertEqual(df["Score"].iloc[1], 37)
+        self.assertEqual(df["Category"].iloc[1], "Mathematics")
+        self.assertEqual(df["Score"].iloc[2], 90)
+        self.assertEqual(df["Category"].iloc[2], "Japanese")
+        self.assertEqual(df["Score"].iloc[3], 58)
+        self.assertEqual(df["Category"].iloc[3], "Machine Learning")

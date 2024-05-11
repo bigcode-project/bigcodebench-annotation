@@ -1,137 +1,125 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.preprocessing import MinMaxScaler
+import numpy as np
 
 
-def task_func(data: pd.DataFrame) -> (pd.DataFrame, plt.Axes):
+def task_func(L):
     """
-    Normalize the data and visualize it using a heatmap.
+    Draw a histogram of all elements in a nested list 'L' and return the Axes object of the plot.
 
-    This function takes a pandas DataFrame, normalizes the data to a range [0, 1], and then visualizes this
-    normalized data using a seaborn heatmap.  The heatmap uses the "YlGnBu" colormap to represent normalized
-    values and includes a color bar labeled "Normalized Value" to indicate the range of data values.
-    It returns both the normalized data and the heatmap plot.
+    The function first uses Numpy to handle array operations, checking for correct input type
+    while ignoring empty sublists. It then plots the histogram using pandas, assigning
+    each unique value its own bin and plotting the histogram with rwidth 0.8.
 
     Parameters:
-    - data (pd.DataFrame): The input data with multiple features in columns.
+    L (list of list of int): Nested list of integers.
 
     Returns:
-    - pd.DataFrame: Normalized data.
-    - plt.Axes: Heatmap plot of the normalized data.
+    ax (matplotlib.axes._axes.Axes): The Axes object of the histogram plot.
 
+    Raises:
+    If the input is not a list of list of integers, a TypeError is raised.
+    
     Requirements:
     - pandas
     - numpy
-    - matplotlib.pyplot
-    - seaborn
-    
+
     Example:
-    >>> df = pd.DataFrame([[1,1,1], [2,2,2], [3,3,3]], columns=['Feature1', 'Feature2', 'Feature3'])
-    >>> normalized_df, _ = task_func(df)
-    >>> type(normalized_df)
-    <class 'pandas.core.frame.DataFrame'>
-    >>> normalized_df['Feature1'].iloc[0]  # Returns a normalized value between 0 and 1
-    0.0
+    >>> ax = task_func([[1,2,3],[4,5,6]])
+    >>> type(ax)
+    <class 'matplotlib.axes._axes.Axes'>
+    >>> ax.get_xticklabels()
+    [Text(0.0, 0, '0'), Text(1.0, 0, '1'), Text(2.0, 0, '2'), Text(3.0, 0, '3'), Text(4.0, 0, '4'), Text(5.0, 0, '5'), Text(6.0, 0, '6'), Text(7.0, 0, '7')]
     """
-    scaler = MinMaxScaler()
-    normalized_data = pd.DataFrame(scaler.fit_transform(data), columns=data.columns)
-    plt.figure(figsize=(10, 8))
-    ax = sns.heatmap(
-        normalized_data, cmap="YlGnBu", cbar_kws={"label": "Normalized Value"}
-    )
-    return normalized_data, ax
+    flattened = np.concatenate([l for l in L if l])
+    if not np.issubdtype(flattened.dtype, np.integer):
+        raise TypeError("Expected list of list of int")
+    bins = len(np.unique(flattened))
+    ax = pd.Series(flattened).plot(kind="hist", rwidth=0.8, bins=bins)
+    return ax
 
 import unittest
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        np.random.seed(0)
-        # default columns used for testing, but function is not limited to these options
-        self.expected_columns = [
-            "Feature1",
-            "Feature2",
-            "Feature3",
-            "Feature4",
-            "Feature5",
-        ]
-    def _check_data_structure(self, data, expected_columns):
-        self.assertIsInstance(data, pd.DataFrame)
-        for col in data.columns:
-            self.assertIn(col, expected_columns)
-    def _check_data_value(self, data):
-        # Check if values in normalized data are between 0 and 1
-        # (allowing a small margin for precision issues)
-        self.assertTrue(((data.values >= -1e-10) & (data.values <= 1.00000001)).all())
-    def _check_heatmap(self, ax):
-        # Test visualization
-        self.assertIsInstance(ax, plt.Axes)
-        self.assertEqual(len(ax.collections), 1)  # 1 heatmap
-        cbar = ax.collections[0].colorbar
-        self.assertTrue(cbar is not None)
-        self.assertTrue(cbar.ax.get_ylabel(), "Normalized Value")
-        self.assertEqual(ax.collections[0].cmap.name, "YlGnBu")
     def test_case_1(self):
-        # Test with random data
-        data = pd.DataFrame(
-            np.random.rand(100, 5),
-            columns=self.expected_columns,
-        )
-        normalized_data, ax = task_func(data)
-        self._check_data_structure(normalized_data, self.expected_columns)
-        self._check_data_value(normalized_data)
-        self._check_heatmap(ax)
+        # Test non-overlapping numbers split into multi-item listss
+        ax = task_func([[1, 2, 3], [4, 5, 6]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticklabels()), 8)
+        self.assertEqual(len(ax.get_yticklabels()), 7)
     def test_case_2(self):
-        # Test with data having all zeros
-        data = pd.DataFrame(
-            np.zeros((100, 5)),
-            columns=self.expected_columns,
-        )
-        normalized_data, ax = task_func(data)
-        self._check_data_structure(normalized_data, self.expected_columns)
-        self._check_heatmap(ax)
-        # Check if all values in normalized data are zero
-        self.assertTrue((normalized_data.values == 0).all())
+        # Test non-overlapping numbers in individual lists
+        ax = task_func([[1], [2], [3], [4], [5], [6]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticklabels()), 8)
+        self.assertEqual(len(ax.get_yticklabels()), 7)
     def test_case_3(self):
-        # Test with data having incremental values
-        data = pd.DataFrame(
-            np.arange(500).reshape(100, 5),
-            columns=self.expected_columns,
-        )
-        normalized_data, ax = task_func(data)
-        self._check_data_structure(normalized_data, self.expected_columns)
-        self._check_data_value(normalized_data)
-        self._check_heatmap(ax)
+        # Test overlapping numbers split into multi-item lists
+        ax = task_func([[1, 1], [2, 2], [3, 3]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticklabels()), 11)
+        self.assertEqual(len(ax.get_yticklabels()), 10)
     def test_case_4(self):
-        # Test with data having decremental values
-        data = pd.DataFrame(
-            np.arange(500, 0, -1).reshape(100, 5),
-            columns=self.expected_columns,
-        )
-        normalized_data, ax = task_func(data)
-        self._check_data_structure(normalized_data, self.expected_columns)
-        self._check_data_value(normalized_data)
-        self._check_heatmap(ax)
+        # Test overlapping numbers that repeat across items
+        ax = task_func([[1, 2], [1, 3], [2, 3]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticklabels()), 11)
+        self.assertEqual(len(ax.get_yticklabels()), 10)
     def test_case_5(self):
-        # Test single valid column
-        data = pd.DataFrame(np.random.rand(100, 1), columns=["Feature1"])
-        normalized_data, ax = task_func(data)
-        self._check_data_structure(normalized_data, ["Feature1"])
-        self._check_data_value(normalized_data)
-        self._check_heatmap(ax)
+        # Test overlapping numbers in individual lists
+        ax = task_func([[1], [1], [2], [2], [3], [3]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticklabels()), 11)
+        self.assertEqual(len(ax.get_yticklabels()), 10)
+        
     def test_case_6(self):
-        # Test should fail when inputs are invalid - string column
-        data = pd.DataFrame(
-            {"Feature1": np.random.rand(100), "Feature2": ["string"] * 100}
-        )
-        with self.assertRaises(ValueError):
-            task_func(data)
+        # Test case with uneven segment sizes
+        ax = task_func([[10, 20, 30], [40]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticklabels()), 9)
+        self.assertEqual(len(ax.get_yticklabels()), 7)
     def test_case_7(self):
-        # Test should fail when inputs are invalid - empty dataframe
-        data = pd.DataFrame()
+        # Test negative integers
+        ax = task_func([[-1, -2], [-2, -3]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticklabels()), 11)
+        self.assertEqual(len(ax.get_yticklabels()), 10)
+    def test_case_8(self):
+        # Test larger integers
+        ax = task_func([[10000, 20000], [30000]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticklabels()), 11)
+        self.assertEqual(len(ax.get_yticklabels()), 7)
+    def test_case_9(self):
+        # Test single element
+        ax = task_func([[1]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticklabels()), 11)
+        self.assertEqual(len(ax.get_yticklabels()), 7)
+    def test_case_10(self):
+        # Test handling mix of valid sublists and empty ones
+        ax = task_func([[], [1, 2], [], [3, 4], []])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticklabels()), 9)
+        self.assertEqual(len(ax.get_yticklabels()), 7)
+    def test_case_11(self):
+        # Test handling NumPy array conversion
+        ax = task_func([[np.int64(1)], [np.int32(2)], [3]])
+        self.assertIsInstance(ax, plt.Axes)
+        self.assertEqual(len(ax.get_xticklabels()), 11)
+        self.assertEqual(len(ax.get_yticklabels()), 7)
+    def test_case_12(self):
+        # Test handling invalid input - fully empty lists, excessive nesting
         with self.assertRaises(ValueError):
-            task_func(data)
+            task_func([[], [], []])
+        with self.assertRaises(ValueError):
+            task_func([[[1]], [2], [3]])
+    def test_case_13(self):
+        # Test handling invalid input - non-int types
+        with self.assertRaises(TypeError):
+            task_func([1.1, 2.2], [3.3])
+        with self.assertRaises(TypeError):
+            task_func(["1", "2"], ["3", "4"])
+        with self.assertRaises(TypeError):
+            task_func([[1, 2], ["a", "b"]])
     def tearDown(self):
         plt.close("all")

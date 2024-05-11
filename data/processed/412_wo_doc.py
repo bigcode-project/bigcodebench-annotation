@@ -1,112 +1,81 @@
-import pandas as pd
 import json
+import base64
+import unicodedata
 
-
-def task_func(data: dict, output_path: str = "./default_data_output.json") -> str:
-    """Converts the given DataFrame to a dictionary, dropping the column named 'c'
-    if it exists, and then saves it as a JSON file.
+def task_func(json_file: str) -> dict:
+    """
+    This function reads a JSON file where each key is a unique identifier, and the corresponding value is a base64 encoded string.
+    After decoding, it applies Unicode normalization form C (NFC) to each decoded string to ensure the canonical composition of characters.
+    The function returns a dictionary where the keys are preserved, and the values are the normalized, decoded strings. Decoding is performed using the UTF-8 encoding scheme.
 
     Parameters:
-    - data (dict): The input data dictionary.
-    - output_path (str, optional): The path where the JSON file should be saved. Default is './default_data_output.json'.
+    - json_file (str): The path to the JSON file.
 
     Returns:
-    - str: Path where the JSON file was saved.
+    - dict: A dictionary where each key is mapped to a normalized, decoded string from the base64 encoded value in the input file.
 
     Requirements:
-    - pandas
+    - unicodedata
     - json
+    - base64
 
-    Example:
-    >>> task_func({'a': [1,2], 'b': [3,4], 'c': [5,6]})
-    './default_data_output.json'
-    >>> task_func({'a': [1,2], 'b': [3,4], 'c': [5,6]}, 'custom/path/results.json')
-    'custom/path/results.json'
+    Examples:
+    Given a file 'example.json' with the content:
+    {"key1": "SGVsbG8gV29ybGQ=", "key2": "UHl0aG9uIENvZGUgUmVmaW5lcg=="}
+
+    >>> task_func('example.json')
+    {'key1': 'Hello World', 'key2': 'Python Code Refiner'}
+
+    Given a file 'empty.json' with the content:
+    {}
+
+    >>> task_func('empty.json')
+    {}
     """
-    df = pd.DataFrame(data)
-    df = df.drop(columns="c", errors="ignore")
-    data_dict = df.to_dict(orient="dict")
-    with open(output_path, "w") as file:
-        json.dump(data_dict, file)
-    return output_path
+    ENCODING = 'utf-8'
+    with open(json_file, 'r') as f:
+        data = json.load(f)
+    decoded_data = {k: unicodedata.normalize('NFC', base64.b64decode(v).decode(ENCODING)) for k, v in data.items()}
+    return decoded_data
 
 import unittest
-import pandas as pd
+from unittest.mock import mock_open, patch
 import json
-import os
 class TestCases(unittest.TestCase):
-    def read_json_file(self, path):
-        # Helper function to read content from a JSON file
-        with open(path, "r") as f:
-            return json.load(f)
-    def tearDown(self):
-        # Cleanup procedure after each test to remove generated files
-        files_to_remove = [
-            "./default_data_output.json",
-            "./custom_data_output_2.json",
-            "./custom_data_output_3.json",
-            "./custom_data_output_4.json",
-            "./custom_data_output_5.json",
-        ]
-        for file in files_to_remove:
-            if os.path.exists(file):
-                os.remove(file)
-    def convert_keys_to_str(self, dictionary):
-        # Convert dictionary keys to strings recursively
-        if not isinstance(dictionary, dict):
-            return dictionary
-        return {str(k): self.convert_keys_to_str(v) for k, v in dictionary.items()}
-    def test_case_1(self):
-        # Test basic DataFrame with column "c"
-        data = {"a": [1, 2], "b": [3, 4], "c": [5, 6]}
-        df = pd.DataFrame(data)
-        output_path = task_func(data)
-        self.assertTrue(os.path.exists(output_path))
-        expected_data = self.convert_keys_to_str(
-            df.drop(columns="c").to_dict(orient="dict")
-        )
-        self.assertEqual(self.read_json_file(output_path), expected_data)
-    def test_case_2(self):
-        # Test DataFrame with non-numeric data and column "c"
-        data = {"name": ["Alice", "Bob"], "country": ["USA", "Canada"], "c": ["x", "y"]}
-        df = pd.DataFrame(data)
-        custom_path = "./custom_data_output_2.json"
-        output_path = task_func(data, custom_path)
-        self.assertTrue(os.path.exists(output_path))
-        expected_data = self.convert_keys_to_str(
-            df.drop(columns="c").to_dict(orient="dict")
-        )
-        self.assertEqual(self.read_json_file(output_path), expected_data)
-    def test_case_3(self):
-        # Test DataFrame with multiple columns and no column "c"
-        data = {"age": [25, 30], "height": [170, 175]}
-        df = pd.DataFrame(data)
-        custom_path = "./custom_data_output_3.json"
-        output_path = task_func(data, custom_path)
-        self.assertTrue(os.path.exists(output_path))
-        expected_data = self.convert_keys_to_str(df.to_dict(orient="dict"))
-        self.assertEqual(self.read_json_file(output_path), expected_data)
-    def test_case_4(self):
-        # Test DataFrame with mixed data types including column "c"
-        data = {
-                "id": [1, 2],
-                "is_student": [True, False],
-                "grades": ["A", "B"],
-                "c": [0.5, 0.8],
-            }
-        df = pd.DataFrame(data)
-        output_path = task_func(data)
-        self.assertTrue(os.path.exists(output_path))
-        expected_data = self.convert_keys_to_str(
-            df.drop(columns="c").to_dict(orient="dict")
-        )
-        self.assertEqual(self.read_json_file(output_path), expected_data)
-    def test_case_5(self):
-        # Test an empty DataFrame
-        data = {}
-        df = pd.DataFrame(data)
-        custom_path = "./custom_data_output_5.json"
-        output_path = task_func(data, custom_path)
-        self.assertTrue(os.path.exists(output_path))
-        expected_data = self.convert_keys_to_str(df.to_dict(orient="dict"))
-        self.assertEqual(self.read_json_file(output_path), expected_data)
+    def setUp(self):
+        # Initialize test data and expected results
+        self.mock_data = '{"key1": "SGVsbG8gV29ybGQ=", "key2": "UHl0aG9uIENvZGUgUmVmaW5lcg=="}'
+        self.expected_output = {'key1': 'Hello World', 'key2': 'Python Code Refiner'}
+    def test_decode_base64(self):
+        # Test decoding base64 encoded strings from a mock JSON file
+        with patch('builtins.open', mock_open(read_data=self.mock_data)):
+            result = task_func('dummy_file.json')
+            self.assertEqual(result, self.expected_output)
+    def test_empty_json(self):
+        # Test handling of an empty JSON file
+        with patch('builtins.open', mock_open(read_data='{}')):
+            result = task_func('dummy_file.json')
+            self.assertEqual(result, {})
+    def test_non_json_content(self):
+        # Test error handling for non-JSON content
+        with patch('builtins.open', mock_open(read_data='Not a JSON')):
+            with self.assertRaises(json.JSONDecodeError):
+                task_func('dummy_file.json')
+    def test_file_not_found(self):
+        # Test error handling for a non-existent file
+        with self.assertRaises(FileNotFoundError):
+            task_func('non_existent_file.json')
+    def test_invalid_base64(self):
+        # Test error handling for invalid base64 encoding
+        with patch('builtins.open', mock_open(read_data='{"key1": "Invalid base64"}')):
+            with self.assertRaises(ValueError):
+                task_func('dummy_file.json')
+    def test_unicode_normalization(self):
+        # Properly encode a Unicode string 'è' to base64
+        unicode_string = 'è'
+        encoded_unicode_string = base64.b64encode(unicode_string.encode('utf-8')).decode('ascii')
+        mock_data_with_unicode = f'{{"key1": "{encoded_unicode_string}"}}'  # Encoded mock data
+        expected_normalized_output = {'key1': 'è'}  # Expected result after normalization
+        with patch('builtins.open', mock_open(read_data=mock_data_with_unicode)):
+            result = task_func('dummy_file_unicode.json')
+            self.assertEqual(result, expected_normalized_output)

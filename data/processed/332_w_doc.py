@@ -1,69 +1,60 @@
-import bisect
-import random
+import re
+from collections import Counter
+from nltk.corpus import stopwords
 
-def task_func(num, list_length = 5, min_value = 0, max_value = 0):
+
+def task_func(text: str) -> dict:
     """
-    Insert a number into a randomly generated sorted list and return the new sorted list.
-
+    Count the number of non-stop words in a given text.
+    
     Parameters:
-    num (int): The integer number to insert.
-    list_length (int): The length of the randomly generated list of integers.
-    min_value (int): The minimum value for randomly generated integers.
-    max_value (int): The maximum value for randomly generated integers.
-
+    - text (str): The input text for word counting.
+    
     Returns:
-    tuple: A tuple containing two lists: 
-        list[int]: The randomly generated list of integers with the specified length.
-        list[int]: A new sorted list containing the original elements and the inserted number.
+    dict: A dictionary with the words (as keys) and their counts (as values).
     
     Requirements:
-    - bisect
-    - random
-
+    - re
+    - collections.Counter
+    
     Example:
-    >>> random.seed(0)
-    >>> task_func(4, 5, 100, 100)
-    ([100, 100, 100, 100, 100], [4, 100, 100, 100, 100, 100])
-    >>> task_func(15, 0, 10, 20)
-    ([], [15])
+    >>> count = task_func("This is a sample text. Some words are repeated.")
+    >>> print(count)
+    {'sample': 1, 'text': 1, 'words': 1, 'repeated': 1}
     """
-    numbers = [random.randint(min_value, max_value) for _ in range(list_length)]
-    sorted_list = numbers.copy()
-    bisect.insort(sorted_list, num)
-    return numbers, sorted_list
+    words = re.findall(r'\b\w+\b', text)
+    non_stopwords = [word for word in words if word.lower() not in set(stopwords.words('english'))]
+    count = dict(Counter(non_stopwords))
+    return count
 
 import unittest
-from unittest.mock import patch
-import random
+import doctest
 class TestCases(unittest.TestCase):
-    @patch('random.randint', side_effect=[12, 23, 34, 45, 56])
-    def test_insert_into_empty_list(self, mock_randint):
-        random.seed(0)
-        result = task_func(15, 0, 5, 60)
-        self.assertEqual(result, ([], [15]))
-    @patch('random.randint', side_effect=[12, 23, 34, 45, 56])
-    def test_insert_into_existing_list(self, mock_randint):
-        random.seed(0)
-        result = task_func(15, 5, 10, 60)
-        self.assertEqual(result, ([12, 23, 34, 45, 56], [12, 15, 23, 34, 45, 56]))
-    @patch('random.randint', side_effect=[12, 23, 34, 45, 56])
-    def test_insert_at_beginning(self, mock_randint):
-        random.seed(0)
-        result = task_func(4, 4, 10, 60)
-        self.assertEqual(result, ([12, 23, 34, 45], [4, 12, 23, 34, 45]))
-    # @patch('random.randint', side_effect=[12, 23, 34, 45, 56])
-    def test_insert_at_end(self):
-        random.seed(0)
-        result = task_func(15, 4, 10, 10)
-        self.assertEqual(result, ([10, 10, 10, 10], [10, 10, 10, 10, 15]))
-    @patch('random.randint', side_effect=[12, 34, 56])
-    def test_insert_in_middle(self, mock_randint):
-        random.seed(0)
-        result = task_func(15, 3, 10, 60)
-        self.assertEqual(result, ([12, 34, 56], [12, 15, 34, 56]))
-    @patch('random.randint', side_effect=[12, 23, 34, 45, 56])
-    def test_random_list_length(self, mock_randint):
-        random.seed(0)
-        result = task_func(15, 5, 10, 20)
-        self.assertEqual(len(result[0]), 5)
-        self.assertIn(15, result[1])
+    def test_case_1(self):
+        # Simple sentence with some stopwords
+        input_text = "This is a simple test."
+        expected_output = {'simple': 1, 'test': 1}
+        self.assertDictEqual(task_func(input_text), expected_output)
+    def test_case_2(self):
+        # Longer sentence with repeated words
+        input_text = "Some words are repeated more than once. Repeated words are common."
+        expected_output = {'words': 2, 'repeated': 1, 'Repeated': 1, 'common': 1}
+        self.assertDictEqual(task_func(input_text), expected_output)
+        
+    def test_case_3(self):
+        # Text with no stopwords
+        input_text = "Python programming language."
+        expected_output = {'Python': 1, 'programming': 1, 'language': 1}
+        self.assertDictEqual(task_func(input_text), expected_output)
+        
+    def test_case_4(self):
+        # Text with all stopwords
+        input_text = "This is an and the with"
+        expected_output = {}
+        self.assertDictEqual(task_func(input_text), expected_output)
+        
+    def test_case_5(self):
+        # Empty text
+        input_text = ""
+        expected_output = {}
+        self.assertDictEqual(task_func(input_text), expected_output)

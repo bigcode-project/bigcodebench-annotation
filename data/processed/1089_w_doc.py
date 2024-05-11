@@ -1,83 +1,87 @@
 import numpy as np
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
+from collections import Counter
 
 
-def task_func(data=None):
+def task_func(list_of_tuples):
     """
-    Pre-process a dataset by converting it to a Pandas DataFrame,
-    replacing values less than 0.5 with zeros, and
-    standardizing the data using StandardScaler.
+    Computes the sum of numeric values and counts the occurrences of categories in a list of tuples.
+
+    Each tuple in the input list contains a numeric value and a category. This function calculates
+    the sum of all the numeric values and also counts how many times each category appears in the list.
 
     Parameters:
-    - data (numpy.ndarray, optional): A numpy array representing the dataset. If not provided, a random dataset
-      of shape (100, 5) is generated.
+    - list_of_tuples (list of tuple): A list where each tuple contains a numeric value and a category.
 
     Returns:
-    - pandas.DataFrame: The preprocessed dataset. Original values less than 0.5 are replaced with zeros, and the
-      entire dataset is standardized.
+    - tuple: A 2-element tuple where the first element is the sum of the numeric values, and the
+             second element is a dictionary with categories as keys and their counts as values.
 
     Requirements:
     - numpy
-    - pandas
-    - sklearn.preprocessing.StandardScaler
+    - collections.Counter
 
     Example:
-    >>> np.random.seed(0)
-    >>> dataset = np.random.rand(10, 5)
-    >>> preprocessed_data = task_func(dataset)
-    >>> preprocessed_data.head(2)
-              0         1         2        3         4
-    0  0.175481  1.062315  0.244316 -0.17039 -0.647463
-    1  0.461851 -0.978767  1.052947  1.06408 -0.647463
+    >>> list_of_tuples = [(5, 'Fruits'), (9, 'Vegetables'), (-1, 'Dairy'), (-2, 'Bakery'), (4, 'Meat')]
+    >>> sum_of_values, category_counts = task_func(list_of_tuples)
+    >>> print(sum_of_values)
+    15
+    >>> print(category_counts)
+    {'Fruits': 1, 'Vegetables': 1, 'Dairy': 1, 'Bakery': 1, 'Meat': 1}
     """
-    if data is None:
-        data = np.random.rand(100, 5)
-    df = pd.DataFrame(data)
-    df[df < 0.5] = 0
-    scaler = StandardScaler()
-    scaled_data = scaler.fit_transform(df)
-    standardized_df = pd.DataFrame(scaled_data, columns=df.columns)
-    return standardized_df
+    numeric_values = [pair[0] for pair in list_of_tuples]
+    categories = [pair[1] for pair in list_of_tuples]
+    total_sum = np.sum(numeric_values)
+    category_counts = Counter(categories)
+    return total_sum, dict(category_counts)
 
-import numpy as np
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
 import unittest
 class TestCases(unittest.TestCase):
-    """Test cases for the function task_func."""
-    def test_default_dataset(self):
-        """Test the function with default dataset."""
-        result = task_func()
-        self.assertIsInstance(result, pd.DataFrame)
-        self.assertEqual(result.shape, (100, 5))
-    def test_small_dataset(self):
-        """Test the function with a small dataset."""
-        data = np.array([[0.1, 0.9], [0.4, 0.8]])
-        result = task_func(data)
-        self.assertEqual(result.shape, (2, 2))
-    def test_replacement(self):
-        """Test the replacement of values less than 0.5."""
-        data = np.array([[0.1, 0.9], [0.4, 0.8]])
-        result = task_func(data)
-        self.assertNotIn(0.1, result.values)
-        self.assertNotIn(0.4, result.values)
-    def test_no_replacement(self):
-        """Test no replacement for values greater than 0.5."""
-        data = np.array([[0.6, 0.9], [0.7, 0.8]])
-        result = task_func(data)
-        self.assertNotIn(0.6, result.values)
-        self.assertNotIn(0.7, result.values)
-        self.assertNotIn(0.8, result.values)
-        self.assertNotIn(0.9, result.values)
-    def test_standardization(self):
-        """Test the standardization of the dataset."""
-        data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-        result = task_func(data)
-        self.assertTrue(np.isclose(result.mean().mean(), 0, atol=1e-5))
-        self.assertTrue(np.isclose(result.std().mean(), 1.225, atol=0.01))
-        """Test the replacement of values less than 0.5."""
-        data = np.array([[0.1, 0.9], [0.4, 0.8]])
-        result = task_func(data)
-        self.assertNotIn(0.1, result.values)
-        self.assertNotIn(0.4, result.values)
+    def test_case_1(self):
+        # Regular list of tuples with different categories
+        input_data = [(5, 'Fruits'), (9, 'Vegetables'), (-1, 'Dairy'), (-2, 'Bakery'), (4, 'Meat')]
+        sum_values, count_values = task_func(input_data)
+        self.assertEqual(sum_values, 15)
+        self.assertEqual(count_values, {'Fruits': 1, 'Vegetables': 1, 'Dairy': 1, 'Bakery': 1, 'Meat': 1})
+    def test_case_2(self):
+        # List of tuples with all the same categories
+        input_data = [(5, 'Fruits'), (9, 'Fruits'), (-1, 'Fruits'), (-2, 'Fruits')]
+        sum_values, count_values = task_func(input_data)
+        self.assertEqual(sum_values, 11)
+        self.assertEqual(count_values, {'Fruits': 4})
+    def test_case_3(self):
+        # List of tuples with all negative numeric values
+        input_data = [(-5, 'Fruits'), (-9, 'Vegetables'), (-1, 'Dairy')]
+        sum_values, count_values = task_func(input_data)
+        self.assertEqual(sum_values, -15)
+        self.assertEqual(count_values, {'Fruits': 1, 'Vegetables': 1, 'Dairy': 1})
+    def test_case_4(self):
+        # Empty list
+        input_data = []
+        sum_values, count_values = task_func(input_data)
+        self.assertEqual(sum_values, 0)
+        self.assertEqual(count_values, {})
+    def test_case_5(self):
+        # List of tuples with mixed positive and negative numeric values for the same category
+        input_data = [(5, 'Fruits'), (-5, 'Fruits'), (3, 'Fruits')]
+        sum_values, count_values = task_func(input_data)
+        self.assertEqual(sum_values, 3)
+        self.assertEqual(count_values, {'Fruits': 3})
+    def test_empty_list(self):
+        """Test with an empty list."""
+        self.assertEqual(task_func([]), (0, {}))
+    def test_all_negative_values(self):
+        """Test with all negative numeric values."""
+        list_of_tuples = [(-5, 'Fruits'), (-2, 'Vegetables')]
+        self.assertEqual(task_func(list_of_tuples), (-7, {'Fruits': 1, 'Vegetables': 1}))
+    def test_duplicate_categories(self):
+        """Test with duplicate categories."""
+        list_of_tuples = [(1, 'Fruits'), (2, 'Fruits'), (3, 'Vegetables')]
+        self.assertEqual(task_func(list_of_tuples), (6, {'Fruits': 2, 'Vegetables': 1}))
+    def test_single_tuple_in_list(self):
+        """Test with a single tuple in the list."""
+        list_of_tuples = [(10, 'Meat')]
+        self.assertEqual(task_func(list_of_tuples), (10, {'Meat': 1}))
+    def test_float_numeric_values(self):
+        """Test with non-integer numeric values (floats)."""
+        list_of_tuples = [(1.5, 'Fruits'), (2.5, 'Vegetables')]
+        self.assertEqual(task_func(list_of_tuples), (4.0, {'Fruits': 1, 'Vegetables': 1}))

@@ -21,6 +21,10 @@ def f_322(frequency, sample_size=10000):
     - matplotlib.pyplot for plotting
     - math for mathematical constants
 
+    Raises:
+    - ValueError: If the frequency is negative.
+    - ValueError: If the sample size is non-positive.
+    
     Example:
     >>> fig, ax = f_322(1, 2500)
     >>> type(fig)

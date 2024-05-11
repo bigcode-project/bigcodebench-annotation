@@ -1,63 +1,96 @@
-import struct
-import io
-import gzip
+import pandas as pd
+import seaborn as sns
+from scipy import stats
 
-def task_func(newArray):
+# Constants
+COLUMN_NAMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+
+
+def task_func(data):
     """
-    Compresses a given NumPy array using gzip compression and returns the compressed data.
-
-    This method takes a NumPy array as input, compresses it using gzip, and returns the compressed data as bytes.
-    It is useful for efficiently handling large datasets, especially when saving space is a concern.
-    The function utilizes the struct module to pack the array elements into bytes before compressing them.
-    The compressed data can then be used for storage or transmission purposes where space efficiency is crucial.
+    Processes a given dataset to compute the average of each row, plots the distribution of these averages,
+    and evaluates their normality. The function returns these averages as an additional column in a DataFrame,
+    the plot of the distribution, and the p-value from the normality test if applicable.
 
     Parameters:
-        newArray (numpy.array): The NumPy array to be compressed. The array should contain numerical data.
+    data (numpy.array): A 2D numpy array with eight columns representing different data types or categories, with a
+    shape of (n_samples, 8).
 
     Returns:
-        bytes: The gzipped data of the NumPy array.
+    tuple: Contains three elements:
+        - DataFrame: A pandas DataFrame with the original data and an added 'Average' column.
+        - Axes object: The Axes object from the seaborn distribution plot of the averages.
+        - float or None: The p-value from the normality test on the averages, or None
+        if the test could not be conducted.
 
     Requirements:
-    - struct
-    - io
-    - gzip
+    - pandas
+    - seaborn
+    - scipy
 
-    Examples:
-    >>> isinstance(task_func(np.array([1, 2, 3])), bytes)
-    True
-    >>> len(task_func(np.array([1, 2, 3, 4, 5]))) > 0
-    True
+    Raises:
+    ValueError: If the input data does not have exactly eight columns.
+
+    Note:
+    The function uses seaborn's distplot for visualization and scipy's normaltest for statistical analysis.
+    It requires at least 20 data points to perform the normality test.
+
+    Example:
+    >>> import numpy as np
+    >>> data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])
+    >>> df, ax, p_value = task_func(data)
+    >>> print(df)
+       A  B  C  D  E  F  G  H  Average
+    0  1  2  3  4  4  3  7  1    3.125
+    1  6  2  3  4  3  4  4  1    3.375
+    >>> print(p_value)
+    None
     """
-    buffer = io.BytesIO()
-    with gzip.GzipFile(fileobj=buffer, mode='w') as f:
-        f.write(struct.pack('d'*newArray.size, *newArray))
-    return buffer.getvalue()
+    if data.shape[1] != 8:
+        raise ValueError("Data must contain exactly eight columns.")
+    df = pd.DataFrame(data, columns=COLUMN_NAMES)
+    df['Average'] = df.mean(axis=1)
+    ax = sns.kdeplot(df['Average'], linewidth=3)
+    if len(df['Average']) >= 20:
+        k2, p = stats.normaltest(df['Average'])
+    else:
+        p = None
+    return df, ax, p
 
-import unittest
 import numpy as np
+import pandas as pd
+import unittest
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
-    def test_return_type(self):
-        """Test that the function returns bytes."""
-        result = task_func(np.array([1, 2, 3]))
-        self.assertIsInstance(result, bytes)
-    def test_gzipped_data_size(self):
-        """Test the size of the gzipped data is greater than 0."""
-        data = task_func(np.array([1, 2, 3]))
-        self.assertGreater(len(data), 0)
-    def test_with_different_array_sizes(self):
-        """Ensure larger arrays produce gzipped data of greater or equal size compared to smaller arrays."""
-        small_array = task_func(np.array([1]))
-        larger_array = task_func(np.array(range(100)))
-        self.assertGreaterEqual(len(larger_array), len(small_array))
-    def test_with_different_array_types(self):
-        """Compare gzipped sizes of int and float arrays to acknowledge compression differences."""
-        int_array = task_func(np.array([1, 2, 3], dtype=int))
-        float_array = task_func(np.array([1.0, 2.0, 3.0], dtype=float))
-        # Acknowledge that the compression might affect differently due to data representation
-        # Therefore, not asserting equality of lengths but rather that they are compressed without error
-        self.assertTrue(len(int_array) > 0 and len(float_array) > 0)
-    def test_compression_efficiency(self):
-        """Test that repeated elements in an array compress to a smaller size than unique elements."""
-        repeated_elements = task_func(np.array([1]*100))
-        unique_elements = task_func(np.array(range(100)))
-        self.assertLess(len(repeated_elements), len(unique_elements))
+    def setUp(self):
+        # Mock plt.show to prevent it from displaying plots during tests
+        self.addCleanup(plt.close, 'all')
+    def test_basic_functionality(self):
+        data = np.array([[1, 2, 3, 4, 4, 3, 7, 1], [6, 2, 3, 4, 3, 4, 4, 1]])
+        df, ax, p_value = task_func(data)
+        expected_averages = [np.mean(row) for row in data]
+        self.assertTrue(isinstance(df, pd.DataFrame), "Expected output to be a pandas DataFrame")
+        self.assertIn('Average', df.columns, "DataFrame should have an 'Average' column")
+        self.assertTrue(np.array_equal(df['Average'], expected_averages), "Averages are not calculated correctly")
+        self.assertTrue(isinstance(ax, plt.Axes), "Expected a matplotlib Axes object for plotting")
+    def test_empty_input(self):
+        data = np.array([[]])
+        with self.assertRaises(ValueError):
+            task_func(data)
+    def test_insufficient_columns(self):
+        data = np.random.rand(10, 7)  # Only 7 columns, one less than required
+        with self.assertRaises(ValueError):
+            task_func(data)
+    def test_non_numeric_input(self):
+        data = np.array([['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']])
+        with self.assertRaises(TypeError):
+            task_func(data)
+    def test_plot_output(self):
+        data = np.random.rand(20, 8)
+        df, ax, _ = task_func(data)
+        self.assertEqual(len(ax.lines), 1, "There should be one line on the plot")
+    def test_normality_test(self):
+        # Create a dataset large enough to properly trigger the normality test
+        data = np.random.rand(20, 8)  # Increase to 20 rows
+        df, ax, p_value = task_func(data)
+        self.assertIsNotNone(p_value, "p-value should not be None for sufficient data size")

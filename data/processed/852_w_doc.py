@@ -1,64 +1,83 @@
-import textwrap
-import re
+import random
+import string
 
-def task_func(input_string, width):
-    """
-    Divide a multi-line string into separate strings and wrap each line to a certain width.
-    
+def task_func(max_length, n_samples, seed=None):
+    """Generate a list containing random strings of lowercase letters. Each string's length varies from 1 to `max_length`.
+    An optional seed can be set for the random number generator for reproducible results.
+
+    Note:
+    The function utilizes the `random.choices` function to generate random strings and combines them into a list.
+
     Parameters:
-    - input_string (str): The multi-line string that needs to be wrapped.
-    - width (int): The width to wrap each line to.
-    
-    Returns:
-    - str: The wrapped string where each line is wrapped to the specified width.
-    
-    Requirements:
-    - textwrap
-    - re
-    
-    Example:
-    >>> task_func('Another line\\nWith wrapping', 8)
-    'Another\\nline\\nWith\\nwrapping'
-    """
-    lines = input_string.split('\\n')
-    wrapped_lines = [textwrap.fill(line, width, break_long_words=False) for line in lines]
-    wrapped_string = '\\n'.join(wrapped_lines)
-    wrapped_string = re.sub(r'\bis\b', 'was', wrapped_string)
-    return wrapped_string
+    max_length (int): The maximum length of the strings.
+    n_samples (int): The number of strings to return.
+    seed (int, optional): A seed for the random number generator. If None, the generator is initialized without a seed.
 
+    Returns:
+    list: A list containing random strings. Each string is a random combination of lowercase letters, 
+    and their lengths will vary from 1 to `max_length`.
+
+    Requirements:
+    - random
+    - string
+
+    Raises:
+    ValueError: If max_length is smaller than 1.
+
+    Example:
+    >>> task_func(3, 12, seed=12)
+    ['gn', 'da', 'mq', 'rp', 'aqz', 'ex', 'o', 'b', 'vru', 'a', 'v', 'ncz']
+    >>> task_func(5, n_samples=8, seed=1)
+    ['ou', 'g', 'tmjf', 'avlt', 's', 'sfy', 'aao', 'rzsn']
+
+    """
+    if max_length < 1:
+        raise ValueError("max_length must be larger than or equal to 1.")
+    LETTERS = string.ascii_lowercase
+    if seed is not None:
+        random.seed(seed)
+    all_combinations = []
+    for i in range(n_samples):
+        random_length = random.randint(1, max_length)
+        combination = ''.join(random.choices(LETTERS, k=random_length))
+        all_combinations.append(combination)
+    return all_combinations
+
+"""
+This script contains tests for the function task_func.
+Each test checks a specific aspect of the function's behavior.
+"""
 import unittest
+import random
 class TestCases(unittest.TestCase):
-    
-    def test_case_1(self):
-        input_str = "Hello world\nThis is a test string\nHappy coding!"
-        width = 10
-        expected_output = "Hello\nworld This\nwas a test\nstring\nHappy\ncoding!"
-        self.assertEqual(task_func(input_str, width), expected_output)
+    def test_length_and_content(self):
+        """Test the length of the output and whether it contains valid strings."""
+        seed = 1  # for reproducibility
+        max_length = 5
+        result = task_func(max_length, n_samples=10, seed=seed)
         
-        
-    def test_case_2(self):
-        # Test with single line and specific width
-        input_str = "Hello world"
-        width = 5
-        expected_output = "Hello\nworld"
-        self.assertEqual(task_func(input_str, width), expected_output)
-    
-    def test_case_3(self):
-        # Test with empty string and specific width
-        input_str = ""
-        width = 10
-        expected_output = ""
-        self.assertEqual(task_func(input_str, width), expected_output)
-    
-    def test_case_4(self):
-        input_str = "Hello world This is a test string Happy coding!"
-        width = 1000
-        expected_output = "Hello world This was a test string Happy coding!"  # Very wide width, should not wrap
-        self.assertEqual(task_func(input_str, width), expected_output)
-    
-    def test_case_5(self):
-        # Test with special characters and specific width
-        input_str = "Hello, @world!\n#This$is^a&test*string"
-        width = 10
-        expected_output = "Hello,\n@world!\n#This$was^a&test*string"
-        self.assertEqual(task_func(input_str, width), expected_output)
+        # All outputs should be strings
+        self.assertTrue(all(isinstance(item, str) for item in result))
+        # All strings should be of length <= max_length and > 0
+        self.assertTrue(all(1 <= len(item) <= max_length for item in result))
+        expected = ['ou', 'g', 'tmjf', 'avlt', 's', 'sfy', 'aao', 'rzsn', 'yoir', 'yykx']
+        self.assertCountEqual(result, expected)
+    def test_randomness(self):
+        """Test that setting a seed produces reproducible results."""
+        seed = 2
+        result1 = task_func(3, seed=seed, n_samples=100)
+        result2 = task_func(3, seed=seed, n_samples=100)
+        self.assertEqual(result1, result2)  # results should be same with same seed
+    def test_varying_length(self):
+        """Test with varying n to check the function's robustness with different input sizes."""
+        seed = 3
+        for n in range(1, 15):  # testing multiple sizes
+            result = task_func(n, seed=seed, n_samples=10)
+            self.assertTrue(all(1 <= len(item) <= n for item in result))
+    def test_negative_input(self):
+        """Test how the function handles negative input. It should handle it gracefully."""
+        with self.assertRaises(ValueError):
+            task_func(-1, n_samples=22)  # negative numbers shouldn't be allowed
+    def test_zero_length(self):
+        """Test how the function handles zero input. It should handle it gracefully or according to its specification."""
+        self.assertRaises(ValueError, task_func, 0, n_samples=5)

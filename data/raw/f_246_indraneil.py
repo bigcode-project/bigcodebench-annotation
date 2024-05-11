@@ -8,7 +8,7 @@ def f_246(mu, sigma, seed=0, num_samples=1000, num_bins=30):
     Create a histogram of a normal distribution with a given mean and standard deviation, and overlay the 
     probability density function (PDF) of the normal distribution on the histogram. Additionally, overlay a 
     second order polynomial function on the histogram fitted bin-wise using ordinary least squares (OLS) 
-    regression. The random seed is set for reproducibility.
+    regression. The random seed is set for reproducibility. The color of the PDF line is red, and the color of the OLS line is green.
     
     Parameters:
     - mu (float): The mean of the distribution.

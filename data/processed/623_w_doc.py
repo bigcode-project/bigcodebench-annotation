@@ -1,63 +1,50 @@
-import matplotlib.pyplot as plt
-import numpy as np
-from scipy.stats import norm
 from itertools import chain
+import numpy as np
+from sklearn.cluster import KMeans
 
 
 def task_func(L):
-    '''
-    Convert a list of lists 'L' into a flattened list of integers, then fit a normal distribution to the data 
-    and plot a histogram with the fitted normal distribution overlay.
+    """
+    Convert a list of lists into a list of integers, apply the KMeans clustering, 
+    and return a scatter plot 'matplotlib.axes.Axes' with data points color-coded by their cluster.
 
     Requirements:
-    - numpy
     - itertools.chain
-    - scipy.stats.norm
-    - matplotlib.pyplot
+    - numpy
+    - sklearn.cluster
 
     Parameters:
-    L (list of lists): A nested list where each inner list contains integers.
+    L (list of lists): A list of lists where each sublist contains integers.
 
     Returns:
-    matplotlib.axes._axes.Axes: Axes object with the plotted histogram and normal distribution overlay.
+    matplotlib.axes.Axes: An Axes object representing the scatter plot.
 
     Example:
-    >>> ax = task_func([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    '''
+    >>> ax = task_func([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
+    """
+    N_CLUSTERS = 3
     data = list(chain(*L))
-    mu, std = norm.fit(data)
+    data = np.array(data).reshape(-1, 1)
+    kmeans = KMeans(n_clusters=N_CLUSTERS).fit(data)
     fig, ax = plt.subplots()
-    ax.hist(data, bins=30, density=True, alpha=0.6, color='g')
-    xmin, xmax = plt.xlim()
-    x = np.linspace(xmin, xmax, 100)
-    p = norm.pdf(x, mu, std)
-    ax.plot(x, p, 'k', linewidth=2)
-    title = "Fit results: mu = %.2f,  std = %.2f" % (mu, std)
-    ax.set_title(title)
+    ax.scatter(data, [0]*len(data), c=kmeans.labels_.astype(float))
     return ax
 
 import unittest
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     def test_case_1(self):
-        L = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-        ax = task_func(L)
+        ax = task_func([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
         self.assertIsInstance(ax, plt.Axes)
     def test_case_2(self):
-        L = [[10, 20, 30], [40, 50, 60], [70, 80, 90]]
-        ax = task_func(L)
+        ax = task_func([[1, 5], [2, 6], [3, 7]])
         self.assertIsInstance(ax, plt.Axes)
-        # self.assertIn("Fit results:", ax.get_title())
     def test_case_3(self):
-        L = [[-1, -2, -3], [-4, -5, -6], [-7, -8, -9]]
-        ax = task_func(L)
+        ax = task_func([[10, 20, 30, 40], [15, 25, 35, 45]])
         self.assertIsInstance(ax, plt.Axes)
-        # self.assertIn("Fit results:", ax.get_title())
     def test_case_4(self):
-        L = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-        ax = task_func(L)
+        ax = task_func([[1000, 2000], [3000, 4000], [5000, 6000]])
         self.assertIsInstance(ax, plt.Axes)
-        # self.assertIn("Fit results:", ax.get_title())
     def test_case_5(self):
-        L = [[5, 15, 25], [35, 45, 55], [65, 75, 85]]
-        ax = task_func(L)
+        ax = task_func([[-1, -2, -3], [-50, -60, -70], [-100, -110, -120]])
         self.assertIsInstance(ax, plt.Axes)

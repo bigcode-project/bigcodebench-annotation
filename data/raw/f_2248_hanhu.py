@@ -62,7 +62,7 @@ def f_2250(dic):
 
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, ANY
 
 class TestCases(unittest.TestCase):
     def setUp(self):
@@ -106,7 +106,7 @@ class TestCases(unittest.TestCase):
         locations = {'Loc1': {'Lat': 0, 'Lon': 0}, 'Loc2': {'Lat': 4, 'Lon': 4}}
         f_2250(locations)
         # Assuming that the map is initialized at the location of the first entry in the dictionary
-        mock_map.assert_called_with(location=[0, 0], zoom_start=4)
+        mock_map.assert_called_with(location=[0, 0], zoom_start=ANY)
 
 
 

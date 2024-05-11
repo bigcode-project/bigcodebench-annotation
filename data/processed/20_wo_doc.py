@@ -1,105 +1,168 @@
-import os
-import glob
-import zipfile
+import ast
+import pandas as pd
+import seaborn as sns
 
-def task_func(directory):
+
+def task_func(csv_file):
     """
-    Zips all files (not including subdirectories) located in the specified directory and returns the path to the created zip file.
-    
+    Read a CSV file, convert the string representations of dictionaries in a specific column ('dict_column') to Python dictionaries, and visualize the data with Seaborn's pairplot.
+
     Parameters:
-    directory (str): The directory path containing the files to be zipped.
-    
+    - csv_file (str): The path to the CSV file.
+
     Returns:
-    str: The path to the generated zip file. Returns None if the directory does not contain any files.
-    
-    Raises:
-    FileNotFoundError: if the specified directory does not exist
+    tuple: A tuple containing:
+        - df (DataFrame): The DataFrame after reading and processing the CSV file.
+        - ax (PairGrid): Seaborn's PairGrid object after plotting.
 
     Requirements:
-    - os
-    - glob
-    - zipfile
-    
-    Notes:
-    - The zip name is always 'files.zip'
+    - ast
+    - pandas
+    - seaborn
 
     Example:
-    >>> path = task_func('/path/to/files')
-    >>> isinstance(path, str)
-    True
+    >>> df, ax = task_func('data/task_func/csv_1.csv')
+    >>> type(df)
+    <class 'pandas.core.frame.DataFrame'>
+    >>> type(ax)
+    <class 'seaborn.axisgrid.PairGrid'>
     """
-    if not os.path.exists(directory):
-        raise FileNotFoundError(f"Directory '{directory}' not found.")
-    files = [f for f in glob.glob(os.path.join(directory, '*')) if os.path.isfile(f)]
-    if not files:
-        return None
-    zip_file_path = os.path.join(directory, 'files.zip')
-    with zipfile.ZipFile(zip_file_path, 'w') as zipf:
-        for file in files:
-            zipf.write(file, os.path.basename(file))
-    return zip_file_path
+    df = pd.read_csv(csv_file)
+    df["dict_column"] = df["dict_column"].apply(ast.literal_eval)
+    df["hue_column"] = df["dict_column"].apply(str)
+    ax = sns.pairplot(df, hue="hue_column")
+    return df, ax
 
 import unittest
+import matplotlib
 import os
-import tempfile
-import zipfile
 class TestCases(unittest.TestCase):
-    
+    """Test cases for the task_func function."""
     def setUp(self):
-        """Setup a temporary directory before each test."""
-        self.test_dir = tempfile.mkdtemp()
-    
-    def tearDown(self):
-        """Clean up the temporary directory after each test."""
-        for root, dirs, files in os.walk(self.test_dir, topdown=False):
-            for name in files:
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                os.rmdir(os.path.join(root, name))
-        os.rmdir(self.test_dir)
-    
-    def test_single_file_zip(self):
-        """Test zipping a directory with one file."""
-        with open(os.path.join(self.test_dir, "testfile1.txt"), "w") as f:
-            f.write("This is a test file.")
-        zip_path = task_func(self.test_dir)
-        self.assertTrue(os.path.exists(zip_path))
-    
-    def test_multiple_files_zip(self):
-        """Test zipping a directory with multiple files."""
-        for i in range(5):
-            with open(os.path.join(self.test_dir, f"testfile{i}.txt"), "w") as f:
-                f.write(f"This is test file {i}.")
-        zip_path = task_func(self.test_dir)
-        self.assertTrue(os.path.exists(zip_path))
-    
-    def test_empty_directory(self):
-        """Test zipping an empty directory should return None."""
-        zip_path = task_func(self.test_dir)
-        self.assertIsNone(zip_path)
-    
-    def test_non_existent_directory(self):
-        """Test behavior when the specified directory does not exist."""
-        with self.assertRaises(FileNotFoundError):
-            task_func("/non/existent/directory")
-    
-    def test_exclusion_of_subdirectories(self):
-        """Ensure that subdirectories within the specified directory are not included in the zip."""
-        os.makedirs(os.path.join(self.test_dir, "subdir"))
-        with open(os.path.join(self.test_dir, "testfile.txt"), "w") as f:
-            f.write("This is a test file.")
-        with open(os.path.join(self.test_dir, "subdir", "nestedfile.txt"), "w") as f:
-            f.write("This is a nested file.")
-        zip_path = task_func(self.test_dir)
-        with zipfile.ZipFile(zip_path, 'r') as zipf:
-            self.assertEqual(len(zipf.namelist()), 1)  # Only testfile.txt should be included
-    def test_file_integrity_in_zip(self):
-        """Check that files zipped are intact and readable."""
-        filename = "testfile.txt"
-        content = "This is a test file."
-        with open(os.path.join(self.test_dir, filename), "w") as f:
-            f.write(content)
-        zip_path = task_func(self.test_dir)
-        with zipfile.ZipFile(zip_path, 'r') as zipf:
-            with zipf.open(filename) as file:
-                self.assertEqual(file.read().decode(), content)
+        self.test_dir = "data/task_func"
+        os.makedirs(self.test_dir, exist_ok=True)
+        df = pd.DataFrame(
+            {
+                "dict_column": [
+                    "{'A' : 1, 'B' : 2, 'C' : 3}",
+                    "{'D' : 4, 'E' : 5, 'F' : 6}",
+                ],
+                "Value1": [1, 2],
+                "Value2": [3, 4],
+            }
+        )
+        self.f_1 = os.path.join(self.test_dir, "csv_1.csv")
+        df.to_csv(self.f_1, index=False)
+        df = pd.DataFrame(
+            {
+                "dict_column": [
+                    "{'G' : 7, 'H' : 8}",
+                    "{'I' : 9, 'J' : 10}",
+                    "{'G' : 7, 'H' : 8}",
+                    "{'I' : 9, 'J' : 10}",
+                ],
+                "Value1": [2, 1, 2, 2],
+                "Value2": [1, 1, 3, 1],
+            }
+        )
+        self.f_2 = os.path.join(self.test_dir, "csv_2.csv")
+        df.to_csv(self.f_2, index=False)
+        df = pd.DataFrame(
+            {
+                "dict_column": [
+                    "{'K' : 11, 'L' : 12, 'M' : 13, 'N' : 14}",
+                ],
+                "Value1": [1],
+                "Value2": [2],
+            }
+        )
+        self.f_3 = os.path.join(self.test_dir, "csv_3.csv")
+        df.to_csv(self.f_3, index=False)
+        df = pd.DataFrame(
+            {
+                "dict_column": [
+                    "{'O' : 15}",
+                    "{'P' : 16}",
+                    "{'Q' : 17}",
+                    "{'R' : 18}",
+                    "{'Q' : 17}",
+                    "{'P' : 16}",
+                    "{'P' : 16}",
+                    "{'P' : 16}",
+                ],
+                "Value1": [1, 2, 2, 1, 1, 1, 2, 2],
+                "Value2": [1, 1, 1, 1, 2, 2, 2, 2],
+            }
+        )
+        self.f_4 = os.path.join(self.test_dir, "csv_4.csv")
+        df.to_csv(self.f_4, index=False)
+        df = pd.DataFrame(
+            {
+                "dict_column": [
+                    "{'S' : 19, 'T' : 20, 'U' : 21, 'V' : 22}",
+                    "{'W' : 23, 'X' : 24, 'Y' : 25, 'Z' : 26}",
+                ],
+                "Value1": [1, 2],
+                "Value2": [1, 2],
+            }
+        )
+        self.f_5 = os.path.join(self.test_dir, "csv_5.csv")
+        df.to_csv(self.f_5, index=False)
+    def tearDown(self) -> None:
+        import shutil
+        shutil.rmtree(self.test_dir)
+    def test_case_1(self):
+        df, ax = task_func(self.f_1)
+        # Assertions for DataFrame
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(len(df), 2)
+        self.assertTrue("dict_column" in df.columns)
+        self.assertTrue(isinstance(df.iloc[0]["dict_column"], dict))
+        # Assertions for Seaborn PairGrid (plot)
+        self.assertIsInstance(ax, sns.axisgrid.PairGrid)
+        self.assertTrue(hasattr(ax, "fig"))
+        self.assertIsInstance(ax.fig, matplotlib.figure.Figure)
+    def test_case_2(self):
+        df, ax = task_func(self.f_2)
+        # Assertions for DataFrame
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(len(df), 4)
+        self.assertTrue("dict_column" in df.columns)
+        self.assertTrue(isinstance(df.iloc[0]["dict_column"], dict))
+        # Assertions for Seaborn PairGrid (plot)
+        self.assertIsInstance(ax, sns.axisgrid.PairGrid)
+        self.assertTrue(hasattr(ax, "fig"))
+        self.assertIsInstance(ax.fig, matplotlib.figure.Figure)
+    def test_case_3(self):
+        df, ax = task_func(self.f_3)
+        # Assertions for DataFrame
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(len(df), 1)
+        self.assertTrue("dict_column" in df.columns)
+        self.assertTrue(isinstance(df.iloc[0]["dict_column"], dict))
+        # Assertions for Seaborn PairGrid (plot)
+        self.assertIsInstance(ax, sns.axisgrid.PairGrid)
+        self.assertTrue(hasattr(ax, "fig"))
+        self.assertIsInstance(ax.fig, matplotlib.figure.Figure)
+    def test_case_4(self):
+        df, ax = task_func(self.f_4)
+        # Assertions for DataFrame
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(len(df), 8)
+        self.assertTrue("dict_column" in df.columns)
+        self.assertTrue(isinstance(df.iloc[0]["dict_column"], dict))
+        # Assertions for Seaborn PairGrid (plot)
+        self.assertIsInstance(ax, sns.axisgrid.PairGrid)
+        self.assertTrue(hasattr(ax, "fig"))
+        self.assertIsInstance(ax.fig, matplotlib.figure.Figure)
+    def test_case_5(self):
+        df, ax = task_func(self.f_5)
+        # Assertions for DataFrame
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(len(df), 2)
+        self.assertTrue("dict_column" in df.columns)
+        self.assertTrue(isinstance(df.iloc[0]["dict_column"], dict))
+        # Assertions for Seaborn PairGrid (plot)
+        self.assertIsInstance(ax, sns.axisgrid.PairGrid)
+        self.assertTrue(hasattr(ax, "fig"))
+        self.assertIsInstance(ax.fig, matplotlib.figure.Figure)

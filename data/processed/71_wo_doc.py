@@ -1,180 +1,166 @@
 import pandas as pd
-import json
+import seaborn as sns
 import numpy as np
+import ast
 
-# Constants
-COLUMNS = ['email', 'list']
-
-def task_func(json_file):
+def task_func(csv_file):
     """
-    Load e-mail data from a JSON file, convert it into a Pandas DataFrame, calculate the sum and mean
-    of the list associated with each e-mail, and then record those values. Additionally, it plots the sum
-    and mean values for each email.
-
-    If there is no e-mail data, return an empty dataframe with the right columns (['email', 'list', 'sum', 'mean']), and None as the plot.
+    Load e-mail data from a CSV file, convert it into a Pandas DataFrame, and calculate the sum, mean, and standard deviation of the list associated with each e-mail. Additionally, this function will
+    draw a histogram of the mean values and return both the DataFrame and the histogram plot.
 
     Parameters:
-    json_file (str): The path to the JSON file. The JSON file should have the structure:
-                     [
-                         {"email": "email1@example.com", "list": [value1, value2, ...]},
-                         ...
-                     ]
+    - csv_file (str): The path to the CSV file containing email data.
 
     Returns:
-    tuple: A tuple containing:
-        - DataFrame: A pandas DataFrame with columns ['email', 'list', 'sum', 'mean'].
-        - Axes: The Axes object for the plot. None if the dataframe is empty.
+    - tuple: A tuple containing two elements:
+        - DataFrame: A pandas DataFrame with columns 'email', 'list', 'sum', 'mean', and 'std'.
+        - Axes: A histogram plot of the mean values.
 
     Requirements:
     - pandas
-    - json
+    - seaborn
     - numpy
+    - ast
 
     Example:
-    >>> df, ax = task_func('data/task_func/json_1.json')
-    >>> print(df)
+    >>> df, plot = task_func('data/task_func/csv_1.csv')
+    >>> print(df.head())
+    >>> print(type(plot))
     """
-    with open(json_file, 'r') as file:
-        email_data = json.load(file)
-    if not email_data :
-        return pd.DataFrame([], columns = COLUMNS + ["sum", "mean"]), None
-    df = pd.DataFrame(email_data, columns=COLUMNS)
-    df['sum'] = df['list'].apply(np.sum)
+    df = pd.read_csv(csv_file)
+    df['list'] = df['list'].map(ast.literal_eval)
+    df['sum'] = df['list'].apply(sum)
     df['mean'] = df['list'].apply(np.mean)
-    ax = df[['sum', 'mean']].plot(kind='bar')
-    return df, ax
+    df['std'] = df['list'].apply(np.std)
+    plot = sns.histplot(df['mean'], kde=True)
+    return df, plot
 
 import os
-import shutil
 import unittest
+import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
     """Test cases for the task_func function."""
     def setUp(self):
         self.test_dir = 'data/task_func'
         os.makedirs(self.test_dir, exist_ok=True)
-        self.f_1 = os.path.join(self.test_dir, "json_1.json")
-        self.f_2 = os.path.join(self.test_dir, "json_2.json")
-        self.f_3 = os.path.join(self.test_dir, "json_3.json")
-        self.f_4 = os.path.join(self.test_dir, "json_4.json")
-        self.f_5 = os.path.join(self.test_dir, "json_5.json")
-        with open(self.f_1, "w") as fout :
-            json.dump(
-                [
-                    {
-                        "email" : "first@example.com",
-                        "list" : [12, 17, 29, 45, 7, 3]
-                    },
-                    {
-                        "email" : "second@example.com",
-                        "list" : [1, 1, 3, 73, 21, 19, 12]
-                    },
-                    {
-                        "email" : "third@example.com",
-                        "list" : [91, 23, 7, 14, 66]
-                    }
-                ],
-                fout
-            )
-        with open(self.f_2, "w") as fout :
-            json.dump(
-                [
-                    {
-                        "email" : "fourth@example.com",
-                        "list" : [12, 21, 35, 2, 1]
-                    },
-                    {
-                        "email" : "fifth@example.com",
-                        "list" : [13, 4, 10, 20]
-                    },
-                    {
-                        "email" : "sixth@example.com",
-                        "list" : [82, 23, 7, 14, 66]
-                    },
-                    {
-                        "email" : "seventh@example.com",
-                        "list" : [111, 23, 4]
-                    }
-                ],
-                fout
-            )
-        with open(self.f_3, "w") as fout :
-            json.dump(
-                [
-                    {
-                        "email" : "eight@example.com",
-                        "list" : [1, 2, 3, 4, 5]
-                    },
-                    {
-                        "email" : "ninth@example.com",
-                        "list" : [6, 7, 8, 9, 10]
-                    }
-                ],
-                fout
-            )
-        with open(self.f_4, "w") as fout :
-            json.dump(
-                [
-                    {
-                        "email" : "tenth@example.com",
-                        "list" : [11, 12, 13, 14, 15]
-                    }
-                ],
-                fout
-            )
-        with open(self.f_5, "w") as fout :
-            json.dump(
-                [],
-                fout
-            )
+        self.f_1 = os.path.join(self.test_dir, "csv_1.csv")
+        self.f_2 = os.path.join(self.test_dir, "csv_2.csv")
+        self.f_3 = os.path.join(self.test_dir, "csv_3.csv")
+        df = pd.DataFrame(
+            {
+                "email" : ["first@example.com", "second@example.com", "third@example.com"],
+                "list" : [
+                    [11, 12, 34, 21, 9, 3, 32],
+                    [17, 16, 15, 6, 3, 21, 6],
+                    [9, 7, 3, 3, 2, 1, 1, 1]
+                ]
+            }
+        )
+        df.to_csv(self.f_1, index=False)
+        df = pd.DataFrame(
+            {
+                "email" : ["fourth@example.com", "fifth@example.com", "sixth@example.com", "seventh@example.com"],
+                "list" : [
+                    [11, 12, 34, 21, 9, 3, 32],
+                    [8, 4, 2, 13, 2, 1, 1, 1],
+                    [0, 7, 3, 3, 2, 1, 1, 1],
+                    [9, 7, 3, 3, 2, 1, 1, 1]
+                ]
+            }
+        )
+        df.to_csv(self.f_2, index=False)
+        df = pd.DataFrame(
+            {
+                "email" : ["ninth@example.com", "tenth@example.com"],
+                "list" : [
+                    [19, 7, 23, 3, 2, 1, 5, 1],
+                    [9, 7, 13, 3, 12, 1, 4, 5]
+                ]
+            }
+        )
+        df.to_csv(self.f_3, index=False)
+        self.f_4 = os.path.join(self.test_dir, "csv_4.csv")
+        df = pd.DataFrame(
+            {
+                "email" : ["A@example.com", "B@example.com"],
+                "list" : [
+                    [1],
+                    [1, 2],
+                ]
+            }
+        )
+        df.to_csv(self.f_4, index=False)
+        self.f_5 = os.path.join(self.test_dir, "csv_5.csv")
+        df = pd.DataFrame(
+            {
+                "email" : ["C@example.com"],
+                "list" : [
+                    [11, 23, 36, 180, 32, 98, 96, 56, 32, 72, 7, 24, 32],
+                ]
+            }
+        )
+        df.to_csv(self.f_5, index=False)
     def tearDown(self):
-        if os.path.exists(self.test_dir):
+        import shutil
+        try:
             shutil.rmtree(self.test_dir)
+        except OSError as e:
+            print(e)
     def test_case_1(self):
-        # Test with sample JSON data
-        df, ax = task_func(self.f_1)
-        # Assert DataFrame values
-        self.assertEqual(df["email"].tolist(), ["first@example.com", "second@example.com", "third@example.com"])
-        self.assertEqual(df["sum"].tolist(), [113, 130, 201])
-        self.assertEqual(df["mean"].tolist(), [113/6.0, 130/7.0, 201/5.0])
-        # Assert plot attributes
-        self.assertEqual(ax.get_title(), '')
-        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], ['0', '1', '2'])
-        self.assertListEqual([label.get_text() for label in ax.get_legend().get_texts()], ['sum', 'mean'])
+        df, plot = task_func(self.f_1)
+        try:
+            fig = plot.get_figure()
+            plt.close(fig)
+        except:
+            pass
+        self.assertEqual(df.shape[1], 5)
+        self.assertIn('email', df.columns)
+        self.assertIn('list', df.columns)
+        self.assertIn('sum', df.columns)
+        self.assertIn('mean', df.columns)
+        self.assertIn('std', df.columns)
+        self.assertIsInstance(plot, plt.Axes)
     def test_case_2(self):
-        # Test with sample JSON data
         df, ax = task_func(self.f_2)
-        # Assert DataFrame values
-        self.assertEqual(df["email"].tolist(), ["fourth@example.com", "fifth@example.com", "sixth@example.com", "seventh@example.com"])
-        self.assertEqual(df["sum"].tolist(), [71, 47, 192, 138])
-        self.assertEqual(df["mean"].tolist(), [71/5.0, 47/4.0, 192/5.0, 138/3.0])
-        # Assert plot attributes
-        self.assertEqual(ax.get_title(), '')
-        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], ['0', '1', '2', '3'])
-        self.assertListEqual([label.get_text() for label in ax.get_legend().get_texts()], ['sum', 'mean'])
+        try:
+            fig = ax.get_figure()
+            plt.close(fig)
+        except:
+            pass
+        for _, row in df.iterrows():
+            self.assertEqual(row['sum'], sum(row['list']))
+            self.assertAlmostEqual(row['mean'], np.mean(row['list']))
+            self.assertAlmostEqual(row['std'], np.std(row['list']))
     def test_case_3(self):
-        # Test with sample JSON data
         df, ax = task_func(self.f_3)
-        # Assert DataFrame values
-        self.assertEqual(df["email"].tolist(), ["eight@example.com", "ninth@example.com"])
-        self.assertEqual(df["sum"].tolist(), [15.0, 40.0])
-        self.assertEqual(df["mean"].tolist(), [3.0, 8.0])
-        # Assert plot attributes
-        self.assertEqual(ax.get_title(), '')
-        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], ['0', '1'])
-        self.assertListEqual([label.get_text() for label in ax.get_legend().get_texts()], ['sum', 'mean'])
+        try:
+            fig = ax.get_figure()
+            plt.close(fig)
+        except:
+            pass
+        for _, row in df.iterrows():
+            self.assertEqual(row['sum'], sum(row['list']))
+            self.assertAlmostEqual(row['mean'], np.mean(row['list']))
+            self.assertAlmostEqual(row['std'], np.std(row['list']))
     def test_case_4(self):
-        # Test with sample JSON data
         df, ax = task_func(self.f_4)
-        # Assert DataFrame values
-        self.assertEqual(df["email"].tolist(), ["tenth@example.com"])
-        self.assertEqual(df["sum"].tolist(), [65.0])
-        self.assertEqual(df["mean"].tolist(), [13.0])
-        # Assert plot attributes
-        self.assertEqual(ax.get_title(), '')
-        self.assertListEqual([label.get_text() for label in ax.get_xticklabels()], ['0'])
-        self.assertListEqual([label.get_text() for label in ax.get_legend().get_texts()], ['sum', 'mean'])
+        try:
+            fig = ax.get_figure()
+            plt.close(fig)
+        except:
+            pass
+        for _, row in df.iterrows():
+            self.assertEqual(row['sum'], sum(row['list']))
+            self.assertAlmostEqual(row['mean'], np.mean(row['list']))
+            self.assertAlmostEqual(row['std'], np.std(row['list']))
     def test_case_5(self):
-        # Test with empty JSON data
         df, ax = task_func(self.f_5)
-        self.assertIsNone(ax)
-        self.assertTrue(df.empty)
+        try:
+            fig = ax.get_figure()
+            plt.close(fig)
+        except:
+            pass
+        for _, row in df.iterrows():
+            self.assertEqual(row['sum'], sum(row['list']))
+            self.assertAlmostEqual(row['mean'], np.mean(row['list']))
+            self.assertAlmostEqual(row['std'], np.std(row['list']))

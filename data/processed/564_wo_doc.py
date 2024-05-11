@@ -1,93 +1,99 @@
-import ctypes
 import os
-import shutil
-import glob
+import ctypes
+from datetime import datetime
+import pytz
 
-
-
-def task_func(filepath, destination_dir):
+def task_func(filepath):
     """
-    Loads a DLL file specified by the given filepath and moves all DLL files in the same directory
-    to another specified directory. This function demonstrates file operations including DLL loading,
-    file path manipulation, and file moving using ctypes, os, shutil, and glob modules.
+    Loads a DLL file from the specified filepath and returns its metadata, including creation time,
+    modification time, and file size. The times are displayed in UTC format. This function
+    demonstrates the use of ctypes for loading DLLs and os module for accessing file metadata.
 
+    
     Parameters:
-    filepath (str): The path of the DLL file to be loaded.
-    destination_dir (str): The path of the destination directory where DLL files will be moved.
+    filepath (str): The path of the DLL file.
 
     Returns:
     str: The name of the loaded DLL file.
-
+    dict: A dictionary containing the metadata of the DLL file, including the keys 'Creation Time', 'Modification Time', and 'Size'.
+    
     Requirements:
     - ctypes
     - os
-    - shutil
-    - glob
+    - datetime.datetime
+    - pytz
 
     Examples:
-    >>> destination = 'destination_dir'
-    >>> task_func('libc.so.6', destination) # Doctest will vary based on system and file availability.
-    'libc.so.6'
-    >>> isinstance(task_func('libc.so.6', destination), str)
+    >>> isinstance(task_func('libc.so.6'), str) # Doctest will vary based on the system and DLL file availability.
+    True
+    >>> 'libc.so.6' in task_func('libc.so.6')
     True
     """
+    metadata = dict()
     lib = ctypes.CDLL(filepath)
-    dll_dir = os.path.dirname(filepath)
-    dll_files = glob.glob(os.path.join(dll_dir, '*.dll'))
-    for dll_file in dll_files:
-        shutil.move(dll_file, destination_dir)
-    return lib._name
+    file_stat = os.stat(filepath)
+    creation_time = datetime.fromtimestamp(file_stat.st_ctime, pytz.UTC)
+    modification_time = datetime.fromtimestamp(file_stat.st_mtime, pytz.UTC)
+    file_size = file_stat.st_size
+    metadata['Creation Time'] = creation_time
+    metadata['Modification Time'] = modification_time
+    metadata['Size'] = file_size
+    return lib._name, metadata
 
 import unittest
+import os
+import ctypes
+from unittest.mock import patch
 import tempfile
-from unittest.mock import patch, MagicMock
+import sys
+from datetime import datetime
+import pytz
+from io import StringIO
 class TestCases(unittest.TestCase):
     def setUp(self):
-        # Create a temporary directory for DLL files
-        self.dll_dir = tempfile.mkdtemp()
-        self.destination_dir = tempfile.mkdtemp()
-        # Create a sample DLL file in the temporary directory
-        self.sample_dll = os.path.join(self.dll_dir, 'sample.dll')
-        with open(self.sample_dll, 'w') as file:
-            file.write('')
-    @patch('ctypes.CDLL', autospec=True)
-    def test_return_type(self, mock_cdll):
-        self.assertIsInstance(task_func(self.sample_dll, self.destination_dir), str)
-        
-    @patch('ctypes.CDLL', autospec=True)
-    def test_dll_file_movement(self, mock_cdll):
-        """Test if DLL files are correctly moved to the destination directory."""
-        task_func(self.sample_dll, self.destination_dir)
-        
-        # Check that the DLL file has been moved to the destination directory
-        self.assertFalse(os.path.exists(self.sample_dll), "The DLL file should not exist in the source directory after moving.")
-        self.assertTrue(os.path.exists(os.path.join(self.destination_dir, 'sample.dll')), "The DLL file should exist in the destination directory after moving.")
+        # Create a temporary DLL file
+        self.temp_file = tempfile.NamedTemporaryFile(suffix='.dll', delete=False)
+        self.filepath = self.temp_file.name
+    def test_file_existence(self):
+        self.assertTrue(os.path.exists(self.filepath))
     def test_invalid_file_path(self):
         with self.assertRaises(OSError):
-            task_func('invalid_path.dll', self.destination_dir)
-    def test_invalid_destination_dir(self):
-        with self.assertRaises(OSError):
-            task_func(self.sample_dll, 'invalid_destination')
+            task_func('invalid_path.dll')
     @patch('ctypes.CDLL')
-    def test_file_movement_with_mock_cdll(self, mock_cdll):
-        # Setup the mock CDLL instance
-        mock_cdll_instance = MagicMock()
-        mock_cdll.return_value = mock_cdll_instance
-        # Mock a function 'example_function' within the DLL
-        example_function_mock = MagicMock(return_value=42)  # Assume it returns an integer
-        mock_cdll_instance.example_function = example_function_mock
-        # Call the function under test
-        task_func(self.sample_dll, self.destination_dir)
-        # Verify the DLL was "loaded"
-        mock_cdll.assert_called_once_with(self.sample_dll)
-    @patch('ctypes.CDLL', autospec=True)
-    def test_no_dll_in_source(self, cdll):
-        # Remove the DLL file and run the function
-        os.remove(self.sample_dll)
-        task_func(self.sample_dll, self.destination_dir)
-        # Check that no new files are in the destination directory
-        self.assertEqual(len(os.listdir(self.destination_dir)), 0)
+    @patch('os.stat')
+    def test_return_value(self, mock_stat, mock_cdll):
+        """Verify that the function returns the name of the DLL file."""
+        mock_cdll.return_value._name = 'test.dll'
+        result, metadata = task_func('path/to/test.dll')
+        self.assertEqual(result, 'test.dll')
+        self.assertIsInstance(metadata, dict)
+    @patch('ctypes.CDLL', side_effect=OSError("File not found"))
+    def test_nonexistent_file(self, mock_cdll):
+        """Ensure function handles nonexistent files appropriately."""
+        with self.assertRaises(OSError) as context:
+            task_func('path/to/nonexistent.dll')
+        self.assertEqual(str(context.exception), "File not found")
+    @patch('os.stat')
+    @patch('ctypes.CDLL')
+    def test_metadata_printing(self, mock_cdll, mock_stat):
+        """Check if file metadata is correctly printed."""
+        # Setup mock for os.stat to return specific file metadata
+        mock_stat.return_value.st_ctime = 1609459200  # 2021-01-01 00:00:00 UTC
+        mock_stat.return_value.st_mtime = 1609545600  # 2021-01-02 00:00:00 UTC
+        mock_stat.return_value.st_size = 123456
+        # Setup mock for CDLL to return a dummy name
+        mock_cdll.return_value._name = 'test.dll'
+        # Set the expected output dictionary
+        expected_output = {
+            'Creation Time': datetime(2021, 1, 1, 0, 0, 0, tzinfo=pytz.UTC),
+            'Modification Time': datetime(2021, 1, 2, 0, 0, 0, tzinfo=pytz.UTC),
+            'Size': 123456
+        }
+        # Call the function
+        result, metadata = task_func('path/to/test.dll')
+        # Check if the output matches the expected dictionary
+        self.assertEqual(result, 'test.dll', expected_output)
+        self.assertEqual(metadata, expected_output)
+        
     def tearDown(self):
-        # Clean up temporary directories
-        shutil.rmtree(self.dll_dir)
-        shutil.rmtree(self.destination_dir)
+        os.remove(self.filepath)

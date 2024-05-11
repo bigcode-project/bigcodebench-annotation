@@ -1,84 +1,77 @@
+import urllib.request
 import os
-import csv
-from collections import Counter
+import re
 
 # Constants
-BASE_PATH = 'task_func_data_xiaoheng'
-FILE_NAME = os.path.join(BASE_PATH, 'Output.txt')
+TARGET_FILE = 'downloaded_file.txt'
+SEARCH_PATTERN = r'\bERROR\b'
 
-def task_func(file_path):
+def task_func(url):
     """
-    This function reads the specified CSV file, counts the frequency of each word, and returns the most common word 
-    along with its frequency.
+    Download a text file from the specified url and search for occurrences of the word "ERROR."
 
     Parameters:
-    - file_path (str): The path to the CSV file.
-
-    Requirements:
-    - os
-    - csv
-    - collections
+    - url (str): The url of the text file to be downloaded.
 
     Returns:
-    - tuple: The most common word and its frequency, or None if the file doesn't exist or is empty.
+    - occurrences (int): The number of occurrences of the word 'ERROR'.
+
+    Requirements:
+    - urllib
+    - os
+    - re
 
     Example:
-    >>> # Assuming 'example.txt' contains multiple repetitions of the word 'example'
-    >>> task_func('example.txt')  # doctest: +SKIP
-    ('example', <some_positive_integer>)
-
-    Note:
-    - The function specifically reads from the given file path.
-    - This example uses +SKIP because it relies on external file content.
+    >>> task_func('http://example.com/log.txt')
+    5 # Assuming there are 5 occurrences of 'ERROR' in the file
     """
-    if not os.path.isfile(file_path):
-        return None
-    word_counter = Counter()
-    with open(file_path, 'r') as f:
-        csv_reader = csv.reader(f, delimiter=',', skipinitialspace=True)
-        for row in csv_reader:
-            for word in row:
-                word_counter[word.strip()] += 1
-    if not word_counter:
-        return None
-    most_common_word, frequency = word_counter.most_common(1)[0]
-    return most_common_word, frequency
+    TARGET_FILE = 'downloaded_file.txt'
+    SEARCH_PATTERN = r'\bERROR\b'
+    urllib.request.urlretrieve(url, TARGET_FILE)
+    with open(TARGET_FILE, 'r') as f:
+        data = f.read()
+    occurrences = len(re.findall(SEARCH_PATTERN, data))
+    os.remove(TARGET_FILE)
+    return occurrences
 
 import unittest
+from unittest.mock import patch, mock_open
 class TestCases(unittest.TestCase):
-    def setUp(self):
-        """Create the directory for test files."""
-        os.makedirs(BASE_PATH, exist_ok=True)
-    def tearDown(self):
-        """Remove all created test files and the directory after all tests."""
-        for filename in os.listdir(BASE_PATH):
-            os.remove(os.path.join(BASE_PATH, filename))
-        os.rmdir(BASE_PATH)
-    def create_and_fill_file(self, filename, contents):
-        """Helper method to create and populate a file with given contents."""
-        full_path = os.path.join(BASE_PATH, filename)
-        with open(full_path, 'w', newline='') as file:
-            writer = csv.writer(file)
-            for content in contents:
-                writer.writerow([content])
-        return full_path
-    def test_1(self):
-        file_path = self.create_and_fill_file('Output.txt', ['banana']*5)
-        result = task_func(file_path)
-        self.assertEqual(result, ('banana', 5))
-    def test_2(self):
-        file_path = self.create_and_fill_file('AnotherOutput.txt', ['cat']*5)
-        result = task_func(file_path)
-        self.assertEqual(result, ('cat', 5))
-    def test_3(self):
-        file_path = self.create_and_fill_file('YetAnotherOutput.txt', ['moon']*5)
-        result = task_func(file_path)
-        self.assertEqual(result, ('moon', 5))
-    def test_4(self):
-        file_path = self.create_and_fill_file('Nonexistent.txt', [])
-        result = task_func(file_path)
-        self.assertIsNone(result)
-    def test_5(self):
-        file_path = self.create_and_fill_file('EmptyFile.txt', [])
-        result = task_func(file_path)
-        self.assertIsNone(result)
+    @patch('urllib.request.urlretrieve')
+    @patch('builtins.open', new_callable=mock_open, read_data='ERROR\nOK\nERROR')
+    @patch('os.remove')
+    def test_sample1(self, mock_remove, mock_file, mock_urlretrieve):
+        mock_urlretrieve.return_value = ('mock/path/to/file.txt', {'mock': 'headers'})
+        result = task_func('http://example.com/log.txt')
+        self.assertEqual(result, 2)  # Expecting 2 occurrences of 'ERROR'
+    
+    @patch('urllib.request.urlretrieve')
+    @patch('builtins.open', new_callable=mock_open, read_data='OK\nFINE\nGOOD')
+    @patch('os.remove')
+    def test_sample2(self, mock_remove, mock_file, mock_urlretrieve):
+        result = task_func('http://example.com/log.txt')
+        self.assertEqual(result, 0)  # Expecting 0 occurrences of 'ERROR'
+    @patch('urllib.request.urlretrieve')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.remove')
+    def test_sample3(self, mock_remove, mock_file, mock_urlretrieve):
+        mock_file.return_value.read.return_value = "ERROR\nERROR\nERROR\nERROR\nERROR"
+        mock_urlretrieve.return_value = ('mock/path/to/file.txt', {'mock': 'headers'})
+        result = task_func('http://example.com/log.txt')
+        self.assertEqual(result, 5)  # Expecting 5 occurrences of 'ERROR'
+    @patch('urllib.request.urlretrieve')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.remove')
+    def test_mixed_case_errors(self, mock_remove, mock_file, mock_urlretrieve):
+        mock_file.return_value.read.return_value = "Error\nerror\nERROR"
+        mock_urlretrieve.return_value = ('mock/path/to/file.txt', {'mock': 'headers'})
+        result = task_func('http://example.com/log.txt')
+        self.assertEqual(result, 1)  # Expecting 1 occurrence of 'ERROR' (case-sensitive)
+    @patch('urllib.request.urlretrieve')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.remove')
+    def test_large_file(self, mock_remove, mock_file, mock_urlretrieve):
+        mock_file.return_value.read.return_value = "ERROR\n" * 5001
+        mock_urlretrieve.return_value = ('mock/path/to/file.txt', {'mock': 'headers'})
+        result = task_func('http://example.com/log.txt')
+        self.assertEqual(result, 5001)  # Expecting 5001 occurrences of 'ERROR'

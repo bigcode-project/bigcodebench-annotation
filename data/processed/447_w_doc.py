@@ -1,97 +1,128 @@
+import numpy as np
+from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-from sklearn.datasets import make_blobs
 
 
-def task_func(n_samples=100, centers=3, n_features=2, random_seed=42):
+def task_func(data, n_components=2, random_state=None):
     """
-    Create isotropic Gaussian blobs to form clusters and visualize them.
+    Performs Principal Component Analysis (PCA) on the provided dataset to reduce its dimensionality,
+    and visualizes the results using a scatter plot.
+
+    This function applies PCA to the dataset, reducing its features to the specified number of principal components.
+    It then visualizes the reduced data in a scatter plot. For datasets reduced to a single component, the function
+    generates a 1D scatter plot along the X-axis, with all Y-values set to zero. For reductions resulting in two or more
+    components, only the first two principal components are visualized.
 
     Parameters:
-    - n_samples (int): The total number of points divided among clusters.
-    - centers (int): The number of centers to generate.
-    - n_features (int): The number of features for each sample.
-    - random_seed (int): The seed for the random number generator.
+    - data (ndarray): A numpy ndarray of shape (n_samples, n_features) representing the data.
+    - n_components (int, optional): Number of components to keep. Defaults to 2.
+    - random_state (int, optional): Seed for reproducibility. Defaults to None.
 
     Returns:
-    tuple: A tuple containing:
-        - X (numpy.ndarray): The matrix of blob points.
-        - y (numpy.ndarray): The vector of blob labels.
-        - ax (matplotlib.axes.Axes): The Axes object with the scatter plot.
+    dict: A dictionary containing:
+        - "transformed_data" (np.ndarray): The transformed data.
+        - "ax" (plt.Axes): The scatter plot visualizing the transformed data.
 
     Requirements:
-    - matplotlib.pyplot
+    - numpy
+    - matplotlib
     - sklearn
 
     Example:
-    >>> X, y, ax = task_func(n_samples=500, centers=5, random_seed=0)
-    >>> type(X), type(y), type(ax)
-    (<class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'matplotlib.axes._axes.Axes'>)
-    >>> ax
-    <Axes: >
+    >>> data = np.random.random((100, 5))
+    >>> results = task_func(data, random_state=42)
+    >>> results['transformed_data'].shape
+    (100, 2)
+    >>> type(results['ax'])
+    <class 'matplotlib.axes._axes.Axes'>
     """
-    X, y = make_blobs(
-        n_samples=n_samples,
-        centers=centers,
-        n_features=n_features,
-        random_state=random_seed,
-    )
+    pca = PCA(n_components=n_components, random_state=random_state)
+    transformed_data = pca.fit_transform(data)
     fig, ax = plt.subplots()
-    ax.scatter(X[:, 0], X[:, 1], c=y)
-    return X, y, ax
+    if transformed_data.shape[1] == 1:
+        ax.scatter(transformed_data[:, 0], np.zeros_like(transformed_data[:, 0]))
+    else:
+        ax.scatter(transformed_data[:, 0], transformed_data[:, 1])
+    return {"transformed_data": transformed_data, "ax": ax}
 
 import unittest
-import matplotlib
+from sklearn.decomposition import PCA
+import numpy as np
 import matplotlib.pyplot as plt
 class TestCases(unittest.TestCase):
+    def setUp(self):
+        self.seed = 42
+        self.n = 100
+        self.n_dims = 5
+        self.n_components = 2
+        self.data = np.random.RandomState(self.seed).random((self.n, self.n_dims))
+    def assert_pca_correctness(self, data, results, n_components, random_state):
+        """Helper method to assert PCA correctness"""
+        # 1. Variance explained
+        pca = PCA(n_components=n_components, random_state=random_state)
+        pca.fit(data)
+        explained_variance_ratio = pca.explained_variance_ratio_
+        if data.shape[1] == 1:
+            # For one-dimensional data, the explained variance ratio should be 1
+            self.assertAlmostEqual(explained_variance_ratio[0], 1.0, delta=1e-2)
+        else:
+            cov_matrix = np.cov(data, rowvar=False)
+            eigenvalues = np.linalg.eigvals(cov_matrix)
+            sorted_eigenvalues = np.sort(eigenvalues)[::-1][:n_components]
+            normalized_eigenvalues = sorted_eigenvalues / sum(eigenvalues)
+            self.assertTrue(
+                np.allclose(explained_variance_ratio, normalized_eigenvalues, atol=1e-1)
+            )
+        # 2. Orthogonality
+        for i in range(n_components):
+            for j in range(i + 1, n_components):
+                dot_product = np.dot(
+                    results["transformed_data"][:, i], results["transformed_data"][:, j]
+                )
+                self.assertAlmostEqual(dot_product, 0, delta=1e-2)
     def test_case_1(self):
-        # Test default case
-        n_samples, n_features, centers = 100, 2, 3
-        X, y, ax = task_func()
-        self.assertEqual(X.shape, (n_samples, n_features))
-        self.assertEqual(y.shape, (n_samples,))
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
-        self.assertEqual(len(set(y)), centers)
+        # Test with default settings
+        results = task_func(self.data, random_state=self.seed)
+        self.assertEqual(results["transformed_data"].shape, (self.n, self.n_components))
+        x_data = results["ax"].collections[0].get_offsets()[:, 0]
+        y_data = results["ax"].collections[0].get_offsets()[:, 1]
+        self.assertTrue(np.array_equal(x_data, results["transformed_data"][:, 0]))
+        self.assertTrue(np.array_equal(y_data, results["transformed_data"][:, 1]))
+        self.assert_pca_correctness(self.data, results, self.n_components, self.seed)
     def test_case_2(self):
-        # Test n_samples
-        for n_samples in [1, 50, 100]:
-            X, y, _ = task_func(n_samples=n_samples)
-            self.assertEqual(X.shape[0], n_samples)
-            self.assertEqual(y.shape[0], n_samples)
+        # Test n_components
+        for n_components in [1, 2, min(self.data.shape)]:
+            results = task_func(self.data, n_components=n_components, random_state=42)
+            self.assertEqual(results["transformed_data"].shape[1], n_components)
+            self.assert_pca_correctness(self.data, results, n_components, self.seed)
     def test_case_3(self):
-        # Test centers
-        for centers in [1, 50, 100]:
-            _, y, _ = task_func(centers=centers)
-        self.assertEqual(len(set(y)), centers)
+        # Test when one of the features has zero variance
+        data = self.data.copy()
+        data[:, 1] = 0  # Second feature has zero variance
+        results = task_func(data, n_components=2, random_state=self.seed)
+        self.assertEqual(results["transformed_data"].shape, (100, 2))
+        self.assert_pca_correctness(data, results, 2, self.seed)
     def test_case_4(self):
-        # Test n_features
-        for n_features in [2, 50, 100]:
-            X, y, _ = task_func(n_features=n_features)
-            self.assertEqual(X.shape[1], n_features)
+        # Test with n_components greater than min(n_samples, n_features)
+        data = np.random.RandomState(self.seed).randn(10, 2)
+        with self.assertRaises(ValueError):
+            task_func(data, n_components=3, random_state=self.seed)
     def test_case_5(self):
-        # Test random seed
-        X1, y1, _ = task_func(n_samples=100, centers=3, n_features=2, random_seed=42)
-        X2, y2, _ = task_func(n_samples=100, centers=3, n_features=2, random_seed=42)
-        self.assertTrue((X1 == X2).all())
-        self.assertTrue((y1 == y2).all())
+        # Test with a single sample
+        data = np.random.RandomState(self.seed).randn(1, self.n_dims)
+        with self.assertRaises(ValueError):
+            task_func(data)
     def test_case_6(self):
-        # Test with the minimum possible values that are still valid
-        n_samples, n_features, centers = 1, 2, 1
-        X, y, ax = task_func(
-            n_samples=1, centers=centers, n_features=n_features, random_seed=0
-        )
-        self.assertEqual(X.shape, (n_samples, n_features))
-        self.assertEqual(y.shape, (n_samples,))
-        self.assertEqual(len(set(y)), centers)
-        self.assertIsInstance(ax, matplotlib.axes.Axes)
+        # Edge case - test when dataset contains NaN
+        data = self.data.copy()
+        data[0, 0] = np.nan  # Introduce a NaN value
+        with self.assertRaises(ValueError):
+            task_func(data, n_components=2, random_state=self.seed)
     def test_case_7(self):
-        # Example of handling an expected failure due to invalid input
+        # Edge case - test when dataset contains infinite values
+        data = self.data.copy()
+        data[0, 0] = np.inf  # Introduce an infinite value
         with self.assertRaises(ValueError):
-            task_func(n_samples=-100)
-        with self.assertRaises(ValueError):
-            task_func(centers=-10)
-        with self.assertRaises(Exception):
-            task_func(n_features=0)
-        with self.assertRaises(ValueError):
-            task_func(random_seed="invalid")
+            task_func(data, n_components=2, random_state=self.seed)
     def tearDown(self):
         plt.close("all")

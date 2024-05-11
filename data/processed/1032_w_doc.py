@@ -1,75 +1,112 @@
+import matplotlib.pyplot as plt
 import random
 import string
 import pandas as pd
+import seaborn as sns
+
+# Constants
+LETTERS = list(string.ascii_lowercase)
 
 
-def task_func(n_rows=1000):
+def task_func(rows=1000, string_length=3):
     """
-    Generate a histogram of the frequency of the top 30 unique random 3-letter strings.
-    The function creates random strings, each consisting of 3 letters from the lowercase English alphabet.
-    It then plots a histogram showing the frequencies of the top 30 most common strings among the generated set.
+    Generate a dataframe of random strings and create a heatmap showing the correlation
+    in the frequency of each letter in these strings.
+
+    This function generates a specified number of random strings, each of a given length,
+    and calculates the frequency of each letter in these strings. A heatmap of the 
+    correlation matrix is then displayed, showing the co-occurrence frequencies of different 
+    letters within these strings.
+
+    If the number of rows specified is zero, the function will print a message indicating
+    that no data is available to generate the heatmap and will return None. Otherwise, 
+    it processes the DataFrame to convert the generated strings into a one-hot encoded format
+    and then sums up these encodings to calculate the frequency of each letter.
 
     Parameters:
-    - n_rows (int): Number of random 3-letter strings to generate.
-    Must be positive. Default is 1000.
+    - rows (int, optional): Number of random strings to generate. Must be non-negative. 
+      Default is 1000. If set to 0, the function returns None after printing a message.
+    - string_length (int, optional): Length of each random string. Must be non-negative. 
+      Default is 3. A value of 0 results in the generation of empty strings.
 
     Returns:
-    - ax (matplotlib.axes.Axes): A Matplotlib Axes object containing the histogram.
-    Each bar represents one of the top 30 most frequent 3-letter strings.
-
-    Raises:
-    - ValueError: If `n_rows` is less than or equal to 0.
+    - matplotlib.axes._axes.Axes or None: A seaborn heatmap plot object if 
+      data is generated; otherwise, None.
 
     Requirements:
     - random
     - string
     - pandas
-    
+    - seaborn
+    - matplotlib
+
+    Note
+    - If no strings are generated (e.g., rows = 0), the 
+       DataFrame will be empty. In this case, the function prints a message "No data to generate heatmap." and returns None.
+    - If the DataFrame is not empty, each string is split into its 
+       constituent letters, converted into one-hot encoded format, and then the frequency 
+       of each letter is calculated by summing these encodings.
+       
     Example:
-    >>> ax = task_func(1000)
-    >>> ax.get_title()
-    'Top 30 Frequencies of Random 3-Letter Strings'
+    >>> ax = task_func(1000, 3)
+    >>> ax.get_xlim()
+    (0.0, 26.0)
     """
-    if n_rows <= 0:
-        raise ValueError("Number of rows must be greater than 0")
-    data = ["".join(random.choices(string.ascii_lowercase, k=3)) for _ in range(n_rows)]
-    df = pd.DataFrame(data, columns=["String"])
-    frequency = df["String"].value_counts()
-    ax = frequency.head(30).plot(
-        kind="bar"
-    )  # Limit to the top 30 frequencies for readability
-    ax.set_title("Top 30 Frequencies of Random 3-Letter Strings")
-    ax.set_xlabel("String")
-    ax.set_ylabel("Frequency")
+    data = ["".join(random.choices(LETTERS, k=string_length)) for _ in range(rows)]
+    df = pd.DataFrame({"String": data})
+    if df.empty:
+        print("No data to generate heatmap.")
+        return None
+    df = pd.get_dummies(df["String"].apply(list).explode()).groupby(level=0).sum()
+    corr = df.corr()
+    ax = sns.heatmap(corr, annot=True, fmt=".2f")
+    plt.close()  # Close the plot to prevent it from showing during function call
     return ax
 
 import unittest
-import random
-from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
+import random
 class TestCases(unittest.TestCase):
-    """Tests for the function task_func."""
-    def test_return_type(self):
-        """Test if the function returns a Matplotlib Axes object."""
+    """Tests for task_func."""
+    def test_default_parameters(self):
+        """
+        Test task_func with default parameters (rows=1000, string_length=3).
+        Verifies if the function returns a matplotlib Axes object.
+        """
         random.seed(0)
-        result = task_func(100)
-        self.assertIsInstance(result, Axes)
-    def test_default_parameter(self):
-        """Test the function with the default parameter."""
         result = task_func()
-        self.assertIsInstance(result, Axes)
-    def test_zero_rows(self):
-        """Test the function with zero rows."""
-        with self.assertRaises(ValueError):
-            task_func(0)
-    def test_negative_rows(self):
-        """Test the function with a negative number of rows."""
-        with self.assertRaises(ValueError):
-            task_func(-1)
-    def test_large_number_of_rows(self):
-        """Test the function with a large number of rows."""
+        self.assertIsInstance(result, plt.Axes)
+    def test_custom_rows(self):
+        """
+        Test task_func with a custom number of rows.
+        Verifies if the function still returns a matplotlib Axes object.
+        """
+        random.seed(1)
+        result = task_func(rows=500)
+        self.assertIsInstance(result, plt.Axes)
+    def test_custom_string_length(self):
+        """
+        Test task_func with a custom string length.
+        Verifies if the function still returns a matplotlib Axes object.
+        """
         random.seed(2)
-        result = task_func(10000)
-        self.assertIsInstance(result, Axes)
+        result = task_func(string_length=5)
+        self.assertIsInstance(result, plt.Axes)
+    def test_large_dataset(self):
+        """
+        Test task_func with a large dataset.
+        Verifies if the function can handle a large number of rows without errors.
+        """
+        random.seed(3)
+        result = task_func(rows=10000, string_length=3)
+        self.assertIsInstance(result, plt.Axes)
+    def test_zero_rows(self):
+        """
+        Test task_func with zero rows.
+        Verifies if the function handles edge case of zero rows by returning None.
+        """
+        random.seed(4)
+        result = task_func(rows=0)
+        self.assertIsNone(result, "Function should return None for zero rows.")
     def tearDown(self):
         plt.close()

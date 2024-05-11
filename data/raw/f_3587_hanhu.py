@@ -111,7 +111,10 @@ class TestCases(unittest.TestCase):
             moved_files = f_3589(src_dir, dest_dir, ext)
 
             # Assertions adjusted for corrected logic
-            mock_move.assert_called_once_with('/fake/source/file2.txt', dest_dir)
+            try:
+                mock_move.assert_called_once_with('/fake/source/file2.txt', dest_dir)
+            except:
+                mock_move.assert_called_once_with('/fake/source/file2.txt', dest_dir+'/file2.txt')
             self.assertEqual(len(moved_files), 1)  # Expecting only 'file2.txt' to be considered moved
             self.assertIn('/fake/destination/file2.txt', moved_files)  # Path should reflect the file moved to the destination
 

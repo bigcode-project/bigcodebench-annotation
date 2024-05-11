@@ -1,118 +1,120 @@
-import requests
-import json
-from bs4 import BeautifulSoup
+import urllib.request
+import os
+import zipfile
+
+# Constants
+TARGET_DIR = "downloaded_files"
+TARGET_ZIP_FILE = "downloaded_files.zip"
 
 
-def task_func(url: str, file_name: str = "Output.txt") -> str:
+def task_func(url):
     """
-    Scrape the title from a specified web page, save it in JSON format to a given file, 
-    and append to the file if it exists.
+    Download and extract a zip file from a specified URL to a designated directory.
 
     Parameters:
-    - url (str): The URL of the web page from which the title is to be scraped.
-    - file_name (str, optional): The name of the file to save the scraped title. 
-    If the file already exists, the new data is appended. Defaults to 'Output.txt'.
+    - url (str): The URL of the zip file.
 
     Returns:
-    - str: The file path where the scraped title is saved.
+    - str: The path of the directory where the contents of the zip file are extracted.
 
     Requirements:
-    - requests
-    - json
-    - bs4
+      - urllib
+      - os
+      - zipfile
 
-    Notes:
-    - If the web page does not have a title, 'None' is saved as the title value in the JSON data.
-    - Data is appended to the specified file in JSON format, with each title on a new line.
+    Behavior:
+    - If the target directory TARGET_DIR does not exist, it is created.
+    - The zip file is downloaded from the given URL and saved locally as TARGET_ZIP_FILE.
+    - The local zip file TARGET_ZIP_FILE is deleted after extraction.
 
-    Example:
-    >>> task_func("http://example.com")
-    'Output.txt'
-    >>> task_func("http://another-example.com", "AnotherOutput.txt")
-    'AnotherOutput.txt'
+    Error Handling:
+    - The function does not explicitly handle errors that may occur during the download or extraction process.
+      Errors such as a failed download, invalid URL, or corrupted zip file will result in an unhandled exception.
+
+    Examples:
+    >>> task_func("http://example.com/files.zip")
+    'downloaded_files'
     """
-    response = requests.get(url, timeout=5)
-    soup = BeautifulSoup(response.text, "html.parser")
-    title = soup.title.string if soup.title else None
-    data = {"title": title}
-    json_data = json.dumps(data)
-    with open(file_name, "a", encoding="utf-8") as f:
-        f.write(json_data + "\n")
-    return file_name
+    os.makedirs(TARGET_DIR, exist_ok=True)
+    urllib.request.urlretrieve(url, TARGET_ZIP_FILE)
+    with zipfile.ZipFile(TARGET_ZIP_FILE, "r") as zip_ref:
+        zip_ref.extractall(TARGET_DIR)
+    if os.path.exists(TARGET_ZIP_FILE):
+        os.remove(TARGET_ZIP_FILE)
+    return TARGET_DIR
 
 import unittest
-from unittest.mock import patch, mock_open
-import requests
-import json
+from unittest.mock import patch, MagicMock
+import os
+import shutil
 class TestCases(unittest.TestCase):
-    """Test cases for task_func"""
-    @patch("builtins.open", new_callable=mock_open, read_data="")
-    def test_scrape_title_page_1(self, mock_file):
-        """Test that the title is scraped from a web page and saved to a file"""
-        mock_response = requests.Response()
-        mock_response.status_code = 200
-        mock_response._content = b"<title>Test Page 1</title>"
-        with patch("requests.get", return_value=mock_response):
-            file_path = task_func("http://example.com")
-            self.assertEqual(file_path, "Output.txt")
-            mock_file().write.assert_called_once_with(
-                json.dumps({"title": "Test Page 1"}) + "\n"
-            )
-    @patch("builtins.open", new_callable=mock_open, read_data="")
-    def test_scrape_title_page_2(self, mock_file):
-        """Test that the title is scraped from a web page and saved to a file"""
-        mock_response = requests.Response()
-        mock_response.status_code = 200
-        mock_response._content = b"<title>Test Page 2</title>"
-        with patch("requests.get", return_value=mock_response):
-            file_path = task_func("http://example.com", "AnotherOutput.txt")
-            self.assertEqual(file_path, "AnotherOutput.txt")
-            mock_file().write.assert_called_once_with(
-                json.dumps({"title": "Test Page 2"}) + "\n"
-            )
-    @patch("builtins.open", new_callable=mock_open, read_data="")
-    def test_invalid_url(self, mock_file):
-        """Test that an exception is raised when the URL is invalid"""
-        with self.assertRaises(requests.RequestException):
-            task_func("http://invalid-url")
-    @patch("builtins.open", new_callable=mock_open, read_data="")
-    def test_page_without_title(self, mock_file):
-        """Test that 'None' is saved as the title when the web page does not have a title"""
-        mock_response = requests.Response()
-        mock_response.status_code = 200
-        mock_response._content = b"<html><head></head><body></body></html>"
-        with patch("requests.get", return_value=mock_response):
-            file_path = task_func("http://example.com")
-            self.assertEqual(file_path, "Output.txt")
-            mock_file().write.assert_called_once_with(
-                json.dumps({"title": None}) + "\n"
-            )
-    @patch("builtins.open", new_callable=mock_open, read_data="")
-    def test_very_long_title(self, mock_file):
-        """Test that a very long title is saved correctly"""
-        long_title = "A" * 1024  # A very long title of 1024 characters
-        mock_response = requests.Response()
-        mock_response.status_code = 200
-        mock_response._content = f"<title>{long_title}</title>".encode()
-        with patch("requests.get", return_value=mock_response):
-            file_path = task_func("http://example.com")
-            self.assertEqual(file_path, "Output.txt")
-            mock_file().write.assert_called_once_with(
-                json.dumps({"title": long_title}) + "\n"
-            )
-    @patch(
-        "builtins.open",
-        new_callable=mock_open,
-        read_data=json.dumps({"title": "Existing Title"}) + "\n",
-    )
-    def test_append_to_existing_file(self, mock_file):
-        """Test that data is appended to an existing file"""
-        mock_response = requests.Response()
-        mock_response.status_code = 200
-        mock_response._content = b"<title>New Title</title>"
-        with patch("requests.get", return_value=mock_response):
-            file_path = task_func("http://example.com")
-            self.assertEqual(file_path, "Output.txt")
-            mock_file().write.assert_called_with(
-                json.dumps({"title": "New Title"}) + "\n"
-            )
+    """Test cases for the task_func function."""
+    def setUp(self):
+        if not os.path.exists(TARGET_DIR):
+            os.makedirs(TARGET_DIR)
+        if os.path.exists(TARGET_DIR):
+            shutil.rmtree(TARGET_DIR)
+    @patch("urllib.request.urlretrieve")
+    @patch("zipfile.ZipFile")
+    def test_valid_zip_file(self, mock_zipfile, mock_urlretrieve):
+        """Test that the function returns the correct directory path."""
+        url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
+        mock_zipfile.return_value.__enter__.return_value = MagicMock()
+        result = task_func(url)
+        mock_urlretrieve.assert_called_with(url, TARGET_ZIP_FILE)
+        self.assertEqual(result, TARGET_DIR)
+        self.assertTrue(os.path.exists(TARGET_DIR))
+    @patch("urllib.request.urlretrieve")
+    def test_invalid_url(self, mock_urlretrieve):
+        """Test that the function raises an exception when the URL is invalid."""
+        mock_urlretrieve.side_effect = Exception
+        url = "https://invalid.url/invalid.zip"
+        with self.assertRaises(Exception):
+            task_func(url)
+    @patch("urllib.request.urlretrieve")
+    @patch("zipfile.ZipFile")
+    def test_non_zip_file(self, mock_zipfile, mock_urlretrieve):
+        """Test that the function raises an exception when the URL does not point to a zip file."""
+        mock_zipfile.side_effect = zipfile.BadZipFile
+        url = "https://www.sample-videos.com/img/Sample-jpg-image-5mb.jpg"
+        with self.assertRaises(zipfile.BadZipFile):
+            task_func(url)
+    @patch("urllib.request.urlretrieve")
+    @patch("zipfile.ZipFile")
+    def test_cleanup(self, mock_zipfile, mock_urlretrieve):
+        """Test that the function deletes the downloaded zip file after extraction."""
+        mock_zipfile.return_value.__enter__.return_value = MagicMock()
+        url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
+        task_func(url)
+        self.assertFalse(os.path.exists(TARGET_ZIP_FILE))
+    @patch("urllib.request.urlretrieve")
+    @patch("zipfile.ZipFile")
+    def test_directory_creation(self, mock_zipfile, mock_urlretrieve):
+        """Test that the function creates a directory to store the extracted files."""
+        mock_zipfile.return_value.__enter__.return_value = MagicMock()
+        url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
+        task_func(url)
+        self.assertTrue(os.path.exists(TARGET_DIR))
+        self.assertTrue(os.path.isdir(TARGET_DIR))
+    @patch("urllib.request.urlretrieve")
+    @patch("zipfile.ZipFile")
+    def test_zip_extraction_content(self, mock_zipfile, mock_urlretrieve):
+        """Test that the function extracts the contents of the zip file."""
+        mock_extractall = MagicMock()
+        mock_zipfile.return_value.__enter__.return_value.extractall = mock_extractall
+        url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
+        task_func(url)
+        mock_extractall.assert_called_once()
+    @patch("urllib.request.urlretrieve")
+    @patch("zipfile.ZipFile")
+    def test_file_removal(self, mock_zipfile, mock_urlretrieve):
+        """Test that the function deletes the downloaded zip file even if extraction fails."""
+        mock_zipfile.return_value.__enter__.return_value = MagicMock()
+        url = "https://www.sample-videos.com/zip/Sample-Zip-5mb.zip"
+        # Create a dummy file to simulate download
+        open(TARGET_ZIP_FILE, "a").close()
+        task_func(url)
+        self.assertFalse(os.path.exists(TARGET_ZIP_FILE))
+    def tearDown(self):
+        if os.path.exists(TARGET_DIR):
+            shutil.rmtree(TARGET_DIR)

@@ -1,71 +1,88 @@
 import sys
-import subprocess
+import json
+from datetime import datetime
 
 # Constants
-PYTHON_VERSION = '3.8'
 PATH_TO_APPEND = '/path/to/whatever'
+JSON_FILE = '/path/to/json_file.json'
 
-def task_func(python_version=PYTHON_VERSION, path_to_append=PATH_TO_APPEND):
+def task_func(path_to_append=PATH_TO_APPEND, json_file=JSON_FILE):
     """
-    Switch to a specific version of Python and add a specific path to sys.path.
-    
-    Note: This function changes the global Python version and should be used carefully.
+    Add a specific path to sys.path and update a JSON file with the current date and time.
+    This function appends a given path to Python's sys.path and updates a JSON file with the current date and time under the key 'last_updated'.
     
     Parameters:
-    - python_version (str): The Python version to switch to. Default is '3.8'.
     - path_to_append (str): The path to append to sys.path. Default is '/path/to/whatever'.
+    - json_file (str): The path to the JSON file to update. Default is '/path/to/json_file.json'. The file should exist before running the function.
 
     Returns:
-    - python_version (str): The Python version that was switched to.
+    - json_data (dict): The updated JSON data. The dictionary will contain a 'last_updated' key with the current datetime as its value.
 
     Requirements:
     - sys
-    - subprocess
+    - json
+    - datetime.datetime
 
     Example:
-    >>> task_func('3.7', '/path/to/new_directory')
-    '3.7'
+    >>> task_func('/path/to/new_directory', '/path/to/new_json_file.json')
+    {'last_updated': '2023-08-28 12:34:56'}
     """
-    subprocess.run(['pyenv', 'global', python_version], check=True)
     sys.path.append(path_to_append)
-    return python_version
+    with open(json_file, 'r+') as file:
+        json_data = json.load(file)
+        json_data['last_updated'] = str(datetime.now())
+        file.seek(0)
+        json.dump(json_data, file, indent=4)
+        file.truncate()
+    return json_data
 
-import sys
 import unittest
-from unittest.mock import patch
+import json
+import os
+import tempfile
+import sys
+from datetime import datetime
+# Update this path if needed to point to an actual temporary directory
 class TestCases(unittest.TestCase):
-    @patch('subprocess.run')
-    def test_switch_to_default_python_version(self, mock_run):
-        original_path_length = len(sys.path)
-        task_func()
-        mock_run.assert_called_with(['pyenv', 'global', '3.8'], check=True)
-        self.assertEqual(sys.path[-1], '/path/to/whatever')
-        sys.path = sys.path[:original_path_length]  # Reset sys.path to original state
-    @patch('subprocess.run')
-    def test_switch_to_python_3_7(self, mock_run):
-        original_path_length = len(sys.path)
-        task_func('3.7', '/another/path')
-        mock_run.assert_called_with(['pyenv', 'global', '3.7'], check=True)
-        self.assertEqual(sys.path[-1], '/another/path')
-        sys.path = sys.path[:original_path_length]
-    @patch('subprocess.run')
-    def test_switch_to_python_3_9(self, mock_run):
-        original_path_length = len(sys.path)
-        task_func('3.9')
-        mock_run.assert_called_with(['pyenv', 'global', '3.9'], check=True)
-        self.assertEqual(sys.path[-1], '/path/to/whatever')
-        sys.path = sys.path[:original_path_length]
-    @patch('subprocess.run')
-    def test_switch_to_python_2_7(self, mock_run):
-        original_path_length = len(sys.path)
-        task_func('2.7')
-        mock_run.assert_called_with(['pyenv', 'global', '2.7'], check=True)
-        self.assertEqual(sys.path[-1], '/path/to/whatever')
-        sys.path = sys.path[:original_path_length]
-    @patch('subprocess.run')
-    def test_switch_to_python_3_6(self, mock_run):
-        original_path_length = len(sys.path)
-        task_func('3.6', '/different/path')
-        mock_run.assert_called_with(['pyenv', 'global', '3.6'], check=True)
-        self.assertEqual(sys.path[-1], '/different/path')
-        sys.path = sys.path[:original_path_length]
+    
+    def setUp(self):
+        # Create temporary JSON files for testing in text mode
+        self.test_json_file_1 = tempfile.NamedTemporaryFile(mode='w+', delete=False)
+        self.test_json_file_2 = tempfile.NamedTemporaryFile(mode='w+', delete=False)
+        json.dump({'key': 'value'}, self.test_json_file_1)
+        json.dump({'key': 'value'}, self.test_json_file_2)
+        self.test_json_file_1.close()
+        self.test_json_file_2.close()
+        self.tmp_file = tempfile.mktemp(suffix='.json')
+        with open(self.tmp_file, 'w') as f:
+            json.dump({'initial_key': 'initial_value'}, f)
+    def tearDown(self):
+        # Remove temporary JSON files after testing
+        os.unlink(self.test_json_file_1.name)
+        os.unlink(self.test_json_file_2.name)
+        os.remove(self.tmp_file)
+        
+    def test_path_append(self):
+        # Test if the path is correctly appended to sys.path
+        new_path = '/new/test/path'
+        task_func(path_to_append=new_path, json_file=self.test_json_file_1.name)
+        self.assertIn(new_path, sys.path)
+    def test_json_update_1(self):
+        # Test if the JSON file is correctly updated (test_json_file_1)
+        output = task_func(json_file=self.test_json_file_1.name)
+        self.assertIn('last_updated', output)
+        self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
+    def test_json_update_2(self):
+        # Test if the JSON file is correctly updated (test_json_file_2)
+        output = task_func(json_file=self.test_json_file_2.name)
+        self.assertIn('last_updated', output)
+        self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
+    def test_default_path(self):
+        # Test if the default path is correctly appended when no argument is passed
+        task_func(json_file=self.test_json_file_1.name)
+        self.assertIn('/path/to/whatever', sys.path)
+    def test_default_json(self):
+        # Test if the default JSON file is correctly updated when no argument is passed
+        output = task_func(json_file=self.tmp_file)
+        self.assertIn('last_updated', output)
+        self.assertIsInstance(datetime.strptime(output['last_updated'], '%Y-%m-%d %H:%M:%S.%f'), datetime)

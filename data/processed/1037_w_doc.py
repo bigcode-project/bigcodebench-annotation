@@ -1,85 +1,118 @@
 import pandas as pd
-import seaborn as sns
+from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 
 
-def task_func(s1, s2):
+def task_func(s1, s2, n_clusters=3):
     """
-    Visualize two Series using a swarm plot with a highlight on their intersecting data points.
-
-    This function creates a swarm plot to visually compare two pandas Series. 
-    It highlights the intersection points between these two series by drawing red dashed lines at the intersecting data points.
+    Perform K-Means clustering on data points from two pandas Series and visualize the clusters.
 
     Parameters:
-    - s1 (pd.Series): The first series of data. This series must have a unique name that identifies it in the plot.
-    - s2 (pd.Series): The second series of data. Similar to s1, this series must also have a unique name.
+    - s1 (pandas.Series): The first series of data. Each value in the series represents a data point's coordinate along one dimension.
+    - s2 (pandas.Series): The second series of data. Each value corresponds to a data point's coordinate along another dimension. The length of s2 must match that of s1.
+    - n_clusters (int, optional): The number of clusters to form as well as the number of centroids to generate. Defaults to 3.
 
     Returns:
-    - ax (matplotlib.Axes): The Axes object of the plotted swarm chart. This object can be used for further customization of the plot if required.
-    intersection_count (int): The number of unique intersecting data points between s1 and s2. 
-    This count gives a quick numerical summary of the overlap between the two series.
+    - tuple: A tuple containing the following elements:
+        - ndarray: An array of cluster labels indicating the cluster each data point belongs to.
+        - matplotlib.axes.Axes: The Axes object of the plot, which shows the data points colored according to their cluster labels.
+
+    Raises:
+    - ValueError: If either s1 or s2 is not a pandas Series, raise "s1 and s2 must be pandas Series"
+    - ValueError: If s1 and s2 have different lengths, raise "s1 and s2 must have the same length"
 
     Requirements:
     - pandas
-    - seaborn
+    - scikit-learn
     - matplotlib
 
+    Notes:
+    - The function needs to ensure that s1 and s2 are pandas Series of equal length. 
+    - It then performs K-Means clustering on the combined data points from s1 and s2. 
+    - After clustering, it creates a scatter plot where each cluster is visualized with a different color. 
+    - The plot title is set to "K-Means Clustering" to describe the visualization technique. 
+    - A legend is added, which uses elements from the scatter plot to describe each cluster.
+        
     Example:
-    >>> s1 = pd.Series([1, 2, 3, 4, 5], name='Series1')
-    >>> s2 = pd.Series([4, 5, 6, 7, 8], name='Series2')
-    >>> ax, count = task_func(s1, s2)
-    >>> ax.get_title()
-    'Overlap Between Series1 and Series2'
+    >>> s1 = pd.Series(np.random.rand(100), name='feature1')
+    >>> s2 = pd.Series(np.random.rand(100), name='feature2')
+    >>> labels, ax = task_func(s1, s2, n_clusters=4)
+    >>> print(ax.get_title())
+    K-Means Clustering
+
+   
     """
-    intersection = set(s1).intersection(set(s2))
-    df1 = pd.DataFrame({s1.name: s1, "Type": "Series1"})
-    df2 = pd.DataFrame({s2.name: s2, "Type": "Series2"})
-    df = pd.concat([df1, df2], axis=0, ignore_index=True)
-    _, ax = plt.subplots(figsize=(10, 6))
-    sns.swarmplot(x=df.columns[0], y="Type", data=df, ax=ax)
-    for point in intersection:
-        ax.axvline(x=point, color="red", linestyle="--")
-    ax.set_title(f"Overlap Between {s1.name} and {s2.name}")
-    return ax, len(intersection)
+    if not isinstance(s1, pd.Series) or not isinstance(s2, pd.Series):
+        raise ValueError("s1 and s2 must be pandas Series")
+    if len(s1) != len(s2):
+        raise ValueError("s1 and s2 must have the same length")
+    df = pd.concat([s1, s2], axis=1)
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+    labels = kmeans.fit_predict(df)
+    _, ax = plt.subplots()
+    scatter = ax.scatter(df[s1.name], df[s2.name], c=labels)
+    ax.set_xlabel(s1.name)
+    ax.set_ylabel(s2.name)
+    ax.set_title("K-Means Clustering")
+    plt.legend(*scatter.legend_elements(), title="Clusters")
+    return labels, ax
 
 import pandas as pd
+import numpy as np
 import unittest
+import os
+from sklearn.datasets import make_blobs
 class TestCases(unittest.TestCase):
-    """Tests for the function task_func."""
-    def test_intersection_exists(self):
-        """Test that the function works when the two series have an intersection."""
-        s1 = pd.Series([1, 2, 3, 4, 5], name="Series1")
-        s2 = pd.Series([4, 5, 6, 7, 8], name="Series2")
-        ax, intersection_count = task_func(s1, s2)
-        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
-        self.assertEqual(intersection_count, 2)
-    def test_no_intersection(self):
-        """Test that the function works when the two series have no intersection."""
-        s1 = pd.Series([1, 2, 3], name="Series1")
-        s2 = pd.Series([4, 5, 6], name="Series2")
-        ax, intersection_count = task_func(s1, s2)
-        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
-        self.assertEqual(intersection_count, 0)
-    def test_empty_series(self):
-        """Test that the function works when one of the series is empty."""
-        s1 = pd.Series([], name="Series1")
-        s2 = pd.Series([], name="Series2")
-        ax, intersection_count = task_func(s1, s2)
-        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
-        self.assertEqual(intersection_count, 0)
-    def test_partial_intersection(self):
-        """Test that the function works when the two series have a partial intersection."""
-        s1 = pd.Series([1, 2], name="Series1")
-        s2 = pd.Series([2, 3], name="Series2")
-        ax, intersection_count = task_func(s1, s2)
-        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
-        self.assertEqual(intersection_count, 1)
-    def test_identical_series(self):
-        """Test that the function works when the two series are identical."""
-        s1 = pd.Series([1, 2, 3], name="Series1")
-        s2 = pd.Series([1, 2, 3], name="Series2")
-        ax, intersection_count = task_func(s1, s2)
-        self.assertEqual(ax.get_title(), "Overlap Between Series1 and Series2")
-        self.assertEqual(intersection_count, 3)
+    """Tests for task_func."""
+    def setUp(self) -> None:
+        os.environ["LOKY_MAX_CPU_COUNT"] = "2"
+    def test_random_data_size_100(self):
+        """Test with random data of size 100 and default number of clusters"""
+        np.random.seed(42)
+        s1 = pd.Series(np.random.rand(100), name="feature1")
+        np.random.seed(0)
+        s2 = pd.Series(np.random.rand(100), name="feature2")
+        labels, ax = task_func(s1, s2)
+        # Check if labels are ndarray
+        self.assertIsInstance(labels, np.ndarray)
+        # Check the plot's title
+        self.assertEqual(ax.get_title(), "K-Means Clustering")
+    def test_random_data_custom_clusters(self):
+        """Test with random data of size 100 and custom number of clusters"""
+        np.random.seed(42)
+        s1 = pd.Series(np.random.rand(100), name="feature1")
+        np.random.seed(0)
+        s2 = pd.Series(np.random.rand(100), name="feature2")
+        labels, ax = task_func(s1, s2, n_clusters=5)
+        # Check if labels are ndarray
+        self.assertIsInstance(labels, np.ndarray)
+        self.assertEqual(len(set(labels)), 5)
+        # Check the plot's title
+        self.assertEqual(ax.get_title(), "K-Means Clustering")
+    def test_invalid_input_non_series(self):
+        """Test with invalid input types (non-Series)"""
+        with self.assertRaises(ValueError):
+            task_func([1, 2, 3], pd.Series([4, 5, 6]))
+    def test_invalid_input_mismatched_length(self):
+        """Test with mismatched length of Series"""
+        s1 = pd.Series([1, 2, 3], name="feature1")
+        s2 = pd.Series([4, 5], name="feature2")
+        with self.assertRaises(ValueError):
+            task_func(s1, s2)
+    def test_custom_clusters_with_synthetic_data(self):
+        """Test with synthetic data and custom number of clusters using make_blobs"""
+        # Generate synthetic data with 2 distinct clusters
+        X, _ = make_blobs(n_samples=100, centers=2, random_state=42)
+        # Convert to pandas Series
+        s1 = pd.Series(X[:, 0], name="feature1")
+        s2 = pd.Series(X[:, 1], name="feature2")
+        # Run the clustering function
+        labels, ax = task_func(s1, s2, n_clusters=2)
+        # Check if labels are ndarray
+        self.assertIsInstance(labels, np.ndarray)
+        # Check the number of unique labels (should be 2 for 2 clusters)
+        self.assertEqual(len(set(labels)), 2)
+        # Check the plot's title
+        self.assertEqual(ax.get_title(), "K-Means Clustering")
     def tearDown(self):
         plt.clf()

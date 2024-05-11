@@ -1,51 +1,115 @@
-import pytz
-from dateutil import parser
+import os
+import ctypes
+import sys
+import subprocess
 
-def task_func(date_str, from_tz, to_tz):
+
+def task_func(filepath):
     """
-    Converts a date time from one timezone to another.
+    Loads a DLL file specified by the given filepath, then retrieves and prints system information
+    including system name, node name, release, version, machine, Python version, and PIP version.
+    This function demonstrates the use of various system-related libraries in Python.
+
+    The format of the printed message is:
+    System: <system-name-here>
+    Node Name: <node-name-here>
+    Release: <release-here>
+    Version: <version-here>
+    Machine: <type-of-the-machine-here>
+    Python Version: <python-version-here> 
+    PIP Version: <pip-version-here>
 
     Parameters:
-    date_str (str): The date string in "yyyy-mm-dd hh:mm:ss" format.
-    from_tz (str): The timezone of the given date string.
-    to_tz (str): The timezone to which the date should be converted.
+    filepath (str): The path of the DLL file to be loaded.
 
     Returns:
-    str: The converted datetime string in "yyyy-mm-dd hh:mm:ss" format.
+    str: The name of the loaded DLL file.
 
+    Raises:
+    OSError: if the input filepath is invalid or empty
+    TypeError: if the input filepath is not a string
+    
     Requirements:
-    - pytz
-    - dateutil.parser
+    - ctypes
+    - os
+    - sys
+    - subprocess
 
-    Example:
-    >>> task_func('2022-03-01 12:00:00', 'UTC', 'America/New_York')
-    '2022-03-01 07:00:00'
+    Examples:
+    >>> task_func('libc.so.6') # Doctest will vary based on the system and DLL file.
+    'libc.so.6'
+    >>> isinstance(task_func('libc.so.6'), str)
+    True
     """
-    from_tz = pytz.timezone(from_tz)
-    to_tz = pytz.timezone(to_tz)
-    date = parser.parse(date_str).replace(tzinfo=from_tz)
-    date = date.astimezone(to_tz)
-    return date.strftime('%Y-%m-%d %H:%M:%S')
+    if not isinstance(filepath, str):
+        raise TypeError("Invalid filepath type")
+    elif filepath == "" or not os.path.exists(filepath):
+        raise OSError("Invalid filepath")
+    else:
+        lib = ctypes.CDLL(filepath)
+    uname = os.uname()
+    print(f'System: {uname.sysname}')
+    print(f'Node Name: {uname.nodename}')
+    print(f'Release: {uname.release}')
+    print(f'Version: {uname.version}')
+    print(f'Machine: {uname.machine}')
+    python_version = sys.version
+    print(f'Python Version: {python_version}')
+    pip_version = subprocess.check_output(['pip', '--version'])
+    print(f'PIP Version: {pip_version.decode("utf-8")}')
+    return lib._name
 
 import unittest
+from unittest.mock import patch, MagicMock
+import io
+import sys
 class TestCases(unittest.TestCase):
-    def test_utc_to_new_york(self):
-        """Test conversion from UTC to America/New_York timezone."""
-        result = task_func('2022-03-01 12:00:00', 'UTC', 'America/New_York')
-        self.assertEqual(result, '2022-03-01 07:00:00')
-    def test_utc_to_los_angeles_summer_time(self):
-        """Test conversion from UTC to America/Los_Angeles with daylight saving."""
-        result = task_func('2022-06-01 12:00:00', 'UTC', 'America/Los_Angeles')
-        self.assertEqual(result, '2022-06-01 05:00:00')
-    def test_invalid_date_format(self):
-        """Test handling of invalid date format."""
-        with self.assertRaises(ValueError):
-            task_func('invalid-date', 'UTC', 'America/New_York')
-    def test_same_timezone_conversion(self):
-        """Test conversion where from_tz and to_tz are the same."""
-        result = task_func('2022-03-01 12:00:00', 'UTC', 'UTC')
-        self.assertEqual(result, '2022-03-01 12:00:00')
-    def test_utc_to_london_summer_time(self):
-        """Test conversion from UTC to Europe/London during summer (BST)."""
-        result = task_func('2022-06-01 12:00:00', 'UTC', 'Europe/London')
-        self.assertEqual(result, '2022-06-01 13:00:00')
+    @patch('ctypes.CDLL', autospec=True)
+    @patch('os.path.exists', return_value=True)
+    @patch('subprocess.check_output', return_value=b'pip 20.2.3 from /usr/lib/python3.8/site-packages/pip (python 3.8)')
+    def test_system_info_printing(self, mock_check_output, mock_exists, mock_cdll):
+        """Check if system information is correctly printed."""
+        # Set up the mock CDLL instance
+        mock_cdll_instance = MagicMock()
+        mock_cdll.return_value = mock_cdll_instance
+        mock_cdll_instance._name = 'libc.so.6'
+        # Capture the output of print statements
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        task_func('libc.so.6')
+        # Restore stdout
+        sys.stdout = sys.__stdout__
+        # Verify that the expected information is printed
+        output = captured_output.getvalue()
+        self.assertIn('System:', output)
+        self.assertIn('Node Name:', output)
+        self.assertIn('Release:', output)
+        self.assertIn('Version:', output)
+        self.assertIn('Machine:', output)
+        self.assertIn('Python Version:', output)
+        self.assertIn('PIP Version:', output)
+    @patch('ctypes.CDLL', autospec=True)
+    @patch('os.path.exists', return_value=True)
+    def test_return_type(self, mock_exists, mock_cdll):
+        # Set up the mock CDLL instance
+        mock_cdll_instance = MagicMock()
+        mock_cdll.return_value = mock_cdll_instance
+        mock_cdll_instance._name = 'libc.so.6'  # Setting up the expected return value
+        # Invoke task_func with a filepath
+        filepath = 'libc.so.6'
+        result = task_func(filepath)
+        # Check that the function returns a string and that the string is the name of the DLL
+        self.assertIsInstance(result, str)  # Ensure the return type is string
+        self.assertEqual(result, 'libc.so.6')  # Check if the name matches what's expected
+    def test_invalid_file_path(self):
+        with self.assertRaises(OSError):
+            task_func('invalid_path.dll')
+    def test_empty_file_path(self):
+        with self.assertRaises(OSError):
+            task_func('')
+    def test_non_string_input(self):
+        with self.assertRaises(TypeError):
+            task_func(123)
+    def test_os_uname_output(self):
+        filepath = 'libc.so.6'
+        self.assertFalse('sysname' in os.uname())
