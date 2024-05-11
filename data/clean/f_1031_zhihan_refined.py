@@ -20,7 +20,7 @@ def f_1031(list_of_pairs):
     >>> list_of_pairs = [('Fruits', 5), ('Vegetables', 9), ('Dairy', -1), ('Bakery', -2), ('Meat', 4)]
     >>> product_array = f_1031(list_of_pairs)
     >>> print(product_array)
-    360
+    [360]
     """
     second_values = [pair[1] for pair in list_of_pairs]
     product = reduce(np.multiply, second_values)
