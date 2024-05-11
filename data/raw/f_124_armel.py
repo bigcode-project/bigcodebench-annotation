@@ -30,18 +30,9 @@ def f_124(text):
     words       1
     dtype: int64
     """
-    # Normalize the text to lowercase
-    text = text.lower()
-    
-    # Use regex to find words, considering words as sequences of alphabetic characters
-    words = re.findall(r'\b\p{L}+\b', text)
-    
-    # Filter out stopwords
-    filtered_words = [word for word in words if word not in STOPWORDS]
-    
-    # Count the frequency of each word using pandas Series
-    word_counts = pd.Series(filtered_words).value_counts()
-    
+    words = re.findall(r"\b\w+\b", text.lower())
+    words = [word for word in words if word not in STOPWORDS]
+    word_counts = pd.Series(words).value_counts().rename(None)
     return word_counts
 
 
