@@ -15,7 +15,7 @@ def task_func(r_script_path: str, output_path: str, duration: int) -> (bool, str
     Returns:
     - tuple containing:
       - bool: True if the output file is generated within the specified duration, False otherwise.
-      - str: A message indicating whether the file was generated successfully or not.
+      - str: A message indicating whether the file was generated successfully or not. If the generation is successful, the message will be 'File generated successfully within the specified duration.'; otherwise, it will be 'File not generated within the specified duration.'
     
     Requirements:
     - subprocess
