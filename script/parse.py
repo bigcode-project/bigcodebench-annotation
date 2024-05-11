@@ -261,7 +261,7 @@ def extract_test(file_contents, function_name):
         return f"Error processing the script: {e}"
 
 def replace_pii(content):
-    for name in ["chien", "jenny", "wenhao", "niklas", "hanhu", "ratna", "ming", "junda", "haolan", "xiaohenng"]:   
+    for name in ["chien", "jenny", "wenhao", "niklas", "hanhu", "ratna", "ming", "junda", "haolan", "xiaoheng", "armel", "zhihan", "indraneil", "james", "simon"]:
         content = content.replace("_"+name, "")
         content = content.replace(name+"_", "")
     return content
