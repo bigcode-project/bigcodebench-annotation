@@ -70,9 +70,10 @@ class TestCases(unittest.TestCase):
         # Execute the function under test
         with patch('matplotlib.pyplot.show'):
             f_1757()
-
             # Assert the plot was called correctly, allow additional arguments like labels
-            mock_plot.assert_called_with(expected_X, expected_Y, label=ANY)
+            args, kwargs = mock_plot.call_args
+            self.assertTrue(np.allclose(args[0], expected_X))
+            self.assertTrue(np.allclose(args[1], expected_Y))
 
     def test_grid_enabled(self):
         """Test if the grid is enabled in the plot."""
