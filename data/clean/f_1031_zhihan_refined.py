@@ -22,14 +22,11 @@ def f_1031(list_of_pairs):
     >>> print(product_array)
     360
     """
-    # Extract the second element from each tuple using a list comprehension
-    values = [pair[1] for pair in list_of_pairs]
-    
-    # Use reduce to calculate the product of all elements in the values list
-    product = reduce(lambda x, y: x * y, values)
-    
-    # Return the result as a numpy array with a single element
-    return np.array([product])
+    second_values = [pair[1] for pair in list_of_pairs]
+    product = reduce(np.multiply, second_values)
+    product_array = np.array([product])
+
+    return product_array
 
 import unittest
 import numpy as np
@@ -46,7 +43,7 @@ class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Basic test case with positive and negative numbers
         list_of_pairs = [('Fruits', 5), ('Vegetables', 9), ('Dairy', -1), ('Bakery', -2), ('Meat', 4)]
-        expected_output = np.array(360)
+        expected_output = np.array([360])
         actual_output = f_1031(list_of_pairs)
         print(actual_output, expected_output)
         self.assertTrue(np.array_equal(actual_output, expected_output))
@@ -54,28 +51,28 @@ class TestCases(unittest.TestCase):
     def test_case_2(self):
         # Test case with all positive numbers
         list_of_pairs = [('A', 2), ('B', 3), ('C', 4)]
-        expected_output = np.array(24)
+        expected_output = np.array([24])
         actual_output = f_1031(list_of_pairs)
         self.assertTrue(np.array_equal(actual_output, expected_output))
     
     def test_case_3(self):
         # Test case with all negative numbers
         list_of_pairs = [('A', -2), ('B', -3), ('C', -4)]
-        expected_output = np.array(-24)
+        expected_output = np.array([-24])
         actual_output = f_1031(list_of_pairs)
         self.assertTrue(np.array_equal(actual_output, expected_output))
     
     def test_case_4(self):
         # Test case with a single tuple
         list_of_pairs = [('A', 10)]
-        expected_output = np.array(10)
+        expected_output = np.array([10])
         actual_output = f_1031(list_of_pairs)
         self.assertTrue(np.array_equal(actual_output, expected_output))
     
     def test_case_5(self):
         # Test case with zeros
         list_of_pairs = [('A', 0), ('B', 5), ('C', 10)]
-        expected_output = np.array(0)
+        expected_output = np.array([0])
         actual_output = f_1031(list_of_pairs)
         self.assertTrue(np.array_equal(actual_output, expected_output))
 if __name__ == "__main__":
