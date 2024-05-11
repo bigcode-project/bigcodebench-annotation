@@ -42,7 +42,8 @@ import unittest
 import socket
 import threading
 
-
+SERVER_ADDRESS = "localhost"
+BUFFER_SIZE = 1024
 class TestCases(unittest.TestCase):
     """Test cases for f_882."""
 

@@ -2,10 +2,6 @@ import os
 import csv
 from collections import Counter
 
-# Constants
-BASE_PATH = 'task_func_data'
-FILE_NAME = os.path.join(BASE_PATH, 'Output.txt')
-
 def task_func(file_path):
     """
     This function reads the specified CSV file, counts the frequency of each word, and returns the most common word 
@@ -45,6 +41,9 @@ def task_func(file_path):
     return most_common_word, frequency
 
 import unittest
+# Constants
+BASE_PATH = 'task_func_data'
+FILE_NAME = os.path.join(BASE_PATH, 'Output.txt')
 class TestCases(unittest.TestCase):
     def setUp(self):
         """Create the directory for test files."""

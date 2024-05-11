@@ -2,10 +2,6 @@ import os
 import csv
 from collections import Counter
 
-# Constants
-BASE_PATH = 'f_623_data_xiaoheng'
-FILE_NAME = os.path.join(BASE_PATH, 'Output.txt')
-
 def f_623(file_path):
     """
     This function reads the specified CSV file, counts the frequency of each word, and returns the most common word 
@@ -49,6 +45,9 @@ def f_623(file_path):
     return most_common_word, frequency
 
 import unittest
+# Constants
+BASE_PATH = 'f_623_data_xiaoheng'
+FILE_NAME = os.path.join(BASE_PATH, 'Output.txt')
 
 def run_tests():
     suite = unittest.TestSuite()
