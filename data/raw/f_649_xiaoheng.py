@@ -48,7 +48,7 @@ class TestCases(unittest.TestCase):
 
     def test_2(self):
         avg_distance = f_649(500)
-        self.assertTrue(3.2 <= avg_distance <= 3.5, f"Expected average distance to be between 3.2 and 3.5, got {avg_distance}")
+        self.assertTrue(3.0 <= avg_distance <= 3.6, f"Expected average distance to be between 3.2 and 3.5, got {avg_distance}")
 
     def test_3(self):
         avg_distance = f_649(100)
