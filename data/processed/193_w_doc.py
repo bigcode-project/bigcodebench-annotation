@@ -41,7 +41,6 @@ def task_func(rows, columns):
     >>> isinstance(df, pd.DataFrame)
     True
     """
-
     data = {}
     for col in range(columns):
         data_type = choice(DATA_TYPES)

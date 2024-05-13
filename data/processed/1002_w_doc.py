@@ -33,7 +33,6 @@ def task_func(data, column_name="target_column"):
     0       1     10
     1       2     15
     """
-
     df = pd.DataFrame(data)
     if column_name not in df.columns:
         raise ValueError(f"Column '{column_name}' not found in the DataFrame.")

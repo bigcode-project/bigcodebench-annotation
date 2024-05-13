@@ -30,7 +30,6 @@ def task_func(text, filename):
     >>> task_func(text, 'dollar_words.csv')
     '/absolute/path/to/dollar_words.csv'
     """
-
     punctuation_set = set(punctuation)
     tokenizer = RegexpTokenizer(r'\$\w+')
     dollar_prefixed_words = tokenizer.tokenize(text)

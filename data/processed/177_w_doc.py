@@ -29,7 +29,6 @@ def task_func(df):
     >>> task_func(df)
     {'Like': 1, 'what': 1, 'you': 1, 'see': 1}
     """
-
     if "Title" not in df.columns or "Content" not in df.columns:
         raise ValueError("DataFrame must include 'Title' and 'Content' columns.")
     pattern = re.compile(r'(like|what)', re.IGNORECASE)

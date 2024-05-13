@@ -22,7 +22,6 @@ def task_func(array_length=100):
     Example:
     >>> df, ax = task_func(50)
     '''
-
     array1 = np.random.rand(array_length)
     array2 = np.random.rand(array_length)
     statistics = {

@@ -35,7 +35,6 @@ def task_func(data):
     2 -0.602019  1.244180  cherry
     3  1.707546 -1.457267    date
     """
-
     dataframe = pd.DataFrame(data)
     scaler = StandardScaler()
     for column in dataframe.columns:

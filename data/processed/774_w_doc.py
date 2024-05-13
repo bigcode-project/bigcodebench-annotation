@@ -38,7 +38,6 @@ def task_func(num_samples=100, n_estimators=100, random_seed=None, cv=5):
     >>> print(results)
     (0.47332912782858, RandomForestRegressor(random_state=1))
     '''
-
     if num_samples / cv < 2:
         raise ValueError("num_samples / cv should be greater than or equal to 2.")
     np.random.seed(random_seed)

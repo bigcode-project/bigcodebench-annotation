@@ -30,7 +30,6 @@ def task_func(date_str):
     ...
     49     Dave 2023-06-24
     """
-
     start_date = datetime.strptime(date_str, "%Y-%m-%d")
     dates = pd.date_range(start_date, periods=10).tolist()
     df = pd.DataFrame(list(product(EMPLOYEES, dates)), columns=["Employee", "Date"])

@@ -34,7 +34,6 @@ def task_func(json_file):
     >>> df, ax = task_func('data/task_func/json_1.json')
     >>> print(df)
     """
-
     with open(json_file, 'r') as file:
         email_data = json.load(file)
     if not email_data :

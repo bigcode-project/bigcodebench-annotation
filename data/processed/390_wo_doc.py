@@ -34,7 +34,6 @@ def task_func(csv_url_dict, sort_by_column="title"):
     0   1   Apple    0.3
     1   2  Banana    0.5
     """
-
     if "URL" not in csv_url_dict or not csv_url_dict:
         raise ValueError("The dictionary must contain a 'URL' key.")
     response = requests.get(csv_url_dict["URL"])

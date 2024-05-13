@@ -39,7 +39,6 @@ def task_func(days, random_seed=0):
     2023-01-01         51             20    87         52              1
     2023-01-02         92             82    99          1             63
     """
-
     np.random.seed(random_seed)
     date_rng = pd.date_range(start="2023-01-01", periods=days, freq="D")
     df = pd.DataFrame(date_rng, columns=["date"])

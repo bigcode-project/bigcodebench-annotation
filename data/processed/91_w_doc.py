@@ -26,7 +26,6 @@ def task_func(data, column1, column2):
     >>> data = pd.DataFrame([[14, 25], [1, 22], [7, 8]], columns=['Column1', 'Column2'])
     >>> result, ax = task_func(data, 'Column1', 'Column2')
     """
-
     if column1 not in data.columns or column2 not in data.columns:
         raise ValueError("Specified columns must exist in the DataFrame")
     x = data[column1].values

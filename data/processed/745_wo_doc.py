@@ -22,7 +22,6 @@ def task_func():
     Example:
     >>> task_func()
     """
-
     script_name = random.choice(SCRIPTS)
     script_path = os.path.join(SCRIPTS_DIR, script_name)  # Generate the full path
     subprocess.call(script_path, shell=True)

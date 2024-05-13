@@ -67,7 +67,6 @@ def task_func(num_pairs=10):
     >>> [tick.get_text() for tick in ax.get_xticklabels()]
     ['Circle:Red', 'Circle:Blue', 'Circle:Green', 'Circle:Yellow', 'Circle:Black', 'Circle:White', 'Circle:Purple', 'Circle:Orange', 'Circle:Pink', 'Circle:Brown']
     """
-
     max_pairs = len(SHAPES) * len(COLORS)
     num_pairs = min(num_pairs, max_pairs)
     pairs = [f"{s}:{c}" for s, c in itertools.product(SHAPES, COLORS)][:num_pairs]

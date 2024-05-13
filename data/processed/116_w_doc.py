@@ -39,7 +39,6 @@ def task_func(mu, sigma, sample_size):
     >>> isinstance(data, np.ndarray)
     True
     """
-
     samples = np.random.normal(mu, sigma, sample_size)
     plt.hist(samples, bins=30, alpha=0.75, color='blue')
     plt.title('Histogram of Generated Samples')

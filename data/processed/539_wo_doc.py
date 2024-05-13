@@ -36,7 +36,6 @@ def task_func(db_name, table_name, num_entries, random_seed=None):
     >>> print(db_path)
     '/absolute/path/to/test.db'
     """
-
     NAMES = ["John", "Jane", "Steve", "Emma", "Liam", "Olivia"]
     AGES = range(18, 65)
     HEIGHTS = range(150, 200)

@@ -46,7 +46,6 @@ Example:
     >>> print(random_value)
     5
 """
-
     random.seed(seed)
     attr_values = [getattr(obj, attr) for obj in obj_list]
     if len(attr_values) == 0:

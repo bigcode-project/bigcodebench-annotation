@@ -31,7 +31,6 @@ def task_func(filename):
     >>> os.path.exists(path)
     True
     """
-
     filepath = os.path.join(os.getcwd(), filename)
     with open(filepath, 'w', newline='') as file:
         writer = csv.writer(file)

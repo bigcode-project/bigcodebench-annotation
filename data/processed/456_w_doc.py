@@ -34,7 +34,6 @@ def task_func(data: pd.DataFrame) -> (pd.DataFrame, plt.Axes):
     >>> normalized_df['Feature1'].iloc[0]  # Returns a normalized value between 0 and 1
     0.0
     """
-
     scaler = MinMaxScaler()
     normalized_data = pd.DataFrame(scaler.fit_transform(data), columns=data.columns)
     plt.figure(figsize=(10, 8))

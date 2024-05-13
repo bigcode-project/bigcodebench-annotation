@@ -44,7 +44,6 @@ def task_func(num, from_base, to_base, alphabet):
     >>> result1 != result2
     True
     """
-
     base64_table = np.array(list(alphabet))
     n = int(num, from_base)
     new_num = ''

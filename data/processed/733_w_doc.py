@@ -18,7 +18,6 @@ def task_func(content):
     >>> task_func('this is an example content')
     1
     """
-
     STOPWORDS = set([
         "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", 
         "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", 

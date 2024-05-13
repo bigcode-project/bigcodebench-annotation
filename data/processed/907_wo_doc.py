@@ -23,7 +23,6 @@ def task_func(pattern: str, replacement: str, directory: str) -> bool:
     >>> task_func('tmp', 'temp', '/home/user/downloads')
     False
     """
-
     try:
         for file in os.listdir(directory):
             if re.search(pattern, file):

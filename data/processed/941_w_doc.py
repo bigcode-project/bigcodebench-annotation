@@ -40,7 +40,6 @@ def task_func(start_date: str, periods: int, freq: str, random_seed: int = 0) ->
     2022-03-31    448
     2022-04-30    370
     """
-
     np.random.seed(random_seed)
     date_range = pd.date_range(start_date, periods=periods, freq=freq)
     sales_forecast = np.random.randint(100, 500, size=periods)

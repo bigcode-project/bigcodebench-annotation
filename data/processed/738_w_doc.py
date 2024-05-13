@@ -19,7 +19,6 @@ def task_func(L):
     >>> task_func([[1,2,3],[4,5,6]])
     2.5
     """
-
     flattened = np.array(L).flatten()
     iqr_value = iqr(flattened)
     return iqr_value

@@ -38,7 +38,6 @@ def task_func(file_path, onpick):
     >>> ax = task_func('image.jpg', onpick)
     >>> os.remove(dummy_img_path)
     """
-
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"No file found at {file_path}")
     img = cv2.imread(file_path)

@@ -24,7 +24,6 @@ def task_func(arr):
     >>> ax.get_title()
     'Absolute values of FFT coefficients'
     """
-
     row_sums = arr.sum(axis=1)
     fft_coefficients = fftpack.fft(row_sums)
     _, ax = plt.subplots()

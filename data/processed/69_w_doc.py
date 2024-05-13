@@ -29,7 +29,6 @@ def task_func(dict1):
     >>> print(ax)
     Axes(0.125,0.11;0.775x0.77)
     """
-
     emp_salaries = []
     for prefix, num_employees in dict1.items():
         if not prefix.startswith('EMPXX'):

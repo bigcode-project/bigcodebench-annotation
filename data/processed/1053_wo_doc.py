@@ -50,7 +50,6 @@ def task_func(file_path, save_path=None):
     >>> print(result)
     None
     """
-
     try:
         df = pd.read_csv(file_path, usecols=[0], names=["Text"], header=None)
         vectorizer = CountVectorizer(stop_words=STOP_WORDS)

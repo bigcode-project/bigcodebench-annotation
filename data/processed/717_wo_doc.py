@@ -26,7 +26,6 @@ def task_func(path_to_append=PATH_TO_APPEND, config_file=CONFIG_FILE):
     >>> 'path_to_append' in config['DEFAULT']
     True
     """
-
     if isinstance(path_to_append, list):
         for path in path_to_append:
             sys.path.append(path)

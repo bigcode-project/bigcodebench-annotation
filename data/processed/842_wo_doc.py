@@ -49,7 +49,6 @@ def task_func(db_path,
     (2, 'age', 'INTEGER', 0, None, 0),
     (3, 'country', 'TEXT', 0, None, 0)]
     """
-
     random.seed(random_seed)
     conn = sqlite3.connect(db_path)
     c = conn.cursor()

@@ -38,7 +38,6 @@ def task_func(T1, RANGE=100):
     >>> print(stats)
     (23.773333333333333, 25.0, 15)
     """
-
     if len(T1) <= 0:
         raise statistics.StatisticsError
     int_list = [list(map(int, x)) for x in T1]

@@ -21,7 +21,6 @@ def task_func(df, letter):
     >>> df = {'Word': ['apple', 'banana', 'cherry', 'date', 'fig', 'grape', 'avocado']}
     >>> ax = task_func(df, 'a')
     """
-
     start_time = time.time()
     df = pd.DataFrame(df)
     regex = f'^{letter}'

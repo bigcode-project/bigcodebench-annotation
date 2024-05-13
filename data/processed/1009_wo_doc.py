@@ -41,7 +41,6 @@ def task_func(xml_content, output_csv_path):
     - The output CSV path should be a valid file path where the user has write
       permissions, to prevent IOError.
     """
-
     try:
         root = ET.fromstring(xml_content)
         data = [[elem.tag, elem.text] for elem in root.iter()]

@@ -32,7 +32,6 @@ def task_func(dataframe: pd.DataFrame) -> pd.DataFrame:
     - pandas
     - codecs
     """
-
     if not isinstance(dataframe, pd.DataFrame):
         raise TypeError("The input must be a pandas DataFrame.")
     if 'UnicodeString' not in dataframe.columns:

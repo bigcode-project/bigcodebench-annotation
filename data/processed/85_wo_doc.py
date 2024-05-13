@@ -47,7 +47,6 @@ def task_func(start_date, end_date, random_seed=42):
     >>> plot.get_figure().savefig("weather_data_plot.png")  # Save the plot to a file
     >>> os.remove("weather_data_plot.png")
     """
-
     if end_date < start_date:
         raise ValueError("End date must be after start date")
     np.random.seed(random_seed)

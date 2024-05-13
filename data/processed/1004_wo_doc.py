@@ -35,7 +35,6 @@ def task_func(url):
     - matplotlib
     
     """
-
     with urllib.request.urlopen(url) as response:
         text = response.read().decode()
         words = re.findall(r"\b\w+\b", text)

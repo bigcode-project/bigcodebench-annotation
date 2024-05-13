@@ -41,7 +41,6 @@ def task_func(number_list, element):
     Columns: [Combinations]
     Index: []
     """
-
     combinations_list = list(combinations(number_list, 3))
     valid_combinations = [comb for comb in combinations_list if sum(comb) == element]
     return pd.DataFrame({'Combinations': list(set(valid_combinations))})

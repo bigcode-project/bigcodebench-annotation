@@ -33,7 +33,6 @@ def task_func(ROOT_DIR, DEST_DIR, SPECIFIC_HASH):
     >>> task_func('/path/to/root', '/path/to/dest', 'd41d8cd98f00b204e9800998ecf8427e') >= 0
     True
     """
-
     files_moved = 0
     os.makedirs(DEST_DIR, exist_ok=True)
     for filename in glob.glob(os.path.join(ROOT_DIR, '*')):

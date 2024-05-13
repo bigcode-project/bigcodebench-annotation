@@ -40,7 +40,6 @@ def task_func(rolls, seed=None):
     [15 21 17 22 16  9]
     >>> plt.show()
     """
-
     if seed is not None:
         random.seed(seed)
     outcomes = [random.choice(NUMBERS) for _ in range(rolls)]

@@ -37,7 +37,6 @@ def task_func(source_directory: str, target_directory: str):
     >>> task_func('./empty_folder', './target_folder')
     0
     """
-
     moved_files = 0
     if not os.path.exists(source_directory):
         raise FileNotFoundError("source_directory must exist.")

@@ -36,7 +36,6 @@ def task_func(text, num_gaussians=1, seed=42):
     >>> freqs
     {'Josie': 1, 'Smith': 2, 'Mugsy': 1, 'Dog': 1}
     '''
-
     np.random.seed(seed)
     names = re.findall(r'(.*?)(?:\[.*?\]|$)', text)
     words = ' '.join(names).split()

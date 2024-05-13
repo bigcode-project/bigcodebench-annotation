@@ -24,7 +24,6 @@ def task_func():
         >>> fig, axs = task_func()
         >>> plt.show()
     """
-
     x_values = np.linspace(0, 2 * np.pi, 400)
     fig, axs = plt.subplots(2)
     axs[0].plot(x_values, np.sin(x_values))

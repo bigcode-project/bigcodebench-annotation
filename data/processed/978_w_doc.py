@@ -37,7 +37,6 @@ def task_func(array, seed=None):
     >>> df.shape
     (2, 2)
     """
-
     if seed is not None:
         np.random.seed(seed)
     if not isinstance(array, np.ndarray) or len(array.shape) != 2:

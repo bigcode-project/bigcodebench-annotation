@@ -32,7 +32,6 @@ def task_func(file_name, excel_file_path, csv_file_path) -> str:
     Note:
     - This function assumes the active sheet is the one to be converted.
     """
-
     excel_file = os.path.join(excel_file_path, file_name)
     if not os.path.isfile(excel_file):
         raise FileNotFoundError(f"[Errno 2] No such file or directory: '{excel_file}'")

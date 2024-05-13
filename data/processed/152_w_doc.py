@@ -38,7 +38,6 @@ def task_func():
       Zoe         63.750
      Matt         54.750
     """
-
     students_data = []
     for student in STUDENTS:
         grades = [randint(0, 100) for _ in COURSES]

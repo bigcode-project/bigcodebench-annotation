@@ -34,7 +34,6 @@ def task_func(df):
     75%    5.5  4.25  7.5
     max    7.0  5.00  9.0
     """
-
     df = df.fillna(df.mean(axis=0))
     description = df.describe()
     plots = []

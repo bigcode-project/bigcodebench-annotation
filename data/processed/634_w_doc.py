@@ -31,7 +31,6 @@ def task_func(input_list: list, repetitions: int) -> Any:
     >>> task_func([1, 2, 3], 5)
     ModeResult(mode=array([1]), count=array([5]))
     """
-
     flattened_list = np.array(list(itertools.chain(*[input_list for _ in range(repetitions)])))
     mode = stats.mode(flattened_list)
     return mode

@@ -25,7 +25,6 @@ def task_func(string):
     >>> task_func('abc-def-ghij')
     {'a': 1, 'b': 1, 'c': 1, 'd': 1, 'e': 1, 'f': 1, 'g': 0, 'h': 0, 'i': 0, 'j': 0, 'k': 0, 'l': 0, 'm': 0, 'n': 0, 'o': 0, 'p': 0, 'q': 0, 'r': 0, 's': 0, 't': 0, 'u': 0, 'v': 0, 'w': 0, 'x': 0, 'y': 0, 'z': 0}
     """
-
     match = re.search(r'^(.*)-', string)
     if match:
         prefix = match.group(1)

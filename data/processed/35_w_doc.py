@@ -31,7 +31,6 @@ def task_func(df, target_values=[1, 3, 4]):
     >>> print(ax)
     Axes(0.125,0.11;0.775x0.77)
     """
-
     df = df.applymap(lambda x: x if x in target_values else 0)
     plt.figure(figsize=(10, 5))
     for column in df.columns:

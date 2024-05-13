@@ -44,7 +44,6 @@ def task_func(data, columns=['Name', 'Age', 'Occupation'], fill_missing=False, n
     1   Apple       NaN
     2  Banana       NaN
     """
-
     if seed is not None:
         random.seed(seed)
     df = pd.DataFrame(data, columns=columns)

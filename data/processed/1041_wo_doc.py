@@ -31,7 +31,6 @@ def task_func(request):
     >>> task_func("GET /restricted.txt HTTP/1.1") # Assuming an I/O error occurs
     "HTTP/1.1 500 INTERNAL SERVER ERROR\r\n\r\nInternal Server Error"
     """
-
     match = re.match(r"^GET /([\w\.\-]+) HTTP/1\.1$", request)
     if match:
         file_name = match.group(1)

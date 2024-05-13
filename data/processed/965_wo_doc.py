@@ -31,7 +31,6 @@ def task_func(source_directory: str, target_directory: str, pattern: str = r"\d{
     >>> task_func('/path/to/source', '/path/to/target')
     3
     """
-
     moved_files_count = 0
     if not os.path.exists(source_directory) or not os.path.isdir(source_directory):
         return 0

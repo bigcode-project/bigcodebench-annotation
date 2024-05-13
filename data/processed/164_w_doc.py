@@ -27,7 +27,6 @@ def task_func(num_labels=5, data_range=(0, 1)):
     >>> fig = task_func(num_labels=3, data_range=(1, 10))
     >>> fig.show()  # This will display the figure with three labels and data range from 1 to 10
     """
-
     np.random.seed(0)
     columns = [f'Label{i + 1}' for i in range(num_labels)]
     data = pd.DataFrame(np.random.uniform(data_range[0], data_range[1], size=(num_labels, num_labels)), columns=columns)

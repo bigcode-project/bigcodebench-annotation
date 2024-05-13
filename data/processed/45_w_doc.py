@@ -32,7 +32,6 @@ def task_func(df: pd.DataFrame):
     1    -0.286236     1.472436
     2    -4.164679    -0.809596
     """
-
     df_numeric = df.select_dtypes(include=[np.number])
     df_numeric = df_numeric.fillna(df_numeric.mean(axis=0))
     pca = PCA(n_components=2)

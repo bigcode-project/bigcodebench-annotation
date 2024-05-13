@@ -29,7 +29,6 @@ def task_func(text):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     words = re.split(r"\W+", text)
     word_counts = [len(word) for word in words if word]
     _, ax = plt.subplots()

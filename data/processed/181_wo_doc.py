@@ -29,7 +29,6 @@ def task_func(data, min_delay, max_delay):
     >>> json.loads(response.content)
     {"Sample-Key": "Sample-Value"}
     """
-
     delay = random.uniform(min_delay, max_delay)
     time.sleep(delay)
     response = HttpResponse(data, content_type='application/json')

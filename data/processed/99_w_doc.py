@@ -26,7 +26,6 @@ def task_func():
         >>> type(fig)
         <class 'matplotlib.figure.Figure'>
     """
-
     plt.rc('font', family='Arial')  # Set the global font to Arial.
     iris = load_iris()
     iris_df = pd.DataFrame(data=iris.data, columns=iris.feature_names)

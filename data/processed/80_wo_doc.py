@@ -31,7 +31,6 @@ def task_func(template_folder):
     >>> 'POST' in app.url_map.bind('').match('/', method='POST')
     False
     """
-
     app = Flask(__name__, template_folder=template_folder)
     @app.route('/', methods=['POST'])
     def handle_post():

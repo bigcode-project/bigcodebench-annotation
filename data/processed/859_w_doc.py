@@ -25,7 +25,6 @@ def task_func():
     >>> task_func()
     (1.0, None)
     """
-
     warnings.simplefilter('always')
     iris = datasets.load_iris()
     X_train, X_test, y_train, y_test = model_selection.train_test_split(

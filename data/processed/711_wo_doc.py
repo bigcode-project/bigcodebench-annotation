@@ -20,7 +20,6 @@ def task_func(json_file, csv_file):
     >>> task_func('path_to_json_file.json', 'path_to_csv_file.csv')
     'path_to_csv_file.csv'
     """
-
     with open(json_file, 'r') as f:
         data = json.load(f)
     with open(csv_file, 'w') as f:

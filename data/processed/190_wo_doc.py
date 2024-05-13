@@ -38,7 +38,6 @@ def task_func(csv_input):
     0  1  Alice
     1  2    Bob
     """
-
     if isinstance(csv_input, StringIO):
         dr = csv.DictReader(csv_input)  # Read from StringIO
     else:

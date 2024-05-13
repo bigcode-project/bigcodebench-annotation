@@ -28,7 +28,6 @@ def task_func(data_dict, data_keys):
     >>> isinstance(plot, plt.Axes)
     True
     """
-
     x = data_dict[data_keys[0]]
     y = data_dict[data_keys[1]]
     correlation, _ = stats.pearsonr(x, y)

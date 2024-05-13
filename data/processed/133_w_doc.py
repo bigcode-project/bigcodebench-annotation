@@ -30,7 +30,6 @@ def task_func(df):
     >>> normalized_df, ax = task_func(df)
     >>> plt.show()
     """
-
     if not isinstance(df, pd.DataFrame) or df.empty:
         raise ValueError("Input must be a non-empty DataFrame.")
     last_col_name = df.columns[-1]

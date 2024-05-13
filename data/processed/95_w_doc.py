@@ -34,7 +34,6 @@ def task_func(categories=None, months=None, random_seed=42):
         3  January                   Books  152.676699
         4  January  Beauty & Personal Care  379.086939
     """
-
     if categories is None:
         categories = ['Electronics', 'Clothing', 'Home & Kitchen', 'Books', 'Beauty & Personal Care']
     if months is None:

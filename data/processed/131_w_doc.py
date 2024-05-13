@@ -31,7 +31,6 @@ def task_func(hex_str, salt_size):
     >>> isinstance(result[0], str) and isinstance(result[1], str)
     True
     """
-
     salt = os.urandom(salt_size)
     data = binascii.unhexlify(hex_str.replace('\\x', ''))
     salted_data = salt + data

@@ -40,7 +40,6 @@ def task_func(df, bins=4):
     >>> counter
     Counter({2: 6, 1: 5, 3: 5, 4: 4})
     """
-
     duplicates = df[df["value"].duplicated(keep=False)]
     duplicates_counter = Counter(duplicates["value"])
     if df.empty or df["value"].nunique() == 1:

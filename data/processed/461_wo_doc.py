@@ -39,7 +39,6 @@ def task_func(script_path: str, timeout=10) -> dict:
     >>> resources
     {'CPU Usage': 5.2, 'Memory Usage': 2048}
     """
-
     if not os.path.exists(script_path):
         raise FileNotFoundError(f"'{script_path}' does not exist.")
     p = subprocess.Popen(["bash", script_path])

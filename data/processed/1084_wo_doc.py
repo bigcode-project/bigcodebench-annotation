@@ -30,7 +30,6 @@ def task_func(data_file_path: str):
     >>> print(f'Means: {means}, Standard Deviations: {std_devs}')
     >>> print(anova_results)
     """
-
     df = pd.read_csv(data_file_path)
     for col in df.columns:
         df[col] = pd.to_numeric(df[col].replace(",", "", regex=True), errors="coerce")

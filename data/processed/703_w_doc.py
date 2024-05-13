@@ -27,7 +27,6 @@ def task_func(data, cols):
     1  4.9  3.0        0
     2  4.7  3.2        0
     """
-
     df = pd.DataFrame(data, columns=cols)
     dbscan = DBSCAN(eps=3, min_samples=2)
     df['Cluster'] = dbscan.fit_predict(df)

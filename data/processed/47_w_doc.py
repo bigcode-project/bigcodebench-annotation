@@ -30,7 +30,6 @@ def task_func(df):
     1  0.000000  1.224745  0.000000
     2  1.224745  0.000000  1.224745
     """
-
     df = df.fillna(df.mean(axis=0))
     scaler = StandardScaler()
     df[df.columns] = scaler.fit_transform(df[df.columns])

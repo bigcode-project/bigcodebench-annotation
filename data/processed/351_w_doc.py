@@ -33,7 +33,6 @@ def task_func(product_list, categories, min_value = 10, max_value = 100):
     >>> report.iloc[0]['Revenue']
     10000
     """
-
     report_data = []
     for product in product_list:
         category = categories[random.randint(0, len(categories)-1)]

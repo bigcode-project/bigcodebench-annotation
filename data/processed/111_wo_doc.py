@@ -32,7 +32,6 @@ def task_func(df):
     >>> ax.get_title()  # Expected: 'Temperature Heatmap'
     'Temperature Heatmap'
     """
-
     if not isinstance(df, pd.DataFrame) or not all(col in df.columns for col in ['Date', 'Time', 'Temperature']):
         raise ValueError("Invalid 'df': must be a DataFrame with 'Date', 'Time', and 'Temperature' columns.")
     df['Date'] = pd.to_datetime(df['Date'])

@@ -34,7 +34,6 @@ def task_func(array: list, random_seed: int = 42) -> (pd.DataFrame, np.ndarray):
     >>> print(transformed[:, 0])
     [ 11.18033989  -0.         -11.18033989]
     """
-
     df = pd.DataFrame(array)
     pca = PCA(n_components=2, random_state=random_seed)
     transformed_data = pca.fit_transform(df)

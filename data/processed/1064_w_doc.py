@@ -27,7 +27,6 @@ def task_func(arr):
     >>> ax.get_title()
     'Heatmap of the 2D Array'
     """
-
     row_sums = arr.sum(axis=1)
     vmax = np.max(arr)  # Set vmax to the maximum value in the array
     vmin = np.min(arr)  # Set vmin to the minimum value in the array

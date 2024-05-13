@@ -38,7 +38,6 @@ def task_func(arr):
     >>> ax.get_title()
     'Time Series of Row Sums'
     """
-
     if not arr.size:  # Check for empty array
         _, ax = plt.subplots()
         ax.set_title("Time Series of Row Sums")

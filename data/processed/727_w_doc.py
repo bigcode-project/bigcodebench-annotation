@@ -26,7 +26,6 @@ def task_func(s: str) -> np.ndarray:
     >>> print(vec)
     [0 0 1 0 0 0 1 1 1]
     """
-
     s = re.sub(r'\W+', ' ', s)
     vectorizer = CountVectorizer()
     X = vectorizer.fit_transform([s] + SENTENCES)

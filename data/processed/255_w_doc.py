@@ -33,7 +33,6 @@ def task_func(ax, func_index):
     1.0
     >>> plt.close()
     """
-
     print(type(ax))
     if not isinstance(ax, matplotlib.axes.Axes):
         raise ValueError("The input is not an axes")

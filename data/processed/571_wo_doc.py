@@ -35,7 +35,6 @@ def task_func(f_list, file_path):
     >>> task_func([f, g], './function_info.csv')
     >>> os.remove('./function_info.csv')
     """
-
     if not all(callable(f) for f in f_list):
         raise ValueError("All elements in f_list must be callable functions.")
     if not f_list:

@@ -40,7 +40,6 @@ def task_func(file_path,
     >>> task_func('/test.csv', 100, gender=['test'], countries['Albania', 'Germany', 'Austria'], seed=12)
     'test.csv'
     """
-
     FIELDS = ['Name', 'Age', 'Gender', 'Country']
     random.seed(seed)
     with open(file_path, 'w', newline='') as csv_file:

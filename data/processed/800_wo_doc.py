@@ -43,7 +43,6 @@ def task_func(goals, penalties, csv_file_path=CSV_FILE_PATH):
     >>> print(counts)
     Counter({'goals': 8, 'penalties': 7})
     """
-
     counts = Counter({'goals': 0, 'penalties': 0})
     if os.path.exists(csv_file_path):
         with open(csv_file_path, 'r') as file:

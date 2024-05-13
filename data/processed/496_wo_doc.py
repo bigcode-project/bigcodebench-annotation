@@ -35,7 +35,6 @@ def task_func(days_in_past=7, random_seed=0):
     >>> ax.get_xticklabels()
     [Text(19810.0, 0, '2024-03-28'), Text(19811.0, 0, '2024-03-29'), Text(19812.0, 0, '2024-03-30'), Text(19813.0, 0, '2024-03-31'), Text(19814.0, 0, '2024-04-01'), Text(19815.0, 0, '2024-04-02'), Text(19816.0, 0, '2024-04-03')]
     """
-
     np.random.seed(random_seed)
     if days_in_past < 1:
         raise ValueError("days_in_past must be in the past")

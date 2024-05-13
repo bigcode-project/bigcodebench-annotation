@@ -44,7 +44,6 @@ def task_func(arr: np.ndarray) -> (plt.Axes, np.ndarray):
     >>> print(normalized_data)
     [-1.22474487  0.          1.22474487]
     """
-
     row_sums = arr.sum(axis=1)
     mean = np.mean(row_sums)
     std_dev = np.std(row_sums)

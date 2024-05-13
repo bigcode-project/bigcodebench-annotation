@@ -39,7 +39,6 @@ def task_func(n, seed=None):
     >>> task_func(30, seed=1)
     defaultdict(<class 'list'>, {'e': ['e'], 's': ['s'], 'z': ['z', 'z', 'z'], 'y': ['y', 'y', 'y', 'y'], 'c': ['c'], 'i': ['i', 'i'], 'd': ['d', 'd'], 'p': ['p', 'p', 'p'], 'o': ['o', 'o'], 'u': ['u'], 'm': ['m', 'm'], 'g': ['g'], 'a': ['a', 'a'], 'n': ['n'], 't': ['t'], 'w': ['w'], 'x': ['x'], 'h': ['h']})
     """
-
     LETTERS = string.ascii_lowercase
     random.seed(seed)
     letter_dict = defaultdict(list)

@@ -23,7 +23,6 @@ def task_func(nested_dict):
     ... })
     {'ale': 0.4121184852417566, 'ile': -0.5440211108893698, 'ole': -0.9589242746631385, 'ule': -0.27941549819892586}
     """
-
     counter = Counter()
     for sub_dict in nested_dict.values():
         counter.update(sub_dict)

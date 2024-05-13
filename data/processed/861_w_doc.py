@@ -27,7 +27,6 @@ def task_func(list_of_lists):
     >>> sum(len(basket) for basket in baskets) # The sum of lengths of all baskets; illustrative example
     3
     """
-
     seed(42)  # Set the seed for reproducibility
     baskets = []
     for list_ in list_of_lists:

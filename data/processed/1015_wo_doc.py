@@ -38,7 +38,6 @@ def task_func(webpage_url: str, database_name: str = "my_database.db") -> int:
     >>> print(f"Number of rows parsed: {num_rows}")
     Number of rows parsed: 5
     """
-
     try:
         if webpage_url.startswith("file://"):
             with open(webpage_url[7:], "r", encoding="utf-8") as file:

@@ -45,7 +45,6 @@ def task_func(start_date=datetime(2020, 1, 1), end_date=datetime(2020, 12, 31), 
     4   2020-05-16
     dtype: datetime64[ns]
     """
-
     if not all(isinstance(date, datetime) for date in [start_date, end_date]):
         raise ValueError("start_date and end_date must be datetime.datetime objects.")
     if start_date > end_date:

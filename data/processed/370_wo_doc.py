@@ -40,7 +40,6 @@ def task_func(directory_path: str) -> list:
     >>> len(files)
     2
     """
-
     if not os.path.exists(directory_path):
         raise FileNotFoundError(f"Directory {directory_path} not found.")
     json_files = glob.glob(directory_path + '/*.json')

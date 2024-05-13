@@ -40,7 +40,6 @@ def task_func(news_articles):
     >>> print(sorted_articles)
     defaultdict(<class 'list'>, {'climate': [{'title': 'Der Standard', 'title_url': 'standard', 'id': 2, 'category': 'climate'}, {'title': 'tecky', 'title_url': 'tecky', 'id': 4, 'category': 'climate'}], 'environment': [{'title': 'earth magazine', 'title_url': 'earth', 'id': 4, 'category': 'environment'}]})
     """
-
     if any(not sorted(dic.keys()) == ['category', 'id', 'title', 'title_url']  for dic in news_articles):
         raise ValueError("input dictionaries must contain the following keys: 'category', 'id', 'title', 'title_url'")
     news_articles.sort(key=itemgetter('category', 'title'))

@@ -30,7 +30,6 @@ def task_func(text):
     >>> print(sentiment)
     Sentiment(polarity=0.13888888888888887, subjectivity=0.6666666666666666)
     """
-
     text = re.sub(r'\b(\w+)( \1\b)+', r'\1', text)
     words = [word for word in re.findall(r'\b\w+\b', text.lower()) if word not in STOPWORDS]
     text = ' '.join(words)

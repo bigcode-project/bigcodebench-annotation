@@ -22,7 +22,6 @@ def task_func(x_list, y_list):
     >>> df = pd.DataFrame({'x': [1, 2, 3, 4, 5, 6], 'y': [2, 3, 4, 5, 6, 7]})
     >>> labels, centroids = task_func([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
     """
-
     df = pd.DataFrame({'x': x_list, 'y': y_list})
     kmeans = KMeans(n_clusters=2, random_state=0).fit(df)
     return kmeans.labels_, kmeans.cluster_centers_

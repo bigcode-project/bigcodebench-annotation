@@ -27,7 +27,6 @@ def task_func(db_name, table_name):
     >>> ax.get_xticklabels()
     [Text(0.9400000000000001, 0, '0.94'), ... ]
     """
-
     conn = sqlite3.connect(db_name)
     df = pd.read_sql_query(f"SELECT * from {table_name}", conn)
     numerical_columns = df.select_dtypes(include=["float64", "int64"]).columns.tolist()

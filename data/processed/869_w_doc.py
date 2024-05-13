@@ -50,7 +50,6 @@ def task_func(
     3    David      6
     4      Eve      3
     """
-
     if len(students) == 0:
         raise ValueError("The students list should contain at least one student.")
     seed(rng_seed)

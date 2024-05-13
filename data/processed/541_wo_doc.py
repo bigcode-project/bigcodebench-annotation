@@ -35,7 +35,6 @@ def task_func(package_name):
     >>> 'random' in task_func('numpy')
     True
     """
-
     added_modules = []
     try:
         package = importlib.import_module(package_name)

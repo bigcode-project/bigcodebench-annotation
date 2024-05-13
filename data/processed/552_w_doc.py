@@ -28,7 +28,6 @@ def task_func(a, b, items=ITEMS):
     >>> isinstance(ax, matplotlib.axes.Axes)
     True
     """
-
     combined = list(itertools.chain(a, b))
     counter = collections.Counter(combined)
     item_counts = [counter.get(item, 0) for item in items]

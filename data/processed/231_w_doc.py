@@ -38,7 +38,6 @@ def task_func(obj_list) -> Axes:
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     '''
-
     if len(obj_list) == 0:
         values = [0]
     else:

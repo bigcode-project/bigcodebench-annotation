@@ -27,7 +27,6 @@ def task_func(f):
     >>> task_func(lambda_func)['is_lambda']
     True
     """
-
     spec = inspect.getfullargspec(f)
     return {
         'function_name': f.__name__,

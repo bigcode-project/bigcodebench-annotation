@@ -33,7 +33,6 @@ def task_func(pattern, directory, extensions):
     >>> str(matches[0]).endswith('hello.txt')
     True
     """
-
     matched_files = []
     for ext in extensions:
         files = glob.glob(os.path.join(directory, ext))

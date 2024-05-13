@@ -31,7 +31,6 @@ def task_func(data):
     2     2     1     3
     3     2     2     1
     """
-
     df = pd.DataFrame(data, columns=COLUMNS)
     analyzed_df = df.groupby(COLUMNS[:-1])[COLUMNS[-1]].nunique().reset_index()
     fig, ax = plt.subplots()

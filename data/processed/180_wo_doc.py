@@ -38,7 +38,6 @@ def task_func(img_path, scale_factors=[0.5, 0.75, 1.5, 2.0]):
     Scale factor: 1.5 (30, 30, 3)
     Scale factor: 2.0 (40, 40, 3)
     """
-
     if not os.path.exists(img_path):
         raise FileNotFoundError(f"No file found at {img_path}")
     im = Image.open(img_path)

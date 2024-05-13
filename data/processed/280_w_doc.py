@@ -30,7 +30,6 @@ def task_func(signal, precision=2, seed=777):
     >>> print(transformed_signal)
     [0.-0.j 0.-2.j 0.-0.j 0.+2.j]
     """
-
     np.random.seed(seed)
     transformed_signal = fft(signal)
     transformed_signal_rounded = np.round(transformed_signal, precision).tolist()

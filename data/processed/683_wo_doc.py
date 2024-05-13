@@ -19,7 +19,6 @@ def task_func(yaml_path, key):
     Example:
     >>> yaml_data = task_func('data.yaml', 'ele')
     """
-
     with open(yaml_path, 'r') as file:
         data = yaml.safe_load(file)
     if key in data:

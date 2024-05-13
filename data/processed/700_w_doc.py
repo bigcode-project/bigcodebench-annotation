@@ -24,7 +24,6 @@ def task_func(data, cols):
     y  0.596040  1.000000  0.114708
     z  0.866025  0.114708  1.000000
     """
-
     df = pd.DataFrame(data, columns=cols)
     df_np = np.array(df)
     df = pd.DataFrame(df_np, columns=cols)

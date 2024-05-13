@@ -26,7 +26,6 @@ def task_func(list_of_lists, size=5, seed=0):
     >>> task_func([[1, 2, 3], [], [4, 5, 6]])
     {'mean': 23.454545454545453, 'median': 5.0, 'mode': array([5])}
     """
-
     random.seed(seed)
     data = []
     for list_ in list_of_lists:

@@ -26,7 +26,6 @@ def task_func(directory_path):
     >>> task_func('./yourdictfiles/')
     1500
     """
-
     word_counts = Counter()
     for file_name in os.listdir(directory_path):
         if not file_name.endswith('.txt'):

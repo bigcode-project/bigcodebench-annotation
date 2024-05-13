@@ -31,7 +31,6 @@ def task_func():
            [0.71428571],
            [0.28571429]])
     """
-
     np.random.seed(42)  # For reproducibility, as shown in your example
     array = np.random.randint(0, 10, ARRAY_LENGTH).reshape(-1, 1)
     scaler = MinMaxScaler()

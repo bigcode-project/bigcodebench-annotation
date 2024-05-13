@@ -46,7 +46,6 @@ def task_func(num_samples, countries=['Russia', 'China', 'USA', 'India', 'Brazil
     3  Austria   19       1
     4  Austria   21       1
     """
-
     if not isinstance(num_samples, int):
         raise ValueError("num_samples should be an integer.")
     rng = np.random.default_rng(seed=rng_seed)

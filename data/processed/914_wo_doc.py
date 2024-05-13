@@ -33,7 +33,6 @@ def task_func(df):
     >>> print(pred_prices)
     [107.0, 108.0, 109.0, 110.0, 111.0, 112.0, 113.0]
     """
-
     df['date'] = pd.to_datetime(df['date'])
     df['date'] = df['date'].map(pd.Timestamp.timestamp)
     X = df['date'].values.reshape(-1, 1)

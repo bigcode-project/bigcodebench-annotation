@@ -38,7 +38,6 @@ def task_func(mystrings, n_products, seed=0):
       Product Name Category  Price
     0      Sweater    Books  67.64
     """
-
     catalogue_data = []
     random.seed(seed)
     np.random.seed(seed)

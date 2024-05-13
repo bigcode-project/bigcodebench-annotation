@@ -24,7 +24,6 @@ def task_func(url):
     >>> task_func('https://www.example.com?q=4a4b4c')
     'JKL'
     """
-
     try:
         parsed_url = urllib.parse.urlparse(url)
         query = urllib.parse.parse_qs(parsed_url.query).get("q", [None])[0]

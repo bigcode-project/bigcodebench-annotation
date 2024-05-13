@@ -38,7 +38,6 @@ def task_func(df1, df2):
     >>> type(plot)
     <class 'seaborn.axisgrid.PairGrid'>
     """
-
     merged_df = pd.merge(df1, df2, on="id", how="outer")
     numeric_features_df1 = df1.select_dtypes(
         include=["float64", "int64"]

@@ -22,7 +22,6 @@ def task_func(x, w):
     >>> task_func('abc', {'a': 10, 'b': -5, 'c': 3})
     'a'
     """
-
     max_weight = -math.inf
     max_substr = ''
     for start, end in combinations(range(len(x) + 1), 2):

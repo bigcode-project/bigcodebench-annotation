@@ -28,7 +28,6 @@ def task_func(source_dir, target_dir, prefix='#Hash: '):
     >>> task_func(source_dir='samples', target_dir='hashed_samples', prefix='#MD5: ')
     ['hashed_samples/file1.txt', 'hashed_samples/file2.txt']
     """
-
     if not os.path.exists(source_dir):
         raise FileNotFoundError(f"Source directory '{source_dir}' does not exist.")
     if not os.path.exists(target_dir):

@@ -46,7 +46,6 @@ def task_func(data):
     >>> print(p_value)
     None
     """
-
     if data.shape[1] != 8:
         raise ValueError("Data must contain exactly eight columns.")
     df = pd.DataFrame(data, columns=COLUMN_NAMES)

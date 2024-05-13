@@ -27,7 +27,6 @@ def task_func(text, seed=None):
     >>> task_func(text, 0)
     'Mynbi, qpmzj!'
     """
-
     def replace_with_random_char(c):
         if c.isalpha():
             if c.islower():

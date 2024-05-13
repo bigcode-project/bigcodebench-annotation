@@ -27,7 +27,6 @@ def task_func(csv_file):
     >>> print(df.head())
     >>> print(type(plot))
     """
-
     df = pd.read_csv(csv_file)
     df['list'] = df['list'].map(ast.literal_eval)
     df['sum'] = df['list'].apply(sum)

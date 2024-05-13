@@ -38,7 +38,6 @@ def task_func(path):
     1  3  4  a.json
     >>> shutil.rmtree('data')
     """
-
     df = pd.DataFrame()
     processed_path = os.path.join(path, 'processed')
     if not os.path.exists(processed_path):

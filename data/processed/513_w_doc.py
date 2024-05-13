@@ -44,7 +44,6 @@ def task_func(column, data):
     >>> print(stats)
     {'sum': 16500, 'mean': 5500.0, 'min': 5000, 'max': 6000}
     """
-
     COLUMNS = ["Date", "Steps", "Calories Burned", "Distance Walked"]
     if column not in COLUMNS:
         raise KeyError(f"{column} is not a valid column. Choose from {COLUMNS}.")

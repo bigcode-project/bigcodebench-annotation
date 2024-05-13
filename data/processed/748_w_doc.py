@@ -52,7 +52,6 @@ def task_func(df, age, weight):
     2  1.565016  1.524165            1.702277
     3 -0.601929 -0.482331           -0.764791
     """
-
     selected_df = df[(df['Age'] < age) & (df['Weight'] > weight)]
     if selected_df.empty:
         return selected_df

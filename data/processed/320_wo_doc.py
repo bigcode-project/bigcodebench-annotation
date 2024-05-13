@@ -23,7 +23,6 @@ def task_func(directory, file_list):
     >>> task_func("c:\Program Files\VMware\VMware Server", ["file1.bat", "file2.bat"]) #valid directory and file list
     0 
     """
-
     if not file_list:
         return None
     file = random.choice(file_list)

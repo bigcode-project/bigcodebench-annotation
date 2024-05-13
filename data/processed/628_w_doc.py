@@ -22,7 +22,6 @@ def task_func():
     Example:
     >>> ax = task_func()
     """
-
     x = [i/100 for i in range(1000)]
     frequency = randint(1, 5)
     amplitude = randint(1, 5)

@@ -30,7 +30,6 @@ def task_func(f):
     >>> task_func(lambda_func)['lambda_in_defaults'] == 0
     True
     """
-
     spec = inspect.getfullargspec(f)
     info = {
         'function_name': f.__name__,

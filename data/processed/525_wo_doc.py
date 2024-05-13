@@ -32,7 +32,6 @@ def task_func(input_file):
     >>> results
     {'a': {'mean': 3.0, 'median': 3.0}, 'b': {'mean': 6.0, 'median': 6.0}}
     """
-
     with open(input_file, "r") as f:
         data = json.load(f)
     stats = defaultdict(list)

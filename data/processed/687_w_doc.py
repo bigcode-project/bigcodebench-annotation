@@ -21,7 +21,6 @@ def task_func(list_of_lists):
     >>> task_func([[1, 1, 3], [4, 5, 6], [7, 8, 9]])
     (array([1]), array([2]))
     """
-
     merged_list = np.array([item for sublist in list_of_lists for item in sublist])
     mode_value, mode_count = mode(merged_list)
     return mode_value, mode_count

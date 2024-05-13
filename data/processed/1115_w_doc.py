@@ -23,7 +23,6 @@ def task_func(dict1):
     >>> print(emp_ids)
     ['EMP$$MYNBI', 'EMP$$QPMZJ', 'EMP$$PLSGQ', 'EMP$$EJEYD', 'EMP$$TZIRW', 'EMP$$ZTEJD', 'EMP$$XCVKP', 'EMP$$RDLNK', 'EMP$$TUGRP', 'EMP$$OQIBZ', 'MAN$$RACXM', 'MAN$$WZVUA', 'MAN$$TPKHX', 'MAN$$KWCGS', 'MAN$$HHZEZ', 'DEV$$ROCCK', 'DEV$$QPDJR', 'DEV$$JWDRK', 'DEV$$RGZTR', 'DEV$$SJOCT', 'DEV$$ZMKSH', 'DEV$$JFGFB', 'DEV$$TVIPC', 'HR$$CVYEE', 'HR$$BCWRV', 'HR$$MWQIQ', 'HR$$ZHGVS', 'HR$$NSIOP', 'HR$$VUWZL', 'HR$$CKTDP']
     """
-
     employee_ids = []
     for prefix, num_employees in dict1.items():
         for _ in range(num_employees):

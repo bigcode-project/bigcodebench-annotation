@@ -27,7 +27,6 @@ def task_func(numbers):
     >>> isinstance(task_func(numbers), float)
     True
     """
-
     sum_log_products = 0
     for r in range(1, len(numbers) + 1):
         combinations = itertools.combinations(numbers, r)

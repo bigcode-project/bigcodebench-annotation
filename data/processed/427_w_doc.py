@@ -36,7 +36,6 @@ def task_func(df1, df2, features=["feature1", "feature2", "feature3"], target="t
     >>> type(result['residuals_plot'])
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     df = pd.merge(df1, df2, on="id")
     X = df[features]
     y = df[target]

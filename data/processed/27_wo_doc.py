@@ -28,7 +28,6 @@ def task_func(data: dict, DATE_FORMAT = "%Y-%m-%d %H:%M:%S") -> str:
     >>> isinstance(encoded_data, str)
     True
     """
-
     data['timestamp'] = datetime.now().strftime(DATE_FORMAT)
     json_data = json.dumps(data)
     encoded_data = base64.b64encode(json_data.encode('ascii')).decode('ascii')

@@ -20,7 +20,6 @@ def task_func(filepath: str) -> dict:
     >>> task_func('/path/to/file.txt')
     {'size': '1024 bytes', 'last_modified': '2022-01-01 12:30:45'}
     """
-
     try:
         size = os.path.getsize(filepath)
         mtime = os.path.getmtime(filepath)

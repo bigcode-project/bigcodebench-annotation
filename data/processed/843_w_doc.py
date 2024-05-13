@@ -31,7 +31,6 @@ def task_func(n_sentences):
     Note: 
     - The actual output will vary due to the randomness of sentence generation.
     """
-
     sentences = []
     for _ in range(n_sentences):
         sentence_len = random.randint(5, 10)

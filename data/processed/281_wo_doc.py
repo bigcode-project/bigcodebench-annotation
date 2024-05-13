@@ -26,7 +26,6 @@ def task_func(folder_path: str) -> dict:
     >>> task_func(temp_dir)
     {}
     """
-
     IP_REGEX = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
     counter = Counter()
     for filename in os.listdir(folder_path):

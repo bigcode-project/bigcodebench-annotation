@@ -30,7 +30,6 @@ def task_func(length, min_value = 0, max_value = 100):
     >>> print(len(cdf))
     1
     """
-
     data = np.random.randint(min_value, max_value, size=(length, len(COLUMNS)))
     df = pd.DataFrame(data, columns=COLUMNS)
     df = df.apply(lambda x: x.value_counts().sort_index().cumsum())

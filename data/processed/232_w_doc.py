@@ -28,7 +28,6 @@ def task_func(df):
     >>> print(report)
     {'Total Sales': 800, 'Most Popular Category': 'Electronics'}
     """
-
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df is not a DataFrame")
     df = df.drop_duplicates(subset='Customer')

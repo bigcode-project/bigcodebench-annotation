@@ -33,7 +33,6 @@ def task_func(df):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     if df.empty or 'Likes' not in df.columns or 'Views' not in df.columns or 'Title' not in df.columns:
         fig, ax = plt.subplots()
         return ax

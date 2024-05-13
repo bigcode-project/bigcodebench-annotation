@@ -37,7 +37,6 @@ def task_func(filename=IMAGE_PATH, from_encoding="cp1251", to_encoding="utf8"):
     >>> print(text)
     'Привет мир'  # This output is the utf-8 encoded version of the extracted text.
     """
-
     with Image.open(filename) as image:
         try:
             extracted_text = pytesseract.image_to_string(image)

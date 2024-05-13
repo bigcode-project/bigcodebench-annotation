@@ -22,7 +22,6 @@ def task_func(file_path='File.txt'):
     >>> task_func('data.txt')
     ['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog', '.']
     """
-
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
     tokens = []

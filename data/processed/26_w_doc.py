@@ -25,7 +25,6 @@ def task_func(message, encryption_key):
     >>> isinstance(encrypted_message, str)
     True
     """
-
     fernet = Fernet(base64.urlsafe_b64encode(encryption_key.encode()))
     encrypted_message = fernet.encrypt(message.encode())
     return base64.b64encode(encrypted_message).decode()

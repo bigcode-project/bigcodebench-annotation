@@ -57,7 +57,6 @@ def task_func():
     <BLANKLINE>
     [2 rows x 9 columns]
     """
-
     pairs = [
         f"{planet}:{element}"
         for planet, element in itertools.product(PLANETS, ELEMENTS)

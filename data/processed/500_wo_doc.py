@@ -35,7 +35,6 @@ def task_func(values, filename):
     >>> os.path.exists(path) and 'empty_data.xls' in path
     True
     """
-
     book = xlwt.Workbook()
     sheet1 = book.add_sheet("persons")
     for col_index, col in enumerate(FIELDS):

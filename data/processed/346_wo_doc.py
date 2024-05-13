@@ -36,7 +36,6 @@ def task_func(script_path, wait=True, *args):
     0
     >>> task_func(script_path, False, 'arg1', 'arg2') # Should return None
     """
-
     if not os.path.isfile(script_path):
         raise ValueError(f"Script '{script_path}' does not exist.")
     process = subprocess.Popen(

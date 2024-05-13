@@ -32,7 +32,6 @@ def task_func(frequency, sample_size=10000):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     if frequency < 0:
         raise ValueError("Frequency cannot be negative")
     if sample_size <= 0:

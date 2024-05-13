@@ -45,7 +45,6 @@ def task_func():
     >>> issubclass(handler, http.server.BaseHTTPRequestHandler)
     True
     """
-
     class PostRequestHandler(http.server.BaseHTTPRequestHandler):
         def do_POST(self):
             ctype, pdict = cgi.parse_header(self.headers.get('content-type'))

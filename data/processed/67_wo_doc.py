@@ -22,7 +22,6 @@ def task_func(dir_path: str, pattern: str = '^EMP'):
     >>> report = task_func('/path/to/directory')
     >>> print(report)
     """
-
     file_sizes = []
     for file in sorted(os.listdir(dir_path)):
         if re.match(pattern, file):

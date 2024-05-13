@@ -28,7 +28,6 @@ def task_func(directory_path='./xlsx_files/'):
     >>> task_func(temp_dir)
     1
     """
-
     if not os.path.isdir(directory_path):
         raise FileNotFoundError('The specified directory does not exist.')
     xlsx_files = glob.glob(directory_path + '/*.xlsx')

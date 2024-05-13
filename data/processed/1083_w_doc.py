@@ -40,7 +40,6 @@ def task_func(data):
     >>> print(ax.get_title())
     Normalized Salary vs Experience
     """
-
     if not all(key in data for key in ["Salary_String", "Experience"]):
         raise ValueError(
             "Input data must contain 'Salary_String' and 'Experience' keys."

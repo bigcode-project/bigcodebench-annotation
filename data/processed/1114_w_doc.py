@@ -24,7 +24,6 @@ def task_func(dict1):
     >>> print(emp_data.keys())
     dict_keys(['EMP$$1', 'EMP$$2'])
     """
-
     employee_data = defaultdict(list)
     for prefix, num_employees in dict1.items():
         if not prefix.startswith('EMP$$'):

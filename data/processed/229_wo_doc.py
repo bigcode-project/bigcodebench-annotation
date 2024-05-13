@@ -29,7 +29,6 @@ def task_func(file_path, num_entries, seed=None):
     >>> task_func('/tmp/log.json', 100)
     '/tmp/log.json'
     """
-
     if seed is not None:
         random.seed(seed)
     log_entries = []

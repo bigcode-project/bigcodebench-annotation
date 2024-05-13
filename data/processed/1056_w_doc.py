@@ -43,7 +43,6 @@ def task_func(n_pairs=26):
     >>> [bar.get_label() for bar in ax]
     ['d:4', 'b:2', 'c:3', 'e:5', 'a:1']
     """
-
     if n_pairs > 26 or n_pairs < 1:
         raise ValueError("n_pairs should be between 1 and 26")
     pairs = [f"{letter}:{number}" for letter, number in zip(LETTERS, NUMBERS)][:n_pairs]

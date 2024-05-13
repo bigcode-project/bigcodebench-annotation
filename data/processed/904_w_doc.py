@@ -26,7 +26,6 @@ def task_func(d, keys=['x', 'y', 'z']):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     df = pd.DataFrame(d)
     fig, ax = plt.subplots()
     plotted_keys = []

@@ -40,7 +40,6 @@ def task_func(src_dir, dest_dir, ext):
     >>> os.listdir(test_dest_dir)  # Verify that files were moved, and no duplicates exist in the destination
     ['test_file.txt']
     """
-
     if not os.path.exists(dest_dir):
         raise FileNotFoundError(f"Destination directory '{dest_dir}' does not exist.")
     if not os.path.exists(src_dir):

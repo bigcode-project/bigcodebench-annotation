@@ -29,7 +29,6 @@ def task_func(data_dir: str, csv_files: list) -> pd.DataFrame:
     1      Tom   23    Male
     0   Franko   12    Male
     """
-
     merged_df = pd.DataFrame()
     for file in csv_files:
         file_path = os.path.join(data_dir, file)

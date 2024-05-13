@@ -36,7 +36,6 @@ def task_func(vegetable_dict, seed=0):
     Potato      7   46.666667
     Tomato      1    6.666667
     """
-
     random.seed(seed)
     reversed_dict = {v: k for k, v in vegetable_dict.items()}
     vegetable_counter = collections.Counter({vegetable: random.randint(1, 10) for vegetable in reversed_dict.keys()})

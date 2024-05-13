@@ -25,7 +25,6 @@ def task_func(l):
     >>> task_func(ELEMENTS)
     Counter({'I': 3, 'F': 3, 'G': 3, 'J': 3, 'E': 3, 'A': 3, 'B': 3, 'H': 3, 'D': 3, 'C': 3})
     """
-
     if not l:  # Check if the list is empty
         return Counter()  # Return an empty counter if the list is empty
     random.shuffle(l)

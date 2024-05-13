@@ -22,7 +22,6 @@ def task_func(date_str):
     >>> task_func('2022-10-28')
     datetime.datetime(2022, 10, 31, 0, 0)
     """
-
     given_date = parse(date_str)
     next_day = given_date
     while True:

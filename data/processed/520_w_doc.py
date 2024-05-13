@@ -31,7 +31,6 @@ def task_func(data):
     >>> type(plot)
     <class 'matplotlib.container.BarContainer'>
     """
-
     if not data:
         return dict(), None
     all_keys = set().union(*data)

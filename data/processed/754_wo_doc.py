@@ -43,7 +43,6 @@ def task_func(result):
     ...          ]
     >>> summary = task_func(result)
     """
-
     from_user_values = np.array([d['from_user'] for d in result if 'from_user' in d])
     if len(from_user_values) == 0:
         summary = {

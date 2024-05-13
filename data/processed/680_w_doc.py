@@ -28,7 +28,6 @@ def task_func(df, features):
     0  0.608932  0.127900  0.647689
     1  2.025355  0.031682 -0.234137
     """
-
     if not features:
         return df
     scaler = StandardScaler()

@@ -33,7 +33,6 @@ def task_func(input_file="data.json"):
     b        mean  median
     c        mean  median
     """
-
     with open(input_file, "r") as f:
         data = json.load(f)
     all_keys = set().union(*(d.keys() for d in data))

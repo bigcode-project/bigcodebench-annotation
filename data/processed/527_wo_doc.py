@@ -36,7 +36,6 @@ def task_func(input_file: str) -> plt.Axes:
     >>> results
     {'a': {'mean': 3.0, 'median': 3.0}, 'b': {'mean': 2.0, 'median': 3.0}}
     """
-
     with open(input_file, "r") as f:
         data = json.load(f)
     stats = defaultdict(list)

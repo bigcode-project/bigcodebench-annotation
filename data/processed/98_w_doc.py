@@ -28,7 +28,6 @@ def task_func(num_strings, string_length):
     >>> all(isinstance(pair, tuple) and len(pair) == 2 for pair in task_func(1000, 5))
     True
     """
-
     strings = [''.join(random.choices(string.ascii_lowercase, k=string_length)) for _ in range(num_strings)]
     characters = ''.join(strings)
     character_counter = Counter(characters)

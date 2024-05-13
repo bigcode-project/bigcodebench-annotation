@@ -38,7 +38,6 @@ def task_func(url):
     - The function will not handle redirections or authentication scenarios. It
       expects a direct link to an image resource.
     """
-
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()

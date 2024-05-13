@@ -31,7 +31,6 @@ def task_func(l1, l2, K=10):
     >>> print(freq)
     Counter({5: 2, 10: 1, 2: 1, 3: 1, 9: 1, 14: 1, 7: 1, 1: 1, 8: 1})
     """
-
     combined = [val for pair in zip_longest(l1, l2) for val in pair if val is not None]
     sample = choices(combined, k=K)
     freq = collections.Counter(sample)

@@ -31,7 +31,6 @@ def task_func(app_name):
     >>> print(mail.__getattribute__("app").name)
     test
     """
-
     app = Flask(app_name)
     app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'localhost')
     app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 25))

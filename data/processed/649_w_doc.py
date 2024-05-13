@@ -36,7 +36,6 @@ def task_func(dates_str_list):
     Sunday       1
     dtype: int64
     """
-
     DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     weekdays = [parse(date_str).weekday() for date_str in dates_str_list]
     weekday_counts = np.bincount(weekdays, minlength=7)

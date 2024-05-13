@@ -39,7 +39,6 @@ def task_func(goals, penalties, rng_seed=None, teams=TEAMS):
     3  Team D      1             0
     4  Team E      5             0
     """
-
     if rng_seed is not None:
         seed(rng_seed)
     match_results = []

@@ -29,7 +29,6 @@ def task_func(process_name: str) -> int:
     >>> pids
     0
     """
-
     try:
         pids = subprocess.check_output(['pgrep', '-f', process_name]).decode().split('\n')[:-1] 
     except subprocess.CalledProcessError:

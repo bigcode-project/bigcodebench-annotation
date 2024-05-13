@@ -30,7 +30,6 @@ def task_func(ftp_server='ftp.dlptest.com', ftp_user='dlpuser', ftp_password='rN
     >>> task_func()
     ['file1.txt', 'file2.jpg', ...]
     """
-
     try:
         ftp_obj = ftplib.FTP(ftp_server)
     except Exception as e:

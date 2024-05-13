@@ -24,7 +24,6 @@ def task_func(example_str):
     >>> print(tfidf_scores)
     {'dog': 0.3779644730092272, 'josie': 0.3779644730092272, 'mugsy': 0.3779644730092272, 'smith': 0.7559289460184544}
     """
-
     pattern = r'\[.*?\]'
     text = re.sub(pattern, '', example_str)
     if not text.strip():

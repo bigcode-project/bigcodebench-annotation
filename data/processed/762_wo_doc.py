@@ -37,7 +37,6 @@ def task_func(directory_name="latin_files",
     >>> print(zipped_file)
     directorio.zip
     '''
-
     os.makedirs(directory_name, exist_ok=True)
     for file_name in file_names:
         with open(os.path.join(directory_name, file_name), 'wb') as f:

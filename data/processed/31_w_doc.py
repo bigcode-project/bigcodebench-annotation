@@ -30,7 +30,6 @@ def task_func(text):
     >>> print(ax)
     Axes(0.125,0.11;0.775x0.77)
     """
-
     words = text.split()
     dollar_words = [
         word

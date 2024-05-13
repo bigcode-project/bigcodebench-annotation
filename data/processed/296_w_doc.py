@@ -30,7 +30,6 @@ def task_func(df):
     2
     >>> plt.close()
     """
-
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df is not a DataFrame")
     value_counts = df['value'].value_counts()

@@ -23,7 +23,6 @@ def task_func(input_string):
     >>> task_func('line a\\nfollows by line b\\n...bye\\n')
     {'line': 2, 'follows': 1, 'b': 1, 'bye': 1}
     """
-
     lines = input_string.split('\n')
     word_count = Counter()
     for line in lines:

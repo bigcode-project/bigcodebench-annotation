@@ -26,7 +26,6 @@ def task_func():
     >>> task_func()
 
     """
-
     SOURCE_DIR = '/source/dir'
     TARGET_DIR = '/target/dir'
     FILE_PATTERN = re.compile(r'^(.*?)-\d+\.json$')

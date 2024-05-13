@@ -43,7 +43,6 @@ def task_func(list_of_pairs):
     3    plane  0.000000
     4     ship  1.000000
     """
-
     if len(list_of_pairs) == 0:
         raise Exception('The input array should not be empty.')
     df = pd.DataFrame(list_of_pairs, columns=['Category', 'Value'])

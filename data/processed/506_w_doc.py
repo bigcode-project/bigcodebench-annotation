@@ -40,7 +40,6 @@ def task_func(column, data):
     >>> type(result['plot'])
     <class 'matplotlib.container.BarContainer'>
     """
-
     COLUMNS = ["Date", "Temperature", "Humidity", "Wind Speed", "Precipitation"]
     df = pd.DataFrame(data, columns=COLUMNS)
     column_data = df[column]

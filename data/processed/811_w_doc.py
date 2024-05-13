@@ -44,7 +44,6 @@ def task_func(dictionary, item, sample_size=None, random_seed=None):
     1      car   light
     2  traffic  candle)
     """
-
     dataframe = pd.DataFrame(dictionary)
     positions = [(i, col) for i in dataframe.index for col in dataframe.columns if dataframe.at[i, col] == item]
     if random_seed is not None:

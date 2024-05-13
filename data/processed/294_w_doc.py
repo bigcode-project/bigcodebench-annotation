@@ -24,7 +24,6 @@ def task_func(df):
     >>> print(df_standardized.iloc[0]['age'] == 25)
     False
     """
-
     try:
         scaler = StandardScaler()
         df_grouped = df.groupby('id').apply(lambda x: pd.DataFrame(scaler.fit_transform(x[['age', 'income']]), columns=['age', 'income'], index=x.index))

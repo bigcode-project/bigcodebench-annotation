@@ -27,7 +27,6 @@ def task_func(file_path):
     >>> task_func('./invalid_data.json') # File does not exist
     False
     """
-
     if not os.path.exists(file_path):
         return False
     with open(file_path, 'r') as file:

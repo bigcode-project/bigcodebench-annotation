@@ -26,7 +26,6 @@ def task_func(points: int):
     >>> task_func(3)
     ([0.4049341374504143, 0.7837985890347726, 0.30331272607892745], <Axes: >)
     """
-
     x = list(range(points))
     y = [random.random() for _ in range(points)]
     _, ax = plt.subplots()

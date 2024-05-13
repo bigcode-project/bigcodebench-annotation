@@ -47,7 +47,6 @@ def task_func(timestamp):
     3        Asia/Tokyo 2012-09-13 15:22:50
     4  Australia/Sydney 2012-09-13 16:22:50
     """
-
     datetimes = [
         datetime.fromtimestamp(timestamp, pytz.timezone(tz)).strftime(DATE_FORMAT)
         for tz in TIMEZONES

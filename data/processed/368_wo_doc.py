@@ -29,7 +29,6 @@ def task_func(src_dir: str, dest_dir: str, seed:int = 100) -> str:
     >>> task_func(src_dir, dest_dir, seed=1)
     'file2.txt'
     """
-
     random.seed(seed)
     files = os.listdir(src_dir)
     if len(files) == 0:

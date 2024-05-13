@@ -30,7 +30,6 @@ def task_func(directory):
     
     Note: The function will return the backup directory path and a list of errors (if any).
     """
-
     errors = []
     if not os.path.exists(directory):
         errors.append(f"Directory does not exist: {directory}")

@@ -24,7 +24,6 @@ def task_func(pattern, log_dir='/var/log/'):
     >>> task_func(r'^access.log.[0-9]+$', '/var/log/')
     '/var/log/access.log.1234'
     """
-
     log_files = [f for f in os.listdir(log_dir) if re.match(pattern, f)]
     log_files = sorted(log_files, key=lambda f: os.path.getmtime(os.path.join(log_dir, f)), reverse=True)
     return os.path.join(log_dir, log_files[0]) if log_files else None

@@ -29,7 +29,6 @@ def task_func(
     >>> print(task_func())
     'Server started on localhost:12345. Ran for 5 seconds.'
     """
-
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setblocking(0)
     server.bind((server_address, server_port))

@@ -18,7 +18,6 @@ def task_func(data_path):
     Example:
     >>> df = task_func('path_to_data_file.csv')
     """
-
     df = pd.read_csv(data_path)
     data = df.to_numpy()
     scaler = MinMaxScaler()

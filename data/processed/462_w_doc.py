@@ -36,7 +36,6 @@ def task_func(num_rows=100, categories=["a", "b", "c", "d", "e"], random_seed=42
     3        b     87
     4        b     95
     """
-
     if num_rows <= 0:
         raise ValueError("num_rows must not be negative")
     random.seed(random_seed)

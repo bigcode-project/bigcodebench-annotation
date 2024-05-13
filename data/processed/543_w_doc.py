@@ -21,7 +21,6 @@ def task_func():
     >>> len(example_output) > 0
     True
     """
-
     float_bytes = os.urandom(4)
     encoded_str = base64.b64encode(float_bytes)
     return encoded_str.decode()

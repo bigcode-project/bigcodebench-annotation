@@ -27,7 +27,6 @@ def task_func(csv_file):
     >>> type(ax)
     <class 'seaborn.axisgrid.PairGrid'>
     """
-
     df = pd.read_csv(csv_file)
     df["dict_column"] = df["dict_column"].apply(ast.literal_eval)
     df["hue_column"] = df["dict_column"].apply(str)

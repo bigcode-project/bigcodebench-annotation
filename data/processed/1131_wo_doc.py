@@ -27,7 +27,6 @@ def task_func(salt, cursor):
     >>> print(num_updated)
     5
     """
-
     if not isinstance(salt, str):
         raise TypeError
     cursor.execute("SELECT id, password FROM users")

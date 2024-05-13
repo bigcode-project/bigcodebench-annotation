@@ -25,7 +25,6 @@ def task_func(url):
     >>> task_func('http://example.com/log.txt')
     5 # Assuming there are 5 occurrences of 'ERROR' in the file
     """
-
     TARGET_FILE = 'downloaded_file.txt'
     SEARCH_PATTERN = r'\bERROR\b'
     urllib.request.urlretrieve(url, TARGET_FILE)

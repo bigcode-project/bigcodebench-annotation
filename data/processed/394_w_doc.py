@@ -27,7 +27,6 @@ def task_func(length, seed=0):
     >>> task_func(5, 0)  # The result should be deterministic for a given seed
     {'y': 1, 'W': 1, 'A': 1, 'c': 1, 'q': 1}
     """
-
     random.seed(seed)
     random_string = ''.join(random.choice(string.ascii_letters) for _ in range(length))
     char_freq = collections.Counter(random_string)

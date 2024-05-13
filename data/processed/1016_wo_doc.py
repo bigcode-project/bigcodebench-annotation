@@ -29,7 +29,6 @@ def task_func(url: str) -> "matplotlib.axes._axes.Axes":
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     response = None  # Initialize response to None
     if not isinstance(url, str) or not url:
         raise ValueError("Invalid URL provided.")

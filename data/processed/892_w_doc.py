@@ -19,7 +19,6 @@ def task_func(strings: list) -> dict:
     >>> task_func(['abcd}def}', 'pqrs}tuv}', 'wxyz}123}', '456}789}', '0ab}cde}'])
     Counter({2: 10})
     """
-
     if not strings:
         return Counter()
     pattern = '}'

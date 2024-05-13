@@ -37,7 +37,6 @@ def task_func(student_grades, possible_grades=["A", "B", "C", "D", "F"]):
     D          1
     F          1
     """
-
     if not student_grades:
         raise ValueError("student_grades cannot be empty")
     possible_grades = [*dict.fromkeys([g.upper() for g in possible_grades])]

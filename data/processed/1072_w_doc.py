@@ -40,7 +40,6 @@ def task_func(list_of_lists):
     - The function uses numpy's random shuffle, which modifies the sequence in-place. Therefore, each call to the function
       may produce different Series values unless the random seed is set beforehand.
     """
-
     series_list = []
     for sublist in list_of_lists:
         values = np.arange(1, len(sublist) + 1)

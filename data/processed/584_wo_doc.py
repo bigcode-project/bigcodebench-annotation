@@ -36,7 +36,6 @@ def task_func(url):
     >>> isinstance(hash_value, bytes)
     True
     """
-
     try:
         (pub_key, priv_key) = rsa.newkeys(512)
         response = urllib.request.urlopen(url)

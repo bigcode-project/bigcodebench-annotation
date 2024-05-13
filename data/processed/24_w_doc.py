@@ -30,7 +30,6 @@ def task_func(password, SALT_LENGTH = 32):
     >>> isinstance(hashed_password, bytes)
     True
     """
-
     if not password:
         raise ValueError
     salt = os.urandom(SALT_LENGTH)

@@ -47,7 +47,6 @@ def task_func(data_dict):
     >>> plot.get_title() if plot is not None else 'No plot generated'
     'Value Distribution'
     """
-
     df = pd.DataFrame(data_dict).dropna()
     if df.empty or df.nunique().min() < 2:
         return df, None

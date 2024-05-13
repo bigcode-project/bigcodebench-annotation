@@ -28,7 +28,6 @@ def task_func(fruit_dict):
     >>> dict(freq)
     {'Apple': 2, 'Banana': 1, 'Cherry': 1, 'Date': 1}
     """
-
     fruit_list = [item for item in fruit_dict.values() if isinstance(item, str) and item in FRUITS]
     fruit_counter = Counter(fruit_list)
     plt.bar(fruit_counter.keys(), fruit_counter.values())

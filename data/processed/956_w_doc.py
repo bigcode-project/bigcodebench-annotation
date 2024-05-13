@@ -31,7 +31,6 @@ def task_func(text: str, seed=None) -> str:
     >>> task_func('attention is all you need', 42)
     'ATtENTIOn_IS_ALL_You_Need'
     """
-
     if seed is not None:
         random.seed(seed)
     text = re.sub("[%s]" % re.escape(string.punctuation), "", text)

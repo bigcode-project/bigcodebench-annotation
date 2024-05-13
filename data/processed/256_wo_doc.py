@@ -33,7 +33,6 @@ def task_func(utc_datetime, salt='salt', password_length=10, seed=0):
     >>> utc_time = datetime(2023, 6, 15, 12, 0, 0, tzinfo=pytz.UTC)
     >>> password_json_str = task_func(utc_time)
     """
-
     random.seed(seed)
     if not isinstance(utc_datetime, datetime):
         raise ValueError("Input should be a datetime object")

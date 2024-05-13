@@ -42,7 +42,6 @@ def task_func(db_file, table_name, column_name, pattern='\d+[xX]'):
     60  61                   5xgirl
     61  62                   5xkind
     """
-
     if not os.path.isfile(db_file):
         raise ValueError('db_file does not exist.')
     conn = sqlite3.connect(db_file)

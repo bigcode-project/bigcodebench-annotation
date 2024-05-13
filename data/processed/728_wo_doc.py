@@ -31,7 +31,6 @@ def task_func(filename, from_encoding='cp1251', to_encoding='utf8', delimiter=',
     - The default filename to use if not specified is 'sample.csv'.
     - The default delimiter is ','.
     """
-
     with io.open(filename, 'r', encoding=from_encoding) as file:
         content = file.read()
     content = content.encode(from_encoding).decode(to_encoding)

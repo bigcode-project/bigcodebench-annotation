@@ -29,7 +29,6 @@ def task_func(samples=10, delay=0.1):
     >>> print(f'Mean: %.3f, Std: %.4f' % (mean, std))
     Mean: 0.001, Std: 0.0000
     """
-
     delay_times = []
     for _ in range(samples):
         t1 = time.time()

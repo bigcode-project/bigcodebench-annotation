@@ -32,7 +32,6 @@ def task_func(text, seed=None):
     >>> task_func("apple321#", seed=42)
     'uahev901#'
     """
-
     if seed is not None:
         random.seed(seed)
     if not text:

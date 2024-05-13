@@ -30,7 +30,6 @@ def task_func(output_file, test_directory):
     >>> task_func('word_counts.csv')
     10
     """
-
     total_words = 0
     try:
         word_counts = Counter()

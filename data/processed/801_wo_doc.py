@@ -30,7 +30,6 @@ def task_func(file_name):
     'Genre': 'HipHop',
     'Height': 172}
     """
-
     data = np.genfromtxt(file_name, delimiter=',', names=True,
                          dtype=None, encoding=None)
     common_values = {}

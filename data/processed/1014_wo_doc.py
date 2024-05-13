@@ -31,7 +31,6 @@ def task_func(api_url):
     >>> if plot:
     >>>     plot.show()
     """
-
     if not isinstance(api_url, str):
         raise TypeError("api_url must be a string")
     response = requests.get(api_url, timeout=5)

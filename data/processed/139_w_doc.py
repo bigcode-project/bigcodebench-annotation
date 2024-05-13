@@ -29,7 +29,6 @@ def task_func(df):
     >>> for ax in axes:
     ...     plt.show()
     """
-
     if not isinstance(df, pd.DataFrame) or df.empty:
         raise ValueError("The input must be a non-empty pandas DataFrame.")
     numeric_cols = df.select_dtypes(include=np.number).columns

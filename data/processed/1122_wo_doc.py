@@ -24,7 +24,6 @@ def task_func(myString):
     >>> task_func("Check these links: http://www.google.com, https://www.python.org")
     {'www.google.com': '172.217.12.142', 'www.python.org': '151.101.193.223'}
     """
-
     urls = re.findall(r'https?://[^\s,]+', myString)
     ip_addresses = {}
     for url in urls:

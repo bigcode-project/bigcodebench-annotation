@@ -31,7 +31,6 @@ def task_func(num_rolls, num_dice, plot_path=None, random_seed=0):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     POSSIBLE_VALUES = list(range(1, 7))
     random.seed(random_seed)
     sums = []

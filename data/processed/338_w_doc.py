@@ -32,7 +32,6 @@ def task_func(elements, seed=100):
     >>> counts
     {'%': 4, ' ': 2, 'j': 1, 'C': 2, 'V': 1, 'R': 1, 'T': 1, 'A': 1, 'X': 1, 'H': 1, 'e': 1}
     """
-
     random.seed(seed)
     random_patterns = []
     for element in elements:

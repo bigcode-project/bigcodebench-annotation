@@ -25,7 +25,6 @@ def task_func(pattern):
     
     Note: This function will return the archive file path.
     """
-
     if not os.path.exists(ARCHIVE_DIR):
         os.makedirs(ARCHIVE_DIR)
     file_list = glob.glob(pattern)

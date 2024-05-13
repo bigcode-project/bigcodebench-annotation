@@ -23,7 +23,6 @@ def task_func(L):
     Examples:
     >>> ax = task_func([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     '''
-
     data = list(chain(*L))
     data = np.array(data).reshape(-1, 1)
     scaler = StandardScaler()

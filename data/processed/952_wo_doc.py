@@ -45,7 +45,6 @@ def task_func(
     >>> type(df)
     <class 'pandas.core.frame.DataFrame'>
     """
-
     if seed is not None:
         random.seed(seed)
     if n_tasks < 0:

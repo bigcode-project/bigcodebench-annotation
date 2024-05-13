@@ -26,7 +26,6 @@ def task_func(duration):
     >>> type(task_func(1))
     <class 'tuple'>
     """
-
     VALUES_RANGE = (0, 100)
     PLOT_INTERVAL = 0.1
     plt.ion()

@@ -30,7 +30,6 @@ def task_func(original):
     >>> print(stats)
     {'mean': 2.5, 'std': 1.118033988749895, 'min': 1, 'max': 4}
     """
-
     arr = np.array([b for (a, b) in original])
     computed_stats = {
         'mean': np.mean(arr),

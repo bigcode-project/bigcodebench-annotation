@@ -36,7 +36,6 @@ def task_func(
     >>> type(clf)
     <class 'sklearn.ensemble._forest.RandomForestClassifier'>
     """
-
     if seed is not None:
         np.random.seed(seed)
     shuffled_array = feature_array.copy()

@@ -24,7 +24,6 @@ def task_func(date_str):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     date = datetime.strptime(date_str, "%Y-%m-%d")
     num_of_values = date.day
     random_values = [random.randint(1, 100) for _ in range(num_of_values)]

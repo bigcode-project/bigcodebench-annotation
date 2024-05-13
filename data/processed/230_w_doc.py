@@ -36,7 +36,6 @@ def task_func(df):
     >>> print(task_func("not a dataframe"))
     Invalid input
     """
-
     if not isinstance(df, pd.DataFrame):
         return "Invalid input"
     try:

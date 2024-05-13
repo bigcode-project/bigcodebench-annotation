@@ -24,7 +24,6 @@ def task_func(decimal_value, precision=2):
     >>> print(json_str)
     "1.97"
     """
-
     square_root = round(math.sqrt(decimal_value), 2)
     json_str = json.dumps(str(square_root))
     return json_str

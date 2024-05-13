@@ -29,7 +29,6 @@ def task_func(n_strings, string_length):
     >>> task_func(2, 3)
     {'O': 1, 'h': 1, 'b': 1, 'V': 1, 'r': 1, 'p': 1}
     """
-
     strings = [''.join(random.choice(VALID_CHARACTERS) for _ in range(string_length)) for _ in range(n_strings)]
     character_counts = collections.Counter(''.join(strings))
     return dict(character_counts)

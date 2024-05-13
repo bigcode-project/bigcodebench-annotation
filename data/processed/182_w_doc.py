@@ -31,7 +31,6 @@ def task_func(df):
     >>> task_func(df_sample)
     [0, 1, 0, 1]
     """
-
     pattern = re.compile(r'(how|what)', re.IGNORECASE)
     interesting_articles = df[df['Title'].apply(lambda x: bool(pattern.search(x)))]
     if interesting_articles.empty:

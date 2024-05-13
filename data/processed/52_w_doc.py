@@ -30,7 +30,6 @@ def task_func(text):
     words       1
     dtype: int64
     """
-
     words = re.findall(r"\b\w+\b", text.lower())
     words = [word for word in words if word not in STOPWORDS]
     word_counts = pd.Series(words).value_counts().rename(None)

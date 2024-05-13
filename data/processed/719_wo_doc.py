@@ -24,7 +24,6 @@ def task_func(directory, word):
     >>> task_func('./documents', 'apple')
     3
     """
-
     count = 0
     pattern = re.compile(r'\b' + re.escape(word) + r'\b', re.IGNORECASE)
     for filename in glob.glob(os.path.join(directory, '*.*')):

@@ -29,7 +29,6 @@ def task_func(df, filename, output_dir=OUTPUT_DIR):
     >>> 'data.csv' in task_func(df, 'data.csv')
     True
     """
-
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     file_path = os.path.join(output_dir, filename)

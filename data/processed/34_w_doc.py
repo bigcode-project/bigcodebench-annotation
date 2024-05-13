@@ -26,7 +26,6 @@ def task_func(text):
     >>> print(task_func('Check out this link: http://www.example.com. Machine learning is fascinating.').words_)
     {'Check': 1.0, 'link': 1.0, 'Machine': 1.0, 'learning': 1.0, 'fascinating': 1.0}
     """
-
     text = re.sub(r"http[s]?://\S+", "", text)
     if not text.strip():  # Check if text is not empty after URL removal
         raise ValueError(

@@ -29,7 +29,6 @@ def task_func(rows):
     >>> print(ax.title.get_text())  # Should return 'Non-Zero Value Counts'
     Non-Zero Value Counts
     """
-
     plt.close('all')  # Clear previous plots
     if rows <= 0:
         empty_ax = plt.gca()

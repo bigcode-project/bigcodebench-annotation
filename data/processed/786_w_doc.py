@@ -51,7 +51,6 @@ def task_func(
     5    Austria  coffee     48
     6    Austria  coffee     27
     """
-
     random.seed(random_seed)
     sales_data = []
     for _ in range(n):

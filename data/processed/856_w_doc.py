@@ -41,7 +41,6 @@ def task_func(shape=(3, 3), low=1, high=10, seed=None):
            [5, 3, 5, 8],
            [8, 2, 8, 1]]))
     """
-
     if seed is not None:
         np.random.seed(seed)
     if high <= low:

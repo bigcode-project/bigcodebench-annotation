@@ -25,7 +25,6 @@ def task_func(content):
     >>> task_func('running runner run')
     {'run': 1, 'runner': 1}
     """
-
     content = content.split(' ')[:-1]
     words = [word.strip(string.punctuation).lower() for word in re.split('\W+', ' '.join(content))]
     stemmed_words = [STEMMER.stem(word) for word in words]

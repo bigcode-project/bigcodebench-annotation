@@ -35,7 +35,6 @@ def task_func(P, T):
     >>> type(heatmap)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     if not (isinstance(P, np.ndarray) and isinstance(T, np.ndarray)):
         raise TypeError("Expected inputs to be numpy arrays")
     result = np.tensordot(P, T, axes=[1, 0])

@@ -26,7 +26,6 @@ def task_func(url_str, file_path):
     >>> task_func('http://example.com/data.json', '/path/to/file.json.gz').endswith('.gz')
     True
     """
-
     response = urllib.request.urlopen(url_str)
     data = response.read().decode()
     json_data = json.loads(data)

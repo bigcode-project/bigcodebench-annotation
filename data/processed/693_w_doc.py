@@ -25,7 +25,6 @@ def task_func(tuples_list, columns):
     1  0.000000  0.000000  0.000000  0.000000
     2  1.224745  1.224745  1.224745  1.224745
     """
-
     df = pd.DataFrame(tuples_list, columns=columns)
     scaler = StandardScaler()
     df_scaled = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)

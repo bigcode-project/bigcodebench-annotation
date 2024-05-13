@@ -90,7 +90,6 @@ def task_func(test_scores, student):
     2        1      1
     3        1      1)
     """
-
     test_scores = pd.DataFrame(test_scores)
     if student not in test_scores['Student'].values:
         raise ValueError(f"The student with ID {student} is not present in the test scores DataFrame.")

@@ -29,7 +29,6 @@ def task_func(goals, penalties):
     Example:
     >>> df, plots = task_func(5, 3)
     """
-
     match_results = []
     for team in TEAMS:
         team_goals = randint(0, goals)

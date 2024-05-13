@@ -25,7 +25,6 @@ def task_func(num_samples=100, num_features=5):
     >>> df, ax = task_func(10, 3)
     >>> ax.figure.show()
     """
-
     FEATURES = ['Feature' + str(i) for i in range(1, num_features + 1)]
     SAMPLES = ['Sample' + str(i) for i in range(1, num_samples + 1)]
     data = np.random.rand(len(SAMPLES), len(FEATURES))

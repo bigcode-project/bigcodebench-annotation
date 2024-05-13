@@ -27,7 +27,6 @@ def task_func(n):
     >>> task_func(50)
     3.4443
     """
-
     distances = []
     for _ in range(n):
         theta = 2 * math.pi * random.random()

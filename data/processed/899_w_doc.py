@@ -26,7 +26,6 @@ def task_func(length=10000, seed=0):
     >>> walk.tolist()
     [0, 1, 2, 1, 0, 1]
     """
-
     if length < 0:
         raise ValueError("length must be a non-negative integer")
     random.seed(seed)

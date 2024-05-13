@@ -30,7 +30,6 @@ def task_func(SOURCE_DIR, DEST_DIR, EXTENSIONS):
     >>> task_func('/path/to/source', '/path/to/destination', ['.jpg'])
     []
     """
-
     warnings.simplefilter('always')
     transferred_files = []  # Ensure this is reset each time the function is called
     for ext in EXTENSIONS:

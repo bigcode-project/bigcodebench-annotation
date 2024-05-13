@@ -33,7 +33,6 @@ def task_func(
                      AAPL      GOOGL       MSFT       AMZN         FB
     2024-03-30  37.454012  95.071431  73.199394  59.865848  15.601864
     """
-
     np.random.seed(random_seed)
     if not isinstance(days_in_past, int) or days_in_past <= 0:
         raise ValueError("days_in_past must be a positive integer.")

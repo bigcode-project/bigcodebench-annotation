@@ -33,7 +33,6 @@ def task_func(n_data_points=N_DATA_POINTS):
     >>> MIN_VALUE <= data.iloc[0]['Value'] <= MAX_VALUE
     True
     '''
-
     if n_data_points == 0:
         return pd.DataFrame(columns=['Value'])
     data = [round(random.uniform(MIN_VALUE, MAX_VALUE), 3) for _ in range(n_data_points)]

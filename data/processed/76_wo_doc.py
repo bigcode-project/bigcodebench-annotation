@@ -43,7 +43,6 @@ def task_func(request, session_expire_time):
     - random
     - string
     """
-
     session_key = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
     has_digit = any(char.isdigit() for char in session_key)
     has_letter = any(char.isalpha() for char in session_key)

@@ -29,7 +29,6 @@ def task_func(data, n_components=2):
     >>> data = pd.DataFrame([[14, 25], [1, 22], [7, 8]], columns=['Column1', 'Column2'])
     >>> transformed_data, plot = task_func(data)
     """
-
     np.random.seed(42)
     if not isinstance(n_components, int) or n_components <= 0:
         raise ValueError("n_components must be a positive integer")

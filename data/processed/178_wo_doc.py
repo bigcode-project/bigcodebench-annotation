@@ -29,7 +29,6 @@ def task_func(ip_address):
     >>> task_func(ip_address)
     '192.168.1.1'
     """
-
     try:
         response = ip_address
         data = json.loads(response)

@@ -26,7 +26,6 @@ def task_func(x, y, labels):
     >>> labels = ['H₂O', 'O₂', 'CO₂']
     >>> fig = task_func(x, y, labels)
     """
-
     pca = PCA(n_components=2)
     fig, ax = plt.subplots()
     for i in range(len(x)):

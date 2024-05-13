@@ -23,7 +23,6 @@ def task_func(mu, sigma, num_samples):
     Example:
     >>> plt = task_func(0, 1, 1000)
     """
-
     samples = np.random.normal(mu, sigma, num_samples)
     fig, ax = plt.subplots()
     ax.hist(samples, bins=30, density=True, alpha=0.6, color='g')

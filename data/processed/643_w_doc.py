@@ -31,7 +31,6 @@ def task_func(dataframe, data_pattern=DATA_PATTERN):
     0  1.23  7.89
     1  4.56  0.12
     """
-
     for col in dataframe.columns:
         dataframe[col] = dataframe[col].apply(lambda x: float(re.search(data_pattern, x).group(0)[1:-1])
                                               if pd.notnull(x) and re.search(data_pattern, x) else np.nan)

@@ -30,7 +30,6 @@ def task_func(text1, text2):
     >>> print(cleaned_text1, cleaned_text2)
     test with parenthesis  And other stuff 
     """
-
     PUNCTUATION = string.punctuation
     cleaned_texts = []
     for text in [text1, text2]:

@@ -26,7 +26,6 @@ def task_func(products_list):
     >>> type(sales_data)
     <class 'pandas.core.frame.DataFrame'>
     """
-
     sales_data = []
     for product in products_list:
         sales = [randint(100, 500) for _ in range(12)]

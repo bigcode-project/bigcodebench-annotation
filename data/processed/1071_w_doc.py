@@ -41,7 +41,6 @@ def task_func(list_of_lists):
       unless a random seed is set externally.
     - The function uses a default set of colors defined in the COLORS constant.
     """
-
     fig, ax = plt.subplots()
     color_cycle = cycle(COLORS)
     for list_ in list_of_lists:

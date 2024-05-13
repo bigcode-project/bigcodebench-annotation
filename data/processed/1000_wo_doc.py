@@ -31,7 +31,6 @@ def task_func(url):
     0  Alice   25       New York
     1    Bob   30  San Francisco
     """
-
     urllib.request.urlretrieve(url, TARGET_JSON_FILE)
     with open(TARGET_JSON_FILE, "r") as f:
         data = json.load(f)

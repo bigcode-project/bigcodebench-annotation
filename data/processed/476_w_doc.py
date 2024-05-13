@@ -30,7 +30,6 @@ def task_func(X, Y):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     def func(x, a, b, c):
         return a * x ** 2 + b * x + c
     popt, pcov = curve_fit(func, X, Y)

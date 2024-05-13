@@ -36,7 +36,6 @@ def task_func(goals, penalties):
     3  Team D      0
     4  Team E      2
     """
-
     scores_data = []
     for team in TEAMS:
         team_goals = goals.get(team, 0)

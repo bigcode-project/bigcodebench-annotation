@@ -30,7 +30,6 @@ def task_func(l, n_groups = 5):
     >>> set(df.iloc[0]) == set(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'])
     True
     """
-
     if not l:
         return pd.DataFrame()
     shuffle(l)

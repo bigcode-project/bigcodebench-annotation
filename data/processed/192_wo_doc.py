@@ -38,7 +38,6 @@ def task_func(text=TEXT, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, email_add
     >>> task_func(text="Josie Smith [3996 COLLEGE AVENUE, SOMETOWN, MD 21003]Mugsy Dog Smith [2560 OAK ST, GLENMEADE, WI 14098]", smtp=mock_smtp)
     ['Josie Smith', 'Mugsy Dog Smith']
     """
-
     names = re.findall('(.*?)(?:\\[.*?\\]|$)', text)
     names = [name.strip() for name in names if name != ""]
     message = 'Subject: Extracted Names\n\n' + '\n'.join(names)

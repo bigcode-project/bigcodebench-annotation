@@ -28,7 +28,6 @@ def task_func(log_file):
     >>> print(output_path)
     log_data.csv
     """
-
     log_pattern = r'(ERROR|INFO): \[\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*\] - (.*)'
     parsed_data = []
     with open(log_file, 'r') as file:

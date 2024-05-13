@@ -30,7 +30,6 @@ def task_func(commands):
     >>> all(isinstance(output, bytes) for output in result)
     True
     """
-
     if not commands:  # Handle case where commands list is empty
         return []
     with Pool(processes=len(commands)) as pool:

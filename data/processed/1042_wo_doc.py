@@ -37,7 +37,6 @@ def task_func(client_socket):
     >>> client_socket, addr = server_socket.accept()
     >>> task_func(client_socket)
     """
-
     request = client_socket.recv(BUFFER_SIZE).decode("utf-8")
     print(f"Received: {request}")
     email = EmailMessage()

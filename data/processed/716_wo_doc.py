@@ -27,7 +27,6 @@ def task_func(path_to_append=PATH_TO_APPEND, json_file=JSON_FILE):
     >>> task_func('/path/to/new_directory', '/path/to/new_json_file.json')
     {'last_updated': '2023-08-28 12:34:56'}
     """
-
     sys.path.append(path_to_append)
     with open(json_file, 'r+') as file:
         json_data = json.load(file)

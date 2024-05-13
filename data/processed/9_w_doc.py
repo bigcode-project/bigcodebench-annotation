@@ -31,7 +31,6 @@ def task_func(list_of_pairs):
     0      Fruits      5
     1  Vegetables      9
     """
-
     df = pd.DataFrame(list_of_pairs, columns=["Category", "Value"])
     plt.figure(figsize=(10, 5))
     sns.barplot(x="Category", y="Value", data=df)

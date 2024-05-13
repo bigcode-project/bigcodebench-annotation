@@ -34,7 +34,6 @@ def task_func(data_matrix, n_components=2):
     1   -2.850439
     Name: Mean, dtype: float64
     """
-
     pca = PCA(n_components=n_components)
     transformed_data = pca.fit_transform(data_matrix)
     df = pd.DataFrame(

@@ -25,7 +25,6 @@ def task_func(range_start=0, range_end=10, step=0.1):
     >>> ax.get_title()  # Returns the title of the plot
     'Exponential Function Plot'
     """
-
     x_values = np.arange(range_start, range_end, step)
     data = ((x, math.exp(x)) for x in x_values)
     _, ax = plt.subplots()

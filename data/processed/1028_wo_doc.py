@@ -38,7 +38,6 @@ def task_func(interval, duration):
     >>> task_func(5, 60)
     'logfile.log'
     """
-
     if interval <= 0 or duration <= 0:
         raise ValueError("Interval and duration must be greater than zero.")
     start_time = time.time()

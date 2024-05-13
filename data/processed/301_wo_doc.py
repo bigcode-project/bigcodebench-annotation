@@ -31,7 +31,6 @@ def task_func(date_str, from_tz, to_tz):
     >>> task_func('1990-01-01 00:00:00', 'UTC', 'America/New_York')
     0.6548607339452851
     """
-
     from_tz = pytz.timezone(from_tz)
     to_tz = pytz.timezone(to_tz)
     given_date = parse(date_str).replace(tzinfo=from_tz)

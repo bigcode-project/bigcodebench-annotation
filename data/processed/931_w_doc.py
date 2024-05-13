@@ -24,7 +24,6 @@ def task_func(word: str) -> dict:
     >>> task_func('a1!b@c#d$')
     defaultdict(<class 'int'>, {'ab': 1, 'bc': 1, 'cd': 1})
     """
-
     sanitized_word = re.sub('[^A-Za-z]', '', word)
     occurrences = defaultdict(int)
     pairs = [''.join(x) for x in zip(sanitized_word, sanitized_word[1:])]

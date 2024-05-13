@@ -26,7 +26,6 @@ def task_func(app):
     >>> 'MAIL_SERVER' in configs
     True
     """
-
     app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'localhost')
     app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 25))
     app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', False) == 'True'

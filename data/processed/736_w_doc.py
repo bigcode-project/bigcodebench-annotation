@@ -19,7 +19,6 @@ def task_func(L):
     >>> task_func([[1,2,3],[4,5,6]])
     1
     '''
-
     flattened = np.hstack(L)  
     mode = stats.mode(flattened)[0][0]
     return mode

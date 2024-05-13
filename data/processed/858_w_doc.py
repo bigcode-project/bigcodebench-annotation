@@ -39,7 +39,6 @@ def task_func(n, seed=None):
     letters before counting them. The randomness of letter selection can be 
     consistent by providing a seed.
     """
-
     LETTERS = string.ascii_lowercase
     if seed is not None:
         random.seed(seed)

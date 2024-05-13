@@ -28,7 +28,6 @@ def task_func(directory_path: str) -> int:
     >>> task_func(temp_dir)
     1
     """
-
     docx_files = glob.glob(directory_path + '/*.docx')
     processed_files = 0
     for docx_file in docx_files:

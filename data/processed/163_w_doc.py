@@ -28,7 +28,6 @@ def task_func(rows=5, cols=5):
     >>> isinstance(ax, matplotlib.axes.Axes)
     True
     """
-
     np.random.seed(0)
     categories = ['A', 'B', 'C', 'D', 'E']
     if cols > len(categories):

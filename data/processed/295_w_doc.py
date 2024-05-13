@@ -22,7 +22,6 @@ def task_func(elements, subset_size):
     >>> task_func((1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 2)
     {'mean': 11, 'median': 11, 'mode': 11}
     """
-
     combinations = list(itertools.combinations(elements, subset_size))
     sums = [sum(combination) for combination in combinations]
     return {

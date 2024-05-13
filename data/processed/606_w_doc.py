@@ -28,7 +28,6 @@ def task_func(matrix):
     >>> np.allclose(normalized_df.std(ddof=0), 1)
     True
     """
-
     df = pd.DataFrame(matrix)
     normalized_df = df.apply(stats.zscore)
     normalized_df = normalized_df.fillna(0.0)

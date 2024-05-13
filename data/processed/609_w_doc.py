@@ -26,7 +26,6 @@ def task_func(df, tuples, n_plots):
     >>> tuples = [(0.1, 0.2, 0.3, 0.4, 0.5)]
     >>> modified_df, plots = task_func(df, tuples, 3)
     """
-
     COLUMNS = ['A', 'B', 'C', 'D', 'E']
     df = df.set_index(list('ABCDE')).drop(tuples, errors='ignore').reset_index()
     plots = []

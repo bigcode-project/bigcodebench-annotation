@@ -27,7 +27,6 @@ def task_func(f):
     >>> 'sample_function2' in task_func(sample_function2)
     True
     """
-
     spec = inspect.getfullargspec(f)
     annotations = {k: v.__name__ if isinstance(v, type) else str(v) for k, v in spec.annotations.items()}
     info = {

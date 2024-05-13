@@ -60,7 +60,6 @@ def task_func(df, col_a='A', col_b='B', col_c='C', seed=None):
     >>> print(model)
     LinearRegression()
     """
-
     if df.empty or not all(col in df for col in [col_a, col_b, col_c]):
         return None  # Invalid input scenario
     try:

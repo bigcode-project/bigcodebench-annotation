@@ -27,7 +27,6 @@ def task_func(my_tuple, path_csv_files):
     >>> print(result['Country'])
     Counter({'USA': 3, 'Canada': 1, 'UK': 1, 'Germany': 1})
     """
-
     counter = {column: collections.Counter() for column in my_tuple}
     for csv_file in path_csv_files:
         df = pd.read_csv(csv_file)

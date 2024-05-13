@@ -24,7 +24,6 @@ def task_func(text, top_n):
     Note:
     - Valid url is start with http or https
     """
-
     text = re.sub('http[s]?://\S+', '', text)
     words = re.findall(r'\b\w+\b', text)
     word_freq = Counter(words)

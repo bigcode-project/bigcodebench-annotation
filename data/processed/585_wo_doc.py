@@ -32,7 +32,6 @@ def task_func(directory):
     >>> isinstance(zipfile_name, str)
     'True'
     """
-
     (pub_key, priv_key) = rsa.newkeys(512)
     zipfile_name = 'encrypted_files.zip'
     with zipfile.ZipFile(zipfile_name, 'w') as zipf:

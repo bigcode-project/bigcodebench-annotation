@@ -25,7 +25,6 @@ def task_func(data, cols, percentage):
     >>> print(result)
     [('x', 'y')]
     """
-
     if not 0 <= percentage <= 1:
         raise ValueError('Percentage must be between 0 and 1')
     df = pd.DataFrame(data, columns=cols)

@@ -32,7 +32,6 @@ def task_func(data_dict, data_keys):
     0.5 0.5
     1.0 1.0
     """
-
     data_for_keys = {key: data_dict[key] for key in data_keys if key in data_dict}
     df = pd.DataFrame(data_for_keys)
     if df.empty:

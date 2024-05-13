@@ -27,7 +27,6 @@ def task_func(list_of_lists):
            [0., 0., 0., 0., 0., 0., 0., 1., 0.],
            [0., 0., 0., 0., 0., 0., 0., 0., 1.]])
     """
-
     merged_list = np.array([item for sublist in list_of_lists for item in sublist]).reshape(-1, 1)
     encoder = OneHotEncoder(sparse=False)
     one_hot = encoder.fit_transform(merged_list)

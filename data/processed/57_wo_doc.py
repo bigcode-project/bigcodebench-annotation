@@ -23,7 +23,6 @@ def task_func(csv_file_path: str, title: str):
     >>> data = "data/task_func/csv_1.csv"
     >>> c, ax = task_func(data, 'Correlation Heatmap')
     """
-
     data = pd.read_csv(csv_file_path)
     corr = data.corr().round(2)
     plt.figure(figsize=(10, 8))

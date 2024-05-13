@@ -24,7 +24,6 @@ def task_func(df, target):
     >>> print(r_squared)
     0.0011582111228732872
     """
-
     X = pd.DataFrame.drop(df, target, axis=1)  
     y = pd.Series(df[target])  
     model = LinearRegression()

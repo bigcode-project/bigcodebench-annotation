@@ -28,7 +28,6 @@ def task_func(array):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     COLUMNS = ["A", "B", "C", "D", "E"]
     df = pd.DataFrame(array, columns=COLUMNS)
     sums = df.sum()

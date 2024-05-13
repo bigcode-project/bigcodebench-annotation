@@ -24,7 +24,6 @@ def task_func(hex_key=None):
     '36806.1'
 
     """
-
     if hex_key is None:
         hex_key = random.choice(KEYS)
     float_num = struct.unpack('!f', bytes.fromhex(hex_key))[0]

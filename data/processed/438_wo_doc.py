@@ -29,7 +29,6 @@ def task_func(numbers, file_path="save.pkl"):
     >>> type(loaded_fig)
     <class 'matplotlib.figure.Figure'>
     """
-
     if not isinstance(numbers, list) or not all(
         isinstance(item, (int, float)) for item in numbers
     ):

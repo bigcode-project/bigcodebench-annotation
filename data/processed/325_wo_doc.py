@@ -25,7 +25,6 @@ def task_func(directory_path: str, regex_pattern: str = r'\\(.+?\\)|\\w') -> dic
     >>> print(matches)
     {}
     """
-
     FILE_PATTERN = '*.txt'
     match_dict = {}
     file_paths = glob.glob(os.path.join(directory_path, FILE_PATTERN))

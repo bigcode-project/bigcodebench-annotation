@@ -28,7 +28,6 @@ def task_func(area_string, data=DATA):
     >>> task_func('6,000')
     600.0
     """
-
     df = pd.DataFrame(data)
     df["Area_Float"] = df["Area_String"].str.replace(",", "").astype(float)
     X = df[["Area_Float"]]

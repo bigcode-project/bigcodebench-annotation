@@ -28,7 +28,6 @@ def task_func(df, x_column, y_column):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     X = df[x_column].values.reshape(-1, 1)
     Y = df[y_column].values
     reg = LinearRegression().fit(X, Y)

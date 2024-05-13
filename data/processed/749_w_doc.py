@@ -20,7 +20,6 @@ def task_func(myList):
     >>> task_func(myList)
     array([0.  , 0.25, 0.5 , 0.75, 1.  ])
     """
-
     myList = np.array(myList).reshape(-1, 1)
     scaler = MinMaxScaler()
     normalized_list = scaler.fit_transform(myList)

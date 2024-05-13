@@ -43,7 +43,6 @@ def task_func(kwargs):
     >>> results['significant']
     True
     """
-
     alpha = 0.05  # Define the significance level
     group1 = np.array(kwargs.get("group1", []))
     group2 = np.array(kwargs.get("group2", []))

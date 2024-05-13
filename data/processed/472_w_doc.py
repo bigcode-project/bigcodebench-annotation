@@ -29,7 +29,6 @@ def task_func(myList, n_clusters):
     >>> ax.get_xticklabels()
     [Text(0.0, 0, '0'), Text(1.0, 0, '1'), Text(2.0, 0, '2'), Text(3.0, 0, '3'), Text(4.0, 0, '4'), Text(5.0, 0, '5'), Text(6.0, 0, '6'), Text(7.0, 0, '7'), Text(8.0, 0, '8'), Text(9.0, 0, '9'), Text(10.0, 0, '10')]
     """
-
     if not myList or n_clusters <= 0:
         raise ValueError("Invalid inputs")
     kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)

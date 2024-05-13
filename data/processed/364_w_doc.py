@@ -33,7 +33,6 @@ def task_func(df):
     >>> print(len(model.coef_))
     10
     """
-
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df is not a DataFrame")
     X = df[FEATURES]

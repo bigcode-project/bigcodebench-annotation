@@ -49,7 +49,6 @@ def task_func(image_path='image.jpg', n_clusters=3, random_seed=42):
     - Clustering with a single cluster is allowed and will return the original image as both the 
       original and segmented images, since all pixels will be assigned to the same cluster.
     """
-
     if not isinstance(n_clusters, int) or n_clusters <= 0:
         raise ValueError("n_clusters must be a positive integer.")
     if not os.path.exists(image_path):

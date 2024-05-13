@@ -26,7 +26,6 @@ def task_func(list_of_lists, seed=0):
     >>> type(plot)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     random.seed(seed)
     data = []
     plt.figure()

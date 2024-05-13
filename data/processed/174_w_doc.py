@@ -32,7 +32,6 @@ def task_func(data, key, min_value, max_value):
     1  value2     2        0
     2  value3     3        3
     '''
-
     if not isinstance(data, pd.DataFrame):
         raise ValueError("Input 'data' must be a pandas DataFrame.")
     random_generated = np.random.randint(min_value, max_value + 1, size=len(data))

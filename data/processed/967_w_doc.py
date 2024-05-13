@@ -31,7 +31,6 @@ def task_func(func, x_range=(-2, 2), num_points=1000):
     >>> ax.get_legend_handles_labels()[-1]
     ['sin(x)', 'Integral of sin(x)']
     """
-
     X = np.linspace(x_range[0], x_range[1], num_points)
     y = func(X)
     y_int = integrate.cumulative_trapezoid(y, X, initial=0)

@@ -30,7 +30,6 @@ def task_func(source_dir, target_dir, file_pattern=r'\b[A-Za-z0-9]+\.(txt|doc|do
     3
     This example would move 3 files from '/path/to/source' to '/path/to/target' if their filenames match the default pattern.
     """
-
     if not os.path.exists(source_dir):
         raise FileNotFoundError("The source directory does not exist.")
     if not os.path.exists(target_dir):

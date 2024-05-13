@@ -35,7 +35,6 @@ def task_func(P, T, tensor_shape=(3, 3, 3)):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     if not (isinstance(P, np.ndarray) and isinstance(T, np.ndarray)):
         raise TypeError("Expected inputs to be numpy arrays")
     if not T.shape == tensor_shape:

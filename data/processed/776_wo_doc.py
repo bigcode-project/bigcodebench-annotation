@@ -35,7 +35,6 @@ def task_func(file_path, output_path=None, sort_key='title', linear_regression=F
 
     
     """
-
     try:
         df = pd.read_csv(file_path)
         df.sort_values(by=[sort_key], inplace=True)

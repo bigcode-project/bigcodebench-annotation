@@ -36,7 +36,6 @@ def task_func(df, age: int, height: int):
        Age  Height  Weight  Cluster
     2   60     165      75        0
     """
-
     selected_df = df[(df["Age"] > age) & (df["Height"] < height)].copy()
     if len(selected_df) >= 3:
         kmeans = KMeans(n_clusters=3)

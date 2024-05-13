@@ -31,7 +31,6 @@ def task_func(length, num_digits):
     >>> task_func(5, 2)
     '4Ob3h'
     """
-
     random.seed(42)
     if length <= 0:
         raise ValueError("Length must be a positive integer.")

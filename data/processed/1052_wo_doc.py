@@ -34,7 +34,6 @@ def task_func(file_path, save_path=None):
     >>> result = task_func('text_data.csv', 'output_plot.png')
     # result is None, and the plot is saved to 'output_plot.png'
     """
-
     df = pd.read_csv(file_path, header=None, names=["Text"])
     df["Text"] = df["Text"].str.split("\\n").str.join(" ")
     vectorizer = CountVectorizer(stop_words=STOP_WORDS)

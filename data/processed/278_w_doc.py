@@ -25,7 +25,6 @@ def task_func(precision=2, seed=0):
     >>> result
     ((-3.86+0j), (-0.54+0j))
     """
-
     np.random.seed(seed)
     a = np.random.uniform(-10, 10)
     b = np.random.uniform(-10, 10)

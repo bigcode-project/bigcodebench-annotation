@@ -23,7 +23,6 @@ def task_func(filename, data, password):
     >>> task_func('test.txt', 'Hello, World!', 'password')
     'Fu0k9LUEJCY+ookLrA=='
     """
-
     directory = os.path.dirname(filename)
     os.makedirs(directory, exist_ok=True)
     if not os.path.exists(filename):

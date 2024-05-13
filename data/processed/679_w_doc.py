@@ -22,7 +22,6 @@ def task_func(df):
     >>> task_func(df)
     {('a', 'b', 'c', 'd', 'e'): 2, ('b', 'c', 'd', 'e', 'f'): 1}
     """
-
     df['combination'] = pd.Series(df.apply(lambda row: tuple(sorted(row)), axis=1))
     combination_freq = Counter(df['combination'])
     return dict(combination_freq)

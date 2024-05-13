@@ -39,7 +39,6 @@ def task_func(text: str, sia: SentimentIntensityAnalyzer) -> dict:
     >>> task_func("I love Python!", sia)
     {'neg': 0.0, 'neu': 0.192, 'pos': 0.808, 'compound': 0.6369}
     """
-
     text = ALPHANUMERIC.sub(' ', text).lower()
     text = text.translate(str.maketrans('', '', PUNCTUATIONS))
     sentiment_scores = sia.polarity_scores(text)

@@ -41,7 +41,6 @@ def task_func(
     3  Product3 2009-03-08 11:27:31.807     27
     4  Product2 2009-03-08 11:27:31.807     25
     """
-
     random.seed(random_seed)
     products = list(set(products))
     if len(products) != 5:

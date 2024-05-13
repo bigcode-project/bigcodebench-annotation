@@ -24,7 +24,6 @@ def task_func(kwargs, target_dir="non_none_files"):
     >>> files = {'/path/to/file4.txt': 'Another', '/path/to/file5.txt': 'Example'}
     >>> task_func(files, target_dir="another_directory")
     """
-
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
     copied_files = []

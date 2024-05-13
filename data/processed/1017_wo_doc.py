@@ -39,7 +39,6 @@ def task_func(csv_file_path, target_column="target", test_size=0.2, n_estimators
         The CSV file must have a column with the name specified by 'target_column', and it should be in a
         format readable by pandas.read_csv().
     """
-
     df = pd.read_csv(csv_file_path)
     if target_column not in df.columns:
         raise ValueError(f"'{target_column}' column not found in the CSV file.")

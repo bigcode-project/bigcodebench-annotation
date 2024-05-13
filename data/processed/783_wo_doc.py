@@ -20,7 +20,6 @@ def task_func(src_dir, dest_dir, extension):
     Example:
     >>> task_func('/path/to/src', '/path/to/dest', '.txt')
     """
-
     files_moved = 0
     for file_name in os.listdir(src_dir):
         if file_name.endswith(extension):

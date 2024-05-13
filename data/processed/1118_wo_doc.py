@@ -28,7 +28,6 @@ def task_func(csv_url=CSV_URL, json_file_path=JSON_FILE):
     >>> task_func("https://example.com/sample.csv", "sample.json")
     "sample.json"
     """
-
     response = requests.get(csv_url)
     csv_data = csv.reader(StringIO(response.text))
     headers = next(csv_data)

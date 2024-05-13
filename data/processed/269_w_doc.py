@@ -34,7 +34,6 @@ def task_func(data_dict):
     >>> stats
     {'mean': 5.33, 'median': 5.0, 'mode': array([1])}
     """
-
     SCALER_RANGE = (0, 1)
     data_dict.update(dict(a=1))
     values = np.array(list(data_dict.values()))

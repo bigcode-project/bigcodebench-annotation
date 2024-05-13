@@ -28,7 +28,6 @@ def task_func(rows=3, columns=2, start_date=datetime(2021, 1, 1), end_date=datet
     [['2021-01-03T00:00:00.000000000', '2021-01-07T00:00:00.000000000'],
      ['2021-01-09T00:00:00.000000000', '2021-01-04T00:00:00.000000000']]
     """
-
     if seed is not None:
         random.seed(seed)
     start_date_np = np.datetime64(start_date)

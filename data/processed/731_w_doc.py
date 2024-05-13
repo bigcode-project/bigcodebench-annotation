@@ -27,7 +27,6 @@ def task_func(data, target):
     >>> loaded_data, loaded_target = task_func(data, target)
     >>> assert np.array_equal(data, loaded_data) and np.array_equal(target, loaded_target)
     """
-
     with open(FILE_NAME, 'wb') as file:
         pickle.dump((data, target), file)
     with open(FILE_NAME, 'rb') as file:

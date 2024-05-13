@@ -31,7 +31,6 @@ def task_func(original):
     >>> print(fft_data)
     [10.-0.j -2.+2.j -2.-0.j -2.-2.j]
     """
-
     arr = np.array([b for (_, b) in original])
     if arr.size == 0:
         fft_data = np.array([])

@@ -30,7 +30,6 @@ def task_func(data_matrix):
     0   0.662085   1.489691  -1.406930  -0.579324  -0.165521 -2.053913e-16
     1  -1.207020  -0.742781   0.649934   1.578410  -0.278543 -3.330669e-17
     """
-
     z_scores = zscore(data_matrix, axis=1)
     feature_columns = ["Feature " + str(i + 1) for i in range(data_matrix.shape[1])]
     df = pd.DataFrame(z_scores, columns=feature_columns)

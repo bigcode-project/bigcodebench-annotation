@@ -27,7 +27,6 @@ def task_func(x, y, labels):
     >>> labels = ['H₂O', 'O₂', 'CO₂']
     >>> fig = task_func(x, y, labels)
     """
-
     fig, ax = plt.subplots()
     for i in range(len(x)):
         mu = np.mean(y[i])

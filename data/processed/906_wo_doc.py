@@ -28,7 +28,6 @@ def task_func(source_dir: str, target_dir: str, archive_name: str = 'archive.zip
     >>> task_func('./data/', './data_processed/', 'my_archive.zip')
     './data_processed/my_archive.zip'
     """
-
     os.makedirs(source_dir, exist_ok=True)
     os.makedirs(target_dir, exist_ok=True)
     archive_path = os.path.join(target_dir, archive_name)

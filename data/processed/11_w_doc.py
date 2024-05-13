@@ -30,7 +30,6 @@ def task_func(T1, max_value=100):
     >>> print(percentiles)
     (24.0, 48.0, 77.0)
     """
-
     int_list = [list(map(int, x)) for x in T1]
     flattened_list = list(itertools.chain(*int_list))
     total_nums = sum(flattened_list)

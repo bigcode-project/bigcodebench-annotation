@@ -27,7 +27,6 @@ def task_func(a, b):
     >>> print(euclidean_distance)
     1.7320508075688772
     """
-
     euclidean_distance = distance.euclidean(a, b)
     df = pd.DataFrame({'A': a, 'B': b})
     fig, ax = plt.subplots()

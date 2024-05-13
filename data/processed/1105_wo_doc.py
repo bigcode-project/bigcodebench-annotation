@@ -29,7 +29,6 @@ def task_func(r_script_path: str, output_path: str, duration: int) -> (bool, str
     >>> task_func('/path_to_script/InvalidScript.r', '/path_to_output/', 5)
     (False, 'File not generated within the specified duration.')
     """
-
     command = f'/usr/bin/Rscript --vanilla {r_script_path}'
     subprocess.call(command, shell=True)
     start_time = time.time()

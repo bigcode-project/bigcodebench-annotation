@@ -48,7 +48,6 @@ def task_func(num_samples=NUM_SAMPLES, num_outliers=NUM_OUTLIERS):
     >>> print(outliers_detected)
     [-9.61613603 -3.96850367  3.20347075]
     """
-
     normal_data = np.random.normal(size=num_samples)
     outliers = np.random.uniform(low=-10, high=10, size=num_outliers)
     data = np.concatenate([normal_data, outliers]) if num_samples > 0 else outliers

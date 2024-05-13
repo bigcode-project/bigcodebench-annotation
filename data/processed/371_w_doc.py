@@ -26,7 +26,6 @@ def task_func(l):
     >>> print(int(df.iloc[0]['Scaled Values']))
     0
     """
-
     scaler = MinMaxScaler()
     l_scaled = scaler.fit_transform(l.reshape(-1, 1))
     df = pd.DataFrame(l_scaled, columns=['Scaled Values'])

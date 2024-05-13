@@ -25,7 +25,6 @@ def task_func(matrix1, matrix2):
     >>> all(x in result.replace(' ', '') for x in ['123789', '456101112'])
     True
     """
-
     combined_matrix = np.concatenate((matrix1, matrix2), axis=1)
     df = pd.DataFrame(combined_matrix)
     return df.to_string(index=False, header=False)

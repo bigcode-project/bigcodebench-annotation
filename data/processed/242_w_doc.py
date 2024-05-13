@@ -29,7 +29,6 @@ def task_func(image_path, kernel_size):
     >>> blurred_img, ax_original, ax_blurred = task_func('image.jpg', 5) # The function returns the blurred image array, and axes objects with titles 'Original' and 'Blurred' for the original and blurred images, respectively.
     >>> os.remove(dummy_img_path)
     """
-
     if kernel_size <= 0 or not isinstance(kernel_size, int):
         raise ValueError("kernel_size must be a positive integer")
     try:

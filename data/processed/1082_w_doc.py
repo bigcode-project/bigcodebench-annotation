@@ -29,7 +29,6 @@ def task_func(data):
     >>> round(task_func({'Score_String': ['80.5', '85.7', '90.2'], 'Grade': ['B', 'B+', 'A-']}),2)
     -0.46
     """
-
     df = pd.DataFrame(data)
     if len(df) < 2:  # Check if the data frame has less than 2 rows
         return float("nan")  # or return None

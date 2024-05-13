@@ -42,7 +42,6 @@ def task_func(url=API_URL, from_encoding=None, to_encoding="utf8"):
     - It handles cases with empty content and undetectable encoding by returning an empty dictionary or raising an exception, respectively.
     - The decoding and re-encoding steps ensure compatibility with various data formats and the final JSON parsing.
     """
-
     response = requests.get(url, timeout=5)
     content = response.content
     if from_encoding is None:

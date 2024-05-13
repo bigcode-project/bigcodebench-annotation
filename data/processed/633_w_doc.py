@@ -27,7 +27,6 @@ def task_func(text: str) -> dict:
     >>> task_func("hello hello world")
     {'hello': 1, 'world': 1}
     """
-
     stop_words = set(stopwords.words('english'))
     text = ' '.join(sorted(set(text.split()), key=text.index))
     words = [word for word in re.findall(r'\b\w+\b', text.lower()) if word not in stop_words]

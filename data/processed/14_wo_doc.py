@@ -34,7 +34,6 @@ def task_func(config_file_path, archieve_dir ='/home/user/archive'):
     >>> task_func("/path/to/config.ini")
     True
     """
-
     config = configparser.ConfigParser()
     config.read(config_file_path)
     project_dir = config.get('Project', 'directory')

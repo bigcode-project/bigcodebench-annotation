@@ -30,7 +30,6 @@ def task_func(hex_keys=KEYS, seed=42):
     >>> task_func(['1a2b3c4d', '5e6f7g8h'])
     '426614caa490f2c185aebf58f1d4adac'
     """
-
     random.seed(seed)
     hex_key = random.choice(hex_keys)
     try:

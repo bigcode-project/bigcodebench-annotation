@@ -38,7 +38,6 @@ def task_func(goals, penalties, teams=TEAMS, penalty_cost=PENALTY_COST, rng_seed
     >>> all(df['Goals'] <= 5) and all(df['Penalty Cost'] <= 3000)  # Goals and penalties are within expected range
     True
     """
-
     if rng_seed is not None:
         seed(rng_seed)
     goals = abs(goals)

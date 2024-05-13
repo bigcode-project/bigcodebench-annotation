@@ -39,7 +39,6 @@ def task_func(data, date_format, country, country_codes=None):
     >>> ax.get_title()
     'Date Distribution'
     """
-
     default_country_codes = {
         'Russia': 'ru_RU',
         'Germany': 'de_DE',

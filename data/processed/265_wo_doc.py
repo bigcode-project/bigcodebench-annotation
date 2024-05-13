@@ -27,7 +27,6 @@ def task_func(data, json_file_name='data.json'):
     >>> task_func(data, json_file.name) is not None
     True
     """
-
     data['a'] = 1
     freq = collections.Counter(data.values())
     json_data = {'data': data, 'freq': dict(freq)}

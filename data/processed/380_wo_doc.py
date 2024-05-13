@@ -28,7 +28,6 @@ def task_func(directory):
     >>> os.listdir(temp_dir)
     ['txt']
     """
-
     for filename in os.listdir(directory):
         match = re.search(r'\.(.*?)$', filename)
         if match:

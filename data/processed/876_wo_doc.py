@@ -49,7 +49,6 @@ def task_func(data_dict, source_directory, backup_directory):
     >>> print(backup_status)
     True
     """
-
     data_dict.update({'a': 1})
     counter = collections.Counter(data_dict.values())
     sorted_dict = sorted(counter.items(), key=operator.itemgetter(1), reverse=True)

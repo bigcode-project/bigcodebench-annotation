@@ -30,7 +30,6 @@ def task_func(n, file_name, seed=77):
     >>> task_func(5, file_name, 29).endswith('word_counts.json')
     True
     """
-
     random.seed(seed)
     if n < 1 or n > len(WORDS):
         raise ValueError('n must be greater than 0')

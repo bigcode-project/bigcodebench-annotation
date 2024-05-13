@@ -39,7 +39,6 @@ def task_func(directory, string):
     >>> len(files)
     1
     """
-
     json_files = glob(f"{directory}/**/*.json", recursive=True)
     found_files = []
     for file in json_files:

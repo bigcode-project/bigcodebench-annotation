@@ -31,7 +31,6 @@ def task_func(req_data):
     >>> task_func({'empty': ''})[0] != task_func({'another': 'data'})[0]
     True
     """
-
     json_req_data = json.dumps(req_data)
     blake3_hex = blake3.blake3(json_req_data.encode('utf-8')).hexdigest()
     md5_hash = hashlib.md5(blake3_hex.encode('utf-8')).hexdigest()

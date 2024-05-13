@@ -37,7 +37,6 @@ def task_func(url='http://example.com'):
     0                                                   
     1  Largest economies in the world by GDP (nominal...
     """
-
     try:
         response = requests.get(url)
         response.raise_for_status()

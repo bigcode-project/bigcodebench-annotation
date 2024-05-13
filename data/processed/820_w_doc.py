@@ -26,7 +26,6 @@ def task_func(num_words, word_length):
     >>> task_func(5, 3)
     ['Ohb', 'Vrp', 'oiV', 'gRV', 'IfL']
     """
-
     if num_words < 0 or word_length < 0:
         raise ValueError("num_words and word_length must be non-negative")
     random.seed(42)

@@ -27,7 +27,6 @@ def task_func(SERVER_NAME, SERVER_PORT, path):
     >>> isinstance(response, str)
     True
     """
-
     context = ssl.create_default_context()
     with socket.create_connection((SERVER_NAME, SERVER_PORT)) as sock:
         with context.wrap_socket(sock, server_hostname=SERVER_NAME) as ssock:

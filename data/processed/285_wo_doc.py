@@ -27,7 +27,6 @@ def task_func(url, form_id, data):
         >>> isinstance(title, str)
         True
     """
-
     br = mechanize.Browser()
     br.open(url)
     br.select_form(nr=form_id)

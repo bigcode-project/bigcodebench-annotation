@@ -23,7 +23,6 @@ def task_func(date_str):
     >>> print(ax.get_title())
     Sine Wave for 2023-06-15 (Frequency: 15)
     """
-
     date = datetime.strptime(date_str, "%Y-%m-%d")
     x = np.linspace(0, 2 * np.pi, 1000)
     frequency = date.day

@@ -23,7 +23,6 @@ def task_func(d):
     >>> print(task_func(data))
     {'x': Counter({2.0: 2}), 'y': Counter({10.0: 1, 15.0: 1}), 'z': Counter({5.0: 1, 7.0: 1})}
     """
-
     df = pd.DataFrame(d)
     counts = {}
     for key in ['x', 'y', 'z']:

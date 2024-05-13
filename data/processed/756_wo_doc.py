@@ -27,7 +27,6 @@ def task_func(source_dir: str, target_dir: str, extensions: List[str]) -> int:
     >>> task_func('path/to/source/', 'path/to/target/', ['.txt'])
     1
     '''
-
     if Path(source_dir).is_dir() == False:
         raise ValueError("source_dir does not exist.")
     if Path(target_dir).is_dir() == False:

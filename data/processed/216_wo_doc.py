@@ -37,7 +37,6 @@ def task_func(json_dir_path, word_count):
     >>> task_func(temp_dir.name, 2)
     [('add', 2), ('Top', 1)]
     """
-
     word_counter = Counter()
     for filename in os.listdir(json_dir_path):
         if filename.endswith('.json'):

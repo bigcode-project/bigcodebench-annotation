@@ -35,7 +35,6 @@ def task_func(url):
     Note:
     The function requires internet connectivity to fetch HTML content.
     """
-
     if not url:
         raise ValueError("URL must not be empty.")
     try:

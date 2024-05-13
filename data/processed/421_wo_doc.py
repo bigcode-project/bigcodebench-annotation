@@ -36,7 +36,6 @@ def task_func(url, directory, metadata):
     Example:
     >>> task_func('https://www.example.com', './uploads', {'userId': 'abc'})
     """
-
     files = os.listdir(directory)
     status_codes = []
     for file in files:

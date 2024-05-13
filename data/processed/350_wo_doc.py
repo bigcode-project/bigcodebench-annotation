@@ -36,7 +36,6 @@ def task_func(src_folder, dst_folder):
     >>> task_func(src_folder, dst_folder)
     {'success': True, 'message': 'All files compressed and moved successfully.', 'failed_files': []}
     """
-
     if not os.path.isdir(src_folder):
         raise ValueError(f"Source folder '{src_folder}' does not exist.")
     if not os.path.isdir(dst_folder):

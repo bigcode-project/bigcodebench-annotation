@@ -31,7 +31,6 @@ def task_func(file_path):
 
     Note: Ensure the CSV file is in proper format and has a .csv extension. Other file formats will raise a ValueError.
     """
-
     file_path = file_path.strip()
     if not file_path.lower().endswith(".csv"):
         raise ValueError("Invalid file format. Only .csv files are accepted.")

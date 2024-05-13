@@ -29,7 +29,6 @@ def task_func(text: str) -> tuple:
     >>> task_func('Python is  awesome!  ')
     (3, 15, 12)
     """
-
     words = text.split()
     chars = re.sub("\s", "", re.sub(f"[{string.punctuation}]", "", text))
     return len(words), len(chars), len(set(chars))

@@ -38,7 +38,6 @@ def task_func(n_colors, colors=['Red', 'Green', 'Blue', 'Yellow', 'Purple'], rng
     >>> print(color_pattern)
     ['Brown', 'Black', 'Green', 'Brown', 'Black', 'Brown', 'Brown', 'Black', 'Green', 'Green', 'Black', 'Brown']
     """
-
     if rng_seed is not None:
         seed(rng_seed)
     color_cycle = cycle(colors)

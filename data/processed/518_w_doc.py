@@ -36,7 +36,6 @@ def task_func(array):
     0   0.00000  11.18034
     1  11.18034   0.00000
     """
-
     if not isinstance(array, list):
         raise TypeError("Input must be a list.")
     if not all(isinstance(sublist, list) for sublist in array):

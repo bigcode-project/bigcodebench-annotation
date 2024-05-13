@@ -32,7 +32,6 @@ def task_func(df, test_size=0.2, random_state=42):
     >>> accuracy <= 1.0
     True
     """
-
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df is not a DataFrame")
     df = df.drop_duplicates(subset='Name')

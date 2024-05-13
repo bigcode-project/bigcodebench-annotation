@@ -32,7 +32,6 @@ def task_func(column, data):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     COLUMNS = ["Age", "Salary", "Experience"]
     df = pd.DataFrame(data, columns=COLUMNS)
     column_data = df[column]

@@ -31,7 +31,6 @@ def task_func(arr):
     >>> axes.get_title()
     'Explained Variance Ratio of Principal Components'
     """
-
     row_sums = arr.sum(axis=1)
     pca = PCA(n_components=1)
     pca.fit(row_sums.reshape(-1, 1))

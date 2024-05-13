@@ -29,7 +29,6 @@ def task_func(df):
     >>> ax.get_ylabel()  # Expected: 'Sales'
     'Sales'
     """
-
     if not isinstance(df, pd.DataFrame) or not all(col in df.columns for col in ['Date', 'Sales']):
         raise ValueError("Invalid 'df': must be a DataFrame with 'Date' and 'Sales' columns.")
     df['Date'] = pd.to_datetime(df['Date'])

@@ -27,7 +27,6 @@ def task_func(activities):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     if not all(isinstance(activity, datetime) for activity in activities):
         raise TypeError('All activities must be datetime objects')
     activity_counts = defaultdict(int)

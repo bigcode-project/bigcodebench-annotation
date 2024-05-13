@@ -22,7 +22,6 @@ def task_func(word: str) -> np.ndarray:
     >>> task_func('hello')
     (array([-3,  7,  0,  3]), -inf)
     """
-
     if not word:  # Handling the case for empty string
         return np.array([])
     word_ascii_values = np.array([ord(x) for x in word])

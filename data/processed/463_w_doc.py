@@ -34,7 +34,6 @@ def task_func(data_str, separator=",", bins=20):
     >>> print(type(ax))
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     data = np.fromstring(data_str, sep=separator)
     if data.size == 0:
         raise ValueError("Failed to find valid data")

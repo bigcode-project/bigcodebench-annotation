@@ -22,7 +22,6 @@ def task_func(df):
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
     >>> skewness = task_func(df)
     """
-
     if not isinstance(df, pd.DataFrame) or df.empty:
         raise ValueError("Input must be a non-empty pandas DataFrame.")
     last_col = df.columns[-1]

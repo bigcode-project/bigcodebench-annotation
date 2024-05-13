@@ -24,7 +24,6 @@ def task_func(url):
         >>> 'https://www.example.com/about' in task_func('https://www.example.com')
         True or False, depending on the actual content of 'https://www.example.com'
     """
-
     br = mechanize.Browser()
     response = br.open(url)
     soup = BeautifulSoup(response.read(), 'html.parser')

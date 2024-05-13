@@ -21,7 +21,6 @@ def task_func(input_str):
     >>> task_func('Special $#! characters   spaces 888323')
     Counter({'Special': 1, 'characters': 1, 'spaces': 1, '888323': 1})
     """
-
     cleaned_str = re.sub('[^A-Za-z0-9 ]+', '', input_str)
     words = word_tokenize(cleaned_str)
     freq_dict = Counter(words)

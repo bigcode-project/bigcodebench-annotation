@@ -36,7 +36,6 @@ def task_func(timestamps):
     1  1475153730  2016-09-29 08:55:30
     2  1602737300  2020-10-15 00:48:20
     """
-
     if not timestamps:
         raise ValueError("Input list of timestamps is empty.")
     datetimes = [datetime.fromtimestamp(t).strftime(DATE_FORMAT) for t in timestamps]

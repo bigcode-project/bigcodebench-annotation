@@ -29,7 +29,6 @@ def task_func(csv_path=os.path.join(OUTPUT_DIR, 'data.csv'), date_column='date')
         ...
     FileNotFoundError: nonexistent.csv does not exist
     """
-
     if not os.path.isfile(csv_path):
         raise FileNotFoundError(f"{csv_path} does not exist")
     df = pd.read_csv(csv_path)

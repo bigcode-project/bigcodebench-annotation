@@ -35,7 +35,6 @@ def task_func(df, z_threshold=2):
     ... })
     >>> outliers2, plot2 = task_func(df2, z_threshold=1.5)
     """
-
     df['Z_score'] = zscore(df['closing_price'])
     outliers = df[np.abs(df['Z_score']) > z_threshold]
     fig, ax = plt.subplots(figsize=(10, 5))

@@ -27,7 +27,6 @@ def task_func(input_list):
     >>> print(stats)
     (81, 60, 30, 10712, 8460, 8460)
     """
-
     fft = np.abs(np.fft.fft([math.degrees(x) for x in input_list]))
     sorted_list = sorted(input_list, key=lambda x: (math.degrees(x), x))
     mean = statistics.mean(sorted_list)

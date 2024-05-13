@@ -24,7 +24,6 @@ def task_func(json_str, top_n=10):
     >>> task_func('{"name": "John", "website": "https://www.example.com"}')
     {'https://www.example.com': 1}
     """
-
     pattern = r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})'
     data = json.loads(json_str)
     urls = []

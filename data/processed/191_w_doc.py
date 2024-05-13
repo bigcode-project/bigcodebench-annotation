@@ -28,7 +28,6 @@ def task_func(animals, mean):
     >>> sum(sales.values()) >= 0  # sum of sales should be non-negative
     True
     """
-
     if not animals:
         return {}
     sales = {animal: 0 for animal in animals}

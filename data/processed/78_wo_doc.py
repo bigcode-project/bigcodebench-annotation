@@ -36,7 +36,6 @@ def task_func(request, header, csv_data):
     >>> response['Content-Disposition']
     'attachment; filename="data.csv"'
     """
-
     csv_io = io.StringIO()
     writer = csv.writer(csv_io)
     writer.writerow(header)

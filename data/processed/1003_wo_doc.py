@@ -39,7 +39,6 @@ def task_func(url):
     >>> df = task_func('http://example.com/invalid_structure.xml')
     ValueError: XML structure does not match expected format.
     """
-
     try:
         with urllib.request.urlopen(url) as response:
             xml_data = response.read()

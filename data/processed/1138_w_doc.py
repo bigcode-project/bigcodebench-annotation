@@ -21,7 +21,6 @@ def task_func(matrix):
     >>> task_func(np.array([[1, 3], [2, 4]]))
     (array([1, 2, 3, 4]), [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)])
     """
-
     sorted_array = np.sort(matrix, axis=None)
     combinations = list(itertools.combinations(sorted_array, 2))
     return sorted_array, combinations

@@ -30,7 +30,6 @@ def task_func(json_str):
     >>> task_func(json_str)
     {'data': {'name': 'John', 'email': 'None'}, 'value_counts': Counter({'John': 1, 'None': 1})}
     """
-
     data = json.loads(json_str)
     processed_data = {}
     for key, value in data.items():

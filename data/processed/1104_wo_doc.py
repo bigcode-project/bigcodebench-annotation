@@ -31,7 +31,6 @@ def task_func(script_path: str, timeout: int = 60) -> str:
     Raise:
     - The code will raise FileNotFoundError if the file is not exist.
     """
-
     def target():
         subprocess.call(['python', script_path])
     thread = threading.Thread(target=target)

@@ -26,7 +26,6 @@ def task_func(length):
     >>> task_func(8)
     'Ƥ'
     """
-
     HEX_CHARS = string.hexdigits.lower()
     hex_string = "".join(random.choice(HEX_CHARS) for _ in range(length))
     return binascii.unhexlify(hex_string).decode("utf-8", "ignore")

@@ -34,7 +34,6 @@ def task_func(df):
     3    Sam  0.341882  0.399511
     4   Nick  1.481487 -1.426825
     """
-
     df = df.drop_duplicates(subset='Name')
     scaler = StandardScaler()
     df[['Age', 'Score']] = scaler.fit_transform(df[['Age', 'Score']])

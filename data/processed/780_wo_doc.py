@@ -39,7 +39,6 @@ def task_func(articles, timezone):
     Sports          1  19.0   19   19
     Technology      1   8.0    8    8
     """
-
     if not isinstance(articles, list):
         raise TypeError("articles should be a list of dictionaries.")
     if not all(isinstance(item, dict) for item in articles):

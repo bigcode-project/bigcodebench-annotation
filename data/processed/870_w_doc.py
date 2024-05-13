@@ -41,7 +41,6 @@ def task_func(data_list=[('a', 1, 2.1), ('b', 2, 3.2), ('c', 3, 4.3), ('d', 4, 5
     Position 1         3.0
     Position 2         4.3
     """
-
     unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
     mean_values = []
     for column in unzipped_data[:]:

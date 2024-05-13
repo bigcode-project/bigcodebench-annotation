@@ -25,7 +25,6 @@ def task_func(ax, num_turns):
     >>> ax.get_rlabel_position()
     135.0
     """
-
     r = np.linspace(0, num_turns * 2 * math.pi, 1000)
     theta = r
     ax.plot(theta, r)

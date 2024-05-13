@@ -30,7 +30,6 @@ def task_func(df, column):
     >>> print(counts.index[0])
     6f96cfdfe5ccc627cadf24b41725caa4
     """
-
     matches = df[column].apply(lambda x: re.findall(PATTERN, x))
     flattened_matches = np.concatenate(matches.values)
     counts = pd.Series(flattened_matches).value_counts()

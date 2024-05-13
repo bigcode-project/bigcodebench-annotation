@@ -61,7 +61,6 @@ def task_func(data, n_components=2):
     3  0.069179
     4 -0.847722
     """
-
     if not isinstance(data, pd.DataFrame):
         raise ValueError("data should be a DataFrame.")
     if not data.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()).all():

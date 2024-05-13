@@ -43,7 +43,6 @@ def task_func(csv_file_path, col1_name="column1", col2_name="column2"):
     - The function does not handle missing data. Ensure that the CSV file has clean and complete data for accurate results.
     - The bar plot is customizable using matplotlib's functionality after the function returns the Axes object.
     """
-
     df = pd.read_csv(csv_file_path)
     groupby_data = df.groupby(col1_name)[col2_name].mean()
     _, ax = plt.subplots(figsize=(10, 6))

@@ -36,7 +36,6 @@ def task_func(df):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     pattern = re.compile(r'(how|what)', re.IGNORECASE)
     if not set(['Title', 'Content']).issubset(df.columns):
         fig, ax = plt.subplots()

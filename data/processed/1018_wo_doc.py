@@ -37,7 +37,6 @@ def task_func(url=URL, from_encoding="cp1251", use_lxml=False):
       In such cases, the function returns None, indicating that the webpage could not be successfully retrieved or was not available.
       
     """
-
     if not url:
         return None
     try:

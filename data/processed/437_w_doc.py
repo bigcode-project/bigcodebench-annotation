@@ -32,7 +32,6 @@ def task_func(df, file_name="save.pkl"):
     0  44  47  64  67
     1  67   9  83  21
     """
-
     with open(file_name, "wb") as file:
         pickle.dump(df, file)
     with open(file_name, "rb") as file:

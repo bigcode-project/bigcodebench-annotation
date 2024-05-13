@@ -33,7 +33,6 @@ def task_func(df: pd.DataFrame, height: int, weight: int, columns: list) -> sm.r
     >>> model = task_func(df, 45, 72, columns=['Age', 'Height', 'Weight'])
 
     """
-
     if df.empty:
         return None
     selected_df = df[(df[columns[1]] > height) & (df[columns[2]] < weight)]

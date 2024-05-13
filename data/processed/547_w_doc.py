@@ -23,7 +23,6 @@ def task_func(password: str, salt_length: int = 8) -> str:
     >>> isinstance(task_func('my_password'), str)
     True
     """
-
     salt = os.urandom(salt_length)
     hash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
     salted_hash = salt + hash

@@ -31,7 +31,6 @@ def task_func(ax, num_points):
     10.0
     >>> plt.close()
     """
-
     if not isinstance(ax, matplotlib.axes.Axes):
         raise ValueError("The input is not an axes")
     r = np.random.rand(num_points)

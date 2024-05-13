@@ -32,7 +32,6 @@ def task_func(length):
     1
     >>> plt.close()
     """
-
     MU = 0
     SIGMA = 1
     distribution = np.random.normal(MU, SIGMA, length)

@@ -38,7 +38,6 @@ def task_func(N=100, CATEGORIES=["A", "B", "C", "D", "E"], seed=42):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     np.random.seed(seed)
     if N < len(CATEGORIES):
         all_categories = np.random.choice(CATEGORIES, N, replace=False)

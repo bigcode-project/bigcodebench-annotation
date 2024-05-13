@@ -30,7 +30,6 @@ def task_func(length, seed=None, alphabets=list(string.ascii_lowercase)):
     >>> task_func(2, 123, alphabets=['x', 'y', 'z'])
     ['xz', 'xz', 'zx', 'xy', 'yx', 'zx', 'xy', 'xx', 'xy', 'xx']
     """
-
     np.random.seed(seed)
     all_combinations = [''.join(p) for p in product(alphabets, repeat=length)]
     return np.random.choice(all_combinations, size=10).tolist()

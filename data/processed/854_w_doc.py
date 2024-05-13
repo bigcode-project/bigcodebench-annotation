@@ -39,7 +39,6 @@ def task_func(numbers):
     >>> print(perm)
     [(0, 4), (4, 0)]
     '''
-
     if not isinstance(numbers, list):
         raise TypeError("numbers should be a list of integers.")
     if not all(isinstance(number, int) for number in numbers):

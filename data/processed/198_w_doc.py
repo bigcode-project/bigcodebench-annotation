@@ -35,7 +35,6 @@ def task_func(data, value):
     >>> count
     5
     """
-
     if not data:  # Handle empty data list
         return np.array([]), 0
     data = np.array(data)

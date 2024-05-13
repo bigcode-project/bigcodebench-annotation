@@ -24,7 +24,6 @@ def task_func(length):
     >>> df.shape
     (5, 5)
     """
-
     data = np.random.randint(0,100,size=(length, len(COLUMNS)))
     df = pd.DataFrame(data, columns=COLUMNS)
     return df

@@ -29,7 +29,6 @@ def task_func(ax):
     True
     >>> plt.close()
     """
-
     x = np.linspace(0, 2 * np.pi, 1000)
     y = np.sin(random.randint(1, 10)*x)
     color = random.choice(COLORS)

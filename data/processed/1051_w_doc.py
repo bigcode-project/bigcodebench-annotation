@@ -40,7 +40,6 @@ def task_func(data_dict):
     >>> print(message)
     The distribution is not uniform.
     """
-
     if not data_dict:
         return None, "The distribution is uniform."
     data_counter = collections.Counter(data_dict)

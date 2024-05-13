@@ -23,7 +23,6 @@ def task_func(data):
     <class 'matplotlib.axes._axes.Axes'>
 
     """
-
     df = pd.DataFrame(data)
     correlation_matrix = df.corr()
     ax = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')

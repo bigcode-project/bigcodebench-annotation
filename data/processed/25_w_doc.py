@@ -25,7 +25,6 @@ def task_func(data_dict):
     >>> print(encoded_data)
     eJyrVspOrTRUslJQKkvMKU01VNJRAIkYwUWMlGoBw5sKmw==
     """
-
     json_str = json.dumps(data_dict)
     compressed = zlib.compress(json_str.encode())
     return base64.b64encode(compressed).decode()

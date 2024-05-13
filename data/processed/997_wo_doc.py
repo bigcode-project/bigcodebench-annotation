@@ -35,7 +35,6 @@ def task_func(url):
     >>> task_func("http://example.com/files.zip")
     'downloaded_files'
     """
-
     os.makedirs(TARGET_DIR, exist_ok=True)
     urllib.request.urlretrieve(url, TARGET_ZIP_FILE)
     with zipfile.ZipFile(TARGET_ZIP_FILE, "r") as zip_ref:

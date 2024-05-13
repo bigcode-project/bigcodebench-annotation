@@ -32,7 +32,6 @@ def task_func(n, pattern, seed=None):
     >>> task_func(1000, r'[1-9]{2}', seed=1)
     ['51', '84', '16', '79', '16', '28', '63', '82', '94', '18', '68', '42', '95', '33', '64', '38', '69', '56', '32', '16', '18', '19', '27']
      """
-
     if seed is not None:
         random.seed(seed)
     rand_str = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(n))

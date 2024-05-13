@@ -47,7 +47,6 @@ def task_func(file_path1, file_path2, delimiter=',', quotechar='"'):
     2            3      +  ('Alice', '31')
     3            4           ('Bob', '25')
     """
-
     def csv_to_list(file_path, delimiter=',', quotechar='"'):
         with open(file_path, 'r', newline='') as file:
             reader = csv.reader(file, delimiter=delimiter, quotechar=quotechar)

@@ -32,7 +32,6 @@ def task_func(my_obj):
     >>> task_func({'name': 'Alice', 'age': 30})
     '{"name": "Alice", "age": 30}'
     """
-
     class EnumEncoder(json.JSONEncoder):
         def default(self, obj):
             if isinstance(obj, Enum):

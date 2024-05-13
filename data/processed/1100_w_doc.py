@@ -31,7 +31,6 @@ def task_func(texts):
     - URLs in the text documents are removed before calculating TF-IDF scores to ensure they do not affect the analysis.
     - The TF-IDF scores are rounded to 8 decimal places for precision.
     """
-
     if all(text.strip() == "" for text in texts):
         return [], []
     cleaned_texts = [re.sub('http[s]?://\S+', '', text) for text in texts]

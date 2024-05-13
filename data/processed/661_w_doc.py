@@ -30,7 +30,6 @@ def task_func(x, y, labels):
     >>> labels = ['H\u2082O', 'O\u2082', 'CO\u2082']
     >>> ax = task_func(x, y, labels)
     """
-
     data = []
     for i in range(len(x)):
         data.append(np.concatenate((x[i], y[i])))

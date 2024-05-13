@@ -42,7 +42,6 @@ def task_func(data: np.ndarray, threshold: float = 2.0) -> list:
 
       
     """
-
     mean, std_dev = norm.fit(data)
     if std_dev == 0:
         return [], mean, std_dev**2

@@ -29,7 +29,6 @@ def task_func(text):
     Sentence 2    5
     dtype: int64
     """
-
     sentences = re.split(r"\.\s*", text)
     sentence_counts = {}
     for i, sentence in enumerate(sentences):

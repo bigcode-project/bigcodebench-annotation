@@ -24,7 +24,6 @@ def task_func(value_range=(0, 100)):
     >>> df['Count'][0] >= 0
     True
     """
-
     distribution = {category: random.randint(*value_range) for category in CATEGORIES}
     df = pd.DataFrame(list(distribution.items()), columns=['Category', 'Count'])
     return df

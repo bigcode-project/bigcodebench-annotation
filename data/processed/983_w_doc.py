@@ -34,7 +34,6 @@ def task_func(df):
     B  1.0  1.0  1.0
     C  1.0  1.0  1.0
     """
-
     if df.empty:
         raise ValueError("DataFrame is empty. Non-empty DataFrame required.")
     if not all(df.dtypes.apply(lambda x: np.issubdtype(x, np.number))):

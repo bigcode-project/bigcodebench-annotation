@@ -28,7 +28,6 @@ def task_func(ip_range, timeout):
     >>> isinstance(task_func('192.168.0.0/16', 5), list)
     True
     """
-
     results = []
     try:
         network = ipaddress.IPv4Network(ip_range, strict=False)  # Note the `strict=False`

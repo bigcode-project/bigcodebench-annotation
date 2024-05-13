@@ -22,7 +22,6 @@ def task_func(list_of_pairs):
     >>> print(product_array)
     [360]
     """
-
     second_values = [pair[1] for pair in list_of_pairs]
     product = reduce(np.multiply, second_values)
     product_array = np.array([product])

@@ -31,7 +31,6 @@ def task_func(metrics, filename, log_dir=LOG_DIR):
     An error occurred: [Errno 2] No such file or directory: './logs/evaluation.log'
     False
     """
-
     if not isinstance(metrics, dict):
         raise ValueError("Metrics must be a dictionary")
     if not isinstance(filename, str):

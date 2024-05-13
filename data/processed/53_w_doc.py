@@ -36,7 +36,6 @@ def task_func(text):
     0  John Doe  john.doe@example.com   30     USA
     1  Jane Doe  jane.doe@example.com   25      UK
     """
-
     pattern = r"Name: (.*?), Email: (.*?), Age: (.*?), Country: (.*?)($|\n)"
     matches = re.findall(pattern, text)
     data = []

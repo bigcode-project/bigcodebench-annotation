@@ -29,7 +29,6 @@ def task_func(data_url="http://lib.stat.cmu.edu/datasets/boston", seed=42):
         >>> type(ax)
         <class 'matplotlib.axes._axes.Axes'>
     """
-
     try:
         font = {'sans-serif': 'Arial', 'family': 'sans-serif'}
         plt.rc('font', **font)

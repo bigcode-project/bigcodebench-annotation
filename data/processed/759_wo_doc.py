@@ -26,7 +26,6 @@ def task_func(source_directory, destination_directory, file_pattern):
     >>> task_func('/path/to/source', '/path/to/destination', '*.txt')
     ['task_func_data/file1.txt', 'task_func_data/file2.txt']
     """
-
     moved_files = []
     for path, dirs, files in os.walk(source_directory):
         for filename in fnmatch.filter(files, file_pattern):

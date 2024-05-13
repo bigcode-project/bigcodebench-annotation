@@ -28,7 +28,6 @@ def task_func(target_value='332', csv_dir='./csv_files/', processed_dir='./proce
     The above example assumes that '332' is found at index 10 in 'file1.csv' and index 15 in 'file2.csv' and that the 
     file moving is simulated.
     """
-
     result = {}
     for filename in os.listdir(csv_dir):
         if filename.endswith('.csv'):

@@ -33,7 +33,6 @@ def task_func(column, data):
     >>> plot
     <Axes: title={'center': 'Bar Chart of Total Sales'}, xlabel='Product'>
     """
-
     COLUMNS = ["Product", "Quantity Sold", "Total Sales"]
     df = pd.DataFrame(data, columns=COLUMNS)
     if (df["Quantity Sold"] < 0).any() or (df["Total Sales"] < 0).any():

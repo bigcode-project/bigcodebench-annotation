@@ -31,7 +31,6 @@ def task_func(data, column="c"):
     1  2  5
     2  3  6
     """
-
     df = pd.DataFrame(data)
     if column in df.columns:
         df = df.drop(columns=column)

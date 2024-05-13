@@ -32,7 +32,6 @@ def task_func(elements, seed=0):
     >>> print(stats)
     {'count': 1000.0, 'mean': 18.18, 'std': 9.516415405086212, 'min': -5.0, '5%': 1.0, '25%': 11.0, '50%': 20.0, '75%': 26.0, '95%': 31.0, 'max': 36.0}
     """
-
     np.random.seed(seed)
     if not isinstance(elements, int) or elements <= 0:
         raise ValueError("Element must be a positive integer.")

@@ -24,7 +24,6 @@ def task_func(word_dict):
     >>> print(counts)
     {'e': 9, 'a': 6, 'r': 6, 'p': 3, 'n': 3, 'y': 3, 'd': 3, 'l': 2, 'b': 2, 'h': 2, 'g': 2, 'c': 1, 't': 1, 'f': 1, 'i': 1, 'o': 1, 'w': 1}
     """
-
     letters = list(itertools.chain.from_iterable(word_dict.keys()))
     count_dict = dict(Counter(letters))
     sorted_dict = dict(sorted(count_dict.items(), key=itemgetter(1), reverse=True))

@@ -37,7 +37,6 @@ def task_func(epoch_milliseconds, seed=None):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     CATEGORIES = ["Electronics", "Clothing", "Home", "Books", "Sports"]
     if seed is not None:
         random.seed(seed)

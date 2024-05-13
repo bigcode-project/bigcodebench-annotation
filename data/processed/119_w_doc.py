@@ -25,7 +25,6 @@ def task_func():
     >>> type(task_func())
     <class 'NoneType'>
     """
-
     X = np.linspace(-10, 10, 400)
     Y = X**2
     plt.figure()

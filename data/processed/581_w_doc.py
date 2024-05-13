@@ -35,7 +35,6 @@ def task_func(size=SIZE, frequency=1):
     >>> isinstance(ax.lines[0].get_ydata()[0], float)  # Check if y-values are floating-point numbers
     True
     '''
-
     x_values = np.arange(0, size)
     y_values = [math.sin((2 * PI / RANGE) * (x + int(RANGE * random.random()) * frequency)) for x in range(size)]
     fig, ax = plt.subplots()

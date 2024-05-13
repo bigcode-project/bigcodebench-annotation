@@ -43,7 +43,6 @@ def task_func(X, Y):
     >>> isinstance(ax, plt.Axes)
     True
     """
-
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.25)
     model = Sequential([Dense(input_dim=2, units=1, activation='sigmoid')])
     model.compile(loss='binary_crossentropy', optimizer=SGD(learning_rate=0.1))

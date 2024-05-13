@@ -44,7 +44,6 @@ def task_func(texts, num_topics):
 
     Note: The exact output may vary depending on the TF-IDF vectorization and NMF initialization.
     """
-
     if not texts:
         return [], None  # Adjusted to return a tuple similar to the main return type
     cleaned_texts = [ALPHANUMERIC.sub(' ', text).lower() for text in texts]

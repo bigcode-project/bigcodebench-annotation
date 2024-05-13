@@ -32,7 +32,6 @@ def task_func(script_path, output_file_path):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     try:
         subprocess.run([script_path], check=True)
     except (subprocess.CalledProcessError, FileNotFoundError):

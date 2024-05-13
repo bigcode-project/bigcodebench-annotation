@@ -27,7 +27,6 @@ def task_func(intervals=100, seed=0):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     random.seed(seed)
     times = []
     numbers = []

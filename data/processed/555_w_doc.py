@@ -31,7 +31,6 @@ def task_func(a, b):
     >>> round(correlation, 1)
     1.0
     """
-
     correlation, _ = stats.pearsonr(a, b)
     df = pd.DataFrame({'A': a, 'B': b})
     plt.scatter(df['A'], df['B'])

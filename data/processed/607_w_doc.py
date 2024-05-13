@@ -29,7 +29,6 @@ def task_func(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, li
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
     >>> modified_df, plots = task_func(df, tuples, 3)
     '''
-
     df = df[~df.apply(tuple, axis=1).isin(tuples)]
     plots = []
     for _ in range(n_plots):

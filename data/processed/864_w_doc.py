@@ -40,7 +40,6 @@ def task_func(fruit_data):
     apple           112           56.0
     orange           25           25.0
     """
-
     if len(fruit_data) == 0:
         return pd.DataFrame()
     fruits, counts = zip(*fruit_data)

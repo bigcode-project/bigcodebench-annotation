@@ -40,7 +40,6 @@ def task_func(colors, states):
     1    Blue:Solid   Green:Solid
     2     Red:Solid  Green:Liquid
     """
-
     combinations = list(itertools.product(colors, states))
     random.seed(42)
     random.shuffle(combinations)

@@ -35,7 +35,6 @@ def task_func(dictionary, key, value, n=100, bins=30, seed=0):
     >>> len(data)
     500
     """
-
     np.random.seed(seed)
     try:
         float(value)

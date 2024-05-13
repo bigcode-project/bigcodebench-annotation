@@ -20,7 +20,6 @@ def task_func(directory_path):
     >>> task_func('/path/to/directory')
     ["txt.world.hello", "csv.data.sample"]
     """
-
     new_filenames = []
     for filename in glob.glob(os.path.join(directory_path, '*')):
         base_name = os.path.basename(filename)

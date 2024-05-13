@@ -22,7 +22,6 @@ def task_func(array_length=100):
     Example:
     >>> ax = task_func(100)
     """
-
     array1 = np.array([randint(1, 100) for _ in range(array_length)])
     array2 = np.array([randint(1, 100) for _ in range(array_length)])
     max_values = np.maximum(array1, array2)

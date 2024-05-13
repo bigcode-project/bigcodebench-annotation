@@ -26,7 +26,6 @@ def task_func(list_of_menuitems):
         >>> isinstance(ax, matplotlib.axes.Axes)
         True
     """
-
     if not list_of_menuitems or not any(list_of_menuitems):
         print("No items to plot.")
         return None

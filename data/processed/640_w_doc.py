@@ -39,7 +39,6 @@ def task_func():
     >>> (df.values >= 100).all() and (df.values <= 1000).all()
     True
     """
-
     sales = np.random.randint(100, 1001, size=(len(MONTHS), len(PRODUCTS)))
     df = pd.DataFrame(sales, index=MONTHS, columns=PRODUCTS)
     total_sales = df.sum()

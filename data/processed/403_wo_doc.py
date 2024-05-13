@@ -31,7 +31,6 @@ def task_func(img_path, blur_radius=5):
     >>> original, processed = task_func(image_path)
     >>> os.remove(image_path)
     """
-
     if not os.path.exists(img_path):
         raise FileNotFoundError(f"No file found at {img_path}")
     img = Image.open(img_path)

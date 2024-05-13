@@ -52,7 +52,6 @@ def task_func(
     3     Tokyo   2023-01-01 21:00:00 JST            Cloudy
     4    Sydney  2023-01-01 23:00:00 AEDT            Cloudy
     """
-
     set_seed(seed)
     if not isinstance(utc_datetime, datetime):
         raise ValueError("utc_datetime must be a datetime object with tzinfo set to UTC.")

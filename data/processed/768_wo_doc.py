@@ -31,7 +31,6 @@ def task_func(dir_path):
     >>> task_func("/path/to/directory")
     {'file1.txt': 2, 'subdir/file2.txt': 1}
     """
-
     if not os.path.isdir(dir_path):
         raise ValueError("Specified directory does not exist.")
     result = {}

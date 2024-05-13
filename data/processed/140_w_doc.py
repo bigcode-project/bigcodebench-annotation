@@ -34,7 +34,6 @@ def task_func(df, cols):
     75%    6.607755e-01  4.095312e-01
     max    2.841457e+00  5.353738e+00
     """
-
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df must be a pandas DataFrame.")
     if not isinstance(cols, list) or not all(isinstance(col, str) for col in cols):

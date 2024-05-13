@@ -32,7 +32,6 @@ def task_func(data_list, seed=0):
     0        lamp, bag, mirror        lamp, tkg, mirror
     1  table, chair, bag, lamp  table, chair, bag, kuhm
     """
-
     random.seed(seed)
     df = pd.DataFrame(data_list, columns=["Original String"])
     modified_strings = []

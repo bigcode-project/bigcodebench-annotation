@@ -30,7 +30,6 @@ def task_func(url):
     >>> task_func('http://example.com/files.tar.gz')
     True
     """
-
     try:
         urllib.request.urlretrieve(url, TARGET_TAR_FILE)
     except Exception as e:

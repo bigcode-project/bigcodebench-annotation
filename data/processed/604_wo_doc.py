@@ -30,7 +30,6 @@ def task_func(filepath):
     >>> os.path.exists('example')
     True
     """
-
     logging.basicConfig(level=logging.INFO)
     try:
         subprocess.check_call(['g++', filepath, '-o', filepath.split('.')[0]])

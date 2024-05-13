@@ -25,7 +25,6 @@ def task_func(script_path: str, temp_dir: str) -> str:
     Note: 
     - If the Python code can be run successfully return "Script executed successfully!", otherwise "Script execution failed!"
     """
-
     try:
         shutil.copy(script_path, temp_dir)
         temp_script_path = os.path.join(temp_dir, os.path.basename(script_path))

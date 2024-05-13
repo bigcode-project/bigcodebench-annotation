@@ -29,7 +29,6 @@ def task_func(LETTERS, n):
     >>> 'letter_combinations_' in task_func(['a', 'b', 'c', 'd', 'e'], 2)
     True
     """
-
     combinations = list(itertools.combinations(LETTERS, n))
     letter_counts = defaultdict(int)
     for combination in combinations:

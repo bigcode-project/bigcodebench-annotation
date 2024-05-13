@@ -27,7 +27,6 @@ def task_func(dict1):
     >>> print(stats)
     (44.7, 46.5, [46, 48, 24, 38, 54, 53, 47, 41, 52, 44])
     """
-
     emp_ages = []
     for prefix, num_employees in dict1.items():
         if not prefix.startswith('EMP$$'):

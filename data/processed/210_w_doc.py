@@ -25,7 +25,6 @@ def task_func(data):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     letter_counts = collections.Counter([item[0] for item in data])
     max_value_letter = max(data, key=itemgetter(1))[0]
     letters, counts = zip(*letter_counts.items())

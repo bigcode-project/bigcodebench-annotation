@@ -29,7 +29,6 @@ def task_func(mean, std_dev, n):
     >>> len(task_func(5, 2, 500))
     500
     """
-
     samples = np.random.normal(mean, std_dev, n)
     plt.figure(figsize=(10, 6))
     plt.hist(samples, bins=30, density=True, alpha=0.6, color='g')

@@ -30,7 +30,6 @@ def task_func(students=["Alice", "Bob", "Charlie", "David", "Eve"], seed=42):
     3    David     71
     1      Bob     92
     """
-
     np.random.seed(seed)
     scores_data = [(student, np.random.randint(0, 100)) for student in students]
     df = pd.DataFrame(scores_data, columns=["Student", "Score"])

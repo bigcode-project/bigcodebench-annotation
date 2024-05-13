@@ -29,7 +29,6 @@ def task_func(word: str) -> dict:
     >>> list(task_func('abcdef').items())[:5]
     [('ab', 1), ('ac', 0), ('ad', 0), ('ae', 0), ('af', 0)]
     """
-
     ALPHABETS = string.ascii_lowercase
     permutations = [''.join(x) for x in itertools.permutations(ALPHABETS, 2)]
     combinations = permutations + [x*2 for x in ALPHABETS]

@@ -33,7 +33,6 @@ def task_func(df, groups=['A', 'B', 'C', 'D', 'E']):
     >>> ax = task_func(df)
     >>> ax.figure.show()  # This will display the plot
     """
-
     if not isinstance(df, pd.DataFrame) or not all(col in df.columns for col in ['group', 'date', 'value']):
         raise ValueError("Invalid 'df': must be a DataFrame with 'group', 'date', and 'value' columns.")
     color_cycle = cycle('bgrcmk')

@@ -30,7 +30,6 @@ def task_func(n_rows=1000):
     >>> ax.get_title()
     'Top 30 Frequencies of Random 3-Letter Strings'
     """
-
     if n_rows <= 0:
         raise ValueError("Number of rows must be greater than 0")
     data = ["".join(random.choices(string.ascii_lowercase, k=3)) for _ in range(n_rows)]

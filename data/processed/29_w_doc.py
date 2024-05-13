@@ -23,7 +23,6 @@ def task_func(data):
     >>> print(encoded_data)
     W1stMS4gLTEuXQogWy0xLiAtMS5dCiBbIDEuICAxLl0KIFsgMS4gIDEuXV0=
     """
-
     scaler = StandardScaler()
     standardized_data = scaler.fit_transform(data)
     standardized_data_str = np.array2string(standardized_data)

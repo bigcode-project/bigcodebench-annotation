@@ -33,7 +33,6 @@ def task_func(data_url: str) -> list:
     >>> task_func("https://api.example.com/other_data")
     ['John', 'Eve']
     """
-
     try:
         response = requests.get(data_url)
         data = response.json()

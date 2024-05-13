@@ -24,7 +24,6 @@ def task_func(count, seed=0):
     >>> task_func(0, seed=42)
     Counter()
     """
-
     random.seed(seed)
     pairs = [tuple(random.choices(LETTERS, k=2)) for _ in range(count)]
     pair_frequency = Counter(pairs)

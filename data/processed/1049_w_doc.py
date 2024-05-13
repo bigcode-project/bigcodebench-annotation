@@ -32,7 +32,6 @@ def task_func(input_string: str) -> pd.DataFrame:
     1  followed by line b with a tab
     2                         ...bye
     """
-
     input_string = input_string.replace('\\n', '\n').replace('\\t', ' ')
     lines = [line for line in input_string.split("\n") if line.strip()]
     lines = [re.sub("\t", " ", line) for line in lines]

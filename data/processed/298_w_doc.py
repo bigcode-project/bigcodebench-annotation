@@ -39,7 +39,6 @@ def task_func(df, plot=False):
     (2, 4)
     >>> plt.close()
     '''
-
     df['Date'] = pd.to_datetime(df['Date'])
     df = pd.concat([df['Date'], df['Value'].apply(pd.Series)], axis=1)
     scaler = StandardScaler()

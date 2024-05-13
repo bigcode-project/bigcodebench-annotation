@@ -27,7 +27,6 @@ def task_func(time_string, from_tz, to_tz):
 
     Note: The example assumes no daylight saving time shift between the given timezones at the specified date and time.
     """
-
     from_zone = pytz.timezone(from_tz)
     to_zone = pytz.timezone(to_tz)
     dt = parse(time_string, dayfirst=True)

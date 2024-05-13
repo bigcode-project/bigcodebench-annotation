@@ -32,7 +32,6 @@ def task_func(elements, pattern, seed=100):
     >>> print(replaced_elements)
     ['%vqd%', '%LAG%']
     """
-
     random.seed(seed)
     replaced_elements = []
     for element in elements:

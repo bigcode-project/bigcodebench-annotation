@@ -36,7 +36,6 @@ def task_func(s, n):
     >>> set(task_func("apple Apple APPle", 3)) == {"apple"}
     True
     """
-
     word_list = re.findall(r'\b\w+\b', s.lower())  # Convert to lowercase for comparison
     english_words = [word for word in word_list if word in SAMPLE_ENGLISH_WORDS]
     if len(english_words) < n:

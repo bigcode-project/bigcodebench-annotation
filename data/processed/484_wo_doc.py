@@ -55,7 +55,6 @@ def task_func(
                         Timestamp   Sensor1   Sensor2   Sensor3 SensorStatus
     0  1970-01-01 00:00:00.000000  0.049671  0.986174  0.064769        ERROR
     """
-
     np.random.seed(random_seed)
     if start_time > end_time:
         raise ValueError("start_time cannot be after end_time")

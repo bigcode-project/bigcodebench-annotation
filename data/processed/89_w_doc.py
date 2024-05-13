@@ -40,7 +40,6 @@ def task_func(data, column, outlier_z_score):
     >>> isinstance(task_func(data, column, 3.0)[2], tuple)
     True
     """
-
     data_copy = np.copy(data)
     column_data = data_copy[:, column]
     scaler = StandardScaler()

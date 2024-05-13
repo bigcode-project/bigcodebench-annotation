@@ -29,7 +29,6 @@ def task_func(input_string):
     >>> print(file_paths)
     ['./hashed_files/489fe1fa6c.txt', './hashed_files/67009597fe.txt', './hashed_files/eab4758603.txt']
     """
-
     if not os.path.exists(DIRECTORY):
         os.makedirs(DIRECTORY)
     file_paths = []

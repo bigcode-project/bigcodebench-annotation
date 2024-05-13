@@ -24,7 +24,6 @@ def task_func(data):
     >>> task_func({'Hours': [10, 20, 40], 'Scores': [90, 80, 70]})
     25.0
     '''
-
     df = pd.DataFrame(data)
     X = df[['Hours']]
     y = df['Scores']

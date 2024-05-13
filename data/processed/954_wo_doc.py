@@ -35,7 +35,6 @@ def task_func(target_words, n_sentences, vocabulary):
     >>> task_func(['Alice Charlie', 'ALICE BOB', 'aLiCe dAn'], 1, ['alice', 'bob', 'charlie', 'dan'])
     ['alice_charlie alice alice_charlie charlie alice_charlie dan alice']
     """
-
     if n_sentences < 0:
         raise ValueError("n_sentences cannot be negative.")
     if not vocabulary:

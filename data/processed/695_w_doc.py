@@ -22,7 +22,6 @@ def task_func(tuples_list, n_components):
      [ 0.00000000e+00  0.00000000e+00]
      [-8.00000000e+00  3.84592537e-16]]
     """
-
     data = np.array(tuples_list)
     pca = PCA(n_components=n_components)
     transformed_data = pca.fit_transform(data)

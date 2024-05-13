@@ -27,7 +27,6 @@ def task_func(password_length=10, salt="salty"):
     >>> print(hashed_password)
     a706478dc5969e90dcfc2fbaffff0b9f8e7f2b006002edac13cb17f5bf9ba941
     """
-
     password_chars = string.ascii_letters + string.digits + string.punctuation
     password = ''.join(random.choice(password_chars) for i in range(password_length))
     password = codecs.encode(password, 'latin-1').decode('utf-8')

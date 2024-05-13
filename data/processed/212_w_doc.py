@@ -25,7 +25,6 @@ def task_func(data):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     max_y_point = max(data, key=itemgetter(1))
     points = np.array(data)
     x = points[:,0]

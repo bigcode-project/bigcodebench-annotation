@@ -36,7 +36,6 @@ def task_func(seed=42):
         >>> ax.get_ylabel()
         'Value'
     """
-
     try:
         plt.rc('font', family='Arial')
         random.seed(seed)

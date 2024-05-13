@@ -29,7 +29,6 @@ def task_func(data_size):
     >>> print(color in ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black'])
     True
     """
-
     np.random.seed(0)
     data = np.random.randn(data_size)
     color = np.random.choice(BAR_COLOR)

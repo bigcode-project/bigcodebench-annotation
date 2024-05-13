@@ -20,7 +20,6 @@ def task_func(input):
     >>> task_func('Fetch data from https://api.example.com/data')
     {'key': 'value'}
     """
-
     endpoint = re.search(r'https?:\/\/[^ ]+', input).group()
     response = requests.get(endpoint)
     return response.json()

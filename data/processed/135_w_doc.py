@@ -34,7 +34,6 @@ def task_func(df):
     >>> ax.get_xlabel() # 'D'
     'D'
     """
-
     if not isinstance(df, pd.DataFrame) or df.empty:
         raise ValueError("Input must be a non-empty pandas DataFrame.")
     last_col = df.columns[-1]

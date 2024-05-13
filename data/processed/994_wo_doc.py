@@ -41,7 +41,6 @@ def task_func(url: str, csv_file_path: str) -> list:
     >>> len(data) > 0
     True
     """
-
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()

@@ -32,7 +32,6 @@ def task_func(data, n_clusters):
     >>> print(cluster_list)
     [array([0]), array([1])]
     """
-
     kmeans = KMeans(n_clusters=n_clusters).fit(data)
     labels = kmeans.labels_
     clusters = {i: np.where(labels == i)[0] for i in range(n_clusters)}

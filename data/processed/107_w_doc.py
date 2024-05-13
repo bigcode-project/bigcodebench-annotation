@@ -36,7 +36,6 @@ def task_func(df, n_clusters=3, random_state=0):
         ... })
         >>> ax = task_func(df)
     """
-
     if df.empty or not all(col in df.columns for col in ['group', 'date', 'value']):
         raise ValueError("DataFrame must be non-empty and contain 'group', 'date', and 'value' columns.")
     if not pd.api.types.is_datetime64_any_dtype(df['date']):

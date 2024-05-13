@@ -28,7 +28,6 @@ def task_func(text, seed=None):
     >>> task_func("Programming is fun, isn't it?", 42)
     "Prmiangmrog is fun, isn't it?"
     """
-
     if seed is not None:
         random.seed(seed)
     def scramble_word(match):

@@ -44,7 +44,6 @@ def task_func(mystrings, folder_path, seed=None):
     >>> task_func(['First Plot', 'Second Plot'], './another_folder/')
     ['First_Plot.png', 'Second_Plot.png']
     """
-
     if seed is not None:
         np.random.seed(seed)
     saved_plots = []

@@ -33,7 +33,6 @@ def task_func(file_path):
     >>> encrypted_key_file.endswith('.encrypted')
     True
     """
-
     (pub_key, priv_key) = rsa.newkeys(512)
     fernet_key = Fernet.generate_key()
     fernet = Fernet(fernet_key)

@@ -39,7 +39,6 @@ def task_func(P, T):
     <BLANKLINE>
     [2 rows x 25 columns]
     """
-
     if P.size == 0 or T.size == 0:
         raise ValueError("Inputs cannot be empty.")
     if P.shape[1] != T.shape[0]:

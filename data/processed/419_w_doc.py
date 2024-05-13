@@ -41,7 +41,6 @@ def task_func(X, Y):
     >>> isinstance(ax, plt.Axes)
     True
     """
-
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
     input_dim = X.shape[1]  # Dynamically set input dimension
     model = keras.models.Sequential([keras.layers.Dense(units=1, input_dim=input_dim, activation='sigmoid')])

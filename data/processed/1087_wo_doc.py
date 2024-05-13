@@ -30,7 +30,6 @@ def task_func(mean=123456.908, std_dev=1.2, save_plots=False):
     Skewness: 0.03385895323538189, Kurtosis: -0.04676632447765128, Plots: ['histogram_plot.png', 'qq_plot.png']
 
     """
-
     sample = np.random.normal(mean, std_dev, 1000)
     plot_paths = []
     plt.figure()

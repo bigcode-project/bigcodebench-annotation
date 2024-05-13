@@ -43,7 +43,6 @@ def task_func(data_list):
     >>> ax.get_xticks()
     array([0., 1., 2., 3., 4., 5., 6.])
     """
-
     if not data_list:
         raise ValueError("The data list is empty.")
     data_series = pd.Series(data_list)

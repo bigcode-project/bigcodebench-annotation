@@ -26,7 +26,6 @@ def task_func(mu, sigma, seed=0):
     >>> type(plot)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     np.random.seed(seed)
     samples = np.random.normal(mu, sigma, 1000)
     mappable = sns.kdeplot(samples, fill=True)

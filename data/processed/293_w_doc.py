@@ -31,7 +31,6 @@ def task_func(elements, subset_size):
     >>> len(sums)
     45
     """
-
     combinations = list(itertools.combinations(elements, subset_size))
     sums = [sum(combination) for combination in combinations]
     ax = plt.hist(sums, bins=np.arange(min(sums), max(sums) + 2) - 0.5, rwidth=0.8, align='left')

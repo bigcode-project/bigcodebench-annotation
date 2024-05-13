@@ -26,7 +26,6 @@ def task_func(source_dir, target_dir, file_pattern=r'\b[A-Za-z0-9]+\.(txt|doc|do
     >>> task_func('/path/to/source', '/path/to/target')
     3
     """
-
     if not os.path.exists(source_dir):
         raise FileNotFoundError("The source directory does not exist.")
     if not os.path.exists(target_dir):

@@ -30,7 +30,6 @@ def task_func(data):
     4.5
     4.5
     """
-
     if not isinstance(data, np.ndarray) or data.ndim != 2:
         raise ValueError("Input data must be a 2D numpy array.")
     df = pd.DataFrame(data)

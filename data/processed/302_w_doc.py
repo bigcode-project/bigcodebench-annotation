@@ -37,7 +37,6 @@ def task_func(df, plot=False):
     >>> print(corr_df[0][0])
     1.0
     '''
-
     if not isinstance(df, pd.DataFrame) or 'Value' not in df or 'Date' not in df or len(df.index) == 0:
         raise ValueError()
     df['Date'] = pd.to_datetime(df['Date'])

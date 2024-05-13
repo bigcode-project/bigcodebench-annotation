@@ -27,7 +27,6 @@ def task_func(delay_time: float = 1.0, num_threads: int = 5):
     >>> task_func(1, 10)
     ['Delay in thread 0 completed', 'Delay in thread 1 completed', 'Delay in thread 2 completed', 'Delay in thread 3 completed', 'Delay in thread 4 completed', 'Delay in thread 5 completed', 'Delay in thread 6 completed', 'Delay in thread 7 completed', 'Delay in thread 8 completed', 'Delay in thread 9 completed']
     '''
-
     results = []
     def delay():
         time.sleep(delay_time)

@@ -44,7 +44,6 @@ def task_func(file_path: str) -> pd.DataFrame:
     Message                Application started
     Name: 0, dtype: object
     """
-
     LOG_REGEX = r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}) - (\w+) - (.+)$"
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"The file {file_path} does not exist.")

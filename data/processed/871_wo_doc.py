@@ -46,7 +46,6 @@ def task_func(data_list, file_name):
     >>> print(txt_content)
     ['Position 1: -0.9\\n', 'Position 2: 11.0\\n', 'Position 3: 8.05\\n']
     """
-
     unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
     mean_values = []
     for column in unzipped_data[1:]:

@@ -32,7 +32,6 @@ def task_func(json_files_path='./json_files/', key='name'):
     >>> task_func(json_files_path=directory, key='product')
     {'apple': 1, 'banana': 1}
     """
-
     key_values = []
     for filename in os.listdir(json_files_path):
         if filename.endswith('.json'):

@@ -30,7 +30,6 @@ def task_func(json_data, unknown_key, save_dir=None):
     >>> file_path = task_func(json_str, 'unknown')
     >>> print(f"Downloaded file saved at: {file_path}")
     """
-
     data = json.loads(json_data)
     url = data[unknown_key]  # Assuming the key directly contains the URL
     response = requests.get(url)

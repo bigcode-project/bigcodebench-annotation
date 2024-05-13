@@ -34,7 +34,6 @@ def task_func(goals, penalties, teams=TEAMS, penalties_costs=PENALTIES_COSTS):
     >>> penalties = {'Team A': 1, 'Team B': 0}
     >>> report = task_func(goals, penalties)
     """
-
     report_data = []
     for team in teams:
         team_goals = goals.get(team, 0)

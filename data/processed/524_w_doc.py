@@ -32,7 +32,6 @@ def task_func(data):
     >>> axes
     [<Axes: title={'center': 'Statistics of cat'}, ylabel='Value'>, <Axes: title={'center': 'Statistics of dog'}, ylabel='Value'>]
     """
-
     if not data:
         raise ValueError("Input data is empty.")
     if not isinstance(data, list) or not all(isinstance(d, dict) for d in data):

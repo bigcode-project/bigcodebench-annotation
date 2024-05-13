@@ -30,7 +30,6 @@ def task_func(df, tuples, n_plots):
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
     >>> modified_df, plot_details = task_func(df, tuples, 3)
     """
-
     mask = df.apply(tuple, axis=1).isin(tuples)
     df = df[~mask]
     plot_details = []

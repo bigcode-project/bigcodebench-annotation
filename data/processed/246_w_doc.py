@@ -35,7 +35,6 @@ def task_func(n_waves, seed=0):
     >>> fft_data.shape
     (629,)
     """
-
     np.random.seed(seed)
     sine_wave_series = []
     if n_waves < 1:

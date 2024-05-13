@@ -46,7 +46,6 @@ def task_func(data):
     7   Tom   20     86
     9   Tom   20     85
     """
-
     if not all(key in data for key in ['Name', 'Age', 'Score']):
         raise ValueError("The dictionary must have the keys 'Name', 'Age', 'Score'")
     df = pd.DataFrame(data).sort_values(['Name', 'Age'])

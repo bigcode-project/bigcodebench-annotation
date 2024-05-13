@@ -29,7 +29,6 @@ def task_func(username):
     >>> 'login' in result
     True
     """
-
     response = requests.get(URL + username)
     try:
         response.raise_for_status()  # This will raise an HTTPError if the response was an error

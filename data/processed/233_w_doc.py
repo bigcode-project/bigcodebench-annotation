@@ -40,7 +40,6 @@ def task_func(obj_list, attr, num_bins=30, seed=0):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
-
     random.seed(seed)
     attr_values = [getattr(obj, attr) for obj in obj_list]
     fig, ax = plt.subplots()

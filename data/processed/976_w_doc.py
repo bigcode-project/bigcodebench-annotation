@@ -43,7 +43,6 @@ def task_func(records: np.ndarray, random_seed: int = 0) -> pd.DataFrame:
     1  0.000000  0.000000  0.000000  0.000000  0.000000
     2  1.224745  1.224745  1.224745  1.224745  1.224745
     """
-
     if random_seed is not None:
         np.random.seed(random_seed)
     if not (records.ndim == 2):

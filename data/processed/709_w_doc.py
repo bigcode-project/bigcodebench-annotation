@@ -24,7 +24,6 @@ def task_func(raw_string, line_length):
     >>> task_func('SGVsbG8sICBXb3JsZCEgICAg', 5)
     'Hello\\n, Wor\\nld!'
     """
-
     decoded_string = base64.b64decode(raw_string).decode('utf-8')
     unescaped_string = unescape(decoded_string)
     cleaned_string = re.sub(' +', ' ', unescaped_string).strip()

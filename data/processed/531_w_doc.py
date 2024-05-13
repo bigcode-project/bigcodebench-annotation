@@ -42,7 +42,6 @@ def task_func(df, n_clusters=3, random_state=None, n_init=10):
     >>> duplicates
     Counter({(2, 1): 3})
     """
-
     duplicates = df[df.duplicated(subset=["x", "y"], keep=False)]
     duplicates_counter = Counter(map(tuple, duplicates[["x", "y"]].values))
     unique_df = df.drop_duplicates(subset=["x", "y"]).copy()

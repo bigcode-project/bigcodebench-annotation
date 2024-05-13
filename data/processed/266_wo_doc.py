@@ -26,7 +26,6 @@ def task_func(my_path):
     Example:
     >>> task_func('/usr/my_directory')
     """
-
     file_sizes = collections.defaultdict(int)
     for dirpath, dirnames, filenames in os.walk(my_path):
         for f in filenames:

@@ -26,7 +26,6 @@ def task_func(length, count, seed=0):
     >>> task_func(0, 100, seed=2)
     Counter()
     """
-
     random.seed(seed)
     strings = [''.join(random.choices(['a', 'b', 'c', 'd', 'e'], k=length)) for _ in range(count)]
     letter_frequency = Counter(itertools.chain(*strings))

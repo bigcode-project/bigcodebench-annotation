@@ -43,7 +43,6 @@ def task_func():
         >>> all(df['Random Numbers'].between(0, RANGE))
         True
     """
-
     numbers = [random.randint(0, RANGE) for _ in range(SIZE)]
     moving_avg = [statistics.mean(numbers[max(0, i - 5):i + 1]) for i in range(SIZE)]
     df = pd.DataFrame({

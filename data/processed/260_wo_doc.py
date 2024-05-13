@@ -30,7 +30,6 @@ def task_func(directory):
     >>> task_func('./json_files') # Random test case with no JSON files
     0
     """
-
     files = glob.glob(os.path.join(directory, '*.json'))
     updated_files = 0
     for file in files:

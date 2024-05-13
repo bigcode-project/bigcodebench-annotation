@@ -27,7 +27,6 @@ def task_func(mu, sigma, num_samples=1000, seed=77):
     >>> type(fig)
     <class 'matplotlib.figure.Figure'>
     """
-
     np.random.seed(seed)
     samples = np.random.normal(mu, sigma, num_samples)
     fig = plt.figure(figsize=(12, 6))

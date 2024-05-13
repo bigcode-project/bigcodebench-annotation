@@ -26,7 +26,6 @@ def task_func(data):
     >>> data = '1-2-3-4-5-6-7-8-9-10'
     >>> ax = task_func(data)
     """
-
     data = data.split('-')
     data = [int(d) for d in data]
     df = pd.DataFrame(data, columns=['Values'])

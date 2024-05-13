@@ -39,7 +39,6 @@ def task_func(data=None):
     >>> print(ax.get_title())
     Weight vs Height
     """
-
     if data is None:
         data = {
             "Weight_String": ["60.5", "65.7", "70.2", "75.9", "80.1"],

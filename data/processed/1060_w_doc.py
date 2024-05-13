@@ -40,7 +40,6 @@ def task_func(df: pd.DataFrame, column_name: str) -> (str, plt.Axes):
     >>> print(message)
     The distribution of values is not uniform.
     """
-
     if df.empty or column_name not in df.columns or df[column_name].isnull().all():
         message = "The DataFrame is empty or the specified column has no data."
         _, ax = plt.subplots()

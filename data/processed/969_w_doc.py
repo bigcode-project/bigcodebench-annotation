@@ -34,7 +34,6 @@ def task_func(df: pd.DataFrame) -> pd.DataFrame:
     1  0.4  0.666667
     2  1.0  1.000000
     """
-
     if df.select_dtypes(include=np.number).shape[1] != df.shape[1]:
         raise TypeError("Input DataFrame contains non-numeric data types.")
     if df.empty or df.isnull().values.any():
