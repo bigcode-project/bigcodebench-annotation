@@ -41,6 +41,7 @@ def task_func(data, column):
     0  sample sentence
     1  Another example
     """
+
     df = pd.DataFrame(data)
     df[column] = df[column].apply(lambda x: ' '.join([word for word in re.findall(r'\b\w+\b', x) if word.lower() not in STOPWORDS]))
     return df

@@ -24,6 +24,7 @@ def task_func(text):
     >>> task_func(text)
     [('abc', 3), ('hij', 3), ('efg', 1)]
     """
+
     tokenizer = RegexpTokenizer(r'\$\$+\w*|\$\w+')
     dollar_prefixed_words = tokenizer.tokenize(text)
     normalized_words = [word.lstrip("$") if len(word.lstrip("$")) > 0 else word for word in dollar_prefixed_words]

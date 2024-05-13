@@ -27,6 +27,7 @@ def task_func(df, letter):
     >>> stats['median'] > 0
     True
     """
+
     df = pd.DataFrame(df)
     regex = '^' + letter
     filtered_df = df[df['Word'].str.contains(regex, regex=True)]

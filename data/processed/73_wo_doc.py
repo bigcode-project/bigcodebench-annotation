@@ -32,6 +32,7 @@ def task_func(db_file):
     >>> df, ax = task_func('data/task_func/db_1.db')
     >>> print(df)
     """
+
     conn = sqlite3.connect(db_file)
     df = pd.read_sql_query("SELECT * FROM EmailData", conn)
     df["list"] = df["list"].map(ast.literal_eval)

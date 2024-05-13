@@ -30,6 +30,7 @@ def task_func(df1, df2):
     >>> selected_features
     ['feature2', 'feature3']
     """
+
     df = pd.merge(df1, df2, on="id")
     features = df1.columns.drop("id")
     X = df[features]

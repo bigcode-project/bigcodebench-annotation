@@ -24,6 +24,7 @@ def task_func(input_file, output_file):
     Example:
     >>> task_func('data.json', 'stats.csv')
     """
+
     with open(input_file, 'r') as f:
         data = json.load(f)
     stats = defaultdict(list)

@@ -39,6 +39,7 @@ def task_func(
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     tensor_shape = (3, 3, 3)
     if not T.shape == tensor_shape:
         raise ValueError("Provided tensor does not match the expected shape.")

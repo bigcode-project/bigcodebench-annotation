@@ -31,6 +31,7 @@ def task_func(data):
      1  2  3  4  4  3  7  1    3.125
      6  2  3  4  3  4  4  1    3.375
     """
+
     df = pd.DataFrame(data, columns=COLUMN_NAMES)
     df['Average'] = df.mean(axis=1)
     fig, ax = plt.subplots()

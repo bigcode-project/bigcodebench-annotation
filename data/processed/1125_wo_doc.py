@@ -23,6 +23,7 @@ def task_func(myString, token):
     >>> task_func('Please check: https://www.google.com', 'your_token_here')
     {'message': 'URL received'}
     """
+
     url = re.search(r'(https?://\S+)', myString).group()
     headers = {'Authorization': 'Bearer ' + token}
     data = {'url': url}

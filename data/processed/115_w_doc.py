@@ -28,6 +28,7 @@ def task_func(numbers):
         >>> 'mode' in result and result['mode'] == 3 and 'entropy' in result
         True
     """
+
     if len(numbers) == 0:
         raise ValueError
     my_dict = {'array': np.array(numbers)}

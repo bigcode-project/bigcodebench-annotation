@@ -24,6 +24,7 @@ def task_func(list_of_menuitems):
         >>> result.loc['Coke', 'Count']
         2
     """
+
     flat_list = [item for sublist in list_of_menuitems for item in sublist]
     counter = Counter(flat_list)
     df = pd.DataFrame.from_dict(counter, orient='index', columns=['Count'])

@@ -36,6 +36,7 @@ def task_func(df, dict_mapping, plot_histogram=False):
     True
     >>> plt.close()
     """
+
     if not isinstance(df, pd.DataFrame):
         raise ValueError("Input df is not a DataFrame.")
     required_columns = FEATURES + [TARGET]

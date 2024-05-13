@@ -23,6 +23,7 @@ def task_func(json_data):
     >>> task_func(json_data)
     False
     """
+
     try:
         data = json.loads(json_data)
         datetime_str = data['utc_datetime']

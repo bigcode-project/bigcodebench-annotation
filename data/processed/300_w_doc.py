@@ -34,6 +34,7 @@ def task_func(df):
     (2, 4)
     >>> plt.close()
     """
+
     df['Date'] = pd.to_datetime(df['Date'])
     df = pd.concat([df['Date'], df['Value'].apply(pd.Series)], axis=1)
     df.iloc[:,1:] = df.iloc[:,1:].apply(zscore)

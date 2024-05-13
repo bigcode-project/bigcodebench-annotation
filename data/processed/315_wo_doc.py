@@ -32,6 +32,7 @@ def task_func(dir, api_key, recipient_email):
     >>> task_func('/nonexistent_directory', 'YOUR_SENDGRID_API_KEY', 'YOUR_EMAIL')  # This will return False, as the directory does not exist.
     False
     """
+
     try:
         file_list = os.listdir(dir)
     except:

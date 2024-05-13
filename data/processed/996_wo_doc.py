@@ -31,6 +31,7 @@ def task_func(url: str, file_name: str = "Output.txt") -> str:
     >>> task_func("http://another-example.com", "AnotherOutput.txt")
     'AnotherOutput.txt'
     """
+
     response = requests.get(url, timeout=5)
     soup = BeautifulSoup(response.text, "html.parser")
     title = soup.title.string if soup.title else None

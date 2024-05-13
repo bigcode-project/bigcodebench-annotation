@@ -29,6 +29,7 @@ def task_func(mu, sigma, sample_size, seed=0):
     >>> type(ax) # The result should be a matplotlib.axes._axes.Axes object
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     if sample_size <= 0:
         raise ValueError('sample_size must be a positive integer.')
     np.random.seed(seed)

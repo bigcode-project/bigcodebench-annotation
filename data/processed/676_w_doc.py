@@ -30,6 +30,7 @@ def task_func(df):
     >>> assert df['winner'].dtype == object
     >>> assert all(winner in ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'] for winner in df['winner'])
     """
+
     def determine_winner(row):
         if row['score1'] > row['score2']:
             return row['team1']

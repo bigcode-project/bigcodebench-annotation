@@ -22,6 +22,7 @@ def task_func(letters: list, repetitions: int) -> dict:
     >>> task_func(['A', 'B'], 3)
     {'A': 3, 'B': 3}
     """
+
     flattened_list = list(itertools.chain(*[letters for _ in range(repetitions)]))
     counts = dict(Counter(flattened_list))
     return counts

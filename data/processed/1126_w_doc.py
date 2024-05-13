@@ -20,6 +20,7 @@ def task_func(input_str):
     >>> task_func('Special $#! characters   spaces 888323')
     'af30263c4d44d67917a4f0727191a4149e1ab615b772b2aeda859068178b146c'
     """
+
     cleaned_str = re.sub('[^A-Za-z0-9]+', '', input_str)
     hashed_str = hashlib.sha256(cleaned_str.encode()).hexdigest()
     return hashed_str

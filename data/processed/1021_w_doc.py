@@ -28,6 +28,7 @@ def task_func(input_string, verify_hash=None):
     >>> task_func("Hello, World!", "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f")
     True
     """
+
     if not isinstance(input_string, str):
         raise TypeError("Input must be a string")
     if verify_hash is not None and not isinstance(verify_hash, str):

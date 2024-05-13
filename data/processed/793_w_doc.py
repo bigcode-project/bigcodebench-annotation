@@ -23,6 +23,7 @@ def task_func(l=None):
     >>> task_func()
     array(['I', 'F', 'G', 'J', 'E', 'A', 'B', 'H', 'D', 'C'], dtype='<U1')
     """
+
     if l is None:
         l = ELEMENTS.copy()  # Use a copy to avoid modifying the original list
     random.shuffle(l)

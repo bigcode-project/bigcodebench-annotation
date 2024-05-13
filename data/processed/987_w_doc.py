@@ -40,6 +40,7 @@ def task_func(json_data: str, data_key: str):
     >>> type(original_data), type(normalized_data), type(ax)
     (<class 'pandas.core.series.Series'>, <class 'pandas.core.series.Series'>, <class 'matplotlib.axes._axes.Axes'>)
     """
+
     data = json.loads(json_data)
     try:
         data = json.loads(json_data)

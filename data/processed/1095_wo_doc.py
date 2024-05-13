@@ -28,6 +28,7 @@ def task_func(text, output_filename):
     >>> task_func(example_text, 'extracted_dollar_words.txt')
     '/absolute/path/to/extracted_dollar_words.txt'
     """
+
     punctuation_set = set(punctuation)
     tokenizer = RegexpTokenizer(r'\$\w+')
     dollar_prefixed_words = tokenizer.tokenize(text)

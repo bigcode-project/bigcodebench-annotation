@@ -30,6 +30,7 @@ def task_func(file_path, unknown_key):
     >>> new_file = task_func(json_file, 'B')
     >>> print(f"Hashed data saved at: {new_file}")
     """
+
     with open(file_path, 'r') as f:
         data = json.load(f)
     value = data['A'][unknown_key]["maindata"][0]["Info"]

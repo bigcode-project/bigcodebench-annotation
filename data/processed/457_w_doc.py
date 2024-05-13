@@ -30,6 +30,7 @@ def task_func(L):
     >>> ax.get_xticklabels()
     [Text(0.0, 0, '0'), Text(1.0, 0, '1'), Text(2.0, 0, '2'), Text(3.0, 0, '3'), Text(4.0, 0, '4'), Text(5.0, 0, '5'), Text(6.0, 0, '6'), Text(7.0, 0, '7')]
     """
+
     flattened = np.concatenate([l for l in L if l])
     if not np.issubdtype(flattened.dtype, np.integer):
         raise TypeError("Expected list of list of int")

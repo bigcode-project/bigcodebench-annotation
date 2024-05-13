@@ -29,6 +29,7 @@ def task_func(matrix):
     >>> round(kurtosis, 2)
     -1.5
     """
+
     max_values = [max(row) for row in matrix]
     fig, ax = plt.subplots()
     ax.hist(max_values, bins=10, density=True, alpha=0.6, color='g')

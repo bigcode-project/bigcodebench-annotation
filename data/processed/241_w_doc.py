@@ -30,6 +30,7 @@ def task_func(original):
     >>> print(norm_arr)
     [0.18257419 0.36514837 0.54772256 0.73029674]
     """
+
     arr = np.array([b for (a, b) in original])
     if arr.size == 0:
         norm_arr = arr

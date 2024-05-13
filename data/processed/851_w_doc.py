@@ -20,6 +20,7 @@ def task_func(input_string, width):
     >>> task_func('Another line\\nWith wrapping', 8)
     'Another\\nline\\nWith\\nwrapping'
     """
+
     lines = input_string.split('\\n')
     wrapped_lines = [textwrap.fill(line, width, break_long_words=False) for line in lines]
     wrapped_string = '\\n'.join(wrapped_lines)

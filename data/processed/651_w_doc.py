@@ -24,6 +24,7 @@ def task_func(df, target_value):
     >>> df = {'Column1': ['0', 'a', '332', '33']}
     >>> series, ax = task_func(df, '332')
     '''
+
     start_time = time.time()
     dataframe = pd.DataFrame(df)
     dataframe = dataframe.astype(str)

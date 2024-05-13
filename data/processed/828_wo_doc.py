@@ -37,6 +37,7 @@ def task_func(filename, dest_dir):
       will overwrite that file without warning.
     - The original file will not be deleted from the filesystem, only its content will be cleared.
     """
+
     try:
         os.makedirs(dest_dir, exist_ok=True)  # Simplified directory creation
     except OSError as e:

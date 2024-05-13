@@ -34,6 +34,7 @@ def task_func(hours, output_dir=OUTPUT_DIR):
     >>> 'weather_data.csv' in task_func(10)
     True
     """
+
     FILE_PATH = os.path.join(output_dir, 'weather_data.csv')
     BACKUP_PATH = os.path.join(output_dir, 'backup/')
     data = [['Time', 'Condition']]

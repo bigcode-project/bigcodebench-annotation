@@ -38,6 +38,7 @@ def task_func(amplitude, frequency, time):
     >>> isinstance(wave[0], complex)
     True
     """
+
     wave = amplitude * np.exp(1j * 2 * math.pi * frequency * time)
     window = get_window('hann', time.size)  # Apply a Hann window
     wave *= window  # Apply the window to the wave

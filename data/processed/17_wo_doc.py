@@ -27,6 +27,7 @@ def task_func(process_name: str) -> str:
     >>> task_func('notepad')
     "Process found. Restarting notepad."
     '''
+
     is_running = any([proc for proc in psutil.process_iter() if proc.name() == process_name])
     if is_running:
         for proc in psutil.process_iter():

@@ -23,6 +23,7 @@ def task_func(data):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     max_tuple = max(data, key=itemgetter(1))
     tuples = np.array(data)
     x = tuples[:,0]

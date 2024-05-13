@@ -56,6 +56,7 @@ def task_func(df, columns=['A', 'B', 'C'], larger=50, equal=900):
     >>> task_func(df, ['test', 'hi', 'column3'], larger=2, equal=50)
     0.23810330555354436
     """
+
     if len(columns) != 3:
         raise ValueError("Exactly three columns should be specified.")
     for column in columns:

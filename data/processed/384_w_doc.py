@@ -41,6 +41,7 @@ def task_func(animal_dict, max_count=10, seed=0):
     >>> dict(animal_counter.most_common(5))
     {'Giraffe': 14, 'Cat': 13, 'Zebra': 9, 'Snake': 8, 'Elephant': 6}
     """
+
     if max_count < 1:
         raise ValueError("max_count must be a positive integer")
     random.seed(seed)

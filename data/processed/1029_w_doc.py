@@ -39,6 +39,7 @@ def task_func(rows=100, columns=3):
     x    1
     Name: count, dtype: int64
     """
+
     column_names = [
         chr(97 + i) for i in range(columns)
     ]  # generate column names based on the number of columns

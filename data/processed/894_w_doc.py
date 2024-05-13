@@ -28,6 +28,7 @@ def task_func():
     49.6135 28.5323416100046
     >>> plt.show()
     """
+
     array = np.random.randint(1, 100, size=ARRAY_SIZE)
     mean = np.mean(array)
     std = np.std(array)

@@ -42,6 +42,7 @@ def task_func(df, target_column, target_values=None):
         >>> print(model.intercept_)
         53.362739257681035
     """
+
     if not isinstance(df, pd.DataFrame):
         raise ValueError("df should be a DataFrame.")
     if df.empty:

@@ -29,6 +29,7 @@ def task_func(data, column):
     >>> data = {'Type': ['A', 'A', 'C', 'E', 'D', 'E', 'D']}
     >>> ax = task_func(data, 'Type')
     """
+
     df = pd.DataFrame(data)
     CATEGORIES = ['A', 'B', 'C', 'D', 'E']
     counts = df[column].value_counts()

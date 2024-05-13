@@ -46,6 +46,7 @@ def task_func(df, feature, target, n=10):
     >>> print(model)
     LinearRegression()
     """
+
     if feature not in df.columns or target not in df.columns:
         raise ValueError(f"Columns {feature} or {target} not found in the DataFrame.")
     X = df[feature].values.reshape(-1, 1)

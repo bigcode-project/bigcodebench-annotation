@@ -49,6 +49,7 @@ def task_func(json_data, output_dir=".", file_name="country_population_report.cs
     0  Country A   331002651
     1  Country B    67886011
     """
+
     os.makedirs(output_dir, exist_ok=True)
     file_path = os.path.join(output_dir, file_name)
     try:

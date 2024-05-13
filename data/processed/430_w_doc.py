@@ -33,6 +33,7 @@ def task_func(df1, df2, column1="feature1", column2="feature2"):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     df = pd.merge(df1, df2, on="id")
     X = df[[column1, column2]]
     kmeans = KMeans(n_clusters=2, n_init=10)

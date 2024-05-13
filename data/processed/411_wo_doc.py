@@ -28,6 +28,7 @@ def task_func(data: dict, output_path: str = "./default_data_output.json") -> st
     >>> print(json.load(open(task_func({'a': [1,2], 'b': [3,4], 'c': [5,6]}, 'custom/path/results.json')))
     {'a': {'0': 1, '1': 2}, 'b': {'0': 3, '1': 4}}
     """
+
     df = pd.DataFrame(data)
     df = df.drop(columns="c", errors="ignore")
     data_dict = df.to_dict(orient="dict")

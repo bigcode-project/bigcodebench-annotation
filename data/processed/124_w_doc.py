@@ -42,6 +42,7 @@ def task_func(my_list, size=100, seed=100):
     >>> ax.get_title()  # Returns 'Histogram of Random Numbers'
     'Histogram of Random Numbers'
     """
+
     if not isinstance(my_list, list):
         raise TypeError("Input must be a list.")
     if not all(isinstance(item, (int, float)) for item in my_list):

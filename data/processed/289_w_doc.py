@@ -36,6 +36,7 @@ def task_func(X, y, n_splits, batch_size, epochs):
     >>> all('loss' in hist.history.keys() for hist in history)
     True
     """
+
     scaler = MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
     kf = KFold(n_splits=n_splits)

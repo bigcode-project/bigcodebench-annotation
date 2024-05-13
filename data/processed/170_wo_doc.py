@@ -35,6 +35,7 @@ def task_func(csv_url, sort_by_column="title"):
     1   2  Banana    0.5
     
     """
+
     response = requests.get(csv_url)
     response.raise_for_status()  # Raise an exception for invalid responses
     csv_data = response.text

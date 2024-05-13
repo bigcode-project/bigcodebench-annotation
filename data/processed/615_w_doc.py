@@ -31,6 +31,7 @@ def task_func(goals, penalties, rng_seed=None):
     3  Team D     (1 goals, $0)
     4  Team E     (5 goals, $0)
     """
+
     TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
     PENALTY_COST = 1000  # in dollars
     if rng_seed is not None:

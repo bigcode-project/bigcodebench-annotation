@@ -20,6 +20,7 @@ def task_func(filename):
     >>> task_func('file.csv')
     'file.csv'
     """
+
     if not os.path.exists(filename):
         return filename
     with open(filename, 'r') as file:

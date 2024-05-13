@@ -26,6 +26,7 @@ def task_func(data):
     >>> task_func([{'apple': 10, 'banana': 15, 'cherry': 12}, {'apple': 12, 'banana': 20, 'cherry': 14}])
     <Axes: title={'center': 'Fruit Sales over Time'}, xlabel='Time', ylabel='Sales Quantity'>
     """
+
     df = pd.DataFrame(data)
     df.fillna(0, inplace=True)
     for fruit in df.columns:

@@ -35,6 +35,7 @@ def task_func(start_date, end_date, seed=42):
     3 2021-01-04    270
     4 2021-01-05    106
     """
+
     np.random.seed(seed)
     data = []
     date = start_date

@@ -32,6 +32,7 @@ def task_func(json_file: str) -> dict:
     >>> task_func('empty.json')
     {}
     """
+
     ENCODING = 'utf-8'
     with open(json_file, 'r') as f:
         data = json.load(f)

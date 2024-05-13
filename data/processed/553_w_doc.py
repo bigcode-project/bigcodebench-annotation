@@ -30,6 +30,7 @@ def task_func(a, b):
     Example:
     >>> ax = task_func([1, 2, 3], ['A', 'B', 'C', 'D', 'E'])
     """
+
     if not a or not b:  # Check if either list is empty
         fig, ax = plt.subplots()  # Creates a blank plot
         plt.close(fig)  # Close the plot window to prevent it from showing empty plots

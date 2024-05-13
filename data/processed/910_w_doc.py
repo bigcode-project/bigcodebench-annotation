@@ -36,6 +36,7 @@ def task_func(letters, repetitions, colors):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     if len(letters) != len(repetitions) or len(letters) != len(colors) or len(letters) == 0:
         raise ValueError("All lists must be the same length and non-empty.")
     counts = np.array(repetitions)

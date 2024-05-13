@@ -35,6 +35,7 @@ def task_func(file_location, sheet_name):
     >>> fig.axes[0].get_title()
     'Mean and Standard Deviation'
     """
+
     if not os.path.exists(file_location):
         raise FileNotFoundError(f"No file found at {file_location}")
     try:

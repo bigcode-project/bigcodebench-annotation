@@ -33,6 +33,7 @@ def task_func(file_path="data.csv", columns=["A", "B", "C"]):
     >>> croot
     0    1.0    
     """
+
     df = pd.read_csv(file_path, dtype=float)
     ax = df[columns].plot()
     croot = np.cbrt(df[columns])

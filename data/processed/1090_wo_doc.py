@@ -30,6 +30,7 @@ def task_func(file_pointer):
     >>>    print(key_frequency)
     Counter({'name': 5, 'age': 5, 'city': 3})
     """
+
     data = json.load(file_pointer)
     key_frequency_counter = Counter()
     for item in data:

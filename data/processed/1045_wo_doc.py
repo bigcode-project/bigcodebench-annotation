@@ -58,6 +58,7 @@ def task_func(date_str):
     >>> print(total_seconds)
     1702597276
     """
+
     given_date = parse(date_str)
     current_date = datetime.now()
     total_seconds = (current_date - given_date).total_seconds()

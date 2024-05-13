@@ -26,6 +26,7 @@ def task_func(img_path):
     >>> img, contours = task_func(img_path)
     >>> os.remove(img_path)
     """
+
     if not os.path.exists(img_path):
         raise FileNotFoundError(f"No file found at {img_path}")
     img = cv2.imread(img_path)

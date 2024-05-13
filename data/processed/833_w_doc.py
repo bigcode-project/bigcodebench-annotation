@@ -39,6 +39,7 @@ def task_func(list_length=1000, range_start=1, range_end=10, random_seed=None):
     >>> print([_ for _ in numbers])
     [(136, 1), (30, 1), (-4, 1), (291, 1), (145, 1), (204, 1), (182, 1), (259, 1), (171, 1), (54, 1), (86, 1), (124, 1), (215, 1), (-5, 1), (101, 1), (305, 1), (220, 1), (0, 1), (42, 1), (31, 1)]
     """
+
     random.seed(random_seed)
     random_list = [random.randint(range_start, range_end) for _ in range(list_length)]
     counter = Counter(random_list)

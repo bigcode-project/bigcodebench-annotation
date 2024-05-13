@@ -41,6 +41,7 @@ def task_func(csv_file, column_name='data', pattern='\d+[xX]', sample_size=None,
     810    811  Early right nature technology. Conference mind...
     60      61  Interest require gas wall. Different it see fi...
     """
+
     df = pd.read_csv(csv_file)
     matches = df[df[column_name].str.contains(pattern, na=False)]
     if sample_size is not None:

@@ -27,6 +27,7 @@ def task_func(input_list):
     >>> task_func([101, 102, 103, 104])
     [101, 103]
     """
+
     primes = [i for i in input_list if isprime(i)]
     sorted_primes = sorted(primes, key=lambda x: (math.degrees(x), x))
     return sorted_primes

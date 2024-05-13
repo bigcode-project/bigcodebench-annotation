@@ -28,6 +28,7 @@ def task_func(dataframe, target_value='332'):
     ... })
     >>> mask, ax = task_func(df, '332')
     """
+
     mask = dataframe.applymap(lambda x: x == target_value)
     plt.figure(figsize=(8, 6))
     ax = sns.heatmap(mask, cmap='Blues', cbar=False)  # Adjusted to not display color bar for clarity in Boolean visualization

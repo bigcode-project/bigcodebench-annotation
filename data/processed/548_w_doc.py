@@ -25,6 +25,7 @@ def task_func(string_length=100):
     >>> print(compressed_string)
     eJxzNTH0CgqMMHJxMgkwdAyM8rQwc3IMMffzCHDyCAjy9PQI9HY0CY1wtzRx9YmKMg8wjgQAWN0NxA==
     """
+
     random_string = ''.join(random.choices(string.ascii_uppercase + string.digits, k=string_length))
     compressed_string = zlib.compress(random_string.encode('utf-8'))
     encoded_compressed_string = base64.b64encode(compressed_string)

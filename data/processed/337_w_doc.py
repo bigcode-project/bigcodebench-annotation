@@ -38,6 +38,7 @@ def task_func(df, group_col, value_col):
     Raises:
     -This function will raise TypeError if the 'Value' has non-numeric values.
     """
+
     group_mean = df.groupby(group_col)[value_col].mean()
     group_std = df.groupby(group_col)[value_col].std()
     num_groups = len(group_mean)

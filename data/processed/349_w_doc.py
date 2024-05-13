@@ -29,6 +29,7 @@ def task_func(product_list, categories):
     >>> report.iloc[0]['Category'] in ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports']
     True
     """
+
     report_data = []
     for product in product_list:
         category = categories[random.randint(0, len(categories)-1)]

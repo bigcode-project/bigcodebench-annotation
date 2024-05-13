@@ -29,6 +29,7 @@ def task_func(df):
     0  0.000000  0.566735  0.0  0.0  0.000000
     1  0.530493  0.000000  0.0  0.0  0.607007
     """
+
     if (df <= 0).any().any():
         raise ValueError("Input DataFrame should contain only positive values.")
     df = df.applymap(lambda x: x if x in TARGET_VALUES else 0)

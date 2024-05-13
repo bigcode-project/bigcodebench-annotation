@@ -24,6 +24,7 @@ def task_func(ip_range, csv_path):
     >>> csv_path.endswith('.csv')
     True
     """
+
     with open(csv_path, 'w', newline='') as csvfile:
         fieldnames = ['IP Address']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)

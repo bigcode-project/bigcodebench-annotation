@@ -25,6 +25,7 @@ def task_func(data, mapping):
     0  National Aeronautics and Space Administration ...
     1             I live in the United States of America
     """
+
     df = pd.DataFrame(data)
     pattern = re.compile(r'\b[A-Z]+\b')
     def replace_match(match):

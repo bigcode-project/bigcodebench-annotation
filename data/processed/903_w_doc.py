@@ -27,6 +27,7 @@ def task_func(d, target='z'):
     >>> isinstance(model, LinearRegression)
     True
     """
+
     df = pd.DataFrame(d)
     predictors = [k for k in df.columns if k != target]
     X = df[predictors]

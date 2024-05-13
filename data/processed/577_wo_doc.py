@@ -30,6 +30,7 @@ def task_func(directory):
     >>> 'test.txt' in info
     True
     """
+
     files_info = {}
     for file_path in pathlib.Path(directory).iterdir():
         if file_path.is_file():

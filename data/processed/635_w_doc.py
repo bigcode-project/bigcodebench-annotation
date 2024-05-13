@@ -42,6 +42,7 @@ def task_func(text, n=2):
     >>> isinstance(ax, matplotlib.axes.Axes)
     True
     """
+
     text = re.sub(r'\b(\w+)( \1\b)+', r'\1', text)
     stop_words = set(stopwords.words('english'))
     words_filtered = ' '.join([word for word in text.lower().split() if word not in stop_words])

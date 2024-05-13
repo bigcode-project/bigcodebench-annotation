@@ -35,6 +35,7 @@ def task_func(data_dir: str, csv_file: str) -> pd.DataFrame:
     2  Avocado       Bad        1.667
     3  Coconut     Tasty        2
     """
+
     file_path = os.path.join(data_dir, csv_file)
     try:
         df = pd.read_csv(file_path)

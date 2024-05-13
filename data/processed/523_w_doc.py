@@ -30,6 +30,7 @@ def task_func(data):
     >>> len(ax.lines)
     3
     """
+
     if not data:
         return None
     df = pd.DataFrame(data)

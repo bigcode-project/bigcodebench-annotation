@@ -24,6 +24,7 @@ def task_func(L):
     >>> type(df)
     <class 'pandas.core.frame.DataFrame'>
     '''
+
     rows, columns = L[0][0] * L[0][1], L[1][0] * L[1][1]
     random_array = np.random.randint(RANGE[0], RANGE[1], size=(rows, columns))
     df = pd.DataFrame(random_array)

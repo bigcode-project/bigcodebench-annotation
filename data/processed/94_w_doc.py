@@ -42,6 +42,7 @@ def task_func(mean, std_dev, num_samples):
 
     Note: The actual values in the array depend on the random seed and will vary each time the function is called.
     """
+
     samples = np.random.normal(mean, std_dev, num_samples)
     fig, ax = plt.subplots()
     ax.hist(samples, bins=30, density=True, alpha=0.6, color='g')

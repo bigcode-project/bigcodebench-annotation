@@ -26,6 +26,7 @@ def task_func(my_dict):
     >>> print(most_common_letters)
     ['d', 'v', 'c']
     """
+
     letter_counter = Counter(my_dict)
     most_common_letters = heapq.nlargest(3, letter_counter, key=letter_counter.get)
     return most_common_letters

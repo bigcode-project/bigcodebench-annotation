@@ -31,6 +31,7 @@ def task_func(commands_file_path, output_dir_path):
     >>> task_func("commands.csv", "/path/to/output_directory")
     ['/path/to/output_directory/command_1_output.txt', '/path/to/output_directory/command_2_output.txt', ...]
     """
+
     if not os.path.exists(commands_file_path):
         raise FileNotFoundError(f"File '{commands_file_path}' not found.")
     if not os.path.exists(output_dir_path):

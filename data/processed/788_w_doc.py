@@ -42,6 +42,7 @@ def task_func(df, col1, col2, N=10):
 
 
     """
+
     if N <= 1:
         raise ValueError(f"N should be greater than 1. Received N={N}.")
     if col1 not in df.columns or col2 not in df.columns:

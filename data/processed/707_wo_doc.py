@@ -29,6 +29,7 @@ def task_func(df):
     4     5.0
 
     """
+
     df['IntCol'] = np.log10(df['IntCol'])
     int_col_list = df['IntCol'].tolist()
     with open('IntCol.json', 'w') as json_file:

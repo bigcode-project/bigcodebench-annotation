@@ -31,6 +31,7 @@ def task_func(d):
     1  1.00  0.0000  0.583333
     2  0.25  1.0000  0.000000
     """
+
     if not d:  # Check if the input list is empty
         return pd.DataFrame(columns=['x', 'y', 'z'])  # Return an empty DataFrame with specified columns
     df = pd.DataFrame(d)

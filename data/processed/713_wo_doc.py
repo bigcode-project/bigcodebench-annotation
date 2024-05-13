@@ -21,6 +21,7 @@ def task_func(log_file_path: str, keywords: list):
     >>> task_func('/path/to/log_file.log', ['ERROR', 'WARNING'])
     ['    ERROR :    11:30:10 : This is an error message', '    WARNING :    11:35:10 : This is a warning message']
     '''
+
     if not os.path.exists(log_file_path):
         raise FileNotFoundError(f"Log file {log_file_path} does not exist.")
     formatted_lines = []

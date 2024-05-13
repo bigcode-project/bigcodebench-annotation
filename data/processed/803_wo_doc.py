@@ -30,6 +30,7 @@ def task_func(file_name: str) -> pd.DataFrame:
     3	Brian Washington	0.126279	0.459948
     4	Elias Lawrence	0.337239	0.124185
     """
+
     df = pd.read_csv(file_name)
     if df.select_dtypes(include='number').empty:
         raise ValueError("Input must at least have one numeric column.")

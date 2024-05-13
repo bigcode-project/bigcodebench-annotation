@@ -28,6 +28,7 @@ def task_func(data_list, seed=None):
     0        lamp, bag, mirror         lamp, bag
     1  table, chair, bag, lamp  chair, bag, lamp
     """
+
     if seed is not None:
         random.seed(seed)
     df = pd.DataFrame([s.strip() for s in data_list], columns=["Original String"])

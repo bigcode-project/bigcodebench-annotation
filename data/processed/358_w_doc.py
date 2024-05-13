@@ -28,6 +28,7 @@ def task_func(json_list, r):
     >>> print(combinations)
     [(1, 2, 3), (1, 2, 4), (1, 2, 5), (1, 3, 4), (1, 3, 5), (1, 4, 5), (2, 3, 4), (2, 3, 5), (2, 4, 5), (3, 4, 5)]
     """
+
     try:
         data = json.loads(json_list)
         number_list = data['number_list']

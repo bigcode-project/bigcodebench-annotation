@@ -20,6 +20,7 @@ def task_func(x, n):
     >>> task_func({'a': 1, 'b': 2, 'c': 3}, 2)
     ['c', 'b']
     """
+
     counter = collections.Counter(x)
     most_frequent = heapq.nlargest(n, counter.keys(), key=counter.get)
     return most_frequent

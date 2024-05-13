@@ -25,6 +25,7 @@ def task_func(data):
     >>> data = {'A': [1, 2, 3], 'B': [4, 5, 6]}
     >>> ax = task_func(data)
     """
+
     df = pd.DataFrame(data)
     numeric_df = df.select_dtypes(include=["number"])
     if numeric_df.empty:

@@ -26,6 +26,7 @@ def task_func(data_list):
     >>> type(plot)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
     if len(unzipped_data) == 0:
         raise ValueError('Empty data_list')

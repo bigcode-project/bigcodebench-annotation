@@ -21,6 +21,7 @@ def task_func(ip_addresses: list) -> dict:
     >>> task_func(['8.8.8.8', '8.8.4.4'])
     {'8.8.8.8': 'dns.google', '8.8.4.4': 'dns.google'}
     """
+
     IP_REGEX = r'[0-9]+(?:\.[0-9]+){3}'
     hostnames = {}
     for ip in ip_addresses:

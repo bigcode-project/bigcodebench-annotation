@@ -32,6 +32,7 @@ def task_func():
     >>> 'Memory Usage' in system_info
     True
     """
+
     system_info = {}
     system_info['OS'] = platform.system()
     system_info['Architecture'] = platform.architecture()[0]

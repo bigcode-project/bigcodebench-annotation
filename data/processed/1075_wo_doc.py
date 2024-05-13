@@ -31,6 +31,7 @@ def task_func(time_strings):
     >>> ax = task_func(time_strings)
     >>> plt.show()  # This will display the bar chart
     """
+
     differences = (
         np.diff([datetime.datetime.strptime(t, TIME_FORMAT) for t in time_strings])
         .astype("timedelta64[s]")

@@ -35,6 +35,7 @@ def task_func(df, dct):
     >>> np.allclose(correlation_matrix, np.array([[1.0, 1.0], [1.0, 1.0]]))
     True
     """
+
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df is not a DataFrame")
     df = df.replace(dct)

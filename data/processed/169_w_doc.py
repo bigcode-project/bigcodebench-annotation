@@ -31,6 +31,7 @@ def task_func(image, sigma=2):
     >>> ax[1].get_title()  # Checking the title of the second subplot
     'Filtered'
     """
+
     if not isinstance(image, np.ndarray):
         raise TypeError("The image must be a numpy array.")
     if sigma <= 0:

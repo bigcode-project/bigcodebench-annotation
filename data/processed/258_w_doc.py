@@ -44,6 +44,7 @@ def task_func(utc_datetime, seed=0):
     >>> print(json_data["age"])
     33
     """
+
     random.seed(seed)
     person = random.choice(DATA)
     person['timestamp'] = utc_datetime.isoformat()

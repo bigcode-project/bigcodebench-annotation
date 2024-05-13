@@ -23,6 +23,7 @@ def task_func(source_dir, dest_dir, extension):
     >>> task_func('path_to_source_dir', 'path_to_dest_dir', '.txt')
     10
     """
+
     files = glob.glob(os.path.join(source_dir, f'*.{extension}'))
     for file in files:
         shutil.move(file, dest_dir)

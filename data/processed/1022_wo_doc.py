@@ -41,6 +41,7 @@ def task_func(csv_file_path, column_name, date_format="%Y-%m-%d"):
     0   2023-12-10  100
     1   2023-12-11  150
     """
+
     if not os.path.isfile(csv_file_path):
         raise FileNotFoundError(f"The file {csv_file_path} does not exist.")
     try:

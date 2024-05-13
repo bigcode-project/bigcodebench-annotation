@@ -34,6 +34,7 @@ def task_func(db_path, table_name, num_entries, random_seed=None):
     >>> task_func('path_to_test.db', 'People', 100, random_seed=42)
     100
     """
+
     if random_seed is not None:
         seed(random_seed)
         np.random.seed(random_seed)

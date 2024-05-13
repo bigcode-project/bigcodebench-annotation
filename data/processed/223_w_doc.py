@@ -35,6 +35,7 @@ def task_func(df, dct, columns=None):
     Raises:
     - The function will raise a ValueError is input df is not a DataFrame.
     """
+
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df is not a DataFrame")
     df = df.replace(dct)

@@ -27,6 +27,7 @@ def task_func(df, column, value):
     >>> df = pd.DataFrame({'A': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
     >>> greater_avg, num_greater_value, ax = task_func(df, 'A', 5)
     """
+
     if column not in df.columns:
         raise ValueError(f"Column '{column}' does not exist in DataFrame")
     if not isinstance(value, (int, float)):

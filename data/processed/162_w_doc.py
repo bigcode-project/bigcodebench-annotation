@@ -30,6 +30,7 @@ def task_func(text, rwidth=0.8):
     >>> isinstance(ax, matplotlib.axes.Axes)
     True
     """
+
     words = re.split(r'\W+', text)
     word_lengths = [len(word) for word in words if word != '']
     fig, ax = plt.subplots()

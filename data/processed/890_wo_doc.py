@@ -40,6 +40,7 @@ def task_func(data_dir,
     15   Elephant       1000
      2      Tiger        500
     """
+
     random.seed(seed)
     file = csv_files[random.randint(0, len(csv_files) - 1)]
     file_path = os.path.join(data_dir, file)

@@ -30,6 +30,7 @@ def task_func(source_path, destination_path):
     >>> x
     ('Scripts', ['file_1_in_scripts_dir.txt', 'file_2_in_scripts_dir.txt'])
     """
+
     source_path = pathlib.Path(source_path).resolve()
     destination_path = pathlib.Path(destination_path).resolve()
     if not (source_path.exists() and source_path.is_dir()):

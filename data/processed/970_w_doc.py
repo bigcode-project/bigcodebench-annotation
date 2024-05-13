@@ -32,6 +32,7 @@ def task_func(data: np.ndarray) -> plt.Axes:
     >>> ax.get_title()
     'Cumulative Probability Plot'
     """
+
     if np.any(data < 0) or np.isnan(data).any():
         raise ValueError("Input array contains negative numbers or NaNs.")
     if not np.issubdtype(data.dtype, np.number):

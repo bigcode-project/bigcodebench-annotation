@@ -38,6 +38,7 @@ def task_func(my_list, file_dir='./data_files/', file_ext='.csv'):
     4  1  4
     >>> tearDown_dummy()
     """
+
     if not isinstance(my_list, list):
         raise TypeError("my_list must be a list.")
     my_list.append(12)

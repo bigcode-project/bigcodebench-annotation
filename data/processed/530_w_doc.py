@@ -43,6 +43,7 @@ def task_func(df: pd.DataFrame) -> (Counter, plt.Axes):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     if df.empty:
         raise ValueError("Input data cannot be empty.")
     if any(df["age"] < 0):

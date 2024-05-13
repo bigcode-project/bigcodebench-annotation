@@ -32,6 +32,7 @@ def task_func(start_date=datetime(2023, 1, 1), end_date=datetime(2023, 12, 31), 
     >>> print(business_days[0])
     2023-01-03 00:00:00
     """
+
     if not isinstance(start_date, datetime) or not isinstance(end_date, datetime):
         raise ValueError("start_date and end_date must be datetime objects.")
     if start_date > end_date:

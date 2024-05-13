@@ -27,6 +27,7 @@ def task_func(text):
     >>> task_func('This is a sample text. This text is for testing.')
     {'sample': 1, 'text': 2, 'testing': 1}
     """
+
     words = re.split(r'\W+', text.lower())
     words = [word for word in words if word not in STOPWORDS and word != '']
     word_freq = dict(Counter(words))

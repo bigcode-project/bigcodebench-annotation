@@ -34,6 +34,7 @@ def task_func(arr):
     >>> is_uniform
     True
     """
+
     unique, counts = np.unique(arr, return_counts=True)
     uniform_distribution = len(set(counts)) == 1
     _, ax = plt.subplots()

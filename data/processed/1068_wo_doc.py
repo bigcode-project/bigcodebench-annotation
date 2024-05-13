@@ -34,6 +34,7 @@ def task_func(db_path, query, warn_large_dataset=True):
     1         2        5
     2         3        6
     """
+
     if warn_large_dataset:
         warnings.simplefilter("always")
     try:

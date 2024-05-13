@@ -24,6 +24,7 @@ def task_func(df):
     1 -0.187649 -0.142630
     2 -0.147132  0.154622
     """
+
     pca = PCA(n_components=2)
     df_pca = pca.fit_transform(df)
     df_pca = pd.DataFrame(df_pca, columns=['PC1', 'PC2'])

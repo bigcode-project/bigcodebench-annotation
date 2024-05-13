@@ -38,6 +38,7 @@ def task_func(hours, file_path=FILE_PATH):
     >>> 'custom_data.csv' in file_path
     True
     """
+
     data = {'Time': [], 'Temperature': [], 'Category': []}
     for i in range(hours):
         temp = randint(-10, 40)  # random temperature between -10 and 40

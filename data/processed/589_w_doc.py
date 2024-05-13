@@ -36,6 +36,7 @@ def task_func():
     >>> len(kmeans.cluster_centers_) == 5  # Check the number of clusters
     True
     """
+
     data = np.array([(np.random.randint(0, RANGE), np.random.randint(0, RANGE)) for _ in range(SIZE)])
     kmeans = KMeans(n_clusters=CLUSTERS)
     kmeans.fit(data)

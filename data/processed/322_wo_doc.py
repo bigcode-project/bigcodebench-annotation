@@ -27,6 +27,7 @@ def task_func(filename):
     >>> task_func('nonexistent.bat') # If backup fails or file doesn't exist
     -1
     """
+
     file_path = os.path.join(DIRECTORY, filename)
     backup_path = os.path.join(BACKUP_DIRECTORY, filename)
     try:

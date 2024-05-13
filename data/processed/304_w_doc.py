@@ -32,6 +32,7 @@ def task_func(df):
     >>> print(len(explained_variance_ratio))
     2
     '''
+
     if df.empty:
         return 0,0
     df['Date'] = pd.to_datetime(df['Date'])

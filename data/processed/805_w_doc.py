@@ -35,6 +35,7 @@ def task_func(dictionary, item, seed):
     1  b  d   ddd  e
     2  e  d  aaaa  d)
     """
+
     random.seed(seed)
     random_int = random.randint(0, 9)
     df = pd.DataFrame(dictionary)

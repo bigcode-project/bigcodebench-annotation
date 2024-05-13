@@ -21,6 +21,7 @@ def task_func(t, n):
     >>> task_func((1, 2, 3, 4), 2)
     (3, 4)
     """
+
     combinations = list(itertools.combinations(t, n))
     selected_combination = random.choice(combinations)
     return selected_combination

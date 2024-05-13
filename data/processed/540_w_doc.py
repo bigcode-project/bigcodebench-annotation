@@ -29,6 +29,7 @@ def task_func(list_of_menuitems, title="Menu Distribution", color="blue", width=
     >>> task_func(['Burger'], title='A Title', color='red', width=5.0)
     <Axes: title={'center': 'A Title'}, xlabel='Menu Items', ylabel='Frequency'>
     """
+
     flat_list = list(itertools.chain(*list_of_menuitems))
     counter = Counter(flat_list)
     labels, values = zip(*sorted(counter.items(), key=lambda x: x[0]))

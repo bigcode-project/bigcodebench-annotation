@@ -33,6 +33,7 @@ def task_func(n_samples=1000, mu=0, sigma=1, random_seed=0):
     >>> ax.get_xticklabels()
     [Text(-5.0, 0, '−5'), Text(-4.0, 0, '−4'), Text(-3.0, 0, '−3'), Text(-2.0, 0, '−2'), Text(-1.0, 0, '−1'), Text(0.0, 0, '0'), Text(1.0, 0, '1'), Text(2.0, 0, '2'), Text(3.0, 0, '3'), Text(4.0, 0, '4'), Text(5.0, 0, '5')]
     """
+
     if n_samples <= 0 or sigma <= 0:
         raise ValueError("Invalid n_samples or sigma")
     np.random.seed(random_seed)

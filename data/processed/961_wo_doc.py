@@ -34,6 +34,7 @@ def task_func(directory, extensions=[".txt", ".docx", ".xlsx", ".csv"], keep_zer
     >>> task_func('/path/to/documents', extensions=['.txt'], keep_zero=False)
     Counter({'.txt': 5})
     """
+
     if not os.path.exists(directory):
         raise OSError("directory must exist.")
     counter = Counter()

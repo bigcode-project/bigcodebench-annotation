@@ -33,6 +33,7 @@ def task_func(array1, array2):
     >>> task_func(array1, array2)
     4.123105625617661
     """
+
     if len(array1) != len(array2):
         raise ValueError("The input arrays must have the same length.")
     if len(array1) == 0:

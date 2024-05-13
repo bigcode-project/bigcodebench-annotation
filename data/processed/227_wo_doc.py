@@ -48,6 +48,7 @@ def task_func(L, M, N, audio_file):
     >>> isinstance(matrix, np.ndarray)
     True
     """
+
     if not os.path.isfile(audio_file):
         raise FileNotFoundError(f"{audio_file} does not exist.")
     data, samplerate = sf.read(audio_file)

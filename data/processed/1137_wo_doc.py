@@ -24,6 +24,7 @@ def task_func(url: str, output_path: str) -> list:
     >>> task_func('file:///path/to/local/file.txt', 'output.json')
     ['+1 (234) 567 8901', '+44 1234 567890']
     """
+
     HEADERS = {'User-Agent': 'Mozilla/5.0'}
     PHONE_REGEX = r"\+\d{1,3}?\s?\(?\d{1,4}?\)?\s?\d{1,4}?\s?\d{1,9}"
     if url.startswith("file://"):

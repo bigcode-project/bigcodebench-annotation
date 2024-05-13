@@ -35,6 +35,7 @@ def task_func(data_matrix):
     0        1.0        1.0       -1.0       -1.0        1.0   0.2
     1       -1.0       -1.0        1.0        1.0       -1.0  -0.2
     """
+
     scaler = StandardScaler()
     standardized_data = scaler.fit_transform(data_matrix)
     df = pd.DataFrame(standardized_data, columns=FEATURE_NAMES)

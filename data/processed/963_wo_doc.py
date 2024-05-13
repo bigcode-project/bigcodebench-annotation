@@ -38,6 +38,7 @@ def task_func(source_directory, target_directory, zip_name):
     >>> path
     '/path/to/target_directory/zipped_files.zip'
     """
+
     if not os.path.exists(source_directory):
         raise OSError("source_directory must exist.")
     if not os.path.exists(target_directory):

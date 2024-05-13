@@ -26,6 +26,7 @@ def task_func(secret, message):
     >>> len(task_func('mysecretkey', 'Goodbye, world!')) == 64
     True
     """
+
     return hmac.new(secret.encode(), message.encode(), hashlib.sha256).hexdigest()
 
 import unittest

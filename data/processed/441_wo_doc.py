@@ -32,6 +32,7 @@ def task_func(P, T):
     >>> type(ax)
     <class 'mpl_toolkits.mplot3d.axes3d.Axes3D'>
     """
+
     if not (isinstance(P, np.ndarray) and isinstance(T, np.ndarray)):
         raise TypeError("Expected inputs to be numpy arrays")
     result = np.einsum("ij,jkl->ik", P, T)

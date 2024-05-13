@@ -26,6 +26,7 @@ def task_func(url):
     >>> task_func('http://www.example.com/')
     'scraped_data.csv'
     """
+
     html = urllib.request.urlopen(url).read()
     soup = BeautifulSoup(html, 'html.parser')
     data = []

@@ -41,6 +41,7 @@ def task_func(directory_path: str):
     >>> print(result)
     []
     """
+
     if not Path(directory_path).is_dir():
         raise ValueError(f"The path {directory_path} is not a valid directory.")
     file_details = []

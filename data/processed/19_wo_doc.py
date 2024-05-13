@@ -28,6 +28,7 @@ def task_func(directory):
     >>> isinstance(path, str)
     True
     """
+
     if not os.path.exists(directory):
         raise FileNotFoundError(f"Directory '{directory}' not found.")
     files = [f for f in glob.glob(os.path.join(directory, '*')) if os.path.isfile(f)]

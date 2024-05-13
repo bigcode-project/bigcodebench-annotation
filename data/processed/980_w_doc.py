@@ -41,6 +41,7 @@ def task_func(df):
     >>> type(fig)
     <class 'matplotlib.figure.Figure'>
     """
+
     numeric_df = df.select_dtypes(include=[np.number])
     if numeric_df.empty:
         raise ValueError("No numeric columns present")

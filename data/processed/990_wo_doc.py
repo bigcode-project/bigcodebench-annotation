@@ -35,6 +35,7 @@ def task_func(hex_string):
     >>> task_func("68656c6c6f")
     {'hex': '68656c6c6f', 'base64': 'aGVsbG8=', 'utf-8': 'hello', 'utf-16': 'hello', 'utf-32': 'hello', 'ASCII': 'hello', 'URL': 'hello', 'ROT13': 'uryyb'}
     """
+
     encodings = {}
     decoded_str = bytes.fromhex(hex_string).decode("utf-8")
     encodings["hex"] = binascii.hexlify(decoded_str.encode()).decode()

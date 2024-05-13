@@ -51,6 +51,7 @@ def task_func(rows, columns=['A', 'B', 'C', 'D', 'E', 'F'], seed=42):
         >>> print(stats)
         {'A': {'mean': 47, 'median': 42.5}, 'B': {'mean': 53, 'median': 60.5}, 'C': {'mean': 38.7, 'median': 32.0}, 'D': {'mean': 53.3, 'median': 53.0}, 'E': {'mean': 52, 'median': 60.5}, 'F': {'mean': 57.5, 'median': 55.5}}
     """
+
     if not isinstance(rows, int) or rows <= 0:
         raise ValueError("rows must be a positive integer greater than 0.")
     np.random.seed(seed)

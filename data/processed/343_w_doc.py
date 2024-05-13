@@ -35,6 +35,7 @@ def task_func(df, col, title=None):
     - The pie chart can have a title if specified.
 
     """
+
     if not isinstance(df, pd.DataFrame) or df.empty or col not in df.columns:
         raise ValueError("The DataFrame is empty or the specified column does not exist.")
     value_counts = df[col].value_counts()

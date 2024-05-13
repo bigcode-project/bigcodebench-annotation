@@ -32,6 +32,7 @@ def task_func(client_socket):
     ... finally:
     ...     server_socket.close()
     """
+
     response_data = {"message": "Hello", "time": str(datetime.now())}
     response = json.dumps(response_data) + "\n"
     client_socket.send(response.encode("utf-8"))

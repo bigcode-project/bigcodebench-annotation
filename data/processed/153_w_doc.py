@@ -32,6 +32,7 @@ def task_func(data):
            B        1
            C        2
     """
+
     le = LabelEncoder()
     encoded = le.fit_transform(data)
     df = pd.DataFrame({'Category': data, 'Encoded': encoded})

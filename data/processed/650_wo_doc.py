@@ -23,6 +23,7 @@ def task_func(date_str, tz_str):
     >>> type(task_func('2022-10-22 11:59:59', 'America/Chicago'))
     <class 'int'>
     """
+
     tz = pytz.timezone(tz_str)
     given_date = parse(date_str).astimezone(tz)  # Correctly handle timezone conversion
     next_year = given_date.year + 1

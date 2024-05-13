@@ -31,6 +31,7 @@ def task_func(name: str, age: int, code: str, salary: float, bio: str) -> pd.Dat
        Name  Age  Code  Salary                        Bio  Job Title
     0  John   30  A10B  5000.0  This is a bio with spaces  Developer
     """
+
     EMPLOYEES = ["John", "Alice", "Bob", "Charlie", "David"]
     JOBS = ["Engineer", "Manager", "Analyst", "Developer", "Tester"]
     if name not in EMPLOYEES:

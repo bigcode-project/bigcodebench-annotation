@@ -39,6 +39,7 @@ def task_func(list_of_lists):
     3  F  G  D
     4  D  A  C
     """
+
     dataframes = []
     for list_ in list_of_lists:
         df_dict = {col: POSSIBLE_VALUES.copy() for col in list_}

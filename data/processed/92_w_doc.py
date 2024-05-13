@@ -33,6 +33,7 @@ def task_func(data, n_clusters=3):
     >>> ax.get_title()
     'K-Means Clustering'
     """
+
     if not isinstance(data, pd.DataFrame):
         raise ValueError("Input 'data' must be a pandas DataFrame.")
     if not isinstance(n_clusters, int) or n_clusters <= 1:

@@ -30,6 +30,7 @@ def task_func(mu, sigma, seed=0, num_samples=1000, num_bins=30):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     '''
+
     np.random.seed(seed)
     samples = np.random.normal(mu, sigma, num_samples)
     fig, ax = plt.subplots()

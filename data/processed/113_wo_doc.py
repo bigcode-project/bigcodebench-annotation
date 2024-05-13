@@ -35,6 +35,7 @@ def task_func(my_dict, keys):
     >>> len(result) > 2  # Checking if more keys have been added
     True
     """
+
     if len(set(keys)) != 10:
         raise ValueError("keys parameter must contain exactly 10 unique elements")
     for key in keys:

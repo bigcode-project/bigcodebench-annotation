@@ -29,6 +29,7 @@ def task_func(file):
     >>> task_func('/path/to/file.csv')
     ['/path/to/split_00', '/path/to/split_01', ...]
     """
+
     if not os.path.exists(file):
         print("Provided file does not exist.")
         return []

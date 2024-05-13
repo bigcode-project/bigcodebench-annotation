@@ -48,6 +48,7 @@ def task_func(num_of_students, seed=42, name_list=None, gender_list=None, age_ra
     3  John   17  Female     72
     4  Nick   16  Female     82
     """
+
     if num_of_students <= 0:
         raise ValueError("num_of_students must be positive.")
     set_seed(seed)

@@ -27,6 +27,7 @@ def task_func(data, columns, target_column):
     >>> task_func(data, columns, 'target')
     0.0
     """
+
     df = pd.DataFrame(data, columns=columns)
     if target_column not in df.columns:
         raise ValueError('Target column does not exist in DataFrame')

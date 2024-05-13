@@ -24,6 +24,7 @@ def task_func(test_dir):
     >>> task_func("/mnt/data/mix_files/")
     {'script1.py': 0.04103803634643555, "script2.py": 5}
     """
+
     execution_times = {}
     py_scripts = glob.glob(os.path.join(test_dir, '*.py'))
     for py_script in py_scripts:

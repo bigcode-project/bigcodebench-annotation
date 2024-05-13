@@ -23,6 +23,7 @@ def task_func(tuples_list):
     1 -0.958924 -0.279415  0.656987  0.989358
     2  0.412118 -0.544021 -0.999990 -0.536573
     """
+
     df = pd.DataFrame([(math.sin(n) for n in t) for t in tuples_list])
     return df
 

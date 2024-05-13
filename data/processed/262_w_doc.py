@@ -27,6 +27,7 @@ def task_func(dictionary, new_key, new_value):
     >>> updated_dict
     {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
     """
+
     dictionary[new_key] = new_value
     values_counts = collections.Counter(dictionary.values())
     ax = sns.barplot(y=list(values_counts.keys()), x=list(values_counts.values()))

@@ -32,6 +32,7 @@ def task_func(myString):
     >>> task_func('Check this broken link: https://www.thisdoesnotexist12345.com')
     'Unable to fetch the content of the URL: https://www.thisdoesnotexist12345.com'
     """
+
     HEADERS = {'User-Agent': 'Mozilla/5.0'}
     url_match = re.search(r'(https?://\S+)', myString)
     if not url_match:

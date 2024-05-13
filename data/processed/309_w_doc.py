@@ -24,6 +24,7 @@ def task_func(list_of_lists, seed=42):
     >>> task_func([[1, 2, 3], [], [4, 5, 6]])
     [[0.0, 0.5, 1.0], [0.8571428571428572, 0.1208791208791209, 0.0, 1.0, 0.3516483516483517], [0.0, 0.5, 1.0]]
     """
+
     np.random.seed(seed)
     random.seed(seed)
     scaled_data = []

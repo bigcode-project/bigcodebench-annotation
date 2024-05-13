@@ -32,6 +32,7 @@ def task_func(df, dct, columns=None, plot_histograms=False):
     2    c    g    k
     3    d    h    l
     '''
+
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df is not a DataFrame")
     df_replaced = df.replace(dct)

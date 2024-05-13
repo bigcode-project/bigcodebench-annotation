@@ -36,6 +36,7 @@ def task_func(data, n_components=2, random_state=None):
     >>> type(results['ax'])
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     pca = PCA(n_components=n_components, random_state=random_state)
     transformed_data = pca.fit_transform(data)
     fig, ax = plt.subplots()

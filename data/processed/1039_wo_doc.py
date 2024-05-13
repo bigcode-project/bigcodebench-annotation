@@ -41,6 +41,7 @@ def task_func(client_socket, cert_file, key_file, buffer_size=1024):
         >>> print("Sent file hash:", file_hash)
         >>> server_socket.close()
     """
+
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.load_cert_chain(certfile=cert_file, keyfile=key_file)
     secure_socket = None

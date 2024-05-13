@@ -25,6 +25,7 @@ def task_func():
     >>> ax.get_title()
     'Solution of the equation y=2x+1 at x=2'
     """
+
     X = np.linspace(-10, 10, 400)  # X range specified
     y = 2 * X + 1
     fig, ax = plt.subplots()

@@ -19,6 +19,7 @@ def task_func(elements, subset_size):
     >>> dict(task_func((1, 2, 3, 4, 5), 2))
     {3: 1, 4: 1, 5: 2, 6: 2, 7: 2, 8: 1, 9: 1}
     """
+
     combinations = list(itertools.combinations(elements, subset_size))
     sums = [sum(combination) for combination in combinations]
     return collections.Counter(sums)

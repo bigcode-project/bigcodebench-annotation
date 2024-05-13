@@ -24,6 +24,7 @@ def task_func(input_string, directory='./text_files'):
     >>> task_func('line a\nfollows by line b\n...bye\n')
     ['./text_files/12345.txt', './text_files/67890.txt', './text_files/11223.txt']
     """
+
     lines = input_string.split('\n')
     file_paths = []
     for line in lines:

@@ -22,6 +22,7 @@ def task_func(filename, data):
     >>> print(result)
     True
     """
+
     try:
         directory = os.path.dirname(filename)
         if directory and not os.path.exists(directory):

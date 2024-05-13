@@ -38,6 +38,7 @@ def task_func(df, col):
     2
     >>> plt.close()
     """
+
     if not isinstance(df, pd.DataFrame) or df.empty or col not in df.columns:
         raise ValueError("The DataFrame is empty or the specified column does not exist.")
     fig, axes = plt.subplots(nrows=2, ncols=1)

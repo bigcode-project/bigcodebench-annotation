@@ -22,6 +22,7 @@ def task_func(values, weights, n_samples):
     >>> task_func([1, 2, 3], [3, 2, 1], 1000)
     {2: 342, 1: 480, 3: 178}
     """
+
     import random
     samples = random.choices(values, weights=weights, k=n_samples)
     histogram = dict(Counter(samples))

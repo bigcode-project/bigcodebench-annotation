@@ -28,6 +28,7 @@ def task_func(sentences_dict, word_keys):
     >>> type(task_func(sentences_dict, word_keys))
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     word_counts = collections.Counter(' '.join(sentences_dict.values()).split())
     frequencies = [word_counts[word] for word in word_keys]
     word_series = pd.Series(frequencies, index=word_keys)

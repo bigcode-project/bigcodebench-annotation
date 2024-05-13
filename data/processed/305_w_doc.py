@@ -27,6 +27,7 @@ def task_func(list_of_lists, seed=0):
     >>> dict(task_func([['a', 'b', 'c'], [], ['d', 'e', 'f']]))
     {'a': 1, 'b': 2, 'c': 1, 'd': 1, 'e': 1, 'f': 1, 'm': 1, 'y': 1, 'n': 1, 'i': 1, 'q': 1, 'p': 1, 'z': 1, 'j': 1, 't': 1}
     """
+
     random.seed(seed)
     flattened_list = list(itertools.chain(*list_of_lists))
     for list_item in list_of_lists:

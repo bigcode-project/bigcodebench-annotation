@@ -25,6 +25,7 @@ def task_func(text):
     >>> print(common_words)
     [('sample', 3), ('text', 3), ('this', 2), ('words', 2), ('is', 1), ('a', 1), ('contains', 1), ('like', 1), ('and', 1)]
     """
+
     cleaned_text = re.sub(f"[{punctuation}]", "", text).lower()
     words = cleaned_text.split()
     word_counts = Counter(words)

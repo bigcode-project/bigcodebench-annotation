@@ -39,6 +39,7 @@ def task_func(
 
 
     """
+
     try:
         if os.path.exists(save_path):
             os.remove(save_path)

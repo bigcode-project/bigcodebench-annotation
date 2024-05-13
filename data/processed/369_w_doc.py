@@ -29,6 +29,7 @@ def task_func(l):
     Fit results: mu = 5.00,  std = 0.00
     >>> plt.close()
     '''
+
     fig, ax = plt.subplots()
     ax.hist(l, bins='auto', density=True, alpha=0.6, color='g')
     mu, std = stats.norm.fit(l)

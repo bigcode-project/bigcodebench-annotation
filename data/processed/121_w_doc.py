@@ -35,6 +35,7 @@ def task_func(my_list, seed=42):
     >>> ax.get_title()  # Returns 'Category-wise Sales Data'
     'Category-wise Sales Data'
     """
+
     if not isinstance(my_list, list):
         raise TypeError("Input must be a list.")
     if seed is not None:

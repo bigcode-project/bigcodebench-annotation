@@ -22,6 +22,7 @@ def task_func(file_list):
     >>> task_func(["task_func_data/file1.bat", "task_func_data/file2.bat"])
     [0, 0]
     """
+
     exit_codes = []
     def execute_file(file):
         file_path = file

@@ -39,6 +39,7 @@ def task_func(text_dict, word_keys, top_k=2):
     >>> frequencies
     {'the': 3, 'that': 2, 'be': 1}
     """
+
     if top_k < 0:
         raise ValueError('top_k must be a positive integer.')
     elif top_k >= len(text_dict):

@@ -27,6 +27,7 @@ def task_func(directory=DIRECTORY_PATH, from_encoding='cp1251', to_encoding='utf
     >>> task_func('./files/', 'cp1251', 'utf8')  # Converts all .txt files in './files/' from 'cp1251' to 'utf8'
     >>> task_func('./other_files/', 'utf8', 'ascii')  # Converts all .txt files in './other_files/' from 'utf8' to 'ascii'
     """
+
     for filename in glob.glob(os.path.join(directory, '*.txt')):
         with codecs.open(filename, 'r', from_encoding) as file:
             content = file.read()

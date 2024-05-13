@@ -25,6 +25,7 @@ def task_func(list_of_lists):
     >>> task_func([['Pizza', 'Burger'], ['Pizza', 'Coke'], ['Pasta', 'Coke']])
     {'O': 1, 'h': 1, 'b': 1}
     """
+
     flat_list = [random.choice(LETTERS) for _ in list_of_lists]
     return dict(Counter(flat_list))
 

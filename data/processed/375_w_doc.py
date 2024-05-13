@@ -30,6 +30,7 @@ def task_func(l):
     PCA Result
     >>> plt.close()
     """
+
     pca = PCA(n_components=2)
     principalComponents = pca.fit_transform(l)
     fig = plt.figure(figsize=(6, 4))

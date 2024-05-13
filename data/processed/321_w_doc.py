@@ -36,6 +36,7 @@ def task_func(text):
     >>> round(kurtosis, 2) is not None
     True
     """
+
     names = re.findall(r'(.*?)(?:\[.*?\]|$)', text)
     names = [name.strip() for name in names if name.strip()]  # Removing any empty or whitespace names
     name_freqs = pd.Series(names).value_counts()

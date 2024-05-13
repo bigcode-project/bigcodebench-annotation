@@ -45,6 +45,7 @@ def task_func(num, from_base, to_base, private_key, alphabet):
     - The RSA private key must be generated and provided to sign the converted number.
     - The custom alphabet for base64 encoding allows for flexibility in encoding schemes.
     """
+
     base64_table = np.array(list(alphabet))
     n = int(num, from_base)
     new_num = ''

@@ -35,6 +35,7 @@ def task_func(time_strings, timezone):
     >>> print(mean_diff)
     61.0
     """
+
     if len(time_strings) < 2:
         return 0.0
     time_zone = pytz.timezone(timezone)

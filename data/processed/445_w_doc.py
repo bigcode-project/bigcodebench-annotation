@@ -31,6 +31,7 @@ def task_func(points, seed=0):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     if not isinstance(points, np.ndarray):
         raise TypeError("Expected Numpy array")
     if len(points) < 3:

@@ -26,6 +26,7 @@ def task_func(df, letter):
     >>> df = pd.DataFrame({'Word': words})
     >>> _ = task_func(df, 'apple')
     """
+
     start_time = time.time()
     if 'Word' not in df.columns:
         raise ValueError("The DataFrame should contain a 'Word' column.")

@@ -38,6 +38,7 @@ def task_func(number_list, bins):
     True
     >>> plt.close()
     """
+
     fig, ax = plt.subplots()
     color = random.choice(COLORS)  # Randomly select color from the COLORS constant
     ax.hist(number_list, bins=bins, color=color)

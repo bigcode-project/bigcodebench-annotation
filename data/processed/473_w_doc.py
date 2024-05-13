@@ -30,6 +30,7 @@ def task_func(n_walks, n_steps, seed=None):
     >>> ax.get_xticklabels()
     [Text(-20.0, 0, '−20'), Text(0.0, 0, '0'), Text(20.0, 0, '20'), Text(40.0, 0, '40'), Text(60.0, 0, '60'), Text(80.0, 0, '80'), Text(100.0, 0, '100'), Text(120.0, 0, '120')]
     """
+
     if n_walks < 0 or n_steps < 0:
         raise ValueError("Walks and steps cannot be negative.")
     np.random.seed(seed)

@@ -35,6 +35,7 @@ def task_func(data, n_clusters=2, random_state=0):
     >>> print(labels)
     [0 0 0 1 1 2]
     """
+
     items, x_values, y_values = zip(*data)
     coordinates = np.array(list(zip(x_values, y_values)))
     kmeans = KMeans(n_clusters=n_clusters, random_state=random_state).fit(coordinates)

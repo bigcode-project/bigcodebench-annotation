@@ -34,6 +34,7 @@ def task_func(feature: pd.Series, target: pd.Series) -> (np.ndarray, plt.Axes):
     >>> ax.get_title()
     'Confusion Matrix'
     """
+
     df = pd.DataFrame({"Feature": feature, "Target": target})
     X_train, X_test, y_train, y_test = train_test_split(
         df["Feature"], df["Target"], test_size=0.2, random_state=42

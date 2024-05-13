@@ -35,6 +35,7 @@ def task_func(n_samples=200, centers=4, plot_path=None, random_seed=None):
     >>> plot
     <Axes: >
     """
+
     X, y = make_blobs(
         n_samples=n_samples,
         n_features=2,

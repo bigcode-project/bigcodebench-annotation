@@ -24,6 +24,7 @@ def task_func(content):
     >>> task_func('this is an example content')
     {'DT': 2, 'VBZ': 1, 'NN': 1}
     """
+
     words = content.split()[:-1]  # Split and remove the last word
     pos_tags = nltk.pos_tag(words)  # Tokenization is built into pos_tag for simple whitespace tokenization
     pos_counts = Counter(tag for _, tag in pos_tags)

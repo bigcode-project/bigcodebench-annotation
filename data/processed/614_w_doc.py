@@ -32,6 +32,7 @@ def task_func(goals, penalties):
     3  Team D      0          3
     4  Team E      2          1
     """
+
     TEAMS = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
     data = []
     for team in TEAMS:

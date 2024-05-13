@@ -36,6 +36,7 @@ def task_func(request, file_paths):
     >>> response['Content-Disposition']
     'attachment; filename="files.zip"'
     """
+
     zip_io = io.BytesIO()
     with zipfile.ZipFile(zip_io, 'w') as zip_file:
         for file_path in file_paths:

@@ -31,6 +31,7 @@ def task_func(df: pd.DataFrame, tuples: list, n_plots: int) -> (pd.DataFrame, li
     >>> tuples = [(10, 20, 30, 40, 50), (60, 70, 80, 90, 100)]
     >>> modified_df, plots = task_func(df, tuples, 3)
     '''
+
     df = df.set_index(list('ABCDE')).drop(tuples, errors='ignore').reset_index()
     plots = []
     if not df.empty:

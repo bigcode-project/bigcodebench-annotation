@@ -34,6 +34,7 @@ def task_func(file_path, regex_pattern=r'\(.+?\)|\w+|[\W_]+'):
     >>> print(counts)
     {'a': 1, ' ': 1, 'b': 1, ' (': 1, 'abc': 1, ')': 1}
     """
+
     with open(file_path, 'r') as file:
         reader = csv.reader(file)
         text = ' '.join(row[0] for row in reader)

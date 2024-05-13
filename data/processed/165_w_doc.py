@@ -25,6 +25,7 @@ def task_func(num_rows=5, rand_range=(0, 100)):
     >>> type(fig)
     <class 'matplotlib.figure.Figure'>
     """
+
     labels = ['A', 'B', 'C', 'D', 'E']
     data = pd.DataFrame({label: [randint(rand_range[0], rand_range[1]) for _ in range(num_rows)] for label in labels})
     fig, ax = plt.subplots()

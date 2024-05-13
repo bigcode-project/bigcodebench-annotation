@@ -27,6 +27,7 @@ def task_func(myList):
     banana      3
     cherry      1
     """
+
     words = [w.lower().strip() for w in myList]
     word_counts = dict(Counter(words))
     report_df = pd.DataFrame.from_dict(word_counts, orient="index", columns=["Count"])

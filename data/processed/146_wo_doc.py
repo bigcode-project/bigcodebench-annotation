@@ -27,6 +27,7 @@ def task_func(ip_range):
     >>> all(isinstance(key, str) and isinstance(value, bool) for key, value in result.items())
     True
     """
+
     active_ips = {}
     for ip in IPv4Network(ip_range):
         try:

@@ -32,6 +32,7 @@ def task_func(csv_content, filename):
     >>> os.path.isfile(task_func(csv_content, 'single_cell.xls'))
     True
     """
+
     book = xlwt.Workbook()
     sheet1 = book.add_sheet("sheet1")
     reader = csv.reader(io.StringIO(csv_content))

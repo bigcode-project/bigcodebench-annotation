@@ -27,6 +27,7 @@ def task_func(mu=0, sigma=1):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     x = np.linspace(mu - 3 * sigma, mu + 3 * sigma, 100)
     y = norm.pdf(x, mu, sigma)
     fig, ax = plt.subplots()

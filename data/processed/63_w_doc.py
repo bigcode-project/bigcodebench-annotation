@@ -30,6 +30,7 @@ def task_func(car_dict):
     3     Tesla   White
     4       BMW  Silver
     """
+
     car_data = list(car_dict.items())
     df = pd.DataFrame(car_data, columns=['Car', 'Color'])
     color_counts = df["Color"].value_counts()

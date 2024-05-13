@@ -35,6 +35,7 @@ def task_func(df, column, bins=30, density=True, alpha=0.6, color="g", seed=None
     >>> ax.get_title()
     "Normal Fit for 'A'"
     """
+
     if seed is not None:
         np.random.seed(seed)
     data = df[column]

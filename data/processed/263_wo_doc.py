@@ -28,6 +28,7 @@ def task_func(my_path: str, days_old: int) -> str:
     >>> task_func('/usr/my_directory', 30)
     '/usr/my_directory/archive'
     """
+
     archive_dir = os.path.join(my_path, 'archive')
     os.makedirs(archive_dir, exist_ok=True)
     for ext in FILE_EXTENSIONS:

@@ -41,6 +41,7 @@ def task_func(smtp_server, smtp_port, smtp_username, smtp_password):
     >>> issubclass(handler, http.server.BaseHTTPRequestHandler)
     True
     """
+
     class EmailRequestHandler(http.server.BaseHTTPRequestHandler):
         def do_POST(self):
             ctype, pdict = cgi.parse_header(self.headers.get('content-type'))

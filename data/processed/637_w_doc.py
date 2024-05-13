@@ -30,6 +30,7 @@ def task_func(num_students):
     >>> ax.get_title()
     'Course-wise Average and Passing Grade Counts'
     """
+
     STUDENTS = ['Student' + str(i) for i in range(1, 101)]
     COURSES = ['Course' + str(i) for i in range(1, 6)]
     students_sample = sample(STUDENTS, num_students)

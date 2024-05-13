@@ -25,6 +25,7 @@ def task_func(input_df):
        clean_text  text_length
     0  HelloWorld           10
     """
+
     def clean_text_and_calculate_length(row):
         if pd.isnull(row['text']):
             return pd.Series(['', 0], index=['clean_text', 'text_length'])

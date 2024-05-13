@@ -24,6 +24,7 @@ def task_func(my_dict):
     >>> print(aggregated_dict)
     {'a': 4, 'b': 11}
     """
+
     sorted_items = sorted(my_dict.items(), key=lambda item: item[0][0])
     aggregated_dict = {k: sum(item[1] for item in g) for k, g in groupby(sorted_items, key=lambda item: item[0][0])}
     return aggregated_dict

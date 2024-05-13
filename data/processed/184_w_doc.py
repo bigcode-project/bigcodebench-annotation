@@ -40,6 +40,7 @@ def task_func(dataframe, text_column):
             0     1     0       1        0     0     0       0
             1     0     1       0        1     0     1       1
     """
+
     def preprocess_text(text):
         text = text.lower()
         text = re.sub(r'\d+', '', text)

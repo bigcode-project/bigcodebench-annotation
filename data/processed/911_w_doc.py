@@ -28,6 +28,7 @@ def task_func(letters):
     Note:
     The function uses a predefined dictionary to map each uppercase letter to its corresponding number.
     """
+
     letter_to_number = {letter: i+1 for i, letter in enumerate(string.ascii_uppercase)}
     numbers = [letter_to_number[letter] for letter in letters]
     product = reduce(operator.mul, numbers, 1)

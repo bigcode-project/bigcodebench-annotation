@@ -41,6 +41,7 @@ def task_func(time_strings, target_tz):
     1  15/04/10 14:25:46.789  15/04/10 10:25:46.789000
     2  20/12/11 12:34:56.000  20/12/11 07:34:56.000000
     """
+
     data = []
     for time_string in time_strings:
         utc_time = datetime.strptime(time_string, TIME_FORMAT)

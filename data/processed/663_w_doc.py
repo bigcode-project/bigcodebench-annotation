@@ -26,6 +26,7 @@ def task_func(x, y, labels):
     >>> y_data = [np.array([4,5,6]), np.array([7,8,9]), np.array([10,11,12])]
     >>> labels = ['H2O', 'O2', 'CO2']
     """
+
     if not x or not y or not labels:
         raise ValueError("Empty data lists provided.")
     def exponential_func(x, a, b, c):

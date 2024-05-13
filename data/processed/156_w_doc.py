@@ -31,6 +31,7 @@ def task_func(data):
     0  0.0  0.0  0.0  0.0  1.0  0.0  1.0  0.0     0.25
     1  1.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0     0.25
     """
+
     COLUMN_NAMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     scaler = MinMaxScaler()
     normalized_data = scaler.fit_transform(data)

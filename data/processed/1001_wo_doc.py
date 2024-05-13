@@ -27,6 +27,7 @@ def task_func(csv_file_path: str):
     >>> ax.get_title()
     "          Plot Title :  Normalized Column 1"
     """
+
     df = pd.read_csv(csv_file_path)
     mean = df["column1"].mean()
     std = df["column1"].std()

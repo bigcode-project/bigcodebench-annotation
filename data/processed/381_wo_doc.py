@@ -41,6 +41,7 @@ def task_func(file_path='arena.csv', target_column='Index', seed=42):
     >>> ax, importances = task_func(file_path, 'Index') # This will train a random forest model predicting 'Index' from 'Score1', 'Score2', and 'Score3', then plot and return the importances of 'Score1', 'Score2', and 'Score3' as features (X).
     >>> os.remove(file_path)
     """
+
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"The file '{file_path}' does not exist.")
     df = pd.read_csv(file_path)

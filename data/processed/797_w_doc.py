@@ -31,6 +31,7 @@ def task_func(df: pd.DataFrame) -> int:
     >>> task_func(df)
     8
     """
+
     if not isinstance(df, pd.DataFrame):
         raise TypeError("df should be a DataFrame.")
     BRACKETS_PATTERN = '[(){}[\]]'

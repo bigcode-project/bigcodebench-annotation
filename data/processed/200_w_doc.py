@@ -31,6 +31,7 @@ def task_func(n, value):
     >>> len(greater_avg) <= 10
     True
     """
+
     if n < 1:  # Handle case where n is 0 or less
         return [], 0
     numbers = [random.random() for _ in range(n)]

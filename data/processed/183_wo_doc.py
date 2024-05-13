@@ -21,6 +21,7 @@ def task_func(data):
     >>> response.has_key('UUID')
     True
     """
+
     response = HttpResponse(data, content_type='application/json')
     request_uuid = uuid.uuid4()
     response['UUID'] = str(request_uuid)

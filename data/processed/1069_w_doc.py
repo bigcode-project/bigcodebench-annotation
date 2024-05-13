@@ -25,6 +25,7 @@ def task_func(data_dict):
     >>> [ax.get_title() for ax in axes]
     ['Category1', 'Category2']
     """
+
     df = pd.DataFrame(data_dict)
     axes_list = []
     for column in df.columns:

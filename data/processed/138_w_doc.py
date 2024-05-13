@@ -27,6 +27,7 @@ def task_func(df, letters=list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')):
     >>> ax = task_func(df)
     >>> plt.show()
     """
+
     if not isinstance(df, pd.DataFrame) or 'Letters' not in df.columns:
         raise ValueError("The input must be a pandas DataFrame with a 'Letters' column.")
     letter_frequency = df['Letters'].value_counts().reindex(letters, fill_value=0)

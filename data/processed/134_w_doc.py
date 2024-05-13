@@ -27,6 +27,7 @@ def task_func(df, bins=20):
     >>> ax = task_func(df)
     >>> plt.show()
     """
+
     if not isinstance(df, pd.DataFrame) or df.empty:
         raise ValueError("The input must be a non-empty pandas DataFrame.")
     last_col_name = df.columns[-1]

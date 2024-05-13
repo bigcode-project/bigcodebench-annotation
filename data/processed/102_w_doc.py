@@ -29,6 +29,7 @@ def task_func():
     >>> type(fig).__name__
     'Figure'
     """
+
     font = {'family': 'Arial'}
     plt.rc('font', **font)  # Set the global font to Arial.
     DIABETES = load_diabetes()

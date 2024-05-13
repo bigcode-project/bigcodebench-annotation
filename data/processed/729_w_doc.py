@@ -27,6 +27,7 @@ def task_func(strings, filename=None):
     >>> loaded_strings = task_func(strings)
     >>> assert strings == loaded_strings
     """
+
     if filename is None:
         filename = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)) + ".pkl"
     with open(filename, 'wb') as file:

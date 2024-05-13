@@ -21,6 +21,7 @@ def task_func(data='/path/to/data.csv', emp_prefix='EMP'):
     >>> df, ax = task_func()
     >>> print(df)
     """
+
     df = pd.read_csv(data)
     df = df[df['Employee ID'].str.startswith(emp_prefix)]
     ax = sns.histplot(data=df, x='Age', kde=True)

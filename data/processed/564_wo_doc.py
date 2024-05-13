@@ -29,6 +29,7 @@ def task_func(filepath):
     >>> 'libc.so.6' in task_func('libc.so.6')
     True
     """
+
     metadata = dict()
     lib = ctypes.CDLL(filepath)
     file_stat = os.stat(filepath)

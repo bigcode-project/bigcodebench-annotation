@@ -42,6 +42,7 @@ def task_func(iterations=5, min_delay=1.0, max_delay=2.0, seed=None):
     >>> print(delay)
     6.490494998960768
     """
+
     random.seed(seed)
     if not isinstance(iterations, int) or iterations <= 0:
         raise ValueError("iterations must be a positive integer.")

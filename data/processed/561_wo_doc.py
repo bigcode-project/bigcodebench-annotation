@@ -21,6 +21,7 @@ def task_func(date_str, from_tz, to_tz):
     >>> task_func('2022-03-01 12:00:00', 'UTC', 'America/New_York')
     '2022-03-01 07:00:00'
     """
+
     from_tz = pytz.timezone(from_tz)
     to_tz = pytz.timezone(to_tz)
     date = parser.parse(date_str).replace(tzinfo=from_tz)

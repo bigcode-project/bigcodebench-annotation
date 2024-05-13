@@ -28,6 +28,7 @@ def task_func(data, sample_rate=8000):
     >>> data = {'key1': 1, 'key2': 2, 'key3': 3}
     >>> fft, ax = task_func(data)
     """
+
     data['a'] = 1
     signal = np.array(list(data.values()))
     time = np.linspace(0, 2, 2 * sample_rate, False)

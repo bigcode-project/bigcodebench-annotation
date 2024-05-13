@@ -19,6 +19,7 @@ def task_func(L):
     >>> task_func([[1,2,3],[4,5,6]])
     3.5
     """
+
     def flatten(lst):
         flat_list = []
         for item in lst:

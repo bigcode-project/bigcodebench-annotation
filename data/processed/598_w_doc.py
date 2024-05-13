@@ -24,6 +24,7 @@ def task_func(df, letter):
     >>> task_func(df, 'a')
     {5: 1}
     """
+
     start_time = time.time()
     df = pd.DataFrame(df)
     regex = '^' + letter

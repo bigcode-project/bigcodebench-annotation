@@ -36,6 +36,7 @@ def task_func(num_groups=5, data_size=5, labels=None):
     >>> print(plot_filename)
     test_plot.png
     """
+
     if labels is None:
         labels = [f'Group{i + 1}' for i in range(num_groups)]
     data = pd.DataFrame(np.random.rand(data_size, num_groups), columns=labels)

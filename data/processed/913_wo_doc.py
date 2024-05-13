@@ -27,6 +27,7 @@ def task_func(data: List[Union[int, str]], repetitions: int = 1):
     >>> task_func([1, '2', '2'], repetitions=1)
     {'mode': array(['2'], dtype='<U1'), 'count': [2], 'fft': array([ 5.-0.j, -1.+0.j, -1.-0.j])}
     """
+
     def calculate_mode(data):
         counts = {}
         for item in data:

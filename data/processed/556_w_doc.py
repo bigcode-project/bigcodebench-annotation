@@ -34,6 +34,7 @@ def task_func(s, min_length, max_length, letters):
     >>> isinstance(is_similar, bool)
     True
     """
+
     string_length = np.random.randint(min_length, max_length+1)
     generated_s = ''.join(random.choice(letters) for _ in range(string_length))
     similarity = SequenceMatcher(None, s, generated_s).ratio()

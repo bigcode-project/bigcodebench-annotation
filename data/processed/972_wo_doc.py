@@ -33,6 +33,7 @@ def task_func(path: str, delimiter: str = os.path.sep) -> list:
     >>> task_func(r'Docs\\src\\Scripts\\temp', '\\\\')
     ['Docs', 'src', 'Scripts', 'temp']
     """
+
     if not path:
         return []
     path = path.replace("\\", "/")

@@ -28,6 +28,7 @@ def task_func(newArray):
     >>> len(task_func(np.array([1, 2, 3, 4, 5]))) > 0
     True
     """
+
     buffer = io.BytesIO()
     with gzip.GzipFile(fileobj=buffer, mode='w') as f:
         f.write(struct.pack('d'*newArray.size, *newArray))

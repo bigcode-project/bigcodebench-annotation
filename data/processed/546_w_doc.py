@@ -26,6 +26,7 @@ def task_func(my_dict):
     >>> str(task_func({})).startswith('+')
     True
     """
+
     ordered_dict = OrderedDict(sorted(my_dict.items(), key=lambda t: t[0]))
     table = PrettyTable(['Key', 'Value'])
     for key, value in ordered_dict.items():

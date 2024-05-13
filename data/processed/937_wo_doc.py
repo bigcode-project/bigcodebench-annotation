@@ -20,6 +20,7 @@ def task_func(input_str):
     >>> task_func("Hello, World!")
     Counter({'l': 3, 'o': 2, 'h': 1, 'e': 1, 'w': 1, 'r': 1, 'd': 1})
     """
+
     cleaned_str = re.sub('[^A-Za-z0-9]+', '', input_str).lower()
     freq_dict = Counter(cleaned_str)
     return freq_dict

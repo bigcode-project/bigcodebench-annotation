@@ -25,6 +25,7 @@ def task_func(cities_list):
     >>> type(pop_data)
     <class 'pandas.core.frame.DataFrame'>
     """
+
     population_data = []
     for city in cities_list:
         population = math.ceil(randint(1000000, 20000000) / 1000.0) * 1000

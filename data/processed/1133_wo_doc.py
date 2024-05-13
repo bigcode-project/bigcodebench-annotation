@@ -26,6 +26,7 @@ def task_func(API_URL, endpoint, PREFIX):
     >>> print(filename)
     'MEusers.json'
     """
+
     try:
         response = requests.get(API_URL + endpoint)
         response.raise_for_status()  # Raises an HTTPError for bad responses

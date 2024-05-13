@@ -41,6 +41,7 @@ def task_func(num_samples=500, noise_strength=1, random_seed=None, test_size=0.2
     >>> task_func(noise_strength=0.1)
     (0.9658328575162494, LinearRegression())
     """
+
     if num_samples * test_size < 2:
         raise ValueError("Test set should contain at least 2 samples. num_samples * testsize >=2")
     if random_seed is not None:

@@ -27,6 +27,7 @@ def task_func(array, target_value):
     >>> len(params)
     3
     """
+
     def func(x, a, b, c):
         return a * np.exp(-b * x) + c
     indices = np.where(array[:, 0] == target_value)[0]

@@ -30,6 +30,7 @@ def task_func(target_value=TARGET_VALUE, array=ARRAY):
     >>> task_func()
     (2.0, 'N/A', 'N/A', 'N/A')
     """
+
     indices = np.where(array[:, 0] == target_value)[0]
     if len(indices) < 2:
         plt.hist(indices, bins='auto')  # Plotting can still occur

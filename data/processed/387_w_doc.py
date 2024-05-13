@@ -31,6 +31,7 @@ def task_func(city_dict, max_range=1000000, seed=0):
     >>> city_dict = {'John': 'New York', 'Alice': 'London', 'Bob': 'Beijing', 'Charlie': 'Tokyo', 'David': 'Sydney'}
     >>> population_dict, plot_axes = task_func(city_dict)
     """
+
     if max_range < 1:
         raise ValueError("max_range must be a positive integer")
     np.random.seed(seed)

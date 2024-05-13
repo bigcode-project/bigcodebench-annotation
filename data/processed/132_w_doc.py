@@ -33,6 +33,7 @@ def task_func(hex_str):
     2         243          1
     >>> plt.show()
     """
+
     hex_str_cleaned = hex_str.replace('\\x', '')
     try:
         bytes_data = binascii.unhexlify(hex_str_cleaned)

@@ -30,6 +30,7 @@ def task_func(file_path: str, regex_pattern=r'\(.+?\)|\w') -> dict:
     >>> len(matches['sample_data.json'])
     34
     """
+
     with open(file_path, 'r') as file:
         data = json.load(file)
         text = ' '.join(data.values())

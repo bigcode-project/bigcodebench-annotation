@@ -21,6 +21,7 @@ def task_func(csv_file, emp_prefix='EMP$$'):
     >>> print(counts)
     {'EMP$$001': 5, 'EMP$$002': 3}
     """
+
     counter = collections.Counter()
     try:
         with open(csv_file, 'r') as f:

@@ -27,6 +27,7 @@ def task_func(n):
     >>> print(task_func(2))
     ((0.8444218515250481, 0.7579544029403025), (0.420571580830845, 0.25891675029296335))
     """
+
     if n < 2:
         return None
     points = [(random.random(), random.random()) for i in range(n)]

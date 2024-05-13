@@ -34,6 +34,7 @@ def task_func(pattern):
     >>> task_func(r'\\\\d{3}-\\\\d{2}-\\\\d{4}')  # For matching SSN format
     '/absolute/path/to/matched_data.csv'
     """
+
     response = requests.get(API_URL)
     data = json.loads(response.text)
     matched_data = [re.findall(pattern, str(item)) for item in data['data']]

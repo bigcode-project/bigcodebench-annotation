@@ -21,6 +21,7 @@ def task_func(numbers=list(range(1, 3))):
     >>> isinstance(result, float)
     True
     """
+
     permutations = list(itertools.permutations(numbers))
     sum_diffs = 0
     for perm in permutations:

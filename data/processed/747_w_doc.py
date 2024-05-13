@@ -23,6 +23,7 @@ def task_func(s):
     >>> print("{:.2f}".format(sqrt_sum))  # Ensure this matches exactly with expected output
     8.65
     '''
+
     numbers = re.findall(r'\b\d+(?:\.\d+)?\b', s)  # Use non-capturing group for decimals
     count = len(numbers)
     sqrt_sum = sum(math.sqrt(float(num)) for num in numbers if num)  # Ensure conversion to float

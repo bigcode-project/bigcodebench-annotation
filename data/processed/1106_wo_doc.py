@@ -26,6 +26,7 @@ def task_func(file_path):
     >>> task_func('/path/to/file.txt')
     '2023-09-28 12:30:45'
     """
+
     if not Path(file_path).exists():
         raise FileNotFoundError(f"No such file or directory: '{file_path}'")
     creation_time = os.path.getctime(file_path)

@@ -27,6 +27,7 @@ def task_func(ip_range, port):
     - ipaddress.IPv4Network
     - threading.Thread
     """
+
     open_ports = {}
     def check_port(ip):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

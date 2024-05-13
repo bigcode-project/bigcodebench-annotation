@@ -27,6 +27,7 @@ def task_func(df, filename, output_dir=OUTPUT_DIR):
     >>> 'data.json' in task_func(df, 'data.json')
     True
     """
+
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     file_path = os.path.join(output_dir, filename)

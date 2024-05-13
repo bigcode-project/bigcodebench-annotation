@@ -42,6 +42,7 @@ def task_func(start_date=START_DATE, periods=PERIODS, freq=FREQ, categories=CATE
     8 2020-02-03  Electronics    109
     9 2020-02-03      Fashion    311
     """
+
     np.random.seed(0)  # Ensure reproducible sales figures
     date_range = pd.date_range(start=start_date, periods=periods, freq=freq)
     report_data = []

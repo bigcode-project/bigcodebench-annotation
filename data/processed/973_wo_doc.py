@@ -29,6 +29,7 @@ def task_func(path, delimiter="/"):
     >>> task_func('a/b', '/')
     [('a', {'total': 300, 'used': 150, 'free': 150}), ('b', {'total': 400, 'used': 200, 'free': 200})]
     """
+
     if not path or not isinstance(path, str):
         raise ValueError("Path must be a non-empty string")
     if not os.path.exists(path):

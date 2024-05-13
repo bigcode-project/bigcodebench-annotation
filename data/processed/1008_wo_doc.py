@@ -56,6 +56,7 @@ def task_func(url, table_id):
     Columns: []
     Index: []
     """
+
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code

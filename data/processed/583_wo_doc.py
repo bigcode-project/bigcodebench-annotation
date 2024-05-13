@@ -36,6 +36,7 @@ def task_func():
     >>> isinstance(nonce, bytes)
     True
     """
+
     (pub_key, priv_key) = rsa.newkeys(512)
     password = get_random_bytes(16)
     cipher = AES.new(password, AES.MODE_EAX)

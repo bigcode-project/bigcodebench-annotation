@@ -28,6 +28,7 @@ def task_func(s):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     if not isinstance(s, str):
         raise TypeError("Expected string input")
     LETTERS = string.ascii_lowercase

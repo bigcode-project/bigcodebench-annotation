@@ -40,6 +40,7 @@ def task_func(json_str):
     1  4  9.8  10
     2  6  9.8  10
     """
+
     NUMBERS = re.compile(r"^-?\d+(?:\.\d+)?$")
     my_dict = json.loads(json_str)
     if not my_dict:

@@ -46,6 +46,7 @@ def task_func(directory: str, pattern: str = r'^(.*?)-\d+\.csv$') -> list:
     print("New files created:", new_files)
     ```
     """
+
     file_dir = Path(directory)
     file_pattern = re.compile(pattern)
     new_files = []

@@ -28,6 +28,7 @@ def task_func(original_file_location="test.xlsx", new_file_location="new_test.xl
     >>> os.remove(file_path)
     >>> os.remove(file_new_path)
     """
+
     if not os.path.exists(original_file_location):
         raise FileNotFoundError(f"No file found at {original_file_location}")
     try:

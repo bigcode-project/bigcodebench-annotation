@@ -21,6 +21,7 @@ def task_func(arr):
     >>> print(reversed_arr)
     ['orange.apple' 'yellow.green.red']
     """
+
     vectorized_reverse = np.vectorize(lambda s: '.'.join(s.split('.')[::-1]))
     now = datetime.datetime.now()
     return vectorized_reverse(arr)

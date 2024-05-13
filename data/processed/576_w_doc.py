@@ -28,6 +28,7 @@ def task_func(l, n_groups = 5):
     >>> len(result) == 15  # Check if the length of the result is as expected for 3 elements cycled 5 times
     True
     """
+
     if not l:
         return pd.Series()
     shuffle(l)

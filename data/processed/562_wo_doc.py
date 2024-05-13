@@ -41,6 +41,7 @@ def task_func(filepath):
     >>> isinstance(task_func('libc.so.6'), str)
     True
     """
+
     if not isinstance(filepath, str):
         raise TypeError("Invalid filepath type")
     elif filepath == "" or not os.path.exists(filepath):

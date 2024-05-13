@@ -51,6 +51,7 @@ def task_func(T1, row_num=50, seed=None):
     4     74     72
     5     63     44
     """
+
     np.random.seed(seed)
     int_list = [list(map(int, x)) for x in T1]
     flattened_list = list(itertools.chain(*int_list))

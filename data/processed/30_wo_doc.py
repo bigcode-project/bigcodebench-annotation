@@ -48,6 +48,7 @@ def task_func(
     >>> task_func('/path/to/file.json', 'email')
     'john.doe@example.com'
     """
+
     if not os.path.isfile(file_path):
         raise ValueError(f'{file_path} does not exist.')
     with open(file_path, 'r') as f:

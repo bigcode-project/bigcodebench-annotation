@@ -23,6 +23,7 @@ def task_func(path, delimiter):
     >>> task_func("Docs/src/file.txt", "/")
     [('Docs', None), ('/', None), ('src', None), ('/', None), ('file.txt', 'hash_value')]
     """
+
     path_components = re.split(f'({delimiter})', path)
     hashes = []
     for component in path_components:

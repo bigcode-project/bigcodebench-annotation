@@ -33,6 +33,7 @@ def task_func(data_dict):
     >>> plot_ax.get_title()
     'Scaled Values'
     """
+
     df = pd.DataFrame(data_dict).dropna()
     if df.empty:
         ax = plt.gca()

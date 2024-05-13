@@ -32,6 +32,7 @@ def task_func(df):
         >>> model, predictions, ax = task_func(df)
         >>> plt.show()  # Displays the plot with original and predicted values
     """
+
     if not isinstance(df, pd.DataFrame) or not all(col in df.columns for col in ['group', 'date', 'value']):
         raise ValueError("Invalid 'df': must be a DataFrame with 'group', 'date', and 'value' columns.")
     df['date'] = df['date'].apply(lambda x: x.toordinal())

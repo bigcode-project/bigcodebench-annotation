@@ -31,6 +31,7 @@ def task_func(filepath, destination_dir):
     >>> isinstance(task_func('libc.so.6', destination), str)
     True
     """
+
     lib = ctypes.CDLL(filepath)
     dll_dir = os.path.dirname(filepath)
     dll_files = glob.glob(os.path.join(dll_dir, '*.dll'))

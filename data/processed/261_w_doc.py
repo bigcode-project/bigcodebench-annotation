@@ -31,6 +31,7 @@ def task_func(ax, radius):
     True
     >>> plt.close()
     '''
+
     if radius < 0:
         raise ValueError('Radius must be non-negative')
     if not isinstance(ax, plt.PolarAxes):

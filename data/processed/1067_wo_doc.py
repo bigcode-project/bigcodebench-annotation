@@ -30,6 +30,7 @@ def task_func(repo_url: str) -> dict:
     >>> task_func('https://api.github.com/repos/some/repo')
     { ... }  # dictionary containing repo information with a possible runtime warning about open issues
     """
+
     try:
         response = requests.get(repo_url, timeout=2)
         response.raise_for_status()  # Raises HTTPError for bad requests

@@ -43,6 +43,7 @@ def task_func(n,
     2  Article 2  test.de/Article_2   2        B   1048
 
     """
+
     random.seed(random_seed)
     np.random.seed(random_seed)
     data = []

@@ -46,6 +46,7 @@ def task_func(epoch_milliseconds, seed=0):
     Time        2021-03-08 12:47:31.807000
     Name: 0, dtype: object
     """
+
     random.seed(seed)
     USERS = ["user1", "user2", "user3", "user4", "user5"]
     ACTIVITIES = ["login", "logout", "browse", "search", "purchase"]

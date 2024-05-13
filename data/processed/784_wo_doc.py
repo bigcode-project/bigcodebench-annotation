@@ -52,6 +52,7 @@ def task_func(n,
     6  cat     test      True      1
     7  dog      fun      True      1
     """
+
     survey_data = []
     random.seed(random_seed)
     for _ in range(n):

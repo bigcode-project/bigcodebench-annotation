@@ -27,6 +27,7 @@ def task_func(csv_file_path):
     >>> task_func("path/to/sales.csv")
     'Product ABC'
     """
+
     with open(csv_file_path, 'r') as f:
         reader = csv.reader(f)
         next(reader)  # Skip the header row

@@ -30,6 +30,7 @@ def task_func(script_dir, scripts, delay):
     >>> task_func('/path/to/scripts/', ['script1.sh', 'script2.sh'], 5)
     ['2023-09-09 10:10:10', '2023-09-09 10:10:15']
     """
+
     if delay < 0:
         raise ValueError("delay cannot be negative.")
     if not scripts:

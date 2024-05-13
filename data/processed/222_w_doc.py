@@ -28,6 +28,7 @@ def task_func(list_input):
     >>> ax.get_title()
     'Cumulative Sum Plot'
     """
+
     sorted_list = sorted(list_input, key=lambda x: (math.degrees(x), x))
     cumsum = np.cumsum(sorted_list)
     ax = plt.plot(cumsum)[0].axes

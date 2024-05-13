@@ -31,6 +31,7 @@ def task_func(directory, archive_dir='archive'):
     >>> task_func(temp_dir, backup_dir)
     (True, [])
     """
+
     if not os.path.exists(archive_dir):
         os.makedirs(archive_dir)
     json_files = glob.glob(os.path.join(directory, '*.json'))

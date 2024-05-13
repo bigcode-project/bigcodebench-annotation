@@ -30,6 +30,7 @@ def task_func(word: str) -> list:
     >>> task_func("a1b2c3")
     [('ab', 1)]
     """
+
     clean_word = re.sub('[^a-z]', '', word.lower())
     if len(clean_word) < 2:
         return []

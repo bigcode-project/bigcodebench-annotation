@@ -31,6 +31,7 @@ def task_func(myList):
     >>> ax.get_xticklabels()
     [Text(0.0, 0, '0.0'), Text(0.5, 0, '0.5'), Text(1.0, 0, '1.0'), Text(1.5, 0, '1.5'), Text(2.0, 0, '2.0'), Text(2.5, 0, '2.5'), Text(3.0, 0, '3.0'), Text(3.5, 0, '3.5'), Text(4.0, 0, '4.0'), Text(4.5, 0, '4.5'), Text(5.0, 0, '5.0')]
     """
+
     _, ax = plt.subplots()
     ax.hist(
         myList, bins=np.arange(min(myList), max(myList) + 2) - 0.5, edgecolor="black"

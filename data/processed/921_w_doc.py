@@ -28,6 +28,7 @@ def task_func(data, columns):
     1  0.5  0.5
     2  1.0  1.0
     """
+
     df = pd.DataFrame(data)
     scaler = MinMaxScaler()
     df_copy = df.copy()

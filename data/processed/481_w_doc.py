@@ -28,6 +28,7 @@ def task_func(data_list, seed=42):
     >>> df['Randomized String'][0]
     'mirror, lamp, bag'
     """
+
     random.seed(seed)
     df = pd.DataFrame(data_list, columns=["Original String"])
     randomized_strings = []

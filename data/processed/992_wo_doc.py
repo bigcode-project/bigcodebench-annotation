@@ -32,6 +32,7 @@ def task_func(path_to_append=PATH_TO_APPEND, database=DATABASE):
     >>> task_func()
     'path/to/whatever'
     """
+
     sys.path.append(path_to_append)
     conn = sqlite3.connect(database)
     cur = conn.cursor()

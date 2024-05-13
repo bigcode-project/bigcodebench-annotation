@@ -39,6 +39,7 @@ def task_func(sheet_name, excel_file_location="test.xlsx", csv_file_location="te
     Note:
     - Ensure the Excel file contains only numerical data for accurate sum calculations.
     """
+
     try:
         logging.info('Reading the Excel file.')
         df = pd.read_excel(excel_file_location, sheet_name=sheet_name)

@@ -29,6 +29,7 @@ def task_func(df):
     >>> ax.get_title() # Should return 'Status Distribution'
     'Status Distribution'
     """
+
     if not isinstance(df, pd.DataFrame) or 'Status' not in df.columns:
         raise ValueError("Input must be a pandas DataFrame with a 'Status' column.")
     status_counts = df['Status'].value_counts()

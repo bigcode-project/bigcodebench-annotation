@@ -24,6 +24,7 @@ def task_func(documents):
     >>> print(tfidf.shape)
     (4, 11)
     """
+
     vectorizer = TfidfVectorizer(tokenizer=word_tokenize)
     tfidf_matrix = vectorizer.fit_transform(documents)
     tfidf_df = pd.DataFrame(tfidf_matrix.toarray(), columns=vectorizer.get_feature_names_out())

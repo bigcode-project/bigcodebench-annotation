@@ -32,6 +32,7 @@ def task_func(directory):
     >>> files['subdir2'][0].startswith('file3_')
     True
     """
+
     DATE_FORMAT = '%Y%m%d%H%M%S'
     moved_files = {}
     for filename in os.listdir(directory):

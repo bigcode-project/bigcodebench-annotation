@@ -28,6 +28,7 @@ def task_func(string_length=100):
     >>> freq  # Example output: OrderedDict([('e', 15), ('a', 12), ('b', 10), ('d', 8), ('c', 5)])
     OrderedDict(...)
     """
+
     string = ''.join([LETTERS[random.randint(0, len(LETTERS)-1)] for _ in range(string_length)])
     freq = collections.Counter(string)
     pq = PriorityQueue()

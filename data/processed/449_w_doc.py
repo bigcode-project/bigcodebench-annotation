@@ -40,6 +40,7 @@ def task_func(data: pd.DataFrame) -> (pd.DataFrame, list):
     >>> type(axes_list[0])
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     FEATURES = ["Feature1", "Feature2", "Feature3", "Feature4", "Feature5"]
     scaler = StandardScaler()
     data_standardized = pd.DataFrame(

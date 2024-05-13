@@ -28,6 +28,7 @@ def task_func(data, letter):
     >>> len(filtered_names)
     1
     """
+
     df = pd.DataFrame(data)
     start_time = time.time()
     regex = f'^{letter}'

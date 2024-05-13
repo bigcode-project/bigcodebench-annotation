@@ -34,6 +34,7 @@ def task_func(goals, penalties, rng_seed=None):
     >>> print(predictions)
     [706.89655172 439.65517241]
     """
+
     if rng_seed is not None:
         seed(rng_seed)
     match_results = []

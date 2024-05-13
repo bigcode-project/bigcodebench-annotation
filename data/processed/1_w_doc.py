@@ -28,6 +28,7 @@ def task_func(length=100):
     >>> task_func(10)
     {'h': 1, 'B': 2, 'O': 1, 'L': 1, 'm': 1, 'j': 1, 'u': 1, 'E': 1, 'V': 1}
     """
+
     if length < 0:
         raise ValueError
     random_string = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase, k=length))

@@ -23,6 +23,7 @@ def task_func(df):
     1  0.000000  0.000000
     2  1.224745  1.224745
     """
+
     scaler = StandardScaler()
     df_standardized = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
     return df_standardized

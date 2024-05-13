@@ -27,6 +27,7 @@ def task_func(file_path):
     - The function specifically reads from the given file path.
     - This example uses +SKIP because it relies on external file content.
     """
+
     if not os.path.isfile(file_path):
         return None
     word_counter = Counter()

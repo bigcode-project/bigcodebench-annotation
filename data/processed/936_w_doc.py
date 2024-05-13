@@ -32,6 +32,7 @@ def task_func(word):
     The function uses the index of each letter in the English alphabet to represent its position.
     For example, 'a' will be represented by 1, 'b' by 2, and so on.
     """
+
     if not all(char in ALPHABET for char in word):
         raise ValueError("The word should contain only lowercase alphabetic characters.")
     letter_positions = np.array(list(map(lambda x: ALPHABET.index(x) + 1, word)))

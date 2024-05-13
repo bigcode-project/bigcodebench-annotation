@@ -37,6 +37,7 @@ def task_func(animals=None, seed=42):
     Note: The mode is not included in the returned DataFrame due to the possibility of no repeating values 
     in the randomly generated counts.
     """
+
     random_seed(seed)
     animals = animals or ['Lion', 'Elephant', 'Tiger', 'Giraffe', 'Panda']
     report_data = []

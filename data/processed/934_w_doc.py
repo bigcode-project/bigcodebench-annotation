@@ -20,6 +20,7 @@ def task_func(word: str) -> dict:
     >>> task_func('hello')
     'dd5dec1a853625e2dc48f3d42665c337'
     """
+
     pairs = list(map(''.join, zip(word[:-1], word[1:])))
     pairs_count = dict(Counter(pairs))
     return hashlib.md5(str(pairs_count).encode()).hexdigest()

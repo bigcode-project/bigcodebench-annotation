@@ -50,6 +50,7 @@ def task_func(data, file_path, headers):
     ['hallo', '1', '-2']
     ['1', 'hi', 'hello']
     """
+
     if file_path is None:
         raise ValueError("The file path is invalid.")
     with open(file_path, 'w', newline='') as csvfile:

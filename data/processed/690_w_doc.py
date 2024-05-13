@@ -26,6 +26,7 @@ def task_func(df):
     >>> print(model)
     LinearRegression()
     """
+
     X = pd.DataFrame(df[['X']])  # Extracting column 'X' as a DataFrame
     y = pd.Series(df['Y'])       # Extracting column 'Y' as a Series
     model = LinearRegression().fit(X, y)

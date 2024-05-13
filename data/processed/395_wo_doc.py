@@ -40,6 +40,7 @@ def task_func(directory='./', file_pattern='*.txt', regex=r'([0-9]+)'):
     3        mixed.txt   [123, 456]
     4  non_numeric.txt           []
     """
+
     if not os.path.exists(directory):
         raise FileNotFoundError(f"The directory '{directory}' does not exist.")
     files = natsort.natsorted(glob.glob(os.path.join(directory, file_pattern)))

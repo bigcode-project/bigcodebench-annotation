@@ -30,6 +30,7 @@ def task_func(elements, subset_size, top_n=2):
     >>> list(sums)
     [5, 4]
     """
+
     if subset_size > len(elements) or subset_size <= 0:
         return 1, []
     combinations = list(itertools.combinations(elements, subset_size))

@@ -26,6 +26,7 @@ def task_func(data, column="c"):
     <Axes: >
     >>> task_func(pd.DataFrame({'a': ["foo", "bar"]}))
     """
+
     df = pd.DataFrame(data)
     if column in df.columns:
         df = df.drop(columns=column)

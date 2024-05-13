@@ -23,6 +23,7 @@ def task_func(df: pd.DataFrame, filename: str) -> str:
     >>> 'data.jsonl' in task_func(df, 'data.jsonl')
     True
     """
+
     start_time = time.time()
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)

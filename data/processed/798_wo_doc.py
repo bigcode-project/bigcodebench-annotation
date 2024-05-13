@@ -31,6 +31,7 @@ def task_func(directory):
     Note: 
     - This function will return the restored directory path on successful rollback, or an error message otherwise.
     """
+
     if not os.path.exists(BACKUP_DIR):
         return f'Backup directory {BACKUP_DIR} does not exist. Cannot rollback update.'
     backups = sorted(os.listdir(BACKUP_DIR))

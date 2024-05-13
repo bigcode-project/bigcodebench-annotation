@@ -51,6 +51,7 @@ def task_func(data, n_clusters=3, seed=None):
     >>> print(model)
     KMeans(n_clusters=3, n_init=10, random_state=213)
     """
+
     if not data.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()).all():
         raise ValueError("DataFrame should only contain numeric values.")
     kmeans = KMeans(n_clusters=n_clusters, random_state=seed, n_init=10)

@@ -26,6 +26,7 @@ def task_func(colors):
     >>> turtle.TurtleScreen._RUNNING
     True  # Check if the Turtle Graphics screen is running
     """
+
     window = turtle.Screen()
     window.bgcolor('white')
     t = turtle.Turtle()

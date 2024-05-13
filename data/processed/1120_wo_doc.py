@@ -24,6 +24,7 @@ def task_func(myString, API_KEY):
     >>> task_func("Check these links: http://www.google.com, https://www.python.org")
     {'www.google.com': {'status': 'success', 'country': 'United States', 'countryCode': 'US', 'region': 'CA', 'regionName': 'California', 'city': 'Mountain View', 'zip': '94043', 'lat': '37.4192', 'lon': '-122.0574', 'timezone': 'America/Los_Angeles', 'isp': 'Google LLC', 'org': 'Google LLC', 'as': 'AS15169 Google LLC', 'query': '172.217.12.142'}, 'www.python.org': {'status': 'success', 'country': 'United States', 'countryCode': 'US', 'region': 'OR', 'regionName': 'Oregon', 'city': 'Boardman', 'zip': '97818', 'lat': '45.8696', 'lon': '-119.688', 'timezone': 'America/Los_Angeles', 'isp': 'Amazon.com, Inc.', 'org': 'Amazon Data Services NoVa', 'as': 'AS16509 Amazon.com, Inc.', 'query': '151.101.193.223'}}
     """
+
     urls = re.findall(r'(https?://[^\s,]+)', myString)
     geo_data = {}
     for url in urls:

@@ -37,6 +37,7 @@ def task_func(animals=None, foods=None):
     - The function generates all possible combinations of the provided 'animals' and 'foods' using itertools.product.
     - The resulting pairs are shuffled randomly to ensure variety in the DataFrame layout.
     """
+
     if animals is None:
         animals = [
             "Dog",

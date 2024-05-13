@@ -27,6 +27,7 @@ def task_func(df):
     >>> print(df_scaled.iloc[0]['income'])
     0.0
     """
+
     scaler = MinMaxScaler(feature_range=(0, 1))
     df_grouped = df.groupby('id').apply(
         lambda x: pd.DataFrame(

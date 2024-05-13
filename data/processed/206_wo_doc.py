@@ -34,6 +34,7 @@ def task_func(file_name):
     >>> print(json_file.startswith('/tmp/report_') and json_file.endswith('.json'))
     True
     """
+
     if not os.path.exists(file_name):
         raise FileNotFoundError("File does not exist.")
     data = []

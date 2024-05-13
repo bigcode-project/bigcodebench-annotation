@@ -32,6 +32,7 @@ def task_func(db_name="test.db", table_name="People"):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     conn = sqlite3.connect(db_name)
     df = pd.read_sql_query(f"SELECT age from {table_name}", conn)
     if (df["age"] < 0).any():

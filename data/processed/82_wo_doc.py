@@ -41,6 +41,7 @@ def task_func(secret_key, template_folder):
     >>> app.config['SECRET_KEY'] == 'mysecretkey'
     True
     """
+
     app = Flask(__name__, template_folder=template_folder)
     app.config['SECRET_KEY'] = secret_key
     login_manager.init_app(app)

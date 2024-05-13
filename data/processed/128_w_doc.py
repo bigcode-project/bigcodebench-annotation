@@ -28,6 +28,7 @@ def task_func(POINTS=100):
         >>> isinstance(fig, matplotlib.figure.Figure)
         True
     """
+
     x = np.zeros(POINTS)
     y = np.zeros(POINTS)
     for i in range(1, POINTS):

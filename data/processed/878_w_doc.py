@@ -51,6 +51,7 @@ def task_func(data, target, test_size=0.2, random_state=None):
     2         3         4       4.2     7
     3        53         1      -2.0     1)
     """
+
     data = pd.DataFrame(data)
     if data.empty or target not in data.columns:
         raise ValueError("Data must not be empty and target column must exist in the DataFrame.")

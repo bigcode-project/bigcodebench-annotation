@@ -28,6 +28,7 @@ def task_func(x):
     >>> result[0]
     (7.69459862670642e-23+3.037941424911643e-09j)
     """
+
     if not isinstance(x, np.ndarray):
         raise TypeError("x must be numpy.ndarray")
     real_part = norm.pdf(x, 0, 1)

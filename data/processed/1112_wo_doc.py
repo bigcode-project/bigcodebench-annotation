@@ -35,6 +35,7 @@ def task_func(file_name="data.csv"):
     >>> task_func("data.csv")
     'path/to/data.csv'
     """
+
     with open(file_name, 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['Time'] + DATA)

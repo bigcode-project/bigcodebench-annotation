@@ -32,6 +32,7 @@ def task_func(range_start=-10, range_end=10, step=0.1):
     >>> print(next(data))
     (-10.0, 0.5440211108893698, -0.8390715290764524, 1.383092639965822)
     """
+
     if range_start>range_end:
         raise ValueError("range_start cannot be smaller than range_end.")
     x_values = np.arange(range_start, range_end, step)

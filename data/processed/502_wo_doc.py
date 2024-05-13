@@ -39,6 +39,7 @@ def task_func(days_in_past=7, random_seed=0):
     Date        Activity  Duration
     YYYY-MM-DD  Running   45
     """
+
     random.seed(random_seed)
     if days_in_past < 1:
         raise ValueError("days_in_past must be in the past")

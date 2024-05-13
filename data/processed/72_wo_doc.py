@@ -27,6 +27,7 @@ def task_func(directory):
     Example:
     >>> task_func('data_directory')
     """
+
     name = None
     for filename in os.listdir(directory):
         if filename.endswith('.csv'):

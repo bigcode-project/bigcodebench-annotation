@@ -47,6 +47,7 @@ def task_func(data, col1, col2):
     1.0
 
     """
+
     if data.empty:
         raise ValueError("The input DataFrame is empty.")
     if col1 not in data or col2 not in data:

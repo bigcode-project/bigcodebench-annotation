@@ -26,6 +26,7 @@ def task_func(my_list):
         >>> isinstance(result, np.ndarray)
         True
     """
+
     random_number = random.randint(0, 100)
     my_list.append(random_number)
     size = sum(my_list)

@@ -30,6 +30,7 @@ def task_func(points_count=1000, radius=1):
     500
     >>> plt.close()
     """
+
     points = [(radius * math.sqrt(random.random()) * math.cos(2 * math.pi * random.random()), 
                radius * math.sqrt(random.random()) * math.sin(2 * math.pi * random.random())) 
               for _ in range(points_count)]

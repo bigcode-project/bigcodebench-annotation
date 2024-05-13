@@ -26,6 +26,7 @@ def task_func(L):
     >>> type(pca_result)
     <class 'numpy.ndarray'>
     """
+
     data = np.array(L)
     pca = PCA(n_components=N_COMPONENTS)
     pca_result = pca.fit_transform(data)

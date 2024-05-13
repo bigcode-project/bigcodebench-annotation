@@ -25,6 +25,7 @@ def task_func(dir_path: str) -> list:
     >>> task_func('another/directory/path')
     ['anotherFile1', 'anotherFile2']
     """
+
     new_names = []
     for file_path in glob.glob(os.path.join(dir_path, '*')):
         base_name = os.path.basename(file_path)

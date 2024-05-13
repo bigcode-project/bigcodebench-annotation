@@ -21,6 +21,7 @@ def task_func():
     >>> task_func()
     
     """
+
     FILE_NAME = 'task_func_data/Output.txt'
     FIELDS = ['Timestamp', 'Temperature', 'Humidity']
     os.makedirs(os.path.dirname(FILE_NAME), exist_ok=True)

@@ -24,6 +24,7 @@ def task_func(text):
     1     90  Science
     2     80     Math
     """
+
     pattern = r"Score: (.*?), Category: (.*?)(\n|$)"
     matches = re.findall(pattern, text)
     data = [

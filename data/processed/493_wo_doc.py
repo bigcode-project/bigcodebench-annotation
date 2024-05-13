@@ -36,6 +36,7 @@ def task_func(
     >>> type(ax)
     <class 'matplotlib.figure.Figure'>
     """
+
     random.seed(random_seed)
     if (not isinstance(teams, list)) or (not all(isinstance(t, str) for t in teams)):
         raise TypeError("Expected teams to be list of str")

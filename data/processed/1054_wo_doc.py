@@ -47,6 +47,7 @@ def task_func(file_path):
     function reads this file, samples 30 values, computes their mean and standard deviation, and plots
     a histogram with a normal distribution curve.
     """
+
     try:
         with open(file_path, "r", encoding="utf-8") as file:
             reader = csv.reader(file)

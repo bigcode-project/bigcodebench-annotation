@@ -49,6 +49,7 @@ def task_func(obj_list, attr):
     1     Circle      1
     2  Rectangle      2
     """
+
     attr_values = [getattr(obj, attr) for obj in obj_list]
     count = collections.Counter(attr_values)
     if len(count.keys()) == 0:

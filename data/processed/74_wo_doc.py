@@ -31,6 +31,7 @@ def task_func(host):
     - socket
     - requests
     """
+
     if not host:
         raise ValueError("Host must be a non-empty string.")
     try:

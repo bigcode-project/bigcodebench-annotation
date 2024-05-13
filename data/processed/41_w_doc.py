@@ -28,6 +28,7 @@ def task_func(data_matrix):
     0  0.122440
     1  0.403407
     """
+
     skewness = skew(data_matrix, axis=1)
     df = pd.DataFrame(skewness, columns=["Skewness"])
     plt.figure(figsize=(10, 5))

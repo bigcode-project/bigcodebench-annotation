@@ -28,6 +28,7 @@ def task_func(text, n, top_k):
     >>> type(task_func('This is a sample text for testing.', 2, 5))
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     blob = TextBlob(text.lower())
     words_freq = Counter([' '.join(list(span)) for span in blob.ngrams(n=n)])  # Get n-grams and count frequency
     words_freq_filtered = words_freq.most_common(top_k)  # Get top k n-grams

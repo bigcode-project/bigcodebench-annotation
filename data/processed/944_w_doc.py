@@ -30,6 +30,7 @@ def task_func(start_date='2016-01-01', periods=13, freq='WOM-2FRI', seed=0):
     >>> ax.title.get_text()
     'Stock Prices'
     """
+
     if seed is not None:
         np.random.seed(seed)
     date_range = pd.date_range(start=start_date, periods=periods, freq=freq)

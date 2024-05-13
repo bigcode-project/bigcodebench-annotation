@@ -27,6 +27,7 @@ def task_func(db_path: str, table_name: str, column_name: str) -> pd.DataFrame:
     >>> df.loc[1, 'text']  # Assuming the second row originally contained "Good\nMorning"
     'Good<br>Morning'
     """
+
     try:
         conn = sqlite3.connect(db_path)
         df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)

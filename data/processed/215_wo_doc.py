@@ -38,6 +38,7 @@ def task_func(url, parameters):
     >>> df.iloc[0]['data']
     1
     """
+
     try:
         response = requests.get(url, params=parameters, headers=HEADERS)
         data = json.loads(response.text)

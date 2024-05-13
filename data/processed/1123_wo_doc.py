@@ -28,6 +28,7 @@ def task_func(myString):
     >>> task_func("Check these links: https://www.google.com, https://www.python.org")
     {'www.google.com': '2023-06-15 12:00:00', 'www.python.org': '2023-07-20 12:00:00'}
     """
+
     urls = re.findall(r'https://[^\s,]+', myString)
     ssl_expiry_dates = {}
     for url in urls:

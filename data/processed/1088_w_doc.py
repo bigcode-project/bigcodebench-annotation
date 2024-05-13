@@ -31,6 +31,7 @@ def task_func(data=None):
     0  0.175481  1.062315  0.244316 -0.17039 -0.647463
     1  0.461851 -0.978767  1.052947  1.06408 -0.647463
     """
+
     if data is None:
         data = np.random.rand(100, 5)
     df = pd.DataFrame(data)

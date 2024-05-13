@@ -41,6 +41,7 @@ def task_func(url, column_name, csv_file_path):
     - The downloaded CSV file is deleted after its contents have been processed.
     - The function only counts values in the specified column and ignores other data.
     """
+
     urllib.request.urlretrieve(url, csv_file_path)
     with open(csv_file_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)

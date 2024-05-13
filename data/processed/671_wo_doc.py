@@ -22,6 +22,7 @@ def task_func(directory, n):
     >>> task_func('/path/to/directory', 1)
     '/path/to/directory'
     """
+
     if not os.path.exists(directory):
         os.makedirs(directory)
     for i in range(n):

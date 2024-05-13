@@ -23,6 +23,7 @@ def task_func(dt):
     >>> loaded_dt = task_func(dt)
     >>> assert dt == loaded_dt
     """
+
     with open(FILE_NAME, 'wb') as file:
         pickle.dump(dt, file)
     with open(FILE_NAME, 'rb') as file:

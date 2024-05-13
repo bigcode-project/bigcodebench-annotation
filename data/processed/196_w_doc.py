@@ -31,6 +31,7 @@ def task_func(length, range_limit=100, seed=0):
     >>> isinstance(ax, plt.Axes)
     True
     """
+
     if range_limit <= 1:
         raise ValueError("range_limit must be greater than 1")
     random.seed(seed)

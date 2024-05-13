@@ -33,6 +33,7 @@ def task_func(column, data):
     >>> type(results)
     <class 'dict'>
     """
+
     valid_columns = ["Date", "Open", "High", "Low", "Close", "Volume"]
     if column not in valid_columns:
         raise ValueError(f"Invalid column name.")

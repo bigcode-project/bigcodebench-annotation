@@ -29,6 +29,7 @@ def task_func(df, col):
     3  23   2  52        False
     4   1  87  37         True
     """
+
     updated_df = pd.DataFrame(df).drop(col, axis=1)
     updated_df['IsEvenIndex'] = np.arange(len(updated_df)) % 2 == 0
     return updated_df

@@ -37,6 +37,7 @@ def task_func(result):
     >>> print(square_roots)
     [4. 3.]
     """
+
     from_user_values = [d['from_user'] for d in result if 'from_user' in d]
     square_roots = np.round(np.sqrt(from_user_values), 2)
     plt.figure()

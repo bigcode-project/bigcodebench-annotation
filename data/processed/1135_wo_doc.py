@@ -25,6 +25,7 @@ def task_func(user, API_URL = 'https://api.github.com/users/'):
     >>> task_func('octocat')
     ['Spoon-Knife', 'Hello-World', 'octocat.github.io']  # Example output, actual results may vary.
     """
+
     response = requests.get(API_URL + user + '/repos')
     data = json.loads(response.text)
     repos = {repo['name']: repo['created_at'] for repo in data}

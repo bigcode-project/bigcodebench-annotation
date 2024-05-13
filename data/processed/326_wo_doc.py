@@ -24,6 +24,7 @@ def task_func(directory_path):
     >>> task_func("path/to/directory")
     [("file1.bat", 0), ("file2.bat", 1)]
     """
+
     results = []
     file_paths = glob.glob(os.path.join(directory_path, '*.bat'))
     for file_path in file_paths:

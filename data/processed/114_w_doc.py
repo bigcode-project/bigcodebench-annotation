@@ -31,6 +31,7 @@ def task_func(my_dict):
     >>> isinstance(result['normalized_array'], np.ndarray)
     True
     """
+
     if not isinstance(my_dict["array"], np.ndarray):
         raise TypeError
     SCALER = MinMaxScaler()

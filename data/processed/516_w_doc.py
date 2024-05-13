@@ -36,6 +36,7 @@ def task_func(
     0  1  2  3  4         5
     1  6  7  8  9        10
     """
+
     COLUMNS = ["A", "B", "C", "D", "Response"]
     np.random.seed(random_seed)
     if not all(len(row) == len(COLUMNS) for row in array):

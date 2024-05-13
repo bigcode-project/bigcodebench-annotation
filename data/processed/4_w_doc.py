@@ -24,6 +24,7 @@ def task_func(d):
     >>> print(count_dict)
     {1: 3, 2: 2, 3: 2, 4: 1, 5: 1}
     """
+
     count_dict = Counter(itertools.chain.from_iterable(d.values()))
     return dict(count_dict)
 

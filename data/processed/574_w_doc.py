@@ -22,6 +22,7 @@ def task_func(array_length=100, noise_level=0.2):
     Example:
     >>> ax = task_func(100, 0.2)
     """
+
     x = np.linspace(0, 4*np.pi, array_length)
     y = np.sin(x) + noise_level * np.random.rand(array_length)
     def func(x, a, b):

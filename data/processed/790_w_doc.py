@@ -38,6 +38,7 @@ def task_func(df, col1, col2, N=10):
     >>> print(indices)   
     [2, 3, 0, 1]
     """
+
     if col1 not in df.columns or col2 not in df.columns:
         raise ValueError(f"Columns {col1} or {col2} not found in the DataFrame.")
     scaler = StandardScaler()

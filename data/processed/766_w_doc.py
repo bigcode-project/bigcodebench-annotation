@@ -29,6 +29,7 @@ def task_func(string, patterns=['nnn', 'aaa', 'sss', 'ddd', 'fff']):
     >>> task_func('123kajhdlkfah12345k,jk123', patterns=['123', '1234'])
     {'123': 3, '1234': 1}
     """
+
     if not isinstance(string, str):
         raise TypeError("Input string should be of type string.")
     if not isinstance(patterns, list):

@@ -33,6 +33,7 @@ def task_func(days_in_past=7):
     >>> task_func(3)
     'Friday'
     """
+
     if days_in_past < 0:
         raise ValueError("Days in the past cannot be negative")
     date = datetime.now(pytz.UTC) - timedelta(days=days_in_past)

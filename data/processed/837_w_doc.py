@@ -40,6 +40,7 @@ def task_func(n_rows, scale_cols, columns=['A', 'B', 'C', 'D', 'E'], random_seed
     3  75  0.611694 -1.121896  0.782984  13
     4  82  1.075099  0.802925  0.358109  35
     """
+
     np.random.seed(random_seed)
     df = pd.DataFrame(np.random.randint(0, 100, size=(n_rows, len(columns))), columns=columns)
     for i in scale_cols:

@@ -28,6 +28,7 @@ def task_func(rows=3, cols=2, min_val=0, max_val=100, seed=0):
     >>> print(df.shape)
     (3, 2)
     """
+
     random.seed(seed)
     if min_val == max_val:
         matrix = np.full((rows, cols), min_val)

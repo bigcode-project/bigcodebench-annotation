@@ -34,6 +34,7 @@ def task_func(text1, text2):
     >>> task_func("Hello, World!", "Hello World")
     (0.9999999999999998, 0.9565217391304348)
     """
+
     text1 = ALPHANUMERIC.sub(' ', text1).lower()
     text2 = ALPHANUMERIC.sub(' ', text2).lower()
     vec1 = Counter(text1.split())

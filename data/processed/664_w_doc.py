@@ -30,6 +30,7 @@ def task_func(sales_data):
     >>> ax = task_func(sales_data)
     >>> plt.show()  # Displays the plot
     """
+
     fig, ax = plt.subplots()
     for label in sales_data.columns[1:]:  # Skipping 'Month' column
         monthly_sales = sales_data[label]

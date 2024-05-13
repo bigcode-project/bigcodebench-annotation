@@ -39,6 +39,7 @@ def task_func(excel_directory: str, file_name: str, column_name: str, start_date
     - pandas
     - datetime
     """
+
     excel_file = os.path.join(excel_directory, file_name)
     if not os.path.exists(excel_file):
         raise FileNotFoundError(f"The file {excel_file} does not exist.")

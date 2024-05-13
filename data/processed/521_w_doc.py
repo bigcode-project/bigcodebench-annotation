@@ -30,6 +30,7 @@ def task_func(data_list):
     >>> ax.get_xticklabels()
     [Text(-0.25, 0, '−0.25'), Text(0.0, 0, '0.00'), Text(0.25, 0, '0.25'), Text(0.5, 0, '0.50'), Text(0.75, 0, '0.75'), Text(1.0, 0, '1.00'), Text(1.25, 0, '1.25'), Text(1.5, 0, '1.50'), Text(1.75, 0, '1.75'), Text(2.0, 0, '2.00'), Text(2.25, 0, '2.25')]
     """
+
     df = pd.DataFrame(data_list)
     fig, ax = plt.subplots()
     for column in df:

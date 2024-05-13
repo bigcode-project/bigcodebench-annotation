@@ -29,6 +29,7 @@ def task_func(df):
         >>> pca_df, ax = task_func(df)
         >>> plt.show()
     """
+
     if not isinstance(df, pd.DataFrame):
         raise ValueError("Input must be a DataFrame")
     if df.empty:

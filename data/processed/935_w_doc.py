@@ -33,6 +33,7 @@ def task_func(word):
     Raises:
     - ValueError: If the input word is not in lowercase or contains non-alphabetic characters.
     """
+
     if not word:  # Check if the input word is empty and return an empty DataFrame
         return pd.DataFrame({'Letter': [], 'Position': []})
     elif not word.isalpha() or not word.islower():

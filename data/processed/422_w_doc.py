@@ -43,6 +43,7 @@ def task_func(df, target_column, column_to_remove="c", test_size=0.2):
     >>> type(y_test), y_test.shape
     (<class 'pandas.core.series.Series'>, (1,))
     """
+
     df = pd.DataFrame(df)
     if column_to_remove in df.columns:
         df = df.drop(columns=column_to_remove)

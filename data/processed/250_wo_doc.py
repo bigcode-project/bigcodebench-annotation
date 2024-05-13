@@ -27,6 +27,7 @@ def task_func(data_list, json_file_name="mean_values.json"):
     >>> task_func([('a', 1, 2), ('b', 2, 3), ('c', 3, 4), ('d', 4, 5), ('e', 5, 6)], json_file.name)
     {'Position 1': 3.0, 'Position 2': 4.0}
     """
+
     unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
     mean_values = [np.nanmean(column) for column in unzipped_data[1:]]
     results = {'Position {}'.format(i+1): mean_value for i, mean_value in enumerate(mean_values)}

@@ -28,6 +28,7 @@ def task_func(directory, backup_directory):
     >>> all(file.endswith('.json') for file in task_func(directory, backup_directory))
     True
     """
+
     copied_files = []
     if not os.path.exists(backup_directory):
         os.makedirs(backup_directory)

@@ -25,6 +25,7 @@ def task_func(directory):
     >>> task_func('/another/path/to/json/files')
     {'is_': 8, 'has_': 6, 'can_': 1, 'should_': 4}
     """
+
     stats = {prefix: 0 for prefix in PREFIXES}
     for filename in os.listdir(directory):
         if filename.endswith('.json'):

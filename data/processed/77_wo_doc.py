@@ -48,6 +48,7 @@ def task_func(data):
     - hashlib
     - binascii
     """
+
     try:
         username = data['username']
         password = base64.b64decode(data['password']).decode()

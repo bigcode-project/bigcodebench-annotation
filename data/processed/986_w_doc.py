@@ -34,6 +34,7 @@ def task_func(json_data: str, key_path: list):
     >>> isinstance(fig, plt.Figure)
     True
     """
+
     try:
         data = json.loads(json_data)
         for key in key_path:

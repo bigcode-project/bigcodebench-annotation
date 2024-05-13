@@ -38,6 +38,7 @@ def task_func(url, download_path="mnt/data/downloads/"):
     >>> task_func('https://example.com/file.zip')
        'mnt/data/downloads/file'
     """
+
     if not os.path.exists(download_path):
         os.makedirs(download_path)
     try:

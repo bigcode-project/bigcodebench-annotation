@@ -32,6 +32,7 @@ def task_func(excel_file_path, file_name, column_name):
     >>> print(stats)
     {'mean': 200.0, 'median': 200.0, 'std_dev': 70.71067811865476}
     """
+
     excel_file = os.path.join(excel_file_path, file_name)
     if not os.path.exists(excel_file):
         raise FileNotFoundError(f"No file found at {excel_file}")

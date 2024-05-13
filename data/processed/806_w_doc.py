@@ -32,6 +32,7 @@ def task_func(text, n=2):
     >>> print(ngrams)
     Counter({('quick', 'brown'): 1, ('brown', 'fox'): 1, ('fox', 'jumps'): 1, ('jumps', 'lazy'): 1, ('lazy', 'dog'): 1, ('dog', 'dog'): 1, ('dog', 'quick'): 1, ('quick', 'respond'): 1})
     """
+
     text = re.sub(r'[^\w\s]', '', text)  # Remove all punctuation
     text = re.sub(r'\s+', ' ', text)  # Normalize whitespace
     words = [word.lower() for word in text.split() if word.lower() not in STOPWORDS]

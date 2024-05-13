@@ -28,6 +28,7 @@ def task_func(a, b, columns=['A', 'B']):
         >>> isinstance(df, pd.DataFrame) and isinstance(ax, matplotlib.axes.Axes)
         True
     """
+
     if len(a) == 0 or len(b) == 0:
         fig, ax = plt.subplots()
         plt.close(fig)  # Prevent empty plot from displaying

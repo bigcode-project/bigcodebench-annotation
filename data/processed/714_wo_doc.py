@@ -29,6 +29,7 @@ def task_func(path_to_append=PATH_TO_APPEND):
     "/path/to/whatever"
 
     """
+
     Path(path_to_append).mkdir(parents=True, exist_ok=True)
     sys.path.append(path_to_append)
     return path_to_append

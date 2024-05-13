@@ -26,6 +26,7 @@ def task_func(word):
     >>> task_func('xyz')
     ['yz', 'yz', 'yz']
     """
+
     if not all(char in string.ascii_letters for char in word):
         raise ValueError("Input must only contain letters.")
     if len(word) < 2:

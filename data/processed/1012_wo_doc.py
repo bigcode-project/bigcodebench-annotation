@@ -32,6 +32,7 @@ def task_func(url, filename):
     >>> task_func('http://example.com/myfile.zip', 'myfile.zip')
     ('Download and extraction successful', ['file1.txt', 'file2.txt'])
     """
+
     try:
         response = requests.get(url, stream=True, timeout=5)
         if response.status_code == 200:

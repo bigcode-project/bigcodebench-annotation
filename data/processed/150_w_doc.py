@@ -33,6 +33,7 @@ def task_func(product_dict, product_keys):
     1  Banana       120    1.5   180.0            2.0           215.0
 
     """
+
     columns = ['Product', 'Quantity', 'Price', 'Profit']
     data = []
     for key in product_keys:

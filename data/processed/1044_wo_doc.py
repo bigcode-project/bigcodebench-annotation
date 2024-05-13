@@ -42,6 +42,7 @@ def task_func(date_str, booking_data):
     3  Room4     Not Listed
     4  Room5     Not Listed
     """
+
     try:
         date = datetime.strptime(date_str, "%Y-%m-%d")
         if date < datetime.now():

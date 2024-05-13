@@ -27,6 +27,7 @@ def task_func(example_str, top_n=30):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     text = ' '.join(re.findall('(.*?)\\[.*?\\]', example_str))
     words = text.split()
     fdist = FreqDist(words)

@@ -32,6 +32,7 @@ def task_func(products, ratings, weights, random_seed=42):
     3      Airpods       3
     1         iPad       1
     """
+
     seed(random_seed)  # Setting the seed for reproducibility
     product_ratings = []
     for product in products:

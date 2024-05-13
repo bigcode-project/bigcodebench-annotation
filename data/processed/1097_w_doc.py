@@ -32,6 +32,7 @@ def task_func(text):
     >>> task_func('Visit https://www.python.org for more info. I love to eat apples.')
     'Visit info love eat apples'
     """
+
     PUNCTUATION = set(punctuation)
     text = re.sub('http[s]?://\S+', '', text)
     text = re.sub('[{}]'.format(re.escape(''.join(PUNCTUATION))), '', text)

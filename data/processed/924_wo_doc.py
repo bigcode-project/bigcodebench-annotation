@@ -27,6 +27,7 @@ def task_func(file_path: str, column_name: str) -> pd.DataFrame:
     >>> print(df['Comments'].iloc[1])
     "hello<br>world"
     """
+
     if not os.path.exists(file_path):
         print(f'File does not exist: {file_path}')
         sys.exit(1)

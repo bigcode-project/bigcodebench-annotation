@@ -27,6 +27,7 @@ def task_func(directory):
     >>> task_func('./another_directory/')
     ['./another_directory/file{3}.png']
     """
+
     BRACKET_PATTERN = '[(){}\\[\\]]'  # Corrected pattern to match any type of bracket
     file_list = []
     for root, dirs, files in os.walk(directory):

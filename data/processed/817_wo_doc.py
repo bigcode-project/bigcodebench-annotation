@@ -57,6 +57,7 @@ def task_func(letter_list, element, log_path):
     <BLANKLINE>
 
     """
+
     formatter = logging.Formatter('%(levelname)s:%(message)s')
     handler = logging.FileHandler(log_path+'/task_func.log', mode='w')
     logger = logging.getLogger()

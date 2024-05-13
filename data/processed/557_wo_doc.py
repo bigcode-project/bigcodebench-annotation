@@ -32,6 +32,7 @@ def task_func(s_list, plot_path=None):
     True
     >>> os.remove('similarity_plot.png')
     """
+
     if not all(isinstance(item, str) for item in s_list):
         raise ValueError("All items in s_list must be strings.")
     avg_scores = []

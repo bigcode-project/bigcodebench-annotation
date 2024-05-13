@@ -30,6 +30,7 @@ def task_func(api_url, template_folder):
     >>> type(api).__name__
     'Api'
     """
+
     app = Flask(__name__, template_folder=template_folder)
     api = Api(app)
     class DataResource(Resource):

@@ -24,6 +24,7 @@ def task_func(hex_string=KEY):
     >>> task_func("ABCD1234")
     b'x\\x9c\\xf3\\xd7>+\\x04\\x00\\x03m\\x01Z'
     """
+
     binary_float = struct.pack('!f', int(hex_string, 16))
     compressed_data = zlib.compress(binary_float)
     return compressed_data

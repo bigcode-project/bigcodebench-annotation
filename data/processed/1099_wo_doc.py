@@ -38,6 +38,7 @@ def task_func(text):
     - Valid url is start with http or https
     - The capitilization need to macth the stopwords
     """
+
     text = re.sub('http[s]?://\S+', '', text)
     words = re.findall(r'\b\w+\b', text)
     word_freq = Counter(words)

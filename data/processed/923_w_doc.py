@@ -33,6 +33,7 @@ def task_func(person_names, email_domains, num_records=5):
         Name                 Email
     0  Alice  alice[at]outlook.com
     """
+
     if len(person_names) < num_records or len(email_domains) == 0:
         raise ValueError("Insufficient number of names or domains provided.")
     data = []

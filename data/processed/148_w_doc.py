@@ -23,6 +23,7 @@ def task_func(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
     >>> encoded_df['fruit'].tolist()
     [0, 1, 2, 0, 1]
     """
+
     le = LabelEncoder()
     df[column_name] = le.fit_transform(df[column_name])
     return df

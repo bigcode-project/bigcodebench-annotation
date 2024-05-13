@@ -24,6 +24,7 @@ def task_func(L):
     Example:
     >>> ax = task_func([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     '''
+
     data = list(chain(*L))
     mu, std = norm.fit(data)
     fig, ax = plt.subplots()

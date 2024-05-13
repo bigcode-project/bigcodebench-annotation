@@ -72,6 +72,7 @@ def task_func(start_year=1980, end_year=2000, email_domain='example.com',
     <BLANKLINE>
     [100 rows x 4 columns]
     """
+
     latin_names = [codecs.encode(name, 'utf-8').decode('utf-8') for name in latin_names]
     if rng_seed is not None:
         np.random.seed(rng_seed)

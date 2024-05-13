@@ -41,6 +41,7 @@ def task_func(data):
     - The function assumes that each product name in the 'Product' list has a corresponding price in the 'Price_String' list.
     - The histogram plot's appearance (like color, alpha, and rwidth) is pre-set but can be customized further if needed.
     """
+
     df = pd.DataFrame(data)
     df["Price_Float"] = df["Price_String"].apply(lambda x: float(x.replace(",", "")))
     mean_price = np.mean(df["Price_Float"])

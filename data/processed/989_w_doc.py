@@ -37,6 +37,7 @@ def task_func(length: int, predicates: list, seed: int = None):
     >>> task_func(5, ['has_lowercase'], seed=123)
     ('eiMk[', {'has_lowercase': True})
     """
+
     if seed is not None:
         random.seed(seed)
     if length < 0:

@@ -31,6 +31,7 @@ def task_func(data_list):
     >>> task_func([(1, 'a', 2), ('a', 3, 5), ('c', 1, -2)])
     [1.0, 2.0, 1.6666666666666667]
     """
+
     unzipped_data = list(itertools.zip_longest(*data_list, fillvalue=np.nan))
     mean_values = [np.nanmean([val for val in column if isinstance(val, (int, float))]) for column in unzipped_data]
     return mean_values

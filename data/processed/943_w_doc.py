@@ -29,6 +29,7 @@ def task_func(start_date='2016-01-01', periods=24, freq='M', model='additive'):
     >>> len(result['seasonal'])
     24
     """
+
     date_range = pd.date_range(start=start_date, periods=periods, freq=freq)
     sales_data = np.random.randint(low=100, high=500, size=periods)
     sales_series = pd.Series(sales_data, index=date_range)

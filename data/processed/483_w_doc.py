@@ -39,6 +39,7 @@ def task_func(df: pd.DataFrame, column_name: str, pattern: str) -> pd.DataFrame:
     0      yellow car red  3
     1  green apple yellow  4
     """
+
     def reverse_matched_words(text):
         words = text.split()
         matched_words = [word for word in words if re.search(pattern, word)][::-1]

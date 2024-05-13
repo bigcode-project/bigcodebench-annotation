@@ -42,6 +42,7 @@ def task_func(data_dir='./data/'):
     +-----------+------+---------+
     >>> tear_down_dummy_files(data_dir, dummy_files)
     """
+
     if not os.path.exists(data_dir):
         raise FileNotFoundError(f"The directory '{data_dir}' does not exist.")
     data_files = sorted(glob.glob(os.path.join(data_dir, '*.csv')))

@@ -29,6 +29,7 @@ def task_func(directory, backup_dir='/path/to/backup'):
     >>> task_func('/path/to/logs', '/alternative/backup/dir')
     '/alternative/backup/dir/logs_backup.tar.gz'
     """
+
     if not os.path.exists(directory):
         raise FileNotFoundError(f"Directory '{directory}' not found.")
     log_files = glob.glob(os.path.join(directory, '*.log'))

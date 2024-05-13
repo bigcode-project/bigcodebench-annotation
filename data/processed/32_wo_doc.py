@@ -20,6 +20,7 @@ def task_func(url, tag):
     >>> task_func("https://www.google.com/", "title")
     'Google'
     """
+
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
     tag_content = soup.find(tag)

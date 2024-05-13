@@ -31,6 +31,7 @@ def task_func(max_length, n_samples, seed=None):
     ['ou', 'g', 'tmjf', 'avlt', 's', 'sfy', 'aao', 'rzsn']
 
     """
+
     if max_length < 1:
         raise ValueError("max_length must be larger than or equal to 1.")
     LETTERS = string.ascii_lowercase

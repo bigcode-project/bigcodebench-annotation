@@ -32,6 +32,7 @@ def task_func(filepath):
     >>> 'libc.so.6' in result
     True
     """
+
     lib = ctypes.CDLL(filepath)
     with open(filepath, 'rb') as f:
         data = f.read()

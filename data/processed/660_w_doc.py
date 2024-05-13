@@ -28,6 +28,7 @@ def task_func(x, y, labels):
     >>> fig = task_func(x, y, labels)
     >>> plt.show()
     """
+
     scaler = StandardScaler()
     fig, ax = plt.subplots()
     for i in range(len(x)):

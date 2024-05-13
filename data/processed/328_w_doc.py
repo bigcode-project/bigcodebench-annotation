@@ -29,6 +29,7 @@ def task_func(number_teams=5):
     >>> print(ranking)
     OrderedDict([('Team 4', 50), ('Team 5', 40), ('Team 1', 30), ('Team 2', 20), ('Team 3', 10)])
     """
+
     TEAMS = []
     POINTS = []
     for i in range(1, number_teams+1):

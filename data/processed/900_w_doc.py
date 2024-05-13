@@ -27,6 +27,7 @@ def task_func(d):
     >>> task_func([{'a': 1}])
     {'x': None, 'y': None, 'z': None}
     """
+
     if not isinstance(d, list) or any(not isinstance(item, dict) for item in d):
         raise ValueError("Input must be a list of dictionaries.")
     if not d:

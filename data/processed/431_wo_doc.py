@@ -39,6 +39,7 @@ def task_func(image_file: str) -> np.ndarray:
     - The histogram array is 1D with a size of 256, where each index corresponds to a pixel value, and the value at each index
       represents the count of pixels in the image with that pixel value.
     """
+
     if not os.path.exists(image_file):
         raise FileNotFoundError(f"The file {image_file} does not exist.")
     img = cv2.imread(image_file, cv2.IMREAD_GRAYSCALE)

@@ -21,6 +21,7 @@ def task_func(x):
     >>> task_func({'a': 1, 'b': -2, 'c': -5, 'd': 4})
     ['b', 'c']
     """
+
     min_length = math.inf
     min_subseq = []
     for r in range(1, len(x) + 1):

@@ -34,6 +34,7 @@ def task_func(df: pd.DataFrame) -> tuple:
     >>> print(histplot_ax.get_title())
     Histogram of Closing Prices
     """
+
     fig, axes = plt.subplots(1, 2, figsize=(12, 6))
     boxplot_ax = sns.boxplot(x=df['closing_price'], ax=axes[0])
     boxplot_ax.set_title('Box Plot of Closing Prices')

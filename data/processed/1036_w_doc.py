@@ -31,6 +31,7 @@ def task_func(s1, s2):
     >>> ax.get_title()
     'Overlap Between Series1 and Series2'
     """
+
     intersection = set(s1).intersection(set(s2))
     df1 = pd.DataFrame({s1.name: s1, "Type": "Series1"})
     df2 = pd.DataFrame({s2.name: s2, "Type": "Series2"})

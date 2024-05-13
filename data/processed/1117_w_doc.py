@@ -32,6 +32,7 @@ def task_func(department_data):
     >>> print(level_data_json)
     {"EMP$$": ["Mid", "Mid", "Junior", "Mid", "Senior", "Mid", "Mid", "Mid", "Mid", "Mid"], "MAN$$": ["Senior", "Junior", "Senior", "Junior", "Mid"], "DEV$$": ["Junior", "Junior", "Senior", "Mid", "Senior", "Senior", "Senior", "Junior"], "HR$$": ["Mid", "Junior", "Senior", "Junior", "Senior", "Mid", "Mid"]}
     """
+
     level_data = collections.defaultdict(list)
     for prefix, num_employees in department_data.items():
         if prefix not in PREFICES:

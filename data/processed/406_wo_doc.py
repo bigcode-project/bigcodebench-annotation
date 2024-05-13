@@ -31,6 +31,7 @@ def task_func(img_path, angle):
     >>> original_img_array, rotated_img_array = task_func(img_path, 45)
     >>> os.remove(img_path)
     """
+
     if not os.path.exists(img_path):
         raise FileNotFoundError(f"No file found at {img_path}")
     img = Image.open(img_path)

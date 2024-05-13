@@ -28,6 +28,7 @@ def task_func(file_path):
     >>> len(task_func('empty.txt')) > 0
     True
     """
+
     with open(file_path, 'rb') as f:
         content = f.read()
     hash_output = hashlib.sha256(content).digest()

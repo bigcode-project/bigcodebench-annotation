@@ -28,6 +28,7 @@ def task_func(filename, data):
     >>> print(written_data)  # This should print: {'key': 'value'}
     {'key': 'value'}
     """
+
     try:
         with open(filename, 'w') as f:
             json.dump(data, f)

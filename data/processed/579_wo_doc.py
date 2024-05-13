@@ -38,6 +38,7 @@ def task_func(csv_file):
     Note:
     The function assumes that the CSV file contains text data and that the file is properly formatted.
     """
+
     try:
         words = []
         with open(csv_file, 'r') as file:

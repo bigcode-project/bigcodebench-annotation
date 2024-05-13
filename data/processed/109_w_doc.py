@@ -35,6 +35,7 @@ def task_func(df, items=None, locations=None):
     >>> ax.get_title()
     'Item Distribution by Location'
     """
+
     if not isinstance(df, pd.DataFrame) or not all(col in df.columns for col in ['Item', 'Location']):
         raise ValueError("Invalid 'df': must be a DataFrame with 'Item' and 'Location' columns.")
     items = items or ['apple', 'banana', 'grape', 'orange', 'pineapple']

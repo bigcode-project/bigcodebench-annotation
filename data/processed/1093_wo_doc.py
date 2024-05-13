@@ -23,6 +23,7 @@ def task_func(text_file: str) -> list:
     >>> f_1008("another_sample.txt")
     [{'name': 'John', 'age': 30}, {'name': 'Jane', 'age': 25}]
     """
+
     with open(text_file, 'r') as file:
         text = file.read()
     pattern = re.compile(r"\{[^{}]*\{[^{}]*\}[^{}]*\}|\{[^{}]*\}")

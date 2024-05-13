@@ -27,6 +27,7 @@ def task_func(n, pattern):
     >>> bool(re.match('^[A-Z]+$', task_func(3, '^[A-Z]+$')))
     True
     """
+
     while True:
         s = ''.join(choice(string.ascii_letters) for _ in range(n))
         if re.match(pattern, s):

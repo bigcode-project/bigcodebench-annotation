@@ -24,6 +24,7 @@ def task_func(url, destination_directory, headers=None):
     >>> print(extracted_files)
     ['file1.txt', 'file2.csv']
     """
+
     if headers is None:
         headers = {
             'accept': 'application/octet-stream'

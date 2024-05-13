@@ -41,6 +41,7 @@ def task_func(hours, output_dir=OUTPUT_DIR):
     >>> isinstance(ax, matplotlib.axes.Axes)
     True
     """
+
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     FILE_PATH = os.path.join(output_dir, 'traffic_data.csv')

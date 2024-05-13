@@ -42,6 +42,7 @@ def task_func(num_samples=1000, k=5, d=2,  random_seed=None):
     >>> print(mse)
     0.001113785307245742
     """
+
     if random_seed is not None:
         np.random.seed(random_seed)
     data = np.random.randn(num_samples, 1)*k + d

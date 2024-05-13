@@ -21,6 +21,7 @@ def task_func(url):
     >>> task_func('https://www.google.com')
     0
     """
+
     if platform.system() == 'Darwin':
         cmd = 'open'
     elif platform.system() == 'Windows':

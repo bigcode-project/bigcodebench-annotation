@@ -37,6 +37,7 @@ def task_func(df, freq='D', decomposition_model='multiplicative'):
     >>> result, ax = task_func(df, freq='D', decomposition_model='multiplicative')
     >>> plt.show()  # This will display the plot with title 'Time Series Decomposition' and y-axis labeled 'Value'
     """
+
     required_columns = ['group', 'date', 'value']
     if not isinstance(df, pd.DataFrame) or not all(col in df.columns for col in required_columns):
         raise ValueError("Invalid 'df': must be a DataFrame with 'group', 'date', and 'value' columns.")

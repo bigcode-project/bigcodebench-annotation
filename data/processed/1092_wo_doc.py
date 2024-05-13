@@ -27,6 +27,7 @@ def task_func(url):
     >>> task_func('https://example.com')
     [{'key': 'value'}, ...]
     """
+
     try:
         response = requests.get(url)
         response.raise_for_status()

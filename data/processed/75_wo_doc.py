@@ -44,6 +44,7 @@ def task_func(df, fruits=None, days=None, seed=None, sales_lower_bound=1, sales_
     >>> plot.figure.show()
 
     """
+
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame")
     if not df.empty:

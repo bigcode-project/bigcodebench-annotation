@@ -40,6 +40,7 @@ def task_func(start_date, end_date, num_series, seed=None):
     2020-01-01        81        67        19
     2020-01-02        14        20        29
     """
+
     if seed is not None:
         random.seed(seed)
     start_date_dt = datetime.strptime(start_date, "%Y-%m-%d")

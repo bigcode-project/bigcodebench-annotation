@@ -29,6 +29,7 @@ def task_func(smtp_server, smtp_port, smtp_user, smtp_password, template_folder)
     >>> app.config['MAIL_USERNAME'] == 'user@example.com'
     True
     """
+
     app = Flask(__name__, template_folder=template_folder)
     app.config['MAIL_SERVER'] = smtp_server
     app.config['MAIL_PORT'] = smtp_port

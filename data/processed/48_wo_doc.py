@@ -32,6 +32,7 @@ def task_func(n, output_path=None):
     >>> print(timestamps)
     ['2013-07-06 20:56:46', '1977-07-29 23:34:23', '1971-09-14 11:29:44']
     """
+
     timestamps = []
     for _ in range(n):
         timestamp = random.randint(0, int(time.time()))

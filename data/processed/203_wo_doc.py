@@ -32,6 +32,7 @@ def task_func(input_data=None, smtp_server=SMTP_SERVER, smtp_port=SMTP_PORT, ema
     >>> task_func('{"recipient": "recipient@example.com", "names": ["Josie Smith", "Mugsy Dog Smith"]}', smtp=mock_smtp)
     ['Josie Smith', 'Mugsy Dog Smith']
     """
+
     if input_data is None:
         return []
     try:

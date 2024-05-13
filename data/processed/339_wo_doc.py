@@ -30,6 +30,7 @@ def task_func(req_data, secret_key):
     >>> isinstance(task_func({'another': 'data', 'key': 123}, secret_key), str)
     True
     """
+
     if not isinstance(req_data, dict):
         raise TypeError("req_data must be a dictionary")
     json_req_data = json.dumps(req_data)

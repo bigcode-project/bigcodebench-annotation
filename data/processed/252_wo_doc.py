@@ -29,6 +29,7 @@ def task_func(data, labels):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     fig, ax = plt.subplots()
     for series, label, color in zip_longest(data, labels, COLORS, fillvalue='black'):
         ax.plot(series, label=label, color=color)

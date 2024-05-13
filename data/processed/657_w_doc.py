@@ -28,6 +28,7 @@ def task_func(texts, stopwords=None):
     >>> model = task_func(texts)
     >>> vector = model.wv['python']
     """
+
     if stopwords is None:
         stopwords = nltk.corpus.stopwords.words('english')
     cleaned_texts = [ALPHANUMERIC.sub(' ', text).lower() for text in texts]

@@ -31,6 +31,7 @@ def task_func(directory):
     Raises:
     - The function would raise a ValueError if there are text file(s) that have invalid dictionary representation
     """
+
     path = os.path.join(directory, '*.txt')
     files = glob.glob(path)
     results = []

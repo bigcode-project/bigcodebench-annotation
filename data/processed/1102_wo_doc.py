@@ -26,6 +26,7 @@ def task_func(script_path: str) -> dict:
         'Stderr': 'Any errors here...'
     }
     '''
+
     start_time = datetime.now()
     process = subprocess.Popen(shlex.split(f"/usr/bin/Rscript --vanilla {script_path}"),
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)

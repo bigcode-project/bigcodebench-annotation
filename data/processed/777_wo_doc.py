@@ -23,6 +23,7 @@ def task_func(directory, pattern=r'^(.*?)-\d+\.zip$'):
     ('/tmp/backup/backup_20230827010101', [])
 
     """
+
     extracted_dirs = []
     for filename in os.listdir(directory):
         match = re.match(pattern, filename)

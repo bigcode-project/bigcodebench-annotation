@@ -34,6 +34,7 @@ def task_func(json_string):
     - The function is case-insensitive and treats words like "Hello" and "hello" as the same word.
     - If the JSON string is malformed or the "text" field is missing, an empty dictionary is returned.
     """
+
     try:
         data = json.loads(json_string)
         text = data.get('text', '')

@@ -26,6 +26,7 @@ def task_func(unix_timestamp, target_timezone):
     >>> task_func(unix_timestamp, target_timezone)
     '2020-12-31 19:00:00'
     """
+
     datetime_utc = datetime.utcfromtimestamp(unix_timestamp).replace(tzinfo=pytz.utc)
     datetime_in_target_timezone = datetime_utc.astimezone(pytz.timezone(target_timezone))
     formatted_datetime = datetime_in_target_timezone.strftime(DATE_FORMAT)

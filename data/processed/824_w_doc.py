@@ -22,6 +22,7 @@ def task_func(text):
     >>> task_func("Hello, world! This is a test.")
     (6, 3)
     """
+
     words = re.findall(r'\b\w+\b', text)
     punctuation_marks = [char for char in text if char in PUNCTUATION]
     return len(words), len(punctuation_marks)

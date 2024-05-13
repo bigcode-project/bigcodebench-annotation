@@ -23,6 +23,7 @@ def task_func(df):
     >>> print(coefficients)
     {'coefficients': [[-0.03353164387961974]], 'intercept': [0.5135976564010359]}
     """
+
     X = np.array(df['feature']).reshape(-1,1)  # Explicitly converting to numpy array and reshaping
     y = np.array(df['value']).reshape(-1,1)    # Explicitly converting to numpy array and reshaping
     model = LinearRegression().fit(X, y)

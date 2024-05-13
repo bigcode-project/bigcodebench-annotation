@@ -29,6 +29,7 @@ def task_func(rows=3, columns=2, seed=0):
     >>> print('Vh shape:', Vh.shape)
     Vh shape: (2, 2)
     """
+
     np.random.seed(seed)
     matrix = np.random.rand(rows, columns)
     U, s, Vh = svd(matrix)

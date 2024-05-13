@@ -40,6 +40,7 @@ def task_func(dir_path: str, predicates: list) -> dict:
     >>> task_func('/path/to/dir', ['is_dir', 'has_special_chars'])
     {'my_folder': {'is_dir': True, 'has_special_chars': False}, 'a_@Folder': {'is_dir': True, 'has_special_chars': True}}
     """
+
     predicate_functions = {
         "is_file": lambda x: x.is_file(),
         "is_dir": lambda x: x.is_dir(),

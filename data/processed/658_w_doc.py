@@ -36,6 +36,7 @@ def task_func(texts):
     >>> texts = ["Hello, world!", "Machine learning is great.", "Python is my favorite programming language."]
     >>> dtm = task_func(texts)
     """
+
     cleaned_texts = [ALPHANUMERIC.sub(' ', text).lower() for text in texts]
     tokenized_texts = [' '.join(word for word in text.split() if word not in STOPWORDS) for text in cleaned_texts]
     vectorizer = CountVectorizer()

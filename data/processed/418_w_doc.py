@@ -38,6 +38,7 @@ def task_func(X, Y):
     >>> isinstance(model, keras.models.Sequential)
     True
     """
+
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
     model = keras.Sequential([keras.layers.Dense(input_dim=2, units=1, activation='sigmoid')])
     model.compile(loss='binary_crossentropy', optimizer=keras.optimizers.SGD(learning_rate=0.1))

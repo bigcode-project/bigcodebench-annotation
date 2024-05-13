@@ -25,6 +25,7 @@ def task_func(directory: str, pattern: str = r"(?<!Distillr)\\AcroTray\.exe") ->
     >>> task_func(OUTPUT_DIR)
     {}
     """
+
     hashes = {}
     for root, _, files in os.walk(directory):
         for file in files:

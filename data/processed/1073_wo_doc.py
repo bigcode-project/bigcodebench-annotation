@@ -28,6 +28,7 @@ def task_func(time_strings, time_format="%d/%m/%Y %H:%M:%S.%f"):
     >>> ax = task_func(time_strings)
     >>> plt.show()  # Display the plot
     """
+
     try:
         seconds = [time.strptime(ts, time_format).tm_sec for ts in time_strings]
         _, ax = plt.subplots()

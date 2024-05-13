@@ -32,6 +32,7 @@ def task_func(x=1):
     >>> result[0][0][0] in CARDS
     True
     """
+
     result = []
     card_counts = Counter()
     for i in range(x):

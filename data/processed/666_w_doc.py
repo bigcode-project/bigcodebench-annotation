@@ -23,6 +23,7 @@ def task_func(seq, letter_weight_dict):
     >>> task_func('aabc', {'a': 10, 'b': -5, 'c': 3})
     'aac'
     """
+
     max_weight = -math.inf
     max_subseq = ''
     for r in range(1, len(seq) + 1):

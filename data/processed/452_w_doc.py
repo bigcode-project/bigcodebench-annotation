@@ -34,6 +34,7 @@ def task_func(n_samples=100, n_features=10, random_seed=None):
     >>> round(mse, 4)
     0.0113
     """
+
     X, y = datasets.make_regression(
         n_samples=n_samples, n_features=n_features, noise=0.1, random_state=random_seed
     )

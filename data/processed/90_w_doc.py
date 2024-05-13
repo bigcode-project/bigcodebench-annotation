@@ -32,6 +32,7 @@ def task_func(data, target, k):
     >>> task_func(data, target, k)
     [[7, 8], [14, 25]]
     """
+
     if not isinstance(k, int) or k < 0:
         raise ValueError("'k' must be a non-negative integer")
     RADIUS_EARTH_KM = 6371.0  # Radius of the Earth in kilometers

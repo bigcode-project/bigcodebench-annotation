@@ -36,6 +36,7 @@ def task_func(f_list):
     ...
     ValueError: The function should not be a lambda function.
     """
+
     func_info = []
     for f in f_list:
         if f.__name__ == "<lambda>":

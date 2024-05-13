@@ -28,6 +28,7 @@ def task_func(password, PREFIX="ME", SALT_LENGTH=16):
     >>> isinstance(hashed_password, str)
     True
     """
+
     if SALT_LENGTH < 0:
         raise ValueError
     salt = os.urandom(SALT_LENGTH)

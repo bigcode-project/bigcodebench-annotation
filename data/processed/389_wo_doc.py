@@ -29,6 +29,7 @@ def task_func(directory):
     >>> task_func(temp_dir)
     ['another_file_with_what.doc', 'hidden_what_in_name.whatever', 'file_with_like.txt']
     """
+
     pattern = re.compile(r'(like|what)', re.IGNORECASE)
     interesting_files = [file for file in os.listdir(directory) if pattern.search(file)]
     if not os.path.exists(os.path.join(directory, 'Interesting Files')):

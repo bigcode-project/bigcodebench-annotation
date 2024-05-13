@@ -28,6 +28,7 @@ def task_func(size=1000):
     >>> len(fig.axes[0].patches) > 10  # Check if there are histogram bars (patches) present
     True
     '''
+
     data = np.random.randn(size)
     mu, std = stats.norm.fit(data)
     bin_edges = np.histogram_bin_edges(data, bins='auto')

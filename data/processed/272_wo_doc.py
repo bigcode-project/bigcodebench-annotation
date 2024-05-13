@@ -27,6 +27,7 @@ def task_func():
     >>> server = http.server.HTTPServer(('127.0.0.1', 8080), handler)
     >>> server.serve_forever()
     """
+
     class PostRequestHandler(http.server.BaseHTTPRequestHandler):
         def do_POST(self):
             ctype, pdict = cgi.parse_header(self.headers.get('content-type'))

@@ -26,6 +26,7 @@ def task_func(filename, directory):
     >>> print(count)
     3
     """
+
     total_words = 0
     word_counts = Counter()
     for file_name in os.listdir(directory):

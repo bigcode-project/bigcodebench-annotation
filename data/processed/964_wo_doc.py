@@ -38,6 +38,7 @@ def task_func(source_directory: str, target_directory: str) -> int:
     >>> task_func('/path/to/source', '/path/to/target')
     2
     """
+
     converted_files = 0
     extensions = [".txt", ".docx", ".xlsx", ".csv"]
     if not os.path.exists(source_directory):

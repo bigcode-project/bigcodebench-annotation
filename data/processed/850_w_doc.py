@@ -31,6 +31,7 @@ def task_func(students, subjects, seed=None):
     1      Bob    98       52       34      61.333333
     2  Charlie    13        4       48      21.666667
     """
+
     if seed is not None:
         random.seed(seed)
     report_data = []

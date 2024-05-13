@@ -27,6 +27,7 @@ def task_func(df):
     >>> assert len(df) == 10
     >>> assert len(df.columns) == 3
     """
+
     regression = linregress(df['var1'], df['var2'])
     predictions = np.array(regression.slope) * np.array(df['var1']) + np.array(regression.intercept)
     df['predicted'] = pd.Series(predictions, index=df.index)

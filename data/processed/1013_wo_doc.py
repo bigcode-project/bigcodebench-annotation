@@ -32,6 +32,7 @@ def task_func(
     >>> task_func('/anotherpage', base_url='https://www.different.com', csv_file='other_links.csv')
     8
     """
+
     full_url = urljoin(base_url, url)
     response = requests.get(full_url)
     soup = BeautifulSoup(response.text, "html.parser")

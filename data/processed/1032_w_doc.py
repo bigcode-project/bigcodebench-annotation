@@ -52,6 +52,7 @@ def task_func(rows=1000, string_length=3):
     >>> ax.get_xlim()
     (0.0, 26.0)
     """
+
     data = ["".join(random.choices(LETTERS, k=string_length)) for _ in range(rows)]
     df = pd.DataFrame({"String": data})
     if df.empty:

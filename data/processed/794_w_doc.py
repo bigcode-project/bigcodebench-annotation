@@ -38,6 +38,7 @@ def task_func(length, random_seed=None):
     >>> print(string)
     ieqh]{[yng]by)a{rogubbb
     """
+
     random.seed(random_seed)
     BRACKETS = "(){}[]"
     return ''.join(random.choice(string.ascii_lowercase + BRACKETS) for _ in range(length))

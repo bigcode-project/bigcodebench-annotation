@@ -19,6 +19,7 @@ def task_func(filename):
     >>> task_func('file.csv')
     'file.csv'
     """
+
     try:
         with open(filename, 'r+') as file:
             reader = csv.reader(file)

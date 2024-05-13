@@ -26,6 +26,7 @@ def task_func(rows=3, columns=2, seed=42):
     array([[0., 1.],
            [1., 0.]])
     """
+
     np.random.seed(seed) # Ensure reproducibility for consistent outputs across different runs
     matrix = np.random.rand(rows, columns)
     scaler = MinMaxScaler()

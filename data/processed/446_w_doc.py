@@ -29,6 +29,7 @@ def task_func(n_samples=100, centers=3, n_features=2, random_seed=42):
     >>> ax
     <Axes: >
     """
+
     X, y = make_blobs(
         n_samples=n_samples,
         centers=centers,

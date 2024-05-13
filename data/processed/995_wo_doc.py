@@ -36,6 +36,7 @@ def task_func(file_path: str, plot_path: str) -> (float, float, str):
     >>> task_func("sample_data.csv", "output_plot.png")
     (25.5, 23.0, "output_plot.png")
     """
+
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"File {file_path} does not exist.")
     try:

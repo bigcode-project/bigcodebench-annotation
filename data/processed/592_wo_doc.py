@@ -35,6 +35,7 @@ def task_func(hours, output_dir=OUTPUT_DIR):
     >>> 'sensor_data.csv' in file_path  # Ensure the filename is correct
     True
     """
+
     FILE_PATH = os.path.join(output_dir, 'sensor_data.csv')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)

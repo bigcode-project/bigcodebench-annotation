@@ -27,6 +27,7 @@ def task_func(rows, columns, seed=None):
     >>> print(df.shape)
     (1, 1)
     """
+
     if seed is not None:
         np.random.seed(seed)
     matrix = np.random.rand(rows, columns)

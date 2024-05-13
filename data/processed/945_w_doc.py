@@ -30,6 +30,7 @@ def task_func(start_date='2016-01-01', periods=13, freq='WOM-2FRI', sales_data=N
     >>> task_func('2020-01-01', 5, 'M', [200, 300, 400, 500, 600])
     array([238.9, 226. , 213.1, 200.2, 187.3])
     """
+
     sales_data = np.random.randint(low=100, high=500, size=periods)
     date_range = pd.date_range(start=start_date, freq=freq, periods=periods)
     sales_df = pd.DataFrame({'Date': date_range, 'Sales': sales_data})

@@ -24,6 +24,7 @@ def task_func(file_path, output_dir=OUTPUT_DIR):
     Example:
     >>> task_func(os.path.join(OUTPUT_DIR, 'random_matrix.csv'))
     """
+
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
     matrix = pd.DataFrame(np.random.choice(LETTERS, (10, 10)))

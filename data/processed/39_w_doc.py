@@ -38,6 +38,7 @@ def task_func(data_matrix):
     >>> print(indices)
     []
     """
+
     means = np.mean(data_matrix, axis=1)
     population_mean = np.mean(data_matrix)
     _, p_value = ttest_1samp(means, population_mean)

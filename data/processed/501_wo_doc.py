@@ -34,6 +34,7 @@ def task_func(json_str, filename, sheet_name="sheet1"):
     True
     >>> os.remove('data.xls')
     """
+
     if not isinstance(json_str, (str, bytes, bytearray)):
         raise TypeError("json_str must be a string, bytes, or bytearray")
     try:

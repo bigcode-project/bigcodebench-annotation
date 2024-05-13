@@ -32,6 +32,7 @@ def task_func(dir_path, exe_pattern, execute_files=True):
     >>> task_func("C:\\SomeDir", r"(?<!Distillr)\\AcroTray\.exe", execute_files=False)
     []
     """
+
     results = []
     for dirpath, dirnames, filenames in os.walk(os.path.normpath(dir_path)):
         for filename in filenames:

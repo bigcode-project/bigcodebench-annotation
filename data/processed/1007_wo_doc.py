@@ -37,6 +37,7 @@ def task_func(url: str) -> pd.DataFrame:
     - It checks the HTTP response status and raises an HTTPError for unsuccessful status codes.
     - Directly converts the HTTP response to JSON and then to a DataFrame, without intermediate processing.
     """
+
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code

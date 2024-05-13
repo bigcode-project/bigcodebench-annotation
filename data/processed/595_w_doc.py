@@ -28,6 +28,7 @@ def task_func(n=10, total=100):
     >>> sum(sorted_nums) == 50
     True
     """
+
     nums = []
     while sum(nums) != total:
         nums = [random.randint(0, total) for _ in range(n)]

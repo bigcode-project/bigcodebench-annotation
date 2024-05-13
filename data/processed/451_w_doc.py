@@ -31,6 +31,7 @@ def task_func(n_components=2, N_SAMPLES=500, N_FEATURES=50, random_seed=None):
     >>> transformed.shape
     (500, 2)
     """
+
     np.random.seed(random_seed)  # Ensuring reproducibility
     X = np.random.rand(N_SAMPLES, N_FEATURES)
     pca = PCA(n_components=n_components, random_state=random_seed)

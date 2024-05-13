@@ -22,6 +22,7 @@ def task_func(date_str, from_tz, to_tz):
     >>> type(task_func('2022-10-22 11:59:59', 'UTC', 'America/Chicago'))
     <class 'int'>
     """
+
     from_tz_obj = pytz.timezone(from_tz)
     to_tz_obj = pytz.timezone(to_tz)
     given_date_naive = parse(date_str)

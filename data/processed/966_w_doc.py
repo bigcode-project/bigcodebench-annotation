@@ -40,6 +40,7 @@ def task_func(df: pd.DataFrame) -> pd.DataFrame:
     >>> fig
     <Figure size 640x480 with 1 Axes>
     """
+
     cumsum_df = df.cumsum()
     fig, ax = plt.subplots()
     cumsum_df.plot(kind="bar", ax=ax)

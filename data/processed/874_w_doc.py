@@ -33,6 +33,7 @@ def task_func(points):
     >>> task_func([(1, 2), (4), (-1.2, 4)])
     [3.605551275463989, 5.2]
     """
+
     distances = []
     for point1, point2 in zip_longest(points, points[1:]):
         if point2 is not None:

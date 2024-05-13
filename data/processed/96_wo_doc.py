@@ -33,6 +33,7 @@ def task_func(csv_file, csv_delimiter):
     >>> all(isinstance(pair, tuple) and len(pair) == 2 for pair in task_func('temp_data.csv', ','))
     True
     """
+
     words = []
     with open(csv_file, 'r') as f:
         reader = csv.reader(f, delimiter=csv_delimiter)

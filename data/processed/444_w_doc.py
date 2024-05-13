@@ -27,6 +27,7 @@ def task_func(n_points=100, random_seed=None):
     >>> type(plot)
     <class 'mpl_toolkits.mplot3d.axes3d.Axes3D'>
     """
+
     np.random.seed(random_seed)
     points = np.random.random((n_points, 3))
     fig = plt.figure()

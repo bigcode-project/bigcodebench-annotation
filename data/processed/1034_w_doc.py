@@ -34,6 +34,7 @@ def task_func(s1, s2):
     >>> edit_distance
     387.5590277622236
     """
+
     high_sales_categories = s1.index[(s1 > 200) & (s2 > 200)]
     if high_sales_categories.empty:
         return None, 0.0

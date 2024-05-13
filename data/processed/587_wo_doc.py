@@ -38,6 +38,7 @@ def task_func(file_path):
     >>> encrypted_key_file.endswith('.encrypted')
     True
     """
+
     (pub_key, priv_key) = rsa.newkeys(512)
     aes_key = os.urandom(32)
     iv = os.urandom(16)

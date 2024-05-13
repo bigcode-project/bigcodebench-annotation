@@ -42,6 +42,7 @@ def task_func(s1, s2, n_clusters=3):
 
    
     """
+
     if not isinstance(s1, pd.Series) or not isinstance(s2, pd.Series):
         raise ValueError("s1 and s2 must be pandas Series")
     if len(s1) != len(s2):

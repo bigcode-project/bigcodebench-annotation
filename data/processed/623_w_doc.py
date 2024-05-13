@@ -22,6 +22,7 @@ def task_func(L):
     Example:
     >>> ax = task_func([[1, 2, 3], [50, 60, 70], [100, 110, 120]])
     """
+
     N_CLUSTERS = 3
     data = list(chain(*L))
     data = np.array(data).reshape(-1, 1)

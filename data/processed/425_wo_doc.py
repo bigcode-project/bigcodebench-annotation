@@ -32,6 +32,7 @@ def task_func(image_path='image.jpg', histogram_path='histogram.png'):
     >>> histogram_axes.title.get_text()
     'Grayscale Histogram'
     """
+
     if not os.path.exists(image_path):
         raise FileNotFoundError(f"No image found at {image_path}")
     img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)

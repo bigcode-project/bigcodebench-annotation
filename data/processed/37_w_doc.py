@@ -34,6 +34,7 @@ def task_func(df, target_column):
     >>> print(model)
     RandomForestClassifier(random_state=42)
     """
+
     X = df.drop(target_column, axis=1)
     y = df[target_column]
     model = RandomForestClassifier(random_state=42).fit(X, y)

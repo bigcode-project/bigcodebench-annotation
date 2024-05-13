@@ -20,6 +20,7 @@ def task_func(page_title):
     Example:
     >>> ax = task_func('Python (programming language)')
     """
+
     try:
         text = wikipedia.page(page_title).content
     except Exception as e:

@@ -35,6 +35,7 @@ def task_func():
     3  a  a  d
     4  a  a  e
     """
+
     LETTERS = list(string.ascii_lowercase)
     combinations = list(itertools.product(LETTERS, repeat=3))
     df = pd.DataFrame(combinations, columns=["a", "b", "c"])

@@ -28,6 +28,7 @@ def task_func(df):
     >>> df_input = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7.0, np.nan, 9.0]], columns=["col1", "col2", "col3"])
     >>> zscore_output, plots = task_func(df_input)
     """
+
     df = df.fillna(df.mean(axis=0))
     df = df.apply(zscore)
     axes = df.hist(grid=False, bins=10, layout=(1, df.shape[1]))

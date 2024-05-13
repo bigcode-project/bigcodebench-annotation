@@ -29,6 +29,7 @@ def task_func(seed=42, image_size=(100, 100, 3), range_low=0, range_high=255):
     Example:
     >>> ax, image = task_func()
     """
+
     if range_low >= range_high:
         raise ValueError("range_low must be less than range_high.")
     random.seed(seed)

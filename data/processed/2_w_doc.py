@@ -27,6 +27,7 @@ def task_func(LETTERS):
     >>> type(sorted_dict['a'])  # Check type of values
     <class 'list'>
     """
+
     random_dict = {k: [random.randint(0, 100) for _ in range(random.randint(1, 10))] for k in LETTERS}
     sorted_dict = dict(sorted(random_dict.items(), key=lambda item: statistics.mean(item[1]), reverse=True))
     return sorted_dict

@@ -28,6 +28,7 @@ def task_func(L):
     >>> print(stats["mode"])
     1
     """
+
     mean = np.mean(L)
     median = np.median(L)
     mode = Counter(L).most_common(1)[0][0]

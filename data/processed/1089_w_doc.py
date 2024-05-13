@@ -28,6 +28,7 @@ def task_func(list_of_tuples):
     >>> print(category_counts)
     {'Fruits': 1, 'Vegetables': 1, 'Dairy': 1, 'Bakery': 1, 'Meat': 1}
     """
+
     numeric_values = [pair[0] for pair in list_of_tuples]
     categories = [pair[1] for pair in list_of_tuples]
     total_sum = np.sum(numeric_values)

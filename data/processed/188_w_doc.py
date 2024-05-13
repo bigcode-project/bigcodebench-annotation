@@ -35,6 +35,7 @@ def task_func(dic):
     >>> [0.0, 0.0] == result.location
     True
     """
+
     geolocator = Photon(user_agent="geoapiExercises")
     preprocessed_locations = []
     for location, value in dic.items():

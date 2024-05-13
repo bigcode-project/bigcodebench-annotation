@@ -26,6 +26,7 @@ def task_func(df, column, alpha):
     >>> print(task_func(df, 'Value', 0.05))
     True
     """
+
     mean_value = np.mean(df[column])
     df[column] = df[column] - mean_value
     if column not in df.columns:

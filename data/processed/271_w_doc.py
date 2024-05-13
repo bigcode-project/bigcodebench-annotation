@@ -28,6 +28,7 @@ def task_func(data_dict: dict, seed=0) -> dict:
     '8691a011016e0fba3c2b0b8a26e4c9c722975f1defe42f580ab55a9c97dfccf8'
 
     """
+
     random.seed(seed)
     SALT_LENGTH = 5
     data_dict.update(dict(a=1))

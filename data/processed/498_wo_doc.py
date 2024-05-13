@@ -37,6 +37,7 @@ def task_func(s, save_json, json_file_path):
     >>> task_func('<data><item>1</item><item>2</item></data>', save_json=True, json_file_path='data.json')
     # A JSON file 'data.json' will be created with the parsed XML data.
     """
+
     if not s.strip():  # Check for empty or whitespace-only string
         raise ValueError("The input XML string is empty or contains only whitespace.")
     my_dict = xmltodict.parse(s)

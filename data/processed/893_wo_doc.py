@@ -22,6 +22,7 @@ def task_func(logs: list):
             '2021-06-15 10:35:00 INFO: Backup completed successfully'])
     ([datetime.time(9, 45)], datetime.time(9, 45))
     """
+
     error_times = []
     total_time = 0
     for log in logs:

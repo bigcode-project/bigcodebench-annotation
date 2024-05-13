@@ -26,6 +26,7 @@ def task_func(db_name, table_name, csv_path="data.csv"):
     >>> task_func('/absolute/path/to/test.db', 'Orders', 'orders.csv')
     '/absolute/path/to/orders.csv'
     """
+
     try:
         conn = sqlite3.connect(db_name)
         df = pd.read_sql_query(f"SELECT * from {table_name}", conn)

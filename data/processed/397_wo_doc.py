@@ -33,6 +33,7 @@ def task_func(API_URL):
     ...     task_func('https://api.ipify.org?format=json')
     '192.168.1.1'
     """
+
     try:
         response = urllib.request.urlopen(API_URL)
         data = json.loads(response.read())

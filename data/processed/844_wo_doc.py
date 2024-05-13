@@ -50,6 +50,7 @@ def task_func(file_path, num_rows, random_seed=None):
         ['John Benjamin', '29', '8523 Rhonda Avenue, Rosemouth, HI 32166', 'masonjohn@example.org']
     ]
     """
+
     if num_rows < 0 or not isinstance(num_rows, int):
         raise ValueError('num_rows should be an integer >=0.')
     fake = Faker()

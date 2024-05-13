@@ -40,6 +40,7 @@ def task_func(df, group_col, value_col, group_name):
     True
     >>> plt.close()
     """
+
     group_data = df[df[group_col] == group_name]
     if group_data.empty:
         raise ValueError

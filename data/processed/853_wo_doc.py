@@ -26,6 +26,7 @@ def task_func(directory_path):
     >>> task_func('path_to_directory')
     {'txt': 2, 'jpg': 1, 'Invalid': 1}
     """
+
     summary = {}
     for filename in os.listdir(directory_path):
         if any(char in INVALID_CHARACTERS for char in filename):

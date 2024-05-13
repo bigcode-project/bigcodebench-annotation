@@ -37,6 +37,7 @@ def task_func():
         >>> all(df['X'].between(0, RANGE - 1)) and all(df['Y'].between(0, RANGE - 1))
         True
     """
+
     df = pd.DataFrame({
         'X': np.random.randint(0, RANGE, SIZE),
         'Y': np.random.randint(0, RANGE, SIZE)

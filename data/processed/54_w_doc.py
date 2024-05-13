@@ -27,6 +27,7 @@ def task_func(text):
     0         0   1       1         1     1      0
     1         1   0       1         1     1      1
     """
+
     sentences = re.split(r"\.\s*", text)
     sentences = [sentence for sentence in sentences if len(sentence.strip()) != 0]
     vectorizer = CountVectorizer()

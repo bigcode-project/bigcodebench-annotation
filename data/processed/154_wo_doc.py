@@ -28,6 +28,7 @@ def task_func(directory, file_pattern, suffix):
     >>> 'example_suff.txt' in task_func(r'dir', '*_suff.txt', '_suff')
     True  # This example assumes 'example_suff.txt' is in the directory and matches the pattern and suffix
     """
+
     os.chdir(directory)
     files = glob.glob(file_pattern)
     file_types = {}

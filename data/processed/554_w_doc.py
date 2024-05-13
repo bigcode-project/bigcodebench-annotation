@@ -32,6 +32,7 @@ def task_func(MIN_WORDS, MAX_WORDS, WORDS_POOL):
     >>> MIN_WORDS <= len(sentence.split()) <= MAX_WORDS
     True
     """
+
     sentence_length = np.random.randint(MIN_WORDS, MAX_WORDS + 1)
     first_half = [random.choice(WORDS_POOL) for _ in range(sentence_length // 2)]
     if sentence_length % 2 == 1:

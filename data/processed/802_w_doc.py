@@ -27,6 +27,7 @@ def task_func(dimension, seed=42):
     >>> print(flat_list)
     [52, 93, 15, 72, 61, 21, 83, 87, 75]
     """
+
     np.random.seed(seed)  # Ensure reproducible results
     if dimension <= 0:
         raise ValueError("The dimension must be a positive integer")

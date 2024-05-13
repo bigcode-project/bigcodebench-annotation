@@ -33,6 +33,7 @@ def task_func(csv_file_path, attribute, test_size=0.2, random_state=42):
     >>> print(predictions)
     [123.45, ..., 126.78]
     """
+
     df = pd.read_csv(csv_file_path)
     X = df.drop(columns=[attribute])
     y = df[attribute]

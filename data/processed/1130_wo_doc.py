@@ -24,6 +24,7 @@ def task_func(directory: str) -> str:
     >>> json_file = task_func("/path/to/directory")
     >>> print(f"Hashes saved at: {json_file}")
     """
+
     hash_dict = {}
     for root, dirs, files in os.walk(directory):
         for file in files:

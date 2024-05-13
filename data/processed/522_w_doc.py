@@ -35,6 +35,7 @@ def task_func(data):
     >>> ax.get_xticklabels()
     [Text(0, 0, 'Jane'), Text(1, 0, 'Joe'), Text(2, 0, 'John')]
     """
+
     if not data:
         return None
     combined_dict = {}

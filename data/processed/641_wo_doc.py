@@ -26,6 +26,7 @@ def task_func(pattern: str, directory: str, output_csv: str) -> pd.DataFrame:
     Example:
     >>> df = task_func(".*\.txt$", "/path/to/search", "matched_files.csv")
     """
+
     matched_paths = []
     for root, _, files in os.walk(directory):
         for file in files:

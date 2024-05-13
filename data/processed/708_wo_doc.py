@@ -25,6 +25,7 @@ def task_func(raw_string, filename, output_dir):
     >>> task_func('eyJrZXkiOiAiVmFsdWUifQ==', 'data', './output')
     './output/data.csv'
     """
+
     decoded_string = base64.b64decode(raw_string).decode('utf-8')
     data = json.loads(decoded_string)
     os.makedirs(output_dir, exist_ok=True)

@@ -33,6 +33,7 @@ def task_func(dataframe):
     >>> print(ax)
     Axes(0.125,0.11;0.775x0.77)
     """
+
     if dataframe.empty:
         raise ValueError("DataFrame is empty.")
     if not all(dataframe.dtypes.apply(lambda x: np.issubdtype(x, np.number))):

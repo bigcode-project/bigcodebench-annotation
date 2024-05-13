@@ -22,6 +22,7 @@ def task_func(text: str) -> dict:
     >>> print(count)
     {'sample': 1, 'text': 1, 'words': 1, 'repeated': 1}
     """
+
     words = re.findall(r'\b\w+\b', text)
     non_stopwords = [word for word in words if word.lower() not in set(stopwords.words('english'))]
     count = dict(Counter(non_stopwords))

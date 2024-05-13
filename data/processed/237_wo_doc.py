@@ -33,6 +33,7 @@ def task_func(data, save_plot=False, plot_path=None):
     array([[ 8.66025404e-01,  4.09680598e-17],
            [-8.66025404e-01,  4.09680598e-17]])
     """
+
     items, x_values, y_values, z_values = zip(*data)
     coordinates = np.array(list(zip(x_values, y_values, z_values)))
     pca = PCA(n_components=2)

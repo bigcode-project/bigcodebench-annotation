@@ -33,6 +33,7 @@ def task_func(mu=0, sigma=1, sample_size=1000, seed=0):
     >>> print(round(std, 3))
     0.987
     """
+
     np.random.seed(seed)
     sample = np.random.normal(mu, sigma, sample_size)
     fig, ax = plt.subplots()

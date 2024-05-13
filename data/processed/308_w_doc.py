@@ -36,6 +36,7 @@ def task_func(additional_fields = []):
            'Computer Science', 'Geography', 'Average Grade'],
           dtype='object')
     """
+
     FIELDS_ALL = FIELDS + additional_fields
     report_data = {field: [random.randint(0, 100) for _ in STUDENTS] for field in FIELDS_ALL}
     df = pd.DataFrame(report_data, index=STUDENTS)

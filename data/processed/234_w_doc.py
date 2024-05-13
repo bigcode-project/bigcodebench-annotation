@@ -31,6 +31,7 @@ def task_func(df):
     >>> ax.lines[0].get_xdata()[0]
     20
     """
+
     if not isinstance(df, pd.DataFrame):
         raise ValueError("The input df is not a DataFrame")
     df = df.drop_duplicates(subset='Name')

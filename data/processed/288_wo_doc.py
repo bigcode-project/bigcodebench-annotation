@@ -30,6 +30,7 @@ def task_func(directory_path: str) -> dict:
     >>> task_func(directory)
     {'name': 3, 'age': 3, 'address': 1}
     """
+
     key_counts = collections.defaultdict(int)
     for filename in os.listdir(directory_path):
         if filename.endswith('.json'):

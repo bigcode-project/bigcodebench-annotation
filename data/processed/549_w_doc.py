@@ -25,6 +25,7 @@ def task_func(df):
         >>> len(encoded_df) > 0  # The actual encoded string will vary
         True
     """
+
     df = pd.DataFrame(df)
     csv = df.to_csv(index=False)
     csv_bytes = csv.encode('utf-8')

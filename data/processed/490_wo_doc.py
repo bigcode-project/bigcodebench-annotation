@@ -25,6 +25,7 @@ def task_func(s, file_path):
     >>> result['school']['class']['student']
     'Emma'
     """
+
     my_dict = xmltodict.parse(s)
     with open(file_path, 'w') as json_file:
         json.dump(my_dict, json_file, indent=4)

@@ -28,6 +28,7 @@ def task_func(text_series):
     anoth exampl
 
     """
+
     stemmer = PorterStemmer()
     def process_text(text):
         text = re.sub('[^\sa-zA-Z0-9]', '', text).lower().strip()

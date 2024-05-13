@@ -33,6 +33,7 @@ def task_func(x, y):
     >>> isinstance(ax, plt.Axes), isinstance(Z, np.ndarray)
     (True, True)
     """
+
     if not isinstance(x, np.ndarray) or not isinstance(y, np.ndarray):
         raise TypeError("x and y must be numpy.ndarray")
     if x.size == 0 or y.size == 0:

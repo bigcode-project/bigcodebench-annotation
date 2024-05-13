@@ -41,6 +41,7 @@ def task_func(text):
     0  $hello          1
     1   $test          3
     """
+
     if not isinstance(text, str):
         raise ValueError("The input should be a string.")
     tk = nltk.WhitespaceTokenizer()

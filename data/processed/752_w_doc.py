@@ -54,6 +54,7 @@ def task_func(data, target_column, test_size=0.2, random_state = 0) -> float:
     >>> result
     1.0
     """
+
     if not isinstance(data, pd.DataFrame):
         raise ValueError("data should be a DataFrame.")
     if data.empty:

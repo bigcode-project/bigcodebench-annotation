@@ -42,6 +42,7 @@ def task_func(data):
     3  Christopher         -1.760916           0.000000
     4      Timothy         -0.238270           0.120482
     """
+
     items, counts, weights = zip(*data)
     counts_normalized = zscore(counts)
     scaler = MinMaxScaler()

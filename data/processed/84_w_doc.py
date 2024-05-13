@@ -37,6 +37,7 @@ def task_func(products, n_samples=100, sales_lower=50, sales_upper=200, profit_m
     1  Apple Watch   1123  308.078536
     4       iPhone    921  294.013887
     """
+
     np.random.seed(random_seed)
     if not products:
         return pd.DataFrame(columns=["Product", "Sales", "Profit"])

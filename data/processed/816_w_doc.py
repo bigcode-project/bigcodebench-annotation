@@ -31,6 +31,7 @@ def task_func():
         >>> print(rank_counts)  
         Counter({'Q': 2, '2': 1, '5': 1, '4': 1})
     """
+
     random.seed(42)
     hand = []
     for _ in range(5):

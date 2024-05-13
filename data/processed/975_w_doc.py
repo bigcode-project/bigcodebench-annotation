@@ -32,6 +32,7 @@ def task_func(rows, columns=["A", "B", "C", "D", "E"], seed=0) -> pd.DataFrame:
     0  0.548814  0.715189  0.602763  0.544883  0.423655
     1  0.645894  0.437587  0.891773  0.963663  0.383442
     """
+
     np.random.seed(seed)
     columns = sorted(list(set(columns)))
     data = np.random.rand(rows, len(columns))

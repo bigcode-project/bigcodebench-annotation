@@ -33,6 +33,7 @@ def task_func(image_path='image.jpg', threshold=128):
     >>> original_img_array.shape, binary_img_array.shape # ((image_height, image_width), (image_height, image_width))
     ((20, 20), (20, 20))
     """
+
     if not isinstance(threshold, int) or not (0 <= threshold <= 255):
         raise ValueError("Threshold must be an integer between 0 and 255.")
     if not os.path.exists(image_path):

@@ -19,6 +19,7 @@ def task_func(L):
     >>> task_func([[1,2,3],[4,5,6]])
     {'mean': 3.5, 'variance': 2.9166666666666665}
     """
+
     flattened = list(chain.from_iterable(L))
     mean = np.mean(flattened)
     variance = np.var(flattened)

@@ -20,6 +20,7 @@ def task_func(file_path, key):
     Example:
     >>> df = task_func('data.json', 'ele')
     """
+
     with open(file_path, 'r') as file:
         data = json.load(file)
     df = pd.DataFrame(data)

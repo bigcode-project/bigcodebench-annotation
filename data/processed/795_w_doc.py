@@ -25,6 +25,7 @@ def task_func(l):
     The square root of the sum of numeric elements: 3.872983346207417
     deque([3, 4, 5, 1, 2])
     """
+
     if not l:  # Handle empty list
         return deque()
     dq = deque(l)

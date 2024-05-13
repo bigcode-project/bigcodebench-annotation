@@ -28,6 +28,7 @@ def task_func(filename: str) -> pd.DataFrame:
         ...
     FileNotFoundError: No such file: 'nonexistent.csv'
     """
+
     if not os.path.exists(filename):
         raise FileNotFoundError(f"No such file: '{filename}'")
     if os.stat(filename).st_size == 0:

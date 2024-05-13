@@ -34,6 +34,7 @@ def task_func(mystrings, text):
     >>> type(ax)
     <class 'matplotlib.axes._axes.Axes'>
     """
+
     if not text:
         raise ValueError("text cannot be empty.")
     for word in mystrings:

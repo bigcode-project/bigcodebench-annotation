@@ -31,6 +31,7 @@ def task_func(temperatures):
         >>> type(ax)
         <class 'matplotlib.axes._axes.Axes'>
     """
+
     try:
         if temperatures.empty or not isinstance(temperatures, pd.DataFrame):
             raise ValueError("Input temperatures must be a non-empty pandas DataFrame.")
