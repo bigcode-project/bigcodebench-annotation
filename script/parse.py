@@ -4,16 +4,10 @@ import re
 import ast
 import json
 import zipfile
-import base64
 import shutil
 from glob import glob
 from pprint import pprint
 from tqdm import tqdm
-import folium
-import geopy
-import librosa
-import Crypto
-
 
 def extract_apis(code):
     tree = ast.parse(code)
@@ -306,8 +300,8 @@ def extract_content(file_path, rename_id=None, task_id=None):
         # get the nearest "def" before docstring_start
         function_name_start = content.rfind("def", 0, docstring_start)
         data["signature"] = " ".join(l.strip() for l in content[function_name_start:docstring_start].strip().splitlines())
-        data["prompt"] = content[:docstring_end + 3]
-        data["prompt_wo_doc"] = "\n".join(line for line in content[:docstring_start].strip().splitlines() if line)
+        data["prompt"] = content[:docstring_end + 3] + "\n"
+        data["prompt_wo_doc"] = "\n".join(line for line in content[:docstring_start].strip().splitlines() if line) + "\n"
         # print(data["prompt"])
         tree = ast.parse(content)
         function_end_line = None
@@ -414,7 +408,7 @@ def parse_docstring(docstring):
     return sections
 
 def reconstruct_problem(data):
-    return data["prompt"] + "\n" + data["clean_canonical_solution"] + "\n\n" + data["test"] + "\n"
+    return data["prompt"] + data["clean_canonical_solution"] + "\n\n" + data["test"] + "\n"
 
 def get_instruction_prompt(data):
     base = "Write a function called " + f'`{data["signature"]}` to: ' + " ".join(data["doc"]["description"])
@@ -423,7 +417,7 @@ def get_instruction_prompt(data):
     if data["doc"]["raises"]:
         base += "\nThe function should raise the exception for: " + " ".join(data["doc"]["raises"])
     base += "\nThe function should output with:\n    " +\
-        "\n    ".join(data["doc"]["returns"]) + "\nYou should start with:\n```\n" + data["prompt_wo_doc"] + "\n```"
+        "\n    ".join(data["doc"]["returns"]) + "\nYou should start with:\n```\n" + data["prompt_wo_doc"] + "```"
     return base
 
 def check_test_wo_doc(data):
