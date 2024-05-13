@@ -24,11 +24,11 @@ Levenshtein==0.25.0
 PyYAML==6.0.1
 wordninja==2.0.0
 Faker==20.1.0
-tensorflow
-wordcloud
-pytesseract
-chardet
-python-dateutil
+tensorflow==2.11.1
+wordcloud==1.9.3
+pytesseract==0.3.10
+chardet==5.2.0
+python-dateutil==2.9.0
 blake3==0.4.1
 dnspython==2.6.1
 flask==3.0.3
@@ -38,7 +38,7 @@ flask_restful==0.3.10
 flask_wtf==1.2.1
 folium==0.16.0
 geopy==2.4.1
-keras
+keras==2.11.0
 librosa==0.10.1
 mechanize==0.4.9
 prettytable==3.10.0
@@ -58,8 +58,8 @@ xmltodict==0.13.0
 python-Levenshtein-wheels
 gensim==4.3.2
 sympy==1.12
-pyfakefs
-textblob
+pyfakefs==5.4.1
+textblob==0.18.0
 docxtpl==0.11.5
 statsmodels==0.14.0
 pyquery==1.4.3
