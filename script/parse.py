@@ -411,7 +411,7 @@ def reconstruct_problem(data):
     return data["prompt"] + data["clean_canonical_solution"] + "\n\n" + data["test"] + "\n"
 
 def get_instruction_prompt(data):
-    base = "Write a function called " + f'`{data["signature"]}` to: ' + " ".join(data["doc"]["description"])
+    base = " ".join(data["doc"]["description"])
     if data["doc"]["notes"]:
         base += "\nNote that: " + " ".join(data["doc"]["notes"])
     if data["doc"]["raises"]:
