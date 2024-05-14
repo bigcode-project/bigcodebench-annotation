@@ -98,15 +98,17 @@ class TestCases(unittest.TestCase):
         self.assertIsInstance(result, np.ndarray)
         self.assertEqual(result.shape, (10, 2))
         # Test the return value
+        # Expected result (can have flipped signs)
+        expected = np.array([
+            [-7.79, 0.], [-6.06, 0.], [-4.33, 0.], [-2.6, 0.], [-0.87, 0.],
+            [0.87, 0.], [2.6, 0.], [4.33, 0.], [6.06, 0.], [7.79, 0.]
+        ])
+    
+        # Check if either the original or the sign-flipped version matches
+        flipped = -expected
         self.assertTrue(
-            np.allclose(
-                result, 
-                [
-                    [-7.79, 0.], [-6.06, 0.], [-4.33, -0.], [-2.6, -0.], [-0.87, -0.], 
-                    [0.87, 0.], [2.6, 0.], [4.33, 0.], [6.06, -0.], [7.79, 0.]
-                ], 
-                atol=0.1
-            )
+            np.allclose(result, expected, atol=0.1) or np.allclose(result, flipped, atol=0.1),
+            "The PCA results do not match the expected values considering possible sign flips."
         )
 
 

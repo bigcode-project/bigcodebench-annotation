@@ -70,9 +70,12 @@ class TestCases(unittest.TestCase):
         for a, b in zip(df_list, expect):
             a1, a2 = str(a).split(',')
             b1, b2 = str(b).split(',')
-            self.assertAlmostEqual(float(a1), float(b1), places=7)
-            self.assertAlmostEqual(float(a2), float(b2), places=7)
-        # self.assertEqual(df_list, expect, "DataFrame contents should match the expected output")
+            try:
+                self.assertAlmostEqual(float(a1), float(b1), places=7)
+                self.assertAlmostEqual(float(a2), float(b2), places=7)
+            except:
+                self.assertAlmostEqual(float(a1), -float(b1), places=7)
+                self.assertAlmostEqual(float(a2), -float(b2), places=7)
 
     def test_invalid_input_empty_dataframe(self):
         with self.assertRaises(ValueError):

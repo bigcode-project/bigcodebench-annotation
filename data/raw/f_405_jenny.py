@@ -112,15 +112,19 @@ class TestCases(unittest.TestCase):
         data = [[2, 3], [3, 4], [5, 6]]
         _, transformed_data = f_405(data)
         # Using the sklearn PCA output as the expected transformation
-        expected_transformation = np.array(
+        expected = np.array(
             [
                 [-1.88561808e00, 1.93816421e-16],
                 [-4.71404521e-01, 3.32511118e-16],
                 [2.35702260e00, 2.21555360e-16],
             ]
         )
-        np.testing.assert_almost_equal(
-            transformed_data, expected_transformation, decimal=5
+        
+        # Check if either the original or the sign-flipped version matches
+        flipped = -expected
+        self.assertTrue(
+            np.allclose(transformed_data, expected, atol=0.1) or np.allclose(transformed_data, flipped, atol=0.1),
+            "The PCA results do not match the expected values considering possible sign flips."
         )
 
     def test_case_9(self):

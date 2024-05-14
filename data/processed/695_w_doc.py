@@ -46,6 +46,10 @@ class TestCases(unittest.TestCase):
     def test_case_5(self):
         transformed_data = task_func([(-1, -1, -1), (0, 0, 0), (1, 1, 1)], 1)
         self.assertEqual(transformed_data.shape, (3, 1))
-        self.assertTrue(transformed_data[0][0] < 0)
         self.assertTrue(transformed_data[1][0] == 0)
-        self.assertTrue(transformed_data[2][0] > 0)
+        try:
+            self.assertTrue(transformed_data[0][0] < 0)
+            self.assertTrue(transformed_data[2][0] > 0)
+        except:
+            self.assertTrue(transformed_data[0][0] > 0)
+            self.assertTrue(transformed_data[2][0] < 0)

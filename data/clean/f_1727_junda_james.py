@@ -83,8 +83,12 @@ class TestCases(unittest.TestCase):
 
         # Assert each pair of tuples is approximately equal
         for actual, expected in zip(df_tuples, expect_tuples):
-            self.assertAlmostEqual(actual[0], expected[0], places=7, msg="DataFrame contents should match the expected output")
-            self.assertAlmostEqual(actual[1], expected[1], places=7, msg="DataFrame contents should match the expected output")
+            try:
+                self.assertAlmostEqual(actual[0], expected[0], places=7, msg="DataFrame contents should match the expected output")
+                self.assertAlmostEqual(actual[1], expected[1], places=7, msg="DataFrame contents should match the expected output")
+            except:
+                self.assertAlmostEqual(actual[0], -expected[0], places=7, msg="DataFrame contents should match the expected output")
+                self.assertAlmostEqual(actual[1], -expected[1], places=7, msg="DataFrame contents should match the expected output")
 
 def run_tests():
     """Run all tests for this function."""
