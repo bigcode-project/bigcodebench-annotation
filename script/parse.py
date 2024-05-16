@@ -417,7 +417,7 @@ def get_instruction_prompt(data):
     if data["doc"]["raises"]:
         base += "\nThe function should raise the exception for: " + " ".join(data["doc"]["raises"])
     base += "\nThe function should output with:\n    " +\
-        "\n    ".join(data["doc"]["returns"]) + "\nYou should start with:\n```\n" + data["prompt_wo_doc"] + "```"
+        "\n    ".join(data["doc"]["returns"]) + "\nYou should write self-contained code starting with:\n```\n" + data["prompt_wo_doc"] + "```"
     return base
 
 def check_test_wo_doc(data):
