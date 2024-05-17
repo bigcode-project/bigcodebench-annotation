@@ -22,29 +22,8 @@ def f_658(directory: str, pattern: str = r'^(.*?)-\d+\.csv$') -> list:
     - csv
 
     Example:
-    ```python
-    import re
-    import os
-    from pathlib import Path
-    import csv
-
-    def f_658(directory: str, pattern: str = r'^(.*?)-\d+\.csv$') -> list:
-        # Define the function body here...
-
-    # Create a test directory and some CSV files for testing
-    test_dir = 'test_dir'
-    os.makedirs(test_dir, exist_ok=True)
-    with open(os.path.join(test_dir, 'file1-123.csv'), 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(['A', 'B', 'C'])
-    with open(os.path.join(test_dir, 'file2-456.csv'), 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(['X', 'Y', 'Z'])
-
-    # Call the function for testing
-    new_files = f_658(test_dir)
-    print("New files created:", new_files)
-    ```
+    >>> f_658("/mnt/data/test_data")
+    ['Shan.csv', 'Shannon.csv']
     """
 
     file_dir = Path(directory)
