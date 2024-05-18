@@ -48,7 +48,7 @@ import tempfile
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Preparing sample JSON data for testing
-        self.base_tmp_dir = tempfile.gettempdir()
+        self.base_tmp_dir = tempfile.mkdtemp()
         self.test_data_folder = f"{self.base_tmp_dir}/test"
         os.makedirs(self.test_data_folder, exist_ok=True)
 
@@ -67,11 +67,10 @@ class TestCases(unittest.TestCase):
         write_json_file('invalid.json', invalid_json_data)
         write_json_file('empty.json', empty_json_data)
         write_json_file('non_dict_list.json', non_dict_list_json_data)
-        super(TestCases, self).setUp()
 
     def tearDown(self):
-        shutil.rmtree(self.test_data_folder)
-        super(TestCases, self).tearDown()
+        if os.path.exists(self.test_data_folder):
+            shutil.rmtree(self.test_data_folder)
 
     def test_case_1(self):
         file_path = os.path.join(self.test_data_folder, 'valid.json')

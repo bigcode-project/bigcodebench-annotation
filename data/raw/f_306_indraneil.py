@@ -86,11 +86,10 @@ class TestCases(unittest.TestCase):
 
         for dir_name in self.dest_dirs.keys():
             os.makedirs(dir_name, exist_ok=True)
-        return super().setUp()
 
     def tearDown(self):
-        shutil.rmtree(self.base_test_dir)
-        return super().tearDown()
+        if os.path.exists(self.base_test_dir):
+            shutil.rmtree(self.base_test_dir)
 
     def test_case_1(self):
         moved_file = f_306(

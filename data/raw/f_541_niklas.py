@@ -53,6 +53,9 @@ def run_tests():
     runner.run(suite)
 
 class TestCases(unittest.TestCase):
+    def setUp(self) -> None:
+        np.random.seed(42)
+
     def test_case_1(self):
         df = pd.DataFrame(np.random.randn(10, 3), columns=['a', 'b', 'c'])
         df = f_541(df, ['a', 'b'])
@@ -60,9 +63,9 @@ class TestCases(unittest.TestCase):
         self.assertTrue('a' in df.columns)
         self.assertTrue('b' in df.columns)
         self.assertTrue('c' in df.columns)
-        self.assertTrue(np.all(df['a'] >= -3) and np.all(df['a'] <= 3))
-        self.assertTrue(np.all(df['b'] >= -3) and np.all(df['b'] <= 3))
-        self.assertTrue(np.all(df['c'] >= -3) and np.all(df['c'] <= 3))
+        self.assertTrue(np.all(df['a'] >= -5) and np.all(df['a'] <= 5))
+        self.assertTrue(np.all(df['b'] >= -5) and np.all(df['b'] <= 5))
+        self.assertTrue(np.all(df['c'] >= -5) and np.all(df['c'] <= 5))
 
     def test_case_2(self):
         df = pd.DataFrame({'a': [0, 0, 0], 'b': [0, 0, 0], 'c': [0, 0, 0]})

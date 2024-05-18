@@ -108,11 +108,10 @@ class TestCases(unittest.TestCase):
         # Empty directory for testing
         empty_dir = os.path.join(self.test_dir, 'empty_dir')
         os.makedirs(empty_dir, exist_ok=True)
-        super(TestCases, self).setUp()
 
     def tearDown(self):
-        shutil.rmtree(self.test_dir)
-        super(TestCases, self).tearDown()
+        if os.path.exists(self.test_dir):
+            shutil.rmtree(self.test_dir)
 
     def test_with_target_string(self):
         """Test with files containing the target string."""
