@@ -87,11 +87,8 @@ class TestCases(unittest.TestCase):
                 else open(path, "x")
             ) as file:
                 file.write(content)
-        super().setUp()
     def tearDown(self):
         shutil.rmtree(f"{self.base_dir}")
-        super().tearDown()
-    
     def test_case_1(self):
         # Testing script1.py that should exit with code 0
         return_code = task_func(self.script_paths[0])

@@ -66,13 +66,14 @@ class TestCases(unittest.TestCase):
     def setUp(self):
         # Create a dummy image for testing
         np.random.seed(42)
-        self.dummy_img_path = os.path.join(tempfile.gettempdir(), 'test_image.jpg')
+        self.dummy_img_path = os.path.join(tempfile.mkdtemp(), 'test_image.jpg')
         dummy_img = np.random.randint(0, 255, (20, 20, 3), dtype=np.uint8)
         cv2.imwrite(self.dummy_img_path, dummy_img)
 
     def tearDown(self):
         # Cleanup the dummy image
-        os.remove(self.dummy_img_path)
+        if os.path.exists(self.dummy_img_path):
+            os.remove(self.dummy_img_path)
 
     def test_valid_input(self):
         def dummy_onpick(event):

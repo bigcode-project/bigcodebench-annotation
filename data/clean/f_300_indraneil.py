@@ -100,13 +100,12 @@ class TestCases(unittest.TestCase):
                 file.write(content)
             file_paths.append(file_path)
 
-        return super().setUp()
-    
+
     def tearDown(self):
         # Reset the test folders after each test
-        shutil.rmtree(self.base_tmp_dir, ignore_errors=True)
-        return super().tearDown()
-        
+        if os.path.exists(self.base_tmp_dir):
+            shutil.rmtree(self.base_tmp_dir, ignore_errors=True)
+
     def test_case_1(self):
         """Test basic functionality."""
         # Create some sample files in the source folder

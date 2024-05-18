@@ -48,7 +48,6 @@ class TestCases(unittest.TestCase):
     def tearDown(self) -> None:
         if os.path.exists(self.file_name):
             os.remove(self.file_name)
-        return super().tearDown()
     def test_case_1(self):
         # Test with n = 3
         self.file_name = task_func(3, self.file_name)

@@ -54,6 +54,7 @@ import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Input 1: Simple list of objects with integer values from 0 to 9
+        random.seed(1)
         obj_list = [Object(value=i) for i in range(10)]
         ax = task_func(obj_list, 'value')
         
@@ -65,6 +66,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(sum([p.get_height() for p in ax.patches]), len(obj_list), "Histogram data points do not match input list size.")
     def test_case_2(self):
         # Input 2: List of objects with random Gaussian values
+        random.seed(2)
         obj_list = [Object() for _ in range(100)]
         ax = task_func(obj_list, 'value', seed=77)
         
@@ -75,10 +77,11 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_ylabel(), 'Count', "Y-axis label is incorrect.")
         self.assertEqual(sum([p.get_height() for p in ax.patches]), len(obj_list), "Histogram data points do not match input list size.")
         # Check axis data
-        self.assertAlmostEqual(ax.get_xlim()[0], -2.57, delta=0.1, msg="X-axis lower limit is incorrect.")
+        self.assertAlmostEqual(ax.get_xlim()[0], -3.933336166652307, delta=0.1, msg="X-axis lower limit is incorrect.")
         
     def test_case_3(self):
         # Input 3: List of objects with fixed value
+        random.seed(3)
         obj_list = [Object(value=5) for _ in range(50)]
         ax = task_func(obj_list, 'value', seed=4)
         
@@ -106,6 +109,7 @@ class TestCases(unittest.TestCase):
         self.assertAlmostEqual(ax.get_ylim()[1], 0.05, msg="Y-axis limits are incorrect.", delta=0.01)
     def test_case_5(self):
         # Input 5: Large list of objects
+        random.seed(5)
         obj_list = [Object(value=random.gauss(0, 5)) for _ in range(1000)]
         ax = task_func(obj_list, 'value')
         

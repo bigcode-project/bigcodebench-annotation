@@ -45,7 +45,6 @@ import doctest
 class TestCases(unittest.TestCase):
     def tearDown(self) -> None:
         plt.close('all')
-        return super().tearDown()
 
     def test_case_1(self):
         # Test with a simple text, bigram (n=2) and top 2 n-grams

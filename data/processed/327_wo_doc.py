@@ -23,7 +23,7 @@ def task_func(file_path, regex_pattern=r'\(.+?\)|\w+|[\W_]+'):
     
     Example:
     >>> import tempfile
-    >>> temp_dir = tempfile.gettempdir()
+    >>> temp_dir = tempfile.mkdtemp()
     >>> file_path = os.path.join(temp_dir, 'data.csv')
     >>> with open(file_path, 'w', newline='') as file:
     ...     writer = csv.writer(file)
@@ -48,7 +48,7 @@ import doctest
 import tempfile
 from collections import Counter
 class TestCases(unittest.TestCase):
-    base_tmp_dir = tempfile.gettempdir()
+    base_tmp_dir = tempfile.mkdtemp()
     test_data_dir = f"{base_tmp_dir}/test"
     def setUp(self):
         self.csv_file_path = 'data.csv'

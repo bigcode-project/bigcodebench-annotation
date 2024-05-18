@@ -28,7 +28,7 @@ def task_func(data, save_plot=False, plot_path=None):
 
     Example:
     >>> import tempfile
-    >>> temp_dir = tempfile.gettempdir()
+    >>> temp_dir = tempfile.mkdtemp()
     >>> task_func([('A', 1, 1, 1), ('B', 2, 2, 2)], save_plot=True, plot_path=f"{temp_dir}/temp_plot.png")[0]
     array([[ 8.66025404e-01,  4.09680598e-17],
            [-8.66025404e-01,  4.09680598e-17]])

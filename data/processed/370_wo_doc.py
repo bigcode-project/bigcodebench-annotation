@@ -82,10 +82,9 @@ class TestCases(unittest.TestCase):
             json.dump(self.json_data1, file)
         with open(os.path.join(self.test_directory, "file2.json"), "w") as file:
             json.dump(self.json_data2, file)
-        super(TestCases, self).setUp()
     def tearDown(self):
-        shutil.rmtree(self.test_directory)
-        super(TestCases, self).tearDown()
+        if os.path.exists(self.test_directory):
+            shutil.rmtree(self.test_directory)
     def test_case_1(self):
         # Test with the sample directory created
         result = task_func(self.test_directory)

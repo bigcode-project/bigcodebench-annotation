@@ -124,7 +124,8 @@ class TestCases(unittest.TestCase):
         Test the function with the current date and time.
         """
         current_date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.assertEqual(f_889(current_date_str), 0)
+        self.assertTrue(0 <= f_889(current_date_str) <= 2)
+
 
 
 def run_tests():

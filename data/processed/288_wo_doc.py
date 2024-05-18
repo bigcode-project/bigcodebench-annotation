@@ -67,10 +67,9 @@ def setup_test_directory():
 class TestCases(unittest.TestCase):
     def setUp(self):
         setup_test_directory()
-        super().setUp()
     def tearDown(self):
-        shutil.rmtree(TEST_DIR_PATH)
-        super().tearDown()
+        if os.path.exists(TEST_DIR_PATH):
+            shutil.rmtree(TEST_DIR_PATH)
     def test_case_1(self):
         # Test with 5 JSON files containing various keys
         expected_result = {'name': 5, 'age': 2, 'address': 2, 'email': 2, 'title': 1}

@@ -52,12 +52,11 @@ class TestCases(unittest.TestCase):
         self.temp_dir = f"{self.base_tmp_dir}/test"
         if not os.path.exists(self.temp_dir):
             os.mkdir(self.temp_dir)
-        return super().setUp()
-    
+
     def tearDown(self) -> None:
-        shutil.rmtree(self.base_tmp_dir)
-        return super().tearDown()
-    
+        if os.path.exists(self.base_tmp_dir):
+            shutil.rmtree(self.base_tmp_dir)
+
     def test_case_1(self):
         # Test with the first sample directory
         input_text = {

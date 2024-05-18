@@ -60,10 +60,9 @@ class TestCases(unittest.TestCase):
                 f.write("Dummy content for testing.")
         if os.path.exists(os.path.join(self.test_directory, "Interesting Files")):
             shutil.rmtree(os.path.join(self.test_directory, "Interesting Files"))
-        super(TestCases, self).setUp()
     def tearDown(self):
-        shutil.rmtree(self.test_directory)
-        super(TestCases, self).tearDown()
+        if os.path.exists(self.test_directory):
+            shutil.rmtree(self.test_directory)
     def test_caae_1(self):
         """Test if only files with 'like' or 'what' in their names are moved."""
         expected_files = ["file_with_like.txt", "another_file_with_what.doc", "LIKE_in_caps.pdf", "hidden_what_in_name.whatever"]

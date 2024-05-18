@@ -22,7 +22,7 @@ def task_func(file_path: str, regex_pattern=r'\(.+?\)|\w') -> dict:
     
     Example:
     >>> import tempfile
-    >>> temp_dir = tempfile.gettempdir()
+    >>> temp_dir = tempfile.mkdtemp()
     >>> file_path = os.path.join(temp_dir, 'sample_data.json')
     >>> with open(file_path, 'w') as file:
     ...     json.dump({'content': 'This is a (sample) text with some (matches) and characters.'}, file)

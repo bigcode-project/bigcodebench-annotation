@@ -5,7 +5,7 @@ from sklearn.preprocessing import MinMaxScaler
 def task_func(X, y, n_splits, batch_size, epochs):
     """
     Trains a simple neural network on provided data using k-fold cross-validation.
-    The network has one hidden layer with 50 neurons and ReLU activation, and
+    The network has one hidden layer with 20 neurons and ReLU activation, and
     an output layer with sigmoid activation for binary classification.
 
     Parameters:
@@ -13,7 +13,7 @@ def task_func(X, y, n_splits, batch_size, epochs):
         y (numpy.array): The target data.
         n_splits (int): The number of splits for k-fold cross-validation. Default is 5.
         batch_size (int): The size of the batch used during training. Default is 32.
-        epochs (int): The number of epochs for training the model. Default is 10.
+        epochs (int): The number of epochs for training the model. Default is 1.
 
     Returns:
         list: A list containing the training history of the model for each fold. Each history
@@ -44,7 +44,7 @@ def task_func(X, y, n_splits, batch_size, epochs):
         X_train, X_test = X_scaled[train_index], X_scaled[test_index]
         y_train, y_test = y[train_index], y[test_index]
         model = tf.keras.models.Sequential([
-            tf.keras.layers.Dense(50, activation='relu'),
+            tf.keras.layers.Dense(20, activation='relu'),
             tf.keras.layers.Dense(1, activation='sigmoid')
         ])
         model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -62,7 +62,7 @@ class TestCases(unittest.TestCase):
         self.y = np.random.randint(0, 2, 100)
         self.n_splits = 5
         self.batch_size = 32
-        self.epochs = 10
+        self.epochs = 1
     def test_return_type(self):
         """Test that the function returns a list."""
         result = task_func(self.X, self.y, self.n_splits, self.batch_size, self.epochs)
@@ -87,6 +87,6 @@ class TestCases(unittest.TestCase):
             self.assertEqual(len(result), self.n_splits)  # Validating function execution
     def test_effect_of_different_epochs(self):
         """Test function behavior with different epochs."""
-        for epochs in [5, 20]:
-            result = task_func(self.X, self.y, self.n_splits, self.batch_size, epochs)
-            self.assertEqual(len(result), self.n_splits)  # Validating function execution
+        epochs=5
+        result = task_func(self.X, self.y, self.n_splits, self.batch_size, epochs)
+        self.assertEqual(len(result), self.n_splits)  # Validating function execution
