@@ -71,11 +71,9 @@ class TestCases(unittest.TestCase):
                 doc.add_paragraph(paragraph)
             doc.save(self.test_directory + file_name)
 
-        super(TestCases, self).setUp()
-
     def tearDown(self):
-        shutil.rmtree(self.test_directory)
-        super(TestCases, self).tearDown()
+        if os.path.exists(self.test_directory):
+            shutil.rmtree(self.test_directory)
 
     def read_docx_content(self, file_path):
         doc = Document(file_path)

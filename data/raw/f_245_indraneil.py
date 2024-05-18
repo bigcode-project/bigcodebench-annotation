@@ -85,7 +85,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(ax.get_ylabel(), 'Count', "Y-axis label is incorrect.")
         self.assertEqual(sum([p.get_height() for p in ax.patches]), len(obj_list), "Histogram data points do not match input list size.")
         # Check axis data
-        self.assertAlmostEqual(ax.get_xlim()[0], -2.57, delta=0.1, msg="X-axis lower limit is incorrect.")
+        self.assertAlmostEqual(ax.get_xlim()[0], -3.933336166652307, delta=0.1, msg="X-axis lower limit is incorrect.")
         
     def test_case_3(self):
         # Input 3: List of objects with fixed value

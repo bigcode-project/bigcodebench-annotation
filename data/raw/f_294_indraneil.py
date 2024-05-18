@@ -75,12 +75,10 @@ class TestCases(unittest.TestCase):
                     else open(os.path.join(self.test_directory, filename), 'x')
             ) as file:
                 file.write(content)
-        return super().setUp()
 
     def tearDown(self):
         if os.path.exists(self.test_directory):
             shutil.rmtree(self.test_directory)
-        return super().tearDown()
 
     def test_case_1(self):
         matched_files = f_294('.*hello.*', self.test_directory, self.extensions)
