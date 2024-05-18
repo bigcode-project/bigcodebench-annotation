@@ -57,7 +57,7 @@ class TestCases(unittest.TestCase):
 
     def setUp(self):
         # Set up the test file path
-        self.temp_dir = tempfile.gettempdir()
+        self.temp_dir = tempfile.mkdtemp()
         self.test_file_path = f"{self.temp_dir}/test_log.json"
     
     def tearDown(self):

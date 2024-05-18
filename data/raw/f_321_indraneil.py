@@ -48,7 +48,7 @@ import tempfile
 class TestCases(unittest.TestCase):
     def setUp(self):
         # Preparing sample JSON data for testing
-        self.base_tmp_dir = tempfile.gettempdir()
+        self.base_tmp_dir = tempfile.mkdtemp()
         self.test_data_folder = f"{self.base_tmp_dir}/test"
         os.makedirs(self.test_data_folder, exist_ok=True)
 

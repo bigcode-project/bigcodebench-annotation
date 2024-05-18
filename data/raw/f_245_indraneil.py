@@ -61,6 +61,7 @@ import doctest
 class TestCases(unittest.TestCase):
     def test_case_1(self):
         # Input 1: Simple list of objects with integer values from 0 to 9
+        random.seed(1)
         obj_list = [Object(value=i) for i in range(10)]
         ax = f_1238(obj_list, 'value')
         
@@ -73,6 +74,7 @@ class TestCases(unittest.TestCase):
 
     def test_case_2(self):
         # Input 2: List of objects with random Gaussian values
+        random.seed(2)
         obj_list = [Object() for _ in range(100)]
         ax = f_1238(obj_list, 'value', seed=77)
         
@@ -87,6 +89,7 @@ class TestCases(unittest.TestCase):
         
     def test_case_3(self):
         # Input 3: List of objects with fixed value
+        random.seed(3)
         obj_list = [Object(value=5) for _ in range(50)]
         ax = f_1238(obj_list, 'value', seed=4)
         
@@ -116,6 +119,7 @@ class TestCases(unittest.TestCase):
 
     def test_case_5(self):
         # Input 5: Large list of objects
+        random.seed(5)
         obj_list = [Object(value=random.gauss(0, 5)) for _ in range(1000)]
         ax = f_1238(obj_list, 'value')
         

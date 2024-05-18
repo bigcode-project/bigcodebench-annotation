@@ -54,7 +54,7 @@ class TestCases(unittest.TestCase):
 
     def setUp(self):
         self.extensions = ['*.txt', '*.md', '*.csv']
-        self.base_tmp_dir = tempfile.gettempdir()
+        self.base_tmp_dir = tempfile.mkdtemp()
         self.test_directory = f"{self.base_tmp_dir}/test/"
         os.makedirs(self.test_directory, exist_ok=True)
 
@@ -70,9 +70,9 @@ class TestCases(unittest.TestCase):
         # Write the sample data to files
         for filename, content in sample_files_data.items():
             with (
-                open(os.path.join(self.test_directory, filename), 'w')
-                if os.path.exists(os.path.join(self.test_directory, filename))
-                else open(os.path.join(self.test_directory, filename), 'x')
+                    open(os.path.join(self.test_directory, filename), 'w')
+                    if os.path.exists(os.path.join(self.test_directory, filename))
+                    else open(os.path.join(self.test_directory, filename), 'x')
             ) as file:
                 file.write(content)
         return super().setUp()
