@@ -463,9 +463,9 @@ def validate_doc_reqs(data):
 if __name__ == "__main__":
     shutil.rmtree("data/processed", ignore_errors=True)
     os.makedirs("data/processed", exist_ok=True)
-    with open("data/wild-code-bench.jsonl", "w") as f:
+    with open("data/BigCodeBench.jsonl", "w") as f:
         for i, file in enumerate(tqdm(sorted(glob("data/clean/*.py")))):
-            data = extract_content(file, f"task_func", f"WildCodeBench/{i}")
+            data = extract_content(file, f"task_func", f"BigCodeBench/{i}")
             if not validate_lib_num(data):
                 print(file.replace('clean/', 'raw/'), "Less than 2 libraries are used")
             if not validate_doc_example(data):
