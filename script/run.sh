@@ -1,15 +1,15 @@
-NAMES=(indraneil chien jenny wenhao niklas hanhu ratna simon ming zhihan james xiaoheng armel)
-rm -rf data/clean/*
-mkdir -p data/clean
-for name in "${NAMES[@]}"; do
-    # Copy all files for other names
-    cp data/raw/*"$name"*py data/clean/
-done
+# NAMES=(indraneil chien jenny wenhao niklas hanhu ratna simon ming zhihan james xiaoheng armel)
+# rm -rf data/clean/*
+# mkdir -p data/clean
+# for name in "${NAMES[@]}"; do
+#     # Copy all files for other names
+#     cp data/raw/*"$name"*py data/clean/
+# done
 
-flake8 data/clean/*.py --select=E9,F63,F7,F82 --show-source --statistics
-python script/parse.py
+# flake8 data/clean/*.py --select=E9,F63,F7,F82 --show-source --statistics
+# python script/parse.py
 
-gzip data/BigCodeBench.jsonl > data/BigCodeBench.jsonl.gz
+# gzip data/BigCodeBench.jsonl > data/BigCodeBench.jsonl.gz
 
 # # used for BigCodeBench evaluation
 # pip install -U bigcodebench
