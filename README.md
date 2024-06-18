@@ -1,3 +1,0 @@
-# Benchmarking Programming Agents for Realistic Function Calling
-
-WIP. Coming soon...
